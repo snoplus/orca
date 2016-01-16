@@ -62,6 +62,8 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
 
 @implementation ELLIEModel
 
+@synthesize tellieFireParameters;
+@synthesize tellieFibreMapping;
 @synthesize smellieRunSettings;
 @synthesize exampleTask;
 @synthesize smellieRunHeaderDocList;
@@ -157,6 +159,159 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSLog(@"Response from Tellie: %@\n",responseFromTellie);
 }
 
+-(void) loadTELLIEStaticsFromDB
+{
+    /*
+     Load current tellie channel calibration and patch map settings from telliedb.
+    */
+
+    NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+
+    // **********************************
+    // Load latest calibration constants
+    // **********************************
+    
+    // **********************************
+    // For testing on personal machine
+    //
+    NSString* parsUrlString = [NSString stringWithFormat:@"http://snoplus:PureTe->Dirac!=True@couch.snopl.us/telliedb/_design/tellieQuery/_view/fetchFireParameters?key=0"];
+    //NSString* parsUrlString = [NSString stringWithFormat:@"%@:%u/telliedb/_design/tellieQuery/_view/fetchFireParameters?key=0",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
+    //***********************************
+    NSString* webParsString = [parsUrlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    NSURL* parsUrl = [NSURL URLWithString:webParsString];
+    NSLog(@"Querying : %@\n",parsUrl);
+    
+    // Get data string from URL
+    NSError* parsDataError =  nil;
+    NSData* parsData = [NSData dataWithContentsOfURL:parsUrl
+                                         options:NSDataReadingMapped
+                                           error:&parsDataError];
+    if(parsDataError){
+        NSLog(@"@\n",parsDataError);
+    }
+    NSString* parsReturnStr = [[NSString alloc] initWithData:parsData encoding:NSUTF8StringEncoding];
+    // Format queried data to dictionary
+    NSError* parsDictError =  nil;
+    NSMutableDictionary* parsDict = [NSJSONSerialization JSONObjectWithData:[parsReturnStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&parsDictError];
+    if(!parsDictError){
+        NSLog(@"sucessful query\n");
+    }else{
+        NSLog(@"Error querying couchDB, please check the connection is correct %@\n",parsDictError);
+    }
+    [parsReturnStr release];
+    
+    NSMutableDictionary* fireParametersDoc =[[[parsDict objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"];
+    NSLog(@"%TELLIE fire parameters sucessfully loaded!\n");
+    self.tellieFireParameters = fireParametersDoc;
+    
+    // **********************************
+    // Load latest mapping doc.
+    // **********************************
+    // For testing on personal machine
+    //
+    NSString* mapUrlString = [NSString stringWithFormat:@"http://snoplus:PureTe->Dirac!=True@couch.snopl.us/telliedb/_design/tellieQuery/_view/fetchCurrentMapping?key=0"];
+    //NSString* parsUrlString = [NSString stringWithFormat:@"%@:%u/telliedb/_design/tellieQuery/_view/fetchCurrentMapping?key=0",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
+    //***********************************
+    NSString* webMapString = [mapUrlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    NSURL* mapUrl = [NSURL URLWithString:webMapString];
+    NSLog(@"Querying : %@\n",mapUrl);
+    
+    // Get data string from URL
+    NSError* mapDataError =  nil;
+    NSData* mapData = [NSData dataWithContentsOfURL:mapUrl
+                                            options:NSDataReadingMapped
+                                              error:&mapDataError];
+    if(mapDataError){
+        NSLog(@"%@\n",mapDataError);
+    }
+    NSString* mapReturnStr = [[NSString alloc] initWithData:mapData encoding:NSUTF8StringEncoding];
+    // Format queried data to dictionary
+    NSError* mapDictError =  nil;
+    NSMutableDictionary* mapDict = [NSJSONSerialization JSONObjectWithData:[mapReturnStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&mapDictError];
+    if(!mapDictError){
+        NSLog(@"sucessful query\n");
+    }else{
+        NSLog(@"Error querying couchDB, please check the connection is correct %@\n",mapDictError);
+    }
+    [mapReturnStr release];
+    
+    NSMutableDictionary* mappingDoc =[[[mapDict objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"];
+    NSLog(@"TELLIE mapping document sucessfully loaded!\n");
+    self.tellieFibreMapping = mappingDoc;
+}
+
+-(NSMutableDictionary*) returnTellieFireCommands:(NSString*)fibreName withNPhotons:(NSUInteger)photons withFireFrequency:(NSUInteger)frequency withNPulses:(NSUInteger)pulses
+{
+    /*
+     Calculate the tellie fire commands given certain input parameters
+     
+     //NEED TO ADD FIBRE DELAY & TRIGGER DELAY
+    */
+    NSNumber* tellieChannel = [self calcTellieChannelForFibre:fibreName];
+    NSNumber* pulseWidth = [self calcTellieChannelPulseSettings:[tellieChannel integerValue] withNPhotons:photons withFireFrequency:frequency];
+    float pulseSeparation = (1./frequency)*1000; // TELLIE accepts pulse rate in ms
+
+    NSMutableDictionary* settingsDict = [NSMutableDictionary dictionaryWithCapacity:7];
+    [settingsDict setValue:tellieChannel forKey:@"channel"];
+    [settingsDict setValue:pulseWidth forKey:@"pulse_width"];
+    [settingsDict setValue:[NSNumber numberWithFloat:pulseSeparation] forKey:@"pulse_rate"];
+    [settingsDict setValue:[NSNumber numberWithInteger:pulses] forKey:@"number_of_shots"];
+    //Static settings
+    [settingsDict setValue:[NSNumber numberWithInteger:16385] forKey:@"pulse_height"];
+    [settingsDict setValue:[NSNumber numberWithInteger:0] forKey:@"fibre_delay"];
+    [settingsDict setValue:[NSNumber numberWithInteger:0] forKey:@"trigger_delay"];
+    NSLog(@"Tellie settings dict sucessfully created!\n");
+    return settingsDict;
+}
+
+
+-(NSNumber*) calcTellieChannelPulseSettings:(NSUInteger)channel withNPhotons:(NSUInteger)photons withFireFrequency:(NSUInteger)frequency
+{
+    /*
+     Calculate the pulse width settings required to return a given intenstity from a specified channel, at a specified rate.
+    */
+    if(frequency != 1000){
+        //10Hz frequency calibrations not complete.
+        [NSException raise:@"Variable exception" format:@"The passed frequency != 1000Hz"];
+    }
+
+    float a = [[[[self.tellieFireParameters objectForKey:[NSString stringWithFormat:@"Channel_%d",channel]] objectForKey:@"Pars_1kHz"] objectAtIndex:0] floatValue];
+    float b = [[[[self.tellieFireParameters objectForKey:[NSString stringWithFormat:@"Channel_%d",channel]] objectForKey:@"Pars_1kHz"] objectAtIndex:1] floatValue];
+    float c = [[[[self.tellieFireParameters objectForKey:[NSString stringWithFormat:@"Channel_%d",channel]] objectForKey:@"Pars_1kHz"] objectAtIndex:2] floatValue];
+
+    float floatPulseWidth = (-sqrt(-4*a*c + b*b + 4*c*photons)-b) / (2*c);
+    NSNumber* pulseWidth = [NSNumber numberWithFloat:floatPulseWidth];
+    NSLog(@"IPW setting calculated as: %d\n",[pulseWidth intValue]);
+    return pulseWidth;
+}
+
+-(NSNumber*) calcTellieChannelForFibre:(NSString*)fibre
+{
+    /*
+     Use patch pannel map loaded from the telliedb to map a given fibre to the correct tellie channel.
+    */
+    if(self.tellieFibreMapping == nil){
+        NSException* e = [NSException
+                          exceptionWithName:@"EmptyFibreMappingProperty"
+                          reason:@"*** Fibre map has not been loaded from couchdb - you need to call loadTellieStaticsFromDB"
+                          userInfo:nil];
+        @throw e;
+    } else if(![[self.tellieFibreMapping objectForKey:@"fibres"] containsObject:fibre]){
+        NSString* reasonStr = [NSString stringWithFormat:@"*** Fibre map does not include a reference to fibre: %@",fibre];
+        NSException* eFibre = [NSException
+                               exceptionWithName:@"FibreNotPatched"
+                               reason:reasonStr
+                               userInfo:nil];
+        @throw eFibre;
+    }
+    NSUInteger fibreIndex = [[self.tellieFibreMapping objectForKey:@"fibres"] indexOfObject:fibre];
+    NSUInteger channelInt = [[[self.tellieFibreMapping objectForKey:@"channels"] objectAtIndex:fibreIndex] integerValue];
+    NSNumber* channel = [NSNumber numberWithInt:channelInt];
+    NSLog(@"Fibre: %@ corresponds to tellie channel %d\n",fibre, channelInt);
+    return channel;
+}
+
 -(void) fireTellieFibreMaster:(NSMutableDictionary*)fireCommands
 {
     /*
@@ -191,8 +346,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         NSLog(@"Pulse by pulse delay is too small. Setting to 0.1");
         pulseByPulseDelay = 0.1;
     }
-    else if (pulseByPulseDelay > 25.0)
-    {
+    else if (pulseByPulseDelay > 25.0){
         NSLog(@"Pulse by pulse delay is too small. Setting to 25.0");
         pulseByPulseDelay = 25.0;
     }
@@ -290,11 +444,19 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     //Initialise the SNOPModel
     SNOPModel* aSnotModel = [objs objectAtIndex:0];
-    
-	return [ORCouchDB couchHost:[aSnotModel orcaDBIPAddress]
+    /*
+    //Commented out for testing
+    return [ORCouchDB couchHost:[aSnotModel orcaDBIPAddress]
                            port:[aSnotModel orcaDBPort]
                        username:[aSnotModel orcaDBUserName]
                             pwd:[aSnotModel orcaDBPassword]
+                       database:aCouchDb
+                       delegate:aSnotModel];
+    */
+    return [ORCouchDB couchHost:@"http://couch.snopl.us"
+                           port:[aSnotModel orcaDBPort]
+                       username:@"snoplus"
+                            pwd:@"PureTe->Dirac!=True"
                        database:aCouchDb
                        delegate:aSnotModel];
 }
@@ -473,6 +635,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSArray*  objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     runControl = [objs3 objectAtIndex:0];
     
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    
     NSString* docType = [NSMutableString stringWithFormat:@"tellie_run"];
     NSMutableArray* subRunArray = [NSMutableArray arrayWithCapacity:10];
     
@@ -486,7 +651,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     self.tellieRunDoc = runDocDict;
     
-    [[self orcaDbRefWithEntryDB:self withDB:@"tellie"] addDocument:runDocDict tag:kTellieRunDocumentAdded];
+    [[aSnotModel orcaDbRefWithEntryDB:self withDB:@"telliedb"] addDocument:runDocDict tag:kTellieRunDocumentAdded];
     
     //wait for main thread to receive acknowledgement from couchdb
     NSDate* timeout = [NSDate dateWithTimeIntervalSinceNow:2.0];
@@ -556,7 +721,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     //check to see if run is offline or not
     if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
-        [[self orcaDbRefWithEntryDB:self withDB:@"tellie"]
+        [[self orcaDbRefWithEntryDB:self withDB:@"telliedb"]
                             updateDocument:runDocDict
                                 documentId:[runDocDict objectForKey:@"_id"]
                                        tag:kTellieRunDocumentUpdated];
