@@ -218,10 +218,18 @@ mtcStatusDataAvailable = _mtcStatusDataAvailable,
 mtcStatusNumEventsInMem = _mtcStatusNumEventsInMem,
 resetFifoOnStart = _resetFifoOnStart;
 
+/* #define these variables for now. Eventually we need to add fields
+ * to the GUI, but Javi is working on the SNOPModel now */
+#define MTC_HOST @"sbc.sp.snolab.ca"
+#define MTC_PORT 4001
+
 
 - (id) init //designated initializer
 {
     self = [super init];
+
+    /* initialize our connection to the MTC server */
+    mtc = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
 	
     [[self undoManager] disableUndoRegistration];
 	[self setTriggerName:@"Trigger"];
@@ -238,6 +246,7 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (void) dealloc
 {
+    [mtc release];
     [triggerGroup release];
     [defaultFile release];
     [lastFile release];
@@ -760,71 +769,22 @@ resetFifoOnStart = _resetFifoOnStart;
 }
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{        
-    if(![[self adapter] controllerCard]){
-		[NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
-    }
-    
-    //----------------------------------------------------------------------------------------
-    // first add our description to the data description
-    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORMTCModel"];
-    
-/*
-    dataTakers = [[triggerGroup allObjects] retain];	//cache of data takers.
-    
-    NSEnumerator* e = [dataTakers objectEnumerator];
-    id obj;
-    while(obj = [e nextObject]){
-		[obj runTaskStarted:aDataPacket userInfo:userInfo];
-    }
-*/
-	
+{
     if ([[userInfo objectForKey:@"doinit"] boolValue]) {
-        if([self adapterIsSBC]){
-            //moved to ORMTCReadout::Start
-            //[self clearGlobalTriggerWordMask];
-            //[self zeroTheGTCounter];
-            //[self setGTCrateMask];
-            //[self setSingleGTWordMask: uLongDBValue(kGtMask)];
-        }
-        else {
-            [self clearGlobalTriggerWordMask];
-            [self zeroTheGTCounter];
-            [self setGTCrateMask];
-            [self setSingleGTWordMask: uLongDBValue(kGtMask)];
-        }
+        /* cold start */
+        [self clearGlobalTriggerWordMask];
+        [self zeroTheGTCounter];
+        [self setGTCrateMask];
+        [self setSingleGTWordMask: uLongDBValue(kGtMask)];
         [self setResetFifoOnStart:YES];
-    }
-    else {
-        //soft start
+    } else {
+        /* soft start, how do we know if it is an auto run start? */
         [self setResetFifoOnStart:NO];
     }
 }
 
-//**************************************************************************************
-// Function:	TakeData
-// Description: Read data from a card From Mac. IfSBC is used, then this routine is NOT used.
-//**************************************************************************************
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    NSString* errorLocation = @"";
-    
-    @try {
-		//errorLocation = @"Reading Status Reg";
-		//do something to see if the fecs need to be read out.
-		//if((statusReg & kTrigger1EventMask)){
-		//OK finally go out and read all the data takers scheduled to be read out with a trigger 1 event.
-		//errorLocation = @"Reading Children";
-		//[self _readOutChildren:dataTakers1 dataPacket:aDataPacket  useParams:YES withGTID:gtid isMSAMEvent:isMSAMEvent];
-		//}
-		
-	}
-	@catch(NSException* localException) {
-		NSLogError(@"",@"Mtc Error",errorLocation,nil);
-		[self incExceptionCount];
-		[localException raise];
-	}
-	
 }
 
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -836,32 +796,17 @@ resetFifoOnStart = _resetFifoOnStart;
         runControl = [objs objectAtIndex:0];
         if ([runControl nextRunWillQuickStart]) {
             //keep it running
-        }
-        else {
-            if([self adapterIsSBC]){
-                @try {
-                    //[self clearGlobalTriggerWordMask];
-                    [self tellReadoutSBC:kSNOMtcTellReadoutHardEnd];
-                }
-                @catch (NSException *exception) {
-                    NSLog(@"MTCD clear trigger mask at the end of a run failed.\n");
-                }
-            }
-            else {
-                @try {
-                    [self clearGlobalTriggerWordMask];
-                }
-                @catch (NSException *exception) {
-                    NSLog(@"MTCD clear trigger mask at the end of a run failed.\n");
-                }
+        } else {
+            @try {
+                [self clearGlobalTriggerWordMask];
+            } @catch (NSException *exception) {
+                NSLog(@"MTCD clear trigger mask at the end of a run failed.\n");
             }
         }
-    }
-    else {
+    } else {
         @try {
             [self clearGlobalTriggerWordMask];
-        }
-        @catch (NSException *exception) {
+        } @catch (NSException *exception) {
         NSLog(@"MTCD clear trigger mask at the end of a run failed.\n");
         }
     }
@@ -870,15 +815,6 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-/*
-    NSEnumerator* e = [dataTakers objectEnumerator];
-    id obj;
-    while(obj = [e nextObject]){
-		[obj runTaskStopped:aDataPacket userInfo:userInfo];
-    }
-	
-    [dataTakers release];
-*/
 }
 
 - (void) saveReadOutList:(NSFileHandle*)aFile
@@ -977,6 +913,9 @@ resetFifoOnStart = _resetFifoOnStart;
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
+	
+    /* initialize our connection to the MTC server */
+    mtc = [[RedisClient alloc] initWithHostname:MTC_HOST withPort:MTC_PORT];
 	
     [[self undoManager] disableUndoRegistration];
     [self setESumViewType:	[decoder decodeIntForKey:		@"ORMTCModelESumViewType"]];
@@ -1114,33 +1053,23 @@ resetFifoOnStart = _resetFifoOnStart;
     return reg[anIndex].regName;
 }
 
-- (unsigned long) read:(int)aReg
+- (uint32_t) read:(int)aReg
 {
-	unsigned long theValue = 0;
+	uint32_t theValue = 0;
 	@try {
-		[[self adapter] readLongBlock:&theValue
-							atAddress:[self baseAddress]+reg[aReg].addressOffset
-							numToRead:1
-						   withAddMod:reg[aReg].addressModifier
-						usingAddSpace:reg[aReg].addressSpace];
-	}
-	@catch(NSException* localException) {
+        theValue = [mtc intCommand:"mtcd_read %d", reg[aReg].addressOffset];
+	} @catch(NSException* localException) {
 		NSLog(@"Couldn't read the MTC %@!\n",reg[aReg].regName);
 		[localException raise];
 	}
 	return theValue;
 }
 
-- (void) write:(int)aReg value:(unsigned long)aValue
+- (void) write:(uint32_t)aReg value:(uint32_t)aValue
 {
 	@try {
-		[[self adapter] writeLongBlock:&aValue
-							 atAddress:[self baseAddress]+reg[aReg].addressOffset
-							numToWrite:1
-							withAddMod:reg[aReg].addressModifier
-						 usingAddSpace:reg[aReg].addressSpace];
-	}
-	@catch(NSException* localException) {
+        [mtc okCommand:"mtcd_write %d %d", reg[aReg].addressOffset, aValue];
+	} @catch(NSException* localException) {
 		NSLog(@"Couldn't write %d to the MTC %@!\n",aValue,reg[aReg].regName);
 		[localException raise];
 	}
@@ -2138,18 +2067,7 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (void) loadMTCXilinx
 {
-	NSData* theData = [NSData dataWithContentsOfFile:[self xilinxFilePath]];
-	if(![theData length]){
-		NSLog(@"Couldn't open the MTC Xilinx file %@!\n",[self xilinxFilePath]);
-		[NSException raise:@"Couldn't open Xilinx File" format:	@"%@",[self xilinxFilePath]];	
-	}
-	
-	if([self adapterIsSBC]){
-		[self loadXilinxUsingSBC:theData];
-	}
-	else {
-		[self loadXilinxUsingLocalAdapter:theData];
-	}
+    [mtc okCommand:"load_xilinx"];
 }
 
 - (void) setTubRegister

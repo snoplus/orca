@@ -26,6 +26,8 @@
 #import "ORDataTaker.h"
 #import "VME_eCPU_Config.h"
 #import "SBC_Config.h"
+#import "RedisClient.h"
+#include <stdint.h>
 
 @class ORMTC_DB;
 @class ORReadOutList;
@@ -85,6 +87,8 @@
     BOOL _mtcStatusDataAvailable;
     unsigned long _mtcStatusNumEventsInMem;
     BOOL _resetFifoOnStart;
+
+    RedisClient *mtc;
 }
 
 @property (nonatomic,assign) BOOL isPulserFixedRate;
@@ -200,8 +204,8 @@
 - (BOOL) adapterIsSBC;
 - (short) getNumberRegisters;
 - (NSString*) getRegisterName:(short) anIndex;
-- (unsigned long) read:(int)aReg;
-- (void) write:(int)aReg value:(unsigned long)aValue;
+- (uint32_t) read:(uint32_t)aReg;
+- (void) write:(uint32_t)aReg value:(uint32_t)aValue;
 - (void) setBits:(int)aReg mask:(unsigned long)aMask;
 - (void) clrBits:(int)aReg mask:(unsigned long)aMask;
 - (unsigned long) getMTC_CSR;
