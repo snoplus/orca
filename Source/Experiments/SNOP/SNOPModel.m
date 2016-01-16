@@ -104,10 +104,7 @@ mtcConfigDoc = _mtcConfigDoc;
 ECA_pattern_number = _ECA_pattern_number,
 ECA_type = _ECA_type,
 ECA_tslope_pattern = _ECA_tslope_pattern,
-ECA_subrun_time = _ECA_subrun_time,
-ECA_coarse_delay = _ECA_coarse_delay,
-ECA_fine_delay = _ECA_fine_delay,
-ECA_pedestal_width = _ECA_pedestal_width;
+ECA_subrun_time = _ECA_subrun_time;
 
 #pragma mark ¥¥¥Initialization
 
@@ -1110,9 +1107,6 @@ ECA_pedestal_width = _ECA_pedestal_width;
         [self addGlobalVariable:@1 withName:@"eca_type" withValue:[self ECA_type]];
         [self addGlobalVariable:@2 withName:@"tslope_pattern" withValue:[self ECA_tslope_pattern]];
         [self addGlobalVariable:@3 withName:@"sub_run_time" withValue:[self ECA_subrun_time]];
-        [self addGlobalVariable:@4 withName:@"coarse_delay" withValue:[self ECA_coarse_delay]];
-        [self addGlobalVariable:@5 withName:@"fine_delay" withValue:[self ECA_fine_delay]];
-        [self addGlobalVariable:@6 withName:@"pedestal_width" withValue:[self ECA_pedestal_width]];
     }
     
     //Clean script pointer

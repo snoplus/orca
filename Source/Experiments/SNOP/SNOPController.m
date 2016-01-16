@@ -1058,9 +1058,6 @@ smellieRunFile;
     [ECAtypePopUpButton setEnabled:!locked && !runInProgress];
     [TSlopePatternTextField setEnabled:!locked && !runInProgress];
     [subTimeTextField setEnabled:!locked && !runInProgress];
-    [coarseDelayTextField setEnabled:!locked && !runInProgress];
-    [fineDelayTextField setEnabled:!locked && !runInProgress];
-    [pedestalWidthTextField setEnabled:!locked && !runInProgress];
     [standardRunPopupMenu setEnabled:!locked && !runInProgress];
     [standardRunSaveButton setEnabled:!locked && !runInProgress];
     [standardRunLoadButton setEnabled:!locked && !runInProgress];
@@ -1092,23 +1089,11 @@ smellieRunFile;
     value = [NSNumber numberWithInt:[subTimeTextField intValue]];
     //NSLog(@"Set sub_run_time to %i \n", [value intValue]);
     [model setECA_subrun_time:value];
-    value = [NSNumber numberWithInt:[coarseDelayTextField intValue]];
-    //NSLog(@"Set coarse_delay to %i \n", [value intValue]);
-    [model setECA_coarse_delay:value];
-    value = [NSNumber numberWithInt:[fineDelayTextField intValue]];
-    //NSLog(@"Set fine_delay to %i \n", [value intValue]);
-    [model setECA_fine_delay:value];
-    value = [NSNumber numberWithInt:[pedestalWidthTextField intValue]];
-    //NSLog(@"Set pedestal_width to %i \n", [value intValue]);
-    [model setECA_pedestal_width:value];
     
     [ECApatternCheckBox setBackgroundColor:[NSColor greenColor]];
     [ECAtypeCheckBox setBackgroundColor:[NSColor greenColor]];
     [subTimeTextField setBackgroundColor:[NSColor greenColor]];
     [TSlopePatternTextField setBackgroundColor:[NSColor greenColor]];
-    [coarseDelayTextField setBackgroundColor:[NSColor greenColor]];
-    [fineDelayTextField setBackgroundColor:[NSColor greenColor]];
-    [pedestalWidthTextField setBackgroundColor:[NSColor greenColor]];
     
     //[self pushvaluestomodel];
     // Ship the global variables to the ORCA script
@@ -1122,12 +1107,6 @@ smellieRunFile;
         [subTimeTextField setBackgroundColor:[NSColor orangeColor]];
     if( [ [model ECA_tslope_pattern] intValue ] != [TSlopePatternTextField intValue] )
         [TSlopePatternTextField setBackgroundColor:[NSColor orangeColor]];
-    if( [ [model ECA_coarse_delay] intValue ] != [coarseDelayTextField intValue] )
-        [coarseDelayTextField setBackgroundColor:[NSColor orangeColor]];
-    if( [ [model ECA_fine_delay] intValue ] != [fineDelayTextField intValue] )
-        [fineDelayTextField setBackgroundColor:[NSColor orangeColor]];
-    if( [ [model ECA_pedestal_width] intValue ] != [pedestalWidthTextField intValue] )
-        [pedestalWidthTextField setBackgroundColor:[NSColor orangeColor]];
     if( [ [model ECA_pattern_number] intValue ] != [ECApatternPopUpButton indexOfSelectedItem] + 1)
         [ECApatternCheckBox setBackgroundColor:[NSColor orangeColor]];
     if( [ [model ECA_type] intValue ] != [ECAtypePopUpButton indexOfSelectedItem] + 1)

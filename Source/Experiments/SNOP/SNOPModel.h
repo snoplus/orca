@@ -110,9 +110,6 @@
     NSNumber *_ECA_type;
     NSNumber *_ECA_tslope_pattern;
     NSNumber *_ECA_subrun_time;
-    NSNumber *_ECA_coarse_delay;
-    NSNumber *_ECA_fine_delay;
-    NSNumber *_ECA_pedestal_width;
     ORScriptIDEModel *SR_script;
     ORRunModel* runControl;
     
@@ -158,9 +155,6 @@
 @property (nonatomic,copy) NSNumber *ECA_type;
 @property (nonatomic,copy) NSNumber *ECA_tslope_pattern;
 @property (nonatomic,copy) NSNumber *ECA_subrun_time;
-@property (nonatomic,copy) NSNumber *ECA_coarse_delay;
-@property (nonatomic,copy) NSNumber *ECA_fine_delay;
-@property (nonatomic,copy) NSNumber *ECA_pedestal_width;
 
 - (void) initSmellieRunDocsDic;
 - (void) initOrcaDBConnectionHistory;

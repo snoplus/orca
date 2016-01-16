@@ -113,9 +113,6 @@
     IBOutlet NSTextField *ECAtypeCheckBox;
     IBOutlet NSTextField *TSlopePatternTextField;
     IBOutlet NSTextField *subTimeTextField;
-    IBOutlet NSTextField *coarseDelayTextField;
-    IBOutlet NSTextField *fineDelayTextField;
-    IBOutlet NSTextField *pedestalWidthTextField;
     IBOutlet NSButton *loadValuesButton;
     
     IBOutlet NSComboBox *standardRunPopupMenu;

@@ -15,7 +15,6 @@
                 <outlet property="captureStateButton" destination="383" id="416"/>
                 <outlet property="cardCheckView" destination="1000" id="1002"/>
                 <outlet property="clearButton" destination="2609" id="2612"/>
-                <outlet property="coarseDelayTextField" destination="hcE-3B-jIR" id="GlQ-m5-yxt"/>
                 <outlet property="currentRunNumber" destination="3752" id="3779"/>
                 <outlet property="currentRunType" destination="3753" id="3780"/>
                 <outlet property="currentStatus" destination="3733" id="3781"/>
@@ -30,7 +29,6 @@
                 <outlet property="elapsedTimeField" destination="1256" id="1264"/>
                 <outlet property="emergyencyStopEnabled" destination="3988" id="3992"/>
                 <outlet property="esumhi" destination="3708" id="3860"/>
-                <outlet property="fineDelayTextField" destination="lR3-7y-AvN" id="azV-hN-pMF"/>
                 <outlet property="globalRunTypesMatrix" destination="3935" id="3978"/>
                 <outlet property="globalxl3Mode" destination="4194" id="4216"/>
                 <outlet property="hardwareCheckView" destination="822" id="823"/>
@@ -57,7 +55,6 @@
                 <outlet property="newMaintainenceRunButton" destination="3913" id="3924"/>
                 <outlet property="orcaDBIPAddressPU" destination="2683" id="2962"/>
                 <outlet property="owln" destination="3714" id="3861"/>
-                <outlet property="pedestalWidthTextField" destination="OF4-7M-JD2" id="kEF-Ko-lDA"/>
                 <outlet property="pollingStatus" destination="3998" id="4000"/>
                 <outlet property="primaryAdcClassNamePopup" destination="901" id="1223"/>
                 <outlet property="primaryColorAxisLogCB" destination="1149" id="1225"/>
@@ -1593,60 +1590,6 @@
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                 </textFieldCell>
                                                             </textField>
-                                                            <textField verticalHuggingPriority="750" id="hcE-3B-jIR">
-                                                                <rect key="frame" x="132" y="92" width="96" height="22"/>
-                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" enabled="NO" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="center" title="170" drawsBackground="YES" id="JAu-iE-h9x">
-                                                                    <font key="font" metaFont="system"/>
-                                                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                </textFieldCell>
-                                                                <connections>
-                                                                    <action selector="ECACheckValues:" target="-2" id="t8m-Sn-I6x"/>
-                                                                </connections>
-                                                            </textField>
-                                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="O2h-YN-Lnk">
-                                                                <rect key="frame" x="43" y="95" width="85" height="17"/>
-                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Coarse delay" id="8s2-u2-hK1">
-                                                                    <font key="font" metaFont="system"/>
-                                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                </textFieldCell>
-                                                            </textField>
-                                                            <textField verticalHuggingPriority="750" id="lR3-7y-AvN">
-                                                                <rect key="frame" x="132" y="51" width="96" height="22"/>
-                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" enabled="NO" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="center" title="255" drawsBackground="YES" id="gBn-J6-MVJ">
-                                                                    <font key="font" metaFont="system"/>
-                                                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                </textFieldCell>
-                                                                <connections>
-                                                                    <action selector="ECACheckValues:" target="-2" id="xXx-sT-lxo"/>
-                                                                </connections>
-                                                            </textField>
-                                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="SLH-9c-iVP">
-                                                                <rect key="frame" x="61" y="54" width="67" height="17"/>
-                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Fine delay" id="NRg-qc-DLj">
-                                                                    <font key="font" metaFont="system"/>
-                                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                </textFieldCell>
-                                                            </textField>
-                                                            <textField verticalHuggingPriority="750" id="OF4-7M-JD2">
-                                                                <rect key="frame" x="132" y="12" width="96" height="22"/>
-                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" enabled="NO" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="center" title="40" drawsBackground="YES" id="KaU-9B-otG">
-                                                                    <font key="font" metaFont="system"/>
-                                                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                </textFieldCell>
-                                                                <connections>
-                                                                    <action selector="ECACheckValues:" target="-2" id="UCy-v6-Lxu"/>
-                                                                </connections>
-                                                            </textField>
                                                             <textField verticalHuggingPriority="750" id="aEA-58-gqr">
                                                                 <rect key="frame" x="280" y="245" width="15" height="15"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -1663,15 +1606,6 @@
                                                                     <font key="font" metaFont="system"/>
                                                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                </textFieldCell>
-                                                            </textField>
-                                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="RoC-Vz-4xd">
-                                                                <rect key="frame" x="32" y="17" width="96" height="17"/>
-                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Pedestal width" id="ShS-mk-Rbl">
-                                                                    <font key="font" metaFont="system"/>
-                                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                 </textFieldCell>
                                                             </textField>
                                                             <popUpButton verticalHuggingPriority="750" id="i3g-ic-RZW">
