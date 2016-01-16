@@ -1061,7 +1061,9 @@ smellieRunFile;
     [coarseDelayTextField setEnabled:!locked && !runInProgress];
     [fineDelayTextField setEnabled:!locked && !runInProgress];
     [pedestalWidthTextField setEnabled:!locked && !runInProgress];
-    [pulserRateTextField setEnabled:!locked && !runInProgress];
+    [standardRunPopupMenu setEnabled:!locked && !runInProgress];
+    [standardRunSaveButton setEnabled:!locked && !runInProgress];
+    [standardRunLoadButton setEnabled:!locked && !runInProgress];
     
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
@@ -1099,10 +1101,6 @@ smellieRunFile;
     value = [NSNumber numberWithInt:[pedestalWidthTextField intValue]];
     //NSLog(@"Set pedestal_width to %i \n", [value intValue]);
     [model setECA_pedestal_width:value];
-    value = [NSNumber numberWithInt:[pulserRateTextField intValue]];
-    //NSLog(@"Set pulser_rate to %i \n", [value intValue]);
-    [model setECA_pulser_rate:value];
-    
     
     [ECApatternCheckBox setBackgroundColor:[NSColor greenColor]];
     [ECAtypeCheckBox setBackgroundColor:[NSColor greenColor]];
@@ -1111,7 +1109,6 @@ smellieRunFile;
     [coarseDelayTextField setBackgroundColor:[NSColor greenColor]];
     [fineDelayTextField setBackgroundColor:[NSColor greenColor]];
     [pedestalWidthTextField setBackgroundColor:[NSColor greenColor]];
-    [pulserRateTextField setBackgroundColor:[NSColor greenColor]];
     
     //[self pushvaluestomodel];
     // Ship the global variables to the ORCA script
@@ -1121,8 +1118,6 @@ smellieRunFile;
 
 - (IBAction) ECACheckValues:(id)sender {
     
-    if( [ [model ECA_pulser_rate] intValue ] != [pulserRateTextField intValue] )
-        [pulserRateTextField setBackgroundColor:[NSColor orangeColor]];
     if( [ [model ECA_subrun_time] intValue ] != [subTimeTextField intValue] )
         [subTimeTextField setBackgroundColor:[NSColor orangeColor]];
     if( [ [model ECA_tslope_pattern] intValue ] != [TSlopePatternTextField intValue] )
@@ -1138,6 +1133,21 @@ smellieRunFile;
     if( [ [model ECA_type] intValue ] != [ECAtypePopUpButton indexOfSelectedItem] + 1)
         [ECAtypeCheckBox setBackgroundColor:[NSColor orangeColor]];
     
+}
+
+//General tools
+- (IBAction)loadStandardRunFromDB:(id)sender {
+    [model loadStandardRun:[standardRunPopupMenu objectValueOfSelectedItem]];
+}
+
+- (IBAction)saveStandardRunToDB:(id)sender {
+    [model saveStandardRun:[standardRunPopupMenu objectValueOfSelectedItem]];
+}
+
+- (IBAction)addNewStandardRun:(id)sender {
+    if ([standardRunPopupMenu indexOfItemWithObjectValue:[standardRunPopupMenu stringValue]] == NSNotFound) {
+        [standardRunPopupMenu addItemWithObjectValue:[standardRunPopupMenu stringValue]];
+    }
 }
 
 

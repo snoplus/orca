@@ -116,11 +116,11 @@
     IBOutlet NSTextField *coarseDelayTextField;
     IBOutlet NSTextField *fineDelayTextField;
     IBOutlet NSTextField *pedestalWidthTextField;
-    IBOutlet NSTextField *pulserRateTextField;
     IBOutlet NSButton *loadValuesButton;
     
-    NSTextField *ECApulserRateTFAction;
-
+    IBOutlet NSComboBox *standardRunPopupMenu;
+    IBOutlet NSButton *standardRunSaveButton;
+    IBOutlet NSButton *standardRunLoadButton;
     
 }
 

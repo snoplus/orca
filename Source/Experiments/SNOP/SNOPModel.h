@@ -113,7 +113,6 @@
     NSNumber *_ECA_coarse_delay;
     NSNumber *_ECA_fine_delay;
     NSNumber *_ECA_pedestal_width;
-    NSNumber *_ECA_pulser_rate;
     ORScriptIDEModel *SR_script;
     ORRunModel* runControl;
     
@@ -162,7 +161,6 @@
 @property (nonatomic,copy) NSNumber *ECA_coarse_delay;
 @property (nonatomic,copy) NSNumber *ECA_fine_delay;
 @property (nonatomic,copy) NSNumber *ECA_pedestal_width;
-@property (nonatomic,copy) NSNumber *ECA_pulser_rate;
 
 - (void) initSmellieRunDocsDic;
 - (void) initOrcaDBConnectionHistory;
@@ -240,6 +238,8 @@
 //Standard runs functions
 -(void) loadVariablesInScript:(NSString*)userscriptname;
 -(void) addGlobalVariable:(NSNumber*)varindex withName:(NSString*)varname withValue:(NSNumber*)varvalue;
+-(void) loadStandardRun:(NSString*)runTypeName;
+-(void) saveStandardRun:(NSString*)runTypeName;
 
 @end
 
