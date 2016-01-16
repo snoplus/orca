@@ -189,18 +189,11 @@ kPEDCrateMask
 @end
 
 @interface ORMTCModel (SBC)
-- (void) loadXilinxUsingSBC:(NSData*) theData;
 - (void) fireMTCPedestalsFixedTimeSBC;
 - (void) stopMTCPedestalsFixedTimeSBC;
 - (void) enableSingleShotMTCPedestalsFixedTimeSBC;
 - (unsigned long) singleShotMTCPedestalsFixedTimeSBC:(unsigned long) pedestalCount withDelay:(unsigned long) usecDelay;
-- (void) loadTheMTCADacsUsingSBC;
 - (void) tellReadoutSBC:(unsigned int) cmd;
-@end
-
-@interface ORMTCModel (LocalAdapter)
-- (void) loadXilinxUsingLocalAdapter:(NSData*) theData;
-- (void) loadTheMTCADacsUsingLocalAdapter;
 @end
 
 @implementation ORMTCModel
@@ -915,7 +908,7 @@ resetFifoOnStart = _resetFifoOnStart;
     self = [super initWithCoder:decoder];
 	
     /* initialize our connection to the MTC server */
-    mtc = [[RedisClient alloc] initWithHostname:MTC_HOST withPort:MTC_PORT];
+    mtc = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
 	
     [[self undoManager] disableUndoRegistration];
     [self setESumViewType:	[decoder decodeIntForKey:		@"ORMTCModelESumViewType"]];
@@ -1065,7 +1058,7 @@ resetFifoOnStart = _resetFifoOnStart;
 	return theValue;
 }
 
-- (void) write:(uint32_t)aReg value:(uint32_t)aValue
+- (void) write:(int)aReg value:(uint32_t)aValue
 {
 	@try {
         [mtc okCommand:"mtcd_write %d %d", reg[aReg].addressOffset, aValue];
@@ -1075,14 +1068,14 @@ resetFifoOnStart = _resetFifoOnStart;
 	}
 }
 
-- (void) setBits:(int)aReg mask:(unsigned long)aMask
+- (void) setBits:(int)aReg mask:(uint32_t)aMask
 {
 	unsigned long old_value = [self read:aReg];
 	unsigned long new_value = (old_value & ~aMask) | aMask;
 	[self write:aReg value:new_value];
 }
 
-- (void) clrBits:(int)aReg mask:(unsigned long)aMask
+- (void) clrBits:(int)aReg mask:(uint32_t)aMask
 {
 	unsigned long old_value = [self read:aReg];
 	unsigned long new_value = (old_value & ~aMask);
@@ -2050,13 +2043,69 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (void) loadTheMTCADacs
 {
+	//-------------- variables -----------------
 
-	if([self adapterIsSBC]){
-		[self loadTheMTCADacsUsingSBC];
-		//[self loadTheMTCADacsUsingLocalAdapter];
+	short	index, bitIndex, dacIndex;
+	unsigned short	dacValues[14];
+	unsigned long   aValue = 0;
+
+
+	//-------------- variables -----------------
+
+	@try {
+		
+		// STEP 3: load the DAC values from the database into dacValues[14]
+		for (index = 0; index < 14 ; index++){
+			dacValues[index] = [self dacValueByIndex:index];
+		}
+		
+		// STEP 4: Set DACSEL in Register 2 high[in hardware it's inverted -- i.e. it is set low]
+		[self write:kMtcDacCntReg value:MTC_DAC_CNT_DACSEL];
+		
+		// STEP 5: now parallel load the 16bit word into the serial shift register
+		// STEP 5a: the first 4 bits are loaded zeros 
+		aValue = 0UL;
+		for (index = 0; index < 4 ; index++){
+			
+			// data bit, with DACSEL high, clock low
+			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
+			
+			// clock high
+			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL | MTC_DAC_CNT_DACCLK];
+			
+			// clock low
+			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
+		}
+		
+		//STEP 5b:  now build the word and load the next 12 bits, load MSB first
+		for (bitIndex = 11; bitIndex >= 0 ; bitIndex--){
+			
+			aValue = 0UL;
+			
+			for (dacIndex = 0; dacIndex < 14 ; dacIndex++){
+				
+				if ( dacValues[dacIndex] & (1UL << bitIndex) )
+					aValue |= (1UL << dacIndex);
+			}
+			
+			// data bit, with DACSEL high, clock low
+			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
+			
+			// clock high
+			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL | MTC_DAC_CNT_DACCLK];
+			
+			// clock low
+			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
+		}
+		
+		// STEP 5: Set DACSEL in Register 2 low[in hardware it's inverted -- i.e. it is set high], with all other bits low
+		[self write:kMtcDacCntReg value:0];
+		NSLog(@"Loaded the MTC/A DACs\n");
+		
 	}
-	else {
-		[self loadTheMTCADacsUsingLocalAdapter];
+	@catch(NSException* localException) {
+		NSLog(@"Could not load the MTC/A DACs!\n");		
+		[localException raise];
 	}
 }
 
@@ -2110,70 +2159,25 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (void) mtcatResetMtcat:(unsigned char) mtcat
 {
-    if([self adapterIsSBC]){
-        long errorCode = 0;
-        SBC_Packet aPacket;
-        aPacket.cmdHeader.destination = kSNO;
-        aPacket.cmdHeader.cmdID = kSNOMtcatResetMtcat;
-        aPacket.cmdHeader.numberBytesinPayload	= 1*sizeof(long);
-        
-        unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
-        payloadPtr[0] = mtcat;
-        
-        @try {
-            [[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
-            unsigned long* responsePtr = (unsigned long*) aPacket.payload;
-            errorCode = responsePtr[0];
-            if(errorCode){
-                @throw [NSException exceptionWithName:@"Reset MTCA+ error" reason:@"SBC and/or LabJack failed.\n" userInfo:nil];
-            }
-        }
-        @catch(NSException* e) {
-            NSLog(@"SBC failed reset MTCA+ num: %d\n", mtcat);
-            NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
-            //@throw e;
-        }
+    @try {
+        [mtc okCommand:"reset_mtca %d", mtcat];
+    } @catch (NSException *e) {
+        NSLog(@"mtcatResetMtcat: %@\n", e.reason);
     }
-	else {
-        NSLog(@"Not implemented. Requires SBC with LabJack\n");
-	}
 }
 
 
 - (void) mtcatResetAll
 {
-    if([self adapterIsSBC]){
-        long errorCode = 0;
-        SBC_Packet aPacket;
-        aPacket.cmdHeader.destination = kSNO;
-        aPacket.cmdHeader.cmdID = kSNOMtcatResetAll;
-        aPacket.cmdHeader.numberBytesinPayload	= 1*sizeof(long);
-        
-        unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
-        payloadPtr[0] = 0;
-        
-        @try {
-            [[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
-            unsigned long* responsePtr = (unsigned long*) aPacket.payload;
-            errorCode = responsePtr[0];
-            if(errorCode){
-                @throw [NSException exceptionWithName:@"Reset All MTCA+ error" reason:@"SBC and/or LabJack failed.\n" userInfo:nil];
-            }
-        }
-        @catch(NSException* e) {
-            NSLog(@"SBC failed reset all MTCA+\n");
-            NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
-            //@throw e;
-        }
+    @try {
+        [mtc okCommand:"reset_mtca"];
+    } @catch (NSException *e) {
+        NSLog(@"mtcatResetAll: %@\n", e.reason);
     }
-	else {
-        NSLog(@"Not implemented. Requires SBC with LabJack\n");
-	}
 }
 
 - (void) mtcatLoadCrateMasks
 {
-    //TODO move to SBC
     [self mtcatResetAll];
     [self mtcatLoadCrateMask:[self mtcaN100Mask] toMtcat:0];
     [self mtcatLoadCrateMask:[self mtcaN20Mask] toMtcat:1];
@@ -2186,7 +2190,6 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (void) mtcatClearCrateMasks
 {
-    //TODO move to SBC
     [self mtcatResetAll];
     [self mtcatLoadCrateMask:0 toMtcat:0];
     [self mtcatLoadCrateMask:0 toMtcat:1];
@@ -2204,36 +2207,15 @@ resetFifoOnStart = _resetFifoOnStart;
         return;
     }
 
-    if([self adapterIsSBC]){
-        long errorCode = 0;
-        SBC_Packet aPacket;
-        aPacket.cmdHeader.destination = kSNO;
-        aPacket.cmdHeader.cmdID = kSNOMtcatLoadCrateMask;
-        aPacket.cmdHeader.numberBytesinPayload	= 2*sizeof(long);
-        
-        unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
-        payloadPtr[0] = mask;
-        payloadPtr[1] = mtcat;
-        
-        @try {
-            [[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
-            unsigned long* responsePtr = (unsigned long*) aPacket.payload;
-            errorCode = responsePtr[0];
-            if(errorCode){
-                @throw [NSException exceptionWithName:@"Load CrateMask to MTCA+ error" reason:@"SBC and/or LabJack failed.\n" userInfo:nil];
-            }
-        }
-        @catch(NSException* e) {
-            NSLog(@"SBC failed loading MTCA+ mask\n");
-            NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
-            //@throw e;
-        }
-        char* mtcats[] = {"N100", "N20", "EHI", "ELO", "OELO", "OEHI", "OWLN"};
-        NSLog(@"MTCA: set %s crate mask to 0x%08x\n", mtcats[mtcat], mask);
+    @try {
+        [mtc okCommand:"load_mtca_crate_mask %d %d", mtcat, mask];
+    } @catch(NSException* e) {
+        NSLog(@"mtcatLoadCrateMask: %@\n", e.reason);
+        return;
     }
-	else {
-        NSLog(@"Not implemented. Requires SBC with LabJack\n");
-	}    
+
+    char* mtcats[] = {"N100", "N20", "EHI", "ELO", "OELO", "OEHI", "OWLN"};
+    NSLog(@"MTCA: set %s crate mask to 0x%08x\n", mtcats[mtcat], mask);
 }
 
 
@@ -2329,242 +2311,7 @@ resetFifoOnStart = _resetFifoOnStart;
 }
 @end
 
-@implementation ORMTCModel (LocalAdapter)
-- (void) loadXilinxUsingLocalAdapter:(NSData*) theData
-{
-	//--------------------------- The file format as of 1/7/97 -------------------------------------
-	//
-	// 1st field: Beginning of the comment block -- /
-	//			  If no backslash then you will get an error message and Xilinx load will abort
-	// Now include your comment.
-	// The comment block is delimited by another backslash.
-	// If no backslash at the end of the comment block then you will get error message.
-	//
-	// After the comment block include the data in ACSII binary.
-	// No spaces or other characters in between data. It will complain otherwise.
-	//
-	//----------------------------------------------------------------------------------------------
-	
-	//-------------- variables -----------------
-	
-	unsigned long bitCount		= 0UL;
-	unsigned long readValue		= 0UL;
-	unsigned long aValue		= 0UL;
-	
-	BOOL firstPass = TRUE;
-	
-	const unsigned long DATA_HIGH_CLOCK_LOW = 0x00000001; 	 // bit 0 high and bit 1 low
-	const unsigned long DATA_LOW_CLOCK_LOW  = 0x00000000;  	 // bit 0 low and bit 1 low
-	
-	//------------------------------------------
-	
-	
-	//	NSLog(@"Loading the MTC Xilinx chips....\n"); 
-	
-	@try {
-		
-		char* charData = (char*)[theData bytes];
-		
-		long index = [theData length];	// total number of charcters 
-		
-		// set  all bits, except bit 3[PROG_EN], low -- new step 1/16/97
-		aValue = 0x00000008;
-		[self write:kMtcXilProgReg value:aValue];
-		
-		// set  all bits, except bit 1[CCLK], low
-		aValue = 0x00000002;						
-		[self write:kMtcXilProgReg value:aValue];
-		
-		[ORTimer delay:.1]; // 100 msec delay
-		unsigned long i;
-		for (i = 1;i < index;i++){
-			
-			if ( (firstPass) && (*charData != '/') ){
-				charData++;
-				NSLog(@"Invalid first character in Xilinx file.\n");
-				[NSException raise:@"Xilinx load failed" format:@""];
-			}
-			
-			if (firstPass){
-				
-				charData++;							// for the first slash
-				i++;  									// need to keep track of i
-				
-				while(*charData++ != '/'){
-					
-					i++;
-					if ( i>index ){
-						NSLog(@"Comment block not delimited by a backslash.\n");	
-						[NSException raise:@"Xilinx load failed" format:@""];
-					}
-					
-				}
-				
-			}
-			firstPass = FALSE;
-			
-			// strip carriage return, tabs
-			if ( ((*charData =='\r') || (*charData =='\n') || (*charData =='\t' )) && (!firstPass) ){		
-				charData++;
-			}
-			else{
-				
-				bitCount++;
-				
-				if ( *charData == '1' ) {
-					aValue = DATA_HIGH_CLOCK_LOW;	// bit 0 high and bit 1 low
-				}
-				else if ( *charData == '0' ) {
-					aValue = DATA_LOW_CLOCK_LOW;	// bit 0 low and bit 1 low
-				}
-				else {
-					NSLog(@"Invalid character in Xilinx file.\n");
-					[NSException raise:@"Xilinx load failed" format:@""];
-				}
-				charData++;
-				
-				[self write:kMtcXilProgReg value:aValue];
-			    // perform bitwise OR to set the bit 1 high[toggle clock high] 
-				aValue |= (1UL << 1);		
-				
-				[self write:kMtcXilProgReg value:aValue];
-				
-			}
-			
-		}
-		
-		[ORTimer delay:.100]; // 100 msec delay
-		
-		// check to see if the Xilinx was loaded properly 
-		// read the bit 2, this should be high if the Xilinx was loaded
-		readValue = [self read:kMtcXilProgReg];
-		
-		if (!(readValue & 0x000000010))	// bit 4, PROGRAM*, should be high for Xilinx success		
-			NSLog(@"Xilinx load failed for the MTC/D!\n");
-		
-		
-	}
-	@catch(NSException* localException) {
-		
-		NSLog(@"Xilinx load failed for the MTC/D.\n");
-		[localException raise];
-		
-	}
-}
-
-- (void) loadTheMTCADacsUsingLocalAdapter
-{
-	//-------------- variables -----------------
-
-	short	index, bitIndex, dacIndex;
-	unsigned short	dacValues[14];
-	unsigned long   aValue = 0;
-
-
-	//-------------- variables -----------------
-
-	@try {
-		
-		// STEP 3: load the DAC values from the database into dacValues[14]
-		for (index = 0; index < 14 ; index++){
-			dacValues[index] = [self dacValueByIndex:index];
-		}
-		
-		// STEP 4: Set DACSEL in Register 2 high[in hardware it's inverted -- i.e. it is set low]
-		[self write:kMtcDacCntReg value:MTC_DAC_CNT_DACSEL];
-		
-		// STEP 5: now parallel load the 16bit word into the serial shift register
-		// STEP 5a: the first 4 bits are loaded zeros 
-		aValue = 0UL;
-		for (index = 0; index < 4 ; index++){
-			
-			// data bit, with DACSEL high, clock low
-			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
-			
-			// clock high
-			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL | MTC_DAC_CNT_DACCLK];
-			
-			// clock low
-			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
-		}
-		
-		//STEP 5b:  now build the word and load the next 12 bits, load MSB first
-		for (bitIndex = 11; bitIndex >= 0 ; bitIndex--){
-			
-			aValue = 0UL;
-			
-			for (dacIndex = 0; dacIndex < 14 ; dacIndex++){
-				
-				if ( dacValues[dacIndex] & (1UL << bitIndex) )
-					aValue |= (1UL << dacIndex);
-			}
-			
-			// data bit, with DACSEL high, clock low
-			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
-			
-			// clock high
-			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL | MTC_DAC_CNT_DACCLK];
-			
-			// clock low
-			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
-		}
-		
-		// STEP 5: Set DACSEL in Register 2 low[in hardware it's inverted -- i.e. it is set high], with all other bits low
-		[self write:kMtcDacCntReg value:0];
-		NSLog(@"Loaded the MTC/A DACs\n");
-		
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Could not load the MTC/A DACs!\n");		
-		[localException raise];
-	}
-}
-
-
-@end
-
 @implementation ORMTCModel (SBC)
-- (void) loadXilinxUsingSBC:(NSData*) theData
-{	
-	
-	NSLog(@"Sending Xilinx file to the SBC. (Can take a few seconds)\n");
-	
-	long errorCode = 0;
-	unsigned long numLongs		= ceil([theData length]/4.0); //round up to long word boundary
-	SBC_Packet aPacket;
-	aPacket.cmdHeader.destination	= kSNO;
-	aPacket.cmdHeader.cmdID			= kSNOMtcLoadXilinx;
-	aPacket.cmdHeader.numberBytesinPayload	= sizeof(SNOMtc_XilinxLoadStruct) + numLongs*sizeof(long);
-	
-	SNOMtc_XilinxLoadStruct* payloadPtr = (SNOMtc_XilinxLoadStruct*)aPacket.payload;
-	payloadPtr->baseAddress		= [self baseAddress];
-	payloadPtr->addressModifier	= [self addressModifier];
-	payloadPtr->errorCode	    = 666;
-	payloadPtr->programRegOffset= reg[kMtcXilProgReg].addressOffset;
-	payloadPtr->fileSize		= [theData length];
-	const char* dataPtr			= (const char*)[theData bytes];
-	//really should be an error check here that the file isn't bigger than the max payload size
-	char* p = (char*)payloadPtr + sizeof(SNOMtc_XilinxLoadStruct);
-	strncpy(p, dataPtr, [theData length]);
-	
-	@try {
-		[[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
-		SNOMtc_XilinxLoadStruct *responsePtr = (SNOMtc_XilinxLoadStruct*)aPacket.payload;
-		errorCode = responsePtr->errorCode;
-		if(errorCode){
-			NSLog(@"Error Code: %d %s\n",errorCode,aPacket.message);
-			[NSException raise:@"Xilinx load failed" format:@""];
-		}
-		else {
-			NSLog(@"Looks like success. (Program Reg reported Successful load)\n");
-		}
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Xilinx load failed for the MTC/D.\n");
-		NSLog(@"Exception: %@\n",localException);
-		[localException raise];
-	}
-}
 
 //this is the SBC job variant suited for the mixed physics and pedestal runs
 - (void) fireMTCPedestalsFixedTimeSBC
@@ -2701,38 +2448,6 @@ resetFifoOnStart = _resetFifoOnStart;
 	}
 	
 	return gtidDiff;
-}
-
-- (void) loadTheMTCADacsUsingSBC
-{	
-	short index;
-	long errorCode = 0;
-
-	SBC_Packet aPacket;
-	aPacket.cmdHeader.destination		= kSNO;
-	aPacket.cmdHeader.cmdID			= kSNOMtcLoadMTCADacs;
-	aPacket.cmdHeader.numberBytesinPayload	= 14*sizeof(long);
-	
-	unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
-	for (index = 0; index < 14 ; index++){
-		payloadPtr[index] = [self dacValueByIndex:index];
-	}
-	
-	@try {
-		[[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
-		unsigned long* responsePtr = (unsigned long*) aPacket.payload;
-		errorCode = responsePtr[0];
-		if(errorCode){
-			NSLog(@"SBC failed to load the MTCA DACs.\n");
-		}
-		else {
-			NSLog(@"Loaded the MTCA DACs through SBC.\n");
-		}
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Could not load the MTC/A DACs!\n");		
-		[localException raise];
-	}
 }
 
 - (void) tellReadoutSBC:(unsigned int) cmd

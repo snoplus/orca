@@ -204,10 +204,10 @@
 - (BOOL) adapterIsSBC;
 - (short) getNumberRegisters;
 - (NSString*) getRegisterName:(short) anIndex;
-- (uint32_t) read:(uint32_t)aReg;
-- (void) write:(uint32_t)aReg value:(uint32_t)aValue;
-- (void) setBits:(int)aReg mask:(unsigned long)aMask;
-- (void) clrBits:(int)aReg mask:(unsigned long)aMask;
+- (uint32_t) read:(int)aReg;
+- (void) write:(int)aReg value:(uint32_t)aValue;
+- (void) setBits:(int)aReg mask:(uint32_t)aMask;
+- (void) clrBits:(int)aReg mask:(uint32_t)aMask;
 - (unsigned long) getMTC_CSR;
 - (unsigned long) getMTC_GTID;
 - (unsigned long) getMTC_PedWidth;
