@@ -134,6 +134,7 @@ snotDb = _snotDb;
 - (id) init
 {
 	self = [super init];
+    hvInitLock = [[NSLock alloc] init];
 	return self;
 }
 
@@ -151,6 +152,7 @@ snotDb = _snotDb;
     if (relayStatus) [relayStatus release];
     if (triggerStatus) [triggerStatus release];
     [xl3DateFormatter release];
+    [hvInitLock release];
 	[super dealloc];
 }
 
@@ -1411,7 +1413,7 @@ void SwapLongBlock(void* p, int32_t n)
         memcpy(&safe_bundle[i], &aConfigBundle, sizeof(mb_t));
     }
     
-    [self safeSpawnHvInit];
+    [self safeHvInit];
      
 	[[self undoManager] enableUndoRegistration];
     [self registerNotificationObservers];
@@ -3276,8 +3278,11 @@ void SwapLongBlock(void* p, int32_t n)
 // This will reset the HV control logic completely.
 // Call this to wait for an XL3 to connect, read back the status, and get the
 // gui into the correct state.
-- (void) safeSpawnHvInit
+- (void) safeHvInit
 {
+    //Make sure we only have one init cycle going
+    [hvInitLock lock];
+    
     //Kill the HV thread if it exists
     if (hvThread) {
         if (![hvThread isFinished]) {
@@ -3303,6 +3308,8 @@ void SwapLongBlock(void* p, int32_t n)
     //Start thread to wait for the XL3 to connect and be initilized
     hvInitThread = [[NSThread alloc] initWithTarget:self selector:@selector(_hvInit) object:nil];
     [hvInitThread start];
+    
+    [hvInitLock unlock];
 }
 
 - (void) readHVStatus:(hv_readback_results_t*)status

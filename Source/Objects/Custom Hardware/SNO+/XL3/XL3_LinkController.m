@@ -771,11 +771,8 @@ static NSDictionary* xl3Ops;
     //we need the control
     if([[model xl3Link] connectState] == kDisconnected){
         
-        //Take HV back into safe state and wait for reconnect
-        [model setHvEverUpdated:NO];
-        [model setHvSwitchEverUpdated:NO];
         //Start thread to wait for the XL3 to connect and be initilized
-        [model safeSpawnHvInit];
+        [model safeHvInit];
         [toggleConnectButton setTitle:@"Connect"];
         
     }
