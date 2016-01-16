@@ -1131,76 +1131,6 @@ ECA_subrun_time = _ECA_subrun_time;
 // Load last MTC values (saved with 'saveStandardRun') from the DB for the selected Standard Run
 -(void) loadStandardRun:(NSString*)runTypeName
 {
-
-    
-    NSArray* paramNames = [NSArray arrayWithObjects:
-
-                               @"LockOutWidth",
-                               @"PedestalWidth",
-                               @"Nhit100LoPrescale",
-                               @"PulserPeriod",
-                               @"Low10MhzClock",
-                               @"High10MhzClock",
-                               @"FineSlope",
-                               @"MinDelayOffset",
-                               @"CoarseDelay",
-                               @"FineDelay",
-                           
-                               @"GTMask",
-                               @"GTCrateMask",
-                               @"PEDCrateMask",
-                               @"ControlMask",
-                           
-                               @"NHit100HiThreshold",
-                               @"NHit100MedThreshold",
-                               @"NHit100LoThreshold",
-                               @"NHit20Threshold",
-                               @"NHit20LBThreshold",
-                               @"OWLNThreshold",
-                               
-                               @"NHit100HimVperAdc",
-                               @"NHit100MedmVperVAdc",
-                               @"NHit100LomVperAdc",
-                               @"NHit20mVperAdc",
-                               @"NHit20LBmVperAdc",
-                               @"OWLNmVperAdc",
-                               
-                               @"NHit100HimVperNHit",
-                               @"NHit100MedmVperNHit",
-                               @"NHit100LomVperNHit",
-                               @"NHit20mVperNHit",
-                               @"NHit20LBmVperNHit",
-                               @"OWLNmVperNHit",
-                               
-                               @"NHit100HidcOffset",
-                               @"NHit100MeddcOffset",
-                               @"NHit100LodcOffset",
-                               @"NHit20dcOffset",
-                               @"NHit20LBdcOffset",
-                               @"OWLNdcOffset",
-                               
-                               @"ESumLowThreshold",
-                               @"ESumHiThreshold",
-                               @"OWLELoThreshold",
-                               @"OWLEHiThreshold",
-                               
-                               @"ESumLowmVperAdc",
-                               @"ESumHimVperAdc",
-                               @"OWLELomVperAdc",
-                               @"OWLEHimVperAdc",
-                               
-                               @"ESumLowmVperpC",
-                               @"ESumHimVperpC",
-                               @"OWLELomVperpC",
-                               @"OWLEHimVperpC",
-                               
-                               @"ESumLowdcOffset",
-                               @"ESumHidcOffset",
-                               @"OWLELodcOffset",
-                               @"OWLEHidcOffset",
-                               
-                               nil];
-    
     
     //Get MTC model
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
@@ -1230,8 +1160,8 @@ ECA_subrun_time = _ECA_subrun_time;
         }
         
         //Load MTC/D parameters, trigger masks and MTC/A+ thresholds
-        for (int iparam=0; iparam<50; iparam++) {
-            [mtcModel setDbObject:[[[[json valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[paramNames objectAtIndex:iparam]] forIndex:iparam];
+        for (int iparam=0; iparam<kDbLookUpTableSize; iparam++) {
+            [mtcModel setDbObject:[[[[json valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtcModel getDBKeyByIndex:iparam]] forIndex:iparam];
         }
         
     }
@@ -1244,75 +1174,6 @@ ECA_subrun_time = _ECA_subrun_time;
 //Save MTC settings in a Standard Run table in CouchDB for later use by the Run Scripts or the user
 -(void) saveStandardRun:(NSString*)runTypeName
 {
-
-    NSArray* paramNames = [NSArray arrayWithObjects:
-                           
-                           @"LockOutWidth",
-                           @"PedestalWidth",
-                           @"Nhit100LoPrescale",
-                           @"PulserPeriod",
-                           @"Low10MhzClock",
-                           @"High10MhzClock",
-                           @"FineSlope",
-                           @"MinDelayOffset",
-                           @"CoarseDelay",
-                           @"FineDelay",
-                           
-                           @"GTMask",
-                           @"GTCrateMask",
-                           @"PEDCrateMask",
-                           @"ControlMask",
-                           
-                           @"NHit100HiThreshold",
-                           @"NHit100MedThreshold",
-                           @"NHit100LoThreshold",
-                           @"NHit20Threshold",
-                           @"NHit20LBThreshold",
-                           @"OWLNThreshold",
-                           
-                           @"NHit100HimVperAdc",
-                           @"NHit100MedmVperVAdc",
-                           @"NHit100LomVperAdc",
-                           @"NHit20mVperAdc",
-                           @"NHit20LBmVperAdc",
-                           @"OWLNmVperAdc",
-                           
-                           @"NHit100HimVperNHit",
-                           @"NHit100MedmVperNHit",
-                           @"NHit100LomVperNHit",
-                           @"NHit20mVperNHit",
-                           @"NHit20LBmVperNHit",
-                           @"OWLNmVperNHit",
-                           
-                           @"NHit100HidcOffset",
-                           @"NHit100MeddcOffset",
-                           @"NHit100LodcOffset",
-                           @"NHit20dcOffset",
-                           @"NHit20LBdcOffset",
-                           @"OWLNdcOffset",
-                           
-                           @"ESumLowThreshold",
-                           @"ESumHiThreshold",
-                           @"OWLELoThreshold",
-                           @"OWLEHiThreshold",
-                           
-                           @"ESumLowmVperAdc",
-                           @"ESumHimVperAdc",
-                           @"OWLELomVperAdc",
-                           @"OWLEHimVperAdc",
-                           
-                           @"ESumLowmVperpC",
-                           @"ESumHimVperpC",
-                           @"OWLELomVperpC",
-                           @"OWLEHimVperpC",
-                           
-                           @"ESumLowdcOffset",
-                           @"ESumHidcOffset",
-                           @"OWLELodcOffset",
-                           @"OWLEHidcOffset",
-                           
-                           nil];
-    
     
     //Get MTC model
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
@@ -1327,12 +1188,12 @@ ECA_subrun_time = _ECA_subrun_time;
     [thresholdsFromMTC setObject:date forKey:@"time_stamp"];
 
     //Save MTC/D parameters, trigger masks and MTC/A+ thresholds
-    for (int iparam=0; iparam<50; iparam++) {
-//        NSLog(@" Writting %@ to %@ \n", [mtcModel dbObjectByIndex:ithres+kNHit100HiThreshold], [thresholdNames objectAtIndex:ithres]);
-        [thresholdsFromMTC setObject:[mtcModel dbObjectByIndex:iparam] forKey:[paramNames objectAtIndex:iparam]];
+    for (int iparam=0; iparam<kDbLookUpTableSize; iparam++) {
+        // NSLog(@" Writting %@ to %@ \n", [mtcModel dbObjectByIndex:ithres+kNHit100HiThreshold], [thresholdNames objectAtIndex:ithres]);
+        [thresholdsFromMTC setObject:[mtcModel dbObjectByIndex:iparam] forKey:[mtcModel getDBKeyByIndex:iparam]];
     }
     
-    //    NSLog(@" Writting to ORCADB \n");
+    // NSLog(@" Writting to ORCADB \n");
 
     [[self orcaDbRefWithEntryDB:self withDB:@"orca"] addDocument:thresholdsFromMTC tag:@"kStandardRunDocumentAdded"];
 }
