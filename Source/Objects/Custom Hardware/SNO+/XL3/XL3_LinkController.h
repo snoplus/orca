@@ -22,6 +22,7 @@
 
 @interface XL3_LinkController : OrcaObjectController
 {
+    bool HVAramping, HVBramping;
 	NSView* blankView;
     IBOutlet NSView* xl3View;
 	NSSize  basicSize;
@@ -106,6 +107,13 @@
     IBOutlet NSButton* monVltThresholdInInitButton;
     IBOutlet NSButton* monVltThresholdSetButton;
     //hv
+    IBOutlet NSButton *hvOnButton;
+    IBOutlet NSButton *hvOffButton;
+    IBOutlet NSButton *hvStepUpButton;
+    IBOutlet NSButton *hvStepDownButton;
+    IBOutlet NSButton *hvRampUpButton;
+    IBOutlet NSButton *hvRampDownButton;
+    IBOutlet NSButton *hvStopRampButton;
     IBOutlet NSTextField *hvRelayMaskLowField;
     IBOutlet NSTextField *hvRelayMaskHighField;
     IBOutlet NSTextField *hvRelayStatusField;
@@ -150,6 +158,7 @@
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
 - (void) updateWindow;
+- (void) updateHVButtons;
 - (void) checkGlobalSecurity;
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item;
 
