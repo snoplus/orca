@@ -126,46 +126,41 @@
 // GUI actions. CTRL-drag handles from the IB into this file.
 - (IBAction)PulserFire:(id)sender {
     if ([sender tag] == 1){
-        NSLog(@"TUBii: SMELLIE pulser ON. Rate = %.2f, Width = %.2f, NPulses = %d.\n",[model smellieRate],[model smelliePulseWidth],[model smellieNPulses]);
         [model fireSmelliePulser];
     }
     else if([sender tag] == 2){
-        NSLog(@"TUBii: TELLIE pulser ON. Rate = %.2f, Width = %.2f, NPulses = %d.\n",[model tellieRate],[model telliePulseWidth],[model tellieNPulses]);
         [model fireTelliePulser];
     }
     else if([sender tag] == 3){
-        NSLog(@"TUBii: Generic pulser ON. Rate = %.2f, Width = %.2f, NPulses = %d.\n",[model pulserRate],[model pulseWidth],[model NPulses]);
         [model firePulser];
     }
     return;
 }
 - (IBAction)PulserStop:(id)sender {
     if([sender tag] == 1){
-        NSLog(@"TUBii: SMELLIE pulser STOP\n");
         [model stopSmelliePulser];
     }
     else if([sender tag] == 2){
-        NSLog(@"TUBii: TELLIE pulser STOP\n");
         [model stopTelliePulser];
     }
     else if([sender tag] == 3){
-        NSLog(@"TUBii: Pulser STOP\n");
         [model stopPulser];
     }
     return;
 }
 - (IBAction)LoadDelay:(id)sender {
+    int delay =0;
     if([sender tag] == 1){
-        NSLog(@"TUBii: Smellie delay = %0.2f\n",[model smellieDelay]);
-        [model loadSmellieDelay];
+        delay = [SmellieDelay_TextField integerValue];
+        [model setSmellieDelay:delay];
     }
     else if([sender tag] == 2){
-        NSLog(@"TUBii: Tellie delay = %0.2f\n",[model tellieDelay]);
-        [model loadTellieDelay];
+        delay = [TellieDelay_TextField integerValue];
+        [model setTellieDelay:delay];
     }
     else if([sender tag] == 3){
-        NSLog(@"TUBii: Generic delay = %0.2f\n",[model genericDelay]);
-        [model loadDelay];
+        delay = [GenericDelay_TextField integerValue];
+        [model setGenericDelay:delay];
     }
     return;
 }
@@ -178,7 +173,6 @@
 }
 - (IBAction)TrigMaskLoad:(id)sender {
     NSUInteger maskVal = [self GetBitInfoFromCheckBoxes:TrigMaskSelect FromBit:0 ToBit:21];
-    NSLog(@"TUBii: Trigger mask: %lu\n",maskVal);
     [model setTrigMask:maskVal];
 }
 
@@ -220,7 +214,6 @@
     GainMask |= [[caenGainSelect_5 selectedCell] tag ]*gainSel_5;
     GainMask |= [[caenGainSelect_6 selectedCell] tag ]*gainSel_6;
     GainMask |= [[caenGainSelect_7 selectedCell] tag ]*gainSel_7;
-    NSLog(@"Sending to TUBii CAEN Mask %i, %i\n",ChannelMask,GainMask);
     [model setCaenMasks:ChannelMask GainMask:GainMask];
 }
 
@@ -296,12 +289,10 @@
     maskVal |= [self GetBitInfoFromCheckBoxes:maskSelect_2 FromBit:16 ToBit:22];
 
     if ([sender tag] ==1) {
-        NSLog(@"TUBii: Speaker mask: %lu\n",maskVal);
         [model setSpeakerMask:maskVal];
     }
     else if ([sender tag] ==2)
     {
-        NSLog(@"TUBii: Counter mask: %lu\n",maskVal);
         [model setCounterMask:maskVal];
     }
 
@@ -312,7 +303,6 @@
     newControlReg =  [CounterLZBSelect intValue] ==1 ? scalerLZB_Bit : 0;
     newControlReg |=  [CounterTestModeSelect intValue] ==1 ? 0 : scalerT_Bit;
     newControlReg |=  [CounterInhibitSelect intValue] ==1 ? 0 : scalerI_Bit;
-    NSLog(@"New Control Reg Value = %d\n",newControlReg);
     [model setControlReg:newControlReg];
 }
 - (IBAction)SpeakerCheckBoxChanged:(id)sender {
@@ -417,9 +407,6 @@
         ControlReg = [model controlReg] & ~lockoutSel_Bit;
     }
     [model setControlReg: ControlReg];
-    NSLog(@"Control Reg = %i\n",ControlReg);
-    NSLog(@"DGT Delay = %.0f, LO Delay = %.0f\n",DGT_Delay,LO_Delay);
-    NSLog(@"DGT Bits = %i, LO Bits = %i\n",[model DGTBits],[model LOBits]);
 }
 - (IBAction)GTDelaysMatchHardware:(id)sender {
     float LO_Delay = [self ConvertBitsToValue:[model LOBits] NBits:8 MinVal:0 MaxVal:1275];
@@ -476,7 +463,6 @@
 }
 
 - (IBAction)ResetClock:(id)sender {
-    NSLog(@"Clock reset signal sent \n");
     [model ResetClock];
 }
 - (IBAction)ECAEnableChanged:(id)sender {
@@ -505,7 +491,6 @@
 - (IBAction)MTCAMimicLoadValue:(id)sender {
     double value = [MTCAMimic_TextField floatValue];
     [model setMTCAMimic1_Threshold:value];
-    NSLog(@"MTCA Mimic1 DAC = %0.3fV\n",value);
 }
 
 - (float) ConvertBitsToValue:(NSUInteger)bits NBits: (int) nBits MinVal: (float) minVal MaxVal: (float) maxVal{

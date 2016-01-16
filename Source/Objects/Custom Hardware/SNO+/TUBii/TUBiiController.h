@@ -58,6 +58,10 @@
     NSSlider *MTCAMimic_Slider;
     NSTextField *MTCAMimic_TextField;
 
+    IBOutlet NSTextField *SmellieDelay_TextField;
+    IBOutlet NSTextField *TellieDelay_TextField;
+    IBOutlet NSTextField *GenericDelay_TextField;
+
 }
 -(id) init;
 
@@ -131,7 +135,6 @@
 - (IBAction)ECAEnableChanged:(id)sender;
 - (IBAction)MTCAMimicTextFieldChanged:(id)sender;
 - (IBAction)MTCAMimicSliderChanged:(id)sender;
-
 - (IBAction)MTCAMimicMatchHardware:(id)sender;
 - (IBAction)MTCAMimicLoadValue:(id)sender;
 

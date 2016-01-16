@@ -7,6 +7,7 @@
 //
 
 #import "OrcaObject.h"
+#import "RedisClient.h"
 @class NetSocket;
 
 typedef NS_OPTIONS(NSUInteger, CAEN_CHANNEL_MASK) {
@@ -76,32 +77,14 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
     int smellieNPulses;
     int tellieNPulses;
     int NPulses;
-    float smellieDelay;
-    float tellieDelay;
-    float genericDelay;
-    unsigned long trigMask;
-    double MTCAMimic1_Threshold;
-    float DGT_DelayLength;
-    float LO_DelayLength;
-    BOOL ECAMode;
-    NSUInteger DGTBits;
-    NSUInteger LOBits;
-    NSUInteger speakerMask;
-    NSUInteger counterMask;
-    CONTROL_REG_MASK controlReg;
 
-    CAEN_CHANNEL_MASK caenChannelMask;
-    CAEN_GAIN_MASK caenGainMask;
-
-    NetSocket *nsocket;
-    int serverSocket;
-	int workingSocket;
-    unsigned long portNumber;
-    int	connectState;
-    char* strHostName;//="192.168.80.25";
+    RedisClient *connection;
+    int portNumber;
+    NSString* strHostName;//="192.168.80.25";
     NSNumber *forcedUpdates;
 }
-
+@property int portNumber;
+@property (nonatomic,assign) NSString* strHostName;
 @property (nonatomic) float smellieRate;
 @property (nonatomic) float tellieRate;
 @property (nonatomic) float pulserRate;
@@ -111,11 +94,10 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 @property (nonatomic) int smellieNPulses;
 @property (nonatomic) int tellieNPulses;
 @property (nonatomic) int NPulses;
-@property (nonatomic) float smellieDelay;
-@property (nonatomic) float tellieDelay;
-@property (nonatomic) float genericDelay;
-@property (nonatomic) unsigned long trigMask;
-@property (nonatomic,assign) double MTCAMimic1_Threshold;
+@property (nonatomic) NSUInteger smellieDelay;
+@property (nonatomic) NSUInteger tellieDelay;
+@property (nonatomic) NSUInteger genericDelay;
+@property (nonatomic,assign) float MTCAMimic1_Threshold;
 @property (nonatomic) BOOL ECAMode;
 @property (nonatomic,readonly) CAEN_CHANNEL_MASK caenChannelMask;
 @property (nonatomic,readonly) CAEN_GAIN_MASK caenGainMask;
@@ -123,24 +105,20 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 @property (nonatomic,readonly) NSUInteger LOBits;
 @property (nonatomic) NSUInteger speakerMask;
 @property (nonatomic) NSUInteger counterMask;
+@property (nonatomic) NSUInteger trigMask;
 @property (nonatomic) CONTROL_REG_MASK controlReg;
 @property (assign,nonatomic) NSNumber *forcedUpdates;
 
-- (void) connectSocket:(BOOL)aFlag;
-- (void) connectToPort:(NSString*)command;
+- (void) sendOkCmd:(NSString* const)aCmd;
+- (int) sendIntCmd:(NSString*const)aCmd;
 - (void) fireSmelliePulser;
 - (void) fireTelliePulser;
 - (void) firePulser;
 - (void) stopSmelliePulser;
 - (void) stopTelliePulser;
 - (void) stopPulser;
-- (void) loadSmellieDelay;
-- (void) loadTellieDelay;
-- (void) loadDelay;
-- (void) setTrigMask:(unsigned long)trigMask;
-- (void) loadTrigMask:(BOOL)button;
 -(void) setCaenMasks: (CAEN_CHANNEL_MASK)aChannelMask
             GainMask:(CAEN_GAIN_MASK) aGainMask;
-- (void) setGTDelaysBits: (NSUInteger) aDGTMask LOBits:aLOMask;
+- (void) setGTDelaysBits: (NSUInteger) aDGTMask LOBits:(NSUInteger)aLOMask;
 - (void) ResetClock;
 @end

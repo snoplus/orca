@@ -10,33 +10,21 @@
 #import "NetSocket.h"
 #import "netdb.h"
 
-#define kRemotePort 4001
-NSString* otherSystemIP = @"192.168.80.25";
-
-
-
-
 @implementation TUBiiModel
 
-@synthesize trigMask;
-@synthesize NPulses;
-@synthesize smellieRate;
-@synthesize tellieRate;
-@synthesize pulserRate;
-@synthesize smellieNPulses;
-@synthesize tellieNPulses;
-@synthesize smelliePulseWidth;
+@synthesize portNumber;
+@synthesize strHostName;
 @synthesize telliePulseWidth;
+@synthesize smelliePulseWidth;
 @synthesize pulseWidth;
-@synthesize smellieDelay;
-@synthesize tellieDelay;
-@synthesize genericDelay;
-@synthesize speakerMask;
-@synthesize counterMask;
-@synthesize controlReg;
+@synthesize tellieNPulses;
+@synthesize smellieNPulses;
+@synthesize NPulses;
+@synthesize tellieRate;
+@synthesize smellieRate;
+@synthesize pulserRate;
+
 @synthesize forcedUpdates;
-@synthesize ECAMode;
-@synthesize MTCAMimic1_Threshold;
 
 - (void) setUpImage
 {
@@ -49,18 +37,40 @@ NSString* otherSystemIP = @"192.168.80.25";
     [img setSize:halfSize];
     [self setImage:img];
 }
-
 // Link the model to the controller
 - (void) makeMainController
 {
     [self linkToController:@"TUBiiController"];
 }
-
 // Initialize the model.
 // Note that this is initWithCoder and not just init, and we
 // call the superclass initWithCoder too!
+- (id) initWithCoder:(NSCoder *)aCoder {
+    NSLog(@"TUBii init with coder");
+    self = [super initWithCoder:aCoder];
+    smellieRate = 0;
+    tellieRate = 0;
+    pulserRate = 0;
+    smelliePulseWidth = 0;
+    telliePulseWidth = 0;
+    pulseWidth = 0;
+    smellieNPulses=0;
+    tellieNPulses=0;
+    NPulses=0;
+    portNumber = 4001;
+
+    /*
+    strHostName = [[NSString alloc] initWithCoder:aCoder];
+    forcedUpdates = [[NSNumber alloc] initWithCoder:aCoder];
+     */
+    strHostName = [[NSString alloc]initWithUTF8String:"192.168.80.25"];
+    portNumber= 4001;
+    forcedUpdates = [[NSNumber alloc]initWithBool:NO];
+    connection = [[RedisClient alloc] initWithHostName:strHostName withPort:portNumber];
+    return self;
+}
 - (id) init {
-    
+    NSLog(@"init called");
     self = [super init];
     // Initialize model member variables
     smellieRate = 0;
@@ -72,196 +82,152 @@ NSString* otherSystemIP = @"192.168.80.25";
     smellieNPulses=0;
     tellieNPulses=0;
     NPulses=0;
-    smellieDelay = 0;
-    tellieDelay = 0;
-    genericDelay = 0;
-    trigMask=0;
-    LO_DelayLength = 0;
-    DGT_DelayLength = 0;
-    strHostName="192.168.80.25";
-    nsocket = [[NetSocket alloc] init];
+    portNumber= 4001;
+    strHostName = [[NSString alloc]initWithUTF8String:"192.168.80.25"];
     forcedUpdates = [[NSNumber alloc]initWithBool:NO];
-    
+    connection = [[RedisClient alloc] initWithHostName:strHostName withPort:portNumber];
     return self;
 }
-
-- (void) sendCmd:(NSString*)aCmd
-{
-    //if([self isConnected]){
-        [socket writeString:aCmd encoding:NSASCIIStringEncoding];
-    //}
-}
-
-- (void) connectSocket:(BOOL)aFlag
-{
-    NSLog(@"Try to connect...\n");
-    if(aFlag){
-        NSLog(@"Connected and stuff? Port %i\n", kRemotePort);
-        [self setSocket:[NetSocket netsocketConnectedToHost:otherSystemIP port:kRemotePort]];
-        //[self sendCmd:@"gtpoll"];
-        NSLog(@"Connected and stuff!\n");
+- (void) sendOkCmd:(NSString* const)aCmd {
+    @try {
+        NSLog(@"Sending %@ to TUBii\n");
+        [connection okCommand: [aCmd UTF8String]];
     }
-    else {
-        [nsocket close];
-        //[self setIsConnected:[socket isConnected]];
+    @catch (NSException *exception) {
+        NSLog(@"Command %@ failed.\nReason: %@\n", aCmd,[exception reason]);
     }
 }
-
-- (void) connectToPort:(NSString*)command
-{
-    struct sockaddr_in address;
-    struct hostent* pHostInfo;
-
-
-    int hSocketCommand;
-    portNumber=4001;
-    
-    NSLog(@"Making a socket!\n");
-    NSLog(@"Sending command %@\n",command);
-    hSocketCommand=socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
-        
-    if(hSocketCommand == -1)
-        [NSException raise:@"Could not make a socket.\n"];
-        
-    /*@try{hSocketCommand=socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);}
-    @catch(NSException* localException){
-        NSLog(@"Could not make a socket.\n");
-        return;
+- (int) sendIntCmd: (NSString* const) aCmd {
+    @try {
+        NSLog(@"Sending %@ to TUBii",aCmd);
+        return [connection intCommand: [aCmd UTF8String]];
     }
-    NSLog(@"so far\n");*/
-    pHostInfo= gethostbyname(strHostName);
-    if(pHostInfo == NULL)
-        [NSException raise:@"No such host.\n"];
-        
-    bzero((char *) &address, sizeof(address));
-    address.sin_family = AF_INET;         // host byte order
-    bcopy((char *) pHostInfo->h_addr, (char *) &address.sin_addr.s_addr, pHostInfo->h_length);
-    address.sin_port = htons(portNumber);     // short, network byte order
-
-    if(connect(hSocketCommand,(struct sockaddr*) &address, sizeof(address)) == -1)
-        [NSException raise:@"Could not connect to host.\n"];
-
-    char* chcomm= [command UTF8String];
-    write(hSocketCommand,chcomm,255);
-    
-    if(close(hSocketCommand) == -1)
-        [NSException raise:@"Could not close socket.\n"];
+    @catch (NSException *exception) {
+        NSLog(@"Command %@ failed.\nReason: %@\n", aCmd,[exception reason]);
+        return nil;
+    }
 }
-
-- (void) setSocket:(NetSocket*)aSocket
-{
-    [aSocket retain];
-    [nsocket release];
-    nsocket = aSocket;
-    
-    [nsocket setDelegate:self];
-}
-
 - (void) fireSmelliePulser {
-    NSString* command=@"smelliepulser ";
-    NSString* argument1=[NSString stringWithFormat:@"%f", smellieRate];
-    NSString* argument2=[NSString stringWithFormat:@" %f", smelliePulseWidth];
-    NSString* argument3=[NSString stringWithFormat:@" %i", smellieNPulses];
-    NSString* endl=@" \r\n";
-    command= [command stringByAppendingString:argument1];
-    command= [command stringByAppendingString:argument2];
-    command= [command stringByAppendingString:argument3];
-    command = [command stringByAppendingString:endl];
-    //[self connectToPort:command];
+    NSString* const command=[NSString stringWithFormat:@"SetSmelliePulser %f %f %d",tellieRate,telliePulseWidth,tellieNPulses ];
+    [self sendOkCmd:command];
 }
 - (void) stopSmelliePulser {
-    NSString* command=@"smelliepulser 0 0 0\r\n";
-    [self connectToPort:command];
+    NSString* const command=@"SetSmelliePulser 0 0 0";
+    [self sendOkCmd:command];
 }
 - (void) fireTelliePulser{
-    NSString* command=@"telliepulser ";
-    NSString* argument1=[NSString stringWithFormat:@"%f", tellieRate];
-    NSString* argument2=[NSString stringWithFormat:@" %f", telliePulseWidth];
-    NSString* argument3=[NSString stringWithFormat:@" %i", tellieNPulses];
-    NSString* endl=@" \r\n";
-    command= [command stringByAppendingString:argument1];
-    command= [command stringByAppendingString:argument2];
-    command= [command stringByAppendingString:argument3];
-    command = [command stringByAppendingString:endl];
-    //[self connectToPort:command];
+    NSString* const command=[NSString stringWithFormat:@"SetTelliePulser %f %f %d",tellieRate,telliePulseWidth,tellieNPulses ];
+    [self sendOkCmd:command];
 }
 - (void) stopTelliePulser {
-    NSString* command=@"telliepulser 0 0 0\r\n";
-    [self connectToPort:command];
+    NSString* const command=@"SetTelliePulser 0 0 0";
+    [self sendOkCmd:command];
 }
 - (void) firePulser{
-    NSString* command=@"genericpulser ";
-    NSString* argument1=[NSString stringWithFormat:@"%f", pulserRate];
-    NSString* argument2=[NSString stringWithFormat:@" %f", pulseWidth];
-    NSString* argument3=[NSString stringWithFormat:@" %i", NPulses];
-    NSString* endl=@" \r\n";
-    command= [command stringByAppendingString:argument1];
-    command= [command stringByAppendingString:argument2];
-    command= [command stringByAppendingString:argument3];
-    command = [command stringByAppendingString:endl];
-    //[self connectToPort:command];
+    NSString* const command=[NSString stringWithFormat:@"SetGenericPulser %f %f %d",pulserRate,pulseWidth,NPulses ];
+    [self sendOkCmd:command];
 }
 - (void) stopPulser {
-    NSString* command=@"genericpulser 0 0 0\r\n";
-    [self connectToPort:command];
-}
-- (void) loadSmellieDelay {
-    NSString* command=@"smelliedelay ";
-    NSString* argument=[NSString stringWithFormat:@"%f", smellieDelay];
-    NSString* endl=@" \r\n";
-    command= [command stringByAppendingString:argument];
-    command = [command stringByAppendingString:endl];
-    //[self connectToPort:command];
-}
-- (void) loadTellieDelay {
-    NSString* command=@"telliedelay ";
-    NSString* argument=[NSString stringWithFormat:@"%f", tellieDelay];
-    NSString* endl=@" \r\n";
-    command= [command stringByAppendingString:argument];
-    command = [command stringByAppendingString:endl];
-    //[self connectToPort:command];
-}
-- (void) loadDelay {
-    NSString* command=@"genericdelay ";
-    NSString* argument=[NSString stringWithFormat:@"%f", genericDelay];
-    NSString* endl=@" \r\n";
-    command= [command stringByAppendingString:argument];
-    command = [command stringByAppendingString:endl];
-    //[self connectToPort:command];
-}
-- (void) loadTrigMask {
-    NSString* command=@"trigMask ";
-    NSString* argument=[NSString stringWithFormat:@"%lu", trigMask];
-    NSString* endl=@" \r\n";
-    command= [command stringByAppendingString:argument];
-    command = [command stringByAppendingString:endl];
-    [self connectToPort:command];
-}
-- (void) ResetClock {
-    //Insert code to send ResetClock signal to
-    //the MZ here.
+    NSString* const command=@"SetGenericPulser 0 0 0";
+    [self sendOkCmd:command];
 }
 
+- (void) ResetClock {
+    [connection okCommand:"ResetClock"];
+}
 -(void) setCaenMasks: (CAEN_CHANNEL_MASK)aChannelMask
             GainMask:(CAEN_GAIN_MASK) aGainMask; {
-    caenChannelMask = aChannelMask;
-    caenGainMask = aGainMask;
+    NSString* const command = [NSString stringWithFormat:@"SetCAENWords %d %d",aGainMask,aChannelMask];
+    [self sendOkCmd:command];
 }
 -(CAEN_CHANNEL_MASK) caenChannelMask {
-    return caenChannelMask;
+    NSString* const command = @"GetCAENChannelSelectWord";
+    return [self sendIntCmd:command];
 }
 
 -(CAEN_GAIN_MASK) caenGainMask {
-    return caenGainMask;
+    return [self sendIntCmd:@"GetCAENGainPathWord"];
 }
-- (void) setGTDelaysBits:(NSUInteger)aDGTMask LOBits:(id)aLOMask {
-    DGTBits = aDGTMask;
-    LOBits = aLOMask;
+- (void) setGTDelaysBits:(NSUInteger)aDGTMask LOBits:(NSUInteger)aLOMask {
+    NSString* const command = [NSString stringWithFormat:@"SetGTDelays %d %d",aLOMask,aDGTMask];
+    [self sendOkCmd:command];
 }
 - (NSUInteger) DGTBits{
-    return DGTBits;
+    return [self sendIntCmd:@"GetDGTDelay"];
 }
 - (NSUInteger) LOBits{
-    return LOBits;
+    return [self sendIntCmd:@"GetLODelay"];
+}
+- (void) setTrigMask:(NSUInteger)_trigMask {
+    NSString * const command = [NSString stringWithFormat:@"SetTriggerMask %d",_trigMask];
+    [self sendOkCmd:command];
+}
+- (NSUInteger) trigMask {
+    return [connection intCommand: "GetTriggerMask"];
+}
+- (void) setSmellieDelay:(NSUInteger)_smellieDelay {
+    NSString * const command = [NSString stringWithFormat:@"SetSmellieDelay %d",_smellieDelay];
+    [self sendOkCmd:command];
+}
+- (NSUInteger) smellieDelay {
+    return [connection intCommand: "GetSmellieDelay"];
+}
+- (void) setTellieDelay:(NSUInteger)_tellieDelay {
+    NSString * const command = [NSString stringWithFormat:@"SetTellieDelay %d",_tellieDelay];
+    [self sendOkCmd:command];
+}
+- (NSUInteger) tellieDelay {
+    return [self sendIntCmd:@"GetTellieDelay"];
+}
+- (void) setGenericDelay:(NSUInteger)_genericDelay {
+    NSString * const command = [NSString stringWithFormat:@"SetGenericDelay %d",_genericDelay];
+    [self sendOkCmd:command];
+}
+- (NSUInteger) genericDelay {
+    return [self sendIntCmd:@"GetGenericDelay"];
+}
+- (void) setCounterMask:(NSUInteger)_counterMask {
+    NSString * const command = [NSString stringWithFormat:@"SetCounterMask %d",_counterMask];
+    [self sendOkCmd:command];
+}
+- (NSUInteger) counterMask {
+    return [self sendIntCmd:@"GetCounterMask"];
+}
+- (void) setControlReg:(CONTROL_REG_MASK)_controlReg {
+    NSString * const command = [NSString stringWithFormat:@"SetControlReg %d",_controlReg];
+    [self sendOkCmd:command];
+}
+- (CONTROL_REG_MASK) controlReg {
+    return [self sendIntCmd:@"GetControlReg"];
+}
+- (void) setECAMode:(BOOL)_ECAMode {
+    CONTROL_REG_MASK controlReg = [self controlReg];
+    if (_ECAMode){
+        controlReg |= ecalEnable_Bit;
+    }
+    else {
+        controlReg &= ~ecalEnable_Bit;
+    }
+    [self setControlReg: controlReg];
+}
+- (BOOL) ECAMode {
+    CONTROL_REG_MASK controlReg =[self controlReg];
+    return (controlReg & ecalEnable_Bit) > 0;
+}
+- (void) setMTCAMimic1_Threshold:(float)_MTCAMimic1_Threshold {
+    NSString * const command = [NSString stringWithFormat:@"SetDACThreshold %f",_MTCAMimic1_Threshold];
+    [self sendOkCmd:command];
+}
+- (float) MTCAMimic1_Threshold {
+    int ValInmV = [self sendIntCmd:@"GetDACThreshold"];
+    return (float)ValInmV / 1000.0;
+}
+- (void) setSpeakerMask:(NSUInteger)_speakerMask{
+    NSString * const command = [NSString stringWithFormat:@"SetSpeakerMask %d",_speakerMask];
+    [self sendOkCmd:command];
+}
+- (NSUInteger) speakerMask {
+    NSString* const command = @"GetSpeakerMask";
+    return [self sendIntCmd:command];
 }
 @end
