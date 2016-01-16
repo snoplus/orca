@@ -17,6 +17,7 @@
                 <outlet property="CounterTestModeSelect" destination="KeY-bo-8dd" id="yb4-bY-Iz0"/>
                 <outlet property="DGT_Field" destination="bES-kQ-hog" id="bBS-b1-wI0"/>
                 <outlet property="DGT_Slider" destination="Kr0-MY-jx1" id="jE9-7i-cd5"/>
+                <outlet property="ECA_EnableButton" destination="iur-DA-0o0" id="61l-gC-XRy"/>
                 <outlet property="GenericDelay_TextField" destination="WdA-qe-6i0" id="ce3-I3-F0I"/>
                 <outlet property="LO_Field" destination="02V-nh-qDt" id="yqV-Jv-WEM"/>
                 <outlet property="LO_Slider" destination="zq5-Yh-wDu" id="OSd-sM-W4d"/>

@@ -11,43 +11,6 @@
 
 @implementation TUBiiController
 
-@synthesize TrigMaskSelect;
-
-@synthesize caenChannelSelect_0;
-@synthesize caenChannelSelect_1;
-@synthesize caenChannelSelect_2;
-@synthesize caenChannelSelect_3;
-@synthesize caenGainSelect_0;
-@synthesize caenGainSelect_1;
-@synthesize caenGainSelect_2;
-@synthesize caenGainSelect_3;
-@synthesize caenGainSelect_4;
-@synthesize caenGainSelect_5;
-@synthesize caenGainSelect_6;
-@synthesize caenGainSelect_7;
-
-@synthesize SpeakerMaskSelect_1;
-@synthesize SpeakerMaskSelect_2;
-@synthesize SpeakerMaskField;
-
-@synthesize CounterMaskSelect_1;
-@synthesize CounterMaskSelect_2;
-@synthesize CounterMaskField;
-@synthesize CounterAdvancedOptionsBox;
-@synthesize CounterMaskSelectBox;
-@synthesize CounterLZBSelect;
-@synthesize CounterTestModeSelect;
-@synthesize CounterInhibitSelect;
-
-@synthesize LO_Field;
-@synthesize DGT_Field;
-@synthesize LO_SrcSelect;
-@synthesize LO_Slider;
-@synthesize DGT_Slider;
-
-@synthesize MTCAMimic_Slider;
-@synthesize MTCAMimic_TextField;
-
 @synthesize tabView;
 
 - (id)init{
@@ -69,19 +32,19 @@
     [tabView setDelegate:self];
 
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
-    NSUInteger maskVal = [self GetBitInfoFromCheckBoxes:SpeakerMaskSelect_1 FromBit:0 ToBit:16];
+   /* NSUInteger maskVal = [self GetBitInfoFromCheckBoxes:SpeakerMaskSelect_1 FromBit:0 ToBit:16];
     maskVal |= [self GetBitInfoFromCheckBoxes:SpeakerMaskSelect_2 FromBit:16 ToBit:22];
     [SpeakerMaskField setStringValue:[NSString stringWithFormat:@"%i",maskVal]];
     maskVal = [self GetBitInfoFromCheckBoxes:CounterMaskSelect_1 FromBit:0 ToBit:16];
     maskVal |= [self GetBitInfoFromCheckBoxes:CounterMaskSelect_2 FromBit:16 ToBit:22];
-    [CounterMaskField setStringValue:[NSString stringWithFormat:@"%i",maskVal]];
+    [CounterMaskField setStringValue:[NSString stringWithFormat:@"%i",maskVal]];*/
     [CounterAdvancedOptionsBox setHidden:YES];
 
-    [self CaenMatchHardware:(self)];
-    [[self caenChannelSelect_3] setEnabled:NO];//Not currently working on board
+    //[self CaenMatchHardware:(self)];
+    [caenChannelSelect_3 setEnabled:NO];//Not currently working on board
     [caenGainSelect_4 setEnabled:NO]; //Not currently working on board.
 
-    [self GTDelaysMatchHardware:self];
+    //[self GTDelaysMatchHardware:self];
 }
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item{
     int tabIndex = [aTabView indexOfTabViewItem:item];
