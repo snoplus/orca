@@ -29,7 +29,7 @@
     return timeout;
 }
 
-- (instancetype)init
+- (id)init
 {
     self = [self initWithHostName: @"" withPort: -1];
     return self;
