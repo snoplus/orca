@@ -3283,6 +3283,16 @@ void SwapLongBlock(void* p, int32_t n)
     //Make sure we only have one init cycle going
     [hvInitLock lock];
     
+    //Free the HV Init thread if it exists
+    if (hvInitThread) {
+        if (![hvInitThread isFinished]) {
+            //Already created the thread and it is running
+            return;
+        }
+        [hvInitThread release];
+        hvInitThread = nil;
+    }
+    
     //Kill the HV thread if it exists
     if (hvThread) {
         if (![hvThread isFinished]) {
@@ -3290,15 +3300,6 @@ void SwapLongBlock(void* p, int32_t n)
         }
         [hvThread release];
         hvThread = nil;
-    }
-    
-    //Kill the HV Init thread if it exists
-    if (hvInitThread) {
-        if (![hvInitThread isFinished]) {
-            [hvInitThread cancel];
-        }
-        [hvInitThread release];
-        hvInitThread = nil;
     }
     
     //Set the HV control to a safe state
@@ -4414,7 +4415,8 @@ void SwapLongBlock(void* p, int32_t n)
 {
     NSAutoreleasePool* hvPool = [[NSAutoreleasePool alloc] init];
     NSLog(@"Attempting to readout HV status from XL3\n");
-    while (![self hvEverUpdated] || ![self hvSwitchEverUpdated]) {
+    while (true) {
+        sleep(1);
         //do nothing without an xl3 connected
         if ([self xl3Link] && [[self xl3Link] isConnected]) {
             
@@ -4458,8 +4460,9 @@ void SwapLongBlock(void* p, int32_t n)
             
             //let everyone know that we now have HV control
             [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
+            
+            break; //exit loop
         }
-        sleep(1);
     }
     [hvPool release];
 }
