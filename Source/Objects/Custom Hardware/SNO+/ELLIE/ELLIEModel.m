@@ -271,6 +271,13 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     /*
      Calculate the pulse width settings required to return a given intenstity from a specified channel, at a specified rate.
     */
+    if(self.tellieFireParameters == nil){
+        NSException* e = [NSException
+                          exceptionWithName:@"NoTellieFireParameters"
+                          reason:@"*** TELLIE fire_parameters doc has not been loaded - you need to call loadTellieStaticsFromDB"
+                          userInfo:nil];
+        @throw e;
+    }
     if(frequency != 1000){
         //10Hz frequency calibrations not complete.
         [NSException raise:@"Variable exception" format:@"The passed frequency != 1000Hz"];
@@ -630,6 +637,43 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
      variables and push up to the telliedb. Additionally, the run doc dictionary set as 
      the tellieRunDoc propery, to be updated later in the run.
     */
+    NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:10];
+    
+    NSArray*  objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    runControl = [objs3 objectAtIndex:0];
+    
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    
+    NSString* docType = [NSMutableString stringWithFormat:@"tellie_run"];
+    NSMutableArray* subRunArray = [NSMutableArray arrayWithCapacity:10];
+    
+    [runDocDict setObject:docType forKey:@"type"];
+    [runDocDict setObject:[NSString stringWithFormat:@"%i",0] forKey:@"version"];
+    [runDocDict setObject:[NSString stringWithFormat:@"%lu",[runControl runNumber]] forKey:@"index"];
+    [runDocDict setObject:[self stringUnixFromDate:nil] forKey:@"issue_time_unix"];
+    [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"issue_time_iso"];
+    [runDocDict setObject:[NSNumber numberWithInt:[runControl runNumber]] forKey:@"run"];
+    [runDocDict setObject:subRunArray forKey:@"sub_run_info"];
+    
+    self.tellieRunDoc = runDocDict;
+    
+    [[aSnotModel orcaDbRefWithEntryDB:self withDB:@"telliedb"] addDocument:runDocDict tag:kTellieRunDocumentAdded];
+    
+    //wait for main thread to receive acknowledgement from couchdb
+    NSDate* timeout = [NSDate dateWithTimeIntervalSinceNow:2.0];
+    while ([timeout timeIntervalSinceNow] > 0 && ![self.tellieRunDoc objectForKey:@"_id"]) {
+        [NSThread sleepForTimeInterval:0.1];
+    }
+}
+
+-(void) pushTellieRunDocument
+{
+    /*
+     Create a standard tellie run doc using ELLIEModel / SNOPModel / ORRunModel class
+     variables and push up to the telliedb. Additionally, the run doc dictionary set as
+     the tellieRunDoc propery, to be updated later in the run.
+     */
     NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:10];
     
     NSArray*  objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
