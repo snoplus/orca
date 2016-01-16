@@ -223,7 +223,7 @@
         maskSelect_2 = CounterMaskSelect_2;
         textField = CounterMaskField;
     }
-    [textField setStringValue:[NSString stringWithFormat:@"%i",maskVal]];
+    [textField setIntegerValue:maskVal];
     [self SendBitInfo:maskVal FromBit:0 ToBit:16 ToCheckBoxes:maskSelect_1];
     [self SendBitInfo:maskVal FromBit:16 ToBit:22 ToCheckBoxes:maskSelect_2];
 }
@@ -379,10 +379,10 @@
     [DGT_Slider setFloatValue:DGT_Delay];
     [DGT_Field setIntegerValue:DGT_Delay];
     if (([model controlReg] & lockoutSel_Bit)>0){
-        [[self LO_SrcSelect] selectCellWithTag:1];
+        [LO_SrcSelect selectCellWithTag:1];
     }
-    else{
-        [[self LO_SrcSelect] selectCellWithTag:2];
+    else {
+        [LO_SrcSelect selectCellWithTag:2];
     }
     [self LOSrcSelectChanged:self];
 }

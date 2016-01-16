@@ -61,7 +61,7 @@
                         <rect key="frame" x="13" y="-58" width="595" height="696"/>
                         <tabViewItems>
                             <tabViewItem label="Pulsers &amp; Delays" identifier="1" id="8WF-ET-0MY">
-                                <view key="view" ambiguous="YES" id="cdC-ig-bsI">
+                                <view key="view" id="cdC-ig-bsI">
                                     <rect key="frame" x="10" y="25" width="575" height="658"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
@@ -890,7 +890,7 @@
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Analog" identifier="" id="eZN-gI-gx9">
-                                <view key="view" id="y5f-eX-O1H">
+                                <view key="view" ambiguous="YES" id="y5f-eX-O1H">
                                     <rect key="frame" x="10" y="25" width="575" height="658"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
