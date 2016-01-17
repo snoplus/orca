@@ -192,14 +192,6 @@ kPEDCrateMask
 - (void) setupDefaults;
 @end
 
-@interface ORMTCModel (SBC)
-- (void) fireMTCPedestalsFixedTimeSBC;
-- (void) stopMTCPedestalsFixedTimeSBC;
-- (void) enableSingleShotMTCPedestalsFixedTimeSBC;
-- (unsigned long) singleShotMTCPedestalsFixedTimeSBC:(unsigned long) pedestalCount withDelay:(unsigned long) usecDelay;
-- (void) tellReadoutSBC:(unsigned int) cmd;
-@end
-
 @implementation ORMTCModel
 
 @synthesize
@@ -290,9 +282,30 @@ resetFifoOnStart = _resetFifoOnStart;
 - (void) runAboutToStart:(NSNotification*)aNote
 {
     /* At the start of every run, we initialize the HW settings. */
+
+    /* Setup MTCD pedestal/pulser settings */
+    if ([self isPedestalEnabledInCSR]) [self enablePedestal];
+	[self setupPulseGTDelaysCoarse: uLongDBValue(kCoarseDelay) fine:uLongDBValue(kFineDelay)];
+	[self setTheLockoutWidth: uLongDBValue(kLockOutWidth)];
+	[self setThePedestalWidth: uLongDBValue(kPedestalWidth)];
+    [self setThePulserRate:floatDBValue(kPulserPeriod)];
+	[self setThePrescaleValue];
+
+    /* Setup Pedestal Crate Mask */
+	[self setPedestalCrateMask];
+
+    /* Setup the GT mask */
     [self clearGlobalTriggerWordMask];
+	[self setSingleGTWordMask: uLongDBValue(kGtMask)];
+
+    /* Setup GT Crate Mask */
     [self setGTCrateMask];
-    [self setSingleGTWordMask: uLongDBValue(kGtMask)];
+
+    /* Setup MTCA Thresholds */
+    [self loadTheMTCADacs];
+
+    /* Setup MTCA relays */
+    [self mtcatLoadCrateMasks];
 }
 
 #pragma mark •••Accessors
@@ -790,29 +803,7 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	//subclasses can override
-    NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* runControl;
-    if ([objs count]) {
-        runControl = [objs objectAtIndex:0];
-        if ([runControl nextRunWillQuickStart]) {
-            //keep it running
-        } else {
-            @try {
-                [self clearGlobalTriggerWordMask];
-            } @catch (NSException *exception) {
-                NSLog(@"MTCD clear trigger mask at the end of a run failed.\n");
-            }
-        }
-    } else {
-        @try {
-            [self clearGlobalTriggerWordMask];
-        } @catch (NSException *exception) {
-        NSLog(@"MTCD clear trigger mask at the end of a run failed.\n");
-        }
-    }
 }
-
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
@@ -1720,75 +1711,17 @@ resetFifoOnStart = _resetFifoOnStart;
 	}
 }
 
-- (void) setThePulserRate:(float) thePulserPeriodValue
+- (void) setThePulserRate:(float) pulserRate
 {
 	@try {
-		[self setThePulserRate:thePulserPeriodValue setToInfinity:NO];
-		NSLog(@"Set GT Pusler rate\n");			
+        [mtc okCommand:"set_pulser_freq %f", pulserRate];
+		NSLog(@"mtc: pulser rate set to %.2f Hz\n", pulserRate);			
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Could not set GT Pusler rate!\n");			
 		NSLog(@"Exception: %@\n",localException);
 		[localException raise];			
 		
-	}
-}
-
-- (void) setThePulserRate:(float) thePulserPeriodValue setToInfinity:(BOOL) setToInfinity
-{
-	unsigned long	pulserShiftValue = 0xffffff;
-	
-	@try {
-		// STEP 1: Load the shift register
-		if(setToInfinity)pulserShiftValue =  0;  
-		else {
-            if (thePulserPeriodValue < 0.05) {
-                pulserShiftValue = 0xffffff;
-            }
-            else {
-                // calculate the value to be shifted into SMTC_SERIAL_REG
-                //float pulserShiftFValue =  (thePulserPeriodValue/0.001280) - 1.0;  // max pulser period = (0.00128ms * 0x00ffffff) = 21474.8532ms
-                // the pulser period value is rate now
-                float pulserShiftFValue =  (1000.0/thePulserPeriodValue/0.001280) - 1.0;
-                pulserShiftValue = (unsigned long)pulserShiftFValue;
-            }
-		}
-		
-		// STEP 2: Now serially shift into SMTC_SERIAL_REG the value 'pulserShiftValue'
-		short j;
-		for ( j = 23; j >= 0; j--){							
-			
-			unsigned long aValue = 0UL;
-			if ( (1UL << j ) & pulserShiftValue ) aValue |= ( 1UL << 1 );		// build the data word
-			
-			[self write:kMtcSerialReg value:aValue + 1]; // Bit 0 is always high
-			// clock in data value, BIT 0 = high
-			[self write:kMtcSerialReg value:((aValue | MTC_SERIAL_SHFTCLKPS) | 0x000000001)]; 	
-			
-		}		
-		
-		float frequencyValue = (float)( 781.25/((float)pulserShiftValue + 1.0) );					// in KHz
-		if (frequencyValue < 0.001)		NSLog(@"Pulser frequency set @ %3.3f mHz.\n",(frequencyValue * 1000000.0));
-		else if (frequencyValue <= 1.0)	NSLog(@"Pulser frequency set @ %3.3f Hz.\n",(frequencyValue * 1000.0));
-		else if (frequencyValue > 1.0)	NSLog(@"Pulser frequency set @ %3.4f kHz.\n",frequencyValue);
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Could not setup the MTC pulser frequency!\n");
-		[localException raise];
-	}
-}
-
-- (void) loadEnablePulser
-{
-	@try {
-		[self clrBits:kMtcControlReg mask:MTC_CSR_LOAD_ENPS];
-		[self setBits:kMtcControlReg mask:MTC_CSR_LOAD_ENPS];
-		[self clrBits:kMtcControlReg mask:MTC_CSR_LOAD_ENPS];
-		NSLog(@"loaded/enabled the pulser!\n");		
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Unable to load/enable the pulser!\n");		
-		[localException raise];	
 	}
 }
 
@@ -1872,23 +1805,14 @@ resetFifoOnStart = _resetFifoOnStart;
 	//GT coarse delay, GT Lockout Width, pedestal width in ns and a 
 	//specified crate mask set in MTC Databse. Trigger mask is EXT_8.
     
-    //get the run controller
-    NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* runControl;
-    runControl = [objs objectAtIndex:0];
-    //access the run control and only allow this to happen if a run is going
-    if([runControl isRunning]){
-            @try {
-                [self basicMTCPedestalGTrigSetup];				//STEP 1: Perfom the basic setup for pedestals and gtrigs
-                [self setupPulserRateAndEnable:floatDBValue(kPulserPeriod)];	// STEP 2 : Setup pulser rate and enable
-            }
-            @catch(NSException* e) {
-                NSLog(@"MTC failed to fire pedestals at the specified settings!\n");
-                NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
-            }
-    }
-    else{
-        NSLog(@"MTC failed to fire pedestals because there is no run going!\n");
+    @try {
+		/* setup pedestals and global trigger */
+        [self basicMTCPedestalGTrigSetup];
+        [self setThePulserRate:floatDBValue(kPulserPeriod)];
+        [self enablePulser];
+    } @catch(NSException* e) {
+        NSLog(@"MTC failed to fire pedestals at the specified settings!\n");
+        NSLog(@"fireMTCPedestalsFixedRate: %@\n", [e reason]);
     }
 }
 
@@ -1914,119 +1838,48 @@ resetFifoOnStart = _resetFifoOnStart;
 	}
 }
 
-- (void) setupPulserRateAndEnable:(float) pulserPeriodVal
-{
-	[self setThePulserRate:pulserPeriodVal];	// STEP 1: Setup the pulser rate [pulser period in ms]
-	[self loadEnablePulser];			// STEP 2 : Load Enable Pulser
-	[self enablePulser];				// STEP 3 : Enable Pulser	
-}
-
-//starts an SBC job
 - (void) fireMTCPedestalsFixedTime
 {
-	if([self adapterIsSBC]){
-		[self enableSingleShotMTCPedestalsFixedTime];
-		[self fireMTCPedestalsFixedTimeSBC];
-	}
-	else {
-		NSLog(@"Implemented for SBC only");
-	}	
+    @try {
+		/* setup pedestals and global trigger */
+        [self basicMTCPedestalGTrigSetup];
+
+		[self clearSingleGTWordMask:MTC_SOFT_GT_MASK];
+
+        /* set the pulser rate to 0, which will enable SOFT_GT to trigger
+         * pedestals */
+        [self setThePulserRate:0];
+
+        [self enablePulser];
+
+        [mtc okCommand:"multi_soft_gt %d %f", [self fixedPulserRateCount],
+                        [self fixedPulserRateDelay]];
+
+    } @catch(NSException* e) {
+        NSLog(@"MTC failed to fire pedestals at the specified settings!\n");
+        NSLog(@"fireMTCPedestalsFixedRate: %@\n", [e reason]);
+    }
 }
 
-//kills the SBC job
 - (void) stopMTCPedestalsFixedTime
 {
-	if([self adapterIsSBC]){
-		[self stopMTCPedestalsFixedTimeSBC];
-	}
-	else {
-		NSLog(@"Implemented for SBC only");
-	}
+    [mtc okCommand:"stop_multi_soft_gt"];
 }
 
-- (void) enableSingleShotMTCPedestalsFixedTime
+- (void) firePedestals:(unsigned long) count withRate:(float) rate
 {
-	if([self adapterIsSBC]){
-		@try {
-			[self enableSingleShotMTCPedestalsFixedTimeSBC];
-			[self setGlobalTriggerWordMask];
-		}
-		@catch (NSException * e) {
-			NSLog(@"Error enabling pedestals fixed time.!");
-			NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
-		}
-	}
-	else {
-		NSLog(@"Implemented for SBC only");
-	}		
-}
+    /* Fires a fix number of pedestals at a specified rate in Hz.
+     * This function should not be called on the main GUI thread, but
+     * only by ORCA scripts since it blocks until completion */
 
-//single shot blocking SBC command for ORCA macros only (no GUI)
-- (void) singleShotMTCPedestalsFixedTime
-{
-    if ([self fixedPulserRateDelay] == 0) {
-        NSLog(@"MTCD: pulser rate of 0 Hz requested and ignored.\n");
-        return;
-    }
-    unsigned long pulserDelay;
-	pulserDelay = (unsigned long) (1./[self fixedPulserRateDelay] * 1e7); //100 nsec delay between pulses indeed, sorry
+    long timeout = [mtc timeout];
 
-	[self singleShotMTCPedestalsFixedTime:[self fixedPulserRateCount] withDelay:pulserDelay];
-    
-}
+    /* Temporarily increase the timeout since it might take a while */
+    [mtc setTimeout:(long) count/rate];
 
-//single shot blocking SBC command for ORCA macros only (no GUI) returns GTID difference before - after from the MTC register
-- (unsigned long) singleShotMTCPedestalsFixedTime:(unsigned long) pedestalCount withDelay:(unsigned long) usecDelay
-{
-	unsigned long aValue = 0;
+    [mtc okCommand:"fire_pedestals %d %f", count, rate];
 
-	if([self adapterIsSBC]){
-		@try {
-			NSLog(@"pedestalCount: %d, delay: %d\n", pedestalCount, usecDelay);
-			aValue = [self singleShotMTCPedestalsFixedTimeSBC:pedestalCount withDelay:usecDelay];
-		}
-		@catch (NSException * e) {
-			NSLog(@"Error firing pedestals fixed time.!");
-			NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
-		}
-	}
-	else {
-		NSLog(@"Implemented for SBC only");
-	}		
-
-	return aValue;
-}
-
-//todo: convert into local adapter one
-- (void) fireMTCPedestalsFixedNumber:(unsigned long) numPedestals
-{
-	@try {
-		short j;
-		for (j = 23; j >= 0; j--){							
-			unsigned long aValue = 0UL;
-			[self write:kMtcSerialReg value:aValue | MTC_SERIAL_REG_SEN];
-			[self write:kMtcSerialReg value:aValue | MTC_SERIAL_SHFTCLKPS];
-		}
-		[self loadEnablePulser];
-		[self enablePulser];
-		[self basicMTCPedestalGTrigSetup];
-		
-		[self setSingleGTWordMask:MTC_EXT_8_MASK];	
-		
-		short i;
-		for (i = 0; i < numPedestals; i++){
-			[ORTimer delay:0.005];					// 5 ms delay
-			[self write:kMtcSoftGtReg value:0];		//value doesn't matter
-		}
-		
-		[self clearSingleGTWordMask:MTC_EXT_8_MASK];
-		[self disablePulser];
-		[self disablePedestal];
-	}
-	@catch(NSException* localException) {
-		NSLog(@"couldn't fire pedestal\n");
-		[localException raise];
-	}
+    [mtc setTimeout:timeout];
 }
 
 - (void) basicMTCReset
