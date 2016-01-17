@@ -11,8 +11,6 @@
 
 @implementation TUBiiController
 
-@synthesize tabView;
-
 - (id)init{
     // Initialize by launching the GUI, referenced by the name of the xib/nib file
     self = [super initWithWindowNibName:@"TUBii"];
@@ -29,22 +27,14 @@
     Analog_size = NSMakeSize(615, 445);
     GTDelays_size = NSMakeSize(500, 250);
     SpeakerCounter_size = NSMakeSize(575,550);
+    ClockMonitor_size = NSMakeSize(500, 175);
+
     [tabView setDelegate:self];
 
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
-   /* NSUInteger maskVal = [self GetBitInfoFromCheckBoxes:SpeakerMaskSelect_1 FromBit:0 ToBit:16];
-    maskVal |= [self GetBitInfoFromCheckBoxes:SpeakerMaskSelect_2 FromBit:16 ToBit:22];
-    [SpeakerMaskField setStringValue:[NSString stringWithFormat:@"%i",maskVal]];
-    maskVal = [self GetBitInfoFromCheckBoxes:CounterMaskSelect_1 FromBit:0 ToBit:16];
-    maskVal |= [self GetBitInfoFromCheckBoxes:CounterMaskSelect_2 FromBit:16 ToBit:22];
-    [CounterMaskField setStringValue:[NSString stringWithFormat:@"%i",maskVal]];*/
     [CounterAdvancedOptionsBox setHidden:YES];
-
-    //[self CaenMatchHardware:(self)];
     [caenChannelSelect_3 setEnabled:NO];//Not currently working on board
     [caenGainSelect_4 setEnabled:NO]; //Not currently working on board.
-
-    //[self GTDelaysMatchHardware:self];
 }
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item{
     int tabIndex = [aTabView indexOfTabViewItem:item];
@@ -84,9 +74,33 @@
         [self resizeWindowToSize:SpeakerCounter_size];
         [[self window] setContentView:tabView];
     }
+    else if(tabIndex==6)
+    {
+        [[self window] setContentView:blankView];
+        [self resizeWindowToSize:ClockMonitor_size];
+        [[self window] setContentView:tabView];
+    }
 }
 
 // GUI actions. CTRL-drag handles from the IB into this file.
+- (IBAction)DataReadoutChanged:(id)sender {
+    if ([[sender selectedCell] tag] == 1) { //Data Readout On is selected
+        [model setDataReadout:YES];
+    }
+    else { //Data Readout Off is selected
+        [model setDataReadout:NO];
+    }
+    return;
+}
+- (IBAction)StatusReadoutChanged:(id)sender {
+    if ([[sender selectedCell] tag] == 1) { //Status Readout On is selected
+        [model setStatusReadout:YES];
+    }
+    else { //Status Readout Off is selected
+        [model setStatusReadout:NO];
+    }
+    return;
+}
 - (IBAction)PulserFire:(id)sender {
     if ([sender tag] == 1){
         [model fireSmelliePulser];
@@ -234,6 +248,12 @@
     [CounterLZBSelect setState: (ControlRegVal & scalerLZB_Bit) > 0 ? NSOnState : NSOffState ];
     [CounterTestModeSelect setState: (ControlRegVal & scalerT_Bit) > 0 ? NSOffState : NSOnState ]; //Unchecked = bit high
     [CounterInhibitSelect setState: (ControlRegVal & scalerI_Bit) > 0 ? NSOffState : NSOnState ]; //Unchecked = bit high
+    if ([model CounterMode]) {
+        [CounterModeSelect selectCellWithTag:1];
+    }
+    else {
+        [CounterModeSelect selectCellWithTag:0];
+    }
 }
 - (IBAction)SpeakerLoadMask:(id)sender {
     NSUInteger maskVal=0;
@@ -267,7 +287,15 @@
     newControlReg |=  [CounterTestModeSelect intValue] ==1 ? 0 : scalerT_Bit;
     newControlReg |=  [CounterInhibitSelect intValue] ==1 ? 0 : scalerI_Bit;
     [model setControlReg:newControlReg];
-}
+    if ([[CounterModeSelect selectedCell] tag] ==1) {
+        //Rate Mode is selected
+        [model setCounterMode:YES];
+    }
+    else { //Totalizer Mode is selected
+        [model setCounterMode:NO];
+    }
+
+    }
 - (IBAction)SpeakerCheckBoxChanged:(id)sender {
     NSUInteger maskVal = [self GetBitInfoFromCheckBoxes:SpeakerMaskSelect_1 FromBit:0 ToBit:16];
     maskVal |= [self GetBitInfoFromCheckBoxes:SpeakerMaskSelect_2 FromBit:16 ToBit:22];
@@ -355,7 +383,6 @@
         }
     }
 }
-
 
 - (IBAction)GTDelaysLoadMask:(id)sender {
     float LO_Delay = [LO_Field floatValue];
@@ -446,22 +473,37 @@
 }
 
 - (IBAction)MTCAMimicMatchHardware:(id)sender {
-    double value = [model MTCAMimic1_Threshold];
+    NSUInteger DACBits= [model MTCAMimic1_Threshold];
+    //Bit value of the DAC
+    float value =[self ConvertBitsToValue:DACBits NBits:12 MinVal:-5.0 MaxVal:5.0];
     [MTCAMimic_Slider setFloatValue:value];
-    [MTCAMimic_TextField setStringValue:[NSString stringWithFormat:@"%.3f",value]];
+    [MTCAMimic_TextField setFloatValue:value];
 }
 
 - (IBAction)MTCAMimicLoadValue:(id)sender {
     double value = [MTCAMimic_TextField floatValue];
-    [model setMTCAMimic1_Threshold:value];
+    NSUInteger DACBits = [self ConvertValueToBits:value NBits:12 MinVal:-5.0 MaxVal:5.0];
+    [model setMTCAMimic1_Threshold:DACBits];
+}
+
+- (IBAction)LoadClockSource:(id)sender {
+    if([[DefaultClockSelect selectedCell] tag]==1){
+        [model setTUBiiIsDefaultClock: YES];
+    }
+    else {
+        [model setTUBiiIsDefaultClock: NO];
+    }
+}
+
+- (IBAction)ClockSourceMatchHardware:(id)sender {
 }
 
 - (float) ConvertBitsToValue:(NSUInteger)bits NBits: (int) nBits MinVal: (float) minVal MaxVal: (float) maxVal{
     float stepSize = (maxVal - minVal)/(pow(2, nBits)-1.0);
-    return bits*stepSize;
+    return bits*stepSize+minVal;
 }
 - (NSUInteger) ConvertValueToBits: (float) value NBits: (int) nBits MinVal: (float) minVal MaxVal: (float) maxVal{
     float stepSize = (maxVal - minVal)/(pow(2,nBits)-1.0);
-    return value/stepSize;
+    return (value - minVal)/stepSize;
 }
 @end

@@ -10,13 +10,18 @@
 
 
 @interface TUBiiController : OrcaObjectController <NSTabViewDelegate> {
+
     NSView *blankView;
+    //NSSizes used for resizing window on tab change
     NSSize PulserAndDelays_size;
     NSSize Triggers_size;
     NSSize Tubii_size;
     NSSize Analog_size;
     NSSize GTDelays_size;
     NSSize SpeakerCounter_size;
+    NSSize ClockMonitor_size;
+    // These references to UI elements are created by CTRL-dragging them into this
+    // header file. Note the connection dots on the left.
     IBOutlet NSTabView *tabView;
 
     IBOutlet NSMatrix *TrigMaskSelect;
@@ -46,6 +51,8 @@
     IBOutlet NSButton *CounterLZBSelect;
     IBOutlet NSButton *CounterTestModeSelect;
     IBOutlet NSButton *CounterInhibitSelect;
+    IBOutlet NSMatrix *CounterModeSelect;
+
     IBOutlet NSMatrix *ECA_EnableButton;
     
     IBOutlet NSTextField *DGT_Field;
@@ -61,12 +68,13 @@
     IBOutlet NSTextField *TellieDelay_TextField;
     IBOutlet NSTextField *GenericDelay_TextField;
 
+    IBOutlet NSMatrix *DefaultClockSelect;
+
+    NSButton *ClockSourceMatchHardware;
 }
 -(id) init;
 
-// These references to UI elements are created by CTRL-dragging them into this
-// header file. Note the connection dots on the left.
-@property (assign,weak) IBOutlet NSTabView *tabView;
+
 
 
 - (NSUInteger) GetBitInfoFromCheckBoxes: (NSMatrix*)aMatrix FromBit:(int)low ToBit: (int)high;
@@ -74,6 +82,9 @@
 
 - (float) ConvertBitsToValue:(NSUInteger)bits NBits: (int) nBits MinVal: (float) minVal MaxVal: (float) maxVal;
 - (NSUInteger) ConvertValueToBits: (float) value NBits: (int) nBits MinVal: (float) minVal MaxVal: (float) maxVal;
+
+- (IBAction)StatusReadoutChanged:(id)sender;
+- (IBAction)DataReadoutChanged:(id)sender;
 
 - (IBAction)CaenMatchHardware:(id)sender;
 - (IBAction)CaenLoadMask:(id)sender;
@@ -103,5 +114,6 @@
 - (IBAction)MTCAMimicSliderChanged:(id)sender;
 - (IBAction)MTCAMimicMatchHardware:(id)sender;
 - (IBAction)MTCAMimicLoadValue:(id)sender;
-
+- (IBAction)LoadClockSource:(id)sender;
+- (IBAction)ClockSourceMatchHardware:(id)sender;
 @end

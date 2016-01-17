@@ -10,6 +10,9 @@
 #import "NetSocket.h"
 #import "netdb.h"
 
+#define TUBII_DEFAULT_IP "192.168.80.25"
+#define TUBII_DEFAULT_PORT 4001
+
 @implementation TUBiiModel
 
 @synthesize portNumber;
@@ -24,7 +27,6 @@
 @synthesize smellieRate;
 @synthesize pulserRate;
 
-@synthesize forcedUpdates;
 
 - (void) setUpImage
 {
@@ -46,7 +48,7 @@
 // Note that this is initWithCoder and not just init, and we
 // call the superclass initWithCoder too!
 - (id) initWithCoder:(NSCoder *)aCoder {
-    NSLog(@"TUBii init with coder");
+    NSLog(@"TUBii init with coder\n");
     self = [super initWithCoder:aCoder];
     smellieRate = 0;
     tellieRate = 0;
@@ -57,20 +59,13 @@
     smellieNPulses=0;
     tellieNPulses=0;
     NPulses=0;
-    portNumber = 4001;
-
-    /*
-    strHostName = [[NSString alloc] initWithCoder:aCoder];
-    forcedUpdates = [[NSNumber alloc] initWithCoder:aCoder];
-     */
-    strHostName = [[NSString alloc]initWithUTF8String:"192.168.80.25"];
-    portNumber= 4001;
-    forcedUpdates = [[NSNumber alloc]initWithBool:NO];
+    portNumber = TUBII_DEFAULT_PORT;
+    strHostName = [[NSString alloc]initWithUTF8String:TUBII_DEFAULT_IP];
     connection = [[RedisClient alloc] initWithHostName:strHostName withPort:portNumber];
     return self;
 }
 - (id) init {
-    NSLog(@"init called");
+    NSLog(@"init called\n");
     self = [super init];
     // Initialize model member variables
     smellieRate = 0;
@@ -82,28 +77,27 @@
     smellieNPulses=0;
     tellieNPulses=0;
     NPulses=0;
-    portNumber= 4001;
-    strHostName = [[NSString alloc]initWithUTF8String:"192.168.80.25"];
-    forcedUpdates = [[NSNumber alloc]initWithBool:NO];
+    portNumber =TUBII_DEFAULT_PORT;
+    strHostName = [[NSString alloc]initWithUTF8String:TUBII_DEFAULT_IP];
     connection = [[RedisClient alloc] initWithHostName:strHostName withPort:portNumber];
     return self;
 }
 - (void) sendOkCmd:(NSString* const)aCmd {
     @try {
-        NSLog(@"Sending %@ to TUBii\n");
+        NSLog(@"Sending %@ to TUBii\n",aCmd);
         [connection okCommand: [aCmd UTF8String]];
     }
     @catch (NSException *exception) {
-        NSLog(@"Command %@ failed.\nReason: %@\n", aCmd,[exception reason]);
+        NSLog(@"Command: %@ failed.  Reason: %@\n", aCmd,[exception reason]);
     }
 }
 - (int) sendIntCmd: (NSString* const) aCmd {
     @try {
-        NSLog(@"Sending %@ to TUBii",aCmd);
+        NSLog(@"Sending %@ to TUBii\n",aCmd);
         return [connection intCommand: [aCmd UTF8String]];
     }
     @catch (NSException *exception) {
-        NSLog(@"Command %@ failed.\nReason: %@\n", aCmd,[exception reason]);
+        NSLog(@"Command: %@ failed.  Reason: %@\n", aCmd,[exception reason]);
         return nil;
     }
 }
@@ -133,7 +127,7 @@
 }
 
 - (void) ResetClock {
-    [connection okCommand:"ResetClock"];
+    [self sendOkCmd:@"ResetCommand"];
 }
 -(void) setCaenMasks: (CAEN_CHANNEL_MASK)aChannelMask
             GainMask:(CAEN_GAIN_MASK) aGainMask; {
@@ -214,13 +208,12 @@
     CONTROL_REG_MASK controlReg =[self controlReg];
     return (controlReg & ecalEnable_Bit) > 0;
 }
-- (void) setMTCAMimic1_Threshold:(float)_MTCAMimic1_Threshold {
-    NSString * const command = [NSString stringWithFormat:@"SetDACThreshold %f",_MTCAMimic1_Threshold];
+- (void) setMTCAMimic1_Threshold:(NSUInteger)_MTCAMimic1_Threshold {
+    NSString * const command = [NSString stringWithFormat:@"SetDACThreshold %u",_MTCAMimic1_Threshold];
     [self sendOkCmd:command];
 }
-- (float) MTCAMimic1_Threshold {
-    int ValInmV = [self sendIntCmd:@"GetDACThreshold"];
-    return (float)ValInmV / 1000.0;
+- (NSUInteger) MTCAMimic1_Threshold {
+    return [self sendIntCmd:@"GetDACThreshold"];
 }
 - (void) setSpeakerMask:(NSUInteger)_speakerMask{
     NSString * const command = [NSString stringWithFormat:@"SetSpeakerMask %d",_speakerMask];
@@ -229,5 +222,46 @@
 - (NSUInteger) speakerMask {
     NSString* const command = @"GetSpeakerMask";
     return [self sendIntCmd:command];
+}
+- (void) setTUBiiIsDefaultClock: (BOOL) IsDefault {
+    CONTROL_REG_MASK controlReg = [self controlReg];
+    if (IsDefault){
+        controlReg |= clkSel_Bit;
+    }
+    else {
+        controlReg &= ~clkSel_Bit;
+    }
+    [self setControlReg: controlReg];
+}
+-(BOOL) TUBiiIsDefaultClock {
+    CONTROL_REG_MASK controlReg = [self controlReg];
+    return (controlReg & clkSel_Bit) >0;
+}
+- (void) setDataReadout:(BOOL)val {
+    if (val) {
+        [self sendOkCmd:@"StartDataReadout"];
+    }
+    else {
+        [self sendOkCmd:@"StopDataReadout"];
+    }
+}
+- (void) setStatusReadout:(BOOL)val {
+    if (val) {
+        [self sendOkCmd:@"StartStatusReadout"];
+    }
+    else {
+        [self sendOkCmd:@"StopStatusReadout"];
+    }
+}
+- (void) setCounterMode:(BOOL)mode {
+    if (mode) {
+        [self sendOkCmd:@"SetCounterMode 1"]; //Rate Mode
+    }
+    else {
+        [self sendOkCmd:@"SetCounterMode 0"]; //Totalizer Mode
+    }
+}
+- (BOOL) CounterMode {
+    return ([self sendIntCmd:@"GetCounterMode"]) > 0;
 }
 @end

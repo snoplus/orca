@@ -80,10 +80,9 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 
     RedisClient *connection;
     int portNumber;
-    NSString* strHostName;//="192.168.80.25";
-    NSNumber *forcedUpdates;
+    NSString* strHostName;//"192.168.80.25";
 }
-@property int portNumber;
+@property (nonatomic) int portNumber;
 @property (nonatomic,assign) NSString* strHostName;
 @property (nonatomic) float smellieRate;
 @property (nonatomic) float tellieRate;
@@ -97,7 +96,7 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 @property (nonatomic) NSUInteger smellieDelay;
 @property (nonatomic) NSUInteger tellieDelay;
 @property (nonatomic) NSUInteger genericDelay;
-@property (nonatomic,assign) float MTCAMimic1_Threshold;
+@property (nonatomic) NSUInteger MTCAMimic1_Threshold;
 @property (nonatomic) BOOL ECAMode;
 @property (nonatomic,readonly) CAEN_CHANNEL_MASK caenChannelMask;
 @property (nonatomic,readonly) CAEN_GAIN_MASK caenGainMask;
@@ -107,16 +106,19 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 @property (nonatomic) NSUInteger counterMask;
 @property (nonatomic) NSUInteger trigMask;
 @property (nonatomic) CONTROL_REG_MASK controlReg;
-@property (assign,nonatomic) NSNumber *forcedUpdates;
+@property (nonatomic) BOOL TUBiiIsDefaultClock;
+@property (nonatomic) BOOL CounterMode;
 
 - (void) sendOkCmd:(NSString* const)aCmd;
-- (int) sendIntCmd:(NSString*const)aCmd;
+- (int) sendIntCmd:(NSString* const)aCmd;
 - (void) fireSmelliePulser;
 - (void) fireTelliePulser;
 - (void) firePulser;
 - (void) stopSmelliePulser;
 - (void) stopTelliePulser;
 - (void) stopPulser;
+- (void) setDataReadout: (BOOL) val;
+- (void) setStatusReadout: (BOOL) val;
 -(void) setCaenMasks: (CAEN_CHANNEL_MASK)aChannelMask
             GainMask:(CAEN_GAIN_MASK) aGainMask;
 - (void) setGTDelaysBits: (NSUInteger) aDGTMask LOBits:(NSUInteger)aLOMask;
