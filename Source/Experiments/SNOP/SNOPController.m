@@ -1061,6 +1061,7 @@ smellieRunFile;
     [standardRunPopupMenu setEnabled:!locked && !runInProgress];
     [standardRunSaveButton setEnabled:!locked && !runInProgress];
     [standardRunLoadButton setEnabled:!locked && !runInProgress];
+    [standardRunLoadToHWButton setEnabled:!locked && !runInProgress];
     
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
@@ -1117,6 +1118,10 @@ smellieRunFile;
 //General tools
 - (IBAction)loadStandardRunFromDB:(id)sender {
     [model loadStandardRun:[standardRunPopupMenu objectValueOfSelectedItem]];
+}
+
+- (IBAction)loadStandardRunToHW:(id)sender {
+    [model loadStandardRunToHW:[standardRunPopupMenu objectValueOfSelectedItem]];
 }
 
 - (IBAction)saveStandardRunToDB:(id)sender {

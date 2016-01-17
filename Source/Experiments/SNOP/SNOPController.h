@@ -118,6 +118,7 @@
     IBOutlet NSComboBox *standardRunPopupMenu;
     IBOutlet NSButton *standardRunSaveButton;
     IBOutlet NSButton *standardRunLoadButton;
+    IBOutlet NSButton *standardRunLoadToHWButton;
     
 }
 

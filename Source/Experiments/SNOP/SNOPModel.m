@@ -1169,6 +1169,18 @@ ECA_subrun_time = _ECA_subrun_time;
         NSLog(@"Error ",e);
     }
     
+}
+
+-(void) loadStandardRunToHW:(NSString*)runTypeName
+{
+
+    //Load to GUI
+    [self loadStandardRun:runTypeName];
+    
+    //Get MTC model
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    ORMTCModel* mtcModel = [objs objectAtIndex:0];
+
     //Ship values to MTC
     [mtcModel load10MHzClock];
     [mtcModel setupGTCorseDelay];
@@ -1179,8 +1191,8 @@ ECA_subrun_time = _ECA_subrun_time;
     [mtcModel setGTCrateMask];
     [mtcModel setPedestalCrateMask];
     [mtcModel mtcatLoadCrateMasks];
-    
 }
+
 
 //Save MTC settings in a Standard Run table in CouchDB for later use by the Run Scripts or the user
 -(void) saveStandardRun:(NSString*)runTypeName

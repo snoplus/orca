@@ -83,6 +83,7 @@
                 <outlet property="smellieStartRunButton" destination="3546" id="3611"/>
                 <outlet property="smellieStopRunButton" destination="3548" id="3612"/>
                 <outlet property="standardRunLoadButton" destination="ySv-iP-Vo5" id="yYU-zM-j8N"/>
+                <outlet property="standardRunLoadToHWButton" destination="tiy-4e-cxu" id="tcr-Ez-XrD"/>
                 <outlet property="standardRunPopupMenu" destination="xjE-ug-crJ" id="6RP-6D-4Dl"/>
                 <outlet property="standardRunSaveButton" destination="sQD-Yo-L3O" id="e4J-4j-lMT"/>
                 <outlet property="standardRunsSaveButton" destination="sQD-Yo-L3O" id="PGa-M7-0o4"/>
@@ -1042,28 +1043,6 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <button verticalHuggingPriority="750" id="ySv-iP-Vo5">
-                                            <rect key="frame" x="11" y="342" width="160" height="32"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="push" title="Load Standard Run" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="N75-hx-Szw">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="loadStandardRunFromDB:" target="-2" id="T2q-q5-yfj"/>
-                                            </connections>
-                                        </button>
-                                        <button verticalHuggingPriority="750" id="sQD-Yo-L3O">
-                                            <rect key="frame" x="290" y="342" width="279" height="32"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="push" title="Save Current Settings in Standard Run" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="NCG-Lr-klR">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="saveStandardRunToDB:" target="-2" id="ZUX-Fk-MrH"/>
-                                            </connections>
-                                        </button>
                                         <tabView controlSize="small" id="3092">
                                             <rect key="frame" x="10" y="-7" width="555" height="346"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -2205,41 +2184,102 @@
                                                         </subviews>
                                                     </view>
                                                 </tabViewItem>
-                                                <tabViewItem label="MANUAL" identifier="" id="3103">
+                                                <tabViewItem label="STANDARD RUNS" identifier="" id="3103">
                                                     <view key="view" id="3104">
                                                         <rect key="frame" x="10" y="25" width="535" height="308"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
-                                                            <button horizontalHuggingPriority="750" verticalHuggingPriority="750" id="3113">
-                                                                <rect key="frame" x="63" y="219" width="29" height="26"/>
+                                                            <button verticalHuggingPriority="750" id="ySv-iP-Vo5">
+                                                                <rect key="frame" x="28" y="121" width="204" height="32"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <buttonCell key="cell" type="disclosure" bezelStyle="roundedDisclosure" imagePosition="overlaps" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="3114">
-                                                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
+                                                                <buttonCell key="cell" type="push" title="Load Standard Run to GUI" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="N75-hx-Szw">
+                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
+                                                                <connections>
+                                                                    <action selector="loadStandardRunFromDB:" target="-2" id="T2q-q5-yfj"/>
+                                                                </connections>
                                                             </button>
+                                                            <button verticalHuggingPriority="750" id="tiy-4e-cxu">
+                                                                <rect key="frame" x="11" y="40" width="239" height="32"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <buttonCell key="cell" type="push" title="Load Standard Run to Hardware" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="bgn-5h-VEU">
+                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <connections>
+                                                                    <action selector="loadStandardRunToHW:" target="-2" id="iox-Ao-eZT"/>
+                                                                </connections>
+                                                            </button>
+                                                            <button toolTip="This button will save MTCD/A settings like thresholds and trigger masks" verticalHuggingPriority="750" allowsExpansionToolTips="YES" id="sQD-Yo-L3O">
+                                                                <rect key="frame" x="256" y="121" width="279" height="32"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <buttonCell key="cell" type="push" title="Save Current Settings in Standard Run" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="NCG-Lr-klR">
+                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <connections>
+                                                                    <action selector="saveStandardRunToDB:" target="-2" id="ZUX-Fk-MrH"/>
+                                                                </connections>
+                                                            </button>
+                                                            <comboBox verticalHuggingPriority="750" id="xjE-ug-crJ">
+                                                                <rect key="frame" x="211" y="226" width="116" height="26"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="Standard Run" drawsBackground="YES" numberOfVisibleItems="10" id="12x-oz-P6Z">
+                                                                    <font key="font" metaFont="system"/>
+                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                    <objectValues>
+                                                                        <string>PHYSICS</string>
+                                                                        <string>SOURCE</string>
+                                                                        <string>ECA</string>
+                                                                    </objectValues>
+                                                                </comboBoxCell>
+                                                                <connections>
+                                                                    <action selector="addNewStandardRun:" target="-2" id="ZZS-tZ-3iA"/>
+                                                                </connections>
+                                                            </comboBox>
+                                                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" id="83p-8M-CT2">
+                                                                <rect key="frame" x="27" y="147" width="207" height="58"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Load MTCD/A settings to GUI (do NOT write anything to hardware):" id="GQJ-fg-pad">
+                                                                    <font key="font" metaFont="system"/>
+                                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                            </textField>
+                                                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" id="guu-uM-vS9">
+                                                                <rect key="frame" x="164" y="258" width="207" height="34"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Select a Standard Run or create a new one:" id="oUM-uJ-DPT">
+                                                                    <font key="font" metaFont="system"/>
+                                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                            </textField>
+                                                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" id="2Nh-mv-7JU">
+                                                                <rect key="frame" x="27" y="70" width="207" height="34"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Ship the values display in the MTC GUI to the Hardware:" id="zg4-2R-BFp">
+                                                                    <font key="font" metaFont="system"/>
+                                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                            </textField>
+                                                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" id="Abe-8t-EOA">
+                                                                <rect key="frame" x="292" y="147" width="207" height="58"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="This button will save MTCD/A settings like thresholds and trigger masks:" id="MYa-hZ-RFi">
+                                                                    <font key="font" metaFont="system"/>
+                                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                            </textField>
                                                         </subviews>
                                                     </view>
                                                 </tabViewItem>
                                             </tabViewItems>
                                         </tabView>
-                                        <comboBox verticalHuggingPriority="750" id="xjE-ug-crJ">
-                                            <rect key="frame" x="173" y="346" width="116" height="26"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="Standard Run" drawsBackground="YES" numberOfVisibleItems="10" id="12x-oz-P6Z">
-                                                <font key="font" metaFont="system"/>
-                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                <objectValues>
-                                                    <string>PHYSICS</string>
-                                                    <string>SOURCE</string>
-                                                    <string>ECA</string>
-                                                </objectValues>
-                                            </comboBoxCell>
-                                            <connections>
-                                                <action selector="addNewStandardRun:" target="-2" id="ZZS-tZ-3iA"/>
-                                            </connections>
-                                        </comboBox>
                                     </subviews>
                                 </view>
                             </tabViewItem>
