@@ -38,46 +38,35 @@
 }
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item{
     int tabIndex = [aTabView indexOfTabViewItem:item];
-    if (tabIndex==0)
-    {
-        [[self window] setContentView:blankView];
-        [self resizeWindowToSize:PulserAndDelays_size];
-        [[self window] setContentView:tabView];
+    NSSize* newSize = nil;
+    switch (tabIndex) {
+        case 0:
+            newSize = &PulserAndDelays_size;
+            break;
+        case 1:
+            newSize = &Triggers_size;
+            break;
+        case 2:
+            newSize = &Tubii_size;
+            break;
+        case 3:
+            newSize = &Analog_size;
+            break;
+        case 4:
+            newSize = &GTDelays_size;
+            break;
+        case 5:
+            newSize = &SpeakerCounter_size;
+            break;
+        case 6:
+            newSize = &ClockMonitor_size;
+            break;
+        default:
+            break;
     }
-    else if (tabIndex==1)
-    {
-        [[self window] setContentView:blankView];
-        [self resizeWindowToSize:Triggers_size];
-        [[self window] setContentView:tabView];
-    }
-    else if (tabIndex==2)
-    {
-        [[self window] setContentView:blankView];
-        [self resizeWindowToSize:Tubii_size];
-        [[self window] setContentView:tabView];
-    }
-    else if (tabIndex==3)
-    {
-        [[self window] setContentView:blankView];
-        [self resizeWindowToSize:Analog_size];
-        [[self window] setContentView:tabView];
-    }
-    else if (tabIndex==4)
-    {
-        [[self window] setContentView:blankView];
-        [self resizeWindowToSize:GTDelays_size];
-        [[self window] setContentView:tabView];
-    }
-    else if (tabIndex==5)
-    {
-        [[self window] setContentView:blankView];
-        [self resizeWindowToSize:SpeakerCounter_size];
-        [[self window] setContentView:tabView];
-    }
-    else if(tabIndex==6)
-    {
-        [[self window] setContentView:blankView];
-        [self resizeWindowToSize:ClockMonitor_size];
+    if (newSize) {
+        [[self window] setContentView:blankView]; //Put in a blank view for nicer transition look
+        [self resizeWindowToSize:*newSize];
         [[self window] setContentView:tabView];
     }
 }
