@@ -47,40 +47,66 @@
 // Initialize the model.
 // Note that this is initWithCoder and not just init, and we
 // call the superclass initWithCoder too!
-- (id) initWithCoder:(NSCoder *)aCoder {
-    NSLog(@"TUBii init with coder\n");
-    self = [super initWithCoder:aCoder];
-    smellieRate = 0;
-    tellieRate = 0;
-    pulserRate = 0;
-    smelliePulseWidth = 0;
-    telliePulseWidth = 0;
-    pulseWidth = 0;
-    smellieNPulses=0;
-    tellieNPulses=0;
-    NPulses=0;
-    portNumber = TUBII_DEFAULT_PORT;
-    strHostName = [[NSString alloc]initWithUTF8String:TUBII_DEFAULT_IP];
-    connection = [[RedisClient alloc] initWithHostName:strHostName withPort:portNumber];
-    return self;
-}
+
 - (id) init {
     NSLog(@"init called\n");
     self = [super init];
-    // Initialize model member variables
-    smellieRate = 0;
-    tellieRate = 0;
-    pulserRate = 0;
-    smelliePulseWidth = 0;
-    telliePulseWidth = 0;
-    pulseWidth = 0;
-    smellieNPulses=0;
-    tellieNPulses=0;
-    NPulses=0;
-    portNumber =TUBII_DEFAULT_PORT;
-    strHostName = [[NSString alloc]initWithUTF8String:TUBII_DEFAULT_IP];
-    connection = [[RedisClient alloc] initWithHostName:strHostName withPort:portNumber];
+    if (self) {
+        // Initialize model member variables
+        smellieRate = 0;
+        tellieRate = 0;
+        pulserRate = 0;
+        smelliePulseWidth = 0;
+        telliePulseWidth = 0;
+        pulseWidth = 0;
+        smellieNPulses=0;
+        tellieNPulses=0;
+        NPulses=0;
+        portNumber =TUBII_DEFAULT_PORT;
+        strHostName = [[NSString alloc]initWithUTF8String:TUBII_DEFAULT_IP];
+        connection = [[RedisClient alloc] initWithHostName:strHostName withPort:portNumber];
+    }
     return self;
+}
+- (id) initWithCoder:(NSCoder *)aCoder {
+    self = [super initWithCoder:aCoder];
+    if (self) {
+        smellieRate =     [ aCoder decodeFloatForKey:@"TUBiiModelSmellieRate"];
+        smelliePulseWidth=[ aCoder decodeFloatForKey:@"TUBiiModelSmelliePulseWidth"];
+        smellieNPulses =  [ aCoder decodeIntForKey:@"TUBiiModelSmellieNPulses"];
+        tellieRate =      [ aCoder decodeFloatForKey:@"TUBiiModelTellieRate"];
+        telliePulseWidth =[ aCoder decodeFloatForKey:@"TUBiiModelTelliePulseWidth"];
+        tellieNPulses =   [ aCoder decodeIntForKey:@"TUBiiModelTellieNPulses"];
+        pulserRate =      [ aCoder decodeFloatForKey:@"TUBiiModelPulserRate"];
+        pulseWidth =      [ aCoder decodeFloatForKey:@"TUBiiModelPulseWidth"];
+        NPulses =         [ aCoder decodeIntForKey:@"TUBiiModelNPulses"];
+        portNumber =      [ aCoder decodeIntForKey:@"TUBiiModelPortNumber"];
+        strHostName =     [ aCoder decodeObjectForKey:@"TUBiiModelStrHostName"];
+        if (!strHostName) {
+            [strHostName dealloc]; //Not sure if this is needed or not.
+            strHostName = [[NSString alloc]initWithUTF8String:TUBII_DEFAULT_IP];
+
+        }
+        if (!portNumber) {
+            portNumber = TUBII_DEFAULT_PORT;
+        }
+        connection = [[RedisClient alloc] initWithHostName:strHostName withPort:portNumber];
+    }
+    return self;
+}
+- (void) encodeWithCoder:(NSCoder *)aCoder{
+    [super encodeWithCoder:aCoder];
+    [aCoder encodeFloat:smellieRate         forKey:@"TUBiiModelSmellieRate"];
+    [aCoder encodeFloat:smelliePulseWidth   forKey:@"TUBiiModelSmelliePulseWidth"];
+    [aCoder encodeInt:smellieNPulses		forKey:@"TUBiiModelSmellieNPulses"];
+    [aCoder encodeFloat:tellieRate          forKey:@"TUBiiModelTellieRate"];
+    [aCoder encodeFloat:telliePulseWidth    forKey:@"TUBiiModelTelliePulseWidth"];
+    [aCoder encodeInt:tellieNPulses         forKey:@"TUBiiModelTellieNPulses"];
+    [aCoder encodeFloat:pulserRate          forKey:@"TUBiiModelPulserRate"];
+    [aCoder encodeFloat:pulseWidth          forKey:@"TUBiiModelPulseWidth"];
+    [aCoder encodeInt:NPulses               forKey:@"TUBiiModelNPulses"];
+    [aCoder encodeInt:portNumber            forKey:@"TUBiiModelPortNumber"];
+    [aCoder encodeObject:strHostName        forKey:@"TUBiiModelStrHostName"];
 }
 - (void) sendOkCmd:(NSString* const)aCmd {
     @try {

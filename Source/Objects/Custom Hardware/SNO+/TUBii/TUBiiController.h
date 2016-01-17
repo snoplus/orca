@@ -72,7 +72,8 @@
 
     NSButton *ClockSourceMatchHardware;
 }
--(id) init;
+- (id) init;
+- (void) awakeFromNib;
 
 
 

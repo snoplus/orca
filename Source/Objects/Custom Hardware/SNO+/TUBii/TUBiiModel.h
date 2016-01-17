@@ -109,6 +109,10 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 @property (nonatomic) BOOL TUBiiIsDefaultClock;
 @property (nonatomic) BOOL CounterMode;
 
+- (id) init;
+- (id) initWithCoder:(NSCoder *)aCoder;
+- (void) encodeWithCoder:(NSCoder *)aCoder;
+
 - (void) sendOkCmd:(NSString* const)aCmd;
 - (int) sendIntCmd:(NSString* const)aCmd;
 - (void) fireSmelliePulser;
