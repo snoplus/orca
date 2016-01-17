@@ -285,18 +285,18 @@ resetFifoOnStart = _resetFifoOnStart;
 
     /* Setup MTCD pedestal/pulser settings */
     if ([self isPedestalEnabledInCSR]) [self enablePedestal];
-	[self setupPulseGTDelaysCoarse: uLongDBValue(kCoarseDelay) fine:uLongDBValue(kFineDelay)];
-	[self setTheLockoutWidth: uLongDBValue(kLockOutWidth)];
-	[self setThePedestalWidth: uLongDBValue(kPedestalWidth)];
+    [self setupPulseGTDelaysCoarse: uLongDBValue(kCoarseDelay) fine:uLongDBValue(kFineDelay)];
+    [self setTheLockoutWidth: uLongDBValue(kLockOutWidth)];
+    [self setThePedestalWidth: uLongDBValue(kPedestalWidth)];
     [self setThePulserRate:floatDBValue(kPulserPeriod)];
-	[self setThePrescaleValue];
+    [self setThePrescaleValue];
 
     /* Setup Pedestal Crate Mask */
 	[self setPedestalCrateMask];
 
     /* Setup the GT mask */
     [self clearGlobalTriggerWordMask];
-	[self setSingleGTWordMask: uLongDBValue(kGtMask)];
+    [self setSingleGTWordMask: uLongDBValue(kGtMask)];
 
     /* Setup GT Crate Mask */
     [self setGTCrateMask];
