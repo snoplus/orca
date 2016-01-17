@@ -121,6 +121,9 @@
 - (void) makeMainController;
 - (BOOL) solitaryObject;
 
+- (void) registerNotificationObservers;
+- (void) runAboutToStart:(NSNotification*)aNote;
+
 #pragma mark •••Accessors
 - (ORReadOutList*) triggerGroup;
 - (void) setTriggerGroup:(ORReadOutList*)newTrigger1Group;

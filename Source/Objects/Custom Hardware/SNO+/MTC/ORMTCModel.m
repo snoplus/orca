@@ -36,6 +36,10 @@
 #import "ORCaen1720Model.h"
 #import "ORRunController.h"
 
+#define uShortDBValue(A) [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] unsignedShortValue]
+#define uLongDBValue(A)  [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] unsignedLongValue]
+#define floatDBValue(A)  [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] floatValue]
+
 #pragma mark •••Definitions
 NSString* ORMTCModelESumViewTypeChanged		= @"ORMTCModelESumViewTypeChanged";
 NSString* ORMTCModelNHitViewTypeChanged		= @"ORMTCModelNHitViewTypeChanged";
@@ -270,6 +274,25 @@ resetFifoOnStart = _resetFifoOnStart;
 - (BOOL) solitaryObject
 {
     return YES;
+}
+
+- (void) registerNotificationObservers
+{
+    [super registerNotificationObservers];
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(runAboutToStart:)
+                         name : ORRunAboutToStartNotification
+                       object : nil];
+}
+
+- (void) runAboutToStart:(NSNotification*)aNote
+{
+    /* At the start of every run, we initialize the HW settings. */
+    [self clearGlobalTriggerWordMask];
+    [self setGTCrateMask];
+    [self setSingleGTWordMask: uLongDBValue(kGtMask)];
 }
 
 #pragma mark •••Accessors
@@ -723,10 +746,6 @@ resetFifoOnStart = _resetFifoOnStart;
 	return [self mVoltsToRaw:mVolts];
 }
 
-#define uShortDBValue(A) [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] unsignedShortValue]
-#define uLongDBValue(A)  [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] unsignedLongValue]
-#define floatDBValue(A)  [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] floatValue]
-
 -(NSMutableDictionary*) get_MTCDataBase
 {
     return mtcDataBase;
@@ -763,17 +782,6 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    if ([[userInfo objectForKey:@"doinit"] boolValue]) {
-        /* cold start */
-        [self clearGlobalTriggerWordMask];
-        [self zeroTheGTCounter];
-        [self setGTCrateMask];
-        [self setSingleGTWordMask: uLongDBValue(kGtMask)];
-        [self setResetFifoOnStart:YES];
-    } else {
-        /* soft start, how do we know if it is an auto run start? */
-        [self setResetFifoOnStart:NO];
-    }
 }
 
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
