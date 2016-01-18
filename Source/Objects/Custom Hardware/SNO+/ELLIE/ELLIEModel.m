@@ -516,14 +516,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                             pwd:[aSnotModel orcaDBPassword]
                        database:aCouchDb
                        delegate:aSnotModel];
-    /*
-    return [ORCouchDB couchHost:@"http://couch.snopl.us"
-                           port:[aSnotModel orcaDBPort]
-                       username:@"snoplus"
-                            pwd:@"PureTe->Dirac!=True"
-                       database:aCouchDb
-                        delegate:aSnotModel];
-     */
 }
 
 -(NSString*)callPythonScript:(NSString*)pythonScriptFilePath withCmdLineArgs:(NSArray*)commandLineArgs
