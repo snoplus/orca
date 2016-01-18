@@ -126,6 +126,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
 {
     self.isRunning = NO;
     self.currentState = kMJDInterlocks_Idle;
+    [delegate setVmeCrateHVConstraint:[self module] state:NO];
 }
 
 - (void) setCurrentState:(int)aState

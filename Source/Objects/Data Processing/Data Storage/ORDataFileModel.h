@@ -74,6 +74,7 @@
 		float			processLimitHigh;
         BOOL            generateMD5;
         NSOperationQueue* md5Queue;
+        NSDate*         startTime;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -122,6 +123,7 @@
 - (void) runAboutToStart:(NSNotification*)aNotification;
 - (void) setRunMode:(int)aMode;
 - (void) statusLogFlushed:(NSNotification*)aNotification;
+- (void) closeOutLogFiles:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Data Handling
 - (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;

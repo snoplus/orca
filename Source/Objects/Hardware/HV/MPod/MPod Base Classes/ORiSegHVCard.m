@@ -28,6 +28,7 @@
 #import "ORSNMP.h"
 #import "ORMPodCrate.h"
 #import "ORAlarm.h"
+#import "ORDataPacket.h"
 
 NSString* ORiSegHVCardShipRecordsChanged		= @"ORiSegHVCardShipRecordsChanged";
 NSString* ORiSegHVCardMaxCurrentChanged         = @"ORiSegHVCardMaxCurrentChanged";
@@ -45,6 +46,8 @@ NSString* ORiSegHVCardConstraintsChanged		= @"ORiSegHVCardConstraintsChanged";
 NSString* ORiSegHVCardRequestHVMaxValues		= @"ORiSegHVCardRequestHVMaxValues";
 NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged";
 NSString* ORiSegHVCardDoNotPostSafetyAlarmChanged = @"ORiSegHVCardDoNotPostSafetyAlarmChanged";
+NSString* ORiSegHVCardRequestCustomInfo		    = @"ORiSegHVCardRequestCustomInfo";
+NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChanged";
 
 @implementation ORiSegHVCard
 
@@ -60,6 +63,7 @@ NSString* ORiSegHVCardDoNotPostSafetyAlarmChanged = @"ORiSegHVCardDoNotPostSafet
 
 - (void) dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 	int i;
 	for(i=0;i<[self numberOfChannels];i++){
 		[voltageHistory[i] release];
@@ -117,6 +121,23 @@ NSString* ORiSegHVCardDoNotPostSafetyAlarmChanged = @"ORiSegHVCardDoNotPostSafet
 	return @"??"; //subclasses should override
 }
 
+
+- (void) registerNotificationObservers
+{
+    NSNotificationCenter* notifyCenter = [ NSNotificationCenter defaultCenter ];
+    [notifyCenter addObserver : self
+                     selector : @selector(runStarted:)
+                         name : ORRunStartedNotification
+                       object : nil];
+}
+
+- (void) runStarted:(NSNotification*)aNote
+{
+    [self shipDataRecords];
+}
+
+#pragma mark ***Accessors
+
 - (BOOL) polarity
 {
 	return kPositivePolarity;
@@ -129,7 +150,6 @@ NSString* ORiSegHVCardDoNotPostSafetyAlarmChanged = @"ORiSegHVCardDoNotPostSafet
 }
 
 
-#pragma mark ***Accessors
 - (id)	adapter
 {
 	id anAdapter = [guardian adapter];
@@ -304,6 +324,7 @@ NSString* ORiSegHVCardDoNotPostSafetyAlarmChanged = @"ORiSegHVCardDoNotPostSafet
         [[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardSelectedChannelChanged object:self];
         
         [self requestMaxValues:selectedChannel];
+        [self requestCustomInfo:selectedChannel];
         
     }
 }
@@ -319,6 +340,20 @@ NSString* ORiSegHVCardDoNotPostSafetyAlarmChanged = @"ORiSegHVCardDoNotPostSafet
         [[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardRequestHVMaxValues object:self userInfo:userInfo];
     }
 }
+
+- (void) requestCustomInfo:(int)aChannel
+{
+    if([self channelInBounds:aChannel]){
+        NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                  [NSNumber numberWithInt:[self crateNumber]],      @"crate",
+                                  [NSNumber numberWithInt:[self slot]],             @"card",
+                                  [NSNumber numberWithInt:aChannel],                @"channel",
+                                  nil];
+        [self setCustomInfo:aChannel string:@""]; //assume no request returned
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardRequestCustomInfo object:self userInfo:userInfo];
+    }
+}
+
 
 - (NSString*) getModuleString
 {
@@ -826,7 +861,23 @@ NSString* ORiSegHVCardDoNotPostSafetyAlarmChanged = @"ORiSegHVCardDoNotPostSafet
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardMaxVoltageChanged object:self];
 	}
 }
+- (NSString*) customInfo:(short)chan
+{
+   	if([self channelInBounds:chan]){
+        if([customInfo[chan] length])return customInfo[chan];
+    }
+    return @"";
+}
 
+- (void) setCustomInfo:(short)chan string:(NSString*)aString
+{
+    if([self channelInBounds:chan]){
+        if([aString length]==0)aString=@"";
+        [customInfo[chan] autorelease];
+        customInfo[chan] = [aString copy];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardCustomInfoChanged object:self];
+    }
+}
 - (int) target:(short)chan
 {
 	if([self channelInBounds:chan])return target[chan];
@@ -899,16 +950,24 @@ NSString* ORiSegHVCardDoNotPostSafetyAlarmChanged = @"ORiSegHVCardDoNotPostSafet
     [self setDataId:[anotherCard dataId]];
 }
 
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    //----------------------------------------------------------------------------------------
+    // first add our description to the data description
+    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORiSegHVCard"];
+}
+
 - (NSDictionary*) dataRecordDescription
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
+    int n = 5+[self numberOfChannels]*2;
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
 								 @"ORiSegHVCardDecoderForHV",			@"decoder",
 								 [NSNumber numberWithLong:dataId],      @"dataId",
 								 [NSNumber numberWithBool:NO],          @"variable",
-								 [NSNumber numberWithLong:21],			@"length",
+								 [NSNumber numberWithLong:n],			@"length",
 								 nil];
-    [dataDictionary setObject:aDictionary forKey:@"Waveform"];
+    [dataDictionary setObject:aDictionary forKey:@"State"];
     
     return dataDictionary;
 }
@@ -927,11 +986,12 @@ NSString* ORiSegHVCardDoNotPostSafetyAlarmChanged = @"ORiSegHVCardDoNotPostSafet
     
 	int i;
 	for(i=0;i<[self numberOfChannels];i++){
-		//[self setHwGoal:i withValue: [decoder decodeIntForKey:	[@"hwGoal" stringByAppendingFormat:@"%d",i]]];
 		[self setTarget:i withValue: [decoder decodeIntForKey:		[@"target" stringByAppendingFormat:@"%d",i]]];
 		[self setMaxCurrent:i withValue:[decoder decodeFloatForKey: [@"maxCurrent" stringByAppendingFormat:@"%d",i]]];
 	}
 	[[self undoManager] enableUndoRegistration];
+    
+    [self registerNotificationObservers];
     
     return self;
 }
@@ -947,7 +1007,6 @@ NSString* ORiSegHVCardDoNotPostSafetyAlarmChanged = @"ORiSegHVCardDoNotPostSafet
     
 	int i;
  	for(i=0;i<[self numberOfChannels];i++){
-		//[encoder encodeInt:hwGoal[i] forKey:[@"hwGoal" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:target[i] forKey:[@"target" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeFloat:maxCurrent[i] forKey:[@"maxCurrent" stringByAppendingFormat:@"%d",i]];
 	}
@@ -1014,14 +1073,22 @@ NSString* ORiSegHVCardDoNotPostSafetyAlarmChanged = @"ORiSegHVCardDoNotPostSafet
 		time_t	ut_Time;
 		time(&ut_Time);
 		
+        
+        
 		int i;
-		unsigned long data[21];
-		data[0] = dataId | 21;
+        unsigned long onMask = 0x0;
+        for(i=0;i<[self numberOfChannels];i++){
+            if([self isOn:i])onMask |= (0x1<<i);
+        }
+        int n = 5+[self numberOfChannels]*2;
+
+		unsigned long data[n];
+		data[0] = dataId | n;
 		data[1] = (([self crateNumber] & 0xf) << 20) |
         (([self slot]&0xf)<<16)            |
         (([self numberOfChannels])<<4)     |
         ([self polarity] & 0x1);
-		data[2] = 0x0; //spare
+        data[2] = onMask;
 		data[3] = 0x0; //spare
 		data[4] = ut_Time;
 		
@@ -1029,17 +1096,15 @@ NSString* ORiSegHVCardDoNotPostSafetyAlarmChanged = @"ORiSegHVCardDoNotPostSafet
 			float asFloat;
 			unsigned long asLong;
 		}theData;
-        
 		for(i=0;i<[self numberOfChannels];i++){
 			theData.asFloat = [self channel:i readParamAsFloat:@"outputMeasurementSenseVoltage"];
 			data[5+i] = theData.asLong;
 			
 			theData.asFloat = [self channel:i readParamAsFloat:@"outputMeasurementCurrent"];
 			data[6+i] = theData.asLong;
-			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification
-																object:[NSData dataWithBytes:data length:sizeof(long)*21]];
 		}
-	}
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification
+                                                            object:[NSData dataWithBytes:data length:sizeof(long)*n]];	}
 }
 #pragma mark ¥¥¥Convenience Methods
 - (float) voltage:(short)aChannel

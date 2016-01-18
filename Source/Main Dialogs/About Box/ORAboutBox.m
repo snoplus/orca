@@ -31,15 +31,6 @@
 - (IBAction)showAboutBox:(id)sender
 {
     if (!appNameField) {
-        NSWindow *theWindow;
-        NSString *creditsPath;
-        NSAttributedString *creditsString;
-        NSString *appName;
-        NSString *versionString;
-        NSString *copyrightString;
-        NSDictionary *infoDictionary;
-        CFBundleRef localInfoBundle;
-        NSDictionary *localInfoDict;
 #if !defined(MAC_OS_X_VERSION_10_9)
         if (![NSBundle loadNibNamed:@"AboutBox" owner:self]){
 #else
@@ -53,22 +44,18 @@
             return;
         }
         [topLevelObjects retain];
-        theWindow = [appNameField window];
-                // Get the info dictionary (Info.plist)
-        infoDictionary = [[NSBundle mainBundle] infoDictionary];
+        NSWindow* theWindow          = [appNameField window];
+        NSDictionary* infoDictionary = [[NSBundle mainBundle] infoDictionary];
 
         // Get the localized info dictionary (InfoPlist.strings)
-        localInfoBundle = CFBundleGetMainBundle();
-        localInfoDict = (NSDictionary *)
+        CFBundleRef localInfoBundle = CFBundleGetMainBundle();
+        NSDictionary* localInfoDict = (NSDictionary *)
             CFBundleGetLocalInfoDictionary( localInfoBundle );
 
-        // Setup the app name field
-        appName = [localInfoDict objectForKey:@"CFBundleName"];
+        NSString* appName = [localInfoDict objectForKey:@"CFBundleName"];
         [appNameField setStringValue:appName];
-                // Set the about box window title
         [theWindow setTitle:[NSString stringWithFormat:@"About %@", appName]];
-                // Setup the version field
-        versionString = [infoDictionary objectForKey:@"CFBundleVersion"];
+        NSString* versionString = [infoDictionary objectForKey:@"CFBundleVersion"];
 		
 		NSFileManager* fm = [NSFileManager defaultManager];
 		NSString* svnVersionPath = [[NSBundle mainBundle] pathForResource:@"svnversion"ofType:nil];
@@ -82,17 +69,19 @@
             versionString,[svnVersion length]?@":":@"",[svnVersion length]?svnVersion:@""]];
 
         // Setup our credits
-        creditsPath = [[NSBundle mainBundle] pathForResource:@"Credits"
+        NSString* creditsPath = [[NSBundle mainBundle] pathForResource:@"Credits"
                                                       ofType:@"rtf"];
-        creditsString = [[NSAttributedString alloc] initWithPath:creditsPath
-                                              documentAttributes:nil];
+            
+        NSData*             rtfData       = [NSData dataWithContentsOfFile:creditsPath];
+        NSAttributedString* creditsString = [[NSAttributedString alloc] initWithRTF:rtfData documentAttributes:nil];
+            
         [creditsField replaceCharactersInRange:NSMakeRange( 0, 0 )
                                        withRTF:[creditsString RTFFromRange:
                                            NSMakeRange( 0, [creditsString length] )
                             documentAttributes:[NSDictionary dictionary]]];
 
         // Setup the copyright field
-        copyrightString = [localInfoDict objectForKey:@"NSHumanReadableCopyright"];
+        NSString* copyrightString = [localInfoDict objectForKey:@"NSHumanReadableCopyright"];
         [copyrightField setStringValue:copyrightString];
                 // Prepare some scroll info
         maxScrollHeight = [[creditsField string] length];
