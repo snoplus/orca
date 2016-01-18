@@ -310,18 +310,18 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     float min_photons = a + b*min_x + c*(min_x*min_x);
     //If photon output requested is not possible using calibration curve, estimate the low end with linear extrapolation.
     if(photons < min_photons){
-        NSLog(@"Channel_%d has a minimum output of %.1f photons\n",channel,min_photons);
-        NSLog(@"Using a linear interpolation of 5ph/IPW from %.1f to estimate requested settings\n",min_x);
+        NSLog(@"Channel_%d has a minimum output of %.1f photons...\n",channel,min_photons);
+        NSLog(@"Using a linear interpolation of 5ph/IPW from min_photons = %.1f, to estimate requested %d photon settings\n",min_photons,photons);
         float floatPulseWidth = min_x + (min_photons-photons)/5.;
         NSNumber* pulseWidth = [NSNumber numberWithInteger:floatPulseWidth];
         NSLog(@"IPW setting calculated as: %d\n",[pulseWidth intValue]);
         return pulseWidth;
+    } else {
+        float floatPulseWidth = (-sqrt(-4*a*c + b*b + 4*c*photons)-b) / (2*c);
+        NSNumber* pulseWidth = [NSNumber numberWithInteger:floatPulseWidth];
+        NSLog(@"IPW setting calculated as: %d\n",[pulseWidth intValue]);
+        return pulseWidth;
     }
-    
-    float floatPulseWidth = (-sqrt(-4*a*c + b*b + 4*c*photons)-b) / (2*c);
-    NSNumber* pulseWidth = [NSNumber numberWithInteger:floatPulseWidth];
-    NSLog(@"IPW setting calculated as: %d\n",[pulseWidth intValue]);
-    return pulseWidth;
 }
 
 -(NSNumber*) calcTellieChannelForFibre:(NSString*)fibre
