@@ -551,7 +551,7 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 }
 
 //SV
-- (void) waitForEndOfRun
+- (void) waitForEndOfRun:(NSTimer*)aTimer
 {
     NSLog(@"Scheduled sentry system toggle\n");
     [toggleTimer invalidate];
@@ -578,7 +578,7 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
         if (toggleInterval <= 0) [self setToggleInterval:7]; //7 days is default
         NSLog(@"Starting sentry timer\n");
         [toggleTimer release];
-        toggleTimer = [[NSTimer scheduledTimerWithTimeInterval:(toggleInterval*86400) target:self selector:@selector(waitForEndOfRun) userInfo:nil repeats:NO] retain];
+        toggleTimer = [[NSTimer scheduledTimerWithTimeInterval:(toggleInterval*86400) target:self selector:@selector(waitForEndOfRun:) userInfo:nil repeats:NO] retain];
     }
 }
 

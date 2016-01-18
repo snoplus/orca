@@ -382,7 +382,7 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
             [self setUpArduinoIO];
             nextTime = kVeryLongStepTime;
             elapsedTime = 0;
-            [self setCurrentState:kMJDSource_GetMirrorTrack];
+            [self setCurrentState:kMJDSource_SetupArduinoToCloseGV];
             break;
 
         case kMJDSource_SetupArduinoToCloseGV:
@@ -407,7 +407,7 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
                 }
                 else {
                     if(elapsedTime>5) [self setCurrentState:kMJDSource_MirrorTrackError];
-                    else            [self setCurrentState:kMJDSource_GetMirrorTrack];
+                    else              [self setCurrentState:kMJDSource_GetMirrorTrack];
                 }
             }
             else if(elapsedTime>5)[self setCurrentState:kMJDSource_MirrorTrackError];
@@ -426,7 +426,7 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
            break;
             
         case kMJDSource_CloseGV2:
-            nextTime = kLongStepTime;
+            nextTime = kVeryLongStepTime;
             [self closeGateValveStepTwo];
             [self setCurrentState:kMJDSource_GetGVClosePosition];
             elapsedTime = 0;
@@ -571,7 +571,8 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
        [remoteOpStatus objectForKey:@"LED"]
        ){
  
-        float kGVAdcOffset = 0.3;
+        //float kGVAdcOffset = 0.3; -- old
+        float kGVAdcOffset = 1.0;
         
         float  gvAdc = [[remoteOpStatus objectForKey:@"GV"]floatValue];
         if((gvAdc - kGVAdcOffset)>0.1)  self.gateValveIsOpen = kMJDSource_True;
@@ -582,9 +583,11 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
             }
         }
         
-        float kLEDAdcOffset = 1.6;
+        //float kLEDAdcOffset = 1.6; -- old
+        float kLEDAdcOffset = 1.0;
         float  ledAdc = [[remoteOpStatus objectForKey:@"LED"]floatValue];
-        if((ledAdc - kLEDAdcOffset)>0.2) self.sourceIsIn = kMJDSource_True;
+        //if((ledAdc - kLEDAdcOffset)>0.2) self.sourceIsIn = kMJDSource_True; --old
+        if((ledAdc - kLEDAdcOffset)<0.2) self.sourceIsIn = kMJDSource_True;
         else                             self.sourceIsIn = kMJDSource_False;
         
         if(oneTimeGVVerbose){
@@ -633,7 +636,8 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
 
             if([order length]>=5){
                 if(isRetracting){
-                    if(([[order substringFromIndex: [order length] - 5] isEqualToString: @"CCBBA"] )||
+                    //if(([[order substringFromIndex: [order length] - 5] isEqualToString: @"CCBBA"] )|| //old...
+                    if(([[order substringFromIndex: [order length] - 5] isEqualToString: @"CCBAB"] )||
                        ([[order substringFromIndex: [order length] - 5] isEqualToString: @"CBCAB" ])){
                         [self setCurrentState:kMJDSource_StopMotion];
                         NSLog(@"Module %d Source fully retracted\n",slot+1);

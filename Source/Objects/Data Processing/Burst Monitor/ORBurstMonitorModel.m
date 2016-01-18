@@ -1420,18 +1420,19 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
         chanpvalue = 999.999;
     }
     //make runtype string
-    NSString* theRuntypes = @"";
-    if([[runbits objectAtIndex:0] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@"Maintenance"];
-    if([[runbits objectAtIndex:1] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@"Supernova"];
-    if([[runbits objectAtIndex:2] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@"Calibration"];
-    if([[runbits objectAtIndex:3] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", Underground"];
-    if([[runbits objectAtIndex:4] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", Front Shielding"];
-    if([[runbits objectAtIndex:5] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", Unusual Condition"];
-    if([[runbits objectAtIndex:6] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", SNEWS"];
-    if([[runbits objectAtIndex:7] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", Pulser"];
-    if([[runbits objectAtIndex:8] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", Source in Storage"];
-    if([[runbits objectAtIndex:9] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", Source in Area"];
-    if([[runbits objectAtIndex:10] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", Source in HALO"];
+    NSString* theRuntypes = @"[";
+    if([[runbits objectAtIndex:0] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@"\"Maintenance\""];
+    if([[runbits objectAtIndex:1] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@"\"Supernova\""];
+    if([[runbits objectAtIndex:2] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@"\"Calibration\""];
+    if([[runbits objectAtIndex:3] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", \"Underground\""];
+    if([[runbits objectAtIndex:4] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", \"Front Shielding\""];
+    if([[runbits objectAtIndex:5] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", \"Unusual Condition\""];
+    if([[runbits objectAtIndex:6] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", \"SNEWS\""];
+    if([[runbits objectAtIndex:7] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", \"Pulser\""];
+    if([[runbits objectAtIndex:8] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", \"Source in Storage\""];
+    if([[runbits objectAtIndex:9] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", \"Source in Area\""];
+    if([[runbits objectAtIndex:10] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", \"Source in HALO\""];
+    theRuntypes = [theRuntypes stringByAppendingString:@"]"];
     //send email to announce the burst
     int numMicTillBurst = (1000000*fmod(numSecTillBurst,1));
     NSLog(@"Novastate is now %i \n", novaState); ////////////////////////////////////////////////////////////
@@ -1503,8 +1504,8 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
         int count = [aQueue count];
         theContent = [theContent stringByAppendingFormat:@"Channel: %@ Number Events: %d %@\n",aKey,[aQueue count],count>=1?@" <---":@""];
     }
-    if(novaState == 3){  //if supernova candidate
-        [emailList insertObject:@"HALO_full@snolab.ca"  atIndex:0]; //add halo full, HALO_full@snolab.ca
+    if(novaState == 3 && [[runbits objectAtIndex:6] intValue]){  //if supernova candidate
+        [emailList insertObject:@"halo_snews_burst@snolab.ca"  atIndex:0]; //add halo full, HALO_full@snolab.ca
     }
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
     theContent = [theContent stringByAppendingString:@"The following people received this message:\n"];
@@ -1514,9 +1515,101 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     NSLog(@"theContent in delayedBurstEvent is: \n %@", theContent);
     NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[self cleanupAddresses:emailList],@"Address",theContent,@"Message",nil];
     [self sendMail:userInfo state:novaState];
-    if(novaState == 3){
+    if(novaState == 3 && [[runbits objectAtIndex:6] intValue]){
         [emailList removeObjectAtIndex:0]; //clean up extra email addressses
     }
+    
+    //write file with burst data
+    NSString* allBurstData = [NSString stringWithFormat:@"\",\"novaState\":%i,\"dateSec\":%f,\"dateMic\":%i,\"runNum\":%i,\"runType\":%@,\"Ncount\":%i,\"Nmult\":%i,\"Nchan\":%i,\"ENchan\":%f,\"pNchan\":%f,\"N\":%i,\"adcP\":%f,\"gammaP\":%f,\"alphaP\":%f,\"Xcenter\":%i,\"Xrms\":%f,\"Ycenter\":%i,\"Yrms\":%f,\"phi\":%f,\"Rcenter\":%f,\"Rrms\":%f,\"Pcenter\":%f,\"durSec\":%f,\"rSec\":%f,\"burstNum\":%i}",novaState,numSecTillBurst,numMicTillBurst,runnum,theRuntypes,countsInBurst,multInBurst,numBurstChan,exChan,chanpvalue,peakN+lowN,adcP,gammaP,alphaP,Xcenter,Xrms,Ycenter,Yrms,phi,Rcenter,Rrms,exp(-0.5*rSqrNorm),durSec,rSec,burstCount];
+    
+    NSTask* getrev;
+    getrev =[[NSTask alloc] init];
+    NSPipe* piperev;
+    piperev = [NSPipe pipe];
+    [getrev setStandardOutput: piperev];
+    
+    [getrev setLaunchPath: @"/usr/bin/curl"];  //curl is there
+    ////[getrev setArguments: [NSArray arrayWithObjects: @"-s", @"-X", @"GET", @"http://10.0.3.1:5984/shapers/card8channel0", @"|", @"cut", @"-d", @"\"}\"", @"-f", 1, @"|", @"cut", @"-d", @"\",\"", @"-f", 2, @"|", @"cut", @"-d", @"\":\"", @"-f", 2, nil]]; //gets bad access
+    ////[getrev setArguments: [NSArray arrayWithObjects: @"-s", @"-X", @"GET", @"http://10.0.3.1:5984/shapers/card8channel0", @"|", @"cut", @"-d", @"\"}\"", @"-f", @"1", @"|", @"cut", @"-d", @"\",\"", @"-f", @"2", @"|", @"cut", @"-d", @"\":\"", @"-f", @"2", nil]];  //this returns min args return on DAQ1 somehow
+    [getrev setArguments: [NSArray arrayWithObjects: @"-s", @"-X", @"GET", @"http://10.0.3.1:5984/bursts/burstevents", nil]];  //was @"http://10.0.3.1:5984/shapers/card8channel0"
+    NSFileHandle* revfile;
+    NSData *revdata;
+    NSString *revstring;
+    NSString* bursttextstr = @"{\"_id\":\"burstevents\",\"_rev\":\"";
+    @try{
+    [getrev launch]; //find the rev!!!
+    NSLog(@"part 0\n"); //got here with end card8channel0, and with } end
+    
+    [getrev waitUntilExit]; //waits like 60 seconds for 10.0.3.1 on lu daq, freezes before without this
+    //NSLog(@"part 1\n");
+    [getrev terminate]; //needs this to work
+    [getrev release];
+    //NSLog(@"part 2\n");
+    revfile =[piperev fileHandleForReading];  //maybe need declare here
+    revdata = [revfile readDataToEndOfFile];
+    //NSLog(@"part 3\n");
+    revstring = [[NSString alloc] initWithData:revdata encoding:NSUTF8StringEncoding];
+    //revstring = [revstring stringByAppendingString:@"{\"_id\":\"card8channel0\",\"_rev\":\"37-5b3dc887d615db963492927bfb3fb124\",\"Run\":\"3832\",\"Card\":\"8\",\"Channel\":\"0\",\"Centroids\":\"187.524,324.44,457.7,593.55,727.29,860.39,994.6,1127.99,1262.36,1396.07\",\"Standard_deviation_centroids\":\"1.15036,0.316961,0.299833,0.30639,0.336242,0.317772,0.294958,0.277667,0.333023,0.325655\",\"Fit_parameter 0\":\"-2.43283\",\"Error_param 0\":\"0.643567\",\"Fit_parameter 1\":\"9.61408\",\"Error_param 1\":\"0.0160168\",\"Fit_parameter 2\":\"-0.000254695\",\"Error_param 2\":\"8.90062e-05\",\"Reduced_chisquare\":\"3.91508\"}"]; //Set to this for test
+    NSLog(@"early allburstdata is %@\n", allBurstData);
+    NSLog(@"early revstring is %@\n", revstring);
+    NSRange revnumstart = [revstring rangeOfString:@"rev\":\""];
+    NSRange revnumend =[revstring rangeOfString:@"\",\"novaState\":"];
+    int revnumlen = revnumend.location - (revnumstart.location + 6);
+    NSRange revRange = NSMakeRange((revnumstart.location + 6), revnumlen);
+    revstring = [revstring substringWithRange:revRange];
+    bursttextstr = [bursttextstr stringByAppendingString:revstring];
+    bursttextstr = [bursttextstr stringByAppendingString:allBurstData];
+    //allBurstData = [revstring stringByAppendingString:allBurstData];
+    NSLog(@"part 4\n");
+    }
+    @catch(NSException* exc)
+    {
+        NSLog(@"Could not contact couchDB to get revision number.  Exception is %@\n", exc);
+    }
+    NSLog(@"bursttextstr is %@\n", bursttextstr);
+    //////stringWithFormat:@"{'novaState':'%i','dateSec':'%f','dateMic':'%i','runNum':'%i','runType':'%@','Ncount':'%i','Nmult':'%i','Nchan':'%i','ENchan':'%f','pNchan':'%f','N':'%i','adcP':'%f','gammaP':'%f','alphaP':'%f','Xcenter':'%i','Xrms':'%f','Ycenter':'%i','Yrms':'%f','phi':'%f','Rcenter':'%f','Rrms':'%f','Pcenter':'%f','durSec':'%f','rSec':'%f','burstNum':'%i'}",novaState,numSecTillBurst,numMicTillBurst,runnum,theRuntypes,countsInBurst,multInBurst,numBurstChan,exChan,chanpvalue,peakN+lowN,adcP,gammaP,alphaP,Xcenter,Xrms,Ycenter,Yrms,phi,Rcenter,Rrms,exp(-0.5*rSqrNorm),durSec,rSec,burstCount];
+    /// return from min args {"_id":"card8channel0","_rev":"37-5b3dc887d615db963492927bfb3fb124","Run":"3832","Card":"8","Channel":"0","Centroids":"187.524,324.44,457.7,593.55,727.29,860.39,994.6,1127.99,1262.36,1396.07","Standard_deviation_centroids":"1.15036,0.316961,0.299833,0.30639,0.336242,0.317772,0.294958,0.277667,0.333023,0.325655","Fit_parameter 0":"-2.43283","Error_param 0":"0.643567","Fit_parameter 1":"9.61408","Error_param 1":"0.0160168","Fit_parameter 2":"-0.000254695","Error_param 2":"8.90062e-05","Reduced_chisquare":"3.91508"}
+    //make append string
+    if(1){ //write the file when we want to do that
+        NSError* fileWriteErr;
+        NSFileManager* fileman = nil;
+        NSString* currentDir = [fileman currentDirectoryPath];
+        BOOL ok = [bursttextstr writeToFile:@"/Users/daq/lastburst.txt" atomically:1 encoding:NSASCIIStringEncoding error:&fileWriteErr]; //Encoding that dont work: NSUnicodeStringEncoding
+        NSLog(@"file write okness is %i\n", ok);
+        NSLog(@"look for the file at %@\n", currentDir);
+    }
+    //send the file to couchdb
+    system("Users/daq/burstcouch.sh");
+    /*
+    NSTask* sendrev;
+    NSFileHandle* sendfile;
+    NSData *senddata;
+    NSString *sendstring;
+    sendrev =[[NSTask alloc] init];
+    NSPipe* pipesend;
+    pipesend = [NSPipe pipe];
+    @try{
+    [sendrev setStandardOutput: pipesend];
+    [sendrev setLaunchPath: @"/usr/bin/curl"];
+    [sendrev setArguments: [NSArray arrayWithObjects: @"-s", @"-X", @"PUT", @"http://10.0.3.1:5984/bursts/burstevents", @"-d", @"@/Users/daq/lastburst.txt", @"-H", @"\"Content-Type: application/json\"", nil]];
+    ///curl -s -X PUT http://10.0.3.1:5984/DATABASE_NAME/DOCUMENT_NAME -d @/PATH/TO/TEXT/FILE.txt -H "Content-Type: application/json"
+    NSLog(@" Now Sending the burst data to couch\n");
+    [sendrev launch];
+    [sendrev waitUntilExit];
+    [sendrev terminate];
+    [sendrev release];
+    NSLog(@"Done Sending the burst data to couch\n");
+    sendfile =[pipesend fileHandleForReading];  //maybe need declare here
+    senddata = [sendfile readDataToEndOfFile];
+    sendstring = [[NSString alloc] initWithData:senddata encoding:NSUTF8StringEncoding];
+    NSLog(@"Send to couch result: %@\n", sendstring);
+    }
+    @catch(NSException* exc)
+    {
+        NSLog(@"Could not send text file to couchdb.  Exception is %@\n", exc);
+    }
+    */
+    
     //flush all queues to the disk fle
     NSString* fileSuffix = [NSString stringWithFormat:@"Burst_%d_",burstCount];
     [runUserInfo setObject:fileSuffix forKey:kFileSuffix];

@@ -195,8 +195,10 @@
 - (void) decode:(NSData*)someData intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long length = [someData length]/sizeof(long);
-    unsigned long* dPtr = (unsigned long*)[someData bytes];
-	[self decode:dPtr length:length intoDataSet:aDataSet];
+    if(length){
+        unsigned long* dPtr = (unsigned long*)[someData bytes];
+        if(dPtr!=0)[self decode:dPtr length:length intoDataSet:aDataSet];
+    }
 }
 
 - (void) decode:(unsigned long*)dPtr length:(long)length intoDataSet:(ORDataSet*)aDataSet

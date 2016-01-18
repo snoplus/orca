@@ -574,6 +574,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
         if([self isMaster]){
             @try {
                 [self readRegister:kBoardID];
+               // [self pulseNIMOutput];
                 [self initClockDistribution];
             }
             @catch(NSException* e){
@@ -593,6 +594,23 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
         [noClockAlarm postAlarm];
         [self setToInternalClock];
     }
+}
+
+- (void) pulseNIMOutput
+{
+    //this routine will send out a single pulse on both NIM outputs
+    //if(!setupNIMOutputDone){
+        setupNIMOutputDone = YES;
+        unsigned short regValue = [self readRegister:kAuxIOCrl]; //get the orginal value
+        regValue |= 0x5000; //set both NIM outputs to Any Trigger b0101
+        [self writeRegister:kAuxIOCrl withValue:regValue];
+
+        [self writeRegister:kTrigMask withValue:0x1];
+        [self writeRegister:kAuxTriggerWidth withValue:0xff]; //set to max width ~50µs
+   // }
+    
+    [self writeRegister:kPulsedCtl1 withValue:0x80000]; //generate 1 manual trigger)
+    
 }
 
 #pragma mark ***Accessors
@@ -1095,8 +1113,6 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     }
     [self setLocked:lockState];
     
-
-    
     return lockState;
 }
 
@@ -1131,6 +1147,48 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     }
 }
 
+- (void) printMasterDiagnosticReport
+{
+    int i;
+    if([self isMaster]){
+        for(i=0;i<8;i++){
+            ORConnector* otherConnector = [linkConnector[i] connector];
+            if([otherConnector identifer] == 'L'){
+                ORGretinaTriggerModel* routerObj = [otherConnector objectLink];
+                [routerObj printRouterDiagnosticReport];
+            }
+        }
+    }
+    else {
+        NSLogColor([NSColor redColor],@"Illegal call. Do not call %@ on a Router card./n",NSStringFromSelector(_cmd));
+    }
+}
+
+- (void) printRouterDiagnosticReport
+{
+    if(![self isMaster]){
+        int i;
+        for(i=0;i<8;i++){
+            if([linkConnector[i]  identifer] != 'L'){
+                ORGretina4MModel* digitizerObj   = [[linkConnector[i] connector] objectLink];
+                if(digitizerObj){
+                    if(![digitizerObj isLocked]){
+                        NSLogColor([NSColor redColor],@"%@: NOT Lock./n",[digitizerObj fullID]);
+                    }
+                    else {
+                        NSLog(@"%@: Locked./n",[digitizerObj fullID]);
+                    }
+                }
+            }
+        }
+    }
+    else {
+        NSLogColor([NSColor redColor],@"Illegal call. Do not call %@ on the Master Trigger card./n",NSStringFromSelector(_cmd));
+    }
+}
+
+
+
 - (BOOL) isLocked
 {
     [self setMiscStatReg:       [self readRegister:kMiscStatus]];
@@ -1154,6 +1212,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
         
         if([self isMaster] && linkWasLost){
             NSLogColor([NSColor redColor],@"%@: Trigger card was locked but lock was lost.\n",[self fullID]);
+            [self printMasterDiagnosticReport];
         }
         [self shipDataRecord]; //ship a record to show the new state
 

@@ -26,6 +26,7 @@
 	IBOutlet ORTimedTextField*   warningField;
     @protected
         id model;
+        BOOL updatedOnce;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -62,7 +63,8 @@
 - (void) checkGlobalSecurity;
 - (void) uniqueIDChanged:(NSNotification*)aNotification;
 - (void) warningPosted:(NSNotification*)aNotification;
-
+- (void) setUpdatedOnce;
+- (void) resetUpdatedOnce;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) incDialog:(id)sender;
@@ -72,6 +74,9 @@
 - (IBAction) printDocument:(id)sender;
 
 - (IBAction) copy:(id)sender;
+- (void) updateValueMatrix:(NSMatrix*)aMatrix getter:(SEL)aGetter;
+- (void) updateBOOLMatrix:(NSMatrix*)aMatrix getter:(SEL)aGetter;
+- (void) updatePUMatrix:(NSMatrix*)aMatrix getter:(SEL)aGetter;
 
 @end
 

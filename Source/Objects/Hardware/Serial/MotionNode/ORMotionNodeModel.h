@@ -45,12 +45,25 @@ typedef struct MotionNodeCalibrations {
 	float  slope;
 } MotionNodeCalibrations; 
 
+typedef struct MotionNodeHistoryData {
+     short x;
+     short y;
+     short z;
+}MotionNodeHistoryData;
 
-#define kModeNodeTraceLength 1500
+typedef struct MotionNodeHistoryHeader {
+    unsigned long           moduleID;
+    double                  endTime;
+    double                  startTime;
+    MotionNodeCalibrations  calibrations[3];
+    unsigned long numDataPoints;
+    //numDataPoints * MotionNodeData structs to follow
+} MotionNodeHistoryHeader;
 
-#define kModeNodeLongTraceLength 1000
-#define kModeNodePtsToCombine (6000/kModeNodeLongTraceLength)
-#define kNumMin 60
+#define kModeNodeTraceLength        1500
+#define kModeNodeLongTraceLength    1000
+#define kModeNodePtsToCombine       (6000/kModeNodeLongTraceLength)
+#define kNumMin                     60
 
 @interface ORMotionNodeModel : ORSerialPortModel {
 	unsigned long	dataId;
@@ -67,6 +80,7 @@ typedef struct MotionNodeCalibrations {
     float			ax;
     float			ay;
     float			az;
+    float           amean;
     int				traceIndex;
     int				longTraceIndex;
     int				longTraceMinIndex;
@@ -74,6 +88,7 @@ typedef struct MotionNodeCalibrations {
 	float			yTrace[kModeNodeTraceLength];
 	float			zTrace[kModeNodeTraceLength];
 	float			xyzTrace[kModeNodeTraceLength];
+    NSMutableArray* specialTrace;
 	float**			longTermTrace;
 	int				throttle;
 	float			temperatureAverage;
@@ -87,7 +102,8 @@ typedef struct MotionNodeCalibrations {
 	BOOL			cycledOnce;
     BOOL			showLongTermDelta;
 	BOOL			scheduledToShip;
-    BOOL			autoStart;
+    BOOL			autoStart; //with Run
+    BOOL			autoStartWithOrca;
     float			shipThreshold;
     BOOL			shipExcursions;
     BOOL			outOfBand;
@@ -95,12 +111,30 @@ typedef struct MotionNodeCalibrations {
     int				totalShipped;
 	int				excursionIndex;
 	float			longTraceValueToKeep;
+    BOOL            keepHistory;
+    NSString*		historyFolder;
+    NSMutableData*  historyTrace;
+    int             historyIndex;
+    int             averageIndex;
+    NSDate*         specialStartTime;
+    BOOL            eventInProgress;
+    int             postEventCount;
+    
+    MotionNodeHistoryData*  historyPtr;
+    
+    NSData*         oldHistoryData;
+    
+    
+    NSString*       serialID;
 }
 
 #pragma mark ***Initialization
 - (void) registerNotificationObservers;
+- (void) orcaIsTerminating:(NSNotification*)aNote;
 - (void) runStarting:(NSNotification*)aNote;
 - (void) runStopping:(NSNotification*)aNote;
+- (void) delayedOpen;
+- (void) delayedStart;
 
 #pragma mark ***Accessors
 - (int) totalShipped;
@@ -115,6 +149,8 @@ typedef struct MotionNodeCalibrations {
 - (void) setShipThreshold:(float)aShipThreshold;
 - (BOOL) autoStart;
 - (void) setAutoStart:(BOOL)aAutoStart;
+- (BOOL) autoStartWithOrca;
+- (void) setAutoStartWithOrca:(BOOL)aAutoStart;
 - (BOOL) showLongTermDelta;
 - (void) setShowLongTermDelta:(BOOL)aShowLongTermDelta;
 - (int) longTermSensitivity;
@@ -141,6 +177,7 @@ typedef struct MotionNodeCalibrations {
 - (float) ay;
 - (float) az;
 
+
 - (int) packetLength;
 - (void) setPacketLength:(int)aPacketLength;
 - (BOOL) isAccelOnly;
@@ -151,6 +188,18 @@ typedef struct MotionNodeCalibrations {
 - (void) setSerialNumber:(NSString*)aSerialNumber;
 - (id) lastRequest;
 - (void) setLastRequest:(id)aCmd;
+
+- (NSString*) historyFolder;
+- (void) setHistoryFolder:(NSString*)aHistoryFolder;
+- (void) viewPastHistory:(NSString*)filePath;
+- (int) numPointsInOldHistory;
+- (int) numPointsInOldHistory;
+- (float) oldHistoryValue:(int)index;
+- (NSTimeInterval) oldHistoryStartTime;
+- (NSTimeInterval) oldHistoryEndTime;
+- (unsigned long)maxHistoryLength;
+- (BOOL) keepHistory;
+- (void) setKeepHistory:(BOOL)aFlag;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -190,6 +239,7 @@ extern NSString* ORMotionNodeModelOutOfBandChanged;
 extern NSString* ORMotionNodeModelShipExcursionsChanged;
 extern NSString* ORMotionNodeModelShipThresholdChanged;
 extern NSString* ORMotionNodeModelAutoStartChanged;
+extern NSString* ORMotionNodeModelAutoStartWithOrcaChanged;
 extern NSString* ORMotionNodeModelShowLongTermDeltaChanged;
 extern NSString* ORMotionNodeModelLongTermSensitivityChanged;
 extern NSString* ORMotionNodeModelStartTimeChanged;
@@ -204,4 +254,6 @@ extern NSString* ORMotionNodeModelLock;
 extern NSString* ORMotionNodeModelSerialNumberChanged;
 extern NSString* ORMotionNodeModelDisplayComponentsChanged;
 extern NSString* ORMotionNodeModelUpdateLongTermTrace;
-
+extern NSString* ORMotionNodeModelHistoryFolderChanged;
+extern NSString* ORMotionNodeModelUpdateHistoryPlot;
+extern NSString* ORMotionNodeModelKeepHistoryChanged;

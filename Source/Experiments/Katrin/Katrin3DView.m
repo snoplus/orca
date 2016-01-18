@@ -11,6 +11,7 @@
 #import "ORSegmentGroup.h"
 #import "ORDetectorView.h"
 #import "ORColorScale.h"
+#import "ORExperimentModel.h"
 
 @implementation Katrin3DView
 - (void) draw3D:(NSRect)aRect;

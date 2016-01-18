@@ -937,7 +937,12 @@ nil];
 				if([aTag isEqualToString:kCreateRemoteDB]){
 					NSLog(@"Following Couch Message is from: %@\n",remoteHostName);
 				}
-				[aResult prettyPrint:@"CouchDB Message:"];
+                if([aTag isEqualToString:kCreateDB]){
+                    if([[aResult objectForKey:@"Reason"] rangeOfString:@"already exists"].location == NSNotFound){
+                        [aResult prettyPrint:@"CouchDB Message:"];
+                    }
+                }
+				else [aResult prettyPrint:@"CouchDB Message:"];
 			}
 			else {
 				if([aTag isEqualToString:kInfoDB]){
@@ -981,7 +986,8 @@ nil];
 				}
                 else if([aTag isEqualToString:kAddUpdateHandler]){
                     if([[aResult objectForKey:@"error"] isEqualToString:@"conflict"]){
-                        NSLog(@"CouchDB: Update handler already installed\n");
+                        
+                        //NSLog(@"CouchDB: %@ Update handler already installed\n",[anOp database]);
                         [self setUsingUpdateHandler:YES];
                     }
                     else if(![aResult objectForKey:@"error"]){
@@ -995,7 +1001,10 @@ nil];
 				}
 
 				else {
-					[aResult prettyPrint:@"CouchDB"];
+                    if( [[aResult objectForKey:@"_local_id"] rangeOfString:@"+continuous"].location == NSNotFound &&
+                        [[aResult objectForKey:@"ok"] intValue] != 1){
+                         [aResult prettyPrint:@"CouchDB"];
+                    }
 				}
 			}
 		}

@@ -188,8 +188,14 @@
     [notifyCenter addObserver : self
                      selector : @selector(maxVoltageChanged:)
                          name : ORiSegHVCardMaxVoltageChanged
-						object: model];
+                        object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(customInfoChanged:)
+                         name : ORiSegHVCardCustomInfoChanged
+                        object: model];
+
+    
     [notifyCenter addObserver : self
                      selector : @selector(chanNameChanged:)
                          name : ORiSegHVCardChanNameChanged
@@ -217,7 +223,8 @@
 	[self maxCurrentChanged:nil];
 	[self shipRecordsChanged:nil];
 	[self constraintsChanged:nil];
-	[self maxVoltageChanged:nil];
+    [self maxVoltageChanged:nil];
+    [self customInfoChanged:nil];
     [self chanNameChanged:nil];
     [self doNotPostSafetyLoopAlarmChanged:nil];
 }
@@ -231,6 +238,11 @@
 - (void) maxVoltageChanged:(NSNotification*)aNote
 {
     [maxVoltageField setStringValue:[NSString stringWithFormat:@"Max: %d",[model maxVoltage:[model selectedChannel]]]];
+}
+
+- (void) customInfoChanged:(NSNotification*)aNote
+{
+    [customInfoField setStringValue:[model customInfo:[model selectedChannel]]];
 }
 
 - (void) chanNameChanged:(NSNotification*)aNote

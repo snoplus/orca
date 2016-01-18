@@ -184,7 +184,7 @@ enum eHaloStatus {
 - (void) setToggleInterval:(float) seconds; //SV
 - (void) startTimer; //SV
 - (void) stopTimer; //SV
-- (void) waitForEndOfRun;
+- (void) waitForEndOfRun:(NSTimer*)aTimer;
 
 #pragma mark ***Run Stuff
 - (void) start;
