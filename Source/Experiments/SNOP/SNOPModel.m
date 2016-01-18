@@ -103,6 +103,8 @@ mtcConfigDoc = _mtcConfigDoc;
  * to the GUI, but Javi is working on the SNOPModel now */
 #define MTC_HOST @"sbc.sp.snolab.ca"
 #define MTC_PORT 4001
+#define XL3_HOST @"daq1.sp.snolab.ca"
+#define XL3_PORT 4001
 
 
 #pragma mark ¥¥¥Initialization
@@ -110,6 +112,12 @@ mtcConfigDoc = _mtcConfigDoc;
 - (id) init
 {
     self = [super init];
+
+    /* initialize our connection to the MTC server */
+    mtc_server = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
+
+    /* initialize our connection to the XL3 server */
+    xl3_server = [[RedisClient alloc] initWithHostName:XL3_HOST withPort:XL3_PORT];
 
     [[self undoManager] disableUndoRegistration];
 	[self initOrcaDBConnectionHistory];
@@ -126,8 +134,11 @@ mtcConfigDoc = _mtcConfigDoc;
     self = [super initWithCoder:decoder];
 
     /* initialize our connection to the MTC server */
-    mtc = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
-	
+    mtc_server = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
+
+    /* initialize our connection to the XL3 server */
+    xl3_server = [[RedisClient alloc] initWithHostName:XL3_HOST withPort:XL3_PORT];
+
     [[self undoManager] disableUndoRegistration];
 	[self initOrcaDBConnectionHistory];
 	[self initDebugDBConnectionHistory];
@@ -309,13 +320,13 @@ mtcConfigDoc = _mtcConfigDoc;
     @try {
         if ([aNote userInfo][@"doinit"]) {
             /* cold run start, so we need to reset the MTC/CAEN GTID */
-            [mtc okCommand:"reset_gtid"];
+            [mtc_server okCommand:"reset_gtid"];
         }
 
         /* Tell the MTC server to queue the run start. This will suspend
          * the MTC readout and fire a SOFT_GT. When the run starts, we will
          * resume the MTC readout */
-        [mtc okCommand:"queue_run_start"];
+        [mtc_server okCommand:"queue_run_start"];
     } @catch (NSException *e) {
         /* Need to abort the run start here, because uncaught exceptions are
          * not handled by ORCA during this phase of run start */
@@ -342,7 +353,7 @@ mtcConfigDoc = _mtcConfigDoc;
     /* send the run_start command to the MTC server which will send the
      * run header record to the builder, resume the MTC readout, fire a
      * SOFT_GT, and send a trigger record to the builder */
-    [mtc okCommand:"run_start %d %d %d", run_number, run_type, source_mask];
+    [mtc_server okCommand:"run_start %d %d %d", run_number, run_type, source_mask];
 
     //initilise the run document
     self.runDocument = nil;
@@ -367,10 +378,38 @@ mtcConfigDoc = _mtcConfigDoc;
 
     if ([run nextRunWillQuickStart]) {
         /* fire a SOFT_GT to mark end of run */
-        [mtc okCommand:"soft_gt"];
+        [mtc_server okCommand:"soft_gt"];
     } else {
-        [mtc okCommand:"run_stop"];
+        [mtc_server okCommand:"run_stop"];
+
+        NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                  @"waiting for MTC/XL3/CAEN data", @"Reason",
+                                  nil];
+
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object: self userInfo: userInfo];
+
+        /* detach a thread to monitor XL3/CAEN/MTC buffers */
+        [NSThread detachNewThreadSelector:@selector(_waitForBuffers)
+                                 toTarget:self
+                               withObject:nil];
     }
+}
+
+- (void) _waitForBuffers
+{
+    while (1) {
+        @try {
+            if (([mtc_server intCommand:"data_available"] == 0) &&
+                ([xl3_server intCommand:"data_available"] == 0))
+                break;
+        } @catch (NSException *e) {
+            NSLog(@"Failed to check MTC/XL3 data buffers. Quitting run...\n");
+            break;
+        }
+    }
+
+    /* Go ahead and end the run. */
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
 }
 
 - (void) runStopped:(NSNotification*)aNote
@@ -382,7 +421,7 @@ mtcConfigDoc = _mtcConfigDoc;
     ORRunModel *run = [aNote object];
 
     if (![run nextRunWillQuickStart]) {
-        [mtc okCommand:"builder_end_run"];
+        [mtc_server okCommand:"builder_end_run"];
     }
 
     [NSThread detachNewThreadSelector:@selector(_runEndDocumentWorker:)

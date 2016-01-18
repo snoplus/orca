@@ -104,7 +104,8 @@
     bool isEmergencyStopEnabled;
     bool isEStopPolling;
 
-    RedisClient *mtc;
+    RedisClient *mtc_server;
+    RedisClient *xl3_server;
 }
 
 @property (nonatomic,retain) NSMutableDictionary* smellieRunHeaderDocList;
@@ -171,6 +172,8 @@
 - (void) runStarted:(NSNotification*)aNote;
 - (void) runAboutToStop:(NSNotification*)aNote;
 - (void) runStopped:(NSNotification*)aNote;
+
+- (void) _waitForBuffers;
 
 - (void) runStateChanged:(NSNotification*)aNote;
 - (void) subRunStarted:(NSNotification*)aNote;
