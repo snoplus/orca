@@ -1807,14 +1807,14 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" title="Power Supply" borderType="line" id="4053">
-                                            <rect key="frame" x="5" y="-1" width="451" height="189"/>
+                                            <rect key="frame" x="5" y="70" width="451" height="118"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView">
-                                                <rect key="frame" x="1" y="1" width="449" height="173"/>
+                                                <rect key="frame" x="1" y="1" width="449" height="102"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button verticalHuggingPriority="750" id="4205">
-                                                        <rect key="frame" x="169" y="139" width="105" height="28"/>
+                                                        <rect key="frame" x="169" y="68" width="105" height="28"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Get Status" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4206">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1825,7 +1825,7 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" id="4207">
-                                                        <rect key="frame" x="324" y="139" width="105" height="28"/>
+                                                        <rect key="frame" x="324" y="68" width="105" height="28"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="push" title="HV OFF" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4208">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1836,7 +1836,7 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" id="4209">
-                                                        <rect key="frame" x="10" y="139" width="105" height="28"/>
+                                                        <rect key="frame" x="10" y="68" width="105" height="28"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="push" title="HV ON" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4210">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1847,7 +1847,7 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" id="4211">
-                                                        <rect key="frame" x="169" y="79" width="105" height="28"/>
+                                                        <rect key="frame" x="169" y="8" width="105" height="28"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Stop Ramp" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4216">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1858,7 +1858,7 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" id="4212">
-                                                        <rect key="frame" x="324" y="79" width="105" height="28"/>
+                                                        <rect key="frame" x="324" y="8" width="105" height="28"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Ramp DOWN" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4215">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1869,7 +1869,7 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" id="4213">
-                                                        <rect key="frame" x="10" y="79" width="105" height="28"/>
+                                                        <rect key="frame" x="10" y="8" width="105" height="28"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Ramp UP" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4214">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1880,7 +1880,7 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" id="4225">
-                                                        <rect key="frame" x="320" y="107" width="114" height="28"/>
+                                                        <rect key="frame" x="320" y="36" width="114" height="28"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Step DOWN 50V" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4228">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1891,7 +1891,7 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" id="4226">
-                                                        <rect key="frame" x="10" y="109" width="105" height="28"/>
+                                                        <rect key="frame" x="10" y="38" width="105" height="28"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Step UP 50V" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4227">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1902,7 +1902,7 @@
                                                         </connections>
                                                     </button>
                                                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="4274">
-                                                        <rect key="frame" x="256" y="112" width="15" height="22"/>
+                                                        <rect key="frame" x="256" y="41" width="15" height="22"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="4095" id="4275">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1912,7 +1912,7 @@
                                                         </connections>
                                                     </stepper>
                                                     <textField verticalHuggingPriority="750" id="4276">
-                                                        <rect key="frame" x="133" y="116" width="48" height="14"/>
+                                                        <rect key="frame" x="133" y="45" width="48" height="14"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="target: " id="4277">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1921,7 +1921,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="4498">
-                                                        <rect key="frame" x="241" y="115" width="12" height="14"/>
+                                                        <rect key="frame" x="241" y="44" width="12" height="14"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="V" id="4499">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1930,7 +1930,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="4495">
-                                                        <rect key="frame" x="184" y="114" width="55" height="19"/>
+                                                        <rect key="frame" x="184" y="43" width="55" height="19"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="8888.8" drawsBackground="YES" id="4496">
                                                             <numberFormatter key="formatter" formatterBehavior="custom10_4" numberStyle="decimal" usesGroupingSeparator="NO" minimumIntegerDigits="1" maximumIntegerDigits="4" minimumFractionDigits="1" maximumFractionDigits="1" id="4497"/>
@@ -1968,7 +1968,7 @@
                                                         </connections>
                                                     </textField>
                                                     <button verticalHuggingPriority="750" id="4060">
-                                                        <rect key="frame" x="13" y="7" width="105" height="28"/>
+                                                        <rect key="frame" x="13" y="3" width="105" height="28"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Set Relays" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4061">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1979,7 +1979,7 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" id="4065">
-                                                        <rect key="frame" x="324" y="7" width="105" height="28"/>
+                                                        <rect key="frame" x="324" y="2" width="105" height="28"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Open All" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4066">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1990,7 +1990,7 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" id="4068">
-                                                        <rect key="frame" x="168" y="7" width="109" height="28"/>
+                                                        <rect key="frame" x="170" y="2" width="109" height="28"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Check Interlock" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4069">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2268,7 +2268,7 @@
                                                         </buttonCell>
                                                         <cells>
                                                             <column>
-                                                                <buttonCell type="check" title="Check" bezelStyle="regularSquare" imagePosition="only" alignment="left" controlSize="small" inset="2" id="4341">
+                                                                <buttonCell type="check" bezelStyle="regularSquare" imagePosition="overlaps" alignment="left" controlSize="small" inset="2" id="4341">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
@@ -2510,7 +2510,7 @@
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Check" bezelStyle="regularSquare" imagePosition="only" alignment="left" controlSize="small" inset="2" id="4397">
+                                                                <buttonCell type="check" bezelStyle="regularSquare" imagePosition="overlaps" alignment="left" controlSize="small" inset="2" id="4397">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
@@ -2520,7 +2520,7 @@
                                                                 </buttonCell>
                                                             </column>
                                                             <column>
-                                                                <buttonCell type="check" title="Check" bezelStyle="regularSquare" imagePosition="only" alignment="left" controlSize="small" inset="2" id="4403">
+                                                                <buttonCell type="check" bezelStyle="regularSquare" imagePosition="overlaps" alignment="left" controlSize="small" inset="2" id="4403">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
@@ -2550,7 +2550,7 @@
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Check" bezelStyle="regularSquare" imagePosition="only" alignment="left" controlSize="small" inset="2" id="4407">
+                                                                <buttonCell type="check" bezelStyle="regularSquare" imagePosition="overlaps" alignment="left" controlSize="small" inset="2" id="4407">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
@@ -2560,6 +2560,42 @@
                                                             <action selector="hvRelayMaskMatrixAction:" target="-2" id="4409"/>
                                                         </connections>
                                                     </matrix>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="6Dn-gW-kKb">
+                                                        <rect key="frame" x="87" y="29" width="113" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Pending / Current" id="CLO-ZQ-MTA">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Nss-0b-mdg">
+                                                        <rect key="frame" x="257" y="29" width="38" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Open" id="bU8-5W-lCl">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" red="0.0" green="0.83714535361842102" blue="0.0" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="AUv-8W-OXE">
+                                                        <rect key="frame" x="299" y="30" width="23" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="|" id="UEg-Lq-ild">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="KOb-uh-csH">
+                                                        <rect key="frame" x="310" y="29" width="48" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Closed" id="hdb-zX-1QV">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" red="1" green="0.0" blue="0.0" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>

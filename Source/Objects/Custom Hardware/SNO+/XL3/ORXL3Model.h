@@ -98,8 +98,7 @@ enum {
     ORTimer*        timer;
     
     unsigned long long  relayMask;
-    uint32_t relayLowMask;
-    uint32_t relayHighMask; 
+    unsigned long long  relayViewMask;
     NSString* relayStatus;
     BOOL hvASwitch;
     BOOL hvBSwitch;
@@ -174,8 +173,7 @@ enum {
 @property (nonatomic,assign) BOOL isPollingForced;
 
 @property (nonatomic,assign) unsigned long long relayMask;
-@property (nonatomic,assign) uint32_t relayLowMask;
-@property (nonatomic,assign) uint32_t relayHighMask;
+@property (nonatomic,assign) unsigned long long relayViewMask;
 @property (nonatomic,copy) NSString* relayStatus;
 @property (nonatomic,assign) BOOL hvASwitch;
 @property (nonatomic,assign) BOOL hvBSwitch;

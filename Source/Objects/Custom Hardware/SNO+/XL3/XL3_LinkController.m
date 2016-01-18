@@ -24,6 +24,7 @@
 #import "XL3_Link.h"
 #import "ORXL3Model.h"
 #import "ORSNOCrateModel.h"
+#import "ORQuadStateBox.h"
 
 static NSArray* xl3RWModes;
 static NSDictionary* xl3RWSelects;
@@ -625,18 +626,25 @@ static NSDictionary* xl3Ops;
 
 - (void) hvRelayMaskChanged:(NSNotification*)aNote
 {
-    unsigned long long relayMask = [model relayMask];
-
-    [hvRelayMaskLowField setIntValue:relayMask & 0xffffffff];
-    [hvRelayMaskHighField setIntValue:relayMask >> 32];
+    ORQuadStateBox* quadStateBox = [ORQuadStateBox sharedQuadStateBox];
     
-    [self splitRelayMask:relayMask];
+    unsigned long long relayMask = [model relayMask];
+    unsigned long long relayViewMask = [model relayViewMask];
+
+    [hvRelayMaskLowField setIntValue:relayViewMask & 0xffffffff];
+    [hvRelayMaskHighField setIntValue:relayViewMask >> 32];
 
     unsigned char slot;
     unsigned char pmtic;
     for (slot = 0; slot<16; slot++) {
         for (pmtic=0; pmtic<4; pmtic++) {
-            [[hvRelayMaskMatrix cellAtRow:pmtic column:15-slot] setIntValue: (relayMask >> (slot*4 + pmtic)) & 0x1];
+            int modelval = (relayMask >> (slot*4 + pmtic)) & 0x1;
+            int viewval = (relayViewMask >> (slot*4 + pmtic)) & 0x1;
+            
+            int state = modelval ? (viewval ? kQuadStateBoxOff : kQuadStateBoxImageOffOnPending) : (viewval ? kQuadStateBoxOnOffPending : kQuadStateBoxImageOn);
+            
+            [[hvRelayMaskMatrix cellAtRow:pmtic column:15-slot] setIntValue:viewval];
+            [[hvRelayMaskMatrix cellAtRow:pmtic column:15-slot] setImage:[quadStateBox imageForState:state]];
         }
     }
 }
@@ -1232,34 +1240,21 @@ static NSDictionary* xl3Ops;
     [model setIsPollingXl3:false];
 }
 
-//split the relayMask into a low and high parts for posting to couchdb
--(void)splitRelayMask:(unsigned long long)aHvRelayMask
-{
-    //split the hvRelayMask into two parts
-    uint32_t highMask = (uint32_t)((aHvRelayMask & 0xFFFFFFFF00000000ULL) >> 32);
-    uint32_t lowMask = (uint32_t)(aHvRelayMask & 0xFFFFFFFF);
-    [model setRelayHighMask:highMask];
-    [model setRelayLowMask:lowMask];
-}
-
-
 //hv
 - (IBAction)hvRelayMaskHighAction:(id)sender
 {
     [[sender window] makeFirstResponder:tabView];
-    unsigned long long newRelayMask = [model relayMask] & 0xFFFFFFFFULL;
+    unsigned long long newRelayMask = [model relayViewMask] & 0xFFFFFFFFULL;
     newRelayMask |= ((unsigned long long)[sender intValue]) << 32;
-    [self splitRelayMask:newRelayMask];
-    [model setRelayMask:newRelayMask];
+    [model setRelayViewMask:newRelayMask];
 }
 
 - (IBAction)hvRelayMaskLowAction:(id)sender
 {
     [[sender window] makeFirstResponder:tabView];
-    unsigned long long newRelayMask = [model relayMask] & (0xFFFFFFFFULL << 32);
+    unsigned long long newRelayMask = [model relayViewMask] & (0xFFFFFFFFULL << 32);
     newRelayMask |= [sender intValue] & 0xFFFFFFFF;
-    [self splitRelayMask:newRelayMask];
-    [model setRelayMask:newRelayMask];    
+    [model setRelayViewMask:newRelayMask];
 }
 
 - (IBAction)hvRelayMaskMatrixAction:(id)sender
@@ -1269,20 +1264,16 @@ static NSDictionary* xl3Ops;
     unsigned char pmtic;
     for (slot = 0; slot<16; slot++) {
         for (pmtic=0; pmtic<4; pmtic++) {
-            //NSLog(@"slot: %d, db: %d, value: %d\n",slot,pmtic,[[sender cellAtRow:(3-pmtic) column:(15-slot)] intValue]);
             newRelayMask |= ([[sender cellAtRow:pmtic column:15-slot] intValue]?1ULL:0ULL) << (slot*4 + pmtic);
         }
     }
-    
-    //split the hvRelayMask into two parts
-    [self splitRelayMask:newRelayMask];
-    
-    [model setRelayMask:newRelayMask];
+    [model setRelayViewMask:newRelayMask];
 }
 
 - (IBAction)hvRelaySetAction:(id)sender
 {
     [self endEditing];
+    [model setRelayMask:[model relayViewMask]];
     [model closeHVRelays];
 }
 
