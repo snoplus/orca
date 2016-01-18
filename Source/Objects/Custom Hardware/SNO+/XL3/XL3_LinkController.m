@@ -602,7 +602,6 @@ static NSDictionary* xl3Ops;
 - (void) updateHVButtons
 {
     if ([hvPowerSupplyMatrix selectedColumn] == 0) { //A
-        [hvAStatusPanel setHidden:(![model hvEverUpdated] || ![model hvSwitchEverUpdated])];
         [hvOnButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && ![model hvASwitch]];
         [hvOffButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch]];
         [hvStepUpButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping]];
@@ -611,7 +610,6 @@ static NSDictionary* xl3Ops;
         [hvRampDownButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping]];
         [hvStopRampButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && [model hvARamping]];
     } else {
-        [hvBStatusPanel setHidden:(![model hvEverUpdated] || ![model hvSwitchEverUpdated])];
         [hvOnButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && ![model hvBSwitch]];
         [hvOffButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch]];
         [hvStepUpButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && ![model hvBRamping]];
@@ -669,12 +667,14 @@ static NSDictionary* xl3Ops;
     
     // Only crate 16 has an HV B (apparently)
     if ([model crateNumber] == 16) {
-        [hvBStatusPanel setHidden:false];
+        [hvAStatusPanel setHidden:(![model hvEverUpdated] || ![model hvSwitchEverUpdated])];
+        [hvBStatusPanel setHidden:(![model hvEverUpdated] || ![model hvSwitchEverUpdated])];
         [hvBOnStatusField setStringValue:[model hvBSwitch]?@"ON":@"OFF"];
         [hvBVoltageSetField setStringValue:[NSString stringWithFormat:@"%lu V",[model hvBVoltageDACSetValue]*3000/4096]];
         [hvBVoltageReadField setStringValue:[NSString stringWithFormat:@"%d V",(unsigned int)[model hvBVoltageReadValue]]];
         [hvBCurrentReadField setStringValue:[NSString stringWithFormat:@"%3.1f mA",[model hvBCurrentReadValue]]];
     } else {
+        [hvAStatusPanel setHidden:(![model hvEverUpdated] || ![model hvSwitchEverUpdated])];
         [hvBStatusPanel setHidden:true];
         [hvBOnStatusField setStringValue:@"N/A"];
         [hvBVoltageSetField setStringValue:@""];
