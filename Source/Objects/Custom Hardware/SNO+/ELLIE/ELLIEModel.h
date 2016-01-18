@@ -90,7 +90,7 @@
 -(bool)isELLIEFiring;
 
 -(NSMutableDictionary*) returnTellieFireCommands:(NSString*)fibreName  withNPhotons:(NSUInteger)photons withFireFrequency:(NSUInteger)frequency withNPulses:(NSUInteger)pulses;
--(NSNumber*) calcTellieChannelPulseSettings:(NSUInteger)channel withNPhotons:(NSUInteger)photons withFireFrequency:(NSUInteger)frequency withNPulses:(NSUInteger)pulses;
+-(NSNumber*) calcTellieChannelPulseSettings:(NSUInteger)channel withNPhotons:(NSUInteger)photons withFireFrequency:(NSUInteger)frequency;
 -(NSNumber*) calcTellieChannelForFibre:(NSString*)fibre;
 -(void) loadTELLIEStaticsFromDB;
 

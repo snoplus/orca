@@ -132,7 +132,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
      Possible additions:
         Use SNOPModel to check if tellie run type is masked in
      */
-    
+
     if(scriptFlag == YES){
         [self _pushInitialTellieRunDocument];
     } else {
@@ -398,7 +398,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         //Start a new subrun and ship EPED record. The EPED record flags the subrun boundry in the data structure for a run.
         [runControl performSelectorOnMainThread:@selector(prepareForNewSubRun) withObject:nil waitUntilDone:YES];
         [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
-        [aSnotModel shipEPEDRecord];
+        //[aSnotModel shipEPEDRecord];
         
         //Create arguments array to be passed to 'fireTellie.py' script.
         __block NSString * responseFromTellie = [[NSString alloc] init];
