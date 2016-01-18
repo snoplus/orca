@@ -31,6 +31,7 @@
     NSMutableDictionary* tellieSubRunSettings;
     NSMutableDictionary* tellieFireParameters;
     NSMutableDictionary* tellieFibreMapping;
+    BOOL ellieFireFlag;
     
 }
 
@@ -40,6 +41,7 @@
 @property (nonatomic,retain) NSMutableDictionary* smellieRunSettings;
 @property (nonatomic,retain) NSMutableDictionary* currentOrcaSettingsForSmellie;
 @property (nonatomic,retain) NSMutableDictionary* tellieRunDoc;
+@property (nonatomic,assign) BOOL ellieFireFlag;
 @property (nonatomic,retain) NSTask* exampleTask;
 @property (nonatomic,retain) NSMutableDictionary* smellieRunHeaderDocList;
 @property (nonatomic,retain) NSMutableArray* smellieSubRunInfo;
@@ -85,12 +87,14 @@
 -(NSMutableDictionary*) fetchCurrentConfigurationForVersion:(NSNumber*)currentVersion;
 
 //TELLIE Control Functions
+-(bool)isELLIEFiring;
+
 -(NSMutableDictionary*) returnTellieFireCommands:(NSString*)fibreName  withNPhotons:(NSUInteger)photons withFireFrequency:(NSUInteger)frequency withNPulses:(NSUInteger)pulses;
 -(NSNumber*) calcTellieChannelPulseSettings:(NSUInteger)channel withNPhotons:(NSUInteger)photons withFireFrequency:(NSUInteger)frequency withNPulses:(NSUInteger)pulses;
 -(NSNumber*) calcTellieChannelForFibre:(NSString*)fibre;
 -(void) loadTELLIEStaticsFromDB;
 
--(void) startTellieRun;
+-(void) startTellieRun:(BOOL)scriptFlag;
 -(void) stopTellieRun;
 -(void) pollTellieFibre;
 -(void) fireTellieFibreMaster:(NSMutableDictionary*)fireCommands;

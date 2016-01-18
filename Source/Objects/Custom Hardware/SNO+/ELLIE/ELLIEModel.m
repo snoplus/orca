@@ -64,6 +64,7 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
 
 @synthesize tellieFireParameters;
 @synthesize tellieFibreMapping;
+@synthesize ellieFireFlag;
 @synthesize smellieRunSettings;
 @synthesize exampleTask;
 @synthesize smellieRunHeaderDocList;
@@ -100,7 +101,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 -(void)dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	[super dealloc];
+    [self stopTellieRun];
+    self.ellieFireFlag = NO;
+    [super dealloc];
 }
 
 - (void) registerNotificationObservers
@@ -110,10 +113,18 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 	[notifyCenter removeObserver:self name:NSWindowDidResignKeyNotification object:nil];
 }
 
+-(bool) isELLIEFiring{
+    if(self.ellieFireFlag == YES){
+        return YES;
+    } else {
+        return NO;
+    }
+}
+
 /**************************************/
 /*          TELLIE Functions          */
 /**************************************/
--(void) startTellieRun
+-(void) startTellieRun:(BOOL)scriptFlag
 {
     /* 
      Start run using run control object and push initial TELLIE run doc to telliedb.
@@ -122,14 +133,18 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         Use SNOPModel to check if tellie run type is masked in
      */
     
-    //add run control object
-    NSArray*  runControlObjsArray = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    runControl = [runControlObjsArray objectAtIndex:0];
-    
-    if(![runControl isRunning]){
-        [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
-    } else if ([runControl isRunning]) {
+    if(scriptFlag == YES){
         [self _pushInitialTellieRunDocument];
+    } else {
+        //add run control object
+        NSArray*  runControlObjsArray = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+        runControl = [runControlObjsArray objectAtIndex:0];
+    
+        if(![runControl isRunning]){
+            [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
+        } else if ([runControl isRunning]) {
+            [self _pushInitialTellieRunDocument];
+        }
     }
 }
 
@@ -154,7 +169,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
      Poll the TELLIE hardware using an XMLRPC server and requests the response from the
      hardware.
     */
-    
     NSString* responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_readout_script.py" withCmdLineArgs:nil];
     NSLog(@"Response from Tellie: %@\n",responseFromTellie);
 }
@@ -246,7 +260,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     /*
      Calculate the tellie fire commands given certain input parameters
      
-     //NEED TO ADD FIBRE DELAY & TRIGGER DELAY
+     //NEED TO ADD FIBRE DELAY & TRIGGER DELAY READS FROM CALIBRATION FILES
+     //CURRENTLY THOSE NUMBERS DON'T EXIST.
     */
     NSNumber* tellieChannel = [self calcTellieChannelForFibre:fibreName];
     NSNumber* pulseWidth = [self calcTellieChannelPulseSettings:[tellieChannel integerValue] withNPhotons:photons withFireFrequency:frequency];
@@ -274,21 +289,37 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     if(self.tellieFireParameters == nil){
         NSException* e = [NSException
                           exceptionWithName:@"NoTellieFireParameters"
-                          reason:@"*** TELLIE fire_parameters doc has not been loaded - you need to call loadTellieStaticsFromDB"
+                          reason:@"*** TELLIE fire_parameters doc has not been loaded - you need to callloadTellieStaticsFromDB"
                           userInfo:nil];
         @throw e;
     }
+    
+    //Frequency check
     if(frequency != 1000){
         //10Hz frequency calibrations not complete.
         [NSException raise:@"Variable exception" format:@"The passed frequency != 1000Hz"];
     }
-
+    
+    //Get Calibration parameters
     float a = [[[[self.tellieFireParameters objectForKey:[NSString stringWithFormat:@"Channel_%d",channel]] objectForKey:@"Pars_1kHz"] objectAtIndex:0] floatValue];
     float b = [[[[self.tellieFireParameters objectForKey:[NSString stringWithFormat:@"Channel_%d",channel]] objectForKey:@"Pars_1kHz"] objectAtIndex:1] floatValue];
     float c = [[[[self.tellieFireParameters objectForKey:[NSString stringWithFormat:@"Channel_%d",channel]] objectForKey:@"Pars_1kHz"] objectAtIndex:2] floatValue];
-
+    
+    //Minimum photon settings check
+    float min_x = -b / (2*c);
+    float min_photons = a + b*min_x + c*(min_x*min_x);
+    //If photon output requested is not possible using calibration curve, estimate the low end with linear extrapolation.
+    if(photons < min_photons){
+        NSLog(@"Channel_%d has a minimum output of %.1f photons\n",channel,min_photons);
+        NSLog(@"Using a linear interpolation of 5ph/IPW from %.1f to estimate requested settings\n",min_x);
+        float floatPulseWidth = min_x + (min_photons-photons)/5.;
+        NSNumber* pulseWidth = [NSNumber numberWithInteger:floatPulseWidth];
+        NSLog(@"IPW setting calculated as: %d\n",[pulseWidth intValue]);
+        return pulseWidth;
+    }
+    
     float floatPulseWidth = (-sqrt(-4*a*c + b*b + 4*c*photons)-b) / (2*c);
-    NSNumber* pulseWidth = [NSNumber numberWithFloat:floatPulseWidth];
+    NSNumber* pulseWidth = [NSNumber numberWithInteger:floatPulseWidth];
     NSLog(@"IPW setting calculated as: %d\n",[pulseWidth intValue]);
     return pulseWidth;
 }
@@ -304,7 +335,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                           reason:@"*** Fibre map has not been loaded from couchdb - you need to call loadTellieStaticsFromDB"
                           userInfo:nil];
         @throw e;
-    } else if(![[self.tellieFibreMapping objectForKey:@"fibres"] containsObject:fibre]){
+    }
+    if(![[self.tellieFibreMapping objectForKey:@"fibres"] containsObject:fibre]){
         NSString* reasonStr = [NSString stringWithFormat:@"*** Fibre map does not include a reference to fibre: %@",fibre];
         NSException* eFibre = [NSException
                                exceptionWithName:@"FibreNotPatched"
@@ -322,7 +354,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 -(void) fireTellieFibreMaster:(NSMutableDictionary*)fireCommands
 {
     /*
-     Fire a tellie channel - which maps to an optical fibre in the detector. This function
+     Fire a tellie using hardware settings passed as dictionary. This function
      calls a python script on the DAQ1 machine, passing it command line arguments relating
      to specific tellie channel settings. The called python script relays the commands 
      to the tellie hardware using a XMLRPC server which must be lanuched manually via the
@@ -333,68 +365,93 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                                             be relayed to the tellie hardware.
      
     */
+    //Set tellieFiring flag
+    self.ellieFireFlag = YES;
+    NSLog(@"ELLIE fire flag set to: %@\n",YES);
     
-    //add run control object
+    //Add run control object
     NSArray*  runControlObjsArray = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     runControl = [runControlObjsArray objectAtIndex:0];
     
-    //start a new subrun
-    [runControl performSelectorOnMainThread:@selector(prepareForNewSubRun) withObject:nil waitUntilDone:YES];
-    [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
+    //Add SNOPModel object
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    SNOPModel* aSnotModel = [objs objectAtIndex:0];
     
-    //TODO:Add this back in
-    //Post to the Database what is about to happen
-    __block NSString * responseFromTellie = [[NSString alloc] init];
-    NSArray * nullCommandArguments = @[@"-c",[[fireCommands objectForKey:@"channel"] stringValue],@"-n",[[fireCommands objectForKey:@"number_of_shots"] stringValue],@"-d",[[fireCommands objectForKey:@"pulse_rate"] stringValue],@"-t",[[fireCommands objectForKey:@"trigger_delay"] stringValue],@"-w",[[fireCommands objectForKey:@"pulse_width"] stringValue],@"-z",[[fireCommands objectForKey:@"pulse_height"] stringValue],@"-x",[[fireCommands objectForKey:@"fibre_delay"] stringValue]];
+    //TELLIE pin readout is an average measurement of the passed "number_of_shots". If a large number of shots are requested
+    //it is useful to split the data into smaller chunks in order to get multiple pin readings.
+    NSNumber* loops = [NSNumber numberWithInteger:1];
+    int totalShots = [[fireCommands objectForKey:@"number_of_shots"] integerValue];
+    float fRemainder = fmod(totalShots, 5e3);
+    if( totalShots > 5e3){
+        int iLoops = (totalShots - fRemainder) / 5e3;
+        loops = [NSNumber numberWithInteger:(iLoops+1)];
+    }
     
-    double numberOfShots = [[fireCommands objectForKey:@"number_of_shots"] doubleValue];
-    double timeBetweenShotsInMicroSeconds = [[fireCommands objectForKey:@"pulse_rate"] doubleValue]/(1000.0);
-    if(pulseByPulseDelay < 0.1){
-        NSLog(@"Pulse by pulse delay is too small. Setting to 0.1");
-        pulseByPulseDelay = 0.1;
-    }
-    else if (pulseByPulseDelay > 25.0){
-        NSLog(@"Pulse by pulse delay is too small. Setting to 25.0");
-        pulseByPulseDelay = 25.0;
-    }
-    else{
+    for(int i = 0; i<[loops integerValue]; i++){
+        
+        //Each loop fires 5e3 identical tellie pulses, except the final one, which fires: (totalRequestedShots % 5e3)
+        NSNumber* noShots = [NSNumber numberWithInt:5e3];
+        if(i == ([loops integerValue]-1)){
+            noShots = [NSNumber numberWithInt:fRemainder];
+        }
+        
+        //Start a new subrun and ship EPED record. The EPED record flags the subrun boundry in the data structure for a run.
+        [runControl performSelectorOnMainThread:@selector(prepareForNewSubRun) withObject:nil waitUntilDone:YES];
+        [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
+        [aSnotModel shipEPEDRecord];
+        
+        //Create arguments array to be passed to 'fireTellie.py' script.
+        __block NSString * responseFromTellie = [[NSString alloc] init];
+        NSArray * nullCommandArguments = @[@"-c",[[fireCommands objectForKey:@"channel"] stringValue],@"-n",[noShots stringValue],@"-d",[[fireCommands objectForKey:@"pulse_rate"] stringValue],@"-t",[[fireCommands objectForKey:@"trigger_delay"] stringValue],@"-w",[[fireCommands objectForKey:@"pulse_width"] stringValue],@"-z",[[fireCommands objectForKey:@"pulse_height"] stringValue],@"-x",[[fireCommands objectForKey:@"fibre_delay"] stringValue]];
+    
+        //Wait until tellie has stopped firing
+        double timeBetweenShotsInMicroSeconds = [[fireCommands objectForKey:@"pulse_rate"] doubleValue]/(1000.0);
+        if(pulseByPulseDelay < 0.1){
+            NSLog(@"Pulse by pulse delay is too small. Setting to 0.1");
+            pulseByPulseDelay = 0.1;
+        }
+        else if (pulseByPulseDelay > 25.0){
+            NSLog(@"Pulse by pulse delay is too small. Setting to 25.0");
+            pulseByPulseDelay = 25.0;
+        } else{
         //do nothing 
-    }
+        }
     
-    //reduce the pulse by pulse delay to a percentage
-    pulseByPulseDelay = pulseByPulseDelay/100.0;
+        //reduce the pulse by pulse delay to a percentage
+        pulseByPulseDelay = pulseByPulseDelay/100.0;
+        double timeToSleep = (1.0+pulseByPulseDelay)*[noShots integerValue]*timeBetweenShotsInMicroSeconds; //20% grace period for each shot
     
-    double timeToSleep = (1.0+pulseByPulseDelay)*numberOfShots*timeBetweenShotsInMicroSeconds; //20% grace period for each shot
-    
-    //hold the fire command on this thread
-    // This line is depreciated - bring it up with the working group, see if they have
-    // a preferred solution.*
-    dispatch_sync(dispatch_get_current_queue(), ^{
-        responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_fire_script.py" withCmdLineArgs:nullCommandArguments];
-        NSLog(@"Response from Tellie FIRE command: %@\n",responseFromTellie);
-    });
+        //hold the fire command on this thread
+        // This line is depreciated - bring it up with the working group, see if they have
+        // a preferred solution.*
+        NSLog(@"***** FIRING %d TELLIE PULSES *****\n",[noShots integerValue]);
+        dispatch_sync(dispatch_get_current_queue(), ^{
+            responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_fire_script.py" withCmdLineArgs:nullCommandArguments];
+            NSLog(@"Response from Tellie FIRE command: %@\n",responseFromTellie);
+        });
 
-    //NSLog(@"in here");
-    [NSThread sleepForTimeInterval:timeToSleep];
+        [NSThread sleepForTimeInterval:timeToSleep];
     
-    //[NSThread sleepForTimeInterval:1.0];
-    __block NSString * responseFromPoll = [[NSString alloc] init];
-    // * same as above.
-    dispatch_sync(dispatch_get_current_queue(), ^{
-        responseFromPoll = [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_readout_script.py" withCmdLineArgs:nil];
-        NSLog(@"Response from Tellie READ command: %@\n",responseFromPoll);
-    });
+        __block NSString * responseFromPoll = [[NSString alloc] init];
+        // * same as above.
+        dispatch_sync(dispatch_get_current_queue(), ^{
+            responseFromPoll = [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_readout_script.py" withCmdLineArgs:nil];
+            NSLog(@"Response from Tellie READ command: %@\n",responseFromPoll);
+        });
     
-    @try {
-        [fireCommands setObject:[NSNumber numberWithInt:[responseFromPoll intValue]] forKey:@"pin_readout"];
+        @try {
+            [fireCommands setObject:[NSNumber numberWithInt:[responseFromPoll intValue]] forKey:@"pin_readout"];
+        } @catch (NSException *exception) {
+            NSLog(@"Unable to add pin readout due to error %@",exception);
+        }
+    
+        [responseFromTellie release];
+        [self updateTellieDocument:fireCommands];
     }
-    @catch (NSException *exception) {
-        NSLog(@"Unable to add pin readout due to error %@",exception);
-    }
-    
-    [responseFromTellie release];
-    [self updateTellieDocument:fireCommands];
+    self.ellieFireFlag = NO;
+    NSLog(@"ELLIE fire flag set to: %@\n",NO);
 }
+
 
 -(void) stopTellieFibre:(NSArray*)fireCommands
 {
@@ -406,7 +463,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 }
 
 /***************************************/
-/*          Smellie Functions         */
+/*          Smellie Functions          */
 /***************************************/
 - (void) fetchSmellieConfigurationInformation
 {
@@ -448,10 +505,10 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     */
     //Collect a series of objects from the SNOPModel
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    
+
     //Initialise the SNOPModel
     SNOPModel* aSnotModel = [objs objectAtIndex:0];
-    /*
+    
     //Commented out for testing
     return [ORCouchDB couchHost:[aSnotModel orcaDBIPAddress]
                            port:[aSnotModel orcaDBPort]
@@ -459,13 +516,14 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                             pwd:[aSnotModel orcaDBPassword]
                        database:aCouchDb
                        delegate:aSnotModel];
-    */
+    /*
     return [ORCouchDB couchHost:@"http://couch.snopl.us"
                            port:[aSnotModel orcaDBPort]
                        username:@"snoplus"
                             pwd:@"PureTe->Dirac!=True"
                        database:aCouchDb
-                       delegate:aSnotModel];
+                        delegate:aSnotModel];
+     */
 }
 
 -(NSString*)callPythonScript:(NSString*)pythonScriptFilePath withCmdLineArgs:(NSArray*)commandLineArgs
@@ -637,43 +695,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
      variables and push up to the telliedb. Additionally, the run doc dictionary set as 
      the tellieRunDoc propery, to be updated later in the run.
     */
-    NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:10];
-    
-    NSArray*  objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    runControl = [objs3 objectAtIndex:0];
-    
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* aSnotModel = [objs objectAtIndex:0];
-    
-    NSString* docType = [NSMutableString stringWithFormat:@"tellie_run"];
-    NSMutableArray* subRunArray = [NSMutableArray arrayWithCapacity:10];
-    
-    [runDocDict setObject:docType forKey:@"type"];
-    [runDocDict setObject:[NSString stringWithFormat:@"%i",0] forKey:@"version"];
-    [runDocDict setObject:[NSString stringWithFormat:@"%lu",[runControl runNumber]] forKey:@"index"];
-    [runDocDict setObject:[self stringUnixFromDate:nil] forKey:@"issue_time_unix"];
-    [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"issue_time_iso"];
-    [runDocDict setObject:[NSNumber numberWithInt:[runControl runNumber]] forKey:@"run"];
-    [runDocDict setObject:subRunArray forKey:@"sub_run_info"];
-    
-    self.tellieRunDoc = runDocDict;
-    
-    [[aSnotModel orcaDbRefWithEntryDB:self withDB:@"telliedb"] addDocument:runDocDict tag:kTellieRunDocumentAdded];
-    
-    //wait for main thread to receive acknowledgement from couchdb
-    NSDate* timeout = [NSDate dateWithTimeIntervalSinceNow:2.0];
-    while ([timeout timeIntervalSinceNow] > 0 && ![self.tellieRunDoc objectForKey:@"_id"]) {
-        [NSThread sleepForTimeInterval:0.1];
-    }
-}
-
--(void) pushTellieRunDocument
-{
-    /*
-     Create a standard tellie run doc using ELLIEModel / SNOPModel / ORRunModel class
-     variables and push up to the telliedb. Additionally, the run doc dictionary set as
-     the tellieRunDoc propery, to be updated later in the run.
-     */
     NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:10];
     
     NSArray*  objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
