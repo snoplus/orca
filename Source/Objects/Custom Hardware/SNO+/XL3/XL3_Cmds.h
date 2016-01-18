@@ -141,6 +141,17 @@
 #define CTC_SEL			(0x01000000)
 #define XL3_SEL			(0x02000000)
 
+//*************************WARNING*****************************
+//*************************DANGER******************************
+//
+// pack(1) /should/ force Orca to pack these structs the same
+// as the XL3 code which is /critical/ for being able to parse
+// the XL3 response packets. This could change at any time for
+// no reason, so beware!
+//
+//*************************DANGER******************************
+//*************************WARNING*****************************
+#pragma pack(1)
 
 //xl3_code/include/lwip_functions.h
 typedef struct {
@@ -183,20 +194,6 @@ typedef
 		char payload[XL3_MAXPAYLOADSIZE_BYTES];
 	}
 XL3_PayloadStruct;
-
-//*************************WARNING*****************************
-//*************************DANGER******************************
-//
-// The XL3 and penn_daq codebases do not specify packing and use
-// the C(++) default packing. Orca/Objective-C seems to always
-// pack structs by default. pack(8) /should/ force Orca to pack
-// these structs the same as the XL3 code which is /critical/ for
-// being able to parse the XL3 response packets. This could change
-// at any time for no reason, so beware!
-//
-//*************************DANGER******************************
-//*************************WARNING*****************************
-#pragma pack(8)
 
 //db_types.h
 typedef struct {
