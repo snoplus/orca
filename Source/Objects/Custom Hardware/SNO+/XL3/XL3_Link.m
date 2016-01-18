@@ -519,7 +519,7 @@ readFifoFlag = _readFifoFlag;
 	}
     if(askForResponse){
         @try {
-            NSLog(@"wait for command response with packetType: 0x%x, packetNum: 0x%x, packetSize: %i\n", packetType, packetNum, payloadBlock->numberBytesinPayload);
+            //NSLog(@"wait for command response with packetType: 0x%x, packetNum: 0x%x, packetSize: %i\n", packetType, packetNum, payloadBlock->numberBytesinPayload);
 			[self readXL3Packet:&aPacket withPacketType:packetType andPacketNum:packetNum];
 			XL3_PayloadStruct* payloadPtr = (XL3_PayloadStruct*) aPacket.payload;
 			memcpy(payloadBlock->payload, payloadPtr, payloadBlock->numberBytesinPayload);

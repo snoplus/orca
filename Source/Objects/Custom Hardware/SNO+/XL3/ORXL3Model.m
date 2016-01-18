@@ -4441,11 +4441,16 @@ void SwapLongBlock(void* p, int32_t n)
             if ([self hvASwitch]) {
                 [self setHvAVoltageDACSetValue:[self hvAVoltageReadValue]* 4096/3000.];
                 [self setHvANextStepValue:[self hvAVoltageReadValue]* 4096/3000.];
+                [self setHvAVoltageTargetValue:[self hvAVoltageReadValue]];
             }
             if ([self hvBSwitch]) {
                 [self setHvBVoltageDACSetValue:[self hvBVoltageReadValue]* 4096/3000.];
                 [self setHvBNextStepValue:[self hvBVoltageReadValue]* 4096/3000.];
+                [self setHvBVoltageTargetValue:[self hvBVoltageReadValue]];
             }
+            
+            //let everyone know there are new target values
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHVTargetValueChanged object:self];
             
             //finally launch a new HV thread
             if (hvThread) {
