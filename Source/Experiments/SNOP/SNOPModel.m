@@ -355,7 +355,10 @@ mtcConfigDoc = _mtcConfigDoc;
 
     ORRunModel *run = [aNote object];
 
-    if (![run nextRunWillQuickStart]) {
+    if ([run nextRunWillQuickStart]) {
+        /* fire a SOFT_GT to mark end of run */
+        [mtc okCommand:"soft_gt"];
+    } else {
         [mtc okCommand:"run_stop"];
     }
 }
