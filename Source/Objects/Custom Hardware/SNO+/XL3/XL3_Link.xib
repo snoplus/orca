@@ -56,11 +56,13 @@
                 <outlet property="errorTimeOutPU" destination="3924" id="3958"/>
                 <outlet property="hvACurrentReadField" destination="4461" id="4490"/>
                 <outlet property="hvAOnStatusField" destination="4469" id="4483"/>
+                <outlet property="hvAStatusPanel" destination="4459" id="FO5-1Y-FJd"/>
                 <outlet property="hvATriggerStatusField" destination="4467" id="4486"/>
                 <outlet property="hvAVoltageReadField" destination="4463" id="4491"/>
                 <outlet property="hvAVoltageSetField" destination="4464" id="4488"/>
                 <outlet property="hvBCurrentReadField" destination="4455" id="4492"/>
                 <outlet property="hvBOnStatusField" destination="4439" id="4484"/>
+                <outlet property="hvBStatusPanel" destination="4430" id="efI-Hh-E3Q"/>
                 <outlet property="hvBTriggerStatusField" destination="4443" id="4487"/>
                 <outlet property="hvBVoltageReadField" destination="4449" id="4493"/>
                 <outlet property="hvBVoltageSetField" destination="4448" id="4489"/>

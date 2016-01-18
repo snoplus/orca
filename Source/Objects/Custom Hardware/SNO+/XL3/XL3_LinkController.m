@@ -31,6 +31,8 @@ static NSDictionary* xl3RWAddresses;
 static NSDictionary* xl3Ops;
 
 @implementation XL3_LinkController
+@synthesize hvBStatusPanel;
+@synthesize hvAStatusPanel;
 
 #pragma mark •••Initialization
 
@@ -658,11 +660,13 @@ static NSDictionary* xl3Ops;
     
     // Only crate 16 has an HV B (apparently)
     if ([model crateNumber] == 16) {
+        [hvBStatusPanel setHidden:false];
         [hvBOnStatusField setStringValue:[model hvBSwitch]?@"ON":@"OFF"];
         [hvBVoltageSetField setStringValue:[NSString stringWithFormat:@"%lu V",[model hvBVoltageDACSetValue]*3000/4096]];
         [hvBVoltageReadField setStringValue:[NSString stringWithFormat:@"%d V",(unsigned int)[model hvBVoltageReadValue]]];
         [hvBCurrentReadField setStringValue:[NSString stringWithFormat:@"%3.1f mA",[model hvBCurrentReadValue]]];
     } else {
+        [hvBStatusPanel setHidden:true];
         [hvBOnStatusField setStringValue:@"N/A"];
         [hvBVoltageSetField setStringValue:@""];
         [hvBVoltageReadField setStringValue:@""];

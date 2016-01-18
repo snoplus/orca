@@ -147,6 +147,8 @@
     IBOutlet NSButton*              connectionAutoInitCrateButton;
     
     id owl_crate_master;
+    NSBox *hvBStatusPanel;
+    NSBox *hvAStatusPanel;
 }	
 
 #pragma mark •••Initialization
@@ -266,6 +268,11 @@
 - (IBAction) monVltThresholdInInitAction:(id)sender;
 - (IBAction) monVltThresholdSetAction:(id)sender;
 //hv
+@property (assign) IBOutlet NSBox *hvBStatusPanel;
+@property (assign) IBOutlet NSBox *hvAStatusPanel;
+
+	
+
 - (IBAction)hvRelayMaskHighAction:(id)sender;
 - (IBAction)hvRelayMaskLowAction:(id)sender;
 - (IBAction)hvRelayMaskMatrixAction:(id)sender;
