@@ -602,6 +602,7 @@ static NSDictionary* xl3Ops;
 - (void) updateHVButtons
 {
     if ([hvPowerSupplyMatrix selectedColumn] == 0) { //A
+        [hvAStatusPanel setHidden:(![model hvEverUpdated] || ![model hvSwitchEverUpdated])];
         [hvOnButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && ![model hvASwitch]];
         [hvOffButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch]];
         [hvStepUpButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping]];
@@ -610,6 +611,7 @@ static NSDictionary* xl3Ops;
         [hvRampDownButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping]];
         [hvStopRampButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && [model hvARamping]];
     } else {
+        [hvBStatusPanel setHidden:(![model hvEverUpdated] || ![model hvSwitchEverUpdated])];
         [hvOnButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && ![model hvBSwitch]];
         [hvOffButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch]];
         [hvStepUpButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && ![model hvBRamping]];
