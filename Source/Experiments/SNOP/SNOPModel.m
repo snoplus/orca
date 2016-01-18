@@ -306,15 +306,25 @@ mtcConfigDoc = _mtcConfigDoc;
 
 - (void) runInitialization:(NSNotification*)aNote
 {
-    if ([aNote userInfo][@"doinit"]) {
-        /* cold run start, so we need to reset the MTC/CAEN GTID */
-        [mtc okCommand:"reset_gtid"];
-    }
+    @try {
+        if ([aNote userInfo][@"doinit"]) {
+            /* cold run start, so we need to reset the MTC/CAEN GTID */
+            [mtc okCommand:"reset_gtid"];
+        }
 
-    /* Tell the MTC server to queue the run start. This will suspend
-     * the MTC readout and fire a SOFT_GT. When the run starts, we will
-     * resume the MTC readout */
-    [mtc okCommand:"queue_run_start"];
+        /* Tell the MTC server to queue the run start. This will suspend
+         * the MTC readout and fire a SOFT_GT. When the run starts, we will
+         * resume the MTC readout */
+        [mtc okCommand:"queue_run_start"];
+    } @catch (NSException *e) {
+        /* Need to abort the run start here, because uncaught exceptions are
+         * not handled by ORCA during this phase of run start */
+        NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                    [e name], @"Reason",
+                                    [e reason], @"Details",
+                                    nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStartupAbort object: self userInfo: userInfo];
+    }
 }
 
 - (void) runAboutToStart:(NSNotification*)aNote
