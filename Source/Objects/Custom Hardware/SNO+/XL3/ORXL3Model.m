@@ -3419,6 +3419,7 @@ void SwapLongBlock(void* p, int32_t n)
     }
     @catch (NSException *exception) {
         NSLog(@"%@ error sending setHVRelays command.\n",[[self xl3Link] crateName]);
+        *aError = 0xFFFFFFFF;
         @throw exception;
     }
     
@@ -3437,13 +3438,11 @@ void SwapLongBlock(void* p, int32_t n)
         [self setHVRelays:aRelayMask error:&error];
     }
     @catch (NSException *exception) {
-        ;
     }
     
     if (error != 0) {
         NSLog(@"%@ error in setHVRelays relays were NOT set.\n",[[self xl3Link] crateName]);
-    }
-    else{
+    } else {
         NSLog(@"%@ HV relays set.\n",[[self xl3Link] crateName]);
     }
 }
@@ -3472,6 +3471,8 @@ void SwapLongBlock(void* p, int32_t n)
 - (void) openHVRelays
 {
     unsigned long error;
+    
+    [self setRelayMask:0ULL];
     
     @try {
         [self setHVRelays:0ULL error:&error];
