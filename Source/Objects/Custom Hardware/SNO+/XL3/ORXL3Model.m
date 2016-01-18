@@ -4441,12 +4441,12 @@ void SwapLongBlock(void* p, int32_t n)
             if ([self hvASwitch]) {
                 [self setHvAVoltageDACSetValue:[self hvAVoltageReadValue]* 4096/3000.];
                 [self setHvANextStepValue:[self hvAVoltageReadValue]* 4096/3000.];
-                [self setHvAVoltageTargetValue:[self hvAVoltageReadValue]];
+                [self setHvAVoltageTargetValue:[self hvAVoltageReadValue]* 4096/3000.	];
             }
             if ([self hvBSwitch]) {
                 [self setHvBVoltageDACSetValue:[self hvBVoltageReadValue]* 4096/3000.];
                 [self setHvBNextStepValue:[self hvBVoltageReadValue]* 4096/3000.];
-                [self setHvBVoltageTargetValue:[self hvBVoltageReadValue]];
+                [self setHvBVoltageTargetValue:[self hvBVoltageReadValue]* 4096/3000.];
             }
             
             //let everyone know there are new target values
