@@ -112,6 +112,7 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 - (id) init;
 - (id) initWithCoder:(NSCoder *)aCoder;
 - (void) encodeWithCoder:(NSCoder *)aCoder;
+- (void) dealloc;
 
 - (void) sendOkCmd:(NSString* const)aCmd;
 - (int) sendIntCmd:(NSString* const)aCmd;

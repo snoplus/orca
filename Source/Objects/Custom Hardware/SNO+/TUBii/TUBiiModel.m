@@ -108,6 +108,11 @@
     [aCoder encodeInt:portNumber            forKey:@"TUBiiModelPortNumber"];
     [aCoder encodeObject:strHostName        forKey:@"TUBiiModelStrHostName"];
 }
+- (void) dealloc {
+    [super dealloc];
+    [connection dealloc];
+    [strHostName dealloc];
+}
 - (void) sendOkCmd:(NSString* const)aCmd {
     @try {
         NSLog(@"Sending %@ to TUBii\n",aCmd);
