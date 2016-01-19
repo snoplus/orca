@@ -4437,7 +4437,7 @@ void SwapLongBlock(void* p, int32_t n)
             @try {
                 [[self xl3Link] sendCommand:CHECK_XL3_STATE_ID withPayload:&payload expectResponse:YES];
             } @catch (NSException *e) {
-                NSLog(@"%@ error reading XL3 mode; error: %@ reason: %@\n", [[self xl3Link] crateName], [e name], [e reason]);
+                NSLog(@"%@ error reading XL3 init; error: %@ reason: %@\n", [[self xl3Link] crateName], [e name], [e reason]);
                 continue; // try again later if there was an error
             }
             
@@ -4445,8 +4445,15 @@ void SwapLongBlock(void* p, int32_t n)
             if (!result->initialized) continue;
             
             //now readback the HV settings according to the XL3
-            [self readHVSwitchOn];
-            [self readHVStatus];
+            @try {
+                [self readHVSwitchOn];
+                [self readHVStatus];
+            } @catch (NSException *e) {
+                NSLog(@"%@ error reading XL3 hv status; error: %@ reason: %@\n", [[self xl3Link] crateName], [e name], [e reason]);
+                continue; // try again later if there was an error
+            }
+            
+            //set model values to hv readback
             if ([self hvASwitch]) {
                 [self setHvAVoltageDACSetValue:[self hvAVoltageReadValue]* 4096/3000.];
                 [self setHvANextStepValue:[self hvAVoltageReadValue]* 4096/3000.];
