@@ -1148,7 +1148,9 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     //first call to see if any object needs to stop the run or do something to cause the run start process to wait
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunInitializationNotification
                                                         object: self
-                                                      userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:eRunStarting] forKey:@"State"]];
+                                                      userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:eRunStarting], @"State",
+							  [NSNumber numberWithInt:doInit||forceFullInit], @"doinit",
+    nil]];
 
     [self setDataTypeAssigner:[[[ORDataTypeAssigner alloc] init]autorelease]];
     
