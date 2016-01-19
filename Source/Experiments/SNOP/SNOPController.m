@@ -1061,28 +1061,39 @@ smellieRunFile;
 {
     BOOL runInProgress				= [gOrcaGlobals runInProgress];
     BOOL locked						= [gSecurity isLocked:ORSNOPRunsLockNotification];
-    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORSNOPRunsLockNotification];
+    BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORSNOPRunsLockNotification];
     
     //[softwareTriggerButton setEnabled: !locked && !runInProgress];
     [runsLockButton setState: locked];
     
     //Enable or disable fields
-    [loadValuesButton setEnabled:!lockedOrRunningMaintenance];
-    [ECApatternPopUpButton setEnabled:!lockedOrRunningMaintenance];
-    [ECAtypePopUpButton setEnabled:!lockedOrRunningMaintenance];
-    [TSlopePatternTextField setEnabled:!lockedOrRunningMaintenance];
-    [subTimeTextField setEnabled:!lockedOrRunningMaintenance];
-    [standardRunPopupMenu setEnabled:!lockedOrRunningMaintenance];
-    [standardRunSaveButton setEnabled:!lockedOrRunningMaintenance];
-    [standardRunLoadButton setEnabled:!lockedOrRunningMaintenance];
-    [standardRunLoadToHWButton setEnabled:!lockedOrRunningMaintenance];
+    [loadValuesButton setEnabled:!lockedOrNotRunningMaintenance];
+    [ECApatternPopUpButton setEnabled:!lockedOrNotRunningMaintenance];
+    [ECAtypePopUpButton setEnabled:!lockedOrNotRunningMaintenance];
+    [TSlopePatternTextField setEnabled:!lockedOrNotRunningMaintenance];
+    [subTimeTextField setEnabled:!lockedOrNotRunningMaintenance];
+    [standardRunPopupMenu setEnabled:!lockedOrNotRunningMaintenance];
+    [standardRunSaveButton setEnabled:!lockedOrNotRunningMaintenance];
+    [standardRunLoadButton setEnabled:!lockedOrNotRunningMaintenance];
+    [standardRunLoadToHWButton setEnabled:!lockedOrNotRunningMaintenance];
     
-    NSString* s = @"";
-    if(lockedOrRunningMaintenance){
-        if(runInProgress && ![gSecurity isLocked:ORSNOPRunsLockNotification])
-            s = @"Not in Maintenance Run.";
+    [runStatusTextField setStringValue:@"UNLOCKED"];
+    [runStatusTextField setBackgroundColor:[NSColor colorWithSRGBRed:0 green:0 blue:1 alpha:1]];
+    if(lockedOrNotRunningMaintenance){
+        if(locked){
+            [runStatusTextField setStringValue:@"LOCKED"];
+            [runStatusTextField setBackgroundColor:[NSColor redColor]];
+        }
+        else{
+            [runStatusTextField setStringValue:@"RUN IN PROGRESS"];
+            [runStatusTextField setBackgroundColor:[NSColor redColor]];
+        }
     }
-    [runsLockTextField setStringValue:s];
+    else if(runInProgress){
+        [runStatusTextField setStringValue:@"MAINTENACE RUN"];
+        [runStatusTextField setBackgroundColor:[NSColor orangeColor]];
+    }
+    
 }
 
 //***Standard runs***

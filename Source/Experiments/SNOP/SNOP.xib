@@ -71,6 +71,7 @@
                 <outlet property="runModeMatrix" destination="1340" id="1356"/>
                 <outlet property="runNumberField" destination="1259" id="1262"/>
                 <outlet property="runStatusField" destination="1257" id="1263"/>
+                <outlet property="runStatusTextField" destination="Np3-DI-Iif" id="b6k-lH-Hln"/>
                 <outlet property="runsLockButton" destination="URx-nh-GMP" id="E2u-gI-0d3"/>
                 <outlet property="runsLockTextField" destination="FfB-Ej-uUK" id="k18-EV-EOz"/>
                 <outlet property="savePrimaryMapFileButton" destination="290" id="1231"/>
@@ -104,20 +105,20 @@
         <window title="SNO+" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="5" userLabel="Window">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="497" y="291" width="847" height="652"/>
+            <rect key="contentRect" x="497" y="291" width="847" height="684"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1028"/>
             <view key="contentView" id="6">
-                <rect key="frame" x="0.0" y="0.0" width="847" height="652"/>
+                <rect key="frame" x="0.0" y="0.0" width="847" height="684"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <tabView controlSize="small" initialItem="3006" id="101">
-                        <rect key="frame" x="25" y="1" width="809" height="643"/>
+                        <rect key="frame" x="25" y="1" width="809" height="674"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <font key="font" metaFont="system" size="14"/>
                         <tabViewItems>
                             <tabViewItem label="Detector" identifier="" id="103">
                                 <view key="view" autoresizesSubviews="NO" id="105">
-                                    <rect key="frame" x="10" y="25" width="789" height="605"/>
+                                    <rect key="frame" x="10" y="25" width="789" height="636"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <customView id="2645" customClass="ORAxis">
@@ -588,7 +589,7 @@
                             </tabViewItem>
                             <tabViewItem label="Runs" identifier="" id="3006">
                                 <view key="view" autoresizesSubviews="NO" id="3007">
-                                    <rect key="frame" x="10" y="25" width="789" height="605"/>
+                                    <rect key="frame" x="10" y="25" width="789" height="636"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" title="Threshold Status" borderType="line" id="3680">
@@ -1023,17 +1024,15 @@
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
-                                        <button id="URx-nh-GMP">
-                                            <rect key="frame" x="269" y="344" width="36" height="33"/>
+                                        <textField verticalHuggingPriority="750" id="FfB-Ej-uUK">
+                                            <rect key="frame" x="295" y="344" width="146" height="13"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="Unlocked" imagePosition="above" alignment="center" alternateImage="Locked" inset="2" id="HE1-OC-JMz">
-                                                <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system" size="10"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="runsLockAction:" target="-2" id="MFs-mm-seY"/>
-                                            </connections>
-                                        </button>
+                                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Not in Maintenance Run." id="Rbi-wI-exf">
+                                                <font key="font" metaFont="label"/>
+                                                <color key="textColor" red="0.063412726000000003" green="0.15111595" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
                                         <tabView controlSize="small" id="3092">
                                             <rect key="frame" x="10" y="-7" width="555" height="346"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -2271,21 +2270,32 @@
                                                 </tabViewItem>
                                             </tabViewItems>
                                         </tabView>
-                                        <textField verticalHuggingPriority="750" id="FfB-Ej-uUK">
-                                            <rect key="frame" x="295" y="344" width="146" height="13"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Not in Maintenance Run." id="Rbi-wI-exf">
-                                                <font key="font" metaFont="label"/>
-                                                <color key="textColor" red="0.063412726000000003" green="0.15111595" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                        <textField verticalHuggingPriority="750" id="Np3-DI-Iif">
+                                            <rect key="frame" x="61" y="607" width="695" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" state="on" alignment="center" title="UNLOCKED" drawsBackground="YES" id="NE5-q1-6Cp">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" red="0.25796978300000001" green="0.50936399129999999" blue="0.89733270200000004" alpha="1" colorSpace="calibratedRGB"/>
                                             </textFieldCell>
                                         </textField>
+                                        <button id="URx-nh-GMP">
+                                            <rect key="frame" x="17" y="600" width="36" height="33"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="Unlocked" imagePosition="above" alignment="center" alternateImage="Locked" inset="2" id="HE1-OC-JMz">
+                                                <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system" size="10"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="runsLockAction:" target="-2" id="MFs-mm-seY"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Details" identifier="" id="1134">
                                 <view key="view" hidden="YES" autoresizesSubviews="NO" id="1135">
-                                    <rect key="frame" x="10" y="25" width="789" height="605"/>
+                                    <rect key="frame" x="10" y="25" width="789" height="636"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField verticalHuggingPriority="750" id="1139">
@@ -2427,7 +2437,7 @@
                             </tabViewItem>
                             <tabViewItem label="HW Map" identifier="" id="246">
                                 <view key="view" hidden="YES" id="247">
-                                    <rect key="frame" x="10" y="25" width="789" height="605"/>
+                                    <rect key="frame" x="10" y="25" width="789" height="636"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <scrollView autohidesScrollers="YES" horizontalLineScroll="15" horizontalPageScroll="10" verticalLineScroll="15" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="248">
@@ -2579,7 +2589,7 @@
                             </tabViewItem>
                             <tabViewItem label="CouchDB" identifier="" id="2638">
                                 <view key="view" autoresizesSubviews="NO" id="2639">
-                                    <rect key="frame" x="10" y="25" width="789" height="605"/>
+                                    <rect key="frame" x="10" y="25" width="789" height="636"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" title="OrcaDB" borderType="line" id="2651">
@@ -2931,7 +2941,7 @@
                             </tabViewItem>
                             <tabViewItem label="HV Master" identifier="" id="2797">
                                 <view key="view" autoresizesSubviews="NO" id="2798">
-                                    <rect key="frame" x="10" y="25" width="789" height="605"/>
+                                    <rect key="frame" x="10" y="25" width="789" height="636"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <matrix verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="2830">
@@ -3774,6 +3784,7 @@
             <connections>
                 <outlet property="delegate" destination="-2" id="61"/>
             </connections>
+            <point key="canvasLocation" x="474.5" y="260"/>
         </window>
         <customObject id="270" userLabel="OHexFormatter" customClass="OHexFormatter"/>
         <customView id="402" userLabel="BiStateView" customClass="BiStateView">

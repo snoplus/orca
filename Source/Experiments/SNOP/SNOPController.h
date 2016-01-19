@@ -103,7 +103,7 @@
     NSMutableDictionary *snopRunTypeMaskDic; 
 
     IBOutlet NSButton* runsLockButton;
-    IBOutlet NSTextField* runsLockTextField;
+    IBOutlet NSTextField *runStatusTextField;
 
     //*****Standard runs*****//
     //ECA
