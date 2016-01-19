@@ -762,11 +762,6 @@ static void SwapLongBlock(void* p, int32_t n)
 			break;
 		}
 
-        if ([self errorTimeOutSeconds] && (time(0) - t0) > [self errorTimeOutSeconds]) {
-            //[self performSelectorOnMainThread:@selector(disconnectSocket) withObject:nil waitUntilDone:YES];
-            break;
-        }
-
 		if (selectionResult > 0 && FD_ISSET(workingSocket, &fds)) {
 			@try {
 				[coreSocketLock lock];
