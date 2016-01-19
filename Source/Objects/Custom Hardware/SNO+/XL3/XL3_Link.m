@@ -30,6 +30,8 @@
 #import <sys/errno.h>
 #include "anet.h"
 
+#define XL3_SERVER "localhost"
+
 
 NSString* XL3_LinkConnectionChanged     = @"XL3_LinkConnectionChanged";
 NSString* XL3_LinkTimeConnectedChanged	= @"XL3_LinkTimeConnectedChanged";
@@ -666,8 +668,7 @@ readFifoFlag = _readFifoFlag;
 		}
 	}
 	else {
-		NSLog(@"XL3 Link failed to call connect for socketfd: %@, IPNumber: %@, and portNumber: %d\n",
-		      serverSocket?@"ALLOCATED!":@"ok", IPNumber, portNumber);
+        NSLog(@"connectSocket: XL3_Link failed to call connect for IP %@ and port %d\n", IPNumber, portNumber);
 	}
 }
 
@@ -707,7 +708,7 @@ static void SwapLongBlock(void* p, int32_t n)
     [[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectStateChanged object: self];
 
     workingSocket = 0;
-    if ((workingSocket = anetTcpConnect(err, "localhost", portNumber+100))) {
+    if ((workingSocket = anetTcpConnect(err, XL3_SERVER, portNumber+100))) {
         NSLog(@"%@: %s\n", [self crateName], err);
 
         if (workingSocket) {
@@ -755,7 +756,7 @@ static void SwapLongBlock(void* p, int32_t n)
             usleep(500);
 			//[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.005]];
             
-			if (workingSocket || serverSocket) {
+			if (workingSocket) {
 				NSLog(@"Error reading XL3 <%@> port: %d\n", IPNumber, portNumber);
 			}
 			break;
@@ -774,7 +775,7 @@ static void SwapLongBlock(void* p, int32_t n)
             }
 			@catch (NSException* localException) {
                 [coreSocketLock unlock];
-				if (serverSocket || workingSocket) {
+				if (workingSocket) {
 					NSLog(@"Couldn't read from XL3 <%@> port:%d\n", IPNumber, portNumber);
 				}
 				break;
