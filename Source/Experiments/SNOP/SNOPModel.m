@@ -318,7 +318,7 @@ mtcConfigDoc = _mtcConfigDoc;
 - (void) runInitialization:(NSNotification*)aNote
 {
     @try {
-        if ([aNote userInfo][@"doinit"]) {
+        if ([[aNote userInfo][@"doinit"] boolValue]) {
             /* cold run start, so we need to reset the MTC/CAEN GTID */
             [mtc_server okCommand:"reset_gtid"];
         }
