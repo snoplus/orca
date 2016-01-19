@@ -74,9 +74,10 @@
     return self;
 }
 - (void) dealloc {
+    [connection release];
+    [strHostName release];
     [super dealloc];
-    [connection dealloc];
-    [strHostName dealloc];
+
 }
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder *)aCoder {
