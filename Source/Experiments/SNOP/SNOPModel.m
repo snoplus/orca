@@ -47,7 +47,7 @@ static NSString* SNOPDbConnector	= @"SNOPDbConnector";
 NSString* ORSNOPModelOrcaDBIPAddressChanged = @"ORSNOPModelOrcaDBIPAddressChanged";
 NSString* ORSNOPModelDebugDBIPAddressChanged = @"ORSNOPModelDebugDBIPAddressChanged";
 NSString* SNOPRunTypeChangedNotification = @"SNOPRunTypeChangedNotification";
-NSString* SNOPRunsLockNotification = @"SNOPRunsLockNotification";
+NSString* ORSNOPRunsLockNotification = @"ORSNOPRunsLockNotification";
 
 #define kOrcaRunDocumentAdded   @"kOrcaRunDocumentAdded"
 #define kOrcaRunDocumentUpdated @"kOrcaRunDocumentUpdated"
@@ -951,14 +951,14 @@ ECA_subrun_time = _ECA_subrun_time;
 
 - (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
  {
- 
+
      ORCouchDB* result = [ORCouchDB couchHost:self.orcaDBIPAddress
                                          port:self.orcaDBPort
                                      username:self.orcaDBUserName
                                           pwd:self.orcaDBPassword
                                      database:entryDB
                                      delegate:self];
- 
+     
      if (aCouchDelegate)
          [result setDelegate:aCouchDelegate];
  
@@ -1129,25 +1129,35 @@ ECA_subrun_time = _ECA_subrun_time;
 }
 
 // Load last MTC values (saved with 'saveStandardRun') from the DB for the selected Standard Run
--(void) loadStandardRun:(NSString*)runTypeName
+-(BOOL) loadStandardRun:(NSString*)runTypeName
 {
-    
+
+    //Alert the operator
+    if(runTypeName == nil){
+        NSLog(@"Please, set a name in the popup menu and click enter. \n",runTypeName);
+        return false;
+    }
+    NSLog(@"Loading settings for standard run: %@ ........ \n",runTypeName);
+
     //Get MTC model
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     ORMTCModel* mtcModel = [objs objectAtIndex:0];
 
     //Query the OrcaDB and get a dictionary with the parameters
-    NSString *urlString = [NSString stringWithFormat:@"http://%@:%u/orca/_design/standardRuns/_view/getRuns?startkey=[\"%@\",{}]&endkey=[\"%@\",0]&descending=True&include_docs=True",[self orcaDBIPAddress],[self orcaDBPort],runTypeName,runTypeName];
+    NSString *urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/orca/_design/standardRuns/_view/getStandardRuns?startkey=[\"%@\",{}]&endkey=[\"%@\",0]&descending=True&include_docs=True",[self orcaDBUserName],[self orcaDBPassword],[self orcaDBIPAddress],[self orcaDBPort],runTypeName,runTypeName];
 
     NSString* urlStringScaped = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     NSURL *url = [NSURL URLWithString:urlStringScaped];
     NSData *data = [NSData dataWithContentsOfURL:url];
     NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     NSError *error =  nil;
-    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
+    NSDictionary *detectorSettings = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
 
-    if(error) NSLog(@"Error querying couchDB, please check the connection is correct %@",error);
-
+    if(error) {
+        NSLog(@"Error querying couchDB, please check the connection is correct %@ \n",error);
+        return false;
+    }
+    
     //Load values
     @try{
 
@@ -1161,22 +1171,26 @@ ECA_subrun_time = _ECA_subrun_time;
         
         //Load MTC/D parameters, trigger masks and MTC/A+ thresholds
         for (int iparam=0; iparam<kDbLookUpTableSize; iparam++) {
-            [mtcModel setDbObject:[[[[json valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtcModel getDBKeyByIndex:iparam]] forIndex:iparam];
+            [mtcModel setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtcModel getDBKeyByIndex:iparam]] forIndex:iparam];
         }
-        
+        return true;
     }
     @catch (NSException *e) {
         NSLog(@"Error ",e);
+        return false;
     }
     
 }
 
--(void) loadStandardRunToHW:(NSString*)runTypeName
+-(BOOL) loadStandardRunToHW:(NSString*)runTypeName
 {
 
     //Load to GUI
-    [self loadStandardRun:runTypeName];
-    
+    BOOL loadstatus = [self loadStandardRun:runTypeName];
+    if(!loadstatus) {
+        return false;
+    }
+        
     //Get MTC model
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     ORMTCModel* mtcModel = [objs objectAtIndex:0];
@@ -1191,34 +1205,48 @@ ECA_subrun_time = _ECA_subrun_time;
     [mtcModel setGTCrateMask];
     [mtcModel setPedestalCrateMask];
     [mtcModel mtcatLoadCrateMasks];
+    
+    return true;
+
 }
 
 
 //Save MTC settings in a Standard Run table in CouchDB for later use by the Run Scripts or the user
--(void) saveStandardRun:(NSString*)runTypeName
+-(BOOL) saveStandardRun:(NSString*)runTypeName
 {
     
+    //Check that runTypeName is properly set:
+    if(runTypeName == nil){
+        NSLog(@"Please, set a name in the popup menu and click enter. \n",runTypeName);
+        return false;
+    }
+    NSLog(@"Savings settings for standard run: %@ ........ \n",runTypeName);
+
     //Get MTC model
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     ORMTCModel* mtcModel = [objs objectAtIndex:0];
 
     //Build run table
-    NSMutableDictionary *thresholdsFromMTC = [NSMutableDictionary dictionaryWithCapacity:100];
+    NSMutableDictionary *detectorSettings = [NSMutableDictionary dictionaryWithCapacity:100];
     
-    [thresholdsFromMTC setObject:@"standard_run" forKey:@"type"];
-    [thresholdsFromMTC setObject:runTypeName forKey:@"run_type"];
+    [detectorSettings setObject:@"standard_run" forKey:@"type"];
+    [detectorSettings setObject:runTypeName forKey:@"run_type"];
     NSNumber *date = [NSNumber numberWithDouble:[[NSDate date] timeIntervalSince1970]];
-    [thresholdsFromMTC setObject:date forKey:@"time_stamp"];
+    [detectorSettings setObject:date forKey:@"time_stamp"];
 
     //Save MTC/D parameters, trigger masks and MTC/A+ thresholds
     for (int iparam=0; iparam<kDbLookUpTableSize; iparam++) {
         // NSLog(@" Writting %@ to %@ \n", [mtcModel dbObjectByIndex:ithres+kNHit100HiThreshold], [thresholdNames objectAtIndex:ithres]);
-        [thresholdsFromMTC setObject:[mtcModel dbObjectByIndex:iparam] forKey:[mtcModel getDBKeyByIndex:iparam]];
+        [detectorSettings setObject:[mtcModel dbObjectByIndex:iparam] forKey:[mtcModel getDBKeyByIndex:iparam]];
     }
     
-    // NSLog(@" Writting to ORCADB \n");
+    [[self orcaDbRefWithEntryDB:self withDB:@"orca"] addDocument:detectorSettings tag:@"kStandardRunDocumentAdded"];
 
-    [[self orcaDbRefWithEntryDB:self withDB:@"orca"] addDocument:thresholdsFromMTC tag:@"kStandardRunDocumentAdded"];
+    while([self isWaitingForResponse]){
+    }
+    NSLog(@"%@ run saved as standard run. \n",runTypeName);
+    return true;
+
 }
 
 

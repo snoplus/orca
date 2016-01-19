@@ -232,9 +232,9 @@
 //Standard runs functions
 -(void) loadVariablesInScript:(NSString*)userscriptname;
 -(void) addGlobalVariable:(NSNumber*)varindex withName:(NSString*)varname withValue:(NSNumber*)varvalue;
--(void) loadStandardRun:(NSString*)runTypeName;
--(void) loadStandardRunToHW;
--(void) saveStandardRun:(NSString*)runTypeName;
+-(BOOL) loadStandardRun:(NSString*)runTypeName;
+-(BOOL) loadStandardRunToHW:(NSString*)runTypeName;
+-(BOOL) saveStandardRun:(NSString*)runTypeName;
 
 @end
 
@@ -254,4 +254,4 @@ extern NSString* ORSNOPModelViewTypeChanged;
 extern NSString* ORSNOPModelOrcaDBIPAddressChanged;
 extern NSString* ORSNOPModelDebugDBIPAddressChanged;
 extern NSString* SNOPRunTypeChangedNotification;
-extern NSString* SNOPRunsLockNotification;
+extern NSString* ORSNOPRunsLockNotification;

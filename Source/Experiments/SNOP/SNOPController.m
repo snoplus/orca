@@ -154,7 +154,12 @@ smellieRunFile;
 
     [notifyCenter addObserver : self
                      selector : @selector(runsLockChanged:)
-                         name : SNOPRunsLockNotification
+                         name : ORSNOPRunsLockNotification
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(runsLockChanged:)
+                         name : ORRunStatusChangedNotification
                        object : nil];
     
     //TODO: add the notification for changedRunType on SNO+
@@ -179,6 +184,13 @@ smellieRunFile;
     [self runStatusChanged:nil]; //update the run status
     [model setIsEmergencyStopEnabled:TRUE]; //enable the emergency stop
     [self runsLockChanged:nil];
+}
+
+- (void) checkGlobalSecurity
+{
+    BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
+    [gSecurity setLock:ORSNOPRunsLockNotification to:secure];
+    [runsLockButton setEnabled:secure];
 }
 
 -(void) fetchRunMaskSettings
@@ -596,17 +608,19 @@ smellieRunFile;
 }
 
 - (IBAction) orcaDBFutonAction:(id)sender {
-    [[NSWorkspace sharedWorkspace]
-     openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@:%@@%@:%d/_utils/database.html?%@",
-                                   [model orcaDBUserName], [model orcaDBPassword], [model orcaDBIPAddress],
-                                   [model orcaDBPort], [model orcaDBName]]]];
+
+    NSString *url = [NSString stringWithFormat:@"http://%@:%@@%@:%d/_utils/database.html?%@",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort],[model orcaDBName]];
+    NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlScaped]];
 }
 
 - (IBAction) debugDBFutonAction:(id)sender {
-    [[NSWorkspace sharedWorkspace]
-     openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@:%@@%@:%d/_utils/database.html?%@",
-                                   [model debugDBUserName], [model debugDBPassword], [model debugDBIPAddress],
-                                   [model debugDBPort], [model debugDBName]]]];
+
+    NSString *url = [NSString stringWithFormat:@"http://%@:%@@%@:%d/_utils/database.html?%@", [model debugDBUserName], [model debugDBPassword],[model debugDBIPAddress],[model debugDBPort], [model debugDBName]];
+    NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlScaped]];
 }
 
 - (IBAction) orcaDBTestAction:(id)sender {
@@ -1040,32 +1054,32 @@ smellieRunFile;
 
 - (IBAction) runsLockAction:(id)sender
 {
-    [gSecurity tryToSetLock:SNOPRunsLockNotification to:[sender intValue] forWindow:[self window]];
+    [gSecurity tryToSetLock:ORSNOPRunsLockNotification to:[sender intValue] forWindow:[self window]];
 }
 
 - (void) runsLockChanged:(NSNotification*)aNotification
 {
     BOOL runInProgress				= [gOrcaGlobals runInProgress];
-    BOOL locked						= [gSecurity isLocked:SNOPRunsLockNotification];
-    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:SNOPRunsLockNotification];
+    BOOL locked						= [gSecurity isLocked:ORSNOPRunsLockNotification];
+    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORSNOPRunsLockNotification];
     
     //[softwareTriggerButton setEnabled: !locked && !runInProgress];
     [runsLockButton setState: locked];
     
     //Enable or disable fields
-    [loadValuesButton setEnabled:!locked && !runInProgress];
-    [ECApatternPopUpButton setEnabled:!locked && !runInProgress];
-    [ECAtypePopUpButton setEnabled:!locked && !runInProgress];
-    [TSlopePatternTextField setEnabled:!locked && !runInProgress];
-    [subTimeTextField setEnabled:!locked && !runInProgress];
-    [standardRunPopupMenu setEnabled:!locked && !runInProgress];
-    [standardRunSaveButton setEnabled:!locked && !runInProgress];
-    [standardRunLoadButton setEnabled:!locked && !runInProgress];
-    [standardRunLoadToHWButton setEnabled:!locked && !runInProgress];
+    [loadValuesButton setEnabled:!lockedOrRunningMaintenance];
+    [ECApatternPopUpButton setEnabled:!lockedOrRunningMaintenance];
+    [ECAtypePopUpButton setEnabled:!lockedOrRunningMaintenance];
+    [TSlopePatternTextField setEnabled:!lockedOrRunningMaintenance];
+    [subTimeTextField setEnabled:!lockedOrRunningMaintenance];
+    [standardRunPopupMenu setEnabled:!lockedOrRunningMaintenance];
+    [standardRunSaveButton setEnabled:!lockedOrRunningMaintenance];
+    [standardRunLoadButton setEnabled:!lockedOrRunningMaintenance];
+    [standardRunLoadToHWButton setEnabled:!lockedOrRunningMaintenance];
     
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
-        if(runInProgress && ![gSecurity isLocked:SNOPRunsLockNotification])
+        if(runInProgress && ![gSecurity isLocked:ORSNOPRunsLockNotification])
             s = @"Not in Maintenance Run.";
     }
     [runsLockTextField setStringValue:s];
@@ -1131,6 +1145,7 @@ smellieRunFile;
 - (IBAction)addNewStandardRun:(id)sender {
     if ([standardRunPopupMenu indexOfItemWithObjectValue:[standardRunPopupMenu stringValue]] == NSNotFound) {
         [standardRunPopupMenu addItemWithObjectValue:[standardRunPopupMenu stringValue]];
+        [standardRunPopupMenu selectItemWithObjectValue:[standardRunPopupMenu stringValue]];
     }
 }
 
