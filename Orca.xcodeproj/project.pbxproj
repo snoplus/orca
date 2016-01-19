@@ -235,6 +235,8 @@
 		2DD81EA816A6E4B100F50F0F /* ipe4tbtools.h in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2DD81EA416A6E49700F50F0F /* ipe4tbtools.h */; };
 		2DD81EB316A6E5D300F50F0F /* ipe4tbtools.cpp in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2DD81EB216A6E5D300F50F0F /* ipe4tbtools.cpp */; };
 		2DE91C6719DC8C2B005C1A11 /* amptek-logo.gif in Resources */ = {isa = PBXBuildFile; fileRef = 2DE91C6619DC8C2B005C1A11 /* amptek-logo.gif */; };
+		3602C15C1C4EC291006B50B3 /* anet.c in Sources */ = {isa = PBXBuildFile; fileRef = 3602C15A1C4EC291006B50B3 /* anet.c */; };
+		3602C15D1C4EC291006B50B3 /* anet.h in Headers */ = {isa = PBXBuildFile; fileRef = 3602C15B1C4EC291006B50B3 /* anet.h */; };
 		362F928B1681A05100F3ACB4 /* SNO.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 362F928A16819FCE00F3ACB4 /* SNO.cc */; };
 		3672CF8C1C4EB15000870996 /* SNOCaen1720.nib in Resources */ = {isa = PBXBuildFile; fileRef = 3672CF811C4EB15000870996 /* SNOCaen1720.nib */; };
 		3672CF8D1C4EB15000870996 /* SNOCaen1720Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3672CF821C4EB15000870996 /* SNOCaen1720Card.gif */; };
@@ -3876,6 +3878,8 @@
 		2DD81EA416A6E49700F50F0F /* ipe4tbtools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ipe4tbtools.h; path = EdelweissSLT/EdelweissSLTv4_Readout_Code/ipe4tbtools.h; sourceTree = "<group>"; };
 		2DD81EB216A6E5D300F50F0F /* ipe4tbtools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ipe4tbtools.cpp; path = EdelweissSLT/EdelweissSLTv4_Readout_Code/ipe4tbtools.cpp; sourceTree = "<group>"; };
 		2DE91C6619DC8C2B005C1A11 /* amptek-logo.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "amptek-logo.gif"; sourceTree = "<group>"; };
+		3602C15A1C4EC291006B50B3 /* anet.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = anet.c; sourceTree = "<group>"; };
+		3602C15B1C4EC291006B50B3 /* anet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = anet.h; sourceTree = "<group>"; };
 		362F928A16819FCE00F3ACB4 /* SNO.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SNO.cc; sourceTree = "<group>"; };
 		3672CF811C4EB15000870996 /* SNOCaen1720.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = SNOCaen1720.nib; sourceTree = "<group>"; };
 		3672CF821C4EB15000870996 /* SNOCaen1720Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = SNOCaen1720Card.gif; sourceTree = "<group>"; };
@@ -13938,6 +13942,8 @@
 		EF7722B111E813120064A1CF /* XL3 */ = {
 			isa = PBXGroup;
 			children = (
+				3602C15A1C4EC291006B50B3 /* anet.c */,
+				3602C15B1C4EC291006B50B3 /* anet.h */,
 				6B325E0F1B2F431C002E2DD7 /* XL3_Link.xib */,
 				EFCE3ADD123DD9A2009AEBA8 /* ORXL3Decoders.h */,
 				EFCE3ADE123DD9A2009AEBA8 /* ORXL3Decoders.m */,
@@ -15107,6 +15113,7 @@
 				84B28CE40F4C597900E2B056 /* ORBocTIC3Model.h in Headers */,
 				84B28CFA0F4C5DBB00E2B056 /* ORAmi286Controller.h in Headers */,
 				0F16E3581C493AD7003C9EC9 /* read.h in Headers */,
+				3602C15D1C4EC291006B50B3 /* anet.h in Headers */,
 				84B28CFC0F4C5DBB00E2B056 /* ORAmi286Decoders.h in Headers */,
 				84B28CFE0F4C5DBB00E2B056 /* ORAmi286Model.h in Headers */,
 				84E9C355194F42140028B7E2 /* ORPacFPModel.h in Headers */,
@@ -17267,6 +17274,7 @@
 				84499B7A0F13BB6E004B855B /* ORMksPdr2000Controller.m in Sources */,
 				84499B7C0F13BB6E004B855B /* ORMksPdr2000Decoders.m in Sources */,
 				84499B7E0F13BB6E004B855B /* ORMksPdr2000Model.m in Sources */,
+				3602C15C1C4EC291006B50B3 /* anet.c in Sources */,
 				84499CC90F13E457004B855B /* ORCTITempController.m in Sources */,
 				84499CCB0F13E457004B855B /* ORCTITempDecoders.m in Sources */,
 				84499CCD0F13E457004B855B /* ORCTITempModel.m in Sources */,
