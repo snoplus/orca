@@ -1,5 +1,5 @@
 //
-//ORCaen1720Controller.m
+//SNOCaenController.m
 //Orca
 //
 //Created by Mark Howe on Mon Apr 14 2008.
@@ -19,9 +19,9 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#import "ORCaen1720Controller.h"
+#import "SNOCaenController.h"
 #import "ORCaenDataDecoder.h"
-#import "ORCaen1720Model.h"
+#import "SNOCaenModel.h"
 #import "ORValueBar.h"
 #import "ORTimeRate.h"
 #import "ORRate.h"
@@ -37,7 +37,7 @@
 
 int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 
-@implementation ORCaen1720Controller
+@implementation SNOCaenController
 
 #pragma mark ***Initialization
 - (id) init
@@ -95,106 +95,106 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 	
     [notifyCenter addObserver : self
 					 selector : @selector(selectedRegIndexChanged:)
-						 name : ORCaen1720SelectedRegIndexChanged
+						 name : SNOCaenSelectedRegIndexChanged
 					   object : model];
 	
     [notifyCenter addObserver : self
 					 selector : @selector(selectedRegChannelChanged:)
-						 name : ORCaen1720SelectedChannelChanged
+						 name : SNOCaenSelectedChannelChanged
 					   object : model];
 	
     [notifyCenter addObserver : self
 					 selector : @selector(writeValueChanged:)
-						 name : ORCaen1720WriteValueChanged
+						 name : SNOCaenWriteValueChanged
 					   object : model];
 	
     [notifyCenter addObserver : self
 					 selector : @selector(thresholdChanged:)
-						 name : ORCaen1720ChnlThresholdChanged
+						 name : SNOCaenChnlThresholdChanged
 					   object : model];
 	
 	[notifyCenter addObserver : self
 					 selector : @selector(dacChanged:)
-						 name : ORCaen1720ChnlDacChanged
+						 name : SNOCaenChnlDacChanged
 					   object : model];
 	
 	[notifyCenter addObserver : self
 					 selector : @selector(overUnderChanged:)
-						 name : ORCaen1720OverUnderThresholdChanged
+						 name : SNOCaenOverUnderThresholdChanged
 					   object : model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(channelConfigMaskChanged:)
-                         name : ORCaen1720ModelChannelConfigMaskChanged
+                         name : SNOCaenModelChannelConfigMaskChanged
 					   object : model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(customSizeChanged:)
-                         name : ORCaen1720ModelCustomSizeChanged
+                         name : SNOCaenModelCustomSizeChanged
 					   object : model];
 
 	[notifyCenter addObserver : self
 			 selector : @selector(isCustomSizeChanged:)
-			     name : ORCaen1720ModelIsCustomSizeChanged
+			     name : SNOCaenModelIsCustomSizeChanged
 			   object : model];
 	
 	[notifyCenter addObserver : self
 			 selector : @selector(isFixedSizeChanged:)
-			     name : ORCaen1720ModelIsFixedSizeChanged
+			     name : SNOCaenModelIsFixedSizeChanged
 			   object : model];
 	
 	[notifyCenter addObserver : self
                      selector : @selector(countAllTriggersChanged:)
-                         name : ORCaen1720ModelCountAllTriggersChanged
+                         name : SNOCaenModelCountAllTriggersChanged
 					   object : model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(acquisitionModeChanged:)
-                         name : ORCaen1720ModelAcquisitionModeChanged
+                         name : SNOCaenModelAcquisitionModeChanged
 					   object : model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(coincidenceLevelChanged:)
-                         name : ORCaen1720ModelCoincidenceLevelChanged
+                         name : SNOCaenModelCoincidenceLevelChanged
 					   object : model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(triggerSourceMaskChanged:)
-                         name : ORCaen1720ModelTriggerSourceMaskChanged
+                         name : SNOCaenModelTriggerSourceMaskChanged
 					   object : model];
 	[notifyCenter addObserver : self
 			 selector : @selector(triggerOutMaskChanged:)
-			     name : ORCaen1720ModelTriggerOutMaskChanged
+			     name : SNOCaenModelTriggerOutMaskChanged
 			   object : model];
 
 	[notifyCenter addObserver : self
 			 selector : @selector(fpIOControlChanged:)
-			     name : ORCaen1720ModelFrontPanelControlMaskChanged
+			     name : SNOCaenModelFrontPanelControlMaskChanged
 			   object : model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(postTriggerSettingChanged:)
-                         name : ORCaen1720ModelPostTriggerSettingChanged
+                         name : SNOCaenModelPostTriggerSettingChanged
 					   object : model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(enabledMaskChanged:)
-                         name : ORCaen1720ModelEnabledMaskChanged
+                         name : SNOCaenModelEnabledMaskChanged
 					   object : model];
 	
 	[notifyCenter addObserver : self
 					 selector : @selector(basicLockChanged:)
-						 name : ORCaen1720BasicLock
+						 name : SNOCaenBasicLock
 					   object : nil];
 	
 	[notifyCenter addObserver : self
 					 selector : @selector(settingsLockChanged:)
-						 name : ORCaen1720SettingsLock
+						 name : SNOCaenSettingsLock
 					   object : nil];
 	
 	[notifyCenter addObserver : self
 					 selector : @selector(basicLockChanged:)
-						 name : ORCaen1720BasicLock
+						 name : SNOCaenBasicLock
 					   object : nil];
 	
     [notifyCenter addObserver : self
@@ -220,12 +220,12 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 	
     [notifyCenter addObserver : self
                      selector : @selector(setBufferStateLabel)
-                         name : ORCaen1720ModelBufferCheckChanged
+                         name : SNOCaenModelBufferCheckChanged
                        object : model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(eventSizeChanged:)
-                         name : ORCaen1720ModelEventSizeChanged
+                         name : SNOCaenModelEventSizeChanged
 						object: model];
 	
     [notifyCenter addObserver : self
@@ -235,7 +235,7 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 
     [notifyCenter addObserver : self
 					 selector : @selector(continousRunsChanged:)
-						 name : ORCaen1720ModelContinuousModeChanged
+						 name : SNOCaenModelContinuousModeChanged
 					   object : model];
 
 	[self registerRates];
@@ -319,9 +319,9 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 - (void) checkGlobalSecurity
 {
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
-    [gSecurity setLock:ORCaen1720BasicLock to:secure];
+    [gSecurity setLock:SNOCaenBasicLock to:secure];
     [basicLockButton setEnabled:secure];
-    [gSecurity setLock:ORCaen1720SettingsLock to:secure];
+    [gSecurity setLock:SNOCaenSettingsLock to:secure];
     [settingsLockButton setEnabled:secure];
 }
 
@@ -393,7 +393,7 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 	[basicWriteButton setEnabled:writeAllowed];
 	[basicReadButton setEnabled:readAllowed];
 	
-	BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORCaen1720BasicLock];
+	BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:SNOCaenBasicLock];
 	if ([model selectedRegIndex] >= kZS_Thres && [model selectedRegIndex]<=kAdcConfig){
 		[channelPopUp setEnabled:!lockedOrRunningMaintenance];
 	}
@@ -509,7 +509,7 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 {
 	// Get the channel that changed and then set the GUI value using the model value.
 	if(aNotification){
-		int chnl = [[[aNotification userInfo] objectForKey:ORCaen1720Chnl] intValue];
+		int chnl = [[[aNotification userInfo] objectForKey:SNOCaenChnl] intValue];
 		[[thresholdMatrix cellWithTag:chnl] setIntValue:[model threshold:chnl]];
 	}
 	else {
@@ -523,7 +523,7 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 - (void) dacChanged: (NSNotification*) aNotification
 {
 	if(aNotification){
-		int chnl = [[[aNotification userInfo] objectForKey:ORCaen1720Chnl] intValue];
+		int chnl = [[[aNotification userInfo] objectForKey:SNOCaenChnl] intValue];
 		[[dacMatrix cellWithTag:chnl] setFloatValue:[model convertDacToVolts:[model dac:chnl]]];
 	}
 	else {
@@ -537,7 +537,7 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 - (void) overUnderChanged: (NSNotification*) aNotification
 {
 	if(aNotification){
-		int chnl = [[[aNotification userInfo] objectForKey:ORCaen1720Chnl] intValue];
+		int chnl = [[[aNotification userInfo] objectForKey:SNOCaenChnl] intValue];
 		[[overUnderMatrix cellWithTag:chnl] setIntValue:[model overUnderThreshold:chnl]];
 	}
 	else {
@@ -556,8 +556,8 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 - (void) basicLockChanged:(NSNotification*)aNotification
 {	
     BOOL runInProgress				= [gOrcaGlobals runInProgress];
-    BOOL locked						= [gSecurity isLocked:ORCaen1720BasicLock];
-    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORCaen1720BasicLock];
+    BOOL locked						= [gSecurity isLocked:SNOCaenBasicLock];
+    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:SNOCaenBasicLock];
 	
 	//[softwareTriggerButton setEnabled: !locked && !runInProgress]; 
     [basicLockButton setState: locked];
@@ -576,7 +576,7 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
-		if(runInProgress && ![gSecurity isLocked:ORCaen1720BasicLock])s = @"Not in Maintenance Run.";
+		if(runInProgress && ![gSecurity isLocked:SNOCaenBasicLock])s = @"Not in Maintenance Run.";
     }
     [basicLockDocField setStringValue:s];
 }
@@ -584,8 +584,8 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 - (void) settingsLockChanged:(NSNotification*)aNotification
 {	
     BOOL runInProgress				= [gOrcaGlobals runInProgress];
-    BOOL locked						= [gSecurity isLocked:ORCaen1720SettingsLock];
-    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORCaen1720SettingsLock];
+    BOOL locked						= [gSecurity isLocked:SNOCaenSettingsLock];
+    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:SNOCaenSettingsLock];
     [settingsLockButton setState: locked];
 	[self setBufferStateLabel];
     [thresholdMatrix setEnabled:!lockedOrRunningMaintenance]; 
@@ -626,7 +626,7 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 	
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
-		if(runInProgress && ![gSecurity isLocked:ORCaen1720SettingsLock])s = @"Not in Maintenance Run.";
+		if(runInProgress && ![gSecurity isLocked:SNOCaenSettingsLock])s = @"Not in Maintenance Run.";
     }
     [settingsLockDocField setStringValue:s];
 	
@@ -708,12 +708,12 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 }
 - (IBAction) basicLockAction:(id)sender
 {
-    [gSecurity tryToSetLock:ORCaen1720BasicLock to:[sender intValue] forWindow:[self window]];
+    [gSecurity tryToSetLock:SNOCaenBasicLock to:[sender intValue] forWindow:[self window]];
 }
 
 - (IBAction) settingsLockAction:(id)sender
 {
-    [gSecurity tryToSetLock:ORCaen1720SettingsLock to:[sender intValue] forWindow:[self window]];
+    [gSecurity tryToSetLock:SNOCaenSettingsLock to:[sender intValue] forWindow:[self window]];
 }
 
 - (IBAction) report: (id) sender

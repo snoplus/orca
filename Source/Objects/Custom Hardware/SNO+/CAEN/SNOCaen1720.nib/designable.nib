@@ -42,7 +42,7 @@
 		</object>
 		<array class="NSMutableArray" key="IBDocument.RootObjects" id="334844816">
 			<object class="NSCustomObject" id="794521871">
-				<string key="NSClassName">ORCaen1720Controller</string>
+				<string key="NSClassName">SNOCaenController</string>
 			</object>
 			<object class="NSCustomObject" id="525299237">
 				<string key="NSClassName">FirstResponder</string>
@@ -12876,7 +12876,7 @@ xcjGRsbDx0HHv8g9yLzJOsm5yjjKt8s2y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
-					<string key="className">ORCaen1720Controller</string>
+					<string key="className">SNOCaenController</string>
 					<string key="superclassName">OrcaObjectController</string>
 					<dictionary class="NSMutableDictionary" key="actions">
 						<string key="acquisitionModeAction:">id</string>
@@ -13388,7 +13388,7 @@ xcjGRsbDx0HHv8g9yLzJOsm5yjjKt8s2y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ
 					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/ORCaen1720Controller.h</string>
+						<string key="minorKey">./Classes/SNOCaenController.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">

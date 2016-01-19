@@ -1,5 +1,5 @@
 //
-//ORCaen1720Controller.h
+//SNOCaenController.h
 //Orca
 //
 //Created by Mark Howe on Mon Apr 14 2008.
@@ -24,7 +24,7 @@
 @class ORValueBarGroupView;
 @class ORCompositeTimeLineView;
 
-@interface ORCaen1720Controller : OrcaObjectController {
+@interface SNOCaenController : OrcaObjectController {
     IBOutlet NSTabView* 	tabView;
     IBOutlet NSStepper* 	addressStepper;
     IBOutlet NSTextField* 	addressTextField;

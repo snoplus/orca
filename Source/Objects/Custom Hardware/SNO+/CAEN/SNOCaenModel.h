@@ -1,5 +1,5 @@
 //
-//ORCaen1720Model.h
+//SNOCaenModel.h
 //Orca
 //
 //Created by Mark Howe on Mon Apr 14 2008.
@@ -97,7 +97,7 @@ enum {
 @class ORAlarm;
 
 // Class definition
-@interface ORCaen1720Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping>
+@interface SNOCaenModel : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping>
 {
 	unsigned long   dataId;
 	unsigned short  selectedRegIndex;
@@ -250,38 +250,38 @@ enum {
 
 @end
 
-extern NSString* ORCaen1720ModelEventSizeChanged;
-extern NSString* ORCaen1720SelectedRegIndexChanged;
-extern NSString* ORCaen1720SelectedChannelChanged;
-extern NSString* ORCaen1720WriteValueChanged;
-extern NSString* ORCaen1720ModelEnabledMaskChanged;
-extern NSString* ORCaen1720ModelPostTriggerSettingChanged;
-extern NSString* ORCaen1720ModelTriggerSourceMaskChanged;
-extern NSString* ORCaen1720ModelTriggerOutMaskChanged;
-extern NSString* ORCaen1720ModelFrontPanelControlMaskChanged;
-extern NSString* ORCaen1720ModelCoincidenceLevelChanged;
-extern NSString* ORCaen1720ModelAcquisitionModeChanged;
-extern NSString* ORCaen1720ModelCountAllTriggersChanged;
-extern NSString* ORCaen1720ModelCustomSizeChanged;
-extern NSString* ORCaen1720ModelIsCustomSizeChanged;
-extern NSString* ORCaen1720ModelIsFixedSizeChanged;
-extern NSString* ORCaen1720ModelChannelConfigMaskChanged;
-extern NSString* ORCaen1720ModelNumberBLTEventsToReadoutChanged;
-extern NSString* ORCaen1720ChnlDacChanged;
-extern NSString* ORCaen1720OverUnderThresholdChanged;
-extern NSString* ORCaen1720Chnl;
-extern NSString* ORCaen1720ChnlThresholdChanged;
-extern NSString* ORCaen1720SelectedRegIndexChanged;
-extern NSString* ORCaen1720SelectedRegIndexChanged;
-extern NSString* ORCaen1720SelectedChannelChanged;
-extern NSString* ORCaen1720WriteValueChanged;
-extern NSString* ORCaen1720BasicLock;
-extern NSString* ORCaen1720SettingsLock;
-extern NSString* ORCaen1720RateGroupChanged;
-extern NSString* ORCaen1720ModelBufferCheckChanged;
-extern NSString* ORCaen1720ModelContinuousModeChanged;
+extern NSString* SNOCaenModelEventSizeChanged;
+extern NSString* SNOCaenSelectedRegIndexChanged;
+extern NSString* SNOCaenSelectedChannelChanged;
+extern NSString* SNOCaenWriteValueChanged;
+extern NSString* SNOCaenModelEnabledMaskChanged;
+extern NSString* SNOCaenModelPostTriggerSettingChanged;
+extern NSString* SNOCaenModelTriggerSourceMaskChanged;
+extern NSString* SNOCaenModelTriggerOutMaskChanged;
+extern NSString* SNOCaenModelFrontPanelControlMaskChanged;
+extern NSString* SNOCaenModelCoincidenceLevelChanged;
+extern NSString* SNOCaenModelAcquisitionModeChanged;
+extern NSString* SNOCaenModelCountAllTriggersChanged;
+extern NSString* SNOCaenModelCustomSizeChanged;
+extern NSString* SNOCaenModelIsCustomSizeChanged;
+extern NSString* SNOCaenModelIsFixedSizeChanged;
+extern NSString* SNOCaenModelChannelConfigMaskChanged;
+extern NSString* SNOCaenModelNumberBLTEventsToReadoutChanged;
+extern NSString* SNOCaenChnlDacChanged;
+extern NSString* SNOCaenOverUnderThresholdChanged;
+extern NSString* SNOCaenChnl;
+extern NSString* SNOCaenChnlThresholdChanged;
+extern NSString* SNOCaenSelectedRegIndexChanged;
+extern NSString* SNOCaenSelectedRegIndexChanged;
+extern NSString* SNOCaenSelectedChannelChanged;
+extern NSString* SNOCaenWriteValueChanged;
+extern NSString* SNOCaenBasicLock;
+extern NSString* SNOCaenSettingsLock;
+extern NSString* SNOCaenRateGroupChanged;
+extern NSString* SNOCaenModelBufferCheckChanged;
+extern NSString* SNOCaenModelContinuousModeChanged;
 //the decoder concrete decoder class
-@interface ORCaen1720DecoderForCAEN : ORCaenDataDecoder
+@interface SNOCaenDecoderForCAEN : ORCaenDataDecoder
 {}
 - (NSString*) identifier;
 @end

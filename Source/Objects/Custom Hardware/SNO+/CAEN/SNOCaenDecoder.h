@@ -1,5 +1,5 @@
 //
-//ORCaen1720Decoder.h
+//SNOCaenDecoder.h
 //Orca
 //
 //Created by Mark Howe on Mon Apr 14 2008.
@@ -23,9 +23,9 @@
 @class ORDataPacket;
 
 //--------------------------------------------------------------------------------
-// Class ORCaen1720Decoder
+// Class SNOCaenDecoder
 //--------------------------------------------------------------------------------
-@interface ORCaen1720WaveformDecoder : ORVmeCardDecoder 
+@interface SNOCaenWaveformDecoder : ORVmeCardDecoder 
 {
     @private 
         BOOL getRatesFromDecodeStage;
