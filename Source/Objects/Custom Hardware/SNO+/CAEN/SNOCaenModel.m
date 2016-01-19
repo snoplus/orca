@@ -29,6 +29,11 @@
 #import "VME_HW_Definitions.h"
 #import "ORRunModel.h"
 
+/* #define these variables for now. Eventually we need to add fields
+ * to the GUI, but Javi is working on the SNOPModel now */
+#define MTC_HOST @"sbc.sp.snolab.ca"
+#define MTC_PORT 4001
+
 
 // Address information for this unit.
 #define k792DefaultBaseAddress 		0xa00000
@@ -609,7 +614,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     
     // Do actual write
     @try {
-        [self mtc_server okCommand:"caen_write %d %d", [self getAddressOffset:pReg] + chan*0x100];
+        [mtc_server okCommand:"caen_write %d %d", [self getAddressOffset:pReg] + chan*0x100, pValue];
 	}
 	@catch(NSException* localException) {
 	}
@@ -744,7 +749,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     }
     
     // Perform the read operation.
-    *pValue = [mtc_server intCommand:"caen_read %d", [self getAddressOffset:pReg];
+    *pValue = [mtc_server intCommand:"caen_read %d", [self getAddressOffset:pReg]];
 }
 
 - (void) write:(unsigned short) pReg sendValue:(unsigned long) pValue
@@ -781,7 +786,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 	int i;
 	for(i=0;i<8;i++){
 		unsigned long aValue = overUnderThreshold[i];
-        [mtc_server okCommand:"caen_write %d %d", reg[kNumOUThreshold].addressOffset + (pChan*0x100), aValue];
+        [mtc_server okCommand:"caen_write %d %d", reg[kNumOUThreshold].addressOffset + (i*0x100), aValue];
 	}
 }
 
@@ -789,8 +794,8 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 {
 	int i;
 	for(i=0;i<8;i++){
-		unsigned long value;
-        *value = [mtc_server intCommand:"caen_read %d", reg[kNumOUThreshold].addressOffset + (pChan*0x100)];
+		unsigned long value = [mtc_server intCommand:"caen_read %d", reg[kNumOUThreshold].addressOffset + (i*0x100)];
+        [self setOverUnderThreshold:i withValue:value];
 	}
 }
 
@@ -960,7 +965,8 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 
 - (void) readFrontPanelControl
 {
-	unsigned long aValue = [self read:kFPIOControl];
+	unsigned long aValue;
+    [self read:kFPIOControl returnValue:&aValue];
 	
 	[self setFrontPanelControlMask:aValue];
 }
@@ -978,7 +984,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 
 - (void) writePostTriggerSetting
 {
-    [self write:kPostTriggerSetting sendValue:postTriggerSetting];
+    [self write:kPostTrigSetting sendValue:postTriggerSetting];
 }
 
 - (void) writeAcquistionControl:(BOOL)start
@@ -998,7 +1004,8 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 
 - (void) writeEnableBerr:(BOOL)enable
 {
-    unsigned long aValue = [self read:kVMEControl];
+    unsigned long aValue;
+    [self read:kVMEControl returnValue:&aValue];
 
 	//we set both bit4: BERR and bit5: ALIGN64 for MBLT64 to work correctly with SBC
 	if ( enable ) aValue |= 0x30;

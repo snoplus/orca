@@ -35,7 +35,7 @@
 #define kNumChanConfigBits 5
 #define kNumTrigSourceBits 10
 
-int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
+static int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 
 @implementation SNOCaenController
 
