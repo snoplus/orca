@@ -24,6 +24,8 @@
 #import "ORHWWizard.h"
 #import "ORCaenDataDecoder.h"
 #import "SBC_Config.h"
+#import "RedisClient.h"
+#include <stdint.h>
 
 typedef struct  {
 	NSString*       regName;
@@ -133,6 +135,8 @@ enum {
 	unsigned long   location;
 	unsigned long	eventSizeReg;
 	unsigned long	dataReg;
+
+    RedisClient *mtc_server;
 }
 
 @property (assign, nonatomic)   BOOL    continuousMode;

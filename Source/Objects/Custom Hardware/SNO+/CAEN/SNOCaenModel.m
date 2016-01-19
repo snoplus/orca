@@ -128,6 +128,9 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     self = [super init];
     [[self undoManager] disableUndoRegistration];
 	
+    /* initialize our connection to the MTC server */
+    mtc_server = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
+	
     [self setBaseAddress:k792DefaultBaseAddress];
     [self setAddressModifier:k792DefaultAddressModifier];
 	[self setEnabledMask:0xFF];
@@ -587,12 +590,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     }
     
     // Perform the read operation.
-    [[self adapter] readLongBlock:pValue
-                        atAddress:[self baseAddress] + [self getAddressOffset:pReg] + chan*0x100
-                        numToRead:1
-                       withAddMod:[self addressModifier]
-                    usingAddSpace:0x01];
-    
+    *pValue = [mtc_server intCommand:"caen_read %d", [self getAddressOffset:pReg] + chan*0x100];
 }
 
 - (void) writeChan:(unsigned short)chan reg:(unsigned short) pReg sendValue:(unsigned long) pValue
@@ -611,12 +609,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     
     // Do actual write
     @try {
-		[[self adapter] writeLongBlock:&theValue
-							 atAddress:[self baseAddress] + [self getAddressOffset:pReg] + chan*0x100
-							numToWrite:1
-							withAddMod:[self addressModifier]
-						 usingAddSpace:0x01];
-		
+        [self mtc_server okCommand:"caen_write %d %d", [self getAddressOffset:pReg] + chan*0x100];
 	}
 	@catch(NSException* localException) {
 	}
@@ -751,12 +744,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     }
     
     // Perform the read operation.
-    [[self adapter] readLongBlock:pValue
-                        atAddress:[self baseAddress] + [self getAddressOffset:pReg]
-                        numToRead:1
-                       withAddMod:[self addressModifier]
-                    usingAddSpace:0x01];
-    
+    *pValue = [mtc_server intCommand:"caen_read %d", [self getAddressOffset:pReg];
 }
 
 - (void) write:(unsigned short) pReg sendValue:(unsigned long) pValue
@@ -774,12 +762,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     
     // Do actual write
     @try {
-		[[self adapter] writeLongBlock:&pValue
-							 atAddress:[self baseAddress] + [self getAddressOffset:pReg]
-							numToWrite:1
-							withAddMod:[self addressModifier]
-						 usingAddSpace:0x01];
-		
+        [mtc_server okCommand:"caen_write %d %d", [self getAddressOffset:pReg], pValue];
 	}
 	@catch(NSException* localException) {
 	}
@@ -790,11 +773,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 {
     unsigned long 	threshold = [self threshold:pChan];
     
-    [[self adapter] writeLongBlock:&threshold
-                         atAddress:[self baseAddress] + reg[kThresholds].addressOffset + (pChan * 0x100)
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+    [mtc_server okCommand:"caen_write %d %d", reg[kThresholds].addressOffset + (pChan*0x100), threshold];
 }
 
 - (void) writeOverUnderThresholds
@@ -802,11 +781,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 	int i;
 	for(i=0;i<8;i++){
 		unsigned long aValue = overUnderThreshold[i];
-		[[self adapter] writeLongBlock:&aValue
-							 atAddress:[self baseAddress] + reg[kNumOUThreshold].addressOffset + (i * 0x100)
-							numToWrite:1
-							withAddMod:[self addressModifier]
-						 usingAddSpace:0x01];
+        [mtc_server okCommand:"caen_write %d %d", reg[kNumOUThreshold].addressOffset + (pChan*0x100), aValue];
 	}
 }
 
@@ -815,11 +790,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 	int i;
 	for(i=0;i<8;i++){
 		unsigned long value;
-		[[self adapter] readLongBlock:&value
-							atAddress:[self baseAddress] + reg[kNumOUThreshold].addressOffset + (i * 0x100)
-							numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];
+        *value = [mtc_server intCommand:"caen_read %d", reg[kNumOUThreshold].addressOffset + (pChan*0x100)];
 	}
 }
 
@@ -835,41 +806,24 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 {
     unsigned long 	aValue = [self dac:pChan];
     
-    [[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kDacs].addressOffset + (pChan * 0x100)
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+    [mtc_server okCommand:"caen_write %d %d", reg[kDacs].addressOffset + (pChan*0x100), aValue];
 }
 
 - (void) generateSoftwareTrigger
 {
-	unsigned long dummy = 0;
-    [[self adapter] writeLongBlock:&dummy
-                         atAddress:[self baseAddress] + reg[kSWTrigger].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+    [self write:kSWTrigger sendValue:0];
 }
 
 - (void) writeChannelConfiguration
 {
 	unsigned long mask = [self channelConfigMask];
-	[[self adapter] writeLongBlock:&mask
-                         atAddress:[self baseAddress] + reg[kChanConfig].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+    [self write:kChanConfig sendValue:mask];
 }
 
 - (void) writeCustomSize
 {
 	unsigned long aValue = [self isCustomSize]?[self customSize]:0UL;
-	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kCustomSize].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+    [self write:kCustomSize sendValue:aValue];
 }
 
 - (void) report
@@ -973,76 +927,40 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 
 - (void) softwareReset
 {
-	unsigned long aValue = 0;
-	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kSWReset].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-	
+    [self write:kSWReset sendValue:0];
 }
 
 - (void) clearAllMemory
 {
-	unsigned long aValue = 0;
-	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kSWClear].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-	
+    [self write:kSWClear sendValue:0];
 }
 
 - (void) writeTriggerCount
 {
 	unsigned long aValue = ((coincidenceLevel&0x7)<<24) | (triggerSourceMask & 0xffffffff);
-	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kTrigSrcEnblMask].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+    [self write:kTrigSrcEnblMask sendValue:aValue];
 }
 
 
 - (void) writeTriggerSource
 {
 	unsigned long aValue = ((coincidenceLevel&0x7)<<24) | (triggerSourceMask & 0xffffffff);
-	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kTrigSrcEnblMask].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-	
+    [self write:kTrigSrcEnblMask sendValue:aValue];
 }
 
 - (void) writeTriggerOut
 {
-	unsigned long aValue = triggerOutMask;
-	[[self adapter] writeLongBlock:&aValue
-			     atAddress:[self baseAddress] + reg[kFPTrigOutEnblMask].addressOffset
-			    numToWrite:1
-			    withAddMod:[self addressModifier]
-			 usingAddSpace:0x01];
+    [self write:kFPTrigOutEnblMask sendValue:triggerOutMask];
 }
 
 - (void) writeFrontPanelControl
 {
-	unsigned long aValue = frontPanelControlMask;
-	[[self adapter] writeLongBlock:&aValue
-			     atAddress:[self baseAddress] + reg[kFPIOControl].addressOffset
-			    numToWrite:1
-			    withAddMod:[self addressModifier]
-			 usingAddSpace:0x01];
+    [self write:kFPIOControl sendValue:frontPanelControlMask];
 }
 
 - (void) readFrontPanelControl
 {
-	unsigned long aValue = 0;
-	[[self adapter] readLongBlock:&aValue
-			     atAddress:[self baseAddress] + reg[kFPIOControl].addressOffset
-			    numToRead:1
-			    withAddMod:[self addressModifier]
-			 usingAddSpace:0x01];
+	unsigned long aValue = [self read:kFPIOControl];
 	
 	[self setFrontPanelControlMask:aValue];
 }
@@ -1050,44 +968,23 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 
 - (void) writeBufferOrganization
 {
-	unsigned long aValue = eventSize;//(unsigned long)pow(2.,(float)eventSize);	
-	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kBufferOrganization].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+    [self write:kBufferOrganization sendValue:eventSize];
 }
 
 - (void) writeChannelEnabledMask
 {
-	unsigned long aValue = enabledMask;
-	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kChanEnableMask].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-	
+    [self write:kChanEnableMask sendValue:enabledMask];
 }
 
 - (void) writePostTriggerSetting
 {
-	[[self adapter] writeLongBlock:&postTriggerSetting
-                         atAddress:[self baseAddress] + reg[kPostTrigSetting].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-	
+    [self write:kPostTriggerSetting sendValue:postTriggerSetting];
 }
 
 - (void) writeAcquistionControl:(BOOL)start
 {
 	unsigned long aValue = (countAllTriggers<<3) | (start<<2) | (acquisitionMode&0x3);
-	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kAcqControl].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-	
+    [self write:kAcqControl sendValue:aValue];
 }
 
 - (void) writeNumberBLTEvents:(BOOL)enable
@@ -1095,34 +992,21 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     //we must start in a safe mode with 1 event, the numberBLTEvents is passed to SBC
     //unsigned long aValue = (enable) ? numberBLTEventsToReadout : 0;
     unsigned long aValue = (enable) ? 1 : 0;
-    
-	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kBLTEventNum].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+
+    [self write:kBLTEventNum sendValue:aValue];
 }
 
 - (void) writeEnableBerr:(BOOL)enable
 {
-    unsigned long aValue;
-	[[self adapter] readLongBlock:&aValue
-						atAddress:[self baseAddress] + reg[kVMEControl].addressOffset
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
+    unsigned long aValue = [self read:kVMEControl];
 
 	//we set both bit4: BERR and bit5: ALIGN64 for MBLT64 to work correctly with SBC
 	if ( enable ) aValue |= 0x30;
 	else aValue &= 0xFFCF;
 	//if ( enable ) aValue |= 0x10;
 	//else aValue &= 0xFFEF;
-    
-	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kVMEControl].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+
+    [self write:kVMEControl sendValue:aValue];
 }
 
 - (void) checkBufferAlarm
@@ -1206,37 +1090,10 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 
 - (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
-	if(![[self adapter] controllerCard]){
-        [NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
-    }
-	
-    //----------------------------------------------------------------------------------------
-    // first add our description to the data description
-    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:NSStringFromClass([self class])]; 
-    
-	//cache for speed    
-	controller		= [self adapter]; 
-	statusReg		= [self baseAddress] + reg[kAcqStatus].addressOffset;
-	eventSizeReg	= [self baseAddress] + reg[kEventSize].addressOffset;
-	dataReg			= [self baseAddress] + reg[kOutputBuffer].addressOffset;
-	location		=  (([self crateNumber]&0x01e)<<21) | (([self slot]& 0x0000001f)<<16);
-	isRunning		= NO;
-    
-    BOOL sbcRun = [[userInfo objectForKey:kSBCisDataTaker] boolValue];
-
-    [self startRates];
-
-	if ([self continuousMode] && ![[userInfo objectForKey:@"doinit"] boolValue]) {
-        //??
-    }
-    else {
-        [self initBoard];
-        [self writeNumberBLTEvents:sbcRun];
-        [self writeEnableBerr:sbcRun];
-        [self writeAcquistionControl:YES];
-    }
-	
-	[self performSelector:@selector(checkBufferAlarm) withObject:nil afterDelay:1];
+    [self initBoard];
+    [self writeNumberBLTEvents:0];
+    [self writeEnableBerr:0];
+    [self writeAcquistionControl:YES];
 }
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
@@ -1367,6 +1224,9 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 - (id) initWithCoder:(NSCoder*) aDecoder
 {
     self = [super initWithCoder:aDecoder];
+	
+    /* initialize our connection to the MTC server */
+    mtc_server = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
 	
     [[self undoManager] disableUndoRegistration];
     [self setEventSize:[aDecoder decodeIntForKey:@"SNOCaenModelEventSize"]];
