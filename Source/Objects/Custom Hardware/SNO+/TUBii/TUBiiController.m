@@ -72,6 +72,7 @@
 }
 
 // GUI actions. CTRL-drag handles from the IB into this file.
+#pragma mark •••Actions
 - (IBAction)DataReadoutChanged:(id)sender {
     if ([[sender selectedCell] tag] == 1) { //Data Readout On is selected
         [model setDataReadout:YES];
@@ -183,29 +184,6 @@
     [model setCaenMasks:ChannelMask GainMask:GainMask];
 }
 
-- (NSUInteger) GetBitInfoFromCheckBoxes: (NSMatrix*)aMatrix FromBit:(int)low ToBit: (int)high {
-    NSUInteger maskVal = 0;
-    for (int i=low; i<high; i++) {
-        if([[aMatrix cellWithTag:i] intValue]>0)
-        {
-            maskVal |= (1<<i);
-        }
-    }
-    return maskVal;
-}
-- (void) SendBitInfo:(NSUInteger) maskVal FromBit:(int)low ToBit:(int) high ToCheckBoxes: (NSMatrix*) aMatrix {
-    for (int i=low;i<high;i++)
-    {
-        if((maskVal & 1<<i) >0)
-        {
-            [[aMatrix cellWithTag:i] setState:1];
-        }
-        else
-        {
-            [[aMatrix cellWithTag:i] setState:0];
-        }
-    }
-}
 - (IBAction)SpeakerMatchHardware:(id)sender {
     NSUInteger maskVal =0;
     NSMatrix *maskSelect_1 =nil;
@@ -456,11 +434,9 @@
 - (IBAction)MTCAMimicTextFieldChanged:(id)sender {
     [MTCAMimic_Slider setFloatValue:[MTCAMimic_TextField floatValue]];
 }
-
 - (IBAction)MTCAMimicSliderChanged:(id)sender {
     [MTCAMimic_TextField setStringValue:[NSString stringWithFormat:@"%.3f",[MTCAMimic_Slider floatValue]]];
 }
-
 - (IBAction)MTCAMimicMatchHardware:(id)sender {
     NSUInteger DACBits= [model MTCAMimic1_Threshold];
     //Bit value of the DAC
@@ -468,7 +444,6 @@
     [MTCAMimic_Slider setFloatValue:value];
     [MTCAMimic_TextField setFloatValue:value];
 }
-
 - (IBAction)MTCAMimicLoadValue:(id)sender {
     double value = [MTCAMimic_TextField floatValue];
     NSUInteger DACBits = [self ConvertValueToBits:value NBits:12 MinVal:-5.0 MaxVal:5.0];
@@ -483,8 +458,32 @@
         [model setTUBiiIsDefaultClock: NO];
     }
 }
-
 - (IBAction)ClockSourceMatchHardware:(id)sender {
+}
+
+#pragma mark •••Helper Functions
+- (NSUInteger) GetBitInfoFromCheckBoxes: (NSMatrix*)aMatrix FromBit:(int)low ToBit: (int)high {
+    NSUInteger maskVal = 0;
+    for (int i=low; i<high; i++) {
+        if([[aMatrix cellWithTag:i] intValue]>0)
+        {
+            maskVal |= (1<<i);
+        }
+    }
+    return maskVal;
+}
+- (void) SendBitInfo:(NSUInteger) maskVal FromBit:(int)low ToBit:(int) high ToCheckBoxes: (NSMatrix*) aMatrix {
+    for (int i=low;i<high;i++)
+    {
+        if((maskVal & 1<<i) >0)
+        {
+            [[aMatrix cellWithTag:i] setState:1];
+        }
+        else
+        {
+            [[aMatrix cellWithTag:i] setState:0];
+        }
+    }
 }
 
 - (float) ConvertBitsToValue:(NSUInteger)bits NBits: (int) nBits MinVal: (float) minVal MaxVal: (float) maxVal{

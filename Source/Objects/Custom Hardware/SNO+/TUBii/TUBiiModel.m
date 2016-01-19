@@ -5,16 +5,17 @@
 //  Created by Ian Coulter on 9/15/15.
 //
 //
-
+#pragma mark •••Imported Files
 #import "TUBiiModel.h"
-#import "NetSocket.h"
+#import "RedisClient.h"
 #import "netdb.h"
 
+#pragma mark •••Definitions
 #define TUBII_DEFAULT_IP "192.168.80.25"
 #define TUBII_DEFAULT_PORT 4001
 
 @implementation TUBiiModel
-
+#pragma mark •••Synthesized Variables
 @synthesize portNumber;
 @synthesize strHostName;
 @synthesize telliePulseWidth;
@@ -38,6 +39,10 @@
     halfSize.width  = (int)(halfSize.width  / 2);
     [img setSize:halfSize];
     [self setImage:img];
+}
+
+- (BOOL) solitaryObject {
+    return YES; //Prevents there from being two TUBiis
 }
 // Link the model to the controller
 - (void) makeMainController
@@ -68,6 +73,12 @@
     }
     return self;
 }
+- (void) dealloc {
+    [super dealloc];
+    [connection dealloc];
+    [strHostName dealloc];
+}
+#pragma mark •••Archival
 - (id) initWithCoder:(NSCoder *)aCoder {
     self = [super initWithCoder:aCoder];
     if (self) {
@@ -108,11 +119,7 @@
     [aCoder encodeInt:portNumber            forKey:@"TUBiiModelPortNumber"];
     [aCoder encodeObject:strHostName        forKey:@"TUBiiModelStrHostName"];
 }
-- (void) dealloc {
-    [super dealloc];
-    [connection dealloc];
-    [strHostName dealloc];
-}
+#pragma mark •••Network Communication
 - (void) sendOkCmd:(NSString* const)aCmd {
     @try {
         NSLog(@"Sending %@ to TUBii\n",aCmd);
@@ -132,6 +139,7 @@
         return nil;
     }
 }
+#pragma mark •••HW Access
 - (void) fireSmelliePulser {
     NSString* const command=[NSString stringWithFormat:@"SetSmelliePulser %f %f %d",tellieRate,telliePulseWidth,tellieNPulses ];
     [self sendOkCmd:command];

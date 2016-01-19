@@ -5,10 +5,10 @@
 //  Created by Ian Coulter on 9/15/15.
 //
 //
-
+#pragma mark •••Imported Files
 #import "OrcaObject.h"
-#import "RedisClient.h"
-@class NetSocket;
+
+@class RedisClient; //Forward declaration
 
 typedef NS_OPTIONS(NSUInteger, CAEN_CHANNEL_MASK) {
     channelSel_0 = 1<<3,
@@ -82,6 +82,7 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
     int portNumber;
     NSString* strHostName;//"192.168.80.25";
 }
+@property (readonly) BOOL solitaryObject; //Prevents there from being two TUBiis
 @property (nonatomic) int portNumber;
 @property (nonatomic,assign) NSString* strHostName;
 @property (nonatomic) float smellieRate;
@@ -109,10 +110,14 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 @property (nonatomic) BOOL TUBiiIsDefaultClock;
 @property (nonatomic) BOOL CounterMode;
 
+#pragma mark •••Initialization
 - (id) init;
 - (id) initWithCoder:(NSCoder *)aCoder;
+- (void) setUpImage;
+- (void) makeMainController;
 - (void) encodeWithCoder:(NSCoder *)aCoder;
 - (void) dealloc;
+- (BOOL) solitaryObject;
 
 - (void) sendOkCmd:(NSString* const)aCmd;
 - (int) sendIntCmd:(NSString* const)aCmd;
