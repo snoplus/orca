@@ -379,14 +379,14 @@ static NSDictionary* xl3Ops;
 
 #pragma mark •••Interface Management
 - (void) settingsLockChanged:(NSNotification*)aNotification
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	BOOL locked = [gSecurity isLocked:[model xl3LockName]];   
 	[lockButton setState: locked];
 	[self xl3LockChanged:aNotification];
-}
+}); }
 
 - (void) xl3LockChanged:(NSNotification*)aNotification
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	
 	//BOOL runInProgress = [gOrcaGlobals runInProgress];
 	BOOL locked = [gSecurity isLocked:[model xl3LockName]];
@@ -410,10 +410,10 @@ static NSDictionary* xl3Ops;
 	[errorTimeOutPU setEnabled:!locked];
 	//[self setToggleCrateButtonState];
 
-}
+}); }
 
 - (void) opsRunningChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	for (id key in xl3Ops) {
 		if ([model xl3OpsRunningForKey:key]) {
 			[[[xl3Ops objectForKey:key] objectForKey:@"spinner"] startAnimation:model];
@@ -422,69 +422,69 @@ static NSDictionary* xl3Ops;
 			[[[xl3Ops objectForKey:key] objectForKey:@"spinner"] stopAnimation:model];			
 		}
 	}
-}
+}); }
 
 
 #pragma mark •basic ops
 - (void) repeatCountChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	[repeatCountField setIntValue: [model repeatOpCount]];
 	[repeatCountStepper setIntValue: [model repeatOpCount]];
-}
+}); }
 
 - (void) repeatDelayChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	[repeatDelayField setIntValue:[model repeatDelay]];
 	[repeatDelayStepper setIntValue: [model repeatDelay]];
-}
+}); }
 
 - (void) autoIncrementChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	[autoIncrementCB setState:[model autoIncrement]];
-}
+}); }
 
 - (void) basicOpsRunningChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	if ([model basicOpsRunning]) [basicOpsRunningIndicator startAnimation:model];
 	else [basicOpsRunningIndicator stopAnimation:model];
-}
+}); }
 
 - (void) writeValueChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	[writeValueField setIntValue:[model writeValue]];
 	[writeValueStepper setIntValue:[model writeValue]];
-}
+}); }
 
 - (void) selectedRegisterChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	[selectedRegisterPU selectItemAtIndex: [model selectedRegister]];
-}
+}); }
 
 
 #pragma mark •composite
 - (void) compositeXl3ModeChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	[compositeXl3ModePU selectItemWithTag:[model xl3Mode]]; 
-}
+}); }
 
 - (void) compositeXl3ModeRunningChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	if ([model xl3ModeRunning]) [compositeXl3ModeRunningIndicator startAnimation:model];
 	else [compositeXl3ModeRunningIndicator stopAnimation:model];
-}
+}); }
 
 - (void) compositeSlotMaskChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	unsigned long mask = [model slotMask];
 	int i;
 	for(i=0; i<16; i++){
 		[[compositeSlotMaskMatrix cellWithTag:i] setIntValue:(mask & 1UL << i)];
 	}
 	[compositeSlotMaskField setIntValue:mask];
-}
+}); }
 
 - (void) compositeXl3RWAddressChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	[compositeXl3RWAddressValueField setIntValue:[model xl3RWAddressValue]];
 	[compositeXl3RWModePU selectItemAtIndex:([model xl3RWAddressValue] >> 28)];
 
@@ -493,93 +493,93 @@ static NSDictionary* xl3Ops;
 	
 	[compositeXl3RWRegisterPU selectItemWithTitle:
 	 [[xl3RWAddresses allKeysForObject:[NSNumber numberWithInt:[model xl3RWAddressValue] & 0xFFF]] lastObject]];
-}
+}); }
 
 - (void) compositeXL3RWDataChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	[compositeXl3RWDataValueField setIntValue:[model xl3RWDataValue]];
-}
+}); }
 
 - (void) compositeXl3PedestalMaskChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	[compositeSetPedestalField setIntValue:[model xl3PedestalMask]];
-}
+}); }
 
 - (void) compositeXl3ChargeInjChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [compositeChargeInjChargeField setIntValue:[model xl3ChargeInjCharge]];
     [compositeChargeInjMaskField setIntValue:[model xl3ChargeInjMask]];
-}
+}); }
 
 
 #pragma mark •mon
 - (void) monPollXl3TimeChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [monPollingRatePU selectItemWithTag:[model pollXl3Time]];
-}
+}); }
 
 - (void) monIsPollingXl3Changed:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [monPollingStatusField setStringValue:[model pollStatus]];
-}
+}); }
 
 - (void) monIsPollingCMOSRatesChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [monIsPollingCMOSRatesButton setIntValue:[model isPollingCMOSRates]];
-}
+}); }
 
 - (void) monPollCMOSRatesMaskChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [monPollCMOSRatesMaskField setIntValue:[model pollCMOSRatesMask]];
-}
+}); }
 
 - (void) monIsPollingPMTCurrentsChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [monIsPollingPMTCurrentsButton setIntValue:[model isPollingPMTCurrents]];
-}
+}); }
 
 - (void) monPollPMTCurrentsMaskChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [monPollPMTCurrentsMaskField setIntValue:[model pollPMTCurrentsMask]];
-}
+}); }
 
 - (void) monIsPollingFECVoltagesChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [monIsPollingFECVoltagesButton setIntValue:[model isPollingFECVoltages]];
-}
+}); }
 
 - (void) monPollFECVoltagesMaskChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [monPollFECVoltagesMaskField setIntValue:[model pollFECVoltagesMask]];    
-}
+}); }
 
 - (void) monIsPollingXl3VoltagesChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [monIsPollingXl3VoltagesButton setIntValue:[model isPollingXl3Voltages]];
-}
+}); }
 
 - (void) monIsPollingHVSupplyChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [monIsPollingHVSupplyButton setIntValue:[model isPollingHVSupply]];    
-}
+}); }
 
 - (void) monIsPollingXl3WithRunChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [monIsPollingWithRunButton setIntValue:[model isPollingXl3WithRun]];        
-}
+}); }
 
 - (void) monPollStatusChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [monPollingStatusField setStringValue:[model pollStatus]];
-}
+}); }
 
 - (void) monIsPollingVerboseChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [monIsPollingVerboseButton setIntValue:[model isPollingVerbose]];
-}
+}); }
 
 - (void) monVltThresholdChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     
     NSTextField* monVltThresholdTextField[] = {monVltThresholdTextField0, monVltThresholdTextField1,
         monVltThresholdTextField2, monVltThresholdTextField3, monVltThresholdTextField6, monVltThresholdTextField7,
@@ -590,12 +590,12 @@ static NSDictionary* xl3Ops;
     for (i=0; i<12; i++) {
         [monVltThresholdTextField[i] setFloatValue:[model xl3VltThreshold:i]];
     }
-}
+}); }
 
 - (void) monVltThresholdInInitChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [monVltThresholdInInitButton setIntValue:[model isXl3VltThresholdInInit]];
-}
+}); }
 
 #pragma mark •hv
 
@@ -622,7 +622,7 @@ static NSDictionary* xl3Ops;
 }
 
 - (void) hvRelayMaskChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     ORQuadStateBox* quadStateBox = [ORQuadStateBox sharedQuadStateBox];
     
     unsigned long long relayMask = [model relayMask];
@@ -644,15 +644,15 @@ static NSDictionary* xl3Ops;
             [[hvRelayMaskMatrix cellAtRow:pmtic column:15-slot] setImage:[quadStateBox imageForState:state]];
         }
     }
-}
+}); }
 
 - (void) hvRelayStatusChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [hvRelayStatusField setStringValue:[model relayStatus]];
-}
+}); }
 
 - (void) hvStatusChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     if (!owl_crate_master) { //cache owl master
         NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
         for (id xl3 in xl3s) {
@@ -701,16 +701,16 @@ static NSDictionary* xl3Ops;
         [hvRelayCloseButton setEnabled:YES];        
     }
     [self updateHVButtons];
-}
+}); }
 
 - (void) hvTriggerStatusChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [hvATriggerStatusField setStringValue:[model triggerStatus]];
     [hvBTriggerStatusField setStringValue:[model triggerStatus]];
-}
+}); }
 
 - (void) hvTargetValueChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     if ([hvPowerSupplyMatrix selectedColumn] == 0) { //A
         [hvTargetValueField setFloatValue:[model hvAVoltageTargetValue] * 3000. / 4096.];
         [hvTargetValueStepper setIntValue:[model hvAVoltageTargetValue]];
@@ -719,10 +719,10 @@ static NSDictionary* xl3Ops;
         [hvTargetValueField setFloatValue:[model hvBVoltageTargetValue] * 3000. / 4096.];
         [hvTargetValueStepper setIntValue:[model hvBVoltageTargetValue]];
     }
-}
+}); }
 
 - (void) hvCMOSRateLimitChanged:(NSNotification *)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     if ([hvPowerSupplyMatrix selectedColumn] == 0) { //A
         [hvCMOSRateLimitField setIntValue:[model hvACMOSRateLimit]];
         [hvCMOSRateLimitStepper setIntValue:[model hvACMOSRateLimit]];
@@ -731,10 +731,10 @@ static NSDictionary* xl3Ops;
         [hvCMOSRateLimitField setIntValue:[model hvBCMOSRateLimit]];
         [hvCMOSRateLimitStepper setIntValue:[model hvBCMOSRateLimit]];
     }    
-}
+}); }
 
 - (void) hvCMOSRateIgnoreChanged:(NSNotification *)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     if ([hvPowerSupplyMatrix selectedColumn] == 0) { //A
         [hvCMOSRateIgnoreField setIntValue:[model hvACMOSRateIgnore]];
         [hvCMOSRateIgnoreStepper setIntValue:[model hvACMOSRateIgnore]];
@@ -743,25 +743,25 @@ static NSDictionary* xl3Ops;
         [hvCMOSRateIgnoreField setIntValue:[model hvBCMOSRateIgnore]];
         [hvCMOSRateIgnoreStepper setIntValue:[model hvBCMOSRateIgnore]];
     }    
-}
+}); }
 
 - (void) hvChangePowerSupplyChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [self hvTargetValueChanged:aNote];
     [self hvCMOSRateLimitChanged:aNote];
     [self hvCMOSRateIgnoreChanged:aNote];
     [self hvStatusChanged:aNote];
-}
+}); }
 
 #pragma mark •ip connection
 
 - (void) linkConnectionChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [self connectStateChanged:aNote];
-}
+}); }
 
 - (void) connectStateChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     /*
 	BOOL runInProgress = [gOrcaGlobals runInProgress];
 	BOOL locked = [gSecurity isLocked:[model xl3LockName]];
@@ -792,17 +792,17 @@ static NSDictionary* xl3Ops;
     else {
         [toggleConnectButton setTitle:@"Disconnect"];
     }
-}
+}); }
 
 - (void) errorTimeOutChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	[errorTimeOutPU selectItemAtIndex:[[model xl3Link] errorTimeOut]];
-}
+}); }
 
 - (void) connectionAutoConnectChanged:(NSNotification*)aNote;
-{
-    [connectionAutoConnectButton setIntValue:[[model xl3Link] autoConnect]];    
-}
+{ dispatch_async(dispatch_get_main_queue(), ^{
+    [connectionAutoConnectButton setIntValue:[[model xl3Link] autoConnect]];
+}); }
 
 #pragma mark •••Helper
 - (void) populateOps
