@@ -43,9 +43,12 @@ static NSDictionary* xl3Ops;
 	return self;
 }
 
+
+
 - (void) dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
+    [msbox release];
 	[super dealloc];
 }
 
@@ -57,6 +60,14 @@ static NSDictionary* xl3Ops;
     [tabView setFocusRingType:NSFocusRingTypeNone];
 
 	[super awakeFromNib];
+    
+    NSDictionary *statedict = [NSDictionary dictionaryWithObjectsAndKeys:
+                               [NSColor redColor], @"closed",
+                               [NSColor greenColor], @"open",
+                               [NSColor blackColor], @"unk",
+                               nil];
+    msbox = [[ORMultiStateBox alloc] initWithStates:statedict size:20 pad:4 bevel:2];
+    //[statedict release];
 
 	NSString* key = [NSString stringWithFormat: @"orca.ORXL3%d.selectedtab",[model crateNumber]]; //uniqueIdNumber?
 	int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
@@ -625,8 +636,6 @@ static NSDictionary* xl3Ops;
 
 - (void) hvRelayMaskChanged:(NSNotification*)aNote
 { dispatch_async(dispatch_get_main_queue(), ^{
-    ORQuadStateBox* quadStateBox = [ORQuadStateBox sharedQuadStateBox];
-    
     unsigned long long relayMask = [model relayMask];
     unsigned long long relayViewMask = [model relayViewMask];
 
@@ -640,10 +649,11 @@ static NSDictionary* xl3Ops;
             int modelval = (relayMask >> (slot*4 + pmtic)) & 0x1;
             int viewval = (relayViewMask >> (slot*4 + pmtic)) & 0x1;
             
-            int state = modelval ? (viewval ? kQuadStateBoxOff : kQuadStateBoxImageOffOnPending) : (viewval ? kQuadStateBoxOnOffPending : kQuadStateBoxImageOn);
+            NSString *ulstate = viewval ? @"closed" : @"open";
+            NSString *brstate = [[model relayStatus]  isEqual: @"status: UNKNOWN"] ? @"unk" : (modelval ? @"closed" : @"open");
             
             [[hvRelayMaskMatrix cellAtRow:pmtic column:15-slot] setIntValue:viewval];
-            [[hvRelayMaskMatrix cellAtRow:pmtic column:15-slot] setImage:[quadStateBox imageForState:state]];
+            [[hvRelayMaskMatrix cellAtRow:pmtic column:15-slot] setImage:[msbox upLeft:ulstate botRight:brstate]];
         }
     }
 }); }
