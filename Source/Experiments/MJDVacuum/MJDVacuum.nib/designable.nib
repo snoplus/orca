@@ -208,7 +208,7 @@
                                                     </textFieldCell>
                                                 </textField>
                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="dhf-bw-83x">
-                                                    <rect key="frame" x="542" y="626" width="199" height="22"/>
+                                                    <rect key="frame" x="542" y="623" width="199" height="22"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" id="LeQ-wg-Fow">
                                                         <font key="font" metaFont="systemBold" size="16"/>
