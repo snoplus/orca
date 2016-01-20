@@ -79,9 +79,11 @@ static NSDictionary* xl3Ops;
         [hvPowerSupplyMatrix selectCellAtRow:0 column:0];
         if ([model crateNumber] != 16) {
             [[hvPowerSupplyMatrix cellAtRow:0 column:1] setEnabled:NO];
+            [hvPowerSupplyMatrix setHidden:true];
         }
         else {
             [[hvPowerSupplyMatrix cellAtRow:0 column:1] setEnabled:YES];
+            [hvPowerSupplyMatrix setHidden:false];
         }
         [self hvChangePowerSupplyChanged:nil];
     }
