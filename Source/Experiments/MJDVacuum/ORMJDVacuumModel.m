@@ -977,7 +977,7 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 
 - (void) resetHvTimer
 {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetHvTimer) object:nil];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(setNoHvInfo) object:nil];
     [self clearNoHvInfo];
     if(hvUpdateTime>0) {
         [self setNextHvUpdateTime:[NSDate dateWithTimeIntervalSinceNow:hvUpdateTime*60]];
