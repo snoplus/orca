@@ -71,6 +71,8 @@ eXL3_CrateStates;
     unsigned        bundleWriteMark;
     NSLock*         bundleBufferLock;
     long            bundleFreeSpace;
+
+    long delay;
 }
 
 @property (assign,nonatomic) BOOL isConnected;

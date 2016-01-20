@@ -30,6 +30,8 @@
 #import <sys/errno.h>
 #include "anet.h"
 
+#define MAX_DELAY 3600
+
 #define XL3_SERVER "localhost"
 
 
@@ -62,6 +64,9 @@ readFifoFlag = _readFifoFlag;
 - (id) init
 {
 	self = [super init];
+
+    delay = 10;
+
 	commandSocketLock = [[NSLock alloc] init];
 	coreSocketLock = [[NSLock alloc] init];
 	cmdArrayLock = [[NSLock alloc] init];
@@ -150,6 +155,8 @@ readFifoFlag = _readFifoFlag;
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
+
+    delay = 10;
 
 	[self setErrorTimeOut: [decoder decodeIntForKey: @"errorTimeOut"]];
     [self setAutoConnect: [decoder decodeBoolForKey: @"autoConnect"]];
@@ -720,8 +727,12 @@ static void SwapLongBlock(void* p, int32_t n)
         [[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectStateChanged object: self];
 
         [self setIsConnected:NO];
-        [NSThread sleepForTimeInterval:10.0];
+
+        delay *= 2;
+
+        [NSThread sleepForTimeInterval:delay];
     } else {
+        delay = 10;
         [self setIsConnected:YES];
     }
 	
