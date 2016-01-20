@@ -318,10 +318,7 @@ mtcConfigDoc = _mtcConfigDoc;
 - (void) runInitialization:(NSNotification*)aNote
 {
     @try {
-        if ([[aNote userInfo][@"doinit"] boolValue]) {
-            /* cold run start, so we need to reset the MTC/CAEN GTID */
-            [mtc_server okCommand:"reset_gtid"];
-        }
+        [mtc_server okCommand:"reset_gtid"];
 
         /* Tell the MTC server to queue the run start. This will suspend
          * the MTC readout and fire a SOFT_GT. When the run starts, we will
@@ -376,23 +373,18 @@ mtcConfigDoc = _mtcConfigDoc;
 
     ORRunModel *run = [aNote object];
 
-    if ([run nextRunWillQuickStart]) {
-        /* fire a SOFT_GT to mark end of run */
-        [mtc_server okCommand:"soft_gt"];
-    } else {
-        [mtc_server okCommand:"run_stop"];
+    [mtc_server okCommand:"run_stop"];
 
-        NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-                                  @"waiting for MTC/XL3/CAEN data", @"Reason",
-                                  nil];
+    NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                              @"waiting for MTC/XL3/CAEN data", @"Reason",
+                              nil];
 
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object: self userInfo: userInfo];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object: self userInfo: userInfo];
 
-        /* detach a thread to monitor XL3/CAEN/MTC buffers */
-        [NSThread detachNewThreadSelector:@selector(_waitForBuffers)
-                                 toTarget:self
-                               withObject:nil];
-    }
+    /* detach a thread to monitor XL3/CAEN/MTC buffers */
+    [NSThread detachNewThreadSelector:@selector(_waitForBuffers)
+                             toTarget:self
+                           withObject:nil];
 }
 
 - (void) _waitForBuffers
