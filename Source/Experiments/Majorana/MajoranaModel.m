@@ -846,7 +846,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 - (NSString*) specialMapFileAsString
 {
    	NSMutableString* stringRep = [NSMutableString string];
-    [stringRep appendFormat:@"Index,Description,VME,Slot,Chan,PADig,PAChan,Type\n"];
+    [stringRep appendFormat:@"Index,Description,VME,Slot,Chan,PADig,PAChan,Cable,Type\n"];
     for(id item in specialMap){
         
         [stringRep appendFormat:@"%@,%@,%@,%@,%@,%@,%@,%@,%@\n",
