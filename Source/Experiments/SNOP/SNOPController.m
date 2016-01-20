@@ -161,6 +161,12 @@ smellieRunFile;
                      selector : @selector(runsLockChanged:)
                          name : ORRunStatusChangedNotification
                        object : nil];
+
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(runsECAChanged:)
+                         name : ORSNOPModelRunsECAChangedNotification
+                        object: model];
     
     //TODO: add the notification for changedRunType on SNO+
     /*[notifyCenter addObserver:self
@@ -184,6 +190,7 @@ smellieRunFile;
     [self runStatusChanged:nil]; //update the run status
     [model setIsEmergencyStopEnabled:TRUE]; //enable the emergency stop
     [self runsLockChanged:nil];
+    [self runsECAChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -1067,7 +1074,6 @@ smellieRunFile;
     [runsLockButton setState: locked];
     
     //Enable or disable fields
-    [loadValuesButton setEnabled:!lockedOrNotRunningMaintenance];
     [ECApatternPopUpButton setEnabled:!lockedOrNotRunningMaintenance];
     [ECAtypePopUpButton setEnabled:!lockedOrNotRunningMaintenance];
     [TSlopePatternTextField setEnabled:!lockedOrNotRunningMaintenance];
@@ -1096,64 +1102,64 @@ smellieRunFile;
     
 }
 
-//***Standard runs***
-//ECA
-- (IBAction)loadValues:(id)sender {
+- (void) runsECAChanged:(NSNotification*)aNotification
+{
+
+    //Refresh values in GUI to match the model
+    NSInteger* index = [model ECA_pattern] -1;
+    [ECApatternPopUpButton selectItemAtIndex:index];
+    index = [model ECA_type] -1;
+    [ECAtypePopUpButton selectItemAtIndex:index];
+    int integ = [model ECA_tslope_pattern];
+    [TSlopePatternTextField setIntValue:integ];
+    double doub = [model ECA_subrun_time];
+    [subTimeTextField setDoubleValue:doub];
     
-    //Push global variables to model
+}
+
+//ECA RUNS
+- (IBAction)ecaPatternChangedAction:(id)sender {
+
+    int value = (int)[ECApatternPopUpButton indexOfSelectedItem];
+    [model setECA_pattern:value+1];
+
+}
+
+- (IBAction)ecaTypeChangedAction:(id)sender {
     
-    //setter needs a NSNumber* as argument
-    NSNumber* value = [NSNumber numberWithInt:[ECApatternPopUpButton indexOfSelectedItem]+1];
-    //NSLog(@"Set pattern_number to %i \n", [value intValue]);
-    [model setECA_pattern_number:value];
-    value = [NSNumber numberWithInt:[ECAtypePopUpButton indexOfSelectedItem]+1];
-    //NSLog(@"Set eca_type to %i \n", [value intValue]);
-    [model setECA_type:value];
-    value = [NSNumber numberWithInt:[TSlopePatternTextField intValue]];
-    //NSLog(@"Set tslope_pattern to %i \n", [value intValue]);
+    int value = (int)[ECAtypePopUpButton indexOfSelectedItem];
+    [model setECA_type:value+1];
+    
+}
+
+- (IBAction)ecaTSlopePatternChangedAction:(id)sender {
+    
+    int value = [TSlopePatternTextField intValue];
     [model setECA_tslope_pattern:value];
-    value = [NSNumber numberWithInt:[subTimeTextField intValue]];
-    //NSLog(@"Set sub_run_time to %i \n", [value intValue]);
+    
+}
+
+- (IBAction)ecaSubrunTimeChangedAction:(id)sender {
+    
+    double value = [subTimeTextField doubleValue];
     [model setECA_subrun_time:value];
     
-    [ECApatternCheckBox setBackgroundColor:[NSColor greenColor]];
-    [ECAtypeCheckBox setBackgroundColor:[NSColor greenColor]];
-    [subTimeTextField setBackgroundColor:[NSColor greenColor]];
-    [TSlopePatternTextField setBackgroundColor:[NSColor greenColor]];
-    
-    //[self pushvaluestomodel];
-    // Ship the global variables to the ORCA script
-    [model loadVariablesInScript:@"ECA_singleRun"];
-    
 }
 
-- (IBAction) ECACheckValues:(id)sender {
-    
-    if( [ [model ECA_subrun_time] intValue ] != [subTimeTextField intValue] )
-        [subTimeTextField setBackgroundColor:[NSColor orangeColor]];
-    if( [ [model ECA_tslope_pattern] intValue ] != [TSlopePatternTextField intValue] )
-        [TSlopePatternTextField setBackgroundColor:[NSColor orangeColor]];
-    if( [ [model ECA_pattern_number] intValue ] != [ECApatternPopUpButton indexOfSelectedItem] + 1)
-        [ECApatternCheckBox setBackgroundColor:[NSColor orangeColor]];
-    if( [ [model ECA_type] intValue ] != [ECAtypePopUpButton indexOfSelectedItem] + 1)
-        [ECAtypeCheckBox setBackgroundColor:[NSColor orangeColor]];
-    
-}
-
-//General tools
-- (IBAction)loadStandardRunFromDB:(id)sender {
+//STANDARD RUNS
+- (IBAction)loadStandardRunFromDBAction:(id)sender {
     [model loadStandardRun:[standardRunPopupMenu objectValueOfSelectedItem]];
 }
 
-- (IBAction)loadStandardRunToHW:(id)sender {
+- (IBAction)loadStandardRunToHWAction:(id)sender {
     [model loadStandardRunToHW:[standardRunPopupMenu objectValueOfSelectedItem]];
 }
 
-- (IBAction)saveStandardRunToDB:(id)sender {
+- (IBAction)saveStandardRunToDBAction:(id)sender {
     [model saveStandardRun:[standardRunPopupMenu objectValueOfSelectedItem]];
 }
 
-- (IBAction)addNewStandardRun:(id)sender {
+- (IBAction)addNewStandardRunAction:(id)sender {
     if ([standardRunPopupMenu indexOfItemWithObjectValue:[standardRunPopupMenu stringValue]] == NSNotFound) {
         [standardRunPopupMenu addItemWithObjectValue:[standardRunPopupMenu stringValue]];
         [standardRunPopupMenu selectItemWithObjectValue:[standardRunPopupMenu stringValue]];

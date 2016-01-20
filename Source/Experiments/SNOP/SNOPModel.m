@@ -48,6 +48,7 @@ NSString* ORSNOPModelOrcaDBIPAddressChanged = @"ORSNOPModelOrcaDBIPAddressChange
 NSString* ORSNOPModelDebugDBIPAddressChanged = @"ORSNOPModelDebugDBIPAddressChanged";
 NSString* SNOPRunTypeChangedNotification = @"SNOPRunTypeChangedNotification";
 NSString* ORSNOPRunsLockNotification = @"ORSNOPRunsLockNotification";
+NSString* ORSNOPModelRunsECAChangedNotification = @"ORSNOPModelRunsECAChangedNotification";
 
 #define kOrcaRunDocumentAdded   @"kOrcaRunDocumentAdded"
 #define kOrcaRunDocumentUpdated @"kOrcaRunDocumentUpdated"
@@ -97,14 +98,6 @@ isEmergencyStopEnabled = isEmergencyStopEnabled,
 mtcConfigDoc = _mtcConfigDoc;
 
 @synthesize smellieRunHeaderDocList;
-
-//Standard Runs
-//ECA
-@synthesize
-ECA_pattern_number = _ECA_pattern_number,
-ECA_type = _ECA_type,
-ECA_tslope_pattern = _ECA_tslope_pattern,
-ECA_subrun_time = _ECA_subrun_time;
 
 #pragma mark ¥¥¥Initialization
 
@@ -1068,49 +1061,119 @@ ECA_subrun_time = _ECA_subrun_time;
     }
 }
 
+- (int)ECA_pattern
+{
+    return ECA_pattern;
+}
+
+- (void) setECA_pattern:(int)aValue
+{
+    
+    ECA_pattern = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
+    
+}
+
+- (int) getECA_pattern
+{
+    return ECA_pattern;
+}
+
+- (int)ECA_type
+{
+    return ECA_type;
+}
+
+- (void) setECA_type:(int)aValue
+{
+    
+    ECA_type = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
+    
+}
+
+- (int) getECA_type
+{
+    return ECA_type;
+}
+
+- (int)ECA_tslope_pattern
+{
+    return ECA_tslope_pattern;
+}
+
+- (void) setECA_tslope_pattern:(int)aValue
+{
+    
+    ECA_tslope_pattern = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
+    
+}
+
+- (int) getECA_tslope_pattern{
+    return ECA_tslope_pattern;
+}
+
+- (double)ECA_subrun_time
+{
+    return ECA_subrun_time;
+}
+
+- (void) setECA_subrun_time:(double)aValue
+{
+    
+    ECA_subrun_time = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
+    
+}
+
+- (double) getECA_subrun_time{
+    return ECA_subrun_time;
+}
+
 - (void) loadVariablesInScript:(NSString*)userscriptname
 {
     
-    //Collect ALL the RunScripts & ORCAScripts in an array
-    NSArray* runscripts = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunScriptModel")];
-    NSArray* orcascripts = [[self document] collectObjectsOfClass:NSClassFromString(@"ORScriptTaskModel")];
-    
-    //Look for the requested runscript by looping through the script names
-    for (int i=0; i<[runscripts count]; i++) {
-        //NSLog(@"%d: %@ \n", i, [runscripts[i] scriptName]);
-        if([[runscripts[i] scriptName] isEqualToString:userscriptname])
-        {
-            //This is the one we are looking for so get the script and exit
-            SR_script = [runscripts objectAtIndex:i];
-            break;
-        }
-    }
-    
-    //Look for the requested orcascript by looping through the script names
-    for (int i=0; i<[orcascripts count]; i++) {
-        //NSLog(@"%d: %@ \n", i, [orcascripts[i] scriptName]);
-        if([[orcascripts[i] scriptName] isEqualToString:userscriptname])
-        {
-            //This is the one we are looking for so get the script and exit
-            SR_script = [orcascripts objectAtIndex:i];
-            break;
-        }
-    }
-    
-    if(!SR_script){  //It didn't found the script
-        NSLog(@"ORCA script %@ not found. \n", userscriptname);
-    }
-    else if([[SR_script scriptName] isEqualToString:@"ECA_singleRun"]){
-        //Set global variables
-        NSLog(@"Set values in %@ ORCA script. \n",userscriptname);
-        [self addGlobalVariable:@0 withName:@"pattern_number" withValue:[self ECA_pattern_number]];
-        [self addGlobalVariable:@1 withName:@"eca_type" withValue:[self ECA_type]];
-        [self addGlobalVariable:@2 withName:@"tslope_pattern" withValue:[self ECA_tslope_pattern]];
-        [self addGlobalVariable:@3 withName:@"sub_run_time" withValue:[self ECA_subrun_time]];
-    }
-    
-    //Clean script pointer
-    SR_script = nil;
+//    //Collect ALL the RunScripts & ORCAScripts in an array
+//    NSArray* runscripts = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunScriptModel")];
+//    NSArray* orcascripts = [[self document] collectObjectsOfClass:NSClassFromString(@"ORScriptTaskModel")];
+//    
+//    //Look for the requested runscript by looping through the script names
+//    for (int i=0; i<[runscripts count]; i++) {
+//        //NSLog(@"%d: %@ \n", i, [runscripts[i] scriptName]);
+//        if([[runscripts[i] scriptName] isEqualToString:userscriptname])
+//        {
+//            //This is the one we are looking for so get the script and exit
+//            SR_script = [runscripts objectAtIndex:i];
+//            break;
+//        }
+//    }
+//    
+//    //Look for the requested orcascript by looping through the script names
+//    for (int i=0; i<[orcascripts count]; i++) {
+//        //NSLog(@"%d: %@ \n", i, [orcascripts[i] scriptName]);
+//        if([[orcascripts[i] scriptName] isEqualToString:userscriptname])
+//        {
+//            //This is the one we are looking for so get the script and exit
+//            SR_script = [orcascripts objectAtIndex:i];
+//            break;
+//        }
+//    }
+//    
+//    if(!SR_script){  //It didn't found the script
+//        NSLog(@"ORCA script %@ not found. \n", userscriptname);
+//    }
+//    else if([[SR_script scriptName] isEqualToString:@"ECA_singleRun"]){
+//        //Set global variables
+//        NSLog(@"Set values in %@ ORCA script. \n",userscriptname);
+//        [self addGlobalVariable:@0 withName:@"pattern" withValue:[self ECA_pattern]];
+//        [self addGlobalVariable:@1 withName:@"eca_type" withValue:[self ECA_type]];
+//        [self addGlobalVariable:@2 withName:@"tslope_pattern" withValue:[self ECA_tslope_pattern]];
+//        [self addGlobalVariable:@3 withName:@"sub_run_time" withValue:[self ECA_subrun_time]];
+//    }
+//    
+//    //Clean script pointer
+//    SR_script = nil;
     
 }
 
@@ -1154,7 +1217,7 @@ ECA_subrun_time = _ECA_subrun_time;
     NSDictionary *detectorSettings = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
 
     if(error) {
-        NSLog(@"Error querying couchDB, please check the connection is correct %@ \n",error);
+        NSLog(@"Error querying couchDB, please check the connection is correct: \n %@ \n", ret);
         return false;
     }
     
@@ -1173,6 +1236,8 @@ ECA_subrun_time = _ECA_subrun_time;
         for (int iparam=0; iparam<kDbLookUpTableSize; iparam++) {
             [mtcModel setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtcModel getDBKeyByIndex:iparam]] forIndex:iparam];
         }
+        
+        NSLog(@"Standard run %@ settings loaded. \n",runTypeName);
         return true;
     }
     @catch (NSException *e) {
@@ -1242,8 +1307,6 @@ ECA_subrun_time = _ECA_subrun_time;
     
     [[self orcaDbRefWithEntryDB:self withDB:@"orca"] addDocument:detectorSettings tag:@"kStandardRunDocumentAdded"];
 
-    while([self isWaitingForResponse]){
-    }
     NSLog(@"%@ run saved as standard run. \n",runTypeName);
     return true;
 

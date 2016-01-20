@@ -104,14 +104,16 @@
     
     bool isEmergencyStopEnabled;
     bool isEStopPolling;
-    
-    //Standard runs stuff
-    NSNumber *_ECA_pattern_number;
-    NSNumber *_ECA_type;
-    NSNumber *_ECA_tslope_pattern;
-    NSNumber *_ECA_subrun_time;
-    ORScriptIDEModel *SR_script;
-    ORRunModel* runControl;
+
+    @private
+        //Standard runs stuff
+        int ECA_pattern;
+        int ECA_type;
+        int ECA_tslope_pattern;
+        double ECA_subrun_time;
+
+        ORScriptIDEModel *SR_script;
+        ORRunModel* runControl;
     
 }
 
@@ -150,11 +152,6 @@
 @property (copy) NSDictionary* configDocument;
 @property (copy) NSDictionary* mtcConfigDoc;
 
-//Standard runs
-@property (nonatomic,copy) NSNumber *ECA_pattern_number;
-@property (nonatomic,copy) NSNumber *ECA_type;
-@property (nonatomic,copy) NSNumber *ECA_tslope_pattern;
-@property (nonatomic,copy) NSNumber *ECA_subrun_time;
 
 - (void) initSmellieRunDocsDic;
 - (void) initOrcaDBConnectionHistory;
@@ -199,6 +196,18 @@
 #pragma mark ¥¥¥Accessors
 - (void) setViewType:(int)aViewType;
 - (int) viewType;
+- (int) ECA_pattern;
+- (int) ECA_type;
+- (int) ECA_tslope_pattern;
+- (double) ECA_subrun_time;
+- (void) setECA_pattern:(int)aValue;
+- (void) setECA_type:(int)aValue;
+- (void) setECA_tslope_pattern:(int)aValue;
+- (void) setECA_subrun_time:(double)aValue;
+- (int) getECA_pattern;
+- (int) getECA_type;
+- (int) getECA_tslope_pattern;
+- (double) getECA_subrun_time;
 
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups;
@@ -255,3 +264,4 @@ extern NSString* ORSNOPModelOrcaDBIPAddressChanged;
 extern NSString* ORSNOPModelDebugDBIPAddressChanged;
 extern NSString* SNOPRunTypeChangedNotification;
 extern NSString* ORSNOPRunsLockNotification;
+extern NSString* ORSNOPModelRunsECAChangedNotification;

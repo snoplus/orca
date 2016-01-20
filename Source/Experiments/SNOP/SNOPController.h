@@ -105,16 +105,13 @@
     IBOutlet NSButton* runsLockButton;
     IBOutlet NSTextField *runStatusTextField;
 
-    //*****Standard runs*****//
-    //ECA
+    //ECA RUNS
     IBOutlet NSPopUpButton *ECApatternPopUpButton;
-    IBOutlet NSTextField *ECApatternCheckBox;
     IBOutlet NSPopUpButton *ECAtypePopUpButton;
-    IBOutlet NSTextField *ECAtypeCheckBox;
     IBOutlet NSTextField *TSlopePatternTextField;
     IBOutlet NSTextField *subTimeTextField;
-    IBOutlet NSButton *loadValuesButton;
     
+    //STANDARD RUNS
     IBOutlet NSComboBox *standardRunPopupMenu;
     IBOutlet NSButton *standardRunSaveButton;
     IBOutlet NSButton *standardRunLoadButton;
@@ -127,8 +124,6 @@
 @property (nonatomic,retain) NSMutableDictionary *snopRunTypeMaskDic;
 @property (nonatomic,retain) NSDictionary *smellieRunFile;
 @property (nonatomic,retain) NSNumber *runTypeMask;
-//Standard runs
-@property (assign) IBOutlet NSButton *loadValuesButton;
 
 #pragma mark ¥¥¥Initialization
 - (void) registerNotificationObservers;
@@ -182,10 +177,6 @@
 -(void) fetchRunMaskSettings;
 
 - (IBAction) runsLockAction:(id)sender;
-
-//Standard runs
-- (IBAction) loadValues:(id)sender;
-- (IBAction) ECACheckValues:(id)sender;
 
 @end
 @interface ORDetectorView (SNO)
