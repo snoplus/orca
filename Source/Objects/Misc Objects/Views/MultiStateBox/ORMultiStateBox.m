@@ -42,7 +42,6 @@ void freeBMPData(void *info, const void *data, size_t size) {
                     int a = x-bd-sz+bev;
                     int b = y-bd-sz+bev;
                     float fact = (1.0 - (a > b ? a : b)/(double)bev) * 0.3 + 0.7;
-                    printf("bev: fact %f a %d b %d\n",fact,a,b);
                     val = 0xFF000000 | (((int)(((val>>16)&0xFF)*fact))<<16) | (((int)(((val>>8)&0xFF)*fact))<<8) | (((int)(((val>>0)&0xFF)*fact))<<0);
                     bmp[y*dim+x] = val;
                 } else {
