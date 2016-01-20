@@ -35,6 +35,10 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
 #define kOnCallAlarmWaitTime        3*60
 #define kOnCallAcknowledgeWaitTime 10*60
 
+@interface OROnCallListModel (private)
+- (void) postCouchDBRecord;
+@end
+
 
 @implementation OROnCallListModel
 
@@ -65,6 +69,11 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
 - (void) setUpImage         { [self setImage:[NSImage imageNamed:@"OnCallList"]]; }
 - (void) makeMainController { [self linkToController:@"OROnCallListController"];  }
 - (NSString*) helpURL       { return @"Subsystems/On_Call_List.html";             }
+
+- (void) awakeAfterDocumentLoaded
+{
+    [self postCouchDBRecord];
+}
 
 #pragma mark ***Accessors
 
@@ -156,7 +165,7 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
         }
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:OROnCallListModelReloadTable object:self];
-
+    [self postCouchDBRecord];
 }
 
 - (void) registerNotificationObservers
@@ -537,5 +546,18 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
     OROnCallPerson* copy = [[OROnCallPerson alloc] init];
     copy.data = [[data copyWithZone:zone] autorelease];
     return copy;
+}
+@end
+
+@implementation OROnCallListModel (private)
+- (void) postCouchDBRecord
+{
+    NSMutableDictionary* record = [NSMutableDictionary dictionary];
+    if([self primaryPerson])[record setObject:[[self primaryPerson] data] forKey:@"Primary"];
+    if([self secondaryPerson])[record setObject:[[self secondaryPerson] data] forKey:@"Secondary"];
+    if([self tertiaryPerson])[record setObject:[[self tertiaryPerson] data] forKey:@"Tertiary"];
+    
+    NSLog(@"%@\n",record);
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:record];
 }
 @end
