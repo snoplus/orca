@@ -216,6 +216,7 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
             [tertiary setStatus:[NSString stringWithFormat:@"Will Contact: %@",[contactDate descriptionFromTemplate:@"HH:mm:ss"]]];
         }
     }
+    [self postCouchDBRecord];
     [[NSNotificationCenter defaultCenter] postNotificationName:OROnCallListPeopleNotifiedChanged object:self];
 }
 
