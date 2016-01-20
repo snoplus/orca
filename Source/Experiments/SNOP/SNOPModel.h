@@ -209,6 +209,10 @@
 - (int) getECA_tslope_pattern;
 - (double) getECA_subrun_time;
 
+#pragma mark ¥¥¥Archival
+- (id)initWithCoder:(NSCoder*)decoder;
+- (void)encodeWithCoder:(NSCoder*)encoder;
+
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups;
 

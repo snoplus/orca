@@ -640,7 +640,6 @@ mtcConfigDoc = _mtcConfigDoc;
 	} // synchronized
 }
 
-
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups
 {
@@ -825,6 +824,7 @@ mtcConfigDoc = _mtcConfigDoc;
     
     [self setViewType:[decoder decodeIntForKey:@"viewType"]];
 
+    //CouchDB
     self.orcaDBUserName = [decoder decodeObjectForKey:@"ORSNOPModelOrcaDBUserName"];
     self.orcaDBPassword = [decoder decodeObjectForKey:@"ORSNOPModelOrcaDBPassword"];
     self.orcaDBName = [decoder decodeObjectForKey:@"ORSNOPModelOrcaDBName"];
@@ -835,9 +835,14 @@ mtcConfigDoc = _mtcConfigDoc;
     self.debugDBName = [decoder decodeObjectForKey:@"ORSNOPModelDebugDBName"];
     self.debugDBPort = [decoder decodeInt32ForKey:@"ORSNOPModelDebugDBPort"];
     self.debugDBIPAddress = [decoder decodeObjectForKey:@"ORSNOPModelDebugDBIPAddress"];
-    
+
+    //Runs tab
     self.runTypeMask = [decoder decodeObjectForKey:@"SNOPRunTypeMask"];
-	
+    [self setECA_pattern:[decoder decodeIntForKey:@"SNOPECApattern"]];
+    [self setECA_type:[decoder decodeIntForKey:@"SNOPECAtype"]];
+    [self setECA_tslope_pattern:[decoder decodeIntForKey:@"SNOPECAtslppattern"]];
+    [self setECA_subrun_time:[decoder decodeDoubleForKey:@"SNOPECAsubruntime"]];
+    
     [[self undoManager] enableUndoRegistration];
     return self;
 }
@@ -847,6 +852,7 @@ mtcConfigDoc = _mtcConfigDoc;
     [super encodeWithCoder:encoder];
     [encoder encodeInt:viewType forKey:@"viewType"];
 
+    //CouchDB
     [encoder encodeObject:self.orcaDBUserName forKey:@"ORSNOPModelOrcaDBUserName"];
     [encoder encodeObject:self.orcaDBPassword forKey:@"ORSNOPModelOrcaDBPassword"];
     [encoder encodeObject:self.orcaDBName forKey:@"ORSNOPModelOrcaDBName"];
@@ -857,7 +863,14 @@ mtcConfigDoc = _mtcConfigDoc;
     [encoder encodeObject:self.debugDBName forKey:@"ORSNOPModelDebugDBName"];
     [encoder encodeInt32:self.debugDBPort forKey:@"ORSNOPModelDebugDBPort"];
     [encoder encodeObject:self.debugDBIPAddress forKey:@"ORSNOPModelDebugDBIPAddress"];
+
+    //Runs tab
     [encoder encodeObject:self.runTypeMask forKey:@"SNOPRunTypeMask"];
+    [encoder encodeInt:[self ECA_pattern] forKey:@"SNOPECApattern"];
+    [encoder encodeInt:[self ECA_type] forKey:@"SNOPECAtype"];
+    [encoder encodeInt:[self ECA_tslope_pattern] forKey:@"SNOPECAtslppattern"];
+    [encoder encodeDouble:[self ECA_subrun_time] forKey:@"SNOPECAsubruntime"];
+    
 }
 
 - (NSString*) reformatSelectionString:(NSString*)aString forSet:(int)aSet
@@ -1074,11 +1087,6 @@ mtcConfigDoc = _mtcConfigDoc;
     
 }
 
-- (int) getECA_pattern
-{
-    return ECA_pattern;
-}
-
 - (int)ECA_type
 {
     return ECA_type;
@@ -1090,11 +1098,6 @@ mtcConfigDoc = _mtcConfigDoc;
     ECA_type = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
     
-}
-
-- (int) getECA_type
-{
-    return ECA_type;
 }
 
 - (int)ECA_tslope_pattern
@@ -1110,10 +1113,6 @@ mtcConfigDoc = _mtcConfigDoc;
     
 }
 
-- (int) getECA_tslope_pattern{
-    return ECA_tslope_pattern;
-}
-
 - (double)ECA_subrun_time
 {
     return ECA_subrun_time;
@@ -1124,70 +1123,6 @@ mtcConfigDoc = _mtcConfigDoc;
     
     ECA_subrun_time = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
-    
-}
-
-- (double) getECA_subrun_time{
-    return ECA_subrun_time;
-}
-
-- (void) loadVariablesInScript:(NSString*)userscriptname
-{
-    
-//    //Collect ALL the RunScripts & ORCAScripts in an array
-//    NSArray* runscripts = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunScriptModel")];
-//    NSArray* orcascripts = [[self document] collectObjectsOfClass:NSClassFromString(@"ORScriptTaskModel")];
-//    
-//    //Look for the requested runscript by looping through the script names
-//    for (int i=0; i<[runscripts count]; i++) {
-//        //NSLog(@"%d: %@ \n", i, [runscripts[i] scriptName]);
-//        if([[runscripts[i] scriptName] isEqualToString:userscriptname])
-//        {
-//            //This is the one we are looking for so get the script and exit
-//            SR_script = [runscripts objectAtIndex:i];
-//            break;
-//        }
-//    }
-//    
-//    //Look for the requested orcascript by looping through the script names
-//    for (int i=0; i<[orcascripts count]; i++) {
-//        //NSLog(@"%d: %@ \n", i, [orcascripts[i] scriptName]);
-//        if([[orcascripts[i] scriptName] isEqualToString:userscriptname])
-//        {
-//            //This is the one we are looking for so get the script and exit
-//            SR_script = [orcascripts objectAtIndex:i];
-//            break;
-//        }
-//    }
-//    
-//    if(!SR_script){  //It didn't found the script
-//        NSLog(@"ORCA script %@ not found. \n", userscriptname);
-//    }
-//    else if([[SR_script scriptName] isEqualToString:@"ECA_singleRun"]){
-//        //Set global variables
-//        NSLog(@"Set values in %@ ORCA script. \n",userscriptname);
-//        [self addGlobalVariable:@0 withName:@"pattern" withValue:[self ECA_pattern]];
-//        [self addGlobalVariable:@1 withName:@"eca_type" withValue:[self ECA_type]];
-//        [self addGlobalVariable:@2 withName:@"tslope_pattern" withValue:[self ECA_tslope_pattern]];
-//        [self addGlobalVariable:@3 withName:@"sub_run_time" withValue:[self ECA_subrun_time]];
-//    }
-//    
-//    //Clean script pointer
-//    SR_script = nil;
-    
-}
-
-- (void) addGlobalVariable:(NSNumber*)varindex withName:(NSString*)varname withValue:(NSNumber*)varvalue
-{
-    
-    NSLog(@"Adding new global variable: %@ = %@ \n",varname, varvalue);
-    //Add new global variable in case it doesn't already exist
-    if([varindex integerValue] + 1 > [[SR_script inputValues] count]){
-        [SR_script addInputValue];
-    }
-    
-    //Copy the value
-    [[SR_script inputValues] replaceObjectAtIndex:[varindex intValue] withObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:varname,@"name",[NSDecimalNumber numberWithUnsignedLong:[varvalue intValue]],@"iValue",nil]];
     
 }
 

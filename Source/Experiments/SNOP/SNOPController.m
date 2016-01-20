@@ -1082,6 +1082,7 @@ smellieRunFile;
     [standardRunSaveButton setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunLoadButton setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunLoadToHWButton setEnabled:!lockedOrNotRunningMaintenance];
+    [standardRunDeleteButton setEnabled:!lockedOrNotRunningMaintenance];
     
     [runStatusTextField setStringValue:@"UNLOCKED"];
     [runStatusTextField setBackgroundColor:[NSColor colorWithSRGBRed:0 green:0 blue:1 alpha:1]];
@@ -1158,9 +1159,16 @@ smellieRunFile;
 - (IBAction)saveStandardRunToDBAction:(id)sender {
     [model saveStandardRun:[standardRunPopupMenu objectValueOfSelectedItem]];
 }
+- (IBAction)deleteStandardRun:(id)sender {
+
+    [standardRunPopupMenu removeItemWithObjectValue:[standardRunPopupMenu stringValue]];
+    [standardRunPopupMenu selectItemAtIndex:0];
+
+}
 
 - (IBAction)addNewStandardRunAction:(id)sender {
-    if ([standardRunPopupMenu indexOfItemWithObjectValue:[standardRunPopupMenu stringValue]] == NSNotFound) {
+    if ([standardRunPopupMenu indexOfItemWithObjectValue:[standardRunPopupMenu stringValue]] == NSNotFound &&
+        [[standardRunPopupMenu stringValue] isNotEqualTo:@""]) {
         [standardRunPopupMenu addItemWithObjectValue:[standardRunPopupMenu stringValue]];
         [standardRunPopupMenu selectItemWithObjectValue:[standardRunPopupMenu stringValue]];
     }

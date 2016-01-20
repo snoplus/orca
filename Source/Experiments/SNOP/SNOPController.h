@@ -116,6 +116,7 @@
     IBOutlet NSButton *standardRunSaveButton;
     IBOutlet NSButton *standardRunLoadButton;
     IBOutlet NSButton *standardRunLoadToHWButton;
+    IBOutlet NSButton *standardRunDeleteButton;
     
 }
 
