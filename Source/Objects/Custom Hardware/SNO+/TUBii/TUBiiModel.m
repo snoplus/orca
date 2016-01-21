@@ -221,6 +221,44 @@
     //See comments in setGTDelayBits for info
     return [self sendIntCmd:@"GetLODelay"];
 }
+- (void) setGTDelaysInNS:(int)DGT LOValue:(int)LO {
+    //Convenience method that sets the DGT and LO delays
+    //and automatically converts from nano seconds to bit values
+    [self setGTDelaysBits:[self DGT_NanoSecondsToBits:DGT]
+                   LOBits:[self LODelay_NanoSecondsToBits:LO]];
+}
+- (int) LODelayInNS {
+    //Convenience method that gets the LO width/delay and
+    //automatically handles the conversion from bit value to nanoseconds
+    //See Comments in setGTDelayBits for more info
+    return [self LODelay_NanoSecondsToBits:[self LODelayBits]];
+}
+- (int) DGTInNS {
+    //Convenience method that gets the DGT delay and
+    //automatically handles the conversion from bit value to nanoseconds
+    //See Comments in setGTDelayBits for more info
+    return [self DGT_BitsToNanoSeconds:[self DGTBits]];
+}
+- (int) LODelay_BitsToNanoSeconds: (NSUInteger)Bits {
+    //Helper method that handles the conversion to ns from bits for the
+    //LO delay on TUBii
+    return [self ConvertBitsToValue:Bits NBits:8 MinVal:0 MaxVal: 1275];
+}
+- (NSUInteger) LODelay_NanoSecondsToBits: (int) Nanoseconds {
+    //Helper method that handles the conversion to bits from ns for the
+    //LO delay on TUBii
+    return [self ConvertValueToBits:Nanoseconds NBits:8 MinVal:0 MaxVal:1275];
+}
+- (int) DGT_BitsToNanoSeconds: (NSUInteger) Bits {
+    //Helper method that handles the conversion to ns from bits for the
+    //DGT delay on TUBii
+    return [self ConvertBitsToValue:Bits NBits:8 MinVal:0 MaxVal: 510];
+}
+- (NSUInteger) DGT_NanoSecondsToBits: (int) Nanoseconds {
+    //Helper method that handles the conversion to bits from ns for the
+    //DGT delay on TUBii
+    return [self ConvertValueToBits:Nanoseconds NBits:8 MinVal:0 MaxVal:510];
+}
 - (void) setTrigMask:(NSUInteger)_trigMask {
     //Sets which trigger inputs are capable causing TUBii to issue a Raw Trigger
     NSString * const command = [NSString stringWithFormat:@"SetTriggerMask %d",_trigMask];
@@ -332,6 +370,31 @@
     //See setMTCAMimic1_Threshold for more info
     return [self sendIntCmd:@"GetDACThreshold"];
 }
+- (void) setMTCAMimic1_ThresholdInVolts:(float)_MTCAMimic1_ThresholdInVolts {
+    //Sets the voltage Value MTCA Mimic thresold.
+    //The only difference between this and setMTCAMimic1_ThresholdInBits is that
+    //This takes a voltage value as an input. Whereas the other function takes a bit value.
+    //For more info see AD7243 data sheet and TUBii schematics pg 14
+    [self setMTCAMimic1_ThresholdInBits:[self MTCAMimic_VoltsToBits:_MTCAMimic1_ThresholdInVolts]];
+}
+- (float) MTCAMimic1_ThresholdInVolts {
+    //Gets the voltage alue MTCA Mimic DAC thresold.
+    //The only difference between this and MTCAMimic1_ThresholdInBits is that
+    //this returns the analog voltage value between -5.0V and 5.0V that the threshold
+    //is capable of being. Whereas the other function returns a bit value
+    //See AD7243 data sheet and TUBii schematics pg 14 for more info
+    return [self MTCAMimic_BitsToVolts:[self MTCAMimic1_ThresholdInBits]];
+}
+- (NSUInteger) MTCAMimic_VoltsToBits:(float)VoltageValue {
+    //Helper function that converts MTCA Mimic threshold values from a voltage
+    //to a 12 bit word. See AD7243 data sheet and TUBii schematics pg 14 for more info
+    return [self ConvertValueToBits:VoltageValue NBits:12 MinVal:-5.0 MaxVal:5.0];
+}
+- (float) MTCAMimic_BitsToVolts: (NSUInteger) BitValue {
+    //Helper function that converts MTCA Mimic 12 bit word to the corresponding
+    //analog threshold value. See AD7243 data sheet & TUBii schematics pg 14 for more info
+    return [self ConvertBitsToValue:BitValue NBits:12 MinVal:-5.0 MaxVal:5.0];
+}
 - (void) setSpeakerMask:(NSUInteger)_speakerMask{
     //Sets the mask for which trigger inputs should driver the speaker/aux jack on TUBii
     NSString * const command = [NSString stringWithFormat:@"SetSpeakerMask %d",_speakerMask];
@@ -341,6 +404,26 @@
     //See comment in setSpeakerMask for info about the speaker mask.
     NSString* const command = @"GetSpeakerMask";
     return [self sendIntCmd:command];
+}
+- (void) setTUBiiIsLOSrc:(BOOL)isSrc {
+    //Note if TUBii is the LO source than the lockoutSel_Bit should be low.
+    //High means the MTC/D is the LO source
+    //See TUBii schematics pg 13B
+    CONTROL_REG_MASK controlReg = [self controlReg];
+    if (!isSrc){
+        controlReg |= lockoutSel_Bit;
+    }
+    else {
+        controlReg &= ~lockoutSel_Bit;
+    }
+    [self setControlReg: controlReg];
+}
+- (BOOL) TUBiiIsLOSrc {
+    //Note if TUBii is the LO source than the lockoutSel_Bit should be low.
+    //High means the MTC/D is the LO
+    //See TUBii schematics pg 13B
+    CONTROL_REG_MASK controlReg = [self controlReg];
+    return !((controlReg & lockoutSel_Bit) >0);
 }
 - (void) setTUBiiIsDefaultClock: (BOOL) IsDefault {
     //Note if TUBii is the Default clock the clkSel_Bit should be high
@@ -403,6 +486,21 @@
         [self sendOkCmd:@"SetCounterMode 0"]; //Totalizer Mode
     }
 }
+- (float) ConvertBitsToValue:(NSUInteger)bits NBits: (int) nBits MinVal: (float) minVal MaxVal: (float) maxVal{
+    //Helper function converts a bit value to a float value where it's assume
+    //that if all the bits are zero the desired float value is MinVal and
+    //if all the bits are 1 the desired float value is maxVal.
+    float stepSize = (maxVal - minVal)/(pow(2, nBits)-1.0);
+    return bits*stepSize+minVal;
+}
+- (NSUInteger) ConvertValueToBits: (float) value NBits: (int) nBits MinVal: (float) minVal MaxVal: (float) maxVal{
+    //Helper function converts a float value to a bit value.
+    //It's assumed that a float value equal to MinVal is equal to a bit value of all 0s
+    //and a float value equal to MaxVal is equal to all 1's
+    float stepSize = (maxVal - minVal)/(pow(2,nBits)-1.0);
+    return (value - minVal)/stepSize;
+}
+
 - (BOOL) CounterMode {
     //See comments in setCounterMode for info
     return ([self sendIntCmd:@"GetCounterMode"]) > 0;

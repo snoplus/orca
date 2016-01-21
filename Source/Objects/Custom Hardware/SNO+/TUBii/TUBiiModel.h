@@ -98,16 +98,20 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 @property (nonatomic) NSUInteger tellieDelay;
 @property (nonatomic) NSUInteger genericDelay;
 @property (nonatomic) NSUInteger MTCAMimic1_ThresholdInBits;
+@property (nonatomic) float MTCAMimic1_ThresholdInVolts;
 @property (nonatomic) BOOL ECALMode;
 @property (nonatomic,readonly) CAEN_CHANNEL_MASK caenChannelMask;
 @property (nonatomic,readonly) CAEN_GAIN_MASK caenGainMask;
 @property (nonatomic,readonly) NSUInteger DGTBits;
 @property (nonatomic,readonly) NSUInteger LODelayBits;
+@property (nonatomic,readonly) int LODelayInNS;
+@property (nonatomic,readonly) int DGTInNS;
 @property (nonatomic) NSUInteger speakerMask;
 @property (nonatomic) NSUInteger counterMask;
 @property (nonatomic) NSUInteger trigMask;
 @property (nonatomic) CONTROL_REG_MASK controlReg;
 @property (nonatomic) BOOL TUBiiIsDefaultClock;
+@property (nonatomic) BOOL TUBiiIsLOSrc;
 @property (nonatomic) BOOL CounterMode;
 
 #pragma mark •••Initialization
@@ -119,8 +123,13 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 - (void) dealloc;
 - (BOOL) solitaryObject;
 
+- (float) ConvertBitsToValue:(NSUInteger)bits NBits: (int) nBits MinVal: (float) minVal MaxVal: (float) maxVal;
+- (NSUInteger) ConvertValueToBits: (float) value NBits: (int) nBits MinVal: (float) minVal MaxVal: (float) maxVal;
+
 - (void) sendOkCmd:(NSString* const)aCmd;
 - (int) sendIntCmd:(NSString* const)aCmd;
+- (NSUInteger) MTCAMimic_VoltsToBits: (float) VoltageValue;
+- (float) MTCAMimic_BitsToVolts: (NSUInteger) BitValue;
 - (void) fireSmelliePulser;
 - (void) fireTelliePulser;
 - (void) firePulser;
@@ -133,5 +142,13 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
             GainMask:(CAEN_GAIN_MASK) aGainMask;
 
 - (void) setGTDelaysBits:(NSUInteger)aDGTMask LOBits:(NSUInteger)aLOMask;
+- (void) setGTDelaysInNS:(int)DGT LOValue:(int)LO;
+- (int) LODelay_BitsToNanoSeconds: (NSUInteger)Bits;
+- (NSUInteger) LODelay_NanoSecondsToBits: (int) Nanoseconds;
+- (int) DGT_BitsToNanoSeconds: (NSUInteger) Bits;
+- (NSUInteger) DGT_NanoSecondsToBits: (int) Nanoseconds;
+
+
+
 - (void) ResetClock;
 @end

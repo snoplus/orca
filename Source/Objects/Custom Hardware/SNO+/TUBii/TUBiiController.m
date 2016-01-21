@@ -354,24 +354,24 @@
 - (IBAction)GTDelaysLoadMask:(id)sender {
     float LO_Delay = [LO_Field floatValue];
     float DGT_Delay = [DGT_Field floatValue];
-    CONTROL_REG_MASK ControlReg;
-    [model setGTDelaysBits: [self ConvertValueToBits:DGT_Delay NBits:8 MinVal:0 MaxVal:510]
-                    LOBits: [self ConvertValueToBits:LO_Delay NBits:8 MinVal:0 MaxVal:1275]];
+    [model setGTDelaysInNS:DGT_Delay LOValue:LO_Delay];
+
     if([[LO_SrcSelect selectedCell] tag] ==1){
-        ControlReg = [model controlReg] | lockoutSel_Bit;
+        //MTCD is LO Src is selected
+        [model setTUBiiIsLOSrc:NO];
     }
-    else{
-        ControlReg = [model controlReg] & ~lockoutSel_Bit;
+    else {
+        //TUBii is LO Src is selected
+        [model setTUBiiIsLOSrc:YES];
     }
-    [model setControlReg: ControlReg];
 }
 - (IBAction)GTDelaysMatchHardware:(id)sender {
-    float LO_Delay = [self ConvertBitsToValue:[model LOBits] NBits:8 MinVal:0 MaxVal:1275];
-    [LO_Slider setFloatValue:LO_Delay];
+    float LO_Delay = [model LODelayInNS];
+    [LO_Slider setIntValue:LO_Delay];
     [LO_Field setIntegerValue:LO_Delay];
-    float DGT_Delay = [self ConvertBitsToValue:[model DGTBits] NBits:8 MinVal:0 MaxVal:510];
-    [DGT_Slider setFloatValue:DGT_Delay];
-    [DGT_Field setIntegerValue:DGT_Delay];
+    float DGT_Delay = [model DGTInNS];
+    [DGT_Slider setIntValue:DGT_Delay];
+    [DGT_Field setIntValue:DGT_Delay];
     if (([model controlReg] & lockoutSel_Bit)>0){
         [LO_SrcSelect selectCellWithTag:1];
     }
@@ -438,16 +438,15 @@
     [MTCAMimic_TextField setStringValue:[NSString stringWithFormat:@"%.3f",[MTCAMimic_Slider floatValue]]];
 }
 - (IBAction)MTCAMimicMatchHardware:(id)sender {
-    NSUInteger DACBits= [model MTCAMimic1_Threshold];
+    NSUInteger ThresholdValue= [model MTCAMimic1_ThresholdInVolts];
     //Bit value of the DAC
-    float value =[self ConvertBitsToValue:DACBits NBits:12 MinVal:-5.0 MaxVal:5.0];
-    [MTCAMimic_Slider setFloatValue:value];
-    [MTCAMimic_TextField setFloatValue:value];
+
+    [MTCAMimic_Slider setFloatValue:ThresholdValue];
+    [MTCAMimic_TextField setFloatValue:ThresholdValue];
 }
 - (IBAction)MTCAMimicLoadValue:(id)sender {
     double value = [MTCAMimic_TextField floatValue];
-    NSUInteger DACBits = [self ConvertValueToBits:value NBits:12 MinVal:-5.0 MaxVal:5.0];
-    [model setMTCAMimic1_Threshold:DACBits];
+    [model setMTCAMimic1_ThresholdInVolts:value];
 }
 
 - (IBAction)LoadClockSource:(id)sender {
@@ -484,14 +483,5 @@
             [[aMatrix cellWithTag:i] setState:0];
         }
     }
-}
-
-- (float) ConvertBitsToValue:(NSUInteger)bits NBits: (int) nBits MinVal: (float) minVal MaxVal: (float) maxVal{
-    float stepSize = (maxVal - minVal)/(pow(2, nBits)-1.0);
-    return bits*stepSize+minVal;
-}
-- (NSUInteger) ConvertValueToBits: (float) value NBits: (int) nBits MinVal: (float) minVal MaxVal: (float) maxVal{
-    float stepSize = (maxVal - minVal)/(pow(2,nBits)-1.0);
-    return (value - minVal)/stepSize;
 }
 @end
