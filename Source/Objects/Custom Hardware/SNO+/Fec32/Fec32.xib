@@ -2751,7 +2751,7 @@
                     <popUpButton verticalHuggingPriority="750" id="1381">
                         <rect key="frame" x="495" y="552" width="183" height="22"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <popUpButtonCell key="cell" type="push" title="PMT States" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="ytn-L2-3Hn" id="1919">
+                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="1919">
                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="smallSystem"/>
                             <menu key="menu" title="OtherViews" id="1383">
@@ -2762,7 +2762,7 @@
                                     <menuItem title="Thresholds" id="1385"/>
                                     <menuItem title="VBals" id="1602"/>
                                     <menuItem title="CMOS Rates" id="1808"/>
-                                    <menuItem title="PMT States" state="on" id="ytn-L2-3Hn"/>
+                                    <menuItem title="PMT States" id="ytn-L2-3Hn"/>
                                 </items>
                             </menu>
                         </popUpButtonCell>
@@ -2770,7 +2770,7 @@
                             <action selector="variableDisplayPUAction:" target="-2" id="1887"/>
                         </connections>
                     </popUpButton>
-                    <tabView type="noTabsBezelBorder" id="1387">
+                    <tabView type="noTabsBezelBorder" initialItem="FVw-vu-uZj" id="1387">
                         <rect key="frame" x="494" y="189" width="185" height="366"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <font key="font" metaFont="system"/>
@@ -5311,7 +5311,7 @@
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Enabled" id="cjT-x5-bNd">
                                                 <font key="font" metaFont="smallSystem"/>
-                                                <color key="textColor" red="0.1142493381" green="0.48758518950000002" blue="0.033423576259999997" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
+                                                <color key="textColor" red="0.0" green="0.0" blue="1" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
@@ -5320,7 +5320,7 @@
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Disabled" id="akf-0D-DFm">
                                                 <font key="font" metaFont="smallSystem"/>
-                                                <color key="textColor" red="0.53440824470000003" green="0.097053469099999998" blue="0.13502191259999999" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
+                                                <color key="textColor" red="1" green="0.0" blue="0.0" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
@@ -5334,9 +5334,9 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="VF5-ow-nGK">
-                                            <rect key="frame" x="5" y="25" width="85" height="14"/>
+                                            <rect key="frame" x="5" y="25" width="98" height="14"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Pending/Actual" id="Bgl-3k-BS8">
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Pending / Current" id="Bgl-3k-BS8">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
