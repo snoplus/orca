@@ -2574,7 +2574,7 @@
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Open" id="bU8-5W-lCl">
                                                             <font key="font" metaFont="system"/>
-                                                            <color key="textColor" red="0.0" green="0.83714535361842102" blue="0.0" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
+                                                            <color key="textColor" red="0.0" green="0.0" blue="1" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>

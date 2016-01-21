@@ -63,11 +63,10 @@ static NSDictionary* xl3Ops;
     
     NSDictionary *statedict = [NSDictionary dictionaryWithObjectsAndKeys:
                                [NSColor redColor], @"closed",
-                               [NSColor greenColor], @"open",
+                               [NSColor blueColor], @"open",
                                [NSColor blackColor], @"unk",
                                nil];
     msbox = [[ORMultiStateBox alloc] initWithStates:statedict size:20 pad:4 bevel:2];
-    //[statedict release];
 
 	NSString* key = [NSString stringWithFormat: @"orca.ORXL3%d.selectedtab",[model crateNumber]]; //uniqueIdNumber?
 	int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
