@@ -424,10 +424,10 @@
 }
 - (IBAction)ECAEnableChanged:(id)sender {
     if([[ECA_EnableButton selectedCell] tag]==1){ //ECA mode On is selected
-        [model setECAMode: YES];
+        [model setECALMode: YES];
     }
     else { //ECA mode Off is selected
-        [model setECAMode: NO];
+        [model setECALMode: NO];
     }
 }
 

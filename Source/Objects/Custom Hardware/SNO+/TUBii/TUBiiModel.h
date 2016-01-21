@@ -97,12 +97,12 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 @property (nonatomic) NSUInteger smellieDelay;
 @property (nonatomic) NSUInteger tellieDelay;
 @property (nonatomic) NSUInteger genericDelay;
-@property (nonatomic) NSUInteger MTCAMimic1_Threshold;
-@property (nonatomic) BOOL ECAMode;
+@property (nonatomic) NSUInteger MTCAMimic1_ThresholdInBits;
+@property (nonatomic) BOOL ECALMode;
 @property (nonatomic,readonly) CAEN_CHANNEL_MASK caenChannelMask;
 @property (nonatomic,readonly) CAEN_GAIN_MASK caenGainMask;
 @property (nonatomic,readonly) NSUInteger DGTBits;
-@property (nonatomic,readonly) NSUInteger LOBits;
+@property (nonatomic,readonly) NSUInteger LODelayBits;
 @property (nonatomic) NSUInteger speakerMask;
 @property (nonatomic) NSUInteger counterMask;
 @property (nonatomic) NSUInteger trigMask;
@@ -131,6 +131,7 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 - (void) setStatusReadout: (BOOL) val;
 -(void) setCaenMasks: (CAEN_CHANNEL_MASK)aChannelMask
             GainMask:(CAEN_GAIN_MASK) aGainMask;
-- (void) setGTDelaysBits: (NSUInteger) aDGTMask LOBits:(NSUInteger)aLOMask;
+
+- (void) setGTDelaysBits:(NSUInteger)aDGTMask LOBits:(NSUInteger)aLOMask;
 - (void) ResetClock;
 @end

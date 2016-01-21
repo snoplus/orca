@@ -167,32 +167,62 @@
 }
 
 - (void) ResetClock {
+    //Resets the clock error checking circuitry.
+    //i.e. if the circuitry detects an error in the clock and then automatcially
+    //switches over to the backup clock you need to reset the system with this command
+    //in order to go back to using the default clock
+    //See TUBii schematics page 7,7A, and 7B for more info.
     [self sendOkCmd:@"ResetCommand"];
 }
 -(void) setCaenMasks: (CAEN_CHANNEL_MASK)aChannelMask
             GainMask:(CAEN_GAIN_MASK) aGainMask; {
+    //Sets the two shift registers that specify how TUBii should handle the 12 Analog inputs (A0-A11) it has.
+    //The channel mask specifies which channels should be routed from input to output.
+    //There are 4 output channels (C0,C1,C2,&C3) which are capable of being sent 1 of 2 different inputs.
+    //i.e. If bit 0 in the channel mask is low then C0 recieves A0 as input. If bit 0 is high C0 recieves A8 as input.
+    //The same is true for the scope output (S0 can recieve either A0 or A8 as input)
+    //Only the first 4 bits of the channel mask are used
+    //
+    //The Gain mask controls what sort of attenuations is applied to a given channel's input.
+    //The 8 CAEN outputs (C0-C7) are controlled by a bit in the GainMask.
+    //If a Bit is high that channel is attenuated. If low that channel has unity-gain.
+    //
+    //These two masks have to be set at the same time b/c the 8-bit shift registers that
+    //hold these masks are daisy chained together so in effect it's a single 16 bit shift register
+    //
+    //See TUBii Schematics pages 11A and 11B for more info.
     NSString* const command = [NSString stringWithFormat:@"SetCAENWords %d %d",aGainMask,aChannelMask];
     [self sendOkCmd:command];
 }
 -(CAEN_CHANNEL_MASK) caenChannelMask {
+    //See comments in setCaenMask for info
     NSString* const command = @"GetCAENChannelSelectWord";
     return [self sendIntCmd:command];
 }
-
 -(CAEN_GAIN_MASK) caenGainMask {
+    //See comments in setCaenMask for info
     return [self sendIntCmd:@"GetCAENGainPathWord"];
 }
 - (void) setGTDelaysBits:(NSUInteger)aDGTMask LOBits:(NSUInteger)aLOMask {
+    //Sets two 8 bit shift register that are daisy chained together such that they
+    //act like a single 16 bit register.
+    //The first of these registers controls the length of time between when a GT arrives and when DGT is sent
+    //The seconds controls how long the LO window is.
+    //The chips that create these delays are the DS1023-200 and DS1023-500, see their data sheet for details
+    //See TUBii schematic page 13A for more info
     NSString* const command = [NSString stringWithFormat:@"SetGTDelays %d %d",aLOMask,aDGTMask];
     [self sendOkCmd:command];
 }
 - (NSUInteger) DGTBits{
+    //See comments in setGTDelayBits for info
     return [self sendIntCmd:@"GetDGTDelay"];
 }
-- (NSUInteger) LOBits{
+- (NSUInteger) LODelayBits{
+    //See comments in setGTDelayBits for info
     return [self sendIntCmd:@"GetLODelay"];
 }
 - (void) setTrigMask:(NSUInteger)_trigMask {
+    //Sets which trigger inputs are capable causing TUBii to issue a Raw Trigger
     NSString * const command = [NSString stringWithFormat:@"SetTriggerMask %d",_trigMask];
     [self sendOkCmd:command];
 }
@@ -200,43 +230,81 @@
     return [connection intCommand: "GetTriggerMask"];
 }
 - (void) setSmellieDelay:(NSUInteger)_smellieDelay {
+    //This specifies (in nanoseconds) how long the MicroZed should delay a pulse that
+    //is put into TUBii's SMELLIE Delay In port. After that delay the signal is then sent back out
+    //at TUBii's SMELLIE Delay Out port. Additionally the MicroZed registers the input signal as a trigger
+    //after that delay.
     NSString * const command = [NSString stringWithFormat:@"SetSmellieDelay %d",_smellieDelay];
     [self sendOkCmd:command];
 }
 - (NSUInteger) smellieDelay {
+    //See comments setSmellieDelay for info
     return [connection intCommand: "GetSmellieDelay"];
 }
 - (void) setTellieDelay:(NSUInteger)_tellieDelay {
+    //This specifies (in nanoseconds) how long the MicroZed should delay a pulse that
+    //is put into TUBii's TELLIE Delay In port. After that delay the signal is then sent back out
+    //at TUBii's TELLIE Delay Out port. Additionally the MicroZed registers the input signal as a trigger
+    //after that delay.
     NSString * const command = [NSString stringWithFormat:@"SetTellieDelay %d",_tellieDelay];
     [self sendOkCmd:command];
 }
 - (NSUInteger) tellieDelay {
+    //See comments in setTellieDelay for more info
     return [self sendIntCmd:@"GetTellieDelay"];
 }
 - (void) setGenericDelay:(NSUInteger)_genericDelay {
+    //This specifies how long a pulse fed into TUBii's Generic Delay in port in
+    //should be delayed before it appears on TUBii's Generic Delay Out port
+    //The arguement should be in nano-seconds.
+    //It's not currently supported in the TUBiiServer but the hardware supports a a coarse and a fine delay
+    //The coarse delay happens in the MicroZed, the fine delay is done by a chip on TUBii (a DS1023-50)
+    //The MicroZed is capable of ~10ns resolution on delays. The chip is capable of 0.5ns resolution.
+    //Hopefully I'll get around to adding this some time.
+    //
+    //As of the time of writing this it is not possible to trigger on this input.
+    ///See TUBii Schematics 8C for more information
     NSString * const command = [NSString stringWithFormat:@"SetGenericDelay %d",_genericDelay];
     [self sendOkCmd:command];
 }
 - (NSUInteger) genericDelay {
+    //See comments in setGenericDelay for info
     return [self sendIntCmd:@"GetGenericDelay"];
 }
 - (void) setCounterMask:(NSUInteger)_counterMask {
+    //Sets which trigger inputs are capable of incrementing the count
+    //for the scaler/counter on TUBii's front panel
+    //This is handled entierly within the MicroZed/TUBiiServer
     NSString * const command = [NSString stringWithFormat:@"SetCounterMask %d",_counterMask];
     [self sendOkCmd:command];
 }
 - (NSUInteger) counterMask {
+    //See comments in setCounterMask for info
     return [self sendIntCmd:@"GetCounterMask"];
 }
 - (void) setControlReg:(CONTROL_REG_MASK)_controlReg {
+    //TUBii's control register is an 8-bit shift register.
+    //It contains state information that is not expected to change very often
+    //i.e. It's values change on a run by run basis and not at 1khz or something like that.
+    //The bits in the register specify the following things.
+    //If TUBii is the default clock source or not (see setTUBiiIsDefaultClock for more info)
+    //If TUBii is the source for LO* (see setTUBiiIsLOSrc for more info)
+    //If TUBii is in ECAL Mode (see setECALMode for more info)
+    //Sets the Lead Zero Blanking, Test Mode and Inhibit bits for the Scaler/Counter on TUBii's front panel
+    //See TUBii schematics page 4 for even more info
     NSString * const command = [NSString stringWithFormat:@"SetControlReg %d",_controlReg];
     [self sendOkCmd:command];
 }
 - (CONTROL_REG_MASK) controlReg {
+    //See comments in setControlReg for more info
     return [self sendIntCmd:@"GetControlReg"];
 }
-- (void) setECAMode:(BOOL)_ECAMode {
+- (void) setECALMode:(BOOL)_ECALMode {
+    //ECAL Mode enabled means TUBii re-routes GT to it's EXT PED Out port (Ext Ped In then does nothing)
+    //To enter ECALMode the ecalEnable_Bit in the control register must be high
+    //See TUBii schematics page 10 and page 4 for more info
     CONTROL_REG_MASK controlReg = [self controlReg];
-    if (_ECAMode){
+    if (_ECALMode){
         controlReg |= ecalEnable_Bit;
     }
     else {
@@ -244,26 +312,42 @@
     }
     [self setControlReg: controlReg];
 }
-- (BOOL) ECAMode {
+- (BOOL) ECALMode {
+    //See comments setECAMode for info
     CONTROL_REG_MASK controlReg =[self controlReg];
     return (controlReg & ecalEnable_Bit) > 0;
 }
-- (void) setMTCAMimic1_Threshold:(NSUInteger)_MTCAMimic1_Threshold {
-    NSString * const command = [NSString stringWithFormat:@"SetDACThreshold %u",_MTCAMimic1_Threshold];
+- (void) setMTCAMimic1_ThresholdInBits:(NSUInteger)_MTCAMimic1_ThresholdInBits {
+    //Sets the bits on the DAC on TUBii that is used as a threshold against which
+    //an analog pulse is compared.
+    //See TUBii schematics page 14 or AD7243 data sheet for more info.
+    //
+    //The arguement for this must be the bits that are to be loaded into the DAC on TUBii
+    //To convert a threshold value to bits use the convinience function MTCAMimic_VoltsToBits
+    //Or skip the middle man and use the function setMTCAMimic_ThresholdInVolts
+    NSString * const command = [NSString stringWithFormat:@"SetDACThreshold %u",_MTCAMimic1_ThresholdInBits];
     [self sendOkCmd:command];
 }
-- (NSUInteger) MTCAMimic1_Threshold {
+- (NSUInteger) MTCAMimic1_ThresholdInBits {
+    //See setMTCAMimic1_Threshold for more info
     return [self sendIntCmd:@"GetDACThreshold"];
 }
 - (void) setSpeakerMask:(NSUInteger)_speakerMask{
+    //Sets the mask for which trigger inputs should driver the speaker/aux jack on TUBii
     NSString * const command = [NSString stringWithFormat:@"SetSpeakerMask %d",_speakerMask];
     [self sendOkCmd:command];
 }
 - (NSUInteger) speakerMask {
+    //See comment in setSpeakerMask for info about the speaker mask.
     NSString* const command = @"GetSpeakerMask";
     return [self sendIntCmd:command];
 }
 - (void) setTUBiiIsDefaultClock: (BOOL) IsDefault {
+    //Note if TUBii is the Default clock the clkSel_Bit should be high
+    //Low means the TUB is the default clock
+    //The default clock gets checked for errors, the backup clock is used in the event
+    //that the default clock fails/ has too many errors.
+    //See TUBii schematics pg 7A
     CONTROL_REG_MASK controlReg = [self controlReg];
     if (IsDefault){
         controlReg |= clkSel_Bit;
@@ -273,20 +357,28 @@
     }
     [self setControlReg: controlReg];
 }
--(BOOL) TUBiiIsDefaultClock {
+- (BOOL) TUBiiIsDefaultClock {
+    //See comment in setTUBiiIsDefaultClock for info
     CONTROL_REG_MASK controlReg = [self controlReg];
     return (controlReg & clkSel_Bit) >0;
 }
-- (void) setDataReadout:(BOOL)val {
-    if (val) {
+- (void) setDataReadout:(BOOL) Readout {
+    //This is implemented in the TUBii Server that runs on the MicroZed.
+    //It simply tells the MicroZed to begin reading out data about it's trigger inputs
+    //The data should include info about which triggers were high when a GT arrived as well as
+    if (Readout) {
         [self sendOkCmd:@"StartDataReadout"];
     }
     else {
         [self sendOkCmd:@"StopDataReadout"];
     }
 }
-- (void) setStatusReadout:(BOOL)val {
-    if (val) {
+- (void) setStatusReadout:(BOOL) Readout {
+    //This is implemented in the TUBii Server that runs on the MicroZed.
+    //It simply tells the MicroZed to send out status information
+    //At the time of writing this I can't say exactly what will be in the status packets
+    //It will include info about the state of the 100Mhz clock.
+    if (Readout) {
         [self sendOkCmd:@"StartStatusReadout"];
     }
     else {
@@ -294,6 +386,16 @@
     }
 }
 - (void) setCounterMode:(BOOL)mode {
+    //The TUBii Server logic on the MicroZed determines what the pin state should be for
+    //Rate mode or Totalizer mode.
+    //
+    //The way it should work is in Rate mode the counterReset and the counterLatch pin is
+    //toggled once per second that way the display only updates once per second and it
+    //displays how many count pulses were sent in that second.
+    //In totalizer mode the display is always latched and the count is never reset.
+    //
+    //The max rate the scaler is capable is 750kHz, the MZ (puroposefully) limits it even further to ~500kHz
+    //See data sheet for SUBCub 28a and TUBii schematics pages 3,4, and FP_6 for more info
     if (mode) {
         [self sendOkCmd:@"SetCounterMode 1"]; //Rate Mode
     }
@@ -302,6 +404,7 @@
     }
 }
 - (BOOL) CounterMode {
+    //See comments in setCounterMode for info
     return ([self sendIntCmd:@"GetCounterMode"]) > 0;
 }
 @end
