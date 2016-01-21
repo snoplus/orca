@@ -95,9 +95,7 @@
         portNumber =      [ aCoder decodeIntForKey:@"TUBiiModelPortNumber"];
         strHostName =     [ aCoder decodeObjectForKey:@"TUBiiModelStrHostName"];
         if (!strHostName) {
-            [strHostName dealloc]; //Not sure if this is needed or not.
             strHostName = [[NSString alloc]initWithUTF8String:TUBII_DEFAULT_IP];
-
         }
         if (!portNumber) {
             portNumber = TUBII_DEFAULT_PORT;
