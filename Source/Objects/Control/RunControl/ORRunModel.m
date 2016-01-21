@@ -1381,16 +1381,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     }
 }
 
-- (void) stopRunStage1
-{
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(stopRunStage1) object:nil];
-    if([objectsRequestingStateChangeWait count]==0)[self stopRunStage2];
-    else {
-        [self performSelector:@selector(stopRunStage1) withObject:nil afterDelay:0];
-    }
-}
 
-- (void) stopRunStage2
+- (void) stopRunStage1
 {
 	if([self runningState] == eRunStopping){
 		NSLog(@"Stop Run message received and ignored because run is already stopping.\n");
@@ -1433,9 +1425,19 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		
 		totalWaitTime = 0;
 		
-		[self waitForRunToStop];
-	}	
+        [self stopRunStage2];
+	}
 }
+
+- (void) stopRunStage2
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(stopRunStage2) object:nil];
+    if([objectsRequestingStateChangeWait count]==0)[self waitForRunToStop];
+    else {
+        [self performSelector:@selector(stopRunStage2) withObject:nil afterDelay:0];
+    }
+}
+
 
 - (void) needMoreTimeToStopRun:(NSNotification*)aNote
 {

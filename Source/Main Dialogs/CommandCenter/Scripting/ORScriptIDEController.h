@@ -61,7 +61,8 @@
 	IBOutlet NSButton*			pauseButton;
 	IBOutlet NSButton*			stepButton;
 	IBOutlet NSButton*			stepInButton;
-	IBOutlet NSButton*			stepOutButton;
+    IBOutlet NSButton*			stepOutButton;
+    IBOutlet NSButton*			debuggerButton;
 	IBOutlet NSPopUpButton*		codeHelperPU;
 	IBOutlet NSButton*			insertCodeButton;
 }
