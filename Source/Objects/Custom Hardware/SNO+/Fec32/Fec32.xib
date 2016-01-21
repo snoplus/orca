@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14F27" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14F1509" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
         <development version="5100" identifier="xcode"/>
@@ -42,7 +42,6 @@
                 <outlet property="pmtStateMatrix0_15" destination="Ci9-Re-53R" id="7vj-Z0-7kZ"/>
                 <outlet property="pmtStateMatrix16_31" destination="Mb4-6Y-03z" id="oTh-pE-kmm"/>
                 <outlet property="pmtView" destination="172" id="178"/>
-                <outlet property="problemMatrix" destination="Lyw-Vq-ClV" id="aS1-CC-yO7"/>
                 <outlet property="readCMOSRatesButton" destination="1805" id="sDc-dC-VOq"/>
                 <outlet property="readVoltagesButton" destination="1142" id="1145"/>
                 <outlet property="showVoltsCB" destination="280" id="284"/>
