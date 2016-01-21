@@ -558,7 +558,6 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
     if([self secondaryPerson])[record setObject:[[self secondaryPerson] data] forKey:@"Secondary"];
     if([self tertiaryPerson])[record setObject:[[self tertiaryPerson] data] forKey:@"Tertiary"];
     
-    NSLog(@"%@\n",record);
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:record];
 }
 @end
