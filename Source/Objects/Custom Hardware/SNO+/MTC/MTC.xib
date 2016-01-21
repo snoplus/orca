@@ -36,7 +36,6 @@
                 <outlet property="isPulserFixedRateMatrix" destination="4091" id="4096"/>
                 <outlet property="lastFileLoadedField" destination="2059" id="2942"/>
                 <outlet property="load10MhzCounterButton" destination="4155" id="4432"/>
-                <outlet property="loadFilePathField" destination="2066" id="2820"/>
                 <outlet property="loadGTCrateMaskButton" destination="4423" id="4450"/>
                 <outlet property="loadMTCACrateMaskButton" destination="4429" id="4452"/>
                 <outlet property="loadMTCADacsButton" destination="4157" id="4435"/>
@@ -82,7 +81,6 @@
                 <outlet property="window" destination="21" id="307"/>
                 <outlet property="writeValueField" destination="1228" id="2824"/>
                 <outlet property="writeValueStepper" destination="1227" id="1297"/>
-                <outlet property="xilinxFileField" destination="2066" id="3240"/>
                 <outlet property="xilinxFilePathField" destination="2066" id="3568"/>
             </connections>
         </customObject>
