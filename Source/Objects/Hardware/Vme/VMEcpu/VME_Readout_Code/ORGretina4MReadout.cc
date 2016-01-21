@@ -37,9 +37,11 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
         
         //we want to read as much as possible to have the highest thru-put
         int32_t                                     numEventsToRead = 1;
-        if(fifoState & kGretina4MFIFO30KFull)       numEventsToRead = 16;
-        else if(fifoState & kGretina4MFIFO16KFull)  numEventsToRead = 8;
+        if(fifoState & kGretina4MFIFO30KFull)       numEventsToRead = 256;
+        else if(fifoState & kGretina4MFIFO16KFull)  numEventsToRead = 128;
 
+        //printf("num to read: %d\n",numEventsToRead);
+       // int32_t count = 0;
         int32_t i;
         for(i=0;i<numEventsToRead;i++){
             ensureDataCanHold(1024+2);
@@ -70,7 +72,11 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
                 clearFifo(fifoResetAddress);
                 break;
             }
+           // else {
+           //     count++;
+           // }
         }
+       // printf("got %d waveforms\n",count);
     }
 
     return true; 
