@@ -140,7 +140,7 @@
 }
 #pragma mark •••HW Access
 - (void) fireSmelliePulser {
-    NSString* const command=[NSString stringWithFormat:@"SetSmelliePulser %f %f %d",tellieRate,telliePulseWidth,tellieNPulses ];
+    NSString* const command=[NSString stringWithFormat:@"SetSmelliePulser %f %f %d",smellieRate,smelliePulseWidth,smellieNPulses ];
     [self sendOkCmd:command];
 }
 - (void) stopSmelliePulser {
@@ -498,7 +498,6 @@
     float stepSize = (maxVal - minVal)/(pow(2,nBits)-1.0);
     return (value - minVal)/stepSize;
 }
-
 - (BOOL) CounterMode {
     //See comments in setCounterMode for info
     return ([self sendIntCmd:@"GetCounterMode"]) > 0;
