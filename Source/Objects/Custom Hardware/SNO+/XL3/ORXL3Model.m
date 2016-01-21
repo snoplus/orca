@@ -3464,7 +3464,7 @@ void SwapLongBlock(void* p, int32_t n)
     }
     else{
         NSLog(@"%@ HV relays closed.\n",[[self xl3Link] crateName]);
-        [self setRelayStatus:@"relays CLOSED"];
+        [self setRelayStatus:@"relays SET"];
     }
 }
 
