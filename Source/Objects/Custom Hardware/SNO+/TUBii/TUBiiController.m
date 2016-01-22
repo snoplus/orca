@@ -14,8 +14,6 @@
 - (id)init{
     // Initialize by launching the GUI, referenced by the name of the xib/nib file
     self = [super initWithWindowNibName:@"TUBii"];
-
-
     return self;
 }
 - (void) awakeFromNib{
@@ -250,7 +248,7 @@
 - (IBAction)CounterLoadMask:(id)sender {
     [self SpeakerLoadMask:sender];
     CONTROL_REG_MASK newControlReg = [model controlReg];
-    newControlReg =  [CounterLZBSelect intValue] ==1 ? scalerLZB_Bit : 0;
+    newControlReg |=  [CounterLZBSelect intValue] ==1 ? scalerLZB_Bit : 0;
     newControlReg |=  [CounterTestModeSelect intValue] ==1 ? 0 : scalerT_Bit;
     newControlReg |=  [CounterInhibitSelect intValue] ==1 ? 0 : scalerI_Bit;
     [model setControlReg:newControlReg];
