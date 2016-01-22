@@ -1157,7 +1157,7 @@ smellieRunFile;
 }
 
 - (IBAction)saveStandardRunToDBAction:(id)sender {
-    [model saveStandardRun:[standardRunPopupMenu objectValueOfSelectedItem]];
+    [model saveStandardRun:[standardRunPopupMenu objectValueOfSelectedItem] withVersion:[standardRunVersionPopupMenu objectValueOfSelectedItem]];
 }
 - (IBAction)deleteStandardRun:(id)sender {
 
@@ -1167,12 +1167,15 @@ smellieRunFile;
 }
 
 - (IBAction)addNewStandardRunAction:(id)sender {
-    if ([standardRunPopupMenu indexOfItemWithObjectValue:[standardRunPopupMenu stringValue]] == NSNotFound &&
-        [[standardRunPopupMenu stringValue] isNotEqualTo:@""]) {
-        [standardRunPopupMenu addItemWithObjectValue:[standardRunPopupMenu stringValue]];
-        [standardRunPopupMenu selectItemWithObjectValue:[standardRunPopupMenu stringValue]];
+    
+    NSString *newStandardRun = [standardRunPopupMenu stringValue];
+    if ([standardRunPopupMenu indexOfItemWithObjectValue:newStandardRun] == NSNotFound && [newStandardRun isNotEqualTo:@""]){
+        BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Creating new Standard Run: \"%@\"", newStandardRun],@"Is this really what you want?",@"Cancel",@"Yes, Make New Standard Run",nil);
+        if(!cancel){
+            [standardRunPopupMenu addItemWithObjectValue:newStandardRun];
+            [standardRunPopupMenu selectItemWithObjectValue:newStandardRun];
+        }
     }
 }
-
 
 @end

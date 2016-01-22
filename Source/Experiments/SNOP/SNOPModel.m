@@ -1212,15 +1212,15 @@ mtcConfigDoc = _mtcConfigDoc;
 
 
 //Save MTC settings in a Standard Run table in CouchDB for later use by the Run Scripts or the user
--(BOOL) saveStandardRun:(NSString*)runTypeName
+-(BOOL) saveStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion
 {
     
     //Check that runTypeName is properly set:
-    if(runTypeName == nil){
-        NSLog(@"Please, set a name in the popup menu and click enter. \n",runTypeName);
+    if(runTypeName == nil || runVersion == nil){
+        ORRunAlertPanel(@"Invalid Standard Run Name",@"Please, set a valid name in the popup menus and click enter",@"OK",nil,nil);
         return false;
     }
-    NSLog(@"Savings settings for standard run: %@ ........ \n",runTypeName);
+    NSLog(@"Saving settings for Standard Run: %@ version %@ ........ \n",runTypeName,runVersion);
 
     //Get MTC model
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];

@@ -247,7 +247,7 @@
 -(void) addGlobalVariable:(NSNumber*)varindex withName:(NSString*)varname withValue:(NSNumber*)varvalue;
 -(BOOL) loadStandardRun:(NSString*)runTypeName;
 -(BOOL) loadStandardRunToHW:(NSString*)runTypeName;
--(BOOL) saveStandardRun:(NSString*)runTypeName;
+-(BOOL) saveStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
 
 @end
 

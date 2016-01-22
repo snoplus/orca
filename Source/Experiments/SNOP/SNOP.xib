@@ -78,6 +78,7 @@
                 <outlet property="standardRunLoadToHWButton" destination="tiy-4e-cxu" id="tcr-Ez-XrD"/>
                 <outlet property="standardRunPopupMenu" destination="xjE-ug-crJ" id="6RP-6D-4Dl"/>
                 <outlet property="standardRunSaveButton" destination="sQD-Yo-L3O" id="e4J-4j-lMT"/>
+                <outlet property="standardRunVersionPopupMenu" destination="0tV-8Q-LGs" id="WhV-Ow-TuV"/>
                 <outlet property="standardRunsSaveButton" destination="sQD-Yo-L3O" id="PGa-M7-0o4"/>
                 <outlet property="startMaintainenceRunButton" destination="3912" id="3922"/>
                 <outlet property="startRunButton" destination="1253" id="1260"/>
@@ -103,13 +104,13 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <tabView controlSize="small" initialItem="3006" id="101">
-                        <rect key="frame" x="25" y="10" width="809" height="673"/>
+                        <rect key="frame" x="25" y="12" width="809" height="666"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <font key="font" metaFont="system" size="14"/>
                         <tabViewItems>
                             <tabViewItem label="Detector" identifier="" id="103">
                                 <view key="view" autoresizesSubviews="NO" id="105">
-                                    <rect key="frame" x="10" y="25" width="789" height="635"/>
+                                    <rect key="frame" x="10" y="25" width="789" height="628"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <customView id="2645" customClass="ORAxis">
@@ -580,7 +581,7 @@
                             </tabViewItem>
                             <tabViewItem label="Runs" identifier="" id="3006">
                                 <view key="view" autoresizesSubviews="NO" id="3007">
-                                    <rect key="frame" x="10" y="25" width="789" height="635"/>
+                                    <rect key="frame" x="10" y="25" width="789" height="628"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" title="Threshold Status" borderType="line" id="3680">
@@ -863,14 +864,14 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" title="Run Types" borderType="line" id="3963">
-                                            <rect key="frame" x="582" y="-1" width="177" height="605"/>
+                                            <rect key="frame" x="582" y="14" width="177" height="590"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView">
-                                                <rect key="frame" x="1" y="1" width="175" height="589"/>
+                                                <rect key="frame" x="1" y="1" width="175" height="574"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <matrix verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="3935">
-                                                        <rect key="frame" x="18" y="21" width="131" height="558"/>
+                                                        <rect key="frame" x="18" y="6" width="131" height="558"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         <size key="cellSize" width="131" height="18"/>
@@ -1036,7 +1037,7 @@
                                             </connections>
                                         </button>
                                         <tabView controlSize="small" id="3092">
-                                            <rect key="frame" x="10" y="-7" width="555" height="371"/>
+                                            <rect key="frame" x="10" y="8" width="555" height="371"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <tabViewItems>
                                                 <tabViewItem label="STANDARD RUNS" identifier="" id="3103">
@@ -1045,7 +1046,7 @@
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <button verticalHuggingPriority="750" id="ySv-iP-Vo5">
-                                                                <rect key="frame" x="28" y="151" width="204" height="32"/>
+                                                                <rect key="frame" x="11" y="155" width="204" height="32"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="push" title="Load Standard Run to GUI" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="N75-hx-Szw">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1056,7 +1057,7 @@
                                                                 </connections>
                                                             </button>
                                                             <button verticalHuggingPriority="750" id="tiy-4e-cxu">
-                                                                <rect key="frame" x="11" y="70" width="239" height="32"/>
+                                                                <rect key="frame" x="244" y="155" width="239" height="32"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="push" title="Load Standard Run to Hardware" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="bgn-5h-VEU">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1067,7 +1068,7 @@
                                                                 </connections>
                                                             </button>
                                                             <button toolTip="This button will save MTCD/A settings like thresholds and trigger masks" verticalHuggingPriority="750" allowsExpansionToolTips="YES" id="sQD-Yo-L3O">
-                                                                <rect key="frame" x="256" y="151" width="279" height="32"/>
+                                                                <rect key="frame" x="10" y="87" width="279" height="32"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="push" title="Save Current Settings in Standard Run" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="NCG-Lr-klR">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1077,8 +1078,54 @@
                                                                     <action selector="saveStandardRunToDBAction:" target="-2" id="Tq3-yC-Oo0"/>
                                                                 </connections>
                                                             </button>
+                                                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" id="guu-uM-vS9">
+                                                                <rect key="frame" x="2" y="306" width="302" height="17"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Select a Standard Run or create a new one:" id="oUM-uJ-DPT">
+                                                                    <font key="font" metaFont="system"/>
+                                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                            </textField>
+                                                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" id="Abe-8t-EOA">
+                                                                <rect key="frame" x="15" y="123" width="131" height="17"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Save Standard Run:" id="MYa-hZ-RFi">
+                                                                    <font key="font" metaFont="system"/>
+                                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                            </textField>
+                                                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" id="83p-8M-CT2">
+                                                                <rect key="frame" x="15" y="191" width="131" height="17"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Load Standard Run:" id="GQJ-fg-pad">
+                                                                    <font key="font" metaFont="system"/>
+                                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                            </textField>
+                                                            <button toolTip="This button will save MTCD/A settings like thresholds and trigger masks" verticalHuggingPriority="750" allowsExpansionToolTips="YES" id="jrv-HL-aUL">
+                                                                <rect key="frame" x="356" y="19" width="168" height="32"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <buttonCell key="cell" type="push" title="Delete Standard Run" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="IBn-eg-RBZ">
+                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <connections>
+                                                                    <action selector="deleteStandardRun:" target="-2" id="HV6-eO-UiR"/>
+                                                                </connections>
+                                                            </button>
+                                                            <button verticalHuggingPriority="750" id="7BS-1f-soQ">
+                                                                <rect key="frame" x="300" y="256" width="183" height="32"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <buttonCell key="cell" type="push" title="Refresh Standard Runs" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="XzG-e2-Pgo">
+                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                            </button>
                                                             <comboBox verticalHuggingPriority="750" id="xjE-ug-crJ">
-                                                                <rect key="frame" x="211" y="256" width="116" height="26"/>
+                                                                <rect key="frame" x="165" y="274" width="116" height="26"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="Standard Run" drawsBackground="YES" numberOfVisibleItems="10" id="12x-oz-P6Z">
                                                                     <font key="font" metaFont="system"/>
@@ -1094,53 +1141,36 @@
                                                                     <action selector="addNewStandardRunAction:" target="-2" id="CGz-uK-QVP"/>
                                                                 </connections>
                                                             </comboBox>
-                                                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" id="83p-8M-CT2">
-                                                                <rect key="frame" x="27" y="177" width="207" height="58"/>
+                                                            <comboBox verticalHuggingPriority="750" id="0tV-8Q-LGs">
+                                                                <rect key="frame" x="165" y="241" width="116" height="26"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Load MTCD/A settings to GUI (do NOT write anything to hardware):" id="GQJ-fg-pad">
+                                                                <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="Version" drawsBackground="YES" numberOfVisibleItems="10" id="HKw-bJ-vsh">
+                                                                    <font key="font" metaFont="system"/>
+                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                    <objectValues>
+                                                                        <string>DEFAULT</string>
+                                                                    </objectValues>
+                                                                </comboBoxCell>
+                                                            </comboBox>
+                                                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" id="qNy-JH-zTn">
+                                                                <rect key="frame" x="88" y="280" width="74" height="17"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Run Type:" id="9Vj-zg-dZz">
                                                                     <font key="font" metaFont="system"/>
                                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                 </textFieldCell>
                                                             </textField>
-                                                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" id="guu-uM-vS9">
-                                                                <rect key="frame" x="164" y="288" width="207" height="34"/>
+                                                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" id="xdp-to-RxG">
+                                                                <rect key="frame" x="76" y="247" width="86" height="17"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Select a Standard Run or create a new one:" id="oUM-uJ-DPT">
+                                                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Run Version:" id="eCY-x0-2L5">
                                                                     <font key="font" metaFont="system"/>
                                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                 </textFieldCell>
                                                             </textField>
-                                                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" id="2Nh-mv-7JU">
-                                                                <rect key="frame" x="27" y="100" width="207" height="34"/>
-                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Ship the values displayed in the MTC GUI to the Hardware:" id="zg4-2R-BFp">
-                                                                    <font key="font" metaFont="system"/>
-                                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                </textFieldCell>
-                                                            </textField>
-                                                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" id="Abe-8t-EOA">
-                                                                <rect key="frame" x="292" y="186" width="207" height="34"/>
-                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Save MTCD/A settings like thresholds and trigger masks:" id="MYa-hZ-RFi">
-                                                                    <font key="font" metaFont="system"/>
-                                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                </textFieldCell>
-                                                            </textField>
-                                                            <button toolTip="This button will save MTCD/A settings like thresholds and trigger masks" verticalHuggingPriority="750" allowsExpansionToolTips="YES" id="jrv-HL-aUL">
-                                                                <rect key="frame" x="367" y="10" width="168" height="32"/>
-                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <buttonCell key="cell" type="push" title="Delete Standard Run" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="IBn-eg-RBZ">
-                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                                    <font key="font" metaFont="system"/>
-                                                                </buttonCell>
-                                                                <connections>
-                                                                    <action selector="deleteStandardRun:" target="-2" id="HV6-eO-UiR"/>
-                                                                </connections>
-                                                            </button>
                                                         </subviews>
                                                     </view>
                                                 </tabViewItem>
@@ -1333,7 +1363,7 @@
                                                             <popUpButton verticalHuggingPriority="750" id="i3g-ic-RZW">
                                                                 <rect key="frame" x="161" y="288" width="143" height="26"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <popUpButtonCell key="cell" type="push" title="Double Beta" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" borderStyle="border" inset="2" selectedItem="n0C-Sg-4Ab" id="NBI-Qc-AFN">
+                                                                <popUpButtonCell key="cell" type="push" title="SNO style" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" inset="2" selectedItem="n0C-Sg-4Ab" id="NBI-Qc-AFN">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="menu"/>
                                                                     <menu key="menu" id="weK-Qe-bwx">
@@ -2277,7 +2307,7 @@
                             </tabViewItem>
                             <tabViewItem label="Details" identifier="" id="1134">
                                 <view key="view" hidden="YES" autoresizesSubviews="NO" id="1135">
-                                    <rect key="frame" x="10" y="25" width="789" height="635"/>
+                                    <rect key="frame" x="10" y="25" width="789" height="628"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField verticalHuggingPriority="750" id="1139">
@@ -2297,7 +2327,7 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowHeight="13" headerView="2599" id="1200">
-                                                        <rect key="frame" x="0.0" y="0.0" width="194" height="254"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="194" height="15"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" red="0.77501147999999997" green="1" blue="0.83125859000000002" alpha="1" colorSpace="calibratedRGB"/>
@@ -2317,7 +2347,7 @@
                                                                 </textFieldCell>
                                                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                             </tableColumn>
-                                                            <tableColumn identifier="threshold" width="99" minWidth="40" maxWidth="1000" id="1202">
+                                                            <tableColumn identifier="threshold" width="85" minWidth="40" maxWidth="1000" id="1202">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Threshold">
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -2419,18 +2449,18 @@
                             </tabViewItem>
                             <tabViewItem label="HW Map" identifier="" id="246">
                                 <view key="view" hidden="YES" id="247">
-                                    <rect key="frame" x="10" y="25" width="789" height="635"/>
+                                    <rect key="frame" x="10" y="25" width="789" height="628"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <scrollView autohidesScrollers="YES" horizontalLineScroll="15" horizontalPageScroll="10" verticalLineScroll="15" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="GgP-OC-u51">
-                                            <rect key="frame" x="226" y="190" width="135" height="405"/>
+                                            <rect key="frame" x="226" y="198" width="135" height="405"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" id="gjp-T7-epR">
                                                 <rect key="frame" x="1" y="17" width="133" height="387"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" alternatingRowBackgroundColors="YES" multipleSelection="NO" autosaveName="FocalPlaneTableView" rowHeight="13" headerView="BKY-Yi-rKz" id="jpl-vK-Vml">
-                                                        <rect key="frame" x="0.0" y="0.0" width="133" height="387"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="133" height="15"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" red="1" green="0.98048109000000006" blue="0.95548701000000003" alpha="1" colorSpace="calibratedRGB"/>
@@ -2499,7 +2529,7 @@
                                             </tableHeaderView>
                                         </scrollView>
                                         <button verticalHuggingPriority="750" id="AVL-1g-F5l">
-                                            <rect key="frame" x="221" y="158" width="77" height="28"/>
+                                            <rect key="frame" x="221" y="166" width="77" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Read..." bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="rbi-Vw-IVU">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2510,7 +2540,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" id="h31-Yc-mcb">
-                                            <rect key="frame" x="221" y="123" width="77" height="28"/>
+                                            <rect key="frame" x="221" y="131" width="77" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Save As..." bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="JYO-ih-7KW">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2521,7 +2551,7 @@
                                             </connections>
                                         </button>
                                         <button id="Bc4-ob-5xH">
-                                            <rect key="frame" x="184" y="59" width="33" height="53"/>
+                                            <rect key="frame" x="184" y="67" width="33" height="53"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="Unlocked" imagePosition="above" alignment="center" alternateImage="Locked" inset="2" id="DFs-gM-WOb">
                                                 <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -2532,7 +2562,7 @@
                                             </connections>
                                         </button>
                                         <textField verticalHuggingPriority="750" id="ddm-wP-KKG">
-                                            <rect key="frame" x="257" y="599" width="171" height="17"/>
+                                            <rect key="frame" x="257" y="607" width="171" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Hardware Map" id="tNP-RT-Yts">
                                                 <font key="font" metaFont="label"/>
@@ -2541,7 +2571,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <popUpButton verticalHuggingPriority="750" id="37O-Qd-vKu">
-                                            <rect key="frame" x="307" y="161" width="165" height="22"/>
+                                            <rect key="frame" x="307" y="169" width="165" height="22"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="push" title="ORAugerFLTModel" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="MLY-0H-srC" id="dGY-jv-hHO">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -2558,7 +2588,7 @@
                                             </connections>
                                         </popUpButton>
                                         <textField verticalHuggingPriority="750" id="REK-Vd-QER">
-                                            <rect key="frame" x="313" y="112" width="168" height="41"/>
+                                            <rect key="frame" x="313" y="120" width="168" height="41"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Small System Font Text" id="Dbo-10-QjO">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -2571,7 +2601,7 @@
                             </tabViewItem>
                             <tabViewItem label="CouchDB" identifier="" id="2638">
                                 <view key="view" autoresizesSubviews="NO" id="2639">
-                                    <rect key="frame" x="10" y="25" width="789" height="635"/>
+                                    <rect key="frame" x="10" y="25" width="789" height="628"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" title="OrcaDB" borderType="line" id="2651">
@@ -2923,7 +2953,7 @@
                             </tabViewItem>
                             <tabViewItem label="HV Master" identifier="" id="2797">
                                 <view key="view" autoresizesSubviews="NO" id="2798">
-                                    <rect key="frame" x="10" y="25" width="789" height="635"/>
+                                    <rect key="frame" x="10" y="25" width="789" height="628"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <matrix verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="2830">
