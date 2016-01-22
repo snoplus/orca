@@ -516,8 +516,26 @@
 {
 
     BOOL locked						= [gSecurity isLocked:ORMTCBasicLock];
+    BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORMTCBasicLock];
 
     [basicOpsLockButton setState: locked];
+    
+    [autoIncrementCB setEnabled: !lockedOrNotRunningMaintenance];
+    [useMemoryMatrix setEnabled: !lockedOrNotRunningMaintenance];
+    [repeatDelayField setEnabled: !lockedOrNotRunningMaintenance];
+    [repeatDelayStepper setEnabled: !lockedOrNotRunningMaintenance];
+    [repeatCountField setEnabled: !lockedOrNotRunningMaintenance];
+    [repeatCountStepper setEnabled: !lockedOrNotRunningMaintenance];
+    [writeValueField setEnabled: !lockedOrNotRunningMaintenance];
+    [writeValueStepper setEnabled: !lockedOrNotRunningMaintenance];
+    [memoryOffsetField setEnabled: !lockedOrNotRunningMaintenance];
+    [memoryOffsetStepper setEnabled: !lockedOrNotRunningMaintenance];
+    [selectedRegisterPU setEnabled: !lockedOrNotRunningMaintenance];
+    [memBaseAddressStepper setEnabled: !lockedOrNotRunningMaintenance];
+    [readButton setEnabled: !lockedOrNotRunningMaintenance];
+    [writteButton setEnabled: !lockedOrNotRunningMaintenance];
+    [stopButton setEnabled: !lockedOrNotRunningMaintenance];
+    [statusButton setEnabled: !lockedOrNotRunningMaintenance];
     
 }
 

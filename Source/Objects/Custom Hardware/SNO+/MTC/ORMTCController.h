@@ -38,11 +38,16 @@
     IBOutlet NSTextField*   slotField;
     IBOutlet NSStepper* 	regBaseAddressStepper;
     IBOutlet NSTextField* 	regBaseAddressText;
-    IBOutlet NSStepper* 	memBaseAddressStepper;
     IBOutlet NSTextField* 	memBaseAddressText;
+    IBOutlet NSStepper* 	memBaseAddressStepper;
 	IBOutlet NSButton*		basicOpsLockButton;
  	IBOutlet NSTextField*	defaultFileField;
-	
+    IBOutlet NSButton *readButton;
+    IBOutlet NSButton *writteButton;
+    IBOutlet NSButton *stopButton;
+    IBOutlet NSButton *statusButton;
+
+    
 	//standard Ops
 	IBOutlet NSButton*		standardOpsLockButton;
 	IBOutlet NSButton*		initMtcButton;
