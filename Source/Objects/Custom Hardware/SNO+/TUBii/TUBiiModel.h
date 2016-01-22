@@ -10,13 +10,13 @@
 
 @class RedisClient; //Forward declaration
 
-typedef NS_OPTIONS(NSUInteger, CAEN_CHANNEL_MASK) {
+typedef NS_OPTIONS(uint8_t, CAEN_CHANNEL_MASK) {
     channelSel_0 = 1<<3,
     channelSel_1 = 1<<0,
     channelSel_2 = 1<<1,
     channelSel_3 = 1<<2
 };
-typedef NS_OPTIONS(NSUInteger,CAEN_GAIN_MASK)
+typedef NS_OPTIONS(uint8_t,CAEN_GAIN_MASK)
 {
     gainSel_0 = 1<<0,
     gainSel_1 = 1<<2,
@@ -32,7 +32,7 @@ typedef NS_OPTIONS(NSUInteger,CAEN_GAIN_MASK)
 //unfortunately to do so the bit# to function# correspondece had
 //to be muddied up a bit.
 
-typedef NS_OPTIONS(NSUInteger,CONTROL_REG_MASK)
+typedef NS_OPTIONS(uint8_t,CONTROL_REG_MASK)
 {
     clkSel_Bit = 1<<0,      //1 indicates FOX is default clk TUB is backup. O is vice versa
     lockoutSel_Bit = 1<<1,  //1 indicates MTCD supplies LO. 0 means TUBii supplies it.
@@ -41,7 +41,7 @@ typedef NS_OPTIONS(NSUInteger,CONTROL_REG_MASK)
     scalerT_Bit = 1<<4,    //Scaler Test* when low scaler is test mode
     scalerI_Bit = 1<<5    //Scaler Inhibit* when low counting is inhibited
 };
-typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
+typedef NS_OPTIONS(uint32_t, TRIG_MASK)
 {
     ExtTrig0 = 1<<0,
     ExtTrig1 = 1<<1,
@@ -66,7 +66,26 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
     Combo = 1<<20,
     GT = 1<<21
 };
-
+struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of TUBii's state at once.
+    float smellieRate;
+    float tellieRate;
+    float pulserRate;
+    float smelliePulseWidth;
+    float telliePulseWidth;
+    float pulseWidth;
+    int smellieNPulses;
+    int tellieNPulses;
+    int NPulses;
+    CAEN_CHANNEL_MASK CaenChannelMask;
+    CAEN_GAIN_MASK CaenGainMask;
+    uint8_t DGT_Bits;
+    uint8_t LO_Bits;
+    uint32_t speakerMask;
+    uint32_t counterMask;
+    uint32_t trigMask;
+    CONTROL_REG_MASK controlReg;
+    BOOL CounterMode;
+};
 @interface TUBiiModel : OrcaObject{
     float smellieRate;
     float tellieRate;
@@ -85,15 +104,6 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 @property (readonly) BOOL solitaryObject; //Prevents there from being two TUBiis
 @property (nonatomic) int portNumber;
 @property (nonatomic,retain) NSString* strHostName;
-@property (nonatomic) float smellieRate;
-@property (nonatomic) float tellieRate;
-@property (nonatomic) float pulserRate;
-@property (nonatomic) float smelliePulseWidth;
-@property (nonatomic) float telliePulseWidth;
-@property (nonatomic) float pulseWidth;
-@property (nonatomic) int smellieNPulses;
-@property (nonatomic) int tellieNPulses;
-@property (nonatomic) int NPulses;
 @property (nonatomic) NSUInteger smellieDelay;
 @property (nonatomic) NSUInteger tellieDelay;
 @property (nonatomic) NSUInteger genericDelay;
@@ -113,6 +123,7 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 @property (nonatomic) BOOL TUBiiIsDefaultClock;
 @property (nonatomic) BOOL TUBiiIsLOSrc;
 @property (nonatomic) BOOL CounterMode;
+@property (nonatomic) struct TUBiiState CurrentState; //Get/Sets a struct that fully specifies TUBii's Current state
 
 #pragma mark •••Initialization
 - (id) init;
@@ -130,6 +141,15 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 - (int) sendIntCmd:(NSString* const)aCmd;
 - (NSUInteger) MTCAMimic_VoltsToBits: (float) VoltageValue;
 - (float) MTCAMimic_BitsToVolts: (NSUInteger) BitValue;
+- (float) setSmellieRate;
+- (float) setTellieRate;
+- (float) setPulserRate;
+- (float) setSmelliePulseWidth;
+- (float) setTelliePulseWidth;
+- (float) setPulseWidth;
+- (int) setSmellieNPulses;
+- (int) setTellieNPulses;
+- (int) setNPulses;
 - (void) fireSmelliePulser;
 - (void) fireTelliePulser;
 - (void) firePulser;
