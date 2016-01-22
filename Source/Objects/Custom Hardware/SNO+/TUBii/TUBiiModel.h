@@ -140,12 +140,17 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 - (void) setStatusReadout: (BOOL) val;
 -(void) setCaenMasks: (CAEN_CHANNEL_MASK)aChannelMask
             GainMask:(CAEN_GAIN_MASK) aGainMask;
-
+- (void) ResetClock;
 - (void) setGTDelaysBits:(NSUInteger)aDGTMask LOBits:(NSUInteger)aLOMask;
 - (void) setGTDelaysInNS:(int)DGT LOValue:(int)LO;
 - (int) LODelay_BitsToNanoSeconds: (NSUInteger)Bits;
 - (NSUInteger) LODelay_NanoSecondsToBits: (int) Nanoseconds;
 - (int) DGT_BitsToNanoSeconds: (NSUInteger) Bits;
 - (NSUInteger) DGT_NanoSecondsToBits: (int) Nanoseconds;
-- (void) ResetClock;
+- (CONTROL_REG_MASK) CraftControlReg_isClkSrc:(bool) ClkSrc
+                                      isLOSrc: (bool) LOsrc
+                                       EcalOn: (bool)EcalOn
+                                   CounterLZBOn: (bool) LZB
+                                  CounterTestOn: (bool) TestMode
+                               CounterInhibitOn: (bool) Inhibit;
 @end

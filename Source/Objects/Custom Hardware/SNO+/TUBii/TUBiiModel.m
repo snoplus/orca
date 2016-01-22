@@ -259,10 +259,12 @@
 }
 - (void) setTrigMask:(NSUInteger)_trigMask {
     //Sets which trigger inputs are capable causing TUBii to issue a Raw Trigger
+    //This function is handled entierly within the MicroZed processing logic.
     NSString * const command = [NSString stringWithFormat:@"SetTriggerMask %d",_trigMask];
     [self sendOkCmd:command];
 }
 - (NSUInteger) trigMask {
+    //See comment in setTrigMask for info.
     return [connection intCommand: "GetTriggerMask"];
 }
 - (void) setSmellieDelay:(NSUInteger)_smellieDelay {
@@ -336,6 +338,12 @@
     return [self sendIntCmd:@"GetControlReg"];
 }
 - (void) setECALMode:(BOOL)_ECALMode {
+    //This is kindof a helper function.
+    //In general one should use setControlReg with CraftControlReg
+    //to change the control register. But if you only want to change this one bit
+    //then this is handy for that b/c you don't have to worry about the other
+    //bits in the control register
+    //
     //ECAL Mode enabled means TUBii re-routes GT to it's EXT PED Out port (Ext Ped In then does nothing)
     //To enter ECALMode the ecalEnable_Bit in the control register must be high
     //See TUBii schematics page 10 and page 4 for more info
@@ -404,6 +412,12 @@
     return [self sendIntCmd:command];
 }
 - (void) setTUBiiIsLOSrc:(BOOL)isSrc {
+    //This is kindof a helper function.
+    //In general one should use setControlReg with CraftControlReg
+    //to change the control register. But if you only want to change this one bit
+    //then this is handy for that b/c you don't have to worry about the other
+    //bits in the control register
+    //
     //Note if TUBii is the LO source than the lockoutSel_Bit should be low.
     //High means the MTC/D is the LO source
     //See TUBii schematics pg 13B
@@ -424,6 +438,12 @@
     return !((controlReg & lockoutSel_Bit) >0);
 }
 - (void) setTUBiiIsDefaultClock: (BOOL) IsDefault {
+    //This is kindof a helper function.
+    //In general one should use setControlReg with CraftControlReg
+    //to change the control register. But if you only want to change this one bit
+    //then this is handy for that b/c you don't have to worry about the other
+    //bits in the control register
+    //
     //Note if TUBii is the Default clock the clkSel_Bit should be high
     //Low means the TUB is the default clock
     //The default clock gets checked for errors, the backup clock is used in the event
@@ -498,6 +518,42 @@
     float stepSize = (maxVal - minVal)/(pow(2,nBits)-1.0);
     return (value - minVal)/stepSize;
 }
+- (CONTROL_REG_MASK) CraftControlReg_isClkSrc:(bool)ClkSrc
+                                      isLOSrc: (bool) LOsrc
+                                       EcalOn: (bool)EcalOn
+                                 CounterLZBOn: (bool) LZB
+                                CounterTestOn: (bool) TestMode
+                             CounterInhibitOn: (bool) Inhibit {
+    //This is a helper function that handles the details of what should
+    //be sent to the control register for a given functional state
+    //So for example if you want to create a control register value you shouldn't
+    //have to worry about the fact that the scaler requires the Inhibit bit to be low
+    //to display properly. So you just tell this function Inhbit=false and it appropriately
+    //creates the register value that reflects that.
+    //See the CONTROL_REG_MASK type def and TUBiiSchematics Page 4 for more detail
+
+    CONTROL_REG_MASK aRegVal =0;
+    if (ClkSrc) {
+        aRegVal |= clkSel_Bit; //Sets TUBii as default clock
+    }
+    if (!LOsrc) {
+        aRegVal |= lockoutSel_Bit; //Sets MTCD as LO Src
+    }
+    if(EcalOn) {
+        aRegVal |= ecalEnable_Bit; //Turns on ECAL mode
+    }
+    if(LZB) {
+        aRegVal |= scalerLZB_Bit; //Gets rid of leading zeroes on scaler
+    }
+    if (!TestMode) {
+        aRegVal |= scalerT_Bit; //Puts scaler in test mode
+    }
+    if (!Inhibit) {
+        aRegVal |= scalerI_Bit; //Inhibits the scaler from displaying right.
+    }
+    return aRegVal;
+}
+
 - (BOOL) CounterMode {
     //See comments in setCounterMode for info
     return ([self sendIntCmd:@"GetCounterMode"]) > 0;
