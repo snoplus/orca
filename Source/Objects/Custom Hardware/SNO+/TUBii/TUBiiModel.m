@@ -93,9 +93,9 @@
         pulseWidth =      [ aCoder decodeFloatForKey:@"TUBiiModelPulseWidth"];
         NPulses =         [ aCoder decodeIntForKey:@"TUBiiModelNPulses"];
         portNumber =      [ aCoder decodeIntForKey:@"TUBiiModelPortNumber"];
-        strHostName =     [ aCoder decodeObjectForKey:@"TUBiiModelStrHostName"];
+        [self setStrHostName:[ aCoder decodeObjectForKey:@"TUBiiModelStrHostName"]];
         if (!strHostName) {
-            strHostName = [[NSString alloc]initWithUTF8String:TUBII_DEFAULT_IP];
+            [self setStrHostName:[[NSString alloc] initWithUTF8String:TUBII_DEFAULT_IP ]];
         }
         if (!portNumber) {
             portNumber = TUBII_DEFAULT_PORT;

@@ -84,7 +84,7 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 }
 @property (readonly) BOOL solitaryObject; //Prevents there from being two TUBiis
 @property (nonatomic) int portNumber;
-@property (nonatomic,assign) NSString* strHostName;
+@property (nonatomic,retain) NSString* strHostName;
 @property (nonatomic) float smellieRate;
 @property (nonatomic) float tellieRate;
 @property (nonatomic) float pulserRate;
@@ -147,8 +147,5 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 - (NSUInteger) LODelay_NanoSecondsToBits: (int) Nanoseconds;
 - (int) DGT_BitsToNanoSeconds: (NSUInteger) Bits;
 - (NSUInteger) DGT_NanoSecondsToBits: (int) Nanoseconds;
-
-
-
 - (void) ResetClock;
 @end
