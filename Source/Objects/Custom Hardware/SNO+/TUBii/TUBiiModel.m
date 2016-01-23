@@ -18,16 +18,6 @@
 #pragma mark •••Synthesized Variables
 @synthesize portNumber;
 @synthesize strHostName;
-/*@synthesize telliePulseWidth;
-@synthesize smelliePulseWidth;
-@synthesize pulseWidth;
-@synthesize tellieNPulses;
-@synthesize smellieNPulses;
-@synthesize NPulses;
-@synthesize tellieRate;
-@synthesize smellieRate;
-@synthesize pulserRate;*/
-
 
 - (void) setUpImage
 {
@@ -629,6 +619,7 @@
 }
 
 - (void) setCurrentState:(struct TUBiiState)aState {
+    // Set every relevant variable state variable of TUBii
     [self setSmellieNPulses: aState.smellieRate];
     [self setTellieRate: aState.tellieRate];
     [self setPulserRate: aState.pulserRate];
@@ -638,7 +629,6 @@
     [self setSmellieNPulses: aState.smellieNPulses];
     [self setTellieNPulses: aState.tellieNPulses];
     [self setNPulses: aState.NPulses];
-    //Get the rest from the TUBiiServer
     [self setTellieDelay: aState.tellieDelay];
     [self setSmellieDelay: aState.smellieDelay];
     [self setGenericDelay: aState.genericDelay];
@@ -651,8 +641,11 @@
     [self setControlReg: aState.controlReg];
 }
 - (struct TUBiiState) CurrentState {
+    // Returns a struct that that is a static representation of
+    // TUBii's static.
     struct TUBiiState aState;
-    //Write the write only variables to a reasonable value
+
+    // Write the write only variables to a reasonable value
     aState.smellieRate = 0;
     aState.tellieRate = 0;
     aState.pulserRate = 0;
