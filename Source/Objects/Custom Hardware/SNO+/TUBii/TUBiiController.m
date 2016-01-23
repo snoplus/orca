@@ -8,6 +8,14 @@
 
 #import "TUBiiController.h"
 #import "TUBiiModel.h"
+//Defs to map between tab number and tab name
+#define TUBII_GUI_PULSER_TAB_NUM 0
+#define TUBII_GUI_TRIGGER_TAB_NUM 1
+#define TUBII_GUI_TUBII_TAB_NUM 2
+#define TUBII_GUI_SPEAKER_TAB_NUM 5
+#define TUBII_GUI_ANALOG_TAB_NUM 3
+#define TUBII_GUI_GTDELAY_TAB_NUM 4
+#define TUBII_GUI_CLOCK_TAB_NUM 6
 
 @implementation TUBiiController
 
@@ -38,25 +46,25 @@
     int tabIndex = [aTabView indexOfTabViewItem:item];
     NSSize* newSize = nil;
     switch (tabIndex) {
-        case 0:
+        case TUBII_GUI_PULSER_TAB_NUM:
             newSize = &PulserAndDelays_size;
             break;
-        case 1:
+        case TUBII_GUI_TRIGGER_TAB_NUM:
             newSize = &Triggers_size;
             break;
-        case 2:
+        case TUBII_GUI_TUBII_TAB_NUM:
             newSize = &Tubii_size;
             break;
-        case 3:
+        case TUBII_GUI_ANALOG_TAB_NUM:
             newSize = &Analog_size;
             break;
-        case 4:
+        case TUBII_GUI_GTDELAY_TAB_NUM:
             newSize = &GTDelays_size;
             break;
-        case 5:
+        case TUBII_GUI_SPEAKER_TAB_NUM:
             newSize = &SpeakerCounter_size;
             break;
-        case 6:
+        case TUBII_GUI_CLOCK_TAB_NUM:
             newSize = &ClockMonitor_size;
             break;
         default:
