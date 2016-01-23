@@ -123,4 +123,6 @@
 - (IBAction)MTCAMimicLoadValue:(id)sender;
 - (IBAction)LoadClockSource:(id)sender;
 - (IBAction)ClockSourceMatchHardware:(id)sender;
+
+- (IBAction)InitializeClicked:(id)sender;
 @end

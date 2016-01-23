@@ -71,6 +71,9 @@
 
 // GUI actions. CTRL-drag handles from the IB into this file.
 #pragma mark •••Actions
+- (IBAction)InitializeClicked:(id)sender {
+    [model Initialize];
+}
 - (IBAction)DataReadoutChanged:(id)sender {
     if ([[sender selectedCell] tag] == 1) { //Data Readout On is selected
         [model setDataReadout:YES];

@@ -145,6 +145,7 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
 - (int) sendIntCmd:(NSString* const)aCmd;
 - (NSUInteger) MTCAMimic_VoltsToBits: (float) VoltageValue;
 - (float) MTCAMimic_BitsToVolts: (NSUInteger) BitValue;
+- (void) Initialize;
 - (void) setSmellieRate: (float) _rate;
 - (void) setTellieRate: (float) _rate;
 - (void) setPulserRate: (float) _rate;

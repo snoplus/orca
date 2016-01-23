@@ -140,6 +140,12 @@
     }
 }
 #pragma mark •••HW Access
+- (void) Initialize {
+    // The contents of initialize are defined on the TUBii Server
+    // See documentation for that for more info (assuming it exists eventually)
+    NSString* const command=@"Initialize";
+    [self sendOkCmd:command];
+}
 - (void) setSmellieRate:(float)rate {
     // Specifies the frequency (in Hz) that the smellie pulser will pulse at
     // once fireSmelliePulser is called.
@@ -631,6 +637,8 @@
 
 - (void) setCurrentState:(struct TUBiiState)aState {
     // Set every relevant variable state variable of TUBii
+    // aState must have every variable filled in with a value
+    // to have good behavior from this function
     [self setSmellieNPulses: aState.smellieRate];
     [self setTellieRate: aState.tellieRate];
     [self setPulserRate: aState.pulserRate];
