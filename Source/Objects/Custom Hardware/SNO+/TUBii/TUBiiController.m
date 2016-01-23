@@ -9,9 +9,9 @@
 #import "TUBiiController.h"
 #import "TUBiiModel.h"
 //Defs to map between tab number and tab name
-#define TUBII_GUI_PULSER_TAB_NUM 0
-#define TUBII_GUI_TRIGGER_TAB_NUM 1
-#define TUBII_GUI_TUBII_TAB_NUM 2
+#define TUBII_GUI_TUBII_TAB_NUM 0
+#define TUBII_GUI_PULSER_TAB_NUM 1
+#define TUBII_GUI_TRIGGER_TAB_NUM 2
 #define TUBII_GUI_SPEAKER_TAB_NUM 5
 #define TUBII_GUI_ANALOG_TAB_NUM 3
 #define TUBII_GUI_GTDELAY_TAB_NUM 4
