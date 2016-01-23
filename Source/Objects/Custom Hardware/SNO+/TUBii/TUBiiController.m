@@ -152,9 +152,6 @@
     }
     return;
 }
-- (IBAction)TrigMaskSet:(id)sender {
-
-}
 - (IBAction)TrigMaskMatchHardware:(id)sender {
     NSUInteger maskVal = [model trigMask];
     [self SendBitInfo:maskVal FromBit:0 ToBit:21 ToCheckBoxes:TrigMaskSelect];

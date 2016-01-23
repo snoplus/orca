@@ -88,7 +88,7 @@
                         <rect key="frame" x="13" y="-58" width="595" height="696"/>
                         <tabViewItems>
                             <tabViewItem label="TUBii" identifier="" id="T81-Ks-egO">
-                                <view key="view" ambiguous="YES" id="tgY-du-t2x">
+                                <view key="view" id="tgY-du-t2x">
                                     <rect key="frame" x="10" y="25" width="575" height="658"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
@@ -572,7 +572,7 @@
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Triggers" identifier="2" id="Z1o-ot-g3o">
-                                <view key="view" id="V8F-IY-uB4">
+                                <view key="view" ambiguous="YES" id="V8F-IY-uB4">
                                     <rect key="frame" x="10" y="25" width="575" height="658"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
@@ -671,114 +671,66 @@
                                                     <buttonCell type="check" title="ExtTrig 0" bezelStyle="regularSquare" imagePosition="left" tag="1" inset="2" id="6jl-qy-uLp">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
-                                                        <connections>
-                                                            <action selector="TrigMaskSet:" target="-2" id="bZG-bJ-TIA"/>
-                                                        </connections>
                                                     </buttonCell>
                                                     <buttonCell type="check" title="ExtTrig 1" bezelStyle="regularSquare" imagePosition="left" tag="2" inset="2" id="Dgc-2v-92l">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
-                                                        <connections>
-                                                            <action selector="TrigMaskSet:" target="-2" id="pmc-eq-0jM"/>
-                                                        </connections>
                                                     </buttonCell>
                                                     <buttonCell type="check" title="ExtTrig 2" bezelStyle="regularSquare" imagePosition="left" tag="3" inset="2" id="LAy-18-US0">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
-                                                        <connections>
-                                                            <action selector="TrigMaskSet:" target="-2" id="AaV-cp-Fbv"/>
-                                                        </connections>
                                                     </buttonCell>
                                                     <buttonCell type="check" title="ExtTrig 3" bezelStyle="regularSquare" imagePosition="left" tag="4" inset="2" id="Zor-aQ-Asn">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
-                                                        <connections>
-                                                            <action selector="TrigMaskSet:" target="-2" id="1Bg-Fa-Ito"/>
-                                                        </connections>
                                                     </buttonCell>
                                                     <buttonCell type="check" title="ExtTrig 4" bezelStyle="regularSquare" imagePosition="left" tag="5" inset="2" id="9GZ-LX-BAe">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
-                                                        <connections>
-                                                            <action selector="TrigMaskSet:" target="-2" id="dpO-15-YDU"/>
-                                                        </connections>
                                                     </buttonCell>
                                                     <buttonCell type="check" title="ExtTrig 5" bezelStyle="regularSquare" imagePosition="left" tag="6" inset="2" id="ICA-WN-aHW">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
-                                                        <connections>
-                                                            <action selector="TrigMaskSet:" target="-2" id="ieJ-Sg-tDf"/>
-                                                        </connections>
                                                     </buttonCell>
                                                     <buttonCell type="check" title="ExtTrig 6" bezelStyle="regularSquare" imagePosition="left" tag="7" inset="2" id="h0n-cF-slV">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
-                                                        <connections>
-                                                            <action selector="TrigMaskSet:" target="-2" id="p3c-xD-3yf"/>
-                                                        </connections>
                                                     </buttonCell>
                                                     <buttonCell type="check" title="ExtTrig 7" bezelStyle="regularSquare" imagePosition="left" state="on" tag="8" inset="2" id="cPx-HO-03f">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
-                                                        <connections>
-                                                            <action selector="TrigMaskSet:" target="-2" id="0j7-7T-YrW"/>
-                                                        </connections>
                                                     </buttonCell>
                                                     <buttonCell type="check" title="ExtTrig 8" bezelStyle="regularSquare" imagePosition="left" tag="9" inset="2" id="OEa-1H-nu7">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
-                                                        <connections>
-                                                            <action selector="TrigMaskSet:" target="-2" id="EE3-PX-Aeb"/>
-                                                        </connections>
                                                     </buttonCell>
                                                     <buttonCell type="check" title="ExtTrig 9" bezelStyle="regularSquare" imagePosition="left" tag="10" inset="2" id="IF0-cC-y9O">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
-                                                        <connections>
-                                                            <action selector="TrigMaskSet:" target="-2" id="ko9-qD-Sxq"/>
-                                                        </connections>
                                                     </buttonCell>
                                                     <buttonCell type="check" title="ExtTrig 10" bezelStyle="regularSquare" imagePosition="left" state="on" tag="11" inset="2" id="IFe-aF-2sN">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
-                                                        <connections>
-                                                            <action selector="TrigMaskSet:" target="-2" id="Ttl-2n-Gt8"/>
-                                                        </connections>
                                                     </buttonCell>
                                                     <buttonCell type="check" title="ExtTrig 11" bezelStyle="regularSquare" imagePosition="left" tag="12" inset="2" id="Vca-8c-jSN">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
-                                                        <connections>
-                                                            <action selector="TrigMaskSet:" target="-2" id="Ks0-pS-TzI"/>
-                                                        </connections>
                                                     </buttonCell>
                                                     <buttonCell type="check" title="ExtTrig 12" bezelStyle="regularSquare" imagePosition="left" tag="13" inset="2" id="8ve-4X-2KD">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
-                                                        <connections>
-                                                            <action selector="TrigMaskSet:" target="-2" id="m4a-cd-OZJ"/>
-                                                        </connections>
                                                     </buttonCell>
                                                     <buttonCell type="check" title="ExtTrig 13" bezelStyle="regularSquare" imagePosition="left" tag="14" inset="2" id="2Jb-Kh-H8G">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
-                                                        <connections>
-                                                            <action selector="TrigMaskSet:" target="-2" id="SCy-I5-W3c"/>
-                                                        </connections>
                                                     </buttonCell>
                                                     <buttonCell type="check" title="ExtTrig 14" bezelStyle="regularSquare" imagePosition="left" tag="15" inset="2" id="JNi-My-9Sk">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
-                                                        <connections>
-                                                            <action selector="TrigMaskSet:" target="-2" id="oQe-N4-Np3"/>
-                                                        </connections>
                                                     </buttonCell>
                                                     <buttonCell type="check" title="ExtTrig 15" bezelStyle="regularSquare" imagePosition="left" tag="16" inset="2" id="1mW-04-o2w">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
-                                                        <connections>
-                                                            <action selector="TrigMaskSet:" target="-2" id="q5F-wZ-P0L"/>
-                                                        </connections>
                                                     </buttonCell>
                                                     <buttonCell type="check" title="MTCA Mimic 1" bezelStyle="regularSquare" imagePosition="left" state="on" tag="16" inset="2" id="zzQ-dT-SOq">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -802,9 +754,6 @@
                                                     </buttonCell>
                                                 </column>
                                             </cells>
-                                            <connections>
-                                                <action selector="TrigMaskSet:" target="-2" id="NNL-X5-sC7"/>
-                                            </connections>
                                         </matrix>
                                         <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gi2-ac-HvU">
                                             <rect key="frame" x="239" y="314" width="96" height="22"/>
