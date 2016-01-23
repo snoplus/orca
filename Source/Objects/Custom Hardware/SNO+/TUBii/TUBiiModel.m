@@ -629,10 +629,30 @@
 }
 
 - (void) setCurrentState:(struct TUBiiState)aState {
-
+    [self setSmellieNPulses: aState.smellieRate];
+    [self setTellieRate: aState.tellieRate];
+    [self setPulserRate: aState.pulserRate];
+    [self setSmelliePulseWidth: aState.smelliePulseWidth];
+    [self setTelliePulseWidth: aState.telliePulseWidth];
+    [self setPulseWidth: aState.pulseWidth];
+    [self setSmellieNPulses: aState.smellieNPulses];
+    [self setTellieNPulses: aState.tellieNPulses];
+    [self setNPulses: aState.NPulses];
+    //Get the rest from the TUBiiServer
+    [self setTellieDelay: aState.tellieDelay];
+    [self setSmellieDelay: aState.smellieDelay];
+    [self setGenericDelay: aState.genericDelay];
+    [self setCaenMasks:aState.CaenChannelMask GainMask:aState.CaenGainMask];
+    [self setGTDelaysBits:aState.DGT_Bits LOBits:aState.LO_Bits];
+    [self setSpeakerMask: aState.speakerMask];
+    [self setCounterMask: aState.counterMask];
+    [self setTrigMask: aState.trigMask];
+    [self setCounterMode: aState.CounterMode];
+    [self setControlReg: aState.controlReg];
 }
 - (struct TUBiiState) CurrentState {
     struct TUBiiState aState;
+    //Write the write only variables to a reasonable value
     aState.smellieRate = 0;
     aState.tellieRate = 0;
     aState.pulserRate = 0;
@@ -642,6 +662,7 @@
     aState.smellieNPulses = 0;
     aState.tellieNPulses = 0;
     aState.NPulses = 0;
+    //Get the rest from the TUBiiServer
     aState.tellieDelay = [self tellieDelay];
     aState.smellieDelay = [self smellieDelay];
     aState.genericDelay = [self genericDelay];
