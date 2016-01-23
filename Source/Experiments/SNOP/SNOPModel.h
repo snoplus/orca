@@ -204,10 +204,6 @@
 - (void) setECA_type:(int)aValue;
 - (void) setECA_tslope_pattern:(int)aValue;
 - (void) setECA_subrun_time:(double)aValue;
-- (int) getECA_pattern;
-- (int) getECA_type;
-- (int) getECA_tslope_pattern;
-- (double) getECA_subrun_time;
 
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder;
@@ -243,8 +239,6 @@
 -(void) testerHv;
 
 //Standard runs functions
--(void) loadVariablesInScript:(NSString*)userscriptname;
--(void) addGlobalVariable:(NSNumber*)varindex withName:(NSString*)varname withValue:(NSNumber*)varvalue;
 -(BOOL) loadStandardRun:(NSString*)runTypeName;
 -(BOOL) loadStandardRunToHW:(NSString*)runTypeName;
 -(BOOL) saveStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;

@@ -80,16 +80,16 @@ smellieRunFile;
 
 -(void) awakeFromNib
 {
-	detectorSize		= NSMakeSize(820,640);
-	detailsSize		= NSMakeSize(820,640);//NSMakeSize(450,589);
-	focalPlaneSize		= NSMakeSize(820,640);//NSMakeSize(450,589);
-	couchDBSize		= NSMakeSize(820,640);//(620,595);//NSMakeSize(450,480);
-	hvMasterSize		= NSMakeSize(820,640);
-	runsSize		= NSMakeSize(820,640);
+	detectorSize		= NSMakeSize(1200,700);
+	detailsSize		= NSMakeSize(1200,700);//NSMakeSize(450,589);
+	focalPlaneSize		= NSMakeSize(1200,700);//NSMakeSize(450,589);
+	couchDBSize		= NSMakeSize(1200,700);//(620,595);//NSMakeSize(450,480);
+	hvMasterSize		= NSMakeSize(1200,700);
+	runsSize		= NSMakeSize(1200,700);
 	
 	blankView = [[NSView alloc] init];
-    [tabView setFocusRingType:NSFocusRingTypeNone];
-	[self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
+//  [tabView setFocusRingType:NSFocusRingTypeNone];
+//	[self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
     
     //pull the information from the SMELLIE DB
     [model getSmellieRunListInfo];
@@ -752,32 +752,32 @@ smellieRunFile;
     if([tabView indexOfTabViewItem:tabViewItem] == 0){
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:detectorSize];
-		[[self window] setContentView:tabView];
+		[[self window] setContentView:snopView];
     }
     else if([tabView indexOfTabViewItem:tabViewItem] == 5){
         [[self window] setContentView:blankView];
         [self resizeWindowToSize:runsSize];
-        [[self window] setContentView:tabView];
+        [[self window] setContentView:snopView];
     }
     else if([tabView indexOfTabViewItem:tabViewItem] == 2){
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:detailsSize];
-		[[self window] setContentView:tabView];
+		[[self window] setContentView:snopView];
     }
     else if([tabView indexOfTabViewItem:tabViewItem] == 3){
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:focalPlaneSize];
-		[[self window] setContentView:tabView];
+		[[self window] setContentView:snopView];
     }
     else if([tabView indexOfTabViewItem:tabViewItem] == 4){
 	    [[self window] setContentView:blankView];
 	    [self resizeWindowToSize:couchDBSize];
-	    [[self window] setContentView:tabView];
+	    [[self window] setContentView:snopView];
     }
     else if([tabView indexOfTabViewItem:tabViewItem] == 5){
 	    [[self window] setContentView:blankView];
 	    [self resizeWindowToSize:hvMasterSize];
-	    [[self window] setContentView:tabView];
+	    [[self window] setContentView:snopView];
     }
 
 	int index = [tabView indexOfTabViewItem:tabViewItem];

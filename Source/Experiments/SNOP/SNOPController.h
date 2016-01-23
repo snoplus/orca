@@ -27,9 +27,10 @@
 @interface SNOPController : ORExperimentController {
 	IBOutlet NSTextField* detectorTitle;
 	IBOutlet NSPopUpButton*	viewTypePU;
+    IBOutlet NSView *snopView;
     
-	NSView *blankView;
-	NSSize detectorSize;
+    NSView *blankView;
+    NSSize detectorSize;
 	NSSize detailsSize;
 	NSSize focalPlaneSize;
 	NSSize couchDBSize;
