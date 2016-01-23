@@ -3,8 +3,9 @@
 //  Orca
 //
 //  Created by Ian Coulter on 9/15/15.
-//
-//
+//  Largely written by Eric Marzec marzece@gmail.com
+//  Last edited on Jan 23 2016
+//  See comments in TUBiiModel.m for the deets
 #pragma mark •••Imported Files
 #import "OrcaObject.h"
 

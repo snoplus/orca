@@ -3,6 +3,17 @@
 //   Orca
 //
 //   Created by Ian Coulter on 9/15/15.
+//   Largely written by Eric Marzec
+//   Last edited on Jan 23 2016
+//
+//   This file is a bit different from other Models in
+//   Orca. Most use instance variables which dynamically update
+//   to represent a hardware item. TUBiiModel however has very
+//   few instance variables. Instead it forwards every desired change
+//   to the server that runs on the MicroZed. The server then is in 
+//   charge of tracking and dynamically updating the state. And
+//   of course the server also contacts the FPGA side of the MicroZed
+//   and that changes the actual hardware on the board.
 //
 //
 #pragma mark •••Imported Files
