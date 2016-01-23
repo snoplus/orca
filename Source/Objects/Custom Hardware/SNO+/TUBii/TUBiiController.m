@@ -91,12 +91,24 @@
 }
 - (IBAction)PulserFire:(id)sender {
     if ([sender tag] == 1){
+        //Smellie Pulser is being fired
+        [model setSmellieRate:[SmellieRate_TextField floatValue]];
+        [model setSmelliePulseWidth:[SmellieWidth_TextField floatValue]];
+        [model setSmellieNPulses:[SmellieNPulses_TextField intValue]];
         [model fireSmelliePulser];
     }
     else if([sender tag] == 2){
+        //Tellie Pulser is being fired
+        [model setTellieRate:[TellieRate_TextField floatValue]];
+        [model setTelliePulseWidth:[TellieWidth_TextField floatValue]];
+        [model setTellieNPulses:[TellieNPulses_TextField intValue]];
         [model fireTelliePulser];
     }
     else if([sender tag] == 3){
+        //Generic Pulser is being fired
+        [model setPulserRate:[GenericRate_TextField floatValue]];
+        [model setPulseWidth:[GenericWidth_TextField floatValue]];
+        [model setNPulses:[GenericNPulses_TextField intValue]];
         [model firePulser];
     }
     return;

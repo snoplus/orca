@@ -140,55 +140,96 @@
 }
 #pragma mark •••HW Access
 - (void) setSmellieRate:(float)rate {
+    // Specifies the frequency (in Hz) that the smellie pulser will pulse at
+    // once fireSmelliePulser is called.
     NSString* const command=[NSString stringWithFormat:@"SetSmellieRate %f",rate];
     [self sendOkCmd:command];
 }
-- (void) setSmelliePulseWidth:(float) PulseWidth {
-    
+- (void) setSmelliePulseWidth:(float) _pulseWidth {
+    // Specifies the width the of the pulses that the smellie pulser will pulse at
+    // once fireSmelliePulser is called
+    NSString * const command = [NSString stringWithFormat:@"SetSmelliePulseWidth %f",_pulseWidth];
+    [self sendOkCmd:command];
 }
-- (void) setSmellieNPulses:(int) NPulses {
-    
+- (void) setSmellieNPulses:(int) _NPulses {
+    // Specifies the number of pulses that will be fired off by the Smellie pulser
+    // once fireSmellie pulser is called
+    NSString * const command = [NSString stringWithFormat:@"SetSmellieNPulses %d", _NPulses];
+    [self sendOkCmd:command];
 }
-- (void) setTellieRate:(float)rate {
-    
+- (void) setTellieRate:(float)_rate {
+    // Specifies the frequency (in Hz) that the tellie pulser will pulse at
+    // once fireTelliePulser is called.
+    NSString * const command = [NSString stringWithFormat:@"SetTellieRate %f", _rate];
+    [self sendOkCmd:command];
 }
-- (void) setTelliePulseWidth:(float)pulseWidth {
-    
+- (void) setTelliePulseWidth:(float)_pulseWidth {
+    // Specifies the width the of the pulses that the tellie pulser will pulse at
+    // once fireTelliePulser is called
+    NSString * const command = [NSString stringWithFormat:@"SetTelliePulseWidth %f",_pulseWidth];
+    [self sendOkCmd:command];
 }
-- (void) setTellieNPulses:(int) NPulses {
-    
+- (void) setTellieNPulses:(int) _NPulses {
+    // Specifies the number of pulses that will be fired off by the Tellie pulser
+    // once fireTellie pulser is called
+    NSString * const command = [NSString stringWithFormat:@"SetTellieNPulses %d", _NPulses];
+    [self sendOkCmd:command];
 }
-- (void) setPulserRate:(float)rate {
-    
+- (void) setPulserRate:(float) _rate {
+    // Specifies the frequency (in Hz) that the generic pulser will pulse at
+    // once firePulser is called.
+    NSString * const command = [NSString stringWithFormat:@"SetGenericRate %f", _rate];
+    [self sendOkCmd:command];
 }
-- (void) setPulseWidth:(float) pulseWidth {
-    
+- (void) setPulseWidth:(float) _pulseWidth {
+    // Specifies the width the of the pulses that the generic pulser will pulse at
+    // once firePulser is called
+    NSString * const command = [NSString stringWithFormat:@"SetGenericPulseWidth %f",_pulseWidth];
+    [self sendOkCmd:command];
 }
-- (void) setNPulses:(int) NPulses {
-    
+- (void) setNPulses:(int) _NPulses {
+    // Specifies the number of pulses that will be fired off by the generic pulser
+    // once firePulser pulser is called
+    NSString * const command = [NSString stringWithFormat:@"SetGenericNPulses %d", _NPulses];
+    [self sendOkCmd:command];
 }
 - (void) fireSmelliePulser {
-    NSString* const command=[NSString stringWithFormat:@"SetSmelliePulser %f %f %d",smellieRate,smelliePulseWidth,smellieNPulses ];
+    // Causes the SMELLIE pulser to fire off pulses at a rate/duty cycle as
+    // specified by it's internal variables which can be set with
+    // setSmellieRate setSmelliePulseWidth setSmellieNPulses
+    NSString* const command= @"FireSmelliePulser";
     [self sendOkCmd:command];
 }
 - (void) stopSmelliePulser {
-    NSString* const command=@"SetSmelliePulser 0 0 0";
+    // Stops the smellie pulser by setting the number of pulses to be fired to zero.
+    [self setSmellieNPulses:0];
+    NSString* const command=@"FireSmelliePulser";
     [self sendOkCmd:command];
 }
 - (void) fireTelliePulser{
-    NSString* const command=[NSString stringWithFormat:@"SetTelliePulser %f %f %d",tellieRate,telliePulseWidth,tellieNPulses ];
+    // Causes the TELLIE pulser to fire off pulses at a rate/duty cycle as
+    // specified by it's internal variables which can be set with
+    // setTellieRate setTelliePulseWidth setTellieNPulses
+    NSString* const command= @"FireTelliePulser";
     [self sendOkCmd:command];
 }
 - (void) stopTelliePulser {
-    NSString* const command=@"SetTelliePulser 0 0 0";
+    // Stops the Tellie pulser by setting the number of pulses to be fired to zero.
+    [self setTellieNPulses:0];
+    NSString* const command=@"FireTelliePulser";
     [self sendOkCmd:command];
 }
 - (void) firePulser{
-    NSString* const command=[NSString stringWithFormat:@"SetGenericPulser %f %f %d",pulserRate,pulseWidth,NPulses ];
+    // Causes the generic pulser to fire off pulses at a rate/duty cycle as
+    // specified by it's internal variables which can be set with
+    // setPulserRate setPulseWidth setNPulses
+    NSString* const command=@"FireGenericPulser";
     [self sendOkCmd:command];
 }
 - (void) stopPulser {
-    NSString* const command=@"SetGenericPulser 0 0 0";
+    // Stops the generic pulser by setting the number of pulses to be fired to zero.
+    [self setNPulses:0];
+    NSString* const command=@"FireGenericPulser";
     [self sendOkCmd:command];
 }
 
@@ -592,15 +633,18 @@
 }
 - (struct TUBiiState) CurrentState {
     struct TUBiiState aState;
-    aState.smellieRate = [self smellieRate];
-    aState.tellieRate = [self tellieRate];
-    aState.pulserRate = [self pulserRate];
-    aState.smelliePulseWidth = [self smelliePulseWidth];
-    aState.telliePulseWidth = [self telliePulseWidth];
-    aState.pulseWidth = [self pulseWidth];
-    aState.smellieNPulses = [self smellieNPulses];
-    aState.tellieNPulses = [self tellieNPulses];
-    aState.NPulses = [self NPulses];
+    aState.smellieRate = 0;
+    aState.tellieRate = 0;
+    aState.pulserRate = 0;
+    aState.smelliePulseWidth = 0;
+    aState.telliePulseWidth = 0;
+    aState.pulseWidth = 0;
+    aState.smellieNPulses = 0;
+    aState.tellieNPulses = 0;
+    aState.NPulses = 0;
+    aState.tellieDelay = [self tellieDelay];
+    aState.smellieDelay = [self smellieDelay];
+    aState.genericDelay = [self genericDelay];
     aState.CaenChannelMask = [self caenChannelMask];
     aState.CaenGainMask = [self caenGainMask];
     aState.DGT_Bits = [self DGTBits];

@@ -68,6 +68,18 @@
     IBOutlet NSTextField *TellieDelay_TextField;
     IBOutlet NSTextField *GenericDelay_TextField;
 
+    IBOutlet NSTextField *SmellieRate_TextField;
+    IBOutlet NSTextField *TellieRate_TextField;
+    IBOutlet NSTextField *GenericRate_TextField;
+
+    IBOutlet NSTextField *SmellieWidth_TextField;
+    IBOutlet NSTextField *TellieWidth_TextField;
+    IBOutlet NSTextField *GenericWidth_TextField;
+
+    IBOutlet NSTextField *SmellieNPulses_TextField;
+    IBOutlet NSTextField *TellieNPulses_TextField;
+    IBOutlet NSTextField *GenericNPulses_TextField;
+
     IBOutlet NSMatrix *DefaultClockSelect;
 
     NSButton *ClockSourceMatchHardware;
@@ -77,8 +89,6 @@
 
 - (NSUInteger) GetBitInfoFromCheckBoxes: (NSMatrix*)aMatrix FromBit:(int)low ToBit: (int)high;
 - (void) SendBitInfo:(NSUInteger) maskVal FromBit:(int)low ToBit:(int) high ToCheckBoxes: (NSMatrix*) aMatrix;
-
-
 
 - (IBAction)StatusReadoutChanged:(id)sender;
 - (IBAction)DataReadoutChanged:(id)sender;
