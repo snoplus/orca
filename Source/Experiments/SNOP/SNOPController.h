@@ -19,7 +19,9 @@
 //-------------------------------------------------------------
 
 #import "ORExperimentController.h"
+#import "ORExperimentController.h"
 #import "SNOPDetectorView.h"
+#import "StopLightView.h"
 
 @class ORColorScale;
 @class ORSegmentGroup;
@@ -41,6 +43,9 @@
     IBOutlet NSComboBox *debugDBIPAddressPU;
     IBOutlet NSMatrix* hvStatusMatrix;
     
+    //Run control
+    IBOutlet StopLightView *lightBoardView;
+    
     //Run Types Information
     IBOutlet NSMatrix*  globalRunTypesMatrix;
     
@@ -48,9 +53,7 @@
     IBOutlet NSMatrix * globalxl3Mode;
     
     //Run information
-    IBOutlet NSTextField* currentRunNumber;
     IBOutlet NSTextField* currentRunType;
-    IBOutlet NSTextField* currentStatus;
     IBOutlet NSTextField* lastRunNumber;
     IBOutlet NSTextField* lastRunType;
 
@@ -79,14 +82,7 @@
     IBOutlet NSButton *smellieEmergencyStop;
     IBOutlet NSButton *smellieBuildCustomRun;
     IBOutlet NSButton *smellieChangeConfiguration;
-    
-    IBOutlet NSButton *tellieEnabled;
-    
-    IBOutlet NSButton *startPhysicsRunButton;
-    IBOutlet NSButton *startMaintainenceRunButton;
-    IBOutlet NSButton *newPhysicsRunButton;
-    IBOutlet NSButton *newMaintainenceRunButton;
-    
+        
     //eStop buttons
     IBOutlet NSButton *emergyencyStopEnabled;
     IBOutlet NSButton *eStopButton;

@@ -26,6 +26,7 @@
 #import "ORAxis.h"
 #import "ORDetectorSegment.h"
 #import "ORXL3Model.h"
+#import "ORSNOCrateModel.h"
 #import "ELLIEModel.h"
 #import "ORCouchDB.h"
 #import "ORRunModel.h"
@@ -269,7 +270,6 @@ smellieRunFile;
 {
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* theRunControl = [objs objectAtIndex:0];
-    [currentRunNumber setIntValue:[theRunControl runNumber]];
     [lastRunNumber setIntValue:[theRunControl runNumber] - 1];
 }
 
@@ -281,59 +281,46 @@ smellieRunFile;
 }
 
 
-- (IBAction) startRunAction:(id)sender
-{
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* theRunControl = [objs objectAtIndex:0];
-	if([[theRunControl document] isDocumentEdited]){
-		[[theRunControl document] afterSaveDo:@selector(startRun) withTarget:self];
-        [[theRunControl document] saveDocument:nil];
-    }
-	else [self startRun];
-    [currentStatus setStringValue:[self getStartingString]];
-    
-    NSLog(@"Sender: %@",[sender title]);
-    
-    //decide whether to issue a standard Physics run or a maintainence run
-    if([[sender title] isEqualToString:@"Start Physics Run"]){
+//- (IBAction) startRunAction:(id)sender
+//{
+//    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+//    ORRunModel* theRunControl = [objs objectAtIndex:0];
+//	if([[theRunControl document] isDocumentEdited]){
+//		[[theRunControl document] afterSaveDo:@selector(startRun) withTarget:self];
+//        [[theRunControl document] saveDocument:nil];
+//    }
+//	else [self startRun];
+////    [currentStatus setStringValue:[self getStartingString]];
+//    
+//    NSLog(@"Sender: %@",[sender title]);
+//    
+//    //decide whether to issue a standard Physics run or a maintainence run
+//    if([[sender title] isEqualToString:@"Start Physics Run"]){
+//        //[model setRunType:kRunStandardPhysicsRun];
+//    }
+//    else if ([[sender title] isEqualToString:@"Start Run"]){
+//        //[model setRunType:kRunMaintainence];
+//        NSLog(@"Starting a run from SNOP");
+//    }
+//    else{
+//        NSLog(@"SNOP_CONTROL:Run isn't correctly defined. Please check NSButton titles");
+//        //[model setRunType:kRunUndefined];
+//    }
+//    
+//    
+//}
 
-        //Check to see if TELLIE is enabled
-        if([tellieEnabled isEnabled]){
-            //[model setRunType:kRunStandardPhysicsRunWithoutTellie];
-        }
-        else{
-            //[model setRunType:kRunStandardPhysicsRun];
-        }
-    }
-    else if ([[sender title] isEqualToString:@"Start Run"]){
-        //[model setRunType:kRunMaintainence];
-        NSLog(@"Starting a run from SNOP");
-    }
-    else{
-        NSLog(@"SNOP_CONTROL:Run isn't correctly defined. Please check NSButton titles");
-        //[model setRunType:kRunUndefined];
-    }
-    
-    
-}
 - (IBAction)newRunAction:(id)sender {
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* theRunControl = [objs objectAtIndex:0];
     [theRunControl setForceRestart:YES];
     [theRunControl performSelector:@selector(stopRun) withObject:nil afterDelay:0];
-    [currentStatus setStringValue:[self getRestartingString]];
+    [runStatusField setStringValue:[self getRestartingString]];
     
     NSLog(@"Sender: %@",[sender title]);
     
     if([[sender title] isEqualToString:@"New Physics Run"]){
-        
-        //Check to see if TELLIE is enabled
-        if([tellieEnabled isEnabled]){
-            //[model setRunType:kRunStandardPhysicsRunWithoutTellie];
-        }
-        else{
-            //[model setRunType:kRunStandardPhysicsRun];
-        }
+        //[model setRunType:kRunStandardPhysicsRun];
     }
     else if ([[sender title] isEqualToString:@"New Maint. Run"]){
         //[model setRunType:kRunMaintainence];
@@ -377,15 +364,15 @@ smellieRunFile;
 }
 
 
-- (IBAction)stopRunAction:(id)sender {
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* theRunControl = [objs objectAtIndex:0];
-    [theRunControl performSelector:@selector(haltRun)withObject:nil afterDelay:.1];
-    [currentStatus setStringValue:[self getStoppingString]];
-    
-    //reset the run Type to be undefined
-    //[model setRunType:kRunUndefined];
-}
+//- (IBAction)stopRunAction:(id)sender {
+//    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+//    ORRunModel* theRunControl = [objs objectAtIndex:0];
+//    [theRunControl performSelector:@selector(haltRun)withObject:nil afterDelay:.1];
+//    [currentStatus setStringValue:[self getStoppingString]];
+//    
+//    //reset the run Type to be undefined
+//    //[model setRunType:kRunUndefined];
+//}
 
 - (void) startRun
 {
@@ -399,18 +386,21 @@ smellieRunFile;
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* theRunControl = [objs objectAtIndex:0];
     if([theRunControl runningState] == eRunInProgress){
-		if(![theRunControl runPaused])[currentStatus setStringValue:[[ORGlobal sharedGlobal] runModeString]];
-		else [currentStatus setStringValue:@"Paused"];
+		if(![theRunControl runPaused])[runStatusField setStringValue:[[ORGlobal sharedGlobal] runModeString]];
+		else [runStatusField setStringValue:@"Paused"];
+        [lightBoardView setState:kGoLight];
 	}
 	else if([theRunControl runningState] == eRunStopped){
-		[currentStatus setStringValue:@"Stopped"];
+		[runStatusField setStringValue:@"Stopped"];
+        [lightBoardView setState:kStoppedLight];
 	}
 	else if([theRunControl runningState] == eRunStarting || [theRunControl runningState] == eRunStopping || [theRunControl runningState] == eRunBetweenSubRuns){
-		if([theRunControl runningState] == eRunStarting)[currentStatus setStringValue:[self getStartingString]];
+		if([theRunControl runningState] == eRunStarting)[runStatusField setStringValue:[self getStartingString]];
 		else {
-			if([theRunControl runningState] == eRunBetweenSubRuns)	[currentStatus setStringValue:[self getBetweenSubrunsString]];
-			else                                                    [currentStatus setStringValue:[self getStoppingString]];
+			if([theRunControl runningState] == eRunBetweenSubRuns)	[runStatusField setStringValue:[self getBetweenSubrunsString]];
+			else                                                    [runStatusField setStringValue:[self getStoppingString]];
 		}
+        [lightBoardView setState:kCautionLight];
 	}
 }
 
@@ -654,14 +644,7 @@ smellieRunFile;
 
 - (IBAction)hvMasterPanicAction:(id)sender
 {
-    
     [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
-/*
-    NSArray* xl3s = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
-    for (id xl3 in xl3s) {
-        [model hvPanicDown];
-    }
- */
     NSLog(@"Detector wide panic down started\n");
 }
 
@@ -700,16 +683,32 @@ smellieRunFile;
     
 }
 
-- (IBAction)hvMasterTriggersOFF:(id)sender
-{
+- (IBAction)initCratesWithXilinx:(id)sender {
     
-    [model hvMasterTriggersOFF];
-
+    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORSNOCrateModel")] makeObjectsPerformSelector:@selector(setAutoInit:) withObject:NO];
+    
+    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORSNOCrateModel")] makeObjectsPerformSelector:@selector(initCrate:) withObject:NO];
+    
 }
+
+- (IBAction)initCratesWithOutXilinx:(id)sender {
+    
+    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORSNOCrateModel")] makeObjectsPerformSelector:@selector(setAutoInit:) withObject:NO];
+    
+    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORSNOCrateModel")] makeObjectsPerformSelector:@selector(initCrate:) withObject:YES];
+    
+}
+
+
 
 - (IBAction)hvMasterTriggersON:(id)sender
 {
     [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersON)];
+}
+
+- (IBAction)hvMasterTriggersOFF:(id)sender
+{
+    [model hvMasterTriggersOFF];
 }
 
 - (IBAction)hvMasterStatus:(id)sender
@@ -1120,31 +1119,23 @@ smellieRunFile;
 
 //ECA RUNS
 - (IBAction)ecaPatternChangedAction:(id)sender {
-
     int value = (int)[ECApatternPopUpButton indexOfSelectedItem];
     [model setECA_pattern:value+1];
-
 }
 
 - (IBAction)ecaTypeChangedAction:(id)sender {
-    
     int value = (int)[ECAtypePopUpButton indexOfSelectedItem];
     [model setECA_type:value+1];
-    
 }
 
 - (IBAction)ecaTSlopePatternChangedAction:(id)sender {
-    
     int value = [TSlopePatternTextField intValue];
     [model setECA_tslope_pattern:value];
-    
 }
 
 - (IBAction)ecaSubrunTimeChangedAction:(id)sender {
-    
     double value = [subTimeTextField doubleValue];
     [model setECA_subrun_time:value];
-    
 }
 
 //STANDARD RUNS
@@ -1160,14 +1151,11 @@ smellieRunFile;
     [model saveStandardRun:[standardRunPopupMenu objectValueOfSelectedItem] withVersion:[standardRunVersionPopupMenu objectValueOfSelectedItem]];
 }
 - (IBAction)deleteStandardRun:(id)sender {
-
     [standardRunPopupMenu removeItemWithObjectValue:[standardRunPopupMenu stringValue]];
     [standardRunPopupMenu selectItemAtIndex:0];
-
 }
 
 - (IBAction)addNewStandardRunAction:(id)sender {
-    
     NSString *newStandardRun = [standardRunPopupMenu stringValue];
     if ([standardRunPopupMenu indexOfItemWithObjectValue:newStandardRun] == NSNotFound && [newStandardRun isNotEqualTo:@""]){
         BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Creating new Standard Run: \"%@\"", newStandardRun],@"Is this really what you want?",@"Cancel",@"Yes, Make New Standard Run",nil);
