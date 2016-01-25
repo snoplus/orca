@@ -320,7 +320,7 @@ NSString* ORMJDDewarScaleValueChanged           = @"ORMJDDewarScaleValueChanged"
 {
 	double theValue = 0;
 	@synchronized(self){
-        return [self value:aChan];
+        return [self weight:aChan];
     }
 	return theValue;
 }
