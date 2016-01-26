@@ -1343,19 +1343,17 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
         
         NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
                                     [self fullID],               @"name",
-                                    @"Seismic",                  @"title",
-                                    [[specialTrace copy] autorelease],                    @"trace",
-                                    [NSNumber numberWithInt:    [self uniqueIdNumber]],   @"module",
-                                    [NSNumber numberWithInt:    eventInProgress],         @"highResolution",
-                                    [NSNumber numberWithInt:    [specialTrace count]],    @"numPoints",
+                                    [NSString stringWithFormat:@"Seismic%lu", [self uniqueIdNumber]], @"title",
+                                    [[specialTrace copy] autorelease],                                @"trace",
+                                    [NSNumber numberWithInt:    [self uniqueIdNumber]],               @"module",
+                                    [NSNumber numberWithInt:    eventInProgress],                     @"highResolution",
+                                    [NSNumber numberWithInt:    [specialTrace count]],                @"numPoints",
                                     [NSNumber numberWithDouble: t1],        @"startTime",
                                     [NSNumber numberWithDouble: t2],        @"endTime",
                                     [NSNumber numberWithDouble: t2-t1],     @"deltaTime",
                                     nil];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddHistoryAdcRecord" object:self userInfo:values];
         [specialTrace removeAllObjects];
-        
-        NSLog(@"%.2f\n",t2-t1);
         
         [specialStartTime release];
         specialStartTime = [[NSDate date] retain];
