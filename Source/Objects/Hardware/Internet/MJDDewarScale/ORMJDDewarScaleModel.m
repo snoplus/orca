@@ -331,12 +331,12 @@ NSString* ORMJDDewarScaleValueChanged           = @"ORMJDDewarScaleValueChanged"
 
 - (double) maxValueForChan:(int)aChan
 {
-    return 100;
+    return 350;
 }
 
 - (double) minValueForChan:(int)aChan
 {
-    return 0;
+    return 20;
 }
 
 - (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit channel:(int)channel
