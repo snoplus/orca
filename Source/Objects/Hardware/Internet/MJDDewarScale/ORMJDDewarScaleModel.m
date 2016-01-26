@@ -192,7 +192,8 @@ NSString* ORMJDDewarScaleValueChanged           = @"ORMJDDewarScaleValueChanged"
                             if([parts count]>=4){
                                 int aScale = [[parts objectAtIndex:1] intValue];
                                 int adc = [[parts objectAtIndex:3] intValue];
-                                float lbs = 0.7423*adc - 398.88;
+                                //float lbs = 0.7423*adc - 398.88;
+                                float lbs = 0.8402*adc - 456.71;
                                 float aValue = ((lbs - 23.0)/307.0)*100.;
                                 
                                 if(lbs<0)lbs = 0;
