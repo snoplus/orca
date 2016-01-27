@@ -19,9 +19,11 @@
 //-------------------------------------------------------------
 
 #import "OrcaObjectController.h"
+#import "ORMultiStateBox.h"
 
 @interface XL3_LinkController : OrcaObjectController
 {
+    ORMultiStateBox *msbox;
     bool HVAramping, HVBramping;
 	NSView* blankView;
     IBOutlet NSView* xl3View;
