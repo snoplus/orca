@@ -137,7 +137,6 @@ smellieRunFile;
                          name : ORELLIERunFinished
                         object: nil];
     
-    
     [notifyCenter addObserver: self
                      selector: @selector(runNumberChanged:)
                          name: ORRunNumberChangedNotification
@@ -152,6 +151,11 @@ smellieRunFile;
                      selector:@selector(runTypeChanged:)
                          name:SNOPRunTypeChangedNotification
                        object:self];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(runsLockChanged:)
+                         name : SNOPRunsLockNotification
+                       object : nil];
     
     //TODO: add the notification for changedRunType on SNO+
     /*[notifyCenter addObserver:self
@@ -174,6 +178,7 @@ smellieRunFile;
     //[self runNumberChanged:nil]; //update the run number
     [self runStatusChanged:nil]; //update the run status
     [model setIsEmergencyStopEnabled:TRUE]; //enable the emergency stop
+    [self runsLockChanged:nil];
 }
 
 -(void) fetchRunMaskSettings
@@ -676,9 +681,9 @@ smellieRunFile;
 
 - (IBAction)hvMasterTriggersOFF:(id)sender
 {
-    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(setIsPollingXl3:) withObject:NO];
     
-    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersOFF)];
+    [model hvMasterTriggersOFF];
+
 }
 
 - (IBAction)hvMasterTriggersON:(id)sender
@@ -1031,6 +1036,108 @@ smellieRunFile;
     //(if a smellie run is currently operating) start a maintainence run
     //reset the smellie laser system
     //TODO:Make a note in the datastream that this happened 
+}
+
+- (IBAction) runsLockAction:(id)sender
+{
+    [gSecurity tryToSetLock:SNOPRunsLockNotification to:[sender intValue] forWindow:[self window]];
+}
+
+- (void) runsLockChanged:(NSNotification*)aNotification
+{
+    BOOL runInProgress				= [gOrcaGlobals runInProgress];
+    BOOL locked						= [gSecurity isLocked:SNOPRunsLockNotification];
+    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:SNOPRunsLockNotification];
+    
+    //[softwareTriggerButton setEnabled: !locked && !runInProgress];
+    [runsLockButton setState: locked];
+    
+    //Enable or disable fields
+    [loadValuesButton setEnabled:!locked && !runInProgress];
+    [ECApatternPopUpButton setEnabled:!locked && !runInProgress];
+    [ECAtypePopUpButton setEnabled:!locked && !runInProgress];
+    [TSlopePatternTextField setEnabled:!locked && !runInProgress];
+    [subTimeTextField setEnabled:!locked && !runInProgress];
+    [coarseDelayTextField setEnabled:!locked && !runInProgress];
+    [fineDelayTextField setEnabled:!locked && !runInProgress];
+    [pedestalWidthTextField setEnabled:!locked && !runInProgress];
+    [pulserRateTextField setEnabled:!locked && !runInProgress];
+    
+    NSString* s = @"";
+    if(lockedOrRunningMaintenance){
+        if(runInProgress && ![gSecurity isLocked:SNOPRunsLockNotification])
+            s = @"Not in Maintenance Run.";
+    }
+    [runsLockTextField setStringValue:s];
+}
+
+//***Standard runs***
+//ECA
+- (IBAction)loadValues:(id)sender {
+    
+    //Push global variables to model
+    
+    //setter needs a NSNumber* as argument
+    NSNumber* value = [NSNumber numberWithInt:[ECApatternPopUpButton indexOfSelectedItem]+1];
+    //NSLog(@"Set pattern_number to %i \n", [value intValue]);
+    [model setECA_pattern_number:value];
+    value = [NSNumber numberWithInt:[ECAtypePopUpButton indexOfSelectedItem]+1];
+    //NSLog(@"Set eca_type to %i \n", [value intValue]);
+    [model setECA_type:value];
+    value = [NSNumber numberWithInt:[TSlopePatternTextField intValue]];
+    //NSLog(@"Set tslope_pattern to %i \n", [value intValue]);
+    [model setECA_tslope_pattern:value];
+    value = [NSNumber numberWithInt:[subTimeTextField intValue]];
+    //NSLog(@"Set sub_run_time to %i \n", [value intValue]);
+    [model setECA_subrun_time:value];
+    value = [NSNumber numberWithInt:[coarseDelayTextField intValue]];
+    //NSLog(@"Set coarse_delay to %i \n", [value intValue]);
+    [model setECA_coarse_delay:value];
+    value = [NSNumber numberWithInt:[fineDelayTextField intValue]];
+    //NSLog(@"Set fine_delay to %i \n", [value intValue]);
+    [model setECA_fine_delay:value];
+    value = [NSNumber numberWithInt:[pedestalWidthTextField intValue]];
+    //NSLog(@"Set pedestal_width to %i \n", [value intValue]);
+    [model setECA_pedestal_width:value];
+    value = [NSNumber numberWithInt:[pulserRateTextField intValue]];
+    //NSLog(@"Set pulser_rate to %i \n", [value intValue]);
+    [model setECA_pulser_rate:value];
+    
+    
+    [ECApatternCheckBox setBackgroundColor:[NSColor greenColor]];
+    [ECAtypeCheckBox setBackgroundColor:[NSColor greenColor]];
+    [subTimeTextField setBackgroundColor:[NSColor greenColor]];
+    [TSlopePatternTextField setBackgroundColor:[NSColor greenColor]];
+    [coarseDelayTextField setBackgroundColor:[NSColor greenColor]];
+    [fineDelayTextField setBackgroundColor:[NSColor greenColor]];
+    [pedestalWidthTextField setBackgroundColor:[NSColor greenColor]];
+    [pulserRateTextField setBackgroundColor:[NSColor greenColor]];
+    
+    //[self pushvaluestomodel];
+    // Ship the global variables to the ORCA script
+    [model loadVariablesInScript:@"ECA_singleRun"];
+    
+}
+
+- (IBAction) ECACheckValues:(id)sender {
+    
+    if( [ [model ECA_pulser_rate] intValue ] != [pulserRateTextField intValue] )
+        [pulserRateTextField setBackgroundColor:[NSColor orangeColor]];
+    if( [ [model ECA_subrun_time] intValue ] != [subTimeTextField intValue] )
+        [subTimeTextField setBackgroundColor:[NSColor orangeColor]];
+    if( [ [model ECA_tslope_pattern] intValue ] != [TSlopePatternTextField intValue] )
+        [TSlopePatternTextField setBackgroundColor:[NSColor orangeColor]];
+    if( [ [model ECA_coarse_delay] intValue ] != [coarseDelayTextField intValue] )
+        [coarseDelayTextField setBackgroundColor:[NSColor orangeColor]];
+    if( [ [model ECA_fine_delay] intValue ] != [fineDelayTextField intValue] )
+        [fineDelayTextField setBackgroundColor:[NSColor orangeColor]];
+    if( [ [model ECA_pedestal_width] intValue ] != [pedestalWidthTextField intValue] )
+        [pedestalWidthTextField setBackgroundColor:[NSColor orangeColor]];
+    if( [ [model ECA_pattern_number] intValue ] != [ECApatternPopUpButton indexOfSelectedItem] + 1)
+        [ECApatternCheckBox setBackgroundColor:[NSColor orangeColor]];
+    if( [ [model ECA_type] intValue ] != [ECAtypePopUpButton indexOfSelectedItem] + 1)
+        [ECAtypeCheckBox setBackgroundColor:[NSColor orangeColor]];
+    
 }
 
 

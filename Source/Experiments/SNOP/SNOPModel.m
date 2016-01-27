@@ -47,6 +47,7 @@ static NSString* SNOPDbConnector	= @"SNOPDbConnector";
 NSString* ORSNOPModelOrcaDBIPAddressChanged = @"ORSNOPModelOrcaDBIPAddressChanged";
 NSString* ORSNOPModelDebugDBIPAddressChanged = @"ORSNOPModelDebugDBIPAddressChanged";
 NSString* SNOPRunTypeChangedNotification = @"SNOPRunTypeChangedNotification";
+NSString* SNOPRunsLockNotification = @"SNOPRunsLockNotification";
 
 #define kOrcaRunDocumentAdded   @"kOrcaRunDocumentAdded"
 #define kOrcaRunDocumentUpdated @"kOrcaRunDocumentUpdated"
@@ -96,6 +97,18 @@ isEmergencyStopEnabled = isEmergencyStopEnabled,
 mtcConfigDoc = _mtcConfigDoc;
 
 @synthesize smellieRunHeaderDocList;
+
+//Standard Runs
+//ECA
+@synthesize
+ECA_pattern_number = _ECA_pattern_number,
+ECA_type = _ECA_type,
+ECA_tslope_pattern = _ECA_tslope_pattern,
+ECA_subrun_time = _ECA_subrun_time,
+ECA_coarse_delay = _ECA_coarse_delay,
+ECA_fine_delay = _ECA_fine_delay,
+ECA_pedestal_width = _ECA_pedestal_width,
+ECA_pulser_rate = _ECA_pulser_rate;
 
 
 #pragma mark ¥¥¥Initialization
@@ -982,6 +995,14 @@ mtcConfigDoc = _mtcConfigDoc;
     
 }
 
+
+- (void)hvMasterTriggersOFF
+{
+    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(setIsPollingXl3:) withObject:NO];
+    
+    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersOFF)];
+}
+
 - (void) getSmellieRunListInfo
 {
     //Collect a series of objects from the ORMTCModel
@@ -1052,6 +1073,69 @@ mtcConfigDoc = _mtcConfigDoc;
     }
 }
 
+- (void) loadVariablesInScript:(NSString*)userscriptname
+{
+    
+    //Collect ALL the RunScripts & ORCAScripts in an array
+    NSArray* runscripts = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunScriptModel")];
+    NSArray* orcascripts = [[self document] collectObjectsOfClass:NSClassFromString(@"ORScriptTaskModel")];
+    
+    //Look for the requested runscript by looping through the script names
+    for (int i=0; i<[runscripts count]; i++) {
+        //NSLog(@"%d: %@ \n", i, [runscripts[i] scriptName]);
+        if([[runscripts[i] scriptName] isEqualToString:userscriptname])
+        {
+            //This is the one we are looking for so get the script and exit
+            SR_script = [runscripts objectAtIndex:i];
+            break;
+        }
+    }
+    
+    //Look for the requested orcascript by looping through the script names
+    for (int i=0; i<[orcascripts count]; i++) {
+        //NSLog(@"%d: %@ \n", i, [orcascripts[i] scriptName]);
+        if([[orcascripts[i] scriptName] isEqualToString:userscriptname])
+        {
+            //This is the one we are looking for so get the script and exit
+            SR_script = [orcascripts objectAtIndex:i];
+            break;
+        }
+    }
+    
+    if(!SR_script){  //It didn't found the script
+        NSLog(@"ORCA script %@ not found. \n", userscriptname);
+    }
+    else if([[SR_script scriptName] isEqualToString:@"ECA_singleRun"]){
+        //Set global variables
+        NSLog(@"Set values in %@ ORCA script. \n",userscriptname);
+        [self addGlobalVariable:@0 withName:@"pattern_number" withValue:[self ECA_pattern_number]];
+        [self addGlobalVariable:@1 withName:@"eca_type" withValue:[self ECA_type]];
+        [self addGlobalVariable:@2 withName:@"tslope_pattern" withValue:[self ECA_tslope_pattern]];
+        [self addGlobalVariable:@3 withName:@"sub_run_time" withValue:[self ECA_subrun_time]];
+        [self addGlobalVariable:@4 withName:@"coarse_delay" withValue:[self ECA_coarse_delay]];
+        [self addGlobalVariable:@5 withName:@"fine_delay" withValue:[self ECA_fine_delay]];
+        [self addGlobalVariable:@6 withName:@"pedestal_width" withValue:[self ECA_pedestal_width]];
+        [self addGlobalVariable:@7 withName:@"pulser_rate" withValue:[self ECA_pulser_rate]];
+    }
+    
+    //Clean script pointer
+    SR_script = nil;
+    
+}
+
+- (void) addGlobalVariable:(NSNumber*)varindex withName:(NSString*)varname withValue:(NSNumber*)varvalue
+{
+    
+    NSLog(@"Adding new global variable: %@ = %@ \n",varname, varvalue);
+    //Add new global variable in case it doesn't already exist
+    if([varindex integerValue] + 1 > [[SR_script inputValues] count]){
+        [SR_script addInputValue];
+    }
+    
+    //Copy the value
+    [[SR_script inputValues] replaceObjectAtIndex:[varindex intValue] withObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:varname,@"name",[NSDecimalNumber numberWithUnsignedLong:[varvalue intValue]],@"iValue",nil]];
+    
+}
 @end
 
 @implementation SNOPModel (private)
