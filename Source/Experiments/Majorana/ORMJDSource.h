@@ -102,9 +102,11 @@ typedef struct {
     int                 stateAOld;
     int                 stateBOld;
     int                 stateCOld;
+    int                 stateXOld;
     int                 stateA;
     int                 stateB;
     int                 stateC;
+    int                 stateX;
     float               runningTime;
     NSMutableString*    order;
     BOOL                oneTimeGVVerbose;
