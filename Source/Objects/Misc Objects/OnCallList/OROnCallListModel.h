@@ -100,6 +100,7 @@ extern NSString* OROnCallListMessageChanged;
 - (void)      setStatus:(NSString*)aString;
 - (NSString*) status;
 - (void) sendMessage:(NSString*)aMessage;
+- (void) sendMessage:(NSString*)aMessage isAlarm:(BOOL)isAlarm;
 - (void) sendAlarmReport;
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
