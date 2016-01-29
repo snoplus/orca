@@ -553,7 +553,6 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
             [self setCurrentState:kMJDSource_ConnectionError];
         }
     }
-    
     //vxm moving?
     if([remoteOpStatus objectForKey:@"sourceMoving"]){
         BOOL moving = [[remoteOpStatus objectForKey:@"sourceMoving"] boolValue];
@@ -567,7 +566,8 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
        [remoteOpStatus objectForKey:@"B"] &&
        [remoteOpStatus objectForKey:@"C"] &&
        [remoteOpStatus objectForKey:@"GV"] &&
-       [remoteOpStatus objectForKey:@"X"] &&
+       [remoteOpStatus objectForKey:@"CV0"] &&
+       [remoteOpStatus objectForKey:@"CV1"] &&
        [remoteOpStatus objectForKey:@"LED"]
        ){
  
@@ -607,14 +607,16 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
         stateA = [[remoteOpStatus objectForKey:@"A"]intValue];
         stateB = [[remoteOpStatus objectForKey:@"B"]intValue];
         stateC = [[remoteOpStatus objectForKey:@"C"]intValue];
-        stateX = [[remoteOpStatus objectForKey:@"X"]intValue];
+        state0 = [[remoteOpStatus objectForKey:@"CV0"]intValue];
+        state1 = [[remoteOpStatus objectForKey:@"CV1"]intValue];
       
         if(firstTime){
             firstTime = NO;
             stateAOld = stateA;
             stateBOld = stateB;
             stateCOld = stateC;
-            stateXOld = stateX;
+            state0Old = state0;
+            state1Old = state1;
             self.order = [NSMutableString string];
         }
         else {
@@ -630,13 +632,16 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
                 [order appendString:@"C"];
                 NSLog(@"Module %d %@ source, Sensor: %@\n",slot+1,isDeploying==kMJDSource_True?@"Deploying":@"Retracting",order);
             }
+            if (state1Old != state1){
+                NSLog(@"Module %d %@ source, CustomValue: %d\n",slot+1,isDeploying==kMJDSource_True?@"Deploying":@"Retracting",state1);
+            }
             
-            if ((stateX != stateXOld)){
+            if ((state0 != state0Old)){
                 NSString*            s = @"[State Unknown]";
-                if(stateX == 1)      s = @"Deployed";
-                else if(stateX == 2) s = @"Moving";
-                else if(stateX == 3) s = @"Retracted";
-                NSLog(@"Module %d source %@, CustomValue: %d\n",slot+1,s,stateX);
+                if(state0 == 1)      s = @"Deployed";
+                else if(state0 == 2) s = @"Moving";
+                else if(state0 == 3) s = @"Retracted";
+                NSLog(@"Module %d source %@, CustomValue: %d\n",slot+1,s,state0);
             }
             
             [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDSourcePatternChanged object:self];
@@ -644,13 +649,16 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
             stateAOld = stateA;
             stateBOld = stateB;
             stateCOld = stateC;
-            stateXOld = stateX;
+            state0Old = state0;
+            state1Old = state1;
 
-            if([order length]>=5 || stateX!=2){
+            if([order length]>=5 || state0!=2){
                 if(isRetracting){
                     if(([[order substringFromIndex: [order length] - 5] isEqualToString: @"CCBAB"] )||
                        ([[order substringFromIndex: [order length] - 5] isEqualToString: @"CBCAB" ])||
-                       stateX == 3){
+                       (state1 == 99636)||
+                       (state1 == 96936)||
+                       state0 == 3){
                         [self setCurrentState:kMJDSource_StopMotion];
                         NSLog(@"Module %d Source fully retracted\n",slot+1);
                         self.order = [NSMutableString stringWithString:@"RETRACTED"];
@@ -659,7 +667,9 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
                 else {
                     if(([[order substringFromIndex: [order length] - 5] isEqualToString: @"ABACB"] )||
                        ([[order substringFromIndex: [order length] - 5] isEqualToString: @"ABCAB" ])||
-                       stateX == 1){
+                       (state1 == 36396)||
+                       (state1 == 36936)||
+                       state0 == 1){
                         [self setCurrentState:kMJDSource_StopMotion];
                         NSLog(@"Module %d Source fully deployed\n",slot+1);
                         self.order = [NSMutableString stringWithString:@"DEPLOYED"];
@@ -863,6 +873,7 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
     NSLog(@"Module %d configure Arduino I/O\n",slot+1);
     NSMutableArray* cmds = [NSMutableArray arrayWithObjects:
                             @"[ORArduinoUNOModel,1 setCustomValue:0 withValue:2];",    //set custom value to 2
+                            @"[ORArduinoUNOModel,1 setCustomValue:1 withValue:0];",    //set custom value to 2
                             @"[ORArduinoUNOModel,1 setPin:3  type:0];",         //set to input
                             @"[ORArduinoUNOModel,1 setPin:4  type:1];",         //set to output
                             @"[ORArduinoUNOModel,1 setPin:5  type:1];",         //set to output
@@ -920,7 +931,8 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
                             @"A = [ORArduinoUNOModel,1 pinStateIn:3];",
                             @"B = [ORArduinoUNOModel,1 pinStateIn:6];",
                             @"C = [ORArduinoUNOModel,1 pinStateIn:9];",
-                            @"X = [ORArduinoUNOModel,1 customValue:0];",
+                            @"CV0 = [ORArduinoUNOModel,1 customValue:0];",
+                            @"CV1 = [ORArduinoUNOModel,1 customValue:1];",
                             @"GV = [ORArduinoUNOModel,1 adc:0];",
                             @"LED =[ORArduinoUNOModel,1 adc:5];",
                             nil];
