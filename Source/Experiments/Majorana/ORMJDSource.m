@@ -651,14 +651,32 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
             stateCOld = stateC;
             state0Old = state0;
             state1Old = state1;
+            
+            if(state0!=2){
+                if(isRetracting){
+                    if((state1 == 99636) ||
+                       (state1 == 96936) ||
+                       state0 == 3){
+                        [self setCurrentState:kMJDSource_StopMotion];
+                        NSLog(@"Module %d Source fully retracted\n",slot+1);
+                        self.order = [NSMutableString stringWithString:@"RETRACTED"];
+                    }
+                }
+                else {
+                    if((state1 == 36396)||
+                       (state1 == 36936)||
+                       state0 == 1){
+                        [self setCurrentState:kMJDSource_StopMotion];
+                        NSLog(@"Module %d Source fully deployed\n",slot+1);
+                        self.order = [NSMutableString stringWithString:@"DEPLOYED"];
+                    }
+                }
+            }
 
-            if([order length]>=5 || state0!=2){
+            else if([order length]>=5){
                 if(isRetracting){
                     if(([[order substringFromIndex: [order length] - 5] isEqualToString: @"CCBAB"] )||
-                       ([[order substringFromIndex: [order length] - 5] isEqualToString: @"CBCAB" ])||
-                       (state1 == 99636)||
-                       (state1 == 96936)||
-                       state0 == 3){
+                       ([[order substringFromIndex: [order length] - 5] isEqualToString: @"CBCAB" ])){
                         [self setCurrentState:kMJDSource_StopMotion];
                         NSLog(@"Module %d Source fully retracted\n",slot+1);
                         self.order = [NSMutableString stringWithString:@"RETRACTED"];
@@ -666,10 +684,7 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
                 }
                 else {
                     if(([[order substringFromIndex: [order length] - 5] isEqualToString: @"ABACB"] )||
-                       ([[order substringFromIndex: [order length] - 5] isEqualToString: @"ABCAB" ])||
-                       (state1 == 36396)||
-                       (state1 == 36936)||
-                       state0 == 1){
+                       ([[order substringFromIndex: [order length] - 5] isEqualToString: @"ABCAB" ])){
                         [self setCurrentState:kMJDSource_StopMotion];
                         NSLog(@"Module %d Source fully deployed\n",slot+1);
                         self.order = [NSMutableString stringWithString:@"DEPLOYED"];
