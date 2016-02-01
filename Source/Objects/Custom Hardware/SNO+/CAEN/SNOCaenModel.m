@@ -158,6 +158,25 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 	return NSMakeRange(baseAddress,0xEF28);
 }
 
+- (void) registerNotificationObservers
+{
+    [super registerNotificationObservers];
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(runAboutToStart:)
+                         name : ORRunAboutToStartNotification
+                       object : nil];
+}
+
+- (void) runAboutToStart:(NSNotification*)aNote
+{
+    [self initBoard];
+    [self writeNumberBLTEvents:0];
+    [self writeEnableBerr:0];
+    [self writeAcquistionControl:YES];
+}
+
 #pragma mark ***Accessors
 
 - (int) eventSize
@@ -1046,185 +1065,6 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 		bufferFullAlarm = nil;
 	}
     [[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelBufferCheckChanged object:self];
-}
-
-#pragma mark ***DataTaker
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
-{
-    dataId = DataId;
-}
-- (void) setDataIds:(id)assigner
-{
-    dataId       = [assigner assignDataIds:kLongForm]; //short form preferred
-}
-
-- (void) syncDataIdsWith:(id)anotherCard
-{
-    [self setDataId:[anotherCard dataId]];
-}
-
-- (NSDictionary*) dataRecordDescription
-{
-    NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
-	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								 @"SNOCaenWaveformDecoder",				@"decoder",
-								 [NSNumber numberWithLong:dataId],           @"dataId",
-								 [NSNumber numberWithBool:YES],              @"variable",
-								 [NSNumber numberWithLong:-1],               @"length",
-								 nil];
-    [dataDictionary setObject:aDictionary forKey:@"CAEN1720"];
-    return dataDictionary;
-}
-
--(void) startRates
-{
-    [self clearWaveFormCounts];
-    [waveFormRateGroup start:self];
-}
-
-- (void) clearWaveFormCounts
-{
-    int i;
-    for(i=0;i<8;i++){
-        waveFormCount[i]=0;
-    }
-}
-
-- (void) reset
-{
-}
-
-- (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
-{
-    [self initBoard];
-    [self writeNumberBLTEvents:0];
-    [self writeEnableBerr:0];
-    [self writeAcquistionControl:YES];
-}
-
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-{
-	@try {
-		unsigned long status;
-		isRunning = YES; 
-		
-		[controller readLongBlock:&status
-						atAddress:statusReg
-						numToRead:1
-					   withAddMod:addressModifier 
-					usingAddSpace:0x01];
-		bufferState = (status & 0x10) >> 4;						
-		if(status & kEventReadyMask){
-			//OK, at least one event is ready
-			unsigned long theFirst;
-			[controller readLongBlock:&theFirst
-					atAddress:dataReg
-					numToRead:1
-				       withAddMod:addressModifier 
-				    usingAddSpace:0x01]; //we set it to not increment the address.
-			
-			unsigned long theEventSize;
-			theEventSize = theFirst&0x0FFFFFFF;
-			if ( theEventSize == 0 ) return;
-
-			NSMutableData* theData = [NSMutableData dataWithCapacity:2+theEventSize*sizeof(long)];
-			[theData setLength:(2+theEventSize)*sizeof(long)];
-			unsigned long* p = (unsigned long*)[theData bytes];
-			*p++ = dataId | (2 + theEventSize);
-			*p++ = location; 
-			*p++ = theFirst;
-
-			[controller readLongBlock:p
-							atAddress:dataReg
-							numToRead:theEventSize
-						   withAddMod:addressModifier 
-						usingAddSpace:0xFF]; //we set it to not increment the address.
-			
-			[aDataPacket addData:theData];
-			unsigned short chanMask = p[0]; //remember, the point was already inc'ed to the start of data+1
-			int i;
-			for(i=0;i<8;i++){
-				if(chanMask & (1<<i)) ++waveFormCount[i]; 
-			}
-		}
-	}
-	@catch(NSException* localException) {
-	}
-}
-
-- (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
-{
-    isRunning = NO;
-    [waveFormRateGroup stop];
-	short i;
-    for(i=0;i<8;i++)waveFormCount[i] = 0;
-    
-    NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* runControl;
-    if ([objs count]) {
-        runControl = [objs objectAtIndex:0];
-        if ([self continuousMode] && [runControl nextRunWillQuickStart]) {
-            return;
-        }
-    }
-    [self writeAcquistionControl:NO];
-}
-
-- (BOOL) bumpRateFromDecodeStage:(short)channel
-{
-	if(isRunning)return NO;
-    
-    ++waveFormCount[channel];
-    return YES;
-}
-
-
-- (NSString*) identifier
-{
-    return [NSString stringWithFormat:@"CAEN 1720 (Slot %d) ",[self slot]];
-}
-
-//this is the data structure for the new SBCs (i.e. VX704 from Concurrent)
-- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
-{
-	configStruct->total_cards++;
-	configStruct->card_info[index].hw_type_id	= kCaen1720; //should be unique
-	configStruct->card_info[index].hw_mask[0] 	= dataId; //better be unique
-	configStruct->card_info[index].slot			= [self slot];
-	configStruct->card_info[index].crate		= [self crateNumber];
-	configStruct->card_info[index].add_mod		= [self addressModifier];
-	configStruct->card_info[index].base_add		= [self baseAddress];
-	configStruct->card_info[index].deviceSpecificData[0]	= reg[kVMEStatus].addressOffset; //VME Status buffer
-    configStruct->card_info[index].deviceSpecificData[1]	= reg[kEventSize].addressOffset; // "next event size" address
-    configStruct->card_info[index].deviceSpecificData[2]	= reg[kOutputBuffer].addressOffset; // fifo Address
-    configStruct->card_info[index].deviceSpecificData[3]	= 0x0C; // fifo Address Modifier (A32 MBLT supervisory)
-    configStruct->card_info[index].deviceSpecificData[4]	= 0x0FFC; // fifo Size, has to match datasheet
-    configStruct->card_info[index].deviceSpecificData[5]	= location;
-    configStruct->card_info[index].deviceSpecificData[6]	= reg[kVMEControl].addressOffset; // VME Control address
-    configStruct->card_info[index].deviceSpecificData[7]	= reg[kBLTEventNum].addressOffset; // Num of BLT events address
-
-    //sizeOfEvent is the size of a single event, regardless what the BLTEvent number is
-    //SBC uses it to calculate number of blocks for the DMA transfer
-    //unit is uint32_t word
-	unsigned sizeOfEvent = 0;
-	if (isFixedSize) {
-		unsigned long numChan = 0;
-		unsigned long chanMask = [self enabledMask];
-		for (; chanMask; numChan++) chanMask &= chanMask - 1;
-		if (isCustomSize) {
-			sizeOfEvent = numChan * customSize * 2 + 4;
-		}
-		else {
-			sizeOfEvent = numChan * (1UL << 20 >> [self eventSize]) / 4 + 4; //(1MB / num of blocks)
-		}
-	}
-	configStruct->card_info[index].deviceSpecificData[8] = sizeOfEvent;
-    configStruct->card_info[index].deviceSpecificData[9] = kNumberBLTEventsToReadout;
-	configStruct->card_info[index].num_Trigger_Indexes = 0;
-	configStruct->card_info[index].next_Card_Index = index+1;
-	
-	return index+1;
 }
 
 #pragma mark ***Archival

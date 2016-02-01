@@ -20,7 +20,6 @@
 //-------------------------------------------------------------
 
 #import "ORVmeIOCard.h"
-#import "ORDataTaker.h"
 #import "ORHWWizard.h"
 #import "ORCaenDataDecoder.h"
 #import "SBC_Config.h"
@@ -99,7 +98,7 @@ enum {
 @class ORAlarm;
 
 // Class definition
-@interface SNOCaenModel : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping>
+@interface SNOCaenModel : ORVmeIOCard <ORHWWizard>
 {
 	unsigned long   dataId;
 	unsigned short  selectedRegIndex;
@@ -140,6 +139,9 @@ enum {
 }
 
 @property (assign, nonatomic)   BOOL    continuousMode;
+
+- (void) registerNotificationObservers;
+- (void) runAboutToStart:(NSNotification*)aNote;
 
 #pragma mark ***Accessors
 - (int)				eventSize;
@@ -284,9 +286,3 @@ extern NSString* SNOCaenSettingsLock;
 extern NSString* SNOCaenRateGroupChanged;
 extern NSString* SNOCaenModelBufferCheckChanged;
 extern NSString* SNOCaenModelContinuousModeChanged;
-//the decoder concrete decoder class
-@interface SNOCaenDecoderForCAEN : ORCaenDataDecoder
-{}
-- (NSString*) identifier;
-@end
-
