@@ -2021,7 +2021,7 @@ resetFifoOnStart = _resetFifoOnStart;
 - (void) mtcatResetMtcat:(unsigned char) mtcat
 {
     @try {
-        [mtc okCommand:"reset_mtca %d", mtcat];
+        [mtc okCommand:"mtca_reset %d", mtcat];
     } @catch (NSException *e) {
         NSLog(@"mtcatResetMtcat: %@\n", e.reason);
     }
@@ -2031,7 +2031,7 @@ resetFifoOnStart = _resetFifoOnStart;
 - (void) mtcatResetAll
 {
     @try {
-        [mtc okCommand:"reset_mtca"];
+        [mtc okCommand:"mtca_reset_all"];
     } @catch (NSException *e) {
         NSLog(@"mtcatResetAll: %@\n", e.reason);
     }
@@ -2069,7 +2069,7 @@ resetFifoOnStart = _resetFifoOnStart;
     }
 
     @try {
-        [mtc okCommand:"load_mtca_crate_mask %d %d", mtcat, mask];
+        [mtc okCommand:"mtca_load_crate_mask %d %d", mtcat, mask];
     } @catch(NSException* e) {
         NSLog(@"mtcatLoadCrateMask: %@\n", e.reason);
         return;
