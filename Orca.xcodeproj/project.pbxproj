@@ -242,8 +242,6 @@
 		3672CF8D1C4EB15000870996 /* SNOCaen1720Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3672CF821C4EB15000870996 /* SNOCaen1720Card.gif */; };
 		3672CF8E1C4EB15000870996 /* SNOCaenController.h in Headers */ = {isa = PBXBuildFile; fileRef = 3672CF831C4EB15000870996 /* SNOCaenController.h */; };
 		3672CF8F1C4EB15000870996 /* SNOCaenController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3672CF841C4EB15000870996 /* SNOCaenController.m */; };
-		3672CF901C4EB15000870996 /* SNOCaenDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 3672CF851C4EB15000870996 /* SNOCaenDecoder.h */; };
-		3672CF911C4EB15000870996 /* SNOCaenDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 3672CF861C4EB15000870996 /* SNOCaenDecoder.m */; };
 		3672CF921C4EB15000870996 /* SNOCaenModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 3672CF871C4EB15000870996 /* SNOCaenModel.h */; };
 		3672CF931C4EB15000870996 /* SNOCaenModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 3672CF881C4EB15000870996 /* SNOCaenModel.m */; };
 		43135802195C5D89007B1F15 /* ORGretinaTriggerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 43135801195C5D89007B1F15 /* ORGretinaTriggerModel.m */; };
@@ -2130,8 +2128,6 @@
 		849928180DCB997C00E82DB4 /* MTCCard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 849928100DCB997C00E82DB4 /* MTCCard.gif */; };
 		849928190DCB997C00E82DB4 /* ORMTCController.h in Headers */ = {isa = PBXBuildFile; fileRef = 849928110DCB997C00E82DB4 /* ORMTCController.h */; };
 		8499281A0DCB997C00E82DB4 /* ORMTCController.m in Sources */ = {isa = PBXBuildFile; fileRef = 849928120DCB997C00E82DB4 /* ORMTCController.m */; };
-		8499281B0DCB997C00E82DB4 /* ORMTCDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 849928130DCB997C00E82DB4 /* ORMTCDecoders.h */; };
-		8499281C0DCB997C00E82DB4 /* ORMTCDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 849928140DCB997C00E82DB4 /* ORMTCDecoders.m */; };
 		8499281D0DCB997C00E82DB4 /* ORMTCModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 849928150DCB997C00E82DB4 /* ORMTCModel.h */; };
 		8499281E0DCB997C00E82DB4 /* ORMTCModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 849928160DCB997C00E82DB4 /* ORMTCModel.m */; };
 		849929AB0DCFCA5900E82DB4 /* ORMTC_Constants.h in Headers */ = {isa = PBXBuildFile; fileRef = 849929AA0DCFCA5900E82DB4 /* ORMTC_Constants.h */; };
@@ -3885,8 +3881,6 @@
 		3672CF821C4EB15000870996 /* SNOCaen1720Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = SNOCaen1720Card.gif; sourceTree = "<group>"; };
 		3672CF831C4EB15000870996 /* SNOCaenController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNOCaenController.h; sourceTree = "<group>"; };
 		3672CF841C4EB15000870996 /* SNOCaenController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SNOCaenController.m; sourceTree = "<group>"; };
-		3672CF851C4EB15000870996 /* SNOCaenDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNOCaenDecoder.h; sourceTree = "<group>"; };
-		3672CF861C4EB15000870996 /* SNOCaenDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SNOCaenDecoder.m; sourceTree = "<group>"; };
 		3672CF871C4EB15000870996 /* SNOCaenModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNOCaenModel.h; sourceTree = "<group>"; };
 		3672CF881C4EB15000870996 /* SNOCaenModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SNOCaenModel.m; sourceTree = "<group>"; };
 		43135801195C5D89007B1F15 /* ORGretinaTriggerModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGretinaTriggerModel.m; sourceTree = "<group>"; };
@@ -5545,8 +5539,6 @@
 		849928100DCB997C00E82DB4 /* MTCCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = MTCCard.gif; path = "Source/Objects/Custom Hardware/SNO+/MTC/MTCCard.gif"; sourceTree = SOURCE_ROOT; };
 		849928110DCB997C00E82DB4 /* ORMTCController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMTCController.h; path = "Source/Objects/Custom Hardware/SNO+/MTC/ORMTCController.h"; sourceTree = SOURCE_ROOT; };
 		849928120DCB997C00E82DB4 /* ORMTCController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMTCController.m; path = "Source/Objects/Custom Hardware/SNO+/MTC/ORMTCController.m"; sourceTree = SOURCE_ROOT; };
-		849928130DCB997C00E82DB4 /* ORMTCDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMTCDecoders.h; path = "Source/Objects/Custom Hardware/SNO+/MTC/ORMTCDecoders.h"; sourceTree = SOURCE_ROOT; };
-		849928140DCB997C00E82DB4 /* ORMTCDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMTCDecoders.m; path = "Source/Objects/Custom Hardware/SNO+/MTC/ORMTCDecoders.m"; sourceTree = SOURCE_ROOT; };
 		849928150DCB997C00E82DB4 /* ORMTCModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMTCModel.h; path = "Source/Objects/Custom Hardware/SNO+/MTC/ORMTCModel.h"; sourceTree = SOURCE_ROOT; };
 		849928160DCB997C00E82DB4 /* ORMTCModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMTCModel.m; path = "Source/Objects/Custom Hardware/SNO+/MTC/ORMTCModel.m"; sourceTree = SOURCE_ROOT; };
 		849929AA0DCFCA5900E82DB4 /* ORMTC_Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORMTC_Constants.h; sourceTree = "<group>"; };
@@ -7453,8 +7445,6 @@
 				3672CF821C4EB15000870996 /* SNOCaen1720Card.gif */,
 				3672CF831C4EB15000870996 /* SNOCaenController.h */,
 				3672CF841C4EB15000870996 /* SNOCaenController.m */,
-				3672CF851C4EB15000870996 /* SNOCaenDecoder.h */,
-				3672CF861C4EB15000870996 /* SNOCaenDecoder.m */,
 				3672CF871C4EB15000870996 /* SNOCaenModel.h */,
 				3672CF881C4EB15000870996 /* SNOCaenModel.m */,
 			);
@@ -11046,8 +11036,6 @@
 				849928100DCB997C00E82DB4 /* MTCCard.gif */,
 				849928110DCB997C00E82DB4 /* ORMTCController.h */,
 				849928120DCB997C00E82DB4 /* ORMTCController.m */,
-				849928130DCB997C00E82DB4 /* ORMTCDecoders.h */,
-				849928140DCB997C00E82DB4 /* ORMTCDecoders.m */,
 				849928150DCB997C00E82DB4 /* ORMTCModel.h */,
 				849928160DCB997C00E82DB4 /* ORMTCModel.m */,
 				849929AA0DCFCA5900E82DB4 /* ORMTC_Constants.h */,
@@ -15023,7 +15011,6 @@
 				8499FFDD0DC90F5800E82DB4 /* ORXL1Model.h in Headers */,
 				8499FFE40DC9102700E82DB4 /* ORXL2Model.h in Headers */,
 				849928190DCB997C00E82DB4 /* ORMTCController.h in Headers */,
-				8499281B0DCB997C00E82DB4 /* ORMTCDecoders.h in Headers */,
 				8499281D0DCB997C00E82DB4 /* ORMTCModel.h in Headers */,
 				849929AB0DCFCA5900E82DB4 /* ORMTC_Constants.h in Headers */,
 				84992CB60DD21F3800E82DB4 /* ORHP3458aController.h in Headers */,
@@ -15067,7 +15054,6 @@
 				8491E6CA0EB9E1900084BAD6 /* ORXL1Controller.h in Headers */,
 				8491F4760EC0CDEF0084BAD6 /* ORPmtImage.h in Headers */,
 				8491FE440EC1DD270084BAD6 /* NSImage+Extensions.h in Headers */,
-				3672CF901C4EB15000870996 /* SNOCaenDecoder.h in Headers */,
 				8491FE8B0EC1DF780084BAD6 /* ORSwitchImage.h in Headers */,
 				841B061B0EC4837000B6F77C /* SupportedUSBDevices.h in Headers */,
 				842360B70ED1F4D800BECB64 /* ORSNOConstants.h in Headers */,
@@ -17222,7 +17208,6 @@
 				8499FFDE0DC90F5800E82DB4 /* ORXL1Model.m in Sources */,
 				8499FFE50DC9102700E82DB4 /* ORXL2Model.m in Sources */,
 				8499281A0DCB997C00E82DB4 /* ORMTCController.m in Sources */,
-				8499281C0DCB997C00E82DB4 /* ORMTCDecoders.m in Sources */,
 				8499281E0DCB997C00E82DB4 /* ORMTCModel.m in Sources */,
 				84992CB70DD21F3800E82DB4 /* ORHP3458aController.m in Sources */,
 				84992CB90DD21F3800E82DB4 /* ORHP3458aModel.m in Sources */,
@@ -17695,7 +17680,6 @@
 				8449A53B16AEDF5B00296104 /* ORCV1721Decoder.m in Sources */,
 				8449A53D16AEDF5B00296104 /* ORCV1721Model.m in Sources */,
 				8449A55216B0781B00296104 /* ORGretinaCntView.m in Sources */,
-				3672CF911C4EB15000870996 /* SNOCaenDecoder.m in Sources */,
 				84DA76C316B803E00045F22A /* ORAdcRateController.m in Sources */,
 				84DA76C516B803E00045F22A /* ORAdcRateModel.m in Sources */,
 				84C00CC116B82350003D1504 /* ORFixedValueController.m in Sources */,

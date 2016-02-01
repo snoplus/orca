@@ -23,9 +23,6 @@
 #pragma mark •••Imported Files
 
 #import "ORVmeIOCard.h"
-#import "ORDataTaker.h"
-#import "VME_eCPU_Config.h"
-#import "SBC_Config.h"
 #import "RedisClient.h"
 #include <stdint.h>
 
@@ -34,7 +31,7 @@
 
 #define MTCLockOutWidth @"MTCLockOutWidth"
 
-@interface ORMTCModel :  ORVmeIOCard <ORDataTaker>
+@interface ORMTCModel :  ORVmeIOCard
 {
     @private
 		unsigned long			_dataId;
@@ -184,19 +181,6 @@
 - (float) mVoltsTopC:(float) mVolts dcOffset:(float)dcOffset mVperpC:(float)mVperp;
 - (float) pCTomVolts:(float) pC dcOffset:(float)dcOffset mVperpC:(float)mVperp;
 - (long) pCToRaw:(float) pC dcOffset:(float)dcOffset mVperpC:(float)mVperp;
-
-#pragma mark •••Data Taker
-- (unsigned long) dataId;
-- (void) setDataId: (unsigned long) DataId;
-- (NSDictionary*) dataRecordDescription;
-- (void) setDataIds:(id)assigner;
-- (void) syncDataIdsWith:(id)anotherMTC;
-- (void) reset;
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
-- (BOOL) bumpRateFromDecodeStage:(NSDictionary*) mtcStatus;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;

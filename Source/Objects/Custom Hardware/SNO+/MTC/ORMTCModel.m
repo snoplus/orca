@@ -23,17 +23,11 @@
 #pragma mark •••Imported Files
 #import "ORMTCModel.h"
 #import "ORVmeCrateModel.h"
-#import "ORDataTypeAssigner.h"
 #import "ORMTC_Constants.h"
 #import "NSDictionary+Extensions.h"
-#import "ORReadOutList.h"
-#import "SBC_Config.h"
-#import "VME_HW_Definitions.h"
 #import "SNOCmds.h"
-#import "SBC_Link.h"
 #import "ORSelectorSequence.h"
 #import "ORRunModel.h"
-#import "ORCaen1720Model.h"
 #import "ORRunController.h"
 
 #define uShortDBValue(A) [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] unsignedShortValue]
@@ -764,142 +758,6 @@ resetFifoOnStart = _resetFifoOnStart;
     //return [[mtcDataBase objectForNestedKey:[self getDBDefaultByIndex:DBRef]] unsignedShortValue];
 }
 
-#pragma mark •••Data Taker
-- (NSMutableArray*) children {
-    //methods exists to give common interface across all objects for display in lists
-    return [NSMutableArray arrayWithObjects:triggerGroup,nil];
-}
-
-- (NSDictionary*) dataRecordDescription
-{
-    NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
-    NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								 @"ORMTCDecoderForMTC",	@"decoder",
-								 [NSNumber numberWithLong:[self dataId]], @"dataId",
-								 [NSNumber numberWithBool:NO], @"variable",
-								 [NSNumber numberWithLong:7], @"length",  //****put in actual length
-								 nil];
-    [dataDictionary setObject:aDictionary forKey:@"MTC"];
-
-    NSDictionary* bDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								 @"ORMTCDecoderForMTCStatus",	@"decoder",
-								 [NSNumber numberWithLong:[self mtcStatusDataId]], @"dataId",
-								 [NSNumber numberWithBool:NO], @"variable",
-								 [NSNumber numberWithLong:7], @"length",
-								 nil];
-    [dataDictionary setObject:bDictionary forKey:@"MTCStatus"];
-
-    return dataDictionary;
-}
-
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-}
-
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-}
-
-- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-}
-
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-}
-
-- (void) saveReadOutList:(NSFileHandle*)aFile
-{
-    [triggerGroup saveUsingFile:aFile];
-}
-
-- (void) loadReadOutList:(NSFileHandle*)aFile
-{
-    [self setTriggerGroup:[[[ORReadOutList alloc] initWithIdentifier:@"Mtc Trigger"]autorelease]];
-    [triggerGroup loadUsingFile:aFile];
-}
-
-//this is the data structure for the new SBCs (i.e. VX704 from Concurrent)
-- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
-{
-    configStruct->total_cards++;
-    configStruct->card_info[index].hw_type_id		= kMtc;			//should be unique 
-    configStruct->card_info[index].hw_mask[0]		= [self dataId];		//better be unique
-	configStruct->card_info[index].hw_mask[1] = [self mtcStatusDataId];
-    configStruct->card_info[index].slot				= [self slot];
-    configStruct->card_info[index].add_mod			= [self addressModifier];
-    configStruct->card_info[index].base_add			= [self baseAddress];
-	configStruct->card_info[index].deviceSpecificData[0] = reg[kMtcBbaReg].addressOffset;
-	configStruct->card_info[index].deviceSpecificData[1] = reg[kMtcBwrAddOutReg].addressOffset;
-	configStruct->card_info[index].deviceSpecificData[2] = [self memBaseAddress];
-	configStruct->card_info[index].deviceSpecificData[3] = [self memAddressModifier];
-	configStruct->card_info[index].deviceSpecificData[4] = 500; //delay between monitoring packets in msec
-	configStruct->card_info[index].deviceSpecificData[5] = [self resetFifoOnStart];
-    configStruct->card_info[index].deviceSpecificData[6] = uLongDBValue(kGtMask);
-    configStruct->card_info[index].deviceSpecificData[7] = uLongDBValue(kGtCrateMask);
-
-	configStruct->card_info[index].num_Trigger_Indexes = 0; //no children
-	configStruct->card_info[index].next_Card_Index = index + 1;
-	
-	return index + 1;
-
-// this doesn't work in the XL3 push mode
-// it would be great if it did
-/*
-	configStruct->card_info[index].num_Trigger_Indexes = 1;
-	int nextIndex = index+1;
-    
-	configStruct->card_info[index].next_Trigger_Index[0] = -1;
-	NSEnumerator* e = [dataTakers objectEnumerator];
-	id obj;
-	while(obj = [e nextObject]){
-		if([obj respondsToSelector:@selector(load_HW_Config_Structure:index:)]){
-			if(configStruct->card_info[index].next_Trigger_Index[0] == -1){
-				configStruct->card_info[index].next_Trigger_Index[0] = nextIndex;
-			}
-			int savedIndex = nextIndex;
-			nextIndex = [obj load_HW_Config_Structure:configStruct index:nextIndex];
-			if(obj == [dataTakers lastObject]){
-				configStruct->card_info[savedIndex].next_Card_Index = -1; //make the last object a leaf node
-			}
-		}
-	}
-	
-    configStruct->card_info[index].next_Card_Index 	 = nextIndex;
-    
-    return nextIndex;
-*/
-	
-}
-
-- (BOOL) bumpRateFromDecodeStage:(NSDictionary*) mtcStatus
-{
-    unsigned long oldGTID = [self mtcStatusGTID];
-    
-    [self setMtcStatusGTID:[[mtcStatus objectForKey:@"GTID"] unsignedLongValue]];
-    
-    unsigned long newGTID = [self mtcStatusGTID];
-
-    double mtcStatusGTIDRate = 2 * (newGTID - oldGTID);
-    
-    [self setMtcStatusGTIDRate: mtcStatusGTIDRate];
-    
-    //[self setMtcStatusGTIDRate: [[mtcStatus objectForKey:@"GTIDRate"] unsignedLongValue ]];
-    [self setMtcStatusCnt10MHz:[[mtcStatus objectForKey:@"cnt10MHz"] unsignedLongLongValue]];
-    [self setMtcStatusTime10Mhz:[mtcStatus objectForKey:@"time10MHz"]];
-    [self setMtcStatusReadPtr:[[mtcStatus objectForKey:@"readPtr"] unsignedLongValue]];
-    [self setMtcStatusWritePtr:[[mtcStatus objectForKey:@"writePtr"] unsignedLongValue]];
-    [self setMtcStatusDataAvailable:[[mtcStatus objectForKey:@"dataAvailable"] boolValue]];
-    long numEventsInMem = [self mtcStatusWritePtr] - [self mtcStatusReadPtr];
-    if (numEventsInMem < 0 || (numEventsInMem == 0 && [self mtcStatusDataAvailable])) {
-        numEventsInMem += 0x100000;
-    }
-    [self setMtcStatusNumEventsInMem:(unsigned long)numEventsInMem];
-
-    
-    return YES;
-}
-
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
@@ -982,22 +840,6 @@ resetFifoOnStart = _resetFifoOnStart;
     
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
 	return objDictionary;
-}
-
-- (void) setDataIds:(id)assigner
-{
-    [self setDataId:[assigner assignDataIds:kLongForm]];
-    [self setMtcStatusDataId:[assigner assignDataIds:kLongForm]];
-}
-
-- (void) syncDataIdsWith:(id)anotherMTC
-{
-    [self setDataId:[anotherMTC dataId]];
-    [self setMtcStatusDataId:[anotherMTC mtcStatusDataId]];
-}
-
-- (void) reset
-{
 }
 
 #pragma mark •••DB Helpers
