@@ -84,6 +84,7 @@
                 <outlet property="subTimeTextField" destination="76n-l0-vbd" id="FvJ-Ex-JLF"/>
                 <outlet property="tabView" destination="101" id="332"/>
                 <outlet property="timeLimitField" destination="1342" id="1353"/>
+                <outlet property="timeStartedField" destination="3770" id="rbE-Hw-cDc"/>
                 <outlet property="timedRunCB" destination="1344" id="1352"/>
                 <outlet property="valueHistogramsPlot" destination="2627" id="2637"/>
                 <outlet property="viewTypePU" destination="2304" id="2310"/>
@@ -2717,7 +2718,7 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowHeight="13" headerView="2599" id="1200">
-                                                        <rect key="frame" x="0.0" y="0.0" width="194" height="254"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="194" height="15"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" red="0.77501147999999997" green="1" blue="0.83125859000000002" alpha="1" colorSpace="calibratedRGB"/>
@@ -2737,7 +2738,7 @@
                                                                 </textFieldCell>
                                                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                             </tableColumn>
-                                                            <tableColumn identifier="threshold" width="99" minWidth="40" maxWidth="1000" id="1202">
+                                                            <tableColumn identifier="threshold" width="85" minWidth="40" maxWidth="1000" id="1202">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Threshold">
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -2850,7 +2851,7 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" alternatingRowBackgroundColors="YES" multipleSelection="NO" autosaveName="FocalPlaneTableView" rowHeight="13" headerView="BKY-Yi-rKz" id="jpl-vK-Vml">
-                                                        <rect key="frame" x="0.0" y="0.0" width="133" height="387"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="133" height="15"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" red="1" green="0.98048109000000006" blue="0.95548701000000003" alpha="1" colorSpace="calibratedRGB"/>
@@ -3328,7 +3329,7 @@
                                                     <textField verticalHuggingPriority="750" id="3770">
                                                         <rect key="frame" x="92" y="61" width="61" height="14"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Now" id="3773">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="--" id="3773">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -3337,7 +3338,7 @@
                                                     <textField verticalHuggingPriority="750" id="3771">
                                                         <rect key="frame" x="92" y="42" width="61" height="14"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Now" id="3772">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="--" id="3772">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -3346,7 +3347,7 @@
                                                     <textField verticalHuggingPriority="750" id="3753">
                                                         <rect key="frame" x="92" y="95" width="68" height="14"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Physics" id="3758">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="--" id="3758">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
