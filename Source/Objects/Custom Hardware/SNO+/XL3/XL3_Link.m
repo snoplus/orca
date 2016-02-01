@@ -30,10 +30,7 @@
 #import <sys/errno.h>
 #include "anet.h"
 
-#define MAX_DELAY 3600
-
 #define XL3_SERVER "daq1.sp.snolab.ca"
-
 
 NSString* XL3_LinkConnectionChanged     = @"XL3_LinkConnectionChanged";
 NSString* XL3_LinkTimeConnectedChanged	= @"XL3_LinkTimeConnectedChanged";
@@ -64,8 +61,6 @@ readFifoFlag = _readFifoFlag;
 - (id) init
 {
 	self = [super init];
-
-    delay = 10;
 
 	commandSocketLock = [[NSLock alloc] init];
 	coreSocketLock = [[NSLock alloc] init];
@@ -155,8 +150,6 @@ readFifoFlag = _readFifoFlag;
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
-
-    delay = 10;
 
 	[self setErrorTimeOut: [decoder decodeIntForKey: @"errorTimeOut"]];
     [self setAutoConnect: [decoder decodeBoolForKey: @"autoConnect"]];
@@ -716,8 +709,6 @@ static void SwapLongBlock(void* p, int32_t n)
 
     workingSocket = 0;
     if ((workingSocket = anetTcpConnect(err, XL3_SERVER, portNumber+100)) == ANET_ERR) {
-        NSLog(@"%@: %s\n", [self crateName], err);
-
         if (workingSocket) {
             close(workingSocket);
             workingSocket = 0;
@@ -728,11 +719,8 @@ static void SwapLongBlock(void* p, int32_t n)
 
         [self setIsConnected:NO];
 
-        delay *= 2;
-
-        [NSThread sleepForTimeInterval:delay];
+        [NSThread sleepForTimeInterval:10.0];
     } else {
-        delay = 10;
         [self setIsConnected:YES];
     }
 	
