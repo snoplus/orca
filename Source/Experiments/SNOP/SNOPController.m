@@ -687,7 +687,10 @@ smellieRunFile;
     
     [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORSNOCrateModel")] makeObjectsPerformSelector:@selector(setAutoInit:) withObject:NO];
     
-    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORSNOCrateModel")] makeObjectsPerformSelector:@selector(initCrate:) withObject:NO];
+    NSArray *crates = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass: NSClassFromString(@"ORSNOCrateModel")];
+    for (id crate in crates) {
+        [crate performSelector:@selector(initCrate:phase:) withObject:NO withObject:0];
+    }
     
 }
 
@@ -695,7 +698,10 @@ smellieRunFile;
     
     [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORSNOCrateModel")] makeObjectsPerformSelector:@selector(setAutoInit:) withObject:NO];
     
-    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORSNOCrateModel")] makeObjectsPerformSelector:@selector(initCrate:) withObject:YES];
+    NSArray *crates = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass: NSClassFromString(@"ORSNOCrateModel")];
+    for (id crate in crates) {
+        [crate performSelector:@selector(initCrate:phase:) withObject:YES withObject:0];
+    }
     
 }
 
