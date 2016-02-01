@@ -30,8 +30,6 @@
 @class ORMTC_DB;
 @class ORReadOutList;
 
-#define MTCLockOutWidth @"MTCLockOutWidth"
-
 @interface ORMTCModel :  ORVmeIOCard <ORDataTaker>
 {
     @private
@@ -305,6 +303,9 @@ extern NSString* ORMTCModelIsPulserFixedRateChanged;
 extern NSString* ORMTCModelFixedPulserRateCountChanged;
 extern NSString* ORMTCModelFixedPulserRateDelayChanged;
 extern NSString* ORMtcTriggerNameChanged;
-extern NSString* ORMTCLock;
+extern NSString* ORMTCBasicLock;
+extern NSString* ORMTCStandardOpsLock;
+extern NSString* ORMTCSettingsLock;
+extern NSString* ORMTCTriggersLock;
 extern NSString* ORMTCModelMTCAMaskChanged;
 extern NSString* ORMTCModelIsPedestalEnabledInCSR;

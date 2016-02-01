@@ -57,7 +57,10 @@ NSString* ORMTCModelIsPulserFixedRateChanged	= @"ORMTCModelIsPulserFixedRateChan
 NSString* ORMTCModelFixedPulserRateCountChanged = @"ORMTCModelFixedPulserRateCountChanged";
 NSString* ORMTCModelFixedPulserRateDelayChanged = @"ORMTCModelFixedPulserRateDelayChanged";
 NSString* ORMtcTriggerNameChanged		= @"ORMtcTriggerNameChanged";
-NSString* ORMTCLock				= @"ORMTCLock";
+NSString* ORMTCBasicLock				= @"ORMTCBasicLock";
+NSString* ORMTCStandardOpsLock				= @"ORMTCStandardOpsLock";
+NSString* ORMTCSettingsLock				= @"ORMTCSettingsLock";
+NSString* ORMTCTriggersLock				= @"ORMTCTriggersLock";
 NSString* ORMTCModelMTCAMaskChanged = @"ORMTCModelMTCAMaskChanged";
 NSString* ORMTCModelIsPedestalEnabledInCSR = @"ORMTCModelIsPedestalEnabledInCSR";
 
