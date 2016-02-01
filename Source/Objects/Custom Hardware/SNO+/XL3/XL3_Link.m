@@ -32,7 +32,7 @@
 
 #define MAX_DELAY 3600
 
-#define XL3_SERVER "localhost"
+#define XL3_SERVER "daq1.sp.snolab.ca"
 
 
 NSString* XL3_LinkConnectionChanged     = @"XL3_LinkConnectionChanged";
