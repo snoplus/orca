@@ -104,7 +104,7 @@ mtcConfigDoc = _mtcConfigDoc;
 #define MTC_HOST @"sbc.sp.snolab.ca"
 #define MTC_PORT 4001
 #define XL3_HOST @"daq1.sp.snolab.ca"
-#define XL3_PORT 4001
+#define XL3_PORT 4004
 
 
 #pragma mark ¥¥¥Initialization
