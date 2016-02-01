@@ -160,7 +160,6 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 
 - (void) registerNotificationObservers
 {
-    [super registerNotificationObservers];
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     
     [notifyCenter addObserver : self
@@ -619,7 +618,6 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 
 - (void) writeChan:(unsigned short)chan reg:(unsigned short) pReg sendValue:(unsigned long) pValue
 {
-	unsigned long theValue = pValue;
     // Check that register is a valid register.
     if (pReg >= [self getNumberRegisters]){
         [NSException raise:@"Illegal Register" format:@"Register index out of bounds on %@",[self identifier]];
@@ -1186,12 +1184,5 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     else return nil;
 }
 
-@end
-
-@implementation SNOCaenDecoderForCAEN : ORCaenDataDecoder
-- (NSString*) identifier
-{
-    return @"CAEN 1720 Digitizer";
-}
 @end
 

@@ -147,7 +147,6 @@ enum {
 - (int)				eventSize;
 - (void)			setEventSize:(int)aEventSize;
 - (int)				bufferState;
-- (void)			clearWaveFormCounts;
 - (void)			setRateIntegrationTime:(double)newIntegrationTime;
 - (id)				rateObject:(int)channel;
 - (ORRateGroup*)	waveFormRateGroup;
@@ -237,18 +236,6 @@ enum {
 - (void)			writeThreshold:(unsigned short) pChan;
 - (void)			readOverUnderThresholds;
 - (void)			writeBufferOrganization;
-
-#pragma mark •••DataTaker
-- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
-- (unsigned long)	dataId;
-- (void)			setDataId: (unsigned long) DataId;
-- (void)			setDataIds:(id)assigner;
-- (void)			syncDataIdsWith:(id)anotherShaper;
-- (NSDictionary*)	dataRecordDescription;
-- (void)			runTaskStarted: (ORDataPacket*) aDataPacket userInfo:(id)userInfo;
-- (void)			takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void)			runTaskStopped: (ORDataPacket*) aDataPacket userInfo:(id)userInfo;
-- (BOOL)			bumpRateFromDecodeStage:(short)channel;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;

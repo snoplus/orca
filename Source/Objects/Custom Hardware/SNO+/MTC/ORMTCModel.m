@@ -270,7 +270,6 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (void) registerNotificationObservers
 {
-    [super registerNotificationObservers];
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     
     [notifyCenter addObserver : self
