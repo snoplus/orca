@@ -54,7 +54,6 @@ NSString* ORMTCModelLastFileLoadedChanged	= @"ORMTCModelLastFileLoadedChanged";
 NSString* ORMTCModelIsPulserFixedRateChanged	= @"ORMTCModelIsPulserFixedRateChanged";
 NSString* ORMTCModelFixedPulserRateCountChanged = @"ORMTCModelFixedPulserRateCountChanged";
 NSString* ORMTCModelFixedPulserRateDelayChanged = @"ORMTCModelFixedPulserRateDelayChanged";
-NSString* ORMtcTriggerNameChanged		= @"ORMtcTriggerNameChanged";
 NSString* ORMTCLock				= @"ORMTCLock";
 NSString* ORMTCModelMTCAMaskChanged = @"ORMTCModelMTCAMaskChanged";
 NSString* ORMTCModelIsPedestalEnabledInCSR = @"ORMTCModelIsPedestalEnabledInCSR";
@@ -217,12 +216,7 @@ resetFifoOnStart = _resetFifoOnStart;
     mtc = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
 	
     [[self undoManager] disableUndoRegistration];
-	[self setTriggerName:@"Trigger"];
     
-    ORReadOutList* r1 = [[ORReadOutList alloc] initWithIdentifier:triggerName];
-    [self setTriggerGroup:r1];
-    [r1 release];
-	
     [[self undoManager] enableUndoRegistration];
 	[self setFixedPulserRateCount: 1];
 	[self setFixedPulserRateDelay: 10];
@@ -232,7 +226,6 @@ resetFifoOnStart = _resetFifoOnStart;
 - (void) dealloc
 {
     [mtc release];
-    [triggerGroup release];
     [defaultFile release];
     [lastFile release];
     [lastFileLoaded release];
@@ -308,35 +301,6 @@ resetFifoOnStart = _resetFifoOnStart;
 - (unsigned short) addressModifier
 {
 	return 0x29;
-}
-
-- (ORReadOutList*) triggerGroup
-{
-    return triggerGroup;
-}
-
-- (void) setTriggerGroup:(ORReadOutList*)newTriggerGroup
-{
-    [triggerGroup autorelease];
-    triggerGroup=[newTriggerGroup retain];
-}
-- (NSString *) triggerName
-{
-    return triggerName;
-}
-
-- (void) setTriggerName: (NSString *) aTriggerName
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setTriggerName:triggerName];
-    [triggerName autorelease];
-    triggerName = [aTriggerName copy];
-    
-    [triggerGroup setIdentifier:triggerName];
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMtcTriggerNameChanged
-                                                        object:self];
-    
-    
 }
 
 - (int) eSumViewType
@@ -787,8 +751,6 @@ resetFifoOnStart = _resetFifoOnStart;
 	[self setFixedPulserRateCount:	[decoder decodeIntForKey:	@"ORMTCModelFixedPulserRateCount"]];
 	[self setFixedPulserRateDelay:	[decoder decodeFloatForKey:	@"ORMTCModelFixedPulserRateDelay"]];
 	[self setMtcDataBase:		[decoder decodeObjectForKey:	@"ORMTCModelMtcDataBase"]];
-    [self setTriggerGroup:  [decoder decodeObjectForKey:    @"ORMtcTriggerGroup"]];
-    [self setTriggerName:	[decoder decodeObjectForKey:	@"ORMtcTrigger1Name"]];
 
     [self setMtcaN100Mask:[decoder decodeIntForKey:@"mtcaN100Mask"]];
     [self setMtcaN20Mask:[decoder decodeIntForKey:@"mtcaN20Mask"]];
@@ -800,9 +762,6 @@ resetFifoOnStart = _resetFifoOnStart;
     [self setIsPedestalEnabledInCSR:[decoder decodeBoolForKey:@"isPedestalEnabledInCSR"]];
     
 	if(!mtcDataBase)[self setupDefaults];
-    if(triggerName == nil || [triggerName length]==0){
-        [self setTriggerName:@"Trigger"];
-    }
     [[self undoManager] enableUndoRegistration];
 	
     return self;
@@ -827,8 +786,6 @@ resetFifoOnStart = _resetFifoOnStart;
 	[encoder encodeBool:isPulserFixedRate	forKey:@"ORMTCModelIsPulserFixedRate"];
 	[encoder encodeInt:fixedPulserRateCount forKey:@"ORMTCModelFixedPulserRateCount"];
 	[encoder encodeFloat:fixedPulserRateDelay forKey:@"ORMTCModelFixedPulserRateDelay"];
-	[encoder encodeObject:triggerGroup	forKey:@"ORMtcTriggerGroup"];
-    [encoder encodeObject:triggerName	forKey:@"ORMtcTriggerName"];
     [encoder encodeInt:[self mtcaN100Mask] forKey:@"mtcaN100Mask"];
     [encoder encodeInt:[self mtcaN20Mask] forKey:@"mtcaN20Mask"];
     [encoder encodeInt:[self mtcaEHIMask] forKey:@"mtcaEHIMask"];
