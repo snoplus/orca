@@ -47,6 +47,12 @@
     IBOutlet StopLightView *lightBoardView;
     IBOutlet NSButton *maintenanceRunBox;
 
+    //Quick links
+    
+    //Danger zone
+    IBOutlet NSButton *panicDownButton;
+    IBOutlet NSTextField *detectorHVStatus;
+    
     //Run Types Information
     IBOutlet NSMatrix*  globalRunTypesMatrix;
     

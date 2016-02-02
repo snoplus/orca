@@ -489,12 +489,15 @@ smellieRunFile;
             int mRow;
             int mColumn;
             bool found;
+            bool globalHVON = false;
             
             found = [hvStatusMatrix getRow:&mRow column:&mColumn ofCell:[hvStatusMatrix cellWithTag:[xl3 crateNumber]]];
             if (found) {
+                //Individual HV status
                 [[hvStatusMatrix cellAtRow:mRow column:1] setStringValue:[xl3 hvASwitch]?@"ON":@"OFF"];
                 if ([xl3 hvASwitch]) {
                     [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor redColor]];
+                    globalHVON = true;
                 }
                 else {
                     [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor blackColor]];
@@ -505,6 +508,17 @@ smellieRunFile;
                  [NSString stringWithFormat:@"%d V",(unsigned int)[xl3 hvAVoltageReadValue]]];
                 [[hvStatusMatrix cellAtRow:mRow column:4] setStringValue:
                  [NSString stringWithFormat:@"%3.1f mA",[xl3 hvACurrentReadValue]]];
+            }
+            //Detector worldwide HV status
+            if(globalHVON){
+                [detectorHVStatus setStringValue:@"PMTs HV is ON"];
+                [detectorHVStatus setBackgroundColor:[NSColor colorWithSRGBRed:255./255. green:102./255. blue:102./255. alpha:1]];
+                [panicDownButton setEnabled:1];
+            }
+            else{
+                [detectorHVStatus setStringValue:@"PMTs HV is OFF"];
+                [detectorHVStatus setBackgroundColor:[NSColor colorWithSRGBRed:153./255. green:204./255. blue:255./255. alpha:1]];
+                [panicDownButton setEnabled:0];
             }
             if ([xl3 crateNumber] == 16) {//16B
                 int mRow;

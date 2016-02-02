@@ -16,6 +16,7 @@
                 <outlet property="currentRunType" destination="3753" id="3780"/>
                 <outlet property="debugDBIPAddressPU" destination="2730" id="2967"/>
                 <outlet property="detailsLockButton" destination="1216" id="1217"/>
+                <outlet property="detectorHVStatus" destination="fHi-qS-g5A" id="oT8-lw-7La"/>
                 <outlet property="detectorLockButton" destination="368" id="370"/>
                 <outlet property="detectorTitle" destination="1189" id="1190"/>
                 <outlet property="detectorView" destination="1151" id="1168"/>
@@ -50,6 +51,7 @@
                 <outlet property="n20hi" destination="3706" id="3859"/>
                 <outlet property="orcaDBIPAddressPU" destination="2683" id="2962"/>
                 <outlet property="owln" destination="3714" id="3861"/>
+                <outlet property="panicDownButton" destination="zmA-F4-wTd" id="37F-oN-VJj"/>
                 <outlet property="pollingStatus" destination="3998" id="4000"/>
                 <outlet property="primaryColorAxisLogCB" destination="1149" id="1225"/>
                 <outlet property="primaryRateField" destination="867" id="1227"/>
