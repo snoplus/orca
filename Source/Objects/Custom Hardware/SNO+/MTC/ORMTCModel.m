@@ -54,7 +54,6 @@ NSString* ORMTCModelLastFileLoadedChanged	= @"ORMTCModelLastFileLoadedChanged";
 NSString* ORMTCModelIsPulserFixedRateChanged	= @"ORMTCModelIsPulserFixedRateChanged";
 NSString* ORMTCModelFixedPulserRateCountChanged = @"ORMTCModelFixedPulserRateCountChanged";
 NSString* ORMTCModelFixedPulserRateDelayChanged = @"ORMTCModelFixedPulserRateDelayChanged";
-NSString* ORMtcTriggerNameChanged		= @"ORMtcTriggerNameChanged";
 NSString* ORMTCLock				= @"ORMTCLock";
 NSString* ORMTCModelMTCAMaskChanged = @"ORMTCModelMTCAMaskChanged";
 NSString* ORMTCModelIsPedestalEnabledInCSR = @"ORMTCModelIsPedestalEnabledInCSR";
@@ -217,12 +216,7 @@ resetFifoOnStart = _resetFifoOnStart;
     mtc = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
 	
     [[self undoManager] disableUndoRegistration];
-	[self setTriggerName:@"Trigger"];
     
-    ORReadOutList* r1 = [[ORReadOutList alloc] initWithIdentifier:triggerName];
-    [self setTriggerGroup:r1];
-    [r1 release];
-	
     [[self undoManager] enableUndoRegistration];
 	[self setFixedPulserRateCount: 1];
 	[self setFixedPulserRateDelay: 10];
@@ -232,7 +226,6 @@ resetFifoOnStart = _resetFifoOnStart;
 - (void) dealloc
 {
     [mtc release];
-    [triggerGroup release];
     [defaultFile release];
     [lastFile release];
     [lastFileLoaded release];
@@ -265,6 +258,50 @@ resetFifoOnStart = _resetFifoOnStart;
 }
 
 - (void) registerNotificationObservers
+<<<<<<< HEAD
+{
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(runAboutToStart:)
+                         name : ORRunAboutToStartNotification
+                       object : nil];
+}
+
+- (void) runAboutToStart:(NSNotification*)aNote
+{
+    /* At the start of every run, we initialize the HW settings. */
+
+    /* Setup MTCD pedestal/pulser settings */
+    if ([self isPedestalEnabledInCSR]) [self enablePedestal];
+    [self setupPulseGTDelaysCoarse: uLongDBValue(kCoarseDelay) fine:uLongDBValue(kFineDelay)];
+    [self setTheLockoutWidth: uLongDBValue(kLockOutWidth)];
+    [self setThePedestalWidth: uLongDBValue(kPedestalWidth)];
+    [self setThePulserRate:floatDBValue(kPulserPeriod)];
+    [self setThePrescaleValue];
+
+    /* Setup Pedestal Crate Mask */
+	[self setPedestalCrateMask];
+
+    /* Setup the GT mask */
+    [self clearGlobalTriggerWordMask];
+    [self setSingleGTWordMask: uLongDBValue(kGtMask)];
+
+    /* Setup GT Crate Mask */
+    [self setGTCrateMask];
+
+    /* Setup MTCA Thresholds */
+    [self loadTheMTCADacs];
+
+    /* Setup MTCA relays */
+    [self mtcatLoadCrateMasks];
+}
+
+#pragma mark •••Accessors
+
+- (unsigned short) addressModifier
+=======
+>>>>>>> mtc
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     
@@ -308,35 +345,6 @@ resetFifoOnStart = _resetFifoOnStart;
 - (unsigned short) addressModifier
 {
 	return 0x29;
-}
-
-- (ORReadOutList*) triggerGroup
-{
-    return triggerGroup;
-}
-
-- (void) setTriggerGroup:(ORReadOutList*)newTriggerGroup
-{
-    [triggerGroup autorelease];
-    triggerGroup=[newTriggerGroup retain];
-}
-- (NSString *) triggerName
-{
-    return triggerName;
-}
-
-- (void) setTriggerName: (NSString *) aTriggerName
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setTriggerName:triggerName];
-    [triggerName autorelease];
-    triggerName = [aTriggerName copy];
-    
-    [triggerGroup setIdentifier:triggerName];
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMtcTriggerNameChanged
-                                                        object:self];
-    
-    
 }
 
 - (int) eSumViewType
@@ -787,8 +795,6 @@ resetFifoOnStart = _resetFifoOnStart;
 	[self setFixedPulserRateCount:	[decoder decodeIntForKey:	@"ORMTCModelFixedPulserRateCount"]];
 	[self setFixedPulserRateDelay:	[decoder decodeFloatForKey:	@"ORMTCModelFixedPulserRateDelay"]];
 	[self setMtcDataBase:		[decoder decodeObjectForKey:	@"ORMTCModelMtcDataBase"]];
-    [self setTriggerGroup:  [decoder decodeObjectForKey:    @"ORMtcTriggerGroup"]];
-    [self setTriggerName:	[decoder decodeObjectForKey:	@"ORMtcTrigger1Name"]];
 
     [self setMtcaN100Mask:[decoder decodeIntForKey:@"mtcaN100Mask"]];
     [self setMtcaN20Mask:[decoder decodeIntForKey:@"mtcaN20Mask"]];
@@ -800,9 +806,6 @@ resetFifoOnStart = _resetFifoOnStart;
     [self setIsPedestalEnabledInCSR:[decoder decodeBoolForKey:@"isPedestalEnabledInCSR"]];
     
 	if(!mtcDataBase)[self setupDefaults];
-    if(triggerName == nil || [triggerName length]==0){
-        [self setTriggerName:@"Trigger"];
-    }
     [[self undoManager] enableUndoRegistration];
 	
     return self;
@@ -827,8 +830,6 @@ resetFifoOnStart = _resetFifoOnStart;
 	[encoder encodeBool:isPulserFixedRate	forKey:@"ORMTCModelIsPulserFixedRate"];
 	[encoder encodeInt:fixedPulserRateCount forKey:@"ORMTCModelFixedPulserRateCount"];
 	[encoder encodeFloat:fixedPulserRateDelay forKey:@"ORMTCModelFixedPulserRateDelay"];
-	[encoder encodeObject:triggerGroup	forKey:@"ORMtcTriggerGroup"];
-    [encoder encodeObject:triggerName	forKey:@"ORMtcTriggerName"];
     [encoder encodeInt:[self mtcaN100Mask] forKey:@"mtcaN100Mask"];
     [encoder encodeInt:[self mtcaN20Mask] forKey:@"mtcaN20Mask"];
     [encoder encodeInt:[self mtcaEHIMask] forKey:@"mtcaEHIMask"];
@@ -1754,9 +1755,79 @@ resetFifoOnStart = _resetFifoOnStart;
 	short	index, bitIndex, dacIndex;
 	unsigned short	dacValues[14];
 	unsigned long   aValue = 0;
+<<<<<<< HEAD
 
 
 	//-------------- variables -----------------
+
+	@try {
+		
+		// STEP 3: load the DAC values from the database into dacValues[14]
+		for (index = 0; index < 14 ; index++){
+			dacValues[index] = [self dacValueByIndex:index];
+		}
+		
+		// STEP 4: Set DACSEL in Register 2 high[in hardware it's inverted -- i.e. it is set low]
+		[self write:kMtcDacCntReg value:MTC_DAC_CNT_DACSEL];
+		
+		// STEP 5: now parallel load the 16bit word into the serial shift register
+		// STEP 5a: the first 4 bits are loaded zeros 
+		aValue = 0UL;
+		for (index = 0; index < 4 ; index++){
+			
+			// data bit, with DACSEL high, clock low
+			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
+			
+			// clock high
+			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL | MTC_DAC_CNT_DACCLK];
+			
+			// clock low
+			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
+		}
+		
+		//STEP 5b:  now build the word and load the next 12 bits, load MSB first
+		for (bitIndex = 11; bitIndex >= 0 ; bitIndex--){
+			
+			aValue = 0UL;
+			
+			for (dacIndex = 0; dacIndex < 14 ; dacIndex++){
+				
+				if ( dacValues[dacIndex] & (1UL << bitIndex) )
+					aValue |= (1UL << dacIndex);
+			}
+			
+			// data bit, with DACSEL high, clock low
+			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
+			
+			// clock high
+			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL | MTC_DAC_CNT_DACCLK];
+			
+			// clock low
+			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
+		}
+		
+		// STEP 5: Set DACSEL in Register 2 low[in hardware it's inverted -- i.e. it is set high], with all other bits low
+		[self write:kMtcDacCntReg value:0];
+		NSLog(@"Loaded the MTC/A DACs\n");
+		
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Could not load the MTC/A DACs!\n");		
+		[localException raise];
+	}
+}
+=======
+>>>>>>> mtc
+
+
+<<<<<<< HEAD
+- (void) loadMTCXilinx
+{
+    [mtc okCommand:"load_xilinx"];
+}
+=======
+	//-------------- variables -----------------
+>>>>>>> mtc
 
 	@try {
 		

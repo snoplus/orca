@@ -71,10 +71,6 @@
     unsigned long _mtcaOEHIMask;
     unsigned long _mtcaOWLNMask;
 
-		//data taking variables
-		ORReadOutList*  triggerGroup;
-		NSString*		triggerName;
-		//NSArray*		dataTakers;       //cache of data takers.
     unsigned long _mtcStatusGTID;
     double _mtcStatusGTIDRate;
     unsigned long long _mtcStatusCnt10MHz;
@@ -122,10 +118,6 @@
 - (void) runAboutToStart:(NSNotification*)aNote;
 
 #pragma mark •••Accessors
-- (ORReadOutList*) triggerGroup;
-- (void) setTriggerGroup:(ORReadOutList*)newTrigger1Group;
-- (NSString *) triggerName;
-- (void) setTriggerName: (NSString *) aTrigger1Name;
 - (int) eSumViewType;
 - (void) setESumViewType:(int)aESumViewType;
 - (int) nHitViewType;
@@ -289,7 +281,6 @@ extern NSString* ORMTCModelMtcDataBaseChanged;
 extern NSString* ORMTCModelIsPulserFixedRateChanged;
 extern NSString* ORMTCModelFixedPulserRateCountChanged;
 extern NSString* ORMTCModelFixedPulserRateDelayChanged;
-extern NSString* ORMtcTriggerNameChanged;
 extern NSString* ORMTCLock;
 extern NSString* ORMTCModelMTCAMaskChanged;
 extern NSString* ORMTCModelIsPedestalEnabledInCSR;
