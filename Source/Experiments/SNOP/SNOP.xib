@@ -44,6 +44,7 @@
                 <outlet property="loadedSmellieOperationModeLabel" destination="3614" id="3620"/>
                 <outlet property="loadedSmellieRunNameLabel" destination="3566" id="3595"/>
                 <outlet property="loadedSmellieTriggerFrequencyLabel" destination="3568" id="3596"/>
+                <outlet property="maintenanceRunBox" destination="yCr-y5-XJN" id="xRb-vV-iIx"/>
                 <outlet property="n100Hi" destination="3699" id="3857"/>
                 <outlet property="n100Lo" destination="3716" id="3863"/>
                 <outlet property="n100med" destination="3702" id="3858"/>
@@ -3195,6 +3196,9 @@
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="maintenanceBoxAction:" target="-2" id="hav-GY-eLW"/>
+                                            </connections>
                                         </button>
                                         <textField verticalHuggingPriority="750" id="1342">
                                             <rect key="frame" x="87" y="53" width="70" height="18"/>

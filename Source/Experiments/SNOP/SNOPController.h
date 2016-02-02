@@ -43,9 +43,10 @@
     IBOutlet NSComboBox *debugDBIPAddressPU;
     IBOutlet NSMatrix* hvStatusMatrix;
     
-    //Run control
+    //Run control (the rest is in the ORExperimentController)
     IBOutlet StopLightView *lightBoardView;
-    
+    IBOutlet NSButton *maintenanceRunBox;
+
     //Run Types Information
     IBOutlet NSMatrix*  globalRunTypesMatrix;
     

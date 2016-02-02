@@ -152,7 +152,12 @@ smellieRunFile;
                      selector:@selector(runTypeChanged:)
                          name:SNOPRunTypeChangedNotification
                        object:self];
-
+    
+    [notifyCenter addObserver:self
+                     selector:@selector(runTypeMaskChanged:)
+                         name:ORRunTypeChangedNotification
+                       object:theRunControl];
+    
     [notifyCenter addObserver : self
                      selector : @selector(runsLockChanged:)
                          name : ORSNOPRunsLockNotification
@@ -280,6 +285,28 @@ smellieRunFile;
     
 }
 
+-(void) runTypeMaskChanged:(NSNotification*)aNote
+{
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    ORRunModel* mainRunControl = [objs objectAtIndex:0];
+
+    [maintenanceRunBox setState:[mainRunControl runType] & 1];
+}
+
+
+- (IBAction)maintenanceBoxAction:(id)sender {
+
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    ORRunModel* mainRunControl = [objs objectAtIndex:0];
+    if([maintenanceRunBox state]){
+        [runControl setRunType:[mainRunControl runType] | (eMaintenanceRunType)];
+    }
+    else if(![maintenanceRunBox state]){
+        [runControl setRunType:[mainRunControl runType] & ~(eMaintenanceRunType)];
+    }
+    
+}
+
 
 //- (IBAction) startRunAction:(id)sender
 //{
@@ -374,12 +401,12 @@ smellieRunFile;
 //    //[model setRunType:kRunUndefined];
 //}
 
-- (void) startRun
-{
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* theRunControl = [objs objectAtIndex:0];
-	[theRunControl performSelector:@selector(startRun)withObject:nil afterDelay:.1];
-}
+//- (void) startRun
+//{
+//    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+//    ORRunModel* theRunControl = [objs objectAtIndex:0];
+//	[theRunControl performSelector:@selector(startRun)withObject:nil afterDelay:.1];
+//}
 
 - (void) runStatusChanged:(NSNotification*)aNotification{
     
@@ -1088,6 +1115,7 @@ smellieRunFile;
     [standardRunLoadButton setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunLoadToHWButton setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunDeleteButton setEnabled:!lockedOrNotRunningMaintenance];
+    [maintenanceRunBox setEnabled:!lockedOrNotRunningMaintenance];
     
     [runStatusTextField setStringValue:@"UNLOCKED"];
     [runStatusTextField setBackgroundColor:[NSColor colorWithSRGBRed:0 green:0 blue:1 alpha:1]];
