@@ -18,6 +18,10 @@
 @property (nonatomic) int port;
 @property (nonatomic) long timeout;
 
+- (id) init;
+- (id) initWithHostName: (NSString*) _host withPort: (int) _port;
+- (long) timeout;
+- (void) setTimeout: (long) _timeout;
 - (void) connect;
 - (void) disconnect;
 - (redisReply*) vcommand: (const char*) fmt args:(va_list) args;

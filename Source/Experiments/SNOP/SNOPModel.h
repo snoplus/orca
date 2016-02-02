@@ -22,6 +22,7 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORExperimentModel.h"
 #import "ORVmeCardDecoder.h"
+#import "RedisClient.h"
 
 @class ORDataPacket;
 @class ORDataSet;
@@ -102,6 +103,9 @@
     
     bool isEmergencyStopEnabled;
     bool isEStopPolling;
+
+    RedisClient *mtc_server;
+    RedisClient *xl3_server;
 }
 
 @property (nonatomic,retain) NSMutableDictionary* smellieRunHeaderDocList;
@@ -139,6 +143,9 @@
 @property (copy) NSDictionary* configDocument;
 @property (copy) NSDictionary* mtcConfigDoc;
 
+- (id) init;
+- (id) initWithCoder:(NSCoder*)decoder;
+
 - (void) initSmellieRunDocsDic;
 - (void) initOrcaDBConnectionHistory;
 - (void) clearOrcaDBConnectionHistory;
@@ -159,11 +166,18 @@
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
+
+- (void) runInitialization:(NSNotification*)aNote;
+- (void) runAboutToStart:(NSNotification*)aNote;
+- (void) runStarted:(NSNotification*)aNote;
+- (void) runAboutToStop:(NSNotification*)aNote;
+- (void) runStopped:(NSNotification*)aNote;
+
+- (void) _waitForBuffers;
+
 - (void) runStateChanged:(NSNotification*)aNote;
 - (void) subRunStarted:(NSNotification*)aNote;
 - (void) subRunEnded:(NSNotification*)aNote;
-- (void) runStarted:(NSNotification*)aNote;
-- (void) runStopped:(NSNotification*)aNote;
 
 - (void) updateEPEDStructWithCoarseDelay: (unsigned long) coarseDelay
                                fineDelay: (unsigned long) fineDelay
