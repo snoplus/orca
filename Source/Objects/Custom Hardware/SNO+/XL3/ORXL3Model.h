@@ -21,8 +21,6 @@
 #pragma mark •••Imported Files
 #import "ORSNOCard.h"
 #import "XL3_Cmds.h"
-#import "ORDataTaker.h"
-#import "VME_eCPU_Config.h"
 #import "SNOPModel.h"
 
 typedef struct  {
@@ -53,7 +51,7 @@ enum {
 @class ORCouchDB;
 
 
-@interface ORXL3Model : ORSNOCard <ORDataTaker>
+@interface ORXL3Model : ORSNOCard
 {
 	XL3_Link*       xl3Link;
 	unsigned long	_xl3MegaBundleDataId;
@@ -264,15 +262,6 @@ enum {
 - (void) parseEcalDocument:(NSDictionary*)aResult;
 - (void) updateUIFromEcalBundle:(NSDictionary*)aBundle slot:(unsigned int)aSlot;
 - (BOOL) isRelayClosedForSlot:(unsigned int)slot pc:(unsigned int)aPC;
-
-#pragma mark •••DataTaker
-- (void) setDataIds:(id)assigner;
-- (void) syncDataIdsWith:(id)anotherObj;
-- (NSDictionary*) dataRecordDescription;
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (int) load_eCPU_HW_Config_Structure:(VME_crate_config*)configStruct index:(int)index;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;

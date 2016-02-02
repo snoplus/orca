@@ -41,6 +41,8 @@
 #import "SNOP_Run_Constants.h"
 #import "SBC_Link.h"
 #import "SNOCmds.h"
+#import "RedisClient.h"
+#include <stdint.h>
 
 NSString* ORSNOPModelViewTypeChanged	= @"ORSNOPModelViewTypeChanged";
 static NSString* SNOPDbConnector	= @"SNOPDbConnector";
@@ -97,8 +99,71 @@ mtcConfigDoc = _mtcConfigDoc;
 
 @synthesize smellieRunHeaderDocList;
 
+/* #define these variables for now. Eventually we need to add fields
+ * to the GUI, but Javi is working on the SNOPModel now */
+#define MTC_HOST @"sbc.sp.snolab.ca"
+#define MTC_PORT 4001
+#define XL3_HOST @"daq1.sp.snolab.ca"
+#define XL3_PORT 4004
+
 
 #pragma mark ¥¥¥Initialization
+
+- (id) init
+{
+    self = [super init];
+
+    /* initialize our connection to the MTC server */
+    mtc_server = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
+
+    /* initialize our connection to the XL3 server */
+    xl3_server = [[RedisClient alloc] initWithHostName:XL3_HOST withPort:XL3_PORT];
+
+    [[self undoManager] disableUndoRegistration];
+	[self initOrcaDBConnectionHistory];
+	[self initDebugDBConnectionHistory];
+    [self initSmellieRunDocsDic];
+
+    [[self undoManager] enableUndoRegistration];
+
+    return self;
+}
+
+- (id) initWithCoder:(NSCoder*)decoder
+{
+    self = [super initWithCoder:decoder];
+
+    /* initialize our connection to the MTC server */
+    mtc_server = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
+
+    /* initialize our connection to the XL3 server */
+    xl3_server = [[RedisClient alloc] initWithHostName:XL3_HOST withPort:XL3_PORT];
+
+    [[self undoManager] disableUndoRegistration];
+	[self initOrcaDBConnectionHistory];
+	[self initDebugDBConnectionHistory];
+    [self initSmellieRunDocsDic];
+
+
+    
+    [self setViewType:[decoder decodeIntForKey:@"viewType"]];
+
+    self.orcaDBUserName = [decoder decodeObjectForKey:@"ORSNOPModelOrcaDBUserName"];
+    self.orcaDBPassword = [decoder decodeObjectForKey:@"ORSNOPModelOrcaDBPassword"];
+    self.orcaDBName = [decoder decodeObjectForKey:@"ORSNOPModelOrcaDBName"];
+    self.orcaDBPort = [decoder decodeInt32ForKey:@"ORSNOPModelOrcaDBPort"];
+    self.orcaDBIPAddress = [decoder decodeObjectForKey:@"ORSNOPModelOrcaDBIPAddress"];
+    self.debugDBUserName = [decoder decodeObjectForKey:@"ORSNOPModelDebugDBUserName"];
+    self.debugDBPassword = [decoder decodeObjectForKey:@"ORSNOPModelDebugDBPassword"];
+    self.debugDBName = [decoder decodeObjectForKey:@"ORSNOPModelDebugDBName"];
+    self.debugDBPort = [decoder decodeInt32ForKey:@"ORSNOPModelDebugDBPort"];
+    self.debugDBIPAddress = [decoder decodeObjectForKey:@"ORSNOPModelDebugDBIPAddress"];
+    
+    self.runTypeMask = [decoder decodeObjectForKey:@"SNOPRunTypeMask"];
+	
+    [[self undoManager] enableUndoRegistration];
+    return self;
+}
 
 - (void) setUpImage
 {
@@ -209,6 +274,31 @@ mtcConfigDoc = _mtcConfigDoc;
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     
     [notifyCenter addObserver : self
+                     selector : @selector(runInitialization:)
+                         name : ORRunInitializationNotification
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(runAboutToStart:)
+                         name : ORRunAboutToStartNotification
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(runStarted:)
+                         name : ORRunStartedNotification
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(runAboutToStop:)
+                         name : ORRunAboutToStopNotification
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(runStopped:)
+                         name : ORRunStoppedNotification
+                       object : nil];
+
+    [notifyCenter addObserver : self
                      selector : @selector(runStateChanged:)
                          name : ORRunStatusChangedNotification
                        object : nil];    
@@ -223,15 +313,114 @@ mtcConfigDoc = _mtcConfigDoc;
                          name : ORRunBetweenSubRunsNotification
                        object : nil];
 
-    [notifyCenter addObserver : self
-                     selector : @selector(runStarted:)
-                         name : ORRunStartedNotification
-                       object : nil];
+}
 
-    [notifyCenter addObserver : self
-                     selector : @selector(runStopped:)
-                         name : ORRunStoppedNotification
-                       object : nil];
+- (void) runInitialization:(NSNotification*)aNote
+{
+    @try {
+        [mtc_server okCommand:"reset_gtid"];
+
+        /* Tell the MTC server to queue the run start. This will suspend
+         * the MTC readout and fire a SOFT_GT. When the run starts, we will
+         * resume the MTC readout */
+        [mtc_server okCommand:"queue_run_start"];
+    } @catch (NSException *e) {
+        /* Need to abort the run start here, because uncaught exceptions are
+         * not handled by ORCA during this phase of run start */
+        NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                    [e name], @"Reason",
+                                    [e reason], @"Details",
+                                    nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStartupAbort object: self userInfo: userInfo];
+    }
+}
+
+- (void) runAboutToStart:(NSNotification*)aNote
+{
+}
+
+- (void) runStarted:(NSNotification*)aNote
+{
+    ORRunModel *run = [aNote object];
+
+    uint32_t run_type = [run runType];
+    uint32_t run_number = [run runNumber];
+    uint32_t source_mask = 0; /* needs to come from the MANIP system */
+
+    /* send the run_start command to the MTC server which will send the
+     * run header record to the builder, resume the MTC readout, fire a
+     * SOFT_GT, and send a trigger record to the builder */
+    [mtc_server okCommand:"run_start %d %d %d", run_number, run_type, source_mask];
+
+    //initilise the run document
+    self.runDocument = nil;
+    //intialise the configuation document
+    self.configDocument = nil;
+    //initilise the run document
+    self.mtcConfigDoc = nil;
+    
+    [NSThread detachNewThreadSelector:@selector(_runDocumentWorker) toTarget:self withObject:nil];
+
+    [self updateRHDRSruct];
+    [self shipRHDRRecord];
+}
+
+- (void) runAboutToStop:(NSNotification*)aNote
+{
+    /* If this is a hard stop, we send run_stop to the MTC server which
+     * will fire a SOFT_GT and turn triggers off. Then we need to wait
+     * until the MTC/CAEN/XL3s have read out all the data. */
+
+    ORRunModel *run = [aNote object];
+
+    [mtc_server okCommand:"run_stop"];
+
+    NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                              @"waiting for MTC/XL3/CAEN data", @"Reason",
+                              nil];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object: self userInfo: userInfo];
+
+    /* detach a thread to monitor XL3/CAEN/MTC buffers */
+    [NSThread detachNewThreadSelector:@selector(_waitForBuffers)
+                             toTarget:self
+                           withObject:nil];
+}
+
+- (void) _waitForBuffers
+{
+    while (1) {
+        @try {
+            if (([mtc_server intCommand:"data_available"] == 0) &&
+                ([xl3_server intCommand:"data_available"] == 0))
+                break;
+        } @catch (NSException *e) {
+            NSLog(@"Failed to check MTC/XL3 data buffers. Quitting run...\n");
+            break;
+        }
+    }
+
+    /* Go ahead and end the run. */
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
+}
+
+- (void) runStopped:(NSNotification*)aNote
+{
+    /* By this point, the MTC/CAEN/XL3s should be read out, so if this is
+     * a hard run stop, we send the MTC server the builder_end_run command
+     * which will tell the builder to flush all events */
+
+    ORRunModel *run = [aNote object];
+
+    if (![run nextRunWillQuickStart]) {
+        [mtc_server okCommand:"builder_end_run"];
+    }
+
+    [NSThread detachNewThreadSelector:@selector(_runEndDocumentWorker:)
+                             toTarget:self
+                           withObject:[[self.runDocument copy] autorelease]];
+    self.runDocument = nil;
+    self.configDocument = nil;
 }
 
 - (void) runStateChanged:(NSNotification*)aNote
@@ -253,30 +442,6 @@ mtcConfigDoc = _mtcConfigDoc;
 - (void) subRunEnded:(NSNotification*)aNote
 {
     //update calibration documents (TELLIE temp)
-}
-
-- (void) runStarted:(NSNotification*)aNote
-{
-    //initilise the run document
-    self.runDocument = nil;
-    //intialise the configuation document
-    self.configDocument = nil;
-    //initilise the run document
-    self.mtcConfigDoc = nil;
-    
-    [NSThread detachNewThreadSelector:@selector(_runDocumentWorker) toTarget:self withObject:nil];
-
-    [self updateRHDRSruct];
-    [self shipRHDRRecord];
-}
-
-- (void) runStopped:(NSNotification*)aNote
-{
-    [NSThread detachNewThreadSelector:@selector(_runEndDocumentWorker:)
-                             toTarget:self
-                           withObject:[[self.runDocument copy] autorelease]];
-    self.runDocument = nil;
-    self.configDocument = nil;
 }
 
 // orca script helper (will come from DB)
@@ -809,36 +974,6 @@ mtcConfigDoc = _mtcConfigDoc;
 - (int) viewType
 {
 	return viewType;
-}
-
-//undefined run type
-- (id)initWithCoder:(NSCoder*)decoder
-{
-    self = [super initWithCoder:decoder];
-    [[self undoManager] disableUndoRegistration];
-	[self initOrcaDBConnectionHistory];
-	[self initDebugDBConnectionHistory];
-    [self initSmellieRunDocsDic];
-
-
-    
-    [self setViewType:[decoder decodeIntForKey:@"viewType"]];
-
-    self.orcaDBUserName = [decoder decodeObjectForKey:@"ORSNOPModelOrcaDBUserName"];
-    self.orcaDBPassword = [decoder decodeObjectForKey:@"ORSNOPModelOrcaDBPassword"];
-    self.orcaDBName = [decoder decodeObjectForKey:@"ORSNOPModelOrcaDBName"];
-    self.orcaDBPort = [decoder decodeInt32ForKey:@"ORSNOPModelOrcaDBPort"];
-    self.orcaDBIPAddress = [decoder decodeObjectForKey:@"ORSNOPModelOrcaDBIPAddress"];
-    self.debugDBUserName = [decoder decodeObjectForKey:@"ORSNOPModelDebugDBUserName"];
-    self.debugDBPassword = [decoder decodeObjectForKey:@"ORSNOPModelDebugDBPassword"];
-    self.debugDBName = [decoder decodeObjectForKey:@"ORSNOPModelDebugDBName"];
-    self.debugDBPort = [decoder decodeInt32ForKey:@"ORSNOPModelDebugDBPort"];
-    self.debugDBIPAddress = [decoder decodeObjectForKey:@"ORSNOPModelDebugDBIPAddress"];
-    
-    self.runTypeMask = [decoder decodeObjectForKey:@"SNOPRunTypeMask"];
-	
-    [[self undoManager] enableUndoRegistration];
-    return self;
 }
 
 - (void)encodeWithCoder:(NSCoder*)encoder

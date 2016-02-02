@@ -181,6 +181,16 @@ snotDb = _snotDb;
                      selector : @selector(readHVStatus)
                          name : ORSNOPRequestHVStatus
                        object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(runAboutToStart:)
+                         name : ORRunAboutToStartNotification
+                       object : nil];
+}
+
+- (void) runAboutToStart:(NSNotification*)aNote
+{
+    [self initCrateRegistersOnly];
 }
 
 - (void) makeMainController
@@ -1146,148 +1156,6 @@ void SwapLongBlock(void* p, int32_t n)
 
 	aBundle->disable_mask = 0;
 }
-
-#pragma mark •••DataTaker
-- (void) setDataIds:(id)assigner
-{
-    [self setXl3MegaBundleDataId:[assigner assignDataIds:kLongForm]];
-    [self setPmtBaseCurrentDataId:[assigner assignDataIds:kLongForm]];
-    [self setCmosRateDataId:[assigner assignDataIds:kLongForm]];
-    [self setXl3FifoDataId:[assigner assignDataIds:kLongForm]];
-    [self setXl3HvDataId:[assigner assignDataIds:kLongForm]];
-    [self setXl3VltDataId:[assigner assignDataIds:kLongForm]];
-    [self setFecVltDataId:[assigner assignDataIds:kLongForm]];
-}
-
-- (void) syncDataIdsWith:(id)anotherObj
-{
-	[self setXl3MegaBundleDataId:[anotherObj xl3MegaBundleDataId]];
-	[self setCmosRateDataId:[anotherObj cmosRateDataId]];
-    [self setPmtBaseCurrentDataId:[anotherObj pmtBaseCurrentDataId]];
-    [self setXl3FifoDataId:[anotherObj xl3FifoDataId]];
-    [self setXl3HvDataId:[anotherObj xl3HvDataId]];
-    [self setXl3VltDataId:[anotherObj xl3VltDataId]];
-    [self setFecVltDataId:[anotherObj fecVltDataId]];
-}
-
-- (void) initBoard
-{
-    //unused -- here to satisfy the datataker protocol
-}
-
-- (NSDictionary*) dataRecordDescription
-{
-	NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
-	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-				     @"ORXL3DecoderForXL3MegaBundle", @"decoder",
-				     [NSNumber numberWithLong:[self xl3MegaBundleDataId]], @"dataId",
-				     [NSNumber numberWithBool:YES],	@"variable",
-				     [NSNumber numberWithLong:-1], @"length",
-				     nil];
-	[dataDictionary setObject:aDictionary forKey:@"Xl3MegaBundle"];
-
-	NSDictionary* bDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-				     @"ORXL3DecoderForCmosRate", @"decoder",
-				     [NSNumber numberWithLong:[self cmosRateDataId]], @"dataId",
-				     [NSNumber numberWithBool:NO], @"variable",
-				     [NSNumber numberWithLong:21+8*32+6], @"length",
-				     nil];
-	[dataDictionary setObject:bDictionary forKey:@"Xl3CmosRate"];
-    
-    NSDictionary* dDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 @"ORXL3DecoderForPmtBaseCurrent", @"decoder",
-                                 [NSNumber numberWithLong:[self pmtBaseCurrentDataId]], @"dataId",
-                                 [NSNumber numberWithBool:NO], @"variable",
-                                 [NSNumber numberWithLong:20+16*8+16*8+6], @"length",
-                                 nil];
-	[dataDictionary setObject:dDictionary forKey:@"Xl3PmtBaseCurrent"];
-    
-    NSDictionary* cDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 @"ORXL3DecoderForFifo", @"decoder",
-                                 [NSNumber numberWithLong:[self xl3FifoDataId]], @"dataId",
-                                 [NSNumber numberWithBool:NO], @"variable",
-                                 [NSNumber numberWithLong:19], @"length",
-                                 nil];
-	[dataDictionary setObject:cDictionary forKey:@"Xl3Fifo"];
-
-    NSDictionary* eDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 @"ORXL3DecoderForHv", @"decoder",
-                                 [NSNumber numberWithLong:[self xl3HvDataId]], @"dataId",
-                                 [NSNumber numberWithBool:NO], @"variable",
-                                 [NSNumber numberWithLong:12], @"length",
-                                 nil];
-	[dataDictionary setObject:eDictionary forKey:@"Xl3Hv"];
-
-    NSDictionary* fDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 @"ORXL3DecoderForVlt", @"decoder",
-                                 [NSNumber numberWithLong:[self xl3VltDataId]], @"dataId",
-                                 [NSNumber numberWithBool:NO], @"variable",
-                                 [NSNumber numberWithLong:16], @"length",
-                                 nil];
-	[dataDictionary setObject:fDictionary forKey:@"Xl3Vlt"];
-
-    NSDictionary* gDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 @"ORXL3DecoderForFecVlt", @"decoder",
-                                 [NSNumber numberWithLong:[self fecVltDataId]], @"dataId",
-                                 [NSNumber numberWithBool:NO], @"variable",
-                                 [NSNumber numberWithLong:30], @"length",
-                                 nil];
-	[dataDictionary setObject:gDictionary forKey:@"FecVlt"];
-
-	return dataDictionary;
-}
-
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-	[aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORXL3Model"];
-    
-    if([[userInfo objectForKey:@"doinit"]intValue]){
-        [self initCrateRegistersOnly];
-    }
-}
-
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-	while ([xl3Link bundleAvailable]) {
-        NSMutableData* aBundle = [xl3Link readNextBundle];
-        if (!aBundle) break; //an extra protection against nil
-        unsigned long data_length = [aBundle length] / 4;
-        /*
-        if (data_length < 4) {
-            NSLog(@"%@ problem in takeData, corrupted megabundle with length of zero ignored\n",
-                  [[self xl3Link] crateName]);
-        }
-        */
-        unsigned long* data = (unsigned long*)[aBundle mutableBytes];
-        data[0] = [self xl3MegaBundleDataId] | data_length;
-		data[1] |= [self crateNumber]; //bits 0--4 crateNumber, bits 5-- version set by XL3_Link
-
-		[aDataPacket addLongsToFrameBuffer:data length:data_length];
-		[aBundle release]; aBundle = nil; //this is correct even if the analyzer doesn't agree, see writeBundle in XL3_Link
-	}
-
-    if ([xl3Link readFifoFlag]) {
-        unsigned long data[19];
-        data[0] = [self xl3FifoDataId] | 19;
-		data[1] = [self crateNumber];
-        memcpy(data+2, [xl3Link fifoBundle], 17*4);
-        
-		[aDataPacket addLongsToFrameBuffer:data length:19];
-        [xl3Link setReadFifoFlag:NO];
-    }
- 
-}
-
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-}
-
-//never used
-- (int) load_eCPU_HW_Config_Structure:(VME_crate_config*)configStruct index:(int)index
-{
-	return 0;
-}
-
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder

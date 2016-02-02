@@ -32,7 +32,6 @@ eXL3_CrateStates;
 
 @interface XL3_Link : ORGroup
 {
-	int         serverSocket;
 	int         workingSocket;
 	NSLock*		commandSocketLock;	//avoids clashes between commands. Wrap an XL3 packet write,
                                     //so you know a possible write error comes from your command.
@@ -95,8 +94,6 @@ eXL3_CrateStates;
 - (void)encodeWithCoder:(NSCoder*)encoder;
 
 #pragma mark •••Accessors
-- (int)  serverSocket;
-- (void) setServerSocket:(int) aSocket;
 - (int)  workingSocket;
 - (void) setWorkingSocket:(int) aSocket;
 - (BOOL) needToSwap;

@@ -23,18 +23,16 @@
 #pragma mark •••Imported Files
 #import "ORMTCModel.h"
 #import "ORVmeCrateModel.h"
-#import "ORDataTypeAssigner.h"
 #import "ORMTC_Constants.h"
 #import "NSDictionary+Extensions.h"
-#import "ORReadOutList.h"
-#import "SBC_Config.h"
-#import "VME_HW_Definitions.h"
 #import "SNOCmds.h"
-#import "SBC_Link.h"
 #import "ORSelectorSequence.h"
 #import "ORRunModel.h"
-#import "ORCaen1720Model.h"
 #import "ORRunController.h"
+
+#define uShortDBValue(A) [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] unsignedShortValue]
+#define uLongDBValue(A)  [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] unsignedLongValue]
+#define floatDBValue(A)  [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] floatValue]
 
 #pragma mark •••Definitions
 NSString* ORMTCModelESumViewTypeChanged		= @"ORMTCModelESumViewTypeChanged";
@@ -188,21 +186,6 @@ kPEDCrateMask
 - (void) setupDefaults;
 @end
 
-@interface ORMTCModel (SBC)
-- (void) loadXilinxUsingSBC:(NSData*) theData;
-- (void) fireMTCPedestalsFixedTimeSBC;
-- (void) stopMTCPedestalsFixedTimeSBC;
-- (void) enableSingleShotMTCPedestalsFixedTimeSBC;
-- (unsigned long) singleShotMTCPedestalsFixedTimeSBC:(unsigned long) pedestalCount withDelay:(unsigned long) usecDelay;
-- (void) loadTheMTCADacsUsingSBC;
-- (void) tellReadoutSBC:(unsigned int) cmd;
-@end
-
-@interface ORMTCModel (LocalAdapter)
-- (void) loadXilinxUsingLocalAdapter:(NSData*) theData;
-- (void) loadTheMTCADacsUsingLocalAdapter;
-@end
-
 @implementation ORMTCModel
 
 @synthesize
@@ -218,10 +201,20 @@ mtcStatusDataAvailable = _mtcStatusDataAvailable,
 mtcStatusNumEventsInMem = _mtcStatusNumEventsInMem,
 resetFifoOnStart = _resetFifoOnStart;
 
+/* #define these variables for now. Eventually we need to add fields
+ * to the GUI, but Javi is working on the SNOPModel now */
+#define MTC_HOST @"sbc.sp.snolab.ca"
+#define MTC_PORT 4001
+
 
 - (id) init //designated initializer
 {
     self = [super init];
+
+    [self registerNotificationObservers];
+
+    /* initialize our connection to the MTC server */
+    mtc = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
 	
     [[self undoManager] disableUndoRegistration];
 	[self setTriggerName:@"Trigger"];
@@ -238,6 +231,7 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (void) dealloc
 {
+    [mtc release];
     [triggerGroup release];
     [defaultFile release];
     [lastFile release];
@@ -268,6 +262,45 @@ resetFifoOnStart = _resetFifoOnStart;
 - (BOOL) solitaryObject
 {
     return YES;
+}
+
+- (void) registerNotificationObservers
+{
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(runAboutToStart:)
+                         name : ORRunAboutToStartNotification
+                       object : nil];
+}
+
+- (void) runAboutToStart:(NSNotification*)aNote
+{
+    /* At the start of every run, we initialize the HW settings. */
+
+    /* Setup MTCD pedestal/pulser settings */
+    if ([self isPedestalEnabledInCSR]) [self enablePedestal];
+    [self setupPulseGTDelaysCoarse: uLongDBValue(kCoarseDelay) fine:uLongDBValue(kFineDelay)];
+    [self setTheLockoutWidth: uLongDBValue(kLockOutWidth)];
+    [self setThePedestalWidth: uLongDBValue(kPedestalWidth)];
+    [self setThePulserRate:floatDBValue(kPulserPeriod)];
+    [self setThePrescaleValue];
+
+    /* Setup Pedestal Crate Mask */
+	[self setPedestalCrateMask];
+
+    /* Setup the GT mask */
+    [self clearGlobalTriggerWordMask];
+    [self setSingleGTWordMask: uLongDBValue(kGtMask)];
+
+    /* Setup GT Crate Mask */
+    [self setGTCrateMask];
+
+    /* Setup MTCA Thresholds */
+    [self loadTheMTCADacs];
+
+    /* Setup MTCA relays */
+    [self mtcatLoadCrateMasks];
 }
 
 #pragma mark •••Accessors
@@ -721,262 +754,21 @@ resetFifoOnStart = _resetFifoOnStart;
 	return [self mVoltsToRaw:mVolts];
 }
 
-#define uShortDBValue(A) [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] unsignedShortValue]
-#define uLongDBValue(A)  [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] unsignedLongValue]
-#define floatDBValue(A)  [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] floatValue]
-
 -(NSMutableDictionary*) get_MTCDataBase
 {
     return mtcDataBase;
     //return [[mtcDataBase objectForNestedKey:[self getDBDefaultByIndex:DBRef]] unsignedShortValue];
 }
 
-#pragma mark •••Data Taker
-- (NSMutableArray*) children {
-    //methods exists to give common interface across all objects for display in lists
-    return [NSMutableArray arrayWithObjects:triggerGroup,nil];
-}
-
-- (NSDictionary*) dataRecordDescription
-{
-    NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
-    NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								 @"ORMTCDecoderForMTC",	@"decoder",
-								 [NSNumber numberWithLong:[self dataId]], @"dataId",
-								 [NSNumber numberWithBool:NO], @"variable",
-								 [NSNumber numberWithLong:7], @"length",  //****put in actual length
-								 nil];
-    [dataDictionary setObject:aDictionary forKey:@"MTC"];
-
-    NSDictionary* bDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								 @"ORMTCDecoderForMTCStatus",	@"decoder",
-								 [NSNumber numberWithLong:[self mtcStatusDataId]], @"dataId",
-								 [NSNumber numberWithBool:NO], @"variable",
-								 [NSNumber numberWithLong:7], @"length",
-								 nil];
-    [dataDictionary setObject:bDictionary forKey:@"MTCStatus"];
-
-    return dataDictionary;
-}
-
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{        
-    if(![[self adapter] controllerCard]){
-		[NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
-    }
-    
-    //----------------------------------------------------------------------------------------
-    // first add our description to the data description
-    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORMTCModel"];
-    
-/*
-    dataTakers = [[triggerGroup allObjects] retain];	//cache of data takers.
-    
-    NSEnumerator* e = [dataTakers objectEnumerator];
-    id obj;
-    while(obj = [e nextObject]){
-		[obj runTaskStarted:aDataPacket userInfo:userInfo];
-    }
-*/
-	
-    if ([[userInfo objectForKey:@"doinit"] boolValue]) {
-        if([self adapterIsSBC]){
-            //moved to ORMTCReadout::Start
-            //[self clearGlobalTriggerWordMask];
-            //[self zeroTheGTCounter];
-            //[self setGTCrateMask];
-            //[self setSingleGTWordMask: uLongDBValue(kGtMask)];
-        }
-        else {
-            [self clearGlobalTriggerWordMask];
-            [self zeroTheGTCounter];
-            [self setGTCrateMask];
-            [self setSingleGTWordMask: uLongDBValue(kGtMask)];
-        }
-        [self setResetFifoOnStart:YES];
-    }
-    else {
-        //soft start
-        [self setResetFifoOnStart:NO];
-    }
-}
-
-//**************************************************************************************
-// Function:	TakeData
-// Description: Read data from a card From Mac. IfSBC is used, then this routine is NOT used.
-//**************************************************************************************
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-    NSString* errorLocation = @"";
-    
-    @try {
-		//errorLocation = @"Reading Status Reg";
-		//do something to see if the fecs need to be read out.
-		//if((statusReg & kTrigger1EventMask)){
-		//OK finally go out and read all the data takers scheduled to be read out with a trigger 1 event.
-		//errorLocation = @"Reading Children";
-		//[self _readOutChildren:dataTakers1 dataPacket:aDataPacket  useParams:YES withGTID:gtid isMSAMEvent:isMSAMEvent];
-		//}
-		
-	}
-	@catch(NSException* localException) {
-		NSLogError(@"",@"Mtc Error",errorLocation,nil);
-		[self incExceptionCount];
-		[localException raise];
-	}
-	
-}
-
-- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-	//subclasses can override
-    NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* runControl;
-    if ([objs count]) {
-        runControl = [objs objectAtIndex:0];
-        if ([runControl nextRunWillQuickStart]) {
-            //keep it running
-        }
-        else {
-            if([self adapterIsSBC]){
-                @try {
-                    //[self clearGlobalTriggerWordMask];
-                    [self tellReadoutSBC:kSNOMtcTellReadoutHardEnd];
-                }
-                @catch (NSException *exception) {
-                    NSLog(@"MTCD clear trigger mask at the end of a run failed.\n");
-                }
-            }
-            else {
-                @try {
-                    [self clearGlobalTriggerWordMask];
-                }
-                @catch (NSException *exception) {
-                    NSLog(@"MTCD clear trigger mask at the end of a run failed.\n");
-                }
-            }
-        }
-    }
-    else {
-        @try {
-            [self clearGlobalTriggerWordMask];
-        }
-        @catch (NSException *exception) {
-        NSLog(@"MTCD clear trigger mask at the end of a run failed.\n");
-        }
-    }
-}
-
-
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-/*
-    NSEnumerator* e = [dataTakers objectEnumerator];
-    id obj;
-    while(obj = [e nextObject]){
-		[obj runTaskStopped:aDataPacket userInfo:userInfo];
-    }
-	
-    [dataTakers release];
-*/
-}
-
-- (void) saveReadOutList:(NSFileHandle*)aFile
-{
-    [triggerGroup saveUsingFile:aFile];
-}
-
-- (void) loadReadOutList:(NSFileHandle*)aFile
-{
-    [self setTriggerGroup:[[[ORReadOutList alloc] initWithIdentifier:@"Mtc Trigger"]autorelease]];
-    [triggerGroup loadUsingFile:aFile];
-}
-
-//this is the data structure for the new SBCs (i.e. VX704 from Concurrent)
-- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
-{
-    configStruct->total_cards++;
-    configStruct->card_info[index].hw_type_id		= kMtc;			//should be unique 
-    configStruct->card_info[index].hw_mask[0]		= [self dataId];		//better be unique
-	configStruct->card_info[index].hw_mask[1] = [self mtcStatusDataId];
-    configStruct->card_info[index].slot				= [self slot];
-    configStruct->card_info[index].add_mod			= [self addressModifier];
-    configStruct->card_info[index].base_add			= [self baseAddress];
-	configStruct->card_info[index].deviceSpecificData[0] = reg[kMtcBbaReg].addressOffset;
-	configStruct->card_info[index].deviceSpecificData[1] = reg[kMtcBwrAddOutReg].addressOffset;
-	configStruct->card_info[index].deviceSpecificData[2] = [self memBaseAddress];
-	configStruct->card_info[index].deviceSpecificData[3] = [self memAddressModifier];
-	configStruct->card_info[index].deviceSpecificData[4] = 500; //delay between monitoring packets in msec
-	configStruct->card_info[index].deviceSpecificData[5] = [self resetFifoOnStart];
-    configStruct->card_info[index].deviceSpecificData[6] = uLongDBValue(kGtMask);
-    configStruct->card_info[index].deviceSpecificData[7] = uLongDBValue(kGtCrateMask);
-
-	configStruct->card_info[index].num_Trigger_Indexes = 0; //no children
-	configStruct->card_info[index].next_Card_Index = index + 1;
-	
-	return index + 1;
-
-// this doesn't work in the XL3 push mode
-// it would be great if it did
-/*
-	configStruct->card_info[index].num_Trigger_Indexes = 1;
-	int nextIndex = index+1;
-    
-	configStruct->card_info[index].next_Trigger_Index[0] = -1;
-	NSEnumerator* e = [dataTakers objectEnumerator];
-	id obj;
-	while(obj = [e nextObject]){
-		if([obj respondsToSelector:@selector(load_HW_Config_Structure:index:)]){
-			if(configStruct->card_info[index].next_Trigger_Index[0] == -1){
-				configStruct->card_info[index].next_Trigger_Index[0] = nextIndex;
-			}
-			int savedIndex = nextIndex;
-			nextIndex = [obj load_HW_Config_Structure:configStruct index:nextIndex];
-			if(obj == [dataTakers lastObject]){
-				configStruct->card_info[savedIndex].next_Card_Index = -1; //make the last object a leaf node
-			}
-		}
-	}
-	
-    configStruct->card_info[index].next_Card_Index 	 = nextIndex;
-    
-    return nextIndex;
-*/
-	
-}
-
-- (BOOL) bumpRateFromDecodeStage:(NSDictionary*) mtcStatus
-{
-    unsigned long oldGTID = [self mtcStatusGTID];
-    
-    [self setMtcStatusGTID:[[mtcStatus objectForKey:@"GTID"] unsignedLongValue]];
-    
-    unsigned long newGTID = [self mtcStatusGTID];
-
-    double mtcStatusGTIDRate = 2 * (newGTID - oldGTID);
-    
-    [self setMtcStatusGTIDRate: mtcStatusGTIDRate];
-    
-    //[self setMtcStatusGTIDRate: [[mtcStatus objectForKey:@"GTIDRate"] unsignedLongValue ]];
-    [self setMtcStatusCnt10MHz:[[mtcStatus objectForKey:@"cnt10MHz"] unsignedLongLongValue]];
-    [self setMtcStatusTime10Mhz:[mtcStatus objectForKey:@"time10MHz"]];
-    [self setMtcStatusReadPtr:[[mtcStatus objectForKey:@"readPtr"] unsignedLongValue]];
-    [self setMtcStatusWritePtr:[[mtcStatus objectForKey:@"writePtr"] unsignedLongValue]];
-    [self setMtcStatusDataAvailable:[[mtcStatus objectForKey:@"dataAvailable"] boolValue]];
-    long numEventsInMem = [self mtcStatusWritePtr] - [self mtcStatusReadPtr];
-    if (numEventsInMem < 0 || (numEventsInMem == 0 && [self mtcStatusDataAvailable])) {
-        numEventsInMem += 0x100000;
-    }
-    [self setMtcStatusNumEventsInMem:(unsigned long)numEventsInMem];
-
-    
-    return YES;
-}
-
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
+
+    [self registerNotificationObservers];
+
+    /* initialize our connection to the MTC server */
+    mtc = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
 	
     [[self undoManager] disableUndoRegistration];
     [self setESumViewType:	[decoder decodeIntForKey:		@"ORMTCModelESumViewType"]];
@@ -1054,22 +846,6 @@ resetFifoOnStart = _resetFifoOnStart;
 	return objDictionary;
 }
 
-- (void) setDataIds:(id)assigner
-{
-    [self setDataId:[assigner assignDataIds:kLongForm]];
-    [self setMtcStatusDataId:[assigner assignDataIds:kLongForm]];
-}
-
-- (void) syncDataIdsWith:(id)anotherMTC
-{
-    [self setDataId:[anotherMTC dataId]];
-    [self setMtcStatusDataId:[anotherMTC mtcStatusDataId]];
-}
-
-- (void) reset
-{
-}
-
 #pragma mark •••DB Helpers
 - (void) setDbLong:(long) aValue forIndex:(int)anIndex
 {
@@ -1114,46 +890,36 @@ resetFifoOnStart = _resetFifoOnStart;
     return reg[anIndex].regName;
 }
 
-- (unsigned long) read:(int)aReg
+- (uint32_t) read:(int)aReg
 {
-	unsigned long theValue = 0;
+	uint32_t theValue = 0;
 	@try {
-		[[self adapter] readLongBlock:&theValue
-							atAddress:[self baseAddress]+reg[aReg].addressOffset
-							numToRead:1
-						   withAddMod:reg[aReg].addressModifier
-						usingAddSpace:reg[aReg].addressSpace];
-	}
-	@catch(NSException* localException) {
+        theValue = [mtc intCommand:"mtcd_read %d", reg[aReg].addressOffset];
+	} @catch(NSException* localException) {
 		NSLog(@"Couldn't read the MTC %@!\n",reg[aReg].regName);
 		[localException raise];
 	}
 	return theValue;
 }
 
-- (void) write:(int)aReg value:(unsigned long)aValue
+- (void) write:(int)aReg value:(uint32_t)aValue
 {
 	@try {
-		[[self adapter] writeLongBlock:&aValue
-							 atAddress:[self baseAddress]+reg[aReg].addressOffset
-							numToWrite:1
-							withAddMod:reg[aReg].addressModifier
-						 usingAddSpace:reg[aReg].addressSpace];
-	}
-	@catch(NSException* localException) {
+        [mtc okCommand:"mtcd_write %d %d", reg[aReg].addressOffset, aValue];
+	} @catch(NSException* localException) {
 		NSLog(@"Couldn't write %d to the MTC %@!\n",aValue,reg[aReg].regName);
 		[localException raise];
 	}
 }
 
-- (void) setBits:(int)aReg mask:(unsigned long)aMask
+- (void) setBits:(int)aReg mask:(uint32_t)aMask
 {
 	unsigned long old_value = [self read:aReg];
 	unsigned long new_value = (old_value & ~aMask) | aMask;
 	[self write:aReg value:new_value];
 }
 
-- (void) clrBits:(int)aReg mask:(unsigned long)aMask
+- (void) clrBits:(int)aReg mask:(uint32_t)aMask
 {
 	unsigned long old_value = [self read:aReg];
 	unsigned long new_value = (old_value & ~aMask);
@@ -1790,75 +1556,17 @@ resetFifoOnStart = _resetFifoOnStart;
 	}
 }
 
-- (void) setThePulserRate:(float) thePulserPeriodValue
+- (void) setThePulserRate:(float) pulserRate
 {
 	@try {
-		[self setThePulserRate:thePulserPeriodValue setToInfinity:NO];
-		NSLog(@"Set GT Pusler rate\n");			
+        [mtc okCommand:"set_pulser_freq %f", pulserRate];
+		NSLog(@"mtc: pulser rate set to %.2f Hz\n", pulserRate);			
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Could not set GT Pusler rate!\n");			
 		NSLog(@"Exception: %@\n",localException);
 		[localException raise];			
 		
-	}
-}
-
-- (void) setThePulserRate:(float) thePulserPeriodValue setToInfinity:(BOOL) setToInfinity
-{
-	unsigned long	pulserShiftValue = 0xffffff;
-	
-	@try {
-		// STEP 1: Load the shift register
-		if(setToInfinity)pulserShiftValue =  0;  
-		else {
-            if (thePulserPeriodValue < 0.05) {
-                pulserShiftValue = 0xffffff;
-            }
-            else {
-                // calculate the value to be shifted into SMTC_SERIAL_REG
-                //float pulserShiftFValue =  (thePulserPeriodValue/0.001280) - 1.0;  // max pulser period = (0.00128ms * 0x00ffffff) = 21474.8532ms
-                // the pulser period value is rate now
-                float pulserShiftFValue =  (1000.0/thePulserPeriodValue/0.001280) - 1.0;
-                pulserShiftValue = (unsigned long)pulserShiftFValue;
-            }
-		}
-		
-		// STEP 2: Now serially shift into SMTC_SERIAL_REG the value 'pulserShiftValue'
-		short j;
-		for ( j = 23; j >= 0; j--){							
-			
-			unsigned long aValue = 0UL;
-			if ( (1UL << j ) & pulserShiftValue ) aValue |= ( 1UL << 1 );		// build the data word
-			
-			[self write:kMtcSerialReg value:aValue + 1]; // Bit 0 is always high
-			// clock in data value, BIT 0 = high
-			[self write:kMtcSerialReg value:((aValue | MTC_SERIAL_SHFTCLKPS) | 0x000000001)]; 	
-			
-		}		
-		
-		float frequencyValue = (float)( 781.25/((float)pulserShiftValue + 1.0) );					// in KHz
-		if (frequencyValue < 0.001)		NSLog(@"Pulser frequency set @ %3.3f mHz.\n",(frequencyValue * 1000000.0));
-		else if (frequencyValue <= 1.0)	NSLog(@"Pulser frequency set @ %3.3f Hz.\n",(frequencyValue * 1000.0));
-		else if (frequencyValue > 1.0)	NSLog(@"Pulser frequency set @ %3.4f kHz.\n",frequencyValue);
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Could not setup the MTC pulser frequency!\n");
-		[localException raise];
-	}
-}
-
-- (void) loadEnablePulser
-{
-	@try {
-		[self clrBits:kMtcControlReg mask:MTC_CSR_LOAD_ENPS];
-		[self setBits:kMtcControlReg mask:MTC_CSR_LOAD_ENPS];
-		[self clrBits:kMtcControlReg mask:MTC_CSR_LOAD_ENPS];
-		NSLog(@"loaded/enabled the pulser!\n");		
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Unable to load/enable the pulser!\n");		
-		[localException raise];	
 	}
 }
 
@@ -1942,23 +1650,14 @@ resetFifoOnStart = _resetFifoOnStart;
 	//GT coarse delay, GT Lockout Width, pedestal width in ns and a 
 	//specified crate mask set in MTC Databse. Trigger mask is EXT_8.
     
-    //get the run controller
-    NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* runControl;
-    runControl = [objs objectAtIndex:0];
-    //access the run control and only allow this to happen if a run is going
-    if([runControl isRunning]){
-            @try {
-                [self basicMTCPedestalGTrigSetup];				//STEP 1: Perfom the basic setup for pedestals and gtrigs
-                [self setupPulserRateAndEnable:floatDBValue(kPulserPeriod)];	// STEP 2 : Setup pulser rate and enable
-            }
-            @catch(NSException* e) {
-                NSLog(@"MTC failed to fire pedestals at the specified settings!\n");
-                NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
-            }
-    }
-    else{
-        NSLog(@"MTC failed to fire pedestals because there is no run going!\n");
+    @try {
+		/* setup pedestals and global trigger */
+        [self basicMTCPedestalGTrigSetup];
+        [self setThePulserRate:floatDBValue(kPulserPeriod)];
+        [self enablePulser];
+    } @catch(NSException* e) {
+        NSLog(@"MTC failed to fire pedestals at the specified settings!\n");
+        NSLog(@"fireMTCPedestalsFixedRate: %@\n", [e reason]);
     }
 }
 
@@ -1984,119 +1683,48 @@ resetFifoOnStart = _resetFifoOnStart;
 	}
 }
 
-- (void) setupPulserRateAndEnable:(float) pulserPeriodVal
-{
-	[self setThePulserRate:pulserPeriodVal];	// STEP 1: Setup the pulser rate [pulser period in ms]
-	[self loadEnablePulser];			// STEP 2 : Load Enable Pulser
-	[self enablePulser];				// STEP 3 : Enable Pulser	
-}
-
-//starts an SBC job
 - (void) fireMTCPedestalsFixedTime
 {
-	if([self adapterIsSBC]){
-		[self enableSingleShotMTCPedestalsFixedTime];
-		[self fireMTCPedestalsFixedTimeSBC];
-	}
-	else {
-		NSLog(@"Implemented for SBC only");
-	}	
+    @try {
+		/* setup pedestals and global trigger */
+        [self basicMTCPedestalGTrigSetup];
+
+		[self clearSingleGTWordMask:MTC_SOFT_GT_MASK];
+
+        /* set the pulser rate to 0, which will enable SOFT_GT to trigger
+         * pedestals */
+        [self setThePulserRate:0];
+
+        [self enablePulser];
+
+        [mtc okCommand:"multi_soft_gt %d %f", [self fixedPulserRateCount],
+                        [self fixedPulserRateDelay]];
+
+    } @catch(NSException* e) {
+        NSLog(@"MTC failed to fire pedestals at the specified settings!\n");
+        NSLog(@"fireMTCPedestalsFixedRate: %@\n", [e reason]);
+    }
 }
 
-//kills the SBC job
 - (void) stopMTCPedestalsFixedTime
 {
-	if([self adapterIsSBC]){
-		[self stopMTCPedestalsFixedTimeSBC];
-	}
-	else {
-		NSLog(@"Implemented for SBC only");
-	}
+    [mtc okCommand:"stop_multi_soft_gt"];
 }
 
-- (void) enableSingleShotMTCPedestalsFixedTime
+- (void) firePedestals:(unsigned long) count withRate:(float) rate
 {
-	if([self adapterIsSBC]){
-		@try {
-			[self enableSingleShotMTCPedestalsFixedTimeSBC];
-			[self setGlobalTriggerWordMask];
-		}
-		@catch (NSException * e) {
-			NSLog(@"Error enabling pedestals fixed time.!");
-			NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
-		}
-	}
-	else {
-		NSLog(@"Implemented for SBC only");
-	}		
-}
+    /* Fires a fix number of pedestals at a specified rate in Hz.
+     * This function should not be called on the main GUI thread, but
+     * only by ORCA scripts since it blocks until completion */
 
-//single shot blocking SBC command for ORCA macros only (no GUI)
-- (void) singleShotMTCPedestalsFixedTime
-{
-    if ([self fixedPulserRateDelay] == 0) {
-        NSLog(@"MTCD: pulser rate of 0 Hz requested and ignored.\n");
-        return;
-    }
-    unsigned long pulserDelay;
-	pulserDelay = (unsigned long) (1./[self fixedPulserRateDelay] * 1e7); //100 nsec delay between pulses indeed, sorry
+    long timeout = [mtc timeout];
 
-	[self singleShotMTCPedestalsFixedTime:[self fixedPulserRateCount] withDelay:pulserDelay];
-    
-}
+    /* Temporarily increase the timeout since it might take a while */
+    [mtc setTimeout:(long) 1.5*count/rate];
 
-//single shot blocking SBC command for ORCA macros only (no GUI) returns GTID difference before - after from the MTC register
-- (unsigned long) singleShotMTCPedestalsFixedTime:(unsigned long) pedestalCount withDelay:(unsigned long) usecDelay
-{
-	unsigned long aValue = 0;
+    [mtc okCommand:"fire_pedestals %d %f", count, rate];
 
-	if([self adapterIsSBC]){
-		@try {
-			NSLog(@"pedestalCount: %d, delay: %d\n", pedestalCount, usecDelay);
-			aValue = [self singleShotMTCPedestalsFixedTimeSBC:pedestalCount withDelay:usecDelay];
-		}
-		@catch (NSException * e) {
-			NSLog(@"Error firing pedestals fixed time.!");
-			NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
-		}
-	}
-	else {
-		NSLog(@"Implemented for SBC only");
-	}		
-
-	return aValue;
-}
-
-//todo: convert into local adapter one
-- (void) fireMTCPedestalsFixedNumber:(unsigned long) numPedestals
-{
-	@try {
-		short j;
-		for (j = 23; j >= 0; j--){							
-			unsigned long aValue = 0UL;
-			[self write:kMtcSerialReg value:aValue | MTC_SERIAL_REG_SEN];
-			[self write:kMtcSerialReg value:aValue | MTC_SERIAL_SHFTCLKPS];
-		}
-		[self loadEnablePulser];
-		[self enablePulser];
-		[self basicMTCPedestalGTrigSetup];
-		
-		[self setSingleGTWordMask:MTC_EXT_8_MASK];	
-		
-		short i;
-		for (i = 0; i < numPedestals; i++){
-			[ORTimer delay:0.005];					// 5 ms delay
-			[self write:kMtcSoftGtReg value:0];		//value doesn't matter
-		}
-		
-		[self clearSingleGTWordMask:MTC_EXT_8_MASK];
-		[self disablePulser];
-		[self disablePedestal];
-	}
-	@catch(NSException* localException) {
-		NSLog(@"couldn't fire pedestal\n");
-		[localException raise];
-	}
+    [mtc setTimeout:timeout];
 }
 
 - (void) basicMTCReset
@@ -2121,13 +1749,69 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (void) loadTheMTCADacs
 {
+	//-------------- variables -----------------
 
-	if([self adapterIsSBC]){
-		[self loadTheMTCADacsUsingSBC];
-		//[self loadTheMTCADacsUsingLocalAdapter];
+	short	index, bitIndex, dacIndex;
+	unsigned short	dacValues[14];
+	unsigned long   aValue = 0;
+
+
+	//-------------- variables -----------------
+
+	@try {
+		
+		// STEP 3: load the DAC values from the database into dacValues[14]
+		for (index = 0; index < 14 ; index++){
+			dacValues[index] = [self dacValueByIndex:index];
+		}
+		
+		// STEP 4: Set DACSEL in Register 2 high[in hardware it's inverted -- i.e. it is set low]
+		[self write:kMtcDacCntReg value:MTC_DAC_CNT_DACSEL];
+		
+		// STEP 5: now parallel load the 16bit word into the serial shift register
+		// STEP 5a: the first 4 bits are loaded zeros 
+		aValue = 0UL;
+		for (index = 0; index < 4 ; index++){
+			
+			// data bit, with DACSEL high, clock low
+			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
+			
+			// clock high
+			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL | MTC_DAC_CNT_DACCLK];
+			
+			// clock low
+			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
+		}
+		
+		//STEP 5b:  now build the word and load the next 12 bits, load MSB first
+		for (bitIndex = 11; bitIndex >= 0 ; bitIndex--){
+			
+			aValue = 0UL;
+			
+			for (dacIndex = 0; dacIndex < 14 ; dacIndex++){
+				
+				if ( dacValues[dacIndex] & (1UL << bitIndex) )
+					aValue |= (1UL << dacIndex);
+			}
+			
+			// data bit, with DACSEL high, clock low
+			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
+			
+			// clock high
+			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL | MTC_DAC_CNT_DACCLK];
+			
+			// clock low
+			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
+		}
+		
+		// STEP 5: Set DACSEL in Register 2 low[in hardware it's inverted -- i.e. it is set high], with all other bits low
+		[self write:kMtcDacCntReg value:0];
+		NSLog(@"Loaded the MTC/A DACs\n");
+		
 	}
-	else {
-		[self loadTheMTCADacsUsingLocalAdapter];
+	@catch(NSException* localException) {
+		NSLog(@"Could not load the MTC/A DACs!\n");		
+		[localException raise];
 	}
 }
 
@@ -2138,18 +1822,7 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (void) loadMTCXilinx
 {
-	NSData* theData = [NSData dataWithContentsOfFile:[self xilinxFilePath]];
-	if(![theData length]){
-		NSLog(@"Couldn't open the MTC Xilinx file %@!\n",[self xilinxFilePath]);
-		[NSException raise:@"Couldn't open Xilinx File" format:	@"%@",[self xilinxFilePath]];	
-	}
-	
-	if([self adapterIsSBC]){
-		[self loadXilinxUsingSBC:theData];
-	}
-	else {
-		[self loadXilinxUsingLocalAdapter:theData];
-	}
+    [mtc okCommand:"load_xilinx"];
 }
 
 - (void) setTubRegister
@@ -2192,70 +1865,25 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (void) mtcatResetMtcat:(unsigned char) mtcat
 {
-    if([self adapterIsSBC]){
-        long errorCode = 0;
-        SBC_Packet aPacket;
-        aPacket.cmdHeader.destination = kSNO;
-        aPacket.cmdHeader.cmdID = kSNOMtcatResetMtcat;
-        aPacket.cmdHeader.numberBytesinPayload	= 1*sizeof(long);
-        
-        unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
-        payloadPtr[0] = mtcat;
-        
-        @try {
-            [[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
-            unsigned long* responsePtr = (unsigned long*) aPacket.payload;
-            errorCode = responsePtr[0];
-            if(errorCode){
-                @throw [NSException exceptionWithName:@"Reset MTCA+ error" reason:@"SBC and/or LabJack failed.\n" userInfo:nil];
-            }
-        }
-        @catch(NSException* e) {
-            NSLog(@"SBC failed reset MTCA+ num: %d\n", mtcat);
-            NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
-            //@throw e;
-        }
+    @try {
+        [mtc okCommand:"mtca_reset %d", mtcat];
+    } @catch (NSException *e) {
+        NSLog(@"mtcatResetMtcat: %@\n", e.reason);
     }
-	else {
-        NSLog(@"Not implemented. Requires SBC with LabJack\n");
-	}
 }
 
 
 - (void) mtcatResetAll
 {
-    if([self adapterIsSBC]){
-        long errorCode = 0;
-        SBC_Packet aPacket;
-        aPacket.cmdHeader.destination = kSNO;
-        aPacket.cmdHeader.cmdID = kSNOMtcatResetAll;
-        aPacket.cmdHeader.numberBytesinPayload	= 1*sizeof(long);
-        
-        unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
-        payloadPtr[0] = 0;
-        
-        @try {
-            [[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
-            unsigned long* responsePtr = (unsigned long*) aPacket.payload;
-            errorCode = responsePtr[0];
-            if(errorCode){
-                @throw [NSException exceptionWithName:@"Reset All MTCA+ error" reason:@"SBC and/or LabJack failed.\n" userInfo:nil];
-            }
-        }
-        @catch(NSException* e) {
-            NSLog(@"SBC failed reset all MTCA+\n");
-            NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
-            //@throw e;
-        }
+    @try {
+        [mtc okCommand:"mtca_reset_all"];
+    } @catch (NSException *e) {
+        NSLog(@"mtcatResetAll: %@\n", e.reason);
     }
-	else {
-        NSLog(@"Not implemented. Requires SBC with LabJack\n");
-	}
 }
 
 - (void) mtcatLoadCrateMasks
 {
-    //TODO move to SBC
     [self mtcatResetAll];
     [self mtcatLoadCrateMask:[self mtcaN100Mask] toMtcat:0];
     [self mtcatLoadCrateMask:[self mtcaN20Mask] toMtcat:1];
@@ -2268,7 +1896,6 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (void) mtcatClearCrateMasks
 {
-    //TODO move to SBC
     [self mtcatResetAll];
     [self mtcatLoadCrateMask:0 toMtcat:0];
     [self mtcatLoadCrateMask:0 toMtcat:1];
@@ -2286,36 +1913,15 @@ resetFifoOnStart = _resetFifoOnStart;
         return;
     }
 
-    if([self adapterIsSBC]){
-        long errorCode = 0;
-        SBC_Packet aPacket;
-        aPacket.cmdHeader.destination = kSNO;
-        aPacket.cmdHeader.cmdID = kSNOMtcatLoadCrateMask;
-        aPacket.cmdHeader.numberBytesinPayload	= 2*sizeof(long);
-        
-        unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
-        payloadPtr[0] = mask;
-        payloadPtr[1] = mtcat;
-        
-        @try {
-            [[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
-            unsigned long* responsePtr = (unsigned long*) aPacket.payload;
-            errorCode = responsePtr[0];
-            if(errorCode){
-                @throw [NSException exceptionWithName:@"Load CrateMask to MTCA+ error" reason:@"SBC and/or LabJack failed.\n" userInfo:nil];
-            }
-        }
-        @catch(NSException* e) {
-            NSLog(@"SBC failed loading MTCA+ mask\n");
-            NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
-            //@throw e;
-        }
-        char* mtcats[] = {"N100", "N20", "EHI", "ELO", "OELO", "OEHI", "OWLN"};
-        NSLog(@"MTCA: set %s crate mask to 0x%08x\n", mtcats[mtcat], mask);
+    @try {
+        [mtc okCommand:"mtca_load_crate_mask %d %d", mtcat, mask];
+    } @catch(NSException* e) {
+        NSLog(@"mtcatLoadCrateMask: %@\n", e.reason);
+        return;
     }
-	else {
-        NSLog(@"Not implemented. Requires SBC with LabJack\n");
-	}    
+
+    char* mtcats[] = {"N100", "N20", "EHI", "ELO", "OELO", "OEHI", "OWLN"};
+    NSLog(@"MTCA: set %s crate mask to 0x%08x\n", mtcats[mtcat], mask);
 }
 
 
@@ -2409,442 +2015,5 @@ resetFifoOnStart = _resetFifoOnStart;
 	}
 	[self setMtcDataBase:aDictionary];
 }
-@end
-
-@implementation ORMTCModel (LocalAdapter)
-- (void) loadXilinxUsingLocalAdapter:(NSData*) theData
-{
-	//--------------------------- The file format as of 1/7/97 -------------------------------------
-	//
-	// 1st field: Beginning of the comment block -- /
-	//			  If no backslash then you will get an error message and Xilinx load will abort
-	// Now include your comment.
-	// The comment block is delimited by another backslash.
-	// If no backslash at the end of the comment block then you will get error message.
-	//
-	// After the comment block include the data in ACSII binary.
-	// No spaces or other characters in between data. It will complain otherwise.
-	//
-	//----------------------------------------------------------------------------------------------
-	
-	//-------------- variables -----------------
-	
-	unsigned long bitCount		= 0UL;
-	unsigned long readValue		= 0UL;
-	unsigned long aValue		= 0UL;
-	
-	BOOL firstPass = TRUE;
-	
-	const unsigned long DATA_HIGH_CLOCK_LOW = 0x00000001; 	 // bit 0 high and bit 1 low
-	const unsigned long DATA_LOW_CLOCK_LOW  = 0x00000000;  	 // bit 0 low and bit 1 low
-	
-	//------------------------------------------
-	
-	
-	//	NSLog(@"Loading the MTC Xilinx chips....\n"); 
-	
-	@try {
-		
-		char* charData = (char*)[theData bytes];
-		
-		long index = [theData length];	// total number of charcters 
-		
-		// set  all bits, except bit 3[PROG_EN], low -- new step 1/16/97
-		aValue = 0x00000008;
-		[self write:kMtcXilProgReg value:aValue];
-		
-		// set  all bits, except bit 1[CCLK], low
-		aValue = 0x00000002;						
-		[self write:kMtcXilProgReg value:aValue];
-		
-		[ORTimer delay:.1]; // 100 msec delay
-		unsigned long i;
-		for (i = 1;i < index;i++){
-			
-			if ( (firstPass) && (*charData != '/') ){
-				charData++;
-				NSLog(@"Invalid first character in Xilinx file.\n");
-				[NSException raise:@"Xilinx load failed" format:@""];
-			}
-			
-			if (firstPass){
-				
-				charData++;							// for the first slash
-				i++;  									// need to keep track of i
-				
-				while(*charData++ != '/'){
-					
-					i++;
-					if ( i>index ){
-						NSLog(@"Comment block not delimited by a backslash.\n");	
-						[NSException raise:@"Xilinx load failed" format:@""];
-					}
-					
-				}
-				
-			}
-			firstPass = FALSE;
-			
-			// strip carriage return, tabs
-			if ( ((*charData =='\r') || (*charData =='\n') || (*charData =='\t' )) && (!firstPass) ){		
-				charData++;
-			}
-			else{
-				
-				bitCount++;
-				
-				if ( *charData == '1' ) {
-					aValue = DATA_HIGH_CLOCK_LOW;	// bit 0 high and bit 1 low
-				}
-				else if ( *charData == '0' ) {
-					aValue = DATA_LOW_CLOCK_LOW;	// bit 0 low and bit 1 low
-				}
-				else {
-					NSLog(@"Invalid character in Xilinx file.\n");
-					[NSException raise:@"Xilinx load failed" format:@""];
-				}
-				charData++;
-				
-				[self write:kMtcXilProgReg value:aValue];
-			    // perform bitwise OR to set the bit 1 high[toggle clock high] 
-				aValue |= (1UL << 1);		
-				
-				[self write:kMtcXilProgReg value:aValue];
-				
-			}
-			
-		}
-		
-		[ORTimer delay:.100]; // 100 msec delay
-		
-		// check to see if the Xilinx was loaded properly 
-		// read the bit 2, this should be high if the Xilinx was loaded
-		readValue = [self read:kMtcXilProgReg];
-		
-		if (!(readValue & 0x000000010))	// bit 4, PROGRAM*, should be high for Xilinx success		
-			NSLog(@"Xilinx load failed for the MTC/D!\n");
-		
-		
-	}
-	@catch(NSException* localException) {
-		
-		NSLog(@"Xilinx load failed for the MTC/D.\n");
-		[localException raise];
-		
-	}
-}
-
-- (void) loadTheMTCADacsUsingLocalAdapter
-{
-	//-------------- variables -----------------
-
-	short	index, bitIndex, dacIndex;
-	unsigned short	dacValues[14];
-	unsigned long   aValue = 0;
-
-
-	//-------------- variables -----------------
-
-	@try {
-		
-		// STEP 3: load the DAC values from the database into dacValues[14]
-		for (index = 0; index < 14 ; index++){
-			dacValues[index] = [self dacValueByIndex:index];
-		}
-		
-		// STEP 4: Set DACSEL in Register 2 high[in hardware it's inverted -- i.e. it is set low]
-		[self write:kMtcDacCntReg value:MTC_DAC_CNT_DACSEL];
-		
-		// STEP 5: now parallel load the 16bit word into the serial shift register
-		// STEP 5a: the first 4 bits are loaded zeros 
-		aValue = 0UL;
-		for (index = 0; index < 4 ; index++){
-			
-			// data bit, with DACSEL high, clock low
-			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
-			
-			// clock high
-			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL | MTC_DAC_CNT_DACCLK];
-			
-			// clock low
-			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
-		}
-		
-		//STEP 5b:  now build the word and load the next 12 bits, load MSB first
-		for (bitIndex = 11; bitIndex >= 0 ; bitIndex--){
-			
-			aValue = 0UL;
-			
-			for (dacIndex = 0; dacIndex < 14 ; dacIndex++){
-				
-				if ( dacValues[dacIndex] & (1UL << bitIndex) )
-					aValue |= (1UL << dacIndex);
-			}
-			
-			// data bit, with DACSEL high, clock low
-			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
-			
-			// clock high
-			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL | MTC_DAC_CNT_DACCLK];
-			
-			// clock low
-			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
-		}
-		
-		// STEP 5: Set DACSEL in Register 2 low[in hardware it's inverted -- i.e. it is set high], with all other bits low
-		[self write:kMtcDacCntReg value:0];
-		NSLog(@"Loaded the MTC/A DACs\n");
-		
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Could not load the MTC/A DACs!\n");		
-		[localException raise];
-	}
-}
-
-
-@end
-
-@implementation ORMTCModel (SBC)
-- (void) loadXilinxUsingSBC:(NSData*) theData
-{	
-	
-	NSLog(@"Sending Xilinx file to the SBC. (Can take a few seconds)\n");
-	
-	long errorCode = 0;
-	unsigned long numLongs		= ceil([theData length]/4.0); //round up to long word boundary
-	SBC_Packet aPacket;
-	aPacket.cmdHeader.destination	= kSNO;
-	aPacket.cmdHeader.cmdID			= kSNOMtcLoadXilinx;
-	aPacket.cmdHeader.numberBytesinPayload	= sizeof(SNOMtc_XilinxLoadStruct) + numLongs*sizeof(long);
-	
-	SNOMtc_XilinxLoadStruct* payloadPtr = (SNOMtc_XilinxLoadStruct*)aPacket.payload;
-	payloadPtr->baseAddress		= [self baseAddress];
-	payloadPtr->addressModifier	= [self addressModifier];
-	payloadPtr->errorCode	    = 666;
-	payloadPtr->programRegOffset= reg[kMtcXilProgReg].addressOffset;
-	payloadPtr->fileSize		= [theData length];
-	const char* dataPtr			= (const char*)[theData bytes];
-	//really should be an error check here that the file isn't bigger than the max payload size
-	char* p = (char*)payloadPtr + sizeof(SNOMtc_XilinxLoadStruct);
-	strncpy(p, dataPtr, [theData length]);
-	
-	@try {
-		[[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
-		SNOMtc_XilinxLoadStruct *responsePtr = (SNOMtc_XilinxLoadStruct*)aPacket.payload;
-		errorCode = responsePtr->errorCode;
-		if(errorCode){
-			NSLog(@"Error Code: %d %s\n",errorCode,aPacket.message);
-			[NSException raise:@"Xilinx load failed" format:@""];
-		}
-		else {
-			NSLog(@"Looks like success. (Program Reg reported Successful load)\n");
-		}
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Xilinx load failed for the MTC/D.\n");
-		NSLog(@"Exception: %@\n",localException);
-		[localException raise];
-	}
-}
-
-//this is the SBC job variant suited for the mixed physics and pedestal runs
-- (void) fireMTCPedestalsFixedTimeSBC
-{
-	SBC_Packet aPacket;
-	aPacket.cmdHeader.destination	= kSNO;
-	aPacket.cmdHeader.cmdID			= kSNOMtcFirePedestalJobFixedTime;
-	aPacket.cmdHeader.numberBytesinPayload	= 3*sizeof(long);
-	
-	unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
-	payloadPtr[0] = [self fixedPulserRateCount];
-    //the delay is rate in Hz indeed, and we need multiples of 100 nsec for SBC
-    if ([self fixedPulserRateDelay] == 0) {
-        NSLog(@"MTCD: pulser rate of 0 Hz requested and ignored.\n");
-        return;
-    }
-	payloadPtr[1] = (unsigned long) (1./[self fixedPulserRateDelay] * 1e7); //100 nsec delay between pulses indeed, sorry
-    payloadPtr[2] = 0x2; //enable pulser
-    if ([self isPedestalEnabledInCSR]) {
-        payloadPtr[2] |= 1; //enable ped
-    }
-
-	@try {
-		[[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
-        
-        SBC_JobStatusStruct *responsePtr = (SBC_JobStatusStruct*)aPacket.payload;
-		long running = responsePtr->running;
-		if(running){
-			NSLog(@"Firing pedestals fixed time.\n");
-			//start progress indicator
-			//schedule to stop it
-			//[[self sbcLink] monitorJobFor:self statusSelector:@selector(xilinxLoadStatus:)];
-		}
-		else {
-			NSLog(@"SBC failed to fire pedestals fixed time.\n");
-		}
-	}
-	@catch(NSException* e) {
-		NSLog(@"SBC failed to fire pedestals fixed time.\n");
-		NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
-	}
-}
-
-- (void) stopMTCPedestalsFixedTimeSBC
-{
-	//kill job
-
-	SBC_Packet aPacket;
-	aPacket.cmdHeader.destination		= kSBC_Process;
-	aPacket.cmdHeader.cmdID			= kSBC_KillJob;
-	aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_JobStatusStruct);
-	
-	@try {
-//		[self send:&aPacket receive:&aPacket];
-		
-		SBC_JobStatusStruct* p	= (SBC_JobStatusStruct*)aPacket.payload;
-//		if([jobDelegate respondsToSelector:statusSelector]){
-//			ORSBCLinkJobStatus* aJobStatus = [ORSBCLinkJobStatus jobStatus:p message:aPacket.message];
-//			[self setJobStatus:aJobStatus];
-//			//NSLog(@"monitor job ok: job %s running with message: %s\n", [aJobStatus running]?"is":"is not", [aJobStatus message]);
-//			[jobDelegate performSelector:statusSelector withObject:jobStatus];
-//		}
-		if(p->running) { 
-			NSLog(@"SBC failed to stop firing pedestals fixed time.\n");
-		} else {
-			NSLog(@"Pedestals stopped.\n");
-			//stop progress indicator
-		}
-	}
-	@catch(NSException* e) {
-		NSLog(@"SBC failed to stop firing pedestals fixed time.\n");
-		NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
-	}
-}
-
-- (void) enableSingleShotMTCPedestalsFixedTimeSBC
-{
-	long errorCode = 0;
-	SBC_Packet aPacket;
-	aPacket.cmdHeader.destination		= kSNO;
-	aPacket.cmdHeader.cmdID			= kSNOMtcEnablePedestalsFixedTime;
-	aPacket.cmdHeader.numberBytesinPayload	= 1*sizeof(long);
-	
-	unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
-	payloadPtr[0] = 0;
-	
-	@try {
-		[[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
-		unsigned long* responsePtr = (unsigned long*) aPacket.payload;
-		errorCode = responsePtr[0];
-		if(errorCode){
-			@throw [NSException exceptionWithName:@"Pedestals error.\n" reason:@"SBC failed to enable pedestals fixed time.\n" userInfo:nil];
-		}
-	}
-	@catch(NSException* e) {
-		NSLog(@"SBC failed to enable pedestals fixed time.\n");
-		NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
-		@throw e;
-	}
-}
-
-- (unsigned long) singleShotMTCPedestalsFixedTimeSBC:(unsigned long) pedestalCount withDelay:(unsigned long) usecDelay
-{
-	long errorCode = 0;
-	unsigned long gtidDiff = 0;
-	SBC_Packet aPacket;
-	aPacket.cmdHeader.destination		= kSNO;
-	aPacket.cmdHeader.cmdID			= kSNOMtcFirePedestalsFixedTime;
-	aPacket.cmdHeader.numberBytesinPayload	= 3*sizeof(long);
-	
-	unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
-	payloadPtr[0] = pedestalCount;
-	payloadPtr[1] = (unsigned long) usecDelay; //100 nsec delay between pulses indeed, sorry
-    payloadPtr[2] = 0x2; //enable pulser
-    if ([self isPedestalEnabledInCSR]) {
-        payloadPtr[2] |= 1; //enable ped
-    }
-	
-	@try {
-		[[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
-		unsigned long* responsePtr = (unsigned long*) aPacket.payload;
-		errorCode = responsePtr[0];
-		if(errorCode){
-			@throw [NSException exceptionWithName:@"Pedestals error.\n" reason:@"SBC failed to fire pedestals fixed time.\n" userInfo:nil];
-		}
-		else {
-			gtidDiff = responsePtr[1];
-		}
-	}
-	@catch(NSException* e) {
-		NSLog(@"SBC failed to fire pedestals fixed time.\n");
-		NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
-		@throw e;
-	}
-	
-	return gtidDiff;
-}
-
-- (void) loadTheMTCADacsUsingSBC
-{	
-	short index;
-	long errorCode = 0;
-
-	SBC_Packet aPacket;
-	aPacket.cmdHeader.destination		= kSNO;
-	aPacket.cmdHeader.cmdID			= kSNOMtcLoadMTCADacs;
-	aPacket.cmdHeader.numberBytesinPayload	= 14*sizeof(long);
-	
-	unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
-	for (index = 0; index < 14 ; index++){
-		payloadPtr[index] = [self dacValueByIndex:index];
-	}
-	
-	@try {
-		[[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
-		unsigned long* responsePtr = (unsigned long*) aPacket.payload;
-		errorCode = responsePtr[0];
-		if(errorCode){
-			NSLog(@"SBC failed to load the MTCA DACs.\n");
-		}
-		else {
-			NSLog(@"Loaded the MTCA DACs through SBC.\n");
-		}
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Could not load the MTC/A DACs!\n");		
-		[localException raise];
-	}
-}
-
-- (void) tellReadoutSBC:(unsigned int) cmd
-{
-	long errorCode = 0;
-    
-	SBC_Packet aPacket;
-	aPacket.cmdHeader.destination = kSNO;
-	aPacket.cmdHeader.cmdID	= kSNOMtcTellReadout;
-	aPacket.cmdHeader.numberBytesinPayload = 1*sizeof(long);
-	
-	unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
-    payloadPtr[0] = cmd;
-	
-	@try {
-		[[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
-		unsigned long* responsePtr = (unsigned long*) aPacket.payload;
-		errorCode = responsePtr[0];
-		if(errorCode){
-			NSLog(@"SBC failed to update MTC readout.\n");
-		}
-		else {
-			NSLog(@"SBC updated MTC readout.\n");
-		}
-	}
-	@catch(NSException* e) {
-		NSLog(@"MTC: Could not update readout; %@; reason: %@\n", [e name], [e reason]);
-		[e raise];
-	}
-}
-
 @end
 
