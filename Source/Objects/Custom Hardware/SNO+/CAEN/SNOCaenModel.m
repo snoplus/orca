@@ -132,6 +132,8 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 {
     self = [super init];
     [[self undoManager] disableUndoRegistration];
+
+    [self registerNotificationObservers];
 	
     /* initialize our connection to the MTC server */
     mtc_server = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
@@ -1070,6 +1072,8 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 {
     self = [super initWithCoder:aDecoder];
 	
+    [self registerNotificationObservers];
+
     /* initialize our connection to the MTC server */
     mtc_server = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
 	

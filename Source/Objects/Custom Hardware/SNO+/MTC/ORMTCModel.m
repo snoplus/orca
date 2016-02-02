@@ -211,6 +211,8 @@ resetFifoOnStart = _resetFifoOnStart;
 {
     self = [super init];
 
+    [self registerNotificationObservers];
+
     /* initialize our connection to the MTC server */
     mtc = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
 	
@@ -762,7 +764,9 @@ resetFifoOnStart = _resetFifoOnStart;
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
-	
+
+    [self registerNotificationObservers];
+
     /* initialize our connection to the MTC server */
     mtc = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
 	
