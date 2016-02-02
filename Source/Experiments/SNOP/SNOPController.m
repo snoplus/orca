@@ -139,11 +139,6 @@ smellieRunFile;
                         object: nil];
     
     [notifyCenter addObserver: self
-                     selector: @selector(runNumberChanged:)
-                         name: ORRunNumberChangedNotification
-                       object: theRunControl];
-    
-    [notifyCenter addObserver: self
                      selector: @selector(runStatusChanged:)
                          name: ORRunStatusChangedNotification
                        object: theRunControl];
@@ -192,7 +187,6 @@ smellieRunFile;
     [self dbDebugDBIPChanged:nil];
     [self fetchNhitSettings];
     [self fetchRunMaskSettings];
-    //[self runNumberChanged:nil]; //update the run number
     [self runStatusChanged:nil]; //update the run status
     [model setIsEmergencyStopEnabled:TRUE]; //enable the emergency stop
     [self runsLockChanged:nil];
@@ -269,13 +263,6 @@ smellieRunFile;
     else {
         NSLogColor([NSColor redColor],@"Must have an MTC in the configuration\n");
     }
-}
-
-- (void) runNumberChanged:(NSNotification*)aNotification
-{
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* theRunControl = [objs objectAtIndex:0];
-    [lastRunNumber setIntValue:[theRunControl runNumber] - 1];
 }
 
 -(void) runTypeChanged:(NSNotification*)aNote

@@ -55,7 +55,6 @@
     
     //Run information
     IBOutlet NSTextField* currentRunType;
-    IBOutlet NSTextField* lastRunNumber;
     IBOutlet NSTextField* lastRunType;
 
     IBOutlet NSTextField *n100Hi;
