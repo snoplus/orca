@@ -237,6 +237,7 @@
 		2DE91C6719DC8C2B005C1A11 /* amptek-logo.gif in Resources */ = {isa = PBXBuildFile; fileRef = 2DE91C6619DC8C2B005C1A11 /* amptek-logo.gif */; };
 		3602C15C1C4EC291006B50B3 /* anet.c in Sources */ = {isa = PBXBuildFile; fileRef = 3602C15A1C4EC291006B50B3 /* anet.c */; };
 		3602C15D1C4EC291006B50B3 /* anet.h in Headers */ = {isa = PBXBuildFile; fileRef = 3602C15B1C4EC291006B50B3 /* anet.h */; };
+		36148E3A1C6046610088C93E /* Fec32.xib in Resources */ = {isa = PBXBuildFile; fileRef = 36148E391C6046610088C93E /* Fec32.xib */; };
 		362F928B1681A05100F3ACB4 /* SNO.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 362F928A16819FCE00F3ACB4 /* SNO.cc */; };
 		3672CF8C1C4EB15000870996 /* SNOCaen1720.nib in Resources */ = {isa = PBXBuildFile; fileRef = 3672CF811C4EB15000870996 /* SNOCaen1720.nib */; };
 		3672CF8D1C4EB15000870996 /* SNOCaen1720Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3672CF821C4EB15000870996 /* SNOCaen1720Card.gif */; };
@@ -3876,6 +3877,7 @@
 		2DE91C6619DC8C2B005C1A11 /* amptek-logo.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "amptek-logo.gif"; sourceTree = "<group>"; };
 		3602C15A1C4EC291006B50B3 /* anet.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = anet.c; sourceTree = "<group>"; };
 		3602C15B1C4EC291006B50B3 /* anet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = anet.h; sourceTree = "<group>"; };
+		36148E391C6046610088C93E /* Fec32.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Fec32.xib; sourceTree = "<group>"; };
 		362F928A16819FCE00F3ACB4 /* SNO.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SNO.cc; sourceTree = "<group>"; };
 		3672CF811C4EB15000870996 /* SNOCaen1720.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = SNOCaen1720.nib; sourceTree = "<group>"; };
 		3672CF821C4EB15000870996 /* SNOCaen1720Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = SNOCaen1720Card.gif; sourceTree = "<group>"; };
@@ -12751,6 +12753,7 @@
 		84CEA3620EA4EB2E0060076A /* Fec32 */ = {
 			isa = PBXGroup;
 			children = (
+				36148E391C6046610088C93E /* Fec32.xib */,
 				84CEA3630EA4EB2E0060076A /* Fec32.gif */,
 				84CEA3650EA4EB2E0060076A /* Fec32Card.gif */,
 				84CEA3660EA4EB2E0060076A /* ORFec32Controller.h */,
@@ -16041,6 +16044,7 @@
 				840B20C60B4D7CE80021220C /* Editing.tif in Resources */,
 				844352090B56E9360033B918 /* FindPanel.nib in Resources */,
 				8443574A0B5AC9DE0033B918 /* chainBroken.tif in Resources */,
+				36148E3A1C6046610088C93E /* Fec32.xib in Resources */,
 				8443574B0B5AC9E00033B918 /* checkScript.tif in Resources */,
 				8443574C0B5AC9E00033B918 /* checkSyntax.tif in Resources */,
 				8443574D0B5AC9E00033B918 /* Folder.tiff in Resources */,
