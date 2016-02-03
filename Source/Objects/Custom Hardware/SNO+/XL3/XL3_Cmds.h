@@ -141,6 +141,17 @@
 #define CTC_SEL			(0x01000000)
 #define XL3_SEL			(0x02000000)
 
+//*************************WARNING*****************************
+//*************************DANGER******************************
+//
+// pack(1) /should/ force Orca to pack these structs the same
+// as the XL3 code which is /critical/ for being able to parse
+// the XL3 response packets. This could change at any time for
+// no reason, so beware!
+//
+//*************************DANGER******************************
+//*************************WARNING*****************************
+#pragma pack(1)
 
 //xl3_code/include/lwip_functions.h
 typedef struct {
@@ -481,6 +492,7 @@ typedef struct{
     uint32_t debugging_mode;
     uint32_t data_avail_mask;
     uint64_t xl3_clock;
+    uint32_t initialized; // Will be 0 if not initialized, != 0 otherwise
 } check_xl3_state_results;
 
 typedef struct{
@@ -502,3 +514,5 @@ typedef struct{
     uint32_t error_flags;
 } multi_set_up_charge_inj_results;
 
+//Reset packing to Objective-C default
+#pragma pack()

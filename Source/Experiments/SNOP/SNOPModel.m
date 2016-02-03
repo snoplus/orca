@@ -1713,8 +1713,8 @@ mtcConfigDoc = _mtcConfigDoc;
         [crateXl3Info setObject:[NSNumber numberWithFloat:          [xl3 hvAVoltageReadValue]]      forKey:@"hv_voltage_read_value_a"];
         [crateXl3Info setObject:[NSNumber numberWithFloat:          [xl3 hvACurrentReadValue]]      forKey:@"hv_current_read_value_a"];
         [crateXl3Info setObject:[NSNumber numberWithInt:            [xl3 xl3Mode]]                  forKey:@"xl3_mode"];
-        [crateXl3Info setObject:[NSNumber numberWithUnsignedLong:   [xl3 relayHighMask]]            forKey:@"hv_relay_high_mask"];
-        [crateXl3Info setObject:[NSNumber numberWithUnsignedLong:   [xl3 relayLowMask]]             forKey:@"hv_relay_low_mask"];
+        [crateXl3Info setObject:[NSNumber numberWithUnsignedLong:   ([xl3 relayMask]>>32)&0xFFFFFFFF]            forKey:@"hv_relay_high_mask"];
+        [crateXl3Info setObject:[NSNumber numberWithUnsignedLong:   [xl3 relayMask]&0xFFFFFFFF]             forKey:@"hv_relay_low_mask"];
         
         if([xl3 crateNumber] == 16) {
             

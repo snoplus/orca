@@ -386,6 +386,8 @@
 		6B40D6641B2B79960000F7C1 /* ResistorDBViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B40D65E1B2B79960000F7C1 /* ResistorDBViewController.h */; };
 		6B40D6651B2B79960000F7C1 /* ResistorDBViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B40D65F1B2B79960000F7C1 /* ResistorDBViewController.m */; };
 		6B40D6661B2B79960000F7C1 /* ResistorDBWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B40D6601B2B79960000F7C1 /* ResistorDBWindow.xib */; };
+		6B5EFA481C4D76AF00B9A80B /* ORMultiStateBox.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B5EFA461C4D76AF00B9A80B /* ORMultiStateBox.h */; };
+		6B5EFA491C4D76AF00B9A80B /* ORMultiStateBox.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B5EFA471C4D76AF00B9A80B /* ORMultiStateBox.m */; };
 		8400D08D09AD40CE000C1DA4 /* ORcPCICard.h in Headers */ = {isa = PBXBuildFile; fileRef = 8400D08C09AD40CE000C1DA4 /* ORcPCICard.h */; };
 		8400D67A09AF96C5000C1DA4 /* ORTaskSequence.h in Headers */ = {isa = PBXBuildFile; fileRef = 8400D67809AF96C5000C1DA4 /* ORTaskSequence.h */; };
 		8400D67B09AF96C6000C1DA4 /* ORTaskSequence.m in Sources */ = {isa = PBXBuildFile; fileRef = 8400D67909AF96C5000C1DA4 /* ORTaskSequence.m */; };
@@ -4005,6 +4007,8 @@
 		6B40D65E1B2B79960000F7C1 /* ResistorDBViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ResistorDBViewController.h; sourceTree = "<group>"; };
 		6B40D65F1B2B79960000F7C1 /* ResistorDBViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ResistorDBViewController.m; sourceTree = "<group>"; };
 		6B40D6601B2B79960000F7C1 /* ResistorDBWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ResistorDBWindow.xib; sourceTree = "<group>"; };
+		6B5EFA461C4D76AF00B9A80B /* ORMultiStateBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMultiStateBox.h; path = MultiStateBox/ORMultiStateBox.h; sourceTree = "<group>"; };
+		6B5EFA471C4D76AF00B9A80B /* ORMultiStateBox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMultiStateBox.m; path = MultiStateBox/ORMultiStateBox.m; sourceTree = "<group>"; };
 		8400D08C09AD40CE000C1DA4 /* ORcPCICard.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORcPCICard.h; path = "Source/Objects/Hardware/CompactPCI/cPCI Base Classes/ORcPCICard.h"; sourceTree = SOURCE_ROOT; };
 		8400D67809AF96C5000C1DA4 /* ORTaskSequence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTaskSequence.h; sourceTree = "<group>"; };
 		8400D67909AF96C5000C1DA4 /* ORTaskSequence.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORTaskSequence.m; sourceTree = "<group>"; };
@@ -7546,6 +7550,15 @@
 				6B40D6601B2B79960000F7C1 /* ResistorDBWindow.xib */,
 			);
 			path = ResistorDB;
+			sourceTree = "<group>";
+		};
+		6B5EFA401C4D73CB00B9A80B /* MultiStateBox */ = {
+			isa = PBXGroup;
+			children = (
+				6B5EFA461C4D76AF00B9A80B /* ORMultiStateBox.h */,
+				6B5EFA471C4D76AF00B9A80B /* ORMultiStateBox.m */,
+			);
+			name = MultiStateBox;
 			sourceTree = "<group>";
 		};
 		8402796907397B8700972B07 /* Bit3 Adaptor */ = {
@@ -12827,6 +12840,7 @@
 		84CF3B3A05E6BF0700C5C320 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				6B5EFA401C4D73CB00B9A80B /* MultiStateBox */,
 				840832280FC3307F002B2394 /* LongTermView */,
 				840823C90F9F83DC007E6061 /* FlippedView */,
 				8491F4730EC0CDEF0084BAD6 /* pmtImage */,
@@ -14858,6 +14872,7 @@
 				84F7FB5F0AE5566D00A5AA4C /* mysql_time.h in Headers */,
 				84F7FB600AE5566D00A5AA4C /* typelib.h in Headers */,
 				84F7FB610AE5566D00A5AA4C /* my_list.h in Headers */,
+				6B5EFA481C4D76AF00B9A80B /* ORMultiStateBox.h in Headers */,
 				84F7FB620AE5566D00A5AA4C /* mysql_com.h in Headers */,
 				84F7FB640AE5569100A5AA4C /* my_alloc.h in Headers */,
 				844BF49A0B1B85560047C9BF /* KatrinDetectorView.h in Headers */,
@@ -17334,6 +17349,7 @@
 				840982630F84EA5900036BE8 /* ORTek220Model.m in Sources */,
 				84098F570F964F0100036BE8 /* ORPDcuController.m in Sources */,
 				84098F590F964F0100036BE8 /* ORPDcuDecoders.m in Sources */,
+				6B5EFA491C4D76AF00B9A80B /* ORMultiStateBox.m in Sources */,
 				84098F5B0F964F0100036BE8 /* ORPDcuModel.m in Sources */,
 				84BC88DF0F9CDB5600336DF1 /* ORSerialPortController.m in Sources */,
 				842FCCB6197849C700B89723 /* OREHS8260pModel.m in Sources */,

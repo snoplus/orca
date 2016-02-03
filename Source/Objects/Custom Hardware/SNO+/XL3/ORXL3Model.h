@@ -96,11 +96,15 @@ enum {
     ORTimer*        timer;
     
     unsigned long long  relayMask;
-    uint32_t relayLowMask;
-    uint32_t relayHighMask; 
+    unsigned long long  relayViewMask;
     NSString* relayStatus;
     BOOL hvASwitch;
     BOOL hvBSwitch;
+    BOOL hvARamping;
+    BOOL hvBRamping;
+    BOOL hvEverUpdated;
+    BOOL hvSwitchEverUpdated;
+    
     NSString* triggerStatus;
     BOOL _isTriggerON;
 
@@ -123,6 +127,8 @@ enum {
     unsigned long _hvNominalVoltageA;
     unsigned long _hvNominalVoltageB;
     BOOL _hvPanicFlag;
+    NSLock* hvInitLock;
+    NSThread* hvInitThread;
     NSThread* hvThread;
     NSDateFormatter* xl3DateFormatter;
     float _xl3VltThreshold[12];
@@ -165,8 +171,7 @@ enum {
 @property (nonatomic,assign) BOOL isPollingForced;
 
 @property (nonatomic,assign) unsigned long long relayMask;
-@property (nonatomic,assign) uint32_t relayLowMask;
-@property (nonatomic,assign) uint32_t relayHighMask;
+@property (nonatomic,assign) unsigned long long relayViewMask;
 @property (nonatomic,copy) NSString* relayStatus;
 @property (nonatomic,assign) BOOL hvASwitch;
 @property (nonatomic,assign) BOOL hvBSwitch;
@@ -197,6 +202,11 @@ enum {
 @property (assign) unsigned long ecal_received; //set accross multiple threads
 @property (nonatomic,assign) bool ecalToOrcaInProgress;
 @property (assign) id snotDb;//I replaced 'weak' by 'assign' to get Orca compiled under 10.6 (-tb- 2013-09)
+
+@property BOOL hvEverUpdated;
+@property BOOL hvSwitchEverUpdated;
+@property BOOL hvARamping;
+@property BOOL hvBRamping;
 
 
 #pragma mark •••Initialization
@@ -332,6 +342,7 @@ enum {
 - (void) readHVSwitchOnForA:(BOOL*)aIsOn forB:(BOOL*)bIsOn;
 - (void) readHVSwitchOn;
 
+- (void) safeHvInit;
 - (void) setHVSwitch:(BOOL)aOn forPowerSupply:(unsigned char)sup;
 - (void) hvPanicDown;
 - (void) hvMasterPanicDown;
