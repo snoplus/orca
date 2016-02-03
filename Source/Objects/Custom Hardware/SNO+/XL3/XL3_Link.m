@@ -512,7 +512,7 @@ readFifoFlag = _readFifoFlag;
 	}
     if(askForResponse){
         @try {
-            //ßNSLog(@"wait for command response with packetType: 0x%x, packetNum: 0x%x\n", packetType, packetNum);
+            //NSLog(@"wait for command response with packetType: 0x%x, packetNum: 0x%x, packetSize: %i\n", packetType, packetNum, payloadBlock->numberBytesinPayload);
 			[self readXL3Packet:&aPacket withPacketType:packetType andPacketNum:packetNum];
 			XL3_PayloadStruct* payloadPtr = (XL3_PayloadStruct*) aPacket.payload;
 			memcpy(payloadBlock->payload, payloadPtr, payloadBlock->numberBytesinPayload);
@@ -873,7 +873,7 @@ static void SwapLongBlock(void* p, int32_t n)
                 
                 if (needToSwap) packetNum = swapShort(packetNum);
                 //NSLog(@"%@ packet type: %d and packetNum: %d, xl3 megabundle count: %d, NSNumber value: %dß\n", [self crateName], packetType, packetNum, bundle_count, [[NSNumber numberWithUnsignedShort:packetType] unsignedShortValue]);
-                
+                                
                 NSData* packetData = [[NSData alloc] initWithBytes:aPacket length:XL3_PACKET_SIZE];
                 NSNumber* packetNNum = [[NSNumber alloc] initWithUnsignedShort:packetNum];
                 NSNumber* packetNType = [[NSNumber alloc] initWithUnsignedChar:packetType];

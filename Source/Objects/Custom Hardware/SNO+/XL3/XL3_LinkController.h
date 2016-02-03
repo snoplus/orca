@@ -19,9 +19,12 @@
 //-------------------------------------------------------------
 
 #import "OrcaObjectController.h"
+#import "ORMultiStateBox.h"
 
 @interface XL3_LinkController : OrcaObjectController
 {
+    ORMultiStateBox *msbox;
+    bool HVAramping, HVBramping;
 	NSView* blankView;
     IBOutlet NSView* xl3View;
 	NSSize  basicSize;
@@ -106,6 +109,13 @@
     IBOutlet NSButton* monVltThresholdInInitButton;
     IBOutlet NSButton* monVltThresholdSetButton;
     //hv
+    IBOutlet NSButton *hvOnButton;
+    IBOutlet NSButton *hvOffButton;
+    IBOutlet NSButton *hvStepUpButton;
+    IBOutlet NSButton *hvStepDownButton;
+    IBOutlet NSButton *hvRampUpButton;
+    IBOutlet NSButton *hvRampDownButton;
+    IBOutlet NSButton *hvStopRampButton;
     IBOutlet NSTextField *hvRelayMaskLowField;
     IBOutlet NSTextField *hvRelayMaskHighField;
     IBOutlet NSTextField *hvRelayStatusField;
@@ -139,6 +149,8 @@
     IBOutlet NSButton*              connectionAutoInitCrateButton;
     
     id owl_crate_master;
+    NSBox *hvBStatusPanel;
+    NSBox *hvAStatusPanel;
 }	
 
 #pragma mark •••Initialization
@@ -150,6 +162,7 @@
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
 - (void) updateWindow;
+- (void) updateHVButtons;
 - (void) checkGlobalSecurity;
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item;
 
@@ -257,6 +270,11 @@
 - (IBAction) monVltThresholdInInitAction:(id)sender;
 - (IBAction) monVltThresholdSetAction:(id)sender;
 //hv
+@property (assign) IBOutlet NSBox *hvBStatusPanel;
+@property (assign) IBOutlet NSBox *hvAStatusPanel;
+
+	
+
 - (IBAction)hvRelayMaskHighAction:(id)sender;
 - (IBAction)hvRelayMaskLowAction:(id)sender;
 - (IBAction)hvRelayMaskMatrixAction:(id)sender;
