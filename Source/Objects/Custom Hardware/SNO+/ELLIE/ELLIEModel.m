@@ -4,6 +4,9 @@
 //
 //  Created by Chris Jones on 01/04/2014.
 //
+//  Revision history:
+//  Ed Leming 30/12/2015 - Memory updates and tidy up.
+//
 //
 
 /*TODO:
@@ -94,54 +97,45 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 -(void)dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-    
 	[super dealloc];
 }
 
 - (void) registerNotificationObservers
 {
-    //[super registerNotificationObservers];
-    
-    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    
+     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     //we don't want this notification
 	[notifyCenter removeObserver:self name:NSWindowDidResignKeyNotification object:nil];
 }
 
-
+/**************************************/
+/*          TELLIE Functions          */
+/**************************************/
 -(void) startTellieRun
 {
-    //Collect a series of objects from the SNOPModel
-    //NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    //SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    /* 
+     Start run using run control object and push initial TELLIE run doc to telliedb.
+     
+     Possible additions:
+        Use SNOPModel to check if tellie run type is masked in
+     */
     
     //add run control object
     NSArray*  runControlObjsArray = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     runControl = [runControlObjsArray objectAtIndex:0];
     
-    
-    //if(![runControl isRunning]){
-        //[aSnotModel setRunType:kRunTellie];
-        //if([aSnotModel isRunTypeMaskedIn:@"Tellie"]){
-    [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
-        //}
-        //else{
-        //    NSLog(@"Tellie Run Type is not masked in. Please add this to the runType Mask\n");
-        //}
-    //}
-    //else if ([runControl isRunning])
-    //{
-        //if([aSnotModel isRunTypeMaskedIn:@"Tellie"]){
-    [self _pushInitialTellieRunDocument];
-        //}
-        //else{
-        //    NSLog(@"Tellie Run Type is not masked in. Please add this to the runType Mask\n");
-        //}
-    //}
+    if(![runControl isRunning]){
+        [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
+    } else if ([runControl isRunning]) {
+        [self _pushInitialTellieRunDocument];
+    }
 }
 
 -(void) stopTellieRun
-{    
+{
+    /*
+     Use run control object to stop a tellie run.
+    */
+    
     //add run control object
     NSArray*  runControlObjsArray = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     runControl = [runControlObjsArray objectAtIndex:0];
@@ -151,18 +145,32 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     }
 }
 
-/* TELLIE Functions */
-//This function polls the TELLIE hardware using an XMLPRC Server and requests the response from the hardware
 -(void) pollTellieFibre
 {
-    NSString *responseFromTellie = [[NSString alloc] init];
-    //NSArray * nullCommandArguments = @[@"0",@"0",@"0"];
-    responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_readout_script.py" withCmdLineArgs:nil];
+    /*
+     Poll the TELLIE hardware using an XMLRPC server and requests the response from the
+     hardware.
+    */
+    
+    NSString* responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_readout_script.py" withCmdLineArgs:nil];
     NSLog(@"Response from Tellie: %@\n",responseFromTellie);
 }
 
--(void) fireTellieFibre:(NSMutableDictionary*)fireCommands
+-(void) fireTellieFibreMaster:(NSMutableDictionary*)fireCommands
 {
+    /*
+     Fire a tellie channel - which maps to an optical fibre in the detector. This function
+     calls a python script on the DAQ1 machine, passing it command line arguments relating
+     to specific tellie channel settings. The called python script relays the commands 
+     to the tellie hardware using a XMLRPC server which must be lanuched manually via the
+     command line prior to launching ORCA.
+     
+     Arguments: 
+        NSMutableDictionary fireCommands :  A dictionary containing hardware settings to
+                                            be relayed to the tellie hardware.
+     
+    */
+    
     //add run control object
     NSArray*  runControlObjsArray = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     runControl = [runControlObjsArray objectAtIndex:0];
@@ -171,19 +179,10 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [runControl performSelectorOnMainThread:@selector(prepareForNewSubRun) withObject:nil waitUntilDone:YES];
     [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
     
-    //wait a small amount of time to establish sub run info 
-    //[NSThread sleepForTimeInterval:0.5f];
-    
-    //TODO:Add this back in 
+    //TODO:Add this back in
     //Post to the Database what is about to happen
     __block NSString * responseFromTellie = [[NSString alloc] init];
     NSArray * nullCommandArguments = @[@"-c",[[fireCommands objectForKey:@"channel"] stringValue],@"-n",[[fireCommands objectForKey:@"number_of_shots"] stringValue],@"-d",[[fireCommands objectForKey:@"pulse_rate"] stringValue],@"-t",[[fireCommands objectForKey:@"trigger_delay"] stringValue],@"-w",[[fireCommands objectForKey:@"pulse_width"] stringValue],@"-z",[[fireCommands objectForKey:@"pulse_height"] stringValue],@"-x",[[fireCommands objectForKey:@"fibre_delay"] stringValue]];
-    
-    //NSArray * tellieCommandLineArguments = @[@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_fire_script.py",@"-c",[[fireCommands objectForKey:@"channel"] stringValue],@"-n",[[fireCommands objectForKey:@"number_of_shots"] stringValue],@"-d",[[fireCommands objectForKey:@"pulse_rate"] stringValue],@"-t",[[fireCommands objectForKey:@"trigger_delay"] stringValue],@"-w",[[fireCommands objectForKey:@"pulse_width"] stringValue],@"-z",[[fireCommands objectForKey:@"pulse_height"] stringValue],@"-x",[[fireCommands objectForKey:@"fibre_delay"] stringValue]];
-    
-    //responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_fire_script.py" withCmdLineArgs:nullCommandArguments];
-
-    //responseFromTellie = [self performSelector:@selector(callPythonScript:withCmdLineArgs:) onThread:[NSThread currentThread] withObject:tellieCommandLineArguments waitUntilDone:YES];
     
     double numberOfShots = [[fireCommands objectForKey:@"number_of_shots"] doubleValue];
     double timeBetweenShotsInMicroSeconds = [[fireCommands objectForKey:@"pulse_rate"] doubleValue]/(1000.0);
@@ -205,8 +204,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     double timeToSleep = (1.0+pulseByPulseDelay)*numberOfShots*timeBetweenShotsInMicroSeconds; //20% grace period for each shot
     
-    
     //hold the fire command on this thread
+    // This line is depreciated - bring it up with the working group, see if they have
+    // a preferred solution.*
     dispatch_sync(dispatch_get_current_queue(), ^{
         responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_fire_script.py" withCmdLineArgs:nullCommandArguments];
         NSLog(@"Response from Tellie FIRE command: %@\n",responseFromTellie);
@@ -217,6 +217,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     //[NSThread sleepForTimeInterval:1.0];
     __block NSString * responseFromPoll = [[NSString alloc] init];
+    // * same as above.
     dispatch_sync(dispatch_get_current_queue(), ^{
         responseFromPoll = [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_readout_script.py" withCmdLineArgs:nil];
         NSLog(@"Response from Tellie READ command: %@\n",responseFromPoll);
@@ -229,46 +230,60 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         NSLog(@"Unable to add pin readout due to error %@",exception);
     }
     
+    [responseFromTellie release];
     [self updateTellieDocument:fireCommands];
-
 }
-
 
 -(void) stopTellieFibre:(NSArray*)fireCommands
 {
-    NSString *responseFromTellie = [[NSString alloc] init];
-    //NSArray * nullCommandArguments = @[@"0",@"0",@"0"];
-    responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_stop_script.py" withCmdLineArgs:nil];
+    /*
+     Call tellie stop script. The script itself is stored on the DAQ1 machine.
+    */
+    NSString *responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_stop_script.py" withCmdLineArgs:nil];
     NSLog(@"Response from Tellie: %@\n",responseFromTellie);
 }
 
-/*Smellie Functions */
-
+/***************************************/
+/*          Smellie Functions         */
+/***************************************/
 - (void) fetchSmellieConfigurationInformation
-{ 
+{
+    /*
+        Get smellie config information from the smelliedb.
+    */
+
     //this is dependant upon the current couchDB view that exsists within the database
     NSString *requestString = [NSString stringWithFormat:@"_design/smellieMainQuery/_view/pullEllieConfigHeaders"];
     
     [[self generalDBRef:@"smellie"] getDocumentId:requestString tag:kSmellieConfigHeaderRetrieved];
     
     [self setSmellieDBReadInProgress:YES];
+    // Is there a better way to do this... Do we know it's received after the delay?
     [self performSelector:@selector(smellieDocumentsRecieved) withObject:nil afterDelay:10.0];
 }
 
 //complete this after the smellie documents have been recieved
 -(void)smellieDocumentsRecieved
 {
+    /*
+     Update smeillieDBReadInProgress property bool.
+    */
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(smellieDocumentsRecieved) object:nil];
     if (![self smellieDBReadInProgress]) { //killed already
         return;
     }
     
     [self setSmellieDBReadInProgress:NO];
-    
 }
 
 - (ORCouchDB*) generalDBRef:(NSString*)aCouchDb
 {
+    /* 
+     Get and return a reference to a couchDB repo.
+     
+     Arguments:
+        NSString* aCouchDb : The database name e.g. telliedb/rat
+    */
     //Collect a series of objects from the SNOPModel
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     
@@ -283,22 +298,28 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                        delegate:aSnotModel];
 }
 
-//This calls a python script but can only take two command line arguments 
 -(NSString*)callPythonScript:(NSString*)pythonScriptFilePath withCmdLineArgs:(NSArray*)commandLineArgs
 {
-    /*if([commandLineArgs count] != 3){
-        NSLog(@"Three command line arguments are required!\n");
-        return nil;
-    }*/
+    /*
+     Call a python script on the DAQ1 machine. Currently three cases are hardcoded into
+     this function, defined by the size of the commandLineArgs array variable. Smellie
+     commands take three args, tellie fire commands take fourteen and poll requests take
+     none.
+     
+     Arguments: 
+      NSString* pythonScriptFilePath : Path to the script to be called (on DAQ1). 
+      NSArray* commandLineArgs       : Arguments to be passed to the script.
+     
+     Returns:
+      NSString* responseFromCmdLine  : The text response returned by the called script.
+    */
     
-    NSTask *task;
-    task = [[NSTask alloc] init];
+    NSTask* task = [[NSTask alloc] init];
     [task setLaunchPath: @"/usr/bin/python"]; // Tell the task to execute the ssh command
     
     if([commandLineArgs count] == 3){ //this is the case for smellie commands 
         [task setArguments: [NSArray arrayWithObjects:pythonScriptFilePath,[commandLineArgs objectAtIndex:0],[commandLineArgs objectAtIndex:1],[commandLineArgs objectAtIndex:2], nil]];
     }
-    
     else if ([commandLineArgs count] == 14){ //this is the case for the fire tellie commands
         [task setArguments: [NSArray arrayWithObjects:pythonScriptFilePath,[commandLineArgs objectAtIndex:0],[commandLineArgs objectAtIndex:1],[commandLineArgs objectAtIndex:2],[commandLineArgs objectAtIndex:3],[commandLineArgs objectAtIndex:4],[commandLineArgs objectAtIndex:5],[commandLineArgs objectAtIndex:6],[commandLineArgs objectAtIndex:7],[commandLineArgs objectAtIndex:8],[commandLineArgs objectAtIndex:9],[commandLineArgs objectAtIndex:10],[commandLineArgs objectAtIndex:11],[commandLineArgs objectAtIndex:12],[commandLineArgs objectAtIndex:13], nil]];
     }
@@ -309,36 +330,39 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         return @"unable to call python script with correct number of arguments";
     }
     
-    NSPipe *pipe;
-    pipe = [NSPipe pipe];
+    NSPipe* pipe = [NSPipe pipe];
     [task setStandardOutput: pipe];
-    NSFileHandle *file;
-    file = [pipe fileHandleForReading]; // This file handle is a reference to the output of the ssh command
+    NSFileHandle* file = [pipe fileHandleForReading]; // This file handle is a reference to the output of the ssh command
     
     @try{
         [task launch];
     }
     @catch (NSException *e) {
-        NSLog(@"SMELLIE Connection Error: %@",e);
+        NSLog(@"ELLIE Connection Error calling script %@: %@",pythonScriptFilePath,e);
     }
     @finally {
         //do something here
     }
-    
-    NSData *data;
-    data = [file readDataToEndOfFile];
-    
-    NSString *responseFromCmdLine;
-    responseFromCmdLine = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding]; // This string now contains the entire output of the ssh command.
+
+    NSData* data = [file readDataToEndOfFile];
+    NSString* responseFromCmdLine = [[[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding] autorelease]; // This string now contains the entire output of the ssh command.
     
     [task release];
-    return [responseFromCmdLine autorelease];
+    return responseFromCmdLine;
 }
 
 
-//used to create the timestamp in the couchDB files 
 - (NSString*) stringDateFromDate:(NSDate*)aDate
 {
+    /*
+     Format date object to a string for inclusion in couchDB files.
+
+     Arguments:
+        NSDate* aDate : A NSDate object with the current time / date.
+     
+     Returns: 
+        NSString* result : The date formatted into a human readable sting.
+     */
     NSDateFormatter* snotDateFormatter = [[NSDateFormatter alloc] init];
     [snotDateFormatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'SS'Z'"];
     snotDateFormatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
@@ -349,24 +373,50 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         strDate = aDate;
     NSString* result = [snotDateFormatter stringFromDate:strDate];
     [snotDateFormatter release];
-    strDate = nil;
-    return [[result retain] autorelease];
+    
+    return result;
 }
 
-//Push the information from the GUI into a couchDB database
+- (NSString*) stringUnixFromDate:(NSDate*)aDate
+{
+    /*
+     Format date object to a string with the standard unix format.
+
+     Arguments:
+        NSDate* aDate : A NSDate object with the current time / date.
+     
+     Returns:
+        NSString* result : The date formatted into a human readable sting.
+    */
+    NSDate* strDate;
+    if(!aDate){
+        strDate = [NSDate date];
+    }else{
+        strDate = aDate;
+    }
+    NSString* result = [NSString stringWithFormat:@"%f",[strDate timeIntervalSince1970]];
+    strDate = nil;
+    
+    return result;
+}
+
 -(void) _pushEllieCustomRunToDB:(NSString*)aCouchDBName runFiletoPush:(NSMutableDictionary*)customRunFile withDocType:(NSString*)aDocType
 {
-    NSAutoreleasePool* runDocPool = [[NSAutoreleasePool alloc] init];
+    /*
+     Push custom run information from the GUI to a couchDB database.
+     
+     Arguments:
+      NSString* aCouchDBName            : The couchdb database name.
+      NSMutableDictionary* customRunFile: GUI settings stored in a dictionary.
+      NSString* aDocType                : Type of document being uploaded.
+    */
     NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:100];
     
     //Collect a series of objects from the SNOPModel
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    
-    //Initialise the SNOPModel
     SNOPModel* aSnotModel = [objs objectAtIndex:0];
     
     NSString* docType = [NSMutableString stringWithFormat:@"%@",aDocType];
-    
     NSLog(@"document_type: %@",docType);
     
     [runDocDict setObject:docType forKey:@"doc_type"];
@@ -375,46 +425,26 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
             
     //self.runDocument = runDocDict;
     [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:aCouchDBName] addDocument:runDocDict tag:kSmellieRunDocumentAdded];
-    
-    [runDocPool release];
-}
-
-//unix version of the date
-- (NSString*) stringUnixFromDate:(NSDate*)aDate
-{
-    //NSDateFormatter* snotDateFormatter = [[NSDateFormatter alloc] init];
-    //[snotDateFormatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'SS'Z'"];
-    //snotDateFormatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
-    NSDate* strDate;
-    if (!aDate)
-        strDate = [NSDate date];
-    else
-        strDate = aDate;
-    //strDate.date.timeIntervalSince1970
-    NSString* result = [NSString stringWithFormat:@"%f",[strDate timeIntervalSince1970]];
-    //[snotDateFormatter release];
-    strDate = nil;
-    return [[result retain] autorelease];
 }
 
 -(void) _pushSmellieRunDocument
 {
-    NSAutoreleasePool* runDocPool = [[NSAutoreleasePool alloc] init];
+    /*
+     Creat a standard smellie run doc using ELLIEModel / SNOPModel / ORRunModel class 
+     variables and push up to the smelliedb.
+    */
     NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:100];
     
     //Collect a series of objects from the SNOPModel
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     SNOPModel* aSnotModel = [objs objectAtIndex:0];
     
+    //Collect objects from ORRunModel
     NSArray*  objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     runControl = [objs3 objectAtIndex:0];
     
     NSString* docType = [NSMutableString stringWithFormat:@"smellie_run"];
-    
     NSString* smellieRunNameLabel = [aSnotModel smellieRunNameLabel];
-    
-    //Fetch the run index that is being used
-    //NSString* runDescription = [NSString stringWithFormat:@"%@",[aSnotModel]]
     
     [runDocDict setObject:docType forKey:@"type"];
     [runDocDict setObject:[NSString stringWithFormat:@"%i",0] forKey:@"version"];
@@ -427,23 +457,23 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [runDocDict setObject:[NSNumber numberWithInt:[runControl runNumber]] forKey:@"run"];
     [runDocDict setObject:smellieSubRunInfo forKey:@"sub_run_info"];
     
-    //self.runDocument = runDocDict;
     [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:@"smellie"] addDocument:runDocDict tag:kSmellieSubRunDocumentAdded];
-    
-    [runDocPool release];
 }
 
 -(void) _pushInitialTellieRunDocument
 {
-    /* Creates and uploads an initial run document to the CouchDB. A dictionary repesenting the doc is additionally saved as a memeber variable, this dict is updated with subrun info as it becomes availbale. If the document fails to upload, raises an exception */
+    /* Creates and uploads an initial run document to the CouchDB. A dictionary
+     * repesenting the doc is additionally saved as a memeber variable, this
+     * dict is updated with subrun info as it becomes availbale. If the
+     * document fails to upload, raises an exception */
     
     // Get run control object
     NSArray*  objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     runControl = [objs3 objectAtIndex:0];
 
-    //Build dictionary
-    NSMutableDictionary* runDocDict = [[NSMutableDictionary alloc] initWithCapacity:10];
-    NSMutableArray* subRunArray = [[NSMutableArray alloc] initWithCapacity:10];
+    // Build dictionary
+    NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:10];
+    NSMutableArray* subRunArray = [NSMutableArray arrayWithCapacity:10];
     [runDocDict setObject:@"tellie_run" forKey:@"type"];
     [runDocDict setObject:[NSString stringWithFormat:@"%i",0] forKey:@"version"];
     [runDocDict setObject:[NSString stringWithFormat:@"%i",0] forKey:@"pass"];
@@ -455,15 +485,16 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [runDocDict setObject:[NSMutableArray arrayWithObjects:[runControl runNumber],[runControl runNumber], nil] forKey:@"run_range"];
     [runDocDict setObject:subRunArray forKey:@"sub_run_info"];
 
-    // Use tellieRunDoc property's autogenerated setter to set tellieRunDoc. The tellieRunDoc property was instantiated
-    // with the release property so getter and setter methods will automatically handle memory creation / retention /
-    // release.
+    // Use tellieRunDoc property's autogenerated setter to set tellieRunDoc.
+    // The tellieRunDoc property was instantiated with the release property so
+    // getter and setter methods will automatically handle memory creation /
+    // retention / release.
     self.tellieRunDoc = runDocDict;
     
-    //Post and update kTellieRunDocumentAdded bool
+    // Post and update kTellieRunDocumentAdded bool
     [[self orcaDbRefWithEntryDB:self withDB:@"tellie"] addDocument:runDocDict tag:kTellieRunDocumentAdded];
     
-    //wait for main thread to receive acknowledgement from couchdb
+    // wait for main thread to receive acknowledgement from couchdb
     NSInteger timeoutLimit = 2;
     NSDate* timeout = [NSDate dateWithTimeIntervalSinceNow:timeoutLimit];
     while (![self.tellieRunDoc objectForKey:@"_id"]) {
@@ -472,13 +503,25 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
             [NSException raise:@"Timeout exception" format:@"Initial tellieRunDoc took > %d s to post", timeoutLimit];
         }
     }
-    [runDocDict release];
-    [subRunArray release];
 }
 
 - (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
 {
-    
+    /*
+     Get an ORCouchDB object pointing to a sno+ couchDB repo.
+     
+     Arguments:
+        id aCouchDelegate:  An ELLIEModel object which will be delgated some functionality during
+                            ORCouchDB function calls.
+        NSString* entryDB:  The SNO+ couchDB repo to be assocated with the ORCouchDB object.
+     
+     Returns:
+        ORCouchDB* result:  An ORCouchDB object pointing to the entryDB repo.
+     
+     COMMENT: 
+        I'm not sure why this is here? There is an identical method in SNOPModel. Might be worth
+        deleting this method and replacing any reference to it with the SNOPModel version.
+    */
     //Collect a series of objects from the SNOPModel
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     SNOPModel* aSnotModel = [objs objectAtIndex:0];
@@ -493,14 +536,19 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     if (aCouchDelegate)
         [result setDelegate:aCouchDelegate];
     
-    return [[result retain] autorelease];
+    return result;
 }
 
 - (void) updateTellieDocument:(NSDictionary*)subRunDoc
 {
-    NSAutoreleasePool* runDocPool = [[NSAutoreleasePool alloc] init];
-    NSMutableDictionary* runDocDict = [[self.tellieRunDoc mutableCopy] autorelease];
-    NSMutableDictionary* subRunDocDict = [[self.tellieSubRunSettings mutableCopy] autorelease];
+    /*
+     Update self.tellieRunDoc with subrun information.
+     
+     Arguments:
+        NSDictionary* subRunDoc:  Subrun information to be added to the current self.tellieRunDoc.
+    */
+    NSMutableDictionary* runDocDict = [self.tellieRunDoc mutableCopy];
+    NSMutableDictionary* subRunDocDict = [self.tellieSubRunSettings mutableCopy];
     
     [subRunDocDict setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
     @try{
@@ -509,17 +557,12 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     @catch (NSException *e) {
         NSLog(@"Error in pin readout %@",e);
     }
-    NSMutableArray * subRunInfo = [[NSMutableArray alloc] initWithCapacity:10];
-    subRunInfo = [[runDocDict objectForKey:@"sub_run_info"] mutableCopy];
-
-    
+    NSMutableArray * subRunInfo = [[runDocDict objectForKey:@"sub_run_info"] mutableCopy];
     [subRunInfo addObject:subRunDocDict];
     [runDocDict setObject:subRunInfo forKey:@"sub_run_info"];
     
-
-    
+    //Update tellieRunDoc property.
     self.tellieRunDoc = runDocDict;
-    
     
     //check to see if run is offline or not
     if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
@@ -528,13 +571,22 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                                 documentId:[runDocDict objectForKey:@"_id"]
                                        tag:kTellieRunDocumentUpdated];
     }
-    
-    [runDocPool release];
+    [subRunInfo release];
+    [runDocDict release];
+    [subRunDocDict release];
 }
 
 -(void) _pushEllieConfigDocToDB:(NSString*)aCouchDBName runFiletoPush:(NSMutableDictionary*)customRunFile withDocType:(NSString*)aDocType
 {
-    NSAutoreleasePool* configDocPool = [[NSAutoreleasePool alloc] init];
+    /*
+     Create and push a smellie config file to couchdb.
+     
+     Arguments:
+        NSString* aCouchDBName:             Name of the couchdb repo the document will be uploaded to.
+        NSMutableDictionary customRunFile:  Custom run settings to be uploaded to db.
+        NSString* aDocType:                 Name to be used in the 'doc_type' field of the uploaded doc.
+     
+    */
     NSMutableDictionary* configDocDic = [NSMutableDictionary dictionaryWithCapacity:100];
     
     //Collect a series of objects from the SNOPModel
@@ -553,8 +605,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 
     //self.runDocument = runDocDict;
     [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:aCouchDBName] addDocument:configDocDic tag:kSmellieRunDocumentAdded];
-    
-    [configDocPool release];
 }
 
 -(void) smellieDBpush:(NSMutableDictionary*)dbDic
@@ -569,6 +619,15 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp
 {
+    /*
+     Checks a result returned from a couchdb query for ellie doocument add / retrieval
+     tags.
+     
+    Arguments: 
+        id aResult:     Object returned by cauchdb query.
+        NSString* aTag: The query tag to check against expected cases.
+        id anOp:        This doesn't appear to be used??
+    */
 	@synchronized(self){
 		if([aResult isKindOfClass:[NSDictionary class]]){
 			NSString* message = [aResult objectForKey:@"Message"];
@@ -579,26 +638,19 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
             //Look through all of the possible tags for ellie couchDB results 
             
             //This is called when smellie run header is queried from CouchDB
-            if ([aTag isEqualToString:kSmellieRunHeaderRetrieved])
-            {
-                NSLog(@"here\n");
+            if ([aTag isEqualToString:kSmellieRunHeaderRetrieved]){
                 NSLog(@"Object: %@\n",aResult);
                 NSLog(@"result: %@\n",[aResult objectForKey:@"run_name"]);
                 //[self parseSmellieRunHeaderDoc:aResult];
-            }
-            
-            else if ([aTag isEqualToString:kSmellieConfigHeaderRetrieved])
-            {
+            }else if ([aTag isEqualToString:kSmellieConfigHeaderRetrieved]){
                 NSLog(@"Smellie configuration file Object: %@\n",aResult);
                 //[self parseSmellieConfigHeaderDoc:aResult];
-            }
-            else if ([aTag isEqualToString:kTellieRunDocumentAdded])
-            {
-                NSMutableDictionary* runDoc = [[[self tellieRunDoc] mutableCopy] autorelease];
+            }else if ([aTag isEqualToString:kTellieRunDocumentAdded]){
+                NSMutableDictionary* runDoc = [[self tellieRunDoc] mutableCopy];
                 [runDoc setObject:[aResult objectForKey:@"id"] forKey:@"_id"];
                 self.tellieRunDoc = runDoc;
+                [runDoc release];
             }
-            
             //If no tag is found for the query result
 			else {
                 NSLog(@"No Tag assigned to that query/couchDB View \n");
@@ -608,9 +660,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         
 		else if([aResult isKindOfClass:[NSArray class]]){
             [aResult prettyPrint:@"CouchDB"];
-		}
-        
-		else {
+		}else{
 			//no docs found 
 		}
 	}
@@ -618,13 +668,12 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 
 -(void)startSmellieRunInBackground:(NSDictionary*)smellieSettings
 {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     [self performSelectorOnMainThread:@selector(startSmellieRun:) withObject:smellieSettings waitUntilDone:NO];
-    [pool release];
-    
 }
 
-//SMELLIE Control Functions
+/****************************************/
+/*      SMELLIE Control Functions       */
+/****************************************/
 -(void)setSmellieSafeStates
 {
     NSArray * setSafeStates = @[@"30",@"0",@"0"]; //30 is the flag for setting smellie to its safe states
@@ -704,23 +753,24 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         customArgument2 = @"0";
     }
         
-    NSArray * smellieCustomCmd = @[customCmd,customArgument1,customArgument2];
+    NSArray* smellieCustomCmd = @[customCmd,customArgument1,customArgument2];
     [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:smellieCustomCmd];
-    
 }
 
 -(void)testFunction
 {
-    NSArray*  objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    NSArray* objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     runControl = [objs3 objectAtIndex:0];
     
     [runControl performSelector:@selector(haltRun)withObject:nil afterDelay:.1];
-    
-    
 }
 
 -(NSNumber*) fetchRecentVersion
 {
+    /*
+     Query smellie config documenets on the smelliedb to find the most recent config versioning
+     number.
+    */
     //Collect a series of objects from the SNOPModel
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     //Initialise the SNOPModel
@@ -738,15 +788,13 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
             //format the json response
             NSString *stringValueOfCurrentVersion = [NSString stringWithFormat:@"%@",[[[json valueForKey:@"rows"] valueForKey:@"value"]objectAtIndex:0]];
             currentVersionNumber = [NSNumber numberWithInt:[stringValueOfCurrentVersion intValue]];
-            //NSLog(@"parsedNumber%@",currentVersionNumber);
-            //NSLog(@"parsedString %@",stringValueOfCurrentVersion);
-            //NSLog(@"valueforkey2=%@", [[json valueForKey:@"rows"] valueForKey:@"value"]);
+            NSLog(@"parsedNumber%@",currentVersionNumber);
+            NSLog(@"valueforkey2=%@", [[json valueForKey:@"rows"] valueForKey:@"value"]);
         }
         @catch (NSException *e) {
             NSLog(@"Error in fetching the SMELLIE CONFIGURATION FILE: %@ . Please fix this before changing the configuration file",e);
         }
-    }
-    else{
+    }else{
         NSLog(@"Error querying couchDB, please check the connection is correct %@",error);
     }
     
@@ -755,9 +803,14 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 
 -(NSMutableDictionary*) fetchCurrentConfigurationForVersion:(NSNumber*)currentVersion
 {
+    /*
+     Fetch the current configuration document of a given version number.
+     
+     Arguments:
+        NSNumber* currentVersion: The version number to be used with the query.
+    */
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     SNOPModel* aSnotModel = [objs objectAtIndex:0];
-    //NSDictionary* currentConfig;
     
     NSString *urlString = [NSString stringWithFormat:@"http://%@:%u/smellie/_design/smellieMainQuery/_view/pullEllieConfigHeaders?key=[%i]&limit=1",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort],[currentVersion intValue]];
     
@@ -767,22 +820,30 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSError *error =  nil;
     NSMutableDictionary *currentConfig = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
     if(!error){
-        //NSLog(@"sucessful query");
-    }
-    else{
+        NSLog(@"sucessful query");
+    }else{
         NSLog(@"Error querying couchDB, please check the connection is correct %@",error);
     }
     
+    [ret release];
     return [[[[currentConfig objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"] objectForKey:@"configuration_info"];
 }
 
 -(void)startSmellieRun:(NSDictionary*)smellieSettings
 {
+    /*
+     Start a smellie run. 
+     
+     COMMENT:
+        I think this method should be implemented as a standard run script, not as an object 
+        method. I'll look into doing this after the DAQ meeting in Jan - Once I know the tellie
+        one works!
+    */
     //stop any current runs and go into a maintainence run 
     //[runControl performSelectorOnMainThread:@selector(stopRun) withObject:nil waitUntilDone:YES];
     //[runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
     
-    //Set the Run Type to a SMELLIE run
+    //Set the Run Type to a SMELLIE run -- Not sure if this should be commented back in?
     //NSArray*  objsSNOP = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     //SNOPModel* theSNOPModel = [objsSNOP objectAtIndex:0];
     //[theSNOPModel setRunType:kRunSmellie]; //sets the run_type to a smellie run type
@@ -792,12 +853,10 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSLog(@"SMELLIE_RUN:Stopping any Blocking Software on SMELLIE computer(SNODROP)\n");
     [self killBlockingSoftware];
 
-    NSNumber *currentConfigurationVersion = [[NSNumber alloc] initWithInt:0];
-    currentConfigurationVersion = [self fetchRecentVersion];
+    NSNumber* currentConfigurationVersion = [self fetchRecentVersion];
     
     //fetch the data associated with the current configuration
-    NSMutableDictionary *configForSmellie = [[NSMutableDictionary alloc] initWithCapacity:10];
-    configForSmellie = [[self fetchCurrentConfigurationForVersion:currentConfigurationVersion] mutableCopy];
+    NSMutableDictionary *configForSmellie = [[self fetchCurrentConfigurationForVersion:currentConfigurationVersion] mutableCopy];
     
     NSMutableDictionary *laserHeadToSepiaMapping = [[NSMutableDictionary alloc] initWithCapacity:10];
     int laserHeadIndex =0;
@@ -814,7 +873,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     } //end of looping through each laserHeadIndex
     
     NSMutableDictionary *laserHeadToGainControlMapping = [[NSMutableDictionary alloc] initWithCapacity:10];
-    laserHeadIndex =0;
     for(laserHeadIndex =0; laserHeadIndex < 6; laserHeadIndex++){
         
         for (id specificConfigValue in configForSmellie){
@@ -831,12 +889,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     NSMutableDictionary *laserToInputFibreMapping = [[NSMutableDictionary alloc] initWithCapacity:10];
     
-    //int inputChannelIndex = 0;
-    //for(inputChannelIndex =1; inputChannelIndex < 6; inputChannelIndex++){
-
     for (id specificConfigValue in configForSmellie){
-            
-            
+        
             if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput0"]]
                || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput1"]]
                || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput2"]]
@@ -850,7 +904,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                 NSString * laserHeadReference = [[configForSmellie objectForKey:specificConfigValue] objectForKey:@"laserHeadConnected"];
                 
                 [laserToInputFibreMapping setObject:parsedFibreReference forKey:laserHeadReference];
-                
                 
                 //NSString* updatedFibreReference = [fibreSwitchInputConnected stringByReplacingOccurrencesOfString:@"Channel" withString:@""];
                 
@@ -890,16 +943,13 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     if([operationMode isEqualToString:@"Slave Mode"]){
         slaveMode = YES;
         masterMode = NO;
-    }
-    else if([operationMode isEqualToString:@"Master Mode"]){
+    }else if([operationMode isEqualToString:@"Master Mode"]){
         slaveMode = NO;
         masterMode = YES;
-    }
-    else{
+    }else{
         slaveMode = NO;
         masterMode = NO;
     }
-   
     
     NSLog(@"SMELLIE_RUN:Running in %@\n",operationMode);
     NSLog(@"SMELLIE_RUN:Checking Connection to SMELLIE\n");
@@ -953,33 +1003,32 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     ORMTCModel* theMTCModel = [objsMTC objectAtIndex:0];
     [theMTCModel stopMTCPedestalsFixedRate]; //stop any pedestals that are currently running
     
-
-    
     //get the run controller
     NSArray*  objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     runControl = [objs3 objectAtIndex:0];
     
     //Save the current settings of the detector
-    currentOrcaSettingsForSmellie  = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary* tmpCurrentOrcaSettingsForSmellie  = [[NSMutableDictionary alloc] init];
     NSLog(@"SMELLIE_RUN:Mtcd coarse delay set to %f ns\n",[theMTCModel dbFloatByIndex:kCoarseDelay]);
     NSNumber * mtcCoarseDelay = [NSNumber numberWithUnsignedLong:[theMTCModel dbFloatByIndex:kCoarseDelay]];
-    [currentOrcaSettingsForSmellie setObject:mtcCoarseDelay forKey:@"mtcd_coarse_delay"];
+    [tmpCurrentOrcaSettingsForSmellie setObject:mtcCoarseDelay forKey:@"mtcd_coarse_delay"];
     
     NSLog(@"SMELLIE_RUN:Mtcd pulser rate set to %f Hz\n",[theMTCModel dbFloatByIndex:kPulserPeriod]);
     NSNumber * mtcPulserPeriod = [NSNumber numberWithFloat:[theMTCModel dbFloatByIndex:kPulserPeriod]];
-    [currentOrcaSettingsForSmellie setObject:mtcPulserPeriod forKey:@"mtcd_pulser_period"];
+    [tmpCurrentOrcaSettingsForSmellie setObject:mtcPulserPeriod forKey:@"mtcd_pulser_period"];
+    
+    //Set property variable and delete tmpVar.
+    self.currentOrcaSettingsForSmellie = tmpCurrentOrcaSettingsForSmellie;
+    [tmpCurrentOrcaSettingsForSmellie release];
     
     //Set the Mtcd for smellie settings
     //NSLog(@"SMELLIE_RUN:Setting the mtcd coarse delay to 900ns \n",[[NSNumber numberWithUnsignedShort:900] unsignedShortValue]);
     //[theMTCModel setupGTCorseDelay:[[NSNumber numberWithInt:900] intValue]];
     
-    
-    
     if(![runControl isRunning]){
         //start the run controller
         [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
-    }
-    else{
+    }else{
         //Stop the current run and start a new run 
         [runControl setForceRestart:YES];
         [runControl performSelectorOnMainThread:@selector(stopRun) withObject:nil waitUntilDone:YES];
@@ -1049,8 +1098,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
             int increment;
             if(maxLaserIntensity != minLaserIntensity){
                 increment = (maxLaserIntensity - minLaserIntensity)/[numOfIntensitySteps floatValue];
-            }
-            else{
+            }else{
                 increment = 0;
             }
             //NSNumber *incrementInteger = [NSNUmber numberWithFloat:increment];
@@ -1058,7 +1106,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
             //Loop through each intensity of a SMELLIE run
             int intensityLoopInt;
             for(intensityLoopInt = minLaserIntensity;intensityLoopInt <= maxLaserIntensity; intensityLoopInt = intensityLoopInt + increment){
-                
                 
                 //if run control cancels the run
                 /*if(![runControl isRunning]){
@@ -1172,12 +1219,15 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 
 -(void)stopSmellieRun
 {
+    /*
+     Some sign off / tidy up stuff to be called at the end of a smellie run. Again, I think this
+     should be moved to a runscript.
+    */
     //Even though this is stopping in Orca it can still contine on SNODROP!
     //Need a stop run command here
     //TODO: add a try and except statement here
     NSArray*  objsMTC = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     ORMTCModel* theMTCModel = [objsMTC objectAtIndex:0];
-    
     
     //removed this to stop splurgingb
     NSArray*  objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];

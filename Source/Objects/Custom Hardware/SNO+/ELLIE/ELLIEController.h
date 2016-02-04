@@ -4,6 +4,9 @@
 //
 //  Created by Chris Jones on 01/04/2014.
 //
+//  Revision history:
+//  Ed Leming 04/01/2016 -  Removed global variables to move logic to
+//                          ELLIEModel
 //
 
 #import <Foundation/Foundation.h>
