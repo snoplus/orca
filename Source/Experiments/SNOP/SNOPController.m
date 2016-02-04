@@ -105,6 +105,8 @@ smellieRunFile;
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* theRunControl = [objs objectAtIndex:0];
+    objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    ORMTCModel* mtcModel = [objs objectAtIndex:0];
     
     [super registerNotificationObservers];
 
@@ -145,8 +147,8 @@ smellieRunFile;
     
     [notifyCenter addObserver:self
                      selector:@selector(runTypeChanged:)
-                         name:SNOPRunTypeChangedNotification
-                       object:self];
+                         name:ORSNOPModelSRChangedNotification
+                       object:model];
     
     [notifyCenter addObserver:self
                      selector:@selector(runTypeMaskChanged:)
@@ -162,12 +164,18 @@ smellieRunFile;
                      selector : @selector(runsLockChanged:)
                          name : ORRunStatusChangedNotification
                        object : nil];
-
     
     [notifyCenter addObserver : self
                      selector : @selector(runsECAChanged:)
                          name : ORSNOPModelRunsECAChangedNotification
                         object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(mtcDataBaseChanged:)
+                         name : ORMTCModelMtcDataBaseChanged
+                        object: mtcModel];
+    
+    
     
     //TODO: add the notification for changedRunType on SNO+
     /*[notifyCenter addObserver:self
@@ -185,7 +193,6 @@ smellieRunFile;
     [self hvStatusChanged:nil];
     [self dbOrcaDBIPChanged:nil];
     [self dbDebugDBIPChanged:nil];
-    [self fetchNhitSettings];
     [self fetchRunMaskSettings];
     [self runStatusChanged:nil]; //update the run status
     [model setIsEmergencyStopEnabled:TRUE]; //enable the emergency stop
@@ -228,47 +235,9 @@ smellieRunFile;
 
 }
 
--(void)fetchNhitSettings
-{
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    if([objs count]){
-        ORMTCModel* theMtcModel = [objs objectAtIndex:0];
-        int col,row;
-        for(col=0;col<4;col++){
-            for(row=0;row<6;row++){
-                int index = kNHit100HiThreshold + row + (col * 6);
-                int mtcaIndex = kESumLowThreshold + row + (col * 4);
-                if((col == 0) && (row==0)){
-                    [n100Hi setIntValue:[theMtcModel dbFloatByIndex: index]];
-                    [esumhi setIntValue:[theMtcModel dbFloatByIndex:mtcaIndex]];
-                }
-                else if((col == 0) && (row==1)){
-                    [n100med setIntValue:[theMtcModel dbFloatByIndex: index]];
-                }
-                else if((col == 0) && (row==3)){
-                    [n20hi setIntValue:[theMtcModel dbFloatByIndex: index]];
-                }
-                else if((col == 0) && (row==5)){
-                    [owln setIntValue:[theMtcModel dbFloatByIndex: index]];
-                }
-                else if((col == 0) && (row==2)){
-                    [n100Lo setIntValue:[theMtcModel dbFloatByIndex: index]]; 
-                }
-                else{
-                    //do nothing
-                }
-            }
-        }
-    }
-    else {
-        NSLogColor([NSColor redColor],@"Must have an MTC in the configuration\n");
-    }
-}
-
 -(void) runTypeChanged:(NSNotification*)aNote
 {
-    [lastRunType setIntValue:[[model runTypeMask] intValue]]; //update the old run types
-    //[currentRunType setIntValue:[aNote intValue]]; //update the current Run Type
+
     
 }
 
@@ -416,6 +385,10 @@ smellieRunFile;
 		}
         [lightBoardView setState:kCautionLight];
 	}
+
+    //Update standard run type
+    [standardRunTypeField setStringValue:[model standardRunType]];
+
 }
 
 - (NSString*) getStartingString
@@ -1114,7 +1087,6 @@ smellieRunFile;
     [standardRunPopupMenu setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunSaveButton setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunLoadButton setEnabled:!lockedOrNotRunningMaintenance];
-    [standardRunLoadToHWButton setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunDeleteButton setEnabled:!lockedOrNotRunningMaintenance];
     [maintenanceRunBox setEnabled:!lockedOrNotRunningMaintenance];
     
@@ -1174,12 +1146,31 @@ smellieRunFile;
 }
 
 //STANDARD RUNS
-- (IBAction)loadStandardRunFromDBAction:(id)sender {
-    [model loadStandardRun:[standardRunPopupMenu objectValueOfSelectedItem]];
+- (void) mtcDataBaseChanged:(NSNotification*)aNotification
+{
+    
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    ORMTCModel* mtcModel = [objs objectAtIndex:0];
+    
+    [[standardRunThresNewValues cellAtRow:0 column:0] setFloatValue:[mtcModel dbFloatByIndex:kNHit100HiThreshold]];
+    [[standardRunThresNewValues cellAtRow:1 column:0] setFloatValue:[mtcModel dbFloatByIndex:kNHit100MedThreshold]];
+    [[standardRunThresNewValues cellAtRow:2 column:0] setFloatValue:[mtcModel dbFloatByIndex:kNHit100LoThreshold]];
+    [[standardRunThresNewValues cellAtRow:3 column:0] setFloatValue:[mtcModel dbFloatByIndex:kNHit20Threshold]];
+    [[standardRunThresNewValues cellAtRow:4 column:0] setFloatValue:[mtcModel dbFloatByIndex:kNHit20LBThreshold]];
+    [[standardRunThresNewValues cellAtRow:5 column:0] setFloatValue:[mtcModel dbFloatByIndex:kOWLNThreshold]];
+    [[standardRunThresNewValues cellAtRow:6 column:0] setFloatValue:[mtcModel dbFloatByIndex:kESumHiThreshold]];
+    [[standardRunThresNewValues cellAtRow:7 column:0] setFloatValue:[mtcModel dbFloatByIndex:kESumLowThreshold]];
+    [[standardRunThresNewValues cellAtRow:8 column:0] setFloatValue:[mtcModel dbFloatByIndex:kOWLEHiThreshold]];
+    [[standardRunThresNewValues cellAtRow:9 column:0] setFloatValue:[mtcModel dbFloatByIndex:kOWLELoThreshold]];
+    [[standardRunThresNewValues cellAtRow:10 column:0] setFloatValue:[mtcModel dbFloatByIndex:kNhit100LoPrescale]];
+    [[standardRunThresNewValues cellAtRow:11 column:0] setFloatValue:[mtcModel dbFloatByIndex:kPulserPeriod]];
+
 }
 
-- (IBAction)loadStandardRunToHWAction:(id)sender {
-    [model loadStandardRunToHW:[standardRunPopupMenu objectValueOfSelectedItem]];
+
+
+- (IBAction)loadStandardRunFromDBAction:(id)sender {
+    [model loadStandardRun:[standardRunPopupMenu objectValueOfSelectedItem]];
 }
 
 - (IBAction)saveStandardRunToDBAction:(id)sender {
@@ -1190,15 +1181,52 @@ smellieRunFile;
     [standardRunPopupMenu selectItemAtIndex:0];
 }
 
-- (IBAction)addNewStandardRunAction:(id)sender {
-    NSString *newStandardRun = [standardRunPopupMenu stringValue];
-    if ([standardRunPopupMenu indexOfItemWithObjectValue:newStandardRun] == NSNotFound && [newStandardRun isNotEqualTo:@""]){
-        BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Creating new Standard Run: \"%@\"", newStandardRun],@"Is this really what you want?",@"Cancel",@"Yes, Make New Standard Run",nil);
+// Create a new SR item if doesn't exist and set the runType string value
+- (IBAction)standardRunPopupAction:(id)sender {
+    NSString *standardRun = [standardRunPopupMenu stringValue];
+    if ([standardRunPopupMenu indexOfItemWithObjectValue:standardRun] == NSNotFound && [standardRun isNotEqualTo:@""]){
+        BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Creating new Standard Run: \"%@\"", standardRun],@"Is this really what you want?",@"Cancel",@"Yes, Make New Standard Run",nil);
         if(!cancel){
-            [standardRunPopupMenu addItemWithObjectValue:newStandardRun];
-            [standardRunPopupMenu selectItemWithObjectValue:newStandardRun];
+            [standardRunPopupMenu addItemWithObjectValue:standardRun];
+            [standardRunPopupMenu selectItemWithObjectValue:standardRun];
         }
     }
+    [model setStandardRunType:standardRun];
+    
+    
+    //Fetch DB and display trigger configuration in GUI
+    //Query the OrcaDB and get a dictionary with the parameters
+    NSString *urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/orca/_design/standardRuns/_view/getStandardRuns?startkey=[\"%@\",{}]&endkey=[\"%@\",0]&descending=True&include_docs=True",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort],[model standardRunType],[model standardRunType]];
+    
+    NSString* urlStringScaped = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+
+    NSURL *url = [NSURL URLWithString:urlStringScaped];
+    NSData *data = [NSData dataWithContentsOfURL:url];
+    NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    NSError *error =  nil;
+    NSDictionary *detectorSettings = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
+
+    if(error) {
+        NSLog(@"Error querying couchDB, please check the connection is correct: \n %@ \n", ret);
+        return;
+    }
+
+    //Display configuration in GUI
+    [[standardRunThresStoredValues cellAtRow:0 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Hi,Threshold"] intValue]];
+    [[standardRunThresStoredValues cellAtRow:1 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Med,Threshold"] intValue]];
+    [[standardRunThresStoredValues cellAtRow:2 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Lo,Threshold"] intValue]];
+    [[standardRunThresStoredValues cellAtRow:3 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20,Threshold"] intValue]];
+    [[standardRunThresStoredValues cellAtRow:4 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20LB,Threshold"] intValue]];
+    [[standardRunThresStoredValues cellAtRow:5 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLN,Threshold"] intValue]];
+    [[standardRunThresStoredValues cellAtRow:6 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumHi,Threshold"] intValue]];
+    [[standardRunThresStoredValues cellAtRow:7 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumLow,Threshold"] intValue]];
+    [[standardRunThresStoredValues cellAtRow:8 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLEHi,Threshold"] intValue]];
+    [[standardRunThresStoredValues cellAtRow:9 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLELo,Threshold"] intValue]];
+    [[standardRunThresStoredValues cellAtRow:10 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,Nhit100LoPrescale"] intValue]];
+    [[standardRunThresStoredValues cellAtRow:11 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,PulserPeriod"] intValue]];
+    
+    
+    
 }
 
 @end

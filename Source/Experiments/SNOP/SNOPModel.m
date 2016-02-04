@@ -49,6 +49,7 @@ NSString* ORSNOPModelDebugDBIPAddressChanged = @"ORSNOPModelDebugDBIPAddressChan
 NSString* SNOPRunTypeChangedNotification = @"SNOPRunTypeChangedNotification";
 NSString* ORSNOPRunsLockNotification = @"ORSNOPRunsLockNotification";
 NSString* ORSNOPModelRunsECAChangedNotification = @"ORSNOPModelRunsECAChangedNotification";
+NSString* ORSNOPModelSRChangedNotification = @"ORSNOPModelSRChangedNotification";
 
 #define kOrcaRunDocumentAdded   @"kOrcaRunDocumentAdded"
 #define kOrcaRunDocumentUpdated @"kOrcaRunDocumentUpdated"
@@ -146,6 +147,8 @@ mtcConfigDoc = _mtcConfigDoc;
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
+    [standardRunType release];
+
     [super dealloc];
 }
 
@@ -838,6 +841,7 @@ mtcConfigDoc = _mtcConfigDoc;
 
     //Runs tab
     self.runTypeMask = [decoder decodeObjectForKey:@"SNOPRunTypeMask"];
+    [self setStandardRunType:[decoder decodeObjectForKey:@"SNOPStandarRunType"]];
     [self setECA_pattern:[decoder decodeIntForKey:@"SNOPECApattern"]];
     [self setECA_type:[decoder decodeIntForKey:@"SNOPECAtype"]];
     [self setECA_tslope_pattern:[decoder decodeIntForKey:@"SNOPECAtslppattern"]];
@@ -866,6 +870,7 @@ mtcConfigDoc = _mtcConfigDoc;
 
     //Runs tab
     [encoder encodeObject:self.runTypeMask forKey:@"SNOPRunTypeMask"];
+    [encoder encodeObject:[self standardRunType] forKey:@"SNOPStandarRunType"];
     [encoder encodeInt:[self ECA_pattern] forKey:@"SNOPECApattern"];
     [encoder encodeInt:[self ECA_type] forKey:@"SNOPECAtype"];
     [encoder encodeInt:[self ECA_tslope_pattern] forKey:@"SNOPECAtslppattern"];
@@ -1074,6 +1079,20 @@ mtcConfigDoc = _mtcConfigDoc;
     }
 }
 
+- (NSString*)standardRunType
+{
+    return standardRunType;
+}
+
+- (void) setStandardRunType:(NSString *)aValue
+{
+    [aValue retain];
+    [standardRunType release];
+    standardRunType = aValue;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelSRChangedNotification object:self];
+}
+
 - (int)ECA_pattern
 {
     return ECA_pattern;
@@ -1081,10 +1100,8 @@ mtcConfigDoc = _mtcConfigDoc;
 
 - (void) setECA_pattern:(int)aValue
 {
-    
     ECA_pattern = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
-    
 }
 
 - (int)ECA_type
@@ -1094,10 +1111,8 @@ mtcConfigDoc = _mtcConfigDoc;
 
 - (void) setECA_type:(int)aValue
 {
-    
     ECA_type = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
-    
 }
 
 - (int)ECA_tslope_pattern
@@ -1107,10 +1122,8 @@ mtcConfigDoc = _mtcConfigDoc;
 
 - (void) setECA_tslope_pattern:(int)aValue
 {
-    
     ECA_tslope_pattern = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
-    
 }
 
 - (double)ECA_subrun_time
@@ -1120,10 +1133,8 @@ mtcConfigDoc = _mtcConfigDoc;
 
 - (void) setECA_subrun_time:(double)aValue
 {
-    
     ECA_subrun_time = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
-    
 }
 
 // Load last MTC values (saved with 'saveStandardRun') from the DB for the selected Standard Run

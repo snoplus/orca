@@ -99,6 +99,7 @@
     bool _smellieDocUploaded;
     NSMutableDictionary * snopRunTypeMask;
     NSNumber * runTypeMask;
+    NSString * standardRunType;
     
     NSThread * eStopThread;
     
@@ -107,6 +108,7 @@
 
     @private
         //Standard runs stuff
+
         int ECA_pattern;
         int ECA_type;
         int ECA_tslope_pattern;
@@ -196,6 +198,8 @@
 #pragma mark ¥¥¥Accessors
 - (void) setViewType:(int)aViewType;
 - (int) viewType;
+- (NSString*) standardRunType;
+- (void) setStandardRunType:(NSString*)aValue;
 - (int) ECA_pattern;
 - (int) ECA_type;
 - (int) ECA_tslope_pattern;
@@ -263,3 +267,4 @@ extern NSString* ORSNOPModelDebugDBIPAddressChanged;
 extern NSString* SNOPRunTypeChangedNotification;
 extern NSString* ORSNOPRunsLockNotification;
 extern NSString* ORSNOPModelRunsECAChangedNotification;
+extern NSString* ORSNOPModelSRChangedNotification;

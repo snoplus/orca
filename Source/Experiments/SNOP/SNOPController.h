@@ -46,6 +46,8 @@
     //Run control (the rest is in the ORExperimentController)
     IBOutlet StopLightView *lightBoardView;
     IBOutlet NSButton *maintenanceRunBox;
+    IBOutlet NSTextField* standardRunTypeField;
+    IBOutlet NSTextField* lastRunType;
 
     //Quick links
     
@@ -53,22 +55,22 @@
     IBOutlet NSButton *panicDownButton;
     IBOutlet NSTextField *detectorHVStatus;
     
+    //Standard Runs
+    IBOutlet NSComboBox *standardRunPopupMenu;
+    IBOutlet NSComboBox *standardRunVersionPopupMenu;
+    IBOutlet NSButton *standardRunLoadButton;
+    IBOutlet NSButton *standardRunSaveButton;
+    IBOutlet NSButton *standardRunDeleteButton;
+    IBOutlet NSMatrix *standardRunThresNewValues;
+    IBOutlet NSMatrix *standardRunThresStoredValues;
+    IBOutlet NSMatrix *standardRunThresDefaultValues;
+
+    
     //Run Types Information
     IBOutlet NSMatrix*  globalRunTypesMatrix;
     
     //Xl3 Mode
     IBOutlet NSMatrix * globalxl3Mode;
-    
-    //Run information
-    IBOutlet NSTextField* currentRunType;
-    IBOutlet NSTextField* lastRunType;
-
-    IBOutlet NSTextField *n100Hi;
-    IBOutlet NSTextField *n100med;
-    IBOutlet NSTextField *n20hi;
-    IBOutlet NSTextField *esumhi;
-    IBOutlet NSTextField *owln;
-    IBOutlet NSTextField *n100Lo;
     
     //smellie buttons ---------
     IBOutlet NSComboBox *smellieRunFileNameField;
@@ -113,14 +115,6 @@
     IBOutlet NSPopUpButton *ECAtypePopUpButton;
     IBOutlet NSTextField *TSlopePatternTextField;
     IBOutlet NSTextField *subTimeTextField;
-    
-    //STANDARD RUNS
-    IBOutlet NSComboBox *standardRunPopupMenu;
-    IBOutlet NSComboBox *standardRunVersionPopupMenu;
-    IBOutlet NSButton *standardRunSaveButton;
-    IBOutlet NSButton *standardRunLoadButton;
-    IBOutlet NSButton *standardRunLoadToHWButton;
-    IBOutlet NSButton *standardRunDeleteButton;
     
 }
 
