@@ -1184,7 +1184,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     runControl = [objs3 objectAtIndex:0];
     
     //Set the Mtcd for back to original settings
-    [theMTCModel setupPulserRateAndEnable:[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_pulser_period"] floatValue]];
+    [theMTCModel setThePulserRate:[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_pulser_period"] floatValue]];
+    [theMTCModel enablePulser];
     NSLog(@"SMELLIE_RUN:Setting the mtcd pulser back to %f Hz\n",[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_pulser_period"] floatValue]);
     [theMTCModel stopMTCPedestalsFixedRate];
     
