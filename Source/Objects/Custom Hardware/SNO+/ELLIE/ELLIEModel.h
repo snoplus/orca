@@ -4,6 +4,8 @@
 //
 //  Created by Chris Jones on 01/04/2014.
 //
+//  Revision history:
+//  Ed Leming 30/12/2015 - Memory updates and tidy up.
 //
 
 #import <Foundation/Foundation.h>
@@ -21,12 +23,12 @@
     NSMutableDictionary* smellieRunHeaderDocList;
     ORRunModel* runControl;
     ORRunController* theRunController;
-    NSMutableArray *smellieSubRunInfo;
+    NSMutableArray* smellieSubRunInfo;
     bool _smellieDBReadInProgress;
     float pulseByPulseDelay;
     
     //tellie settings
-    NSMutableDictionary * tellieSubRunSettings;
+    NSMutableDictionary* tellieSubRunSettings;
     
 }
 
@@ -54,35 +56,36 @@
 /*This function calls a python script: 
     pythonScriptFilePath - this is the python script file path
     withCmdLineArgs - these are the arguments for the python script*/
--(NSString*)callPythonScript:(NSString*)pythonScriptFilePath withCmdLineArgs:(NSArray*)commandLineArgs;
+-(NSString*) callPythonScript:(NSString*)pythonScriptFilePath withCmdLineArgs:(NSArray*)commandLineArgs;
 
 //starts a SMELLIE run with given parameters and submits the smellie run file to the database
 -(void) startSmellieRun:(NSDictionary*)smellieSettings;
 -(void) stopSmellieRun;
 -(void) smellieDBpush:(NSMutableDictionary*)dbDic;
 -(void) smellieConfigurationDBpush:(NSMutableDictionary*)dbDic;
--(void)startSmellieRunInBackground:(NSDictionary*)smellieSettings;
+-(void) startSmellieRunInBackground:(NSDictionary*)smellieSettings;
 
 //SMELLIE Control Functions
--(void)setSmellieSafeStates;
--(void)setLaserSwitch:(NSString*)laserSwitchChannel;
--(void)setFibreSwitch:(NSString*)fibreSwitchInputChannel withOutputChannel:(NSString*)fibreSwitchOutputChannel;
--(void)setLaserIntensity:(NSString*)laserIntensity;
--(void)setLaserSoftLockOn;
--(void)setLaserSoftLockOff;
--(void)setSmellieMasterMode:(NSString*)triggerFrequency withNumOfPulses:(NSString*)numOfPulses;
--(void)sendCustomSmellieCmd:(NSString*)customCmd withArgument1:(NSString*)customArgument1 withArgument2:(NSString*)customArgument2;
--(void)testFunction;
--(void)setLaserFrequency20Mhz;
--(void)fetchSmellieConfigurationInformation;
+-(void) setSmellieSafeStates;
+-(void) setLaserSwitch:(NSString*)laserSwitchChannel;
+-(void) setFibreSwitch:(NSString*)fibreSwitchInputChannel withOutputChannel:(NSString*)fibreSwitchOutputChannel;
+-(void) setLaserIntensity:(NSString*)laserIntensity;
+-(void) setLaserSoftLockOn;
+-(void) setLaserSoftLockOff;
+-(void) setSmellieMasterMode:(NSString*)triggerFrequency withNumOfPulses:(NSString*)numOfPulses;
+-(void) sendCustomSmellieCmd:(NSString*)customCmd withArgument1:(NSString*)customArgument1 withArgument2:(NSString*)customArgument2;
+-(void) testFunction;
+-(void) setLaserFrequency20Mhz;
+-(void) fetchSmellieConfigurationInformation;
+-(NSNumber*) fetchRecentVersion;
+-(NSMutableDictionary*) fetchCurrentConfigurationForVersion:(NSNumber*)currentVersion;
 
 //TELLIE Control Functions
 -(void) pollTellieFibre;
--(void) fireTellieFibre:(NSMutableDictionary*)fireCommands;
+-(void) fireTellieFibreMaster:(NSMutableDictionary*)fireCommands;
 -(void) stopTellieFibre:(NSArray*)fireCommands;
 -(void) startTellieRun;
 -(void) stopTellieRun;
-
 
 @end
 
