@@ -148,6 +148,7 @@ mtcConfigDoc = _mtcConfigDoc;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
     [standardRunType release];
+    [standardRunVersion release];
 
     [super dealloc];
 }
@@ -842,6 +843,7 @@ mtcConfigDoc = _mtcConfigDoc;
     //Runs tab
     self.runTypeMask = [decoder decodeObjectForKey:@"SNOPRunTypeMask"];
     [self setStandardRunType:[decoder decodeObjectForKey:@"SNOPStandarRunType"]];
+    [self setStandardRunVersion:[decoder decodeObjectForKey:@"SNOPStandarRunVersion"]];
     [self setECA_pattern:[decoder decodeIntForKey:@"SNOPECApattern"]];
     [self setECA_type:[decoder decodeIntForKey:@"SNOPECAtype"]];
     [self setECA_tslope_pattern:[decoder decodeIntForKey:@"SNOPECAtslppattern"]];
@@ -871,6 +873,7 @@ mtcConfigDoc = _mtcConfigDoc;
     //Runs tab
     [encoder encodeObject:self.runTypeMask forKey:@"SNOPRunTypeMask"];
     [encoder encodeObject:[self standardRunType] forKey:@"SNOPStandarRunType"];
+    [encoder encodeObject:[self standardRunVersion] forKey:@"SNOPStandarRunVersion"];
     [encoder encodeInt:[self ECA_pattern] forKey:@"SNOPECApattern"];
     [encoder encodeInt:[self ECA_type] forKey:@"SNOPECAtype"];
     [encoder encodeInt:[self ECA_tslope_pattern] forKey:@"SNOPECAtslppattern"];
@@ -1084,11 +1087,25 @@ mtcConfigDoc = _mtcConfigDoc;
     return standardRunType;
 }
 
+- (NSString*)standardRunVersion
+{
+    return standardRunVersion;
+}
+
 - (void) setStandardRunType:(NSString *)aValue
 {
     [aValue retain];
     [standardRunType release];
     standardRunType = aValue;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelSRChangedNotification object:self];
+}
+
+- (void) setStandardRunVersion:(NSString *)aValue
+{
+    [aValue retain];
+    [standardRunVersion release];
+    standardRunVersion = aValue;
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelSRChangedNotification object:self];
 }
@@ -1138,22 +1155,22 @@ mtcConfigDoc = _mtcConfigDoc;
 }
 
 // Load last MTC values (saved with 'saveStandardRun') from the DB for the selected Standard Run
--(BOOL) loadStandardRun:(NSString*)runTypeName
+-(BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion
 {
 
     //Alert the operator
-    if(runTypeName == nil){
-        NSLog(@"Please, set a name in the popup menu and click enter. \n",runTypeName);
+    if(runTypeName == nil || runVersion == nil){
+        NSLog(@"Please, set a valid name and click enter. \n");
         return false;
     }
-    NSLog(@"Loading settings for standard run: %@ ........ \n",runTypeName);
+    NSLog(@"Loading settings for standard run: %@ - Version: %@ ........ \n",runTypeName, runVersion);
 
     //Get MTC model
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     ORMTCModel* mtcModel = [objs objectAtIndex:0];
 
     //Query the OrcaDB and get a dictionary with the parameters
-    NSString *urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/orca/_design/standardRuns/_view/getStandardRuns?startkey=[\"%@\",{}]&endkey=[\"%@\",0]&descending=True&include_docs=True",[self orcaDBUserName],[self orcaDBPassword],[self orcaDBIPAddress],[self orcaDBPort],runTypeName,runTypeName];
+    NSString *urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/orca/_design/standardRuns/_view/getStandardRuns?startkey=[\"%@\",\"%@\",{}]&endkey=[\"%@\",\"%@\",0]&descending=True&include_docs=True",[self orcaDBUserName],[self orcaDBPassword],[self orcaDBIPAddress],[self orcaDBPort],runTypeName,runVersion,runTypeName,runVersion];
 
     NSString* urlStringScaped = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     NSURL *url = [NSURL URLWithString:urlStringScaped];
@@ -1193,35 +1210,6 @@ mtcConfigDoc = _mtcConfigDoc;
     
 }
 
--(BOOL) loadStandardRunToHW:(NSString*)runTypeName
-{
-
-    //Load to GUI
-    BOOL loadstatus = [self loadStandardRun:runTypeName];
-    if(!loadstatus) {
-        return false;
-    }
-        
-    //Get MTC model
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    ORMTCModel* mtcModel = [objs objectAtIndex:0];
-
-    //Ship values to MTC
-    [mtcModel load10MHzClock];
-    [mtcModel setupGTCorseDelay];
-    [mtcModel setupGTFineDelay];
-    [mtcModel loadTheMTCADacs];
-
-    [mtcModel setGlobalTriggerWordMask];
-    [mtcModel setGTCrateMask];
-    [mtcModel setPedestalCrateMask];
-    [mtcModel mtcatLoadCrateMasks];
-    
-    return true;
-
-}
-
-
 //Save MTC settings in a Standard Run table in CouchDB for later use by the Run Scripts or the user
 -(BOOL) saveStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion
 {
@@ -1231,7 +1219,7 @@ mtcConfigDoc = _mtcConfigDoc;
         ORRunAlertPanel(@"Invalid Standard Run Name",@"Please, set a valid name in the popup menus and click enter",@"OK",nil,nil);
         return false;
     }
-    NSLog(@"Saving settings for Standard Run: %@ version %@ ........ \n",runTypeName,runVersion);
+    NSLog(@"Saving settings for Standard Run: %@ - Version: %@ ........ \n",runTypeName,runVersion);
 
     //Get MTC model
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
@@ -1242,6 +1230,7 @@ mtcConfigDoc = _mtcConfigDoc;
     
     [detectorSettings setObject:@"standard_run" forKey:@"type"];
     [detectorSettings setObject:runTypeName forKey:@"run_type"];
+    [detectorSettings setObject:runVersion forKey:@"run_version"];
     NSNumber *date = [NSNumber numberWithDouble:[[NSDate date] timeIntervalSince1970]];
     [detectorSettings setObject:date forKey:@"time_stamp"];
 

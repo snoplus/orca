@@ -44,10 +44,9 @@
     IBOutlet NSMatrix* hvStatusMatrix;
     
     //Run control (the rest is in the ORExperimentController)
-    IBOutlet StopLightView *lightBoardView;
     IBOutlet NSButton *maintenanceRunBox;
     IBOutlet NSTextField* standardRunTypeField;
-    IBOutlet NSTextField* lastRunType;
+    IBOutlet StopLightView *lightBoardView;
 
     //Quick links
     

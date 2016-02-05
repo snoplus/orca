@@ -1167,22 +1167,55 @@ smellieRunFile;
 
 }
 
-
-
 - (IBAction)loadStandardRunFromDBAction:(id)sender {
-    [model loadStandardRun:[standardRunPopupMenu objectValueOfSelectedItem]];
+    
+    NSString *standardRun = [standardRunPopupMenu objectValueOfSelectedItem];
+    NSString *standardRunVer = [standardRunVersionPopupMenu objectValueOfSelectedItem];
+    
+    [model loadStandardRun:standardRun withVersion: standardRunVer];
+    
+}
+
+- (IBAction)loadStandardRunFromDBAsDefaultAction:(id)sender {
+    
+    NSString *standardRun = [standardRunPopupMenu objectValueOfSelectedItem];
+    NSString *standardRunVer = @"DEFAULT";
+    
+    [model loadStandardRun:standardRun withVersion: standardRunVer];
+    
 }
 
 - (IBAction)saveStandardRunToDBAction:(id)sender {
-    [model saveStandardRun:[standardRunPopupMenu objectValueOfSelectedItem] withVersion:[standardRunVersionPopupMenu objectValueOfSelectedItem]];
+    
+    NSString *standardRun = [standardRunPopupMenu objectValueOfSelectedItem];
+    NSString *standardRunVer = [standardRunVersionPopupMenu objectValueOfSelectedItem];
+    
+    BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Overwriting stored values for run \"%@\" with version \"%@\"", standardRun,standardRunVer],@"Is this really what you want?",@"Cancel",@"Yes, Save it",nil);
+    
+    if(!cancel) [model saveStandardRun:standardRun withVersion:standardRunVer];
+    
 }
+
+- (IBAction)saveStandardRunToDBAsDefaultAction:(id)sender {
+    
+    NSString *standardRun = [standardRunPopupMenu objectValueOfSelectedItem];
+    NSString *standardRunVer = @"DEFAULT";
+    
+    BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Overwriting stored values for run \"%@\" with version \"%@\"", standardRun,standardRunVer],@"Is this really what you want?",@"Cancel",@"Yes, Save it",nil);
+    
+    if(!cancel) [model saveStandardRun:standardRun withVersion:standardRunVer];
+    
+}
+
 - (IBAction)deleteStandardRun:(id)sender {
     [standardRunPopupMenu removeItemWithObjectValue:[standardRunPopupMenu stringValue]];
     [standardRunPopupMenu selectItemAtIndex:0];
 }
 
-// Create a new SR item if doesn't exist and set the runType string value
+// Create a new SR item if doesn't exist, set the runType string value and query the DB to display the trigger configuration
 - (IBAction)standardRunPopupAction:(id)sender {
+
+    //Create new SR if does not exist
     NSString *standardRun = [standardRunPopupMenu stringValue];
     if ([standardRunPopupMenu indexOfItemWithObjectValue:standardRun] == NSNotFound && [standardRun isNotEqualTo:@""]){
         BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Creating new Standard Run: \"%@\"", standardRun],@"Is this really what you want?",@"Cancel",@"Yes, Make New Standard Run",nil);
@@ -1191,15 +1224,19 @@ smellieRunFile;
             [standardRunPopupMenu selectItemWithObjectValue:standardRun];
         }
     }
+    
+    //Set run type name
     [model setStandardRunType:standardRun];
     
     
     //Fetch DB and display trigger configuration in GUI
     //Query the OrcaDB and get a dictionary with the parameters
-    NSString *urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/orca/_design/standardRuns/_view/getStandardRuns?startkey=[\"%@\",{}]&endkey=[\"%@\",0]&descending=True&include_docs=True",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort],[model standardRunType],[model standardRunType]];
+    NSString *urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/orca/_design/standardRuns/_view/getStandardRuns?startkey=[\"%@\",\"%@\",{}]&endkey=[\"%@\",\"%@\",0]&descending=True&include_docs=True",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort],[model standardRunType],[model standardRunVersion], [model standardRunType],[model standardRunVersion]];
     
     NSString* urlStringScaped = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 
+    NSLog(@"%@",urlStringScaped);
+    
     NSURL *url = [NSURL URLWithString:urlStringScaped];
     NSData *data = [NSData dataWithContentsOfURL:url];
     NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
@@ -1225,7 +1262,23 @@ smellieRunFile;
     [[standardRunThresStoredValues cellAtRow:10 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,Nhit100LoPrescale"] intValue]];
     [[standardRunThresStoredValues cellAtRow:11 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,PulserPeriod"] intValue]];
     
+}
+
+- (IBAction)standardRunVersionPopupAction:(id)sender {
+
+    //Create new SR version if does not exist
+    NSString *standardRun = [standardRunPopupMenu stringValue];
+    NSString *standardRunVer = [standardRunVersionPopupMenu stringValue];
+    if ([standardRunVersionPopupMenu indexOfItemWithObjectValue:standardRunVer] == NSNotFound && [standardRunVer isNotEqualTo:@""]){
+        BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Creating new Version: \"%@\" of Standard Run: \"%@\"", standardRunVer, standardRun], @"Is this really what you want?",@"Cancel",@"Yes, Make New Version",nil);
+        if(!cancel){
+            [standardRunVersionPopupMenu addItemWithObjectValue:standardRunVer];
+            [standardRunVersionPopupMenu selectItemWithObjectValue:standardRunVer];
+        }
+    }
     
+    //Set run type name
+    [model setStandardRunVersion:standardRunVer];
     
 }
 

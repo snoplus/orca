@@ -100,6 +100,7 @@
     NSMutableDictionary * snopRunTypeMask;
     NSNumber * runTypeMask;
     NSString * standardRunType;
+    NSString * standardRunVersion;
     
     NSThread * eStopThread;
     
@@ -199,7 +200,9 @@
 - (void) setViewType:(int)aViewType;
 - (int) viewType;
 - (NSString*) standardRunType;
+- (NSString*) standardRunVersion;
 - (void) setStandardRunType:(NSString*)aValue;
+- (void) setStandardRunVersion:(NSString*)aValue;
 - (int) ECA_pattern;
 - (int) ECA_type;
 - (int) ECA_tslope_pattern;
@@ -243,7 +246,7 @@
 -(void) testerHv;
 
 //Standard runs functions
--(BOOL) loadStandardRun:(NSString*)runTypeName;
+-(BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
 -(BOOL) loadStandardRunToHW:(NSString*)runTypeName;
 -(BOOL) saveStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
 
