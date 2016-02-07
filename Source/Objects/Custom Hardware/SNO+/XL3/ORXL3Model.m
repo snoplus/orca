@@ -1143,15 +1143,22 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) byteSwapBundle:(MB*)aBundle
 {
-	int i;
-	
-	//vBal_vals_t
-	aBundle->mbID = swapShort(aBundle->mbID);
-	for (i=0; i<4; i++) aBundle->dbID[i] = swapShort(aBundle->dbID[i]);
-	//sCmos_vals_t
-	for (i=0; i<32; i++) aBundle->sCmos[i] = swapShort(aBundle->sCmos[i]);
-	//mb_chan_disable_vals_t
-	aBundle->disableMask = swapLong(aBundle->disableMask);	
+    /* Byte swap a FEC bundle. Note that we only byte swap some of the
+     * variables because the rest are just bytes and so don't need to
+     * be swapped. */
+
+    int i;
+    
+    aBundle->mbID = swapShort(aBundle->mbID);
+    for (i=0; i<4; i++) {
+        aBundle->dbID[i] = swapShort(aBundle->dbID[i]);
+    }
+
+    for (i=0; i<32; i++) {
+        aBundle->sCmos[i] = swapShort(aBundle->sCmos[i]);
+    }
+
+    aBundle->disableMask = swapLong(aBundle->disableMask);  
 }
 
 - (void) synthesizeFECIntoBundle:(MB*) mb forSlot:(unsigned short) slot
