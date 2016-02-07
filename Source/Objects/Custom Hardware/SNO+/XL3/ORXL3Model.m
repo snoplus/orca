@@ -1020,13 +1020,17 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (ORCouchDB*) debugDBRef
 {
-    //replace by snop experiment UI
-	return [ORCouchDB couchHost:@"couch.snopl.us" port:80 username:@"snoplus"
-                            pwd:@"scintillate" database:@"debugdb" delegate:self];
+    SNOPModel *snop;
 
-	//return [ORCouchDB couchHost:@"127.0.0.1" port:5984 username:@"snoplus"
-    //                        pwd:@"scintillate" database:@"debugdb" delegate:self];
+    NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
 
+	if([objs count]) {
+		snop = [objs objectAtIndex:0];
+    } else {
+        return NULL;
+    }
+
+    return [snop debugDBRef:self];
 }
 
 - (void) synthesizeDefaultsIntoBundle:(MB*)aBundle forSlot:(unsigned short)aSlot
@@ -1836,12 +1840,19 @@ void SwapLongBlock(void* p, int32_t n)
 - (void) ecalToOrca
 {
     unsigned short slot;
+    ORCouchDB *couch;
+
+    if ((couch = [self debugDBRef]) == NULL) {
+        NSLog(@"ecalToOrca: couldn't get CouchDB from SNOPModel!");
+        return;
+    }
+
     [self setEcal_received:0UL];
     for (slot=0; slot<16; slot++) {
         NSString* requestString = [NSString stringWithFormat:@"_design/penn_daq_views/_view/get_fec_by_generated?descending=true&startkey=[%d,%d,{}]&endkey=[%d,%d,\"\"]&limit=1",[self crateNumber], slot, [self crateNumber], slot];
         NSString* tagString = [NSString stringWithFormat:@"%@.%d.%d", kDebugDbEcalDocGot, [self crateNumber], slot];
         //NSLog(@"%@ slot %hd request: %@ tag: %@\n", [[self xl3Link] crateName], slot, requestString, tagString);
-        [[self debugDBRef] getDocumentId:requestString tag:tagString];
+        [couch getDocumentId:requestString tag:tagString];
     }
     NSLog(@"%@ ECAL docs requested from debugDB\n", [[self xl3Link] crateName]);
     [self setEcalToOrcaInProgress:YES];
