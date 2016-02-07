@@ -90,7 +90,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
 @end
 
 @interface ORFec32Model (XL3)
--(BOOL) parseVoltagesUsingXL3:(vmon_results_t*)result;
+-(BOOL) parseVoltagesUsingXL3:(VMonResults*)result;
 -(BOOL) readVoltagesUsingXL3;
 -(void) readCMOSCountsUsingXL3:(unsigned long)aChannelMask;
 -(void) readCMOSRatesUsingXL3:(unsigned long)aChannelMask;
@@ -979,7 +979,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
     }	
 }
 
--(void) parseVoltages:(vmon_results_t*)result;
+-(void) parseVoltages:(VMonResults*)result;
 {
     //bool statusChanged = false;
     
@@ -2637,7 +2637,7 @@ const short kVoltageADCMaximumAttempts = 10;
 
 @implementation ORFec32Model (XL3)
 
--(BOOL) parseVoltagesUsingXL3:(vmon_results_t*) result
+-(BOOL) parseVoltagesUsingXL3:(VMonResults*) result
 {
     BOOL statusChanged = false;
     short whichADC;
@@ -2671,7 +2671,7 @@ const short kVoltageADCMaximumAttempts = 10;
 -(BOOL) readVoltagesUsingXL3
 {
     BOOL statusChanged = false;
-    vmon_results_t result;
+    VMonResults result;
     [[guardian adapter] readVMONForSlot:[self stationNumber] voltages:&result];
 
     statusChanged = [self parseVoltagesUsingXL3:&result];
@@ -2681,11 +2681,11 @@ const short kVoltageADCMaximumAttempts = 10;
 
 -(void) readCMOSCountsUsingXL3:(unsigned long)aChannelMask
 {
-    check_total_count_args_t args;
-    check_total_count_results_t results;
+    CheckTotalCountArgs args;
+    CheckTotalCountResults results;
     
-    args.slot_mask |= 0x1 << [self stationNumber];
-    args.channel_masks[[self stationNumber]] = aChannelMask;
+    args.slotMask |= 0x1 << [self stationNumber];
+    args.channelMasks[[self stationNumber]] = aChannelMask;
     //what about disabled??? [self cmosReadDisabled:channel]
     
     @try {
@@ -2695,20 +2695,20 @@ const short kVoltageADCMaximumAttempts = 10;
         ;
     }
     
-    //if (results.error_flags != 0); ???
+    //if (results.errorFlags != 0); ???
     unsigned char ch;
     for (ch=0; ch<32; ch++) {
-        cmosCount[ch]  = results.counts[ch];
+        cmosCount[ch]  = results.count[ch];
     }
 }
 
 -(void) readCMOSRatesUsingXL3:(unsigned long)aChannelMask
 {
-    read_cmos_rate_args_t args;
-    read_cmos_rate_results_t results;
+    CrateNoiseRateArgs args;
+    CrateNoiseRateResults results;
 
-    args.slot_mask |= 0x1 << [self stationNumber];
-    args.channel_masks[[self stationNumber]] = aChannelMask;
+    args.slotMask |= 0x1 << [self stationNumber];
+    args.channelMask[[self stationNumber]] = aChannelMask;
     args.period = 1; //usec according to doc, msec according to code
     
     @try {
@@ -2718,7 +2718,7 @@ const short kVoltageADCMaximumAttempts = 10;
         ;
     }
 
-    //if (results.error_flags != 0) {    }
+    //if (results.errorFlags != 0) {    }
     unsigned char ch;
     for (ch=0; ch<32; ch++) {
         cmosRate[ch]  = results.rates[ch];

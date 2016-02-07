@@ -18,7 +18,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#import "XL3_Cmds.h"
+#import "PacketTypes.h"
 @class ORSafeCircularBuffer;
 
 typedef enum eXL3_ConnectStates {
@@ -52,7 +52,7 @@ eXL3_CrateStates;
 	NSMutableArray*	cmdArray;
 	unsigned long long num_cmd_packets;
 	unsigned long long num_dat_packets;
-	XL3_Packet	aMultiCmdPacket;
+	XL3Packet	aMultiCmdPacket;
     NSArray*    fifoStatus;         //array of 16 diffs between write and read FEC pointers, NSNumbers for MORCA
     NSDate*     _fifoTimeStamp;     //time stamp when fifoStatus received
     BOOL _readFifoFlag;             //a flag check by Xl3Model::takeData;
@@ -115,14 +115,14 @@ eXL3_CrateStates;
 
 - (void) newMultiCmd;
 - (void) addMultiCmdToAddress:(long)anAddress withValue:(long)aValue;
-- (XL3_Packet*) executeMultiCmd;
+- (XL3Packet*) executeMultiCmd;
 - (BOOL) multiCmdFailed;
 
-- (void) sendXL3Packet:(XL3_Packet*)aSendPacket;
-- (void) sendCommand:(long)aCmd withPayload:(XL3_PayloadStruct*)payloadBlock expectResponse:(BOOL)askForResponse;
+- (void) sendXL3Packet:(XL3Packet*)aSendPacket;
+- (void) sendCommand:(long)aCmd withPayload:(XL3PayloadStruct*)payloadBlock expectResponse:(BOOL)askForResponse;
 - (void) sendCommand:(long)aCmd expectResponse:(BOOL)askForResponse;
-- (void) sendFECCommand:(long)aCmd toAddress:(unsigned long)address withData:(unsigned long*)value;
-- (void) readXL3Packet:(XL3_Packet*)aPacket withPacketType:(unsigned char)packetType andPacketNum:(unsigned short)packetNum;
+- (void) sendCommand:(long)aCmd toAddress:(unsigned long)address withData:(unsigned long*)value;
+- (void) readXL3Packet:(XL3Packet*)aPacket withPacketType:(unsigned char)packetType andPacketNum:(unsigned short)packetNum;
 
 - (void) connectSocket;
 - (void) disconnectSocket;

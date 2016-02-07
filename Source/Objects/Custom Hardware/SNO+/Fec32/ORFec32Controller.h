@@ -85,7 +85,7 @@
 	IBOutlet NSMatrix*		thresholds1LabelsMatrix;
 	IBOutlet NSMatrix*		thresholds1Matrix;
 	
-	//vbals
+	//vBals
 	IBOutlet NSMatrix*		vb0LabelsMatrix;
 	IBOutlet NSMatrix*		vb0HMatrix;
 	IBOutlet NSMatrix*		vb0LMatrix;
