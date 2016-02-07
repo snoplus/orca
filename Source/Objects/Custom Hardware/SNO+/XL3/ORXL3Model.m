@@ -1154,65 +1154,81 @@ void SwapLongBlock(void* p, int32_t n)
 	aBundle->disableMask = swapLong(aBundle->disableMask);	
 }
 
-- (void) synthesizeFECIntoBundle:(MB*)aBundle forSlot:(unsigned short)aSlot
+- (void) synthesizeFECIntoBundle:(MB*) mb forSlot:(unsigned short) slot
 {
+    int i, dbNum, channel;
+    ORFec32Model *fec;
+    ORFecDaughterCardModel *db;
 
-    [self synthesizeDefaultsIntoBundle:aBundle forSlot:aSlot];
+    [self synthesizeDefaultsIntoBundle:mb forSlot:slot];
 
-    ORFec32Model* fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-aSlot];
-    if (!fec) {
-        return;
+    fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
+
+    if (!fec) return;
+
+    mb->mbID = 0;
+    for (i = 0; i < 4; i++) {
+        mb->dbID[i] = 0;
     }
 
-    unsigned short i;
-    aBundle->mbID = 0;
-    for (i=0; i<4; i++) {
-        aBundle->dbID[i] = 0;
-    }
+    for (dbNum = 0; dbNum < 4; dbNum++) {
+        if (![fec dcPresent:dbNum]) continue;
 
-    unsigned short dbNum;
-    for (dbNum=0; dbNum<4; dbNum++) {
-        if ([fec dcPresent:dbNum]) {
-            unsigned short channel;
+        db = [fec dc:dbNum];
             
-            for (channel=0; channel<8; channel++) {
-                aBundle->vThr[dbNum*8+channel] = [[fec dc:dbNum] vt:channel];
-                aBundle->tCmos.tacShift[dbNum*8+channel] = [[fec dc:dbNum] tac0trim:channel];
-                aBundle->sCmos[dbNum*8+channel] = [[fec dc:dbNum] tac1trim:channel];
+        for (channel = 0; channel < 8; channel++) {
+            mb->vThr[dbNum*8+channel] = [db vt:channel];
+            mb->tCmos.tacShift[dbNum*8+channel] = [db tac0trim:channel];
+            mb->sCmos[dbNum*8+channel] = [db tac1trim:channel];
 
-                //aBundle->tr100.mask[dbNum*8+channel] = 0; //be compatible with penn_daq, it's not used
-                aBundle->tr100.tDelay[dbNum*8+channel] = [[fec dc:dbNum] ns100width:channel] | 0x40;
+            /* Note that the N100 and N20 trigger masks are *not*
+             * set using the mask variable. Instead the ML403 sets these
+             * triggers using the delay and width variables. */
 
-                //aBundle->tr20.mask[dbNum*8+channel] = 0; //be compatible with penn_daq, it's not used
-                aBundle->tr20.tDelay[dbNum*8+channel] = [[fec dc:dbNum] ns20delay:channel];
-                aBundle->tr20.tWidth[dbNum*8+channel] = [[fec dc:dbNum] ns20width:channel] | 0x20;
+            // mb->tr100.mask[dbNum*8+channel] = 0;
+            mb->tr100.tDelay[dbNum*8+channel] = [db ns100width:channel];
 
-                for (i=0; i<2; i++) {
-                    aBundle->vBal[i][dbNum*8+channel] = [[fec dc:dbNum] vb:i*8+channel];
-                }
+            if ([fec trigger100nsEnabled: (dbNum*8 + channel)]) {
+                mb->tr100.tDelay[dbNum*8+channel] |= 0x40;
+            } else {
+                mb->tr100.tDelay[dbNum*8+channel] &= ~0x40;
             }
-            
+
+            // mb->tr20.mask[dbNum*8+channel] = 0;
+            mb->tr20.tDelay[dbNum*8+channel] = [db ns20delay:channel];
+            mb->tr20.tWidth[dbNum*8+channel] = [db ns20width:channel];
+
+            if ([fec trigger20nsEnabled: (dbNum*8 + channel)]) {
+                mb->tr20.tWidth[dbNum*8+channel] |= 0x20;
+            } else {
+                mb->tr20.tWidth[dbNum*8+channel] &= ~0x20;
+            }
+
             for (i=0; i<2; i++) {
-                aBundle->tDisc.rmp[dbNum*2+i] = [[fec dc:dbNum] rp2:i];
-                aBundle->tDisc.rmpup[dbNum*2+i] = [[fec dc:dbNum] rp1:i];
-                aBundle->tDisc.vsi[dbNum*2+i] = [[fec dc:dbNum] vsi:i];
-                aBundle->tDisc.vli[dbNum*2+i] = [[fec dc:dbNum] vli:i];
+                mb->vBal[i][dbNum*8+channel] = [db vb:i*8+channel];
             }
+        }
+        
+        for (i=0; i<2; i++) {
+            mb->tDisc.rmp[dbNum*2+i] = [db rp2:i];
+            mb->tDisc.rmpup[dbNum*2+i] = [db rp1:i];
+            mb->tDisc.vsi[dbNum*2+i] = [db vsi:i];
+            mb->tDisc.vli[dbNum*2+i] = [db vli:i];
         }
     }
 
-    aBundle->vInt = [fec vRes];
-    aBundle->hvRef = [fec hVRef];
+    mb->vInt = [fec vRes];
+    mb->hvRef = [fec hVRef];
     
-    //unsigned char	cmos[6];	//board related	0-ISETA1 1-ISETA0 2-ISETM1 3-ISETM0 4-TACREF 5-VMAX
-    aBundle->tCmos.iseta[1] = [fec cmos:0];
-    aBundle->tCmos.iseta[0] = [fec cmos:1];
-    aBundle->tCmos.isetm[1] = [fec cmos:2];
-    aBundle->tCmos.isetm[0] = [fec cmos:3];
-    aBundle->tCmos.tacRef = [fec cmos:4];
-    aBundle->tCmos.vMax = [fec cmos:5];
+    // board related    0-ISETA1 1-ISETA0 2-ISETM1 3-ISETM0 4-TACREF 5-VMAX
+    mb->tCmos.iseta[1] = [fec cmos:0];
+    mb->tCmos.iseta[0] = [fec cmos:1];
+    mb->tCmos.isetm[1] = [fec cmos:2];
+    mb->tCmos.isetm[0] = [fec cmos:3];
+    mb->tCmos.tacRef = [fec cmos:4];
+    mb->tCmos.vMax = [fec cmos:5];
 
-	aBundle->disableMask = 0;
+    mb->disableMask = [fec seqDisabledMask];
 }
 
 #pragma mark •••Archival
