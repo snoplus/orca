@@ -2143,33 +2143,33 @@ void SwapLongBlock(void* p, int32_t n)
     
     for (i=0; i<2; i++) {
         for (j=0; j<32; j++) {
-            aConfigBundle.vBal[i][j] = [[[[hwDic objectForKey:@"vBal"] objectAtIndex:i] objectAtIndex:j] intValue];
+            aConfigBundle.vBal[i][j] = [[[[hwDic objectForKey:@"vbal"] objectAtIndex:i] objectAtIndex:j] intValue];
         }
     }
     
     for (i=0; i<32; i++) {
-        aConfigBundle.vThr[i] = [[[hwDic objectForKey:@"vThr"] objectAtIndex:i] intValue];
+        aConfigBundle.vThr[i] = [[[hwDic objectForKey:@"vthr"] objectAtIndex:i] intValue];
     }
     
     for (i=0; i<8; i++) {
-        aConfigBundle.tDisc.rmp[i] = [[[[hwDic objectForKey:@"tDisc"] objectForKey:@"rmp"] objectAtIndex:i] intValue];
-        aConfigBundle.tDisc.rmpup[i] = [[[[hwDic objectForKey:@"tDisc"] objectForKey:@"rmpup"] objectAtIndex:i] intValue];
-        aConfigBundle.tDisc.vsi[i] = [[[[hwDic objectForKey:@"tDisc"] objectForKey:@"vsi"] objectAtIndex:i] intValue];
-        aConfigBundle.tDisc.vli[i] = [[[[hwDic objectForKey:@"tDisc"] objectForKey:@"vli"] objectAtIndex:i] intValue];
+        aConfigBundle.tDisc.rmp[i] = [[[[hwDic objectForKey:@"tdisc"] objectForKey:@"rmp"] objectAtIndex:i] intValue];
+        aConfigBundle.tDisc.rmpup[i] = [[[[hwDic objectForKey:@"tdisc"] objectForKey:@"rmpup"] objectAtIndex:i] intValue];
+        aConfigBundle.tDisc.vsi[i] = [[[[hwDic objectForKey:@"tdisc"] objectForKey:@"vsi"] objectAtIndex:i] intValue];
+        aConfigBundle.tDisc.vli[i] = [[[[hwDic objectForKey:@"tdisc"] objectForKey:@"vli"] objectAtIndex:i] intValue];
     }
     
-    aConfigBundle.tCmos.vMax = [[[hwDic objectForKey:@"tCmos"] objectForKey:@"vMax"] intValue];
-    aConfigBundle.tCmos.tacRef = [[[hwDic objectForKey:@"tCmos"] objectForKey:@"vtacRef"] intValue];
+    aConfigBundle.tCmos.vMax = [[[hwDic objectForKey:@"tcmos"] objectForKey:@"vmax"] intValue];
+    aConfigBundle.tCmos.tacRef = [[[hwDic objectForKey:@"tcmos"] objectForKey:@"vtacref"] intValue];
     for (i=0; i<2; i++) {
-        aConfigBundle.tCmos.isetm[i] = [[[[hwDic objectForKey:@"tCmos"] objectForKey:@"isetm"] objectAtIndex:i] intValue];
-        aConfigBundle.tCmos.iseta[i] = [[[[hwDic objectForKey:@"tCmos"] objectForKey:@"iseta"] objectAtIndex:i] intValue];
+        aConfigBundle.tCmos.isetm[i] = [[[[hwDic objectForKey:@"tcmos"] objectForKey:@"isetm"] objectAtIndex:i] intValue];
+        aConfigBundle.tCmos.iseta[i] = [[[[hwDic objectForKey:@"tcmos"] objectForKey:@"iseta"] objectAtIndex:i] intValue];
     }
     for (i=0; i<32; i++) {
-        aConfigBundle.tCmos.tacShift[i] = [[[[hwDic objectForKey:@"tCmos"] objectForKey:@"tac_trim"] objectAtIndex:i] intValue];
+        aConfigBundle.tCmos.tacShift[i] = [[[[hwDic objectForKey:@"tcmos"] objectForKey:@"tac_trim"] objectAtIndex:i] intValue];
     }
 
-    aConfigBundle.vInt = [[hwDic objectForKey:@"vInt"] intValue];
-    aConfigBundle.hvRef = [[hwDic objectForKey:@"hvRef"] intValue];
+    aConfigBundle.vInt = [[hwDic objectForKey:@"vint"] intValue];
+    aConfigBundle.hvRef = [[hwDic objectForKey:@"hvref"] intValue];
 
     for (i=0; i<32; i++) {
         aConfigBundle.tr100.mask[i] = [[[[hwDic objectForKey:@"tr100"] objectForKey:@"mask"] objectAtIndex:i] intValue];
@@ -2183,7 +2183,7 @@ void SwapLongBlock(void* p, int32_t n)
     }
 
     for (i=0; i<32; i++) {
-        aConfigBundle.sCmos[i] = [[[[hwDic objectForKey:@"tr20"] objectForKey:@"sCmos"] objectAtIndex:i] intValue];
+        aConfigBundle.sCmos[i] = [[[[hwDic objectForKey:@"tr20"] objectForKey:@"scmos"] objectAtIndex:i] intValue];
     }
 
 	aConfigBundle.disableMask = 0;
@@ -2221,19 +2221,19 @@ void SwapLongBlock(void* p, int32_t n)
 
             for (channel=0; channel<8; channel++) {
                 [[fec dc:dbNum] setVt_ecal:channel
-                                 withValue:[[[hwDic objectForKey:@"vThr"] objectAtIndex:dbNum*8+channel] intValue]];
+                                 withValue:[[[hwDic objectForKey:@"vthr"] objectAtIndex:dbNum*8+channel] intValue]];
                 [[fec dc:dbNum] setVt_zero:channel
-                                 withValue:[[[hwDic objectForKey:@"vThr_zero"] objectAtIndex:dbNum*8+channel] intValue]];
+                                 withValue:[[[hwDic objectForKey:@"vthr_zero"] objectAtIndex:dbNum*8+channel] intValue]];
 
                 [[fec dc:dbNum] setTac0trim:channel
-                                  withValue:[[[[hwDic objectForKey:@"tCmos"] objectForKey:@"tac_trim"] objectAtIndex:dbNum*8+channel] intValue]];
+                                  withValue:[[[[hwDic objectForKey:@"tcmos"] objectForKey:@"tac_trim"] objectAtIndex:dbNum*8+channel] intValue]];
 
                 [[fec dc:dbNum] setTac1trim:channel
-                                  withValue:[[[[hwDic objectForKey:@"tr20"] objectForKey:@"sCmos"] objectAtIndex:dbNum*8+channel] intValue]];
+                                  withValue:[[[[hwDic objectForKey:@"tr20"] objectForKey:@"scmos"] objectAtIndex:dbNum*8+channel] intValue]];
                 
                 for (itg=0; itg<2; itg++) {
                     [[fec dc:dbNum] setVb:itg*8+channel
-                                withValue:[[[[hwDic objectForKey:@"vBal"] objectAtIndex:itg] objectAtIndex:dbNum*8+channel] intValue]];
+                                withValue:[[[[hwDic objectForKey:@"vbal"] objectAtIndex:itg] objectAtIndex:dbNum*8+channel] intValue]];
                 }
                 
                 [[fec dc:dbNum] setNs100width:channel
@@ -2248,31 +2248,31 @@ void SwapLongBlock(void* p, int32_t n)
             
             for (itg=0; itg<2; itg++) {
                 [[fec dc:dbNum] setRp2:itg
-                             withValue:[[[[hwDic objectForKey:@"tDisc"] objectForKey:@"rmp"] objectAtIndex:dbNum*2+itg] intValue]];
+                             withValue:[[[[hwDic objectForKey:@"tdisc"] objectForKey:@"rmp"] objectAtIndex:dbNum*2+itg] intValue]];
 
                 [[fec dc:dbNum] setRp1:itg
-                             withValue:[[[[hwDic objectForKey:@"tDisc"] objectForKey:@"rmpup"] objectAtIndex:dbNum*2+itg] intValue]];
+                             withValue:[[[[hwDic objectForKey:@"tdisc"] objectForKey:@"rmpup"] objectAtIndex:dbNum*2+itg] intValue]];
                 
                 [[fec dc:dbNum] setVli:itg
-                             withValue:[[[[hwDic objectForKey:@"tDisc"] objectForKey:@"vli"] objectAtIndex:dbNum*2+itg] intValue]];
+                             withValue:[[[[hwDic objectForKey:@"tdisc"] objectForKey:@"vli"] objectAtIndex:dbNum*2+itg] intValue]];
 
                 [[fec dc:dbNum] setVsi:itg
-                             withValue:[[[[hwDic objectForKey:@"tDisc"] objectForKey:@"vsi"] objectAtIndex:dbNum*2+itg] intValue]];
+                             withValue:[[[[hwDic objectForKey:@"tdisc"] objectForKey:@"vsi"] objectAtIndex:dbNum*2+itg] intValue]];
                 
             }            
         }
     }
     
-    [fec setVRes:[[hwDic objectForKey:@"vInt"] intValue]];
-    [fec setHVRef:[[hwDic objectForKey:@"hvRef"] intValue]];
+    [fec setVRes:[[hwDic objectForKey:@"vint"] intValue]];
+    [fec setHVRef:[[hwDic objectForKey:@"hvref"] intValue]];
 
     //unsigned char	cmos[6];	//board related	0-ISETA1 1-ISETA0 2-ISETM1 3-ISETM0 4-TACREF 5-VMAX
-    [fec setCmos:0 withValue:[[[[hwDic objectForKey:@"tCmos"] objectForKey:@"iseta"] objectAtIndex:1] intValue]];
-    [fec setCmos:1 withValue:[[[[hwDic objectForKey:@"tCmos"] objectForKey:@"iseta"] objectAtIndex:0] intValue]];
-    [fec setCmos:2 withValue:[[[[hwDic objectForKey:@"tCmos"] objectForKey:@"isetm"] objectAtIndex:1] intValue]];
-    [fec setCmos:3 withValue:[[[[hwDic objectForKey:@"tCmos"] objectForKey:@"isetm"] objectAtIndex:0] intValue]];
-    [fec setCmos:4 withValue:[[[hwDic objectForKey:@"tCmos"] objectForKey:@"vtacRef"] intValue]];
-    [fec setCmos:5 withValue:[[[hwDic objectForKey:@"tCmos"] objectForKey:@"vMax"] intValue]];
+    [fec setCmos:0 withValue:[[[[hwDic objectForKey:@"tcmos"] objectForKey:@"iseta"] objectAtIndex:1] intValue]];
+    [fec setCmos:1 withValue:[[[[hwDic objectForKey:@"tcmos"] objectForKey:@"iseta"] objectAtIndex:0] intValue]];
+    [fec setCmos:2 withValue:[[[[hwDic objectForKey:@"tcmos"] objectForKey:@"isetm"] objectAtIndex:1] intValue]];
+    [fec setCmos:3 withValue:[[[[hwDic objectForKey:@"tcmos"] objectForKey:@"isetm"] objectAtIndex:0] intValue]];
+    [fec setCmos:4 withValue:[[[hwDic objectForKey:@"tcmos"] objectForKey:@"vtacref"] intValue]];
+    [fec setCmos:5 withValue:[[[hwDic objectForKey:@"tcmos"] objectForKey:@"vmax"] intValue]];
 }
 
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp
