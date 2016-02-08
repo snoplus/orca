@@ -121,7 +121,7 @@ eXL3_CrateStates;
 - (void) sendXL3Packet:(XL3Packet*)aSendPacket;
 - (void) sendCommand:(long)aCmd withPayload:(XL3PayloadStruct*)payloadBlock expectResponse:(BOOL)askForResponse;
 - (void) sendCommand:(long)aCmd expectResponse:(BOOL)askForResponse;
-- (void) sendCommand:(long)aCmd toAddress:(unsigned long)address withData:(unsigned long*)value;
+- (void) sendCommand:(long)aCmd toAddress:(uint32_t)address withData:(uint32_t *)value;
 - (void) readXL3Packet:(XL3Packet*)aPacket withPacketType:(unsigned char)packetType andPacketNum:(unsigned short)packetNum;
 
 - (void) connectSocket;

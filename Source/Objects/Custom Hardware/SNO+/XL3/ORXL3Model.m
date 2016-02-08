@@ -1416,10 +1416,11 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) writeHardwareRegister:(unsigned long)regAddress value:(unsigned long) aValue
 {
-	unsigned long xl3Address = regAddress | WRITE_REG;
+	uint32_t address = regAddress | WRITE_REG;
+    uint32_t value = aValue;
 
 	@try {
-		[xl3Link sendCommand:0UL toAddress:xl3Address withData:&aValue];
+		[xl3Link sendCommand:0UL toAddress:address withData:&value];
 	}
 	@catch (NSException* e) {
 		NSLog(@"XL3 writeHadwareRegister at address: 0x%08x failed\n", regAddress);
@@ -1429,8 +1430,8 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (unsigned long) readHardwareRegister:(unsigned long)regAddress
 {
-	unsigned long xl3Address = regAddress | READ_REG;
-	unsigned long aValue = 0UL;
+	uint32_t xl3Address = regAddress | READ_REG;
+	uint32_t aValue = 0UL;
 
 	@try {
 		[xl3Link sendCommand:0UL toAddress:xl3Address withData:&aValue];
@@ -1445,9 +1446,11 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) writeHardwareMemory:(unsigned long)memAddress value:(unsigned long)aValue
 {
-	unsigned long xl3Address = memAddress | WRITE_MEM;
+	uint32_t address = memAddress | WRITE_MEM;
+    uint32_t value = aValue;
+
 	@try {
-		[xl3Link sendCommand:0UL toAddress:xl3Address withData:&aValue];
+		[xl3Link sendCommand:0UL toAddress:address withData:&value];
 	}
 	@catch (NSException* e) {
 		NSLog(@"XL3 writeHadwareMemory at address: 0x%08x failed\n", memAddress);
@@ -1457,8 +1460,8 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (unsigned long) readHardwareMemory:(unsigned long) memAddress
 {
-	unsigned long xl3Address = memAddress | READ_MEM;
-	unsigned long aValue = 0UL;
+	uint32_t xl3Address = memAddress | READ_MEM;
+	uint32_t aValue = 0UL;
 	@try {
 		[xl3Link sendCommand:0UL toAddress:xl3Address withData:&aValue];
 	}
@@ -1846,8 +1849,8 @@ void SwapLongBlock(void* p, int32_t n)
             continue;
         }
 
-        unsigned long aValue = disableSeqMask[slot];
-        unsigned long xl3Address = FEC_SEL * slot | 0x90 | WRITE_REG; //CMOS CHIP DIS
+        uint32_t aValue = disableSeqMask[slot];
+        uint32_t xl3Address = FEC_SEL * slot | 0x90 | WRITE_REG; //CMOS CHIP DIS
         
         
         @try {
@@ -2415,7 +2418,7 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) compositeXl3RW
 {
-	unsigned long aValue = [self xl3RWDataValue];
+	uint32_t aValue = [self xl3RWDataValue];
 	NSLog(@"%@ XL3_rw to address: 0x%08x with data: 0x%08x\n",[[self xl3Link] crateName], [self xl3RWAddressValue], aValue);
 	[self setXl3OpsRunning:YES forKey:@"compositeXl3RW"];
 	
@@ -2633,8 +2636,8 @@ void SwapLongBlock(void* p, int32_t n)
 	[self setXl3OpsRunning:YES forKey:@"compositResetFIFOAndSeuencer"];
 	NSLog(@"Reset FIFO and Sequencer to be implemented.\n");
 	//slot mask?
-	unsigned long xl3Address = XL3_SEL | [self getRegisterAddress:kXl3SelectReg] | WRITE_REG;
-	unsigned long aValue = 0xffffffffUL;
+	uint32_t xl3Address = XL3_SEL | [self getRegisterAddress:kXl3SelectReg] | WRITE_REG;
+	uint32_t aValue = 0xffffffffUL;
     
 	@try {
 		[xl3Link sendCommand:0UL toAddress:xl3Address withData:&aValue];
@@ -2714,9 +2717,9 @@ void SwapLongBlock(void* p, int32_t n)
 {
     //borrowed from penn_daq EnableChargeInjection
     
-    unsigned long aValue = 0;
-    unsigned long xl3Value = 0;
-    unsigned long xl3Address = FEC_SEL * aSlot | 0x26 | WRITE_REG; //FEC HV CSR
+    uint32_t aValue = 0;
+    uint32_t xl3Value = 0;
+    uint32_t xl3Address = FEC_SEL * aSlot | 0x26 | WRITE_REG; //FEC HV CSR
     const int HV_BIT_COUNT = 40;
     
     @try {
@@ -3613,8 +3616,8 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) setHVSwitchOnForA:(BOOL)aIsOn forB:(BOOL)bIsOn
 {
-	unsigned long xl3Address = XL3_SEL | [self getRegisterAddress:kXl3HvCsReg] | WRITE_REG;
-	unsigned long aValue = 0UL;
+	uint32_t xl3Address = XL3_SEL | [self getRegisterAddress:kXl3HvCsReg] | WRITE_REG;
+	uint32_t aValue = 0UL;
 
     if (aIsOn) aValue |= 1UL;
     if (bIsOn) aValue |= 0x10000UL;
@@ -3630,8 +3633,8 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) readHVSwitchOnForA:(BOOL*)aIsOn forB:(BOOL*)bIsOn
 {
-	unsigned long xl3Address = XL3_SEL | [self getRegisterAddress:kXl3HvCsReg] | READ_REG;
-	unsigned long aValue = 0UL;
+	uint32_t xl3Address = XL3_SEL | [self getRegisterAddress:kXl3HvCsReg] | READ_REG;
+	uint32_t aValue = 0UL;
     
 	@try {
 		[xl3Link sendCommand:0UL toAddress:xl3Address withData:&aValue];
@@ -3863,8 +3866,8 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) readHVInterlockGood:(BOOL*)isGood
 {
-	unsigned long xl3Address = XL3_SEL | [self getRegisterAddress:kXl3HvCsReg] | READ_REG;
-	unsigned long aValue = 0UL;
+	uint32_t xl3Address = XL3_SEL | [self getRegisterAddress:kXl3HvCsReg] | READ_REG;
+	uint32_t aValue = 0UL;
     
 	@try {
 		[xl3Link sendCommand:0UL toAddress:xl3Address withData:&aValue];
@@ -3896,8 +3899,8 @@ void SwapLongBlock(void* p, int32_t n)
 {
     //todo a dedicated HV lock
     @synchronized (self) {
-        unsigned long xl3Address = XL3_SEL | [self getRegisterAddress:kXl3HvSetPointReg] | WRITE_REG;
-        unsigned long aValue = 0UL;
+        uint32_t xl3Address = XL3_SEL | [self getRegisterAddress:kXl3HvSetPointReg] | WRITE_REG;
+        uint32_t aValue = 0UL;
         
         aValue |= aDac & 0xFFFUL;
         aValue |= (bDac & 0xFFFUL) << 16;
@@ -4912,8 +4915,8 @@ void SwapLongBlock(void* p, int32_t n)
             //if (*data != 0) error_flag = YES;
             
             //the following is a workaround until set_crate_pedestal is fixed on XL3 side
-            unsigned long aValue = [aFec pedEnabledMask];
-            unsigned long xl3Address = FEC_SEL * [aFec stationNumber] | 0x23 | WRITE_REG; //FEC PED ENABLE
+            uint32_t aValue = [aFec pedEnabledMask];
+            uint32_t xl3Address = FEC_SEL * [aFec stationNumber] | 0x23 | WRITE_REG; //FEC PED ENABLE
             [xl3Link sendCommand:0UL toAddress:xl3Address withData:&aValue];
             if ([xl3Link needToSwap]) aValue = swapLong(aValue);
             //if (aValue != 0) error_flag = YES;

@@ -540,7 +540,7 @@ readFifoFlag = _readFifoFlag;
 	}
 }
 
-- (void) sendCommand:(long)aCmd toAddress:(unsigned long)address withData:(unsigned long*)value
+- (void) sendCommand:(long)aCmd toAddress:(uint32_t)address withData:(uint32_t *)value
 {
 	XL3PayloadStruct payload;
 	Command* command = (Command*) payload.payload;
