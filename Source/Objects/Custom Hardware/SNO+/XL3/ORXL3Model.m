@@ -1543,7 +1543,7 @@ void SwapLongBlock(void* p, int32_t n)
     if ([xl3Link needToSwap]) result->mode = swapLong(result->mode);
     
     oldMode = result->mode;
-    [self setXl3Mode:1];
+    xl3Mode = 1;
     [self writeXl3Mode];
 
     for (slot = 0; slot < 16; slot++) {
@@ -1575,7 +1575,7 @@ void SwapLongBlock(void* p, int32_t n)
         }
     }
 
-    [self setXl3Mode:oldMode];
+    xl3Mode = oldMode;
     [self writeXl3Mode];
 
     return 0;
