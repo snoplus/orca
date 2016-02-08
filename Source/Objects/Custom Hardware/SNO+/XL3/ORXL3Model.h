@@ -46,6 +46,10 @@ enum {
 	kXl3NumRegisters //must be last
 };
 
+/* flags to the initCrate function */
+#define INIT_XILINX          0x1    /* load xilinx */
+#define INIT_SHIFT_REGISTERS 0x2    /* just load shift registers */
+
 @class XL3_Link;
 @class ORCommandList;
 @class ORCouchDB;
@@ -288,6 +292,8 @@ enum {
 - (void) writeXL3Register:(short)aRegister value:(unsigned long)aValue;
 - (unsigned long) readXL3Register:(short)aRegister;
 
+- (int) setSequencerMasks;
+- (int) initCrate: (int) flags results: (CrateInitResults *) results;
 - (void) initCrateRegistersOnly;
 - (void) initCrateWithXilinx:(BOOL)aXilinxFlag autoInit:(BOOL)anAutoInitFlag;
 - (void) initCrateWithDict:(NSDictionary*)argDict;
