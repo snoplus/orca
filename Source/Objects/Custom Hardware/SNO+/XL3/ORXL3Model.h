@@ -293,8 +293,8 @@ enum {
 - (unsigned long) readXL3Register:(short)aRegister;
 
 - (int) setSequencerMasks;
-- (void) initCrateAsync: (int) flags withCallback: (SEL) callback;
-- (void) initCrate: (int) flags withCallback: (SEL) callback;
+- (void) initCrateAsync: (int) flags withCallback: (SEL) callback target: (id) target;
+- (void) initCrate: (int) flags withCallback: (SEL) callback target: (id) target;
 - (int) initCrate: (int) flags results: (CrateInitResults *) results;
 - (void) initCrateRegistersOnly;
 - (void) initCrateWithXilinx:(BOOL)aXilinxFlag autoInit:(BOOL)anAutoInitFlag;

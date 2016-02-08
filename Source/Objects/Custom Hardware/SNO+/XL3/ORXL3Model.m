@@ -195,7 +195,7 @@ snotDb = _snotDb;
     /* Post a notification telling ORCA not to start the run until we've
      * finished initializing */
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object:self];
-    [self initCrateAsync: INIT_SHIFT_REGISTERS withCallback: @selector(runStartDone:)];
+    [self initCrateAsync: INIT_SHIFT_REGISTERS withCallback: @selector(runStartDone:) target:self];
 }
 
 - (void) runStartDone: (CrateInitResults *) results
@@ -1578,15 +1578,29 @@ void SwapLongBlock(void* p, int32_t n)
     return 0;
 }
 
-- (void) initCrateAsync: (int) flags withCallback: (SEL) callback
+- (void) initCrateAsync: (int) flags withCallback: (SEL) callback target: (id) target
 {
     /* Initialize the crate in a separate thread and call the selector
      * `callback` when done. */
-    [NSThread detachNewSelector:@selector(initCrate:withCallback:)
-        withObject:flags withObject:callback];
+    NSDictionary *args = [NSDictionary dictionaryWithObjectsAndKeys:
+                            flags, @"flags",
+                            [NSValue valueWithPointer:callback], @"callback",
+                            target, @"target",
+                             nil];
+    [NSThread detachNewThreadSelector:@selector(initCrateAsyncThread:)
+        toTarget:self withObject:args];
 }
 
-- (void) initCrate: (int) flags withCallback: (SEL) callback
+- (void) initCrateAsyncThread: (NSDictionary *) args
+{
+    /* NSThread requires a function with only one argument, so we
+     * pass the arguments in a dictionary and call them here.
+     * Ugh...
+     */
+    [self initCrate: [args objectForKey:@"flags"] withCallback: [[args objectForKey:@"callback"] pointerValue] target: [args objectForKey:@"target"]];
+}
+
+- (void) initCrate: (int) flags withCallback: (SEL) callback target: (id) target
 {
     /* Initialize the crate with a callback. The callback should look like:
      *
@@ -1595,11 +1609,19 @@ void SwapLongBlock(void* p, int32_t n)
      * If the crate init failed, the results pointer will be NULL. */
     CrateInitResults results;
 
+    /* We have to do this craziness with NSInvocation because performSelector()
+     * can only call selectors which take NSObjects as parameters. */
+    NSInvocation *method = [NSInvocation invocationWithMethodSignature:[target methodSignatureForSelector:callback]];
+    [method setSelector:callback];
+    [method setTarget:target];
+
     if ([self initCrate: flags results: &results]) {
-        [self performSelector:callback withObject: &results];
+        [method setArgument:&results atIndex:2];
     } else {
-        [self performSelector:callback withObject: NULL];
+        [method setArgument:NULL atIndex:2];
     }
+
+    [method invoke];
 }
 
 - (int) initCrate: (int) flags results: (CrateInitResults *) results
