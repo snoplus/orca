@@ -192,7 +192,21 @@ snotDb = _snotDb;
 
 - (void) runAboutToStart:(NSNotification*)aNote
 {
-    [self initCrateRegistersOnly];
+    /* Post a notification telling ORCA not to start the run until we've
+     * finished initializing */
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object:self];
+    [self initCrateAsync: INIT_SHIFT_REGISTERS withCallback: @selector(runStartDone:)];
+}
+
+- (void) runStartDone: (CrateInitResults *) results
+{
+    if (results == NULL) {
+        NSLogColor([NSColor redColor], @"%@: crate init failed\n",
+                        [[self xl3Link] crateName]);
+    }
+
+    /* Tell ORCA that we have finished initializing */
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object:self];
 }
 
 - (void) makeMainController
@@ -1555,7 +1569,6 @@ void SwapLongBlock(void* p, int32_t n)
         } @catch (NSException* e) {
             NSLog(@"%@ sequencer update failed; error: %@ reason: %@\n",
                   [[self xl3Link] crateName], [e name], [e reason]);
-            return -1;
         }
     }
 
@@ -1563,6 +1576,30 @@ void SwapLongBlock(void* p, int32_t n)
     [self writeXl3Mode];
 
     return 0;
+}
+
+- (void) initCrateAsync: (int) flags withCallback: (SEL) callback
+{
+    /* Initialize the crate in a separate thread and call the selector
+     * `callback` when done. */
+    [NSThread detachNewSelector:@selector(initCrate:withCallback:)
+        withObject:flags withObject:callback];
+}
+
+- (void) initCrate: (int) flags withCallback: (SEL) callback
+{
+    /* Initialize the crate with a callback. The callback should look like:
+     *
+     * - (void) callback: (CrateInitResults *)
+     *
+     * If the crate init failed, the results pointer will be NULL. */
+    CrateInitResults results;
+
+    if ([self initCrate: flags results: &results]) {
+        [self performSelector:callback withObject: &results];
+    } else {
+        [self performSelector:callback withObject: NULL];
+    }
 }
 
 - (int) initCrate: (int) flags results: (CrateInitResults *) results
@@ -1596,9 +1633,7 @@ void SwapLongBlock(void* p, int32_t n)
 
     /* Set the sequencer masks separately because if we are doing a registers
      * only init, they are not updated. */
-    if ([self setSequencerMasks]) {
-        return -1;
-    }
+    [self setSequencerMasks];
 
     payload.numberBytesInPayload = sizeof(CrateInitSetupArgs);
 
