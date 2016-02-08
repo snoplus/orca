@@ -1511,9 +1511,9 @@ void SwapLongBlock(void* p, int32_t n)
     uint32_t address, value;
     ORFec32Model *fec;
 
- 	XL3PayloadStruct payload;
-	memset(payload.payload, 0, XL3_PAYLOAD_SIZE);
-	payload.numberBytesInPayload = sizeof(CheckXL3StateResults);
+    XL3PayloadStruct payload;
+    memset(payload.payload, 0, XL3_PAYLOAD_SIZE);
+    payload.numberBytesInPayload = sizeof(CheckXL3StateResults);
     
     CheckXL3StateResults* result = (CheckXL3StateResults*)payload.payload;
     
