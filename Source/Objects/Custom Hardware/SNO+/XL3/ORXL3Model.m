@@ -1563,7 +1563,7 @@ void SwapLongBlock(void* p, int32_t n)
             value = [self crateNumber] << 11;
             [xl3Link sendCommand:0UL toAddress:address withData:&value];
 
-            value = [fec getSeqDisabledMask];
+            value = [fec seqDisabledMask];
             address = FEC_SEL * slot | 0x90 | WRITE_REG; //CMOS CHIP DIS
             [xl3Link sendCommand:0UL toAddress:address withData:&value];
         } @catch (NSException* e) {
@@ -1583,7 +1583,7 @@ void SwapLongBlock(void* p, int32_t n)
     /* Initialize the crate in a separate thread and call the selector
      * `callback` when done. */
     NSDictionary *args = [NSDictionary dictionaryWithObjectsAndKeys:
-                            flags, @"flags",
+                            [NSNumber numberWithInt:flags], @"flags",
                             [NSValue valueWithPointer:callback], @"callback",
                             target, @"target",
                              nil];
@@ -1597,7 +1597,7 @@ void SwapLongBlock(void* p, int32_t n)
      * pass the arguments in a dictionary and call them here.
      * Ugh...
      */
-    [self initCrate: [args objectForKey:@"flags"] withCallback: [[args objectForKey:@"callback"] pointerValue] target: [args objectForKey:@"target"]];
+    [self initCrate: [[args objectForKey:@"flags"] intValue] withCallback: [[args objectForKey:@"callback"] pointerValue] target: [args objectForKey:@"target"]];
 }
 
 - (void) initCrate: (int) flags withCallback: (SEL) callback target: (id) target
@@ -1615,11 +1615,13 @@ void SwapLongBlock(void* p, int32_t n)
     [method setSelector:callback];
     [method setTarget:target];
 
+    CrateInitResults *r = &results;
+
     if ([self initCrate: flags results: &results]) {
-        [method setArgument:&results atIndex:2];
-    } else {
-        [method setArgument:NULL atIndex:2];
+        r = NULL;
     }
+
+    [method setArgument:&r atIndex:2];
 
     [method invoke];
 }
