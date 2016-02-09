@@ -1659,7 +1659,7 @@ void SwapLongBlock(void* p, int32_t n)
      * `callback` when done. */
     NSDictionary *args = [NSDictionary dictionaryWithObjectsAndKeys:
                             [NSNumber numberWithInt:flags], @"flags",
-                            [NSNumber numberWithInt:slotMask], @"slotMask",
+                            [NSNumber numberWithInt:slotMask], @"slotmask",
                             [NSValue valueWithPointer:callback], @"callback",
                             target, @"target",
                              nil];
