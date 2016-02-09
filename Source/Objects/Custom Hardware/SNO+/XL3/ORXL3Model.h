@@ -294,6 +294,7 @@ enum {
 
 - (int) setSequencerMasks: (uint32_t) slotMask;
 - (void) initCrateAsync: (int) flags;
+- (void) initCrateAsync: (int) flags slotMask: (uint32_t) slotMask;
 - (void) initCrateAsync: (int) flags withCallback: (SEL) callback target: (id) target;
 - (void) initCrateAsync: (int) flags slotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target;
 - (void) initCrateAsyncThread: (NSDictionary *) args;

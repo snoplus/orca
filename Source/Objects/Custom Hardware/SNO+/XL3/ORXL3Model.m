@@ -1590,6 +1590,12 @@ void SwapLongBlock(void* p, int32_t n)
     [self initCrateAsync: flags withCallback: NULL target: NULL];
 }
 
+- (void) initCrateAsync: (int) flags slotMask: (uint32_t) slotMask
+{
+    [self initCrateAsync: flags slotMask: slotMask
+         withCallback:NULL target:NULL];
+}
+
 - (void) initCrateAsync: (int) flags withCallback: (SEL) callback target: (id) target
 {
     [self initCrateAsync: flags slotMask: [self getSlotsPresent]
