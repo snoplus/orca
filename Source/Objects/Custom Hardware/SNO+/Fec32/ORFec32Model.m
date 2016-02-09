@@ -457,8 +457,8 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
 - (void) setTrigger100ns:(short) chan disabled:(short)state
 {
     unsigned long aMask = trigger100nsDisabledMask;
-    if(state) trigger100nsDisabledMask |= (1<<chan);
-    else      trigger100nsDisabledMask &= ~(1<<chan);
+    if(state) aMask |= (1<<chan);
+    else      aMask &= ~(1<<chan);
     [self setTrigger100nsDisabledMask:aMask];
 }
 
