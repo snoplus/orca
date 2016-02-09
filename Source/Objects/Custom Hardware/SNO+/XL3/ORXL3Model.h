@@ -50,6 +50,10 @@ enum {
 #define INIT_XILINX          0x1    /* load xilinx */
 #define INIT_SHIFT_REGISTERS 0x2    /* just load shift registers */
 
+/* XL3 modes */
+#define INIT_MODE 1
+#define NORMAL_MODE 2
+
 @class XL3_Link;
 @class ORCommandList;
 @class ORCouchDB;

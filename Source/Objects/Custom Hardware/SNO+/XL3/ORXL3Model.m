@@ -1365,7 +1365,7 @@ void SwapLongBlock(void* p, int32_t n)
     }
     [self setIsXl3VltThresholdInInit:[decoder decodeBoolForKey:@"ORXL3ModelXl3VltThresholdInInit"]];
 
-	if (xl3Mode == 0) [self setXl3Mode: 1];
+	if (xl3Mode == 0) [self setXl3Mode: INIT_MODE];
 	if (xl3OpsRunning == nil) xl3OpsRunning = [[NSMutableDictionary alloc] init];
     [self setXl3InitInProgress:NO];
     //if (isPollingXl3 == YES) [self setIsPollingXl3:NO];
@@ -1595,7 +1595,7 @@ void SwapLongBlock(void* p, int32_t n)
     @synchronized (self) {
         /* synchronize on self here because we don't want to have two
          * competing threads both setting the XL3 mode */
-        xl3Mode = 1;
+        xl3Mode = INIT_MODE;
         [self writeXl3Mode];
 
         for (slot = 0; slot < 16; slot++) {
@@ -1929,7 +1929,7 @@ void SwapLongBlock(void* p, int32_t n)
     }
     
     unsigned int oldMode = result->mode;
-    [self setXl3Mode:1];
+    [self setXl3Mode:INIT_MODE];
     [self writeXl3Mode];
 
     for (slot=0; slot<16; slot++) {
@@ -2479,30 +2479,35 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) writeXl3Mode
 {
-	XL3PayloadStruct payload;
-	payload.numberBytesInPayload = 8;
-	unsigned long* data = (unsigned long*) payload.payload;
+    /* Change the mode of the XL3. In init mode, the XL3 does not read out
+     * the front end cards, while in normal mode it reads out whichever
+     * front end cards are specified in the dataAvailMask. Here we set the
+     * dataAvailMask to whichever cards ORCA thinks are present. */
 
-	if ([xl3Link needToSwap]) {
-		data[0] = swapLong([self xl3Mode]);
-		data[1] = swapLong([self slotMask]);
-	}
-	else {
-		data[0] = [self xl3Mode];
-		data[1] = [self slotMask];
-	}
-	
-	[self setXl3ModeRunning:YES];
-	NSLog(@"%@ Set mode: %d slot mask: 0x%04x ...\n",[[self xl3Link] crateName], [self xl3Mode], [self slotMask]);
-	@try {
-		[[self xl3Link] sendCommand:CHANGE_MODE_ID withPayload:&payload expectResponse:YES];
-		NSLog(@"ok\n");
-	}
-	@catch (NSException* e) {
-		NSLog(@"Set XL3 mode failed; error: %@ reason: %@\n", [e name], [e reason]);
-	}
-	[self setXl3ModeRunning:NO];
-	//XL3 sends the payload back not touching it, should we check?	
+    XL3PayloadStruct payload;
+    payload.numberBytesInPayload = 8;
+    ChangeModeArgs* args = (ChangeModeArgs *) payload.payload;
+
+    args->mode = [self xl3Mode];
+    args->dataAvailMask = [self getSlotsPresent];
+
+    if ([xl3Link needToSwap]) {
+        args->mode = swapLong(args->mode);
+        args->dataAvailMask = swapLong(args->dataAvailMask);
+    }
+
+    [self setXl3ModeRunning:YES];
+    @try {
+        [[self xl3Link] sendCommand:CHANGE_MODE_ID withPayload:&payload
+                             expectResponse:YES];
+        NSLog(@"xl3 %02d set to %s mode.\n", [self crateNumber],
+                xl3Mode == 0 ? "INIT" : "NORMAL");
+    } @catch (NSException* e) {
+        NSLogColor([NSColor redColor],
+                    @"Set XL3 mode failed; error: %@ reason: %@\n",
+                    [e name], [e reason]);
+    }
+    [self setXl3ModeRunning:NO];
 }
 
 - (void) compositeXl3RW
