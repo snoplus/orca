@@ -2509,7 +2509,7 @@ void SwapLongBlock(void* p, int32_t n)
         [[self xl3Link] sendCommand:CHANGE_MODE_ID withPayload:&payload
                              expectResponse:YES];
         NSLog(@"xl3 %02d set to %s mode.\n", [self crateNumber],
-                xl3Mode == 0 ? "INIT" : "NORMAL");
+                (xl3Mode == INIT_MODE) ? "INIT" : "NORMAL");
     } @catch (NSException* e) {
         NSLogColor([NSColor redColor],
                     @"Set XL3 mode failed; error: %@ reason: %@\n",
