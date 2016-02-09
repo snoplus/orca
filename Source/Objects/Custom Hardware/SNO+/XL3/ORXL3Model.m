@@ -1585,6 +1585,11 @@ void SwapLongBlock(void* p, int32_t n)
     return 0;
 }
 
+- (void) initCrateAsync: (int) flags
+{
+    [self initCrateAsync: flags withCallback: NULL target: NULL];
+}
+
 - (void) initCrateAsync: (int) flags withCallback: (SEL) callback target: (id) target
 {
     [self initCrateAsync: flags slotMask: [self getSlotsPresent]
@@ -1642,21 +1647,22 @@ void SwapLongBlock(void* p, int32_t n)
      * If the crate init failed, the results pointer will be NULL. */
     CrateInitResults results;
 
-    /* We have to do this craziness with NSInvocation because performSelector()
-     * can only call selectors which take NSObjects as parameters. */
-    NSInvocation *method = [NSInvocation invocationWithMethodSignature:[target methodSignatureForSelector:callback]];
-    [method setSelector:callback];
-    [method setTarget:target];
-
     CrateInitResults *r = &results;
 
     if ([self initCrate: flags slotMask: slotMask results: &results]) {
         r = NULL;
     }
 
-    [method setArgument:&r atIndex:2];
-
-    [method invoke];
+    if (callback) {
+        /* We have to do this craziness with NSInvocation because
+         * performSelector() can only call selectors which take NSObjects as
+         * parameters. */
+        NSInvocation *method = [NSInvocation invocationWithMethodSignature:[target methodSignatureForSelector:callback]];
+        [method setSelector:callback];
+        [method setTarget:target];
+        [method setArgument:&r atIndex:2];
+        [method invoke];
+    }
 }
 
 - (int) initCrate: (int) flags slotMask: (uint32_t) slotMask results: (CrateInitResults *) results

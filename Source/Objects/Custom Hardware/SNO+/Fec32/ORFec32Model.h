@@ -192,6 +192,11 @@ typedef struct Fec32CmosShiftReg{
     unsigned long   trigger100nsDisabledMask;
     unsigned long	cmosReadDisabledMask;
 
+    unsigned long lastSeqDisabledMask;
+    unsigned long lastTrigger100nsDisabledMask;
+    unsigned long lastTrigger20nsDisabledMask;
+    unsigned long lastCmosReadDisabledMask;
+
     unsigned long   seqPendingDisabledMask;
     unsigned long   trigger20nsPendingDisabledMask;
     unsigned long   trigger100nsPendingDisabledMask;

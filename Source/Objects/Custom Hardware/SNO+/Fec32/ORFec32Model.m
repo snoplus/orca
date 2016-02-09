@@ -582,13 +582,38 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
 // load hardware from pending state
 - (void) loadHardware
 {
+    /* save these in case the init fails, then we can restore the current
+     * state of the hardware */
+    lastSeqDisabledMask = [self seqDisabledMask];
+    lastTrigger100nsDisabledMask = [self trigger100nsDisabledMask];
+    lastTrigger20nsDisabledMask = [self trigger20nsDisabledMask];
+    lastCmosReadDisabledMask = [self cmosReadDisabledMask];
+
     [[self undoManager] disableUndoRegistration];
     [self setSeqDisabledMask:[self seqPendingDisabledMask]];
     [self setTrigger20nsDisabledMask:[self trigger20nsPendingDisabledMask]];
     [self setTrigger100nsDisabledMask:[self trigger100nsPendingDisabledMask]];
     [self setCmosReadDisabledMask:[self cmosReadPendingDisabledMask]];
-    [[[self guardian] adapter] initCrateRegistersOnly];
+    [[[self guardian] adapter] initCrateAsync:INIT_SHIFT_REGISTERS
+         slotMask: (1 << [self stationNumber])
+         withCallback:@selector(loadHardwareDone:)
+         target:self];
     [[self undoManager] enableUndoRegistration];
+}
+
+- (void) loadHardwareDone: (CrateInitResults *) r
+{
+    if (r == NULL) {
+        NSLogColor([NSColor redColor], @"crate %d slot %d failed to load hardware!\n", [self crateNumber], [self stationNumber]);
+        [[self undoManager] disableUndoRegistration];
+        [self setSeqDisabledMask:lastSeqDisabledMask];
+        [self setTrigger20nsDisabledMask:lastTrigger20nsDisabledMask];
+        [self setTrigger100nsDisabledMask:lastTrigger100nsDisabledMask];
+        [self setCmosReadDisabledMask:lastCmosReadDisabledMask];
+        [[self undoManager] enableUndoRegistration];
+    } else {
+        NSLog(@"crate %d slot %d hardware loaded!\n", [self crateNumber], [self stationNumber]);
+    }
 }
 
 #pragma mark Trigger 20/100ns enable/disable methods
@@ -617,7 +642,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
 - (void) setOnlineMask:(unsigned long) aMask
 {
     [self setOnlineMaskNoInit:aMask];
-    [[[self guardian] adapter] initCrateRegistersOnly];
+    [[[self guardian] adapter] initCrateAsync: INIT_SHIFT_REGISTERS];
     cardChangedFlag = false;
 }
 
@@ -880,7 +905,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
     }
     if (crateInitMask & (1UL << [self crateNumber])) {
         // initialize the crate registers from our current settings
-        [[[self guardian] adapter] initCrateRegistersOnly];
+        [[[self guardian] adapter] initCrateAsync:INIT_SHIFT_REGISTERS];
         // make sure we don't do this crate again
         crateInitMask &= ~(1UL << [self crateNumber]);
     }
