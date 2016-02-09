@@ -192,7 +192,7 @@ snotDb = _snotDb;
 
 - (void) runAboutToStart:(NSNotification*)aNote
 {
-    int slot, i;
+    int slot, i, hv;
     ORFec32Model *fec;
 
     /* Before the run starts, we make sure that all channels with HV on
@@ -218,7 +218,7 @@ snotDb = _snotDb;
         if (!fec) continue;
 
         for (i = 0; i < 32; i++) {
-            hv = [self relayMask] & (1 << (slot*4 + (3-i/8)))
+            hv = [self relayMask] & (1 << (slot*4 + (3-i/8)));
 
             if (hv) {
                 if ([fec seqDisabled:i]) {
