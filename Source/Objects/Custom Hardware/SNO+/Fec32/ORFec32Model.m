@@ -1070,7 +1070,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
     [encoder encodeInt32:seqDisabledMask                    forKey: @"seqDisabledMask"];
     [encoder encodeInt32:cmosReadDisabledMask               forKey: @"cmosReadDisabledMask"];
     [encoder encodeInt32:trigger20nsDisabledMask            forKey: @"trigger20nsDisabledMask"];
-    [encoder encodeInt32:trigger100nsDisabledMask           forKey: @"trigge100nsDisabledMask"];
+    [encoder encodeInt32:trigger100nsDisabledMask           forKey: @"trigger100nsDisabledMask"];
     [encoder encodeInt32:seqPendingDisabledMask             forKey: @"seqDisabledPendingMask"];
     [encoder encodeInt32:cmosReadPendingDisabledMask        forKey: @"cmosReadPendingDisabledMask"];
     [encoder encodeInt32:trigger20nsPendingDisabledMask     forKey: @"trigger20nsPendingDisabledMask"];
