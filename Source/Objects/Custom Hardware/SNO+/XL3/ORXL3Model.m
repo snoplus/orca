@@ -1809,6 +1809,14 @@ void SwapLongBlock(void* p, int32_t n)
         return -1;
     }
 
+    if ([self xl3Mode] != NORMAL_MODE) {
+        NSLog(@"xl3 %02d switching to normal mode.\n", [self crateNumber]);
+        [[self undoManager] disableUndoRegistration];
+        [self setXl3Mode: NORMAL_MODE];
+        [[self undoManager] enableUndoRegistration];
+        [self writeXl3Mode];
+    }
+
     if (results) *results = *((CrateInitResults *) payload.payload);
 
     return 0;
