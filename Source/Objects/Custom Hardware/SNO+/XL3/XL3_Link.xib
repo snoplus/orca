@@ -378,14 +378,13 @@
                                                     <popUpButton verticalHuggingPriority="750" id="3508">
                                                         <rect key="frame" x="6" y="14" width="106" height="22"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <popUpButtonCell key="cell" type="push" title="1: Init" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="1" inset="2" selectedItem="3513" id="3511">
+                                                        <popUpButtonCell key="cell" type="push" title="2: Normal" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="2" inset="2" selectedItem="3514" id="3511">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <menu key="menu" title="OtherViews" id="3512">
                                                                 <items>
-                                                                    <menuItem title="1: Init" state="on" tag="1" id="3513"/>
-                                                                    <menuItem title="2: Normal" tag="2" id="3514"/>
-                                                                    <menuItem title="3: CGT" tag="2" id="3771"/>
+                                                                    <menuItem title="1: Init" tag="1" id="3513"/>
+                                                                    <menuItem title="2: Normal" state="on" tag="2" id="3514"/>
                                                                 </items>
                                                             </menu>
                                                         </popUpButtonCell>
