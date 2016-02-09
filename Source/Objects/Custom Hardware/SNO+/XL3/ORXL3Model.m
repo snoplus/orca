@@ -194,8 +194,10 @@ snotDb = _snotDb;
 {
     /* Post a notification telling ORCA not to start the run until we've
      * finished initializing */
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object:self];
-    [self initCrateAsync: INIT_SHIFT_REGISTERS withCallback: @selector(runStartDone:) target:self];
+    if ([[self xl3Link] isConnected]) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object:self];
+        [self initCrateAsync: INIT_SHIFT_REGISTERS withCallback: @selector(runStartDone:) target:self];
+    }
 }
 
 - (void) runStartDone: (CrateInitResults *) results
