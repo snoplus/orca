@@ -321,13 +321,13 @@ snotDb = _snotDb;
 
 - (unsigned long) slotMask
 {
-	return slotMask;
+	return selectedSlotMask;
 }
 
 - (void) setSlotMask:(unsigned long)aSlotMask
 {
-	[[[self undoManager] prepareWithInvocationTarget:self] setSlotMask:slotMask];
-	slotMask = aSlotMask;
+	[[[self undoManager] prepareWithInvocationTarget:self] setSlotMask:selectedSlotMask];
+	selectedSlotMask = aSlotMask;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelSlotMaskChanged object:self];
 }
 
@@ -1351,7 +1351,7 @@ void SwapLongBlock(void* p, int32_t n)
 	[encoder encodeInt:repeatDelay          forKey:@"ORXL3ModelRepeatDelay"];
 	[encoder encodeInt:repeatOpCount        forKey:@"ORXL3ModelRepeatOpCount"];
 	[encoder encodeInt:xl3Mode              forKey:@"ORXL3ModelXl3Mode"];
-	[encoder encodeInt:slotMask             forKey:@"ORXL3ModelSlotMask"];
+	[encoder encodeInt:selectedSlotMask     forKey:@"ORXL3ModelSlotMask"];
 	[encoder encodeInt:xl3RWAddressValue	forKey:@"ORXL3ModelXl3RWAddressValue"];
 	[encoder encodeInt:xl3RWDataValue       forKey:@"ORXL3ModelXl3RWDataValue"];
 	[encoder encodeInt:xl3PedestalMask      forKey:@"ORXL3ModelXl3PedestalMask"];

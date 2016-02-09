@@ -74,7 +74,7 @@ enum {
 	unsigned long   workingCount;
 	unsigned long   writeValue;
 	unsigned int    xl3Mode;
-	unsigned long   slotMask;
+	unsigned long   selectedSlotMask;
 	BOOL            xl3ModeRunning;
 	unsigned long   xl3RWAddressValue;
     unsigned long   xl3RWDataValue;
