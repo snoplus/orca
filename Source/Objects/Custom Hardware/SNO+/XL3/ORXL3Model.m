@@ -1591,42 +1591,47 @@ void SwapLongBlock(void* p, int32_t n)
     if ([xl3Link needToSwap]) result->mode = swapLong(result->mode);
     
     oldMode = result->mode;
-    xl3Mode = 1;
-    [self writeXl3Mode];
 
-    for (slot = 0; slot < 16; slot++) {
-        if ((slotMask & (1 << slot)) == 0) continue;
+    @synchronized (self) {
+        /* synchronize on self here because we don't want to have two
+         * competing threads both setting the XL3 mode */
+        xl3Mode = 1;
+        [self writeXl3Mode];
 
-        fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
+        for (slot = 0; slot < 16; slot++) {
+            if ((slotMask & (1 << slot)) == 0) continue;
 
-        if (!fec) continue;
+            fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
 
-        @try {
-            value = 0xffffffff;
-            address = FEC_SEL * slot | 0x90 | WRITE_REG; //CMOS CHIP DIS
-            [xl3Link sendCommand:0UL toAddress:address withData:&value];
-            
-            value = 0x2;
-            address = FEC_SEL * slot | 0x20 | WRITE_REG; //FEC CSR
-            [xl3Link sendCommand:0UL toAddress:address withData:&value];
+            if (!fec) continue;
 
-            value = 0x0;
-            [xl3Link sendCommand:0UL toAddress:address withData:&value];
+            @try {
+                value = 0xffffffff;
+                address = FEC_SEL * slot | 0x90 | WRITE_REG; //CMOS CHIP DIS
+                [xl3Link sendCommand:0UL toAddress:address withData:&value];
+                
+                value = 0x2;
+                address = FEC_SEL * slot | 0x20 | WRITE_REG; //FEC CSR
+                [xl3Link sendCommand:0UL toAddress:address withData:&value];
 
-            value = [self crateNumber] << 11;
-            [xl3Link sendCommand:0UL toAddress:address withData:&value];
+                value = 0x0;
+                [xl3Link sendCommand:0UL toAddress:address withData:&value];
 
-            value = [fec seqDisabledMask];
-            address = FEC_SEL * slot | 0x90 | WRITE_REG; //CMOS CHIP DIS
-            [xl3Link sendCommand:0UL toAddress:address withData:&value];
-        } @catch (NSException* e) {
-            NSLog(@"%@ sequencer update failed; error: %@ reason: %@\n",
-                  [[self xl3Link] crateName], [e name], [e reason]);
+                value = [self crateNumber] << 11;
+                [xl3Link sendCommand:0UL toAddress:address withData:&value];
+
+                value = [fec seqDisabledMask];
+                address = FEC_SEL * slot | 0x90 | WRITE_REG; //CMOS CHIP DIS
+                [xl3Link sendCommand:0UL toAddress:address withData:&value];
+            } @catch (NSException* e) {
+                NSLog(@"%@ sequencer update failed; error: %@ reason: %@\n",
+                      [[self xl3Link] crateName], [e name], [e reason]);
+            }
         }
-    }
 
-    xl3Mode = oldMode;
-    [self writeXl3Mode];
+        xl3Mode = oldMode;
+        [self writeXl3Mode];
+    }
 
     return 0;
 }
