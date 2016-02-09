@@ -1524,7 +1524,7 @@ void SwapLongBlock(void* p, int32_t n)
 	//[[self xl1] executeCommandList:aList];		
 }
 
-- (int) setSequencerMasks
+- (int) setSequencerMasks: (uint32_t) slotMask
 {
     int oldMode, slot;
     uint32_t address, value;
@@ -1549,6 +1549,8 @@ void SwapLongBlock(void* p, int32_t n)
     [self writeXl3Mode];
 
     for (slot = 0; slot < 16; slot++) {
+        if ((slotMask & (1 << slot)) == 0) continue;
+
         fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
 
         if (!fec) continue;
@@ -1585,10 +1587,17 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) initCrateAsync: (int) flags withCallback: (SEL) callback target: (id) target
 {
+    [self initCrateAsync: flags slotMask: [self getSlotsPresent]
+         withCallback:callback target:target];
+}
+
+- (void) initCrateAsync: (int) flags slotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target
+{
     /* Initialize the crate in a separate thread and call the selector
      * `callback` when done. */
     NSDictionary *args = [NSDictionary dictionaryWithObjectsAndKeys:
                             [NSNumber numberWithInt:flags], @"flags",
+                            [NSNumber numberWithInt:slotMask], @"slotMask",
                             [NSValue valueWithPointer:callback], @"callback",
                             target, @"target",
                              nil];
@@ -1602,10 +1611,29 @@ void SwapLongBlock(void* p, int32_t n)
      * pass the arguments in a dictionary and call them here.
      * Ugh...
      */
-    [self initCrate: [[args objectForKey:@"flags"] intValue] withCallback: [[args objectForKey:@"callback"] pointerValue] target: [args objectForKey:@"target"]];
+    [self initCrate: [[args objectForKey:@"flags"] intValue] slotMask: [[args objectForKey:@"slotmask"] intValue] withCallback: [[args objectForKey:@"callback"] pointerValue] target: [args objectForKey:@"target"]];
 }
 
-- (void) initCrate: (int) flags withCallback: (SEL) callback target: (id) target
+- (uint32_t) getSlotsPresent
+{
+    /* Returns a bitmask of which slots ORCA thinks are plugged in. */
+    int slot;
+    ORFec32Model *fec;
+
+    uint32_t slotMask = 0;
+
+    for (slot = 0; slot < 16; slot++) {
+        fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
+
+        if (!fec) continue;
+
+        slotMask |= (1 << slot);
+    }
+
+    return slotMask;
+}
+
+- (void) initCrate: (int) flags slotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target
 {
     /* Initialize the crate with a callback. The callback should look like:
      *
@@ -1622,7 +1650,7 @@ void SwapLongBlock(void* p, int32_t n)
 
     CrateInitResults *r = &results;
 
-    if ([self initCrate: flags results: &results]) {
+    if ([self initCrate: flags slotMask: slotMask results: &results]) {
         r = NULL;
     }
 
@@ -1631,18 +1659,19 @@ void SwapLongBlock(void* p, int32_t n)
     [method invoke];
 }
 
-- (int) initCrate: (int) flags results: (CrateInitResults *) results
+- (int) initCrate: (int) flags slotMask: (uint32_t) slotMask results: (CrateInitResults *) results
 {
     int slot, channel;
     MB mb[16];
     XL3PayloadStruct payload;
     CrateInitSetupArgs *setupArgs;
     CrateInitArgs *crateInitArgs;
-    ORFec32Model *fec;
 
     if (![[self xl3Link] isConnected]) return -1;
 
     for (slot = 0; slot < 16; slot++) {
+        if ((slotMask & (1 << slot)) == 0) continue;
+
         [self synthesizeFECIntoBundle:&mb[slot] forSlot:slot];
     }
 
@@ -1652,6 +1681,8 @@ void SwapLongBlock(void* p, int32_t n)
         [self setTriggerStatus:@"ON"];
     } else {
         for (slot = 0; slot < 16; slot++) {
+            if ((slotMask & (1 << slot)) == 0) continue;
+
             for (channel = 0; channel < 32; channel++) {
                 mb[slot].tr100.tDelay[channel] &= ~0x40U;
                 mb[slot].tr20.tWidth[channel] &= ~0x20U;
@@ -1662,13 +1693,15 @@ void SwapLongBlock(void* p, int32_t n)
 
     /* Set the sequencer masks separately because if we are doing a registers
      * only init, they are not updated. */
-    [self setSequencerMasks];
+    [self setSequencerMasks: slotMask];
 
     payload.numberBytesInPayload = sizeof(CrateInitSetupArgs);
 
     /* Send the first 16 packets which have the FEC settings. Note that
      * no hardware is updated until we send one more CrateInitArgs packet */
     for (slot = 0; slot < 16; slot++) {
+        if ((slotMask & (1 << slot)) == 0) continue;
+
         memset(payload.payload, 0, XL3_PAYLOAD_SIZE);
         setupArgs = (CrateInitSetupArgs *) payload.payload;
         setupArgs->mbNum = slot;
@@ -1693,16 +1726,7 @@ void SwapLongBlock(void* p, int32_t n)
     crateInitArgs->mbNum = 0xff;
     crateInitArgs->xilinxLoad = flags & INIT_XILINX;
     crateInitArgs->hvReset = 0;
-    crateInitArgs->slotMask = 0;
-
-    for (slot = 0; slot < 16; slot++) {
-        fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
-
-        if (!fec) continue;
-
-        crateInitArgs->slotMask |= (1 << slot);
-    }
-
+    crateInitArgs->slotMask = slotMask;
     crateInitArgs->ctcDelay = 0;
     crateInitArgs->shiftRegOnly = (flags & INIT_SHIFT_REGISTERS) ? 2 : 0;
 
