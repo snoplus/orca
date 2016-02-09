@@ -192,6 +192,52 @@ snotDb = _snotDb;
 
 - (void) runAboutToStart:(NSNotification*)aNote
 {
+    int slot, i;
+    ORFec32Model *fec;
+
+    /* Before the run starts, we make sure that all channels with HV on
+     * have their sequencers enabled, and all channels with HV off have
+     * their triggers turned off. Turning the sequencers on for channels
+     * with HV is to make sure that we don't have a blind flasher. Turning
+     * triggers off for channels without HV is to prevent trigger dropout
+     * due to a bug in the CMOS chip. Quoting Josh:
+     *
+     * "The problem here is that pickup will generate runt pulses into the
+     *  SNOD, and the CMOS chip has a logical bug which then will latch
+     *  the trigger signal without resetting it, creating dropout. Turning
+     *  the thresholds to maximum will mitigate the pickup, but even then I'd
+     *  only want to do that for a fixed (short) period of time."
+     *
+     * Note that we only set these in the model, but immediately after
+     * call initCrate so all these settings are loaded to hardware shortly
+     * after and before the run starts. */
+
+    for (slot = 0; slot < 16; slot++) {
+        fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
+
+        if (!fec) continue;
+
+        for (i = 0; i < 32; i++) {
+            hv = [self relayMask] & (1 << (slot*4 + (3-i/8)))
+
+            if (hv) {
+                if ([fec seqDisabled:i]) {
+                    NSLogColor([NSColor redColor], @"%02d/%02d/%02d HV is on, turning sequencer on!\n", [self crateNumber], slot, i);
+                    [fec setSeq:i enabled:YES];
+                }
+            } else {
+                if ([fec trigger100nsEnabled:i]) {
+                    NSLogColor([NSColor redColor], @"%02d/%02d/%02d HV is off, turning N100 trigger off!\n", [self crateNumber], slot, i);
+                    [fec setTrigger100ns:i enabled:NO];
+                }
+                if ([fec trigger20nsEnabled:i]) {
+                    NSLogColor([NSColor redColor], @"%02d/%02d/%02d HV is off, turning N20 trigger off!\n", [self crateNumber], slot, i);
+                    [fec setTrigger20ns:i enabled:NO];
+                }
+            }
+        }
+    }
+
     /* Post a notification telling ORCA not to start the run until we've
      * finished initializing */
     if ([[self xl3Link] isConnected]) {
