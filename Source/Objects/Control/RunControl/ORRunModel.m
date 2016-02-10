@@ -1026,7 +1026,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (void) prepareForNewSubRunStage1
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(prepareForNewSubRunStage1) object:nil];
-    if([objectsRequestingStateChangeWait count]==0){
+    if([self waitRequestersCount]==0){
         [self prepareForNewSubRunStage2];
     }
     else {
@@ -1082,7 +1082,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (void) startNewSubRunStage1
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startNewSubRunStage1) object:nil];
-    if([objectsRequestingStateChangeWait count]==0){
+    if([self waitRequestersCount]==0){
         [self startNewSubRunStage2];
     }
     else {
@@ -1164,7 +1164,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (void) waitOnObjects:(NSNumber*)doInitBool
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(waitOnObjects:) object:doInitBool];
-    if([objectsRequestingStateChangeWait count]==0){
+    if([self waitRequestersCount]==0){
         [self continueWithRunStart:doInitBool];
     }
     else {
@@ -1238,7 +1238,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
                                                         object: self
                                                       userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:eRunStarting] forKey:@"State"]];
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startRunStage2:) object:doInitBool];
-    if([objectsRequestingStateChangeWait count]==0)[self startRunStage3:doInitBool];
+    if([self waitRequestersCount]==0)[self startRunStage3:doInitBool];
     else {
         [self performSelector:@selector(startRunStage2:) withObject:doInitBool afterDelay:0];
     }
@@ -1434,7 +1434,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (void) stopRunStage2
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(stopRunStage2) object:nil];
-    if([objectsRequestingStateChangeWait count]==0)[self waitForRunToStop];
+    if([self waitRequestersCount]==0)[self waitForRunToStop];
     else {
         [self performSelector:@selector(stopRunStage2) withObject:nil afterDelay:0];
     }
@@ -1951,7 +1951,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 {
     id result = nil;
 	@synchronized (self){
-        if(index<[objectsRequestingStateChangeWait count]){
+        if(index<[self waitRequestersCount]){
             result = [objectsRequestingStateChangeWait objectAtIndex:index];
         }
     }
