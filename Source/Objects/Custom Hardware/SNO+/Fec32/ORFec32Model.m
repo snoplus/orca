@@ -594,13 +594,57 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
     [self setTrigger20nsDisabledMask:[self trigger20nsPendingDisabledMask]];
     [self setTrigger100nsDisabledMask:[self trigger100nsPendingDisabledMask]];
     [self setCmosReadDisabledMask:[self cmosReadPendingDisabledMask]];
-    [[[self guardian] adapter] initCrateAsync:INIT_SHIFT_REGISTERS
-         slotMask: (1 << [self stationNumber])
+    [[[self guardian] adapter]
+         loadHardwareWithSlotMask: (1 << [self stationNumber])
          withCallback:@selector(loadHardwareDone:)
          target:self];
     [[self undoManager] enableUndoRegistration];
 }
 
+- (uint32_t) boardIDAsInt
+{
+    return strtoul([[self boardID] UTF8String], NULL, 16);
+}
+
+- (void) checkConfig: (FECConfiguration *) config
+{
+    int i;
+    ORFecDaughterCardModel *db;
+
+    if (config->mbID == 0) {
+        NSLogColor([NSColor redColor],
+            @"crate %02d slot %02d is not plugged in according to XL3.",
+            [self crateNumber], [self stationNumber]);
+        return;
+    }
+
+    if (config->mbID != [self boardIDAsInt]) {
+        NSLogColor([NSColor redColor],
+             @"crate %02d slot %02d mismatching board id. updating ORCA...\n",
+             [self crateNumber], [self stationNumber]);
+        [self setBoardID:[NSString stringWithFormat:@"%x", config->mbID]];
+    }
+
+    for (i = 0; i < 4; i++) {
+        if ([self dcPresent:i]) {
+            db = [self dc:i];
+
+            if (config->dbID[i] != [db boardIDAsInt]) {
+                NSLogColor([NSColor redColor], @"crate %02d slot %02d db %d mismatching board id. updating ORCA...\n", [self crateNumber], [self stationNumber], i);
+                [db setBoardID:[NSString stringWithFormat:@"%x", config->dbID[i]]];
+            }
+        } else {
+            if (config->dbID[i] != 0) {
+                NSLogColor([NSColor redColor], @"crate %02d slot %02d db %d exists accoring to XL3. Adding to ORCA...\n", [self crateNumber], [self stationNumber], i);
+                db = [ObjectFactory makeObject:@"ORFecDaughterCardModel"];
+                [self addObject:db];
+                [self place:db intoSlot:i];
+                [db setBoardID:[NSString stringWithFormat:@"%x", config->dbID[i]]];
+            }
+        }
+    }
+}
+            
 - (void) loadHardwareDone: (CrateInitResults *) r
 {
     if (r == NULL) {
@@ -642,7 +686,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
 - (void) setOnlineMask:(unsigned long) aMask
 {
     [self setOnlineMaskNoInit:aMask];
-    [[[self guardian] adapter] initCrateAsync: INIT_SHIFT_REGISTERS];
+    [[[self guardian] adapter] loadHardware];
     cardChangedFlag = false;
 }
 
@@ -905,7 +949,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
     }
     if (crateInitMask & (1UL << [self crateNumber])) {
         // initialize the crate registers from our current settings
-        [[[self guardian] adapter] initCrateAsync:INIT_SHIFT_REGISTERS];
+        [[[self guardian] adapter] loadHardware];
         // make sure we don't do this crate again
         crateInitMask &= ~(1UL << [self crateNumber]);
     }

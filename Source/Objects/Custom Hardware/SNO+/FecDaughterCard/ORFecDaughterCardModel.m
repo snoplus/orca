@@ -54,6 +54,11 @@ NSString* ORDCModelTac1trimChanged			= @"ORDCModelTac1trimChanged";
     return self;
 }
 
+- (uint32_t) boardIDAsInt
+{
+    return strtoul([[self boardID] UTF8String], NULL, 16);
+}
+
 -(void)dealloc
 {
     [comments release];

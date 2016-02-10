@@ -776,7 +776,7 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 
 - (void) initCrateUsingXL3:(BOOL) loadTheFEC32XilinxFile phase:(int) phase
 {
-	[[self adapter] initCrateWithXilinx:loadTheFEC32XilinxFile autoInit:[self autoInit]];
+	[[self adapter] initCrate:loadTheFEC32XilinxFile];
 }
 
 @end

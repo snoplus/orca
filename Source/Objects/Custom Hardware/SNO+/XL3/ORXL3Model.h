@@ -46,9 +46,8 @@ enum {
 	kXl3NumRegisters //must be last
 };
 
-/* flags to the initCrate function */
-#define INIT_XILINX          0x1    /* load xilinx */
-#define INIT_SHIFT_REGISTERS 0x2    /* just load shift registers */
+/* shiftRegOnly parameter to crate init */
+#define SHIFT_AND_DAC 2
 
 /* XL3 modes */
 #define INIT_MODE 1
@@ -101,7 +100,6 @@ enum {
     BOOL            isPollingForced;
     NSString*       pollStatus;
     NSThread*       pollThread;
-    ORTimer*        timer;
     
     unsigned long long  relayMask;
     unsigned long long  relayViewMask;
@@ -297,17 +295,21 @@ enum {
 - (unsigned long) readXL3Register:(short)aRegister;
 
 - (int) setSequencerMasks: (uint32_t) slotMask;
-- (void) initCrateAsync: (int) flags;
-- (void) initCrateAsync: (int) flags slotMask: (uint32_t) slotMask;
-- (void) initCrateAsync: (int) flags withCallback: (SEL) callback target: (id) target;
-- (void) initCrateAsync: (int) flags slotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target;
+- (void) initCrate: (int) xilinxLoad;
+- (void) initCrateDone: (CrateInitResults *)r;
+- (void) loadHardware;
+- (void) loadHardwareWithSlotMask: (uint32_t) slotMask;
+- (void) loadHardwareWithSlotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target;
+- (void) initCrateAsync: (int) xilinxLoad shiftRegOnly: (uint32_t) shiftRegOnly slotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target;
 - (void) initCrateAsyncThread: (NSDictionary *) args;
+- (void) initCrate: (int) xilinxLoad shiftRegOnly: (uint32_t) shiftRegOnly slotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target;
+- (int) initCrate: (int) xilinxLoad shiftRegOnly: (uint32_t) shiftRegOnly slotMask: (uint32_t) slotMask results: (CrateInitResults *) results;
+- (void) checkCrateConfig: (BuildCrateConfigResults *)r;
+
 - (uint32_t) getSlotsPresent;
-- (void) initCrate: (int) flags slotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target;
-- (int) initCrate: (int) flags slotMask: (uint32_t) slotMask results: (CrateInitResults *) results;
-- (void) initCrateRegistersOnly;
-- (void) initCrateWithXilinx:(BOOL)aXilinxFlag autoInit:(BOOL)anAutoInitFlag;
-- (void) initCrateWithDict:(NSDictionary*)argDict;
+//- (void) initCrateRegistersOnly;
+//- (void) initCrateWithXilinx:(BOOL)aXilinxFlag autoInit:(BOOL)anAutoInitFlag;
+//- (void) initCrateWithDict:(NSDictionary*)argDict;
 - (void) orcaToHw;
 
 #pragma mark •••Basic Ops
