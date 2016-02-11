@@ -644,8 +644,9 @@ NSString* ORDCModelTac1trimChanged			= @"ORDCModelTac1trimChanged";
 
 - (void) setVtToHw
 {
-    //call xl3 initRegistersOnly
-    [[[[self guardian] guardian] adapter] initCrateRegistersOnly];
+    // call xl3 loadHardware
+    [[[[self guardian] guardian] adapter]
+         loadHardwareWithSlotMask: (1 << [[self guardian] stationNumber])];
 }
 @end
 
