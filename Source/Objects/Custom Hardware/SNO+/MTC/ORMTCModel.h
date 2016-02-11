@@ -23,16 +23,15 @@
 #pragma mark •••Imported Files
 
 #import "ORVmeIOCard.h"
-#import "ORDataTaker.h"
-#import "VME_eCPU_Config.h"
-#import "SBC_Config.h"
+#import "RedisClient.h"
+#include <stdint.h>
 
 @class ORMTC_DB;
 @class ORReadOutList;
 
 #define MTCLockOutWidth @"MTCLockOutWidth"
 
-@interface ORMTCModel :  ORVmeIOCard <ORDataTaker>
+@interface ORMTCModel :  ORVmeIOCard
 {
     @private
 		unsigned long			_dataId;
@@ -72,10 +71,6 @@
     unsigned long _mtcaOEHIMask;
     unsigned long _mtcaOWLNMask;
 
-		//data taking variables
-		ORReadOutList*  triggerGroup;
-		NSString*		triggerName;
-		//NSArray*		dataTakers;       //cache of data takers.
     unsigned long _mtcStatusGTID;
     double _mtcStatusGTIDRate;
     unsigned long long _mtcStatusCnt10MHz;
@@ -85,6 +80,8 @@
     BOOL _mtcStatusDataAvailable;
     unsigned long _mtcStatusNumEventsInMem;
     BOOL _resetFifoOnStart;
+
+    RedisClient *mtc;
 }
 
 @property (nonatomic,assign) BOOL isPulserFixedRate;
@@ -117,11 +114,10 @@
 - (void) makeMainController;
 - (BOOL) solitaryObject;
 
+- (void) registerNotificationObservers;
+- (void) runAboutToStart:(NSNotification*)aNote;
+
 #pragma mark •••Accessors
-- (ORReadOutList*) triggerGroup;
-- (void) setTriggerGroup:(ORReadOutList*)newTrigger1Group;
-- (NSString *) triggerName;
-- (void) setTriggerName: (NSString *) aTrigger1Name;
 - (int) eSumViewType;
 - (void) setESumViewType:(int)aESumViewType;
 - (int) nHitViewType;
@@ -178,19 +174,6 @@
 - (float) pCTomVolts:(float) pC dcOffset:(float)dcOffset mVperpC:(float)mVperp;
 - (long) pCToRaw:(float) pC dcOffset:(float)dcOffset mVperpC:(float)mVperp;
 
-#pragma mark •••Data Taker
-- (unsigned long) dataId;
-- (void) setDataId: (unsigned long) DataId;
-- (NSDictionary*) dataRecordDescription;
-- (void) setDataIds:(id)assigner;
-- (void) syncDataIdsWith:(id)anotherMTC;
-- (void) reset;
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
-- (BOOL) bumpRateFromDecodeStage:(NSDictionary*) mtcStatus;
-
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
@@ -200,10 +183,10 @@
 - (BOOL) adapterIsSBC;
 - (short) getNumberRegisters;
 - (NSString*) getRegisterName:(short) anIndex;
-- (unsigned long) read:(int)aReg;
-- (void) write:(int)aReg value:(unsigned long)aValue;
-- (void) setBits:(int)aReg mask:(unsigned long)aMask;
-- (void) clrBits:(int)aReg mask:(unsigned long)aMask;
+- (uint32_t) read:(int)aReg;
+- (void) write:(int)aReg value:(uint32_t)aValue;
+- (void) setBits:(int)aReg mask:(uint32_t)aMask;
+- (void) clrBits:(int)aReg mask:(uint32_t)aMask;
 - (unsigned long) getMTC_CSR;
 - (unsigned long) getMTC_GTID;
 - (unsigned long) getMTC_PedWidth;
@@ -240,24 +223,18 @@
 - (void) setupGTCorseDelay;
 - (void) setupGTFineDelay:(unsigned short) theAddelValue;
 - (void) setupGTFineDelay;
-- (void) setThePulserRate:(float) thePulserPeriodValue;
-- (void) setThePulserRate:(float) thePulserPeriodValue setToInfinity:(BOOL) setToInfinity;
-- (void) loadEnablePulser;
+- (void) setThePulserRate:(float) pulserRate;
 - (void) enablePulser;
 - (void) disablePulser;
 - (void) enablePedestal;
 - (void) disablePedestal;
-- (void) stopMTCPedestalsFixedRate;
-- (void) continueMTCPedestalsFixedRate;
 - (void) fireMTCPedestalsFixedRate;
+- (void) continueMTCPedestalsFixedRate;
+- (void) stopMTCPedestalsFixedRate;
 - (void) basicMTCPedestalGTrigSetup;
-- (void) setupPulserRateAndEnable:(float) pulserPeriodVal;
 - (void) fireMTCPedestalsFixedTime;
 - (void) stopMTCPedestalsFixedTime;
-- (void) enableSingleShotMTCPedestalsFixedTime;
-- (void) singleShotMTCPedestalsFixedTime;
-- (unsigned long) singleShotMTCPedestalsFixedTime:(unsigned long) pedestalCount withDelay:(unsigned long) usecDelay;
-- (void) fireMTCPedestalsFixedNumber:(unsigned long) numPedestals;
+- (void) firePedestals:(unsigned long) count withRate:(float) rate;
 - (void) basicMTCReset;
 - (void) loadTheMTCADacs;
 - (void) loadMTCXilinx;
@@ -304,7 +281,6 @@ extern NSString* ORMTCModelMtcDataBaseChanged;
 extern NSString* ORMTCModelIsPulserFixedRateChanged;
 extern NSString* ORMTCModelFixedPulserRateCountChanged;
 extern NSString* ORMTCModelFixedPulserRateDelayChanged;
-extern NSString* ORMtcTriggerNameChanged;
 extern NSString* ORMTCLock;
 extern NSString* ORMTCModelMTCAMaskChanged;
 extern NSString* ORMTCModelIsPedestalEnabledInCSR;

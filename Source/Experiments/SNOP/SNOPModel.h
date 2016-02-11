@@ -22,7 +22,7 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORExperimentModel.h"
 #import "ORVmeCardDecoder.h"
-#import "ORScriptIDEModel.h"
+#import "RedisClient.h"
 
 @class ORDataPacket;
 @class ORDataSet;
@@ -107,16 +107,15 @@
     bool isEmergencyStopEnabled;
     bool isEStopPolling;
 
-    @private
-        //Standard runs stuff
+    RedisClient *mtc_server;
+    RedisClient *xl3_server;
 
+    @private
+        //ECA stuff
         int ECA_pattern;
         int ECA_type;
         int ECA_tslope_pattern;
         double ECA_subrun_time;
-
-        ORScriptIDEModel *SR_script;
-        ORRunModel* runControl;
     
 }
 
@@ -156,6 +155,8 @@
 @property (copy) NSDictionary* mtcConfigDoc;
 
 
+- (id) init;
+
 - (void) initSmellieRunDocsDic;
 - (void) initOrcaDBConnectionHistory;
 - (void) clearOrcaDBConnectionHistory;
@@ -177,11 +178,18 @@
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
+
+- (void) runInitialization:(NSNotification*)aNote;
+- (void) runAboutToStart:(NSNotification*)aNote;
+- (void) runStarted:(NSNotification*)aNote;
+- (void) runAboutToStop:(NSNotification*)aNote;
+- (void) runStopped:(NSNotification*)aNote;
+
+- (void) _waitForBuffers;
+
 - (void) runStateChanged:(NSNotification*)aNote;
 - (void) subRunStarted:(NSNotification*)aNote;
 - (void) subRunEnded:(NSNotification*)aNote;
-- (void) runStarted:(NSNotification*)aNote;
-- (void) runStopped:(NSNotification*)aNote;
 
 - (void) updateEPEDStructWithCoarseDelay: (unsigned long) coarseDelay
                                fineDelay: (unsigned long) fineDelay

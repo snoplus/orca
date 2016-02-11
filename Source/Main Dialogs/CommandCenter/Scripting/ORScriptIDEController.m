@@ -329,19 +329,22 @@
 
 - (void) lockChanged:(NSNotification*)aNotification
 {
-    BOOL locked = [gSecurity isLocked:ORScriptIDEModelLock];
+    BOOL    locked = [gSecurity isLocked:ORScriptIDEModelLock];
+    BOOL    okToRunManually = ![[model guardian] isKindOfClass:NSClassFromString(@"ORRunModel")];
     [lockButton setState: locked];
 	
     [addInputButton setEnabled:!locked];
 	[removeInputButton setEnabled:!locked && ([[inputVariablesTableView selectedRowIndexes] count] > 0)];
     [periodicRunIntervalField setEnabled:!locked && [model runPeriodically]];
+    [runButton setEnabled:!locked  & okToRunManually];
     
-    [breakChainButton setEnabled:!locked];
-	[runPeriodicallyCB setEnabled:!locked];
-	[autoRunAtQuitCB setEnabled:!locked];
-	[autoStopWithRunCB setEnabled:!locked];
-	[autoStartWithRunCB setEnabled:!locked];
-	[autoStartWithDocumentCB setEnabled:!locked];
+    [breakChainButton setEnabled:!locked & okToRunManually];
+	[runPeriodicallyCB setEnabled:!locked & okToRunManually];
+	[autoRunAtQuitCB setEnabled:!locked & okToRunManually];
+	[autoStopWithRunCB setEnabled:!locked & okToRunManually];
+	[autoStartWithRunCB setEnabled:!locked & okToRunManually];
+    [autoStartWithDocumentCB setEnabled:!locked & okToRunManually];
+    [debuggerButton setEnabled:!locked & okToRunManually];
     [nameField setEnabled:!locked];
     [insertCodeButton setEnabled:!locked];
 }

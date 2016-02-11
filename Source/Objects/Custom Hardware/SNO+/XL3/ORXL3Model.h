@@ -21,8 +21,6 @@
 #pragma mark •••Imported Files
 #import "ORSNOCard.h"
 #import "XL3_Cmds.h"
-#import "ORDataTaker.h"
-#import "VME_eCPU_Config.h"
 #import "SNOPModel.h"
 
 typedef struct  {
@@ -53,7 +51,7 @@ enum {
 @class ORCouchDB;
 
 
-@interface ORXL3Model : ORSNOCard <ORDataTaker>
+@interface ORXL3Model : ORSNOCard
 {
 	XL3_Link*       xl3Link;
 	unsigned long	_xl3MegaBundleDataId;
@@ -98,11 +96,15 @@ enum {
     ORTimer*        timer;
     
     unsigned long long  relayMask;
-    uint32_t relayLowMask;
-    uint32_t relayHighMask; 
+    unsigned long long  relayViewMask;
     NSString* relayStatus;
     BOOL hvASwitch;
     BOOL hvBSwitch;
+    BOOL hvARamping;
+    BOOL hvBRamping;
+    BOOL hvEverUpdated;
+    BOOL hvSwitchEverUpdated;
+    
     NSString* triggerStatus;
     BOOL _isTriggerON;
 
@@ -125,6 +127,8 @@ enum {
     unsigned long _hvNominalVoltageA;
     unsigned long _hvNominalVoltageB;
     BOOL _hvPanicFlag;
+    NSLock* hvInitLock;
+    NSThread* hvInitThread;
     NSThread* hvThread;
     NSDateFormatter* xl3DateFormatter;
     float _xl3VltThreshold[12];
@@ -167,8 +171,7 @@ enum {
 @property (nonatomic,assign) BOOL isPollingForced;
 
 @property (nonatomic,assign) unsigned long long relayMask;
-@property (nonatomic,assign) uint32_t relayLowMask;
-@property (nonatomic,assign) uint32_t relayHighMask;
+@property (nonatomic,assign) unsigned long long relayViewMask;
 @property (nonatomic,copy) NSString* relayStatus;
 @property (nonatomic,assign) BOOL hvASwitch;
 @property (nonatomic,assign) BOOL hvBSwitch;
@@ -199,6 +202,11 @@ enum {
 @property (assign) unsigned long ecal_received; //set accross multiple threads
 @property (nonatomic,assign) bool ecalToOrcaInProgress;
 @property (assign) id snotDb;//I replaced 'weak' by 'assign' to get Orca compiled under 10.6 (-tb- 2013-09)
+
+@property BOOL hvEverUpdated;
+@property BOOL hvSwitchEverUpdated;
+@property BOOL hvARamping;
+@property BOOL hvBRamping;
 
 
 #pragma mark •••Initialization
@@ -264,15 +272,6 @@ enum {
 - (void) parseEcalDocument:(NSDictionary*)aResult;
 - (void) updateUIFromEcalBundle:(NSDictionary*)aBundle slot:(unsigned int)aSlot;
 - (BOOL) isRelayClosedForSlot:(unsigned int)slot pc:(unsigned int)aPC;
-
-#pragma mark •••DataTaker
-- (void) setDataIds:(id)assigner;
-- (void) syncDataIdsWith:(id)anotherObj;
-- (NSDictionary*) dataRecordDescription;
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (int) load_eCPU_HW_Config_Structure:(VME_crate_config*)configStruct index:(int)index;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
@@ -343,6 +342,7 @@ enum {
 - (void) readHVSwitchOnForA:(BOOL*)aIsOn forB:(BOOL*)bIsOn;
 - (void) readHVSwitchOn;
 
+- (void) safeHvInit;
 - (void) setHVSwitch:(BOOL)aOn forPowerSupply:(unsigned char)sup;
 - (void) hvPanicDown;
 - (void) hvMasterPanicDown;

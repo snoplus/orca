@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14B25" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9531" systemVersion="15D21" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
         <development version="5100" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9531"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ORRunController">
@@ -1121,11 +1121,11 @@
                     </textFieldCell>
                 </textField>
                 <button verticalHuggingPriority="750" id="2650">
-                    <rect key="frame" x="171" y="9" width="129" height="25"/>
+                    <rect key="frame" x="171" y="9" width="147" height="25"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <buttonCell key="cell" type="squareTextured" title="Force Clear All Waits" bezelStyle="texturedSquare" imagePosition="overlaps" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2651">
+                    <buttonCell key="cell" type="square" title="Force Clear All Waits" bezelStyle="shadowlessSquare" imagePosition="overlaps" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2651">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
                         <action selector="forceClearWaitsAction:" target="-2" id="2664"/>
@@ -1169,11 +1169,11 @@
                     <rect key="frame" x="24" y="47" width="159" height="285"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <clipView key="contentView" id="EDo-Ay-y08">
-                        <rect key="frame" x="0.0" y="0.0" width="159" height="285"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <rect key="frame" x="0.0" y="0.0" width="144" height="285"/>
+                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <customView id="2733" customClass="ORCardContainerView">
-                                <rect key="frame" x="0.0" y="-259" width="147" height="800"/>
+                                <rect key="frame" x="0.0" y="-258.5" width="147" height="800"/>
                                 <autoresizingMask key="autoresizingMask"/>
                             </customView>
                         </subviews>
@@ -1182,7 +1182,7 @@
                         <rect key="frame" x="-100" y="-100" width="169" height="16"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
-                    <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="2757">
+                    <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="0.49805825242718449" horizontal="NO" id="2757">
                         <rect key="frame" x="144" y="0.0" width="15" height="285"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>

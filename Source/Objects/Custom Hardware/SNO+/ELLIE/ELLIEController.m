@@ -4,6 +4,9 @@
 //
 //  Created by Chris Jones on 01/04/2014.
 //
+//  Revision history:
+//  Ed Leming 04/01/2016 -  Removed global variables to move logic to
+//                          ELLIEModel
 //
 
 #import "ELLIEController.h"
@@ -14,7 +17,6 @@
 
 
 @implementation ELLIEController
-    NSMutableDictionary *laserHeadDic;
     NSMutableDictionary *configForSmellie;
     BOOL *laserHeadSelected;
     BOOL *fibreSwitchOutputSelected;
@@ -34,13 +36,13 @@
     
     //this function operates under the assumption that there is an initial file already in place
     NSNumber *currentConfigurationVersion = [[NSNumber alloc] initWithInt:0];
-    
+        
     //fetch the current version of the smellie configuration
-    currentConfigurationVersion = [self fetchRecentVersion];
+    ELLIEModel* aELLIEModel = [[ELLIEModel alloc] init];
+    currentConfigurationVersion = [aELLIEModel fetchRecentVersion];
     
     //fetch the data associated with the current configuration
-    configForSmellie = [[NSMutableDictionary alloc] initWithCapacity:10];
-    configForSmellie = [[self fetchCurrentConfigurationForVersion:currentConfigurationVersion] mutableCopy];
+    configForSmellie = [[aELLIEModel fetchCurrentConfigurationForVersion:currentConfigurationVersion] mutableCopy];
     
     //increment the current version of the incrementation
     currentConfigurationVersion = [NSNumber numberWithInt:[currentConfigurationVersion intValue] + 1];
@@ -81,18 +83,10 @@
         NSLog(@"CouchDB for ELLIE isn't connected properly. Please reload the ELLIE Gui and check the database connections\n");
         NSLog(@"Reason for error %@ \n",e);
     }
-        
-    //load most recent smellie config file 
-    laserHeadDic = [[NSMutableDictionary alloc] initWithCapacity:100];
-        
-    //NSMutableDictionary *smellieRunInfo = [[NSMutableDictionary alloc] init];
-    //NSLog(@"Value of smellie %@",[smellieRunInfo objectForKey:@"run_name"]);
-    //[smellieRunName release];
-    
+
     /*Setting up TELLIE GUI */
     [self initialiseTellie];
-
-
+    
     return self;
 }
 
@@ -496,10 +490,10 @@
                                    forKey:@"pulse_by_pulse_extra_delay"];
             [model setPulseByPulseDelay:[tellieVariableDelay floatValue]];
             [model setTellieSubRunSettings:tellieSettings];
+            [tellieSettings release];
             
             tellieThread = [[NSThread alloc] initWithTarget:model selector:@selector(fireTellieFibre:) object:fireTellieCommands];
             [tellieThread start];
-            
             //[model fireTellieFibre:fireTellieCommands];
         }
         else{
@@ -509,7 +503,7 @@
     else{
         NSLog(@"Tellie: Validate all settings for Tellie\n");
     }
-    
+    [fireTellieCommands release];
 }
 
 
@@ -899,8 +893,7 @@
     [smellieAllLasersButton setEnabled:YES];
     [smellieMakeNewRunButton setEnabled:NO];
     
-    [smellieSettingsPool release];
-    
+    [smellieSettingsPool drain];
     
 }
 
@@ -929,69 +922,6 @@
         NSLog(@"Error querying couchDB, please check the connection is correct %@",error);
     }
 
-    
-    
-}
-
-
--(NSNumber*) fetchRecentVersion
-{
-    
-    //Collect a series of objects from the SNOPModel
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    
-    //Initialise the SNOPModel
-    SNOPModel* aSnotModel = [objs objectAtIndex:0];
-    
-    NSString *urlString = [NSString stringWithFormat:@"http://%@:%u/smellie/_design/smellieMainQuery/_view/fetchMostRecentConfigVersion?descending=True&limit=1",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
-    NSURL *url = [NSURL URLWithString:urlString];
-    NSNumber *currentVersionNumber;
-    NSData *data = [NSData dataWithContentsOfURL:url];
-    NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    NSError *error =  nil;
-    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
-    if(!error){
-        @try{
-            //format the json response
-            NSString *stringValueOfCurrentVersion = [NSString stringWithFormat:@"%@",[[[json valueForKey:@"rows"] valueForKey:@"value"]objectAtIndex:0]];
-            currentVersionNumber = [NSNumber numberWithInt:[stringValueOfCurrentVersion intValue]];
-            //NSLog(@"parsedNumber%@",currentVersionNumber);
-            //NSLog(@"parsedString %@",stringValueOfCurrentVersion);
-            //NSLog(@"valueforkey2=%@", [[json valueForKey:@"rows"] valueForKey:@"value"]);
-        }
-        @catch (NSException *e) {
-            NSLog(@"Error in fetching the SMELLIE CONFIGURATION FILE: %@ . Please fix this before changing the configuration file",e);
-        }
-    }
-    else{
-        NSLog(@"Error querying couchDB, please check the connection is correct %@",error);
-    }
-
-    return currentVersionNumber;
-}
-
--(NSMutableDictionary*) fetchCurrentConfigurationForVersion:(NSNumber*)currentVersion
-{
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* aSnotModel = [objs objectAtIndex:0];
-    //NSDictionary* currentConfig;
-    
-    NSString *urlString = [NSString stringWithFormat:@"http://%@:%u/smellie/_design/smellieMainQuery/_view/pullEllieConfigHeaders?key=[%i]&limit=1",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort],[currentVersion intValue]];
-    
-    NSURL *url = [NSURL URLWithString:urlString];
-    NSData *data = [NSData dataWithContentsOfURL:url];
-    NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    NSError *error =  nil;
-    NSMutableDictionary *currentConfig = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
-    if(!error){
-        NSLog(@"sucessful query with config version %i\n",[currentVersion intValue]);
-
-    }
-    else{
-        NSLog(@"Error querying couchDB, please check the connection is correct %@",error);
-    }
-    
-    return [[[[currentConfig objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"] objectForKey:@"configuration_info"];
 }
 
 //Submit Smellie configuration file to the Database
@@ -1051,7 +981,7 @@
         NSString *currentSepiaInputChannel = [NSString stringWithFormat:@"laserInput%@",[smellieConfigSepiaInputChannel objectValueOfSelectedItem]];
         
         //copy the current object into an array
-        NSMutableDictionary *currentSmellieConfigForSepiaInput = [[configForSmellie objectForKey:currentSepiaInputChannel] mutableCopy];
+        NSMutableDictionary *currentSmellieConfigForSepiaInput = [[[configForSmellie objectForKey:currentSepiaInputChannel] mutableCopy] autorelease];
         
         //update with new value
         [currentSmellieConfigForSepiaInput setObject:[smellieConfigLaserHeadField objectValueOfSelectedItem] forKey:@"laserHeadConnected"];
@@ -1068,7 +998,7 @@
         NSString *currentSepiaInputChannel = [NSString stringWithFormat:@"laserInput%@",[smellieConfigSepiaInputChannel objectValueOfSelectedItem]];
         
         //copy the current object into an array
-        NSMutableDictionary *currentSmellieConfigForSepiaInput = [[configForSmellie objectForKey:currentSepiaInputChannel] mutableCopy];
+        NSMutableDictionary *currentSmellieConfigForSepiaInput = [[[configForSmellie objectForKey:currentSepiaInputChannel] mutableCopy] autorelease];
         
         //update with new value
         [currentSmellieConfigForSepiaInput setObject:[smellieConfigAttenuatorField objectValueOfSelectedItem] forKey:@"splitterTypeConnected"];
@@ -1084,7 +1014,7 @@
         NSString *currentSepiaInputChannel = [NSString stringWithFormat:@"laserInput%@",[smellieConfigSepiaInputChannel objectValueOfSelectedItem]];
         
         //copy the current object into an array
-        NSMutableDictionary *currentSmellieConfigForSepiaInput = [[configForSmellie objectForKey:currentSepiaInputChannel] mutableCopy];
+        NSMutableDictionary *currentSmellieConfigForSepiaInput = [[[configForSmellie objectForKey:currentSepiaInputChannel] mutableCopy] autorelease];
         
         //update with new value
         [currentSmellieConfigForSepiaInput setObject:[smellieConfigFsInputCh objectValueOfSelectedItem] forKey:@"fibreSwitchInputConnected"];
@@ -1122,7 +1052,7 @@
         NSString *currentSepiaInputChannel = [NSString stringWithFormat:@"%@",[smellieConfigFsOutputCh objectValueOfSelectedItem]];
         
         //copy the current object into an array
-        NSMutableDictionary *currentSmellieConfigForSepiaInput = [[configForSmellie objectForKey:currentSepiaInputChannel] mutableCopy];
+        NSMutableDictionary *currentSmellieConfigForSepiaInput = [[[configForSmellie objectForKey:currentSepiaInputChannel] mutableCopy] autorelease];
         
         //update with new value
         [currentSmellieConfigForSepiaInput setObject:[smellieConfigDetectorFibreRef objectValueOfSelectedItem] forKey:@"detectorFibreReference"];
@@ -1160,7 +1090,7 @@ BOOL isNumeric(NSString *s)
             else{
                 NSString *currentSepiaInputChannel = [NSString stringWithFormat:@"laserInput%@",[smellieConfigSepiaInputChannel objectValueOfSelectedItem]];
                 //copy the current object into an array
-                NSMutableDictionary *currentSmellieConfigForSepiaInput = [[configForSmellie objectForKey:currentSepiaInputChannel] mutableCopy];
+                NSMutableDictionary *currentSmellieConfigForSepiaInput = [[[configForSmellie objectForKey:currentSepiaInputChannel] mutableCopy] autorelease];
                 [currentSmellieConfigForSepiaInput
                     setObject:[NSString stringWithString:[smellieConfigAttenutationFactor stringValue]]
                     forKey:@"attenuationFactor"];
@@ -1190,14 +1120,13 @@ BOOL isNumeric(NSString *s)
             else{
                 NSString *currentSepiaInputChannel = [NSString stringWithFormat:@"laserInput%@",[smellieConfigSepiaInputChannel objectValueOfSelectedItem]];
                 //copy the current object into an array
-                NSMutableDictionary *currentSmellieConfigForSepiaInput = [[configForSmellie objectForKey:currentSepiaInputChannel] mutableCopy];
+                NSMutableDictionary *currentSmellieConfigForSepiaInput = [[[configForSmellie objectForKey:currentSepiaInputChannel] mutableCopy] autorelease];
                 [currentSmellieConfigForSepiaInput
                  setObject:[NSString stringWithString:[smellieConfigGainControl stringValue]]
                  forKey:@"gainControlFactor"];
                 
                 [configForSmellie setObject:currentSmellieConfigForSepiaInput forKey:currentSepiaInputChannel];
             }
-            
         }
         else{
             NSLog(@"SMELLIE_CONFIGURATION_BUILDER: Please enter a numerical value for the gain Control Factor\n");
@@ -1209,7 +1138,7 @@ BOOL isNumeric(NSString *s)
 - (IBAction)onClickNumOfPulses:(id)sender
 {
     //copy the current object into an array
-    NSMutableDictionary *currentSmellieConfig = [configForSmellie mutableCopy];
+    NSMutableDictionary *currentSmellieConfig = [[configForSmellie mutableCopy] autorelease];
     
     BOOL isNumOfPulsesNumeric = isNumeric([smellieConfigSelfTestNoOfPulses stringValue]);
     
@@ -1227,7 +1156,7 @@ BOOL isNumeric(NSString *s)
 - (IBAction)onClickSelfTestLasertTrigFreq:(id)sender
 {
     //copy the current object into an array
-    NSMutableDictionary *currentSmellieConfig = [configForSmellie mutableCopy];
+    NSMutableDictionary *currentSmellieConfig = [[configForSmellie mutableCopy] autorelease];
     
     BOOL isLaserFreqNumeric = isNumeric([smellieConfigSelfTestLaserTriggerFreq stringValue]);
     
@@ -1241,11 +1170,9 @@ BOOL isNumeric(NSString *s)
             NSLog(@"SMELLIE_CONFIGURATION_BUILDER: Laser self test frequency has to be between 0.0 and 17000 Hz\n");
             [smellieConfigSelfTestNoOfPulses setFloatValue:10.0];
         }
-        
         else{
             [currentSmellieConfig setObject:[NSString stringWithString:[smellieConfigSelfTestLaserTriggerFreq stringValue]]
                                      forKey:@"selfTestLaserTrigFrequency"];
-    
             configForSmellie = [currentSmellieConfig mutableCopy];
         }
     }
@@ -1257,7 +1184,7 @@ BOOL isNumeric(NSString *s)
 - (IBAction)onClickSelfTestPmtSampleRate:(id)sender
 {
     //copy the current object into an array
-    NSMutableDictionary *currentSmellieConfig = [configForSmellie mutableCopy];
+    NSMutableDictionary *currentSmellieConfig = [[configForSmellie mutableCopy] autorelease];
     
     BOOL isSelfTestPmtSampleRateNumeric = isNumeric([smellieConfigSelfTestPmtSampleRate stringValue]);
     
@@ -1276,7 +1203,7 @@ BOOL isNumeric(NSString *s)
 //PMT samples to take per Laser
 - (IBAction)onClickNumOfPulsesPerLaser:(id)sender
 {
-    NSMutableDictionary *currentSmellieConfig = [configForSmellie mutableCopy];
+    NSMutableDictionary *currentSmellieConfig = [[configForSmellie mutableCopy] autorelease];
     
     BOOL isNumberOfPulsesPerLaserNumeric = isNumeric([smellieConfigSelfTestNoOfPulsesPerLaser stringValue]);
     
@@ -1286,7 +1213,6 @@ BOOL isNumeric(NSString *s)
                                  forKey:@"selfTestNumOfPulsesPerLaser"];
     
         configForSmellie = [currentSmellieConfig mutableCopy];
-        
     }
     else{
         NSLog(@"SMELLIE_CONFIGURATION_BUILDER: Please enter a numerical value for the Self test Pmt samples per laser\n");
@@ -1295,7 +1221,7 @@ BOOL isNumeric(NSString *s)
 
 - (IBAction)onClickNiTriggerOutputPin:(id)sender
 {
-    NSMutableDictionary *currentSmellieConfig = [configForSmellie mutableCopy];
+    NSMutableDictionary *currentSmellieConfig = [[configForSmellie mutableCopy] autorelease];
     
     [currentSmellieConfig setObject:[NSString stringWithString:[smellieConfigSelfTestNiTriggerOutputPin stringValue]]
                              forKey:@"selfTestNiTriggerOutputPin"];
@@ -1304,7 +1230,7 @@ BOOL isNumeric(NSString *s)
 }
 - (IBAction)onClickNiTriggerInputPin:(id)sender
 {
-    NSMutableDictionary *currentSmellieConfig = [configForSmellie mutableCopy];
+    NSMutableDictionary *currentSmellieConfig = [[configForSmellie mutableCopy] autorelease];
     
     [currentSmellieConfig setObject:[NSString stringWithString:[smellieConfigSelfTestNiTriggerInputPin stringValue]]
                              forKey:@"selfTestNiTriggerInputPin"];
@@ -1333,7 +1259,7 @@ BOOL isNumeric(NSString *s)
 //Custom Command for Smellie
 -(IBAction)executeSmellieCmdDirectAction:(id)sender
 {
-    NSString * cmd = [[NSString alloc] init];
+    NSString * cmd = [[[NSString alloc] init] autorelease];
     NSLog(@"CMD %@",[executeCmdBox stringValue]);
     NSLog(@"CMD %i",[executeCmdBox indexOfSelectedItem]);
     
@@ -1392,9 +1318,6 @@ BOOL isNumeric(NSString *s)
     
     [model sendCustomSmellieCmd:cmd withArgument1:arg1 withArgument2:arg2];
 }
-
 //TELLIE functions -------------------------
-
-
 
 @end

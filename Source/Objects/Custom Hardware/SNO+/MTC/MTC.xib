@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14F27" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14F1509" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
         <development version="5100" identifier="xcode"/>
@@ -36,7 +36,6 @@
                 <outlet property="isPulserFixedRateMatrix" destination="4091" id="4096"/>
                 <outlet property="lastFileLoadedField" destination="2059" id="2942"/>
                 <outlet property="load10MhzCounterButton" destination="4155" id="4432"/>
-                <outlet property="loadFilePathField" destination="2066" id="2820"/>
                 <outlet property="loadGTCrateMaskButton" destination="4423" id="4450"/>
                 <outlet property="loadMTCACrateMaskButton" destination="4429" id="4452"/>
                 <outlet property="loadMTCADacsButton" destination="4157" id="4435"/>
@@ -82,7 +81,6 @@
                 <outlet property="window" destination="21" id="307"/>
                 <outlet property="writeValueField" destination="1228" id="2824"/>
                 <outlet property="writeValueStepper" destination="1227" id="1297"/>
-                <outlet property="xilinxFileField" destination="2066" id="3240"/>
                 <outlet property="xilinxFilePathField" destination="2066" id="3568"/>
             </connections>
         </customObject>
@@ -428,7 +426,7 @@
                             <tabViewItem label="Standard Ops" identifier="" id="1358">
                                 <view key="view" id="1359">
                                     <rect key="frame" x="10" y="25" width="773" height="601"/>
-                                    <autoresizingMask key="autoresizingMask"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box borderType="line" titlePosition="noTitle" id="1366">
                                             <rect key="frame" x="15" y="486" width="509" height="111"/>
@@ -969,7 +967,7 @@
                             <tabViewItem label="Settings" identifier="" id="1483">
                                 <view key="view" id="1484">
                                     <rect key="frame" x="10" y="25" width="773" height="601"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box title="MTC/D" borderType="line" id="1488">
                                             <rect key="frame" x="7" y="154" width="361" height="196"/>
@@ -1800,7 +1798,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <button verticalHuggingPriority="750" id="2057">
-                                            <rect key="frame" x="14.5" y="504" width="115" height="28"/>
+                                            <rect key="frame" x="15" y="504" width="115" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Load from DB" bezelStyle="rounded" alignment="center" controlSize="small" enabled="NO" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4011">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1811,7 +1809,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" id="4176">
-                                            <rect key="frame" x="14.5" y="424" width="115" height="28"/>
+                                            <rect key="frame" x="15" y="424" width="115" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Verify settings" bezelStyle="rounded" alignment="center" controlSize="small" enabled="NO" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4177">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1833,7 +1831,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" id="2061">
-                                            <rect key="frame" x="14.5" y="463" width="115" height="28"/>
+                                            <rect key="frame" x="15" y="463" width="115" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Upload to DB" bezelStyle="rounded" alignment="center" controlSize="small" enabled="NO" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4013">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>

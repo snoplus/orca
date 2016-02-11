@@ -621,7 +621,7 @@
 {
     BOOL locked = [gSecurity isLocked:ORRunTypeLock];
     [runTypeLockButton setState: locked];
-    [runTypeMatrix setEnabled: !locked];
+    //[runTypeMatrix setEnabled: !locked];
     [runDefinitionsButton setEnabled:!locked];
     [clearAllTypesButton setEnabled:!locked];
 }
