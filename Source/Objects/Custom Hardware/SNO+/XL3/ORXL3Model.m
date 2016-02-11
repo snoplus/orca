@@ -4969,15 +4969,21 @@ void SwapLongBlock(void* p, int32_t n)
                     NSLogColor([NSColor redColor], @"adding fec to ORCA\n");
 
                     fec = [ObjectFactory makeObject:@"ORFec32Model"];
-                    [[self guardian] addObject:fec];
-                    [[self guardian] place:fec intoSlot:slot];
                     [fec setBoardID:[NSString stringWithFormat:@"%x", fec_config.mbID]];
+
+                    dispatch_sync(dispatch_get_main_queue(), ^{
+                        [[self guardian] addObject:fec];
+                        [[self guardian] place:fec intoSlot:slot];
+                    });
 
                     for (i = 0; i < 4; i++) {
                         db = [ObjectFactory makeObject:@"ORFecDaughterCardModel"];
-                        [fec addObject:db];
-                        [fec place:db intoSlot:i];
                         [db setBoardID:[NSString stringWithFormat:@"%x", fec_config.dbID[i]]];
+
+                        dispatch_sync(dispatch_get_main_queue(), ^{
+                            [fec addObject:db];
+                            [fec place:db intoSlot:i];
+                        });
                     }
                 }
             }

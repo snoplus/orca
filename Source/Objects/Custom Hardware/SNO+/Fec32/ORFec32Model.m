@@ -637,9 +637,12 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
             if (config->dbID[i] != 0) {
                 NSLogColor([NSColor redColor], @"crate %02d slot %02d db %d exists accoring to XL3. Adding to ORCA...\n", [self crateNumber], [self stationNumber], i);
                 db = [ObjectFactory makeObject:@"ORFecDaughterCardModel"];
-                [self addObject:db];
-                [self place:db intoSlot:i];
                 [db setBoardID:[NSString stringWithFormat:@"%x", config->dbID[i]]];
+
+                dispatch_sync(dispatch_get_main_queue(), ^{
+                    [self addObject:db];
+                    [self place:db intoSlot:i];
+                });
             }
         }
     }
