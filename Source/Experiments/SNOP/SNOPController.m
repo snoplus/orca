@@ -94,6 +94,8 @@ smellieRunFile;
     
     //pull the information from the SMELLIE DB
     [model getSmellieRunListInfo];
+    [self mtcDataBaseChanged:nil];
+    [self refreshStandardRuns];
 	[super awakeFromNib];
     [self performSelector:@selector(updateWindow)withObject:self afterDelay:0.1];
 }
@@ -1086,8 +1088,9 @@ smellieRunFile;
     [subTimeTextField setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunPopupMenu setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunSaveButton setEnabled:!lockedOrNotRunningMaintenance];
+    [standardRunSaveDefaultsButton setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunLoadButton setEnabled:!lockedOrNotRunningMaintenance];
-    [standardRunDeleteButton setEnabled:!lockedOrNotRunningMaintenance];
+    [standardRunLoadDefaultsButton setEnabled:!lockedOrNotRunningMaintenance];
     [maintenanceRunBox setEnabled:!lockedOrNotRunningMaintenance];
     
     [runStatusTextField setStringValue:@"UNLOCKED"];
@@ -1176,7 +1179,7 @@ smellieRunFile;
     
 }
 
-- (IBAction)loadStandardRunFromDBAsDefaultAction:(id)sender {
+- (IBAction)loadDefaultStandardRunFromDBDefaultAction:(id)sender {
     
     NSString *standardRun = [standardRunPopupMenu objectValueOfSelectedItem];
     NSString *standardRunVer = @"DEFAULT";
@@ -1193,7 +1196,8 @@ smellieRunFile;
     BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Overwriting stored values for run \"%@\" with version \"%@\"", standardRun,standardRunVer],@"Is this really what you want?",@"Cancel",@"Yes, Save it",nil);
     
     if(!cancel) [model saveStandardRun:standardRun withVersion:standardRunVer];
-    
+    [self displayThresholdsFromDB:[model standardRunVersion]];
+
 }
 
 - (IBAction)saveStandardRunToDBAsDefaultAction:(id)sender {
@@ -1201,25 +1205,24 @@ smellieRunFile;
     NSString *standardRun = [standardRunPopupMenu objectValueOfSelectedItem];
     NSString *standardRunVer = @"DEFAULT";
     
-    BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Overwriting stored values for run \"%@\" with version \"%@\"", standardRun,standardRunVer],@"Is this really what you want?",@"Cancel",@"Yes, Save it",nil);
+    BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Overwriting stored values for run \"%@\" as DEFAULT", standardRun],@"Is this really what you want?",@"Cancel",@"Yes, Save it",nil);
     
     if(!cancel) [model saveStandardRun:standardRun withVersion:standardRunVer];
-    
-}
+    [self displayThresholdsFromDB:@"DEFAULT"];
 
-- (IBAction)deleteStandardRun:(id)sender {
-    [standardRunPopupMenu removeItemWithObjectValue:[standardRunPopupMenu stringValue]];
-    [standardRunPopupMenu selectItemAtIndex:0];
 }
 
 // Create a new SR item if doesn't exist, set the runType string value and query the DB to display the trigger configuration
 - (IBAction)standardRunPopupAction:(id)sender {
 
-    //Create new SR if does not exist
     NSString *standardRun = [standardRunPopupMenu stringValue];
+    //Create new SR if does not exist
     if ([standardRunPopupMenu indexOfItemWithObjectValue:standardRun] == NSNotFound && [standardRun isNotEqualTo:@""]){
         BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Creating new Standard Run: \"%@\"", standardRun],@"Is this really what you want?",@"Cancel",@"Yes, Make New Standard Run",nil);
-        if(!cancel){
+        if(cancel){
+            [standardRunPopupMenu selectItemWithObjectValue:[model standardRunType]];
+        }
+        else{
             [standardRunPopupMenu addItemWithObjectValue:standardRun];
             [standardRunPopupMenu selectItemWithObjectValue:standardRun];
         }
@@ -1227,51 +1230,28 @@ smellieRunFile;
     
     //Set run type name
     [model setStandardRunType:standardRun];
-    
-    
-    //Fetch DB and display trigger configuration in GUI
-    //Query the OrcaDB and get a dictionary with the parameters
-    NSString *urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/orca/_design/standardRuns/_view/getStandardRuns?startkey=[\"%@\",\"%@\",{}]&endkey=[\"%@\",\"%@\",0]&descending=True&include_docs=True",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort],[model standardRunType],[model standardRunVersion], [model standardRunType],[model standardRunVersion]];
-    
-    NSString* urlStringScaped = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    [self refreshStandardRunVersions];
 
-    NSLog(@"%@",urlStringScaped);
-    
-    NSURL *url = [NSURL URLWithString:urlStringScaped];
-    NSData *data = [NSData dataWithContentsOfURL:url];
-    NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    NSError *error =  nil;
-    NSDictionary *detectorSettings = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
-
-    if(error) {
-        NSLog(@"Error querying couchDB, please check the connection is correct: \n %@ \n", ret);
-        return;
-    }
-
-    //Display configuration in GUI
-    [[standardRunThresStoredValues cellAtRow:0 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Hi,Threshold"] intValue]];
-    [[standardRunThresStoredValues cellAtRow:1 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Med,Threshold"] intValue]];
-    [[standardRunThresStoredValues cellAtRow:2 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Lo,Threshold"] intValue]];
-    [[standardRunThresStoredValues cellAtRow:3 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20,Threshold"] intValue]];
-    [[standardRunThresStoredValues cellAtRow:4 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20LB,Threshold"] intValue]];
-    [[standardRunThresStoredValues cellAtRow:5 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLN,Threshold"] intValue]];
-    [[standardRunThresStoredValues cellAtRow:6 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumHi,Threshold"] intValue]];
-    [[standardRunThresStoredValues cellAtRow:7 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumLow,Threshold"] intValue]];
-    [[standardRunThresStoredValues cellAtRow:8 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLEHi,Threshold"] intValue]];
-    [[standardRunThresStoredValues cellAtRow:9 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLELo,Threshold"] intValue]];
-    [[standardRunThresStoredValues cellAtRow:10 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,Nhit100LoPrescale"] intValue]];
-    [[standardRunThresStoredValues cellAtRow:11 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,PulserPeriod"] intValue]];
+    [self displayThresholdsFromDB:[model standardRunVersion]];
+    [self displayThresholdsFromDB:@"DEFAULT"];
     
 }
 
 - (IBAction)standardRunVersionPopupAction:(id)sender {
-
+    
     //Create new SR version if does not exist
     NSString *standardRun = [standardRunPopupMenu stringValue];
     NSString *standardRunVer = [standardRunVersionPopupMenu stringValue];
+    if([standardRunVer isEqualToString:@"DEFAULT"]) {
+        ORRunAlertPanel([NSString stringWithFormat:@"Can create a version called DEFAULT"], @"It is a protected word",@"Cancel",@"OK",nil);
+        return;
+    }
     if ([standardRunVersionPopupMenu indexOfItemWithObjectValue:standardRunVer] == NSNotFound && [standardRunVer isNotEqualTo:@""]){
         BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Creating new Version: \"%@\" of Standard Run: \"%@\"", standardRunVer, standardRun], @"Is this really what you want?",@"Cancel",@"Yes, Make New Version",nil);
-        if(!cancel){
+        if(cancel){
+            [standardRunVersionPopupMenu selectItemWithObjectValue:[model standardRunVersion]];
+        }
+        else{
             [standardRunVersionPopupMenu addItemWithObjectValue:standardRunVer];
             [standardRunVersionPopupMenu selectItemWithObjectValue:standardRunVer];
         }
@@ -1280,6 +1260,164 @@ smellieRunFile;
     //Set run type name
     [model setStandardRunVersion:standardRunVer];
     
+    [self displayThresholdsFromDB:[model standardRunVersion]];
+    [self displayThresholdsFromDB:@"DEFAULT"];
+    
+}
+
+
+-(void) displayThresholdsFromDB:(NSString*)stdrunversion {
+    
+    if(stdrunversion == nil){
+        for (int i=0; i<[standardRunThresDefaultValues numberOfRows];i++) {
+            [[standardRunThresStoredValues cellAtRow:i column:0] setStringValue:@"--"];
+        }
+        return;
+    }
+    
+    //Fetch DB and display trigger configuration in GUI
+    //Query the OrcaDB and get a dictionary with the parameters
+    NSString *urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/orca/_design/standardRuns/_view/getStandardRuns?startkey=[\"%@\",\"%@\",{}]&endkey=[\"%@\",\"%@\",0]&descending=True&include_docs=True",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort],[model standardRunType],stdrunversion, [model standardRunType],stdrunversion];
+    
+    NSString* urlStringScaped = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    
+//  NSLog(@"%@\n",urlStringScaped);
+    
+    NSURL *url = [NSURL URLWithString:urlStringScaped];
+    NSData *data = [NSData dataWithContentsOfURL:url];
+    NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    NSError *error =  nil;
+    NSDictionary *detectorSettings = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
+
+    
+    
+    //If the run does not exist
+    if([[detectorSettings valueForKey:@"rows"] count] == 0){
+        if([stdrunversion isEqualToString:@"DEFAULT"]){
+            for (int i=0; i<[standardRunThresDefaultValues numberOfRows];i++) {
+                [[standardRunThresDefaultValues cellAtRow:i column:0] setStringValue:@"--"];
+            }
+        }
+        else{
+            for (int i=0; i<[standardRunThresStoredValues numberOfRows];i++) {
+                [[standardRunThresStoredValues cellAtRow:i column:0] setStringValue:@"--"];
+            }
+        }
+        return;
+    }
+    
+    if(error) {
+        NSLog(@"Error querying couchDB, please check the connection is correct: \n %@ \n", ret);
+        return;
+    }
+    
+    if([stdrunversion isEqualToString:@"DEFAULT"]){
+        [[standardRunThresDefaultValues cellAtRow:0 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Hi,Threshold"] intValue]];
+        [[standardRunThresDefaultValues cellAtRow:1 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Med,Threshold"] intValue]];
+        [[standardRunThresDefaultValues cellAtRow:2 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Lo,Threshold"] intValue]];
+        [[standardRunThresDefaultValues cellAtRow:3 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20,Threshold"] intValue]];
+        [[standardRunThresDefaultValues cellAtRow:4 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20LB,Threshold"] intValue]];
+        [[standardRunThresDefaultValues cellAtRow:5 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLN,Threshold"] intValue]];
+        [[standardRunThresDefaultValues cellAtRow:6 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumHi,Threshold"] intValue]];
+        [[standardRunThresDefaultValues cellAtRow:7 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumLow,Threshold"] intValue]];
+        [[standardRunThresDefaultValues cellAtRow:8 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLEHi,Threshold"] intValue]];
+        [[standardRunThresDefaultValues cellAtRow:9 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLELo,Threshold"] intValue]];
+        [[standardRunThresDefaultValues cellAtRow:10 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,Nhit100LoPrescale"] intValue]];
+        [[standardRunThresDefaultValues cellAtRow:11 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,PulserPeriod"] intValue]];
+    }
+    else{
+        //Display configuration in GUI
+        [[standardRunThresStoredValues cellAtRow:0 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Hi,Threshold"] intValue]];
+        [[standardRunThresStoredValues cellAtRow:1 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Med,Threshold"] intValue]];
+        [[standardRunThresStoredValues cellAtRow:2 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Lo,Threshold"] intValue]];
+        [[standardRunThresStoredValues cellAtRow:3 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20,Threshold"] intValue]];
+        [[standardRunThresStoredValues cellAtRow:4 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20LB,Threshold"] intValue]];
+        [[standardRunThresStoredValues cellAtRow:5 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLN,Threshold"] intValue]];
+        [[standardRunThresStoredValues cellAtRow:6 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumHi,Threshold"] intValue]];
+        [[standardRunThresStoredValues cellAtRow:7 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumLow,Threshold"] intValue]];
+        [[standardRunThresStoredValues cellAtRow:8 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLEHi,Threshold"] intValue]];
+        [[standardRunThresStoredValues cellAtRow:9 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLELo,Threshold"] intValue]];
+        [[standardRunThresStoredValues cellAtRow:10 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,Nhit100LoPrescale"] intValue]];
+        [[standardRunThresStoredValues cellAtRow:11 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,PulserPeriod"] intValue]];
+    }
+}
+
+- (void) refreshStandardRuns {
+    
+    //Clear first
+    [standardRunPopupMenu removeAllItems];
+    
+    NSString *urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/orca/_design/standardRuns/_view/getStandardRuns",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort]];
+
+    NSString* urlStringScaped = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    
+//    NSLog(@"%@\n",urlStringScaped);
+
+    NSURL *url = [NSURL URLWithString:urlStringScaped];
+    NSData *data = [NSData dataWithContentsOfURL:url];
+    NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    NSError *error =  nil;
+    NSDictionary *standardRunTypes = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
+    
+    if(error) {
+        NSLog(@"Error querying couchDB, please check the connection is correct: \n %@ \n", ret);
+        return;
+    }
+
+    for(id entry in [standardRunTypes valueForKey:@"rows"]){
+        NSString *runtype = [entry valueForKey:@"value"];
+        if([standardRunPopupMenu indexOfItemWithObjectValue:runtype]==NSNotFound)[standardRunPopupMenu addItemWithObjectValue:runtype];
+    }
+    
+    //Select first item in popup menu
+    [standardRunPopupMenu selectItemAtIndex:0];
+    [self refreshStandardRunVersions];
+    [model setStandardRunType:[standardRunPopupMenu stringValue]];
+    [model setStandardRunVersion:[standardRunVersionPopupMenu stringValue]];
+    
+    [self displayThresholdsFromDB:[model standardRunVersion]];
+    [self displayThresholdsFromDB:@"DEFAULT"];
+    
+}
+
+- (void) refreshStandardRunVersions {
+    
+    //Clear first
+    [model setStandardRunVersion:nil];
+    [standardRunVersionPopupMenu deselectItemAtIndex:[standardRunVersionPopupMenu indexOfSelectedItem]];
+    [standardRunVersionPopupMenu removeAllItems];
+
+    NSString *urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/orca/_design/standardRuns/_view/getStandardRuns",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort]];
+    
+    NSString* urlStringScaped = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    
+//    NSLog(@"%@\n",urlStringScaped);
+    
+    NSURL *url = [NSURL URLWithString:urlStringScaped];
+    NSData *data = [NSData dataWithContentsOfURL:url];
+    NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    NSError *error =  nil;
+    NSDictionary *standardRunVersions = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
+    
+    if(error) {
+        NSLog(@"Error querying couchDB, please check the connection is correct: \n %@ \n", ret);
+        return;
+    }
+    
+    for(id entry in [standardRunVersions valueForKey:@"rows"]){
+        NSString *runtype = [[entry valueForKey:@"key"] objectAtIndex:0];
+        NSString *runversion = [[entry valueForKey:@"key"] objectAtIndex:1];
+        if([runversion isEqualToString:@"DEFAULT"]) continue;
+        if([runtype isEqualToString:[model standardRunType]])
+            if([standardRunVersionPopupMenu indexOfItemWithObjectValue:runversion]==NSNotFound)[standardRunVersionPopupMenu addItemWithObjectValue:runversion];
+    }
+    
+    //Select first item in popup menu
+    if([standardRunVersionPopupMenu numberOfItems] == 0) return;
+    [standardRunVersionPopupMenu selectItemAtIndex:0];
+    NSString *standardRunVersion = [standardRunVersionPopupMenu stringValue];
+    [model setStandardRunVersion:standardRunVersion];
+
 }
 
 @end

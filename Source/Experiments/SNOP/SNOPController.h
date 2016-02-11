@@ -58,8 +58,9 @@
     IBOutlet NSComboBox *standardRunPopupMenu;
     IBOutlet NSComboBox *standardRunVersionPopupMenu;
     IBOutlet NSButton *standardRunLoadButton;
+    IBOutlet NSButton *standardRunLoadDefaultsButton;
     IBOutlet NSButton *standardRunSaveButton;
-    IBOutlet NSButton *standardRunDeleteButton;
+    IBOutlet NSButton *standardRunSaveDefaultsButton;
     IBOutlet NSMatrix *standardRunThresNewValues;
     IBOutlet NSMatrix *standardRunThresStoredValues;
     IBOutlet NSMatrix *standardRunThresDefaultValues;
