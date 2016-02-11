@@ -1780,7 +1780,7 @@ void SwapLongBlock(void* p, int32_t n)
 
     /* Set the sequencer masks separately because if we are doing a registers
      * only init, they are not updated. */
-    [self setSequencerMasks: slotMask];
+    if (shiftRegOnly) [self setSequencerMasks: slotMask];
 
     payload.numberBytesInPayload = sizeof(CrateInitSetupArgs);
 
