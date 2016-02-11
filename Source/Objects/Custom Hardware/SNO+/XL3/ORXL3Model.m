@@ -4973,7 +4973,7 @@ void SwapLongBlock(void* p, int32_t n)
 
                     dispatch_sync(dispatch_get_main_queue(), ^{
                         [[self guardian] addObject:fec];
-                        [[self guardian] place:fec intoSlot:slot];
+                        [[self guardian] place:fec intoSlot:16-slot];
                     });
 
                     for (i = 0; i < 4; i++) {
