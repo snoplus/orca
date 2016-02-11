@@ -307,9 +307,6 @@ enum {
 - (void) checkCrateConfig: (BuildCrateConfigResults *)r;
 
 - (uint32_t) getSlotsPresent;
-//- (void) initCrateRegistersOnly;
-//- (void) initCrateWithXilinx:(BOOL)aXilinxFlag autoInit:(BOOL)anAutoInitFlag;
-//- (void) initCrateWithDict:(NSDictionary*)argDict;
 - (void) orcaToHw;
 
 #pragma mark •••Basic Ops
