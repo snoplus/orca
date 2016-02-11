@@ -1846,6 +1846,81 @@ void SwapLongBlock(void* p, int32_t n)
     return 0;
 }
 
+- (void) initCrateDone: (CrateInitResults *)r
+{
+    /* Checks the hardware configuration sent back from the XL3 after
+     * a full crate init. */
+
+    int slot, i;
+    FECConfiguration *fec;
+
+    if (r == NULL || r->errorFlags) {
+        /* crate init failed */
+        return;
+    }
+
+    for (slot = 0; slot < 16; slot++) {
+        fec = &r->hwareVals[slot];
+        fec->mbID = swapShort(fec->mbID);
+
+        for (i = 0; i < 4; i++) {
+            fec->dbID[i] = swapShort(fec->dbID[i]);
+        }
+    }
+
+    [self checkCrateConfig: (BuildCrateConfigResults *)r];
+}
+
+- (void) checkCrateConfig: (BuildCrateConfigResults *)r
+{
+    int slot, i;
+    ORFec32Model *fec;
+    ORFecDaughterCardModel *db;
+    FECConfiguration fec_config;
+
+    if (r == NULL) {
+        NSLogColor([NSColor redColor], @"checkCrateConfig: config results is NULL!\n");
+        return;
+    }
+
+    @synchronized(self) {
+        for (slot = 0; slot < 16; slot++) {
+            fec_config = r->hwareVals[slot];
+            fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
+
+            if (fec) {
+                [fec checkConfig:&fec_config];
+            } else {
+                if (fec_config.mbID) {
+                    NSLogColor([NSColor redColor], @"adding fec to ORCA\n");
+
+                    fec = [ObjectFactory makeObject:@"ORFec32Model"];
+                    [fec setBoardID:[NSString stringWithFormat:@"%x", fec_config.mbID]];
+
+                    dispatch_sync(dispatch_get_main_queue(), ^{
+                        [[self guardian] addObject:fec];
+                        [[self guardian] place:fec intoSlot:16-slot];
+                    });
+
+                    for (i = 0; i < 4; i++) {
+                        db = [ObjectFactory makeObject:@"ORFecDaughterCardModel"];
+                        [db setBoardID:[NSString stringWithFormat:@"%x", fec_config.dbID[i]]];
+
+                        dispatch_sync(dispatch_get_main_queue(), ^{
+                            [fec addObject:db];
+                            [fec place:db intoSlot:i];
+                        });
+                    }
+                }
+            }
+        }
+
+        // update XL3 alarm levels on safe init
+        if ([self isXl3VltThresholdInInit]) [self setVltThreshold];
+
+    }
+}
+
 - (void) initCrateRegistersOnly
 {
     if (![[self xl3Link] isConnected]) {
@@ -4917,82 +4992,6 @@ void SwapLongBlock(void* p, int32_t n)
                            withObject:[resp autorelease] waitUntilDone:NO];
 
     [initPool release];
-}
-
-- (void) initCrateDone: (CrateInitResults *)r
-{
-    /* Checks the hardware configuration sent back from the XL3 after
-     * a full crate init. */
-
-    int slot, i;
-    FECConfiguration *fec;
-
-    if (r == NULL || r->errorFlags) {
-        /* crate init failed */
-        return;
-    }
-
-    for (slot = 0; slot < 16; slot++) {
-        fec = &r->hwareVals[i];
-        fec->mbID = swapShort(fec->mbID);
-
-        for (i = 0; i < 4; i++) {
-            fec->dbID[i] = swapShort(fec->dbID[i]);
-        }
-    }
-
-    [self checkCrateConfig: (BuildCrateConfigResults *)r];
-}
-
-- (void) checkCrateConfig: (BuildCrateConfigResults *)r
-{
-    int slot, i;
-    ORFec32Model *fec;
-    ORFecDaughterCardModel *db;
-    ORSNOCrateModel *crate;
-    FECConfiguration fec_config;
-
-    if (r == NULL) {
-        NSLogColor([NSColor redColor], @"checkCrateConfig: config results is NULL!\n");
-        return;
-    }
-
-    @synchronized(self) {
-        for (slot = 0; slot < 16; slot++) {
-            fec_config = r->hwareVals[slot];
-            fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
-
-            if (fec) {
-                [fec checkConfig:&fec_config];
-            } else {
-                if (fec_config.mbID) {
-                    NSLogColor([NSColor redColor], @"adding fec to ORCA\n");
-
-                    fec = [ObjectFactory makeObject:@"ORFec32Model"];
-                    [fec setBoardID:[NSString stringWithFormat:@"%x", fec_config.mbID]];
-
-                    dispatch_sync(dispatch_get_main_queue(), ^{
-                        [[self guardian] addObject:fec];
-                        [[self guardian] place:fec intoSlot:16-slot];
-                    });
-
-                    for (i = 0; i < 4; i++) {
-                        db = [ObjectFactory makeObject:@"ORFecDaughterCardModel"];
-                        [db setBoardID:[NSString stringWithFormat:@"%x", fec_config.dbID[i]]];
-
-                        dispatch_sync(dispatch_get_main_queue(), ^{
-                            [fec addObject:db];
-                            [fec place:db intoSlot:i];
-                        });
-                    }
-                }
-            }
-        }
-
-        // update XL3 alarm levels on safe init
-        if ([self isXl3VltThresholdInInit]) [self setVltThreshold];
-
-    }
 }
 
 - (void) _setPedestalInParallelWorker
