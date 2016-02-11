@@ -21,6 +21,7 @@
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Imported Files
 #import "ORDataTaker.h"
+#import "ORAdcProcessing.h"
 #import "ORIpeCard.h"
 #import "SBC_Linking.h"
 #import "SBC_Config.h"
@@ -81,6 +82,7 @@ enum AmptekDP5ASCIICommandEnum {
 #define kFirmwareVersionOffset   24
 #define kFPGAVersionOffset       25
 #define kSerialNumberOffset      26
+#define kBoardTemperature        34
 #define kFlags1Offset            35
 #define kFlags2Offset            36
 #define kFirmwareBuildNumberOffset            37
@@ -154,7 +156,7 @@ enum AmptekDP5ASCIICommandEnum {
 #define kTrgTimingTrgWindow		(0x00000007 <<  16) //R/W
 #define kTrgEndPageDelay		(0x000007FF <<   0) //R/W
 
-@interface ORAmptekDP5Model : OrcaObject <ORDataTaker>
+@interface ORAmptekDP5Model : OrcaObject <ORDataTaker,ORAdcProcessing>  //added ORAdcProcessing 2016-02-11 -tb-
 {
 	@private
 		unsigned long	hwVersion;
@@ -312,6 +314,7 @@ enum AmptekDP5ASCIICommandEnum {
     int realTime;
     int fastCounter;
     int slowCounter;
+    int boardTemperature;
     
     BOOL needToDropFirstSpectrum;
 
@@ -336,6 +339,8 @@ enum AmptekDP5ASCIICommandEnum {
 - (void) queueStringCommand:(NSString*)aCommand;
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Accessors
+- (int) boardTemperature;
+- (void) setBoardTemperature:(int)aBoardTemperature;
 - (int) slowCounter;
 - (void) setSlowCounter:(int)aSlowCounter;
 - (int) fastCounter;
@@ -706,6 +711,30 @@ enum AmptekDP5ASCIICommandEnum {
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherCard;
 
+
+#pragma mark •••Related to Adc or Bit Processing Protocol
+// methods for setting LoAlarm, HiAlarm, LoLimit (=minValue), HiLimit (=maxValue) (from IPESlowControlModel -tb-)
+//- (void) setLoAlarmForChan:(int)channel value:(double)aValue;
+//- (void) setHiAlarmForChan:(int)channel value:(double)aValue;
+//- (void) setLoLimitForChan:(int)channel value:(double)aValue;
+//- (void) setHiLimitForChan:(int)channel value:(double)aValue;
+
+#pragma mark •••Adc or Bit Processing Protocol
+//- (void)processIsStarting;
+//- (void)processIsStopping;
+- (void) startProcessCycle;
+- (void) endProcessCycle;
+- (BOOL) processValue:(int)channel;
+- (void) setProcessOutput:(int)channel value:(int)value; //not usually used, but needed for easy compatibility with the bit protocol
+- (NSString*) processingTitle;
+- (double) convertedValue:(int)channel;
+- (double) maxValueForChan:(int)channel;
+- (double) minValueForChan:(int)channel;
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel;
+
+
+
+
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢DataTaker
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
@@ -732,6 +761,7 @@ enum AmptekDP5ASCIICommandEnum {
 
 @end
 
+extern NSString* ORAmptekDP5ModelBoardTemperatureChanged;
 extern NSString* ORAmptekDP5ModelSlowCounterChanged;
 extern NSString* ORAmptekDP5ModelFastCounterChanged;
 extern NSString* ORAmptekDP5ModelRealTimeChanged;

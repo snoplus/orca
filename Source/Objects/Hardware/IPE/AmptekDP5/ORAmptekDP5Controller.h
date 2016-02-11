@@ -29,6 +29,7 @@
 @interface ORAmptekDP5Controller : OrcaObjectController {
     // status table view
 	IBOutlet   NSTextField* slowCounterTextField;
+	IBOutlet   NSTextField* boardTemperatureTextField;
 	IBOutlet   NSTextField* fastCounterTextField;
 	IBOutlet   NSTextField* realTimeTextField;
 	IBOutlet   NSTextField* acquisitionTimeTextField;
@@ -195,6 +196,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Interface Management
+- (void) boardTemperatureChanged:(NSNotification*)aNote;
 - (void) slowCounterChanged:(NSNotification*)aNote;
 - (void) fastCounterChanged:(NSNotification*)aNote;
 - (void) realTimeChanged:(NSNotification*)aNote;
