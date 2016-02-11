@@ -1161,10 +1161,10 @@ smellieRunFile;
     [[standardRunThresNewValues cellAtRow:3 column:0] setFloatValue:[mtcModel dbFloatByIndex:kNHit20Threshold]];
     [[standardRunThresNewValues cellAtRow:4 column:0] setFloatValue:[mtcModel dbFloatByIndex:kNHit20LBThreshold]];
     [[standardRunThresNewValues cellAtRow:5 column:0] setFloatValue:[mtcModel dbFloatByIndex:kOWLNThreshold]];
-    [[standardRunThresNewValues cellAtRow:6 column:0] setFloatValue:[mtcModel dbFloatByIndex:kESumHiThreshold]];
-    [[standardRunThresNewValues cellAtRow:7 column:0] setFloatValue:[mtcModel dbFloatByIndex:kESumLowThreshold]];
-    [[standardRunThresNewValues cellAtRow:8 column:0] setFloatValue:[mtcModel dbFloatByIndex:kOWLEHiThreshold]];
-    [[standardRunThresNewValues cellAtRow:9 column:0] setFloatValue:[mtcModel dbFloatByIndex:kOWLELoThreshold]];
+    [[standardRunThresNewValues cellAtRow:6 column:0] setFloatValue:round([mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kESumHiThreshold]])];
+    [[standardRunThresNewValues cellAtRow:7 column:0] setFloatValue:round([mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kESumLowThreshold]])];
+    [[standardRunThresNewValues cellAtRow:8 column:0] setFloatValue:round([mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kOWLEHiThreshold]])];
+    [[standardRunThresNewValues cellAtRow:9 column:0] setFloatValue:round([mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kOWLELoThreshold]])];
     [[standardRunThresNewValues cellAtRow:10 column:0] setFloatValue:[mtcModel dbFloatByIndex:kNhit100LoPrescale]];
     [[standardRunThresNewValues cellAtRow:11 column:0] setFloatValue:[mtcModel dbFloatByIndex:kPulserPeriod]];
 
@@ -1268,6 +1268,11 @@ smellieRunFile;
 
 -(void) displayThresholdsFromDB:(NSString*)stdrunversion {
     
+    //Get MTC model
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    ORMTCModel* mtcModel = [objs objectAtIndex:0];
+    
+    //If the version is not set display null values and quit
     if(stdrunversion == nil){
         for (int i=0; i<[standardRunThresDefaultValues numberOfRows];i++) {
             [[standardRunThresStoredValues cellAtRow:i column:0] setStringValue:@"--"];
@@ -1318,10 +1323,14 @@ smellieRunFile;
         [[standardRunThresDefaultValues cellAtRow:3 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20,Threshold"] intValue]];
         [[standardRunThresDefaultValues cellAtRow:4 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20LB,Threshold"] intValue]];
         [[standardRunThresDefaultValues cellAtRow:5 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLN,Threshold"] intValue]];
-        [[standardRunThresDefaultValues cellAtRow:6 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumHi,Threshold"] intValue]];
-        [[standardRunThresDefaultValues cellAtRow:7 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumLow,Threshold"] intValue]];
-        [[standardRunThresDefaultValues cellAtRow:8 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLEHi,Threshold"] intValue]];
-        [[standardRunThresDefaultValues cellAtRow:9 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLELo,Threshold"] intValue]];
+        float nhits = [[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumHi,Threshold"] floatValue];
+        [[standardRunThresDefaultValues cellAtRow:6 column:0] setFloatValue: round([mtcModel rawTomVolts:nhits])];
+        nhits = [[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumLow,Threshold"] floatValue];
+        [[standardRunThresDefaultValues cellAtRow:7 column:0] setFloatValue: round([mtcModel rawTomVolts:nhits])];
+        nhits = [[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLEHi,Threshold"] floatValue];
+        [[standardRunThresDefaultValues cellAtRow:8 column:0] setFloatValue: round([mtcModel rawTomVolts:nhits])];
+        nhits = [[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLELo,Threshold"] floatValue];
+        [[standardRunThresDefaultValues cellAtRow:9 column:0] setFloatValue: round([mtcModel rawTomVolts:nhits])];
         [[standardRunThresDefaultValues cellAtRow:10 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,Nhit100LoPrescale"] intValue]];
         [[standardRunThresDefaultValues cellAtRow:11 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,PulserPeriod"] intValue]];
     }
@@ -1333,10 +1342,14 @@ smellieRunFile;
         [[standardRunThresStoredValues cellAtRow:3 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20,Threshold"] intValue]];
         [[standardRunThresStoredValues cellAtRow:4 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20LB,Threshold"] intValue]];
         [[standardRunThresStoredValues cellAtRow:5 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLN,Threshold"] intValue]];
-        [[standardRunThresStoredValues cellAtRow:6 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumHi,Threshold"] intValue]];
-        [[standardRunThresStoredValues cellAtRow:7 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumLow,Threshold"] intValue]];
-        [[standardRunThresStoredValues cellAtRow:8 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLEHi,Threshold"] intValue]];
-        [[standardRunThresStoredValues cellAtRow:9 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLELo,Threshold"] intValue]];
+        float nhits = [[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumHi,Threshold"] floatValue];
+        [[standardRunThresStoredValues cellAtRow:6 column:0] setFloatValue: round([mtcModel rawTomVolts:nhits])];
+        nhits = [[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumLow,Threshold"] floatValue];
+        [[standardRunThresStoredValues cellAtRow:7 column:0] setFloatValue: round([mtcModel rawTomVolts:nhits])];
+        nhits = [[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLEHi,Threshold"] floatValue];
+        [[standardRunThresStoredValues cellAtRow:8 column:0] setFloatValue: round([mtcModel rawTomVolts:nhits])];
+        nhits = [[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLELo,Threshold"] floatValue];
+        [[standardRunThresStoredValues cellAtRow:9 column:0] setFloatValue: round([mtcModel rawTomVolts:nhits])];
         [[standardRunThresStoredValues cellAtRow:10 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,Nhit100LoPrescale"] intValue]];
         [[standardRunThresStoredValues cellAtRow:11 column:0] setIntValue:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,PulserPeriod"] intValue]];
     }
@@ -1371,9 +1384,8 @@ smellieRunFile;
     
     //Select first item in popup menu
     [standardRunPopupMenu selectItemAtIndex:0];
-    [self refreshStandardRunVersions];
     [model setStandardRunType:[standardRunPopupMenu stringValue]];
-    [model setStandardRunVersion:[standardRunVersionPopupMenu stringValue]];
+    [self refreshStandardRunVersions];
     
     [self displayThresholdsFromDB:[model standardRunVersion]];
     [self displayThresholdsFromDB:@"DEFAULT"];
