@@ -457,9 +457,19 @@ NSString* fltEdelweissV4TriggerSourceNamesXXX[2][kFltNumberTriggerSources] = {
                          name : ORAmptekDP5ModelSlowCounterChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(boardTemperatureChanged:)
+                         name : ORAmptekDP5ModelBoardTemperatureChanged
+						object: model];
+
 }
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Interface Management
+
+- (void) boardTemperatureChanged:(NSNotification*)aNote
+{
+	[boardTemperatureTextField setIntValue: [model boardTemperature]];
+}
 
 - (void) slowCounterChanged:(NSNotification*)aNote
 {
@@ -1032,6 +1042,7 @@ return;
 	[self realTimeChanged:nil];
 	[self fastCounterChanged:nil];
 	[self slowCounterChanged:nil];
+	[self boardTemperatureChanged:nil];
 }
 
 - (void) setWindowTitle
