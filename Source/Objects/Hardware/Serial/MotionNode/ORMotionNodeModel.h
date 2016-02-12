@@ -119,7 +119,8 @@ typedef struct MotionNodeHistoryHeader {
     NSDate*         specialStartTime;
     BOOL            eventInProgress;
     int             postEventCount;
-    
+    int             averageCount;
+
     MotionNodeHistoryData*  historyPtr;
     
     NSData*         oldHistoryData;
