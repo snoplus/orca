@@ -124,8 +124,8 @@
 // BOARD ID STUFF
 #define BOARD_ID_CLOCK (0x00000001)
 #define BOARD_ID_D_IN (0x00000080)
-#define BOARD_ID_PRE (0x00000100)
-#define BOARD_ID_PE (0x00000200)
+//#define BOARD_ID_PRE (0x00000100)
+//#define BOARD_ID_PE (0x00000200)
 #define BOARD_ID_D_OUT (0x00000400)
 #define BOARD_ID_CMD_READ (0x180)
 #define BOARD_ID_CMD_WRITE (0x140)
@@ -140,10 +140,10 @@
 #define VMON_BUSY_BIT (0x00000100)
 
 //FEC HV STUFF
-#define HV_CSR_CLK	 (0x1)
-#define HV_CSR_DATIN  (0x2)
-#define HV_CSR_LOAD   (0x4)
-#define HV_CSR_DATOUT (0x8)
+//#define HV_CSR_CLK	 (0x1)
+//#define HV_CSR_DATIN  (0x2)
+//#define HV_CSR_LOAD   (0x4)
+//#define HV_CSR_DATOUT (0x8)
 
 //FEC GENERAL CSR STUFF
 #define FEC_CSR_CRATE_OFFSET (11)
