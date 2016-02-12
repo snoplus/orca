@@ -1249,8 +1249,10 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
     }
     //keep a running average
     float atotal = sqrt(ax*ax + ay*ay + az*az);
-    amean = (amean*historyIndex+atotal)/(historyIndex+1);
     
+    amean = (amean*averageCount+atotal)/(averageCount+1);
+    averageCount++;
+
     //the every value into the history
     historyPtr[historyIndex].x = xAcc;
     historyPtr[historyIndex].y = yAcc;
@@ -1267,10 +1269,10 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
             postEventCount = 0;
         }
         [specialTrace addObject: [NSNumber numberWithFloat:atotal]];
-  }
+    }
     else {
         if(!eventInProgress){
-            if(!(historyIndex%100)){ //about every second
+            if(!(averageCount%100)){ //about every second
                 [specialTrace addObject: [NSNumber numberWithFloat:amean]];
                 if([specialTrace count]>60){
                     [self postSpecialToCouch];
@@ -1336,6 +1338,8 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
 //special data readout
 - (void) postSpecialToCouch
 {
+    averageCount = 1; //reset the average counter
+
     if([specialTrace count]){
         
         NSTimeInterval t1 = [specialStartTime timeIntervalSince1970];
