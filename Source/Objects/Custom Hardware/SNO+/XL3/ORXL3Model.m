@@ -1747,7 +1747,11 @@ void SwapLongBlock(void* p, int32_t n)
     CrateInitSetupArgs *setupArgs;
     CrateInitArgs *crateInitArgs;
 
-    if (![[self xl3Link] isConnected]) return -1;
+    if (![[self xl3Link] isConnected]) {
+        NSLogColor([NSColor redColor], @"xl3 %02d is not connected!\n",
+                    [self crateNumber]);
+        return -1;
+    }
 
     if (shiftRegOnly && xilinxLoad) {
         NSLogColor([NSColor redColor], @"crate %02d: warning xilinx is not loaded if shiftRegOnly != 0\n", [self crateNumber]);
