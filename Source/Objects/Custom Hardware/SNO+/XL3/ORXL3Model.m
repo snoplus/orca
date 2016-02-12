@@ -1574,14 +1574,13 @@ void SwapLongBlock(void* p, int32_t n)
     uint32_t address, value;
     ORFec32Model *fec;
 
-    XL3PayloadStruct payload;
-    memset(payload.payload, 0, XL3_PAYLOAD_SIZE);
-    payload.numberBytesInPayload = sizeof(CheckXL3StateResults);
+    char payload[XL3_PAYLOAD_SIZE];
+    memset(payload, 0, XL3_PAYLOAD_SIZE);
     
-    CheckXL3StateResults* result = (CheckXL3StateResults*)payload.payload;
+    CheckXL3StateResults* result = (CheckXL3StateResults*)payload;
     
     @try {
-        [[self xl3Link] sendCommand:CHECK_XL3_STATE_ID withPayload:&payload expectResponse:YES];
+        [[self xl3Link] sendCommand:CHECK_XL3_STATE_ID withPayload:payload expectResponse:YES];
     } @catch (NSException *e) {
         return -1;
     }
@@ -1744,7 +1743,7 @@ void SwapLongBlock(void* p, int32_t n)
 {
     int slot, channel;
     MB mb[16];
-    XL3PayloadStruct payload;
+    char payload[XL3_PAYLOAD_SIZE];
     CrateInitSetupArgs *setupArgs;
     CrateInitArgs *crateInitArgs;
 
@@ -1780,15 +1779,13 @@ void SwapLongBlock(void* p, int32_t n)
      * only init, they are not updated. */
     if (shiftRegOnly) [self setSequencerMasks: slotMask];
 
-    payload.numberBytesInPayload = sizeof(CrateInitSetupArgs);
-
     /* Send the first 16 packets which have the FEC settings. Note that
      * no hardware is updated until we send one more CrateInitArgs packet */
     for (slot = 0; slot < 16; slot++) {
         if ((slotMask & (1 << slot)) == 0) continue;
 
-        memset(payload.payload, 0, XL3_PAYLOAD_SIZE);
-        setupArgs = (CrateInitSetupArgs *) payload.payload;
+        memset(payload, 0, XL3_PAYLOAD_SIZE);
+        setupArgs = (CrateInitSetupArgs *) payload;
         setupArgs->mbNum = slot;
         setupArgs->settings = mb[slot];
         
@@ -1798,15 +1795,14 @@ void SwapLongBlock(void* p, int32_t n)
         }
 
         @try {
-            [[self xl3Link] sendCommand:CRATE_INIT_ID withPayload:&payload expectResponse:NO];
+            [[self xl3Link] sendCommand:CRATE_INIT_ID withPayload:payload expectResponse:NO];
         } @catch (NSException* e) {
             NSLog(@"%@ Init crate failed; error: %@ reason: %@\n",[[self xl3Link] crateName], [e name], [e reason]);
             return -1;
         }
     }
 
-    payload.numberBytesInPayload = sizeof(CrateInitArgs);
-    crateInitArgs = (CrateInitArgs *) payload.payload;
+    crateInitArgs = (CrateInitArgs *) payload;
 
     crateInitArgs->mbNum = 0xff;
     crateInitArgs->xilinxLoad = xilinxLoad;
@@ -1825,7 +1821,7 @@ void SwapLongBlock(void* p, int32_t n)
     }
 
     @try {
-        [[self xl3Link] sendCommand:CRATE_INIT_ID withPayload:&payload expectResponse:YES];
+        [[self xl3Link] sendCommand:CRATE_INIT_ID withPayload:payload expectResponse:YES];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor], @"%@: crate init failed. error: %@ reason:%@\n", [[self xl3Link] crateName], [e name], [e reason]);
         return -1;
@@ -1839,7 +1835,7 @@ void SwapLongBlock(void* p, int32_t n)
         [self writeXl3Mode];
     }
 
-    if (results) *results = *((CrateInitResults *) payload.payload);
+    if (results) *results = *((CrateInitResults *) payload);
 
     return 0;
 }
@@ -2256,9 +2252,8 @@ void SwapLongBlock(void* p, int32_t n)
      * front end cards are specified in the dataAvailMask. Here we set the
      * dataAvailMask to whichever cards ORCA thinks are present. */
 
-    XL3PayloadStruct payload;
-    payload.numberBytesInPayload = 8;
-    ChangeModeArgs* args = (ChangeModeArgs *) payload.payload;
+    char payload[XL3_PAYLOAD_SIZE];
+    ChangeModeArgs* args = (ChangeModeArgs *) payload;
 
     args->mode = [self xl3Mode];
     args->dataAvailMask = [self getSlotsPresent];
@@ -2270,7 +2265,7 @@ void SwapLongBlock(void* p, int32_t n)
 
     [self setXl3ModeRunning:YES];
     @try {
-        [[self xl3Link] sendCommand:CHANGE_MODE_ID withPayload:&payload
+        [[self xl3Link] sendCommand:CHANGE_MODE_ID withPayload:payload
                              expectResponse:YES];
         NSLog(@"xl3 %02d set to %s mode.\n", [self crateNumber],
                 (xl3Mode == INIT_MODE) ? "INIT" : "NORMAL");
@@ -2301,9 +2296,8 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) compositeQuit
 {
-	XL3PayloadStruct payload;
-	payload.numberBytesInPayload = 8;
-	unsigned long* data = (unsigned long*) payload.payload;
+	char payload[XL3_PAYLOAD_SIZE];
+	unsigned long* data = (unsigned long*) payload;
 	
 	if ([xl3Link needToSwap]) {
 		data[0] = 0x20657942UL;
@@ -2317,7 +2311,7 @@ void SwapLongBlock(void* p, int32_t n)
 	[self setXl3OpsRunning:YES forKey:@"compositeQuit"];
 	NSLog(@"%@ Send XL3 Quit ...\n", [[self xl3Link] crateName]);
 	@try {
-		[[self xl3Link] sendCommand:DAQ_QUIT_ID withPayload:&payload expectResponse:NO];
+		[[self xl3Link] sendCommand:DAQ_QUIT_ID withPayload:payload expectResponse:NO];
 		NSLog(@"ok\n");
 	}
 	@catch (NSException* e) {
@@ -2328,9 +2322,8 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) compositeSetPedestal
 {
-	XL3PayloadStruct payload;
-	payload.numberBytesInPayload = 8;
-	unsigned long* data = (unsigned long*) payload.payload;
+	char payload[XL3_PAYLOAD_SIZE];
+	unsigned long* data = (unsigned long*) payload;
 
 	if ([xl3Link needToSwap]) {
 		data[0] = swapLong([self slotMask]);
@@ -2344,7 +2337,7 @@ void SwapLongBlock(void* p, int32_t n)
 	[self setXl3OpsRunning:YES forKey:@"compositeSetPedestal"];
 	NSLog(@"%@ Set Pedestal ...\n", [[self xl3Link] crateName]);
 	@try {
-		[[self xl3Link] sendCommand:SET_CRATE_PEDESTALS_ID withPayload:&payload expectResponse:YES];
+		[[self xl3Link] sendCommand:SET_CRATE_PEDESTALS_ID withPayload:payload expectResponse:YES];
 		if ([xl3Link needToSwap]) *data = swapLong(*data);
 		if (*data == 0) NSLog(@"ok\n");
 		else NSLog(@"failed with XL3 error: 0x%08x\n", *data);
@@ -2386,9 +2379,8 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (unsigned short) getBoardIDForSlot:(unsigned short)aSlot chip:(unsigned short)aChip
 {
-	XL3PayloadStruct payload;
-	payload.numberBytesInPayload = 12;
-	unsigned long* data = (unsigned long*) payload.payload;
+	char payload[XL3_PAYLOAD_SIZE];
+	unsigned long* data = (unsigned long*) payload;
 	
 	data[0] = aSlot;
 	data[1] = aChip;
@@ -2401,7 +2393,7 @@ void SwapLongBlock(void* p, int32_t n)
 	}
 
 	@try {
-		[[self xl3Link] sendCommand:BOARD_ID_READ_ID withPayload:&payload expectResponse:YES];
+		[[self xl3Link] sendCommand:BOARD_ID_READ_ID withPayload:payload expectResponse:YES];
 		if ([xl3Link needToSwap]) *data = swapLong(*data);
 	}
 	@catch (NSException* e) {
@@ -2636,10 +2628,9 @@ void SwapLongBlock(void* p, int32_t n)
         
 /*
     
-	XL3PayloadStruct payload;
-	memset(payload.payload, 0, XL3_PAYLOAD_SIZE);
-	payload.numberBytesInPayload = 8;
-	unsigned long* data = (unsigned long*) payload.payload;
+	char payload[XL3_PAYLOAD_SIZE];
+	memset(payload, 0, XL3_PAYLOAD_SIZE);
+	unsigned long* data = (unsigned long*) payload;
     
     uint32_t slot = aSlot;
     uint32_t mask = aChannelMask;
@@ -2653,13 +2644,13 @@ void SwapLongBlock(void* p, int32_t n)
     data[1] = mask;
 
     @try {
-        [[self xl3Link] sendCommand:SETUP_CHARGE_INJ_ID withPayload:&payload expectResponse:YES];
+        [[self xl3Link] sendCommand:SETUP_CHARGE_INJ_ID withPayload:payload expectResponse:YES];
     }
     @catch (NSException *exception) {
         NSLog(@"error sending ChargeInjection command.\n");
     }
 
-    if (*(unsigned int*)payload.payload != 0) {
+    if (*(unsigned int*)payload != 0) {
         NSLog(@"XL3 error in enableChargeInjectionForSlot.\n");
     }
 
@@ -2689,11 +2680,10 @@ void SwapLongBlock(void* p, int32_t n)
 #pragma mark •••HV
 - (void) readCMOSCountWithArgs:(CheckTotalCountArgs*)aArgs counts:(CheckTotalCountResults*)aCounts;
 {
-	XL3PayloadStruct payload;
-	memset(payload.payload, 0, XL3_PAYLOAD_SIZE);
-	payload.numberBytesInPayload = sizeof(CheckTotalCountResults);
+	char payload[XL3_PAYLOAD_SIZE];
+	memset(payload, 0, XL3_PAYLOAD_SIZE);
     
-	CheckTotalCountArgs* data = (CheckTotalCountArgs*) payload.payload;
+	CheckTotalCountArgs* data = (CheckTotalCountArgs*) payload;
     memcpy(data, aArgs, sizeof(CheckTotalCountArgs));
     
     //max 8 slots may be masked in
@@ -2710,7 +2700,7 @@ void SwapLongBlock(void* p, int32_t n)
     }
     
     @try {
-        [[self xl3Link] sendCommand:CHECK_TOTAL_COUNT_ID withPayload:&payload expectResponse:YES];
+        [[self xl3Link] sendCommand:CHECK_TOTAL_COUNT_ID withPayload:payload expectResponse:YES];
     }
     @catch (NSException *exception) {
         NSLog(@"%@ error sending CHECK_TOTAL_COUNT_ID command.\n",[[self xl3Link] crateName]);
@@ -2812,11 +2802,10 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) readCMOSRateWithArgs:(CrateNoiseRateArgs*)aArgs rates:(CrateNoiseRateResults*)aRates;
 {
-	XL3PayloadStruct payload;
-	memset(payload.payload, 0, XL3_PAYLOAD_SIZE);
-	payload.numberBytesInPayload = sizeof(CrateNoiseRateResults);
+	char payload[XL3_PAYLOAD_SIZE];
+	memset(payload, 0, XL3_PAYLOAD_SIZE);
     
-	CrateNoiseRateArgs* data = (CrateNoiseRateArgs*) payload.payload;
+	CrateNoiseRateArgs* data = (CrateNoiseRateArgs*) payload;
     memcpy(data, aArgs, sizeof(CrateNoiseRateArgs));
 
     //max 8 slots may be masked in
@@ -2833,7 +2822,7 @@ void SwapLongBlock(void* p, int32_t n)
     }
     
     @try {
-        [[self xl3Link] sendCommand:CRATE_NOISE_RATE_ID withPayload:&payload expectResponse:YES];
+        [[self xl3Link] sendCommand:CRATE_NOISE_RATE_ID withPayload:payload expectResponse:YES];
     }
     @catch (NSException *exception) {
         NSLog(@"%@ error sending CRATE_NOISE_RATE_ID command.\n",[[self xl3Link] crateName]);
@@ -3117,11 +3106,10 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) readPMTBaseCurrentsWithArgs:(ReadPMTCurrentArgs*)aArgs currents:(ReadPMTCurrentResults*)result
 {
-	XL3PayloadStruct payload;
-	memset(payload.payload, 0x0, XL3_PAYLOAD_SIZE);
-	payload.numberBytesInPayload = sizeof(ReadPMTCurrentResults);
+	char payload[XL3_PAYLOAD_SIZE];
+	memset(payload, 0x0, XL3_PAYLOAD_SIZE);
     
-	ReadPMTCurrentArgs* data = (ReadPMTCurrentArgs*) payload.payload;
+	ReadPMTCurrentArgs* data = (ReadPMTCurrentArgs*) payload;
     memcpy(data, aArgs, sizeof(ReadPMTCurrentArgs));
     
     if ([xl3Link needToSwap]) {
@@ -3129,7 +3117,7 @@ void SwapLongBlock(void* p, int32_t n)
     }
     
     @try {
-        [[self xl3Link] sendCommand:READ_PMT_CURRENT_ID withPayload:&payload expectResponse:YES];
+        [[self xl3Link] sendCommand:READ_PMT_CURRENT_ID withPayload:payload expectResponse:YES];
     }
     @catch (NSException *exception) {
         NSLog(@"%@ error sending readPMTBaseCurrentForSlot command.\n",[[self xl3Link] crateName]);
@@ -3312,13 +3300,12 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) readHVStatus:(HVReadbackResults*)status
 {
-	XL3PayloadStruct payload;
-	memset(payload.payload, 0, XL3_PAYLOAD_SIZE);
-	payload.numberBytesInPayload = sizeof(HVReadbackResults);
-        
+	char payload[XL3_PAYLOAD_SIZE];
+	memset(payload, 0, XL3_PAYLOAD_SIZE);
+
     @try {
-        [[self xl3Link] sendCommand:HV_READBACK_ID withPayload:&payload expectResponse:YES];
-        //[[self xl3Link] sendCommand:GET_HV_STATUS_ID withPayload:&payload expectResponse:YES];
+        [[self xl3Link] sendCommand:HV_READBACK_ID withPayload:payload expectResponse:YES];
+        //[[self xl3Link] sendCommand:GET_HV_STATUS_ID withPayload:payload expectResponse:YES];
     }
     @catch (NSException *exception) {
         NSLog(@"%@ error sending readHVStatus command.\n", [[self xl3Link] crateName]);
@@ -3326,9 +3313,9 @@ void SwapLongBlock(void* p, int32_t n)
     }
 
     if ([xl3Link needToSwap]) {
-        SwapLongBlock(payload.payload, sizeof(HVReadbackResults)/4);
+        SwapLongBlock(payload, sizeof(HVReadbackResults)/4);
     }
-    memcpy(status, payload.payload, sizeof(HVReadbackResults));
+    memcpy(status, payload, sizeof(HVReadbackResults));
     [self setHvEverUpdated:YES];
 }
 
@@ -3387,11 +3374,10 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) setHVRelays:(unsigned long long)aRelayMask error:(unsigned long*)aError
 {
-	XL3PayloadStruct payload;
-	memset(payload.payload, 0, XL3_PAYLOAD_SIZE);
-	payload.numberBytesInPayload = 8;
-    
-    unsigned long* data = (unsigned long*)payload.payload;
+	char payload[XL3_PAYLOAD_SIZE];
+	memset(payload, 0, XL3_PAYLOAD_SIZE);
+
+    unsigned long* data = (unsigned long*)payload;
     data[0] = aRelayMask & 0xffffffffUL; //mask1 bottom
     data[1] = aRelayMask >> 32;          //mask2 top
 
@@ -3403,7 +3389,7 @@ void SwapLongBlock(void* p, int32_t n)
     }
 
     @try {
-        [[self xl3Link] sendCommand:SET_HV_RELAYS_ID withPayload:&payload expectResponse:YES];
+        [[self xl3Link] sendCommand:SET_HV_RELAYS_ID withPayload:payload expectResponse:YES];
     }
     @catch (NSException *exception) {
         NSLog(@"%@ error sending setHVRelays command.\n",[[self xl3Link] crateName]);
@@ -3782,11 +3768,10 @@ void SwapLongBlock(void* p, int32_t n)
 #pragma mark •••tests
 - (void) readVMONForSlot:(unsigned short)aSlot voltages:(VMonResults*)aVoltages
 {
-    XL3PayloadStruct payload;
-    memset(payload.payload, 0, XL3_PAYLOAD_SIZE);
-    payload.numberBytesInPayload = sizeof(VMonResults);
+    char payload[XL3_PAYLOAD_SIZE];
+    memset(payload, 0, XL3_PAYLOAD_SIZE);
 
-    VMonArgs* data = (VMonArgs*) payload.payload;
+    VMonArgs* data = (VMonArgs*) payload;
     data->slotNum = aSlot;
 
     if ([xl3Link needToSwap]) {
@@ -3794,7 +3779,7 @@ void SwapLongBlock(void* p, int32_t n)
     }
 
     @try {
-        [[self xl3Link] sendCommand:VMON_ID withPayload:&payload expectResponse:YES];
+        [[self xl3Link] sendCommand:VMON_ID withPayload:payload expectResponse:YES];
     }
     @catch (NSException *exception) {
         NSLog(@"%@ error sending VMON_ID command.\n",[[self xl3Link] crateName]);
@@ -4011,13 +3996,12 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) readVMONXL3:(LocalVMonResults*)aVoltages
 {
-    XL3PayloadStruct payload;
-    memset(payload.payload, 0, XL3_PAYLOAD_SIZE);
-    payload.numberBytesInPayload = sizeof(LocalVMonResults);
-    LocalVMonResults* data = (LocalVMonResults*) payload.payload;
+    char payload[XL3_PAYLOAD_SIZE];
+    memset(payload, 0, XL3_PAYLOAD_SIZE);
+    LocalVMonResults* data = (LocalVMonResults*) payload;
         
     @try {
-        [[self xl3Link] sendCommand:LOCAL_VMON_ID withPayload:&payload expectResponse:YES];
+        [[self xl3Link] sendCommand:LOCAL_VMON_ID withPayload:payload expectResponse:YES];
     }
     @catch (NSException *exception) {
         NSLog(@"%@ error sending LOCAL_VMON_ID command.\n",[[self xl3Link] crateName]);
@@ -4101,11 +4085,10 @@ void SwapLongBlock(void* p, int32_t n)
     [self setXl3VltThreshold:8 withValue: -10];
     [self setXl3VltThreshold:9 withValue: 10];
     
-    XL3PayloadStruct payload;
-    memset(payload.payload, 0, XL3_PAYLOAD_SIZE);
-    payload.numberBytesInPayload = sizeof(SetAlarmLevelsArgs);
+    char payload[XL3_PAYLOAD_SIZE];
+    memset(payload, 0, XL3_PAYLOAD_SIZE);
 
-    SetAlarmLevelsArgs* data = (SetAlarmLevelsArgs*) payload.payload;
+    SetAlarmLevelsArgs* data = (SetAlarmLevelsArgs*) payload;
     
     unsigned short i;
     for (i=0; i<6; i++){
@@ -4117,7 +4100,7 @@ void SwapLongBlock(void* p, int32_t n)
     }
     
     @try {
-        [[self xl3Link] sendCommand:SET_ALARM_LEVELS_ID withPayload:&payload expectResponse:YES];
+        [[self xl3Link] sendCommand:SET_ALARM_LEVELS_ID withPayload:payload expectResponse:YES];
     }
     @catch (NSException *e) {
         NSLog(@"%@ error sending SET_ALARM_LEVELS_ID command.\n",[[self xl3Link] crateName]);
@@ -4125,7 +4108,7 @@ void SwapLongBlock(void* p, int32_t n)
         return;
     }
 
-    SetAlarmLevelsResults* res = (SetAlarmLevelsResults*) payload.payload;
+    SetAlarmLevelsResults* res = (SetAlarmLevelsResults*) payload;
     if ([xl3Link needToSwap]) {
         SwapLongBlock(res, sizeof(SetAlarmLevelsResults)/4);
     }
@@ -4166,12 +4149,11 @@ void SwapLongBlock(void* p, int32_t n)
 //TODO: pass erroflags
 - (void) loadSingleDacForSlot:(unsigned short)aSlot dacNum:(unsigned short)aDacNum dacVal:(unsigned char)aDacVal
 {
- 	XL3PayloadStruct payload;
-	memset(payload.payload, 0, XL3_PAYLOAD_SIZE);
-	payload.numberBytesInPayload = sizeof(LoadsDacArgs);
-    
-    LoadsDacArgs* data = (LoadsDacArgs*)payload.payload;
-    LoadsDacResults* result = (LoadsDacResults*)payload.payload;
+ 	char payload[XL3_PAYLOAD_SIZE];
+	memset(payload, 0, XL3_PAYLOAD_SIZE);
+
+    LoadsDacArgs* data = (LoadsDacArgs*)payload;
+    LoadsDacResults* result = (LoadsDacResults*)payload;
     data->slotNum = aSlot;
     data->dacNum = aDacNum;
     data->dacValue = aDacVal;
@@ -4181,7 +4163,7 @@ void SwapLongBlock(void* p, int32_t n)
     }
     
     @try {
-        [[self xl3Link] sendCommand:LOADSDAC_ID withPayload:&payload expectResponse:YES];
+        [[self xl3Link] sendCommand:LOADSDAC_ID withPayload:payload expectResponse:YES];
     }
     @catch (NSException *exception) {
         NSLog(@"%@ error sending loadSingleDac command.\n",[[self xl3Link] crateName]);
@@ -4216,12 +4198,11 @@ void SwapLongBlock(void* p, int32_t n)
     NSLog(@"Set VthrDACs for slot: %d\n", aSlot);
 */
 
- 	XL3PayloadStruct payload;
-	memset(payload.payload, 0, XL3_PAYLOAD_SIZE);
-	payload.numberBytesInPayload = sizeof(MultiLoadsDacArgs);
+ 	char payload[XL3_PAYLOAD_SIZE];
+	memset(payload, 0, XL3_PAYLOAD_SIZE);
     
-    MultiLoadsDacArgs* data = (MultiLoadsDacArgs*)payload.payload;
-    MultiLoadsDacResults* result = (MultiLoadsDacResults*)payload.payload;
+    MultiLoadsDacArgs* data = (MultiLoadsDacArgs*)payload;
+    MultiLoadsDacResults* result = (MultiLoadsDacResults*)payload;
 
     unsigned short i;
     for (i=0; i<32; i++) {
@@ -4238,7 +4219,7 @@ void SwapLongBlock(void* p, int32_t n)
     }
     
     @try {
-        [[self xl3Link] sendCommand:MULTI_LOADSDAC_ID withPayload:&payload expectResponse:YES];
+        [[self xl3Link] sendCommand:MULTI_LOADSDAC_ID withPayload:payload expectResponse:YES];
     }
     @catch (NSException *exception) {
         NSLog(@"Error in setVthrDACsFor slot: %d\n", aSlot);
@@ -4418,12 +4399,11 @@ void SwapLongBlock(void* p, int32_t n)
         if ([self xl3Link] && [[self xl3Link] isConnected]) {
             
             //first see of the xilinx has been initialized
-            XL3PayloadStruct payload;
-            memset(payload.payload, 0, XL3_PAYLOAD_SIZE);
-            payload.numberBytesInPayload = sizeof(CheckXL3StateResults);
-            CheckXL3StateResults* result = (CheckXL3StateResults*)payload.payload;
+            char payload[XL3_PAYLOAD_SIZE];
+            memset(payload, 0, XL3_PAYLOAD_SIZE);
+            CheckXL3StateResults* result = (CheckXL3StateResults*)payload;
             @try {
-                [[self xl3Link] sendCommand:CHECK_XL3_STATE_ID withPayload:&payload expectResponse:YES];
+                [[self xl3Link] sendCommand:CHECK_XL3_STATE_ID withPayload:payload expectResponse:YES];
             } @catch (NSException *e) {
                 NSLog(@"%@ error reading XL3 init; error: %@ reason: %@\n", [[self xl3Link] crateName], [e name], [e reason]);
                 continue; // try again later if there was an error
@@ -4634,9 +4614,8 @@ void SwapLongBlock(void* p, int32_t n)
         return;
     }
 
-    XL3PayloadStruct payload;
-	payload.numberBytesInPayload = 8;
-	unsigned long* data = (unsigned long*) payload.payload;
+    char payload[XL3_PAYLOAD_SIZE];
+	unsigned long* data = (unsigned long*) payload;
     BOOL error_flag = NO;
 
     NSArray* fecs = [[self guardian] collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
@@ -4652,7 +4631,7 @@ void SwapLongBlock(void* p, int32_t n)
         }
 
         @try {
-            //[[self xl3Link] sendCommand:SET_CRATE_PEDESTALS_ID withPayload:&payload expectResponse:YES];
+            //[[self xl3Link] sendCommand:SET_CRATE_PEDESTALS_ID withPayload:payload expectResponse:YES];
             //if ([xl3Link needToSwap]) *data = swapLong(*data);
             //if (*data != 0) error_flag = YES;
             

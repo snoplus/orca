@@ -86,12 +86,6 @@ typedef struct
 
 typedef struct
 {
-    uint32_t numberBytesInPayload;
-    char payload[XL3_PAYLOAD_SIZE];
-} XL3PayloadStruct;
-
-typedef struct
-{
   XL3CommandHeader header;
   char payload[XL3_PAYLOAD_SIZE];
 } XL3Packet;

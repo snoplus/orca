@@ -488,62 +488,53 @@ readFifoFlag = _readFifoFlag;
 	}
 }
 
-- (void) sendCommand:(long)aCmd withPayload:(XL3PayloadStruct*)payloadBlock expectResponse:(BOOL)askForResponse
+- (void) sendCommand:(uint8_t) aCmd withPayload:(char *) payload expectResponse:(BOOL) askForResponse
 {
-	//client is responsible for payload swapping, we take care of the header
-	XL3Packet aPacket;
-	memset(aPacket.payload, 0, XL3_PAYLOAD_SIZE);
-	unsigned char packetType = (unsigned char) aCmd;
-	unsigned short packetNum = (unsigned short) ++num_cmd_packets;
-	aPacket.header.packetNum = (uint16_t) packetNum;
-	aPacket.header.packetType = (uint8_t) packetType;
-	aPacket.header.numBundles = 0;
-	if (needToSwap) aPacket.header.packetNum = swapShort(aPacket.header.packetNum);
-	memcpy(aPacket.payload, payloadBlock->payload, payloadBlock->numberBytesInPayload);
-	
-	@try {
-		[commandSocketLock lock]; //begin critical section
-		[self writePacket:(char*) &aPacket];
-		[commandSocketLock unlock]; //end critical section
-	}
-	@catch (NSException* localException) {
-		[commandSocketLock unlock]; //end critical section
-		@throw localException;
-	}
+    //client is responsible for payload swapping, we take care of the header
+    XL3Packet aPacket;
+
+    uint16_t packetNum = ++num_cmd_packets;
+    aPacket.header.packetNum = htons(packetNum);
+    aPacket.header.packetType = aCmd;
+    aPacket.header.numBundles = 0;
+    memcpy(aPacket.payload, payload, XL3_PAYLOAD_SIZE);
+    
+    @try {
+        [commandSocketLock lock]; //begin critical section
+        [self writePacket:(char*) &aPacket];
+        [commandSocketLock unlock]; //end critical section
+    } @catch (NSException* localException) {
+        [commandSocketLock unlock]; //end critical section
+        @throw localException;
+    }
     if(askForResponse){
         @try {
-            //NSLog(@"wait for command response with packetType: 0x%x, packetNum: 0x%x, packetSize: %i\n", packetType, packetNum, payloadBlock->numberBytesInPayload);
-			[self readXL3Packet:&aPacket withPacketType:packetType andPacketNum:packetNum];
-			XL3PayloadStruct* payloadPtr = (XL3PayloadStruct*) aPacket.payload;
-			memcpy(payloadBlock->payload, payloadPtr, payloadBlock->numberBytesInPayload);
-		}
-        @catch (NSException* localException) {
+            [self readXL3Packet:&aPacket withPacketType:aCmd andPacketNum:packetNum];
+            memcpy(payload, aPacket.payload, XL3_PAYLOAD_SIZE);
+        } @catch (NSException* localException) {
             @throw localException;
         }
-	}
-	if (! askForResponse) {
-		[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.005]];
-	}
+    } else {
+        [NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.005]];
+    }
 }
 
 
-- (void) sendCommand:(long)aCmd expectResponse:(BOOL)askForResponse
+- (void) sendCommand:(uint8_t) aCmd expectResponse:(BOOL) askForResponse
 {
-	XL3PayloadStruct payload;
-	payload.numberBytesInPayload = 0;
+	char payload[XL3_PAYLOAD_SIZE];
 	@try {
-		[self sendCommand:aCmd withPayload:&payload expectResponse:askForResponse];
-	}
-	@catch (NSException* localException) {
+		[self sendCommand:aCmd withPayload:payload expectResponse:askForResponse];
+	} @catch (NSException* localException) {
 		@throw localException;
 		//what about the response?		
 	}
 }
 
-- (void) sendCommand:(long)aCmd toAddress:(uint32_t)address withData:(uint32_t *)value
+- (void) sendCommand:(uint8_t) aCmd toAddress:(uint32_t) address withData:(uint32_t *) value
 {
-	XL3PayloadStruct payload;
-	Command* command = (Command*) payload.payload;
+	char payload[XL3_PAYLOAD_SIZE];
+	Command* command = (Command*) payload;
 		
 	command->cmdNum = aCmd;
 	command->packetNum = 0; // todo: figure out what are these two good for...
@@ -558,9 +549,8 @@ readFifoFlag = _readFifoFlag;
 		command->data = swapLong(command->data);
 	}	
 
-	payload.numberBytesInPayload = sizeof(Command);
 	@try { 
-		[self sendCommand:FAST_CMD_ID withPayload:&payload expectResponse:YES];
+		[self sendCommand:FAST_CMD_ID withPayload:payload expectResponse:YES];
 	}
 	@catch (NSException* e) {
 		NSLog(@"%@ Command error sending command\n", [self crateName]);
@@ -576,7 +566,7 @@ readFifoFlag = _readFifoFlag;
 	if (needToSwap) *value = swapLong(*value);	
 }
 
-- (void) readXL3Packet:(XL3Packet*)aPacket withPacketType:(unsigned char)packetType andPacketNum:(unsigned short)packetNum
+- (void) readXL3Packet:(XL3Packet*) aPacket withPacketType:(uint8_t) packetType andPacketNum: (uint16_t) packetNum
 {
 	//look into the cmdArray
     NSDate* sleepDate = [[NSDate alloc] initWithTimeIntervalSinceNow:0.01];
