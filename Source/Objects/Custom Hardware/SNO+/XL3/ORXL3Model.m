@@ -1568,26 +1568,39 @@ void SwapLongBlock(void* p, int32_t n)
 	//[[self xl1] executeCommandList:aList];		
 }
 
+- (int) updateXl3Mode
+{
+    /* Update the model with the current XL3 mode. */
+    char payload[XL3_PAYLOAD_SIZE];
+    memset(payload, 0, XL3_PAYLOAD_SIZE);
+    
+    CheckXL3StateResults* result = (CheckXL3StateResults*) payload;
+    
+    @try {
+        [[self xl3Link] sendCommand:CHECK_XL3_STATE_ID withPayload:payload expectResponse:YES];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+            @"xl3 %02d: failed to check XL3 state.\n", [self crateNumber]);
+        return -1;
+    }
+
+    /* Enable undoManager since we are setting the mode outside of the GUI. */
+    [[self undoManager] disableUndoRegistration];
+    [self setXl3Mode: ntohl(result->mode)];
+    [[self undoManager] enableUndoRegistration];
+
+    return 0;
+}
+    
 - (int) setSequencerMasks: (uint32_t) slotMask
 {
     int oldMode, slot;
     uint32_t address, value;
     ORFec32Model *fec;
 
-    char payload[XL3_PAYLOAD_SIZE];
-    memset(payload, 0, XL3_PAYLOAD_SIZE);
-    
-    CheckXL3StateResults* result = (CheckXL3StateResults*)payload;
-    
-    @try {
-        [[self xl3Link] sendCommand:CHECK_XL3_STATE_ID withPayload:payload expectResponse:YES];
-    } @catch (NSException *e) {
-        return -1;
-    }
-    
-    if ([xl3Link needToSwap]) result->mode = swapLong(result->mode);
-    
-    oldMode = result->mode;
+    if ([self updateXl3Mode]) return -1;
+
+    oldMode = xl3Mode;
 
     @synchronized (self) {
         /* synchronize on self here because we don't want to have two

@@ -294,6 +294,7 @@ enum {
 - (void) writeXL3Register:(short)aRegister value:(unsigned long)aValue;
 - (unsigned long) readXL3Register:(short)aRegister;
 
+- (int) updateXl3Mode;
 - (int) setSequencerMasks: (uint32_t) slotMask;
 - (void) initCrate: (int) xilinxLoad;
 - (void) initCrateDone: (CrateInitResults *)r;
