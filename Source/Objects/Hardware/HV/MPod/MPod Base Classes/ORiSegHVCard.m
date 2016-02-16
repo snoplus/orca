@@ -1261,6 +1261,7 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
     
     NSDictionary* historyRecord = [NSDictionary dictionaryWithObjectsAndKeys:
                                    [self fullID],                               @"name",
+                                   @"HV",                                       @"title",
                                    [NSNumber numberWithInt:[self crateNumber]], @"crate",
                                    [NSNumber numberWithInt:[self slot]],        @"slot",
                                    voltages,                                    @"voltages",
