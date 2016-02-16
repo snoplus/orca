@@ -49,6 +49,10 @@ NSString* ORiSegHVCardDoNotPostSafetyAlarmChanged = @"ORiSegHVCardDoNotPostSafet
 NSString* ORiSegHVCardRequestCustomInfo		    = @"ORiSegHVCardRequestCustomInfo";
 NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChanged";
 
+@interface ORiSegHVCard (private)
+- (void) postHistoryRecord;
+@end
+
 @implementation ORiSegHVCard
 
 #define kMaxVoltage 6000
@@ -75,6 +79,7 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
     [safetyLoopNotGoodAlarm clearAlarm];
     [safetyLoopNotGoodAlarm release];
     [modParams release];
+    [lastHistoryPost release];
     
     [super dealloc];
 }
@@ -269,6 +274,14 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
                 }
             }
         }
+        
+        NSDate* now = [NSDate date];
+        if([now timeIntervalSinceDate:lastHistoryPost]>=60){
+            [lastHistoryPost release];
+            lastHistoryPost = [now retain];
+            [self postHistoryRecord];
+        }
+        
 	}
     @catch(NSException* e){
         
@@ -1233,5 +1246,28 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
     }
     return s;
 }
+@end
 
+@implementation ORiSegHVCard (private)
+- (void) postHistoryRecord
+{
+    int channel;
+    NSMutableArray* voltages = [NSMutableArray arrayWithCapacity:[self numberOfChannels]];
+    NSMutableArray* currents = [NSMutableArray arrayWithCapacity:[self numberOfChannels]];
+    for(channel= 0; channel<[self numberOfChannels]; channel++){
+        [voltages addObject:[NSNumber numberWithFloat:[self channel:channel readParamAsFloat:@"outputMeasurementSenseVoltage"]]];
+        [currents addObject:[NSNumber numberWithFloat:[self channel:channel readParamAsFloat:@"outputMeasurementCurrent"]*1000000.]];
+    }
+    
+    NSDictionary* historyRecord = [NSDictionary dictionaryWithObjectsAndKeys:
+                                   [self fullID],                               @"name",
+                                   [NSNumber numberWithInt:[self crateNumber]], @"crate",
+                                   [NSNumber numberWithInt:[self slot]],        @"slot",
+                                   voltages,                                    @"voltages",
+                                   currents,                                    @"currents",
+                                   nil
+                                   ];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddHistoryAdcRecord" object:self userInfo:historyRecord];
+}
 @end
