@@ -1002,6 +1002,10 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
 		[self setTarget:i withValue: [decoder decodeIntForKey:		[@"target" stringByAppendingFormat:@"%d",i]]];
 		[self setMaxCurrent:i withValue:[decoder decodeFloatForKey: [@"maxCurrent" stringByAppendingFormat:@"%d",i]]];
 	}
+    
+    [lastHistoryPost release];
+    lastHistoryPost = [[NSDate date] retain];
+    
 	[[self undoManager] enableUndoRegistration];
     
     [self registerNotificationObservers];
