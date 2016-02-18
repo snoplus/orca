@@ -19,7 +19,7 @@
 //-------------------------------------------------------------
 
 #pragma mark •••Imported Files
-#import "XL3_Cmds.h"
+#import "PacketTypes.h"
 #import "XL3_LinkController.h"
 #import "XL3_Link.h"
 #import "ORXL3Model.h"
