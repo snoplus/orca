@@ -1338,7 +1338,7 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
 //special data readout
 - (void) postSpecialToCouch
 {
-    averageCount = 1; //reset the average counter
+    averageCount = 0; //reset the average counter
 
     if([specialTrace count]){
         
