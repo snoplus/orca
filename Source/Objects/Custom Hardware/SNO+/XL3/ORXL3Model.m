@@ -20,7 +20,8 @@
 
 #pragma mark •••Imported Files
 #import "XL3_Link.h"
-#import "XL3_Cmds.h"
+#import "PacketTypes.h"
+#import "Registers.h"
 #import "ORXL3Model.h"
 #import "ORSNOCrateModel.h"
 #import "ORSNOConstants.h"
@@ -99,8 +100,6 @@ extern NSString* ORSNOPRequestHVStatus;
 - (void) _pollXl3;
 - (void) _hvInit;
 - (void) _hvXl3;
-- (void) sendCommandWithDict:(NSDictionary*)argDict;
-- (void) initCrateDone:(NSDictionary*)resp;
 - (void) _setPedestalInParallelWorker;
 @end
 
@@ -191,7 +190,69 @@ snotDb = _snotDb;
 
 - (void) runAboutToStart:(NSNotification*)aNote
 {
-    [self initCrateRegistersOnly];
+    int slot, i, hv;
+    ORFec32Model *fec;
+
+    /* Before the run starts, we make sure that all channels with HV on
+     * have their sequencers enabled, and all channels with HV off have
+     * their triggers turned off. Turning the sequencers on for channels
+     * with HV is to make sure that we don't have a blind flasher. Turning
+     * triggers off for channels without HV is to prevent trigger dropout
+     * due to a bug in the CMOS chip. Quoting Josh:
+     *
+     * "The problem here is that pickup will generate runt pulses into the
+     *  SNOD, and the CMOS chip has a logical bug which then will latch
+     *  the trigger signal without resetting it, creating dropout. Turning
+     *  the thresholds to maximum will mitigate the pickup, but even then I'd
+     *  only want to do that for a fixed (short) period of time."
+     *
+     * Note that we only set these in the model, but immediately after
+     * call initCrate so all these settings are loaded to hardware shortly
+     * after and before the run starts. */
+
+    for (slot = 0; slot < 16; slot++) {
+        fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
+
+        if (!fec) continue;
+
+        for (i = 0; i < 32; i++) {
+            hv = [self relayMask] & (1 << (slot*4 + (3-i/8)));
+
+            if (hv) {
+                if ([fec seqDisabled:i]) {
+                    NSLogColor([NSColor redColor], @"%02d/%02d/%02d HV is on, turning sequencer on!\n", [self crateNumber], slot, i);
+                    [fec setSeq:i enabled:YES];
+                }
+            } else {
+                if ([fec trigger100nsEnabled:i]) {
+                    NSLogColor([NSColor redColor], @"%02d/%02d/%02d HV is off, turning N100 trigger off!\n", [self crateNumber], slot, i);
+                    [fec setTrigger100ns:i enabled:NO];
+                }
+                if ([fec trigger20nsEnabled:i]) {
+                    NSLogColor([NSColor redColor], @"%02d/%02d/%02d HV is off, turning N20 trigger off!\n", [self crateNumber], slot, i);
+                    [fec setTrigger20ns:i enabled:NO];
+                }
+            }
+        }
+    }
+
+    /* Post a notification telling ORCA not to start the run until we've
+     * finished initializing */
+    if ([[self xl3Link] isConnected]) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object:self];
+        [self loadHardwareWithSlotMask: [self getSlotsPresent] withCallback: @selector(runStartDone:) target:self];
+    }
+}
+
+- (void) runStartDone: (CrateInitResults *) results
+{
+    if (results == NULL) {
+        NSLogColor([NSColor redColor], @"%@: crate init failed\n",
+                        [[self xl3Link] crateName]);
+    }
+
+    /* Tell ORCA that we have finished initializing */
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object:self];
 }
 
 - (void) makeMainController
@@ -304,13 +365,13 @@ snotDb = _snotDb;
 
 - (unsigned long) slotMask
 {
-	return slotMask;
+	return selectedSlotMask;
 }
 
 - (void) setSlotMask:(unsigned long)aSlotMask
 {
-	[[[self undoManager] prepareWithInvocationTarget:self] setSlotMask:slotMask];
-	slotMask = aSlotMask;
+	[[[self undoManager] prepareWithInvocationTarget:self] setSlotMask:selectedSlotMask];
+	selectedSlotMask = aSlotMask;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelSlotMaskChanged object:self];
 }
 
@@ -395,9 +456,19 @@ snotDb = _snotDb;
 
 - (void) setXl3Mode:(unsigned int)aXl3Mode
 {
-	[[[self undoManager] prepareWithInvocationTarget:self] setXl3Mode:xl3Mode];
+    /* NSUndoManager is not thread safe, and this method gets called from
+     * setSequencerMasks and initCrate in a separate thread during XL3
+     * initialization.
+     *
+     * For now, we just comment it out. */
+
+	//[[[self undoManager] prepareWithInvocationTarget:self] setXl3Mode:xl3Mode];
 	xl3Mode = aXl3Mode;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelXl3ModeChanged object:self];
+    /* Again, post the notification on the main thread since this method is called
+     * from other threads during XL3 initialization. */
+    dispatch_async(dispatch_get_main_queue(), ^{
+	    [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelXl3ModeChanged object:self];
+    });
 }	
 
 - (BOOL) xl3ModeRunning
@@ -1019,22 +1090,26 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (ORCouchDB*) debugDBRef
 {
-    //replace by snop experiment UI
-	return [ORCouchDB couchHost:@"couch.snopl.us" port:80 username:@"snoplus"
-                            pwd:@"scintillate" database:@"debugdb" delegate:self];
+    SNOPModel *snop;
 
-	//return [ORCouchDB couchHost:@"127.0.0.1" port:5984 username:@"snoplus"
-    //                        pwd:@"scintillate" database:@"debugdb" delegate:self];
+    NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
 
+	if([objs count]) {
+		snop = [objs objectAtIndex:0];
+    } else {
+        return NULL;
+    }
+
+    return [snop debugDBRef:self];
 }
 
-- (void) synthesizeDefaultsIntoBundle:(mb_t*)aBundle forSlot:(unsigned short)aSlot
+- (void) synthesizeDefaultsIntoBundle:(MB*)aBundle forSlot:(unsigned short)aSlot
 {
-	uint16_t s_mb_id[1] = {0x0000};
-	uint16_t s_dc_id[4] = {0x0000, 0x0000, 0x0000, 0x0000};
+	uint16_t s_mbID[1] = {0x0000};
+	uint16_t s_dbID[4] = {0x0000, 0x0000, 0x0000, 0x0000};
 
-	//vbals are gains per channel x: [0][x] high, [1][x] low
-	uint8_t s_vbal[2][32] = {{ 110, 110, 110, 110, 110, 110, 110, 110,
+	//vBals are gains per channel x: [0][x] high, [1][x] low
+	uint8_t s_vBal[2][32] = {{ 110, 110, 110, 110, 110, 110, 110, 110,
 		 		   110, 110, 110, 110, 110, 110, 110, 110,
 				   110, 110, 110, 110, 110, 110, 110, 110,
 				   110, 110, 110, 110, 110, 110, 110, 110 },
@@ -1043,175 +1118,198 @@ void SwapLongBlock(void* p, int32_t n)
 				   110, 110, 110, 110, 110, 110, 110, 110,
 				   110, 110, 110, 110, 110, 110, 110, 110 }};
 
-	uint8_t s_vthr[32] = {	255, 255, 255, 255, 255, 255, 255, 255,
+	uint8_t s_vThr[32] = {	255, 255, 255, 255, 255, 255, 255, 255,
 				255, 255, 255, 255, 255, 255, 255, 255,
 				255, 255, 255, 255, 255, 255, 255, 255,
 				255, 255, 255, 255, 255, 255, 255, 255 };
 
 
-	//tdisc index definitions: 0=ch0-3, 1=ch4-7, 2=ch8-11, etc
-	uint8_t s_tdisc_rmp[8] =   { 120, 120, 120, 120, 120, 120, 120, 120 }; // back edge timing ramp
-	uint8_t s_tdisc_rmpup[8] = { 115, 115, 115, 115, 115, 115, 115, 115 }; // front edge timing ramp
-	uint8_t s_tdisc_vsi[8] =   { 120, 120, 120, 120, 120, 120, 120, 120 }; // short integrate voltage
-	uint8_t s_tdisc_vli[8] =   { 120, 120, 120, 120, 120, 120, 120, 120 }; // long integrate voltage
+	//tDisc index definitions: 0=ch0-3, 1=ch4-7, 2=ch8-11, etc
+	uint8_t s_tDisc_rmp[8] =   { 120, 120, 120, 120, 120, 120, 120, 120 }; // back edge timing ramp
+	uint8_t s_tDisc_rmpup[8] = { 115, 115, 115, 115, 115, 115, 115, 115 }; // front edge timing ramp
+	uint8_t s_tDisc_vsi[8] =   { 120, 120, 120, 120, 120, 120, 120, 120 }; // short integrate voltage
+	uint8_t s_tDisc_vli[8] =   { 120, 120, 120, 120, 120, 120, 120, 120 }; // long integrate voltage
 	
 
-	//tcmos: the following are motherboard wide constants
-	aBundle->tcmos.vmax = 203; // upper TAC reference voltage
-	aBundle->tcmos.tacref = 72; // lower TAC reference voltage
-	aBundle->tcmos.isetm[0] = 200; // primary timing current (0=tac0,1=tac1)
-	aBundle->tcmos.isetm[1] = 200; // primary timing current (0=tac0,1=tac1)
-	aBundle->tcmos.iseta[0] = 0; // secondary timing current 
-	aBundle->tcmos.iseta[1] = 0; // secondary timing current 
+	//tCmos: the following are motherboard wide constants
+	aBundle->tCmos.vMax = 203; // upper TAC reference voltage
+	aBundle->tCmos.tacRef = 72; // lower TAC reference voltage
+	aBundle->tCmos.isetm[0] = 200; // primary timing current (0=tac0,1=tac1)
+	aBundle->tCmos.isetm[1] = 200; // primary timing current (0=tac0,1=tac1)
+	aBundle->tCmos.iseta[0] = 0; // secondary timing current 
+	aBundle->tCmos.iseta[1] = 0; // secondary timing current 
 	// TAC shift register load bits channel 0 to 31, assume same bits for all channels
 	// bits go from right to left
 	// TAC0-adj0  0 (1=enable), TAC0-adj1  0 (1=enable), TAC0-adj2 0 (1=enable), TAC0-main 0 (0=enable)
 	// same for TAC1	
-	uint8_t s_tcmos_tac_shift[32] = { 0, 0, 0, 0, 0, 0, 0, 0,
+	uint8_t s_TCmosac_shift[32] = { 0, 0, 0, 0, 0, 0, 0, 0,
 					  0, 0, 0, 0, 0, 0, 0, 0,
 					  0, 0, 0, 0, 0, 0, 0, 0,
 					  0, 0, 0, 0, 0, 0, 0, 0 };
-	// vint
-	aBundle->vint = 205; //integrator output voltage
+	// vInt
+	aBundle->vInt = 205; //integrator output voltage
 
 	//chinj
 	//aBundle->chinj.hv_id = 0x0000; // HV card id
-	aBundle->hvref = 0x00; // MB control voltage, charge inj value
+	aBundle->hvRef = 0x00; // MB control voltage, charge inj value
 	//aBundle->chinj.ped_time = 100; // MTCD pedestal width (DONT NEED THIS HERE)
 
 	//tr100 width, channel 0 to 31, only bits 0 to 6 defined, bit0-5 delay, bit6 enable
-	uint8_t s_tr100_tdelay[32] = { 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f,
+	uint8_t s_Tr100delay[32] = { 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f,
 					0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f,
 					0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f,
 					0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f };
 
-	//uint8_t s_tr100_tdelay[32] = { 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f,
+	//uint8_t s_Tr100delay[32] = { 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f,
     //    0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f,
     //    0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f,
     //    0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f };
 
 	//tr20 width, channel 0 to 31, only bits 0 to 5 defined, bit0-4 width, bit5 enable from PennDB
-	uint8_t s_tr20_twidth[32] = { 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
+	uint8_t s_Tr20width[32] = { 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
 					0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
 					0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
 					0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30 };
 
-	//uint8_t s_tr20_twidth[32] = { 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10,
+	//uint8_t s_Tr20width[32] = { 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10,
     //    0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10,
     //    0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10,
     //    0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10 };
 	
 	//tr20 delay, channel 0 to 31, only bits 0 to 3 defined from PennDB
-	uint8_t s_tr20_tdelay[32] = {	0, 0, 0, 0, 0, 0, 0, 0,
+	uint8_t s_Tr20delay[32] = {	0, 0, 0, 0, 0, 0, 0, 0,
 					0, 0, 0, 0, 0, 0, 0, 0,
 					0, 0, 0, 0, 0, 0, 0, 0,
 					0, 0, 0, 0, 0, 0, 0, 0 }; 
 	//sane defaults from DB spec
 	/*
-	uint8_t s_tr20_tdelay[32] = {	2, 2, 2, 2, 2, 2, 2, 2,
+	uint8_t s_Tr20delay[32] = {	2, 2, 2, 2, 2, 2, 2, 2,
 					2, 2, 2, 2, 2, 2, 2, 2,
 					2, 2, 2, 2, 2, 2, 2, 2,
 					2, 2, 2, 2, 2, 2, 2, 2 }; 
 	*/
 	
-	//scmos remaining 10 bits, channel 0 to 31, only bits 0 to 9 defined
-	uint16_t s_scmos[32] = { 0, 0, 0, 0, 0, 0, 0, 0,
+	//sCmos remaining 10 bits, channel 0 to 31, only bits 0 to 9 defined
+	uint16_t s_sCmos[32] = { 0, 0, 0, 0, 0, 0, 0, 0,
 					0, 0, 0, 0, 0, 0, 0, 0,
 					0, 0, 0, 0, 0, 0, 0, 0,
 					0, 0, 0, 0, 0, 0, 0, 0 }; 
 
 	//ch_disable bits 1 == disabled
-	aBundle->disable_mask = 0;
+	aBundle->disableMask = 0;
 		
-	memcpy(&aBundle->mb_id, s_mb_id, 2);
-	memcpy(aBundle->dc_id, s_dc_id, 8);
-	memcpy(aBundle->vbal, s_vbal, 64);
-	memcpy(aBundle->vthr, s_vthr, 32);
-	memcpy(aBundle->tdisc.rmp, s_tdisc_rmp, 8);
-	memcpy(aBundle->tdisc.rmpup, s_tdisc_rmpup, 8);
-	memcpy(aBundle->tdisc.vsi, s_tdisc_vsi, 8);
-	memcpy(aBundle->tdisc.vli, s_tdisc_vli, 8);
-	memcpy(aBundle->tcmos.tac_shift, s_tcmos_tac_shift, 32);
+	memcpy(&aBundle->mbID, s_mbID, 2);
+	memcpy(aBundle->dbID, s_dbID, 8);
+	memcpy(aBundle->vBal, s_vBal, 64);
+	memcpy(aBundle->vThr, s_vThr, 32);
+	memcpy(aBundle->tDisc.rmp, s_tDisc_rmp, 8);
+	memcpy(aBundle->tDisc.rmpup, s_tDisc_rmpup, 8);
+	memcpy(aBundle->tDisc.vsi, s_tDisc_vsi, 8);
+	memcpy(aBundle->tDisc.vli, s_tDisc_vli, 8);
+	memcpy(aBundle->tCmos.tacShift, s_TCmosac_shift, 32);
     memset(aBundle->tr100.mask, 1, 32);
-	memcpy(aBundle->tr100.tdelay, s_tr100_tdelay, 32);
+	memcpy(aBundle->tr100.tDelay, s_Tr100delay, 32);
     memset(aBundle->tr20.mask, 1, 32);
-	memcpy(aBundle->tr20.twidth, s_tr20_twidth, 32);
-	memcpy(aBundle->tr20.tdelay, s_tr20_tdelay, 32);
-	memcpy(aBundle->scmos, s_scmos, 64);
+	memcpy(aBundle->tr20.tWidth, s_Tr20width, 32);
+	memcpy(aBundle->tr20.tDelay, s_Tr20delay, 32);
+	memcpy(aBundle->sCmos, s_sCmos, 64);
 }
 
-- (void) byteSwapBundle:(mb_t*)aBundle
+- (void) byteSwapBundle:(MB*) mb
 {
-	int i;
-	
-	//vbal_vals_t
-	aBundle->mb_id = swapShort(aBundle->mb_id);
-	for (i=0; i<4; i++) aBundle->dc_id[i] = swapShort(aBundle->dc_id[i]);
-	//scmos_vals_t
-	for (i=0; i<32; i++) aBundle->scmos[i] = swapShort(aBundle->scmos[i]);
-	//mb_chan_disable_vals_t
-	aBundle->disable_mask = swapLong(aBundle->disable_mask);	
-}
+    /* Byte swap a FEC bundle. Note that we only byte swap some of the
+     * variables because the rest are just bytes and so don't need to
+     * be swapped. */
 
-- (void) synthesizeFECIntoBundle:(mb_t*)aBundle forSlot:(unsigned short)aSlot
-{
-
-    [self synthesizeDefaultsIntoBundle:aBundle forSlot:aSlot];
-
-    ORFec32Model* fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-aSlot];
-    if (!fec) {
-        return;
-    }
-
-    unsigned short i;
-    aBundle->mb_id = 0;
+    int i;
+    
+    mb->mbID = swapShort(mb->mbID);
     for (i=0; i<4; i++) {
-        aBundle->dc_id[i] = 0;
+        mb->dbID[i] = swapShort(mb->dbID[i]);
     }
 
-    unsigned short dbNum;
-    for (dbNum=0; dbNum<4; dbNum++) {
-        if ([fec dcPresent:dbNum]) {
-            unsigned short channel;
+    for (i=0; i<32; i++) {
+        mb->sCmos[i] = swapShort(mb->sCmos[i]);
+    }
+
+    mb->disableMask = swapLong(mb->disableMask);  
+}
+
+- (void) synthesizeFECIntoBundle:(MB*) mb forSlot:(unsigned short) slot
+{
+    int i, dbNum, channel;
+    ORFec32Model *fec;
+    ORFecDaughterCardModel *db;
+
+    [self synthesizeDefaultsIntoBundle:mb forSlot:slot];
+
+    fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
+
+    if (!fec) return;
+
+    mb->mbID = 0;
+    for (i = 0; i < 4; i++) {
+        mb->dbID[i] = 0;
+    }
+
+    for (dbNum = 0; dbNum < 4; dbNum++) {
+        if (![fec dcPresent:dbNum]) continue;
+
+        db = [fec dc:dbNum];
             
-            for (channel=0; channel<8; channel++) {
-                aBundle->vthr[dbNum*8+channel] = [[fec dc:dbNum] vt:channel];
-                aBundle->tcmos.tac_shift[dbNum*8+channel] = [[fec dc:dbNum] tac0trim:channel];
-                aBundle->scmos[dbNum*8+channel] = [[fec dc:dbNum] tac1trim:channel];
+        for (channel = 0; channel < 8; channel++) {
+            mb->vThr[dbNum*8+channel] = [db vt:channel];
+            mb->tCmos.tacShift[dbNum*8+channel] = [db tac0trim:channel];
+            mb->sCmos[dbNum*8+channel] = [db tac1trim:channel];
 
-                //aBundle->tr100.mask[dbNum*8+channel] = 0; //be compatible with penn_daq, it's not used
-                aBundle->tr100.tdelay[dbNum*8+channel] = [[fec dc:dbNum] ns100width:channel] | 0x40;
+            /* Note that the N100 and N20 trigger masks are *not*
+             * set using the mask variable. Instead the ML403 sets these
+             * triggers using the delay and width variables. */
 
-                //aBundle->tr20.mask[dbNum*8+channel] = 0; //be compatible with penn_daq, it's not used
-                aBundle->tr20.tdelay[dbNum*8+channel] = [[fec dc:dbNum] ns20delay:channel];
-                aBundle->tr20.twidth[dbNum*8+channel] = [[fec dc:dbNum] ns20width:channel] | 0x20;
+            // mb->tr100.mask[dbNum*8+channel] = 0;
+            mb->tr100.tDelay[dbNum*8+channel] = [db ns100width:channel];
 
-                for (i=0; i<2; i++) {
-                    aBundle->vbal[i][dbNum*8+channel] = [[fec dc:dbNum] vb:i*8+channel];
-                }
+            if ([fec trigger100nsEnabled: (dbNum*8 + channel)]) {
+                mb->tr100.tDelay[dbNum*8+channel] |= 0x40;
+            } else {
+                mb->tr100.tDelay[dbNum*8+channel] &= ~0x40;
             }
-            
+
+            // mb->tr20.mask[dbNum*8+channel] = 0;
+            mb->tr20.tDelay[dbNum*8+channel] = [db ns20delay:channel];
+            mb->tr20.tWidth[dbNum*8+channel] = [db ns20width:channel];
+
+            if ([fec trigger20nsEnabled: (dbNum*8 + channel)]) {
+                mb->tr20.tWidth[dbNum*8+channel] |= 0x20;
+            } else {
+                mb->tr20.tWidth[dbNum*8+channel] &= ~0x20;
+            }
+
             for (i=0; i<2; i++) {
-                aBundle->tdisc.rmp[dbNum*2+i] = [[fec dc:dbNum] rp2:i];
-                aBundle->tdisc.rmpup[dbNum*2+i] = [[fec dc:dbNum] rp1:i];
-                aBundle->tdisc.vsi[dbNum*2+i] = [[fec dc:dbNum] vsi:i];
-                aBundle->tdisc.vli[dbNum*2+i] = [[fec dc:dbNum] vli:i];
+                mb->vBal[i][dbNum*8+channel] = [db vb:i*8+channel];
             }
+        }
+        
+        for (i=0; i<2; i++) {
+            mb->tDisc.rmp[dbNum*2+i] = [db rp2:i];
+            mb->tDisc.rmpup[dbNum*2+i] = [db rp1:i];
+            mb->tDisc.vsi[dbNum*2+i] = [db vsi:i];
+            mb->tDisc.vli[dbNum*2+i] = [db vli:i];
         }
     }
 
-    aBundle->vint = [fec vRes];
-    aBundle->hvref = [fec hVRef];
+    mb->vInt = [fec vRes];
+    mb->hvRef = [fec hVRef];
     
-    //unsigned char	cmos[6];	//board related	0-ISETA1 1-ISETA0 2-ISETM1 3-ISETM0 4-TACREF 5-VMAX
-    aBundle->tcmos.iseta[1] = [fec cmos:0];
-    aBundle->tcmos.iseta[0] = [fec cmos:1];
-    aBundle->tcmos.isetm[1] = [fec cmos:2];
-    aBundle->tcmos.isetm[0] = [fec cmos:3];
-    aBundle->tcmos.tacref = [fec cmos:4];
-    aBundle->tcmos.vmax = [fec cmos:5];
+    // board related    0-ISETA1 1-ISETA0 2-ISETM1 3-ISETM0 4-TACREF 5-VMAX
+    mb->tCmos.iseta[1] = [fec cmos:0];
+    mb->tCmos.iseta[0] = [fec cmos:1];
+    mb->tCmos.isetm[1] = [fec cmos:2];
+    mb->tCmos.isetm[0] = [fec cmos:3];
+    mb->tCmos.tacRef = [fec cmos:4];
+    mb->tCmos.vMax = [fec cmos:5];
 
-	aBundle->disable_mask = 0;
+    mb->disableMask = [fec seqDisabledMask];
 }
 
 #pragma mark •••Archival
@@ -1275,7 +1373,7 @@ void SwapLongBlock(void* p, int32_t n)
     }
     [self setIsXl3VltThresholdInInit:[decoder decodeBoolForKey:@"ORXL3ModelXl3VltThresholdInInit"]];
 
-	if (xl3Mode == 0) [self setXl3Mode: 1];
+	if (xl3Mode == 0) [self setXl3Mode: INIT_MODE];
 	if (xl3OpsRunning == nil) xl3OpsRunning = [[NSMutableDictionary alloc] init];
     [self setXl3InitInProgress:NO];
     //if (isPollingXl3 == YES) [self setIsPollingXl3:NO];
@@ -1283,11 +1381,11 @@ void SwapLongBlock(void* p, int32_t n)
     [self setTriggerStatus:@"OFF"]; //this was ON before 
 
     //fill the safe bundle for first crate init, then pull the FEC and DB IDs
-    mb_t aConfigBundle;
+    MB aConfigBundle;
     for (i=0; i<16; i++) {
-        memset(&aConfigBundle, 0, sizeof(mb_t));
+        memset(&aConfigBundle, 0, sizeof(MB));
         [self synthesizeDefaultsIntoBundle:&aConfigBundle forSlot:i];
-        memcpy(&safe_bundle[i], &aConfigBundle, sizeof(mb_t));
+        memcpy(&safe_bundle[i], &aConfigBundle, sizeof(MB));
     }
     
     [self safeHvInit];
@@ -1307,7 +1405,7 @@ void SwapLongBlock(void* p, int32_t n)
 	[encoder encodeInt:repeatDelay          forKey:@"ORXL3ModelRepeatDelay"];
 	[encoder encodeInt:repeatOpCount        forKey:@"ORXL3ModelRepeatOpCount"];
 	[encoder encodeInt:xl3Mode              forKey:@"ORXL3ModelXl3Mode"];
-	[encoder encodeInt:slotMask             forKey:@"ORXL3ModelSlotMask"];
+	[encoder encodeInt:selectedSlotMask     forKey:@"ORXL3ModelSlotMask"];
 	[encoder encodeInt:xl3RWAddressValue	forKey:@"ORXL3ModelXl3RWAddressValue"];
 	[encoder encodeInt:xl3RWDataValue       forKey:@"ORXL3ModelXl3RWDataValue"];
 	[encoder encodeInt:xl3PedestalMask      forKey:@"ORXL3ModelXl3PedestalMask"];
@@ -1374,10 +1472,11 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) writeHardwareRegister:(unsigned long)regAddress value:(unsigned long) aValue
 {
-	unsigned long xl3Address = regAddress | WRITE_REG;
+	uint32_t address = regAddress | WRITE_REG;
+    uint32_t value = aValue;
 
 	@try {
-		[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+		[xl3Link sendCommand:0UL toAddress:address withData:&value];
 	}
 	@catch (NSException* e) {
 		NSLog(@"XL3 writeHadwareRegister at address: 0x%08x failed\n", regAddress);
@@ -1387,11 +1486,11 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (unsigned long) readHardwareRegister:(unsigned long)regAddress
 {
-	unsigned long xl3Address = regAddress | READ_REG;
-	unsigned long aValue = 0UL;
+	uint32_t xl3Address = regAddress | READ_REG;
+	uint32_t aValue = 0UL;
 
 	@try {
-		[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+		[xl3Link sendCommand:0UL toAddress:xl3Address withData:&aValue];
 	}
 	@catch (NSException* e) {
 		NSLog(@"XL3 readHadwareRegister at address: 0x%08x failed\n", regAddress);
@@ -1403,9 +1502,11 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) writeHardwareMemory:(unsigned long)memAddress value:(unsigned long)aValue
 {
-	unsigned long xl3Address = memAddress | WRITE_MEM;
+	uint32_t address = memAddress | WRITE_MEM;
+    uint32_t value = aValue;
+
 	@try {
-		[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+		[xl3Link sendCommand:0UL toAddress:address withData:&value];
 	}
 	@catch (NSException* e) {
 		NSLog(@"XL3 writeHadwareMemory at address: 0x%08x failed\n", memAddress);
@@ -1415,10 +1516,10 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (unsigned long) readHardwareMemory:(unsigned long) memAddress
 {
-	unsigned long xl3Address = memAddress | READ_MEM;
-	unsigned long aValue = 0UL;
+	uint32_t xl3Address = memAddress | READ_MEM;
+	uint32_t aValue = 0UL;
 	@try {
-		[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+		[xl3Link sendCommand:0UL toAddress:xl3Address withData:&aValue];
 	}
 	@catch (NSException* e) {
 		NSLog(@"XL3 readHadwareMemory at address: 0x%08x failed\n", memAddress);
@@ -1477,347 +1578,386 @@ void SwapLongBlock(void* p, int32_t n)
 	//[[self xl1] executeCommandList:aList];		
 }
 
-- (void) initCrateRegistersOnly
+- (int) updateXl3Mode
 {
-    if (![[self xl3Link] isConnected]) {
-        NSLog(@"%@ crate init ignored, xl3 is not connected.\n", [[self xl3Link] crateName]);
-        return;
-    }
+    /* Update the model with the current XL3 mode. */
+    char payload[XL3_PAYLOAD_SIZE];
+    memset(payload, 0, XL3_PAYLOAD_SIZE);
     
-    NSDictionary* argDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                             [NSNumber numberWithBool:YES], @"registersFlag",
+    CheckXL3StateResults* result = (CheckXL3StateResults*) payload;
+    
+    @try {
+        [[self xl3Link] sendCommand:CHECK_XL3_STATE_ID withPayload:payload expectResponse:YES];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+            @"xl3 %02d: failed to check XL3 state.\n", [self crateNumber]);
+        return -1;
+    }
+
+    /* Enable undoManager since we are setting the mode outside of the GUI. */
+    [[self undoManager] disableUndoRegistration];
+    [self setXl3Mode: ntohl(result->mode)];
+    [[self undoManager] enableUndoRegistration];
+
+    return 0;
+}
+    
+- (int) setSequencerMasks: (uint32_t) slotMask
+{
+    int oldMode, slot;
+    uint32_t address, value;
+    ORFec32Model *fec;
+
+    if ([self updateXl3Mode]) return -1;
+
+    oldMode = xl3Mode;
+
+    @synchronized (self) {
+        /* synchronize on self here because we don't want to have two
+         * competing threads both setting the XL3 mode */
+        xl3Mode = INIT_MODE;
+        [self writeXl3Mode];
+
+        for (slot = 0; slot < 16; slot++) {
+            if ((slotMask & (1 << slot)) == 0) continue;
+
+            fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
+
+            if (!fec) continue;
+
+            @try {
+                value = 0xffffffff;
+                address = FEC_SEL * slot | 0x90 | WRITE_REG; //CMOS CHIP DIS
+                [xl3Link sendCommand:0UL toAddress:address withData:&value];
+                
+                value = 0x2;
+                address = FEC_SEL * slot | 0x20 | WRITE_REG; //FEC CSR
+                [xl3Link sendCommand:0UL toAddress:address withData:&value];
+
+                value = 0x0;
+                [xl3Link sendCommand:0UL toAddress:address withData:&value];
+
+                value = [self crateNumber] << 11;
+                [xl3Link sendCommand:0UL toAddress:address withData:&value];
+
+                value = [fec seqDisabledMask];
+                address = FEC_SEL * slot | 0x90 | WRITE_REG; //CMOS CHIP DIS
+                [xl3Link sendCommand:0UL toAddress:address withData:&value];
+            } @catch (NSException* e) {
+                NSLog(@"%@ sequencer update failed; error: %@ reason: %@\n",
+                      [[self xl3Link] crateName], [e name], [e reason]);
+            }
+        }
+
+        xl3Mode = oldMode;
+        [self writeXl3Mode];
+    }
+
+    return 0;
+}
+
+- (void) initCrate: (int) xilinxLoad
+{
+    /* Do a full crate init */
+    [self initCrateAsync: xilinxLoad shiftRegOnly: 0
+         slotMask: [self getSlotsPresent]
+         withCallback: @selector(initCrateDone:)
+         target: self];
+}
+
+- (void) loadHardware
+{
+    /* Load current ORCA settings to every single FEC */
+    [self initCrateAsync: 0 shiftRegOnly: SHIFT_AND_DAC
+         slotMask: [self getSlotsPresent] withCallback:NULL target:NULL];
+}
+
+- (void) loadHardwareWithSlotMask: (uint32_t) slotMask
+{
+    /* Load current ORCA settings to select FECs */
+    [self initCrateAsync: 0 shiftRegOnly: SHIFT_AND_DAC slotMask: slotMask
+         withCallback:NULL target:NULL];
+}
+
+- (void) loadHardwareWithSlotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target
+{
+    /* Load current ORCA settings to select FECs, and call `callback` with
+     * the results. The callback should look like:
+     *
+     * - (void) callback: (CrateInitResults *) r
+     *
+     * If the crate init failed, the results pointer will be NULL. */
+
+    [self initCrateAsync: 0 shiftRegOnly: SHIFT_AND_DAC slotMask: slotMask
+         withCallback:callback target:target];
+}
+
+- (void) initCrateAsync: (int) xilinxLoad shiftRegOnly: (uint32_t) shiftRegOnly slotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target
+{
+    /* Initialize the crate in a separate thread and call the selector
+     * `callback` when done. */
+    NSDictionary *args = [NSDictionary dictionaryWithObjectsAndKeys:
+                            [NSNumber numberWithInt:xilinxLoad], @"xilinxload",
+                            [NSNumber numberWithInt:shiftRegOnly], @"shiftregonly",
+                            [NSNumber numberWithInt:slotMask], @"slotmask",
+                            [NSValue valueWithPointer:callback], @"callback",
+                            target, @"target",
                              nil];
-    
-    unsigned short slot;
-    unsigned short ch;
-    unsigned short dbNum;
-    
-    //config bundles
-    for (slot=0; slot<16; slot++) {
-        memset(&hw_bundle[slot], 0, sizeof(mb_t));
-        [self synthesizeFECIntoBundle:&hw_bundle[slot] forSlot:slot];
-        memcpy(&ui_bundle[slot], &hw_bundle[slot], sizeof(mb_t));
-    }
-    
-    //sequencer disable masks
-    unsigned long disableSeqMask[16];
-    for (slot=0; slot<16; slot++) {
-        ORFec32Model* fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
-        if (!fec) {
-            disableSeqMask[slot] = 0;
-        }
-        else {
-            disableSeqMask[slot] = [fec seqDisabledMask];
-        }
-    }
-    
-    //apply pmt online mask
-    for (slot=0; slot<16; slot++) {
-        ORFec32Model* fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
-        if (!fec) {
-            continue;
-        }
+    [NSThread detachNewThreadSelector:@selector(initCrateAsyncThread:)
+        toTarget:self withObject:args];
+}
 
-        if ([fec onlineMask] != 0xffffffff) {
-            for (ch=0; ch<32; ch++) {
-                if (([fec onlineMask] & 0x1UL << ch) == 0) {
-                    //raise thresholds to max
-                    ui_bundle[slot].vthr[ch] = 0xff;
-                    //disable trigger
-                    ui_bundle[slot].tr100.tdelay[ch] &= ~0x40U;
-                    ui_bundle[slot].tr20.twidth[ch] &= ~0x20U;
-                    //disable sequencer
-                    disableSeqMask[slot] |= 0x1UL << ch;
-                }
-            }
-        }
-    }
-    
-    //apply relay mask
-    for (slot=0; slot<16; slot++) {
-        if (([self relayMask] & 0xf << slot) != 0xf) {
-            ORFec32Model* fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
-            if (!fec) {
-                continue;
-            }
+- (void) initCrateAsyncThread: (NSDictionary *) args
+{
+    /* NSThread requires a function with only one argument, so we
+     * pass the arguments in a dictionary and call them here.
+     * Ugh...
+     */
+    [self initCrate: [[args objectForKey:@"xilinxload"] intValue] shiftRegOnly: [[args objectForKey:@"shiftregonly"] intValue] slotMask: [[args objectForKey:@"slotmask"] intValue] withCallback: [[args objectForKey:@"callback"] pointerValue] target: [args objectForKey:@"target"]];
+}
 
-            for (dbNum=0; dbNum<4; dbNum++) {
-                if (([self relayMask] & 0x1ULL << (slot*4 + (3-dbNum))) == 0) {
-                    for (ch=0; ch<8; ch++) {
-                        //raise thresholds to max
-                        ui_bundle[slot].vthr[dbNum*8+ch] = 0xff;
-                        //disable trigger
-                        ui_bundle[slot].tr100.tdelay[dbNum*8+ch] &= ~0x40U;
-                        ui_bundle[slot].tr20.twidth[dbNum*8+ch] &= ~0x20U;
-                    }
-                    //disable sequencer
-                    disableSeqMask[slot] |= 0xffUL << (dbNum*8);
-                }
-            }
-        }
+- (uint32_t) getSlotsPresent
+{
+    /* Returns a bitmask of which slots ORCA thinks are plugged in. */
+    int slot;
+    ORFec32Model *fec;
+
+    uint32_t slotMask = 0;
+
+    for (slot = 0; slot < 16; slot++) {
+        fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
+
+        if (!fec) continue;
+
+        slotMask |= (1 << slot);
     }
-        
-    //apply trigger mask
+
+    return slotMask;
+}
+
+- (void) initCrate: (int) xilinxLoad shiftRegOnly: (uint32_t) shiftRegOnly slotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target
+{
+    /* Initialize the crate with a callback. The callback should look like:
+     *
+     * - (void) callback: (CrateInitResults *) r
+     *
+     * If the crate init failed, the results pointer will be NULL. */
+    CrateInitResults results;
+
+    CrateInitResults *r = &results;
+
+    if ([self initCrate: xilinxLoad shiftRegOnly: shiftRegOnly slotMask: slotMask results: &results]) {
+        r = NULL;
+    }
+
+    if (callback) {
+        /* We have to do this craziness with NSInvocation because
+         * performSelector() can only call selectors which take NSObjects as
+         * parameters. */
+        NSInvocation *method = [NSInvocation invocationWithMethodSignature:[target methodSignatureForSelector:callback]];
+        [method setSelector:callback];
+        [method setTarget:target];
+        [method setArgument:&r atIndex:2];
+        [method invoke];
+    }
+}
+
+- (int) initCrate: (int) xilinxLoad shiftRegOnly: (uint32_t) shiftRegOnly slotMask: (uint32_t) slotMask results: (CrateInitResults *) results
+{
+    int slot, channel;
+    MB mb[16];
+    char payload[XL3_PAYLOAD_SIZE];
+    CrateInitSetupArgs *setupArgs;
+    CrateInitArgs *crateInitArgs;
+
+    if (![[self xl3Link] isConnected]) {
+        NSLogColor([NSColor redColor], @"xl3 %02d is not connected!\n",
+                    [self crateNumber]);
+        return -1;
+    }
+
+    if (shiftRegOnly && xilinxLoad) {
+        NSLogColor([NSColor redColor], @"crate %02d: warning xilinx is not loaded if shiftRegOnly != 0\n", [self crateNumber]);
+    }
+
+    for (slot = 0; slot < 16; slot++) {
+        if ((slotMask & (1 << slot)) == 0) continue;
+
+        [self synthesizeFECIntoBundle:&mb[slot] forSlot:slot];
+    }
+
+    /* If the triggers OFF button has been pressed, turn off N100 and N20
+     * triggers */
     if ([self isTriggerON]) {
         [self setTriggerStatus:@"ON"];
-    }
-    else {
-        for (slot=0; slot<16; slot++) {
-            for (ch=0; ch<32; ch++) {
-                ui_bundle[slot].tr100.tdelay[ch] &= ~0x40U;
-                ui_bundle[slot].tr20.twidth[ch] &= ~0x20U;
+    } else {
+        for (slot = 0; slot < 16; slot++) {
+            if ((slotMask & (1 << slot)) == 0) continue;
+
+            for (channel = 0; channel < 32; channel++) {
+                mb[slot].tr100.tDelay[channel] &= ~0x40U;
+                mb[slot].tr20.tWidth[channel] &= ~0x20U;
             }
         }
         [self setTriggerStatus:@"OFF"];
     }
 
-    
- 	XL3_PayloadStruct payload;
-	memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
-	payload.numberBytesinPayload = sizeof(check_xl3_state_results);
-    
-    check_xl3_state_results* result = (check_xl3_state_results*)payload.payload;
-    
-    @try {
-        [[self xl3Link] sendCommand:CHECK_XL3_STATE_ID withPayload:&payload expectResponse:YES];
+    /* Set the sequencer masks separately because if we are doing a registers
+     * only init, they are not updated. */
+    if (shiftRegOnly) [self setSequencerMasks: slotMask];
+
+    /* Send the first 16 packets which have the FEC settings. Note that
+     * no hardware is updated until we send one more CrateInitArgs packet */
+    for (slot = 0; slot < 16; slot++) {
+        if ((slotMask & (1 << slot)) == 0) continue;
+
+        memset(payload, 0, XL3_PAYLOAD_SIZE);
+        setupArgs = (CrateInitSetupArgs *) payload;
+        setupArgs->mbNum = slot;
+        setupArgs->settings = mb[slot];
+        
+        if ([xl3Link needToSwap]) {
+            setupArgs->mbNum = swapLong(setupArgs->mbNum);
+            [self byteSwapBundle:&setupArgs->settings];
+        }
+
+        @try {
+            [[self xl3Link] sendCommand:CRATE_INIT_ID withPayload:payload expectResponse:NO];
+        } @catch (NSException* e) {
+            NSLog(@"%@ Init crate failed; error: %@ reason: %@\n",[[self xl3Link] crateName], [e name], [e reason]);
+            return -1;
+        }
     }
-    @catch (NSException *e) {
-        NSLog(@"%@ error reading XL3 mode; error: %@ reason: %@\n",
-              [[self xl3Link] crateName], [e name], [e reason]);
+
+    crateInitArgs = (CrateInitArgs *) payload;
+
+    crateInitArgs->mbNum = 0xff;
+    crateInitArgs->xilinxLoad = xilinxLoad;
+    crateInitArgs->hvReset = 0;
+    crateInitArgs->slotMask = slotMask;
+    crateInitArgs->ctcDelay = 0;
+    crateInitArgs->shiftRegOnly = shiftRegOnly;
+
+    if ([xl3Link needToSwap]) {
+        crateInitArgs->mbNum = swapLong(crateInitArgs->mbNum);
+        crateInitArgs->xilinxLoad = swapLong(crateInitArgs->xilinxLoad);
+        crateInitArgs->hvReset = swapLong(crateInitArgs->hvReset);
+        crateInitArgs->slotMask = swapLong(crateInitArgs->slotMask);
+        crateInitArgs->ctcDelay = swapLong(crateInitArgs->ctcDelay);
+        crateInitArgs->shiftRegOnly = swapLong(crateInitArgs->shiftRegOnly);
+    }
+
+    @try {
+        [[self xl3Link] sendCommand:CRATE_INIT_ID withPayload:payload expectResponse:YES];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor], @"%@: crate init failed. error: %@ reason:%@\n", [[self xl3Link] crateName], [e name], [e reason]);
+        return -1;
+    }
+
+    if ([self xl3Mode] != NORMAL_MODE) {
+        NSLog(@"xl3 %02d switching to normal mode.\n", [self crateNumber]);
+        [[self undoManager] disableUndoRegistration];
+        [self setXl3Mode: NORMAL_MODE];
+        [[self undoManager] enableUndoRegistration];
+        [self writeXl3Mode];
+    }
+
+    if (results) *results = *((CrateInitResults *) payload);
+
+    return 0;
+}
+
+- (void) initCrateDone: (CrateInitResults *)r
+{
+    /* Checks the hardware configuration sent back from the XL3 after
+     * a full crate init. */
+
+    int slot, i;
+    FECConfiguration *fec;
+
+    if (r == NULL || r->errorFlags) {
+        /* crate init failed */
         return;
     }
-    
-    if ([xl3Link needToSwap]) {
-        result->mode = swapLong(result->mode);
-    }
-    
-    unsigned int oldMode = result->mode;
-    [self setXl3Mode:1];
-    [self writeXl3Mode];
 
-    for (slot=0; slot<16; slot++) {
-        ORFec32Model* fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
-        if (!fec) {
-            continue;
-        }
+    for (slot = 0; slot < 16; slot++) {
+        fec = &r->hwareVals[slot];
+        fec->mbID = swapShort(fec->mbID);
 
-        unsigned long aValue = disableSeqMask[slot];
-        unsigned long xl3Address = FEC_SEL * slot | 0x90 | WRITE_REG; //CMOS CHIP DIS
-        
-        
-        @try {
-            
-            aValue = 0xffffffff;
-            xl3Address = FEC_SEL * slot | 0x90 | WRITE_REG; //CMOS CHIP DIS
-            [xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
-            
-            aValue = 0x2;
-            xl3Address = FEC_SEL * slot | 0x20 | WRITE_REG; //FEC CSR
-            [xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
-
-            aValue = 0x0;
-            [xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
-
-            aValue = [self crateNumber] << 11;
-            [xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
-
-            aValue = disableSeqMask[slot];
-            xl3Address = FEC_SEL * slot | 0x90 | WRITE_REG; //CMOS CHIP DIS
-            [xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
-
-        }
-        @catch (NSException* e) {
-            NSLog(@"%@ sequencer update failed; error: %@ reason: %@\n",
-                  [[self xl3Link] crateName], [e name], [e reason]);
-            return;
+        for (i = 0; i < 4; i++) {
+            fec->dbID[i] = swapShort(fec->dbID[i]);
         }
     }
 
-    [self setXl3Mode:oldMode];
-    [self writeXl3Mode];
-
-    NSLog(@"%@ sequencer mask updated.\n", [[self xl3Link] crateName]);
-
-    [self performSelector:@selector(initCrateWithDict:) withObject:argDict afterDelay:0];
+    [self checkCrateConfig: (BuildCrateConfigResults *)r];
 }
 
-- (void) initCrateWithXilinx:(BOOL)aXilinxFlag autoInit:(BOOL)anAutoInitFlag
+- (void) checkCrateConfig: (BuildCrateConfigResults *)r
 {
-    NSDictionary* argDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                             [NSNumber numberWithBool:aXilinxFlag], @"xilinxFlag",
-                             [NSNumber numberWithBool:anAutoInitFlag], @"autoInit",
-                             nil];
+    int slot, i;
+    ORFec32Model *fec;
+    ORFecDaughterCardModel *db;
+    FECConfiguration fec_config;
 
-    [self performSelector:@selector(initCrateWithDict:) withObject:argDict afterDelay:0];
-    
-    //these are safe inits, safe bundle is populated in initwithcoder for now
-    //do not touch UI/HW, leave ECAL there
-    /*
-    unsigned short i;
-    for (i=0; i<16; i++) {
-        memcpy(&hw_bundle[i], &safe_bundle[i], sizeof(mb_t));
-        memcpy(&ui_bundle[i], &safe_bundle[i], sizeof(mb_t));
+    if (r == NULL) {
+        NSLogColor([NSColor redColor], @"checkCrateConfig: config results is NULL!\n");
+        return;
     }
-     */
-}
 
-- (void) initCrateWithDict:(NSDictionary*)argDict
-{
     @synchronized(self) {
-        
-        if ([self xl3InitInProgress]) {
-            NSLog(@"%@ New init crate ignored since init is in progress already.\n",[[self xl3Link] crateName]);
-            return;
-        }
-        
-        BOOL registersFlag = NO;
-        if ([argDict objectForKey:@"registersFlag"])
-            registersFlag = [[argDict objectForKey:@"registersFlag"] boolValue];
-        
-        BOOL aXilinxFlag = NO;
-        if ([argDict objectForKey:@"xilinxFlag"])
-            aXilinxFlag = [[argDict objectForKey:@"xilinxFlag"] boolValue];
-        
-        BOOL anAutoInitFlag = NO;
-        if ([argDict objectForKey:@"autoInit"])
-            anAutoInitFlag = [[argDict objectForKey:@"autoInit"] boolValue];
-        
-        XL3_PayloadStruct payload;
-        memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
-        payload.numberBytesinPayload = sizeof(mb_t) + 4;
-        unsigned long* aMbId = (unsigned long*) payload.payload;
-        mb_t* aConfigBundle = (mb_t*) (payload.payload + 4);
-        
-        BOOL loadOk = YES;
-        unsigned short i;
+        for (slot = 0; slot < 16; slot++) {
+            fec_config = r->hwareVals[slot];
+            fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
 
-        NSLog(@"%@ Init Crate...\n",[[self xl3Link] crateName]);
+            if (fec) {
+                [fec checkConfig:&fec_config];
+            } else {
+                if (fec_config.mbID) {
+                    NSLogColor([NSColor redColor], @"adding fec to ORCA\n");
 
-        for (i=0; i<16; i++) {
-            memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
-            *aMbId = i;
-            
-            if (registersFlag) {
-                memcpy(aConfigBundle, &ui_bundle[i], sizeof(mb_t));
-            }
-            else {
-                memcpy(aConfigBundle, &safe_bundle[i], sizeof(mb_t));
-            }
+                    fec = [ObjectFactory makeObject:@"ORFec32Model"];
+                    [fec setBoardID:[NSString stringWithFormat:@"%x", fec_config.mbID]];
 
-            if ([xl3Link needToSwap]) {
-                *aMbId = swapLong(*aMbId);
-                [self byteSwapBundle:aConfigBundle];
-            }
-            @try {
-                [[self xl3Link] sendCommand:CRATE_INIT_ID withPayload:&payload expectResponse:NO];
-                /*
-                if (*(unsigned int*) payload.payload != 0) {
-                    NSLog(@"XL3 doesn't like the config bundle for slot %d, exiting.\n", i);
-                    loadOk = NO;
-                    break;
-                }
-                */
-            }
-            @catch (NSException* e) {
-                NSLog(@"%@ Init crate failed; error: %@ reason: %@\n",[[self xl3Link] crateName], [e name], [e reason]);
-                loadOk = NO;
-                break;
-            }
-        }
-            
-        if (loadOk) {
-            memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
-            // time to fly (never say 16 here!)
-            aMbId[0] = 666;
-            
-            // xil load
-            if (aXilinxFlag == YES) aMbId[1] = 1;
-            else aMbId[1] = 0;
-            
-            // hv reset, always pass 0
-            aMbId[2] = 0;
-            
-            // slot mask
-            unsigned int msk = 0;
-            if (anAutoInitFlag == YES) {
-                msk = 0xFFFF;
-                NSLog(@"AutoInits not yet implemented, XL3 will freeze probably.\n");
-            }
-            else {
-                ORFec32Model* aFec;
-                msk = 0;
-                NSArray* fecs = [[self guardian] collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
-                for (aFec in fecs) {
-                    msk |= 1 << [aFec stationNumber];
+                    dispatch_sync(dispatch_get_main_queue(), ^{
+                        [[self guardian] addObject:fec];
+                        [[self guardian] place:fec intoSlot:16-slot];
+                    });
+
+                    for (i = 0; i < 4; i++) {
+                        db = [ObjectFactory makeObject:@"ORFecDaughterCardModel"];
+                        [db setBoardID:[NSString stringWithFormat:@"%x", fec_config.dbID[i]]];
+
+                        dispatch_sync(dispatch_get_main_queue(), ^{
+                            [fec addObject:db];
+                            [fec place:db intoSlot:i];
+                        });
+                    }
                 }
             }
-            aMbId[3] = msk;
-
-            // ctc delay
-            aMbId[4] = 0;
-            // cmos shift regs only if != 0
-            aMbId[5] = 0;
-            if (registersFlag) {
-                aMbId[5] = 2; // 0 everything, 1 shift only, 2 shift and dac
-            }
-            
-            if ([xl3Link needToSwap]) {
-                for (i=0; i<6; i++) aMbId[i] = swapLong(aMbId[i]);
-            }
-            
-            //init takes some time...
-            [self setXl3LinkTimeOut:[[self xl3Link] errorTimeOut]];
-            [[self xl3Link] setErrorTimeOut:2];
-            //[[self xl3Link] performSelector:@selector(setErrorTimeOut:) withObject:[NSNumber numberWithInt:currentTimeOut] afterDelay:60];
-            @try {
-                NSDictionary* arggDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                                         [NSNumber numberWithInt:CRATE_INIT_ID], @"cmdId",
-                                         [NSData dataWithBytes:&payload length:sizeof(XL3_PayloadStruct)], @"payload",
-                                         [NSNumber numberWithBool:YES], @"response",
-                                         @"initCrateDone:", @"callback",
-                                         argDict, @"initArgs",
-                                         nil];
-                timer = [[ORTimer alloc]init];
-                [timer start];
-
-                [NSThread detachNewThreadSelector:@selector(sendCommandWithDict:) toTarget:self withObject:arggDict];
-                
-                //[[self xl3Link] sendCommand:CRATE_INIT_ID withPayload:&payload expectResponse:YES];
-                /*
-                if (*(unsigned int*)payload.payload != 0) {
-                    NSLog(@"%@ error during init.\n",[[self xl3Link] crateName]);
-                }
-                 */
-                
-                //todo look into the hw params returned
-                /* xl3 does the following on successfull init, or returns zeros here if things go wrong
-                 for (i=0;i<16;i++){
-                 response_hware_vals = (mb_hware_vals_t *) (payload+4+i*sizeof(mb_hware_vals_t));
-                 *response_hware_vals = hware_vals[i];
-                 */
-            }
-            @catch (NSException* e) {
-                NSLog(@"%@ init crate failed; error: %@ reason: %@\n",[[self xl3Link] crateName], [e name], [e reason]);
-                [[self xl3Link] setErrorTimeOut:[self xl3LinkTimeOut]];
-                return;
-            }
-            [self setXl3InitInProgress:YES];
         }
-        else {
-            NSLog(@"%@ error loading config, init skipped.\n",[[self xl3Link] crateName]);
-        }
-    }//synchronized
+
+        // update XL3 alarm levels on safe init
+        if ([self isXl3VltThresholdInInit]) [self setVltThreshold];
+
+    }
 }
 
 - (void) ecalToOrca
 {
     unsigned short slot;
+    ORCouchDB *couch;
+
+    if ((couch = [self debugDBRef]) == NULL) {
+        NSLog(@"ecalToOrca: couldn't get CouchDB from SNOPModel!");
+        return;
+    }
+
     [self setEcal_received:0UL];
     for (slot=0; slot<16; slot++) {
         NSString* requestString = [NSString stringWithFormat:@"_design/penn_daq_views/_view/get_fec_by_generated?descending=true&startkey=[%d,%d,{}]&endkey=[%d,%d,\"\"]&limit=1",[self crateNumber], slot, [self crateNumber], slot];
         NSString* tagString = [NSString stringWithFormat:@"%@.%d.%d", kDebugDbEcalDocGot, [self crateNumber], slot];
         //NSLog(@"%@ slot %hd request: %@ tag: %@\n", [[self xl3Link] crateName], slot, requestString, tagString);
-        [[self debugDBRef] getDocumentId:requestString tag:tagString];
+        [couch getDocumentId:requestString tag:tagString];
     }
     NSLog(@"%@ ECAL docs requested from debugDB\n", [[self xl3Link] crateName]);
     [self setEcalToOrcaInProgress:YES];
@@ -1863,9 +2003,9 @@ void SwapLongBlock(void* p, int32_t n)
     NSString* docId = [[[aResult objectForKey:@"rows"] objectAtIndex:0] objectForKey:@"id"];
 
     unsigned int crate_num = [[keyArray objectAtIndex:0] intValue];
-    unsigned int slot_num = [[keyArray objectAtIndex:1] intValue];
+    unsigned int slotNum = [[keyArray objectAtIndex:1] intValue];
 
-    NSLog(@"key array crate: %d slot: %d time: %@, id: %@\n", crate_num, slot_num, [keyArray objectAtIndex:2], docId);
+    NSLog(@"key array crate: %d slot: %d time: %@, id: %@\n", crate_num, slotNum, [keyArray objectAtIndex:2], docId);
     
     if ([self crateNumber] != crate_num) {
         NSLog(@"%@ error parsing ECAL document, the crate number in the key array doesn't match: %d\n",
@@ -1876,71 +2016,71 @@ void SwapLongBlock(void* p, int32_t n)
     NSDictionary* hwDic = [ecalDoc objectForKey:@"hw"];
     if (!hwDic) {
         NSLog(@"%@ error parsing ECAL document, the hw dictionary missing for slot: %d\n",
-              [[self xl3Link] crateName], slot_num);
+              [[self xl3Link] crateName], slotNum);
         return;
     }
 
-    mb_t aConfigBundle;
-    memset(&aConfigBundle, 0, sizeof(mb_t));
+    MB aConfigBundle;
+    memset(&aConfigBundle, 0, sizeof(MB));
     
     unsigned short i, j;
-    aConfigBundle.mb_id = 0;
+    aConfigBundle.mbID = 0;
     for (i=0; i<4; i++) {
-        aConfigBundle.dc_id[i] = 0;
+        aConfigBundle.dbID[i] = 0;
     }
     
     for (i=0; i<2; i++) {
         for (j=0; j<32; j++) {
-            aConfigBundle.vbal[i][j] = [[[[hwDic objectForKey:@"vbal"] objectAtIndex:i] objectAtIndex:j] intValue];
+            aConfigBundle.vBal[i][j] = [[[[hwDic objectForKey:@"vbal"] objectAtIndex:i] objectAtIndex:j] intValue];
         }
     }
     
     for (i=0; i<32; i++) {
-        aConfigBundle.vthr[i] = [[[hwDic objectForKey:@"vthr"] objectAtIndex:i] intValue];
+        aConfigBundle.vThr[i] = [[[hwDic objectForKey:@"vthr"] objectAtIndex:i] intValue];
     }
     
     for (i=0; i<8; i++) {
-        aConfigBundle.tdisc.rmp[i] = [[[[hwDic objectForKey:@"tdisc"] objectForKey:@"rmp"] objectAtIndex:i] intValue];
-        aConfigBundle.tdisc.rmpup[i] = [[[[hwDic objectForKey:@"tdisc"] objectForKey:@"rmpup"] objectAtIndex:i] intValue];
-        aConfigBundle.tdisc.vsi[i] = [[[[hwDic objectForKey:@"tdisc"] objectForKey:@"vsi"] objectAtIndex:i] intValue];
-        aConfigBundle.tdisc.vli[i] = [[[[hwDic objectForKey:@"tdisc"] objectForKey:@"vli"] objectAtIndex:i] intValue];
+        aConfigBundle.tDisc.rmp[i] = [[[[hwDic objectForKey:@"tdisc"] objectForKey:@"rmp"] objectAtIndex:i] intValue];
+        aConfigBundle.tDisc.rmpup[i] = [[[[hwDic objectForKey:@"tdisc"] objectForKey:@"rmpup"] objectAtIndex:i] intValue];
+        aConfigBundle.tDisc.vsi[i] = [[[[hwDic objectForKey:@"tdisc"] objectForKey:@"vsi"] objectAtIndex:i] intValue];
+        aConfigBundle.tDisc.vli[i] = [[[[hwDic objectForKey:@"tdisc"] objectForKey:@"vli"] objectAtIndex:i] intValue];
     }
     
-    aConfigBundle.tcmos.vmax = [[[hwDic objectForKey:@"tcmos"] objectForKey:@"vmax"] intValue];
-    aConfigBundle.tcmos.tacref = [[[hwDic objectForKey:@"tcmos"] objectForKey:@"vtacref"] intValue];
+    aConfigBundle.tCmos.vMax = [[[hwDic objectForKey:@"tcmos"] objectForKey:@"vmax"] intValue];
+    aConfigBundle.tCmos.tacRef = [[[hwDic objectForKey:@"tcmos"] objectForKey:@"vtacref"] intValue];
     for (i=0; i<2; i++) {
-        aConfigBundle.tcmos.isetm[i] = [[[[hwDic objectForKey:@"tcmos"] objectForKey:@"isetm"] objectAtIndex:i] intValue];
-        aConfigBundle.tcmos.iseta[i] = [[[[hwDic objectForKey:@"tcmos"] objectForKey:@"iseta"] objectAtIndex:i] intValue];
+        aConfigBundle.tCmos.isetm[i] = [[[[hwDic objectForKey:@"tcmos"] objectForKey:@"isetm"] objectAtIndex:i] intValue];
+        aConfigBundle.tCmos.iseta[i] = [[[[hwDic objectForKey:@"tcmos"] objectForKey:@"iseta"] objectAtIndex:i] intValue];
     }
     for (i=0; i<32; i++) {
-        aConfigBundle.tcmos.tac_shift[i] = [[[[hwDic objectForKey:@"tcmos"] objectForKey:@"tac_trim"] objectAtIndex:i] intValue];
+        aConfigBundle.tCmos.tacShift[i] = [[[[hwDic objectForKey:@"tcmos"] objectForKey:@"tac_trim"] objectAtIndex:i] intValue];
     }
 
-    aConfigBundle.vint = [[hwDic objectForKey:@"vint"] intValue];
-    aConfigBundle.hvref = [[hwDic objectForKey:@"hvref"] intValue];
+    aConfigBundle.vInt = [[hwDic objectForKey:@"vint"] intValue];
+    aConfigBundle.hvRef = [[hwDic objectForKey:@"hvref"] intValue];
 
     for (i=0; i<32; i++) {
         aConfigBundle.tr100.mask[i] = [[[[hwDic objectForKey:@"tr100"] objectForKey:@"mask"] objectAtIndex:i] intValue];
-        aConfigBundle.tr100.tdelay[i] = [[[[hwDic objectForKey:@"tr100"] objectForKey:@"delay"] objectAtIndex:i] intValue];
+        aConfigBundle.tr100.tDelay[i] = [[[[hwDic objectForKey:@"tr100"] objectForKey:@"delay"] objectAtIndex:i] intValue];
     }
 
     for (i=0; i<32; i++) {
         aConfigBundle.tr20.mask[i] = [[[[hwDic objectForKey:@"tr20"] objectForKey:@"mask"] objectAtIndex:i] intValue];
-        aConfigBundle.tr20.tdelay[i] = [[[[hwDic objectForKey:@"tr20"] objectForKey:@"delay"] objectAtIndex:i] intValue];
-        aConfigBundle.tr20.twidth[i] = [[[[hwDic objectForKey:@"tr20"] objectForKey:@"width"] objectAtIndex:i] intValue];
+        aConfigBundle.tr20.tDelay[i] = [[[[hwDic objectForKey:@"tr20"] objectForKey:@"delay"] objectAtIndex:i] intValue];
+        aConfigBundle.tr20.tWidth[i] = [[[[hwDic objectForKey:@"tr20"] objectForKey:@"width"] objectAtIndex:i] intValue];
     }
 
     for (i=0; i<32; i++) {
-        aConfigBundle.scmos[i] = [[[[hwDic objectForKey:@"tr20"] objectForKey:@"scmos"] objectAtIndex:i] intValue];
+        aConfigBundle.sCmos[i] = [[[[hwDic objectForKey:@"tr20"] objectForKey:@"scmos"] objectAtIndex:i] intValue];
     }
 
-	aConfigBundle.disable_mask = 0;
+	aConfigBundle.disableMask = 0;
 
-    memcpy(&ecal_bundle[slot_num], &aConfigBundle, sizeof(mb_t));
-    [self updateUIFromEcalBundle:hwDic slot:slot_num];
-    [self synthesizeFECIntoBundle:&hw_bundle[slot_num] forSlot:slot_num];
+    memcpy(&ecal_bundle[slotNum], &aConfigBundle, sizeof(MB));
+    [self updateUIFromEcalBundle:hwDic slot:slotNum];
+    [self synthesizeFECIntoBundle:&hw_bundle[slotNum] forSlot:slotNum];
     
-    [self setEcal_received:[self ecal_received] | 1UL << slot_num];
+    [self setEcal_received:[self ecal_received] | 1UL << slotNum];
     //NSLog(@"ecal received mask: 0x%08x\n", [self ecal_received]);
     if ([self ecal_received] == 0xffffUL) {
         [self ecalToOrcaDocumentsReceived];
@@ -2069,8 +2209,7 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) orcaToHw
 {
-    [self initCrateRegistersOnly];
-    NSLog(@"%@ crate init registers only\n", [[self xl3Link] crateName]);
+    [self loadHardware];
 }
 
 - (BOOL) isRelayClosedForSlot:(unsigned int)slot pc:(unsigned int)aPC
@@ -2135,40 +2274,44 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) writeXl3Mode
 {
-	XL3_PayloadStruct payload;
-	payload.numberBytesinPayload = 8;
-	unsigned long* data = (unsigned long*) payload.payload;
+    /* Change the mode of the XL3. In init mode, the XL3 does not read out
+     * the front end cards, while in normal mode it reads out whichever
+     * front end cards are specified in the dataAvailMask. Here we set the
+     * dataAvailMask to whichever cards ORCA thinks are present. */
 
-	if ([xl3Link needToSwap]) {
-		data[0] = swapLong([self xl3Mode]);
-		data[1] = swapLong([self slotMask]);
-	}
-	else {
-		data[0] = [self xl3Mode];
-		data[1] = [self slotMask];
-	}
-	
-	[self setXl3ModeRunning:YES];
-	NSLog(@"%@ Set mode: %d slot mask: 0x%04x ...\n",[[self xl3Link] crateName], [self xl3Mode], [self slotMask]);
-	@try {
-		[[self xl3Link] sendCommand:CHANGE_MODE_ID withPayload:&payload expectResponse:YES];
-		NSLog(@"ok\n");
-	}
-	@catch (NSException* e) {
-		NSLog(@"Set XL3 mode failed; error: %@ reason: %@\n", [e name], [e reason]);
-	}
-	[self setXl3ModeRunning:NO];
-	//XL3 sends the payload back not touching it, should we check?	
+    char payload[XL3_PAYLOAD_SIZE];
+    ChangeModeArgs* args = (ChangeModeArgs *) payload;
+
+    args->mode = [self xl3Mode];
+    args->dataAvailMask = [self getSlotsPresent];
+
+    if ([xl3Link needToSwap]) {
+        args->mode = swapLong(args->mode);
+        args->dataAvailMask = swapLong(args->dataAvailMask);
+    }
+
+    [self setXl3ModeRunning:YES];
+    @try {
+        [[self xl3Link] sendCommand:CHANGE_MODE_ID withPayload:payload
+                             expectResponse:YES];
+        NSLog(@"xl3 %02d set to %s mode.\n", [self crateNumber],
+                (xl3Mode == INIT_MODE) ? "INIT" : "NORMAL");
+    } @catch (NSException* e) {
+        NSLogColor([NSColor redColor],
+                    @"Set XL3 mode failed; error: %@ reason: %@\n",
+                    [e name], [e reason]);
+    }
+    [self setXl3ModeRunning:NO];
 }
 
 - (void) compositeXl3RW
 {
-	unsigned long aValue = [self xl3RWDataValue];
+	uint32_t aValue = [self xl3RWDataValue];
 	NSLog(@"%@ XL3_rw to address: 0x%08x with data: 0x%08x\n",[[self xl3Link] crateName], [self xl3RWAddressValue], aValue);
 	[self setXl3OpsRunning:YES forKey:@"compositeXl3RW"];
 	
 	@try {
-		[xl3Link sendFECCommand:0UL toAddress:[self xl3RWAddressValue] withData:&aValue];
+		[xl3Link sendCommand:0UL toAddress:[self xl3RWAddressValue] withData:&aValue];
 		NSLog(@"XL3_rw returned data: 0x%08x\n", aValue);
 	}
 	@catch (NSException* e) {
@@ -2180,9 +2323,8 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) compositeQuit
 {
-	XL3_PayloadStruct payload;
-	payload.numberBytesinPayload = 8;
-	unsigned long* data = (unsigned long*) payload.payload;
+	char payload[XL3_PAYLOAD_SIZE];
+	unsigned long* data = (unsigned long*) payload;
 	
 	if ([xl3Link needToSwap]) {
 		data[0] = 0x20657942UL;
@@ -2196,7 +2338,7 @@ void SwapLongBlock(void* p, int32_t n)
 	[self setXl3OpsRunning:YES forKey:@"compositeQuit"];
 	NSLog(@"%@ Send XL3 Quit ...\n", [[self xl3Link] crateName]);
 	@try {
-		[[self xl3Link] sendCommand:DAQ_QUIT_ID withPayload:&payload expectResponse:NO];
+		[[self xl3Link] sendCommand:DAQ_QUIT_ID withPayload:payload expectResponse:NO];
 		NSLog(@"ok\n");
 	}
 	@catch (NSException* e) {
@@ -2207,9 +2349,8 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) compositeSetPedestal
 {
-	XL3_PayloadStruct payload;
-	payload.numberBytesinPayload = 8;
-	unsigned long* data = (unsigned long*) payload.payload;
+	char payload[XL3_PAYLOAD_SIZE];
+	unsigned long* data = (unsigned long*) payload;
 
 	if ([xl3Link needToSwap]) {
 		data[0] = swapLong([self slotMask]);
@@ -2223,7 +2364,7 @@ void SwapLongBlock(void* p, int32_t n)
 	[self setXl3OpsRunning:YES forKey:@"compositeSetPedestal"];
 	NSLog(@"%@ Set Pedestal ...\n", [[self xl3Link] crateName]);
 	@try {
-		[[self xl3Link] sendCommand:SET_CRATE_PEDESTALS_ID withPayload:&payload expectResponse:YES];
+		[[self xl3Link] sendCommand:SET_CRATE_PEDESTALS_ID withPayload:payload expectResponse:YES];
 		if ([xl3Link needToSwap]) *data = swapLong(*data);
 		if (*data == 0) NSLog(@"ok\n");
 		else NSLog(@"failed with XL3 error: 0x%08x\n", *data);
@@ -2265,9 +2406,8 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (unsigned short) getBoardIDForSlot:(unsigned short)aSlot chip:(unsigned short)aChip
 {
-	XL3_PayloadStruct payload;
-	payload.numberBytesinPayload = 12;
-	unsigned long* data = (unsigned long*) payload.payload;
+	char payload[XL3_PAYLOAD_SIZE];
+	unsigned long* data = (unsigned long*) payload;
 	
 	data[0] = aSlot;
 	data[1] = aChip;
@@ -2280,7 +2420,7 @@ void SwapLongBlock(void* p, int32_t n)
 	}
 
 	@try {
-		[[self xl3Link] sendCommand:BOARD_ID_READ_ID withPayload:&payload expectResponse:YES];
+		[[self xl3Link] sendCommand:BOARD_ID_READ_ID withPayload:payload expectResponse:YES];
 		if ([xl3Link needToSwap]) *data = swapLong(*data);
 	}
 	@catch (NSException* e) {
@@ -2381,11 +2521,11 @@ void SwapLongBlock(void* p, int32_t n)
 	[self setXl3OpsRunning:YES forKey:@"compositResetFIFOAndSeuencer"];
 	NSLog(@"Reset FIFO and Sequencer to be implemented.\n");
 	//slot mask?
-	unsigned long xl3Address = XL3_SEL | [self getRegisterAddress:kXl3SelectReg] | WRITE_REG;
-	unsigned long aValue = 0xffffffffUL;
+	uint32_t xl3Address = XL3_SEL | [self getRegisterAddress:kXl3SelectReg] | WRITE_REG;
+	uint32_t aValue = 0xffffffffUL;
     
 	@try {
-		[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+		[xl3Link sendCommand:0UL toAddress:xl3Address withData:&aValue];
 	}
 	@catch (NSException* e) {
 		NSLog(@"%@ SW reset failed.\n",[[self xl3Link] crateName]);
@@ -2462,9 +2602,9 @@ void SwapLongBlock(void* p, int32_t n)
 {
     //borrowed from penn_daq EnableChargeInjection
     
-    unsigned long aValue = 0;
-    unsigned long xl3Value = 0;
-    unsigned long xl3Address = FEC_SEL * aSlot | 0x26 | WRITE_REG; //FEC HV CSR
+    uint32_t aValue = 0;
+    uint32_t xl3Value = 0;
+    uint32_t xl3Address = FEC_SEL * aSlot | 0x26 | WRITE_REG; //FEC HV CSR
     const int HV_BIT_COUNT = 40;
     
     @try {
@@ -2477,19 +2617,19 @@ void SwapLongBlock(void* p, int32_t n)
                 aValue = ((0x1 << (bit_iter -1)) & aChannelMask) ? HV_CSR_DATIN : 0x0;
             }
             xl3Value = aValue;
-            [xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&xl3Value];
+            [xl3Link sendCommand:0UL toAddress:xl3Address withData:&xl3Value];
             //[[self xl3Link] addMultiCmdToAddress:xl3Address withValue:xl3Value];
 
             xl3Value = aValue | HV_CSR_CLK;
-            [xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&xl3Value];
+            [xl3Link sendCommand:0UL toAddress:xl3Address withData:&xl3Value];
             //[[self xl3Link] addMultiCmdToAddress:xl3Address withValue:xl3Value];
         } // end loop over bits
 
         aValue = 0;
-		[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+		[xl3Link sendCommand:0UL toAddress:xl3Address withData:&aValue];
         //[[self xl3Link] addMultiCmdToAddress:xl3Address withValue:aValue];
         aValue = HV_CSR_LOAD;
-		[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+		[xl3Link sendCommand:0UL toAddress:xl3Address withData:&aValue];
         //[[self xl3Link] addMultiCmdToAddress:xl3Address withValue:xl3Value];
 
         /*
@@ -2515,10 +2655,9 @@ void SwapLongBlock(void* p, int32_t n)
         
 /*
     
-	XL3_PayloadStruct payload;
-	memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
-	payload.numberBytesinPayload = 8;
-	unsigned long* data = (unsigned long*) payload.payload;
+	char payload[XL3_PAYLOAD_SIZE];
+	memset(payload, 0, XL3_PAYLOAD_SIZE);
+	unsigned long* data = (unsigned long*) payload;
     
     uint32_t slot = aSlot;
     uint32_t mask = aChannelMask;
@@ -2532,13 +2671,13 @@ void SwapLongBlock(void* p, int32_t n)
     data[1] = mask;
 
     @try {
-        [[self xl3Link] sendCommand:SETUP_CHARGE_INJ_ID withPayload:&payload expectResponse:YES];
+        [[self xl3Link] sendCommand:SETUP_CHARGE_INJ_ID withPayload:payload expectResponse:YES];
     }
     @catch (NSException *exception) {
         NSLog(@"error sending ChargeInjection command.\n");
     }
 
-    if (*(unsigned int*)payload.payload != 0) {
+    if (*(unsigned int*)payload != 0) {
         NSLog(@"XL3 error in enableChargeInjectionForSlot.\n");
     }
 
@@ -2566,30 +2705,29 @@ void SwapLongBlock(void* p, int32_t n)
 }
 
 #pragma mark •••HV
-- (void) readCMOSCountWithArgs:(check_total_count_args_t*)aArgs counts:(check_total_count_results_t*)aCounts;
+- (void) readCMOSCountWithArgs:(CheckTotalCountArgs*)aArgs counts:(CheckTotalCountResults*)aCounts;
 {
-	XL3_PayloadStruct payload;
-	memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
-	payload.numberBytesinPayload = sizeof(check_total_count_results_t);
+	char payload[XL3_PAYLOAD_SIZE];
+	memset(payload, 0, XL3_PAYLOAD_SIZE);
     
-	check_total_count_args_t* data = (check_total_count_args_t*) payload.payload;
-    memcpy(data, aArgs, sizeof(check_total_count_args_t));
+	CheckTotalCountArgs* data = (CheckTotalCountArgs*) payload;
+    memcpy(data, aArgs, sizeof(CheckTotalCountArgs));
     
     //max 8 slots may be masked in
-    unsigned int v = data->slot_mask;
+    unsigned int v = data->slotMask;
     unsigned int c;
     for (c = 0; v; c++) v &= v - 1;
     if (c > 8) {
         NSLog(@"%@ error in readCMOSCountWithArgs: more than 8 slots were masked in, ask less.\n", [[self xl3Link] crateName]);
-        @throw [NSException exceptionWithName:@"readCMOSCount error" reason:@"More than 8 slots were masked in slot_mask" userInfo:nil];
+        @throw [NSException exceptionWithName:@"readCMOSCount error" reason:@"More than 8 slots were masked in slotMask" userInfo:nil];
     }
     
     if ([xl3Link needToSwap]) {
-        SwapLongBlock(data, sizeof(check_total_count_args_t)/4);
+        SwapLongBlock(data, sizeof(CheckTotalCountArgs)/4);
     }
     
     @try {
-        [[self xl3Link] sendCommand:CHECK_TOTAL_COUNT_ID withPayload:&payload expectResponse:YES];
+        [[self xl3Link] sendCommand:CHECK_TOTAL_COUNT_ID withPayload:payload expectResponse:YES];
     }
     @catch (NSException *exception) {
         NSLog(@"%@ error sending CHECK_TOTAL_COUNT_ID command.\n",[[self xl3Link] crateName]);
@@ -2597,19 +2735,19 @@ void SwapLongBlock(void* p, int32_t n)
     }
     
     if ([xl3Link needToSwap]) {
-        SwapLongBlock(data, sizeof(check_total_count_results_t)/4);
+        SwapLongBlock(data, sizeof(CheckTotalCountResults)/4);
     }
     
-    memcpy(aCounts, data, sizeof(check_total_count_results_t));
+    memcpy(aCounts, data, sizeof(CheckTotalCountResults));
 }
 
 - (void) readCMOSCountForSlot:(unsigned short)aSlot withChannelMask:(unsigned long)aChannelMask
 {
-    check_total_count_args_t args;
-    check_total_count_results_t results;
+    CheckTotalCountArgs args;
+    CheckTotalCountResults results;
     
-    args.slot_mask |= 0x1 << aSlot;
-    args.channel_masks[aSlot] = aChannelMask;
+    args.slotMask |= 0x1 << aSlot;
+    args.channelMasks[aSlot] = aChannelMask;
     
     @try {
         [self readCMOSCountWithArgs:&args counts:&results];
@@ -2618,15 +2756,15 @@ void SwapLongBlock(void* p, int32_t n)
         ;
     }
     
-    if (results.error_flags != 0) {
-        NSLog(@"%@ error in readCMOSCountForSlot, error_flags: 0x%08x.\n",[[self xl3Link] crateName], results.error_flags);
+    if (results.errorFlags != 0) {
+        NSLog(@"%@ error in readCMOSCountForSlot, errorFlags: 0x%08x.\n",[[self xl3Link] crateName], results.errorFlags);
     }
     else{
         NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ CMOS counts for slot: %d\n", [[self xl3Link] crateName], aSlot];
         unsigned int i;
         for (i=0; i<32; i++) {
             if (aChannelMask & 1 << i) {
-                [msg appendFormat:@"%d: %u\n", i, results.counts[i]];
+                [msg appendFormat:@"%d: %u\n", i, results.count[i]];
             }
         }
         NSLog(msg);
@@ -2636,25 +2774,25 @@ void SwapLongBlock(void* p, int32_t n)
 - (void) readCMOSCount
 {
     //all slots, all channels, two shots
-    check_total_count_args_t args_lo;
-    check_total_count_args_t args_hi;
-    check_total_count_results_t results_lo;
-    check_total_count_results_t results_hi;
+    CheckTotalCountArgs args_lo;
+    CheckTotalCountArgs args_hi;
+    CheckTotalCountResults results_lo;
+    CheckTotalCountResults results_hi;
     
-    memset(&args_lo, 0, sizeof(check_total_count_args_t));
-    memset(&args_hi, 0, sizeof(check_total_count_args_t));
-    memset(&results_lo, 0, sizeof(check_total_count_results_t));
-    memset(&results_hi, 0, sizeof(check_total_count_results_t));
+    memset(&args_lo, 0, sizeof(CheckTotalCountArgs));
+    memset(&args_hi, 0, sizeof(CheckTotalCountArgs));
+    memset(&results_lo, 0, sizeof(CheckTotalCountResults));
+    memset(&results_hi, 0, sizeof(CheckTotalCountResults));
     
     unsigned char i;
-    NSLog(@"%@ error in readCMOSCount, error_flags_lo: 0x%08x, error_flags_hi: 0x%08x\n",
-          [[self xl3Link] crateName], results_lo.error_flags, results_hi.error_flags);
+    NSLog(@"%@ error in readCMOSCount, errorFlags_lo: 0x%08x, errorFlags_hi: 0x%08x\n",
+          [[self xl3Link] crateName], results_lo.errorFlags, results_hi.errorFlags);
     
-    args_lo.slot_mask = 0xff;
-    for (i = 0; i < 8; i++) args_lo.channel_masks[i] = 0xffffffff;
+    args_lo.slotMask = 0xff;
+    for (i = 0; i < 8; i++) args_lo.channelMasks[i] = 0xffffffff;
     
-    args_hi.slot_mask = 0xff00;
-    for (i = 8; i < 16; i++) args_hi.channel_masks[i] = 0xffffffff;
+    args_hi.slotMask = 0xff00;
+    for (i = 8; i < 16; i++) args_hi.channelMasks[i] = 0xffffffff;
     
     @try {
         [self readCMOSCountWithArgs:&args_lo counts:&results_lo];
@@ -2664,9 +2802,9 @@ void SwapLongBlock(void* p, int32_t n)
         ;
     }
     
-    if (results_lo.error_flags != 0 || results_hi.error_flags != 0) {
-        NSLog(@"%@ error in readCMOSCount, error_flags_lo: 0x%08x, error_flags_hi: 0x%08x\n",
-              [[self xl3Link] crateName], results_lo.error_flags, results_hi.error_flags);
+    if (results_lo.errorFlags != 0 || results_hi.errorFlags != 0) {
+        NSLog(@"%@ error in readCMOSCount, errorFlags_lo: 0x%08x, errorFlags_hi: 0x%08x\n",
+              [[self xl3Link] crateName], results_lo.errorFlags, results_hi.errorFlags);
     }
     else{
         NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ CMOS counts:\n", [[self xl3Link] crateName]];
@@ -2674,14 +2812,14 @@ void SwapLongBlock(void* p, int32_t n)
         for (i=0; i<32; i++) {
             [msg appendFormat:@"slot %d, ch%2d-%2d:", i/4, i%4 * 8, (i%4 + 1) * 8 - 1];
             for (j=0; j<8; j++) {
-                [msg appendFormat:@"%u ", results_lo.counts[i*8 + j]];
+                [msg appendFormat:@"%u ", results_lo.count[i*8 + j]];
             }
             [msg appendFormat:@"\n"];
         }
         for (i=0; i<32; i++) {
             [msg appendFormat:@"slot %d, ch%2d-%2d:", i/4 + 8, i%4 * 8, (i%4 + 1) * 8 - 1];
             for (j=0; j<8; j++) {
-                [msg appendFormat:@"%u ", results_hi.counts[i*8 + j]];
+                [msg appendFormat:@"%u ", results_hi.count[i*8 + j]];
             }
             [msg appendFormat:@"\n"];
         }
@@ -2689,50 +2827,49 @@ void SwapLongBlock(void* p, int32_t n)
     }    
 }
 
-- (void) readCMOSRateWithArgs:(read_cmos_rate_args_t*)aArgs rates:(read_cmos_rate_results_t*)aRates;
+- (void) readCMOSRateWithArgs:(CrateNoiseRateArgs*)aArgs rates:(CrateNoiseRateResults*)aRates;
 {
-	XL3_PayloadStruct payload;
-	memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
-	payload.numberBytesinPayload = sizeof(read_cmos_rate_results_t);
+	char payload[XL3_PAYLOAD_SIZE];
+	memset(payload, 0, XL3_PAYLOAD_SIZE);
     
-	read_cmos_rate_args_t* data = (read_cmos_rate_args_t*) payload.payload;
-    memcpy(data, aArgs, sizeof(read_cmos_rate_args_t));
+	CrateNoiseRateArgs* data = (CrateNoiseRateArgs*) payload;
+    memcpy(data, aArgs, sizeof(CrateNoiseRateArgs));
 
     //max 8 slots may be masked in
-    unsigned int v = data->slot_mask;
+    unsigned int v = data->slotMask;
     unsigned int c;
     for (c = 0; v; c++) v &= v - 1;
     if (c > 8) {
         NSLog(@"%@ error in readCMOSRateWithArgs: more than 8 slots were masked in, ask less.\n", [[self xl3Link] crateName]);
-        @throw [NSException exceptionWithName:@"readCMOSRate error" reason:@"More than 8 slots were masked in slot_mask" userInfo:nil];
+        @throw [NSException exceptionWithName:@"readCMOSRate error" reason:@"More than 8 slots were masked in slotMask" userInfo:nil];
     }
     
     if ([xl3Link needToSwap]) {
-        SwapLongBlock(data, sizeof(read_cmos_rate_args_t)/4);
+        SwapLongBlock(data, sizeof(CrateNoiseRateArgs)/4);
     }
     
     @try {
-        [[self xl3Link] sendCommand:SLOT_NOISE_RATE_ID withPayload:&payload expectResponse:YES];
+        [[self xl3Link] sendCommand:CRATE_NOISE_RATE_ID withPayload:payload expectResponse:YES];
     }
     @catch (NSException *exception) {
-        NSLog(@"%@ error sending SLOT_NOISE_RATE_ID command.\n",[[self xl3Link] crateName]);
+        NSLog(@"%@ error sending CRATE_NOISE_RATE_ID command.\n",[[self xl3Link] crateName]);
         @throw exception;
     }
     
     if ([xl3Link needToSwap]) {
-        SwapLongBlock(data, sizeof(read_cmos_rate_results_t)/4);
+        SwapLongBlock(data, sizeof(CrateNoiseRateResults)/4);
     }
     
-    memcpy(aRates, data, sizeof(read_cmos_rate_results_t));
+    memcpy(aRates, data, sizeof(CrateNoiseRateResults));
 }
 
 - (void) readCMOSRateForSlot:(unsigned short)aSlot withChannelMask:(unsigned long)aChannelMask withDelay:(unsigned long)aDelay
 {
-    read_cmos_rate_args_t args;
-    read_cmos_rate_results_t results;
+    CrateNoiseRateArgs args;
+    CrateNoiseRateResults results;
     
-    args.slot_mask |= 0x1 << aSlot;
-    args.channel_masks[aSlot] = aChannelMask;
+    args.slotMask |= 0x1 << aSlot;
+    args.channelMask[aSlot] = aChannelMask;
     args.period = aDelay;
     
     @try {
@@ -2742,8 +2879,8 @@ void SwapLongBlock(void* p, int32_t n)
         ;
     }
     
-    if (results.error_flags != 0) {
-        NSLog(@"%@ error in readCMOSCRateForSlot, error_flags: 0x%08x.\n",[[self xl3Link] crateName], results.error_flags);
+    if (results.errorFlags != 0) {
+        NSLog(@"%@ error in readCMOSCRateForSlot, errorFlags: 0x%08x.\n",[[self xl3Link] crateName], results.errorFlags);
     }
     else{
         NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ CMOS rates for slot: %d\n", [[self xl3Link] crateName], aSlot];
@@ -2759,10 +2896,10 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) readCMOSRate
 {
-    check_total_count_args_t args_lo;
-    check_total_count_args_t args_hi;
-    check_total_count_results_t results_lo;
-    check_total_count_results_t results_hi;
+    CheckTotalCountArgs args_lo;
+    CheckTotalCountArgs args_hi;
+    CheckTotalCountResults results_lo;
+    CheckTotalCountResults results_hi;
     unsigned char i;
 
 	unsigned int msk = 0UL;
@@ -2782,16 +2919,16 @@ void SwapLongBlock(void* p, int32_t n)
     for (num_slots = 0; v; num_slots++) v &= v - 1;
     
     if (num_slots > 8) {
-        args_lo.slot_mask = msk & 0xff;
-        args_hi.slot_mask = msk & 0xff00;
+        args_lo.slotMask = msk & 0xff;
+        args_hi.slotMask = msk & 0xff00;
     }
     else {
-        args_lo.slot_mask = msk;
+        args_lo.slotMask = msk;
     }
     
     for (i = 0; i < 16; i++) {
-        args_lo.channel_masks[i] = 0xffffffff;
-        args_hi.channel_masks[i] = 0xffffffff;
+        args_lo.channelMasks[i] = 0xffffffff;
+        args_hi.channelMasks[i] = 0xffffffff;
     }
 
     @try {
@@ -2806,17 +2943,17 @@ void SwapLongBlock(void* p, int32_t n)
         return;
     }
     
-    if (results_lo.error_flags != 0 || (num_slots > 8 &&  results_hi.error_flags != 0)) {
-        NSLog(@"%@ error in readCMOSCountWithArgs, error_flags_lo: 0x%08x, error_flags_hi: 0x%08x\n",
-              [[self xl3Link] crateName], results_lo.error_flags, results_hi.error_flags);
+    if (results_lo.errorFlags != 0 || (num_slots > 8 &&  results_hi.errorFlags != 0)) {
+        NSLog(@"%@ error in readCMOSCountWithArgs, errorFlags_lo: 0x%08x, errorFlags_hi: 0x%08x\n",
+              [[self xl3Link] crateName], results_lo.errorFlags, results_hi.errorFlags);
         return;
     }
     else {
         unsigned char slot_idx = 0;
         unsigned long counts[32];
         
-        read_cmos_rate_results_t rates_lo;
-        read_cmos_rate_results_t rates_hi;
+        CrateNoiseRateResults rates_lo;
+        CrateNoiseRateResults rates_hi;
         
         if (num_slots > 8) {
             slot_idx = 0;
@@ -2825,7 +2962,7 @@ void SwapLongBlock(void* p, int32_t n)
                 if ((msk >> i) & 0x1) {
                     //NSLog(@"slot %d:\n", i);
                     for (j=0; j<32; j++) {
-                        counts[j] = results_lo.counts[slot_idx*32 + j];
+                        counts[j] = results_lo.count[slot_idx*32 + j];
                         //NSLog(@"channel: %d cnt: %ld\n", j, counts[j]);
                     }
                     ORFec32Model* fec=nil;
@@ -2835,7 +2972,7 @@ void SwapLongBlock(void* p, int32_t n)
                             break;
                         }
                     }
-                    [fec processCMOSCounts:counts calcRates:[self calcCMOSRatesFromCounts] withChannelMask:args_lo.channel_masks[i]];
+                    [fec processCMOSCounts:counts calcRates:[self calcCMOSRatesFromCounts] withChannelMask:args_lo.channelMasks[i]];
                     for (j=0; j<32; j++) {
                         rates_lo.rates[slot_idx*32 + j] = [fec cmosRate:j];
                     }                    
@@ -2847,7 +2984,7 @@ void SwapLongBlock(void* p, int32_t n)
                 if ((msk >> (i + 8)) & 0x1) {
                     //NSLog(@"slot %d:\n", i+8);
                     for (j=0; j<32; j++) {
-                        counts[j] = results_hi.counts[slot_idx*32 + j];
+                        counts[j] = results_hi.count[slot_idx*32 + j];
                         //NSLog(@"channel: %d cnt: %ld\n", j, counts[j]);
                     }
                     ORFec32Model* fec = nil;
@@ -2857,7 +2994,7 @@ void SwapLongBlock(void* p, int32_t n)
                             break;
                         }
                     }
-                    [fec processCMOSCounts:counts calcRates:[self calcCMOSRatesFromCounts] withChannelMask:args_hi.channel_masks[i]];
+                    [fec processCMOSCounts:counts calcRates:[self calcCMOSRatesFromCounts] withChannelMask:args_hi.channelMasks[i]];
                     for (j=0; j<32; j++) {
                         rates_hi.rates[slot_idx*32 + j] = [fec cmosRate:j];
                     }                    
@@ -2871,7 +3008,7 @@ void SwapLongBlock(void* p, int32_t n)
             for (i=0; i<16; i++) {
                 if ((msk >> i) & 0x1) {
                     for (j=0; j<32; j++) {
-                        counts[j] = results_lo.counts[slot_idx*32 + j];
+                        counts[j] = results_lo.count[slot_idx*32 + j];
                     }
                     ORFec32Model* fec=nil;
                     for (id anObj in [[self guardian] orcaObjects]) { 
@@ -2880,7 +3017,7 @@ void SwapLongBlock(void* p, int32_t n)
                             break;
                         }
                     }
-                    [fec processCMOSCounts:counts calcRates:[self calcCMOSRatesFromCounts] withChannelMask:args_lo.channel_masks[i]];
+                    [fec processCMOSCounts:counts calcRates:[self calcCMOSRatesFromCounts] withChannelMask:args_lo.channelMasks[i]];
                     for (j=0; j<32; j++) {
                         rates_lo.rates[slot_idx*32 + j] = [fec cmosRate:j];
                     }                    
@@ -2967,11 +3104,11 @@ void SwapLongBlock(void* p, int32_t n)
             unsigned long data[21+8*32+6];
             data[0] = [self cmosRateDataId] | (21+8*32+6);
             data[1] = [self crateNumber];
-            data[2] = args_lo.slot_mask;
-            memcpy(data+3, args_lo.channel_masks, 16*4);
+            data[2] = args_lo.slotMask;
+            memcpy(data+3, args_lo.channelMasks, 16*4);
             data[19] = 0;
-            data[20] = results_lo.error_flags;
-            memcpy(data+21, results_lo.counts, 8*32*4);
+            data[20] = results_lo.errorFlags;
+            memcpy(data+21, results_lo.count, 8*32*4);
             const char* timestamp = [[self stringDate] cStringUsingEncoding:NSASCIIStringEncoding];
             memcpy(data+21+8*32, timestamp, 6*4);
             NSData* cmosData = [[NSData alloc] initWithBytes:data length:sizeof(long)*(21+8*32+6)];
@@ -2980,9 +3117,9 @@ void SwapLongBlock(void* p, int32_t n)
             cmosData = nil;
 
             if (num_slots > 8) {
-                data[2] = args_hi.slot_mask;
-                data[20] = results_hi.error_flags;
-                memcpy(data+21, results_hi.counts, 8*32*4);
+                data[2] = args_hi.slotMask;
+                data[20] = results_hi.errorFlags;
+                memcpy(data+21, results_hi.count, 8*32*4);
                 cmosData = [[NSData alloc] initWithBytes:data length:sizeof(long)*(21+8*32+6)];
                 [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:cmosData];
                 [cmosData release];
@@ -2994,21 +3131,20 @@ void SwapLongBlock(void* p, int32_t n)
     }
 }
 
-- (void) readPMTBaseCurrentsWithArgs:(read_pmt_base_currents_args_t*)aArgs currents:(read_pmt_base_currents_results_t*)result
+- (void) readPMTBaseCurrentsWithArgs:(ReadPMTCurrentArgs*)aArgs currents:(ReadPMTCurrentResults*)result
 {
-	XL3_PayloadStruct payload;
-	memset(payload.payload, 0x0, XL3_MAXPAYLOADSIZE_BYTES);
-	payload.numberBytesinPayload = sizeof(read_pmt_base_currents_results_t);
+	char payload[XL3_PAYLOAD_SIZE];
+	memset(payload, 0x0, XL3_PAYLOAD_SIZE);
     
-	read_pmt_base_currents_args_t* data = (read_pmt_base_currents_args_t*) payload.payload;
-    memcpy(data, aArgs, sizeof(read_pmt_base_currents_args_t));
+	ReadPMTCurrentArgs* data = (ReadPMTCurrentArgs*) payload;
+    memcpy(data, aArgs, sizeof(ReadPMTCurrentArgs));
     
     if ([xl3Link needToSwap]) {
-        SwapLongBlock(data, sizeof(read_pmt_base_currents_args_t)/4);
+        SwapLongBlock(data, sizeof(ReadPMTCurrentArgs)/4);
     }
     
     @try {
-        [[self xl3Link] sendCommand:READ_PMT_CURRENT_ID withPayload:&payload expectResponse:YES];
+        [[self xl3Link] sendCommand:READ_PMT_CURRENT_ID withPayload:payload expectResponse:YES];
     }
     @catch (NSException *exception) {
         NSLog(@"%@ error sending readPMTBaseCurrentForSlot command.\n",[[self xl3Link] crateName]);
@@ -3019,18 +3155,18 @@ void SwapLongBlock(void* p, int32_t n)
         SwapLongBlock(data, 1);
     }
     
-    memcpy(result, data, sizeof(read_pmt_base_currents_results_t));
+    memcpy(result, data, sizeof(ReadPMTCurrentResults));
 }
 
 
 
 - (void) readPMTBaseCurrentsForSlot:(unsigned short)aSlot withChannelMask:(unsigned long)aChannelMask
 {
-    read_pmt_base_currents_args_t args;
-    read_pmt_base_currents_results_t results;
+    ReadPMTCurrentArgs args;
+    ReadPMTCurrentResults results;
 
-    args.slot_mask |= 0x1 << aSlot;
-    args.channel_masks[aSlot] = aChannelMask;
+    args.slotMask |= 0x1 << aSlot;
+    args.channelMask[aSlot] = aChannelMask;
     
     @try {
         [self readPMTBaseCurrentsWithArgs:&args currents:&results];
@@ -3039,15 +3175,15 @@ void SwapLongBlock(void* p, int32_t n)
         ;
     }
 
-    if (results.error_flags != 0) {
-        NSLog(@"%@ error in readPMTBaseCurrentsForSlot, error_flags: 0x%08x.\n",[[self xl3Link] crateName], results.error_flags);
+    if (results.errorFlags != 0) {
+        NSLog(@"%@ error in readPMTBaseCurrentsForSlot, errorFlags: 0x%08x.\n",[[self xl3Link] crateName], results.errorFlags);
     }
     else {
         NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ PMT base currents for slot: %d\n", [[self xl3Link] crateName], aSlot];
         unsigned int i;
         for (i=0; i<32; i++) {
             if (aChannelMask & 0x1 << i) {
-                [msg appendFormat:@"%d: %d\n", i, results.current_adc[aSlot*32 + i]];
+                [msg appendFormat:@"%d: %d\n", i, results.pmtCurrent[aSlot*32 + i]];
             }
         }
         NSLog(msg);
@@ -3057,8 +3193,8 @@ void SwapLongBlock(void* p, int32_t n)
 //used from polling loop and/or ORCA script
 - (void) readPMTBaseCurrents
 {
-    read_pmt_base_currents_args_t args;
-    read_pmt_base_currents_results_t results;
+    ReadPMTCurrentArgs args;
+    ReadPMTCurrentResults results;
     unsigned char i;
 
 	unsigned int msk = 0UL;
@@ -3074,9 +3210,9 @@ void SwapLongBlock(void* p, int32_t n)
         msk &= pollPMTCurrentsMask;
     }
     
-    args.slot_mask = msk;
+    args.slotMask = msk;
     for (i=0; i<16; i++) {
-        args.channel_masks[i] = 0xffffffff;
+        args.channelMask[i] = 0xffffffff;
     }
     
     @try {
@@ -3090,8 +3226,8 @@ void SwapLongBlock(void* p, int32_t n)
         return;
     }
     
-    if (results.error_flags != 0) {
-        NSLog(@"%@ error in readPMTBaseCurrentsForSlot, error_flags: 0x%08x.\n",[[self xl3Link] crateName], results.error_flags);
+    if (results.errorFlags != 0) {
+        NSLog(@"%@ error in readPMTBaseCurrentsForSlot, errorFlags: 0x%08x.\n",[[self xl3Link] crateName], results.errorFlags);
         return;
     }
     else if (!isPollingXl3 || isPollingVerbose) {    
@@ -3116,11 +3252,11 @@ void SwapLongBlock(void* p, int32_t n)
             [msg appendFormat:@"ch %2d: ", ch];
             for (sl=0; sl<16; sl++) {
                 if ((msk >> sl) & 0x1) {
-                    if (results.busy_flag[sl*32 + ch]) {
+                    if (results.busyFlags[sl*32 + ch]) {
                         [msg appendFormat:@" BSY "];
                     }
                     else {
-                        [msg appendFormat:@"%4d ", results.current_adc[sl*32 + ch] - 127];
+                        [msg appendFormat:@"%4d ", results.pmtCurrent[sl*32 + ch] - 127];
                     }
                 }
                 else [msg appendFormat:@" --- "];
@@ -3137,11 +3273,11 @@ void SwapLongBlock(void* p, int32_t n)
         unsigned long data[packet_length];
         data[0] = [self pmtBaseCurrentDataId] | packet_length;
         data[1] = [self crateNumber];
-        data[2] = args.slot_mask;
-        memcpy(data+3, args.channel_masks, 16*4);
-        data[19] = results.error_flags;
-        memcpy(data+20, results.current_adc, 16*32);
-        memcpy(data+20+16*8, results.busy_flag, 16*32);
+        data[2] = args.slotMask;
+        memcpy(data+3, args.channelMask, 16*4);
+        data[19] = results.errorFlags;
+        memcpy(data+20, results.pmtCurrent, 16*32);
+        memcpy(data+20+16*8, results.busyFlags, 16*32);
         const char* timestamp = [[self stringDate] cStringUsingEncoding:NSASCIIStringEncoding];
         memcpy(data+20+16*8+16*8, timestamp, 6*4);
         NSData* pdata = [[NSData alloc] initWithBytes:data length:sizeof(long)*(packet_length)];
@@ -3189,15 +3325,14 @@ void SwapLongBlock(void* p, int32_t n)
     [hvInitLock unlock];
 }
 
-- (void) readHVStatus:(hv_readback_results_t*)status
+- (void) readHVStatus:(HVReadbackResults*)status
 {
-	XL3_PayloadStruct payload;
-	memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
-	payload.numberBytesinPayload = sizeof(hv_readback_results_t);
-        
+	char payload[XL3_PAYLOAD_SIZE];
+	memset(payload, 0, XL3_PAYLOAD_SIZE);
+
     @try {
-        [[self xl3Link] sendCommand:HV_READBACK_ID withPayload:&payload expectResponse:YES];
-        //[[self xl3Link] sendCommand:GET_HV_STATUS_ID withPayload:&payload expectResponse:YES];
+        [[self xl3Link] sendCommand:HV_READBACK_ID withPayload:payload expectResponse:YES];
+        //[[self xl3Link] sendCommand:GET_HV_STATUS_ID withPayload:payload expectResponse:YES];
     }
     @catch (NSException *exception) {
         NSLog(@"%@ error sending readHVStatus command.\n", [[self xl3Link] crateName]);
@@ -3205,9 +3340,9 @@ void SwapLongBlock(void* p, int32_t n)
     }
 
     if ([xl3Link needToSwap]) {
-        SwapLongBlock(payload.payload, sizeof(hv_readback_results_t)/4);
+        SwapLongBlock(payload, sizeof(HVReadbackResults)/4);
     }
-    memcpy(status, payload.payload, sizeof(hv_readback_results_t));
+    memcpy(status, payload, sizeof(HVReadbackResults));
     [self setHvEverUpdated:YES];
 }
 
@@ -3218,7 +3353,7 @@ void SwapLongBlock(void* p, int32_t n)
         if (![[self xl3Link] isConnected]) {//ORSNOPExperiment sends a notification to all crates
             return;
         }
-        hv_readback_results_t status;
+        HVReadbackResults status;
         @try {
             [self readHVStatus:&status];
         }
@@ -3229,16 +3364,16 @@ void SwapLongBlock(void* p, int32_t n)
             }
             return;
         }
-        [self setHvAVoltageReadValue:status.voltage_a * 300.];
-        [self setHvBVoltageReadValue:status.voltage_b * 300.];
-        [self setHvACurrentReadValue:status.current_a * 10.];
-        [self setHvBCurrentReadValue:status.current_b * 10.];
+        [self setHvAVoltageReadValue:status.voltageA * 300.];
+        [self setHvBVoltageReadValue:status.voltageB * 300.];
+        [self setHvACurrentReadValue:status.currentA * 10.];
+        [self setHvBCurrentReadValue:status.currentB * 10.];
 
         //unless (isPollingXl3 && !isPollingVerbose)
         if (!isPollingXl3 || isPollingVerbose) {    
             NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ HV status: \n", [[self xl3Link] crateName]];
-            [msg appendFormat:@"vltA: %.2f V, crtA: %.2f mA\n", status.voltage_a * 300., status.current_a * 10.];
-            [msg appendFormat:@"vltB: %.2f V, crtB: %.2f mA\n", status.voltage_b * 300., status.current_b * 10.];
+            [msg appendFormat:@"vltA: %.2f V, crtA: %.2f mA\n", status.voltageA * 300., status.currentA * 10.];
+            [msg appendFormat:@"vltB: %.2f V, crtB: %.2f mA\n", status.voltageB * 300., status.currentB * 10.];
             NSLog(msg);
         }
         //data packet
@@ -3266,11 +3401,10 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) setHVRelays:(unsigned long long)aRelayMask error:(unsigned long*)aError
 {
-	XL3_PayloadStruct payload;
-	memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
-	payload.numberBytesinPayload = 8;
-    
-    unsigned long* data = (unsigned long*)payload.payload;
+	char payload[XL3_PAYLOAD_SIZE];
+	memset(payload, 0, XL3_PAYLOAD_SIZE);
+
+    unsigned long* data = (unsigned long*)payload;
     data[0] = aRelayMask & 0xffffffffUL; //mask1 bottom
     data[1] = aRelayMask >> 32;          //mask2 top
 
@@ -3282,8 +3416,7 @@ void SwapLongBlock(void* p, int32_t n)
     }
 
     @try {
-        [[self xl3Link] sendCommand:SET_HV_RELAYS_ID withPayload:&payload expectResponse:YES];
-        [self initCrateRegistersOnly];
+        [[self xl3Link] sendCommand:SET_HV_RELAYS_ID withPayload:payload expectResponse:YES];
     }
     @catch (NSException *exception) {
         NSLog(@"%@ error sending setHVRelays command.\n",[[self xl3Link] crateName]);
@@ -3361,14 +3494,14 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) setHVSwitchOnForA:(BOOL)aIsOn forB:(BOOL)bIsOn
 {
-	unsigned long xl3Address = XL3_SEL | [self getRegisterAddress:kXl3HvCsReg] | WRITE_REG;
-	unsigned long aValue = 0UL;
+	uint32_t xl3Address = XL3_SEL | [self getRegisterAddress:kXl3HvCsReg] | WRITE_REG;
+	uint32_t aValue = 0UL;
 
     if (aIsOn) aValue |= 1UL;
     if (bIsOn) aValue |= 0x10000UL;
     
 	@try {
-		[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+		[xl3Link sendCommand:0UL toAddress:xl3Address withData:&aValue];
 	}
 	@catch (NSException* e) {
 		NSLog(@"%@ error writing XL3 HV CS register\n",[[self xl3Link] crateName]);
@@ -3378,11 +3511,11 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) readHVSwitchOnForA:(BOOL*)aIsOn forB:(BOOL*)bIsOn
 {
-	unsigned long xl3Address = XL3_SEL | [self getRegisterAddress:kXl3HvCsReg] | READ_REG;
-	unsigned long aValue = 0UL;
+	uint32_t xl3Address = XL3_SEL | [self getRegisterAddress:kXl3HvCsReg] | READ_REG;
+	uint32_t aValue = 0UL;
     
 	@try {
-		[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+		[xl3Link sendCommand:0UL toAddress:xl3Address withData:&aValue];
 	}
 	@catch (NSException* e) {
 		NSLog(@"%@ error reading XL3 HV CS register\n",[[self xl3Link] crateName]);
@@ -3589,7 +3722,7 @@ void SwapLongBlock(void* p, int32_t n)
 {
     if ([[self xl3Link] isConnected]) {
         [self setIsTriggerON:YES];
-        [self initCrateRegistersOnly];
+        [self loadHardware];
         NSLog(@"%@ triggers ON\n", [[self xl3Link] crateName]);
     }
     else {
@@ -3601,7 +3734,7 @@ void SwapLongBlock(void* p, int32_t n)
 {
     if ([[self xl3Link] isConnected]) {
         [self setIsTriggerON:NO];
-        [self initCrateRegistersOnly];
+        [self loadHardware];
         NSLog(@"%@ triggers OFF\n", [[self xl3Link] crateName]);
     }
     else {
@@ -3611,11 +3744,11 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) readHVInterlockGood:(BOOL*)isGood
 {
-	unsigned long xl3Address = XL3_SEL | [self getRegisterAddress:kXl3HvCsReg] | READ_REG;
-	unsigned long aValue = 0UL;
+	uint32_t xl3Address = XL3_SEL | [self getRegisterAddress:kXl3HvCsReg] | READ_REG;
+	uint32_t aValue = 0UL;
     
 	@try {
-		[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+		[xl3Link sendCommand:0UL toAddress:xl3Address withData:&aValue];
 	}
 	@catch (NSException* e) {
 		NSLog(@"%@ error reading XL3 HV CS register\n",[[self xl3Link] crateName]);
@@ -3644,14 +3777,14 @@ void SwapLongBlock(void* p, int32_t n)
 {
     //todo a dedicated HV lock
     @synchronized (self) {
-        unsigned long xl3Address = XL3_SEL | [self getRegisterAddress:kXl3HvSetPointReg] | WRITE_REG;
-        unsigned long aValue = 0UL;
+        uint32_t xl3Address = XL3_SEL | [self getRegisterAddress:kXl3HvSetPointReg] | WRITE_REG;
+        uint32_t aValue = 0UL;
         
         aValue |= aDac & 0xFFFUL;
         aValue |= (bDac & 0xFFFUL) << 16;
         
         @try {
-            [xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+            [xl3Link sendCommand:0UL toAddress:xl3Address withData:&aValue];
         }
         @catch (NSException* e) {
             NSLog(@"%@ error writing XL3 HV CS register\n",[[self xl3Link] crateName]);
@@ -3660,21 +3793,20 @@ void SwapLongBlock(void* p, int32_t n)
 }
 
 #pragma mark •••tests
-- (void) readVMONForSlot:(unsigned short)aSlot voltages:(vmon_results_t*)aVoltages
+- (void) readVMONForSlot:(unsigned short)aSlot voltages:(VMonResults*)aVoltages
 {
-    XL3_PayloadStruct payload;
-    memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
-    payload.numberBytesinPayload = sizeof(vmon_results_t);
+    char payload[XL3_PAYLOAD_SIZE];
+    memset(payload, 0, XL3_PAYLOAD_SIZE);
 
-    vmon_args_t* data = (vmon_args_t*) payload.payload;
-    data->slot_num = aSlot;
+    VMonArgs* data = (VMonArgs*) payload;
+    data->slotNum = aSlot;
 
     if ([xl3Link needToSwap]) {
-        SwapLongBlock(data, sizeof(vmon_args_t)/4);
+        SwapLongBlock(data, sizeof(VMonArgs)/4);
     }
 
     @try {
-        [[self xl3Link] sendCommand:VMON_ID withPayload:&payload expectResponse:YES];
+        [[self xl3Link] sendCommand:VMON_ID withPayload:payload expectResponse:YES];
     }
     @catch (NSException *exception) {
         NSLog(@"%@ error sending VMON_ID command.\n",[[self xl3Link] crateName]);
@@ -3682,15 +3814,15 @@ void SwapLongBlock(void* p, int32_t n)
     }
 
     if ([xl3Link needToSwap]) {
-        SwapLongBlock(data, sizeof(vmon_results_t)/4);
+        SwapLongBlock(data, sizeof(VMonResults)/4);
     }
 
-    memcpy(aVoltages, data, sizeof(vmon_results_t));
+    memcpy(aVoltages, data, sizeof(VMonResults));
 }
 
 - (void) readVMONForSlot:(unsigned short)aSlot
 {
-    vmon_results_t result;
+    VMonResults result;
         
     @try {
         [self readVMONForSlot:aSlot voltages:&result];
@@ -3704,7 +3836,7 @@ void SwapLongBlock(void* p, int32_t n)
     }
     /*
     if (!isPollingXl3 || isPollingVerbose) {
-        //it doesn't set error_flags
+        //it doesn't set errorFlags
         NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ voltages for slot: %d\n", [[self xl3Link] crateName], aSlot];
         [msg appendFormat:@" -24V Sup: %f V\n", result.voltages[0]];
         [msg appendFormat:@" -15V Sup: %f V\n", result.voltages[1]];
@@ -3773,8 +3905,8 @@ void SwapLongBlock(void* p, int32_t n)
         msk &= aSlotMask;
     }
 
-    vmon_results_t result[16];
-    memset(result, 0, 16*sizeof(vmon_results_t));
+    VMonResults result[16];
+    memset(result, 0, 16*sizeof(VMonResults));
     unsigned char slot;
     for (slot=0; slot<16; slot++) {
         if ((msk >> slot) & 0x1) {
@@ -3850,18 +3982,18 @@ void SwapLongBlock(void* p, int32_t n)
         for (cnt = 0; msk_set; cnt++) msk_set &= msk_set - 1;
         
         while (cnt) {
-            unsigned int slot_num;
+            unsigned int slotNum;
             if (cnt > 8) {
-                slot_num = 8;
+                slotNum = 8;
                 cnt -= 8;
             }
             else {
-                slot_num = cnt;
+                slotNum = cnt;
                 cnt = 0;
             }
-            unsigned int slot_a[slot_num];
+            unsigned int slot_a[slotNum];
             unsigned int slot_to_assign = 0;
-            while (slot_to_assign < slot_num) {
+            while (slot_to_assign < slotNum) {
                 if (msk >> slot & 0x1) {
                     slot_a[slot_to_assign] = slot;
                     slot_to_assign++;
@@ -3871,13 +4003,13 @@ void SwapLongBlock(void* p, int32_t n)
             unsigned char sl = 0;
             unsigned char vlt = 0;
             [msg appendFormat:@"     slot:"];
-            for (sl = 0; sl < slot_num; sl++) {
+            for (sl = 0; sl < slotNum; sl++) {
                 [msg appendFormat:@"%8d ", slot_a[sl]];
             }
             [msg appendFormat:@"\n"];
             for (vlt = 0; vlt < 21; vlt++) {
                 [msg appendFormat:@"%s", vlt_a[vlt]];
-                for (sl = 0; sl < slot_num; sl++) {
+                for (sl = 0; sl < slotNum; sl++) {
                     [msg appendFormat:@"%8.2f ", result[slot_a[sl]].voltages[vlt]];
                 }
                 [msg appendFormat:@"%s\n", vlt_b[vlt]];
@@ -3889,31 +4021,30 @@ void SwapLongBlock(void* p, int32_t n)
     }
 }
 
-- (void) readVMONXL3:(vmon_xl3_results_t*)aVoltages
+- (void) readVMONXL3:(LocalVMonResults*)aVoltages
 {
-    XL3_PayloadStruct payload;
-    memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
-    payload.numberBytesinPayload = sizeof(vmon_xl3_results_t);
-    vmon_xl3_results_t* data = (vmon_xl3_results_t*) payload.payload;
+    char payload[XL3_PAYLOAD_SIZE];
+    memset(payload, 0, XL3_PAYLOAD_SIZE);
+    LocalVMonResults* data = (LocalVMonResults*) payload;
         
     @try {
-        [[self xl3Link] sendCommand:VMON_XL3_ID withPayload:&payload expectResponse:YES];
+        [[self xl3Link] sendCommand:LOCAL_VMON_ID withPayload:payload expectResponse:YES];
     }
     @catch (NSException *exception) {
-        NSLog(@"%@ error sending VMON_XL3_ID command.\n",[[self xl3Link] crateName]);
+        NSLog(@"%@ error sending LOCAL_VMON_ID command.\n",[[self xl3Link] crateName]);
         @throw exception;
     }
     
     if ([xl3Link needToSwap]) {
-        SwapLongBlock(data, sizeof(vmon_xl3_results_t)/4);
+        SwapLongBlock(data, sizeof(LocalVMonResults)/4);
     }
-            memcpy(aVoltages, data, sizeof(vmon_xl3_results_t));
+            memcpy(aVoltages, data, sizeof(LocalVMonResults));
 }
 
 //used from polling loop and/or ORCA script
 - (void) readVMONXL3
 {
-    vmon_xl3_results_t result;
+    LocalVMonResults result;
     
     @try {
         [self readVMONXL3:&result];
@@ -3928,7 +4059,7 @@ void SwapLongBlock(void* p, int32_t n)
     
     //unless (isPollingXl3 && !isPollingVerbose)
     if (!isPollingXl3 || isPollingVerbose) {
-        //it doesn't set error_flags
+        //it doesn't set errorFlags
         NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ local voltages:\n", [[self xl3Link] crateName]];
         [msg appendFormat:@"VCC: %.2f V\n", result.voltages[0]];
         [msg appendFormat:@"VEE: %.2f V\n", result.voltages[1]];
@@ -3981,41 +4112,40 @@ void SwapLongBlock(void* p, int32_t n)
     [self setXl3VltThreshold:8 withValue: -10];
     [self setXl3VltThreshold:9 withValue: 10];
     
-    XL3_PayloadStruct payload;
-    memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
-    payload.numberBytesinPayload = sizeof(set_vlt_thresholds_args_t);
+    char payload[XL3_PAYLOAD_SIZE];
+    memset(payload, 0, XL3_PAYLOAD_SIZE);
 
-    set_vlt_thresholds_args_t* data = (set_vlt_thresholds_args_t*) payload.payload;
+    SetAlarmLevelsArgs* data = (SetAlarmLevelsArgs*) payload;
     
     unsigned short i;
     for (i=0; i<6; i++){
-        data->lowLevel[i] = [self xl3VltThreshold:2*i];
-        data->highLevel[i] = [self xl3VltThreshold:2*i+1];
+        data->lowLevels[i] = [self xl3VltThreshold:2*i];
+        data->highLevels[i] = [self xl3VltThreshold:2*i+1];
     }    
     if ([xl3Link needToSwap]) {
-        SwapLongBlock(data, sizeof(set_vlt_thresholds_args_t)/4);
+        SwapLongBlock(data, sizeof(SetAlarmLevelsArgs)/4);
     }
     
     @try {
-        [[self xl3Link] sendCommand:SET_VLT_THRESHOLD_ID withPayload:&payload expectResponse:YES];
+        [[self xl3Link] sendCommand:SET_ALARM_LEVELS_ID withPayload:payload expectResponse:YES];
     }
     @catch (NSException *e) {
-        NSLog(@"%@ error sending SET_VLT_THRESHOLD_ID command.\n",[[self xl3Link] crateName]);
+        NSLog(@"%@ error sending SET_ALARM_LEVELS_ID command.\n",[[self xl3Link] crateName]);
         NSLog(@"%@ with reason: %@\n", [e name], [e reason]);
         return;
     }
 
-    set_vlt_thresholds_result_t* res = (set_vlt_thresholds_result_t*) payload.payload;
+    SetAlarmLevelsResults* res = (SetAlarmLevelsResults*) payload;
     if ([xl3Link needToSwap]) {
-        SwapLongBlock(res, sizeof(set_vlt_thresholds_result_t)/4);
+        SwapLongBlock(res, sizeof(SetAlarmLevelsResults)/4);
     }
 
-    if (res->error_flags) {
+    if (res->errorFlags) {
         char* vlts[] = {"VCC", "VEE", "VP24", "VM24", "VP8", "TMP0"};
         NSMutableString* msg = [NSMutableString stringWithFormat:
                                 @"%@: setting voltage thresholds failed for: ",[[self xl3Link] crateName]];
         for (i=0; i<6; i++) {
-            if (res->error_flags >> i & 0x1) {
+            if (res->errorFlags >> i & 0x1) {
                 [msg appendFormat:@"%s ", vlts[i]];
             }
         }
@@ -4046,22 +4176,21 @@ void SwapLongBlock(void* p, int32_t n)
 //TODO: pass erroflags
 - (void) loadSingleDacForSlot:(unsigned short)aSlot dacNum:(unsigned short)aDacNum dacVal:(unsigned char)aDacVal
 {
- 	XL3_PayloadStruct payload;
-	memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
-	payload.numberBytesinPayload = sizeof(loadsdac_args_t);
-    
-    loadsdac_args_t* data = (loadsdac_args_t*)payload.payload;
-    loadsdac_results_t* result = (loadsdac_results_t*)payload.payload;
-    data->slot_num = aSlot;
-    data->dac_num = aDacNum;
-    data->dac_value = aDacVal;
+ 	char payload[XL3_PAYLOAD_SIZE];
+	memset(payload, 0, XL3_PAYLOAD_SIZE);
+
+    LoadsDacArgs* data = (LoadsDacArgs*)payload;
+    LoadsDacResults* result = (LoadsDacResults*)payload;
+    data->slotNum = aSlot;
+    data->dacNum = aDacNum;
+    data->dacValue = aDacVal;
     
     if ([xl3Link needToSwap]) {
         SwapLongBlock(data, 3);
     }
     
     @try {
-        [[self xl3Link] sendCommand:LOADSDAC_ID withPayload:&payload expectResponse:YES];
+        [[self xl3Link] sendCommand:LOADSDAC_ID withPayload:payload expectResponse:YES];
     }
     @catch (NSException *exception) {
         NSLog(@"%@ error sending loadSingleDac command.\n",[[self xl3Link] crateName]);
@@ -4069,11 +4198,11 @@ void SwapLongBlock(void* p, int32_t n)
     }
     
     if ([xl3Link needToSwap]) {
-        result->error_flags = swapLong(result->error_flags);
+        result->errorFlags = swapLong(result->errorFlags);
     }
     
-    if (result->error_flags) {
-        NSLog(@"%@ loadSingleDac failed with error_flags: 0x%x.\n",[[self xl3Link] crateName], result->error_flags);
+    if (result->errorFlags) {
+        NSLog(@"%@ loadSingleDac failed with errorFlags: 0x%x.\n",[[self xl3Link] crateName], result->errorFlags);
     }
 }
 
@@ -4096,29 +4225,28 @@ void SwapLongBlock(void* p, int32_t n)
     NSLog(@"Set VthrDACs for slot: %d\n", aSlot);
 */
 
- 	XL3_PayloadStruct payload;
-	memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
-	payload.numberBytesinPayload = sizeof(multi_loadsdac_args_t);
+ 	char payload[XL3_PAYLOAD_SIZE];
+	memset(payload, 0, XL3_PAYLOAD_SIZE);
     
-    multi_loadsdac_args_t* data = (multi_loadsdac_args_t*)payload.payload;
-    multi_loadsdac_results_t* result = (multi_loadsdac_results_t*)payload.payload;
+    MultiLoadsDacArgs* data = (MultiLoadsDacArgs*)payload;
+    MultiLoadsDacResults* result = (MultiLoadsDacResults*)payload;
 
     unsigned short i;
     for (i=0; i<32; i++) {
         if (aChannelMask & (1<<i)) {
-            data->dacs[data->num_dacs].slot_num = aSlot;
-            data->dacs[data->num_dacs].dac_num = 25+i;
-            data->dacs[data->num_dacs].dac_value = aDac;
-            data->num_dacs++;
+            data->dacs[data->numDacs].slotNum = aSlot;
+            data->dacs[data->numDacs].dacNum = 25+i;
+            data->dacs[data->numDacs].dacValue = aDac;
+            data->numDacs++;
         }
     }
 
     if ([xl3Link needToSwap]) {
-        SwapLongBlock(data, sizeof(multi_loadsdac_args_t)/4);
+        SwapLongBlock(data, sizeof(MultiLoadsDacArgs)/4);
     }
     
     @try {
-        [[self xl3Link] sendCommand:MULTI_LOADSDAC_ID withPayload:&payload expectResponse:YES];
+        [[self xl3Link] sendCommand:MULTI_LOADSDAC_ID withPayload:payload expectResponse:YES];
     }
     @catch (NSException *exception) {
         NSLog(@"Error in setVthrDACsFor slot: %d\n", aSlot);
@@ -4126,11 +4254,11 @@ void SwapLongBlock(void* p, int32_t n)
     }
         
     if ([xl3Link needToSwap]) {
-        result->error_flags = swapLong(result->error_flags);
+        result->errorFlags = swapLong(result->errorFlags);
     }
     
-    if (result->error_flags) {
-        NSLog(@"set Vthr DACs for slot %d failed with error_flag:0x%x\n", aSlot, result->error_flags);
+    if (result->errorFlags) {
+        NSLog(@"set Vthr DACs for slot %d failed with error_flag:0x%x\n", aSlot, result->errorFlags);
     }
     else {
         NSLog(@"set Vthr DACs for slot %d\n", aSlot);
@@ -4298,12 +4426,11 @@ void SwapLongBlock(void* p, int32_t n)
         if ([self xl3Link] && [[self xl3Link] isConnected]) {
             
             //first see of the xilinx has been initialized
-            XL3_PayloadStruct payload;
-            memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
-            payload.numberBytesinPayload = sizeof(check_xl3_state_results);
-            check_xl3_state_results* result = (check_xl3_state_results*)payload.payload;
+            char payload[XL3_PAYLOAD_SIZE];
+            memset(payload, 0, XL3_PAYLOAD_SIZE);
+            CheckXL3StateResults* result = (CheckXL3StateResults*)payload;
             @try {
-                [[self xl3Link] sendCommand:CHECK_XL3_STATE_ID withPayload:&payload expectResponse:YES];
+                [[self xl3Link] sendCommand:CHECK_XL3_STATE_ID withPayload:payload expectResponse:YES];
             } @catch (NSException *e) {
                 NSLog(@"%@ error reading XL3 init; error: %@ reason: %@\n", [[self xl3Link] crateName], [e name], [e reason]);
                 continue; // try again later if there was an error
@@ -4505,129 +4632,6 @@ void SwapLongBlock(void* p, int32_t n)
     [hvPool release];
 }
 
-- (void) sendCommandWithDict:(NSDictionary*)argDict
-{
-    //separate thread detached from initCrateWithDict
-    NSAutoreleasePool* initPool = [[NSAutoreleasePool alloc] init];
-    NSMutableDictionary* resp = [[NSMutableDictionary alloc] init];
-    /*
-    NSDictionary* argDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                             [NSNumber numberWithInt:CRATE_INIT_ID], @"cmdId",
-                             [NSData dataWithBytes:&payload length:sizeof(XL3_PayloadStruct)], @"payload",
-                             [NSNumber numberWithBool:YES], @"response",
-                             @"initCrateDone:", @"callback",
-                             nil];
-     */
-    
-    XL3_PayloadStruct payload;
-    memcpy(&payload, [[argDict objectForKey:@"payload"] bytes], sizeof(XL3_PayloadStruct));
-
-    @try {
-        [[self xl3Link] sendCommand:[[argDict objectForKey:@"cmdId"] intValue]
-                        withPayload:&payload
-                        expectResponse:[[argDict objectForKey:@"response"] boolValue]];
-        
-    }
-    @catch (NSException* e) {
-        NSLog(@"%@ init crate failed; error: %@ reason: %@\n",[[self xl3Link] crateName], [e name], [e reason]);
-        [resp setValue:[NSNumber numberWithBool:YES] forKey:@"error"];
-    }
-
-    [resp setValue:argDict forKey:@"sendCommandArgs"];
-    [resp setValue:[NSData dataWithBytes:&payload length:sizeof(XL3_PayloadStruct)] forKey:@"payload"];
-
-    [self performSelectorOnMainThread:NSSelectorFromString([argDict objectForKey:@"callback"])
-                           withObject:[resp autorelease] waitUntilDone:NO];
-
-    [initPool release];
-}
-
-- (void) initCrateDone:(NSDictionary*)resp {
-    //runs back on the main XL3Model thread
-    @synchronized(self) {
-
-        [[self xl3Link] setErrorTimeOut:[self xl3LinkTimeOut]];
-        
-        if ([[self xl3Link] isConnected] && [resp objectForKey:@"error"] == nil) {
-
-            NSLog(@"%@ init ok!\n",[[self xl3Link] crateName]);
-
-            XL3_PayloadStruct payload;
-            memcpy(&payload, [[resp objectForKey:@"payload"] bytes], sizeof(XL3_PayloadStruct));
-
-            //[self setTriggerStatus:@"ON"];
-            unsigned short* aId = (unsigned short*) payload.payload + 2; //hard to say what the first int should be
-            unsigned short i;
-            for (i=0; i<16*5; i++) {
-                aId[i] = swapShort(aId[i]);
-            }
-
-            XL3_PayloadStruct init_payload;
-            memcpy(&init_payload, [[[resp objectForKey:@"sendCommandArgs"] objectForKey:@"payload"] bytes], sizeof(XL3_PayloadStruct));
-            unsigned long* aMbId = (unsigned long*) init_payload.payload;
-            if ([xl3Link needToSwap]) {
-                for (i=0; i<6; i++) aMbId[i] = swapLong(aMbId[i]);
-            }
-            unsigned long msk = aMbId[3];
-            
-            if (aMbId[1] == 1) { //XilinX flag
-                hware_vals_t* ids;
-                NSMutableString* msg = [NSMutableString stringWithFormat:@"\n"];
-                unsigned short slot;
-                //for (id anObj in [[self guardian] orcaObjects]) {
-                for (slot=0; slot<16; slot++) {
-                    //if ([anObj class] == NSClassFromString(@"ORFec32Model") && (msk & 1 << [anObj stationNumber])) {
-                    if (msk & 0x1 << slot) {
-                        ORFec32Model* anObj = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
-                        ids = (hware_vals_t*) aId;
-                        ids += [anObj stationNumber];
-                        [anObj setBoardID:[NSString stringWithFormat:@"%x", ids->mb_id]];
-                        for (i=0; i<4; i++) {
-                            if (ids->dc_id[i] != 0x0 && ids->dc_id[i] != 0xffff) {
-                                //ORFecDaughterCardModel* theCard = [[OROrderedObjManager for:self] objectInSlot:workingSlot];
-                                if (![anObj dcPresent:i]) {
-                                    ORFecDaughterCardModel* proxyDC = [ObjectFactory makeObject:@"ORFecDaughterCardModel"];
-                                    [anObj addObject:proxyDC];
-                                    [anObj place:proxyDC intoSlot:i];
-                                    NSLog(@"slot %2d DB %d ID 0x%4x was added.\n", [anObj stationNumber], i, ids->dc_id[i]);
-                                }
-                                [[anObj dc:i] setBoardID:[NSString stringWithFormat:@"%x", ids->dc_id[i]]];
-                            }
-                            else {
-                                //do not remove anymore, init failure is more likely then the DB really missing
-                                /*
-                                if ([anObj dcPresent:i]) {
-                                    ORFecDaughterCardModel* theCard = [[OROrderedObjManager for:anObj] objectInSlot:i];
-                                    if (theCard) [anObj removeObject:theCard];
-                                    NSLog(@"slot %2d DB %d has BAD ID and was removed.\n", [anObj stationNumber], i);
-                                }
-                                 */
-                            }
-                        }
-                        [msg appendFormat:@"slot: %2d, FEC: %4x, DB0: %4x, DB1: %4x, DB2: %4x, DB3: %4x\n",
-                         [anObj stationNumber], ids->mb_id, ids->dc_id[0], ids->dc_id[1], ids->dc_id[2], ids->dc_id[3]];
-                    }
-                }
-                NSLogFont([NSFont userFixedPitchFontOfSize:0], msg);
-                
-                //update XL3 alarm levels on safe init
-                if ([self isXl3VltThresholdInInit]) {
-                    [self setVltThreshold];
-                }
-            }
-        }
-        else {
-            NSLog(@"%@ Crate init failed.\n",[[self xl3Link] crateName]);
-        }
-
-        [self setXl3InitInProgress:NO];
-
-    }//synchronized
-    NSLog(@"%@ Init time = %f seconds\n",[[self xl3Link] crateName],[timer secondsSinceStart]);
-    [timer stop];
-    [timer release];
-}
-
 - (void) _setPedestalInParallelWorker
 {
     NSAutoreleasePool* pedPool = [[NSAutoreleasePool alloc] init];
@@ -4637,9 +4641,8 @@ void SwapLongBlock(void* p, int32_t n)
         return;
     }
 
-    XL3_PayloadStruct payload;
-	payload.numberBytesinPayload = 8;
-	unsigned long* data = (unsigned long*) payload.payload;
+    char payload[XL3_PAYLOAD_SIZE];
+	unsigned long* data = (unsigned long*) payload;
     BOOL error_flag = NO;
 
     NSArray* fecs = [[self guardian] collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
@@ -4655,14 +4658,14 @@ void SwapLongBlock(void* p, int32_t n)
         }
 
         @try {
-            //[[self xl3Link] sendCommand:SET_CRATE_PEDESTALS_ID withPayload:&payload expectResponse:YES];
+            //[[self xl3Link] sendCommand:SET_CRATE_PEDESTALS_ID withPayload:payload expectResponse:YES];
             //if ([xl3Link needToSwap]) *data = swapLong(*data);
             //if (*data != 0) error_flag = YES;
             
             //the following is a workaround until set_crate_pedestal is fixed on XL3 side
-            unsigned long aValue = [aFec pedEnabledMask];
-            unsigned long xl3Address = FEC_SEL * [aFec stationNumber] | 0x23 | WRITE_REG; //FEC PED ENABLE
-            [xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+            uint32_t aValue = [aFec pedEnabledMask];
+            uint32_t xl3Address = FEC_SEL * [aFec stationNumber] | 0x23 | WRITE_REG; //FEC PED ENABLE
+            [xl3Link sendCommand:0UL toAddress:xl3Address withData:&aValue];
             if ([xl3Link needToSwap]) aValue = swapLong(aValue);
             //if (aValue != 0) error_flag = YES;
         }

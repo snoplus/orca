@@ -1092,9 +1092,19 @@ mtcConfigDoc = _mtcConfigDoc;
      return [[result retain] autorelease];
  }
 
-- (ORCouchDB*) debugDbRef:(id)aCouchDelegate
+- (ORCouchDB*) debugDBRef:(id) aCouchDelegate
 {
-    return nil;
+    ORCouchDB* result = [ORCouchDB couchHost:self.debugDBIPAddress
+                                        port:self.debugDBPort
+                                    username:self.debugDBUserName
+                                         pwd:self.debugDBPassword
+                                    database:self.debugDBName
+                                    delegate:self];
+
+    if (aCouchDelegate)
+        [result setDelegate:aCouchDelegate];
+    
+    return [[result retain] autorelease];
 }
 
 
