@@ -30,7 +30,6 @@
 #import "OROrderedObjManager.h"
 #import "ORSNOConstants.h"
 #import "ORSNOCableDB.h"
-#import "ORQuadStateBox.h"
 
 @implementation ORFec32Controller
 
@@ -49,6 +48,13 @@
 
 - (void) awakeFromNib
 {
+    NSDictionary *statedict = [NSDictionary dictionaryWithObjectsAndKeys:
+                               [NSColor redColor], @"disabled",
+                               [NSColor blueColor], @"enabled",
+                               [NSColor blackColor], @"unknwon",
+                               nil];
+    msbox = [[ORMultiStateBox alloc] initWithStates:statedict size:20 pad:0 bevel:2];
+    
     [groupView setGroup:model];
 	cmosFormatter = [[NSNumberFormatter alloc] init];
 	int i;
@@ -339,50 +345,56 @@
 
 - (void) updateSequencerInfo:(NSNotification*)aNote
 {
-    ORQuadStateBox* quadStateBox = [ORQuadStateBox sharedQuadStateBox];
     int i;
     for(i=0;i<16;i++){
-        int theState = ([model seqPendingEnabled:i]<<1) | [model seqEnabled:i];
-        [[pmtStateMatrix0_15  cellAtRow:i column:kPMTStateSeqColumn] setImage:[quadStateBox imageForState:theState]];
+        id ul = [model seqPendingEnabled:i] ? @"enabled" : @"disabled";
+        id br = [model seqEnabled:i] ? @"enabled" : @"disabled";
+        [[pmtStateMatrix0_15  cellAtRow:i column:kPMTStateSeqColumn] setImage:[msbox upLeft:ul botRight:br]];
         
-        theState = ([model seqPendingEnabled:i+16]<<1) | [model seqEnabled:i+16];
-        [[pmtStateMatrix16_31 cellAtRow:i column:kPMTStateSeqColumn] setImage:[quadStateBox imageForState:theState]];
+        ul = [model seqPendingEnabled:i+16] ? @"enabled" : @"disabled";
+        br = [model seqEnabled:i+16] ? @"enabled" : @"disabled";
+        [[pmtStateMatrix16_31 cellAtRow:i column:kPMTStateSeqColumn] setImage:[msbox upLeft:ul botRight:br]];
     }
 }
 
 - (void) update20nTriggerInfo:(NSNotification*)aNote
 {
-    ORQuadStateBox* quadStateBox = [ORQuadStateBox sharedQuadStateBox];
     int i;
     for(i=0;i<16;i++){
-        int theState = ((int)[model trigger20nsPendingEnabled:i]<<1) | (int)[model trigger20nsEnabled:i];
-        [[pmtStateMatrix0_15  cellAtRow:i column:kPMTState20nsColumn] setImage:[quadStateBox imageForState:theState]];
+        id ul = [model trigger20nsPendingEnabled:i] ? @"enabled" : @"disabled";
+        id br = [model trigger20nsEnabled:i] ? @"enabled" : @"disabled";
+        [[pmtStateMatrix0_15  cellAtRow:i column:kPMTState20nsColumn] setImage:[msbox upLeft:ul botRight:br]];
         
-        theState = ((int)[model trigger20nsPendingEnabled:i+16]<<1) | (int)[model trigger20nsEnabled:i+16];
-        [[pmtStateMatrix16_31 cellAtRow:i column:kPMTState20nsColumn] setImage:[quadStateBox imageForState:theState]];
+        ul = [model trigger20nsPendingEnabled:i+16] ? @"enabled" : @"disabled";
+        br = [model trigger20nsEnabled:i+16] ? @"enabled" : @"disabled";
+        [[pmtStateMatrix16_31 cellAtRow:i column:kPMTState20nsColumn] setImage:[msbox upLeft:ul botRight:br]];
     }
 }
 - (void) update100nTriggerInfo:(NSNotification*)aNote
 {
-    ORQuadStateBox* quadStateBox = [ORQuadStateBox sharedQuadStateBox];
     int i;
     for(i=0;i<16;i++){
-        int theState = ((int)[model trigger100nsPendingEnabled:i]<<1) | (int)[model trigger100nsEnabled:i];
-        [[pmtStateMatrix0_15  cellAtRow:i column:kPMTState100nsColumn] setImage:[quadStateBox imageForState:theState]];
-        theState = ((int)[model trigger100nsPendingEnabled:i+16]<<1) | (int)[model trigger100nsEnabled:i+16];
-        [[pmtStateMatrix16_31 cellAtRow:i column:kPMTState100nsColumn] setImage:[quadStateBox imageForState:theState]];
+        id ul = [model trigger100nsPendingEnabled:i] ? @"enabled" : @"disabled";
+        id br = [model trigger100nsEnabled:i] ? @"enabled" : @"disabled";
+        [[pmtStateMatrix0_15  cellAtRow:i column:kPMTState100nsColumn] setImage:[msbox upLeft:ul botRight:br]];
+        
+        ul = [model trigger100nsPendingEnabled:i+16] ? @"enabled" : @"disabled";
+        br = [model trigger100nsEnabled:i+16] ? @"enabled" : @"disabled";
+        [[pmtStateMatrix16_31 cellAtRow:i column:kPMTState100nsColumn] setImage:[msbox upLeft:ul botRight:br]];
     }
 }
 
 - (void) updateCmosReadInfo:(NSNotification*)aNote
 {
-    ORQuadStateBox* quadStateBox = [ORQuadStateBox sharedQuadStateBox];
     int i;
     for(i=0;i<16;i++){
-        int theState = ((int)[model cmosReadPendingEnabled:i]<<1) | (int)[model cmosReadEnabled:i];
-        [[pmtStateMatrix0_15  cellAtRow:i column:kPMTStateCMOSColumn] setImage:[quadStateBox imageForState:theState]];
-        theState = ((int)[model cmosReadPendingEnabled:i+16]<<1) | (int)[model cmosReadEnabled:i+16];
-        [[pmtStateMatrix16_31 cellAtRow:i column:kPMTStateCMOSColumn] setImage:[quadStateBox imageForState:theState]];
+        id ul = [model cmosReadPendingEnabled:i] ? @"enabled" : @"disabled";
+        id br = [model cmosReadEnabled:i] ? @"enabled" : @"disabled";
+        [[pmtStateMatrix0_15  cellAtRow:i column:kPMTStateCMOSColumn] setImage:[msbox upLeft:ul botRight:br]];
+        
+        ul = [model cmosReadPendingEnabled:i+16] ? @"enabled" : @"disabled";
+        br = [model cmosReadEnabled:i+16] ? @"enabled" : @"disabled";
+        [[pmtStateMatrix16_31 cellAtRow:i column:kPMTStateCMOSColumn] setImage:[msbox upLeft:ul botRight:br]];
     }
 }
 

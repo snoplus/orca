@@ -24,6 +24,7 @@
 #import "XL3_Link.h"
 #import "ORXL3Model.h"
 #import "ORSNOCrateModel.h"
+#import "ORQuadStateBox.h"
 
 static NSArray* xl3RWModes;
 static NSDictionary* xl3RWSelects;
@@ -31,6 +32,8 @@ static NSDictionary* xl3RWAddresses;
 static NSDictionary* xl3Ops;
 
 @implementation XL3_LinkController
+@synthesize hvBStatusPanel;
+@synthesize hvAStatusPanel;
 
 #pragma mark •••Initialization
 
@@ -40,9 +43,12 @@ static NSDictionary* xl3Ops;
 	return self;
 }
 
+
+
 - (void) dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
+    [msbox release];
 	[super dealloc];
 }
 
@@ -51,10 +57,16 @@ static NSDictionary* xl3Ops;
 	basicSize	= NSMakeSize(485,290);
 	compositeSize	= NSMakeSize(485,558);
 	blankView = [[NSView alloc] init];
-	[self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
     [tabView setFocusRingType:NSFocusRingTypeNone];
 
 	[super awakeFromNib];
+    
+    NSDictionary *statedict = [NSDictionary dictionaryWithObjectsAndKeys:
+                               [NSColor redColor], @"closed",
+                               [NSColor blueColor], @"open",
+                               [NSColor blackColor], @"unk",
+                               nil];
+    msbox = [[ORMultiStateBox alloc] initWithStates:statedict size:20 pad:4 bevel:2];
 
 	NSString* key = [NSString stringWithFormat: @"orca.ORXL3%d.selectedtab",[model crateNumber]]; //uniqueIdNumber?
 	int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
@@ -77,9 +89,11 @@ static NSDictionary* xl3Ops;
         [hvPowerSupplyMatrix selectCellAtRow:0 column:0];
         if ([model crateNumber] != 16) {
             [[hvPowerSupplyMatrix cellAtRow:0 column:1] setEnabled:NO];
+            [hvPowerSupplyMatrix setHidden:true];
         }
         else {
             [[hvPowerSupplyMatrix cellAtRow:0 column:1] setEnabled:YES];
+            [hvPowerSupplyMatrix setHidden:false];
         }
         [self hvChangePowerSupplyChanged:nil];
     }
@@ -377,14 +391,14 @@ static NSDictionary* xl3Ops;
 
 #pragma mark •••Interface Management
 - (void) settingsLockChanged:(NSNotification*)aNotification
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	BOOL locked = [gSecurity isLocked:[model xl3LockName]];   
 	[lockButton setState: locked];
 	[self xl3LockChanged:aNotification];
-}
+}); }
 
 - (void) xl3LockChanged:(NSNotification*)aNotification
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	
 	//BOOL runInProgress = [gOrcaGlobals runInProgress];
 	BOOL locked = [gSecurity isLocked:[model xl3LockName]];
@@ -408,10 +422,10 @@ static NSDictionary* xl3Ops;
 	[errorTimeOutPU setEnabled:!locked];
 	//[self setToggleCrateButtonState];
 
-}
+}); }
 
 - (void) opsRunningChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	for (id key in xl3Ops) {
 		if ([model xl3OpsRunningForKey:key]) {
 			[[[xl3Ops objectForKey:key] objectForKey:@"spinner"] startAnimation:model];
@@ -420,69 +434,69 @@ static NSDictionary* xl3Ops;
 			[[[xl3Ops objectForKey:key] objectForKey:@"spinner"] stopAnimation:model];			
 		}
 	}
-}
+}); }
 
 
 #pragma mark •basic ops
 - (void) repeatCountChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	[repeatCountField setIntValue: [model repeatOpCount]];
 	[repeatCountStepper setIntValue: [model repeatOpCount]];
-}
+}); }
 
 - (void) repeatDelayChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	[repeatDelayField setIntValue:[model repeatDelay]];
 	[repeatDelayStepper setIntValue: [model repeatDelay]];
-}
+}); }
 
 - (void) autoIncrementChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	[autoIncrementCB setState:[model autoIncrement]];
-}
+}); }
 
 - (void) basicOpsRunningChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	if ([model basicOpsRunning]) [basicOpsRunningIndicator startAnimation:model];
 	else [basicOpsRunningIndicator stopAnimation:model];
-}
+}); }
 
 - (void) writeValueChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	[writeValueField setIntValue:[model writeValue]];
 	[writeValueStepper setIntValue:[model writeValue]];
-}
+}); }
 
 - (void) selectedRegisterChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	[selectedRegisterPU selectItemAtIndex: [model selectedRegister]];
-}
+}); }
 
 
 #pragma mark •composite
 - (void) compositeXl3ModeChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	[compositeXl3ModePU selectItemWithTag:[model xl3Mode]]; 
-}
+}); }
 
 - (void) compositeXl3ModeRunningChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	if ([model xl3ModeRunning]) [compositeXl3ModeRunningIndicator startAnimation:model];
 	else [compositeXl3ModeRunningIndicator stopAnimation:model];
-}
+}); }
 
 - (void) compositeSlotMaskChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	unsigned long mask = [model slotMask];
 	int i;
 	for(i=0; i<16; i++){
 		[[compositeSlotMaskMatrix cellWithTag:i] setIntValue:(mask & 1UL << i)];
 	}
 	[compositeSlotMaskField setIntValue:mask];
-}
+}); }
 
 - (void) compositeXl3RWAddressChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	[compositeXl3RWAddressValueField setIntValue:[model xl3RWAddressValue]];
 	[compositeXl3RWModePU selectItemAtIndex:([model xl3RWAddressValue] >> 28)];
 
@@ -491,93 +505,93 @@ static NSDictionary* xl3Ops;
 	
 	[compositeXl3RWRegisterPU selectItemWithTitle:
 	 [[xl3RWAddresses allKeysForObject:[NSNumber numberWithInt:[model xl3RWAddressValue] & 0xFFF]] lastObject]];
-}
+}); }
 
 - (void) compositeXL3RWDataChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	[compositeXl3RWDataValueField setIntValue:[model xl3RWDataValue]];
-}
+}); }
 
 - (void) compositeXl3PedestalMaskChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	[compositeSetPedestalField setIntValue:[model xl3PedestalMask]];
-}
+}); }
 
 - (void) compositeXl3ChargeInjChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [compositeChargeInjChargeField setIntValue:[model xl3ChargeInjCharge]];
     [compositeChargeInjMaskField setIntValue:[model xl3ChargeInjMask]];
-}
+}); }
 
 
 #pragma mark •mon
 - (void) monPollXl3TimeChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [monPollingRatePU selectItemWithTag:[model pollXl3Time]];
-}
+}); }
 
 - (void) monIsPollingXl3Changed:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [monPollingStatusField setStringValue:[model pollStatus]];
-}
+}); }
 
 - (void) monIsPollingCMOSRatesChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [monIsPollingCMOSRatesButton setIntValue:[model isPollingCMOSRates]];
-}
+}); }
 
 - (void) monPollCMOSRatesMaskChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [monPollCMOSRatesMaskField setIntValue:[model pollCMOSRatesMask]];
-}
+}); }
 
 - (void) monIsPollingPMTCurrentsChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [monIsPollingPMTCurrentsButton setIntValue:[model isPollingPMTCurrents]];
-}
+}); }
 
 - (void) monPollPMTCurrentsMaskChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [monPollPMTCurrentsMaskField setIntValue:[model pollPMTCurrentsMask]];
-}
+}); }
 
 - (void) monIsPollingFECVoltagesChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [monIsPollingFECVoltagesButton setIntValue:[model isPollingFECVoltages]];
-}
+}); }
 
 - (void) monPollFECVoltagesMaskChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [monPollFECVoltagesMaskField setIntValue:[model pollFECVoltagesMask]];    
-}
+}); }
 
 - (void) monIsPollingXl3VoltagesChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [monIsPollingXl3VoltagesButton setIntValue:[model isPollingXl3Voltages]];
-}
+}); }
 
 - (void) monIsPollingHVSupplyChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [monIsPollingHVSupplyButton setIntValue:[model isPollingHVSupply]];    
-}
+}); }
 
 - (void) monIsPollingXl3WithRunChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [monIsPollingWithRunButton setIntValue:[model isPollingXl3WithRun]];        
-}
+}); }
 
 - (void) monPollStatusChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [monPollingStatusField setStringValue:[model pollStatus]];
-}
+}); }
 
 - (void) monIsPollingVerboseChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [monIsPollingVerboseButton setIntValue:[model isPollingVerbose]];
-}
+}); }
 
 - (void) monVltThresholdChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     
     NSTextField* monVltThresholdTextField[] = {monVltThresholdTextField0, monVltThresholdTextField1,
         monVltThresholdTextField2, monVltThresholdTextField3, monVltThresholdTextField6, monVltThresholdTextField7,
@@ -588,40 +602,68 @@ static NSDictionary* xl3Ops;
     for (i=0; i<12; i++) {
         [monVltThresholdTextField[i] setFloatValue:[model xl3VltThreshold:i]];
     }
-}
+}); }
 
 - (void) monVltThresholdInInitChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [monVltThresholdInInitButton setIntValue:[model isXl3VltThresholdInInit]];
-}
+}); }
 
 #pragma mark •hv
 
-- (void) hvRelayMaskChanged:(NSNotification*)aNote
+- (void) updateHVButtons
 {
-    unsigned long long relayMask = [model relayMask];
-
-    [hvRelayMaskLowField setIntValue:relayMask & 0xffffffff];
-    [hvRelayMaskHighField setIntValue:relayMask >> 32];
+    if ([hvPowerSupplyMatrix selectedColumn] == 0) { //A
+        [hvOnButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && ![model hvASwitch]];
+        [hvOffButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch]];
+        [hvStepUpButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping]];
+        [hvStepDownButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping]];
+        [hvRampUpButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping]];
+        [hvRampDownButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping]];
+        [hvStopRampButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && [model hvARamping]];
+    } else {
+        [hvOnButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && ![model hvBSwitch]];
+        [hvOffButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch]];
+        [hvStepUpButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && ![model hvBRamping]];
+        [hvStepDownButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && ![model hvBRamping]];
+        [hvRampUpButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && ![model hvBRamping]];
+        [hvRampDownButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && ![model hvBRamping]];
+        [hvStopRampButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && [model hvBRamping]];
+     }
     
-    [self splitRelayMask:relayMask];
+}
+
+- (void) hvRelayMaskChanged:(NSNotification*)aNote
+{ dispatch_async(dispatch_get_main_queue(), ^{
+    unsigned long long relayMask = [model relayMask];
+    unsigned long long relayViewMask = [model relayViewMask];
+
+    [hvRelayMaskLowField setIntValue:relayViewMask & 0xffffffff];
+    [hvRelayMaskHighField setIntValue:relayViewMask >> 32];
 
     unsigned char slot;
     unsigned char pmtic;
     for (slot = 0; slot<16; slot++) {
         for (pmtic=0; pmtic<4; pmtic++) {
-            [[hvRelayMaskMatrix cellAtRow:pmtic column:15-slot] setIntValue: (relayMask >> (slot*4 + pmtic)) & 0x1];
+            int modelval = (relayMask >> (slot*4 + pmtic)) & 0x1;
+            int viewval = (relayViewMask >> (slot*4 + pmtic)) & 0x1;
+            
+            NSString *ulstate = viewval ? @"closed" : @"open";
+            NSString *brstate = [[model relayStatus]  isEqual: @"status: UNKNOWN"] ? @"unk" : (modelval ? @"closed" : @"open");
+            
+            [[hvRelayMaskMatrix cellAtRow:pmtic column:15-slot] setIntValue:viewval];
+            [[hvRelayMaskMatrix cellAtRow:pmtic column:15-slot] setImage:[msbox upLeft:ulstate botRight:brstate]];
         }
     }
-}
+}); }
 
 - (void) hvRelayStatusChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [hvRelayStatusField setStringValue:[model relayStatus]];
-}
+}); }
 
 - (void) hvStatusChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     if (!owl_crate_master) { //cache owl master
         NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
         for (id xl3 in xl3s) {
@@ -630,13 +672,26 @@ static NSDictionary* xl3Ops;
     }
     
     [hvAOnStatusField setStringValue:[model hvASwitch]?@"ON":@"OFF"];
-    [hvBOnStatusField setStringValue:[model hvBSwitch]?@"ON":@"OFF"];
     [hvAVoltageSetField setStringValue:[NSString stringWithFormat:@"%lu V",[model hvAVoltageDACSetValue]*3000/4096]];
-    [hvBVoltageSetField setStringValue:[NSString stringWithFormat:@"%lu V",[model hvBVoltageDACSetValue]*3000/4096]];
     [hvAVoltageReadField setStringValue:[NSString stringWithFormat:@"%d V",(unsigned int)[model hvAVoltageReadValue]]];
-    [hvBVoltageReadField setStringValue:[NSString stringWithFormat:@"%d V",(unsigned int)[model hvBVoltageReadValue]]];
     [hvACurrentReadField setStringValue:[NSString stringWithFormat:@"%3.1f mA",[model hvACurrentReadValue]]];
-    [hvBCurrentReadField setStringValue:[NSString stringWithFormat:@"%3.1f mA",[model hvBCurrentReadValue]]];
+    
+    // Only crate 16 has an HV B (apparently)
+    if ([model crateNumber] == 16) {
+        [hvAStatusPanel setHidden:(![model hvEverUpdated] || ![model hvSwitchEverUpdated])];
+        [hvBStatusPanel setHidden:(![model hvEverUpdated] || ![model hvSwitchEverUpdated])];
+        [hvBOnStatusField setStringValue:[model hvBSwitch]?@"ON":@"OFF"];
+        [hvBVoltageSetField setStringValue:[NSString stringWithFormat:@"%lu V",[model hvBVoltageDACSetValue]*3000/4096]];
+        [hvBVoltageReadField setStringValue:[NSString stringWithFormat:@"%d V",(unsigned int)[model hvBVoltageReadValue]]];
+        [hvBCurrentReadField setStringValue:[NSString stringWithFormat:@"%3.1f mA",[model hvBCurrentReadValue]]];
+    } else {
+        [hvAStatusPanel setHidden:(![model hvEverUpdated] || ![model hvSwitchEverUpdated])];
+        [hvBStatusPanel setHidden:true];
+        [hvBOnStatusField setStringValue:@"N/A"];
+        [hvBVoltageSetField setStringValue:@""];
+        [hvBVoltageReadField setStringValue:@""];
+        [hvBCurrentReadField setStringValue:@""];
+    }
 
     //todo: add exception for OWLs
     //if ([hvPowerSupplyMatrix selectedColumn] == 0 && [model hvASwitch]) {
@@ -656,16 +711,17 @@ static NSDictionary* xl3Ops;
         [hvRelayOpenButton setEnabled:YES];
         [hvRelayCloseButton setEnabled:YES];        
     }
-}
+    [self updateHVButtons];
+}); }
 
 - (void) hvTriggerStatusChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [hvATriggerStatusField setStringValue:[model triggerStatus]];
     [hvBTriggerStatusField setStringValue:[model triggerStatus]];
-}
+}); }
 
 - (void) hvTargetValueChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     if ([hvPowerSupplyMatrix selectedColumn] == 0) { //A
         [hvTargetValueField setFloatValue:[model hvAVoltageTargetValue] * 3000. / 4096.];
         [hvTargetValueStepper setIntValue:[model hvAVoltageTargetValue]];
@@ -674,10 +730,10 @@ static NSDictionary* xl3Ops;
         [hvTargetValueField setFloatValue:[model hvBVoltageTargetValue] * 3000. / 4096.];
         [hvTargetValueStepper setIntValue:[model hvBVoltageTargetValue]];
     }
-}
+}); }
 
 - (void) hvCMOSRateLimitChanged:(NSNotification *)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     if ([hvPowerSupplyMatrix selectedColumn] == 0) { //A
         [hvCMOSRateLimitField setIntValue:[model hvACMOSRateLimit]];
         [hvCMOSRateLimitStepper setIntValue:[model hvACMOSRateLimit]];
@@ -686,10 +742,10 @@ static NSDictionary* xl3Ops;
         [hvCMOSRateLimitField setIntValue:[model hvBCMOSRateLimit]];
         [hvCMOSRateLimitStepper setIntValue:[model hvBCMOSRateLimit]];
     }    
-}
+}); }
 
 - (void) hvCMOSRateIgnoreChanged:(NSNotification *)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     if ([hvPowerSupplyMatrix selectedColumn] == 0) { //A
         [hvCMOSRateIgnoreField setIntValue:[model hvACMOSRateIgnore]];
         [hvCMOSRateIgnoreStepper setIntValue:[model hvACMOSRateIgnore]];
@@ -698,25 +754,25 @@ static NSDictionary* xl3Ops;
         [hvCMOSRateIgnoreField setIntValue:[model hvBCMOSRateIgnore]];
         [hvCMOSRateIgnoreStepper setIntValue:[model hvBCMOSRateIgnore]];
     }    
-}
+}); }
 
 - (void) hvChangePowerSupplyChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [self hvTargetValueChanged:aNote];
     [self hvCMOSRateLimitChanged:aNote];
     [self hvCMOSRateIgnoreChanged:aNote];
     [self hvStatusChanged:aNote];
-}
+}); }
 
 #pragma mark •ip connection
 
 - (void) linkConnectionChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [self connectStateChanged:aNote];
-}
+}); }
 
 - (void) connectStateChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     /*
 	BOOL runInProgress = [gOrcaGlobals runInProgress];
 	BOOL locked = [gSecurity isLocked:[model xl3LockName]];
@@ -738,23 +794,26 @@ static NSDictionary* xl3Ops;
     
     //we need the control
     if([[model xl3Link] connectState] == kDisconnected){
+        
+        //Start thread to wait for the XL3 to connect and be initilized
+        [model safeHvInit];
         [toggleConnectButton setTitle:@"Connect"];
         
     }
     else {
         [toggleConnectButton setTitle:@"Disconnect"];
     }
-}
+}); }
 
 - (void) errorTimeOutChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
 	[errorTimeOutPU selectItemAtIndex:[[model xl3Link] errorTimeOut]];
-}
+}); }
 
 - (void) connectionAutoConnectChanged:(NSNotification*)aNote;
-{
-    [connectionAutoConnectButton setIntValue:[[model xl3Link] autoConnect]];    
-}
+{ dispatch_async(dispatch_get_main_queue(), ^{
+    [connectionAutoConnectButton setIntValue:[[model xl3Link] autoConnect]];
+}); }
 
 #pragma mark •••Helper
 - (void) populateOps
@@ -1191,34 +1250,21 @@ static NSDictionary* xl3Ops;
     [model setIsPollingXl3:false];
 }
 
-//split the relayMask into a low and high parts for posting to couchdb
--(void)splitRelayMask:(unsigned long long)aHvRelayMask
-{
-    //split the hvRelayMask into two parts
-    uint32_t highMask = (uint32_t)((aHvRelayMask & 0xFFFFFFFF00000000ULL) >> 32);
-    uint32_t lowMask = (uint32_t)(aHvRelayMask & 0xFFFFFFFF);
-    [model setRelayHighMask:highMask];
-    [model setRelayLowMask:lowMask];
-}
-
-
 //hv
 - (IBAction)hvRelayMaskHighAction:(id)sender
 {
     [[sender window] makeFirstResponder:tabView];
-    unsigned long long newRelayMask = [model relayMask] & 0xFFFFFFFFULL;
+    unsigned long long newRelayMask = [model relayViewMask] & 0xFFFFFFFFULL;
     newRelayMask |= ((unsigned long long)[sender intValue]) << 32;
-    [self splitRelayMask:newRelayMask];
-    [model setRelayMask:newRelayMask];
+    [model setRelayViewMask:newRelayMask];
 }
 
 - (IBAction)hvRelayMaskLowAction:(id)sender
 {
     [[sender window] makeFirstResponder:tabView];
-    unsigned long long newRelayMask = [model relayMask] & (0xFFFFFFFFULL << 32);
+    unsigned long long newRelayMask = [model relayViewMask] & (0xFFFFFFFFULL << 32);
     newRelayMask |= [sender intValue] & 0xFFFFFFFF;
-    [self splitRelayMask:newRelayMask];
-    [model setRelayMask:newRelayMask];    
+    [model setRelayViewMask:newRelayMask];
 }
 
 - (IBAction)hvRelayMaskMatrixAction:(id)sender
@@ -1228,20 +1274,16 @@ static NSDictionary* xl3Ops;
     unsigned char pmtic;
     for (slot = 0; slot<16; slot++) {
         for (pmtic=0; pmtic<4; pmtic++) {
-            //NSLog(@"slot: %d, db: %d, value: %d\n",slot,pmtic,[[sender cellAtRow:(3-pmtic) column:(15-slot)] intValue]);
             newRelayMask |= ([[sender cellAtRow:pmtic column:15-slot] intValue]?1ULL:0ULL) << (slot*4 + pmtic);
         }
     }
-    
-    //split the hvRelayMask into two parts
-    [self splitRelayMask:newRelayMask];
-    
-    [model setRelayMask:newRelayMask];
+    [model setRelayViewMask:newRelayMask];
 }
 
 - (IBAction)hvRelaySetAction:(id)sender
 {
     [self endEditing];
+    [model setRelayMask:[model relayViewMask]];
     [model closeHVRelays];
 }
 

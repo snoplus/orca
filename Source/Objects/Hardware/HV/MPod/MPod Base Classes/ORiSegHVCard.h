@@ -95,6 +95,7 @@ enum{
     NSMutableDictionary* hvConstraints;
     ORAlarm*        safetyLoopNotGoodAlarm;
     BOOL            doNotPostSafetyLoopAlarm;
+    NSDate*         lastHistoryPost;
 }
 
 #pragma mark ***Initialization
