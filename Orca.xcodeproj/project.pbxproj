@@ -19,19 +19,16 @@
 		0F16E3401C493AD7003C9EC9 /* qt.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F16E3181C493AD6003C9EC9 /* qt.h */; };
 		0F16E3411C493AD7003C9EC9 /* async.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F16E3191C493AD6003C9EC9 /* async.c */; };
 		0F16E3421C493AD7003C9EC9 /* async.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F16E31A1C493AD6003C9EC9 /* async.h */; };
-		0F16E3431C493AD7003C9EC9 /* CHANGELOG.md in Sources */ = {isa = PBXBuildFile; fileRef = 0F16E31B1C493AD6003C9EC9 /* CHANGELOG.md */; };
 		0F16E3441C493AD7003C9EC9 /* COPYING in Resources */ = {isa = PBXBuildFile; fileRef = 0F16E31C1C493AD6003C9EC9 /* COPYING */; };
 		0F16E3451C493AD7003C9EC9 /* dict.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F16E31D1C493AD7003C9EC9 /* dict.c */; };
 		0F16E3461C493AD7003C9EC9 /* dict.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F16E31E1C493AD7003C9EC9 /* dict.h */; };
 		0F16E3511C493AD7003C9EC9 /* fmacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F16E32A1C493AD7003C9EC9 /* fmacros.h */; };
 		0F16E3521C493AD7003C9EC9 /* hiredis.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F16E32B1C493AD7003C9EC9 /* hiredis.c */; };
 		0F16E3531C493AD7003C9EC9 /* hiredis.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F16E32C1C493AD7003C9EC9 /* hiredis.h */; };
-		0F16E3541C493AD7003C9EC9 /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = 0F16E32D1C493AD7003C9EC9 /* Makefile */; };
 		0F16E3551C493AD7003C9EC9 /* net.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F16E32E1C493AD7003C9EC9 /* net.c */; };
 		0F16E3561C493AD7003C9EC9 /* net.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F16E32F1C493AD7003C9EC9 /* net.h */; };
 		0F16E3571C493AD7003C9EC9 /* read.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F16E3301C493AD7003C9EC9 /* read.c */; };
 		0F16E3581C493AD7003C9EC9 /* read.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F16E3311C493AD7003C9EC9 /* read.h */; };
-		0F16E3591C493AD7003C9EC9 /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = 0F16E3321C493AD7003C9EC9 /* README.md */; };
 		0F16E35A1C493AD7003C9EC9 /* sds.c in Sources */ = {isa = PBXBuildFile; fileRef = 0F16E3331C493AD7003C9EC9 /* sds.c */; };
 		0F16E35B1C493AD7003C9EC9 /* sds.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F16E3341C493AD7003C9EC9 /* sds.h */; };
 		0F16E35D1C493AD7003C9EC9 /* win32.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F16E3361C493AD7003C9EC9 /* win32.h */; };
@@ -3333,7 +3330,6 @@
 		EF7722B511E813120064A1CF /* ORXL3Model.h in Headers */ = {isa = PBXBuildFile; fileRef = EF7722B211E813120064A1CF /* ORXL3Model.h */; };
 		EF7722B611E813120064A1CF /* ORXL3Model.m in Sources */ = {isa = PBXBuildFile; fileRef = EF7722B311E813120064A1CF /* ORXL3Model.m */; };
 		EF7722B711E813120064A1CF /* XL3Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = EF7722B411E813120064A1CF /* XL3Card.gif */; };
-		EFAC072211E9856800336793 /* XL3_Cmds.h in Headers */ = {isa = PBXBuildFile; fileRef = EFAC072111E9856800336793 /* XL3_Cmds.h */; };
 		EFAC073111E9A6CB00336793 /* XL3_Link.h in Headers */ = {isa = PBXBuildFile; fileRef = EFAC072F11E9A6CB00336793 /* XL3_Link.h */; };
 		EFAC073211E9A6CB00336793 /* XL3_Link.m in Sources */ = {isa = PBXBuildFile; fileRef = EFAC073011E9A6CB00336793 /* XL3_Link.m */; };
 		EFAC073F11E9A9DB00336793 /* XL3_LinkController.h in Headers */ = {isa = PBXBuildFile; fileRef = EFAC073D11E9A9DB00336793 /* XL3_LinkController.h */; };
@@ -3684,19 +3680,16 @@
 		0F16E3181C493AD6003C9EC9 /* qt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = qt.h; sourceTree = "<group>"; };
 		0F16E3191C493AD6003C9EC9 /* async.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = async.c; sourceTree = "<group>"; };
 		0F16E31A1C493AD6003C9EC9 /* async.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = async.h; sourceTree = "<group>"; };
-		0F16E31B1C493AD6003C9EC9 /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
 		0F16E31C1C493AD6003C9EC9 /* COPYING */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = COPYING; sourceTree = "<group>"; };
 		0F16E31D1C493AD7003C9EC9 /* dict.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dict.c; sourceTree = "<group>"; };
 		0F16E31E1C493AD7003C9EC9 /* dict.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dict.h; sourceTree = "<group>"; };
 		0F16E32A1C493AD7003C9EC9 /* fmacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fmacros.h; sourceTree = "<group>"; };
 		0F16E32B1C493AD7003C9EC9 /* hiredis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hiredis.c; sourceTree = "<group>"; };
 		0F16E32C1C493AD7003C9EC9 /* hiredis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hiredis.h; sourceTree = "<group>"; };
-		0F16E32D1C493AD7003C9EC9 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		0F16E32E1C493AD7003C9EC9 /* net.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = net.c; sourceTree = "<group>"; };
 		0F16E32F1C493AD7003C9EC9 /* net.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = net.h; sourceTree = "<group>"; };
 		0F16E3301C493AD7003C9EC9 /* read.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read.c; sourceTree = "<group>"; };
 		0F16E3311C493AD7003C9EC9 /* read.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = read.h; sourceTree = "<group>"; };
-		0F16E3321C493AD7003C9EC9 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		0F16E3331C493AD7003C9EC9 /* sds.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sds.c; sourceTree = "<group>"; };
 		0F16E3341C493AD7003C9EC9 /* sds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sds.h; sourceTree = "<group>"; };
 		0F16E3361C493AD7003C9EC9 /* win32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = win32.h; sourceTree = "<group>"; };
@@ -6862,7 +6855,6 @@
 		EF7722B211E813120064A1CF /* ORXL3Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORXL3Model.h; sourceTree = "<group>"; };
 		EF7722B311E813120064A1CF /* ORXL3Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORXL3Model.m; sourceTree = "<group>"; };
 		EF7722B411E813120064A1CF /* XL3Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = XL3Card.gif; sourceTree = "<group>"; };
-		EFAC072111E9856800336793 /* XL3_Cmds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XL3_Cmds.h; sourceTree = "<group>"; };
 		EFAC072F11E9A6CB00336793 /* XL3_Link.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XL3_Link.h; sourceTree = "<group>"; };
 		EFAC073011E9A6CB00336793 /* XL3_Link.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XL3_Link.m; sourceTree = "<group>"; };
 		EFAC073D11E9A9DB00336793 /* XL3_LinkController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XL3_LinkController.h; sourceTree = "<group>"; };
@@ -7000,19 +6992,16 @@
 				0F16E3101C493AD6003C9EC9 /* adapters */,
 				0F16E3191C493AD6003C9EC9 /* async.c */,
 				0F16E31A1C493AD6003C9EC9 /* async.h */,
-				0F16E31B1C493AD6003C9EC9 /* CHANGELOG.md */,
 				0F16E31C1C493AD6003C9EC9 /* COPYING */,
 				0F16E31D1C493AD7003C9EC9 /* dict.c */,
 				0F16E31E1C493AD7003C9EC9 /* dict.h */,
 				0F16E32A1C493AD7003C9EC9 /* fmacros.h */,
 				0F16E32B1C493AD7003C9EC9 /* hiredis.c */,
 				0F16E32C1C493AD7003C9EC9 /* hiredis.h */,
-				0F16E32D1C493AD7003C9EC9 /* Makefile */,
 				0F16E32E1C493AD7003C9EC9 /* net.c */,
 				0F16E32F1C493AD7003C9EC9 /* net.h */,
 				0F16E3301C493AD7003C9EC9 /* read.c */,
 				0F16E3311C493AD7003C9EC9 /* read.h */,
-				0F16E3321C493AD7003C9EC9 /* README.md */,
 				0F16E3331C493AD7003C9EC9 /* sds.c */,
 				0F16E3341C493AD7003C9EC9 /* sds.h */,
 				0F16E3361C493AD7003C9EC9 /* win32.h */,
@@ -13954,7 +13943,6 @@
 				EFCE3ADE123DD9A2009AEBA8 /* ORXL3Decoders.m */,
 				EF7722B211E813120064A1CF /* ORXL3Model.h */,
 				EF7722B311E813120064A1CF /* ORXL3Model.m */,
-				EFAC072111E9856800336793 /* XL3_Cmds.h */,
 				EFAC072F11E9A6CB00336793 /* XL3_Link.h */,
 				EFAC073011E9A6CB00336793 /* XL3_Link.m */,
 				EFAC073D11E9A9DB00336793 /* XL3_LinkController.h */,
@@ -15328,7 +15316,6 @@
 				4398E6BA11B7E36400FC4DDE /* ORCAEN785Readout.hh in Headers */,
 				4398E7E011B81BBD00FC4DDE /* ORCaen775Decoders.h in Headers */,
 				EF7722B511E813120064A1CF /* ORXL3Model.h in Headers */,
-				EFAC072211E9856800336793 /* XL3_Cmds.h in Headers */,
 				EFAC073111E9A6CB00336793 /* XL3_Link.h in Headers */,
 				EFAC073F11E9A9DB00336793 /* XL3_LinkController.h in Headers */,
 				4342D59511ECB8AD007EFFB1 /* ORCAEN775Readout.hh in Headers */,
@@ -16708,7 +16695,6 @@
 				8434A2C6055B3287002D3102 /* ORShaperController.m in Sources */,
 				8434A2C8055B3287002D3102 /* ORRunController.m in Sources */,
 				8434A2CA055B3287002D3102 /* ORPreferencesController.m in Sources */,
-				0F16E3431C493AD7003C9EC9 /* CHANGELOG.md in Sources */,
 				8434A2CB055B3287002D3102 /* ORDefaults.m in Sources */,
 				43135802195C5D89007B1F15 /* ORGretinaTriggerModel.m in Sources */,
 				8434A2CE055B3287002D3102 /* ORHistoModel.m in Sources */,
@@ -16877,7 +16863,6 @@
 				8484811C07288C26009EDCE2 /* ORDotImage.m in Sources */,
 				8438C36A1845092600A6F4D6 /* ORBlockStep.m in Sources */,
 				847946D307330E5300C5E1FA /* ORPciBit3Controller.m in Sources */,
-				0F16E3591C493AD7003C9EC9 /* README.md in Sources */,
 				847946D507330E5300C5E1FA /* ORPciBit3Model.m in Sources */,
 				847946D707330E5300C5E1FA /* ORPciBit3View.m in Sources */,
 				8402797307397B8700972B07 /* ORBit3Controller.m in Sources */,
@@ -17390,7 +17375,6 @@
 				84D8CF841046FE32005585C5 /* ORAmrelHVDecoders.m in Sources */,
 				84167117104C04D400E47227 /* ORAutoTestUnit.m in Sources */,
 				84AB0F411056DA4E0069D5E2 /* ORModBusController.m in Sources */,
-				0F16E3541C493AD7003C9EC9 /* Makefile in Sources */,
 				84AB0F451056DA4E0069D5E2 /* ORModBusModel.m in Sources */,
 				84AB101F1057D6990069D5E2 /* ORiTransGasSensorModel.m in Sources */,
 				84DBA1331058122C00884B1C /* ORiTransGasSensorController.m in Sources */,

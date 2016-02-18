@@ -19,7 +19,7 @@
 //-------------------------------------------------------------
 
 #pragma mark •••Imported Files
-#import "XL3_Cmds.h"
+#import "PacketTypes.h"
 #import "XL3_Link.h"
 #import "ORSafeCircularBuffer.h"
 
@@ -47,7 +47,7 @@ NSString* XL3_LinkAutoConnectChanged    = @"XL3_LinkAutoConnectChanged";
 @interface XL3_Link (private)
 - (void) allocBufferWithSize:(unsigned) aBufferSize;
 - (void) releaseBuffer;
-- (BOOL) writeBundle:(char*)someBytes length:(unsigned)numBytes version:(unsigned)aRev packetNum:(unsigned short)packet_num;
+- (BOOL) writeBundle:(char*)someBytes length:(unsigned)numBytes version:(unsigned)aRev packetNum:(unsigned short)packetNum;
 - (unsigned) bundleBufferSize;
 - (unsigned) bundleReadMark;
 - (unsigned) bundleWriteMark;
@@ -395,40 +395,40 @@ readFifoFlag = _readFifoFlag;
 
 - (void) newMultiCmd
 {
-	aMultiCmdPacket.cmdHeader.packet_type = MULTI_FAST_CMD_ID;
-	aMultiCmdPacket.cmdHeader.packet_num = (unsigned short) ++num_cmd_packets;
-	aMultiCmdPacket.cmdHeader.num_bundles = 0;
-	memset(aMultiCmdPacket.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
+	aMultiCmdPacket.header.packetType = MULTI_FAST_CMD_ID;
+	aMultiCmdPacket.header.packetNum = (unsigned short) ++num_cmd_packets;
+	aMultiCmdPacket.header.numBundles = 0;
+	memset(aMultiCmdPacket.payload, 0, XL3_PAYLOAD_SIZE);
 }
 
 - (void) addMultiCmdToAddress:(long)anAddress withValue:(long)aValue
 {
-	MultiFC* theMultiFC = (MultiFC*) aMultiCmdPacket.payload;
-	FECCommand* aFECCommand = &(theMultiFC->cmd[theMultiFC->howmany]);
+	MultiCommand* theMultiCommand = (MultiCommand*) aMultiCmdPacket.payload;
+	Command* aCommand = &(theMultiCommand->cmd[theMultiCommand->howMany]);
 
-	aFECCommand->cmd_num = theMultiFC->howmany;
-	aFECCommand->packet_num = aMultiCmdPacket.cmdHeader.packet_num;
-	aFECCommand->flags = 0;
-	aFECCommand->address = anAddress;
-	aFECCommand->data = aValue;
+	aCommand->cmdNum = theMultiCommand->howMany;
+	aCommand->packetNum = aMultiCmdPacket.header.packetNum;
+	aCommand->flags = 0;
+	aCommand->address = anAddress;
+	aCommand->data = aValue;
 	
-	theMultiFC->howmany++;
+	theMultiCommand->howMany++;
 }
 
-- (XL3_Packet*) executeMultiCmd
+- (XL3Packet*) executeMultiCmd
 {
-	MultiFC* theMultiFC = (MultiFC*) aMultiCmdPacket.payload;
+	MultiCommand* theMultiCommand = (MultiCommand*) aMultiCmdPacket.payload;
 	if (needToSwap) {
 		unsigned int i = 0;
-		for (i = 0; i < theMultiFC->howmany; i++) {
-			FECCommand* command = &(theMultiFC->cmd[i]);
-			command->cmd_num = swapLong(command->packet_num);
-			command->packet_num = swapShort(command->packet_num);
+		for (i = 0; i < theMultiCommand->howMany; i++) {
+			Command* command = &(theMultiCommand->cmd[i]);
+			command->cmdNum = swapLong(command->packetNum);
+			command->packetNum = swapShort(command->packetNum);
 			command->address = swapLong(command->address);
 			command->data = swapLong(command->data);
 		}
-		theMultiFC->howmany = swapLong(theMultiFC->howmany);
-		aMultiCmdPacket.cmdHeader.packet_type = swapShort(aMultiCmdPacket.cmdHeader.packet_type);
+		theMultiCommand->howMany = swapLong(theMultiCommand->howMany);
+		aMultiCmdPacket.header.packetType = swapShort(aMultiCmdPacket.header.packetType);
 	}
 
 	@try {
@@ -440,13 +440,13 @@ readFifoFlag = _readFifoFlag;
 	}
 		
 	if (needToSwap) {
-		aMultiCmdPacket.cmdHeader.packet_type = swapShort(aMultiCmdPacket.cmdHeader.packet_type);
-		theMultiFC->howmany = swapLong(theMultiFC->howmany);
+		aMultiCmdPacket.header.packetType = swapShort(aMultiCmdPacket.header.packetType);
+		theMultiCommand->howMany = swapLong(theMultiCommand->howMany);
 		unsigned int i = 0;
-		for (i = 0; i < theMultiFC->howmany; i++) {
-			FECCommand* command = &(theMultiFC->cmd[i]);
-			command->cmd_num = swapLong(command->packet_num);
-			command->packet_num = swapShort(command->packet_num);
+		for (i = 0; i < theMultiCommand->howMany; i++) {
+			Command* command = &(theMultiCommand->cmd[i]);
+			command->cmdNum = swapLong(command->packetNum);
+			command->packetNum = swapShort(command->packetNum);
 			command->address = swapLong(command->address);
 			command->data = swapLong(command->data);
 		}
@@ -458,28 +458,28 @@ readFifoFlag = _readFifoFlag;
 - (BOOL) multiCmdFailed
 {
 	BOOL error = NO;
-	MultiFC* theMultiFC = (MultiFC*) aMultiCmdPacket.payload;
+	MultiCommand* theMultiCommand = (MultiCommand*) aMultiCmdPacket.payload;
 
 	unsigned int i = 0;
-	for (i = 0; i < theMultiFC->howmany; i++) {
-		FECCommand* command = &theMultiFC->cmd[i];
+	for (i = 0; i < theMultiCommand->howMany; i++) {
+		Command* command = &theMultiCommand->cmd[i];
 		error |= command->flags;
 	}
 			
 	return error;
 }
 
-- (void) sendXL3Packet:(XL3_Packet*)aPacket
+- (void) sendXL3Packet:(XL3Packet*)aPacket
 {
 	//expects the packet is swapped correctly (both header and payload)
-	unsigned char  packetType = aPacket->cmdHeader.packet_type;
-	unsigned short packetNum  = aPacket->cmdHeader.packet_num;
+	unsigned char  packetType = aPacket->header.packetType;
+	unsigned short packetNum  = aPacket->header.packetNum;
 	if (needToSwap) packetNum = swapShort(packetNum);
 	
 	@try {
 		[commandSocketLock lock]; //begin critial section
 		[self writePacket:(char*) aPacket];
-		[self readXL3Packet:(XL3_Packet*)aPacket withPacketType:packetType andPacketNum:packetNum];
+		[self readXL3Packet:(XL3Packet*)aPacket withPacketType:packetType andPacketNum:packetNum];
 		[commandSocketLock unlock]; //end critial section
 	}
 	@catch (NSException* localException) {
@@ -488,95 +488,85 @@ readFifoFlag = _readFifoFlag;
 	}
 }
 
-- (void) sendCommand:(long)aCmd withPayload:(XL3_PayloadStruct*)payloadBlock expectResponse:(BOOL)askForResponse
+- (void) sendCommand:(uint8_t) aCmd withPayload:(char *) payload expectResponse:(BOOL) askForResponse
 {
-	//client is responsible for payload swapping, we take care of the header
-	XL3_Packet aPacket;
-	memset(aPacket.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
-	unsigned char packetType = (unsigned char) aCmd;
-	unsigned short packetNum = (unsigned short) ++num_cmd_packets;
-	aPacket.cmdHeader.packet_num = (uint16_t) packetNum;
-	aPacket.cmdHeader.packet_type = (uint8_t) packetType;
-	aPacket.cmdHeader.num_bundles = 0;
-	if (needToSwap) aPacket.cmdHeader.packet_num = swapShort(aPacket.cmdHeader.packet_num);
-	memcpy(aPacket.payload, payloadBlock->payload, payloadBlock->numberBytesinPayload);
-	
-	@try {
-		[commandSocketLock lock]; //begin critical section
-		[self writePacket:(char*) &aPacket];
-		[commandSocketLock unlock]; //end critical section
-	}
-	@catch (NSException* localException) {
-		[commandSocketLock unlock]; //end critical section
-		@throw localException;
-	}
+    //client is responsible for payload swapping, we take care of the header
+    XL3Packet aPacket;
+
+    uint16_t packetNum = ++num_cmd_packets;
+    aPacket.header.packetNum = htons(packetNum);
+    aPacket.header.packetType = aCmd;
+    aPacket.header.numBundles = 0;
+    memcpy(aPacket.payload, payload, XL3_PAYLOAD_SIZE);
+    
+    @try {
+        [commandSocketLock lock]; //begin critical section
+        [self writePacket:(char*) &aPacket];
+        [commandSocketLock unlock]; //end critical section
+    } @catch (NSException* localException) {
+        [commandSocketLock unlock]; //end critical section
+        @throw localException;
+    }
     if(askForResponse){
         @try {
-            //NSLog(@"wait for command response with packetType: 0x%x, packetNum: 0x%x, packetSize: %i\n", packetType, packetNum, payloadBlock->numberBytesinPayload);
-			[self readXL3Packet:&aPacket withPacketType:packetType andPacketNum:packetNum];
-			XL3_PayloadStruct* payloadPtr = (XL3_PayloadStruct*) aPacket.payload;
-			memcpy(payloadBlock->payload, payloadPtr, payloadBlock->numberBytesinPayload);
-		}
-        @catch (NSException* localException) {
+            [self readXL3Packet:&aPacket withPacketType:aCmd andPacketNum:packetNum];
+            memcpy(payload, aPacket.payload, XL3_PAYLOAD_SIZE);
+        } @catch (NSException* localException) {
             @throw localException;
         }
-	}
-	if (! askForResponse) {
-		[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.005]];
-	}
+    } else {
+        [NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.005]];
+    }
 }
 
 
-- (void) sendCommand:(long)aCmd expectResponse:(BOOL)askForResponse
+- (void) sendCommand:(uint8_t) aCmd expectResponse:(BOOL) askForResponse
 {
-	XL3_PayloadStruct payload;
-	payload.numberBytesinPayload = 0;
+	char payload[XL3_PAYLOAD_SIZE];
 	@try {
-		[self sendCommand:aCmd withPayload:&payload expectResponse:askForResponse];
-	}
-	@catch (NSException* localException) {
+		[self sendCommand:aCmd withPayload:payload expectResponse:askForResponse];
+	} @catch (NSException* localException) {
 		@throw localException;
 		//what about the response?		
 	}
 }
 
-- (void) sendFECCommand:(long)aCmd toAddress:(unsigned long)address withData:(unsigned long*)value
+- (void) sendCommand:(uint8_t) aCmd toAddress:(uint32_t) address withData:(uint32_t *) value
 {
-	XL3_PayloadStruct payload;
-	FECCommand* command = (FECCommand*) payload.payload;
+	char payload[XL3_PAYLOAD_SIZE];
+	Command* command = (Command*) payload;
 		
-	command->cmd_num = aCmd;
-	command->packet_num = 0; // todo: figure out what are these two good for...
+	command->cmdNum = aCmd;
+	command->packetNum = 0; // todo: figure out what are these two good for...
 	command->flags = 0;
 	command->address = (uint32_t) address;
 	command->data = *(uint32_t*) value;
 
 	if (needToSwap) {
-		command->cmd_num = swapLong(command->packet_num);
-		command->packet_num = swapShort(command->packet_num);
+		command->cmdNum = swapLong(command->packetNum);
+		command->packetNum = swapShort(command->packetNum);
 		command->address = swapLong(command->address);
 		command->data = swapLong(command->data);
 	}	
 
-	payload.numberBytesinPayload = sizeof(FECCommand);
 	@try { 
-		[self sendCommand:FAST_CMD_ID withPayload:&payload expectResponse:YES];
+		[self sendCommand:FAST_CMD_ID withPayload:payload expectResponse:YES];
 	}
 	@catch (NSException* e) {
-		NSLog(@"%@ FECCommand error sending command\n", [self crateName]);
+		NSLog(@"%@ Command error sending command\n", [self crateName]);
 		@throw e;
 	}
 	//return the same packet!
 	if (command->flags != 0) {
 		NSLog(@"%@ bus error\n", [self crateName]);
-		@throw [NSException exceptionWithName:@"FECCommand error.\n" reason:@"XL3 bus error\n" userInfo:nil];
+		@throw [NSException exceptionWithName:@"Command error.\n" reason:@"XL3 bus error\n" userInfo:nil];
 	}	
 
 	*value = command->data;
 	if (needToSwap) *value = swapLong(*value);	
 }
 
-- (void) readXL3Packet:(XL3_Packet*)aPacket withPacketType:(unsigned char)packetType andPacketNum:(unsigned short)packetNum
+- (void) readXL3Packet:(XL3Packet*) aPacket withPacketType:(uint8_t) packetType andPacketNum: (uint16_t) packetNum
 {
 	//look into the cmdArray
     NSDate* sleepDate = [[NSDate alloc] initWithTimeIntervalSinceNow:0.01];
@@ -596,8 +586,8 @@ readFifoFlag = _readFifoFlag;
 		@try {
 			[cmdArrayLock lock];
 			for (aCmd in cmdArray) {
-				aPacketType = [aCmd objectForKey:@"packet_type"];
-				aPacketNum = [aCmd objectForKey:@"packet_num"];
+				aPacketType = [aCmd objectForKey:@"packetType"];
+				aPacketNum = [aCmd objectForKey:@"packetNum"];
 				//NSLog(@"aPacketType: 0x%x, packetType: 0x%x, aPacketNum: 0x%x, packetNum: 0x%x\n",[aPacketType unsignedShortValue],packetType,[aPacketNum unsignedCharValue],packetNum); 
 
 				if ([aPacketType unsignedCharValue] == packetType && [aPacketNum unsignedShortValue] == packetNum) {
@@ -708,7 +698,7 @@ static void SwapLongBlock(void* p, int32_t n)
     [[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectStateChanged object: self];
 
     workingSocket = 0;
-    if ((workingSocket = anetTcpConnect(err, XL3_SERVER, portNumber+100)) == ANET_ERR) {
+    if ((workingSocket = anetTcpConnect(err, XL3_SERVER, portNumber)) == ANET_ERR) {
         if (workingSocket) {
             close(workingSocket);
             workingSocket = 0;
@@ -778,36 +768,36 @@ static void SwapLongBlock(void* p, int32_t n)
             //reset the timer
             t0 = time(0);
             
-            //NSLog(@"Read packet:  packet_type: 0x%x, packet_num: 0x%x\n", ((XL3_Packet*) aPacket)->cmdHeader.packet_type, ((XL3_Packet*) aPacket)->cmdHeader.packet_num);
+            //NSLog(@"Read packet:  packetType: 0x%x, packetNum: 0x%x\n", ((XL3Packet*) aPacket)->header.packetType, ((XL3Packet*) aPacket)->header.packetNum);
 
-            if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == MEGA_BUNDLE_ID) {
-                //packet_num?
-                unsigned short packet_num = ((XL3_Packet*) aPacket)->cmdHeader.packet_num;
-                if (needToSwap) packet_num = swapShort(packet_num);
-                if (((XL3_Packet*) aPacket)->cmdHeader.num_bundles != 0) {
-                    [self writeBundle:((XL3_Packet*) aPacket)->payload length:((XL3_Packet*) aPacket)->cmdHeader.num_bundles * 12 version:0 packetNum:packet_num];
+            if (((XL3Packet*) aPacket)->header.packetType == MEGA_BUNDLE_ID) {
+                //packetNum?
+                unsigned short packetNum = ((XL3Packet*) aPacket)->header.packetNum;
+                if (needToSwap) packetNum = swapShort(packetNum);
+                if (((XL3Packet*) aPacket)->header.numBundles != 0) {
+                    [self writeBundle:((XL3Packet*) aPacket)->payload length:((XL3Packet*) aPacket)->header.numBundles * 12 version:0 packetNum:packetNum];
                 }
                 else {
-                    unsigned int num_bytes = *(unsigned int*)(((XL3_Packet*)aPacket)->payload);
+                    unsigned int num_bytes = *(unsigned int*)(((XL3Packet*)aPacket)->payload);
                     if (needToSwap) num_bytes = swapLong(num_bytes);
                     num_bytes &= 0xffffff;
                     if (num_bytes == 0) {
                         NSLog(@"%@ megabundle with zero length ignored\n", [self crateName]);
                     }
                     num_bytes = (num_bytes + 3) * 4;
-                    if (num_bytes > XL3_MAXPAYLOADSIZE_BYTES) {
-                        num_bytes = XL3_MAXPAYLOADSIZE_BYTES;
+                    if (num_bytes > XL3_PAYLOAD_SIZE) {
+                        num_bytes = XL3_PAYLOAD_SIZE;
                     }
-                    [self writeBundle:((XL3_Packet*) aPacket)->payload length:num_bytes version:1 packetNum:packet_num];
+                    [self writeBundle:((XL3Packet*) aPacket)->payload length:num_bytes version:1 packetNum:packetNum];
                 }
                 bundle_count++;
             }
-            else if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == PING_ID) {
+            else if (((XL3Packet*) aPacket)->header.packetType == PING_ID) {
                 //NSLog(@"%@: received ping request\n", [self crateName]);
-                (((XL3_Packet*) aPacket)->cmdHeader.packet_type = PONG_ID);
+                (((XL3Packet*) aPacket)->header.packetType = PONG_ID);
                 //get data
-                if (needToSwap) SwapLongBlock(((XL3_Packet*) aPacket)->payload, 17);
-                [self copyFifoStatus:(int32_t*)((XL3_Packet*) aPacket)->payload];
+                if (needToSwap) SwapLongBlock(((XL3Packet*) aPacket)->payload, 17);
+                [self copyFifoStatus:(int32_t*)((XL3Packet*) aPacket)->payload];
                 @try {
                     [commandSocketLock lock]; //begin critial section
                     [self writePacket:(char*) aPacket];
@@ -820,47 +810,47 @@ static void SwapLongBlock(void* p, int32_t n)
                 }
             }
 
-            else if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == MESSAGE_ID) {
-                ((XL3_Packet*) aPacket)->payload[XL3_MAXPAYLOADSIZE_BYTES-1] = '\0';
-                NSString* msg = [NSString stringWithFormat:@"%s", ((XL3_Packet*) aPacket)->payload]; //odd encoding
+            else if (((XL3Packet*) aPacket)->header.packetType == MESSAGE_ID) {
+                ((XL3Packet*) aPacket)->payload[XL3_PAYLOAD_SIZE-1] = '\0';
+                NSString* msg = [NSString stringWithFormat:@"%s", ((XL3Packet*) aPacket)->payload]; //odd encoding
                 msg = [msg stringByReplacingOccurrencesOfString:@"\r" withString:@""];
                 NSLog(@"%@ message:\n%@\n", [self crateName], [[msg retain] autorelease]);
             }
 
-            else if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == ERROR_ID) {
+            else if (((XL3Packet*) aPacket)->header.packetType == ERROR_ID) {
                 NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ error packet received:\n", [self crateName]];
                 int error;
-                error_packet_t* data = (error_packet_t*)((XL3_Packet*)aPacket)->payload;
-                if (needToSwap) SwapLongBlock(data, sizeof(error_packet_t)/4);
+                ErrorPacket* data = (ErrorPacket*)((XL3Packet*)aPacket)->payload;
+                if (needToSwap) SwapLongBlock(data, sizeof(ErrorPacket)/4);
 
-                error = data->cmd_in_rejected_flag;
+                error = data->cmdRejected;
                 if (error) [msg appendFormat:@"cmd_in_rejected: 0x%x, ", error];
-                error = data->transfer_error_flag;
+                error = data->transferError;
                 if (error) [msg appendFormat:@"transfer_error: 0x%x, ", error];
-                error = data->xl3_davail_unknown_flag;
+                error = data->xl3DataAvailUnknown;
                 if (error) [msg appendFormat:@"xl3_davail_unknown: 0x%x, ", error];
                 unsigned int slot;
                 for (slot=0; slot<16; slot++) {
-                    error = data->bundle_read_error_flag[slot];
+                    error = data->fecBundleReadError[slot];
                     if (error) [msg appendFormat:@"bundle_read_error slot %2d: 0x%x, ", slot, error];
                 }
                 for (slot=0; slot<16; slot++) {
-                    error = data->bundle_resync_error_flag[slot];
+                    error = data->fecBundleResyncError[slot];
                     if (error) [msg appendFormat:@"bundle_resync_error slot %2d: 0x%x, ", slot, error];
                 }
                 for (slot=0; slot< 16; slot++) {
-                    error = data->mem_level_unknown_flag[slot];
+                    error = data->fecMemLevelUnknown[slot];
                     if (error) [msg appendFormat:@"mem_level_unknown slot %2d: 0x%x, ", slot, error];
                 }
                 [msg appendFormat:@"\n"];
                 NSLog(msg);
             }
 
-            else if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == SCREWED_ID) {
+            else if (((XL3Packet*) aPacket)->header.packetType == SCREWED_ID) {
                 NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ screwed for slot:\n", [self crateName]];
                 unsigned i, error;
                 for (i = 0; i < 16; i++) {
-                    error = ((screwed_packet_t*) ((XL3_Packet *) aPacket)->payload)->screwed[i];
+                    error = ((ScrewedPacket*) ((XL3Packet *) aPacket)->payload)->fecScrewed[i];
                     if (needToSwap) error = swapLong(error);
                     [msg appendFormat:@"%2d: 0x%x\n", i, error];
                 }
@@ -868,8 +858,8 @@ static void SwapLongBlock(void* p, int32_t n)
             }
 
             else {	//cmd response
-                unsigned short packetNum = ((XL3_Packet*) aPacket)->cmdHeader.packet_num;
-                unsigned short packetType = ((XL3_Packet*) aPacket)->cmdHeader.packet_type;
+                unsigned short packetNum = ((XL3Packet*) aPacket)->header.packetNum;
+                unsigned short packetType = ((XL3Packet*) aPacket)->header.packetType;
                 
                 if (needToSwap) packetNum = swapShort(packetNum);
                 //NSLog(@"%@ packet type: %d and packetNum: %d, xl3 megabundle count: %d, NSNumber value: %dß\n", [self crateName], packetType, packetNum, bundle_count, [[NSNumber numberWithUnsignedShort:packetType] unsignedShortValue]);
@@ -879,8 +869,8 @@ static void SwapLongBlock(void* p, int32_t n)
                 NSNumber* packetNType = [[NSNumber alloc] initWithUnsignedChar:packetType];
                 NSDate* packetDate = [[NSDate alloc] init];
                 NSDictionary* aDictionary = [[NSDictionary alloc] initWithObjectsAndKeys:
-                                             packetNNum, @"packet_num",
-                                             packetNType, @"packet_type",
+                                             packetNNum, @"packetNum",
+                                             packetNType, @"packetType",
                                              packetDate, @"date",
                                              packetData, @"xl3Packet",
                                              nil];
@@ -940,7 +930,7 @@ static void SwapLongBlock(void* p, int32_t n)
 		[NSException raise:@"Write error" format:@"XL3 not connected %@ <%@> port: %lu",[self crateName], IPNumber, portNumber];
 	}
 
-    //NSLog(@"Write packet: packet_type: 0x%x, packet_num: 0x%x\n", ((XL3_Packet*) aPacket)->cmdHeader.packet_type, ((XL3_Packet*) aPacket)->cmdHeader.packet_num);
+    //NSLog(@"Write packet: packetType: 0x%x, packetNum: 0x%x\n", ((XL3Packet*) aPacket)->header.packetType, ((XL3Packet*) aPacket)->header.packetNum);
     
 	int bytesWritten;
 	int selectionResult = 0;
@@ -1118,14 +1108,14 @@ static void SwapLongBlock(void* p, int32_t n)
 	return bundleWriteMark;
 }
 
-- (BOOL) writeBundle:(char*)someBytes length:(unsigned)numBytes version:(unsigned)aRev packetNum:(unsigned short)packet_num
+- (BOOL) writeBundle:(char*)someBytes length:(unsigned)numBytes version:(unsigned)aRev packetNum:(unsigned short)packetNum
 {
     [bundleBufferLock lock];
     BOOL full = NO;
     if(bundleFreeSpace > 0){
         NSMutableData* theData = [[NSMutableData alloc] initWithLength:numBytes + 8];
         unsigned int rev = aRev << 5;
-        rev |= packet_num << 16;
+        rev |= packetNum << 16;
         [theData replaceBytesInRange:NSMakeRange(4, 4) withBytes:&rev length:4];
         [theData replaceBytesInRange:NSMakeRange(8, numBytes) withBytes:someBytes length:numBytes];
         *(dataPtr+bundleWriteMark) = (unsigned long)theData;

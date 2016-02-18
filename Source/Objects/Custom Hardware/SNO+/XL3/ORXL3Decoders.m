@@ -19,7 +19,7 @@
 //-------------------------------------------------------------
 
 #import "ORXL3Decoders.h"
-#import "XL3_Cmds.h"
+#import "PacketTypes.h"
 
 @implementation ORXL3DecoderForXL3MegaBundle
 
@@ -110,7 +110,7 @@
 
     ptr += 1;
     version = ptr[0] >> 5 & 0x7;
-    [dsc appendFormat:@"packet_num: %lu\ncrate_num: %lu\nversion: %d\nnum_longs: %lu\n",
+    [dsc appendFormat:@"packetNum: %lu\ncrate_num: %lu\nversion: %d\nnum_longs: %lu\n",
      ptr[0] >> 16, ptr[0] & 0x1f, version, length];
     ptr += 1;
 
@@ -133,9 +133,9 @@
                 ptr[0] = swapLong(ptr[0]); ptr[1] = swapLong(ptr[1]); ptr[2] = swapLong(ptr[2]);
             }
             
-            if (num_longs * 4 > XL3_MAXPAYLOADSIZE_BYTES) {
-                [dsc appendFormat:@"num longs > XL3_MAXPAYLOADSIZE_BYTES,\ntrimming to continue\n"];
-                num_longs = XL3_MAXPAYLOADSIZE_BYTES / 4;
+            if (num_longs * 4 > XL3_PAYLOAD_SIZE) {
+                [dsc appendFormat:@"num longs > XL3_PAYLOAD_SIZE,\ntrimming to continue\n"];
+                num_longs = XL3_PAYLOAD_SIZE / 4;
             }
             if (num_longs > length - 1) {
                 [dsc appendFormat:@"num longs > orca packet length,\ntrimming to continue\n"];
@@ -299,7 +299,7 @@
      * data[2] ... data[18] longs written by ORCA
      * data[19] long written by XL3 swapped by ORCA
      * data[20] ... 16*32 chars adc written by XL3
-     * data[20+16*8] ... 16*32 chars busy_flags written by XL3
+     * data[20+16*8] ... 16*32 chars busyFlagss written by XL3
      * data[20+16*8+16*8] ... timestamp string by ORCA, 6 longs
      */
     
@@ -310,7 +310,7 @@
     for (idx=3; idx<19; idx++) {
         [dsc appendFormat:@"slot %02u: 0x%08lx\n", idx-3U, dataPtr[idx]];
     }
-    [dsc appendFormat:@"\nerror_flags: 0x%08lx\n", dataPtr[19]];
+    [dsc appendFormat:@"\nerrorFlags: 0x%08lx\n", dataPtr[19]];
 
     if (indexerSwaps) for (idx=20; idx < 20+16*8+16*8+6; idx++) dataPtr[idx] = swapLong(dataPtr[idx]);
     [dsc appendFormat:@"\nADC values:"];
