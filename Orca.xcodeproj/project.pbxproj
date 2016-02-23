@@ -242,7 +242,6 @@
 		3672CF8F1C4EB15000870996 /* SNOCaenController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3672CF841C4EB15000870996 /* SNOCaenController.m */; };
 		3672CF921C4EB15000870996 /* SNOCaenModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 3672CF871C4EB15000870996 /* SNOCaenModel.h */; };
 		3672CF931C4EB15000870996 /* SNOCaenModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 3672CF881C4EB15000870996 /* SNOCaenModel.m */; };
-		369E733D1C7B5E6400A7F89E /* OrcaTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 369E733C1C7B5E6400A7F89E /* OrcaTests.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc -Wno-gnu"; }; };
 		369E73451C7B5E8E00A7F89E /* NSLogTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 369E73441C7B5E8E00A7F89E /* NSLogTest.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc -Wno-gnu"; }; };
 		369E734E1C7B66E000A7F89E /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 841491F11958AD03009F5E40 /* Cocoa.framework */; };
 		369E734F1C7B66E600A7F89E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 840C7FE71955CA5A00E36622 /* Foundation.framework */; };
@@ -3893,7 +3892,6 @@
 		3672CF881C4EB15000870996 /* SNOCaenModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SNOCaenModel.m; sourceTree = "<group>"; };
 		369E73381C7B5E6400A7F89E /* OrcaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OrcaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		369E733B1C7B5E6400A7F89E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		369E733C1C7B5E6400A7F89E /* OrcaTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OrcaTests.m; sourceTree = "<group>"; };
 		369E73441C7B5E8E00A7F89E /* NSLogTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSLogTest.m; sourceTree = "<group>"; };
 		369E734B1C7B64FF00A7F89E /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		43135801195C5D89007B1F15 /* ORGretinaTriggerModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGretinaTriggerModel.m; sourceTree = "<group>"; };
@@ -7478,7 +7476,6 @@
 			isa = PBXGroup;
 			children = (
 				369E73441C7B5E8E00A7F89E /* NSLogTest.m */,
-				369E733C1C7B5E6400A7F89E /* OrcaTests.m */,
 				369E733A1C7B5E6400A7F89E /* Supporting Files */,
 			);
 			path = OrcaTests;
@@ -16739,7 +16736,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				369E733D1C7B5E6400A7F89E /* OrcaTests.m in Sources */,
 				369E73451C7B5E8E00A7F89E /* NSLogTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -18534,6 +18530,7 @@
 				369E73421C7B5E6400A7F89E /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
 		};
 		840C7FF01955CA5A00E36622 /* Build configuration list for PBXNativeTarget "Relaunch" */ = {
 			isa = XCConfigurationList;
