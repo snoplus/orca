@@ -3718,6 +3718,7 @@ void SwapLongBlock(void* p, int32_t n)
     @catch (NSException *e) {
         NSLog(@"%@ error while performing panic down; error: %@ reason: %@\n",
               [[self xl3Link] crateName], [e name], [e reason]);
+        [self safeHvInit];
         return;
     }
     if ([xl3Link needToSwap]) {
@@ -3726,6 +3727,7 @@ void SwapLongBlock(void* p, int32_t n)
     if(result->errorFlags)
     {
         NSLog(@"There was a problem performing panic down. Try again or ramp crate manually");
+        [self safeHvInit];
         return;
     }
     [self safeHvInit];
