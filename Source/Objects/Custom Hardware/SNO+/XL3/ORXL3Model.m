@@ -2290,7 +2290,7 @@ void SwapLongBlock(void* p, int32_t n)
         args->dataAvailMask = swapLong(args->dataAvailMask);
     }
 
-    [self setXl3ModeRunning:YES];
+    //[self setXl3ModeRunning:YES];
     @try {
         [[self xl3Link] sendCommand:CHANGE_MODE_ID withPayload:payload
                              expectResponse:YES];
@@ -2301,7 +2301,7 @@ void SwapLongBlock(void* p, int32_t n)
                     @"Set XL3 mode failed; error: %@ reason: %@\n",
                     [e name], [e reason]);
     }
-    [self setXl3ModeRunning:NO];
+    //[self setXl3ModeRunning:NO];
 }
 
 - (void) compositeXl3RW
