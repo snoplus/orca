@@ -3702,14 +3702,35 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) hvPanicDown
 {
-    [self setIsPollingXl3:NO];	
+    [self setIsPollingXl3:NO];
     if ([self isTriggerON]) {
         [self hvTriggersOFF];
     }
-    [self setHvPanicFlag:YES];
-    [self setHvANextStepValue:0];
-    [self setHvBNextStepValue:0];
-    NSLog(@"%@ panic down started, hit HV ON to recover\n", [[self xl3Link] crateName]);
+
+    XL3Packet packet;
+    memset(packet.payload, 0, XL3_PAYLOAD_SIZE);
+
+    DoPanicDownResults* result = (DoPanicDownResults*)packet.payload;
+
+    @try {
+        [[self xl3Link] sendCommand:DO_PANIC_DOWN withPayload:packet.payload expectResponse:YES];
+    }
+    @catch (NSException *e) {
+        NSLog(@"%@ error while performing panic down; error: %@ reason: %@\n",
+              [[self xl3Link] crateName], [e name], [e reason]);
+        return;
+    }
+    if ([xl3Link needToSwap]) {
+        result->errorFlags = swapLong(result->errorFlags);
+    }
+    if(result->errorFlags)
+    {
+        NSLog(@"There was a problem performing panic down. Try again or ramp crate manually");
+        return;
+    }
+    [self safeHvInit];
+    NSLog(@"%@ panic down completed.\n", [[self xl3Link] crateName]);
+    //NSLog(@"%@ panic down completed, hit HV ON to recover\n", [[self xl3Link] crateName]);
 }
 
 //not used, we collect the objects from the controller now
