@@ -85,6 +85,7 @@
 - (id)      requestFromUser:(id) p;
 - (void)    startConfirmSheet:(id)aString;
 - (void)    startRequestSheet:(id)aString;
+- (void)    endRequestSheet;
 - (id)      showStatusDialog:(id) p;
 - (id)      genRandom:(id) p;
 - (id)      valueArray:(id)p;
@@ -967,9 +968,8 @@
         [NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.1]];
 		[pool release];
 	} while(1);
-    [userDialogController close];
-    [userDialogController release];
-    userDialogController = nil;
+    [self performSelectorOnMainThread:@selector(endRequestSheet) withObject:nil waitUntilDone:YES];
+
     return userResult;
 }
 
@@ -981,7 +981,13 @@
 	[userDialogController showWindow:self];
 }
 
-
+- (void) endRequestSheet
+{
+    [userDialogController close];
+    [userDialogController release];
+    userDialogController = nil;
+  
+}
 - (id) showStatusDialog:(id) p
 {
     NSWindowController* statusDialogController = [[ORScriptUserStatusController alloc] initWithDelegate:self variableList:NodeValue(0)];
@@ -1008,9 +1014,7 @@
         [NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.1]];
 		[pool release];
 	} while(1);
-    [userDialogController close];
-    [userDialogController release];
-    userDialogController = nil;
+    [self performSelectorOnMainThread:@selector(endRequestSheet) withObject:nil waitUntilDone:YES];
     return userResult;
 }
 
@@ -1047,9 +1051,7 @@
 		
 	}while(1);
     
-    [userDialogController close];
-    [userDialogController release];
-    userDialogController = nil;
+    [self performSelectorOnMainThread:@selector(endRequestSheet) withObject:nil waitUntilDone:YES];
     
 	return userResult;
 }

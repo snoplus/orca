@@ -47,7 +47,7 @@ NSString* ORTimeSeriesChangedNotification 	= @"ORTimeSeriesChangedNotification";
 		value[i] = 0;
 		time[i] = 0;
 	}
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORTimeSeriesChangedNotification object:self userInfo:nil];
+	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORTimeSeriesChangedNotification object:self userInfo:nil];
 }
 
 - (unsigned long) startTime
@@ -67,7 +67,7 @@ NSString* ORTimeSeriesChangedNotification 	= @"ORTimeSeriesChangedNotification";
 			readIndex = (readIndex+1)%kTimeSeriesBufferSize;
 		}
 				
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORTimeSeriesChangedNotification object:self userInfo:nil];
+		[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORTimeSeriesChangedNotification object:self userInfo:nil];
 	}
 }
 
