@@ -1548,11 +1548,11 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 //    	unsigned long theValue =
     value &= 0x3;
     
-    [[self adapter] writeLongBlock:&value
-                         atAddress:[self baseAddress] + register_information[kADCConfig].offset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+    [self writeAndCheckLong:value
+              addressOffset:register_information[kADCConfig].offset
+                       mask:0x3
+                  reportKey:@"ClockPhase"
+              forceFullInit:forceFullInitCard];
     [ORTimer delay:0.1];
 
     return;
