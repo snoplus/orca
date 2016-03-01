@@ -202,7 +202,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             
         case kMJDInterlocks_Ping:
             [self setState:kMJDInterlocks_Idle status:@"Running" color:normalColor];
-            if(!retryCount)[self setState:kMJDInterlocks_Ping status:@"Running" color:normalColor];
+            if(!retryCount)[self setState:kMJDInterlocks_Ping status:@"Pinging..." color:normalColor];
             [self ping];
             [self setCurrentState:kMJDInterlocks_PingWait];
             break;
@@ -265,10 +265,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
         
         //send the HV Bias state to the Vac system
         case kMJDInterlocks_UpdateVacSystem:
-            if(![[delegate remoteSocket:slot] queueEmpty]){
-                [self setState:kMJDInterlocks_UpdateVacSystem status:@"Trying Connection" color:normalColor];
-            }
-            else if(remoteOpStatus){
+            if(remoteOpStatus){
                 if([[remoteOpStatus objectForKey:@"connected"] boolValue]==YES){
                     //it worked. move on.
                     retryCount = 0;
@@ -309,10 +306,11 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                         [self setCurrentState:kMJDInterlocks_Idle];
                     }
                 }
+                sentCmds = NO;
                 self.remoteOpStatus=nil;
             }
             else {
-                if([[delegate remoteSocket:slot] queueEmpty]){
+                if(!sentCmds){
                     self.remoteOpStatus=nil;
                     NSMutableArray* cmds = [NSMutableArray arrayWithObjects:
                                             [NSString stringWithFormat:@"[ORMJDVacuumModel,1 setDetectorsBiased:%d];",hvIsOn],
@@ -320,17 +318,15 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                                             
                                             nil];
                     [self sendCommands:cmds remoteSocket:[delegate remoteSocket:slot]];
-                    [self setState:kMJDInterlocks_UpdateVacSystem status:@"Trying Connection" color:normalColor];
+                    [self setState:kMJDInterlocks_UpdateVacSystem status:@"Sending..." color:normalColor];
+                    sentCmds = YES;
                 }
             }
             break;
             
         //HV is ON... see if we need to unbias
         case kMJDInterlocks_GetShouldUnBias:
-            if(![[delegate remoteSocket:slot] queueEmpty]){
-                [self setState:kMJDInterlocks_GetShouldUnBias status:@"Trying Connection" color:normalColor];
-            }
-            else if(remoteOpStatus){
+            if(remoteOpStatus){
                 if([[remoteOpStatus objectForKey:@"connected"] boolValue]==YES && [remoteOpStatus objectForKey:@"shouldUnBias"]){
                     //it worked. move on.
                     retryCount = 0;
@@ -369,25 +365,24 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                         
                     }
                 }
-                self.remoteOpStatus=nil;
+                sentCmds = NO;
+               self.remoteOpStatus=nil;
             }
             else {
-                if([[delegate remoteSocket:slot] queueEmpty]){
+                if(!sentCmds){
                     self.remoteOpStatus=nil;
                     NSMutableArray* cmds = [NSMutableArray arrayWithObjects:@"shouldUnBias = [ORMJDVacuumModel,1 shouldUnbiasDetector];", nil];
                     [self sendCommands:cmds remoteSocket:[delegate remoteSocket:slot]];
-                    [self setState:kMJDInterlocks_GetShouldUnBias status:@"Trying Connection" color:normalColor];
-                }
+                    [self setState:kMJDInterlocks_GetShouldUnBias status:@"Asking..." color:normalColor];
+                    sentCmds = YES;
+               }
             }
             break;
             
             
         //HV is off... see if we would be allowed to bias HV
         case kMJDInterlocks_GetOKToBias:
-            if(![[delegate remoteSocket:slot] queueEmpty]){
-                [self setState:kMJDInterlocks_GetOKToBias status:@"Trying Connection" color:normalColor];
-            }
-            else if(remoteOpStatus){
+            if(remoteOpStatus){
                 if([[remoteOpStatus objectForKey:@"connected"] boolValue]==YES && [remoteOpStatus objectForKey:@"okToBias"]){
                     //it worked. move on.
                     retryCount = 0;
@@ -405,7 +400,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                         lockHVDialog = YES;
                     }
                     [self setCurrentState:kMJDInterlocks_HandleHVDialog];
-                }
+              }
                 else {
                     if(retryCount>=kAllowedConnectionRetry){
                         [self setState:kMJDInterlocks_FinalState status:@"No Response"color:badColor];
@@ -424,15 +419,17 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                         [self setCurrentState:kMJDInterlocks_Idle];
                     }
                 }
+                sentCmds = NO;
                 self.remoteOpStatus=nil;
             }
             else {
-                if([[delegate remoteSocket:slot] queueEmpty]){
+                if(!sentCmds){
                     self.remoteOpStatus=nil;
                     NSMutableArray* cmds = [NSMutableArray arrayWithObjects:@"okToBias = [ORMJDVacuumModel,1 okToBiasDetector];", nil];
                     [self sendCommands:cmds remoteSocket:[delegate remoteSocket:slot]];
-                    [self setState:kMJDInterlocks_GetOKToBias status:@"Trying Connection" color:normalColor];
-                }
+                    [self setState:kMJDInterlocks_GetOKToBias status:@"Asking..." color:normalColor];
+                    sentCmds = YES;
+               }
             }
         break;
             
@@ -475,7 +472,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
 
     }
     if(currentState != kMJDInterlocks_Idle){
-        [self performSelector:@selector(step) withObject:nil afterDelay:.1];
+        [self performSelector:@selector(step) withObject:nil afterDelay:.3];
     }
 }
 
@@ -538,7 +535,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
         
         [pingTask setLaunchPath:@"/sbin/ping"];
         
-        [pingTask setArguments: [NSArray arrayWithObjects:@"-c",@"1",@"-t",@"1",@"-q",ip,nil]];
+        [pingTask setArguments: [NSArray arrayWithObjects:@"-c",@"3",@"-t",@"10",@"-q",ip,nil]];
         
         [aSequence addTaskObj:pingTask];
         [aSequence setVerbose:NO];
@@ -560,7 +557,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
 
 - (void) taskData:(NSString*)text
 {
-    if([text rangeOfString:@" 0.0% packet loss"].location != NSNotFound){
+    if([text rangeOfString:@"round-trip"].location != NSNotFound){
         pingedSuccessfully = YES;
     }
     else if([text rangeOfString:@"100.0% packet loss"].location != NSNotFound){
