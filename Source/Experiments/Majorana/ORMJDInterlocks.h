@@ -61,6 +61,7 @@ typedef struct {
     BOOL                shouldUnBias;
     BOOL                lockHVDialog;
     ORAlarm*            interlockFailureAlarm;
+    BOOL                sentCmds;
 }
 
 - (id)          initWithDelegate:(MajoranaModel*)aDelegate slot:(int)aSlot;
