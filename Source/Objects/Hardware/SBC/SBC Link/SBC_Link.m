@@ -959,7 +959,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 	memcpy(&runInfo,aPacket->payload,sizeof(SBC_info_struct));
 	[pw releaseAndCache];
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkRunInfoChanged object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SBC_LinkRunInfoChanged object:self];
 }
 
 - (void) getErrorInfoBlock
