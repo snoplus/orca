@@ -7,16 +7,15 @@
 
 #ifndef xmlrpc_testing_XmlrpcClient_h
 #define xmlrpc_testing_XmlrpcClient_h
-@interface XmlrpcClient : NSObject<NSURLConnectionDelegate>
-{
+@interface XmlrpcClient : NSObject<NSURLConnectionDelegate>{
     //Privates go here
     NSMutableData* _responseData;
     NSMutableString* _responseString;
     float _timeout;
 }
 
-@property (nonatomic) NSString* host;
-@property (nonatomic) NSString* port;
+@property (nonatomic,retain) NSString* host;
+@property (nonatomic,retain) NSString* port;
 
 -(id)init;
 -(id)initWithHostName:(NSString *)_host withPort:(NSString *)_port;

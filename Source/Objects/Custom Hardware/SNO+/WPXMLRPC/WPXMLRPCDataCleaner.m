@@ -33,9 +33,7 @@
 - (NSString *)cleanClosingTagIfNeeded:(NSString *)str lengthOfCharactersPrecedingPreamble:(NSInteger)length;
 @end
 
-@implementation WPXMLRPCDataCleaner {
-    NSData *xmlData;
-}
+@implementation WPXMLRPCDataCleaner
 
 #pragma mark - initializers
 

@@ -24,7 +24,9 @@
 
 #import <Foundation/Foundation.h>
 
-@interface WPXMLRPCDataCleaner : NSObject
+@interface WPXMLRPCDataCleaner : NSObject{
+    NSData *xmlData;
+}
 - (id)initWithData:(NSData *)data;
 
 - (NSData *)cleanData;

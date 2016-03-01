@@ -31,15 +31,7 @@ NSString *const WPXMLRPCErrorDomain = @"WPXMLRPCError";
 @interface WPXMLRPCDecoder () <NSXMLParserDelegate>
 @end
 
-@implementation WPXMLRPCDecoder {
-    NSXMLParser *_parser;
-    WPXMLRPCDecoderDelegate *_delegate;
-    BOOL _isFault;
-    NSData *_body;
-    NSData *_originalData;
-    id _object;
-    NSMutableString *_methodName;
-}
+@implementation WPXMLRPCDecoder
 
 - (id)initWithData:(NSData *)data {
     if (!data) {
@@ -52,6 +44,7 @@ NSString *const WPXMLRPCErrorDomain = @"WPXMLRPCError";
         _parser = [[NSXMLParser alloc] initWithData:data];
         _delegate = nil;
         _isFault = NO;
+        [self parse];
         [self parse];
     }
     

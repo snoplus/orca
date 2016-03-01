@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 
 #import <Foundation/Foundation.h>
+#import "WPXMLRPCDecoderDelegate.h"
 
 extern NSString *const WPXMLRPCFaultErrorDomain;
 extern NSString *const WPXMLRPCErrorDomain;
@@ -34,7 +35,15 @@ typedef NS_ENUM(NSInteger, WPXMLRPCError) {
 /**
  `WPXMLRPCEncoder` encodes a XML-RPC response
  */
-@interface WPXMLRPCDecoder : NSObject
+@interface WPXMLRPCDecoder : NSObject{
+    NSXMLParser* _parser;
+    WPXMLRPCDecoderDelegate* _delegate;
+    BOOL _isFault;
+    NSData* _body;
+    NSData* _originalData;
+    id _object;
+    NSMutableString* _methodName;
+}
 
 /**
  Initializes a `WPXMLRPCDecoder` object with the specified response data.

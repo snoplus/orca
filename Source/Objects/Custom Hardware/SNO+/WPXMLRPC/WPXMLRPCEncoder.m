@@ -27,15 +27,7 @@
 
 #pragma mark -
 
-@implementation WPXMLRPCEncoder {
-    NSString *_method;
-    NSArray *_parameters;
-    NSFileHandle *_streamingCacheFile;    
-    BOOL _isResponse;
-    BOOL _isFault;
-    NSNumber *_faultCode;
-    NSString *_faultString;
-}
+@implementation WPXMLRPCEncoder 
 
 - (id)initWithMethod:(NSString *)method andParameters:(NSArray *)parameters {
     self = [super init];

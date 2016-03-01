@@ -26,7 +26,15 @@
 /**
  `WPXMLRPCEncoder` encodes a XML-RPC request
  */
-@interface WPXMLRPCEncoder : NSObject
+@interface WPXMLRPCEncoder : NSObject{
+    NSString *_method;
+    NSArray *_parameters;
+    NSFileHandle *_streamingCacheFile;
+    BOOL _isResponse;
+    BOOL _isFault;
+    NSNumber *_faultCode;
+    NSString *_faultString;
+}
 
 /**
  Initializes a `WPXMLRPCEncoder` object with the specified method and parameters.
