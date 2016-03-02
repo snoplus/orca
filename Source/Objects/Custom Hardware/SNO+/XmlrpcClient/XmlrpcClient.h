@@ -12,13 +12,15 @@
     NSMutableData* _responseData;
     NSMutableString* _responseString;
     float _timeout;
+    NSString* _host;
+    NSString* _port;
 }
 
-@property (nonatomic,retain) NSString* host;
+@property (nonatomic, retain) NSString* host;
 @property (nonatomic,retain) NSString* port;
 
 -(id)init;
--(id)initWithHostName:(NSString *)_host withPort:(NSString *)_port;
+-(id)initWithHostName:(NSString *)passedHost withPort:(NSString *)passedPort;
 
 -(void)setTimeout:(float)_timeout;
 -(NSString *)getResult;

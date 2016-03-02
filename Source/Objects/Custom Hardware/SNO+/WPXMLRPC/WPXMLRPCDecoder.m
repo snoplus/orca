@@ -22,7 +22,6 @@
 // THE SOFTWARE.
 
 #import "WPXMLRPCDecoder.h"
-#import "WPXMLRPCDecoderDelegate.h"
 #import "WPXMLRPCDataCleaner.h"
 
 NSString *const WPXMLRPCFaultErrorDomain = @"WPXMLRPCFaultError";
@@ -45,7 +44,6 @@ NSString *const WPXMLRPCErrorDomain = @"WPXMLRPCError";
         _delegate = nil;
         _isFault = NO;
         [self parse];
-        [self parse];
     }
     
     return self;
@@ -66,9 +64,10 @@ NSString *const WPXMLRPCErrorDomain = @"WPXMLRPCError";
         [_parser parse];
     }
 
-    if ([_parser parserError])
+    if ([_parser parserError]){
         return;
-
+    }
+        
     if (_methodName) {
         _object = @{@"methodName": _methodName, @"params": [_delegate elementValue]};
     } else {

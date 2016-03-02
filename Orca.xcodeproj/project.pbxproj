@@ -245,6 +245,8 @@
 		3672CF8F1C4EB15000870996 /* SNOCaenController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3672CF841C4EB15000870996 /* SNOCaenController.m */; };
 		3672CF921C4EB15000870996 /* SNOCaenModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 3672CF871C4EB15000870996 /* SNOCaenModel.h */; };
 		3672CF931C4EB15000870996 /* SNOCaenModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 3672CF881C4EB15000870996 /* SNOCaenModel.m */; };
+		3A5289881C874E7F00DC3204 /* libiconv.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3A5289871C874E7F00DC3204 /* libiconv.2.dylib */; };
+		3A5289891C874E9800DC3204 /* libiconv.2.dylib in Frameworks_Copy */ = {isa = PBXBuildFile; fileRef = 3A5289871C874E7F00DC3204 /* libiconv.2.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		3A5DADFF1C85FB2D007E283C /* WPBase64Utils.h in Headers */ = {isa = PBXBuildFile; fileRef = 3A5DADF21C85FB2D007E283C /* WPBase64Utils.h */; };
 		3A5DAE001C85FB2D007E283C /* WPBase64Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 3A5DADF31C85FB2D007E283C /* WPBase64Utils.m */; };
 		3A5DAE011C85FB2D007E283C /* WPStringUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 3A5DADF41C85FB2D007E283C /* WPStringUtils.h */; };
@@ -3677,6 +3679,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				3A5289891C874E9800DC3204 /* libiconv.2.dylib in Frameworks_Copy */,
 				8475EC8B147693E8003A165D /* libusb-1.0.a in Frameworks_Copy */,
 				EF3787A012DFFF90003C814E /* YAJL.framework in Frameworks_Copy */,
 			);
@@ -3902,6 +3905,7 @@
 		3672CF841C4EB15000870996 /* SNOCaenController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SNOCaenController.m; sourceTree = "<group>"; };
 		3672CF871C4EB15000870996 /* SNOCaenModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNOCaenModel.h; sourceTree = "<group>"; };
 		3672CF881C4EB15000870996 /* SNOCaenModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SNOCaenModel.m; sourceTree = "<group>"; };
+		3A5289871C874E7F00DC3204 /* libiconv.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.2.dylib; path = Frameworks/libiconv.2.dylib; sourceTree = "<group>"; };
 		3A5DADF21C85FB2D007E283C /* WPBase64Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WPBase64Utils.h; sourceTree = "<group>"; };
 		3A5DADF31C85FB2D007E283C /* WPBase64Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WPBase64Utils.m; sourceTree = "<group>"; };
 		3A5DADF41C85FB2D007E283C /* WPStringUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WPStringUtils.h; sourceTree = "<group>"; };
@@ -7000,6 +7004,7 @@
 				84F5E11B0A151E0B00707A0F /* OpenGL.framework in Frameworks */,
 				847599860B5FF26500123411 /* QuartzCore.framework in Frameworks */,
 				2AE87C600D6E636700A839FC /* libmysqlclient.a in Frameworks */,
+				3A5289881C874E7F00DC3204 /* libiconv.2.dylib in Frameworks */,
 				2DC1EE800F33724E00E93C75 /* WebKit.framework in Frameworks */,
 				840F5B191222C90000D49A75 /* QTKit.framework in Frameworks */,
 				EF37879212DFFF81003C814E /* YAJL.framework in Frameworks */,
@@ -7204,6 +7209,7 @@
 		2A37F4C3FDCFA73011CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3A5289871C874E7F00DC3204 /* libiconv.2.dylib */,
 				841491F11958AD03009F5E40 /* Cocoa.framework */,
 				8439D5EE05BEFF3A0077EFF2 /* Carbon.framework */,
 				1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */,
@@ -18089,7 +18095,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				" CFBundlerHelpBookFolder" = OrcaHelp;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CFBundleHelpBookName = OrcaHelp;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = NO;
 				CODE_SIGN_IDENTITY = "";
@@ -18139,6 +18145,7 @@
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_7)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_8)",
 					"$(SRCROOT)/Libraries/libusb",
+					"$(PROJECT_DIR)/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Libraries/libUniversal\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_2 = "\"$(SRCROOT)/Libraries\"";
@@ -18166,7 +18173,7 @@
 		84F201BC0B6531990084F4C3 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CFBundleHelpBookName = OrcaHelp;
 				CFBundlerHelpBookFolder = OrcaHelp;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = NO;
@@ -18214,6 +18221,7 @@
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_7)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_8)",
 					"\"$(SRCROOT)/Libraries/libusb\"",
+					"$(PROJECT_DIR)/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/Libraries\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Libraries/libUniversal\"";
@@ -18239,7 +18247,7 @@
 		84F201BD0B6531990084F4C3 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = NO;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
@@ -18286,6 +18294,7 @@
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_7)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_8)",
 					"\"$(SRCROOT)/Libraries/libusb\"",
+					"$(PROJECT_DIR)/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/Libraries\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Libraries/libUniversal\"";

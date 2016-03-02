@@ -1,8 +1,9 @@
 //
-//  XmlrpcClient.m
-//  Orca
+//  xml_backend.m
+//  xmlrpc-testing
 //
 //  Created by Edward Leming on 10/02/2016.
+//  Copyright (c) 2016 Edward Leming. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -11,9 +12,8 @@
 
 @implementation XmlrpcClient
 
-
-@synthesize host;
-@synthesize port;
+@synthesize host = _host;
+@synthesize port = _port;
 
 -(id)init
 {
@@ -21,13 +21,13 @@
     return self;
 }
 
--(id)initWithHostName:(NSString *)_host withPort:(NSString *)_port
+-(id)initWithHostName:(NSString *)passedHost withPort:(NSString *)passedPort
 {
     self = [super init];
     
     if(self){
-        self.host = _host;
-        self.port = _port;
+        self.host = passedHost;
+        self.port = passedPort;
         _timeout = 5; //5s default timeout
     }
     return self;
@@ -84,7 +84,7 @@
     if(error){
         NSLog(@"Error with xmlrpc client request");
         NSLog(@"Domain: %@", error.domain);
-        NSLog(@"Error Code: %ld", error.code);
+        NSLog(@"Error Code: %ld", (long)error.code);
         NSLog(@"Description: %@", [error localizedDescription]);
         NSLog(@"Reason: %@", [error localizedFailureReason]);
         NSException *excep = [NSException exceptionWithName:@"XmlrpcClient"
@@ -150,7 +150,7 @@
     // Check the error var
     NSLog(@"Error with xmlrpc client request");
     NSLog(@"Domain: %@", error.domain);
-    NSLog(@"Error Code: %ld", error.code);
+    NSLog(@"Error Code: %ld", (long)error.code);
     NSLog(@"Description: %@", [error localizedDescription]);
     NSLog(@"Reason: %@", [error localizedFailureReason]);
 }

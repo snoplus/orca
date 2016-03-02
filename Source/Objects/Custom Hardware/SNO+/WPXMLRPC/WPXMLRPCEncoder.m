@@ -27,7 +27,11 @@
 
 #pragma mark -
 
-@implementation WPXMLRPCEncoder 
+@implementation WPXMLRPCEncoder
+
+@synthesize method = _method;
+@synthesize parameters = _parameters;
+
 
 - (id)initWithMethod:(NSString *)method andParameters:(NSArray *)parameters {
     self = [super init];
