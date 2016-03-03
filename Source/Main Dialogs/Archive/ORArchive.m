@@ -112,7 +112,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    	
+    
+    [notifyCenter removeObserver:self];
+    
 	[notifyCenter addObserver : self
                      selector : @selector(lockChanged:)
                          name : ORRunStatusChangedNotification
@@ -242,7 +244,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 
 - (IBAction) lockAction:(id)sender
 {
-    [gSecurity tryToSetLock:AutoTesterLock to:[sender intValue] forWindow:[self window]];
+    [gSecurity tryToSetLock:ArchiveLock to:[sender intValue] forWindow:[self window]];
 }
 
 - (IBAction) saveDocument:(id)sender
