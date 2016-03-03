@@ -257,8 +257,8 @@
 		3A5DAE0B1C85FB2D007E283C /* WPXMLRPCEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 3A5DADFE1C85FB2D007E283C /* WPXMLRPCEncoder.m */; };
 		3A5DAE0F1C85FB37007E283C /* XmlrpcClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 3A5DAE0D1C85FB37007E283C /* XmlrpcClient.h */; };
 		3A5DAE101C85FB37007E283C /* XmlrpcClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 3A5DAE0E1C85FB37007E283C /* XmlrpcClient.m */; };
-		3A8C9AEB1C88529000DDEFDA /* libiconv.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3A8C9AEA1C88529000DDEFDA /* libiconv.2.dylib */; };
-		3A8C9AEC1C88529D00DDEFDA /* libiconv.2.dylib in Frameworks_Copy */ = {isa = PBXBuildFile; fileRef = 3A8C9AEA1C88529000DDEFDA /* libiconv.2.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		3A8CD5401C88996000589ADE /* libiconv.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3A8CD53F1C88996000589ADE /* libiconv.2.dylib */; };
+		3A8CD5411C889A0200589ADE /* libiconv.2.dylib in Frameworks_Copy */ = {isa = PBXBuildFile; fileRef = 3A77AF0C1C889822008C2FAA /* libiconv.2.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		43135802195C5D89007B1F15 /* ORGretinaTriggerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 43135801195C5D89007B1F15 /* ORGretinaTriggerModel.m */; };
 		43135804195C5DA3007B1F15 /* ORGretinaTriggerModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 43135803195C5DA3007B1F15 /* ORGretinaTriggerModel.h */; };
 		4322E9B217830004008E78A4 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4322E9B117830004008E78A4 /* GLUT.framework */; };
@@ -3675,7 +3675,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				3A8C9AEC1C88529D00DDEFDA /* libiconv.2.dylib in Frameworks_Copy */,
+				3A8CD5411C889A0200589ADE /* libiconv.2.dylib in Frameworks_Copy */,
 				8475EC8B147693E8003A165D /* libusb-1.0.a in Frameworks_Copy */,
 				EF3787A012DFFF90003C814E /* YAJL.framework in Frameworks_Copy */,
 			);
@@ -3913,7 +3913,8 @@
 		3A5DADFE1C85FB2D007E283C /* WPXMLRPCEncoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WPXMLRPCEncoder.m; sourceTree = "<group>"; };
 		3A5DAE0D1C85FB37007E283C /* XmlrpcClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XmlrpcClient.h; sourceTree = "<group>"; };
 		3A5DAE0E1C85FB37007E283C /* XmlrpcClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XmlrpcClient.m; sourceTree = "<group>"; };
-		3A8C9AEA1C88529000DDEFDA /* libiconv.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libiconv.2.dylib; sourceTree = "<group>"; };
+		3A77AF0C1C889822008C2FAA /* libiconv.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libiconv.2.dylib; sourceTree = "<group>"; };
+		3A8CD53F1C88996000589ADE /* libiconv.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.2.dylib; path = usr/lib/libiconv.2.dylib; sourceTree = SDKROOT; };
 		43135801195C5D89007B1F15 /* ORGretinaTriggerModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGretinaTriggerModel.m; sourceTree = "<group>"; };
 		43135803195C5DA3007B1F15 /* ORGretinaTriggerModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORGretinaTriggerModel.h; sourceTree = "<group>"; };
 		4322E9B117830004008E78A4 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../../System/Library/Frameworks/GLUT.framework; sourceTree = "<group>"; };
@@ -6996,10 +6997,10 @@
 				84F5E11B0A151E0B00707A0F /* OpenGL.framework in Frameworks */,
 				847599860B5FF26500123411 /* QuartzCore.framework in Frameworks */,
 				2AE87C600D6E636700A839FC /* libmysqlclient.a in Frameworks */,
-				3A8C9AEB1C88529000DDEFDA /* libiconv.2.dylib in Frameworks */,
 				2DC1EE800F33724E00E93C75 /* WebKit.framework in Frameworks */,
 				840F5B191222C90000D49A75 /* QTKit.framework in Frameworks */,
 				EF37879212DFFF81003C814E /* YAJL.framework in Frameworks */,
+				3A8CD5401C88996000589ADE /* libiconv.2.dylib in Frameworks */,
 				8475EC0B14759D53003A165D /* libusb-1.0.a in Frameworks */,
 				8458E91515DA8A2A005C43A9 /* ScriptingBridge.framework in Frameworks */,
 				8481E67917653766001AB905 /* SystemConfiguration.framework in Frameworks */,
@@ -7198,7 +7199,7 @@
 		2A37F4C3FDCFA73011CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				3A8C9AE91C88529000DDEFDA /* SNO+ */,
+				3A8CD53F1C88996000589ADE /* libiconv.2.dylib */,
 				841491F11958AD03009F5E40 /* Cocoa.framework */,
 				8439D5EE05BEFF3A0077EFF2 /* Carbon.framework */,
 				1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */,
@@ -7511,13 +7512,12 @@
 			path = XmlrpcClient;
 			sourceTree = "<group>";
 		};
-		3A8C9AE91C88529000DDEFDA /* SNO+ */ = {
+		3A77AF0B1C889822008C2FAA /* libSNO+ */ = {
 			isa = PBXGroup;
 			children = (
-				3A8C9AEA1C88529000DDEFDA /* libiconv.2.dylib */,
+				3A77AF0C1C889822008C2FAA /* libiconv.2.dylib */,
 			);
-			name = "SNO+";
-			path = "Frameworks/SNO+";
+			path = "libSNO+";
 			sourceTree = "<group>";
 		};
 		436972B51B42DBE6008D57B5 /* CV1730 */ = {
@@ -13668,6 +13668,7 @@
 		84F7FB520AE5558900A5AA4C /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				3A77AF0B1C889822008C2FAA /* libSNO+ */,
 				8475EC0414759D53003A165D /* libusb */,
 				2AE87BDC0D6E486900A839FC /* libUniversal */,
 				84F7FB630AE5569100A5AA4C /* my_alloc.h */,
@@ -18140,10 +18141,10 @@
 					"$(SRCROOT)/Libraries/libusb",
 					"$(PROJECT_DIR)/Frameworks",
 					"$(PROJECT_DIR)/Frameworks/SNO+",
+					"$(PROJECT_DIR)/Libraries/libSNO+",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Libraries/libUniversal\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_2 = "\"$(SRCROOT)/Libraries\"";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OTHER_CFLAGS = "";
 				OTHER_CPLUSPLUSFLAGS = "";
 				OTHER_LDFLAGS = (
@@ -18217,10 +18218,10 @@
 					"\"$(SRCROOT)/Libraries/libusb\"",
 					"$(PROJECT_DIR)/Frameworks",
 					"$(PROJECT_DIR)/Frameworks/SNO+",
+					"$(PROJECT_DIR)/Libraries/libSNO+",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/Libraries\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Libraries/libUniversal\"";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OTHER_CFLAGS = "";
 				OTHER_CPLUSPLUSFLAGS = "";
 				OTHER_LDFLAGS = (
@@ -18291,10 +18292,10 @@
 					"\"$(SRCROOT)/Libraries/libusb\"",
 					"$(PROJECT_DIR)/Frameworks",
 					"$(PROJECT_DIR)/Frameworks/SNO+",
+					"$(PROJECT_DIR)/Libraries/libSNO+",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/Libraries\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Libraries/libUniversal\"";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OTHER_CFLAGS = "";
 				OTHER_CPLUSPLUSFLAGS = "";
 				OTHER_LDFLAGS = (
