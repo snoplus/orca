@@ -50,6 +50,7 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
     
     //properties can be released like this:
     self.onCallList             = nil;
@@ -125,6 +126,8 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
 
 - (void) personTakingNewRole:(id)newPerson;
 {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(sendShiftChangeMessage) object:nil];
+    [self performSelector:@selector(sendShiftChangeMessage) withObject:nil afterDelay:60];
     //for all on-call roles, only one person is designated
     if([newPerson isOnCall]){
         //someone else can now be relieved
@@ -419,6 +422,36 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
     onCallList = [contents mutableCopy];
     [[NSNotificationCenter defaultCenter] postNotificationName:OROnCallListModelReloadTable object:self];
 }
+
+- (void) sendShiftChangeMessage
+{
+    NSMutableString* messageToSend = [NSMutableString stringWithString:@""];
+    if([self primaryPerson] || [self secondaryPerson] || [self tertiaryPerson]){
+        
+        [messageToSend appendFormat:@"The On-list has been changed.\n"];
+        [messageToSend appendString:@"Here are the new shift responsibilities:\n\n"];
+        
+        if([self primaryPerson])[messageToSend appendFormat:@"Primary: %@\n",[[self primaryPerson] name]];
+        else [messageToSend appendString:@"Primary: NO ONE\n"];
+        
+        if([self secondaryPerson])[messageToSend appendFormat:@"Primary: %@\n",[[self secondaryPerson] name]];
+        else [messageToSend appendString:@"Secondary: NO ONE\n"];
+        
+        if([self tertiaryPerson])[messageToSend appendFormat:@"Primary: %@\n",[[self tertiaryPerson] name]];
+        else [messageToSend appendString:@"Tertiary: NO ONE\n"];
+        [messageToSend appendString:@"\nThis message was send to the entire list.\n"];
+
+    }
+    else {
+        [messageToSend appendString:@"The On-list has been changed. There is no one on call!!\n Someone should take responibility!"];
+   
+    }
+    for(id aPerson in onCallList){
+        [aPerson sendMessage:messageToSend];
+    }
+}
+
+
 @end
 
 //--------------------------------------------------------------------------------------
@@ -498,6 +531,7 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
 {
     [encoder encodeObject:data  forKey:@"data"];
 }
+
 - (void) sendMessage:(NSString*)aMessage
 {
     [self sendMessage:aMessage isAlarm:NO];
@@ -509,23 +543,22 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
         if([aMessage length]){
             NSString* s;
             if(isAlarm) s = [NSString stringWithFormat:@"Posted alarms:\n\n%@\nAcknowlege them or others will be contacted!",aMessage];
-            else        s = [NSString stringWithFormat:@"Manually sent message from ORCA:\n\n%@\n",aMessage];
+            else        s = [NSString stringWithFormat:@"From ORCA (%@). \n\n%@\n",computerName(),aMessage];
             
             NSArray* addresses = [[self address] componentsSeparatedByString:@","];
             for(NSString* anAddress in addresses){
                 if([anAddress rangeOfString:@"@iMessage"].location != NSNotFound){
                     NSArray* parts = [anAddress componentsSeparatedByString:@"@"];
                     NSString* justNumber = [parts objectAtIndex:0];
-                    NSString* machine = computerName();
+                    if([justNumber characterAtIndex:0] == '+')justNumber = [justNumber substringFromIndex:1];
+                    if([justNumber characterAtIndex:0] == '1')justNumber = [justNumber substringFromIndex:1];
                     NSDictionary* errorDict;
                     NSAppleEventDescriptor* returnDescriptor = NULL;
-                    NSString* template = @"\
-                    tell application \"Messages\"\n\
-                    set theBuddy to buddy \"+1$!$\" of service \"E:$2$@gmail.com\"\n\
-                    send \"This is a test\" to theBuddy\n\
-                    end tell";
-                    template = [template stringByReplacingOccurrencesOfString:@"$1$" withString:justNumber];
-                    template = [template stringByReplacingOccurrencesOfString:@"$2$" withString:machine];
+                    
+                    NSString* template = [NSString stringWithFormat:@"\
+                                          tell application \"Messages\"\n\
+                                          send \"%@\" to buddy \"+1%@\" of (service 1 whose service type is iMessage)\n\
+                                          end tell\n", s,justNumber];
                     
                     NSAppleScript* scriptObject = [[NSAppleScript alloc] initWithSource:template ];
                     
