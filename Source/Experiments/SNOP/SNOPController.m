@@ -148,7 +148,7 @@ smellieRunFile;
                        object: theRunControl];
     
     [notifyCenter addObserver:self
-                     selector:@selector(runTypeChanged:)
+                     selector:@selector(SRTypeChanged:)
                          name:ORSNOPModelSRChangedNotification
                        object:model];
     
@@ -237,10 +237,13 @@ smellieRunFile;
 
 }
 
--(void) runTypeChanged:(NSNotification*)aNote
+-(void) SRTypeChanged:(NSNotification*)aNote
 {
 
-    
+    [self refreshStandardRunVersions];
+    [self displayThresholdsFromDB:[model standardRunVersion]];
+    [self displayThresholdsFromDB:@"DEFAULT"];
+
 }
 
 -(void) runTypeMaskChanged:(NSNotification*)aNote
@@ -450,6 +453,9 @@ smellieRunFile;
 
 - (void) hvStatusChanged:(NSNotification*)aNote
 {
+
+    bool globalHVON = false;
+
     if (!aNote) {
         //collect all instances of xl3 objects in Orca
         NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
@@ -464,7 +470,6 @@ smellieRunFile;
             int mRow;
             int mColumn;
             bool found;
-            bool globalHVON = false;
             
             found = [hvStatusMatrix getRow:&mRow column:&mColumn ofCell:[hvStatusMatrix cellWithTag:[xl3 crateNumber]]];
             if (found) {
@@ -484,17 +489,6 @@ smellieRunFile;
                 [[hvStatusMatrix cellAtRow:mRow column:4] setStringValue:
                  [NSString stringWithFormat:@"%3.1f mA",[xl3 hvACurrentReadValue]]];
             }
-            //Detector worldwide HV status
-            if(globalHVON){
-                [detectorHVStatus setStringValue:@"PMTs HV is ON"];
-                [detectorHVStatus setBackgroundColor:[NSColor colorWithSRGBRed:255./255. green:102./255. blue:102./255. alpha:1]];
-                [panicDownButton setEnabled:1];
-            }
-            else{
-                [detectorHVStatus setStringValue:@"PMTs HV is OFF"];
-                [detectorHVStatus setBackgroundColor:[NSColor colorWithSRGBRed:153./255. green:204./255. blue:255./255. alpha:1]];
-                [panicDownButton setEnabled:0];
-            }
             if ([xl3 crateNumber] == 16) {//16B
                 int mRow;
                 int mColumn;
@@ -504,6 +498,7 @@ smellieRunFile;
                     [[hvStatusMatrix cellAtRow:mRow column:1] setStringValue:[xl3 hvBSwitch]?@"ON":@"OFF"];
                     if ([xl3 hvBSwitch]) {
                         [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor redColor]];
+                        globalHVON = true;
                     }
                     else {
                         [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor blackColor]];
@@ -548,6 +543,7 @@ smellieRunFile;
             [[hvStatusMatrix cellAtRow:mRow column:1] setStringValue:[[aNote object] hvASwitch]?@"ON":@"OFF"];
             if ([[aNote object] hvASwitch]) {
                 [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor redColor]];
+                globalHVON = true;
             }
             else {
                 [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor blackColor]];
@@ -568,6 +564,7 @@ smellieRunFile;
                 [[hvStatusMatrix cellAtRow:mRow column:1] setStringValue:[[aNote object] hvBSwitch]?@"ON":@"OFF"];
                 if ([[aNote object] hvBSwitch]) {
                     [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor redColor]];
+                    globalHVON = true;
                 }
                 else {
                     [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor blackColor]];
@@ -580,6 +577,17 @@ smellieRunFile;
                  [NSString stringWithFormat:@"%3.1f mA",[[aNote object] hvBCurrentReadValue]]];
             }
         }
+    }
+    //Detector worldwide HV status
+    if(globalHVON){
+        [detectorHVStatus setStringValue:@"PMTs HV is ON"];
+        [detectorHVStatus setBackgroundColor:[NSColor colorWithSRGBRed:255./255. green:102./255. blue:102./255. alpha:1]];
+        [panicDownButton setEnabled:1];
+    }
+    else{
+        [detectorHVStatus setStringValue:@"PMTs HV is OFF"];
+        [detectorHVStatus setBackgroundColor:[NSColor colorWithSRGBRed:153./255. green:204./255. blue:255./255. alpha:1]];
+        [panicDownButton setEnabled:0];
     }
 }
 
@@ -692,7 +700,7 @@ smellieRunFile;
     
     NSArray *crates = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass: NSClassFromString(@"ORSNOCrateModel")];
     for (id crate in crates) {
-        [crate performSelector:@selector(initCrate:phase:) withObject:NO withObject:0];
+        [crate performSelector:@selector(initCrate:phase:) withObject:YES withObject:0];
     }
     
 }
@@ -703,7 +711,7 @@ smellieRunFile;
     
     NSArray *crates = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass: NSClassFromString(@"ORSNOCrateModel")];
     for (id crate in crates) {
-        [crate performSelector:@selector(initCrate:phase:) withObject:YES withObject:0];
+        [crate performSelector:@selector(initCrate:phase:) withObject:NO withObject:0];
     }
     
 }
@@ -1087,6 +1095,7 @@ smellieRunFile;
     [TSlopePatternTextField setEnabled:!lockedOrNotRunningMaintenance];
     [subTimeTextField setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunPopupMenu setEnabled:!lockedOrNotRunningMaintenance];
+    [standardRunVersionPopupMenu setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunSaveButton setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunSaveDefaultsButton setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunLoadButton setEnabled:!lockedOrNotRunningMaintenance];
@@ -1229,11 +1238,9 @@ smellieRunFile;
     }
     
     //Set run type name
-    [model setStandardRunType:standardRun];
-    [self refreshStandardRunVersions];
-
-    [self displayThresholdsFromDB:[model standardRunVersion]];
-    [self displayThresholdsFromDB:@"DEFAULT"];
+    if(![[model standardRunType] isEqualToString:standardRun]){
+        [model setStandardRunType:standardRun];
+    }
     
 }
 

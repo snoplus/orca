@@ -52,6 +52,7 @@ NSString* SNOPRunTypeChangedNotification = @"SNOPRunTypeChangedNotification";
 NSString* ORSNOPRunsLockNotification = @"ORSNOPRunsLockNotification";
 NSString* ORSNOPModelRunsECAChangedNotification = @"ORSNOPModelRunsECAChangedNotification";
 NSString* ORSNOPModelSRChangedNotification = @"ORSNOPModelSRChangedNotification";
+NSString* ORSNOPModelSRVersionChangedNotification = @"ORSNOPModelSRVersionChangedNotification";
 
 #define kOrcaRunDocumentAdded   @"kOrcaRunDocumentAdded"
 #define kOrcaRunDocumentUpdated @"kOrcaRunDocumentUpdated"
@@ -1244,7 +1245,7 @@ mtcConfigDoc = _mtcConfigDoc;
     [standardRunVersion release];
     standardRunVersion = aValue;
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelSRChangedNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelSRVersionChangedNotification object:self];
 }
 
 - (int)ECA_pattern

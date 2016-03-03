@@ -279,3 +279,4 @@ extern NSString* SNOPRunTypeChangedNotification;
 extern NSString* ORSNOPRunsLockNotification;
 extern NSString* ORSNOPModelRunsECAChangedNotification;
 extern NSString* ORSNOPModelSRChangedNotification;
+extern NSString* ORSNOPModelSRVersionChangedNotification;
