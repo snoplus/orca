@@ -90,7 +90,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
 @end
 
 @interface ORFec32Model (XL3)
--(BOOL) parseVoltagesUsingXL3:(vmon_results_t*)result;
+-(BOOL) parseVoltagesUsingXL3:(VMonResults*)result;
 -(BOOL) readVoltagesUsingXL3;
 -(void) readCMOSCountsUsingXL3:(unsigned long)aChannelMask;
 -(void) readCMOSRatesUsingXL3:(unsigned long)aChannelMask;
@@ -457,8 +457,8 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
 - (void) setTrigger100ns:(short) chan disabled:(short)state
 {
     unsigned long aMask = trigger100nsDisabledMask;
-    if(state) trigger100nsDisabledMask |= (1<<chan);
-    else      trigger100nsDisabledMask &= ~(1<<chan);
+    if(state) aMask |= (1<<chan);
+    else      aMask &= ~(1<<chan);
     [self setTrigger100nsDisabledMask:aMask];
 }
 
@@ -582,13 +582,85 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
 // load hardware from pending state
 - (void) loadHardware
 {
+    /* save these in case the init fails, then we can restore the current
+     * state of the hardware */
+    lastSeqDisabledMask = [self seqDisabledMask];
+    lastTrigger100nsDisabledMask = [self trigger100nsDisabledMask];
+    lastTrigger20nsDisabledMask = [self trigger20nsDisabledMask];
+    lastCmosReadDisabledMask = [self cmosReadDisabledMask];
+
     [[self undoManager] disableUndoRegistration];
     [self setSeqDisabledMask:[self seqPendingDisabledMask]];
     [self setTrigger20nsDisabledMask:[self trigger20nsPendingDisabledMask]];
     [self setTrigger100nsDisabledMask:[self trigger100nsPendingDisabledMask]];
     [self setCmosReadDisabledMask:[self cmosReadPendingDisabledMask]];
-    [[[self guardian] adapter] initCrateRegistersOnly];
+    [[[self guardian] adapter]
+         loadHardwareWithSlotMask: (1 << [self stationNumber])
+         withCallback:@selector(loadHardwareDone:)
+         target:self];
     [[self undoManager] enableUndoRegistration];
+}
+
+- (uint32_t) boardIDAsInt
+{
+    return strtoul([[self boardID] UTF8String], NULL, 16);
+}
+
+- (void) checkConfig: (FECConfiguration *) config
+{
+    int i;
+    ORFecDaughterCardModel *db;
+
+    if (config->mbID == 0) {
+        NSLogColor([NSColor redColor],
+            @"crate %02d slot %02d is not plugged in according to XL3.",
+            [self crateNumber], [self stationNumber]);
+        return;
+    }
+
+    if (config->mbID != [self boardIDAsInt]) {
+        NSLogColor([NSColor redColor],
+             @"crate %02d slot %02d mismatching board id. updating ORCA...\n",
+             [self crateNumber], [self stationNumber]);
+        [self setBoardID:[NSString stringWithFormat:@"%x", config->mbID]];
+    }
+
+    for (i = 0; i < 4; i++) {
+        if ([self dcPresent:i]) {
+            db = [self dc:i];
+
+            if (config->dbID[i] != [db boardIDAsInt]) {
+                NSLogColor([NSColor redColor], @"crate %02d slot %02d db %d mismatching board id. updating ORCA...\n", [self crateNumber], [self stationNumber], i);
+                [db setBoardID:[NSString stringWithFormat:@"%x", config->dbID[i]]];
+            }
+        } else {
+            if (config->dbID[i] != 0) {
+                NSLogColor([NSColor redColor], @"crate %02d slot %02d db %d exists accoring to XL3. Adding to ORCA...\n", [self crateNumber], [self stationNumber], i);
+                db = [ObjectFactory makeObject:@"ORFecDaughterCardModel"];
+                [db setBoardID:[NSString stringWithFormat:@"%x", config->dbID[i]]];
+
+                dispatch_sync(dispatch_get_main_queue(), ^{
+                    [self addObject:db];
+                    [self place:db intoSlot:i];
+                });
+            }
+        }
+    }
+}
+            
+- (void) loadHardwareDone: (CrateInitResults *) r
+{
+    if (r == NULL) {
+        NSLogColor([NSColor redColor], @"crate %d slot %d failed to load hardware!\n", [self crateNumber], [self stationNumber]);
+        [[self undoManager] disableUndoRegistration];
+        [self setSeqDisabledMask:lastSeqDisabledMask];
+        [self setTrigger20nsDisabledMask:lastTrigger20nsDisabledMask];
+        [self setTrigger100nsDisabledMask:lastTrigger100nsDisabledMask];
+        [self setCmosReadDisabledMask:lastCmosReadDisabledMask];
+        [[self undoManager] enableUndoRegistration];
+    } else {
+        NSLog(@"crate %d slot %d hardware loaded!\n", [self crateNumber], [self stationNumber]);
+    }
 }
 
 #pragma mark Trigger 20/100ns enable/disable methods
@@ -617,7 +689,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
 - (void) setOnlineMask:(unsigned long) aMask
 {
     [self setOnlineMaskNoInit:aMask];
-    [[[self guardian] adapter] initCrateRegistersOnly];
+    [[[self guardian] adapter] loadHardware];
     cardChangedFlag = false;
 }
 
@@ -880,7 +952,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
     }
     if (crateInitMask & (1UL << [self crateNumber])) {
         // initialize the crate registers from our current settings
-        [[[self guardian] adapter] initCrateRegistersOnly];
+        [[[self guardian] adapter] loadHardware];
         // make sure we don't do this crate again
         crateInitMask &= ~(1UL << [self crateNumber]);
     }
@@ -979,7 +1051,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
     }	
 }
 
--(void) parseVoltages:(vmon_results_t*)result;
+-(void) parseVoltages:(VMonResults*)result;
 {
     //bool statusChanged = false;
     
@@ -1045,7 +1117,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
     [encoder encodeInt32:seqDisabledMask                    forKey: @"seqDisabledMask"];
     [encoder encodeInt32:cmosReadDisabledMask               forKey: @"cmosReadDisabledMask"];
     [encoder encodeInt32:trigger20nsDisabledMask            forKey: @"trigger20nsDisabledMask"];
-    [encoder encodeInt32:trigger100nsDisabledMask           forKey: @"trigge100nsDisabledMask"];
+    [encoder encodeInt32:trigger100nsDisabledMask           forKey: @"trigger100nsDisabledMask"];
     [encoder encodeInt32:seqPendingDisabledMask             forKey: @"seqDisabledPendingMask"];
     [encoder encodeInt32:cmosReadPendingDisabledMask        forKey: @"cmosReadPendingDisabledMask"];
     [encoder encodeInt32:trigger20nsPendingDisabledMask     forKey: @"trigger20nsPendingDisabledMask"];
@@ -2637,7 +2709,7 @@ const short kVoltageADCMaximumAttempts = 10;
 
 @implementation ORFec32Model (XL3)
 
--(BOOL) parseVoltagesUsingXL3:(vmon_results_t*) result
+-(BOOL) parseVoltagesUsingXL3:(VMonResults*) result
 {
     BOOL statusChanged = false;
     short whichADC;
@@ -2671,7 +2743,7 @@ const short kVoltageADCMaximumAttempts = 10;
 -(BOOL) readVoltagesUsingXL3
 {
     BOOL statusChanged = false;
-    vmon_results_t result;
+    VMonResults result;
     [[guardian adapter] readVMONForSlot:[self stationNumber] voltages:&result];
 
     statusChanged = [self parseVoltagesUsingXL3:&result];
@@ -2681,11 +2753,11 @@ const short kVoltageADCMaximumAttempts = 10;
 
 -(void) readCMOSCountsUsingXL3:(unsigned long)aChannelMask
 {
-    check_total_count_args_t args;
-    check_total_count_results_t results;
+    CheckTotalCountArgs args;
+    CheckTotalCountResults results;
     
-    args.slot_mask |= 0x1 << [self stationNumber];
-    args.channel_masks[[self stationNumber]] = aChannelMask;
+    args.slotMask |= 0x1 << [self stationNumber];
+    args.channelMasks[[self stationNumber]] = aChannelMask;
     //what about disabled??? [self cmosReadDisabled:channel]
     
     @try {
@@ -2695,20 +2767,20 @@ const short kVoltageADCMaximumAttempts = 10;
         ;
     }
     
-    //if (results.error_flags != 0); ???
+    //if (results.errorFlags != 0); ???
     unsigned char ch;
     for (ch=0; ch<32; ch++) {
-        cmosCount[ch]  = results.counts[ch];
+        cmosCount[ch]  = results.count[ch];
     }
 }
 
 -(void) readCMOSRatesUsingXL3:(unsigned long)aChannelMask
 {
-    read_cmos_rate_args_t args;
-    read_cmos_rate_results_t results;
+    CrateNoiseRateArgs args;
+    CrateNoiseRateResults results;
 
-    args.slot_mask |= 0x1 << [self stationNumber];
-    args.channel_masks[[self stationNumber]] = aChannelMask;
+    args.slotMask |= 0x1 << [self stationNumber];
+    args.channelMask[[self stationNumber]] = aChannelMask;
     args.period = 1; //usec according to doc, msec according to code
     
     @try {
@@ -2718,7 +2790,7 @@ const short kVoltageADCMaximumAttempts = 10;
         ;
     }
 
-    //if (results.error_flags != 0) {    }
+    //if (results.errorFlags != 0) {    }
     unsigned char ch;
     for (ch=0; ch<32; ch++) {
         cmosRate[ch]  = results.rates[ch];

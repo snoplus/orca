@@ -193,15 +193,20 @@ NSString* ORMJDDewarScaleValueChanged           = @"ORMJDDewarScaleValueChanged"
                                 int aScale = [[parts objectAtIndex:1] intValue];
                                 int adc = [[parts objectAtIndex:3] intValue];
                                 //float lbs = 0.7423*adc - 398.88;
-                                float lbs = 0.8402*adc - 456.71;
-                                float aValue = ((lbs - 23.0)/307.0)*100.;
-                                
-                                if(lbs<0)lbs = 0;
-                                if(aValue<0)aValue=0;
-                                else if(aValue>100)aValue=100;
                                 
                                 if(aScale>=0 && aScale <kNumMJDDewarScaleChannels){
                                     valueCount++;
+                                    
+                                    float lbs;
+                                    if(aScale == 0) lbs = 0.8712*adc - 478.04;
+                                    else            lbs = 0.8691*adc - 476.61;
+                                    
+                                    float aValue = ((lbs - 23.0)/307.0)*100.;
+                                    
+                                    if(lbs<0)lbs = 0;
+                                    if(aValue<0)aValue=0;
+                                    else if(aValue>100)aValue=100;
+                                    
                                     if(aValue!=value[aScale]){
                                         value[aScale]  = aValue;
                                         weight[aScale] = lbs;

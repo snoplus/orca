@@ -129,12 +129,16 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
     if([newPerson isOnCall]){
         //someone else can now be relieved
         for(OROnCallPerson* aPerson in onCallList){
+            [aPerson setStatus:@""];
             if(aPerson != newPerson){
                 if([aPerson isOnCall] && [aPerson hasSameRoleAs:newPerson]){
                     [aPerson takeOffCall];
                 }
             }
         }
+    }
+    else {
+        [newPerson takeOffCall];
     }
     //now the roles are:
     OROnCallPerson* primary     = [self primaryPerson];
@@ -197,12 +201,13 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
 }
 - (void) startContactProcess
 {
-    if(!notificationTimer){
+    OROnCallPerson* primary     = [self primaryPerson];
+    OROnCallPerson* secondary   = [self secondaryPerson];
+    OROnCallPerson* tertiary    = [self tertiaryPerson];
+
+    if(!notificationTimer && (primary || secondary || tertiary)){
         notificationTimer = [[NSTimer scheduledTimerWithTimeInterval:kOnCallAlarmWaitTime target:self selector:@selector(notifyPrimary:) userInfo:nil repeats:NO] retain];
-        OROnCallPerson* primary     = [self primaryPerson];
-        OROnCallPerson* secondary   = [self secondaryPerson];
-        OROnCallPerson* tertiary    = [self tertiaryPerson];
-        NSDate* contactDate = [[NSDate date] dateByAddingTimeInterval:kOnCallAcknowledgeWaitTime];
+         NSDate* contactDate = [[NSDate date] dateByAddingTimeInterval:kOnCallAcknowledgeWaitTime];
         if(primary){
             [primary setStatus:[NSString stringWithFormat:@"Will Contact: %@",[contactDate descriptionFromTemplate:@"HH:mm:ss"]]];
             if(secondary)       [secondary setStatus:@"Next on deck"];
@@ -451,6 +456,7 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
 - (void) takeOffCall
 {
     [data setValue:[NSNumber numberWithInt:kOffCall] forKey:kPersonRole];
+    [self setStatus:@""];
 }
 
 - (void) setValue:(id)anObject forKey:(id)aKey

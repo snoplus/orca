@@ -31,7 +31,7 @@
 @protocol snotDbDelegate <NSObject>
 @required
 - (ORCouchDB*) orcaDbRef:(id)aCouchDelegate;
-- (ORCouchDB*) debugDbRef:(id)aCouchDelegate;
+- (ORCouchDB*) debugDBRef:(id)aCouchDelegate;
 - (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
 @end
 
@@ -212,7 +212,7 @@
 
 #pragma mark ¥¥¥SnotDbDelegate
 - (ORCouchDB*) orcaDbRef:(id)aCouchDelegate;
-- (ORCouchDB*) debugDbRef:(id)aCouchDelegate;
+- (ORCouchDB*) debugDBRef:(id)aCouchDelegate;
 - (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
 
 //run type definition functions

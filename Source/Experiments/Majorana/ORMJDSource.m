@@ -553,13 +553,14 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
             [self setCurrentState:kMJDSource_ConnectionError];
         }
     }
+
     //vxm moving?
     if([remoteOpStatus objectForKey:@"sourceMoving"]){
         BOOL moving = [[remoteOpStatus objectForKey:@"sourceMoving"] boolValue];
         if(moving)  [self setIsMoving:kMJDSource_True];
         else        [self setIsMoving:kMJDSource_False];
     }
-    
+
 
     //position and gatevalve info
     if([remoteOpStatus objectForKey:@"A"] &&
@@ -956,6 +957,7 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
 
 - (void) queryMotion
 {
+
     NSMutableArray* cmds = [NSMutableArray arrayWithObjects:@"sourceMoving = [ORVXMModel,1 isMoving];", nil];
     [self sendCommands:cmds remoteSocket:[delegate remoteSocket:slot]];
 }

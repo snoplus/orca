@@ -51,8 +51,14 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_10
 NSString* kCrashLogDir               = @"~/Library/Logs/CrashReporter";
 NSString* kLastCrashLog              = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
+#else
+NSString* kCrashLogDir               = @"~/Library/Logs/DiagnosticReports";
+NSString* kLastCrashLog              = @"~/Library/Logs/DiagnosticReports/LastOrca.crash.log";
+#endif
+
 NSString* OROrcaAboutToQuitNotice    = @"OROrcaAboutToQuitNotice";
 NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 

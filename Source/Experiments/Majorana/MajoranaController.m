@@ -552,7 +552,8 @@
 #pragma mark ¥¥¥Calibration Interface Management
 - (void) updateCalibrationButtons
 {
-    BOOL locked         = [gSecurity isLocked:[model calibrationLock]];
+    //BOOL locked         = [gSecurity isLocked:[model calibrationLock]];
+    BOOL locked         = NO; //at Ralph's request
     
     BOOL running0       = [[model mjdSource:0] currentState]!= kMJDSource_Idle;
     BOOL isDeploying0   = [[model mjdSource:0] isDeploying];
