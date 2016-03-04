@@ -1302,32 +1302,44 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
 	@try {
 		unsigned char data[8];
 		int amountRead = [usbInterface readBytesOnInterruptPipeNoLock:data length:8];
-		if(amountRead == 8){
-			if((data[0] & 0x80)){
-				//an AIO command
-				int adcOffset = (data[1] & 0x1) * 4;
-				[self setAdc:0 + adcOffset withValue:(data[2]&0x00f0)<<4 | data[3]];
-				[self setAdc:1 + adcOffset withValue:(data[2]&0x000f)<<8 | data[4]];
-				[self setAdc:2 + adcOffset withValue:(data[5]&0x00f0)<<4 | data[6]];
-				[self setAdc:3 + adcOffset withValue:(data[5]&0x000f)<<8 | data[7]];				
-			}
-			else if((data[0] & 0xC0) == 0){
-				//some digital I/O
-				[self setDoValueIn:data[1]<<8 | data[2]];
-				[self setIoValueIn:data[3]>>4];
-				[self setCounter:(data[4]<<24) | (data[5]<<16) | (data[6]<<8) | data[7] ];
-				
-				//always this is the last query so timestamp here
-				time_t	ut_Time;
-				time(&ut_Time);
-				timeMeasured = ut_Time;
-				
-				if(shipData) [self performSelectorOnMainThread:@selector(shipIOData) withObject:nil waitUntilDone:NO];
-			}
-			else if((data[0] & 0x50) == 0x50){
-				unsigned long n = (data[1]<<1) + (data[2]<<8) + (data[3]<<4) + data[4];
-				[self setDeviceSerialNumber:n];
-			}
+        if(amountRead == 8){
+            unsigned char data0 = data[0];
+            unsigned char data1 = data[1];
+            unsigned char data2 = data[2];
+            unsigned char data3 = data[3];
+            unsigned char data4 = data[4];
+            unsigned char data5 = data[5];
+            unsigned char data6 = data[6];
+            unsigned char data7 = data[7];
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if((data0 & 0x80)){
+                    //an AIO command
+
+                    int adcOffset = (data1 & 0x1) * 4;
+                    [self setAdc:0 + adcOffset withValue:(data2&0x00f0)<<4 | data3];
+                    [self setAdc:1 + adcOffset withValue:(data2&0x000f)<<8 | data4];
+                    [self setAdc:2 + adcOffset withValue:(data5&0x00f0)<<4 | data6];
+                    [self setAdc:3 + adcOffset withValue:(data5&0x000f)<<8 | data7];
+                }
+                else if((data0 & 0xC0) == 0){
+                    //some digital I/O
+                    [self setDoValueIn:data1<<8 | data2];
+                    [self setIoValueIn:data3>>4];
+                    [self setCounter:(data4<<24) | (data5<<16) | (data6<<8) | data7 ];
+                    
+                    //always this is the last query so timestamp here
+                    time_t	ut_Time;
+                    time(&ut_Time);
+                    timeMeasured = ut_Time;
+                    
+                    if(shipData) [self shipIOData];
+                }
+                else if((data0 & 0x50) == 0x50){
+                    unsigned long n = (data1<<1) + (data2<<8) + (data3<<4) + data4;
+                    [self setDeviceSerialNumber:n];
+                }
+            });
 		}
 	}
 	@catch(NSException* e){
