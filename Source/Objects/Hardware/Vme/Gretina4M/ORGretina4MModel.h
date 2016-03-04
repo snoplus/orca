@@ -289,6 +289,9 @@ enum Gretina4MFIFOStates {
     unsigned long       snapShot[kNumberOfGretina4MRegisters];
     unsigned long       fpgaSnapShot[kNumberOfFPGARegisters];
     unsigned long       serialNumber;
+    unsigned long       runNumberLocal;
+    unsigned long       subRunNumberLocal;
+
 }
 
 - (id) init;
