@@ -1787,7 +1787,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
         }
         [pool release];
     }
-    
+    [runInfo setObject:[NSNumber numberWithBool:!quickStart] forKey:@"doinit"];
 	[client runIsStopping:runInfo];
 	
 	@try {

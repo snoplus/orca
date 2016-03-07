@@ -2584,7 +2584,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     @try {
-        if([[userInfo objectForKey:@"doinit"]boolValue]==0){
+        if([[userInfo objectForKey:@"doinit"]boolValue]==1){
             int i;
             for(i=0;i<kNumGretina4MChannels;i++){
                 [self writeControlReg:i enabled:NO];
