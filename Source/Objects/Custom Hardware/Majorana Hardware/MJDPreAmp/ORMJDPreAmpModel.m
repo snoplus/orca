@@ -1170,7 +1170,12 @@ struct {
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollValues) object:nil];
     if(connected){
-        [self readAllAdcs];
+        @try {
+            [self readAllAdcs];
+        }
+        @catch(NSException* e){
+            
+        }
         [self updateTrends];
         [self postCouchDBRecord];
         if(shipValues)[self shipRecords];
