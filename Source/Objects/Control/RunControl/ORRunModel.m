@@ -948,7 +948,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
         _forceRestart = YES;
        [self stopRun];
     }
-    else [self startRun:NO];
+    else [self startRun:!quickStart];
 }
 
 - (void) remoteStartRun:(unsigned long)aRunNumber
