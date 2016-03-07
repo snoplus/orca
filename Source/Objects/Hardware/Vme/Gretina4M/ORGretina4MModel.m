@@ -1572,10 +1572,17 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 }
 
 - (void) initBoard
-{       //disable all channels
+{
+    [self initBoard:YES];
+}
+
+- (void) initBoard:(BOOL)doChannelEnable
+{
     int i;
-    for(i=0;i<kNumGretina4MChannels;i++){
-        [self writeControlReg:i enabled:NO];
+    if(doChannelEnable){
+        for(i=0;i<kNumGretina4MChannels;i++){
+            [self writeControlReg:i enabled:NO];
+        }
     }
     
     //write the card level params
@@ -1598,15 +1605,17 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
             [self writeRisingEdgeWindow:i];
         }
     }
-    //enable channels
+    
     [self resetFIFO];
 
-    for(i=0;i<kNumGretina4MChannels;i++){
-        if([self enabled:i]){
-            [self writeControlReg:i enabled:YES];
+    if(doChannelEnable){
+        for(i=0;i<kNumGretina4MChannels;i++){
+            if([self enabled:i]){
+                [self writeControlReg:i enabled:YES];
+            }
         }
     }
-
+    
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MCardInited object:self];
 }
 
@@ -1660,7 +1669,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     return theValue & 0X3;
 }
 
-//new code version 1 (Jing Qian)
 - (void) writeClockSource: (unsigned long) clocksource
 {
     if(clocksource == 0)return; ////temp..... Clock source might be set by the Trigger Card init code.
@@ -2479,6 +2487,9 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+    runNumberLocal     = [[userInfo objectForKey:@"kRunNumber"] unsignedLongValue];
+    subRunNumberLocal     = [[userInfo objectForKey:@"kSubRunNumber"] unsignedLongValue];
+
     if(![[self adapter] controllerCard]){
         [NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
     }
@@ -2516,7 +2527,9 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     
     [self clearDiagnosticsReport];
     
-    [self initBoard];
+    BOOL doChannelEnable = [[userInfo objectForKey:@"doinit"]boolValue]==1;
+    [self initBoard:doChannelEnable];
+    if(!doChannelEnable) NSLog(@" %@ Quick Start Enabled. Channels NOT disabled. Only Changed values written\n",[self fullID]);
     
     if([self diagnosticsEnabled])[self briefDiagnosticsReport];
     
@@ -2571,10 +2584,15 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     @try {
-		int i;
-		for(i=0;i<kNumGretina4MChannels;i++){					
-			[self writeControlReg:i enabled:NO];
-		}
+        if([[userInfo objectForKey:@"doinit"]boolValue]==0){
+            int i;
+            for(i=0;i<kNumGretina4MChannels;i++){
+                [self writeControlReg:i enabled:NO];
+            }
+        }
+        else {
+            NSLog(@"Quick Start Enabled. %@ left running.\n",[self fullID]);
+        }
 	}
 	@catch(NSException* e){
         [self incExceptionCount];
@@ -2687,7 +2705,9 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     configStruct->card_info[index].deviceSpecificData[2]	= 0x0B; // fifoAM
     configStruct->card_info[index].deviceSpecificData[3]	= [self baseAddress] + 0x04; // fifoReset Address
     configStruct->card_info[index].deviceSpecificData[4]	= location; //crate, card, serial number
-    
+    configStruct->card_info[index].deviceSpecificData[5]	= runNumberLocal;
+    configStruct->card_info[index].deviceSpecificData[6]	= subRunNumberLocal;
+
 	configStruct->card_info[index].num_Trigger_Indexes		= 0;
 	
 	configStruct->card_info[index].next_Card_Index 	= index+1;	
