@@ -1445,6 +1445,8 @@ struct {
 {
     if(!connected)return;
     
+    return; //temps don't work -- don't alarm
+    
     float maxAllowedTemperature = 1000; //temporarily set high because the temp readout isn't working right
     int aChip;
     float aTemperature;
