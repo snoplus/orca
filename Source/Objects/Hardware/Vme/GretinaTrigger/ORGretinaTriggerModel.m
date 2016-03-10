@@ -575,7 +575,21 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             @try {
                 [self readRegister:kBoardID];
                // [self pulseNIMOutput];
-                [self initClockDistribution];
+                if([(ORRunModel*)[aNote object] quickStart]){
+                    NSLog(@"Full Trigger card init bypassed. Only reset the timestamps\n");
+                    //to reset the clocks set bit 6 of the MISC_CTRL reg
+                    //When this bit is set, the timestamp counter is held reset with value of zero
+                    //Since there is just a couple of operations here and we want to be fast just
+                    //send the commands without going thru a state machine.
+                    unsigned long aValue = [self readRegister:kMiscCtl1];
+                    [self writeRegister:kMiscCtl1 withValue:aValue &= ~(0x1<<6)];//release
+                    [self resetScaler];
+                    [self writeRegister:kPulsedCtl2 withValue:0x1000]; //send one imp syn
+                    [self readDisplayRegs];
+               }
+                else {
+                    [self initClockDistribution];
+                }
             }
             @catch(NSException* e){
                 NSLog(@"%@:%@ Exception: %@\n",[self fullID],NSStringFromSelector(_cmd),e);

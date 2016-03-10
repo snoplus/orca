@@ -1347,7 +1347,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) stepSerDesInit
 {
-    int i;
     switch(initializationState){
         case kSerDesSetup:
             [self writeRegister:kMasterLogicStatus  withValue: 0x00000051]; //power up value
@@ -1365,11 +1364,11 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
             break;
             
         case kFlushFifo:
-            for(i=0;i<kNumGretina4MChannels;i++){
-                [self writeControlReg:i enabled:NO];
-            }
+           // for(i=0;i<kNumGretina4MChannels;i++){
+            //    [self writeControlReg:i enabled:NO];
+           // }
             
-            [self resetFIFO];
+            //[self resetFIFO];
             [self setInitState:kReleaseClkManager];
             break;
             
@@ -1583,7 +1582,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
         for(i=0;i<kNumGretina4MChannels;i++){
             [self writeControlReg:i enabled:NO];
         }
-    }
+   // }
     
     //write the card level params
     [self writeClockSource];
@@ -1606,9 +1605,9 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
         }
     }
     
-    [self resetFIFO];
 
-    if(doChannelEnable){
+   // if(doChannelEnable){
+        [self resetFIFO];
         for(i=0;i<kNumGretina4MChannels;i++){
             if([self enabled:i]){
                 [self writeControlReg:i enabled:YES];
