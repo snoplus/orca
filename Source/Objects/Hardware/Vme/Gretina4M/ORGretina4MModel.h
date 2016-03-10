@@ -373,6 +373,7 @@ enum Gretina4MFIFOStates {
 - (BOOL) displayFPGARegisterOnMainPage:(unsigned int)index;
 - (void) writeToAddress:(unsigned long)anAddress aValue:(unsigned long)aValue;
 - (unsigned long) readFromAddress:(unsigned long)anAddress;
+- (void) printThresholds;
 
 - (ORRateGroup*)    waveFormRateGroup;
 - (void)			setWaveFormRateGroup:(ORRateGroup*)newRateGroup;
@@ -494,6 +495,7 @@ enum Gretina4MFIFOStates {
 - (BOOL) noiseFloorRunning;
 - (void) writeDownSample;
 - (BOOL) fifoIsEmpty;
+- (void) loadThresholds;
 
 - (short) readClockSource;
 - (short) readExternalWindow;

@@ -855,6 +855,15 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     fifoState = aFifoState;
 }
 
+- (void) printThresholds
+{
+    NSLog(@"Thresholds entered in dialog for %@\n",[self fullID]);
+    int i;
+    for(i=0;i<kNumGretina4MChannels;i++){
+        NSLogFont([NSFont fontWithName:@"Monaco" size:11],@"%d:%6d\n",i,[self trapEnabled:i]?[self trapThreshold:i]:[self ledThreshold:i]);
+    }
+}
+
 - (short) noiseFloorOffset
 {
     return noiseFloorOffset;
@@ -1617,6 +1626,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MCardInited object:self];
 }
+
+
 
 - (unsigned long) readControlReg:(short)channel
 {
@@ -2461,6 +2472,12 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [p setSetMethodSelector:@selector(initBoard)];
     [a addObject:p];
     
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setUseValue:NO];
+    [p setOncePerCard:YES];
+    [p setName:@"Load Thresholds"];
+    [p setSetMethodSelector:@selector(loadThresholds)];
+    [a addObject:p];
     return a;
 }
 
@@ -3051,7 +3068,18 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     [self setLEDThreshold:chan withValue:aValue];
 }
-
+//separate manually load of thresholds
+- (void) loadThresholds
+{
+    NSLog(@"%@ Manual load of thresholds\n",[self fullID]);
+    int i;
+    for(i=0;i<kNumGretina4MChannels;i++) {
+        if([self enabled:i]){
+            if([self trapEnabled:i]) [self writeTrapThreshold:i];
+            else                     [self writeLEDThreshold:i];
+        }
+    }
+}
 @end
 
 @implementation ORGretina4MModel (private)
