@@ -9,7 +9,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <ELLIEController.h>
+#import "ELLIEController.h"
+#import "XmlrpcClient.h"
 
 @class ORCouchDB;
 @class ORRunModel;
@@ -27,6 +28,10 @@
     bool _smellieDBReadInProgress;
     float pulseByPulseDelay;
     
+    //Server Clients
+    XmlrpcClient* _tellieClient;
+    XmlrpcClient* _smellieClient;
+    
     //tellie settings
     NSMutableDictionary* tellieSubRunSettings;
     
@@ -42,6 +47,7 @@
 @property (nonatomic,assign) bool smellieDBReadInProgress;
 @property (nonatomic,assign) float pulseByPulseDelay;
 
+-(id) init;
 -(void) setUpImage;
 -(void) makeMainController;
 -(void) wakeUp;
@@ -73,15 +79,14 @@
 -(void) setLaserSoftLockOn;
 -(void) setLaserSoftLockOff;
 -(void) setSmellieMasterMode:(NSString*)triggerFrequency withNumOfPulses:(NSString*)numOfPulses;
--(void) sendCustomSmellieCmd:(NSString*)customCmd withArgument1:(NSString*)customArgument1 withArgument2:(NSString*)customArgument2;
+
 -(void) testFunction;
--(void) setLaserFrequency20Mhz;
 -(void) fetchSmellieConfigurationInformation;
 -(NSNumber*) fetchRecentVersion;
 -(NSMutableDictionary*) fetchCurrentConfigurationForVersion:(NSNumber*)currentVersion;
 
 //TELLIE Control Functions
--(void) pollTellieFibre;
+-(NSMutableArray*) pollTellieFibre;
 -(void) fireTellieFibreMaster:(NSMutableDictionary*)fireCommands;
 -(void) stopTellieFibre:(NSArray*)fireCommands;
 -(void) startTellieRun;

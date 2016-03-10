@@ -23,6 +23,7 @@
 */
 
 #import "ELLIEModel.h"
+#import "XmlrpcClient.h"
 #import "ORTaskSequence.h"
 #import "ORCouchDB.h"
 #import "SNOPModel.h"
@@ -71,6 +72,17 @@ tellieRunDoc,
 currentOrcaSettingsForSmellie,
 tellieSubRunSettings,
 smellieDBReadInProgress = _smellieDBReadInProgress;
+
+-(id) init
+{
+    self = [super init];
+    
+    //Create clients for tellie / smellie servers
+    _tellieClient = [[XmlrpcClient alloc] initWithHostName:@"localhost" withPort:@"5030"];
+    _smellieClient = [[XmlrpcClient alloc] initWithHostName:@"snodrop" withPort:@"5020"];
+    
+    return self;
+}
 
 - (void) setUpImage
 {
@@ -145,15 +157,29 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     }
 }
 
--(void) pollTellieFibre
+-(NSMutableArray*) pollTellieFibre
 {
     /*
-     Poll the TELLIE hardware using an XMLRPC server and requests the response from the
-     hardware.
+     Call a function in the server to poll TELLIE hardware for pin readings
     */
-    
-    NSString* responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_readout_script.py" withCmdLineArgs:nil];
-    NSLog(@"Response from Tellie: %@\n",responseFromTellie);
+    NSMutableArray* response = [NSMutableArray arrayWithObjects:@0.0, @0.0, nil];
+    @try {
+        [_tellieClient command:@"read_pin_sequence"];
+        if([_tellieClient getResult] == nil){
+            NSLog(@"Warning: PIN sequence is incomplete, returning zeros");
+        } else {
+            NSLog(@"Raw response from tellie: %@", [_tellieClient getResult]);
+            NSArray* values = [[_tellieClient getResult] componentsSeparatedByString:@" "];
+            NSNumber* pin = [NSNumber numberWithFloat:[values[0] floatValue]];
+            NSNumber* rms = [NSNumber numberWithFloat:[values[1] floatValue]];
+            [response replaceObjectAtIndex:0 withObject:pin];
+            [response replaceObjectAtIndex:1 withObject:rms];
+            NSLog(@"Pin : %f\t rms : %f",[response[0] floatValue], [response[1] floatValue]);
+        }
+    } @catch (NSException* e){
+        NSLog(@"Exception polling tellie fibre: %@", e.reason);
+    }
+    return response;
 }
 
 -(void) fireTellieFibreMaster:(NSMutableDictionary*)fireCommands
@@ -182,7 +208,13 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //TODO:Add this back in
     //Post to the Database what is about to happen
     __block NSString * responseFromTellie = [[NSString alloc] init];
-    NSArray * nullCommandArguments = @[@"-c",[[fireCommands objectForKey:@"channel"] stringValue],@"-n",[[fireCommands objectForKey:@"number_of_shots"] stringValue],@"-d",[[fireCommands objectForKey:@"pulse_rate"] stringValue],@"-t",[[fireCommands objectForKey:@"trigger_delay"] stringValue],@"-w",[[fireCommands objectForKey:@"pulse_width"] stringValue],@"-z",[[fireCommands objectForKey:@"pulse_height"] stringValue],@"-x",[[fireCommands objectForKey:@"fibre_delay"] stringValue]];
+    NSArray * nullCommandArguments = @[[NSNumber numberWithInt:[[fireCommands objectForKey:@"channel"] intValue]],
+                                       [NSNumber numberWithInt:[[fireCommands objectForKey:@"number_of_shots"] intValue]],
+                                        [NSNumber numberWithFloat:[[fireCommands objectForKey:@"pulse_rate"] floatValue]],
+                                       [NSNumber numberWithFloat:[[fireCommands objectForKey:@"trigger_delay"] floatValue]],
+                                       [NSNumber numberWithInt:[[fireCommands objectForKey:@"pulse_width"] intValue]],
+                                       [NSNumber numberWithInt:[[fireCommands objectForKey:@"pulse_height"] intValue]],
+                                       [NSNumber numberWithFloat:[[fireCommands objectForKey:@"fibre_delay"] floatValue]]];
     
     double numberOfShots = [[fireCommands objectForKey:@"number_of_shots"] doubleValue];
     double timeBetweenShotsInMicroSeconds = [[fireCommands objectForKey:@"pulse_rate"] doubleValue]/(1000.0);
@@ -204,14 +236,10 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     double timeToSleep = (1.0+pulseByPulseDelay)*numberOfShots*timeBetweenShotsInMicroSeconds; //20% grace period for each shot
     
-    //hold the fire command on this thread
-    // This line is depreciated - bring it up with the working group, see if they have
-    // a preferred solution.*
-    dispatch_sync(dispatch_get_current_queue(), ^{
-        responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_fire_script.py" withCmdLineArgs:nullCommandArguments];
-        NSLog(@"Response from Tellie FIRE command: %@\n",responseFromTellie);
-    });
-
+    //FIRE!
+    [_tellieClient command:@"init_channel" withArgs:nullCommandArguments];
+    [_tellieClient command:@"fire_sequence"];
+    
     //NSLog(@"in here");
     [NSThread sleepForTimeInterval:timeToSleep];
     
@@ -676,85 +704,54 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 /****************************************/
 -(void)setSmellieSafeStates
 {
-    NSArray * setSafeStates = @[@"30",@"0",@"0"]; //30 is the flag for setting smellie to its safe states
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:setSafeStates];
+    [_smellieClient command:@"set_safe_states"];
 }
 
 -(void)setLaserSwitch:(NSString*)laserSwitchChannel
 {
-    NSArray * setLaserSwitchFlagAndArgument = @[@"2050",laserSwitchChannel,@"0"]; //30 is the flag for setting smellie to its safe states
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:setLaserSwitchFlagAndArgument];
+    NSArray* args = @[laserSwitchChannel];
+    [_smellieClient command:@"set_laser_switch" withArgs:args];
 }
 
 -(void)setFibreSwitch:(NSString*)fibreSwitchInputChannel withOutputChannel:(NSString*)fibreSwitchOutputChannel
 {
-    NSString * argumentStringFS = [NSString stringWithFormat:@"%@s%@",fibreSwitchInputChannel,fibreSwitchOutputChannel];
-    //NSLog(@"fibre switch argument %@",argumentStringFS);
-    NSArray * setFibreSwitchFlagAndArgument = @[@"40",argumentStringFS,@"0"];
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:setFibreSwitchFlagAndArgument];
+    NSString* argumentStringFS = [NSString stringWithFormat:@"%@s%@",fibreSwitchInputChannel,fibreSwitchOutputChannel];
+    NSArray* args = @[argumentStringFS];
+    [_smellieClient command:@"set_fibre_switch" withArgs:args];
 }
 
 -(void)setLaserIntensity:(NSString*)laserIntensity
 {
-    NSArray * setLaserIntensityFlagAndArgument = @[@"50",laserIntensity,@"0"]; //30 is the flag for setting smellie to its safe states
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:setLaserIntensityFlagAndArgument];
+    NSArray* args = @[laserIntensity];
+    [_smellieClient command:@"set_laser_intensity" withArgs:args];
 }
 
 -(void)setLaserSoftLockOn
 {
-    NSArray * softLockOnFlag = @[@"60",@"0",@"0"]; //30 is the flag for setting smellie to its safe states
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:softLockOnFlag];
+    [_smellieClient command:@"set_soft_lock_on"];
 }
 
 //this function kills any external software that will block the functions of a smellie run 
 -(void)killBlockingSoftware
 {
-    NSArray * killBS = @[@"110",@"0",@"0"]; //30 is the flag for setting smellie to its safe states
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:killBS];
+    [_smellieClient command:@"kill_sepia_and_nimax"];
 }
 
 -(void)setLaserSoftLockOff
 {
-    NSArray * softLockOffFlag = @[@"70",@"0",@"0"]; //30 is the flag for setting smellie to its safe states
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:softLockOffFlag];
-}
-
--(void)setLaserFrequency20Mhz
-{
-    NSArray * frequencyTestingModeFlag = @[@"90",@"0",@"0"]; 
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:frequencyTestingModeFlag];
+    [_smellieClient command:@"set_soft_lock_off"];
 }
 
 -(void)setSmellieMasterMode:(NSString*)triggerFrequency withNumOfPulses:(NSString*)numOfPulses
 {
-    NSString * argumentString = [NSString stringWithFormat:@"%@s%@",triggerFrequency,numOfPulses];
-    NSArray * smellieMasterModeFlag = @[@"80",argumentString,@"0"]; //30 is the flag for setting smellie to its safe states
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:smellieMasterModeFlag];
+    NSArray* args = @[triggerFrequency, numOfPulses];
+    [_smellieClient command:@"pulse_master_mode" withArgs:args];
 }
 
 -(void)setGainControlWithGainVoltage:(NSString*)gainVoltage
 {
-    NSArray * gainControlFlag = @[@"22110",gainVoltage,@"0"]; //gain control settings with gain voltage
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:gainControlFlag];
-}
-
--(void)sendCustomSmellieCmd:(NSString*)customCmd withArgument1:(NSString*)customArgument1 withArgument2:(NSString*)customArgument2
-{
-    //Make sure all the arguments default to a safe value if not specified
-    if([customCmd length]==0){
-        customCmd = @"0";
-    }
-    
-    if(([customArgument1 length]==0) || [customArgument1 isEqualToString:@""]){
-        customArgument1 = @"0";
-    }
-    
-    if(([customArgument2 length]==0) || [customArgument2 isEqualToString:@""]){
-        customArgument2 = @"0";
-    }
-        
-    NSArray* smellieCustomCmd = @[customCmd,customArgument1,customArgument2];
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:smellieCustomCmd];
+    NSArray* args = @[gainVoltage];
+    [_smellieClient command:@"set_gain_control" withArgs:args];
 }
 
 -(void)testFunction
