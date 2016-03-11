@@ -182,6 +182,11 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     return response;
 }
 
+-(void) stopTellieFibre
+{
+    [_tellieClient command:@"stop"];
+}
+
 -(void) fireTellieFibreMaster:(NSMutableDictionary*)fireCommands
 {
     /*
@@ -207,10 +212,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     //TODO:Add this back in
     //Post to the Database what is about to happen
-    __block NSString * responseFromTellie = [[NSString alloc] init];
     NSArray * nullCommandArguments = @[[NSNumber numberWithInt:[[fireCommands objectForKey:@"channel"] intValue]],
                                        [NSNumber numberWithInt:[[fireCommands objectForKey:@"number_of_shots"] intValue]],
-                                        [NSNumber numberWithFloat:[[fireCommands objectForKey:@"pulse_rate"] floatValue]],
+                                       [NSNumber numberWithFloat:[[fireCommands objectForKey:@"pulse_rate"] floatValue]],
                                        [NSNumber numberWithFloat:[[fireCommands objectForKey:@"trigger_delay"] floatValue]],
                                        [NSNumber numberWithInt:[[fireCommands objectForKey:@"pulse_width"] intValue]],
                                        [NSNumber numberWithInt:[[fireCommands objectForKey:@"pulse_height"] intValue]],
@@ -218,6 +222,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     double numberOfShots = [[fireCommands objectForKey:@"number_of_shots"] doubleValue];
     double timeBetweenShotsInMicroSeconds = [[fireCommands objectForKey:@"pulse_rate"] doubleValue]/(1000.0);
+
     if(pulseByPulseDelay < 0.1){
         NSLog(@"Pulse by pulse delay is too small. Setting to 0.1");
         pulseByPulseDelay = 0.1;
@@ -244,31 +249,18 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [NSThread sleepForTimeInterval:timeToSleep];
     
     //[NSThread sleepForTimeInterval:1.0];
-    __block NSString * responseFromPoll = [[NSString alloc] init];
-    // * same as above.
-    dispatch_sync(dispatch_get_current_queue(), ^{
-        responseFromPoll = [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_readout_script.py" withCmdLineArgs:nil];
-        NSLog(@"Response from Tellie READ command: %@\n",responseFromPoll);
-    });
+    NSArray* pollResponse = [NSArray arrayWithArray:[self pollTellieFibre]];
     
     @try {
-        [fireCommands setObject:[NSNumber numberWithInt:[responseFromPoll intValue]] forKey:@"pin_readout"];
+        [fireCommands setObject:[NSNumber numberWithInt:[responseFromPoll[0] intValue]] forKey:@"pin_readout"];
+        [fireCommands setObject:[NSNumber numberWithInt:[responseFromPoll[1] floatValue]] forKey:@"pin_rms"];
     }
     @catch (NSException *exception) {
         NSLog(@"Unable to add pin readout due to error %@",exception);
     }
     
-    [responseFromTellie release];
+    [pollResponse release];
     [self updateTellieDocument:fireCommands];
-}
-
--(void) stopTellieFibre:(NSArray*)fireCommands
-{
-    /*
-     Call tellie stop script. The script itself is stored on the DAQ1 machine.
-    */
-    NSString *responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_stop_script.py" withCmdLineArgs:nil];
-    NSLog(@"Response from Tellie: %@\n",responseFromTellie);
 }
 
 /***************************************/
@@ -325,60 +317,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                        database:aCouchDb
                        delegate:aSnotModel];
 }
-
--(NSString*)callPythonScript:(NSString*)pythonScriptFilePath withCmdLineArgs:(NSArray*)commandLineArgs
-{
-    /*
-     Call a python script on the DAQ1 machine. Currently three cases are hardcoded into
-     this function, defined by the size of the commandLineArgs array variable. Smellie
-     commands take three args, tellie fire commands take fourteen and poll requests take
-     none.
-     
-     Arguments: 
-      NSString* pythonScriptFilePath : Path to the script to be called (on DAQ1). 
-      NSArray* commandLineArgs       : Arguments to be passed to the script.
-     
-     Returns:
-      NSString* responseFromCmdLine  : The text response returned by the called script.
-    */
-    
-    NSTask* task = [[NSTask alloc] init];
-    [task setLaunchPath: @"/usr/bin/python"]; // Tell the task to execute the ssh command
-    
-    if([commandLineArgs count] == 3){ //this is the case for smellie commands 
-        [task setArguments: [NSArray arrayWithObjects:pythonScriptFilePath,[commandLineArgs objectAtIndex:0],[commandLineArgs objectAtIndex:1],[commandLineArgs objectAtIndex:2], nil]];
-    }
-    else if ([commandLineArgs count] == 14){ //this is the case for the fire tellie commands
-        [task setArguments: [NSArray arrayWithObjects:pythonScriptFilePath,[commandLineArgs objectAtIndex:0],[commandLineArgs objectAtIndex:1],[commandLineArgs objectAtIndex:2],[commandLineArgs objectAtIndex:3],[commandLineArgs objectAtIndex:4],[commandLineArgs objectAtIndex:5],[commandLineArgs objectAtIndex:6],[commandLineArgs objectAtIndex:7],[commandLineArgs objectAtIndex:8],[commandLineArgs objectAtIndex:9],[commandLineArgs objectAtIndex:10],[commandLineArgs objectAtIndex:11],[commandLineArgs objectAtIndex:12],[commandLineArgs objectAtIndex:13], nil]];
-    }
-    else if ([commandLineArgs count] == 0){  //this is for the tellie poll script
-        [task setArguments:[NSArray arrayWithObjects:pythonScriptFilePath, nil]];
-    }
-    else{
-        return @"unable to call python script with correct number of arguments";
-    }
-    
-    NSPipe* pipe = [NSPipe pipe];
-    [task setStandardOutput: pipe];
-    NSFileHandle* file = [pipe fileHandleForReading]; // This file handle is a reference to the output of the ssh command
-    
-    @try{
-        [task launch];
-    }
-    @catch (NSException *e) {
-        NSLog(@"ELLIE Connection Error calling script %@: %@",pythonScriptFilePath,e);
-    }
-    @finally {
-        //do something here
-    }
-
-    NSData* data = [file readDataToEndOfFile];
-    NSString* responseFromCmdLine = [[[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding] autorelease]; // This string now contains the entire output of the ssh command.
-    
-    [task release];
-    return responseFromCmdLine;
-}
-
 
 - (NSString*) stringDateFromDate:(NSDate*)aDate
 {
@@ -520,7 +458,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     self.tellieRunDoc = runDocDict;
     
     // Post and update kTellieRunDocumentAdded bool
-    [[self orcaDbRefWithEntryDB:self withDB:@"tellie"] addDocument:runDocDict tag:kTellieRunDocumentAdded];
+    [[self orcaDbRefWithEntryDB:self withDB:@"telliedb"] addDocument:runDocDict tag:kTellieRunDocumentAdded];
     
     // wait for main thread to receive acknowledgement from couchdb
     NSInteger timeoutLimit = 2;
@@ -594,7 +532,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     //check to see if run is offline or not
     if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
-        [[self orcaDbRefWithEntryDB:self withDB:@"tellie"]
+        [[self orcaDbRefWithEntryDB:self withDB:@"telliedb"]
                             updateDocument:runDocDict
                                 documentId:[runDocDict objectForKey:@"_id"]
                                        tag:kTellieRunDocumentUpdated];
@@ -715,8 +653,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 
 -(void)setFibreSwitch:(NSString*)fibreSwitchInputChannel withOutputChannel:(NSString*)fibreSwitchOutputChannel
 {
-    NSString* argumentStringFS = [NSString stringWithFormat:@"%@s%@",fibreSwitchInputChannel,fibreSwitchOutputChannel];
-    NSArray* args = @[argumentStringFS];
+    NSArray* args = @[fibreSwitchInputChannel, fibreSwitchOutputChannel];
     [_smellieClient command:@"set_fibre_switch" withArgs:args];
 }
 

@@ -87,8 +87,8 @@
 
 //TELLIE Control Functions
 -(NSMutableArray*) pollTellieFibre;
+-(void) stopTellieFibre;
 -(void) fireTellieFibreMaster:(NSMutableDictionary*)fireCommands;
--(void) stopTellieFibre:(NSArray*)fireCommands;
 -(void) startTellieRun;
 -(void) stopTellieRun;
 
