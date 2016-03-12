@@ -221,7 +221,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     // **********************************
     // Load latest mapping doc.
-    // **********************************
+    // *********
+    *************************
     // For testing on personal machine
     //
     NSString* mapUrlString = [NSString stringWithFormat:@"http://snoplus:PureTe->Dirac!=True@couch.snopl.us/telliedb/_design/tellieQuery/_view/fetchCurrentMapping?key=0"];
