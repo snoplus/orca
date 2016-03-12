@@ -802,23 +802,23 @@ snotDb = _snotDb;
 - (BOOL) hvANeedsUserIntervention
 {
     return hvANeedsUserIntervention;
-    
 }
 
 - (void) setHvANeedsUserIntervention:(BOOL)needs
 {
     hvANeedsUserIntervention = needs;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
 }
 
 - (BOOL) hvBNeedsUserIntervention
 {
     return hvBNeedsUserIntervention;
-    
 }
 
 - (void) setHvBNeedsUserIntervention:(BOOL)needs
 {
     hvBNeedsUserIntervention = needs;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
 }
 
 - (unsigned long) hvAVoltageDACSetValue
