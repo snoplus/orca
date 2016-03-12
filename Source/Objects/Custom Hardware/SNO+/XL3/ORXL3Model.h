@@ -110,6 +110,8 @@ enum {
     BOOL hvBRamping;
     BOOL hvEverUpdated;
     BOOL hvSwitchEverUpdated;
+    BOOL hvANeedsUserIntervention;
+    BOOL hvBNeedsUserIntervention;
     
     NSString* triggerStatus;
     BOOL _isTriggerON;
@@ -213,7 +215,8 @@ enum {
 @property BOOL hvSwitchEverUpdated;
 @property BOOL hvARamping;
 @property BOOL hvBRamping;
-
+@property BOOL hvANeedsUserIntervention;
+@property BOOL hvBNeedsUserIntervention;
 
 #pragma mark •••Initialization
 - (id)   init;
@@ -349,6 +352,8 @@ enum {
 
 - (void) readHVStatus:(HVReadbackResults*)status;
 - (void) readHVStatus;
+
+- (void) hvUserIntervention:(BOOL)forA;
 
 - (void) setHVRelays:(unsigned long long)relayMask error:(unsigned long*)aError;
 - (void) setHVRelays:(unsigned long long)relayMask;
