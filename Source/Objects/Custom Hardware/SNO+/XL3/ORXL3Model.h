@@ -134,7 +134,6 @@ enum {
     unsigned long _hvBNextStepValue;
     unsigned long _hvNominalVoltageA;
     unsigned long _hvNominalVoltageB;
-    BOOL _hvPanicFlag;
     NSLock* hvInitLock;
     NSThread* hvInitThread;
     NSThread* hvThread;
@@ -203,7 +202,6 @@ enum {
 @property (nonatomic,assign) unsigned long hvANextStepValue;
 @property (nonatomic,assign) unsigned long hvBNextStepValue;
 @property (nonatomic,assign) unsigned long hvCMOSReadsCounter;
-@property (nonatomic,assign) BOOL hvPanicFlag;
 @property (nonatomic,assign) BOOL isXl3VltThresholdInInit;
 @property (nonatomic,assign) int xl3LinkTimeOut;
 @property (nonatomic,assign) BOOL xl3InitInProgress;
