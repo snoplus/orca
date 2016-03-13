@@ -1328,6 +1328,7 @@ static NSDictionary* xl3Ops;
 
 - (IBAction)hvAcceptReadback:(id)sender
 {
+    [model hvUserIntervention:([hvPowerSupplyMatrix selectedColumn] ? false : true)];
 }
 
 //FIXME: redo the logic

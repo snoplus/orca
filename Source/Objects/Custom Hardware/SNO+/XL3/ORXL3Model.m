@@ -3417,14 +3417,24 @@ void SwapLongBlock(void* p, int32_t n)
         [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
     }
 }
+
+
 - (void) hvUserIntervention:(BOOL)forA
 {
     if (forA) {
         [self setHvAVoltageDACSetValue:(int)([self hvAVoltageReadValue]/3000.*4096.)];
-        self.hvANeedsUserIntervention = false;
+        [self setHvANextStepValue:[self hvAVoltageDACSetValue]];
+        [self setHvANeedsUserIntervention:false];
     } else {
         [self setHvBVoltageDACSetValue:(int)([self hvBVoltageReadValue]/3000.*4096.)];
-        self.hvBNeedsUserIntervention = false;
+        [self setHvBNextStepValue:[self hvBVoltageDACSetValue]];
+        [self setHvBNeedsUserIntervention:false];
+    }
+    @try {
+        [self setHVDacA:[self hvBVoltageDACSetValue] dacB:[self hvBVoltageDACSetValue]];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"%@ HV failed to set HV!\n", [[self xl3Link] crateName]);
     }
 }
 
@@ -4534,6 +4544,18 @@ void SwapLongBlock(void* p, int32_t n)
     
     NSLog(@"%@ starting HV control thread\n",[[self xl3Link] crateName]);
     
+    //Update log with new values
+    [self readHVStatus];
+    NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ HV A Status: ", [[self xl3Link] crateName]];
+    [msg appendFormat:@"Setpoint: %.2f V, Voltage: %.2f V, Current: %.2f mA\n", [self hvAVoltageDACSetValue]/4096.*3000., [self hvAVoltageReadValue], [self hvACurrentReadValue]];
+    NSLog(msg);
+    if ([self crateNumber] == 16) {
+        NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ HV B Status: ", [[self xl3Link] crateName]];
+        [msg appendFormat:@"Setpoint: %.2f V, Voltage: %.2f V, I: %.2f mA\n", [self hvBVoltageDACSetValue]/4096.*3000., [self hvAVoltageReadValue], [self hvACurrentReadValue]];
+        NSLog(msg);
+    }
+    
+    
     //Runs until the thread is cancelled
     while (![[NSThread currentThread] isCancelled] ) {
         
@@ -4614,11 +4636,11 @@ void SwapLongBlock(void* p, int32_t n)
             
             //check for ramps that aren't tracking the setpoints
             if ([self hvASwitch] && aUp && fabs([self hvAVoltageReadValue] - [self hvAVoltageDACSetValue]/4096.*3000.) > 100) {
-                NSLog(@"%@ HV A read value differs from the setpoint. stopping!\nPress Ramp UP to continue.", [[self xl3Link] crateName]);
+                NSLog(@"%@ HV A read value differs from the setpoint. stopping!\nPress Ramp UP to continue.\n", [[self xl3Link] crateName]);
                 [self setHvANextStepValue:[self hvAVoltageDACSetValue]];
             }
             if ([self hvBSwitch] && bUp && fabs([self hvBVoltageReadValue] - [self hvBVoltageDACSetValue]/4096.*3000.) > 100) {
-                NSLog(@"%@ HV B read value differs from the setpoint. stopping!\nPress Ramp UP to continue.", [[self xl3Link] crateName]);
+                NSLog(@"%@ HV B read value differs from the setpoint. stopping!\nPress Ramp UP to continue.\n", [[self xl3Link] crateName]);
                 [self setHvBNextStepValue:[self hvBVoltageDACSetValue]];
             }
             
@@ -4637,12 +4659,12 @@ void SwapLongBlock(void* p, int32_t n)
                     ORAlarm *hvHighCurrentAlarm = [[ORAlarm alloc] initWithName:alarmString severity:kEmergencyAlarm];
                     [hvHighCurrentAlarm setAcknowledged:NO];
                     [hvHighCurrentAlarm postAlarm];
-                    NSLog(@"%@ HV A read value differs from the setpoint! Suspending HV monitoring and control. Press 'Accept Readback' to resume.", [[self xl3Link] crateName]);
+                    NSLog(@"%@ HV A read value differs from the setpoint! Suspending HV monitoring and control. Press 'Accept Readback' to resume.\n", [[self xl3Link] crateName]);
                 }
             }
             if (self.hvBNeedsUserIntervention) {
                 if (fabs([self hvBVoltageReadValue] - [self hvBVoltageDACSetValue]/4096.*3000.) <= 100) {
-                    NSLog(@"%@ HV B read value differs from the setpoint! Suspending HV monitoring and control. Press 'Accept Readback' to resume.", [[self xl3Link] crateName]);
+                    NSLog(@"%@ HV B read value recovered", [[self xl3Link] crateName]);
                     self.hvBNeedsUserIntervention = false;
                 }
             } else {
@@ -4652,7 +4674,7 @@ void SwapLongBlock(void* p, int32_t n)
                     ORAlarm *hvHighCurrentAlarm = [[ORAlarm alloc] initWithName:alarmString severity:kEmergencyAlarm];
                     [hvHighCurrentAlarm setAcknowledged:NO];
                     [hvHighCurrentAlarm postAlarm];
-                    NSLog(@"%@ HV B read value differs from the setpoint! Suspending HV monitoring and control. Press 'Accept Readback' to resume.", [[self xl3Link] crateName]);
+                    NSLog(@"%@ HV B read value differs from the setpoint! Suspending HV monitoring and control. Press 'Accept Readback' to resume.\n", [[self xl3Link] crateName]);
                 }
             }
             
