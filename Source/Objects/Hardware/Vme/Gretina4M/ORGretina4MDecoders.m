@@ -24,6 +24,7 @@
 #import "ORDataSet.h"
 #import "ORDataTypeAssigner.h"
 #import "ORGretina4MModel.h"
+#include <sys/time.h>
 
 #define kIntegrateTimeKey @"Integration Time"
 #define kHistEMultiplierKey @"Hist E Multiplier"
@@ -112,27 +113,46 @@
             
             [aDataSet histogram:energy numBins:0x1fff sender:self  withKeys:@"Gretina4M", @"Energy",crateKey,cardKey,channelKey,nil];
             
-            dataPtr += 11; //point to the data
+            BOOL fullDecode = NO;
+            
+            struct timeval tv;
+            gettimeofday(&tv, NULL);
+            if(lastTime == 0) firstTime = YES;
+            
+            unsigned long long now =
+                (unsigned long long)(tv.tv_sec) * 1000 +
+                (unsigned long long)(tv.tv_usec) / 1000;
 
-            NSMutableData* tmpData = [NSMutableData dataWithCapacity:512*2];
-              
-            int dataLength = 1024 - headerSize -1;
-            [tmpData setLength:dataLength*sizeof(long)];
-            short* dPtr = (short*)[tmpData bytes];
-            int i;
-            int wordCount = 0;
-            //data is actually 2's complement. detwiler 08/26/08
-            for(i=0;i<dataLength;i++){
-                dPtr[wordCount++] =    (0x0000ffff & *dataPtr);
-                dPtr[wordCount++] =    (0xffff0000 & *dataPtr) >> 16;
-                dataPtr++;
+            if(now - lastTime >= 100){
+                fullDecode = YES;
+                lastTime = now;
             }
-            [aDataSet loadWaveform:tmpData 
+
+            NSMutableData* tmpData = nil;
+            if(firstTime || fullDecode){
+            
+                dataPtr += 11; //point to the data
+
+                tmpData = [NSMutableData dataWithCapacity:512*2];
+                  
+                int dataLength = 1024 - headerSize -1;
+                [tmpData setLength:dataLength*sizeof(long)];
+                short* dPtr = (short*)[tmpData bytes];
+                int i;
+                int wordCount = 0;
+                //data is actually 2's complement. detwiler 08/26/08
+                for(i=0;i<dataLength;i++){
+                    dPtr[wordCount++] =    (0x0000ffff & *dataPtr);
+                    dPtr[wordCount++] =    (0xffff0000 & *dataPtr) >> 16;
+                    dataPtr++;
+                }
+            }
+            [aDataSet loadWaveform:tmpData
                             offset:0 //bytes!
                           unitSize:2 //unit size in bytes!
-                            sender:self  
+                            sender:self
                           withKeys:@"Gretina4M", @"Waveforms",crateKey,cardKey,channelKey,nil];
-        
+  
             //get the actual object
             NSString* aKey = [crateKey stringByAppendingString:cardKey];
             if(!actualGretinaCards)actualGretinaCards = [[NSMutableDictionary alloc] init];
@@ -159,6 +179,8 @@
         }
     }
 	 
+    firstTime = NO;
+    
     return length; //must return number of longs
 }
 
@@ -170,6 +192,7 @@
     
     NSString* crate = [NSString stringWithFormat:@"Crate = %lu\n",(ptr[1]&0x01e00000)>>21];
     NSString* card  = [NSString stringWithFormat:@"Card  = %lu\n",(ptr[1]&0x001f0000)>>16];
+    NSString* fifoState  = [NSString stringWithFormat:@"FifoState  = 0x%04lx\n",(ptr[1]>>30)&0x3];
 
     NSString* crateKey			= [self getCrateKey: (ptr[1]&0x01e00000)>>21];
 	NSString* cardKey			= [self getCardKey: (ptr[1]&0x001f0000)>>16];
@@ -201,7 +224,7 @@
     for(i=0;i<15;i++){
         header = [header stringByAppendingFormat:@"%d: 0x%08lx\n",i,headerStartPtr[i]];
     }
-    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@",title,crate,card,chan,timeStampString,rawEnergyStr,energyStr,header];
+    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@",title,crate,card,chan,fifoState,timeStampString,rawEnergyStr,energyStr,header];
 }
 
 @end
