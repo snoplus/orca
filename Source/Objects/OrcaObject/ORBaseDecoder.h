@@ -30,6 +30,7 @@
 		NSLock* cachedObjectsLock;
     @protected
         BOOL skipRateCounts;
+        BOOL firstTime;
 
 }
 - (void) setSkipRateCounts:(BOOL)aState;

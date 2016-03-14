@@ -94,7 +94,7 @@ static NSString* kCrateKey[16] = {
 
 - (void) runStarted:(NSNotification*)aNote
 {
-
+    firstTime = YES;
 }
 
 - (void) runStopped:(NSNotification*)aNote
