@@ -7,11 +7,10 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
 {
 
 #define kGretinaPacketSeparator ((int32_t)(0xAAAAAAAA))
-#define kGretina4MFIFOEmpty			0x100000
-#define kGretina4MFIFOAlmostEmpty	0x400000
-#define kGretina4MFIFO16KFull       0x800000
-#define kGretina4MFIFO30KFull		0x1000000
-#define kGretina4MFIFOFull          0x2000000
+#define kGretina4MFIFOEmpty			0x00100000
+#define kGretina4MFIFO16KFull       0x00800000
+#define kGretina4MFIFO30KFull		0x01000000
+#define kGretina4MFIFOFull          0x02000000
     
 #define kUseDMA  true
     
@@ -26,6 +25,8 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
 
     int32_t  result;
     uint32_t fifoState = 0;
+    uint32_t fifoFlag;
+    
     result = VMERead(fifoStateAddress,
                      GetAddressModifier(),
                      (uint32_t) 4,
@@ -37,9 +38,15 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
         
         //we want to read as much as possible to have the highest thru-put
         int32_t                                     numEventsToRead = 1;
-        if(fifoState & kGretina4MFIFO30KFull)       numEventsToRead = 256;
-        else if(fifoState & kGretina4MFIFO16KFull)  numEventsToRead = 128;
-
+        if(fifoState & kGretina4MFIFO30KFull){
+            numEventsToRead = 256;
+            fifoFlag = 0x80000000;
+        }
+        else if(fifoState & kGretina4MFIFO16KFull){
+            numEventsToRead = 128;
+            fifoFlag = 0x40000000;
+        }
+        
         //printf("num to read: %d\n",numEventsToRead);
        // int32_t count = 0;
         int32_t i;
@@ -48,7 +55,7 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
      
             int32_t savedIndex      = dataIndex;
             data[dataIndex++]       = dataId | 1026;
-            data[dataIndex++]       = location;
+            data[dataIndex++]       = location | fifoFlag;
             int32_t firstDataIndex  = dataIndex;
 
             if(kUseDMA){
