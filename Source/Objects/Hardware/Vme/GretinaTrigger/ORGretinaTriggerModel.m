@@ -586,6 +586,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
                     [self resetScaler];
                     [self writeRegister:kPulsedCtl2 withValue:0x1000]; //send one imp syn
                     [self readDisplayRegs];
+                    [self shipDataRecord];
                }
                 else {
                     [self initClockDistribution];
