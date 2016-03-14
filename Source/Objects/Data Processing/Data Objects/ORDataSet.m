@@ -1037,29 +1037,33 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 			[currentLevel incrementTotalCounts];
 			
 		} while((s = va_arg(myArgs, NSString *)));
-		
-		ORWaveform* waveform = [nextLevel data];
-		if(!waveform){
-			waveform = [[ORWaveform alloc] init];
-			[waveform setDataSet:self];
-			[waveform setDataOffset:anOffset];
-			[waveform setKey:[nextLevel key]];
-			[waveform setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
-			[waveform setUnitSize:aUnitSize];
-			[nextLevel setData:waveform];
-			[waveform setWaveform:aWaveForm];       
-			[waveform release];
-			[[NSNotificationCenter defaultCenter]
-			 postNotificationName:ORDataSetAdded
-			 object:self
-			 userInfo: nil];
-		}
-		
-		else {
-            [waveform setDataOffset:anOffset];
-			[waveform setUnitSize:aUnitSize];            
-			[waveform setWaveform:aWaveForm];
-		}
+        ORWaveform* waveform = [nextLevel data];
+        if(aWaveForm){
+            if(!waveform){
+                waveform = [[ORWaveform alloc] init];
+                [waveform setDataSet:self];
+                [waveform setDataOffset:anOffset];
+                [waveform setKey:[nextLevel key]];
+                [waveform setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
+                [waveform setUnitSize:aUnitSize];
+                [nextLevel setData:waveform];
+                [waveform setWaveform:aWaveForm]; //increments the count
+                [waveform release];
+                [[NSNotificationCenter defaultCenter]
+                 postNotificationName:ORDataSetAdded
+                 object:self
+                 userInfo: nil];
+            }
+            
+            else {
+                [waveform setDataOffset:anOffset];
+                [waveform setUnitSize:aUnitSize];            
+                [waveform setWaveform:aWaveForm];
+            }
+        }
+        else {
+            [waveform incrementTotalCounts]; //count only
+        }
 		va_end(myArgs);
 	}   
 }
@@ -1199,6 +1203,7 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 
 - (void) loadWaveform:(NSData*)aWaveForm offset:(unsigned long)anOffset unitSize:(int)aUnitSize startIndex:(unsigned long)aStartIndex mask:(unsigned long)aMask sender:(id)obj  withKeys:(NSString*)firstArg,...
 {
+    //if aWaveForm == nil then only increment the counts without displaying the waveform
 	@synchronized(self){  
 		va_list myArgs;
 		va_start(myArgs,firstArg);
