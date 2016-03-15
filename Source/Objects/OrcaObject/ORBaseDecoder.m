@@ -71,6 +71,7 @@ static NSString* kCrateKey[16] = {
 	[cachedObjects release];
 	[cachedObjectsLock unlock];
 	[cachedObjectsLock release];
+    [decoderOptions release];
     [super dealloc];
 }
 
@@ -94,7 +95,6 @@ static NSString* kCrateKey[16] = {
 
 - (void) runStarted:(NSNotification*)aNote
 {
-    firstTime = YES;
 }
 
 - (void) runStopped:(NSNotification*)aNote
