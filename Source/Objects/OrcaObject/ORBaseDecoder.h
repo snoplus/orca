@@ -25,12 +25,12 @@
 @class ORDataSet;
 
 @interface ORBaseDecoder : NSObject {
+    NSMutableDictionary* decoderOptions;
 	@private
 		NSMutableDictionary* cachedObjects;	//decoder can cache info here
 		NSLock* cachedObjectsLock;
     @protected
         BOOL skipRateCounts;
-        BOOL firstTime;
 
 }
 - (void) setSkipRateCounts:(BOOL)aState;

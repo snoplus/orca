@@ -113,23 +113,31 @@
             
             [aDataSet histogram:energy numBins:0x1fff sender:self  withKeys:@"Gretina4M", @"Energy",crateKey,cardKey,channelKey,nil];
             
+            
             BOOL fullDecode = NO;
             
             struct timeval tv;
             gettimeofday(&tv, NULL);
-            if(lastTime == 0) firstTime = YES;
             
             unsigned long long now =
                 (unsigned long long)(tv.tv_sec) * 1000 +
                 (unsigned long long)(tv.tv_usec) / 1000;
+            
+            if(!decoderOptions){
+                decoderOptions = [[NSMutableDictionary dictionary]retain];
+            }
+            
+            NSString* lastTimeKey = [NSString stringWithFormat:@"%@,%@,%@,LastTime",crateKey,cardKey,channelKey];
+            
+            unsigned long long lastTime = [[decoderOptions objectForKey:lastTimeKey] unsignedLongLongValue];
 
             if(now - lastTime >= 100){
                 fullDecode = YES;
-                lastTime = now;
+                [decoderOptions setObject:[NSNumber numberWithUnsignedLongLong:now] forKey:lastTimeKey];
             }
 
             NSMutableData* tmpData = nil;
-            if(firstTime || fullDecode){
+            if(fullDecode){
             
                 dataPtr += 11; //point to the data
 
@@ -178,8 +186,6 @@
   
         }
     }
-	 
-    firstTime = NO;
     
     return length; //must return number of longs
 }
