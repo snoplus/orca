@@ -439,7 +439,7 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
         
         if([self tertiaryPerson])[messageToSend appendFormat:@"Tertiary: %@\n",[[self tertiaryPerson] name]];
         else [messageToSend appendString:@"Tertiary: NO ONE\n"];
-        [messageToSend appendString:@"\nThis message was send to the entire list.\n"];
+        [messageToSend appendString:@"\nThis message was sent to the entire list.\n"];
 
     }
     else {
