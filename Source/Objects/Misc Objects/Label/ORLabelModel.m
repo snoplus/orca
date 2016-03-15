@@ -215,6 +215,9 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 
 - (void) setLabel:(NSString*)aLabel
 {
+    
+    if(![aLabel isKindOfClass:NSClassFromString(@"NSString")])aLabel = @"Bad Label";
+    
     if(!aLabel)aLabel = @"Text Label";
     [[[self undoManager] prepareWithInvocationTarget:self] setLabel:label];
     
@@ -514,16 +517,19 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 		}
 		if([s hasSuffix:@"\n"])s = [s substringToIndex:[s length]-1];
 	}
-	NSAttributedString* n;
-	if(highlight){
-		n = [[NSAttributedString alloc] initWithString:[s length]?s:@"Text Label"
-			 attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSFont fontWithName:@"Monaco"  size:textSize],NSFontAttributeName,
-						 [NSColor colorWithCalibratedRed:.5 green:.5 blue:.5 alpha:.3],NSBackgroundColorAttributeName,nil]];
-	}
-	else {
-		n= [[NSAttributedString alloc] initWithString:[s length]?s:@"Text Label"
-			attributes:[NSDictionary dictionaryWithObject:[NSFont fontWithName:@"Monaco" size:textSize] forKey:NSFontAttributeName]];
-	}
+    NSAttributedString* n = nil;
+    if([s isKindOfClass:NSClassFromString(@"NSString")]){
+        if(highlight){
+            n = [[NSAttributedString alloc] initWithString:[s length]?s:@"Text Label"
+                 attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSFont fontWithName:@"Monaco"  size:textSize],NSFontAttributeName,
+                             [NSColor colorWithCalibratedRed:.5 green:.5 blue:.5 alpha:.3],NSBackgroundColorAttributeName,nil]];
+        }
+        else {
+            n= [[NSAttributedString alloc] initWithString:[s length]?s:@"Text Label"
+                attributes:[NSDictionary dictionaryWithObject:[NSFont fontWithName:@"Monaco" size:textSize] forKey:NSFontAttributeName]];
+        }
+    }
+
 	
 	return [n autorelease];
 }
