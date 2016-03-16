@@ -1591,7 +1591,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
         for(i=0;i<kNumGretina4MChannels;i++){
             [self writeControlReg:i enabled:NO];
         }
-   // }
+    }
     
     //write the card level params
     [self writeClockSource];
@@ -1607,15 +1607,19 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     //write the channel level params
     for(i=0;i<kNumGretina4MChannels;i++) {
         if([self enabled:i]){
-            [self writeLEDThreshold:i];
-            [self writeTrapThreshold:i];
+            if([self trapEnabled:i]){
+                [self writeTrapThreshold:i];
+            }
+            else {
+                [self writeLEDThreshold:i];
+            }
             [self writeWindowTiming:i];
             [self writeRisingEdgeWindow:i];
         }
     }
     
 
-   // if(doChannelEnable){
+    if(doChannelEnable){
         [self resetFIFO];
         for(i=0;i<kNumGretina4MChannels;i++){
             if([self enabled:i]){
