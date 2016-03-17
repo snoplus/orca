@@ -2549,7 +2549,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     
     BOOL doChannelEnable = [[userInfo objectForKey:@"doinit"]boolValue]==1;
     [self initBoard:doChannelEnable];
-    if(!doChannelEnable) NSLog(@" %@ Quick Start Enabled. Channels NOT disabled. Only Changed values written\n",[self fullID]);
+    if(!doChannelEnable) NSLog(@" %@ Quick Start Enabled. Channels NOT disabled/enabled.\n",[self fullID]);
     
     if([self diagnosticsEnabled])[self briefDiagnosticsReport];
     
