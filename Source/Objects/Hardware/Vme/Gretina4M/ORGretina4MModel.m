@@ -1591,7 +1591,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
         for(i=0;i<kNumGretina4MChannels;i++){
             [self writeControlReg:i enabled:NO];
         }
-    }
+    
     
     //write the card level params
     [self writeClockSource];
@@ -1617,15 +1617,15 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
             [self writeRisingEdgeWindow:i];
         }
     }
-    
-
-    if(doChannelEnable){
         [self resetFIFO];
+
+    //if(doChannelEnable){
         for(i=0;i<kNumGretina4MChannels;i++){
             if([self enabled:i]){
                 [self writeControlReg:i enabled:YES];
             }
         }
+
     }
     
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MCardInited object:self];
