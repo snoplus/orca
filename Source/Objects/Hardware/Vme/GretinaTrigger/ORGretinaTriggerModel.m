@@ -548,11 +548,23 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             
             if(![self locked] && [gOrcaGlobals runInProgress]){
                 [self shipDataRecord];
-                [[NSNotificationCenter defaultCenter] postNotificationName:ORRequestRunRestart
-                                                                    object:self
-                                                                  userInfo:[NSDictionary dictionaryWithObjectsAndKeys:@"Clock Lock Lost",@"Reason",@"Master Trigger card reported lost lock",@"Details",nil]];
-
+                
+                NSArray*  runModelObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+                ORRunModel* aRunModel = [runModelObjects objectAtIndex:0];
+                
+                NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:@"Clock Lock Lost",@"Reason",@"Master Trigger card reported lost lock",@"Details",nil];
+                if(([aRunModel quickStart])){
+                    [[NSNotificationCenter defaultCenter] postNotificationName:ORRequestRunHalt
+                                                                        object:self
+                                                                      userInfo:userInfo];
+                }
+                else {
+                    [[NSNotificationCenter defaultCenter] postNotificationName:ORRequestRunRestart
+                                                                        object:self
+                                                                      userInfo:userInfo];
+                }
                 [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollLock) object:nil];
+
             }
             [self performSelector:@selector(pollLock) withObject:nil afterDelay:10];
         }
