@@ -2910,7 +2910,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
                             cardBusErrorCounts,                                     @"cardBusErrorCounts",
                             cardMessageCounts,                                      @"cardMessageCounts",
                             nil];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:delegate userInfo:values];
 
     NSDictionary* historyRecord = [NSDictionary dictionaryWithObjectsAndKeys:
                                    [delegate fullID],               @"name",
