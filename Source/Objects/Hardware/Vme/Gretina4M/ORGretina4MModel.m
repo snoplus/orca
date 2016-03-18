@@ -2579,7 +2579,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
             if(dataBuffer[2]==kGretina4MPacketSeparator){
                 short chan = dataBuffer[3] & 0xf;
                 if(chan < kNumGretina4MChannels){
-                    ++waveFormCount[dataBuffer[3] & 0x7];  //grab the channel and inc the count
+                    ++waveFormCount[chan];  //grab the channel and inc the count
                     [aDataPacket addLongsToFrameBuffer:dataBuffer length:kG4MDataPacketSize];
                 }
                 else {
@@ -2671,13 +2671,18 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (BOOL) bumpRateFromDecodeStage:(short)channel
 {
     if(isRunning)return NO;
-    ++waveFormCount[channel];
+    if(channel>=0 && channel<kNumGretina4MChannels){
+        ++waveFormCount[channel];
+    }
     return YES;
 }
 
 - (unsigned long) waveFormCount:(short)aChannel
 {
-    return waveFormCount[aChannel];
+    if(aChannel>=0 && aChannel<kNumGretina4MChannels){
+        return waveFormCount[aChannel];
+    }
+    else return 0;
 }
 
 -(void) startRates
@@ -3040,7 +3045,10 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (unsigned long) eventCount:(int)aChannel
 {
-    return waveFormCount[aChannel];
+    if(aChannel>=0 && aChannel<kNumGretina4MChannels){
+        return waveFormCount[aChannel];
+    }
+    else return 0;
 }
 
 - (void) clearEventCounts

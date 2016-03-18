@@ -177,7 +177,9 @@
                     }
                 }
             }
-            [obj bumpRateFromDecodeStage:channel];
+            if(channel>=0 && channel<kNumGretina4MChannels){
+                [obj bumpRateFromDecodeStage:channel];
+            }
             
             dataPtr = nextRecordPtr;
         }
