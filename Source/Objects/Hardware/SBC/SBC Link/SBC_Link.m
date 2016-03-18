@@ -1275,10 +1275,10 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
     optionBlock.option[0]	= sbcPollingRate;
 	[self sendCommand:kSBC_SetPollingDelay withOptions:&optionBlock expectResponse:YES];
     if(optionBlock.option[0] == 0){
-        NSLog(@"SBC polling at fastest rate\n");
+        NSLog(@"SBC,%d,%d polling at fastest rate\n",[delegate crateNumber],[delegate slot]);
     }
     else {
-        NSLog(@"SBC polling at ~%luHz\n",optionBlock.option[0]);
+        NSLog(@"SBC,%d,%d polling at ~%luHz\n",optionBlock.option[0],[delegate crateNumber],[delegate slot]);
     }
     
     optionBlock.option[0]	= 0;//reset the option block
@@ -2178,7 +2178,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 	else if(anError == ENOMEM)	details = @"Out of Memory";
 	else details = [NSString stringWithFormat:@"%d",anError];
 	//[NSException raise: @"SBC access Error" format:@"%@:%@\nAddress: 0x%08lx",baseString,details,anAddress];
-	[NSException raise: @"SBC access Error" format:@"%@:ErrorCode:%@\nAddress: 0x%08lx ",baseString,details,anAddress];//give more info -tb-
+    [NSException raise: [NSString stringWithFormat:@"SBC,%d,%d access Error",[delegate crateNumber],[delegate slot]] format:@"%@:ErrorCode:%@\nAddress: 0x%08lx ",baseString,details,anAddress];//give more info -tb-
 }
 
 - (void) fillInScript:(NSString*)theScript
@@ -2463,7 +2463,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 	else if (selectionResult == kSelectionTimeout) {
 		[NSException raise:@"ConnectionTimeOut" format:@"Read from %@ <%@> port: %d timed out (A)",[self crateName],IPNumber,portNumber];
 	}
-	if(aPacket->message[0] && (aPacket->cmdHeader.cmdID != kSBC_JobStatus))NSLog(@"socket message:%s\n",aPacket->message);
+	if(aPacket->message[0] && (aPacket->cmdHeader.cmdID != kSBC_JobStatus))NSLog(@"SBC,%d,%d remote message:%s\n",[delegate crateNumber],[delegate slot],aPacket->message);
 } 
 
 - (void) readSocket:(int)aSocket buffer:(SBC_Packet*)aPacket
