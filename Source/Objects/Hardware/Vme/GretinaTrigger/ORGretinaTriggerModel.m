@@ -537,15 +537,11 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             //Since there is just a couple of operations here and we want to be fast just
             //send the commands without going thru a state machine.
             unsigned long aValue = [self readRegister:kMiscCtl1];
-            [self writeRegister:kMiscCtl1 withValue:aValue |= (0x1<<6)];
-            [ORTimer delay:.001];
             [self writeRegister:kMiscCtl1 withValue:aValue &= ~(0x1<<6)];//release
             [self resetScaler];
-            [ORTimer delay:.001];
             [self writeRegister:kPulsedCtl2 withValue:0x1000]; //send one imp syn
             [self readDisplayRegs];
             [self shipDataRecord];
-
         }
     }
 }
