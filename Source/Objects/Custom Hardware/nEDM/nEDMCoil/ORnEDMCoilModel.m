@@ -1602,9 +1602,9 @@ for (id obj in listOfADCs) [obj x];               \
 //    aPtr[3]=0;
 //    aPtr[4]=2;
 //    aPtr[5]=0;
-    NSMutableData* b =[NSMutableData dataWithLength:[a length]];
+ //   NSMutableData* b =[NSMutableData dataWithLength:[a length]];
     //
-    b = [NSMutableData dataWithData:[self _transposeData:a withColumns:nChannel]];
+    NSMutableData* b = [NSMutableData dataWithData:[self _transposeData:a withColumns:nChannel]];
     //double*  bPtr = (double*)[b bytes];
 //    NSMutableData* c =[NSMutableData dataWithLength:[b length]];
     if (regularizationParameter!=0) {
