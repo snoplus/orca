@@ -28,8 +28,7 @@ void freeBMPData(void *info, const void *data, size_t size) {
     }
     uint32_t ulint = 0xFF000000|(((int)([ul blueComponent]*0xFF))<<16)|(((int)([ul greenComponent]*0xFF))<<8)|(((int)([ul redComponent]*0xFF))<<0);
     uint32_t brint = 0xFF000000|(((int)([br blueComponent]*0xFF))<<16)|(((int)([br greenComponent]*0xFF))<<8)|(((int)([br redComponent]*0xFF))<<0);
-    [ul release];
-    [br release];
+
     
     uint32_t *bmp = malloc(dim*dim*sizeof(uint32_t));
     for (int x = 0; x < dim; x++) {
@@ -90,7 +89,6 @@ void freeBMPData(void *info, const void *data, size_t size) {
         for (id brState in dict) {
             [[dict objectForKey:brState] release];
         }
-        [dict release];
     }
     [imageDictionary release];
     [super dealloc];
