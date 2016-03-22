@@ -256,7 +256,9 @@ snotDb = _snotDb;
      * a run. */
     if ([self xl3Mode] != NORMAL_MODE) {
         NSLog(@"xl3 %02d switching to normal mode.\n", [self crateNumber]);
+        [[self undoManager] disableUndoRegistration];
         [self setXl3Mode: NORMAL_MODE];
+        [[self undoManager] enableUndoRegistration];
         [self writeXl3Mode];
     }
 
@@ -1593,7 +1595,9 @@ void SwapLongBlock(void* p, int32_t n)
         return -1;
     }
 
+    [[self undoManager] disableUndoRegistration];
     [self setXl3Mode: ntohl(result->mode)];
+    [[self undoManager] enableUndoRegistration];
 
     return 0;
 }
