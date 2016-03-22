@@ -198,8 +198,8 @@ NSString* ORMJDDewarScaleValueChanged           = @"ORMJDDewarScaleValueChanged"
                                     valueCount++;
                                     
                                     float lbs;
-                                    if(aScale == 0) lbs = 0.8712*adc - 478.04;
-                                    else            lbs = 0.8691*adc - 476.61;
+                                    if(aScale == 0) lbs = 1.223*adc - 478.9;
+                                    else            lbs = 1.194*adc - 462.6;
                                     
                                     float aValue = ((lbs - 23.0)/307.0)*100.;
                                     
