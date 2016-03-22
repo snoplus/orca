@@ -159,7 +159,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
     }
     else {
         if(!runModeAlarm){
-            runModeAlarm = [[ORAlarm alloc] initWithName:@"Offline Run" severity:kDataFlowAlarm];
+            runModeAlarm = [[ORAlarm alloc] initWithName:@"Offline Run" severity:kInformationAlarm];
             [runModeAlarm setSticky:YES];
             [runModeAlarm setHelpStringFromFile:@"OfflineRunHelp"];
         }

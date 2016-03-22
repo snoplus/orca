@@ -526,6 +526,23 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
         unsigned long aValue = [self readRegister:kMiscCtl1];
         [self writeRegister:kMiscCtl1 withValue:aValue |= (0x1<<6)]; //set the Imp Syn
         [self setMiscCtl1Reg:       [self readRegister:kMiscCtl1]];  //display it
+        
+        //At Jason's request reset the clock at the end of run
+        NSArray*  runModelObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+        ORRunModel* aRunModel = [runModelObjects objectAtIndex:0];
+        if([aRunModel quickStart]){
+            NSLog(@"Reset the timestamps\n");
+            //to reset the clocks set bit 6 of the MISC_CTRL reg
+            //When this bit is set, the timestamp counter is held reset with value of zero
+            //Since there is just a couple of operations here and we want to be fast just
+            //send the commands without going thru a state machine.
+            unsigned long aValue = [self readRegister:kMiscCtl1];
+            [self writeRegister:kMiscCtl1 withValue:aValue &= ~(0x1<<6)];//release
+            [self resetScaler];
+            [self writeRegister:kPulsedCtl2 withValue:0x1000]; //send one imp syn
+            [self readDisplayRegs];
+            [self shipDataRecord];
+        }
     }
 }
 
@@ -548,11 +565,23 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             
             if(![self locked] && [gOrcaGlobals runInProgress]){
                 [self shipDataRecord];
-                [[NSNotificationCenter defaultCenter] postNotificationName:ORRequestRunRestart
-                                                                    object:self
-                                                                  userInfo:[NSDictionary dictionaryWithObjectsAndKeys:@"Clock Lock Lost",@"Reason",@"Master Trigger card reported lost lock",@"Details",nil]];
-
+                
+                NSArray*  runModelObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+                ORRunModel* aRunModel = [runModelObjects objectAtIndex:0];
+                
+                NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:@"Clock Lock Lost",@"Reason",@"Master Trigger card reported lost lock",@"Details",nil];
+                if([aRunModel quickStart]){
+                    [[NSNotificationCenter defaultCenter] postNotificationName:ORRequestRunHalt
+                                                                        object:self
+                                                                      userInfo:userInfo];
+                }
+                else {
+                    [[NSNotificationCenter defaultCenter] postNotificationName:ORRequestRunRestart
+                                                                        object:self
+                                                                      userInfo:userInfo];
+                }
                 [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollLock) object:nil];
+
             }
             [self performSelector:@selector(pollLock) withObject:nil afterDelay:10];
         }
@@ -575,7 +604,9 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             @try {
                 [self readRegister:kBoardID];
                // [self pulseNIMOutput];
-                [self initClockDistribution];
+                if(![(ORRunModel*)[aNote object] quickStart]){
+                    [self initClockDistribution];
+                }
             }
             @catch(NSException* e){
                 NSLog(@"%@:%@ Exception: %@\n",[self fullID],NSStringFromSelector(_cmd),e);
@@ -1108,7 +1139,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
         }
     }
     else {
-        NSLogColor([NSColor redColor],@"Illegal call. Do not call %@ on a Router card./n",NSStringFromSelector(_cmd));
+        NSLogColor([NSColor redColor],@"Illegal call. Do not call %@ on a Router card.\n",NSStringFromSelector(_cmd));
         return NO;
     }
     [self setLocked:lockState];
@@ -1142,7 +1173,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
         return lockState;
     }
     else {
-        NSLogColor([NSColor redColor],@"Illegal call. Do not call %@ on the Master Trigger card./n",NSStringFromSelector(_cmd));
+        NSLogColor([NSColor redColor],@"Illegal call. Do not call %@ on the Master Trigger card.\n",NSStringFromSelector(_cmd));
         return NO;
     }
 }
@@ -1160,7 +1191,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
         }
     }
     else {
-        NSLogColor([NSColor redColor],@"Illegal call. Do not call %@ on a Router card./n",NSStringFromSelector(_cmd));
+        NSLogColor([NSColor redColor],@"Illegal call. Do not call %@ on a Router card.\n",NSStringFromSelector(_cmd));
     }
 }
 
@@ -1173,17 +1204,17 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
                 ORGretina4MModel* digitizerObj   = [[linkConnector[i] connector] objectLink];
                 if(digitizerObj){
                     if(![digitizerObj isLocked]){
-                        NSLogColor([NSColor redColor],@"%@: NOT Lock./n",[digitizerObj fullID]);
+                        NSLogColor([NSColor redColor],@"%@: NOT Lock.\n",[digitizerObj fullID]);
                     }
                     else {
-                        NSLog(@"%@: Locked./n",[digitizerObj fullID]);
+                        NSLog(@"%@: Locked.\n",[digitizerObj fullID]);
                     }
                 }
             }
         }
     }
     else {
-        NSLogColor([NSColor redColor],@"Illegal call. Do not call %@ on the Master Trigger card./n",NSStringFromSelector(_cmd));
+        NSLogColor([NSColor redColor],@"Illegal call. Do not call %@ on the Master Trigger card.\n",NSStringFromSelector(_cmd));
     }
 }
 

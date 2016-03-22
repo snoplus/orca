@@ -80,6 +80,7 @@
     IBOutlet NSButton*      statusButton;
     IBOutlet NSButton*      noiseFloorButton;
     IBOutlet NSButton*      easySetButton;
+    IBOutlet NSButton*      loadThresholdsButton;
 
 	IBOutlet NSPopUpButton* downSamplePU;
 	
@@ -114,7 +115,8 @@
 	IBOutlet NSButton*		writeSPIButton;
 	IBOutlet NSButton*		dumpAllRegistersButton;
 	IBOutlet NSButton*		snapShotRegistersButton;
-	IBOutlet NSButton*		compareRegistersButton;
+    IBOutlet NSButton*		compareRegistersButton;
+    IBOutlet NSButton*		printThresholdsButton;
 	
     IBOutlet NSButton*		diagnosticsEnabledCB;
     IBOutlet NSButton*		diagnosticsReportButton;
@@ -286,6 +288,7 @@
 - (IBAction) spiWriteValueAction:(id)sender;
 - (IBAction) writeSPIAction:(id)sender;
 - (IBAction) dumpAllRegisters:(id)sender;
+- (IBAction) printThresholds:(id)sender;
 
 - (IBAction) openEasySetPanel:(id)sender;
 - (IBAction) closeEasySetPanel:(id)sender;
@@ -295,6 +298,7 @@
 - (IBAction) snapShotRegistersAction:(id)sender;
 - (IBAction) compareToSnapShotAction:(id)sender;
 - (IBAction) viewPreampAction:(id)sender;
+- (IBAction) loadThresholdsAction:(id)sender;
 
 
 #pragma mark •••Data Source

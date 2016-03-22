@@ -152,14 +152,14 @@ resistorDocDic = _resistorDocDic;
     
         //reasonbox
         NSString *reasonString = [[model currentQueryResults] objectForKey:@"reason"];
-        if([reasonString isEqualToString:NULL]){
+        if(!reasonString){
             reasonString = @"";
         }
         [updateReasonBox setStringValue:reasonString];
         
         //infoBox
         NSString *infoString = [[model currentQueryResults] objectForKey:@"info"];
-        if([infoString isEqualToString:NULL]){
+        if(!infoString){
             infoString = @"";
         }
         [updateInfoForPull setStringValue:infoString];
@@ -210,8 +210,7 @@ resistorDocDic = _resistorDocDic;
     [runRange setObject:[NSNumber numberWithInt:currentRunNumber] atIndexedSubscript:1];
     
     //Update the old document with the new values
-    NSMutableDictionary *oldResistorDocDic = [[NSMutableDictionary alloc] initWithCapacity:10];
-    oldResistorDocDic = [[model currentQueryResults] mutableCopy];
+    NSMutableDictionary *oldResistorDocDic = [[model currentQueryResults] mutableCopy];
     [oldResistorDocDic setObject:runRange forKey:@"run_range"];
     
     /* Strictly only allow a run range were the currentRunNumber is larger than the current run number*/
@@ -245,7 +244,7 @@ resistorDocDic = _resistorDocDic;
     [newResistorDoc setObject:[NSNumber numberWithInt:[pulledCableString intValue]] forKey:@"pulledCable"];
     [newResistorDoc setObject:pmtReinstalledString forKey:@"PmtReInstalled"];
     [newResistorDoc setObject:[NSNumber numberWithInt:channelNumber] forKey:@"channel"];
-    self.resistorDocDic = [newResistorDoc mutableCopy];
+    self.resistorDocDic = [[newResistorDoc mutableCopy] autorelease];
     [model checkIfDocumentExists:crateNumber withCard:cardNumber withChannel:channelNumber withRunRange:newRunRange];
     
     

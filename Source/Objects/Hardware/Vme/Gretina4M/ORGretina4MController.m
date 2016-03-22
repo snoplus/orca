@@ -1028,7 +1028,9 @@
 	[pileUpMatrix           setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[dumpAllRegistersButton setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[snapShotRegistersButton setEnabled:!lockedOrRunningMaintenance && !downloading];
-	[compareRegistersButton setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [compareRegistersButton setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [printThresholdsButton  setEnabled:!downloading];
+    [loadThresholdsButton   setEnabled:!lockedOrRunningMaintenance && !downloading];
 
     [baselineRestoredDelayField setEnabled:!lockedOrRunningMaintenance && !downloading];
     [collectionTimeField        setEnabled:!lockedOrRunningMaintenance && !downloading];
@@ -1520,6 +1522,11 @@
 	[model setSPIWriteValue:[sender intValue]];
 }
 
+- (IBAction) printThresholds:(id)sender
+{
+    [model printThresholds];
+}
+
 - (IBAction) writeSPIAction:(id)sender
 {
 	[self endEditing];
@@ -1801,6 +1808,12 @@
 - (IBAction) viewPreampAction:(id)sender
 {
     [model openPreampDialog];
+}
+
+- (IBAction) loadThresholdsAction:(id)sender
+{
+    [self endEditing];
+    [model loadThresholds];
 }
 
 #pragma mark •••Data Source

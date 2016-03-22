@@ -28,8 +28,7 @@ void freeBMPData(void *info, const void *data, size_t size) {
     }
     uint32_t ulint = 0xFF000000|(((int)([ul blueComponent]*0xFF))<<16)|(((int)([ul greenComponent]*0xFF))<<8)|(((int)([ul redComponent]*0xFF))<<0);
     uint32_t brint = 0xFF000000|(((int)([br blueComponent]*0xFF))<<16)|(((int)([br greenComponent]*0xFF))<<8)|(((int)([br redComponent]*0xFF))<<0);
-    [ul release];
-    [br release];
+
     
     uint32_t *bmp = malloc(dim*dim*sizeof(uint32_t));
     for (int x = 0; x < dim; x++) {
@@ -62,7 +61,9 @@ void freeBMPData(void *info, const void *data, size_t size) {
     CGImageRef iref = CGImageCreate(dim, dim, bitsPerComponent, bitsPerPixel, bytesPerRow, colorSpaceRef, bitmapInfo, provider, NULL, YES, renderingIntent);
     
     NSImage *img = [[NSImage alloc] initWithCGImage:iref size:NSMakeSize(dim, dim)];
-    return img;
+    CGImageRelease(iref);
+    CGColorSpaceRelease(colorSpaceRef);
+    return [img autorelease];
 }
 
 - (ORMultiStateBox*) initWithStates:(NSDictionary*)stateDictionary size:(int)sz pad:(int)pad bevel:(int)bev
@@ -71,7 +72,7 @@ void freeBMPData(void *info, const void *data, size_t size) {
         imageDictionary = [[NSMutableDictionary alloc] init];
         for (id ulState in stateDictionary) {
             NSColor *ulColor = [stateDictionary objectForKey:ulState];
-            NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+            NSMutableDictionary *dict = [[[NSMutableDictionary alloc] init] autorelease];
             for (id brState in stateDictionary) {
                 NSColor *brColor = [stateDictionary objectForKey:brState];
                 NSImage *img = [ORMultiStateBox splitBox:sz pad:pad bevel:bev upLeft:ulColor botRight:brColor];
@@ -85,13 +86,6 @@ void freeBMPData(void *info, const void *data, size_t size) {
 
 - (void) dealloc
 {
-    for (id ulState in imageDictionary) {
-        NSMutableDictionary *dict = [imageDictionary objectForKey:ulState];
-        for (id brState in dict) {
-            [[dict objectForKey:brState] release];
-        }
-        [dict release];
-    }
     [imageDictionary release];
     [super dealloc];
 }

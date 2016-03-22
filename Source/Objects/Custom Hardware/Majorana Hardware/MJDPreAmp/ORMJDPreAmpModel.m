@@ -1170,7 +1170,12 @@ struct {
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollValues) object:nil];
     if(connected){
-        [self readAllAdcs];
+        @try {
+            [self readAllAdcs];
+        }
+        @catch(NSException* e){
+            
+        }
         [self updateTrends];
         [self postCouchDBRecord];
         if(shipValues)[self shipRecords];
@@ -1439,6 +1444,8 @@ struct {
 - (void) checkTempIsWithinLimits
 {
     if(!connected)return;
+    
+    return; //temps don't work -- don't alarm
     
     float maxAllowedTemperature = 1000; //temporarily set high because the temp readout isn't working right
     int aChip;

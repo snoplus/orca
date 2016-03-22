@@ -948,7 +948,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
         _forceRestart = YES;
        [self stopRun];
     }
-    else [self startRun:NO];
+    else [self startRun:!quickStart];
 }
 
 - (void) remoteStartRun:(unsigned long)aRunNumber
@@ -1765,7 +1765,9 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	[NSThread setThreadPriority:1];
 
 	dataTakingThreadRunning = YES;
-    [self clearExceptionCount];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self clearExceptionCount];
+    });
     while(!timeToStopTakingData) {
         NSAutoreleasePool *pool = [[NSAutoreleasePool allocWithZone:nil] init];
         @try {
@@ -1777,13 +1779,15 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 			}
 		}
 		@catch(NSException* localException) {
-            [self incExceptionCount];
             NSLogError(@"Uncaught exception",@"Main Run Loop",nil);
-			[self performSelectorOnMainThread:@selector(haltRun) withObject:nil waitUntilDone:NO];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self incExceptionCount];
+                [self haltRun];
+            });
         }
         [pool release];
     }
-    
+    [runInfo setObject:[NSNumber numberWithBool:!quickStart] forKey:@"doinit"];
 	[client runIsStopping:runInfo];
 	
 	@try {
@@ -1796,7 +1800,9 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		}while(!allDone);
 	}
 	@catch(NSException* localException) {
-		[self incExceptionCount];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self incExceptionCount];
+        });
 		NSLogError(@"Uncaught exception",@"Run Loop Cleanup",nil);
 	}
 	

@@ -45,19 +45,14 @@ static NSString* valueChangeString[kNumActions] = {
 
 - (id) init
 {
-    if ((self = [super init]) != nil){
+    self = [super init];
 #if !defined(MAC_OS_X_VERSION_10_9)
-        if (![NSBundle loadNibNamed:@"ActionView" owner:self]){
+    [NSBundle loadNibNamed:@"ActionView" owner:self];
 #else
-        if (![[NSBundle mainBundle] loadNibNamed:@"ActionView" owner:self topLevelObjects:&topLevelObjects]){
+    [[NSBundle mainBundle] loadNibNamed:@"ActionView" owner:self topLevelObjects:&topLevelObjects];
+    [topLevelObjects retain];
 #endif
-            [self release];
-            self = nil;
-            return self;
-        }
-        [topLevelObjects retain];
-        [self setParameterValue:[NSNumber numberWithInt:0]];
-    }
+    [self setParameterValue:[NSNumber numberWithInt:0]];
     
     return self;
 }
@@ -65,10 +60,9 @@ static NSString* valueChangeString[kNumActions] = {
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [subview release];
+    [topLevelObjects release];
     [paramArray release];
     [parameterValue release];
-    [topLevelObjects release];
     [super dealloc];
 }
 
