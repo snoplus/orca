@@ -660,6 +660,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
         [[self undoManager] enableUndoRegistration];
     } else {
         NSLog(@"crate %d slot %d hardware loaded!\n", [self crateNumber], [self stationNumber]);
+        free(r);
     }
 }
 

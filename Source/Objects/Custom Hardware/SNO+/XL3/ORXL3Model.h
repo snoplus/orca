@@ -295,7 +295,7 @@ enum {
 - (unsigned long) readXL3Register:(short)aRegister;
 
 - (int) updateXl3Mode;
-- (int) setSequencerMasks: (uint32_t) slotMask;
+- (int) setSequencerMask: (uint32_t) mask forSlot: (int) slot;
 - (void) initCrate: (int) xilinxLoad;
 - (void) initCrateDone: (CrateInitResults *)r;
 - (void) loadHardware;
@@ -303,8 +303,8 @@ enum {
 - (void) loadHardwareWithSlotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target;
 - (void) initCrateAsync: (int) xilinxLoad shiftRegOnly: (uint32_t) shiftRegOnly slotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target;
 - (void) initCrateAsyncThread: (NSDictionary *) args;
-- (void) initCrate: (int) xilinxLoad shiftRegOnly: (uint32_t) shiftRegOnly slotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target;
-- (int) initCrate: (int) xilinxLoad shiftRegOnly: (uint32_t) shiftRegOnly slotMask: (uint32_t) slotMask results: (CrateInitResults *) results;
+- (void) initCrate: (MB *) mbs xilinxLoad: (int) xilinxLoad shiftRegOnly: (uint32_t) shiftRegOnly slotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target;
+- (int) initCrate: (MB *) mbs xilinxLoad: (int) xilinxLoad shiftRegOnly: (uint32_t) shiftRegOnly slotMask: (uint32_t) slotMask results: (CrateInitResults *) results;
 - (void) checkCrateConfig: (BuildCrateConfigResults *)r;
 
 - (uint32_t) getSlotsPresent;
