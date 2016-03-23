@@ -242,6 +242,23 @@
 		3672CF8F1C4EB15000870996 /* SNOCaenController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3672CF841C4EB15000870996 /* SNOCaenController.m */; };
 		3672CF921C4EB15000870996 /* SNOCaenModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 3672CF871C4EB15000870996 /* SNOCaenModel.h */; };
 		3672CF931C4EB15000870996 /* SNOCaenModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 3672CF881C4EB15000870996 /* SNOCaenModel.m */; };
+		3A5DADFF1C85FB2D007E283C /* WPBase64Utils.h in Headers */ = {isa = PBXBuildFile; fileRef = 3A5DADF21C85FB2D007E283C /* WPBase64Utils.h */; };
+		3A5DAE001C85FB2D007E283C /* WPBase64Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 3A5DADF31C85FB2D007E283C /* WPBase64Utils.m */; };
+		3A5DAE011C85FB2D007E283C /* WPStringUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 3A5DADF41C85FB2D007E283C /* WPStringUtils.h */; };
+		3A5DAE021C85FB2D007E283C /* WPStringUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 3A5DADF51C85FB2D007E283C /* WPStringUtils.m */; };
+		3A5DAE031C85FB2D007E283C /* WPXMLRPC.h in Headers */ = {isa = PBXBuildFile; fileRef = 3A5DADF61C85FB2D007E283C /* WPXMLRPC.h */; };
+		3A5DAE041C85FB2D007E283C /* WPXMLRPCDataCleaner.h in Headers */ = {isa = PBXBuildFile; fileRef = 3A5DADF71C85FB2D007E283C /* WPXMLRPCDataCleaner.h */; };
+		3A5DAE051C85FB2D007E283C /* WPXMLRPCDataCleaner.m in Sources */ = {isa = PBXBuildFile; fileRef = 3A5DADF81C85FB2D007E283C /* WPXMLRPCDataCleaner.m */; };
+		3A5DAE061C85FB2D007E283C /* WPXMLRPCDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 3A5DADF91C85FB2D007E283C /* WPXMLRPCDecoder.h */; };
+		3A5DAE071C85FB2D007E283C /* WPXMLRPCDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 3A5DADFA1C85FB2D007E283C /* WPXMLRPCDecoder.m */; };
+		3A5DAE081C85FB2D007E283C /* WPXMLRPCDecoderDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 3A5DADFB1C85FB2D007E283C /* WPXMLRPCDecoderDelegate.h */; };
+		3A5DAE091C85FB2D007E283C /* WPXMLRPCDecoderDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3A5DADFC1C85FB2D007E283C /* WPXMLRPCDecoderDelegate.m */; };
+		3A5DAE0A1C85FB2D007E283C /* WPXMLRPCEncoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 3A5DADFD1C85FB2D007E283C /* WPXMLRPCEncoder.h */; };
+		3A5DAE0B1C85FB2D007E283C /* WPXMLRPCEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 3A5DADFE1C85FB2D007E283C /* WPXMLRPCEncoder.m */; };
+		3A5DAE0F1C85FB37007E283C /* XmlrpcClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 3A5DAE0D1C85FB37007E283C /* XmlrpcClient.h */; };
+		3A5DAE101C85FB37007E283C /* XmlrpcClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 3A5DAE0E1C85FB37007E283C /* XmlrpcClient.m */; };
+		3A8CD5401C88996000589ADE /* libiconv.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3A8CD53F1C88996000589ADE /* libiconv.2.dylib */; };
+		3A8CD5411C889A0200589ADE /* libiconv.2.dylib in Frameworks_Copy */ = {isa = PBXBuildFile; fileRef = 3A77AF0C1C889822008C2FAA /* libiconv.2.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		43135802195C5D89007B1F15 /* ORGretinaTriggerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 43135801195C5D89007B1F15 /* ORGretinaTriggerModel.m */; };
 		43135804195C5DA3007B1F15 /* ORGretinaTriggerModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 43135803195C5DA3007B1F15 /* ORGretinaTriggerModel.h */; };
 		4322E9B217830004008E78A4 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4322E9B117830004008E78A4 /* GLUT.framework */; };
@@ -3658,6 +3675,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				3A8CD5411C889A0200589ADE /* libiconv.2.dylib in Frameworks_Copy */,
 				8475EC8B147693E8003A165D /* libusb-1.0.a in Frameworks_Copy */,
 				EF3787A012DFFF90003C814E /* YAJL.framework in Frameworks_Copy */,
 			);
@@ -3880,6 +3898,23 @@
 		3672CF841C4EB15000870996 /* SNOCaenController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SNOCaenController.m; sourceTree = "<group>"; };
 		3672CF871C4EB15000870996 /* SNOCaenModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNOCaenModel.h; sourceTree = "<group>"; };
 		3672CF881C4EB15000870996 /* SNOCaenModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SNOCaenModel.m; sourceTree = "<group>"; };
+		3A5DADF21C85FB2D007E283C /* WPBase64Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WPBase64Utils.h; sourceTree = "<group>"; };
+		3A5DADF31C85FB2D007E283C /* WPBase64Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WPBase64Utils.m; sourceTree = "<group>"; };
+		3A5DADF41C85FB2D007E283C /* WPStringUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WPStringUtils.h; sourceTree = "<group>"; };
+		3A5DADF51C85FB2D007E283C /* WPStringUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WPStringUtils.m; sourceTree = "<group>"; };
+		3A5DADF61C85FB2D007E283C /* WPXMLRPC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WPXMLRPC.h; sourceTree = "<group>"; };
+		3A5DADF71C85FB2D007E283C /* WPXMLRPCDataCleaner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WPXMLRPCDataCleaner.h; sourceTree = "<group>"; };
+		3A5DADF81C85FB2D007E283C /* WPXMLRPCDataCleaner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WPXMLRPCDataCleaner.m; sourceTree = "<group>"; };
+		3A5DADF91C85FB2D007E283C /* WPXMLRPCDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WPXMLRPCDecoder.h; sourceTree = "<group>"; };
+		3A5DADFA1C85FB2D007E283C /* WPXMLRPCDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WPXMLRPCDecoder.m; sourceTree = "<group>"; };
+		3A5DADFB1C85FB2D007E283C /* WPXMLRPCDecoderDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WPXMLRPCDecoderDelegate.h; sourceTree = "<group>"; };
+		3A5DADFC1C85FB2D007E283C /* WPXMLRPCDecoderDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WPXMLRPCDecoderDelegate.m; sourceTree = "<group>"; };
+		3A5DADFD1C85FB2D007E283C /* WPXMLRPCEncoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WPXMLRPCEncoder.h; sourceTree = "<group>"; };
+		3A5DADFE1C85FB2D007E283C /* WPXMLRPCEncoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WPXMLRPCEncoder.m; sourceTree = "<group>"; };
+		3A5DAE0D1C85FB37007E283C /* XmlrpcClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XmlrpcClient.h; sourceTree = "<group>"; };
+		3A5DAE0E1C85FB37007E283C /* XmlrpcClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XmlrpcClient.m; sourceTree = "<group>"; };
+		3A77AF0C1C889822008C2FAA /* libiconv.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libiconv.2.dylib; sourceTree = "<group>"; };
+		3A8CD53F1C88996000589ADE /* libiconv.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.2.dylib; path = usr/lib/libiconv.2.dylib; sourceTree = SDKROOT; };
 		43135801195C5D89007B1F15 /* ORGretinaTriggerModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGretinaTriggerModel.m; sourceTree = "<group>"; };
 		43135803195C5DA3007B1F15 /* ORGretinaTriggerModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORGretinaTriggerModel.h; sourceTree = "<group>"; };
 		4322E9B117830004008E78A4 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../../System/Library/Frameworks/GLUT.framework; sourceTree = "<group>"; };
@@ -6965,6 +7000,7 @@
 				2DC1EE800F33724E00E93C75 /* WebKit.framework in Frameworks */,
 				840F5B191222C90000D49A75 /* QTKit.framework in Frameworks */,
 				EF37879212DFFF81003C814E /* YAJL.framework in Frameworks */,
+				3A8CD5401C88996000589ADE /* libiconv.2.dylib in Frameworks */,
 				8475EC0B14759D53003A165D /* libusb-1.0.a in Frameworks */,
 				8458E91515DA8A2A005C43A9 /* ScriptingBridge.framework in Frameworks */,
 				8481E67917653766001AB905 /* SystemConfiguration.framework in Frameworks */,
@@ -7163,6 +7199,7 @@
 		2A37F4C3FDCFA73011CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3A8CD53F1C88996000589ADE /* libiconv.2.dylib */,
 				841491F11958AD03009F5E40 /* Cocoa.framework */,
 				8439D5EE05BEFF3A0077EFF2 /* Carbon.framework */,
 				1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */,
@@ -7444,6 +7481,43 @@
 				3672CF881C4EB15000870996 /* SNOCaenModel.m */,
 			);
 			path = CAEN;
+			sourceTree = "<group>";
+		};
+		3A5DADF11C85FB2D007E283C /* WPXMLRPC */ = {
+			isa = PBXGroup;
+			children = (
+				3A5DADF21C85FB2D007E283C /* WPBase64Utils.h */,
+				3A5DADF31C85FB2D007E283C /* WPBase64Utils.m */,
+				3A5DADF41C85FB2D007E283C /* WPStringUtils.h */,
+				3A5DADF51C85FB2D007E283C /* WPStringUtils.m */,
+				3A5DADF61C85FB2D007E283C /* WPXMLRPC.h */,
+				3A5DADF71C85FB2D007E283C /* WPXMLRPCDataCleaner.h */,
+				3A5DADF81C85FB2D007E283C /* WPXMLRPCDataCleaner.m */,
+				3A5DADF91C85FB2D007E283C /* WPXMLRPCDecoder.h */,
+				3A5DADFA1C85FB2D007E283C /* WPXMLRPCDecoder.m */,
+				3A5DADFB1C85FB2D007E283C /* WPXMLRPCDecoderDelegate.h */,
+				3A5DADFC1C85FB2D007E283C /* WPXMLRPCDecoderDelegate.m */,
+				3A5DADFD1C85FB2D007E283C /* WPXMLRPCEncoder.h */,
+				3A5DADFE1C85FB2D007E283C /* WPXMLRPCEncoder.m */,
+			);
+			path = WPXMLRPC;
+			sourceTree = "<group>";
+		};
+		3A5DAE0C1C85FB37007E283C /* XmlrpcClient */ = {
+			isa = PBXGroup;
+			children = (
+				3A5DAE0D1C85FB37007E283C /* XmlrpcClient.h */,
+				3A5DAE0E1C85FB37007E283C /* XmlrpcClient.m */,
+			);
+			path = XmlrpcClient;
+			sourceTree = "<group>";
+		};
+		3A77AF0B1C889822008C2FAA /* libSNO+ */ = {
+			isa = PBXGroup;
+			children = (
+				3A77AF0C1C889822008C2FAA /* libiconv.2.dylib */,
+			);
+			path = "libSNO+";
 			sourceTree = "<group>";
 		};
 		436972B51B42DBE6008D57B5 /* CV1730 */ = {
@@ -11155,6 +11229,8 @@
 		8499FE810DC8E86800E82DB4 /* SNO+ */ = {
 			isa = PBXGroup;
 			children = (
+				3A5DAE0C1C85FB37007E283C /* XmlrpcClient */,
+				3A5DADF11C85FB2D007E283C /* WPXMLRPC */,
 				3672CF7D1C4EB15000870996 /* CAEN */,
 				0F16E30D1C493AD6003C9EC9 /* hiredis */,
 				0F16E30C1C493ACE003C9EC9 /* RedisClient */,
@@ -13592,6 +13668,7 @@
 		84F7FB520AE5558900A5AA4C /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				3A77AF0B1C889822008C2FAA /* libSNO+ */,
 				8475EC0414759D53003A165D /* libusb */,
 				2AE87BDC0D6E486900A839FC /* libUniversal */,
 				84F7FB630AE5569100A5AA4C /* my_alloc.h */,
@@ -14920,6 +14997,7 @@
 				9C38E5590C775F2A00255848 /* ORcPCICardDecoder.h in Headers */,
 				8493CC420C99FA0700B46CD4 /* SBC_Linking.h in Headers */,
 				8493CC430C99FA0700B46CD4 /* SBC_Link.h in Headers */,
+				3A5DAE061C85FB2D007E283C /* WPXMLRPCDecoder.h in Headers */,
 				8493CC450C99FA0700B46CD4 /* SBC_LinkController.h in Headers */,
 				8493CC4D0C99FA0700B46CD4 /* CircularBuffer.h in Headers */,
 				8493CC4E0C99FA0700B46CD4 /* SBC_Cmds.h in Headers */,
@@ -14964,6 +15042,7 @@
 				84997E850CE37CBA002CFA70 /* ORVme64CrateController.h in Headers */,
 				84997E860CE37CBA002CFA70 /* ORVme64CrateModel.h in Headers */,
 				8407751E0CEE7CAD0073F5A9 /* ORHelpCenter.h in Headers */,
+				3A5DAE011C85FB2D007E283C /* WPStringUtils.h in Headers */,
 				847E6C100CFF4BF400E963C6 /* ORObjectProxy.h in Headers */,
 				847E6C1D0CFF4C3200E963C6 /* OReGunController.h in Headers */,
 				847E6C1F0CFF4C3200E963C6 /* OReGunModel.h in Headers */,
@@ -15022,6 +15101,7 @@
 				84992CB60DD21F3800E82DB4 /* ORHP3458aController.h in Headers */,
 				84992CB80DD21F3800E82DB4 /* ORHP3458aModel.h in Headers */,
 				848D842B0DDE060100D44B81 /* ORTimeMultiPlot.h in Headers */,
+				3A5DAE081C85FB2D007E283C /* WPXMLRPCDecoderDelegate.h in Headers */,
 				848D842D0DDE060100D44B81 /* ORTimeMultiPlotController.h in Headers */,
 				848D8B2C0DE23D2400D44B81 /* ORCaen1190Controller.h in Headers */,
 				848D8B2E0DE23D2400D44B81 /* ORCaen1190Model.h in Headers */,
@@ -15108,6 +15188,7 @@
 				3602C15D1C4EC291006B50B3 /* anet.h in Headers */,
 				84B28CFC0F4C5DBB00E2B056 /* ORAmi286Decoders.h in Headers */,
 				84B28CFE0F4C5DBB00E2B056 /* ORAmi286Model.h in Headers */,
+				3A5DADFF1C85FB2D007E283C /* WPBase64Utils.h in Headers */,
 				84E9C355194F42140028B7E2 /* ORPacFPModel.h in Headers */,
 				84B28D210F4C614000E2B056 /* ORXYScannerController.h in Headers */,
 				84B28D230F4C614000E2B056 /* ORXYScannerDecoders.h in Headers */,
@@ -15136,6 +15217,7 @@
 				84B28E250F4C718400E2B056 /* ORHV4032Model.h in Headers */,
 				84B28E270F4C718400E2B056 /* ORHV4032Supply.h in Headers */,
 				84B28E350F4C7FD400E2B056 /* ORLDA102Controller.h in Headers */,
+				3A5DAE0F1C85FB37007E283C /* XmlrpcClient.h in Headers */,
 				84B28E370F4C7FD400E2B056 /* ORLDA102Model.h in Headers */,
 				84B28E540F4C835500E2B056 /* ORUnivVoltController.h in Headers */,
 				84B28E560F4C835500E2B056 /* ORUnivVoltDecoders.h in Headers */,
@@ -15287,6 +15369,7 @@
 				8476201A118CD53D00016A8D /* OR2dRoi.h in Headers */,
 				8476201C118CD53D00016A8D /* OR2dRoiController.h in Headers */,
 				8476201E118CD53D00016A8D /* ORFFT.h in Headers */,
+				3A5DAE031C85FB2D007E283C /* WPXMLRPC.h in Headers */,
 				84762020118CD53D00016A8D /* ORFFTController.h in Headers */,
 				84762022118CD53D00016A8D /* ORXYFit.h in Headers */,
 				84762024118CD53D00016A8D /* ORXYRoi.h in Headers */,
@@ -15341,6 +15424,7 @@
 				84E9F6A0123FE4D600116607 /* ORNHQ226LController.h in Headers */,
 				436972C41B42DBE6008D57B5 /* ORCV1730Model.h in Headers */,
 				84E9F6A2123FE4D600116607 /* ORNHQ226LDecoders.h in Headers */,
+				3A5DAE041C85FB2D007E283C /* WPXMLRPCDataCleaner.h in Headers */,
 				84E9F6A4123FE4D600116607 /* ORNHQ226LModel.h in Headers */,
 				8471C2F41250CF0C003A8DFB /* ORCAEN260Readout.hh in Headers */,
 				840AC59812638B5D007B6CAF /* nTPCPadPlaneView.h in Headers */,
@@ -15577,6 +15661,7 @@
 				84D29FEB1843EAC800D320DB /* OROpSequenceQueue.h in Headers */,
 				84997895174BA2F600BFEE3E /* ORiSegHVCard.h in Headers */,
 				84BF74C117590CB000AF1F56 /* OR3DScanPlatformController.h in Headers */,
+				3A5DAE0A1C85FB2D007E283C /* WPXMLRPCEncoder.h in Headers */,
 				84BF74C317590CB000AF1F56 /* OR3DScanPlatformModel.h in Headers */,
 				841DACE5175CF05B002542BD /* Katrin3DView.h in Headers */,
 				B3808A8E1700F84B0019C27D /* ORCouchDBListenerController.h in Headers */,
@@ -16743,6 +16828,7 @@
 				8434A30C055B3287002D3102 /* ORSelectionTask.m in Sources */,
 				8434A30D055B3287002D3102 /* NetSocket.m in Sources */,
 				84AC14E31B70E2460071C4EF /* ORMjdDataScannerController.m in Sources */,
+				3A5DAE051C85FB2D007E283C /* WPXMLRPCDataCleaner.m in Sources */,
 				8434A311055B3287002D3102 /* ORTriggerController.m in Sources */,
 				8434A313055B3287002D3102 /* ORTriggerModel.m in Sources */,
 				8434A316055B3287002D3102 /* OR620Model.m in Sources */,
@@ -17161,6 +17247,7 @@
 				8407751F0CEE7CAD0073F5A9 /* ORHelpCenter.m in Sources */,
 				847E6C110CFF4BF400E963C6 /* ORObjectProxy.m in Sources */,
 				847E6C1E0CFF4C3200E963C6 /* OReGunController.m in Sources */,
+				3A5DAE071C85FB2D007E283C /* WPXMLRPCDecoder.m in Sources */,
 				847E6C200CFF4C3200E963C6 /* OReGunModel.m in Sources */,
 				9C1363CA0D0A7921006C550D /* ORCaen265Controller.m in Sources */,
 				9C1363CC0D0A7921006C550D /* ORCaen265Decoders.m in Sources */,
@@ -17269,6 +17356,7 @@
 				84499CCD0F13E457004B855B /* ORCTITempModel.m in Sources */,
 				2D1AB81D0F1B9F2400E6B850 /* ORIpeSlowControlController.m in Sources */,
 				84E9C354194F42140028B7E2 /* ORPacFPDecoders.m in Sources */,
+				3A5DAE001C85FB2D007E283C /* WPBase64Utils.m in Sources */,
 				2D1AB81F0F1B9F2400E6B850 /* ORIpeSlowControlModel.m in Sources */,
 				8493D6BE0F21315300BCD331 /* ORCMC203Controller.m in Sources */,
 				8493D6C00F21315300BCD331 /* ORCMC203Decoders.m in Sources */,
@@ -17336,6 +17424,7 @@
 				84098F590F964F0100036BE8 /* ORPDcuDecoders.m in Sources */,
 				6B5EFA491C4D76AF00B9A80B /* ORMultiStateBox.m in Sources */,
 				84098F5B0F964F0100036BE8 /* ORPDcuModel.m in Sources */,
+				3A5DAE091C85FB2D007E283C /* WPXMLRPCDecoderDelegate.m in Sources */,
 				84BC88DF0F9CDB5600336DF1 /* ORSerialPortController.m in Sources */,
 				842FCCB6197849C700B89723 /* OREHS8260pModel.m in Sources */,
 				84BC89130F9CDDAC00336DF1 /* ORSerialPortModel.m in Sources */,
@@ -17371,6 +17460,8 @@
 				840E72F0103DA7BC0070AD70 /* ORAmrelHVModel.m in Sources */,
 				84D8CB4A10447492005585C5 /* ORAutoTester.m in Sources */,
 				84D8CC8C1045A85B005585C5 /* ORVmeTests.m in Sources */,
+				3A5DAE021C85FB2D007E283C /* WPStringUtils.m in Sources */,
+				3A5DAE0B1C85FB2D007E283C /* WPXMLRPCEncoder.m in Sources */,
 				84B5197F191D285A003A580B /* ORBurstMonitorController.m in Sources */,
 				84D8CF841046FE32005585C5 /* ORAmrelHVDecoders.m in Sources */,
 				84167117104C04D400E47227 /* ORAutoTestUnit.m in Sources */,
@@ -17511,6 +17602,7 @@
 				8472AA7612DB44B400DEEB02 /* ORMPodCrate.m in Sources */,
 				8472AA7D12DB44B400DEEB02 /* ORMPodCController.m in Sources */,
 				8472AA7F12DB44B400DEEB02 /* ORMPodCModel.m in Sources */,
+				3A5DAE101C85FB37007E283C /* XmlrpcClient.m in Sources */,
 				8472AA8412DB44B400DEEB02 /* ORMPodMiniCrateController.m in Sources */,
 				8472AA8612DB44B400DEEB02 /* ORMPodMiniCrateModel.m in Sources */,
 				84BDF04412DC943700B974F8 /* ORSNMP.m in Sources */,
@@ -18047,10 +18139,12 @@
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_7)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_8)",
 					"$(SRCROOT)/Libraries/libusb",
+					"$(PROJECT_DIR)/Frameworks",
+					"$(PROJECT_DIR)/Frameworks/SNO+",
+					"$(PROJECT_DIR)/Libraries/libSNO+",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Libraries/libUniversal\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_2 = "\"$(SRCROOT)/Libraries\"";
-				MACOSX_DEPLOYMENT_TARGET = "";
 				OTHER_CFLAGS = "";
 				OTHER_CPLUSPLUSFLAGS = "";
 				OTHER_LDFLAGS = (
@@ -18122,10 +18216,12 @@
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_7)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_8)",
 					"\"$(SRCROOT)/Libraries/libusb\"",
+					"$(PROJECT_DIR)/Frameworks",
+					"$(PROJECT_DIR)/Frameworks/SNO+",
+					"$(PROJECT_DIR)/Libraries/libSNO+",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/Libraries\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Libraries/libUniversal\"";
-				MACOSX_DEPLOYMENT_TARGET = "";
 				OTHER_CFLAGS = "";
 				OTHER_CPLUSPLUSFLAGS = "";
 				OTHER_LDFLAGS = (
@@ -18194,10 +18290,12 @@
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_7)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_8)",
 					"\"$(SRCROOT)/Libraries/libusb\"",
+					"$(PROJECT_DIR)/Frameworks",
+					"$(PROJECT_DIR)/Frameworks/SNO+",
+					"$(PROJECT_DIR)/Libraries/libSNO+",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/Libraries\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Libraries/libUniversal\"";
-				MACOSX_DEPLOYMENT_TARGET = "";
 				OTHER_CFLAGS = "";
 				OTHER_CPLUSPLUSFLAGS = "";
 				OTHER_LDFLAGS = (
