@@ -254,6 +254,7 @@ snotDb = _snotDb;
     /* Switch XL3 to normal mode if it isn't already. In normal mode, the XL3
      * reads out data from the FECs, which is usually what we want during
      * a run. */
+    [self updateXl3Mode];
     if ([self xl3Mode] != NORMAL_MODE) {
         NSLog(@"xl3 %02d switching to normal mode.\n", [self crateNumber]);
         [[self undoManager] disableUndoRegistration];
