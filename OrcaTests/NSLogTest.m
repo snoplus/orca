@@ -74,25 +74,8 @@
     XCTAssert(range.length>0,@"Test string was not printed");
 }
 //Prints to in a (non-main) thread then checks if the output
-//shows up. The main loop stays in the function the entire time
-- (void)testSecondaryThreadPrint {
-    if (![NSThread isMainThread]) {
-        XCTFail(@"Test was not performed on main thread");
-        return;
-    }
-    UInt StartingLength = [[statusCont contents] length];
-    [NSThread detachNewThreadSelector:@selector(printSingleLine) toTarget:self withObject:nil];
-    [NSThread sleepForTimeInterval:TimeOut]; //Wait a reasonable amount of time
-    NSString *txt = [statusCont contents];
-    if([txt length] <= StartingLength) {
-        XCTFail(@"Secondary Thread failed to print");
-        return;
-    }
-    NSRange range = [txt rangeOfString:printSingleLineTestString];
-    XCTAssert(range.length >0,@"Secondary thread failed to print correctly");
-}
-//Same as testSecondaryThreadPrint except a pause is taken to let the
-//main loop run before any checking is done.
+//shows up.
+//A pause is taken to let the main loop run before any checking is done.
 - (void)testSecondaryThreadPrint_wRML {
     if (![NSThread isMainThread]) {
         XCTFail(@"Test was not performed on main thread");
@@ -149,21 +132,7 @@
 }
 //Runs a separate thread that outputs lots of times then
 //checks after a reasonable time if that output is show.
-//The main loop never leaves this function
-- (void)testLotsOfPrinting_SecondaryThread {
-    UInt StartingLength = [[statusCont contents] length];
-
-    [NSThread detachNewThreadSelector:@selector(printSequentially) toTarget:self withObject:nil];
-    [NSThread sleepForTimeInterval:TimeOut];     //Wait a reasonable amount of time
-    NSString *txt = [statusCont contents];
-    if([txt length] <= StartingLength) {
-        XCTFail(@"Secondary thread failed to print");
-        return;
-    }
-    [self CheckSequentialPrints];
-}
-//Same as testLotsOfPrinting_SecondarThread() except this test
-//lets the main loop do it's thing for a reasonable amount of time
+//Lets the main loop do it's thing for a reasonable amount of time
 //before checking the output.
 - (void)testLotsOfPrinting_SecondaryThread_wRML {
     UInt StartingLength = [[statusCont contents] length];
