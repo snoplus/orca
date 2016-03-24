@@ -465,19 +465,9 @@ snotDb = _snotDb;
 
 - (void) setXl3Mode:(unsigned int)aXl3Mode
 {
-    /* NSUndoManager is not thread safe, and this method gets called from
-     * setSequencerMasks and initCrate in a separate thread during XL3
-     * initialization.
-     *
-     * For now, we just comment it out. */
-
-	//[[[self undoManager] prepareWithInvocationTarget:self] setXl3Mode:xl3Mode];
+	[[[self undoManager] prepareWithInvocationTarget:self] setXl3Mode:xl3Mode];
 	xl3Mode = aXl3Mode;
-    /* Again, post the notification on the main thread since this method is called
-     * from other threads during XL3 initialization. */
-    dispatch_async(dispatch_get_main_queue(), ^{
-	    [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelXl3ModeChanged object:self];
-    });
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelXl3ModeChanged object:self];
 }	
 
 - (BOOL) xl3ModeRunning
