@@ -2462,7 +2462,7 @@ err:
 			//NSLog(@"slot: %02d: MB: %@ DB1: %@ DB2:%@ DB3: %@ DB4: %@ HV: %@\n",
 			//      i+1, bID[0], bID[1], bID[2], bID[3], bID[4], bID[5]);
 			NSLog(@"slot: %02d: MB: %@ DB1: %@ DB2:%@ DB3: %@ DB4: %@\n",
-			      i+1, bID[0], bID[1], bID[2], bID[3], bID[4]);
+			      i, bID[0], bID[1], bID[2], bID[3], bID[4]);
 		}
 	}
 
