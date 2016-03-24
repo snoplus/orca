@@ -34,6 +34,9 @@
 		0F16E35D1C493AD7003C9EC9 /* win32.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F16E3361C493AD7003C9EC9 /* win32.h */; };
 		0F16E3601C493B00003C9EC9 /* RedisClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F16E35E1C493B00003C9EC9 /* RedisClient.h */; };
 		0F16E3611C493B00003C9EC9 /* RedisClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 0F16E35F1C493B00003C9EC9 /* RedisClient.m */; };
+		0F4888691C9992EE00068BC2 /* DB.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F4888661C9992EE00068BC2 /* DB.h */; settings = {ASSET_TAGS = (); }; };
+		0F48886A1C9992EE00068BC2 /* PacketTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F4888671C9992EE00068BC2 /* PacketTypes.h */; settings = {ASSET_TAGS = (); }; };
+		0F48886B1C9992EE00068BC2 /* Registers.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F4888681C9992EE00068BC2 /* Registers.h */; settings = {ASSET_TAGS = (); }; };
 		146822430FC4799C0082BD70 /* ORCircularBufferUV.h in Headers */ = {isa = PBXBuildFile; fileRef = 146822410FC4799C0082BD70 /* ORCircularBufferUV.h */; };
 		146822440FC4799C0082BD70 /* ORCircularBufferUV.m in Sources */ = {isa = PBXBuildFile; fileRef = 146822420FC4799C0082BD70 /* ORCircularBufferUV.m */; };
 		1C50F9F108033CA9008D18EA /* ADC2249.nib in Resources */ = {isa = PBXBuildFile; fileRef = 1C50F9E608033CA9008D18EA /* ADC2249.nib */; };
@@ -3695,6 +3698,9 @@
 		0F16E3361C493AD7003C9EC9 /* win32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = win32.h; sourceTree = "<group>"; };
 		0F16E35E1C493B00003C9EC9 /* RedisClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RedisClient.h; sourceTree = "<group>"; };
 		0F16E35F1C493B00003C9EC9 /* RedisClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RedisClient.m; sourceTree = "<group>"; };
+		0F4888661C9992EE00068BC2 /* DB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DB.h; sourceTree = "<group>"; };
+		0F4888671C9992EE00068BC2 /* PacketTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PacketTypes.h; sourceTree = "<group>"; };
+		0F4888681C9992EE00068BC2 /* Registers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Registers.h; sourceTree = "<group>"; };
 		146822410FC4799C0082BD70 /* ORCircularBufferUV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCircularBufferUV.h; path = Source/Objects/Hardware/HV/UnivVoltHV/ORCircularBufferUV.h; sourceTree = SOURCE_ROOT; };
 		146822420FC4799C0082BD70 /* ORCircularBufferUV.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCircularBufferUV.m; path = Source/Objects/Hardware/HV/UnivVoltHV/ORCircularBufferUV.m; sourceTree = SOURCE_ROOT; };
 		1C50F9E608033CA9008D18EA /* ADC2249.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = ADC2249.nib; sourceTree = "<group>"; };
@@ -13936,6 +13942,9 @@
 		EF7722B111E813120064A1CF /* XL3 */ = {
 			isa = PBXGroup;
 			children = (
+				0F4888661C9992EE00068BC2 /* DB.h */,
+				0F4888671C9992EE00068BC2 /* PacketTypes.h */,
+				0F4888681C9992EE00068BC2 /* Registers.h */,
 				3602C15A1C4EC291006B50B3 /* anet.c */,
 				3602C15B1C4EC291006B50B3 /* anet.h */,
 				6B325E0F1B2F431C002E2DD7 /* XL3_Link.xib */,
@@ -14673,6 +14682,7 @@
 				84FE07D107B403ED00E2CB0E /* NSString+Extensions.h in Headers */,
 				8446CE2107B847B8006CD9C4 /* ORAD413AController.h in Headers */,
 				8446CE2307B847B8006CD9C4 /* ORAD413ADecoders.h in Headers */,
+				0F4888691C9992EE00068BC2 /* DB.h in Headers */,
 				8446CE2607B847B8006CD9C4 /* ORAD413AModel.h in Headers */,
 				843A54DA07BBE7A500534C27 /* OR4ChanTriggerController.h in Headers */,
 				843A54DC07BBE7A500534C27 /* OR4ChanTriggerDecoders.h in Headers */,
@@ -15241,6 +15251,7 @@
 				84EE83FA10D6C52A00BBCBE5 /* ORPMCReadWriteCommand.h in Headers */,
 				849013C410E27B13007591B5 /* ORPlotLinkController.h in Headers */,
 				849013C610E27B13007591B5 /* ORPlotLinkModel.h in Headers */,
+				0F48886A1C9992EE00068BC2 /* PacketTypes.h in Headers */,
 				8411A1DB10F6848100CD9544 /* NSWindow+Extensions.h in Headers */,
 				8411A93211063ACC00CD9544 /* ORUsbDeviceModel.h in Headers */,
 				842FCCB5197849C700B89723 /* OREHS8260pModel.h in Headers */,
@@ -15596,6 +15607,7 @@
 				847D308D17FF0B3000D2D8BC /* ORNMon5085Controller.h in Headers */,
 				847D308F17FF0B3000D2D8BC /* ORNMon5085Model.h in Headers */,
 				8497E5F41808605F00CE974A /* ORGT521Controller.h in Headers */,
+				0F48886B1C9992EE00068BC2 /* Registers.h in Headers */,
 				8497E5F61808605F00CE974A /* ORGT521Model.h in Headers */,
 				8497E604180C5A1E00CE974A /* ORA3818Commands.h in Headers */,
 				8497E605180C5A1E00CE974A /* ORA3818Controller.h in Headers */,
