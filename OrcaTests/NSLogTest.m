@@ -172,18 +172,6 @@
     }
     XCTAssert(!sharedVar,"Deadlock occurred"); //If sharedVar is not false it's b/c a timeout/deadlock occurred
 }
-//Test that runs some performance metrics printing to the status controller
--(void)testPerformance {
-    NSString *testString = @"performance test string\n";
-    NSAttributedString *attrString1 = [[NSAttributedString alloc] initWithString:testString];
-    [self measureBlock:^{
-    for(int i=0;i<1000;i++)
-        {
-            [statusCont printAttributedString:attrString1];
-        }
-    }];
-    [attrString1 release];
-}
 
 //Helper Functions
 
@@ -222,7 +210,7 @@
     {
         NSRange range1 = [txt rangeOfString:[NSString stringWithFormat:printSeqTestString,i]];
         NSRange range2 = [txt rangeOfString:[NSString stringWithFormat:printSeqTestString,i+1]];
-        XCTAssertLessThan(range1.location,range2.location,@"%d showed up before %d\n",i+1,i);
+        XCTAssert(range1.location < range2.location,@"%d showed up before %d\n",i+1,i);
         XCTAssertNotEqual(range1.length,(UInt)0,@"%d not found\n",i);
         XCTAssertNotEqual(range2.length,(UInt)0,@"%d not found\n",i+1);
     }
