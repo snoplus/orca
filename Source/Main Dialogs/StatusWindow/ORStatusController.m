@@ -191,7 +191,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 
 - (oneway void) printAttributedString:(NSAttributedString*)s1
 {
-    [self performSelectorOnMainThread:@selector(mainThreadPrint:) withObject:s1 waitUntilDone:YES];
+    [self performSelectorOnMainThread:@selector(mainThreadPrint:) withObject:s1 waitUntilDone:[NSThread isMainThread]];
 }
 
 
