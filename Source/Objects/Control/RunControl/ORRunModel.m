@@ -1786,10 +1786,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		}
 		@catch(NSException* localException) {
             NSLogError(@"Uncaught exception",@"Main Run Loop",nil);
-            dispatch_sync(dispatch_get_main_queue(), ^{
-                [self incExceptionCount];
-                [self haltRun];
-            });
+            [self performSelectorOnMainThread:@selector(incExceptionCount) withObject:nil waitUntilDone:YES];
+            [self performSelectorOnMainThread:@selector(haltRun) withObject:nil waitUntilDone:NO];
         }
         [pool release];
     }
