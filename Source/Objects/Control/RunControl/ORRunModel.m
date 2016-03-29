@@ -1771,9 +1771,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	[NSThread setThreadPriority:1];
 
 	dataTakingThreadRunning = YES;
-    dispatch_sync(dispatch_get_main_queue(), ^{
-        [self clearExceptionCount];
-    });
+    [self performSelectorOnMainThread:@selector(clearExceptionCount) withObject:nil waitUntilDone:YES];
+
     while(!timeToStopTakingData) {
         NSAutoreleasePool *pool = [[NSAutoreleasePool allocWithZone:nil] init];
         @try {
@@ -1804,9 +1803,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		}while(!allDone);
 	}
 	@catch(NSException* localException) {
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            [self incExceptionCount];
-        });
+        [self performSelectorOnMainThread:@selector(incExceptionCount) withObject:nil waitUntilDone:YES];
 		NSLogError(@"Uncaught exception",@"Run Loop Cleanup",nil);
 	}
 	
