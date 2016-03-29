@@ -1771,7 +1771,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	[NSThread setThreadPriority:1];
 
 	dataTakingThreadRunning = YES;
-    dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_sync(dispatch_get_main_queue(), ^{
         [self clearExceptionCount];
     });
     while(!timeToStopTakingData) {
@@ -1786,7 +1786,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		}
 		@catch(NSException* localException) {
             NSLogError(@"Uncaught exception",@"Main Run Loop",nil);
-            dispatch_async(dispatch_get_main_queue(), ^{
+            dispatch_sync(dispatch_get_main_queue(), ^{
                 [self incExceptionCount];
                 [self haltRun];
             });
@@ -1806,7 +1806,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		}while(!allDone);
 	}
 	@catch(NSException* localException) {
-        dispatch_async(dispatch_get_main_queue(), ^{
+        dispatch_sync(dispatch_get_main_queue(), ^{
             [self incExceptionCount];
         });
 		NSLogError(@"Uncaught exception",@"Run Loop Cleanup",nil);
