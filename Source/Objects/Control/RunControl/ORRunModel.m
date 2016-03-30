@@ -1275,7 +1275,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		//now declare the thread directly so we can set the stack size.
 		//[NSThread detachNewThreadSelector:@selector(takeData) toTarget:self withObject:nil];
         readoutThread = [[NSThread alloc] initWithTarget:self selector:@selector(takeData) object:nil];
-		[readoutThread setStackSize:4*1024*1024];
+		[readoutThread setStackSize:5*1024*1024];
 		[readoutThread start];
 		 
         [self setStartTime:[NSDate date]];
