@@ -77,6 +77,8 @@ pthread_attr_t readoutThreadAttr;
 pthread_mutex_t runInfoMutex;
 pthread_mutex_t lamInfoMutex;
 pthread_mutex_t jobInfoMutex;
+pthread_mutex_t hwMutex;
+
 int32_t  workingSocket;
 int32_t  workingIRQSocket;
 char needToSwap;
@@ -204,6 +206,9 @@ int32_t main(int32_t argc, char *argv[])
         pthread_mutex_lock (&lamInfoMutex);  //begin critical section
         memset(&lam_info ,0,sizeof(SBC_LAM_info_struct)*kMaxNumberLams);
         pthread_mutex_unlock (&lamInfoMutex);//end critical section
+        
+        pthread_mutex_init(&hwMutex, NULL);
+
         /*-------------------------------*/
 
         data = (int32_t*)malloc(kMaxDataBufferSizeLongs*sizeof(int32_t));
@@ -250,6 +255,7 @@ int32_t main(int32_t argc, char *argv[])
 
         /* Take care of pthread variables. */
         pthread_mutex_destroy(&runInfoMutex);
+        pthread_mutex_destroy(&hwMutex);
         pthread_attr_destroy(&readoutThreadAttr);
         pthread_mutex_destroy(&jobInfoMutex);
         pthread_attr_destroy(&sbc_job.jobThreadAttr);
@@ -283,21 +289,29 @@ void processBuffer(SBC_Packet* aPacket, uint8_t reply)
 void processSBCCommand(SBC_Packet* aPacket,uint8_t reply)
 {
     switch(aPacket->cmdHeader.cmdID){
-        case kSBC_WriteBlock:        
-            doWriteBlock(aPacket,reply); 
+        case kSBC_WriteBlock:
+            pthread_mutex_lock(&hwMutex);
+            doWriteBlock(aPacket,reply);
+            pthread_mutex_unlock(&hwMutex);
         break;
         
         case kSBC_ReadBlock:
-            doReadBlock(aPacket,reply);  
-        break;
+            pthread_mutex_lock(&hwMutex);
+            doReadBlock(aPacket,reply);
+            pthread_mutex_unlock(&hwMutex);
+       break;
 		
 		case kSBC_GeneralWrite:        
-            doGeneralWriteOp(aPacket,reply); 
+            pthread_mutex_lock(&hwMutex);
+            doGeneralWriteOp(aPacket,reply);
+            pthread_mutex_unlock(&hwMutex);
         break;
         
         case kSBC_GeneralRead:
-            doGeneralReadOp(aPacket,reply);  
-        break;
+            pthread_mutex_lock(&hwMutex);
+            doGeneralReadOp(aPacket,reply);
+            pthread_mutex_unlock(&hwMutex);
+       break;
           
         case kSBC_LoadConfig:
             if(needToSwap)SwapLongBlock(aPacket->payload,sizeof(SBC_crate_config)/sizeof(int32_t));
@@ -820,9 +834,12 @@ void* readoutThread (void* p)
             
             
             if(timeToCycle){
+                pthread_mutex_lock(&hwMutex);
                 index = readHW(&crate_config,index,0); //nil for the lam data
+                pthread_mutex_unlock(&hwMutex);
                 cycles++;
                 commitData();
+
             }
             
             if(index>=crate_config.total_cards || index<0){
