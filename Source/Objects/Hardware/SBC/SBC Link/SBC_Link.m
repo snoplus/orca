@@ -1278,7 +1278,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
         NSLog(@"SBC,%d,%d polling at fastest rate\n",[delegate crateNumber],[delegate slot]);
     }
     else {
-        NSLog(@"SBC,%d,%d polling at ~%luHz\n",optionBlock.option[0],[delegate crateNumber],[delegate slot]);
+        NSLog(@"SBC,%d,%d polling at ~%luHz\n",[delegate crateNumber],[delegate slot],optionBlock.option[0]);
     }
     
     optionBlock.option[0]	= 0;//reset the option block
