@@ -66,26 +66,24 @@
 
 #define kCrateInsideX        85
 #define kCrateInsideY        35
-#define kCrateSeparation     20
+#define kCrateSeparation     10
 #define kCrateInsideWidth   237
 #define kCrateInsideHeight   85
 
 
 - (void) drawRect:(NSRect)rect
 {
+    [self makeAllSegments];
     [[NSColor colorWithCalibratedRed:.88 green:.88 blue:.88 alpha:1] set];
     [NSBezierPath fillRect:rect];
     
-
 	if(viewType == kUseCrateView){
         [self makeCrateImage];
  		NSFont* font = [NSFont systemFontOfSize:9.0];
 		NSDictionary* attrsDictionary = [NSDictionary dictionaryWithObjectsAndKeys:font,NSFontAttributeName,[NSColor blackColor],NSForegroundColorAttributeName,nil];
        int crate;
-        for(crate=0;crate<2;crate++){
-            float yOffset;
-            if(crate==0) yOffset = 50;
-            else yOffset = 50+[crateImage imageRect].size.height+20;
+        for(crate=0;crate<3;crate++){
+            float yOffset = crate*[crateImage imageRect].size.height+kCrateSeparation;
             NSRect destRect = NSMakeRect(70,yOffset,[crateImage imageRect].size.width,[crateImage imageRect].size.height);
             [crateImage drawInRect:destRect fromRect:[crateImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
             
@@ -112,8 +110,12 @@
                 xx += 11.3;
                 [NSBezierPath strokeLineFromPoint:NSMakePoint(inside.origin.x+i*dx,inside.origin.y) toPoint:NSMakePoint(inside.origin.x+i*dx,inside.origin.y + inside.size.height)];
             }
-          
-            NSAttributedString* s = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"Crate %d",crate] attributes:attrsDictionary];
+            NSString* crateLabel = @"";
+            if(crate==0)      crateLabel = @"Module 1 Crate";
+            else if(crate==1) crateLabel = @"Module 2 Crate";
+            else if(crate==2) crateLabel = @"Veto Crate";
+            
+            NSAttributedString* s = [[NSAttributedString alloc] initWithString:crateLabel attributes:attrsDictionary];
             float sw = [s size].width;
             [s drawAtPoint:NSMakePoint(kCrateInsideX+kCrateInsideWidth/2-sw/2,yOffset+kCrateInsideY+kCrateInsideHeight+1)];
             [s release];
@@ -182,7 +184,7 @@
             int n = [aGroup numSegments];
             for(i=0;i<n;i++){
                 ORDetectorSegment* aSegment = [aGroup segment:i];
-                int crate    = [[aSegment objectForKey:[aSegment mapEntry:[aSegment crateIndex] forKey:@"key"]] intValue];
+                int crate    = [[aSegment objectForKey:[aSegment mapEntry:[aSegment crateIndex] forKey:@"key"]] intValue]-1; //we count from zero here;
                 int cardSlot = [aSegment cardSlot];
                 int channel  = [aSegment channel];
                 if(channel < 0)cardSlot = -1; //we have to make the segment, but we'll draw off screen when not mapped
@@ -190,8 +192,7 @@
                 float yOffset;
                 if(cardSlot<0)yOffset = -50000;
                 else {
-                    if(crate==0) yOffset = 50+kCrateInsideY;
-                    else yOffset = 50+[crateImage imageRect].size.height+kCrateSeparation+kCrateInsideY;
+                    yOffset = crate*[crateImage imageRect].size.height+kCrateSeparation+kCrateInsideY;
                 }
                 
                 NSRect channelRect = NSMakeRect(kCrateInsideX+cardSlot*dx, yOffset + (channel*dy),dx,dy);
