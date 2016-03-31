@@ -485,7 +485,7 @@
 {
 	[viewTypePU selectItemAtIndex:[model viewType]];
 	[detectorView setViewType:[model viewType]];
-	[detectorView makeAllSegments];	
+	[detectorView makeAllSegments];
 }
 
 #pragma mark ¥¥¥Interface Management
@@ -518,9 +518,9 @@
 - (void) setDetectorTitle
 {	
 	switch([model displayType]){
-		case kDisplayRates:			[detectorTitle setStringValue:@"Detector Rate"];	break;
-		case kDisplayThresholds:	[detectorTitle setStringValue:@"Thresholds"];		break;
-		case kDisplayTotalCounts:	[detectorTitle setStringValue:@"Total Counts"];		break;
+		case kDisplayRates:			[detectorTitle setStringValue:@"Rates"];        break;
+		case kDisplayThresholds:	[detectorTitle setStringValue:@"Thresholds"];	break;
+		case kDisplayTotalCounts:	[detectorTitle setStringValue:@"Total Counts"];	break;
 		default: break;
 	}
 }
