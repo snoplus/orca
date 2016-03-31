@@ -90,6 +90,7 @@ NSString* SBC_CodeVersionChanged			= @"SBC_CodeVersionChanged";
 NSString* SBC_SocketDroppedUnexpectedly     = @"SBC_SocketDroppedUnexpectedly";
 NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 NSString* SBC_LinkErrorInfoChanged          = @"SBC_LinkErrorInfoChanged";
+NSString* SBC_MacAddressChanged             = @"SBC_MacAddressChanged";
 
 @interface SBCPacketWrapper : NSObject {
     NSMutableData* data;
@@ -164,6 +165,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 	}
 	@catch (NSException* localException) {
 	}
+    [sbcMacAddress release];
 	[socketLock release];
 	[eCpuDeadAlarm clearAlarm];
 	[eCpuDeadAlarm release];
@@ -977,6 +979,39 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
     
     [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkErrorInfoChanged object:self];
 }
+- (NSString*) sbcMacAddress
+{
+    if([sbcMacAddress length])return sbcMacAddress;
+    else return @"?";
+}
+
+- (void) getMacAddress
+{
+    if([sbcMacAddress length] == 0){
+
+        id pw = [[SBCPacketWrapper alloc] init];
+        SBC_Packet* aPacket = [pw sbcPacket];
+        aPacket->cmdHeader.destination			= kSBC_Process;
+        aPacket->cmdHeader.cmdID                = kSBC_MacAddressRequest;
+        aPacket->cmdHeader.numberBytesinPayload	= 6;
+        @try {
+            [self send:aPacket receive:aPacket];
+            unsigned char* mac = (unsigned char*)aPacket->payload;
+        
+            [sbcMacAddress release];
+            
+            [sbcMacAddress autorelease];
+            sbcMacAddress = [[NSString alloc] initWithFormat:@"%02x:%02x:%02x:%02x:%02x:%02x",mac[0],mac[1],mac[2],mac[3],mac[4],mac[5]];
+        }
+        @catch (NSException* e){
+            
+        }
+        [pw releaseAndCache];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:SBC_MacAddressChanged object:self];
+    }
+}
+
 
 - (unsigned long) totalErrorCount
 {
@@ -1930,9 +1965,8 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 			[self setReloading:NO];
 			
 			NSLog(@"Connected to %@ <%@> port: %d\n",[self crateName],IPNumber,portNumber);
-			//[self getRunInfoBlock];
 			[[delegate crate] performSelector:@selector(connected) withObject:nil afterDelay:1];
-			
+            [self getMacAddress];
 		}
 		@catch (NSException* localException) {
 			if(socketfd){

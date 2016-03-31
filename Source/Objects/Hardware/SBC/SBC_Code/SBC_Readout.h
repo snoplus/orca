@@ -40,6 +40,7 @@ void doRunCommand(SBC_Packet* aPacket);
 void startJob(void(*jobFunction)(SBC_Packet*),SBC_Packet* aPacket);
 void jobStatus(SBC_Packet* aPacket);
 void killJob(SBC_Packet* aPacket);
+void processMacAddressRequest(SBC_Packet* aPacket);
 
 // Hardware functions
 void initializeHWRun (SBC_crate_config* config);

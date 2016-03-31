@@ -120,6 +120,17 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 	//method exists to give common interface across all objects for display in lists
 	return [NSMutableArray arrayWithObject:readOutGroup];
 }
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
+{
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
+    
+
+    [objDictionary setObject:[sbcLink sbcMacAddress] forKey:@"MacAddress"];
+    [objDictionary setObject:[sbcLink IPNumber]      forKey:@"ipNumber"];
+    
+    
+    return objDictionary;
+}
 
 #pragma mark ¥¥¥ORVmeBusProtocol Protocol
 - (void) resetContrl

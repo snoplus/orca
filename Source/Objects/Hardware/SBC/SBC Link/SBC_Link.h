@@ -76,6 +76,7 @@ typedef enum eSBC_ThrottleConsts{
 	unsigned long   addressModifier;
     SBC_info_struct runInfo;
     SBC_error_struct errorInfo;
+    NSString*       sbcMacAddress;
     unsigned long   lastErrorCount;
     float           errorRate;
 	NSDate*			lastQueUpdate;
@@ -374,6 +375,7 @@ typedef enum eSBC_ThrottleConsts{
 - (void) doCBTransferTest;
 - (void) monitorJobFor:(id)aDelegate statusSelector:(SEL)aSelector;
 - (void) monitorJob;
+- (NSString*) sbcMacAddress;
 
 - (void) writeGeneral:(long*) buffer
 			operation:(unsigned long) anOperationID
@@ -443,4 +445,4 @@ extern NSString* SBC_CodeVersionChanged;
 extern NSString* SBC_SocketDroppedUnexpectedly;
 extern NSString* SBC_LinkSbcPollingRateChanged;
 extern NSString* SBC_LinkErrorInfoChanged;
-
+extern NSString* SBC_MacAddressChanged;
