@@ -52,6 +52,15 @@
 - (void) setExternalVariable:(id)aKey to:(id)aValue;
 - (id) externalVariable:(id)aKey;
 
+- (void) postNotificationName:(NSString*)aName;
+- (void) postNotificationName:(NSString*)aName   fromObject:(id)anObject;
+- (void) postNotificationName:(NSString*)aName   fromObject:(id)anObject userInfo:(id)userInfo;
+- (void) runOnNotificationName:(NSString*)aName  fromObject:(id)anObject;
+- (void) stopOnNotificationName:(NSString*)aName fromObject:(id)anObject;
+- (void) cancelNotificationName:(NSString*)aName;
+- (void) runFromNotification:(NSNotification*)aNote;
+- (void) stopFromNotification:(NSNotification*)aNote;
+
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;

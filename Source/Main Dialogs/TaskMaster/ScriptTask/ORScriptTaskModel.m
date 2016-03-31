@@ -223,6 +223,73 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 	}
 }
 
+
+- (void) postNotificationName:(NSString*)aName
+{
+    [self postNotificationName:aName fromObject:nil userInfo:nil];
+}
+
+- (void) postNotificationName:(NSString*)aName fromObject:(id)anObject
+{
+    [self postNotificationName:aName fromObject:anObject userInfo:nil];
+}
+
+- (void) postNotificationName:(NSString*)aName fromObject:(id)anObject userInfo:(id)userInfo
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName:aName object:anObject userInfo:userInfo];
+}
+
+- (void) stopOnNotificationName:(NSString*)aName fromObject:(id)anObject
+{
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    
+    [notifyCenter removeObserver:self name:aName object:anObject];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(stopFromNotification:)
+                         name : aName
+                        object: anObject];
+}
+
+- (void) runOnNotificationName:(NSString*)aName fromObject:(id)anObject
+{
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    
+    [notifyCenter removeObserver:self name:aName object:anObject];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(runFromNotification:)
+                         name : aName
+                        object: anObject];
+}
+
+- (void) cancelNotificationName:(NSString*)aName
+{
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    [notifyCenter removeObserver:self name:aName object:nil];
+}
+
+- (void) runFromNotification:(NSNotification*)aNote
+{
+    NSLog(@"%@ received notification '%@'\n",[self scriptName],[aNote name]);
+    if(![self running]){
+        [self runScript];
+    }
+    else {
+        NSLog(@"%@ already running. Notification ignored\n",[self scriptName]);
+    }
+}
+- (void) stopFromNotification:(NSNotification*)aNote
+{
+    NSLog(@"%@ received notification '%@'\n",[self scriptName],[aNote name]);
+    if([self running]){
+        [self stopScript];
+    }
+    else {
+        NSLog(@"%@ not running. Notification ignored\n",[self scriptName]);
+    }
+}
+
 - (void) mailSent:(NSString*)to
 {
 	NSLog(@"Script sent mail to: %@\n",to);
