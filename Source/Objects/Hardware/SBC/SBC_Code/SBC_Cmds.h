@@ -66,6 +66,7 @@
 #define kSBC_SetPollingDelay   0x21
 #define kSBC_ErrorInfoRequest  0x22
 #define kSBC_GenericJob        0x23
+#define kSBC_MacAddressRequest 0x24
 
 #define kSBC_Exit              0xFFFFFFFF /*close socket and quit application*/
 
@@ -228,5 +229,10 @@ typedef
     }
 BufferInfo;
 
+typedef
+    struct {
+        uint8_t macAddress[8];
+    }
+SBC_MAC_AddressStruct;
 
 #endif
