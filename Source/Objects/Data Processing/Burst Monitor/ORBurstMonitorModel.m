@@ -735,7 +735,7 @@ double facto(unsigned long long num)
                                                 
                                                 //Find background likelyhood in burst //fixme
                                                 int numgamma = 0;
-                                                double rategamma = 3.8; // From run 3681
+                                                double rategamma = 2.3585; // 3.8 From run 3681, //2.3585 from 4680 to 4684
                                                 int numalpha = 0;
                                                 double ratealpha = 319.0/86400.0; // From a bunch of runs before Aug 2015
                                                 double tbackground = 1;
@@ -1542,7 +1542,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     
     [getrev waitUntilExit]; //waits like 60 seconds for 10.0.3.1 on lu daq, freezes before without this
     //NSLog(@"part 1\n");
-    [getrev terminate]; //needs this to work
+    //[getrev terminate]; //needs this to work
     [getrev release];
     //NSLog(@"part 2\n");
     revfile =[piperev fileHandleForReading];  //maybe need declare here
