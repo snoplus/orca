@@ -1275,7 +1275,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		//now declare the thread directly so we can set the stack size.
 		//[NSThread detachNewThreadSelector:@selector(takeData) toTarget:self withObject:nil];
         readoutThread = [[NSThread alloc] initWithTarget:self selector:@selector(takeData) object:nil];
-		[readoutThread setStackSize:4*1024*1024];
+		[readoutThread setStackSize:5*1024*1024];
 		[readoutThread start];
 		 
         [self setStartTime:[NSDate date]];
@@ -1771,9 +1771,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	[NSThread setThreadPriority:1];
 
 	dataTakingThreadRunning = YES;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self clearExceptionCount];
-    });
+    [self performSelectorOnMainThread:@selector(clearExceptionCount) withObject:nil waitUntilDone:YES];
+
     while(!timeToStopTakingData) {
         NSAutoreleasePool *pool = [[NSAutoreleasePool allocWithZone:nil] init];
         @try {
@@ -1786,10 +1785,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		}
 		@catch(NSException* localException) {
             NSLogError(@"Uncaught exception",@"Main Run Loop",nil);
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self incExceptionCount];
-                [self haltRun];
-            });
+            [self performSelectorOnMainThread:@selector(incExceptionCount) withObject:nil waitUntilDone:YES];
+            [self performSelectorOnMainThread:@selector(haltRun) withObject:nil waitUntilDone:NO];
         }
         [pool release];
     }
@@ -1806,9 +1803,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		}while(!allDone);
 	}
 	@catch(NSException* localException) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self incExceptionCount];
-        });
+        [self performSelectorOnMainThread:@selector(incExceptionCount) withObject:nil waitUntilDone:YES];
 		NSLogError(@"Uncaught exception",@"Run Loop Cleanup",nil);
 	}
 	
