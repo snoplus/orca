@@ -20,7 +20,6 @@
 #pragma mark •••Imported Files
 #import "ORPulseCheckModel.h"
 #import "ORAlarm.h"
-#import "ORAlarmCollection.h"
 #import "ORFileGetterOp.h"
 #import "NSDate+Extensions.h"
 
@@ -39,11 +38,6 @@ NSString* ORPulseCheckModelReloadTable      = @"ORPulseCheckModelReloadTable";
 #define kLastChecked    @"kLastChecked"
 #define kMachineStatus  @"kMachineStatus"
 #define kHeartbeatPath  @"kHeartbeatPath"
-
-@interface ORPulseCheckModel (private)
-- (void) postCouchDBRecord;
-@end
-
 
 @implementation ORPulseCheckModel
 
@@ -308,18 +302,4 @@ NSString* ORPulseCheckModelReloadTable      = @"ORPulseCheckModelReloadTable";
     [noHeartbeatAlarm release];
 }
 
-@end
-
-@implementation ORPulseCheckModel (private)
-
-
-- (void) postCouchDBRecord
-{
-//    NSMutableDictionary* record = [NSMutableDictionary dictionary];
-//    if([self primaryMachine])[record setObject:[[self primaryMachine] data] forKey:@"Primary"];
-//    if([self secondaryMachine])[record setObject:[[self secondaryMachine] data] forKey:@"Secondary"];
-//    if([self tertiaryMachine])[record setObject:[[self tertiaryMachine] data] forKey:@"Tertiary"];
-//    
-//    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:record];
-}
 @end
