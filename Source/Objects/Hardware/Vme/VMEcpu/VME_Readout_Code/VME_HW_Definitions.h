@@ -27,7 +27,7 @@
 #define kCaen 	   5 
 #define kCaen1720  6 
 #define kMtc	   7 
-#define kSnoCrate	8 
+#define kSnoCrate  8 
 #define kSIS3300   9 
 #define kCaen419   10
 #define kDataGen   11 //a test data generator
@@ -49,5 +49,6 @@
 #define kGretina4A 27
 #define kCaen1730  28
 #define kXyCom564  29
+#define kSIS3316   30
 
 #endif
