@@ -1152,9 +1152,9 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 - (void) timeout
 {
     isValid = NO;
-	NSLogError(@"command timeout",@"AMI 286",nil);
-	[self setLastRequest:nil];
+	NSLogError(@"",@"Command Timeout",[NSString stringWithFormat:@"AMI 286 %d",[self uniqueIdNumber]],nil);
     [cmdQueue removeAllObjects];
+	[self setLastRequest:nil];
 }
 
 - (void) processOneCommandFromQueue
@@ -1351,6 +1351,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 }
 - (void) postCouchDBRecord
 {
+    if(!isValid)return;//don't post if not valid
     NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
                             [NSArray arrayWithObjects:
                              [NSNumber numberWithFloat:level[0]],
