@@ -361,7 +361,7 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 {
     if([powerOutAlarm isPosted]){
         NSTimeInterval timePowerHasBeenOut = [powerOutAlarm timeSincePosted];
-        if(timePowerHasBeenOut >= 10*60)return YES;
+        if(timePowerHasBeenOut >= 2*60)return YES;
         else return NO;
     }
     else return NO;
