@@ -91,6 +91,7 @@
     int burstForce;
     int peakN;
     int lowN;
+    int isgammalow;
     double adcP;
     double alphaP;
     double gammaP;
