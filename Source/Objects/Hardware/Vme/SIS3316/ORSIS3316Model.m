@@ -412,12 +412,12 @@ unsigned char freqPreset250MHz[6]  = {0x20,0xC2,0xBC,0x33,0xE4,0xF2};
 @implementation ORSIS3316Model
 
 #pragma mark •••Static Declarations
-static unsigned long bankMemory[4][2]={
-{0x00400000,0x00600000},
-{0x00480000,0x00680000},
-{0x00500000,0x00700000},
-{0x00580000,0x00780000},
-};
+//static unsigned long bankMemory[4][2]={
+//{0x00400000,0x00600000},
+//{0x00480000,0x00680000},
+//{0x00500000,0x00700000},
+//{0x00580000,0x00780000},
+//};
 
 static unsigned long eventCountOffset[4][2]={ //group,bank
 {0x00200010,0x00200014},
@@ -741,7 +741,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 - (BOOL) trigBothEdgesMask:(short)chan           { return trigBothEdgesMask & (1<<chan);    }
 - (long) intHeTrigOutPulseMask                   { return intHeTrigOutPulseMask;            }
 - (BOOL) intHeTrigOutPulseMask:(short)chan       { return intHeTrigOutPulseMask & (1<<chan);}
-- (short) intTrigOutPulseBit:(short)aChan         { return intTrigOutPulseBit[aChan];        }
+- (unsigned short) intTrigOutPulseBit:(short)aChan         { return intTrigOutPulseBit[aChan];        }
 
 
 - (void) setHeTrigThreshold:(short)aChan withValue:(unsigned long)aValue
@@ -789,7 +789,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     [self setIntHeTrigOutPulseMask:aMask];
 }
 
-- (void) setIntTrigOutPulseBit:(short)aChan withValue:(short)aValue
+- (void) setIntTrigOutPulseBit:(short)aChan withValue:(unsigned short)aValue
 {
     if(aChan<0 || aChan>kNumSIS3316Channels)return;
 

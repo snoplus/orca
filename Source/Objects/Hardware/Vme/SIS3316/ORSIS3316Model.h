@@ -47,7 +47,7 @@
     unsigned short gapTime[kNumSIS3316Channels];
     unsigned short tauFactor[kNumSIS3316Channels];
     unsigned long  heTrigThreshold[kNumSIS3316Channels];
-    short           intTrigOutPulseBit[kNumSIS3316Channels];
+    unsigned short intTrigOutPulseBit[kNumSIS3316Channels];
     long            trigBothEdgesMask;
     long            intHeTrigOutPulseMask;
     
@@ -202,8 +202,8 @@
 - (void) setIntHeTrigOutPulseMask:(long)aMask;
 - (void) setIntHeTrigOutPulseBit:(short)chan withValue:(BOOL)aValue;
 
-- (short) intTrigOutPulseBit:(short)aChan;
-- (void) setIntTrigOutPulseBit:(short)aChan withValue:(short)aValue;
+- (unsigned short) intTrigOutPulseBit:(short)aChan;
+- (void) setIntTrigOutPulseBit:(short)aChan withValue:(unsigned short)aValue;
 
 - (unsigned short) activeTrigGateWindowLen:(short)aGroup;
 - (void) setActiveTrigGateWindowLen:(short)aGroup withValue:(unsigned short)aValue;
@@ -374,7 +374,7 @@
 - (unsigned long) readTriggerEventBank:(int)bank index:(int)index;
 - (void) readAddressCounts;
 
-- (int) dataWord:(int)chan index:(int)index;
+//- (int) dataWord:(int)chan index:(int)index;
 
 - (void) testMemory;
 //- (void) testEventRead;
