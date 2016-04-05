@@ -1152,7 +1152,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 - (void) timeout
 {
     isValid = NO;
-	NSLogError(@"",@"Command Timeout",[NSString stringWithFormat:@"AMI 286 %d",[self uniqueIdNumber]],nil);
+	NSLogError(@"",@"Command Timeout",[NSString stringWithFormat:@"AMI 286 %lu",[self uniqueIdNumber]],nil);
     [cmdQueue removeAllObjects];
 	[self setLastRequest:nil];
 }
