@@ -253,7 +253,10 @@ NSString* ORPulseCheckModelReloadTable      = @"ORPulseCheckModelReloadTable";
 {
     [self setLastChecked:[[NSDate date]stdDescription]];
     NSString* contents = [NSString stringWithContentsOfFile:[self localPath] encoding:NSASCIIStringEncoding error:nil];
-    if([contents length] == 0)[self postHeartbeatAlarm];
+    if([contents length] == 0){
+        [self setStatus:@"No File"];
+        [self postHeartbeatAlarm];
+    }
     else {
         NSArray* lines = [contents componentsSeparatedByString:@"\n"];
         if([lines count]==1){
