@@ -83,6 +83,11 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
            //     count++;
            // }
         }
+        
+        //a test -- do a non-DMA read to see if the number of SBC errors is reduced
+        uint32_t junk;
+        VMERead(fifoStateAddress,GetAddressModifier(),(uint32_t) 4, junk);
+
        // printf("got %d waveforms\n",count);
     }
 
