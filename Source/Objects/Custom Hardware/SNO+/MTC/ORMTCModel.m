@@ -267,7 +267,7 @@ resetFifoOnStart = _resetFifoOnStart;
     
     [notifyCenter addObserver : self
                      selector : @selector(runAboutToStart:)
-                         name : ORRunAboutToStartNotification
+                         name : @"SNOPRunStart"
                        object : nil];
 }
 

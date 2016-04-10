@@ -104,6 +104,8 @@
     bool isEmergencyStopEnabled;
     bool isEStopPolling;
 
+    bool rolloverRun;
+
     RedisClient *mtc_server;
     RedisClient *xl3_server;
 }

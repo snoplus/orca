@@ -119,6 +119,8 @@ mtcConfigDoc = _mtcConfigDoc;
     /* initialize our connection to the XL3 server */
     xl3_server = [[RedisClient alloc] initWithHostName:XL3_HOST withPort:XL3_PORT];
 
+    rolloverRun = NO;
+
     [[self undoManager] disableUndoRegistration];
 	[self initOrcaDBConnectionHistory];
 	[self initDebugDBConnectionHistory];
@@ -138,6 +140,8 @@ mtcConfigDoc = _mtcConfigDoc;
 
     /* initialize our connection to the XL3 server */
     xl3_server = [[RedisClient alloc] initWithHostName:XL3_HOST withPort:XL3_PORT];
+
+    rolloverRun = NO;
 
     [[self undoManager] disableUndoRegistration];
 	[self initOrcaDBConnectionHistory];
@@ -279,8 +283,13 @@ mtcConfigDoc = _mtcConfigDoc;
                        object : nil];
 
     [notifyCenter addObserver : self
+                     selector : @selector(runAboutToRollOver:)
+                         name : ORRunIsAboutToRollOver
+                       object : nil];
+
+    [notifyCenter addObserver : self
                      selector : @selector(runAboutToStart:)
-                         name : ORRunAboutToStartNotification
+                         name : ORRunSecondChanceForWait
                        object : nil];
 
     [notifyCenter addObserver : self
@@ -315,6 +324,16 @@ mtcConfigDoc = _mtcConfigDoc;
 
 }
 
+- (void) runAboutToRollOver:(NSNotification*)aNote
+{
+    /* When the next run is going to be started due to a rollover, this method
+     * is called.
+     *
+     * Note that the rolloverRun variable is reset to NO after the next run
+     * start. */
+    rolloverRun = YES;
+}
+
 - (void) runInitialization:(NSNotification*)aNote
 {
     @try {
@@ -337,6 +356,15 @@ mtcConfigDoc = _mtcConfigDoc;
 
 - (void) runAboutToStart:(NSNotification*)aNote
 {
+    if (rolloverRun) {
+        /* If this is a rollover run, we don't initialize any hardware. */
+        rolloverRun = NO;
+        return;
+    }
+
+    /* Post a notification telling all of the SNO+ hardware to load the
+     * current model settings to hardware. */
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"SNOPRunStart" object: self userInfo: nil];
 }
 
 - (void) runStarted:(NSNotification*)aNote
