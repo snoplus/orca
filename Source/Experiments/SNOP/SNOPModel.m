@@ -473,28 +473,34 @@ mtcConfigDoc = _mtcConfigDoc;
 // orca script helper
 - (void) shipEPEDRecord
 {
+    /* Sends a command to the MTC server to ship an EPED record to the data
+     * stream server, which will eventually get to the builder.
+     *
+     * Note: Currently, this function does not send EPED records to mark
+     * subrun boundaries. To accomplish this, one would need to mask in
+     * the EPED_FLAG_SUBRUN bit in the flags bitmask, where EPED_FLAG_SUBRUN
+     * is defined in the builder's RecordInfo.h as:
+     *
+     *     #define EPED_FLAG_SUBRUN 0x1000000
+     *
+     */
     if ([[ORGlobal sharedGlobal] runInProgress]) {
-        const unsigned char eped_rec_length = 10;
-        unsigned long data[eped_rec_length];
-        data[0] = [self epedDataId] | eped_rec_length;
-        data[1] = 0;
-
-        data[2] = _epedStruct.pedestalWidth;
-        data[3] = _epedStruct.coarseDelay;
-        data[4] = _epedStruct.fineDelay;
-        data[5] = _epedStruct.chargePulseAmp;
-        data[6] = _epedStruct.stepNumber;
-        data[7] = _epedStruct.calType;
-        data[8] = 0;//_epedStruct.nTSlopePoints;
-        data[9] = 0;
-        
-        NSData* pdata = [[NSData alloc] initWithBytes:data length:sizeof(long)*(eped_rec_length)];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:pdata];
-        [pdata release];
-        pdata = nil;
+        @try {
+            [mtc_server okCommand:"send_eped_record %d %d %d %d %d %d %d",
+                _epedStruct.pedestalWidth,
+                _epedStruct.coarseDelay,
+                _epedStruct.fineDelay,
+                _epedStruct.chargePulseAmp, /* qinj_dacsetting */
+                _epedStruct.stepNumber, /* half crate id? */
+                _epedStruct.calType,
+                0 /* flags */
+            ];
+        } @catch (NSException *e) {
+            NSLogColor([NSColor redColor], @"failed to send EPED record: %@",
+                       [e reason]);
+        }
     }
 }
-
 
 - (void) updateRHDRSruct
 {
