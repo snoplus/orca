@@ -399,34 +399,44 @@ mtcConfigDoc = _mtcConfigDoc;
      * will fire a SOFT_GT and turn triggers off. Then we need to wait
      * until the MTC/CAEN/XL3s have read out all the data. */
 
-    ORRunModel *run = [aNote object];
+    NSDictionary *userInfo = [aNote userInfo];
 
-    [mtc_server okCommand:"run_stop"];
+    if (![[userInfo objectForKey:@"willRestart"] boolValue]) {
+        [mtc_server okCommand:"run_stop"];
 
-    NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-                              @"waiting for MTC/XL3/CAEN data", @"Reason",
-                              nil];
+        NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                  @"waiting for MTC/XL3/CAEN data", @"Reason",
+                                  nil];
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object: self userInfo: userInfo];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object: self userInfo: userInfo];
 
-    /* detach a thread to monitor XL3/CAEN/MTC buffers */
-    [NSThread detachNewThreadSelector:@selector(_waitForBuffers)
-                             toTarget:self
-                           withObject:nil];
+        /* detach a thread to monitor XL3/CAEN/MTC buffers */
+        [NSThread detachNewThreadSelector:@selector(_waitForBuffers)
+                                 toTarget:self
+                               withObject:nil];
+    }
 }
 
 - (void) _waitForBuffers
 {
+    /* Since we are running in a separate thread, we just open a new
+     * connection to the MTC and XL3 servers. */
+    RedisClient *mtc = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
+    RedisClient *xl3 = [[RedisClient alloc] initWithHostName:XL3_HOST withPort:XL3_PORT];
+
     while (1) {
         @try {
-            if (([mtc_server intCommand:"data_available"] == 0) &&
-                ([xl3_server intCommand:"data_available"] == 0))
+            if (([mtc intCommand:"data_available"] == 0) &&
+                ([xl3 intCommand:"data_available"] == 0))
                 break;
         } @catch (NSException *e) {
             NSLog(@"Failed to check MTC/XL3 data buffers. Quitting run...\n");
             break;
         }
     }
+
+    [mtc release];
+    [xl3 release];
 
     /* Go ahead and end the run. */
     [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
@@ -438,9 +448,9 @@ mtcConfigDoc = _mtcConfigDoc;
      * a hard run stop, we send the MTC server the builder_end_run command
      * which will tell the builder to flush all events */
 
-    ORRunModel *run = [aNote object];
+    NSDictionary *userInfo = [aNote userInfo];
 
-    if (![run nextRunWillQuickStart]) {
+    if (![[userInfo objectForKey:@"willRestart"] boolValue]) {
         [mtc_server okCommand:"builder_end_run"];
     }
 
