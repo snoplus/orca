@@ -492,6 +492,7 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary useName:(NSString*)aName addInGroupName:(BOOL)addInGroupName
 {
     NSString* theContents = [self paramsAsString];
+    theContents = [theContents stringByAppendingString:@"\n"];
 	if(addInGroupName){
 		NSMutableDictionary* mapDictionary = [NSMutableDictionary dictionary];
 		

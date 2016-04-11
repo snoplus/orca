@@ -192,6 +192,11 @@ typedef struct Fec32CmosShiftReg{
     unsigned long   trigger100nsDisabledMask;
     unsigned long	cmosReadDisabledMask;
 
+    unsigned long lastSeqDisabledMask;
+    unsigned long lastTrigger100nsDisabledMask;
+    unsigned long lastTrigger20nsDisabledMask;
+    unsigned long lastCmosReadDisabledMask;
+
     unsigned long   seqPendingDisabledMask;
     unsigned long   trigger20nsPendingDisabledMask;
     unsigned long   trigger100nsPendingDisabledMask;
@@ -229,6 +234,7 @@ typedef struct Fec32CmosShiftReg{
 - (void) makeMainController;
 
 #pragma mark •••Accessors
+- (uint32_t) boardIDAsInt;
 - (int)             stationNumber;
 - (long)			cmosRate:(short)index;
 - (void)			setCmosRate:(short)index withValue:(long)aCmosRate;
@@ -293,6 +299,8 @@ typedef struct Fec32CmosShiftReg{
 - (BOOL)			cmosReadPendingDisabled:(short)chan;
 - (void)            makeAllCmosPendingStatesSameAs:(short)chan;
 - (void)            loadHardware;
+- (uint32_t) boardIDAsInt;
+- (void) checkConfig: (FECConfiguration *) config;
 
 - (void)            setTrigger20ns100ns:(short)chan enabled:(short)state;
 - (BOOL)			trigger20ns100nsEnabled:(short)chan;
@@ -352,7 +360,7 @@ typedef struct Fec32CmosShiftReg{
 - (void) setFec32RegisterBits:(unsigned long) aRegister bitMask:(unsigned long) bits_to_set;
 - (void) clearFec32RegisterBits:(unsigned long) aRegister bitMask:(unsigned long) bits_to_clear;
 - (void) readVoltages;
-- (void) parseVoltages:(vmon_results_t*)result;
+- (void) parseVoltages:(VMonResults*)result;
 - (unsigned long) readFromFec32Register:(unsigned long) Register;
 - (void) readBoardIds;
 - (void) boardIDOperation:(unsigned long)theDataValue boardSelectValue:(unsigned long) boardSelectVal beginIndex:(short) beginIndex;

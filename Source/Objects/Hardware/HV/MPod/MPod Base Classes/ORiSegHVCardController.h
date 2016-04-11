@@ -41,7 +41,7 @@
 	IBOutlet NSButton*      hvConstraintImage;
 	IBOutlet NSTextField*   chanNameField;
     IBOutlet NSTextField*   maxVoltageField;
-    
+    IBOutlet NSTextField*   customInfoField;
 	//details 
 	IBOutlet NSTextField*	targetField;
 	IBOutlet NSTextField*	voltageField;
@@ -95,6 +95,7 @@
 - (void) outputStatusChanged:(NSNotification*)aNote;
 - (void) maxVoltageChanged:(NSNotification*)aNote;
 - (void) chanNameChanged:(NSNotification*)aNote;
+- (void) customInfoChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) shipRecordsAction:(id)sender;

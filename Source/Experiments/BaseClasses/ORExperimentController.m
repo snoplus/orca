@@ -65,7 +65,8 @@
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 	
-   
+    [primaryTableView setFocusRingType:NSFocusRingTypeNone];
+
 	ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
 	[ratePlot addPlot: aPlot];
 	[(ORTimeAxis*)[ratePlot xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];

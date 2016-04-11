@@ -1026,7 +1026,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (void) prepareForNewSubRunStage1
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(prepareForNewSubRunStage1) object:nil];
-    if([objectsRequestingStateChangeWait count]==0){
+    if([self waitRequestersCount]==0){
         [self prepareForNewSubRunStage2];
     }
     else {
@@ -1082,7 +1082,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (void) startNewSubRunStage1
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startNewSubRunStage1) object:nil];
-    if([objectsRequestingStateChangeWait count]==0){
+    if([self waitRequestersCount]==0){
         [self startNewSubRunStage2];
     }
     else {
@@ -1148,7 +1148,9 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     //first call to see if any object needs to stop the run or do something to cause the run start process to wait
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunInitializationNotification
                                                         object: self
-                                                      userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:eRunStarting] forKey:@"State"]];
+                                                      userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:eRunStarting], @"State",
+							  [NSNumber numberWithInt:doInit||forceFullInit], @"doinit",
+    nil]];
 
     [self setDataTypeAssigner:[[[ORDataTypeAssigner alloc] init]autorelease]];
     
@@ -1162,7 +1164,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (void) waitOnObjects:(NSNumber*)doInitBool
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(waitOnObjects:) object:doInitBool];
-    if([objectsRequestingStateChangeWait count]==0){
+    if([self waitRequestersCount]==0){
         [self continueWithRunStart:doInitBool];
     }
     else {
@@ -1236,7 +1238,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
                                                         object: self
                                                       userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:eRunStarting] forKey:@"State"]];
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startRunStage2:) object:doInitBool];
-    if([objectsRequestingStateChangeWait count]==0)[self startRunStage3:doInitBool];
+    if([self waitRequestersCount]==0)[self startRunStage3:doInitBool];
     else {
         [self performSelector:@selector(startRunStage2:) withObject:doInitBool afterDelay:0];
     }
@@ -1381,16 +1383,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     }
 }
 
-- (void) stopRunStage1
-{
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(stopRunStage1) object:nil];
-    if([objectsRequestingStateChangeWait count]==0)[self stopRunStage2];
-    else {
-        [self performSelector:@selector(stopRunStage1) withObject:nil afterDelay:0];
-    }
-}
 
-- (void) stopRunStage2
+- (void) stopRunStage1
 {
 	if([self runningState] == eRunStopping){
 		NSLog(@"Stop Run message received and ignored because run is already stopping.\n");
@@ -1433,9 +1427,19 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		
 		totalWaitTime = 0;
 		
-		[self waitForRunToStop];
-	}	
+        [self stopRunStage2];
+	}
 }
+
+- (void) stopRunStage2
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(stopRunStage2) object:nil];
+    if([self waitRequestersCount]==0)[self waitForRunToStop];
+    else {
+        [self performSelector:@selector(stopRunStage2) withObject:nil afterDelay:0];
+    }
+}
+
 
 - (void) needMoreTimeToStopRun:(NSNotification*)aNote
 {
@@ -1445,7 +1449,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (void) waitForRunToStop
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(waitForRunToStop) object:nil];
-	
     //wait for runthread to exit
     if(dataTakingThreadRunning){
 		timeToStopTakingData= YES;
@@ -1528,14 +1531,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	//closeout run will wait until the processing thread is done.
 	[nextObject closeOutRun:runInfo];
 	
-	if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
-		NSLog(@"Run %d stopped.\n",_currentRun);
-	}
-	else {
-		NSLog(@"Offline Run stopped.\n");
-	}
-	NSLog(@"---------------------------------------\n");
-			
 	[self setRunningState:eRunStopped];
 	
 	[dataTypeAssigner release];
@@ -1548,11 +1543,22 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     [[self undoManager] enableUndoRegistration];
 
     
+    if(![self offlineRun])  NSLog(@"Run %d stopped.\n",[self runNumber]);
+    else                    NSLog(@"Offline Run stopped.\n");
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFlushLogsNotification
+                                                        object: self
+                                                      userInfo: runInfo];
+
+    
 	if(_forceRestart ||([self timedRun] && [self repeatRun] && !ignoreRepeat && (!remoteControl || remoteInterface))){
 		ignoreRepeat  = NO;
 		_forceRestart = NO;
 		[self restartRun];
 	}
+    
+
+
 }
 
 - (void) sendHeartBeat:(NSTimer*)aTimer
@@ -1945,7 +1951,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 {
     id result = nil;
 	@synchronized (self){
-        if(index<[objectsRequestingStateChangeWait count]){
+        if(index<[self waitRequestersCount]){
             result = [objectsRequestingStateChangeWait objectAtIndex:index];
         }
     }

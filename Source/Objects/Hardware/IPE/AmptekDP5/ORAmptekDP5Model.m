@@ -568,6 +568,7 @@ void* receiveFromDataReplyServerThreadFunctionXXX (void* p)
 
 #pragma mark ***External Strings
 
+NSString* ORAmptekDP5ModelBoardTemperatureChanged = @"ORAmptekDP5ModelBoardTemperatureChanged";
 NSString* ORAmptekDP5ModelSlowCounterChanged = @"ORAmptekDP5ModelSlowCounterChanged";
 NSString* ORAmptekDP5ModelFastCounterChanged = @"ORAmptekDP5ModelFastCounterChanged";
 NSString* ORAmptekDP5ModelRealTimeChanged = @"ORAmptekDP5ModelRealTimeChanged";
@@ -822,6 +823,18 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
 
+- (int) boardTemperature
+{
+    return boardTemperature;
+}
+
+- (void) setBoardTemperature:(int)aBoardTemperature
+{
+    boardTemperature = aBoardTemperature;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelBoardTemperatureChanged object:self];
+}
+
 
 #if 0
 - (NSData*) lastRequest
@@ -1016,7 +1029,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 	//        indexChan, indexName, indexURL, indexPath, indexLoAlarm, indexHiAlarm, indexLoLimit, indexHiLimit, indexType);
 
     //now create command entry
-    //NSMutableArray * newCommandTable = [[NSMutableArray alloc] initWithCapacity:10];
+    //NSMutableArray * newCommandTable = [[NSMutableArray alloc] initWithCapacity:10]; autorelease?
     NSMutableArray * newCommandTable = [[NSMutableArray array] retain];
     NSMutableDictionary* commandTableRow;
     NSArray *line;
@@ -2666,6 +2679,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
             uint32_t var32=0;
             uint16_t var16=0; var16=0;
             uint8_t var8=0;
+            int8_t var8signed=0;
             //NSLog(@"STATUS:    (statusOffset: %i)\n",statusOffset);
             var32=*( (uint32_t*) (&(dp5Packet[statusOffset + kFastCountOffset])) );
             [self setFastCounter: var32];
@@ -2684,6 +2698,10 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
             var32=*( (uint32_t*) (&(dp5Packet[statusOffset + kRealtimeOffset])) );
             [self setRealTime: var32];
             //NSLog(@"    kRealtimeOffset: %i  x 1 mS (0x%08x)\n",var32,var32);
+            
+            var8signed =*( (int8_t*) (&(dp5Packet[statusOffset + kBoardTemperature])) );
+            [self setBoardTemperature: var8signed];
+            NSLog(@"    kRealtimeOffset: %i  degree celsius  (0x%08x)\n",var8signed,var8signed);
             
             
         }
@@ -4989,6 +5007,95 @@ return ;
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
 	return objDictionary;
 }
+
+
+
+
+
+
+
+#pragma mark •••Related to Adc or Bit Processing Protocol
+// methods for setting LoAlarm, HiAlarm, LoLimit (=minValue), HiLimit (=maxValue) (from IPESlowControlModel -tb-)
+//- (void) setLoAlarmForChan:(int)channel value:(double)aValue;
+//- (void) setHiAlarmForChan:(int)channel value:(double)aValue;
+//- (void) setLoLimitForChan:(int)channel value:(double)aValue;
+//- (void) setHiLimitForChan:(int)channel value:(double)aValue;
+
+#pragma mark •••Adc or Bit Processing Protocol
+//note that everything called by these routines MUST be threadsafe
+- (void) processIsStarting
+{
+	//called when processing is started. nothing to do for now. 
+	//called at the HW polling rate in the process dialog. 
+	//For now we just use the local polling
+}
+
+- (void)processIsStopping
+{
+	//called when processing is stopping. nothing to do for now.
+}
+
+
+
+- (void) startProcessCycle
+{	//called at the HW polling rate in the process dialog. 
+	//ignore for now.
+}
+
+- (void) endProcessCycle
+{  }
+
+/** Note: Adc  Processing supports 30 channels; shipping SC packs channel number into 16 bit (0x00-0xff or 0 ... 255).
+  * But there is no limit to the channel number (except it must be a int).
+  *
+  */ //-tb-
+- (BOOL) processValue:(int)channel
+{
+	return channel==0;// ??? -tb-
+}
+
+- (NSString*) processingTitle
+{
+    return [NSString stringWithFormat: @"Amptek-DP5-%lu",[self uniqueIdNumber]];
+}
+
+
+- (void) setProcessOutput:(int)channel value:(int)value
+{  }  //nothing to do
+
+- (double) convertedValue:(int)channel
+{    
+    if(channel==0) return [self boardTemperature];
+    else return 0.0;
+}
+
+
+
+
+- (double) maxValueForChan:(int)channel
+{
+    return 128.0;
+}
+
+- (double) minValueForChan:(int)channel
+{
+    return -128.0;
+}
+
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel
+{
+		*theLowLimit  =  0.0 ;
+		*theHighLimit  =  80.0 ;
+
+}
+
+
+
+
+
+
+
+
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Data Taker
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo

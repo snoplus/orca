@@ -24,6 +24,7 @@
 
 @class ORTimeRate;
 @class ORAlarm;
+@class ORDataPacket;
 
 #define kPositivePolarity 1
 #define kNegativePolarity 0
@@ -86,6 +87,7 @@ enum{
     int				selectedChannel;
     float			maxCurrent[16];
     int             maxVoltage[16];
+    NSString*       customInfo[16];
 	NSString*       chanName[16];
 	ORTimeRate*		voltageHistory[16];
 	ORTimeRate*		currentHistory[16];
@@ -93,6 +95,7 @@ enum{
     NSMutableDictionary* hvConstraints;
     ORAlarm*        safetyLoopNotGoodAlarm;
     BOOL            doNotPostSafetyLoopAlarm;
+    NSDate*         lastHistoryPost;
 }
 
 #pragma mark ***Initialization
@@ -102,6 +105,8 @@ enum{
 - (void) setUpImage;
 - (void) makeMainController;
 - (BOOL) polarity;
+- (void) registerNotificationObservers;
+- (void) runStarted:(NSNotification*)aNote;
 
 #pragma mark ***Accessors
 - (id)				adapter;
@@ -114,6 +119,8 @@ enum{
 - (void)	setShipRecords:(BOOL)aShipRecords;
 - (int)     maxVoltage:(short)chan;
 - (void)	setMaxVoltage:(short)chan withValue:(int)aValue;
+- (NSString*) customInfo:(short)chan;
+- (void) setCustomInfo:(short)chan string:(NSString*)aString;
 - (NSString*) chanName:(short)chan;
 - (void)	setChan:(short)chan name:(NSString*)aName;
 - (int)     supplyVoltageLimit;
@@ -154,6 +161,7 @@ enum{
 - (NSDictionary*) modParams;
 - (BOOL) constraintsInPlace;
 - (void) requestMaxValues:(int)aChannel;
+- (void) requestCustomInfo:(int)aChannel;
 - (NSString*) getModuleString;
 
 - (BOOL) doNotPostSafetyLoopAlarm;
@@ -164,6 +172,7 @@ enum{
 - (void) setDataId: (unsigned long) DataId;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherShaper;
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (NSDictionary*) dataRecordDescription;
 
 #pragma mark ***Polling
@@ -238,6 +247,7 @@ enum{
 extern NSString* ORiSegHVCardShipRecordsChanged;
 extern NSString* ORiSegHVCardMaxVoltageChanged;
 extern NSString* ORiSegHVCardMaxCurrentChanged;
+extern NSString* ORiSegHVCardCustomInfoChanged;
 extern NSString* ORiSegHVCardSelectedChannelChanged;
 extern NSString* ORiSegHVCardRiseRateChanged;
 extern NSString* ORiSegHVCardHwGoalChanged;
@@ -249,6 +259,7 @@ extern NSString* ORiSegHVCardChannelReadParamsChanged;
 extern NSString* ORiSegHVCardExceptionCountChanged;
 extern NSString* ORiSegHVCardConstraintsChanged;
 extern NSString* ORiSegHVCardRequestHVMaxValues;
+extern NSString* ORiSegHVCardRequestCustomInfo;
 extern NSString* ORiSegHVCardChanNameChanged;
 extern NSString* ORiSegHVCardDoNotPostSafetyAlarmChanged;
 

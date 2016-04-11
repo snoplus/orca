@@ -366,6 +366,7 @@ NSString* ORFolderPercentDoneChanged                = @"ORFolderPercentDoneChang
 
 
 #pragma mark ¥¥¥Data Handling
+//some of these methods can run from a thread and can udpate the gui, so post to main thread
 - (void) queueFileForSending:(NSString*)fullPath
 {
     halt = NO;
@@ -401,7 +402,7 @@ NSString* ORFolderPercentDoneChanged                = @"ORFolderPercentDoneChang
                 [self sendAll];
             }
         }
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORDataFileQueueRunningChangedNotification object: self];
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORDataFileQueueRunningChangedNotification object: self];
         [self performSelectorOnMainThread:@selector(updateSpecialButtons) withObject:nil waitUntilDone:NO];
     }
 }

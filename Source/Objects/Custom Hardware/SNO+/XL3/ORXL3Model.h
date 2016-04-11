@@ -20,9 +20,7 @@
 
 #pragma mark •••Imported Files
 #import "ORSNOCard.h"
-#import "XL3_Cmds.h"
-#import "ORDataTaker.h"
-#import "VME_eCPU_Config.h"
+#import "PacketTypes.h"
 #import "SNOPModel.h"
 
 typedef struct  {
@@ -48,12 +46,19 @@ enum {
 	kXl3NumRegisters //must be last
 };
 
+/* shiftRegOnly parameter to crate init */
+#define SHIFT_AND_DAC 2
+
+/* XL3 modes */
+#define INIT_MODE 1
+#define NORMAL_MODE 2
+
 @class XL3_Link;
 @class ORCommandList;
 @class ORCouchDB;
 
 
-@interface ORXL3Model : ORSNOCard <ORDataTaker>
+@interface ORXL3Model : ORSNOCard
 {
 	XL3_Link*       xl3Link;
 	unsigned long	_xl3MegaBundleDataId;
@@ -72,7 +77,7 @@ enum {
 	unsigned long   workingCount;
 	unsigned long   writeValue;
 	unsigned int    xl3Mode;
-	unsigned long   slotMask;
+	unsigned long   selectedSlotMask;
 	BOOL            xl3ModeRunning;
 	unsigned long   xl3RWAddressValue;
     unsigned long   xl3RWDataValue;
@@ -95,14 +100,17 @@ enum {
     BOOL            isPollingForced;
     NSString*       pollStatus;
     NSThread*       pollThread;
-    ORTimer*        timer;
     
     unsigned long long  relayMask;
-    uint32_t relayLowMask;
-    uint32_t relayHighMask; 
+    unsigned long long  relayViewMask;
     NSString* relayStatus;
     BOOL hvASwitch;
     BOOL hvBSwitch;
+    BOOL hvARamping;
+    BOOL hvBRamping;
+    BOOL hvEverUpdated;
+    BOOL hvSwitchEverUpdated;
+    
     NSString* triggerStatus;
     BOOL _isTriggerON;
 
@@ -125,6 +133,8 @@ enum {
     unsigned long _hvNominalVoltageA;
     unsigned long _hvNominalVoltageB;
     BOOL _hvPanicFlag;
+    NSLock* hvInitLock;
+    NSThread* hvInitThread;
     NSThread* hvThread;
     NSDateFormatter* xl3DateFormatter;
     float _xl3VltThreshold[12];
@@ -133,10 +143,10 @@ enum {
     BOOL _xl3InitInProgress;
     id <snotDbDelegate> _snotDb;
     
-    mb_t safe_bundle[16];
-    mb_t ecal_bundle[16];
-    mb_t hw_bundle[16];
-    mb_t ui_bundle[16];
+    MB safe_bundle[16];
+    MB ecal_bundle[16];
+    MB hw_bundle[16];
+    MB ui_bundle[16];
     unsigned long _ecal_received;
     bool _ecalToOrcaInProgress;
 }
@@ -167,8 +177,7 @@ enum {
 @property (nonatomic,assign) BOOL isPollingForced;
 
 @property (nonatomic,assign) unsigned long long relayMask;
-@property (nonatomic,assign) uint32_t relayLowMask;
-@property (nonatomic,assign) uint32_t relayHighMask;
+@property (nonatomic,assign) unsigned long long relayViewMask;
 @property (nonatomic,copy) NSString* relayStatus;
 @property (nonatomic,assign) BOOL hvASwitch;
 @property (nonatomic,assign) BOOL hvBSwitch;
@@ -199,6 +208,11 @@ enum {
 @property (assign) unsigned long ecal_received; //set accross multiple threads
 @property (nonatomic,assign) bool ecalToOrcaInProgress;
 @property (assign) id snotDb;//I replaced 'weak' by 'assign' to get Orca compiled under 10.6 (-tb- 2013-09)
+
+@property BOOL hvEverUpdated;
+@property BOOL hvSwitchEverUpdated;
+@property BOOL hvARamping;
+@property BOOL hvBRamping;
 
 
 #pragma mark •••Initialization
@@ -254,9 +268,9 @@ enum {
 - (NSComparisonResult) XL3NumberCompare:(id)aCard;
 
 #pragma mark •••DB Helpers
-- (void) synthesizeDefaultsIntoBundle:(mb_t*)aBundle forSlot:(unsigned short)aSlot;
-- (void) byteSwapBundle:(mb_t*)aBundle;
-- (void) synthesizeFECIntoBundle:(mb_t*)aBundle forSlot:(unsigned short)aSlot;
+- (void) synthesizeDefaultsIntoBundle:(MB*)aBundle forSlot:(unsigned short)aSlot;
+- (void) byteSwapBundle:(MB*)aBundle;
+- (void) synthesizeFECIntoBundle:(MB*)aBundle forSlot:(unsigned short)aSlot;
 - (ORCouchDB*) debugDBRef;
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
 - (void) ecalToOrca;
@@ -264,15 +278,6 @@ enum {
 - (void) parseEcalDocument:(NSDictionary*)aResult;
 - (void) updateUIFromEcalBundle:(NSDictionary*)aBundle slot:(unsigned int)aSlot;
 - (BOOL) isRelayClosedForSlot:(unsigned int)slot pc:(unsigned int)aPC;
-
-#pragma mark •••DataTaker
-- (void) setDataIds:(id)assigner;
-- (void) syncDataIdsWith:(id)anotherObj;
-- (NSDictionary*) dataRecordDescription;
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (int) load_eCPU_HW_Config_Structure:(VME_crate_config*)configStruct index:(int)index;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
@@ -289,9 +294,20 @@ enum {
 - (void) writeXL3Register:(short)aRegister value:(unsigned long)aValue;
 - (unsigned long) readXL3Register:(short)aRegister;
 
-- (void) initCrateRegistersOnly;
-- (void) initCrateWithXilinx:(BOOL)aXilinxFlag autoInit:(BOOL)anAutoInitFlag;
-- (void) initCrateWithDict:(NSDictionary*)argDict;
+- (int) updateXl3Mode;
+- (int) setSequencerMasks: (uint32_t) slotMask;
+- (void) initCrate: (int) xilinxLoad;
+- (void) initCrateDone: (CrateInitResults *)r;
+- (void) loadHardware;
+- (void) loadHardwareWithSlotMask: (uint32_t) slotMask;
+- (void) loadHardwareWithSlotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target;
+- (void) initCrateAsync: (int) xilinxLoad shiftRegOnly: (uint32_t) shiftRegOnly slotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target;
+- (void) initCrateAsyncThread: (NSDictionary *) args;
+- (void) initCrate: (int) xilinxLoad shiftRegOnly: (uint32_t) shiftRegOnly slotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target;
+- (int) initCrate: (int) xilinxLoad shiftRegOnly: (uint32_t) shiftRegOnly slotMask: (uint32_t) slotMask results: (CrateInitResults *) results;
+- (void) checkCrateConfig: (BuildCrateConfigResults *)r;
+
+- (uint32_t) getSlotsPresent;
 - (void) orcaToHw;
 
 #pragma mark •••Basic Ops
@@ -319,19 +335,19 @@ enum {
 - (void) enableChargeInjectionForSlot:(unsigned short)aSlot channelMask:(unsigned long)aChannelMask;
 
 #pragma mark •••HV
-- (void) readCMOSCountWithArgs:(check_total_count_args_t*)aSlot counts:(check_total_count_results_t*)aCounts;
+- (void) readCMOSCountWithArgs:(CheckTotalCountArgs*)aSlot counts:(CheckTotalCountResults*)aCounts;
 - (void) readCMOSCountForSlot:(unsigned short)aSlot withChannelMask:(unsigned long)aChannelMask;
 - (void) readCMOSCount;
 
-- (void) readCMOSRateWithArgs:(read_cmos_rate_args_t*)aArgs rates:(read_cmos_rate_results_t*)aRates;
+- (void) readCMOSRateWithArgs:(CrateNoiseRateArgs*)aArgs rates:(CrateNoiseRateResults*)aRates;
 - (void) readCMOSRateForSlot:(unsigned short)aSlot withChannelMask:(unsigned long)aChannelMask withDelay:(unsigned long)aDelay;
 - (void) readCMOSRate;
 
-- (void) readPMTBaseCurrentsWithArgs:(read_pmt_base_currents_args_t*)aArg currents:(read_pmt_base_currents_results_t*)result;
+- (void) readPMTBaseCurrentsWithArgs:(ReadPMTCurrentArgs*)aArg currents:(ReadPMTCurrentResults*)result;
 - (void) readPMTBaseCurrentsForSlot:(unsigned short)aSlot withChannelMask:(unsigned long)aChannelMask;
 - (void) readPMTBaseCurrents;
 
-- (void) readHVStatus:(hv_readback_results_t*)status;
+- (void) readHVStatus:(HVReadbackResults*)status;
 - (void) readHVStatus;
 
 - (void) setHVRelays:(unsigned long long)relayMask error:(unsigned long*)aError;
@@ -343,6 +359,7 @@ enum {
 - (void) readHVSwitchOnForA:(BOOL*)aIsOn forB:(BOOL*)bIsOn;
 - (void) readHVSwitchOn;
 
+- (void) safeHvInit;
 - (void) setHVSwitch:(BOOL)aOn forPowerSupply:(unsigned char)sup;
 - (void) hvPanicDown;
 - (void) hvMasterPanicDown;
@@ -353,10 +370,10 @@ enum {
 - (void) setHVDacA:(unsigned short)aDac dacB:(unsigned short)bDac;
 
 #pragma mark •••tests
-- (void) readVMONForSlot:(unsigned short)aSlot voltages:(vmon_results_t*)aVoltages;
+- (void) readVMONForSlot:(unsigned short)aSlot voltages:(VMonResults*)aVoltages;
 - (void) readVMONForSlot:(unsigned short)aSlot;
 - (void) readVMONWithMask:(unsigned short)aSlotMask;
-- (void) readVMONXL3:(vmon_xl3_results_t*)aVoltages;
+- (void) readVMONXL3:(LocalVMonResults*)aVoltages;
 - (void) readVMONXL3;
 - (void) setVltThreshold;
 

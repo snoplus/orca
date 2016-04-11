@@ -35,6 +35,10 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
 #define kOnCallAlarmWaitTime        3*60
 #define kOnCallAcknowledgeWaitTime 10*60
 
+@interface OROnCallListModel (private)
+- (void) postCouchDBRecord;
+@end
+
 
 @implementation OROnCallListModel
 
@@ -65,6 +69,11 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
 - (void) setUpImage         { [self setImage:[NSImage imageNamed:@"OnCallList"]]; }
 - (void) makeMainController { [self linkToController:@"OROnCallListController"];  }
 - (NSString*) helpURL       { return @"Subsystems/On_Call_List.html";             }
+
+- (void) awakeAfterDocumentLoaded
+{
+    [self postCouchDBRecord];
+}
 
 #pragma mark ***Accessors
 
@@ -120,12 +129,16 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
     if([newPerson isOnCall]){
         //someone else can now be relieved
         for(OROnCallPerson* aPerson in onCallList){
+            [aPerson setStatus:@""];
             if(aPerson != newPerson){
                 if([aPerson isOnCall] && [aPerson hasSameRoleAs:newPerson]){
                     [aPerson takeOffCall];
                 }
             }
         }
+    }
+    else {
+        [newPerson takeOffCall];
     }
     //now the roles are:
     OROnCallPerson* primary     = [self primaryPerson];
@@ -156,7 +169,7 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
         }
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:OROnCallListModelReloadTable object:self];
-
+    [self postCouchDBRecord];
 }
 
 - (void) registerNotificationObservers
@@ -188,12 +201,13 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
 }
 - (void) startContactProcess
 {
-    if(!notificationTimer){
+    OROnCallPerson* primary     = [self primaryPerson];
+    OROnCallPerson* secondary   = [self secondaryPerson];
+    OROnCallPerson* tertiary    = [self tertiaryPerson];
+
+    if(!notificationTimer && (primary || secondary || tertiary)){
         notificationTimer = [[NSTimer scheduledTimerWithTimeInterval:kOnCallAlarmWaitTime target:self selector:@selector(notifyPrimary:) userInfo:nil repeats:NO] retain];
-        OROnCallPerson* primary     = [self primaryPerson];
-        OROnCallPerson* secondary   = [self secondaryPerson];
-        OROnCallPerson* tertiary    = [self tertiaryPerson];
-        NSDate* contactDate = [[NSDate date] dateByAddingTimeInterval:kOnCallAcknowledgeWaitTime];
+         NSDate* contactDate = [[NSDate date] dateByAddingTimeInterval:kOnCallAcknowledgeWaitTime];
         if(primary){
             [primary setStatus:[NSString stringWithFormat:@"Will Contact: %@",[contactDate descriptionFromTemplate:@"HH:mm:ss"]]];
             if(secondary)       [secondary setStatus:@"Next on deck"];
@@ -207,6 +221,7 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
             [tertiary setStatus:[NSString stringWithFormat:@"Will Contact: %@",[contactDate descriptionFromTemplate:@"HH:mm:ss"]]];
         }
     }
+    [self postCouchDBRecord];
     [[NSNotificationCenter defaultCenter] postNotificationName:OROnCallListPeopleNotifiedChanged object:self];
 }
 
@@ -441,6 +456,7 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
 - (void) takeOffCall
 {
     [data setValue:[NSNumber numberWithInt:kOffCall] forKey:kPersonRole];
+    [self setStatus:@""];
 }
 
 - (void) setValue:(id)anObject forKey:(id)aKey
@@ -482,19 +498,56 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
 {
     [encoder encodeObject:data  forKey:@"data"];
 }
-
 - (void) sendMessage:(NSString*)aMessage
+{
+    [self sendMessage:aMessage isAlarm:NO];
+}
+
+- (void) sendMessage:(NSString*)aMessage isAlarm:(BOOL)isAlarm
 {
     if([[self address] length]){
         if([aMessage length]){
-            ORMailer* mailer = [ORMailer mailer];
-            [mailer setTo:[self address]];
-            [mailer setSubject:computerName()];
-            [mailer setBody:[[[NSAttributedString alloc] initWithString:aMessage] autorelease]];
-            [mailer send:self];
-            NSLog(@"On Call Message: %@\n",aMessage);
-            NSLog(@"Sent to %@\n",[self name]);
+            NSString* s;
+            if(isAlarm) s = [NSString stringWithFormat:@"Posted alarms:\n\n%@\nAcknowlege them or others will be contacted!",aMessage];
+            else        s = [NSString stringWithFormat:@"Manually sent message from ORCA:\n\n%@\n",aMessage];
+            
+            NSArray* addresses = [[self address] componentsSeparatedByString:@","];
+            for(NSString* anAddress in addresses){
+                if([anAddress rangeOfString:@"@iMessage"].location != NSNotFound){
+                    NSArray* parts = [anAddress componentsSeparatedByString:@"@"];
+                    NSString* justNumber = [parts objectAtIndex:0];
+                    NSString* machine = computerName();
+                    NSDictionary* errorDict;
+                    NSAppleEventDescriptor* returnDescriptor = NULL;
+                    NSString* template = @"\
+                    tell application \"Messages\"\n\
+                    set theBuddy to buddy \"+1$!$\" of service \"E:$2$@gmail.com\"\n\
+                    send \"This is a test\" to theBuddy\n\
+                    end tell";
+                    template = [template stringByReplacingOccurrencesOfString:@"$1$" withString:justNumber];
+                    template = [template stringByReplacingOccurrencesOfString:@"$2$" withString:machine];
+                    
+                    NSAppleScript* scriptObject = [[NSAppleScript alloc] initWithSource:template ];
+                    
+                    returnDescriptor = [scriptObject executeAndReturnError: &errorDict];
+                    [scriptObject release];
+                    
+                    if (returnDescriptor == NULL){ // failed execution
+                        NSLog(@"Attempt to send message to %@ Failed with error: %@\n",anAddress,errorDict);
+                    }
+                }
+                else {
+                    ORMailer* mailer = [ORMailer mailer];
+                    [mailer setTo:anAddress];
+                    [mailer setSubject:[NSString stringWithFormat: @"ORCA message from %@",computerName()]];
+                    [mailer setBody:[[[NSAttributedString alloc] initWithString:s] autorelease]];
+                    [mailer send:self];
+                }
+             }
         }
+        NSLog(@"On Call Message: %@\n",aMessage);
+        NSLog(@"Sent to %@\n",[self name]);
+
     }
     else NSLog(@"No contact info available for %@\n",[self name]);
 }
@@ -510,16 +563,10 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
                 [report appendFormat:@"%@ : %@ @ %@\n",[anAlarm name],[ORAlarm alarmSeverityName:[anAlarm severity]],[anAlarm timePosted]];
             }
         }
+        
         if([report length]){
-            NSString* s = [NSString stringWithFormat:@"Posted alarms:\n\n%@\nAcknowlege them or others will be contacted!",report];
-            ORMailer* mailer = [ORMailer mailer];
-            [mailer setTo:[self address]];
-            [mailer setSubject:computerName()];
-            [mailer setBody:[[[NSAttributedString alloc] initWithString:s] autorelease]];
-            [mailer send:self];
-            NSLog(@"On Call Message: %@\n",s);
-            NSLog(@"Sent to %@\n",[self name]);
-        }
+            [self sendMessage:report isAlarm:YES];
+         }
     }
     else {
         [self setStatus:@"No Address"];
@@ -537,5 +584,17 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
     OROnCallPerson* copy = [[OROnCallPerson alloc] init];
     copy.data = [[data copyWithZone:zone] autorelease];
     return copy;
+}
+@end
+
+@implementation OROnCallListModel (private)
+- (void) postCouchDBRecord
+{
+    NSMutableDictionary* record = [NSMutableDictionary dictionary];
+    if([self primaryPerson])[record setObject:[[self primaryPerson] data] forKey:@"Primary"];
+    if([self secondaryPerson])[record setObject:[[self secondaryPerson] data] forKey:@"Secondary"];
+    if([self tertiaryPerson])[record setObject:[[self tertiaryPerson] data] forKey:@"Tertiary"];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:record];
 }
 @end

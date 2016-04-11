@@ -346,7 +346,10 @@
 		[delegate couchDBResult:obj tag:tag op:self];
 	}
 }	
-
+- (NSString*)database
+{
+    return database;
+}
 - (NSString*) revision:(NSString*)anID
 {
 	NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, anID];

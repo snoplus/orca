@@ -75,6 +75,8 @@
 
 #pragma mark •••Initialization
 
+- (uint32_t) boardIDAsInt;
+
 #pragma mark •••Accessors
 - (NSString*)	comments;
 - (void)		setComments:(NSString*)aComments;

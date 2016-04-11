@@ -64,6 +64,7 @@ NSString* ORAddRunStateChangeWait           = @"ORAddRunStateChangeWait";
 NSString* ORReleaseRunStateChangeWait       = @"ORReleaseRunStateChangeWait";
 NSString* ORRunAboutToChangeState           = @"ORRunAboutToChangeState";
 NSString* ORAddRunStartupAbort              = @"ORAddRunStartupAbort";
+NSString* ORFlushLogsNotification           = @"ORFlushLogsNotification";
 
 NSString* ORRunTypeMask			    = @"ORRunTypeMask";
 NSString* ORRunStatusValue		    = @"Run Status Value";

@@ -33,11 +33,12 @@ NSString* ORStatusFlushSize				 = @"ORStatusFlushSize";
 
 ORStatusController* theLogger = nil;
 
-#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @interface ORStatusController (private)
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) deleteHistoryActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-@end
 #endif
+- (void) mainThreadPrint:(NSAttributedString*)s1;
+@end
 
 #define kStatusConnection @"StatusConnection"
 #define kMaxTextSize 500000
@@ -187,54 +188,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     return [NSString stringWithFormat:@"%@",[dataSet summarizeIntoString:string]];
 }
 
--(oneway void) printString: (NSString*)s1
-{
-    @synchronized(self){
 
-        [s1 retain];
-        [statusView replaceCharactersInRange:NSMakeRange([self statusTextlength], 0) withString:s1];
-        [statusView scrollRangeToVisible: NSMakeRange([self statusTextlength], 0)];
-        
-        if([self statusTextlength] > kMaxTextSize){
-            [[statusView textStorage] deleteCharactersInRange:NSMakeRange(0,kMaxTextSize/3)];
-            NSString* theText = [[statusView textStorage] string];
-            NSRange endOfLineRange = [theText rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"\n"]];
-            int extra = 0;
-            if(endOfLineRange.location != NSNotFound){
-                [[statusView textStorage] deleteCharactersInRange:NSMakeRange(0,endOfLineRange.location)];
-                extra = endOfLineRange.location;
-            }
-            [[NSNotificationCenter defaultCenter]
-             postNotificationName:ORStatusFlushedNotification
-             object:self
-             userInfo: [NSDictionary dictionaryWithObjectsAndKeys:
-                        [NSNumber numberWithInt:kMaxTextSize/3+extra],ORStatusFlushSize,nil]];
-        }
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORStatusLogUpdatedNotification object:self];
-        
-        [s1 release];
-    }
+- (oneway void) printAttributedString:(NSAttributedString*)s1
+{
+    [self performSelectorOnMainThread:@selector(mainThreadPrint:) withObject:s1 waitUntilDone:YES];
 }
 
--(oneway void) printAttributedString:(NSAttributedString*)s1
-{
-
-    [s1 retain];
-    [self printString:[s1 string]];
-    int len = [s1 length];
-        
-    @synchronized(self){
-       NSUInteger i=0;
-        while (i<len) {
-            NSRange range;
-            NSDictionary* dict = [s1 attributesAtIndex:i effectiveRange:&range];
-            range.location += [self statusTextlength] - len;
-            [[statusView textStorage] setAttributes:dict range:range];
-            i += range.length;
-        }
-        [s1 release];
-    }
-}
 
 - (oneway void) logError: (NSString*)anError usingKeyArray:(NSArray*)keys
 {
@@ -899,7 +858,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 	[printView release];
 	
 }
-
 @end
 
 @implementation ORPrintableOutlineView
@@ -925,61 +883,37 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 
 #pragma mark ¥¥¥¥¥Log Helper Function
 //----------------------------------------------------------------------------------------------------
-//_nsLog
+//NSLogString
 //	a helper function to redirect a call to logStatus to a logger defined by the NSApp delegate
 //----------------------------------------------------------------------------------------------------
-void _nsLog(NSString* s,...)
+void NSLogString(NSString* s,...)
 {
-    @synchronized([ORStatusController sharedStatusController]){
-        NSColor* aColor = [NSColor blackColor];
-        @try {
-            va_list myArgs;
-            va_start(myArgs,s);
-            
-            NSAttributedString* s1 = [[[NSAttributedString alloc]
-                                       initWithString:[[[NSString alloc] initWithFormat:s
-                                                                                 locale:nil
-                                                                              arguments:myArgs] autorelease]
-                                       attributes:[NSDictionary dictionaryWithObject:aColor
-                                                                              forKey:NSForegroundColorAttributeName ]]autorelease];
-            va_end(myArgs);
-            NSLogAttr(s1);        
-        }
-        @catch(NSException* localException) {
-        }
+    NSColor* aColor = [NSColor blackColor];
+    @try {
+        va_list myArgs;
+        va_start(myArgs,s);
+        
+        NSAttributedString* s1 = [[[NSAttributedString alloc]
+                                   initWithString:[[[NSString alloc] initWithFormat:s
+                                                                             locale:nil
+                                                                          arguments:myArgs] autorelease]
+                                   attributes:[NSDictionary dictionaryWithObject:aColor
+                                                                          forKey:NSForegroundColorAttributeName ]]autorelease];
+        va_end(myArgs);
+        
+        [sharedStatusController printAttributedString:s1];
+    }
+    @catch(NSException* localException) {
     }
 }
 
 //----------------------------------------------------------------------------------------------------
 //NSLogAttr
-//	A function to print out attributed strings to the log.  All NSLog* functions call through this
+//	A function to print out attributed strings to the log.
 //----------------------------------------------------------------------------------------------------
 void NSLogAttr(NSAttributedString* s)
 {
-	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-    @try {
-        
-        NSDate* now  	= [NSDate date];
-        NSMutableAttributedString* now_Attr = [[[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ ",[now stdDescription]] attributes:[NSDictionary dictionaryWithObject:[NSColor grayColor] forKey:NSForegroundColorAttributeName ]] autorelease];
-        
-        [now_Attr appendAttributedString:s];
-        
-        NSInvocation *invocation;
-        invocation = [NSInvocation invocationWithMethodSignature:[sharedStatusController methodSignatureForSelector:@selector(printAttributedString:)]];
-        
-        [invocation setTarget:sharedStatusController];
-        [invocation setSelector:@selector(printAttributedString:)];
-        [invocation setArgument:&now_Attr atIndex:2];
-        [invocation retainArguments];
-        
-        [sharedStatusController performSelectorOnMainThread:@selector(handleInvocation:) withObject:invocation waitUntilDone:NO];
-        
-        [sharedStatusController scheduleCouchDBUpdate];
-
-	}
-	@catch(NSException* localException) {
-	}
-	[pool release];
+    [sharedStatusController printAttributedString:s];
 }
 
 
@@ -1001,7 +935,7 @@ void NSLogColor(NSColor* aColor,NSString* s,...)
                                    attributes:[NSDictionary dictionaryWithObject:aColor
                                                                           forKey:NSForegroundColorAttributeName ]]autorelease];
         va_end(myArgs);
-        NSLogAttr(s1);
+        [sharedStatusController printAttributedString:s1];
         
 	}
 	@catch(NSException* localException) {
@@ -1023,10 +957,10 @@ void NSLogFont(NSFont* aFont,NSString* s,...)
                                    initWithString:[[[NSString alloc] initWithFormat:s
                                                                              locale:nil
                                                                           arguments:myArgs] autorelease]
-                                   attributes:[NSDictionary dictionaryWithObject:aFont
+                                    attributes:[NSDictionary dictionaryWithObject:aFont
                                                                           forKey:NSFontAttributeName ]] autorelease];
         va_end(myArgs);
-        NSLogAttr(s1);
+        [sharedStatusController printAttributedString:s1];
 	}
 	@catch(NSException* localException) {
 	}
@@ -1071,8 +1005,8 @@ void NSLogError(NSString* aString,...)
 	[pool release];
 }
 
-#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @implementation ORStatusController (private)
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) deleteHistoryActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertAlternateReturn){		
@@ -1084,5 +1018,47 @@ void NSLogError(NSString* aString,...)
 		NSLog(@"Alarm history deleted\n");
 	}
 }
-@end
 #endif
+- (void) mainThreadPrint:(NSAttributedString*)s1
+{
+    if(![NSThread isMainThread])return;
+    NSDate* now  	= [NSDate date];
+    NSMutableAttributedString* now_Attr = [[[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ ",[now stdDescription]] attributes:[NSDictionary dictionaryWithObject:[NSColor grayColor] forKey:NSForegroundColorAttributeName ]] autorelease];
+    
+    [now_Attr appendAttributedString:s1];
+    
+    
+    [s1 retain];
+
+    [statusView replaceCharactersInRange:NSMakeRange([self statusTextlength], 0) withString:[now_Attr string]];
+    [statusView scrollRangeToVisible: NSMakeRange([self statusTextlength], 0)];
+    
+    if([self statusTextlength] > kMaxTextSize){
+        [[statusView textStorage] deleteCharactersInRange:NSMakeRange(0,kMaxTextSize/3)];
+        NSString* theText = [[statusView textStorage] string];
+        NSRange endOfLineRange = [theText rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"\n"]];
+        int extra = 0;
+        if(endOfLineRange.location != NSNotFound){
+            [[statusView textStorage] deleteCharactersInRange:NSMakeRange(0,endOfLineRange.location)];
+            extra = endOfLineRange.location;
+        }
+        [[NSNotificationCenter defaultCenter]postNotificationName:ORStatusFlushedNotification
+                                                           object:self
+                                                         userInfo: [NSDictionary dictionaryWithObjectsAndKeys:
+                                                                    [NSNumber numberWithInt:kMaxTextSize/3+extra],ORStatusFlushSize,nil]];
+    }
+    
+    int len = [now_Attr length];
+    NSUInteger i=0;
+    while (i<len) {
+        NSRange range;
+        NSDictionary* dict = [now_Attr attributesAtIndex:i effectiveRange:&range];
+        range.location += [self statusTextlength] - len;
+        [[statusView textStorage] setAttributes:dict range:range];
+        i += range.length;
+    }
+    [s1 release];
+    [sharedStatusController scheduleCouchDBUpdate];
+    
+}
+@end

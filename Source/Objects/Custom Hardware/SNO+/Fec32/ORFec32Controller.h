@@ -21,6 +21,7 @@
 
 #pragma mark •••Imported Files
 #import "ORFec32Model.h"
+#import "ORMultiStateBox.h"
 
 #pragma mark •••Forward Declarations
 @class ORFecPmtsView;
@@ -84,7 +85,7 @@
 	IBOutlet NSMatrix*		thresholds1LabelsMatrix;
 	IBOutlet NSMatrix*		thresholds1Matrix;
 	
-	//vbals
+	//vBals
 	IBOutlet NSMatrix*		vb0LabelsMatrix;
 	IBOutlet NSMatrix*		vb0HMatrix;
 	IBOutlet NSMatrix*		vb0LMatrix;
@@ -103,6 +104,8 @@
 	//cache some stuff to make things easier
 	NSMatrix* onlineSwitches[4];
 	NSMatrix* pmtImages[4];
+    
+    ORMultiStateBox *msbox;
 }
 
 #pragma mark •••Accessors

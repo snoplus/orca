@@ -363,7 +363,6 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 	
 	timeToStopProcessThread = NO;
     [NSThread detachNewThreadSelector:@selector(sendDataFromQueue) toTarget:self withObject:nil];
-	NSLog(@"Processing Thread Started\n");
     
 	cycleCount = 0;
 	cycleRate  = 0;
@@ -512,13 +511,12 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 								aDataPacket,                          @"DataPacket",
 								nil];
     
-    
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunFinalCallNotification
                                                         object: self
                                                       userInfo: statusInfo];
 	
  	//wait for the processing queu to clear.
-	NSLog(@"Clearing processing queue\n");
+	if([transferQueue count])NSLog(@"Waiting on %d records in transfer queue\n",[transferQueue count]);
 	float totalTime = 0;
     while([transferQueue count]){
 		[ORTimer delay:.1];
@@ -528,26 +526,26 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 			break;
 		}
 	}	
-	if([transferQueue count]==0)NSLog(@"Processing queue clear\n");
+	if([transferQueue count]==0)NSLog(@"Transfer queue cleared successfully\n");
     else {
-        NSLog(@"Processing queue NOT clear -- Forcing a flush\n");
+        NSLog(@"Transfer queue NOT clear -- Forcing a flush\n");
         [transferQueue removeAllObjects];
     }
 	
 	//wait for the processing thread to exit.
-	NSLog(@"Waiting on processing thread\n");
+	if(processThreadRunning)NSLog(@"Waiting for transfer thread to exit\n");
 	totalTime = 0;
     while(processThreadRunning){
 		timeToStopProcessThread = YES;
 		[ORTimer delay:.1];
 		totalTime += .1;
 		if(totalTime > 2){
-			NSLogColor([NSColor redColor], @"Processing Thread Failed to stop.....You should stop and restart ORCA!\n");
+			NSLogColor([NSColor redColor], @"Transfer Thread Failed to stop.....You should stop and restart ORCA!\n");
 			break;
 		}
 	}	
 	
-	NSLog(@"Close out run\n");
+	if(!processThreadRunning)NSLog(@"Transfer thread exited\n");
     //tell everyone it's over and done.
     [nextObject closeOutRun:userInfo];
 	[nextObject setInvolvedInCurrentRun:NO];
@@ -677,7 +675,7 @@ static NSString *ORDataTaskTimeScaler		= @"ORDataTaskTimeScaler";
 	BOOL singleProcessor = [[ORGlobal sharedGlobal]cpuCount] == 1;
     do {
 		NSAutoreleasePool *pool = [[NSAutoreleasePool allocWithZone:nil] init];
-		unsigned long qc = [transferQueue count];
+ 		unsigned long qc = [transferQueue count];
 		if(qc){
 			queueCount = qc;
 			
@@ -708,7 +706,6 @@ static NSString *ORDataTaskTimeScaler		= @"ORDataTaskTimeScaler";
 			@catch(NSException* localException) {
 				NSLogError(@"Main Queue Exception",@"Data Read_out",nil);
 			}
-			
 		}
 		else {
 			if(singleProcessor)[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.01]];
@@ -737,11 +734,10 @@ static NSString *ORDataTaskTimeScaler		= @"ORDataTaskTimeScaler";
 		}
 		[pool release];
 	} while(!timeToQuit);
-	
-	NSLog(@"Processing Thread Exited\n");
+    processThreadRunning = NO;
+
 	[threadPool	release];
 	
-	processThreadRunning = NO;
 }
 
 - (void) shipPendingRecords:(ORDataPacket*)aDataPacket

@@ -12,9 +12,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#import <Cocoa/Cocoa.h>
-#import "KatrinModel.h"
-
 @class ORColorScale;
 
 #define kDisplayEvents		0
