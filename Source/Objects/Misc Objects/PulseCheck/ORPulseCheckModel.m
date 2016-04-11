@@ -85,6 +85,8 @@ NSString* ORPulseCheckModelReloadTable      = @"ORPulseCheckModelReloadTable";
 - (void) removeMachineAtIndex:(int) anIndex
 {
     if(anIndex < [machines count]){
+        ORMachineToCheck* aMachine = [machines objectAtIndex:anIndex];
+        [aMachine clearHeartbeatAlarm];
         [machines removeObjectAtIndex:anIndex];
         NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Index"];
         [[NSNotificationCenter defaultCenter] postNotificationName:ORPulseCheckMachineRemoved object:self userInfo:userInfo];
