@@ -89,8 +89,8 @@ smellieRunFile;
 	runsSize		= NSMakeSize(1200,700);
 	
 	blankView = [[NSView alloc] init];
-//  [tabView setFocusRingType:NSFocusRingTypeNone];
-//	[self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
+    [tabView setFocusRingType:NSFocusRingTypeNone];
+	[self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
     
     //pull the information from the SMELLIE DB
     [model getSmellieRunListInfo];
@@ -268,7 +268,8 @@ smellieRunFile;
     
 }
 
-
+// Currently use the default startRunAction of the superclass ORExperimentController.
+// Leave this here in case a custom function is needed
 //- (IBAction) startRunAction:(id)sender
 //{
 //    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
@@ -298,6 +299,16 @@ smellieRunFile;
 //    
 //}
 
+// Funtion called by custom startRunAction.
+//- (void) startRun
+//{
+//    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+//    ORRunModel* theRunControl = [objs objectAtIndex:0];
+//	[theRunControl performSelector:@selector(startRun)withObject:nil afterDelay:.1];
+//}
+
+
+// Custom resstart run method. Not used so far until we figure out how to deal with the rollover runs.
 - (IBAction)newRunAction:(id)sender {
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* theRunControl = [objs objectAtIndex:0];
@@ -352,6 +363,8 @@ smellieRunFile;
 }
 
 
+// Currently use the default stopRunAction of the superclass ORExperimentController.
+// Leave this here in case a custom function is needed
 //- (IBAction)stopRunAction:(id)sender {
 //    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
 //    ORRunModel* theRunControl = [objs objectAtIndex:0];
@@ -360,13 +373,6 @@ smellieRunFile;
 //    
 //    //reset the run Type to be undefined
 //    //[model setRunType:kRunUndefined];
-//}
-
-//- (void) startRun
-//{
-//    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-//    ORRunModel* theRunControl = [objs objectAtIndex:0];
-//	[theRunControl performSelector:@selector(startRun)withObject:nil afterDelay:.1];
 //}
 
 - (void) runStatusChanged:(NSNotification*)aNotification{

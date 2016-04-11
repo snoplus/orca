@@ -19,7 +19,6 @@
 //-------------------------------------------------------------
 
 #import "ORExperimentController.h"
-#import "ORExperimentController.h"
 #import "SNOPDetectorView.h"
 #import "StopLightView.h"
 
