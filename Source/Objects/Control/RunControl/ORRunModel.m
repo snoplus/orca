@@ -1409,9 +1409,19 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		[NSObject cancelPreviousPerformRequestsWithTarget:self];
 		
 		@try {
+            BOOL willRestart = _forceRestart ||([self timedRun] && [self repeatRun] && !ignoreRepeat && (!remoteControl || remoteInterface));
+            NSDictionary* userInfo = [NSDictionary
+                                        dictionaryWithObjectsAndKeys:
+                                        [NSNumber numberWithUnsignedLong:runNumber],kRunNumber,
+                                        [NSNumber numberWithUnsignedLong:subRunNumber],kSubRunNumber,
+                                        [NSNumber numberWithLong:[[ORGlobal sharedGlobal] runMode]],  kRunMode,
+                                        [NSNumber numberWithFloat:elapsedRunTime],  kElapsedTime,
+                                        [NSNumber numberWithBool:willRestart],@"willRestart",
+                                        nil];
+
             [[NSNotificationCenter defaultCenter] postNotificationName:ORRunAboutToStopNotification
 															object: self
-														  userInfo: nil];
+														  userInfo: userInfo];
         }
         @catch(NSException* e){
             NSLog(@"Exception thrown and caught broadcasting the RunAboutToStop Notification. Apparently a HW error. %@\n",e);
@@ -1482,6 +1492,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     
     
     id nextObject = [self objectConnectedTo:ORRunModelRunControlConnection];
+    BOOL willRestart = _forceRestart ||([self timedRun] && [self repeatRun] && !ignoreRepeat && (!remoteControl || remoteInterface));
     
     @try {
         
@@ -1497,6 +1508,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
                                     [NSNumber numberWithLong:[[ORGlobal sharedGlobal] runMode]],  kRunMode,
                                     [NSNumber numberWithFloat:elapsedRunTime],  kElapsedTime,
 									@"Not Running",ORRunStatusString,
+                                    [NSNumber numberWithBool:willRestart],@"willRestart",
 									dataPacket,@"DataPacket",nil];
         
         
@@ -1554,7 +1566,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
                                                       userInfo: runInfo];
 
     
-	if(_forceRestart ||([self timedRun] && [self repeatRun] && !ignoreRepeat && (!remoteControl || remoteInterface))){
+	if(willRestart){
 		ignoreRepeat  = NO;
 		_forceRestart = NO;
 		[self restartRun];

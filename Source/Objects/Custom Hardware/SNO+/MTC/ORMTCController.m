@@ -104,16 +104,46 @@
 						 name : ORVmeCardSlotChangedNotification
 					   object : model];
 	
-	[notifyCenter addObserver : self
-					 selector : @selector(settingsLockChanged:)
-						 name : ORRunStatusChangedNotification
-					   object : nil];
-	
     [notifyCenter addObserver : self
-					 selector : @selector(settingsLockChanged:)
-						 name : ORMTCLock
-						object: nil];
+                     selector : @selector(basicLockChanged:)
+                         name : ORRunStatusChangedNotification
+                       object : nil];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(standardOpsLockChanged:)
+                         name : ORRunStatusChangedNotification
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(settingsLockChanged:)
+                         name : ORRunStatusChangedNotification
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(triggersLockChanged:)
+                         name : ORRunStatusChangedNotification
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(basicLockChanged:)
+                         name : ORMTCBasicLock
+                        object: nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(standardOpsLockChanged:)
+                         name : ORMTCStandardOpsLock
+                        object: nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(settingsLockChanged:)
+                         name : ORMTCSettingsLock
+                        object: nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(triggersLockChanged:)
+                         name : ORMTCTriggersLock
+                        object: nil];
+    
     [notifyCenter addObserver : self
                      selector : @selector(selectedRegisterChanged:)
                          name : ORMTCModelSelectedRegisterChanged
@@ -210,16 +240,6 @@
 						object: model];
     
     [notifyCenter addObserver : self
-                     selector : @selector(documentLockChanged:)
-                         name : ORRunStatusChangedNotification
-                       object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(documentLockChanged:)
-                         name : ORDocumentLock
-                       object : nil];
-
-    [notifyCenter addObserver : self
                      selector : @selector(triggerMTCAMaskChanged:)
                          name : ORMTCModelMTCAMaskChanged
                        object : nil];
@@ -237,7 +257,10 @@
     [self regBaseAddressChanged:nil];
     [self memBaseAddressChanged:nil];
     [self slotChanged:nil];
+    [self basicLockChanged:nil];
+    [self standardOpsLockChanged:nil];
     [self settingsLockChanged:nil];
+    [self triggersLockChanged:nil];
 	[self selectedRegisterChanged:nil];
 	[self memoryOffsetChanged:nil];
 	[self writeValueChanged:nil];
@@ -253,7 +276,6 @@
 	[self isPulserFixedRateChanged:nil];
 	[self fixedPulserRateCountChanged:nil];
 	[self fixedPulserRateDelayChanged:nil];
-    [self documentLockChanged:nil];
     [self triggerMTCAMaskChanged:nil];
     [self isPedestalEnabledInCSRChanged:nil];
 }
@@ -261,57 +283,17 @@
 - (void) checkGlobalSecurity
 {
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
-    [gSecurity setLock:ORMTCLock to:secure];
-    [settingsLockButton setEnabled:secure];
+    [gSecurity setLock:ORMTCBasicLock to:secure];
     [basicOpsLockButton setEnabled:secure];
+    [gSecurity setLock:ORMTCStandardOpsLock to:secure];
     [standardOpsLockButton setEnabled:secure];
-	[self updateButtons];
+    [gSecurity setLock:ORMTCSettingsLock to:secure];
+    [settingsLockButton setEnabled:secure];
+    [gSecurity setLock:ORMTCTriggersLock to:secure];
+    [triggersLockButton setEnabled:secure];
 }
 
 #pragma mark •••Interface Management
-
-- (void) updateButtons
-{
-    //BOOL runInProgress = [gOrcaGlobals runInProgress];
-   //BOOL locked	= [gSecurity isLocked:ORMTCLock] ;
-    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORMTCLock] | sequenceRunning;
-
-	[initMtcButton				setEnabled: !lockedOrRunningMaintenance];
-	[initNoXilinxButton			setEnabled: !lockedOrRunningMaintenance];
-	[initNo10MHzButton			setEnabled: !lockedOrRunningMaintenance];
-	[initNoXilinxNo100MHzButton setEnabled: !lockedOrRunningMaintenance];
-	//[load10MhzCounterButton		setEnabled: !lockedOrRunningMaintenance];
-	//[loadOnlineMaskButton		setEnabled: !lockedOrRunningMaintenance];
-	//[loadDacsButton				setEnabled: !lockedOrRunningMaintenance];
-	//[firePedestalsButton		setEnabled: !lockedOrRunningMaintenance];
-	//[triggerZeroMatrix			setEnabled: !lockedOrRunningMaintenance];
-	//[findTriggerZerosButton		setEnabled: !lockedOrRunningMaintenance];
-	//[continuousButton			setEnabled: !lockedOrRunningMaintenance];
-	//[stopTriggerZeroButton		setEnabled: !lockedOrRunningMaintenance];
-	//[setCoarseDelayButton		setEnabled: !lockedOrRunningMaintenance];
-	
-	//we want to fire pedestals during runs
-	[firePedestalsButton		setEnabled: !sequenceRunning && [model isPulserFixedRate]];
-	[stopPedestalsButton		setEnabled: !sequenceRunning && [model isPulserFixedRate]];
-	[continuePedestalsButton	setEnabled: !sequenceRunning && [model isPulserFixedRate]];
-	[fireFixedTimePedestalsButton	setEnabled: !sequenceRunning && ![model isPulserFixedRate]];
-	[stopFixedTimePedestalsButton	setEnabled: !sequenceRunning && ![model isPulserFixedRate]];
-	[fixedTimePedestalsCountField	setEnabled: !sequenceRunning && ![model isPulserFixedRate]];
-	[fixedTimePedestalsDelayField	setEnabled: !sequenceRunning && ![model isPulserFixedRate]];	
-    //and set thresholds
-	[load10MhzCounterButton		setEnabled:YES];
-	[firePedestalsButton		setEnabled:YES];
-	[setCoarseDelayButton		setEnabled:YES];
-}
-
-- (void) documentLockChanged:(NSNotification*)aNotification
-{
-    if([gSecurity isLocked:ORDocumentLock]) [lockDocField setStringValue:@"Document is locked."];
-    else if([gOrcaGlobals runInProgress])   [lockDocField setStringValue:@"Run In Progress"];
-    else				    [lockDocField setStringValue:@""];
-    [self updateButtons];
-}
-
 - (void) sequenceRunning:(NSNotification*)aNote
 {
 	sequenceRunning = YES;
@@ -319,7 +301,7 @@
 	[initProgressBar setDoubleValue:0];
 	[initProgressField setHidden:NO];
 	[initProgressField setDoubleValue:0];
-	[self updateButtons];
+    [self standardOpsLockChanged:nil];
     //hack to unlock UI if the sequence couldn't finish and didn't raise an exception (MTCD feature)
     [self performSelector:@selector(sequenceStopped:) withObject:nil afterDelay:5];
 }
@@ -331,7 +313,7 @@
 	[initProgressBar setDoubleValue:0];
 	[initProgressBar stopAnimation:self];
 	sequenceRunning = NO;
-	[self updateButtons];
+    [self standardOpsLockChanged:nil];
 }
 
 - (void) sequenceProgress:(NSNotification*)aNote
@@ -517,7 +499,7 @@
 {
 	[[isPulserFixedRateMatrix cellWithTag:1] setIntValue:[model isPulserFixedRate]];
 	[[isPulserFixedRateMatrix cellWithTag:0] setIntValue:![model isPulserFixedRate]];
-	[self updateButtons];
+    [self standardOpsLockChanged:nil];
 }
 
 - (void) fixedPulserRateCountChanged:(NSNotification*)aNote
@@ -530,17 +512,117 @@
 	[fixedTimePedestalsDelayField setFloatValue:[model fixedPulserRateDelay]];
 }
 
+- (void) basicLockChanged:(NSNotification*)aNotification
+{
+
+    BOOL locked						= [gSecurity isLocked:ORMTCBasicLock];
+    BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORMTCBasicLock];
+
+    [basicOpsLockButton setState: locked];
+    
+    [autoIncrementCB setEnabled: !lockedOrNotRunningMaintenance];
+    [useMemoryMatrix setEnabled: !lockedOrNotRunningMaintenance];
+    [repeatDelayField setEnabled: !lockedOrNotRunningMaintenance];
+    [repeatDelayStepper setEnabled: !lockedOrNotRunningMaintenance];
+    [repeatCountField setEnabled: !lockedOrNotRunningMaintenance];
+    [repeatCountStepper setEnabled: !lockedOrNotRunningMaintenance];
+    [writeValueField setEnabled: !lockedOrNotRunningMaintenance];
+    [writeValueStepper setEnabled: !lockedOrNotRunningMaintenance];
+    [memoryOffsetField setEnabled: !lockedOrNotRunningMaintenance];
+    [memoryOffsetStepper setEnabled: !lockedOrNotRunningMaintenance];
+    [selectedRegisterPU setEnabled: !lockedOrNotRunningMaintenance];
+    [memBaseAddressStepper setEnabled: !lockedOrNotRunningMaintenance];
+    [readButton setEnabled: !lockedOrNotRunningMaintenance];
+    [writteButton setEnabled: !lockedOrNotRunningMaintenance];
+    [stopButton setEnabled: !lockedOrNotRunningMaintenance];
+    [statusButton setEnabled: !lockedOrNotRunningMaintenance];
+    
+}
+
+- (void) standardOpsLockChanged:(NSNotification*)aNotification
+{
+    
+    BOOL locked						= [gSecurity isLocked:ORMTCStandardOpsLock];
+    BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORMTCStandardOpsLock] | sequenceRunning;
+    
+    [standardOpsLockButton setState: locked];
+    
+    [initMtcButton				setEnabled: !lockedOrNotRunningMaintenance];
+    [initNoXilinxButton			setEnabled: !lockedOrNotRunningMaintenance];
+    [initNo10MHzButton			setEnabled: !lockedOrNotRunningMaintenance];
+    [initNoXilinxNo100MHzButton setEnabled: !lockedOrNotRunningMaintenance];
+    [pulserFeedsMatrix          setEnabled: !lockedOrNotRunningMaintenance];
+    
+    [firePedestalsButton		setEnabled: !lockedOrNotRunningMaintenance && [model isPulserFixedRate]];
+    [stopPedestalsButton		setEnabled: !lockedOrNotRunningMaintenance && [model isPulserFixedRate]];
+    [continuePedestalsButton	setEnabled: !lockedOrNotRunningMaintenance && [model isPulserFixedRate]];
+    [fireFixedTimePedestalsButton	setEnabled: !lockedOrNotRunningMaintenance  && ![model isPulserFixedRate]];
+    [stopFixedTimePedestalsButton	setEnabled: !lockedOrNotRunningMaintenance && ![model isPulserFixedRate]];
+    [fixedTimePedestalsCountField	setEnabled: !lockedOrNotRunningMaintenance && ![model isPulserFixedRate]];
+    [fixedTimePedestalsDelayField	setEnabled: !lockedOrNotRunningMaintenance && ![model isPulserFixedRate]];
+    
+    [triggerZeroMatrix			setEnabled: !lockedOrNotRunningMaintenance];
+    [findTriggerZerosButton		setEnabled: !lockedOrNotRunningMaintenance];
+    [continuousButton			setEnabled: !lockedOrNotRunningMaintenance];
+    [stopTriggerZeroButton		setEnabled: !lockedOrNotRunningMaintenance];
+    
+}
+
 - (void) settingsLockChanged:(NSNotification*)aNotification
 {
-	
-   // BOOL runInProgress = [gOrcaGlobals runInProgress];
-    //BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORMTCSettingsLock];
-    BOOL locked = [gSecurity isLocked:ORMTCLock];
-	
+    
+    BOOL locked						= [gSecurity isLocked:ORMTCSettingsLock];
+    BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORMTCSettingsLock] | sequenceRunning;
+    
     [settingsLockButton setState: locked];
-    [basicOpsLockButton setState: locked];
-    [standardOpsLockButton setState: locked];
-	
+   
+    [load10MhzCounterButton		    setEnabled: !lockedOrNotRunningMaintenance];
+    [setCoarseDelayButton           setEnabled: !lockedOrNotRunningMaintenance];
+    [setFineDelayButton				setEnabled: !lockedOrNotRunningMaintenance];
+    [loadMTCADacsButton				setEnabled: !lockedOrNotRunningMaintenance];
+    [nhitMatrix                     setEnabled: !lockedOrNotRunningMaintenance];
+    [esumMatrix                     setEnabled: !lockedOrNotRunningMaintenance];
+    [lockOutWidthField              setEnabled: !lockedOrNotRunningMaintenance];
+    [pedestalWidthField             setEnabled: !lockedOrNotRunningMaintenance];
+    [low10MhzClockField             setEnabled: !lockedOrNotRunningMaintenance];
+    [high10MhzClockField            setEnabled: !lockedOrNotRunningMaintenance];
+    [nhit100LoPrescaleField         setEnabled: !lockedOrNotRunningMaintenance];
+    [pulserPeriodField              setEnabled: !lockedOrNotRunningMaintenance];
+    [fineSlopeField                 setEnabled: !lockedOrNotRunningMaintenance];
+    [minDelayOffsetField            setEnabled: !lockedOrNotRunningMaintenance];
+    [fineDelayField                 setEnabled: !lockedOrNotRunningMaintenance];
+    [coarseDelayField               setEnabled: !lockedOrNotRunningMaintenance];
+    
+}
+
+- (void) triggersLockChanged:(NSNotification*)aNotification
+{
+    
+    BOOL locked						= [gSecurity isLocked:ORMTCTriggersLock];
+    BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORMTCTriggersLock] | sequenceRunning;
+    
+    [triggersLockButton setState: locked];
+    
+    [globalTriggerCrateMaskMatrix setEnabled: !lockedOrNotRunningMaintenance];
+    [globalTriggerMaskMatrix setEnabled: !lockedOrNotRunningMaintenance];
+    [pedCrateMaskMatrix setEnabled: !lockedOrNotRunningMaintenance];
+    [mtcaEHIMatrix setEnabled: !lockedOrNotRunningMaintenance];
+    [mtcaELOMatrix setEnabled: !lockedOrNotRunningMaintenance];
+    [mtcaN100Matrix setEnabled: !lockedOrNotRunningMaintenance];
+    [mtcaN20Matrix setEnabled: !lockedOrNotRunningMaintenance];
+    [mtcaOEHIMatrix setEnabled: !lockedOrNotRunningMaintenance];
+    [mtcaOELOMatrix setEnabled: !lockedOrNotRunningMaintenance];
+    [mtcaOWLNMatrix setEnabled: !lockedOrNotRunningMaintenance];
+
+    [loadGTCrateMaskButton setEnabled: !lockedOrNotRunningMaintenance];
+    [loadMTCACrateMaskButton setEnabled: !lockedOrNotRunningMaintenance];
+    [loadPEDCrateMaskButton setEnabled: !lockedOrNotRunningMaintenance];
+    [loadTriggerMaskButton setEnabled: !lockedOrNotRunningMaintenance];
+    [clearGTCratesButton setEnabled: !lockedOrNotRunningMaintenance];
+    [clearMTCAMaskButton setEnabled: !lockedOrNotRunningMaintenance];
+    [clearPEDCratesButton setEnabled: !lockedOrNotRunningMaintenance];
+    [clearTriggersButton setEnabled: !lockedOrNotRunningMaintenance];
+
 }
 
 - (void) isPedestalEnabledInCSRChanged:(NSNotification*)aNotification
@@ -682,10 +764,24 @@
 	[model setSelectedRegister:[sender indexOfSelectedItem]];	
 }
 
-//------
-- (IBAction) lockAction:(id) sender
+- (IBAction) basicLockAction:(id)sender
 {
-    [gSecurity tryToSetLock:ORMTCLock to:[sender intValue] forWindow:[self window]];
+    [gSecurity tryToSetLock:ORMTCBasicLock to:[sender intValue] forWindow:[self window]];
+}
+
+- (IBAction) standardOpsLockAction:(id)sender
+{
+    [gSecurity tryToSetLock:ORMTCStandardOpsLock to:[sender intValue] forWindow:[self window]];
+}
+
+- (IBAction) settingsLockAction:(id)sender
+{
+    [gSecurity tryToSetLock:ORMTCSettingsLock to:[sender intValue] forWindow:[self window]];
+}
+
+- (IBAction) triggersLockAction:(id)sender
+{
+    [gSecurity tryToSetLock:ORMTCTriggersLock to:[sender intValue] forWindow:[self window]];
 }
 
 - (void) populatePullDown

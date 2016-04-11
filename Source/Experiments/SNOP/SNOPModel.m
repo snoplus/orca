@@ -119,6 +119,8 @@ mtcConfigDoc = _mtcConfigDoc;
     /* initialize our connection to the XL3 server */
     xl3_server = [[RedisClient alloc] initWithHostName:XL3_HOST withPort:XL3_PORT];
 
+    rolloverRun = NO;
+
     [[self undoManager] disableUndoRegistration];
 	[self initOrcaDBConnectionHistory];
 	[self initDebugDBConnectionHistory];
@@ -138,6 +140,8 @@ mtcConfigDoc = _mtcConfigDoc;
 
     /* initialize our connection to the XL3 server */
     xl3_server = [[RedisClient alloc] initWithHostName:XL3_HOST withPort:XL3_PORT];
+
+    rolloverRun = NO;
 
     [[self undoManager] disableUndoRegistration];
 	[self initOrcaDBConnectionHistory];
@@ -279,8 +283,13 @@ mtcConfigDoc = _mtcConfigDoc;
                        object : nil];
 
     [notifyCenter addObserver : self
+                     selector : @selector(runAboutToRollOver:)
+                         name : ORRunIsAboutToRollOver
+                       object : nil];
+
+    [notifyCenter addObserver : self
                      selector : @selector(runAboutToStart:)
-                         name : ORRunAboutToStartNotification
+                         name : ORRunSecondChanceForWait
                        object : nil];
 
     [notifyCenter addObserver : self
@@ -315,6 +324,16 @@ mtcConfigDoc = _mtcConfigDoc;
 
 }
 
+- (void) runAboutToRollOver:(NSNotification*)aNote
+{
+    /* When the next run is going to be started due to a rollover, this method
+     * is called.
+     *
+     * Note that the rolloverRun variable is reset to NO after the next run
+     * start. */
+    rolloverRun = YES;
+}
+
 - (void) runInitialization:(NSNotification*)aNote
 {
     @try {
@@ -337,6 +356,15 @@ mtcConfigDoc = _mtcConfigDoc;
 
 - (void) runAboutToStart:(NSNotification*)aNote
 {
+    if (rolloverRun) {
+        /* If this is a rollover run, we don't initialize any hardware. */
+        rolloverRun = NO;
+        return;
+    }
+
+    /* Post a notification telling all of the SNO+ hardware to load the
+     * current model settings to hardware. */
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"SNOPRunStart" object: self userInfo: nil];
 }
 
 - (void) runStarted:(NSNotification*)aNote
@@ -473,28 +501,34 @@ mtcConfigDoc = _mtcConfigDoc;
 // orca script helper
 - (void) shipEPEDRecord
 {
+    /* Sends a command to the MTC server to ship an EPED record to the data
+     * stream server, which will eventually get to the builder.
+     *
+     * Note: Currently, this function does not send EPED records to mark
+     * subrun boundaries. To accomplish this, one would need to mask in
+     * the EPED_FLAG_SUBRUN bit in the flags bitmask, where EPED_FLAG_SUBRUN
+     * is defined in the builder's RecordInfo.h as:
+     *
+     *     #define EPED_FLAG_SUBRUN 0x1000000
+     *
+     */
     if ([[ORGlobal sharedGlobal] runInProgress]) {
-        const unsigned char eped_rec_length = 10;
-        unsigned long data[eped_rec_length];
-        data[0] = [self epedDataId] | eped_rec_length;
-        data[1] = 0;
-
-        data[2] = _epedStruct.pedestalWidth;
-        data[3] = _epedStruct.coarseDelay;
-        data[4] = _epedStruct.fineDelay;
-        data[5] = _epedStruct.chargePulseAmp;
-        data[6] = _epedStruct.stepNumber;
-        data[7] = _epedStruct.calType;
-        data[8] = 0;//_epedStruct.nTSlopePoints;
-        data[9] = 0;
-        
-        NSData* pdata = [[NSData alloc] initWithBytes:data length:sizeof(long)*(eped_rec_length)];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:pdata];
-        [pdata release];
-        pdata = nil;
+        @try {
+            [mtc_server okCommand:"send_eped_record %d %d %d %d %d %d %d",
+                _epedStruct.pedestalWidth,
+                _epedStruct.coarseDelay,
+                _epedStruct.fineDelay,
+                _epedStruct.chargePulseAmp, /* qinj_dacsetting */
+                _epedStruct.stepNumber, /* half crate id? */
+                _epedStruct.calType,
+                0 /* flags */
+            ];
+        } @catch (NSException *e) {
+            NSLogColor([NSColor redColor], @"failed to send EPED record: %@",
+                       [e reason]);
+        }
     }
 }
-
 
 - (void) updateRHDRSruct
 {

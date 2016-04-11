@@ -85,6 +85,8 @@ NSString* ORPulseCheckModelReloadTable      = @"ORPulseCheckModelReloadTable";
 - (void) removeMachineAtIndex:(int) anIndex
 {
     if(anIndex < [machines count]){
+        ORMachineToCheck* aMachine = [machines objectAtIndex:anIndex];
+        [aMachine clearHeartbeatAlarm];
         [machines removeObjectAtIndex:anIndex];
         NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Index"];
         [[NSNotificationCenter defaultCenter] postNotificationName:ORPulseCheckMachineRemoved object:self userInfo:userInfo];
@@ -254,7 +256,7 @@ NSString* ORPulseCheckModelReloadTable      = @"ORPulseCheckModelReloadTable";
     [self setLastChecked:[[NSDate date]stdDescription]];
     NSString* contents = [NSString stringWithContentsOfFile:[self localPath] encoding:NSASCIIStringEncoding error:nil];
     if([contents length] == 0){
-        [self setStatus:@"No File"];
+        [self setStatus:@"No Pulse"];
         [self postHeartbeatAlarm];
     }
     else {
@@ -278,7 +280,7 @@ NSString* ORPulseCheckModelReloadTable      = @"ORPulseCheckModelReloadTable";
             time(&now);
             time_t deltaFromNow = now-postTime;
             if(deltaFromNow > 3*maxDelta){
-                [self setStatus:@"Crashed"];
+                [self setStatus:@"No Pulse"];
                 [self postHeartbeatAlarm];
             }
             else {
