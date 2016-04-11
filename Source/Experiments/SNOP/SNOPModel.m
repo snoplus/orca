@@ -401,7 +401,7 @@ mtcConfigDoc = _mtcConfigDoc;
 
     NSDictionary *userInfo = [aNote userInfo];
 
-    if (![userInfo objectForKey:@"willRestart"]) {
+    if (![[userInfo objectForKey:@"willRestart"] boolValue]) {
         [mtc_server okCommand:"run_stop"];
 
         NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -450,7 +450,7 @@ mtcConfigDoc = _mtcConfigDoc;
 
     NSDictionary *userInfo = [aNote userInfo];
 
-    if (![userInfo objectForKey:@"willRestart"]) {
+    if (![[userInfo objectForKey:@"willRestart"] boolValue]) {
         [mtc_server okCommand:"builder_end_run"];
     }
 
