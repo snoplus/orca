@@ -125,7 +125,7 @@ enum {
 		NSArray* dataTakers;	//cache of data takers.
 		unsigned long numEnabledChannels;
         unsigned long    lastChan0Count;
-        unsigned long    chan0RollOverCount;
+        unsigned long long    chan0RollOverCount;
     
 }
 

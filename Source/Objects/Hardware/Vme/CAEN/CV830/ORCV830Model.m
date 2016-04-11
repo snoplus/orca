@@ -810,9 +810,12 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
                     if(dataRecord[4]<lastChan0Count){
                         chan0RollOverCount++;
                     }
+                    long long final = (chan0RollOverCount << 32) | dataRecord[4];
+                    final += count0Offset;
+
                     lastChan0Count = dataRecord[4];
-                    dataRecord[2] = chan0RollOverCount;
-                    dataRecord[4] += count0Offset;
+                    dataRecord[2] = (final >> 32) & 0xffffffff; //store the high word (rollover)
+                    dataRecord[4] = final & 0xffffffff;         //store the low word
                 }
                 else {
                     //temp work around for erroronous counter transfers

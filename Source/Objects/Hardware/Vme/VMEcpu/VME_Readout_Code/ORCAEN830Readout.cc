@@ -71,7 +71,7 @@ bool ORCAEN830Readout::Readout(SBC_LAM_Data* lamData)
                                 if(aValue<lastChan0Count){
                                     rollOverCount++;
                                 }
-                                unsigned long long final = (rollOverCount << 32) | aValue;
+                                long long final = (rollOverCount << 32) | aValue;
                                 final += chan0Offset;
                                 lastChan0Count = aValue;
                                 data[indexForRollOver] = (final >> 32) & 0xffffffff;
