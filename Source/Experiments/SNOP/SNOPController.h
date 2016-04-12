@@ -110,16 +110,16 @@
 
     IBOutlet NSTextField *mtcPort;
     IBOutlet NSTextField *mtcHost;
-    
+
     IBOutlet NSTextField *xl3Port;
     IBOutlet NSTextField *xl3Host;
-    
+
     IBOutlet NSTextField *dataPort;
     IBOutlet NSTextField *dataHost;
-    
+
     IBOutlet NSTextField *logPort;
     IBOutlet NSTextField *logHost;
-    
+
     //ECA RUNS
     IBOutlet NSPopUpButton *ECApatternPopUpButton;
     IBOutlet NSPopUpButton *ECAtypePopUpButton;
