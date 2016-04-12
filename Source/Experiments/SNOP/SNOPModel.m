@@ -122,6 +122,17 @@ logPort;
     xl3_server = [[RedisClient alloc] init];
 
     [[self undoManager] disableUndoRegistration];
+
+    [self setMTCHost:@""];
+    [self setXL3Host:@""];
+    [self setDataServerHost:@""];
+    [self setLogServerHost:@""];
+
+    [self setMTCPort:4001];
+    [self setXL3Port:4004];
+    [self setDataServerPort:4005];
+    [self setLogServerPort:4001];
+
 	[self initOrcaDBConnectionHistory];
 	[self initDebugDBConnectionHistory];
     [self initSmellieRunDocsDic];
@@ -271,8 +282,6 @@ logPort;
 	[self initDebugDBConnectionHistory];
     [self initSmellieRunDocsDic];
 
-
-    
     [self setViewType:[decoder decodeIntForKey:@"viewType"]];
 
     //CouchDB
@@ -308,6 +317,19 @@ logPort;
     [self setLogServerHost:[decoder decodeObjectForKey:@"logHost"]];
     [self setLogServerPort:[decoder decodeIntForKey:@"logPort"]];
     
+    /* Check if we actually decoded the mtc, xl3, data, and log server
+     * hostnames and ports. decodeObjectForKey() will return NULL if the
+     * key doesn't exist, and decodeIntForKey() will return 0. */
+    if ([self mtcHost] == NULL) [self setMTCHost:@""];
+    if ([self xl3Host] == NULL) [self setXL3Host:@""];
+    if ([self dataHost] == NULL) [self setDataServerHost:@""];
+    if ([self logHost] == NULL) [self setLogServerHost:@""];
+
+    if ([self mtcPort] == 0) [self setMTCPort:4001];
+    if ([self xl3Port] == 0) [self setXL3Port:4004];
+    if ([self dataPort] == 0) [self setDataServerPort:4005];
+    if ([self logPort] == 0) [self setLogServerPort:4001];
+
     [[self undoManager] enableUndoRegistration];
 
     /* initialize our connection to the MTC server */

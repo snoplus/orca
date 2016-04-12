@@ -53,8 +53,6 @@
     /* timeout for connect is 1 second */
     struct timeval tv = {1, 0};
 
-    NSLogColor([NSColor redColor], @"connecting to host %@\n", host);
-
     context = redisConnectWithTimeout([host UTF8String], port, tv);
 
     if (context == NULL) {

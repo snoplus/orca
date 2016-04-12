@@ -55,10 +55,7 @@ smellieRunFile;
 }
 
 - (IBAction) settingsChanged:(id)sender {
-    /* Settings tab changed. Update the model. */
-    int i;
-
-    /* Set the model variables in SNOPModel */
+    /* Settings tab changed. Set the model variables in SNOPModel. */
     [model setMTCPort:[mtcPort intValue]];
     [model setMTCHost:[mtcHost stringValue]];
 
@@ -74,6 +71,7 @@ smellieRunFile;
 
 - (void) updateSettings: (NSNotification *) aNote
 {
+    NSLogColor([NSColor redColor], @"updating settings\n");
     [mtcHost setStringValue:[model mtcHost]];
     [mtcPort setIntValue:[model mtcPort]];
 
