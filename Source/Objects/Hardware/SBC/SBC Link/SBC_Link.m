@@ -90,6 +90,7 @@ NSString* SBC_CodeVersionChanged			= @"SBC_CodeVersionChanged";
 NSString* SBC_SocketDroppedUnexpectedly     = @"SBC_SocketDroppedUnexpectedly";
 NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 NSString* SBC_LinkErrorInfoChanged          = @"SBC_LinkErrorInfoChanged";
+NSString* SBC_MacAddressChanged             = @"SBC_MacAddressChanged";
 
 @interface SBCPacketWrapper : NSObject {
     NSMutableData* data;
@@ -164,6 +165,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 	}
 	@catch (NSException* localException) {
 	}
+    [sbcMacAddress release];
 	[socketLock release];
 	[eCpuDeadAlarm clearAlarm];
 	[eCpuDeadAlarm release];
@@ -959,7 +961,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 	memcpy(&runInfo,aPacket->payload,sizeof(SBC_info_struct));
 	[pw releaseAndCache];
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkRunInfoChanged object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SBC_LinkRunInfoChanged object:self];
 }
 
 - (void) getErrorInfoBlock
@@ -977,6 +979,39 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
     
     [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkErrorInfoChanged object:self];
 }
+- (NSString*) sbcMacAddress
+{
+    if([sbcMacAddress length])return sbcMacAddress;
+    else return @"?";
+}
+
+- (void) getMacAddress
+{
+    if([sbcMacAddress length] == 0){
+
+        id pw = [[SBCPacketWrapper alloc] init];
+        SBC_Packet* aPacket = [pw sbcPacket];
+        aPacket->cmdHeader.destination			= kSBC_Process;
+        aPacket->cmdHeader.cmdID                = kSBC_MacAddressRequest;
+        aPacket->cmdHeader.numberBytesinPayload	= 6;
+        @try {
+            [self send:aPacket receive:aPacket];
+            unsigned char* mac = (unsigned char*)aPacket->payload;
+        
+            [sbcMacAddress release];
+            
+            [sbcMacAddress autorelease];
+            sbcMacAddress = [[NSString alloc] initWithFormat:@"%02x:%02x:%02x:%02x:%02x:%02x",mac[0],mac[1],mac[2],mac[3],mac[4],mac[5]];
+        }
+        @catch (NSException* e){
+            
+        }
+        [pw releaseAndCache];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:SBC_MacAddressChanged object:self];
+    }
+}
+
 
 - (unsigned long) totalErrorCount
 {
@@ -1275,10 +1310,10 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
     optionBlock.option[0]	= sbcPollingRate;
 	[self sendCommand:kSBC_SetPollingDelay withOptions:&optionBlock expectResponse:YES];
     if(optionBlock.option[0] == 0){
-        NSLog(@"SBC polling at fastest rate\n");
+        NSLog(@"SBC,%d,%d polling at fastest rate\n",[delegate crateNumber],[delegate slot]);
     }
     else {
-        NSLog(@"SBC polling at ~%luHz\n",optionBlock.option[0]);
+        NSLog(@"SBC,%d,%d polling at ~%luHz\n",[delegate crateNumber],[delegate slot],optionBlock.option[0]);
     }
     
     optionBlock.option[0]	= 0;//reset the option block
@@ -1930,9 +1965,8 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 			[self setReloading:NO];
 			
 			NSLog(@"Connected to %@ <%@> port: %d\n",[self crateName],IPNumber,portNumber);
-			//[self getRunInfoBlock];
 			[[delegate crate] performSelector:@selector(connected) withObject:nil afterDelay:1];
-			
+            [self getMacAddress];
 		}
 		@catch (NSException* localException) {
 			if(socketfd){
@@ -2178,7 +2212,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 	else if(anError == ENOMEM)	details = @"Out of Memory";
 	else details = [NSString stringWithFormat:@"%d",anError];
 	//[NSException raise: @"SBC access Error" format:@"%@:%@\nAddress: 0x%08lx",baseString,details,anAddress];
-	[NSException raise: @"SBC access Error" format:@"%@:ErrorCode:%@\nAddress: 0x%08lx ",baseString,details,anAddress];//give more info -tb-
+    [NSException raise: [NSString stringWithFormat:@"SBC,%d,%d access Error",[delegate crateNumber],[delegate slot]] format:@"%@:ErrorCode:%@\nAddress: 0x%08lx ",baseString,details,anAddress];//give more info -tb-
 }
 
 - (void) fillInScript:(NSString*)theScript
@@ -2463,7 +2497,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 	else if (selectionResult == kSelectionTimeout) {
 		[NSException raise:@"ConnectionTimeOut" format:@"Read from %@ <%@> port: %d timed out (A)",[self crateName],IPNumber,portNumber];
 	}
-	if(aPacket->message[0] && (aPacket->cmdHeader.cmdID != kSBC_JobStatus))NSLog(@"socket message:%s\n",aPacket->message);
+	if(aPacket->message[0] && (aPacket->cmdHeader.cmdID != kSBC_JobStatus))NSLog(@"SBC,%d,%d remote message:%s\n",[delegate crateNumber],[delegate slot],aPacket->message);
 } 
 
 - (void) readSocket:(int)aSocket buffer:(SBC_Packet*)aPacket
@@ -2910,7 +2944,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
                             cardBusErrorCounts,                                     @"cardBusErrorCounts",
                             cardMessageCounts,                                      @"cardMessageCounts",
                             nil];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:delegate userInfo:values];
 
     NSDictionary* historyRecord = [NSDictionary dictionaryWithObjectsAndKeys:
                                    [delegate fullID],               @"name",

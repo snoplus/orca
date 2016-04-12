@@ -63,6 +63,8 @@ NSString* ORRequestRunHalt					= @"ORRequestRunHalt";
 NSString* ORAddRunStateChangeWait           = @"ORAddRunStateChangeWait";
 NSString* ORReleaseRunStateChangeWait       = @"ORReleaseRunStateChangeWait";
 NSString* ORRunAboutToChangeState           = @"ORRunAboutToChangeState";
+NSString* ORRunIsAboutToRollOver            = @"ORRunIsAboutToRollOver";
+NSString* ORRunSecondChanceForWait          = @"ORRunSecondChanceForWait";
 NSString* ORAddRunStartupAbort              = @"ORAddRunStartupAbort";
 NSString* ORFlushLogsNotification           = @"ORFlushLogsNotification";
 
@@ -159,7 +161,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
     }
     else {
         if(!runModeAlarm){
-            runModeAlarm = [[ORAlarm alloc] initWithName:@"Offline Run" severity:kDataFlowAlarm];
+            runModeAlarm = [[ORAlarm alloc] initWithName:@"Offline Run" severity:kInformationAlarm];
             [runModeAlarm setSticky:YES];
             [runModeAlarm setHelpStringFromFile:@"OfflineRunHelp"];
         }

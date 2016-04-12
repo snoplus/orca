@@ -554,10 +554,7 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 			[histo setDataSet:self];
 			[histo mergeHistogram:ptr numValues:numBins];
 			[histo release];
-			[[NSNotificationCenter defaultCenter]
-			 postNotificationName:ORDataSetAdded
-			 object:self
-			 userInfo: nil];
+            [[NSNotificationCenter defaultCenter]  postNotificationOnMainThreadWithName:ORDataSetAdded object:self];
 		}
 		else [histo mergeHistogram:ptr numValues:numBins];
 	}
@@ -603,10 +600,7 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 			[nextLevel setData:histo];
 			[histo histogram:aValue];
 			[histo release];
-			[[NSNotificationCenter defaultCenter]
-			 postNotificationName:ORDataSetAdded
-			 object:self
-			 userInfo: nil];
+            [[NSNotificationCenter defaultCenter]  postNotificationOnMainThreadWithName:ORDataSetAdded object:self];
 		}
 		else if([histo numberBins] != numBins) {
 			[histo setNumberBins:numBins];
@@ -657,10 +651,7 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 			[nextLevel setData:histo];
 			[histo histogramWW:aValue weight:aWeight];
 			[histo release];
-			[[NSNotificationCenter defaultCenter]
-			 postNotificationName:ORDataSetAdded
-			 object:self
-			 userInfo: nil];
+            [[NSNotificationCenter defaultCenter]  postNotificationOnMainThreadWithName:ORDataSetAdded object:self];
 		}
 		else [histo histogramWW:aValue weight:aWeight];
 		
@@ -705,10 +696,7 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 			[histo setDataSet:self];
 			[histo mergeHistogram:ptr numValues:numBins];
 			[histo release];
-			[[NSNotificationCenter defaultCenter]
-			 postNotificationName:ORDataSetAdded
-			 object:self
-			 userInfo: nil];
+            [[NSNotificationCenter defaultCenter]  postNotificationOnMainThreadWithName:ORDataSetAdded object:self];
 		}
 		else [histo mergeHistogram:ptr numValues:numBins];
 	}
@@ -763,10 +751,7 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 								 counts:counts];
 			
 			[histo release];
-			[[NSNotificationCenter defaultCenter]
-			 postNotificationName:ORDataSetAdded
-			 object:self
-			 userInfo: nil];
+            [[NSNotificationCenter defaultCenter]  postNotificationOnMainThreadWithName:ORDataSetAdded object:self];
 		}
 		else //[histo mergeHistogram:ptr numValues:numBins];
 			[histo mergeEnergyHistogram:ptr numBins:numBins maxBins:maxBins
@@ -815,10 +800,7 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 			[histo setDataSet:self];
 			[histo histogramX:xValue y:yValue];  
 			[histo release];
-			[[NSNotificationCenter defaultCenter]
-			 postNotificationName:ORDataSetAdded
-			 object:self
-			 userInfo: nil];
+            [[NSNotificationCenter defaultCenter]  postNotificationOnMainThreadWithName:ORDataSetAdded object:self];
 		}
 		
 		else [histo histogramX:xValue y:yValue];
@@ -864,10 +846,7 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 			[histo setDataSet:self];
 			[histo mergeHistogram:ptr numValues:numBins];
 			[histo release];
-			[[NSNotificationCenter defaultCenter]
-			 postNotificationName:ORDataSetAdded
-			 object:self
-			 userInfo: nil];
+            [[NSNotificationCenter defaultCenter]  postNotificationOnMainThreadWithName:ORDataSetAdded object:self];
 		}
 		else [histo mergeHistogram:ptr numValues:numBins];
 	}
@@ -911,10 +890,7 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 			[histo setDataSet:self];
 			[histo loadX:xValue y:yValue z:zValue];  
 			[histo release];
-			[[NSNotificationCenter defaultCenter]
-			 postNotificationName:ORDataSetAdded
-			 object:self
-			 userInfo: nil];
+            [[NSNotificationCenter defaultCenter]  postNotificationOnMainThreadWithName:ORDataSetAdded object:self];
 		}
 		
 		else {
@@ -964,10 +940,7 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 			[histo setDataSet:self];
 			[histo sumX:xValue y:yValue z:zValue];  
 			[histo release];
-			[[NSNotificationCenter defaultCenter]
-			 postNotificationName:ORDataSetAdded
-			 object:self
-			 userInfo: nil];
+            [[NSNotificationCenter defaultCenter]  postNotificationOnMainThreadWithName:ORDataSetAdded object:self];
 		}
 		
 		else {
@@ -1037,29 +1010,30 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 			[currentLevel incrementTotalCounts];
 			
 		} while((s = va_arg(myArgs, NSString *)));
-		
-		ORWaveform* waveform = [nextLevel data];
-		if(!waveform){
-			waveform = [[ORWaveform alloc] init];
-			[waveform setDataSet:self];
-			[waveform setDataOffset:anOffset];
-			[waveform setKey:[nextLevel key]];
-			[waveform setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
-			[waveform setUnitSize:aUnitSize];
-			[nextLevel setData:waveform];
-			[waveform setWaveform:aWaveForm];       
-			[waveform release];
-			[[NSNotificationCenter defaultCenter]
-			 postNotificationName:ORDataSetAdded
-			 object:self
-			 userInfo: nil];
-		}
-		
-		else {
-            [waveform setDataOffset:anOffset];
-			[waveform setUnitSize:aUnitSize];            
-			[waveform setWaveform:aWaveForm];
-		}
+        ORWaveform* waveform = [nextLevel data];
+        if(aWaveForm){
+            if(!waveform){
+                waveform = [[ORWaveform alloc] init];
+                [waveform setDataSet:self];
+                [waveform setDataOffset:anOffset];
+                [waveform setKey:[nextLevel key]];
+                [waveform setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
+                [waveform setUnitSize:aUnitSize];
+                [nextLevel setData:waveform];
+                [waveform setWaveform:aWaveForm]; //increments the count
+                [waveform release];
+                [[NSNotificationCenter defaultCenter]  postNotificationOnMainThreadWithName:ORDataSetAdded object:self];
+            }
+            
+            else {
+                [waveform setDataOffset:anOffset];
+                [waveform setUnitSize:aUnitSize];            
+                [waveform setWaveform:aWaveForm];
+            }
+        }
+        else {
+            [waveform incrementTotalCounts]; //count only
+        }
 		va_end(myArgs);
 	}   
 }
@@ -1102,10 +1076,7 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 			[nextLevel setData:histo];
 			[histo loadData:aSpectrum];
 			[histo release];
-			[[NSNotificationCenter defaultCenter]
-			 postNotificationName:ORDataSetAdded
-			 object:self
-			 userInfo: nil];
+            [[NSNotificationCenter defaultCenter]  postNotificationOnMainThreadWithName:ORDataSetAdded object:self];
 		}
 		else [histo loadData:aSpectrum];
 		
@@ -1186,7 +1157,7 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 			[nextLevel setData:waveform];
 			[waveform setWaveform:aWaveForm];       
 			[waveform release];
-			[[NSNotificationCenter defaultCenter] postNotificationName:ORDataSetAdded object:self userInfo: nil];
+            [[NSNotificationCenter defaultCenter]  postNotificationOnMainThreadWithName:ORDataSetAdded object:self];
 		}
 		else {
 			[waveform setWaveform:aWaveForm];
@@ -1199,6 +1170,7 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 
 - (void) loadWaveform:(NSData*)aWaveForm offset:(unsigned long)anOffset unitSize:(int)aUnitSize startIndex:(unsigned long)aStartIndex mask:(unsigned long)aMask sender:(id)obj  withKeys:(NSString*)firstArg,...
 {
+    //if aWaveForm == nil then only increment the counts without displaying the waveform
 	@synchronized(self){  
 		va_list myArgs;
 		va_start(myArgs,firstArg);
@@ -1238,7 +1210,7 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 			[nextLevel setData:waveform];
 			[waveform setWaveform:aWaveForm];       
 			[waveform release];
-			[[NSNotificationCenter defaultCenter] postNotificationName:ORDataSetAdded object:self userInfo: nil];
+            [[NSNotificationCenter defaultCenter]  postNotificationOnMainThreadWithName:ORDataSetAdded object:self];
 		}
 		
 		else {
@@ -1301,7 +1273,7 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
             [nextLevel setData:waveform];
             [waveform setWaveform:aWaveForm];
             [waveform release];
-            [[NSNotificationCenter defaultCenter] postNotificationName:ORDataSetAdded object:self userInfo: nil];
+            [[NSNotificationCenter defaultCenter]  postNotificationOnMainThreadWithName:ORDataSetAdded object:self];
         }
         
         else {
@@ -1368,7 +1340,7 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 			[nextLevel setData:waveform];
 			[waveform setWaveform:aWaveForm];       
 			[waveform release];
-			[[NSNotificationCenter defaultCenter] postNotificationName:ORDataSetAdded object:self userInfo: nil];
+            [[NSNotificationCenter defaultCenter]  postNotificationOnMainThreadWithName:ORDataSetAdded object:self];
 		}
 		
 		else {
@@ -1420,10 +1392,7 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 
 			[genericData release];
 
-			[[NSNotificationCenter defaultCenter]
-			 postNotificationName:ORDataSetAdded
-			 object:self
-			 userInfo: nil];
+            [[NSNotificationCenter defaultCenter]  postNotificationOnMainThreadWithName:ORDataSetAdded object:self];
 		}
 		
 		[genericData setGenericData:aString];
@@ -1470,10 +1439,7 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 			[nextLevel setData:genericData];
 			[genericData setGenericData:aString];
 			[genericData release];
-			[[NSNotificationCenter defaultCenter]
-			 postNotificationName:ORDataSetAdded
-			 object:self
-			 userInfo: nil];
+            [[NSNotificationCenter defaultCenter]  postNotificationOnMainThreadWithName:ORDataSetAdded object:self];
 		}
 		
 		else [genericData setGenericData:aString];
@@ -1511,10 +1477,7 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 			[scalerSumData setKey:[nextLevel key]];
 			[nextLevel setData:scalerSumData];
 			[scalerSumData release];
-			[[NSNotificationCenter defaultCenter]
-			 postNotificationName:ORDataSetAdded
-			 object:self
-			 userInfo: nil];
+            [[NSNotificationCenter defaultCenter]  postNotificationOnMainThreadWithName:ORDataSetAdded object:self];
 		}
 		
 		[scalerSumData loadScalerValue:aValue];
@@ -1558,10 +1521,7 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 			[nextLevel setData:timeSeries];
 			[timeSeries setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
 			[timeSeries release];
-			[[NSNotificationCenter defaultCenter]
-			 postNotificationName:ORDataSetAdded
-			 object:self
-			 userInfo: nil];
+            [[NSNotificationCenter defaultCenter]  postNotificationOnMainThreadWithName:ORDataSetAdded object:self];
 		}
 		
 		[timeSeries addValue:aValue atTime:aTime];
@@ -1604,10 +1564,7 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 			[fftPlot setRealArray:realArray imaginaryArray:imaginaryArray];
 			[nextLevel setData:fftPlot];
 			[fftPlot release];
-			[[NSNotificationCenter defaultCenter]
-			 postNotificationName:ORDataSetAdded
-			 object:self
-			 userInfo: nil];
+            [[NSNotificationCenter defaultCenter]  postNotificationOnMainThreadWithName:ORDataSetAdded object:self];
 		}
 		else {
 			[fftPlot setRealArray:realArray imaginaryArray:imaginaryArray];

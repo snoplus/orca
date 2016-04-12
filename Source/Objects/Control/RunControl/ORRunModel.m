@@ -60,7 +60,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 @interface ORRunModel (private)
 - (void) startRun:(BOOL)doInit;
-- (void) waitOnObjects:(NSNumber*)doInitBool;
+- (void) waitOnObjects1:(NSNumber*)doInitBool;
 - (void) continueWithRunStart:(NSNumber*)doInitBool;
 - (void) startRunStage0:(NSNumber*)doInitBool;
 - (void) startRunStage1:(NSNumber*)doInitBool;
@@ -948,7 +948,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
         _forceRestart = YES;
        [self stopRun];
     }
-    else [self startRun:NO];
+    else [self startRun:!quickStart];
 }
 
 - (void) remoteStartRun:(unsigned long)aRunNumber
@@ -1158,17 +1158,17 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
     //------
     //at this stage, some object may need extra time. If so they will post a wait request
-    [self waitOnObjects:[NSNumber numberWithBool:doInit]];
+    [self waitOnObjects1:[NSNumber numberWithBool:doInit]];
 }
 
-- (void) waitOnObjects:(NSNumber*)doInitBool
+- (void) waitOnObjects1:(NSNumber*)doInitBool
 {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(waitOnObjects:) object:doInitBool];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(waitOnObjects1:) object:doInitBool];
     if([self waitRequestersCount]==0){
         [self continueWithRunStart:doInitBool];
     }
     else {
-        [self performSelector:@selector(waitOnObjects:) withObject:doInitBool afterDelay:.01];
+        [self performSelector:@selector(waitOnObjects1:) withObject:doInitBool afterDelay:.01];
     }
 }
 
@@ -1228,17 +1228,24 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
             [self runAbortFromScript];
         }
     }
-    else [self performSelector:@selector(startRunStage2:) withObject:doInitBool afterDelay:0];
- 
+    else {
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORRunSecondChanceForWait
+                                                            object: self
+                                                          userInfo:[NSDictionary dictionaryWithObject:doInitBool forKey:@"doinit"]];
+
+        [self performSelector:@selector(startRunStage2:) withObject:doInitBool afterDelay:0];
+    }
 }
 
 - (void) startRunStage2:(NSNumber*)doInitBool
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORRunAboutToChangeState
-                                                        object: self
-                                                      userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:eRunStarting] forKey:@"State"]];
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startRunStage2:) object:doInitBool];
-    if([self waitRequestersCount]==0)[self startRunStage3:doInitBool];
+    if([self waitRequestersCount]==0){
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORRunAboutToChangeState
+                                                            object: self
+                                                          userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:eRunStarting] forKey:@"State"]];
+        [self startRunStage3:doInitBool];
+    }
     else {
         [self performSelector:@selector(startRunStage2:) withObject:doInitBool afterDelay:0];
     }
@@ -1268,7 +1275,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		//now declare the thread directly so we can set the stack size.
 		//[NSThread detachNewThreadSelector:@selector(takeData) toTarget:self withObject:nil];
         readoutThread = [[NSThread alloc] initWithTarget:self selector:@selector(takeData) object:nil];
-		[readoutThread setStackSize:4*1024*1024];
+		[readoutThread setStackSize:5*1024*1024];
 		[readoutThread start];
 		 
         [self setStartTime:[NSDate date]];
@@ -1401,14 +1408,20 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		
 		[NSObject cancelPreviousPerformRequestsWithTarget:self];
 		
-		//if(!startScript){
-		////NSLog(@"Stop Run message received and ignored because no run in progress.\n");
-		//return;
-		//}
 		@try {
+            BOOL willRestart = _forceRestart ||([self timedRun] && [self repeatRun] && !ignoreRepeat && (!remoteControl || remoteInterface));
+            NSDictionary* userInfo = [NSDictionary
+                                        dictionaryWithObjectsAndKeys:
+                                        [NSNumber numberWithUnsignedLong:runNumber],kRunNumber,
+                                        [NSNumber numberWithUnsignedLong:subRunNumber],kSubRunNumber,
+                                        [NSNumber numberWithLong:[[ORGlobal sharedGlobal] runMode]],  kRunMode,
+                                        [NSNumber numberWithFloat:elapsedRunTime],  kElapsedTime,
+                                        [NSNumber numberWithBool:willRestart],@"willRestart",
+                                        nil];
+
             [[NSNotificationCenter defaultCenter] postNotificationName:ORRunAboutToStopNotification
 															object: self
-														  userInfo: nil];
+														  userInfo: userInfo];
         }
         @catch(NSException* e){
             NSLog(@"Exception thrown and caught broadcasting the RunAboutToStop Notification. Apparently a HW error. %@\n",e);
@@ -1479,6 +1492,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     
     
     id nextObject = [self objectConnectedTo:ORRunModelRunControlConnection];
+    BOOL willRestart = _forceRestart ||([self timedRun] && [self repeatRun] && !ignoreRepeat && (!remoteControl || remoteInterface));
     
     @try {
         
@@ -1494,6 +1508,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
                                     [NSNumber numberWithLong:[[ORGlobal sharedGlobal] runMode]],  kRunMode,
                                     [NSNumber numberWithFloat:elapsedRunTime],  kElapsedTime,
 									@"Not Running",ORRunStatusString,
+                                    [NSNumber numberWithBool:willRestart],@"willRestart",
 									dataPacket,@"DataPacket",nil];
         
         
@@ -1551,7 +1566,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
                                                       userInfo: runInfo];
 
     
-	if(_forceRestart ||([self timedRun] && [self repeatRun] && !ignoreRepeat && (!remoteControl || remoteInterface))){
+	if(willRestart){
 		ignoreRepeat  = NO;
 		_forceRestart = NO;
 		[self restartRun];
@@ -1599,6 +1614,9 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
             if(!_ignoreRunTimeout && timedRun &&(deltaTime >= timeLimit)){
                 if(repeatRun){
                     [self setNextRunWillQuickStart:YES];
+                    [[NSNotificationCenter defaultCenter] postNotificationName:ORRunIsAboutToRollOver
+                                                                        object:self];
+
                 }
                 [self stopRun];
             }
@@ -1765,7 +1783,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	[NSThread setThreadPriority:1];
 
 	dataTakingThreadRunning = YES;
-    [self clearExceptionCount];
+    [self performSelectorOnMainThread:@selector(clearExceptionCount) withObject:nil waitUntilDone:YES];
+
     while(!timeToStopTakingData) {
         NSAutoreleasePool *pool = [[NSAutoreleasePool allocWithZone:nil] init];
         @try {
@@ -1777,13 +1796,13 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 			}
 		}
 		@catch(NSException* localException) {
-            [self incExceptionCount];
             NSLogError(@"Uncaught exception",@"Main Run Loop",nil);
-			[self performSelectorOnMainThread:@selector(haltRun) withObject:nil waitUntilDone:NO];
+            [self performSelectorOnMainThread:@selector(incExceptionCount) withObject:nil waitUntilDone:YES];
+            [self performSelectorOnMainThread:@selector(haltRun) withObject:nil waitUntilDone:NO];
         }
         [pool release];
     }
-    
+    [runInfo setObject:[NSNumber numberWithBool:!quickStart] forKey:@"doinit"];
 	[client runIsStopping:runInfo];
 	
 	@try {
@@ -1796,7 +1815,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		}while(!allDone);
 	}
 	@catch(NSException* localException) {
-		[self incExceptionCount];
+        [self performSelectorOnMainThread:@selector(incExceptionCount) withObject:nil waitUntilDone:YES];
 		NSLogError(@"Uncaught exception",@"Run Loop Cleanup",nil);
 	}
 	

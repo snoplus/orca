@@ -646,9 +646,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 	    [[self window] endEditingFor:nil];		
     }
     
+    NSString* s = [NSString stringWithFormat:@"Hardware Wizard About to Run After Marking the CURRENT State!\n\nYou will be able to return to the CURRENT state using the return point marked: %d",[hwUndoManager numberOfMarks]];
+    
 #if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
     NSAlert *alert = [[[NSAlert alloc] init] autorelease];
-    [alert setMessageText:[NSString stringWithFormat:@"Hardware Wizard About to Run!\nThe return point will be marked: %d",[hwUndoManager numberOfMarks]]];
+    [alert setMessageText:s];
     [alert setInformativeText:@"Really Execute This HardwareWizard Set?"];
     [alert addButtonWithTitle:@"Yes"];
     [alert addButtonWithTitle:@"Cancel"];
@@ -659,10 +661,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
             [self setUseMark:YES];
             [self makeControlStruct:nil];
             [self performSelector:@selector(_delayedExecute) withObject:nil afterDelay:.1];
-            [self setUseMark:NO];
         }      }];
 #else
-    NSBeginAlertSheet([NSString stringWithFormat:@"Hardware Wizard About to Run!\nThe return point will be marked: %d",[hwUndoManager numberOfMarks]],
+    NSBeginAlertSheet(s,
                       @"Yes",
                       @"Cancel",
                       nil,[self window],
@@ -1672,8 +1673,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 {
 	if([self needToRestore])[self askForFileAndExecute];
 	else [self executeControlStruct];
+    [self setUseMark:NO];
 }
-     
+
 - (void) _delayedRestoreAllFileRequest
 {
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];

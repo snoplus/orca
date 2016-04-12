@@ -74,12 +74,14 @@
 		[dataSource plotter:self index:i x:&xValue y:&yValue];
 		y = [mYScale getPixAbsFast:yValue log:aLog integer:aInt minPad:aMinPad];
 		x = [mXScale getPixAbs:startTime - xValue]+chanWidth/2.;
-		if(i!=0){
-			[theDataPath lineToPoint:NSMakePoint(x,y)];
-		}
-		else {
-			[theDataPath moveToPoint:NSMakePoint(0,y)];
-		}
+        if(!isnan(x) && !isnan(y)){
+            if(i!=0){
+                [theDataPath lineToPoint:NSMakePoint(x,y)];
+            }
+            else {
+                [theDataPath moveToPoint:NSMakePoint(0,y)];
+            }
+        }
 
 	}
 	[[self lineColor] set];

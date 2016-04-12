@@ -453,7 +453,7 @@ static NSString *ORGroupObjects 			= @"ORGroupObjects";
 
 -(NSRect)rectEnclosingObjects:(NSArray*)someObjects
 {
-    NSRect theEnclosingRect;
+    NSRect theEnclosingRect = NSZeroRect;
     BOOL first = YES;
     int n = [someObjects count];
     int i;

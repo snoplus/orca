@@ -1339,7 +1339,7 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
 - (void) postSpecialToCouch
 {
     averageCount = 0; //reset the average counter
-
+		
     if([specialTrace count]){
         
         NSTimeInterval t1 = [specialStartTime timeIntervalSince1970];

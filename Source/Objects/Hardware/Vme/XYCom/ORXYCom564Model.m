@@ -396,7 +396,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 - (uint16_t) getAdcValueAtChannel:(int)chan
 {
     if (chan >= [self getNumberOfChannels]) return 0;
-    uint16_t raw;
+    uint16_t raw = 0;
     [self getAdcValues:&raw range:NSMakeRange(chan, 1)];
     return raw;
 }
@@ -404,7 +404,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 - (uint16_t) getAdcAverageValueAtChannel:(int)chan
 {
     if (chan >= [self getNumberOfChannels]) return 0;
-    uint16_t raw;
+    uint16_t raw = 0;
     [self getAdcAverageValues:&raw range:NSMakeRange(chan, 1)];
     return raw;
 }

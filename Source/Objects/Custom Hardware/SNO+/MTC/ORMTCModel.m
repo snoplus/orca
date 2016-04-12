@@ -54,7 +54,11 @@ NSString* ORMTCModelLastFileLoadedChanged	= @"ORMTCModelLastFileLoadedChanged";
 NSString* ORMTCModelIsPulserFixedRateChanged	= @"ORMTCModelIsPulserFixedRateChanged";
 NSString* ORMTCModelFixedPulserRateCountChanged = @"ORMTCModelFixedPulserRateCountChanged";
 NSString* ORMTCModelFixedPulserRateDelayChanged = @"ORMTCModelFixedPulserRateDelayChanged";
-NSString* ORMTCLock				= @"ORMTCLock";
+NSString* ORMtcTriggerNameChanged		= @"ORMtcTriggerNameChanged";
+NSString* ORMTCBasicLock				= @"ORMTCBasicLock";
+NSString* ORMTCStandardOpsLock				= @"ORMTCStandardOpsLock";
+NSString* ORMTCSettingsLock				= @"ORMTCSettingsLock";
+NSString* ORMTCTriggersLock				= @"ORMTCTriggersLock";
 NSString* ORMTCModelMTCAMaskChanged = @"ORMTCModelMTCAMaskChanged";
 NSString* ORMTCModelIsPedestalEnabledInCSR = @"ORMTCModelIsPedestalEnabledInCSR";
 
@@ -263,7 +267,7 @@ resetFifoOnStart = _resetFifoOnStart;
     
     [notifyCenter addObserver : self
                      selector : @selector(runAboutToStart:)
-                         name : ORRunAboutToStartNotification
+                         name : @"SNOPRunStart"
                        object : nil];
 }
 
@@ -1706,70 +1710,20 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (void) loadTheMTCADacs
 {
-	//-------------- variables -----------------
+    /* Load the MTCA thresholds to hardware. */
+    int i;
+    uint16_t dacs[14];
 
-	short	index, bitIndex, dacIndex;
-	unsigned short	dacValues[14];
-	unsigned long   aValue = 0;
+    @try {
+        for (i = 0; i < 14 ; i++) {
+            dacs[i] = [self dacValueByIndex:i];
+        }
 
-
-	//-------------- variables -----------------
-
-	@try {
-		
-		// STEP 3: load the DAC values from the database into dacValues[14]
-		for (index = 0; index < 14 ; index++){
-			dacValues[index] = [self dacValueByIndex:index];
-		}
-		
-		// STEP 4: Set DACSEL in Register 2 high[in hardware it's inverted -- i.e. it is set low]
-		[self write:kMtcDacCntReg value:MTC_DAC_CNT_DACSEL];
-		
-		// STEP 5: now parallel load the 16bit word into the serial shift register
-		// STEP 5a: the first 4 bits are loaded zeros 
-		aValue = 0UL;
-		for (index = 0; index < 4 ; index++){
-			
-			// data bit, with DACSEL high, clock low
-			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
-			
-			// clock high
-			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL | MTC_DAC_CNT_DACCLK];
-			
-			// clock low
-			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
-		}
-		
-		//STEP 5b:  now build the word and load the next 12 bits, load MSB first
-		for (bitIndex = 11; bitIndex >= 0 ; bitIndex--){
-			
-			aValue = 0UL;
-			
-			for (dacIndex = 0; dacIndex < 14 ; dacIndex++){
-				
-				if ( dacValues[dacIndex] & (1UL << bitIndex) )
-					aValue |= (1UL << dacIndex);
-			}
-			
-			// data bit, with DACSEL high, clock low
-			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
-			
-			// clock high
-			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL | MTC_DAC_CNT_DACCLK];
-			
-			// clock low
-			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
-		}
-		
-		// STEP 5: Set DACSEL in Register 2 low[in hardware it's inverted -- i.e. it is set high], with all other bits low
-		[self write:kMtcDacCntReg value:0];
-		NSLog(@"Loaded the MTC/A DACs\n");
-		
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Could not load the MTC/A DACs!\n");		
-		[localException raise];
-	}
+        [mtc okCommand:"load_mtca_dacs %d %d %d %d %d %d %d %d %d %d %d %d %d %d", dacs[0], dacs[1], dacs[2], dacs[3], dacs[4], dacs[5], dacs[6], dacs[7], dacs[8], dacs[9], dacs[10], dacs[11], dacs[12], dacs[13]];
+    } @catch(NSException* e) {
+        NSLog(@"failed to load the MTCA dacs: %@", [e reason]);     
+        [e raise];
+    }
 }
 
 - (BOOL) adapterIsSBC

@@ -20,6 +20,7 @@
 
 #import "ORExperimentController.h"
 #import "SNOPDetectorView.h"
+#import "StopLightView.h"
 
 @class ORColorScale;
 @class ORSegmentGroup;
@@ -27,9 +28,10 @@
 @interface SNOPController : ORExperimentController {
 	IBOutlet NSTextField* detectorTitle;
 	IBOutlet NSPopUpButton*	viewTypePU;
+    IBOutlet NSView *snopView;
     
-	NSView *blankView;
-	NSSize detectorSize;
+    NSView *blankView;
+    NSSize detectorSize;
 	NSSize detailsSize;
 	NSSize focalPlaneSize;
 	NSSize couchDBSize;
@@ -40,25 +42,34 @@
     IBOutlet NSComboBox *debugDBIPAddressPU;
     IBOutlet NSMatrix* hvStatusMatrix;
     
+    //Run control (the rest is in the ORExperimentController)
+    IBOutlet NSButton *maintenanceRunBox;
+    IBOutlet NSTextField* standardRunTypeField;
+    IBOutlet StopLightView *lightBoardView;
+
+    //Quick links
+    
+    //Danger zone
+    IBOutlet NSButton *panicDownButton;
+    IBOutlet NSTextField *detectorHVStatus;
+    
+    //Standard Runs
+    IBOutlet NSComboBox *standardRunPopupMenu;
+    IBOutlet NSComboBox *standardRunVersionPopupMenu;
+    IBOutlet NSButton *standardRunLoadButton;
+    IBOutlet NSButton *standardRunLoadDefaultsButton;
+    IBOutlet NSButton *standardRunSaveButton;
+    IBOutlet NSButton *standardRunSaveDefaultsButton;
+    IBOutlet NSMatrix *standardRunThresNewValues;
+    IBOutlet NSMatrix *standardRunThresStoredValues;
+    IBOutlet NSMatrix *standardRunThresDefaultValues;
+
+    
     //Run Types Information
     IBOutlet NSMatrix*  globalRunTypesMatrix;
     
     //Xl3 Mode
     IBOutlet NSMatrix * globalxl3Mode;
-    
-    //Run information
-    IBOutlet NSTextField* currentRunNumber;
-    IBOutlet NSTextField* currentRunType;
-    IBOutlet NSTextField* currentStatus;
-    IBOutlet NSTextField* lastRunNumber;
-    IBOutlet NSTextField* lastRunType;
-
-    IBOutlet NSTextField *n100Hi;
-    IBOutlet NSTextField *n100med;
-    IBOutlet NSTextField *n20hi;
-    IBOutlet NSTextField *esumhi;
-    IBOutlet NSTextField *owln;
-    IBOutlet NSTextField *n100Lo;
     
     //smellie buttons ---------
     IBOutlet NSComboBox *smellieRunFileNameField;
@@ -78,14 +89,7 @@
     IBOutlet NSButton *smellieEmergencyStop;
     IBOutlet NSButton *smellieBuildCustomRun;
     IBOutlet NSButton *smellieChangeConfiguration;
-    
-    IBOutlet NSButton *tellieEnabled;
-    
-    IBOutlet NSButton *startPhysicsRunButton;
-    IBOutlet NSButton *startMaintainenceRunButton;
-    IBOutlet NSButton *newPhysicsRunButton;
-    IBOutlet NSButton *newMaintainenceRunButton;
-    
+        
     //eStop buttons
     IBOutlet NSButton *emergyencyStopEnabled;
     IBOutlet NSButton *eStopButton;
@@ -101,6 +105,15 @@
     NSThread *eStopPollingThread;
     
     NSMutableDictionary *snopRunTypeMaskDic; 
+
+    IBOutlet NSButton* runsLockButton;
+    IBOutlet NSTextField *runStatusTextField;
+
+    //ECA RUNS
+    IBOutlet NSPopUpButton *ECApatternPopUpButton;
+    IBOutlet NSPopUpButton *ECAtypePopUpButton;
+    IBOutlet NSTextField *TSlopePatternTextField;
+    IBOutlet NSTextField *subTimeTextField;
     
 }
 
@@ -160,6 +173,8 @@
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem;
 -(void) windowDidLoad;
 -(void) fetchRunMaskSettings;
+
+- (IBAction) runsLockAction:(id)sender;
 
 @end
 @interface ORDetectorView (SNO)

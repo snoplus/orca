@@ -767,32 +767,35 @@ static NSString *ORDataTaskTimeScaler		= @"ORDataTaskTimeScaler";
 	}
 	else if([[anItem class] isSubclassOfClass: NSClassFromString(@"ORReadOutObject")]){
 		id anObj = [anItem object];
-		NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
-		[objDictionary setObject:[anObj className] forKey:@"name"];
-		id objGuardian = [anObj guardian];
-		if([objGuardian isKindOfClass:NSClassFromString(@"ORCrate")]){
-			[objDictionary setObject:[NSNumber numberWithInt:[anObj crateNumber]] forKey:@"crate"];
-			if([anObj respondsToSelector:@selector(stationNumber)]){
-				[objDictionary setObject:[NSNumber numberWithInt:[anObj stationNumber]] forKey:@"station"];
-			}
-			else if([anObj respondsToSelector:@selector(slot)]){
-				[objDictionary setObject:[NSNumber numberWithInt:[anObj slot]] forKey:@"slot"];
-			}
-		}
-		else {
-			[objDictionary setObject:[NSNumber numberWithInt:[anObj uniqueIdNumber]] forKey:@"uniqueID"];
-		}
-		someChildren = [anObj children];
-		if([someChildren count]){
-			NSMutableArray* theChildArray = [NSMutableArray array];
-			id aChild;
-			NSEnumerator* e = [someChildren objectEnumerator];
-			while(aChild = [e nextObject]){
-				[self readoutInfo:aChild array:theChildArray];
-			} 
-			[objDictionary setObject:theChildArray forKey:@"children"];
-		}
-		[anArray addObject:objDictionary];
+        //temp check for nil obj
+        if(anObj){
+            NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
+            [objDictionary setObject:[anObj className] forKey:@"name"];
+            id objGuardian = [anObj guardian];
+            if([objGuardian isKindOfClass:NSClassFromString(@"ORCrate")]){
+                [objDictionary setObject:[NSNumber numberWithInt:[anObj crateNumber]] forKey:@"crate"];
+                if([anObj respondsToSelector:@selector(stationNumber)]){
+                    [objDictionary setObject:[NSNumber numberWithInt:[anObj stationNumber]] forKey:@"station"];
+                }
+                else if([anObj respondsToSelector:@selector(slot)]){
+                    [objDictionary setObject:[NSNumber numberWithInt:[anObj slot]] forKey:@"slot"];
+                }
+            }
+            else {
+                [objDictionary setObject:[NSNumber numberWithInt:[anObj uniqueIdNumber]] forKey:@"uniqueID"];
+            }
+            someChildren = [anObj children];
+            if([someChildren count]){
+                NSMutableArray* theChildArray = [NSMutableArray array];
+                id aChild;
+                NSEnumerator* e = [someChildren objectEnumerator];
+                while(aChild = [e nextObject]){
+                    [self readoutInfo:aChild array:theChildArray];
+                } 
+                [objDictionary setObject:theChildArray forKey:@"children"];
+            }
+            [anArray addObject:objDictionary];
+        }
 	}
 	return anArray;
 }

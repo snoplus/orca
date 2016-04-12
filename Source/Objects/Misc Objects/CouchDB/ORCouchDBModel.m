@@ -930,6 +930,9 @@ nil];
 
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp
 {
+    
+    // a couple of things below call methods that can update the GUI.
+    // Must do that on the main thread
 	@synchronized(self){
 		if([aResult isKindOfClass:[NSDictionary class]]){
 			NSString* message = [aResult objectForKey:@"Message"];
@@ -963,7 +966,9 @@ nil];
 				else if([aTag isEqualToString:kDeleteDB]){
                     if(![aResult objectForKey:@"error"]){
                         [aResult prettyPrint:@"Deleted Main Database:"];
-                        [self setUsingUpdateHandler:NO];
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [self setUsingUpdateHandler:NO];
+                        });
 
                     }
                     else {
@@ -986,17 +991,21 @@ nil];
 				}
                 else if([aTag isEqualToString:kAddUpdateHandler]){
                     if([[aResult objectForKey:@"error"] isEqualToString:@"conflict"]){
-                        
-                        //NSLog(@"CouchDB: %@ Update handler already installed\n",[anOp database]);
-                        [self setUsingUpdateHandler:YES];
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                                [self setUsingUpdateHandler:YES];
+                        });
                     }
                     else if(![aResult objectForKey:@"error"]){
                         [aResult prettyPrint:@"CouchDB Update Handler Installation:"];
-                        [self setUsingUpdateHandler:YES];
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [self setUsingUpdateHandler:YES];
+                        });
                    }
                     else {
                         [aResult prettyPrint:@"CouchDB Update Handler Installation Error:"];
-                        [self setUsingUpdateHandler:NO];
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [self setUsingUpdateHandler:NO];
+                        });
                     }
 				}
 
@@ -1029,7 +1038,10 @@ nil];
 {
     if([remoteHostName length]==0)return;
 	if([aList count] && verbose)NSLog(@"Couch Remote Tasks:\n");
-	[self setReplicationRunning:NO];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self setReplicationRunning:NO];
+    });
+
 	for(id aTask in aList){
 		if([[[aTask objectForKey:@"type"] lowercaseString] isEqualToString:@"replication"]){
 			NSArray* keys = [aTask allKeys];
@@ -1037,7 +1049,9 @@ nil];
 				id item = [aTask objectForKey:aKey];
 				if([item isKindOfClass:NSClassFromString(@"NSString")]){
 					if([(NSString*)item rangeOfString:remoteHostName].location != NSNotFound){
-						[self setReplicationRunning:YES];
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [self setReplicationRunning:YES];
+                        });
                         wasReplicationRunning = YES;
                         replicationCheckCount = 0;
 					}

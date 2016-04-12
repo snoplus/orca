@@ -50,6 +50,7 @@
     IBOutlet NSButton*		stopRunButton;
     IBOutlet NSTextField*	runNumberField;
     IBOutlet NSTextField*	runStatusField;
+    IBOutlet NSTextField*   timeStartedField;
     IBOutlet NSTextField*	elapsedTimeField;
     IBOutlet NSButton*      timedRunCB;
     IBOutlet NSButton*      repeatRunCB;

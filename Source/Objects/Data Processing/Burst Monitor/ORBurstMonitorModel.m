@@ -735,7 +735,7 @@ double facto(unsigned long long num)
                                                 
                                                 //Find background likelyhood in burst //fixme
                                                 int numgamma = 0;
-                                                double rategamma = 3.8; // From run 3681
+                                                double rategamma = 2.3585; // 3.8 From run 3681, //2.3585 from 4680 to 4684
                                                 int numalpha = 0;
                                                 double ratealpha = 319.0/86400.0; // From a bunch of runs before Aug 2015
                                                 double tbackground = 1;
@@ -765,6 +765,11 @@ double facto(unsigned long long num)
                                                 if(numalpha>0)
                                                 {
                                                     erralpha = (numalpha - ealpha)/(sqrt(numalpha));
+                                                }
+                                                isgammalow = 0;
+                                                if(egamma>numgamma)
+                                                {
+                                                    isgammalow = 1;
                                                 }
                                                 NSLog(@"BG parameters are time of %f, gamma of %i, alpha of %i, expect %f,%f, errs %f,%f \n", tbackground, numgamma, numalpha, rategamma*tbackground, ratealpha*tbackground, errgamma, erralpha );
                                                 double inprob = 0;
@@ -1330,14 +1335,14 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     //calc chan prob
     double exChan =999.999;
     int novaState = 0;
-    if(multInBurst > 5 && rSec > 0.01 && adcP > 0.001 && gammaP > 0.00001 && alphaP > 0.00001)
+    if(multInBurst > 5 && rSec > 0.01 && adcP > 0.001 && (gammaP > 0.00001 || isgammalow) && alphaP > 0.00001)
     {
         novaState = 3;
     }
     else
     {
         novaState = 0; //Other
-        if (adcP > 0.001 && gammaP > 0.001 && alphaP > 0.001) //Coincidence
+        if (adcP > 0.001 && (gammaP > 0.001 || isgammalow) && alphaP > 0.001) //Coincidence
         {
             novaState = 1;
         }
@@ -1351,6 +1356,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
         }
     }
     NSLog(@"Novastate set to %i \n", novaState);
+    NSLog(@"isgammalow? %i \n", isgammalow);
     if(novaState == 3) //Send a cping somewhere if the burst is good enough
     {
         NSLog(@"Supdernova candidate, send ping if SNEWS run\n");
@@ -1542,7 +1548,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     
     [getrev waitUntilExit]; //waits like 60 seconds for 10.0.3.1 on lu daq, freezes before without this
     //NSLog(@"part 1\n");
-    [getrev terminate]; //needs this to work
+    //[getrev terminate]; //needs this to work
     [getrev release];
     //NSLog(@"part 2\n");
     revfile =[piperev fileHandleForReading];  //maybe need declare here

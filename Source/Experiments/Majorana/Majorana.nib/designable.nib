@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9531" systemVersion="15C50" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9531"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10116"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -374,7 +374,7 @@
                                             </connections>
                                         </button>
                                         <textField verticalHuggingPriority="750" id="1189">
-                                            <rect key="frame" x="107" y="680" width="302" height="31"/>
+                                            <rect key="frame" x="73" y="680" width="404" height="31"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="2540">
                                                 <font key="font" size="18" name="Papyrus"/>
@@ -558,14 +558,14 @@
                                         <popUpButton verticalHuggingPriority="750" id="2421">
                                             <rect key="frame" x="246" y="230" width="107" height="15"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <popUpButtonCell key="cell" type="push" title="Total Counts" bezelStyle="rounded" alignment="left" controlSize="mini" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="4" imageScaling="proportionallyDown" inset="2" selectedItem="2606" id="2553">
+                                            <popUpButtonCell key="cell" type="push" title="Total Counts" bezelStyle="rounded" alignment="left" controlSize="mini" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" tag="4" imageScaling="proportionallyDown" inset="2" selectedItem="2606" id="2553">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="miniSystem"/>
                                                 <menu key="menu" title="OtherViews" id="2423">
                                                     <items>
                                                         <menuItem title="Rates" tag="1" id="2424"/>
                                                         <menuItem title="Thresholds" tag="2" id="2425"/>
-                                                        <menuItem title="Total Counts" state="on" tag="4" id="2606"/>
+                                                        <menuItem title="Total Counts" tag="4" id="2606"/>
                                                     </items>
                                                 </menu>
                                             </popUpButtonCell>
@@ -1414,7 +1414,7 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveName="MJSpecialView" rowHeight="13" headerView="edt-te-ow8" id="lkN-ZI-EC7">
-                                                        <rect key="frame" x="0.0" y="0.0" width="447" height="15"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="452" height="193"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" red="1" green="0.98048109000000006" blue="0.95548701000000003" alpha="1" colorSpace="calibratedRGB"/>
@@ -1547,7 +1547,7 @@
                                                 </subviews>
                                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </clipView>
-                                            <scroller key="horizontalScroller" verticalHuggingPriority="750" controlSize="small" horizontal="YES" id="9zb-e5-OZM">
+                                            <scroller key="horizontalScroller" verticalHuggingPriority="750" doubleValue="0.14285714285714285" controlSize="small" horizontal="YES" id="9zb-e5-OZM">
                                                 <rect key="frame" x="1" y="216" width="445" height="11"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
@@ -1556,7 +1556,7 @@
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                             <tableHeaderView key="headerView" id="edt-te-ow8">
-                                                <rect key="frame" x="0.0" y="0.0" width="447" height="23"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="452" height="23"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </tableHeaderView>
                                         </scrollView>
@@ -1568,7 +1568,7 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" alternatingRowBackgroundColors="YES" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowHeight="14" headerView="dL4-rf-o4k" id="7bG-Ja-hCP">
-                                                        <rect key="frame" x="0.0" y="0.0" width="304" height="16"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="308" height="189"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1675,7 +1675,7 @@
                                                 </subviews>
                                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </clipView>
-                                            <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="PnO-ol-Ixa">
+                                            <scroller key="horizontalScroller" verticalHuggingPriority="750" doubleValue="0.16666666666666666" horizontal="YES" id="PnO-ol-Ixa">
                                                 <rect key="frame" x="1" y="212" width="302" height="15"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
@@ -1684,7 +1684,7 @@
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                             <tableHeaderView key="headerView" id="dL4-rf-o4k">
-                                                <rect key="frame" x="0.0" y="0.0" width="304" height="23"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="308" height="23"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </tableHeaderView>
                                         </scrollView>
@@ -1696,7 +1696,7 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveName="MJTableView" rowHeight="13" headerView="2596" id="250">
-                                                        <rect key="frame" x="0.0" y="0.0" width="718" height="387"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="703" height="15"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" red="1" green="0.98048109000000006" blue="0.95548701000000003" alpha="1" colorSpace="calibratedRGB"/>

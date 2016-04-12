@@ -78,12 +78,12 @@ endRunNumber = _endRunNumber;
     
     //TODO:Remove hardcoding from the localHost database here
 	
-	NSString *urlName=[[NSString alloc] initWithFormat:
-                       @"http:localhost:5984/resistor/_design/resistorQuery/_view/getPmtOnlineMask"];
+	NSString *urlName=[[[NSString alloc] initWithFormat:
+                       @"http:localhost:5984/resistor/_design/resistorQuery/_view/getPmtOnlineMask"] autorelease];
 	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:
                                     [NSURL URLWithString:urlName] cachePolicy: NSURLRequestReloadIgnoringCacheData timeoutInterval:1];
-	NSData *responseData = [[NSData alloc] initWithData:
-                            [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&connectionError]];
+	NSData *responseData = [[[NSData alloc] initWithData:
+                            [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&connectionError]]autorelease];
     
     //this jsonObject contains all the responses from a view 
     NSDictionary *couchDbQueryResponse=[NSJSONSerialization

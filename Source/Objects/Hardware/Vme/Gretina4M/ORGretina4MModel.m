@@ -855,6 +855,15 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     fifoState = aFifoState;
 }
 
+- (void) printThresholds
+{
+    NSLog(@"Thresholds entered in dialog for %@\n",[self fullID]);
+    int i;
+    for(i=0;i<kNumGretina4MChannels;i++){
+        NSLogFont([NSFont fontWithName:@"Monaco" size:11],@"%d:%6d\n",i,[self trapEnabled:i]?[self trapThreshold:i]:[self ledThreshold:i]);
+    }
+}
+
 - (short) noiseFloorOffset
 {
     return noiseFloorOffset;
@@ -1347,7 +1356,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) stepSerDesInit
 {
-    int i;
     switch(initializationState){
         case kSerDesSetup:
             [self writeRegister:kMasterLogicStatus  withValue: 0x00000051]; //power up value
@@ -1365,11 +1373,11 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
             break;
             
         case kFlushFifo:
-            for(i=0;i<kNumGretina4MChannels;i++){
-                [self writeControlReg:i enabled:NO];
-            }
+           // for(i=0;i<kNumGretina4MChannels;i++){
+            //    [self writeControlReg:i enabled:NO];
+           // }
             
-            [self resetFIFO];
+            //[self resetFIFO];
             [self setInitState:kReleaseClkManager];
             break;
             
@@ -1548,11 +1556,11 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 //    	unsigned long theValue =
     value &= 0x3;
     
-    [[self adapter] writeLongBlock:&value
-                         atAddress:[self baseAddress] + register_information[kADCConfig].offset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+    [self writeAndCheckLong:value
+              addressOffset:register_information[kADCConfig].offset
+                       mask:0x3
+                  reportKey:@"ClockPhase"
+              forceFullInit:forceFullInitCard];
     [ORTimer delay:0.1];
 
     return;
@@ -1572,11 +1580,18 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 }
 
 - (void) initBoard
-{       //disable all channels
+{
+    [self initBoard:YES];
+}
+
+- (void) initBoard:(BOOL)doChannelEnable
+{
     int i;
-    for(i=0;i<kNumGretina4MChannels;i++){
-        [self writeControlReg:i enabled:NO];
-    }
+    if(doChannelEnable){
+        for(i=0;i<kNumGretina4MChannels;i++){
+            [self writeControlReg:i enabled:NO];
+        }
+    
     
     //write the card level params
     [self writeClockSource];
@@ -1592,23 +1607,31 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     //write the channel level params
     for(i=0;i<kNumGretina4MChannels;i++) {
         if([self enabled:i]){
-            [self writeLEDThreshold:i];
-            [self writeTrapThreshold:i];
+            if([self trapEnabled:i]){
+                [self writeTrapThreshold:i];
+            }
+            else {
+                [self writeLEDThreshold:i];
+            }
             [self writeWindowTiming:i];
             [self writeRisingEdgeWindow:i];
         }
     }
-    //enable channels
-    [self resetFIFO];
+        [self resetFIFO];
 
-    for(i=0;i<kNumGretina4MChannels;i++){
-        if([self enabled:i]){
-            [self writeControlReg:i enabled:YES];
+    //if(doChannelEnable){
+        for(i=0;i<kNumGretina4MChannels;i++){
+            if([self enabled:i]){
+                [self writeControlReg:i enabled:YES];
+            }
         }
-    }
 
+    }
+    
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MCardInited object:self];
 }
+
+
 
 - (unsigned long) readControlReg:(short)channel
 {
@@ -1660,7 +1683,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     return theValue & 0X3;
 }
 
-//new code version 1 (Jing Qian)
 - (void) writeClockSource: (unsigned long) clocksource
 {
     if(clocksource == 0)return; ////temp..... Clock source might be set by the Trigger Card init code.
@@ -2454,6 +2476,12 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [p setSetMethodSelector:@selector(initBoard)];
     [a addObject:p];
     
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setUseValue:NO];
+    [p setOncePerCard:YES];
+    [p setName:@"Load Thresholds"];
+    [p setSetMethodSelector:@selector(loadThresholds)];
+    [a addObject:p];
     return a;
 }
 
@@ -2479,6 +2507,9 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+    runNumberLocal     = [[userInfo objectForKey:@"kRunNumber"] unsignedLongValue];
+    subRunNumberLocal     = [[userInfo objectForKey:@"kSubRunNumber"] unsignedLongValue];
+
     if(![[self adapter] controllerCard]){
         [NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
     }
@@ -2516,7 +2547,9 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     
     [self clearDiagnosticsReport];
     
-    [self initBoard];
+    BOOL doChannelEnable = [[userInfo objectForKey:@"doinit"]boolValue]==1;
+    [self initBoard:doChannelEnable];
+    if(!doChannelEnable) NSLog(@" %@ Quick Start Enabled. Channels NOT disabled/enabled.\n",[self fullID]);
     
     if([self diagnosticsEnabled])[self briefDiagnosticsReport];
     
@@ -2546,7 +2579,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
             if(dataBuffer[2]==kGretina4MPacketSeparator){
                 short chan = dataBuffer[3] & 0xf;
                 if(chan < kNumGretina4MChannels){
-                    ++waveFormCount[dataBuffer[3] & 0x7];  //grab the channel and inc the count
+                    ++waveFormCount[chan];  //grab the channel and inc the count
                     [aDataPacket addLongsToFrameBuffer:dataBuffer length:kG4MDataPacketSize];
                 }
                 else {
@@ -2571,10 +2604,15 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     @try {
-		int i;
-		for(i=0;i<kNumGretina4MChannels;i++){					
-			[self writeControlReg:i enabled:NO];
-		}
+        if([[userInfo objectForKey:@"doinit"]boolValue]==1){
+            int i;
+            for(i=0;i<kNumGretina4MChannels;i++){
+                [self writeControlReg:i enabled:NO];
+            }
+        }
+        else {
+            NSLog(@"Quick Start Enabled. %@ left running.\n",[self fullID]);
+        }
 	}
 	@catch(NSException* e){
         [self incExceptionCount];
@@ -2633,13 +2671,18 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (BOOL) bumpRateFromDecodeStage:(short)channel
 {
     if(isRunning)return NO;
-    ++waveFormCount[channel];
+    if(channel>=0 && channel<kNumGretina4MChannels){
+        ++waveFormCount[channel];
+    }
     return YES;
 }
 
 - (unsigned long) waveFormCount:(short)aChannel
 {
-    return waveFormCount[aChannel];
+    if(aChannel>=0 && aChannel<kNumGretina4MChannels){
+        return waveFormCount[aChannel];
+    }
+    else return 0;
 }
 
 -(void) startRates
@@ -2687,7 +2730,9 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     configStruct->card_info[index].deviceSpecificData[2]	= 0x0B; // fifoAM
     configStruct->card_info[index].deviceSpecificData[3]	= [self baseAddress] + 0x04; // fifoReset Address
     configStruct->card_info[index].deviceSpecificData[4]	= location; //crate, card, serial number
-    
+    configStruct->card_info[index].deviceSpecificData[5]	= runNumberLocal;
+    configStruct->card_info[index].deviceSpecificData[6]	= subRunNumberLocal;
+
 	configStruct->card_info[index].num_Trigger_Indexes		= 0;
 	
 	configStruct->card_info[index].next_Card_Index 	= index+1;	
@@ -3000,7 +3045,10 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (unsigned long) eventCount:(int)aChannel
 {
-    return waveFormCount[aChannel];
+    if(aChannel>=0 && aChannel<kNumGretina4MChannels){
+        return waveFormCount[aChannel];
+    }
+    else return 0;
 }
 
 - (void) clearEventCounts
@@ -3032,7 +3080,18 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     [self setLEDThreshold:chan withValue:aValue];
 }
-
+//separate manually load of thresholds
+- (void) loadThresholds
+{
+    NSLog(@"%@ Manual load of thresholds\n",[self fullID]);
+    int i;
+    for(i=0;i<kNumGretina4MChannels;i++) {
+        if([self enabled:i]){
+            if([self trapEnabled:i]) [self writeTrapThreshold:i];
+            else                     [self writeLEDThreshold:i];
+        }
+    }
+}
 @end
 
 @implementation ORGretina4MModel (private)

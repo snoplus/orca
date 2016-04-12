@@ -29,7 +29,10 @@
 #endif
 #endif
 #import <Foundation/Foundation.h>
+<<<<<<< HEAD
 
+=======
+>>>>>>> upstream/master
 /**
  `WPXMLRPCEncoder` encodes a XML-RPC request
  */

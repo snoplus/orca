@@ -38,11 +38,16 @@
     IBOutlet NSTextField*   slotField;
     IBOutlet NSStepper* 	regBaseAddressStepper;
     IBOutlet NSTextField* 	regBaseAddressText;
-    IBOutlet NSStepper* 	memBaseAddressStepper;
     IBOutlet NSTextField* 	memBaseAddressText;
+    IBOutlet NSStepper* 	memBaseAddressStepper;
 	IBOutlet NSButton*		basicOpsLockButton;
  	IBOutlet NSTextField*	defaultFileField;
-	
+    IBOutlet NSButton *readButton;
+    IBOutlet NSButton *writteButton;
+    IBOutlet NSButton *stopButton;
+    IBOutlet NSButton *statusButton;
+
+    
 	//standard Ops
 	IBOutlet NSButton*		standardOpsLockButton;
 	IBOutlet NSButton*		initMtcButton;
@@ -91,6 +96,7 @@
 	IBOutlet NSTextField*	commentsField;
 
 	//trigger
+    IBOutlet NSButton*		triggersLockButton;
 	IBOutlet NSMatrix*		globalTriggerMaskMatrix;
 	IBOutlet NSMatrix*		globalTriggerCrateMaskMatrix;
 	IBOutlet NSMatrix*		pedCrateMaskMatrix;
@@ -107,6 +113,11 @@
     IBOutlet NSButton* loadPEDCrateMaskButton;
     IBOutlet NSButton* loadMTCACrateMaskButton;
     
+    IBOutlet NSButton *clearTriggersButton;
+    IBOutlet NSButton *clearGTCratesButton;
+    IBOutlet NSButton *clearPEDCratesButton;
+    IBOutlet NSButton *clearMTCAMaskButton;
+    
 	BOOL	sequenceRunning;
     NSView* blankView;
     NSSize  basicOpsSize;
@@ -122,7 +133,6 @@
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management
-- (void) updateButtons;
 - (void) eSumViewTypeChanged:(NSNotification*)aNote;
 - (void) nHitViewTypeChanged:(NSNotification*)aNote;
 - (void) mtcDataBaseChanged:(NSNotification*)aNote;
@@ -135,7 +145,10 @@
 - (void) writeValueChanged:(NSNotification*)aNote;
 - (void) memoryOffsetChanged:(NSNotification*)aNote;
 - (void) selectedRegisterChanged:(NSNotification*)aNote;
+- (void) basicLockChanged:(NSNotification*)aNote;
+- (void) standardOpsLockChanged:(NSNotification*)aNote;
 - (void) settingsLockChanged:(NSNotification*)aNote;
+- (void) triggersLockChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
 - (void) regBaseAddressChanged:(NSNotification*)aNote;
 - (void) memBaseAddressChanged:(NSNotification*)aNote;
@@ -148,7 +161,6 @@
 - (void) sequenceRunning:(NSNotification*)aNote;
 - (void) sequenceStopped:(NSNotification*)aNote;
 - (void) sequenceProgress:(NSNotification*)aNote;
-- (void) documentLockChanged:(NSNotification*)aNotification;
 - (void) triggerMTCAMaskChanged:(NSNotification*)aNotification;
 - (void) isPedestalEnabledInCSRChanged:(NSNotification*)aNotification;
 
@@ -161,7 +173,6 @@
 - (IBAction) buttonPushed:(id) sender;
 
 #pragma mark •••Actions
-- (IBAction) lockAction:(id) sender;
 
 //Basic Ops
 - (IBAction) basicReadAction:(id) sender;

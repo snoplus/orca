@@ -11,6 +11,10 @@
                 <outlet property="autoIncrementCB" destination="1316" id="1318"/>
                 <outlet property="basicOpsLockButton" destination="2944" id="2954"/>
                 <outlet property="basicOpsRunningIndicator" destination="1324" id="1326"/>
+                <outlet property="clearGTCratesButton" destination="4467" id="0Xb-zw-AO5"/>
+                <outlet property="clearMTCAMaskButton" destination="4473" id="p8l-Gn-iOO"/>
+                <outlet property="clearPEDCratesButton" destination="4470" id="6ID-yE-5zA"/>
+                <outlet property="clearTriggersButton" destination="4464" id="T06-0D-vbt"/>
                 <outlet property="coarseDelayField" destination="1834" id="2516"/>
                 <outlet property="continuePedestalsButton" destination="4056" id="4089"/>
                 <outlet property="continuousButton" destination="1473" id="3882"/>
@@ -62,6 +66,7 @@
                 <outlet property="pedestalWidthField" destination="1803" id="2507"/>
                 <outlet property="pulserFeedsMatrix" destination="4535" id="4539"/>
                 <outlet property="pulserPeriodField" destination="1806" id="2509"/>
+                <outlet property="readButton" destination="1253" id="YOa-8v-Q9c"/>
                 <outlet property="regBaseAddressText" destination="1282" id="1290"/>
                 <outlet property="repeatCountField" destination="1237" id="2825"/>
                 <outlet property="repeatCountStepper" destination="1239" id="1303"/>
@@ -70,17 +75,22 @@
                 <outlet property="selectedRegisterPU" destination="1261" id="1267"/>
                 <outlet property="setCoarseDelayButton" destination="4158" id="4434"/>
                 <outlet property="setFineDelayButton" destination="4170" id="4433"/>
-                <outlet property="settingsLockButton" destination="2948" id="2950"/>
+                <outlet property="settingsLockButton" destination="2948" id="YqP-B4-Zwx"/>
                 <outlet property="standardOpsLockButton" destination="2946" id="2952"/>
+                <outlet property="statusButton" destination="1257" id="vCe-N0-3RA"/>
+                <outlet property="stopButton" destination="1259" id="kkn-k7-bsR"/>
                 <outlet property="stopFixedTimePedestalsButton" destination="4054" id="4100"/>
                 <outlet property="stopPedestalsButton" destination="4057" id="4088"/>
                 <outlet property="stopTriggerZeroButton" destination="1475" id="3883"/>
                 <outlet property="tabView" destination="599" id="1014"/>
                 <outlet property="triggerZeroMatrix" destination="1459" id="3879"/>
+                <outlet property="triggersLockButton" destination="3226" id="ISm-vi-41l"/>
                 <outlet property="useMemoryMatrix" destination="1218" id="1298"/>
                 <outlet property="window" destination="21" id="307"/>
                 <outlet property="writeValueField" destination="1228" id="2824"/>
                 <outlet property="writeValueStepper" destination="1227" id="1297"/>
+                <outlet property="writteButton" destination="1255" id="HS0-aS-53u"/>
+                <outlet property="xilinxFileField" destination="2066" id="3240"/>
                 <outlet property="xilinxFilePathField" destination="2066" id="3568"/>
             </connections>
         </customObject>
@@ -417,7 +427,7 @@
                                                 <font key="font" metaFont="label"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="lockAction:" target="-2" id="2955"/>
+                                                <action selector="basicLockAction:" target="-2" id="vtq-xf-bWj"/>
                                             </connections>
                                         </button>
                                     </subviews>
@@ -920,7 +930,7 @@
                                                 <font key="font" metaFont="label"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="lockAction:" target="-2" id="2953"/>
+                                                <action selector="standardOpsLockAction:" target="-2" id="nAp-7p-o4B"/>
                                             </connections>
                                         </button>
                                         <box autoresizesSubviews="NO" title="Pulser feeds" borderType="line" id="4534">
@@ -1887,7 +1897,7 @@
                                                 <font key="font" metaFont="label"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="lockAction:" target="-2" id="2951"/>
+                                                <action selector="settingsLockAction:" target="-2" id="ZB6-MX-TDC"/>
                                             </connections>
                                         </button>
                                         <box verticalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="3241">
@@ -1974,6 +1984,9 @@
                                                 <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="label"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="triggersLockAction:" target="-2" id="B6w-iQ-QN7"/>
+                                            </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" id="4167">
                                             <rect key="frame" x="375" y="143" width="160" height="28"/>
@@ -1984,17 +1997,6 @@
                                             </buttonCell>
                                             <connections>
                                                 <action selector="triggersLoadTriggerMask:" target="-2" id="4453"/>
-                                            </connections>
-                                        </button>
-                                        <button verticalHuggingPriority="750" id="4464">
-                                            <rect key="frame" x="592" y="143" width="160" height="28"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="push" title="Clear triggers" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4465">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="triggersClearTriggerMask:" target="-2" id="4476"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" id="4429">
@@ -3019,6 +3021,17 @@
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
+                                        <button verticalHuggingPriority="750" id="4464">
+                                            <rect key="frame" x="592" y="143" width="160" height="28"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="push" title="Clear triggers" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4465">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="smallSystem"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="triggersClearTriggerMask:" target="-2" id="4476"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                 </view>
                             </tabViewItem>

@@ -707,7 +707,10 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [runDocDict setObject:[NSString stringWithFormat:@"%lu",[runControl runNumber]] forKey:@"index"];
     [runDocDict setObject:[self stringUnixFromDate:nil] forKey:@"issue_time_unix"];
     [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"issue_time_iso"];
-    [runDocDict setObject:[NSNumber numberWithInt:[runControl runNumber]] forKey:@"run"];
+
+    //[runDocDict setObject:[NSMutableArray arrayWithObjects:[runControl runNumber],[runControl runNumber], nil] forKey:@"run_range"]; <<----- arrays take objects, not numbers. MAH 03/21/2016
+    [runDocDict setObject:[NSMutableArray arrayWithObjects:[NSNumber numberWithUnsignedLong:[runControl runNumber]],[NSNumber numberWithUnsignedLong:[runControl runNumber]], nil] forKey:@"run_range"];
+
     [runDocDict setObject:subRunArray forKey:@"sub_run_info"];
     
     self.tellieRunDoc = runDocDict;
