@@ -79,6 +79,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 {
     [self setSmellieDBReadInProgress:NO];
     [self setImage:[NSImage imageNamed:@"ellie"]];
+    
+    _tellieClient = [[XmlrpcClient alloc] initWithHostName:@"localhost" withPort:@"5030"];
+    _smellieClient = [[XmlrpcClient alloc] initWithHostName:@"snodrop" withPort:@"5020"];
 }
 
 - (void) makeMainController
@@ -163,7 +166,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     }
 }
 
--(void) pollTellieFibre
+-(NSMutableArray*) pollTellieFibre
 {
     /*
      Poll the TELLIE hardware using an XMLRPC server and requests the response from the
@@ -171,6 +174,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     */
     NSString* responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_readout_script.py" withCmdLineArgs:nil];
     NSLog(@"Response from Tellie: %@\n",responseFromTellie);
+    return [[NSMutableArray alloc] initWithObjects:responseFromTellie, nil];
 }
 
 -(void) loadTELLIEStaticsFromDB
@@ -888,85 +892,58 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 /****************************************/
 -(void)setSmellieSafeStates
 {
-    NSArray * setSafeStates = @[@"30",@"0",@"0"]; //30 is the flag for setting smellie to its safe states
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:setSafeStates];
+    [_smellieClient command:@"set_safe_states"];
 }
 
 -(void)setLaserSwitch:(NSString*)laserSwitchChannel
 {
-    NSArray * setLaserSwitchFlagAndArgument = @[@"2050",laserSwitchChannel,@"0"]; //30 is the flag for setting smellie to its safe states
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:setLaserSwitchFlagAndArgument];
+    NSArray* args = @[laserSwitchChannel];
+    [_smellieClient command:@"set_laser_switch" withArgs:args];
 }
 
 -(void)setFibreSwitch:(NSString*)fibreSwitchInputChannel withOutputChannel:(NSString*)fibreSwitchOutputChannel
 {
-    NSString * argumentStringFS = [NSString stringWithFormat:@"%@s%@",fibreSwitchInputChannel,fibreSwitchOutputChannel];
-    //NSLog(@"fibre switch argument %@",argumentStringFS);
-    NSArray * setFibreSwitchFlagAndArgument = @[@"40",argumentStringFS,@"0"];
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:setFibreSwitchFlagAndArgument];
+    NSArray* args = @[fibreSwitchInputChannel, fibreSwitchOutputChannel];
+    [_smellieClient command:@"set_fibre_switch" withArgs:args];
 }
 
 -(void)setLaserIntensity:(NSString*)laserIntensity
 {
-    NSArray * setLaserIntensityFlagAndArgument = @[@"50",laserIntensity,@"0"]; //30 is the flag for setting smellie to its safe states
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:setLaserIntensityFlagAndArgument];
+    NSArray* args = @[laserIntensity];
+    [_smellieClient command:@"set_laser_intensity" withArgs:args];
 }
 
 -(void)setLaserSoftLockOn
 {
-    NSArray * softLockOnFlag = @[@"60",@"0",@"0"]; //30 is the flag for setting smellie to its safe states
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:softLockOnFlag];
+    [_smellieClient command:@"set_soft_lock_on"];
+}
+
+-(void)setLaserSoftLockOff
+{
+    [_smellieClient command:@"set_soft_lock_off"];
 }
 
 //this function kills any external software that will block the functions of a smellie run 
 -(void)killBlockingSoftware
 {
-    NSArray * killBS = @[@"110",@"0",@"0"]; //30 is the flag for setting smellie to its safe states
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:killBS];
-}
-
--(void)setLaserSoftLockOff
-{
-    NSArray * softLockOffFlag = @[@"70",@"0",@"0"]; //30 is the flag for setting smellie to its safe states
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:softLockOffFlag];
-}
-
--(void)setLaserFrequency20Mhz
-{
-    NSArray * frequencyTestingModeFlag = @[@"90",@"0",@"0"]; 
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:frequencyTestingModeFlag];
+    [_smellieClient command:@"kill_sepia_and_nimax"];
 }
 
 -(void)setSmellieMasterMode:(NSString*)triggerFrequency withNumOfPulses:(NSString*)numOfPulses
 {
-    NSString * argumentString = [NSString stringWithFormat:@"%@s%@",triggerFrequency,numOfPulses];
-    NSArray * smellieMasterModeFlag = @[@"80",argumentString,@"0"]; //30 is the flag for setting smellie to its safe states
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:smellieMasterModeFlag];
+    NSArray* args = @[triggerFrequency, numOfPulses];
+    [_smellieClient command:@"pulse_master_mode" withArgs:args];
 }
 
 -(void)setGainControlWithGainVoltage:(NSString*)gainVoltage
 {
-    NSArray * gainControlFlag = @[@"22110",gainVoltage,@"0"]; //gain control settings with gain voltage
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:gainControlFlag];
+    NSArray* args = @[gainVoltage];
+    [_smellieClient command:@"set_gain_control" withArgs:args];
 }
 
--(void)sendCustomSmellieCmd:(NSString*)customCmd withArgument1:(NSString*)customArgument1 withArgument2:(NSString*)customArgument2
+-(void)sendCustomSmellieCmd:(NSString*)customCmd withArgs:(NSArray*)argsArray
 {
-    //Make sure all the arguments default to a safe value if not specified
-    if([customCmd length]==0){
-        customCmd = @"0";
-    }
-    
-    if(([customArgument1 length]==0) || [customArgument1 isEqualToString:@""]){
-        customArgument1 = @"0";
-    }
-    
-    if(([customArgument2 length]==0) || [customArgument2 isEqualToString:@""]){
-        customArgument2 = @"0";
-    }
-        
-    NSArray* smellieCustomCmd = @[customCmd,customArgument1,customArgument2];
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:smellieCustomCmd];
+    [_smellieClient command:customCmd withArgs:argsArray];
 }
 
 -(void)testFunction
