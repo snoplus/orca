@@ -285,11 +285,16 @@
 						 name : ORRunModeChangedNotification
 					   object : nil];
 
-   [notifyCenter addObserver: self
+    [notifyCenter addObserver: self
+                     selector: @selector(startTimeChanged:)
+                         name: ORRunStartTimeChangedNotification
+                       object: nil];
+    
+    [notifyCenter addObserver: self
                      selector: @selector(elapsedTimeChanged:)
                          name: ORRunElapsedTimesChangedNotification
                        object: nil];
-
+    
     [notifyCenter addObserver : self
                      selector : @selector(selectedRunTypeScriptChanged:)
                          name : ORRunModelSelectedRunTypeScriptChanged
@@ -354,7 +359,8 @@
 	[self runModeChanged:nil];
 	[self runTimeLimitChanged:nil];
 	[self repeatRunChanged:nil];
-	[self elapsedTimeChanged:nil];
+    [self startTimeChanged:nil];
+    [self elapsedTimeChanged:nil];
 	[self populatePopups];
     [self colorScaleTypeChanged:nil];
 	
@@ -460,6 +466,14 @@
 - (void) selectedRunTypeScriptChanged:(NSNotification*)aNote
 {
 	[runTypeScriptPU selectItemAtIndex: [runControl selectedRunTypeScript]];
+}
+
+- (void) startTimeChanged:(NSNotification*)aNotification
+{
+
+    if(runControl) [timeStartedField setObjectValue:[[runControl startTime] descriptionFromTemplate:@"MM/dd/yy HH:mm:ss"]];
+    else [timeStartedField setStringValue:@"---"];
+
 }
 
 -(void) elapsedTimeChanged:(NSNotification*)aNotification

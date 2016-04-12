@@ -27,6 +27,7 @@
 @class ORDataPacket;
 @class ORDataSet;
 @class ORCouchDB;
+@class ORRunModel;
 
 @protocol snotDbDelegate <NSObject>
 @required
@@ -98,6 +99,8 @@
     bool _smellieDocUploaded;
     NSMutableDictionary * snopRunTypeMask;
     NSNumber * runTypeMask;
+    NSString * standardRunType;
+    NSString * standardRunVersion;
     
     NSThread * eStopThread;
     
@@ -108,6 +111,14 @@
 
     RedisClient *mtc_server;
     RedisClient *xl3_server;
+
+    @private
+        //ECA stuff
+        int ECA_pattern;
+        int ECA_type;
+        int ECA_tslope_pattern;
+        double ECA_subrun_time;
+    
 }
 
 @property (nonatomic,retain) NSMutableDictionary* smellieRunHeaderDocList;
@@ -145,8 +156,8 @@
 @property (copy) NSDictionary* configDocument;
 @property (copy) NSDictionary* mtcConfigDoc;
 
+
 - (id) init;
-- (id) initWithCoder:(NSCoder*)decoder;
 
 - (void) initSmellieRunDocsDic;
 - (void) initOrcaDBConnectionHistory;
@@ -165,6 +176,7 @@
 #pragma mark ¥¥orcascript helpers
 - (void) zeroPedestalMasks;
 - (void) updatePedestalMasks:(unsigned int)pattern;
+- (void) hvMasterTriggersOFF;
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
@@ -197,6 +209,22 @@
 #pragma mark ¥¥¥Accessors
 - (void) setViewType:(int)aViewType;
 - (int) viewType;
+- (NSString*) standardRunType;
+- (NSString*) standardRunVersion;
+- (void) setStandardRunType:(NSString*)aValue;
+- (void) setStandardRunVersion:(NSString*)aValue;
+- (int) ECA_pattern;
+- (int) ECA_type;
+- (int) ECA_tslope_pattern;
+- (double) ECA_subrun_time;
+- (void) setECA_pattern:(int)aValue;
+- (void) setECA_type:(int)aValue;
+- (void) setECA_tslope_pattern:(int)aValue;
+- (void) setECA_subrun_time:(double)aValue;
+
+#pragma mark ¥¥¥Archival
+- (id)initWithCoder:(NSCoder*)decoder;
+- (void)encodeWithCoder:(NSCoder*)encoder;
 
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups;
@@ -226,6 +254,12 @@
 - (NSMutableDictionary*)smellieTestFct;
 -(BOOL)isRunTypeMaskedIn:(NSString*)aRunType;
 -(void) testerHv;
+
+//Standard runs functions
+-(BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
+-(BOOL) loadStandardRunToHW:(NSString*)runTypeName;
+-(BOOL) saveStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
+
 @end
 
 @interface SNOPDecoderForRHDR : ORVmeCardDecoder {
@@ -244,3 +278,7 @@ extern NSString* ORSNOPModelViewTypeChanged;
 extern NSString* ORSNOPModelOrcaDBIPAddressChanged;
 extern NSString* ORSNOPModelDebugDBIPAddressChanged;
 extern NSString* SNOPRunTypeChangedNotification;
+extern NSString* ORSNOPRunsLockNotification;
+extern NSString* ORSNOPModelRunsECAChangedNotification;
+extern NSString* ORSNOPModelSRChangedNotification;
+extern NSString* ORSNOPModelSRVersionChangedNotification;
