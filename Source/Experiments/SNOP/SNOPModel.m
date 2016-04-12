@@ -307,16 +307,16 @@ logPort;
 
     [self setMTCHost:[decoder decodeObjectForKey:@"mtcHost"]];
     [self setMTCPort:[decoder decodeIntForKey:@"mtcPort"]];
-    
+
     [self setXL3Host:[decoder decodeObjectForKey:@"xl3Host"]];
     [self setXL3Port:[decoder decodeIntForKey:@"xl3Port"]];
-    
+
     [self setDataServerHost:[decoder decodeObjectForKey:@"dataHost"]];
     [self setDataServerPort:[decoder decodeIntForKey:@"dataPort"]];
-    
+
     [self setLogServerHost:[decoder decodeObjectForKey:@"logHost"]];
     [self setLogServerPort:[decoder decodeIntForKey:@"logPort"]];
-    
+
     /* Check if we actually decoded the mtc, xl3, data, and log server
      * hostnames and ports. decodeObjectForKey() will return NULL if the
      * key doesn't exist, and decodeIntForKey() will return 0. */

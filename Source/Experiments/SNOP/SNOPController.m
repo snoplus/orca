@@ -71,7 +71,6 @@ smellieRunFile;
 
 - (void) updateSettings: (NSNotification *) aNote
 {
-    NSLogColor([NSColor redColor], @"updating settings\n");
     [mtcHost setStringValue:[model mtcHost]];
     [mtcPort setIntValue:[model mtcPort]];
 
