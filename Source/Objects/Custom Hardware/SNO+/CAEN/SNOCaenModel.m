@@ -29,12 +29,6 @@
 #import "VME_HW_Definitions.h"
 #import "ORRunModel.h"
 
-/* #define these variables for now. Eventually we need to add fields
- * to the GUI, but Javi is working on the SNOPModel now */
-#define MTC_HOST @"sbc.sp.snolab.ca"
-#define MTC_PORT 4001
-
-
 // Address information for this unit.
 #define k792DefaultBaseAddress 		0xa00000
 #define k792DefaultAddressModifier 	0x09
@@ -136,7 +130,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     [self registerNotificationObservers];
 	
     /* initialize our connection to the MTC server */
-    mtc_server = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
+    mtc_server = [[RedisClient alloc] init];
 	
     [self setBaseAddress:k792DefaultBaseAddress];
     [self setAddressModifier:k792DefaultAddressModifier];
@@ -146,6 +140,31 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     [[self undoManager] enableUndoRegistration];
     
     return self;
+}
+
+- (void) setMTCPort: (int) port
+{
+    mtcPort = port;
+    [mtc_server disconnect];
+    [mtc_server setPort:port];
+}
+
+- (int) mtcPort
+{
+    return mtcPort;
+}
+
+- (void) setMTCHost: (NSString *) host
+{
+    [mtcHost release];
+    mtcHost = [host copy];
+    [mtc_server disconnect];
+    [mtc_server setHost:host];
+}
+
+- (NSString *) mtcHost
+{
+    return mtcHost;
 }
 
 - (void) dealloc 
@@ -1075,7 +1094,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     [self registerNotificationObservers];
 
     /* initialize our connection to the MTC server */
-    mtc_server = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
+    mtc_server = [[RedisClient alloc] init];
 	
     [[self undoManager] disableUndoRegistration];
     [self setEventSize:[aDecoder decodeIntForKey:@"SNOCaenModelEventSize"]];
@@ -1108,6 +1127,9 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
         [self setThreshold:i withValue:[aDecoder decodeInt32ForKey: [NSString stringWithFormat:@"CAENThresChnl%d", i]]];
         [self setOverUnderThreshold:i withValue:[aDecoder decodeIntForKey: [NSString stringWithFormat:@"CAENOverUnderChnl%d", i]]];
     }
+
+    [self setMTCHost:[aDecoder decodeObjectForKey:@"mtcHost"]];
+    [self setMTCPort:[aDecoder decodeIntForKey:@"mtcPort"]];
     
     [[self undoManager] enableUndoRegistration];
     return self;
@@ -1138,6 +1160,8 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
         [anEncoder encodeInt32:thresholds[i] forKey:[NSString stringWithFormat:@"CAENThresChnl%d", i]];
         [anEncoder encodeInt:overUnderThreshold[i] forKey:[NSString stringWithFormat:@"CAENOverUnderChnl%d", i]];
     }
+    [anEncoder encodeInt:[self mtcPort] forKey:@"mtcPort"];
+    [anEncoder encodeObject:[self mtcHost] forKey:@"mtcHost"];
 }
 
 #pragma mark •••HW Wizard

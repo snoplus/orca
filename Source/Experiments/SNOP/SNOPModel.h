@@ -109,6 +109,18 @@
 
     bool rolloverRun;
 
+    NSString *mtcHost;
+    int mtcPort;
+
+    NSString *xl3Host;
+    int xl3Port;
+
+    NSString *dataHost;
+    int dataPort;
+
+    NSString *logHost;
+    int logPort;
+
     RedisClient *mtc_server;
     RedisClient *xl3_server;
 
@@ -151,6 +163,18 @@
 @property (nonatomic,assign) bool smellieDocUploaded;
 @property (nonatomic,assign) bool isEmergencyStopEnabled;
 @property (nonatomic,assign) bool isEStopPolling;
+
+@property (copy,setter=setMTCHost:) NSString *mtcHost;
+@property (setter=setMTCPort:) int mtcPort;
+
+@property (copy,setter=setXL3Host:) NSString *xl3Host;
+@property (setter=setXL3Port:) int xl3Port;
+
+@property (copy,setter=setDataServerHost:) NSString *dataHost;
+@property (setter=setDataServerPort:) int dataPort;
+
+@property (copy,setter=setLogServerHost:) NSString *logHost;
+@property (setter=setLogServerPort:) int logPort;
 
 @property (copy) NSDictionary* runDocument;
 @property (copy) NSDictionary* configDocument;

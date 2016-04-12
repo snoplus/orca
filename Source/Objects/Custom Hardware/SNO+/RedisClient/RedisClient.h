@@ -16,6 +16,7 @@
     long timeout;
 }
 @property (nonatomic) int port;
+@property (nonatomic,copy) NSString *host;
 @property (nonatomic) long timeout;
 
 - (id) init;

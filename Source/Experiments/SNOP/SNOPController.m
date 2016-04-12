@@ -34,6 +34,8 @@
 #import "ORMTC_Constants.h"
 #import "ORMTCModel.h"
 #import "SNOP_Run_Constants.h"
+#import "SNOCaenModel.h"
+#import "XL3_Link.h"
 
 
 NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
@@ -52,6 +54,56 @@ smellieRunFile;
 {
     self = [super initWithWindowNibName:@"SNOP"];
     return self;
+}
+
+- (IBAction) settingsChanged:(id)sender {
+    /* Settings tab changed. Update the model. */
+    int i;
+
+    /* Set the model variables in SNOPModel */
+    [model setMTCPort:[mtcPort intValue]];
+    [model setMTCHost:[mtcHost stringValue]];
+
+    [model setXL3Port:[xl3Port intValue]];
+    [model setXL3Host:[xl3Host stringValue]];
+
+    [model setDataServerPort:[dataPort intValue]];
+    [model setDataServerHost:[dataHost stringValue]];
+
+    [model setLogServerPort:[logPort intValue]];
+    [model setLogServerHost:[logHost stringValue]];
+
+    /* Set the MTC server hostname for the MTC model. */
+    NSArray* mtcs = [[self document]
+         collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+
+    ORMTCModel* mtc;
+    for (i = 0; i < [mtcs count]; i++) {
+        mtc = [mtcs objectAtIndex:0];
+        [mtc setMTCHost:[mtcHost stringValue]];
+        [mtc setMTCPort:[mtcPort intValue]];
+    }
+
+    /* Set the MTC server hostname for the CAEN model. */
+    NSArray* caens = [[self document]
+         collectObjectsOfClass:NSClassFromString(@"SNOCaenModel")];
+
+    SNOCaenModel* caen;
+    for (i = 0; i < [caens count]; i++) {
+        caen = [caens objectAtIndex:0];
+        [caen setMTCHost:[mtcHost stringValue]];
+        [caen setMTCPort:[mtcPort intValue]];
+    }
+
+    /* Set the XL3 server hostname for the XL3 models. */
+    NSArray* xl3s = [[self document]
+         collectObjectsOfClass:NSClassFromString(@"XL3_Link")];
+
+    XL3_Link* xl3;
+    for (i = 0; i < [xl3s count]; i++) {
+        xl3 = [xl3s objectAtIndex:i];
+        [xl3 setXL3Host:[xl3Host stringValue]];
+    }
 }
 
 -(void)windowDidLoad

@@ -11,7 +11,7 @@
 #define DEFUALT_PORT -1
 @implementation RedisClient
 
-@synthesize port;
+@synthesize port, host;
 
 - (void) setTimeout: (long) _timeout
 {
@@ -40,8 +40,8 @@
     self = [super init];
 
     if (self) {
-        host = _host;
-        port = _port;
+        [self setHost:_host];
+        [self setPort:_port];
         timeout = 1000; // Initialize timeout to 1 second
     }
 

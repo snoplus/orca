@@ -30,8 +30,6 @@
 #import <sys/errno.h>
 #include "anet.h"
 
-#define XL3_SERVER "daq1.sp.snolab.ca"
-
 NSString* XL3_LinkConnectionChanged     = @"XL3_LinkConnectionChanged";
 NSString* XL3_LinkTimeConnectedChanged	= @"XL3_LinkTimeConnectedChanged";
 NSString* XL3_LinkIPNumberChanged       = @"XL3_LinkIPNumberChanged";
@@ -74,6 +72,19 @@ readFifoFlag = _readFifoFlag;
 	num_cmd_packets = 0;
 	num_dat_packets = 0;
 	return self;
+}
+
+- (void) setXL3Host: (NSString *) host
+{
+    [xl3Host release];
+    xl3Host = [host copy];
+    [self disconnectSocket];
+    [self connectSocket];
+}
+
+- (NSString *) xl3Host
+{
+    return xl3Host;
 }
 
 - (void) dealloc
@@ -153,6 +164,7 @@ readFifoFlag = _readFifoFlag;
 
 	[self setErrorTimeOut: [decoder decodeIntForKey: @"errorTimeOut"]];
     [self setAutoConnect: [decoder decodeBoolForKey: @"autoConnect"]];
+    [self setXL3Host: [decoder decodeObjectForKey: @"xl3Host"]];
 	[self setNeedToSwap];
 
 	commandSocketLock = [[NSLock alloc] init];
@@ -173,6 +185,7 @@ readFifoFlag = _readFifoFlag;
 	[super encodeWithCoder:encoder];
 	[encoder encodeInt:[self errorTimeOut] forKey:@"errorTimeOut"];
     [encoder encodeBool:autoConnect forKey:@"autoConnect"];
+    [encoder encodeObject:xl3Host forKey:@"xl3Host"];
 }
 
 
@@ -698,7 +711,7 @@ static void SwapLongBlock(void* p, int32_t n)
     [[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectStateChanged object: self];
 
     workingSocket = 0;
-    if ((workingSocket = anetTcpConnect(err, XL3_SERVER, portNumber)) == ANET_ERR) {
+    if ((workingSocket = anetTcpConnect(err, xl3Host, portNumber)) == ANET_ERR) {
         if (workingSocket) {
             close(workingSocket);
             workingSocket = 0;

@@ -99,7 +99,15 @@ snopRunTypeMask = snopRunTypeMask,
 runTypeMask= runTypeMask,
 isEStopPolling = isEStopPolling,
 isEmergencyStopEnabled = isEmergencyStopEnabled,
-mtcConfigDoc = _mtcConfigDoc;
+mtcConfigDoc = _mtcConfigDoc,
+mtcHost,
+mtcPort,
+xl3Host,
+xl3Port,
+dataHost,
+dataPort,
+logHost,
+logPort;
 
 @synthesize smellieRunHeaderDocList;
 
@@ -139,12 +147,6 @@ mtcConfigDoc = _mtcConfigDoc;
 {
     self = [super initWithCoder:decoder];
 
-    /* initialize our connection to the MTC server */
-    mtc_server = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
-
-    /* initialize our connection to the XL3 server */
-    xl3_server = [[RedisClient alloc] initWithHostName:XL3_HOST withPort:XL3_PORT];
-
     rolloverRun = NO;
 
     [[self undoManager] disableUndoRegistration];
@@ -176,10 +178,28 @@ mtcConfigDoc = _mtcConfigDoc;
     [self setECA_type:[decoder decodeIntForKey:@"SNOPECAtype"]];
     [self setECA_tslope_pattern:[decoder decodeIntForKey:@"SNOPECAtslppattern"]];
     [self setECA_subrun_time:[decoder decodeDoubleForKey:@"SNOPECAsubruntime"]];
+
+    [self setMTCHost:[decoder decodeObjectForKey:@"mtcHost"]];
+    [self setMTCPort:[decoder decodeIntForKey:@"mtcHost"]];
+    
+    [self setXL3Host:[decoder decodeObjectForKey:@"xl3Host"]];
+    [self setXL3Port:[decoder decodeIntForKey:@"xl3Host"]];
+    
+    [self setDataServerHost:[decoder decodeObjectForKey:@"dataHost"]];
+    [self setDataServerPort:[decoder decodeIntForKey:@"dataHost"]];
+    
+    [self setLogServerHost:[decoder decodeObjectForKey:@"logHost"]];
+    [self setLogServerPort:[decoder decodeIntForKey:@"logHost"]];
     
     [[self undoManager] enableUndoRegistration];
-    return self;
 
+    /* initialize our connection to the MTC server */
+    mtc_server = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
+
+    /* initialize our connection to the XL3 server */
+    xl3_server = [[RedisClient alloc] initWithHostName:XL3_HOST withPort:XL3_PORT];
+
+    return self;
 }
 
 - (void) setUpImage
@@ -1060,7 +1080,18 @@ mtcConfigDoc = _mtcConfigDoc;
     [encoder encodeInt:[self ECA_type] forKey:@"SNOPECAtype"];
     [encoder encodeInt:[self ECA_tslope_pattern] forKey:@"SNOPECAtslppattern"];
     [encoder encodeDouble:[self ECA_subrun_time] forKey:@"SNOPECAsubruntime"];
-    
+
+    [encoder encodeObject:[self mtcHost] forKey:@"mtcHost"];
+    [encoder encodeInt:[self mtcPort] forKey:@"mtcPort"];
+
+    [encoder encodeObject:[self xl3Host] forKey:@"xl3Host"];
+    [encoder encodeInt:[self xl3Port] forKey:@"xl3Port"];
+
+    [encoder encodeObject:[self dataHost] forKey:@"dataHost"];
+    [encoder encodeInt:[self dataPort] forKey:@"dataPort"];
+
+    [encoder encodeObject:[self logHost] forKey:@"logHost"];
+    [encoder encodeInt:[self logPort] forKey:@"logPort"];
 }
 
 - (NSString*) reformatSelectionString:(NSString*)aString forSet:(int)aSet
