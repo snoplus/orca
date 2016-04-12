@@ -303,9 +303,11 @@ NSString* ORPulseCheckModelReloadTable      = @"ORPulseCheckModelReloadTable";
 
 - (void) clearHeartbeatAlarm
 {
-    [noHeartbeatAlarm clearAlarm];
-    [noHeartbeatAlarm release];
-    noHeartbeatAlarm = nil;
+    if(noHeartbeatAlarm){
+        [noHeartbeatAlarm clearAlarm];
+        [noHeartbeatAlarm release];
+        noHeartbeatAlarm = nil;
+    }
 }
 
 @end
