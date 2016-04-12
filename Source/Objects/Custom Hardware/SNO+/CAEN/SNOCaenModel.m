@@ -28,6 +28,7 @@
 #import "ORRateGroup.h"
 #import "VME_HW_Definitions.h"
 #import "ORRunModel.h"
+#import "SNOPModel.h"
 
 // Address information for this unit.
 #define k792DefaultBaseAddress 		0xa00000
@@ -140,6 +141,24 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     [[self undoManager] enableUndoRegistration];
     
     return self;
+}
+
+- (void) awakeAfterDocumentLoaded
+{
+    NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+
+    NSLogColor([NSColor redColor], @"mtc object awake after document loaded\n");
+
+    SNOPModel* sno;
+    if ([objs count] == 0) {
+        NSLogColor([NSColor redColor], @"mtc: Couldn't find SNO+ model to get MTC server hostname and port from. Please add a SNO+ model object to the experiment.\n");
+    } else {
+        sno = [objs objectAtIndex:0];
+        NSLogColor([NSColor redColor], @"setting host to %@\n", [sno mtcHost]);
+        [self setMTCHost:[sno mtcHost]];
+        [self setMTCPort:[sno mtcPort]];
+    }
 }
 
 - (void) setMTCPort: (int) port

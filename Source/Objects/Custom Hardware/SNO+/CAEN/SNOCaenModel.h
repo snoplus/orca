@@ -144,6 +144,8 @@ enum {
 - (void) registerNotificationObservers;
 - (void) runAboutToStart:(NSNotification*)aNote;
 
+- (void) awakeAfterDocumentLoaded;
+
 - (void) setMTCPort: (int) port;
 - (int) mtcPort;
 

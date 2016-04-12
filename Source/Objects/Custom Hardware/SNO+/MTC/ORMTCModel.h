@@ -123,6 +123,8 @@
 - (void) setMTCHost: (NSString *) host;
 - (NSString *) mtcHost;
 
+- (void) awakeAfterDocumentLoaded;
+
 - (void) registerNotificationObservers;
 - (void) runAboutToStart:(NSNotification*)aNote;
 

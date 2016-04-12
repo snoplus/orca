@@ -29,6 +29,7 @@
 #import <sys/select.h>
 #import <sys/errno.h>
 #include "anet.h"
+#import "SNOPModel.h"
 
 NSString* XL3_LinkConnectionChanged     = @"XL3_LinkConnectionChanged";
 NSString* XL3_LinkTimeConnectedChanged	= @"XL3_LinkTimeConnectedChanged";
@@ -124,6 +125,20 @@ readFifoFlag = _readFifoFlag;
 
 - (void) awakeAfterDocumentLoaded
 {
+    NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+
+    NSLogColor([NSColor redColor], @"xl3 object awake after document loaded\n");
+
+    SNOPModel* sno;
+    if ([objs count] == 0) {
+        NSLogColor([NSColor redColor], @"xl3: Couldn't find SNO+ model to get XL3 server hostname and port from. Please add a SNO+ model object to the experiment.\n");
+    } else {
+        sno = [objs objectAtIndex:0];
+        NSLogColor([NSColor redColor], @"setting host to %@\n", [sno xl3Host]);
+        [self setXL3Host:[sno xl3Host]];
+    }
+
     if (autoConnect) [self connectSocket];
 }
 
