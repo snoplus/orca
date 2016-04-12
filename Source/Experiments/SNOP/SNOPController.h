@@ -142,6 +142,11 @@
 - (void) dbOrcaDBIPChanged:(NSNotification*)aNote;
 - (void) dbDebugDBIPChanged:(NSNotification*)aNote;
 
+- (IBAction) testMTCServer:(id)sender;
+- (IBAction) testXL3Server:(id)sender;
+- (IBAction) testDataServer:(id)sender;
+- (IBAction) testLogServer:(id)sender;
+
 - (void) updateSettings: (NSNotification *) aNote;
 
 #pragma mark ¥¥¥Actions

@@ -54,6 +54,86 @@ smellieRunFile;
     return self;
 }
 
+- (IBAction) testMTCServer:(id)sender
+{
+    int port = [mtcPort intValue];
+    NSString *host = [mtcHost stringValue];
+
+    RedisClient *r = [[RedisClient alloc] initWithHostName:host withPort:port];
+
+    @try {
+        [r connect];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor], @"failed to connect: %@\n", [e reason]);
+        [r release];
+        return;
+    }
+
+    [r release];
+
+    NSLog(@"connected ok!\n");
+}
+
+- (IBAction) testXL3Server:(id)sender
+{
+    int port = [xl3Port intValue];
+    NSString *host = [xl3Host stringValue];
+
+    RedisClient *r = [[RedisClient alloc] initWithHostName:host withPort:port];
+
+    @try {
+        [r connect];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor], @"failed to connect: %@\n", [e reason]);
+        [r release];
+        return;
+    }
+
+    [r release];
+
+    NSLog(@"connected ok!\n");
+}
+
+- (IBAction) testDataServer:(id)sender
+{
+    int port = [dataPort intValue];
+    NSString *host = [dataHost stringValue];
+
+    RedisClient *r = [[RedisClient alloc] initWithHostName:host withPort:port];
+
+    @try {
+        [r connect];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor], @"failed to connect: %@\n", [e reason]);
+        [r release];
+        return;
+    }
+
+    [r release];
+
+    NSLog(@"connected ok!\n");
+}
+
+- (IBAction) testLogServer:(id)sender
+{
+    int port = [logPort intValue];
+    NSString *host = [logHost stringValue];
+
+    RedisClient *r = [[RedisClient alloc] initWithHostName:host withPort:port];
+
+    @try {
+        [r connect];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor], @"failed to connect: %@\n", [e reason]);
+        [r release];
+        return;
+    }
+
+    [r release];
+
+    NSLog(@"connected ok!\n");
+}
+
 - (IBAction) settingsChanged:(id)sender {
     /* Settings tab changed. Set the model variables in SNOPModel. */
     [model setMTCPort:[mtcPort intValue]];

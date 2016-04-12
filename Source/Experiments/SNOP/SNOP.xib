@@ -3364,6 +3364,9 @@
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
+                                                        <connections>
+                                                            <action selector="testMTCServer:" target="-2" id="1pj-b1-ZP7"/>
+                                                        </connections>
                                                     </button>
                                                     <textField verticalHuggingPriority="750" id="2aR-vd-DX1">
                                                         <rect key="frame" x="83" y="40" width="86" height="22"/>
@@ -3442,6 +3445,9 @@
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
+                                                        <connections>
+                                                            <action selector="testXL3Server:" target="-2" id="abu-qw-Ame"/>
+                                                        </connections>
                                                     </button>
                                                 </subviews>
                                             </view>
@@ -3506,6 +3512,9 @@
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
+                                                        <connections>
+                                                            <action selector="testLogServer:" target="-2" id="TCx-SP-1Ki"/>
+                                                        </connections>
                                                     </button>
                                                 </subviews>
                                             </view>
@@ -3556,6 +3565,9 @@
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
+                                                        <connections>
+                                                            <action selector="testDataServer:" target="-2" id="9WF-Bj-7WL"/>
+                                                        </connections>
                                                     </button>
                                                     <textField verticalHuggingPriority="750" id="iRb-mE-Azg">
                                                         <rect key="frame" x="83" y="40" width="86" height="22"/>
