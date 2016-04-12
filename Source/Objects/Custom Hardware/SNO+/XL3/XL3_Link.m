@@ -722,7 +722,7 @@ static void SwapLongBlock(void* p, int32_t n)
     [[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectStateChanged object: self];
 
     workingSocket = 0;
-    if ((workingSocket = anetTcpConnect(err, [xl3Host UTF8String], portNumber)) == ANET_ERR) {
+    if ((workingSocket = anetTcpConnect(err, (char *) [xl3Host UTF8String], portNumber)) == ANET_ERR) {
         if (workingSocket) {
             close(workingSocket);
             workingSocket = 0;

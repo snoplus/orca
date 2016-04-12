@@ -1179,6 +1179,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
         [anEncoder encodeInt32:thresholds[i] forKey:[NSString stringWithFormat:@"CAENThresChnl%d", i]];
         [anEncoder encodeInt:overUnderThreshold[i] forKey:[NSString stringWithFormat:@"CAENOverUnderChnl%d", i]];
     }
+
     [anEncoder encodeInt:[self mtcPort] forKey:@"mtcPort"];
     [anEncoder encodeObject:[self mtcHost] forKey:@"mtcHost"];
 }
