@@ -35,8 +35,6 @@
 #import "ORMTCModel.h"
 #import "SNOP_Run_Constants.h"
 #import "SNOCaenModel.h"
-#import "XL3_Link.h"
-
 
 NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 
@@ -72,62 +70,21 @@ smellieRunFile;
 
     [model setLogServerPort:[logPort intValue]];
     [model setLogServerHost:[logHost stringValue]];
-
-    /* Set the MTC server hostname for the MTC model. */
-    NSArray* mtcs = [[(ORAppDelegate*)[NSApp delegate] document]
-         collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-
-    NSLog(@"mtc count = %i\n", [mtcs count]);
-
-    ORMTCModel* mtc;
-    for (i = 0; i < [mtcs count]; i++) {
-        NSLog(@"setting mtc host to %@\n", [mtcHost stringValue]);
-        mtc = [mtcs objectAtIndex:0];
-        [mtc setMTCHost:[mtcHost stringValue]];
-        [mtc setMTCPort:[mtcPort intValue]];
-    }
-
-    /* Set the MTC server hostname for the CAEN model. */
-    NSArray* caens = [[(ORAppDelegate*)[NSApp delegate] document]
-         collectObjectsOfClass:NSClassFromString(@"SNOCaenModel")];
-
-    NSLog(@"caen count = %i\n", [caens count]);
-
-    SNOCaenModel* caen;
-    for (i = 0; i < [caens count]; i++) {
-        caen = [caens objectAtIndex:0];
-        [caen setMTCHost:[mtcHost stringValue]];
-        [caen setMTCPort:[mtcPort intValue]];
-    }
-
-    /* Set the XL3 server hostname for the XL3 models. */
-    NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document]
-         collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
-
-    NSLog(@"xl3 count = %i\n", [xl3s count]);
-
-    ORXL3Model* xl3;
-    for (i = 0; i < [xl3s count]; i++) {
-        xl3 = [xl3s objectAtIndex:i];
-        [[xl3 xl3Link] setXL3Host:[xl3Host stringValue]];
-    }
 }
 
-- (void) updateSettingsFromModel: (NSNotification *) aNote
+- (void) updateSettings: (NSNotification *) aNote
 {
-    /* Updates the settings tab from the model variables. */
-    NSLog(@"updating settings from model\n");
     [mtcHost setStringValue:[model mtcHost]];
-    [mtcHost setIntValue:[model mtcPort]];
+    [mtcPort setIntValue:[model mtcPort]];
 
     [xl3Host setStringValue:[model xl3Host]];
-    [xl3Host setIntValue:[model xl3Port]];
+    [xl3Port setIntValue:[model xl3Port]];
 
     [dataHost setStringValue:[model dataHost]];
-    [dataHost setIntValue:[model dataPort]];
+    [dataPort setIntValue:[model dataPort]];
 
     [logHost setStringValue:[model logHost]];
-    [logHost setIntValue:[model logPort]];
+    [logPort setIntValue:[model logPort]];
 }
 
 -(void)windowDidLoad
@@ -172,6 +129,7 @@ smellieRunFile;
     [model getSmellieRunListInfo];
     [self mtcDataBaseChanged:nil];
     [self refreshStandardRuns];
+    [self updateSettings:nil];
 	[super awakeFromNib];
     [self performSelector:@selector(updateWindow)withObject:self afterDelay:0.1];
 }
@@ -254,7 +212,7 @@ smellieRunFile;
                         object: mtcModel];
 
     [notifyCenter addObserver : self
-                     selector : @selector(updateSettingsFromModel:)
+                     selector : @selector(updateSettings:)
                          name : @"SNOPSettingsChanged"
                         object: mtcModel];
 

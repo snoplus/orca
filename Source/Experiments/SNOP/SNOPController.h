@@ -142,7 +142,7 @@
 - (void) dbOrcaDBIPChanged:(NSNotification*)aNote;
 - (void) dbDebugDBIPChanged:(NSNotification*)aNote;
 
-- (void) updateSettingsFromModel;
+- (void) updateSettings: (NSNotification *) aNote;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) viewTypeAction:(id)sender;

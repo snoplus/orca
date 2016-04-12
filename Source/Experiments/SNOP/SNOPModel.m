@@ -36,13 +36,13 @@
 #import "ORFec32Model.h"
 #import "OROrderedObjManager.h"
 #import "ORSNOConstants.h"
-#import "ORCaen1720Model.h"
 #import "ELLIEModel.h"
 #import "SNOP_Run_Constants.h"
 #import "SBC_Link.h"
 #import "SNOCmds.h"
 #import "RedisClient.h"
 #include <stdint.h>
+#import "SNOCaenModel.h"
 
 NSString* ORSNOPModelViewTypeChanged	= @"ORSNOPModelViewTypeChanged";
 static NSString* SNOPDbConnector	= @"SNOPDbConnector";
@@ -133,9 +133,36 @@ logPort;
 
 - (void) setMTCPort: (int) port
 {
+    int i;
+
+    if (port == mtcPort) return;
+
     mtcPort = port;
     [mtc_server disconnect];
     [mtc_server setPort:port];
+
+    /* Set the MTC server hostname for the MTC model. */
+    NSArray* mtcs = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+
+    ORMTCModel* mtc;
+    for (i = 0; i < [mtcs count]; i++) {
+        mtc = [mtcs objectAtIndex:0];
+        [mtc setMTCPort:port];
+    }
+
+    /* Set the MTC server hostname for the CAEN model. */
+    NSArray* caens = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"SNOCaenModel")];
+
+    SNOCaenModel* caen;
+    for (i = 0; i < [caens count]; i++) {
+        caen = [caens objectAtIndex:0];
+        [caen setMTCPort:port];
+    }
+
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:@"SNOPSettingsChanged" object:self];
 }
 
 - (int) mtcPort
@@ -145,12 +172,37 @@ logPort;
 
 - (void) setMTCHost: (NSString *) host
 {
+    int i;
+
+    if ([host isEqualToString:mtcHost]) return;
+
     [mtcHost release];
     mtcHost = [host copy];
     [mtc_server disconnect];
     [mtc_server setHost:host];
 
-    //[[NSNotificationCenter defaultCenter] postNotificationName:@"SNOPSettingsChanged" object:self];
+    /* Set the MTC server hostname for the MTC model. */
+    NSArray* mtcs = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+
+    ORMTCModel* mtc;
+    for (i = 0; i < [mtcs count]; i++) {
+        mtc = [mtcs objectAtIndex:0];
+        [mtc setMTCHost:host];
+    }
+
+    /* Set the MTC server hostname for the CAEN model. */
+    NSArray* caens = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"SNOCaenModel")];
+
+    SNOCaenModel* caen;
+    for (i = 0; i < [caens count]; i++) {
+        caen = [caens objectAtIndex:0];
+        [caen setMTCHost:host];
+    }
+
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:@"SNOPSettingsChanged" object:self];
 }
 
 - (NSString *) mtcHost
@@ -160,11 +212,15 @@ logPort;
 
 - (void) setXL3Port: (int) port
 {
+    /* Set the port number for the XL3 server redis client. */
+    if (port == xl3Port) return;
+
     xl3Port = port;
     [xl3_server disconnect];
     [xl3_server setPort:port];
 
-    //[[NSNotificationCenter defaultCenter] postNotificationName:@"SNOPSettingsChanged" object:self];
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:@"SNOPSettingsChanged" object:self];
 }
 
 - (int) xl3Port
@@ -174,10 +230,29 @@ logPort;
 
 - (void) setXL3Host: (NSString *) host
 {
+    /* Set the XL3 server hostname. This function will automatically
+     * sync this value to all of the XL3 model objects. */
+    int i;
+
+    if ([host isEqualToString:xl3Host]) return;
+
     [xl3Host release];
     xl3Host = [host copy];
     [xl3_server disconnect];
     [xl3_server setHost:host];
+
+    /* Set the XL3 server hostname for the XL3 models. */
+    NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+
+    ORXL3Model* xl3;
+    for (i = 0; i < [xl3s count]; i++) {
+        xl3 = [xl3s objectAtIndex:i];
+        [[xl3 xl3Link] setXL3Host:host];
+    }
+
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:@"SNOPSettingsChanged" object:self];
 }
 
 - (NSString *) xl3Host
@@ -1900,9 +1975,9 @@ logPort;
     
     //FILL information from the Caen
     NSMutableDictionary* caenArray = [NSMutableDictionary dictionaryWithCapacity:100];
-    NSArray* caenObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCaen1720Model")];
+    NSArray* caenObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOCaenModel")];
     if([caenObjects count]){
-        ORCaen1720Model* theCaen        = [caenObjects objectAtIndex:0]; //there is only one Caen object
+        SNOCaenModel* theCaen        = [caenObjects objectAtIndex:0]; //there is only one Caen object
         NSMutableDictionary* ioArray    = [NSMutableDictionary dictionaryWithCapacity:20];
         [ioArray setObject:[NSNumber numberWithUnsignedLong:[theCaen frontPanelControlMask]] forKey:@"io_bit_mask"];
     
@@ -2198,7 +2273,7 @@ logPort;
     
     // array object at 0
     //NSEnumerator* e = [listOfCards objectEnumerator];
-    //ORCaen1720Model* aCard;
+    //SNOCaenModel* aCard;
     //while(aCard = [e nextObject]){
     //    if([aCard crateNumber] == crate && [aCard slot] == card){
     //        [actualCards setObject:aCard forKey:aKey];
