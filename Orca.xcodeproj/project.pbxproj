@@ -34,9 +34,9 @@
 		0F16E35D1C493AD7003C9EC9 /* win32.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F16E3361C493AD7003C9EC9 /* win32.h */; };
 		0F16E3601C493B00003C9EC9 /* RedisClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F16E35E1C493B00003C9EC9 /* RedisClient.h */; };
 		0F16E3611C493B00003C9EC9 /* RedisClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 0F16E35F1C493B00003C9EC9 /* RedisClient.m */; };
-		0F4888691C9992EE00068BC2 /* DB.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F4888661C9992EE00068BC2 /* DB.h */; settings = {ASSET_TAGS = (); }; };
-		0F48886A1C9992EE00068BC2 /* PacketTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F4888671C9992EE00068BC2 /* PacketTypes.h */; settings = {ASSET_TAGS = (); }; };
-		0F48886B1C9992EE00068BC2 /* Registers.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F4888681C9992EE00068BC2 /* Registers.h */; settings = {ASSET_TAGS = (); }; };
+		0F4888691C9992EE00068BC2 /* DB.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F4888661C9992EE00068BC2 /* DB.h */; };
+		0F48886A1C9992EE00068BC2 /* PacketTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F4888671C9992EE00068BC2 /* PacketTypes.h */; };
+		0F48886B1C9992EE00068BC2 /* Registers.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F4888681C9992EE00068BC2 /* Registers.h */; };
 		146822430FC4799C0082BD70 /* ORCircularBufferUV.h in Headers */ = {isa = PBXBuildFile; fileRef = 146822410FC4799C0082BD70 /* ORCircularBufferUV.h */; };
 		146822440FC4799C0082BD70 /* ORCircularBufferUV.m in Sources */ = {isa = PBXBuildFile; fileRef = 146822420FC4799C0082BD70 /* ORCircularBufferUV.m */; };
 		1C50F9F108033CA9008D18EA /* ADC2249.nib in Resources */ = {isa = PBXBuildFile; fileRef = 1C50F9E608033CA9008D18EA /* ADC2249.nib */; };
@@ -238,6 +238,22 @@
 		3602C15C1C4EC291006B50B3 /* anet.c in Sources */ = {isa = PBXBuildFile; fileRef = 3602C15A1C4EC291006B50B3 /* anet.c */; };
 		3602C15D1C4EC291006B50B3 /* anet.h in Headers */ = {isa = PBXBuildFile; fileRef = 3602C15B1C4EC291006B50B3 /* anet.h */; };
 		36148E3A1C6046610088C93E /* Fec32.xib in Resources */ = {isa = PBXBuildFile; fileRef = 36148E391C6046610088C93E /* Fec32.xib */; };
+		3620200E1CBD38EE0089296E /* libiconv.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3620200D1CBD38EE0089296E /* libiconv.2.dylib */; };
+		362020201CBD390A0089296E /* WPBase64Utils.h in Headers */ = {isa = PBXBuildFile; fileRef = 362020101CBD390A0089296E /* WPBase64Utils.h */; };
+		362020211CBD390A0089296E /* WPBase64Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 362020111CBD390A0089296E /* WPBase64Utils.m */; };
+		362020221CBD390A0089296E /* WPStringUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 362020121CBD390A0089296E /* WPStringUtils.h */; };
+		362020231CBD390A0089296E /* WPStringUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 362020131CBD390A0089296E /* WPStringUtils.m */; };
+		362020241CBD390A0089296E /* WPXMLRPC.h in Headers */ = {isa = PBXBuildFile; fileRef = 362020141CBD390A0089296E /* WPXMLRPC.h */; };
+		362020251CBD390A0089296E /* WPXMLRPCDataCleaner.h in Headers */ = {isa = PBXBuildFile; fileRef = 362020151CBD390A0089296E /* WPXMLRPCDataCleaner.h */; };
+		362020261CBD390A0089296E /* WPXMLRPCDataCleaner.m in Sources */ = {isa = PBXBuildFile; fileRef = 362020161CBD390A0089296E /* WPXMLRPCDataCleaner.m */; };
+		362020271CBD390A0089296E /* WPXMLRPCDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 362020171CBD390A0089296E /* WPXMLRPCDecoder.h */; };
+		362020281CBD390A0089296E /* WPXMLRPCDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 362020181CBD390A0089296E /* WPXMLRPCDecoder.m */; };
+		362020291CBD390A0089296E /* WPXMLRPCDecoderDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 362020191CBD390A0089296E /* WPXMLRPCDecoderDelegate.h */; };
+		3620202A1CBD390A0089296E /* WPXMLRPCDecoderDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3620201A1CBD390A0089296E /* WPXMLRPCDecoderDelegate.m */; };
+		3620202B1CBD390A0089296E /* WPXMLRPCEncoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 3620201B1CBD390A0089296E /* WPXMLRPCEncoder.h */; };
+		3620202C1CBD390A0089296E /* WPXMLRPCEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 3620201C1CBD390A0089296E /* WPXMLRPCEncoder.m */; };
+		3620202D1CBD390A0089296E /* XmlrpcClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 3620201E1CBD390A0089296E /* XmlrpcClient.h */; };
+		3620202E1CBD390A0089296E /* XmlrpcClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 3620201F1CBD390A0089296E /* XmlrpcClient.m */; };
 		362F928B1681A05100F3ACB4 /* SNO.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 362F928A16819FCE00F3ACB4 /* SNO.cc */; };
 		3672CF8C1C4EB15000870996 /* SNOCaen1720.nib in Resources */ = {isa = PBXBuildFile; fileRef = 3672CF811C4EB15000870996 /* SNOCaen1720.nib */; };
 		3672CF8D1C4EB15000870996 /* SNOCaen1720Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3672CF821C4EB15000870996 /* SNOCaen1720Card.gif */; };
@@ -3903,6 +3919,22 @@
 		3602C15A1C4EC291006B50B3 /* anet.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = anet.c; sourceTree = "<group>"; };
 		3602C15B1C4EC291006B50B3 /* anet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = anet.h; sourceTree = "<group>"; };
 		36148E391C6046610088C93E /* Fec32.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Fec32.xib; sourceTree = "<group>"; };
+		3620200D1CBD38EE0089296E /* libiconv.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libiconv.2.dylib; sourceTree = "<group>"; };
+		362020101CBD390A0089296E /* WPBase64Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WPBase64Utils.h; sourceTree = "<group>"; };
+		362020111CBD390A0089296E /* WPBase64Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WPBase64Utils.m; sourceTree = "<group>"; };
+		362020121CBD390A0089296E /* WPStringUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WPStringUtils.h; sourceTree = "<group>"; };
+		362020131CBD390A0089296E /* WPStringUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WPStringUtils.m; sourceTree = "<group>"; };
+		362020141CBD390A0089296E /* WPXMLRPC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WPXMLRPC.h; sourceTree = "<group>"; };
+		362020151CBD390A0089296E /* WPXMLRPCDataCleaner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WPXMLRPCDataCleaner.h; sourceTree = "<group>"; };
+		362020161CBD390A0089296E /* WPXMLRPCDataCleaner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WPXMLRPCDataCleaner.m; sourceTree = "<group>"; };
+		362020171CBD390A0089296E /* WPXMLRPCDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WPXMLRPCDecoder.h; sourceTree = "<group>"; };
+		362020181CBD390A0089296E /* WPXMLRPCDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WPXMLRPCDecoder.m; sourceTree = "<group>"; };
+		362020191CBD390A0089296E /* WPXMLRPCDecoderDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WPXMLRPCDecoderDelegate.h; sourceTree = "<group>"; };
+		3620201A1CBD390A0089296E /* WPXMLRPCDecoderDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WPXMLRPCDecoderDelegate.m; sourceTree = "<group>"; };
+		3620201B1CBD390A0089296E /* WPXMLRPCEncoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WPXMLRPCEncoder.h; sourceTree = "<group>"; };
+		3620201C1CBD390A0089296E /* WPXMLRPCEncoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WPXMLRPCEncoder.m; sourceTree = "<group>"; };
+		3620201E1CBD390A0089296E /* XmlrpcClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XmlrpcClient.h; sourceTree = "<group>"; };
+		3620201F1CBD390A0089296E /* XmlrpcClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XmlrpcClient.m; sourceTree = "<group>"; };
 		362F928A16819FCE00F3ACB4 /* SNO.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SNO.cc; sourceTree = "<group>"; };
 		3672CF811C4EB15000870996 /* SNOCaen1720.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = SNOCaen1720.nib; sourceTree = "<group>"; };
 		3672CF821C4EB15000870996 /* SNOCaen1720Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = SNOCaen1720Card.gif; sourceTree = "<group>"; };
@@ -7019,6 +7051,7 @@
 				84F5E11B0A151E0B00707A0F /* OpenGL.framework in Frameworks */,
 				847599860B5FF26500123411 /* QuartzCore.framework in Frameworks */,
 				2AE87C600D6E636700A839FC /* libmysqlclient.a in Frameworks */,
+				3620200E1CBD38EE0089296E /* libiconv.2.dylib in Frameworks */,
 				2DC1EE800F33724E00E93C75 /* WebKit.framework in Frameworks */,
 				840F5B191222C90000D49A75 /* QTKit.framework in Frameworks */,
 				EF37879212DFFF81003C814E /* YAJL.framework in Frameworks */,
@@ -7491,6 +7524,43 @@
 				2DD0C8A9193FBAE3009112B2 /* SLTv4GeneralOperations.h */,
 			);
 			path = KatrinSLTv4_Readout_Code;
+			sourceTree = "<group>";
+		};
+		3620200C1CBD38EE0089296E /* libSNO+ */ = {
+			isa = PBXGroup;
+			children = (
+				3620200D1CBD38EE0089296E /* libiconv.2.dylib */,
+			);
+			path = "libSNO+";
+			sourceTree = "<group>";
+		};
+		3620200F1CBD390A0089296E /* WPXMLRPC */ = {
+			isa = PBXGroup;
+			children = (
+				362020101CBD390A0089296E /* WPBase64Utils.h */,
+				362020111CBD390A0089296E /* WPBase64Utils.m */,
+				362020121CBD390A0089296E /* WPStringUtils.h */,
+				362020131CBD390A0089296E /* WPStringUtils.m */,
+				362020141CBD390A0089296E /* WPXMLRPC.h */,
+				362020151CBD390A0089296E /* WPXMLRPCDataCleaner.h */,
+				362020161CBD390A0089296E /* WPXMLRPCDataCleaner.m */,
+				362020171CBD390A0089296E /* WPXMLRPCDecoder.h */,
+				362020181CBD390A0089296E /* WPXMLRPCDecoder.m */,
+				362020191CBD390A0089296E /* WPXMLRPCDecoderDelegate.h */,
+				3620201A1CBD390A0089296E /* WPXMLRPCDecoderDelegate.m */,
+				3620201B1CBD390A0089296E /* WPXMLRPCEncoder.h */,
+				3620201C1CBD390A0089296E /* WPXMLRPCEncoder.m */,
+			);
+			path = WPXMLRPC;
+			sourceTree = "<group>";
+		};
+		3620201D1CBD390A0089296E /* XmlrpcClient */ = {
+			isa = PBXGroup;
+			children = (
+				3620201E1CBD390A0089296E /* XmlrpcClient.h */,
+				3620201F1CBD390A0089296E /* XmlrpcClient.m */,
+			);
+			path = XmlrpcClient;
 			sourceTree = "<group>";
 		};
 		3672CF7D1C4EB15000870996 /* CAEN */ = {
@@ -11246,6 +11316,8 @@
 		8499FE810DC8E86800E82DB4 /* SNO+ */ = {
 			isa = PBXGroup;
 			children = (
+				3620200F1CBD390A0089296E /* WPXMLRPC */,
+				3620201D1CBD390A0089296E /* XmlrpcClient */,
 				3672CF7D1C4EB15000870996 /* CAEN */,
 				0F16E30D1C493AD6003C9EC9 /* hiredis */,
 				0F16E30C1C493ACE003C9EC9 /* RedisClient */,
@@ -13698,6 +13770,7 @@
 		84F7FB520AE5558900A5AA4C /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				3620200C1CBD38EE0089296E /* libSNO+ */,
 				8475EC0414759D53003A165D /* libusb */,
 				2AE87BDC0D6E486900A839FC /* libUniversal */,
 				84F7FB630AE5569100A5AA4C /* my_alloc.h */,
@@ -14612,6 +14685,7 @@
 				8434A1EA055B3287002D3102 /* ORCircularBuffer.h in Headers */,
 				8434A1EB055B3287002D3102 /* ORCircularBufferTypeDefs.h in Headers */,
 				8434A1EC055B3287002D3102 /* ORCircularBufferWriter.h in Headers */,
+				362020221CBD390A0089296E /* WPStringUtils.h in Headers */,
 				8434A1ED055B3287002D3102 /* ORCircularBufferReader.h in Headers */,
 				8434A1EE055B3287002D3102 /* OHexFormatter.h in Headers */,
 				8434A1EF055B3287002D3102 /* ORConnectionTask.h in Headers */,
@@ -14650,6 +14724,7 @@
 				8434A221055B3287002D3102 /* NcdDetector.h in Headers */,
 				8434A222055B3287002D3102 /* NcdTube.h in Headers */,
 				8434A223055B3287002D3102 /* TubeMapData.h in Headers */,
+				3620202D1CBD390A0089296E /* XmlrpcClient.h in Headers */,
 				8434A224055B3287002D3102 /* ORGenericView.h in Headers */,
 				8434A227055B3287002D3102 /* ORTimeRate.h in Headers */,
 				8434A228055B3287002D3102 /* MuxScopeMap.h in Headers */,
@@ -14879,6 +14954,7 @@
 				840E00160944B29000049827 /* ORInputElement.h in Headers */,
 				840E00180944B29000049827 /* ORSPDTRelayController.h in Headers */,
 				845313D71B98A45200FCEEE5 /* ORMJDSource.h in Headers */,
+				3620202B1CBD390A0089296E /* WPXMLRPCEncoder.h in Headers */,
 				840E001A0944B29000049827 /* ORSPDTRelayModel.h in Headers */,
 				840E001F0944B29000049827 /* ORSPSTRelayController.h in Headers */,
 				840E00210944B29000049827 /* ORSPSTRelayModel.h in Headers */,
@@ -14920,6 +14996,7 @@
 				842AECCD09538066009550DE /* ORCRGetterController.h in Headers */,
 				84DF474A0962140800ABE071 /* ORDataExplorerController.h in Headers */,
 				848648820975C1F6001C459D /* ORProcessInConnector.h in Headers */,
+				362020291CBD390A0089296E /* WPXMLRPCDecoderDelegate.h in Headers */,
 				848648960975C415001C459D /* ORProcessOutConnector.h in Headers */,
 				848648AC0975CB2E001C459D /* ORProcessConnector.h in Headers */,
 				84B63C000978299E005B20A5 /* ORCountController.h in Headers */,
@@ -15148,6 +15225,7 @@
 				8407F0E80DEF66DB000F1441 /* ORCaen862Model.h in Headers */,
 				846B8F120E15972A00C41F9D /* ORICS8065Controller.h in Headers */,
 				846B8F140E15972A00C41F9D /* ORICS8065Model.h in Headers */,
+				362020271CBD390A0089296E /* WPXMLRPCDecoder.h in Headers */,
 				9C8846860E2D8D960099B98E /* ORHP4405AController.h in Headers */,
 				9C88468A0E2D8D960099B98E /* ORHP4405AModel.h in Headers */,
 				9C7CE7E60E2FC22500F63679 /* ORCaen260Controller.h in Headers */,
@@ -15325,6 +15403,7 @@
 				43ADFE4010B6DAF90044617C /* ORVCard.hh in Headers */,
 				43ADFE7710B6DBCF0044617C /* ORCAEN419Readout.hh in Headers */,
 				43ADFE7910B6DBCF0044617C /* ORCAEN1720Readout.hh in Headers */,
+				362020241CBD390A0089296E /* WPXMLRPC.h in Headers */,
 				43ADFE7B10B6DBCF0044617C /* ORCAENReadout.hh in Headers */,
 				43ADFE7D10B6DBCF0044617C /* ORDataGenReadout.hh in Headers */,
 				43ADFE8110B6DBCF0044617C /* ORGretinaReadout.hh in Headers */,
@@ -15351,6 +15430,7 @@
 				849516B810C95382001C8112 /* ORStateLabelModel.h in Headers */,
 				849415871B330FEB00ED42F8 /* ORQuadStateBox.h in Headers */,
 				8455097A10CEF7DD008A019C /* ORCaen965Decoder.h in Headers */,
+				362020201CBD390A0089296E /* WPBase64Utils.h in Headers */,
 				84550CB110D033F2008A019C /* ORCAEN965Readout.hh in Headers */,
 				84ACBA6510D44258003B9735 /* ORProcessView.h in Headers */,
 				84EE83FA10D6C52A00BBCBE5 /* ORPMCReadWriteCommand.h in Headers */,
@@ -15395,6 +15475,7 @@
 				84BF445F1187ACEE00F55216 /* ORCAEN1785Readout.hh in Headers */,
 				849F0A9318D0973B00FF3F36 /* ORDT5720Model.h in Headers */,
 				84762012118CD53D00016A8D /* OR1dFit.h in Headers */,
+				362020251CBD390A0089296E /* WPXMLRPCDataCleaner.h in Headers */,
 				84762014118CD53D00016A8D /* OR1dFitController.h in Headers */,
 				845313D31B9886F400FCEEE5 /* ORRemoteCommander.h in Headers */,
 				84762016118CD53D00016A8D /* OR1dRoi.h in Headers */,
@@ -17048,6 +17129,7 @@
 				841DA668078211E70099BBF6 /* ORCC32Controller.m in Sources */,
 				841DA66A078211E70099BBF6 /* ORCC32Model.m in Sources */,
 				3672CF931C4EB15000870996 /* SNOCaenModel.m in Sources */,
+				362020231CBD390A0089296E /* WPStringUtils.m in Sources */,
 				841DA7D9078240420099BBF6 /* ORTRS1Controller.m in Sources */,
 				841DAA5B07838C9A0099BBF6 /* ORDGF4cController.m in Sources */,
 				841DAA5D07838C9A0099BBF6 /* ORDGF4cModel.m in Sources */,
@@ -17167,6 +17249,7 @@
 				840E002D0944B29000049827 /* ORSimpleLogic.m in Sources */,
 				840E00330944B29000049827 /* OROrGateModel.m in Sources */,
 				840E00350944B29000049827 /* ORRSFlipFlopModel.m in Sources */,
+				362020281CBD390A0089296E /* WPXMLRPCDecoder.m in Sources */,
 				840E003B0944B29000049827 /* ORAlarmElementController.m in Sources */,
 				840E003D0944B29000049827 /* ORAlarmElementModel.m in Sources */,
 				840E003F0944B29000049827 /* OROutputElement.m in Sources */,
@@ -17228,6 +17311,7 @@
 				84F5E3210A154C6700707A0F /* KatrinController.m in Sources */,
 				84A30C580A1E44D400DAE618 /* ORPulser33220Controller.m in Sources */,
 				849C68040A2CC20B00511E30 /* ORCCUSBModel.m in Sources */,
+				3620202A1CBD390A0089296E /* WPXMLRPCDecoderDelegate.m in Sources */,
 				849C68130A2CC4B700511E30 /* ORCCUSBController.m in Sources */,
 				84AC6A520A34F9A900A0018E /* NcdPulseChannelsTask.m in Sources */,
 				84A16C580A7EB7D1005BC151 /* ORJADCLController.m in Sources */,
@@ -17423,6 +17507,7 @@
 				84C37D300EF834DD00E77E09 /* SNOModel.m in Sources */,
 				84E18C3B0F0A5D3B0096F0F3 /* NSNotifications+Extensions.m in Sources */,
 				84E18C570F0A640C0096F0F3 /* ORLineMarker.m in Sources */,
+				362020211CBD390A0089296E /* WPBase64Utils.m in Sources */,
 				841922200F0BBE8000EF1C1C /* ORScriptIDEModel.m in Sources */,
 				8419227E0F0BC18800EF1C1C /* ORScriptIDEController.m in Sources */,
 				84499B7A0F13BB6E004B855B /* ORMksPdr2000Controller.m in Sources */,
@@ -17628,6 +17713,7 @@
 				847A5B001190D88D00094181 /* ORWaveformSpecialBitsController.m in Sources */,
 				84E2064611AD7841007D757F /* ORSIS3800Controller.m in Sources */,
 				84E2064811AD7841007D757F /* ORSIS3800Decoders.m in Sources */,
+				362020261CBD390A0089296E /* WPXMLRPCDataCleaner.m in Sources */,
 				84E2064A11AD7841007D757F /* ORSIS3800Model.m in Sources */,
 				8457BE3611B0183500C4082D /* ORSIS3820Controller.m in Sources */,
 				8457BE3811B0183500C4082D /* ORSIS3820Decoders.m in Sources */,
@@ -17711,6 +17797,7 @@
 				8494D85C13393D8A00DD5F9E /* ORRunListModel.m in Sources */,
 				8459A8D5137C1FEC0029C5B6 /* ORComparatorController.m in Sources */,
 				8459A8D7137C1FEC0029C5B6 /* ORComparatorModel.m in Sources */,
+				3620202E1CBD390A0089296E /* XmlrpcClient.m in Sources */,
 				8483D2E5139EAB8B000C8901 /* ORCV812Controller.m in Sources */,
 				8483D2E7139EAB8B000C8901 /* ORCV812Model.m in Sources */,
 				8483D3BB139FAAB8000C8901 /* ORCV895Controller.m in Sources */,
@@ -17771,6 +17858,7 @@
 				B38DEE4D14E02B40003914FF /* ORADVME1314Model.m in Sources */,
 				225D4F4E14E9E4B3009FF60F /* SNOConnection.m in Sources */,
 				84D8556314FBDEDA00C70A00 /* ORCB37Controller.m in Sources */,
+				3620202C1CBD390A0089296E /* WPXMLRPCEncoder.m in Sources */,
 				84D8556514FBDEDA00C70A00 /* ORCB37Model.m in Sources */,
 				849740E3150531410004B444 /* ORVXMMotor.m in Sources */,
 				84976E40150E77F60004B444 /* ORMks651cController.m in Sources */,
@@ -18357,6 +18445,7 @@
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_7)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_8)",
 					"$(SRCROOT)/Libraries/libusb",
+					"$(PROJECT_DIR)/Libraries/libSNO+",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Libraries/libUniversal\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_2 = "\"$(SRCROOT)/Libraries\"";
@@ -18431,6 +18520,7 @@
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_7)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_8)",
 					"\"$(SRCROOT)/Libraries/libusb\"",
+					"$(PROJECT_DIR)/Libraries/libSNO+",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/Libraries\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Libraries/libUniversal\"";
@@ -18502,6 +18592,7 @@
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_7)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_8)",
 					"\"$(SRCROOT)/Libraries/libusb\"",
+					"$(PROJECT_DIR)/Libraries/libSNO+",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/Libraries\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Libraries/libUniversal\"";
