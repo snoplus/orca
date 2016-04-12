@@ -100,10 +100,6 @@ runTypeMask= runTypeMask,
 isEStopPolling = isEStopPolling,
 isEmergencyStopEnabled = isEmergencyStopEnabled,
 mtcConfigDoc = _mtcConfigDoc,
-mtcHost,
-mtcPort,
-xl3Host,
-xl3Port,
 dataHost,
 dataPort,
 logHost,
@@ -111,27 +107,19 @@ logPort;
 
 @synthesize smellieRunHeaderDocList;
 
-/* #define these variables for now. Eventually we need to add fields
- * to the GUI, but Javi is working on the SNOPModel now */
-#define MTC_HOST @"sbc.sp.snolab.ca"
-#define MTC_PORT 4001
-#define XL3_HOST @"daq1.sp.snolab.ca"
-#define XL3_PORT 4004
-
-
 #pragma mark ¥¥¥Initialization
 
 - (id) init
 {
     self = [super init];
 
+    rolloverRun = NO;
+
     /* initialize our connection to the MTC server */
-    mtc_server = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
+    mtc_server = [[RedisClient alloc] init];
 
     /* initialize our connection to the XL3 server */
-    xl3_server = [[RedisClient alloc] initWithHostName:XL3_HOST withPort:XL3_PORT];
-
-    rolloverRun = NO;
+    xl3_server = [[RedisClient alloc] init];
 
     [[self undoManager] disableUndoRegistration];
 	[self initOrcaDBConnectionHistory];
@@ -141,6 +129,60 @@ logPort;
     [[self undoManager] enableUndoRegistration];
 
     return self;
+}
+
+- (void) setMTCPort: (int) port
+{
+    mtcPort = port;
+    [mtc_server disconnect];
+    [mtc_server setPort:port];
+}
+
+- (int) mtcPort
+{
+    return mtcPort;
+}
+
+- (void) setMTCHost: (NSString *) host
+{
+    [mtcHost release];
+    mtcHost = [host copy];
+    [mtc_server disconnect];
+    [mtc_server setHost:host];
+
+    //[[NSNotificationCenter defaultCenter] postNotificationName:@"SNOPSettingsChanged" object:self];
+}
+
+- (NSString *) mtcHost
+{
+    return mtcHost;
+}
+
+- (void) setXL3Port: (int) port
+{
+    xl3Port = port;
+    [xl3_server disconnect];
+    [xl3_server setPort:port];
+
+    //[[NSNotificationCenter defaultCenter] postNotificationName:@"SNOPSettingsChanged" object:self];
+}
+
+- (int) xl3Port
+{
+    return xl3Port;
+}
+
+- (void) setXL3Host: (NSString *) host
+{
+    [xl3Host release];
+    xl3Host = [host copy];
+    [xl3_server disconnect];
+    [xl3_server setHost:host];
+}
+
+- (NSString *) xl3Host
+{
+    return xl3Host;
 }
 
 - (id) initWithCoder:(NSCoder*)decoder
@@ -180,24 +222,24 @@ logPort;
     [self setECA_subrun_time:[decoder decodeDoubleForKey:@"SNOPECAsubruntime"]];
 
     [self setMTCHost:[decoder decodeObjectForKey:@"mtcHost"]];
-    [self setMTCPort:[decoder decodeIntForKey:@"mtcHost"]];
+    [self setMTCPort:[decoder decodeIntForKey:@"mtcPort"]];
     
     [self setXL3Host:[decoder decodeObjectForKey:@"xl3Host"]];
-    [self setXL3Port:[decoder decodeIntForKey:@"xl3Host"]];
+    [self setXL3Port:[decoder decodeIntForKey:@"xl3Port"]];
     
     [self setDataServerHost:[decoder decodeObjectForKey:@"dataHost"]];
-    [self setDataServerPort:[decoder decodeIntForKey:@"dataHost"]];
+    [self setDataServerPort:[decoder decodeIntForKey:@"dataPort"]];
     
     [self setLogServerHost:[decoder decodeObjectForKey:@"logHost"]];
-    [self setLogServerPort:[decoder decodeIntForKey:@"logHost"]];
+    [self setLogServerPort:[decoder decodeIntForKey:@"logPort"]];
     
     [[self undoManager] enableUndoRegistration];
 
     /* initialize our connection to the MTC server */
-    mtc_server = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
+    mtc_server = [[RedisClient alloc] initWithHostName:mtcHost withPort:mtcPort];
 
     /* initialize our connection to the XL3 server */
-    xl3_server = [[RedisClient alloc] initWithHostName:XL3_HOST withPort:XL3_PORT];
+    xl3_server = [[RedisClient alloc] initWithHostName:xl3Host withPort:xl3Port];
 
     return self;
 }
@@ -457,8 +499,8 @@ logPort;
 {
     /* Since we are running in a separate thread, we just open a new
      * connection to the MTC and XL3 servers. */
-    RedisClient *mtc = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
-    RedisClient *xl3 = [[RedisClient alloc] initWithHostName:XL3_HOST withPort:XL3_PORT];
+    RedisClient *mtc = [[RedisClient alloc] initWithHostName:mtcHost withPort:mtcPort];
+    RedisClient *xl3 = [[RedisClient alloc] initWithHostName:xl3Host withPort:xl3Port];
 
     while (1) {
         @try {

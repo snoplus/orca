@@ -164,12 +164,6 @@
 @property (nonatomic,assign) bool isEmergencyStopEnabled;
 @property (nonatomic,assign) bool isEStopPolling;
 
-@property (copy,setter=setMTCHost:) NSString *mtcHost;
-@property (setter=setMTCPort:) int mtcPort;
-
-@property (copy,setter=setXL3Host:) NSString *xl3Host;
-@property (setter=setXL3Port:) int xl3Port;
-
 @property (copy,setter=setDataServerHost:) NSString *dataHost;
 @property (setter=setDataServerPort:) int dataPort;
 
@@ -182,6 +176,18 @@
 
 
 - (id) init;
+
+- (void) setMTCPort: (int) port;
+- (int) mtcPort;
+
+- (void) setMTCHost: (NSString *) host;
+- (NSString *) mtcHost;
+
+- (void) setXL3Port: (int) port;
+- (int) xl3Port;
+
+- (void) setXL3Host: (NSString *) host;
+- (NSString *) xl3Host;
 
 - (void) initSmellieRunDocsDic;
 - (void) initOrcaDBConnectionHistory;
