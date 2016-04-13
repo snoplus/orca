@@ -27,6 +27,7 @@
 @class ORDataPacket;
 @class ORDataSet;
 @class ORCouchDB;
+@class ORRunModel;
 
 @protocol snotDbDelegate <NSObject>
 @required
@@ -98,6 +99,8 @@
     bool _smellieDocUploaded;
     NSMutableDictionary * snopRunTypeMask;
     NSNumber * runTypeMask;
+    NSString * standardRunType;
+    NSString * standardRunVersion;
     
     NSThread * eStopThread;
     
@@ -106,8 +109,28 @@
 
     bool rolloverRun;
 
+    NSString *mtcHost;
+    int mtcPort;
+
+    NSString *xl3Host;
+    int xl3Port;
+
+    NSString *dataHost;
+    int dataPort;
+
+    NSString *logHost;
+    int logPort;
+
     RedisClient *mtc_server;
     RedisClient *xl3_server;
+
+    @private
+        //ECA stuff
+        int ECA_pattern;
+        int ECA_type;
+        int ECA_tslope_pattern;
+        double ECA_subrun_time;
+    
 }
 
 @property (nonatomic,retain) NSMutableDictionary* smellieRunHeaderDocList;
@@ -141,12 +164,30 @@
 @property (nonatomic,assign) bool isEmergencyStopEnabled;
 @property (nonatomic,assign) bool isEStopPolling;
 
+@property (copy,setter=setDataServerHost:) NSString *dataHost;
+@property (setter=setDataServerPort:) int dataPort;
+
+@property (copy,setter=setLogServerHost:) NSString *logHost;
+@property (setter=setLogServerPort:) int logPort;
+
 @property (copy) NSDictionary* runDocument;
 @property (copy) NSDictionary* configDocument;
 @property (copy) NSDictionary* mtcConfigDoc;
 
+
 - (id) init;
-- (id) initWithCoder:(NSCoder*)decoder;
+
+- (void) setMTCPort: (int) port;
+- (int) mtcPort;
+
+- (void) setMTCHost: (NSString *) host;
+- (NSString *) mtcHost;
+
+- (void) setXL3Port: (int) port;
+- (int) xl3Port;
+
+- (void) setXL3Host: (NSString *) host;
+- (NSString *) xl3Host;
 
 - (void) initSmellieRunDocsDic;
 - (void) initOrcaDBConnectionHistory;
@@ -165,6 +206,7 @@
 #pragma mark ¥¥orcascript helpers
 - (void) zeroPedestalMasks;
 - (void) updatePedestalMasks:(unsigned int)pattern;
+- (void) hvMasterTriggersOFF;
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
@@ -197,6 +239,22 @@
 #pragma mark ¥¥¥Accessors
 - (void) setViewType:(int)aViewType;
 - (int) viewType;
+- (NSString*) standardRunType;
+- (NSString*) standardRunVersion;
+- (void) setStandardRunType:(NSString*)aValue;
+- (void) setStandardRunVersion:(NSString*)aValue;
+- (int) ECA_pattern;
+- (int) ECA_type;
+- (int) ECA_tslope_pattern;
+- (double) ECA_subrun_time;
+- (void) setECA_pattern:(int)aValue;
+- (void) setECA_type:(int)aValue;
+- (void) setECA_tslope_pattern:(int)aValue;
+- (void) setECA_subrun_time:(double)aValue;
+
+#pragma mark ¥¥¥Archival
+- (id)initWithCoder:(NSCoder*)decoder;
+- (void)encodeWithCoder:(NSCoder*)encoder;
 
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups;
@@ -226,6 +284,12 @@
 - (NSMutableDictionary*)smellieTestFct;
 -(BOOL)isRunTypeMaskedIn:(NSString*)aRunType;
 -(void) testerHv;
+
+//Standard runs functions
+-(BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
+-(BOOL) loadStandardRunToHW:(NSString*)runTypeName;
+-(BOOL) saveStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
+
 @end
 
 @interface SNOPDecoderForRHDR : ORVmeCardDecoder {
@@ -244,3 +308,7 @@ extern NSString* ORSNOPModelViewTypeChanged;
 extern NSString* ORSNOPModelOrcaDBIPAddressChanged;
 extern NSString* ORSNOPModelDebugDBIPAddressChanged;
 extern NSString* SNOPRunTypeChangedNotification;
+extern NSString* ORSNOPRunsLockNotification;
+extern NSString* ORSNOPModelRunsECAChangedNotification;
+extern NSString* ORSNOPModelSRChangedNotification;
+extern NSString* ORSNOPModelSRVersionChangedNotification;

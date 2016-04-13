@@ -36,19 +36,23 @@
 #import "ORFec32Model.h"
 #import "OROrderedObjManager.h"
 #import "ORSNOConstants.h"
-#import "ORCaen1720Model.h"
 #import "ELLIEModel.h"
 #import "SNOP_Run_Constants.h"
 #import "SBC_Link.h"
 #import "SNOCmds.h"
 #import "RedisClient.h"
 #include <stdint.h>
+#import "SNOCaenModel.h"
 
 NSString* ORSNOPModelViewTypeChanged	= @"ORSNOPModelViewTypeChanged";
 static NSString* SNOPDbConnector	= @"SNOPDbConnector";
 NSString* ORSNOPModelOrcaDBIPAddressChanged = @"ORSNOPModelOrcaDBIPAddressChanged";
 NSString* ORSNOPModelDebugDBIPAddressChanged = @"ORSNOPModelDebugDBIPAddressChanged";
 NSString* SNOPRunTypeChangedNotification = @"SNOPRunTypeChangedNotification";
+NSString* ORSNOPRunsLockNotification = @"ORSNOPRunsLockNotification";
+NSString* ORSNOPModelRunsECAChangedNotification = @"ORSNOPModelRunsECAChangedNotification";
+NSString* ORSNOPModelSRChangedNotification = @"ORSNOPModelSRChangedNotification";
+NSString* ORSNOPModelSRVersionChangedNotification = @"ORSNOPModelSRVersionChangedNotification";
 
 #define kOrcaRunDocumentAdded   @"kOrcaRunDocumentAdded"
 #define kOrcaRunDocumentUpdated @"kOrcaRunDocumentUpdated"
@@ -95,17 +99,13 @@ snopRunTypeMask = snopRunTypeMask,
 runTypeMask= runTypeMask,
 isEStopPolling = isEStopPolling,
 isEmergencyStopEnabled = isEmergencyStopEnabled,
-mtcConfigDoc = _mtcConfigDoc;
+mtcConfigDoc = _mtcConfigDoc,
+dataHost,
+dataPort,
+logHost,
+logPort;
 
 @synthesize smellieRunHeaderDocList;
-
-/* #define these variables for now. Eventually we need to add fields
- * to the GUI, but Javi is working on the SNOPModel now */
-#define MTC_HOST @"sbc.sp.snolab.ca"
-#define MTC_PORT 4001
-#define XL3_HOST @"daq1.sp.snolab.ca"
-#define XL3_PORT 4004
-
 
 #pragma mark ¥¥¥Initialization
 
@@ -113,15 +113,26 @@ mtcConfigDoc = _mtcConfigDoc;
 {
     self = [super init];
 
-    /* initialize our connection to the MTC server */
-    mtc_server = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
-
-    /* initialize our connection to the XL3 server */
-    xl3_server = [[RedisClient alloc] initWithHostName:XL3_HOST withPort:XL3_PORT];
-
     rolloverRun = NO;
 
+    /* initialize our connection to the MTC server */
+    mtc_server = [[RedisClient alloc] init];
+
+    /* initialize our connection to the XL3 server */
+    xl3_server = [[RedisClient alloc] init];
+
     [[self undoManager] disableUndoRegistration];
+
+    [self setMTCHost:@""];
+    [self setXL3Host:@""];
+    [self setDataServerHost:@""];
+    [self setLogServerHost:@""];
+
+    [self setMTCPort:4001];
+    [self setXL3Port:4004];
+    [self setDataServerPort:4005];
+    [self setLogServerPort:4001];
+
 	[self initOrcaDBConnectionHistory];
 	[self initDebugDBConnectionHistory];
     [self initSmellieRunDocsDic];
@@ -131,15 +142,138 @@ mtcConfigDoc = _mtcConfigDoc;
     return self;
 }
 
+- (void) setMTCPort: (int) port
+{
+    int i;
+
+    if (port == mtcPort) return;
+
+    mtcPort = port;
+    [mtc_server disconnect];
+    [mtc_server setPort:port];
+
+    /* Set the MTC server hostname for the MTC model. */
+    NSArray* mtcs = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+
+    ORMTCModel* mtc;
+    for (i = 0; i < [mtcs count]; i++) {
+        mtc = [mtcs objectAtIndex:0];
+        [mtc setMTCPort:port];
+    }
+
+    /* Set the MTC server hostname for the CAEN model. */
+    NSArray* caens = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"SNOCaenModel")];
+
+    SNOCaenModel* caen;
+    for (i = 0; i < [caens count]; i++) {
+        caen = [caens objectAtIndex:0];
+        [caen setMTCPort:port];
+    }
+
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:@"SNOPSettingsChanged" object:self];
+}
+
+- (int) mtcPort
+{
+    return mtcPort;
+}
+
+- (void) setMTCHost: (NSString *) host
+{
+    int i;
+
+    if ([host isEqualToString:mtcHost]) return;
+
+    [mtcHost release];
+    mtcHost = [host copy];
+    [mtc_server disconnect];
+    [mtc_server setHost:host];
+
+    /* Set the MTC server hostname for the MTC model. */
+    NSArray* mtcs = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+
+    ORMTCModel* mtc;
+    for (i = 0; i < [mtcs count]; i++) {
+        mtc = [mtcs objectAtIndex:0];
+        [mtc setMTCHost:host];
+    }
+
+    /* Set the MTC server hostname for the CAEN model. */
+    NSArray* caens = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"SNOCaenModel")];
+
+    SNOCaenModel* caen;
+    for (i = 0; i < [caens count]; i++) {
+        caen = [caens objectAtIndex:0];
+        [caen setMTCHost:host];
+    }
+
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:@"SNOPSettingsChanged" object:self];
+}
+
+- (NSString *) mtcHost
+{
+    return mtcHost;
+}
+
+- (void) setXL3Port: (int) port
+{
+    /* Set the port number for the XL3 server redis client. */
+    if (port == xl3Port) return;
+
+    xl3Port = port;
+    [xl3_server disconnect];
+    [xl3_server setPort:port];
+
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:@"SNOPSettingsChanged" object:self];
+}
+
+- (int) xl3Port
+{
+    return xl3Port;
+}
+
+- (void) setXL3Host: (NSString *) host
+{
+    /* Set the XL3 server hostname. This function will automatically
+     * sync this value to all of the XL3 model objects. */
+    int i;
+
+    if ([host isEqualToString:xl3Host]) return;
+
+    [xl3Host release];
+    xl3Host = [host copy];
+    [xl3_server disconnect];
+    [xl3_server setHost:host];
+
+    /* Set the XL3 server hostname for the XL3 models. */
+    NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+
+    ORXL3Model* xl3;
+    for (i = 0; i < [xl3s count]; i++) {
+        xl3 = [xl3s objectAtIndex:i];
+        [[xl3 xl3Link] setXL3Host:host];
+    }
+
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:@"SNOPSettingsChanged" object:self];
+}
+
+- (NSString *) xl3Host
+{
+    return xl3Host;
+}
+
 - (id) initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
-
-    /* initialize our connection to the MTC server */
-    mtc_server = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
-
-    /* initialize our connection to the XL3 server */
-    xl3_server = [[RedisClient alloc] initWithHostName:XL3_HOST withPort:XL3_PORT];
 
     rolloverRun = NO;
 
@@ -148,10 +282,9 @@ mtcConfigDoc = _mtcConfigDoc;
 	[self initDebugDBConnectionHistory];
     [self initSmellieRunDocsDic];
 
-
-    
     [self setViewType:[decoder decodeIntForKey:@"viewType"]];
 
+    //CouchDB
     self.orcaDBUserName = [decoder decodeObjectForKey:@"ORSNOPModelOrcaDBUserName"];
     self.orcaDBPassword = [decoder decodeObjectForKey:@"ORSNOPModelOrcaDBPassword"];
     self.orcaDBName = [decoder decodeObjectForKey:@"ORSNOPModelOrcaDBName"];
@@ -162,10 +295,49 @@ mtcConfigDoc = _mtcConfigDoc;
     self.debugDBName = [decoder decodeObjectForKey:@"ORSNOPModelDebugDBName"];
     self.debugDBPort = [decoder decodeInt32ForKey:@"ORSNOPModelDebugDBPort"];
     self.debugDBIPAddress = [decoder decodeObjectForKey:@"ORSNOPModelDebugDBIPAddress"];
-    
+
+    //Runs tab
     self.runTypeMask = [decoder decodeObjectForKey:@"SNOPRunTypeMask"];
-	
+    [self setStandardRunType:[decoder decodeObjectForKey:@"SNOPStandarRunType"]];
+    [self setStandardRunVersion:[decoder decodeObjectForKey:@"SNOPStandarRunVersion"]];
+    [self setECA_pattern:[decoder decodeIntForKey:@"SNOPECApattern"]];
+    [self setECA_type:[decoder decodeIntForKey:@"SNOPECAtype"]];
+    [self setECA_tslope_pattern:[decoder decodeIntForKey:@"SNOPECAtslppattern"]];
+    [self setECA_subrun_time:[decoder decodeDoubleForKey:@"SNOPECAsubruntime"]];
+
+    [self setMTCHost:[decoder decodeObjectForKey:@"mtcHost"]];
+    [self setMTCPort:[decoder decodeIntForKey:@"mtcPort"]];
+
+    [self setXL3Host:[decoder decodeObjectForKey:@"xl3Host"]];
+    [self setXL3Port:[decoder decodeIntForKey:@"xl3Port"]];
+
+    [self setDataServerHost:[decoder decodeObjectForKey:@"dataHost"]];
+    [self setDataServerPort:[decoder decodeIntForKey:@"dataPort"]];
+
+    [self setLogServerHost:[decoder decodeObjectForKey:@"logHost"]];
+    [self setLogServerPort:[decoder decodeIntForKey:@"logPort"]];
+
+    /* Check if we actually decoded the mtc, xl3, data, and log server
+     * hostnames and ports. decodeObjectForKey() will return NULL if the
+     * key doesn't exist, and decodeIntForKey() will return 0. */
+    if ([self mtcHost] == NULL) [self setMTCHost:@""];
+    if ([self xl3Host] == NULL) [self setXL3Host:@""];
+    if ([self dataHost] == NULL) [self setDataServerHost:@""];
+    if ([self logHost] == NULL) [self setLogServerHost:@""];
+
+    if ([self mtcPort] == 0) [self setMTCPort:4001];
+    if ([self xl3Port] == 0) [self setXL3Port:4004];
+    if ([self dataPort] == 0) [self setDataServerPort:4005];
+    if ([self logPort] == 0) [self setLogServerPort:4001];
+
     [[self undoManager] enableUndoRegistration];
+
+    /* initialize our connection to the MTC server */
+    mtc_server = [[RedisClient alloc] initWithHostName:mtcHost withPort:mtcPort];
+
+    /* initialize our connection to the XL3 server */
+    xl3_server = [[RedisClient alloc] initWithHostName:xl3Host withPort:xl3Port];
+
     return self;
 }
 
@@ -214,6 +386,9 @@ mtcConfigDoc = _mtcConfigDoc;
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
+    [standardRunType release];
+    [standardRunVersion release];
+
     [super dealloc];
 }
 
@@ -399,34 +574,44 @@ mtcConfigDoc = _mtcConfigDoc;
      * will fire a SOFT_GT and turn triggers off. Then we need to wait
      * until the MTC/CAEN/XL3s have read out all the data. */
 
-    ORRunModel *run = [aNote object];
+    NSDictionary *userInfo = [aNote userInfo];
 
-    [mtc_server okCommand:"run_stop"];
+    if (![[userInfo objectForKey:@"willRestart"] boolValue]) {
+        [mtc_server okCommand:"run_stop"];
 
-    NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-                              @"waiting for MTC/XL3/CAEN data", @"Reason",
-                              nil];
+        NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                  @"waiting for MTC/XL3/CAEN data", @"Reason",
+                                  nil];
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object: self userInfo: userInfo];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object: self userInfo: userInfo];
 
-    /* detach a thread to monitor XL3/CAEN/MTC buffers */
-    [NSThread detachNewThreadSelector:@selector(_waitForBuffers)
-                             toTarget:self
-                           withObject:nil];
+        /* detach a thread to monitor XL3/CAEN/MTC buffers */
+        [NSThread detachNewThreadSelector:@selector(_waitForBuffers)
+                                 toTarget:self
+                               withObject:nil];
+    }
 }
 
 - (void) _waitForBuffers
 {
+    /* Since we are running in a separate thread, we just open a new
+     * connection to the MTC and XL3 servers. */
+    RedisClient *mtc = [[RedisClient alloc] initWithHostName:mtcHost withPort:mtcPort];
+    RedisClient *xl3 = [[RedisClient alloc] initWithHostName:xl3Host withPort:xl3Port];
+
     while (1) {
         @try {
-            if (([mtc_server intCommand:"data_available"] == 0) &&
-                ([xl3_server intCommand:"data_available"] == 0))
+            if (([mtc intCommand:"data_available"] == 0) &&
+                ([xl3 intCommand:"data_available"] == 0))
                 break;
         } @catch (NSException *e) {
             NSLog(@"Failed to check MTC/XL3 data buffers. Quitting run...\n");
             break;
         }
     }
+
+    [mtc release];
+    [xl3 release];
 
     /* Go ahead and end the run. */
     [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
@@ -438,9 +623,9 @@ mtcConfigDoc = _mtcConfigDoc;
      * a hard run stop, we send the MTC server the builder_end_run command
      * which will tell the builder to flush all events */
 
-    ORRunModel *run = [aNote object];
+    NSDictionary *userInfo = [aNote userInfo];
 
-    if (![run nextRunWillQuickStart]) {
+    if (![[userInfo objectForKey:@"willRestart"] boolValue]) {
         [mtc_server okCommand:"builder_end_run"];
     }
 
@@ -838,7 +1023,6 @@ mtcConfigDoc = _mtcConfigDoc;
 	} // synchronized
 }
 
-
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups
 {
@@ -1015,6 +1199,7 @@ mtcConfigDoc = _mtcConfigDoc;
     [super encodeWithCoder:encoder];
     [encoder encodeInt:viewType forKey:@"viewType"];
 
+    //CouchDB
     [encoder encodeObject:self.orcaDBUserName forKey:@"ORSNOPModelOrcaDBUserName"];
     [encoder encodeObject:self.orcaDBPassword forKey:@"ORSNOPModelOrcaDBPassword"];
     [encoder encodeObject:self.orcaDBName forKey:@"ORSNOPModelOrcaDBName"];
@@ -1025,7 +1210,27 @@ mtcConfigDoc = _mtcConfigDoc;
     [encoder encodeObject:self.debugDBName forKey:@"ORSNOPModelDebugDBName"];
     [encoder encodeInt32:self.debugDBPort forKey:@"ORSNOPModelDebugDBPort"];
     [encoder encodeObject:self.debugDBIPAddress forKey:@"ORSNOPModelDebugDBIPAddress"];
+
+    //Runs tab
     [encoder encodeObject:self.runTypeMask forKey:@"SNOPRunTypeMask"];
+    [encoder encodeObject:[self standardRunType] forKey:@"SNOPStandarRunType"];
+    [encoder encodeObject:[self standardRunVersion] forKey:@"SNOPStandarRunVersion"];
+    [encoder encodeInt:[self ECA_pattern] forKey:@"SNOPECApattern"];
+    [encoder encodeInt:[self ECA_type] forKey:@"SNOPECAtype"];
+    [encoder encodeInt:[self ECA_tslope_pattern] forKey:@"SNOPECAtslppattern"];
+    [encoder encodeDouble:[self ECA_subrun_time] forKey:@"SNOPECAsubruntime"];
+
+    [encoder encodeObject:[self mtcHost] forKey:@"mtcHost"];
+    [encoder encodeInt:[self mtcPort] forKey:@"mtcPort"];
+
+    [encoder encodeObject:[self xl3Host] forKey:@"xl3Host"];
+    [encoder encodeInt:[self xl3Port] forKey:@"xl3Port"];
+
+    [encoder encodeObject:[self dataHost] forKey:@"dataHost"];
+    [encoder encodeInt:[self dataPort] forKey:@"dataPort"];
+
+    [encoder encodeObject:[self logHost] forKey:@"logHost"];
+    [encoder encodeInt:[self logPort] forKey:@"logPort"];
 }
 
 - (NSString*) reformatSelectionString:(NSString*)aString forSet:(int)aSet
@@ -1112,14 +1317,14 @@ mtcConfigDoc = _mtcConfigDoc;
 
 - (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
  {
- 
+
      ORCouchDB* result = [ORCouchDB couchHost:self.orcaDBIPAddress
                                          port:self.orcaDBPort
                                      username:self.orcaDBUserName
                                           pwd:self.orcaDBPassword
                                      database:entryDB
                                      delegate:self];
- 
+     
      if (aCouchDelegate)
          [result setDelegate:aCouchDelegate];
  
@@ -1159,6 +1364,14 @@ mtcConfigDoc = _mtcConfigDoc;
     
     //unsigned int* pt_step_crate = pt_step[0];
     
+}
+
+
+- (void)hvMasterTriggersOFF
+{
+    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(setIsPollingXl3:) withObject:NO];
+    
+    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersOFF)];
 }
 
 - (void) getSmellieRunListInfo
@@ -1231,7 +1444,174 @@ mtcConfigDoc = _mtcConfigDoc;
     }
 }
 
+- (NSString*)standardRunType
+{
+    return standardRunType;
+}
+
+- (NSString*)standardRunVersion
+{
+    return standardRunVersion;
+}
+
+- (void) setStandardRunType:(NSString *)aValue
+{
+    [aValue retain];
+    [standardRunType release];
+    standardRunType = aValue;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelSRChangedNotification object:self];
+}
+
+- (void) setStandardRunVersion:(NSString *)aValue
+{
+    [aValue retain];
+    [standardRunVersion release];
+    standardRunVersion = aValue;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelSRVersionChangedNotification object:self];
+}
+
+- (int)ECA_pattern
+{
+    return ECA_pattern;
+}
+
+- (void) setECA_pattern:(int)aValue
+{
+    ECA_pattern = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
+}
+
+- (int)ECA_type
+{
+    return ECA_type;
+}
+
+- (void) setECA_type:(int)aValue
+{
+    ECA_type = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
+}
+
+- (int)ECA_tslope_pattern
+{
+    return ECA_tslope_pattern;
+}
+
+- (void) setECA_tslope_pattern:(int)aValue
+{
+    ECA_tslope_pattern = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
+}
+
+- (double)ECA_subrun_time
+{
+    return ECA_subrun_time;
+}
+
+- (void) setECA_subrun_time:(double)aValue
+{
+    ECA_subrun_time = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
+}
+
+// Load last MTC values (saved with 'saveStandardRun') from the DB for the selected Standard Run
+-(BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion
+{
+
+    //Alert the operator
+    if(runTypeName == nil || runVersion == nil){
+        NSLog(@"Please, set a valid name and click enter. \n");
+        return false;
+    }
+    NSLog(@"Loading settings for standard run: %@ - Version: %@ ........ \n",runTypeName, runVersion);
+
+    //Get MTC model
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    ORMTCModel* mtcModel = [objs objectAtIndex:0];
+
+    //Query the OrcaDB and get a dictionary with the parameters
+    NSString *urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/orca/_design/standardRuns/_view/getStandardRuns?startkey=[\"%@\",\"%@\",{}]&endkey=[\"%@\",\"%@\",0]&descending=True&include_docs=True",[self orcaDBUserName],[self orcaDBPassword],[self orcaDBIPAddress],[self orcaDBPort],runTypeName,runVersion,runTypeName,runVersion];
+
+    NSString* urlStringScaped = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    NSURL *url = [NSURL URLWithString:urlStringScaped];
+    NSData *data = [NSData dataWithContentsOfURL:url];
+    NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    NSError *error =  nil;
+    NSDictionary *detectorSettings = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
+
+    if(error) {
+        NSLog(@"Error querying couchDB, please check the connection is correct: \n %@ \n", ret);
+        return false;
+    }
+    
+    //Load values
+    @try{
+
+        //Set pedestal mode if ECA
+        if([runTypeName isEqualToString:@"ECA"]){
+            [mtcModel setIsPedestalEnabledInCSR:1];
+        }
+        else{
+            [mtcModel setIsPedestalEnabledInCSR:0];
+        }
+        
+        //Load MTC/D parameters, trigger masks and MTC/A+ thresholds
+        for (int iparam=0; iparam<kDbLookUpTableSize; iparam++) {
+            [mtcModel setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtcModel getDBKeyByIndex:iparam]] forIndex:iparam];
+        }
+        
+        NSLog(@"Standard run %@ settings loaded. \n",runTypeName);
+        return true;
+    }
+    @catch (NSException *e) {
+        NSLog(@"Error ",e);
+        return false;
+    }
+    
+}
+
+//Save MTC settings in a Standard Run table in CouchDB for later use by the Run Scripts or the user
+-(BOOL) saveStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion
+{
+    
+    //Check that runTypeName is properly set:
+    if(runTypeName == nil || runVersion == nil){
+        ORRunAlertPanel(@"Invalid Standard Run Name",@"Please, set a valid name in the popup menus and click enter",@"OK",nil,nil);
+        return false;
+    }
+    NSLog(@"Saving settings for Standard Run: %@ - Version: %@ ........ \n",runTypeName,runVersion);
+
+    //Get MTC model
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    ORMTCModel* mtcModel = [objs objectAtIndex:0];
+
+    //Build run table
+    NSMutableDictionary *detectorSettings = [NSMutableDictionary dictionaryWithCapacity:100];
+    
+    [detectorSettings setObject:@"standard_run" forKey:@"type"];
+    [detectorSettings setObject:runTypeName forKey:@"run_type"];
+    [detectorSettings setObject:runVersion forKey:@"run_version"];
+    NSNumber *date = [NSNumber numberWithDouble:[[NSDate date] timeIntervalSince1970]];
+    [detectorSettings setObject:date forKey:@"time_stamp"];
+
+    //Save MTC/D parameters, trigger masks and MTC/A+ thresholds
+    for (int iparam=0; iparam<kDbLookUpTableSize; iparam++) {
+        // NSLog(@" Writting %@ to %@ \n", [mtcModel dbObjectByIndex:ithres+kNHit100HiThreshold], [thresholdNames objectAtIndex:ithres]);
+        [detectorSettings setObject:[mtcModel dbObjectByIndex:iparam] forKey:[mtcModel getDBKeyByIndex:iparam]];
+    }
+    
+    [[self orcaDbRefWithEntryDB:self withDB:@"orca"] addDocument:detectorSettings tag:@"kStandardRunDocumentAdded"];
+
+    NSLog(@"%@ run saved as standard run. \n",runTypeName);
+    return true;
+
+}
+
+
 @end
+
 
 @implementation SNOPModel (private)
 
@@ -1617,9 +1997,9 @@ mtcConfigDoc = _mtcConfigDoc;
     
     //FILL information from the Caen
     NSMutableDictionary* caenArray = [NSMutableDictionary dictionaryWithCapacity:100];
-    NSArray* caenObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCaen1720Model")];
+    NSArray* caenObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOCaenModel")];
     if([caenObjects count]){
-        ORCaen1720Model* theCaen        = [caenObjects objectAtIndex:0]; //there is only one Caen object
+        SNOCaenModel* theCaen        = [caenObjects objectAtIndex:0]; //there is only one Caen object
         NSMutableDictionary* ioArray    = [NSMutableDictionary dictionaryWithCapacity:20];
         [ioArray setObject:[NSNumber numberWithUnsignedLong:[theCaen frontPanelControlMask]] forKey:@"io_bit_mask"];
     
@@ -1915,7 +2295,7 @@ mtcConfigDoc = _mtcConfigDoc;
     
     // array object at 0
     //NSEnumerator* e = [listOfCards objectEnumerator];
-    //ORCaen1720Model* aCard;
+    //SNOCaenModel* aCard;
     //while(aCard = [e nextObject]){
     //    if([aCard crateNumber] == crate && [aCard slot] == card){
     //        [actualCards setObject:aCard forKey:aKey];

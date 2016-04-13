@@ -71,6 +71,8 @@ eXL3_CrateStates;
     unsigned        bundleWriteMark;
     NSLock*         bundleBufferLock;
     long            bundleFreeSpace;
+
+    NSString *xl3Host;
 }
 
 @property (assign,nonatomic) BOOL isConnected;
@@ -84,6 +86,9 @@ eXL3_CrateStates;
 - (void) dealloc;
 - (void) wakeUp; 
 - (void) sleep ;	
+
+- (void) setXL3Host: (NSString *) host;
+- (NSString *) xl3Host;
 
 #pragma mark •••DataTaker Helpers
 - (BOOL) bundleAvailable;

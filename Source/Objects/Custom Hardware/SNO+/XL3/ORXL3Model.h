@@ -223,6 +223,8 @@ enum {
 - (void) wakeUp;
 - (void) sleep;
 
+- (void) awakeAfterDocumentLoaded;
+
 #pragma mark •••Accessors
 - (NSString*) shortName;
 - (id) controllerCard;
