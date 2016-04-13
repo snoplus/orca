@@ -225,7 +225,6 @@ enum {
 
 - (void) awakeAfterDocumentLoaded;
 
-- (void) groupChanged: (NSNotification *) note;
 - (void) registerNotificationObservers;
 
 #pragma mark •••Accessors

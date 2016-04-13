@@ -222,44 +222,34 @@ resetFifoOnStart = _resetFifoOnStart;
     return self;
 }
 
-- (void) awakeAfterDocumentLoaded
+- (void) updateSettings
 {
     NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document]
          collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
 
     SNOPModel* sno;
-    if ([objs count] == 0) {
-        NSLogColor([NSColor redColor], @"mtc: Couldn't find SNO+ model to get MTC server hostname and port from. Please add a SNO+ model object to the experiment.\n");
-    } else {
-        sno = [objs objectAtIndex:0];
-        [self setMTCHost:[sno mtcHost]];
-        [self setMTCPort:[sno mtcPort]];
-    }
+    if ([objs count] == 0) return;
+
+    sno = [objs objectAtIndex:0];
+    [self setMTCHost:[sno mtcHost]];
+    [self setMTCPort:[sno mtcPort]];
+}
+
+- (void) awakeAfterDocumentLoaded
+{
+    [self updateSettings];
 }
 
 - (void) setMTCPort: (int) port
 {
-    mtcPort = port;
-    [mtc disconnect];
     [mtc setPort:port];
-}
-
-- (int) mtcPort
-{
-    return mtcPort;
+    [mtc disconnect];
 }
 
 - (void) setMTCHost: (NSString *) host
 {
-    [mtcHost release];
-    mtcHost = [host copy];
-    [mtc disconnect];
     [mtc setHost:host];
-}
-
-- (NSString *) mtcHost
-{
-    return mtcHost;
+    [mtc disconnect];
 }
 
 - (void) dealloc
@@ -296,22 +286,6 @@ resetFifoOnStart = _resetFifoOnStart;
     return YES;
 }
 
-- (void) groupChanged: (NSNotification *) note
-{
-    int i;
-
-    NSDictionary *userInfo = [note userInfo];
-    NSArray *objs = [userInfo objectForKey:ORGroupObjectList];
-
-    for (i = 0; i < [objs count]; i++) {
-        if ([objs objectAtIndex:i] == self) {
-            /* We just got added. Make sure to sync the MTC hostname and
-             * port from the SNO+ model. */
-            [self awakeAfterDocumentLoaded];
-        }
-    }
-}
-
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -319,11 +293,6 @@ resetFifoOnStart = _resetFifoOnStart;
     [notifyCenter addObserver : self
                      selector : @selector(runAboutToStart:)
                          name : @"SNOPRunStart"
-                       object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(groupChanged:)
-                         name : ORGroupObjectsAdded
                        object : nil];
 }
 
@@ -821,11 +790,16 @@ resetFifoOnStart = _resetFifoOnStart;
     [self setMtcaOWLNMask:[decoder decodeIntForKey:@"mtcaOWLNMask"]];
     [self setIsPedestalEnabledInCSR:[decoder decodeBoolForKey:@"isPedestalEnabledInCSR"]];
 
-    [self setMTCHost:[decoder decodeObjectForKey:@"mtcHost"]];
-    [self setMTCPort:[decoder decodeIntForKey:@"mtcPort"]];
-    
 	if(!mtcDataBase)[self setupDefaults];
     [[self undoManager] enableUndoRegistration];
+
+    /* We need to sync the MTC server hostname and port with the SNO+ model.
+     * Usually this is done in the awakeAfterDocumentLoaded function, because
+     * there we are guaranteed that the SNO+ model already exists.
+     * We call updateSettings here too though to cover the case that this
+     * object was added to an already existing experiment in which case
+     * awakeAfterDocumentLoaded is not called. */
+    [self updateSettings];
 	
     return self;
 }
@@ -857,8 +831,6 @@ resetFifoOnStart = _resetFifoOnStart;
     [encoder encodeInt:[self mtcaEHIMask] forKey:@"mtcaOEHIMask"];
     [encoder encodeInt:[self mtcaEHIMask] forKey:@"mtcaOWLNMask"];
     [encoder encodeBool:[self isPedestalEnabledInCSR] forKey:@"isPedestalEnabledInCSR"];
-    [encoder encodeInt:[self mtcPort] forKey:@"mtcPort"];
-    [encoder encodeObject:[self mtcHost] forKey:@"mtcHost"];
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
