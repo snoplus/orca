@@ -135,6 +135,11 @@ snotDb = _snotDb;
 	return self;
 }
 
+- (void) awakeAfterDocumentLoaded
+{
+    if (xl3Link) [xl3Link awakeAfterDocumentLoaded];
+}
+
 - (void) setUpImage
 {
 	[self setImage:[NSImage imageNamed:@"XL3Card"]];
@@ -151,11 +156,6 @@ snotDb = _snotDb;
     [xl3DateFormatter release];
     [hvInitLock release];
 	[super dealloc];
-}
-
-- (void) awakeAfterDocumentLoaded
-{
-    if (xl3Link) [xl3Link awakeAfterDocumentLoaded];
 }
 
 - (void) wakeUp 
