@@ -46,7 +46,6 @@ enum {
 {
     self = [super init];
     [self setTaskInterval:60];
-    [self setMaxSamples:200];
     [self setLaunchTime:[NSDate date]];
     [self launchTask];
     return self;
@@ -99,16 +98,6 @@ enum {
     [aLaunchTime retain];
     [launchTime release];
     launchTime = aLaunchTime;
-}
-
-- (int) maxSamples
-{
-    return maxSamples;
-}
-
-- (void) setMaxSamples:(int)aMaxSamples
-{
-    maxSamples = aMaxSamples;
 }
 
 - (NSTimeInterval) taskInterval
@@ -169,7 +158,10 @@ enum {
         
 		int i;
 		for(i=0;i<kNumWatchedValues;i++){
-			if(!timeRate[i])timeRate[i] = [[ORTimeRate alloc] init];
+            if(!timeRate[i]){
+                timeRate[i] = [[ORTimeRate alloc] init];
+                [timeRate[i] setSampleTime:taskInterval];
+            }
 		}
         [self setTaskResult:[NSMutableString string]];
 		
