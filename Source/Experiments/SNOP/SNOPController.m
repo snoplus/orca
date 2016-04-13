@@ -562,6 +562,7 @@ smellieRunFile;
 - (void) dbOrcaDBIPChanged:(NSNotification*)aNote
 {
     [orcaDBIPAddressPU setStringValue:[model orcaDBIPAddress]];
+    [self refreshStandardRuns];
 }
 
 - (void) dbDebugDBIPChanged:(NSNotification*)aNote
@@ -1499,6 +1500,7 @@ smellieRunFile;
     
     if(error) {
         NSLog(@"Error querying couchDB, please check the connection is correct: \n %@ \n", ret);
+        [model setStandardRunType:@""];
         return;
     }
 
@@ -1538,6 +1540,7 @@ smellieRunFile;
     
     if(error) {
         NSLog(@"Error querying couchDB, please check the connection is correct: \n %@ \n", ret);
+        [model setStandardRunVersion:@""];
         return;
     }
     
