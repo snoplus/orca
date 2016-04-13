@@ -129,17 +129,25 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     [[self undoManager] disableUndoRegistration];
 
     [self registerNotificationObservers];
-	
+
     /* initialize our connection to the MTC server */
     mtc_server = [[RedisClient alloc] init];
-	
+
     [self setBaseAddress:k792DefaultBaseAddress];
     [self setAddressModifier:k792DefaultAddressModifier];
 	[self setEnabledMask:0xFF];
     [self setEventSize:0xa];
     [self setNumberBLTEventsToReadout:kNumberBLTEventsToReadout];
     [[self undoManager] enableUndoRegistration];
-    
+
+    /* We need to sync the MTC server hostname and port with the SNO+ model.
+     * Usually this is done in the awakeAfterDocumentLoaded function, because
+     * there we are guaranteed that the SNO+ model already exists.
+     * We call updateSettings here too though to cover the case that this
+     * object was added to an already existing experiment in which case
+     * awakeAfterDocumentLoaded is not called. */
+    [self updateSettings];
+
     return self;
 }
 

@@ -213,12 +213,21 @@ resetFifoOnStart = _resetFifoOnStart;
 
     /* initialize our connection to the MTC server */
     mtc = [[RedisClient alloc] init];
-	
+
     [[self undoManager] disableUndoRegistration];
-    
+
     [[self undoManager] enableUndoRegistration];
 	[self setFixedPulserRateCount: 1];
 	[self setFixedPulserRateDelay: 10];
+
+    /* We need to sync the MTC server hostname and port with the SNO+ model.
+     * Usually this is done in the awakeAfterDocumentLoaded function, because
+     * there we are guaranteed that the SNO+ model already exists.
+     * We call updateSettings here too though to cover the case that this
+     * object was added to an already existing experiment in which case
+     * awakeAfterDocumentLoaded is not called. */
+    [self updateSettings];
+
     return self;
 }
 
@@ -800,7 +809,7 @@ resetFifoOnStart = _resetFifoOnStart;
      * object was added to an already existing experiment in which case
      * awakeAfterDocumentLoaded is not called. */
     [self updateSettings];
-	
+
     return self;
 }
 
