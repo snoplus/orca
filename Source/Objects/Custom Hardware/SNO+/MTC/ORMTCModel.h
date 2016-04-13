@@ -119,7 +119,6 @@
 
 - (void) awakeAfterDocumentLoaded;
 
-- (void) groupChanged: (NSNotification *) note;
 - (void) registerNotificationObservers;
 - (void) runAboutToStart:(NSNotification*)aNote;
 
