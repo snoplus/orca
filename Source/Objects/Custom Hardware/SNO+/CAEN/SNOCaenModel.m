@@ -143,48 +143,39 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     return self;
 }
 
-- (void) awakeAfterDocumentLoaded
+- (void) updateSettings
 {
     NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document]
          collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
 
     SNOPModel* sno;
-    if ([objs count] == 0) {
-        NSLogColor([NSColor redColor], @"caen: Couldn't find SNO+ model to get MTC server hostname and port from. Please add a SNO+ model object to the experiment.\n");
-    } else {
-        sno = [objs objectAtIndex:0];
-        [self setMTCHost:[sno mtcHost]];
-        [self setMTCPort:[sno mtcPort]];
-    }
+    if ([objs count] == 0) return;
+
+    sno = [objs objectAtIndex:0];
+    [self setMTCHost:[sno mtcHost]];
+    [self setMTCPort:[sno mtcPort]];
+}
+
+- (void) awakeAfterDocumentLoaded
+{
+    [self updateSettings];
 }
 
 - (void) setMTCPort: (int) port
 {
-    mtcPort = port;
-    [mtc_server disconnect];
     [mtc_server setPort:port];
-}
-
-- (int) mtcPort
-{
-    return mtcPort;
+    [mtc_server disconnect];
 }
 
 - (void) setMTCHost: (NSString *) host
 {
-    [mtcHost release];
-    mtcHost = [host copy];
-    [mtc_server disconnect];
     [mtc_server setHost:host];
-}
-
-- (NSString *) mtcHost
-{
-    return mtcHost;
+    [mtc_server disconnect];
 }
 
 - (void) dealloc 
 {
+    [mtc_server release];
     [waveFormRateGroup release];
 	[bufferFullAlarm release];
     [super dealloc];
@@ -195,22 +186,6 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 	return NSMakeRange(baseAddress,0xEF28);
 }
 
-- (void) groupChanged: (NSNotification *) note
-{
-    int i;
-
-    NSDictionary *userInfo = [note userInfo];
-    NSArray *objs = [userInfo objectForKey:ORGroupObjectList];
-
-    for (i = 0; i < [objs count]; i++) {
-        if ([objs objectAtIndex:i] == self) {
-            /* We just got added. Make sure to sync the MTC hostname and
-             * port from the SNO+ model. */
-            [self awakeAfterDocumentLoaded];
-        }
-    }
-}
-
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -218,11 +193,6 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     [notifyCenter addObserver : self
                      selector : @selector(runAboutToStart:)
                          name : @"SNOPRunStart"
-                       object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(groupChanged:)
-                         name : ORGroupObjectsAdded
                        object : nil];
 }
 
@@ -1165,10 +1135,16 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
         [self setOverUnderThreshold:i withValue:[aDecoder decodeIntForKey: [NSString stringWithFormat:@"CAENOverUnderChnl%d", i]]];
     }
 
-    [self setMTCHost:[aDecoder decodeObjectForKey:@"mtcHost"]];
-    [self setMTCPort:[aDecoder decodeIntForKey:@"mtcPort"]];
-    
     [[self undoManager] enableUndoRegistration];
+
+    /* We need to sync the MTC server hostname and port with the SNO+ model.
+     * Usually this is done in the awakeAfterDocumentLoaded function, because
+     * there we are guaranteed that the SNO+ model already exists.
+     * We call updateSettings here too though to cover the case that this
+     * object was added to an already existing experiment in which case
+     * awakeAfterDocumentLoaded is not called. */
+    [self updateSettings];
+
     return self;
 }
 
@@ -1197,9 +1173,6 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
         [anEncoder encodeInt32:thresholds[i] forKey:[NSString stringWithFormat:@"CAENThresChnl%d", i]];
         [anEncoder encodeInt:overUnderThreshold[i] forKey:[NSString stringWithFormat:@"CAENOverUnderChnl%d", i]];
     }
-
-    [anEncoder encodeInt:[self mtcPort] forKey:@"mtcPort"];
-    [anEncoder encodeObject:[self mtcHost] forKey:@"mtcHost"];
 }
 
 #pragma mark •••HW Wizard
