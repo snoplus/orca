@@ -141,6 +141,7 @@ enum {
 
 @property (assign, nonatomic)   BOOL    continuousMode;
 
+- (void) groupChanged: (NSNotification *) note;
 - (void) registerNotificationObservers;
 - (void) runAboutToStart:(NSNotification*)aNote;
 
