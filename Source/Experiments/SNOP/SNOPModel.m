@@ -43,6 +43,7 @@
 #import "RedisClient.h"
 #include <stdint.h>
 #import "SNOCaenModel.h"
+#import "XL3_Link.h"
 
 NSString* ORSNOPModelViewTypeChanged	= @"ORSNOPModelViewTypeChanged";
 static NSString* SNOPDbConnector	= @"SNOPDbConnector";

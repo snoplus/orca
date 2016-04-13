@@ -24,10 +24,8 @@
 typedef enum eXL3_ConnectStates {
 	kDisconnected,
 	kWaiting,
-	kConnected,
-	kNumStates //must be last
-}
-eXL3_CrateStates;
+	kConnected
+} eXL3_CrateStates;
 
 
 @interface XL3_Link : ORGroup
