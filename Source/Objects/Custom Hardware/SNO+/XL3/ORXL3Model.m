@@ -173,22 +173,6 @@ snotDb = _snotDb;
 	}
 }
 
-- (void) groupChanged: (NSNotification *) note
-{
-    int i;
-
-    NSDictionary *userInfo = [note userInfo];
-    NSArray *objs = [userInfo objectForKey:ORGroupObjectList];
-
-    for (i = 0; i < [objs count]; i++) {
-        if ([objs objectAtIndex:i] == self) {
-            /* We just got added. Make sure to sync the XL3 hostname
-             * from the SNO+ model. */
-            [self awakeAfterDocumentLoaded];
-        }
-    }
-}
-
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -201,11 +185,6 @@ snotDb = _snotDb;
     [notifyCenter addObserver : self
                      selector : @selector(runAboutToStart:)
                          name : @"SNOPRunStart"
-                       object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(groupChanged:)
-                         name : ORGroupObjectsAdded
                        object : nil];
 }
 

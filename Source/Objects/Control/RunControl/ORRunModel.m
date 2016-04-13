@@ -783,7 +783,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 }
 
 
-- (BOOL)nextRunWillQuickStart
+- (BOOL) nextRunWillQuickStart
 {
     return _nextRunWillQuickStart;
 }
@@ -1527,22 +1527,16 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	unsigned long data[4];
 	data[0] = dataId | 4;
 	data[1] =  0;
-	if(_nextRunWillQuickStart){
-		data[1] |= 0x2;			//set the reset bit
-		_nextRunWillQuickStart = NO;
-	}
-	
-	if(remoteControl){
-		data[1] |= 0x4;			//set the remotebit
-	}
-	
+	if(_wasQuickStart)data[1] |= 0x2;
+	if(remoteControl) data[1] |= 0x4;
 	data[1] |= ([self subRunNumber]&0xffff)<<16;
-
-	data[2] = lastRunNumberShipped;
-	data[3] = ut_time;
+	data[2]  = lastRunNumberShipped;
+	data[3]  = ut_time;
 
 	[dataPacket addLongsToFrameBuffer:data length:4];
-	
+    
+    if(_nextRunWillQuickStart)_nextRunWillQuickStart = NO;
+
 	//closeout run will wait until the processing thread is done.
 	[nextObject closeOutRun:runInfo];
 	
@@ -1749,11 +1743,11 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     unsigned long data[4];
     
     data[0] = dataId | 4;
-    data[1] =  0x01 | 0x20; //start of run and first sub run
+    data[1] = 0x01   | 0x20; //start of run and first sub run
     _wasQuickStart = !doInit;
     
     if(_wasQuickStart){
-        data[1] |= 0x2;			//set the reset bit
+        data[1] |= 0x2;
         _nextRunWillQuickStart = NO;
     }
     if(remoteControl){

@@ -43,6 +43,7 @@
 #import "RedisClient.h"
 #include <stdint.h>
 #import "SNOCaenModel.h"
+#import "XL3_Link.h"
 
 NSString* ORSNOPModelViewTypeChanged	= @"ORSNOPModelViewTypeChanged";
 static NSString* SNOPDbConnector	= @"SNOPDbConnector";
@@ -259,7 +260,7 @@ logPort;
     ORXL3Model* xl3;
     for (i = 0; i < [xl3s count]; i++) {
         xl3 = [xl3s objectAtIndex:i];
-        [[xl3 xl3Link] setXL3Host:host];
+        [[xl3 xl3Link] disconnectSocket];
     }
 
     [[NSNotificationCenter defaultCenter]
