@@ -29,8 +29,7 @@
 #import <sys/select.h>
 #import <sys/errno.h>
 #include "anet.h"
-
-#define XL3_SERVER "daq1.sp.snolab.ca"
+#import "SNOPModel.h"
 
 NSString* XL3_LinkConnectionChanged     = @"XL3_LinkConnectionChanged";
 NSString* XL3_LinkTimeConnectedChanged	= @"XL3_LinkTimeConnectedChanged";
@@ -76,6 +75,18 @@ readFifoFlag = _readFifoFlag;
 	return self;
 }
 
+- (void) setXL3Host: (NSString *) host
+{
+    [xl3Host release];
+    xl3Host = [host copy];
+    [self disconnectSocket];
+}
+
+- (NSString *) xl3Host
+{
+    return xl3Host;
+}
+
 - (void) dealloc
 {
 	[commandSocketLock release];
@@ -114,6 +125,17 @@ readFifoFlag = _readFifoFlag;
 
 - (void) awakeAfterDocumentLoaded
 {
+    NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+
+    SNOPModel* sno;
+    if ([objs count] == 0) {
+        NSLogColor([NSColor redColor], @"xl3: Couldn't find SNO+ model to get XL3 server hostname and port from. Please add a SNO+ model object to the experiment.\n");
+    } else {
+        sno = [objs objectAtIndex:0];
+        [self setXL3Host:[sno xl3Host]];
+    }
+
     if (autoConnect) [self connectSocket];
 }
 
@@ -153,6 +175,7 @@ readFifoFlag = _readFifoFlag;
 
 	[self setErrorTimeOut: [decoder decodeIntForKey: @"errorTimeOut"]];
     [self setAutoConnect: [decoder decodeBoolForKey: @"autoConnect"]];
+    [self setXL3Host: [decoder decodeObjectForKey: @"xl3Host"]];
 	[self setNeedToSwap];
 
 	commandSocketLock = [[NSLock alloc] init];
@@ -173,6 +196,7 @@ readFifoFlag = _readFifoFlag;
 	[super encodeWithCoder:encoder];
 	[encoder encodeInt:[self errorTimeOut] forKey:@"errorTimeOut"];
     [encoder encodeBool:autoConnect forKey:@"autoConnect"];
+    [encoder encodeObject:xl3Host forKey:@"xl3Host"];
 }
 
 
@@ -698,7 +722,7 @@ static void SwapLongBlock(void* p, int32_t n)
     [[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectStateChanged object: self];
 
     workingSocket = 0;
-    if ((workingSocket = anetTcpConnect(err, XL3_SERVER, portNumber)) == ANET_ERR) {
+    if ((workingSocket = anetTcpConnect(err, (char *) [xl3Host UTF8String], portNumber)) == ANET_ERR) {
         if (workingSocket) {
             close(workingSocket);
             workingSocket = 0;
