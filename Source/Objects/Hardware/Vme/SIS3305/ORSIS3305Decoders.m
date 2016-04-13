@@ -142,7 +142,7 @@ const unsigned short kchannelModeAndEventID[16][16] = {
         // Biggest pre-computed value  is 31 - if you see this in the data, there IS an error somewhere (only 8 channels...)
         // each of the possible decoding options should handle assigning the channel independently.
         unsigned short channel = 31;
-        NSString* channelKey = [self getChannelKey: channel];;
+        NSString* channelKey; //= [self getChannelKey: channel];;
         
         NSString* crateKey		= [self getCrateKey: crate];
         NSString* cardKey		= [self getCardKey: card];
@@ -328,7 +328,7 @@ const unsigned short kchannelModeAndEventID[16][16] = {
                                             sender: self
                                           withKeys: @"SIS3305", @"Waveform",crateKey,cardKey,channelKey,nil];
 
-        oldDataPtr = dataPtr;
+        //oldDataPtr = dataPtr;
         nextRecordPtr = dataPtr + dataLengthSingle; // take you to the start of the next SIS header
         dataPtr = nextRecordPtr;
 //        NSLog(@"    Decoded %d/%d events so far\n",n+1,numEvents);
