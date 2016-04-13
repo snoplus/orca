@@ -46,6 +46,7 @@
     IBOutlet NSMatrix*		forceFullInitMatrix;
     IBOutlet NSButton*      forceFullInitCardButton;
     IBOutlet NSButton*      viewPreampButton;
+    IBOutlet NSButton*      doHwCheckButton;
     
 	IBOutlet NSMatrix*		trapEnabledMatrix;
 	IBOutlet NSMatrix*		poleZeroEnabledMatrix;
@@ -81,6 +82,7 @@
     IBOutlet NSButton*      noiseFloorButton;
     IBOutlet NSButton*      easySetButton;
     IBOutlet NSButton*      loadThresholdsButton;
+    IBOutlet NSButton*      compareHwNowButton;
 
 	IBOutlet NSPopUpButton* downSamplePU;
 	
@@ -175,6 +177,7 @@
 - (void) postrecntChanged:(NSNotification*)aNote;
 - (void) forceFullInitChanged:(NSNotification*)aNote;
 - (void) forceFullInitCardChanged:(NSNotification*)aNote;
+- (void) doHwCheckChanged:(NSNotification*)aNote;
 
 - (void) pileUpChanged:(NSNotification*)aNote;
 - (void) integrateTimeChanged:(NSNotification*)aNote;
@@ -299,6 +302,8 @@
 - (IBAction) compareToSnapShotAction:(id)sender;
 - (IBAction) viewPreampAction:(id)sender;
 - (IBAction) loadThresholdsAction:(id)sender;
+- (IBAction) doHwCheckButtonAction:(id)sender;
+- (IBAction) compareHwNowButton:(id)sender;
 
 
 #pragma mark •••Data Source

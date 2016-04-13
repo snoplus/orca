@@ -430,6 +430,12 @@
                          name : ORConnectionChanged
                         object: model];
     
+    [notifyCenter addObserver : self
+                     selector : @selector(doHwCheckChanged:)
+                         name : ORGretina4MDoHwCheckChanged
+                        object: model];
+    
+    
     
    	[self registerRates];
 
@@ -519,6 +525,7 @@
     
 	[self histEMultiplierChanged:nil];
     [self initSerDesStateChanged:nil];
+    [self doHwCheckChanged:nil];
     [self lockChanged:nil];
 }
 
@@ -534,6 +541,13 @@
     if([model clockSource] == 1) [clockLockedField setStringValue:@""];
     else [clockLockedField setStringValue:[model locked]?@"":@"NOT Locked"];
 }
+
+- (void) doHwCheckChanged:(NSNotification*)aNote
+{
+   	[doHwCheckButton setIntValue: [model doHwCheck]];
+
+}
+
 
 - (void) initSerDesStateChanged:(NSNotification*) aNote
 {
@@ -1792,12 +1806,16 @@
 - (IBAction) snapShotRegistersAction:(id)sender
 {
     [model snapShotRegisters];
-
 }
 
 - (IBAction) compareToSnapShotAction:(id)sender
 {
     [model compareToSnapShot];
+}
+
+- (IBAction) doHwCheckButtonAction:(id)sender;
+{
+    [model setDoHwCheck:[sender intValue]];
 }
 
 - (IBAction) forceFullInitCardAction:(id)sender
@@ -1814,6 +1832,10 @@
 {
     [self endEditing];
     [model loadThresholds];
+}
+- (IBAction) compareHwNowButton:(id)sender
+{
+    [model checkBoard:YES];
 }
 
 #pragma mark •••Data Source
