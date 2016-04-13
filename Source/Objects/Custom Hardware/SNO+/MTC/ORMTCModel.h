@@ -81,6 +81,9 @@
     unsigned long _mtcStatusNumEventsInMem;
     BOOL _resetFifoOnStart;
 
+    NSString *mtcHost;
+    int mtcPort;
+
     RedisClient *mtc;
 }
 
@@ -113,6 +116,14 @@
 - (void) setUpImage;
 - (void) makeMainController;
 - (BOOL) solitaryObject;
+
+- (void) setMTCPort: (int) port;
+- (int) mtcPort;
+
+- (void) setMTCHost: (NSString *) host;
+- (NSString *) mtcHost;
+
+- (void) awakeAfterDocumentLoaded;
 
 - (void) registerNotificationObservers;
 - (void) runAboutToStart:(NSNotification*)aNote;

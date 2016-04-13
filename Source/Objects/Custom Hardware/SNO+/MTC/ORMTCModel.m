@@ -29,6 +29,7 @@
 #import "ORSelectorSequence.h"
 #import "ORRunModel.h"
 #import "ORRunController.h"
+#import "SNOPModel.h"
 
 #define uShortDBValue(A) [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] unsignedShortValue]
 #define uLongDBValue(A)  [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] unsignedLongValue]
@@ -204,12 +205,6 @@ mtcStatusDataAvailable = _mtcStatusDataAvailable,
 mtcStatusNumEventsInMem = _mtcStatusNumEventsInMem,
 resetFifoOnStart = _resetFifoOnStart;
 
-/* #define these variables for now. Eventually we need to add fields
- * to the GUI, but Javi is working on the SNOPModel now */
-#define MTC_HOST @"sbc.sp.snolab.ca"
-#define MTC_PORT 4001
-
-
 - (id) init //designated initializer
 {
     self = [super init];
@@ -217,7 +212,7 @@ resetFifoOnStart = _resetFifoOnStart;
     [self registerNotificationObservers];
 
     /* initialize our connection to the MTC server */
-    mtc = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
+    mtc = [[RedisClient alloc] init];
 	
     [[self undoManager] disableUndoRegistration];
     
@@ -225,6 +220,49 @@ resetFifoOnStart = _resetFifoOnStart;
 	[self setFixedPulserRateCount: 1];
 	[self setFixedPulserRateDelay: 10];
     return self;
+}
+
+- (void) awakeAfterDocumentLoaded
+{
+    NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+
+    NSLogColor([NSColor redColor], @"mtc object awake after document loaded\n");
+
+    SNOPModel* sno;
+    if ([objs count] == 0) {
+        NSLogColor([NSColor redColor], @"caen: Couldn't find SNO+ model to get MTC server hostname and port from. Please add a SNO+ model object to the experiment.\n");
+    } else {
+        sno = [objs objectAtIndex:0];
+        NSLogColor([NSColor redColor], @"setting host to %@\n", [sno mtcHost]);
+        [self setMTCHost:[sno mtcHost]];
+        [self setMTCPort:[sno mtcPort]];
+    }
+}
+
+- (void) setMTCPort: (int) port
+{
+    mtcPort = port;
+    [mtc disconnect];
+    [mtc setPort:port];
+}
+
+- (int) mtcPort
+{
+    return mtcPort;
+}
+
+- (void) setMTCHost: (NSString *) host
+{
+    [mtcHost release];
+    mtcHost = [host copy];
+    [mtc disconnect];
+    [mtc setHost:host];
+}
+
+- (NSString *) mtcHost
+{
+    return mtcHost;
 }
 
 - (void) dealloc
@@ -736,7 +774,7 @@ resetFifoOnStart = _resetFifoOnStart;
     [self registerNotificationObservers];
 
     /* initialize our connection to the MTC server */
-    mtc = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
+    mtc = [[RedisClient alloc] init];
 	
     [[self undoManager] disableUndoRegistration];
     [self setESumViewType:	[decoder decodeIntForKey:		@"ORMTCModelESumViewType"]];
@@ -764,6 +802,9 @@ resetFifoOnStart = _resetFifoOnStart;
     [self setMtcaOEHIMask:[decoder decodeIntForKey:@"mtcaOEHIMask"]];
     [self setMtcaOWLNMask:[decoder decodeIntForKey:@"mtcaOWLNMask"]];
     [self setIsPedestalEnabledInCSR:[decoder decodeBoolForKey:@"isPedestalEnabledInCSR"]];
+
+    [self setMTCHost:[decoder decodeObjectForKey:@"mtcHost"]];
+    [self setMTCPort:[decoder decodeIntForKey:@"mtcPort"]];
     
 	if(!mtcDataBase)[self setupDefaults];
     [[self undoManager] enableUndoRegistration];
@@ -798,6 +839,8 @@ resetFifoOnStart = _resetFifoOnStart;
     [encoder encodeInt:[self mtcaEHIMask] forKey:@"mtcaOEHIMask"];
     [encoder encodeInt:[self mtcaEHIMask] forKey:@"mtcaOWLNMask"];
     [encoder encodeBool:[self isPedestalEnabledInCSR] forKey:@"isPedestalEnabledInCSR"];
+    [encoder encodeInt:[self mtcPort] forKey:@"mtcPort"];
+    [encoder encodeObject:[self mtcHost] forKey:@"mtcHost"];
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary

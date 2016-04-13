@@ -133,6 +133,9 @@ enum {
 	unsigned long	eventSizeReg;
 	unsigned long	dataReg;
 
+    NSString *mtcHost;
+    int mtcPort;
+
     RedisClient *mtc_server;
 }
 
@@ -140,6 +143,14 @@ enum {
 
 - (void) registerNotificationObservers;
 - (void) runAboutToStart:(NSNotification*)aNote;
+
+- (void) awakeAfterDocumentLoaded;
+
+- (void) setMTCPort: (int) port;
+- (int) mtcPort;
+
+- (void) setMTCHost: (NSString *) host;
+- (NSString *) mtcHost;
 
 #pragma mark ***Accessors
 - (int)				eventSize;

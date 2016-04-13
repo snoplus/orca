@@ -109,6 +109,18 @@
 
     bool rolloverRun;
 
+    NSString *mtcHost;
+    int mtcPort;
+
+    NSString *xl3Host;
+    int xl3Port;
+
+    NSString *dataHost;
+    int dataPort;
+
+    NSString *logHost;
+    int logPort;
+
     RedisClient *mtc_server;
     RedisClient *xl3_server;
 
@@ -152,12 +164,30 @@
 @property (nonatomic,assign) bool isEmergencyStopEnabled;
 @property (nonatomic,assign) bool isEStopPolling;
 
+@property (copy,setter=setDataServerHost:) NSString *dataHost;
+@property (setter=setDataServerPort:) int dataPort;
+
+@property (copy,setter=setLogServerHost:) NSString *logHost;
+@property (setter=setLogServerPort:) int logPort;
+
 @property (copy) NSDictionary* runDocument;
 @property (copy) NSDictionary* configDocument;
 @property (copy) NSDictionary* mtcConfigDoc;
 
 
 - (id) init;
+
+- (void) setMTCPort: (int) port;
+- (int) mtcPort;
+
+- (void) setMTCHost: (NSString *) host;
+- (NSString *) mtcHost;
+
+- (void) setXL3Port: (int) port;
+- (int) xl3Port;
+
+- (void) setXL3Host: (NSString *) host;
+- (NSString *) xl3Host;
 
 - (void) initSmellieRunDocsDic;
 - (void) initOrcaDBConnectionHistory;

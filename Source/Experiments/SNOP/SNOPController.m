@@ -34,7 +34,7 @@
 #import "ORMTC_Constants.h"
 #import "ORMTCModel.h"
 #import "SNOP_Run_Constants.h"
-
+#import "SNOCaenModel.h"
 
 NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 
@@ -52,6 +52,116 @@ smellieRunFile;
 {
     self = [super initWithWindowNibName:@"SNOP"];
     return self;
+}
+
+- (IBAction) testMTCServer:(id)sender
+{
+    int port = [mtcPort intValue];
+    NSString *host = [mtcHost stringValue];
+
+    RedisClient *r = [[RedisClient alloc] initWithHostName:host withPort:port];
+
+    @try {
+        [r connect];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor], @"failed to connect: %@\n", [e reason]);
+        [r release];
+        return;
+    }
+
+    [r release];
+
+    NSLog(@"connected ok!\n");
+}
+
+- (IBAction) testXL3Server:(id)sender
+{
+    int port = [xl3Port intValue];
+    NSString *host = [xl3Host stringValue];
+
+    RedisClient *r = [[RedisClient alloc] initWithHostName:host withPort:port];
+
+    @try {
+        [r connect];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor], @"failed to connect: %@\n", [e reason]);
+        [r release];
+        return;
+    }
+
+    [r release];
+
+    NSLog(@"connected ok!\n");
+}
+
+- (IBAction) testDataServer:(id)sender
+{
+    int port = [dataPort intValue];
+    NSString *host = [dataHost stringValue];
+
+    RedisClient *r = [[RedisClient alloc] initWithHostName:host withPort:port];
+
+    @try {
+        [r connect];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor], @"failed to connect: %@\n", [e reason]);
+        [r release];
+        return;
+    }
+
+    [r release];
+
+    NSLog(@"connected ok!\n");
+}
+
+- (IBAction) testLogServer:(id)sender
+{
+    int port = [logPort intValue];
+    NSString *host = [logHost stringValue];
+
+    RedisClient *r = [[RedisClient alloc] initWithHostName:host withPort:port];
+
+    @try {
+        [r connect];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor], @"failed to connect: %@\n", [e reason]);
+        [r release];
+        return;
+    }
+
+    [r release];
+
+    NSLog(@"connected ok!\n");
+}
+
+- (IBAction) settingsChanged:(id)sender {
+    /* Settings tab changed. Set the model variables in SNOPModel. */
+    [model setMTCPort:[mtcPort intValue]];
+    [model setMTCHost:[mtcHost stringValue]];
+
+    [model setXL3Port:[xl3Port intValue]];
+    [model setXL3Host:[xl3Host stringValue]];
+
+    [model setDataServerPort:[dataPort intValue]];
+    [model setDataServerHost:[dataHost stringValue]];
+
+    [model setLogServerPort:[logPort intValue]];
+    [model setLogServerHost:[logHost stringValue]];
+}
+
+- (void) updateSettings: (NSNotification *) aNote
+{
+    [mtcHost setStringValue:[model mtcHost]];
+    [mtcPort setIntValue:[model mtcPort]];
+
+    [xl3Host setStringValue:[model xl3Host]];
+    [xl3Port setIntValue:[model xl3Port]];
+
+    [dataHost setStringValue:[model dataHost]];
+    [dataPort setIntValue:[model dataPort]];
+
+    [logHost setStringValue:[model logHost]];
+    [logPort setIntValue:[model logPort]];
 }
 
 -(void)windowDidLoad
@@ -96,6 +206,7 @@ smellieRunFile;
     [model getSmellieRunListInfo];
     [self mtcDataBaseChanged:nil];
     [self refreshStandardRuns];
+    [self updateSettings:nil];
 	[super awakeFromNib];
     [self performSelector:@selector(updateWindow)withObject:self afterDelay:0.1];
 }
@@ -176,16 +287,17 @@ smellieRunFile;
                      selector : @selector(mtcDataBaseChanged:)
                          name : ORMTCModelMtcDataBaseChanged
                         object: mtcModel];
-    
-    
-    
+
+    [notifyCenter addObserver : self
+                     selector : @selector(updateSettings:)
+                         name : @"SNOPSettingsChanged"
+                        object: mtcModel];
+
     //TODO: add the notification for changedRunType on SNO+
     /*[notifyCenter addObserver:self
                      selector:@selector(runTypesChanged:)
                          name:nil
                        object:nil];*/
-    
-    
 }
 
 - (void) updateWindow

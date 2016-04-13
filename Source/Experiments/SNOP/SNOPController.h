@@ -64,7 +64,6 @@
     IBOutlet NSMatrix *standardRunThresStoredValues;
     IBOutlet NSMatrix *standardRunThresDefaultValues;
 
-    
     //Run Types Information
     IBOutlet NSMatrix*  globalRunTypesMatrix;
     
@@ -109,12 +108,23 @@
     IBOutlet NSButton* runsLockButton;
     IBOutlet NSTextField *runStatusTextField;
 
+    IBOutlet NSTextField *mtcPort;
+    IBOutlet NSTextField *mtcHost;
+
+    IBOutlet NSTextField *xl3Port;
+    IBOutlet NSTextField *xl3Host;
+
+    IBOutlet NSTextField *dataPort;
+    IBOutlet NSTextField *dataHost;
+
+    IBOutlet NSTextField *logPort;
+    IBOutlet NSTextField *logHost;
+
     //ECA RUNS
     IBOutlet NSPopUpButton *ECApatternPopUpButton;
     IBOutlet NSPopUpButton *ECAtypePopUpButton;
     IBOutlet NSTextField *TSlopePatternTextField;
     IBOutlet NSTextField *subTimeTextField;
-    
 }
 
 @property (nonatomic,retain) NSImage* runStopImg;
@@ -131,6 +141,13 @@
 - (void) hvStatusChanged:(NSNotification*)aNote;
 - (void) dbOrcaDBIPChanged:(NSNotification*)aNote;
 - (void) dbDebugDBIPChanged:(NSNotification*)aNote;
+
+- (IBAction) testMTCServer:(id)sender;
+- (IBAction) testXL3Server:(id)sender;
+- (IBAction) testDataServer:(id)sender;
+- (IBAction) testLogServer:(id)sender;
+
+- (void) updateSettings: (NSNotification *) aNote;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) viewTypeAction:(id)sender;

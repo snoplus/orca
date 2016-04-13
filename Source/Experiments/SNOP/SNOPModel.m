@@ -36,13 +36,13 @@
 #import "ORFec32Model.h"
 #import "OROrderedObjManager.h"
 #import "ORSNOConstants.h"
-#import "ORCaen1720Model.h"
 #import "ELLIEModel.h"
 #import "SNOP_Run_Constants.h"
 #import "SBC_Link.h"
 #import "SNOCmds.h"
 #import "RedisClient.h"
 #include <stdint.h>
+#import "SNOCaenModel.h"
 
 NSString* ORSNOPModelViewTypeChanged	= @"ORSNOPModelViewTypeChanged";
 static NSString* SNOPDbConnector	= @"SNOPDbConnector";
@@ -99,17 +99,13 @@ snopRunTypeMask = snopRunTypeMask,
 runTypeMask= runTypeMask,
 isEStopPolling = isEStopPolling,
 isEmergencyStopEnabled = isEmergencyStopEnabled,
-mtcConfigDoc = _mtcConfigDoc;
+mtcConfigDoc = _mtcConfigDoc,
+dataHost,
+dataPort,
+logHost,
+logPort;
 
 @synthesize smellieRunHeaderDocList;
-
-/* #define these variables for now. Eventually we need to add fields
- * to the GUI, but Javi is working on the SNOPModel now */
-#define MTC_HOST @"sbc.sp.snolab.ca"
-#define MTC_PORT 4001
-#define XL3_HOST @"daq1.sp.snolab.ca"
-#define XL3_PORT 4004
-
 
 #pragma mark ¥¥¥Initialization
 
@@ -117,15 +113,26 @@ mtcConfigDoc = _mtcConfigDoc;
 {
     self = [super init];
 
-    /* initialize our connection to the MTC server */
-    mtc_server = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
-
-    /* initialize our connection to the XL3 server */
-    xl3_server = [[RedisClient alloc] initWithHostName:XL3_HOST withPort:XL3_PORT];
-
     rolloverRun = NO;
 
+    /* initialize our connection to the MTC server */
+    mtc_server = [[RedisClient alloc] init];
+
+    /* initialize our connection to the XL3 server */
+    xl3_server = [[RedisClient alloc] init];
+
     [[self undoManager] disableUndoRegistration];
+
+    [self setMTCHost:@""];
+    [self setXL3Host:@""];
+    [self setDataServerHost:@""];
+    [self setLogServerHost:@""];
+
+    [self setMTCPort:4001];
+    [self setXL3Port:4004];
+    [self setDataServerPort:4005];
+    [self setLogServerPort:4001];
+
 	[self initOrcaDBConnectionHistory];
 	[self initDebugDBConnectionHistory];
     [self initSmellieRunDocsDic];
@@ -135,15 +142,138 @@ mtcConfigDoc = _mtcConfigDoc;
     return self;
 }
 
+- (void) setMTCPort: (int) port
+{
+    int i;
+
+    if (port == mtcPort) return;
+
+    mtcPort = port;
+    [mtc_server disconnect];
+    [mtc_server setPort:port];
+
+    /* Set the MTC server hostname for the MTC model. */
+    NSArray* mtcs = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+
+    ORMTCModel* mtc;
+    for (i = 0; i < [mtcs count]; i++) {
+        mtc = [mtcs objectAtIndex:0];
+        [mtc setMTCPort:port];
+    }
+
+    /* Set the MTC server hostname for the CAEN model. */
+    NSArray* caens = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"SNOCaenModel")];
+
+    SNOCaenModel* caen;
+    for (i = 0; i < [caens count]; i++) {
+        caen = [caens objectAtIndex:0];
+        [caen setMTCPort:port];
+    }
+
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:@"SNOPSettingsChanged" object:self];
+}
+
+- (int) mtcPort
+{
+    return mtcPort;
+}
+
+- (void) setMTCHost: (NSString *) host
+{
+    int i;
+
+    if ([host isEqualToString:mtcHost]) return;
+
+    [mtcHost release];
+    mtcHost = [host copy];
+    [mtc_server disconnect];
+    [mtc_server setHost:host];
+
+    /* Set the MTC server hostname for the MTC model. */
+    NSArray* mtcs = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+
+    ORMTCModel* mtc;
+    for (i = 0; i < [mtcs count]; i++) {
+        mtc = [mtcs objectAtIndex:0];
+        [mtc setMTCHost:host];
+    }
+
+    /* Set the MTC server hostname for the CAEN model. */
+    NSArray* caens = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"SNOCaenModel")];
+
+    SNOCaenModel* caen;
+    for (i = 0; i < [caens count]; i++) {
+        caen = [caens objectAtIndex:0];
+        [caen setMTCHost:host];
+    }
+
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:@"SNOPSettingsChanged" object:self];
+}
+
+- (NSString *) mtcHost
+{
+    return mtcHost;
+}
+
+- (void) setXL3Port: (int) port
+{
+    /* Set the port number for the XL3 server redis client. */
+    if (port == xl3Port) return;
+
+    xl3Port = port;
+    [xl3_server disconnect];
+    [xl3_server setPort:port];
+
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:@"SNOPSettingsChanged" object:self];
+}
+
+- (int) xl3Port
+{
+    return xl3Port;
+}
+
+- (void) setXL3Host: (NSString *) host
+{
+    /* Set the XL3 server hostname. This function will automatically
+     * sync this value to all of the XL3 model objects. */
+    int i;
+
+    if ([host isEqualToString:xl3Host]) return;
+
+    [xl3Host release];
+    xl3Host = [host copy];
+    [xl3_server disconnect];
+    [xl3_server setHost:host];
+
+    /* Set the XL3 server hostname for the XL3 models. */
+    NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+
+    ORXL3Model* xl3;
+    for (i = 0; i < [xl3s count]; i++) {
+        xl3 = [xl3s objectAtIndex:i];
+        [[xl3 xl3Link] setXL3Host:host];
+    }
+
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:@"SNOPSettingsChanged" object:self];
+}
+
+- (NSString *) xl3Host
+{
+    return xl3Host;
+}
+
 - (id) initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
-
-    /* initialize our connection to the MTC server */
-    mtc_server = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
-
-    /* initialize our connection to the XL3 server */
-    xl3_server = [[RedisClient alloc] initWithHostName:XL3_HOST withPort:XL3_PORT];
 
     rolloverRun = NO;
 
@@ -152,8 +282,6 @@ mtcConfigDoc = _mtcConfigDoc;
 	[self initDebugDBConnectionHistory];
     [self initSmellieRunDocsDic];
 
-
-    
     [self setViewType:[decoder decodeIntForKey:@"viewType"]];
 
     //CouchDB
@@ -176,10 +304,41 @@ mtcConfigDoc = _mtcConfigDoc;
     [self setECA_type:[decoder decodeIntForKey:@"SNOPECAtype"]];
     [self setECA_tslope_pattern:[decoder decodeIntForKey:@"SNOPECAtslppattern"]];
     [self setECA_subrun_time:[decoder decodeDoubleForKey:@"SNOPECAsubruntime"]];
-    
-    [[self undoManager] enableUndoRegistration];
-    return self;
 
+    [self setMTCHost:[decoder decodeObjectForKey:@"mtcHost"]];
+    [self setMTCPort:[decoder decodeIntForKey:@"mtcPort"]];
+
+    [self setXL3Host:[decoder decodeObjectForKey:@"xl3Host"]];
+    [self setXL3Port:[decoder decodeIntForKey:@"xl3Port"]];
+
+    [self setDataServerHost:[decoder decodeObjectForKey:@"dataHost"]];
+    [self setDataServerPort:[decoder decodeIntForKey:@"dataPort"]];
+
+    [self setLogServerHost:[decoder decodeObjectForKey:@"logHost"]];
+    [self setLogServerPort:[decoder decodeIntForKey:@"logPort"]];
+
+    /* Check if we actually decoded the mtc, xl3, data, and log server
+     * hostnames and ports. decodeObjectForKey() will return NULL if the
+     * key doesn't exist, and decodeIntForKey() will return 0. */
+    if ([self mtcHost] == NULL) [self setMTCHost:@""];
+    if ([self xl3Host] == NULL) [self setXL3Host:@""];
+    if ([self dataHost] == NULL) [self setDataServerHost:@""];
+    if ([self logHost] == NULL) [self setLogServerHost:@""];
+
+    if ([self mtcPort] == 0) [self setMTCPort:4001];
+    if ([self xl3Port] == 0) [self setXL3Port:4004];
+    if ([self dataPort] == 0) [self setDataServerPort:4005];
+    if ([self logPort] == 0) [self setLogServerPort:4001];
+
+    [[self undoManager] enableUndoRegistration];
+
+    /* initialize our connection to the MTC server */
+    mtc_server = [[RedisClient alloc] initWithHostName:mtcHost withPort:mtcPort];
+
+    /* initialize our connection to the XL3 server */
+    xl3_server = [[RedisClient alloc] initWithHostName:xl3Host withPort:xl3Port];
+
+    return self;
 }
 
 - (void) setUpImage
@@ -437,8 +596,8 @@ mtcConfigDoc = _mtcConfigDoc;
 {
     /* Since we are running in a separate thread, we just open a new
      * connection to the MTC and XL3 servers. */
-    RedisClient *mtc = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
-    RedisClient *xl3 = [[RedisClient alloc] initWithHostName:XL3_HOST withPort:XL3_PORT];
+    RedisClient *mtc = [[RedisClient alloc] initWithHostName:mtcHost withPort:mtcPort];
+    RedisClient *xl3 = [[RedisClient alloc] initWithHostName:xl3Host withPort:xl3Port];
 
     while (1) {
         @try {
@@ -1060,7 +1219,18 @@ mtcConfigDoc = _mtcConfigDoc;
     [encoder encodeInt:[self ECA_type] forKey:@"SNOPECAtype"];
     [encoder encodeInt:[self ECA_tslope_pattern] forKey:@"SNOPECAtslppattern"];
     [encoder encodeDouble:[self ECA_subrun_time] forKey:@"SNOPECAsubruntime"];
-    
+
+    [encoder encodeObject:[self mtcHost] forKey:@"mtcHost"];
+    [encoder encodeInt:[self mtcPort] forKey:@"mtcPort"];
+
+    [encoder encodeObject:[self xl3Host] forKey:@"xl3Host"];
+    [encoder encodeInt:[self xl3Port] forKey:@"xl3Port"];
+
+    [encoder encodeObject:[self dataHost] forKey:@"dataHost"];
+    [encoder encodeInt:[self dataPort] forKey:@"dataPort"];
+
+    [encoder encodeObject:[self logHost] forKey:@"logHost"];
+    [encoder encodeInt:[self logPort] forKey:@"logPort"];
 }
 
 - (NSString*) reformatSelectionString:(NSString*)aString forSet:(int)aSet
@@ -1827,9 +1997,9 @@ mtcConfigDoc = _mtcConfigDoc;
     
     //FILL information from the Caen
     NSMutableDictionary* caenArray = [NSMutableDictionary dictionaryWithCapacity:100];
-    NSArray* caenObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCaen1720Model")];
+    NSArray* caenObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOCaenModel")];
     if([caenObjects count]){
-        ORCaen1720Model* theCaen        = [caenObjects objectAtIndex:0]; //there is only one Caen object
+        SNOCaenModel* theCaen        = [caenObjects objectAtIndex:0]; //there is only one Caen object
         NSMutableDictionary* ioArray    = [NSMutableDictionary dictionaryWithCapacity:20];
         [ioArray setObject:[NSNumber numberWithUnsignedLong:[theCaen frontPanelControlMask]] forKey:@"io_bit_mask"];
     
@@ -2125,7 +2295,7 @@ mtcConfigDoc = _mtcConfigDoc;
     
     // array object at 0
     //NSEnumerator* e = [listOfCards objectEnumerator];
-    //ORCaen1720Model* aCard;
+    //SNOCaenModel* aCard;
     //while(aCard = [e nextObject]){
     //    if([aCard crateNumber] == crate && [aCard slot] == card){
     //        [actualCards setObject:aCard forKey:aKey];
