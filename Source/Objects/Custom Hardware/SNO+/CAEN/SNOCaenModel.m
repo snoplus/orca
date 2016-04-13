@@ -148,14 +148,11 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document]
          collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
 
-    NSLogColor([NSColor redColor], @"mtc object awake after document loaded\n");
-
     SNOPModel* sno;
     if ([objs count] == 0) {
-        NSLogColor([NSColor redColor], @"mtc: Couldn't find SNO+ model to get MTC server hostname and port from. Please add a SNO+ model object to the experiment.\n");
+        NSLogColor([NSColor redColor], @"caen: Couldn't find SNO+ model to get MTC server hostname and port from. Please add a SNO+ model object to the experiment.\n");
     } else {
         sno = [objs objectAtIndex:0];
-        NSLogColor([NSColor redColor], @"setting host to %@\n", [sno mtcHost]);
         [self setMTCHost:[sno mtcHost]];
         [self setMTCPort:[sno mtcPort]];
     }
@@ -198,6 +195,22 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 	return NSMakeRange(baseAddress,0xEF28);
 }
 
+- (void) groupChanged: (NSNotification *) note
+{
+    int i;
+
+    NSDictionary *userInfo = [note userInfo];
+    NSArray *objs = [userInfo objectForKey:ORGroupObjectList];
+
+    for (i = 0; i < [objs count]; i++) {
+        if ([objs objectAtIndex:i] == self) {
+            /* We just got added. Make sure to sync the MTC hostname and
+             * port from the SNO+ model. */
+            [self awakeAfterDocumentLoaded];
+        }
+    }
+}
+
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -205,6 +218,11 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     [notifyCenter addObserver : self
                      selector : @selector(runAboutToStart:)
                          name : @"SNOPRunStart"
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(groupChanged:)
+                         name : ORGroupObjectsAdded
                        object : nil];
 }
 
