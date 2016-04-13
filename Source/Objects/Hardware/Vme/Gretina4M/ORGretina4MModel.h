@@ -281,7 +281,7 @@ enum Gretina4MFIFOStates {
 	BOOL			isRunning;
     NSString*       firmwareStatusString;
     BOOL            locked;
-    unsigned long   boardSerialNumber;
+    BOOL            doHwCheck;
     
     //------------------internal use only
     NSOperationQueue*	fileQueue;
@@ -392,6 +392,8 @@ enum Gretina4MFIFOStates {
 - (void) setNoiseWindow:(short)aNoiseWindow;
 - (short) noiseWindow;
 
+- (BOOL) doHwCheck;
+- (void) setDoHwCheck:(BOOL)aFlag;
 - (void) setForceFullInit:(short)chan withValue:(BOOL)aValue;
 - (void) setTriggerMode:(short)chan withValue:(short)aValue;
 - (void) setPileUp:(short)chan withValue:(short)aValue;		
@@ -477,6 +479,7 @@ enum Gretina4MFIFOStates {
 - (void) resetMainFPGA;
 - (void) resetFIFO;
 - (void) resetSingleFIFO;
+- (void) doForcedInitBoard;
 - (void) initBoard;
 - (unsigned long) readControlReg:(short)channel;
 - (void) writeControlReg:(short)channel enabled:(BOOL)enabled;
@@ -514,6 +517,21 @@ enum Gretina4MFIFOStates {
 
 - (void) tasksCompleted: (NSNotification*)aNote;
 - (BOOL) queueIsRunning;
+
+#pragma mark •••HW checks
+- (void) checkBoard:(BOOL)verbose;
+- (BOOL) checkClockPhase:(BOOL)verbose;
+- (BOOL) checkExternalWindow:(BOOL)verbose;
+- (BOOL) checkPileUpWindow:(BOOL)verbose;
+- (BOOL) checkNoiseWindow:(BOOL)verbose;
+- (BOOL) checkExtTrigLength:(BOOL)verbose;
+- (BOOL) checkCollectionTime:(BOOL)verbose;
+- (BOOL) checkIntegrateTime:(BOOL)verbose;
+- (BOOL) checkDownSample:(BOOL)verbose;
+- (BOOL) checkWindowTiming:(short)channel verbose:(BOOL)verbose;
+- (BOOL) checkRisingEdgeWindow:(short)channel verbose:(BOOL)verbose;
+- (BOOL) checkTrapThreshold:(short)channel verbose:(BOOL)verbose;
+- (BOOL) checkLEDThreshold:(short)channel verbose:(BOOL)verbose;
 
 #pragma mark •••FPGA download
 - (void) startDownLoadingMainFPGA;
@@ -638,3 +656,4 @@ extern NSString* ORGretina4MModelHistEMultiplierChanged;
 extern NSString* ORGretina4MModelInitStateChanged;
 extern NSString* ORGretina4MForceFullInitCardChanged;
 extern NSString* ORGretina4MLockChanged;
+extern NSString* ORGretina4MDoHwCheckChanged;
