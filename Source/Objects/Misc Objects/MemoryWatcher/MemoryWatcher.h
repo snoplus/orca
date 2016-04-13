@@ -33,7 +33,6 @@
     NSTask*              vmTask;
     NSMutableString*     taskResult;
     NSTimeInterval       taskInterval;
-    int                  maxSamples;
     NSDate*              launchTime;
     NSTimeInterval       upTime;
 }
@@ -48,8 +47,6 @@
 - (void) setUpTime:(NSTimeInterval)aUpTime;
 - (NSDate*) launchTime;
 - (void) setLaunchTime:(NSDate*)aLaunchTime;
-- (int) maxSamples;
-- (void) setMaxSamples:(int)aMaxSamples;
 - (NSTimeInterval) taskInterval;
 - (void) setTaskInterval:(NSTimeInterval)aTaskInterval;
 - (NSMutableString*) taskResult;

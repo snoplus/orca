@@ -123,8 +123,8 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(MemoryWatcherController);
     if(aNote == nil || [aNote object] == watcher){
 		NSTimeInterval interval = [watcher taskInterval];
 		NSString* s;
-		if(interval == 1.0) s = @"Max 4096 Samples @ 1 Hz";
-		else s = [NSString stringWithFormat:@"Max 4096 Samples @ 1/%.0f Hz",[watcher taskInterval]];
+		if(interval == 1.0) s = @"Max 4096 Samples @ 1 Hz Shown";
+		else s = [NSString stringWithFormat:@"Max 4096 Samples @ 1/%.0f Hz Shown",[watcher taskInterval]];
 		[plotView setXLabel:s];
     }
 }
