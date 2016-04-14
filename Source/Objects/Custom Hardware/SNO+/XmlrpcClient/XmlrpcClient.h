@@ -25,8 +25,8 @@
 -(void)setTimeout:(float)_timeout;
 -(id)getResult;
 
--(void)command:(NSString *)fmt;
--(void)command:(NSString *)fmt withArgs:(NSArray *)args;
+-(id)command:(NSString *)fmt;
+-(id)command:(NSString *)fmt withArgs:(NSArray *)args;
 
 //NSURLConnection Delegate methods - For asynchronous requests.
 // Implementing the async stuff was taking too long so never fully implemented

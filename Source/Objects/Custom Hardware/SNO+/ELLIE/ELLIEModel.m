@@ -75,13 +75,23 @@ currentOrcaSettingsForSmellie,
 tellieSubRunSettings,
 smellieDBReadInProgress = _smellieDBReadInProgress;
 
+/*********************************************************/
+/*                  Class control methods                */
+/*********************************************************/
+- (id) init
+{
+    self = [super init];
+    if (self){
+        _tellieClient = [[XmlrpcClient alloc] initWithHostName:@"localhost" withPort:@"5030"];
+        _smellieClient = [[XmlrpcClient alloc] initWithHostName:@"snodrop" withPort:@"5020"];
+    }
+    return self;
+}
+
 - (void) setUpImage
 {
     [self setSmellieDBReadInProgress:NO];
     [self setImage:[NSImage imageNamed:@"ellie"]];
-    
-    _tellieClient = [[XmlrpcClient alloc] initWithHostName:@"localhost" withPort:@"5030"];
-    _smellieClient = [[XmlrpcClient alloc] initWithHostName:@"snodrop" withPort:@"5020"];
 }
 
 - (void) makeMainController
@@ -116,17 +126,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 	[notifyCenter removeObserver:self name:NSWindowDidResignKeyNotification object:nil];
 }
 
--(bool) isELLIEFiring{
-    if(self.ellieFireFlag == YES){
-        return YES;
-    } else {
-        return NO;
-    }
-}
-
-/**************************************/
-/*          TELLIE Functions          */
-/**************************************/
+/*********************************************************/
+/*                    TELLIE Functions                   */
+/*********************************************************/
 -(void) startTellieRun:(BOOL)scriptFlag
 {
     /* 
@@ -166,97 +168,54 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     }
 }
 
--(NSMutableArray*) pollTellieFibre
+-(NSArray*) pollTellieFibre:(double)timeOutSeconds
 {
     /*
      Poll the TELLIE hardware using an XMLRPC server and requests the response from the
-     hardware.
-    */
-    NSString* responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_readout_script.py" withCmdLineArgs:nil];
-    NSLog(@"Response from Tellie: %@\n",responseFromTellie);
-    return [[NSMutableArray alloc] initWithObjects:responseFromTellie, nil];
-}
+     hardware. If no response is observed the the hardware is re-polled once every second
+     untill a timeout limit has been reached.
 
--(void) loadTELLIEStaticsFromDB
-{
-    /*
-     Load current tellie channel calibration and patch map settings from telliedb.
+     Arguments:
+       double timeOutSeconds :  How many seconds to wait before polling is considered a
+                                failure and an exception thrown.
+
     */
 
-    NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    NSArray* pollResponse = [_tellieClient command:@"read_pin_sequence"];
+    int count = 0;
+    while ([pollResponse isEqualTo:@""] && count < timeOutSeconds){
+        NSLog(@"Warning: tellie poll has returned nil. Possible sequence hasn't finished. Waiting 1 second and re-polling");
+        [NSThread sleepForTimeInterval:1.0];
+        pollResponse = [_tellieClient command:@"read_pin_sequence"];
+    }
 
-    // **********************************
-    // Load latest calibration constants
-    // **********************************
-    
-    // **********************************
-    // For testing on personal machine
-    //
-    NSString* parsUrlString = [NSString stringWithFormat:@"http://snoplus:PureTe->Dirac!=True@couch.snopl.us/telliedb/_design/tellieQuery/_view/fetchFireParameters?key=0"];
-    //NSString* parsUrlString = [NSString stringWithFormat:@"%@:%u/telliedb/_design/tellieQuery/_view/fetchFireParameters?key=0",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
-    //***********************************
-    NSString* webParsString = [parsUrlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-    NSURL* parsUrl = [NSURL URLWithString:webParsString];
-    NSLog(@"Querying : %@\n",parsUrl);
-    
-    // Get data string from URL
-    NSError* parsDataError =  nil;
-    NSData* parsData = [NSData dataWithContentsOfURL:parsUrl
-                                         options:NSDataReadingMapped
-                                           error:&parsDataError];
-    if(parsDataError){
-        NSLog(@"@\n",parsDataError);
+    // Some checks on the response
+    if ([pollResponse isEqualTo:@""]){
+        NSException* e = [NSException
+                          exceptionWithName:@"noPinResponse"
+                          reason:@"*** PIN diode response could not be read. It's possible the sequence has not finished."
+                          userInfo:nil];
+        @throw e;
+        return [NSArray arrayWithObjects:0, 0, nil];
+    } else if ([pollResponse isKindOfClass:[NSString class]]){
+        NSString* reasonStr = [NSString stringWithFormat:@"*** PIN diode poll returned %@. Likely a hardware problem.", [pollResponse[0] stringValue]];
+        NSException* e = [NSException
+                          exceptionWithName:@"stringPinResponse"
+                          reason:reasonStr
+                          userInfo:nil];
+        @throw e;
+        return [NSArray arrayWithObjects:0, 0, nil];
+    } else if ([pollResponse count] != 3) {
+        NSString* reasonStr = [NSString stringWithFormat:@"*** PIN diode poll returned array of len %i - expected 3", [pollResponse count]];
+        NSException* e = [NSException
+                          exceptionWithName:@"PinResponseBadArrayLength"
+                          reason:reasonStr
+                          userInfo:nil];
+        @throw e;
+        return [NSArray arrayWithObjects:0, 0, nil];
     }
-    NSString* parsReturnStr = [[NSString alloc] initWithData:parsData encoding:NSUTF8StringEncoding];
-    // Format queried data to dictionary
-    NSError* parsDictError =  nil;
-    NSMutableDictionary* parsDict = [NSJSONSerialization JSONObjectWithData:[parsReturnStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&parsDictError];
-    if(!parsDictError){
-        NSLog(@"sucessful query\n");
-    }else{
-        NSLog(@"Error querying couchDB, please check the connection is correct %@\n",parsDictError);
-    }
-    [parsReturnStr release];
     
-    NSMutableDictionary* fireParametersDoc =[[[parsDict objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"];
-    NSLog(@"%TELLIE fire parameters sucessfully loaded!\n");
-    self.tellieFireParameters = fireParametersDoc;
-    
-    // **********************************
-    // Load latest mapping doc.
-    // **********************************
-    // For testing on personal machine
-    //
-    NSString* mapUrlString = [NSString stringWithFormat:@"http://snoplus:PureTe->Dirac!=True@couch.snopl.us/telliedb/_design/tellieQuery/_view/fetchCurrentMapping?key=0"];
-    //NSString* parsUrlString = [NSString stringWithFormat:@"%@:%u/telliedb/_design/tellieQuery/_view/fetchCurrentMapping?key=0",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
-    //***********************************
-    NSString* webMapString = [mapUrlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-    NSURL* mapUrl = [NSURL URLWithString:webMapString];
-    NSLog(@"Querying : %@\n",mapUrl);
-    
-    // Get data string from URL
-    NSError* mapDataError =  nil;
-    NSData* mapData = [NSData dataWithContentsOfURL:mapUrl
-                                            options:NSDataReadingMapped
-                                              error:&mapDataError];
-    if(mapDataError){
-        NSLog(@"%@\n",mapDataError);
-    }
-    NSString* mapReturnStr = [[NSString alloc] initWithData:mapData encoding:NSUTF8StringEncoding];
-    // Format queried data to dictionary
-    NSError* mapDictError =  nil;
-    NSMutableDictionary* mapDict = [NSJSONSerialization JSONObjectWithData:[mapReturnStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&mapDictError];
-    if(!mapDictError){
-        NSLog(@"sucessful query\n");
-    }else{
-        NSLog(@"Error querying couchDB, please check the connection is correct %@\n",mapDictError);
-    }
-    [mapReturnStr release];
-    
-    NSMutableDictionary* mappingDoc =[[[mapDict objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"];
-    NSLog(@"TELLIE mapping document sucessfully loaded!\n");
-    self.tellieFibreMapping = mappingDoc;
+    return pollResponse;
 }
 
 -(NSMutableDictionary*) returnTellieFireCommands:(NSString*)fibreName withNPhotons:(NSUInteger)photons withFireFrequency:(NSUInteger)frequency withNPulses:(NSUInteger)pulses
@@ -404,11 +363,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
         //[aSnotModel shipEPEDRecord];
         
-        //Create arguments array to be passed to 'fireTellie.py' script.
-        __block NSString * responseFromTellie = [[NSString alloc] init];
-        NSArray * nullCommandArguments = @[@"-c",[[fireCommands objectForKey:@"channel"] stringValue],@"-n",[noShots stringValue],@"-d",[[fireCommands objectForKey:@"pulse_rate"] stringValue],@"-t",[[fireCommands objectForKey:@"trigger_delay"] stringValue],@"-w",[[fireCommands objectForKey:@"pulse_width"] stringValue],@"-z",[[fireCommands objectForKey:@"pulse_height"] stringValue],@"-x",[[fireCommands objectForKey:@"fibre_delay"] stringValue]];
-    
-        //Wait until tellie has stopped firing
+        // Set-up delays to wait until tellie has stopped firing
         double timeBetweenShotsInMicroSeconds = [[fireCommands objectForKey:@"pulse_rate"] doubleValue]/(1000.0);
         if(pulseByPulseDelay < 0.1){
             NSLog(@"Pulse by pulse delay is too small. Setting to 0.1");
@@ -424,32 +379,40 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         //reduce the pulse by pulse delay to a percentage
         pulseByPulseDelay = pulseByPulseDelay/100.0;
         double timeToSleep = (1.0+pulseByPulseDelay)*[noShots integerValue]*timeBetweenShotsInMicroSeconds; //20% grace period for each shot
-    
-        //hold the fire command on this thread
-        // This line is depreciated - bring it up with the working group, see if they have
-        // a preferred solution.*
-        NSLog(@"***** FIRING %d TELLIE PULSES *****\n",[noShots integerValue]);
-        dispatch_sync(dispatch_get_current_queue(), ^{
-            responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_fire_script.py" withCmdLineArgs:nullCommandArguments];
-            NSLog(@"Response from Tellie FIRE command: %@\n",responseFromTellie);
-        });
 
+        // Pass requested tellie settings to tellie server
+        if(i == 0){
+            NSArray* fireArgs = @[[[fireCommands objectForKey:@"channel"] stringValue],
+                                  [noShots stringValue],
+                                  [[fireCommands objectForKey:@"pulse_rate"] stringValue],
+                                  [[fireCommands objectForKey:@"trigger_delay"] stringValue],
+                                  [[fireCommands objectForKey:@"pulse_width"] stringValue],
+                                  [[fireCommands objectForKey:@"pulse_height"] stringValue],
+                                  [[fireCommands objectForKey:@"fibre_delay"] stringValue],
+                                  ];
+            
+            [_tellieClient command:@"init_channel" withArgs:fireArgs];
+        }
+        // Set number of pulses to be fired in this sub - run
+        [_tellieClient command:@"set_pulse_number" withArgs:@[noShots]];
+
+        NSLog(@"***** FIRING %d TELLIE PULSES *****\n",[noShots integerValue]);
+        [_tellieClient command:@"fire_sequence"];
+        
+        // Wait until sequence has finished
         [NSThread sleepForTimeInterval:timeToSleep];
     
-        __block NSString * responseFromPoll = [[NSString alloc] init];
-        // * same as above.
-        dispatch_sync(dispatch_get_current_queue(), ^{
-            responseFromPoll = [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_readout_script.py" withCmdLineArgs:nil];
-            NSLog(@"Response from Tellie READ command: %@\n",responseFromPoll);
-        });
+        // Get pin reading with 5s grace period incase sequence took too
+        // long for some reason
+        NSArray* pinReading = [self pollTellieFibre:5.];
     
         @try {
-            [fireCommands setObject:[NSNumber numberWithInt:[responseFromPoll intValue]] forKey:@"pin_readout"];
+            [fireCommands setObject:pinReading[0] forKey:@"pin_value"];
+            [fireCommands setObject:pinReading[1] forKey:@"pin_rms"];
         } @catch (NSException *exception) {
             NSLog(@"Unable to add pin readout due to error %@",exception);
         }
     
-        [responseFromTellie release];
         [self updateTellieDocument:fireCommands];
     }
     self.ellieFireFlag = NO;
@@ -462,235 +425,29 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     /*
      Call tellie stop script. The script itself is stored on the DAQ1 machine.
     */
-    NSString *responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_stop_script.py" withCmdLineArgs:nil];
-    NSLog(@"Response from Tellie: %@\n",responseFromTellie);
+    NSString* responseFromTellie = [_tellieClient command:@"stop"];
+    NSLog(@"Sent stop command to tellie, received: %@\n",responseFromTellie);
 }
 
-/***************************************/
-/*          Smellie Functions          */
-/***************************************/
-- (void) fetchSmellieConfigurationInformation
-{
-    /*
-        Get smellie config information from the smelliedb.
-    */
-
-    //this is dependant upon the current couchDB view that exsists within the database
-    NSString *requestString = [NSString stringWithFormat:@"_design/smellieMainQuery/_view/pullEllieConfigHeaders"];
-    
-    [[self generalDBRef:@"smellie"] getDocumentId:requestString tag:kSmellieConfigHeaderRetrieved];
-    
-    [self setSmellieDBReadInProgress:YES];
-    // Is there a better way to do this... Do we know it's received after the delay?
-    [self performSelector:@selector(smellieDocumentsRecieved) withObject:nil afterDelay:10.0];
+-(bool) isELLIEFiring{
+    if(self.ellieFireFlag == YES){
+        return YES;
+    } else {
+        return NO;
+    }
 }
 
-//complete this after the smellie documents have been recieved
--(void)smellieDocumentsRecieved
-{
-    /*
-     Update smeillieDBReadInProgress property bool.
-    */
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(smellieDocumentsRecieved) object:nil];
-    if (![self smellieDBReadInProgress]) { //killed already
-        return;
-    }
-    
-    [self setSmellieDBReadInProgress:NO];
-}
-
-- (ORCouchDB*) generalDBRef:(NSString*)aCouchDb
-{
-    /* 
-     Get and return a reference to a couchDB repo.
-     
-     Arguments:
-        NSString* aCouchDb : The database name e.g. telliedb/rat
-    */
-    //Collect a series of objects from the SNOPModel
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-
-    //Initialise the SNOPModel
-    SNOPModel* aSnotModel = [objs objectAtIndex:0];
-    
-    //Commented out for testing
-    return [ORCouchDB couchHost:[aSnotModel orcaDBIPAddress]
-                           port:[aSnotModel orcaDBPort]
-                       username:[aSnotModel orcaDBUserName]
-                            pwd:[aSnotModel orcaDBPassword]
-                       database:aCouchDb
-                       delegate:aSnotModel];
-}
-
--(NSString*)callPythonScript:(NSString*)pythonScriptFilePath withCmdLineArgs:(NSArray*)commandLineArgs
-{
-    /*
-     Call a python script on the DAQ1 machine. Currently three cases are hardcoded into
-     this function, defined by the size of the commandLineArgs array variable. Smellie
-     commands take three args, tellie fire commands take fourteen and poll requests take
-     none.
-     
-     Arguments: 
-      NSString* pythonScriptFilePath : Path to the script to be called (on DAQ1). 
-      NSArray* commandLineArgs       : Arguments to be passed to the script.
-     
-     Returns:
-      NSString* responseFromCmdLine  : The text response returned by the called script.
-    */
-    
-    NSTask* task = [[NSTask alloc] init];
-    [task setLaunchPath: @"/usr/bin/python"]; // Tell the task to execute the ssh command
-    
-    if([commandLineArgs count] == 3){ //this is the case for smellie commands 
-        [task setArguments: [NSArray arrayWithObjects:pythonScriptFilePath,[commandLineArgs objectAtIndex:0],[commandLineArgs objectAtIndex:1],[commandLineArgs objectAtIndex:2], nil]];
-    }
-    else if ([commandLineArgs count] == 14){ //this is the case for the fire tellie commands
-        [task setArguments: [NSArray arrayWithObjects:pythonScriptFilePath,[commandLineArgs objectAtIndex:0],[commandLineArgs objectAtIndex:1],[commandLineArgs objectAtIndex:2],[commandLineArgs objectAtIndex:3],[commandLineArgs objectAtIndex:4],[commandLineArgs objectAtIndex:5],[commandLineArgs objectAtIndex:6],[commandLineArgs objectAtIndex:7],[commandLineArgs objectAtIndex:8],[commandLineArgs objectAtIndex:9],[commandLineArgs objectAtIndex:10],[commandLineArgs objectAtIndex:11],[commandLineArgs objectAtIndex:12],[commandLineArgs objectAtIndex:13], nil]];
-    }
-    else if ([commandLineArgs count] == 0){  //this is for the tellie poll script
-        [task setArguments:[NSArray arrayWithObjects:pythonScriptFilePath, nil]];
-    }
-    else{
-        return @"unable to call python script with correct number of arguments";
-    }
-    
-    NSPipe* pipe = [NSPipe pipe];
-    [task setStandardOutput: pipe];
-    NSFileHandle* file = [pipe fileHandleForReading]; // This file handle is a reference to the output of the ssh command
-    
-    @try{
-        [task launch];
-    }
-    @catch (NSException *e) {
-        NSLog(@"ELLIE Connection Error calling script %@: %@",pythonScriptFilePath,e);
-    }
-    @finally {
-        //do something here
-    }
-
-    NSData* data = [file readDataToEndOfFile];
-    NSString* responseFromCmdLine = [[[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding] autorelease]; // This string now contains the entire output of the ssh command.
-    
-    [task release];
-    return responseFromCmdLine;
-}
-
-
-- (NSString*) stringDateFromDate:(NSDate*)aDate
-{
-    /*
-     Format date object to a string for inclusion in couchDB files.
-
-     Arguments:
-        NSDate* aDate : A NSDate object with the current time / date.
-     
-     Returns: 
-        NSString* result : The date formatted into a human readable sting.
-     */
-    NSDateFormatter* snotDateFormatter = [[NSDateFormatter alloc] init];
-    [snotDateFormatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'SS'Z'"];
-    snotDateFormatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
-    NSDate* strDate;
-    if (!aDate)
-        strDate = [NSDate date];
-    else
-        strDate = aDate;
-    NSString* result = [snotDateFormatter stringFromDate:strDate];
-    [snotDateFormatter release];
-    
-    return result;
-}
-
-- (NSString*) stringUnixFromDate:(NSDate*)aDate
-{
-    /*
-     Format date object to a string with the standard unix format.
-
-     Arguments:
-        NSDate* aDate : A NSDate object with the current time / date.
-     
-     Returns:
-        NSString* result : The date formatted into a human readable sting.
-    */
-    NSDate* strDate;
-    if(!aDate){
-        strDate = [NSDate date];
-    }else{
-        strDate = aDate;
-    }
-    NSString* result = [NSString stringWithFormat:@"%f",[strDate timeIntervalSince1970]];
-    strDate = nil;
-    
-    return result;
-}
-
--(void) _pushEllieCustomRunToDB:(NSString*)aCouchDBName runFiletoPush:(NSMutableDictionary*)customRunFile withDocType:(NSString*)aDocType
-{
-    /*
-     Push custom run information from the GUI to a couchDB database.
-     
-     Arguments:
-      NSString* aCouchDBName            : The couchdb database name.
-      NSMutableDictionary* customRunFile: GUI settings stored in a dictionary.
-      NSString* aDocType                : Type of document being uploaded.
-    */
-    NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:100];
-    
-    //Collect a series of objects from the SNOPModel
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* aSnotModel = [objs objectAtIndex:0];
-    
-    NSString* docType = [NSMutableString stringWithFormat:@"%@",aDocType];
-    NSLog(@"document_type: %@",docType);
-    
-    [runDocDict setObject:docType forKey:@"doc_type"];
-    [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"time_stamp"];
-    [runDocDict setObject:customRunFile forKey:@"run_info"];
-            
-    //self.runDocument = runDocDict;
-    [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:aCouchDBName] addDocument:runDocDict tag:kSmellieRunDocumentAdded];
-}
-
--(void) _pushSmellieRunDocument
-{
-    /*
-     Creat a standard smellie run doc using ELLIEModel / SNOPModel / ORRunModel class 
-     variables and push up to the smelliedb.
-    */
-    NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:100];
-    
-    //Collect a series of objects from the SNOPModel
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* aSnotModel = [objs objectAtIndex:0];
-    
-    //Collect objects from ORRunModel
-    NSArray*  objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    runControl = [objs3 objectAtIndex:0];
-    
-    NSString* docType = [NSMutableString stringWithFormat:@"smellie_run"];
-    NSString* smellieRunNameLabel = [aSnotModel smellieRunNameLabel];
-    
-    [runDocDict setObject:docType forKey:@"type"];
-    [runDocDict setObject:[NSString stringWithFormat:@"%i",0] forKey:@"version"];
-    [runDocDict setObject:[NSString stringWithFormat:@"%lu",[runControl runNumber]] forKey:@"index"];
-    [runDocDict setObject:smellieRunNameLabel forKey:@"run_description_used"];
-    [runDocDict setObject:[self stringUnixFromDate:nil] forKey:@"issue_time_unix"];
-    [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"issue_time_iso"];
-    NSNumber *smellieConfigurationVersion = [self fetchRecentVersion];
-    [runDocDict setObject:smellieConfigurationVersion forKey:@"configuration_version"];
-    [runDocDict setObject:[NSNumber numberWithInt:[runControl runNumber]] forKey:@"run"];
-    [runDocDict setObject:smellieSubRunInfo forKey:@"sub_run_info"];
-    
-    [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:@"smellie"] addDocument:runDocDict tag:kSmellieSubRunDocumentAdded];
-}
+/*****************************/
+/*   tellie db interactions  */
+/*****************************/
 
 -(void) _pushInitialTellieRunDocument
 {
     /*
      Create a standard tellie run doc using ELLIEModel / SNOPModel / ORRunModel class
-     variables and push up to the telliedb. Additionally, the run doc dictionary set as 
+     variables and push up to the telliedb. Additionally, the run doc dictionary set as
      the tellieRunDoc propery, to be updated later in the run.
-    */
+     */
     NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:10];
     
     NSArray*  objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
@@ -707,10 +464,10 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [runDocDict setObject:[NSString stringWithFormat:@"%lu",[runControl runNumber]] forKey:@"index"];
     [runDocDict setObject:[self stringUnixFromDate:nil] forKey:@"issue_time_unix"];
     [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"issue_time_iso"];
-
+    
     //[runDocDict setObject:[NSMutableArray arrayWithObjects:[runControl runNumber],[runControl runNumber], nil] forKey:@"run_range"]; <<----- arrays take objects, not numbers. MAH 03/21/2016
     [runDocDict setObject:[NSMutableArray arrayWithObjects:[NSNumber numberWithUnsignedLong:[runControl runNumber]],[NSNumber numberWithUnsignedLong:[runControl runNumber]], nil] forKey:@"run_range"];
-
+    
     [runDocDict setObject:subRunArray forKey:@"sub_run_info"];
     
     self.tellieRunDoc = runDocDict;
@@ -724,48 +481,14 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     }
 }
 
-- (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
-{
-    /*
-     Get an ORCouchDB object pointing to a sno+ couchDB repo.
-     
-     Arguments:
-        id aCouchDelegate:  An ELLIEModel object which will be delgated some functionality during
-                            ORCouchDB function calls.
-        NSString* entryDB:  The SNO+ couchDB repo to be assocated with the ORCouchDB object.
-     
-     Returns:
-        ORCouchDB* result:  An ORCouchDB object pointing to the entryDB repo.
-     
-     COMMENT: 
-        I'm not sure why this is here? There is an identical method in SNOPModel. Might be worth
-        deleting this method and replacing any reference to it with the SNOPModel version.
-    */
-    //Collect a series of objects from the SNOPModel
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* aSnotModel = [objs objectAtIndex:0];
-    
-    ORCouchDB* result = [ORCouchDB couchHost:aSnotModel.orcaDBIPAddress
-                                        port:aSnotModel.orcaDBPort
-                                    username:aSnotModel.orcaDBUserName
-                                         pwd:aSnotModel.orcaDBPassword
-                                    database:entryDB
-                                    delegate:self];
-    
-    if (aCouchDelegate)
-        [result setDelegate:aCouchDelegate];
-    
-    return result;
-}
-
 - (void) updateTellieDocument:(NSDictionary*)subRunDoc
 {
     /*
      Update self.tellieRunDoc with subrun information.
      
      Arguments:
-        NSDictionary* subRunDoc:  Subrun information to be added to the current self.tellieRunDoc.
-    */
+     NSDictionary* subRunDoc:  Subrun information to be added to the current self.tellieRunDoc.
+     */
     NSMutableDictionary* runDocDict = [self.tellieRunDoc mutableCopy];
     NSMutableDictionary* subRunDocDict = [self.tellieSubRunSettings mutableCopy];
     
@@ -786,113 +509,105 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //check to see if run is offline or not
     if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
         [[self orcaDbRefWithEntryDB:self withDB:@"telliedb"]
-                            updateDocument:runDocDict
-                                documentId:[runDocDict objectForKey:@"_id"]
-                                       tag:kTellieRunDocumentUpdated];
+         updateDocument:runDocDict
+         documentId:[runDocDict objectForKey:@"_id"]
+         tag:kTellieRunDocumentUpdated];
     }
     [subRunInfo release];
     [runDocDict release];
     [subRunDocDict release];
 }
 
--(void) _pushEllieConfigDocToDB:(NSString*)aCouchDBName runFiletoPush:(NSMutableDictionary*)customRunFile withDocType:(NSString*)aDocType
+-(void) loadTELLIEStaticsFromDB
 {
     /*
-     Create and push a smellie config file to couchdb.
-     
-     Arguments:
-        NSString* aCouchDBName:             Name of the couchdb repo the document will be uploaded to.
-        NSMutableDictionary customRunFile:  Custom run settings to be uploaded to db.
-        NSString* aDocType:                 Name to be used in the 'doc_type' field of the uploaded doc.
-     
-    */
-    NSMutableDictionary* configDocDic = [NSMutableDictionary dictionaryWithCapacity:100];
-    
-    //Collect a series of objects from the SNOPModel
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    
-    //Initialise the SNOPModel
+     Load current tellie channel calibration and patch map settings from telliedb. 
+     This function accesses the telliedb and pulls down the most recent fireParameters
+     and patchMapping documents. The data is then saved to the member variables 
+     tellieFireParameters and tellieFibreMapping.
+     */
+
+    // Load the SNOPModel to access orcaDBIPAddress and orcaDBPort variables
+    NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     SNOPModel* aSnotModel = [objs objectAtIndex:0];
     
-    NSString* docType = [NSMutableString stringWithFormat:@"%@",aDocType];
+    // **********************************
+    // Load latest calibration constants
+    // **********************************
     
-    NSLog(@"document_type: %@",docType);
+    // **********************************
+    // For testing on personal machine
+    //
+    NSString* parsUrlString = [NSString stringWithFormat:@"http://snoplus:PureTe->Dirac!=True@couch.snopl.us/telliedb/_design/tellieQuery/_view/fetchFireParameters?key=0"];
+    //NSString* parsUrlString = [NSString stringWithFormat:@"%@:%u/telliedb/_design/tellieQuery/_view/fetchFireParameters?key=0",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
+    //***********************************
+    NSString* webParsString = [parsUrlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    NSURL* parsUrl = [NSURL URLWithString:webParsString];
+    NSLog(@"Querying : %@\n",parsUrl);
     
-    [configDocDic setObject:docType forKey:@"doc_type"];
-    [configDocDic setObject:[self stringDateFromDate:nil] forKey:@"time_stamp"];
-    [configDocDic setObject:customRunFile forKey:@"configuration_info"];
+    // Get data string from URL
+    NSError* parsDataError =  nil;
+    NSData* parsData = [NSData dataWithContentsOfURL:parsUrl
+                                             options:NSDataReadingMapped
+                                               error:&parsDataError];
+    if(parsDataError){
+        NSLog(@"@\n",parsDataError);
+    }
+    NSString* parsReturnStr = [[NSString alloc] initWithData:parsData encoding:NSUTF8StringEncoding];
+    // Format queried data to dictionary
+    NSError* parsDictError =  nil;
+    NSMutableDictionary* parsDict = [NSJSONSerialization JSONObjectWithData:[parsReturnStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&parsDictError];
+    if(!parsDictError){
+        NSLog(@"sucessful query\n");
+    }else{
+        NSLog(@"Error querying couchDB, please check the connection is correct %@\n",parsDictError);
+    }
+    [parsReturnStr release];
+    
+    NSMutableDictionary* fireParametersDoc =[[[parsDict objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"];
+    NSLog(@"%TELLIE fire parameters sucessfully loaded!\n");
+    self.tellieFireParameters = fireParametersDoc;
+    
+    // **********************************
+    // Load latest mapping doc.
+    // **********************************
+    // For testing on personal machine
+    //
+    NSString* mapUrlString = [NSString stringWithFormat:@"http://snoplus:PureTe->Dirac!=True@couch.snopl.us/telliedb/_design/tellieQuery/_view/fetchCurrentMapping?key=0"];
+    //NSString* parsUrlString = [NSString stringWithFormat:@"%@:%u/telliedb/_design/tellieQuery/_view/fetchCurrentMapping?key=0",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
 
-    //self.runDocument = runDocDict;
-    [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:aCouchDBName] addDocument:configDocDic tag:kSmellieRunDocumentAdded];
+    NSString* webMapString = [mapUrlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    NSURL* mapUrl = [NSURL URLWithString:webMapString];
+    NSLog(@"Querying : %@\n",mapUrl);
+    
+    // Get data string from URL
+    NSError* mapDataError =  nil;
+    NSData* mapData = [NSData dataWithContentsOfURL:mapUrl
+                                            options:NSDataReadingMapped
+                                              error:&mapDataError];
+    if(mapDataError){
+        NSLog(@"%@\n",mapDataError);
+    }
+    NSString* mapReturnStr = [[NSString alloc] initWithData:mapData encoding:NSUTF8StringEncoding];
+    // Format queried data to dictionary
+    NSError* mapDictError =  nil;
+    NSMutableDictionary* mapDict = [NSJSONSerialization JSONObjectWithData:[mapReturnStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&mapDictError];
+    if(!mapDictError){
+        NSLog(@"sucessful query\n");
+    }else{
+        NSLog(@"Error querying couchDB, please check the connection is correct %@\n",mapDictError);
+    }
+    [mapReturnStr release];
+    
+    NSMutableDictionary* mappingDoc =[[[mapDict objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"];
+    NSLog(@"TELLIE mapping document sucessfully loaded!\n");
+    self.tellieFibreMapping = mappingDoc;
 }
 
--(void) smellieDBpush:(NSMutableDictionary*)dbDic
-{
-    [self _pushEllieCustomRunToDB:@"smellie" runFiletoPush:dbDic withDocType:@"smellie_run_description"];
-}
 
--(void) smellieConfigurationDBpush:(NSMutableDictionary*)dbDic
-{
-    [self _pushEllieConfigDocToDB:@"smellie" runFiletoPush:dbDic withDocType:@"smellie_run_configuration"];
-}
-
-- (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp
-{
-    /*
-     Checks a result returned from a couchdb query for ellie doocument add / retrieval
-     tags.
-     
-    Arguments: 
-        id aResult:     Object returned by cauchdb query.
-        NSString* aTag: The query tag to check against expected cases.
-        id anOp:        This doesn't appear to be used??
-    */
-	@synchronized(self){
-		if([aResult isKindOfClass:[NSDictionary class]]){
-			NSString* message = [aResult objectForKey:@"Message"];
-			if(message){
-				[aResult prettyPrint:@"CouchDB Message:"];
-			}
-            
-            //Look through all of the possible tags for ellie couchDB results 
-            
-            //This is called when smellie run header is queried from CouchDB
-            if ([aTag isEqualToString:kSmellieRunHeaderRetrieved]){
-                NSLog(@"Object: %@\n",aResult);
-                NSLog(@"result: %@\n",[aResult objectForKey:@"run_name"]);
-                //[self parseSmellieRunHeaderDoc:aResult];
-            }else if ([aTag isEqualToString:kSmellieConfigHeaderRetrieved]){
-                NSLog(@"Smellie configuration file Object: %@\n",aResult);
-                //[self parseSmellieConfigHeaderDoc:aResult];
-            }else if ([aTag isEqualToString:kTellieRunDocumentAdded]){
-                NSMutableDictionary* runDoc = [[self tellieRunDoc] mutableCopy];
-                [runDoc setObject:[aResult objectForKey:@"id"] forKey:@"_id"];
-                self.tellieRunDoc = runDoc;
-                [runDoc release];
-            }
-            //If no tag is found for the query result
-			else {
-                NSLog(@"No Tag assigned to that query/couchDB View \n");
-                NSLog(@"Object: %@\n",aResult);
-            }
-		}
-        
-		else if([aResult isKindOfClass:[NSArray class]]){
-            [aResult prettyPrint:@"CouchDB"];
-		}else{
-			//no docs found 
-		}
-	}
-}
-
--(void)startSmellieRunInBackground:(NSDictionary*)smellieSettings
-{
-    [self performSelectorOnMainThread:@selector(startSmellieRun:) withObject:smellieSettings waitUntilDone:NO];
-}
-
-/****************************************/
-/*      SMELLIE Control Functions       */
-/****************************************/
+/*********************************************************/
+/*                  Smellie Functions                    */
+/*********************************************************/
 -(void)setSmellieSafeStates
 {
     [_smellieClient command:@"set_safe_states"];
@@ -926,7 +641,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [_smellieClient command:@"set_soft_lock_off"];
 }
 
-//this function kills any external software that will block the functions of a smellie run 
+//this function kills any external software that will block the functions of a smellie run
 -(void)killBlockingSoftware
 {
     [_smellieClient command:@"kill_sepia_and_nimax"];
@@ -949,6 +664,20 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [_smellieClient command:customCmd withArgs:argsArray];
 }
 
+//complete this after the smellie documents have been recieved
+-(void) smellieDocumentsRecieved
+{
+    /*
+     Update smeillieDBReadInProgress property bool.
+     */
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(smellieDocumentsRecieved) object:nil];
+    if (![self smellieDBReadInProgress]) { //killed already
+        return;
+    }
+    
+    [self setSmellieDBReadInProgress:NO];
+}
+
 -(void)testFunction
 {
     NSArray* objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
@@ -957,81 +686,22 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [runControl performSelector:@selector(haltRun)withObject:nil afterDelay:.1];
 }
 
--(NSNumber*) fetchRecentVersion
+-(void)startSmellieRunInBackground:(NSDictionary*)smellieSettings
 {
-    /*
-     Query smellie config documenets on the smelliedb to find the most recent config versioning
-     number.
-    */
-    //Collect a series of objects from the SNOPModel
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    //Initialise the SNOPModel
-    SNOPModel* aSnotModel = [objs objectAtIndex:0];
-    
-    NSString *urlString = [NSString stringWithFormat:@"http://%@:%u/smellie/_design/smellieMainQuery/_view/fetchMostRecentConfigVersion?descending=True&limit=1",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
-    NSURL *url = [NSURL URLWithString:urlString];
-    NSNumber *currentVersionNumber;
-    NSData *data = [NSData dataWithContentsOfURL:url];
-    NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    NSError *error =  nil;
-    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
-    if(!error){
-        @try{
-            //format the json response
-            NSString *stringValueOfCurrentVersion = [NSString stringWithFormat:@"%@",[[[json valueForKey:@"rows"] valueForKey:@"value"]objectAtIndex:0]];
-            currentVersionNumber = [NSNumber numberWithInt:[stringValueOfCurrentVersion intValue]];
-            NSLog(@"parsedNumber%@",currentVersionNumber);
-            NSLog(@"valueforkey2=%@", [[json valueForKey:@"rows"] valueForKey:@"value"]);
-        }
-        @catch (NSException *e) {
-            NSLog(@"Error in fetching the SMELLIE CONFIGURATION FILE: %@ . Please fix this before changing the configuration file",e);
-        }
-    }else{
-        NSLog(@"Error querying couchDB, please check the connection is correct %@",error);
-    }
-    
-    return currentVersionNumber;
-}
-
--(NSMutableDictionary*) fetchCurrentConfigurationForVersion:(NSNumber*)currentVersion
-{
-    /*
-     Fetch the current configuration document of a given version number.
-     
-     Arguments:
-        NSNumber* currentVersion: The version number to be used with the query.
-    */
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* aSnotModel = [objs objectAtIndex:0];
-    
-    NSString *urlString = [NSString stringWithFormat:@"http://%@:%u/smellie/_design/smellieMainQuery/_view/pullEllieConfigHeaders?key=[%i]&limit=1",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort],[currentVersion intValue]];
-    
-    NSURL *url = [NSURL URLWithString:urlString];
-    NSData *data = [NSData dataWithContentsOfURL:url];
-    NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    NSError *error =  nil;
-    NSMutableDictionary *currentConfig = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
-    if(!error){
-        NSLog(@"sucessful query");
-    }else{
-        NSLog(@"Error querying couchDB, please check the connection is correct %@",error);
-    }
-    
-    [ret release];
-    return [[[[currentConfig objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"] objectForKey:@"configuration_info"];
+    [self performSelectorOnMainThread:@selector(startSmellieRun:) withObject:smellieSettings waitUntilDone:NO];
 }
 
 -(void)startSmellieRun:(NSDictionary*)smellieSettings
 {
     /*
-     Start a smellie run. 
+     Start a smellie run.
      
      COMMENT:
-        I think this method should be implemented as a standard run script, not as an object 
-        method. I'll look into doing this after the DAQ meeting in Jan - Once I know the tellie
-        one works!
-    */
-    //stop any current runs and go into a maintainence run 
+     I think this method should be implemented as a standard run script, not as an object
+     method. I'll look into doing this after the DAQ meeting in Jan - Once I know the tellie
+     one works!
+     */
+    //stop any current runs and go into a maintainence run
     //[runControl performSelectorOnMainThread:@selector(stopRun) withObject:nil waitUntilDone:YES];
     //[runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
     
@@ -1044,7 +714,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     NSLog(@"SMELLIE_RUN:Stopping any Blocking Software on SMELLIE computer(SNODROP)\n");
     [self killBlockingSoftware];
-
+    
     NSNumber* currentConfigurationVersion = [self fetchRecentVersion];
     
     //fetch the data associated with the current configuration
@@ -1083,36 +753,36 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     for (id specificConfigValue in configForSmellie){
         
-            if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput0"]]
-               || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput1"]]
-               || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput2"]]
-               || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput3"]]
-               || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput4"]]
-               || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput5"]]){
-                
-                NSString *fibreSwitchInputConnected = [[configForSmellie objectForKey:specificConfigValue] objectForKey:@"fibreSwitchInputConnected"];
-                NSString* parsedFibreReference = [fibreSwitchInputConnected stringByReplacingOccurrencesOfString:@"Channel" withString:@""];
-                
-                NSString * laserHeadReference = [[configForSmellie objectForKey:specificConfigValue] objectForKey:@"laserHeadConnected"];
-                
-                [laserToInputFibreMapping setObject:parsedFibreReference forKey:laserHeadReference];
-                
-                //NSString* updatedFibreReference = [fibreSwitchInputConnected stringByReplacingOccurrencesOfString:@"Channel" withString:@""];
-                
-                //[specificConfigValue objectForKey:@"fibreSwitchInputConnected"];
-                
+        if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput0"]]
+           || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput1"]]
+           || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput2"]]
+           || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput3"]]
+           || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput4"]]
+           || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput5"]]){
+            
+            NSString *fibreSwitchInputConnected = [[configForSmellie objectForKey:specificConfigValue] objectForKey:@"fibreSwitchInputConnected"];
+            NSString* parsedFibreReference = [fibreSwitchInputConnected stringByReplacingOccurrencesOfString:@"Channel" withString:@""];
+            
+            NSString * laserHeadReference = [[configForSmellie objectForKey:specificConfigValue] objectForKey:@"laserHeadConnected"];
+            
+            [laserToInputFibreMapping setObject:parsedFibreReference forKey:laserHeadReference];
+            
+            //NSString* updatedFibreReference = [fibreSwitchInputConnected stringByReplacingOccurrencesOfString:@"Channel" withString:@""];
+            
+            //[specificConfigValue objectForKey:@"fibreSwitchInputConnected"];
+            
             //if([[specificConfigValue objectForKey:@"fibreSwitchInputConnected"] isEqualToString:[NSString stringWithFormat:@"laserInput%i",inputChannelIndex]]){
-                
-                //NSString *fibreSwitchInputConnected = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"fibreSwitchInputConnected"]];
-                
-                //NSString* updatedFibreReference = [fibreSwitchInputConnected stringByReplacingOccurrencesOfString:@"Channel" withString:@""];
-                
-                /*NSString* laserHeadReference = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"laserHeadConnected"]];
-
-                [laserToInputFibreMapping setObject:[NSString stringWithFormat:@"%i",inputChannelIndex] forKey:laserHeadReference];*/
-    }
-       // }
-
+            
+            //NSString *fibreSwitchInputConnected = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"fibreSwitchInputConnected"]];
+            
+            //NSString* updatedFibreReference = [fibreSwitchInputConnected stringByReplacingOccurrencesOfString:@"Channel" withString:@""];
+            
+            /*NSString* laserHeadReference = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"laserHeadConnected"]];
+             
+             [laserToInputFibreMapping setObject:[NSString stringWithFormat:@"%i",inputChannelIndex] forKey:laserHeadReference];*/
+        }
+        // }
+        
     }
     
     NSMutableDictionary *fibreSwitchOutputToFibre = [[NSMutableDictionary alloc] initWithCapacity:10];
@@ -1157,7 +827,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     int maxLaserIntensity = [maxLaserObj intValue];
     
     NSNumber * numOfIntensitySteps = [smellieSettings objectForKey:@"num_intensity_steps"];
-
+    
     //Extract the lasers to be fired into an array
     NSMutableDictionary * laserArray = [[NSMutableDictionary alloc] init];
     [laserArray setObject:[smellieSettings objectForKey:@"375nm_laser_on"] forKey:@"375nm" ];
@@ -1221,7 +891,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         //start the run controller
         [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
     }else{
-        //Stop the current run and start a new run 
+        //Stop the current run and start a new run
         [runControl setForceRestart:YES];
         [runControl performSelectorOnMainThread:@selector(stopRun) withObject:nil waitUntilDone:YES];
         [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
@@ -1230,20 +900,20 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     //fire some pedestals but only in slave mode. The pedestals are used to trigger the SMELLIE lasers
     /*if(slaveMode){
-
-        NSLog(@"SMELLIE_RUN:Setting the Pedestal to :%@ Hz \n",triggerFrequencyInSlaveMode);
-        NSNumberFormatter * f = [[NSNumberFormatter alloc] init];
-        [f setNumberStyle:NSNumberFormatterDecimalStyle];
-        NSNumber * numericTriggerFrequencyInSlaveMode = [f numberFromString:triggerFrequencyInSlaveMode];
-        [f release];
-        
-        NSLog(@"SMELLIE_RUN:Intensity:Firing Pedestals\n");
-        [theMTCModel fireMTCPedestalsFixedRate];
-        
-        //We need to set the pulser rate after firing pedestals 
-        float pulserRate = [numericTriggerFrequencyInSlaveMode floatValue];
-        [theMTCModel setThePulserRate:pulserRate];
-    }*/
+     
+     NSLog(@"SMELLIE_RUN:Setting the Pedestal to :%@ Hz \n",triggerFrequencyInSlaveMode);
+     NSNumberFormatter * f = [[NSNumberFormatter alloc] init];
+     [f setNumberStyle:NSNumberFormatterDecimalStyle];
+     NSNumber * numericTriggerFrequencyInSlaveMode = [f numberFromString:triggerFrequencyInSlaveMode];
+     [f release];
+     
+     NSLog(@"SMELLIE_RUN:Intensity:Firing Pedestals\n");
+     [theMTCModel fireMTCPedestalsFixedRate];
+     
+     //We need to set the pulser rate after firing pedestals
+     float pulserRate = [numericTriggerFrequencyInSlaveMode floatValue];
+     [theMTCModel setThePulserRate:pulserRate];
+     }*/
     
     BOOL endOfRun = NO;
     int laserLoopInt = 0;
@@ -1268,12 +938,12 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         
         //Loop through each Fibre
         for(id fibreKey in fibreArray){
-        
+            
             if(endOfRun == YES){
                 break;
             }
             
-            //Only loop through fibres that are included in the run 
+            //Only loop through fibres that are included in the run
             if([[fibreArray objectForKey:fibreKey] intValue] != 1){
                 continue;
             }
@@ -1301,10 +971,10 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                 
                 //if run control cancels the run
                 /*if(![runControl isRunning]){
-                    endOfRun = YES;
-                    break;
-                }*/
-            
+                 endOfRun = YES;
+                 break;
+                 }*/
+                
                 if([[NSThread currentThread] isCancelled]){
                     endOfRun = YES;
                     break;
@@ -1389,7 +1059,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [fibreArray release];
     [laserArray release];
     
-    //stop the pedestals if required 
+    //stop the pedestals if required
     if(slaveMode){
         //NSLog(@"SMELLIE_RUN:Stopping MTCPedestals\n");
         [theMTCModel stopMTCPedestalsFixedRate];
@@ -1414,7 +1084,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     /*
      Some sign off / tidy up stuff to be called at the end of a smellie run. Again, I think this
      should be moved to a runscript.
-    */
+     */
     //Even though this is stopping in Orca it can still contine on SNODROP!
     //Need a stop run command here
     //TODO: add a try and except statement here
@@ -1435,21 +1105,366 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     [self _pushSmellieRunDocument];
     
-    [runControl setForceRestart:YES]; 
+    [runControl setForceRestart:YES];
     [runControl performSelectorOnMainThread:@selector(stopRun) withObject:nil waitUntilDone:YES];
     [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
     
     //Set the Run Type to a SMELLIE run
     /*NSArray*  objsSNOP = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* theSNOPModel = [objsSNOP objectAtIndex:0];*/
+     SNOPModel* theSNOPModel = [objsSNOP objectAtIndex:0];*/
     //add
     //[theSNOPModel setRunType:kRunMaintainence]; //sets the run_type to a smellie run type
-    //used to be halt run but this now moves straight into a maintainence run 
+    //used to be halt run but this now moves straight into a maintainence run
     //end the run correctly if it is still running
     //[runControl haltRun];
-    //TODO: Send stop smellie run notification 
+    //TODO: Send stop smellie run notification
     NSLog(@"SMELLIE_RUN:Stopping SMELLIE Run\n");
 }
 
+
+/*****************************/
+/*  smellie db interactions  */
+/*****************************/
+
+- (void) fetchSmellieConfigurationInformation
+{
+    /*
+        Get smellie config information from the smelliedb.
+    */
+
+    //this is dependant upon the current couchDB view that exsists within the database
+    NSString *requestString = [NSString stringWithFormat:@"_design/smellieMainQuery/_view/pullEllieConfigHeaders"];
+    
+    [[self generalDBRef:@"smellie"] getDocumentId:requestString tag:kSmellieConfigHeaderRetrieved];
+    
+    [self setSmellieDBReadInProgress:YES];
+    // Is there a better way to do this... Do we know it's received after the delay?
+    [self performSelector:@selector(smellieDocumentsRecieved) withObject:nil afterDelay:10.0];
+}
+
+-(void) smellieDBpush:(NSMutableDictionary*)dbDic
+{
+    [self _pushEllieCustomRunToDB:@"smellie" runFiletoPush:dbDic withDocType:@"smellie_run_description"];
+}
+
+-(void) smellieConfigurationDBpush:(NSMutableDictionary*)dbDic
+{
+    [self _pushEllieConfigDocToDB:@"smellie" runFiletoPush:dbDic withDocType:@"smellie_run_configuration"];
+}
+
+-(void) _pushSmellieRunDocument
+{
+    /*
+     Creat a standard smellie run doc using ELLIEModel / SNOPModel / ORRunModel class
+     variables and push up to the smelliedb.
+     */
+    NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:100];
+    
+    //Collect a series of objects from the SNOPModel
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    
+    //Collect objects from ORRunModel
+    NSArray*  objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    runControl = [objs3 objectAtIndex:0];
+    
+    NSString* docType = [NSMutableString stringWithFormat:@"smellie_run"];
+    NSString* smellieRunNameLabel = [aSnotModel smellieRunNameLabel];
+    
+    [runDocDict setObject:docType forKey:@"type"];
+    [runDocDict setObject:[NSString stringWithFormat:@"%i",0] forKey:@"version"];
+    [runDocDict setObject:[NSString stringWithFormat:@"%lu",[runControl runNumber]] forKey:@"index"];
+    [runDocDict setObject:smellieRunNameLabel forKey:@"run_description_used"];
+    [runDocDict setObject:[self stringUnixFromDate:nil] forKey:@"issue_time_unix"];
+    [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"issue_time_iso"];
+    NSNumber *smellieConfigurationVersion = [self fetchRecentVersion];
+    [runDocDict setObject:smellieConfigurationVersion forKey:@"configuration_version"];
+    [runDocDict setObject:[NSNumber numberWithInt:[runControl runNumber]] forKey:@"run"];
+    [runDocDict setObject:smellieSubRunInfo forKey:@"sub_run_info"];
+    
+    [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:@"smellie"] addDocument:runDocDict tag:kSmellieSubRunDocumentAdded];
+}
+
+-(void) _pushEllieConfigDocToDB:(NSString*)aCouchDBName runFiletoPush:(NSMutableDictionary*)customRunFile withDocType:(NSString*)aDocType
+{
+    /*
+     Create and push a smellie config file to couchdb.
+     
+     Arguments:
+     NSString* aCouchDBName:             Name of the couchdb repo the document will be uploaded to.
+     NSMutableDictionary customRunFile:  Custom run settings to be uploaded to db.
+     NSString* aDocType:                 Name to be used in the 'doc_type' field of the uploaded doc.
+     
+     */
+    NSMutableDictionary* configDocDic = [NSMutableDictionary dictionaryWithCapacity:100];
+    
+    //Collect a series of objects from the SNOPModel
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    
+    //Initialise the SNOPModel
+    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    
+    NSString* docType = [NSMutableString stringWithFormat:@"%@",aDocType];
+    
+    NSLog(@"document_type: %@",docType);
+    
+    [configDocDic setObject:docType forKey:@"doc_type"];
+    [configDocDic setObject:[self stringDateFromDate:nil] forKey:@"time_stamp"];
+    [configDocDic setObject:customRunFile forKey:@"configuration_info"];
+    
+    //self.runDocument = runDocDict;
+    [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:aCouchDBName] addDocument:configDocDic tag:kSmellieRunDocumentAdded];
+}
+
+
+-(void) _pushEllieCustomRunToDB:(NSString*)aCouchDBName runFiletoPush:(NSMutableDictionary*)customRunFile withDocType:(NSString*)aDocType
+{
+    /*
+     Push custom run information from the GUI to a couchDB database.
+     
+     Arguments:
+     NSString* aCouchDBName            : The couchdb database name.
+     NSMutableDictionary* customRunFile: GUI settings stored in a dictionary.
+     NSString* aDocType                : Type of document being uploaded.
+     */
+    NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:100];
+    
+    //Collect a series of objects from the SNOPModel
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    
+    NSString* docType = [NSMutableString stringWithFormat:@"%@",aDocType];
+    NSLog(@"document_type: %@",docType);
+    
+    [runDocDict setObject:docType forKey:@"doc_type"];
+    [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"time_stamp"];
+    [runDocDict setObject:customRunFile forKey:@"run_info"];
+    
+    //self.runDocument = runDocDict;
+    [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:aCouchDBName] addDocument:runDocDict tag:kSmellieRunDocumentAdded];
+}
+
+-(NSNumber*) fetchRecentVersion
+{
+    /*
+     Query smellie config documenets on the smelliedb to find the most recent config versioning
+     number.
+    */
+    //Collect a series of objects from the SNOPModel
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    //Initialise the SNOPModel
+    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    
+    NSString *urlString = [NSString stringWithFormat:@"http://%@:%u/smellie/_design/smellieMainQuery/_view/fetchMostRecentConfigVersion?descending=True&limit=1",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSNumber *currentVersionNumber;
+    NSData *data = [NSData dataWithContentsOfURL:url];
+    NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    NSError *error =  nil;
+    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
+    if(!error){
+        @try{
+            //format the json response
+            NSString *stringValueOfCurrentVersion = [NSString stringWithFormat:@"%@",[[[json valueForKey:@"rows"] valueForKey:@"value"]objectAtIndex:0]];
+            currentVersionNumber = [NSNumber numberWithInt:[stringValueOfCurrentVersion intValue]];
+            NSLog(@"parsedNumber%@",currentVersionNumber);
+            NSLog(@"valueforkey2=%@", [[json valueForKey:@"rows"] valueForKey:@"value"]);
+        }
+        @catch (NSException *e) {
+            NSLog(@"Error in fetching the SMELLIE CONFIGURATION FILE: %@ . Please fix this before changing the configuration file",e);
+        }
+    }else{
+        NSLog(@"Error querying couchDB, please check the connection is correct %@",error);
+    }
+    
+    return currentVersionNumber;
+}
+
+-(NSMutableDictionary*) fetchCurrentConfigurationForVersion:(NSNumber*)currentVersion
+{
+    /*
+     Fetch the current configuration document of a given version number.
+     
+     Arguments:
+        NSNumber* currentVersion: The version number to be used with the query.
+    */
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    
+    NSString *urlString = [NSString stringWithFormat:@"http://%@:%u/smellie/_design/smellieMainQuery/_view/pullEllieConfigHeaders?key=[%i]&limit=1",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort],[currentVersion intValue]];
+    
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSData *data = [NSData dataWithContentsOfURL:url];
+    NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    NSError *error =  nil;
+    NSMutableDictionary *currentConfig = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
+    if(!error){
+        NSLog(@"sucessful query");
+    }else{
+        NSLog(@"Error querying couchDB, please check the connection is correct %@",error);
+    }
+    
+    [ret release];
+    return [[[[currentConfig objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"] objectForKey:@"configuration_info"];
+}
+
+
+/****************************************/
+/*        Misc generic methods          */
+/****************************************/
+- (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp
+{
+    /*
+     Checks a result returned from a couchdb query for ellie doocument add / retrieval
+     tags.
+     
+     Arguments:
+     id aResult:     Object returned by cauchdb query.
+     NSString* aTag: The query tag to check against expected cases.
+     id anOp:        This doesn't appear to be used??
+     */
+    @synchronized(self){
+        if([aResult isKindOfClass:[NSDictionary class]]){
+            NSString* message = [aResult objectForKey:@"Message"];
+            if(message){
+                [aResult prettyPrint:@"CouchDB Message:"];
+            }
+            
+            //Look through all of the possible tags for ellie couchDB results
+            
+            //This is called when smellie run header is queried from CouchDB
+            if ([aTag isEqualToString:kSmellieRunHeaderRetrieved]){
+                NSLog(@"Object: %@\n",aResult);
+                NSLog(@"result: %@\n",[aResult objectForKey:@"run_name"]);
+                //[self parseSmellieRunHeaderDoc:aResult];
+            }else if ([aTag isEqualToString:kSmellieConfigHeaderRetrieved]){
+                NSLog(@"Smellie configuration file Object: %@\n",aResult);
+                //[self parseSmellieConfigHeaderDoc:aResult];
+            }else if ([aTag isEqualToString:kTellieRunDocumentAdded]){
+                NSMutableDictionary* runDoc = [[self tellieRunDoc] mutableCopy];
+                [runDoc setObject:[aResult objectForKey:@"id"] forKey:@"_id"];
+                self.tellieRunDoc = runDoc;
+                [runDoc release];
+            }
+            //If no tag is found for the query result
+            else {
+                NSLog(@"No Tag assigned to that query/couchDB View \n");
+                NSLog(@"Object: %@\n",aResult);
+            }
+        }
+        
+        else if([aResult isKindOfClass:[NSArray class]]){
+            [aResult prettyPrint:@"CouchDB"];
+        }else{
+            //no docs found 
+        }
+    }
+}
+
+- (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
+{
+    /*
+     Get an ORCouchDB object pointing to a sno+ couchDB repo.
+     
+     Arguments:
+     id aCouchDelegate:  An ELLIEModel object which will be delgated some functionality during
+     ORCouchDB function calls.
+     NSString* entryDB:  The SNO+ couchDB repo to be assocated with the ORCouchDB object.
+     
+     Returns:
+     ORCouchDB* result:  An ORCouchDB object pointing to the entryDB repo.
+     
+     COMMENT:
+     I'm not sure why this is here? There is an identical method in SNOPModel. Might be worth
+     deleting this method and replacing any reference to it with the SNOPModel version.
+     */
+    //Collect a series of objects from the SNOPModel
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    
+    ORCouchDB* result = [ORCouchDB couchHost:aSnotModel.orcaDBIPAddress
+                                        port:aSnotModel.orcaDBPort
+                                    username:aSnotModel.orcaDBUserName
+                                         pwd:aSnotModel.orcaDBPassword
+                                    database:entryDB
+                                    delegate:self];
+    
+    if (aCouchDelegate)
+        [result setDelegate:aCouchDelegate];
+    
+    return result;
+}
+
+
+- (ORCouchDB*) generalDBRef:(NSString*)aCouchDb
+{
+    /*
+     Get and return a reference to a couchDB repo.
+     
+     Arguments:
+     NSString* aCouchDb : The database name e.g. telliedb/rat
+     */
+    //Collect a series of objects from the SNOPModel
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    
+    //Initialise the SNOPModel
+    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    
+    //Commented out for testing
+    return [ORCouchDB couchHost:[aSnotModel orcaDBIPAddress]
+                           port:[aSnotModel orcaDBPort]
+                       username:[aSnotModel orcaDBUserName]
+                            pwd:[aSnotModel orcaDBPassword]
+                       database:aCouchDb
+                       delegate:aSnotModel];
+}
+
+- (NSString*) stringDateFromDate:(NSDate*)aDate
+{
+    /*
+     Format date object to a string for inclusion in couchDB files.
+     
+     Arguments:
+     NSDate* aDate : A NSDate object with the current time / date.
+     
+     Returns:
+     NSString* result : The date formatted into a human readable sting.
+     */
+    NSDateFormatter* snotDateFormatter = [[NSDateFormatter alloc] init];
+    [snotDateFormatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'SS'Z'"];
+    snotDateFormatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
+    NSDate* strDate;
+    if (!aDate)
+        strDate = [NSDate date];
+    else
+        strDate = aDate;
+    NSString* result = [snotDateFormatter stringFromDate:strDate];
+    [snotDateFormatter release];
+    
+    return result;
+}
+
+- (NSString*) stringUnixFromDate:(NSDate*)aDate
+{
+    /*
+     Format date object to a string with the standard unix format.
+     
+     Arguments:
+     NSDate* aDate : A NSDate object with the current time / date.
+     
+     Returns:
+     NSString* result : The date formatted into a human readable sting.
+     */
+    NSDate* strDate;
+    if(!aDate){
+        strDate = [NSDate date];
+    }else{
+        strDate = aDate;
+    }
+    NSString* result = [NSString stringWithFormat:@"%f",[strDate timeIntervalSince1970]];
+    strDate = nil;
+    
+    return result;
+}
 
 @end

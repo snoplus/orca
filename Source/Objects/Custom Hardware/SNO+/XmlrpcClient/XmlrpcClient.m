@@ -46,12 +46,12 @@
     return _response;
 }
 
--(void)command:(NSString *)fmt
+-(id)command:(NSString *)fmt
 {
-    [self command:(NSString *)fmt withArgs:nil];
+    return [self command:(NSString *)fmt withArgs:nil];
 }
 
--(void)command:(NSString *)fmt withArgs:args
+-(id)command:(NSString *)fmt withArgs:args
 {
     /*
      * Encodes a command with the xmlrpc protocol and pipes it up to the
@@ -104,7 +104,7 @@
         _response = [decoder object];
     }
 
-    
+    return _response;
 }
 
 
