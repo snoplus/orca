@@ -337,8 +337,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     runControl = [runControlObjsArray objectAtIndex:0];
     
     //Add SNOPModel object
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    //NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    //SNOPModel* aSnotModel = [objs objectAtIndex:0];
     
     //TELLIE pin readout is an average measurement of the passed "number_of_shots". If a large number of shots are requested
     //it is useful to split the data into smaller chunks in order to get multiple pin readings.
