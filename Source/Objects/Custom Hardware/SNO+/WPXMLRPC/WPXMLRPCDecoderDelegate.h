@@ -39,7 +39,7 @@ typedef enum {
 #pragma mark -
 
 @interface WPXMLRPCDecoderDelegate : NSObject<NSXMLParserDelegate> {
-    __weak WPXMLRPCDecoderDelegate *myParent;
+     WPXMLRPCDecoderDelegate *myParent;
     NSMutableArray *myChildren;
     WPXMLRPCElementType myElementType;
     NSString *myElementKey;
