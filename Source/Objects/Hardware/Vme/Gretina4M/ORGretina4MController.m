@@ -545,7 +545,6 @@
 - (void) doHwCheckChanged:(NSNotification*)aNote
 {
    	[doHwCheckButton setIntValue: [model doHwCheck]];
-
 }
 
 
@@ -1833,7 +1832,7 @@
     [self endEditing];
     [model loadThresholds];
 }
-- (IBAction) compareHwNowButton:(id)sender
+- (IBAction) compareHwNowAction:(id)sender
 {
     [model checkBoard:YES];
 }

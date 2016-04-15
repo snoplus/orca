@@ -104,6 +104,20 @@
         float y = b.size.height-stringSize.height-5;
         [s drawAtPoint:NSMakePoint(x,y)];
         [s release];
+ 
+        int risingEdge   = 2019 - ([flatTopField intValue] + [postReField intValue]);
+        ps = [NSString stringWithFormat:@"%d",risingEdge];
+        theAttributes = [NSDictionary dictionaryWithObjectsAndKeys:theFont,NSFontAttributeName,[NSColor blackColor],NSForegroundColorAttributeName,nil];
+        s = [[NSAttributedString alloc] initWithString:ps attributes:theAttributes];
+        stringSize = [s size];
+        x = risingEdgeBugX - stringSize.width/2.;
+        y = b.size.height-stringSize.height-45;
+        [s drawAtPoint:NSMakePoint(x,y)];
+        [s release];
+
+        
+        
+        
         
         if(baseline<1024)reColor = [NSColor blackColor];
         else             reColor = [NSColor redColor];
@@ -150,9 +164,9 @@
             int postrecnt   = [[dataSource model] postrecnt:i];
             int prerecnt    = [[dataSource model] prerecnt:i];
                         
-            postRisingEdgeBugX  = b.origin.x + (2048. - ftCnt)* b.size.width/2048.;
-            risingEdgeBugX      = postRisingEdgeBugX -  postrecnt* b.size.width/2048.;
-            preRisingEdgeBugX   = risingEdgeBugX -  prerecnt* b.size.width/2048.;
+            postRisingEdgeBugX  = b.origin.x + (2019 - ftCnt)* b.size.width/2019;
+            risingEdgeBugX      = b.origin.x + (2019 - ftCnt - postrecnt)* b.size.width/2019;
+            preRisingEdgeBugX   = b.origin.x + (2019 - ftCnt - postrecnt-prerecnt)* b.size.width/2019;
             break;
         }
     }
@@ -212,13 +226,13 @@
 {
 	if(!finalValues)[[(ORAppDelegate*)[NSApp delegate] undoManager] disableUndoRegistration];
     
-    int ftCnt = 2048 - (postRisingEdgeBugX-b.origin.x)*2048/b.size.width;
+    int ftCnt = 2019 - (postRisingEdgeBugX-b.origin.x)*2019/b.size.width;
     [[dataSource model] setFtCnt:channel withValue:ftCnt];
     
-    int postCnt = ((postRisingEdgeBugX - risingEdgeBugX)-b.origin.x)*2048/b.size.width;
+    int postCnt = ((postRisingEdgeBugX - risingEdgeBugX)-b.origin.x)*2019/b.size.width;
     [[dataSource model] setPostrecnt:channel withValue:postCnt];
  
-    int preCnt = ((risingEdgeBugX - preRisingEdgeBugX)-b.origin.x)*2048/b.size.width;
+    int preCnt = ((risingEdgeBugX - preRisingEdgeBugX)-b.origin.x)*2019/b.size.width;
     [[dataSource model] setPrerecnt:channel withValue:preCnt];
 
     
