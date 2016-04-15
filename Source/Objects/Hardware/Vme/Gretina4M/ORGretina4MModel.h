@@ -27,10 +27,12 @@
 #import "AutoTesting.h"
 #import "ORAdcInfoProviding.h"
 #import "SBC_Link.h"
+//#import "ORRunningAverage.h"
 
 @class ORRateGroup;
 @class ORConnector;
 @class ORFileMoverOp;
+//@class ORRunningAverage;
 
 
 #define kNumGretina4MChannels		10
@@ -277,6 +279,7 @@ enum Gretina4MFIFOStates {
 	ORConnector*    linkConnector; //we won't draw this connector so we have to keep a reference to it
     ORFileMoverOp*  fpgaFileMover;
 	ORRateGroup*	waveFormRateGroup;
+    //ORRunningAverage* waveFormRunningAverage;
 	unsigned long 	waveFormCount[kNumGretina4MChannels];
 	BOOL			isRunning;
     NSString*       firmwareStatusString;
@@ -377,6 +380,7 @@ enum Gretina4MFIFOStates {
 
 - (ORRateGroup*)    waveFormRateGroup;
 - (void)			setWaveFormRateGroup:(ORRateGroup*)newRateGroup;
+//- (ORRunningAverage*) waveFormRunningAverage;
 - (id)              rateObject:(short)channel;
 - (void)            setRateIntegrationTime:(double)newIntegrationTime;
 - (void) setExternalWindow:(short)aValue;
@@ -528,6 +532,7 @@ enum Gretina4MFIFOStates {
 - (BOOL) checkCollectionTime:(BOOL)verbose;
 - (BOOL) checkIntegrateTime:(BOOL)verbose;
 - (BOOL) checkDownSample:(BOOL)verbose;
+- (BOOL) checkControlReg:(short)chan verbose:(BOOL)verbose;
 - (BOOL) checkWindowTiming:(short)channel verbose:(BOOL)verbose;
 - (BOOL) checkRisingEdgeWindow:(short)channel verbose:(BOOL)verbose;
 - (BOOL) checkTrapThreshold:(short)channel verbose:(BOOL)verbose;
@@ -553,7 +558,8 @@ enum Gretina4MFIFOStates {
 - (unsigned long) getCounter:(short)counterTag forGroup:(short)groupTag;
 - (void) checkFifoAlarm;
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
-- (BOOL) bumpRateFromDecodeStage:(short)channel;
+//- (BOOL) bumpRateFromDecodeStage:(short)channel;
+- (BOOL) bumpRateFromDecodeStage:(int)channel;
 
 #pragma mark •••HW Wizard
 - (int) numberOfChannels;

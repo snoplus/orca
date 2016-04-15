@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9531" systemVersion="15C50" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10116"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9531"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -17,6 +17,7 @@
                 <outlet property="clockPhasePU" destination="zlG-9C-GwH" id="tWw-FH-fjf"/>
                 <outlet property="clockSourcePU" destination="2566" id="3784"/>
                 <outlet property="collectionTimeField" destination="2548" id="2558"/>
+                <outlet property="compareHwNowButton" destination="zIA-M5-z6L" id="trZ-JH-zBP"/>
                 <outlet property="compareRegistersButton" destination="JHG-XD-ss2" id="KgR-0X-t6d"/>
                 <outlet property="dataWindowView" destination="3846" id="3947"/>
                 <outlet property="diagnosticsClearButton" destination="9fF-N9-B3Y" id="RjT-5G-9br"/>
@@ -2899,7 +2900,7 @@
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="diagnosticsReportAction:" target="-2" id="RaN-Vq-JkV"/>
+                                                <action selector="compareHwNowAction:" target="-2" id="2Fg-54-His"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" id="9fF-N9-B3Y">
@@ -3001,7 +3002,7 @@
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="diagnosticsEnableAction:" target="-2" id="di0-9T-uyz"/>
+                                                <action selector="doHwCheckButtonAction:" target="-2" id="OS8-Yl-OmK"/>
                                             </connections>
                                         </button>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="sLj-c7-28U">
