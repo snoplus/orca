@@ -142,6 +142,7 @@
             if ([delegate respondsToSelector:theDoneSelector]){
                 [delegate performSelectorOnMainThread:theDoneSelector withObject:nil waitUntilDone:NO];
             }
+            [readHandle closeFile];
         }
         @catch (NSException* e){
             NSLog(@"File Getter exception.. stopped during launch\n");
