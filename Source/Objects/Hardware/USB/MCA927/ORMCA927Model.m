@@ -1310,7 +1310,10 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 	else			  fpgaPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"FPGA_Files/M927.rbf"];
 	
 	if([[NSFileManager defaultManager] fileExistsAtPath:fpgaPath]){
-		return [[NSFileHandle fileHandleForReadingAtPath:fpgaPath] readDataToEndOfFile];
+        NSFileHandle* fh = [NSFileHandle fileHandleForReadingAtPath:fpgaPath];
+		NSData* theData =  [fh readDataToEndOfFile];
+        [fh closeFile];
+        return theData;
 	}
 	else {
 		NSLogColor([NSColor redColor],@"MCA927 FPGA file <FPGA_Files/M927.rbf> not found in app resources\n");
