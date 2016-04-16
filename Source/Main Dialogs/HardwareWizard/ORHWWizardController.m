@@ -730,7 +730,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
         if (result == NSFileHandlingPanelOKButton) {
             NSFileHandle* theFile = [NSFileHandle fileHandleForReadingAtPath:[[openPanel URL]path]];
             [self setFileHeader:[ORDecoder readHeader:theFile]];
-            [self executeControlStruct];   
+            [self executeControlStruct];
+            [theFile closeFile];
         }
     }];
 }
@@ -1689,6 +1690,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
             NSFileHandle* theFile = [NSFileHandle fileHandleForReadingAtPath:[[openPanel URL]path]];
             [self setFileHeader:[ORDecoder readHeader:theFile]];
             [self performSelector:@selector(_restoreAll) withObject:nil afterDelay:.1];
+            [theFile closeFile];
         }
     }];
 }
