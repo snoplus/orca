@@ -430,6 +430,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 				[delegate updateStatus:@"Archiving Done"];
 				NSLog(@"Archived ORCA to: %@\n",archivePath);
 				[task release];
+                [file closeFile];
 			}
 			else {
 				[delegate updateStatus:[NSString stringWithFormat:@"Archive exists: %@\n",[archivePath lastPathComponent]]];
@@ -523,6 +524,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 		}
 		[delegate updateStatus:@"Archiving Done"];
 		[task release];
+        [file closeFile];
+
 	}
 	@catch(NSException* e){
 	}
@@ -614,6 +617,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 			}
 			[delegate updateStatus:@"Update Finished"];
 			[task release];
+            [file closeFile];
+
 		}
 	}
 	@catch(NSException* e){
@@ -687,6 +692,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 				if([result length]) NSLog(@"Operation returned:\n%@", result);
 			}
 			[task release];
+            [file closeFile];
+
 		}
 	}
 	@catch(NSException* e){
@@ -782,6 +789,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 				if([result length]) NSLog(@"build returned:\n%@", result);
 			}
 			[task release];
+            [file closeFile];
+
 		}
 	}
 	@catch(NSException* e){
