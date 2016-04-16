@@ -499,6 +499,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNMPQueue);
                 }
 			}
 			[task release];
+            [file closeFile];
         }
 	}
 	@catch(NSException* e){
