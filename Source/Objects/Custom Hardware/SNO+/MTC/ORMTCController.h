@@ -84,6 +84,7 @@
  	IBOutlet NSTextField*	pedestalWidthField;
  	IBOutlet NSTextField*	nhit100LoPrescaleField;
  	IBOutlet NSTextField*	pulserPeriodField;
+    IBOutlet NSTextField*   extraPulserPeriodField;
  	IBOutlet NSTextField*	low10MhzClockField;
  	IBOutlet NSTextField*	high10MhzClockField;
  	IBOutlet NSTextField*	fineSlopeField;
