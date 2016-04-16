@@ -1483,7 +1483,7 @@ smellieRunFile;
 
 - (void) refreshStandardRuns {
     
-    //Clear first
+    //Clear stored SRs
     [standardRunPopupMenu removeAllItems];
     
     NSString *urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/orca/_design/standardRuns/_view/getStandardRuns",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort]];
@@ -1506,14 +1506,20 @@ smellieRunFile;
 
     for(id entry in [standardRunTypes valueForKey:@"rows"]){
         NSString *runtype = [entry valueForKey:@"value"];
-        if([standardRunPopupMenu indexOfItemWithObjectValue:runtype]==NSNotFound)[standardRunPopupMenu addItemWithObjectValue:runtype];
+        if(runtype != (id)[NSNull null]){
+            if([standardRunPopupMenu indexOfItemWithObjectValue:runtype]==NSNotFound)[standardRunPopupMenu addItemWithObjectValue:runtype];
+        }
     }
-    
-    //Select first item in popup menu
-    [standardRunPopupMenu selectItemAtIndex:0];
-    [model setStandardRunType:[standardRunPopupMenu stringValue]];
+
+    //Handle case with empty DB
+    if ([standardRunPopupMenu numberOfItems] == 0){
+        [model setStandardRunType:@""];
+    } else{ //Select first item in popup menu
+        [standardRunPopupMenu selectItemAtIndex:0];
+        [model setStandardRunType:[standardRunPopupMenu stringValue]];
+    }
+
     [self refreshStandardRunVersions];
-    
     [self displayThresholdsFromDB:[model standardRunVersion]];
     [self displayThresholdsFromDB:@"DEFAULT"];
     
@@ -1521,7 +1527,7 @@ smellieRunFile;
 
 - (void) refreshStandardRunVersions {
     
-    //Clear first
+    //Clear stored Versions
     [model setStandardRunVersion:nil];
     [standardRunVersionPopupMenu deselectItemAtIndex:[standardRunVersionPopupMenu indexOfSelectedItem]];
     [standardRunVersionPopupMenu removeAllItems];
@@ -1547,16 +1553,26 @@ smellieRunFile;
     for(id entry in [standardRunVersions valueForKey:@"rows"]){
         NSString *runtype = [[entry valueForKey:@"key"] objectAtIndex:0];
         NSString *runversion = [[entry valueForKey:@"key"] objectAtIndex:1];
-        if([runversion isEqualToString:@"DEFAULT"]) continue;
-        if([runtype isEqualToString:[model standardRunType]])
-            if([standardRunVersionPopupMenu indexOfItemWithObjectValue:runversion]==NSNotFound)[standardRunVersionPopupMenu addItemWithObjectValue:runversion];
+        if(runversion != (id)[NSNull null]){
+            if([runversion isEqualToString:@"DEFAULT"]) continue;
+            if([runtype isEqualToString:[model standardRunType]])
+                if([standardRunVersionPopupMenu indexOfItemWithObjectValue:runversion]==NSNotFound)[standardRunVersionPopupMenu addItemWithObjectValue:runversion];
+        }
     }
     
-    //Select first item in popup menu
-    if([standardRunVersionPopupMenu numberOfItems] == 0) return;
-    [standardRunVersionPopupMenu selectItemAtIndex:0];
-    NSString *standardRunVersion = [standardRunVersionPopupMenu stringValue];
-    [model setStandardRunVersion:standardRunVersion];
+    //Handle case with empty DB
+    if([standardRunVersionPopupMenu numberOfItems] == 0) {
+        [model setStandardRunVersion:@""];
+    } else{ //Select first item in popup menu
+        [standardRunVersionPopupMenu selectItemAtIndex:0];
+        NSString *standardRunVersion = [standardRunVersionPopupMenu stringValue];
+        if(standardRunVersion != (id)[NSNull null]){
+            [model setStandardRunVersion:standardRunVersion];
+        }
+        else{
+            [model setStandardRunVersion:@""];
+        }
+    }
 
 }
 
