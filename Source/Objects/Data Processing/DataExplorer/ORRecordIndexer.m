@@ -57,6 +57,7 @@
             NSLog(@"Data Explorer: Opening %@\n",filePath);
             NSFileHandle* fh = [NSFileHandle fileHandleForReadingAtPath:filePath];
             fileAsData = [[fh readDataToEndOfFile] retain];
+            [fh closeFile];
             [delegate setDataRecords:[self decodeDataIntoArray]];
             [delegate setHeader:[ORHeaderItem headerFromObject:[currentDecoder fileHeader] named:@"Root"]];
         }

@@ -283,6 +283,7 @@ NSString* ORDataExplorerDataChanged                 = @"ORDataExplorerDataChange
 			if(d)[self setHeader:d ];
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORDataExplorerParseEndedNotification object:self];
 		}
+        [fh closeFile];
 	}
 	else {
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORDataExplorerParseStartedNotification object: self];

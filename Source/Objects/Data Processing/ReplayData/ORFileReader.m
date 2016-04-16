@@ -111,6 +111,7 @@
                                         waitUntilDone:YES];
             }
         }
+        [fh closeFile];
     }
     @catch (NSException* e){
         NSLog(@"Replay halted abnormally\n");
