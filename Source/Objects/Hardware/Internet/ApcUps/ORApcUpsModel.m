@@ -428,13 +428,15 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
     [self disconnect];
     
     [self setUpQueue];
-   
-    ORFileGetterOp* mover = [[[ORFileGetterOp alloc] init] autorelease];
-    mover.delegate     = self;
-    [mover setUseFTP:YES];
-    [mover setParams:@"logs/event.txt" localPath:kApcEventsPath ipAddress:ipAddress userName:username passWord:password];
-    [mover setDoneSelectorName:@"eventsFileArrived"];
-    [fileQueue addOperation:mover];
+    if(mover)[mover cancel];
+    else {
+        mover = [[ORFileGetterOp alloc] init];
+        mover.delegate     = self;
+        [mover setUseFTP:YES];
+        [mover setParams:@"logs/event.txt" localPath:kApcEventsPath ipAddress:ipAddress userName:username passWord:password];
+        [mover setDoneSelectorName:@"eventsFileArrived"];
+        [fileQueue addOperation:mover];
+    }
 }
 
 - (BOOL) isConnected
@@ -452,6 +454,9 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 
 - (void) eventsFileArrived
 {
+    [mover release];
+    mover = nil;
+    
     NSStringEncoding* en=nil;
     NSString* contents = [NSString stringWithContentsOfFile:kApcEventsPath usedEncoding:en error:nil];
     NSArray* lines = [contents componentsSeparatedByString:@"\n"];

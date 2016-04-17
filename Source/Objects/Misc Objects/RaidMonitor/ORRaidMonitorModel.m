@@ -242,13 +242,15 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
         [fileQueue addObserver:self forKeyPath:@"operations" options:0 context:NULL];
     }
 
+    if(mover)[mover cancel];
+    else {
+        mover = [[ORFileGetterOp alloc] init];
+        mover.delegate     = self;
 
-    ORFileGetterOp* mover = [[[ORFileGetterOp alloc] init] autorelease];
-    mover.delegate     = self;
-
-    [mover setParams:remotePath localPath:localPath ipAddress:ipAddress userName:userName passWord:password];
-    [mover setDoneSelectorName:@"fileGetterIsDone"];
-    [fileQueue addOperation:mover];
+        [mover setParams:remotePath localPath:localPath ipAddress:ipAddress userName:userName passWord:password];
+        [mover setDoneSelectorName:@"fileGetterIsDone"];
+        [fileQueue addOperation:mover];
+    }
     [self performSelector:@selector(getStatus) withObject:nil afterDelay:60*60];
 }
 
@@ -267,6 +269,8 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
 
 - (void) fileGetterIsDone
 {
+    [mover release];
+    mover = nil;
     
     NSString* fullLocalPath = [localPath stringByExpandingTildeInPath];
     NSString* contents = [NSString stringWithContentsOfFile:fullLocalPath encoding:NSASCIIStringEncoding error:nil];
