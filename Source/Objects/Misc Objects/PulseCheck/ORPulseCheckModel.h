@@ -19,6 +19,7 @@
 
 @class ORMachineToCheck;
 @class ORAlarm;
+@class ORFileGetterOp;
 
 @interface ORPulseCheckModel : OrcaObject  {
     NSMutableArray* machines;
@@ -52,6 +53,7 @@ extern NSString* ORPulseCheckListLock;
 @interface ORMachineToCheck : NSObject <NSCopying> {
     NSMutableDictionary* data;
     ORAlarm* noHeartbeatAlarm;
+    ORFileGetterOp* mover;
 }
 + (id) machineToCheck;
 - (id) copyWithZone:(NSZone *)zone;
