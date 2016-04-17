@@ -45,7 +45,7 @@ enum {
 - (id) init 
 {
     self = [super init];
-    [self setTaskInterval:60];
+    [self setTaskInterval:3*60];
     [self setLaunchTime:[NSDate date]];
     [self launchTask];
     return self;
@@ -200,6 +200,7 @@ enum {
 - (void) taskCompleted: (NSNotification*)aNote
 {
     if([aNote object] == vmTask){
+        [[[vmTask standardOutput] fileHandleForReading] closeFile];
         [self setVmTask:nil];
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(launchTask) object:nil];
         [self performSelector:@selector(launchTask) withObject:nil afterDelay:taskInterval];
