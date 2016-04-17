@@ -30,7 +30,7 @@ NSString* ORPulseCheckMachineRemoved        = @"ORPulseCheckMachineRemoved";
 NSString* ORPulseCheckListLock              = @"ORPulseCheckListLock";
 NSString* ORPulseCheckModelReloadTable      = @"ORPulseCheckModelReloadTable";
 
-#define kCheckMachineTime 3*60
+#define kCheckMachineTime 5
 
 #define kIpNumber       @"kIpNumber"
 #define kUserName       @"kUserName"
@@ -232,17 +232,20 @@ NSString* ORPulseCheckModelReloadTable      = @"ORPulseCheckModelReloadTable";
 - (void) doCheck
 {
     [[NSFileManager defaultManager] removeItemAtPath:[self localPath] error:nil];
-    ORFileGetterOp* mover = [[[ORFileGetterOp alloc] init] autorelease];
-    mover.delegate     = self;
-    
-    [mover setParams: [self heartbeatPath]
-           localPath: [self localPath]
-           ipAddress: [self ipNumber]
-            userName: [self username]
-            passWord: [self password]];
-    
-    [mover setDoneSelectorName:@"fileGetterIsDone"];
-    [[NSOperationQueue mainQueue] addOperation:mover];
+    if(mover)[mover cancel];
+    else {
+        mover = [[ORFileGetterOp alloc] init];
+        mover.delegate     = self;
+        
+        [mover setParams: [self heartbeatPath]
+               localPath: [self localPath]
+               ipAddress: [self ipNumber]
+                userName: [self username]
+                passWord: [self password]];
+        
+        [mover setDoneSelectorName:@"fileGetterIsDone"];
+        [[NSOperationQueue mainQueue] addOperation:mover];
+    }
 }
 
 - (NSString*)localPath
@@ -253,6 +256,8 @@ NSString* ORPulseCheckModelReloadTable      = @"ORPulseCheckModelReloadTable";
 
 - (void) fileGetterIsDone
 {
+    [mover release];
+    mover = nil;
     [self setLastChecked:[[NSDate date]stdDescription]];
     NSString* contents = [NSString stringWithContentsOfFile:[self localPath] encoding:NSASCIIStringEncoding error:nil];
     if([contents length] == 0){
