@@ -30,7 +30,7 @@ NSString* ORPulseCheckMachineRemoved        = @"ORPulseCheckMachineRemoved";
 NSString* ORPulseCheckListLock              = @"ORPulseCheckListLock";
 NSString* ORPulseCheckModelReloadTable      = @"ORPulseCheckModelReloadTable";
 
-#define kCheckMachineTime 5
+#define kCheckMachineTime 3*60
 
 #define kIpNumber       @"kIpNumber"
 #define kUserName       @"kUserName"
