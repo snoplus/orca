@@ -47,6 +47,7 @@
 - (IBAction) cut:(id)sender;
 - (IBAction) loadFileAction:(id) sender;
 - (IBAction) saveFileAction:(id) sender;
+- (IBAction) checkNow:(id) sender;
 
 #pragma mark •••Delegate Methods
 - (void) tableViewSelectionDidChange:(NSNotification *)aNotification;
