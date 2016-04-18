@@ -448,7 +448,7 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
                          change:(NSDictionary *)change context:(void *)context
 {
     if (object == fileQueue && [keyPath isEqual:@"operations"]) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORApcUpsIsConnectedChanged object:self];
+        [[NSNotificationCenter defaultCenter]  postNotificationOnMainThreadWithName:ORApcUpsIsConnectedChanged object:self userInfo:nil waitUntilDone:NO];
     }
 }
 
