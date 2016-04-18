@@ -269,6 +269,11 @@
     }];
 }
 
+- (IBAction) checkNow:(id) sender
+{
+    [model checkMachines:nil];
+}
+
 #pragma mark Data Source Methods
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
 {
