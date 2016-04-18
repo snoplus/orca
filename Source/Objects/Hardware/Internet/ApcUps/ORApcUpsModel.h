@@ -30,6 +30,7 @@
 @class ORAlarm;
 @class ORTimeRate;
 @class NetSocket;
+@class ORFileGetterOp;
 
 @interface ORApcUpsModel : ORGroup <OROrderedObjHolding,ORAdcProcessing>
 {
@@ -59,6 +60,7 @@
     int                  sayItCount;
     unsigned int         pollTime;
     BOOL                 maintenanceMode;
+    ORFileGetterOp*      mover;
 }
 
 #pragma mark ***Accessors

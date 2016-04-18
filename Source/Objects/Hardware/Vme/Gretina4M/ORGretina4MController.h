@@ -303,7 +303,7 @@
 - (IBAction) viewPreampAction:(id)sender;
 - (IBAction) loadThresholdsAction:(id)sender;
 - (IBAction) doHwCheckButtonAction:(id)sender;
-- (IBAction) compareHwNowButton:(id)sender;
+- (IBAction) compareHwNowAction:(id)sender;
 
 
 #pragma mark •••Data Source

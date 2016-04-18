@@ -1264,26 +1264,34 @@ void SwapLongBlock(void* p, int32_t n)
             mb->tCmos.tacShift[dbNum*8+channel] = [db tac0trim:channel];
             mb->sCmos[dbNum*8+channel] = [db tac1trim:channel];
 
-            /* Note that the N100 and N20 trigger masks are *not*
+            /* Currently the N100 and N20 trigger masks are *not*
              * set using the mask variable. Instead the ML403 sets these
-             * triggers using the delay and width variables. */
+             * triggers using the delay and width variables.
+             *
+             * For now, we set both since the detector database uses
+             * the mask fields. There will soon be a pull request to
+             * the ML403 code to use the mask variables at which point
+             * this warning and the code which sets the masks via
+             * the delay and width fields can be deleted. */
 
-            // mb->tr100.mask[dbNum*8+channel] = 0;
             mb->tr100.tDelay[dbNum*8+channel] = [db ns100width:channel];
 
             if ([fec trigger100nsEnabled: (dbNum*8 + channel)]) {
+                mb->tr100.mask[dbNum*8+channel] = 1;
                 mb->tr100.tDelay[dbNum*8+channel] |= 0x40;
             } else {
+                mb->tr100.mask[dbNum*8+channel] = 0;
                 mb->tr100.tDelay[dbNum*8+channel] &= ~0x40;
             }
 
-            // mb->tr20.mask[dbNum*8+channel] = 0;
             mb->tr20.tDelay[dbNum*8+channel] = [db ns20delay:channel];
             mb->tr20.tWidth[dbNum*8+channel] = [db ns20width:channel];
 
             if ([fec trigger20nsEnabled: (dbNum*8 + channel)]) {
+                mb->tr20.mask[dbNum*8+channel] = 1;
                 mb->tr20.tWidth[dbNum*8+channel] |= 0x20;
             } else {
+                mb->tr20.mask[dbNum*8+channel] = 0;
                 mb->tr20.tWidth[dbNum*8+channel] &= ~0x20;
             }
 

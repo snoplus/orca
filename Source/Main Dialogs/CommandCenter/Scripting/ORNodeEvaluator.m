@@ -896,6 +896,7 @@
 		NSString* tempString = [[NSString alloc] initWithData:inData encoding:NSASCIIStringEncoding];
 		[task release];
 		[tempString autorelease];
+        [readHandle closeFile];
 		NSLog(@"%@\n", tempString);
 	}
 	return nil;

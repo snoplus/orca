@@ -138,6 +138,8 @@
             [task launch];
             
             [self readOutput:readHandle];
+            [readHandle closeFile];
+            
             SEL theDoneSelector = NSSelectorFromString(doneSelectorName);
             if ([delegate respondsToSelector:theDoneSelector]){
                 [delegate performSelectorOnMainThread:theDoneSelector withObject:nil waitUntilDone:NO];

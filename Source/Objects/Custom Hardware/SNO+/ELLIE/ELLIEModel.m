@@ -348,6 +348,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSString* responseFromCmdLine = [[[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding] autorelease]; // This string now contains the entire output of the ssh command.
     
     [task release];
+    [file closeFile]; //bug in NSFileHandle requires the file to be closed.. not enough to just deallocate the handle
     return responseFromCmdLine;
 }
 
