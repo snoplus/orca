@@ -30,8 +30,6 @@
   @private
 	ORTimeRate*	timeRate[kNumWatchedValues];
 	
-    NSTask*              vmTask;
-    NSMutableString*     taskResult;
     NSTimeInterval       taskInterval;
     NSDate*              launchTime;
     NSTimeInterval       upTime;
@@ -49,20 +47,27 @@
 - (void) setLaunchTime:(NSDate*)aLaunchTime;
 - (NSTimeInterval) taskInterval;
 - (void) setTaskInterval:(NSTimeInterval)aTaskInterval;
-- (NSMutableString*) taskResult;
-- (void) setTaskResult:(NSMutableString*)aTaskResult;
-- (NSTask*) vmTask;
-- (void) setVmTask:(NSTask*)aVmTask;
 - (float) convertValue:(float)aValue withMultiplier:(NSString*)aMultiplier;
 - (unsigned) timeRateCount:(int)rateIndex;
 - (float) timeRate:(int)rateIndex value:(int)valueIndex;
 
-- (void) launchTask;
-- (void) taskCompleted: (NSNotification*)aNote;
-- (void) taskDataAvailable:(NSNotification*)aNotification;
+- (void) launchTop;
 @end
 
 extern NSString* MemoryWatcherUpTimeChanged;
 extern NSString* MemoryWatcherChangedNotification;
 extern NSString* MemoryWatcherTaskIntervalNotification;
+//--------------------------------------------------
+// ORTopShellOp
+// An easier way to use top by just executing shell
+// scripts and having the result go back to the delegate
+//--------------------------------------------------
+@interface ORTopShellOp : NSOperation
+{
+    id          delegate;
+    int         tag;
+}
+- (id) initWithDelegate:(id)aDelegate;
+- (void) main;
+@end
 

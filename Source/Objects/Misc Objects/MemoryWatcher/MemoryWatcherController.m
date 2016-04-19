@@ -72,18 +72,10 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(MemoryWatcherController);
 	[thePlot setLineWidth:1];
 	[thePlot setLineColor:[NSColor redColor]];
 	[thePlot setUseConstantColor:YES];
-	[thePlot setName:@"RSize(MB)"];
+	[thePlot setName:@"Memory(MB)"];
 	[plotView addPlot: thePlot];
 	[thePlot release];
-	
-	thePlot = [[ORPlot alloc] initWithTag:2 andDataSource:self];
-	[thePlot setLineWidth:1];
-	[thePlot setLineColor:[NSColor blueColor]];
-	[thePlot setUseConstantColor:YES];
-	[thePlot setName:@"VSize(MB)"];
-	[plotView addPlot: thePlot];
-	[thePlot release];
-	
+		
 	[plotView setShowLegend:YES];
 	
     [plotView setNeedsDisplay:YES];
