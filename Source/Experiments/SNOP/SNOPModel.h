@@ -97,8 +97,6 @@
     
     bool _smellieDBReadInProgress;
     bool _smellieDocUploaded;
-    NSMutableDictionary * snopRunTypeMask;
-    NSNumber * runTypeMask;
     NSString * standardRunType;
     NSString * standardRunVersion;
     
@@ -125,6 +123,8 @@
     RedisClient *xl3_server;
 
     @private
+        //Run type word
+        unsigned long runTypeWord;
         //ECA stuff
         int ECA_pattern;
         int ECA_type;
@@ -134,8 +134,6 @@
 }
 
 @property (nonatomic,retain) NSMutableDictionary* smellieRunHeaderDocList;
-@property (nonatomic,retain) NSMutableDictionary* snopRunTypeMask;
-@property (nonatomic,retain) NSNumber* runTypeMask;
 
 @property (nonatomic,copy) NSString* orcaDBUserName;
 @property (nonatomic,copy) NSString* orcaDBPassword;
@@ -239,9 +237,11 @@
 #pragma mark ¥¥¥Accessors
 - (void) setViewType:(int)aViewType;
 - (int) viewType;
+- (unsigned long) runTypeWord;
+- (void) setRunTypeWord:(unsigned long)aMask;
 - (NSString*) standardRunType;
-- (NSString*) standardRunVersion;
 - (void) setStandardRunType:(NSString*)aValue;
+- (NSString*) standardRunVersion;
 - (void) setStandardRunVersion:(NSString*)aValue;
 - (int) ECA_pattern;
 - (int) ECA_type;
@@ -275,14 +275,9 @@
 - (ORCouchDB*) debugDBRef:(id)aCouchDelegate;
 - (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
 
-//run type definition functions
-- (void) setSnopRunTypeMask:(NSMutableDictionary*)aRunType;
-- (NSMutableDictionary*) getSnopRunTypeMask;
-
 //smellie functions -------
 - (void) getSmellieRunListInfo;
 - (NSMutableDictionary*)smellieTestFct;
--(BOOL)isRunTypeMaskedIn:(NSString*)aRunType;
 -(void) testerHv;
 
 //Standard runs functions
@@ -307,6 +302,7 @@
 extern NSString* ORSNOPModelViewTypeChanged;
 extern NSString* ORSNOPModelOrcaDBIPAddressChanged;
 extern NSString* ORSNOPModelDebugDBIPAddressChanged;
+extern NSString* SNOPRunTypeWordChangedNotification;
 extern NSString* SNOPRunTypeChangedNotification;
 extern NSString* ORSNOPRunsLockNotification;
 extern NSString* ORSNOPModelRunsECAChangedNotification;

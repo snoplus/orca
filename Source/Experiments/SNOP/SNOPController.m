@@ -42,9 +42,7 @@ NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 
 @synthesize
 runStopImg = _runStopImg,
-runTypeMask,
 smellieRunFileList,
-snopRunTypeMaskDic,
 smellieRunFile;
 
 #pragma mark ¥¥¥Initialization
@@ -166,21 +164,7 @@ smellieRunFile;
 
 -(void)windowDidLoad
 {
-    
-    /*if([[globalRunTypesMatrix cellAtRow:i column:0] intValue] == 1){
-        maskValue |= (0x1UL << i);
-    }*/
-    
-    //build run type dictionary from the runTypes in the GUI
-    self.snopRunTypeMaskDic = nil; //reset the current GUI information
-    NSMutableDictionary *temp = [[NSMutableDictionary alloc] initWithCapacity:20];
-    int i;
-    for(i=0;i<31;i++){
-        NSButtonCell* test = [globalRunTypesMatrix cellAtRow:i column:0];
-        [temp setObject:[NSString stringWithFormat:@"empty"] forKey:[test title]];
-    }
-    
-    self.snopRunTypeMaskDic = temp;
+
 }
 
 
@@ -269,7 +253,12 @@ smellieRunFile;
                        object:model];
     
     [notifyCenter addObserver:self
-                     selector:@selector(runTypeMaskChanged:)
+                     selector:@selector(runTypeWordChanged:)
+                         name:ORRunTypeChangedNotification
+                       object:theRunControl];
+    
+    [notifyCenter addObserver:self
+                     selector:@selector(runTypeWordChanged:)
                          name:ORRunTypeChangedNotification
                        object:theRunControl];
     
@@ -297,7 +286,7 @@ smellieRunFile;
                      selector : @selector(updateSettings:)
                          name : @"SNOPSettingsChanged"
                         object: mtcModel];
-
+    
     //TODO: add the notification for changedRunType on SNO+
     /*[notifyCenter addObserver:self
                      selector:@selector(runTypesChanged:)
@@ -312,11 +301,12 @@ smellieRunFile;
     [self hvStatusChanged:nil];
     [self dbOrcaDBIPChanged:nil];
     [self dbDebugDBIPChanged:nil];
-    [self fetchRunMaskSettings];
     [self runStatusChanged:nil]; //update the run status
     [model setIsEmergencyStopEnabled:TRUE]; //enable the emergency stop
     [self runsLockChanged:nil];
     [self runsECAChanged:nil];
+    [self refreshRunWordLabels:nil];
+    [self runTypeWordChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -324,20 +314,6 @@ smellieRunFile;
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
     [gSecurity setLock:ORSNOPRunsLockNotification to:secure];
     [runsLockButton setEnabled:secure];
-}
-
--(void) fetchRunMaskSettings
-{
-    int i;
-    for(i=0;i<31;i++){
-        unsigned long mask = 0;
-        mask = [[model runTypeMask] unsignedLongValue];
-        //read the bitmask from the run mask
-        int valueToSetInMatrix = (int) ((mask >> i) & 0x1UL);
-        [[globalRunTypesMatrix cellAtRow:i column:0] setIntValue:valueToSetInMatrix];
-        
-    }
-    //[globalRunTypesMatrix
 }
 
 -(IBAction)setTellie:(id)sender
@@ -367,15 +343,6 @@ smellieRunFile;
     [self displayThresholdsFromDB];
     
 }
-
--(void) runTypeMaskChanged:(NSNotification*)aNote
-{
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* mainRunControl = [objs objectAtIndex:0];
-
-    [maintenanceRunBox setState:[mainRunControl runType] & 1];
-}
-
 
 - (IBAction)maintenanceBoxAction:(id)sender {
 
@@ -452,38 +419,6 @@ smellieRunFile;
     }
     
 }
-
-
-- (IBAction)changedRunTypeMatrixAction:(id)sender
-{    
-    //write in the new runType mask
-    unsigned long maskValue = 0;
-    int i;
-    //only goes up to 31 because there is some strange problem with objective c recasting implictly an unsigned long as a long
-    for(i=0;i<31;i++){
-        if([[globalRunTypesMatrix cellAtRow:i column:0] intValue] == 1){
-            NSButtonCell* test = [globalRunTypesMatrix cellAtRow:i column:0];
-            [snopRunTypeMaskDic setObject:[NSNumber numberWithInt:[[globalRunTypesMatrix cellAtRow:i column:0] intValue]] forKey:[test title]];
-            //set the actual bit mask
-            maskValue |= (0x1UL << i);
-        }
-    }
-    
-    //self.runTypeMask = nil;
-    NSNumber* maskValueForStore = [NSNumber numberWithUnsignedLong:maskValue];
-    self.runTypeMask = maskValueForStore;
-    
-    [model setRunTypeMask:maskValueForStore];
-    
-    //A bit of test code to see a 32-bit word
-    /*NSMutableString *str = [NSMutableString stringWithFormat:@""];
-    for(NSInteger numberCopy = maskValue; numberCopy > 0; numberCopy >>= 1)
-    {
-        // Prepend "0" or "1", depending on the bit
-        [str insertString:((numberCopy & 1) ? @"1" : @"0") atIndex:0];
-    }*/
-}
-
 
 // Currently use the default stopRunAction of the superclass ORExperimentController.
 // Leave this here in case a custom function is needed
@@ -1209,6 +1144,16 @@ smellieRunFile;
     [gSecurity tryToSetLock:ORSNOPRunsLockNotification to:[sender intValue] forWindow:[self window]];
 }
 
+- (IBAction)refreshRunWordLabels:(id)sender {
+    NSArray* theNames = [runControl runTypeNames];
+    
+    int n = [theNames count];
+    for(int i=1;i<n;i++){
+        [[runTypeWordMatrix cellAtRow:i column:0] setTitle:[theNames objectAtIndex:i]];
+    }
+
+}
+
 - (void) runsLockChanged:(NSNotification*)aNotification
 {
     BOOL runInProgress				= [gOrcaGlobals runInProgress];
@@ -1398,6 +1343,19 @@ smellieRunFile;
     
 }
 
+//Run Type Word
+-(void) runTypeWordChanged:(NSNotification*)aNote
+{
+    
+    unsigned long currentRunWord = [runControl runType];
+    [model setRunTypeWord:currentRunWord];
+    
+    //Update display
+    for(int i=0;i<32;i++){
+        [[runTypeWordMatrix cellAtRow:i column:0] setState:(currentRunWord &(1L<<i))!=0];
+    }
+    
+}
 
 -(void) displayThresholdsFromDB {
     

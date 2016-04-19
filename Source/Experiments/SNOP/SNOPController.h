@@ -65,8 +65,8 @@
     IBOutlet NSMatrix *standardRunThresDefaultValues;
 
     //Run Types Information
-    IBOutlet NSMatrix*  globalRunTypesMatrix;
-    
+    IBOutlet NSMatrix*  runTypeWordMatrix;
+
     //Xl3 Mode
     IBOutlet NSMatrix * globalxl3Mode;
     
@@ -100,11 +100,8 @@
     NSMutableDictionary *smellieRunFileList;
     NSDictionary *smellieRunFile;
     NSThread *smellieThread;
-    NSNumber * runTypeMask;
     NSThread *eStopPollingThread;
     
-    NSMutableDictionary *snopRunTypeMaskDic; 
-
     IBOutlet NSButton* runsLockButton;
     IBOutlet NSTextField *runStatusTextField;
 
@@ -125,13 +122,12 @@
     IBOutlet NSPopUpButton *ECAtypePopUpButton;
     IBOutlet NSTextField *TSlopePatternTextField;
     IBOutlet NSTextField *subTimeTextField;
+    NSButton *refreshRunWordNames;
 }
 
 @property (nonatomic,retain) NSImage* runStopImg;
 @property (nonatomic,retain) NSMutableDictionary *smellieRunFileList;
-@property (nonatomic,retain) NSMutableDictionary *snopRunTypeMaskDic;
 @property (nonatomic,retain) NSDictionary *smellieRunFile;
-@property (nonatomic,retain) NSNumber *runTypeMask;
 
 #pragma mark ¥¥¥Initialization
 - (void) registerNotificationObservers;
@@ -192,6 +188,8 @@
 -(void) fetchRunMaskSettings;
 
 - (IBAction) runsLockAction:(id)sender;
+- (IBAction)refreshRunWordLabels:(id)sender;
+
 
 @end
 @interface ORDetectorView (SNO)
