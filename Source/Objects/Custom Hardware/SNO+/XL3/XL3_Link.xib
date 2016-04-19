@@ -85,7 +85,6 @@
                 <outlet property="hvTargetValueStepper" destination="4274" id="4501"/>
                 <outlet property="monIsPollingCMOSRatesButton" destination="3962" id="4027"/>
                 <outlet property="monIsPollingFECVoltagesButton" destination="3968" id="4028"/>
-                <outlet property="monIsPollingHVSupplyButton" destination="3974" id="4029"/>
                 <outlet property="monIsPollingPMTCurrentsButton" destination="3965" id="4030"/>
                 <outlet property="monIsPollingVerboseButton" destination="4004" id="4032"/>
                 <outlet property="monIsPollingWithRunButton" destination="4024" id="4033"/>
@@ -1191,17 +1190,6 @@
                                                         </buttonCell>
                                                         <connections>
                                                             <action selector="monIsPollingXl3VoltagesAction:" target="-2" id="4045"/>
-                                                        </connections>
-                                                    </button>
-                                                    <button id="3974">
-                                                        <rect key="frame" x="15" y="98" width="113" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="HV power supply" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="3975">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="monIsPollingHVSupplyAction:" target="-2" id="4046"/>
                                                         </connections>
                                                     </button>
                                                     <box verticalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="4018">
