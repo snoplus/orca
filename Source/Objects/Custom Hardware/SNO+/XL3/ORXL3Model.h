@@ -184,14 +184,19 @@ enum {
 @property (nonatomic,assign) BOOL hvBSwitch;
 @property (nonatomic,copy) NSString* triggerStatus;
 @property (nonatomic,assign) BOOL isTriggerON;
+//ADC counts (3kV 12bit)
 @property (nonatomic,assign) unsigned long hvAVoltageDACSetValue;
 @property (nonatomic,assign) unsigned long hvBVoltageDACSetValue;
+//volts
 @property (nonatomic,assign) float hvAVoltageReadValue;
 @property (nonatomic,assign) float hvBVoltageReadValue;
+//mili amps
 @property (nonatomic,assign) float hvACurrentReadValue;
 @property (nonatomic,assign) float hvBCurrentReadValue;
+//ADC counts (3kV 12bit)
 @property (nonatomic,assign) unsigned long hvAVoltageTargetValue;
 @property (nonatomic,assign) unsigned long hvBVoltageTargetValue;
+//volts
 @property (nonatomic,assign) unsigned long hvNominalVoltageA;
 @property (nonatomic,assign) unsigned long hvNominalVoltageB;
 @property (nonatomic,assign) BOOL calcCMOSRatesFromCounts;
@@ -199,6 +204,7 @@ enum {
 @property (nonatomic,assign) unsigned long hvBCMOSRateLimit;
 @property (nonatomic,assign) unsigned long hvACMOSRateIgnore;
 @property (nonatomic,assign) unsigned long hvBCMOSRateIgnore;
+//ADC counts (3kV 12bit)
 @property (nonatomic,assign) unsigned long hvANextStepValue;
 @property (nonatomic,assign) unsigned long hvBNextStepValue;
 @property (nonatomic,assign) unsigned long hvCMOSReadsCounter;

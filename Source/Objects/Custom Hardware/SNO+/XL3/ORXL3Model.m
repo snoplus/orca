@@ -3645,37 +3645,6 @@ void SwapLongBlock(void* p, int32_t n)
         return;
     }
 
-    //XL3 reset button
-    if (fabs([self hvAVoltageReadValue] * 4096/3000. - [self hvAVoltageDACSetValue]) > 50) {
-        NSLog(@"%@ Mismatch between expected and read HV value for A supply, updating ORCA from the XL3 value",
-              [[self xl3Link] crateName]);
-        [self setHvAVoltageDACSetValue:[self hvAVoltageReadValue]* 4096/3000.];
-    }
-    
-    //even if it matches but the read switch position is OFF update to zero
-    //XL3 SW reset
-    if (sup == 0 && ![self hvASwitch] && [self hvAVoltageDACSetValue] > 0) [self setHvAVoltageDACSetValue:0];
-    if (sup == 1 && ![self hvBSwitch] && [self hvBVoltageDACSetValue] > 0) [self setHvBVoltageDACSetValue:0];
-
-    /*
-     //if B output not present there is mismatch expected
-    if (fabs([self hvAVoltageReadValue] * 4096/3000. - [self hvAVoltageDACSetValue]) > 50) {
-        NSLog(@"%@ Mismatch between expected and read HV value for A supply, updating ORCA from the XL3 value",
-              [[self xl3Link] crateName]);
-        [self setHvAVoltageDACSetValue:[self hvAVoltageReadValue]* 4096/3000.];
-    }
-     */
-
-    @try {
-        if ((sup == 0 && hvASwitch != aOn) || (sup == 1 && hvBSwitch != aOn)) { //changing A from OFF to ON or ON to OFF
-            [self setHVDacA:[self hvAVoltageDACSetValue] dacB:[self hvBVoltageDACSetValue]];
-        }
-    }
-    @catch (NSException *exception) {
-        NSLog(@"%@ error in setting HV DAC values.",[[self xl3Link] crateName]);
-        return;
-    }
-
     @try {
         if (sup == 0) { //A
             [self setHVSwitchOnForA:aOn forB:hvBSwitch];
@@ -3688,16 +3657,7 @@ void SwapLongBlock(void* p, int32_t n)
         NSLog(@"%@ error in setting the HV switch.",[[self xl3Link] crateName]);
         return;
     }
-
-    //check the hv thread is running
-    if (hvASwitch || hvBSwitch || aOn) {
-        [self setIsPollingHVSupply:YES];
-        //[self setIsPollingXl3:YES];
         
-        [self setHvANextStepValue:[self hvAVoltageDACSetValue]];
-        [self setHvBNextStepValue:[self hvBVoltageDACSetValue]];
-    }
-
     //let's believe it worked
     if (sup == 0) { //A
         [self setHvASwitch:aOn];
@@ -4460,7 +4420,6 @@ void SwapLongBlock(void* p, int32_t n)
 - (void) _hvInit
 {
     NSAutoreleasePool* hvPool = [[NSAutoreleasePool alloc] init];
-    NSLog(@"Attempting to readout HV status from XL3\n");
     while (true) {
         sleep(1);
         //do nothing without an xl3 connected
@@ -4489,20 +4448,34 @@ void SwapLongBlock(void* p, int32_t n)
                 continue; // try again later if there was an error
             }
             
-            //set model values to hv readback
-            if ([self hvASwitch] && !self.hvANeedsUserIntervention) {
-                [self setHvAVoltageDACSetValue:[self hvAVoltageReadValue]* 4096/3000.];
-                [self setHvANextStepValue:[self hvAVoltageReadValue]* 4096/3000.];
-                [self setHvAVoltageTargetValue:[self hvAVoltageReadValue]* 4096/3000.	];
+            //set model values to hv readback or 0 if switch is off
+            if (!self.hvANeedsUserIntervention) {
+                if ([self hvASwitch]) {
+                    [self setHvAVoltageDACSetValue:[self hvAVoltageReadValue]* 4096/3000.];
+                    [self setHvANextStepValue:[self hvAVoltageReadValue]* 4096/3000.];
+                } else {
+                    [self setHvAVoltageDACSetValue:0];
+                    [self setHvANextStepValue:0];
+                }
             }
-            if ([self hvBSwitch] && !self.hvBNeedsUserIntervention) {
-                [self setHvBVoltageDACSetValue:[self hvBVoltageReadValue]* 4096/3000.];
-                [self setHvBNextStepValue:[self hvBVoltageReadValue]* 4096/3000.];
-                [self setHvBVoltageTargetValue:[self hvBVoltageReadValue]* 4096/3000.];
+            if (!self.hvBNeedsUserIntervention) {
+                if ([self hvBSwitch]) {
+                    [self setHvBVoltageDACSetValue:[self hvBVoltageReadValue]* 4096/3000.];
+                    [self setHvBNextStepValue:[self hvBVoltageReadValue]* 4096/3000.];
+                } else {
+                    [self setHvBVoltageDACSetValue:0];
+                    [self setHvBNextStepValue:0];
+                }
             }
             
-            //let everyone know there are new target values
-            [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHVTargetValueChanged object:self];
+            //Update XL3 in case switch was off
+            @try {
+                [self setHVDacA:[self hvAVoltageDACSetValue] dacB:[self hvBVoltageDACSetValue]];
+            }
+            @catch (NSException *exception) {
+                NSLog(@"%@ HV init failed to set HV!\n", [self hvBVoltageDACSetValue]);
+                continue;
+            }
             
             //finally launch a new HV thread
             if (hvThread) {
