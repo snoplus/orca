@@ -177,7 +177,7 @@
 //eStop functions
 - (IBAction) enmergencyStopToggle:(id)sender;
 
-//xl3 mode sttaus
+//xl3 mode status
 - (IBAction)updatexl3Mode:(id)sender;
 
 #pragma mark ¥¥¥Details Interface Management
@@ -185,10 +185,12 @@
 - (void) viewTypeChanged:(NSNotification*)aNote;
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem;
 -(void) windowDidLoad;
--(void) fetchRunMaskSettings;
 
 - (IBAction) runsLockAction:(id)sender;
-- (IBAction)refreshRunWordLabels:(id)sender;
+
+//Run type
+- (IBAction) refreshRunWordLabels:(id)sender;
+- (IBAction) runTypeWordAction:(id)sender;
 
 
 @end

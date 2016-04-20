@@ -189,6 +189,7 @@ smellieRunFile;
     //pull the information from the SMELLIE DB
     [model getSmellieRunListInfo];
     [self mtcDataBaseChanged:nil];
+    [self runTypeWordChanged:nil];
     [self refreshStandardRuns];
     [self updateSettings:nil];
 	[super awakeFromNib];
@@ -341,6 +342,7 @@ smellieRunFile;
 {
     
     [self displayThresholdsFromDB];
+    [self runTypeWordChanged:nil];
     
 }
 
@@ -1152,6 +1154,18 @@ smellieRunFile;
         [[runTypeWordMatrix cellAtRow:i column:0] setTitle:[theNames objectAtIndex:i]];
     }
 
+}
+
+- (IBAction)runTypeWordAction:(id)sender {
+    
+    short i = [sender selectedRow];
+    BOOL state  = [[sender selectedCell] state];
+    unsigned long currentRunMask = [runControl runType];
+    if(state) currentRunMask |= (1L<<i);
+    else      currentRunMask &= ~(1L<<i);
+    
+    [runControl setRunType:currentRunMask];
+    
 }
 
 - (void) runsLockChanged:(NSNotification*)aNotification

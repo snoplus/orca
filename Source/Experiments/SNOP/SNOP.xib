@@ -495,142 +495,145 @@
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         <size key="cellSize" width="96" height="13"/>
-                                                        <buttonCell key="prototype" type="check" title="Check" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" state="on" inset="2" id="3962">
+                                                        <buttonCell key="prototype" type="check" title="Check" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" state="on" inset="2" id="3962">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="miniSystem"/>
                                                         </buttonCell>
                                                         <cells>
                                                             <column>
-                                                                <buttonCell type="check" title="Maintaince" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" inset="2" id="3961">
+                                                                <buttonCell type="check" title="Maintaince" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" inset="2" id="3961">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Physics" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" tag="1" inset="2" id="3960">
+                                                                <buttonCell type="check" title="Physics" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" tag="1" inset="2" id="3960">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Scintillator" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" tag="2" inset="2" id="3959">
+                                                                <buttonCell type="check" title="Scintillator" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" tag="2" inset="2" id="3959">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Water" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" tag="3" inset="2" id="3958">
+                                                                <buttonCell type="check" title="Water" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" tag="3" inset="2" id="3958">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Air" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" tag="4" inset="2" id="3957">
+                                                                <buttonCell type="check" title="Air" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" tag="4" inset="2" id="3957">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Tellurium" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" tag="5" inset="2" id="3956">
+                                                                <buttonCell type="check" title="Tellurium" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" tag="5" inset="2" id="3956">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Transition" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" tag="6" inset="2" id="3955">
+                                                                <buttonCell type="check" title="Transition" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" tag="6" inset="2" id="3955">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Source" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" tag="7" inset="2" id="3954">
+                                                                <buttonCell type="check" title="Source" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" tag="7" inset="2" id="3954">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Calibration" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" tag="8" inset="2" id="3953">
+                                                                <buttonCell type="check" title="Calibration" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" tag="8" inset="2" id="3953">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Tellie" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" tag="9" inset="2" id="3952">
+                                                                <buttonCell type="check" title="Tellie" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" tag="9" inset="2" id="3952">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Smellie" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" tag="10" inset="2" id="3951">
+                                                                <buttonCell type="check" title="Smellie" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" tag="10" inset="2" id="3951">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Amellie" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" tag="11" inset="2" id="3950">
+                                                                <buttonCell type="check" title="Amellie" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" tag="11" inset="2" id="3950">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="ECA Pedestal" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" tag="12" inset="2" id="3949">
+                                                                <buttonCell type="check" title="ECA Pedestal" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" tag="12" inset="2" id="3949">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="ECA Tslope" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" tag="13" inset="2" id="3948">
+                                                                <buttonCell type="check" title="ECA Tslope" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" tag="13" inset="2" id="3948">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="PCA" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" tag="14" inset="2" id="3947">
+                                                                <buttonCell type="check" title="PCA" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" tag="14" inset="2" id="3947">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Comp. Coils." bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" tag="15" inset="2" id="3946">
+                                                                <buttonCell type="check" title="Comp. Coils." bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" tag="15" inset="2" id="3946">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Diagnostic" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" tag="16" inset="2" id="3945">
+                                                                <buttonCell type="check" title="Diagnostic" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" tag="16" inset="2" id="3945">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Bubblers" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" tag="17" inset="2" id="3944">
+                                                                <buttonCell type="check" title="Bubblers" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" tag="17" inset="2" id="3944">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Slassay" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" tag="18" inset="2" id="3943">
+                                                                <buttonCell type="check" title="Slassay" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" tag="18" inset="2" id="3943">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="MtcPmt Off" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" tag="19" inset="2" id="3942">
+                                                                <buttonCell type="check" title="MtcPmt Off" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" tag="19" inset="2" id="3942">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="DCR Activity" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" tag="20" inset="2" id="3941">
+                                                                <buttonCell type="check" title="DCR Activity" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" tag="20" inset="2" id="3941">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Source Moving" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" tag="21" inset="2" id="3940">
+                                                                <buttonCell type="check" title="Source Moving" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" tag="21" inset="2" id="3940">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Supernova" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" tag="22" inset="2" id="3939">
+                                                                <buttonCell type="check" title="Supernova" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" tag="22" inset="2" id="3939">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Bit 23 Spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" tag="23" inset="2" id="3938">
+                                                                <buttonCell type="check" title="Bit 23 Spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" tag="23" inset="2" id="3938">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Bit 24 Spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" tag="24" inset="2" id="3937">
+                                                                <buttonCell type="check" title="Bit 24 Spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" tag="24" inset="2" id="3937">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Bit 25 Spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" tag="25" inset="2" id="3936">
+                                                                <buttonCell type="check" title="Bit 25 Spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" tag="25" inset="2" id="3936">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Bit 26 Spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" inset="2" id="3972">
+                                                                <buttonCell type="check" title="Bit 26 Spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" inset="2" id="3972">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Bit 27 Spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" inset="2" id="3973">
+                                                                <buttonCell type="check" title="Bit 27 Spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" inset="2" id="3973">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Bit 28 Spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" inset="2" id="3974">
+                                                                <buttonCell type="check" title="Bit 28 Spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" inset="2" id="3974">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Bit 29 Spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" inset="2" id="3975">
+                                                                <buttonCell type="check" title="Bit 29 Spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" inset="2" id="3975">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Bit 30 Spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" inset="2" id="3976">
+                                                                <buttonCell type="check" title="Bit 30 Spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" inset="2" id="3976">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="God Mode" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" enabled="NO" state="on" inset="2" id="okW-FI-DyY">
+                                                                <buttonCell type="check" title="God Mode" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="mini" state="on" inset="2" id="okW-FI-DyY">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
                                                             </column>
                                                         </cells>
+                                                        <connections>
+                                                            <action selector="runTypeWordAction:" target="-2" id="VQD-bE-i61"/>
+                                                        </connections>
                                                     </matrix>
                                                     <button verticalHuggingPriority="750" id="Xjy-eU-kJv">
                                                         <rect key="frame" x="11" y="579" width="111" height="28"/>
