@@ -43,9 +43,11 @@
     IBOutlet NSMatrix* hvStatusMatrix;
     
     //Run control (the rest is in the ORExperimentController)
-    IBOutlet NSButton *maintenanceRunBox;
-    IBOutlet NSTextField* standardRunTypeField;
     IBOutlet StopLightView *lightBoardView;
+    IBOutlet NSButton *maintenanceRunBox;
+    IBOutlet NSTextField *standardRunTypeField;
+    IBOutlet NSTextField *standardRunVersionField;
+    IBOutlet NSTextField *runTypeWordField;
 
     //Quick links
     
@@ -81,6 +83,10 @@
     IBOutlet NSTextField *loadedSmellieMaxIntensityLaser;
     IBOutlet NSTextField *loadedSmellieMinIntensityLaser;
     
+    //SMELLIE
+    NSMutableDictionary *smellieRunFileList;
+    NSDictionary *smellieRunFile;
+    NSThread *smellieThread;
     IBOutlet NSButton *smellieLoadRunFile;
     IBOutlet NSButton *smellieCheckInterlock;
     IBOutlet NSButton *smellieStartRunButton;
@@ -90,18 +96,12 @@
     IBOutlet NSButton *smellieChangeConfiguration;
         
     //eStop buttons
+    NSThread *eStopPollingThread;
     IBOutlet NSButton *emergyencyStopEnabled;
     IBOutlet NSButton *eStopButton;
     
     IBOutlet NSTextField *pollingStatus;
-    
-    
-    NSImage* _runStopImg;
-    NSMutableDictionary *smellieRunFileList;
-    NSDictionary *smellieRunFile;
-    NSThread *smellieThread;
-    NSThread *eStopPollingThread;
-    
+        
     IBOutlet NSButton* runsLockButton;
     IBOutlet NSTextField *runStatusTextField;
 
@@ -125,7 +125,6 @@
     NSButton *refreshRunWordNames;
 }
 
-@property (nonatomic,retain) NSImage* runStopImg;
 @property (nonatomic,retain) NSMutableDictionary *smellieRunFileList;
 @property (nonatomic,retain) NSDictionary *smellieRunFile;
 

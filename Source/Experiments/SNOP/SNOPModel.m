@@ -49,8 +49,8 @@ NSString* ORSNOPModelViewTypeChanged	= @"ORSNOPModelViewTypeChanged";
 static NSString* SNOPDbConnector	= @"SNOPDbConnector";
 NSString* ORSNOPModelOrcaDBIPAddressChanged = @"ORSNOPModelOrcaDBIPAddressChanged";
 NSString* ORSNOPModelDebugDBIPAddressChanged = @"ORSNOPModelDebugDBIPAddressChanged";
-NSString* SNOPRunTypeWordChangedNotification = @"SNOPRunTypeWordChangedNotification";
-NSString* SNOPRunTypeChangedNotification = @"SNOPRunTypeChangedNotification";
+NSString* ORSNOPRunTypeWordChangedNotification = @"ORSNOPRunTypeWordChangedNotification";
+NSString* ORSNOPRunTypeChangedNotification = @"ORSNOPRunTypeChangedNotification";
 NSString* ORSNOPRunsLockNotification = @"ORSNOPRunsLockNotification";
 NSString* ORSNOPModelRunsECAChangedNotification = @"ORSNOPModelRunsECAChangedNotification";
 NSString* ORSNOPModelSRChangedNotification = @"ORSNOPModelSRChangedNotification";
@@ -1423,10 +1423,16 @@ logPort;
     }
 }
 
+- (unsigned long) runTypeWord
+{
+    return runTypeWord;
+}
+
+
 - (void) setRunTypeWord:(unsigned long)aValue
 {
     runTypeWord = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:SNOPRunTypeWordChangedNotification object: self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPRunTypeWordChangedNotification object: self];
 }
 
 - (NSString*)standardRunType

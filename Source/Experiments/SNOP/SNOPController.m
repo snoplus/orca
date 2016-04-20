@@ -41,7 +41,6 @@ NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 @implementation SNOPController
 
 @synthesize
-runStopImg = _runStopImg,
 smellieRunFileList,
 smellieRunFile;
 
@@ -253,10 +252,10 @@ smellieRunFile;
                          name:ORSNOPModelSRVersionChangedNotification
                        object:model];
     
-    [notifyCenter addObserver:self
-                     selector:@selector(runTypeWordChanged:)
-                         name:ORRunTypeChangedNotification
-                       object:theRunControl];
+    [notifyCenter addObserver :self
+                     selector :@selector(runTypeWordChanged:)
+                         name :ORRunTypeChangedNotification
+                       object :theRunControl];
     
     [notifyCenter addObserver : self
                      selector : @selector(runsLockChanged:)
@@ -395,27 +394,27 @@ smellieRunFile;
 
 
 // Custom resstart run method. Not used so far until we figure out how to deal with the rollover runs.
-- (IBAction)newRunAction:(id)sender {
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* theRunControl = [objs objectAtIndex:0];
-    [theRunControl setForceRestart:YES];
-    [theRunControl performSelector:@selector(stopRun) withObject:nil afterDelay:0];
-    [runStatusField setStringValue:[self getRestartingString]];
-    
-    NSLog(@"Sender: %@",[sender title]);
-    
-    if([[sender title] isEqualToString:@"New Physics Run"]){
-        //[model setRunType:kRunStandardPhysicsRun];
-    }
-    else if ([[sender title] isEqualToString:@"New Maint. Run"]){
-        //[model setRunType:kRunMaintainence];
-    }
-    else{
-        NSLog(@"SNOP_CONTROL:Run isn't correctly defined. Please check NSButton titles");
-        //[model setRunType:kRunUndefined];
-    }
-    
-}
+//- (IBAction)newRunAction:(id)sender {
+//    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+//    ORRunModel* theRunControl = [objs objectAtIndex:0];
+//    [theRunControl setForceRestart:YES];
+//    [theRunControl performSelector:@selector(stopRun) withObject:nil afterDelay:0];
+//    [runStatusField setStringValue:[self getRestartingString]];
+//    
+//    NSLog(@"Sender: %@",[sender title]);
+//    
+//    if([[sender title] isEqualToString:@"New Physics Run"]){
+//        //[model setRunType:kRunStandardPhysicsRun];
+//    }
+//    else if ([[sender title] isEqualToString:@"New Maint. Run"]){
+//        //[model setRunType:kRunMaintainence];
+//    }
+//    else{
+//        NSLog(@"SNOP_CONTROL:Run isn't correctly defined. Please check NSButton titles");
+//        //[model setRunType:kRunUndefined];
+//    }
+//    
+//}
 
 // Currently use the default stopRunAction of the superclass ORExperimentController.
 // Leave this here in case a custom function is needed
@@ -434,64 +433,24 @@ smellieRunFile;
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* theRunControl = [objs objectAtIndex:0];
     if([theRunControl runningState] == eRunInProgress){
-		if(![theRunControl runPaused])[runStatusField setStringValue:[[ORGlobal sharedGlobal] runModeString]];
-		else [runStatusField setStringValue:@"Paused"];
         [lightBoardView setState:kGoLight];
 	}
 	else if([theRunControl runningState] == eRunStopped){
-		[runStatusField setStringValue:@"Stopped"];
         [lightBoardView setState:kStoppedLight];
 	}
 	else if([theRunControl runningState] == eRunStarting || [theRunControl runningState] == eRunStopping || [theRunControl runningState] == eRunBetweenSubRuns){
-		if([theRunControl runningState] == eRunStarting)[runStatusField setStringValue:[self getStartingString]];
+        if([theRunControl runningState] == eRunStarting){
+            //The run started so update the display
+            [standardRunTypeField setStringValue:[model standardRunType]];
+            [standardRunVersionField setStringValue:[model standardRunVersion]];
+            [runTypeWordField setStringValue:[NSString stringWithFormat:@"0x%X",(int)[model runTypeWord]]]; //FIXME: revisit if we go over 32 bits
+        }
 		else {
-			if([theRunControl runningState] == eRunBetweenSubRuns)	[runStatusField setStringValue:[self getBetweenSubrunsString]];
-			else                                                    [runStatusField setStringValue:[self getStoppingString]];
+            //Do nothing
 		}
         [lightBoardView setState:kCautionLight];
 	}
-
-    //Update standard run type
-    [standardRunTypeField setStringValue:[model standardRunType]];
-
-}
-
-- (NSString*) getStartingString
-{
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* theRunControl = [objs objectAtIndex:0];
-    NSString* s;
-    if([theRunControl waitRequestersCount]==0)s = @"Starting...";
-    else s = @"Starting (Waiting)";
-    return s;
-}
-
-- (NSString*) getRestartingString
-{
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* theRunControl = [objs objectAtIndex:0];
-    NSString* s;
-    if([theRunControl waitRequestersCount]==0)s = @"Restart...";
-    else s = @"Restarting (Waiting)";
-    return s;
-}
-- (NSString*) getStoppingString
-{
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* theRunControl = [objs objectAtIndex:0];
-    NSString* s;
-    if([theRunControl waitRequestersCount]==0)s = @"Stopping...";
-    else s = @"Stopping (Waiting)";
-    return s;
-}
-- (NSString*) getBetweenSubrunsString
-{
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* theRunControl = [objs objectAtIndex:0];
-    NSString* s;
-    if([theRunControl waitRequestersCount]==0)s = @"Between Sub Runs..";
-    else s = @"'TweenSubRuns (Waiting)";
-    return s;
+    
 }
 
 - (void) viewTypeChanged:(NSNotification*)aNote
@@ -1153,12 +1112,20 @@ smellieRunFile;
 
 - (IBAction)runTypeWordAction:(id)sender {
     
-    short i = [sender selectedRow];
+    short bit = [sender selectedRow];
     BOOL state  = [[sender selectedCell] state];
-    unsigned long currentRunMask = [runControl runType];
-    if(state) currentRunMask |= (1L<<i);
-    else      currentRunMask &= ~(1L<<i);
-    
+    unsigned long currentRunMask = [model runTypeWord];
+    if(state) currentRunMask |= (1L<<bit);
+    else      currentRunMask &= ~(1L<<bit);
+    //Unset bits for the mutually exclusive part so that it's impossible to mess up with it
+    if(bit != 0 && bit<11){
+        for(int i=1; i<11; i++){
+            currentRunMask &= ~(1L<<i);
+        }
+        if(state) currentRunMask |= (1L<<bit);
+        else      currentRunMask &= ~(1L<<bit);
+    }
+
     [runControl setRunType:currentRunMask];
     
 }
@@ -1177,14 +1144,14 @@ smellieRunFile;
     [ECAtypePopUpButton setEnabled:!lockedOrNotRunningMaintenance];
     [TSlopePatternTextField setEnabled:!lockedOrNotRunningMaintenance];
     [subTimeTextField setEnabled:!lockedOrNotRunningMaintenance];
-    [standardRunPopupMenu setEnabled:!lockedOrNotRunningMaintenance];
-    [standardRunVersionPopupMenu setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunSaveButton setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunSaveDefaultsButton setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunLoadButton setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunLoadDefaultsButton setEnabled:!lockedOrNotRunningMaintenance];
     [maintenanceRunBox setEnabled:!lockedOrNotRunningMaintenance];
+    [runTypeWordMatrix setEnabled:!lockedOrNotRunningMaintenance];
     
+    //Display status
     [runStatusTextField setStringValue:@"UNLOCKED"];
     [runStatusTextField setBackgroundColor:[NSColor colorWithSRGBRed:0 green:0 blue:1 alpha:1]];
     if(lockedOrNotRunningMaintenance){

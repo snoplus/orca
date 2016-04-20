@@ -302,7 +302,7 @@
 extern NSString* ORSNOPModelViewTypeChanged;
 extern NSString* ORSNOPModelOrcaDBIPAddressChanged;
 extern NSString* ORSNOPModelDebugDBIPAddressChanged;
-extern NSString* SNOPRunTypeWordChangedNotification;
+extern NSString* ORSNOPRunTypeWordChangedNotification;
 extern NSString* SNOPRunTypeChangedNotification;
 extern NSString* ORSNOPRunsLockNotification;
 extern NSString* ORSNOPModelRunsECAChangedNotification;
