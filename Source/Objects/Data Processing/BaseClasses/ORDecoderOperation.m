@@ -27,13 +27,14 @@
 	self = [super init];
     [self setFilePath:aPath];
 	[self setDelegate:aDelegate];
-	NSFileHandle* fp = [NSFileHandle fileHandleForReadingAtPath:aPath];
+	fp = [[NSFileHandle fileHandleForReadingAtPath:aPath] retain];
 	[self setCurrentDecoder: [ORDecoder decoderWithFile:fp]];
     return self;
 }
 
 - (void) dealloc
 {
+    [fp closeFile];
 	[filePath release];
 	[currentDecoder release];
 	[super dealloc];
