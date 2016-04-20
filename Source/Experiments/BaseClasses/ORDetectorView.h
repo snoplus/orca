@@ -51,8 +51,7 @@
 - (void) downArrow;
 - (void) leftArrow;
 - (void) rightArrow;
-- (NSColor*) getColorForSet:(int)setIndex value:(unsigned long)aValue;
-- (NSColor*) getColorForSet:(int)setIndex floatValue:(float)aValue;
+- (NSColor*) getColorForSet:(int)setIndex value:(float)aValue;
 
 @end
 

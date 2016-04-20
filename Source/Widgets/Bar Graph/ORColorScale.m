@@ -154,7 +154,7 @@
 	[self setNeedsDisplay:YES];
 }
 
-- (NSColor*) getColorForValue:(unsigned long)aValue
+- (NSColor*) getColorForValue:(float)aValue
 {	
 	float h=[self bounds].size.height;
 	float w=[self bounds].size.width;
@@ -171,25 +171,6 @@
 	else if(i<0)return nil;
 	else return [colors lastObject];
 }
-
-- (NSColor*) getColorForFloatValue:(float)aValue
-{
-    float h=[self bounds].size.height;
-    float w=[self bounds].size.width;
-    float i;
-    aValue = [colorAxis getPixAbs:aValue];
-    
-    if(w>h)i = aValue * numColors/w;
-    else   i = aValue * numColors/h;
-    
-    if(i>=0 && i<numColors-1){
-        if(i==0 && excludeZero) return nil;
-        else                    return [colors objectAtIndex:(int)i];
-    }
-    else if(i<0)return nil;
-    else return [colors lastObject];
-}
-
 
 
 - (NSColor*) getColorForIndex:(unsigned short)index

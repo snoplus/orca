@@ -99,7 +99,7 @@
 	[super drawRect:rect];
 }
 
-- (NSColor*) getColorForSet:(int)setIndex value:(unsigned long)aValue
+- (NSColor*) getColorForSet:(int)setIndex value:(float)aValue
 {
 	if(setIndex==0)return [focalPlaneColorScale getColorForValue:aValue];
 	else return [vetoColorScale getColorForValue:aValue];
