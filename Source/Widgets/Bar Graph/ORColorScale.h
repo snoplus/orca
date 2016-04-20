@@ -54,6 +54,7 @@
 - (unsigned short) getFastColorIndexForValue:(unsigned long)aValue log:(BOOL)aLog integer:(BOOL)aInt minPad:(double)aMinPad;
 - (unsigned short) getColorIndexForValue:(unsigned long)aValue;
 - (NSColor*) getColorForIndex:(unsigned short)index;
+- (NSColor*) getColorForFloatValue:(float)aValue;
 
 - (BOOL) useRainBow;
 - (void) setUseRainBow: (BOOL) flag;
