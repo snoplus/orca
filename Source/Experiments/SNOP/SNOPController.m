@@ -258,11 +258,6 @@ smellieRunFile;
                          name:ORRunTypeChangedNotification
                        object:theRunControl];
     
-    [notifyCenter addObserver:self
-                     selector:@selector(runTypeWordChanged:)
-                         name:ORRunTypeChangedNotification
-                       object:theRunControl];
-    
     [notifyCenter addObserver : self
                      selector : @selector(runsLockChanged:)
                          name : ORSNOPRunsLockNotification
@@ -1368,6 +1363,9 @@ smellieRunFile;
     for(int i=0;i<32;i++){
         [[runTypeWordMatrix cellAtRow:i column:0] setState:(currentRunWord &(1L<<i))!=0];
     }
+
+    //Special maintenance box
+    [maintenanceRunBox setState:(currentRunWord &(1L<<0))!=0];
     
 }
 

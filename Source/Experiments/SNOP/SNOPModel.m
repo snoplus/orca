@@ -1682,9 +1682,8 @@ logPort;
     NSNumber* runNumber = [NSNumber numberWithUnsignedInt:run_number];
 
     [runDocDict setObject:@"run" forKey:@"type"];
-    //[runDocDict setObject:[self getRunType] forKey:@"run_type"];
     [runDocDict setObject:[NSNumber numberWithUnsignedLong:[aMTCcard mtcStatusGTID]] forKey:@"start_gtid"];
-    [runDocDict setObject:[NSNumber numberWithUnsignedLong:[[self runTypeWord] unsignedLongValue]] forKey:@"run_type"];
+    [runDocDict setObject:[NSNumber numberWithUnsignedLong:[self runTypeWord]] forKey:@"run_type"];
     [runDocDict setObject:[NSNumber numberWithUnsignedInt:0] forKey:@"version"];
     [runDocDict setObject:[NSNumber numberWithDouble:[[self stringUnixFromDate:nil] doubleValue]] forKey:@"timestamp_start"];
     [runDocDict setObject:[self rfc2822StringDateFromDate:nil] forKey:@"sudbury_time_start"];
