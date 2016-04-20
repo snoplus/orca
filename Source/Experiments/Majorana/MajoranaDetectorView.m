@@ -133,11 +133,16 @@
     
 
 }
+- (NSColor*) getColorForSet:(int)setIndex floatValue:(float)aValue
+{
+    if(setIndex==0) return [detectorColorScale getColorForFloatValue:aValue];
+    else            return [vetoColorScale getColorForFloatValue:aValue];
+}
 
 - (NSColor*) getColorForSet:(int)setIndex value:(unsigned long)aValue
 {
-	if(setIndex==0) return [detectorColorScale getColorForValue:aValue];
-	else            return [vetoColorScale getColorForValue:aValue];
+	if(setIndex==0) return [detectorColorScale getColorForFloatValue:aValue];
+	else            return [vetoColorScale getColorForFloatValue:aValue];
 }
 
 - (void) downArrow

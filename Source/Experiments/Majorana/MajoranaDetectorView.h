@@ -29,5 +29,6 @@
     NSDictionary* stringLabelAttributes;
 }
 - (void) setViewType:(int)aViewType;
+- (NSColor*) getColorForSet:(int)setIndex floatValue:(float)aValue;
 
 @end
