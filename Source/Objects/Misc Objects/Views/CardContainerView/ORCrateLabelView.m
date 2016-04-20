@@ -38,7 +38,11 @@
 	[filter release];
 	[super dealloc];
 }
-
+- (BOOL) isOpaque
+{
+    return YES;
+}
+    
 - (void) setShowLabels:(BOOL)aState
 {
 	showLabels = aState;

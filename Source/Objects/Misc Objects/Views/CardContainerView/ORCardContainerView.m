@@ -37,6 +37,11 @@
 	return NO;
 }
 
+- (BOOL)isOpaque
+{
+    return YES;
+}
+
 - (BOOL) prepareForDragOperation:(id <NSDraggingInfo>)sender
 {
     if([super prepareForDragOperation:sender]){
