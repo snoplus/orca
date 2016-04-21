@@ -10,9 +10,8 @@
 		<string>Wizard</string>
 		<string>preferences</string>
 		<string>CommandCenter</string>
-		<string>NSToolbarPrintItem</string>
 		<string>NSToolbarFlexibleSpaceItem</string>
-		<string>NSToolbarCustomizeToolbarItem</string>
+		<string>NSToolbarPrintItem</string>
 	</array>
 	<key>Items</key>
 	<dict>
