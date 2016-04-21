@@ -210,10 +210,12 @@ enum {
 
 - (void) main
 {
+    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
     @try {
         if(![self isCancelled]){
             NSTask* task = [[NSTask alloc] init];
             [task setLaunchPath:@"/usr/bin/top"];
+            
             [task setArguments: [NSArray arrayWithObjects:@"-l",@"2",@"-i",@"1",@"-stats",@"command,cpu,rsize",nil]];
             
             NSPipe* pipe = [NSPipe pipe];
@@ -236,6 +238,9 @@ enum {
         }
     }
     @catch(NSException* e){
+    }
+    @finally{
+        [pool release];
     }
 }
 
