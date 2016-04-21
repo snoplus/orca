@@ -10,30 +10,19 @@
 		<string>Wizard</string>
 		<string>preferences</string>
 		<string>CommandCenter</string>
-		<string>NSToolbarPrintItem</string>
 		<string>NSToolbarFlexibleSpaceItem</string>
-		<string>NSToolbarCustomizeToolbarItem</string>
-		<string>hardwareFinder</string>
+		<string>NSToolbarPrintItem</string>
 	</array>
 	<key>Items</key>
 	<dict>
-		<key>hardwareFinder</key>
-		<dict>
-			<key>ToolTip</key>
-			<string>Open Hardware Finder</string>
-			<key>Label</key>
-			<string>Hardware Finder</string>
-			<key>Action</key>
-			<string>hardwareFinder:</string>
-		</dict>
-		<key>AutoTester</key>
+		<key>alarmMaster</key>
 		<dict>
 			<key>Action</key>
-			<string>showAutoTester:</string>
+			<string>alarmMaster:</string>
 			<key>Label</key>
-			<string>AutoTester</string>
+			<string>Alarm Master</string>
 			<key>ToolTip</key>
-			<string>Open AutoTester</string>
+			<string>Open Alarm Master</string>
 		</dict>
 		<key>Archive</key>
 		<dict>
@@ -44,23 +33,14 @@
 			<key>ToolTip</key>
 			<string>Open Archival</string>
 		</dict>
-		<key>statusWindow</key>
+		<key>AutoTester</key>
 		<dict>
 			<key>Action</key>
-			<string>statusLog:</string>
+			<string>showAutoTester:</string>
 			<key>Label</key>
-			<string>Status Log</string>
+			<string>AutoTester</string>
 			<key>ToolTip</key>
-			<string>Open Status Log</string>
-		</dict>
-		<key>alarmMaster</key>
-		<dict>
-			<key>Action</key>
-			<string>alarmMaster:</string>
-			<key>Label</key>
-			<string>Alarm Master</string>
-			<key>ToolTip</key>
-			<string>Open Alarm Master</string>
+			<string>Open AutoTester</string>
 		</dict>
 		<key>catalog</key>
 		<dict>
@@ -71,14 +51,43 @@
 			<key>ToolTip</key>
 			<string>Open Object Catalog</string>
 		</dict>
-		<key>Wizard</key>
+		<key>CommandCenter</key>
 		<dict>
 			<key>Action</key>
-			<string>openHWWizard:</string>
+			<string>openCommandCenter:</string>
 			<key>Label</key>
-			<string>HW Wizard</string>
+			<string>CommandCenter</string>
 			<key>ToolTip</key>
-			<string>Open Hardware Wizard</string>
+			<string>Open Command Center</string>
+		</dict>
+		<key>hardwareFinder</key>
+		<dict>
+			<key>ToolTip</key>
+			<string>Open Hardware Finder</string>
+			<key>Label</key>
+			<string>Hardware Finder</string>
+			<key>Action</key>
+			<string>hardwareFinder:</string>
+		</dict>
+		<key>help</key>
+		<dict>
+			<key>Action</key>
+			<string>openHelp:</string>
+			<key>Label</key>
+			<string>Help</string>
+			<key>ToolTip</key>
+			<string>Open ORCA Help</string>
+		</dict>
+		<key>NSToolbarPrintItem</key>
+		<dict/>
+		<key>ORCARootService</key>
+		<dict>
+			<key>Action</key>
+			<string>openORCARootService:</string>
+			<key>Label</key>
+			<string>ORCARootService</string>
+			<key>ToolTip</key>
+			<string>Open ORCARoot Service</string>
 		</dict>
 		<key>preferences</key>
 		<dict>
@@ -89,14 +98,23 @@
 			<key>ToolTip</key>
 			<string>Open Preferences</string>
 		</dict>
-		<key>CommandCenter</key>
+		<key>ProcessCenter</key>
 		<dict>
 			<key>Action</key>
-			<string>openCommandCenter:</string>
+			<string>showProcessCenter:</string>
 			<key>Label</key>
-			<string>CommandCenter</string>
+			<string>ProcessCenter</string>
 			<key>ToolTip</key>
-			<string>Open Command Center</string>
+			<string>Open ProcessCenter</string>
+		</dict>
+		<key>statusWindow</key>
+		<dict>
+			<key>Action</key>
+			<string>statusLog:</string>
+			<key>Label</key>
+			<string>Status Log</string>
+			<key>ToolTip</key>
+			<string>Open Status Log</string>
 		</dict>
 		<key>TaskMaster</key>
 		<dict>
@@ -107,34 +125,14 @@
 			<key>ToolTip</key>
 			<string>Open Task Master</string>
 		</dict>
-		<key>ProcessCenter</key>
+		<key>Wizard</key>
 		<dict>
 			<key>Action</key>
-			<string>showProcessCenter:</string>
+			<string>openHWWizard:</string>
 			<key>Label</key>
-			<string>ProcessCenter</string>
+			<string>HW Wizard</string>
 			<key>ToolTip</key>
-			<string>Open ProcessCenter</string>
-		</dict>
-		<key>ORCARootService</key>
-		<dict>
-			<key>Action</key>
-			<string>openORCARootService:</string>
-			<key>Label</key>
-			<string>ORCARootService</string>
-			<key>ToolTip</key>
-			<string>Open ORCARoot Service</string>
-		</dict>
-		<key>NSToolbarPrintItem</key>
-		<dict/>
-		<key>help</key>
-		<dict>
-			<key>Action</key>
-			<string>openHelp:</string>
-			<key>Label</key>
-			<string>Help</string>
-			<key>ToolTip</key>
-			<string>Open ORCA Help</string>
+			<string>Open Hardware Wizard</string>
 		</dict>
 	</dict>
 </dict>
