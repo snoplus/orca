@@ -73,7 +73,6 @@
 
 - (void) drawRect:(NSRect)rect
 {
-    [self makeAllSegments];
     [[NSColor colorWithCalibratedRed:.88 green:.88 blue:.88 alpha:1] set];
     [NSBezierPath fillRect:rect];
     
@@ -169,6 +168,8 @@
 	[super makeAllSegments];
 	
 	if(viewType == kUseCrateView){
+        [self makeCrateImage];
+
 		float dx = kCrateInsideWidth/21.;
         int numSets = [delegate numberOfSegmentGroups];
         int set;
@@ -187,13 +188,12 @@
                 int crate    = [[aSegment objectForKey:[aSegment mapEntry:[aSegment crateIndex] forKey:@"key"]] intValue]-1; //we count from zero here;
                 int cardSlot = [aSegment cardSlot];
                 int channel  = [aSegment channel];
-                if(channel < 0)cardSlot = -1; //we have to make the segment, but we'll draw off screen when not mapped
+                BOOL drawOnScreen = YES;
+                if(channel < 0 || crate<0)drawOnScreen = NO; //we have to make the segment, but we'll draw off screen when not mapped
                 
-                float yOffset;
-                if(cardSlot<0)yOffset = -50000;
-                else {
-                    yOffset = crate*[crateImage imageRect].size.height+kCrateSeparation+kCrateInsideY;
-                }
+                float yOffset = -5000;;
+                if(drawOnScreen)yOffset = crate*[crateImage imageRect].size.height+kCrateSeparation+kCrateInsideY;
+                
                 
                 NSRect channelRect = NSMakeRect(kCrateInsideX+cardSlot*dx, yOffset + (channel*dy),dx,dy);
                 
@@ -211,6 +211,7 @@
 	}
     [self setNeedsDisplay:YES];
 }
+
 
 - (void) drawLabels
 {
@@ -238,7 +239,6 @@
 
 - (void) makeDetectors
 {
-    
     [delegate setDetectorStringPositions];
     
     NSMutableArray* segmentPaths     = [NSMutableArray arrayWithCapacity:kNumDetectors];

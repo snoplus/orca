@@ -80,7 +80,7 @@
  	[super drawRect:rect];
 }
 
-- (NSColor*) getColorForSet:(int)setIndex value:(float)aValue
+- (NSColor*) getColorForSet:(int)setIndex value:(unsigned long)aValue
 {
 	return [focalPlaneColorScale getColorForValue:aValue];
 }
