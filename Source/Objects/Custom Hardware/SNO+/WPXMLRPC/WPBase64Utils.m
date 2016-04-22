@@ -296,9 +296,9 @@ NSUInteger const WPBase64UtilsChunkSize = 18000;
 	size_t outputLength;
 	char *outputBuffer = NewBase64Encode([data bytes], [data length], false, &outputLength);
 
-	NSString *result = [[NSString alloc] initWithBytes:outputBuffer
+	NSString *result = [[[NSString alloc] initWithBytes:outputBuffer
                                                 length:outputLength
-                                              encoding:NSASCIIStringEncoding];
+                                              encoding:NSASCIIStringEncoding] autorelease];
 
 	free(outputBuffer);
 	return result;

@@ -57,7 +57,7 @@ NSString *const WPXMLRPCErrorDomain = @"WPXMLRPCError";
     [_parser parse];
 
     if ([_parser parserError]) {
-        WPXMLRPCDataCleaner *cleaner = [[WPXMLRPCDataCleaner alloc] initWithData:_originalData];
+        WPXMLRPCDataCleaner *cleaner = [[[WPXMLRPCDataCleaner alloc] initWithData:_originalData] autorelease];
         _body = [cleaner cleanData];
         _parser = [[NSXMLParser alloc] initWithData:_body];
         [_parser setDelegate:self];
@@ -103,7 +103,7 @@ NSString *const WPXMLRPCErrorDomain = @"WPXMLRPCError";
 
 - (NSError *)error {
     if ([_parser parserError]) {
-        NSString *response = [[NSString alloc] initWithData:_originalData encoding:NSUTF8StringEncoding];
+        NSString *response = [[[NSString alloc] initWithData:_originalData encoding:NSUTF8StringEncoding] autorelease];
         if (response) {
             // Search for known PHP errors
             NSError *error = NULL;
