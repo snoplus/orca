@@ -499,6 +499,11 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
                      selector : @selector(endPollingLock:)
                          name : ORRunAboutToStopNotification
                        object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(runStopped:)
+                         name : ORRunStoppedNotification
+                       object : nil];
 
 }
 
@@ -526,7 +531,12 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
         unsigned long aValue = [self readRegister:kMiscCtl1];
         [self writeRegister:kMiscCtl1 withValue:aValue |= (0x1<<6)]; //set the Imp Syn
         [self setMiscCtl1Reg:       [self readRegister:kMiscCtl1]];  //display it
-        
+     }
+}
+
+- (void) runStopped:(NSNotification*)aNote
+{
+    if([self isMaster]){
         //At Jason's request reset the clock at the end of run
         NSArray*  runModelObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
         ORRunModel* aRunModel = [runModelObjects objectAtIndex:0];
@@ -546,8 +556,8 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             [ORTimer delay:.1];
         }
     }
-}
 
+}
 - (void) pollLock
 {
     @try {
