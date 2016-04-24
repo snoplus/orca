@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="8191" systemVersion="14F1021" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <development version="6300" identifier="xcode"/>
+        <deployment identifier="macosx"/>
+        <development version="5100" identifier="xcode"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="8191"/>
     </dependencies>
     <objects>
@@ -89,11 +90,11 @@
                         <tabViewItems>
                             <tabViewItem label="TUBii" identifier="" id="T81-Ks-egO">
                                 <view key="view" id="tgY-du-t2x">
-                                    <rect key="frame" x="10" y="25" width="575" height="658"/>
+                                    <rect key="frame" x="10" y="25" width="389" height="0.0"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="o6D-C9-MfD">
-                                            <rect key="frame" x="49" y="612" width="137" height="22"/>
+                                            <rect key="frame" x="49" y="-46" width="137" height="22"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="" drawsBackground="YES" id="k6h-Fw-gTo">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -108,7 +109,7 @@
                                             </connections>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fw8-QQ-H0F">
-                                            <rect key="frame" x="49" y="635" width="54" height="17"/>
+                                            <rect key="frame" x="49" y="-23" width="54" height="17"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="TUBii IP" id="EFE-oa-VtN">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -116,7 +117,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fXd-cQ-We0">
-                                            <rect key="frame" x="216" y="635" width="30" height="17"/>
+                                            <rect key="frame" x="216" y="-23" width="30" height="17"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Port" id="JST-8r-J4g">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -124,14 +125,14 @@
                                             </textFieldCell>
                                         </textField>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Lgn-4t-R8b">
-                                            <rect key="frame" x="341" y="606" width="68" height="32"/>
+                                            <rect key="frame" x="341" y="-52" width="68" height="32"/>
                                             <buttonCell key="cell" type="push" title="Ping" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="NlH-dt-PjR">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="STE-s6-s7D">
-                                            <rect key="frame" x="41" y="562" width="90" height="32"/>
+                                            <rect key="frame" x="41" y="-96" width="90" height="32"/>
                                             <buttonCell key="cell" type="push" title="Initialize" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="aEy-eQ-ZTb">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -141,7 +142,7 @@
                                             </connections>
                                         </button>
                                         <matrix toolTip="Tells TUBii to begine reading out it's data." verticalHuggingPriority="750" fixedFrame="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CrM-oe-jTF">
-                                            <rect key="frame" x="47" y="497" width="89" height="58"/>
+                                            <rect key="frame" x="47" y="-161" width="89" height="58"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             <size key="cellSize" width="76.573170731707322" height="18"/>
                                             <size key="intercellSpacing" width="4" height="2"/>
@@ -171,7 +172,7 @@
                                             </connections>
                                         </matrix>
                                         <matrix toolTip="Tells TUBii to readout it's status at a set rate (1Hz)" verticalHuggingPriority="750" fixedFrame="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="K3y-kF-h1w">
-                                            <rect key="frame" x="47" y="419" width="89" height="58"/>
+                                            <rect key="frame" x="47" y="-239" width="89" height="58"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             <size key="cellSize" width="85.873983739837399" height="18"/>
                                             <size key="intercellSpacing" width="4" height="2"/>
@@ -201,7 +202,7 @@
                                             </connections>
                                         </matrix>
                                         <matrix toolTip="Use this to enable TUBii's ECA mode. This re-routes GT to EXT PED OUT and causes EXT PED IN to be ignored." verticalHuggingPriority="750" fixedFrame="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iur-DA-0o0">
-                                            <rect key="frame" x="47" y="336" width="89" height="58"/>
+                                            <rect key="frame" x="47" y="-322" width="89" height="58"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             <size key="cellSize" width="72.951219512195109" height="18"/>
                                             <size key="intercellSpacing" width="4" height="2"/>
@@ -231,7 +232,7 @@
                                             </connections>
                                         </matrix>
                                         <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TSo-02-c2u">
-                                            <rect key="frame" x="218" y="612" width="96" height="22"/>
+                                            <rect key="frame" x="218" y="-46" width="96" height="22"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="J1d-dr-fE0">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -668,67 +669,67 @@
                                             </buttonCell>
                                             <cells>
                                                 <column>
-                                                    <buttonCell type="check" title="ExtTrig 0" bezelStyle="regularSquare" imagePosition="left" tag="1" inset="2" id="6jl-qy-uLp">
+                                                    <buttonCell type="check" title="ExtTrig 0" bezelStyle="regularSquare" imagePosition="left" inset="2" id="6jl-qy-uLp">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
                                                     </buttonCell>
-                                                    <buttonCell type="check" title="ExtTrig 1" bezelStyle="regularSquare" imagePosition="left" tag="2" inset="2" id="Dgc-2v-92l">
+                                                    <buttonCell type="check" title="ExtTrig 1" bezelStyle="regularSquare" imagePosition="left" tag="1" inset="2" id="Dgc-2v-92l">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
                                                     </buttonCell>
-                                                    <buttonCell type="check" title="ExtTrig 2" bezelStyle="regularSquare" imagePosition="left" tag="3" inset="2" id="LAy-18-US0">
+                                                    <buttonCell type="check" title="ExtTrig 2" bezelStyle="regularSquare" imagePosition="left" tag="2" inset="2" id="LAy-18-US0">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
                                                     </buttonCell>
-                                                    <buttonCell type="check" title="ExtTrig 3" bezelStyle="regularSquare" imagePosition="left" tag="4" inset="2" id="Zor-aQ-Asn">
+                                                    <buttonCell type="check" title="ExtTrig 3" bezelStyle="regularSquare" imagePosition="left" tag="3" inset="2" id="Zor-aQ-Asn">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
                                                     </buttonCell>
-                                                    <buttonCell type="check" title="ExtTrig 4" bezelStyle="regularSquare" imagePosition="left" tag="5" inset="2" id="9GZ-LX-BAe">
+                                                    <buttonCell type="check" title="ExtTrig 4" bezelStyle="regularSquare" imagePosition="left" tag="4" inset="2" id="9GZ-LX-BAe">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
                                                     </buttonCell>
-                                                    <buttonCell type="check" title="ExtTrig 5" bezelStyle="regularSquare" imagePosition="left" tag="6" inset="2" id="ICA-WN-aHW">
+                                                    <buttonCell type="check" title="ExtTrig 5" bezelStyle="regularSquare" imagePosition="left" tag="5" inset="2" id="ICA-WN-aHW">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
                                                     </buttonCell>
-                                                    <buttonCell type="check" title="ExtTrig 6" bezelStyle="regularSquare" imagePosition="left" tag="7" inset="2" id="h0n-cF-slV">
+                                                    <buttonCell type="check" title="ExtTrig 6" bezelStyle="regularSquare" imagePosition="left" tag="6" inset="2" id="h0n-cF-slV">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
                                                     </buttonCell>
-                                                    <buttonCell type="check" title="ExtTrig 7" bezelStyle="regularSquare" imagePosition="left" state="on" tag="8" inset="2" id="cPx-HO-03f">
+                                                    <buttonCell type="check" title="ExtTrig 7" bezelStyle="regularSquare" imagePosition="left" state="on" tag="7" inset="2" id="cPx-HO-03f">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
                                                     </buttonCell>
-                                                    <buttonCell type="check" title="ExtTrig 8" bezelStyle="regularSquare" imagePosition="left" tag="9" inset="2" id="OEa-1H-nu7">
+                                                    <buttonCell type="check" title="ExtTrig 8" bezelStyle="regularSquare" imagePosition="left" tag="8" inset="2" id="OEa-1H-nu7">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
                                                     </buttonCell>
-                                                    <buttonCell type="check" title="ExtTrig 9" bezelStyle="regularSquare" imagePosition="left" tag="10" inset="2" id="IF0-cC-y9O">
+                                                    <buttonCell type="check" title="ExtTrig 9" bezelStyle="regularSquare" imagePosition="left" tag="9" inset="2" id="IF0-cC-y9O">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
                                                     </buttonCell>
-                                                    <buttonCell type="check" title="ExtTrig 10" bezelStyle="regularSquare" imagePosition="left" state="on" tag="11" inset="2" id="IFe-aF-2sN">
+                                                    <buttonCell type="check" title="ExtTrig 10" bezelStyle="regularSquare" imagePosition="left" state="on" tag="10" inset="2" id="IFe-aF-2sN">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
                                                     </buttonCell>
-                                                    <buttonCell type="check" title="ExtTrig 11" bezelStyle="regularSquare" imagePosition="left" tag="12" inset="2" id="Vca-8c-jSN">
+                                                    <buttonCell type="check" title="ExtTrig 11" bezelStyle="regularSquare" imagePosition="left" tag="11" inset="2" id="Vca-8c-jSN">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
                                                     </buttonCell>
-                                                    <buttonCell type="check" title="ExtTrig 12" bezelStyle="regularSquare" imagePosition="left" tag="13" inset="2" id="8ve-4X-2KD">
+                                                    <buttonCell type="check" title="ExtTrig 12" bezelStyle="regularSquare" imagePosition="left" tag="12" inset="2" id="8ve-4X-2KD">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
                                                     </buttonCell>
-                                                    <buttonCell type="check" title="ExtTrig 13" bezelStyle="regularSquare" imagePosition="left" tag="14" inset="2" id="2Jb-Kh-H8G">
+                                                    <buttonCell type="check" title="ExtTrig 13" bezelStyle="regularSquare" imagePosition="left" tag="13" inset="2" id="2Jb-Kh-H8G">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
                                                     </buttonCell>
-                                                    <buttonCell type="check" title="ExtTrig 14" bezelStyle="regularSquare" imagePosition="left" tag="15" inset="2" id="JNi-My-9Sk">
+                                                    <buttonCell type="check" title="ExtTrig 14" bezelStyle="regularSquare" imagePosition="left" tag="14" inset="2" id="JNi-My-9Sk">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
                                                     </buttonCell>
-                                                    <buttonCell type="check" title="ExtTrig 15" bezelStyle="regularSquare" imagePosition="left" tag="16" inset="2" id="1mW-04-o2w">
+                                                    <buttonCell type="check" title="ExtTrig 15" bezelStyle="regularSquare" imagePosition="left" tag="15" inset="2" id="1mW-04-o2w">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
                                                     </buttonCell>
