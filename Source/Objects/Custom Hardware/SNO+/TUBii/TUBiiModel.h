@@ -163,6 +163,7 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
 - (void) stopPulser;
 - (void) setDataReadout: (BOOL) val;
 - (void) setStatusReadout: (BOOL) val;
+- (void) ResetFifo;
 -(void) setCaenMasks: (CAEN_CHANNEL_MASK)aChannelMask
             GainMask:(CAEN_GAIN_MASK) aGainMask;
 - (void) ResetClock;

@@ -562,6 +562,10 @@
         [self sendOkCmd:@"StopStatusReadout"];
     }
 }
+- (void) ResetFifo
+{
+    [self sendOkCmd:@"ResetFifo"];
+}
 - (void) setCounterMode:(BOOL)mode {
     // The TUBii Server logic on the MicroZed determines what the pin state should be for
     // Rate mode or Totalizer mode.
