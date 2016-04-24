@@ -573,7 +573,7 @@
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Triggers" identifier="2" id="Z1o-ot-g3o">
-                                <view key="view" ambiguous="YES" id="V8F-IY-uB4">
+                                <view key="view" id="V8F-IY-uB4">
                                     <rect key="frame" x="10" y="25" width="575" height="658"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
@@ -1628,7 +1628,7 @@
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Speaker &amp; Counter" identifier="" id="qvg-PS-ArU">
-                                <view key="view" id="ayJ-xc-snR">
+                                <view key="view" ambiguous="YES" id="ayJ-xc-snR">
                                     <rect key="frame" x="10" y="25" width="575" height="658"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
@@ -2207,9 +2207,6 @@
                                                                             </buttonCell>
                                                                         </column>
                                                                     </cells>
-                                                                    <connections>
-                                                                        <action selector="CounterModeChanged:" target="-2" id="dRA-fH-g15"/>
-                                                                    </connections>
                                                                 </matrix>
                                                             </subviews>
                                                         </view>
