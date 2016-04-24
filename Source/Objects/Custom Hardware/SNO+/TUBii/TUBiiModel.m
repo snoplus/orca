@@ -57,6 +57,7 @@
 - (id) init {
     NSLog(@"init called\n");
     self = [super init];
+    [self registerNotificationObservers];
     if (self) {
         //  Initialize model member variables
         smellieRate = 0;
@@ -118,6 +119,20 @@
     [aCoder encodeInt:NPulses               forKey:@"TUBiiModelNPulses"];
     [aCoder encodeInt:portNumber            forKey:@"TUBiiModelPortNumber"];
     [aCoder encodeObject:strHostName        forKey:@"TUBiiModelStrHostName"];
+}
+- (void) registerNotificationObservers{
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(runAboutToStart:)
+                         name : ORRunAboutToStartNotification
+                       object : nil];
+}
+- (void) runAboutToStart: (NSNotification*) aNone {
+    [self setDataReadout:NO];
+    [self ResetFifo]; //Maybe take this out eventually? I'm not sure
+    [self setDataReadout:YES];
+    [self setStatusReadout:YES];
 }
 #pragma mark •••Network Communication
 - (void) sendOkCmd:(NSString* const)aCmd {
