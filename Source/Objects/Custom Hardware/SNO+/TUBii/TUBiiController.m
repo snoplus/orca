@@ -40,7 +40,6 @@
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
     [CounterAdvancedOptionsBox setHidden:YES];
     [caenChannelSelect_3 setEnabled:NO];//Not currently working on board
-    [caenGainSelect_4 setEnabled:NO]; //Not currently working on board.
 }
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item{
     int tabIndex = [aTabView indexOfTabViewItem:item];
