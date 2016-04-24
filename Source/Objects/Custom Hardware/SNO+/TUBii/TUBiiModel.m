@@ -55,7 +55,6 @@
 //  call the superclass initWithCoder too!
 
 - (id) init {
-    NSLog(@"init called\n");
     self = [super init];
     [self registerNotificationObservers];
     if (self) {
