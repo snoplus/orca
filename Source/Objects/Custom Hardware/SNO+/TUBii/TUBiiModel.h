@@ -100,6 +100,7 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
     int smellieNPulses;
     int tellieNPulses;
     int NPulses;
+    BOOL CounterMode_memoryVal;//Hack b/c tubii server doesn't yet have GetCounterMode command
 
     RedisClient *connection;
     int portNumber;

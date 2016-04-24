@@ -592,11 +592,12 @@
     //
     // The max rate the scaler is capable is 750kHz, the MZ (puroposefully) limits it even further to ~500kHz
     // See data sheet for SUBCub 28a and TUBii schematics pages 3,4, and FP_6 for more info
+    CounterMode_memoryVal = mode;
     if (mode) {
-        [self sendOkCmd:@"SetCounterMode 1"]; // Rate Mode
+        [self sendOkCmd:@"CounterMode 1"]; // Rate Mode
     }
     else {
-        [self sendOkCmd:@"SetCounterMode 0"]; // Totalizer Mode
+        [self sendOkCmd:@"CounterMode 0"]; // Totalizer Mode
     }
 }
 - (float) ConvertBitsToValue:(NSUInteger)bits NBits: (int) nBits MinVal: (float) minVal MaxVal: (float) maxVal{
@@ -651,7 +652,10 @@
 
 - (BOOL) CounterMode {
     // See comments in setCounterMode for info
-    return ([self sendIntCmd:@"GetCounterMode"]) > 0;
+    //return ([self sendIntCmd:@"GetCounterMode"]) > 0;
+
+    //Note TUBii server doesn't yet have GetCounterMode command so this hack is in here for now
+    return CounterMode_memoryVal;
 }
 
 - (void) setCurrentState:(struct TUBiiState)aState {
