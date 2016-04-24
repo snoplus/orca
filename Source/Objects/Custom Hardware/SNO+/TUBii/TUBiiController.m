@@ -28,7 +28,7 @@
     [tabView setFocusRingType:NSFocusRingTypeNone];
     
     PulserAndDelays_size = NSMakeSize(500, 350);
-    Triggers_size = NSMakeSize(530, 575);
+    Triggers_size = NSMakeSize(500, 610);
     Tubii_size = NSMakeSize(450, 400);
     Analog_size = NSMakeSize(615, 445);
     GTDelays_size = NSMakeSize(500, 250);

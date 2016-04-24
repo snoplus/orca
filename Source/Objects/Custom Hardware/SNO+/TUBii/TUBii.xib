@@ -573,243 +573,301 @@
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Triggers" identifier="2" id="Z1o-ot-g3o">
-                                <view key="view" id="V8F-IY-uB4">
+                                <view key="view" ambiguous="YES" id="V8F-IY-uB4">
                                     <rect key="frame" x="10" y="25" width="575" height="658"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oLy-3Y-DUA">
-                                            <rect key="frame" x="6" y="120" width="128" height="32"/>
-                                            <buttonCell key="cell" type="push" title="Send To TUBii" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="cXB-Pf-unk">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="TrigMaskLoad:" target="-2" id="NXr-XD-6rt"/>
-                                            </connections>
-                                        </button>
-                                        <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Tgr-hp-71d">
-                                            <rect key="frame" x="201" y="630" width="128" height="22"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Burst Trig Rate (Hz)" drawsBackground="YES" id="1bs-uX-uTC">
-                                                <font key="font" metaFont="system"/>
-                                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Tpk-AU-IZe">
-                                            <rect key="frame" x="201" y="589" width="128" height="22"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Burst Trig Mask" drawsBackground="YES" id="dfD-8j-F39">
-                                                <font key="font" metaFont="system"/>
-                                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="z9q-y6-H7l">
-                                            <rect key="frame" x="201" y="499" width="128" height="22"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Combo Trig Mask" drawsBackground="YES" id="dFM-fC-q8R">
-                                                <font key="font" metaFont="system"/>
-                                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7sY-tt-zZY">
-                                            <rect key="frame" x="201" y="430" width="128" height="22"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Prescale Trig Rate" drawsBackground="YES" id="XSz-gB-swM">
-                                                <font key="font" metaFont="system"/>
-                                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZyV-ia-jpL">
-                                            <rect key="frame" x="201" y="387" width="128" height="22"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Prescale Trig Mask" drawsBackground="YES" id="Snc-kH-2ER">
-                                                <font key="font" metaFont="system"/>
-                                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3cv-0M-hAe">
-                                            <rect key="frame" x="354" y="493" width="128" height="32"/>
-                                            <buttonCell key="cell" type="push" title="Send To TUBii" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="EHs-Sc-7ka">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                        </button>
-                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WRT-qx-g2F">
-                                            <rect key="frame" x="354" y="381" width="128" height="32"/>
-                                            <buttonCell key="cell" type="push" title="Send To TUBii" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="XvW-Bb-8jx">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                        </button>
-                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="W5H-z8-op5">
-                                            <rect key="frame" x="153" y="120" width="142" height="32"/>
-                                            <buttonCell key="cell" type="push" title="Match Hardware" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="SGV-hU-drx">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="TrigMaskMatchHardware:" target="-2" id="qkg-Hq-VFD"/>
-                                            </connections>
-                                        </button>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="PWs-YL-ZWQ">
-                                            <rect key="frame" x="10" y="640" width="168" height="17"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Select Triggers to Mask In " id="EPS-8G-94b">
-                                                <font key="font" metaFont="system"/>
-                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <matrix toolTip="Select desired inputs to TUBii trigger. " verticalHuggingPriority="750" fixedFrame="YES" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yhg-sx-P1v">
-                                            <rect key="frame" x="12" y="149" width="124" height="483"/>
-                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            <size key="cellSize" width="124" height="23"/>
-                                            <buttonCell key="prototype" type="check" title="0" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="fzb-fS-RuK">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <cells>
-                                                <column>
-                                                    <buttonCell type="check" title="ExtTrig 0" bezelStyle="regularSquare" imagePosition="left" inset="2" id="6jl-qy-uLp">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <buttonCell type="check" title="ExtTrig 1" bezelStyle="regularSquare" imagePosition="left" tag="1" inset="2" id="Dgc-2v-92l">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <buttonCell type="check" title="ExtTrig 2" bezelStyle="regularSquare" imagePosition="left" tag="2" inset="2" id="LAy-18-US0">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <buttonCell type="check" title="ExtTrig 3" bezelStyle="regularSquare" imagePosition="left" tag="3" inset="2" id="Zor-aQ-Asn">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <buttonCell type="check" title="ExtTrig 4" bezelStyle="regularSquare" imagePosition="left" tag="4" inset="2" id="9GZ-LX-BAe">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <buttonCell type="check" title="ExtTrig 5" bezelStyle="regularSquare" imagePosition="left" tag="5" inset="2" id="ICA-WN-aHW">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <buttonCell type="check" title="ExtTrig 6" bezelStyle="regularSquare" imagePosition="left" tag="6" inset="2" id="h0n-cF-slV">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <buttonCell type="check" title="ExtTrig 7" bezelStyle="regularSquare" imagePosition="left" state="on" tag="7" inset="2" id="cPx-HO-03f">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <buttonCell type="check" title="ExtTrig 8" bezelStyle="regularSquare" imagePosition="left" tag="8" inset="2" id="OEa-1H-nu7">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <buttonCell type="check" title="ExtTrig 9" bezelStyle="regularSquare" imagePosition="left" tag="9" inset="2" id="IF0-cC-y9O">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <buttonCell type="check" title="ExtTrig 10" bezelStyle="regularSquare" imagePosition="left" state="on" tag="10" inset="2" id="IFe-aF-2sN">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <buttonCell type="check" title="ExtTrig 11" bezelStyle="regularSquare" imagePosition="left" tag="11" inset="2" id="Vca-8c-jSN">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <buttonCell type="check" title="ExtTrig 12" bezelStyle="regularSquare" imagePosition="left" tag="12" inset="2" id="8ve-4X-2KD">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <buttonCell type="check" title="ExtTrig 13" bezelStyle="regularSquare" imagePosition="left" tag="13" inset="2" id="2Jb-Kh-H8G">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <buttonCell type="check" title="ExtTrig 14" bezelStyle="regularSquare" imagePosition="left" tag="14" inset="2" id="JNi-My-9Sk">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <buttonCell type="check" title="ExtTrig 15" bezelStyle="regularSquare" imagePosition="left" tag="15" inset="2" id="1mW-04-o2w">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <buttonCell type="check" title="MTCA Mimic 1" bezelStyle="regularSquare" imagePosition="left" state="on" tag="16" inset="2" id="zzQ-dT-SOq">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <buttonCell type="check" title="MTCA Mimic 2" bezelStyle="regularSquare" imagePosition="left" state="on" tag="17" inset="2" id="eCf-Io-Zna">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <buttonCell type="check" title="Burst" bezelStyle="regularSquare" imagePosition="left" state="on" tag="18" inset="2" id="SSF-N1-Xyn">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <buttonCell type="check" title="Combo" bezelStyle="regularSquare" imagePosition="left" state="on" tag="19" inset="2" id="kf8-aX-gco">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <buttonCell type="check" title="Prescale" bezelStyle="regularSquare" imagePosition="left" state="on" tag="20" inset="2" id="PPw-z0-p9J">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                </column>
-                                            </cells>
-                                        </matrix>
-                                        <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gi2-ac-HvU">
-                                            <rect key="frame" x="239" y="314" width="96" height="22"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="MIf-yK-vPb">
-                                                <font key="font" metaFont="system"/>
-                                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                            <connections>
-                                                <action selector="MTCAMimicTextFieldChanged:" target="-2" id="l9Y-PR-EjK"/>
-                                                <outlet property="formatter" destination="1xr-qD-OOh" id="TPm-fc-GMG"/>
-                                            </connections>
-                                        </textField>
-                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HsA-Vk-Efz">
-                                            <rect key="frame" x="216" y="239" width="142" height="32"/>
-                                            <buttonCell key="cell" type="push" title="Match Hardware" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Zr2-pQ-EQk">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="MTCAMimicMatchHardware:" target="-2" id="TVF-5W-FQn"/>
-                                            </connections>
-                                        </button>
-                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MX5-Zj-gla">
-                                            <rect key="frame" x="223" y="206" width="128" height="32"/>
-                                            <buttonCell key="cell" type="push" title="Send To TUBii" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4FP-wi-OSj">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="MTCAMimicLoadValue:" target="-2" id="X3S-T4-njl"/>
-                                            </connections>
-                                        </button>
-                                        <slider verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ibD-Ox-QD5">
-                                            <rect key="frame" x="173" y="283" width="228" height="23"/>
-                                            <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="-5" maxValue="5" doubleValue="5" tickMarkPosition="above" numberOfTickMarks="4096" allowsTickMarkValuesOnly="YES" sliderType="linear" id="RQk-oK-sqf"/>
-                                            <connections>
-                                                <action selector="MTCAMimicSliderChanged:" target="-2" id="tt6-HN-vKC"/>
-                                            </connections>
-                                        </slider>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Yku-Mh-D0S">
-                                            <rect key="frame" x="201" y="346" width="172" height="17"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="MTCA MIMIC Threshold (V)" id="aaC-7P-B8g">
-                                                <font key="font" metaFont="system"/>
-                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Gx5-Ag-RBg">
-                                            <rect key="frame" x="354" y="583" width="128" height="32"/>
-                                            <buttonCell key="cell" type="push" title="Send To TUBii" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="HET-c4-J6h">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                        </button>
+                                        <box fixedFrame="YES" title="Special Trigger Settings" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="abp-EP-OxH">
+                                            <rect key="frame" x="219" y="82" width="263" height="572"/>
+                                            <view key="contentView">
+                                                <rect key="frame" x="1" y="1" width="261" height="556"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <box fixedFrame="YES" title="MTCA Mimic" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="iPD-Ez-2Lz">
+                                                        <rect key="frame" x="15" y="10" width="231" height="178"/>
+                                                        <view key="contentView">
+                                                            <rect key="frame" x="1" y="1" width="229" height="162"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                            <subviews>
+                                                                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gi2-ac-HvU">
+                                                                    <rect key="frame" x="66" y="109" width="96" height="22"/>
+                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="MIf-yK-vPb">
+                                                                        <font key="font" metaFont="system"/>
+                                                                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                    <connections>
+                                                                        <action selector="MTCAMimicTextFieldChanged:" target="-2" id="l9Y-PR-EjK"/>
+                                                                        <outlet property="formatter" destination="1xr-qD-OOh" id="TPm-fc-GMG"/>
+                                                                    </connections>
+                                                                </textField>
+                                                                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HsA-Vk-Efz">
+                                                                    <rect key="frame" x="43" y="0.0" width="142" height="32"/>
+                                                                    <buttonCell key="cell" type="push" title="Match Hardware" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Zr2-pQ-EQk">
+                                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="MTCAMimicMatchHardware:" target="-2" id="TVF-5W-FQn"/>
+                                                                    </connections>
+                                                                </button>
+                                                                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MX5-Zj-gla">
+                                                                    <rect key="frame" x="50" y="30" width="128" height="32"/>
+                                                                    <buttonCell key="cell" type="push" title="Send To TUBii" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4FP-wi-OSj">
+                                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="MTCAMimicLoadValue:" target="-2" id="X3S-T4-njl"/>
+                                                                    </connections>
+                                                                </button>
+                                                                <slider verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ibD-Ox-QD5">
+                                                                    <rect key="frame" x="0.0" y="78" width="228" height="23"/>
+                                                                    <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="-5" maxValue="5" doubleValue="5" tickMarkPosition="above" numberOfTickMarks="4096" allowsTickMarkValuesOnly="YES" sliderType="linear" id="RQk-oK-sqf"/>
+                                                                    <connections>
+                                                                        <action selector="MTCAMimicSliderChanged:" target="-2" id="tt6-HN-vKC"/>
+                                                                    </connections>
+                                                                </slider>
+                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Yku-Mh-D0S">
+                                                                    <rect key="frame" x="61" y="136" width="107" height="17"/>
+                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Threshold (Volts)" id="aaC-7P-B8g">
+                                                                        <font key="font" metaFont="system"/>
+                                                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                </textField>
+                                                            </subviews>
+                                                        </view>
+                                                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                    </box>
+                                                    <box fixedFrame="YES" title="Combo Trigger" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="0a2-0L-yeG">
+                                                        <rect key="frame" x="42" y="319" width="177" height="91"/>
+                                                        <view key="contentView">
+                                                            <rect key="frame" x="1" y="1" width="175" height="75"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                            <subviews>
+                                                                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="z9q-y6-H7l">
+                                                                    <rect key="frame" x="23" y="43" width="128" height="22"/>
+                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Combo Trig Mask" drawsBackground="YES" id="dFM-fC-q8R">
+                                                                        <font key="font" metaFont="system"/>
+                                                                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                </textField>
+                                                                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3cv-0M-hAe">
+                                                                    <rect key="frame" x="23" y="7" width="128" height="32"/>
+                                                                    <buttonCell key="cell" type="push" title="Send To TUBii" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="EHs-Sc-7ka">
+                                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                </button>
+                                                            </subviews>
+                                                        </view>
+                                                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                    </box>
+                                                    <box fixedFrame="YES" title="Prescale Trigger" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="o1w-Cl-XWr">
+                                                        <rect key="frame" x="42" y="199" width="177" height="114"/>
+                                                        <view key="contentView">
+                                                            <rect key="frame" x="1" y="1" width="175" height="98"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                            <subviews>
+                                                                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7sY-tt-zZY">
+                                                                    <rect key="frame" x="23" y="71" width="128" height="22"/>
+                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Prescale Trig Rate" drawsBackground="YES" id="XSz-gB-swM">
+                                                                        <font key="font" metaFont="system"/>
+                                                                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                </textField>
+                                                                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZyV-ia-jpL">
+                                                                    <rect key="frame" x="23" y="39" width="128" height="22"/>
+                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Prescale Trig Mask" drawsBackground="YES" id="Snc-kH-2ER">
+                                                                        <font key="font" metaFont="system"/>
+                                                                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                </textField>
+                                                                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WRT-qx-g2F">
+                                                                    <rect key="frame" x="23" y="3" width="128" height="32"/>
+                                                                    <buttonCell key="cell" type="push" title="Send To TUBii" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="XvW-Bb-8jx">
+                                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                </button>
+                                                            </subviews>
+                                                        </view>
+                                                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                    </box>
+                                                    <box fixedFrame="YES" title="Burst Trigger" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="MCH-uh-EPv">
+                                                        <rect key="frame" x="42" y="420" width="177" height="126"/>
+                                                        <view key="contentView">
+                                                            <rect key="frame" x="1" y="1" width="175" height="110"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                            <subviews>
+                                                                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Tgr-hp-71d">
+                                                                    <rect key="frame" x="18" y="83" width="128" height="22"/>
+                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Burst Trig Rate (Hz)" drawsBackground="YES" id="1bs-uX-uTC">
+                                                                        <font key="font" metaFont="system"/>
+                                                                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                </textField>
+                                                                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Tpk-AU-IZe">
+                                                                    <rect key="frame" x="18" y="49" width="128" height="22"/>
+                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Burst Trig Mask" drawsBackground="YES" id="dfD-8j-F39">
+                                                                        <font key="font" metaFont="system"/>
+                                                                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                </textField>
+                                                                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Gx5-Ag-RBg">
+                                                                    <rect key="frame" x="18" y="7" width="128" height="32"/>
+                                                                    <buttonCell key="cell" type="push" title="Send To TUBii" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="HET-c4-J6h">
+                                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                </button>
+                                                            </subviews>
+                                                        </view>
+                                                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                    </box>
+                                                </subviews>
+                                            </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </box>
+                                        <box fixedFrame="YES" title="Select Trigger Mask" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="8uw-Gr-9Ff">
+                                            <rect key="frame" x="14" y="82" width="177" height="571"/>
+                                            <view key="contentView">
+                                                <rect key="frame" x="1" y="1" width="175" height="555"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oLy-3Y-DUA">
+                                                        <rect key="frame" x="19" y="33" width="128" height="32"/>
+                                                        <buttonCell key="cell" type="push" title="Send To TUBii" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="cXB-Pf-unk">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="TrigMaskLoad:" target="-2" id="NXr-XD-6rt"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="W5H-z8-op5">
+                                                        <rect key="frame" x="12" y="0.0" width="142" height="32"/>
+                                                        <buttonCell key="cell" type="push" title="Match Hardware" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="SGV-hU-drx">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="TrigMaskMatchHardware:" target="-2" id="qkg-Hq-VFD"/>
+                                                        </connections>
+                                                    </button>
+                                                    <matrix toolTip="Select desired inputs to TUBii trigger. " verticalHuggingPriority="750" fixedFrame="YES" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yhg-sx-P1v">
+                                                        <rect key="frame" x="25" y="62" width="124" height="483"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        <size key="cellSize" width="124" height="23"/>
+                                                        <buttonCell key="prototype" type="check" title="0" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="fzb-fS-RuK">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <cells>
+                                                            <column>
+                                                                <buttonCell type="check" title="ExtTrig 0" bezelStyle="regularSquare" imagePosition="left" inset="2" id="6jl-qy-uLp">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ExtTrig 1" bezelStyle="regularSquare" imagePosition="left" tag="1" inset="2" id="Dgc-2v-92l">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ExtTrig 2" bezelStyle="regularSquare" imagePosition="left" tag="2" inset="2" id="LAy-18-US0">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ExtTrig 3" bezelStyle="regularSquare" imagePosition="left" tag="3" inset="2" id="Zor-aQ-Asn">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ExtTrig 4" bezelStyle="regularSquare" imagePosition="left" tag="4" inset="2" id="9GZ-LX-BAe">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ExtTrig 5" bezelStyle="regularSquare" imagePosition="left" tag="5" inset="2" id="ICA-WN-aHW">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ExtTrig 6" bezelStyle="regularSquare" imagePosition="left" tag="6" inset="2" id="h0n-cF-slV">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ExtTrig 7" bezelStyle="regularSquare" imagePosition="left" state="on" tag="7" inset="2" id="cPx-HO-03f">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ExtTrig 8" bezelStyle="regularSquare" imagePosition="left" tag="8" inset="2" id="OEa-1H-nu7">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ExtTrig 9" bezelStyle="regularSquare" imagePosition="left" tag="9" inset="2" id="IF0-cC-y9O">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ExtTrig 10" bezelStyle="regularSquare" imagePosition="left" state="on" tag="10" inset="2" id="IFe-aF-2sN">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ExtTrig 11" bezelStyle="regularSquare" imagePosition="left" tag="11" inset="2" id="Vca-8c-jSN">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ExtTrig 12" bezelStyle="regularSquare" imagePosition="left" tag="12" inset="2" id="8ve-4X-2KD">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ExtTrig 13" bezelStyle="regularSquare" imagePosition="left" tag="13" inset="2" id="2Jb-Kh-H8G">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ExtTrig 14" bezelStyle="regularSquare" imagePosition="left" tag="14" inset="2" id="JNi-My-9Sk">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ExtTrig 15" bezelStyle="regularSquare" imagePosition="left" tag="15" inset="2" id="1mW-04-o2w">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="MTCA Mimic 1" bezelStyle="regularSquare" imagePosition="left" state="on" tag="16" inset="2" id="zzQ-dT-SOq">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="MTCA Mimic 2" bezelStyle="regularSquare" imagePosition="left" state="on" tag="17" inset="2" id="eCf-Io-Zna">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="Burst" bezelStyle="regularSquare" imagePosition="left" state="on" tag="18" inset="2" id="SSF-N1-Xyn">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="Combo" bezelStyle="regularSquare" imagePosition="left" state="on" tag="19" inset="2" id="kf8-aX-gco">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="Prescale" bezelStyle="regularSquare" imagePosition="left" state="on" tag="20" inset="2" id="PPw-z0-p9J">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                            </column>
+                                                        </cells>
+                                                    </matrix>
+                                                </subviews>
+                                            </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </box>
                                     </subviews>
                                 </view>
                             </tabViewItem>
@@ -1570,7 +1628,7 @@
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Speaker &amp; Counter" identifier="" id="qvg-PS-ArU">
-                                <view key="view" ambiguous="YES" id="ayJ-xc-snR">
+                                <view key="view" id="ayJ-xc-snR">
                                     <rect key="frame" x="10" y="25" width="575" height="658"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
