@@ -273,7 +273,7 @@ endRunNumber = _endRunNumber;
 
 - (void)parseResistorDbResult:(id)aResult
 {
-    self.currentQueryResults = [[NSMutableDictionary alloc] init];
+    self.currentQueryResults = [[[NSMutableDictionary alloc] init]autorelease];
     self.currentQueryResults = [[[aResult objectForKey:@"rows"] objectAtIndex:0] objectForKey:@"value"];
 
     //make notification here to tell controller that this has changed 

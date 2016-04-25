@@ -24,6 +24,7 @@
 	id delegate;
 	BOOL needToSwap;
 	ORDecoder* currentDecoder;
+    NSFileHandle* fp;
 }
 
 - (id)   initWithPath:(NSString*)aPath delegate:(id)aDelegate;

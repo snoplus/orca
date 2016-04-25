@@ -87,7 +87,7 @@
 	[super drawRect:rect];
 }
 
-- (NSColor*) getColorForSet:(int)setIndex value:(unsigned long)aValue
+- (NSColor*) getColorForSet:(int)setIndex value:(float)aValue
 {
 	return [prespecColorScale getColorForValue:aValue];
 }

@@ -320,8 +320,8 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
             NSDate* scriptLastRan = [dateConvertFormatter dateFromString:ds];
             NSString* scriptLastRanString = [dateFormatter stringFromDate:scriptLastRan];
             if(scriptLastRanString)[resultDict setObject:scriptLastRanString forKey:@"scriptRan"];
-            
-            [resultDict setObject:[dateFormatter stringFromDate:[NSDate date]] forKey:@"lastChecked"];
+            NSString* s =[dateFormatter stringFromDate:[NSDate date]];
+            if(s)[resultDict setObject:s forKey:@"lastChecked"];
         }
         else {
             aLine = [aLine stringByReplacingOccurrencesOfString:@" " withString:@""];

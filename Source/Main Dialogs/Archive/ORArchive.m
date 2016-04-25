@@ -394,6 +394,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 
 - (void) main
 {
+    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	@try {
 		NSString* binPath = appPath();
 		NSString* dir = [kOldBinaryPath stringByExpandingTildeInPath];
@@ -439,6 +440,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	}
 	@catch(NSException* e){
 	}
+    [pool release];
 }
 @end
 
@@ -452,8 +454,10 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 
 - (void) main
 {
+    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	if(![(ORAppDelegate*)[NSApp delegate] configLoadedOK]){
 		NSLog(@"You currently do not have a valid config. It was NOT archived.\n");
+        [pool release];
 		return;
 	}
 	@try {	
@@ -478,6 +482,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	}
 	@catch(NSException* e){
 	}
+    [pool release];
 }
 @end
 
@@ -498,6 +503,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 
 - (void) main
 {
+    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	@try {
 		NSTask* task = [[NSTask alloc] init];
 		NSString* binPath = appPath();
@@ -529,6 +535,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	}
 	@catch(NSException* e){
 	}
+    [pool release];
 }
 @end
 
@@ -548,6 +555,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 }
 - (void) main
 {
+    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	@try {
 		[[ORGlobal sharedGlobal] prepareForForcedHalt];
 		[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:YES] forKey:ORNormalShutDownFlag];    
@@ -567,6 +575,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	}
 	@catch(NSException* e){
 	}
+    [pool release];
 }
 
 @end
@@ -592,6 +601,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 
 - (void) main
 {
+    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	@try {
 		if(srcPath){
 			NSTask* task = [[NSTask alloc] init];
@@ -623,6 +633,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	}
 	@catch(NSException* e){
 	}
+    [pool release];
 }
 @end
 @implementation ORCleanOrcaOp
@@ -642,6 +653,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 
 - (void) main
 {
+    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	@try {
 		if(srcPath){
 			NSTask* task = [[NSTask alloc] init];
@@ -698,6 +710,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	}
 	@catch(NSException* e){
 	}
+    @finally{
+        [pool release];
+    }
 }
 @end
 
@@ -718,6 +733,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 
 - (void) main
 {
+    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	@try {
 		if(srcPath){
             NSString* currentAppPath = [appPath() stringByDeletingLastPathComponent];
@@ -795,6 +811,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	}
 	@catch(NSException* e){
 	}
+    @finally{
+        [pool release];
+    }
 }
 @end
 

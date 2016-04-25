@@ -39,6 +39,7 @@ typedef enum _eFileTransferType {
 	NSString*           remoteUserName;
 	NSString*           remotePassWord;
 	NSString*           fullPath;
+    NSFileHandle*       readHandle;
 	int                 percentDone;
 	eFileTransferType   transferType;
 	BOOL verbose;

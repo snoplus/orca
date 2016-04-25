@@ -465,7 +465,12 @@ static NSString *ORFanOutNumber 		= @"Number of Fan In Outputs";
         [obj runTaskStopped:userInfo];
     }
 }
-
+- (void) preCloseOut:(id)userInfo
+{
+    for(id obj in cachedProcessors){
+        [obj preCloseOut:userInfo];
+    }
+}
 - (void) closeOutRun:(id)userInfo
 {
 	for(id obj in cachedProcessors){

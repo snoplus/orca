@@ -480,6 +480,7 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
                         [eventLog addObject:aLine];
                     }
                 }
+                [parts release];
             }
         }
         i++;

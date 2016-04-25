@@ -126,7 +126,7 @@
 
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)element namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qualifiedName attributes:(NSDictionary *)attributes {
     if ([element isEqualToString:@"value"] || [element isEqualToString:@"member"] || [element isEqualToString:@"name"]) {
-        WPXMLRPCDecoderDelegate *parserDelegate = [[WPXMLRPCDecoderDelegate alloc] initWithParent:self];
+        WPXMLRPCDecoderDelegate *parserDelegate = [[[WPXMLRPCDecoderDelegate alloc] initWithParent:self] autorelease];
         
         if ([element isEqualToString:@"member"]) {
             [parserDelegate setElementType:WPXMLRPCElementTypeMember];
@@ -143,14 +143,14 @@
     }
     
     if ([element isEqualToString:@"array"] || [element isEqualToString:@"params"]) {
-        NSMutableArray *array = [[NSMutableArray alloc] init];
+        NSMutableArray *array = [[[NSMutableArray alloc] init] autorelease];
         
         [self setElementValue:array];
         
         
         [self setElementType:WPXMLRPCElementTypeArray];
     } else if ([element isEqualToString:@"struct"]) {
-        NSMutableDictionary *dictionary = [[NSMutableDictionary alloc] init];
+        NSMutableDictionary *dictionary = [[[NSMutableDictionary alloc] init] autorelease];
         
         [self setElementValue:dictionary];
         
@@ -292,8 +292,8 @@
 - (NSDate *)parseDateString:(NSString *)dateString withFormat:(NSString *)format {
     // Set the local to POSIX format so changing date formats on the device doesn't affect the format being passed in
     // Since we're assuming GMT the timeZone should be set but this currently breaks WordPress for iOS so leaving for now
-    NSLocale *enUSPOSIXLocale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    NSLocale *enUSPOSIXLocale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"] autorelease];
+    NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
     dateFormatter.locale = enUSPOSIXLocale;
     // Forcing to GMT time zone to prevent issues with converting from/to time zones
     dateFormatter.timeZone = [NSTimeZone timeZoneWithName:@"GMT"];

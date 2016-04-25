@@ -448,7 +448,11 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 
 - (void) runTaskBoundary
 {
-    [dataSet runTaskBoundary];
+   [dataSet runTaskBoundary];
+}
+
+- (void) preCloseOut:(id)userInfo
+{
 }
 
 - (void) closeOutRun:(id)userInfo

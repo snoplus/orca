@@ -43,6 +43,11 @@
     [stopLight release];
     [super dealloc];
 }
+- (BOOL) isOpaque
+{
+    return YES;
+}
+
 #pragma mark ***Accessors
 
 - (ORDotImage*) offLight
