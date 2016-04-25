@@ -403,7 +403,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNMPQueue);
 @implementation ORSNMPWriteOperation
 - (void) main
 {
-	if([self isCancelled]) return;
+    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+
+    if([self isCancelled]){
+        [pool release];
+        return;
+    }
 	
 	ORSNMP* ss = [[ORSNMP alloc] initWithMib:mib];
 	[ss openGuruSession:ipNumber];
@@ -413,6 +418,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNMPQueue);
 	[delegate performSelectorOnMainThread:selector withObject:response waitUntilDone:YES];
 	[ss release];
 	//[ORTimer delay:.05];
+    [pool release];
 }
 
 @end
@@ -424,7 +430,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNMPQueue);
 @implementation ORSNMPReadOperation
 - (void) main
 {	
-	if([self isCancelled]) return;
+    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+    if([self isCancelled]){
+        [pool release];
+        return;
+    }
 	ORSNMP* ss = [[ORSNMP alloc] initWithMib:mib];
 	[ss openPublicSession:ipNumber];
 	if(verbose)for(id aCmd in cmds) NSLog(@"SNMP Getting: %@\n",aCmd);
@@ -433,6 +443,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNMPQueue);
 	[delegate performSelectorOnMainThread:selector withObject:response waitUntilDone:YES];
 	[ss release];
 	//[ORTimer delay:.05];
+    [pool release];
 }
 @end
 
@@ -445,10 +456,15 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNMPQueue);
 
 - (void) main
 {	
-	if([self isCancelled]) return;
+    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+    if([self isCancelled]){
+        [pool release];
+        return;
+    }
 	if(verbose)NSLog(@"CallBack to %@: %@ with %@\n",[target className], NSStringFromSelector(selector),userInfo);
 	[target performSelectorOnMainThread:selector withObject:userInfo waitUntilDone:YES];
 	//[ORTimer delay:.1];
+    [pool release];
 }
 @end
 
@@ -477,6 +493,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNMPQueue);
 
 - (void) main
 {
+    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	@try {
 		if(command && ![self isCancelled]){
 			NSTask* task = [[NSTask alloc] init];
@@ -504,6 +521,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNMPQueue);
 	}
 	@catch(NSException* e){
 	}
+    @finally{
+        [pool release];
+    }
 }
 
 @end

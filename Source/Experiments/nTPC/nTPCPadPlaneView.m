@@ -109,7 +109,7 @@
 	}
 }
 
-- (NSColor*) getColorForSet:(int)setIndex value:(unsigned long)aValue
+- (NSColor*) getColorForSet:(int)setIndex value:(float)aValue
 {
 	return [colorScale getColorForValue:aValue];
 }
@@ -142,7 +142,7 @@
 						}
 						if(displayValue){
 							if(displayType != kDisplayEvents){
-								displayColor = [self getColorForSet:setIndex value:(int)displayValue];
+								displayColor = [self getColorForSet:setIndex value:displayValue];
 							}
 							else {
 								if(displayValue)displayColor = [NSColor blackColor];

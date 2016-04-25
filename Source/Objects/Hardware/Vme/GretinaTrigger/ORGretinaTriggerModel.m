@@ -499,6 +499,11 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
                      selector : @selector(endPollingLock:)
                          name : ORRunAboutToStopNotification
                        object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(runStopped:)
+                         name : ORRunStoppedNotification
+                       object : nil];
 
 }
 
@@ -526,11 +531,18 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
         unsigned long aValue = [self readRegister:kMiscCtl1];
         [self writeRegister:kMiscCtl1 withValue:aValue |= (0x1<<6)]; //set the Imp Syn
         [self setMiscCtl1Reg:       [self readRegister:kMiscCtl1]];  //display it
-        
+     }
+}
+
+- (void) runStopped:(NSNotification*)aNote
+{
+    if([self isMaster]){
         //At Jason's request reset the clock at the end of run
         NSArray*  runModelObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
         ORRunModel* aRunModel = [runModelObjects objectAtIndex:0];
         if([aRunModel quickStart]){
+            [self shipDataRecord];
+            [ORTimer delay:.1];
             NSLog(@"Reset the timestamps\n");
             //to reset the clocks set bit 6 of the MISC_CTRL reg
             //When this bit is set, the timestamp counter is held reset with value of zero
@@ -541,11 +553,11 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             [self resetScaler];
             [self writeRegister:kPulsedCtl2 withValue:0x1000]; //send one imp syn
             [self readDisplayRegs];
-            [self shipDataRecord];
+            [ORTimer delay:.1];
         }
     }
-}
 
+}
 - (void) pollLock
 {
     @try {

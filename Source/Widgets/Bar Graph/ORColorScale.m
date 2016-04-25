@@ -154,7 +154,7 @@
 	[self setNeedsDisplay:YES];
 }
 
-- (NSColor*) getColorForValue:(unsigned long)aValue
+- (NSColor*) getColorForValue:(float)aValue
 {	
 	float h=[self bounds].size.height;
 	float w=[self bounds].size.width;
@@ -171,6 +171,8 @@
 	else if(i<0)return nil;
 	else return [colors lastObject];
 }
+
+
 - (NSColor*) getColorForIndex:(unsigned short)index
 {
     return [colors objectAtIndex:index];

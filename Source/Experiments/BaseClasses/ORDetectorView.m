@@ -96,7 +96,7 @@
 - (void) downArrow{;}
 - (void) leftArrow{;}
 - (void) rightArrow{;}
-- (NSColor*) getColorForSet:(int)setIndex value:(unsigned long)aValue{return nil;}
+- (NSColor*) getColorForSet:(int)setIndex value:(float)aValue{return nil;}
 - (int) selectedSet  {return selectedSet;}
 - (int) selectedPath {return selectedPath;}
 
@@ -175,7 +175,7 @@
 						case kDisplayTotalCounts:	displayValue = [segmentGroup getTotalCounts:segmentIndex];	break;
 						default:					displayValue = [segmentGroup getRate:segmentIndex];			break;
 					}
-					NSColor* displayColor = [self getColorForSet:setIndex value:(unsigned long)displayValue];
+					NSColor* displayColor = [self getColorForSet:setIndex value:displayValue];
 					if(displayColor)[displayColor set];
 					else [[NSColor darkGrayColor] set];
 				}

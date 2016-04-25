@@ -53,6 +53,10 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
         [task terminate];
     }
     [task release];
+    
+    [readHandle closeFile];
+    [readHandle release];
+    
     [fileName release];
     [scriptFilePath release];
     [remoteHost release];
@@ -240,7 +244,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
     [t release];
     
     NSPipe *newPipe = [NSPipe pipe];
-    NSFileHandle *readHandle = [newPipe fileHandleForReading];
+    readHandle = [[newPipe fileHandleForReading] retain];
     
     NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
 	
@@ -465,6 +469,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
         else           [userInfo setObject:@"Failed" forKey:@"Status"];
         [nc postNotificationName:ORFileMoverIsDoneNotification object:self userInfo:userInfo];
 	}
+
 }
 
 - (void)taskDataAvailable:(NSNotification*)aNotification

@@ -54,6 +54,7 @@
 - (void) runTaskStarted:(id)userInfo;
 - (void) runTaskStopped:(id)userInfo;
 - (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
+- (void) preCloseOut:(id)userInfo;
 - (void) closeOutRun:(id)userInfo;
 
 #pragma mark ¥¥¥Forwarding

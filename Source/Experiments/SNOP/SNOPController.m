@@ -5,16 +5,16 @@
 //  Created by Mark Howe on Tue Apr 20, 2010.
 //  Copyright (c) 2010  University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
-//This program was prepared for the Regents of the University of 
-//Washington at the Center for Experimental Nuclear Physics and 
-//Astrophysics (CENPA) sponsored in part by the United States 
-//Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
-//The University has certain rights in the program pursuant to 
-//the contract and the program should not be copied or distributed 
-//outside your organization.  The DOE and the University of 
+//This program was prepared for the Regents of the University of
+//Washington at the Center for Experimental Nuclear Physics and
+//Astrophysics (CENPA) sponsored in part by the United States
+//Department of Energy (DOE) under Grant #DE-FG02-97ER41020.
+//The University has certain rights in the program pursuant to
+//the contract and the program should not be copied or distributed
+//outside your organization.  The DOE and the University of
 //Washington reserve all rights in the program. Neither the authors,
-//University of Washington, or U.S. Government make any warranty, 
-//express or implied, or assume any liability or responsibility 
+//University of Washington, or U.S. Government make any warranty,
+//express or implied, or assume any liability or responsibility
 //for the use of this software.
 //-------------------------------------------------------------
 
@@ -55,9 +55,9 @@ smellieRunFile;
 {
     int port = [mtcPort intValue];
     NSString *host = [mtcHost stringValue];
-
+    
     RedisClient *r = [[RedisClient alloc] initWithHostName:host withPort:port];
-
+    
     @try {
         [r connect];
     } @catch (NSException *e) {
@@ -65,9 +65,9 @@ smellieRunFile;
         [r release];
         return;
     }
-
+    
     [r release];
-
+    
     NSLog(@"connected ok!\n");
 }
 
@@ -75,9 +75,9 @@ smellieRunFile;
 {
     int port = [xl3Port intValue];
     NSString *host = [xl3Host stringValue];
-
+    
     RedisClient *r = [[RedisClient alloc] initWithHostName:host withPort:port];
-
+    
     @try {
         [r connect];
     } @catch (NSException *e) {
@@ -85,9 +85,9 @@ smellieRunFile;
         [r release];
         return;
     }
-
+    
     [r release];
-
+    
     NSLog(@"connected ok!\n");
 }
 
@@ -95,9 +95,9 @@ smellieRunFile;
 {
     int port = [dataPort intValue];
     NSString *host = [dataHost stringValue];
-
+    
     RedisClient *r = [[RedisClient alloc] initWithHostName:host withPort:port];
-
+    
     @try {
         [r connect];
     } @catch (NSException *e) {
@@ -105,9 +105,9 @@ smellieRunFile;
         [r release];
         return;
     }
-
+    
     [r release];
-
+    
     NSLog(@"connected ok!\n");
 }
 
@@ -115,9 +115,9 @@ smellieRunFile;
 {
     int port = [logPort intValue];
     NSString *host = [logHost stringValue];
-
+    
     RedisClient *r = [[RedisClient alloc] initWithHostName:host withPort:port];
-
+    
     @try {
         [r connect];
     } @catch (NSException *e) {
@@ -125,9 +125,9 @@ smellieRunFile;
         [r release];
         return;
     }
-
+    
     [r release];
-
+    
     NSLog(@"connected ok!\n");
 }
 
@@ -135,13 +135,13 @@ smellieRunFile;
     /* Settings tab changed. Set the model variables in SNOPModel. */
     [model setMTCPort:[mtcPort intValue]];
     [model setMTCHost:[mtcHost stringValue]];
-
+    
     [model setXL3Port:[xl3Port intValue]];
     [model setXL3Host:[xl3Host stringValue]];
-
+    
     [model setDataServerPort:[dataPort intValue]];
     [model setDataServerHost:[dataHost stringValue]];
-
+    
     [model setLogServerPort:[logPort intValue]];
     [model setLogServerHost:[logHost stringValue]];
 }
@@ -150,13 +150,13 @@ smellieRunFile;
 {
     [mtcHost setStringValue:[model mtcHost]];
     [mtcPort setIntValue:[model mtcPort]];
-
+    
     [xl3Host setStringValue:[model xl3Host]];
     [xl3Port setIntValue:[model xl3Port]];
-
+    
     [dataHost setStringValue:[model dataHost]];
     [dataPort setIntValue:[model dataPort]];
-
+    
     [logHost setStringValue:[model logHost]];
     [logPort setIntValue:[model logPort]];
 }
@@ -169,21 +169,21 @@ smellieRunFile;
 
 - (NSString*) defaultPrimaryMapFilePath
 {
-	return @"~/SNOP";
+    return @"~/SNOP";
 }
 
 -(void) awakeFromNib
 {
-	detectorSize		= NSMakeSize(1200,700);
-	detailsSize		= NSMakeSize(1200,700);//NSMakeSize(450,589);
-	focalPlaneSize		= NSMakeSize(1200,700);//NSMakeSize(450,589);
-	couchDBSize		= NSMakeSize(1200,700);//(620,595);//NSMakeSize(450,480);
-	hvMasterSize		= NSMakeSize(1200,700);
-	runsSize		= NSMakeSize(1200,700);
-	
-	blankView = [[NSView alloc] init];
+    detectorSize		= NSMakeSize(1200,700);
+    detailsSize		= NSMakeSize(1200,700);//NSMakeSize(450,589);
+    focalPlaneSize		= NSMakeSize(1200,700);//NSMakeSize(450,589);
+    couchDBSize		= NSMakeSize(1200,700);//(620,595);//NSMakeSize(450,480);
+    hvMasterSize		= NSMakeSize(1200,700);
+    runsSize		= NSMakeSize(1200,700);
+    
+    blankView = [[NSView alloc] init];
     [tabView setFocusRingType:NSFocusRingTypeNone];
-	[self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
+    [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
     
     //pull the information from the SMELLIE DB
     [model getSmellieRunListInfo];
@@ -191,7 +191,7 @@ smellieRunFile;
     [self runTypeWordChanged:nil];
     [self refreshStandardRuns];
     [self updateSettings:nil];
-	[super awakeFromNib];
+    [super awakeFromNib];
     [self performSelector:@selector(updateWindow)withObject:self afterDelay:0.1];
 }
 
@@ -206,7 +206,7 @@ smellieRunFile;
     ORMTCModel* mtcModel = [objs objectAtIndex:0];
     
     [super registerNotificationObservers];
-
+    
     [notifyCenter addObserver : self
                      selector : @selector(viewTypeChanged:)
                          name : ORSNOPModelViewTypeChanged
@@ -216,12 +216,12 @@ smellieRunFile;
                      selector : @selector(dbOrcaDBIPChanged:)
                          name : ORSNOPModelOrcaDBIPAddressChanged
                         object: model];
-
+    
     [notifyCenter addObserver : self
                      selector : @selector(dbDebugDBIPChanged:)
                          name : ORSNOPModelDebugDBIPAddressChanged
                         object: model];
-
+    
     [notifyCenter addObserver : self
                      selector : @selector(hvStatusChanged:)
                          name : ORXL3ModelHvStatusChanged
@@ -246,7 +246,7 @@ smellieRunFile;
                      selector:@selector(SRTypeChanged:)
                          name:ORSNOPModelSRChangedNotification
                        object:model];
-
+    
     [notifyCenter addObserver:self
                      selector:@selector(SRVersionChanged:)
                          name:ORSNOPModelSRVersionChangedNotification
@@ -276,7 +276,7 @@ smellieRunFile;
                      selector : @selector(mtcDataBaseChanged:)
                          name : ORMTCModelMtcDataBaseChanged
                         object: mtcModel];
-
+    
     [notifyCenter addObserver : self
                      selector : @selector(updateSettings:)
                          name : @"SNOPSettingsChanged"
@@ -284,15 +284,15 @@ smellieRunFile;
     
     //TODO: add the notification for changedRunType on SNO+
     /*[notifyCenter addObserver:self
-                     selector:@selector(runTypesChanged:)
-                         name:nil
-                       object:nil];*/
+     selector:@selector(runTypesChanged:)
+     name:nil
+     object:nil];*/
 }
 
 - (void) updateWindow
 {
     [super updateWindow];
-	[self viewTypeChanged:nil];
+    [self viewTypeChanged:nil];
     [self hvStatusChanged:nil];
     [self dbOrcaDBIPChanged:nil];
     [self dbDebugDBIPChanged:nil];
@@ -322,7 +322,7 @@ smellieRunFile;
 
 -(IBAction)fireTellie:(id)sender
 {
-
+    
 }
 
 -(void) SRTypeChanged:(NSNotification*)aNote
@@ -341,7 +341,7 @@ smellieRunFile;
 }
 
 - (IBAction)maintenanceBoxAction:(id)sender {
-
+    
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* mainRunControl = [objs objectAtIndex:0];
     if([maintenanceRunBox state]){
@@ -365,9 +365,9 @@ smellieRunFile;
 //    }
 //	else [self startRun];
 ////    [currentStatus setStringValue:[self getStartingString]];
-//    
+//
 //    NSLog(@"Sender: %@",[sender title]);
-//    
+//
 //    //decide whether to issue a standard Physics run or a maintainence run
 //    if([[sender title] isEqualToString:@"Start Physics Run"]){
 //        //[model setRunType:kRunStandardPhysicsRun];
@@ -380,8 +380,8 @@ smellieRunFile;
 //        NSLog(@"SNOP_CONTROL:Run isn't correctly defined. Please check NSButton titles");
 //        //[model setRunType:kRunUndefined];
 //    }
-//    
-//    
+//
+//
 //}
 
 // Funtion called by custom startRunAction.
@@ -423,7 +423,7 @@ smellieRunFile;
 //    ORRunModel* theRunControl = [objs objectAtIndex:0];
 //    [theRunControl performSelector:@selector(haltRun)withObject:nil afterDelay:.1];
 //    [currentStatus setStringValue:[self getStoppingString]];
-//    
+//
 //    //reset the run Type to be undefined
 //    //[model setRunType:kRunUndefined];
 //}
@@ -455,9 +455,9 @@ smellieRunFile;
 
 - (void) viewTypeChanged:(NSNotification*)aNote
 {
-	[viewTypePU selectItemAtIndex:[model viewType]];
-	[detectorView setViewType:[model viewType]];
-	[detectorView makeAllSegments];	
+    [viewTypePU selectItemAtIndex:[model viewType]];
+    [detectorView setViewType:[model viewType]];
+    [detectorView makeAllSegments];
 }
 
 - (void) dbOrcaDBIPChanged:(NSNotification*)aNote
@@ -473,9 +473,9 @@ smellieRunFile;
 
 - (void) hvStatusChanged:(NSNotification*)aNote
 {
-
+    
     bool globalHVON = false;
-
+    
     if (!aNote) {
         //collect all instances of xl3 objects in Orca
         NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
@@ -558,7 +558,7 @@ smellieRunFile;
         bool found;
         found = [hvStatusMatrix getRow:&mRow column:&mColumn ofCell:
                  [hvStatusMatrix cellWithTag:[[aNote object] crateNumber]]];
-
+        
         if (found) {
             [[hvStatusMatrix cellAtRow:mRow column:1] setStringValue:[[aNote object] hvASwitch]?@"ON":@"OFF"];
             if ([[aNote object] hvASwitch]) {
@@ -614,7 +614,7 @@ smellieRunFile;
 #pragma mark ¥¥¥Interface Management
 - (IBAction) viewTypeAction:(id)sender
 {
-	[model setViewType:[sender indexOfSelectedItem]];
+    [model setViewType:[sender indexOfSelectedItem]];
 }
 
 - (IBAction) orcaDBIPAddressAction:(id)sender {
@@ -636,18 +636,18 @@ smellieRunFile;
 }
 
 - (IBAction) orcaDBFutonAction:(id)sender {
-
+    
     NSString *url = [NSString stringWithFormat:@"http://%@:%@@%@:%d/_utils/database.html?%@",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort],[model orcaDBName]];
     NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-
+    
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlScaped]];
 }
 
 - (IBAction) debugDBFutonAction:(id)sender {
-
+    
     NSString *url = [NSString stringWithFormat:@"http://%@:%@@%@:%d/_utils/database.html?%@", [model debugDBUserName], [model debugDBPassword],[model debugDBIPAddress],[model debugDBPort], [model debugDBName]];
     NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-
+    
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlScaped]];
 }
 
@@ -694,7 +694,7 @@ smellieRunFile;
         
         if([anXl3 crateNumber] == 16){
             i++;
-        [[globalxl3Mode cellAtRow:16 column:0] setStringValue:xl3ModeDescription];
+            [[globalxl3Mode cellAtRow:16 column:0] setStringValue:xl3ModeDescription];
             if(i>0){
                 [[globalxl3Mode cellAtRow:17 column:0] setStringValue:xl3ModeDescription];
             }
@@ -707,9 +707,9 @@ smellieRunFile;
         }
         //setStringValue:[xl3 xl3Mode] stringValue]];
         /*if([anXl3 crateNumber] >= 16); //skip for 16B
-        {
-            [[globalxl3Mode cellAtRow:[anXl3 crateNumber] column:0] setStringValue:xl3ModeDescription];
-        }*/
+         {
+         [[globalxl3Mode cellAtRow:[anXl3 crateNumber] column:0] setStringValue:xl3ModeDescription];
+         }*/
     }
     
 }
@@ -755,40 +755,40 @@ smellieRunFile;
 
 - (void) specialUpdate:(NSNotification*)aNote
 {
-	[super specialUpdate:aNote];
-	[detectorView makeAllSegments];
+    [super specialUpdate:aNote];
+    [detectorView makeAllSegments];
 }
 
 - (void) setDetectorTitle
-{	
-	switch([model displayType]){
-		case kDisplayRates:		[detectorTitle setStringValue:@"Detector Rate"];	break;
-		case kDisplayThresholds:	[detectorTitle setStringValue:@"Thresholds"];		break;
-		case kDisplayTotalCounts:	[detectorTitle setStringValue:@"Total Counts"];		break;
-		default: break;
-	}
+{
+    switch([model displayType]){
+        case kDisplayRates:		[detectorTitle setStringValue:@"Detector Rate"];	break;
+        case kDisplayThresholds:	[detectorTitle setStringValue:@"Thresholds"];		break;
+        case kDisplayTotalCounts:	[detectorTitle setStringValue:@"Total Counts"];		break;
+        default: break;
+    }
 }
 
 #pragma mark ¥¥¥Details Interface Management
 - (void) detailsLockChanged:(NSNotification*)aNotification
 {
-	[super detailsLockChanged:aNotification];
-	BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:[model experimentDetailsLock]];
-	BOOL locked = [gSecurity isLocked:[model experimentDetailsLock]];
-
-	[detailsLockButton setState: locked];
-	[initButton setEnabled: !lockedOrRunningMaintenance];
+    [super detailsLockChanged:aNotification];
+    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:[model experimentDetailsLock]];
+    BOOL locked = [gSecurity isLocked:[model experimentDetailsLock]];
+    
+    [detailsLockButton setState: locked];
+    [initButton setEnabled: !lockedOrRunningMaintenance];
 }
 
 #pragma mark ¥¥¥Table Data Source
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem
 {
-	
+    
     if([tabView indexOfTabViewItem:tabViewItem] == 0){
-		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:detectorSize];
-		[[self window] setContentView:snopView];
+        [[self window] setContentView:blankView];
+        [self resizeWindowToSize:detectorSize];
+        [[self window] setContentView:snopView];
     }
     else if([tabView indexOfTabViewItem:tabViewItem] == 5){
         [[self window] setContentView:blankView];
@@ -796,28 +796,28 @@ smellieRunFile;
         [[self window] setContentView:snopView];
     }
     else if([tabView indexOfTabViewItem:tabViewItem] == 2){
-		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:detailsSize];
-		[[self window] setContentView:snopView];
+        [[self window] setContentView:blankView];
+        [self resizeWindowToSize:detailsSize];
+        [[self window] setContentView:snopView];
     }
     else if([tabView indexOfTabViewItem:tabViewItem] == 3){
-		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:focalPlaneSize];
-		[[self window] setContentView:snopView];
+        [[self window] setContentView:blankView];
+        [self resizeWindowToSize:focalPlaneSize];
+        [[self window] setContentView:snopView];
     }
     else if([tabView indexOfTabViewItem:tabViewItem] == 4){
-	    [[self window] setContentView:blankView];
-	    [self resizeWindowToSize:couchDBSize];
-	    [[self window] setContentView:snopView];
+        [[self window] setContentView:blankView];
+        [self resizeWindowToSize:couchDBSize];
+        [[self window] setContentView:snopView];
     }
     else if([tabView indexOfTabViewItem:tabViewItem] == 5){
-	    [[self window] setContentView:blankView];
-	    [self resizeWindowToSize:hvMasterSize];
-	    [[self window] setContentView:snopView];
+        [[self window] setContentView:blankView];
+        [self resizeWindowToSize:hvMasterSize];
+        [[self window] setContentView:snopView];
     }
-
-	int index = [tabView indexOfTabViewItem:tabViewItem];
-	[[NSUserDefaults standardUserDefaults] setInteger:index forKey:@"orca.SNOPController.selectedtab"];
+    
+    int index = [tabView indexOfTabViewItem:tabViewItem];
+    [[NSUserDefaults standardUserDefaults] setInteger:index forKey:@"orca.SNOPController.selectedtab"];
 }
 
 #pragma mark ¥¥¥ComboBox Data Source
@@ -829,7 +829,7 @@ smellieRunFile;
     else if (aComboBox == debugDBIPAddressPU) {
         return [[model debugDBConnectionHistory] count];
     }
-
+    
     return 0;
 }
 
@@ -847,28 +847,28 @@ smellieRunFile;
 
 //smellie functions ----------------------------------------------
 
-//this fetches the smellie run file information 
+//this fetches the smellie run file information
 - (IBAction) callSmellieSettings:(id)sender
-{	
-    //remove any old smellie file values 
+{
+    //remove any old smellie file values
     self.smellieRunFileList = nil;
     NSMutableDictionary *tmp = [[NSMutableDictionary alloc] initWithDictionary:[model smellieTestFct]];
     
-    //remove all the old items 
+    //remove all the old items
     [smellieRunFileNameField removeAllItems];
     
-    //Fill lthe combo box with information 
+    //Fill lthe combo box with information
     for(id key in tmp){
         id loopValue = [tmp objectForKey:key];
         [smellieRunFileNameField addItemWithObjectValue:[NSString stringWithFormat:@"%@",[loopValue objectForKey:@"run_name"]]];
     }
-
+    
     [smellieRunFileNameField setEnabled:YES];
     [smellieLoadRunFile setEnabled:YES];
-
+    
     self.smellieRunFileList = tmp;
     [tmp release];
-
+    
 }
 
 -(IBAction)loadSmellieRunAction:(id)sender
@@ -879,7 +879,7 @@ smellieRunFile;
         [smellieStopRunButton setEnabled:YES];
         [smellieEmergencyStop setEnabled:YES];
         
-        //Loop through all the smellie files in the run list 
+        //Loop through all the smellie files in the run list
         for(id key in self.smellieRunFileList){
             
             id loopValue = [self.smellieRunFileList objectForKey:key];
@@ -924,7 +924,7 @@ smellieRunFile;
                 //Concatenate the laser string
                 NSMutableString * smellieLaserString = [[NSMutableString alloc] init];
                 
-                //see if the 375nm laser is on 
+                //see if the 375nm laser is on
                 if([[self.smellieRunFile objectForKey:@"375nm_laser_on"] intValue] == 1){
                     [smellieLaserString appendString:@" 375nm "];
                 }
@@ -956,7 +956,7 @@ smellieRunFile;
                 float totalTime = timePerLaser*(1.0*laserCounter) + (30*laserCounter);
                 
                 //return total approx time in minutes
-                totalTime = totalTime/60.0; 
+                totalTime = totalTime/60.0;
                 
                 [loadedSmellieApproxTimeLabel setStringValue:[NSString stringWithFormat:@"%0.1f",totalTime]];
                 [loadedSmellieLasersLabel setStringValue:smellieLaserString];
@@ -983,7 +983,7 @@ smellieRunFile;
     
     //assign the run type as a SMELLIE run
     //[model setRunType:kRunSmellie];
-
+    
     //start different sub runs as the laser runs through
     //communicate with smellie model
     
@@ -993,11 +993,11 @@ smellieRunFile;
     //get the ELLIE Model object
     ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
     
-    //Method for completing this without a new thread 
+    //Method for completing this without a new thread
     //[theELLIEModel startSmellieRun:smellieRunFile];
     
     //if([model isRunTypeMaskedIn:@"Smellie"]){
-
+    
     smellieThread = [[NSThread alloc] initWithTarget:theELLIEModel selector:@selector(startSmellieRun:) object:smellieRunFile];
     [smellieThread start];
     //}
@@ -1014,11 +1014,11 @@ smellieRunFile;
 - (IBAction) enmergencyStopToggle:(id)sender
 {
     /*if([emergyencyStopEnabled state] == 1){
-        [model setIsEmergencyStopEnabled:true];
-    }
-    else{
-        [model setIsEmergencyStopEnabled:false];
-    }*/
+     [model setIsEmergencyStopEnabled:true];
+     }
+     else{
+     [model setIsEmergencyStopEnabled:false];
+     }*/
     [model setIsEmergencyStopEnabled:(bool)[sender state]];
 }
 
@@ -1036,7 +1036,7 @@ smellieRunFile;
         [model setIsEStopPolling:YES];
         [model eStopPolling];
     }
-
+    
 }
 
 - (IBAction) stopSmellieRunAction:(id)sender
@@ -1050,7 +1050,7 @@ smellieRunFile;
     
     //unassign the run type as a SMELLIE run
     //[model setRunType:kRunUndefined];
-   
+    
     //Collect a series of objects from the ELLIEModel
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
     
@@ -1058,8 +1058,8 @@ smellieRunFile;
     ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
     
     /*[NSThread detachNewThreadSelector:@selector(startSmellieRun:)
-                             toTarget:theELLIEModel
-                           withObject:[smellieRunFile autorelease]];*/
+     toTarget:theELLIEModel
+     withObject:[smellieRunFile autorelease]];*/
     
     /*[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startSmellieRun:) object:smellieRunFile];*/
     //cancel the smellie thread
@@ -1092,7 +1092,7 @@ smellieRunFile;
     //turn the interlock off
     //(if a smellie run is currently operating) start a maintainence run
     //reset the smellie laser system
-    //TODO:Make a note in the datastream that this happened 
+    //TODO:Make a note in the datastream that this happened
 }
 
 - (IBAction) runsLockAction:(id)sender
@@ -1173,7 +1173,7 @@ smellieRunFile;
 
 - (void) runsECAChanged:(NSNotification*)aNotification
 {
-
+    
     //Refresh values in GUI to match the model
     NSInteger* index = [model ECA_pattern] -1;
     [ECApatternPopUpButton selectItemAtIndex:index];
@@ -1226,7 +1226,7 @@ smellieRunFile;
     [[standardRunThresNewValues cellAtRow:9 column:0] setFloatValue:round([mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kOWLELoThreshold]])];
     [[standardRunThresNewValues cellAtRow:10 column:0] setFloatValue:[mtcModel dbFloatByIndex:kNhit100LoPrescale]];
     [[standardRunThresNewValues cellAtRow:11 column:0] setFloatValue:[mtcModel dbFloatByIndex:kPulserPeriod]];
-
+    
 }
 
 - (IBAction)loadStandardRunFromDBAction:(id)sender {
@@ -1256,7 +1256,7 @@ smellieRunFile;
     
     if(!cancel) [model saveStandardRun:standardRun withVersion:standardRunVer];
     [self displayThresholdsFromDB];
-
+    
 }
 
 - (IBAction)saveStandardRunToDBAsDefaultAction:(id)sender {
@@ -1268,12 +1268,12 @@ smellieRunFile;
     
     if(!cancel) [model saveStandardRun:standardRun withVersion:standardRunVer];
     [self displayThresholdsFromDB];
-
+    
 }
 
 // Create a new SR item if doesn't exist, set the runType string value and query the DB to display the trigger configuration
 - (IBAction)standardRunPopupAction:(id)sender {
-
+    
     NSString *standardRun = [standardRunPopupMenu stringValue];
     //Create new SR if does not exist
     if ([standardRunPopupMenu indexOfItemWithObjectValue:standardRun] == NSNotFound && [standardRun isNotEqualTo:@""]){
@@ -1349,7 +1349,7 @@ smellieRunFile;
         }
         return;
     }
-
+    
     //Fetch DB and display trigger configuration in GUI
     //Query the OrcaDB and get a dictionary with the parameters
     //DEFAULT
@@ -1359,7 +1359,7 @@ smellieRunFile;
     NSURLResponse* response = nil;
     NSError* error = nil;
     NSData* data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-    NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    NSString *ret = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]autorelease];
     NSDictionary *defaultSettings = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
     if(error) {
         NSLog(@"Couldn't retrieve SR DEFAULT values. Error querying couchDB, please check the connection is correct. Error: \n %@ \n", error);
@@ -1373,7 +1373,7 @@ smellieRunFile;
     response = nil;
     error = nil;
     data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-    ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    ret = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]autorelease];
     NSDictionary *versionSettings = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
     if(error) {
         NSLog(@"Couldn't retrieve SR VERSION values. Error querying couchDB, please check the connection is correct. Error: \n %@ \n", error);
@@ -1443,7 +1443,7 @@ smellieRunFile;
     NSURLResponse* response=nil;
     NSError* error=nil;
     NSData* data=[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-    NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    NSString *ret = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
     
     NSDictionary *standardRunTypes = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
     
@@ -1451,14 +1451,14 @@ smellieRunFile;
         [model setStandardRunType:@""];
         return;
     }
-
+    
     for(id entry in [standardRunTypes valueForKey:@"rows"]){
         NSString *runtype = [entry valueForKey:@"value"];
         if(runtype != (id)[NSNull null]){
             if([standardRunPopupMenu indexOfItemWithObjectValue:runtype]==NSNotFound)[standardRunPopupMenu addItemWithObjectValue:runtype];
         }
     }
-
+    
     //Handle case with empty DB
     if ([standardRunPopupMenu numberOfItems] == 0){
         [model setStandardRunType:@""];
@@ -1474,14 +1474,14 @@ smellieRunFile;
     //Clear stored Versions
     [standardRunVersionPopupMenu deselectItemAtIndex:[standardRunVersionPopupMenu indexOfSelectedItem]];
     [standardRunVersionPopupMenu removeAllItems];
-
+    
     NSString *urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/orca/_design/standardRuns/_view/getStandardRuns",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort]];
     NSString* link = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:link] cachePolicy:0 timeoutInterval:2];
     NSURLResponse* response=nil;
     NSError* error=nil;
     NSData* data=[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-    NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    NSString *ret = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]autorelease];
     NSDictionary *standardRunVersions = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
     
     if(error) {
@@ -1512,7 +1512,7 @@ smellieRunFile;
             [model setStandardRunVersion:@""];
         }
     }
-
+    
 }
 
 @end

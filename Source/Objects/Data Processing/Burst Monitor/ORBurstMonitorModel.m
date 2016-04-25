@@ -1088,6 +1088,9 @@ double facto(unsigned long long num)
     [runbits release];
 
 }
+- (void) preCloseOut:(id)userInfo
+{
+}
 
 - (void) closeOutRun:(id)userInfo
 {

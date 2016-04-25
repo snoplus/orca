@@ -735,6 +735,7 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 
 - (void) main
 {
+    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	@try {
 		if([[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatEnabled] intValue]){
 			NSString* finalPath = [[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatPath] stringByAppendingPathComponent:@"Heartbeat"]; 
@@ -751,6 +752,7 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 	}
 	@catch(NSException* e){
 	}
+    [pool release];
 }
 @end
 

@@ -63,13 +63,13 @@
 
     NSString *URLString = [NSString stringWithFormat:@"http://%@:%@", self.host, self.port];
     NSURL *URL = [NSURL URLWithString:URLString];
-    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:URL];
+    NSMutableURLRequest *request = [[[NSMutableURLRequest alloc] initWithURL:URL] autorelease];
 
     
     request.timeoutInterval = _timeout;
     [request setHTTPMethod:@"POST"];
     
-    WPXMLRPCEncoder *encoder = [[WPXMLRPCEncoder alloc] initWithMethod:fmt andParameters:args];
+    WPXMLRPCEncoder *encoder = [[[WPXMLRPCEncoder alloc] initWithMethod:fmt andParameters:args]autorelease];
     [request setHTTPBody:[encoder dataEncodedWithError:nil]];
     
     //Make sure private data variables are set to nil an make request.
@@ -93,7 +93,7 @@
         [excep raise];
     }
 
-    WPXMLRPCDecoder *decoder = [[WPXMLRPCDecoder alloc] initWithData:data];
+    WPXMLRPCDecoder *decoder = [[[WPXMLRPCDecoder alloc] initWithData:data] autorelease];
     
     if ([decoder isFault]) {
         NSException *excep = [NSException exceptionWithName:@"XmlrpcClient"
@@ -125,7 +125,7 @@
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
     // Append the new data to the instance variable you declared
-    WPXMLRPCDecoder *decoder = [[WPXMLRPCDecoder alloc] initWithData:data];
+    WPXMLRPCDecoder *decoder = [[[WPXMLRPCDecoder alloc] initWithData:data]autorelease];
     NSMutableString* returnString = [NSMutableString stringWithFormat:@"%@",[decoder object]];
     NSLog(@"XML-RPC response: %@", returnString);
     _responseString = returnString;
