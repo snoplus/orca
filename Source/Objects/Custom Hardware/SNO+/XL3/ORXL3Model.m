@@ -3692,9 +3692,7 @@ void SwapLongBlock(void* p, int32_t n)
 - (void) hvPanicDown
 {
     [self setIsPollingXl3:NO];
-    if ([self isTriggerON]) {
-        [self hvTriggersOFF];
-    }
+    //triggers turned off in DoPanicDown command
 
     XL3Packet packet;
     memset(packet.payload, 0, XL3_PAYLOAD_SIZE);
