@@ -422,6 +422,10 @@ NSString* ORDispatcherLock                      = @"ORDispatcherLock";
 	runInProgress = NO;
 }
 
+- (void) preCloseOut:(id)userInfo
+{
+}
+
 - (void) closeOutRun:(id)userInfo
 {
 	[currentHeader release];

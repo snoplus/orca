@@ -135,6 +135,7 @@
 - (void) verifyFilterIsReady;
 - (void) runTaskStarted:(id)userInfo;
 - (void) runTaskStopped:(id)userInfo;
+- (void) preCloseOut:(id)userInfo;
 - (void) closeOutRun:(id)userInfo;
 - (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
 - (void) setRunMode:(int)aMode;

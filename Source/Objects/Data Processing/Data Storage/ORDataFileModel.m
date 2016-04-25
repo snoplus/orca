@@ -524,6 +524,10 @@ static const int currentVersion = 1;           // Current version
 	//we don't care
 }
 
+- (void) preCloseOut:(id)userInfo
+{
+    
+}
 
 - (void) closeOutRun:(id)userInfo
 {	

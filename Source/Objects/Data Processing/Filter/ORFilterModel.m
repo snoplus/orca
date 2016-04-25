@@ -634,6 +634,10 @@ int filterGraph(nodeType*);
 	
 }
 
+- (void) preCloseOut:(id)userInfo
+{
+}
+
 - (void) closeOutRun:(id)userInfo
 {
 	

@@ -76,6 +76,7 @@
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) runTaskStarted:(id)userInfo;
 - (void) runTaskStopped:(id)userInfo;
+- (void) preCloseOut:(id)userInfo;
 - (void) closeOutRun:(id)userInfo;
 - (void) runTaskBoundary;
 - (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
