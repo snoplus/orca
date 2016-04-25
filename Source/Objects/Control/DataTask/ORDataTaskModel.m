@@ -497,6 +497,13 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 	[self setCycleRate:0];
 }
 
+- (void) preCloseOut:(id)userInfo
+{
+    //a chance to do a preclean of the pending records
+    ORDataPacket* aDataPacket = [userInfo objectForKey:kDataPacket];
+    [self shipPendingRecords:aDataPacket];
+}
+
 - (void) closeOutRun:(id)userInfo
 {
 	ORDataPacket* aDataPacket = [userInfo objectForKey:kDataPacket];

@@ -373,6 +373,7 @@ NSString* ORRunNotesItemChanged				 = @"ORRunNotesItemChanged";
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo { [nextObject takeData:aDataPacket userInfo:userInfo]; }
 - (void) runIsStopping:(id)userInfo		{ [nextObject runIsStopping:userInfo];  }
 - (void) runTaskStopped:(id)userInfo	{ [nextObject runTaskStopped:userInfo]; }
+- (void) preCloseOut:(id)userInfo		{ [nextObject preCloseOut:userInfo];    }
 - (void) closeOutRun:(id)userInfo		{ [nextObject closeOutRun:userInfo];    }
 - (BOOL) doneTakingData					{ return [nextObject doneTakingData];   }
 - (void) setRunMode:(int)runMode		{ [[self objectConnectedTo: ORRunNotesDataOut] setRunMode:runMode]; }

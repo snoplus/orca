@@ -36,6 +36,7 @@
 - (void) runTaskStarted:(id)userInfo;
 - (void) subRunTaskStarted:(id)userInfo;
 - (void) runTaskStopped:(id)userInfo;
+- (void) preCloseOut:(id)userInfo;
 - (void) closeOutRun:(id)userInfo;
 - (void) setInvolvedInCurrentRun:(BOOL)state;
 - (void) runTaskBoundary;
