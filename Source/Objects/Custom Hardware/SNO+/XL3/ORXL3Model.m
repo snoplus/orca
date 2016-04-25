@@ -4468,13 +4468,15 @@ void SwapLongBlock(void* p, int32_t n)
                 }
             }
             
-            //Update XL3 in case switch was off
-            @try {
-                [self setHVDacA:[self hvAVoltageDACSetValue] dacB:[self hvBVoltageDACSetValue]];
-            }
-            @catch (NSException *exception) {
-                NSLog(@"%@ HV init failed to set HV!\n", [self hvBVoltageDACSetValue]);
-                continue;
+            if (!self.hvANeedsUserIntervention && !self.hvBNeedsUserIntervention) {
+                //Update XL3 in case switch was off
+                @try {
+                    [self setHVDacA:[self hvAVoltageDACSetValue] dacB:[self hvBVoltageDACSetValue]];
+                }
+                @catch (NSException *exception) {
+                    NSLog(@"%@ HV init failed to set HV!\n", [self hvBVoltageDACSetValue]);
+                    continue;
+                }
             }
             
             //finally launch a new HV thread
