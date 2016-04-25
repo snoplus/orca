@@ -8,6 +8,10 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="TUBiiController">
             <connections>
+                <outlet property="BurstRate" destination="Tgr-hp-71d" id="ot9-em-gN1"/>
+                <outlet property="BurstTriggerMask" destination="Tpk-AU-IZe" id="pfJ-UR-5b1"/>
+                <outlet property="ComboEnableMask" destination="XcF-C9-gKW" id="uxZ-om-YaM"/>
+                <outlet property="ComboTriggerMask" destination="z9q-y6-H7l" id="SvB-Ur-aiJ"/>
                 <outlet property="CounterAdvancedOptionsBox" destination="DfJ-E1-Nzy" id="dUh-3w-wlP"/>
                 <outlet property="CounterInhibitSelect" destination="R9S-QB-kA2" id="HDc-Sr-doT"/>
                 <outlet property="CounterLZBSelect" destination="T1W-5S-E4n" id="Bk8-L3-jDb"/>
@@ -30,6 +34,8 @@
                 <outlet property="LO_SrcSelect" destination="C9v-Fy-6fe" id="9Uz-J4-W1o"/>
                 <outlet property="MTCAMimic_Slider" destination="ibD-Ox-QD5" id="S4q-aY-91g"/>
                 <outlet property="MTCAMimic_TextField" destination="gi2-ac-HvU" id="Br2-7h-ple"/>
+                <outlet property="PrescaleFactor" destination="7sY-tt-zZY" id="F3Y-BT-Zfb"/>
+                <outlet property="PrescaleTriggerMask" destination="ZyV-ia-jpL" id="6Na-dU-7lB"/>
                 <outlet property="SmellieDelay_TextField" destination="Ikx-eW-3Qf" id="BoX-sW-Zc2"/>
                 <outlet property="SmellieNPulses_TextField" destination="47k-aZ-HKz" id="cP3-Co-gMU"/>
                 <outlet property="SmellieRate_TextField" destination="eYl-tz-T1R" id="TKc-sC-mLm"/>
@@ -573,7 +579,7 @@
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Triggers" identifier="2" id="Z1o-ot-g3o">
-                                <view key="view" id="V8F-IY-uB4">
+                                <view key="view" ambiguous="YES" id="V8F-IY-uB4">
                                     <rect key="frame" x="10" y="25" width="575" height="658"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
@@ -641,95 +647,161 @@
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                     </box>
-                                                    <box fixedFrame="YES" title="Combo Trigger" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="0a2-0L-yeG">
-                                                        <rect key="frame" x="42" y="319" width="177" height="91"/>
-                                                        <view key="contentView">
-                                                            <rect key="frame" x="1" y="1" width="175" height="75"/>
-                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                            <subviews>
-                                                                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="z9q-y6-H7l">
-                                                                    <rect key="frame" x="23" y="43" width="128" height="22"/>
-                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Combo Trig Mask" drawsBackground="YES" id="dFM-fC-q8R">
-                                                                        <font key="font" metaFont="system"/>
-                                                                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                    </textFieldCell>
-                                                                </textField>
-                                                                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3cv-0M-hAe">
-                                                                    <rect key="frame" x="23" y="7" width="128" height="32"/>
-                                                                    <buttonCell key="cell" type="push" title="Send To TUBii" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="EHs-Sc-7ka">
-                                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                                        <font key="font" metaFont="system"/>
-                                                                    </buttonCell>
-                                                                </button>
-                                                            </subviews>
-                                                        </view>
-                                                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                                                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                                    </box>
-                                                    <box fixedFrame="YES" title="Prescale Trigger" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="o1w-Cl-XWr">
-                                                        <rect key="frame" x="42" y="199" width="177" height="114"/>
-                                                        <view key="contentView">
-                                                            <rect key="frame" x="1" y="1" width="175" height="98"/>
-                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                            <subviews>
-                                                                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7sY-tt-zZY">
-                                                                    <rect key="frame" x="23" y="71" width="128" height="22"/>
-                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Prescale Trig Rate" drawsBackground="YES" id="XSz-gB-swM">
-                                                                        <font key="font" metaFont="system"/>
-                                                                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                    </textFieldCell>
-                                                                </textField>
-                                                                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZyV-ia-jpL">
-                                                                    <rect key="frame" x="23" y="39" width="128" height="22"/>
-                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Prescale Trig Mask" drawsBackground="YES" id="Snc-kH-2ER">
-                                                                        <font key="font" metaFont="system"/>
-                                                                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                    </textFieldCell>
-                                                                </textField>
-                                                                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WRT-qx-g2F">
-                                                                    <rect key="frame" x="23" y="3" width="128" height="32"/>
-                                                                    <buttonCell key="cell" type="push" title="Send To TUBii" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="XvW-Bb-8jx">
-                                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                                        <font key="font" metaFont="system"/>
-                                                                    </buttonCell>
-                                                                </button>
-                                                            </subviews>
-                                                        </view>
-                                                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                                                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                                    </box>
                                                     <box fixedFrame="YES" title="Burst Trigger" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="MCH-uh-EPv">
-                                                        <rect key="frame" x="42" y="420" width="177" height="126"/>
+                                                        <rect key="frame" x="15" y="427" width="231" height="126"/>
                                                         <view key="contentView">
-                                                            <rect key="frame" x="1" y="1" width="175" height="110"/>
+                                                            <rect key="frame" x="1" y="1" width="229" height="110"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Tgr-hp-71d">
-                                                                    <rect key="frame" x="18" y="83" width="128" height="22"/>
-                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Burst Trig Rate (Hz)" drawsBackground="YES" id="1bs-uX-uTC">
+                                                                    <rect key="frame" x="18" y="78" width="122" height="22"/>
+                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="0" drawsBackground="YES" id="1bs-uX-uTC">
                                                                         <font key="font" metaFont="system"/>
                                                                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
                                                                 </textField>
                                                                 <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Tpk-AU-IZe">
-                                                                    <rect key="frame" x="18" y="49" width="128" height="22"/>
-                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Burst Trig Mask" drawsBackground="YES" id="dfD-8j-F39">
+                                                                    <rect key="frame" x="18" y="46" width="122" height="22"/>
+                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="0" drawsBackground="YES" id="dfD-8j-F39">
                                                                         <font key="font" metaFont="system"/>
                                                                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
                                                                 </textField>
                                                                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Gx5-Ag-RBg">
-                                                                    <rect key="frame" x="18" y="7" width="128" height="32"/>
+                                                                    <rect key="frame" x="45" y="7" width="128" height="32"/>
                                                                     <buttonCell key="cell" type="push" title="Send To TUBii" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="HET-c4-J6h">
                                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                         <font key="font" metaFont="system"/>
                                                                     </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="BurstTriggerLoad:" target="-2" id="7Pg-ed-RQt"/>
+                                                                    </connections>
                                                                 </button>
+                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="V9g-MJ-CrN">
+                                                                    <rect key="frame" x="140" y="49" width="84" height="17"/>
+                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Trigger Mask" id="mlq-rS-0ZS">
+                                                                        <font key="font" metaFont="system"/>
+                                                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                </textField>
+                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DH9-Hj-QVe">
+                                                                    <rect key="frame" x="142" y="80" width="61" height="17"/>
+                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Rate (Hz)" id="Olq-bA-8AC">
+                                                                        <font key="font" metaFont="system"/>
+                                                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                </textField>
+                                                            </subviews>
+                                                        </view>
+                                                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                    </box>
+                                                    <box fixedFrame="YES" title="Prescale Trigger" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="o1w-Cl-XWr">
+                                                        <rect key="frame" x="15" y="193" width="231" height="114"/>
+                                                        <view key="contentView">
+                                                            <rect key="frame" x="1" y="1" width="229" height="98"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                            <subviews>
+                                                                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7sY-tt-zZY">
+                                                                    <rect key="frame" x="18" y="66" width="120" height="22"/>
+                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="0" drawsBackground="YES" id="XSz-gB-swM">
+                                                                        <font key="font" metaFont="system"/>
+                                                                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                </textField>
+                                                                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WRT-qx-g2F">
+                                                                    <rect key="frame" x="50" y="3" width="128" height="32"/>
+                                                                    <buttonCell key="cell" type="push" title="Send To TUBii" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="XvW-Bb-8jx">
+                                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="PrescaleTriggerLoad:" target="-2" id="85z-P1-gph"/>
+                                                                    </connections>
+                                                                </button>
+                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Dds-Vv-CM9">
+                                                                    <rect key="frame" x="140" y="69" width="44" height="17"/>
+                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Factor" id="ADS-a2-ByR">
+                                                                        <font key="font" metaFont="system"/>
+                                                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                </textField>
+                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="afH-jT-l0b">
+                                                                    <rect key="frame" x="140" y="36" width="84" height="17"/>
+                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Trigger Mask" id="Zn0-Ie-SW9">
+                                                                        <font key="font" metaFont="system"/>
+                                                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                </textField>
+                                                                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZyV-ia-jpL">
+                                                                    <rect key="frame" x="18" y="32" width="120" height="22"/>
+                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="0" drawsBackground="YES" id="Snc-kH-2ER">
+                                                                        <font key="font" metaFont="system"/>
+                                                                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                </textField>
+                                                            </subviews>
+                                                        </view>
+                                                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                    </box>
+                                                    <box fixedFrame="YES" title="Combo Trigger" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="0a2-0L-yeG">
+                                                        <rect key="frame" x="15" y="305" width="231" height="125"/>
+                                                        <view key="contentView">
+                                                            <rect key="frame" x="1" y="1" width="229" height="109"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                            <subviews>
+                                                                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3cv-0M-hAe">
+                                                                    <rect key="frame" x="42" y="0.0" width="128" height="32"/>
+                                                                    <buttonCell key="cell" type="push" title="Send To TUBii" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="EHs-Sc-7ka">
+                                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="ComboTriggerLoad:" target="-2" id="uAz-fN-k4H"/>
+                                                                    </connections>
+                                                                </button>
+                                                                <textField toolTip="Specify which triggers you'd like to be enable in the combo trigger." verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XcF-C9-gKW">
+                                                                    <rect key="frame" x="18" y="77" width="120" height="22"/>
+                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="0" drawsBackground="YES" id="if5-dl-n04">
+                                                                        <numberFormatter key="formatter" formatterBehavior="default10_4" numberStyle="decimal" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" maximumFractionDigits="3" id="tKH-38-fu3"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                </textField>
+                                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="b02-2Z-EKv">
+                                                                    <rect key="frame" x="137" y="79" width="84" height="17"/>
+                                                                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Enable Mask" id="zxh-cI-xta">
+                                                                        <font key="font" metaFont="system"/>
+                                                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                </textField>
+                                                                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="z9q-y6-H7l">
+                                                                    <rect key="frame" x="18" y="39" width="120" height="22"/>
+                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="0" drawsBackground="YES" id="dFM-fC-q8R">
+                                                                        <font key="font" metaFont="system"/>
+                                                                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                </textField>
+                                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ozY-Fb-imY">
+                                                                    <rect key="frame" x="137" y="42" width="88" height="17"/>
+                                                                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Trigger Mask" id="32f-Xn-DLu">
+                                                                        <font key="font" metaFont="system"/>
+                                                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                </textField>
                                                             </subviews>
                                                         </view>
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
@@ -1628,7 +1700,7 @@
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Speaker &amp; Counter" identifier="" id="qvg-PS-ArU">
-                                <view key="view" ambiguous="YES" id="ayJ-xc-snR">
+                                <view key="view" id="ayJ-xc-snR">
                                     <rect key="frame" x="10" y="25" width="575" height="658"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>

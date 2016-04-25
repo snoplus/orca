@@ -160,6 +160,18 @@
     NSString* const command=@"Initialize";
     [self sendOkCmd:command];
 }
+- (void) setBurstTrigger {
+    //I'm not exactly sure what the command is for this yet
+}
+- (void) setComboTrigger_EnableMask:(uint32_t) enableMask TriggerMask:(uint32_t) triggerMask {
+    NSString* const command = [NSString stringWithFormat:@"SetComboTrigger %u %u",enableMask,triggerMask];
+    [self sendOkCmd:command];
+}
+- (void) setPrescaleTrigger_Mask:(uint32_t)mask ByFactor:(uint32_t)factor {
+    NSString* const command = [NSString stringWithFormat:@"SetPrescaleTrigger %u %u",factor,mask];
+    [self sendOkCmd:command];
+}
+
 - (void) setSmellieRate:(float)rate {
     // Specifies the frequency (in Hz) that the smellie pulser will pulse at
     // once fireSmelliePulser is called.

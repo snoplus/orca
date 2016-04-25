@@ -25,6 +25,12 @@
     IBOutlet NSTabView *tabView;
 
     IBOutlet NSMatrix *TrigMaskSelect;
+    IBOutlet NSTextField *BurstTriggerMask;
+    IBOutlet NSTextField *BurstRate;
+    IBOutlet NSTextField *ComboEnableMask;
+    IBOutlet NSTextField *ComboTriggerMask;
+    IBOutlet NSTextField *PrescaleTriggerMask;
+    IBOutlet NSTextField *PrescaleFactor;
 
     IBOutlet NSMatrix *caenChannelSelect_3;
     IBOutlet NSMatrix *caenChannelSelect_2;
@@ -92,6 +98,12 @@
 
 - (IBAction)StatusReadoutChanged:(id)sender;
 - (IBAction)DataReadoutChanged:(id)sender;
+
+- (IBAction)TrigMaskMatchHardware:(id)sender;
+- (IBAction)TrigMaskLoad:(id)sender;
+- (IBAction)BurstTriggerLoad:(id)sender;
+- (IBAction)ComboTriggerLoad:(id)sender;
+- (IBAction)PrescaleTriggerLoad:(id)sender;
 
 - (IBAction)CaenMatchHardware:(id)sender;
 - (IBAction)CaenLoadMask:(id)sender;

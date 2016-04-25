@@ -159,7 +159,22 @@
     NSUInteger maskVal = [self GetBitInfoFromCheckBoxes:TrigMaskSelect FromBit:0 ToBit:21];
     [model setTrigMask:maskVal];
 }
-
+- (IBAction)BurstTriggerLoad:(id)sender {
+    //NSUInteger rate = [BurstRate integerValue];
+    //NSUInteger mask = [BurstTriggerMask integerValue];
+    NSLog(@"Not yet implemented. :(");
+    
+}
+- (IBAction)ComboTriggerLoad:(id)sender {
+    NSUInteger enableMask = [ComboEnableMask integerValue];
+    NSUInteger triggerMask = [ComboTriggerMask integerValue];
+    [model setComboTrigger_EnableMask:enableMask TriggerMask:triggerMask];
+}
+- (IBAction)PrescaleTriggerLoad:(id)sender {
+    float factor = [PrescaleFactor floatValue];
+    NSUInteger mask = [PrescaleTriggerMask integerValue];
+    [model setPrescaleTrigger_Mask:mask ByFactor:factor];
+}
 - (IBAction)CaenMatchHardware:(id)sender {
   
     CAEN_CHANNEL_MASK ChannelMask = [model caenChannelMask];
