@@ -23,6 +23,7 @@
 	NSRecursiveLock* mLock;
     int              mBufferStatus;
     int              mOldBufferStatus;
+    unsigned long    mOldAmountInBuffer;
 }
 
 // Creation
