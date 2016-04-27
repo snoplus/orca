@@ -530,11 +530,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     // Load latest calibration constants
     // **********************************
     
-    // **********************************
-    // For testing on personal machine
-    //
     NSString* parsUrlString = [NSString stringWithFormat:@"%@:%u/telliedb/_design/tellieQuery/_view/fetchFireParameters?key=0",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
-    //***********************************
     NSString* webParsString = [parsUrlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     NSURL* parsUrl = [NSURL URLWithString:webParsString];
     NSLog(@"Querying : %@\n",parsUrl);
