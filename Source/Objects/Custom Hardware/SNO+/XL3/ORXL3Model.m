@@ -1613,39 +1613,30 @@ void SwapLongBlock(void* p, int32_t n)
     
 - (int) setSequencerMask: (uint32_t) mask forSlot: (int) slot
 {
-    /* Make sure the XL3 is in INIT_MODE before calling this function.
-     *
-     * There is a shift report from October 2012 that says:
-     *
-     *    It appears that writing to the sequencer registers will corrupt
-     *    the data, need to clear it by writing to the FEC csr afterwards
-     *    and then rewriting the crate address to the FEC csr. So writing
-     *    to the sequencer should only happen between runs.
-     *
-     * Returns -1 on error, 0 on success. */
-    uint32_t address, value;
+     /* Returns -1 on error, 0 on success.
+      Sets the sequencer mask for a single FEC */
+
+    char payload[XL3_PAYLOAD_SIZE];
+    memset(payload, 0, XL3_PAYLOAD_SIZE);
+
+    SetSequencerArgs* data = (SetSequencerArgs*) payload;
+
+    SetSequencerResults* results = (SetSequencerResults*)payload;
+
+
+    data->slot = htonl((uint32_t) slot);
+    data->channelMask = htonl(mask);
 
     @try {
-        value = 0xffffffff;
-        address = FEC_SEL * slot | 0x90 | WRITE_REG; //CMOS CHIP DIS
-        [xl3Link sendCommand:0UL toAddress:address withData:&value];
-        
-        value = 0x2;
-        address = FEC_SEL * slot | 0x20 | WRITE_REG; //FEC CSR
-        [xl3Link sendCommand:0UL toAddress:address withData:&value];
+        [[self xl3Link] sendCommand:SET_SEQUENCER_ID withPayload:payload expectResponse:YES];
+    }
+    @catch (NSException *exception) {
+        NSLogColor([NSColor redColor],@"%@ error sending SET SEQUENCER command.\n",[[self xl3Link] crateName]);
+        return -1;
+    }
 
-        value = 0x0;
-        [xl3Link sendCommand:0UL toAddress:address withData:&value];
-
-        value = [self crateNumber] << 11;
-        [xl3Link sendCommand:0UL toAddress:address withData:&value];
-
-        value = mask;
-        address = FEC_SEL * slot | 0x90 | WRITE_REG; //CMOS CHIP DIS
-        [xl3Link sendCommand:0UL toAddress:address withData:&value];
-    } @catch (NSException* e) {
-        NSLog(@"%@ sequencer update failed; error: %@ reason: %@\n",
-              [[self xl3Link] crateName], [e name], [e reason]);
+    if(htonl(results->errors)) {
+        NSLogColor([NSColor redColor],@"XL3 error occured while setting sequencer");
         return -1;
     }
 
@@ -1824,7 +1815,7 @@ void SwapLongBlock(void* p, int32_t n)
         for (slot = 0; slot < 16; slot++) {
             if ((slotMask & (1 << slot)) == 0) continue;
             
-            [self setSequencerMask: mbs[slot].disableMask forSlot:slot];
+            [self setSequencerMask: ~(mbs[slot].disableMask) forSlot:slot];
         }
     }
 
