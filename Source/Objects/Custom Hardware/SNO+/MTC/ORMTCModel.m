@@ -759,7 +759,6 @@ resetFifoOnStart = _resetFifoOnStart;
 -(NSMutableDictionary*) get_MTCDataBase
 {
     return mtcDataBase;
-    //return [[mtcDataBase objectForNestedKey:[self getDBDefaultByIndex:DBRef]] unsignedShortValue];
 }
 
 #pragma mark •••Archival
