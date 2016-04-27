@@ -67,6 +67,7 @@
 - (void)    sendStrings:(NSArray*)cmdArray;
 - (void)    sendStrings:(NSArray*)cmdArray delegate:(id)aDelegate;
 - (id)		responseForKey:(NSString*)aKey;
+- (id)      responseForKeyButDoNotRemove:(NSString*)aKey;
 - (BOOL)	responseExistsForKey:(NSString*)aKey;
 - (void)    mainThreadSendString:(NSString*)aString;
 

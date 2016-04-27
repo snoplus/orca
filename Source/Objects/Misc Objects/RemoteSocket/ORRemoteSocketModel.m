@@ -220,6 +220,7 @@ NSString* ORRemoteSocketQueueCountChanged = @"ORRemoteSocketQueueCountChanged";
     if([NSThread isMainThread]){
         @synchronized(self){
             @try {
+                NSLog(@"sending: %@\n",aString);
                 [socket writeString:aString encoding:[self defaultStringEncoding]];
             }
             @catch (NSException* exception) {
@@ -235,7 +236,8 @@ NSString* ORRemoteSocketQueueCountChanged = @"ORRemoteSocketQueueCountChanged";
 {
     @synchronized(self){
         if(!responseDictionary)responseDictionary = [[NSMutableDictionary dictionary] retain];
-    
+        NSLog(@"got: %@\n",message);
+
         message = [[message trimSpacesFromEnds] removeNLandCRs];
         NSArray* parts = [message componentsSeparatedByString:@":"];
         if([parts count]==2){
@@ -263,7 +265,17 @@ NSString* ORRemoteSocketQueueCountChanged = @"ORRemoteSocketQueueCountChanged";
         [responseDictionary removeObjectForKey:aKey];
     }
 }
-
+- (id) responseForKeyButDoNotRemove:(NSString*)aKey
+{
+    if(aKey){
+        id theValue = nil;
+        @synchronized(self){
+            theValue =  [[[responseDictionary objectForKey:aKey] retain] autorelease];
+        }
+        return theValue;
+    }
+    else return nil;
+}
 - (id) responseForKey:(NSString*)aKey
 {
 	if(aKey){
@@ -401,8 +413,14 @@ NSString* ORRemoteSocketQueueCountChanged = @"ORRemoteSocketQueueCountChanged";
                 if(totalTime>10)break;
                 if(aKey){
                     if([remObj responseExistsForKey:aKey]){
-                        id aValue = [remObj responseForKey:aKey];
-                        [result setObject:aValue forKey:aKey];
+                        id aValue;
+                        if(delegate != nil){
+                            aValue = [remObj responseForKey:aKey];
+                        }
+                        else {
+                            aValue = [remObj responseForKeyButDoNotRemove:aKey];
+                            [result setObject:aValue forKey:aKey];
+                       }
                         break;
                     }
                 }
