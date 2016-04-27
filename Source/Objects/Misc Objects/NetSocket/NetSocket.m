@@ -1030,7 +1030,8 @@ static void _cfsocketCallback( CFSocketRef inCFSocketRef, CFSocketCallBackType i
         mBufferStatus = kNetSocketBlocked;
 	    // Enable the write callback on our CFSocketRef so we know when the socket is writable again
 	    CFSocketEnableCallBacks( mCFSocketRef, kCFSocketWriteCallBack );
-	}
+        
+    }
     else {
 		// Disable the write callback
 		CFSocketDisableCallBacks( mCFSocketRef, kCFSocketWriteCallBack );
@@ -1039,24 +1040,26 @@ static void _cfsocketCallback( CFSocketRef inCFSocketRef, CFSocketCallBackType i
 		[self _cfsocketDisconnected];
     }
     
-    // Remove the data we managed to write to the socket 
+    if( [mDelegate respondsToSelector:@selector( netsocketDataInOutgoingBuffer:length: )] ){
+        [mDelegate netsocketDataInOutgoingBuffer:self length:[mOutgoingBuffer length]];
+    }
+
+    // Remove the data we managed to write to the socket
     [mOutgoingBuffer replaceBytesInRange:NSMakeRange( 0, amountSent ) withBytes:NULL length:0];
     
-    // If our outgoing buffer is empty, notify our delegate
-    unsigned long len = [mOutgoingBuffer length];
-    if( len == 0 ){
+    // If our outgoing buffer is empty, notify our delegate to update
+    if( amountSent > 0){
 		if( [mDelegate respondsToSelector:@selector( netsocketDataSent:length: )] ){
 			[mDelegate netsocketDataSent:self length:amountSent];
         }
     }
-    if( [mDelegate respondsToSelector:@selector( netsocketDataInOutgoingBuffer:length: )] ){
-            [mDelegate netsocketDataInOutgoingBuffer:self length:len];
-    }
-    if(mBufferStatus!=mOldBufferStatus){
+    unsigned long len = [mOutgoingBuffer length];
+    if((mBufferStatus!=mOldBufferStatus) || (len != mOldAmountInBuffer)){
         if( [mDelegate respondsToSelector:@selector( netsocket:status: )] ){
             [mDelegate netsocket:self status:mBufferStatus];
         }
         mOldBufferStatus = mBufferStatus;
+        mOldAmountInBuffer = len;
     }
    
 

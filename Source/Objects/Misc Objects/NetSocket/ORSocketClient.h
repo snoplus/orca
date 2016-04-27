@@ -26,7 +26,7 @@
     NetSocket*		socket;
     NSDate*			timeConnected;
     unsigned long	amountInBuffer;
-    unsigned long	totalSent;
+    unsigned long long	totalSent;
     int             socketStatus;
 }
 
@@ -37,8 +37,8 @@
 - (void) setDelegate:(id)newDelegate;
 - (NSString*) name;
 - (void) setName:(NSString*)newName;
-- (unsigned long) totalSent;
-- (void) setTotalSent:(unsigned long)aTotalSent;
+- (unsigned long long) totalSent;
+- (void) setTotalSent:(unsigned long long)aTotalSent;
 - (NetSocket*) socket;
 - (NSDate*) timeConnected;
 - (void) setTimeConnected:(NSDate*)newTimeConnected;
