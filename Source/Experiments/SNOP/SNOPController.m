@@ -1118,8 +1118,8 @@ smellieRunFile;
     if(state) currentRunMask |= (1L<<bit);
     else      currentRunMask &= ~(1L<<bit);
     //Unset bits for the mutually exclusive part so that it's impossible to mess up with it
-    if(bit != 0 && bit<11){
-        for(int i=1; i<11; i++){
+    if(bit<11){
+        for(int i=0; i<11; i++){
             currentRunMask &= ~(1L<<i);
         }
         if(state) currentRunMask |= (1L<<bit);
