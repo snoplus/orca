@@ -29,6 +29,7 @@
 #import "ORSelectorSequence.h"
 #import "ORRunModel.h"
 #import "ORRunController.h"
+#import "SNOPModel.h"
 
 #define uShortDBValue(A) [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] unsignedShortValue]
 #define uLongDBValue(A)  [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] unsignedLongValue]
@@ -204,12 +205,6 @@ mtcStatusDataAvailable = _mtcStatusDataAvailable,
 mtcStatusNumEventsInMem = _mtcStatusNumEventsInMem,
 resetFifoOnStart = _resetFifoOnStart;
 
-/* #define these variables for now. Eventually we need to add fields
- * to the GUI, but Javi is working on the SNOPModel now */
-#define MTC_HOST @"sbc.sp.snolab.ca"
-#define MTC_PORT 4001
-
-
 - (id) init //designated initializer
 {
     self = [super init];
@@ -217,14 +212,53 @@ resetFifoOnStart = _resetFifoOnStart;
     [self registerNotificationObservers];
 
     /* initialize our connection to the MTC server */
-    mtc = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
-	
+    mtc = [[RedisClient alloc] init];
+
     [[self undoManager] disableUndoRegistration];
-    
+
     [[self undoManager] enableUndoRegistration];
 	[self setFixedPulserRateCount: 1];
 	[self setFixedPulserRateDelay: 10];
+
+    /* We need to sync the MTC server hostname and port with the SNO+ model.
+     * Usually this is done in the awakeAfterDocumentLoaded function, because
+     * there we are guaranteed that the SNO+ model already exists.
+     * We call updateSettings here too though to cover the case that this
+     * object was added to an already existing experiment in which case
+     * awakeAfterDocumentLoaded is not called. */
+    [self updateSettings];
+
     return self;
+}
+
+- (void) updateSettings
+{
+    NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+
+    SNOPModel* sno;
+    if ([objs count] == 0) return;
+
+    sno = [objs objectAtIndex:0];
+    [self setMTCHost:[sno mtcHost]];
+    [self setMTCPort:[sno mtcPort]];
+}
+
+- (void) awakeAfterDocumentLoaded
+{
+    [self updateSettings];
+}
+
+- (void) setMTCPort: (int) port
+{
+    [mtc setPort:port];
+    [mtc disconnect];
+}
+
+- (void) setMTCHost: (NSString *) host
+{
+    [mtc setHost:host];
+    [mtc disconnect];
 }
 
 - (void) dealloc
@@ -736,7 +770,7 @@ resetFifoOnStart = _resetFifoOnStart;
     [self registerNotificationObservers];
 
     /* initialize our connection to the MTC server */
-    mtc = [[RedisClient alloc] initWithHostName:MTC_HOST withPort:MTC_PORT];
+    mtc = [[RedisClient alloc] init];
 	
     [[self undoManager] disableUndoRegistration];
     [self setESumViewType:	[decoder decodeIntForKey:		@"ORMTCModelESumViewType"]];
@@ -764,10 +798,18 @@ resetFifoOnStart = _resetFifoOnStart;
     [self setMtcaOEHIMask:[decoder decodeIntForKey:@"mtcaOEHIMask"]];
     [self setMtcaOWLNMask:[decoder decodeIntForKey:@"mtcaOWLNMask"]];
     [self setIsPedestalEnabledInCSR:[decoder decodeBoolForKey:@"isPedestalEnabledInCSR"]];
-    
+
 	if(!mtcDataBase)[self setupDefaults];
     [[self undoManager] enableUndoRegistration];
-	
+
+    /* We need to sync the MTC server hostname and port with the SNO+ model.
+     * Usually this is done in the awakeAfterDocumentLoaded function, because
+     * there we are guaranteed that the SNO+ model already exists.
+     * We call updateSettings here too though to cover the case that this
+     * object was added to an already existing experiment in which case
+     * awakeAfterDocumentLoaded is not called. */
+    [self updateSettings];
+
     return self;
 }
 

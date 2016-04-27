@@ -346,22 +346,15 @@
 	[theHeader release];
 }
 
-- (NSFileHandle*) createFileFromHeader: (NSString*)path
-{
-    BOOL result = [fileHeader writeToFile:path atomically:YES];
-	if(!result)NSLog(@"ORDecoder:: Could not create header. This is most likely caused by non-complient object(s) in the header.\n");
-	
-    NSFileHandle* fp = [NSFileHandle fileHandleForWritingAtPath:path];
-    [fp seekToEndOfFile];
-    return fp;
-}
-
 - (NSData*) headerAsData
 {
     //write header to temp file because we want the form you get from a disk file...the string to property list isn't right.
     NSString* tempName = [NSFileManager tempPathInAppSupportFolderUsingTemplate:@"OrcaHeaderXXX"];
-    [self createFileFromHeader:tempName];
-    
+    BOOL result = [fileHeader writeToFile:tempName atomically:YES];
+    if(!result){
+        NSLog(@"ORDecoder:: Could not create header. This is most likely caused by non-complient object(s) in the header.\n");
+        return nil;
+    }
     NSData* dataBlock = [NSData dataWithContentsOfFile:tempName];
 	unsigned long headerLength        = [dataBlock length];											//in bytes
 	unsigned long lengthWhenPadded    = sizeof(long)*(round(.5 + headerLength/(float)sizeof(long)));					//in bytes

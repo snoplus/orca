@@ -104,6 +104,7 @@
 - (void) runTaskStopped:(id)userInfo;
 - (void) putDataInQueue:(ORDataPacket*)aDataPacket force:(BOOL)forceAdd;
 - (void) queueRecordForShipping:(NSNotification*)aNote;
+- (void) preCloseOut:(id)userInfo;
 - (void) closeOutRun:(id)userInfo;
 - (void) doCycleRate;
 - (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;

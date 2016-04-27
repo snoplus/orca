@@ -123,6 +123,7 @@
 - (void) runAboutToStart:(NSNotification*)aNotification;
 - (void) setRunMode:(int)aMode;
 - (void) statusLogFlushed:(NSNotification*)aNotification;
+- (void) preCloseOut:(id)userInfo;
 - (void) closeOutLogFiles:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Data Handling

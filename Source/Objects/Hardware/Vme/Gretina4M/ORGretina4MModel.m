@@ -91,6 +91,7 @@ NSString* ORGretina4MEasySelectedChanged        = @"ORGretina4MEasySelectedChang
 NSString* ORGretina4MModelHistEMultiplierChanged= @"ORGretina4MModelHistEMultiplierChanged";
 NSString* ORGretina4MModelInitStateChanged      = @"ORGretina4MModelInitStateChanged";
 NSString* ORGretina4MForceFullInitCardChanged   = @"ORGretina4MForceFullInitCardChanged";
+NSString* ORGretina4MDoHwCheckChanged           = @"ORGretina4MDoHwCheckChanged";
 
 NSString* ORGretina4MLockChanged                = @"ORGretina4MLockChanged";
 
@@ -239,6 +240,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [mainFPGADownLoadState release];
     [fpgaFilePath release];
     [waveFormRateGroup release];
+    //[waveFormRunningAverage release];
 	[fifoFullAlarm clearAlarm];
 	[fifoFullAlarm release];
 	[progressLock release];
@@ -288,7 +290,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (NSString*) helpURL
 {
-	return @"VME/Gretina.html";
+	return @"VME/Gretina4M.html";
 }
 
 - (Class) guardianClass
@@ -391,6 +393,18 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 }
 
 #pragma mark ***Accessors
+- (BOOL) doHwCheck
+{
+    return doHwCheck;
+}
+
+- (void) setDoHwCheck:(BOOL)aFlag
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setDoHwCheck:doHwCheck];
+    doHwCheck = aFlag;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MDoHwCheckChanged object:self];
+}
+
 - (BOOL) forceFullInitCard
 {
     return forceFullInitCard;
@@ -893,6 +907,13 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	 object:self];    
 }
 
+//- (ORRunningAverage*) waveFormRunningAverage
+//{
+//    //[waveFormRunningAverage setWindowLength: 11];
+//    //NSLog(@"can I really return this object%@\n",waveFormRunningAverage);
+//    return waveFormRunningAverage;
+//}
+
 - (BOOL) noiseFloorRunning
 {
 	return noiseFloorRunning;
@@ -955,6 +976,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
 	if(groupTag == 0){
 		if(counterTag>=0 && counterTag<kNumGretina4MChannels){
+    //        if(counterTag==1) NSLog(@"The current count = %U\n", waveFormCount[counterTag]);
 			return waveFormCount[counterTag];
 		}	
 		else return 0;
@@ -1122,8 +1144,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setPrerecnt:(short)chan withValue:(short)aValue
 {
-	if(aValue<0)aValue=0;
-	else if(aValue>2036)aValue = 2036; //HW = user+13
+	if(aValue<kPreAdjust)aValue=kPreAdjust;
+	else if(aValue>0x7ff-kPreAdjust)aValue = 0x7ff-kPreAdjust; //HW = user+13
     [[[self undoManager] prepareWithInvocationTarget:self] setPrerecnt:chan withValue:prerecnt[chan]];
 	prerecnt[chan] = aValue;
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
@@ -1133,7 +1155,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setPostrecnt:(short)chan withValue:(short)aValue
 {
 	if(aValue<18)aValue=18;
-	else if(aValue>2065)aValue = 2065; //HW = user-18
+	else if(aValue>0x7ff+kPostAdjust)aValue = 0x7ff+kPostAdjust; //HW = user-18
     [[[self undoManager] prepareWithInvocationTarget:self] setPostrecnt:chan withValue:postrecnt[chan]];
 	postrecnt[chan] = aValue;
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
@@ -1143,7 +1165,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setFtCnt:(short)chan withValue:(short)aValue
 {
 	if(aValue<0)aValue=0;
-	else if(aValue>1021)aValue = 2043; //HW = user + 4
+	else if(aValue>0x7ff-kFtAdjust)aValue = 0x7ff-kFtAdjust; //HW = user + 4
     [[[self undoManager] prepareWithInvocationTarget:self] setFtCnt:chan withValue:ftCnt[chan]];
 	ftCnt[chan] = aValue;
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
@@ -1152,7 +1174,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (int) baseLineLength:(int)chan
 {
-    return 2048-kHeaderSize-postrecnt[chan]-prerecnt[chan]-ftCnt[chan];
+    return 2018-(postrecnt[chan]+prerecnt[chan]+ftCnt[chan]);
 }
 
 - (void) setTpol:(short)chan withValue:(short)aValue
@@ -1542,13 +1564,11 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                          usingAddSpace:0x01];
         [ORTimer delay:0.1];
     }
-    return;
 }
 
 - (void) writeClockPhase
 {
     [self writeClockPhaseWithValue:clockPhase];
-    return;
 }
 
 - (void) writeClockPhaseWithValue:(unsigned long)value
@@ -1562,9 +1582,21 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                   reportKey:@"ClockPhase"
               forceFullInit:forceFullInitCard];
     [ORTimer delay:0.1];
+}
 
-    return;
-	
+- (BOOL) checkClockPhase:(BOOL)verbose
+{
+    unsigned long aValue = 0 ;
+    [[self adapter] readLongBlock:&aValue
+                        atAddress:[self baseAddress] + register_information[kADCConfig].offset
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    if((aValue & 0x3) == clockPhase)return YES;
+    else {
+        if(verbose)NSLog(@"clockPhase mismatch: 0x%x != 0x%x\n",aValue & 0x3,clockPhase);
+        return NO;
+    }
 }
 
 - (unsigned long) readClockPhase
@@ -1577,6 +1609,12 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                     usingAddSpace:0x01];
     
     return theValue;
+}
+
+- (void) doForcedInitBoard
+{
+    [self clearOldUserValues];
+    [self initBoard];
 }
 
 - (void) initBoard
@@ -1592,43 +1630,79 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
             [self writeControlReg:i enabled:NO];
         }
     
-    
-    //write the card level params
-    [self writeClockSource];
-    [self writeClockPhase];
-	[self writeExternalWindow];
-	[self writePileUpWindow];
-	[self writeNoiseWindow];
-	[self writeExtTrigLength];
-    [self writeCollectionTime];
-    [self writeIntegrateTime];
-	[self writeDownSample];
-    
-    //write the channel level params
-    for(i=0;i<kNumGretina4MChannels;i++) {
-        if([self enabled:i]){
-            if([self trapEnabled:i]){
-                [self writeTrapThreshold:i];
+        //write the card level params
+        [self writeClockSource];
+        [self writeClockPhase];
+        [self writeExternalWindow];
+        [self writePileUpWindow];
+        [self writeNoiseWindow];
+        [self writeExtTrigLength];
+        [self writeCollectionTime];
+        [self writeIntegrateTime];
+        [self writeDownSample];
+        
+        //write the channel level params
+        for(i=0;i<kNumGretina4MChannels;i++) {
+            if([self enabled:i]){
+                if([self trapEnabled:i])[self writeTrapThreshold:i];
+                else                    [self writeLEDThreshold:i];
+                [self writeWindowTiming:i];
+                [self writeRisingEdgeWindow:i];
             }
-            else {
-                [self writeLEDThreshold:i];
-            }
-            [self writeWindowTiming:i];
-            [self writeRisingEdgeWindow:i];
         }
-    }
         [self resetFIFO];
 
-    //if(doChannelEnable){
         for(i=0;i<kNumGretina4MChannels;i++){
             if([self enabled:i]){
                 [self writeControlReg:i enabled:YES];
             }
         }
-
     }
-    
+    if(doHwCheck)[self checkBoard:YES];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MCardInited object:self];
+}
+
+- (void) checkBoard:(BOOL)verbose
+{
+    BOOL clockPhaseResult       = [self checkClockPhase:verbose];
+    BOOL externalWindowResult   = [self checkExternalWindow:verbose];
+    BOOL pileUpWindowResult     = [self checkPileUpWindow:verbose];
+    BOOL noiseWindowResult      = [self checkNoiseWindow:verbose];
+    BOOL extTrigLengthResult    = [self checkExtTrigLength:verbose];
+    BOOL collectionTimeResult   = [self checkCollectionTime:verbose];
+    BOOL integrateTimeResult    = [self checkIntegrateTime:verbose];
+    BOOL downSampleResult       = [self checkDownSample:verbose];
+    unsigned short controlRegResultMask     = 0xFFFF; //assume all OK
+    unsigned short thresholdResultMask      = 0xFFFF; //assume all OK
+    unsigned short windowTimingResultMask   = 0xFFFF; //assume all OK
+    unsigned short risingEdgeResultMask     = 0xFFFF; //assume all OK
+    int i;
+    for(i=0;i<kNumGretina4MChannels;i++) {
+        if([self enabled:i]){
+            if(![self checkControlReg:i verbose:verbose]) controlRegResultMask ^= (0x1<<i);
+            if(![self trapEnabled:i])if(![self checkLEDThreshold:i verbose:verbose]) thresholdResultMask ^= (0x1<<i);
+
+    
+            if(![self checkWindowTiming:i verbose:verbose])     windowTimingResultMask ^= (0x1<<i);
+            if(![self checkRisingEdgeWindow:i verbose:verbose]) risingEdgeResultMask ^= (0x1<<i);
+        }
+    }
+    if(verbose){
+        if( clockPhaseResult        &
+            externalWindowResult    &
+            pileUpWindowResult      &
+            noiseWindowResult       &
+            extTrigLengthResult     &
+            collectionTimeResult    &
+            integrateTimeResult     &
+            downSampleResult        &
+            controlRegResultMask    &
+            thresholdResultMask     &
+            windowTimingResultMask  &
+            risingEdgeResultMask) {
+            NSLog(@"%@ HW registers match dialog values\n",[self fullID]);
+        }
+    }
 }
 
 
@@ -1671,7 +1745,32 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
               forceFullInit:forceFullInit[chan]];
 }
     
-     
+- (BOOL) checkControlReg:(short)chan verbose:(BOOL)verbose
+{
+    unsigned long checkValue = ((baselineRestoreEnabled[chan] & 0x1 ) << 22)  |
+    
+        ((pzTraceEnabled[chan]         & 0x1 ) << 14)  |
+        ((poleZeroEnabled[chan]        & 0x1 ) << 13)  |
+        ((tpol[chan]                   & 0x3 ) << 10)  |
+        ((triggerMode[chan]            & 0x1 ) << 4)   |
+        ((presumEnabled[chan]          & 0x1 ) << 3)   |
+        ((pileUp[chan]                 & 0x1 ) << 2);
+    
+    unsigned long aValue = 0 ;
+    [[self adapter] readLongBlock:&aValue
+                        atAddress:[self baseAddress] + register_information[kControlStatus].offset
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    if((aValue & 0x0040641C) == checkValue){
+        return YES;
+    }
+    else {
+        if(verbose)NSLog(@"control Reg mismatch: 0x%x != 0x%x\n",aValue & 0x0040641C,checkValue);
+        return NO;
+    }
+}
+
 - (short) readClockSource
 {
     unsigned long theValue = 0 ;
@@ -1709,6 +1808,23 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 }
 
+- (BOOL) checkNoiseWindow:(BOOL)verbose
+{
+    unsigned long aValue = 0 ;
+    [[self adapter] readLongBlock:&aValue
+                        atAddress:[self baseAddress] + register_information[kNoiseWindow].offset
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    if((aValue & 0x7f) == noiseWindow){
+        return YES;
+    }
+    else {
+        if(verbose)NSLog(@"noiseWindow mismatch: 0x%x != 0x%x\n",aValue & 0x7f,noiseWindow);
+        return NO;
+    }
+}
+
 - (void) writeExternalWindow
 {
     [self writeAndCheckLong:externalWindow
@@ -1718,15 +1834,48 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
               forceFullInit:forceFullInitCard];
 }
 
+- (BOOL) checkExternalWindow:(BOOL)verbose
+{
+    unsigned long aValue = 0 ;
+    [[self adapter] readLongBlock:&aValue
+                        atAddress:[self baseAddress] + register_information[kExternalWindow].offset
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    if((aValue & 0x7ff) == externalWindow){
+        return YES;
+    }
+    else {
+        if(verbose)NSLog(@"externalWindow mismatch: 0x%x != 0x%x\n",aValue & 0x7ff,externalWindow);
+        return NO;
+    }
+}
+
 - (void) writePileUpWindow
 {
-    unsigned long theValue = (baselineRestoredDelay<<16) &  pileUpWindow;
+    unsigned long theValue = (baselineRestoredDelay<<16) |  pileUpWindow;
  
     [self writeAndCheckLong:theValue
               addressOffset:register_information[kPileupWindow].offset
                        mask:0xffffffff
                   reportKey:@"PileupWindow"
               forceFullInit:forceFullInitCard];
+}
+
+- (BOOL) checkPileUpWindow:(BOOL)verbose
+{
+    unsigned long checkValue = (baselineRestoredDelay<<16) |  pileUpWindow;
+    unsigned long aValue = 0 ;
+    [[self adapter] readLongBlock:&aValue
+                        atAddress:[self baseAddress] + register_information[kPileupWindow].offset
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    if((aValue & 0xffffffff) == checkValue) return YES;
+    else {
+        if(verbose)NSLog(@"pileUpWindow mismatch: 0x%x != 0x%x\n",aValue & 0xffffffff,checkValue);
+        return NO;
+    }
 }
 
 - (void) writeExtTrigLength
@@ -1738,6 +1887,22 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
               forceFullInit:forceFullInitCard];
 }
 
+- (BOOL) checkExtTrigLength:(BOOL)verbose
+{
+    unsigned long aValue = 0 ;
+    [[self adapter] readLongBlock:&aValue
+                        atAddress:[self baseAddress] + register_information[kExtTrigSlidingLength].offset
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    if((aValue & 0x7ff) == extTrigLength) return YES;
+    else {
+        if(verbose)NSLog(@"extTrigLength mismatch: 0x%x != 0x%x\n",aValue & 0x7ff,extTrigLength);
+        return NO;
+    }
+}
+
+
 - (void) writeCollectionTime
 {
     [self writeAndCheckLong:collectionTime
@@ -1746,6 +1911,20 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                   reportKey:@"CollectionTime"
               forceFullInit:forceFullInitCard];
 
+}
+- (BOOL) checkCollectionTime:(BOOL)verbose
+{
+    unsigned long aValue = 0 ;
+    [[self adapter] readLongBlock:&aValue
+                        atAddress:[self baseAddress] + register_information[kCollectionTime].offset
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    if((aValue & 0x3ff) == collectionTime) return YES;
+    else {
+        if(verbose)NSLog(@"collectionTime mismatch: 0x%x != 0x%x\n",aValue & 0x3ff,collectionTime);
+        return NO;
+    }
 }
 
 
@@ -1759,6 +1938,20 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 
 }
+- (BOOL) checkIntegrateTime:(BOOL)verbose
+{
+    unsigned long aValue = 0 ;
+    [[self adapter] readLongBlock:&aValue
+                        atAddress:[self baseAddress] + register_information[kIntegrateTime].offset
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    if((aValue & 0x3ff) == integrateTime) return YES;
+    else {
+        if(verbose)NSLog(@"integrateTime mismatch: 0x%x != 0x%x\n",aValue & 0x3ff,integrateTime);
+        return NO;
+    }
+}
 
 - (void) writeLEDThreshold:(short)channel
 {
@@ -1771,6 +1964,24 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                   reportKey:[NSString stringWithFormat:@"LEDThreshold_%d",channel]
               forceFullInit:forceFullInit[channel]];
 
+}
+
+- (BOOL) checkLEDThreshold:(short)channel verbose:(BOOL)verbose
+{
+    unsigned long checkValue = ((poleZeroMult[channel] & 0xFFF) << 20) |
+                                (ledThreshold[channel] & 0x1FFFF);
+    
+    unsigned long aValue = 0 ;
+    [[self adapter] readLongBlock:&aValue
+                        atAddress:[self baseAddress] +register_information[kLEDThreshold].offset + 4*channel
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    if((aValue & 0xfff1ffff) == checkValue) return YES;
+    else {
+        if(verbose)NSLog(@"channel %d ledThreshold mismatch: 0x%x != 0x%x\n",channel,aValue & 0xfff1ffff,checkValue);
+        return NO;
+    }
 }
 
 - (void) writeTrapThreshold:(int)channel
@@ -1789,6 +2000,23 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
               forceFullInit:forceFullInit[channel]];
     
 }
+- (BOOL) checkTrapThreshold:(short)channel verbose:(BOOL)verbose
+{
+    unsigned long checkValue =  (trapEnabled[channel] << 31) |
+                                (trapThreshold[channel] & 0xFFFFFF);
+    
+    unsigned long aValue = 0 ;
+    [[self adapter] readLongBlock:&aValue
+                        atAddress:[self baseAddress] +register_information[kTrapThreshold].offset + 4*channel
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    if((aValue & 0x80ffffff) == checkValue) return YES;
+    else {
+        if(verbose)NSLog(@"channel %d trapThreshold mismatch: 0x%x != 0x%x\n",channel,aValue & 0x80ffffff,checkValue);
+        return NO;
+    }
+}
 
 - (void) writeWindowTiming:(short)channel
 {    
@@ -1803,7 +2031,30 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                        mask:0x07ffffff
                   reportKey:[NSString stringWithFormat:@"WindowTiming_%d",channel]
               forceFullInit:forceFullInit[channel]];
+
 }
+
+
+- (BOOL) checkWindowTiming:(short)channel verbose:(BOOL)verbose
+{
+    unsigned long checkValue = (((ftCnt[channel]+kFtAdjust)&0x7ff)<<16) |
+                                            ((mrpsrt[channel]&0xf)<<12) |
+                                            ((mrpsdv[channel]&0xf)<<8)  |
+                                            ((chpsrt[channel]&0xf)<<4)  |
+                                            (chpsdv[channel] & 0xf);
+    unsigned long aValue = 0 ;
+    [[self adapter] readLongBlock:&aValue
+                    atAddress:[self baseAddress] +register_information[kWindowTiming].offset + 4*channel
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    if((aValue & 0x07ffffff) == checkValue) return YES;
+    else {
+        if(verbose)NSLog(@"channel %d windowTiming mismatch: 0x%x != 0x%x\n",channel,aValue & 0x07ffffff,checkValue);
+        return NO;
+    }
+}
+
 
 - (void) writeRisingEdgeWindow:(short)channel
 {    
@@ -1815,6 +2066,22 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                   reportKey:[NSString stringWithFormat:@"RisingEdgeWindow_%d",channel]
               forceFullInit:forceFullInit[channel]];
 
+}
+- (BOOL) checkRisingEdgeWindow:(short)channel verbose:(BOOL)verbose
+{
+    unsigned long checkValue = (((prerecnt[channel]+kPreAdjust)&0x7ff)<<12) | (((postrecnt[channel]+kPostAdjust)&0x7ff));
+
+    unsigned long aValue = 0 ;
+    [[self adapter] readLongBlock:&aValue
+                        atAddress:[self baseAddress] +register_information[kRisingEdgeWindow].offset + 4*channel
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    if((aValue & 0x007ff7ff) == checkValue) return YES;
+    else {
+        if(verbose)NSLog(@"channel %d risingEdgeWindow mismatch: 0x%x != 0x%x\n",channel,aValue & 0x007ff7ff,checkValue);
+        return NO;
+    }
 }
 
 
@@ -1842,7 +2109,23 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                        mask:0x70000000
                   reportKey:@"downSample"
               forceFullInit:forceFullInitCard];
- }
+}
+
+- (BOOL) checkDownSample:(BOOL)verbose
+{
+    unsigned long checkValue = ((downSample & 0xF) << 28);
+    unsigned long aValue = 0 ;
+    [[self adapter] readLongBlock:&aValue
+                        atAddress:[self baseAddress] + register_information[kProgrammingDone].offset
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    if((aValue & 0x70000000) == checkValue) return YES;
+    else {
+        if(verbose)NSLog(@"downSample mismatch: 0x%x != 0x%x\n",aValue & 0x70000000,checkValue);
+        return NO;
+    }
+}
 
 - (short) readExternalWindow
 {
@@ -2479,6 +2762,14 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setUseValue:NO];
     [p setOncePerCard:YES];
+    [p setName:@"Init (Forced)"];
+    [p setSetMethodSelector:@selector(doForcedInitBoard)];
+    [a addObject:p];
+
+    
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setUseValue:NO];
+    [p setOncePerCard:YES];
     [p setName:@"Load Thresholds"];
     [p setSetMethodSelector:@selector(loadThresholds)];
     [a addObject:p];
@@ -2563,6 +2854,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     isRunning = YES;
+    NSLog(@"isRunning is set to be true");
     NSString* errorLocation = @"";
     @try {
         if(![self fifoIsEmpty]){
@@ -2578,6 +2870,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
             //the first word of the actual data record had better be the packet separator
             if(dataBuffer[2]==kGretina4MPacketSeparator){
                 short chan = dataBuffer[3] & 0xf;
+                //if(chan==1 || dataBuffer[3] & 0x7 ==1) {NSLog(@"!!!! Channel = 1 should have increase of events, while chan = %hu\n", chan);}
                 if(chan < kNumGretina4MChannels){
                     ++waveFormCount[chan];  //grab the channel and inc the count
                     [aDataPacket addLongsToFrameBuffer:dataBuffer length:kG4MDataPacketSize];
@@ -2668,12 +2961,17 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 }
 
 
-- (BOOL) bumpRateFromDecodeStage:(short)channel
+- (BOOL) bumpRateFromDecodeStage:(int)channel
+//- (BOOL) bumpRateFromDecodeStage:(short)channel
 {
-    if(isRunning)return NO;
+    //if(isRunning)return NO;
+   // if(isRunning){NSLog(@"!!! Bad !!!  it is running\n"); return NO;}
+    
+        
     if(channel>=0 && channel<kNumGretina4MChannels){
         ++waveFormCount[channel];
     }
+   // if(channel==1) NSLog(@"!!! GOOD !!! channel 1 rate bumped up during bumpRateFromDecodeStage to %U\n", waveFormCount[channel]);
     return YES;
 }
 
@@ -2766,7 +3064,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self setNoiseFloorOffset:			[decoder decodeIntForKey:@"NoiseFloorOffset"]];
     [self setHistEMultiplier:			[decoder decodeIntForKey:@"histEMultiplier"]];
     [self setForceFullInitCard:			[decoder decodeBoolForKey:@"forceFullInitCard"]];
-
+    [self setDoHwCheck:                 [decoder decodeBoolForKey:@"doHwCheck"]];
     
     [self setWaveFormRateGroup:[decoder decodeObjectForKey:@"waveFormRateGroup"]];
     
@@ -2776,6 +3074,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     }
     [waveFormRateGroup resetRates];
     [waveFormRateGroup calcRates];
+   
+//    waveFormRunningAverage = [[ORRunningAverage alloc] init];
 	
 	int i;
 	for(i=0;i<kNumGretina4MChannels;i++){
@@ -2804,7 +3104,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	}
     
     [[self undoManager] enableUndoRegistration];
-    
     return self;
 }
 
@@ -2830,9 +3129,11 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [encoder encodeFloat:noiseFloorIntegrationTime	forKey:@"NoiseFloorIntegrationTime"];
     [encoder encodeInt:noiseFloorOffset				forKey:@"NoiseFloorOffset"];
     [encoder encodeObject:waveFormRateGroup			forKey:@"waveFormRateGroup"];
+  //  [encoder encodeObject:waveFormRunningAverage	forKey:@"waveFormRunningAverage"];
     [encoder encodeInt:histEMultiplier              forKey:@"histEMultiplier"];
     [encoder encodeBool:forceFullInitCard           forKey:@"forceFullInitCard"];
-    
+    [encoder encodeBool:doHwCheck                   forKey:@"doHwCheck"];
+
 	int i;
  	for(i=0;i<kNumGretina4MChannels;i++){
         [encoder encodeInt:forceFullInit[i]	forKey:[@"forceFullInit"		stringByAppendingFormat:@"%d",i]];

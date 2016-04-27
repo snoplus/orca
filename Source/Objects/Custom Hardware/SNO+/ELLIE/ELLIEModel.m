@@ -412,7 +412,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         } @catch (NSException *exception) {
             NSLog(@"Unable to add pin readout due to error %@",exception);
         }
-    
         [self updateTellieDocument:fireCommands];
     }
     self.ellieFireFlag = NO;

@@ -71,12 +71,12 @@
 	}
 }
 
-- (unsigned long)totalSent 
+- (unsigned long long)totalSent
 {
     return totalSent;
 }
 
-- (void)setTotalSent:(unsigned long)aTotalSent 
+- (void)setTotalSent:(unsigned long long)aTotalSent
 {
     totalSent = aTotalSent;
     if([delegate respondsToSelector:@selector(clientDataChanged:)]){

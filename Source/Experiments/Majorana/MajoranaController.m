@@ -412,8 +412,8 @@
 - (void) auxTablesChanged:(NSNotification*)aNote
 {
 	[stringMapTableView reloadData];
-	[detectorView makeAllSegments];
     [specialChannelsTableView reloadData];
+    [detectorView makeAllSegments];
 }
 
 - (void) checkGlobalSecurity
@@ -485,7 +485,7 @@
 {
 	[viewTypePU selectItemAtIndex:[model viewType]];
 	[detectorView setViewType:[model viewType]];
-	[detectorView makeAllSegments];
+    [detectorView makeAllSegments];
 }
 
 #pragma mark ¥¥¥Interface Management
@@ -993,6 +993,7 @@
             [aSegment setObject:[NSNumber numberWithInt:rowIndex] forKey:@"kDetector"];
         }
         [[model segmentGroup:0] configurationChanged:nil];
+        
 	}
     
     else if(aTableView == stringMapTableView){

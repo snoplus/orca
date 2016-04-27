@@ -53,11 +53,11 @@
         return nil;
 
     NSData *cleanData = [self cleanInvalidUTF8:xmlData];
-    NSString *cleanString = [[NSString alloc] initWithData:cleanData encoding:NSUTF8StringEncoding];
+    NSString *cleanString = [[[NSString alloc] initWithData:cleanData encoding:NSUTF8StringEncoding] autorelease];
 
     if (cleanString == nil) {
         // Although it shouldn't happen, fall back to Latin1 if data is not proper UTF-8
-        cleanString = [[NSString alloc] initWithData:cleanData encoding:NSISOLatin1StringEncoding];
+        cleanString = [[[NSString alloc] initWithData:cleanData encoding:NSISOLatin1StringEncoding] autorelease];
     }
     NSInteger startinglength = [cleanString length];
     cleanString = [self cleanCharactersBeforePreamble:cleanString];

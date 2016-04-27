@@ -369,7 +369,7 @@ static NSString *OROrcaObjectControllerNibName	= @"OROrcaObjectControllerNibName
         [[self window] setFrameFromString:s];
 	}
 	@catch(NSException* localException) {
-        NSLog(@"Failed loading: %@\n",nibName);
+        NSLogColor([NSColor redColor], @"Failed loading: %@. Reason: %@\n", nibName, [localException reason]);
     }
     return self;
 }

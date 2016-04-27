@@ -141,6 +141,11 @@ enum {
 - (void) registerNotificationObservers;
 - (void) runAboutToStart:(NSNotification*)aNote;
 
+- (void) awakeAfterDocumentLoaded;
+
+- (void) setMTCPort: (int) port;
+- (void) setMTCHost: (NSString *) host;
+
 #pragma mark ***Accessors
 - (int)				eventSize;
 - (void)			setEventSize:(int)aEventSize;

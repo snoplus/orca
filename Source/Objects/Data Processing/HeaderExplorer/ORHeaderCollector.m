@@ -82,6 +82,7 @@
 		}		
 	}
 	else NSLog(@"%@ doesn't appear to be a legal ORCA file\n");
+    [fh closeFile];
     [thePool release];
 }
 

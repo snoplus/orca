@@ -72,18 +72,10 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(MemoryWatcherController);
 	[thePlot setLineWidth:1];
 	[thePlot setLineColor:[NSColor redColor]];
 	[thePlot setUseConstantColor:YES];
-	[thePlot setName:@"RSize(MB)"];
+	[thePlot setName:@"Memory(MB)"];
 	[plotView addPlot: thePlot];
 	[thePlot release];
-	
-	thePlot = [[ORPlot alloc] initWithTag:2 andDataSource:self];
-	[thePlot setLineWidth:1];
-	[thePlot setLineColor:[NSColor blueColor]];
-	[thePlot setUseConstantColor:YES];
-	[thePlot setName:@"VSize(MB)"];
-	[plotView addPlot: thePlot];
-	[thePlot release];
-	
+		
 	[plotView setShowLegend:YES];
 	
     [plotView setNeedsDisplay:YES];
@@ -123,8 +115,8 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(MemoryWatcherController);
     if(aNote == nil || [aNote object] == watcher){
 		NSTimeInterval interval = [watcher taskInterval];
 		NSString* s;
-		if(interval == 1.0) s = @"Max 4096 Samples @ 1 Hz";
-		else s = [NSString stringWithFormat:@"Max 4096 Samples @ 1/%.0f Hz",[watcher taskInterval]];
+		if(interval == 1.0) s = @"Max 4096 Samples @ 1 Hz Shown";
+		else s = [NSString stringWithFormat:@"Max 4096 Samples @ 1/%.0f Hz Shown",[watcher taskInterval]];
 		[plotView setXLabel:s];
     }
 }

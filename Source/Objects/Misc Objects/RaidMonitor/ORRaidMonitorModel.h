@@ -21,6 +21,7 @@
 #import "OrcaObject.h"
 @class ORAlarm;
 @class ORFileMoverOp;
+@class ORFileGetterOp;
 
 @interface ORRaidMonitorModel : OrcaObject
 {
@@ -41,6 +42,7 @@
     NSDateFormatter*    dateFormatter;
     NSDateFormatter*    dateConvertFormatter;
     ORFileMoverOp*      fileMover;
+    ORFileGetterOp*     mover;
 }
 
 #pragma mark ***Initialization

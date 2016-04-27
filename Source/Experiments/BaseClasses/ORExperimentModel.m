@@ -886,7 +886,7 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
 	theData = [NSMutableData dataWithLength:numSegments*sizeof(long)];
 	ORSegmentGroup* segmentGroup = [self segmentGroup:aSet];
 	int i;
-	unsigned long* p = (unsigned long*)[theData bytes];
+	float* p = (float*)[theData bytes];
 	for(i = 0;i<numSegments;i++){
 		p[i] = [segmentGroup getRate:i];
 	}

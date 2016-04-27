@@ -114,6 +114,11 @@
 - (void) makeMainController;
 - (BOOL) solitaryObject;
 
+- (void) setMTCPort: (int) port;
+- (void) setMTCHost: (NSString *) host;
+
+- (void) awakeAfterDocumentLoaded;
+
 - (void) registerNotificationObservers;
 - (void) runAboutToStart:(NSNotification*)aNote;
 

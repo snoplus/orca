@@ -524,6 +524,10 @@ static const int currentVersion = 1;           // Current version
 	//we don't care
 }
 
+- (void) preCloseOut:(id)userInfo
+{
+    
+}
 
 - (void) closeOutRun:(id)userInfo
 {	
@@ -539,6 +543,7 @@ static const int currentVersion = 1;           // Current version
         //write out the last of the data if any
         [filePointer writeData:dataBuffer];
         
+        [filePointer closeFile];
         [filePointer release];
         filePointer = nil;
   
@@ -1007,6 +1012,8 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
                 }
 			}
 			[task release];
+            [file closeFile];
+
         }
 	}
 	@catch(NSException* e){

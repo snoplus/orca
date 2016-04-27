@@ -95,7 +95,13 @@
 		[obj runTaskStopped:userInfo];
 	}
 }
-
+- (void) preCloseOut:(id)userInfo;
+{
+    id obj = [[destination connector] objectLink];
+    if(obj && [obj respondsToSelector:@selector(preCloseOut:)]){
+        [obj preCloseOut:userInfo];
+    }
+}
 - (void) closeOutRun:(id)userInfo
 {
 	id obj = [[destination connector] objectLink];

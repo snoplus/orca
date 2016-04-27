@@ -29,8 +29,7 @@
 #import <sys/select.h>
 #import <sys/errno.h>
 #include "anet.h"
-
-#define XL3_SERVER "daq1.sp.snolab.ca"
+#import "SNOPModel.h"
 
 NSString* XL3_LinkConnectionChanged     = @"XL3_LinkConnectionChanged";
 NSString* XL3_LinkTimeConnectedChanged	= @"XL3_LinkTimeConnectedChanged";
@@ -691,6 +690,22 @@ static void SwapLongBlock(void* p, int32_t n)
 - (void) connectToPort
 {
     char err[ANET_ERR_LEN];
+    char *host;
+
+    NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+
+    SNOPModel* sno;
+    if ([objs count] == 0) {
+        NSLogColor([NSColor redColor],
+            @"xl3: Couldn't find SNO+ model to get XL3 server "
+             "hostname and port from. Please add a SNO+ model object to the "
+             "experiment.\n");
+        return;
+    }
+
+    sno = [objs objectAtIndex:0];
+    host = (char *) [[sno xl3Host] UTF8String];
 
 	NSAutoreleasePool *pool = [[NSAutoreleasePool allocWithZone:nil] init];
 
@@ -698,7 +713,7 @@ static void SwapLongBlock(void* p, int32_t n)
     [[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectStateChanged object: self];
 
     workingSocket = 0;
-    if ((workingSocket = anetTcpConnect(err, XL3_SERVER, portNumber)) == ANET_ERR) {
+    if ((workingSocket = anetTcpConnect(err, host, portNumber)) == ANET_ERR) {
         if (workingSocket) {
             close(workingSocket);
             workingSocket = 0;

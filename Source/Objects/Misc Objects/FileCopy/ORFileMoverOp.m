@@ -204,6 +204,7 @@
             if ([delegate respondsToSelector:@selector(fileMoverIsDone)]){
                 [delegate performSelectorOnMainThread:@selector(fileMoverIsDone) withObject:nil waitUntilDone:NO];
             }
+            [readHandle closeFile];
         }
         @catch (NSException* e){
             NSLog(@"File Mover exception.. stopped during launch\n");
