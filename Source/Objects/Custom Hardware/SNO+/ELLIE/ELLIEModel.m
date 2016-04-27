@@ -490,15 +490,10 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
      NSDictionary* subRunDoc:  Subrun information to be added to the current self.tellieRunDoc.
      */
     NSMutableDictionary* runDocDict = [self.tellieRunDoc mutableCopy];
-    NSMutableDictionary* subRunDocDict = [self.tellieSubRunSettings mutableCopy];
+    NSMutableDictionary* subRunDocDict = [subRunDoc mutableCopy];
     
     [subRunDocDict setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
-    @try{
-        [subRunDocDict setObject:[NSNumber numberWithInt:[[subRunDoc objectForKey:@"pin_readout"] intValue]] forKey:@"pin_readout"];
-    }
-    @catch (NSException *e) {
-        NSLog(@"Error in pin readout %@",e);
-    }
+ 
     NSMutableArray * subRunInfo = [[runDocDict objectForKey:@"sub_run_info"] mutableCopy];
     [subRunInfo addObject:subRunDocDict];
     [runDocDict setObject:subRunInfo forKey:@"sub_run_info"];
