@@ -479,26 +479,6 @@
                             </tabViewItem>
                         </tabViewItems>
                     </tabView>
-                    <button id="URx-nh-GMP">
-                        <rect key="frame" x="1155" y="8" width="36" height="33"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="Unlocked" imagePosition="above" alignment="center" alternateImage="Locked" inset="2" id="HE1-OC-JMz">
-                            <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                            <font key="font" metaFont="system" size="10"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="runsLockAction:" target="-2" id="MFs-mm-seY"/>
-                        </connections>
-                    </button>
-                    <textField verticalHuggingPriority="750" id="Np3-DI-Iif">
-                        <rect key="frame" x="938" y="8" width="217" height="18"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" state="on" alignment="center" title="UNLOCKED" drawsBackground="YES" id="NE5-q1-6Cp">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" red="0.25796978300000001" green="0.50936399129999999" blue="0.89733270200000004" alpha="1" colorSpace="calibratedRGB"/>
-                        </textFieldCell>
-                    </textField>
                     <tabView controlSize="small" id="101">
                         <rect key="frame" x="394" y="10" width="793" height="673"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1868,6 +1848,17 @@
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
+                                        <button id="URx-nh-GMP">
+                                            <rect key="frame" x="740" y="7" width="36" height="33"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="Unlocked" imagePosition="above" alignment="center" alternateImage="Locked" inset="2" id="HE1-OC-JMz">
+                                                <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system" size="10"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="runsLockAction:" target="-2" id="MFs-mm-seY"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                 </view>
                             </tabViewItem>
@@ -3648,6 +3639,15 @@
                             <outlet property="delegate" destination="-2" id="347"/>
                         </connections>
                     </tabView>
+                    <textField verticalHuggingPriority="750" id="Np3-DI-Iif">
+                        <rect key="frame" x="963" y="8" width="217" height="18"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" state="on" alignment="center" title="UNLOCKED" drawsBackground="YES" id="NE5-q1-6Cp">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" red="0.25796978300000001" green="0.50936399129999999" blue="0.89733270200000004" alpha="1" colorSpace="calibratedRGB"/>
+                        </textFieldCell>
+                    </textField>
                 </subviews>
             </view>
             <connections>
