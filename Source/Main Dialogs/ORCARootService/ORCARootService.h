@@ -72,8 +72,8 @@
 - (void) setSocket:(NetSocket*)aSocket;
 - (NSString*) name;
 - (void) setName:(NSString*)newName;
-- (unsigned long) totalSent;
-- (void) setTotalSent:(unsigned long)aTotalSent;
+- (unsigned long long) totalSent;
+- (void) setTotalSent:(unsigned long long)aTotalSent;
 - (NSDate*) timeConnected;
 - (void) setTimeConnected:(NSDate*)newTimeConnected;
 - (unsigned long) amountInBuffer; 

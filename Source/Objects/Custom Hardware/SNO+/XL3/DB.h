@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#pragma pack(1)
+
 typedef struct
 {
   uint16_t mbID;
@@ -63,5 +65,7 @@ typedef struct
 } Crate; //!< all database values for the crate
 
 Crate crate; //!< Current configuration
+
+#pragma pack()
 
 #endif

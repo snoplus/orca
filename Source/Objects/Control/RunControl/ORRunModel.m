@@ -1520,6 +1520,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	@catch(NSException* localException) {
 	}
 	
+    [nextObject preCloseOut:runInfo];
+    
 	//get the time(UT!)
 	time_t	ut_time;
     time(&ut_time);    
