@@ -412,6 +412,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         } @catch (NSException *exception) {
             NSLog(@"Unable to add pin readout due to error %@",exception);
         }
+    
         [self updateTellieDocument:fireCommands];
     }
     self.ellieFireFlag = NO;
@@ -532,8 +533,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     // **********************************
     // For testing on personal machine
     //
-    NSString* parsUrlString = [NSString stringWithFormat:@"http://snoplus:PureTe->Dirac!=True@couch.snopl.us/telliedb/_design/tellieQuery/_view/fetchFireParameters?key=0"];
-    //NSString* parsUrlString = [NSString stringWithFormat:@"%@:%u/telliedb/_design/tellieQuery/_view/fetchFireParameters?key=0",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
+    NSString* parsUrlString = [NSString stringWithFormat:@"%@:%u/telliedb/_design/tellieQuery/_view/fetchFireParameters?key=0",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
     //***********************************
     NSString* webParsString = [parsUrlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     NSURL* parsUrl = [NSURL URLWithString:webParsString];
