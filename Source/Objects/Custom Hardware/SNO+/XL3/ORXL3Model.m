@@ -1278,10 +1278,8 @@ void SwapLongBlock(void* p, int32_t n)
 
             if ([fec trigger100nsEnabled: (dbNum*8 + channel)]) {
                 mb->tr100.mask[dbNum*8+channel] = 1;
-                mb->tr100.tDelay[dbNum*8+channel] |= 0x40;
             } else {
                 mb->tr100.mask[dbNum*8+channel] = 0;
-                mb->tr100.tDelay[dbNum*8+channel] &= ~0x40;
             }
 
             mb->tr20.tDelay[dbNum*8+channel] = [db ns20delay:channel];
@@ -1289,10 +1287,8 @@ void SwapLongBlock(void* p, int32_t n)
 
             if ([fec trigger20nsEnabled: (dbNum*8 + channel)]) {
                 mb->tr20.mask[dbNum*8+channel] = 1;
-                mb->tr20.tWidth[dbNum*8+channel] |= 0x20;
             } else {
                 mb->tr20.mask[dbNum*8+channel] = 0;
-                mb->tr20.tWidth[dbNum*8+channel] &= ~0x20;
             }
 
             for (i=0; i<2; i++) {
@@ -1709,8 +1705,8 @@ void SwapLongBlock(void* p, int32_t n)
             if ((slotMask & (1 << slot)) == 0) continue;
 
             for (channel = 0; channel < 32; channel++) {
-                mbs[slot].tr100.tDelay[channel] &= ~0x40U;
-                mbs[slot].tr20.tWidth[channel] &= ~0x20U;
+                mbs[slot].tr100.mask[channel] = 0;
+                mbs[slot].tr20.mask[channel] = 0;
             }
         }
         [self setTriggerStatus:@"OFF"];
