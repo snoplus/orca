@@ -3741,7 +3741,7 @@ err:
         NSLog(@"%@ triggers OFF\n", [[self xl3Link] crateName]);
     }
     else {
-        NSLog(@"%@ triggers ON ignored, crate is not connected.\n", [[self xl3Link] crateName]);
+        NSLog(@"%@ triggers OFF ignored, crate is not connected.\n", [[self xl3Link] crateName]);
     }
 }
 
