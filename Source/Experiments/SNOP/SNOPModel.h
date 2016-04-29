@@ -282,7 +282,6 @@
 
 //Standard runs functions
 -(BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
--(BOOL) loadStandardRunToHW:(NSString*)runTypeName;
 -(BOOL) saveStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
 
 @end

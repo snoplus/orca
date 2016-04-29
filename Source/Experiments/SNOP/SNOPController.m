@@ -300,7 +300,6 @@ smellieRunFile;
     [model setIsEmergencyStopEnabled:TRUE]; //enable the emergency stop
     [self runsLockChanged:nil];
     [self runsECAChanged:nil];
-    [self refreshRunWordLabels:nil];
     [self runTypeWordChanged:nil];
 }
 

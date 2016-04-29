@@ -620,7 +620,7 @@
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Comp. Coils." bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="22" inset="2" id="3939">
+                                                                <buttonCell type="check" title="Comp. Coils. OFF" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="22" inset="2" id="3939">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
