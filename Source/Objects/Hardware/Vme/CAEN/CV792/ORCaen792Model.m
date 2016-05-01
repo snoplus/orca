@@ -742,7 +742,9 @@ NSString* ORCaen792ModelShipTimeStampChanged          = @"ORCaen792ModelShipTime
     [self stopCyclingZeroSuppression];
 	[qdcRateGroup stop];
 	isRunning = NO;
-    [self clearData];
+    
+    BOOL doInit = [[userInfo objectForKey:@"doinit"] boolValue];
+    if(doInit)[self clearData];
 
     [super runTaskStopped:aDataPacket userInfo:userInfo];
 }
