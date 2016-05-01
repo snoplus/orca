@@ -561,10 +561,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     // **********************************
     // Load latest mapping doc.
     // **********************************
-    // For testing on personal machine
-    //
-    NSString* mapUrlString = [NSString stringWithFormat:@"http://snoplus:PureTe->Dirac!=True@couch.snopl.us/telliedb/_design/tellieQuery/_view/fetchCurrentMapping?key=0"];
-    //NSString* parsUrlString = [NSString stringWithFormat:@"%@:%u/telliedb/_design/tellieQuery/_view/fetchCurrentMapping?key=0",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
+    NSString* mapUrlString = [NSString stringWithFormat:@"%@:%u/telliedb/_design/tellieQuery/_view/fetchCurrentMapping?key=0",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
 
     NSString* webMapString = [mapUrlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     NSURL* mapUrl = [NSURL URLWithString:webMapString];
