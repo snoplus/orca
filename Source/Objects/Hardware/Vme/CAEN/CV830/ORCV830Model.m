@@ -470,7 +470,11 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 		
 	}
 }
-
+- (void) skipBoardInit
+{
+    remoteInit= YES;
+ 
+}
 - (void) remoteInitBoard
 {
     remoteInit= YES;
@@ -767,9 +771,10 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 	numEnabledChannels  = [self numEnabledChannels];
 	chan0RollOverCount  = 0;
     lastChan0Count      = 0;
-    if(!remoteInit)[self initBoard];
-    
-	//cache the data takers for alittle more speed
+    BOOL doInit = [[userInfo objectForKey:@"doinit"] boolValue];
+    if(!remoteInit && doInit)[self initBoard];
+
+    //cache the data takers for alittle more speed
 	dataTakers = [[readOutGroup allObjects] retain];		//cache of data takers.
 	for(id obj in dataTakers){
         [obj runTaskStarted:aDataPacket userInfo:userInfo];
