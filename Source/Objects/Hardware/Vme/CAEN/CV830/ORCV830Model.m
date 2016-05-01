@@ -470,11 +470,7 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 		
 	}
 }
-- (void) skipBoardInit
-{
-    remoteInit= YES;
- 
-}
+
 - (void) remoteInitBoard
 {
     remoteInit= YES;
