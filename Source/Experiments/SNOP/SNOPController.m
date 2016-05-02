@@ -1149,6 +1149,7 @@ smellieRunFile;
     [standardRunLoadDefaultsButton setEnabled:!lockedOrNotRunningMaintenance];
     [maintenanceRunBox setEnabled:!lockedOrNotRunningMaintenance];
     [runTypeWordMatrix setEnabled:!lockedOrNotRunningMaintenance];
+    [standardRunVersionPopupMenu setEnabled:!lockedOrNotRunningMaintenance];
     
     //Display status
     [runStatusTextField setStringValue:@"UNLOCKED"];
