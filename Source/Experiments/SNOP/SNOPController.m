@@ -326,17 +326,13 @@ smellieRunFile;
 
 -(void) SRTypeChanged:(NSNotification*)aNote
 {
-    
     [self refreshStandardRunVersions];
-    
 }
 
 -(void) SRVersionChanged:(NSNotification*)aNote
 {
-    
     [self displayThresholdsFromDB];
     [self runTypeWordChanged:nil];
-    
 }
 
 - (IBAction)maintenanceBoxAction:(id)sender {
@@ -432,14 +428,20 @@ smellieRunFile;
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* theRunControl = [objs objectAtIndex:0];
     if([theRunControl runningState] == eRunInProgress){
+        [startRunButton setEnabled:true];
+        [startRunButton setTitle:@"RESTART RUN"];
         [lightBoardView setState:kGoLight];
 	}
 	else if([theRunControl runningState] == eRunStopped){
+        [startRunButton setEnabled:true];
+        [startRunButton setTitle:@"START RUN"];
         [lightBoardView setState:kStoppedLight];
 	}
 	else if([theRunControl runningState] == eRunStarting || [theRunControl runningState] == eRunStopping || [theRunControl runningState] == eRunBetweenSubRuns){
         if([theRunControl runningState] == eRunStarting){
             //The run started so update the display
+            [startRunButton setEnabled:false];
+            [startRunButton setTitle:@"STARTING..."];
             [standardRunTypeField setStringValue:[model standardRunType]];
             [standardRunVersionField setStringValue:[model standardRunVersion]];
             [runTypeWordField setStringValue:[NSString stringWithFormat:@"0x%X",(int)[model runTypeWord]]]; //FIXME: revisit if we go over 32 bits
@@ -672,6 +674,12 @@ smellieRunFile;
     [model debugDBPing];
 }
 
+- (IBAction) setHighThreholdsAction:(id)sender
+{
+    NSLog(@"Setting detector to a safe state...\n");
+    [model setStandardRunType:@"HIGH THRESHOLDS"];
+}
+
 - (IBAction)hvMasterPanicAction:(id)sender
 {
     [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
@@ -735,7 +743,23 @@ smellieRunFile;
     
 }
 
+- (IBAction) reportAction:(id)sender {
+    NSString *url = [NSString stringWithFormat:@"https://github.com/snoplus/orca/issues/new"];
+    NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlScaped]];
+}
 
+- (IBAction) logAction:(id)sender {
+    NSString *url = [NSString stringWithFormat:@"http://snopl.us/shift/"];
+    NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlScaped]];
+}
+
+- (IBAction) opManualAction:(id)sender {
+    NSString *url = [NSString stringWithFormat:@"https://www.snolab.ca/snoplus/TWiki/bin/view/Main/OperatorManual"];
+    NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlScaped]];
+}
 
 - (IBAction)hvMasterTriggersON:(id)sender
 {
@@ -1150,6 +1174,9 @@ smellieRunFile;
     [maintenanceRunBox setEnabled:!lockedOrNotRunningMaintenance];
     [runTypeWordMatrix setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunVersionPopupMenu setEnabled:!lockedOrNotRunningMaintenance];
+    [timedRunCB setEnabled:!lockedOrNotRunningMaintenance];
+    [timeLimitField setEnabled:!lockedOrNotRunningMaintenance];
+    [repeatRunCB setEnabled:!lockedOrNotRunningMaintenance];
     
     //Display status
     [runStatusTextField setStringValue:@"UNLOCKED"];
@@ -1438,6 +1465,10 @@ smellieRunFile;
     [standardRunPopupMenu deselectItemAtIndex:[standardRunPopupMenu indexOfSelectedItem]];
     [standardRunPopupMenu removeAllItems];
     
+    //First add special offline High Thresholds run
+    [standardRunPopupMenu addItemWithObjectValue:@"HIGH THRESHOLDS"];
+
+    //Now query DB and fetch the SRs
     NSString* urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/orca/_design/standardRuns/_view/getStandardRuns",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort]];
     NSString* link = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:link] cachePolicy:0 timeoutInterval:2];
@@ -1449,7 +1480,7 @@ smellieRunFile;
     NSDictionary *standardRunTypes = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
     
     if(error) {
-        [model setStandardRunType:@""];
+        [model setStandardRunType:@"HIGH THRESHOLDS"];
         return;
     }
     
@@ -1462,7 +1493,7 @@ smellieRunFile;
     
     //Handle case with empty DB
     if ([standardRunPopupMenu numberOfItems] == 0){
-        [model setStandardRunType:@""];
+        [model setStandardRunType:@"HIGH THRESHOLDS"];
     } else{ //Select first item in popup menu
         [standardRunPopupMenu selectItemAtIndex:0];
         [model setStandardRunType:[standardRunPopupMenu stringValue]];
