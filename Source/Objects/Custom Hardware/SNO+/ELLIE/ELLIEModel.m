@@ -83,7 +83,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 {
     self = [super init];
     if (self){
-        _tellieClient = [[XmlrpcClient alloc] initWithHostName:@"localhost" withPort:@"5030"];
+        _tellieClient = [[XmlrpcClient alloc] initWithHostName:@"daq1" withPort:@"5030"];
         _smellieClient = [[XmlrpcClient alloc] initWithHostName:@"snodrop" withPort:@"5020"];
     }
     return self;
@@ -331,7 +331,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     */
     //Set tellieFiring flag
     self.ellieFireFlag = YES;
-    NSLog(@"ELLIE fire flag set to: %@\n",YES);
+    NSLog(@"ELLIE fire flag set to: %@\n",@YES);
     
     //Add run control object
     NSArray*  runControlObjsArray = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
@@ -358,7 +358,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         if(i == ([loops integerValue]-1)){
             noShots = [NSNumber numberWithInt:fRemainder];
         }
-        
         //Start a new subrun and ship EPED record. The EPED record flags the subrun boundry in the data structure for a run.
         [runControl performSelectorOnMainThread:@selector(prepareForNewSubRun) withObject:nil waitUntilDone:YES];
         [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
@@ -391,15 +390,16 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                                   [[fireCommands objectForKey:@"pulse_height"] stringValue],
                                   [[fireCommands objectForKey:@"fibre_delay"] stringValue],
                                   ];
-            
+            NSLog(@"Initing tellie with settings");
             [_tellieClient command:@"init_channel" withArgs:fireArgs];
         }
         // Set number of pulses to be fired in this sub - run
+        NSLog(@"Setting number of pulses");
         [_tellieClient command:@"set_pulse_number" withArgs:@[noShots]];
 
         NSLog(@"***** FIRING %d TELLIE PULSES *****\n",[noShots integerValue]);
         [_tellieClient command:@"fire_sequence"];
-        
+        NSLog(@"After fire command");
         // Wait until sequence has finished
         [NSThread sleepForTimeInterval:timeToSleep];
     
@@ -414,7 +414,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
             NSLog(@"Unable to add pin readout due to error %@",exception);
         }
     
-        [self updateTellieDocument:fireCommands];
+        [self updateTellieRunDocument:fireCommands];
     }
     self.ellieFireFlag = NO;
     NSLog(@"ELLIE fire flag set to: %@\n",NO);
@@ -528,19 +528,30 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     // **********************************
     // Load latest calibration constants
     // **********************************
-    NSString* parsUrlString = [NSString stringWithFormat:@"%@:%u/telliedb/_design/tellieQuery/_view/fetchFireParameters?key=0",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
+    NSString* parsUrlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/telliedb/_design/tellieQuery/_view/fetchFireParameters?key=0",[aSnotModel orcaDBUserName], [aSnotModel orcaDBPassword], [aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
 
     NSString* webParsString = [parsUrlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     NSURL* parsUrl = [NSURL URLWithString:webParsString];
     NSLog(@"Querying : %@\n",parsUrl);
+    NSMutableURLRequest* parsUrlRequest = [NSMutableURLRequest requestWithURL:parsUrl
+                                                                  cachePolicy:0
+                                                              timeoutInterval:20];
     
+    // Get data string from URL
+    NSError* parsDataError =  nil;
+    NSURLResponse* parsUrlResponse;
+    NSData* parsData = [NSURLConnection sendSynchronousRequest:parsUrlRequest
+                                            returningResponse:&parsUrlResponse
+                                                        error:&parsDataError];
+    /*
     // Get data string from URL
     NSError* parsDataError =  nil;
     NSData* parsData = [NSData dataWithContentsOfURL:parsUrl
                                              options:NSDataReadingMapped
                                                error:&parsDataError];
+    */
     if(parsDataError){
-        NSLog(@"@\n",parsDataError);
+        NSLog(@"\n%@\n\n",parsDataError);
     }
     NSString* parsReturnStr = [[NSString alloc] initWithData:parsData encoding:NSUTF8StringEncoding];
     // Format queried data to dictionary
@@ -560,19 +571,28 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     // **********************************
     // Load latest mapping doc.
     // **********************************
-    NSString* mapUrlString = [NSString stringWithFormat:@"%@:%u/telliedb/_design/tellieQuery/_view/fetchCurrentMapping?key=0",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
-
+    NSString* mapUrlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/telliedb/_design/tellieQuery/_view/fetchCurrentMapping?key=0",[aSnotModel orcaDBUserName], [aSnotModel orcaDBPassword], [aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
+    
     NSString* webMapString = [mapUrlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     NSURL* mapUrl = [NSURL URLWithString:webMapString];
     NSLog(@"Querying : %@\n",mapUrl);
+    NSMutableURLRequest* mapUrlRequest = [NSMutableURLRequest requestWithURL:mapUrl
+                                                                 cachePolicy:0
+                                                             timeoutInterval:20];
     
     // Get data string from URL
     NSError* mapDataError =  nil;
+    NSURLResponse* mapUrlResponse;
+    NSData* mapData = [NSURLConnection sendSynchronousRequest:mapUrlRequest
+                                            returningResponse:&mapUrlResponse
+                                                        error:&mapDataError];
+    /*
     NSData* mapData = [NSData dataWithContentsOfURL:mapUrl
                                             options:NSDataReadingMapped
                                               error:&mapDataError];
-    if(mapDataError){
-        NSLog(@"%@\n",mapDataError);
+    */
+     if(mapDataError){
+        NSLog(@"\n%@\n\n",mapDataError);
     }
     NSString* mapReturnStr = [[NSString alloc] initWithData:mapData encoding:NSUTF8StringEncoding];
     // Format queried data to dictionary
