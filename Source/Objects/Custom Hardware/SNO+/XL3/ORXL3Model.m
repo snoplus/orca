@@ -3719,7 +3719,6 @@ void SwapLongBlock(void* p, int32_t n)
     }
     [self safeHvInit];
     NSLog(@"%@ panic down completed.\n", [[self xl3Link] crateName]);
-    //NSLog(@"%@ panic down completed, hit HV ON to recover\n", [[self xl3Link] crateName]);
 }
 
 //not used, we collect the objects from the controller now
