@@ -20,6 +20,7 @@
     NSMutableDictionary* smellieRunSettings;
     NSMutableDictionary* currentOrcaSettingsForSmellie;
     NSMutableDictionary* tellieRunDoc;
+    NSMutableDictionary* smellieRunDoc;
     NSTask* exampleTask;
     NSMutableDictionary* smellieRunHeaderDocList;
     ORRunModel* runControl;
@@ -37,7 +38,6 @@
     NSMutableDictionary* tellieFireParameters;
     NSMutableDictionary* tellieFibreMapping;
     BOOL ellieFireFlag;
-    
 }
 
 @property (nonatomic,retain) NSMutableDictionary* tellieFireParameters;
@@ -46,6 +46,7 @@
 @property (nonatomic,retain) NSMutableDictionary* smellieRunSettings;
 @property (nonatomic,retain) NSMutableDictionary* currentOrcaSettingsForSmellie;
 @property (nonatomic,retain) NSMutableDictionary* tellieRunDoc;
+@property (nonatomic,retain) NSMutableDictionary* smellieRunDoc;
 @property (nonatomic,assign) BOOL ellieFireFlag;
 @property (nonatomic,retain) NSTask* exampleTask;
 @property (nonatomic,retain) NSMutableDictionary* smellieRunHeaderDocList;
@@ -77,7 +78,8 @@
 -(bool)isELLIEFiring;
 
 // TELLIE database interactions
--(void) updateTellieDocument:(NSDictionary*)subRunDoc;
+-(void) pushInitialTellieRunDocument;
+-(void) updateTellieRunDocument:(NSDictionary*)subRunDoc;
 -(void) loadTELLIEStaticsFromDB;
 
 /************************/
@@ -99,6 +101,8 @@
 
 // SMELLIE database interactions
 -(void) fetchSmellieConfigurationInformation;
+-(void) pushInitialSmellieRunDocument;
+-(void) updateSmellieRunDocument:(NSDictionary*)subRunDoc;
 -(void) smellieDBpush:(NSMutableDictionary*)dbDic;
 -(void) smellieConfigurationDBpush:(NSMutableDictionary*)dbDic;
 -(NSNumber*) fetchRecentVersion;

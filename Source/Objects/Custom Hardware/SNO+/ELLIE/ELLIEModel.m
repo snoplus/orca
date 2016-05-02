@@ -71,6 +71,7 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
 @synthesize smellieSubRunInfo,
 pulseByPulseDelay,
 tellieRunDoc,
+smellieRunDoc,
 currentOrcaSettingsForSmellie,
 tellieSubRunSettings,
 smellieDBReadInProgress = _smellieDBReadInProgress;
@@ -139,7 +140,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
      */
 
     if(scriptFlag == YES){
-        [self _pushInitialTellieRunDocument];
+        [self pushInitialTellieRunDocument];
     } else {
         //add run control object
         NSArray*  runControlObjsArray = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
@@ -148,7 +149,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         if(![runControl isRunning]){
             [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
         } else if ([runControl isRunning]) {
-            [self _pushInitialTellieRunDocument];
+            [self pushInitialTellieRunDocument];
         }
     }
 }
@@ -440,8 +441,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 /*****************************/
 /*   tellie db interactions  */
 /*****************************/
-
--(void) _pushInitialTellieRunDocument
+-(void) pushInitialTellieRunDocument
 {
     /*
      Create a standard tellie run doc using ELLIEModel / SNOPModel / ORRunModel class
@@ -465,7 +465,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [runDocDict setObject:[self stringUnixFromDate:nil] forKey:@"issue_time_unix"];
     [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"issue_time_iso"];
     
-    //[runDocDict setObject:[NSMutableArray arrayWithObjects:[runControl runNumber],[runControl runNumber], nil] forKey:@"run_range"]; <<----- arrays take objects, not numbers. MAH 03/21/2016
     [runDocDict setObject:[NSMutableArray arrayWithObjects:[NSNumber numberWithUnsignedLong:[runControl runNumber]],[NSNumber numberWithUnsignedLong:[runControl runNumber]], nil] forKey:@"run_range"];
     
     [runDocDict setObject:subRunArray forKey:@"sub_run_info"];
@@ -481,7 +480,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     }
 }
 
-- (void) updateTellieDocument:(NSDictionary*)subRunDoc
+- (void) updateTellieRunDocument:(NSDictionary*)subRunDoc
 {
     /*
      Update self.tellieRunDoc with subrun information.
@@ -529,8 +528,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     // **********************************
     // Load latest calibration constants
     // **********************************
-    
     NSString* parsUrlString = [NSString stringWithFormat:@"%@:%u/telliedb/_design/tellieQuery/_view/fetchFireParameters?key=0",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
+
     NSString* webParsString = [parsUrlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     NSURL* parsUrl = [NSURL URLWithString:webParsString];
     NSLog(@"Querying : %@\n",parsUrl);
@@ -1137,6 +1136,78 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 -(void) smellieConfigurationDBpush:(NSMutableDictionary*)dbDic
 {
     [self _pushEllieConfigDocToDB:@"smellie" runFiletoPush:dbDic withDocType:@"smellie_run_configuration"];
+}
+
+-(void) pushInitialSmellieRunDocument
+{
+    /*
+     Create a standard smellie run doc using ELLIEModel / SNOPModel / ORRunModel class
+     variables and push up to the smelliedb. Additionally, the run doc dictionary set as
+     the tellieRunDoc propery, to be updated later in the run.
+     */
+    NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:10];
+    
+    NSArray*  objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    runControl = [objs3 objectAtIndex:0];
+    
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    
+    NSString* docType = [NSMutableString stringWithFormat:@"smellie_run"];
+    NSMutableArray* subRunArray = [NSMutableArray arrayWithCapacity:10];
+    
+    [runDocDict setObject:docType forKey:@"type"];
+    [runDocDict setObject:[NSString stringWithFormat:@"%i",0] forKey:@"version"];
+    [runDocDict setObject:[NSString stringWithFormat:@"%lu",[runControl runNumber]] forKey:@"index"];
+    [runDocDict setObject:[self stringUnixFromDate:nil] forKey:@"issue_time_unix"];
+    [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"issue_time_iso"];
+    [runDocDict setObject:[self fetchRecentVersion] forKey:@"configuration_version"];
+    [runDocDict setObject:[NSNumber numberWithInt:[runControl runNumber]] forKey:@"run"];
+    [runDocDict setObject:[NSMutableArray arrayWithObjects:[NSNumber numberWithUnsignedLong:[runControl runNumber]],[NSNumber numberWithUnsignedLong:[runControl runNumber]], nil] forKey:@"run_range"];
+    
+    [runDocDict setObject:subRunArray forKey:@"sub_run_info"];
+    
+    self.smellieRunDoc = runDocDict;
+    
+    [[aSnotModel orcaDbRefWithEntryDB:self withDB:@"smellie"] addDocument:runDocDict tag:kSmellieRunDocumentAdded];
+    
+    //wait for main thread to receive acknowledgement from couchdb
+    NSDate* timeout = [NSDate dateWithTimeIntervalSinceNow:2.0];
+    while ([timeout timeIntervalSinceNow] > 0 && ![self.smellieRunDoc objectForKey:@"_id"]) {
+        [NSThread sleepForTimeInterval:0.1];
+    }
+}
+
+- (void) updateSmellieRunDocument:(NSDictionary*)subRunDoc
+{
+    /*
+     Update self.tellieRunDoc with subrun information.
+     
+     Arguments:
+     NSDictionary* subRunDoc:  Subrun information to be added to the current self.tellieRunDoc.
+     */
+    NSMutableDictionary* runDocDict = [self.smellieRunDoc mutableCopy];
+    NSMutableDictionary* subRunDocDict = [subRunDoc mutableCopy];
+    
+    [subRunDocDict setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
+    
+    NSMutableArray * subRunInfo = [[runDocDict objectForKey:@"sub_run_info"] mutableCopy];
+    [subRunInfo addObject:subRunDocDict];
+    [runDocDict setObject:subRunInfo forKey:@"sub_run_info"];
+    
+    //Update tellieRunDoc property.
+    self.smellieRunDoc = runDocDict;
+    
+    //check to see if run is offline or not
+    if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
+        [[self orcaDbRefWithEntryDB:self withDB:@"smellie"]
+         updateDocument:runDocDict
+         documentId:[runDocDict objectForKey:@"_id"]
+         tag:kTellieRunDocumentUpdated];
+    }
+    [subRunInfo release];
+    [runDocDict release];
+    [subRunDocDict release];
 }
 
 -(void) _pushSmellieRunDocument
