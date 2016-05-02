@@ -4605,6 +4605,9 @@ void SwapLongBlock(void* p, int32_t n)
             
         } else {
             
+            [self setHvARamping:false];
+            [self setHvBRamping:false];
+            
             //check for voltage dropout (FIXME: add current checking)
             if (self.hvANeedsUserIntervention) {
                 if (fabs([self hvAVoltageReadValue] - [self hvAVoltageDACSetValue]/4096.*3000.) <= 100) {
