@@ -4423,22 +4423,6 @@ void SwapLongBlock(void* p, int32_t n)
         //do nothing without an xl3 connected
         if ([self xl3Link] && [[self xl3Link] isConnected]) {
             
-            /*
-            //first see of the xilinx has been initialized
-            char payload[XL3_PAYLOAD_SIZE];
-            memset(payload, 0, XL3_PAYLOAD_SIZE);
-            CheckXL3StateResults* result = (CheckXL3StateResults*)payload;
-            @try {
-                [[self xl3Link] sendCommand:CHECK_XL3_STATE_ID withPayload:payload expectResponse:YES];
-            } @catch (NSException *e) {
-                NSLog(@"%@ error reading XL3 init; error: %@ reason: %@\n", [[self xl3Link] crateName], [e name], [e reason]);
-                continue; // try again later if there was an error
-            }
-            
-            //if the xilinx has not been initialized we cannot read back HV settings, so try again later
-            if (!result->initialized) continue;
-            */
-            
             //now readback the HV settings according to the XL3
             @try {
                 [self readHVSwitchOn];
