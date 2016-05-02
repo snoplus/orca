@@ -4423,6 +4423,7 @@ void SwapLongBlock(void* p, int32_t n)
         //do nothing without an xl3 connected
         if ([self xl3Link] && [[self xl3Link] isConnected]) {
             
+            /*
             //first see of the xilinx has been initialized
             char payload[XL3_PAYLOAD_SIZE];
             memset(payload, 0, XL3_PAYLOAD_SIZE);
@@ -4436,6 +4437,7 @@ void SwapLongBlock(void* p, int32_t n)
             
             //if the xilinx has not been initialized we cannot read back HV settings, so try again later
             if (!result->initialized) continue;
+            */
             
             //now readback the HV settings according to the XL3
             @try {
