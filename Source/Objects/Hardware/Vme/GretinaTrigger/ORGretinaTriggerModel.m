@@ -528,9 +528,12 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
 {
     if([self isMaster]){
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollLock) object:nil];
-        unsigned long aValue = [self readRegister:kMiscCtl1];
-        [self writeRegister:kMiscCtl1 withValue:aValue |= (0x1<<6)]; //set the Imp Syn
-        [self setMiscCtl1Reg:       [self readRegister:kMiscCtl1]];  //display it
+        BOOL doInit = [[[aNote userInfo] objectForKey:@"doinit"] boolValue];
+        if(doInit){
+            unsigned long aValue = [self readRegister:kMiscCtl1];
+            [self writeRegister:kMiscCtl1 withValue:aValue |= (0x1<<6)]; //set the Imp Syn
+            [self setMiscCtl1Reg:       [self readRegister:kMiscCtl1]];  //display it
+        }
      }
 }
 
