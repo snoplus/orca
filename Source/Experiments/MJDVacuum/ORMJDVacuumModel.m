@@ -1736,7 +1736,8 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 - (void) checkRGARelatedConstraints:(ORRGA300Model*) rga
 {
 	BOOL rgaIsOn;
-	if(![rga isValid]) rgaIsOn = YES;
+    //if(![rga isValid]) rgaIsOn = YES;
+    if(![rga isValid]) rgaIsOn = NO;  //Matt Green asked that this be changed to NO 4/2/16
 	else rgaIsOn = [rga filamentIsOn];
 	
 	ORVacuumStatusLabel* turboRegionObj	= [statusDictionary objectForKey:[NSNumber numberWithInt:kRegionAboveTurbo]];
