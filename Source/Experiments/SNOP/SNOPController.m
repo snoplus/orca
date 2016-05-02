@@ -189,7 +189,7 @@ smellieRunFile;
     [model getSmellieRunListInfo];
     [self mtcDataBaseChanged:nil];
     [self runTypeWordChanged:nil];
-    [self refreshStandardRuns];
+    [self refreshStandardRuns:nil];
     [self updateSettings:nil];
     [super awakeFromNib];
     [self performSelector:@selector(updateWindow)withObject:self afterDelay:0.1];
@@ -462,7 +462,7 @@ smellieRunFile;
 - (void) dbOrcaDBIPChanged:(NSNotification*)aNote
 {
     [orcaDBIPAddressPU setStringValue:[model orcaDBIPAddress]];
-    [self refreshStandardRuns];
+    [self refreshStandardRuns:nil];
 }
 
 - (void) dbDebugDBIPChanged:(NSNotification*)aNote
@@ -1432,9 +1432,10 @@ smellieRunFile;
     
 }
 
-- (void) refreshStandardRuns {
+- (IBAction)refreshStandardRuns:(id)sender {
     
     //Clear stored SRs
+    [standardRunPopupMenu deselectItemAtIndex:[standardRunPopupMenu indexOfSelectedItem]];
     [standardRunPopupMenu removeAllItems];
     
     NSString* urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/orca/_design/standardRuns/_view/getStandardRuns",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort]];

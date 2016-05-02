@@ -1351,7 +1351,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <comboBox verticalHuggingPriority="750" id="xjE-ug-crJ">
-                                                        <rect key="frame" x="18" y="221" width="189" height="22"/>
+                                                        <rect key="frame" x="18" y="206" width="189" height="22"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <comboBoxCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="Standard Run" drawsBackground="YES" numberOfVisibleItems="10" id="12x-oz-P6Z">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1363,7 +1363,7 @@
                                                         </connections>
                                                     </comboBox>
                                                     <comboBox verticalHuggingPriority="750" id="0tV-8Q-LGs">
-                                                        <rect key="frame" x="18" y="177" width="174" height="22"/>
+                                                        <rect key="frame" x="18" y="162" width="174" height="22"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <comboBoxCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="Version" drawsBackground="YES" numberOfVisibleItems="10" id="HKw-bJ-vsh">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1375,7 +1375,7 @@
                                                         </connections>
                                                     </comboBox>
                                                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" id="qNy-JH-zTn">
-                                                        <rect key="frame" x="16" y="245" width="74" height="14"/>
+                                                        <rect key="frame" x="16" y="230" width="74" height="14"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="left" title="Run Type:" id="9Vj-zg-dZz">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1384,7 +1384,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" id="xdp-to-RxG">
-                                                        <rect key="frame" x="16" y="201" width="86" height="14"/>
+                                                        <rect key="frame" x="16" y="186" width="86" height="14"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="left" title="Test runs:" id="eCY-x0-2L5">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1392,30 +1392,8 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <button verticalHuggingPriority="750" id="ySv-iP-Vo5">
-                                                        <rect key="frame" x="13" y="138" width="158" height="28"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="push" title="Load Stored Values" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="N75-hx-Szw">
-                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="loadStandardRunFromDBAction:" target="-2" id="SJW-Zh-0Ce"/>
-                                                        </connections>
-                                                    </button>
-                                                    <button verticalHuggingPriority="750" id="MKV-rG-XIM">
-                                                        <rect key="frame" x="13" y="108" width="158" height="28"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="push" title="Load Default Values" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Kn4-wZ-8CA">
-                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="loadDefaultStandardRunFromDBDefaultAction:" target="-2" id="kxV-70-Iuy"/>
-                                                        </connections>
-                                                    </button>
                                                     <button toolTip="This button will save MTCD/A settings like thresholds and trigger masks" verticalHuggingPriority="750" allowsExpansionToolTips="YES" id="sQD-Yo-L3O">
-                                                        <rect key="frame" x="13" y="41" width="158" height="28"/>
+                                                        <rect key="frame" x="36" y="48" width="158" height="28"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Overwrite stored values" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="NCG-Lr-klR">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1426,7 +1404,7 @@
                                                         </connections>
                                                     </button>
                                                     <button toolTip="This button will save MTCD/A settings like thresholds and trigger masks" verticalHuggingPriority="750" allowsExpansionToolTips="YES" id="NXj-wA-0bA">
-                                                        <rect key="frame" x="13" y="11" width="158" height="28"/>
+                                                        <rect key="frame" x="36" y="18" width="158" height="28"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Overwrite default values" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="E3j-yj-nII">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1843,6 +1821,53 @@
                                                             </column>
                                                         </cells>
                                                     </matrix>
+                                                    <button verticalHuggingPriority="750" id="Gv3-u0-KqL">
+                                                        <rect key="frame" x="13" y="242" width="158" height="28"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Refresh Standard Runs" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="kjE-bk-bEs">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="refreshStandardRuns:" target="-2" id="nCm-Lp-3Qj"/>
+                                                        </connections>
+                                                    </button>
+                                                    <box verticalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="37L-IM-rPI">
+                                                        <rect key="frame" x="14" y="150" width="199" height="5"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                        <font key="titleFont" metaFont="system"/>
+                                                    </box>
+                                                    <box verticalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="tLz-ku-OKi">
+                                                        <rect key="frame" x="14" y="74" width="199" height="5"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                        <font key="titleFont" metaFont="system"/>
+                                                    </box>
+                                                    <button verticalHuggingPriority="750" id="ySv-iP-Vo5">
+                                                        <rect key="frame" x="36" y="123" width="158" height="28"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Load Stored Values" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="N75-hx-Szw">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="loadStandardRunFromDBAction:" target="-2" id="SJW-Zh-0Ce"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" id="MKV-rG-XIM">
+                                                        <rect key="frame" x="36" y="93" width="158" height="28"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Load Default Values" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Kn4-wZ-8CA">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="loadDefaultStandardRunFromDBDefaultAction:" target="-2" id="kxV-70-Iuy"/>
+                                                        </connections>
+                                                    </button>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
