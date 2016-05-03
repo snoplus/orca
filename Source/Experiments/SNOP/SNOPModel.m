@@ -680,6 +680,8 @@ err:
     /* Cold run start, so the XL3s were initialized. Still need to load
      * triggers and start the run. */
     @try {
+        [mtc_server okCommand:"queue_run_start"];
+
         /* Load MTC settings including triggers. */
         if ([mtc initAtRunStart: 1]) {
             NSLogColor([NSColor redColor], @"failed to load MTC settings at run start!\n");
