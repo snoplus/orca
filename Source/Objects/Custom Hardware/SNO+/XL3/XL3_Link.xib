@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6254" systemVersion="13F1077" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14F1605" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1050" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6254"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="XL3_LinkController">
@@ -60,6 +60,7 @@
                 <outlet property="hvATriggerStatusField" destination="4467" id="4486"/>
                 <outlet property="hvAVoltageReadField" destination="4463" id="4491"/>
                 <outlet property="hvAVoltageSetField" destination="4464" id="4488"/>
+                <outlet property="hvAcceptReadbackButton" destination="4206" id="mSj-4v-rdR"/>
                 <outlet property="hvBCurrentReadField" destination="4455" id="4492"/>
                 <outlet property="hvBOnStatusField" destination="4439" id="4484"/>
                 <outlet property="hvBStatusPanel" destination="4430" id="efI-Hh-E3Q"/>
@@ -84,7 +85,6 @@
                 <outlet property="hvTargetValueStepper" destination="4274" id="4501"/>
                 <outlet property="monIsPollingCMOSRatesButton" destination="3962" id="4027"/>
                 <outlet property="monIsPollingFECVoltagesButton" destination="3968" id="4028"/>
-                <outlet property="monIsPollingHVSupplyButton" destination="3974" id="4029"/>
                 <outlet property="monIsPollingPMTCurrentsButton" destination="3965" id="4030"/>
                 <outlet property="monIsPollingVerboseButton" destination="4004" id="4032"/>
                 <outlet property="monIsPollingWithRunButton" destination="4024" id="4033"/>
@@ -1192,17 +1192,6 @@
                                                             <action selector="monIsPollingXl3VoltagesAction:" target="-2" id="4045"/>
                                                         </connections>
                                                     </button>
-                                                    <button id="3974">
-                                                        <rect key="frame" x="15" y="98" width="113" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="HV power supply" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="3975">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="monIsPollingHVSupplyAction:" target="-2" id="4046"/>
-                                                        </connections>
-                                                    </button>
                                                     <box verticalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="4018">
                                                         <rect key="frame" x="18" y="89" width="330" height="5"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -1813,14 +1802,14 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button verticalHuggingPriority="750" id="4205">
-                                                        <rect key="frame" x="169" y="68" width="105" height="28"/>
+                                                        <rect key="frame" x="162" y="68" width="120" height="28"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="push" title="Get Status" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4206">
+                                                        <buttonCell key="cell" type="push" title="Accept Readback" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4206">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
                                                         <connections>
-                                                            <action selector="hvGetStatusAction:" target="-2" id="4482"/>
+                                                            <action selector="hvAcceptReadback:" target="-2" id="YUm-2t-udx"/>
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" id="4207">
