@@ -109,6 +109,7 @@
     IBOutlet NSButton* monVltThresholdInInitButton;
     IBOutlet NSButton* monVltThresholdSetButton;
     //hv
+    IBOutlet NSButtonCell *hvAcceptReadbackButton;
     IBOutlet NSButton *hvOnButton;
     IBOutlet NSButton *hvOffButton;
     IBOutlet NSButton *hvStepUpButton;
@@ -283,7 +284,7 @@
 - (IBAction)hvCheckInterlockAction:(id)sender;
 - (IBAction)hvTurnOnAction:(id)sender;
 - (IBAction)hvTurnOffAction:(id)sender;
-- (IBAction)hvGetStatusAction:(id)sender;
+- (IBAction)hvAcceptReadback:(id)sender;
 - (IBAction)hvTargetValueAction:(id)sender;
 - (IBAction)hvCMOSRateLimitAction:(id)sender;
 - (IBAction)hvCMOSRateIgnoreAction:(id)sender;
