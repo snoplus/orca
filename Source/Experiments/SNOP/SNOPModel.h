@@ -122,7 +122,7 @@
     RedisClient *mtc_server;
     RedisClient *xl3_server;
 
-    int doinit;
+    bool doinit;
 
     @private
         //Run type word

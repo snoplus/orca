@@ -113,6 +113,8 @@ logPort;
 {
     self = [super init];
 
+    /* By default, when ORCA starts, we have to initialize all the hardware. */
+    doinit = YES;
     rolloverRun = NO;
 
     /* initialize our connection to the MTC server */
@@ -275,6 +277,7 @@ logPort;
 {
     self = [super initWithCoder:decoder];
 
+    doinit = YES;
     rolloverRun = NO;
 
     [[self undoManager] disableUndoRegistration];
@@ -495,7 +498,6 @@ logPort;
     SNOCaenModel* caen;
     ORMTCModel* mtc;
     ORXL3Model* xl3;
-    enableTriggersDuringRunStart = 0;
     ORRunModel *run = [aNote object];
 
     uint32_t run_type = [run runType];
@@ -525,8 +527,6 @@ logPort;
 
         return;
     }
-
-    doinit = [[[aNote userInfo] objectForKey:@"doinit"] intValue];
 
     objs = [[(ORAppDelegate*)[NSApp delegate] document]
          collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
@@ -716,6 +716,10 @@ err:
 
 - (void) runStarted:(NSNotification*)aNote
 {
+    /* The run successfully started, so we don't need to initialize everything
+     * when the next run starts. */
+    doinit = NO;
+
     //initilise the run document
     self.runDocument = nil;
     //intialise the configuation document
@@ -750,6 +754,10 @@ err:
         [NSThread detachNewThreadSelector:@selector(_waitForBuffers)
                                  toTarget:self
                                withObject:nil];
+
+        /* This is hard run stop, so we need to reinitialize the hardware
+         * settings when the run starts. */
+        doinit = YES;
     }
 }
 
