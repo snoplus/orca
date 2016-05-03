@@ -492,7 +492,7 @@
             [model setTellieSubRunSettings:tellieSettings];
             [tellieSettings release];
             
-            tellieThread = [[NSThread alloc] initWithTarget:model selector:@selector(fireTellieFibre:) object:fireTellieCommands];
+            tellieThread = [[NSThread alloc] initWithTarget:model selector:@selector(fireTellieFibreMaster:) object:fireTellieCommands];
             [tellieThread start];
             //[model fireTellieFibre:fireTellieCommands];
         }
