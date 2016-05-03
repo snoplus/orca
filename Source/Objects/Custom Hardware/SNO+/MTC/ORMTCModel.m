@@ -314,9 +314,11 @@ resetFifoOnStart = _resetFifoOnStart;
     /* Setup Pedestal Crate Mask */
 	[self setPedestalCrateMask];
 
-    /* Setup the GT mask */
-    [self clearGlobalTriggerWordMask];
-    [self setSingleGTWordMask: uLongDBValue(kGtMask)];
+    if (loadTriggers) {
+        /* Setup the GT mask */
+        [self clearGlobalTriggerWordMask];
+        [self setSingleGTWordMask: uLongDBValue(kGtMask)];
+    }
 
     /* Setup GT Crate Mask */
     [self setGTCrateMask];
