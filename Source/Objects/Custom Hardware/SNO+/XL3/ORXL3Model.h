@@ -230,6 +230,8 @@ enum {
 - (void) wakeUp;
 - (void) sleep;
 
+- (int) initAtRunStart;
+
 - (void) awakeAfterDocumentLoaded;
 
 - (void) registerNotificationObservers;

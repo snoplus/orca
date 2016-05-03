@@ -491,50 +491,231 @@ logPort;
 
 - (void) runInitialization:(NSNotification*)aNote
 {
-    @try {
-        [mtc_server okCommand:"reset_gtid"];
-
-        /* Tell the MTC server to queue the run start. This will suspend
-         * the MTC readout and fire a SOFT_GT. When the run starts, we will
-         * resume the MTC readout */
-        [mtc_server okCommand:"queue_run_start"];
-    } @catch (NSException *e) {
-        /* Need to abort the run start here, because uncaught exceptions are
-         * not handled by ORCA during this phase of run start */
-        NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-                                    [e name], @"Reason",
-                                    [e reason], @"Details",
-                                    nil];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStartupAbort object: self userInfo: userInfo];
-    }
-}
-
-- (void) runAboutToStart:(NSNotification*)aNote
-{
-    if (rolloverRun) {
-        /* If this is a rollover run, we don't initialize any hardware. */
-        rolloverRun = NO;
-        return;
-    }
-
-    /* Post a notification telling all of the SNO+ hardware to load the
-     * current model settings to hardware. */
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"SNOPRunStart" object: self userInfo: nil];
-}
-
-- (void) runStarted:(NSNotification*)aNote
-{
+    NSArray* objs;
+    SNOCaenModel* caen;
+    ORMTCModel* mtc;
+    ORXL3Model* xl3;
+    enableTriggersDuringRunStart = 0;
     ORRunModel *run = [aNote object];
 
     uint32_t run_type = [run runType];
     uint32_t run_number = [run runNumber];
     uint32_t source_mask = 0; /* needs to come from the MANIP system */
 
-    /* send the run_start command to the MTC server which will send the
-     * run header record to the builder, resume the MTC readout, fire a
-     * SOFT_GT, and send a trigger record to the builder */
-    [mtc_server okCommand:"run_start %d %d %d", run_number, run_type, source_mask];
+    if (rolloverRun) {
+        /* If this is a rollover run, we don't initialize any hardware. */
+        rolloverRun = NO;
 
+        @try {
+            /* Tell the MTC server to queue the run start. This will suspend
+             * the MTC readout and fire a SOFT_GT. When the run starts, we will
+             * resume the MTC readout */
+            [mtc_server okCommand:"queue_run_start"];
+
+            /* send the run_start command to the MTC server which will send the
+             * run header record to the builder, resume the MTC readout, fire a
+             * SOFT_GT, and send a trigger record to the builder */
+            [mtc_server okCommand:"run_start %d %d %d", run_number, run_type, source_mask];
+        } @catch (NSException *e) {
+            /* Need to abort the run start here, because uncaught exceptions
+             * are not handled by ORCA during this phase of run start */
+            NSLogColor([NSColor redColor], @"failed to send queue_run_start to mtc server: %@", [e reason]);
+            goto err;
+        }
+
+        return;
+    }
+
+    doinit = [[[aNote userInfo] objectForKey:@"doinit"] intValue];
+
+    objs = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+
+    if ([objs count]) {
+        mtc = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"failed to find ORMTCModel. Please add it to the experiment and restart the run.\n");
+        goto err;
+    }
+
+    objs = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"SNOCaenModel")];
+
+    if ([objs count]) {
+        caen = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"failed to find SNOCaenModel. Please add it to the experiment and restart the run.\n");
+        goto err;
+    }
+
+    if (doinit) {
+        /* If doinit is set, that means this is a cold run start, so we
+         * initialize *all* the hardware, including the CAEN and the crates. */
+
+        /* make sure triggers are off */
+        [mtc_server okCommand:"set_gt_mask 0"];
+
+        /* Reset the GTID. */
+        [mtc_server okCommand:"reset_gtid"];
+
+        /* Load the CAEN settings. This should automatically reset it's
+         * counter to zero. */
+        if ([caen initAtRunStart]) {
+            NSLogColor([NSColor redColor], @"failed to load CAEN settings at run start!\n");
+            goto err;
+        }
+
+        /* Load standard run thresholds to the MTC model. Abort the run start
+         * if this fails. */
+        if ([self loadStandardRun:standardRunType withVersion:standardRunVersion]) {
+            NSLogColor([NSColor redColor], @"failed to load standard run settings at run start!\n");
+            goto err;
+        }
+
+        /* Load MTC settings except for triggers. */
+        if ([mtc initAtRunStart: 0]) {
+            NSLogColor([NSColor redColor], @"failed to load MTC settings at run start!\n");
+            goto err;
+        }
+
+        objs = [[(ORAppDelegate*)[NSApp delegate] document]
+             collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+
+        for (int i = 0; i < [objs count]; i++) {
+            /* Load XL3 settings. */
+            xl3 = [objs objectAtIndex:i];
+
+            if ([xl3 initAtRunStart]) {
+                NSLogColor([NSColor redColor], @"failed to load crate %i settings at run start!\n", [xl3 crateNumber]);
+                goto err;
+            }
+        }
+
+        /* The XL3 initAtRunStart function starts a separate thread to load
+         * the crate settings. It will post a run wait notification so that
+         * the next stage of the run start (runAboutToStart) won't happen
+         * until all of the settings are loaded, so we wait until then to
+         * enable triggers. */
+        return;
+    }
+
+    /* If doinit is zero, then we are doing a continuous run start. In this
+     * case we just load the MTC settings for the given standard run, but don't
+     * initialize the crates. In the future we need to check here whether the
+     * CAEN settings need to change because if so we cannot do this smoothly
+     * since writing to the CAEN causes it to reset it's internal counter, and
+     * so you essentially have to do a hard stop first. For now, the CAEN
+     * settings are not a part of the standard run settings and so we don't do
+     * this check. */
+    @try {
+        /* Tell the MTC server to queue the run start. This will suspend
+         * the MTC readout and fire a SOFT_GT. When the run starts, we will
+         * resume the MTC readout */
+        [mtc_server okCommand:"queue_run_start"];
+
+        /* Load standard run thresholds to the MTC model. Ideally here we would
+         * check and if the settings haven't changed, we wouldn't need to write
+         * anything, but currently this is not implemented. */
+        if ([self loadStandardRun:standardRunType withVersion:standardRunVersion]) {
+            NSLogColor([NSColor redColor], @"failed to load standard run settings at run start!\n");
+            goto err;
+        }
+
+        /* Load MTC settings including triggers. */
+        if ([mtc initAtRunStart: 1]) {
+            NSLogColor([NSColor redColor], @"failed to load MTC settings at run start!\n");
+            goto err;
+        }
+
+        /* send the run_start command to the MTC server which will send the
+         * run header record to the builder, resume the MTC readout, fire a
+         * SOFT_GT, and send a trigger record to the builder */
+        [mtc_server okCommand:"run_start %d %d %d", run_number, run_type, source_mask];
+    } @catch (NSException *e) {
+        /* Need to abort the run start here, because uncaught exceptions are
+         * not handled by ORCA during this phase of run start */
+        NSLogColor([NSColor redColor], @"failed to send queue_run_start to mtc server: %@", [e reason]);
+        goto err;
+    }
+
+    return;
+
+err:
+{
+    /* Post a notification to stop the run. We don't fill in the reason or
+     * details here because there should already be a reason in the log. */
+    NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                @"", @"Reason",
+                                @"", @"Details",
+                                nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStartupAbort object: self userInfo: userInfo];
+}
+}
+
+- (void) runAboutToStart:(NSNotification*)aNote
+{
+    NSArray *objs;
+    ORMTCModel* mtc;
+    ORRunModel *run = [aNote object];
+
+    uint32_t run_type = [run runType];
+    uint32_t run_number = [run runNumber];
+    uint32_t source_mask = 0; /* needs to come from the MANIP system */
+
+
+    objs = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+
+    if ([objs count]) {
+        mtc = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"failed to find ORMTCModel. Please add it to the experiment and restart the run.\n");
+        goto err;
+    }
+
+    if (!doinit) {
+        return;
+    }
+
+    /* Cold run start, so the XL3s were initialized. Still need to load
+     * triggers and start the run. */
+    @try {
+        /* Load MTC settings including triggers. */
+        if ([mtc initAtRunStart: 1]) {
+            NSLogColor([NSColor redColor], @"failed to load MTC settings at run start!\n");
+            goto err;
+        }
+
+        /* send the run_start command to the MTC server which will send the
+         * run header record to the builder, resume the MTC readout, fire a
+         * SOFT_GT, and send a trigger record to the builder */
+        [mtc_server okCommand:"run_start %d %d %d", run_number, run_type, source_mask];
+    } @catch (NSException *e) {
+        /* Need to abort the run start here, because uncaught exceptions are
+         * not handled by ORCA during this phase of run start */
+        NSLogColor([NSColor redColor], @"failed to send queue_run_start to mtc server: %@", [e reason]);
+        goto err;
+    }
+
+    return;
+
+err:
+{
+    /* Post a notification to stop the run. We don't fill in the reason or
+     * details here because there should already be a reason in the log. */
+    NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                @"", @"Reason",
+                                @"", @"Details",
+                                nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStartupAbort object: self userInfo: userInfo];
+    /* Post a notification telling all of the SNO+ hardware to load the
+     * current model settings to hardware. */
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"SNOPRunStart" object: self userInfo: nil];
+}
+}
+
+- (void) runStarted:(NSNotification*)aNote
+{
     //initilise the run document
     self.runDocument = nil;
     //intialise the configuation document
@@ -1507,25 +1688,42 @@ logPort;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
 }
 
-// Load Detector Settings from the DB into the Models
--(BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion
+- (int) loadStandardRun: (NSString*) runTypeName withVersion: (NSString*) runVersion
 {
+    /* Loads the MTC thresholds to the MTC model for a given standard run
+     * type name and version. Returns 0 on succcess, -1 on failure. */
+    NSArray*  objs;
+    ORRunModel* runControlModel;
+    ORMTCModel* mtcModel;
 
-    //Alert the operator
-    if(runTypeName == nil || runVersion == nil){
-        NSLog(@"Please, set a valid name and click enter. \n");
-        return false;
+    // Alert the operator if there is no run type name or version
+    if(runTypeName == nil || runVersion == nil) {
+        NSLog(@"Please, set a valid name and click enter.\n");
+        return -1;
     }
+
     NSLog(@"Loading settings for standard run: %@ - Version: %@ ........ \n",runTypeName, runVersion);
 
-    //Get RC model
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* runControlModel = [objs objectAtIndex:0];
-    //Get MTC model
-    objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    ORMTCModel* mtcModel = [objs objectAtIndex:0];
+    // Get RC model
+    objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    if ([objs count]) {
+        runControlModel = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"failed to load standard run: failed to find run control model. Please add it to the experiment.\n");
+        return -1;
+    }
 
-    //Query the OrcaDB and get a dictionary with the parameters
+    // Get MTC model
+    objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+
+    if ([objs count]) {
+        mtcModel = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"failed to load standard run: failed to find the mtc model. Please add it to the experiment.\n");
+        return -1;
+    }
+
+    // Query the OrcaDB and get a dictionary with the parameters
     NSString *urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/orca/_design/standardRuns/_view/getStandardRuns?startkey=[\"%@\",\"%@\",{}]&endkey=[\"%@\",\"%@\",0]&descending=True&include_docs=True",[self orcaDBUserName],[self orcaDBPassword],[self orcaDBIPAddress],[self orcaDBPort],runTypeName,runVersion,runTypeName,runVersion];
 
     NSString* urlStringScaped = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
@@ -1537,16 +1735,14 @@ logPort;
 
     if(error) {
         NSLog(@"Error querying couchDB, please check the connection is correct: \n %@ \n", ret);
-        return false;
+        return -1;
     }
     
-    //Load values
     @try{
-
-        //Load run type word
+        // Load run type word to the run control model
         [runControlModel setRunType:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"run_type_word"] unsignedLongValue]];
 
-        //Set pedestal mode if ECA
+        // Set pedestal mode if ECA
         if([runTypeName isEqualToString:@"ECA"]){
             [mtcModel setIsPedestalEnabledInCSR:1];
         }
@@ -1554,40 +1750,56 @@ logPort;
             [mtcModel setIsPedestalEnabledInCSR:0];
         }
         
-        //Load MTC/D parameters, trigger masks and MTC/A+ thresholds
-        for (int iparam=0; iparam<kDbLookUpTableSize; iparam++) {
+        // Load MTC/D parameters, trigger masks and MTC/A+ thresholds
+        for (int iparam=0; iparam < kDbLookUpTableSize; iparam++) {
             [mtcModel setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtcModel getDBKeyByIndex:iparam]] forIndex:iparam];
         }
         
-        NSLog(@"Standard run %@ settings loaded. \n",runTypeName);
-        return true;
+        NSLog(@"Standard run %@ settings loaded.\n", runTypeName);
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor], @"Error loading standard run parameters: %@", e);
+        return -1;
     }
-    @catch (NSException *e) {
-        NSLog(@"Error ",e);
-        return false;
-    }
-    
+
+    return 0;
 }
 
-//Save MTC settings in a Standard Run table in CouchDB for later use by the Run Scripts or the user
--(BOOL) saveStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion
+- (int) saveStandardRun: (NSString*) runTypeName withVersion: (NSString*) runVersion
 {
+    /* Save MTC settings in a Standard Run table in CouchDB for later use by
+     * the Run Scripts or the user. Returns 0 on success, -1 on failure. */
+    NSArray*  objs;
+    ORRunModel* runControlModel;
+    ORMTCModel* mtcModel;
     
-    //Check that runTypeName is properly set:
+    // Check that runTypeName is properly set:
     if(runTypeName == nil || runVersion == nil){
         ORRunAlertPanel(@"Invalid Standard Run Name",@"Please, set a valid name in the popup menus and click enter",@"OK",nil,nil);
-        return false;
+        return -1;
     }
+
     NSLog(@"Saving settings for Standard Run: %@ - Version: %@ ........ \n",runTypeName,runVersion);
 
-    //Get RC model
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* runControlModel = [objs objectAtIndex:0];
-    //Get MTC model
-    objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    ORMTCModel* mtcModel = [objs objectAtIndex:0];
+    // Get RC model
+    objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    if ([objs count]) {
+        runControlModel = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"failed to load standard run: failed to find run control model. Please add it to the experiment.\n");
+        return -1;
+    }
 
-    //Build run table
+    // Get MTC model
+    objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+
+    if ([objs count]) {
+        mtcModel = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"failed to load standard run: failed to find the mtc model. Please add it to the experiment.\n");
+        return -1;
+    }
+
+    // Build run table
     NSMutableDictionary *detectorSettings = [NSMutableDictionary dictionaryWithCapacity:200];
     
     [detectorSettings setObject:@"standard_run" forKey:@"type"];
@@ -1597,17 +1809,15 @@ logPort;
     [detectorSettings setObject:date forKey:@"time_stamp"];
     [detectorSettings setObject:[NSNumber numberWithUnsignedLong:[runControlModel runType]] forKey:@"run_type_word"];
 
-    //Save MTC/D parameters, trigger masks and MTC/A+ thresholds
+    // Save MTC/D parameters, trigger masks and MTC/A+ thresholds
     for (int iparam=0; iparam<kDbLookUpTableSize; iparam++) {
-        // NSLog(@" Writting %@ to %@ \n", [mtcModel dbObjectByIndex:ithres+kNHit100HiThreshold], [thresholdNames objectAtIndex:ithres]);
         [detectorSettings setObject:[mtcModel dbObjectByIndex:iparam] forKey:[mtcModel getDBKeyByIndex:iparam]];
     }
     
     [[self orcaDbRefWithEntryDB:self withDB:@"orca"] addDocument:detectorSettings tag:@"kStandardRunDocumentAdded"];
 
     NSLog(@"%@ run saved as standard run. \n",runTypeName);
-    return true;
-
+    return 0;
 }
 
 

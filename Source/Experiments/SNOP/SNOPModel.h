@@ -122,6 +122,8 @@
     RedisClient *mtc_server;
     RedisClient *xl3_server;
 
+    int doinit;
+
     @private
         //Run type word
         unsigned long runTypeWord;
@@ -281,8 +283,8 @@
 -(void) testerHv;
 
 //Standard runs functions
--(BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
--(BOOL) saveStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
+-(int) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
+-(int) saveStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
 
 @end
 
