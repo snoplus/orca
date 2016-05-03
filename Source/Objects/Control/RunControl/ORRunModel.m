@@ -1417,6 +1417,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
                                         [NSNumber numberWithLong:[[ORGlobal sharedGlobal] runMode]],  kRunMode,
                                         [NSNumber numberWithFloat:elapsedRunTime],  kElapsedTime,
                                         [NSNumber numberWithBool:willRestart],@"willRestart",
+                                        [NSNumber numberWithInt:!quickStart && willRestart], @"doinit",
                                         nil];
 
             [[NSNotificationCenter defaultCenter] postNotificationName:ORRunAboutToStopNotification
@@ -1501,7 +1502,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 		[NSThread setThreadPriority:1];
 		
-        NSDictionary* statusInfo = [NSDictionary
+       NSDictionary* statusInfo = [NSDictionary
 									dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:eRunStopped],ORRunStatusValue,
                                     [NSNumber numberWithUnsignedLong:runNumber],kRunNumber,
                                     [NSNumber numberWithUnsignedLong:subRunNumber],kSubRunNumber,
@@ -1509,6 +1510,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
                                     [NSNumber numberWithFloat:elapsedRunTime],  kElapsedTime,
 									@"Not Running",ORRunStatusString,
                                     [NSNumber numberWithBool:willRestart],@"willRestart",
+                                    [NSNumber numberWithInt:!quickStart && willRestart], @"doinit",
 									dataPacket,@"DataPacket",nil];
         
         

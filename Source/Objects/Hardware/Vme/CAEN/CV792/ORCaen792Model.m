@@ -628,10 +628,13 @@ NSString* ORCaen792ModelShipTimeStampChanged          = @"ORCaen792ModelShipTime
     // Set options
  	location =  (([self crateNumber]&0xf)<<21) | (([self slot]& 0x0000001f)<<16) && (shipTimeStamp & 0x1); //doesn't change so do it here.
 
-    [self initBoard];
+    BOOL doInit = [[userInfo objectForKey:@"doinit"] boolValue];
+    if(doInit){
+        [self initBoard];
     
-    if(cycleZeroSuppression){
-        [self startCyclingZeroSuppression];
+        if(cycleZeroSuppression){
+            [self startCyclingZeroSuppression];
+        }
     }
 	isRunning = NO;
     [self startRates];
@@ -738,11 +741,14 @@ NSString* ORCaen792ModelShipTimeStampChanged          = @"ORCaen792ModelShipTime
 
 - (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
-    [self stopCyclingZeroSuppression];
 	[qdcRateGroup stop];
 	isRunning = NO;
-    [self clearData];
-
+    
+    BOOL doInit = [[userInfo objectForKey:@"doinit"] boolValue];
+    if(doInit){
+        [self stopCyclingZeroSuppression];
+        [self clearData];
+    }
     [super runTaskStopped:aDataPacket userInfo:userInfo];
 }
 

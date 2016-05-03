@@ -110,6 +110,8 @@ enum {
     BOOL hvBRamping;
     BOOL hvEverUpdated;
     BOOL hvSwitchEverUpdated;
+    BOOL hvANeedsUserIntervention;
+    BOOL hvBNeedsUserIntervention;
     
     NSString* triggerStatus;
     BOOL _isTriggerON;
@@ -132,7 +134,6 @@ enum {
     unsigned long _hvBNextStepValue;
     unsigned long _hvNominalVoltageA;
     unsigned long _hvNominalVoltageB;
-    BOOL _hvPanicFlag;
     NSLock* hvInitLock;
     NSThread* hvInitThread;
     NSThread* hvThread;
@@ -183,14 +184,19 @@ enum {
 @property (nonatomic,assign) BOOL hvBSwitch;
 @property (nonatomic,copy) NSString* triggerStatus;
 @property (nonatomic,assign) BOOL isTriggerON;
+//ADC counts (3kV 12bit)
 @property (nonatomic,assign) unsigned long hvAVoltageDACSetValue;
 @property (nonatomic,assign) unsigned long hvBVoltageDACSetValue;
+//volts
 @property (nonatomic,assign) float hvAVoltageReadValue;
 @property (nonatomic,assign) float hvBVoltageReadValue;
+//mili amps
 @property (nonatomic,assign) float hvACurrentReadValue;
 @property (nonatomic,assign) float hvBCurrentReadValue;
+//ADC counts (3kV 12bit)
 @property (nonatomic,assign) unsigned long hvAVoltageTargetValue;
 @property (nonatomic,assign) unsigned long hvBVoltageTargetValue;
+//volts
 @property (nonatomic,assign) unsigned long hvNominalVoltageA;
 @property (nonatomic,assign) unsigned long hvNominalVoltageB;
 @property (nonatomic,assign) BOOL calcCMOSRatesFromCounts;
@@ -198,10 +204,10 @@ enum {
 @property (nonatomic,assign) unsigned long hvBCMOSRateLimit;
 @property (nonatomic,assign) unsigned long hvACMOSRateIgnore;
 @property (nonatomic,assign) unsigned long hvBCMOSRateIgnore;
+//ADC counts (3kV 12bit)
 @property (nonatomic,assign) unsigned long hvANextStepValue;
 @property (nonatomic,assign) unsigned long hvBNextStepValue;
 @property (nonatomic,assign) unsigned long hvCMOSReadsCounter;
-@property (nonatomic,assign) BOOL hvPanicFlag;
 @property (nonatomic,assign) BOOL isXl3VltThresholdInInit;
 @property (nonatomic,assign) int xl3LinkTimeOut;
 @property (nonatomic,assign) BOOL xl3InitInProgress;
@@ -213,7 +219,8 @@ enum {
 @property BOOL hvSwitchEverUpdated;
 @property BOOL hvARamping;
 @property BOOL hvBRamping;
-
+@property BOOL hvANeedsUserIntervention;
+@property BOOL hvBNeedsUserIntervention;
 
 #pragma mark •••Initialization
 - (id)   init;
@@ -353,6 +360,8 @@ enum {
 
 - (void) readHVStatus:(HVReadbackResults*)status;
 - (void) readHVStatus;
+
+- (void) hvUserIntervention:(BOOL)forA;
 
 - (void) setHVRelays:(unsigned long long)relayMask error:(unsigned long*)aError;
 - (void) setHVRelays:(unsigned long long)relayMask;

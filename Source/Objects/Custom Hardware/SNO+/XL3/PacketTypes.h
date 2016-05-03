@@ -55,6 +55,7 @@
 #define READ_PMT_CURRENT_ID	      (0x43) //!< reads pmt current from FEC hv csr	
 #define SETUP_CHARGE_INJ_ID		    (0x44) //!< setup charge injection in FEC hv csr
 #define MULTI_SETUP_CHARGE_INJ_ID (0x45) //!< setup charge injection for multiple fecs and set dac level
+#define DO_PANIC_DOWN             (0x46) //!< Ramps crate HV to zero
 // Tests
 #define FEC_TEST_ID               (0x60) //!< check read/write to FEC registers
 #define MEM_TEST_ID               (0x61) //!< check read/write to FEC ram, address lines
@@ -365,6 +366,10 @@ typedef struct{
 typedef struct{
   uint32_t errorFlags;
 } SetUpChargeInjResults;
+
+typedef struct{
+    uint32_t errorFlags;
+}DoPanicDownResults;
 
 typedef struct{
   uint32_t slotMask;
