@@ -55,6 +55,7 @@
 @property (nonatomic,assign) float pulseByPulseDelay;
 
 -(id) init;
+-(id) initWithCoder:(NSCoder *)aCoder;
 -(void) setUpImage;
 -(void) makeMainController;
 -(void) wakeUp;

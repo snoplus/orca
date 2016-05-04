@@ -1096,13 +1096,14 @@ smellieRunFile;
     //start different sub runs as the laser runs through
     //communicate with smellie model
     
+    ELLIEModel* theELLIEModel = nil;
     //Collect a series of objects from the ELLIEModel
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
     if ([objs count]) {
       //get the ELLIE Model object
-      ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
+      theELLIEModel = [objs objectAtIndex:0];
     } else { 
-      reasonStr = @"ELLIE model not available, add an ELLIE model to your experiment";
+      NSString* reasonStr = @"ELLIE model not available, add an ELLIE model to your experiment";
       NSException* e = [NSException
 			exceptionWithName:@"NoEllieModel"
 			reason:reasonStr
@@ -1168,12 +1169,13 @@ smellieRunFile;
     //[model setRunType:kRunUndefined];
     
     //Collect a series of objects from the ELLIEModel
+    ELLIEModel* theELLIEModel = nil;
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
     if ([objs count]) {
       //get the ELLIE Model object
-      ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
+      theELLIEModel = [objs objectAtIndex:0];
     } else {
-      reasonStr = @"ELLIE model not available, add an ELLIE model to your experiment";
+      NSString* reasonStr = @"ELLIE model not available, add an ELLIE model to your experiment";
       NSException* e = [NSException
                         exceptionWithName:@"NoEllieModel"
                         reason:reasonStr

@@ -76,12 +76,25 @@ currentOrcaSettingsForSmellie,
 tellieSubRunSettings,
 smellieDBReadInProgress = _smellieDBReadInProgress;
 
+
+
 /*********************************************************/
 /*                  Class control methods                */
 /*********************************************************/
 - (id) init
 {
     self = [super init];
+    if (self){
+        _tellieClient = [[XmlrpcClient alloc] initWithHostName:@"daq1" withPort:@"5030"];
+        _smellieClient = [[XmlrpcClient alloc] initWithHostName:@"snodrop" withPort:@"5020"];
+    }
+    return self;
+}
+
+-(id) initWithCoder:(NSCoder *)aCoder
+{
+    self = [super initWithCoder:aCoder];
+    
     if (self){
         _tellieClient = [[XmlrpcClient alloc] initWithHostName:@"daq1" withPort:@"5030"];
         _smellieClient = [[XmlrpcClient alloc] initWithHostName:@"snodrop" withPort:@"5020"];
@@ -365,11 +378,11 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         // Set-up delays to wait until tellie has stopped firing
         double timeBetweenShotsInMicroSeconds = [[fireCommands objectForKey:@"pulse_rate"] doubleValue]/(1000.0);
         if(pulseByPulseDelay < 0.1){
-            NSLog(@"Pulse by pulse delay is too small. Setting to 0.1");
+            NSLog(@"Pulse by pulse delay is too small. Setting to 0.1\n");
             pulseByPulseDelay = 0.1;
         }
         else if (pulseByPulseDelay > 25.0){
-            NSLog(@"Pulse by pulse delay is too small. Setting to 25.0");
+            NSLog(@"Pulse by pulse delay is too small. Setting to 25.0\n");
             pulseByPulseDelay = 25.0;
         } else{
         //do nothing 
@@ -383,19 +396,21 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         if(i == 0){
             NSArray* fireArgs = @[[[fireCommands objectForKey:@"channel"] stringValue],
                                   [noShots stringValue],
-                                  [[fireCommands objectForKey:@"pulse_rate"] stringValue],
+                                  [[NSNumber numberWithFloat:1.] floatValue] / [[fireCommands objectForKey:@"pulse_rate"] floatValue],
                                   [[fireCommands objectForKey:@"trigger_delay"] stringValue],
                                   [[fireCommands objectForKey:@"pulse_width"] stringValue],
                                   [[fireCommands objectForKey:@"pulse_height"] stringValue],
                                   [[fireCommands objectForKey:@"fibre_delay"] stringValue],
                                   ];
-            NSLog(@"Initing tellie with settings");
+            NSLog(@"Init-ing tellie with settings\n");
             [_tellieClient command:@"init_channel" withArgs:fireArgs];
         }
         // Set number of pulses to be fired in this sub - run
-        NSLog(@"Setting number of pulses");
+        NSLog(@"Setting number of pulses\t");
+        NSLog(@"%@",[_tellieClient command:@"check_ready"]);
         [_tellieClient command:@"set_pulse_number" withArgs:@[noShots]];
-
+        NSLog(@"%@",[_tellieClient command:@"check_ready"]);
+        
         NSLog(@"***** FIRING %d TELLIE PULSES *****\n",[noShots integerValue]);
         [_tellieClient command:@"fire_sequence"];
         NSLog(@"After fire command");
