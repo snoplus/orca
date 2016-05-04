@@ -189,7 +189,7 @@ smellieRunFile;
     [model getSmellieRunListInfo];
     [self mtcDataBaseChanged:nil];
     [self runTypeWordChanged:nil];
-    [self refreshStandardRuns];
+    [self refreshStandardRuns:nil];
     [self updateSettings:nil];
     [super awakeFromNib];
     [self performSelector:@selector(updateWindow)withObject:self afterDelay:0.1];
@@ -326,17 +326,19 @@ smellieRunFile;
 
 -(void) SRTypeChanged:(NSNotification*)aNote
 {
-    
-    [self refreshStandardRunVersions];
-    
+    if([[model standardRunType] isEqualToString:@"HIGH THRESHOLDS"]) {
+        [model setStandardRunVersion:@"DEFAULT"];
+    } else {
+        [self refreshStandardRunVersions];
+    }
 }
 
 -(void) SRVersionChanged:(NSNotification*)aNote
 {
+    [standardRunVersionPopupMenu selectItemWithObjectValue:[model standardRunVersion]];
     
     [self displayThresholdsFromDB];
     [self runTypeWordChanged:nil];
-    
 }
 
 - (IBAction)maintenanceBoxAction:(id)sender {
@@ -344,102 +346,57 @@ smellieRunFile;
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* mainRunControl = [objs objectAtIndex:0];
     if([maintenanceRunBox state]){
-        [runControl setRunType:[mainRunControl runType] | (eMaintenanceRunType)];
+        [runControl setRunType:([mainRunControl runType] & ~(0x1FFE)) | (eMaintenanceRunType)]; //Maintenance is now mutually exclusive
     }
-    else if(![maintenanceRunBox state]){
+    else{
         [runControl setRunType:[mainRunControl runType] & ~(eMaintenanceRunType)];
     }
     
 }
 
-// Currently use the default startRunAction of the superclass ORExperimentController.
-// Leave this here in case a custom function is needed
-//- (IBAction) startRunAction:(id)sender
-//{
-//    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-//    ORRunModel* theRunControl = [objs objectAtIndex:0];
-//	if([[theRunControl document] isDocumentEdited]){
-//		[[theRunControl document] afterSaveDo:@selector(startRun) withTarget:self];
-//        [[theRunControl document] saveDocument:nil];
-//    }
-//	else [self startRun];
-////    [currentStatus setStringValue:[self getStartingString]];
-//
-//    NSLog(@"Sender: %@",[sender title]);
-//
-//    //decide whether to issue a standard Physics run or a maintainence run
-//    if([[sender title] isEqualToString:@"Start Physics Run"]){
-//        //[model setRunType:kRunStandardPhysicsRun];
-//    }
-//    else if ([[sender title] isEqualToString:@"Start Run"]){
-//        //[model setRunType:kRunMaintainence];
-//        NSLog(@"Starting a run from SNOP");
-//    }
-//    else{
-//        NSLog(@"SNOP_CONTROL:Run isn't correctly defined. Please check NSButton titles");
-//        //[model setRunType:kRunUndefined];
-//    }
-//
-//
-//}
+- (IBAction) startRunAction:(id)sender
+{
+    //Load selected SR in case the user didn't click enter
+    NSString *standardRun = [standardRunPopupMenu objectValueOfSelectedItem];
+    NSString *standardRunVersion = [[standardRunVersionPopupMenu objectValueOfSelectedItem] copy];//The pointer will be unset with the next
+    //command, so we need to copy it beforehand. Will be released afterwards.
+    [model setStandardRunType:standardRun];
+    [model setStandardRunVersion:standardRunVersion];
 
-// Funtion called by custom startRunAction.
-//- (void) startRun
-//{
-//    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-//    ORRunModel* theRunControl = [objs objectAtIndex:0];
-//	[theRunControl performSelector:@selector(startRun)withObject:nil afterDelay:.1];
-//}
+    //Load values into model
+    [model loadStandardRun:standardRun withVersion:standardRunVersion];
 
+    //Start or restart the run
+    if([runControl isRunning])[runControl restartRun];
+    else [runControl startRun];
+    
+    [standardRunVersion release];
+}
 
-// Custom resstart run method. Not used so far until we figure out how to deal with the rollover runs.
-//- (IBAction)newRunAction:(id)sender {
-//    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-//    ORRunModel* theRunControl = [objs objectAtIndex:0];
-//    [theRunControl setForceRestart:YES];
-//    [theRunControl performSelector:@selector(stopRun) withObject:nil afterDelay:0];
-//    [runStatusField setStringValue:[self getRestartingString]];
-//
-//    NSLog(@"Sender: %@",[sender title]);
-//
-//    if([[sender title] isEqualToString:@"New Physics Run"]){
-//        //[model setRunType:kRunStandardPhysicsRun];
-//    }
-//    else if ([[sender title] isEqualToString:@"New Maint. Run"]){
-//        //[model setRunType:kRunMaintainence];
-//    }
-//    else{
-//        NSLog(@"SNOP_CONTROL:Run isn't correctly defined. Please check NSButton titles");
-//        //[model setRunType:kRunUndefined];
-//    }
-//
-//}
-
-// Currently use the default stopRunAction of the superclass ORExperimentController.
-// Leave this here in case a custom function is needed
-//- (IBAction)stopRunAction:(id)sender {
-//    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-//    ORRunModel* theRunControl = [objs objectAtIndex:0];
-//    [theRunControl performSelector:@selector(haltRun)withObject:nil afterDelay:.1];
-//    [currentStatus setStringValue:[self getStoppingString]];
-//
-//    //reset the run Type to be undefined
-//    //[model setRunType:kRunUndefined];
-//}
+- (IBAction) stopRunAction:(id)sender
+{
+    [runControl haltRun];
+}
 
 - (void) runStatusChanged:(NSNotification*)aNotification{
     
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* theRunControl = [objs objectAtIndex:0];
     if([theRunControl runningState] == eRunInProgress){
+        [startRunButton setEnabled:true];
+        [startRunButton setTitle:@"RESTART RUN"];
         [lightBoardView setState:kGoLight];
 	}
 	else if([theRunControl runningState] == eRunStopped){
+        [startRunButton setEnabled:true];
+        [startRunButton setTitle:@"START RUN"];
         [lightBoardView setState:kStoppedLight];
 	}
 	else if([theRunControl runningState] == eRunStarting || [theRunControl runningState] == eRunStopping || [theRunControl runningState] == eRunBetweenSubRuns){
         if([theRunControl runningState] == eRunStarting){
             //The run started so update the display
+            [startRunButton setEnabled:false];
+            [startRunButton setTitle:@"STARTING..."];
             [standardRunTypeField setStringValue:[model standardRunType]];
             [standardRunVersionField setStringValue:[model standardRunVersion]];
             [runTypeWordField setStringValue:[NSString stringWithFormat:@"0x%X",(int)[model runTypeWord]]]; //FIXME: revisit if we go over 32 bits
@@ -462,7 +419,7 @@ smellieRunFile;
 - (void) dbOrcaDBIPChanged:(NSNotification*)aNote
 {
     [orcaDBIPAddressPU setStringValue:[model orcaDBIPAddress]];
-    [self refreshStandardRuns];
+    [self refreshStandardRuns:nil];
 }
 
 - (void) dbDebugDBIPChanged:(NSNotification*)aNote
@@ -672,6 +629,12 @@ smellieRunFile;
     [model debugDBPing];
 }
 
+- (IBAction) setHighThreholdsAction:(id)sender
+{
+    NSLog(@"Setting detector to a safe state...\n");
+    [model loadOfflineRun];
+}
+
 - (IBAction)hvMasterPanicAction:(id)sender
 {
     [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
@@ -735,7 +698,23 @@ smellieRunFile;
     
 }
 
+- (IBAction) reportAction:(id)sender {
+    NSString *url = [NSString stringWithFormat:@"https://github.com/snoplus/orca/issues/new"];
+    NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlScaped]];
+}
 
+- (IBAction) logAction:(id)sender {
+    NSString *url = [NSString stringWithFormat:@"http://snopl.us/shift/"];
+    NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlScaped]];
+}
+
+- (IBAction) opManualAction:(id)sender {
+    NSString *url = [NSString stringWithFormat:@"https://www.snolab.ca/snoplus/TWiki/bin/view/Main/OperatorManual"];
+    NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlScaped]];
+}
 
 - (IBAction)hvMasterTriggersON:(id)sender
 {
@@ -1101,7 +1080,6 @@ smellieRunFile;
 
 - (IBAction)refreshRunWordLabels:(id)sender {
     NSArray* theNames = [runControl runTypeNames];
-
     int n = [theNames count];
     for(int i=1;i<n;i++){
         [[runTypeWordMatrix cellAtRow:i column:0] setTitle:[theNames objectAtIndex:i]];
@@ -1145,8 +1123,12 @@ smellieRunFile;
     [standardRunSaveDefaultsButton setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunLoadButton setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunLoadDefaultsButton setEnabled:!lockedOrNotRunningMaintenance];
-    [maintenanceRunBox setEnabled:!lockedOrNotRunningMaintenance];
+    [maintenanceRunBox setEnabled:!locked];
     [runTypeWordMatrix setEnabled:!lockedOrNotRunningMaintenance];
+    [standardRunVersionPopupMenu setEnabled:!lockedOrNotRunningMaintenance];
+    [timedRunCB setEnabled:!lockedOrNotRunningMaintenance];
+    [timeLimitField setEnabled:!lockedOrNotRunningMaintenance];
+    [repeatRunCB setEnabled:!lockedOrNotRunningMaintenance];
     
     //Display status
     [runStatusTextField setStringValue:@"UNLOCKED"];
@@ -1293,13 +1275,14 @@ smellieRunFile;
 
 - (IBAction)standardRunVersionPopupAction:(id)sender {
     
-    //Create new SR version if does not exist
     NSString *standardRun = [standardRunPopupMenu stringValue];
     NSString *standardRunVer = [standardRunVersionPopupMenu stringValue];
-    if([standardRunVer isEqualToString:@"DEFAULT"]) {
-        ORRunAlertPanel([NSString stringWithFormat:@"Can create a version called DEFAULT"], @"It is a protected word",@"Cancel",@"OK",nil);
-        return;
-    }
+//    if([standardRunVer isEqualToString:@"DEFAULT"]) {
+//        ORRunAlertPanel([NSString stringWithFormat:@"Can create a version called DEFAULT"], @"It is a protected word",@"Cancel",@"OK",nil);
+//        return;
+//    }
+
+    //Create new SR version if does not exist
     if ([standardRunVersionPopupMenu indexOfItemWithObjectValue:standardRunVer] == NSNotFound && [standardRunVer isNotEqualTo:@""]){
         BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Creating new Version: \"%@\" of Standard Run: \"%@\"", standardRunVer, standardRun], @"Is this really what you want?",@"Cancel",@"Yes, Make New Version",nil);
         if(cancel){
@@ -1321,7 +1304,6 @@ smellieRunFile;
 {
     unsigned long currentRunWord = [runControl runType];
     [model setRunTypeWord:currentRunWord];
-
     //Update display
     for(int i=0;i<32;i++){
         [[runTypeWordMatrix cellAtRow:i column:0] setState:(currentRunWord &(1L<<i))!=0];
@@ -1329,10 +1311,11 @@ smellieRunFile;
 
     //Special maintenance box
     [maintenanceRunBox setState:(currentRunWord &(1L<<0))!=0];
+    
 }
 
 -(void) displayThresholdsFromDB {
-    
+
     //Get MTC model
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     ORMTCModel* mtcModel = [objs objectAtIndex:0];
@@ -1342,6 +1325,7 @@ smellieRunFile;
         for (int i=0; i<[standardRunThresDefaultValues numberOfRows];i++) {
             [[standardRunThresStoredValues cellAtRow:i column:0] setStringValue:@"--"];
         }
+        NSLog(@"Standard Run Version not set \n");
         return;
     }
     
@@ -1375,12 +1359,12 @@ smellieRunFile;
         return;
     }
     
-    //DEFULTS
+    //DEFAULTS
     if([[defaultSettings valueForKey:@"rows"] count] == 0){
         for (int i=0; i<[standardRunThresDefaultValues numberOfRows];i++) {
             [[standardRunThresDefaultValues cellAtRow:i column:0] setStringValue:@"--"];
         }
-        NSLog(@"Couldn't retrieve SR DEFAULT values. Error querying couchDB, please check the connection is correct. Error: \n %@ \n", error);
+        NSLog(@"Cannot display DEFAULT values. There was some problem with the Standard Run DataBase. \n");
     } else {
         [[standardRunThresDefaultValues cellAtRow:0 column:0] setIntValue:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Hi,Threshold"] intValue]];
         [[standardRunThresDefaultValues cellAtRow:1 column:0] setIntValue:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Med,Threshold"] intValue]];
@@ -1405,7 +1389,7 @@ smellieRunFile;
         for (int i=0; i<[standardRunThresStoredValues numberOfRows];i++) {
             [[standardRunThresStoredValues cellAtRow:i column:0] setStringValue:@"--"];
         }
-        NSLog(@"Couldn't retrieve SR VERSION values. Error querying couchDB, please check the connection is correct. Error: \n %@ \n", error);
+        NSLog(@"Cannot display TEST RUN values. There was some problem with the Standard Run DataBase. \n");
     } else {
         [[standardRunThresStoredValues cellAtRow:0 column:0] setIntValue:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Hi,Threshold"] intValue]];
         [[standardRunThresStoredValues cellAtRow:1 column:0] setIntValue:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Med,Threshold"] intValue]];
@@ -1427,11 +1411,13 @@ smellieRunFile;
     
 }
 
-- (void) refreshStandardRuns {
+- (IBAction)refreshStandardRuns:(id)sender {
     
     //Clear stored SRs
+    [standardRunPopupMenu deselectItemAtIndex:[standardRunPopupMenu indexOfSelectedItem]];
     [standardRunPopupMenu removeAllItems];
     
+    //Now query DB and fetch the SRs
     NSString* urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/orca/_design/standardRuns/_view/getStandardRuns",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort]];
     NSString* link = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:link] cachePolicy:0 timeoutInterval:2];
@@ -1488,7 +1474,7 @@ smellieRunFile;
         NSString *runtype = [[entry valueForKey:@"key"] objectAtIndex:0];
         NSString *runversion = [[entry valueForKey:@"key"] objectAtIndex:1];
         if(runversion != (id)[NSNull null]){
-            if([runversion isEqualToString:@"DEFAULT"]) continue;
+//            if([runversion isEqualToString:@"DEFAULT"]) continue;
             if([runtype isEqualToString:[model standardRunType]])
                 if([standardRunVersionPopupMenu indexOfItemWithObjectValue:runversion]==NSNotFound)[standardRunVersionPopupMenu addItemWithObjectValue:runversion];
         }
