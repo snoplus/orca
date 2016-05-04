@@ -103,7 +103,7 @@
     IBOutlet NSTextField *pollingStatus;
 
     IBOutlet NSButton* runsLockButton;
-    IBOutlet NSTextField *runStatusTextField;
+    IBOutlet NSTextField *lockStatusTextField;
 
     IBOutlet NSTextField *mtcPort;
     IBOutlet NSTextField *mtcHost;

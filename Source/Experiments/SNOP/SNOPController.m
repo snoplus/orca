@@ -1125,27 +1125,27 @@ smellieRunFile;
     [standardRunLoadDefaultsButton setEnabled:!lockedOrNotRunningMaintenance];
     [maintenanceRunBox setEnabled:!locked];
     [runTypeWordMatrix setEnabled:!lockedOrNotRunningMaintenance];
-    [standardRunVersionPopupMenu setEnabled:!lockedOrNotRunningMaintenance];
+    [standardRunVersionPopupMenu setEnabled:!locked];
     [timedRunCB setEnabled:!lockedOrNotRunningMaintenance];
     [timeLimitField setEnabled:!lockedOrNotRunningMaintenance];
     [repeatRunCB setEnabled:!lockedOrNotRunningMaintenance];
     
     //Display status
-    [runStatusTextField setStringValue:@"UNLOCKED"];
-    [runStatusTextField setBackgroundColor:[NSColor colorWithSRGBRed:0 green:0 blue:1 alpha:1]];
+    [lockStatusTextField setStringValue:@"UNLOCKED"];
+    [lockStatusTextField setBackgroundColor:[NSColor colorWithSRGBRed:0 green:0 blue:1 alpha:1]];
     if(lockedOrNotRunningMaintenance){
         if(locked){
-            [runStatusTextField setStringValue:@"LOCKED"];
-            [runStatusTextField setBackgroundColor:[NSColor redColor]];
+            [lockStatusTextField setStringValue:@"LOCKED"];
+            [lockStatusTextField setBackgroundColor:[NSColor redColor]];
         }
         else{
-            [runStatusTextField setStringValue:@"RUN IN PROGRESS"];
-            [runStatusTextField setBackgroundColor:[NSColor redColor]];
+            [lockStatusTextField setStringValue:@"RUN IN PROGRESS"];
+            [lockStatusTextField setBackgroundColor:[NSColor redColor]];
         }
     }
     else if(runInProgress){
-        [runStatusTextField setStringValue:@"MAINTENACE RUN"];
-        [runStatusTextField setBackgroundColor:[NSColor orangeColor]];
+        [lockStatusTextField setStringValue:@"MAINTENACE RUN"];
+        [lockStatusTextField setBackgroundColor:[NSColor orangeColor]];
     }
     
 }
@@ -1231,9 +1231,7 @@ smellieRunFile;
     NSString *standardRun = [standardRunPopupMenu objectValueOfSelectedItem];
     NSString *standardRunVer = [standardRunVersionPopupMenu objectValueOfSelectedItem];
     
-    BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Overwriting stored values for run \"%@\" with version \"%@\"", standardRun,standardRunVer],@"Is this really what you want?",@"Cancel",@"Yes, Save it",nil);
-    
-    if(!cancel) [model saveStandardRun:standardRun withVersion:standardRunVer];
+    [model saveStandardRun:standardRun withVersion:standardRunVer];
     [self displayThresholdsFromDB];
     
 }
@@ -1243,9 +1241,7 @@ smellieRunFile;
     NSString *standardRun = [standardRunPopupMenu objectValueOfSelectedItem];
     NSString *standardRunVer = @"DEFAULT";
     
-    BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Overwriting stored values for run \"%@\" as DEFAULT", standardRun],@"Is this really what you want?",@"Cancel",@"Yes, Save it",nil);
-    
-    if(!cancel) [model saveStandardRun:standardRun withVersion:standardRunVer];
+    [model saveStandardRun:standardRun withVersion:standardRunVer];
     [self displayThresholdsFromDB];
     
 }

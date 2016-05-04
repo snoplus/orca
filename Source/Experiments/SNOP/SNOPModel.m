@@ -1568,6 +1568,10 @@ logPort;
         //Load MTC GT Mask
         [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kGtMask]] forIndex:kGtMask];
 
+        //Load the PED/PGT mode
+        BOOL pedpgtmode = [[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"PED_PGT_Mode"] boolValue];
+        [mtc setIsPedestalEnabledInCSR:pedpgtmode];
+        
         NSLog(@"Standard run %@ settings loaded. \n",runTypeName);
         return true;
     }
@@ -1587,6 +1591,10 @@ logPort;
         ORRunAlertPanel(@"Invalid Standard Run Name",@"Please, set a valid name in the popup menus and click enter",@"OK",nil,nil);
         return false;
     }
+    else{
+        BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Overwriting stored values for run \"%@\" with version \"%@\"", runTypeName,runVersion],@"Is this really what you want?",@"Cancel",@"Yes, Save it",nil);
+        if(cancel) return false;
+    }
     NSLog(@"Saving settings for Standard Run: %@ - Version: %@ ........ \n",runTypeName,runVersion);
 
     //Get RC model
@@ -1594,7 +1602,7 @@ logPort;
     ORRunModel* runControlModel = [objs objectAtIndex:0];
     //Get MTC model
     objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    ORMTCModel* mtcModel = [objs objectAtIndex:0];
+    ORMTCModel* mtc = [objs objectAtIndex:0];
 
     //Build run table
     NSMutableDictionary *detectorSettings = [NSMutableDictionary dictionaryWithCapacity:200];
@@ -1608,9 +1616,10 @@ logPort;
 
     //Save MTC/D parameters, trigger masks and MTC/A+ thresholds
     for (int iparam=0; iparam<kDbLookUpTableSize; iparam++) {
-        // NSLog(@" Writting %@ to %@ \n", [mtcModel dbObjectByIndex:ithres+kNHit100HiThreshold], [thresholdNames objectAtIndex:ithres]);
-        [detectorSettings setObject:[mtcModel dbObjectByIndex:iparam] forKey:[mtcModel getDBKeyByIndex:iparam]];
+        [detectorSettings setObject:[mtc dbObjectByIndex:iparam] forKey:[mtc getDBKeyByIndex:iparam]];
     }
+    //Save PED/PGT mode
+    [detectorSettings setObject:[NSNumber numberWithBool:[mtc isPedestalEnabledInCSR]] forKey:@"PED_PGT_Mode"];
     
     [[self orcaDbRefWithEntryDB:self withDB:@"orca"] addDocument:detectorSettings tag:@"kStandardRunDocumentAdded"];
 
