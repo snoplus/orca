@@ -1656,7 +1656,7 @@ void SwapLongBlock(void* p, int32_t n)
     }
 
     if(htonl(results->errors)) {
-        NSLogColor([NSColor redColor],@"XL3 error occured while setting sequencer");
+        NSLogColor([NSColor redColor],@"XL3 error occured while setting sequencer\n");
         return -1;
     }
 

@@ -834,10 +834,10 @@ resetFifoOnStart = _resetFifoOnStart;
     [encoder encodeInt:[self mtcaN100Mask] forKey:@"mtcaN100Mask"];
     [encoder encodeInt:[self mtcaN20Mask] forKey:@"mtcaN20Mask"];
     [encoder encodeInt:[self mtcaEHIMask] forKey:@"mtcaEHIMask"];
-    [encoder encodeInt:[self mtcaEHIMask] forKey:@"mtcaELOMask"];
-    [encoder encodeInt:[self mtcaEHIMask] forKey:@"mtcaOELOMask"];
-    [encoder encodeInt:[self mtcaEHIMask] forKey:@"mtcaOEHIMask"];
-    [encoder encodeInt:[self mtcaEHIMask] forKey:@"mtcaOWLNMask"];
+    [encoder encodeInt:[self mtcaELOMask] forKey:@"mtcaELOMask"];
+    [encoder encodeInt:[self mtcaOELOMask] forKey:@"mtcaOELOMask"];
+    [encoder encodeInt:[self mtcaOEHIMask] forKey:@"mtcaOEHIMask"];
+    [encoder encodeInt:[self mtcaOWLNMask] forKey:@"mtcaOWLNMask"];
     [encoder encodeBool:[self isPedestalEnabledInCSR] forKey:@"isPedestalEnabledInCSR"];
 }
 
