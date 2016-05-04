@@ -196,7 +196,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                           exceptionWithName:@"noPinResponse"
                           reason:@"*** PIN diode response could not be read. It's possible the sequence has not finished."
                           userInfo:nil];
-        @throw e;
+        [e raise];
         return [NSArray arrayWithObjects:0, 0, nil];
     } else if ([pollResponse isKindOfClass:[NSString class]]){
         NSString* reasonStr = [NSString stringWithFormat:@"*** PIN diode poll returned %@. Likely a hardware problem.", [pollResponse[0] stringValue]];
@@ -204,7 +204,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                           exceptionWithName:@"stringPinResponse"
                           reason:reasonStr
                           userInfo:nil];
-        @throw e;
+        [e raise];
         return [NSArray arrayWithObjects:0, 0, nil];
     } else if ([pollResponse count] != 3) {
         NSString* reasonStr = [NSString stringWithFormat:@"*** PIN diode poll returned array of len %i - expected 3", [pollResponse count]];
@@ -212,10 +212,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                           exceptionWithName:@"PinResponseBadArrayLength"
                           reason:reasonStr
                           userInfo:nil];
-        @throw e;
+        [e raise];
         return [NSArray arrayWithObjects:0, 0, nil];
     }
-    
     return pollResponse;
 }
 
@@ -255,7 +254,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                           exceptionWithName:@"NoTellieFireParameters"
                           reason:@"*** TELLIE fire_parameters doc has not been loaded - you need to callloadTellieStaticsFromDB"
                           userInfo:nil];
-        @throw e;
+        [e raise];
     }
     
     //Frequency check
@@ -298,7 +297,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                           exceptionWithName:@"EmptyFibreMappingProperty"
                           reason:@"*** Fibre map has not been loaded from couchdb - you need to call loadTellieStaticsFromDB"
                           userInfo:nil];
-        @throw e;
+        [e raise];
     }
     if(![[self.tellieFibreMapping objectForKey:@"fibres"] containsObject:fibre]){
         NSString* reasonStr = [NSString stringWithFormat:@"*** Fibre map does not include a reference to fibre: %@",fibre];
@@ -306,7 +305,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                                exceptionWithName:@"FibreNotPatched"
                                reason:reasonStr
                                userInfo:nil];
-        @throw eFibre;
+        [eFibre raise];
     }
     NSUInteger fibreIndex = [[self.tellieFibreMapping objectForKey:@"fibres"] indexOfObject:fibre];
     NSUInteger channelInt = [[[self.tellieFibreMapping objectForKey:@"channels"] objectAtIndex:fibreIndex] integerValue];

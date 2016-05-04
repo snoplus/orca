@@ -1098,10 +1098,17 @@ smellieRunFile;
     
     //Collect a series of objects from the ELLIEModel
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
-    
-    //get the ELLIE Model object
-    ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
-    
+    if ([objs count]) {
+      //get the ELLIE Model object
+      ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
+    } else { 
+      reasonStr = @"ELLIE model not available, add an ELLIE model to your experiment";
+      NSException* e = [NSException
+			exceptionWithName:@"NoEllieModel"
+			reason:reasonStr
+			userInfo:nil];
+      [e raise];
+    }
     //Method for completing this without a new thread
     //[theELLIEModel startSmellieRun:smellieRunFile];
     
@@ -1162,9 +1169,17 @@ smellieRunFile;
     
     //Collect a series of objects from the ELLIEModel
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
-    
-    //get the ELLIE Model object
-    ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
+    if ([objs count]) {
+      //get the ELLIE Model object
+      ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
+    } else {
+      reasonStr = @"ELLIE model not available, add an ELLIE model to your experiment";
+      NSException* e = [NSException
+                        exceptionWithName:@"NoEllieModel"
+                        reason:reasonStr
+                        userInfo:nil];
+      [e raise];
+    }    
     
     /*[NSThread detachNewThreadSelector:@selector(startSmellieRun:)
      toTarget:theELLIEModel
