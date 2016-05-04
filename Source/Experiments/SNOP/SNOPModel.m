@@ -1523,7 +1523,7 @@ logPort;
     ORRunModel* runControlModel = [objs objectAtIndex:0];
     //Get MTC model
     objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    ORMTCModel* mtcModel = [objs objectAtIndex:0];
+    ORMTCModel* mtc = [objs objectAtIndex:0];
 
     //Query the OrcaDB and get a dictionary with the parameters
     NSString *urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/orca/_design/standardRuns/_view/getStandardRuns?startkey=[\"%@\",\"%@\",{}]&endkey=[\"%@\",\"%@\",0]&descending=True&include_docs=True",[self orcaDBUserName],[self orcaDBPassword],[self orcaDBIPAddress],[self orcaDBPort],runTypeName,runVersion,runTypeName,runVersion];
@@ -1544,26 +1544,35 @@ logPort;
     @try{
 
         //Load run type word
-        [runControlModel setRunType:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"run_type_word"] unsignedLongValue]];
+        //DO NOT TOUCH THE MAINTENANCE BIT!
+        unsigned long currentRunTypeWord = [self runTypeWord];
+        unsigned long nextruntypeword = [[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"run_type_word"] unsignedLongValue];
+        if(currentRunTypeWord>>0 & 1) nextruntypeword |= 1 << 0;//In maintenance
+        else nextruntypeword &= ~(1 << 0) << 0;
+        [runControlModel setRunType:nextruntypeword];
         
-        //Set pedestal mode if ECA
-        if([runTypeName isEqualToString:@"ECA"]){
-            [mtcModel setIsPedestalEnabledInCSR:1];
-        }
-        else{
-            [mtcModel setIsPedestalEnabledInCSR:0];
-        }
-        
-        //Load MTC/D parameters, trigger masks and MTC/A+ thresholds
-        for (int iparam=0; iparam<kDbLookUpTableSize; iparam++) {
-            [mtcModel setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtcModel getDBKeyByIndex:iparam]] forIndex:iparam];
-        }
-        
+        //Load MTC thresholds
+        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kNHit100HiThreshold]] forIndex:kNHit100HiThreshold];
+        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kNHit100MedThreshold]] forIndex:kNHit100MedThreshold];
+        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kNHit100LoThreshold]] forIndex:kNHit100LoThreshold];
+        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kNHit20Threshold]] forIndex:kNHit20Threshold];
+        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kNHit20LBThreshold]] forIndex:kNHit20LBThreshold];
+        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kOWLNThreshold]] forIndex:kOWLNThreshold];
+        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kESumLowThreshold]] forIndex:kESumLowThreshold];
+        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kESumHiThreshold]] forIndex:kESumHiThreshold];
+        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kOWLELoThreshold]] forIndex:kOWLELoThreshold];
+        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kOWLEHiThreshold]] forIndex:kOWLEHiThreshold];
+        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kNhit100LoPrescale]] forIndex:kNhit100LoPrescale];
+        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kPulserPeriod]] forIndex:kPulserPeriod];
+
+        //Load MTC GT Mask
+        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kGtMask]] forIndex:kGtMask];
+
         NSLog(@"Standard run %@ settings loaded. \n",runTypeName);
         return true;
     }
     @catch (NSException *e) {
-        NSLog(@"Error ",e);
+        NSLog(@"Error retrieving Standard Runs information: \n %@ \n", e);
         return false;
     }
     
@@ -1608,6 +1617,37 @@ logPort;
     NSLog(@"%@ run saved as standard run. \n",runTypeName);
     return true;
 
+}
+
+-(void) loadOfflineRun
+{
+
+    //Get RC model
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    ORRunModel* runControl = [objs objectAtIndex:0];
+    //Get MTC model
+    objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    ORMTCModel* mtc = [objs objectAtIndex:0];
+    //FIXME: Set correct hardcoded values!!!
+    [mtc setDbObject:[NSNumber numberWithDouble:3000.0] forIndex:kNHit100HiThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:3000.0] forIndex:kNHit100MedThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:3000.0] forIndex:kNHit100LoThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:3000.0] forIndex:kNHit20Threshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:3000.0] forIndex:kNHit20LBThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:3000.0] forIndex:kOWLNThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:3000.0] forIndex:kESumLowThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:3000.0] forIndex:kESumHiThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:3000.0] forIndex:kOWLELoThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:3000.0] forIndex:kOWLEHiThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:100.0] forIndex:kNhit100LoPrescale];
+    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kPulserPeriod];
+    
+    //Restart the run if the run is ongoing and do nothing if there is no run happening
+    if([runControl isRunning]){
+        [self setStandardRunType:@"HIGH THRESHOLDS"];
+        [runControl restartRun];
+    }
+    
 }
 
 

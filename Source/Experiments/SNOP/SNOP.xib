@@ -268,7 +268,7 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="startRunAction:" target="-2" id="Zbl-Kd-FSZ"/>
+                                                <action selector="startRunAction:" target="-2" id="3d7-z4-3Vt"/>
                                             </connections>
                                         </button>
                                         <box autoresizesSubviews="NO" title="Run status" borderType="line" id="3751">
@@ -330,7 +330,7 @@
                                                         </cells>
                                                     </matrix>
                                                     <textField verticalHuggingPriority="750" id="3752">
-                                                        <rect key="frame" x="96" y="103" width="102" height="14"/>
+                                                        <rect key="frame" x="96" y="103" width="124" height="14"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="--" id="3759">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -339,7 +339,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="3733">
-                                                        <rect key="frame" x="96" y="57" width="102" height="14"/>
+                                                        <rect key="frame" x="96" y="57" width="124" height="14"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="--" id="3734">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -348,7 +348,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="3770">
-                                                        <rect key="frame" x="96" y="43" width="102" height="14"/>
+                                                        <rect key="frame" x="96" y="43" width="124" height="14"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="--" id="3773">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -357,7 +357,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="3771">
-                                                        <rect key="frame" x="96" y="29" width="102" height="14"/>
+                                                        <rect key="frame" x="96" y="29" width="124" height="14"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="--" id="3772">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -366,7 +366,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="j3W-VL-afi">
-                                                        <rect key="frame" x="96" y="14" width="102" height="14"/>
+                                                        <rect key="frame" x="96" y="14" width="124" height="14"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="--" id="7cL-3v-APt">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -375,7 +375,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="3753">
-                                                        <rect key="frame" x="96" y="88" width="102" height="14"/>
+                                                        <rect key="frame" x="96" y="88" width="124" height="14"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="--" id="3758">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -384,7 +384,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="R1A-yJ-rRJ">
-                                                        <rect key="frame" x="96" y="73" width="102" height="14"/>
+                                                        <rect key="frame" x="96" y="73" width="124" height="14"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="--" id="BWm-H1-MEe">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -420,7 +420,7 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="stopRunAction:" target="-2" id="1266"/>
+                                                <action selector="stopRunAction:" target="-2" id="OEq-3s-ipa"/>
                                             </connections>
                                         </button>
                                         <progressIndicator verticalHuggingPriority="750" maxValue="100" bezeled="NO" controlSize="small" style="bar" id="MBu-zu-x36">
