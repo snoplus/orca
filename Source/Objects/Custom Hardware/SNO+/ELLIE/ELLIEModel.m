@@ -246,10 +246,10 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSMutableDictionary* settingsDict = [NSMutableDictionary dictionaryWithCapacity:7];
     [settingsDict setValue:tellieChannel forKey:@"channel"];
     [settingsDict setValue:pulseWidth forKey:@"pulse_width"];
-    [settingsDict setValue:[NSNumber numberWithFloat:pulseSeparation] forKey:@"pulse_rate"];
+    [settingsDict setValue:[NSNumber numberWithFloat:pulseSeparation] forKey:@"pulse_separation"];
     [settingsDict setValue:[NSNumber numberWithInteger:pulses] forKey:@"number_of_shots"];
     //Static settings
-    [settingsDict setValue:[NSNumber numberWithInteger:16385] forKey:@"pulse_height"];
+    [settingsDict setValue:[NSNumber numberWithInteger:16383] forKey:@"pulse_height"];
     [settingsDict setValue:[NSNumber numberWithInteger:0] forKey:@"fibre_delay"];
     [settingsDict setValue:[NSNumber numberWithInteger:0] forKey:@"trigger_delay"];
     NSLog(@"Tellie settings dict sucessfully created!\n");
@@ -376,7 +376,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         //[aSnotModel shipEPEDRecord];
         
         // Set-up delays to wait until tellie has stopped firing
-        double timeBetweenShotsInMicroSeconds = [[fireCommands objectForKey:@"pulse_rate"] doubleValue]/(1000.0);
+        double timeBetweenShotsInMicroSeconds = [[fireCommands objectForKey:@"pulse_separation"] doubleValue]*(1000.0);
         if(pulseByPulseDelay < 0.1){
             NSLog(@"Pulse by pulse delay is too small. Setting to 0.1\n");
             pulseByPulseDelay = 0.1;
@@ -396,7 +396,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         if(i == 0){
             NSArray* fireArgs = @[[[fireCommands objectForKey:@"channel"] stringValue],
                                   [noShots stringValue],
-                                  [[NSNumber numberWithFloat:1.] floatValue] / [[fireCommands objectForKey:@"pulse_rate"] floatValue],
+                                  [[fireCommands objectForKey:@"pulse_separation"] stringValue],
                                   [[fireCommands objectForKey:@"trigger_delay"] stringValue],
                                   [[fireCommands objectForKey:@"pulse_width"] stringValue],
                                   [[fireCommands objectForKey:@"pulse_height"] stringValue],
@@ -407,20 +407,18 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         }
         // Set number of pulses to be fired in this sub - run
         NSLog(@"Setting number of pulses\t");
-        NSLog(@"%@",[_tellieClient command:@"check_ready"]);
         [_tellieClient command:@"set_pulse_number" withArgs:@[noShots]];
-        NSLog(@"%@",[_tellieClient command:@"check_ready"]);
         
         NSLog(@"***** FIRING %d TELLIE PULSES *****\n",[noShots integerValue]);
         [_tellieClient command:@"fire_sequence"];
-        NSLog(@"After fire command");
         // Wait until sequence has finished
         [NSThread sleepForTimeInterval:timeToSleep];
     
         // Get pin reading with 5s grace period incase sequence took too
         // long for some reason
+        NSLog(@"Polling for tellie pin response...");
         NSArray* pinReading = [self pollTellieFibre:5.];
-    
+        NSLog(@"Pin response received %@ +/- %@", pinReading[0], pinReading[1]);
         @try {
             [fireCommands setObject:pinReading[0] forKey:@"pin_value"];
             [fireCommands setObject:pinReading[1] forKey:@"pin_rms"];
