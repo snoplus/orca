@@ -215,7 +215,7 @@ snotDb = _snotDb;
         if (!fec) continue;
 
         for (i = 0; i < 32; i++) {
-            hv = [self relayMask] & (1 << (slot*4 + (3-i/8)));
+            hv = ([self relayMask] >> (slot*4 + (3-i/8))) & 0x1;
 
             if (hv) {
                 if ([fec seqDisabled:i]) {
