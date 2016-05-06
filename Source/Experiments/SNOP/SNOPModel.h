@@ -220,7 +220,6 @@
 
 - (void) _waitForBuffers;
 
-- (void) runStateChanged:(NSNotification*)aNote;
 - (void) subRunStarted:(NSNotification*)aNote;
 - (void) subRunEnded:(NSNotification*)aNote;
 

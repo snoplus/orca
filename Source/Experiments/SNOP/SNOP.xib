@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14B25" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6254"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SNOPController">
@@ -2790,22 +2790,11 @@
                                                         </connections>
                                                     </button>
                                                     <textField verticalHuggingPriority="750" id="423">
-                                                        <rect key="frame" x="43" y="51" width="114" height="13"/>
+                                                        <rect key="frame" x="68" y="50" width="103" height="13"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="09/30/04 16:11:55" id="2532">
                                                             <dateFormatter key="formatter" formatterBehavior="pre10_4" dateFormat="%m/%d/%y %H:%M:%S" id="425"/>
                                                             <font key="font" metaFont="label"/>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
-                                                    <textField verticalHuggingPriority="750" id="426">
-                                                        <rect key="frame" x="14" y="38" width="27" height="26"/>
-                                                        <autoresizingMask key="autoresizingMask"/>
-                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" id="2533">
-                                                            <font key="font" metaFont="label"/>
-                                                            <string key="title">Last:
-</string>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
@@ -2824,7 +2813,7 @@
                                                         <autoresizingMask key="autoresizingMask"/>
                                                     </customView>
                                                     <textField verticalHuggingPriority="750" id="999">
-                                                        <rect key="frame" x="26" y="84" width="60" height="26"/>
+                                                        <rect key="frame" x="26" y="96" width="121" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" id="2535">
                                                             <font key="font" metaFont="label"/>
@@ -2849,6 +2838,17 @@
                                                             <action selector="ignoreHWChecksAction:" target="-2" id="2617"/>
                                                         </connections>
                                                     </button>
+                                                    <textField verticalHuggingPriority="750" id="426">
+                                                        <rect key="frame" x="15" y="50" width="46" height="13"/>
+                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" id="2533">
+                                                            <font key="font" metaFont="label"/>
+                                                            <string key="title">Last:
+</string>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
