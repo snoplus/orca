@@ -529,7 +529,7 @@ logPort;
     uint32_t run_type = [run runType];
     uint32_t run_number = [run runNumber];
     uint32_t source_mask = 0; /* needs to come from the MANIP system */
-    
+
     /* send the run_start command to the MTC server which will send the
      * run header record to the builder, resume the MTC readout, fire a
      * SOFT_GT, and send a trigger record to the builder */
@@ -629,9 +629,6 @@ logPort;
 {
     //Ship subrunrecord - Just a special case of an eped record
     [self shipSubRunRecord];
-    
-    //TRIG record?
-    //update orcadb run document?
 }
 
 - (void) subRunEnded:(NSNotification*)aNote
@@ -664,40 +661,40 @@ logPort;
     _epedStruct.nTSlopePoints = nTSlopePoints;
 }
 
-
-// orca script helper
 - (void) shipSubRunRecord
 {
     /* Sends a command to the MTC server to ship an 'EPED' record to the data
      * stream server, which will eventually get to the builder. The feature that 
      * distinguishs between the subRunRecord and the eped record is the 
-     * inclusion of the subrun flag, defined in the builder's RecordInfo.h as:
+     * inclusion of the subrun flag, defined in rat's zdab_convert.cc as:
      * 
-     *     #define EPED_FLAG_SUBRUN 0x1000000
+     *     #define EPED_FLAG_SUBRUN 0x01000000
      *
-     * All fields associated with EPED settings are set to zero. The mtc server
-     * adds a GTID value to the record before piping it down to the builder.
+     * All fields associated with EPED settings are set to zero, with the exception
+     * of the half crate id, which is repurposed to hold the 
+     * [runControl subRunNumber]. The mtc server adds a GTID value to the record
+     * before piping it down to the builder.
      *
      */
-
     //get the run controller
-    NSArray*  objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* runControl = [objs3 objectAtIndex:0];
-    
-    if ([[ORGlobal sharedGlobal] runInProgress]) {
-        @try {
-            [mtc_server okCommand:"send_eped_record %d %d %d %d %d %d %d",
-             [runControl subRunNumber],
-             0,
-             0,
-             0,
-             0,
-             0,
-             0x1000000 /* subRun flag */
-             ];
-        } @catch (NSException *e) {
-            NSLogColor([NSColor redColor], @"failed to send EPED record: %@",
-                       [e reason]);
+    NSArray*  runObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    if([runObjects count]){
+        ORRunModel* runControl = [runObjects objectAtIndex:0];
+        if ([[ORGlobal sharedGlobal] runInProgress]) {
+            @try {
+                [mtc_server okCommand:"send_eped_record %d %d %d %d %d %d %d",
+                 0,
+                 0,
+                 0,
+                 0,
+                 [runControl subRunNumber], /* In place of half crate id */
+                 0,
+                 0x01000000 /* subRun flag */
+                 ];
+            } @catch (NSException *e) {
+                NSLogColor([NSColor redColor], @"failed to send EPED record: %@",
+                           [e reason]);
+            }
         }
     }
 }
