@@ -96,6 +96,7 @@
 -(void) setLaserSoftLockOff;
 -(void) setSmellieMasterMode:(NSString*)triggerFrequency withNumOfPulses:(NSString*)numOfPulses;
 -(void) sendCustomSmellieCmd:(NSString*)customCmd withArgs:(NSArray*)argsArray;
+-(NSMutableDictionary*)loadConfigFile:(NSNumber*)versionNumber;
 -(void) startSmellieRunInBackground:(NSDictionary*)smellieSettings;
 -(void) startSmellieRun:(NSDictionary*)smellieSettings;
 -(void) stopSmellieRun;

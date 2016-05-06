@@ -719,6 +719,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [self performSelectorOnMainThread:@selector(startSmellieRun:) withObject:smellieSettings waitUntilDone:NO];
 }
 
+
+
 -(void)startSmellieRun:(NSDictionary*)smellieSettings
 {
     /*
