@@ -1412,11 +1412,10 @@ logPort;
 
 -(void) parseSmellieRunHeaderDoc:(id)aResult
 {
-    unsigned int i,cnt = [[aResult objectForKey:@"rows"] count];
-    
+    unsigned int cnt = [[aResult objectForKey:@"rows"] count];
     NSMutableDictionary *tmp = [[NSMutableDictionary alloc] init];
     
-    for(i=0;i<cnt;i++){
+    for(int i=0;i<cnt;i++){
         NSMutableDictionary* smellieRunHeaderDocIterator = [[[aResult objectForKey:@"rows"] objectAtIndex:i] objectForKey:@"value"];
         NSString *keyForSmellieDocs = [NSString stringWithFormat:@"%u",i];
         [tmp setObject:smellieRunHeaderDocIterator forKey:keyForSmellieDocs];

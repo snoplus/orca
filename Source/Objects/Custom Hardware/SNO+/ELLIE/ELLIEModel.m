@@ -1207,7 +1207,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"issue_time_iso"];
     [runDocDict setObject:[self fetchRecentVersion] forKey:@"configuration_version"];
     [runDocDict setObject:[NSNumber numberWithInt:[runControl runNumber]] forKey:@"run"];
-    [runDocDict setObject:[NSMutableArray arrayWithObjects:[NSNumber numberWithUnsignedLong:[runControl runNumber]],[NSNumber numberWithUnsignedLong:[runControl runNumber]], nil] forKey:@"run_range"];
+    [runDocDict setObject:[NSMutableArray arrayWithObjects:[NSNumber numberWithUnsignedLong:[runControl runNumber]],[NSNumber numberWithUnsignedLong:[runControl runNumber]], nil] forKey:@"run_range"];
     
     [runDocDict setObject:subRunArray forKey:@"sub_run_info"];
     

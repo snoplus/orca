@@ -993,10 +993,10 @@ smellieRunFile;
             
             id loopValue = [self.smellieRunFileList objectForKey:key];
             
-            NSString *string1 = [loopValue objectForKey:@"run_name"];
-            NSString *string2 = [smellieRunFileNameField objectValueOfSelectedItem];
+            NSString *thisRunFile = [loopValue objectForKey:@"run_name"];
+            NSString *requestedRunFile = [smellieRunFileNameField objectValueOfSelectedItem];
             
-            if( [string1 isEqualToString:string2]){
+            if( [thisRunFile isEqualToString:requestedRunFile]){
                 self.smellieRunFile = loopValue;
                 
                 [loadedSmellieRunNameLabel setStringValue:[smellieRunFile objectForKey:@"run_name"]];
