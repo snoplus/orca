@@ -194,25 +194,18 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                                 failure and an exception thrown.
 
     */
-
     NSArray* pollResponse = [_tellieClient command:@"read_pin_sequence"];
     int count = 0;
-    while ([pollResponse isEqualTo:@""] && count < timeOutSeconds){
-        NSLog(@"Warning: tellie poll has returned nil. Possible sequence hasn't finished. Waiting 1 second and re-polling");
+    while ([pollResponse isKindOfClass:[NSString class]] && count < timeOutSeconds){
+        NSLog(@"Warning: tellie poll has returned nil. Possible sequence hasn't finished. Waiting 1 second and re-polling\n");
         [NSThread sleepForTimeInterval:1.0];
         pollResponse = [_tellieClient command:@"read_pin_sequence"];
+        count = count + 1;
     }
-
+    
     // Some checks on the response
-    if ([pollResponse isEqualTo:@""]){
-        NSException* e = [NSException
-                          exceptionWithName:@"noPinResponse"
-                          reason:@"*** PIN diode response could not be read. It's possible the sequence has not finished."
-                          userInfo:nil];
-        [e raise];
-        return [NSArray arrayWithObjects:0, 0, nil];
-    } else if ([pollResponse isKindOfClass:[NSString class]]){
-        NSString* reasonStr = [NSString stringWithFormat:@"*** PIN diode poll returned %@. Likely a hardware problem.", [pollResponse[0] stringValue]];
+    if ([pollResponse isKindOfClass:[NSString class]]){
+        NSString* reasonStr = [NSString stringWithFormat:@"*** PIN diode poll returned %@. Likely that the sequence didn't finish before timeout.", [pollResponse stringValue]];
         NSException* e = [NSException
                           exceptionWithName:@"stringPinResponse"
                           reason:reasonStr
@@ -243,7 +236,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSNumber* pulseWidth = [self calcTellieChannelPulseSettings:[tellieChannel integerValue] withNPhotons:photons withFireFrequency:frequency];
     float pulseSeparation = (1./frequency)*1000; // TELLIE accepts pulse rate in ms
 
-    NSMutableDictionary* settingsDict = [NSMutableDictionary dictionaryWithCapacity:7];
+    NSMutableDictionary* settingsDict = [NSMutableDictionary dictionaryWithCapacity:8];
+    [settingsDict setValue:fibreName forKey:@"fibre"];
     [settingsDict setValue:tellieChannel forKey:@"channel"];
     [settingsDict setValue:pulseWidth forKey:@"pulse_width"];
     [settingsDict setValue:[NSNumber numberWithFloat:pulseSeparation] forKey:@"pulse_separation"];
@@ -358,16 +352,23 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSNumber* loops = [NSNumber numberWithInteger:1];
     int totalShots = [[fireCommands objectForKey:@"number_of_shots"] integerValue];
     float fRemainder = fmod(totalShots, 5e3);
+    NSLog(@"fRemainder = %@", fRemainder);
     if( totalShots > 5e3){
-        int iLoops = (totalShots - fRemainder) / 5e3;
-        loops = [NSNumber numberWithInteger:(iLoops+1)];
+        if (fRemainder > 0){
+            int iLoops = (totalShots - fRemainder) / 5e3;
+            loops = [NSNumber numberWithInteger:(iLoops+1)];
+        } else {
+            int iLoops = totalShots / 5e3;
+            loops =[NSNumber numberWithInteger:iLoops];
+
+        }
     }
     
     for(int i = 0; i<[loops integerValue]; i++){
         
         //Each loop fires 5e3 identical tellie pulses, except the final one, which fires: (totalRequestedShots % 5e3)
         NSNumber* noShots = [NSNumber numberWithInt:5e3];
-        if(i == ([loops integerValue]-1)){
+        if(i == ([loops integerValue]-1) && fRemainder > 0){
             noShots = [NSNumber numberWithInt:fRemainder];
         }
         //Start a new subrun and ship EPED record. The EPED record flags the subrun boundry in the data structure for a run.
@@ -377,6 +378,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         
         // Set-up delays to wait until tellie has stopped firing
         double timeBetweenShotsInMicroSeconds = [[fireCommands objectForKey:@"pulse_separation"] doubleValue]*(1000.0);
+        //NSLog(@"pulse_sep in ms: %@\n", [[fireCommands objectForKey:@"pulse_separation"] doubleValue]);
+        //NSLog(@"Time between shots us: %@\n", timeBetweenShotsInMicroSeconds);
         if(pulseByPulseDelay < 0.1){
             NSLog(@"Pulse by pulse delay is too small. Setting to 0.1\n");
             pulseByPulseDelay = 0.1;
@@ -406,19 +409,20 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
             [_tellieClient command:@"init_channel" withArgs:fireArgs];
         }
         // Set number of pulses to be fired in this sub - run
-        NSLog(@"Setting number of pulses\t");
+        NSLog(@"Setting number of pulses\n");
         [_tellieClient command:@"set_pulse_number" withArgs:@[noShots]];
         
-        NSLog(@"***** FIRING %d TELLIE PULSES *****\n",[noShots integerValue]);
+        NSLog(@"***** FIRING %d TELLIE PULSES in Fibre %@ *****\n",[noShots integerValue], [fireCommands objectForKey:@"fibre"]);
         [_tellieClient command:@"fire_sequence"];
         // Wait until sequence has finished
-        [NSThread sleepForTimeInterval:timeToSleep];
+        //NSLog(@"Time to sleep: %@\n Time between shots in us %@", timeToSleep, timeBetweenShotsInMicroSeconds);
+        //[NSThread sleepForTimeInterval:timeToSleep];
     
         // Get pin reading with 5s grace period incase sequence took too
         // long for some reason
-        NSLog(@"Polling for tellie pin response...");
-        NSArray* pinReading = [self pollTellieFibre:5.];
-        NSLog(@"Pin response received %@ +/- %@", pinReading[0], pinReading[1]);
+        NSLog(@"Polling for tellie pin response...\n");
+        NSArray* pinReading = [self pollTellieFibre:6.];
+        NSLog(@"Pin response received %@ +/- %@\n", pinReading[0], pinReading[1]);
         @try {
             [fireCommands setObject:pinReading[0] forKey:@"pin_value"];
             [fireCommands setObject:pinReading[1] forKey:@"pin_rms"];
@@ -427,6 +431,13 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         }
     
         [self updateTellieRunDocument:fireCommands];
+        
+        if ([noShots integerValue] == 5000){
+            BOOL check = ORRunAlertPanel(@"TELLIE Run Check",@"Would you like to contiune with this fibre?",@"OK",@"No something's up",nil);
+            if (check == NO) {
+                break;
+            }
+        }
     }
     self.ellieFireFlag = NO;
     NSLog(@"ELLIE fire flag set to: %@\n",NO);
@@ -621,7 +632,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSLog(@"TELLIE mapping document sucessfully loaded!\n");
     self.tellieFibreMapping = mappingDoc;
 }
-
 
 /*********************************************************/
 /*                  Smellie Functions                    */
