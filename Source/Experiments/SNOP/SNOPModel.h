@@ -227,6 +227,7 @@
                            pedestalWidth: (unsigned long) pedestalWidth
                                  calType: (unsigned long) calType;
 - (void) updateEPEDStructWithStepNumber: (unsigned long) stepNumber;
+- (void) shipSubRunRecord;
 - (void) shipEPEDRecord;
 - (void) updateRHDRSruct;
 - (void) shipRHDRRecord;
