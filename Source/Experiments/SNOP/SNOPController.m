@@ -30,7 +30,6 @@
 #import "ELLIEModel.h"
 #import "ORCouchDB.h"
 #import "ORRunModel.h"
-#import "ORRunController.h"
 #import "ORMTC_Constants.h"
 #import "ORMTCModel.h"
 #import "SNOP_Run_Constants.h"
@@ -174,6 +173,7 @@ smellieRunFile;
 
 -(void) awakeFromNib
 {
+
     detectorSize		= NSMakeSize(1200,700);
     detailsSize		= NSMakeSize(1200,700);//NSMakeSize(450,589);
     focalPlaneSize		= NSMakeSize(1200,700);//NSMakeSize(450,589);
@@ -184,13 +184,22 @@ smellieRunFile;
     blankView = [[NSView alloc] init];
     [tabView setFocusRingType:NSFocusRingTypeNone];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
-    
-    //pull the information from the SMELLIE DB
-    [model getSmellieRunListInfo];
+
+    //Sync runnumber with main RunControl
+    [self updateRunInfo:nil];
+    [self findRunControl:nil];
+    [runControl getCurrentRunNumber]; //this should be done by the base clase... but it is not
+    //Sync SR with MTC
     [self mtcDataBaseChanged:nil];
+    //Update runtype word
     [self runTypeWordChanged:nil];
+    //Refresh SRs
     [self refreshStandardRuns:nil];
+    //Update conection settings
     [self updateSettings:nil];
+    //Pull the information from the SMELLIE DB
+    [model getSmellieRunListInfo];
+
     [super awakeFromNib];
     [self performSelector:@selector(updateWindow)withObject:self afterDelay:0.1];
 }
@@ -200,9 +209,7 @@ smellieRunFile;
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* theRunControl = [objs objectAtIndex:0];
-    objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     ORMTCModel* mtcModel = [objs objectAtIndex:0];
     
     [super registerNotificationObservers];
@@ -240,7 +247,7 @@ smellieRunFile;
     [notifyCenter addObserver: self
                      selector: @selector(runStatusChanged:)
                          name: ORRunStatusChangedNotification
-                       object: theRunControl];
+                       object: runControl];
     
     [notifyCenter addObserver:self
                      selector:@selector(SRTypeChanged:)
@@ -255,7 +262,7 @@ smellieRunFile;
     [notifyCenter addObserver :self
                      selector :@selector(runTypeWordChanged:)
                          name :ORRunTypeChangedNotification
-                       object :theRunControl];
+                       object :runControl];
     
     [notifyCenter addObserver : self
                      selector : @selector(runsLockChanged:)
@@ -282,11 +289,6 @@ smellieRunFile;
                          name : @"SNOPSettingsChanged"
                         object: mtcModel];
     
-    //TODO: add the notification for changedRunType on SNO+
-    /*[notifyCenter addObserver:self
-     selector:@selector(runTypesChanged:)
-     name:nil
-     object:nil];*/
 }
 
 - (void) updateWindow
@@ -296,7 +298,9 @@ smellieRunFile;
     [self hvStatusChanged:nil];
     [self dbOrcaDBIPChanged:nil];
     [self dbDebugDBIPChanged:nil];
-    [self runStatusChanged:nil]; //update the run status
+    [self runStatusChanged:nil];
+    [self SRTypeChanged:nil];
+    [self SRVersionChanged:nil];
     [model setIsEmergencyStopEnabled:TRUE]; //enable the emergency stop
     [self runsLockChanged:nil];
     [self runsECAChanged:nil];
@@ -326,6 +330,8 @@ smellieRunFile;
 
 -(void) SRTypeChanged:(NSNotification*)aNote
 {
+    [standardRunPopupMenu selectItemWithObjectValue:[model standardRunType]];
+
     if([[model standardRunType] isEqualToString:@"HIGH THRESHOLDS"]) {
         [model setStandardRunVersion:@"DEFAULT"];
     } else {
@@ -342,14 +348,12 @@ smellieRunFile;
 }
 
 - (IBAction)maintenanceBoxAction:(id)sender {
-    
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* mainRunControl = [objs objectAtIndex:0];
+
     if([maintenanceRunBox state]){
-        [runControl setRunType:([mainRunControl runType] & ~(0x1FFE)) | (eMaintenanceRunType)]; //Maintenance is now mutually exclusive
+        [runControl setRunType:([runControl runType] & ~(0x1FFE)) | (eMaintenanceRunType)]; //Maintenance is now mutually exclusive
     }
     else{
-        [runControl setRunType:[mainRunControl runType] & ~(eMaintenanceRunType)];
+        [runControl setRunType:[runControl runType] & ~(eMaintenanceRunType)];
     }
     
 }
@@ -380,26 +384,25 @@ smellieRunFile;
 
 - (void) runStatusChanged:(NSNotification*)aNotification{
     
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* theRunControl = [objs objectAtIndex:0];
-    if([theRunControl runningState] == eRunInProgress){
+    if([runControl runningState] == eRunInProgress){
         [startRunButton setEnabled:true];
         [startRunButton setTitle:@"RESTART RUN"];
         [lightBoardView setState:kGoLight];
 	}
-	else if([theRunControl runningState] == eRunStopped){
+	else if([runControl runningState] == eRunStopped){
         [startRunButton setEnabled:true];
         [startRunButton setTitle:@"START RUN"];
         [lightBoardView setState:kStoppedLight];
 	}
-	else if([theRunControl runningState] == eRunStarting || [theRunControl runningState] == eRunStopping || [theRunControl runningState] == eRunBetweenSubRuns){
-        if([theRunControl runningState] == eRunStarting){
+	else if([runControl runningState] == eRunStarting || [runControl runningState] == eRunStopping || [runControl runningState] == eRunBetweenSubRuns){
+        if([runControl runningState] == eRunStarting){
             //The run started so update the display
             [startRunButton setEnabled:false];
             [startRunButton setTitle:@"STARTING..."];
-            [standardRunTypeField setStringValue:[model standardRunType]];
-            [standardRunVersionField setStringValue:[model standardRunVersion]];
-            [runTypeWordField setStringValue:[NSString stringWithFormat:@"0x%X",(int)[model runTypeWord]]]; //FIXME: revisit if we go over 32 bits
+            [model setLastStandardRunType:[model standardRunType]];
+            [model setLastStandardRunVersion:[model standardRunVersion]];
+            NSString* _lastRunTypeWord = [[NSString stringWithFormat:@"0x%X",(int)[model runTypeWord]] copy];
+            [model setLastRunTypeWord:_lastRunTypeWord]; //FIXME: revisit if we go over 32 bits
         }
 		else {
             //Do nothing
@@ -1249,16 +1252,22 @@ smellieRunFile;
 // Create a new SR item if doesn't exist, set the runType string value and query the DB to display the trigger configuration
 - (IBAction)standardRunPopupAction:(id)sender {
     
-    NSString *standardRun = [standardRunPopupMenu stringValue];
+    NSString *standardRun = [[standardRunPopupMenu stringValue] uppercaseString];
+    [standardRunPopupMenu setStringValue:standardRun];
     //Create new SR if does not exist
     if ([standardRunPopupMenu indexOfItemWithObjectValue:standardRun] == NSNotFound && [standardRun isNotEqualTo:@""]){
         BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Creating new Standard Run: \"%@\"", standardRun],@"Is this really what you want?",@"Cancel",@"Yes, Make New Standard Run",nil);
         if(cancel){
             [standardRunPopupMenu selectItemWithObjectValue:[model standardRunType]];
+            [standardRunVersionPopupMenu selectItemWithObjectValue:[model standardRunVersion]];
+            return;
         }
         else{
             [standardRunPopupMenu addItemWithObjectValue:standardRun];
             [standardRunPopupMenu selectItemWithObjectValue:standardRun];
+            [standardRunVersionPopupMenu addItemWithObjectValue:@"DEFAULT"];
+            [standardRunVersionPopupMenu selectItemWithObjectValue:@"DEFAULT"];
+            [model saveStandardRun:standardRun withVersion:@"DEFAULT"];
         }
     }
     
@@ -1271,12 +1280,15 @@ smellieRunFile;
 
 - (IBAction)standardRunVersionPopupAction:(id)sender {
     
-    NSString *standardRun = [standardRunPopupMenu stringValue];
-    NSString *standardRunVer = [standardRunVersionPopupMenu stringValue];
-//    if([standardRunVer isEqualToString:@"DEFAULT"]) {
-//        ORRunAlertPanel([NSString stringWithFormat:@"Can create a version called DEFAULT"], @"It is a protected word",@"Cancel",@"OK",nil);
-//        return;
-//    }
+    NSString *standardRun = [[standardRunPopupMenu stringValue] uppercaseString];
+    NSString *standardRunVer = [[standardRunVersionPopupMenu stringValue] uppercaseString];
+    [standardRunVersionPopupMenu setStringValue:standardRunVer];
+
+    if([standardRunVersionPopupMenu indexOfItemWithObjectValue:standardRunVer] == NSNotFound && [standardRunVer isEqualToString:@"DEFAULT"]) {
+        //Should never get here, but being cautious
+        ORRunAlertPanel([NSString stringWithFormat:@"Can create a version called DEFAULT"], @"It is a protected word",@"Cancel",@"OK",nil);
+        return;
+    }
 
     //Create new SR version if does not exist
     if ([standardRunVersionPopupMenu indexOfItemWithObjectValue:standardRunVer] == NSNotFound && [standardRunVer isNotEqualTo:@""]){
@@ -1287,12 +1299,14 @@ smellieRunFile;
         else{
             [standardRunVersionPopupMenu addItemWithObjectValue:standardRunVer];
             [standardRunVersionPopupMenu selectItemWithObjectValue:standardRunVer];
+            [model saveStandardRun:standardRun withVersion:standardRunVer];
         }
     }
     
     //Set run type name
-    [model setStandardRunVersion:standardRunVer];
-    
+    if(![[model standardRunVersion] isEqualToString:standardRunVer]){
+        [model setStandardRunVersion:standardRunVer];
+    }
 }
 
 //Run Type Word
@@ -1439,8 +1453,15 @@ smellieRunFile;
     //Handle case with empty DB
     if ([standardRunPopupMenu numberOfItems] == 0){
         [model setStandardRunType:@""];
-    } else{ //Select first item in popup menu
-        [standardRunPopupMenu selectItemAtIndex:0];
+    } else{
+        //Check if old selected run exists
+        if([standardRunPopupMenu indexOfItemWithObjectValue:[model standardRunType]] == NSNotFound)
+            //Select first item in popup menu
+            [standardRunPopupMenu selectItemAtIndex:0];
+        else
+            //Recover old run
+            [standardRunPopupMenu selectItemWithObjectValue:[model standardRunType]];
+
         [model setStandardRunType:[standardRunPopupMenu stringValue]];
     }
     
@@ -1479,8 +1500,15 @@ smellieRunFile;
     //Handle case with empty DB
     if([standardRunVersionPopupMenu numberOfItems] == 0) {
         [model setStandardRunVersion:@""];
-    } else{ //Select first item in popup menu
-        [standardRunVersionPopupMenu selectItemAtIndex:0];
+    } else{
+        //Check if old selected run exists
+        if([standardRunVersionPopupMenu indexOfItemWithObjectValue:[model standardRunVersion]] == NSNotFound)
+            //Select first item in popup menu
+            [standardRunVersionPopupMenu selectItemAtIndex:0];
+        else
+            //Recover old run
+            [standardRunVersionPopupMenu selectItemWithObjectValue:[model standardRunVersion]];
+
         NSString *standardRunVersion = [standardRunVersionPopupMenu stringValue];
         if(standardRunVersion != (id)[NSNull null]){
             [model setStandardRunVersion:standardRunVersion];

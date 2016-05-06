@@ -432,40 +432,35 @@ logPort;
     [super registerNotificationObservers];
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     
-    [notifyCenter addObserver : self
-                     selector : @selector(runInitialization:)
-                         name : ORRunInitializationNotification
-                       object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(runAboutToRollOver:)
-                         name : ORRunIsAboutToRollOver
-                       object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(runAboutToStart:)
-                         name : ORRunSecondChanceForWait
-                       object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(runStarted:)
-                         name : ORRunStartedNotification
-                       object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(runAboutToStop:)
-                         name : ORRunAboutToStopNotification
-                       object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(runStopped:)
-                         name : ORRunStoppedNotification
-                       object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(runStateChanged:)
-                         name : ORRunStatusChangedNotification
-                       object : nil];    
+//    [notifyCenter addObserver : self
+//                     selector : @selector(runInitialization:)
+//                         name : ORRunInitializationNotification
+//                       object : nil];
+//
+//    [notifyCenter addObserver : self
+//                     selector : @selector(runAboutToRollOver:)
+//                         name : ORRunIsAboutToRollOver
+//                       object : nil];
+//
+//    [notifyCenter addObserver : self
+//                     selector : @selector(runAboutToStart:)
+//                         name : ORRunSecondChanceForWait
+//                       object : nil];
+//
+//    [notifyCenter addObserver : self
+//                     selector : @selector(runStarted:)
+//                         name : ORRunStartedNotification
+//                       object : nil];
+//
+//    [notifyCenter addObserver : self
+//                     selector : @selector(runAboutToStop:)
+//                         name : ORRunAboutToStopNotification
+//                       object : nil];
+//
+//    [notifyCenter addObserver : self
+//                     selector : @selector(runStopped:)
+//                         name : ORRunStoppedNotification
+//                       object : nil];
 
     [notifyCenter addObserver : self
                      selector : @selector(subRunStarted:)
@@ -614,15 +609,6 @@ logPort;
                            withObject:[[self.runDocument copy] autorelease]];
     self.runDocument = nil;
     self.configDocument = nil;
-}
-
-- (void) runStateChanged:(NSNotification*)aNote
-{
-    int running = [[[aNote userInfo] objectForKey:ORRunStatusValue] intValue];
-    if(running == eRunStopped){
-    }
-    else if(running == eRunStarting) {
-    }
 }
 
 - (void) subRunStarted:(NSNotification*)aNote
@@ -1428,11 +1414,20 @@ logPort;
     return runTypeWord;
 }
 
-
 - (void) setRunTypeWord:(unsigned long)aValue
 {
     runTypeWord = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPRunTypeWordChangedNotification object: self];
+}
+
+- (NSString*) lastRunTypeWord
+{
+    return lastRunTypeWord;
+}
+
+- (void) setLastRunTypeWord:(NSString*)aValue
+{
+    lastRunTypeWord = aValue;
 }
 
 - (NSString*)standardRunType
@@ -1461,6 +1456,30 @@ logPort;
     standardRunVersion = aValue;
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelSRVersionChangedNotification object:self];
+}
+
+- (NSString*)lastStandardRunType
+{
+    return lastStandardRunType;
+}
+
+- (void) setLastStandardRunType:(NSString *)aValue
+{
+    [aValue retain];
+    [lastStandardRunType release];
+    lastStandardRunType = aValue;
+}
+
+- (NSString*)lastStandardRunVersion
+{
+    return lastStandardRunVersion;
+}
+
+- (void) setLastStandardRunVersion:(NSString *)aValue
+{
+    [aValue retain];
+    [lastStandardRunVersion release];
+    lastStandardRunVersion = aValue;
 }
 
 - (int)ECA_pattern

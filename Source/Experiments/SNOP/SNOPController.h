@@ -45,9 +45,6 @@
     //Run control (the rest is in the ORExperimentController)
     IBOutlet StopLightView *lightBoardView;
     IBOutlet NSButton *maintenanceRunBox;
-    IBOutlet NSTextField *standardRunTypeField;
-    IBOutlet NSTextField *standardRunVersionField;
-    IBOutlet NSTextField *runTypeWordField;
 
     //Quick links
     

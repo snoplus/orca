@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14B25" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6254"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SNOPController">
@@ -38,6 +38,7 @@
                 <outlet property="loadedSmellieOperationModeLabel" destination="3614" id="3620"/>
                 <outlet property="loadedSmellieRunNameLabel" destination="3566" id="3595"/>
                 <outlet property="loadedSmellieTriggerFrequencyLabel" destination="3568" id="3596"/>
+                <outlet property="lockStatusTextField" destination="Np3-DI-Iif" id="5ty-0b-EY4"/>
                 <outlet property="logHost" destination="KzD-He-2lG" id="LXs-Sy-EvF"/>
                 <outlet property="logPort" destination="DpW-Vd-aQd" id="9DN-uP-F1q"/>
                 <outlet property="maintenanceRunBox" destination="yCr-y5-XJN" id="xRb-vV-iIx"/>
@@ -56,8 +57,6 @@
                 <outlet property="runBar" destination="MBu-zu-x36" id="iTV-aT-8hr"/>
                 <outlet property="runNumberField" destination="3752" id="NlG-fq-pyu"/>
                 <outlet property="runStatusField" destination="3733" id="LhC-Ec-9HL"/>
-                <outlet property="runStatusTextField" destination="Np3-DI-Iif" id="b6k-lH-Hln"/>
-                <outlet property="runTypeWordField" destination="j3W-VL-afi" id="Mtq-0d-ERF"/>
                 <outlet property="runTypeWordMatrix" destination="3935" id="GbT-ZR-J8S"/>
                 <outlet property="runsLockButton" destination="URx-nh-GMP" id="E2u-gI-0d3"/>
                 <outlet property="selectionStringTextView" destination="376" id="949"/>
@@ -77,8 +76,6 @@
                 <outlet property="standardRunThresDefaultValues" destination="Myz-zR-yFQ" id="CoK-fB-J73"/>
                 <outlet property="standardRunThresNewValues" destination="aqZ-km-AbR" id="e7e-Kr-XbA"/>
                 <outlet property="standardRunThresStoredValues" destination="hkr-OH-tez" id="iZh-fA-WYP"/>
-                <outlet property="standardRunTypeField" destination="3753" id="p0e-8l-6ic"/>
-                <outlet property="standardRunVersionField" destination="R1A-yJ-rRJ" id="lXs-U2-m8M"/>
                 <outlet property="standardRunVersionPopupMenu" destination="0tV-8Q-LGs" id="WhV-Ow-TuV"/>
                 <outlet property="startRunButton" destination="1253" id="XdY-Mu-6m6"/>
                 <outlet property="stopRunButton" destination="1258" id="PGc-XS-Wt7"/>
@@ -317,6 +314,9 @@
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
+                                                        <connections>
+                                                            <binding destination="2987" name="value" keyPath="selection.lastRunTypeWord" id="rCL-WQ-Mzg"/>
+                                                        </connections>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="3753">
                                                         <rect key="frame" x="96" y="88" width="124" height="14"/>
@@ -326,6 +326,9 @@
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
+                                                        <connections>
+                                                            <binding destination="2987" name="value" keyPath="selection.lastStandardRunType" id="e3T-c6-Cbg"/>
+                                                        </connections>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="R1A-yJ-rRJ">
                                                         <rect key="frame" x="96" y="73" width="124" height="14"/>
@@ -335,6 +338,9 @@
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
+                                                        <connections>
+                                                            <binding destination="2987" name="value" keyPath="selection.lastStandardRunVersion" id="Pbl-N5-weA"/>
+                                                        </connections>
                                                     </textField>
                                                 </subviews>
                                             </view>

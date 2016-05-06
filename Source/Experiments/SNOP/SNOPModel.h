@@ -99,6 +99,8 @@
     bool _smellieDocUploaded;
     NSString * standardRunType;
     NSString * standardRunVersion;
+    NSString * lastStandardRunType;
+    NSString * lastStandardRunVersion;
     
     NSThread * eStopThread;
     
@@ -125,6 +127,7 @@
     @private
         //Run type word
         unsigned long runTypeWord;
+        NSString * lastRunTypeWord;
         //ECA stuff
         int ECA_pattern;
         int ECA_type;
@@ -239,10 +242,16 @@
 - (int) viewType;
 - (unsigned long) runTypeWord;
 - (void) setRunTypeWord:(unsigned long)aMask;
+- (NSString*) lastRunTypeWord;
+- (void) setLastRunTypeWord:(NSString*)aValue;
 - (NSString*) standardRunType;
 - (void) setStandardRunType:(NSString*)aValue;
 - (NSString*) standardRunVersion;
 - (void) setStandardRunVersion:(NSString*)aValue;
+- (NSString*) lastStandardRunType;
+- (void) setLastStandardRunType:(NSString*)aValue;
+- (NSString*) lastStandardRunVersion;
+- (void) setLastStandardRunVersion:(NSString*)aValue;
 - (int) ECA_pattern;
 - (int) ECA_type;
 - (int) ECA_tslope_pattern;
@@ -281,6 +290,8 @@
 -(void) testerHv;
 
 //Standard runs functions
+
+
 -(BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
 -(BOOL) saveStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
 -(void) loadOfflineRun;
