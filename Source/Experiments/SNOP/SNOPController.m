@@ -991,13 +991,18 @@ smellieRunFile;
         //Loop through all the smellie files in the run list
         for(id key in self.smellieRunFileList){
             
-            id loopValue = [self.smellieRunFileList objectForKey:key];
+            id currentRunFile = [self.smellieRunFileList objectForKey:key];
             
-            NSString *thisRunFile = [loopValue objectForKey:@"run_name"];
+            NSString *thisRunFile = [currentRunFile objectForKey:@"run_name"];
             NSString *requestedRunFile = [smellieRunFileNameField objectValueOfSelectedItem];
             
             if( [thisRunFile isEqualToString:requestedRunFile]){
-                self.smellieRunFile = loopValue;
+                self.smellieRunFile = currentRunFile;
+                
+                // If it's an old run file, add superK fields, set to zero
+                if(![smellieRunFile objectForKey:@"SuperK_laser_on"]){
+                    [smellieRunFile setValue:0 forKey:@"SuperK_laser_on"];
+                }
                 
                 [loadedSmellieRunNameLabel setStringValue:[smellieRunFile objectForKey:@"run_name"]];
                 [model setSmellieRunNameLabel:[NSString stringWithFormat:@"%@",[smellieRunFile objectForKey:@"run_name"]]];
@@ -1027,6 +1032,7 @@ smellieRunFile;
                 laserCounter = laserCounter + [[self.smellieRunFile objectForKey:@"405nm_laser_on"] intValue];
                 laserCounter = laserCounter + [[self.smellieRunFile objectForKey:@"440nm_laser_on"] intValue];
                 laserCounter = laserCounter + [[self.smellieRunFile objectForKey:@"500nm_laser_on"] intValue];
+                laserCounter = laserCounter + [[self.smellieRunFile objectForKey:@"SuperK_laser_on"] intValue];
                 
                 [loadedSmellieFibresLabel setStringValue:[NSString stringWithFormat:@"%i",fibreCounter]];
                 
@@ -1051,6 +1057,11 @@ smellieRunFile;
                 //see if the 500nm laser is on
                 if([[self.smellieRunFile objectForKey:@"500nm_laser_on"] intValue] == 1){
                     [smellieLaserString appendString:@" 500nm "];
+                }
+
+                //see if the 500nm laser is on
+                if([[self.smellieRunFile objectForKey:@"SuperK_laser_on"] intValue] == 1){
+                    [smellieLaserString appendString:@" SuperK "];
                 }
                 
                 //Calculate the approximate time of the run

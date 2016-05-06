@@ -708,8 +708,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 
 -(void)testFunction
 {
-    NSArray* objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    runControl = [objs3 objectAtIndex:0];
+    NSArray* runControlObjs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    
+    runControl = [runControlObjs objectAtIndex:0];
     
     [runControl performSelector:@selector(haltRun)withObject:nil afterDelay:.1];
 }
