@@ -605,10 +605,10 @@
     // See data sheet for SUBCub 28a and TUBii schematics pages 3,4, and FP_6 for more info
     CounterMode_memoryVal = mode;
     if (mode) {
-        [self sendOkCmd:@"CounterMode 1"]; // Rate Mode
+        [self sendOkCmd:@"CountMode 1"]; // Rate Mode
     }
     else {
-        [self sendOkCmd:@"CounterMode 0"]; // Totalizer Mode
+        [self sendOkCmd:@"CountMode 0"]; // Totalizer Mode
     }
 }
 - (float) ConvertBitsToValue:(NSUInteger)bits NBits: (int) nBits MinVal: (float) minVal MaxVal: (float) maxVal{
