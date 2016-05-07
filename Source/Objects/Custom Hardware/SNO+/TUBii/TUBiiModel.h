@@ -154,9 +154,9 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
 - (void) setSmellieRate: (float) _rate;
 - (void) setTellieRate: (float) _rate;
 - (void) setPulserRate: (float) _rate;
-- (void) setSmelliePulseWidth: (float) _pulseWidth;
-- (void) setTelliePulseWidth: (float) _pulseWidth;
-- (void) setPulseWidth: (float) _pulseWidth;
+- (void) setSmelliePulseWidth: (double) _pulseWidth;
+- (void) setTelliePulseWidth: (double) _pulseWidth;
+- (void) setPulseWidth: (double) _pulseWidth;
 - (void) setSmellieNPulses: (int) _NPulses;
 - (void) setTellieNPulses: (int) _NPulses;
 - (void) setNPulses: (int) _NPulses;
@@ -166,6 +166,9 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
 - (void) stopSmelliePulser;
 - (void) stopTelliePulser;
 - (void) stopPulser;
+- (void) fireSmelliePulser_rate: (float)rate pulseWidth:(double)_pulseWidth NPulses:(int)_NPulses;
+- (void) fireTelliePulser_rate: (float)rate pulseWidth:(double)_pulseWidth NPulses:(int)_NPulses;
+- (void) firePulser_rate: (float)rate pulseWidth:(double)_pulseWidth NPulses:(int)_NPulses;
 - (void) setDataReadout: (BOOL) val;
 - (void) setStatusReadout: (BOOL) val;
 - (void) ResetFifo;

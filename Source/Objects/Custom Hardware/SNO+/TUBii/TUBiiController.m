@@ -104,26 +104,31 @@
     return;
 }
 - (IBAction)PulserFire:(id)sender {
+    //The commented out code in this function is how it will eventually work
+    //currently the server doesn't support this though.
     if ([sender tag] == 1){
         //Smellie Pulser is being fired
-        [model setSmellieRate:[SmellieRate_TextField floatValue]];
+        /*[model setSmellieRate:[SmellieRate_TextField floatValue]];
         [model setSmelliePulseWidth:[SmellieWidth_TextField floatValue]];
         [model setSmellieNPulses:[SmellieNPulses_TextField intValue]];
-        [model fireSmelliePulser];
+        [model fireSmelliePulser];*/
+        [model fireSmelliePulser_rate:[SmellieRate_TextField floatValue] pulseWidth:[SmellieWidth_TextField doubleValue] NPulses:[SmellieNPulses_TextField intValue]];
     }
     else if([sender tag] == 2){
         //Tellie Pulser is being fired
-        [model setTellieRate:[TellieRate_TextField floatValue]];
+        /*[model setTellieRate:[TellieRate_TextField floatValue]];
         [model setTelliePulseWidth:[TellieWidth_TextField floatValue]];
         [model setTellieNPulses:[TellieNPulses_TextField intValue]];
-        [model fireTelliePulser];
+        [model fireTelliePulser];*/
+        [model fireTelliePulser_rate:[TellieRate_TextField floatValue] pulseWidth:[TellieWidth_TextField doubleValue] NPulses:[TellieNPulses_TextField intValue]];
     }
     else if([sender tag] == 3){
         //Generic Pulser is being fired
-        [model setPulserRate:[GenericRate_TextField floatValue]];
+        /*[model setPulserRate:[GenericRate_TextField floatValue]];
         [model setPulseWidth:[GenericWidth_TextField floatValue]];
         [model setNPulses:[GenericNPulses_TextField intValue]];
-        [model firePulser];
+        [model firePulser];*/
+        [model firePulser_rate:[ GenericRate_TextField floatValue] pulseWidth:[GenericWidth_TextField doubleValue] NPulses:[GenericNPulses_TextField intValue]];
     }
     return;
 }

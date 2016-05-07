@@ -193,10 +193,10 @@
     NSString* const command=[NSString stringWithFormat:@"SetSmellieRate %f",rate];
     [self sendOkCmd:command];
 }
-- (void) setSmelliePulseWidth:(float) _pulseWidth {
+- (void) setSmelliePulseWidth:(double) _pulseWidth {
     // Specifies the width the of the pulses that the smellie pulser will pulse at
     // once fireSmelliePulser is called
-    NSString * const command = [NSString stringWithFormat:@"SetSmelliePulseWidth %f",_pulseWidth];
+    NSString * const command = [NSString stringWithFormat:@"SetSmelliePulseWidth %e",_pulseWidth];
     [self sendOkCmd:command];
 }
 - (void) setSmellieNPulses:(int) _NPulses {
@@ -211,10 +211,10 @@
     NSString * const command = [NSString stringWithFormat:@"SetTellieRate %f", _rate];
     [self sendOkCmd:command];
 }
-- (void) setTelliePulseWidth:(float)_pulseWidth {
+- (void) setTelliePulseWidth:(double)_pulseWidth {
     // Specifies the width the of the pulses that the tellie pulser will pulse at
     // once fireTelliePulser is called
-    NSString * const command = [NSString stringWithFormat:@"SetTelliePulseWidth %f",_pulseWidth];
+    NSString * const command = [NSString stringWithFormat:@"SetTelliePulseWidth %e",_pulseWidth];
     [self sendOkCmd:command];
 }
 - (void) setTellieNPulses:(int) _NPulses {
@@ -229,10 +229,10 @@
     NSString * const command = [NSString stringWithFormat:@"SetGenericRate %f", _rate];
     [self sendOkCmd:command];
 }
-- (void) setPulseWidth:(float) _pulseWidth {
+- (void) setPulseWidth:(double) _pulseWidth {
     // Specifies the width the of the pulses that the generic pulser will pulse at
     // once firePulser is called
-    NSString * const command = [NSString stringWithFormat:@"SetGenericPulseWidth %f",_pulseWidth];
+    NSString * const command = [NSString stringWithFormat:@"SetGenericPulseWidth %e",_pulseWidth];
     [self sendOkCmd:command];
 }
 - (void) setNPulses:(int) _NPulses {
@@ -280,7 +280,18 @@
     NSString* const command=@"FireGenericPulser";
     [self sendOkCmd:command];
 }
-
+- (void) fireSmelliePulser_rate: (float)rate pulseWidth:(double)_pulseWidth NPulses:(int)_NPulses {
+    NSString* const command = [NSString stringWithFormat:@"SetSmelliepulser %0.3f %e %d",rate,_pulseWidth,_NPulses];
+    [self sendOkCmd:command];
+}
+- (void) fireTelliePulser_rate: (float)rate pulseWidth:(double)_pulseWidth NPulses:(int)_NPulses {
+    NSString* const command = [NSString stringWithFormat:@"SetTelliePulser %0.3f %e %d",rate,_pulseWidth,_NPulses];
+    [self sendOkCmd:command];
+}
+- (void) firePulser_rate: (float)rate pulseWidth:(double)_pulseWidth NPulses:(int)_NPulses {
+    NSString* const command = [NSString stringWithFormat:@"SetGenericPulser %0.3f %e %d",rate,_pulseWidth,_NPulses];
+    [self sendOkCmd:command];
+}
 - (void) ResetClock {
     // Resets the clock error checking circuitry.
     // i.e. if the circuitry detects an error in the clock and then automatcially
