@@ -774,13 +774,13 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSMutableArray* laserArray = [NSMutableArray arrayWithCapacity:5];
     if([[smellieSettings objectForKey:@"375nm_laser_on"] intValue] == 1){
         [laserArray addObject:@"375nm"];
-    } else if([[smellieSettings objectForKey:@"405nm_laser_on"] intValue] == 1) {
+    } if([[smellieSettings objectForKey:@"405nm_laser_on"] intValue] == 1) {
         [laserArray addObject:@"405nm"];
-    } else if([[smellieSettings objectForKey:@"440nm_laser_on"] intValue] == 1) {
+    } if([[smellieSettings objectForKey:@"440nm_laser_on"] intValue] == 1) {
         [laserArray addObject:@"440nm"];
-    } else if([[smellieSettings objectForKey:@"500nm_laser_on"] intValue] == 1) {
+    } if([[smellieSettings objectForKey:@"500nm_laser_on"] intValue] == 1) {
         [laserArray addObject:@"500nm"];
-    } else if([[smellieSettings objectForKey:@"superK_laser_on"] intValue] == 1) {
+    } if([[smellieSettings objectForKey:@"superK_laser_on"] intValue] == 1) {
         [laserArray addObject:@"superK"];
     }
     return laserArray;
@@ -792,27 +792,27 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSMutableArray* fibreArray = [NSMutableArray arrayWithCapacity:12];
     if ([[smellieSettings objectForKey:@"FS007"] intValue] == 1){
         [fibreArray addObject:@"FS007"];
-    } else if ([[smellieSettings objectForKey:@"FS107"] intValue] == 1){
+    } if ([[smellieSettings objectForKey:@"FS107"] intValue] == 1){
         [fibreArray addObject:@"FS107"];
-    } else if ([[smellieSettings objectForKey:@"FS207"] intValue] == 1){
+    } if ([[smellieSettings objectForKey:@"FS207"] intValue] == 1){
         [fibreArray addObject:@"FS207"];
-    } else if ([[smellieSettings objectForKey:@"FS025"] intValue] == 1){
+    } if ([[smellieSettings objectForKey:@"FS025"] intValue] == 1){
         [fibreArray addObject:@"FS025"];
-    } else if ([[smellieSettings objectForKey:@"FS125"] intValue] == 1){
+    } if ([[smellieSettings objectForKey:@"FS125"] intValue] == 1){
         [fibreArray addObject:@"FS125"];
-    } else if ([[smellieSettings objectForKey:@"FS225"] intValue] == 1){
+    } if ([[smellieSettings objectForKey:@"FS225"] intValue] == 1){
         [fibreArray addObject:@"FS225"];
-    } else if ([[smellieSettings objectForKey:@"FS037"] intValue] == 1){
+    } if ([[smellieSettings objectForKey:@"FS037"] intValue] == 1){
         [fibreArray addObject:@"FS037"];
-    } else if ([[smellieSettings objectForKey:@"FS137"] intValue] == 1){
+    } if ([[smellieSettings objectForKey:@"FS137"] intValue] == 1){
         [fibreArray addObject:@"FS137"];
-    } else if ([[smellieSettings objectForKey:@"FS237"] intValue] == 1){
+    } if ([[smellieSettings objectForKey:@"FS237"] intValue] == 1){
         [fibreArray addObject:@"FS237"];
-    } else if ([[smellieSettings objectForKey:@"FS055"] intValue] == 1){
+    } if ([[smellieSettings objectForKey:@"FS055"] intValue] == 1){
         [fibreArray addObject:@"FS055"];
-    } else if ([[smellieSettings objectForKey:@"FS155"] intValue] == 1){
+    } if ([[smellieSettings objectForKey:@"FS155"] intValue] == 1){
         [fibreArray addObject:@"FS155"];
-    } else if ([[smellieSettings objectForKey:@"FS255"] intValue] == 1){
+    } if ([[smellieSettings objectForKey:@"FS255"] intValue] == 1){
         [fibreArray addObject:@"FS255"];
     }
     return fibreArray;
@@ -1165,9 +1165,11 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     [self _pushSmellieRunDocument];
     
-    [runControl setForceRestart:YES];
-    [runControl performSelectorOnMainThread:@selector(stopRun) withObject:nil waitUntilDone:YES];
-    [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
+    if([runControl isRunning]){
+        [runControl setForceRestart:YES];
+        [runControl performSelectorOnMainThread:@selector(stopRun) withObject:nil waitUntilDone:YES];
+        [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
+    }
     
     //Set the Run Type to a SMELLIE run
     /*NSArray*  objsSNOP = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];

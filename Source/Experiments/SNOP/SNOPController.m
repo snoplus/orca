@@ -1084,13 +1084,13 @@ smellieRunFile;
     
     /*[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startSmellieRun:) object:smellieRunFile];*/
     //cancel the smellie thread
+
     [smellieThread cancel];
     [smellieThread release];
     smellieThread = nil;
     
     //Method for completing this without a new thread
     [theELLIEModel stopSmellieRun];
-    
     
     //[theELLIEModel release];
     
