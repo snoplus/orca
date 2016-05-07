@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="8191" systemVersion="14F1021" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
         <development version="5100" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10116"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="8191"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ORCatalogController">
@@ -3082,9 +3082,9 @@ Relay</string>
                                                                 </buttonCell>
                                                             </button>
                                                             <button toolTip="ORSNORackModel" id="26814" customClass="ObjectFactory">
-                                                                <rect key="frame" x="9" y="11" width="98" height="190"/>
+                                                                <rect key="frame" x="9" y="62" width="73" height="139"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <buttonCell key="cell" type="bevel" title="SNO Rack" bezelStyle="regularSquare" image="SNORack" imagePosition="above" alignment="center" inset="2" id="26815">
+                                                                <buttonCell key="cell" type="bevel" title="SNO Rack" bezelStyle="regularSquare" image="SNORack" imagePosition="above" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="26815">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="system" size="10"/>
                                                                 </buttonCell>
@@ -3133,6 +3133,14 @@ Relay</string>
                                                                 <rect key="frame" x="343" y="9" width="129" height="42"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" title="Symmetricom XL-GPS" bezelStyle="regularSquare" image="XLGPSIcon" imagePosition="above" alignment="center" state="on" inset="2" id="26799">
+                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                    <font key="font" metaFont="system" size="10"/>
+                                                                </buttonCell>
+                                                            </button>
+                                                            <button toolTip="TUBiiModel" id="b7b-q3-gnR" customClass="ObjectFactory">
+                                                                <rect key="frame" x="-2" y="-5" width="95" height="67"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <buttonCell key="cell" type="bevel" title="TUBii" bezelStyle="regularSquare" image="tubii" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="9dv-xS-g34">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="system" size="10"/>
                                                                 </buttonCell>
@@ -3448,5 +3456,6 @@ Relay</string>
         <image name="prespectrometer" width="72" height="48"/>
         <image name="rangeTimer" width="67" height="66"/>
         <image name="resistor" width="95" height="43"/>
+        <image name="tubii" width="402" height="348"/>
     </resources>
 </document>

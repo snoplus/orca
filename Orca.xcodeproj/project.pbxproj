@@ -37,6 +37,12 @@
 		0F4888691C9992EE00068BC2 /* DB.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F4888661C9992EE00068BC2 /* DB.h */; };
 		0F48886A1C9992EE00068BC2 /* PacketTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F4888671C9992EE00068BC2 /* PacketTypes.h */; };
 		0F48886B1C9992EE00068BC2 /* Registers.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F4888681C9992EE00068BC2 /* Registers.h */; };
+		0F5F66A41CCD36E2001FF7A4 /* tubii.gif in Resources */ = {isa = PBXBuildFile; fileRef = 0F5F669E1CCD36E2001FF7A4 /* tubii.gif */; settings = {ASSET_TAGS = (); }; };
+		0F5F66A51CCD36E2001FF7A4 /* TUBiiController.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F5F669F1CCD36E2001FF7A4 /* TUBiiController.h */; settings = {ASSET_TAGS = (); }; };
+		0F5F66A61CCD36E2001FF7A4 /* TUBiiController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0F5F66A01CCD36E2001FF7A4 /* TUBiiController.m */; settings = {ASSET_TAGS = (); }; };
+		0F5F66A71CCD36E2001FF7A4 /* TUBii.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0F5F66A11CCD36E2001FF7A4 /* TUBii.xib */; settings = {ASSET_TAGS = (); }; };
+		0F5F66A81CCD36E2001FF7A4 /* TUBiiModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F5F66A21CCD36E2001FF7A4 /* TUBiiModel.h */; settings = {ASSET_TAGS = (); }; };
+		0F5F66A91CCD36E2001FF7A4 /* TUBiiModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0F5F66A31CCD36E2001FF7A4 /* TUBiiModel.m */; settings = {ASSET_TAGS = (); }; };
 		146822430FC4799C0082BD70 /* ORCircularBufferUV.h in Headers */ = {isa = PBXBuildFile; fileRef = 146822410FC4799C0082BD70 /* ORCircularBufferUV.h */; };
 		146822440FC4799C0082BD70 /* ORCircularBufferUV.m in Sources */ = {isa = PBXBuildFile; fileRef = 146822420FC4799C0082BD70 /* ORCircularBufferUV.m */; };
 		1C50F9F108033CA9008D18EA /* ADC2249.nib in Resources */ = {isa = PBXBuildFile; fileRef = 1C50F9E608033CA9008D18EA /* ADC2249.nib */; };
@@ -3741,6 +3747,12 @@
 		0F4888661C9992EE00068BC2 /* DB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DB.h; sourceTree = "<group>"; };
 		0F4888671C9992EE00068BC2 /* PacketTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PacketTypes.h; sourceTree = "<group>"; };
 		0F4888681C9992EE00068BC2 /* Registers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Registers.h; sourceTree = "<group>"; };
+		0F5F669E1CCD36E2001FF7A4 /* tubii.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = tubii.gif; sourceTree = "<group>"; };
+		0F5F669F1CCD36E2001FF7A4 /* TUBiiController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TUBiiController.h; sourceTree = "<group>"; };
+		0F5F66A01CCD36E2001FF7A4 /* TUBiiController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TUBiiController.m; sourceTree = "<group>"; };
+		0F5F66A11CCD36E2001FF7A4 /* TUBii.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TUBii.xib; sourceTree = "<group>"; };
+		0F5F66A21CCD36E2001FF7A4 /* TUBiiModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TUBiiModel.h; sourceTree = "<group>"; };
+		0F5F66A31CCD36E2001FF7A4 /* TUBiiModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TUBiiModel.m; sourceTree = "<group>"; };
 		146822410FC4799C0082BD70 /* ORCircularBufferUV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCircularBufferUV.h; path = Source/Objects/Hardware/HV/UnivVoltHV/ORCircularBufferUV.h; sourceTree = SOURCE_ROOT; };
 		146822420FC4799C0082BD70 /* ORCircularBufferUV.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCircularBufferUV.m; path = Source/Objects/Hardware/HV/UnivVoltHV/ORCircularBufferUV.m; sourceTree = SOURCE_ROOT; };
 		1C50F9E608033CA9008D18EA /* ADC2249.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = ADC2249.nib; sourceTree = "<group>"; };
@@ -7112,6 +7124,19 @@
 				0F16E3181C493AD6003C9EC9 /* qt.h */,
 			);
 			path = adapters;
+			sourceTree = "<group>";
+		};
+		0F5F669D1CCD36E2001FF7A4 /* TUBii */ = {
+			isa = PBXGroup;
+			children = (
+				0F5F669E1CCD36E2001FF7A4 /* tubii.gif */,
+				0F5F669F1CCD36E2001FF7A4 /* TUBiiController.h */,
+				0F5F66A01CCD36E2001FF7A4 /* TUBiiController.m */,
+				0F5F66A11CCD36E2001FF7A4 /* TUBii.xib */,
+				0F5F66A21CCD36E2001FF7A4 /* TUBiiModel.h */,
+				0F5F66A31CCD36E2001FF7A4 /* TUBiiModel.m */,
+			);
+			path = TUBii;
 			sourceTree = "<group>";
 		};
 		1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */ = {
@@ -11316,6 +11341,7 @@
 		8499FE810DC8E86800E82DB4 /* SNO+ */ = {
 			isa = PBXGroup;
 			children = (
+				0F5F669D1CCD36E2001FF7A4 /* TUBii */,
 				3620200F1CBD390A0089296E /* WPXMLRPC */,
 				3620201D1CBD390A0089296E /* XmlrpcClient */,
 				3672CF7D1C4EB15000870996 /* CAEN */,
@@ -14997,6 +15023,7 @@
 				84DF474A0962140800ABE071 /* ORDataExplorerController.h in Headers */,
 				848648820975C1F6001C459D /* ORProcessInConnector.h in Headers */,
 				362020291CBD390A0089296E /* WPXMLRPCDecoderDelegate.h in Headers */,
+				0F5F66A51CCD36E2001FF7A4 /* TUBiiController.h in Headers */,
 				848648960975C415001C459D /* ORProcessOutConnector.h in Headers */,
 				848648AC0975CB2E001C459D /* ORProcessConnector.h in Headers */,
 				84B63C000978299E005B20A5 /* ORCountController.h in Headers */,
@@ -15696,6 +15723,7 @@
 				84913CA21538698000597004 /* OROutputCallBackController.h in Headers */,
 				84913CA41538698000597004 /* OROutputCallBackModel.h in Headers */,
 				84BBE097153CB5110084E6B1 /* ORTPG256AController.h in Headers */,
+				0F5F66A81CCD36E2001FF7A4 /* TUBiiModel.h in Headers */,
 				84AC14E21B70E2460071C4EF /* ORMjdDataScannerController.h in Headers */,
 				84BBE099153CB5110084E6B1 /* ORTPG256ADecoders.h in Headers */,
 				84BBE09B153CB5110084E6B1 /* ORTPG256AModel.h in Headers */,
@@ -16096,6 +16124,7 @@
 				84FD0DD707945D17004A0E46 /* OfflineRunHelp.plist in Resources */,
 				84FD0DFA079462FB004A0E46 /* RunFailedHelp.plist in Resources */,
 				84FD0E1F0794640E004A0E46 /* NoPciHardwareHelp.plist in Resources */,
+				0F5F66A41CCD36E2001FF7A4 /* tubii.gif in Resources */,
 				84FD0E4007946718004A0E46 /* NoCamacHardwareHelp.plist in Resources */,
 				84FD0E8F07946BE9004A0E46 /* eCPUDeadHelp.plist in Resources */,
 				84FD0E9B07946DBE004A0E46 /* eCPUNoStartHelp.plist in Resources */,
@@ -16398,6 +16427,7 @@
 				9C8846A60E2D90ED0099B98E /* HP4405A.gif in Resources */,
 				844CD8FD18CA974E00F47A5B /* CouchUpdateHandler.txt in Resources */,
 				9C7CE7E40E2FC22500F63679 /* Caen260.nib in Resources */,
+				0F5F66A71CCD36E2001FF7A4 /* TUBii.xib in Resources */,
 				9C7CE7E50E2FC22500F63679 /* CV260Card.gif in Resources */,
 				844445770E81311500A1440D /* IpeV4FLT.nib in Resources */,
 				844445780E81311500A1440D /* IpeV4FLTCard.gif in Resources */,
@@ -16933,6 +16963,7 @@
 				8434A2BE055B3287002D3102 /* OrcaObject.m in Sources */,
 				8434A2C0055B3287002D3102 /* OrcaObjectFactory.m in Sources */,
 				8434A2C3055B3287002D3102 /* OR617Model.m in Sources */,
+				0F5F66A61CCD36E2001FF7A4 /* TUBiiController.m in Sources */,
 				8434A2C4055B3287002D3102 /* ORPciCard.m in Sources */,
 				8434A2C5055B3287002D3102 /* ORShaperModel.m in Sources */,
 				8434A2C6055B3287002D3102 /* ORShaperController.m in Sources */,
@@ -17790,6 +17821,7 @@
 				844B9BF4132E527700FEDA6B /* ORCaen1724Model.m in Sources */,
 				841224D8132E6638001AC05B /* ORTPG262Controller.m in Sources */,
 				841224DA132E6638001AC05B /* ORTPG262Decoders.m in Sources */,
+				0F5F66A91CCD36E2001FF7A4 /* TUBiiModel.m in Sources */,
 				841224DC132E6638001AC05B /* ORTPG262Model.m in Sources */,
 				43E9ED471339044100888F93 /* ORAuxHw.m in Sources */,
 				3672CF8F1C4EB15000870996 /* SNOCaenController.m in Sources */,
