@@ -123,6 +123,8 @@ logPort;
     self = [super init];
 
     rolloverRun = NO;
+    state = STOPPED;
+    start = COLD_START;
 
     /* initialize our connection to the MTC server */
     mtc_server = [[RedisClient alloc] init];
@@ -285,6 +287,8 @@ logPort;
     self = [super initWithCoder:decoder];
 
     rolloverRun = NO;
+    state = STOPPED;
+    start = COLD_START;
 
     [[self undoManager] disableUndoRegistration];
 	[self initOrcaDBConnectionHistory];
