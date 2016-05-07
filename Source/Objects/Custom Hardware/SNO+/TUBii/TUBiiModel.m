@@ -27,8 +27,6 @@
 
 @implementation TUBiiModel
 #pragma mark •••Synthesized Variables
-@synthesize portNumber;
-@synthesize strHostName;
 
 - (void) setUpImage
 {
@@ -44,6 +42,18 @@
 
 - (BOOL) solitaryObject {
     return YES; // Prevents there from being two TUBiis
+}
+- (void) setPortNumber:(int)_portNumber {
+    [connection setPort:_portNumber];
+}
+- (int) portNumber {
+    return [connection port];
+}
+- (void) setStrHostName:(NSString *)_strHostName {
+    [connection setHost:_strHostName];
+}
+- (NSString*) strHostName {
+    return [connection host];
 }
 //  Link the model to the controller
 - (void) makeMainController
@@ -68,9 +78,9 @@
         smellieNPulses=0;
         tellieNPulses=0;
         NPulses=0;
+        connection = [[RedisClient alloc] init]; // Connection must be allocated before port and host name are set
         portNumber =TUBII_DEFAULT_PORT;
         strHostName = [[NSString alloc]initWithUTF8String:TUBII_DEFAULT_IP];
-        connection = [[RedisClient alloc] initWithHostName:strHostName withPort:portNumber];
     }
     return self;
 }
@@ -94,6 +104,8 @@
         pulseWidth =      [ aCoder decodeFloatForKey:@"TUBiiModelPulseWidth"];
         NPulses =         [ aCoder decodeIntForKey:@"TUBiiModelNPulses"];
         portNumber =      [ aCoder decodeIntForKey:@"TUBiiModelPortNumber"];
+        //Connection must be made before port and host name are set.
+        connection = [[RedisClient alloc] initWithHostName:strHostName withPort:portNumber];
         [self setStrHostName:[ aCoder decodeObjectForKey:@"TUBiiModelStrHostName"]];
         if (!strHostName) {
             [self setStrHostName:[[NSString alloc] initWithUTF8String:TUBII_DEFAULT_IP ]];
@@ -101,7 +113,6 @@
         if (!portNumber) {
             portNumber = TUBII_DEFAULT_PORT;
         }
-        connection = [[RedisClient alloc] initWithHostName:strHostName withPort:portNumber];
     }
     return self;
 }
