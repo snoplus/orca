@@ -94,7 +94,6 @@
 }
 - (void) dealloc {
     [connection release];
-    [strHostName release];
     [super dealloc];
 
 }
@@ -112,14 +111,15 @@
         pulseWidth =      [ aCoder decodeFloatForKey:@"TUBiiModelPulseWidth"];
         NPulses =         [ aCoder decodeIntForKey:@"TUBiiModelNPulses"];
         portNumber =      [ aCoder decodeIntForKey:@"TUBiiModelPortNumber"];
+        
         //Connection must be made before port and host name are set.
         connection = [[RedisClient alloc] initWithHostName:strHostName withPort:portNumber];
         [self setStrHostName:[ aCoder decodeObjectForKey:@"TUBiiModelStrHostName"]];
         if (!strHostName) {
-            [self setStrHostName:[[NSString alloc] initWithUTF8String:TUBII_DEFAULT_IP ]];
+            [self setStrHostName: @TUBII_DEFAULT_IP];
         }
-        if (!portNumber) {
-            portNumber = TUBII_DEFAULT_PORT;
+        if (![self portNumber]) {
+            [self setPortNumber:TUBII_DEFAULT_PORT];
         }
     }
     return self;
