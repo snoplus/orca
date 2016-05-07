@@ -772,15 +772,15 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 {
     //Extract the lasers to be fired into an array
     NSMutableArray* laserArray = [NSMutableArray arrayWithCapacity:5];
-    if([smellieSettings objectForKey:@"375nm_laser_on"]){
+    if([[smellieSettings objectForKey:@"375nm_laser_on"] intValue] == 1){
         [laserArray addObject:@"375nm"];
-    } else if([smellieSettings objectForKey:@"405nm_laser_on"]) {
+    } else if([[smellieSettings objectForKey:@"405nm_laser_on"] intValue] == 1) {
         [laserArray addObject:@"405nm"];
-    } else if([smellieSettings objectForKey:@"440nm_laser_on"]) {
+    } else if([[smellieSettings objectForKey:@"440nm_laser_on"] intValue] == 1) {
         [laserArray addObject:@"440nm"];
-    } else if([smellieSettings objectForKey:@"500nm_laser_on"]) {
+    } else if([[smellieSettings objectForKey:@"500nm_laser_on"] intValue] == 1) {
         [laserArray addObject:@"500nm"];
-    } else if([smellieSettings objectForKey:@"superK_laser_on"]) {
+    } else if([[smellieSettings objectForKey:@"superK_laser_on"] intValue] == 1) {
         [laserArray addObject:@"superK"];
     }
     return laserArray;
@@ -790,29 +790,29 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 {
     //Extract the fibres to be fired into an array
     NSMutableArray* fibreArray = [NSMutableArray arrayWithCapacity:12];
-    if ([smellieSettings objectForKey:@"FS007"]){
+    if ([[smellieSettings objectForKey:@"FS007"] intValue] == 1){
         [fibreArray addObject:@"FS007"];
-    } else if ([smellieSettings objectForKey:@"FS107"]){
+    } else if ([[smellieSettings objectForKey:@"FS107"] intValue] == 1){
         [fibreArray addObject:@"FS107"];
-    } else if ([smellieSettings objectForKey:@"FS207"]){
+    } else if ([[smellieSettings objectForKey:@"FS207"] intValue] == 1){
         [fibreArray addObject:@"FS207"];
-    } else if ([smellieSettings objectForKey:@"FS025"]){
+    } else if ([[smellieSettings objectForKey:@"FS025"] intValue] == 1){
         [fibreArray addObject:@"FS025"];
-    } else if ([smellieSettings objectForKey:@"FS125"]){
+    } else if ([[smellieSettings objectForKey:@"FS125"] intValue] == 1){
         [fibreArray addObject:@"FS125"];
-    } else if ([smellieSettings objectForKey:@"FS225"]){
+    } else if ([[smellieSettings objectForKey:@"FS225"] intValue] == 1){
         [fibreArray addObject:@"FS225"];
-    } else if ([smellieSettings objectForKey:@"FS037"]){
+    } else if ([[smellieSettings objectForKey:@"FS037"] intValue] == 1){
         [fibreArray addObject:@"FS037"];
-    } else if ([smellieSettings objectForKey:@"FS137"]){
+    } else if ([[smellieSettings objectForKey:@"FS137"] intValue] == 1){
         [fibreArray addObject:@"FS137"];
-    } else if ([smellieSettings objectForKey:@"FS237"]){
+    } else if ([[smellieSettings objectForKey:@"FS237"] intValue] == 1){
         [fibreArray addObject:@"FS237"];
-    } else if ([smellieSettings objectForKey:@"FS055"]){
+    } else if ([[smellieSettings objectForKey:@"FS055"] intValue] == 1){
         [fibreArray addObject:@"FS055"];
-    } else if ([smellieSettings objectForKey:@"FS155"]){
+    } else if ([[smellieSettings objectForKey:@"FS155"] intValue] == 1){
         [fibreArray addObject:@"FS155"];
-    } else if ([smellieSettings objectForKey:@"FS255"]){
+    } else if ([[smellieSettings objectForKey:@"FS255"] intValue] == 1){
         [fibreArray addObject:@"FS255"];
     }
     return fibreArray;
@@ -825,21 +825,10 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 
 -(NSMutableArray*)getSmellieRunIntensityArray:(NSDictionary*)smellieSettings
 {
-    //Extract the min intensity
-    NSLog(@"%@", [smellieSettings objectForKey:@"min_laser_intensity"]);
-    if([[smellieSettings objectForKey:@"min_laser_intensity"] isKindOfClass:[NSString class]]){
-        NSLog(@"STRING!");
-    } if([[smellieSettings objectForKey:@"min_laser_intensity"] isKindOfClass:[NSNumber class]]){
-        NSLog(@"Number!");
-    }
-    else {
-        NSLog(@"Something else!");
-    }
-
+    //Extract bounds
     int minIntensity = [[smellieSettings objectForKey:@"min_laser_intensity"] intValue];
     int maxIntensity = [[smellieSettings objectForKey:@"max_laser_intensity"] intValue];
     int noSteps = [[smellieSettings objectForKey:@"num_intensity_steps"] intValue];
-
     
     //Check to see if the maximum intensity is the same as the minimum intensity
     int increment = 0;
@@ -955,7 +944,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSMutableArray* laserArray = [self getSmellieRunLaserArray:smellieSettings];
     NSMutableArray* fibreArray = [self getSmellieRunFibreArray:smellieSettings];
     
-    
+    NSLog(@"%@\n", intensityArray);
+    NSLog(@"%@\n", laserArray);
+    NSLog(@"%@\n", fibreArray);
     
     NSMutableArray* subRunInfo = [[NSMutableArray alloc] initWithCapacity:100];
     NSString* numOfPulsesInSlaveMode = [NSString stringWithFormat:@"%@",[smellieSettings objectForKey:@"triggers_per_loop"]];
@@ -1064,7 +1055,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                     
                     //We need to set the pulser rate after firing pedestals
                     float pulserRate = [numericTriggerFrequencyInSlaveMode floatValue];
-                    [theMTCModel setThePulserRate:pulserRate];
+                    //[theMTCModel setThePulserRate:pulserRate];
                  
                     NSLog(@"SMELLIE_RUN: Pulsing at %f Hz for %f seconds \n",[triggerFrequencyInSlaveMode floatValue],timeToPulse);
                     //Wait a certain amount of time for slave Mode
@@ -1120,7 +1111,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //stop the pedestals if required
     if([self smellieSlaveMode]){
         //NSLog(@"SMELLIE_RUN:Stopping MTCPedestals\n");
-        [theMTCModel stopMTCPedestalsFixedRate];
+        //[theMTCModel stopMTCPedestalsFixedRate];
     }
     
     //Resetting the mtcd to settings before the smellie run
@@ -1164,12 +1155,12 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     runControl = [runModels objectAtIndex:0];
     
     //Set the Mtcd for back to original settings
-    [theMTCModel setThePulserRate:[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_pulser_period"] floatValue]];
-    [theMTCModel enablePulser];
+    //[theMTCModel setThePulserRate:[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_pulser_period"] floatValue]];
+    //[theMTCModel enablePulser];
     NSLog(@"SMELLIE_RUN:Setting the mtcd pulser back to %f Hz\n",[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_pulser_period"] floatValue]);
-    [theMTCModel stopMTCPedestalsFixedRate];
+    //[theMTCModel stopMTCPedestalsFixedRate];
     
-    [theMTCModel setupGTCorseDelay:[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_coarse_delay"] intValue]];
+    //[theMTCModel setupGTCorseDelay:[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_coarse_delay"] intValue]];
     NSLog(@"SMELLIE_RUN:Setting the mtcd coarse delay back to %i \n",[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_coarse_delay"] intValue]);
     
     [self _pushSmellieRunDocument];

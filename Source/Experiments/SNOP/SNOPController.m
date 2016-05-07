@@ -1068,12 +1068,8 @@ smellieRunFile;
     //[model setRunType:kRunUndefined];
     
     //Collect a series of objects from the ELLIEModel
-    ELLIEModel* theELLIEModel = nil;
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
-    if ([objs count]) {
-      //get the ELLIE Model object
-      theELLIEModel = [objs objectAtIndex:0];
-    } else {
+    if (![objs count]) {
       NSString* reasonStr = @"ELLIE model not available, add an ELLIE model to your experiment";
       NSException* e = [NSException
                         exceptionWithName:@"NoEllieModel"
@@ -1081,7 +1077,7 @@ smellieRunFile;
                         userInfo:nil];
       [e raise];
     }    
-    
+    ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
     /*[NSThread detachNewThreadSelector:@selector(startSmellieRun:)
      toTarget:theELLIEModel
      withObject:[smellieRunFile autorelease]];*/
