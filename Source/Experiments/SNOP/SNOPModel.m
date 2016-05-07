@@ -1659,19 +1659,19 @@ logPort;
     objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     ORMTCModel* mtc = [objs objectAtIndex:0];
     //FIXME: Set correct hardcoded values!!!
-    [mtc setDbObject:[NSNumber numberWithDouble:3000.0] forIndex:kNHit100HiThreshold];
-    [mtc setDbObject:[NSNumber numberWithDouble:3000.0] forIndex:kNHit100MedThreshold];
-    [mtc setDbObject:[NSNumber numberWithDouble:3000.0] forIndex:kNHit100LoThreshold];
-    [mtc setDbObject:[NSNumber numberWithDouble:3000.0] forIndex:kNHit20Threshold];
-    [mtc setDbObject:[NSNumber numberWithDouble:3000.0] forIndex:kNHit20LBThreshold];
-    [mtc setDbObject:[NSNumber numberWithDouble:3000.0] forIndex:kOWLNThreshold];
-    [mtc setDbObject:[NSNumber numberWithDouble:3000.0] forIndex:kESumLowThreshold];
-    [mtc setDbObject:[NSNumber numberWithDouble:3000.0] forIndex:kESumHiThreshold];
-    [mtc setDbObject:[NSNumber numberWithDouble:3000.0] forIndex:kOWLELoThreshold];
-    [mtc setDbObject:[NSNumber numberWithDouble:3000.0] forIndex:kOWLEHiThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:5000.0] forIndex:kNHit100HiThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:5000.0] forIndex:kNHit100MedThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:5000.0] forIndex:kNHit100LoThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:5000.0] forIndex:kNHit20Threshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:5000.0] forIndex:kNHit20LBThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:5000.0] forIndex:kOWLNThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:5000.0] forIndex:kESumLowThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:5000.0] forIndex:kESumHiThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:5000.0] forIndex:kOWLELoThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:5000.0] forIndex:kOWLEHiThreshold];
     [mtc setDbObject:[NSNumber numberWithDouble:100.0] forIndex:kNhit100LoPrescale];
     [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kPulserPeriod];
-    
+
     //Restart the run if the run is ongoing and do nothing if there is no run happening
     if([runControl isRunning]){
         [self setStandardRunType:@"HIGH THRESHOLDS"];

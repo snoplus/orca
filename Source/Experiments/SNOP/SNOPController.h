@@ -120,10 +120,19 @@
     IBOutlet NSTextField *TSlopePatternTextField;
     IBOutlet NSTextField *subTimeTextField;
     NSButton *refreshRunWordNames;
+    
+    //Custom colors
+    NSColor *snopRedColor;
+    NSColor *snopBlueColor;
+    NSColor *snopGreenColor;
+
 }
 
 @property (nonatomic,retain) NSMutableDictionary *smellieRunFileList;
 @property (nonatomic,retain) NSDictionary *smellieRunFile;
+@property (nonatomic,retain) NSColor *snopRedColor;
+@property (nonatomic,retain) NSColor *snopBlueColor;
+@property (nonatomic,retain) NSColor *snopGreenColor;
 
 #pragma mark ¥¥¥Initialization
 - (void) registerNotificationObservers;
