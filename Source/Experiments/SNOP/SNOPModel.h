@@ -124,6 +124,10 @@
 
     bool doinit;
 
+    int run_state;
+
+    int start;
+
     @private
         //Run type word
         unsigned long runTypeWord;

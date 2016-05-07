@@ -45,6 +45,15 @@
 #import "SNOCaenModel.h"
 #import "XL3_Link.h"
 
+#define STOPPED 0
+#define STARTING 1
+#define RUNNING 2
+#define STOPPING 3
+
+#define COLD_START 0
+#define CONTINUOUS_START 1
+#define ROLLOVER_START 2
+
 NSString* ORSNOPModelViewTypeChanged	= @"ORSNOPModelViewTypeChanged";
 static NSString* SNOPDbConnector	= @"SNOPDbConnector";
 NSString* ORSNOPModelOrcaDBIPAddressChanged = @"ORSNOPModelOrcaDBIPAddressChanged";
@@ -498,41 +507,31 @@ logPort;
     SNOCaenModel* caen;
     ORMTCModel* mtc;
     ORXL3Model* xl3;
-    ORRunModel *run = [aNote object];
 
-    uint32_t run_type = [run runType];
-    uint32_t run_number = [run runNumber];
-    uint32_t source_mask = 0; /* needs to come from the MANIP system */
-
-    if (rolloverRun) {
-        /* If this is a rollover run, we don't initialize any hardware. */
-        rolloverRun = NO;
-
-        @try {
-            /* Tell the MTC server to queue the run start. This will suspend
-             * the MTC readout and fire a SOFT_GT. When the run starts, we will
-             * resume the MTC readout */
-            [mtc_server okCommand:"queue_run_start"];
-        } @catch (NSException *e) {
-            /* Need to abort the run start here, because uncaught exceptions
-             * are not handled by ORCA during this phase of run start */
-            NSLogColor([NSColor redColor], @"failed to send queue_run_start to mtc server: %@", [e reason]);
-            goto err;
-        }
-
-        @try {
-            /* send the run_start command to the MTC server which will send the
-             * run header record to the builder, resume the MTC readout, fire a
-             * SOFT_GT, and send a trigger record to the builder */
-            [mtc_server okCommand:"run_start %d %d %d", run_number, run_type, source_mask];
-        } @catch (NSException *e) {
-            /* Need to abort the run start here, because uncaught exceptions
-             * are not handled by ORCA during this phase of run start */
-            NSLogColor([NSColor redColor], @"failed to send run_start to mtc server: %@", [e reason]);
-            goto err;
-        }
-
-        return;
+    switch(run_state) {
+        case STOPPED:
+            run_state = STARTING;
+            start = COLD_START;
+            break;
+        case RUNNING:
+            run_state = STARTING;
+            if (rolloverRun) {
+                rolloverRun = NO;
+                start = ROLLOVER_START;
+            } else {
+                start = CONTINUOUS_START;
+            }
+            break;
+        case STARTING:
+        case STOPPING:
+            NSLogColor([NSColor redColor], @"SNO+ mode: run state shouldn't be STARTING or STOPPING. Starting run anyways...\n");
+            run_state = STARTING;
+            start = COLD_START;
+            break;
+        default:
+            NSLogColor([NSColor redColor], @"SNO+ model: unknown run state number %i. Starting run anyways...\n");
+            run_state = STARTING;
+            start = COLD_START;
     }
 
     objs = [[(ORAppDelegate*)[NSApp delegate] document]
@@ -555,9 +554,26 @@ logPort;
         goto err;
     }
 
-    if (doinit) {
-        /* If doinit is set, that means this is a cold run start, so we
-         * initialize *all* the hardware, including the CAEN and the crates. */
+    switch (start) {
+    case ROLLOVER_START:
+    {
+        @try {
+            /* Tell the MTC server to queue the run start. This will suspend
+             * the MTC readout and fire a SOFT_GT. When the run starts, we will
+             * resume the MTC readout */
+            [mtc_server okCommand:"queue_run_start"];
+        } @catch (NSException *e) {
+            /* Need to abort the run start here, because uncaught exceptions
+             * are not handled by ORCA during this phase of run start */
+            NSLogColor([NSColor redColor], @"failed to send queue_run_start to mtc server: %@\n", [e reason]);
+            goto err;
+        }
+        break;
+    }
+    case COLD_START:
+    {
+        /* If we are doing a cold start, we initialize *all* the hardware,
+         * including the CAEN and the crates. */
 
         @try {
             /* make sure triggers are off */
@@ -565,7 +581,7 @@ logPort;
         } @catch (NSException *e) {
             /* Need to abort the run start here, because uncaught exceptions are
              * not handled by ORCA during this phase of run start */
-            NSLogColor([NSColor redColor], @"failed to send set_gt_mask to mtc server: %@", [e reason]);
+            NSLogColor([NSColor redColor], @"failed to send set_gt_mask to mtc server: %@\n", [e reason]);
             goto err;
         }
 
@@ -576,7 +592,7 @@ logPort;
         } @catch (NSException *e) {
             /* Need to abort the run start here, because uncaught exceptions are
              * not handled by ORCA during this phase of run start */
-            NSLogColor([NSColor redColor], @"failed to send reset_gtid to mtc server: %@", [e reason]);
+            NSLogColor([NSColor redColor], @"failed to send reset_gtid to mtc server: %@\n", [e reason]);
             goto err;
         }
 
@@ -618,53 +634,43 @@ logPort;
          * the next stage of the run start (runAboutToStart) won't happen
          * until all of the settings are loaded, so we wait until then to
          * enable triggers. */
-        return;
+        break;
     }
+    case CONTINUOUS_START:
+        /* If this is a continuous run start we just load the MTC settings for
+         * the given standard run, but don't initialize the crates. In the
+         * future we need to check here whether the CAEN settings need to
+         * change because if so we cannot do this smoothly since writing to the
+         * CAEN causes it to reset it's internal counter, and so you
+         * essentially have to do a hard stop first. For now, the CAEN settings
+         * are not a part of the standard run settings and so we don't do this
+         * check. */
+        @try {
+            /* Tell the MTC server to queue the run start. This will suspend
+             * the MTC readout and fire a SOFT_GT. When the run starts, we will
+             * resume the MTC readout */
+            [mtc_server okCommand:"queue_run_start"];
+        } @catch (NSException *e) {
+            /* Need to abort the run start here, because uncaught exceptions are
+             * not handled by ORCA during this phase of run start */
+            NSLogColor([NSColor redColor], @"failed to send queue_run_start to mtc server: %@", [e reason]);
+            goto err;
+        }
 
-    /* If doinit is zero, then we are doing a continuous run start. In this
-     * case we just load the MTC settings for the given standard run, but don't
-     * initialize the crates. In the future we need to check here whether the
-     * CAEN settings need to change because if so we cannot do this smoothly
-     * since writing to the CAEN causes it to reset it's internal counter, and
-     * so you essentially have to do a hard stop first. For now, the CAEN
-     * settings are not a part of the standard run settings and so we don't do
-     * this check. */
-    @try {
-        /* Tell the MTC server to queue the run start. This will suspend
-         * the MTC readout and fire a SOFT_GT. When the run starts, we will
-         * resume the MTC readout */
-        [mtc_server okCommand:"queue_run_start"];
-    } @catch (NSException *e) {
-        /* Need to abort the run start here, because uncaught exceptions are
-         * not handled by ORCA during this phase of run start */
-        NSLogColor([NSColor redColor], @"failed to send queue_run_start to mtc server: %@", [e reason]);
-        goto err;
-    }
+        /* Load standard run thresholds to the MTC model. Ideally here we would
+         * check and if the settings haven't changed, we wouldn't need to write
+         * anything, but currently this is not implemented. */
+        if ([self loadStandardRun:standardRunType withVersion:standardRunVersion]) {
+            NSLogColor([NSColor redColor], @"failed to load standard run settings at run start!\n");
+            goto err;
+        }
 
-    /* Load standard run thresholds to the MTC model. Ideally here we would
-     * check and if the settings haven't changed, we wouldn't need to write
-     * anything, but currently this is not implemented. */
-    if ([self loadStandardRun:standardRunType withVersion:standardRunVersion]) {
-        NSLogColor([NSColor redColor], @"failed to load standard run settings at run start!\n");
-        goto err;
-    }
+        /* Load MTC settings including triggers. */
+        if ([mtc initAtRunStart: 1]) {
+            NSLogColor([NSColor redColor], @"failed to load MTC settings at run start!\n");
+            goto err;
+        }
 
-    /* Load MTC settings including triggers. */
-    if ([mtc initAtRunStart: 1]) {
-        NSLogColor([NSColor redColor], @"failed to load MTC settings at run start!\n");
-        goto err;
-    }
-
-    @try {
-        /* send the run_start command to the MTC server which will send the
-         * run header record to the builder, resume the MTC readout, fire a
-         * SOFT_GT, and send a trigger record to the builder */
-        [mtc_server okCommand:"run_start %d %d %d", run_number, run_type, source_mask];
-    } @catch (NSException *e) {
-        /* Need to abort the run start here, because uncaught exceptions are
-         * not handled by ORCA during this phase of run start */
-        NSLogColor([NSColor redColor], @"failed to send command to mtc server: %@", [e reason]);
-        goto err;
     }
 
     return;
@@ -678,6 +684,8 @@ err:
                                 @"", @"Details",
                                 nil];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStartupAbort object: self userInfo: userInfo];
+
+    run_state = STOPPED;
 }
 }
 
@@ -685,12 +693,6 @@ err:
 {
     NSArray *objs;
     ORMTCModel* mtc;
-    ORRunModel *run = [aNote object];
-
-    uint32_t run_type = [run runType];
-    uint32_t run_number = [run runNumber];
-    uint32_t source_mask = 0; /* needs to come from the MANIP system */
-
 
     objs = [[(ORAppDelegate*)[NSApp delegate] document]
          collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
@@ -702,37 +704,29 @@ err:
         goto err;
     }
 
-    if (!doinit) {
-        return;
-    }
+    switch (start) {
+    case COLD_START:
+    {
+        /* Cold run start, so the XL3s were initialized. Still need to load
+         * triggers and start the run. */
+        @try {
+            [mtc_server okCommand:"queue_run_start"];
+        } @catch (NSException *e) {
+            /* Need to abort the run start here, because uncaught exceptions
+             * are not handled by ORCA during this phase of run start */
+            NSLogColor([NSColor redColor], @"failed to send queue_run_start to mtc server: %@\n", [e reason]);
+            goto err;
+        }
 
-    /* Cold run start, so the XL3s were initialized. Still need to load
-     * triggers and start the run. */
-    @try {
-        [mtc_server okCommand:"queue_run_start"];
-    } @catch (NSException *e) {
-        /* Need to abort the run start here, because uncaught exceptions are
-         * not handled by ORCA during this phase of run start */
-        NSLogColor([NSColor redColor], @"failed to send queue_run_start to mtc server: %@", [e reason]);
-        goto err;
+        /* Load MTC settings including triggers. */
+        if ([mtc initAtRunStart: 1]) {
+            NSLogColor([NSColor redColor], @"failed to load MTC settings at run start!\n");
+            goto err;
+        }
+        break;
     }
-
-    /* Load MTC settings including triggers. */
-    if ([mtc initAtRunStart: 1]) {
-        NSLogColor([NSColor redColor], @"failed to load MTC settings at run start!\n");
-        goto err;
-    }
-
-    @try {
-        /* send the run_start command to the MTC server which will send the
-         * run header record to the builder, resume the MTC readout, fire a
-         * SOFT_GT, and send a trigger record to the builder */
-        [mtc_server okCommand:"run_start %d %d %d", run_number, run_type, source_mask];
-    } @catch (NSException *e) {
-        /* Need to abort the run start here, because uncaught exceptions are
-         * not handled by ORCA during this phase of run start */
-        NSLogColor([NSColor redColor], @"failed to send run_start to mtc server: %@", [e reason]);
-        goto err;
+    default:
+        break;
     }
 
     return;
@@ -746,14 +740,39 @@ err:
                                 @"", @"Details",
                                 nil];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStartupAbort object: self userInfo: userInfo];
+
+    run_state = STOPPED;
 }
 }
 
 - (void) runStarted:(NSNotification*)aNote
 {
-    /* The run successfully started, so we don't need to initialize everything
-     * when the next run starts. */
-    doinit = NO;
+    ORRunModel *run = [aNote object];
+
+    uint32_t run_type = [run runType];
+    uint32_t run_number = [run runNumber];
+    uint32_t source_mask = 0; /* needs to come from the MANIP system */
+
+    switch (run_state) {
+    case STARTING:
+        run_state = RUNNING;
+        break;
+    default:
+        NSLogColor([NSColor redColor], @"error in run_state: run_state is %i, and got runStarted notification. Starting run anyways...\n", run_state);
+        run_state = RUNNING;
+        break;
+    }
+
+    @try {
+        /* send the run_start command to the MTC server which will send the run
+         * header record to the builder, resume the MTC readout, fire a
+         * SOFT_GT, and send a trigger record to the builder */
+        [mtc_server okCommand:"run_start %d %d %d", run_number, run_type, source_mask];
+    } @catch (NSException *e) {
+        /* Need to abort the run start here, because uncaught exceptions are
+         * not handled by ORCA during this phase of run start */
+        NSLogColor([NSColor redColor], @"failed to send command to mtc server: %@", [e reason]);
+    }
 
     //initilise the run document
     self.runDocument = nil;
@@ -776,7 +795,23 @@ err:
 
     NSDictionary *userInfo = [aNote userInfo];
 
-    if (![[userInfo objectForKey:@"willRestart"] boolValue]) {
+    switch (run_state) {
+    case RUNNING:
+        if (![[userInfo objectForKey:@"willRestart"] boolValue]) {
+            run_state = STOPPING;
+        }
+        /* If the run is going to restart, then we keep the run state as
+         * running, since according to the builder the run never really
+         * stops until the next run starts. */
+        break;
+    default:
+        NSLogColor([NSColor redColor], @"runAboutToStop but run state is %i. Doing a hard run stop...\n", run_state);
+        run_state = STOPPING;
+        break;
+    }
+
+    switch (run_state) {
+    case STOPPING:
         @try {
             [mtc_server okCommand:"run_stop"];
         } @catch (NSException *e) {
@@ -793,10 +828,7 @@ err:
         [NSThread detachNewThreadSelector:@selector(_waitForBuffers)
                                  toTarget:self
                                withObject:nil];
-
-        /* This is hard run stop, so we need to reinitialize the hardware
-         * settings when the run starts. */
-        doinit = YES;
+        break;
     }
 }
 
@@ -832,15 +864,27 @@ err:
      * a hard run stop, we send the MTC server the builder_end_run command
      * which will tell the builder to flush all events */
 
-    NSDictionary *userInfo = [aNote userInfo];
+    switch (run_state) {
+    case STOPPING:
+        run_state = STOPPED;
+        break;
+    case RUNNING:
+        break;
+    default:
+        NSLogColor([NSColor redColor], @"runStopped called but run state is %i.\n", run_state);
+        run_state = STOPPED;
+        break;
+    }
 
-    if (![[userInfo objectForKey:@"willRestart"] boolValue]) {
+    switch (run_state) {
+    case STOPPED:
         @try {
             [mtc_server okCommand:"builder_end_run"];
         } @catch (NSException *e) {
             NSLogColor([NSColor redColor], @"failed to send builder_end_run command to mtc server.\n");
         }
-    }
+        break;
+    };
 
     [NSThread detachNewThreadSelector:@selector(_runEndDocumentWorker:)
                              toTarget:self
