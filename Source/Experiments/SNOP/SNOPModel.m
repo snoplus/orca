@@ -49,7 +49,8 @@ NSString* ORSNOPModelViewTypeChanged	= @"ORSNOPModelViewTypeChanged";
 static NSString* SNOPDbConnector	= @"SNOPDbConnector";
 NSString* ORSNOPModelOrcaDBIPAddressChanged = @"ORSNOPModelOrcaDBIPAddressChanged";
 NSString* ORSNOPModelDebugDBIPAddressChanged = @"ORSNOPModelDebugDBIPAddressChanged";
-NSString* SNOPRunTypeChangedNotification = @"SNOPRunTypeChangedNotification";
+NSString* ORSNOPRunTypeWordChangedNotification = @"ORSNOPRunTypeWordChangedNotification";
+NSString* ORSNOPRunTypeChangedNotification = @"ORSNOPRunTypeChangedNotification";
 NSString* ORSNOPRunsLockNotification = @"ORSNOPRunsLockNotification";
 NSString* ORSNOPModelRunsECAChangedNotification = @"ORSNOPModelRunsECAChangedNotification";
 NSString* ORSNOPModelSRChangedNotification = @"ORSNOPModelSRChangedNotification";
@@ -96,8 +97,6 @@ runDocument = _runDocument,
 smellieDBReadInProgress = _smellieDBReadInProgress,
 smellieDocUploaded = _smellieDocUploaded,
 configDocument  = _configDocument,
-snopRunTypeMask = snopRunTypeMask,
-runTypeMask= runTypeMask,
 isEStopPolling = isEStopPolling,
 isEmergencyStopEnabled = isEmergencyStopEnabled,
 mtcConfigDoc = _mtcConfigDoc,
@@ -298,7 +297,6 @@ logPort;
     self.debugDBIPAddress = [decoder decodeObjectForKey:@"ORSNOPModelDebugDBIPAddress"];
 
     //Runs tab
-    self.runTypeMask = [decoder decodeObjectForKey:@"SNOPRunTypeMask"];
     [self setStandardRunType:[decoder decodeObjectForKey:@"SNOPStandarRunType"]];
     [self setStandardRunVersion:[decoder decodeObjectForKey:@"SNOPStandarRunVersion"]];
     [self setECA_pattern:[decoder decodeIntForKey:@"SNOPECApattern"]];
@@ -345,25 +343,6 @@ logPort;
 - (void) setUpImage
 {
     [self setImage:[NSImage imageNamed:@"SNOP"]];
-}
-
-- (NSMutableDictionary*) getSnopRunTypeMask
-{
-    return snopRunTypeMask;
-}
-
-- (void) setSnopRunTypeMask:(NSMutableDictionary*)aSnopRunTypeMask
-{
-    [[NSNotificationCenter defaultCenter] postNotificationName:SNOPRunTypeChangedNotification object:self];
-    snopRunTypeMask = aSnopRunTypeMask;
-}
-
-//check to see if the current SNO+ runType mask has the correct settings
--(BOOL)isRunTypeMaskedIn:(NSString*)aRunType
-{
-    bool runTypeMaskedIn;
-    runTypeMaskedIn = [[self.snopRunTypeMask objectForKey:aRunType] boolValue];
-    return runTypeMaskedIn;
 }
 
 - (void) makeMainController
@@ -1213,7 +1192,6 @@ logPort;
     [encoder encodeObject:self.debugDBIPAddress forKey:@"ORSNOPModelDebugDBIPAddress"];
 
     //Runs tab
-    [encoder encodeObject:self.runTypeMask forKey:@"SNOPRunTypeMask"];
     [encoder encodeObject:[self standardRunType] forKey:@"SNOPStandarRunType"];
     [encoder encodeObject:[self standardRunVersion] forKey:@"SNOPStandarRunVersion"];
     [encoder encodeInt:[self ECA_pattern] forKey:@"SNOPECApattern"];
@@ -1444,14 +1422,21 @@ logPort;
     }
 }
 
+- (unsigned long) runTypeWord
+{
+    return runTypeWord;
+}
+
+
+- (void) setRunTypeWord:(unsigned long)aValue
+{
+    runTypeWord = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPRunTypeWordChangedNotification object: self];
+}
+
 - (NSString*)standardRunType
 {
     return standardRunType;
-}
-
-- (NSString*)standardRunVersion
-{
-    return standardRunVersion;
 }
 
 - (void) setStandardRunType:(NSString *)aValue
@@ -1461,6 +1446,11 @@ logPort;
     standardRunType = aValue;
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelSRChangedNotification object:self];
+}
+
+- (NSString*)standardRunVersion
+{
+    return standardRunVersion;
 }
 
 - (void) setStandardRunVersion:(NSString *)aValue
@@ -1516,7 +1506,7 @@ logPort;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
 }
 
-// Load last MTC values (saved with 'saveStandardRun') from the DB for the selected Standard Run
+// Load Detector Settings from the DB into the Models
 -(BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion
 {
 
@@ -1527,8 +1517,11 @@ logPort;
     }
     NSLog(@"Loading settings for standard run: %@ - Version: %@ ........ \n",runTypeName, runVersion);
 
+    //Get RC model
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    ORRunModel* runControlModel = [objs objectAtIndex:0];
     //Get MTC model
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     ORMTCModel* mtcModel = [objs objectAtIndex:0];
 
     //Query the OrcaDB and get a dictionary with the parameters
@@ -1548,6 +1541,9 @@ logPort;
     
     //Load values
     @try{
+
+        //Load run type word
+        [runControlModel setRunType:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"run_type_word"] unsignedLongValue]];
 
         //Set pedestal mode if ECA
         if([runTypeName isEqualToString:@"ECA"]){
@@ -1583,18 +1579,22 @@ logPort;
     }
     NSLog(@"Saving settings for Standard Run: %@ - Version: %@ ........ \n",runTypeName,runVersion);
 
+    //Get RC model
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    ORRunModel* runControlModel = [objs objectAtIndex:0];
     //Get MTC model
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     ORMTCModel* mtcModel = [objs objectAtIndex:0];
 
     //Build run table
-    NSMutableDictionary *detectorSettings = [NSMutableDictionary dictionaryWithCapacity:100];
+    NSMutableDictionary *detectorSettings = [NSMutableDictionary dictionaryWithCapacity:200];
     
     [detectorSettings setObject:@"standard_run" forKey:@"type"];
     [detectorSettings setObject:runTypeName forKey:@"run_type"];
     [detectorSettings setObject:runVersion forKey:@"run_version"];
     NSNumber *date = [NSNumber numberWithDouble:[[NSDate date] timeIntervalSince1970]];
     [detectorSettings setObject:date forKey:@"time_stamp"];
+    [detectorSettings setObject:[NSNumber numberWithUnsignedLong:[runControlModel runType]] forKey:@"run_type_word"];
 
     //Save MTC/D parameters, trigger masks and MTC/A+ thresholds
     for (int iparam=0; iparam<kDbLookUpTableSize; iparam++) {
@@ -1687,9 +1687,8 @@ logPort;
     NSNumber* runNumber = [NSNumber numberWithUnsignedInt:run_number];
 
     [runDocDict setObject:@"run" forKey:@"type"];
-    //[runDocDict setObject:[self getRunType] forKey:@"run_type"];
     [runDocDict setObject:[NSNumber numberWithUnsignedLong:[aMTCcard mtcStatusGTID]] forKey:@"start_gtid"];
-    [runDocDict setObject:[NSNumber numberWithUnsignedLong:[[self runTypeMask] unsignedLongValue]] forKey:@"run_type"];
+    [runDocDict setObject:[NSNumber numberWithUnsignedLong:[self runTypeWord]] forKey:@"run_type"];
     [runDocDict setObject:[NSNumber numberWithUnsignedInt:0] forKey:@"version"];
     [runDocDict setObject:[NSNumber numberWithDouble:[[self stringUnixFromDate:nil] doubleValue]] forKey:@"timestamp_start"];
     [runDocDict setObject:[self rfc2822StringDateFromDate:nil] forKey:@"sudbury_time_start"];

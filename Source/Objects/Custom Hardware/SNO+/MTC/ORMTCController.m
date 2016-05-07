@@ -344,9 +344,8 @@
 	[pedestalWidthField		setFloatValue:	[model dbFloatByIndex: kPedestalWidth]];
 	[nhit100LoPrescaleField setFloatValue:	[model dbFloatByIndex: kNhit100LoPrescale]];
 	[pulserPeriodField		setFloatValue:	[model dbFloatByIndex: kPulserPeriod]];
-	[low10MhzClockField		setFloatValue:	[model dbFloatByIndex: kLow10MhzClock]];
-	[high10MhzClockField	setFloatValue:	[model dbFloatByIndex: kHigh10MhzClock]];
-	[fineSlopeField			setFloatValue:	[model dbFloatByIndex: kFineSlope]];
+    [extraPulserPeriodField	setFloatValue:	[model dbFloatByIndex: kPulserPeriod]];
+    [fineSlopeField			setFloatValue:	[model dbFloatByIndex: kFineSlope]];
 	[minDelayOffsetField	setFloatValue:	[model dbFloatByIndex: kMinDelayOffset]];
 	[coarseDelayField		setFloatValue:	[model dbFloatByIndex: kCoarseDelay]];
 	[fineDelayField			setFloatValue:	[model dbFloatByIndex: kFineDelay]];
@@ -588,6 +587,7 @@
     [high10MhzClockField            setEnabled: !lockedOrNotRunningMaintenance];
     [nhit100LoPrescaleField         setEnabled: !lockedOrNotRunningMaintenance];
     [pulserPeriodField              setEnabled: !lockedOrNotRunningMaintenance];
+    [extraPulserPeriodField         setEnabled: !lockedOrNotRunningMaintenance];
     [fineSlopeField                 setEnabled: !lockedOrNotRunningMaintenance];
     [minDelayOffsetField            setEnabled: !lockedOrNotRunningMaintenance];
     [fineDelayField                 setEnabled: !lockedOrNotRunningMaintenance];

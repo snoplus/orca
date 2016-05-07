@@ -48,12 +48,14 @@
 #define SET_ALARM_LEVELS_ID       (0x30) //!< Set one or many of the voltage alarm dacs
 #define MULTI_SET_CRATE_PEDS_ID   (0x31) //!< Unlike set_crate_pedestals_id, allows different mask per slot, and doesn't change slots not in the mask
 #define BOARD_ID_WRITE_ID         (0x32)
+#define SET_SEQUENCER_ID          (0x33) //!< Set the sequencer
 // HV Tasks
 #define SET_HV_RELAYS_ID          (0x40) //!< turns on/off hv relays
 #define HV_READBACK_ID			      (0x42) //!< reads voltage and current	
 #define READ_PMT_CURRENT_ID	      (0x43) //!< reads pmt current from FEC hv csr	
 #define SETUP_CHARGE_INJ_ID		    (0x44) //!< setup charge injection in FEC hv csr
 #define MULTI_SETUP_CHARGE_INJ_ID (0x45) //!< setup charge injection for multiple fecs and set dac level
+#define DO_PANIC_DOWN             (0x46) //!< Ramps crate HV to zero
 // Tests
 #define FEC_TEST_ID               (0x60) //!< check read/write to FEC registers
 #define MEM_TEST_ID               (0x61) //!< check read/write to FEC ram, address lines
@@ -366,6 +368,10 @@ typedef struct{
 } SetUpChargeInjResults;
 
 typedef struct{
+    uint32_t errorFlags;
+}DoPanicDownResults;
+
+typedef struct{
   uint32_t slotMask;
 } FECTestArgs;
 
@@ -416,6 +422,15 @@ typedef struct{
 typedef struct{
   uint32_t busErrors;
 } BoardIDWriteResults;
+
+typedef struct{
+    uint32_t slot;
+    uint32_t channelMask;
+} SetSequencerArgs;
+
+typedef struct{
+    uint32_t errors;
+} SetSequencerResults;
 
 typedef struct{
   uint32_t slotNum;

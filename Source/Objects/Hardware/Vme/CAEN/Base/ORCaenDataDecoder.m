@@ -249,17 +249,24 @@
     
     NSString* len =[NSString stringWithFormat:   @"Record Length = %lu\n",length-2];
     NSString* crate = [NSString stringWithFormat:@"Crate = %lu\n",(ptr[1] >> 21)&0x0000000f];
-    NSString* card  = [NSString stringWithFormat:@"Card  = %lu\n",(ptr[1] >> 16)&0x0000001f];    
-   
+    NSString* card  = [NSString stringWithFormat:@"Card  = %lu\n",(ptr[1] >> 16)&0x0000001f];
+    NSString* timeStamp = @"No Timestamp\n";
+    int firstDataIndex = 2;
+    if(ptr[1] | 0x1){
+        timeStamp  = [NSString stringWithFormat:@"TimeStamp = %lu.%lu\n",ptr[2],ptr[3]];
+        firstDataIndex = 4;
+    }
+    
+    
     NSString* restOfString = [NSString string];
     int i;
-    for( i = 2; i < length; i++ ){
+    for( i = firstDataIndex; i < length; i++ ){
          if( [self isValidDatum: ptr[i]] ){
-            restOfString = [restOfString stringByAppendingFormat:@"Chan  = %d  Value = %ld",[self channel: ptr[i]],[self adcValue: ptr[i]]];
+            restOfString = [restOfString stringByAppendingFormat:@"Chan  = %d  Value = %ld\n",[self channel: ptr[i]],[self adcValue: ptr[i]]];
         }
     }
 
-    return [NSString stringWithFormat:@"%@%@%@%@%@",title,len,crate,card,restOfString];               
+    return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,len,crate,card,timeStamp,restOfString];
 }
 
 

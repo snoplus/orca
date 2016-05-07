@@ -303,6 +303,8 @@
 
 - (id) valueForSymbol:(NSString*) aKey
 {
+    
+    if(!symbolTable)symbolTable = [[self makeSymbolTable] retain];
 	id aValue  = [symbolTable threadSafeObjectForKey:aKey usingLock:symbolTableLock];
 	if(!aValue){
 		aValue = _zero;

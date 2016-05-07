@@ -43,9 +43,11 @@
     IBOutlet NSMatrix* hvStatusMatrix;
     
     //Run control (the rest is in the ORExperimentController)
-    IBOutlet NSButton *maintenanceRunBox;
-    IBOutlet NSTextField* standardRunTypeField;
     IBOutlet StopLightView *lightBoardView;
+    IBOutlet NSButton *maintenanceRunBox;
+    IBOutlet NSTextField *standardRunTypeField;
+    IBOutlet NSTextField *standardRunVersionField;
+    IBOutlet NSTextField *runTypeWordField;
 
     //Quick links
     
@@ -65,8 +67,8 @@
     IBOutlet NSMatrix *standardRunThresDefaultValues;
 
     //Run Types Information
-    IBOutlet NSMatrix*  globalRunTypesMatrix;
-    
+    IBOutlet NSMatrix*  runTypeWordMatrix;
+
     //Xl3 Mode
     IBOutlet NSMatrix * globalxl3Mode;
     
@@ -81,6 +83,10 @@
     IBOutlet NSTextField *loadedSmellieMaxIntensityLaser;
     IBOutlet NSTextField *loadedSmellieMinIntensityLaser;
     
+    //SMELLIE
+    NSMutableDictionary *smellieRunFileList;
+    NSDictionary *smellieRunFile;
+    NSThread *smellieThread;
     IBOutlet NSButton *smellieLoadRunFile;
     IBOutlet NSButton *smellieCheckInterlock;
     IBOutlet NSButton *smellieStartRunButton;
@@ -90,20 +96,11 @@
     IBOutlet NSButton *smellieChangeConfiguration;
         
     //eStop buttons
+    NSThread *eStopPollingThread;
     IBOutlet NSButton *emergyencyStopEnabled;
     IBOutlet NSButton *eStopButton;
     
     IBOutlet NSTextField *pollingStatus;
-    
-    
-    NSImage* _runStopImg;
-    NSMutableDictionary *smellieRunFileList;
-    NSDictionary *smellieRunFile;
-    NSThread *smellieThread;
-    NSNumber * runTypeMask;
-    NSThread *eStopPollingThread;
-    
-    NSMutableDictionary *snopRunTypeMaskDic; 
 
     IBOutlet NSButton* runsLockButton;
     IBOutlet NSTextField *runStatusTextField;
@@ -125,13 +122,11 @@
     IBOutlet NSPopUpButton *ECAtypePopUpButton;
     IBOutlet NSTextField *TSlopePatternTextField;
     IBOutlet NSTextField *subTimeTextField;
+    NSButton *refreshRunWordNames;
 }
 
-@property (nonatomic,retain) NSImage* runStopImg;
 @property (nonatomic,retain) NSMutableDictionary *smellieRunFileList;
-@property (nonatomic,retain) NSMutableDictionary *snopRunTypeMaskDic;
 @property (nonatomic,retain) NSDictionary *smellieRunFile;
-@property (nonatomic,retain) NSNumber *runTypeMask;
 
 #pragma mark ¥¥¥Initialization
 - (void) registerNotificationObservers;
@@ -181,7 +176,7 @@
 //eStop functions
 - (IBAction) enmergencyStopToggle:(id)sender;
 
-//xl3 mode sttaus
+//xl3 mode status
 - (IBAction)updatexl3Mode:(id)sender;
 
 #pragma mark ¥¥¥Details Interface Management
@@ -189,9 +184,13 @@
 - (void) viewTypeChanged:(NSNotification*)aNote;
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem;
 -(void) windowDidLoad;
--(void) fetchRunMaskSettings;
 
 - (IBAction) runsLockAction:(id)sender;
+
+//Run type
+- (IBAction) refreshRunWordLabels:(id)sender;
+- (IBAction) runTypeWordAction:(id)sender;
+
 
 @end
 @interface ORDetectorView (SNO)
