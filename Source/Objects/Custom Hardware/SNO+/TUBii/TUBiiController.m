@@ -32,7 +32,8 @@
     Tubii_size = NSMakeSize(450, 400);
     Analog_size = NSMakeSize(615, 445);
     GTDelays_size = NSMakeSize(500, 250);
-    SpeakerCounter_size = NSMakeSize(575,550);
+    SpeakerCounter_size_small = NSMakeSize(575,550);
+    SpeakerCounter_size_big = NSMakeSize(575,650);
     ClockMonitor_size = NSMakeSize(500, 175);
 
     [tabView setDelegate:self];
@@ -61,7 +62,12 @@
             newSize = &GTDelays_size;
             break;
         case TUBII_GUI_SPEAKER_TAB_NUM:
-            newSize = &SpeakerCounter_size;
+            if([CounterAdvancedOptionsBox isHidden]) {
+            newSize = &SpeakerCounter_size_small;
+            }
+            else {
+                newSize = &SpeakerCounter_size_big;
+            }
             break;
         case TUBII_GUI_CLOCK_TAB_NUM:
             newSize = &ClockMonitor_size;
@@ -380,14 +386,12 @@
 - (IBAction)AdvancedOptionsButtonChanged:(id)sender{
     if([sender state] == NSOffState){
         [CounterAdvancedOptionsBox setHidden:YES];
-        [self resizeWindowToSize:SpeakerCounter_size];
+        [self resizeWindowToSize:SpeakerCounter_size_small];
     }
     else{
         [CounterAdvancedOptionsBox setHidden:NO];
-        NSSize newSize = SpeakerCounter_size;
-        newSize.height += 100;
-        if(self.window.frame.size.height < newSize.height){
-            [self resizeWindowToSize:newSize];
+        if(self.window.frame.size.height < SpeakerCounter_size_big.height){
+            [self resizeWindowToSize:SpeakerCounter_size_big];
         }
     }
 }

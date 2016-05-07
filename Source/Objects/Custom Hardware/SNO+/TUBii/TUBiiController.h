@@ -18,7 +18,8 @@
     NSSize Tubii_size;
     NSSize Analog_size;
     NSSize GTDelays_size;
-    NSSize SpeakerCounter_size;
+    NSSize SpeakerCounter_size_big;
+    NSSize SpeakerCounter_size_small;
     NSSize ClockMonitor_size;
     // These references to UI elements are created by CTRL-dragging them into this
     // header file. Note the connection dots on the left.
