@@ -122,6 +122,9 @@
     RedisClient *mtc_server;
     RedisClient *xl3_server;
 
+    int state;
+    int start;
+
     @private
         //Run type word
         unsigned long runTypeWord;
