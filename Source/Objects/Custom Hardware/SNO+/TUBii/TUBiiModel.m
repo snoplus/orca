@@ -142,7 +142,6 @@
     [self setDataReadout:NO];
     [self ResetFifo]; //Maybe take this out eventually? I'm not sure
     [self setDataReadout:YES];
-    [self setStatusReadout:YES];
 }
 #pragma mark •••Network Communication
 - (void) sendOkCmd:(NSString* const)aCmd {
@@ -600,18 +599,6 @@
     }
     else {
         [self sendOkCmd:@"StopReadout"];
-    }
-}
-- (void) setStatusReadout:(BOOL) Readout {
-    // This is implemented in the TUBii Server that runs on the MicroZed.
-    // It simply tells the MicroZed to send out status information
-    // At the time of writing this I can't say exactly what will be in the status packets
-    // It will include info about the state of the 100Mhz clock.
-    if (Readout) {
-        [self sendOkCmd:@"StartStatusReadout"];
-    }
-    else {
-        [self sendOkCmd:@"StopStatusReadout"];
     }
 }
 - (void) ResetFifo

@@ -99,7 +99,6 @@
 
 - (IBAction)InitializeClicked:(id)sender;
 - (IBAction)SendPing:(id)sender;
-- (IBAction)StatusReadoutChanged:(id)sender;
 - (IBAction)DataReadoutChanged:(id)sender;
 
 - (IBAction)TrigMaskMatchHardware:(id)sender;

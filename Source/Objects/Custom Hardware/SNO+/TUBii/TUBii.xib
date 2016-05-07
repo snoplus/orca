@@ -136,6 +136,9 @@
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="SendPing:" target="-2" id="wm5-9H-daI"/>
+                                            </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="STE-s6-s7D">
                                             <rect key="frame" x="41" y="562" width="90" height="32"/>
@@ -177,38 +180,20 @@
                                                 <action selector="DataReadoutChanged:" target="-2" id="UaP-MH-EWx"/>
                                             </connections>
                                         </matrix>
-                                        <matrix toolTip="Tells TUBii to readout it's status at a set rate (1Hz)" verticalHuggingPriority="750" fixedFrame="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="K3y-kF-h1w">
-                                            <rect key="frame" x="47" y="419" width="89" height="58"/>
-                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            <size key="cellSize" width="83.40087890625" height="18"/>
-                                            <size key="intercellSpacing" width="4" height="2"/>
-                                            <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" inset="2" id="3Ff-A8-DAJ">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TSo-02-c2u">
+                                            <rect key="frame" x="218" y="612" width="96" height="22"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="J1d-dr-fE0">
                                                 <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <cells>
-                                                <column>
-                                                    <textFieldCell controlSize="small" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Status Readout" id="R6T-74-gqX">
-                                                        <font key="font" metaFont="smallSystem"/>
-                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                    </textFieldCell>
-                                                    <buttonCell type="radio" title="On" imagePosition="left" alignment="left" tag="1" inset="2" id="MRN-0K-CSE">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                    <buttonCell type="radio" title="Off" imagePosition="left" alignment="left" state="on" tag="2" inset="2" id="eqw-p3-R5a">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                    </buttonCell>
-                                                </column>
-                                            </cells>
+                                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
                                             <connections>
-                                                <action selector="StatusReadoutChanged:" target="-2" id="08C-RC-GeP"/>
+                                                <binding destination="-2" name="value" keyPath="self.model.portNumber" id="qAC-c1-uVM"/>
+                                                <outlet property="formatter" destination="nx4-pj-I1a" id="LPG-9V-Yd3"/>
                                             </connections>
-                                        </matrix>
+                                        </textField>
                                         <matrix toolTip="Use this to enable TUBii's ECA mode. This re-routes GT to EXT PED OUT and causes EXT PED IN to be ignored." verticalHuggingPriority="750" fixedFrame="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iur-DA-0o0">
-                                            <rect key="frame" x="47" y="336" width="89" height="58"/>
+                                            <rect key="frame" x="47" y="425" width="89" height="58"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             <size key="cellSize" width="69.548828125" height="18"/>
                                             <size key="intercellSpacing" width="4" height="2"/>
@@ -237,18 +222,6 @@
                                                 <action selector="ECAEnableChanged:" target="-2" id="nVg-wW-Xza"/>
                                             </connections>
                                         </matrix>
-                                        <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TSo-02-c2u">
-                                            <rect key="frame" x="218" y="612" width="96" height="22"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="J1d-dr-fE0">
-                                                <font key="font" metaFont="system"/>
-                                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                            <connections>
-                                                <binding destination="-2" name="value" keyPath="self.model.portNumber" id="qAC-c1-uVM"/>
-                                                <outlet property="formatter" destination="nx4-pj-I1a" id="LPG-9V-Yd3"/>
-                                            </connections>
-                                        </textField>
                                     </subviews>
                                 </view>
                             </tabViewItem>

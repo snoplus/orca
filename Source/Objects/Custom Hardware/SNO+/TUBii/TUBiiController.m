@@ -100,15 +100,6 @@
     }
     return;
 }
-- (IBAction)StatusReadoutChanged:(id)sender {
-    if ([[sender selectedCell] tag] == 1) { //Status Readout On is selected
-        [model setStatusReadout:YES];
-    }
-    else { //Status Readout Off is selected
-        [model setStatusReadout:NO];
-    }
-    return;
-}
 - (IBAction)PulserFire:(id)sender {
     //The commented out code in this function is how it will eventually work
     //currently the server doesn't support this though.
