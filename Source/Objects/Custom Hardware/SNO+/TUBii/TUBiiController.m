@@ -82,14 +82,12 @@
     }
 }
 
-// GUI actions. CTRL-drag handles from the IB into this file.
 #pragma mark •••Actions
 - (IBAction)InitializeClicked:(id)sender {
     [model Initialize];
 }
 - (IBAction)SendPing:(id)sender {
     [model Ping];
-    
 }
 - (IBAction)DataReadoutChanged:(id)sender {
     if ([[sender selectedCell] tag] == 1) { //Data Readout On is selected
@@ -101,35 +99,24 @@
     return;
 }
 - (IBAction)PulserFire:(id)sender {
-    //The commented out code in this function is how it will eventually work
-    //currently the server doesn't support this though.
+    //Eventually these functions should be changed to use setting the values like they were settings
+    //rather then just sending them all at once.
     if ([sender tag] == 1){
         //Smellie Pulser is being fired
-        /*[model setSmellieRate:[SmellieRate_TextField floatValue]];
-        [model setSmelliePulseWidth:[SmellieWidth_TextField floatValue]];
-        [model setSmellieNPulses:[SmellieNPulses_TextField intValue]];
-        [model fireSmelliePulser];*/
         [model fireSmelliePulser_rate:[SmellieRate_TextField floatValue] pulseWidth:[SmellieWidth_TextField doubleValue] NPulses:[SmellieNPulses_TextField intValue]];
     }
     else if([sender tag] == 2){
         //Tellie Pulser is being fired
-        /*[model setTellieRate:[TellieRate_TextField floatValue]];
-        [model setTelliePulseWidth:[TellieWidth_TextField floatValue]];
-        [model setTellieNPulses:[TellieNPulses_TextField intValue]];
-        [model fireTelliePulser];*/
         [model fireTelliePulser_rate:[TellieRate_TextField floatValue] pulseWidth:[TellieWidth_TextField doubleValue] NPulses:[TellieNPulses_TextField intValue]];
     }
     else if([sender tag] == 3){
         //Generic Pulser is being fired
-        /*[model setPulserRate:[GenericRate_TextField floatValue]];
-        [model setPulseWidth:[GenericWidth_TextField floatValue]];
-        [model setNPulses:[GenericNPulses_TextField intValue]];
-        [model firePulser];*/
         [model firePulser_rate:[ GenericRate_TextField floatValue] pulseWidth:[GenericWidth_TextField doubleValue] NPulses:[GenericNPulses_TextField intValue]];
     }
     return;
 }
 - (IBAction)PulserStop:(id)sender {
+    //Stops the pulser from sending anymore pulses
     if([sender tag] == 1){
         [model stopSmelliePulser];
     }
@@ -142,6 +129,7 @@
     return;
 }
 - (IBAction)LoadDelay:(id)sender {
+    //Sends the selected delay value to TUBii
     int delay =0;
     if([sender tag] == 1){
         delay = [SmellieDelay_TextField integerValue];
@@ -158,18 +146,17 @@
     return;
 }
 - (IBAction)TrigMaskMatchHardware:(id)sender {
+    //Makes the trigger mask GUI element match TUBii's hardware state
     NSUInteger maskVal = [model trigMask];
     [self SendBitInfo:maskVal FromBit:0 ToBit:21 ToCheckBoxes:TrigMaskSelect];
 }
 - (IBAction)TrigMaskLoad:(id)sender {
+    //Makes the trigger mask hardware state match the corresponding GUI element
     NSUInteger maskVal = [self GetBitInfoFromCheckBoxes:TrigMaskSelect FromBit:0 ToBit:21];
     [model setTrigMask:maskVal];
 }
 - (IBAction)BurstTriggerLoad:(id)sender {
-    //NSUInteger rate = [BurstRate integerValue];
-    //NSUInteger mask = [BurstTriggerMask integerValue];
     NSLog(@"Not yet implemented. :(");
-    
 }
 - (IBAction)ComboTriggerLoad:(id)sender {
     NSUInteger enableMask = [ComboEnableMask integerValue];
@@ -182,7 +169,7 @@
     [model setPrescaleTrigger_Mask:mask ByFactor:factor];
 }
 - (IBAction)CaenMatchHardware:(id)sender {
-  
+    //Makes the CAEN GUI reflect the current hardware state
     CAEN_CHANNEL_MASK ChannelMask = [model caenChannelMask];
     CAEN_GAIN_MASK GainMask = [model caenGainMask];
 
@@ -200,11 +187,11 @@
     err &= [caenGainSelect_6 selectCellWithTag:(GainMask & gainSel_6)>0];
     err &= [caenGainSelect_7 selectCellWithTag:(GainMask & gainSel_7)>0];
     if (err==NO) {
-        NSLog(@"Error in CaenMatchHardware");
+        NSLogColor([NSColor redColor],@"Error in CaenMatchHardware");
     }
-    
 }
 - (IBAction)CaenLoadMask:(id)sender {
+    //Sends the CAEN GUI values to TUBii
     CAEN_CHANNEL_MASK ChannelMask =0;
     CAEN_GAIN_MASK GainMask=0;
     ChannelMask |= [[caenChannelSelect_0 selectedCell] tag ]*channelSel_0;
@@ -223,6 +210,7 @@
 }
 
 - (IBAction)SpeakerMatchHardware:(id)sender {
+    //Makes the Speaker/Counter GUI elements match the hardware
     NSUInteger maskVal =0;
     NSMatrix *maskSelect_1 =nil;
     NSMatrix *maskSelect_2 =nil;
@@ -468,9 +456,11 @@
 }
 
 - (IBAction)MTCAMimicTextFieldChanged:(id)sender {
+    //Used to keep the MTCA Mimic slider and text field in sync
     [MTCAMimic_Slider setFloatValue:[MTCAMimic_TextField floatValue]];
 }
 - (IBAction)MTCAMimicSliderChanged:(id)sender {
+    //Used to keep the MTCA Mimic slider and text field in sync
     [MTCAMimic_TextField setStringValue:[NSString stringWithFormat:@"%.3f",[MTCAMimic_Slider floatValue]]];
 }
 - (IBAction)MTCAMimicMatchHardware:(id)sender {
@@ -494,10 +484,18 @@
     }
 }
 - (IBAction)ClockSourceMatchHardware:(id)sender {
+    CONTROL_REG_MASK cntrl_reg = [model controlReg];
+    if(cntrl_reg & clkSel_Bit) {
+        [DefaultClockSelect selectCellWithTag:1]; //TUBii Clk is tag 1
+    }
+    else {
+        [DefaultClockSelect selectCellWithTag:2];//TUB Clk is tag 2
+    }
 }
 
 #pragma mark •••Helper Functions
 - (NSUInteger) GetBitInfoFromCheckBoxes: (NSMatrix*)aMatrix FromBit:(int)low ToBit: (int)high {
+    //Helper function to gather a bit value from a bunch of checkboxes
     NSUInteger maskVal = 0;
     for (int i=low; i<high; i++) {
         if([[aMatrix cellWithTag:i] intValue]>0)
@@ -508,6 +506,7 @@
     return maskVal;
 }
 - (void) SendBitInfo:(NSUInteger) maskVal FromBit:(int)low ToBit:(int) high ToCheckBoxes: (NSMatrix*) aMatrix {
+    //Helper function to send a bit value to a bunch of check boxes
     for (int i=low;i<high;i++)
     {
         if((maskVal & 1<<i) >0)
