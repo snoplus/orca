@@ -44,13 +44,21 @@
     return YES; // Prevents there from being two TUBiis
 }
 - (void) setPortNumber:(int)_portNumber {
-    [connection setPort:_portNumber];
+    if( _portNumber != portNumber)
+    {
+        [connection setPort:_portNumber];
+        [connection disconnect];
+    }
 }
 - (int) portNumber {
     return [connection port];
 }
 - (void) setStrHostName:(NSString *)_strHostName {
-    [connection setHost:_strHostName];
+    if(_strHostName != strHostName) {
+        [connection setHost:_strHostName];
+        [connection disconnect];
+    }
+
 }
 - (NSString*) strHostName {
     return [connection host];
