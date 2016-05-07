@@ -887,14 +887,14 @@ smellieRunFile;
             NSString *requestedRunFile = [smellieRunFileNameField objectValueOfSelectedItem];
             
             if( [thisRunFile isEqualToString:requestedRunFile]){
-                [self setSmellieRunFile:currentRunFile];
                 
                 NSLog(@"%", [self smellieRunFile]);
                 // If it's an old run file, add superK fields, set to zero
                 if(![smellieRunFile objectForKey:@"superK_laser_on"]){
                     [smellieRunFile setValue:0 forKey:@"superK_laser_on"];
                 }
-                
+                [self setSmellieRunFile:currentRunFile];
+
                 [loadedSmellieRunNameLabel setStringValue:[smellieRunFile objectForKey:@"run_name"]];
                 [model setSmellieRunNameLabel:[NSString stringWithFormat:@"%@",[smellieRunFile objectForKey:@"run_name"]]];
                 [loadedSmellieTriggerFrequencyLabel setStringValue:[smellieRunFile objectForKey:@"trigger_frequency"]];
@@ -998,13 +998,9 @@ smellieRunFile;
     //start different sub runs as the laser runs through
     //communicate with smellie model
     
-    ELLIEModel* theELLIEModel = nil;
     //Collect a series of objects from the ELLIEModel
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
-    if ([objs count]) {
-      //get the ELLIE Model object
-      theELLIEModel = [objs objectAtIndex:0];
-    } else { 
+    if (![objs count]) {
       NSString* reasonStr = @"ELLIE model not available, add an ELLIE model to your experiment";
       NSException* e = [NSException
 			exceptionWithName:@"NoEllieModel"
@@ -1012,6 +1008,7 @@ smellieRunFile;
 			userInfo:nil];
       [e raise];
     }
+    ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
     //Method for completing this without a new thread
     //[theELLIEModel startSmellieRun:smellieRunFile];
     

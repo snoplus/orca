@@ -108,10 +108,10 @@
 -(void) setLaserSoftLockOff;
 -(void) setSmellieMasterMode:(NSString*)triggerFrequency withNumOfPulses:(NSString*)numOfPulses;
 -(void) sendCustomSmellieCmd:(NSString*)customCmd withArgs:(NSArray*)argsArray;
--(NSMutableDictionary*)getSmellieRunLaserDict:(NSDictionary*)smellieSettings;
--(NSMutableDictionary*)getSmellieRunFibreDict:(NSDictionary*)smellieSettings;
--(NSArray*)getSmellieRunFrequencyArray:(NSDictionary*)smellieSettings;
--(NSArray*)getSmellieRunIntensityArray:(NSDictionary*)smellieSettings;
+-(NSMutableArray*)getSmellieRunLaserArray:(NSDictionary*)smellieSettings;
+-(NSMutableArray*)getSmellieRunFibreArray:(NSDictionary*)smellieSettings;
+-(NSMutableArray*)getSmellieRunFrequencyArray:(NSDictionary*)smellieSettings;
+-(NSMutableArray*)getSmellieRunIntensityArray:(NSDictionary*)smellieSettings;
 -(void) startSmellieRunInBackground:(NSDictionary*)smellieSettings;
 -(void) startSmellieRun:(NSDictionary*)smellieSettings;
 -(void) stopSmellieRun;
