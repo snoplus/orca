@@ -69,6 +69,11 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
 @synthesize exampleTask;
 @synthesize smellieRunHeaderDocList;
 @synthesize smellieSubRunInfo,
+smellieLaserHeadToSepiaMapping,
+smellieLaserHeadToGainMapping,
+smellieLaserToInputFibreMapping,
+smellieFibreSwitchToFibreMapping,
+smellieSlaveMode,
 pulseByPulseDelay,
 tellieRunDoc,
 smellieRunDoc,
@@ -86,7 +91,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     self = [super init];
     if (self){
         _tellieClient = [[XmlrpcClient alloc] initWithHostName:@"daq1" withPort:@"5030"];
-        _smellieClient = [[XmlrpcClient alloc] initWithHostName:@"snodrop" withPort:@"5020"];
+        _smellieClient = [[XmlrpcClient alloc] initWithHostName:@"SNODROP2" withPort:@"5020"];
     }
     return self;
 }
@@ -97,7 +102,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     if (self){
         _tellieClient = [[XmlrpcClient alloc] initWithHostName:@"daq1" withPort:@"5030"];
-        _smellieClient = [[XmlrpcClient alloc] initWithHostName:@"snodrop" withPort:@"5020"];
+        _smellieClient = [[XmlrpcClient alloc] initWithHostName:@"SNODROP2" withPort:@"5020"];
     }
     return self;
 }
@@ -806,19 +811,20 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     int minLaserIntensity = [minLaserObj intValue];
     
     //Extract the min intensity
-    NSNumber * maxLaserObj = [smellieSettings objectForKey:@"max_laser_intensity"];
+    NSNumber* maxLaserObj = [smellieSettings objectForKey:@"max_laser_intensity"];
     int maxLaserIntensity = [maxLaserObj intValue];
     
-    NSNumber * numOfIntensitySteps = [smellieSettings objectForKey:@"num_intensity_steps"];
+    NSNumber* numOfIntensitySteps = [smellieSettings objectForKey:@"num_intensity_steps"];
     
     //Check to see if the maximum intensity is the same as the minimum intensity
     int increment;
     NSMutableArray* intensities = [NSMutableArray arrayWithCapacity:numOfIntensitySteps];
     if(maxLaserIntensity != minLaserIntensity){
         increment = (maxLaserIntensity - minLaserIntensity)/[numOfIntensitySteps floatValue];
-    }else{
+    } else {
         increment = 0;
         [intensities addObject:maxLaserObj];
+        return intensities;
     }
     
     //Create intensities array
@@ -849,6 +855,10 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSLog(@"SMELLIE_RUN:Stopping any Blocking Software on SMELLIE computer(SNODROP)\n");
     [self killBlockingSoftware];
 
+    //Load config
+    [self fetchCurrentConfigurationForVersion:[self fetchRecentVersion]];
+    NSLog(@"Config loaded!");
+    
     if ([self smellieSlaveMode]){
         NSLog(@"SMELLIE_RUN:Running in SLAVE mode\n");
     } else {
@@ -903,9 +913,12 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //Set up run control
     if(![runControl isRunning]){
         //start the run controller
+        NSLogColor([NSColor redColor], @"Starting our own run! \n");
         [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
+        
     }else{
         //Stop the current run and start a new run
+        NSLogColor([NSColor redColor], @"Resetting run! \n");
         [runControl setForceRestart:YES];
         [runControl performSelectorOnMainThread:@selector(stopRun) withObject:nil waitUntilDone:YES];
         [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
@@ -947,7 +960,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //
     BOOL endOfRun = NO;
     for(id laserKey in laserArray){
-        
+
+        NSLogColor([NSColor redColor], @"Inside laser loop\n");
         if(endOfRun == YES){
             break; //if the end of the run is reached then break the run loop
         }
@@ -959,7 +973,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         
         //Set the laser switch which corresponds to the laserHead mapping to Sepia
         NSLog(@"SMELLIE_RUN:Setting the Laser Switch to Channel:%@ which corresponds to the %@ Laser\n",[NSString stringWithFormat:@"%@",[[self smellieLaserHeadToSepiaMapping] objectForKey:laserKey]],laserKey);
-        [self setLaserSwitch:[NSString stringWithFormat:@"%@",[[ self smellieLaserHeadToSepiaMapping] objectForKey:laserKey]]];
+        //[self setLaserSwitch:[NSString stringWithFormat:@"%@",[[ self smellieLaserHeadToSepiaMapping] objectForKey:laserKey]]];
         
         //Set the gain Control
         NSLog(@"SMELLIE_RUN:Setting the gain control to: %i V\n",[[[self smellieLaserHeadToGainMapping] objectForKey:laserKey] floatValue]);
@@ -968,7 +982,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         //Loop through each Fibre
         for(id fibreKey in fibreArray){
             
+            NSLogColor([NSColor redColor], @"Inside fibre loop\n");
             if(endOfRun == YES){
+                NSLog(@"End of run 1");
                 break;
             }
             
@@ -981,18 +997,22 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
             
             NSLog(@"SMELLIE_RUN:Setting the Fibre Switch to Input Channel:%@ from the %@ Laser and Output Channel %@\n",inputFibneSwitchChannel,laserKey,[NSString stringWithFormat:@"%@",[[self smellieFibreSwitchToFibreMapping] objectForKey:fibreKey]]);
             [self setFibreSwitch:inputFibneSwitchChannel withOutputChannel:[NSString stringWithFormat:@"%@",[[self smellieFibreSwitchToFibreMapping] objectForKey:fibreKey]]];
+            NSLog(@"After command");
             [NSThread sleepForTimeInterval:1.0f];
             
             //Loop through each intensity of a SMELLIE run
             for(NSNumber* intensity in intensityArray){
                 
+                NSLogColor([NSColor redColor], @"Inside intensity loop\n");
                 //if run control cancels the run
                 if(![runControl isRunning]){
+                    NSLog(@"End of run 2");
                     endOfRun = YES;
                     break;
                  }
                 
                 if([[NSThread currentThread] isCancelled]){
+                    NSLog(@"End of run 3");
                     endOfRun = YES;
                     break;
                 }
@@ -1000,6 +1020,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                 //start a new subrun
                 [runControl performSelectorOnMainThread:@selector(prepareForNewSubRun) withObject:nil waitUntilDone:YES];
                 [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
+                NSLogColor([NSColor redColor], @"launched new subrun thread\n");
                 
                 NSString * laserIntensityAsString = [NSString stringWithFormat:@"%i",[intensity intValue]];
                 NSLog(@"SMELLIE_RUN:Setting the Laser Intensity to %@ \n",laserIntensityAsString);
@@ -1057,13 +1078,15 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                     NSLog(@"Intensity:%i \n",[intensity intValue]);
                 }
 
+                NSLogColor([NSColor redColor], @"before sleep\n");
                 //Check if run file requests a sleep time between sub_runs
                 if([smellieSettings objectForKey:@"sleep_between_sub_run"]){
                     NSTimeInterval sleepTime = [[smellieSettings objectForKey:@"sleep_between_sub_run"] floatValue];
                     [NSThread sleepForTimeInterval:sleepTime];
+                } else {
+                    [NSThread sleepForTimeInterval:1.0f];
                 }
-                [NSThread sleepForTimeInterval:1.0f];
-                
+                NSLogColor([NSColor redColor], @"END OF INTENSITY LOOP\n");
             }//end of looping through each intensity setting on the smellie laser
             
         }//end of looping through each Fibre

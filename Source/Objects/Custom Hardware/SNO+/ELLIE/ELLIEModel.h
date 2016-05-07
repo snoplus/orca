@@ -109,7 +109,7 @@
 -(void) setSmellieMasterMode:(NSString*)triggerFrequency withNumOfPulses:(NSString*)numOfPulses;
 -(void) sendCustomSmellieCmd:(NSString*)customCmd withArgs:(NSArray*)argsArray;
 -(NSMutableDictionary*)getSmellieRunLaserDict:(NSDictionary*)smellieSettings;
--(NSMutableDictionary*)getSmellieFibreDict:(NSDictionary*)smellieSettings;
+-(NSMutableDictionary*)getSmellieRunFibreDict:(NSDictionary*)smellieSettings;
 -(NSArray*)getSmellieRunFrequencyArray:(NSDictionary*)smellieSettings;
 -(NSArray*)getSmellieRunIntensityArray:(NSDictionary*)smellieSettings;
 -(void) startSmellieRunInBackground:(NSDictionary*)smellieSettings;
