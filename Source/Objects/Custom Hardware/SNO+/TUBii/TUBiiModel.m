@@ -570,10 +570,10 @@
     // It simply tells the MicroZed to begin reading out data about it's trigger inputs
     // The data should include info about which triggers were high when a GT arrived as well as
     if (Readout) {
-        [self sendOkCmd:@"StartDataReadout"];
+        [self sendOkCmd:@"StartReadout"];
     }
     else {
-        [self sendOkCmd:@"StopDataReadout"];
+        [self sendOkCmd:@"StopReadout"];
     }
 }
 - (void) setStatusReadout:(BOOL) Readout {
