@@ -659,12 +659,6 @@ err:
 
     switch (start) {
     case COLD_START:
-        /* Load the GT mask. */
-        if ([mtc initAtRunStart:1]) {
-            NSLogColor([NSColor redColor], @"error initializing MTC.\n");
-            goto err;
-        }
-
         @try {
             /* Tell the MTC server to queue the run start. This will suspend
              * the MTC readout and fire a SOFT_GT. When the run starts, we will
@@ -675,6 +669,13 @@ err:
                        "command to mtc_server: %@\n", [e reason]);
             goto err;
         }
+
+        /* Load the GT mask. */
+        if ([mtc initAtRunStart:1]) {
+            NSLogColor([NSColor redColor], @"error initializing MTC.\n");
+            goto err;
+        }
+
         break;
     default:
         break;
