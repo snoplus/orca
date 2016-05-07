@@ -158,7 +158,7 @@
         [connection okCommand: [aCmd UTF8String]];
     }
     @catch (NSException *exception) {
-        NSLog(@"Command: %@ failed.  Reason: %@\n", aCmd,[exception reason]);
+        NSLogColor([NSColor redColor],@"Command: %@ failed.  Reason: %@\n", aCmd,[exception reason]);
     }
 }
 - (int) sendIntCmd: (NSString* const) aCmd {
@@ -167,7 +167,7 @@
         return [connection intCommand: [aCmd UTF8String]];
     }
     @catch (NSException *exception) {
-        NSLog(@"Command: %@ failed.  Reason: %@\n", aCmd,[exception reason]);
+        NSLogColor([NSColor redColor],@"Command: %@ failed.  Reason: %@\n", aCmd,[exception reason]);
         return nil;
     }
 }
