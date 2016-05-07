@@ -2102,7 +2102,7 @@
                                                         </buttonCell>
                                                         <cells>
                                                             <column>
-                                                                <buttonCell type="check" title="Prescale" bezelStyle="regularSquare" imagePosition="left" tag="19" inset="2" id="AjO-Ce-XOt">
+                                                                <buttonCell type="check" title="Prescale" bezelStyle="regularSquare" imagePosition="left" tag="18" inset="2" id="AjO-Ce-XOt">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                     <connections>
@@ -2262,7 +2262,7 @@
                                                                 <matrix verticalHuggingPriority="750" fixedFrame="YES" tag="1" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="j2I-tx-Kgy">
                                                                     <rect key="frame" x="200" y="37" width="156" height="19"/>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                    <size key="cellSize" width="74" height="18"/>
+                                                                    <size key="cellSize" width="77" height="18"/>
                                                                     <size key="intercellSpacing" width="4" height="2"/>
                                                                     <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" inset="2" id="w4E-IF-rYH">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
