@@ -29,6 +29,7 @@
 #endif
 #endif
 #import <Foundation/Foundation.h>
+
 /**
  `WPXMLRPCEncoder` encodes a XML-RPC request
  */

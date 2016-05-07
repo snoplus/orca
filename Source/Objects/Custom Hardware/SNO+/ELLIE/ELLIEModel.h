@@ -9,7 +9,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <ELLIEController.h>
+#import "ELLIEController.h"
+#import "XmlrpcClient.h"
 
 @class ORCouchDB;
 @class ORRunModel;
@@ -19,6 +20,7 @@
     NSMutableDictionary* smellieRunSettings;
     NSMutableDictionary* currentOrcaSettingsForSmellie;
     NSMutableDictionary* tellieRunDoc;
+    NSMutableDictionary* smellieRunDoc;
     NSTask* exampleTask;
     NSMutableDictionary* smellieRunHeaderDocList;
     ORRunModel* runControl;
@@ -27,43 +29,62 @@
     bool _smellieDBReadInProgress;
     float pulseByPulseDelay;
     
+    //Server Clients
+    XmlrpcClient* _tellieClient;
+    XmlrpcClient* _smellieClient;
+    
     //tellie settings
     NSMutableDictionary* tellieSubRunSettings;
-    
+    NSMutableDictionary* tellieFireParameters;
+    NSMutableDictionary* tellieFibreMapping;
+    BOOL ellieFireFlag;
 }
 
+@property (nonatomic,retain) NSMutableDictionary* tellieFireParameters;
+@property (nonatomic,retain) NSMutableDictionary* tellieFibreMapping;
 @property (nonatomic,retain) NSMutableDictionary* tellieSubRunSettings;
 @property (nonatomic,retain) NSMutableDictionary* smellieRunSettings;
 @property (nonatomic,retain) NSMutableDictionary* currentOrcaSettingsForSmellie;
 @property (nonatomic,retain) NSMutableDictionary* tellieRunDoc;
+@property (nonatomic,retain) NSMutableDictionary* smellieRunDoc;
+@property (nonatomic,assign) BOOL ellieFireFlag;
 @property (nonatomic,retain) NSTask* exampleTask;
 @property (nonatomic,retain) NSMutableDictionary* smellieRunHeaderDocList;
 @property (nonatomic,retain) NSMutableArray* smellieSubRunInfo;
 @property (nonatomic,assign) bool smellieDBReadInProgress;
 @property (nonatomic,assign) float pulseByPulseDelay;
 
+-(id) init;
 -(void) setUpImage;
 -(void) makeMainController;
 -(void) wakeUp;
 -(void) sleep;
 -(void) dealloc;
 -(void) registerNotificationObservers;
-- (ORCouchDB*) generalDBRef:(NSString*)aCouchDb;
 
-//This is called by ORCouchDB.h class as a returning delegate
-- (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
+/************************/
+/*   TELLIE Functions   */
+/************************/
 
-/*This function calls a python script: 
-    pythonScriptFilePath - this is the python script file path
-    withCmdLineArgs - these are the arguments for the python script*/
--(NSString*) callPythonScript:(NSString*)pythonScriptFilePath withCmdLineArgs:(NSArray*)commandLineArgs;
+// TELLIE calc & control functons
+-(void) startTellieRun:(BOOL)scriptFlag;
+-(void) stopTellieRun;
+-(NSArray*) pollTellieFibre:(double)seconds;
+-(NSMutableDictionary*) returnTellieFireCommands:(NSString*)fibreName  withNPhotons:(NSUInteger)photons withFireFrequency:(NSUInteger)frequency withNPulses:(NSUInteger)pulses;
+-(NSNumber*) calcTellieChannelPulseSettings:(NSUInteger)channel withNPhotons:(NSUInteger)photons withFireFrequency:(NSUInteger)frequency;
+-(NSNumber*) calcTellieChannelForFibre:(NSString*)fibre;
+-(void) fireTellieFibreMaster:(NSMutableDictionary*)fireCommands;
+-(void) stopTellieFibre:(NSArray*)fireCommands;
+-(bool)isELLIEFiring;
 
-//starts a SMELLIE run with given parameters and submits the smellie run file to the database
--(void) startSmellieRun:(NSDictionary*)smellieSettings;
--(void) stopSmellieRun;
--(void) smellieDBpush:(NSMutableDictionary*)dbDic;
--(void) smellieConfigurationDBpush:(NSMutableDictionary*)dbDic;
--(void) startSmellieRunInBackground:(NSDictionary*)smellieSettings;
+// TELLIE database interactions
+-(void) pushInitialTellieRunDocument;
+-(void) updateTellieRunDocument:(NSDictionary*)subRunDoc;
+-(void) loadTELLIEStaticsFromDB;
+
+/************************/
+/*  SMELLIE Functions   */
+/************************/
 
 //SMELLIE Control Functions
 -(void) setSmellieSafeStates;
@@ -73,19 +94,28 @@
 -(void) setLaserSoftLockOn;
 -(void) setLaserSoftLockOff;
 -(void) setSmellieMasterMode:(NSString*)triggerFrequency withNumOfPulses:(NSString*)numOfPulses;
--(void) sendCustomSmellieCmd:(NSString*)customCmd withArgument1:(NSString*)customArgument1 withArgument2:(NSString*)customArgument2;
--(void) testFunction;
--(void) setLaserFrequency20Mhz;
+-(void) sendCustomSmellieCmd:(NSString*)customCmd withArgs:(NSArray*)argsArray;
+-(void) startSmellieRunInBackground:(NSDictionary*)smellieSettings;
+-(void) startSmellieRun:(NSDictionary*)smellieSettings;
+-(void) stopSmellieRun;
+
+// SMELLIE database interactions
 -(void) fetchSmellieConfigurationInformation;
+-(void) pushInitialSmellieRunDocument;
+-(void) updateSmellieRunDocument:(NSDictionary*)subRunDoc;
+-(void) smellieDBpush:(NSMutableDictionary*)dbDic;
+-(void) smellieConfigurationDBpush:(NSMutableDictionary*)dbDic;
 -(NSNumber*) fetchRecentVersion;
 -(NSMutableDictionary*) fetchCurrentConfigurationForVersion:(NSNumber*)currentVersion;
 
-//TELLIE Control Functions
--(void) pollTellieFibre;
--(void) fireTellieFibreMaster:(NSMutableDictionary*)fireCommands;
--(void) stopTellieFibre:(NSArray*)fireCommands;
--(void) startTellieRun;
--(void) stopTellieRun;
+/*************************/
+/* Misc generic methods  */
+/*************************/
+- (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
+- (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
+- (ORCouchDB*) generalDBRef:(NSString*)aCouchDb;
+- (NSString*) stringDateFromDate:(NSDate*)aDate;
+- (NSString*) stringUnixFromDate:(NSDate*)aDate;
 
 @end
 
