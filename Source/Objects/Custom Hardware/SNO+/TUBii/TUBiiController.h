@@ -96,6 +96,8 @@
 - (NSUInteger) GetBitInfoFromCheckBoxes: (NSMatrix*)aMatrix FromBit:(int)low ToBit: (int)high;
 - (void) SendBitInfo:(NSUInteger) maskVal FromBit:(int)low ToBit:(int) high ToCheckBoxes: (NSMatrix*) aMatrix;
 
+- (IBAction)InitializeClicked:(id)sender;
+- (IBAction)SendPing:(id)sender;
 - (IBAction)StatusReadoutChanged:(id)sender;
 - (IBAction)DataReadoutChanged:(id)sender;
 
@@ -136,5 +138,5 @@
 - (IBAction)LoadClockSource:(id)sender;
 - (IBAction)ClockSourceMatchHardware:(id)sender;
 
-- (IBAction)InitializeClicked:(id)sender;
+
 @end

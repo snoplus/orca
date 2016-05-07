@@ -81,6 +81,10 @@
 - (IBAction)InitializeClicked:(id)sender {
     [model Initialize];
 }
+- (IBAction)SendPing:(id)sender {
+    [model Ping];
+    
+}
 - (IBAction)DataReadoutChanged:(id)sender {
     if ([[sender selectedCell] tag] == 1) { //Data Readout On is selected
         [model setDataReadout:YES];

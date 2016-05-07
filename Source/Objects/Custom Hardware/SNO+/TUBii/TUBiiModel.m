@@ -168,7 +168,11 @@
 - (void) Initialize {
     // The contents of initialize are defined on the TUBii Server
     // See documentation for that for more info (assuming it exists eventually)
-    NSString* const command=@"Initialize";
+    NSString* const command=@"Initialise";
+    [self sendOkCmd:command];
+}
+- (void) Ping {
+    NSString* const command = @"ping";
     [self sendOkCmd:command];
 }
 - (void) setBurstTrigger {
