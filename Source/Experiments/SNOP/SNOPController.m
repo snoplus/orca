@@ -330,8 +330,15 @@ smellieRunFile;
 
 -(void) SRTypeChanged:(NSNotification*)aNote
 {
-    [standardRunPopupMenu selectItemWithObjectValue:[model standardRunType]];
-
+    
+    NSString* standardRun = [model standardRunType];
+    if([standardRunPopupMenu indexOfItemWithObjectValue:standardRun] == NSNotFound){
+        NSLog(@"Standard Run \"%@\" does not exist in DB. \n",standardRun);
+    }
+    else{
+        [standardRunPopupMenu selectItemWithObjectValue:standardRun];
+    }
+    
     if([[model standardRunType] isEqualToString:@"HIGH THRESHOLDS"]) {
         [model setStandardRunVersion:@"DEFAULT"];
     } else {
@@ -341,7 +348,13 @@ smellieRunFile;
 
 -(void) SRVersionChanged:(NSNotification*)aNote
 {
-    [standardRunVersionPopupMenu selectItemWithObjectValue:[model standardRunVersion]];
+    NSString* standardRunVersion = [model standardRunVersion];
+    if([standardRunVersionPopupMenu indexOfItemWithObjectValue:standardRunVersion] == NSNotFound){
+        NSLog(@"Standard Run Version \"%@\" does not exist in DB. \n",standardRunVersion);
+    }
+    else{
+        [standardRunVersionPopupMenu selectItemWithObjectValue:standardRunVersion];
+    }
     
     [self displayThresholdsFromDB];
     [self runTypeWordChanged:nil];
@@ -1195,43 +1208,71 @@ smellieRunFile;
     
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     ORMTCModel* mtcModel = [objs objectAtIndex:0];
-    
+
+    //Setup format
+    NSNumberFormatter *thresholdFormatter = [[[NSNumberFormatter alloc] init] autorelease];;
+    [thresholdFormatter setFormat:@"##0.0"];
+
+    //NHIT100HI
     float mVolts = [mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kNHit100HiThreshold]];
     float dcOffset  = [mtcModel dbFloatByIndex:kNHit100HiThreshold + kNHitDcOffset_Offset];
     float mVperNHit = [mtcModel dbFloatByIndex:kNHit100HiThreshold + kmVoltPerNHit_Offset];
     float nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
     [[standardRunThresNewValues cellAtRow:0 column:0] setFloatValue:nHits];
+    [[standardRunThresNewValues cellAtRow:0 column:0] setFormatter:thresholdFormatter];
+    //NHIT100MED
     mVolts = [mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kNHit100MedThreshold]];
     dcOffset  = [mtcModel dbFloatByIndex:kNHit100MedThreshold + kNHitDcOffset_Offset];
     mVperNHit = [mtcModel dbFloatByIndex:kNHit100MedThreshold + kmVoltPerNHit_Offset];
     nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
     [[standardRunThresNewValues cellAtRow:1 column:0] setFloatValue:nHits];
+    [[standardRunThresNewValues cellAtRow:1 column:0] setFormatter:thresholdFormatter];
+    //NHIT100LO
     mVolts = [mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kNHit100LoThreshold]];
     dcOffset  = [mtcModel dbFloatByIndex:kNHit100LoThreshold + kNHitDcOffset_Offset];
     mVperNHit = [mtcModel dbFloatByIndex:kNHit100LoThreshold + kmVoltPerNHit_Offset];
     nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
     [[standardRunThresNewValues cellAtRow:2 column:0] setFloatValue:nHits];
+    [[standardRunThresNewValues cellAtRow:2 column:0] setFormatter:thresholdFormatter];
+    //NHIT20
     mVolts = [mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kNHit20Threshold]];
     dcOffset  = [mtcModel dbFloatByIndex:kNHit20Threshold + kNHitDcOffset_Offset];
     mVperNHit = [mtcModel dbFloatByIndex:kNHit20Threshold + kmVoltPerNHit_Offset];
     nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
     [[standardRunThresNewValues cellAtRow:3 column:0] setFloatValue:nHits];
+    [[standardRunThresNewValues cellAtRow:3 column:0] setFormatter:thresholdFormatter];
+    //NHIT20LO
     mVolts = [mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kNHit20LBThreshold]];
     dcOffset  = [mtcModel dbFloatByIndex:kNHit20LBThreshold + kNHitDcOffset_Offset];
     mVperNHit = [mtcModel dbFloatByIndex:kNHit20LBThreshold + kmVoltPerNHit_Offset];
     nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
     [[standardRunThresNewValues cellAtRow:4 column:0] setFloatValue:nHits];
+    [[standardRunThresNewValues cellAtRow:4 column:0] setFormatter:thresholdFormatter];
+    //OWLN
     mVolts = [mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kOWLNThreshold]];
     dcOffset  = [mtcModel dbFloatByIndex:kOWLNThreshold + kNHitDcOffset_Offset];
     mVperNHit = [mtcModel dbFloatByIndex:kOWLNThreshold + kmVoltPerNHit_Offset];
     nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
-    [[standardRunThresNewValues cellAtRow:5 column:0] setFloatValue:[mtcModel dbFloatByIndex:kOWLNThreshold]];
-    [[standardRunThresNewValues cellAtRow:6 column:0] setFloatValue:round([mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kESumHiThreshold]])];
-    [[standardRunThresNewValues cellAtRow:7 column:0] setFloatValue:round([mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kESumLowThreshold]])];
-    [[standardRunThresNewValues cellAtRow:8 column:0] setFloatValue:round([mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kOWLEHiThreshold]])];
-    [[standardRunThresNewValues cellAtRow:9 column:0] setFloatValue:round([mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kOWLELoThreshold]])];
+    [[standardRunThresNewValues cellAtRow:5 column:0] setFloatValue:nHits];
+    [[standardRunThresNewValues cellAtRow:5 column:0] setFormatter:thresholdFormatter];
+    //ESUMHI
+    [[standardRunThresNewValues cellAtRow:6 column:0] setFloatValue:[mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kESumHiThreshold]]];
+    [[standardRunThresNewValues cellAtRow:6 column:0] setFormatter:thresholdFormatter];
+    //ESUMLO
+    [[standardRunThresNewValues cellAtRow:7 column:0] setFloatValue:[mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kESumLowThreshold]]];
+    [[standardRunThresNewValues cellAtRow:7 column:0] setFormatter:thresholdFormatter];
+    //OWLEHI
+    [[standardRunThresNewValues cellAtRow:8 column:0] setFloatValue:[mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kOWLEHiThreshold]]];
+    [[standardRunThresNewValues cellAtRow:8 column:0] setFormatter:thresholdFormatter];
+    //OWLELO
+    [[standardRunThresNewValues cellAtRow:9 column:0] setFloatValue:[mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kOWLELoThreshold]]];
+    [[standardRunThresNewValues cellAtRow:9 column:0] setFormatter:thresholdFormatter];
+    //Prescale
     [[standardRunThresNewValues cellAtRow:10 column:0] setFloatValue:[mtcModel dbFloatByIndex:kNhit100LoPrescale]];
+    [[standardRunThresNewValues cellAtRow:10 column:0] setFormatter:thresholdFormatter];
+    //Pulser
     [[standardRunThresNewValues cellAtRow:11 column:0] setFloatValue:[mtcModel dbFloatByIndex:kPulserPeriod]];
+    [[standardRunThresNewValues cellAtRow:11 column:0] setFormatter:thresholdFormatter];
     
 }
 
@@ -1278,6 +1319,11 @@ smellieRunFile;
     
     NSString *standardRun = [[standardRunPopupMenu stringValue] uppercaseString];
     [standardRunPopupMenu setStringValue:standardRun];
+    //Do not allow to overwrite the detector safe offline run
+    if ([standardRun isEqualTo:@"HIGH THRESHOLDS"]){
+        ORRunAlertPanel([NSString stringWithFormat:@"Can create a version called HIGH THRESHOLDS"], @"It is a protected word",@"Cancel",@"OK",nil);
+        return;
+    }
     //Create new SR if does not exist
     if ([standardRunPopupMenu indexOfItemWithObjectValue:standardRun] == NSNotFound && [standardRun isNotEqualTo:@""]){
         BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Creating new Standard Run: \"%@\"", standardRun],@"Is this really what you want?",@"Cancel",@"Yes, Make New Standard Run",nil);
@@ -1392,7 +1438,11 @@ smellieRunFile;
         NSLog(@"Couldn't retrieve SR VERSION values. Error querying couchDB, please check the connection is correct. Error: \n %@ \n", error);
         return;
     }
-    
+
+    //Setup format
+    NSNumberFormatter *thresholdFormatter = [[[NSNumberFormatter alloc] init] autorelease];;
+    [thresholdFormatter setFormat:@"##0.0"];
+
     //DEFAULTS
     if([[defaultSettings valueForKey:@"rows"] count] == 0){
         for (int i=0; i<[standardRunThresDefaultValues numberOfRows];i++) {
@@ -1400,26 +1450,73 @@ smellieRunFile;
         }
         NSLog(@"Cannot display DEFAULT values. There was some problem with the Standard Run DataBase. \n");
     } else {
+        //NHIT100HI
         float mVolts = [mtcModel rawTomVolts:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Hi,Threshold"] floatValue]];
         float dcOffset  = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Hi,dcOffset"] floatValue];
         float mVperNHit = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Hi,mV/Hit"] floatValue];
         float nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
+        [[standardRunThresDefaultValues cellAtRow:0 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresDefaultValues cellAtRow:0 column:0] setFloatValue:nHits];
-        [[standardRunThresDefaultValues cellAtRow:1 column:0] setIntValue:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Med,Threshold"] intValue]];
-        [[standardRunThresDefaultValues cellAtRow:2 column:0] setIntValue:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Lo,Threshold"] intValue]];
-        [[standardRunThresDefaultValues cellAtRow:3 column:0] setIntValue:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20,Threshold"] intValue]];
-        [[standardRunThresDefaultValues cellAtRow:4 column:0] setIntValue:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20LB,Threshold"] intValue]];
-        [[standardRunThresDefaultValues cellAtRow:5 column:0] setIntValue:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLN,Threshold"] intValue]];
-        float nhits = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumHi,Threshold"] floatValue];
-        [[standardRunThresDefaultValues cellAtRow:6 column:0] setFloatValue: round([mtcModel rawTomVolts:nhits])];
-        nhits = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumLow,Threshold"] floatValue];
-        [[standardRunThresDefaultValues cellAtRow:7 column:0] setFloatValue: round([mtcModel rawTomVolts:nhits])];
-        nhits = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLEHi,Threshold"] floatValue];
-        [[standardRunThresDefaultValues cellAtRow:8 column:0] setFloatValue: round([mtcModel rawTomVolts:nhits])];
-        nhits = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLELo,Threshold"] floatValue];
-        [[standardRunThresDefaultValues cellAtRow:9 column:0] setFloatValue: round([mtcModel rawTomVolts:nhits])];
-        [[standardRunThresDefaultValues cellAtRow:10 column:0] setIntValue:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,Nhit100LoPrescale"] intValue]];
-        [[standardRunThresDefaultValues cellAtRow:11 column:0] setIntValue:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,PulserPeriod"] intValue]];
+        //NHIT100MED
+        mVolts = [mtcModel rawTomVolts:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Med,Threshold"] floatValue]];
+        dcOffset  = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Med,dcOffset"] floatValue];
+        mVperNHit = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Med,mV/Hit"] floatValue];
+        nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
+        [[standardRunThresDefaultValues cellAtRow:1 column:0] setFormatter:thresholdFormatter];
+        [[standardRunThresDefaultValues cellAtRow:1 column:0] setFloatValue:nHits];
+        //NHIT100LO
+        mVolts = [mtcModel rawTomVolts:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Lo,Threshold"] floatValue]];
+        dcOffset  = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Lo,dcOffset"] floatValue];
+        mVperNHit = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Lo,mV/Hit"] floatValue];
+        nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
+        [[standardRunThresDefaultValues cellAtRow:2 column:0] setFormatter:thresholdFormatter];
+        [[standardRunThresDefaultValues cellAtRow:2 column:0] setFloatValue:nHits];
+        //NHIT20
+        mVolts = [mtcModel rawTomVolts:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20,Threshold"] floatValue]];
+        dcOffset  = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20,dcOffset"] floatValue];
+        mVperNHit = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20,mV/Hit"] floatValue];
+        nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
+        [[standardRunThresDefaultValues cellAtRow:3 column:0] setFormatter:thresholdFormatter];
+        [[standardRunThresDefaultValues cellAtRow:3 column:0] setFloatValue:nHits];
+        //NHIT20LO
+        mVolts = [mtcModel rawTomVolts:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20LB,Threshold"] floatValue]];
+        dcOffset  = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20LB,dcOffset"] floatValue];
+        mVperNHit = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20LB,mV/Hit"] floatValue];
+        nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
+        [[standardRunThresDefaultValues cellAtRow:4 column:0] setFormatter:thresholdFormatter];
+        [[standardRunThresDefaultValues cellAtRow:4 column:0] setFloatValue:nHits];
+        //OWLN
+        mVolts = [mtcModel rawTomVolts:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLN,Threshold"] floatValue]];
+        dcOffset  = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLN,dcOffset"] floatValue];
+        mVperNHit = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLN,mV/Hit"] floatValue];
+        nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
+        [[standardRunThresDefaultValues cellAtRow:5 column:0] setFormatter:thresholdFormatter];
+        [[standardRunThresDefaultValues cellAtRow:5 column:0] setFloatValue:nHits];
+        //ESUMHI
+        mVolts = [mtcModel rawTomVolts:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumHi,Threshold"] floatValue]];
+        [[standardRunThresDefaultValues cellAtRow:6 column:0] setFloatValue:mVolts];
+        [[standardRunThresDefaultValues cellAtRow:6 column:0] setFormatter:thresholdFormatter];
+        //ESUMLO
+        mVolts = [mtcModel rawTomVolts:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumLow,Threshold"] floatValue]];
+        [[standardRunThresDefaultValues cellAtRow:7 column:0] setFloatValue:mVolts];
+        [[standardRunThresDefaultValues cellAtRow:7 column:0] setFormatter:thresholdFormatter];
+        //OWLEHI
+        mVolts = [mtcModel rawTomVolts:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLEHi,Threshold"] floatValue]];
+        [[standardRunThresDefaultValues cellAtRow:8 column:0] setFloatValue:mVolts];
+        [[standardRunThresDefaultValues cellAtRow:8 column:0] setFormatter:thresholdFormatter];
+        //OWLELO
+        mVolts = [mtcModel rawTomVolts:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLELo,Threshold"] floatValue]];
+        [[standardRunThresDefaultValues cellAtRow:9 column:0] setFloatValue:mVolts];
+        [[standardRunThresDefaultValues cellAtRow:9 column:0] setFormatter:thresholdFormatter];
+        //Prescale
+        mVolts = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,Nhit100LoPrescale"] floatValue];
+        [[standardRunThresDefaultValues cellAtRow:10 column:0] setFloatValue:mVolts];
+        [[standardRunThresDefaultValues cellAtRow:10 column:0] setFormatter:thresholdFormatter];
+        //Pulser
+        mVolts = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,PulserPeriod"] floatValue];
+        [[standardRunThresDefaultValues cellAtRow:11 column:0] setFloatValue:mVolts];
+        [[standardRunThresDefaultValues cellAtRow:11 column:0] setFormatter:thresholdFormatter];
+
     }
     
     //SR VERSION
@@ -1429,22 +1526,72 @@ smellieRunFile;
         }
         NSLog(@"Cannot display TEST RUN values. There was some problem with the Standard Run DataBase. \n");
     } else {
-        [[standardRunThresStoredValues cellAtRow:0 column:0] setIntValue:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Hi,Threshold"] intValue]];
-        [[standardRunThresStoredValues cellAtRow:1 column:0] setIntValue:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Med,Threshold"] intValue]];
-        [[standardRunThresStoredValues cellAtRow:2 column:0] setIntValue:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Lo,Threshold"] intValue]];
-        [[standardRunThresStoredValues cellAtRow:3 column:0] setIntValue:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20,Threshold"] intValue]];
-        [[standardRunThresStoredValues cellAtRow:4 column:0] setIntValue:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20LB,Threshold"] intValue]];
-        [[standardRunThresStoredValues cellAtRow:5 column:0] setIntValue:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLN,Threshold"] intValue]];
-        float nhits = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumHi,Threshold"] floatValue];
-        [[standardRunThresStoredValues cellAtRow:6 column:0] setFloatValue: round([mtcModel rawTomVolts:nhits])];
-        nhits = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumLow,Threshold"] floatValue];
-        [[standardRunThresStoredValues cellAtRow:7 column:0] setFloatValue: round([mtcModel rawTomVolts:nhits])];
-        nhits = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLEHi,Threshold"] floatValue];
-        [[standardRunThresStoredValues cellAtRow:8 column:0] setFloatValue: round([mtcModel rawTomVolts:nhits])];
-        nhits = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLELo,Threshold"] floatValue];
-        [[standardRunThresStoredValues cellAtRow:9 column:0] setFloatValue: round([mtcModel rawTomVolts:nhits])];
-        [[standardRunThresStoredValues cellAtRow:10 column:0] setIntValue:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,Nhit100LoPrescale"] intValue]];
-        [[standardRunThresStoredValues cellAtRow:11 column:0] setIntValue:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,PulserPeriod"] intValue]];
+        //NHIT100HI
+        float mVolts = [mtcModel rawTomVolts:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Hi,Threshold"] floatValue]];
+        float dcOffset  = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Hi,dcOffset"] floatValue];
+        float mVperNHit = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Hi,mV/Hit"] floatValue];
+        float nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
+        [[standardRunThresStoredValues cellAtRow:0 column:0] setFormatter:thresholdFormatter];
+        [[standardRunThresStoredValues cellAtRow:0 column:0] setFloatValue:nHits];
+        //NHIT100MED
+        mVolts = [mtcModel rawTomVolts:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Med,Threshold"] floatValue]];
+        dcOffset  = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Med,dcOffset"] floatValue];
+        mVperNHit = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Med,mV/Hit"] floatValue];
+        nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
+        [[standardRunThresStoredValues cellAtRow:1 column:0] setFormatter:thresholdFormatter];
+        [[standardRunThresStoredValues cellAtRow:1 column:0] setFloatValue:nHits];
+        //NHIT100LO
+        mVolts = [mtcModel rawTomVolts:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Lo,Threshold"] floatValue]];
+        dcOffset  = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Lo,dcOffset"] floatValue];
+        mVperNHit = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Lo,mV/Hit"] floatValue];
+        nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
+        [[standardRunThresStoredValues cellAtRow:2 column:0] setFormatter:thresholdFormatter];
+        [[standardRunThresStoredValues cellAtRow:2 column:0] setFloatValue:nHits];
+        //NHIT20
+        mVolts = [mtcModel rawTomVolts:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20,Threshold"] floatValue]];
+        dcOffset  = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20,dcOffset"] floatValue];
+        mVperNHit = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20,mV/Hit"] floatValue];
+        nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
+        [[standardRunThresStoredValues cellAtRow:3 column:0] setFormatter:thresholdFormatter];
+        [[standardRunThresStoredValues cellAtRow:3 column:0] setFloatValue:nHits];
+        //NHIT20LO
+        mVolts = [mtcModel rawTomVolts:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20LB,Threshold"] floatValue]];
+        dcOffset  = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20LB,dcOffset"] floatValue];
+        mVperNHit = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20LB,mV/Hit"] floatValue];
+        nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
+        [[standardRunThresStoredValues cellAtRow:4 column:0] setFormatter:thresholdFormatter];
+        [[standardRunThresStoredValues cellAtRow:4 column:0] setFloatValue:nHits];
+        //OWLN
+        mVolts = [mtcModel rawTomVolts:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLN,Threshold"] floatValue]];
+        dcOffset  = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLN,dcOffset"] floatValue];
+        mVperNHit = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLN,mV/Hit"] floatValue];
+        nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
+        [[standardRunThresStoredValues cellAtRow:5 column:0] setFormatter:thresholdFormatter];
+        [[standardRunThresStoredValues cellAtRow:5 column:0] setFloatValue:nHits];
+        //ESUMHI
+        mVolts = [mtcModel rawTomVolts:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumHi,Threshold"] floatValue]];
+        [[standardRunThresStoredValues cellAtRow:6 column:0] setFloatValue:mVolts];
+        [[standardRunThresStoredValues cellAtRow:6 column:0] setFormatter:thresholdFormatter];
+        //ESUMLO
+        mVolts = [mtcModel rawTomVolts:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumLow,Threshold"] floatValue]];
+        [[standardRunThresStoredValues cellAtRow:7 column:0] setFloatValue:mVolts];
+        [[standardRunThresStoredValues cellAtRow:7 column:0] setFormatter:thresholdFormatter];
+        //OWLEHI
+        mVolts = [mtcModel rawTomVolts:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLEHi,Threshold"] floatValue]];
+        [[standardRunThresStoredValues cellAtRow:8 column:0] setFloatValue:mVolts];
+        [[standardRunThresStoredValues cellAtRow:8 column:0] setFormatter:thresholdFormatter];
+        //OWLELO
+        mVolts = [mtcModel rawTomVolts:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLELo,Threshold"] floatValue]];
+        [[standardRunThresStoredValues cellAtRow:9 column:0] setFloatValue:mVolts];
+        [[standardRunThresStoredValues cellAtRow:9 column:0] setFormatter:thresholdFormatter];
+        //Prescale
+        mVolts = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,Nhit100LoPrescale"] floatValue];
+        [[standardRunThresStoredValues cellAtRow:10 column:0] setFloatValue:mVolts];
+        [[standardRunThresStoredValues cellAtRow:10 column:0] setFormatter:thresholdFormatter];
+        //Pulser
+        mVolts = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,PulserPeriod"] floatValue];
+        [[standardRunThresStoredValues cellAtRow:11 column:0] setFloatValue:mVolts];
+        [[standardRunThresStoredValues cellAtRow:11 column:0] setFormatter:thresholdFormatter];
     }
     
 }

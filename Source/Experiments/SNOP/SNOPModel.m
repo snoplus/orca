@@ -296,14 +296,13 @@ logPort;
     self.debugDBPort = [decoder decodeInt32ForKey:@"ORSNOPModelDebugDBPort"];
     self.debugDBIPAddress = [decoder decodeObjectForKey:@"ORSNOPModelDebugDBIPAddress"];
 
-    //Runs tab
-    [self setStandardRunType:[decoder decodeObjectForKey:@"SNOPStandarRunType"]];
-    [self setStandardRunVersion:[decoder decodeObjectForKey:@"SNOPStandarRunVersion"]];
+    //ECA
     [self setECA_pattern:[decoder decodeIntForKey:@"SNOPECApattern"]];
     [self setECA_type:[decoder decodeIntForKey:@"SNOPECAtype"]];
     [self setECA_tslope_pattern:[decoder decodeIntForKey:@"SNOPECAtslppattern"]];
     [self setECA_subrun_time:[decoder decodeDoubleForKey:@"SNOPECAsubruntime"]];
 
+    //Settings
     [self setMTCHost:[decoder decodeObjectForKey:@"mtcHost"]];
     [self setMTCPort:[decoder decodeIntForKey:@"mtcPort"]];
 
@@ -315,6 +314,11 @@ logPort;
 
     [self setLogServerHost:[decoder decodeObjectForKey:@"logHost"]];
     [self setLogServerPort:[decoder decodeIntForKey:@"logPort"]];
+
+    //Standard Runs
+    [self setStandardRunType:[decoder decodeObjectForKey:@"SNOPStandardRunType"]];
+    [self setStandardRunVersion:[decoder decodeObjectForKey:@"SNOPStandardRunVersion"]];
+    
 
     /* Check if we actually decoded the mtc, xl3, data, and log server
      * hostnames and ports. decodeObjectForKey() will return NULL if the
@@ -1172,14 +1176,13 @@ logPort;
     [encoder encodeInt32:self.debugDBPort forKey:@"ORSNOPModelDebugDBPort"];
     [encoder encodeObject:self.debugDBIPAddress forKey:@"ORSNOPModelDebugDBIPAddress"];
 
-    //Runs tab
-    [encoder encodeObject:[self standardRunType] forKey:@"SNOPStandarRunType"];
-    [encoder encodeObject:[self standardRunVersion] forKey:@"SNOPStandarRunVersion"];
+    //ECA
     [encoder encodeInt:[self ECA_pattern] forKey:@"SNOPECApattern"];
     [encoder encodeInt:[self ECA_type] forKey:@"SNOPECAtype"];
     [encoder encodeInt:[self ECA_tslope_pattern] forKey:@"SNOPECAtslppattern"];
     [encoder encodeDouble:[self ECA_subrun_time] forKey:@"SNOPECAsubruntime"];
 
+    //Settings
     [encoder encodeObject:[self mtcHost] forKey:@"mtcHost"];
     [encoder encodeInt:[self mtcPort] forKey:@"mtcPort"];
 
@@ -1191,6 +1194,11 @@ logPort;
 
     [encoder encodeObject:[self logHost] forKey:@"logHost"];
     [encoder encodeInt:[self logPort] forKey:@"logPort"];
+
+    //Runs tab
+    [encoder encodeObject:[self standardRunType] forKey:@"SNOPStandardRunType"];
+    [encoder encodeObject:[self standardRunVersion] forKey:@"SNOPStandardRunVersion"];
+
 }
 
 - (NSString*) reformatSelectionString:(NSString*)aString forSet:(int)aSet
@@ -1325,7 +1333,6 @@ logPort;
     //unsigned int* pt_step_crate = pt_step[0];
     
 }
-
 
 - (void)hvMasterTriggersOFF
 {
