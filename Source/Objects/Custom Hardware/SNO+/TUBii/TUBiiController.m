@@ -251,12 +251,12 @@
         maskSelect_2 = CounterMaskSelect_2;
         textField = CounterMaskField;
     }
-    [textField setIntegerValue:maskVal];
+    [textField setStringValue:[NSString stringWithFormat:@"%@",@(maskVal)]];
     [self SendBitInfo:maskVal FromBit:0 ToBit:16 ToCheckBoxes:maskSelect_1];
     [self SendBitInfo:maskVal FromBit:16 ToBit:32 ToCheckBoxes:maskSelect_2];
 }
 - (IBAction)CounterMatchHardware:(id)sender {
-    [self SpeakerMatchHardware:sender];
+    [self SpeakerMatchHardware:sender]; //Bit of a hack. I should probably rename the function
     CONTROL_REG_MASK ControlRegVal = [model controlReg];
 
     [CounterLZBSelect setState: (ControlRegVal & scalerLZB_Bit) > 0 ? NSOnState : NSOffState ];
