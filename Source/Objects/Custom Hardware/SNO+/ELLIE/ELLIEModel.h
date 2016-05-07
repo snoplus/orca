@@ -38,6 +38,13 @@
     NSMutableDictionary* tellieFireParameters;
     NSMutableDictionary* tellieFibreMapping;
     BOOL ellieFireFlag;
+    
+    //smellie config mappings
+    NSMutableDictionary* smellieLaserHeadToSepiaMapping;
+    NSMutableDictionary* smellieLaserHeadToGainMapping;
+    NSMutableDictionary* smellieLaserToInputFibreMapping;
+    NSMutableDictionary* smellieFibreSwitchToFibreMapping;
+    BOOL smellieSlaveMode;
 }
 
 @property (nonatomic,retain) NSMutableDictionary* tellieFireParameters;
@@ -45,6 +52,11 @@
 @property (nonatomic,retain) NSMutableDictionary* tellieSubRunSettings;
 @property (nonatomic,retain) NSMutableDictionary* smellieRunSettings;
 @property (nonatomic,retain) NSMutableDictionary* currentOrcaSettingsForSmellie;
+@property (nonatomic,retain) NSMutableDictionary* smellieLaserHeadToSepiaMapping;
+@property (nonatomic,retain) NSMutableDictionary* smellieLaserHeadToGainMapping;
+@property (nonatomic,retain) NSMutableDictionary* smellieLaserToInputFibreMapping;
+@property (nonatomic,retain) NSMutableDictionary* smellieFibreSwitchToFibreMapping;
+@property (nonatomic,assign) BOOL smellieSlaveMode;
 @property (nonatomic,retain) NSMutableDictionary* tellieRunDoc;
 @property (nonatomic,retain) NSMutableDictionary* smellieRunDoc;
 @property (nonatomic,assign) BOOL ellieFireFlag;
@@ -96,7 +108,10 @@
 -(void) setLaserSoftLockOff;
 -(void) setSmellieMasterMode:(NSString*)triggerFrequency withNumOfPulses:(NSString*)numOfPulses;
 -(void) sendCustomSmellieCmd:(NSString*)customCmd withArgs:(NSArray*)argsArray;
--(NSMutableDictionary*)loadConfigFile:(NSNumber*)versionNumber;
+-(NSMutableDictionary*)getSmellieRunLaserDict:(NSDictionary*)smellieSettings;
+-(NSMutableDictionary*)getSmellieFibreDict:(NSDictionary*)smellieSettings;
+-(NSArray*)getSmellieRunFrequencyArray:(NSDictionary*)smellieSettings;
+-(NSArray*)getSmellieRunIntensityArray:(NSDictionary*)smellieSettings;
 -(void) startSmellieRunInBackground:(NSDictionary*)smellieSettings;
 -(void) startSmellieRun:(NSDictionary*)smellieSettings;
 -(void) stopSmellieRun;

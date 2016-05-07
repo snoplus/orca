@@ -997,11 +997,12 @@ smellieRunFile;
             NSString *requestedRunFile = [smellieRunFileNameField objectValueOfSelectedItem];
             
             if( [thisRunFile isEqualToString:requestedRunFile]){
-                self.smellieRunFile = currentRunFile;
+                [self setSmellieRunFile:currentRunFile];
                 
+                NSLog(@"%", [self smellieRunFile]);
                 // If it's an old run file, add superK fields, set to zero
-                if(![smellieRunFile objectForKey:@"SuperK_laser_on"]){
-                    [smellieRunFile setValue:0 forKey:@"SuperK_laser_on"];
+                if(![smellieRunFile objectForKey:@"superK_laser_on"]){
+                    [smellieRunFile setValue:0 forKey:@"superK_laser_on"];
                 }
                 
                 [loadedSmellieRunNameLabel setStringValue:[smellieRunFile objectForKey:@"run_name"]];
@@ -1060,8 +1061,8 @@ smellieRunFile;
                 }
 
                 //see if the 500nm laser is on
-                if([[self.smellieRunFile objectForKey:@"SuperK_laser_on"] intValue] == 1){
-                    [smellieLaserString appendString:@" SuperK "];
+                if([[self.smellieRunFile objectForKey:@"superK_laser_on"] intValue] == 1){
+                    [smellieLaserString appendString:@" superK "];
                 }
                 
                 //Calculate the approximate time of the run

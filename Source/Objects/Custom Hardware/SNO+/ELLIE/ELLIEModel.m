@@ -156,8 +156,15 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         [self pushInitialTellieRunDocument];
     } else {
         //add run control object
-        NSArray*  runControlObjsArray = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-        runControl = [runControlObjsArray objectAtIndex:0];
+        NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+        if(![runModels count]){
+            NSException* e = [NSException
+                              exceptionWithName:@"noRunModel"
+                              reason:@"*** Please add a ORRunModel to the experiment"
+                              userInfo:nil];
+            [e raise];
+        }
+        runControl = [runModels objectAtIndex:0];
     
         if(![runControl isRunning]){
             [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
@@ -174,8 +181,15 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     */
     
     //add run control object
-    NSArray*  runControlObjsArray = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    runControl = [runControlObjsArray objectAtIndex:0];
+    NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    if(![runModels count]){
+        NSException* e = [NSException
+                          exceptionWithName:@"noRunModel"
+                          reason:@"*** Please add a ORRunModel to the experiment"
+                          userInfo:nil];
+        [e raise];
+    }
+    runControl = [runModels objectAtIndex:0];
     
     if([runControl isRunning]){
         [runControl performSelectorOnMainThread:@selector(haltRun) withObject:nil waitUntilDone:YES];
@@ -336,16 +350,19 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
      
     */
     //Set tellieFiring flag
-    self.ellieFireFlag = YES;
+    [self setEllieFireFlag:YES];
     NSLog(@"ELLIE fire flag set to: %@\n",@YES);
     
     //Add run control object
-    NSArray*  runControlObjsArray = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    runControl = [runControlObjsArray objectAtIndex:0];
-    
-    //Add SNOPModel object
-    //NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    //SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    if(![runModels count]){
+        NSException* e = [NSException
+                          exceptionWithName:@"noRunModel"
+                          reason:@"*** Please add a ORRunModel to the experiment"
+                          userInfo:nil];
+        [e raise];
+    }
+    runControl = [runModels objectAtIndex:0];
     
     //TELLIE pin readout is an average measurement of the passed "number_of_shots". If a large number of shots are requested
     //it is useful to split the data into smaller chunks in order to get multiple pin readings.
@@ -439,7 +456,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
             }
         }
     }
-    self.ellieFireFlag = NO;
+    [self setEllieFireFlag:NO];
     NSLog(@"ELLIE fire flag set to: %@\n",NO);
 }
 
@@ -473,11 +490,25 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
      */
     NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:10];
     
-    NSArray*  objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    runControl = [objs3 objectAtIndex:0];
+    NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    if(![runModels count]){
+        NSException* e = [NSException
+                          exceptionWithName:@"noRunModel"
+                          reason:@"*** Please add a ORRunModel to the experiment"
+                          userInfo:nil];
+        [e raise];
+    }
+    runControl = [runModels objectAtIndex:0];
     
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    if(![snopModels count]){
+        NSException* e = [NSException
+                          exceptionWithName:@"noSNOPModel"
+                          reason:@"*** Please add a SNOPModel to the experiment"
+                          userInfo:nil];
+        [e raise];
+    }
+    SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
     
     NSString* docType = [NSMutableString stringWithFormat:@"tellie_run"];
     NSMutableArray* subRunArray = [NSMutableArray arrayWithCapacity:10];
@@ -488,7 +519,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [runDocDict setObject:[self stringUnixFromDate:nil] forKey:@"issue_time_unix"];
     [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"issue_time_iso"];
     
-    [runDocDict setObject:[NSMutableArray arrayWithObjects:[NSNumber numberWithUnsignedLong:[runControl runNumber]],[NSNumber numberWithUnsignedLong:[runControl runNumber]], nil] forKey:@"run_range"];
+    [runDocDict setObject:[NSMutableArray arrayWithObjects:[NSNumber numberWithUnsignedLong:[runControl runNumber]],[NSNumber numberWithUnsignedLong:[runControl runNumber]], nil] forKey:@"run_range"];
     
     [runDocDict setObject:subRunArray forKey:@"sub_run_info"];
     
@@ -545,8 +576,15 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
      */
 
     // Load the SNOPModel to access orcaDBIPAddress and orcaDBPort variables
-    NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    NSArray* snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    if(![snopModels count]){
+        NSException* e = [NSException
+                          exceptionWithName:@"noSNOPModel"
+                          reason:@"*** Please add a SNOPModel to the experiment"
+                          userInfo:nil];
+        [e raise];
+    }
+    SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
     
     // **********************************
     // Load latest calibration constants
@@ -708,10 +746,15 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 
 -(void)testFunction
 {
-    NSArray* runControlObjs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    
-    runControl = [runControlObjs objectAtIndex:0];
-    
+    NSArray* runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    if(![runModels count]){
+        NSException* e = [NSException
+                          exceptionWithName:@"noRunModel"
+                          reason:@"*** Please add a ORRunModel to the experiment"
+                          userInfo:nil];
+        [e raise];
+    }
+    runControl = [runModels objectAtIndex:0];
     [runControl performSelector:@selector(haltRun)withObject:nil afterDelay:.1];
 }
 
@@ -720,154 +763,22 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [self performSelectorOnMainThread:@selector(startSmellieRun:) withObject:smellieSettings waitUntilDone:NO];
 }
 
-
-
--(void)startSmellieRun:(NSDictionary*)smellieSettings
+-(NSMutableDictionary*)getSmellieRunLaserDict:(NSDictionary*)smellieSettings
 {
-    /*
-     Start a smellie run.
-     
-     COMMENT:
-     I think this method should be implemented as a standard run script, not as an object
-     method. I'll look into doing this after the DAQ meeting in Jan - Once I know the tellie
-     one works!
-     */
-    //stop any current runs and go into a maintainence run
-    //[runControl performSelectorOnMainThread:@selector(stopRun) withObject:nil waitUntilDone:YES];
-    //[runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
-    
-    //Set the Run Type to a SMELLIE run -- Not sure if this should be commented back in?
-    //NSArray*  objsSNOP = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    //SNOPModel* theSNOPModel = [objsSNOP objectAtIndex:0];
-    //[theSNOPModel setRunType:kRunSmellie]; //sets the run_type to a smellie run type
-    
-    NSLog(@"SMELLIE_RUN:Setting up a SMELLIE Run\n");
-    
-    NSLog(@"SMELLIE_RUN:Stopping any Blocking Software on SMELLIE computer(SNODROP)\n");
-    [self killBlockingSoftware];
-    
-    NSNumber* currentConfigurationVersion = [self fetchRecentVersion];
-    
-    //fetch the data associated with the current configuration
-    NSMutableDictionary *configForSmellie = [[self fetchCurrentConfigurationForVersion:currentConfigurationVersion] mutableCopy];
-    
-    NSMutableDictionary *laserHeadToSepiaMapping = [[NSMutableDictionary alloc] initWithCapacity:10];
-    int laserHeadIndex =0;
-    for(laserHeadIndex =0; laserHeadIndex < 6; laserHeadIndex++){
-        
-        for (id specificConfigValue in configForSmellie){
-            if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput%i",laserHeadIndex]]){
-                
-                NSString *laserHeadConnected = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"laserHeadConnected"]];
-                
-                [laserHeadToSepiaMapping setObject:[NSString stringWithFormat:@"%i",laserHeadIndex] forKey:laserHeadConnected];
-            }
-        }
-    } //end of looping through each laserHeadIndex
-    
-    NSMutableDictionary *laserHeadToGainControlMapping = [[NSMutableDictionary alloc] initWithCapacity:10];
-    for(laserHeadIndex =0; laserHeadIndex < 6; laserHeadIndex++){
-        
-        for (id specificConfigValue in configForSmellie){
-            if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput%i",laserHeadIndex]]){
-                
-                NSString *laserHeadConnected = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"laserHeadConnected"]];
-                
-                NSString *laserGainControl = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"gainControlFactor"]];
-                
-                [laserHeadToGainControlMapping setObject:[NSString stringWithFormat:@"%@",laserGainControl] forKey:laserHeadConnected];
-            }
-        }
-    } //end of looping through each laserHeadIndex
-    
-    NSMutableDictionary *laserToInputFibreMapping = [[NSMutableDictionary alloc] initWithCapacity:10];
-    
-    for (id specificConfigValue in configForSmellie){
-        
-        if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput0"]]
-           || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput1"]]
-           || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput2"]]
-           || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput3"]]
-           || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput4"]]
-           || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput5"]]){
-            
-            NSString *fibreSwitchInputConnected = [[configForSmellie objectForKey:specificConfigValue] objectForKey:@"fibreSwitchInputConnected"];
-            NSString* parsedFibreReference = [fibreSwitchInputConnected stringByReplacingOccurrencesOfString:@"Channel" withString:@""];
-            
-            NSString * laserHeadReference = [[configForSmellie objectForKey:specificConfigValue] objectForKey:@"laserHeadConnected"];
-            
-            [laserToInputFibreMapping setObject:parsedFibreReference forKey:laserHeadReference];
-            
-            //NSString* updatedFibreReference = [fibreSwitchInputConnected stringByReplacingOccurrencesOfString:@"Channel" withString:@""];
-            
-            //[specificConfigValue objectForKey:@"fibreSwitchInputConnected"];
-            
-            //if([[specificConfigValue objectForKey:@"fibreSwitchInputConnected"] isEqualToString:[NSString stringWithFormat:@"laserInput%i",inputChannelIndex]]){
-            
-            //NSString *fibreSwitchInputConnected = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"fibreSwitchInputConnected"]];
-            
-            //NSString* updatedFibreReference = [fibreSwitchInputConnected stringByReplacingOccurrencesOfString:@"Channel" withString:@""];
-            
-            /*NSString* laserHeadReference = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"laserHeadConnected"]];
-             
-             [laserToInputFibreMapping setObject:[NSString stringWithFormat:@"%i",inputChannelIndex] forKey:laserHeadReference];*/
-        }
-        // }
-        
-    }
-    
-    NSMutableDictionary *fibreSwitchOutputToFibre = [[NSMutableDictionary alloc] initWithCapacity:10];
-    
-    int outputChannelIndex = 0;
-    for(outputChannelIndex = 1; outputChannelIndex < 15; outputChannelIndex++){
-        
-        for (id specificConfigValue in configForSmellie){
-            if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"Channel%i",outputChannelIndex]]){
-                
-                NSString *fibreReference = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"detectorFibreReference"]];
-                
-                [fibreSwitchOutputToFibre setObject:[NSString stringWithFormat:@"%i",outputChannelIndex] forKey:fibreReference];
-            }
-        }
-    }
-    
-    BOOL slaveMode,masterMode;
-    NSString *operationMode = [NSString stringWithFormat:@"%@",[smellieSettings objectForKey:@"operation_mode"]];
-    if([operationMode isEqualToString:@"Slave Mode"]){
-        slaveMode = YES;
-        masterMode = NO;
-    }else if([operationMode isEqualToString:@"Master Mode"]){
-        slaveMode = NO;
-        masterMode = YES;
-    }else{
-        slaveMode = NO;
-        masterMode = NO;
-    }
-    
-    NSLog(@"SMELLIE_RUN:Running in %@\n",operationMode);
-    NSLog(@"SMELLIE_RUN:Checking Connection to SMELLIE\n");
-    NSLog(@"SMELLIE_RUN:Setting SMELLIE into Safe States before starting a Run\n");
-    [self setSmellieSafeStates];
-    
-    //Extract the min intensity
-    NSNumber * minLaserObj = [smellieSettings objectForKey:@"min_laser_intensity"];
-    int minLaserIntensity = [minLaserObj intValue];
-    
-    //Extract the min intensity
-    NSNumber * maxLaserObj = [smellieSettings objectForKey:@"max_laser_intensity"];
-    int maxLaserIntensity = [maxLaserObj intValue];
-    
-    NSNumber * numOfIntensitySteps = [smellieSettings objectForKey:@"num_intensity_steps"];
-    
     //Extract the lasers to be fired into an array
-    NSMutableDictionary * laserArray = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary * laserArray = [NSMutableDictionary dictionaryWithCapacity:5];
     [laserArray setObject:[smellieSettings objectForKey:@"375nm_laser_on"] forKey:@"375nm" ];
     [laserArray setObject:[smellieSettings objectForKey:@"405nm_laser_on"] forKey:@"405nm" ];
     [laserArray setObject:[smellieSettings objectForKey:@"440nm_laser_on"] forKey:@"440nm" ];
     [laserArray setObject:[smellieSettings objectForKey:@"500nm_laser_on"] forKey:@"500nm" ];
-    
+    [laserArray setObject:[smellieSettings objectForKey:@"superK_laser_on"] forKey:@"superK" ];
+    return laserArray;
+};
+
+-(NSMutableDictionary*)getSmellieRunFibreDict:(NSDictionary*)smellieSettings
+{
     //Extract the fibres to be fired into an array
-    NSMutableDictionary *fibreArray = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary* fibreArray = [NSMutableDictionary dictionaryWithCapacity:12];
     [fibreArray setObject:[smellieSettings objectForKey:@"FS007"] forKey:@"FS007" ];
     [fibreArray setObject:[smellieSettings objectForKey:@"FS107"] forKey:@"FS107" ];
     [fibreArray setObject:[smellieSettings objectForKey:@"FS207"] forKey:@"FS207" ];
@@ -880,44 +791,116 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [fibreArray setObject:[smellieSettings objectForKey:@"FS055"] forKey:@"FS055" ];
     [fibreArray setObject:[smellieSettings objectForKey:@"FS155"] forKey:@"FS155" ];
     [fibreArray setObject:[smellieSettings objectForKey:@"FS255"] forKey:@"FS255" ];
+    return fibreArray;
+}
+
+-(NSArray*)getSmellieRunFrequencyArray:(NSDictionary*)smellieSettings
+{
+    return nil;
+}
+
+-(NSArray*)getSmellieRunIntensityArray:(NSDictionary*)smellieSettings
+{
+    //Extract the min intensity
+    NSNumber * minLaserObj = [smellieSettings objectForKey:@"min_laser_intensity"];
+    int minLaserIntensity = [minLaserObj intValue];
     
-    smellieSubRunInfo = [[NSMutableArray alloc] initWithCapacity:100];
-    NSString* numOfPulsesInSlaveMode = [NSString stringWithFormat:@"%@",[smellieSettings objectForKey:@"triggers_per_loop"]];
-    NSString* triggerFrequencyInSlaveMode = [NSString stringWithFormat:@"%@",[smellieSettings objectForKey:@"trigger_frequency"]];
+    //Extract the min intensity
+    NSNumber * maxLaserObj = [smellieSettings objectForKey:@"max_laser_intensity"];
+    int maxLaserIntensity = [maxLaserObj intValue];
     
-    NSNumberFormatter * f = [[NSNumberFormatter alloc] init];
-    [f setNumberStyle:NSNumberFormatterDecimalStyle];
-    float timeToPulse = [[f numberFromString:numOfPulsesInSlaveMode] floatValue]/[[f numberFromString:triggerFrequencyInSlaveMode] floatValue];
-    [f release];
+    NSNumber * numOfIntensitySteps = [smellieSettings objectForKey:@"num_intensity_steps"];
     
+    //Check to see if the maximum intensity is the same as the minimum intensity
+    int increment;
+    NSMutableArray* intensities = [NSMutableArray arrayWithCapacity:numOfIntensitySteps];
+    if(maxLaserIntensity != minLaserIntensity){
+        increment = (maxLaserIntensity - minLaserIntensity)/[numOfIntensitySteps floatValue];
+    }else{
+        increment = 0;
+        [intensities addObject:maxLaserObj];
+    }
     
-    //get the MTC Object (but only use in Slave Mode)
-    NSArray*  objsMTC = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    ORMTCModel* theMTCModel = [objsMTC objectAtIndex:0];
+    //Create intensities array
+    for(int intensityLoopInt = minLaserIntensity;intensityLoopInt <= maxLaserIntensity; intensityLoopInt = intensityLoopInt + increment){
+        [intensities addObject:[NSNumber numberWithInt:intensityLoopInt]];
+    }
+    
+    return intensities;
+}
+
+-(void)startSmellieRun:(NSDictionary*)smellieSettings
+{
+    /*
+     Form a smellie run using the passed smellie run file, stored in smellieSettings.
+     
+     COMMENT:
+     I think this method should be implemented as a standard run script, not as an object
+     method. I'll look into doing this after the DAQ meeting in Jan - Once I know the tellie
+     one works!
+     */
+    
+    //Set the Run Type to a SMELLIE run -- Not sure if this should be commented back in?
+    //NSArray*  objsSNOP = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    //SNOPModel* theSNOPModel = [objsSNOP objectAtIndex:0];
+    //[theSNOPModel setRunType:kRunSmellie]; //sets the run_type to a smellie run type
+    
+    NSLog(@"SMELLIE_RUN:Setting up a SMELLIE Run\n");
+    NSLog(@"SMELLIE_RUN:Stopping any Blocking Software on SMELLIE computer(SNODROP)\n");
+    [self killBlockingSoftware];
+
+    if ([self smellieSlaveMode]){
+        NSLog(@"SMELLIE_RUN:Running in SLAVE mode\n");
+    } else {
+        NSLog(@"SMELIE_RUN:Running n MASTER mode\n");
+    }
+    NSLog(@"SMELLIE_RUN:Setting SMELLIE into Safe States before starting a Run\n");
+    //[self setSmellieSafeStates];
+    
+    //   GET MODELS
+    //
+    //Get the MTC Object (will only be used in Slave Mode)
+    NSArray*  mtcModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    if(![mtcModels count]){
+        NSException* e = [NSException
+                          exceptionWithName:@"noMTCModel"
+                          reason:@"*** Please add a ORMTCModel to the experiment"
+                          userInfo:nil];
+        [e raise];
+    }
+    ORMTCModel* theMTCModel = [mtcModels objectAtIndex:0];
     [theMTCModel stopMTCPedestalsFixedRate]; //stop any pedestals that are currently running
     
-    //get the run controller
-    NSArray*  objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    runControl = [objs3 objectAtIndex:0];
-    
-    //Save the current settings of the detector
-    NSMutableDictionary* tmpCurrentOrcaSettingsForSmellie  = [[NSMutableDictionary alloc] init];
+    //Get the run controller
+    NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    if(![runModels count]){
+        NSException* e = [NSException
+                          exceptionWithName:@"noRunModel"
+                          reason:@"*** Please add a ORRunModel to the experiment"
+                          userInfo:nil];
+        [e raise];
+    }
+    runControl = [runModels objectAtIndex:0];
+
+    // STORE MTC SETTINGS
+    //
+    //Save the current MTC delay / period settings
+    NSMutableDictionary* currentMTCSettings = [[NSMutableDictionary alloc] init];
     NSLog(@"SMELLIE_RUN:Mtcd coarse delay set to %f ns\n",[theMTCModel dbFloatByIndex:kCoarseDelay]);
     NSNumber * mtcCoarseDelay = [NSNumber numberWithUnsignedLong:[theMTCModel dbFloatByIndex:kCoarseDelay]];
-    [tmpCurrentOrcaSettingsForSmellie setObject:mtcCoarseDelay forKey:@"mtcd_coarse_delay"];
+    [currentMTCSettings setObject:mtcCoarseDelay forKey:@"mtcd_coarse_delay"];
     
     NSLog(@"SMELLIE_RUN:Mtcd pulser rate set to %f Hz\n",[theMTCModel dbFloatByIndex:kPulserPeriod]);
     NSNumber * mtcPulserPeriod = [NSNumber numberWithFloat:[theMTCModel dbFloatByIndex:kPulserPeriod]];
-    [tmpCurrentOrcaSettingsForSmellie setObject:mtcPulserPeriod forKey:@"mtcd_pulser_period"];
+    [currentMTCSettings setObject:mtcPulserPeriod forKey:@"mtcd_pulser_period"];
     
     //Set property variable and delete tmpVar.
-    self.currentOrcaSettingsForSmellie = tmpCurrentOrcaSettingsForSmellie;
-    [tmpCurrentOrcaSettingsForSmellie release];
+    [self setCurrentOrcaSettingsForSmellie:currentMTCSettings];
+    [currentMTCSettings release];
     
-    //Set the Mtcd for smellie settings
-    //NSLog(@"SMELLIE_RUN:Setting the mtcd coarse delay to 900ns \n",[[NSNumber numberWithUnsignedShort:900] unsignedShortValue]);
-    //[theMTCModel setupGTCorseDelay:[[NSNumber numberWithInt:900] intValue]];
-    
+    // RUN CONTROL STUFF
+    //
+    //Set up run control
     if(![runControl isRunning]){
         //start the run controller
         [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
@@ -929,25 +912,40 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         //[runControl:@selector(stopRun) withObject:nil afterDelay:0];
     }
     
-    //fire some pedestals but only in slave mode. The pedestals are used to trigger the SMELLIE lasers
-    /*if(slaveMode){
-     
-     NSLog(@"SMELLIE_RUN:Setting the Pedestal to :%@ Hz \n",triggerFrequencyInSlaveMode);
-     NSNumberFormatter * f = [[NSNumberFormatter alloc] init];
-     [f setNumberStyle:NSNumberFormatterDecimalStyle];
-     NSNumber * numericTriggerFrequencyInSlaveMode = [f numberFromString:triggerFrequencyInSlaveMode];
-     [f release];
-     
-     NSLog(@"SMELLIE_RUN:Intensity:Firing Pedestals\n");
-     [theMTCModel fireMTCPedestalsFixedRate];
-     
-     //We need to set the pulser rate after firing pedestals
-     float pulserRate = [numericTriggerFrequencyInSlaveMode floatValue];
-     [theMTCModel setThePulserRate:pulserRate];
-     }*/
+    // GET SMELLIE RUN SETTINGS FOR LOOPING OVER
+    //
+    NSMutableDictionary* laserArray = [self getSmellieRunLaserDict:smellieSettings];
+    NSMutableDictionary* fibreArray = [self getSmellieRunFibreDict:smellieSettings];
+    NSArray* intensityArray = [self getSmellieRunIntensityArray:smellieSettings];
     
+    smellieSubRunInfo = [[NSMutableArray alloc] initWithCapacity:100];
+    NSString* numOfPulsesInSlaveMode = [NSString stringWithFormat:@"%@",[smellieSettings objectForKey:@"triggers_per_loop"]];
+    NSString* triggerFrequencyInSlaveMode = [NSString stringWithFormat:@"%@",[smellieSettings objectForKey:@"trigger_frequency"]];
+    
+    //Set slave / master mode
+    NSString *operationMode = [NSString stringWithFormat:@"%@",[smellieSettings objectForKey:@"operation_mode"]];
+    if([operationMode isEqualToString:@"Slave Mode"]){
+        [self setSmellieSlaveMode:YES];
+    }else if([operationMode isEqualToString:@"Master Mode"]){
+        [self setSmellieSlaveMode:NO];
+    }else{
+        NSException* e = [NSException
+                          exceptionWithName:@"badConfigEntry"
+                          reason:@"*** Slave / Master mode does not appear to be included in config file"
+                          userInfo:nil];
+        [e raise];
+    }
+    
+    //How long do we need to run pulser?
+    NSNumberFormatter * f = [[NSNumberFormatter alloc] init];
+    [f setNumberStyle:NSNumberFormatterDecimalStyle];
+    float timeToPulse = [[f numberFromString:numOfPulsesInSlaveMode] floatValue]/[[f numberFromString:triggerFrequencyInSlaveMode] floatValue];
+    [f release];
+    
+    
+    // BEGIN LOOPING!
+    //
     BOOL endOfRun = NO;
-    int laserLoopInt = 0;
     for(id laserKey in laserArray){
         
         if(endOfRun == YES){
@@ -959,13 +957,13 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
             continue;
         }
         
-        //set the laser switch which corresponds to the laserHead mapping to Sepia
-        NSLog(@"SMELLIE_RUN:Setting the Laser Switch to Channel:%@ which corresponds to the %@ Laser\n",[NSString stringWithFormat:@"%@",[laserHeadToSepiaMapping objectForKey:laserKey]],laserKey);
-        [self setLaserSwitch:[NSString stringWithFormat:@"%@",[laserHeadToSepiaMapping objectForKey:laserKey]]];
+        //Set the laser switch which corresponds to the laserHead mapping to Sepia
+        NSLog(@"SMELLIE_RUN:Setting the Laser Switch to Channel:%@ which corresponds to the %@ Laser\n",[NSString stringWithFormat:@"%@",[[self smellieLaserHeadToSepiaMapping] objectForKey:laserKey]],laserKey);
+        [self setLaserSwitch:[NSString stringWithFormat:@"%@",[[ self smellieLaserHeadToSepiaMapping] objectForKey:laserKey]]];
         
-        //set the gain Control
-        NSLog(@"SMELLIE_RUN:Setting the gain control to: %i V\n",[[laserHeadToGainControlMapping objectForKey:laserKey] floatValue]);
-        [self setGainControlWithGainVoltage:[NSString stringWithFormat:@"%@",[laserHeadToGainControlMapping objectForKey:laserKey]]];
+        //Set the gain Control
+        NSLog(@"SMELLIE_RUN:Setting the gain control to: %i V\n",[[[self smellieLaserHeadToGainMapping] objectForKey:laserKey] floatValue]);
+        [self setGainControlWithGainVoltage:[NSString stringWithFormat:@"%@",[[self smellieLaserHeadToGainMapping] objectForKey:laserKey]]];
         
         //Loop through each Fibre
         for(id fibreKey in fibreArray){
@@ -979,32 +977,20 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                 continue;
             }
             
-            //NSString *inputFibneSwitchChannel = [NSString stringWithFormat:@"%i",laserLoopInt+1];
-            NSString *inputFibneSwitchChannel = [NSString stringWithFormat:@"%@",[laserToInputFibreMapping objectForKey:laserKey]];
+            NSString *inputFibneSwitchChannel = [NSString stringWithFormat:@"%@",[[self smellieLaserToInputFibreMapping] objectForKey:laserKey]];
             
-            NSLog(@"SMELLIE_RUN:Setting the Fibre Switch to Input Channel:%@ from the %@ Laser and Output Channel %@\n",inputFibneSwitchChannel,laserKey,[NSString stringWithFormat:@"%@",[fibreSwitchOutputToFibre objectForKey:fibreKey]]);
-            [self setFibreSwitch:inputFibneSwitchChannel withOutputChannel:[NSString stringWithFormat:@"%@",[fibreSwitchOutputToFibre objectForKey:fibreKey]]];
+            NSLog(@"SMELLIE_RUN:Setting the Fibre Switch to Input Channel:%@ from the %@ Laser and Output Channel %@\n",inputFibneSwitchChannel,laserKey,[NSString stringWithFormat:@"%@",[[self smellieFibreSwitchToFibreMapping] objectForKey:fibreKey]]);
+            [self setFibreSwitch:inputFibneSwitchChannel withOutputChannel:[NSString stringWithFormat:@"%@",[[self smellieFibreSwitchToFibreMapping] objectForKey:fibreKey]]];
             [NSThread sleepForTimeInterval:1.0f];
             
-            
-            /* Check to see if the maximum intensity is the same as the minimum intensity */
-            int increment;
-            if(maxLaserIntensity != minLaserIntensity){
-                increment = (maxLaserIntensity - minLaserIntensity)/[numOfIntensitySteps floatValue];
-            }else{
-                increment = 0;
-            }
-            //NSNumber *incrementInteger = [NSNUmber numberWithFloat:increment];
-            
             //Loop through each intensity of a SMELLIE run
-            int intensityLoopInt;
-            for(intensityLoopInt = minLaserIntensity;intensityLoopInt <= maxLaserIntensity; intensityLoopInt = intensityLoopInt + increment){
+            for(NSNumber* intensity in intensityArray){
                 
                 //if run control cancels the run
-                /*if(![runControl isRunning]){
-                 endOfRun = YES;
-                 break;
-                 }*/
+                if(![runControl isRunning]){
+                    endOfRun = YES;
+                    break;
+                 }
                 
                 if([[NSThread currentThread] isCancelled]){
                     endOfRun = YES;
@@ -1015,20 +1001,20 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                 [runControl performSelectorOnMainThread:@selector(prepareForNewSubRun) withObject:nil waitUntilDone:YES];
                 [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
                 
-                NSString * laserIntensityAsString = [NSString stringWithFormat:@"%i",intensityLoopInt];
+                NSString * laserIntensityAsString = [NSString stringWithFormat:@"%i",[intensity intValue]];
                 NSLog(@"SMELLIE_RUN:Setting the Laser Intensity to %@ \n",laserIntensityAsString);
                 [self setLaserIntensity:laserIntensityAsString];
+
+                //this used to be 10.0,  Slave mode in Orca requires time (unknown reason) - Chris J
                 [NSThread sleepForTimeInterval:1.0f];
-                
-                //this used to be 10.0,  Slave mode in Orca requires time (unknown reason)
                 
                 NSMutableDictionary *valuesToFillPerSubRun = [[NSMutableDictionary alloc] initWithCapacity:100];
                 [valuesToFillPerSubRun setObject:laserKey forKey:@"laser"];
                 [valuesToFillPerSubRun setObject:fibreKey forKey:@"fibre"];
-                [valuesToFillPerSubRun setObject:[NSNumber numberWithInt:intensityLoopInt] forKey:@"intensity"];
+                [valuesToFillPerSubRun setObject:intensity forKey:@"intensity"];
                 [valuesToFillPerSubRun setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
                 
-                if(slaveMode){
+                if([self smellieSlaveMode]){
                     [self setLaserSoftLockOff];
                     NSLog(@"SMELLIE_RUN:Setting the Pedestal to :%@ Hz \n",triggerFrequencyInSlaveMode);
                     NSNumberFormatter * f = [[NSNumberFormatter alloc] init];
@@ -1042,46 +1028,46 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                     //We need to set the pulser rate after firing pedestals
                     float pulserRate = [numericTriggerFrequencyInSlaveMode floatValue];
                     [theMTCModel setThePulserRate:pulserRate];
-                    
+                 
+                    NSLog(@"SMELLIE_RUN: Pulsing at %f Hz for %f seconds \n",[triggerFrequencyInSlaveMode floatValue],timeToPulse);
+                    //Wait a certain amount of time for slave Mode
+                    [NSThread sleepForTimeInterval:timeToPulse];
                 }
                 
                 [NSThread sleepForTimeInterval:1.0f];
-                if(masterMode){
+                if(![self smellieSlaveMode]){
                     NSString* numOfPulses = [NSString stringWithFormat:@"%@",[smellieSettings objectForKey:@"triggers_per_loop"]];
                     NSString* triggerFrequency = [NSString stringWithFormat:@"%@",[smellieSettings objectForKey:@"trigger_frequency"]];
                     NSLog(@"SMELLIE_RUN:%@ Pulses at %@ Hz \n",numOfPulses,triggerFrequency);
                     [self setSmellieMasterMode:triggerFrequency withNumOfPulses:numOfPulses];
                 }
                 
-                if(slaveMode){
-                    NSLog(@"SMELLIE_RUN: Pulsing at %f Hz for %f seconds \n",[triggerFrequencyInSlaveMode floatValue],timeToPulse);
-                    //Wait a certain amount of time for slave Mode
-                    [NSThread sleepForTimeInterval:timeToPulse];
-                }
-                
                 [smellieSubRunInfo addObject:valuesToFillPerSubRun];
                 [valuesToFillPerSubRun release];
                 
-                if(!endOfRun){
-                    NSLog(@"Laser:%@ ", laserKey);
-                    NSLog(@"Fibre:%@ ",fibreKey);
-                    NSLog(@"Intensity:%i \n",intensityLoopInt);
-                }
-                
-                //TODO:only have this in slave mode
-                if(slaveMode){
+                if([self smellieSlaveMode]){
                     NSLog(@"SMELLIE_RUN:Stopping MTCPedestals\n");
                     [theMTCModel stopMTCPedestalsFixedRate];
                     [self setLaserSoftLockOn];
                 }
                 
+                if(!endOfRun){
+                    NSLog(@"Laser:%@ ", laserKey);
+                    NSLog(@"Fibre:%@ ",fibreKey);
+                    NSLog(@"Intensity:%i \n",[intensity intValue]);
+                }
+
+                //Check if run file requests a sleep time between sub_runs
+                if([smellieSettings objectForKey:@"sleep_between_sub_run"]){
+                    NSTimeInterval sleepTime = [[smellieSettings objectForKey:@"sleep_between_sub_run"] floatValue];
+                    [NSThread sleepForTimeInterval:sleepTime];
+                }
                 [NSThread sleepForTimeInterval:1.0f];
                 
             }//end of looping through each intensity setting on the smellie laser
             
         }//end of looping through each Fibre
         
-        laserLoopInt = laserLoopInt + 1;
     }//end of looping through each laser
     
     //End the run
@@ -1089,20 +1075,17 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //[smellieSubRun release];
     [fibreArray release];
     [laserArray release];
+    [intensityArray release];
     
     //stop the pedestals if required
-    if(slaveMode){
+    if([self smellieSlaveMode]){
         //NSLog(@"SMELLIE_RUN:Stopping MTCPedestals\n");
         [theMTCModel stopMTCPedestalsFixedRate];
     }
     
     //Resetting the mtcd to settings before the smellie run
-    
     NSLog(@"SMELLIE_RUN:Returning SMELLIE into Safe States after finishing a Run\n");
-    [self setSmellieSafeStates];
-    
-    //don't know if I need this??? called in stop smellie run ???
-    //[runControl performSelectorOnMainThread:@selector(haltRun) withObject:nil waitUntilDone:YES];
+    //[self setSmellieSafeStates];
     
     if(!endOfRun){
         [[NSNotificationCenter defaultCenter] postNotificationName:ORELLIERunFinished object:self];
@@ -1119,15 +1102,30 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //Even though this is stopping in Orca it can still contine on SNODROP!
     //Need a stop run command here
     //TODO: add a try and except statement here
-    NSArray*  objsMTC = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    ORMTCModel* theMTCModel = [objsMTC objectAtIndex:0];
+    NSArray*  mtcModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    if(![mtcModels count]){
+        NSException* e = [NSException
+                          exceptionWithName:@"noMTCModel"
+                          reason:@"*** Please add a MTCModel to the experiment"
+                          userInfo:nil];
+        [e raise];
+    }
+    ORMTCModel* theMTCModel = [mtcModels objectAtIndex:0];
     
     //removed this to stop splurgingb
-    NSArray*  objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    runControl = [objs3 objectAtIndex:0];
+    NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    if(![runModels count]){
+        NSException* e = [NSException
+                          exceptionWithName:@"noRunModel"
+                          reason:@"*** Please add a ORRunModel to the experiment"
+                          userInfo:nil];
+        [e raise];
+    }
+    runControl = [runModels objectAtIndex:0];
     
     //Set the Mtcd for back to original settings
-    [theMTCModel setupPulserRateAndEnable:[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_pulser_period"] floatValue]];
+    [theMTCModel setThePulserRate:[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_pulser_period"] floatValue]];
+    [theMTCModel enablePulser];
     NSLog(@"SMELLIE_RUN:Setting the mtcd pulser back to %f Hz\n",[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_pulser_period"] floatValue]);
     [theMTCModel stopMTCPedestalsFixedRate];
     
@@ -1192,11 +1190,25 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
      */
     NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:10];
     
-    NSArray*  objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    runControl = [objs3 objectAtIndex:0];
+    NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    if(![runModels count]){
+        NSException* e = [NSException
+                          exceptionWithName:@"noRunModel"
+                          reason:@"*** Please add a ORRunModel to the experiment"
+                          userInfo:nil];
+        [e raise];
+    }
+    runControl = [runModels objectAtIndex:0];
     
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    if(![snopModels count]){
+        NSException* e = [NSException
+                          exceptionWithName:@"noSNOPModel"
+                          reason:@"*** Please add a SNOPModel to the experiment"
+                          userInfo:nil];
+        [e raise];
+    }
+    SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
     
     NSString* docType = [NSMutableString stringWithFormat:@"smellie_run"];
     NSMutableArray* subRunArray = [NSMutableArray arrayWithCapacity:10];
@@ -1264,12 +1276,26 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:100];
     
     //Collect a series of objects from the SNOPModel
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    if(![snopModels count]){
+        NSException* e = [NSException
+                          exceptionWithName:@"noSNOPModel"
+                          reason:@"*** Please add a SNOPModel to the experiment"
+                          userInfo:nil];
+        [e raise];
+    }
+    SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
     
     //Collect objects from ORRunModel
-    NSArray*  objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    runControl = [objs3 objectAtIndex:0];
+    NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    if(![runModels count]){
+        NSException* e = [NSException
+                          exceptionWithName:@"noRunModel"
+                          reason:@"*** Please add a ORRunModel to the experiment"
+                          userInfo:nil];
+        [e raise];
+    }
+    runControl = [runModels objectAtIndex:0];
     
     NSString* docType = [NSMutableString stringWithFormat:@"smellie_run"];
     NSString* smellieRunNameLabel = [aSnotModel smellieRunNameLabel];
@@ -1302,10 +1328,16 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSMutableDictionary* configDocDic = [NSMutableDictionary dictionaryWithCapacity:100];
     
     //Collect a series of objects from the SNOPModel
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    
+    NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    if(![snopModels count]){
+        NSException* e = [NSException
+                          exceptionWithName:@"noSNOPModel"
+                          reason:@"*** Please add a SNOPModel to the experiment"
+                          userInfo:nil];
+        [e raise];
+    }
     //Initialise the SNOPModel
-    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
     
     NSString* docType = [NSMutableString stringWithFormat:@"%@",aDocType];
     
@@ -1354,9 +1386,15 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
      number.
     */
     //Collect a series of objects from the SNOPModel
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    //Initialise the SNOPModel
-    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    if(![snopModels count]){
+        NSException* e = [NSException
+                          exceptionWithName:@"noSNOPModel"
+                          reason:@"*** Please add a SNOPModel to the experiment"
+                          userInfo:nil];
+        [e raise];
+    }
+    SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
     
     NSString *urlString = [NSString stringWithFormat:@"http://%@:%u/smellie/_design/smellieMainQuery/_view/fetchMostRecentConfigVersion?descending=True&limit=1",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
     NSURL *url = [NSURL URLWithString:urlString];
@@ -1391,8 +1429,15 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
      Arguments:
         NSNumber* currentVersion: The version number to be used with the query.
     */
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    if(![snopModels count]){
+        NSException* e = [NSException
+                          exceptionWithName:@"noSNOPModel"
+                          reason:@"*** Please add a SNOPModel to the experiment"
+                          userInfo:nil];
+        [e raise];
+    }
+    SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
     
     NSString *urlString = [NSString stringWithFormat:@"http://%@:%u/smellie/_design/smellieMainQuery/_view/pullEllieConfigHeaders?key=[%i]&limit=1",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort],[currentVersion intValue]];
     
@@ -1408,7 +1453,69 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     }
     
     [ret release];
-    return [[[[currentConfig objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"] objectForKey:@"configuration_info"];
+    
+    NSMutableDictionary* configForSmellie = [[[[currentConfig objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"] objectForKey:@"configuration_info"];
+
+    //Set laser head to sepia mapping
+    NSMutableDictionary *laserHeadToSepiaMapping = [[NSMutableDictionary alloc] initWithCapacity:10];
+    for(int laserHeadIndex =0; laserHeadIndex < 6; laserHeadIndex++){
+        for (id specificConfigValue in configForSmellie){
+            if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput%i",laserHeadIndex]]){
+                NSString *laserHeadConnected = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"laserHeadConnected"]];
+                [laserHeadToSepiaMapping setObject:[NSString stringWithFormat:@"%i",laserHeadIndex] forKey:laserHeadConnected];
+            }
+        }
+    }
+    [self setSmellieLaserHeadToSepiaMapping:laserHeadToSepiaMapping];
+    [laserHeadToSepiaMapping release];
+
+    //Set laser head to gain control mapping
+    NSMutableDictionary *laserHeadToGainControlMapping = [[NSMutableDictionary alloc] initWithCapacity:10];
+    for(int laserHeadIndex =0; laserHeadIndex < 6; laserHeadIndex++){
+        for (id specificConfigValue in configForSmellie){
+            if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput%i",laserHeadIndex]]){
+                NSString *laserHeadConnected = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"laserHeadConnected"]];
+                NSString *laserGainControl = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"gainControlFactor"]];
+                [laserHeadToGainControlMapping setObject:[NSString stringWithFormat:@"%@",laserGainControl] forKey:laserHeadConnected];
+            }
+        }
+    }
+    [self setSmellieLaserHeadToGainMapping:laserHeadToGainControlMapping];
+    [laserHeadToGainControlMapping release];
+    
+    //Set laser to input fibre mapping
+    NSMutableDictionary *laserToInputFibreMapping = [[NSMutableDictionary alloc] initWithCapacity:10];
+    for (id specificConfigValue in configForSmellie){
+        
+        if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput0"]]
+           || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput1"]]
+           || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput2"]]
+           || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput3"]]
+           || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput4"]]
+           || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput5"]]){
+            NSString *fibreSwitchInputConnected = [[configForSmellie objectForKey:specificConfigValue] objectForKey:@"fibreSwitchInputConnected"];
+            NSString* parsedFibreReference = [fibreSwitchInputConnected stringByReplacingOccurrencesOfString:@"Channel" withString:@""];
+            NSString * laserHeadReference = [[configForSmellie objectForKey:specificConfigValue] objectForKey:@"laserHeadConnected"];
+            [laserToInputFibreMapping setObject:parsedFibreReference forKey:laserHeadReference];
+        }
+    }
+    [self setSmellieLaserToInputFibreMapping:laserToInputFibreMapping];
+    [laserToInputFibreMapping release];
+    
+    //Set fibre switch to fibre mapping
+    NSMutableDictionary *fibreSwitchOutputToFibre = [[NSMutableDictionary alloc] initWithCapacity:10];
+    for(int outputChannelIndex = 1; outputChannelIndex < 15; outputChannelIndex++){
+        for (id specificConfigValue in configForSmellie){
+            if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"Channel%i",outputChannelIndex]]){
+                NSString *fibreReference = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"detectorFibreReference"]];
+                [fibreSwitchOutputToFibre setObject:[NSString stringWithFormat:@"%i",outputChannelIndex] forKey:fibreReference];
+            }
+        }
+    }
+    [self setSmellieFibreSwitchToFibreMapping:fibreSwitchOutputToFibre];
+    [fibreSwitchOutputToFibre release];
+
+    return configForSmellie;
 }
 
 
