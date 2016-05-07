@@ -297,15 +297,9 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (void) registerNotificationObservers
 {
-    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(runAboutToStart:)
-                         name : @"SNOPRunStart"
-                       object : nil];
 }
 
-- (void) runAboutToStart:(NSNotification*)aNote
+- (int) initAtRunStart: (int) loadTriggers
 {
     /* At the start of every run, we initialize the HW settings. */
 
@@ -320,9 +314,11 @@ resetFifoOnStart = _resetFifoOnStart;
     /* Setup Pedestal Crate Mask */
 	[self setPedestalCrateMask];
 
-    /* Setup the GT mask */
-    [self clearGlobalTriggerWordMask];
-    [self setSingleGTWordMask: uLongDBValue(kGtMask)];
+    if (loadTriggers) {
+        /* Setup the GT mask */
+        [self clearGlobalTriggerWordMask];
+        [self setSingleGTWordMask: uLongDBValue(kGtMask)];
+    }
 
     /* Setup GT Crate Mask */
     [self setGTCrateMask];
@@ -332,6 +328,8 @@ resetFifoOnStart = _resetFifoOnStart;
 
     /* Setup MTCA relays */
     [self mtcatLoadCrateMasks];
+
+    return 0;
 }
 
 #pragma mark •••Accessors

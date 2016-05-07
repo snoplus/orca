@@ -196,20 +196,15 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 
 - (void) registerNotificationObservers
 {
-    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(runAboutToStart:)
-                         name : @"SNOPRunStart"
-                       object : nil];
 }
 
-- (void) runAboutToStart:(NSNotification*)aNote
+- (int) initAtRunStart
 {
     [self initBoard];
     [self writeNumberBLTEvents:0];
     [self writeEnableBerr:0];
     [self writeAcquistionControl:YES];
+    return 0;
 }
 
 #pragma mark ***Accessors

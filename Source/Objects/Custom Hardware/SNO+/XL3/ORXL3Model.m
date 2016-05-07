@@ -180,15 +180,15 @@ snotDb = _snotDb;
                      selector : @selector(readHVStatus)
                          name : ORSNOPRequestHVStatus
                        object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(runAboutToStart:)
-                         name : @"SNOPRunStart"
-                       object : nil];
 }
 
-- (void) runAboutToStart:(NSNotification*)aNote
+- (int) initAtRunStart
 {
+    /* Called at run start. This function will post a run change wait
+     * notification to prevent the run from continuing and then start a
+     * separate thread to load the crate settings. When the settings have been
+     * loaded, it will clear it's run wait by sending another notification.
+     * Returns 0 on success, -1 on failure. */
     int slot, i, hv;
     ORFec32Model *fec;
 
@@ -241,6 +241,8 @@ snotDb = _snotDb;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object:self];
         [self loadHardwareWithSlotMask: [self getSlotsPresent] withCallback: @selector(runStartDone:) target:self];
     }
+
+    return 0;
 }
 
 - (void) runStartDone: (CrateInitResults *) results
