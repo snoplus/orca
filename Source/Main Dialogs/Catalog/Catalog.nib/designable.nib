@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="8191" systemVersion="14F1021" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
         <development version="5100" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10116"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="8191"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ORCatalogController">
@@ -2977,7 +2977,7 @@ Relay</string>
                                                     </view>
                                                 </tabViewItem>
                                                 <tabViewItem label="SNO Lab" identifier="" id="7202">
-                                                    <view key="view" id="7203">
+                                                    <view key="view" toolTip="TUBiiModel" id="7203">
                                                         <rect key="frame" x="10" y="7" width="817" height="209"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
@@ -2999,16 +2999,6 @@ Relay</string>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                 </textFieldCell>
                                                             </textField>
-                                                            <button toolTip="SNOModel" id="26792" customClass="ObjectFactory">
-                                                                <rect key="frame" x="571" y="72" width="100" height="135"/>
-                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="SNO" imagePosition="above" alignment="center" state="on" inset="2" id="26793">
-                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                                    <string key="title">SNO+ Monitoring
-</string>
-                                                                    <font key="font" metaFont="system" size="10"/>
-                                                                </buttonCell>
-                                                            </button>
                                                             <button toolTip="SNOPModel" id="26794" customClass="ObjectFactory">
                                                                 <rect key="frame" x="480" y="79" width="87" height="129"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -3133,6 +3123,14 @@ Relay</string>
                                                                 <rect key="frame" x="343" y="9" width="129" height="42"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" title="Symmetricom XL-GPS" bezelStyle="regularSquare" image="XLGPSIcon" imagePosition="above" alignment="center" state="on" inset="2" id="26799">
+                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                    <font key="font" metaFont="system" size="10"/>
+                                                                </buttonCell>
+                                                            </button>
+                                                            <button toolTip="TUBiiModel" id="m62-sW-PFv" customClass="ObjectFactory">
+                                                                <rect key="frame" x="576" y="108" width="95" height="71"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="tubii" imagePosition="only" alignment="center" inset="2" id="Ehu-ZU-KP4">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="system" size="10"/>
                                                                 </buttonCell>
@@ -3388,7 +3386,6 @@ Relay</string>
         <image name="SIS3350Card" width="16" height="128"/>
         <image name="SIS3800Card" width="16" height="128"/>
         <image name="SIS3820Card" width="16" height="128"/>
-        <image name="SNO" width="75" height="113"/>
         <image name="SNOCaen1720Card" width="16" height="128"/>
         <image name="SNOCrate" width="98" height="56"/>
         <image name="SNOP" width="75" height="113"/>
@@ -3448,5 +3445,6 @@ Relay</string>
         <image name="prespectrometer" width="72" height="48"/>
         <image name="rangeTimer" width="67" height="66"/>
         <image name="resistor" width="95" height="43"/>
+        <image name="tubii" width="100" height="58"/>
     </resources>
 </document>
