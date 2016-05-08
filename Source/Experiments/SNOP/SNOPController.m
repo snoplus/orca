@@ -1234,11 +1234,9 @@ snopGreenColor;
     if([scriptList containsObject:@"ECAStandardRun"]){
         [runControl selectRunTypeScriptByName:@"ECAStandardRun"];
         [runControl startRun];
-        //Reset runScript popup menu
-        [runControl setSelectedRunTypeScript:@"NO"];
     }
     else{
-        NSLog(@"ECA Standard Run not configured. Please, set the RunScript properly. ECA run won't start.");
+        NSLog(@"ECA Standard Run not configured. Please, set the RunScript properly. ECA run won't start. \n");
     }
 }
 
@@ -1247,11 +1245,9 @@ snopGreenColor;
     if([scriptList containsObject:@"ECASingleRun"]){
         [runControl selectRunTypeScriptByName:@"ECASingleRun"];
         [runControl startRun];
-        //Reset runScript popup
-        [runControl setSelectedRunTypeScript:@"NO"];
     }
     else{
-        NSLog(@"ECA Single Run not configured. Please, set the RunScript properly. ECA run won't start.");
+        NSLog(@"ECA Single Run not configured. Please, set the RunScript properly. ECA run won't start. \n");
     }
 }
 
