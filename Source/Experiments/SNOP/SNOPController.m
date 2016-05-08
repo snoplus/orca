@@ -398,12 +398,9 @@ snopGreenColor;
     [standardRunVersion release];
 }
 
+//Placeholder for resync run. It's not implemented yet.
 - (IBAction)resyncRunAction:(id)sender {
-    [runControl haltRun];
-    while(![runControl runningState] == eRunStopped){
-        sleep(0.2);
-    }
-    [runControl startRun];
+    NSLogColor([NSColor redColor], @"Resync run is still not implemented... \n");
 }
 
 
