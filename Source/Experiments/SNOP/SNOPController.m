@@ -717,6 +717,8 @@ snopGreenColor;
     
     NSArray *crates = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass: NSClassFromString(@"ORSNOCrateModel")];
     for (id crate in crates) {
+        [crate performSelector:@selector(setXl3Mode:) withObject:INIT_MODE];
+        [crate performSelector:@selector(writeXl3Mode)];
         [crate performSelector:@selector(initCrate:phase:) withObject:YES withObject:0];
     }
     
