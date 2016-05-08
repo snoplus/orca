@@ -443,45 +443,45 @@ logPort;
     [super registerNotificationObservers];
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     
-    [notifyCenter addObserver : self
-                     selector : @selector(runInitialization:)
-                         name : ORRunInitializationNotification
-                       object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(runAboutToRollOver:)
-                         name : ORRunIsAboutToRollOver
-                       object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(runAboutToStart:)
-                         name : ORRunSecondChanceForWait
-                       object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(runStarted:)
-                         name : ORRunStartedNotification
-                       object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(runAboutToStop:)
-                         name : ORRunAboutToStopNotification
-                       object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(runStopped:)
-                         name : ORRunStoppedNotification
-                       object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(subRunStarted:)
-                         name : ORRunStartSubRunNotification
-                       object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(subRunEnded:)
-                         name : ORRunBetweenSubRunsNotification
-                       object : nil];
+//    [notifyCenter addObserver : self
+//                     selector : @selector(runInitialization:)
+//                         name : ORRunInitializationNotification
+//                       object : nil];
+//
+//    [notifyCenter addObserver : self
+//                     selector : @selector(runAboutToRollOver:)
+//                         name : ORRunIsAboutToRollOver
+//                       object : nil];
+//
+//    [notifyCenter addObserver : self
+//                     selector : @selector(runAboutToStart:)
+//                         name : ORRunSecondChanceForWait
+//                       object : nil];
+//
+//    [notifyCenter addObserver : self
+//                     selector : @selector(runStarted:)
+//                         name : ORRunStartedNotification
+//                       object : nil];
+//
+//    [notifyCenter addObserver : self
+//                     selector : @selector(runAboutToStop:)
+//                         name : ORRunAboutToStopNotification
+//                       object : nil];
+//
+//    [notifyCenter addObserver : self
+//                     selector : @selector(runStopped:)
+//                         name : ORRunStoppedNotification
+//                       object : nil];
+//
+//    [notifyCenter addObserver : self
+//                     selector : @selector(subRunStarted:)
+//                         name : ORRunStartSubRunNotification
+//                       object : nil];
+//
+//    [notifyCenter addObserver : self
+//                     selector : @selector(subRunEnded:)
+//                         name : ORRunBetweenSubRunsNotification
+//                       object : nil];
 
 }
 
@@ -1820,10 +1820,22 @@ err:
 
     //Get RC model
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* runControlModel = [objs objectAtIndex:0];
+    ORRunModel* runControlModel;
+    if ([objs count]) {
+        runControlModel = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find MTC model. Please add it to the experiment and restart the run.\n");
+        return 0;
+    }
     //Get MTC model
     objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    ORMTCModel* mtc = [objs objectAtIndex:0];
+    ORMTCModel* mtc;
+    if ([objs count]) {
+        mtc = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find MTC model. Please add it to the experiment and restart the run.\n");
+        return 0;
+    }
 
     //Query the OrcaDB and get a dictionary with the parameters
     NSString *urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/orca/_design/standardRuns/_view/getStandardRuns?startkey=[\"%@\",\"%@\",{}]&endkey=[\"%@\",\"%@\",0]&descending=True&include_docs=True",[self orcaDBUserName],[self orcaDBPassword],[self orcaDBIPAddress],[self orcaDBPort],runTypeName,runVersion,runTypeName,runVersion];
@@ -1895,10 +1907,22 @@ err:
 
     //Get RC model
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* runControlModel = [objs objectAtIndex:0];
+    ORRunModel* runControlModel;
+    if ([objs count]) {
+        runControlModel = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find MTC model. Please add it to the experiment and restart the run.\n");
+        return 0;
+    }
     //Get MTC model
     objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    ORMTCModel* mtc = [objs objectAtIndex:0];
+    ORMTCModel* mtc;
+    if ([objs count]) {
+        mtc = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find MTC model. Please add it to the experiment and restart the run.\n");
+        return 0;
+    }
 
     //Build run table
     NSMutableDictionary *detectorSettings = [NSMutableDictionary dictionaryWithCapacity:200];
@@ -1929,28 +1953,44 @@ err:
 
     //Get RC model
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* runControl = [objs objectAtIndex:0];
+    ORRunModel* runControlModel;
+    if ([objs count]) {
+        runControlModel = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find MTC model. Please add it to the experiment and restart the run.\n");
+        return;
+    }
     //Get MTC model
     objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    ORMTCModel* mtc = [objs objectAtIndex:0];
+    ORMTCModel* mtc;
+    if ([objs count]) {
+        mtc = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find MTC model. Please add it to the experiment and restart the run.\n");
+        return;
+    }
     //FIXME: Set correct hardcoded values!!!
-    [mtc setDbObject:[NSNumber numberWithDouble:5000.0] forIndex:kNHit100HiThreshold];
-    [mtc setDbObject:[NSNumber numberWithDouble:5000.0] forIndex:kNHit100MedThreshold];
-    [mtc setDbObject:[NSNumber numberWithDouble:5000.0] forIndex:kNHit100LoThreshold];
-    [mtc setDbObject:[NSNumber numberWithDouble:5000.0] forIndex:kNHit20Threshold];
-    [mtc setDbObject:[NSNumber numberWithDouble:5000.0] forIndex:kNHit20LBThreshold];
-    [mtc setDbObject:[NSNumber numberWithDouble:5000.0] forIndex:kOWLNThreshold];
-    [mtc setDbObject:[NSNumber numberWithDouble:5000.0] forIndex:kESumLowThreshold];
-    [mtc setDbObject:[NSNumber numberWithDouble:5000.0] forIndex:kESumHiThreshold];
-    [mtc setDbObject:[NSNumber numberWithDouble:5000.0] forIndex:kOWLELoThreshold];
-    [mtc setDbObject:[NSNumber numberWithDouble:5000.0] forIndex:kOWLEHiThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kNHit100HiThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kNHit100MedThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kNHit100LoThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kNHit20Threshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kNHit20LBThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kOWLNThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kESumLowThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kESumHiThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kOWLELoThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kOWLEHiThreshold];
     [mtc setDbObject:[NSNumber numberWithDouble:100.0] forIndex:kNhit100LoPrescale];
     [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kPulserPeriod];
 
+    //Send to HW
+    [mtc loadTheMTCADacs];
+    [mtc setGlobalTriggerWordMask];
+    
     //Restart the run if the run is ongoing and do nothing if there is no run happening
-    if([runControl isRunning]){
+    if([runControlModel isRunning]){
         [self setStandardRunType:@"HIGH THRESHOLDS"];
-        [runControl restartRun];
+        [runControlModel restartRun];
     }
     
 }

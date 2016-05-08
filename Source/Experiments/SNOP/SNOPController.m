@@ -217,25 +217,23 @@ snopGreenColor;
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    ORMTCModel* mtcModel = [objs objectAtIndex:0];
     
     [super registerNotificationObservers];
     
     [notifyCenter addObserver : self
                      selector : @selector(viewTypeChanged:)
                          name : ORSNOPModelViewTypeChanged
-                        object: model];
+                        object: nil];
     
     [notifyCenter addObserver : self
                      selector : @selector(dbOrcaDBIPChanged:)
                          name : ORSNOPModelOrcaDBIPAddressChanged
-                        object: model];
+                        object: nil];
     
     [notifyCenter addObserver : self
                      selector : @selector(dbDebugDBIPChanged:)
                          name : ORSNOPModelDebugDBIPAddressChanged
-                        object: model];
+                        object: nil];
     
     [notifyCenter addObserver : self
                      selector : @selector(hvStatusChanged:)
@@ -255,22 +253,22 @@ snopGreenColor;
     [notifyCenter addObserver: self
                      selector: @selector(runStatusChanged:)
                          name: ORRunStatusChangedNotification
-                       object: runControl];
+                       object: nil];
     
     [notifyCenter addObserver:self
                      selector:@selector(SRTypeChanged:)
                          name:ORSNOPModelSRChangedNotification
-                       object:model];
+                       object:nil];
     
     [notifyCenter addObserver:self
                      selector:@selector(SRVersionChanged:)
                          name:ORSNOPModelSRVersionChangedNotification
-                       object:model];
+                       object:nil];
     
     [notifyCenter addObserver :self
                      selector :@selector(runTypeWordChanged:)
                          name :ORRunTypeChangedNotification
-                       object :runControl];
+                       object :nil];
     
     [notifyCenter addObserver : self
                      selector : @selector(runsLockChanged:)
@@ -285,17 +283,17 @@ snopGreenColor;
     [notifyCenter addObserver : self
                      selector : @selector(runsECAChanged:)
                          name : ORSNOPModelRunsECAChangedNotification
-                        object: model];
+                        object: nil];
     
     [notifyCenter addObserver : self
                      selector : @selector(mtcDataBaseChanged:)
                          name : ORMTCModelMtcDataBaseChanged
-                        object: mtcModel];
+                        object: nil];
     
     [notifyCenter addObserver : self
                      selector : @selector(updateSettings:)
                          name : @"SNOPSettingsChanged"
-                        object: mtcModel];
+                        object: nil];
     
 }
 
@@ -372,7 +370,7 @@ snopGreenColor;
 {
     //Load selected SR in case the user didn't click enter
     NSString *standardRun = [standardRunPopupMenu objectValueOfSelectedItem];
-    NSString *standardRunVersion = [[standardRunVersionPopupMenu objectValueOfSelectedItem] copy];//The pointer will be unset with the next
+    NSString *standardRunVersion = [[standardRunVersionPopupMenu objectValueOfSelectedItem] retain];//The pointer will be unset with the next
     //command, so we need to copy it beforehand. Will be released afterwards.
     [model setStandardRunType:standardRun];
     [model setStandardRunVersion:standardRunVersion];
@@ -384,7 +382,6 @@ snopGreenColor;
     if([runControl isRunning])[runControl restartRun];
     else [runControl startRun];
     
-    [standardRunVersion release];
 }
 
 //Placeholder for resync run. It's not implemented yet.
@@ -1217,6 +1214,11 @@ snopGreenColor;
     [model setECA_nevents:value];
 }
 
+- (IBAction)ecaPulserRateAction:(id)sender {
+    [model setECA_rate:sender];
+}
+
+
 - (IBAction)startECAStandardRunAction:(id)sender {
 
     NSArray* scriptList = [runControl runScriptList];
@@ -1245,7 +1247,13 @@ snopGreenColor;
 //STANDARD RUNS
 - (IBAction)standardRunNewValueAction:(id)sender {
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    ORMTCModel* mtcModel = [objs objectAtIndex:0];
+    ORMTCModel* mtcModel;
+    if ([objs count]) {
+        mtcModel = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find MTC model. Please add it to the experiment and restart the run.\n");
+        return;
+    }
 
     int activeCell = [sender selectedRow];
     //NHIT100HI
@@ -1341,7 +1349,13 @@ snopGreenColor;
 {
     
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    ORMTCModel* mtcModel = [objs objectAtIndex:0];
+    ORMTCModel* mtcModel;
+    if ([objs count]) {
+        mtcModel = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find MTC model. Please add it to the experiment and restart the run.\n");
+        return;
+    }
 
     //Setup format
     NSNumberFormatter *thresholdFormatter = [[[NSNumberFormatter alloc] init] autorelease];;
@@ -1588,7 +1602,13 @@ snopGreenColor;
 
     //Get MTC model
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    ORMTCModel* mtcModel = [objs objectAtIndex:0];
+    ORMTCModel* mtcModel;
+    if ([objs count]) {
+        mtcModel = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find MTC model. Please add it to the experiment and restart the run.\n");
+        return;
+    }
     
     //If no version: display null values and quit
     if([model standardRunVersion] == nil){

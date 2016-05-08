@@ -268,6 +268,7 @@
 - (void) setECA_type:(NSString*)aValue;
 - (void) setECA_tslope_pattern:(int)aValue;
 - (void) setECA_nevents:(int)aValue;
+- (void) setECA_rate:(NSNumber*)aValue;
 
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder;
