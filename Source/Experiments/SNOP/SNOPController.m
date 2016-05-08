@@ -177,7 +177,6 @@ snopGreenColor;
 
 -(void) awakeFromNib
 {
-
     detectorSize		= NSMakeSize(1200,700);
     detailsSize		= NSMakeSize(1200,700);//NSMakeSize(450,589);
     focalPlaneSize		= NSMakeSize(1200,700);//NSMakeSize(450,589);
@@ -209,7 +208,6 @@ snopGreenColor;
     [self updateSettings:nil];
     //Pull the information from the SMELLIE DB
     [model getSmellieRunListInfo];
-
     [super awakeFromNib];
     [self performSelector:@selector(updateWindow)withObject:self afterDelay:0.1];
 }
@@ -299,6 +297,11 @@ snopGreenColor;
                          name : @"SNOPSettingsChanged"
                         object: mtcModel];
     
+    //TODO: add the notification for changedRunType on SNO+
+    /*[notifyCenter addObserver:self
+     selector:@selector(runTypesChanged:)
+     name:nil
+     object:nil];*/
 }
 
 - (void) updateWindow
@@ -752,6 +755,8 @@ snopGreenColor;
     NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlScaped]];
 }
+
+
 
 - (IBAction)hvMasterTriggersON:(id)sender
 {
@@ -1967,7 +1972,6 @@ snopGreenColor;
         NSString *runtype = [[entry valueForKey:@"key"] objectAtIndex:0];
         NSString *runversion = [[entry valueForKey:@"key"] objectAtIndex:1];
         if(runversion != (id)[NSNull null]){
-//            if([runversion isEqualToString:@"DEFAULT"]) continue;
             if([runtype isEqualToString:[model standardRunType]])
                 if([standardRunVersionPopupMenu indexOfItemWithObjectValue:runversion]==NSNotFound)[standardRunVersionPopupMenu addItemWithObjectValue:runversion];
         }

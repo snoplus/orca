@@ -281,6 +281,7 @@ primary_expr
 | request_statement			{ $$ = $1; }
 | wait_statement			{ $$ = $1; }
 | makeObj                   { $$ = $1; }
+| time_statement            { $$ = $1; }
 ;
 
 postfix_expr

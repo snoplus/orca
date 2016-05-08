@@ -124,6 +124,9 @@
     RedisClient *mtc_server;
     RedisClient *xl3_server;
 
+    int state;
+    int start;
+
     @private
         //Run type word
         unsigned long runTypeWord;
@@ -230,6 +233,7 @@
                            pedestalWidth: (unsigned long) pedestalWidth
                                  calType: (unsigned long) calType;
 - (void) updateEPEDStructWithStepNumber: (unsigned long) stepNumber;
+- (void) shipSubRunRecord;
 - (void) shipEPEDRecord;
 - (void) updateRHDRSruct;
 - (void) shipRHDRRecord;
@@ -292,8 +296,6 @@
 -(void) testerHv;
 
 //Standard runs functions
-
-
 -(BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
 -(BOOL) saveStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
 -(void) loadOfflineRun;

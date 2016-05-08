@@ -38,12 +38,14 @@ typedef enum eXL3_ConnectStates {
 	NSLock*		cmdArrayLock;		//cmdArrayLock protects manipulations with the array of command responses
                                     //received from an XL3, to synchronize the threaded worker pushing XL3 responses,
                                     //and XL3Model pulling/distributing the responses
+    int         pendingThreads;     //Number of threads waiting on a response
+    NSLock*     connectionLock;     //Must be held before modifying pendingThreads
 	BOOL		needToSwap;
 	NSString*	IPNumber;
 	NSString*	crateName;
 	unsigned long	portNumber;
-	BOOL		isConnected;
     BOOL        autoConnect;
+    BOOL		isConnected;
 	int		connectState;
 	int		_errorTimeOut;
 	NSDate*	timeConnected;
@@ -72,6 +74,7 @@ typedef enum eXL3_ConnectStates {
 }
 
 @property (assign,nonatomic) BOOL isConnected;
+@property (assign,nonatomic) int pendingThreads;
 @property (assign,nonatomic) BOOL autoConnect;
 @property (copy,nonatomic) NSArray* fifoStatus;
 @property (copy,nonatomic) NSDate* fifoTimeStamp;
