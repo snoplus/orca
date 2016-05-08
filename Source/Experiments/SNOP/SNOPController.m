@@ -1016,6 +1016,7 @@ smellieRunFile;
     
     smellieThread = [[NSThread alloc] initWithTarget:theELLIEModel selector:@selector(startSmellieRun:) object:smellieRunFile];
     [smellieThread start];
+    
     //}
     //else{
     //    NSLog(@"Smellie Run Type is not masked in. Please mask this in and try again \n");
@@ -1084,15 +1085,14 @@ smellieRunFile;
     
     /*[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startSmellieRun:) object:smellieRunFile];*/
     //cancel the smellie thread
-
-    [smellieThread cancel];
-    [smellieThread release];
-    smellieThread = nil;
     
     //Method for completing this without a new thread
     [theELLIEModel stopSmellieRun];
+    [theELLIEModel release];
     
-    //[theELLIEModel release];
+    [smellieThread cancel];
+    [smellieThread release];
+    smellieThread = nil;
     
     //wait for the current loop to finish
     //move straight to a maintainence run
@@ -1105,7 +1105,7 @@ smellieRunFile;
     [smellieLoadRunFile setEnabled:YES];
     [smellieRunFileNameField setEnabled:YES];
     [smellieStartRunButton setEnabled:NO];
-    [smellieStopRunButton setEnabled:NO];
+    [smellieStopRunButton setEnabled:YES];
     
     //unassign the run type as a SMELLIE run
     //[model setRunType:kRunUndefined];

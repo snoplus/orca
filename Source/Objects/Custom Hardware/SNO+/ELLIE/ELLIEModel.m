@@ -1055,7 +1055,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                     
                     //We need to set the pulser rate after firing pedestals
                     float pulserRate = [numericTriggerFrequencyInSlaveMode floatValue];
-                    //[theMTCModel setThePulserRate:pulserRate];
+                    [theMTCModel setThePulserRate:pulserRate];
                  
                     NSLog(@"SMELLIE_RUN: Pulsing at %f Hz for %f seconds \n",[triggerFrequencyInSlaveMode floatValue],timeToPulse);
                     //Wait a certain amount of time for slave Mode
@@ -1094,10 +1094,11 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                     [NSThread sleepForTimeInterval:1.0f];
                 }
                 fprintf(stderr,"END OF INTENSITY LOOP\n");
-            }//end of looping through each intensity setting on the smellie laser
             
+            }//end of looping through each intensity setting on the smellie laser
+            break;
         }//end of looping through each Fibre
-        
+        break;
     }//end of looping through each laser
     
     //End the run
@@ -1111,7 +1112,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //stop the pedestals if required
     if([self smellieSlaveMode]){
         //NSLog(@"SMELLIE_RUN:Stopping MTCPedestals\n");
-        //[theMTCModel stopMTCPedestalsFixedRate];
+        [theMTCModel stopMTCPedestalsFixedRate];
     }
     
     //Resetting the mtcd to settings before the smellie run
@@ -1119,9 +1120,10 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //[self setSmellieSafeStates];
     
     if(!endOfRun){
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORELLIERunFinished object:self];
+        //[[NSNotificationCenter defaultCenter] postNotificationName:ORELLIERunFinished object:self];
+        [self stopSmellieRun];
     }
-    
+    NSLog(@"END OFF SMELLIE RUN");
 }
 
 -(void)stopSmellieRun
@@ -1155,21 +1157,21 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     runControl = [runModels objectAtIndex:0];
     
     //Set the Mtcd for back to original settings
-    //[theMTCModel setThePulserRate:[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_pulser_period"] floatValue]];
-    //[theMTCModel enablePulser];
+    [theMTCModel setThePulserRate:[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_pulser_period"] floatValue]];
+    [theMTCModel enablePulser];
     NSLog(@"SMELLIE_RUN:Setting the mtcd pulser back to %f Hz\n",[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_pulser_period"] floatValue]);
-    //[theMTCModel stopMTCPedestalsFixedRate];
+    [theMTCModel stopMTCPedestalsFixedRate];
     
-    //[theMTCModel setupGTCorseDelay:[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_coarse_delay"] intValue]];
+    [theMTCModel setupGTCorseDelay:[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_coarse_delay"] intValue]];
     NSLog(@"SMELLIE_RUN:Setting the mtcd coarse delay back to %i \n",[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_coarse_delay"] intValue]);
     
     [self _pushSmellieRunDocument];
     
-    if([runControl isRunning]){
-        [runControl setForceRestart:YES];
-        [runControl performSelectorOnMainThread:@selector(stopRun) withObject:nil waitUntilDone:YES];
-        [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
-    }
+    //if([runControl isRunning]){
+    [runControl setForceRestart:YES];
+    [runControl performSelectorOnMainThread:@selector(stopRun) withObject:nil waitUntilDone:YES];
+    [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
+    //}
     
     //Set the Run Type to a SMELLIE run
     /*NSArray*  objsSNOP = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
@@ -1344,6 +1346,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [runDocDict setObject:[NSNumber numberWithInt:[runControl runNumber]] forKey:@"run"];
     [runDocDict setObject:smellieSubRunInfo forKey:@"sub_run_info"];
     
+    NSLog(@"%@", runDocDict);
+    
     [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:@"smellie"] addDocument:runDocDict tag:kSmellieSubRunDocumentAdded];
 }
 
@@ -1441,8 +1445,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
             //format the json response
             NSString *stringValueOfCurrentVersion = [NSString stringWithFormat:@"%@",[[[json valueForKey:@"rows"] valueForKey:@"value"]objectAtIndex:0]];
             currentVersionNumber = [NSNumber numberWithInt:[stringValueOfCurrentVersion intValue]];
-            NSLog(@"parsedNumber%@",currentVersionNumber);
-            NSLog(@"valueforkey2=%@", [[json valueForKey:@"rows"] valueForKey:@"value"]);
         }
         @catch (NSException *e) {
             NSLog(@"Error in fetching the SMELLIE CONFIGURATION FILE: %@ . Please fix this before changing the configuration file",e);
