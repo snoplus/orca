@@ -178,7 +178,7 @@
                                         <button id="gK5-2W-FLX">
                                             <rect key="frame" x="15" y="179" width="158" height="38"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="bevel" title="Init crates with XiLinx" bezelStyle="regularSquare" imagePosition="overlaps" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="oad-oe-Cr3">
+                                            <buttonCell key="cell" type="bevel" title="Init crates with XiLinx" bezelStyle="regularSquare" imagePosition="overlaps" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="oad-oe-Cr3">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system" size="10"/>
                                             </buttonCell>
