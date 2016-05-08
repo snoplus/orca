@@ -742,7 +742,9 @@ snotDb = _snotDb;
 - (void) setHvEverUpdated:(BOOL)ever
 {
     hvEverUpdated = ever;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
+    dispatch_async(dispatch_get_main_queue(), ^{
+     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
+    });
 }
 
 - (BOOL) hvSwitchEverUpdated
@@ -763,7 +765,9 @@ snotDb = _snotDb;
 - (void) setHvARamping:(BOOL)ramping
 {
     hvARamping = ramping;
+    dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
+    });
 }
 
 - (BOOL) hvBRamping
@@ -774,7 +778,9 @@ snotDb = _snotDb;
 - (void) setHvBRamping:(BOOL)ramping
 {
     hvBRamping = ramping;
+    dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
+    });
 }
 
 - (BOOL) hvASwitch
@@ -785,7 +791,9 @@ snotDb = _snotDb;
 - (void) setHvASwitch:(BOOL)aHvASwitch
 {
     hvASwitch = aHvASwitch;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];        
+	dispatch_async(dispatch_get_main_queue(), ^{
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
+    });
 }
 
 - (BOOL) hvBSwitch
@@ -796,7 +804,9 @@ snotDb = _snotDb;
 - (void) setHvBSwitch:(BOOL)aHvBSwitch
 {
     hvBSwitch = aHvBSwitch;
+    dispatch_async(dispatch_get_main_queue(), ^{
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];        
+    });
 }
 
 - (BOOL) hvANeedsUserIntervention
@@ -807,7 +817,9 @@ snotDb = _snotDb;
 - (void) setHvANeedsUserIntervention:(BOOL)needs
 {
     hvANeedsUserIntervention = needs;
+    dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
+    });
 }
 
 - (BOOL) hvBNeedsUserIntervention
@@ -818,7 +830,9 @@ snotDb = _snotDb;
 - (void) setHvBNeedsUserIntervention:(BOOL)needs
 {
     hvBNeedsUserIntervention = needs;
+    dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
+    });
 }
 
 - (unsigned long) hvAVoltageDACSetValue
@@ -828,7 +842,9 @@ snotDb = _snotDb;
 
 - (void) setHvAVoltageDACSetValue:(unsigned long)aHvAVoltageDACSetValue {
     hvAVoltageDACSetValue = aHvAVoltageDACSetValue;
+    dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];        
+    });
 }
 
 - (unsigned long) hvBVoltageDACSetValue
@@ -838,7 +854,9 @@ snotDb = _snotDb;
 
 - (void) setHvBVoltageDACSetValue:(unsigned long)aHvBVoltageDACSetValue {
     hvBVoltageDACSetValue = aHvBVoltageDACSetValue;
+    dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];        
+    });
 }
 
 - (float) hvAVoltageReadValue
@@ -849,7 +867,9 @@ snotDb = _snotDb;
 - (void) setHvAVoltageReadValue:(float)hvAVoltageReadValue
 {
     _hvAVoltageReadValue = hvAVoltageReadValue;
+    dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];        
+    });
 }
 
 - (float) hvBVoltageReadValue
@@ -860,7 +880,9 @@ snotDb = _snotDb;
 - (void) setHvBVoltageReadValue:(float)hvBVoltageReadValue
 {
     _hvBVoltageReadValue = hvBVoltageReadValue;
+    dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];        
+    });
 }
 
 - (float) hvACurrentReadValue
@@ -871,7 +893,9 @@ snotDb = _snotDb;
 - (void) setHvACurrentReadValue:(float)hvACurrentReadValue
 {
     _hvACurrentReadValue = hvACurrentReadValue;
+    dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];        
+    });
 }
 
 - (float) hvBCurrentReadValue
@@ -882,7 +906,9 @@ snotDb = _snotDb;
 - (void) setHvBCurrentReadValue:(float)hvBCurrentReadValue
 {
     _hvBCurrentReadValue = hvBCurrentReadValue;
+    dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];        
+    });
 }
 
 - (unsigned long) hvAVoltageTargetValue
@@ -894,7 +920,9 @@ snotDb = _snotDb;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setHvAVoltageTargetValue:_hvAVoltageTargetValue];
     _hvAVoltageTargetValue = hvAVoltageTargetValue;
+    dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHVTargetValueChanged object:self];        
+    });
 }
 
 - (unsigned long) hvBVoltageTargetValue
@@ -906,7 +934,9 @@ snotDb = _snotDb;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setHvBVoltageTargetValue:_hvBVoltageTargetValue];
     _hvBVoltageTargetValue = hvBVoltageTargetValue;
+    dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHVTargetValueChanged object:self];        
+    });
 }
 
 - (unsigned long) hvNominalVoltageA
@@ -918,7 +948,9 @@ snotDb = _snotDb;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setHvNominalVoltageA:[self hvNominalVoltageA]];
     _hvNominalVoltageA = hvNominalVoltageA;
+    dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHVNominalVoltageChanged object:self];
+    });
 }
 
 - (unsigned long) hvNominalVoltageB
@@ -930,7 +962,9 @@ snotDb = _snotDb;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setHvNominalVoltageB:[self hvNominalVoltageB]];
     _hvNominalVoltageB = hvNominalVoltageB;
+    dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHVNominalVoltageChanged object:self];
+    });
 }
 
 - (unsigned long) hvACMOSRateLimit
@@ -3408,12 +3442,15 @@ err:
             const char* timestamp = [[self stringDate] cStringUsingEncoding:NSASCIIStringEncoding];
             memcpy(data+6, timestamp, 6*4);
             NSData* pdata = [[NSData alloc] initWithBytes:data length:sizeof(long)*(packet_length)];
-            [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:pdata];
-            [pdata release];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:pdata];
+                [pdata release];
+            });
             pdata = nil;
         }
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
+        });
     }
 }
 
@@ -3576,7 +3613,7 @@ err:
         [self readHVSwitchOnForA:&switchAIsOn forB:&switchBIsOn];
     }
     @catch (NSException *exception) {
-        NSLog(@"%@ error in readHVSwitchOn\n", [[self xl3Link] crateName]);
+        NSLogColor([NSColor redColor],@"%@ error in readHVSwitchOn\n", [[self xl3Link] crateName]);
         return;
     }
     
@@ -4460,8 +4497,9 @@ err:
             [hvThread start];
             
             //let everyone know that we now have HV control
-            [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
-            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
+            });
             break; //exit loop
         }
     }
