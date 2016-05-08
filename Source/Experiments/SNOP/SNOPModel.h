@@ -137,6 +137,7 @@
         NSString* ECA_type;
         int ECA_tslope_pattern;
         int ECA_nevents;
+        NSNumber* ECA_rate;
     
 }
 
@@ -262,6 +263,7 @@
 - (NSString*) ECA_type;
 - (int) ECA_tslope_pattern;
 - (int) ECA_nevents;
+- (NSNumber*) ECA_rate;
 - (void) setECA_pattern:(int)aValue;
 - (void) setECA_type:(NSString*)aValue;
 - (void) setECA_tslope_pattern:(int)aValue;

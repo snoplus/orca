@@ -1217,13 +1217,8 @@ snopGreenColor;
     [model setECA_nevents:value];
 }
 
-- (IBAction)ecaPulserRateAction:(id)sender {
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    ORMTCModel* mtcModel = [objs objectAtIndex:0];
-    [mtcModel setDbFloat:[sender intValue] forIndex:kPulserPeriod];
-}
-
 - (IBAction)startECAStandardRunAction:(id)sender {
+
     NSArray* scriptList = [runControl runScriptList];
     if([scriptList containsObject:@"ECAStandardRun"]){
         [runControl selectRunTypeScriptByName:@"ECAStandardRun"];
@@ -1235,6 +1230,7 @@ snopGreenColor;
 }
 
 - (IBAction)startECASingleRunAction:(id)sender {
+
     NSArray* scriptList = [runControl runScriptList];
     if([scriptList containsObject:@"ECASingleRun"]){
         [runControl selectRunTypeScriptByName:@"ECASingleRun"];
@@ -1474,7 +1470,6 @@ snopGreenColor;
     } else{
         [[standardRunThresNewValues cellAtRow:11 column:0] setTextColor:[self snopRedColor]];
     }
-    [ecaPulserRateField setDoubleValue:[mtcModel dbFloatByIndex:kPulserPeriod]];
     
 }
 
@@ -1555,12 +1550,6 @@ snopGreenColor;
     NSString *standardRun = [[standardRunPopupMenu stringValue] uppercaseString];
     NSString *standardRunVer = [[standardRunVersionPopupMenu stringValue] uppercaseString];
     [standardRunVersionPopupMenu setStringValue:standardRunVer];
-
-    if([standardRunVersionPopupMenu indexOfItemWithObjectValue:standardRunVer] == NSNotFound && [standardRunVer isEqualToString:@"DEFAULT"]) {
-        //Should never get here, but being cautious
-        ORRunAlertPanel([NSString stringWithFormat:@"Cannot create a version called DEFAULT"], @"It is a protected word",@"Cancel",@"OK",nil);
-        return;
-    }
 
     //Create new SR version if does not exist
     if ([standardRunVersionPopupMenu indexOfItemWithObjectValue:standardRunVer] == NSNotFound && [standardRunVer isNotEqualTo:@""]){

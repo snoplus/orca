@@ -1796,6 +1796,17 @@ err:
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
 }
 
+- (NSNumber*)ECA_rate
+{
+    return ECA_rate;
+}
+
+- (void) setECA_rate:(NSNumber*)aValue
+{
+    if(aValue <= 0) aValue = 1;
+    ECA_rate = aValue;
+}
+
 // Load Detector Settings from the DB into the Models
 -(BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion
 {

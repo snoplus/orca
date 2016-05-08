@@ -118,7 +118,6 @@
     IBOutlet NSPopUpButton *ECAtypePopUpButton;
     IBOutlet NSTextField *TSlopePatternTextField;
     IBOutlet NSTextField *ecaNEventsTextField;
-    IBOutlet NSTextField *ecaPulserRateField;
 
     NSButton *refreshRunWordNames;
     
