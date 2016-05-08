@@ -180,13 +180,15 @@ snotDb = _snotDb;
                      selector : @selector(readHVStatus)
                          name : ORSNOPRequestHVStatus
                        object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(runAboutToStart:)
+                         name : @"SNOPRunStart"
+                       object : nil];
 }
 
-- (int) initAtRunStart
+- (void) runAboutToStart:(NSNotification*)aNote
 {
-    /* Load the XL3 settings to hardware at the run start. This function
-     * will launch a thread to set the settings so that they can be set
-     * in parallel. */
     int slot, i, hv;
     ORFec32Model *fec;
 
@@ -239,8 +241,6 @@ snotDb = _snotDb;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object:self];
         [self loadHardwareWithSlotMask: [self getSlotsPresent] withCallback: @selector(runStartDone:) target:self];
     }
-
-    return 0;
 }
 
 - (void) runStartDone: (CrateInitResults *) results
@@ -742,9 +742,7 @@ snotDb = _snotDb;
 - (void) setHvEverUpdated:(BOOL)ever
 {
     hvEverUpdated = ever;
-    dispatch_async(dispatch_get_main_queue(), ^{
-     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
-    });
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
 }
 
 - (BOOL) hvSwitchEverUpdated
@@ -765,9 +763,7 @@ snotDb = _snotDb;
 - (void) setHvARamping:(BOOL)ramping
 {
     hvARamping = ramping;
-    dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
-    });
 }
 
 - (BOOL) hvBRamping
@@ -778,9 +774,7 @@ snotDb = _snotDb;
 - (void) setHvBRamping:(BOOL)ramping
 {
     hvBRamping = ramping;
-    dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
-    });
 }
 
 - (BOOL) hvASwitch
@@ -790,10 +784,9 @@ snotDb = _snotDb;
 
 - (void) setHvASwitch:(BOOL)aHvASwitch
 {
+    [[[self undoManager] prepareWithInvocationTarget:self] setHvASwitch:hvASwitch];
     hvASwitch = aHvASwitch;
-	dispatch_async(dispatch_get_main_queue(), ^{
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
-    });
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];        
 }
 
 - (BOOL) hvBSwitch
@@ -803,10 +796,9 @@ snotDb = _snotDb;
 
 - (void) setHvBSwitch:(BOOL)aHvBSwitch
 {
+    [[[self undoManager] prepareWithInvocationTarget:self] setHvBSwitch:hvBSwitch];
     hvBSwitch = aHvBSwitch;
-    dispatch_async(dispatch_get_main_queue(), ^{
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];        
-    });
 }
 
 - (BOOL) hvANeedsUserIntervention
@@ -817,9 +809,7 @@ snotDb = _snotDb;
 - (void) setHvANeedsUserIntervention:(BOOL)needs
 {
     hvANeedsUserIntervention = needs;
-    dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
-    });
 }
 
 - (BOOL) hvBNeedsUserIntervention
@@ -830,9 +820,7 @@ snotDb = _snotDb;
 - (void) setHvBNeedsUserIntervention:(BOOL)needs
 {
     hvBNeedsUserIntervention = needs;
-    dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
-    });
 }
 
 - (unsigned long) hvAVoltageDACSetValue
@@ -841,10 +829,9 @@ snotDb = _snotDb;
 }
 
 - (void) setHvAVoltageDACSetValue:(unsigned long)aHvAVoltageDACSetValue {
+    [[[self undoManager] prepareWithInvocationTarget:self] setHvAVoltageDACSetValue:aHvAVoltageDACSetValue];
     hvAVoltageDACSetValue = aHvAVoltageDACSetValue;
-    dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];        
-    });
 }
 
 - (unsigned long) hvBVoltageDACSetValue
@@ -853,10 +840,9 @@ snotDb = _snotDb;
 }
 
 - (void) setHvBVoltageDACSetValue:(unsigned long)aHvBVoltageDACSetValue {
+    [[[self undoManager] prepareWithInvocationTarget:self] setHvBVoltageDACSetValue:aHvBVoltageDACSetValue];
     hvBVoltageDACSetValue = aHvBVoltageDACSetValue;
-    dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];        
-    });
 }
 
 - (float) hvAVoltageReadValue
@@ -867,9 +853,7 @@ snotDb = _snotDb;
 - (void) setHvAVoltageReadValue:(float)hvAVoltageReadValue
 {
     _hvAVoltageReadValue = hvAVoltageReadValue;
-    dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];        
-    });
 }
 
 - (float) hvBVoltageReadValue
@@ -880,9 +864,7 @@ snotDb = _snotDb;
 - (void) setHvBVoltageReadValue:(float)hvBVoltageReadValue
 {
     _hvBVoltageReadValue = hvBVoltageReadValue;
-    dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];        
-    });
 }
 
 - (float) hvACurrentReadValue
@@ -893,9 +875,7 @@ snotDb = _snotDb;
 - (void) setHvACurrentReadValue:(float)hvACurrentReadValue
 {
     _hvACurrentReadValue = hvACurrentReadValue;
-    dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];        
-    });
 }
 
 - (float) hvBCurrentReadValue
@@ -906,9 +886,7 @@ snotDb = _snotDb;
 - (void) setHvBCurrentReadValue:(float)hvBCurrentReadValue
 {
     _hvBCurrentReadValue = hvBCurrentReadValue;
-    dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];        
-    });
 }
 
 - (unsigned long) hvAVoltageTargetValue
@@ -920,9 +898,7 @@ snotDb = _snotDb;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setHvAVoltageTargetValue:_hvAVoltageTargetValue];
     _hvAVoltageTargetValue = hvAVoltageTargetValue;
-    dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHVTargetValueChanged object:self];        
-    });
 }
 
 - (unsigned long) hvBVoltageTargetValue
@@ -934,9 +910,7 @@ snotDb = _snotDb;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setHvBVoltageTargetValue:_hvBVoltageTargetValue];
     _hvBVoltageTargetValue = hvBVoltageTargetValue;
-    dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHVTargetValueChanged object:self];        
-    });
 }
 
 - (unsigned long) hvNominalVoltageA
@@ -948,9 +922,7 @@ snotDb = _snotDb;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setHvNominalVoltageA:[self hvNominalVoltageA]];
     _hvNominalVoltageA = hvNominalVoltageA;
-    dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHVNominalVoltageChanged object:self];
-    });
 }
 
 - (unsigned long) hvNominalVoltageB
@@ -962,9 +934,7 @@ snotDb = _snotDb;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setHvNominalVoltageB:[self hvNominalVoltageB]];
     _hvNominalVoltageB = hvNominalVoltageB;
-    dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHVNominalVoltageChanged object:self];
-    });
 }
 
 - (unsigned long) hvACMOSRateLimit
@@ -3392,7 +3362,7 @@ err:
         //[[self xl3Link] sendCommand:GET_HV_STATUS_ID withPayload:payload expectResponse:YES];
     }
     @catch (NSException *exception) {
-        NSLogColor([NSColor redColor],@"%@ error sending readHVStatus command.\n", [[self xl3Link] crateName]);
+        NSLog(@"%@ error sending readHVStatus command.\n", [[self xl3Link] crateName]);
         @throw exception;
     }
 
@@ -3442,15 +3412,12 @@ err:
             const char* timestamp = [[self stringDate] cStringUsingEncoding:NSASCIIStringEncoding];
             memcpy(data+6, timestamp, 6*4);
             NSData* pdata = [[NSData alloc] initWithBytes:data length:sizeof(long)*(packet_length)];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:pdata];
-                [pdata release];
-            });
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:pdata];
+            [pdata release];
             pdata = nil;
         }
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
-        });
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
     }
 }
 
@@ -3470,7 +3437,7 @@ err:
         [self setHVDacA:[self hvBVoltageDACSetValue] dacB:[self hvBVoltageDACSetValue]];
     }
     @catch (NSException *exception) {
-        NSLogColor([NSColor redColor],@"%@ HV failed to set HV!\n", [[self xl3Link] crateName]);
+        NSLog(@"%@ HV failed to set HV!\n", [[self xl3Link] crateName]);
     }
 }
 
@@ -3494,7 +3461,7 @@ err:
         [[self xl3Link] sendCommand:SET_HV_RELAYS_ID withPayload:payload expectResponse:YES];
     }
     @catch (NSException *exception) {
-        NSLogColor([NSColor redColor],@"%@ error sending setHVRelays command.\n",[[self xl3Link] crateName]);
+        NSLog(@"%@ error sending setHVRelays command.\n",[[self xl3Link] crateName]);
         *aError = 0xFFFFFFFF;
         @throw exception;
     }
@@ -3517,7 +3484,7 @@ err:
     }
     
     if (error != 0) {
-        NSLogColor([NSColor redColor],@"%@ error in setHVRelays relays were NOT set.\n",[[self xl3Link] crateName]);
+        NSLog(@"%@ error in setHVRelays relays were NOT set.\n",[[self xl3Link] crateName]);
     } else {
         NSLog(@"%@ HV relays set.\n",[[self xl3Link] crateName]);
     }
@@ -3535,7 +3502,7 @@ err:
     }
     
     if (error != 0) {
-        NSLogColor([NSColor redColor],@"%@ error in setHVRelays relays were NOT set.\n",[[self xl3Link] crateName]);
+        NSLog(@"%@ error in setHVRelays relays were NOT set.\n",[[self xl3Link] crateName]);
         [self setRelayStatus:@"status: UNKNOWN"];
     }
     else{
@@ -3558,7 +3525,7 @@ err:
     }
     
     if (error != 0) {
-        NSLogColor([NSColor redColor],@"%@ error in openHVRelays relays were NOT set.\n",[[self xl3Link] crateName]);
+        NSLog(@"%@ error in openHVRelays relays were NOT set.\n",[[self xl3Link] crateName]);
         [self setRelayStatus:@"status: UNKNOWN"];
     }
     else{
@@ -3613,7 +3580,7 @@ err:
         [self readHVSwitchOnForA:&switchAIsOn forB:&switchBIsOn];
     }
     @catch (NSException *exception) {
-        NSLogColor([NSColor redColor],@"%@ error in readHVSwitchOn\n", [[self xl3Link] crateName]);
+        NSLog(@"%@ error in readHVSwitchOn\n", [[self xl3Link] crateName]);
         return;
     }
     
@@ -3636,6 +3603,19 @@ err:
         return;
     }
 
+    //always trust the switch read?
+    /*    
+     if (xl3SwitchA != [self hvASwitch]) {
+     NSLog(@"%@ HV switch A is reported %@ by XL3 and expected to be %@ by ORCA.\n",[[self xl3Link] crateName], xl3SwitchA?@"ON":@"OFF", hvASwitch?@"ON":@"OFF");
+     [self setHvASwitch:xl3SwitchA];
+     }
+     
+     if (xl3SwitchB != [self hvBSwitch]) {
+     NSLog(@"%@ HV switch B is reported %@ by XL3 and expected to be %@ by ORCA.\n",[[self xl3Link] crateName], xl3SwitchB?@"ON":@"OFF", hvBSwitch?@"ON":@"OFF");
+     [self setHvBSwitch:xl3SwitchB];
+     }
+     */
+
     [self setHvASwitch:xl3SwitchA];
     [self setHvBSwitch:xl3SwitchB];
         
@@ -3645,12 +3625,12 @@ err:
         [self readHVInterlockGood:&interlockIsGood];
     }
     @catch (NSException *exception) {
-        NSLogColor([NSColor redColor],@"%@ error in readHVInterlock\n",[[self xl3Link] crateName]);
+        NSLog(@"%@ error in readHVInterlock\n",[[self xl3Link] crateName]);
         return;
     }
 
     if (!interlockIsGood) {
-        NSLogColor([NSColor redColor],@"%@ HV interlock BAD\n",[[self xl3Link] crateName]);
+        NSLog(@"%@ HV interlock BAD\n",[[self xl3Link] crateName]);
         if (aOn) {
             NSLog(@"%@ NOT turning ON the HV power supply.\n",[[self xl3Link] crateName]);
             return;
@@ -3664,7 +3644,7 @@ err:
         [self readHVStatus];
     }
     @catch (NSException *exception) {
-        NSLogColor([NSColor redColor],@"%@ error in readHVStatus\n",[[self xl3Link] crateName]);
+        NSLog(@"%@ error in readHVStatus\n",[[self xl3Link] crateName]);
         return;
     }
 
@@ -3677,7 +3657,7 @@ err:
         }
     }
     @catch (NSException *exception) {
-        NSLogColor([NSColor redColor],@"%@ error in setting the HV switch.",[[self xl3Link] crateName]);
+        NSLog(@"%@ error in setting the HV switch.",[[self xl3Link] crateName]);
         return;
     }
         
@@ -3694,7 +3674,7 @@ err:
         [self readHVSwitchOnForA:&xl3SwitchA forB:&xl3SwitchB];
     }
     @catch (NSException *exception) {
-        NSLogColor([NSColor redColor],@"%@ error in readHVSwitch\n", [[self xl3Link] crateName]);
+        NSLog(@"%@ error in readHVSwitch\n", [[self xl3Link] crateName]);
         return;
     }
     
@@ -3705,7 +3685,7 @@ err:
         [self readHVStatus];
     }
     @catch (NSException *exception) {
-        NSLogColor([NSColor redColor],@"%@ error in readHVStatus\n",[[self xl3Link] crateName]);
+        NSLog(@"%@ error in readHVStatus\n",[[self xl3Link] crateName]);
         return;
     }
     
@@ -3726,7 +3706,7 @@ err:
         [[self xl3Link] sendCommand:DO_PANIC_DOWN withPayload:packet.payload expectResponse:YES];
     }
     @catch (NSException *e) {
-        NSLogColor([NSColor redColor],@"%@ error while performing panic down; error: %@ reason: %@\n",
+        NSLog(@"%@ error while performing panic down; error: %@ reason: %@\n",
               [[self xl3Link] crateName], [e name], [e reason]);
         [self safeHvInit];
         return;
@@ -3736,7 +3716,7 @@ err:
     }
     if(result->errorFlags)
     {
-        NSLogColor([NSColor redColor],@"There was a problem performing panic down. Try again or ramp crate manually");
+        NSLog(@"There was a problem performing panic down. Try again or ramp crate manually");
         [self safeHvInit];
         return;
     }
@@ -4450,7 +4430,7 @@ err:
                 [self readHVSwitchOn];
                 [self readHVStatus];
             } @catch (NSException *e) {
-                NSLogColor([NSColor redColor],@"%@ error reading XL3 hv status; error: %@ reason: %@\n", [[self xl3Link] crateName], [e name], [e reason]);
+                NSLog(@"%@ error reading XL3 hv status; error: %@ reason: %@\n", [[self xl3Link] crateName], [e name], [e reason]);
                 continue; // try again later if there was an error
             }
             
@@ -4480,7 +4460,7 @@ err:
                     [self setHVDacA:[self hvAVoltageDACSetValue] dacB:[self hvBVoltageDACSetValue]];
                 }
                 @catch (NSException *exception) {
-                    NSLogColor([NSColor redColor],@"%@ HV init failed to set HV!\n", [self hvBVoltageDACSetValue]);
+                    NSLog(@"%@ HV init failed to set HV!\n", [self hvBVoltageDACSetValue]);
                     continue;
                 }
             }
@@ -4497,9 +4477,8 @@ err:
             [hvThread start];
             
             //let everyone know that we now have HV control
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
-            });
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
+            
             break; //exit loop
         }
     }
@@ -4565,7 +4544,7 @@ err:
                 [self setHvAVoltageDACSetValue:aValueToSet];
             }
             @catch (NSException *exception) {
-                NSLogColor([NSColor redColor],@"%@ HV failed to set HV!\n", [[self xl3Link] crateName]);
+                NSLog(@"%@ HV failed to set HV!\n", [[self xl3Link] crateName]);
             }
         }
         
@@ -4590,7 +4569,7 @@ err:
                 [self setHvBVoltageDACSetValue:aValueToSet];
             }
             @catch (NSException *exception) {
-                NSLogColor([NSColor redColor],@"%@ HV B failed to set HV!\n", [[self xl3Link] crateName]);
+                NSLog(@"%@ HV B failed to set HV!\n", [[self xl3Link] crateName]);
             }
         }
 
@@ -4617,11 +4596,11 @@ err:
 
             //check for ramps that aren't tracking the setpoints
             if ([self hvASwitch] && aUp && fabs([self hvAVoltageReadValue] - [self hvAVoltageDACSetValue]/4096.*3000.) > 100) {
-                NSLogColor([NSColor redColor],@"%@ HV A read value differs from the setpoint. stopping!\nPress Ramp UP to continue.\n", [[self xl3Link] crateName]);
+                NSLog(@"%@ HV A read value differs from the setpoint. stopping!\nPress Ramp UP to continue.\n", [[self xl3Link] crateName]);
                 [self setHvANextStepValue:[self hvAVoltageDACSetValue]];
             }
             if ([self hvBSwitch] && bUp && fabs([self hvBVoltageReadValue] - [self hvBVoltageDACSetValue]/4096.*3000.) > 100) {
-                NSLogColor([NSColor redColor],@"%@ HV B read value differs from the setpoint. stopping!\nPress Ramp UP to continue.\n", [[self xl3Link] crateName]);
+                NSLog(@"%@ HV B read value differs from the setpoint. stopping!\nPress Ramp UP to continue.\n", [[self xl3Link] crateName]);
                 [self setHvBNextStepValue:[self hvBVoltageDACSetValue]];
             }
 
@@ -4633,7 +4612,7 @@ err:
             //check for voltage dropout (FIXME: add current checking)
             if (self.hvANeedsUserIntervention) {
                 if (fabs([self hvAVoltageReadValue] - [self hvAVoltageDACSetValue]/4096.*3000.) <= 100) {
-                    NSLogColor([NSColor redColor],@"%@ HV A read value recovered.", [[self xl3Link] crateName]);
+                    NSLog(@"%@ HV A read value recovered.", [[self xl3Link] crateName]);
                     self.hvANeedsUserIntervention = false;
                 }
             } else {
@@ -4643,7 +4622,7 @@ err:
                     ORAlarm *hvHighCurrentAlarm = [[ORAlarm alloc] initWithName:alarmString severity:kEmergencyAlarm];
                     [hvHighCurrentAlarm setAcknowledged:NO];
                     [hvHighCurrentAlarm postAlarm];
-                    NSLogColor([NSColor redColor],@"%@ HV A read value differs from the setpoint! Suspending HV monitoring and control. Press 'Accept Readback' to resume.\n", [[self xl3Link] crateName]);
+                    NSLog(@"%@ HV A read value differs from the setpoint! Suspending HV monitoring and control. Press 'Accept Readback' to resume.\n", [[self xl3Link] crateName]);
                 }
             }
             if (self.hvBNeedsUserIntervention) {
@@ -4658,7 +4637,7 @@ err:
                     ORAlarm *hvHighCurrentAlarm = [[ORAlarm alloc] initWithName:alarmString severity:kEmergencyAlarm];
                     [hvHighCurrentAlarm setAcknowledged:NO];
                     [hvHighCurrentAlarm postAlarm];
-                    NSLogColor([NSColor redColor],@"%@ HV B read value differs from the setpoint! Suspending HV monitoring and control. Press 'Accept Readback' to resume.\n", [[self xl3Link] crateName]);
+                    NSLog(@"%@ HV B read value differs from the setpoint! Suspending HV monitoring and control. Press 'Accept Readback' to resume.\n", [[self xl3Link] crateName]);
                 }
             }
         }

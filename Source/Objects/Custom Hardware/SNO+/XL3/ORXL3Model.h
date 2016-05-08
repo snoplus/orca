@@ -233,7 +233,6 @@ enum {
 - (void) awakeAfterDocumentLoaded;
 
 - (void) registerNotificationObservers;
-- (int) initAtRunStart;
 
 #pragma mark •••Accessors
 - (NSString*) shortName;

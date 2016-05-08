@@ -120,7 +120,7 @@
 - (void) awakeAfterDocumentLoaded;
 
 - (void) registerNotificationObservers;
-- (int) initAtRunStart: (int) loadTriggers;
+- (void) runAboutToStart:(NSNotification*)aNote;
 
 #pragma mark •••Accessors
 - (int) eSumViewType;

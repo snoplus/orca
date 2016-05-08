@@ -55,7 +55,6 @@ NSString* XL3_LinkAutoConnectChanged    = @"XL3_LinkAutoConnectChanged";
 
 @implementation XL3_Link
 @synthesize fifoTimeStamp = _fifoTimeStamp,
-pendingThreads,
 readFifoFlag = _readFifoFlag;
 
 - (id) init
@@ -65,8 +64,6 @@ readFifoFlag = _readFifoFlag;
 	commandSocketLock = [[NSLock alloc] init];
 	coreSocketLock = [[NSLock alloc] init];
 	cmdArrayLock = [[NSLock alloc] init];
-    connectionLock = [[NSLock alloc] init];
-    pendingThreads = 0;
 	[self setNeedToSwap];
 	connectState = kDisconnected;
 	cmdArray = [[NSMutableArray alloc] init];
@@ -83,7 +80,6 @@ readFifoFlag = _readFifoFlag;
 	[commandSocketLock release];
 	[coreSocketLock release];
 	[cmdArrayLock release];
-    [connectionLock release];
 	if(cmdArray){
 		[cmdArray release];
 		cmdArray = nil;
@@ -571,19 +567,7 @@ readFifoFlag = _readFifoFlag;
 
 - (void) readXL3Packet:(XL3Packet*) aPacket withPacketType:(uint8_t) packetType andPacketNum: (uint16_t) packetNum
 {
-    // lock connection and if connected increment the pending count, otherwise throw exception
-    [connectionLock lock];
-    if ([self isConnected]) {
-        [self setPendingThreads:pendingThreads+1];
-        [connectionLock unlock];
-    } else {
-        [connectionLock unlock];
-        @throw [NSException exceptionWithName:@"ReadXL3Packet not connected"
-            reason:[NSString stringWithFormat:@"Not connected for %@ <%@> port: %lu\n", [self crateName], IPNumber, portNumber]
-            userInfo:nil];
-    }
-    
-    //look into the cmdArray
+	//look into the cmdArray
     NSDate* sleepDate = [[NSDate alloc] initWithTimeIntervalSinceNow:0.01];
 	[NSThread sleepUntilDate:sleepDate];
     [sleepDate release];
@@ -595,8 +579,9 @@ readFifoFlag = _readFifoFlag;
     NSNumber* aPacketType;
     NSNumber* aPacketNum;
 
-    // loop until disconnect, packet found (breaks out), timeout (exception thrown)
-	while ([self isConnected]) {
+    //NSLog(@"%@ waiting for response with packetType: %d and packetNum %d\n",[self crateName], packetType, packetNum);
+    
+	while(1) {
 		@try {
 			[cmdArrayLock lock];
 			for (aCmd in cmdArray) {
@@ -610,12 +595,7 @@ readFifoFlag = _readFifoFlag;
 			}
 			[cmdArrayLock unlock];
 		}
-        @catch (NSException* e) {
-            [connectionLock lock];
-            [self setPendingThreads:pendingThreads-1];
-            [connectionLock unlock];
-            [foundCmds release];
-            foundCmds = nil;
+		@catch (NSException* e) {
 			[cmdArrayLock unlock];
 			NSLog(@"Error in readXL3Packet parsing cmdArray: %@ %@\n", [e name], [e reason]);
 			@throw e;
@@ -623,33 +603,23 @@ readFifoFlag = _readFifoFlag;
 
 		if ([foundCmds count]) {
 			break;
-		} else if ([self errorTimeOutSeconds] && time(0) - xl3ReadTimer > [self errorTimeOutSeconds]) {
-            [connectionLock lock];
-            [self setPendingThreads:pendingThreads-1];
-            [connectionLock unlock];
-            [foundCmds release];
-            foundCmds = nil;
+		}
+		else if ([self errorTimeOutSeconds] && time(0) - xl3ReadTimer > [self errorTimeOutSeconds]) {
             [self performSelectorOnMainThread:@selector(disconnectSocket) withObject:nil waitUntilDone:NO];
 			@throw [NSException exceptionWithName:@"ReadXL3Packet time out"
 				reason:[NSString stringWithFormat:@"Time out for %@ <%@> port: %lu\n", [self crateName], IPNumber, portNumber]
 				userInfo:nil];
-		} else {
+		}
+		else {
+            //[[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
             usleep(500);
         }
 	}
 
-    if ([foundCmds count] == 0) {
-        [connectionLock lock];
-        [self setPendingThreads:pendingThreads-1];
-        [connectionLock unlock];
-        [foundCmds release];
-        foundCmds = nil;
-        @throw [NSException exceptionWithName:@"ReadXL3Packet XL3 disconnected"
-            reason:[NSString stringWithFormat:@"XL3 disconnected for %@ <%@> port: %lu\n", [self crateName], IPNumber, portNumber]
-            userInfo:nil];
-    } else if ([foundCmds count] > 1) {
-		NSLogColor([NSColor redColor],@"Multiple responses for XL3 command with packet type: %d and packet num: %d from %@ <%@> port: %d\n",
+	if ([foundCmds count] > 1) {
+		NSLog(@"Multiple responses for XL3 command with packet type: %d and packet num: %d from %@ <%@> port: %d\n",
 		      [self crateName], IPNumber, portNumber, packetType, packetNum);
+		// todo: do something not too retarded, ask a smart guy
 	}
 	
 	aCmd = [foundCmds objectAtIndex:0];
@@ -662,14 +632,11 @@ readFifoFlag = _readFifoFlag;
 	}
 	@catch (NSException* localException) {
 		[cmdArrayLock unlock];
-		NSLogColor([NSColor redColor],@"XL3_Link error removing an XL3 packet from the command array\n");
-		NSLogColor([NSColor redColor],@"%@ %@\n", [localException name], [localException reason]);
+		NSLog(@"XL3_Link error removing an XL3 packet from the command array\n");
+		NSLog(@"%@ %@\n", [localException name], [localException reason]);
 		@throw localException;
 	}
     @finally {
-        [connectionLock lock];
-        [self setPendingThreads:pendingThreads-1];
-        [connectionLock unlock];
         [foundCmds release];
         foundCmds = nil;
     }
@@ -696,14 +663,13 @@ readFifoFlag = _readFifoFlag;
 
 - (void) disconnectSocket
 {
-    if (workingSocket){
+	if(workingSocket){
 		close(workingSocket);
 		workingSocket = 0;
 	}
 		
 	[self setIsConnected: NO];
 	[self setTimeConnected:nil];
-    
 	NSLog(@"Disconnected %@ <%@> port: %d\n", [self crateName], IPNumber, portNumber);
 }
 
@@ -725,11 +691,6 @@ static void SwapLongBlock(void* p, int32_t n)
 {
     char err[ANET_ERR_LEN];
     char *host;
-    
-    if (isConnected) {
-        NSLogColor([NSColor redColor],@"%@ already connected, aborting reconnect.\n",[self crateName]);
-        return;
-    }
 
     NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document]
          collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
@@ -749,18 +710,8 @@ static void SwapLongBlock(void* p, int32_t n)
 	NSAutoreleasePool *pool = [[NSAutoreleasePool allocWithZone:nil] init];
 
     connectState = kWaiting;
-    
     [[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectStateChanged object: self];
 
-    //wait for all pending threads on a previous connection to exit
-    [connectionLock lock];
-    while (pendingThreads > 0) {
-        [connectionLock unlock];
-        usleep(100000);
-        [connectionLock lock];
-    }
-    [connectionLock unlock];
-    
     workingSocket = 0;
     if ((workingSocket = anetTcpConnect(err, host, portNumber)) == ANET_ERR) {
         if (workingSocket) {

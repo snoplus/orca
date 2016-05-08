@@ -297,46 +297,41 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (void) registerNotificationObservers
 {
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(runAboutToStart:)
+                         name : @"SNOPRunStart"
+                       object : nil];
 }
 
-- (int) initAtRunStart:(int) loadTriggers
+- (void) runAboutToStart:(NSNotification*)aNote
 {
-    /* Initialize all hardware from the model at run start. If loadTriggers
-     * is true, then load the GT mask, otherwise, don't load the GT mask.
-     * Returns 0 on success, -1 on failure. */
+    /* At the start of every run, we initialize the HW settings. */
 
-    @try {
-        /* Setup MTCD pedestal/pulser settings */
-        if ([self isPedestalEnabledInCSR]) [self enablePedestal];
-        [self setupPulseGTDelaysCoarse: uLongDBValue(kCoarseDelay) fine:uLongDBValue(kFineDelay)];
-        [self setTheLockoutWidth: uLongDBValue(kLockOutWidth)];
-        [self setThePedestalWidth: uLongDBValue(kPedestalWidth)];
-        [self setThePulserRate:floatDBValue(kPulserPeriod)];
-        [self setThePrescaleValue];
+    /* Setup MTCD pedestal/pulser settings */
+    if ([self isPedestalEnabledInCSR]) [self enablePedestal];
+    [self setupPulseGTDelaysCoarse: uLongDBValue(kCoarseDelay) fine:uLongDBValue(kFineDelay)];
+    [self setTheLockoutWidth: uLongDBValue(kLockOutWidth)];
+    [self setThePedestalWidth: uLongDBValue(kPedestalWidth)];
+    [self setThePulserRate:floatDBValue(kPulserPeriod)];
+    [self setThePrescaleValue];
 
-        /* Setup Pedestal Crate Mask */
-        [self setPedestalCrateMask];
+    /* Setup Pedestal Crate Mask */
+	[self setPedestalCrateMask];
 
-        if (loadTriggers) {
-            /* Setup the GT mask */
-            [self clearGlobalTriggerWordMask];
-            [self setSingleGTWordMask: uLongDBValue(kGtMask)];
-        }
+    /* Setup the GT mask */
+    [self clearGlobalTriggerWordMask];
+    [self setSingleGTWordMask: uLongDBValue(kGtMask)];
 
-        /* Setup GT Crate Mask */
-        [self setGTCrateMask];
+    /* Setup GT Crate Mask */
+    [self setGTCrateMask];
 
-        /* Setup MTCA Thresholds */
-        [self loadTheMTCADacs];
+    /* Setup MTCA Thresholds */
+    [self loadTheMTCADacs];
 
-        /* Setup MTCA relays */
-        [self mtcatLoadCrateMasks];
-    } @catch (NSException *e) {
-        NSLogColor([NSColor redColor], @"error loading MTC hardware at run start: %@\n", [e reason]);
-        return -1;
-    }
-
-    return 0;
+    /* Setup MTCA relays */
+    [self mtcatLoadCrateMasks];
 }
 
 #pragma mark •••Accessors

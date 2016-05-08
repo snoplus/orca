@@ -139,7 +139,7 @@ enum {
 @property (assign, nonatomic)   BOOL    continuousMode;
 
 - (void) registerNotificationObservers;
-- (int) initAtRunStart;
+- (void) runAboutToStart:(NSNotification*)aNote;
 
 - (void) awakeAfterDocumentLoaded;
 
