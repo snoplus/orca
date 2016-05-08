@@ -370,6 +370,9 @@
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="resyncRunAction:" target="-2" id="Dts-ba-02a"/>
+                                            </connections>
                                         </button>
                                         <progressIndicator verticalHuggingPriority="750" maxValue="100" bezeled="NO" controlSize="small" style="bar" id="MBu-zu-x36">
                                             <rect key="frame" x="23" y="35" width="315" height="12"/>

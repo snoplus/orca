@@ -398,6 +398,15 @@ snopGreenColor;
     [standardRunVersion release];
 }
 
+- (IBAction)resyncRunAction:(id)sender {
+    [runControl haltRun];
+    while(![runControl runningState] == eRunStopped){
+        sleep(0.2);
+    }
+    [runControl startRun];
+}
+
+
 - (IBAction) stopRunAction:(id)sender
 {
     [runControl haltRun];
