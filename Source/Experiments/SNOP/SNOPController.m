@@ -881,14 +881,20 @@ smellieRunFile;
         //Loop through all the smellie files in the run list
         for(id key in self.smellieRunFileList){
             
-            id loopValue = [self.smellieRunFileList objectForKey:key];
+            id currentRunFile = [self.smellieRunFileList objectForKey:key];
             
-            NSString *string1 = [loopValue objectForKey:@"run_name"];
-            NSString *string2 = [smellieRunFileNameField objectValueOfSelectedItem];
+            NSString *thisRunFile = [currentRunFile objectForKey:@"run_name"];
+            NSString *requestedRunFile = [smellieRunFileNameField objectValueOfSelectedItem];
             
-            if( [string1 isEqualToString:string2]){
-                self.smellieRunFile = loopValue;
+            if( [thisRunFile isEqualToString:requestedRunFile]){
                 
+                NSLog(@"%", [self smellieRunFile]);
+                // If it's an old run file, add superK fields, set to zero
+                if(![smellieRunFile objectForKey:@"superK_laser_on"]){
+                    [smellieRunFile setValue:0 forKey:@"superK_laser_on"];
+                }
+                [self setSmellieRunFile:currentRunFile];
+
                 [loadedSmellieRunNameLabel setStringValue:[smellieRunFile objectForKey:@"run_name"]];
                 [model setSmellieRunNameLabel:[NSString stringWithFormat:@"%@",[smellieRunFile objectForKey:@"run_name"]]];
                 [loadedSmellieTriggerFrequencyLabel setStringValue:[smellieRunFile objectForKey:@"trigger_frequency"]];
@@ -917,6 +923,7 @@ smellieRunFile;
                 laserCounter = laserCounter + [[self.smellieRunFile objectForKey:@"405nm_laser_on"] intValue];
                 laserCounter = laserCounter + [[self.smellieRunFile objectForKey:@"440nm_laser_on"] intValue];
                 laserCounter = laserCounter + [[self.smellieRunFile objectForKey:@"500nm_laser_on"] intValue];
+                laserCounter = laserCounter + [[self.smellieRunFile objectForKey:@"SuperK_laser_on"] intValue];
                 
                 [loadedSmellieFibresLabel setStringValue:[NSString stringWithFormat:@"%i",fibreCounter]];
                 
@@ -941,6 +948,11 @@ smellieRunFile;
                 //see if the 500nm laser is on
                 if([[self.smellieRunFile objectForKey:@"500nm_laser_on"] intValue] == 1){
                     [smellieLaserString appendString:@" 500nm "];
+                }
+
+                //see if the 500nm laser is on
+                if([[self.smellieRunFile objectForKey:@"superK_laser_on"] intValue] == 1){
+                    [smellieLaserString appendString:@" superK "];
                 }
                 
                 //Calculate the approximate time of the run
@@ -988,10 +1000,15 @@ smellieRunFile;
     
     //Collect a series of objects from the ELLIEModel
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
-    
-    //get the ELLIE Model object
+    if (![objs count]) {
+      NSString* reasonStr = @"ELLIE model not available, add an ELLIE model to your experiment";
+      NSException* e = [NSException
+			exceptionWithName:@"NoEllieModel"
+			reason:reasonStr
+			userInfo:nil];
+      [e raise];
+    }
     ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
-    
     //Method for completing this without a new thread
     //[theELLIEModel startSmellieRun:smellieRunFile];
     
@@ -1052,23 +1069,28 @@ smellieRunFile;
     
     //Collect a series of objects from the ELLIEModel
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
-    
-    //get the ELLIE Model object
+    if (![objs count]) {
+      NSString* reasonStr = @"ELLIE model not available, add an ELLIE model to your experiment";
+      NSException* e = [NSException
+                        exceptionWithName:@"NoEllieModel"
+                        reason:reasonStr
+                        userInfo:nil];
+      [e raise];
+    }    
     ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
-    
     /*[NSThread detachNewThreadSelector:@selector(startSmellieRun:)
      toTarget:theELLIEModel
      withObject:[smellieRunFile autorelease]];*/
     
     /*[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startSmellieRun:) object:smellieRunFile];*/
     //cancel the smellie thread
+
     [smellieThread cancel];
     [smellieThread release];
     smellieThread = nil;
     
     //Method for completing this without a new thread
     [theELLIEModel stopSmellieRun];
-    
     
     //[theELLIEModel release];
     

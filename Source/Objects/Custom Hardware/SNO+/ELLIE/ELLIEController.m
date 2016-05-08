@@ -792,7 +792,7 @@
 
 -(IBAction)testButtonAction:(id)sender
 {
-    [model testFunction];
+    //[model testFunction];
 }
 
 -(IBAction)makeNewSmellieRun:(id)sender

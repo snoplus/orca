@@ -38,20 +38,20 @@
     _timeout = timeout;
 }
 
--(NSString *)getResult
+-(id)getResult
 {
-    if(_responseString == nil){
-        NSLog(@"WARNING: XMLRPC response string is nil");
+    if(_response == nil){
+        NSLog(@"WARNING: XMLRPC response is nil");
     }
-    return _responseString;
+    return _response;
 }
 
--(void)command:(NSString *)fmt
+-(id)command:(NSString *)fmt
 {
-    [self command:(NSString *)fmt withArgs:nil];
+    return [self command:(NSString *)fmt withArgs:nil];
 }
 
--(void)command:(NSString *)fmt withArgs:args
+-(id)command:(NSString *)fmt withArgs:args
 {
     /*
      * Encodes a command with the xmlrpc protocol and pipes it up to the
@@ -74,7 +74,7 @@
     
     //Make sure private data variables are set to nil an make request.
     _responseData = nil;
-    _responseString = nil;
+    _response = nil;
     
     NSURLResponse * response = nil;
     NSError * error = nil;
@@ -101,10 +101,10 @@
                                                    userInfo: nil];
         [excep raise];
     } else {
-        _responseString = [NSMutableString stringWithFormat:@"%@",[decoder object]];
+        _response = [decoder object];
     }
 
-    
+    return _response;
 }
 
 
@@ -119,8 +119,7 @@
     // didReceiveData method. Furthermore, this method is called each time
     // there is a redirect so reinitializing it also serves to clear it.
     _responseData = [[NSMutableData alloc] init];
-    _responseString = [[NSMutableString alloc] init];
-
+    _response = nil;
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
@@ -128,7 +127,7 @@
     WPXMLRPCDecoder *decoder = [[[WPXMLRPCDecoder alloc] initWithData:data]autorelease];
     NSMutableString* returnString = [NSMutableString stringWithFormat:@"%@",[decoder object]];
     NSLog(@"XML-RPC response: %@", returnString);
-    _responseString = returnString;
+    _response = [decoder object];
     [_responseData appendData:data];
 }
 
