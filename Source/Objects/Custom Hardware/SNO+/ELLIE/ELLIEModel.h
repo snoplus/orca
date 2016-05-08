@@ -44,6 +44,7 @@
     NSMutableDictionary* smellieLaserHeadToGainMapping;
     NSMutableDictionary* smellieLaserToInputFibreMapping;
     NSMutableDictionary* smellieFibreSwitchToFibreMapping;
+    NSNumber* smellieConfigVersionNo;
     BOOL smellieSlaveMode;
 }
 
@@ -56,6 +57,7 @@
 @property (nonatomic,retain) NSMutableDictionary* smellieLaserHeadToGainMapping;
 @property (nonatomic,retain) NSMutableDictionary* smellieLaserToInputFibreMapping;
 @property (nonatomic,retain) NSMutableDictionary* smellieFibreSwitchToFibreMapping;
+@property (nonatomic,retain) NSNumber* smellieConfigVersionNo;
 @property (nonatomic,assign) BOOL smellieSlaveMode;
 @property (nonatomic,retain) NSMutableDictionary* tellieRunDoc;
 @property (nonatomic,retain) NSMutableDictionary* smellieRunDoc;

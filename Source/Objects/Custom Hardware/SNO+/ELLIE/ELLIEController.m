@@ -133,7 +133,7 @@
 
 -(IBAction)startTellieRunAction:(id)sender
 {
-    [model startTellieRun];
+    [model startTellieRun:NO];
 }
 
 
