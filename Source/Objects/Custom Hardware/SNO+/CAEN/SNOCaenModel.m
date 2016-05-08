@@ -196,20 +196,25 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 
 - (void) registerNotificationObservers
 {
-    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(runAboutToStart:)
-                         name : @"SNOPRunStart"
-                       object : nil];
 }
 
-- (void) runAboutToStart:(NSNotification*)aNote
+- (int) initAtRunStart
 {
-    [self initBoard];
-    [self writeNumberBLTEvents:0];
-    [self writeEnableBerr:0];
-    [self writeAcquistionControl:YES];
+    /* Load model settings to hardware at the run start. Returns 0 on success,
+     * -1 on failure. */
+
+    @try {
+        [self initBoard];
+        [self writeNumberBLTEvents:0];
+        [self writeEnableBerr:0];
+        [self writeAcquistionControl:YES];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor], @"error loading CAEN hardware: %@\n",
+                   [e reason]);
+        return -1;
+    }
+
+    return 0;
 }
 
 #pragma mark ***Accessors

@@ -180,15 +180,13 @@ snotDb = _snotDb;
                      selector : @selector(readHVStatus)
                          name : ORSNOPRequestHVStatus
                        object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(runAboutToStart:)
-                         name : @"SNOPRunStart"
-                       object : nil];
 }
 
-- (void) runAboutToStart:(NSNotification*)aNote
+- (int) initAtRunStart
 {
+    /* Load the XL3 settings to hardware at the run start. This function
+     * will launch a thread to set the settings so that they can be set
+     * in parallel. */
     int slot, i, hv;
     ORFec32Model *fec;
 
@@ -241,6 +239,8 @@ snotDb = _snotDb;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object:self];
         [self loadHardwareWithSlotMask: [self getSlotsPresent] withCallback: @selector(runStartDone:) target:self];
     }
+
+    return 0;
 }
 
 - (void) runStartDone: (CrateInitResults *) results
