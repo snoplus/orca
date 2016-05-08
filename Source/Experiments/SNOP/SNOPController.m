@@ -1204,8 +1204,7 @@ snopGreenColor;
     //Refresh values in GUI to match the model
     NSInteger* index = [model ECA_pattern] -1;
     [ECApatternPopUpButton selectItemAtIndex:index];
-    index = [model ECA_type] -1;
-    [ECAtypePopUpButton selectItemAtIndex:index];
+    [ECAtypePopUpButton selectItemWithTitle:[model ECA_type]];
     int integ = [model ECA_tslope_pattern];
     [TSlopePatternTextField setIntValue:integ];
     integ = [model ECA_nevents];
@@ -1220,8 +1219,7 @@ snopGreenColor;
 }
 
 - (IBAction)ecaTypeChangedAction:(id)sender {
-    int value = (int)[ECAtypePopUpButton indexOfSelectedItem];
-    [model setECA_type:value+1];
+    [model setECA_type:[ECAtypePopUpButton titleOfSelectedItem]];
 }
 
 - (IBAction)ecaTSlopePatternChangedAction:(id)sender {

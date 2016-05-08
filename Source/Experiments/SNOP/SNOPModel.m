@@ -311,7 +311,7 @@ logPort;
 
     //ECA
     [self setECA_pattern:[decoder decodeIntForKey:@"SNOPECApattern"]];
-    [self setECA_type:[decoder decodeIntForKey:@"SNOPECAtype"]];
+    [self setECA_type:[decoder decodeObjectForKey:@"SNOPECAtype"]];
     [self setECA_tslope_pattern:[decoder decodeIntForKey:@"SNOPECAtslppattern"]];
     [self setECA_nevents:[decoder decodeIntForKey:@"SNOPECANEvents"]];
 
@@ -1435,7 +1435,7 @@ err:
 
     //ECA
     [encoder encodeInt:[self ECA_pattern] forKey:@"SNOPECApattern"];
-    [encoder encodeInt:[self ECA_type] forKey:@"SNOPECAtype"];
+    [encoder encodeObject:[self ECA_type] forKey:@"SNOPECAtype"];
     [encoder encodeInt:[self ECA_tslope_pattern] forKey:@"SNOPECAtslppattern"];
     [encoder encodeInt:[self ECA_nevents] forKey:@"SNOPECANEvents"];
 
@@ -1762,12 +1762,12 @@ err:
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
 }
 
-- (int)ECA_type
+- (NSString*)ECA_type
 {
     return ECA_type;
 }
 
-- (void) setECA_type:(int)aValue
+- (void) setECA_type:(NSString*)aValue
 {
     ECA_type = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];

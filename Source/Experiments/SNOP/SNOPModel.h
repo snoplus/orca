@@ -131,10 +131,10 @@
         //Run type word
         unsigned long runTypeWord;
         unsigned long lastRunTypeWord;
-        NSString * lastRunTypeWordHex;
+        NSString* lastRunTypeWordHex;
         //ECA stuff
         int ECA_pattern;
-        int ECA_type;
+        NSString* ECA_type;
         int ECA_tslope_pattern;
         int ECA_nevents;
     
@@ -259,11 +259,11 @@
 - (NSString*) lastStandardRunVersion;
 - (void) setLastStandardRunVersion:(NSString*)aValue;
 - (int) ECA_pattern;
-- (int) ECA_type;
+- (NSString*) ECA_type;
 - (int) ECA_tslope_pattern;
 - (int) ECA_nevents;
 - (void) setECA_pattern:(int)aValue;
-- (void) setECA_type:(int)aValue;
+- (void) setECA_type:(NSString*)aValue;
 - (void) setECA_tslope_pattern:(int)aValue;
 - (void) setECA_nevents:(int)aValue;
 
