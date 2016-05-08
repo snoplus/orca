@@ -1344,17 +1344,13 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     NSMutableArray * subRunInfo = [[runDocDict objectForKey:@"sub_run_info"] mutableCopy];
     [subRunInfo addObject:subRunDocDict];
-    NSLog(@"This sub run : %@", subRunDoc);
     [runDocDict setObject:subRunInfo forKey:@"sub_run_info"];
     
     //Update tellieRunDoc property.
     self.smellieRunDoc = runDocDict;
-    NSLog(@"_id : %@\n", [runDocDict objectForKey:@"_id"]);
-    NSLog(@"All sub runs: %@\n", [runDocDict objectForKey:@"sub_run_info"]);
+
     //check to see if run is offline or not
-    //if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
     [[aSnotModel orcaDbRefWithEntryDB:self withDB:@"smellie"] updateDocument:runDocDict documentId:[runDocDict objectForKey:@"_id"] tag:kTellieRunDocumentUpdated];
-    //}
     [subRunInfo release];
     [runDocDict release];
     [subRunDocDict release];
