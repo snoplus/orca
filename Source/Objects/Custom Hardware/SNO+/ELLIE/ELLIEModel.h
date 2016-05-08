@@ -107,11 +107,18 @@
 -(void) setLaserSoftLockOn;
 -(void) setLaserSoftLockOff;
 -(void) setSmellieMasterMode:(NSString*)triggerFrequency withNumOfPulses:(NSString*)numOfPulses;
+-(void) setSuperKSafeStates;
+-(void) setSuperKSoftLockOn;
+-(void) setSuperKSoftLockOff;
+-(void) setSuperKWavelegth:(NSString*)lowBin withHighEdge:(NSString*)highBin;
 -(void) sendCustomSmellieCmd:(NSString*)customCmd withArgs:(NSArray*)argsArray;
+
 -(NSMutableArray*)getSmellieRunLaserArray:(NSDictionary*)smellieSettings;
 -(NSMutableArray*)getSmellieRunFibreArray:(NSDictionary*)smellieSettings;
 -(NSMutableArray*)getSmellieRunFrequencyArray:(NSDictionary*)smellieSettings;
 -(NSMutableArray*)getSmellieRunIntensityArray:(NSDictionary*)smellieSettings;
+-(NSMutableArray*)getLowEdgeWavelengthArray:(NSDictionary*)smellieSettings;
+-(NSMutableArray*)getHighEdgeWavelengthArray:(NSDictionary*)smellieSettings;
 -(void) startSmellieRunInBackground:(NSDictionary*)smellieSettings;
 -(void) startSmellieRun:(NSDictionary*)smellieSettings;
 -(void) stopSmellieRun;
@@ -122,8 +129,9 @@
 -(void) updateSmellieRunDocument:(NSDictionary*)subRunDoc;
 -(void) smellieDBpush:(NSMutableDictionary*)dbDic;
 -(void) smellieConfigurationDBpush:(NSMutableDictionary*)dbDic;
--(NSNumber*) fetchRecentVersion;
--(NSMutableDictionary*) fetchCurrentConfigurationForVersion:(NSNumber*)currentVersion;
+-(NSNumber*) fetchRecentConfigVersion;
+-(NSNumber*) fetchConfigVersionFor:(NSString*)name;
+-(NSMutableDictionary*) fetchConfigurationFile:(NSNumber*)currentVersion;
 
 /*************************/
 /* Misc generic methods  */

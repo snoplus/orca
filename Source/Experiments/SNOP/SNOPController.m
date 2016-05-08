@@ -892,6 +892,10 @@ smellieRunFile;
                 // If it's an old run file, add superK fields, set to zero
                 if(![smellieRunFile objectForKey:@"superK_laser_on"]){
                     [smellieRunFile setValue:0 forKey:@"superK_laser_on"];
+                    [smellieRunFile setValue:0 forKey:@"superK_wavelength_low"];
+                    [smellieRunFile setValue:0 forKey:@"superK_wavelength_high"];
+                    [smellieRunFile setValue:0 forKey:@"superK_wavelength_step"];
+                    [smellieRunFile setValue:0 forKey:@"superK_num_wavelength_steps"];
                 }
                 [self setSmellieRunFile:currentRunFile];
 
@@ -1021,11 +1025,7 @@ smellieRunFile;
     //else{
     //    NSLog(@"Smellie Run Type is not masked in. Please mask this in and try again \n");
     //}
-    
     //[NSThread detachNewThreadSelector:@selector(startSmellieRun:) toTarget:theELLIEModel withObject:smellieRunFile];
-    
-    //[theELLIEModel release];
-    
 }
 
 - (IBAction) enmergencyStopToggle:(id)sender
@@ -1079,18 +1079,12 @@ smellieRunFile;
       [e raise];
     }    
     ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
-    /*[NSThread detachNewThreadSelector:@selector(startSmellieRun:)
-     toTarget:theELLIEModel
-     withObject:[smellieRunFile autorelease]];*/
-    
-    /*[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startSmellieRun:) object:smellieRunFile];*/
-    //cancel the smellie thread
     
     //Method for completing this without a new thread
     [theELLIEModel stopSmellieRun];
-    [theELLIEModel release];
     
     [smellieThread cancel];
+    NSLog(@"IS THREAD CANCELED? : %@", [[NSThread currentThread] isCancelled]);
     [smellieThread release];
     smellieThread = nil;
     
@@ -1102,8 +1096,8 @@ smellieRunFile;
 
 - (IBAction) emergencySmellieStopAction:(id)sender
 {
-    [smellieLoadRunFile setEnabled:YES];
-    [smellieRunFileNameField setEnabled:YES];
+    [smellieLoadRunFile setEnabled:NO];
+    [smellieRunFileNameField setEnabled:NO];
     [smellieStartRunButton setEnabled:NO];
     [smellieStopRunButton setEnabled:YES];
     

@@ -369,7 +369,7 @@
 //Poll the Tellie Fibre
 -(IBAction)pollTellieFibreAction:(id)sender
 {
-    [model pollTellieFibre];
+    [model pollTellieFibre:5.];
 }
 
 //manual override to stop the Tellie Fibre firing
