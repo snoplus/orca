@@ -1076,7 +1076,11 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                     endOfRun = YES;
                     break;
                 }
+                
+                //Deactivate software locks
+                [self sendCustomSmellieCmd:softLockOffCommand withArgs:nil];
 
+                //Prepare new subrun - will produce a subrun boundrary in the zdab.
                 [runControl performSelectorOnMainThread:@selector(prepareForNewSubRun) withObject:nil waitUntilDone:YES];
                 [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
 
@@ -1114,7 +1118,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                 [NSThread sleepForTimeInterval:1.0f];
 
                 if([self smellieSlaveMode]){
-                    [self sendCustomSmellieCmd:softLockOffCommand withArgs:nil];
                     NSLog(@"SMELLIE_RUN:Setting the Pedestal to :%@ Hz \n",triggerFrequencyInSlaveMode);
                     NSNumberFormatter * f = [[NSNumberFormatter alloc] init];
                     [f setNumberStyle:NSNumberFormatterDecimalStyle];
@@ -1148,6 +1151,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                 //Keep record of sub-run settings
                 [self updateSmellieRunDocument:valuesToFillPerSubRun];
                 [valuesToFillPerSubRun release];
+
+                //Activate software locks
+                [self sendCustomSmellieCmd:softLockOnCommand withArgs:nil];
 
                 //Check if run file requests a sleep time between sub_runs
                 if([smellieSettings objectForKey:@"sleep_between_sub_run"]){
