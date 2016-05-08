@@ -297,11 +297,6 @@ snopGreenColor;
                          name : @"SNOPSettingsChanged"
                         object: mtcModel];
     
-    //TODO: add the notification for changedRunType on SNO+
-    /*[notifyCenter addObserver:self
-     selector:@selector(runTypesChanged:)
-     name:nil
-     object:nil];*/
 }
 
 - (void) updateWindow
@@ -1160,7 +1155,7 @@ snopGreenColor;
     [ECApatternPopUpButton setEnabled:!lockedOrNotRunningMaintenance];
     [ECAtypePopUpButton setEnabled:!lockedOrNotRunningMaintenance];
     [TSlopePatternTextField setEnabled:!lockedOrNotRunningMaintenance];
-    [subTimeTextField setEnabled:!lockedOrNotRunningMaintenance];
+    [ecaNEventsTextField setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunSaveButton setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunSaveDefaultsButton setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunLoadButton setEnabled:!lockedOrNotRunningMaintenance];
@@ -1202,8 +1197,8 @@ snopGreenColor;
     [ECAtypePopUpButton selectItemAtIndex:index];
     int integ = [model ECA_tslope_pattern];
     [TSlopePatternTextField setIntValue:integ];
-    double doub = [model ECA_subrun_time];
-    [subTimeTextField setDoubleValue:doub];
+    integ = [model ECA_nevents];
+    [ecaNEventsTextField setIntValue:integ];
     
 }
 
@@ -1223,10 +1218,43 @@ snopGreenColor;
     [model setECA_tslope_pattern:value];
 }
 
-- (IBAction)ecaSubrunTimeChangedAction:(id)sender {
-    double value = [subTimeTextField doubleValue];
-    [model setECA_subrun_time:value];
+- (IBAction)ecaNEventsChangedAction:(id)sender {
+    int value = [ecaNEventsTextField intValue];
+    [model setECA_nevents:value];
 }
+
+- (IBAction)ecaPulserRateAction:(id)sender {
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    ORMTCModel* mtcModel = [objs objectAtIndex:0];
+    [mtcModel setDbFloat:[sender intValue] forIndex:kPulserPeriod];
+}
+
+- (IBAction)startECAStandardRunAction:(id)sender {
+    NSArray* scriptList = [runControl runScriptList];
+    if([scriptList containsObject:@"ECAStandardRun"]){
+        [runControl selectRunTypeScriptByName:@"ECAStandardRun"];
+        [runControl startRun];
+        //Reset runScript popup menu
+        [runControl setSelectedRunTypeScript:@"NO"];
+    }
+    else{
+        NSLog(@"ECA Standard Run not configured. Please, set the RunScript properly. ECA run won't start.");
+    }
+}
+
+- (IBAction)startECASingleRunAction:(id)sender {
+    NSArray* scriptList = [runControl runScriptList];
+    if([scriptList containsObject:@"ECASingleRun"]){
+        [runControl selectRunTypeScriptByName:@"ECASingleRun"];
+        [runControl startRun];
+        //Reset runScript popup
+        [runControl setSelectedRunTypeScript:@"NO"];
+    }
+    else{
+        NSLog(@"ECA Single Run not configured. Please, set the RunScript properly. ECA run won't start.");
+    }
+}
+
 
 //STANDARD RUNS
 - (IBAction)standardRunNewValueAction:(id)sender {
@@ -1456,6 +1484,7 @@ snopGreenColor;
     } else{
         [[standardRunThresNewValues cellAtRow:11 column:0] setTextColor:[self snopRedColor]];
     }
+    [ecaPulserRateField setDoubleValue:[mtcModel dbFloatByIndex:kPulserPeriod]];
     
 }
 

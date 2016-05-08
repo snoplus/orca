@@ -313,7 +313,7 @@ logPort;
     [self setECA_pattern:[decoder decodeIntForKey:@"SNOPECApattern"]];
     [self setECA_type:[decoder decodeIntForKey:@"SNOPECAtype"]];
     [self setECA_tslope_pattern:[decoder decodeIntForKey:@"SNOPECAtslppattern"]];
-    [self setECA_subrun_time:[decoder decodeDoubleForKey:@"SNOPECAsubruntime"]];
+    [self setECA_nevents:[decoder decodeIntForKey:@"SNOPECANEvents"]];
 
     //Settings
     [self setMTCHost:[decoder decodeObjectForKey:@"mtcHost"]];
@@ -1437,7 +1437,7 @@ err:
     [encoder encodeInt:[self ECA_pattern] forKey:@"SNOPECApattern"];
     [encoder encodeInt:[self ECA_type] forKey:@"SNOPECAtype"];
     [encoder encodeInt:[self ECA_tslope_pattern] forKey:@"SNOPECAtslppattern"];
-    [encoder encodeDouble:[self ECA_subrun_time] forKey:@"SNOPECAsubruntime"];
+    [encoder encodeInt:[self ECA_nevents] forKey:@"SNOPECANEvents"];
 
     //Settings
     [encoder encodeObject:[self mtcHost] forKey:@"mtcHost"];
@@ -1784,14 +1784,15 @@ err:
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
 }
 
-- (double)ECA_subrun_time
+- (int)ECA_nevents
 {
-    return ECA_subrun_time;
+    return ECA_nevents;
 }
 
-- (void) setECA_subrun_time:(double)aValue
+- (void) setECA_nevents:(int)aValue
 {
-    ECA_subrun_time = aValue;
+    if(aValue <= 0) aValue = 1;
+    ECA_nevents = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
 }
 

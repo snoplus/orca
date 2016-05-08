@@ -136,7 +136,7 @@
         int ECA_pattern;
         int ECA_type;
         int ECA_tslope_pattern;
-        double ECA_subrun_time;
+        int ECA_nevents;
     
 }
 
@@ -261,11 +261,11 @@
 - (int) ECA_pattern;
 - (int) ECA_type;
 - (int) ECA_tslope_pattern;
-- (double) ECA_subrun_time;
+- (int) ECA_nevents;
 - (void) setECA_pattern:(int)aValue;
 - (void) setECA_type:(int)aValue;
 - (void) setECA_tslope_pattern:(int)aValue;
-- (void) setECA_subrun_time:(double)aValue;
+- (void) setECA_nevents:(int)aValue;
 
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder;

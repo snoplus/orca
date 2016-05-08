@@ -118,7 +118,9 @@
     IBOutlet NSPopUpButton *ECApatternPopUpButton;
     IBOutlet NSPopUpButton *ECAtypePopUpButton;
     IBOutlet NSTextField *TSlopePatternTextField;
-    IBOutlet NSTextField *subTimeTextField;
+    IBOutlet NSTextField *ecaNEventsTextField;
+    IBOutlet NSTextField *ecaPulserRateField;
+
     NSButton *refreshRunWordNames;
     
     //Custom colors
