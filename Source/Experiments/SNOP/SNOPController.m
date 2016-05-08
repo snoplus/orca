@@ -341,7 +341,7 @@ snopGreenColor;
     
     NSString* standardRun = [model standardRunType];
     if([standardRunPopupMenu indexOfItemWithObjectValue:standardRun] == NSNotFound){
-        NSLog(@"Standard Run \"%@\" does not exist in DB. \n",standardRun);
+        NSLogColor([NSColor redColor],@"Standard Run \"%@\" does not exist in DB. \n",standardRun);
     }
     else{
         [standardRunPopupMenu selectItemWithObjectValue:standardRun];
@@ -358,7 +358,7 @@ snopGreenColor;
 {
     NSString* standardRunVersion = [model standardRunVersion];
     if([standardRunVersionPopupMenu indexOfItemWithObjectValue:standardRunVersion] == NSNotFound){
-        NSLog(@"Standard Run Version \"%@\" does not exist in DB. \n",standardRunVersion);
+        NSLogColor([NSColor redColor],@"Standard Run Version \"%@\" does not exist in DB. \n",standardRunVersion);
     }
     else{
         [standardRunVersionPopupMenu selectItemWithObjectValue:standardRunVersion];
@@ -366,17 +366,6 @@ snopGreenColor;
     
     [self displayThresholdsFromDB];
     [self runTypeWordChanged:nil];
-}
-
-- (IBAction)maintenanceBoxAction:(id)sender {
-
-    if([maintenanceRunBox state]){
-        [runControl setRunType:([runControl runType] & ~(0x1FFE)) | (eMaintenanceRunType)]; //Maintenance is now mutually exclusive
-    }
-    else{
-        [runControl setRunType:[runControl runType] & ~(eMaintenanceRunType)];
-    }
-    
 }
 
 - (IBAction) startRunAction:(id)sender
@@ -672,14 +661,14 @@ snopGreenColor;
 
 - (IBAction) setHighThreholdsAction:(id)sender
 {
-    NSLog(@"Setting detector to a safe state...\n");
-    [model loadOfflineRun];
+    NSLogColor([NSColor redColor],@"Setting detector to a safe state...\n");
+    [model loadHighThresholdRun];
 }
 
 - (IBAction)hvMasterPanicAction:(id)sender
 {
     [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
-    NSLog(@"Detector wide panic down started\n");
+    NSLogColor([NSColor redColor],@"Detector wide panic down started\n");
 }
 
 - (IBAction)updatexl3Mode:(id)sender{
@@ -754,7 +743,7 @@ snopGreenColor;
 }
 
 - (IBAction) opManualAction:(id)sender {
-    NSString *url = [NSString stringWithFormat:@"https://www.snolab.ca/snoplus/TWiki/bin/view/Main/OperatorManual"];
+    NSString *url = [NSString stringWithFormat:@"http://snopl.us/detector/operator_manual/operator_manual.html"];
     NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlScaped]];
 }
@@ -1168,7 +1157,6 @@ snopGreenColor;
     [standardRunSaveDefaultsButton setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunLoadButton setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunLoadDefaultsButton setEnabled:!lockedOrNotRunningMaintenance];
-    [maintenanceRunBox setEnabled:!locked];
     [runTypeWordMatrix setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunVersionPopupMenu setEnabled:!locked];
     [timedRunCB setEnabled:!lockedOrNotRunningMaintenance];
@@ -1201,7 +1189,7 @@ snopGreenColor;
     //Refresh values in GUI to match the model
     NSInteger* index = [model ECA_pattern] -1;
     [ECApatternPopUpButton selectItemAtIndex:index];
-    [ECAtypePopUpButton selectItemWithTitle:[model ECA_type]];
+    [ECAtypePopUpButton selectItemWithTitle:[[model ECA_type] retain]];
     int integ = [model ECA_tslope_pattern];
     [TSlopePatternTextField setIntValue:integ];
     integ = [model ECA_nevents];
@@ -1242,7 +1230,7 @@ snopGreenColor;
         [runControl startRun];
     }
     else{
-        NSLog(@"ECA Standard Run not configured. Please, set the RunScript properly. ECA run won't start. \n");
+        NSLogColor([NSColor redColor],@"ECA Standard Run not configured. Please, set the RunScript properly. ECA run won't start. \n");
     }
 }
 
@@ -1253,7 +1241,7 @@ snopGreenColor;
         [runControl startRun];
     }
     else{
-        NSLog(@"ECA Single Run not configured. Please, set the RunScript properly. ECA run won't start. \n");
+        NSLogColor([NSColor redColor],@"ECA Single Run not configured. Please, set the RunScript properly. ECA run won't start. \n");
     }
 }
 
@@ -1535,7 +1523,7 @@ snopGreenColor;
     [standardRunPopupMenu setStringValue:standardRun];
     //Do not allow to overwrite the detector safe offline run
     if ([standardRun isEqualTo:@"HIGH THRESHOLDS"]){
-        ORRunAlertPanel([NSString stringWithFormat:@"Can create a version called HIGH THRESHOLDS"], @"It is a protected word",@"Cancel",@"OK",nil);
+        ORRunAlertPanel([NSString stringWithFormat:@"Cannot create a version called HIGH THRESHOLDS"], @"It is a protected word",@"Cancel",@"OK",nil);
         return;
     }
     //Create new SR if does not exist
@@ -1570,7 +1558,7 @@ snopGreenColor;
 
     if([standardRunVersionPopupMenu indexOfItemWithObjectValue:standardRunVer] == NSNotFound && [standardRunVer isEqualToString:@"DEFAULT"]) {
         //Should never get here, but being cautious
-        ORRunAlertPanel([NSString stringWithFormat:@"Can create a version called DEFAULT"], @"It is a protected word",@"Cancel",@"OK",nil);
+        ORRunAlertPanel([NSString stringWithFormat:@"Cannot create a version called DEFAULT"], @"It is a protected word",@"Cancel",@"OK",nil);
         return;
     }
 
@@ -1598,14 +1586,12 @@ snopGreenColor;
 { dispatch_async(dispatch_get_main_queue(), ^{
 
     unsigned long currentRunWord = [runControl runType];
+
     [model setRunTypeWord:currentRunWord];
     //Update display
     for(int i=0;i<32;i++){
         [[runTypeWordMatrix cellAtRow:i column:0] setState:(currentRunWord &(1L<<i))!=0];
     }
-
-    //Special maintenance box
-    [maintenanceRunBox setState:(currentRunWord &(1L<<0))!=0];
     
 }); }
 
@@ -1620,7 +1606,7 @@ snopGreenColor;
         for (int i=0; i<[standardRunThresDefaultValues numberOfRows];i++) {
             [[standardRunThresStoredValues cellAtRow:i column:0] setStringValue:@"--"];
         }
-        NSLog(@"Standard Run Version not set \n");
+        NSLogColor([NSColor redColor],@"Standard Run Version not set \n");
         return;
     }
     
@@ -1636,7 +1622,7 @@ snopGreenColor;
     NSString *ret = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]autorelease];
     NSDictionary *defaultSettings = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
     if(error) {
-        NSLog(@"Couldn't retrieve SR DEFAULT values. Error querying couchDB, please check the connection is correct. Error: \n %@ \n", error);
+        NSLogColor([NSColor redColor],@"Couldn't retrieve SR DEFAULT values. Error querying couchDB, please check the connection is correct. Error: \n %@ \n", error);
         return;
     }
     
@@ -1650,7 +1636,7 @@ snopGreenColor;
     ret = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]autorelease];
     NSDictionary *versionSettings = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
     if(error) {
-        NSLog(@"Couldn't retrieve SR VERSION values. Error querying couchDB, please check the connection is correct. Error: \n %@ \n", error);
+        NSLogColor([NSColor redColor],@"Couldn't retrieve SR VERSION values. Error querying couchDB, please check the connection is correct. Error: \n %@ \n", error);
         return;
     }
 
@@ -1663,7 +1649,7 @@ snopGreenColor;
         for (int i=0; i<[standardRunThresDefaultValues numberOfRows];i++) {
             [[standardRunThresDefaultValues cellAtRow:i column:0] setStringValue:@"--"];
         }
-        NSLog(@"Cannot display DEFAULT values. There was some problem with the Standard Run DataBase. \n");
+        NSLogColor([NSColor redColor],@"Cannot display DEFAULT values. There was some problem with the Standard Run DataBase. \n");
     } else {
         int gtmask = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,GtMask"] intValue];
         //NHIT100HI
@@ -1800,7 +1786,7 @@ snopGreenColor;
         for (int i=0; i<[standardRunThresStoredValues numberOfRows];i++) {
             [[standardRunThresStoredValues cellAtRow:i column:0] setStringValue:@"--"];
         }
-        NSLog(@"Cannot display TEST RUN values. There was some problem with the Standard Run DataBase. \n");
+        NSLogColor([NSColor redColor],@"Cannot display TEST RUN values. There was some problem with the Standard Run DataBase. \n");
     } else {
         int gtmask = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,GtMask"] intValue];
         //NHIT100HI

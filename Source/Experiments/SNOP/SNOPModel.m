@@ -1833,11 +1833,7 @@ err:
     @try{
 
         //Load run type word
-        //DO NOT TOUCH THE MAINTENANCE BIT!
-        unsigned long currentRunTypeWord = [self runTypeWord];
         unsigned long nextruntypeword = [[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"run_type_word"] unsignedLongValue];
-        if(currentRunTypeWord>>0 & 1) nextruntypeword |= 1 << 0;//In maintenance
-        else nextruntypeword &= ~(1 << 0) << 0;
         [runControlModel setRunType:nextruntypeword];
         
         //Load MTC thresholds
@@ -1917,7 +1913,7 @@ err:
 
 }
 
--(void) loadOfflineRun
+-(void) loadHighThresholdRun
 {
 
     //Get RC model
@@ -2037,6 +2033,8 @@ err:
     [runDocDict setObject:@"" forKey:@"timestamp_end"];
     [runDocDict setObject:@"" forKey:@"sudbury_time_end"];
     //[runDocDict setObject:@"" forKey:@"run_stop"];
+
+    [runDocDict setObject:[self ECA_type] forKey:@"eca_type"];
 
     self.runDocument = runDocDict;
     
