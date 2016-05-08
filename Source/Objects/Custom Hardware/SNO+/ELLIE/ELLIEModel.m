@@ -1076,8 +1076,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
             //Loop through each intensity of a SMELLIE run
             for(int i=0; i < loopLength; i++){
                 
-                //if([[NSThread currentThread] isCancelled] || ![runControl isRunning]){
-                if([[NSThread currentThread] isCancelled]){
+                if([[NSThread currentThread] isCancelled] || ![runControl isRunning]){
                     endOfRun = YES;
                     break;
                 }
