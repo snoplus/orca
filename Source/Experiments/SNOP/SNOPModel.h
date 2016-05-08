@@ -127,7 +127,8 @@
     @private
         //Run type word
         unsigned long runTypeWord;
-        NSString * lastRunTypeWord;
+        unsigned long lastRunTypeWord;
+        NSString * lastRunTypeWordHex;
         //ECA stuff
         int ECA_pattern;
         int ECA_type;
@@ -241,8 +242,10 @@
 - (int) viewType;
 - (unsigned long) runTypeWord;
 - (void) setRunTypeWord:(unsigned long)aMask;
-- (NSString*) lastRunTypeWord;
-- (void) setLastRunTypeWord:(NSString*)aValue;
+- (unsigned long) lastRunTypeWord;
+- (void) setLastRunTypeWord:(unsigned long)aMask;
+- (NSString*) lastRunTypeWordHex;
+- (void) setLastRunTypeWordHex:(NSString*)aValue;
 - (NSString*) standardRunType;
 - (void) setStandardRunType:(NSString*)aValue;
 - (NSString*) standardRunVersion;

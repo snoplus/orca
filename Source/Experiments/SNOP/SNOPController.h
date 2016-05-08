@@ -125,6 +125,7 @@
     NSColor *snopRedColor;
     NSColor *snopBlueColor;
     NSColor *snopGreenColor;
+    NSColor *snopOrangeColor;
 
 }
 
@@ -133,6 +134,7 @@
 @property (nonatomic,retain) NSColor *snopRedColor;
 @property (nonatomic,retain) NSColor *snopBlueColor;
 @property (nonatomic,retain) NSColor *snopGreenColor;
+@property (nonatomic,retain) NSColor *snopOrangeColor;
 
 #pragma mark ¥¥¥Initialization
 - (void) registerNotificationObservers;

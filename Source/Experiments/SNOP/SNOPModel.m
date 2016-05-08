@@ -1422,14 +1422,24 @@ logPort;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPRunTypeWordChangedNotification object: self];
 }
 
-- (NSString*) lastRunTypeWord
+- (unsigned long) lastRunTypeWord
 {
     return lastRunTypeWord;
 }
 
-- (void) setLastRunTypeWord:(NSString*)aValue
+- (void) setLastRunTypeWord:(unsigned long)aValue
 {
     lastRunTypeWord = aValue;
+}
+
+- (NSString*) lastRunTypeWordHex
+{
+    return lastRunTypeWordHex;
+}
+
+- (void) setLastRunTypeWordHex:(NSString*)aValue
+{
+    lastRunTypeWordHex = aValue;
 }
 
 - (NSString*)standardRunType

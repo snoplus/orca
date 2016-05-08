@@ -44,6 +44,7 @@ smellieRunFileList,
 smellieRunFile,
 snopBlueColor,
 snopRedColor,
+snopOrangeColor,
 snopGreenColor;
 
 #pragma mark ¥¥¥Initialization
@@ -192,6 +193,7 @@ snopGreenColor;
     [self setSnopBlueColor:[NSColor colorWithSRGBRed:153./255. green:204./255. blue:255./255. alpha:1]];
     [self setSnopRedColor:[NSColor colorWithSRGBRed:255./255. green:102./255. blue:102./255. alpha:1]];
     [self setSnopGreenColor:[NSColor colorWithSRGBRed:0./255. green:150./255. blue:0./255. alpha:1]];
+    [self setSnopOrangeColor:[NSColor colorWithSRGBRed:255./255. green:178./255. blue:102./255. alpha:1]];
 
     //Sync runnumber with main RunControl
     [self updateRunInfo:nil];
@@ -403,27 +405,36 @@ snopGreenColor;
     [runControl haltRun];
 }
 
-- (void) runStatusChanged:(NSNotification*)aNotification{
+- (void) runStatusChanged:(NSNotification*)aNotification
+{ dispatch_async(dispatch_get_main_queue(), ^{
     
     if([runControl runningState] == eRunInProgress){
         [startRunButton setEnabled:true];
-        [startRunButton setTitle:@"RESTART RUN"];
+        [startRunButton setTitle:@"RESTART"];
         [lightBoardView setState:kGoLight];
+        if(([model lastRunTypeWord]>>0) & 1){
+            [runStatusField setStringValue:@"Running Maintenance"];
+        } else{
+            [runStatusField setStringValue:@"Running"];
+        }
 	}
 	else if([runControl runningState] == eRunStopped){
         [startRunButton setEnabled:true];
-        [startRunButton setTitle:@"START RUN"];
+        [startRunButton setTitle:@"START"];
         [lightBoardView setState:kStoppedLight];
+        [runStatusField setStringValue:@"Stopped"];
 	}
 	else if([runControl runningState] == eRunStarting || [runControl runningState] == eRunStopping || [runControl runningState] == eRunBetweenSubRuns){
         if([runControl runningState] == eRunStarting){
             //The run started so update the display
+            [runStatusField setStringValue:@"Starting"];
             [startRunButton setEnabled:false];
             [startRunButton setTitle:@"STARTING..."];
             [model setLastStandardRunType:[model standardRunType]];
             [model setLastStandardRunVersion:[model standardRunVersion]];
+            [model setLastRunTypeWord:[model runTypeWord]];
             NSString* _lastRunTypeWord = [[NSString stringWithFormat:@"0x%X",(int)[model runTypeWord]] copy];
-            [model setLastRunTypeWord:_lastRunTypeWord]; //FIXME: revisit if we go over 32 bits
+            [model setLastRunTypeWordHex:_lastRunTypeWord]; //FIXME: revisit if we go over 32 bits
         }
 		else {
             //Do nothing
@@ -431,7 +442,7 @@ snopGreenColor;
         [lightBoardView setState:kCautionLight];
 	}
     
-}
+}); }
 
 - (void) viewTypeChanged:(NSNotification*)aNote
 {
@@ -452,7 +463,7 @@ snopGreenColor;
 }
 
 - (void) hvStatusChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     
     bool globalHVON = false;
     
@@ -589,7 +600,9 @@ snopGreenColor;
         [detectorHVStatus setBackgroundColor:snopBlueColor];
         [panicDownButton setEnabled:0];
     }
-}
+
+}); }
+
 
 #pragma mark ¥¥¥Interface Management
 - (IBAction) viewTypeAction:(id)sender
@@ -1130,7 +1143,7 @@ snopGreenColor;
 }
 
 - (void) runsLockChanged:(NSNotification*)aNotification
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     BOOL runInProgress				= [gOrcaGlobals runInProgress];
     BOOL locked						= [gSecurity isLocked:ORSNOPRunsLockNotification];
     BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORSNOPRunsLockNotification];
@@ -1155,24 +1168,24 @@ snopGreenColor;
     [repeatRunCB setEnabled:!lockedOrNotRunningMaintenance];
     
     //Display status
-    [lockStatusTextField setStringValue:@"UNLOCKED"];
-    [lockStatusTextField setBackgroundColor:snopBlueColor];
+    [lockStatusTextField setStringValue:@"EXPERT MODE"];
+    [lockStatusTextField setBackgroundColor:snopRedColor];
     if(lockedOrNotRunningMaintenance){
         if(locked){
-            [lockStatusTextField setStringValue:@"LOCKED"];
-            [lockStatusTextField setBackgroundColor:snopRedColor];
+            [lockStatusTextField setStringValue:@"OPERATOR MODE"];
+            [lockStatusTextField setBackgroundColor:snopBlueColor];
         }
         else{
             [lockStatusTextField setStringValue:@"RUN IN PROGRESS"];
-            [lockStatusTextField setBackgroundColor:snopRedColor];
+            [lockStatusTextField setBackgroundColor:snopGreenColor];
         }
     }
     else if(runInProgress){
-        [lockStatusTextField setStringValue:@"MAINTENACE RUN"];
-        [lockStatusTextField setBackgroundColor:[NSColor orangeColor]];
+        [lockStatusTextField setStringValue:@"RUNNING IN MAINTENACE"];
+        [lockStatusTextField setBackgroundColor:snopOrangeColor];
     }
     
-}
+}); }
 
 - (void) runsECAChanged:(NSNotification*)aNotification
 {
@@ -1211,6 +1224,100 @@ snopGreenColor;
 }
 
 //STANDARD RUNS
+- (IBAction)standardRunNewValueAction:(id)sender {
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    ORMTCModel* mtcModel = [objs objectAtIndex:0];
+
+    int activeCell = [sender selectedRow];
+    //NHIT100HI
+    float nHits;
+    float mVolts;
+    float dcOffset;
+    float mVperNHit;
+    float raw;
+    if(activeCell == 0) {
+        nHits = [[sender cellAtRow:0 column:0] floatValue];
+        dcOffset  = [mtcModel dbFloatByIndex:kNHit100HiThreshold + kNHitDcOffset_Offset];
+        mVperNHit = [mtcModel dbFloatByIndex:kNHit100HiThreshold + kmVoltPerNHit_Offset];
+        raw = [mtcModel NHitsToRaw:nHits dcOffset:dcOffset mVperNHit:mVperNHit];
+        [mtcModel setDbFloat: raw forIndex:kNHit100HiThreshold];
+    }
+    //NHIT100MED
+    if(activeCell == 1) {
+        nHits = [[sender cellAtRow:1 column:0] floatValue];
+        dcOffset  = [mtcModel dbFloatByIndex:kNHit100MedThreshold + kNHitDcOffset_Offset];
+        mVperNHit = [mtcModel dbFloatByIndex:kNHit100MedThreshold + kmVoltPerNHit_Offset];
+        raw = [mtcModel NHitsToRaw:nHits dcOffset:dcOffset mVperNHit:mVperNHit];
+        [mtcModel setDbFloat: raw forIndex:kNHit100MedThreshold];
+    }
+    //NHIT100LO
+    if(activeCell == 2) {
+        nHits = [[sender cellAtRow:2 column:0] floatValue];
+        dcOffset  = [mtcModel dbFloatByIndex:kNHit100LoThreshold + kNHitDcOffset_Offset];
+        mVperNHit = [mtcModel dbFloatByIndex:kNHit100LoThreshold + kmVoltPerNHit_Offset];
+        raw = [mtcModel NHitsToRaw:nHits dcOffset:dcOffset mVperNHit:mVperNHit];
+        [mtcModel setDbFloat: raw forIndex:kNHit100LoThreshold];
+    }
+    //NHIT20
+    if(activeCell == 3) {
+        nHits = [[sender cellAtRow:3 column:0] floatValue];
+        dcOffset  = [mtcModel dbFloatByIndex:kNHit20Threshold + kNHitDcOffset_Offset];
+        mVperNHit = [mtcModel dbFloatByIndex:kNHit20Threshold + kmVoltPerNHit_Offset];
+        raw = [mtcModel NHitsToRaw:nHits dcOffset:dcOffset mVperNHit:mVperNHit];
+        [mtcModel setDbFloat: raw forIndex:kNHit20Threshold];
+    }
+    //NHIT20LO
+    if(activeCell == 4) {
+        nHits = [[sender cellAtRow:4 column:0] floatValue];
+        dcOffset  = [mtcModel dbFloatByIndex:kNHit20LBThreshold + kNHitDcOffset_Offset];
+        mVperNHit = [mtcModel dbFloatByIndex:kNHit20LBThreshold + kmVoltPerNHit_Offset];
+        raw = [mtcModel NHitsToRaw:nHits dcOffset:dcOffset mVperNHit:mVperNHit];
+        [mtcModel setDbFloat: raw forIndex:kNHit20LBThreshold];
+    }
+    //OWLN
+    if(activeCell == 5) {
+        nHits = [[sender cellAtRow:5 column:0] floatValue];
+        dcOffset  = [mtcModel dbFloatByIndex:kOWLNThreshold + kNHitDcOffset_Offset];
+        mVperNHit = [mtcModel dbFloatByIndex:kOWLNThreshold + kmVoltPerNHit_Offset];
+        raw = [mtcModel NHitsToRaw:nHits dcOffset:dcOffset mVperNHit:mVperNHit];
+        [mtcModel setDbFloat: raw forIndex:kOWLNThreshold];
+    }
+    //ESUMHI
+    if(activeCell == 6) {
+        mVolts = [[sender cellAtRow:6 column:0] floatValue];
+        raw = [mtcModel mVoltsToRaw:mVolts];
+        [mtcModel setDbFloat: raw forIndex:kESumHiThreshold];
+    }
+    //ESUMLO
+    if(activeCell == 7) {
+        mVolts = [[sender cellAtRow:7 column:0] floatValue];
+        raw = [mtcModel mVoltsToRaw:mVolts];
+        [mtcModel setDbFloat: raw forIndex:kESumLowThreshold];
+    }
+    //OWLEHI
+    if(activeCell == 8) {
+        mVolts = [[sender cellAtRow:8 column:0] floatValue];
+        raw = [mtcModel mVoltsToRaw:mVolts];
+        [mtcModel setDbFloat: raw forIndex:kOWLEHiThreshold];
+    }
+    //OWLELO
+    if(activeCell == 9) {
+        mVolts = [[sender cellAtRow:9 column:0] floatValue];
+        raw = [mtcModel mVoltsToRaw:mVolts];
+        [mtcModel setDbFloat: raw forIndex:kOWLELoThreshold];
+    }
+    //Prescale
+    if(activeCell == 10) {
+        raw = [[sender cellAtRow:10 column:0] floatValue];
+        [mtcModel setDbFloat: raw forIndex:kNhit100LoPrescale];
+    }
+    //Pulser
+    if(activeCell == 11) {
+        raw = [[sender cellAtRow:11 column:0] floatValue];
+        [mtcModel setDbFloat: raw forIndex:kPulserPeriod];
+    }
+}
+
 - (void) mtcDataBaseChanged:(NSNotification*)aNotification
 {
     
@@ -1452,7 +1559,8 @@ snopGreenColor;
 
 //Run Type Word
 -(void) runTypeWordChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
+
     unsigned long currentRunWord = [runControl runType];
     [model setRunTypeWord:currentRunWord];
     //Update display
@@ -1463,7 +1571,7 @@ snopGreenColor;
     //Special maintenance box
     [maintenanceRunBox setState:(currentRunWord &(1L<<0))!=0];
     
-}
+}); }
 
 -(void) displayThresholdsFromDB {
 
