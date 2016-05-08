@@ -28,17 +28,17 @@
     NSMutableArray* smellieSubRunInfo;
     bool _smellieDBReadInProgress;
     float pulseByPulseDelay;
-    
+
     //Server Clients
     XmlrpcClient* _tellieClient;
     XmlrpcClient* _smellieClient;
-    
+
     //tellie settings
     NSMutableDictionary* tellieSubRunSettings;
     NSMutableDictionary* tellieFireParameters;
     NSMutableDictionary* tellieFibreMapping;
     BOOL ellieFireFlag;
-    
+
     //smellie config mappings
     NSMutableDictionary* smellieLaserHeadToSepiaMapping;
     NSMutableDictionary* smellieLaserHeadToGainMapping;

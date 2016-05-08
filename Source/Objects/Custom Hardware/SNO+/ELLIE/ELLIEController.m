@@ -790,11 +790,6 @@
     //[model validationSmellieSettings];
 }
 
--(IBAction)testButtonAction:(id)sender
-{
-    //[model testFunction];
-}
-
 -(IBAction)makeNewSmellieRun:(id)sender
 {
     NSAutoreleasePool* smellieSettingsPool = [[NSAutoreleasePool alloc] init];

@@ -995,13 +995,10 @@ smellieRunFile;
     [smellieRunFileNameField setEnabled:NO];
     [smellieStopRunButton setEnabled:YES];
     [smellieStartRunButton setEnabled:NO];
-    
+
     //assign the run type as a SMELLIE run
     //[model setRunType:kRunSmellie];
-    
-    //start different sub runs as the laser runs through
-    //communicate with smellie model
-    
+
     //Collect a series of objects from the ELLIEModel
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
     if (![objs count]) {
@@ -1020,7 +1017,7 @@ smellieRunFile;
     
     smellieThread = [[NSThread alloc] initWithTarget:theELLIEModel selector:@selector(startSmellieRun:) object:smellieRunFile];
     [smellieThread start];
-    
+
     //}
     //else{
     //    NSLog(@"Smellie Run Type is not masked in. Please mask this in and try again \n");
@@ -1063,11 +1060,10 @@ smellieRunFile;
     [smellieStartRunButton setEnabled:YES];
     [smellieStopRunButton setEnabled:NO];
     //[smellieCheckInterlock setEnabled:YES];
-    
-    
+
     //unassign the run type as a SMELLIE run
     //[model setRunType:kRunUndefined];
-    
+
     //Collect a series of objects from the ELLIEModel
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
     if (![objs count]) {
@@ -1077,17 +1073,17 @@ smellieRunFile;
                         reason:reasonStr
                         userInfo:nil];
       [e raise];
-    }    
+    }
     ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
-    
+
     //Method for completing this without a new thread
     [theELLIEModel stopSmellieRun];
-    
+
     [smellieThread cancel];
     NSLog(@"IS THREAD CANCELED? : %@", [[NSThread currentThread] isCancelled]);
     [smellieThread release];
     smellieThread = nil;
-    
+
     //wait for the current loop to finish
     //move straight to a maintainence run
     //communicate with smellie model
