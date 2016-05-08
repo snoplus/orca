@@ -39,10 +39,10 @@
         
     //fetch the current version of the smellie configuration
     ELLIEModel* aELLIEModel = [[ELLIEModel alloc] init];
-    currentConfigurationVersion = [aELLIEModel fetchRecentVersion];
+    currentConfigurationVersion = [aELLIEModel fetchRecentConfigVersion];
     
     //fetch the data associated with the current configuration
-    configForSmellie = [[aELLIEModel fetchCurrentConfigurationForVersion:currentConfigurationVersion] mutableCopy];
+    configForSmellie = [[aELLIEModel fetchConfigurationFile:currentConfigurationVersion] mutableCopy];
     
     //increment the current version of the incrementation
     currentConfigurationVersion = [NSNumber numberWithInt:[currentConfigurationVersion intValue] + 1];
@@ -1316,7 +1316,7 @@ BOOL isNumeric(NSString *s)
         arg2 = @"0";
     }
     
-    [model sendCustomSmellieCmd:cmd withArgument1:arg1 withArgument2:arg2];
+    [model sendCustomSmellieCmd:cmd withArgs:@[arg1, arg2]];
 }
 //TELLIE functions -------------------------
 

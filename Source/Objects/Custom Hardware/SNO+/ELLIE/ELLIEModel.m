@@ -1073,7 +1073,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
             NSString *inputFibreSwitchChannel = [NSString stringWithFormat:@"%@",[[self smellieLaserToInputFibreMapping] objectForKey:laserKey]];
             
             NSString* popUpMessage = [NSString stringWithFormat:@"About to set the fire switch: Input Channel %@, Laser %@, Output Channel %@\n",inputFibreSwitchChannel,laserKey,[NSString stringWithFormat:@"%@",[[self smellieFibreSwitchToFibreMapping] objectForKey:fibreKey]]];
-            ORRunAlertPanel(@"SMELLIE",popUpMessage,@"OK",nil,nil);
+            ORRunAlertPanel(@"SMELLIE HARDWARE NOTIFICATION",popUpMessage,@"OK",nil,nil);
             NSLog(@"SMELLIE_RUN:Setting the Fibre Switch to Input Channel:%@ from the %@ Laser and Output Channel %@\n",inputFibreSwitchChannel,laserKey,[NSString stringWithFormat:@"%@",[[self smellieFibreSwitchToFibreMapping] objectForKey:fibreKey]]);
             [self setFibreSwitch:inputFibreSwitchChannel withOutputChannel:[NSString stringWithFormat:@"%@",[[self smellieFibreSwitchToFibreMapping] objectForKey:fibreKey]]];
             ORRunAlertPanel(@"SMELLIE",@"Fibre switch set!",@"OK",nil,nil);
@@ -1098,7 +1098,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
             //Loop through each intensity of a SMELLIE run
             for(int i=0; i < loopLength; i++){
                 
-                if([[NSThread currentThread] isCancelled]){
+                if([[NSThread currentThread] isCancelled] || ![runControl isRunning]){
                     endOfRun = YES;
                     break;
                 }

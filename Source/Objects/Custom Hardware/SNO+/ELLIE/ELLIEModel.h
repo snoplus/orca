@@ -117,8 +117,8 @@
 -(NSMutableArray*)getSmellieRunFibreArray:(NSDictionary*)smellieSettings;
 -(NSMutableArray*)getSmellieRunFrequencyArray:(NSDictionary*)smellieSettings;
 -(NSMutableArray*)getSmellieRunIntensityArray:(NSDictionary*)smellieSettings;
--(NSMutableArray*)getLowEdgeWavelengthArray:(NSDictionary*)smellieSettings;
--(NSMutableArray*)getHighEdgeWavelengthArray:(NSDictionary*)smellieSettings;
+-(NSMutableArray*)getSmellieLowEdgeWavelengthArray:(NSDictionary*)smellieSettings;
+-(NSMutableArray*)getSmellieHighEdgeWavelengthArray:(NSDictionary*)smellieSettings;
 -(void) startSmellieRunInBackground:(NSDictionary*)smellieSettings;
 -(void) startSmellieRun:(NSDictionary*)smellieSettings;
 -(void) stopSmellieRun;
