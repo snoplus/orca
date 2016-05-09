@@ -651,7 +651,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 #if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
     NSAlert *alert = [[[NSAlert alloc] init] autorelease];
     [alert setMessageText:s];
-    [alert setInformativeText:@"Really Execute This HardwareWizard Set?"];
+    [alert setInformativeText:[NSString stringWithFormat:@"Really Execute This HardwareWizard Set on %i channels?",chanCount]];
     [alert addButtonWithTitle:@"Yes"];
     [alert addButtonWithTitle:@"Cancel"];
     [alert setAlertStyle:NSWarningAlertStyle];
@@ -670,7 +670,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
                       self,
                       @selector(_doItWithMarkSheetDidEnd:returnCode:contextInfo:),
                       nil,
-                      nil,@"Really Execute This HardwareWizard Set?");
+                      nil,[NSString stringWithFormat:@"Really Execute This HardwareWizard Set on %i channels?",chanCount]);
 #endif
 }
 
@@ -682,7 +682,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 #if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
     NSAlert *alert = [[[NSAlert alloc] init] autorelease];
     [alert setMessageText:@"Hardware Wizard About to Run!"];
-    [alert setInformativeText:@"Really Execute This HardwareWizard Set?"];
+    [alert setInformativeText:[NSString stringWithFormat:@"Really Execute This HardwareWizard Set on %i channels?",chanCount]];
     [alert addButtonWithTitle:@"Yes"];
     [alert addButtonWithTitle:@"Cancel"];
     [alert setAlertStyle:NSWarningAlertStyle];
@@ -702,7 +702,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
                       self,
                       @selector(_doItSheetDidEnd:returnCode:contextInfo:),
                       nil,
-                      nil,@"Really Execute This HardwareWizard Set?");
+                      nil,[NSString stringWithFormat:@"Really Execute This HardwareWizard Set on %i channels?",chanCount]);
 #endif
     
 }
@@ -1179,7 +1179,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     eSelectionLogic	selectionLogic;
     eSelectionLevel	selectionLevel;
     eSelectionAction 	selectionAction;
-    
+    BOOL                firstObject = 1;
 #define kMaskAllChannels 0xffffffff
 #define kMaskChannel1 0x1
 #define kMaxChannels 32
@@ -1201,6 +1201,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
         selectionLevel      = [selectionController objTag]+levelOffset;
         selectionAction     = [selectionController selectionTag];
         
+        /* must use "AND" logic for first object */
+        if (firstObject) {
+            selectionLogic = kSearchLogic_And;
+            firstObject = false;
+        }
         /* get the search edit value */
         long searchValue = [selectionController selectionValue];
         /* initialize channel mask */
