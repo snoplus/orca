@@ -59,7 +59,7 @@
     IBOutlet NSButton *standardRunLoadDefaultsButton;
     IBOutlet NSButton *standardRunSaveButton;
     IBOutlet NSButton *standardRunSaveDefaultsButton;
-    IBOutlet NSMatrix *standardRunThresNewValues;
+    IBOutlet NSMatrix *standardRunThresCurrentValues;
     IBOutlet NSMatrix *standardRunThresStoredValues;
     IBOutlet NSMatrix *standardRunThresDefaultValues;
 
@@ -91,13 +91,6 @@
     IBOutlet NSButton *smellieEmergencyStop;
     IBOutlet NSButton *smellieBuildCustomRun;
     IBOutlet NSButton *smellieChangeConfiguration;
-        
-    //eStop buttons
-    NSThread *eStopPollingThread;
-    IBOutlet NSButton *emergyencyStopEnabled;
-    IBOutlet NSButton *eStopButton;
-    
-    IBOutlet NSTextField *pollingStatus;
 
     IBOutlet NSButton* runsLockButton;
     IBOutlet NSTextField *lockStatusTextField;
@@ -119,6 +112,7 @@
     IBOutlet NSPopUpButton *ECAtypePopUpButton;
     IBOutlet NSTextField *TSlopePatternTextField;
     IBOutlet NSTextField *ecaNEventsTextField;
+    IBOutlet NSTextField *ecaPulserRate;
 
     NSButton *refreshRunWordNames;
     
@@ -127,6 +121,8 @@
     NSColor *snopBlueColor;
     NSColor *snopGreenColor;
     NSColor *snopOrangeColor;
+    NSColor *snopBlackColor;
+    NSColor *snopGrayColor;
 
     /* Mask of which HV supplies are on. Power supply B on crate 16 is bit 19 */
     uint32_t hvMask;
@@ -138,6 +134,8 @@
 @property (nonatomic,retain) NSColor *snopBlueColor;
 @property (nonatomic,retain) NSColor *snopGreenColor;
 @property (nonatomic,retain) NSColor *snopOrangeColor;
+@property (nonatomic,retain) NSColor *snopBlackColor;
+@property (nonatomic,retain) NSColor *snopGrayColor;
 
 #pragma mark ¥¥¥Initialization
 - (void) registerNotificationObservers;
@@ -157,8 +155,6 @@
 
 #pragma mark ¥¥¥Actions
 - (IBAction) viewTypeAction:(id)sender;
-
-- (IBAction) eStop:(id)sender;
 
 - (IBAction) orcaDBIPAddressAction:(id)sender;
 - (IBAction) orcaDBClearHistoryAction:(id)sender;
@@ -183,9 +179,6 @@
 - (IBAction) startSmellieRunAction:(id)sender;
 - (IBAction) stopSmellieRunAction:(id)sender;
 - (IBAction) emergencySmellieStopAction:(id)sender;
-
-//eStop functions
-- (IBAction) enmergencyStopToggle:(id)sender;
 
 //xl3 mode status
 - (IBAction)updatexl3Mode:(id)sender;
