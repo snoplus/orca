@@ -44,10 +44,6 @@
     
     //Run control (the rest is in the ORExperimentController)
     IBOutlet StopLightView *lightBoardView;
-    IBOutlet NSButton *maintenanceRunBox;
-    IBOutlet NSTextField *standardRunTypeField;
-    IBOutlet NSTextField *standardRunVersionField;
-    IBOutlet NSTextField *runTypeWordField;
 
     //Quick links
     
@@ -103,7 +99,7 @@
     IBOutlet NSTextField *pollingStatus;
 
     IBOutlet NSButton* runsLockButton;
-    IBOutlet NSTextField *runStatusTextField;
+    IBOutlet NSTextField *lockStatusTextField;
 
     IBOutlet NSTextField *mtcPort;
     IBOutlet NSTextField *mtcHost;
@@ -121,12 +117,24 @@
     IBOutlet NSPopUpButton *ECApatternPopUpButton;
     IBOutlet NSPopUpButton *ECAtypePopUpButton;
     IBOutlet NSTextField *TSlopePatternTextField;
-    IBOutlet NSTextField *subTimeTextField;
+    IBOutlet NSTextField *ecaNEventsTextField;
+
     NSButton *refreshRunWordNames;
+    
+    //Custom colors
+    NSColor *snopRedColor;
+    NSColor *snopBlueColor;
+    NSColor *snopGreenColor;
+    NSColor *snopOrangeColor;
+
 }
 
 @property (nonatomic,retain) NSMutableDictionary *smellieRunFileList;
 @property (nonatomic,retain) NSDictionary *smellieRunFile;
+@property (nonatomic,retain) NSColor *snopRedColor;
+@property (nonatomic,retain) NSColor *snopBlueColor;
+@property (nonatomic,retain) NSColor *snopGreenColor;
+@property (nonatomic,retain) NSColor *snopOrangeColor;
 
 #pragma mark ¥¥¥Initialization
 - (void) registerNotificationObservers;

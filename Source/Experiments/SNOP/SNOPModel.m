@@ -144,8 +144,8 @@ logPort;
     [self setDataServerPort:4005];
     [self setLogServerPort:4001];
 
-    [self initOrcaDBConnectionHistory];
-    [self initDebugDBConnectionHistory];
+	[self initOrcaDBConnectionHistory];
+	[self initDebugDBConnectionHistory];
     [self initSmellieRunDocsDic];
 
     [[self undoManager] enableUndoRegistration];
@@ -309,14 +309,13 @@ logPort;
     self.debugDBPort = [decoder decodeInt32ForKey:@"ORSNOPModelDebugDBPort"];
     self.debugDBIPAddress = [decoder decodeObjectForKey:@"ORSNOPModelDebugDBIPAddress"];
 
-    //Runs tab
-    [self setStandardRunType:[decoder decodeObjectForKey:@"SNOPStandarRunType"]];
-    [self setStandardRunVersion:[decoder decodeObjectForKey:@"SNOPStandarRunVersion"]];
+    //ECA
     [self setECA_pattern:[decoder decodeIntForKey:@"SNOPECApattern"]];
-    [self setECA_type:[decoder decodeIntForKey:@"SNOPECAtype"]];
+    [self setECA_type:[decoder decodeObjectForKey:@"SNOPECAtype"]];
     [self setECA_tslope_pattern:[decoder decodeIntForKey:@"SNOPECAtslppattern"]];
-    [self setECA_subrun_time:[decoder decodeDoubleForKey:@"SNOPECAsubruntime"]];
+    [self setECA_nevents:[decoder decodeIntForKey:@"SNOPECANEvents"]];
 
+    //Settings
     [self setMTCHost:[decoder decodeObjectForKey:@"mtcHost"]];
     [self setMTCPort:[decoder decodeIntForKey:@"mtcPort"]];
 
@@ -329,6 +328,10 @@ logPort;
     [self setLogServerHost:[decoder decodeObjectForKey:@"logHost"]];
     [self setLogServerPort:[decoder decodeIntForKey:@"logPort"]];
 
+    //Standard Runs
+    [self setStandardRunType:[decoder decodeObjectForKey:@"SNOPStandardRunType"]];
+    [self setStandardRunVersion:[decoder decodeObjectForKey:@"SNOPStandardRunVersion"]];
+    
     /* Check if we actually decoded the mtc, xl3, data, and log server
      * hostnames and ports. decodeObjectForKey() will return NULL if the
      * key doesn't exist, and decodeIntForKey() will return 0. */
@@ -434,11 +437,6 @@ logPort;
     }
 }
 
-//- (NSString*) helpURL
-//{
-//	return @"SNO/Index.html";
-//}
-
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers
 {
@@ -474,11 +472,6 @@ logPort;
                      selector : @selector(runStopped:)
                          name : ORRunStoppedNotification
                        object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(runStateChanged:)
-                         name : ORRunStatusChangedNotification
-                       object : nil];    
 
     [notifyCenter addObserver : self
                      selector : @selector(subRunStarted:)
@@ -838,15 +831,6 @@ err:
                            withObject:[[self.runDocument copy] autorelease]];
     self.runDocument = nil;
     self.configDocument = nil;
-}
-
-- (void) runStateChanged:(NSNotification*)aNote
-{
-    int running = [[[aNote userInfo] objectForKey:ORRunStatusValue] intValue];
-    if(running == eRunStopped){
-    }
-    else if(running == eRunStarting) {
-    }
 }
 
 - (void) subRunStarted:(NSNotification*)aNote
@@ -1449,14 +1433,13 @@ err:
     [encoder encodeInt32:self.debugDBPort forKey:@"ORSNOPModelDebugDBPort"];
     [encoder encodeObject:self.debugDBIPAddress forKey:@"ORSNOPModelDebugDBIPAddress"];
 
-    //Runs tab
-    [encoder encodeObject:[self standardRunType] forKey:@"SNOPStandarRunType"];
-    [encoder encodeObject:[self standardRunVersion] forKey:@"SNOPStandarRunVersion"];
+    //ECA
     [encoder encodeInt:[self ECA_pattern] forKey:@"SNOPECApattern"];
-    [encoder encodeInt:[self ECA_type] forKey:@"SNOPECAtype"];
+    [encoder encodeObject:[self ECA_type] forKey:@"SNOPECAtype"];
     [encoder encodeInt:[self ECA_tslope_pattern] forKey:@"SNOPECAtslppattern"];
-    [encoder encodeDouble:[self ECA_subrun_time] forKey:@"SNOPECAsubruntime"];
+    [encoder encodeInt:[self ECA_nevents] forKey:@"SNOPECANEvents"];
 
+    //Settings
     [encoder encodeObject:[self mtcHost] forKey:@"mtcHost"];
     [encoder encodeInt:[self mtcPort] forKey:@"mtcPort"];
 
@@ -1468,6 +1451,11 @@ err:
 
     [encoder encodeObject:[self logHost] forKey:@"logHost"];
     [encoder encodeInt:[self logPort] forKey:@"logPort"];
+
+    //Runs tab
+    [encoder encodeObject:[self standardRunType] forKey:@"SNOPStandardRunType"];
+    [encoder encodeObject:[self standardRunVersion] forKey:@"SNOPStandardRunVersion"];
+
 }
 
 - (NSString*) reformatSelectionString:(NSString*)aString forSet:(int)aSet
@@ -1603,7 +1591,6 @@ err:
     
 }
 
-
 - (void)hvMasterTriggersOFF
 {
     [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(setIsPollingXl3:) withObject:NO];
@@ -1686,11 +1673,30 @@ err:
     return runTypeWord;
 }
 
-
 - (void) setRunTypeWord:(unsigned long)aValue
 {
     runTypeWord = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPRunTypeWordChangedNotification object: self];
+}
+
+- (unsigned long) lastRunTypeWord
+{
+    return lastRunTypeWord;
+}
+
+- (void) setLastRunTypeWord:(unsigned long)aValue
+{
+    lastRunTypeWord = aValue;
+}
+
+- (NSString*) lastRunTypeWordHex
+{
+    return lastRunTypeWordHex;
+}
+
+- (void) setLastRunTypeWordHex:(NSString*)aValue
+{
+    lastRunTypeWordHex = aValue;
 }
 
 - (NSString*)standardRunType
@@ -1721,6 +1727,30 @@ err:
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelSRVersionChangedNotification object:self];
 }
 
+- (NSString*)lastStandardRunType
+{
+    return lastStandardRunType;
+}
+
+- (void) setLastStandardRunType:(NSString *)aValue
+{
+    [aValue retain];
+    [lastStandardRunType release];
+    lastStandardRunType = aValue;
+}
+
+- (NSString*)lastStandardRunVersion
+{
+    return lastStandardRunVersion;
+}
+
+- (void) setLastStandardRunVersion:(NSString *)aValue
+{
+    [aValue retain];
+    [lastStandardRunVersion release];
+    lastStandardRunVersion = aValue;
+}
+
 - (int)ECA_pattern
 {
     return ECA_pattern;
@@ -1732,12 +1762,12 @@ err:
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
 }
 
-- (int)ECA_type
+- (NSString*)ECA_type
 {
     return ECA_type;
 }
 
-- (void) setECA_type:(int)aValue
+- (void) setECA_type:(NSString*)aValue
 {
     ECA_type = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
@@ -1754,15 +1784,27 @@ err:
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
 }
 
-- (double)ECA_subrun_time
+- (int)ECA_nevents
 {
-    return ECA_subrun_time;
+    return ECA_nevents;
 }
 
-- (void) setECA_subrun_time:(double)aValue
+- (void) setECA_nevents:(int)aValue
 {
-    ECA_subrun_time = aValue;
+    if(aValue <= 0) aValue = 1;
+    ECA_nevents = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
+}
+
+- (NSNumber*)ECA_rate
+{
+    return ECA_rate;
+}
+
+- (void) setECA_rate:(NSNumber*)aValue
+{
+    if(aValue <= 0) aValue = 1;
+    ECA_rate = aValue;
 }
 
 // Load Detector Settings from the DB into the Models
@@ -1778,10 +1820,22 @@ err:
 
     //Get RC model
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* runControlModel = [objs objectAtIndex:0];
+    ORRunModel* runControlModel;
+    if ([objs count]) {
+        runControlModel = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find MTC model. Please add it to the experiment and restart the run.\n");
+        return 0;
+    }
     //Get MTC model
     objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    ORMTCModel* mtcModel = [objs objectAtIndex:0];
+    ORMTCModel* mtc;
+    if ([objs count]) {
+        mtc = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find MTC model. Please add it to the experiment and restart the run.\n");
+        return 0;
+    }
 
     //Query the OrcaDB and get a dictionary with the parameters
     NSString *urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/orca/_design/standardRuns/_view/getStandardRuns?startkey=[\"%@\",\"%@\",{}]&endkey=[\"%@\",\"%@\",0]&descending=True&include_docs=True",[self orcaDBUserName],[self orcaDBPassword],[self orcaDBIPAddress],[self orcaDBPort],runTypeName,runVersion,runTypeName,runVersion];
@@ -1802,26 +1856,35 @@ err:
     @try{
 
         //Load run type word
-        [runControlModel setRunType:[[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"run_type_word"] unsignedLongValue]];
-
-        //Set pedestal mode if ECA
-        if([runTypeName isEqualToString:@"ECA"]){
-            [mtcModel setIsPedestalEnabledInCSR:1];
-        }
-        else{
-            [mtcModel setIsPedestalEnabledInCSR:0];
-        }
+        unsigned long nextruntypeword = [[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"run_type_word"] unsignedLongValue];
+        [runControlModel setRunType:nextruntypeword];
         
-        //Load MTC/D parameters, trigger masks and MTC/A+ thresholds
-        for (int iparam=0; iparam<kDbLookUpTableSize; iparam++) {
-            [mtcModel setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtcModel getDBKeyByIndex:iparam]] forIndex:iparam];
-        }
+        //Load MTC thresholds
+        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kNHit100HiThreshold]] forIndex:kNHit100HiThreshold];
+        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kNHit100MedThreshold]] forIndex:kNHit100MedThreshold];
+        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kNHit100LoThreshold]] forIndex:kNHit100LoThreshold];
+        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kNHit20Threshold]] forIndex:kNHit20Threshold];
+        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kNHit20LBThreshold]] forIndex:kNHit20LBThreshold];
+        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kOWLNThreshold]] forIndex:kOWLNThreshold];
+        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kESumLowThreshold]] forIndex:kESumLowThreshold];
+        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kESumHiThreshold]] forIndex:kESumHiThreshold];
+        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kOWLELoThreshold]] forIndex:kOWLELoThreshold];
+        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kOWLEHiThreshold]] forIndex:kOWLEHiThreshold];
+        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kNhit100LoPrescale]] forIndex:kNhit100LoPrescale];
+        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kPulserPeriod]] forIndex:kPulserPeriod];
+        
+        //Load MTC GT Mask
+        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kGtMask]] forIndex:kGtMask];
+
+        //Load the PED/PGT mode
+        BOOL pedpgtmode = [[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"PED_PGT_Mode"] boolValue];
+        [mtc setIsPedestalEnabledInCSR:pedpgtmode];
         
         NSLog(@"Standard run %@ settings loaded. \n",runTypeName);
         return true;
     }
     @catch (NSException *e) {
-        NSLog(@"Error ",e);
+        NSLog(@"Error retrieving Standard Runs information: \n %@ \n", e);
         return false;
     }
     
@@ -1836,14 +1899,30 @@ err:
         ORRunAlertPanel(@"Invalid Standard Run Name",@"Please, set a valid name in the popup menus and click enter",@"OK",nil,nil);
         return false;
     }
+    else{
+        BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Overwriting stored values for run \"%@\" with version \"%@\"", runTypeName,runVersion],@"Is this really what you want?",@"Cancel",@"Yes, Save it",nil);
+        if(cancel) return false;
+    }
     NSLog(@"Saving settings for Standard Run: %@ - Version: %@ ........ \n",runTypeName,runVersion);
 
     //Get RC model
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* runControlModel = [objs objectAtIndex:0];
+    ORRunModel* runControlModel;
+    if ([objs count]) {
+        runControlModel = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find MTC model. Please add it to the experiment and restart the run.\n");
+        return 0;
+    }
     //Get MTC model
     objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    ORMTCModel* mtcModel = [objs objectAtIndex:0];
+    ORMTCModel* mtc;
+    if ([objs count]) {
+        mtc = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find MTC model. Please add it to the experiment and restart the run.\n");
+        return 0;
+    }
 
     //Build run table
     NSMutableDictionary *detectorSettings = [NSMutableDictionary dictionaryWithCapacity:200];
@@ -1857,9 +1936,10 @@ err:
 
     //Save MTC/D parameters, trigger masks and MTC/A+ thresholds
     for (int iparam=0; iparam<kDbLookUpTableSize; iparam++) {
-        // NSLog(@" Writting %@ to %@ \n", [mtcModel dbObjectByIndex:ithres+kNHit100HiThreshold], [thresholdNames objectAtIndex:ithres]);
-        [detectorSettings setObject:[mtcModel dbObjectByIndex:iparam] forKey:[mtcModel getDBKeyByIndex:iparam]];
+        [detectorSettings setObject:[mtc dbObjectByIndex:iparam] forKey:[mtc getDBKeyByIndex:iparam]];
     }
+    //Save PED/PGT mode
+    [detectorSettings setObject:[NSNumber numberWithBool:[mtc isPedestalEnabledInCSR]] forKey:@"PED_PGT_Mode"];
     
     [[self orcaDbRefWithEntryDB:self withDB:@"orca"] addDocument:detectorSettings tag:@"kStandardRunDocumentAdded"];
 
@@ -1868,6 +1948,52 @@ err:
 
 }
 
+-(void) loadHighThresholdRun
+{
+
+    //Get RC model
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    ORRunModel* runControlModel;
+    if ([objs count]) {
+        runControlModel = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find MTC model. Please add it to the experiment and restart the run.\n");
+        return;
+    }
+    //Get MTC model
+    objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    ORMTCModel* mtc;
+    if ([objs count]) {
+        mtc = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find MTC model. Please add it to the experiment and restart the run.\n");
+        return;
+    }
+    //FIXME: Set correct hardcoded values!!!
+    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kNHit100HiThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kNHit100MedThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kNHit100LoThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kNHit20Threshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kNHit20LBThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kOWLNThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kESumLowThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kESumHiThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kOWLELoThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kOWLEHiThreshold];
+    [mtc setDbObject:[NSNumber numberWithDouble:100.0] forIndex:kNhit100LoPrescale];
+    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kPulserPeriod];
+
+    //Send to HW
+    [mtc loadTheMTCADacs];
+    [mtc setGlobalTriggerWordMask];
+    
+    //Restart the run if the run is ongoing and do nothing if there is no run happening
+    if([runControlModel isRunning]){
+        [self setStandardRunType:@"HIGH THRESHOLDS"];
+        [runControlModel restartRun];
+    }
+    
+}
 
 @end
 
@@ -1958,6 +2084,8 @@ err:
     [runDocDict setObject:@"" forKey:@"timestamp_end"];
     [runDocDict setObject:@"" forKey:@"sudbury_time_end"];
     //[runDocDict setObject:@"" forKey:@"run_stop"];
+
+    [runDocDict setObject:[self ECA_type] forKey:@"eca_type"];
 
     self.runDocument = runDocDict;
     

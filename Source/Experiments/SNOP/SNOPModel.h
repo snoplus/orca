@@ -99,6 +99,8 @@
     bool _smellieDocUploaded;
     NSString * standardRunType;
     NSString * standardRunVersion;
+    NSString * lastStandardRunType;
+    NSString * lastStandardRunVersion;
     
     NSThread * eStopThread;
     
@@ -128,11 +130,14 @@
     @private
         //Run type word
         unsigned long runTypeWord;
+        unsigned long lastRunTypeWord;
+        NSString* lastRunTypeWordHex;
         //ECA stuff
         int ECA_pattern;
-        int ECA_type;
+        NSString* ECA_type;
         int ECA_tslope_pattern;
-        double ECA_subrun_time;
+        int ECA_nevents;
+        NSNumber* ECA_rate;
     
 }
 
@@ -220,7 +225,6 @@
 
 - (void) _waitForBuffers;
 
-- (void) runStateChanged:(NSNotification*)aNote;
 - (void) subRunStarted:(NSNotification*)aNote;
 - (void) subRunEnded:(NSNotification*)aNote;
 
@@ -243,18 +247,28 @@
 - (int) viewType;
 - (unsigned long) runTypeWord;
 - (void) setRunTypeWord:(unsigned long)aMask;
+- (unsigned long) lastRunTypeWord;
+- (void) setLastRunTypeWord:(unsigned long)aMask;
+- (NSString*) lastRunTypeWordHex;
+- (void) setLastRunTypeWordHex:(NSString*)aValue;
 - (NSString*) standardRunType;
 - (void) setStandardRunType:(NSString*)aValue;
 - (NSString*) standardRunVersion;
 - (void) setStandardRunVersion:(NSString*)aValue;
+- (NSString*) lastStandardRunType;
+- (void) setLastStandardRunType:(NSString*)aValue;
+- (NSString*) lastStandardRunVersion;
+- (void) setLastStandardRunVersion:(NSString*)aValue;
 - (int) ECA_pattern;
-- (int) ECA_type;
+- (NSString*) ECA_type;
 - (int) ECA_tslope_pattern;
-- (double) ECA_subrun_time;
+- (int) ECA_nevents;
+- (NSNumber*) ECA_rate;
 - (void) setECA_pattern:(int)aValue;
-- (void) setECA_type:(int)aValue;
+- (void) setECA_type:(NSString*)aValue;
 - (void) setECA_tslope_pattern:(int)aValue;
-- (void) setECA_subrun_time:(double)aValue;
+- (void) setECA_nevents:(int)aValue;
+- (void) setECA_rate:(NSNumber*)aValue;
 
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder;
@@ -287,6 +301,7 @@
 //Standard runs functions
 -(BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
 -(BOOL) saveStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
+-(void) loadHighThresholdRun;
 
 @end
 
