@@ -917,11 +917,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //Get the MTC Object (will only be used in Slave Mode)
     NSArray*  mtcModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     if(![mtcModels count]){
-        NSException* e = [NSException
-                          exceptionWithName:@"noMTCModel"
-                          reason:@"*** Please add a ORMTCModel to the experiment"
-                          userInfo:nil];
-        [e raise];
+        NSLogColor([NSColor redColor], @"SMELLIE_RUN:**Please add an ORMTCModel to the experiment");
     }
     ORMTCModel* theMTCModel = [mtcModels objectAtIndex:0];
     [theMTCModel stopMTCPedestalsFixedRate]; //stop any pedestals that are currently running
@@ -929,11 +925,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //Get the run controller
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
-        NSException* e = [NSException
-                          exceptionWithName:@"noRunModel"
-                          reason:@"*** Please add a ORRunModel to the experiment"
-                          userInfo:nil];
-        [e raise];
+        NSLogColor([NSColor redColor], @"SMELLIE_RUN:**Please add a ORRunModel to the experiment");
     }
     runControl = [runModels objectAtIndex:0];
 
@@ -942,10 +934,10 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSNumber* configVersionNo;
     if([smellieSettings objectForKey:@"config_name"]){
         configVersionNo = [self fetchConfigVersionFor:[smellieSettings objectForKey:@"config_name"]];
-        NSLogColor([NSColor redColor], @"Loading config file: %@\n", [smellieSettings objectForKey:@"config_name"]);
+        NSLogColor([NSColor redColor], @"SMELLIE_RUN:Loading config file: %@\n", [smellieSettings objectForKey:@"config_name"]);
     } else {
         configVersionNo = [self fetchRecentConfigVersion];
-        NSLogColor([NSColor redColor], @"Loading config file: %i\n", [configVersionNo intValue]);
+        NSLogColor([NSColor redColor], @"SMELLIE_RUN:Loading config file: %i\n", [configVersionNo intValue]);
     }
     [self setSmellieConfigVersionNo:configVersionNo];
     [self fetchConfigurationFile:configVersionNo];
@@ -972,12 +964,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //Set up run control
     if(![runControl isRunning]){
         //start the run controller
-        NSLogColor([NSColor redColor], @"Starting our own run! \n");
         [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
-        
     }else{
         //Stop the current run and start a new run
-        NSLogColor([NSColor redColor], @"Resetting run! \n");
         [runControl setForceRestart:YES];
         [runControl performSelectorOnMainThread:@selector(stopRun) withObject:nil waitUntilDone:YES];
         [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
@@ -1004,11 +993,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         [self setSmellieSlaveMode:NO];
         NSLog(@"SMELIE_RUN:Running n MASTER mode\n");
     }else{
-        NSException* e = [NSException
-                          exceptionWithName:@"badConfigEntry"
-                          reason:@"*** Slave / Master mode does not appear to be included in config file"
-                          userInfo:nil];
-        [e raise];
+        NSLogColor([NSColor redColor], @"SMELLIE_RUN:**Slave / Master mode does not appear to be included in config file");
     }
 
     //How long do we need to run pulser? - TO BE REPACED AFTER TUBII INTEGRATION
@@ -1125,14 +1110,21 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                     [f release];
 
                     NSLog(@"SMELLIE_RUN:Intensity:Firing Pedestals\n");
-                    [theMTCModel fireMTCPedestalsFixedRate];
-
                     float pulserRate = [numericTriggerFrequencyInSlaveMode floatValue];
-                    [theMTCModel setThePulserRate:pulserRate];
+                    dispatch_sync(dispatch_get_main_queue(), ^{
+                        [theMTCModel fireMTCPedestalsFixedRate];
+                        [theMTCModel setThePulserRate:pulserRate];
+
+                    });
                  
                     NSLog(@"SMELLIE_RUN: Pulsing at %f Hz for %f seconds \n",[triggerFrequencyInSlaveMode floatValue],timeToPulse);
                     //THIS IS CRAZY - FIND SOME BETTER WAY OF DOING IT USING TUBII COUNTERS
                     [NSThread sleepForTimeInterval:timeToPulse];
+                    
+                    NSLog(@"SMELLIE_RUN:Stopping MTCPedestals\n");
+                    dispatch_sync(dispatch_get_main_queue(), ^{
+                        [theMTCModel stopMTCPedestalsFixedRate];
+                    });
                 }
 
                 if(![self smellieSlaveMode]){
@@ -1141,19 +1133,13 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                     NSLog(@"SMELLIE_RUN:%@ Pulses at %@ Hz \n",numOfPulses,triggerFrequency);
                     [self sendCustomSmellieCmd:masterModeCommand withArgs:@[triggerFrequency, numOfPulses]];
                 }
-
-                if([self smellieSlaveMode]){
-                    NSLog(@"SMELLIE_RUN:Stopping MTCPedestals\n");
-                    [theMTCModel stopMTCPedestalsFixedRate];
-                    [self sendCustomSmellieCmd:softLockOnCommand withArgs:nil];
-                }
-
+                
+                //Activate software locks
+                [self sendCustomSmellieCmd:softLockOnCommand withArgs:nil];
+                
                 //Keep record of sub-run settings
                 [self updateSmellieRunDocument:valuesToFillPerSubRun];
                 [valuesToFillPerSubRun release];
-
-                //Activate software locks
-                [self sendCustomSmellieCmd:softLockOnCommand withArgs:nil];
 
                 //Check if run file requests a sleep time between sub_runs
                 if([smellieSettings objectForKey:@"sleep_between_sub_run"]){
@@ -1272,21 +1258,13 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
-        NSException* e = [NSException
-                          exceptionWithName:@"noRunModel"
-                          reason:@"*** Please add a ORRunModel to the experiment"
-                          userInfo:nil];
-        [e raise];
+        NSLogColor([NSColor redColor], @"SMELLIE_RUN:**Please add a ORRunModel to the experiment");
     }
     runControl = [runModels objectAtIndex:0];
 
     NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     if(![snopModels count]){
-        NSException* e = [NSException
-                          exceptionWithName:@"noSNOPModel"
-                          reason:@"*** Please add a SNOPModel to the experiment"
-                          userInfo:nil];
-        [e raise];
+        NSLogColor([NSColor redColor], @"SMELLIE_RUN:**Please add a SNOPModel to the experiment");
     }
     SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
 
@@ -1326,11 +1304,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
      */
     NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     if(![snopModels count]){
-        NSException* e = [NSException
-                          exceptionWithName:@"noSNOPModel"
-                          reason:@"*** Please add a SNOPModel to the experiment"
-                          userInfo:nil];
-        [e raise];
+        NSLogColor([NSColor redColor], @"SMELLIE_RUN:**Please add a SNOPModel to the experiment");
     }
     SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
 
@@ -1364,21 +1338,13 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //Collect a series of objects from the SNOPModel
     NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     if(![snopModels count]){
-        NSException* e = [NSException
-                          exceptionWithName:@"noSNOPModel"
-                          reason:@"*** Please add a SNOPModel to the experiment"
-                          userInfo:nil];
-        [e raise];
+        NSLogColor([NSColor redColor], @"SMELLIE_RUN:**Please add a SNOPModel to the experiment");
     }
     SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
 
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
-        NSException* e = [NSException
-                          exceptionWithName:@"noRunModel"
-                          reason:@"*** Please add a ORRunModel to the experiment"
-                          userInfo:nil];
-        [e raise];
+        NSLogColor([NSColor redColor], @"SMELLIE_RUN:**Please add an ORRunModel to the experiment");
     }
     runControl = [runModels objectAtIndex:0];
 
@@ -1403,69 +1369,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     }
 
     [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:@"smellie"] addDocument:runDocDict tag:kSmellieSubRunDocumentAdded];
-}
-
--(void) _pushEllieConfigDocToDB:(NSString*)aCouchDBName runFiletoPush:(NSMutableDictionary*)customRunFile withDocType:(NSString*)aDocType
-{
-    /*
-     Create and push a smellie config file to couchdb.
-     
-     Arguments:
-     NSString* aCouchDBName:             Name of the couchdb repo the document will be uploaded to.
-     NSMutableDictionary customRunFile:  Custom run settings to be uploaded to db.
-     NSString* aDocType:                 Name to be used in the 'doc_type' field of the uploaded doc.
-     
-     */
-    NSMutableDictionary* configDocDic = [NSMutableDictionary dictionaryWithCapacity:100];
-
-    //Collect a series of objects from the SNOPModel
-    NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    if(![snopModels count]){
-        NSException* e = [NSException
-                          exceptionWithName:@"noSNOPModel"
-                          reason:@"*** Please add a SNOPModel to the experiment"
-                          userInfo:nil];
-        [e raise];
-    }
-    //Initialise the SNOPModel
-    SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
-
-    NSString* docType = [NSMutableString stringWithFormat:@"%@",aDocType];
-
-    NSLog(@"document_type: %@",docType);
-
-    [configDocDic setObject:docType forKey:@"doc_type"];
-    [configDocDic setObject:[self stringDateFromDate:nil] forKey:@"time_stamp"];
-    [configDocDic setObject:customRunFile forKey:@"configuration_info"];
-
-    [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:aCouchDBName] addDocument:configDocDic tag:kSmellieRunDocumentAdded];
-}
-
-
--(void) _pushEllieCustomRunToDB:(NSString*)aCouchDBName runFiletoPush:(NSMutableDictionary*)customRunFile withDocType:(NSString*)aDocType
-{
-    /*
-     Push custom run information from the GUI to a couchDB database.
-     
-     Arguments:
-     NSString* aCouchDBName            : The couchdb database name.
-     NSMutableDictionary* customRunFile: GUI settings stored in a dictionary.
-     NSString* aDocType                : Type of document being uploaded.
-     */
-    NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:100];
-
-    //Collect a series of objects from the SNOPModel
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* aSnotModel = [objs objectAtIndex:0];
-
-    NSString* docType = [NSMutableString stringWithFormat:@"%@",aDocType];
-    NSLog(@"document_type: %@",docType);
-
-    [runDocDict setObject:docType forKey:@"doc_type"];
-    [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"time_stamp"];
-    [runDocDict setObject:customRunFile forKey:@"run_info"];
-
-    [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:aCouchDBName] addDocument:runDocDict tag:kSmellieRunDocumentAdded];
 }
 
 -(NSNumber*) fetchRecentConfigVersion
@@ -1813,6 +1716,69 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     strDate = nil;
 
     return result;
+}
+
+-(void) _pushEllieConfigDocToDB:(NSString*)aCouchDBName runFiletoPush:(NSMutableDictionary*)customRunFile withDocType:(NSString*)aDocType
+{
+    /*
+     Create and push a smellie config file to couchdb.
+     
+     Arguments:
+     NSString* aCouchDBName:             Name of the couchdb repo the document will be uploaded to.
+     NSMutableDictionary customRunFile:  Custom run settings to be uploaded to db.
+     NSString* aDocType:                 Name to be used in the 'doc_type' field of the uploaded doc.
+     
+     */
+    NSMutableDictionary* configDocDic = [NSMutableDictionary dictionaryWithCapacity:100];
+    
+    //Collect a series of objects from the SNOPModel
+    NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    if(![snopModels count]){
+        NSException* e = [NSException
+                          exceptionWithName:@"noSNOPModel"
+                          reason:@"*** Please add a SNOPModel to the experiment"
+                          userInfo:nil];
+        [e raise];
+    }
+    //Initialise the SNOPModel
+    SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
+    
+    NSString* docType = [NSMutableString stringWithFormat:@"%@",aDocType];
+    
+    NSLog(@"document_type: %@",docType);
+    
+    [configDocDic setObject:docType forKey:@"doc_type"];
+    [configDocDic setObject:[self stringDateFromDate:nil] forKey:@"time_stamp"];
+    [configDocDic setObject:customRunFile forKey:@"configuration_info"];
+    
+    [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:aCouchDBName] addDocument:configDocDic tag:kSmellieRunDocumentAdded];
+}
+
+
+-(void) _pushEllieCustomRunToDB:(NSString*)aCouchDBName runFiletoPush:(NSMutableDictionary*)customRunFile withDocType:(NSString*)aDocType
+{
+    /*
+     Push custom run information from the GUI to a couchDB database.
+     
+     Arguments:
+     NSString* aCouchDBName            : The couchdb database name.
+     NSMutableDictionary* customRunFile: GUI settings stored in a dictionary.
+     NSString* aDocType                : Type of document being uploaded.
+     */
+    NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:100];
+    
+    //Collect a series of objects from the SNOPModel
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    
+    NSString* docType = [NSMutableString stringWithFormat:@"%@",aDocType];
+    NSLog(@"document_type: %@",docType);
+    
+    [runDocDict setObject:docType forKey:@"doc_type"];
+    [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"time_stamp"];
+    [runDocDict setObject:customRunFile forKey:@"run_info"];
+    
+    [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:aCouchDBName] addDocument:runDocDict tag:kSmellieRunDocumentAdded];
 }
 
 @end
