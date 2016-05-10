@@ -119,7 +119,8 @@ enum eHaloStatus {
     NSMutableArray* sentryLog;
     
     NSTimer* toggleTimer; //SV
-    float toggleInterval;    //SV
+    int toggleInterval; //SV
+    BOOL scheduledToggleTime; //SV
 }
 
 #pragma mark ***Initialization
@@ -177,14 +178,14 @@ enum eHaloStatus {
 - (NSString*) report;
 - (NSString*) diskStatus;
 - (BOOL) toggleTimerIsRunning; //SV
-- (void) startStopToggleTimer;
 
+- (int) toggleInterval; //SV
+- (BOOL) scheduledToggleTime; //SV
 - (void) doScheduledToggle; //SV
-- (float) toggleInterval;
-- (void) setToggleInterval:(float) seconds; //SV
+- (void) setToggleInterval:(int) seconds; //SV
 - (void) startTimer; //SV
 - (void) stopTimer; //SV
-- (void) waitForEndOfRun:(NSTimer*)aTimer;
+- (void) waitForEndOfRun:(NSTimer*)aTimer; //SV
 
 #pragma mark ***Run Stuff
 - (void) start;

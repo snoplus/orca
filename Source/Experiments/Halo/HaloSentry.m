@@ -172,8 +172,17 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 {
     //a local run has ended. Switch back to being a neutral system
     if(sentryIsRunning && !ignoreRunStates){
-        [self setSentryType:eNeither];
-        [self setNextState:eStarting stepTime:.2];
+         //SV
+         if(scheduledToggleTime)
+         {
+             [self doScheduledToggle];
+             [runControl setIgnoreRepeat:FALSE];
+         }
+         else
+         {
+             [self setSentryType:eNeither];
+             [self setNextState:eStarting stepTime:.2];
+         }
         [self step];
     }
 }
@@ -507,90 +516,99 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
     return (remoteRunInProgress == eYES) || [runControl isRunning];
 }
 
-- (void) startStopToggleTimer
-{
-    BOOL scheduleState = ![self toggleTimerIsRunning];
-    if (!scheduleState && [self sentryIsRunning] || toggleInterval==0){
-        [self stopTimer];
-    }
-    if (scheduleState && [self sentryIsRunning] && toggleInterval>0){
-        [self startTimer];
-    }
-    //we'll use this notification to force an update on the dialog
-    [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryToggleIntervalChanged object:self];
-}
-    
-
 //SV
 - (BOOL) toggleTimerIsRunning
 {
     return [toggleTimer isValid];
 }
 
-- (float)toggleInterval
+//SV
+- (int)toggleInterval
 {
     return toggleInterval;
 }
 
 //SV
-- (void) setToggleInterval:(float) days
+- (BOOL) scheduledToggleTime
 {
-    if(days < 0)days = 0;
+    return scheduledToggleTime;
+}
 
+//SV
+- (void) setToggleInterval:(int) seconds
+{
     [[[self undoManager] prepareWithInvocationTarget:self] setToggleInterval:toggleInterval];
-    toggleInterval = days;
-    NSLog(@"Toggle interval set to %.3f day(s)\n", days);
-    [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryToggleIntervalChanged object:self];
-}
-
-//SV
-- (void) doScheduledToggle
-{
-    NSLog(@"TOGGLING NOW\n");
-    if ([self runIsInProgress]) {[self toggleSystems];}
-}
-
-//SV
-- (void) waitForEndOfRun:(NSTimer*)aTimer
-{
-    NSLog(@"Scheduled sentry system toggle\n");
-    [toggleTimer invalidate];
-    [toggleTimer release];
-    toggleTimer = nil;
-    if ([self runIsInProgress]){
-        double timeLeft = [runControl timeToGo] - 5;
-        if (timeLeft > 5){
-            NSLog(@"Waiting for local run to end\n");
-            [self performSelector:@selector(doScheduledToggle) withObject:nil afterDelay:timeLeft];
-        }
-        else {
-            NSLog(@"TOGGLING NOW\n");
-            if ([self runIsInProgress]) {[self toggleSystems];}
-        }
+    
+    scheduledToggleTime = FALSE;
+    [runControl setIgnoreRepeat:FALSE];
+    
+    toggleInterval = seconds;
+    [self appendToSentryLog:[NSString stringWithFormat:@"Toggle interval set to %i day(s)", toggleInterval/86400]];
+    
+    //If timer was already running, restart with new setup/toggle interval
+    if([toggleTimer isValid])
+    {
+        [self appendToSentryLog:@"Resetting timer"];
+        [self stopTimer];
+        [self startTimer];
     }
-    else [self startTimer];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryToggleIntervalChanged object:self];
 }
 
 //SV
 - (void) startTimer
 {
-    if ([toggleTimer isValid]){
-        if (toggleInterval <= 0) [self setToggleInterval:7]; //7 days is default
-        NSLog(@"Starting sentry timer\n");
-        [toggleTimer release];
-        toggleTimer = [[NSTimer scheduledTimerWithTimeInterval:(toggleInterval*86400) target:self selector:@selector(waitForEndOfRun:) userInfo:nil repeats:NO] retain];
+    if (toggleInterval > 0)
+    {
+        [self appendToSentryLog:@"Starting sentry timer"];
+        if ([toggleTimer isValid]){ [toggleTimer release]; }
+        toggleTimer = [[NSTimer scheduledTimerWithTimeInterval:toggleInterval target:self selector:@selector(waitForEndOfRun:) userInfo:nil repeats:NO] retain];
+        [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryToggleIntervalChanged object:self];
     }
 }
 
 //SV
 - (void) stopTimer
 {
-    if (![toggleTimer isValid]){
-        NSLog(@"Stopping sentry timer\n");
+    scheduledToggleTime = FALSE;
+    [runControl setIgnoreRepeat:FALSE];
+    if ([toggleTimer isValid]){
+        [self appendToSentryLog:@"Stopping sentry timer"];
         [toggleTimer invalidate];
         [toggleTimer release];
         toggleTimer = nil;
+        [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryToggleIntervalChanged object:self];
     }
+}
+
+//SV
+- (void) doScheduledToggle
+{
+    [self appendToSentryLog:@"TOGGLING NOW"];
+    [self toggleSystems];
+    scheduledToggleTime = FALSE;
+}
+
+//SV
+- (void) waitForEndOfRun:(NSTimer*)aTimer
+{
+    [toggleTimer invalidate];
+    [toggleTimer release];
+    toggleTimer = nil;
+    
+    //If local run in progress
+    if ([[ORGlobal sharedGlobal] runInProgress]){
+        [self appendToSentryLog:@"Scheduled sentry system toggle"];
+        [self appendToSentryLog:@"Waiting for local run to end"];
+        scheduledToggleTime = TRUE;
+        [runControl setIgnoreRepeat:TRUE];
+    }
+    
+    else{
+        [self appendToSentryLog:@"Timer was stopped"];
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryToggleIntervalChanged object:self];
 }
     
 #pragma mark ***Run Stuff
@@ -619,7 +637,6 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super init];
-    
     [[self undoManager] disableUndoRegistration];
     [self setIpNumber2:     [decoder decodeObjectForKey: @"ipNumber2"]];
     [self setIpNumber1:     [decoder decodeObjectForKey: @"ipNumber1"]];
@@ -866,7 +883,7 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
                 [self setNextState:eGetRunState stepTime:10];
             }
             else {
-               //the remote macine is running. Flip over to being the secondarySystem
+               //the remote machine is running. Flip over to being the secondarySystem
                 [self setSentryType:eSecondary];
                 [self setNextState:eStarting stepTime:.3];
             }
@@ -891,7 +908,7 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
             [self clearAllAlarms];
             [self setRemoteMachineReachable:eBeingChecked];
             [self setNextState:eCheckRemoteMachine stepTime:.3];
-            [self startTimer]; //SV
+            if(![toggleTimer isValid])[self startTimer]; //SV
             break;
             
         case eCheckRemoteMachine:
@@ -939,6 +956,7 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
         default: break;
     }
 }
+
 //------------------------------------------------------------------
 //We are the secondary system -- the machine in waiting. We monitor the other machine and
 //if it dies, we have to take over and take control of the run
@@ -947,6 +965,7 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 {
     switch (state){
         case eStarting:
+            [self stopTimer]; //SV
             [self clearAllAlarms];
             [self setRemoteRunInProgress:eBeingChecked];
             [self setNextState:eGetRunState stepTime:2];
@@ -961,7 +980,6 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
             else {
                 //the connection was dropped (other mac crashed) or other mac appears hung.
                 [self takeOverRunning];
-                [self startTimer]; //SV
             }
             break;
   
@@ -1023,9 +1041,12 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
             ignoreRunStates = YES;
             [self appendToSentryLog:@"Toggling healthy systems"];
             if([runControl isRunning]){
-               wasLocalRun = YES;
-               [self appendToSentryLog:@"Stopping local run."];
-               [runControl haltRun];
+                wasLocalRun = YES;
+                if(!scheduledToggleTime) //SV
+                {
+                    [self appendToSentryLog:@"Stopping local run."];
+                    [runControl haltRun];
+                }
                 [self setNextState:eWaitForLocalRunStop stepTime:.1];
                 [self stopTimer]; //SV
             }
@@ -1034,7 +1055,6 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
                 [self appendToSentryLog:@"Stopping remote run."];
                 [self sendCmd:@"[RunControl haltRun];"];
                 [self setNextState:eWaitForRemoteRunStop stepTime:2];
-                [self startTimer]; //SV
             }
             break;
             
@@ -1052,7 +1072,7 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
                     [self appendToSentryLog:[NSString stringWithFormat:@"Local run didn't stop after %.0f seconds.\n",loopTime]];
                     [self appendToSentryLog:@"Passing control to other system"];
                     [self postRunProblemAlarm:@"Local Run didn't stop"];
-                    [self sendCmd:@"[HaloModel takeOver:YES];"];
+                    [self sendCmd:@"[HaloModel takeOverRunning];"];
                     [self setSentryType:eNeither];
                     [self setNextState:eStarting stepTime:2];
                 }
@@ -1243,12 +1263,11 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
     [self setSentryIsRunning:NO];
     [self setSentryType:eNeither];
     [self setNextState:eIdle stepTime:.2];
-    [self stopTimer]; //SV
 }
 
 - (void) takeOverRunning:(BOOL)quiet
 {
-    if(quiet)NSLogColor([NSColor redColor],@"Something is wrong. Trying to restart everything.\n");
+    if(!quiet)NSLogColor([NSColor redColor],@"Something is wrong. Trying to restart everything.\n");
     triedBooting = NO;
     [self setSentryType:eTakeOver];
     [self setNextState:eStarting stepTime:.2];

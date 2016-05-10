@@ -33,7 +33,6 @@
 -(id)init
 {
     self = [super initWithWindowNibName:@"Halo"];
-    scheduleState = true;
     return self;
 }
 
@@ -386,10 +385,34 @@
 	[secondaryAdcClassNamePopup setEnabled:!lockedOrRunningMaintenance];
 }
 
+//SV
 - (void) toggleIntervalChanged:(NSNotification*)aNotification
 {
-    [toggleIntervalField setFloatValue:[[model haloSentry] toggleInterval]];
-    [self updateButtons];
+    int tag;
+    switch([[model haloSentry] toggleInterval]/86400)
+    {
+        case 0:
+            tag = 0; break;
+        case 2:
+            tag = 1; break;
+        case 7:
+            tag = 2; break;
+        case 14:
+            tag = 3; break;
+        default:
+            tag = 0; break;
+    }
+    [schedulerSetupPU selectItemAtIndex:tag];
+
+    if([[model haloSentry]toggleInterval] == 0 || ![[model haloSentry] toggleTimerIsRunning])
+    {
+        if([[model haloSentry] scheduledToggleTime]) [nextToggleField setStringValue:@"Waiting for end of run"];
+        else [nextToggleField setStringValue:@"None scheduled"];
+    }
+    else
+    {
+        [nextToggleField setStringValue:[NSString stringWithFormat:@"%@", [[[NSDate date] dateByAddingTimeInterval:[[model haloSentry] toggleInterval]]stdDescription]]];
+    }
 }
 
 - (void) updateButtons
@@ -399,8 +422,7 @@
     BOOL aRunIsInProgress   = [[model haloSentry] runIsInProgress];
    	BOOL anyAddresses       = ([[model emailList] count]>0);
     BOOL localRunInProgress = [[ORGlobal sharedGlobal] runInProgress];
-    BOOL sentryStateIsSecondary = [[[model haloSentry] sentryTypeName] isEqualToString:@"Secondary"]; //SV
-    BOOL toggleIntervalValid     = [[model haloSentry] toggleInterval]>0;
+    
 	[heartBeatIndexPU setEnabled:anyAddresses];
  
     [stealthMode2CB      setEnabled:!locked && !sentryRunning];
@@ -412,9 +434,6 @@
     [toggleButton        setEnabled:!locked & aRunIsInProgress];
     [sbcPasswordField    setEnabled:!locked & aRunIsInProgress];
     [updateShapersButton setEnabled:!locked & !localRunInProgress];
-    [automaticToggleSelector setEnabled:sentryRunning && !sentryStateIsSecondary && toggleIntervalValid]; //SV
-    [automaticToggleSelector setTitle:[[model haloSentry] toggleTimerIsRunning]?@"Stop":@"Start"]; //SV
-    [toggleIntervalField setEnabled:!locked & ![[model haloSentry] toggleTimerIsRunning]]; //SV
 }
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem
@@ -663,16 +682,27 @@
 }
 
 //SV
-- (IBAction) toggleIntervalAction:(id)sender
+- (IBAction)schedulerSetupChanged:(id)sender
 {
-    [[model haloSentry] setToggleInterval:[sender floatValue]];
-}
+    int index = [sender indexOfSelectedItem];
+    int seconds = 0;
+    
+    switch(index){
+        case 0:
+            seconds = 0;
+            break;
+        case 1:
+            seconds = 2*86400;
+            break;
+        case 2:
+            seconds = 7*86400;
+            break;
+        case 3:
+            seconds = 14*86400;
+            break;
+    }
 
-//SV
-- (IBAction)startStopToggleTimerAction:(id)sender
-{
-    [[model haloSentry] startStopToggleTimer];
-
+    [[model haloSentry] setToggleInterval:seconds];
 }
 
 #pragma mark •••Data Source

@@ -54,9 +54,9 @@
     IBOutlet NSTextField*   missedHeartBeatsCountField;
     IBOutlet NSTextField*   sbcRebootCountField;
     IBOutlet NSTextField*   sentryRunningField;
-    IBOutlet NSTextField*   toggleIntervalField; //SV
-    IBOutlet NSButton*      automaticToggleSelector; //SV
 	IBOutlet NSButton*      updateShapersButton;
+    IBOutlet NSPopUpButton* schedulerSetupPU;
+    IBOutlet NSTextField*   nextToggleField;
 
     //items in the  HW map tab view
     IBOutlet NSTableView*	secondaryValuesView;
@@ -73,8 +73,6 @@
     NSSize focalPlaneSize;
     NSSize sentrySize;
     NSSize testDectorSize;
-    
-    BOOL scheduleState;
 }
 
 #pragma mark ¥¥¥Initialization
@@ -103,6 +101,7 @@
 - (void) secondaryAdcClassNameChanged:(NSNotification*)aNote;
 - (void) secondaryMapFileChanged:(NSNotification*)aNote;
 - (void) nextHeartBeatChanged:(NSNotification*)aNote;
+- (void) toggleIntervalChanged:(NSNotification*)aNotification;
 
 
 #pragma mark ¥¥¥Actions
@@ -121,7 +120,7 @@
 - (IBAction) secondaryAdcClassNameAction:(id)sender;
 - (IBAction) readSecondaryMapFileAction:(id)sender;
 - (IBAction) saveSecondaryMapFileAction:(id)sender;
-- (IBAction) startStopToggleTimerAction:(id)sender;
+- (IBAction) schedulerSetupChanged:(id)sender; //SV
 - (IBAction) heartBeatIndexAction:(id)sender;
 
 #pragma mark ¥¥¥Test Detector Map Actions
