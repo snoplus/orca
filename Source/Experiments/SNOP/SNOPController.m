@@ -51,6 +51,9 @@ snopGreenColor;
 -(id)init
 {
     self = [super initWithWindowNibName:@"SNOP"];
+
+    hvMask = 0;
+
     return self;
 }
 
@@ -453,10 +456,7 @@ snopGreenColor;
 }
 
 - (void) hvStatusChanged:(NSNotification*)aNote
-{ dispatch_async(dispatch_get_main_queue(), ^{
-    
-    bool globalHVON = false;
-    
+{
     if (!aNote) {
         //collect all instances of xl3 objects in Orca
         NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
@@ -478,10 +478,11 @@ snopGreenColor;
                 [[hvStatusMatrix cellAtRow:mRow column:1] setStringValue:[xl3 hvASwitch]?@"ON":@"OFF"];
                 if ([xl3 hvASwitch]) {
                     [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor redColor]];
-                    globalHVON = true;
+		    hvMask |= (1 << [xl3 crateNumber]);
                 }
                 else {
                     [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor blackColor]];
+		    hvMask &= ~(1 << [xl3 crateNumber]);
                 }
                 [[hvStatusMatrix cellAtRow:mRow column:2] setStringValue:
                  [NSString stringWithFormat:@"%d V",(unsigned int)[xl3 hvNominalVoltageA]]];
@@ -499,10 +500,11 @@ snopGreenColor;
                     [[hvStatusMatrix cellAtRow:mRow column:1] setStringValue:[xl3 hvBSwitch]?@"ON":@"OFF"];
                     if ([xl3 hvBSwitch]) {
                         [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor redColor]];
-                        globalHVON = true;
+			hvMask |= (1 << 19);
                     }
                     else {
                         [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor blackColor]];
+			hvMask &= ~(1 << 19);
                     }
                     [[hvStatusMatrix cellAtRow:mRow column:2] setStringValue:
                      [NSString stringWithFormat:@"%d V",(unsigned int)[xl3 hvNominalVoltageB]]];
@@ -544,10 +546,11 @@ snopGreenColor;
             [[hvStatusMatrix cellAtRow:mRow column:1] setStringValue:[[aNote object] hvASwitch]?@"ON":@"OFF"];
             if ([[aNote object] hvASwitch]) {
                 [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor redColor]];
-                globalHVON = true;
+		hvMask |= (1 << [[aNote object] crateNumber]);
             }
             else {
                 [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor blackColor]];
+		hvMask &= ~(1 << [[aNote object] crateNumber]);
             }
             [[hvStatusMatrix cellAtRow:mRow column:2] setStringValue:
              [NSString stringWithFormat:@"%d V",(unsigned int)[[aNote object] hvNominalVoltageA]]];
@@ -565,10 +568,11 @@ snopGreenColor;
                 [[hvStatusMatrix cellAtRow:mRow column:1] setStringValue:[[aNote object] hvBSwitch]?@"ON":@"OFF"];
                 if ([[aNote object] hvBSwitch]) {
                     [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor redColor]];
-                    globalHVON = true;
+		    hvMask |= (1 << 19);
                 }
                 else {
                     [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor blackColor]];
+		    hvMask &= ~(1 << 19);
                 }
                 [[hvStatusMatrix cellAtRow:mRow column:2] setStringValue:
                  [NSString stringWithFormat:@"%d V",(unsigned int)[[aNote object] hvNominalVoltageB]]];
@@ -579,19 +583,18 @@ snopGreenColor;
             }
         }
     }
-    //Detector worldwide HV status
-    if(globalHVON){
-        [detectorHVStatus setStringValue:@"PMTs HV is ON"];
+
+    // Detector worldwide HV status
+    if(hvMask){
+        [detectorHVStatus setStringValue:@"PMT HV is ON"];
         [detectorHVStatus setBackgroundColor:snopRedColor];
         [panicDownButton setEnabled:1];
-    }
-    else{
-        [detectorHVStatus setStringValue:@"PMTs HV is OFF"];
+    } else{
+        [detectorHVStatus setStringValue:@"PMT HV is OFF"];
         [detectorHVStatus setBackgroundColor:snopBlueColor];
         [panicDownButton setEnabled:0];
     }
-
-}); }
+}
 
 
 #pragma mark ¥¥¥Interface Management
