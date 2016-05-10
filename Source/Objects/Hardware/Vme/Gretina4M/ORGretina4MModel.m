@@ -240,7 +240,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [mainFPGADownLoadState release];
     [fpgaFilePath release];
     [waveFormRateGroup release];
-    //[waveFormRunningAverage release];
+    [waveFormRunningAverage release];
 	[fifoFullAlarm clearAlarm];
 	[fifoFullAlarm release];
 	[progressLock release];
@@ -907,12 +907,12 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	 object:self];    
 }
 
-//- (ORRunningAverage*) waveFormRunningAverage
-//{
-//    //[waveFormRunningAverage setWindowLength: 11];
-//    //NSLog(@"can I really return this object%@\n",waveFormRunningAverage);
-//    return waveFormRunningAverage;
-//}
+- (ORRunningAverage*) waveFormRunningAverage
+{
+    //[waveFormRunningAverage setWindowLength: 11];
+    //NSLog(@"can I really return this object%@\n",waveFormRunningAverage);
+    return waveFormRunningAverage;
+}
 
 - (BOOL) noiseFloorRunning
 {
@@ -3075,7 +3075,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [waveFormRateGroup resetRates];
     [waveFormRateGroup calcRates];
    
-//    waveFormRunningAverage = [[ORRunningAverage alloc] init];
+    waveFormRunningAverage = [[ORRunningAverage alloc] init];
+    
 	
 	int i;
 	for(i=0;i<kNumGretina4MChannels;i++){

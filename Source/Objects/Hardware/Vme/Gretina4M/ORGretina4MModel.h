@@ -27,12 +27,12 @@
 #import "AutoTesting.h"
 #import "ORAdcInfoProviding.h"
 #import "SBC_Link.h"
-//#import "ORRunningAverage.h"
+#import "ORRunningAverage.h"
 
 @class ORRateGroup;
 @class ORConnector;
 @class ORFileMoverOp;
-//@class ORRunningAverage;
+@class ORRunningAverage;
 
 
 #define kNumGretina4MChannels		10
@@ -279,7 +279,7 @@ enum Gretina4MFIFOStates {
 	ORConnector*    linkConnector; //we won't draw this connector so we have to keep a reference to it
     ORFileMoverOp*  fpgaFileMover;
 	ORRateGroup*	waveFormRateGroup;
-    //ORRunningAverage* waveFormRunningAverage;
+    ORRunningAverage* waveFormRunningAverage;
 	unsigned long 	waveFormCount[kNumGretina4MChannels];
 	BOOL			isRunning;
     NSString*       firmwareStatusString;
@@ -380,7 +380,7 @@ enum Gretina4MFIFOStates {
 
 - (ORRateGroup*)    waveFormRateGroup;
 - (void)			setWaveFormRateGroup:(ORRateGroup*)newRateGroup;
-//- (ORRunningAverage*) waveFormRunningAverage;
+- (ORRunningAverage*) waveFormRunningAverage;
 - (id)              rateObject:(short)channel;
 - (void)            setRateIntegrationTime:(double)newIntegrationTime;
 - (void) setExternalWindow:(short)aValue;

@@ -37,12 +37,12 @@
 		0F4888691C9992EE00068BC2 /* DB.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F4888661C9992EE00068BC2 /* DB.h */; };
 		0F48886A1C9992EE00068BC2 /* PacketTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F4888671C9992EE00068BC2 /* PacketTypes.h */; };
 		0F48886B1C9992EE00068BC2 /* Registers.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F4888681C9992EE00068BC2 /* Registers.h */; };
-		0FB2022C1CDFCF4E0083F552 /* tubii.gif in Resources */ = {isa = PBXBuildFile; fileRef = 0FB202261CDFCF4E0083F552 /* tubii.gif */; settings = {ASSET_TAGS = (); }; };
-		0FB2022D1CDFCF4E0083F552 /* TUBii.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0FB202271CDFCF4E0083F552 /* TUBii.xib */; settings = {ASSET_TAGS = (); }; };
-		0FB2022E1CDFCF4E0083F552 /* TUBiiController.h in Headers */ = {isa = PBXBuildFile; fileRef = 0FB202281CDFCF4E0083F552 /* TUBiiController.h */; settings = {ASSET_TAGS = (); }; };
-		0FB2022F1CDFCF4E0083F552 /* TUBiiController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0FB202291CDFCF4E0083F552 /* TUBiiController.m */; settings = {ASSET_TAGS = (); }; };
-		0FB202301CDFCF4E0083F552 /* TUBiiModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 0FB2022A1CDFCF4E0083F552 /* TUBiiModel.h */; settings = {ASSET_TAGS = (); }; };
-		0FB202311CDFCF4E0083F552 /* TUBiiModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0FB2022B1CDFCF4E0083F552 /* TUBiiModel.m */; settings = {ASSET_TAGS = (); }; };
+		0FB2022C1CDFCF4E0083F552 /* tubii.gif in Resources */ = {isa = PBXBuildFile; fileRef = 0FB202261CDFCF4E0083F552 /* tubii.gif */; };
+		0FB2022D1CDFCF4E0083F552 /* TUBii.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0FB202271CDFCF4E0083F552 /* TUBii.xib */; };
+		0FB2022E1CDFCF4E0083F552 /* TUBiiController.h in Headers */ = {isa = PBXBuildFile; fileRef = 0FB202281CDFCF4E0083F552 /* TUBiiController.h */; };
+		0FB2022F1CDFCF4E0083F552 /* TUBiiController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0FB202291CDFCF4E0083F552 /* TUBiiController.m */; };
+		0FB202301CDFCF4E0083F552 /* TUBiiModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 0FB2022A1CDFCF4E0083F552 /* TUBiiModel.h */; };
+		0FB202311CDFCF4E0083F552 /* TUBiiModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0FB2022B1CDFCF4E0083F552 /* TUBiiModel.m */; };
 		146822430FC4799C0082BD70 /* ORCircularBufferUV.h in Headers */ = {isa = PBXBuildFile; fileRef = 146822410FC4799C0082BD70 /* ORCircularBufferUV.h */; };
 		146822440FC4799C0082BD70 /* ORCircularBufferUV.m in Sources */ = {isa = PBXBuildFile; fileRef = 146822420FC4799C0082BD70 /* ORCircularBufferUV.m */; };
 		1C50F9F108033CA9008D18EA /* ADC2249.nib in Resources */ = {isa = PBXBuildFile; fileRef = 1C50F9E608033CA9008D18EA /* ADC2249.nib */; };
@@ -364,6 +364,8 @@
 		43B191C01B4D6324003DD77F /* ORCAEN1730Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 43B191BE1B4D6324003DD77F /* ORCAEN1730Readout.hh */; };
 		43B191C31B4D641C003DD77F /* ORCAEN1730Readout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 43B191BD1B4D6324003DD77F /* ORCAEN1730Readout.cc */; };
 		43B191C41B4D641C003DD77F /* ORCAEN1730Readout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 43B191BE1B4D6324003DD77F /* ORCAEN1730Readout.hh */; };
+		43B50A3B1CE2610D003D0146 /* ORRunningAverage.h in Headers */ = {isa = PBXBuildFile; fileRef = 43B50A391CE2610D003D0146 /* ORRunningAverage.h */; };
+		43B50A3C1CE2610D003D0146 /* ORRunningAverage.m in Sources */ = {isa = PBXBuildFile; fileRef = 43B50A3A1CE2610D003D0146 /* ORRunningAverage.m */; };
 		43D7CB89177C84AC00ED4736 /* OROpenGLObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D7CB87177C84AC00ED4736 /* OROpenGLObject.h */; };
 		43D7CB8A177C84AC00ED4736 /* OROpenGLObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 43D7CB88177C84AC00ED4736 /* OROpenGLObject.m */; };
 		43D7CB8D177CBDF600ED4736 /* ORVertex.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D7CB8B177CBDF500ED4736 /* ORVertex.h */; };
@@ -4033,6 +4035,8 @@
 		43ADFEAE10B6E1C80044617C /* ORAcqirisDC440Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORAcqirisDC440Readout.hh; path = Source/Objects/Hardware/CompactPCI/cPCIcpu/cPCI_Readout_Code/ORAcqirisDC440Readout.hh; sourceTree = SOURCE_ROOT; };
 		43B191BD1B4D6324003DD77F /* ORCAEN1730Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORCAEN1730Readout.cc; sourceTree = "<group>"; };
 		43B191BE1B4D6324003DD77F /* ORCAEN1730Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORCAEN1730Readout.hh; sourceTree = "<group>"; };
+		43B50A391CE2610D003D0146 /* ORRunningAverage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORRunningAverage.h; sourceTree = "<group>"; };
+		43B50A3A1CE2610D003D0146 /* ORRunningAverage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORRunningAverage.m; sourceTree = "<group>"; };
 		43D7CB87177C84AC00ED4736 /* OROpenGLObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OROpenGLObject.h; sourceTree = "<group>"; };
 		43D7CB88177C84AC00ED4736 /* OROpenGLObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OROpenGLObject.m; sourceTree = "<group>"; };
 		43D7CB8B177CBDF500ED4736 /* ORVertex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORVertex.h; sourceTree = "<group>"; };
@@ -7637,6 +7641,15 @@
 			path = CV1730;
 			sourceTree = "<group>";
 		};
+		43B50A381CE260F6003D0146 /* RunningAverage */ = {
+			isa = PBXGroup;
+			children = (
+				43B50A391CE2610D003D0146 /* ORRunningAverage.h */,
+				43B50A3A1CE2610D003D0146 /* ORRunningAverage.m */,
+			);
+			path = RunningAverage;
+			sourceTree = "<group>";
+		};
 		546D9DA60874BDD60072A274 /* TDC2228A */ = {
 			isa = PBXGroup;
 			children = (
@@ -8844,6 +8857,7 @@
 		842162EE043E6317005F64B1 /* Misc Objects */ = {
 			isa = PBXGroup;
 			children = (
+				43B50A381CE260F6003D0146 /* RunningAverage */,
 				8461CAF81CB2D8DB001E4044 /* PulseCheck */,
 				84D1535A1BD53D2A005EC269 /* OnCallList */,
 				844CBDC31866010F0012AA3B /* RaidMonitor */,
@@ -15433,6 +15447,7 @@
 				84D34B0410B1D6C90013473E /* ORSIS3302Controller.h in Headers */,
 				84D34B0610B1D6C90013473E /* ORSIS3302Decoders.h in Headers */,
 				84D34B0810B1D6C90013473E /* ORSIS3302Model.h in Headers */,
+				43B50A3B1CE2610D003D0146 /* ORRunningAverage.h in Headers */,
 				43ADFE3F10B6DAF90044617C /* readout_code.h in Headers */,
 				43ADFE4010B6DAF90044617C /* ORVCard.hh in Headers */,
 				43ADFE7710B6DBCF0044617C /* ORCAEN419Readout.hh in Headers */,
@@ -17558,6 +17573,7 @@
 				2D1AB81F0F1B9F2400E6B850 /* ORIpeSlowControlModel.m in Sources */,
 				8493D6BE0F21315300BCD331 /* ORCMC203Controller.m in Sources */,
 				8493D6C00F21315300BCD331 /* ORCMC203Decoders.m in Sources */,
+				43B50A3C1CE2610D003D0146 /* ORRunningAverage.m in Sources */,
 				8493D6C20F21315300BCD331 /* ORCMC203Model.m in Sources */,
 				9C880EDA0F2B5B2500394AEC /* ORVmeCrate.m in Sources */,
 				840D56E10F39E9BF00F9A274 /* ORPacController.m in Sources */,

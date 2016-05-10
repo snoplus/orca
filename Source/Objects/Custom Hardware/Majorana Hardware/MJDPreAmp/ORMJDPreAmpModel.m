@@ -137,6 +137,7 @@ struct {
     [[self undoManager] disableUndoRegistration];
 	[self setUpArrays];
     [[self undoManager] enableUndoRegistration];
+
     return self;
 }
 
@@ -162,6 +163,7 @@ struct {
         [adcAlarm[i] clearAlarm];
         [adcAlarm[i] release];
     }
+    [baselineRunningAverage release];
     [super dealloc];
 }
 
@@ -219,6 +221,9 @@ struct {
 	}
 }
 
+
+
+
 - (void) makeConnectors
 {
     ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width/2- kConnectorSize/2,[self frame].size.height-kConnectorSize) withGuardian:self withObjectLink:self];
@@ -252,6 +257,14 @@ struct {
     name = [name stringByReplacingOccurrencesOfString:@"OR" withString:@""];
     name = [name stringByReplacingOccurrencesOfString:@"Model" withString:@""];
     return name;
+}
+
+
+- (ORRunningAverage*) getobj_baselineRunningAverage
+{
+    //[waveFormRunningAverage setWindowLength: 11];
+    //NSLog(@"can I really return this object%@\n",waveFormRunningAverage);
+    return baselineRunningAverage;
 }
 
 - (void) setUpImage
@@ -1272,6 +1285,8 @@ struct {
 	[self setPollTime:		[decoder decodeIntForKey:   @"pollTime"]];
     [self setFirmwareRev:   [decoder decodeIntForKey:   @"firmwareRev"]];
 
+    baselineRunningAverage = [[ORRunningAverage alloc] init];
+    
 	int i;
 	for(i=0;i<2;i++){
 		[self setEnabled:i		   value:[decoder decodeBoolForKey:[NSString stringWithFormat: @"enabled%d",i]]];
@@ -1297,6 +1312,7 @@ struct {
     [self registerNotificationObservers];
     
     [[self undoManager] enableUndoRegistration];
+    
    
     return self;
 }

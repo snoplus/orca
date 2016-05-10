@@ -21,9 +21,11 @@
 #import "ORHWWizard.h"
 #import "MJDCmds.h"
 #import "ORAuxHw.h"
+#import "ORRunningAverage.h"
 
 @class ORTimeRate;
 @class ORAlarm;
+@class ORRunningAverage;
 
 #define kMJDPreAmpDacChannels               16	//if this ever changes, change the record length also
 #define kMJDPreAmpAdcChannels               16
@@ -63,6 +65,7 @@
     BOOL            connected;
     BOOL            doNotUseHWMap;
     int             firmwareRev;
+    ORRunningAverage* baselineRunningAverage;
  
     //error counting
     BOOL            supplyOutOfBounds[4]; //only count if this goes from low to high
@@ -141,6 +144,7 @@
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherObject;
 - (void) shipRecords;
+- (ORRunningAverage*) getobj_baselineRunningAverage;
 
 #pragma mark ¥¥¥HW Access
 - (BOOL) controllerIsSBC;
