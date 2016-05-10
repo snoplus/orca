@@ -55,6 +55,7 @@
     unsigned long   adcEnabledMask;
     ORTimeRate*		adcHistory[kMJDPreAmpAdcChannels];
     ORTimeRate*		leakageCurrentHistory[kMJDPreAmpLeakageCurrentChannels];
+    ORRunningAverage* baselineRunningAverage[kMJDPreAmpAdcChannels*2];
     ORAlarm*		temperatureAlarm[2];
     ORAlarm*		leakageCurrentAlarm[kMJDPreAmpLeakageCurrentChannels];
     ORAlarm*		adcAlarm[kMJDPreAmpAdcChannels];
@@ -65,7 +66,6 @@
     BOOL            connected;
     BOOL            doNotUseHWMap;
     int             firmwareRev;
-    ORRunningAverage* baselineRunningAverage;
  
     //error counting
     BOOL            supplyOutOfBounds[4]; //only count if this goes from low to high
@@ -98,6 +98,8 @@
 - (void) clearSupplyErrors;
 - (ORTimeRate*)adcHistory:(int)index;
 - (ORTimeRate*)leakageCurrentHistory:(int)index;
+- (ORRunningAverage*) getobj_baselineRunningAverage:(int)index;
+
 - (unsigned long) adcEnabledMask;
 - (void) setAdcEnabledMask:(unsigned long)aAdcEnabledMask;
 - (BOOL) shipValues;
@@ -144,7 +146,6 @@
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherObject;
 - (void) shipRecords;
-- (ORRunningAverage*) getobj_baselineRunningAverage;
 
 #pragma mark ¥¥¥HW Access
 - (BOOL) controllerIsSBC;

@@ -279,7 +279,7 @@ enum Gretina4MFIFOStates {
 	ORConnector*    linkConnector; //we won't draw this connector so we have to keep a reference to it
     ORFileMoverOp*  fpgaFileMover;
 	ORRateGroup*	waveFormRateGroup;
-    ORRunningAverage* waveFormRunningAverage;
+    ORRunningAverage* waveFormRunningAverage[kNumGretina4MChannels];
 	unsigned long 	waveFormCount[kNumGretina4MChannels];
 	BOOL			isRunning;
     NSString*       firmwareStatusString;
@@ -380,7 +380,7 @@ enum Gretina4MFIFOStates {
 
 - (ORRateGroup*)    waveFormRateGroup;
 - (void)			setWaveFormRateGroup:(ORRateGroup*)newRateGroup;
-- (ORRunningAverage*) waveFormRunningAverage;
+- (ORRunningAverage*) getobj_waveFormRunningAverage:(int)index;
 - (id)              rateObject:(short)channel;
 - (void)            setRateIntegrationTime:(double)newIntegrationTime;
 - (void) setExternalWindow:(short)aValue;

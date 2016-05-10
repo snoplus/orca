@@ -163,7 +163,9 @@ struct {
         [adcAlarm[i] clearAlarm];
         [adcAlarm[i] release];
     }
-    [baselineRunningAverage release];
+    for(i=0;i<kMJDPreAmpAdcChannels*2;i++){
+        [baselineRunningAverage[i] release];
+    }
     [super dealloc];
 }
 
@@ -260,12 +262,7 @@ struct {
 }
 
 
-- (ORRunningAverage*) getobj_baselineRunningAverage
-{
-    //[waveFormRunningAverage setWindowLength: 11];
-    //NSLog(@"can I really return this object%@\n",waveFormRunningAverage);
-    return baselineRunningAverage;
-}
+
 
 - (void) setUpImage
 {
@@ -450,6 +447,13 @@ struct {
     else return nil;
 }
 
+- (ORRunningAverage*) getobj_baselineRunningAverage:(int)index
+{
+    //[waveFormRunningAverage setWindowLength: 11];
+    //NSLog(@"can I really return this object%@\n",waveFormRunningAverage);
+    if(index>=0 && index<kMJDPreAmpLeakageCurrentChannels*2)return baselineRunningAverage[index];
+    else return nil;
+}
 
 - (unsigned long) adcEnabledMask
 {
@@ -1285,7 +1289,6 @@ struct {
 	[self setPollTime:		[decoder decodeIntForKey:   @"pollTime"]];
     [self setFirmwareRev:   [decoder decodeIntForKey:   @"firmwareRev"]];
 
-    baselineRunningAverage = [[ORRunningAverage alloc] init];
     
 	int i;
 	for(i=0;i<2;i++){
@@ -1295,6 +1298,10 @@ struct {
 	}
 	for(i=0;i<kMJDPreAmpAdcChannels;i++){
         [self setDetector:i name:[decoder decodeObjectForKey:   [NSString stringWithFormat:@"detectorName%d",i]]];
+        
+        if(!baselineRunningAverage[i*2]) baselineRunningAverage[i*2] = [[ORRunningAverage alloc] init]; //added for wenqin
+        if(!baselineRunningAverage[i*2+1]) baselineRunningAverage[i*2+1] = [[ORRunningAverage alloc] init]; //twice of the ADC chans for AUX
+
     }
     [self setLoopForever:	[decoder decodeBoolForKey:   @"loopForever"]];
     [self setPulseCount:	[decoder decodeIntForKey:    @"pulseCount"]];
