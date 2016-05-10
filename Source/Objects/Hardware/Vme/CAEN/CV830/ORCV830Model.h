@@ -120,13 +120,13 @@ enum {
 		ORReadOutList*	readOutGroup;
         BOOL            remoteInit;
         long            count0Offset;
-   
+        BOOL            resetRollOverInSBC;
+    
 		//some cached variabled
 		NSArray* dataTakers;	//cache of data takers.
 		unsigned long numEnabledChannels;
         unsigned long    lastChan0Count;
         unsigned long long    chan0RollOverCount;
-    
 }
 
 #pragma mark •••Initialization
@@ -173,6 +173,7 @@ enum {
 - (unsigned short) getNumEvents;
 - (unsigned short) numEnabledChannels;
 - (unsigned short) readControlReg;
+- (void) remoteResetCounters;
 
 #pragma mark •••Data Header
 - (unsigned long) polledDataId;

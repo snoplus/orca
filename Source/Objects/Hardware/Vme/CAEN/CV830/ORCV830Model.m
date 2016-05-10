@@ -471,15 +471,29 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 	}
 }
 
+- (void) remoteResetCounters
+{
+    NSLog(@"%@ Reset timestamps\n",[self fullID]);
+    [self softwareClear];
+    resetRollOverInSBC  = YES;  //remote datataking
+    chan0RollOverCount  = 0;    //local datataking
+    lastChan0Count      = 0;    //local datataking
+    remoteInit          = YES;  //someone else is in control. No init locally. Continous running.
+}
+
 - (void) remoteInitBoard
 {
-    remoteInit= YES;
+    remoteInit  = YES;
     [self initBoard];
 }
 
 - (void) initBoard
 {
 	@try {
+        resetRollOverInSBC  = YES;  //remote datataking
+        chan0RollOverCount  = 0;    //local datataking
+        lastChan0Count      = 0;    //local datataking
+
   		[self writeDwellTime];
         [self writeEnabledMask];
 		[self writeControlReg]; //<--clears Counters,MEB, and trigger counter
@@ -765,11 +779,10 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 	[aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:NSStringFromClass([self class])]; 
 	scheduledForUpdate  = NO;
 	numEnabledChannels  = [self numEnabledChannels];
-	chan0RollOverCount  = 0;
-    lastChan0Count      = 0;
     BOOL doInit = [[userInfo objectForKey:@"doinit"] boolValue];
-    if(!remoteInit && doInit)[self initBoard];
-
+    if(!remoteInit && doInit){
+        [self initBoard];
+    }
     //cache the data takers for alittle more speed
 	dataTakers = [[readOutGroup allObjects] retain];		//cache of data takers.
 	for(id obj in dataTakers){
@@ -870,7 +883,10 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 	configStruct->card_info[index].deviceSpecificData[2] = [self getAddressOffset:kMEBEventNum];
 	configStruct->card_info[index].deviceSpecificData[3] = [self getAddressOffset:kEventBuffer];
 	configStruct->card_info[index].deviceSpecificData[4] = [self numEnabledChannels];
-	configStruct->card_info[index].deviceSpecificData[5] = [self count0Offset];
+    configStruct->card_info[index].deviceSpecificData[5] = [self count0Offset];
+    configStruct->card_info[index].deviceSpecificData[6] = resetRollOverInSBC;
+    
+    resetRollOverInSBC = NO; //must be reset for every run
     
 	configStruct->card_info[index].num_Trigger_Indexes = 0;
 	    
