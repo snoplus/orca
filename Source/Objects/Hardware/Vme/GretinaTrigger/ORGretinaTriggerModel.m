@@ -625,7 +625,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
                 }
                 else {
                     //quick start, but check if transistional run
-                    if(([(ORRunModel*)[aNote object] runType] | 0x10000) == 0x10000){
+                    if(([(ORRunModel*)[aNote object] runType] & 0x10000) == 0x10000){
                         [self resetTimeStamps];
                     }
                 }
