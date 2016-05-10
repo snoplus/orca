@@ -11,8 +11,6 @@ class ORCAEN830Readout : public ORVVmeCard
     virtual bool Readout(SBC_LAM_Data*);
 private:
     bool     chan0Enabled;
-    uint32_t lastChan0Count;
-    long long rollOverCount;
     uint32_t errorCount;
     uint32_t goodCount;
 

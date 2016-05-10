@@ -2,13 +2,24 @@
 #include <errno.h>
 #include <sys/timeb.h>
 #include "readout_code.h"
+#include "ORCAEN830Shared.hh"
+#include <stdio.h>
+unsigned long long rollOverCount[21];
+uint32_t lastChan0Count[21];
+
 
 bool ORCAEN830Readout::Start()
 {
-	lastChan0Count  = 0;
-	rollOverCount   = 0;
     errorCount      = 0;
     goodCount       = 0;
+    int32_t reset   = (int32_t)GetDeviceSpecificData()[6];
+    if(reset){
+        for(uint32_t i=0;i<21;i++){
+            lastChan0Count[i] = 0;
+            rollOverCount[i] = 0;
+        }
+    }
+    
     uint32_t enabledMask = GetDeviceSpecificData()[0];
     if(enabledMask & (0x1)) chan0Enabled = true;
     else                    chan0Enabled = false;
@@ -44,7 +55,7 @@ bool ORCAEN830Readout::Readout(SBC_LAM_Data* lamData)
 				uint32_t enabledMask		= GetDeviceSpecificData()[0];
 				uint32_t eventBufferOffset	= GetDeviceSpecificData()[3];
 				uint32_t numEnabledChannels	= GetDeviceSpecificData()[4];
-				
+                
 				for(uint32_t event=0;event<numEvents;event++){
 					ensureDataCanHold(5+numEnabledChannels); //event size
 					data[dataIndex++] = dataId | (5+numEnabledChannels);
@@ -68,12 +79,12 @@ bool ORCAEN830Readout::Readout(SBC_LAM_Data* lamData)
                         //keep a rollover count for channel zero
                         if(chan0Enabled && i==0){
                             if(aValue!=0){
-                                if(aValue<lastChan0Count){
-                                    rollOverCount++;
+                                if(aValue<lastChan0Count[GetSlot()]){
+                                    rollOverCount[GetSlot()]++;
                                 }
-                                long long final = (rollOverCount << 32) | aValue;
+                                long long final = (rollOverCount[GetSlot()] << 32) | aValue;
                                 final += chan0Offset;
-                                lastChan0Count = aValue;
+                                lastChan0Count[GetSlot()] = aValue;
                                 data[indexForRollOver] = (final >> 32) & 0xffffffff;
                                 data[dataIndex++]      = final & 0xffffffff;
                                 goodCount++;
