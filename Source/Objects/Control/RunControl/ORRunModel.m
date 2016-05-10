@@ -1330,6 +1330,12 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     ignoreSelectedScript = aFlag;
 }
 
+//SV
+- (void) setIgnoreRepeat:(BOOL)aFlag
+{
+    ignoreRepeat = aFlag;
+}
+
 - (BOOL) offlineRun
 {
 	return [[ORGlobal sharedGlobal] runMode];

@@ -192,6 +192,7 @@
 - (BOOL) offlineRun;
 - (void) setMaintenanceRuns:(BOOL)aState;
 - (void) setIgnoreSelectedScript:(BOOL)aFlag;
+- (void) setIgnoreRepeat:(BOOL)aFlag; //SV
 
 #pragma mark ¥¥¥Run Modifiers
 - (void) remoteStartRun:(unsigned long)aRunNumber;
