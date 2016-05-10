@@ -1760,16 +1760,16 @@ resetFifoOnStart = _resetFifoOnStart;
     int i;
     uint16_t dacs[14];
 
-    dacs[0] = [self dbIntbyIndex:kNHit100LoThreshold];
-    dacs[1] = [self dbIntbyIndex:kNHit100MedThreshold];
-    dacs[2] = [self dbIntbyIndex:kNHit100HiThreshold];
-    dacs[3] = [self dbIntbyIndex:kNHit20Threshold];
-    dacs[4] = [self dbIntbyIndex:kNHit20LBThreshold];
-    dacs[5] = [self dbIntbyIndex:kESumLowThreshold];
-    dacs[6] = [self dbIntbyIndex:kESumHiThreshold];
-    dacs[7] = [self dbIntbyIndex:kOWLNThreshold];
-    dacs[8] = [self dbIntbyIndex:kOWLELoThreshold];
-    dacs[9] = [self dbIntbyIndex:kOWLEHiThreshold];
+    dacs[0] = [self dbIntByIndex:kNHit100LoThreshold];
+    dacs[1] = [self dbIntByIndex:kNHit100MedThreshold];
+    dacs[2] = [self dbIntByIndex:kNHit100HiThreshold];
+    dacs[3] = [self dbIntByIndex:kNHit20Threshold];
+    dacs[4] = [self dbIntByIndex:kNHit20LBThreshold];
+    dacs[5] = [self dbIntByIndex:kESumLowThreshold];
+    dacs[6] = [self dbIntByIndex:kESumHiThreshold];
+    dacs[7] = [self dbIntByIndex:kOWLNThreshold];
+    dacs[8] = [self dbIntByIndex:kOWLELoThreshold];
+    dacs[9] = [self dbIntByIndex:kOWLEHiThreshold];
 
     /* Last four DAC values are spares? */
     for (i = 10; i < 14; i++) {
