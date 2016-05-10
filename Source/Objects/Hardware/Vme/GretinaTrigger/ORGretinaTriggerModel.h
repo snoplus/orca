@@ -401,6 +401,8 @@ enum {
 - (void) writeToAddress:(unsigned long)anAddress aValue:(unsigned short)aValue;
 - (unsigned short) readFromAddress:(unsigned long)anAddress;
 - (void) readTimeStamps;
+- (void) resetTimeStamps;
+- (void) resetScalerTimeStamps;
 
 #pragma mark •••Data Records
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
