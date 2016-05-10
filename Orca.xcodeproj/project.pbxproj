@@ -1868,6 +1868,8 @@
 		847F948013D4AA31006B06B4 /* ORRad7Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 847F947813D4AA31006B06B4 /* ORRad7Model.m */; };
 		847F948113D4AA31006B06B4 /* Rad7.nib in Resources */ = {isa = PBXBuildFile; fileRef = 847F947913D4AA31006B06B4 /* Rad7.nib */; };
 		847F948213D4AA31006B06B4 /* Rad7.tif in Resources */ = {isa = PBXBuildFile; fileRef = 847F947A13D4AA31006B06B4 /* Rad7.tif */; };
+		8480BE5B1CE116FE006A3EA3 /* ORCAEN830Shared.hh in Headers */ = {isa = PBXBuildFile; fileRef = 8480BE5A1CE116FE006A3EA3 /* ORCAEN830Shared.hh */; };
+		8480BE5C1CE11743006A3EA3 /* ORCAEN830Shared.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 8480BE5A1CE116FE006A3EA3 /* ORCAEN830Shared.hh */; };
 		8481E67917653766001AB905 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8481E67817653766001AB905 /* SystemConfiguration.framework */; };
 		848283C0112B14F100BA30ED /* OffSwitch.tif in Resources */ = {isa = PBXBuildFile; fileRef = 848283BE112B14F100BA30ED /* OffSwitch.tif */; };
 		848283C1112B14F100BA30ED /* OnSwitch.tif in Resources */ = {isa = PBXBuildFile; fileRef = 848283BF112B14F100BA30ED /* OnSwitch.tif */; };
@@ -3594,6 +3596,7 @@
 				84550CB310D03476008A019C /* ORCAEN965Readout.hh in VME_Copy */,
 				4398E6C211B7E3BB00FC4DDE /* ORCAEN785Readout.cc in VME_Copy */,
 				4398E6C311B7E3BB00FC4DDE /* ORCAEN785Readout.hh in VME_Copy */,
+				8480BE5C1CE11743006A3EA3 /* ORCAEN830Shared.hh in VME_Copy */,
 				844EEAB415827AF600E1D7C1 /* ORCAEN830Readout.hh in VME_Copy */,
 				844EEAB315827AD800E1D7C1 /* ORCAEN830Readout.cc in VME_Copy */,
 				43ADFEBB10B6E2090044617C /* ORCAEN419Readout.cc in VME_Copy */,
@@ -5322,6 +5325,7 @@
 		847F947813D4AA31006B06B4 /* ORRad7Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRad7Model.m; path = Source/Objects/Hardware/Serial/Rad7/ORRad7Model.m; sourceTree = SOURCE_ROOT; };
 		847F947913D4AA31006B06B4 /* Rad7.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Rad7.nib; path = Source/Objects/Hardware/Serial/Rad7/Rad7.nib; sourceTree = SOURCE_ROOT; };
 		847F947A13D4AA31006B06B4 /* Rad7.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Rad7.tif; path = Source/Objects/Hardware/Serial/Rad7/Rad7.tif; sourceTree = SOURCE_ROOT; };
+		8480BE5A1CE116FE006A3EA3 /* ORCAEN830Shared.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORCAEN830Shared.hh; sourceTree = "<group>"; };
 		8481E67817653766001AB905 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = ../../../../System/Library/Frameworks/SystemConfiguration.framework; sourceTree = "<group>"; };
 		848283BE112B14F100BA30ED /* OffSwitch.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = OffSwitch.tif; path = Source/Objects/ProcessLogic/ProcessElements/Inputs/PushButton/OffSwitch.tif; sourceTree = SOURCE_ROOT; };
 		848283BF112B14F100BA30ED /* OnSwitch.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = OnSwitch.tif; path = Source/Objects/ProcessLogic/ProcessElements/Inputs/PushButton/OnSwitch.tif; sourceTree = SOURCE_ROOT; };
@@ -10956,6 +10960,7 @@
 				43B191BE1B4D6324003DD77F /* ORCAEN1730Readout.hh */,
 				4342D59211ECB8AD007EFFB1 /* ORCAEN775Readout.cc */,
 				4342D59311ECB8AD007EFFB1 /* ORCAEN775Readout.hh */,
+				8480BE5A1CE116FE006A3EA3 /* ORCAEN830Shared.hh */,
 				844EEAB115827AA100E1D7C1 /* ORCAEN830Readout.hh */,
 				844EEAAF15827A7200E1D7C1 /* ORCAEN830Readout.cc */,
 				43ADFE5C10B6DBCF0044617C /* ORCAENReadout.cc */,
@@ -15138,6 +15143,7 @@
 				8493CC420C99FA0700B46CD4 /* SBC_Linking.h in Headers */,
 				8493CC430C99FA0700B46CD4 /* SBC_Link.h in Headers */,
 				8493CC450C99FA0700B46CD4 /* SBC_LinkController.h in Headers */,
+				8480BE5B1CE116FE006A3EA3 /* ORCAEN830Shared.hh in Headers */,
 				8493CC4D0C99FA0700B46CD4 /* CircularBuffer.h in Headers */,
 				8493CC4E0C99FA0700B46CD4 /* SBC_Cmds.h in Headers */,
 				8493CC4F0C99FA0700B46CD4 /* SBC_Config.h in Headers */,
