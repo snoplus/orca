@@ -545,20 +545,23 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
         ORRunModel* aRunModel = [runModelObjects objectAtIndex:0];
         if([aRunModel quickStart]){
             [self shipDataRecord];
-//            NSLog(@"Reset the timestamps\n");
-//            //to reset the clocks set bit 6 of the MISC_CTRL reg
-//            //When this bit is set, the timestamp counter is held reset with value of zero
-//            //Since there is just a couple of operations here and we want to be fast just
-//            //send the commands without going thru a state machine.
-//            unsigned long aValue = [self readRegister:kMiscCtl1];
-//            [self writeRegister:kMiscCtl1 withValue:aValue &= ~(0x1<<6)];//release
-//            [self resetScaler];
-//            [self writeRegister:kPulsedCtl2 withValue:0x1000]; //send one imp syn
-//            [self readDisplayRegs];
         }
     }
-
 }
+
+- (void) resetTimeStamps
+{
+    //to reset the clocks set bit 6 of the MISC_CTRL reg
+    //When this bit is set, the timestamp counter is held reset with value of zero
+    //Since there is just a couple of operations here and we want to be fast just
+    //send the commands without going thru a state machine.
+    unsigned long aValue = [self readRegister:kMiscCtl1];
+    [self writeRegister:kMiscCtl1 withValue:aValue &= ~(0x1<<6)];//release
+    [self resetScalerTimeStamps];
+    [self writeRegister:kPulsedCtl2 withValue:0x1000]; //send one imp syn
+    [self readDisplayRegs];
+}
+
 - (void) pollLock
 {
     @try {
@@ -619,6 +622,12 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
                // [self pulseNIMOutput];
                 if(![(ORRunModel*)[aNote object] quickStart]){
                     [self initClockDistribution];
+                }
+                else {
+                    //quick start, but check if transistional run
+                    if(([(ORRunModel*)[aNote object] runType] | 0x10000) == 0x10000){
+                        [self resetTimeStamps];
+                    }
                 }
             }
             @catch(NSException* e){
@@ -1561,7 +1570,17 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
         }
     }
 }
-
+- (void) resetScalerTimeStamps
+{
+    if([self isMaster]){
+        //reset the scaler
+        NSArray* scalers = [[(ORAppDelegate*)[NSApp delegate]document] collectObjectsOfClass:NSClassFromString(@"ORCV830Model")];
+        for(id aScaler in scalers){
+            [aScaler performSelector:NSSelectorFromString(@"remoteResetCounters")];
+        }
+    }
+    
+}
 - (BOOL) allRoutersIdle
 {
     int i;
