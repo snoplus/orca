@@ -91,8 +91,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 {
     self = [super init];
     if (self){
-        _tellieClient = [[XmlrpcClient alloc] initWithHostName:@"daq1" withPort:@"5030"];
-        _smellieClient = [[XmlrpcClient alloc] initWithHostName:@"SNODROP2" withPort:@"5020"];
+        _tellieClient = [[XmlrpcClient alloc] initWithHostName:@"localhost" withPort:@"5030"];
+        _smellieClient = [[XmlrpcClient alloc] initWithHostName:@"localhost" withPort:@"5020"];
+        [_smellieClient setTimeout:10];
     }
     return self;
 }
@@ -102,8 +103,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     self = [super initWithCoder:aCoder];
 
     if (self){
-        _tellieClient = [[XmlrpcClient alloc] initWithHostName:@"daq1" withPort:@"5030"];
-        _smellieClient = [[XmlrpcClient alloc] initWithHostName:@"SNODROP2" withPort:@"5020"];
+        _tellieClient = [[XmlrpcClient alloc] initWithHostName:@"localhost" withPort:@"5030"];
+        _smellieClient = [[XmlrpcClient alloc] initWithHostName:@"localhost" withPort:@"5020"];
+        [_smellieClient setTimeout:10];
     }
     return self;
 }
@@ -852,21 +854,19 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 {
     //Read data
     int wavelengthLow = [[smellieSettings objectForKey:@"superK_wavelength_low"] intValue];
-    int wavelengthHigh = [[smellieSettings objectForKey:@"superK_wavelength_high"] intValue];
-    int delta = [[smellieSettings objectForKey:@"superK_wavelength_step"] intValue];
+    int delta = [[smellieSettings objectForKey:@"superK_wavelength_delta"] intValue];
+    int stepSize = [[smellieSettings objectForKey:@"superK_wavelength_step_size"] intValue];
     float noSteps = [[smellieSettings objectForKey:@"superK_num_wavelength_steps"] floatValue];
-
-    float increment;
+    
     NSMutableArray* highEdges = [NSMutableArray arrayWithCapacity:noSteps];
-    if(wavelengthHigh != 0 && wavelengthHigh - wavelengthLow >= delta){
-        increment = (wavelengthHigh - wavelengthLow) / noSteps;
-    } else {
-        [highEdges addObject:[NSNumber numberWithInteger:wavelengthHigh]];
+    if(wavelengthLow == 0 || noSteps == 0){
+        [highEdges addObject:[NSNumber numberWithInteger:(wavelengthLow+delta)]];
         return highEdges;
     }
 
     //Create array
-    for(float edge = (wavelengthLow + delta);edge <= wavelengthHigh; edge = edge + increment){
+    for(int i=0;i<noSteps;i++){
+        int edge = wavelengthLow + delta + i*stepSize;
         [highEdges addObject:[NSNumber numberWithInt:edge]];
     }
     return highEdges;
@@ -876,21 +876,19 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 {
     //Read data
     int wavelengthLow = [[smellieSettings objectForKey:@"superK_wavelength_low"] intValue];
-    int wavelengthHigh = [[smellieSettings objectForKey:@"superK_wavelength_high"] intValue];
-    int delta = [[smellieSettings objectForKey:@"superK_wavelength_step"] intValue];
+    int delta = [[smellieSettings objectForKey:@"superK_wavelength_delta"] intValue];
+    int stepSize = [[smellieSettings objectForKey:@"superK_wavelength_step_size"] intValue];
     float noSteps = [[smellieSettings objectForKey:@"superK_num_wavelength_steps"] floatValue];
     
-    float increment;
     NSMutableArray* lowEdges = [NSMutableArray arrayWithCapacity:noSteps];
-    if(wavelengthHigh != 0 && wavelengthHigh - wavelengthLow >= delta){
-        increment = (wavelengthHigh - wavelengthLow) / noSteps;
-    } else {
+    if(wavelengthLow == 0 || noSteps == 0){
         [lowEdges addObject:[NSNumber numberWithInteger:wavelengthLow]];
         return lowEdges;
     }
     
     //Create array
-    for(float edge = wavelengthLow;edge <= (wavelengthHigh - delta); edge = edge + increment){
+    for(int i=0;i<noSteps;i++){
+        int edge = wavelengthLow + i*stepSize;
         [lowEdges addObject:[NSNumber numberWithInt:edge]];
     }
     return lowEdges;
@@ -906,6 +904,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
      method. I'll look into doing this after the DAQ meeting in Jan - Once I know the tellie
      one works!
      */
+    NSLog(@"%@",smellieSettings);
     NSLog(@"SMELLIE_RUN:Setting up a SMELLIE Run\n");
     NSLog(@"SMELLIE_RUN:Stopping any Blocking Software on SMELLIE computer(SNODROP)\n");
     [self killBlockingSoftware];
@@ -1030,9 +1029,10 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
             break; //if the end of the run is reached then break the run loop
         }
 
+        NSLog(@"%@",[self smellieLaserHeadToSepiaMapping]);
         //Set the laser switch which corresponds to the laserHead mapping to Sepia
         NSLog(@"SMELLIE_RUN:Setting the Laser Switch to Channel:%@ which corresponds to the %@ Laser\n",[NSString stringWithFormat:@"%@",[[self smellieLaserHeadToSepiaMapping] objectForKey:laserKey]],laserKey);
-        [self setLaserSwitch:[NSString stringWithFormat:@"%@",[[ self smellieLaserHeadToSepiaMapping] objectForKey:laserKey]]];
+        [self setLaserSwitch:[NSString stringWithFormat:@"%@",[[self smellieLaserHeadToSepiaMapping] objectForKey:laserKey]]];
 
         //Set the gain Control
         NSLog(@"SMELLIE_RUN:Setting the gain control to: %f V\n",[[[self smellieLaserHeadToGainMapping] objectForKey:laserKey] floatValue]);
@@ -1069,10 +1069,12 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                 softLockOnCommand = @"set_soft_lock_on";
                 softLockOffCommand = @"set_soft_lock_off";
             }
+            NSLog(@"laser key : %@\n", laserKey);
+            NSLog(@"loopLength : %i\n",loopLength);
             //Loop through each intensity of a SMELLIE run
             for(int i=0; i < loopLength; i++){
-
-                if([[NSThread currentThread] isCancelled] || ![runControl isRunning]){
+                NSLog(@"Inside loop : %i\n",i);
+                if([[NSThread currentThread] isCancelled]){// || ![runControl isRunning]){
                     endOfRun = YES;
                     break;
                 }
@@ -1191,6 +1193,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
      Some sign off / tidy up stuff to be called at the end of a smellie run. Again, I think this
      should be moved to a runscript.
      */
+    [self setSmellieSafeStates];
+    [self setSuperKSafeStates];
+
     NSArray*  mtcModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     if(![mtcModels count]){
         NSException* e = [NSException
@@ -1219,9 +1224,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 
     [theMTCModel setupGTCorseDelay:[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_coarse_delay"] intValue]];
     NSLog(@"SMELLIE_RUN:Setting the mtcd coarse delay back to %i \n",[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_coarse_delay"] intValue]);
-
-    [self setSmellieSafeStates];
-    [self setSuperKSafeStates];
 
     if([runControl isRunning]){
         [runControl setForceRestart:YES];
@@ -1648,7 +1650,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     }
     [self setSmellieFibreSwitchToFibreMapping:fibreSwitchOutputToFibre];
     [fibreSwitchOutputToFibre release];
-
+    
+    NSLog(@"%@", fibreSwitchOutputToFibre);
     return configForSmellie;
 }
 
