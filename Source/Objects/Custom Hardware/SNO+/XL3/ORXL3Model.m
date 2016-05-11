@@ -1372,22 +1372,26 @@ void SwapLongBlock(void* p, int32_t n)
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
-	self = [super initWithCoder:decoder];
-	[[self undoManager] disableUndoRegistration];
+    int i;
 
-	[self setSlot:			[decoder decodeIntForKey:	@"slot"]];
-	[self setSelectedRegister:	[decoder decodeIntForKey:	@"ORXL3ModelSelectedRegister"]];
-	xl3Link = [[decoder decodeObjectForKey:@"XL3_Link"] retain];
-	[self setAutoIncrement:		[decoder decodeBoolForKey:	@"ORXL3ModelAutoIncrement"]];
-	[self setRepeatDelay:		[decoder decodeIntForKey:	@"ORXL3ModelRepeatDelay"]];
-	[self setRepeatOpCount:		[decoder decodeIntForKey:	@"ORXL3ModelRepeatOpCount"]];
-	[self setXl3Mode:		[decoder decodeIntForKey:	@"ORXL3ModelXl3Mode"]];
-	[self setSlotMask:		[decoder decodeIntForKey:	@"ORXL3ModelSlotMask"]];
-	[self setXl3RWAddressValue:	[decoder decodeIntForKey:	@"ORXL3ModelXl3RWAddressValue"]];
-	[self setXl3RWDataValue:	[decoder decodeIntForKey:	@"ORXL3ModelXl3RWDataValue"]];
-	[self setXl3PedestalMask:       [decoder decodeIntForKey:	@"ORXL3ModelXl3PedestalMask"]];
-    [self setXl3ChargeInjMask:      [decoder decodeIntForKey: @"ORXL3ModelXl3ChargeInjMask"]];
-    [self setXl3ChargeInjCharge:    [decoder decodeIntForKey: @"ORXL3ModelXl3ChargeInjCharge"]];
+    self = [super initWithCoder:decoder];
+    [[self undoManager] disableUndoRegistration];
+
+    [self setSlot:              [decoder decodeIntForKey:@"slot"]];
+    [self setSelectedRegister:  [decoder decodeIntForKey:@"ORXL3ModelSelectedRegister"]];
+
+    xl3Link = [[decoder decodeObjectForKey:@"XL3_Link"] retain];
+
+    [self setAutoIncrement:         [decoder decodeBoolForKey:@"ORXL3ModelAutoIncrement"]];
+    [self setRepeatDelay:           [decoder decodeIntForKey:@"ORXL3ModelRepeatDelay"]];
+    [self setRepeatOpCount:         [decoder decodeIntForKey:@"ORXL3ModelRepeatOpCount"]];
+    [self setXl3Mode:               [decoder decodeIntForKey:@"ORXL3ModelXl3Mode"]];
+    [self setSlotMask:              [decoder decodeIntForKey:@"ORXL3ModelSlotMask"]];
+    [self setXl3RWAddressValue:     [decoder decodeIntForKey:@"ORXL3ModelXl3RWAddressValue"]];
+    [self setXl3RWDataValue:        [decoder decodeIntForKey:@"ORXL3ModelXl3RWDataValue"]];
+    [self setXl3PedestalMask:       [decoder decodeIntForKey:@"ORXL3ModelXl3PedestalMask"]];
+    [self setXl3ChargeInjMask:      [decoder decodeIntForKey:@"ORXL3ModelXl3ChargeInjMask"]];
+    [self setXl3ChargeInjCharge:    [decoder decodeIntForKey:@"ORXL3ModelXl3ChargeInjCharge"]];
 
     [self setPollXl3Time:           [decoder decodeIntForKey:@"ORXL3ModelPollXl3Time"]];
     //[self setIsPollingXl3:          [decoder decodeBoolForKey:@"ORXL3ModelIsPollingXl3"]];
@@ -1415,6 +1419,13 @@ void SwapLongBlock(void* p, int32_t n)
     [self setHvNominalVoltageA: [decoder decodeIntForKey:@"ORXL3ModelHvNominalVoltageA"]];
     [self setHvNominalVoltageB: [decoder decodeIntForKey:@"ORXL3ModelHvNominalVoltageB"]];
     [self setXl3Mode:           [decoder decodeIntForKey:@"Xl3Mode"]];
+    [self setIsTriggerON:       [decoder decodeBoolForKey:@"isTriggerON"]];
+
+    if ([self isTriggerON]) {
+        [self setTriggerStatus:@"ON"];
+    } else {
+        [self setTriggerStatus:@"OFF"];
+    }
     
     //FIXME from ORCADB
     if ([self hvNominalVoltageA] == 0) {
@@ -1424,18 +1435,15 @@ void SwapLongBlock(void* p, int32_t n)
         [self setHvNominalVoltageB:2500];
     }
 
-    unsigned short i;
-    for (i=0; i<12; i++) {
-        [self setXl3VltThreshold:i withValue:[decoder decodeFloatForKey:[NSString stringWithFormat:@"ORXL3ModelVltThreshold%hd", i]]];
+    for (i = 0; i < 12; i++) {
+        [self setXl3VltThreshold:i withValue:[decoder decodeFloatForKey:[NSString stringWithFormat:@"ORXL3ModelVltThreshold%i", i]]];
     }
     [self setIsXl3VltThresholdInInit:[decoder decodeBoolForKey:@"ORXL3ModelXl3VltThresholdInInit"]];
 
-	if (xl3Mode == 0) [self setXl3Mode: INIT_MODE];
-	if (xl3OpsRunning == nil) xl3OpsRunning = [[NSMutableDictionary alloc] init];
+    if (xl3Mode == 0) [self setXl3Mode: INIT_MODE];
+    if (xl3OpsRunning == nil) xl3OpsRunning = [[NSMutableDictionary alloc] init];
     [self setXl3InitInProgress:NO];
     //if (isPollingXl3 == YES) [self setIsPollingXl3:NO];
-    [self setIsTriggerON:NO]; //this was YES before
-    [self setTriggerStatus:@"OFF"]; //this was ON before 
 
     //fill the safe bundle for first crate init, then pull the FEC and DB IDs
     MB aConfigBundle;
@@ -1450,25 +1458,27 @@ void SwapLongBlock(void* p, int32_t n)
     
     [self safeHvInit];
      
-	[[self undoManager] enableUndoRegistration];
+    [[self undoManager] enableUndoRegistration];
     [self registerNotificationObservers];
-	return self;
+    return self;
 }
 
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
-	[super encodeWithCoder:encoder];
-	[encoder encodeInt:selectedRegister     forKey:@"ORXL3ModelSelectedRegister"];
-	[encoder encodeInt:[self slot]          forKey:@"slot"];
-	[encoder encodeObject:xl3Link           forKey:@"XL3_Link"];
-	[encoder encodeBool:autoIncrement       forKey:@"ORXL3ModelAutoIncrement"];
-	[encoder encodeInt:repeatDelay          forKey:@"ORXL3ModelRepeatDelay"];
-	[encoder encodeInt:repeatOpCount        forKey:@"ORXL3ModelRepeatOpCount"];
-	[encoder encodeInt:xl3Mode              forKey:@"ORXL3ModelXl3Mode"];
-	[encoder encodeInt:selectedSlotMask     forKey:@"ORXL3ModelSlotMask"];
-	[encoder encodeInt:xl3RWAddressValue	forKey:@"ORXL3ModelXl3RWAddressValue"];
-	[encoder encodeInt:xl3RWDataValue       forKey:@"ORXL3ModelXl3RWDataValue"];
-	[encoder encodeInt:xl3PedestalMask      forKey:@"ORXL3ModelXl3PedestalMask"];
+    int i;
+
+    [super encodeWithCoder:encoder];
+    [encoder encodeInt:selectedRegister     forKey:@"ORXL3ModelSelectedRegister"];
+    [encoder encodeInt:[self slot]          forKey:@"slot"];
+    [encoder encodeObject:xl3Link           forKey:@"XL3_Link"];
+    [encoder encodeBool:autoIncrement       forKey:@"ORXL3ModelAutoIncrement"];
+    [encoder encodeInt:repeatDelay          forKey:@"ORXL3ModelRepeatDelay"];
+    [encoder encodeInt:repeatOpCount        forKey:@"ORXL3ModelRepeatOpCount"];
+    [encoder encodeInt:xl3Mode              forKey:@"ORXL3ModelXl3Mode"];
+    [encoder encodeInt:selectedSlotMask     forKey:@"ORXL3ModelSlotMask"];
+    [encoder encodeInt:xl3RWAddressValue    forKey:@"ORXL3ModelXl3RWAddressValue"];
+    [encoder encodeInt:xl3RWDataValue       forKey:@"ORXL3ModelXl3RWDataValue"];
+    [encoder encodeInt:xl3PedestalMask      forKey:@"ORXL3ModelXl3PedestalMask"];
     [encoder encodeInt:xl3ChargeInjMask     forKey:@"ORXL3ModelXl3ChargeInjMask"];
     [encoder encodeInt:xl3ChargeInjCharge   forKey:@"ORXL3ModelXl3ChargeInjCharge"];
 
@@ -1497,10 +1507,10 @@ void SwapLongBlock(void* p, int32_t n)
     [encoder encodeInt:_hvACMOSRateIgnore       forKey:@"ORXL3ModelhvACMOSRateIgnore"];
     [encoder encodeInt:_hvBCMOSRateIgnore       forKey:@"ORXL3ModelhvBCMOSRateIgnore"];
     [encoder encodeInt:xl3Mode                  forKey:@"Xl3Mode"];
+    [encoder encodeBool:_isTriggerON            forKey:@"isTriggerON"];
     
-    unsigned short i;
-    for (i=0; i<12; i++) {
-        [encoder encodeFloat:[self xl3VltThreshold:i] forKey:[NSString stringWithFormat:@"ORXL3ModelVltThreshold%hd", i]];
+    for (i = 0; i < 12; i++) {
+        [encoder encodeFloat:[self xl3VltThreshold:i] forKey:[NSString stringWithFormat:@"ORXL3ModelVltThreshold%i", i]];
     }
     [encoder encodeBool:[self isXl3VltThresholdInInit] forKey:@"ORXL3ModelXl3VltThresholdInInit"];
 }
