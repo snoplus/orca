@@ -126,6 +126,7 @@
 
     int state;
     int start;
+    bool resync;
 
     @private
         //Run type word
@@ -175,6 +176,7 @@
 
 @property (copy,setter=setLogServerHost:) NSString *logHost;
 @property (setter=setLogServerPort:) int logPort;
+@property (nonatomic,assign) bool resync;
 
 @property (copy) NSDictionary* runDocument;
 @property (copy) NSDictionary* configDocument;

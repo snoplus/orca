@@ -112,7 +112,8 @@ mtcConfigDoc = _mtcConfigDoc,
 dataHost,
 dataPort,
 logHost,
-logPort;
+logPort,
+resync;
 
 @synthesize smellieRunHeaderDocList;
 
@@ -125,6 +126,7 @@ logPort;
     rolloverRun = NO;
     state = STOPPED;
     start = COLD_START;
+    resync = NO;
 
     /* initialize our connection to the MTC server */
     mtc_server = [[RedisClient alloc] init];
@@ -289,6 +291,7 @@ logPort;
     rolloverRun = NO;
     state = STOPPED;
     start = COLD_START;
+    resync = NO;
 
     [[self undoManager] disableUndoRegistration];
 	[self initOrcaDBConnectionHistory];
@@ -747,8 +750,9 @@ err:
 
     NSDictionary *userInfo = [aNote userInfo];
 
-    if (![[userInfo objectForKey:@"willRestart"] boolValue]) {
+    if (![[userInfo objectForKey:@"willRestart"] boolValue] || resync) {
         state = STOPPING;
+	resync = NO;
     }
 
     switch (state) {
