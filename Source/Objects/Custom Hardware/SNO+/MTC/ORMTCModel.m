@@ -1760,11 +1760,23 @@ resetFifoOnStart = _resetFifoOnStart;
     int i;
     uint16_t dacs[14];
 
-    @try {
-        for (i = 0; i < 14 ; i++) {
-            dacs[i] = [self dacValueByIndex:i];
-        }
+    dacs[0] = [self dbIntByIndex:kNHit100LoThreshold];
+    dacs[1] = [self dbIntByIndex:kNHit100MedThreshold];
+    dacs[2] = [self dbIntByIndex:kNHit100HiThreshold];
+    dacs[3] = [self dbIntByIndex:kNHit20Threshold];
+    dacs[4] = [self dbIntByIndex:kNHit20LBThreshold];
+    dacs[5] = [self dbIntByIndex:kESumLowThreshold];
+    dacs[6] = [self dbIntByIndex:kESumHiThreshold];
+    dacs[7] = [self dbIntByIndex:kOWLNThreshold];
+    dacs[8] = [self dbIntByIndex:kOWLELoThreshold];
+    dacs[9] = [self dbIntByIndex:kOWLEHiThreshold];
 
+    /* Last four DAC values are spares? */
+    for (i = 10; i < 14; i++) {
+	dacs[i] = 0;
+    }
+
+    @try {
         [mtc okCommand:"load_mtca_dacs %d %d %d %d %d %d %d %d %d %d %d %d %d %d", dacs[0], dacs[1], dacs[2], dacs[3], dacs[4], dacs[5], dacs[6], dacs[7], dacs[8], dacs[9], dacs[10], dacs[11], dacs[12], dacs[13]];
     } @catch(NSException* e) {
         NSLog(@"failed to load the MTCA dacs: %@", [e reason]);     
