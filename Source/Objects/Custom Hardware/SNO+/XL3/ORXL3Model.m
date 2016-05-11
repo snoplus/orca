@@ -1435,8 +1435,8 @@ void SwapLongBlock(void* p, int32_t n)
         [self setHvNominalVoltageB:2500];
     }
 
-    for (i=0; i<12; i++) {
-        [self setXl3VltThreshold:i withValue:[decoder decodeFloatForKey:[NSString stringWithFormat:@"ORXL3ModelVltThreshold%hd", i]]];
+    for (i = 0; i < 12; i++) {
+        [self setXl3VltThreshold:i withValue:[decoder decodeFloatForKey:[NSString stringWithFormat:@"ORXL3ModelVltThreshold%i", i]]];
     }
     [self setIsXl3VltThresholdInInit:[decoder decodeBoolForKey:@"ORXL3ModelXl3VltThresholdInInit"]];
 
@@ -1510,7 +1510,7 @@ void SwapLongBlock(void* p, int32_t n)
     [encoder encodeBool:_isTriggerON            forKey:@"isTriggerON"];
     
     for (i = 0; i < 12; i++) {
-        [encoder encodeFloat:[self xl3VltThreshold:i] forKey:[NSString stringWithFormat:@"ORXL3ModelVltThreshold%hd", i]];
+        [encoder encodeFloat:[self xl3VltThreshold:i] forKey:[NSString stringWithFormat:@"ORXL3ModelVltThreshold%i", i]];
     }
     [encoder encodeBool:[self isXl3VltThresholdInInit] forKey:@"ORXL3ModelXl3VltThresholdInInit"];
 }
