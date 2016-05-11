@@ -387,9 +387,14 @@ snopGreenColor;
     
 }
 
-//Placeholder for resync run. It's not implemented yet.
 - (IBAction)resyncRunAction:(id)sender {
-    NSLogColor([NSColor redColor], @"Resync run is still not implemented... \n");
+    /* A resync run does a hard stop and start without the user having to hit
+     * stop run and then start run. Doing this resets the GTID, which resyncs
+     * crate 9 after it goes out of sync :).
+     *
+     * Does not load the standard run settings. */
+    [model setResync:YES];
+    [runControl restartRun];
 }
 
 
