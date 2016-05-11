@@ -231,7 +231,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                           reason:reasonStr
                           userInfo:nil];
         [e raise];
-        return [NSArray arrayWithObjects:0, 0, nil];
+        return [NSArray array];
+        //return [NSArray arrayWithObjects:0, 0, nil]; <<MAH 5/11/16 can't put numbers into array
+        //not called anyway because of the [e raise] above.
     } else if ([pollResponse count] != 3) {
         NSString* reasonStr = [NSString stringWithFormat:@"*** PIN diode poll returned array of len %i - expected 3", [pollResponse count]];
         NSException* e = [NSException
@@ -239,7 +241,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                           reason:reasonStr
                           userInfo:nil];
         [e raise];
-        return [NSArray arrayWithObjects:0, 0, nil];
+        return [NSArray array];
+        //return [NSArray arrayWithObjects:0, 0, nil]; <<MAH 5/11/16 can't put numbers into array
+        //not called anyway because of the [e raise] above.
     }
     return pollResponse;
 }
@@ -1526,7 +1530,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSString *urlString = [NSString stringWithFormat:@"http://%@:%u/smellie/_design/smellieMainQuery/_view/pullEllieConfigHeaders",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
     NSURL *url = [NSURL URLWithString:urlString];
     NSData *data = [NSData dataWithContentsOfURL:url];
-    NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    NSString *ret = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
     NSError *error =  nil;
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
     if(error){
