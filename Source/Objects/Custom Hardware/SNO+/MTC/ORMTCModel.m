@@ -302,7 +302,7 @@ resetFifoOnStart = _resetFifoOnStart;
 - (int) initAtRunStart:(int) loadTriggers
 {
     /* Initialize all hardware from the model at run start. If loadTriggers
-     * is true, then load the GT mask, otherwise, don't load the GT mask.
+     * is true, then load the GT mask, otherwise, clear the GT mask.
      * Returns 0 on success, -1 on failure. */
 
     @try {
@@ -317,17 +317,21 @@ resetFifoOnStart = _resetFifoOnStart;
         /* Setup Pedestal Crate Mask */
         [self setPedestalCrateMask];
 
-        if (loadTriggers) {
-            /* Setup the GT mask */
-            [self clearGlobalTriggerWordMask];
-            [self setSingleGTWordMask: uLongDBValue(kGtMask)];
-        }
-
         /* Setup GT Crate Mask */
         [self setGTCrateMask];
 
+	/* Clear the GT mask before setting the trigger thresholds because
+	 * we've noticed that changing the thresholds results in a brief
+	 * burst of events. */
+        [self clearGlobalTriggerWordMask];
+
         /* Setup MTCA Thresholds */
         [self loadTheMTCADacs];
+
+        if (loadTriggers) {
+            /* Setup the GT mask */
+            [self setSingleGTWordMask: uLongDBValue(kGtMask)];
+        }
 
         /* Setup MTCA relays */
         [self mtcatLoadCrateMasks];
