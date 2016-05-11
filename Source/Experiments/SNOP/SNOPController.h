@@ -21,6 +21,7 @@
 #import "ORExperimentController.h"
 #import "SNOPDetectorView.h"
 #import "StopLightView.h"
+#include <stdint.h>
 
 @class ORColorScale;
 @class ORSegmentGroup;
@@ -127,6 +128,8 @@
     NSColor *snopGreenColor;
     NSColor *snopOrangeColor;
 
+    /* Mask of which HV supplies are on. Power supply B on crate 16 is bit 19 */
+    uint32_t hvMask;
 }
 
 @property (nonatomic,retain) NSMutableDictionary *smellieRunFileList;
