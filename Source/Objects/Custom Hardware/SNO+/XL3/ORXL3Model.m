@@ -4487,7 +4487,7 @@ err:
             if (!self.hvANeedsUserIntervention && !self.hvBNeedsUserIntervention) {
                 //Update XL3 in case switch was off
                 @try {
-                    [self setHVDacA:[self hvAVoltageDACSetValue] dacB:[self hvBVoltageDACSetValue]];
+                    //[self setHVDacA:[self hvAVoltageDACSetValue] dacB:[self hvBVoltageDACSetValue]];
                 }
                 @catch (NSException *exception) {
                     NSLogColor([NSColor redColor],@"%@ HV init failed to set HV!\n", [self hvBVoltageDACSetValue]);
