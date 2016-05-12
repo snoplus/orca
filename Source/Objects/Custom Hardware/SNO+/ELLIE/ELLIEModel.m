@@ -921,8 +921,13 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     } 
 
     ORMTCModel* theMTCModel = [mtcModels objectAtIndex:0];
-    [theMTCModel stopMTCPedestalsFixedRate]; //stop any pedestals that are currently running
-    
+    @try { 
+      [theMTCModel stopMTCPedestalsFixedRate]; //stop any pedestals that are currently running
+    } @catch {
+        NSLogColor([NSColor redColor], @"couldn't stop MTC ped fixed rate.\n");
+        goto err;
+    }
+     
     //Get the run controller
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
@@ -1092,12 +1097,12 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                     [valuesToFillPerSubRun setObject:[NSNumber numberWithInt:0] forKey:@"intensity"];
                     [valuesToFillPerSubRun setObject:lowBin forKey:@"wavelength_low_edge"];
                     [valuesToFillPerSubRun setObject:highBin forKey:@"wavelength_high_edge"];
-										@try{
-											[self setSuperKWavelegth:lowBinAsString withHighEdge:highBinAsString];
-										} @catch {
-											NSLogColor([NSColor redColor], @" Problem setting superK wavelength.\n");
-											goto err;
-										} 
+		    @try{
+		      [self setSuperKWavelegth:lowBinAsString withHighEdge:highBinAsString];
+		    } @catch {
+		      NSLogColor([NSColor redColor], @" Problem setting superK wavelength.\n");
+		      goto err;
+		    } 
                 } else {
                     NSNumber* laserIntensity = [intensityArray objectAtIndex:i];
                     NSString* laserIntensityAsString = [NSString stringWithFormat:@"%i",[laserIntensity intValue]];
@@ -1107,11 +1112,11 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                     [valuesToFillPerSubRun setObject:[NSNumber numberWithInt:0] forKey:@"wavelength_low_edge"];
                     [valuesToFillPerSubRun setObject:[NSNumber numberWithInt:0] forKey:@"wavelength_high_edge"];
                     @try{
-											[self setLaserIntensity:laserIntensityAsString];
-										} @catch {
-											NSLogColor([NSColor redColor], @" Problem setting laser intensity.\n");
-											goto err;
-										} 
+		      [self setLaserIntensity:laserIntensityAsString];
+		    } @catch {
+		      NSLogColor([NSColor redColor], @" Problem setting laser intensity.\n");
+		      goto err;
+		    } 
                 }
 
                 //this used to be 10.0,  Slave mode in Orca requires time (unknown reason) - Chris J
@@ -1125,20 +1130,20 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                     [f release];
 
                     NSLog(@"SMELLIE_RUN:Intensity:Firing Pedestals\n");
-										@try{
-											[theMTCModel fireMTCPedestalsFixedRate];
-										} @catch {
-											NSLogColor([NSColor redColor], @"Exception setting mtc ped rate.\n");
-											goto err;
-										} 
+		    @try{
+		      [theMTCModel fireMTCPedestalsFixedRate];
+		    } @catch {
+		      NSLogColor([NSColor redColor], @"Exception setting mtc ped rate.\n");
+		      goto err;
+		    } 
 
                     float pulserRate = [numericTriggerFrequencyInSlaveMode floatValue];
-										@try{
-											[theMTCModel setThePulserRate:pulserRate];
-										} @catch {
-											NSLogColor([NSColor redColor], @"Exception setting mtc pulser rate.\n");
-											goto err;
-										}
+		    @try{
+		      [theMTCModel setThePulserRate:pulserRate];
+		    } @catch {
+		      NSLogColor([NSColor redColor], @"Exception setting mtc pulser rate.\n");
+		      goto err;
+		    }
                     NSLog(@"SMELLIE_RUN: Pulsing at %f Hz for %f seconds \n",[triggerFrequencyInSlaveMode floatValue],timeToPulse);
                     //THIS IS CRAZY - FIND SOME BETTER WAY OF DOING IT USING TUBII COUNTERS
                     [NSThread sleepForTimeInterval:timeToPulse];
@@ -1148,35 +1153,35 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                     NSString* numOfPulses = [NSString stringWithFormat:@"%@",[smellieSettings objectForKey:@"triggers_per_loop"]];
                     NSString* triggerFrequency = [NSString stringWithFormat:@"%@",[smellieSettings objectForKey:@"trigger_frequency"]];
                     NSLog(@"SMELLIE_RUN:%@ Pulses at %@ Hz \n",numOfPulses,triggerFrequency);
-										@try{
-											[self sendCustomSmellieCmd:masterModeCommand withArgs:@[triggerFrequency, numOfPulses]];
-										} @catch {
-											NSLogColor([NSColor redColor], @"Problem setting master mode trigger frequency.\n");
-											goto err;
-										}
+		    @try{
+		      [self sendCustomSmellieCmd:masterModeCommand withArgs:@[triggerFrequency, numOfPulses]];
+		    } @catch {
+		      NSLogColor([NSColor redColor], @"Problem setting master mode trigger frequency.\n");
+		      goto err;
+		    }
                 }
 
                 if([self smellieSlaveMode]){
                     NSLog(@"SMELLIE_RUN:Stopping MTCPedestals\n");
-										@try{
-											[theMTCModel stopMTCPedestalsFixedRate];
-										} @catch {
-											NSLogColor([NSColor redColor], @"Exception stopping MTC ped rate.\n");
-											goto err;
-										}
-								}
+		    @try{
+		      [theMTCModel stopMTCPedestalsFixedRate];
+		    } @catch {
+		      NSLogColor([NSColor redColor], @"Exception stopping MTC ped rate.\n");
+		      goto err;
+		    }
+		}
 
                 //Keep record of sub-run settings
                 [self updateSmellieRunDocument:valuesToFillPerSubRun];
                 [valuesToFillPerSubRun release];
 
                 //Activate software locks
-								@try {
-									[self sendCustomSmellieCmd:softLockOnCommand withArgs:nil];
-								} @catch {
-									NSLogColor([NSColor redColor], @"Problem sending softlock.\n");
-									goto err;									
-								}
+		@try {
+		  [self sendCustomSmellieCmd:softLockOnCommand withArgs:nil];
+		} @catch {
+		  NSLogColor([NSColor redColor], @"Problem sending softlock.\n");
+		  goto err;									
+		}
                 //Check if run file requests a sleep time between sub_runs
                 if([smellieSettings objectForKey:@"sleep_between_sub_run"]){
                     NSTimeInterval sleepTime = [[smellieSettings objectForKey:@"sleep_between_sub_run"] floatValue];
@@ -1191,25 +1196,15 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //stop the pedestals if required
     if([self smellieSlaveMode]){
         NSLog(@"SMELLIE_RUN:Stopping MTCPedestals\n");
-				@try {
-					[theMTCModel stopMTCPedestalsFixedRate];
-				} @catch {
-					NSLogColor([NSColor redColor], @"Exception stopping MTC ped rate.\n");
-					goto err;
-				}
+	@try {
+	  [theMTCModel stopMTCPedestalsFixedRate];
+	} @catch {
+	  NSLogColor([NSColor redColor], @"Exception stopping MTC ped rate.\n");
+	  goto err;
+	}
     }
 
-    //Resetting the mtcd to settings before the smellie run
-    NSLog(@"SMELLIE_RUN:Returning SMELLIE into Safe States after finishing a Run\n");
-    [self setSmellieSafeStates];
-    [self setSuperKSafeStates];
-
-    if(!endOfRun){
-        //Post a note. on the main thread to request a call to stopSmellieRun
-        dispatch_sync(dispatch_get_main_queue(), ^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORELLIERunFinished object:self];
-        });
-    }
+    goto err;
 }
 
 -(void)stopSmellieRun
@@ -1223,41 +1218,41 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 
     NSArray*  mtcModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     if(![mtcModels count]){
-					NSLogColor([NSColor redColor], @"Could not get MTC model.\n");
-					goto err;
+      NSLogColor([NSColor redColor], @"Could not get MTC model.\n");
+      goto err;
     }
     ORMTCModel* theMTCModel = [mtcModels objectAtIndex:0];
 
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
-					NSLogColor([NSColor redColor], @"Could not get ORRunModel.\n");
-					goto err;
+      NSLogColor([NSColor redColor], @"Could not get ORRunModel.\n");
+      goto err;
     }
     runControl = [runModels objectAtIndex:0];
 
     //Set the Mtcd for back to original settings
-		@try{
-			[theMTCModel setThePulserRate:[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_pulser_period"] floatValue]];
-		}@catch {
-			NSLogColor([NSColor redColor],@"Problem setting the MTC pulser rate.\n");
-			goto err;
-		}
-
-		@try{
-			[theMTCModel enablePulser];
-		} @catch {
-			NSLogColor([NSColor redColor],@"Could not enable pulser \n");
-			goto err;
-		}
+    @try{
+      [theMTCModel setThePulserRate:[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_pulser_period"] floatValue]];
+    }@catch {
+      NSLogColor([NSColor redColor],@"Problem setting the MTC pulser rate.\n");
+      goto err;
+    }
+    
+    @try{
+      [theMTCModel enablePulser];
+    } @catch {
+      NSLogColor([NSColor redColor],@"Could not enable pulser \n");
+      goto err;
+    }
     NSLog(@"SMELLIE_RUN:Setting the mtcd pulser back to %f Hz\n",[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_pulser_period"] floatValue]);
     [theMTCModel stopMTCPedestalsFixedRate];
 
-		@try{
-			[theMTCModel setupGTCorseDelay:[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_coarse_delay"] intValue]];
-		} @catch {
-			NSLogColor([NSColor redColor],@"Could not set the MTC coarse delay\n");
-			goto err;
-		}
+    @try{
+      [theMTCModel setupGTCorseDelay:[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_coarse_delay"] intValue]];
+    } @catch {
+      NSLogColor([NSColor redColor],@"Could not set the MTC coarse delay\n");
+      goto err;
+    }
     NSLog(@"SMELLIE_RUN:Setting the mtcd coarse delay back to %i \n",[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_coarse_delay"] intValue]);
 
     if([runControl isRunning]){
@@ -1267,7 +1262,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSLog(@"SMELLIE_RUN:Stopping SMELLIE Run\n");
 }
 
-err
+err:
 {
     //Resetting the mtcd to settings before the smellie run
     NSLog(@"SMELLIE_RUN:Returning SMELLIE into Safe States after finishing a Run\n");
