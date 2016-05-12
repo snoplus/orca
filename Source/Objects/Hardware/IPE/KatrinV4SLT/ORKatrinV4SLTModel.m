@@ -1569,7 +1569,7 @@ return;
 	if(countersEnabled)[self writeEnCnt];
 	else [self writeDisCnt];
 	if(countersEnabled  && !(controlReg & (0x1 << kCtrlInhEnShift))  ){
-		NSLog(@"WARNING: IPE-DAQ SLTv4: you use 'Counters Enabled' but 'Inhibits Enabled SW' is not set!\n");//TODO: maybe popup Orca Alarm window? -tb-
+		NSLog(@"WARNING: KATRIN-DAQ SLTv4: you use 'Counters Enabled' but 'Inhibits Enabled SW' is not set!\n");//TODO: maybe popup Orca Alarm window? -tb-
 	}
 	[self loadSecondsReg];
 	[self writeControlReg];
@@ -2270,7 +2270,7 @@ return;
 
 - (NSString*) cpuName
 {
-	return [NSString stringWithFormat:@"IPE-DAQ-V4 SLT Card (Crate %d)",[self crateNumber]];
+	return [NSString stringWithFormat:@"KATRIN-DAQ-V4 SLT Card (Crate %d)",[self crateNumber]];
 }
 
 - (NSString*) sbcLockName
