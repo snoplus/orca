@@ -4465,10 +4465,17 @@ err:
             }
             
             //set model values to hv readback or 0 if switch is off
+            //N.B. readback can be arbitrarily offset from the previous setpoint
+            //so we can't trust it enough to update the real setpoint. Never
+            //allow setpoints over target. The first step if the HV is changed
+            //will include this offset whatever it may be.
             if (!self.hvANeedsUserIntervention) {
                 if ([self hvASwitch]) {
-                    [self setHvAVoltageDACSetValue:[self hvAVoltageReadValue]* 4096/3000.];
-                    [self setHvANextStepValue:[self hvAVoltageReadValue]* 4096/3000.];
+                    double next = [self hvAVoltageReadValue]*4096/3000.;
+                    if (next > [self hvAVoltageTargetValue])
+                        next = [self hvAVoltageTargetValue];
+                    [self setHvAVoltageDACSetValue:next];
+                    [self setHvANextStepValue:next];
                 } else {
                     [self setHvAVoltageDACSetValue:0];
                     [self setHvANextStepValue:0];
@@ -4476,22 +4483,14 @@ err:
             }
             if (!self.hvBNeedsUserIntervention) {
                 if ([self hvBSwitch]) {
-                    [self setHvBVoltageDACSetValue:[self hvBVoltageReadValue]* 4096/3000.];
-                    [self setHvBNextStepValue:[self hvBVoltageReadValue]* 4096/3000.];
+                    double next = [self hvBVoltageReadValue]*4096/3000.;
+                    if (next > [self hvBVoltageTargetValue])
+                        next = [self hvBVoltageTargetValue];
+                    [self setHvBVoltageDACSetValue:next];
+                    [self setHvBNextStepValue:next];
                 } else {
                     [self setHvBVoltageDACSetValue:0];
                     [self setHvBNextStepValue:0];
-                }
-            }
-            
-            if (!self.hvANeedsUserIntervention && !self.hvBNeedsUserIntervention) {
-                //Update XL3 in case switch was off
-                @try {
-                    [self setHVDacA:[self hvAVoltageDACSetValue] dacB:[self hvBVoltageDACSetValue]];
-                }
-                @catch (NSException *exception) {
-                    NSLogColor([NSColor redColor],@"%@ HV init failed to set HV!\n", [self hvBVoltageDACSetValue]);
-                    continue;
                 }
             }
             
