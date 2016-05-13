@@ -57,7 +57,6 @@
     self.task           = nil;
     
     [allOutput release];
-    [[NSFileManager defaultManager] removeItemAtPath:scriptFilePath error:nil];
     self.scriptFilePath = nil;
 
     [super dealloc];
@@ -139,12 +138,19 @@
             
             [self readOutput:readHandle];
             [readHandle closeFile];
-            
+            [[NSFileManager defaultManager] removeItemAtPath:scriptFilePath error:nil];
+
             SEL theDoneSelector = NSSelectorFromString(doneSelectorName);
             if ([delegate respondsToSelector:theDoneSelector]){
                 [delegate performSelectorOnMainThread:theDoneSelector withObject:nil waitUntilDone:NO];
             }
-            [fileManager removeItemAtPath:scriptPath error:nil];
+            @try {
+                [task terminate];
+            }
+            @catch (NSException* e){
+            }
+            self.task           = nil;
+            
         }
         @catch (NSException* e){
             NSLog(@"File Getter exception.. stopped during launch\n");
