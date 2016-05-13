@@ -83,11 +83,6 @@
 
 
 #pragma mark ¥¥¥Drawing
-- (BOOL)isOpaque
-{
-	return YES;
-}
-
 - (void)drawRect:(NSRect)rect 
 {
 	[NSBezierPath setDefaultLineWidth:1];

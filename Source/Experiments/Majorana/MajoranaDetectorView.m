@@ -54,7 +54,6 @@
 {
 	viewType = aViewType;
 }
-- (BOOL) isOpaque {return YES;}
 - (void) makeCrateImage
 {
     if(!crateImage){
