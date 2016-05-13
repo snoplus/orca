@@ -25,7 +25,7 @@ bool ORCaen785Readout::Readout(SBC_LAM_Data* lamData)
 	//read the states
  	
 	result = VMERead(statusTwoAddress,
-                     0x39,
+                     0x09,
                      sizeof(statusTwo),
                      statusTwo);
     if (result != sizeof(statusTwo)) {
@@ -42,7 +42,7 @@ bool ORCaen785Readout::Readout(SBC_LAM_Data* lamData)
 		uint32_t buffer[v785BufferSizeInLongs];
 		
 		result = DMARead(GetBaseAddress()+fifoAddress,
-						 0x39,
+						 0x09,
 						 (uint32_t) 4,
 						 (uint8_t*) buffer,
 						 v785BufferSizeInBytes);
@@ -125,7 +125,7 @@ bool ORCaen785Readout::Readout(SBC_LAM_Data* lamData)
 	
 	else {
 		result = VMERead(statusOneAddress,
-						 0x39,
+						 0x09,
 						 sizeof(statusOne),
 						 statusOne);
 		
@@ -139,7 +139,7 @@ bool ORCaen785Readout::Readout(SBC_LAM_Data* lamData)
 			
 			//OK, at least one data value is ready, first value read should be a header
 			uint32_t dataValue;
-			result = VMERead(GetBaseAddress()+fifoAddress, 0x39, sizeof(dataValue), dataValue);
+			result = VMERead(GetBaseAddress()+fifoAddress, 0x09, sizeof(dataValue), dataValue);
 			if((result == sizeof(dataValue)) && (ShiftAndExtract(dataValue,24,0x7) == 0x2)){
 				int32_t numMemorizedChannels = ShiftAndExtract(dataValue,8,0x3f);
 				int32_t i;
@@ -152,7 +152,7 @@ bool ORCaen785Readout::Readout(SBC_LAM_Data* lamData)
 					data[dataIndex++] = locationMask;
 					uint8_t dataOK = true;
 					for(i=0;i<numMemorizedChannels;i++){
-						result = VMERead(GetBaseAddress()+fifoAddress, 0x39, sizeof(dataValue), dataValue);
+						result = VMERead(GetBaseAddress()+fifoAddress, 0x09, sizeof(dataValue), dataValue);
 						if((result == sizeof(dataValue)) && (ShiftAndExtract(dataValue,24,0x7) == 0x0))data[dataIndex++] = dataValue;
 						else {
 							dataOK = false;
@@ -164,7 +164,7 @@ bool ORCaen785Readout::Readout(SBC_LAM_Data* lamData)
 					}
 					if(dataOK){
 						//OK we read the data, get the end of block
-						result = VMERead(GetBaseAddress()+fifoAddress, 0x39, sizeof(dataValue), dataValue);
+						result = VMERead(GetBaseAddress()+fifoAddress, 0x09, sizeof(dataValue), dataValue);
 						if((result != sizeof(dataValue)) || (ShiftAndExtract(dataValue,24,0x7) != 0x4)){
 							//some kind of bad error, report and flush the buffer
 							LogBusErrorForCard(GetSlot(),"Rd Err: CAEN 785 0x%04x %s", GetBaseAddress(),strerror(errno));
@@ -188,7 +188,7 @@ void ORCaen785Readout::FlushDataBuffer()
 	int32_t i;
 	for(i=0;i<0x07FC;i++) {
 		uint32_t dataValue;
-		int32_t result = VMERead(GetBaseAddress()+fifoAddress, 0x39, sizeof(dataValue), dataValue);
+		int32_t result = VMERead(GetBaseAddress()+fifoAddress, 0x09, sizeof(dataValue), dataValue);
 		if(result<0){
 			LogBusErrorForCard(GetSlot(),"Flush Err: CAEN 785 0x%04x %s", GetBaseAddress(),strerror(errno));
 			break;
