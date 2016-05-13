@@ -359,7 +359,7 @@ bool ORSIS3305Card::writeDataTransferControlReg(uint8_t group, uint8_t command, 
             return false;
             break;
     }
-    if (group >= 0 && group < 2) {
+    if (group < 2) {
         uint32_t writeValue = command << 30;
         writeValue |= value;
         
