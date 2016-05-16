@@ -412,7 +412,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 			[eval setDelegate:self];
 			//[NSThread detachNewThreadSelector:@selector(_evalMain:) toTarget:self withObject:mainNodes];
 			scriptThread = [[NSThread alloc] initWithTarget:self selector:@selector(_evalMain:) object:mainNodes];
-			[scriptThread setStackSize:4*1024*1024];
+			[scriptThread setStackSize:8*1024*1024];
 			[scriptThread start];
 		}
 		else NSLog(@"%@ has NO main function\n",scriptName);
