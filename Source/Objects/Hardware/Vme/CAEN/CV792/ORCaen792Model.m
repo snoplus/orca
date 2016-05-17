@@ -588,6 +588,17 @@ NSString* ORCaen792ModelShipTimeStampChanged          = @"ORCaen792ModelShipTime
     [self writeSlideConstReg];
 }
 
+- (void) resetEventCounter
+{
+    unsigned short aValue = 0;
+    [[self adapter] writeWordBlock:&aValue
+                         atAddress:[self baseAddress] + reg[kEventCounterReset].addressOffset
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+
+}
+
 - (void) doSoftClear
 {
     // Clear unit
