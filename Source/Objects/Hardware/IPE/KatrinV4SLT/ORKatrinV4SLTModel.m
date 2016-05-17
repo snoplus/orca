@@ -2280,7 +2280,7 @@ return;
 
 - (NSString*) sbcLocalCodePath
 {
-	return @"Source/Objects/Hardware/IPE/IpeV4 SLT/SLTv4_Readout_Code";
+	return @"Source/Objects/Hardware/IPE/KatrinV4SLT/KatrinSLTv4_Readout_Code";
 }
 
 - (NSString*) codeResourcePath
