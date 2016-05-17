@@ -1368,7 +1368,7 @@
                                         <button toolTip="ORKatrinV4SLTModel" id="BfE-ou-XXY" customClass="ObjectFactory">
                                             <rect key="frame" x="597" y="31" width="30" height="178"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="bevel" title="SLT" bezelStyle="regularSquare" image="IpeV4SLTCard" imagePosition="above" alignment="center" state="on" inset="2" id="BvF-I6-1FS">
+                                            <buttonCell key="cell" type="bevel" title="SLT" bezelStyle="regularSquare" image="KatrinV4SLTCard" imagePosition="above" alignment="center" state="on" inset="2" id="BvF-I6-1FS">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system" size="10"/>
                                             </buttonCell>
@@ -3299,6 +3299,7 @@ Relay</string>
         <image name="KatrinFLTCard" width="12" height="218"/>
         <image name="KatrinSLTCard" width="12" height="218"/>
         <image name="KatrinV4FLTCard" width="12" height="152"/>
+        <image name="KatrinV4SLTCard" width="12" height="152"/>
         <image name="Keithley6487" width="100" height="46"/>
         <image name="L2301Card" width="16" height="128"/>
         <image name="L2551Card" width="16" height="128"/>
