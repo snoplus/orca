@@ -18656,6 +18656,7 @@
 					"-lcrypto",
 					"-lssl",
 					"-lz",
+					"-Wl,-stack_size,1000000",
 				);
 				PRODUCT_NAME = Orca;
 				SDKROOT = "";
