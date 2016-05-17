@@ -101,6 +101,9 @@
 	
 	NSNumberFormatter*		cmosFormatter;
 
+    //DB
+    IBOutlet NSMatrix*      problemMatrix;
+
 	//cache some stuff to make things easier
 	NSMatrix* onlineSwitches[4];
 	NSMatrix* pmtImages[4];
