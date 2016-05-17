@@ -91,7 +91,6 @@
                 <outlet property="writeValueField" destination="1228" id="2824"/>
                 <outlet property="writeValueStepper" destination="1227" id="1297"/>
                 <outlet property="writteButton" destination="1255" id="HS0-aS-53u"/>
-                <outlet property="xilinxFileField" destination="2066" id="3240"/>
                 <outlet property="xilinxFilePathField" destination="2066" id="3568"/>
             </connections>
         </customObject>
