@@ -542,7 +542,7 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
     if([[self address] length]){
         if([aMessage length]){
             NSString* s;
-            if(isAlarm) s = [NSString stringWithFormat:@"Posted alarms:\n\n%@\nAcknowlege them or others will be contacted!",aMessage];
+            if(isAlarm) s = [NSString stringWithFormat:@"[%@] Posted alarms:\n\n%@\nAcknowlege them or others will be contacted!",computerName(),aMessage];
             else        s = [NSString stringWithFormat:@"From ORCA (%@). \n\n%@\n",computerName(),aMessage];
             
             NSArray* addresses = [[self address] componentsSeparatedByString:@","];
@@ -650,6 +650,11 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
     if([self secondaryPerson])[record setObject:[[self secondaryPerson] data] forKey:@"Secondary"];
     if([self tertiaryPerson])[record setObject:[[self tertiaryPerson] data] forKey:@"Tertiary"];
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:record];
+    if([[record allKeys] count]){
+        [record setObject:@"OnCall" forKey:@"title"];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:record];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddHistoryAdcRecord" object:self userInfo:record];
+    }
 }
 @end
