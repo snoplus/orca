@@ -37,6 +37,7 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
 
 @interface OROnCallListModel (private)
 - (void) postCouchDBRecord;
+- (void) postCouchDBRecord:(BOOL)alsoToHistory;
 @end
 
 
@@ -172,7 +173,7 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
         }
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:OROnCallListModelReloadTable object:self];
-    [self postCouchDBRecord];
+    [self postCouchDBRecord:YES];
 }
 
 - (void) registerNotificationObservers
@@ -645,6 +646,10 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
 @implementation OROnCallListModel (private)
 - (void) postCouchDBRecord
 {
+    [self postCouchDBRecord:NO];
+}
+- (void) postCouchDBRecord:(BOOL)alsoToHistory
+{
     NSMutableDictionary* record = [NSMutableDictionary dictionary];
     if([self primaryPerson])[record setObject:[[self primaryPerson] data] forKey:@"Primary"];
     if([self secondaryPerson])[record setObject:[[self secondaryPerson] data] forKey:@"Secondary"];
@@ -654,7 +659,7 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
         [record setObject:@"OnCall" forKey:@"title"];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:record];
         
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddHistoryAdcRecord" object:self userInfo:record];
+        if(alsoToHistory)[[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddHistoryAdcRecord" object:self userInfo:record];
     }
 }
 @end
