@@ -62,8 +62,8 @@ static NSDictionary* xl3Ops;
 	[super awakeFromNib];
     
     NSDictionary *statedict = [NSDictionary dictionaryWithObjectsAndKeys:
-                               [NSColor redColor], @"closed",
-                               [NSColor blueColor], @"open",
+                               [NSColor blueColor], @"closed",
+                               [NSColor redColor], @"open",
                                [NSColor blackColor], @"unk",
                                nil];
     msbox = [[ORMultiStateBox alloc] initWithStates:statedict size:20 pad:4 bevel:2];
@@ -1496,34 +1496,6 @@ static NSDictionary* xl3Ops;
 - (IBAction)hvTriggerOnAction:(id)sender
 {
     [model hvTriggersON];
-}
-
-- (IBAction)hvMasterPanicAction:(id)sender
-{
-    /*
-    NSArray* xl3s = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
-    for (id xl3 in xl3s) {
-        [model hvPanicDown];
-    }
-     */
-
-    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
-
-    //[model hvMasterPanicDown];
-    NSLog(@"Detector wide panic down started\n");
-}
-
-- (IBAction)hvMasterTriggerOffAction:(id)sender
-{
-    //NSLog(@"Stop all polling of XL3s");
-    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(setIsPollingXl3:) withObject:NO];
-    
-    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersOFF)];
-}
-
-- (IBAction)hvMasterTriggerOnAction:(id)sender
-{
-    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersON)];
 }
 
 //connection
