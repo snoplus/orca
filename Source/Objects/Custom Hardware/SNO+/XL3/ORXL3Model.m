@@ -1867,7 +1867,7 @@ void SwapLongBlock(void* p, int32_t n)
 
     /*Check XL3 is in init mode before init-ing with xilinx. */
     [self updateXl3Mode];
-    if ([self xl3Mode] != NORMAL_MODE && xilinxLoad) {
+    if ([self xl3Mode] != INIT_MODE && xilinxLoad) {
         NSLogColor([NSColor redColor], @"XL3 %02d not in init mode.  Aborting initialization.\n", [self crateNumber]);
         goto err;
     }
