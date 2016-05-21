@@ -639,10 +639,8 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
                 db = [ObjectFactory makeObject:@"ORFecDaughterCardModel"];
                 [db setBoardID:[NSString stringWithFormat:@"%x", config->dbID[i]]];
 
-                dispatch_sync(dispatch_get_main_queue(), ^{
-                    [self addObject:db];
-                    [self place:db intoSlot:i];
-                });
+                [self addObject:db];
+                [self place:db intoSlot:i];
             }
         }
     }

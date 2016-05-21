@@ -1055,67 +1055,80 @@ static void SwapLongBlock(void* p, int32_t n)
 	}
 }
 
-- (void) readPacket:(char*)aPacket
+- (void) readPacket: (char*) aPacket
 {
-	//this is private method called from this object only, we lock the socket, and expect that xl3 thread is the only accessor
-	int n;			
-	int selectionResult = 0;
-	int numBytesToGet = XL3_PACKET_SIZE;
-	time_t t1 = time(0);
-	fd_set fds;
-	
-	struct timeval tv;
-	tv.tv_sec  = 0;
-	tv.tv_usec = 2000;
-	memset(aPacket, 0, XL3_PACKET_SIZE);
-	
-	while(numBytesToGet){
-		do {
-			n = recv(workingSocket, aPacket, numBytesToGet, MSG_DONTWAIT);
-			if(n < 0 && (errno == EAGAIN || errno == EINTR)){
-				if ([self errorTimeOutSeconds] && (time(0) - t1) > [self errorTimeOutSeconds]) {
-					//[self disconnect];
-					[NSException raise:@"Socket time out" format:@"%@ Disconnected", IPNumber];
-				}
-			}
-			else break;
-		} while (1);
+    /* Read a single packet from the XL3. Raise an exception if it times out
+     * or the XL3 disconnects.
+     *
+     * Note: This is private method called from this object only, we lock the
+     * socket, and expect that the xl3 thread is the only accessor. */
+    int n;
+    int selectionResult = 0;
+    int numBytesToGet = XL3_PACKET_SIZE;
+    time_t t1 = time(0);
+    fd_set fds;
 
-		if (n > 0) {
-			numBytesToGet -= n;
-			aPacket += n;
-			if (numBytesToGet == 0) break;
-			//TODO!!! remove the following lines for deployment
-			NSLog(@"XL3 packet read incomplete??? numBytesToGet: %d n: %d\n", numBytesToGet, n);
-			aPacket[n] = '\0';
-			NSLog(@"Dumping the partial packet as a string: %s\n", aPacket);
-			//numBytesToGet = 0;
-			break;
-		}
-		else if(n==0){
-			//[self disconnect];
-			[NSException raise:@"Socket time out" format:@"%@ Disconnected", IPNumber];
-		} 
-		else {
-			[NSException raise:@"Socket error" format:@"Error <%@>: %s",IPNumber,strerror(errno)];
-		} 
-		
-		while(1) {
-			FD_ZERO(&fds);
-			FD_SET(workingSocket, &fds);
-			selectionResult = select(workingSocket + 1, &fds, NULL, NULL, &tv);
-			if (selectionResult == -1 && !(errno == EAGAIN || errno == EINTR)) {
-				NSLog(@"Error reading XL3 <%@> port: %d\n", IPNumber, portNumber);
-				[NSException raise:@"Socket Error" format:@"Error <%@>: %s", IPNumber, strerror(errno)];
-			}
-			if ([self errorTimeOutSeconds] && (time(0) - t1) > [self errorTimeOutSeconds]) {
-				//[self disconnect];
-				[NSException raise:@"Socket time out" format:@"%@ Disconnected",IPNumber];
-			}
-			
-			if (selectionResult > 0 && FD_ISSET(workingSocket, &fds)) break;
-		}			
- 	}
+    struct timeval tv;
+    tv.tv_sec  = 0;
+    tv.tv_usec = 2000;
+    memset(aPacket, 0, XL3_PACKET_SIZE);
+
+    while(numBytesToGet) {
+        do {
+            n = recv(workingSocket, aPacket, numBytesToGet, MSG_DONTWAIT);
+            if(n < 0 && (errno == EAGAIN || errno == EINTR)) {
+                /* Since the socket is nonblocking, recv() returns -1 and sets
+                 * errno to EAGAIN if there are no messages available at the
+                 * socket. */
+                if ([self errorTimeOutSeconds] && \
+                    (time(0) - t1) > [self errorTimeOutSeconds]) {
+                    [NSException raise:@"Socket time out"
+                     format:@"%@ Disconnected", IPNumber];
+                }
+            } else {
+                /* Either we got data or there was a problem. */
+                break;
+            }
+        } while (1);
+
+        if (n > 0) {
+            /* We read n bytes from the socket. */
+            numBytesToGet -= n;
+            aPacket += n;
+            /* If we've got a full packet break. */
+            if (numBytesToGet == 0) break;
+        } else if(n == 0) {
+            /* If recv() returns 0, it means the XL3 has disconnected. */
+            [NSException raise:@"Socket time out" format:@"%@ Disconnected", IPNumber];
+        } else {
+            /* There was a problem with the socket. */
+            [NSException raise:@"Socket error" format:@"Error <%@>: %s",IPNumber,strerror(errno)];
+        }
+
+        while(1) {
+            /* Wait until the socket is readable. */
+            FD_ZERO(&fds);
+            FD_SET(workingSocket, &fds);
+
+            selectionResult = select(workingSocket + 1, &fds, NULL, NULL, &tv);
+
+            if (selectionResult == -1 && \
+                !(errno == EAGAIN || errno == EINTR)) {
+                NSLog(@"Error reading XL3 <%@> port: %d\n", IPNumber,
+                      portNumber);
+                [NSException raise:@"Socket Error" format:@"Error <%@>: %s",
+                 IPNumber, strerror(errno)];
+            }
+
+            if ([self errorTimeOutSeconds] && \
+                (time(0) - t1) > [self errorTimeOutSeconds]) {
+                [NSException raise:@"Socket time out"
+                 format:@"%@ Disconnected",IPNumber];
+            }
+
+            if (selectionResult > 0 && FD_ISSET(workingSocket, &fds)) break;
+        }
+    }
 }
 
 - (BOOL) canWriteTo:(int)aSocket
