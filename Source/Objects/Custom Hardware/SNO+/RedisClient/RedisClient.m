@@ -61,11 +61,11 @@
                               userInfo: nil];
         [excep raise];
     } else if (context->err) {
-       NSString *err = [NSString stringWithUTF8String:context->errstr]; 
-       [self disconnect];
-       NSException *excep = [NSException exceptionWithName:@"RedisClient"
-                             reason:err
-                             userInfo: nil];
+        NSString *err = [NSString stringWithUTF8String:context->errstr]; 
+        [self disconnect];
+        NSException *excep = [NSException exceptionWithName:@"RedisClient"
+                              reason:err
+                              userInfo: nil];
         [excep raise];
     }
 
@@ -78,10 +78,16 @@
 
 - (void) disconnect
 {
-   if(context) {
-       redisFree(context);
-       context = NULL;
-   }
+    if(context) {
+        redisFree(context);
+        context = NULL;
+    }
+}
+
+- (void) reconnect
+{
+    [self disconnect];
+    [self connect];
 }
 
 - (redisReply*) vcommand:(const char *)fmt args:(va_list)ap
@@ -91,12 +97,19 @@
     redisReply *r = redisvCommand(context,fmt,ap);
 
     if (r == NULL) {
-        NSString *err = [NSString stringWithUTF8String:context->errstr];
-        [self disconnect];
-        NSException *excep = [NSException exceptionWithName:@"RedisClient"
-                              reason:err 
-                              userInfo:nil];
-        [excep raise];
+        /* Try the command again in case the server was just restarted. */
+        [self reconnect];
+
+        r = redisvCommand(context,fmt,ap);
+
+        if (r == NULL) {
+            NSString *err = [NSString stringWithUTF8String:context->errstr];
+            [self disconnect];
+            NSException *excep = [NSException exceptionWithName:@"RedisClient"
+                                  reason:err
+                                  userInfo:nil];
+            [excep raise];
+        }
     }
     
     if(r->type == REDIS_REPLY_ERROR) {

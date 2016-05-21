@@ -25,6 +25,7 @@
 - (void) setTimeout: (long) _timeout;
 - (void) connect;
 - (void) disconnect;
+- (void) reconnect;
 - (redisReply*) vcommand: (const char*) fmt args:(va_list) args;
 - (redisReply*) command: (const char *) fmt, ...;
 - (void) okCommand: (const char *) fmt, ...;
