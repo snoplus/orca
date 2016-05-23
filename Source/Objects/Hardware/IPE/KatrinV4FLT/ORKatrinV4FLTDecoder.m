@@ -731,7 +731,7 @@ startIndex=traceStart16;
 
     uint32_t version                = ShiftAndExtract(ptr[1],0,0x1);    //bit 1 = version
     uint32_t countHREnabledChans    = ShiftAndExtract(ptr[1],8,0x1f);   //NOC in record
-
+if(version==1) title= @"Katrin FLT Hit Rate Record v1\n\n";
 
 	int i;
     
@@ -741,12 +741,15 @@ startIndex=traceStart16;
 						  ut_time,hitRateLengthSec,newTotal];
         for(i=0; i<countHREnabledChans; i++){
             uint32_t chan	= ShiftAndExtract(ptr[5+i],20,0xff);
-            uint32_t over	= ShiftAndExtract(ptr[5+countHREnabledChans+i],31,0x1);
-            uint32_t hitrate= ShiftAndExtract(ptr[5+countHREnabledChans+i], 0,0x7fffffff);
+            uint32_t over	= ShiftAndExtract(ptr[5+countHREnabledChans+i],23,0x1);
+            uint32_t hitrate= ShiftAndExtract(ptr[5+countHREnabledChans+i], 0,0x7fffff);
+            uint32_t pileupcount= ShiftAndExtract(ptr[5+countHREnabledChans+i], 24,0xff);
             if(over)
                 [hrString appendString: [NSString stringWithFormat:@"Chan %2d    = OVERFLOW\n", chan] ];
             else
                 [hrString appendString: [NSString stringWithFormat:@"Chan %2d    = %d\n", chan,hitrate] ];
+            //[hrString appendString: [NSString stringWithFormat:@"PilUpCnt %2d    = %d\n", chan,  pileupcount] ];
+            [hrString appendString: [NSString stringWithFormat:    @"  PilUpCnt = %d\n",   pileupcount] ];
         }
         
     }else{
