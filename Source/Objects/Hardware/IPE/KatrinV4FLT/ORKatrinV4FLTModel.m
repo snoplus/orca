@@ -20,6 +20,7 @@
 
 #import "ORKatrinV4FLTModel.h"
 #import "ORIpeV4SLTModel.h"
+#import "ORKatrinV4SLTModel.h"
 #import "ORIpeCrateModel.h"
 #import "ORHWWizParam.h"
 #import "ORHWWizSelection.h"
@@ -520,7 +521,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		    }
             [fltV4useDmaBlockReadAlarm setAcknowledged:NO];
 		    [fltV4useDmaBlockReadAlarm postAlarm];
-            NSLog(@"%@::%@  ALARM: You selected to use DMA mode. This mode is still experimental and should not yet used for important measurements! It is currently available for Energy+Trace (sync) mode only!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+            NSLog(@"%@::%@  ALARM: You selected to use DMA mode. This mode is still experimental. It is currently available for Energy+Trace (sync) mode only!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
 	}
     useDmaBlockRead = aUseDmaBlockRead;
 
@@ -2049,8 +2050,21 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 		}
 		
         //read SLT second counters after readout of the hitrates
-        unsigned long sltSubSecAddr =  [[[self crate] adapter] getAddress: kSltV4SubSecondCounterReg];		
-        unsigned long sltSecAddr    =  [[[self crate] adapter] getAddress: kSltV4SecondCounterReg];		
+        //  need to consider two types of SLT cards -tb- 2016-05
+        //DEBUG
+        NSLog(@"%@::%@   slt is of class %@\n  ",NSStringFromClass([self class]),NSStringFromSelector(_cmd),NSStringFromClass([[[self crate] adapter] class]));//DEBUG -tb-
+        id slt = [[self crate] adapter];
+        unsigned long sltSubSecAddr =  0;
+        unsigned long sltSecAddr    =  0;
+        if( [slt isKindOfClass: [ORKatrinV4SLTModel class]]){
+            sltSubSecAddr =  [slt getAddress: kKatrinV4SLTSubSecondCounterReg];
+            sltSecAddr    =  [slt getAddress: kKatrinV4SLTSecondCounterReg];
+        }else{
+            sltSubSecAddr =  [slt getAddress: kSltV4SubSecondCounterReg];
+            sltSecAddr    =  [slt getAddress: kSltV4SecondCounterReg];
+			
+		}
+        
 		[aList addCommand: [[[self crate] adapter] readHardwareRegisterCmd:sltSubSecAddr]];
 		[aList addCommand: [[[self crate] adapter] readHardwareRegisterCmd:sltSecAddr]];
         
