@@ -15,6 +15,7 @@
 
 //init static members and globals
 uint32_t histoShipSumHistogram = 0;
+uint32_t skipFltEventReadout = 0;
 
 
 #if !PMC_COMPILE_IN_SIMULATION_MODE
@@ -58,6 +59,8 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
     uint32_t eventType  = GetDeviceSpecificData()[1];
     uint32_t fltRunMode = GetDeviceSpecificData()[2];
     uint32_t runFlags   = GetDeviceSpecificData()[3];//this is runFlagsMask of ORKatrinV4FLTModel.m, load_HW_Config_Structure:index:
+        uint32_t skipFltEventReadout = runFlags & kSkipFltEventReadoutFlag;//kSkipFltEventReadoutFlag is 0x200000
+    
     uint32_t triggerEnabledMask = GetDeviceSpecificData()[4];
     uint32_t daqRunMode = GetDeviceSpecificData()[5];
     //uint32_t filterIndex = GetDeviceSpecificData()[6]; obsolete, changed 2012-11 -tb-
@@ -1452,7 +1455,7 @@ fprintf(stdout,"4x - readpr:%i, writeptr:%i\n",readptrx,writeptrx);fflush(stdout
 	
 	// 2013-11-14 bipolar energy update - changes in SLT registers (for versionCFPGA  >= 0x20010300  &&  versionFPGA8 >= 0x20010300) -tb-
 	//===================================================================================================================
-    if(srack->theFlt[col]->isPresent()){
+    if(srack->theFlt[col]->isPresent()  && !(skipFltEventReadout==kSkipFltEventReadoutFlag)){
 		
 		static uint32_t currFlt = col;// only for better readability (started using it since EnergyTraceSync mode for HW data buffering)  -tb-
 		

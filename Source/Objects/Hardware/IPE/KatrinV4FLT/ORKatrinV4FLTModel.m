@@ -32,6 +32,7 @@
 #import "ORCommandList.h"
 
 
+NSString* ORKatrinV4FLTModelSkipFltEventReadoutChanged = @"ORKatrinV4FLTModelSkipFltEventReadoutChanged";
 NSString* ORKatrinV4FLTModelBipolarEnergyThreshTestChanged = @"ORKatrinV4FLTModelBipolarEnergyThreshTestChanged";
 NSString* ORKatrinV4FLTModelUseBipolarEnergyChanged = @"ORKatrinV4FLTModelUseBipolarEnergyChanged";
 NSString* ORKatrinV4FLTModelUseSLTtimeChanged = @"ORKatrinV4FLTModelUseSLTtimeChanged";
@@ -420,6 +421,20 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 }
 
 #pragma mark •••Accessors
+
+- (int) skipFltEventReadout
+{
+    return skipFltEventReadout;
+}
+
+- (void) setSkipFltEventReadout:(int)aSkipFltEventReadout
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSkipFltEventReadout:skipFltEventReadout];
+    if(aSkipFltEventReadout) skipFltEventReadout = 0x1;
+    else  skipFltEventReadout = 0x0;
+    //skipFltEventReadout = aSkipFltEventReadout;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelSkipFltEventReadoutChanged object:self];
+}
 
 - (unsigned long) bipolarEnergyThreshTest
 {
@@ -2228,6 +2243,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     
     [[self undoManager] disableUndoRegistration];
 	
+    [self setSkipFltEventReadout:[decoder decodeIntForKey:@"skipFltEventReadout"]];
     [self setBipolarEnergyThreshTest:[decoder decodeInt32ForKey:@"bipolarEnergyThreshTest"]];
     [self setUseBipolarEnergy:[decoder decodeIntForKey:@"useBipolarEnergy"]];
     //[self setUseSLTtime:[decoder decodeIntForKey:@"useSLTtime"]];
@@ -2270,6 +2286,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 {
     [super encodeWithCoder:encoder];
 	
+    [encoder encodeInt:skipFltEventReadout forKey:@"skipFltEventReadout"];
     [encoder encodeInt32:bipolarEnergyThreshTest forKey:@"bipolarEnergyThreshTest"];
     [encoder encodeInt:useBipolarEnergy forKey:@"useBipolarEnergy"];
     //[encoder encodeInt:useSLTtime forKey:@"useSLTtime"];
@@ -2806,7 +2823,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     if(runMode == kIpeFltV4_EnergyDaqMode | runMode == kIpeFltV4_EnergyTraceDaqMode)
         runFlagsMask |= kSyncFltWithSltTimerFlag;//bit 17 = "sync flt with slt timer" flag
     if((shipSumHistogram == 1) && (!syncWithRunControl)) runFlagsMask |= kShipSumHistogramFlag;//bit 18 = "ship sum histogram" flag   //2013-06 added (!syncWithRunControl) - if syncWithRunControl is set, this 'facility' will produce sum histograms (using the decoder) -tb-
-	
+	if(skipFltEventReadout) runFlagsMask |= kSkipFltEventReadoutFlag;//fast event readout (SLT fifo)  //2016-05 added
     
 	configStruct->card_info[index].deviceSpecificData[3] = runFlagsMask;	
 //NSLog(@"RunFlags 0x%x\n",configStruct->card_info[index].deviceSpecificData[3]);

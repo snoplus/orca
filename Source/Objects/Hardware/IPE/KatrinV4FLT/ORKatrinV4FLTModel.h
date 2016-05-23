@@ -116,6 +116,7 @@
     int32_t isBetweenSubruns;//temp variable used for shipping sum histograms -tb-
     int useBipolarEnergy;
     unsigned long bipolarEnergyThreshTest;
+    int skipFltEventReadout;
 }
 
 #pragma mark •••Initialization
@@ -133,6 +134,8 @@
 - (void) syncWithRunControlCheckStopCondition;
 
 #pragma mark •••Accessors
+- (int) skipFltEventReadout;
+- (void) setSkipFltEventReadout:(int)aSkipFltEventReadout;
 - (unsigned long) bipolarEnergyThreshTest;
 - (void) setBipolarEnergyThreshTest:(unsigned long)aBipolarEnergyThreshTest;
 - (int) useBipolarEnergy;
@@ -424,6 +427,7 @@
 				  n:(int) n;
 @end
 
+extern NSString* ORKatrinV4FLTModelSkipFltEventReadoutChanged;
 extern NSString* ORKatrinV4FLTModelBipolarEnergyThreshTestChanged;
 extern NSString* ORKatrinV4FLTModelUseBipolarEnergyChanged;
 extern NSString* ORKatrinV4FLTModelUseSLTtimeChanged;

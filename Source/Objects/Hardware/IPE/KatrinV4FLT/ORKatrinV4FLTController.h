@@ -29,6 +29,7 @@
 @interface ORKatrinV4FLTController : OrcaObjectController {
 	@private
 		IBOutlet NSTabView*		tabView;	
+	    IBOutlet NSButton*      skipFltEventReadoutCB;
 	IBOutlet   NSTextField* bipolarEnergyThreshTestTextField;
 	    IBOutlet NSButton*      useBipolarEnergyCB;
 	    IBOutlet NSPopUpButton* useSLTtimePU;
@@ -159,6 +160,7 @@
 - (void) updateButtons;
 
 #pragma mark •••Interface Management
+- (void) skipFltEventReadoutChanged:(NSNotification*)aNote;
 - (void) bipolarEnergyThreshTestChanged:(NSNotification*)aNote;
 - (void) useBipolarEnergyChanged:(NSNotification*)aNote;
 - (void) useSLTtimeChanged:(NSNotification*)aNote;
@@ -225,6 +227,7 @@
 - (void) fifoFlagsChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) skipFltEventReadoutCBAction:(id)sender;
 - (IBAction) bipolarEnergyThreshTestTextFieldAction:(id)sender;
 - (IBAction) useBipolarEnergyCBAction:(id)sender;
 - (IBAction) useSLTtimePUAction:(id)sender;

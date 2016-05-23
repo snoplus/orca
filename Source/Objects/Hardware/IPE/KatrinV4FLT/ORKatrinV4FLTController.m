@@ -404,9 +404,19 @@
                          name : ORKatrinV4FLTModelBipolarEnergyThreshTestChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(skipFltEventReadoutChanged:)
+                         name : ORKatrinV4FLTModelSkipFltEventReadoutChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) skipFltEventReadoutChanged:(NSNotification*)aNote
+{
+	[skipFltEventReadoutCB setIntValue: [model skipFltEventReadout]];
+}
 
 - (void) bipolarEnergyThreshTestChanged:(NSNotification*)aNote
 {
@@ -691,6 +701,7 @@
 	[self useSLTtimeChanged:nil];
 	[self useBipolarEnergyChanged:nil];
 	[self bipolarEnergyThreshTestChanged:nil];
+	[self skipFltEventReadoutChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -1081,6 +1092,11 @@
 }
 
 #pragma mark •••Actions
+
+- (void) skipFltEventReadoutCBAction:(id)sender
+{
+	[model setSkipFltEventReadout:[sender intValue]];	
+}
 
 - (void) bipolarEnergyThreshTestTextFieldAction:(id)sender
 {
