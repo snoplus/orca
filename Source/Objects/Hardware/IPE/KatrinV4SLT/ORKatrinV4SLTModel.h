@@ -422,6 +422,7 @@ static IpeRegisterNamesStruct regKatrinSLTV4[kKatrinV4SLTNumRegs] = {
 - (unsigned long) readControlReg;
 - (unsigned long) readPageSelectReg;
 - (void)		  writeControlReg;
+- (void)		  writeControlRegRunFlagOn:(BOOL) aState;
 - (void)		  printControlReg;
 - (unsigned long) readStatusReg;
 - (void)		  printStatusReg;

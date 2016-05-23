@@ -1312,7 +1312,7 @@ NSLog(@"  arguments: %@ \n" , arguments);
 	NSLogFont(aFont,@"PPS            : %@\n",IsBitSet(data,kCtrlPPSMask)?@"GPS":@"Internal");
 	NSLogFont(aFont,@"TP Enable      : 0x%02x\n", ExtractValue(data,kCtrlTpEnMask,11));
 	NSLogFont(aFont,@"TP Shape       : %d\n", IsBitSet(data,kCtrlShapeMask));
-	NSLogFont(aFont,@"Run Mode       : %@\n", IsBitSet(data,kCtrlRunMask)?@"Normal":@"Test");
+	NSLogFont(aFont,@"Run Mode       : %@\n", IsBitSet(data,kCtrlRunMask)?@"ON":@"OFF");
 	NSLogFont(aFont,@"Test SLT       : %@\n", IsBitSet(data,kCtrlTstSltMask)?@"Enabled":@"Disabled");
 	NSLogFont(aFont,@"IntA Enable    : %@\n", IsBitSet(data,kCtrlIntEnMask)?@"Enabled":@"Disabled");
 }
@@ -1323,6 +1323,12 @@ NSLog(@"  arguments: %@ \n" , arguments);
 	[self writeReg:kKatrinV4SLTControlReg value:controlReg];
 }
 
+- (void)writeControlRegRunFlagOn:(BOOL) aState
+{
+    unsigned long controlRegValue = controlReg;
+    controlRegValue &= ~kCtrlRunMask;//
+	[self writeReg:kKatrinV4SLTControlReg value:controlRegValue];
+}
 
 
 
@@ -1874,14 +1880,15 @@ return;
 	if(pollingWasRunning) [poller stop];
 	
 	[self writeSetInhibit];  //TODO: maybe move to readout loop to avoid dead time -tb-
-	
+    [self writeControlRegRunFlagOn:FALSE];//stop run mode -> clear event buffer -tb- 2016-05
+     
         //DEBUG         [self dumpSltSecondCounter:@"vor initBoard"];
         
         
 	dataTakers = [[readOutGroup allObjects] retain];		//cache of data takers.
     
     //check: are there FLTs in histogram mode?
-	int runMode=0, countHistoMode=0, countNonHistoMode=0;
+	int runMode=0, countHistoMode=0, countNonHistoMode=0, countBipolarEnergyMode=0;
     //DEBUG         [self dumpSltSecondCounter:@"FLT-runTaskStarted:"];
     //loop over Readout List
 	for(id obj in dataTakers){
@@ -1889,6 +1896,11 @@ return;
             runMode=[obj runMode];
             if(runMode == kIpeFltV4_Histogram_DaqMode) countHistoMode++; else countNonHistoMode++;
         }
+        if([obj respondsToSelector:@selector(useBipolarEnergy)]){
+            runMode=[obj useBipolarEnergy];
+            if([obj useBipolarEnergy]) countBipolarEnergyMode++;
+        }
+        
     }
     //DEBUG         NSLog(@"%@::%@  countHistoMode:%i  countNonHistoMode:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),countHistoMode,countNonHistoMode);//DEBUG -tb-
     //DEBUG         [self dumpSltSecondCounter:nil];
