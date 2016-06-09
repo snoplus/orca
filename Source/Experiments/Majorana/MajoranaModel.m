@@ -34,6 +34,7 @@
 #import "ORMJDInterlocks.h"
 #import "ORVME64CrateModel.h"
 #import "ORMJDSource.h"
+#import "ORDataProcessing.h"
 
 NSString* MajoranaModelIgnorePanicOnBChanged        = @"MajoranaModelIgnorePanicOnBChanged";
 NSString* MajoranaModelIgnorePanicOnAChanged        = @"MajoranaModelIgnorePanicOnAChanged";
@@ -71,7 +72,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         [mjdSource[i] release];
 
     }
-    
+    [anObjForCouchID release];
     [stringMap release];
     [specialMap release];
     [super dealloc];
@@ -126,8 +127,32 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                      selector : @selector(customInfoRequest:)
                          name : ORiSegHVCardRequestCustomInfo
                        object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(runStarted:)
+                         name : ORRunStartedNotification
+                       object : nil];
+
 
 }
+- (void) runStarted:(NSNotification*) aNote
+{
+    if(!anObjForCouchID) anObjForCouchID = [[ORMJDHeaderRecordID alloc] init];
+    NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:
+                          [anObjForCouchID fullID],                     @"name",
+                          @"MJDHeader",                                 @"title",
+                          [[aNote userInfo] objectForKey:kHeader],      kHeader,
+                          [[aNote userInfo] objectForKey:kRunNumber],   kRunNumber,
+                          [[aNote userInfo] objectForKey:kSubRunNumber],kSubRunNumber,
+                          [[aNote userInfo] objectForKey:kRunMode],     kRunMode,
+                          nil];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:anObjForCouchID userInfo:info];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddHistoryAdcRecord" object:anObjForCouchID userInfo:info];
+}
+
+
 - (void) customInfoRequest:(NSNotification*)aNote
 {
     if([[aNote object] isKindOfClass:NSClassFromString(@"ORiSegHVCard")]){
@@ -932,7 +957,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
 
 #pragma mark ¥¥¥CardHolding Protocol
-- (int) maxNumberOfObjects              { return 2; }
+- (int) maxNumberOfObjects              { return 3; }
 - (int) objWidth                        { return 50; }	//In this case, this is really the obj height.
 - (int) groupSeparation                 { return 0; }
 - (NSString*) nameForSlot:(int)aSlot    { return [NSString stringWithFormat:@"Slot %d",aSlot]; }
@@ -943,7 +968,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
 - (NSRange) legalSlotsForObj:(id)anObj
 {
-	if([anObj isKindOfClass:NSClassFromString(@"ORRemoteSocketModel")])			return NSMakeRange(0,2);
+	if([anObj isKindOfClass:NSClassFromString(@"ORRemoteSocketModel")])			return NSMakeRange(0,3);
     else return NSMakeRange(0,0);
 }
 
@@ -1116,5 +1141,12 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     return [contents componentsSeparatedByString:@"\n"];
 }
 
+@end
+
+@implementation ORMJDHeaderRecordID
+- (NSString*) fullID
+{
+   return @"MJDDataHeader";
+}
 @end
 

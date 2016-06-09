@@ -38,6 +38,7 @@
 @class ORAlarm;
 @class ORMJDInterlocks;
 @class ORMJDSource;
+@class ORMJDHeaderRecordID;
 
 @interface MajoranaModel :  ORExperimentModel <OROrderedObjHolding>
 {
@@ -52,6 +53,7 @@
     
     ORMJDInterlocks*    mjdInterlocks[2];
     ORMJDSource*        mjdSource[2];
+    ORMJDHeaderRecordID* anObjForCouchID;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -70,6 +72,7 @@
 - (void) setVmeCrateHVConstraint:(int)aCrate state:(BOOL)aState;
 - (void) rampDownHV:(int)aCrate vac:(int)aVacSystem;
 - (id) mjdInterlocks:(int)index;
+- (void) runStarted:(NSNotification*) aNote;
 - (void) hvInfoRequest:(NSNotification*)aNote;
 - (void) customInfoRequest:(NSNotification*)aNote;
 - (void) setDetectorStringPositions;
@@ -127,3 +130,8 @@ extern NSString* ORMajoranaModelViewTypeChanged;
 extern NSString* ORMajoranaModelPollTimeChanged;
 extern NSString* ORMJDAuxTablesChanged;
 extern NSString* ORMajoranaModelLastConstraintCheckChanged;
+
+
+@interface ORMJDHeaderRecordID : NSObject
+- (NSString*) fullID;
+@end

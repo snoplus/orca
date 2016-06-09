@@ -61,7 +61,7 @@
 {
 	detectorSize		 = NSMakeSize(770,770);
 	detailsSize			 = NSMakeSize(560,600);
-	subComponentViewSize = NSMakeSize(580,530);
+	subComponentViewSize = NSMakeSize(580,570);
 	detectorMapViewSize	 = NSMakeSize(900,760);
     vetoMapViewSize		 = NSMakeSize(580,565);
     calibrationViewSize	 = NSMakeSize(580,320);
@@ -233,7 +233,8 @@
                      selector : @selector(sourceIsInChanged:)
                          name : ORMJDSourceIsInChanged
                        object : nil];
-}
+ }
+
 
 - (void) updateWindow
 {
