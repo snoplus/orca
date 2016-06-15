@@ -1866,14 +1866,23 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 	return (runInfo.amountInBuffer == 0) && !irqThreadRunning;
 }
 
+//SV
+- (void) waitForPingTask
+{
+    if([self pingTaskRunning]){
+        [self performSelector:@selector(waitForPingTask) withObject:self afterDelay:5];
+    }
+}
+
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {	
     [self performSelector:@selector(getRunInfoBlock) withObject:self afterDelay:1];
+    [self waitForPingTask]; //SV
+    [self pingVerbose:NO]; //SV - moved. Used to be before [self clearRates];
     [self getErrorInfoBlock];
     [self reportErrorsByCard];
 	[eCpuCBFillingAlarm clearAlarm];
 	[eCpuCBLostDataAlarm clearAlarm];
-    [self pingVerbose:NO];
     [self clearRates];
     [self postCouchDBRecord];
 }

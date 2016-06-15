@@ -327,6 +327,7 @@ typedef enum eSBC_ThrottleConsts{
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (BOOL) doneTakingData;
+- (void) waitForPingTask; //SV
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) load_HW_Config:(SBC_crate_config*)aConfig;
 - (unsigned long) throttle;
