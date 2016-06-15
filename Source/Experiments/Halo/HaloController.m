@@ -404,15 +404,7 @@
     }
     [schedulerSetupPU selectItemAtIndex:tag];
 
-    if([[model haloSentry]toggleInterval] == 0 || ![[model haloSentry] toggleTimerIsRunning])
-    {
-        if([[model haloSentry] scheduledToggleTime]) [nextToggleField setStringValue:@"Waiting for end of run"];
-        else [nextToggleField setStringValue:@"None scheduled"];
-    }
-    else
-    {
-        [nextToggleField setStringValue:[NSString stringWithFormat:@"%@", [[[NSDate date] dateByAddingTimeInterval:[[model haloSentry] toggleInterval]]stdDescription]]];
-    }
+    [nextToggleField setStringValue:[[model haloSentry] nextToggleTime]];
 }
 
 - (void) updateButtons

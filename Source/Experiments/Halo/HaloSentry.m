@@ -145,7 +145,7 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 
     [sbcs release];
     sbcs = nil;
-    sbcs = [[[(ORAppDelegate*)[NSApp delegate]document] collectObjectsOfClass:NSClassFromString(@"ORVmecpuModel")]retain];
+    sbcs = [[[(ORAppDelegate*)[NSApp delegate]document] collectObjectsOfClass:NSClassFromString(@"ORVmecpuModel")]retain]; //SV
 
     [shapers release];
     shapers = nil;
@@ -163,6 +163,7 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
     if(sentryIsRunning && !ignoreRunStates){
         [self setSentryType:ePrimary];
         [self setNextState:eStarting stepTime:.2];
+        if(![toggleTimer isValid] && !scheduledToggleTime)[self startTimer]; //SV
         [self step];
         [self updateRemoteMachine];
     }
@@ -190,13 +191,22 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 - (void) sbcSocketDropped:(NSNotification*)aNote
 {
     if(sentryIsRunning){
-        //the sbc socket was dropped. Most likely caused by the sbc readout process dying.
-        ignoreRunStates = YES;
-        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(handleSbcSocketDropped) object:nil];
-        [self performSelector:@selector(handleSbcSocketDropped) withObject:nil afterDelay:5];
+        [self appendToSentryLog:@"Sentry notified of SBC socket dropped"];
+        
+        if(!toggleAction && ([self sentryType]==ePrimary)){
+            [self appendToSentryLog:@"Dropped socket issue will be resolved by this DAQ"];
+            
+            if(scheduledToggleTime){
+                [self setToggleInterval:0];
+            }
+            
+            //the sbc socket was dropped. Most likely caused by the sbc readout process dying.
+            ignoreRunStates = YES;
+            [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(handleSbcSocketDropped) object:nil];
+            [self performSelector:@selector(handleSbcSocketDropped) withObject:nil afterDelay:60]; //Changed delay from 5 to 60
+        }
     }
 }
-
 
 #pragma mark ***Accessors
 
@@ -517,6 +527,12 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 }
 
 //SV
+- (NSMutableArray*) sentryLog
+{
+    return sentryLog;
+}
+
+//SV
 - (BOOL) toggleTimerIsRunning
 {
     return [toggleTimer isValid];
@@ -535,6 +551,12 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 }
 
 //SV
+- (NSString*) nextToggleTime
+{
+    return nextToggleTime;
+}
+
+//SV
 - (void) setToggleInterval:(int) seconds
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setToggleInterval:toggleInterval];
@@ -544,6 +566,7 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
     
     toggleInterval = seconds;
     [self appendToSentryLog:[NSString stringWithFormat:@"Toggle interval set to %i day(s)", toggleInterval/86400]];
+    if(toggleTimer==0){ nextToggleTime = @"None scheduled"; }
     
     //If timer was already running, restart with new setup/toggle interval
     if([toggleTimer isValid])
@@ -559,11 +582,12 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 //SV
 - (void) startTimer
 {
-    if (toggleInterval > 0)
+    if (toggleInterval > 0 && sentryIsRunning)
     {
         [self appendToSentryLog:@"Starting sentry timer"];
         if ([toggleTimer isValid]){ [toggleTimer release]; }
         toggleTimer = [[NSTimer scheduledTimerWithTimeInterval:toggleInterval target:self selector:@selector(waitForEndOfRun:) userInfo:nil repeats:NO] retain];
+        nextToggleTime = [NSString stringWithFormat:@"%@", [[[NSDate date] dateByAddingTimeInterval:toggleInterval] stdDescription]];
         [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryToggleIntervalChanged object:self];
     }
 }
@@ -572,12 +596,12 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 - (void) stopTimer
 {
     scheduledToggleTime = FALSE;
-    [runControl setIgnoreRepeat:FALSE];
     if ([toggleTimer isValid]){
         [self appendToSentryLog:@"Stopping sentry timer"];
         [toggleTimer invalidate];
         [toggleTimer release];
         toggleTimer = nil;
+        nextToggleTime = @"None scheduled";
         [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryToggleIntervalChanged object:self];
     }
 }
@@ -585,9 +609,11 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 //SV
 - (void) doScheduledToggle
 {
-    [self appendToSentryLog:@"TOGGLING NOW"];
-    [self toggleSystems];
-    scheduledToggleTime = FALSE;
+    if(sentryIsRunning){
+        [self appendToSentryLog:@"TOGGLING NOW"];
+        [self toggleSystems];
+        scheduledToggleTime = FALSE;
+    }
 }
 
 //SV
@@ -603,10 +629,12 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
         [self appendToSentryLog:@"Waiting for local run to end"];
         scheduledToggleTime = TRUE;
         [runControl setIgnoreRepeat:TRUE];
+        nextToggleTime = @"Waiting for end of run";
     }
     
     else{
         [self appendToSentryLog:@"Timer was stopped"];
+        nextToggleTime = @"None scheduled";
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryToggleIntervalChanged object:self];
 }
@@ -621,6 +649,8 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
     [toggleTimer invalidate];
     [toggleTimer release];
     toggleTimer = nil; //SV
+    toggleAction = false;
+    [self appendToSentryLog:@"Sentry started."]; //SV
     [self step];
 }
 
@@ -631,6 +661,7 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
     [self step];
     [[ORGlobal sharedGlobal] removeRunVeto:@"Secondary"];
     [self stopTimer]; //SV
+    [self appendToSentryLog:@"Sentry stopped."]; //SV
 }
 
 #pragma mark ***Archival
@@ -671,12 +702,14 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 
 - (void) postConnectionAlarm
 {
-    if(!noConnectionAlarm){
-        noConnectionAlarm = [[ORAlarm alloc] initWithName:@"No ORCA Connection" severity:kHardwareAlarm];
-        [noConnectionAlarm setHelpString:@"No connection can be made to the other ORCA.\n\nThis alarm will remain until the condition is fixed. You may acknowledge the alarm to silence it"];
-        [noConnectionAlarm setSticky:YES];
+    if(sentryIsRunning){
+        if(!noConnectionAlarm){
+            noConnectionAlarm = [[ORAlarm alloc] initWithName:@"No ORCA Connection" severity:kHardwareAlarm];
+            [noConnectionAlarm setHelpString:@"No connection can be made to the other ORCA.\n\nThis alarm will remain until the condition is fixed. You may acknowledge the alarm to silence it"];
+            [noConnectionAlarm setSticky:YES];
+        }
+        [noConnectionAlarm postAlarm];
     }
-    [noConnectionAlarm postAlarm];
 }
 
 - (void) clearConnectionAlarm
@@ -687,15 +720,17 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 
 - (void) postMacPingAlarm
 {
-    macPingFailedCount++;
+    if(sentryIsRunning){
+        macPingFailedCount++;
 
-    if(!macPingFailedAlarm && !otherSystemStealthMode){
-        NSString* alarmName = [NSString stringWithFormat:@"%@ Unreachable",otherSystemIP];
-        macPingFailedAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kHardwareAlarm];
-        [macPingFailedAlarm setHelpString:@"The backup machine is not reachable.\n\nThis alarm will remain until the condition is fixed. You may acknowledge the alarm to silence it"];
-        [macPingFailedAlarm setSticky:YES];
+        if(!macPingFailedAlarm && !otherSystemStealthMode){
+            NSString* alarmName = [NSString stringWithFormat:@"%@ Unreachable",otherSystemIP];
+            macPingFailedAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kHardwareAlarm];
+            [macPingFailedAlarm setHelpString:@"The backup machine is not reachable.\n\nThis alarm will remain until the condition is fixed. You may acknowledge the alarm to silence it"];
+            [macPingFailedAlarm setSticky:YES];
+        }
+        [macPingFailedAlarm postAlarm];
     }
-    [macPingFailedAlarm postAlarm];
 }
 
 - (void) clearMacPingAlarm
@@ -705,18 +740,20 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 }
 
 - (void) postSBCPingAlarm:(NSArray*)sbcList
-{    
-    if(!sbcPingFailedAlarm){
-        sbcPingFailedAlarm = [[ORAlarm alloc] initWithName:@"SBC(s) Failed Ping" severity:kHardwareAlarm];
-        NSString* s = @"SBCs that are unreachable:\n";
-        for(id anSBC in sbcList){
-            s = [s stringByAppendingFormat:@"%@\n",[[anSBC sbcLink] IPNumber]];
+{
+    if(sentryIsRunning){
+        if(!sbcPingFailedAlarm){
+            sbcPingFailedAlarm = [[ORAlarm alloc] initWithName:@"SBC(s) Failed Ping" severity:kHardwareAlarm];
+            NSString* s = @"SBCs that are unreachable:\n";
+            for(id anSBC in sbcList){
+                s = [s stringByAppendingFormat:@"%@\n",[[anSBC sbcLink] IPNumber]];
+            }
+            s = [s stringByAppendingString:@"\n\nThis alarm will remain until the condition is fixed. You may acknowledge the alarm to silence it"];
+            [sbcPingFailedAlarm setHelpString:s];
+            [sbcPingFailedAlarm setSticky:YES];
         }
-        s = [s stringByAppendingString:@"\n\nThis alarm will remain until the condition is fixed. You may acknowledge the alarm to silence it"];
-        [sbcPingFailedAlarm setHelpString:s];
-        [sbcPingFailedAlarm setSticky:YES];
+        [sbcPingFailedAlarm postAlarm];
     }
-    [sbcPingFailedAlarm postAlarm];
 }
 
 - (void) clearSBCPingAlarm
@@ -727,13 +764,15 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 
 - (void) postOrcaHungAlarm
 {
-    if(!orcaHungAlarm){
-        NSString* alarmName = [NSString stringWithFormat:@"ORCA %@ Hung",otherSystemIP];
-        orcaHungAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kHardwareAlarm];
-        [orcaHungAlarm setHelpString:@"The other ORCA appears hung.\n\nThis alarm will remain until the condition is fixed. You may acknowledge the alarm to silence it"];
-        [orcaHungAlarm setSticky:YES];
+    if(sentryIsRunning){
+        if(!orcaHungAlarm){
+            NSString* alarmName = [NSString stringWithFormat:@"ORCA %@ Hung",otherSystemIP];
+            orcaHungAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kHardwareAlarm];
+            [orcaHungAlarm setHelpString:@"The other ORCA appears hung.\n\nThis alarm will remain until the condition is fixed. You may acknowledge the alarm to silence it"];
+            [orcaHungAlarm setSticky:YES];
+        }
+        [orcaHungAlarm postAlarm];
     }
-    [orcaHungAlarm postAlarm];
 }
 
 
@@ -745,12 +784,14 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 
 - (void) postNoRemoteSentryAlarm
 {
-    if(!noRemoteSentryAlarm){
-        noRemoteSentryAlarm = [[ORAlarm alloc] initWithName:@"No Remote Sentry" severity:kInformationAlarm];
-        [noRemoteSentryAlarm setHelpString:@"There is no remote sentry watching this machine.\n\nThis alarm will remain until the condition is fixed. You may acknowledge the alarm to silence it"];
-        [noRemoteSentryAlarm setSticky:YES];
+    if(sentryIsRunning) {
+        if(!noRemoteSentryAlarm){
+            noRemoteSentryAlarm = [[ORAlarm alloc] initWithName:@"No Remote Sentry" severity:kInformationAlarm];
+            [noRemoteSentryAlarm setHelpString:@"There is no remote sentry watching this machine.\n\nThis alarm will remain until the condition is fixed. You may acknowledge the alarm to silence it"];
+            [noRemoteSentryAlarm setSticky:YES];
+        }
+        [noRemoteSentryAlarm postAlarm];
     }
-    [noRemoteSentryAlarm postAlarm];
 }
 
 
@@ -762,14 +803,16 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 
 - (void) postRunProblemAlarm:(NSString*)aTitle
 {
-    if(!runProblemAlarm){
-        runProblemAlarm = [[ORAlarm alloc] initWithName:aTitle severity:kHardwareAlarm];
-        [runProblemAlarm setHelpString:@"There was trouble with the run state.\n\nThis alarm will remain until the condition is fixed. You may acknowledge the alarm to silence it"];
-        [runProblemAlarm setSticky:YES];
+    if(sentryIsRunning){
+        if(!runProblemAlarm){
+            runProblemAlarm = [[ORAlarm alloc] initWithName:aTitle severity:kHardwareAlarm];
+            [runProblemAlarm setHelpString:@"There was trouble with the run state.\n\nThis alarm will remain until the condition is fixed. You may acknowledge the alarm to silence it"];
+            [runProblemAlarm setSticky:YES];
+        }
+        [runProblemAlarm postAlarm];
     }
-    [runProblemAlarm postAlarm];
-
 }
+
 - (void) clearRunProblemAlarm
 {
     [runProblemAlarm clearAlarm];
@@ -778,12 +821,14 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 
 - (void) postListModAlarm
 {
-    if(!listModAlarm){
-        listModAlarm = [[ORAlarm alloc] initWithName:@"Readout List Modified" severity:kHardwareAlarm];
-        [listModAlarm setHelpString:@"There was a problem with one of the SBCs, so the offending object was removed from the readout list"];
-        [listModAlarm setSticky:NO];
+    if(sentryIsRunning){
+        if(!listModAlarm){
+            listModAlarm = [[ORAlarm alloc] initWithName:@"Readout List Modified" severity:kHardwareAlarm];
+            [listModAlarm setHelpString:@"There was a problem with one of the SBCs, so the offending object was removed from the readout list"];
+            [listModAlarm setSticky:NO];
+        }
+        [listModAlarm postAlarm];
     }
-    [listModAlarm postAlarm];
 }
 
 
@@ -831,6 +876,7 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 //and the other one will become secondary
 - (void) stepSimpleWatch
 {
+    toggleAction = false;
     switch (state){
         case eStarting:
             [self setRemoteMachineReachable:eBeingChecked];
@@ -903,12 +949,12 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 //system to ensure that it is alive. If not, all we do is post an alarm.
 - (void) stepPrimarySystem
 {
+    toggleAction = false;
     switch (state){
         case eStarting:
-            [self clearAllAlarms];
+            //SV [self clearAllAlarms];
             [self setRemoteMachineReachable:eBeingChecked];
             [self setNextState:eCheckRemoteMachine stepTime:.3];
-            if(![toggleTimer isValid])[self startTimer]; //SV
             break;
             
         case eCheckRemoteMachine:
@@ -963,10 +1009,11 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 //this sentry type should not be run unless the connection is open and we are ready to take over
 - (void) stepSecondarySystem
 {
+    toggleAction = false;
     switch (state){
         case eStarting:
             [self stopTimer]; //SV
-            [self clearAllAlarms];
+            //SV [self clearAllAlarms];
             [self setRemoteRunInProgress:eBeingChecked];
             [self setNextState:eGetRunState stepTime:2];
            break;
@@ -979,12 +1026,14 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
             }
             else {
                 //the connection was dropped (other mac crashed) or other mac appears hung.
+                //system("/usr/bin/killall Orca"); //SV - kill the hung Orca so that it does not come back up thinking it is primary, human intervention will be needed to bring it back up
                 [self takeOverRunning];
             }
             break;
   
         case ePingCrates:
-            [unPingableSBCs removeAllObjects];
+            [unPingableSBCs release]; //SV
+            unPingableSBCs = [[NSMutableArray arrayWithArray:sbcs]retain]; //SV
             for(id anSBC in sbcs)[[anSBC sbcLink] pingVerbose:NO];
             [self setNextState:eWaitForPing stepTime:.2];
             loopTime = 0;
@@ -1035,6 +1084,7 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 //
 - (void) stepHealthyToggle
 {
+    toggleAction = true;
     switch (state){
         case eStarting:
             loopTime = 0;
@@ -1103,6 +1153,7 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 //this machine.
 - (void) stepTakeOver
 {
+    toggleAction = true;
     switch (state){
         case eStarting:
             restartCount++;
@@ -1121,7 +1172,8 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
             break;
   
         case ePingCrates:
-            [unPingableSBCs removeAllObjects];
+            [unPingableSBCs release]; //SV
+            unPingableSBCs = [[NSMutableArray arrayWithArray:sbcs]retain]; //SV
             [self appendToSentryLog:@"Pinging Crates"];
             for(id anSBC in sbcs)[[anSBC sbcLink] pingVerbose:NO];
             [self setNextState:eWaitForPing stepTime:.2];
@@ -1138,8 +1190,8 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
                 }
                 else {
                     [self appendToSentryLog:@"**Some of the SBCs responded to ping. Some didn't -- they are removed from readout list"];
-
                     [self removeFromReadoutList:unPingableSBCs];
+                    //[sbcs removeObjectsInArray:unPingableSBCs]; //SV - remove to stop thinking it needs to remove SBCs from the readout list
                     [self setNextState:eStartCrates stepTime:2];
                 }
                 sbcPingFailedCount += [unPingableSBCs count];
@@ -1253,6 +1305,7 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 
 - (void) finish
 {
+    toggleAction = false;
     [self connectSocket:NO];
     [self setRemoteMachineReachable:eUnknown];
     [self setRemoteORCARunning:eUnknown];
@@ -1283,23 +1336,17 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 - (void) handleSbcSocketDropped
 {
     sbcSocketDropCount++;
-    NSMutableArray* sbcsToDrop = [NSMutableArray array];
-    if(sbcSocketDropCount>5){
-        for(id anSBC in sbcs){
-            if(![[anSBC sbcLink] isConnected]){
-                [sbcsToDrop addObject:anSBC];
-            }
-        }
-        [self removeFromReadoutList:sbcsToDrop];
-    }
     //try to restart
-    [self takeOverRunning:YES];
+    if(![self runIsInProgress]){ //Added to prevent killing the crates if the other computer is running
+        [self appendToSentryLog:@"TakeOver due to socket dropped."];
+        [self takeOverRunning:YES];
+    }
 }
 
 - (void) appendToSentryLog:(NSString*)aString
 {
-    if([aString hasPrefix:@"**"])   NSLogColor([NSColor redColor],@"%@\n",aString);
-    else                            NSLog(@"%@\n",aString);
+    if([aString hasPrefix:@"**"])   NSLogColor([NSColor redColor],@"SENTRY - %@\n",aString); //SV - added sentry prefix
+    else                            NSLog(@"SENTRY - %@\n",aString); //SV - added sentry prefix
     if(!sentryLog)sentryLog = [[NSMutableArray array] retain];
     
     NSDate* now = [NSDate date];
@@ -1437,9 +1484,17 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 }
 
 #pragma mark ***Delegate Methods
+//SV
 - (void) netsocketConnected:(id)aSocket
 {
-    if(aSocket == socket){
+    [self performSelector:@selector(socketReallyConnected:) withObject:aSocket afterDelay:1];
+}
+
+//SV - used to be in netSocketConnected without perfomSelector and [socket isConnected] in if statement.
+//But alarm kept reposting, it's because a new socket is opened at every check and initializes as connected.
+- (void) socketReallyConnected:(id) aSocket
+{
+    if(aSocket == socket && [socket isConnected]){
         [self setIsConnected:[socket isConnected]];
         [self clearConnectionAlarm];
         [self setRemoteORCARunning:eYES];
@@ -1453,6 +1508,7 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
         [self setIsConnected:[socket isConnected]];
         [self setIsConnected:NO];
         [self setRemoteORCARunning:eBad];
+        //if(![socket isConnected]){
         [self postConnectionAlarm];
     }
 }

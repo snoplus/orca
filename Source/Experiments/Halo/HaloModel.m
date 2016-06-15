@@ -169,6 +169,17 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
         [values setObject:aDictionary forKey:[segmentGroup groupName]];
     }
     
+    //SV - Sentry state
+    NSMutableDictionary* sentryValues =[NSMutableDictionary dictionary];
+    [sentryValues setObject:([haloSentry sentryIsRunning] ? @"Yes" : @"No") forKey:@"RunningState"];
+    [sentryValues setObject:[haloSentry sentryTypeName] forKey:@"Type"];
+    [sentryValues setObject:[haloSentry remoteMachineStatusString] forKey:@"RemoteDaqStatus"];
+    [sentryValues setObject:[haloSentry connectionStatusString] forKey:@"RemoteOrcaStatus"];
+    [sentryValues setObject:[haloSentry nextToggleTime] forKey:@"NextToggle"];
+    [sentryValues setObject:[haloSentry sentryLog] forKey:@"SentryLog"];
+    
+    [values setObject:sentryValues forKey:@"Sentry"];
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
 }
 

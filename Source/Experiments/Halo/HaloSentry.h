@@ -121,6 +121,8 @@ enum eHaloStatus {
     NSTimer* toggleTimer; //SV
     int toggleInterval; //SV
     BOOL scheduledToggleTime; //SV
+    BOOL toggleAction; //SV
+    NSString* nextToggleTime; //SV
 }
 
 #pragma mark ***Initialization
@@ -131,7 +133,6 @@ enum eHaloStatus {
 - (NSUndoManager*) undoManager;
 - (void) awakeAfterDocumentLoaded;
 - (void) registerNotificationObservers;
-
 
 #pragma mark ***Notifications
 - (void) objectsChanged:(NSNotification*)aNote;
@@ -177,8 +178,8 @@ enum eHaloStatus {
 - (NSString*) stateName;
 - (NSString*) report;
 - (NSString*) diskStatus;
-- (BOOL) toggleTimerIsRunning; //SV
 
+- (BOOL) toggleTimerIsRunning; //SV
 - (int) toggleInterval; //SV
 - (BOOL) scheduledToggleTime; //SV
 - (void) doScheduledToggle; //SV
@@ -186,6 +187,8 @@ enum eHaloStatus {
 - (void) startTimer; //SV
 - (void) stopTimer; //SV
 - (void) waitForEndOfRun:(NSTimer*)aTimer; //SV
+- (NSString*) nextToggleTime; //SV
+- (NSMutableArray*) sentryLog; //SV
 
 #pragma mark ***Run Stuff
 - (void) start;
