@@ -273,7 +273,6 @@
 //hv
 @property (assign) IBOutlet NSBox *hvBStatusPanel;
 @property (assign) IBOutlet NSBox *hvAStatusPanel;
-
 	
 
 - (IBAction)hvRelayMaskHighAction:(id)sender;
@@ -297,9 +296,7 @@
 - (IBAction)hvPanicAction:(id)sender;
 - (IBAction)hvTriggerOffAction:(id)sender;
 - (IBAction)hvTriggerOnAction:(id)sender;
-- (IBAction)hvMasterPanicAction:(id)sender;
-- (IBAction)hvMasterTriggerOffAction:(id)sender;
-- (IBAction)hvMasterTriggerOnAction:(id)sender;
+
 //connection
 - (IBAction) toggleConnectAction:(id)sender;
 - (IBAction) errorTimeOutAction:(id)sender;

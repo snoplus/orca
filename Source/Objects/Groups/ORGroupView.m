@@ -161,11 +161,6 @@
     [group drawContents:aRect];	
 }
 
-- (BOOL) isOpaque
-{
-    return NO;
-}
-
 
 //-------------------------------------------------------------------------------
 // backgroundColorChanged

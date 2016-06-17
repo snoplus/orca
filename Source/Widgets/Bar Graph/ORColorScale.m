@@ -54,12 +54,6 @@
 	[super dealloc];
 }
 
-- (BOOL) isOpaque
-{
-	return YES;
-}
-
-
 #pragma mark ¥¥¥Accessors
 - (NSMutableArray*) colors
 {

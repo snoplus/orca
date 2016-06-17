@@ -217,3 +217,6 @@ extern NSString* ORCV830ModelPollingStateChanged;
 extern NSString* ORCV830ModelShipRecordsChanged;
 extern NSString* ORCV830ModelAllScalerValuesChanged;
 
+@interface NSObject (ORCV830)
+- (void) resetEventCounter;
+@end

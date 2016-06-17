@@ -735,7 +735,7 @@ double facto(unsigned long long num)
                                                 
                                                 //Find background likelyhood in burst //fixme
                                                 int numgamma = 0;
-                                                double rategamma = 2.3585; // 3.8 From run 3681, //2.3585 from 4680 to 4684
+                                                double rategamma = 4.95; // 3.8 From run 3681, //4.95 as of 5180
                                                 int numalpha = 0;
                                                 double ratealpha = 319.0/86400.0; // From a bunch of runs before Aug 2015
                                                 double tbackground = 1;

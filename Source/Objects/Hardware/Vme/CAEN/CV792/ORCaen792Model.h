@@ -154,6 +154,7 @@ enum {
 - (void)            clearData;
 - (void)            writeOneShotReset;
 - (void)            doSoftClear;
+- (void)            resetEventCounter;
 
 #pragma mark ***Register - Register specific routines
 - (NSString*) 		getRegisterName: (short) anIndex;

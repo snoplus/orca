@@ -475,6 +475,13 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 {
     NSLog(@"%@ Reset timestamps\n",[self fullID]);
     [self softwareClear];
+    
+    dataTakers = [[readOutGroup allObjects] retain];		//cache of data takers.
+    for(id obj in dataTakers){
+        if([obj respondsToSelector:@selector(resetEventCounter)]){
+            [obj resetEventCounter];
+        }
+    }
     resetRollOverInSBC  = YES;  //remote datataking
     chan0RollOverCount  = 0;    //local datataking
     lastChan0Count      = 0;    //local datataking
