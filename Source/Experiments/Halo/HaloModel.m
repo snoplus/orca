@@ -177,6 +177,30 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
     [sentryValues setObject:[haloSentry connectionStatusString] forKey:@"RemoteOrcaStatus"];
     [sentryValues setObject:[haloSentry nextToggleTime] forKey:@"NextToggle"];
     [sentryValues setObject:[haloSentry sentryLog] forKey:@"SentryLog"];
+    [sentryValues setObject:[NSString stringWithFormat:@"%i",[haloSentry macPingFailedCount]] forKey:@"FailedMacPings"];
+    [sentryValues setObject:[NSString stringWithFormat:@"%i",[haloSentry sbcPingFailedCount]] forKey:@"FailedSbcPings"];
+    [sentryValues setObject:[NSString stringWithFormat:@"%i",[haloSentry sbcRebootCount]] forKey:@"SbcReboots"];
+    [sentryValues setObject:[NSString stringWithFormat:@"%i",[haloSentry missedHeartBeatCount]] forKey:@"MissedHeartbeats"];
+    [sentryValues setObject:[NSString stringWithFormat:@"%i",[haloSentry sbcSocketDropCount]] forKey:@"SbcDroppedSockets"];
+    [sentryValues setObject:[NSString stringWithFormat:@"%i",[haloSentry restartCount]] forKey:@"RestartCount"];
+    
+    //Computed status
+    //Green
+    [sentryValues setObject:@"Green" forKey:@"ComputedStatus"];
+    //Yellow
+    if ([[sentryValues valueForKey: @"RunningState"] isEqualToString:@"No"]
+        || [haloSentry macPingFailedCount]  != 0
+        || [haloSentry sbcPingFailedCount]  != 0
+        || [haloSentry sbcRebootCount]      != 0
+        || [haloSentry missedHeartBeatCount]!= 0)
+        [sentryValues setObject:@"Yellow" forKey:@"ComputedStatus"];
+    //Red
+    if ([[sentryValues valueForKey: @"RemoteDaqStatus"] isEqualToString:@"Unreachable"]
+        || [[sentryValues valueForKey: @"RunningState"] isEqualToString:@"NOT Connected"]
+        || [haloSentry sbcSocketDropCount]  !=0
+        || [haloSentry restartCount]        !=0)
+        [sentryValues setObject:@"Red" forKey:@"ComputedStatus"];
+    
     
     [values setObject:sentryValues forKey:@"Sentry"];
     
