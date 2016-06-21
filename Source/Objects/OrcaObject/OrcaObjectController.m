@@ -38,9 +38,10 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
 
 - (void) dealloc
 {
-	[[self window] close];
-    [model release];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [model release];
+    model = nil;
+	//[[self window] close];
     [super dealloc];
 }
 
@@ -127,6 +128,32 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
     
 	[notifyCenter removeObserver:self];
 	
+    //-------------------------------------------------------
+    //temp for testing... looking for non-thread gui updates.
+    [notifyCenter addObserverForName: nil
+                                object: nil
+                                 queue: nil
+                            usingBlock: ^(NSNotification *notification) {
+                                if(![NSThread isMainThread]){
+                                    if([notification.name rangeOfString:@"WillExit"].location!=NSNotFound)return;
+                                    if([notification.name rangeOfString:@"DidStart"].location!=NSNotFound)return;
+                                    if([notification.name rangeOfString:@"BSNewMetadataAdded"].location!=NSNotFound)return;
+                                    
+                                    if([notification.name rangeOfString:@"WindowTransformAnimation"].location!=NSNotFound)return;
+                                    if([notification.name rangeOfString:@"Extend Time to stop run"].location!=NSNotFound)return;
+                                    
+                                    if([notification.name rangeOfString:@"NSConnectionDidInitializeNotification"].location!=NSNotFound)return;
+                                    if([notification.name rangeOfString:@"NSPortDidBecomeInvalidNotification"].location!=NSNotFound)return;
+                                    if([notification.name rangeOfString:@"NSCalendarDayChangedNotification"].location!=NSNotFound)return;
+                                    
+                                    if(notification.userInfo)NSLog (@"NOTIFICATION %@ -> %@\n",
+                                          notification.name, notification.userInfo);
+                                    else NSLog (@"NOTIFICATION %@\n",
+                                                notification.name);
+                                }
+                            }];
+    //-------------------------------------------------------
+    
     [notifyCenter addObserver : self
                      selector : @selector(securityStateChanged:)
                          name : ORGlobalSecurityStateChanged
