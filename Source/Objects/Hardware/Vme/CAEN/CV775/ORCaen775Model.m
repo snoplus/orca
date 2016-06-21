@@ -19,7 +19,7 @@
 
 // Address information for this unit.
 #define k775DefaultBaseAddress 		0xa00000
-#define k775DefaultAddressModifier 	0x39
+#define k775DefaultAddressModifier 	0x29
 
 #define kStartStop	0x400
 
