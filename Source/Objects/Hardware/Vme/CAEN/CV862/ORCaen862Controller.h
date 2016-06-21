@@ -25,6 +25,13 @@
 
 // Definition of class.
 @interface ORCaen862Controller : ORCaenCardController {
+    IBOutlet NSTextField*  iPedField;
+    IBOutlet NSMatrix*     eventCounterIncMatrix;
+    IBOutlet NSTextField*   slideConstantField;
+    IBOutlet NSMatrix*      slidingScaleEnableMatrix;
+    IBOutlet NSMatrix*      zeroSuppressThresResMatrix;
+    IBOutlet NSMatrix*      zeroSuppressEnableMatrix;
+    IBOutlet NSMatrix*      overflowSuppressEnableMatrix;
 }
 
 #pragma mark ***Initialization
@@ -32,12 +39,22 @@
  	
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
+- (void) updateWindow;
+- (void) iPedChanged:(NSNotification*)aNote;
+- (void) eventCounterIncChanged:(NSNotification*)aNote;
+- (void) slideConstantChanged:(NSNotification*)aNote;
+- (void) slidingScaleEnableChanged:(NSNotification*)aNote;
+- (void) zeroSuppressThresResChanged:(NSNotification*)aNote;
+- (void) zeroSuppressEnableChanged:(NSNotification*)aNote;
+- (void) overflowSuppressEnableChanged:(NSNotification*)aNote;
 
 #pragma mark ***Interface Management
-- (void) updateWindow;
-
-
-// The outlets
-	
+- (IBAction) iPedAction:(id)sender;
+- (IBAction) eventCounterIncAction:(id)sender;
+- (IBAction) slideConstantAction:(id)sender;
+- (IBAction) slidingScaleEnableAction:(id)sender;
+- (IBAction) zeroSuppressThresResAction:(id)sender;
+- (IBAction) zeroSuppressEnableAction:(id)sender;
+- (IBAction) overflowSuppressEnableAction:(id)sender;
 
 @end

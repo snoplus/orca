@@ -25,6 +25,15 @@
 #define k862DefaultBaseAddress 		0xa00000
 #define k862DefaultAddressModifier 	0x39
 
+NSString* ORCaen862ModelIPedChanged                   = @"ORCaen862ModelIPedChanged";
+NSString* ORCaen862ModelEventCounterIncChanged        = @"ORCaen862ModelEventCounterIncChanged";
+NSString* ORCaen862ModelSlideConstantChanged          = @"ORCaen862ModelSlideConstantChanged";
+NSString* ORCaen862ModelSlidingScaleEnableChanged     = @"ORCaen862ModelSlidingScaleEnableChanged";
+NSString* ORCaen862ModelZeroSuppressThresResChanged   = @"ORCaen862ModelZeroSuppressThresResChanged";
+NSString* ORCaen862ModelZeroSuppressEnableChanged     = @"ORCaen862ModelZeroSuppressEnableChanged";
+NSString* ORCaen862ModelOverflowSuppressEnableChanged = @"ORCaen862ModelOverflowSuppressEnableChanged";
+
+
 // Define all the registers available to this unit.
 static RegisterNamesStruct reg[kNumRegisters] = {
 	{@"Output Buffer",      true,	true, 	true,	0x0000,		kReadOnly,	kD32},
@@ -67,7 +76,21 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 };
 
 // Bit Set 2 Register Masks
-#define kClearData	0x04
+#define kMemTest            0x0001
+#define kOffline            0x0002
+#define kClearData          0x0004
+#define kOverRange          0x0008
+#define kLowThres           0x0010
+#define kTestAcq            0x0040
+#define kSlideEnable        0x0080
+#define kZeroThresRes       0x0100
+#define kAutoInc            0x0800
+#define kEmptyPrg           0x1000
+#define kSlideSubEnable     0x2000
+#define kAllTrg             0x4000
+
+#define kSoftReset      0x0080
+
 
 @implementation ORCaen862Model
 
@@ -99,10 +122,12 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 {
 	return NSMakeRange(baseAddress,0x1080);
 }
+
 - (NSString*) helpURL
 {
 	return @"VME/V862.html";
 }
+
 #pragma mark ***Register - General routines
 - (short) getNumberRegisters
 {
@@ -140,6 +165,128 @@ static RegisterNamesStruct reg[kNumRegisters] = {
     return(kOutputBuffer);
 }
 
+- (short) iPed
+{
+    return iPed;
+}
+
+- (void) setIPed:(short)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setIPed:iPed];
+    iPed = aValue & 0xff;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen862ModelIPedChanged object:self];
+}
+
+- (BOOL) eventCounterInc
+{
+    return eventCounterInc;
+}
+
+- (void) setEventCounterInc:(BOOL)aFlag
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setEventCounterInc:eventCounterInc];
+    
+    eventCounterInc = aFlag;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen862ModelEventCounterIncChanged object:self];
+}
+
+- (BOOL) slidingScaleEnable
+{
+    return slidingScaleEnable;
+}
+
+- (void) setSlidingScaleEnable:(BOOL)aFlag
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSlidingScaleEnable:slidingScaleEnable];
+    
+    slidingScaleEnable = aFlag;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen862ModelSlidingScaleEnableChanged object:self];
+}
+
+- (short) slideConstant
+{
+    return slideConstant;
+}
+
+- (void) setSlideConstant:(short)aValue
+{
+    aValue &= 0xff;
+    
+    [[[self undoManager] prepareWithInvocationTarget:self] setSlideConstant:slideConstant];
+    
+    slideConstant = aValue;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen862ModelSlideConstantChanged object:self];
+}
+
+- (BOOL) zeroSuppressThresRes
+{
+    return zeroSuppressThresRes;
+}
+
+- (void) setZeroSuppressThresRes:(BOOL)aFlag
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setZeroSuppressThresRes:zeroSuppressThresRes];
+    
+    zeroSuppressThresRes = aFlag;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen862ModelZeroSuppressThresResChanged object:self];
+}
+
+- (BOOL) zeroSuppressEnable
+{
+    return zeroSuppressEnable;
+}
+
+- (void) setZeroSuppressEnable:(BOOL)aFlag
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setZeroSuppressEnable:zeroSuppressEnable];
+    
+    zeroSuppressEnable = aFlag;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen862ModelZeroSuppressEnableChanged object:self];
+}
+- (BOOL) overflowSuppressEnable
+{
+    return overflowSuppressEnable;
+}
+
+- (void) setOverflowSuppressEnable:(BOOL)aFlag
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setOverflowSuppressEnable:overflowSuppressEnable];
+    
+    overflowSuppressEnable = aFlag;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen862ModelOverflowSuppressEnableChanged object:self];
+}
+
+- (void) writeBit2Register
+{
+    unsigned short setBitMask = 0;
+    unsigned short clrBitMask = 0;
+    
+    if(overflowSuppressEnable)  setBitMask |= kOverRange;
+    else                        clrBitMask |= kOverRange;
+    
+    if(eventCounterInc)         setBitMask |= kAllTrg;
+    else                        clrBitMask |= kAllTrg;
+    
+    if(slidingScaleEnable)      setBitMask |= kSlideSubEnable;
+    else                        clrBitMask |= kSlideSubEnable;
+    
+    if(zeroSuppressEnable)      setBitMask |= kLowThres;
+    else                        clrBitMask |= kLowThres;
+    
+    if(zeroSuppressThresRes)    setBitMask |= kZeroThresRes;
+    else                        clrBitMask |= kZeroThresRes;
+
+    [self write:kBitSet2  sendValue:setBitMask];
+    [self write:kBitClear2 sendValue:clrBitMask];
+ }
+
+
 #pragma mark ***Register - Register specific routines
 - (NSString*) getRegisterName:(short) anIndex
 {
@@ -175,24 +322,48 @@ static RegisterNamesStruct reg[kNumRegisters] = {
     return reg[anIndex].hwReset;
 }
 
+#pragma mark ***HW Access
+- (void) initBoard
+{
+    [self doSoftClear];
+    [self clearEventCount];
+    [self writeIPed];
+    [self writeBit2Register];
+    [self writeSlideConstReg];
+    [self writeThresholds];
+}
+
+- (void) writeSlideConstReg
+{
+    [self write:kSlideConsReg sendValue:slideConstant];
+}
+
+- (void) doSoftClear
+{
+    [self write:kBitSet1   sendValue:kSoftReset];   // set Soft Reset bit,
+    [self write:kBitClear1 sendValue:kSoftReset];   // Clear "Soft Reset" bit of status reg.
+}
+
+- (void) clearEventCount
+{
+    [self write:kEventCounterReset sendValue:0x0000];	// Clear event counter
+}
+
+- (void) writeIPed
+{
+    [self write:kIpedReg sendValue:iPed & 0xff];
+}
 
 #pragma mark ***DataTaker
 - (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
     [super runTaskStarted:aDataPacket userInfo:userInfo];
     
-    // Clear unit
-    [self write:kBitSet2 sendValue:kClearData];			// Clear data,
-    [self write:kBitClear2 sendValue:kClearData];       // Clear "Clear data" bit of status reg.
-    [self write:kEventCounterReset sendValue:0x0000];	// Clear event counter
-
-    // Set options
-
-    // Set thresholds in unit
-    [self writeThresholds];
-    
+    BOOL doInit = [[userInfo objectForKey:@"doinit"] boolValue];
+    if(doInit){
+        [self initBoard];
+    }
 }
-
 
 - (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
@@ -204,14 +375,34 @@ static RegisterNamesStruct reg[kNumRegisters] = {
     return [NSString stringWithFormat:@"CAEN 862 (Slot %d) ",[self slot]];
 }
 
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
+{
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
+    [objDictionary setObject:[NSNumber numberWithShort:iPed]                    forKey:@"iPed"];
+    [objDictionary setObject:[NSNumber numberWithBool:eventCounterInc]          forKey:@"eventCounterInc"];
+    [objDictionary setObject:[NSNumber numberWithShort:slidingScaleEnable]      forKey:@"slidingScaleEnable"];
+    [objDictionary setObject:[NSNumber numberWithBool:slideConstant]            forKey:@"slideConstant"];
+    [objDictionary setObject:[NSNumber numberWithBool:zeroSuppressThresRes]     forKey:@"zeroSuppressThresRes"];
+    [objDictionary setObject:[NSNumber numberWithBool:zeroSuppressEnable]       forKey:@"zeroSuppressEnable"];
+    [objDictionary setObject:[NSNumber numberWithBool:overflowSuppressEnable]   forKey:@"overflowSuppressEnable"];
+    return objDictionary;
+}
+
 #pragma mark ***Archival
 - (id) initWithCoder:(NSCoder*) aDecoder
 {
     self = [super initWithCoder:aDecoder];
 
     [[self undoManager] disableUndoRegistration];
-
     
+    [self setIPed:                  [aDecoder decodeIntForKey:@"iPed"]];
+    [self setEventCounterInc:       [aDecoder decodeBoolForKey: @"eventCounterInc"]];
+    [self setSlideConstant:         [aDecoder decodeIntForKey:  @"slideConstant"]];
+    [self setSlidingScaleEnable:    [aDecoder decodeBoolForKey: @"slidingScaleEnable"]];
+    [self setZeroSuppressThresRes:  [aDecoder decodeBoolForKey: @"zeroSuppressThresRes"]];
+    [self setZeroSuppressEnable:    [aDecoder decodeBoolForKey: @"zeroSuppressEnable"]];
+    [self setOverflowSuppressEnable:[aDecoder decodeBoolForKey: @"overflowSuppressEnable"]];
+
     [[self undoManager] enableUndoRegistration];
     return self;
 }
@@ -219,6 +410,13 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 - (void) encodeWithCoder:(NSCoder*) anEncoder
 {
     [super encodeWithCoder:anEncoder];
+    [anEncoder encodeInt:  iPed                   forKey:@"iPed"];
+    [anEncoder encodeBool: eventCounterInc        forKey:@"eventCounterInc"];
+    [anEncoder encodeInt:  slideConstant          forKey:@"slideConstant"];
+    [anEncoder encodeBool: slidingScaleEnable     forKey:@"slidingScaleEnable"];
+    [anEncoder encodeBool: zeroSuppressThresRes   forKey:@"zeroSuppressThresRes"];
+    [anEncoder encodeBool: zeroSuppressEnable     forKey:@"zeroSuppressEnable"];
+    [anEncoder encodeBool: overflowSuppressEnable forKey:@"overflowSuppressEnable"];
 }
 
 @end

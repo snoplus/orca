@@ -72,9 +72,37 @@ enum {
 // Class definition
 @interface ORCaen862Model : ORCaenCardModel <ORDataTaker,ORHWWizard,ORHWRamping>
 {
+    short iPed;
+    BOOL  eventCounterInc;
+    BOOL  slidingScaleEnable;
+    short slideConstant;
+    BOOL  zeroSuppressEnable;
+    BOOL  zeroSuppressThresRes;
+    BOOL  overflowSuppressEnable;
 }
 
 #pragma mark ***Accessors
+- (short)           iPed;
+- (void)            setIPed:(short)aValue;
+- (BOOL)            eventCounterInc;
+- (void)            setEventCounterInc:(BOOL)aFlag;
+- (short)           slideConstant;
+- (void)            setSlideConstant:(short)aValue;
+- (BOOL)            slidingScaleEnable;
+- (void)            setSlidingScaleEnable:(BOOL)aFlag;
+- (BOOL)            zeroSuppressThresRes;
+- (void)            setZeroSuppressThresRes:(BOOL)aFlag;
+- (BOOL)            zeroSuppressEnable;
+- (void)            setZeroSuppressEnable:(BOOL)aFlag;
+- (BOOL)            overflowSuppressEnable;
+- (void)            setOverflowSuppressEnable:(BOOL)aFlag;
+
+#pragma mark ***HW Access
+- (void)            initBoard;
+- (void)            writeSlideConstReg;
+- (void)            doSoftClear;
+- (void)            writeIPed;
+- (void)            clearEventCount;
 
 #pragma mark ***Register - General routines
 - (short)			getNumberRegisters;
@@ -93,8 +121,15 @@ enum {
 - (BOOL)			dataReset: (short) anIndex;
 - (BOOL)			swReset: (short) anIndex;
 - (BOOL)			hwReset: (short) anIndex;
-
 @end
+
+extern NSString* ORCaen862ModelIPedChanged;
+extern NSString* ORCaen862ModelEventCounterIncChanged;
+extern NSString* ORCaen862ModelSlideConstantChanged;
+extern NSString* ORCaen862ModelSlidingScaleEnableChanged;
+extern NSString* ORCaen862ModelZeroSuppressEnableChanged;
+extern NSString* ORCaen862ModelZeroSuppressThresResChanged;
+extern NSString* ORCaen862ModelOverflowSuppressEnableChanged;
 
 //the decoder concrete decoder class
 @interface ORCaen862DecoderForCAEN : ORCaenDataDecoder

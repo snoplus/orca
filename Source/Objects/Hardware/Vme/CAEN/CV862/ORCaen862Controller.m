@@ -33,18 +33,135 @@
     return self;
 }
 
+- (NSSize) thresholdDialogSize
+{
+    return NSMakeSize(570,580);
+}
 
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers
 {
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     [ super registerNotificationObservers ];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(iPedChanged:)
+                         name : ORCaen862ModelIPedChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(eventCounterIncChanged:)
+                         name : ORCaen862ModelEventCounterIncChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(slidingScaleEnableChanged:)
+                         name : ORCaen862ModelSlidingScaleEnableChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(slideConstantChanged:)
+                         name : ORCaen862ModelSlideConstantChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(zeroSuppressEnableChanged:)
+                         name : ORCaen862ModelZeroSuppressEnableChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(zeroSuppressThresResChanged:)
+                         name : ORCaen862ModelZeroSuppressThresResChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(overflowSuppressEnableChanged:)
+                         name : ORCaen862ModelOverflowSuppressEnableChanged
+                        object: model];
+
 }
 
 #pragma mark ***Interface Management
 - (void) updateWindow
 {
-   [ super updateWindow ];
+    [super updateWindow];
+    [self iPedChanged:nil];
+    [self eventCounterIncChanged:nil];
+    [self slidingScaleEnableChanged:nil];
+    [self slideConstantChanged:nil];
+    [self zeroSuppressEnableChanged:nil];
+    [self zeroSuppressThresResChanged:nil];
+    [self overflowSuppressEnableChanged:nil];
+}
+
+- (void) iPedChanged:(NSNotification*)aNote
+{
+    [iPedField setIntValue:[model iPed]];
+}
+
+- (void) eventCounterIncChanged:(NSNotification*)aNote
+{
+    [eventCounterIncMatrix selectCellWithTag: [model eventCounterInc]];
+}
+- (void) slideConstantChanged:(NSNotification*)aNote
+{
+    [slideConstantField setIntValue: [model slideConstant]];
+}
+
+- (void) slidingScaleEnableChanged:(NSNotification*)aNote
+{
+    [slidingScaleEnableMatrix selectCellWithTag: [model slidingScaleEnable]];
+    [self setUpButtons];
+}
+
+- (void) zeroSuppressThresResChanged:(NSNotification*)aNote
+{
+    [zeroSuppressThresResMatrix selectCellWithTag: [model zeroSuppressThresRes]];
+}
+
+- (void) zeroSuppressEnableChanged:(NSNotification*)aNote
+{
+    [zeroSuppressEnableMatrix selectCellWithTag: [model zeroSuppressEnable]];
+}
+
+- (void) overflowSuppressEnableChanged:(NSNotification*)aNote
+{
+    [overflowSuppressEnableMatrix selectCellWithTag: [model overflowSuppressEnable]];
+}
+
+- (void) thresholdLockChanged:(NSNotification*)aNotification
+{
+    [self setUpButtons];
+}
+
+- (void) setUpButtons
+{
+    BOOL runInProgress              = [gOrcaGlobals runInProgress];
+    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:[self thresholdLockName]];
+    BOOL locked                     = [gSecurity isLocked:[self thresholdLockName]];
+    
+    [thresholdLockButton setState: locked];
+    
+    [thresholdA setEnabled:!lockedOrRunningMaintenance];
+    [stepperA setEnabled:!lockedOrRunningMaintenance];
+    
+    [thresholdWriteButton setEnabled:!lockedOrRunningMaintenance];
+    [thresholdReadButton setEnabled:!lockedOrRunningMaintenance];
+    
+    [eventCounterIncMatrix        setEnabled: !lockedOrRunningMaintenance];
+    [iPedField                    setEnabled: !lockedOrRunningMaintenance];
+    [slideConstantField           setEnabled: !lockedOrRunningMaintenance && ![model slidingScaleEnable]];
+    [slidingScaleEnableMatrix     setEnabled: !lockedOrRunningMaintenance];
+    [zeroSuppressThresResMatrix   setEnabled: !lockedOrRunningMaintenance];
+    [zeroSuppressEnableMatrix     setEnabled: !lockedOrRunningMaintenance];
+    [overflowSuppressEnableMatrix setEnabled: !lockedOrRunningMaintenance];
+
+    NSString* s = @"";
+    if(lockedOrRunningMaintenance){
+        if(runInProgress && ![gSecurity isLocked:[self thresholdLockName]])s = @"Not in Maintenance Run.";
+    }
+    [thresholdLockDocField setStringValue:s];
 }
 
 #pragma mark ***Interface Management - Module specific
@@ -52,4 +169,34 @@
 - (NSString*) basicLockName     {return @"ORCaen862BasicLock";}
 
 #pragma mark •••Actions
+- (IBAction) iPedAction:(id)sender
+{
+    [model setIPed:[sender intValue]];
+}
+
+- (IBAction) eventCounterIncAction:(id)sender
+{
+    [model setEventCounterInc:[[sender selectedCell]tag]];
+}
+- (IBAction) slideConstantAction:(id)sender
+{
+    [model setSlideConstant:[sender intValue]];
+}
+- (IBAction) slidingScaleEnableAction:(id)sender
+{
+    [model setSlidingScaleEnable:[[sender selectedCell]tag]];
+}
+- (IBAction) zeroSuppressThresResAction:(id)sender
+{
+    [model setZeroSuppressThresRes:[[sender selectedCell]tag]];
+}
+- (IBAction) zeroSuppressEnableAction:(id)sender
+{
+    [model setZeroSuppressEnable:[[sender selectedCell]tag]];
+}
+
+- (IBAction) overflowSuppressEnableAction:(id)sender
+{
+    [model setOverflowSuppressEnable:[[sender selectedCell]tag]];
+}
 @end
