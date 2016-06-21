@@ -23,7 +23,7 @@
 
 // Address information for this unit.
 #define k862DefaultBaseAddress 		0xa00000
-#define k862DefaultAddressModifier 	0x39
+#define k862DefaultAddressModifier 	0x29
 
 NSString* ORCaen862ModelIPedChanged                   = @"ORCaen862ModelIPedChanged";
 NSString* ORCaen862ModelEventCounterIncChanged        = @"ORCaen862ModelEventCounterIncChanged";
