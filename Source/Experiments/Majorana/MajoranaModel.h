@@ -48,8 +48,14 @@
     NSMutableArray* stringMap;
     NSMutableArray* specialMap;
     ORAlarm*        rampHVAlarm[2];
+    ORAlarm*        breakdownAlarm[2];
     BOOL            ignorePanicOnA;
     BOOL            ignorePanicOnB;
+    
+    //NSMutableArray* breakdownMapEntries; //conceptual
+    BOOL            ADCrateSpike[2]; //Digitizer event rate
+    BOOL            PreAmpVSpike[2]; //preamp read detector voltage
+    //BOOL            vaccumeSpike[2];
     
     ORMJDInterlocks*    mjdInterlocks[2];
     ORMJDSource*        mjdSource[2];
@@ -78,6 +84,13 @@
 - (void) setDetectorStringPositions;
 - (NSString*) detectorLocation:(int)index;
 - (NSString*) objectNameForCrate:(NSString*)aCrateName andCard:(NSString*)aCardName;
+
+//in the case of being asked to checkBreakdown, it should event rate and baseline, leave the vacuum to the MJD interlock
+- (void) checkBreakdown:(int)aCrate vac:(int)aVacSystem;
+- (void) gretinaRateUpdated:(NSNotification*) aNote;
+- (void) baselineUpdated:(NSNotification*) aNote;
+
+
 
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups;

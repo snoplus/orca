@@ -27,6 +27,8 @@
 #import "MajoranaModel.h"
 #import "ORCard.h"
 
+
+
 #pragma mark ¥¥¥Notification Strings
 NSString* ORMJDPreAmpModelBoardRevChanged   = @"ORMJDPreAmpModelBoardRevChanged";
 NSString* ORMJDPreAmpModelUseSBCChanged     = @"ORMJDPreAmpModelUseSBCChanged";
@@ -55,7 +57,8 @@ NSString* ORMJDPreAmpModelDetectorNameChanged	= @"ORMJDPreAmpModelDetectorNameCh
 NSString* ORMJDPreAmpModelConnectionChanged		= @"ORMJDPreAmpModelConnectionChanged";
 NSString* ORMJDPreAmpModelDoNotUseHWMapChanged  = @"ORMJDPreAmpModelDoNotUseHWMapChanged";
 NSString* ORMJDPreAmpModelFirmwareRevChanged    = @"ORMJDPreAmpModelFirmwareRevChanged";
-
+NSString* ORMJDPreAmpModelRAGChanged = @"ORMJDPreAmpModelRAGChanged"; //RAG=Running Average Group
+NSString* ORMJDPreAmpModelRAGSpiked = @"ORMJDPreAmpModelRAGSpiked";
 
 #pragma mark ¥¥¥Local Strings
 static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
@@ -137,7 +140,6 @@ struct {
     [[self undoManager] disableUndoRegistration];
 	[self setUpArrays];
     [[self undoManager] enableUndoRegistration];
-
     return self;
 }
 
@@ -163,25 +165,138 @@ struct {
         [adcAlarm[i] clearAlarm];
         [adcAlarm[i] release];
     }
-    for(i=0;i<kMJDPreAmpAdcChannels*2;i++){
-        [baselineRunningAverage[i] release];
-    }
+    [baselineRunningAverageGroup release];
     [super dealloc];
 }
 
+- (int) nMaxChannels
+{
+    return kMJDPreAmpAdcChannels;
+}
+
+- (void) setVoltThreshold:(float)a
+{
+    voltThreshold = a;
+    [baselineRunningAverageGroup setThreshold:voltThreshold];
+}
+
+-(float)voltThreshold
+{
+    return voltThreshold;
+}
+
+
+- (ORRunningAverageGroup*) baselineRunningAverageGroup{
+    return baselineRunningAverageGroup;
+}
+
+- (void) setBaselineRunningAverageGroup:(ORRunningAverageGroup*)newRunningAverageGroup
+{
+    [newRunningAverageGroup retain];
+    [baselineRunningAverageGroup release];
+    baselineRunningAverageGroup = newRunningAverageGroup;
+    
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:ORMJDPreAmpModelRAGChanged
+     object:self];
+}
+
+- (void) baselineRunningAverageChanged:(NSNotification*)aNote
+{
+    ORRunningAverageGroup* theRunningAverageObj = [aNote object];
+    [self setVoltSpikes:theRunningAverageObj];
+    //[self setVoltSpikes:[theRunningAverageObj spikes]];
+    //NSLog(@" baseline --- running averages are %@\n",[theRunningAverageObj spikes]);
+} //the setxxxxSpikes function in the model will deal with the spikes
+
+
+
+//- (void) setVoltSpikes:(NSArray*)aarray{
+- (void) setVoltSpikes:(ORRunningAverageGroup*)group{
+
+    NSArray * aarray = [group spikes];
+    bool spike=false;
+    for(int idx=0;idx<kMJDPreAmpAdcChannels; idx++){
+        voltSpikes[idx]= [[aarray objectAtIndex:idx] floatValue];
+        // NSLog(@"before card in slot %d, channel %d, spike = %f", [self slot], idx, voltSpikes[idx]);
+        
+        if(voltSpikes[idx]>[self voltThreshold])
+        {
+            spike=true;
+            channelSpikes[idx]=true; //this channel spiked
+        }
+        else
+        {
+            channelSpikes[idx]=false; //this channel did not spike
+        }
+    }
+    
+   // if(spike || [group globalSpiked]){ //spike or
+        [[NSNotificationCenter defaultCenter]
+         postNotificationName:ORMJDPreAmpModelRAGSpiked
+         object:self]; //this is meant for the MJD object
+        for(int idx=0;idx<kMJDPreAmpAdcChannels; idx++){
+            //NSLog(@"Warning, card in crate %d, slot %d, channel %d, spike ratio = %f\n", [self crateNumber], [self slot], idx, voltSpikes[idx]);
+            NSLog(@"Warning, detector %@ has baseline Updated %g\n",[self detectorName:idx], voltSpikes[idx]);
+        }
+    //}
+}
+
+-(BOOL)channelSpike:(int)idx
+{
+    if(idx<kMJDPreAmpAdcChannels){
+        return channelSpikes[idx];
+    }
+    else return false;
+}
+
+-(float)voltSpike:(int)idx
+{
+    if(idx<kMJDPreAmpAdcChannels){
+        return voltSpikes[idx];
+    }
+    else return 0;
+}
+
+- (id)     runningAverageObject:(short)channel{
+    return [baselineRunningAverageGroup runningAverageObject: channel];
+}
+
+
+- (float) getRunningAverage:(short)channel{
+    return [baselineRunningAverageGroup getRunningAverageValue:channel];
+}
+
+
+- (float) getRunningAverage:(short)counterTag forGroup:(short)groupTag{
+    if(groupTag == 0){
+        if(counterTag>=0 && counterTag<kMJDPreAmpAdcChannels){
+            baselineRunningAverageCount[counterTag]= [baselineRunningAverageGroup getRunningAverageValue: counterTag];
+            return baselineRunningAverageCount[counterTag]; //unnecessary to have waveFormRunningAverageCount array, but might be useful at some point.
+        }
+        else return 0;
+    }
+    else return 0;
+} //this maybe useless
+
+
+
+
 - (void) sleep
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-	[super sleep];
+    [baselineRunningAverageGroup stop];//possibly can be tied with the shiptheValue option.
+    [super sleep];
 }
 
 - (void) wakeUp
 {
-	[super wakeUp];
-	if(pollTime){
-		[self pollValues];
-	}
+    [super wakeUp];
+    if(pollTime){
+        [baselineRunningAverageGroup start:self];//possibly can be tied with the shiptheValue option.
+        [self pollValues];
+    }
     [self registerNotificationObservers];
 }
 
@@ -284,6 +399,18 @@ struct {
                          name : ORSegmentGroupConfiguationChanged
                        object : nil];
     
+    
+    //[notifyCenter removeObserver:self name:ORRunningAverageChangedNotification object:nil];
+    
+    ORRunningAverageGroup * run_ave=[self baselineRunningAverageGroup];
+    if(run_ave){
+        [notifyCenter addObserver : self
+                         selector : @selector(baselineRunningAverageChanged:)
+                             name : ORRunningAverageChangedNotification
+                           object : run_ave];
+    }
+    
+    
 }
 - (void) hardwareMapChanged:(NSNotification*)aNote
 {
@@ -341,6 +468,41 @@ struct {
         }
     }
 }
+
+- (int) connectedGretinaCrate
+{
+    ORConnector* inputConnector     = [[self connectors] objectForKey:MJDPreAmpInputConnector];
+    ORConnector* otherObjConnector  = [inputConnector connector];
+    OrcaObject*  digitizerObj       = [otherObjConnector objectLink];
+    if(digitizerObj){
+        NSString* digitizerID = [digitizerObj fullID];
+        NSArray* parts = [digitizerID componentsSeparatedByString:@","];
+        if([parts count] == 3){
+            int ourVmeCrate = [[parts objectAtIndex: 1]intValue];
+            return ourVmeCrate;
+        }
+        else return -1;
+    }
+    else return -1;
+}
+
+- (int) connectedGretinaSlot //the same as above, excpet for slot
+{
+    ORConnector* inputConnector     = [[self connectors] objectForKey:MJDPreAmpInputConnector];
+    ORConnector* otherObjConnector  = [inputConnector connector];
+    OrcaObject*  digitizerObj       = [otherObjConnector objectLink];
+    if(digitizerObj){
+        NSString* digitizerID = [digitizerObj fullID];
+        NSArray* parts = [digitizerID componentsSeparatedByString:@","];
+        if([parts count] == 3){
+            int ourVmeSlot  = [[parts objectAtIndex: 2]intValue];
+            return ourVmeSlot;
+        }
+        else return -1;
+    }
+    else return -1;
+}
+
 
 - (BOOL) validMapName:(NSString*)aName
 {
@@ -447,13 +609,6 @@ struct {
     else return nil;
 }
 
-- (ORRunningAverage*) getobj_baselineRunningAverage:(int)index
-{
-    //[waveFormRunningAverage setWindowLength: 11];
-    //NSLog(@"can I really return this object%@\n",waveFormRunningAverage);
-    if(index>=0 && index<kMJDPreAmpLeakageCurrentChannels*2)return baselineRunningAverage[index];
-    else return nil;
-}
 
 - (unsigned long) adcEnabledMask
 {
@@ -496,6 +651,10 @@ struct {
 	
 	if(pollTime){
 		[self performSelector:@selector(pollValues) withObject:nil afterDelay:2];
+        [baselineRunningAverageGroup setIntegrationTime:[self pollTime]];
+        NSLog(@"new poll time%d seconds",pollTime);
+      //  [baselineRunningAverageGroup start:self];//possibly can be tied with the shiptheValue option.
+
 	}
 	else {
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollValues) object:nil];
@@ -589,6 +748,32 @@ struct {
 	}
 }
 
+#pragma mark ¥¥¥ Instance rate
+- (float) getVolt:(short)counterTag forGroup:(short)groupTag
+{
+    
+    if(groupTag == 0){
+        if(counterTag>=0 && counterTag<kMJDPreAmpAdcChannels){
+            // return 1.1;
+            return [self adc:counterTag]; //the baseline ADC
+        }
+        else return 0;
+    }
+    else return 0;
+}
+
+#pragma mark ¥¥¥ Instance rates
+- (NSArray*) getRates:(short)groupTag //this must be called getRates for Running Average Group Class
+{
+    NSMutableArray* a = [NSMutableArray array];
+    if(groupTag == 0){
+        for(short counterTag=0; counterTag<kMJDPreAmpAdcChannels; counterTag++){
+            [a addObject:[NSNumber numberWithFloat:[self getVolt: counterTag forGroup:groupTag]]];
+        }
+    }
+    //[a retain];
+    return a;//[a autorelease];
+}
 
 
 - (float) adc:(unsigned short) aChan
@@ -1279,6 +1464,7 @@ struct {
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
+    
     self = [super initWithCoder:decoder];
 	
     [[self undoManager] disableUndoRegistration];
@@ -1296,13 +1482,8 @@ struct {
 		[self setAttenuated:i      value:[decoder decodeBoolForKey:[NSString stringWithFormat: @"attenuated%d",i]]];
 		[self setFinalAttenuated:i value:[decoder decodeBoolForKey:[NSString stringWithFormat: @"finalAttenuated%d",i]]];
 	}
-	for(i=0;i<kMJDPreAmpAdcChannels;i++){
-        [self setDetector:i name:[decoder decodeObjectForKey:   [NSString stringWithFormat:@"detectorName%d",i]]];
-        
-        if(!baselineRunningAverage[i*2]) baselineRunningAverage[i*2] = [[ORRunningAverage alloc] init]; //added for wenqin
-        if(!baselineRunningAverage[i*2+1]) baselineRunningAverage[i*2+1] = [[ORRunningAverage alloc] init]; //twice of the ADC chans for AUX
+    
 
-    }
     [self setLoopForever:	[decoder decodeBoolForKey:   @"loopForever"]];
     [self setPulseCount:	[decoder decodeIntForKey:    @"pulseCount"]];
 	[self setPulseHighTime:	[decoder decodeIntForKey:    @"pulseHighTime"]];
@@ -1316,10 +1497,28 @@ struct {
 	
     if(!dacs || !amplitudes || !feedBackResistors || !baselineVoltages)	[self setUpArrays];
 
+    if(!baselineRunningAverageGroup){
+        [self setBaselineRunningAverageGroup:[[[ORRunningAverageGroup alloc] initGroup:kMJDPreAmpAdcChannels groupTag:0 withLength:10] autorelease]];
+    }
+    
+     //NSLog(@"Baseline initial with Coder, RA group init, to reset\n");
+    [baselineRunningAverageGroup resetCounters:0];
+    [baselineRunningAverageGroup setPrintMymessages:false];
+    [self setVoltThreshold:0.5];
+    [baselineRunningAverageGroup setIntegrationTime:30];
+    for(i=0;i<kMJDPreAmpAdcChannels;i++){
+        voltSpikes[i]=0;
+        channelSpikes[i]=false;
+    }
+    
+    
     [self registerNotificationObservers];
     
     [[self undoManager] enableUndoRegistration];
     
+    
+    
+
    
     return self;
 }

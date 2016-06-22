@@ -20,11 +20,14 @@
 #import "ORAdcProcessing.h"
 #import "ORBitProcessing.h"
 #import "OROrderedObjHolding.h"
+#import "ORRunningAverageGroup.h"
+
 
 @class ORVacuumGateValve;
 @class ORVacuumPipe;
 @class ORLabJackUE9Model;
 @class ORAlarm;
+@class ORRunningAverageGroup;
 
 
 #define kPulseTube    0
@@ -147,6 +150,14 @@
     BOOL                 noHvInfo;
     BOOL                 disableConstraints;
     int coolerMode;
+    
+    
+    ORRunningAverageGroup* vacuumRunningAverageGroup; //init in initwithCoder, start with Wakeup
+    float 	vacuumRunningAverageCount[kNumberRegions];
+    
+    float           vacuumSpikes[kNumberRegions];
+    float           vacuumThreshold;
+    BOOL            channelSpikes[kNumberRegions];
 }
 
 #pragma mark ***Accessors
@@ -160,6 +171,7 @@
 - (void) setLastHvUpdateTime:(NSDate*)aLastHvUpdateTime;
 - (int) hvUpdateTime;
 - (void) setHvUpdateTime:(int)aHvUpdateTime;
+- (BOOL) shouldCheckBreakdown; //this is to check if the vaccum spiked
 - (BOOL) shouldUnbiasDetector;
 - (BOOL) okToBiasDetector;
 - (BOOL) detectorsBiased;
@@ -241,6 +253,21 @@
 - (void) enableConstraints;
 - (BOOL) disableConstraints;
 - (void) reportConstraints;
+
+#pragma mark •••running average
+- (void) vacuumRunningAverageChanged:(NSNotification*)aNote;
+- (void)  setVacuumRunningAverageGroup:(ORRunningAverageGroup*)newRunningAverageGroup;
+- (id)    runningAverageObject:(short)channel;
+- (float) getRunningAverage:(short)counterTag forGroup:(short)groupTag;
+- (float) getRunningAverage:(short)channel;
+- (void) setVacuumSpikes:(NSArray*)aarray;
+- (BOOL) channelSpike:(int)idx; //both channel spike and volt spike are each channel
+- (float) vacuumSpike:(int)idx;
+- (NSArray*) getRates:(short)groupTag;
+
+- (void) setVacuumThreshold:(float)a;
+- (float) vacuumThreshold;
+
 @end
 
 extern NSString* ORMJDVacuumModelCoolerModeChanged;
@@ -254,6 +281,8 @@ extern NSString* ORMJDVacuumModelShowGridChanged;
 extern NSString* ORMJCVacuumLock;
 extern NSString* ORMJDVacuumModelConstraintsChanged;
 extern NSString* ORMJDVacuumModelConstraintsDisabledChanged;
+extern NSString* ORMJDVacuumModelVacuumSpiked; //TEST TEST TEST
+//extern NSString* ORMJDVacuumModelRAGChanged;
 
 
 @interface ORMJDVacuumModel (hidden)

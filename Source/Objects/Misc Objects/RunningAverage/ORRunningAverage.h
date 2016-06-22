@@ -23,17 +23,32 @@
     float runningAverage;
     int windowLength;
     NSMutableArray*	inComingData;
+    int tag;
+    int groupTag;
 }
 //- (id)   initwithwindowLength:(int) wl;
-- (id) init;
+- (id) initWithTag:(short)aTag andLength:(short)wl;
 - (void) dealloc;
 - (void) setWindowLength:(int) wl;
 - (float) updateAverage:(float)datapoint;
+- (float) updateAveragewNSN:(NSNumber*)datapoint;
+- (void) updateAveragewObj:(id)obj;
 - (void) resetCounter:(float) rate;
 ///- (NSNumber *)oldestDataRemoval;
 - (float)oldestDataRemoval;
 - (float)getAverage;
 - (void) dump;
+- (int)tag;
+- (void) setTag:(int)newTag;
+- (int) groupTag;
+- (void) setGroupTag:(int)newGroupTag;
 @end
+
+
+
+@interface NSObject (ORRunningAverage_Catagory)
+- (unsigned long) getRate:(int)tag forGroup:(int)aGroupTag;
+@end
+
 
 

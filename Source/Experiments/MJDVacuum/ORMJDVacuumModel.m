@@ -31,6 +31,7 @@
 #import "ORLakeShore336Model.h"
 #import "ORLakeShore336Input.h"
 #import "ORAlarm.h"
+#import "ORRunningAverageGroup.h"
 
 
 @interface ORMJDVacuumModel (private)
@@ -87,6 +88,9 @@ NSString* ORMJDVacuumModelHvUpdateTimeChanged           = @"ORMJDVacuumModelHvUp
 NSString* ORMJDVacuumModelConstraintsDisabledChanged    = @"ORMJDVacuumModelConstraintsDisabledChanged";
 NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCoolerModeChanged";
 
+NSString* ORMJDVacuumModelVacuumSpiked                     = @"ORMJDVacuumModelVacuumSpiked";
+//NSString* ORMJDVacuumModelRAGChanged                    = @"ORMJDVacuumModelRAGChanged";
+
 @implementation ORMJDVacuumModel
 
 #pragma mark •••initialization
@@ -94,6 +98,8 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 {
     [super wakeUp];
 	[self registerNotificationObservers];
+    [vacuumRunningAverageGroup start:self]; //should this be moved to initwithCoder?
+
 }
 
 - (void) sleep
@@ -101,6 +107,8 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
     [super sleep];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+    [vacuumRunningAverageGroup stop]; //how often it wake up and sleeps? TEST TEST TEST
+
 }
 
 - (void) dealloc
@@ -117,7 +125,129 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 	[orcaClosedCryoPumpValveAlarm release];
 	[orcaClosedCF6TempAlarm clearAlarm];
 	[orcaClosedCF6TempAlarm release];
+    [vacuumRunningAverageGroup release];
 	[super dealloc];
+}
+
+
+//From nMaxChannels to getRates, they are added by wenqin to have running average for vacuum based inside the interlocks
+- (int) nMaxChannels
+{
+    return kNumberRegions;
+}
+
+- (void) setVacuumThreshold:(float)a
+{
+    vacuumThreshold = a;
+    [vacuumRunningAverageGroup setThreshold:a];
+}
+
+-(float)vacuumThreshold
+{
+    return vacuumThreshold;
+}
+
+
+- (ORRunningAverageGroup*) vacuumRunningAverageGroup{
+    return vacuumRunningAverageGroup;
+}
+
+- (void) setVacuumRunningAverageGroup:(ORRunningAverageGroup*)newRunningAverageGroup
+{
+    [newRunningAverageGroup retain];
+    [vacuumRunningAverageGroup release];
+    vacuumRunningAverageGroup = newRunningAverageGroup;
+    
+//    [[NSNotificationCenter defaultCenter]
+//     postNotificationName:ORMJDVacuumModelRAGChanged
+//     object:self];
+}
+
+
+- (void) vacuumRunningAverageChanged:(NSNotification*)aNote
+{
+    ORRunningAverageGroup* theRunningAverageObj = [aNote object];
+    [self setVacuumSpikes:[theRunningAverageObj spikes]];
+    NSLog(@" vacuum --- running averages are %@\n",[theRunningAverageObj spikes]);
+}
+
+- (void) setVacuumSpikes:(NSArray*)aarray{
+    bool spike=false;
+    for(int idx=0;idx<kNumberRegions; idx++){
+        vacuumSpikes[idx]= [[aarray objectAtIndex:idx] floatValue];
+        // NSLog(@"before card in slot %d, channel %d, spike = %f", [self slot], idx, vacuumSpikes[idx]);
+        
+        if(vacuumSpikes[idx]>[self vacuumThreshold])
+        {
+            spike=true;
+            channelSpikes[idx]=true;
+        }
+        else channelSpikes[idx]=false;
+    }
+    //	double			cyrostatPress		= [self valueForRegion:kRegionCryostat]; //Cryostat region is the the most important one.
+
+//    if(spike){
+//        [[NSNotificationCenter defaultCenter]
+//         postNotificationName:ORMJDVacuumModelRAGSpiked
+//         object:self];
+//         Do not need this, due to different DAQ machines, nobody on the same DAQ is listening. MJDInterlock inquire this class.
+        for(int idx=0;idx<kNumberRegions; idx++){
+            //NSLog(@"Warning, card in crate %d, slot %d, channel %d, spike ratio = %f\n", [self crateNumber], [self slot], idx, vacuumSpikes[idx]);
+            NSLog(@"Warning, vaccum region %@ has vacuum jump %g\n",[self regionName:idx],channelSpikes[idx]);
+        }
+  //  }
+}
+
+
+-(BOOL)channelSpike:(int)idx
+{
+    if(idx<kNumberRegions){
+        return channelSpikes[idx];
+    }
+    else return false;
+}
+
+-(float)vacuumSpike:(int)idx
+{
+    if(idx<kNumberRegions){
+        return vacuumSpikes[idx];
+    }
+    else return 0;
+}
+
+- (id)     runningAverageObject:(short)channel{
+    return [vacuumRunningAverageGroup runningAverageObject: channel];
+}
+
+
+- (float) getRunningAverage:(short)channel{
+    return [vacuumRunningAverageGroup getRunningAverageValue:channel];
+}
+
+
+- (float) getRunningAverage:(short)counterTag forGroup:(short)groupTag{
+    if(groupTag == 0){
+        if(counterTag>=0 && counterTag<kNumberRegions){
+            vacuumRunningAverageCount[counterTag]= [vacuumRunningAverageGroup getRunningAverageValue: counterTag];
+            return vacuumRunningAverageCount[counterTag]; //unnecessary to have waveFormRunningAverageCount array, but might be useful at some point.
+        }
+        else return 0;
+    }
+    else return 0;
+} //this maybe useless
+
+- (NSArray*) getRates:(short)groupTag
+{
+    //groupTag must be zero, this is the fault of ORMJDGretina4MModel
+    NSMutableArray* a = [NSMutableArray array];
+    if(groupTag == 0){
+        for(short idx=0; idx<kNumberRegions; idx++){
+            [a addObject:[NSNumber numberWithFloat:[self valueForRegion:idx]]];
+            
+        }
+    }
+    //[a retain];
+    return a;//[a autorelease];
 }
 
 
@@ -265,6 +395,15 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
                      selector : @selector(portClosedAfterTimeout:)
                          name : ORSerialPortWithQueueModelPortClosedAfterTimeout
 						object: nil];
+    
+    ORRunningAverageGroup *run_ave=[self vacuumRunningAverageGroup];
+    if(run_ave){
+        [notifyCenter addObserver : self
+                         selector : @selector(vacuumRunningAverageChanged:)
+                             name : ORRunningAverageChangedNotification
+                           object : run_ave];
+    }
+    
 }
 
 - (void) portClosedAfterTimeout:(NSNotification*)aNote
@@ -444,6 +583,7 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 //- (BOOL)    shouldUnbiasDetector	{ return NO; }
 //- (BOOL)    okToBiasDetector		{ return YES; }
 - (BOOL)    detectorsBiased         { return detectorsBiased;       }
+- (BOOL)    shouldCheckBreakdown    { return channelSpikes[kRegionCryostat];} //TEST TEST TEST, using only the vacuum of cryostat
 
 //-------------------------------------------------------------------
 //This method is typically only called from a remote ORCA to tell us
@@ -502,7 +642,21 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 	[self registerNotificationObservers];
 	
 	[[self undoManager] enableUndoRegistration];
-	
+    
+    
+    
+    if(!vacuumRunningAverageGroup){
+        [self setVacuumRunningAverageGroup:[[[ORRunningAverageGroup alloc] initGroup:kNumberRegions groupTag:0 withLength:10] autorelease]];
+    }
+    //NSLog(@"Gretina init with Coder, RA group init, to reset\n");
+    [vacuumRunningAverageGroup setIntegrationTime:10.];
+    [vacuumRunningAverageGroup resetCounters:0];
+    [vacuumRunningAverageGroup setPrintMymessages:false];
+    [vacuumRunningAverageGroup setTriggerOnRatio:true];
+    [self setVacuumThreshold:0.9]; //anything below 1 is for TEST TEST TEST, always trigger
+    vacuumSpikes[kRegionCryostat]=0;
+    channelSpikes[kRegionCryostat]=false; //only kRegionCryostat matters for TEST TEST TEST.
+    
     return self;
 }
 
@@ -1346,6 +1500,8 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
     [values setObject: [NSNumber numberWithBool:[self shouldUnbiasDetector]] forKey:@"ShouldUnbiasDetector"];
     [values setObject: [NSNumber numberWithBool:[self okToBiasDetector]]     forKey:@"OKToBiasDetector"];
     [values setObject: [NSNumber numberWithInt: [self coolerMode]]           forKey:@"CoolerMode"];
+    //[values setObject: [NSNumber numberWithBool:[self shouldCheckBreakdown]] forKey:@"ShouldCheckBreakdown"];//not sure it is necessary
+
     
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
     [self performSelector:@selector(postCouchRecord) withObject:nil afterDelay:5];
@@ -1542,8 +1698,6 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 	[self checkCryoPumpRelatedConstraints:[self findCryoPump]];
 	[self checkPressureConstraints];
 	[self checkDetectorConstraints];
-    
-    
 	constraintCheckScheduled = NO;
 }
 
@@ -1870,8 +2024,6 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 		}
 		else [self removeConstraintName:kNegPumpPressConstraint fromGateValve:aGateValve];
 	}
-	
-	
 }
 
 - (void) checkDetectorConstraints

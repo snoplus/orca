@@ -27,12 +27,13 @@
 #import "AutoTesting.h"
 #import "ORAdcInfoProviding.h"
 #import "SBC_Link.h"
-#import "ORRunningAverage.h"
+#import "ORRunningAverageGroup.h"
+
 
 @class ORRateGroup;
 @class ORConnector;
 @class ORFileMoverOp;
-@class ORRunningAverage;
+@class ORRunningAverageGroup;
 
 
 #define kNumGretina4MChannels		10
@@ -263,6 +264,9 @@ enum Gretina4MFIFOStates {
 	int noiseFloorTestValue;
 	int noiseFloorOffset;
     float noiseFloorIntegrationTime;
+    float rateSpikes[kNumGretina4MChannels];
+    BOOL  channelSpikes[kNumGretina4MChannels];
+    float rateThreshold;
 	
     NSString* mainFPGADownLoadState;
     NSString* fpgaFilePath;
@@ -279,8 +283,10 @@ enum Gretina4MFIFOStates {
 	ORConnector*    linkConnector; //we won't draw this connector so we have to keep a reference to it
     ORFileMoverOp*  fpgaFileMover;
 	ORRateGroup*	waveFormRateGroup;
-    ORRunningAverage* waveFormRunningAverage[kNumGretina4MChannels];
-	unsigned long 	waveFormCount[kNumGretina4MChannels];
+    ORRunningAverageGroup* waveFormRunningAverageGroup; //initialized in initWithCoder, start by runstart
+    unsigned long 	waveFormCount[kNumGretina4MChannels];
+    float 	waveFormRunningAverageCount[kNumGretina4MChannels];
+
 	BOOL			isRunning;
     NSString*       firmwareStatusString;
     BOOL            locked;
@@ -307,6 +313,7 @@ enum Gretina4MFIFOStates {
 - (void) openPreampDialog;
 
 #pragma mark ***Accessors
+- (int) nMaxChannels;
 - (BOOL) forceFullInitCard;
 - (void) setForceFullInitCard:(BOOL)aForceFullInitCard;
 - (short) initState;
@@ -358,6 +365,8 @@ enum Gretina4MFIFOStates {
 - (void) setNoiseFloorOffset:(short)aNoiseFloorOffset;
 - (void) initParams;
 - (int) baseLineLength:(int)chan;
+- (float) rateThreshold;
+- (void) setRateThreshold:(float)aRateThreshold;
 
 // Register access
 - (NSString*) registerNameAt:(unsigned int)index;
@@ -378,11 +387,16 @@ enum Gretina4MFIFOStates {
 - (unsigned long) readFromAddress:(unsigned long)anAddress;
 - (void) printThresholds;
 
+- (void) registerNotificationObservers;
 - (ORRateGroup*)    waveFormRateGroup;
 - (void)			setWaveFormRateGroup:(ORRateGroup*)newRateGroup;
-- (ORRunningAverage*) getobj_waveFormRunningAverage:(int)index;
 - (id)              rateObject:(short)channel;
 - (void)            setRateIntegrationTime:(double)newIntegrationTime;
+- (void) waveFormRunningAverageChanged:(NSNotification*)aNote;
+- (ORRunningAverageGroup*) waveFormRunningAverageGroup;
+- (void)			setWaveFormRunningAverageGroup:(ORRunningAverageGroup*)newRunningAverageGroup;
+- (id)              runningAverageObject:(short)channel;
+- (float) getRunningAverage:(short)channel;
 - (void) setExternalWindow:(short)aValue;
 - (short) externalWindow;
 - (void) setPileUpWindow:(short)aValue;
@@ -556,11 +570,24 @@ enum Gretina4MFIFOStates {
 - (void)   startRates;
 - (void) clearWaveFormCounts;
 - (unsigned long) getCounter:(short)counterTag forGroup:(short)groupTag;
+- (NSArray*) getRates:(short)groupTag;
+- (float) getRate:(short)counterTag forGroup:(short)groupTag;
+//- (float) waveFormRunningAverage:(short)aChannel;
+- (void) clearWaveFormRunningAverageCounts;
+- (float) getRunningAverage:(short)counterTag forGroup:(short)groupTag;
+
+
 - (void) checkFifoAlarm;
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
 //- (BOOL) bumpRateFromDecodeStage:(short)channel;
 - (BOOL) bumpRateFromDecodeStage:(int)channel;
 
+//- (void) setRateSpikes:(NSArray*)aarray;
+- (void) setRateSpikes:(ORRunningAverageGroup*)group;
+
+- (float) rateSpike:(int)idx;
+
+- (BOOL)channelSpike:(int)idx;
 #pragma mark •••HW Wizard
 - (int) numberOfChannels;
 - (NSArray*) wizardParameters;
@@ -663,3 +690,6 @@ extern NSString* ORGretina4MModelInitStateChanged;
 extern NSString* ORGretina4MForceFullInitCardChanged;
 extern NSString* ORGretina4MLockChanged;
 extern NSString* ORGretina4MDoHwCheckChanged;
+extern NSString* ORRunningAverageChangedNotification;
+
+extern NSString* ORGretina4MModelRAGSpiked;

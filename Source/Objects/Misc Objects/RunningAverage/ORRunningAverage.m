@@ -11,33 +11,38 @@
 #import "ORRunningAverage.h"
 @implementation ORRunningAverage
 
-- (id) init
+- (id) initWithTag: (short)aTag
+         andLength: (short) wl
 {
     self = [super init];
+    [self setTag: aTag];
     inComingData = [[NSMutableArray alloc] init];
+    [self setWindowLength:wl];
     return self;
 }
 
 
-/*
-- (id) initwithwindowLength:(int) wl
-{
-    windowLength = wl;
-    self = [super init];
-    inComingData = [[NSMutableArray alloc] init];
-    for(int idx=0; idx<windowLength;idx++)
-    {
-        [inComingData addObject:[NSNumber numberWithDouble:0]];
-    }
-    NSLog(@"my running average window initially = %d",inComingData.count);
-    runningAverage = 0;
-    return self;
-}
-*/
 - (void) dealloc
 {
     [inComingData release];
     [super dealloc];
+}
+
+- (int) tag
+{
+    return tag;
+}
+- (void) setTag:(int)newTag
+{
+    tag=newTag;
+}
+- (int) groupTag
+{
+    return groupTag;
+}
+- (void) setGroupTag:(int)newGroupTag
+{
+    groupTag=newGroupTag;
 }
 
 - (void) setWindowLength:(int) wl
@@ -49,7 +54,7 @@
     {
         [inComingData addObject:[NSNumber numberWithFloat:0.]];
     }
-    NSLog(@"my running average window initially = %d\n",inComingData.count);
+    //NSLog(@"my running average window initially = %d\n",inComingData.count);
     runningAverage = 0.;
 }
 
@@ -59,11 +64,20 @@
     
     for(int idx=0; idx<windowLength;idx++)
     {
-        [inComingData addObject:[NSNumber numberWithDouble:rate]];
+        [inComingData addObject:[NSNumber numberWithFloat:rate]];
     }
     runningAverage = rate;
-    NSLog(@"Running average window is reset\n",inComingData.count, runningAverage);
+    //NSLog(@"Running average window is reset to be %d array of %f\n",inComingData.count, runningAverage);
+}
 
+- (void) reset
+{
+    [inComingData removeAllObjects];
+    
+    for(int idx=0; idx<windowLength;idx++)
+    {
+        [inComingData addObject:[NSNumber numberWithDouble:0]];
+    }
 }
 
 
@@ -81,17 +95,29 @@
     return oldestDataValue;
 }
 
-//-(float)updateAverage:(NSNumber * )datapoint{
 -(float)updateAverage:(float)datapoint{
-    [inComingData addObject:[NSNumber numberWithDouble:datapoint]];
+    [inComingData addObject:[NSNumber numberWithFloat:datapoint]];
    // NSLog(@"my running average window now = %d-1\n",inComingData.count);
 
     //runningAverage = runningAverage - [[self oldestDataRemoval] floatValue]/windowLength + datapoint/windowLength;
     runningAverage = runningAverage - [self oldestDataRemoval]/windowLength + datapoint/windowLength;
-    //NSLog(@"internal average = %f\n",runningAverage);
+    //NSLog(@"Internally running average for group tag = %d and channel tag = %s is %f\n",groupTag, tag, runningAverage);
     return runningAverage;
     
 }
+
+-(float)updateAveragewNSN:(NSNumber*)datapoint{
+    [inComingData addObject: datapoint];
+    runningAverage = runningAverage - [self oldestDataRemoval]/windowLength + [datapoint floatValue]/windowLength;
+    return runningAverage;
+}
+
+
+
+-(void)updateAveragewObj:(id)obj{
+    float datapoint = [obj getRate:tag forGroup:groupTag];
+    [self updateAverage: datapoint]; //the variable runningAverage is updated in updateAverage
+} //Expect the obj has a getRate method
 
 -(float)getAverage{
     return runningAverage;
@@ -106,3 +132,5 @@
 }
 
 @end
+
+

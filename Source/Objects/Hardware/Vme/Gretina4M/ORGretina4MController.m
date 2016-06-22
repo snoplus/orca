@@ -24,6 +24,7 @@
 #import "ORGretina4MController.h"
 #import "ORRateGroup.h"
 #import "ORRate.h"
+#import "ORRunningAverage.h"
 #import "ORValueBar.h"
 #import "ORTimeRate.h"
 #import "ORTimeLinePlot.h"
@@ -173,6 +174,11 @@
                          name : ORRateAverageChangedNotification
                        object : [[model waveFormRateGroup]timeRate]];
     
+   /* [notifyCenter addObserver : self
+                     selector : @selector(updateTimePlot:)
+                         name : ORRunningverageChangedNotification
+                       object : [[model waveFormRunningAverageGroup]timeRate]];
+    */
     [notifyCenter addObserver : self
                      selector : @selector(integrationChanged:)
                          name : ORRateGroupIntegrationChangedNotification
@@ -458,6 +464,27 @@
                              name : ORRateChangedNotification
                            object : obj];
     }
+    /*
+    
+    [notifyCenter removeObserver:self name:ORRunningAverageChangedNotification object:nil];
+    
+//    NSEnumerator* e_av = [[[model waveFormRunningAverageGroup] runningAverages] objectEnumerator];
+//    id obj_av;
+//    while(obj_av = [e_av nextObject]){
+//    
+//        [notifyCenter removeObserver:self name:ORRunningAverageChangedNotification object:obj_av];
+//        
+//        [notifyCenter addObserver : self
+//                         selector : @selector(waveFormRunningAverageChanged:)
+//                             name : ORRunningAverageChangedNotification
+//                           object : obj_av];
+//    }
+    id obj_av=[model waveFormRunningAverageGroup];
+    [notifyCenter addObserver : self
+                     selector : @selector(waveFormRunningAverageChanged:)
+                         name : ORRunningAverageChangedNotification
+                       object : obj_av];*/
+
 }
 
 
@@ -982,6 +1009,7 @@
     [rate0 setNeedsDisplay:YES];
     
 }
+
 
 - (void) totalRateChanged:(NSNotification*)aNote
 {

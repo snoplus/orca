@@ -129,6 +129,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
     [delegate setVmeCrateHVConstraint:[self module] state:NO];
 }
 
+
 - (void) setCurrentState:(int)aState
 {
     currentState  = aState;
@@ -148,6 +149,8 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDInterlocksStateChanged object:self];
 }
+
+
 
 - (NSString*) stateName:(int)anIndex
 {
@@ -346,6 +349,14 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                         
                         lockHVDialog = NO;
                         [self setCurrentState:kMJDInterlocks_HandleHVDialog];
+                        
+                        //added by wenqin in this condition of vacuum spike indicating possible breakdowns
+                        if(hvIsOn){
+                            shouldCheckBreakdown = [[remoteOpStatus objectForKey:@"shouldCheckBreakdown"] boolValue];
+                            if(shouldCheckBreakdown){
+                                [delegate checkBreakdown:[self module] vac:[self vacSystem]];
+                            }
+                        }
                     }
                 }
                 else {
@@ -371,7 +382,9 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             else {
                 if(!sentCmds){
                     self.remoteOpStatus=nil;
-                    NSMutableArray* cmds = [NSMutableArray arrayWithObjects:@"shouldUnBias = [ORMJDVacuumModel,1 shouldUnbiasDetector];", nil];
+                    NSMutableArray* cmds = [NSMutableArray arrayWithObjects:@"shouldUnBias = [ORMJDVacuumModel,1 shouldUnbiasDetector];", nil]; //nil means end
+                    [cmds addObject:@"shouldCheckBreakdown = [ORMJDVacuumModel,1 shouldCheckBreakdown];"];//added by wenqin
+
                     [self sendCommands:cmds remoteSocket:[delegate remoteSocket:slot]];
                     [self setState:kMJDInterlocks_GetShouldUnBias status:@"Asking..." color:normalColor];
                     sentCmds = YES;
@@ -469,7 +482,6 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
         case kMJDInterlocks_FinalState:
             if([finalReport count])[self errorReport];
             break;
-
     }
     if(currentState != kMJDInterlocks_Idle){
         [self performSelector:@selector(step) withObject:nil afterDelay:.3];

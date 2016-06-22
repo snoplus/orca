@@ -29,7 +29,7 @@
 	int tag;
 	
 	//non-persistant variables
-	id objectKeepingCount;;
+	id objectKeepingCount;
 	double   totalRate;
 	ORTimeRate* timeRate;
 }

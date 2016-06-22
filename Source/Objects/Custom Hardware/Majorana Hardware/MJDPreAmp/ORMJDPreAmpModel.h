@@ -21,11 +21,11 @@
 #import "ORHWWizard.h"
 #import "MJDCmds.h"
 #import "ORAuxHw.h"
-#import "ORRunningAverage.h"
+#import "ORRunningAverageGroup.h"
 
 @class ORTimeRate;
 @class ORAlarm;
-@class ORRunningAverage;
+@class ORRunningAverageGroup;
 
 #define kMJDPreAmpDacChannels               16	//if this ever changes, change the record length also
 #define kMJDPreAmpAdcChannels               16
@@ -55,7 +55,7 @@
     unsigned long   adcEnabledMask;
     ORTimeRate*		adcHistory[kMJDPreAmpAdcChannels];
     ORTimeRate*		leakageCurrentHistory[kMJDPreAmpLeakageCurrentChannels];
-    ORRunningAverage* baselineRunningAverage[kMJDPreAmpAdcChannels*2];
+    ORRunningAverageGroup* baselineRunningAverageGroup; //init in initWithCoder, start with WakeUp
     ORAlarm*		temperatureAlarm[2];
     ORAlarm*		leakageCurrentAlarm[kMJDPreAmpLeakageCurrentChannels];
     ORAlarm*		adcAlarm[kMJDPreAmpAdcChannels];
@@ -66,7 +66,12 @@
     BOOL            connected;
     BOOL            doNotUseHWMap;
     int             firmwareRev;
- 
+    float           baselineRunningAverageCount[kMJDPreAmpAdcChannels];
+
+    float           voltSpikes[kMJDPreAmpAdcChannels];
+    float           voltThreshold;
+    BOOL            channelSpikes[kMJDPreAmpAdcChannels];
+
     //error counting
     BOOL            supplyOutOfBounds[4]; //only count if this goes from low to high
     unsigned long   supplyErrors[4];
@@ -78,6 +83,7 @@
 - (void) hardwareMapChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Accessors
+- (int) nMaxChannels;
 - (int)  firmwareRev;
 - (void) setFirmwareRev:(int)aFirmwareRev;
 - (int)  boardRev;
@@ -98,7 +104,22 @@
 - (void) clearSupplyErrors;
 - (ORTimeRate*)adcHistory:(int)index;
 - (ORTimeRate*)leakageCurrentHistory:(int)index;
-- (ORRunningAverage*) getobj_baselineRunningAverage:(int)index;
+
+//running averages
+- (ORRunningAverageGroup*) baselineRunningAverageGroup;
+- (void) baselineRunningAverageChanged:(NSNotification*)aNote;
+- (void)  setBaselineRunningAverageGroup:(ORRunningAverageGroup*)newRunningAverageGroup;
+- (id)    runningAverageObject:(short)channel;
+- (float) getRunningAverage:(short)counterTag forGroup:(short)groupTag;
+- (float) getRunningAverage:(short)channel;
+//- (void) setVoltSpikes:(NSArray*)aarray;
+- (void) setVoltSpikes:(ORRunningAverageGroup*)group;
+- (BOOL) channelSpike:(int)idx; //both channel spike and volt spike are each channel
+- (float) voltSpike:(int)idx;
+- (NSArray*) getRates:(short)groupTag;
+- (float) getVolt:(short)counterTag forGroup:(short)groupTag;
+- (void) setVoltThreshold:(float)a;
+- (float) voltThreshold;
 
 - (unsigned long) adcEnabledMask;
 - (void) setAdcEnabledMask:(unsigned long)aAdcEnabledMask;
@@ -161,6 +182,8 @@
 - (void) readAllAdcs:(BOOL)verbose;
 - (void) pollValues;
 - (unsigned long) writeAuxIOSPI:(unsigned long)aValue;
+- (int) connectedGretinaCrate;
+- (int) connectedGretinaSlot;
 
 #pragma mark ¥¥¥Alarms
 - (void) checkTempIsWithinLimits;
@@ -202,6 +225,8 @@ extern NSString* ORMJDPreAmpModelDetectorNameChanged;
 extern NSString* ORMJDPreAmpModelConnectionChanged;
 extern NSString* ORMJDPreAmpModelDoNotUseHWMapChanged;
 extern NSString* ORMJDPreAmpModelFirmwareRevChanged;
+extern NSString* ORMJDPreAmpModelRAGSpiked;
+extern NSString* ORMJDPreAmpModelRAGChanged;
 
 @interface NSObject (ORMJDPreAmpModel)
 - (unsigned long) writeAuxIOSPI:(unsigned long)spiData;
