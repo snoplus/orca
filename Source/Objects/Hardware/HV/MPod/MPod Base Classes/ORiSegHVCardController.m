@@ -50,7 +50,7 @@
 {	
 	[super awakeFromNib];
 	
-	[[currentPlotter yAxis] setRngLimitsLow:-5000 withHigh:5000 withMinRng:10];
+	[[currentPlotter yAxis] setRngLimitsLow:-5000000000 withHigh:5000000000 withMinRng:10];
 	[[voltagePlotter yAxis] setRngLimitsLow:0 withHigh:10000 withMinRng:10];
 	[[currentPlotter yAxis] setLabel:@"Current (pA)"];
 	[[voltagePlotter yAxis] setLabel:@"Voltage (V)"];
