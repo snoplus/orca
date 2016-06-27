@@ -71,7 +71,7 @@
 			case 1: aColor  = [NSColor greenColor];     break;
 			case 2: aColor  = [NSColor blueColor];      break;
 			case 3: aColor  = [NSColor cyanColor];      break;
-			case 4: aColor  = [NSColor yellowColor];    break;
+			case 4: aColor  = [NSColor brownColor];     break;
 			case 5: aColor  = [NSColor magentaColor];   break;
 			case 6: aColor  = [NSColor orangeColor];    break;
 			case 7: aColor  = [NSColor purpleColor];    break;
@@ -79,7 +79,7 @@
 			case 9: aColor  = [NSColor greenColor];     break;
 			case 10: aColor = [NSColor blueColor];      break;
 			case 11: aColor = [NSColor cyanColor];      break;
-			case 12: aColor = [NSColor yellowColor];    break;
+			case 12: aColor = [NSColor brownColor];    break;
 			case 13: aColor = [NSColor magentaColor];   break;
 			case 14: aColor = [NSColor orangeColor];    break;
 			case 15: aColor = [NSColor purpleColor];    break;
