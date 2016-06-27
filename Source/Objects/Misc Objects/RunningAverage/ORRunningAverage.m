@@ -5,8 +5,19 @@
 //  Created by Wenqin on 3/23/16.
 //
 //
-
-
+//-----------------------------------------------------------
+//This program was prepared for the Regents of the University of
+//Washington at the Center for Experimental Nuclear Physics and
+//Astrophysics (CENPA) sponsored in part by the United States
+//Department of Energy (DOE) under Grant #DE-FG02-97ER41020.
+//The University has certain rights in the program pursuant to
+//the contract and the program should not be copied or distributed
+//outside your organization.  The DOE and the University of
+//Washington reserve all rights in the program. Neither the authors,
+//University of Washington, or U.S. Government make any warranty,
+//express or implied, or assume any liability or responsibility
+//for the use of this software.
+//-------------------------------------------------------------
 
 #import "ORRunningAverage.h"
 @implementation ORRunningAverage
@@ -21,7 +32,6 @@
     return self;
 }
 
-
 - (void) dealloc
 {
     [inComingData release];
@@ -32,14 +42,17 @@
 {
     return tag;
 }
+
 - (void) setTag:(int)newTag
 {
     tag=newTag;
 }
+
 - (int) groupTag
 {
     return groupTag;
 }
+
 - (void) setGroupTag:(int)newGroupTag
 {
     groupTag=newGroupTag;
@@ -50,8 +63,8 @@
     [inComingData removeAllObjects];
     
     windowLength = wl;
-    for(int idx=0; idx<windowLength;idx++)
-    {
+    int idx;
+    for(idx=0; idx<windowLength;idx++){
         [inComingData addObject:[NSNumber numberWithFloat:0.]];
     }
     //NSLog(@"my running average window initially = %d\n",inComingData.count);
@@ -61,76 +74,112 @@
 - (void) resetCounter:(float) rate
 {
     [inComingData removeAllObjects];
-    
-    for(int idx=0; idx<windowLength;idx++)
-    {
+    int idx;
+    for(idx=0; idx<windowLength;idx++){
         [inComingData addObject:[NSNumber numberWithFloat:rate]];
     }
     runningAverage = rate;
-    //NSLog(@"Running average window is reset to be %d array of %f\n",inComingData.count, runningAverage);
 }
 
 - (void) reset
 {
     [inComingData removeAllObjects];
-    
-    for(int idx=0; idx<windowLength;idx++)
-    {
+    int idx;
+    for(idx=0; idx<windowLength;idx++){
         [inComingData addObject:[NSNumber numberWithDouble:0]];
     }
 }
 
+- (float) updateAverage:(float)dataPoint
+{
+    lastRateValue = dataPoint;
+    [inComingData push:[NSNumber numberWithFloat:dataPoint]];
+    runningAverage = runningAverage - [[inComingData popTop]floatValue]/windowLength + dataPoint/windowLength;
 
-/*
--(NSNumber *)oldestDataRemoval{
-    NSNumber* oldestdata=[[inComingData objectAtIndex:0] retain];
-    [inComingData removeObjectAtIndex:0];
-    return [oldestdata autorelease];
-}*/
-
--(float)oldestDataRemoval{
-    NSNumber* oldestdata=[inComingData objectAtIndex:0];
-    float oldestDataValue=[oldestdata floatValue];
-    [inComingData removeObjectAtIndex:0];
-    return oldestDataValue;
+    return runningAverage;
 }
 
--(float)updateAverage:(float)datapoint{
-    [inComingData addObject:[NSNumber numberWithFloat:datapoint]];
-   // NSLog(@"my running average window now = %d-1\n",inComingData.count);
+- (float) lastRateValue
+{
+    return lastRateValue;
+}
 
-    //runningAverage = runningAverage - [[self oldestDataRemoval] floatValue]/windowLength + datapoint/windowLength;
-    runningAverage = runningAverage - [self oldestDataRemoval]/windowLength + datapoint/windowLength;
-    //NSLog(@"Internally running average for group tag = %d and channel tag = %s is %f\n",groupTag, tag, runningAverage);
+- (float) runningAverage
+{
     return runningAverage;
+}
+- (float)   spikeValue
+{
+    return spikeValue;
+}
+
+- (ORRunningAveSpike*) averageRate:(float)rate minSamples:(int)minSamples triggerValue:(float)triggerValue spikeType:(BOOL)triggerType
+{
+    [self  updateAverage:rate];
     
+    if([inComingData count] < minSamples) return nil;
+    
+    spikeValue = 0;
+    switch(triggerType){
+        case kRASpikeOnRatio: //trigger on the ratio of the rate over the average
+            if(runningAverage != 0) {
+                spikeValue = rate/runningAverage;
+                didSpike   = (fabs(spikeValue) >= triggerValue);
+            }
+            break;
+            
+        case kRASpikeOnThreshold:
+            spikeValue = rate-runningAverage;
+            didSpike   = (fabs(spikeValue) > triggerValue);
+            break;
+            
+        default:
+            break;
+    }
+
+    if(lastDidSpike != didSpike){
+        lastDidSpike = didSpike;
+        ORRunningAveSpike* aSpikeObj = [[ORRunningAveSpike alloc] init];
+        aSpikeObj.timeOfSpike  = [NSDate date];
+        aSpikeObj.spiked       = didSpike;
+        aSpikeObj.tag          = tag;
+        aSpikeObj.ave          = runningAverage;
+        aSpikeObj.spikeValue   = spikeValue;
+        return aSpikeObj;
+    }
+    return nil;
 }
 
--(float)updateAveragewNSN:(NSNumber*)datapoint{
-    [inComingData addObject: datapoint];
-    runningAverage = runningAverage - [self oldestDataRemoval]/windowLength + [datapoint floatValue]/windowLength;
-    return runningAverage;
-}
-
-
-
--(void)updateAveragewObj:(id)obj{
-    float datapoint = [obj getRate:tag forGroup:groupTag];
-    [self updateAverage: datapoint]; //the variable runningAverage is updated in updateAverage
-} //Expect the obj has a getRate method
-
--(float)getAverage{
-    return runningAverage;
-}
-
-
--(void)dump{
-    for(int idx=0; idx<windowLength;idx++)
-    {
+- (void) dump
+{
+    int idx;
+    for(idx=0; idx<windowLength;idx++){
         NSLog(@"number at index %d = %f\n",idx, [[inComingData objectAtIndex:idx] floatValue]);
     }
 }
 
 @end
 
+@implementation ORRunningAveSpike
+@synthesize tag,spiked,timeOfSpike,ave,spikeValue;
+
+- (void) dealloc
+{
+    //dealloc properties like this
+    self.timeOfSpike = nil;
+    
+    [super dealloc];
+}
+
+- (NSString*) description
+{
+    NSString* s = [NSString stringWithFormat:@"\ntime:%@\nspiked:%@\ntag:%d\nave:%.3f\nspikeValue:%.3f",
+                   self.timeOfSpike,
+                   self.spiked?@"YES":@"NO",
+                   self.tag,
+                   self.ave,
+                   self.spikeValue];
+    return s;
+}
+@end
 

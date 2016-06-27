@@ -49,17 +49,16 @@
     NSMutableArray* specialMap;
     ORAlarm*        rampHVAlarm[2];
     ORAlarm*        breakdownAlarm[2];
+    ORAlarm*        baseLineJumpAlarm[2];
     BOOL            ignorePanicOnA;
     BOOL            ignorePanicOnB;
     
-    //NSMutableArray* breakdownMapEntries; //conceptual
-    BOOL            ADCrateSpike[2]; //Digitizer event rate
-    BOOL            PreAmpVSpike[2]; //preamp read detector voltage
-    //BOOL            vaccumeSpike[2];
-    
     ORMJDInterlocks*    mjdInterlocks[2];
     ORMJDSource*        mjdSource[2];
+    NSString*           spikeReport[2];;
     ORMJDHeaderRecordID* anObjForCouchID;
+    NSMutableDictionary* rateSpikes;
+    NSMutableDictionary* baselineSpikes;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -77,6 +76,8 @@
 - (BOOL) anyHvOnVMECrate:(int)aVMECrate;
 - (void) setVmeCrateHVConstraint:(int)aCrate state:(BOOL)aState;
 - (void) rampDownHV:(int)aCrate vac:(int)aVacSystem;
+- (NSString*) checkForBreakdown:(int)aCrate fillingLN:(BOOL)fillingLN vacuumSpike:(BOOL)vacSpike;
+
 - (id) mjdInterlocks:(int)index;
 - (void) runStarted:(NSNotification*) aNote;
 - (void) hvInfoRequest:(NSNotification*)aNote;
@@ -86,17 +87,16 @@
 - (NSString*) objectNameForCrate:(NSString*)aCrateName andCard:(NSString*)aCardName;
 
 //in the case of being asked to checkBreakdown, it should event rate and baseline, leave the vacuum to the MJD interlock
+- (void) rateSpike:(NSNotification*) aNote;
+- (void) baselineSpike:(NSNotification*) aNote;
 - (void) checkBreakdown:(int)aCrate vac:(int)aVacSystem;
-- (void) gretinaRateUpdated:(NSNotification*) aNote;
-- (void) baselineUpdated:(NSNotification*) aNote;
-
-
 
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups;
 - (NSString*) getValueForPartStartingWith:(NSString*)aLabel parts:(NSArray*)parts;
 - (id)   stringMap:(int)i objectForKey:(id)aKey;
 - (void) stringMap:(int)i setObject:(id)anObject forKey:(id)aKey;
+- (BOOL) validateSegmentParam:(NSString*)aParam;
 - (NSString*) stringMapFileAsString;
 - (NSString*) specialMapFileAsString;
 - (BOOL) validateDetector:(int)aDetectorIndex;
@@ -143,7 +143,6 @@ extern NSString* ORMajoranaModelViewTypeChanged;
 extern NSString* ORMajoranaModelPollTimeChanged;
 extern NSString* ORMJDAuxTablesChanged;
 extern NSString* ORMajoranaModelLastConstraintCheckChanged;
-
 
 @interface ORMJDHeaderRecordID : NSObject
 - (NSString*) fullID;

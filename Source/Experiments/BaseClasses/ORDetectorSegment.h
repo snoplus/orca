@@ -59,7 +59,8 @@
 - (NSString*) identifier;
 - (void) setMapEntries:(NSArray*)someMapEntries;
 - (NSArray*) mapEntries;
--(id) mapEntry:(int)index forKey:(id)aKey;
+- (id) mapEntry:(int)index forKey:(id)aKey;
+-(id) validatedParamForKey:(id)aKey;
 - (id) description;
 - (NSString*) name;
 - (id) hardwareCard;

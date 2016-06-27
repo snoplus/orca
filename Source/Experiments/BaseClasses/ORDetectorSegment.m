@@ -75,11 +75,18 @@ NSString* KSegmentChangedNotification	  =	@"KSegmentChangedNotification";
 	return mapEntries;
 }
 	
--(id) mapEntry:(int)index forKey:(id)aKey
+- (id) mapEntry:(int)index forKey:(id)aKey
 {
 	return [[mapEntries objectAtIndex:index] objectForKey:aKey];
 }
-	
+
+- (id) validatedParamForKey:(id)aKey
+{
+    NSString* anEntry = [params objectForKey:aKey];
+    if([anEntry length]==0 || [anEntry rangeOfString:@"-"].location!=NSNotFound)return nil;
+    else return anEntry;
+}
+
 - (BOOL) hardwarePresent
 {
 	return hardwareCard!=nil;

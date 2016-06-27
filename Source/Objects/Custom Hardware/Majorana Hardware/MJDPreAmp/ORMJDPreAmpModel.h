@@ -55,7 +55,7 @@
     unsigned long   adcEnabledMask;
     ORTimeRate*		adcHistory[kMJDPreAmpAdcChannels];
     ORTimeRate*		leakageCurrentHistory[kMJDPreAmpLeakageCurrentChannels];
-    ORRunningAverageGroup* baselineRunningAverageGroup; //init in initWithCoder, start with WakeUp
+    ORRunningAverageGroup* baselineRunningAverages;
     ORAlarm*		temperatureAlarm[2];
     ORAlarm*		leakageCurrentAlarm[kMJDPreAmpLeakageCurrentChannels];
     ORAlarm*		adcAlarm[kMJDPreAmpAdcChannels];
@@ -66,11 +66,6 @@
     BOOL            connected;
     BOOL            doNotUseHWMap;
     int             firmwareRev;
-    float           baselineRunningAverageCount[kMJDPreAmpAdcChannels];
-
-    float           voltSpikes[kMJDPreAmpAdcChannels];
-    float           voltThreshold;
-    BOOL            channelSpikes[kMJDPreAmpAdcChannels];
 
     //error counting
     BOOL            supplyOutOfBounds[4]; //only count if this goes from low to high
@@ -106,20 +101,8 @@
 - (ORTimeRate*)leakageCurrentHistory:(int)index;
 
 //running averages
-- (ORRunningAverageGroup*) baselineRunningAverageGroup;
-- (void) baselineRunningAverageChanged:(NSNotification*)aNote;
-- (void)  setBaselineRunningAverageGroup:(ORRunningAverageGroup*)newRunningAverageGroup;
-- (id)    runningAverageObject:(short)channel;
-- (float) getRunningAverage:(short)counterTag forGroup:(short)groupTag;
-- (float) getRunningAverage:(short)channel;
-//- (void) setVoltSpikes:(NSArray*)aarray;
-- (void) setVoltSpikes:(ORRunningAverageGroup*)group;
-- (BOOL) channelSpike:(int)idx; //both channel spike and volt spike are each channel
-- (float) voltSpike:(int)idx;
-- (NSArray*) getRates:(short)groupTag;
-- (float) getVolt:(short)counterTag forGroup:(short)groupTag;
-- (void) setVoltThreshold:(float)a;
-- (float) voltThreshold;
+- (void) baselineSpikeChanged:(NSNotification*)aNote;
+- (void)  setBaselineRunningAverages:(ORRunningAverageGroup*)newRunningAverageGroup;
 
 - (unsigned long) adcEnabledMask;
 - (void) setAdcEnabledMask:(unsigned long)aAdcEnabledMask;
@@ -225,8 +208,7 @@ extern NSString* ORMJDPreAmpModelDetectorNameChanged;
 extern NSString* ORMJDPreAmpModelConnectionChanged;
 extern NSString* ORMJDPreAmpModelDoNotUseHWMapChanged;
 extern NSString* ORMJDPreAmpModelFirmwareRevChanged;
-extern NSString* ORMJDPreAmpModelRAGSpiked;
-extern NSString* ORMJDPreAmpModelRAGChanged;
+extern NSString* ORMJDPreAmpModelRateSpiked;
 
 @interface NSObject (ORMJDPreAmpModel)
 - (unsigned long) writeAuxIOSPI:(unsigned long)spiData;

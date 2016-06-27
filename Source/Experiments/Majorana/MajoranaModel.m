@@ -37,6 +37,7 @@
 #import "ORDataProcessing.h"
 #import "ORGretina4MModel.h"
 #import "ORMJDPreAmpModel.h"
+#import "ORRunningAverage.h"
 
 NSString* MajoranaModelIgnorePanicOnBChanged        = @"MajoranaModelIgnorePanicOnBChanged";
 NSString* MajoranaModelIgnorePanicOnAChanged        = @"MajoranaModelIgnorePanicOnAChanged";
@@ -44,8 +45,6 @@ NSString* ORMajoranaModelViewTypeChanged            = @"ORMajoranaModelViewTypeC
 NSString* ORMajoranaModelPollTimeChanged            = @"ORMajoranaModelPollTimeChanged";
 NSString* ORMJDAuxTablesChanged                     = @"ORMJDAuxTablesChanged";
 NSString* ORMajoranaModelLastConstraintCheckChanged = @"ORMajoranaModelLastConstraintCheckChanged";
-//NSString* ORGretina4MModelRAGSpiked                 = @"ORGretina4MModelRAGSpiked"; //no need for Global
-//NSString* ORMJDPreAmpModelRAGSpiked                 = @"ORMJDPreAmpModelRAGSpiked";
 
 
 static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
@@ -70,6 +69,10 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         [mjdInterlocks[i] setDelegate:nil];
         [mjdInterlocks[i] stop];
         [mjdInterlocks[i] release];
+        
+        [rateSpikes release];
+        [baselineSpikes release];
+        
         [rampHVAlarm[i]   clearAlarm];
         [rampHVAlarm[i]   release];
         [breakdownAlarm[i]   clearAlarm];
@@ -77,6 +80,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
         [mjdSource[i] setDelegate:nil];
         [mjdSource[i] release];
+
+        [spikeReport[i] release];
 
     }
     [anObjForCouchID release];
@@ -139,17 +144,16 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                      selector : @selector(runStarted:)
                          name : ORRunStartedNotification
                        object : nil];
-
+    
     [notifyCenter addObserver : self
-                     selector : @selector(gretinaRateUpdated:)
-                         name : ORGretina4MModelRAGSpiked
+                     selector : @selector(rateSpike:)
+                         name : ORGretina4MModelRateSpiked
                        object : nil]; //object is the sender of the notification
     
     [notifyCenter addObserver : self
-                     selector : @selector(baselineUpdated:)
-                         name : ORMJDPreAmpModelRAGSpiked
+                     selector : @selector(baselineSpike:)
+                         name : ORMJDPreAmpModelRateSpiked
                        object : nil];
- 
 
 }
 
@@ -205,7 +209,6 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
             [anHVCard setCustomInfo:aChannel string:@""];
         }
     }
-   
 }
 
 - (void) hvInfoRequest:(NSNotification*)aNote
@@ -246,15 +249,93 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     }
 }
 
+- (NSString*) checkForBreakdown:(int)aCrate fillingLN:(BOOL)fillingLN vacuumSpike:(BOOL)vacSpike
+{
+    NSMutableString* interimReport = nil;
 
+    if(baselineSpikes || rateSpikes){
+        //have to match up the baseline and detectors. Easiest to do it in reverse and do it
+        //for each detector and see if they exist in one of the spike lists
+        ORSegmentGroup* aGroup = [segmentGroups objectAtIndex:0];
+        for(id item in stringMap){
+            int i;
+            for(i=0;i<5;i++){
+                NSString* detIndexString = [item objectForKey:[@"kDet" stringByAppendingFormat:@"%d",i]];
+                NSString* stringName     = [item objectForKey:@"kStringName"];
+
+                if([detIndexString length]==0 || [detIndexString rangeOfString:@"-"].location!=NSNotFound)continue;
+                int detIndex = [detIndexString intValue];
+                int crate = [[aGroup segment:detIndex objectForKey:@"kVME"]intValue];
+                if(aCrate != crate)continue;
+                int card  = [[aGroup segment:detIndex objectForKey:@"kCardSlot"]intValue];
+                int chan  = [[aGroup segment:detIndex objectForKey:@"kChannel"]intValue];
+                NSString* detKey = [NSString stringWithFormat:@"%d,%d,%d",crate,card,chan];
+                NSDictionary* rateEntry = [rateSpikes objectForKey:detKey];
+                
+                if(rateEntry){
+                    if(!interimReport)interimReport = [NSMutableString string];
+                    if(rateEntry){
+                        ORRunningAveSpike* spikeObj = [rateEntry objectForKey:@"spikeInfo"];
+                        [interimReport appendFormat:@"\nRate Spike on %@ string: %@\n",[aGroup segment:detIndex objectForKey:@"kDetectorName"],stringName];
+                        [interimReport appendFormat:@"Digitizer Crate: %d Card: %d Chan: %d\n",crate,card,chan];
+                        [interimReport appendFormat:@"Spike detected at: %@\n",[[spikeObj timeOfSpike]stdDescription]];
+                        [interimReport appendFormat:@"Ave Rate: %.3f  Spike Rate: %.3f\n",spikeObj.ave,spikeObj.spikeValue];
+                    }
+                }
+
+                int preAmpDig  = [[aGroup segment:detIndex objectForKey:@"kPreAmpDigitizer"]intValue];
+                int preAmpChan = [[aGroup segment:detIndex objectForKey:@"kPreAmpChan"]intValue];
+                NSString*     preampKey     = [NSString stringWithFormat:@"%d,%d,%d",crate,preAmpDig,preAmpChan];
+                NSDictionary* baseLineEntry = [baselineSpikes objectForKey:preampKey];
+                
+                if(baseLineEntry){
+                    if(!interimReport)interimReport = [NSMutableString string];
+                    if(baseLineEntry){
+                        ORRunningAveSpike* spikeObj = [baseLineEntry objectForKey:@"spikeInfo"];
+                        [interimReport appendFormat:@"\nBaseline jump on %@ string: %@\n",[aGroup segment:detIndex objectForKey:@"kDetectorName"],stringName];
+                        [interimReport appendFormat:@"Digitizer Crate: %d Card: %d Chan: %d\n",crate,card,chan];
+                        [interimReport appendFormat:@"Jump detected at: %@\n",[[spikeObj timeOfSpike]stdDescription]];
+                        [interimReport appendFormat:@"Ave Voltage: %.3f  Spike Voltage: %.3f\n",spikeObj.ave,spikeObj.spikeValue];
+                    }
+                }
+            }
+        }
+    }
+    
+    if(![interimReport isEqualToString:spikeReport[aCrate]]){
+        //just print on changes
+        if(!interimReport && spikeReport[aCrate].length){
+            [spikeReport[aCrate] release];
+            spikeReport[aCrate] = nil;
+            NSLog(@"There was a spike in Rates or Baselines, but now things are normal.\n");
+            return @"No Breakdowns";
+        }
+        if(interimReport){
+            [spikeReport[aCrate] autorelease];
+            spikeReport[aCrate] = [interimReport copy];
+            NSLog(@"%@\n",spikeReport[aCrate]);
+            return @"Concerns. See Log.";
+        }
+    }
+
+    return @"No Breakdowns";
+        
+}
+    
+- (BOOL) validateSegmentParam:(NSString*)aParam
+{
+    if([aParam length]==0 || [aParam rangeOfString:@"-"].location!=NSNotFound)return NO;
+    else return YES;
+}
+    
 - (void) checkBreakdown:(int)aCrate vac:(int)aVacSystem
 {//copied from rampdownHV (check it out!), to be consistent with it, and to deal with the complicated logic of finding the HV crates
 
     if(aVacSystem==0 && ignorePanicOnA)return;
     if(aVacSystem==1 && ignorePanicOnB)return;
     
-    if(!ADCrateSpike[aVacSystem] || !PreAmpVSpike[aVacSystem]) return; //not all 3 conditions are met.
-        
+    
+    
     if(!breakdownAlarm[aVacSystem]){
         breakdownAlarm[aVacSystem] = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Suggestion: Panic HV (Vac %c)",'A'+aVacSystem] severity:(kEmergencyAlarm)];
         [breakdownAlarm[aVacSystem] setSticky:NO];
@@ -274,77 +355,54 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
 }
 
-- (void) gretinaRateUpdated:(NSNotification*) aNote
-{ //this will not be called unless the RunningAverage reports
-    
-    if([[aNote object] isKindOfClass:NSClassFromString(@"ORGretina4MModel")]){
-        ORGretina4MModel* anADCCard = [aNote object];
-
-        int aCrate      = [anADCCard crateNumber];
-        int aCard       = [anADCCard slot];
-        int GretinaChans = [anADCCard nMaxChannels];
-        //int aChannel    = [[userInfo objectForKey:@"channel"]   intValue];
-        
-        float rateSpikes[100];
-        float channelSpikes [100];
-        ADCrateSpike[0]=false;
-        ADCrateSpike[1]=false;
-        for(int idx=0;idx<GretinaChans; idx++)
-        {
-            rateSpikes[idx] = [anADCCard rateSpike:idx];
-            channelSpikes[idx] = [anADCCard channelSpike:idx];
-            ADCrateSpike[0]=true;
-            ADCrateSpike[1]=true;
-        } //pass information
-  
-        [self checkBreakdown:0 vac:1]; //TEST TEST TEST
-        /*
-        //conceptual design
-        bool foundIt=false;
-        int aSet;
-        for(aSet =0;aSet<2;aSet++){
-            ORSegmentGroup* segmentGroup = [self segmentGroup:aSet];
-            int numSegments = [self numberSegmentsInGroup:aSet];
-            int i;
-            for(i = 0; i<numSegments; i++){
-                NSDictionary* params = [[segmentGroup segment:i]params];
-                if(!params)break;
-                if([[params objectForKey:@"kVME"]intValue] != aCrate)continue;
-                if([[params objectForKey:@"kCardSlot"]intValue] != aCard)continue;
-                id preAmpChan       = [params objectForKey:@"kPreAmpChan"];
-                id preAmpDigitizer  = [params objectForKey:@"kPreAmpDigitizer"];
-                foundIt = YES;
-                break;
-            }
-        }*/
-    }//if good
-
+- (void) rateSpike:(NSNotification*) aNote
+{
+    //either a spike happened or a spike cleared
+    NSDictionary* dic = [aNote userInfo];
+    ORRunningAveSpike* spikeInfo = [dic objectForKey:@"spikeInfo"];
+    NSString* aKey = [NSString stringWithFormat:@"%@,%@,%@",
+                      [dic objectForKey:@"crate"],
+                      [dic objectForKey:@"card"],
+                      [dic objectForKey:@"channel"]];
+    BOOL spiked = [spikeInfo spiked];
+    if(spiked){
+        if(![rateSpikes objectForKey:aKey]){
+            if(!rateSpikes)rateSpikes = [[NSMutableDictionary dictionary] retain];
+           [rateSpikes setObject:dic forKey:aKey];
+        }
+    }
+    else {
+        [rateSpikes removeObjectForKey:aKey];
+        if([[rateSpikes allKeys] count] == 0){
+            [rateSpikes release];
+            rateSpikes = nil;
+        }
+    }
 }
 
-
-
-
-- (void) baselineUpdated:(NSNotification*) aNote
+- (void) baselineSpike:(NSNotification*) aNote
 {
-    if([[aNote object] isKindOfClass:NSClassFromString(@"ORMJDPreAmpModel")]){
-        ORMJDPreAmpModel* aPreAmpCard = [aNote object];
-        
-        int aCrate      = [aPreAmpCard connectedGretinaCrate];
-        int aCard       = [aPreAmpCard connectedGretinaSlot];
-        int PreAmpChans = [aPreAmpCard nMaxChannels];
-        
-        float baselineSpikes[100];
-        float channelSpikes [100];
-        PreAmpVSpike[0]=false;
-        PreAmpVSpike[1]=false;
-        for(int idx=0;idx<PreAmpChans; idx++)
-        {
-            baselineSpikes[idx] = [aPreAmpCard voltSpike:idx];
-            channelSpikes[idx] = [aPreAmpCard channelSpike:idx];
-            PreAmpVSpike[0]=true;
-            PreAmpVSpike[1]=true;
-        } //pass information
-    }//if good
+    //either a spike happened or a spike cleared
+    NSDictionary* dic = [aNote userInfo];
+    ORRunningAveSpike* spikeInfo = [dic objectForKey:@"spikeInfo"];
+    NSString* aKey = [NSString stringWithFormat:@"%@,%@,%@",
+                      [dic objectForKey:@"crate"],
+                      [dic objectForKey:@"card"],
+                      [dic objectForKey:@"channel"]];
+    BOOL spiked = [spikeInfo spiked];
+    if(spiked){
+        if(![baselineSpikes objectForKey:aKey]){
+            if(!baselineSpikes)baselineSpikes = [[NSMutableDictionary dictionary] retain];
+            [baselineSpikes setObject:dic forKey:aKey];
+        }
+    }
+    else {
+        [baselineSpikes removeObjectForKey:aKey];
+        if([[baselineSpikes allKeys] count] == 0){
+            [baselineSpikes release];
+            baselineSpikes = nil;
+        }
+    }
 }
 
 #pragma mark ***Accessors
@@ -488,32 +546,6 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     }
 	return mapEntries;
 }
-
-/* conceptual design
-//The following is from Wenqin, could be combined with above
-- (NSMutableArray*) setupBreakdownMapEntries
-{
-
-    breakdownMapEntries = [NSMutableArray array];
-    [breakdownMapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kSegmentNumber",     @"key", [NSNumber numberWithInt:0], @"sortType", nil]];
-    [breakdownMapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kVME",               @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-    [breakdownMapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kCardSlot",          @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-    [breakdownMapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kChannel",           @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-    [breakdownMapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kPreAmpDigitizer",   @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-    [breakdownMapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kPreAmpChan",        @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-    [breakdownMapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kHVCrate",           @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-    [breakdownMapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kHVCard",            @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-    [breakdownMapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kHVChan",            @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-    [breakdownMapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kMaxVoltage",        @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-    [breakdownMapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kDetectorName",      @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-    [breakdownMapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kDetectorType",      @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-    
-    //only the following are new
-    [breakdownMapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kDetectorType",      @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-    [breakdownMapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kDetectorType",      @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-}
-*/
-
 
 - (void) postCouchDBRecord
 {
@@ -810,8 +842,6 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     for(i=0;i<2;i++){
         mjdInterlocks[i] = [[ORMJDInterlocks alloc] initWithDelegate:self slot:i];
         mjdSource[i] = [[ORMJDSource alloc] initWithDelegate:self slot:i];
-        ADCrateSpike[i]=false;
-        PreAmpVSpike[i]=false; //baseline
     }
     pollTime   = [decoder  decodeIntForKey:	@"pollTime"];
     stringMap  = [[decoder decodeObjectForKey:@"stringMap"] retain];

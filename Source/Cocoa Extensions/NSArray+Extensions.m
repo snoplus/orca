@@ -133,7 +133,15 @@
         return [temp autorelease];
     }
 }
-
+- (id) popTop
+{
+    if([self count]==0)return nil;
+    else {
+        id temp = [[self firstObject] retain];
+        [self removeObjectAtIndex:0];
+        return [temp autorelease];
+    }
+}
 - (void) push:(id)object
 {
     [self addObject:object];

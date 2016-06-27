@@ -57,11 +57,11 @@
 	return @"~/MJDVetoMap";
 }
 
--(void) awakeFromNib
+- (void) awakeFromNib
 {
 	detectorSize		 = NSMakeSize(770,770);
 	detailsSize			 = NSMakeSize(560,600);
-	subComponentViewSize = NSMakeSize(580,570);
+	subComponentViewSize = NSMakeSize(580,600);
 	detectorMapViewSize	 = NSMakeSize(900,760);
     vetoMapViewSize		 = NSMakeSize(580,565);
     calibrationViewSize	 = NSMakeSize(580,320);

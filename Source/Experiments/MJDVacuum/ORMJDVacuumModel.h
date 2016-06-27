@@ -20,7 +20,6 @@
 #import "ORAdcProcessing.h"
 #import "ORBitProcessing.h"
 #import "OROrderedObjHolding.h"
-#import "ORRunningAverageGroup.h"
 
 
 @class ORVacuumGateValve;
@@ -28,7 +27,7 @@
 @class ORLabJackUE9Model;
 @class ORAlarm;
 @class ORRunningAverageGroup;
-
+@class ORRunningAveSpike;
 
 #define kPulseTube    0
 #define kThermosyphon 1
@@ -149,15 +148,10 @@
     NSDate*              nextHvUpdateTime;
     BOOL                 noHvInfo;
     BOOL                 disableConstraints;
-    int coolerMode;
-    
-    
-    ORRunningAverageGroup* vacuumRunningAverageGroup; //init in initwithCoder, start with Wakeup
-    float 	vacuumRunningAverageCount[kNumberRegions];
-    
-    float           vacuumSpikes[kNumberRegions];
-    float           vacuumThreshold;
-    BOOL            channelSpikes[kNumberRegions];
+    int                  coolerMode;
+
+    ORRunningAverageGroup* vacuumRunningAverages;
+    BOOL                 vacuumSpike[kNumberRegions];
 }
 
 #pragma mark ***Accessors
@@ -171,7 +165,6 @@
 - (void) setLastHvUpdateTime:(NSDate*)aLastHvUpdateTime;
 - (int) hvUpdateTime;
 - (void) setHvUpdateTime:(int)aHvUpdateTime;
-- (BOOL) shouldCheckBreakdown; //this is to check if the vaccum spiked
 - (BOOL) shouldUnbiasDetector;
 - (BOOL) okToBiasDetector;
 - (BOOL) detectorsBiased;
@@ -255,18 +248,9 @@
 - (void) reportConstraints;
 
 #pragma mark •••running average
-- (void) vacuumRunningAverageChanged:(NSNotification*)aNote;
-- (void)  setVacuumRunningAverageGroup:(ORRunningAverageGroup*)newRunningAverageGroup;
-- (id)    runningAverageObject:(short)channel;
-- (float) getRunningAverage:(short)counterTag forGroup:(short)groupTag;
-- (float) getRunningAverage:(short)channel;
-- (void) setVacuumSpikes:(NSArray*)aarray;
-- (BOOL) channelSpike:(int)idx; //both channel spike and volt spike are each channel
-- (float) vacuumSpike:(int)idx;
-- (NSArray*) getRates:(short)groupTag;
-
-- (void) setVacuumThreshold:(float)a;
-- (float) vacuumThreshold;
+- (void) vacuumSpikeChanged:(NSNotification*)aNote;
+- (void)  setVacuumRunningAverages:(ORRunningAverageGroup*)newRunningAverageGroup;
+- (BOOL) vacuumSpike;
 
 @end
 
@@ -281,12 +265,11 @@ extern NSString* ORMJDVacuumModelShowGridChanged;
 extern NSString* ORMJCVacuumLock;
 extern NSString* ORMJDVacuumModelConstraintsChanged;
 extern NSString* ORMJDVacuumModelConstraintsDisabledChanged;
-extern NSString* ORMJDVacuumModelVacuumSpiked; //TEST TEST TEST
-//extern NSString* ORMJDVacuumModelRAGChanged;
+extern NSString* ORMJDVacuumModelVacuumSpiked;
 
 
 @interface ORMJDVacuumModel (hidden)
-//we don't want scripts calling these -- too dangerous
+//hide these from casual scripting -- too dangerous
 - (void) closeGateValve:(int)aGateValveTag;
 - (void) openGateValve:(int)aGateValveTag;
 - (id) findGateValveControlObj:(ORVacuumGateValve*)aGateValve;

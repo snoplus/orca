@@ -34,6 +34,7 @@
 
 //implements stack behavior
 - (id)   pop;
+- (id)   popTop;
 - (void) push:(id)object;
 - (id)   peek;
 @end

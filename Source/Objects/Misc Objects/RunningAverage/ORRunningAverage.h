@@ -17,37 +17,61 @@
 //express or implied, or assume any liability or responsibility
 //for the use of this software.
 //-------------------------------------------------------------
+#define kRASpikeOnThreshold  0
+#define kRASpikeOnRatio      1
+
+#define kRASpikeNoChange     0
+#define kRASpiked            1
+#define kRARecovered         2
+
+@class ORRunningAveSpike;
 
 @interface ORRunningAverage : NSObject
 {
-    float runningAverage;
-    int windowLength;
+    float           runningAverage;
+    float           spikeValue;
+    float           lastRateValue;
+    int             windowLength;
     NSMutableArray*	inComingData;
-    int tag;
-    int groupTag;
+    int             tag;
+    int             groupTag;
+    BOOL            didSpike;
+    BOOL            lastDidSpike;
 }
-//- (id)   initwithwindowLength:(int) wl;
-- (id) initWithTag:(short)aTag andLength:(short)wl;
-- (void) dealloc;
-- (void) setWindowLength:(int) wl;
-- (float) updateAverage:(float)datapoint;
-- (float) updateAveragewNSN:(NSNumber*)datapoint;
-- (void) updateAveragewObj:(id)obj;
-- (void) resetCounter:(float) rate;
-///- (NSNumber *)oldestDataRemoval;
-- (float)oldestDataRemoval;
-- (float)getAverage;
-- (void) dump;
-- (int)tag;
-- (void) setTag:(int)newTag;
-- (int) groupTag;
-- (void) setGroupTag:(int)newGroupTag;
+- (id)      initWithTag:(short)aTag andLength:(short)wl;
+- (void)    dealloc;
+- (void)    setWindowLength:(int) wl;
+- (float)   updateAverage:(float)datapoint;
+- (void)    resetCounter:(float) rate;
+- (float)   runningAverage;
+- (float)   spikeValue;
+- (float)   lastRateValue;
+- (void)    dump;
+- (int)     tag;
+- (void)    setTag:(int)newTag;
+- (int)     groupTag;
+- (void)    setGroupTag:(int)newGroupTag;
+- (ORRunningAveSpike*) averageRate:(float)rate minSamples:(int)minSamples triggerValue:(float)triggerValue spikeType:(BOOL)triggerType;
 @end
-
-
 
 @interface NSObject (ORRunningAverage_Catagory)
 - (unsigned long) getRate:(int)tag forGroup:(int)aGroupTag;
+@end
+
+@interface ORRunningAveSpike : NSObject
+{
+    BOOL    spiked;
+    NSDate* timeOfSpike;
+    int     tag;
+    float   ave;
+    float   spikeValue;
+}
+@property (assign) BOOL     spiked;
+@property (retain) NSDate*  timeOfSpike;
+@property (assign) int      tag;
+@property (assign) float    ave;
+@property (assign) float    spikeValue;
+
 @end
 
 

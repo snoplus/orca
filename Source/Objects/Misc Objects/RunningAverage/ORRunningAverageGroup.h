@@ -19,75 +19,51 @@
 //-------------------------------------------------------------
 
 #pragma mark •••Imported Files
+#import "ORRunningAverage.h"
 
 @class ORRunningAverage;
 
 @interface ORRunningAverageGroup : NSObject {
-    bool PrintMymessages;
+    BOOL            verbose;
     NSMutableArray* runningAverages;
-    double integrationTime;
-    int windowLength;
-    int tag;
-    int sampled;
-    int groupSize;
-    float threshold;
-    bool triggerOnRatio;
-    bool globalSpiked;
-    //non-persistant variables
-    id objectKeepingRate;
-    NSMutableArray* currentRates;
-    NSMutableArray* spikes;
-//    ORRunningAverage* runAverage;
+    int             windowLength;
+    int             tag;
+    int             groupSize;
+    float           triggerValue;
+    int             triggerType;
 }
 #pragma mark •••Initialization
 - (id) initGroup:(int)numberInGroup groupTag:(int)aGroupTag withLength:(int)wl;
 
 #pragma mark •••Accessors
-- (id) runningAverageObject:(short)index;
-- (NSArray*) runningAverages;
-- (NSArray*) getRunningAverageValues; //float array
-- (void) setRunningAverages:(NSMutableArray*)newRAs;
-- (void) updateWindowLength:(int)newWindowLength;
-- (void) setWindowLength:(int)newWindowLength;
-- (int) windowLength;
-- (void) resetCounters:(float)rate;
-- (void) updateRunningAverages:(NSArray*)newdatapoints; //newdatapoints must be array of NSNumbers of float
-- (double) integrationTime;
-- (void) setIntegrationTime:(double)newIntegrationTime;
-- (int)  tag;
-- (void) setTag:(int)newTag;
-- (int) groupSize;
-- (void) setGroupSize:(int)a;
-- (void) setSampled:(int)a;
-- (int) sampled;
-- (void) setPrintMymessages:(bool)b;
-- (void) calcRunningAverages;
-- (float)getRunningAverageValue:(short)idx; 
-- (NSArray*) spikes; //float array
-- (void) setSpikes:(NSMutableArray*)newarray;
-- (NSArray*) currentRates; //float array
-- (void) setCurrentRates:(NSMutableArray*)newarray;
-- (void) setTriggerOnRatio: (bool)b;
-- (bool) triggerOnRatio;
-- (void) setThreshold:(float)a;
-- (float) threshold;
--(BOOL) globalSpiked;
-- (void) setGlobalSpiked:(BOOL)b;
-- (void) start:(id)obj; //obj must provide an array of instant values in the [getRates:Grouptag] method
-- (void) quit;
-- (void) stop;
-
-
+- (id)          runningAverageObject:(short)index;
+- (NSArray*)    runningAverages;
+- (NSArray*)    getRunningAverageValues; //float array
+- (void)        setRunningAverages:(NSMutableArray*)newRAs;
+- (void)        updateWindowLength:(int)newWindowLength;
+- (void)        setWindowLength:(int)newWindowLength;
+- (int)         windowLength;
+- (void)        resetCounters:(float)rate;
+- (void)        addNewValue:(float)aValue toIndex:(int)i;
+- (int)         tag;
+- (void)        setTag:(int)newTag;
+- (int)         groupSize;
+- (void)        setGroupSize:(int)a;
+- (void)        setVerbose:(BOOL)b;
+- (float)       getRunningAverageValue:(short)idx;
+- (void)        setTriggerType: (int)aType;
+- (int)         triggerType;
+- (void)        setTriggerValue:(float)a;
+- (float)       triggerValue;
 @end
 
+extern NSString* ORRunningAverageSpikeNotification;
 extern NSString* ORRunningAverageChangedNotification;
 
 
 @interface NSObject (ORRunningAverageGroup_Catagory)
-- (NSArray*) getRates:(int)aGroupTag;
+- (float) getRate:(int)aChannel;
 @end
-
-
 
 
 

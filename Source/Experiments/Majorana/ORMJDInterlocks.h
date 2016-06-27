@@ -34,6 +34,8 @@ enum {
     kMJDInterlocks_GetOKToBias,
     kMJDInterlocks_HVRampDown,
     kMJDInterlocks_HandleHVDialog,
+    kMJDInterlocks_CheckLNFill,
+    kMJDInterlocks_CheckForBreakdown,
     kMJDInterlocks_FinalState,
     kMJDInterlocks_NumStates //must be last
 };
@@ -62,7 +64,10 @@ typedef struct {
     BOOL                lockHVDialog;
     ORAlarm*            interlockFailureAlarm;
     BOOL                sentCmds;
-    BOOL                shouldCheckBreakdown;
+    BOOL                vacuumSpike;
+    BOOL                fillingLN;
+    int                 breakDownPass;
+    NSString*           breakDownResult;
 }
 
 - (id)          initWithDelegate:(MajoranaModel*)aDelegate slot:(int)aSlot;

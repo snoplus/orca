@@ -35,12 +35,17 @@ static MJDInterlocksStateInfo state_info [kMJDInterlocks_NumStates] = {
     { kMJDInterlocks_GetOKToBias,        @"Vac: OK to Bias?"},
     { kMJDInterlocks_HVRampDown,         @"Ramp HV Down"},
     { kMJDInterlocks_HandleHVDialog,     @"HV Dialog"},
+    { kMJDInterlocks_CheckLNFill,        @"Check For LN Fill"},
+    { kMJDInterlocks_CheckForBreakdown,  @"Check For Breakdown"},
     { kMJDInterlocks_FinalState,         @"Final Status"},
 };
 
 #define kAllowedPingRetry       5
 #define kAllowedConnectionRetry 5
 #define kAllowedResponseRetry   5
+
+#define kScmSlot 2
+NSString* scmIpNumber = @"151.150.226.70";
 
 @implementation ORMJDInterlocks
 
@@ -66,6 +71,8 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
     self.finalReport = nil;
     [interlockFailureAlarm clearAlarm];
     [interlockFailureAlarm release];
+    [breakDownResult release];
+
     [super dealloc];
 }
 
@@ -330,11 +337,16 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
         //HV is ON... see if we need to unbias
         case kMJDInterlocks_GetShouldUnBias:
             if(remoteOpStatus){
-                if([[remoteOpStatus objectForKey:@"connected"] boolValue]==YES && [remoteOpStatus objectForKey:@"shouldUnBias"]){
+                if([[remoteOpStatus objectForKey:@"connected"] boolValue]==YES &&
+                   [remoteOpStatus objectForKey:@"vacuumSpike"] &&
+                   [remoteOpStatus objectForKey:@"shouldUnBias"]){
                     //it worked. move on.
                     retryCount = 0;
                     [self clearInterlockFailureAlarm];
+                    
+                    vacuumSpike  = [[remoteOpStatus objectForKey:@"vacuumSpike"] boolValue];
                     shouldUnBias = [[remoteOpStatus objectForKey:@"shouldUnBias"] boolValue];
+                    
                     if(shouldUnBias){
                         [self setState:kMJDInterlocks_GetShouldUnBias status:@"Vac says Unbias" color:badColor];
                         [self setState:kMJDInterlocks_FinalState      status:@"Vac says Unbias" color:badColor];
@@ -349,14 +361,6 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                         
                         lockHVDialog = NO;
                         [self setCurrentState:kMJDInterlocks_HandleHVDialog];
-                        
-                        //added by wenqin in this condition of vacuum spike indicating possible breakdowns
-                        if(hvIsOn){
-                            shouldCheckBreakdown = [[remoteOpStatus objectForKey:@"shouldCheckBreakdown"] boolValue];
-                            if(shouldCheckBreakdown){
-                                [delegate checkBreakdown:[self module] vac:[self vacSystem]];
-                            }
-                        }
                     }
                 }
                 else {
@@ -382,8 +386,10 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             else {
                 if(!sentCmds){
                     self.remoteOpStatus=nil;
-                    NSMutableArray* cmds = [NSMutableArray arrayWithObjects:@"shouldUnBias = [ORMJDVacuumModel,1 shouldUnbiasDetector];", nil]; //nil means end
-                    [cmds addObject:@"shouldCheckBreakdown = [ORMJDVacuumModel,1 shouldCheckBreakdown];"];//added by wenqin
+                    NSMutableArray* cmds = [NSMutableArray arrayWithObjects:
+                                            @"shouldUnBias = [ORMJDVacuumModel,1 shouldUnbiasDetector];",
+                                            @"vacuumSpike  = [ORMJDVacuumModel,1 vacuumSpike];",
+                                            nil];
 
                     [self sendCommands:cmds remoteSocket:[delegate remoteSocket:slot]];
                     [self setState:kMJDInterlocks_GetShouldUnBias status:@"Asking..." color:normalColor];
@@ -476,9 +482,80 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             [delegate setVmeCrateHVConstraint:[self module] state:lockHVDialog];
             if(lockHVDialog)[self setState:kMJDInterlocks_HandleHVDialog status:@"Locked" color:badColor];
             else [self setState:kMJDInterlocks_HandleHVDialog status:@"Unlocked" color:okColor];
-            [self setCurrentState:kMJDInterlocks_FinalState];
+            [self setCurrentState:kMJDInterlocks_CheckLNFill];
             break;
 
+        case kMJDInterlocks_CheckLNFill:
+            if(remoteOpStatus){
+                if([[remoteOpStatus objectForKey:@"connected"] boolValue]==YES && [remoteOpStatus objectForKey:@"fillingLN"]){
+                    //it worked. move on.
+                    retryCount = 0;
+                    [self clearInterlockFailureAlarm];
+                    int theStatus = [[remoteOpStatus objectForKey:@"fillingLN"] intValue];
+                    NSString* fillString;
+                    NSColor* fillColor;
+                    if(theStatus == 1 || theStatus == 3){
+                        fillingLN = YES;
+                        fillString = @"Filling";
+                        fillColor = concernColor;
+                    }
+                    else {
+                        fillingLN = NO;
+                        fillString = @"Not Filling";
+                        fillColor = normalColor;
+
+                    }
+                    [self setState:kMJDInterlocks_CheckLNFill status:fillString color:fillColor];
+                    [self setCurrentState:kMJDInterlocks_CheckForBreakdown];
+                }
+                else {
+                    if(retryCount>=kAllowedConnectionRetry){
+                        [self setState:kMJDInterlocks_FinalState status:@"No SCM Connection"color:badColor];
+                        [self addToReport:@"Could not get LN Fill Status. Checking for breakdown anyway"];
+                        [self setCurrentState:kMJDInterlocks_CheckForBreakdown];
+                        retryCount = 0;
+                    }
+                    else {
+                        //no connection
+                        retryCount++;
+                        [self postInterlockFailureAlarm: @"SCM unreachable."];
+                        [self setState:kMJDInterlocks_UpdateVacSystem status:[NSString stringWithFormat:@"Failed: %d/%d",retryCount,kAllowedConnectionRetry] color:badColor];
+                        retryState = kMJDInterlocks_CheckLNFill;  //force a retry of this state next time around
+                        [self setCurrentState:kMJDInterlocks_Idle];
+                    }
+                }
+                breakDownPass= 0;
+                sentCmds = NO;
+                self.remoteOpStatus=nil;
+            }
+            else {
+                if(!sentCmds){
+                    self.remoteOpStatus=nil;
+                    NSString* cmd = [NSString stringWithFormat:@"fillingLN = [ORAmi286Model,2 fillStatus:%d];",slot];
+                    [self sendCommand:cmd remoteSocket:[delegate remoteSocket:kScmSlot]];
+                    [self setState:kMJDInterlocks_CheckLNFill status:@"Sending..." color:normalColor];
+                    sentCmds = YES;
+                }
+            }
+            
+            break;
+            
+        case kMJDInterlocks_CheckForBreakdown:
+            if(breakDownPass == 0){
+                [self setState:kMJDInterlocks_CheckForBreakdown status:@"Checking..." color:normalColor];
+                [breakDownResult autorelease];
+                NSString* s = [delegate checkForBreakdown:[self module] fillingLN:fillingLN vacuumSpike:vacuumSpike];
+                breakDownResult = [s copy];
+
+            }
+            else {
+                [self setState:kMJDInterlocks_CheckForBreakdown status:breakDownResult color:normalColor];
+                [self setCurrentState:kMJDInterlocks_FinalState];
+            }
+            breakDownPass++;
+           break;
+            
+            
         case kMJDInterlocks_FinalState:
             if([finalReport count])[self errorReport];
             break;
@@ -541,6 +618,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
         
         ORRemoteSocketModel* remObj = [delegate remoteSocket:slot];
         NSString*               ip  = [remObj remoteHost];
+        [remObj setRemoteHost:ip];
         
         ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
         pingTask = [[NSTask alloc] init];

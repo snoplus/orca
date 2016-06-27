@@ -1073,21 +1073,21 @@
                                             </textFieldCell>
                                         </textField>
                                         <box autoresizesSubviews="NO" title="Module 1/CryoVacB" borderType="line" id="ebU-OK-fDe">
-                                            <rect key="frame" x="14" y="192" width="271" height="281"/>
+                                            <rect key="frame" x="14" y="151" width="271" height="322"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="9JU-Bf-UtW">
-                                                <rect key="frame" x="1" y="1" width="269" height="265"/>
+                                                <rect key="frame" x="1" y="1" width="269" height="306"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <scrollView horizontalLineScroll="17" horizontalPageScroll="10" verticalLineScroll="17" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" id="bif-zq-zWM">
-                                                        <rect key="frame" x="2" y="40" width="265" height="191"/>
+                                                        <rect key="frame" x="2" y="45" width="265" height="227"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <clipView key="contentView" id="d9E-HT-fhg">
-                                                            <rect key="frame" x="1" y="0.0" width="263" height="190"/>
+                                                            <rect key="frame" x="1" y="0.0" width="263" height="226"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="15" headerView="2Q9-Ad-JTe" id="QuZ-mQ-5Gr">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="263" height="17"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="263" height="209"/>
                                                                     <autoresizingMask key="autoresizingMask"/>
                                                                     <size key="intercellSpacing" width="3" height="2"/>
                                                                     <color key="backgroundColor" red="0.81568627449999997" green="0.81568627449999997" blue="0.81568627449999997" alpha="1" colorSpace="calibratedRGB"/>
@@ -1142,7 +1142,7 @@
                                                         </tableHeaderView>
                                                     </scrollView>
                                                     <button id="n6f-pG-2jJ">
-                                                        <rect key="frame" x="21" y="238" width="186" height="20"/>
+                                                        <rect key="frame" x="21" y="279" width="186" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Ignore HV Ramp Down Actions" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="Ykm-yQ-ToD">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1153,7 +1153,7 @@
                                                         </connections>
                                                     </button>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="INC-ix-fw5">
-                                                        <rect key="frame" x="1" y="15" width="174" height="17"/>
+                                                        <rect key="frame" x="1" y="56" width="174" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title=" " id="xIB-jr-5vh">
                                                             <font key="font" metaFont="titleBar"/>
@@ -1162,7 +1162,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <button verticalHuggingPriority="750" id="i0i-iy-mA6">
-                                                        <rect key="frame" x="183" y="8" width="80" height="28"/>
+                                                        <rect key="frame" x="185" y="8" width="80" height="28"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Run Now" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="PAT-Ez-KOT">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1178,21 +1178,21 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" focusRingType="none" title="Module 2/CryoVacA" borderType="line" id="dNr-vI-j6m">
-                                            <rect key="frame" x="287" y="192" width="271" height="281"/>
+                                            <rect key="frame" x="287" y="151" width="271" height="322"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="7F6-D1-fbq">
-                                                <rect key="frame" x="1" y="1" width="269" height="265"/>
+                                                <rect key="frame" x="1" y="1" width="269" height="306"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <scrollView horizontalLineScroll="17" horizontalPageScroll="10" verticalLineScroll="17" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" id="Q3A-tt-jfZ">
-                                                        <rect key="frame" x="2" y="40" width="265" height="191"/>
+                                                        <rect key="frame" x="2" y="45" width="265" height="227"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <clipView key="contentView" id="0br-rP-Uqg">
-                                                            <rect key="frame" x="1" y="0.0" width="263" height="190"/>
+                                                            <rect key="frame" x="1" y="0.0" width="263" height="226"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="15" headerView="lAF-uO-ErR" id="e05-mF-WWD">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="263" height="17"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="263" height="209"/>
                                                                     <autoresizingMask key="autoresizingMask"/>
                                                                     <size key="intercellSpacing" width="3" height="2"/>
                                                                     <color key="backgroundColor" red="0.81568627449999997" green="0.81568627449999997" blue="0.81568627449999997" alpha="1" colorSpace="calibratedRGB"/>
@@ -1247,7 +1247,7 @@
                                                         </tableHeaderView>
                                                     </scrollView>
                                                     <button tag="1" id="Yb9-3W-isy">
-                                                        <rect key="frame" x="22" y="238" width="218" height="20"/>
+                                                        <rect key="frame" x="22" y="279" width="218" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Ignore HV Ramp Down Action" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="VTV-1J-yjC">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1257,8 +1257,17 @@
                                                             <action selector="ignorePanicOnAAction:" target="-2" id="vue-fF-zZJ"/>
                                                         </connections>
                                                     </button>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="jVY-6n-r5h">
+                                                        <rect key="frame" x="0.0" y="55" width="177" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title=" " id="pHO-Mg-fSN">
+                                                            <font key="font" metaFont="titleBar"/>
+                                                            <color key="textColor" red="0.52986826799999998" green="0.01532832416" blue="0.044266656879999998" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
                                                     <button verticalHuggingPriority="750" id="p65-va-aG2">
-                                                        <rect key="frame" x="185" y="8" width="80" height="28"/>
+                                                        <rect key="frame" x="185" y="6" width="80" height="28"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Run Now" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="rKe-pS-wjh">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1268,15 +1277,6 @@
                                                             <action selector="resetInterLocksOnModule1:" target="-2" id="wl2-yU-GWL"/>
                                                         </connections>
                                                     </button>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="jVY-6n-r5h">
-                                                        <rect key="frame" x="0.0" y="14" width="177" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title=" " id="pHO-Mg-fSN">
-                                                            <font key="font" metaFont="titleBar"/>
-                                                            <color key="textColor" red="0.52986826799999998" green="0.01532832416" blue="0.044266656879999998" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
