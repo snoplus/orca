@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5056" systemVersion="13F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="15F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
         <development version="5100" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="5056"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10116"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ORCatalogController">
@@ -1784,7 +1784,7 @@ Controller</string>
                                         <button toolTip="ORUSBtoGPIBModel" id="26690" customClass="ObjectFactory">
                                             <rect key="frame" x="44" y="1" width="69" height="76"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="bevel" title="USB->GPIB" bezelStyle="regularSquare" image="USBtoGPIB" imagePosition="above" alignment="center" state="on" inset="2" id="26691">
+                                            <buttonCell key="cell" type="bevel" title="USB-&gt;GPIB" bezelStyle="regularSquare" image="USBtoGPIB" imagePosition="above" alignment="center" state="on" inset="2" id="26691">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system" size="10"/>
                                             </buttonCell>
@@ -1873,7 +1873,7 @@ Controller</string>
                                         <button toolTip="ORUSBtoGPIBModel" id="26725" customClass="ObjectFactory">
                                             <rect key="frame" x="705" y="185" width="69" height="76"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="bevel" title="USB->GPIB" bezelStyle="regularSquare" image="USBtoGPIB" imagePosition="above" alignment="center" state="on" inset="2" id="26726">
+                                            <buttonCell key="cell" type="bevel" title="USB-&gt;GPIB" bezelStyle="regularSquare" image="USBtoGPIB" imagePosition="above" alignment="center" state="on" inset="2" id="26726">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system" size="10"/>
                                             </buttonCell>
@@ -1882,6 +1882,14 @@ Controller</string>
                                             <rect key="frame" x="27" y="90" width="124" height="67"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" title="Aglient 33500 Pulser" bezelStyle="regularSquare" image="Pulser33500Icon" imagePosition="above" alignment="center" state="on" inset="2" id="27034">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system" size="10"/>
+                                            </buttonCell>
+                                        </button>
+                                        <button toolTip="ORDT5725Model" id="xUx-og-SeF" customClass="ObjectFactory">
+                                            <rect key="frame" x="645" y="83" width="111" height="50"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="bevel" title="DT5725" bezelStyle="regularSquare" image="DT5720" imagePosition="above" alignment="center" state="on" inset="2" id="PpW-m3-QlR">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system" size="10"/>
                                             </buttonCell>
@@ -2992,7 +3000,7 @@ Relay</string>
                                                             <textField verticalHuggingPriority="750" id="13941">
                                                                 <rect key="frame" x="325" y="186" width="57" height="14"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <textFieldCell key="cell" controlSize="small" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="VME-->" id="25951">
+                                                                <textFieldCell key="cell" controlSize="small" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="VME--&gt;" id="25951">
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
