@@ -2,8 +2,8 @@
 //  ORDT5725Decoder.h
 //  Orca
 //
-//  Created by Mark Howe on Wed Mar 12,2014.
-//  Copyright (c) 2014 University of North Carolina. All rights reserved.
+//  Created by Mark Howe on Wed Jun 29,2016.
+//  Copyright (c) 2016 University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of
 //North Carolina at the Center sponsored in part by the United States

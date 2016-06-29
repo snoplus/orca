@@ -2,8 +2,8 @@
 //  ORDT5725Controller.m
 //  Orca
 //
-//  Created by Mark Howe on Wed Mar 12,2014.
-//  Copyright (c) 2014 University of North Carolina. All rights reserved.
+//  Created by Mark Howe on Wed Jun 29,2016.
+//  Copyright (c) 2016 University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //North Carolina at the Center sponsored in part by the United States
@@ -393,7 +393,7 @@
     [self lowLevelLockChanged:nil];
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Notification of Changes
+#pragma mark •••Notification of Changes
 //a fake action from the scale object
 - (void) scaleAction:(NSNotification*)aNotification
 {
@@ -829,7 +829,7 @@
 }
 
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Security Locks
+#pragma mark •••Security Locks
 - (void) checkGlobalSecurity
 {
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
@@ -930,7 +930,7 @@
     [enabledMaskMatrix              setEnabled:!locked && !runInProgress];
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+#pragma mark •••Actions
 - (IBAction) logicTypeAction:(id)sender
 {
     [model setLogicType:[sender selectedRow] withValue:[[sender selectedCell] indexOfSelectedItem]];
@@ -1273,7 +1273,7 @@
 	
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Data Source
+#pragma mark •••Data Source
 
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue
 {

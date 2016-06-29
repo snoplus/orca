@@ -2,8 +2,8 @@
 //  ORDT5725Model.h
 //  Orca
 //
-//  Created by Mark Howe on Wed Mar 12,2014.
-//  Copyright (c) 2014 University of North Carolina. All rights reserved.
+//  Created by Mark Howe on Wed Jun 29,2016.
+//  Copyright (c) 2016 University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of
 //North Carolina at the Center sponsored in part by the United States
@@ -17,7 +17,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Imported Files
+#pragma mark •••Imported Files
 
 #import "ORUsbDeviceModel.h"
 #import "ORUSB.h"
@@ -320,7 +320,7 @@ typedef struct  {
 - (BOOL)			swReset: (short) anIndex;
 - (BOOL)			hwReset: (short) anIndex;
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢DataTaker
+#pragma mark •••DataTaker
 - (unsigned long)	dataId;
 - (void)			setDataId: (unsigned long) DataId;
 - (void)			setDataIds:(id)assigner;

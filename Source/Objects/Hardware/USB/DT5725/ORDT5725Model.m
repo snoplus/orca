@@ -2,8 +2,8 @@
 //  ORDT5725Model.m
 //  Orca
 //
-//  Created by Mark Howe on Wed Mar 12,2014.
-//  Copyright (c) 2014 University of North Carolina. All rights reserved.
+//  Created by Mark Howe on Wed Jun 29,2016.
+//  Copyright (c) 2016 University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of
 //North Carolina at the Center sponsored in part by the United States
@@ -18,7 +18,7 @@
 //-------------------------------------------------------------
 
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Imported Files
+#pragma mark •••Imported Files
 #import "ORDT5725Model.h"
 #import "ORUSBInterface.h"
 #import "ORDataTypeAssigner.h"
@@ -1585,7 +1585,7 @@ static NSString* DT5725RunModeString[4] = {
 	return [NSString stringWithFormat:@"DT5725 %lu",[self uniqueIdNumber]];
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Data Taker
+#pragma mark •••Data Taker
 - (unsigned long) dataId { return dataId; }
 - (void) setDataId: (unsigned long) DataId
 {

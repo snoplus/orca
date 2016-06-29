@@ -2,8 +2,8 @@
 //  ORDT5725Controller.h
 //  Orca
 //
-//  Created by Mark Howe on Wed Mar 12,2014.
-//  Copyright (c) 2014 University of North Carolina. All rights reserved.
+//  Created by Mark Howe on Wed Jun 29,2016.
+//  Copyright (c) 2016 University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of
 //North Carolina at the Center sponsored in part by the United States
@@ -110,13 +110,13 @@
     NSSize monitoringSize;
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
+#pragma mark •••Initialization
 - (id) init;
 - (void) registerNotificationObservers;
 - (void) awakeFromNib;
 - (void) updateWindow;
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Notifications
+#pragma mark •••Notifications
 - (void) registerNotificationObservers;
 - (void) registerRates;
 - (void) updateWindow;
@@ -171,7 +171,7 @@
 
 - (void) setStatusStrings;
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+#pragma mark •••Actions
 - (IBAction) serialNumberAction:(id)sender;
 - (IBAction) logicTypeAction:(id)sender;
 - (IBAction) zsThresholdAction: (id) sender;
@@ -218,12 +218,12 @@
 - (IBAction) generateTriggerAction:(id)sender;
 - (IBAction) integrationAction:(id)sender;
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Misc Helpers
+#pragma mark •••Misc Helpers
 - (void)    populatePullDown;
 - (void)    updateRegisterDescription: (short) aRegisterIndex;
 - (void)    tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Data Source
+#pragma mark •••Data Source
 - (double) getBarValue:(int)tag;
 - (int) numberPointsInPlot:(id)aPlotter;
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
