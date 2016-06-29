@@ -928,11 +928,10 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) rateChanged:(NSNotification*)aNote
 {
-    NSArray* rates = [waveFormRateGroup rates];
-    int i = 0;;
-    for(id aRate in rates){
-        [rateRunningAverages addNewValue:[aRate floatValue] toIndex:i];
-        i++;
+    int i;
+    for(i=0;i<kNumGretina4MChannels;i++){
+        float rate = [[self rateObject:i] rate];
+        [rateRunningAverages addNewValue:rate toIndex:i];
     }
 }
 
@@ -960,8 +959,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
         
         [notifyCenter addObserver : self
                          selector : @selector(rateChanged:)
-                             name : ORRateGroupIntegrationChangedNotification
-                           object : run_ave];
+                             name : ORRateGroupTotalRateChangedNotification
+                           object : waveFormRateGroup];
       
         
         [notifyCenter addObserver : self
@@ -1056,31 +1055,11 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
 	if(groupTag == 0){
 		if(counterTag>=0 && counterTag<kNumGretina4MChannels){
-    //        if(counterTag==1) NSLog(@"The current count = %U\n", waveFormCount[counterTag]);
 			return waveFormCount[counterTag];
 		}	
-		else return 0;
 	}
-	else return 0;
+	return 0;
 }
-
-#pragma mark ••• Instance rate
-- (float) getRate:(short)counterTag forGroup:(short)groupTag
-{
-    if(groupTag == 0){
-        if(counterTag>=0 && counterTag<kNumGretina4MChannels){
-            return [[self rateObject:counterTag] rate]; //the rate
-        }
-    }
-    return 0;
-}
-
-#pragma mark ••• Instance rates
-- (float) getRate:(short)counterTag
-{
-    return [self getRate:counterTag forGroup:0];
-}
-
 
 #pragma mark •••specific accessors
 - (void) setEasySelected:(short)chan withValue:(BOOL)aValue
@@ -2976,6 +2955,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                 if(chan < kNumGretina4MChannels){
                     ++waveFormCount[chan];  //grab the channel and increase the count
                     [aDataPacket addLongsToFrameBuffer:dataBuffer length:kG4MDataPacketSize];
+
                 }
                 else {
                     NSLogError(@"",@"Bad header--record discarded",@"GRETINA4M",[NSString stringWithFormat:@"slot %d",[self slot]], [NSString stringWithFormat:@"chan %d",1],nil);
@@ -3064,10 +3044,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
 }
 
-
 - (BOOL) bumpRateFromDecodeStage:(int)channel
 {
-    
     if(channel>=0 && channel<kNumGretina4MChannels){
         ++waveFormCount[channel];
     }
@@ -3173,6 +3151,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
         [self setWaveFormRateGroup:[[[ORRateGroup alloc] initGroup:kNumGretina4MChannels groupTag:0] autorelease]];
         [waveFormRateGroup setIntegrationTime:5];
     }
+    
     [waveFormRateGroup resetRates];
     [waveFormRateGroup calcRates];
    
@@ -3183,7 +3162,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [rateRunningAverages setVerbose:false];
     [rateRunningAverages setTriggerType:kRASpikeOnRatio];
     [rateRunningAverages setTriggerValue:0.9]; //this is ratio...  rate threshold could be changed
-
 
 	int i;
     for(i=0;i<kNumGretina4MChannels;i++){ //for running average

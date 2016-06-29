@@ -240,6 +240,13 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
     else NSLog(@"No on call person to send message to!\n");
 }
 
+- (void) broadcastMessage:(NSString*)aMessage
+{
+    [[self primaryPerson]   sendMessage:aMessage];
+    [[self secondaryPerson] sendMessage:aMessage];
+    [[self tertiaryPerson]  sendMessage:aMessage];
+}
+
 - (OROnCallPerson*) primaryPerson
 {
     for(OROnCallPerson* aPerson in onCallList){

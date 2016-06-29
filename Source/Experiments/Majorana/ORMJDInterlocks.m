@@ -337,8 +337,9 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
         //HV is ON... see if we need to unbias
         case kMJDInterlocks_GetShouldUnBias:
             if(remoteOpStatus){
+                int removeTestStuff;
                 if([[remoteOpStatus objectForKey:@"connected"] boolValue]==YES &&
-                   [remoteOpStatus objectForKey:@"vacuumSpike"] &&
+                   //[remoteOpStatus objectForKey:@"vacuumSpike"] &&
                    [remoteOpStatus objectForKey:@"shouldUnBias"]){
                     //it worked. move on.
                     retryCount = 0;
@@ -346,7 +347,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                     
                     vacuumSpike  = [[remoteOpStatus objectForKey:@"vacuumSpike"] boolValue];
                     shouldUnBias = [[remoteOpStatus objectForKey:@"shouldUnBias"] boolValue];
-                    
+                    shouldUnBias = NO; //TEST,TEST,TEST
                     if(shouldUnBias){
                         [self setState:kMJDInterlocks_GetShouldUnBias status:@"Vac says Unbias" color:badColor];
                         [self setState:kMJDInterlocks_FinalState      status:@"Vac says Unbias" color:badColor];
@@ -388,7 +389,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                     self.remoteOpStatus=nil;
                     NSMutableArray* cmds = [NSMutableArray arrayWithObjects:
                                             @"shouldUnBias = [ORMJDVacuumModel,1 shouldUnbiasDetector];",
-                                            @"vacuumSpike  = [ORMJDVacuumModel,1 vacuumSpike];",
+                                            //@"vacuumSpike  = [ORMJDVacuumModel,1 vacuumSpike];",
                                             nil];
 
                     [self sendCommands:cmds remoteSocket:[delegate remoteSocket:slot]];
@@ -486,7 +487,13 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             break;
 
         case kMJDInterlocks_CheckLNFill:
-            if(remoteOpStatus){
+            if(!hvIsOn){
+                [self setState:kMJDInterlocks_CheckLNFill     status:@"Skipped" color:normalColor];
+                [self setState:kMJDInterlocks_CheckForBreakdown     status:@"Skipped" color:normalColor];
+                [self setCurrentState:kMJDInterlocks_FinalState];
+            }
+            
+            else if(remoteOpStatus){
                 if([[remoteOpStatus objectForKey:@"connected"] boolValue]==YES && [remoteOpStatus objectForKey:@"fillingLN"]){
                     //it worked. move on.
                     retryCount = 0;
@@ -544,7 +551,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             if(breakDownPass == 0){
                 [self setState:kMJDInterlocks_CheckForBreakdown status:@"Checking..." color:normalColor];
                 [breakDownResult autorelease];
-                NSString* s = [delegate checkForBreakdown:[self module] fillingLN:fillingLN vacuumSpike:vacuumSpike];
+                NSString* s = [delegate checkForBreakdown:[self module] fillingLN:fillingLN vacSystem:[self vacSystem] vacuumSpike:vacuumSpike];
                 breakDownResult = [s copy];
 
             }
@@ -553,8 +560,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                 [self setCurrentState:kMJDInterlocks_FinalState];
             }
             breakDownPass++;
-           break;
-            
+            break;
             
         case kMJDInterlocks_FinalState:
             if([finalReport count])[self errorReport];

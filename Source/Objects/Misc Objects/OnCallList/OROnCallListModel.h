@@ -56,6 +56,7 @@
 - (OROnCallPerson*) tertiaryPerson;
 - (BOOL) notificationScheduled;
 - (void) sendMessageToOnCallPerson;
+- (void) broadcastMessage:(NSString*)aMessage;
 - (void) sendShiftChangeMessage;
 
 #pragma mark •••Save/Restore

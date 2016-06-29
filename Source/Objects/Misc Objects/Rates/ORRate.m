@@ -100,9 +100,9 @@ NSString* ORRateValue 				= @"ORRateValue";
 - (void) setRate:(float)newRate
 {	
 	rate=newRate;
+    [timeRate addDataToTimeAverage:rate];
+    
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORRateChangedNotification object:self userInfo:nil];
-	
-	[timeRate addDataToTimeAverage:rate];
 }
 
 - (ORTimeRate*) timeRate

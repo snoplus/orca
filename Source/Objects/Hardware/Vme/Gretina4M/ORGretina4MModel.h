@@ -564,8 +564,6 @@ enum Gretina4MFIFOStates {
 - (void)   startRates;
 - (void) clearWaveFormCounts;
 - (unsigned long) getCounter:(short)counterTag forGroup:(short)groupTag;
-- (float) getRate:(short)counterTag;
-- (float) getRate:(short)counterTag forGroup:(short)groupTag;
 
 - (void) checkFifoAlarm;
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
