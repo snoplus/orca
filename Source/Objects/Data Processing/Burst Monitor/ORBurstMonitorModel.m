@@ -700,7 +700,7 @@ double facto(unsigned long long num)
                                                     }
                                                 }
                                                 adcP = 0;
-                                                double peakP=0.86; //mod this later possibly
+                                                double peakP=0.89; //from neutron source data
                                                 double peakExpect = peakP*(peakN+lowN);
                                                 for(n=0; n<(peakN + lowN + 1); n++)
                                                 {
@@ -1338,7 +1338,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     //calc chan prob
     double exChan =999.999;
     int novaState = 0;
-    if(multInBurst > 5 && rSec > 0.01 && adcP > 0.001 && (gammaP > 0.00001 || isgammalow) && alphaP > 0.00001)
+    if(multInBurst > 3 && rSec > 0.01 && adcP > 0.001 && (gammaP > 0.00001 || isgammalow) && alphaP > 0.00001)
     {
         novaState = 3;
     }
@@ -1349,7 +1349,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
         {
             novaState = 1;
         }
-        if (multInBurst > 4 && rSec < 0.01 && adcP > 0.001) //Spallation
+        if (multInBurst > 2 && rSec < 0.01 && adcP > 0.001) //Spallation or SF
         {
             novaState = 2;
         }
@@ -1463,8 +1463,8 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     }
     if(novaState == 2)
     {
-        theTriage = [theTriage stringByAppendingString:@"Spallation"];
-        theContent = [theContent stringByAppendingString:@"Spallation \n"];
+        theTriage = [theTriage stringByAppendingString:@"Spallation/SF"];
+        theContent = [theContent stringByAppendingString:@"Spallation or SF \n"];
     }
     if(novaState == 1)
     {
