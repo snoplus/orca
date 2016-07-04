@@ -181,6 +181,7 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
          }
          else
          {
+             for(id anSBC in sbcs)[[anSBC sbcLink] pingVerbose:NO];
              [self setSentryType:eNeither];
              [self setNextState:eStarting stepTime:.2];
          }
@@ -193,12 +194,12 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
     if(sentryIsRunning){
         [self appendToSentryLog:@"Sentry notified of SBC socket dropped"];
         
-        if(!toggleAction && ([self sentryType]==ePrimary)){
+        if(!toggleAction && ([self sentryType]!=eSecondary)){
             [self appendToSentryLog:@"Dropped socket issue will be resolved by this DAQ"];
             
-            if(scheduledToggleTime){
-                [self setToggleInterval:0];
-            }
+            //SV - June 28th 2016
+            //If an SBC was dropped, stop toggling between computers. The scheduler will have to be manually restarted.
+            [self setToggleInterval:0];
             
             //the sbc socket was dropped. Most likely caused by the sbc readout process dying.
             ignoreRunStates = YES;
@@ -601,9 +602,10 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
         [toggleTimer invalidate];
         [toggleTimer release];
         toggleTimer = nil;
-        nextToggleTime = @"None scheduled";
-        [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryToggleIntervalChanged object:self];
     }
+    
+    nextToggleTime = @"None scheduled";
+    [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryToggleIntervalChanged object:self];
 }
 
 //SV
@@ -1064,6 +1066,7 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
                 }
                 if([unPingableSBCs count] == 0){
                     //all OK
+                    [self clearSBCPingAlarm]; //SV
                     [self clearMacPingAlarm];
                     [self setNextState:eGetRunState stepTime:2];
                 }
@@ -1204,6 +1207,7 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
                     }
                 }
                 if([unPingableSBCs count] == 0){
+                    [self clearSBCPingAlarm]; //SV
                     [self clearMacPingAlarm];
                     [self appendToSentryLog:@"All SBCs responded to ping"];
                     [self setNextState:eStartCrates stepTime:2];
@@ -1335,9 +1339,9 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 
 - (void) handleSbcSocketDropped
 {
-    sbcSocketDropCount++;
     //try to restart
     if(![self runIsInProgress]){ //Added to prevent killing the crates if the other computer is running
+        sbcSocketDropCount++;
         [self appendToSentryLog:@"TakeOver due to socket dropped."];
         [self takeOverRunning:YES];
     }
