@@ -1508,26 +1508,28 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 		[NSThread setThreadPriority:1];
 		
-       NSDictionary* statusInfo = [NSDictionary
-									dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:eRunStopped],ORRunStatusValue,
-                                    [NSNumber numberWithUnsignedLong:runNumber],kRunNumber,
-                                    [NSNumber numberWithUnsignedLong:subRunNumber],kSubRunNumber,
-                                    [NSNumber numberWithLong:[[ORGlobal sharedGlobal] runMode]],  kRunMode,
-                                    [NSNumber numberWithFloat:elapsedRunTime],  kElapsedTime,
-									@"Not Running",ORRunStatusString,
-                                    [NSNumber numberWithBool:willRestart],@"willRestart",
-                                    [NSNumber numberWithInt:!quickStart && willRestart], @"doinit",
-									dataPacket,@"DataPacket",nil];
-        
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORRunStoppedNotification
-                                                            object: self
-                                                          userInfo: statusInfo];
-        
 	}
 	@catch(NSException* localException) {
 	}
 	
+    //SV - Moved this section from inside the try block. This way, there is always a run stopped notification
+    NSDictionary* statusInfo = [NSDictionary
+                                dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:eRunStopped],ORRunStatusValue,
+                                [NSNumber numberWithUnsignedLong:runNumber],kRunNumber,
+                                [NSNumber numberWithUnsignedLong:subRunNumber],kSubRunNumber,
+                                [NSNumber numberWithLong:[[ORGlobal sharedGlobal] runMode]],  kRunMode,
+                                [NSNumber numberWithFloat:elapsedRunTime],  kElapsedTime,
+                                @"Not Running",ORRunStatusString,
+                                [NSNumber numberWithBool:willRestart],@"willRestart",
+                                [NSNumber numberWithInt:!quickStart && willRestart], @"doinit",
+                                dataPacket,@"DataPacket",nil];
+    
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRunStoppedNotification
+                                                        object: self
+                                                      userInfo: statusInfo];
+    //SV - End of changes
+    
     [nextObject preCloseOut:runInfo];
     
 	//get the time(UT!)
