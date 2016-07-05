@@ -664,9 +664,10 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
                     }
                 }
                 else {
-                    if((state1 == 36396)||
-                       (state1 == 36936)||
-                       state0 == 1){
+                    if((state1 == 63969)|| state0 == 1){ //new longer source 7/5/16
+                    //if((state1 == 36396)||
+                    //   (state1 == 36936)||
+                    //   state0 == 1){
                         [self setCurrentState:kMJDSource_StopMotion];
                         NSLog(@"Module %d Source fully deployed\n",slot+1);
                         self.order = [NSMutableString stringWithString:@"DEPLOYED"];
@@ -684,8 +685,10 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
                    }
                 }
                 else {
-                    if(([[order substringFromIndex: [order length] - 5] isEqualToString: @"ABACB"] )||
-                       ([[order substringFromIndex: [order length] - 5] isEqualToString: @"ABCAB" ])){
+                    if([[order substringFromIndex: [order length] - 5] isEqualToString: @"BACBC"] ){ //new longer source 7/5/16
+                        
+//                    if(([[order substringFromIndex: [order length] - 5] isEqualToString: @"ABACB"] )||
+//                       ([[order substringFromIndex: [order length] - 5] isEqualToString: @"ABCAB" ])){
                         [self setCurrentState:kMJDSource_StopMotion];
                         NSLog(@"Module %d Source fully deployed\n",slot+1);
                         self.order = [NSMutableString stringWithString:@"DEPLOYED"];
