@@ -112,27 +112,24 @@
     
     if([inComingData count] < minSamples) return nil;
     [inComingData removeObjectAtIndex:0];
-    
     spikeValue = 0;
     switch(triggerType){
         case kRASpikeOnRatio: //trigger on the ratio of the rate over the average
             if(runningAverage != 0) {
                 spikeValue = rate/runningAverage;
-                //didSpike   = (fabs(spikeValue) >= triggerValue);
-                didSpike   = testSpike;
+                didSpike   = (fabs(spikeValue) >= triggerValue);
             }
             break;
             
         case kRASpikeOnThreshold:
             spikeValue = rate-runningAverage;
-            //didSpike   = (fabs(spikeValue) > triggerValue) || testSpike;
-            didSpike   = testSpike;
-           break;
+            didSpike   = (fabs(spikeValue) > triggerValue);
+            break;
             
         default:
             break;
     }
-
+    
     if(lastDidSpike != didSpike){
         lastDidSpike = didSpike;
         return [self spikedInfo:didSpike];
@@ -149,10 +146,6 @@
     aSpikeObj.ave          = runningAverage;
     aSpikeObj.spikeValue   = spikeValue;
     return aSpikeObj;
-}
-- (void)    setTestSpike:(BOOL)aFlag
-{
-    testSpike = aFlag;   //for testing only
 }
 
 - (void) dump

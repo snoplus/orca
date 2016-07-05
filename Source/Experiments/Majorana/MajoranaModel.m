@@ -481,9 +481,9 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     BOOL vacSpike = NO;
     if(crate>=1 && crate<=2){
         fillingLN = [[self mjdInterlocks:crate-1] fillingLN];
-        vacSpike = [[self mjdInterlocks:crate-1] vacuumSpike];
+        vacSpike  = [[self mjdInterlocks:crate-1] vacuumSpike];
     }
-    return (rateInfo && baselineInfo/* && vacSpike*/ && !fillingLN);
+    return (rateInfo && baselineInfo && vacSpike && !fillingLN);
 }
 
 - (void) rampDownChannelsWithBreakdown:(int)aCrate vac:(int)aVacSystem

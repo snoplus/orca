@@ -37,7 +37,6 @@
     int             groupTag;
     BOOL            didSpike;
     BOOL            lastDidSpike;
-    BOOL            testSpike;
 }
 - (id)      initWithTag:(short)aTag andLength:(short)wl;
 - (void)    dealloc;
@@ -53,7 +52,6 @@
 - (void)    setTag:(int)newTag;
 - (int)     groupTag;
 - (void)    setGroupTag:(int)newGroupTag;
-- (void)    setTestSpike:(BOOL)aFlag;
 - (ORRunningAveSpike*) calculateAverage:(float)rate minSamples:(int)minSamples triggerValue:(float)triggerValue spikeType:(BOOL)triggerType;
 - (ORRunningAveSpike*) spikedInfo:(BOOL)spiked;
 @end
