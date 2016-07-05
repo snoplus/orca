@@ -24,6 +24,8 @@
 @class ORRunningAverage;
 
 @interface ORRunningAverageGroup : NSObject {
+    id              objectKeepingRate;
+    int             pollTime;
     BOOL            verbose;
     NSMutableArray* runningAverages;
     int             windowLength;
@@ -33,7 +35,9 @@
     int             triggerType;
 }
 #pragma mark •••Initialization
-- (id) initGroup:(int)numberInGroup groupTag:(int)aGroupTag withLength:(int)wl;
+- (id)   initGroup:(int)numberInGroup groupTag:(int)aGroupTag withLength:(int)wl;
+- (void) start:(id)obj pollTime:(int)aTime;
+- (void) stop;
 
 #pragma mark •••Accessors
 - (id)          runningAverageObject:(short)index;
@@ -44,6 +48,8 @@
 - (void)        setWindowLength:(int)newWindowLength;
 - (int)         windowLength;
 - (void)        resetCounters:(float)rate;
+- (void)        reset;
+- (void)        addValuesUsingTimer;
 - (void)        addNewValue:(float)aValue toIndex:(int)i;
 - (int)         tag;
 - (void)        setTag:(int)newTag;
@@ -55,6 +61,8 @@
 - (int)         triggerType;
 - (void)        setTriggerValue:(float)a;
 - (float)       triggerValue;
+- (int)         pollTime;
+- (void)        setPollTime:(int)aValue;
 @end
 
 extern NSString* ORRunningAverageSpikeNotification;

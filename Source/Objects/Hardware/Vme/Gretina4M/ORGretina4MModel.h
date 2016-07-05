@@ -387,7 +387,6 @@ enum Gretina4MFIFOStates {
 - (void)			setWaveFormRateGroup:(ORRateGroup*)newRateGroup;
 - (id)              rateObject:(short)channel;
 - (void)            setRateIntegrationTime:(double)newIntegrationTime;
-- (void)            rateChanged:(NSNotification*)aNote;
 - (void)            rateSpikeChanged:(NSNotification*)aNote;
 - (ORRunningAverageGroup*) rateRunningAverages;
 - (void)			setRateRunningAverages:(ORRunningAverageGroup*)newRunningAverageGroup;
@@ -570,6 +569,7 @@ enum Gretina4MFIFOStates {
 - (BOOL) bumpRateFromDecodeStage:(int)channel;
 
 - (float) rateSpike:(int)idx;
+- (float) getRate:(short)channel;
 
 - (BOOL)channelSpike:(int)idx;
 #pragma mark •••HW Wizard

@@ -233,6 +233,11 @@
                      selector : @selector(sourceIsInChanged:)
                          name : ORMJDSourceIsInChanged
                        object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(breakdownDetectedChanged:)
+                         name : ORMajoranaModelUpdateSpikeDisplay
+                       object : nil];
  }
 
 
@@ -260,6 +265,7 @@
     [module1InterlockTable reloadData];
     [module2InterlockTable reloadData];
     [self updateLastConstraintCheck:nil];
+    [self breakdownDetectedChanged:nil];
     [self sourceStateChanged:nil];
     
     //Source
@@ -381,6 +387,7 @@
     }
     [self updateCalibrationButtons];
 }
+
 - (void) sourceStateChanged:(NSNotification*)aNote
 {
     if(!aNote){
@@ -408,6 +415,51 @@
     else {
         [module2InterlockTable setNeedsDisplay:YES];
    }
+}
+
+- (void) breakdownDetectedChanged:(NSNotification*)aNote
+{
+    //update M1
+    NSDictionary* rateSpikes     = [model rateSpikes];
+    if([rateSpikes count]==0){
+        [rate1BiState setState:1];
+        [rate2BiState setState:1];
+    }
+    for(id aKey in [rateSpikes allKeys]){
+        int crate = [aKey intValue]; //pick off the crate value
+        if(crate==1)      [rate1BiState setState:0];
+        else if(crate==2) [rate2BiState setState:0];
+    }
+    
+    NSDictionary* baselineSpikes = [model baselineSpikes];
+    if([baselineSpikes count]==0){
+        [baseline1BiState setState:1];
+        [baseline2BiState setState:1];
+    }
+   for(id aKey in [baselineSpikes allKeys]){
+       int crate = [aKey intValue]; //pick off the crate value
+       if(crate==1)      [baseline1BiState setState:0];
+       else if(crate==2) [baseline2BiState setState:0];
+    }
+    
+    if([model fillingLN:0])     [filling1Field setStringValue:@"YES"];
+    else                        [filling1Field setStringValue:@"NO"];
+    if([model vacuumSpike:0])   [vac1BiState setState:0];
+    else                        [vac1BiState setState:1];
+  
+    
+    if([model fillingLN:1])     [filling2Field setStringValue:@"YES"];
+    else                        [filling2Field setStringValue:@"NO"];
+    if([model vacuumSpike:1])   [vac2BiState setState:0];
+    else                        [vac2BiState setState:1];
+    
+    
+    if([model breakdownAlarmPosted:0])  [breakdown1Field setStringValue:@"YES"];
+    else                                [breakdown1Field setStringValue:@"NO"];
+
+    if([model breakdownAlarmPosted:1])  [breakdown2Field setStringValue:@"YES"];
+    else                                [breakdown2Field setStringValue:@"NO"];
+  
 }
 
 - (void) auxTablesChanged:(NSNotification*)aNote

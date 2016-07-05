@@ -555,6 +555,7 @@ struct {
 	else {
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollValues) object:nil];
         [self clearAllAlarms];
+        [baselineRunningAverages reset];
 	}
 }
 
@@ -630,6 +631,9 @@ struct {
 		[[[self undoManager] prepareWithInvocationTarget:self] setBaselineVoltage:aChan value:[self baselineVoltage:aChan]];
 		[baselineVoltages replaceObjectAtIndex:aChan withObject:[NSNumber numberWithFloat:aValue]];
         
+        [baselineRunningAverages addNewValue:aValue toIndex:aChan];
+
+        
 		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
 		[userInfo setObject:[NSNumber numberWithFloat:aChan] forKey: @"Channel"];
         
@@ -670,7 +674,6 @@ struct {
         
 		adcs[aChan] = aValue;
 	
-        [baselineRunningAverages addNewValue:aValue toIndex:aChan];
         
 		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
 		[userInfo setObject:[NSNumber numberWithFloat:aChan] forKey: @"Channel"];

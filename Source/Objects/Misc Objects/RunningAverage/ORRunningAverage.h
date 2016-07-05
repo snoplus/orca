@@ -37,12 +37,14 @@
     int             groupTag;
     BOOL            didSpike;
     BOOL            lastDidSpike;
+    BOOL            testSpike;
 }
 - (id)      initWithTag:(short)aTag andLength:(short)wl;
 - (void)    dealloc;
 - (void)    setWindowLength:(int) wl;
 - (float)   updateAverage:(float)datapoint;
 - (void)    resetCounter:(float) rate;
+- (void)    reset;
 - (float)   runningAverage;
 - (float)   spikeValue;
 - (float)   lastRateValue;
@@ -51,7 +53,9 @@
 - (void)    setTag:(int)newTag;
 - (int)     groupTag;
 - (void)    setGroupTag:(int)newGroupTag;
-- (ORRunningAveSpike*) averageRate:(float)rate minSamples:(int)minSamples triggerValue:(float)triggerValue spikeType:(BOOL)triggerType;
+- (void)    setTestSpike:(BOOL)aFlag;
+- (ORRunningAveSpike*) calculateAverage:(float)rate minSamples:(int)minSamples triggerValue:(float)triggerValue spikeType:(BOOL)triggerType;
+- (ORRunningAveSpike*) spikedInfo:(BOOL)spiked;
 @end
 
 @interface NSObject (ORRunningAverage_Catagory)

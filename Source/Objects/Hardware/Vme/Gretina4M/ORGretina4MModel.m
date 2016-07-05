@@ -926,15 +926,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
      object:self];
 }
 
-- (void) rateChanged:(NSNotification*)aNote
-{
-    int i;
-    for(i=0;i<kNumGretina4MChannels;i++){
-        float rate = [[self rateObject:i] rate];
-        [rateRunningAverages addNewValue:rate toIndex:i];
-    }
-}
-
 - (void) rateSpikeChanged:(NSNotification*)aNote
 {
     ORRunningAveSpike* spikeObj = [[aNote userInfo] objectForKey:@"SpikeObject"];
@@ -945,8 +936,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                               [NSNumber numberWithInt:[spikeObj tag]],@"channel",
                               nil];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MModelRateSpiked object:self userInfo:userInfo];
+    
 }
-
 
 - (void) registerNotificationObservers
 {
@@ -956,13 +947,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     
     ORRunningAverageGroup* run_ave=[self rateRunningAverages];
     if(run_ave){
-        
-        [notifyCenter addObserver : self
-                         selector : @selector(rateChanged:)
-                             name : ORRateGroupTotalRateChangedNotification
-                           object : waveFormRateGroup];
-      
-        
+    
         [notifyCenter addObserver : self
                          selector : @selector(rateSpikeChanged:)
                              name : ORRunningAverageSpikeNotification
@@ -1059,6 +1044,14 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 		}	
 	}
 	return 0;
+}
+- (float) getRate:(short)channel
+{
+    
+    if(channel>=0 && channel<kNumGretina4MChannels){
+        return [[self rateObject:channel] rate]; //the rate
+    }
+return 0;
 }
 
 #pragma mark •••specific accessors
@@ -3064,7 +3057,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     [self clearWaveFormCounts];
     [waveFormRateGroup start:self];
-    [rateRunningAverages resetCounters:0];
+    [rateRunningAverages start:self pollTime:[waveFormRateGroup integrationTime]];
 }
 
 - (void) clearWaveFormCounts
@@ -3158,8 +3151,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     if(!rateRunningAverages){
         [self setRateRunningAverages:[[[ORRunningAverageGroup alloc] initGroup:kNumGretina4MChannels groupTag:0 withLength:10] autorelease]];
     }
-    [rateRunningAverages resetCounters:0];
-    [rateRunningAverages setVerbose:false];
     [rateRunningAverages setTriggerType:kRASpikeOnRatio];
     [rateRunningAverages setTriggerValue:0.9]; //this is ratio...  rate threshold could be changed
 

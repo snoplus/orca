@@ -59,6 +59,22 @@
     IBOutlet NSTextField*   ignore1Field;
     IBOutlet NSTextField*   ignore2Field;
     
+    IBOutlet BiStateView*	rate1BiState;
+    IBOutlet BiStateView*	rate2BiState;
+    
+    IBOutlet BiStateView*	baseline1BiState;
+    IBOutlet BiStateView*	baseline2BiState;
+
+    IBOutlet BiStateView*	vac1BiState;
+    IBOutlet BiStateView*	vac2BiState;
+
+    IBOutlet NSTextField*	filling1Field;
+    IBOutlet NSTextField*	filling2Field;
+    
+    IBOutlet NSTextField*	breakdown1Field;
+    IBOutlet NSTextField*	breakdown2Field;
+
+
     //items in the Calibration tab view
     IBOutlet NSButton*      checkSourceGateValveButton0;
     IBOutlet NSButton*      deploySourceButton0;
@@ -122,6 +138,7 @@
 - (void) sourceGatevalveChanged:(NSNotification*)aNote;
 - (void) sourceIsInChanged:(NSNotification*)aNote;
 - (void) calibrationLockChanged:(NSNotification*)aNote;
+- (void) sourceStateChanged:(NSNotification*)aNote;
 - (NSString*) order:(int)index;
 - (NSString*) sourceGateValveState:(int)index;
 - (NSString*) sourceIsInState:(int)index;

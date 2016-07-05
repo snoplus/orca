@@ -51,7 +51,7 @@
 - (int) groupTag
 {
     return groupTag;
-}
+} 
 
 - (void) setGroupTag:(int)newGroupTag
 {
@@ -63,10 +63,7 @@
     [inComingData removeAllObjects];
     
     windowLength = wl;
-    int idx;
-    for(idx=0; idx<windowLength;idx++){
-        [inComingData addObject:[NSNumber numberWithFloat:0.]];
-    }
+    [self reset];
     //NSLog(@"my running average window initially = %d\n",inComingData.count);
     runningAverage = 0.;
 }
@@ -80,22 +77,18 @@
     }
     runningAverage = rate;
 }
-
 - (void) reset
 {
     [inComingData removeAllObjects];
-    int idx;
-    for(idx=0; idx<windowLength;idx++){
-        [inComingData addObject:[NSNumber numberWithDouble:0]];
-    }
 }
+
 
 - (float) updateAverage:(float)dataPoint
 {
     lastRateValue = dataPoint;
     [inComingData push:[NSNumber numberWithFloat:dataPoint]];
-    runningAverage = runningAverage - [[inComingData popTop]floatValue]/windowLength + dataPoint/windowLength;
-
+    runningAverage = runningAverage - [[inComingData firstObject]floatValue]/windowLength + dataPoint/windowLength;
+    
     return runningAverage;
 }
 
@@ -113,25 +106,28 @@
     return spikeValue;
 }
 
-- (ORRunningAveSpike*) averageRate:(float)rate minSamples:(int)minSamples triggerValue:(float)triggerValue spikeType:(BOOL)triggerType
+- (ORRunningAveSpike*) calculateAverage:(float)rate minSamples:(int)minSamples triggerValue:(float)triggerValue spikeType:(BOOL)triggerType
 {
     [self  updateAverage:rate];
     
     if([inComingData count] < minSamples) return nil;
+    [inComingData removeObjectAtIndex:0];
     
     spikeValue = 0;
     switch(triggerType){
         case kRASpikeOnRatio: //trigger on the ratio of the rate over the average
             if(runningAverage != 0) {
                 spikeValue = rate/runningAverage;
-                didSpike   = (fabs(spikeValue) >= triggerValue);
+                //didSpike   = (fabs(spikeValue) >= triggerValue);
+                didSpike   = testSpike;
             }
             break;
             
         case kRASpikeOnThreshold:
             spikeValue = rate-runningAverage;
-            didSpike   = (fabs(spikeValue) > triggerValue);
-            break;
+            //didSpike   = (fabs(spikeValue) > triggerValue) || testSpike;
+            didSpike   = testSpike;
+           break;
             
         default:
             break;
@@ -139,21 +135,30 @@
 
     if(lastDidSpike != didSpike){
         lastDidSpike = didSpike;
-        ORRunningAveSpike* aSpikeObj = [[ORRunningAveSpike alloc] init];
-        aSpikeObj.timeOfSpike  = [NSDate date];
-        aSpikeObj.spiked       = didSpike;
-        aSpikeObj.tag          = tag;
-        aSpikeObj.ave          = runningAverage;
-        aSpikeObj.spikeValue   = spikeValue;
-        return aSpikeObj;
+        return [self spikedInfo:didSpike];
     }
     return nil;
+}
+
+- (ORRunningAveSpike*) spikedInfo:(BOOL)spiked
+{
+    ORRunningAveSpike* aSpikeObj = [[ORRunningAveSpike alloc] init];
+    aSpikeObj.timeOfSpike  = [NSDate date];
+    aSpikeObj.spiked       = didSpike;
+    aSpikeObj.tag          = tag;
+    aSpikeObj.ave          = runningAverage;
+    aSpikeObj.spikeValue   = spikeValue;
+    return aSpikeObj;
+}
+- (void)    setTestSpike:(BOOL)aFlag
+{
+    testSpike = aFlag;   //for testing only
 }
 
 - (void) dump
 {
     int idx;
-    for(idx=0; idx<windowLength;idx++){
+    for(idx=0; idx<[inComingData count];idx++){
         NSLog(@"number at index %d = %f\n",idx, [[inComingData objectAtIndex:idx] floatValue]);
     }
 }

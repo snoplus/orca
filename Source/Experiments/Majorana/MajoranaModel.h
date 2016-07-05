@@ -58,6 +58,7 @@
     NSMutableDictionary* rateSpikes;
     NSMutableDictionary* baselineSpikes;
     NSMutableDictionary* breakDownDictionary;
+    BOOL scheduledToRunCheckBreakdown;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -75,9 +76,11 @@
 - (BOOL) anyHvOnVMECrate:(int)aVMECrate;
 - (void) setVmeCrateHVConstraint:(int)aCrate state:(BOOL)aState;
 - (void) rampDownHV:(int)aCrate vac:(int)aVacSystem;
-- (NSString*) checkForBreakdown:(int)aCrate fillingLN:(BOOL)fillingLN vacSystem:(int)aVacuumSystem  vacuumSpike:(BOOL)vacSpike;
+- (NSString*) checkForBreakdown:(int)aCrate vacSystem:(int)aVacSystem;
 - (void) setupBreakDownDictionary;
-- (NSMutableDictionary*) breakDownChannelForKey:(NSString*)aChannelKey;
+- (NSDictionary*) rateSpikes;
+- (NSDictionary*) baselineSpikes;
+- (BOOL) breakdownAlarmPosted:(int)alarmIndex;
 
 - (id) mjdInterlocks:(int)index;
 - (void) runStarted:(NSNotification*) aNote;
@@ -88,9 +91,16 @@
 - (NSString*) objectNameForCrate:(NSString*)aCrateName andCard:(NSString*)aCardName;
 
 //in the case of being asked to checkBreakdown, it should event rate and baseline, leave the vacuum to the MJD interlock
+- (void) logBreakdowns:(int)aCrate;
 - (void) rateSpike:(NSNotification*) aNote;
 - (void) baselineSpike:(NSNotification*) aNote;
-- (void) rampDownChannelsWithBreakdown:(int)module;
+- (BOOL) breakdownConditionsMet:(id)aDetector;
+- (void) rampDownChannelsWithBreakdown:(int)module vac:(int)aVacSystem;
+- (BOOL) rateSpikeDetected:(int)module;
+- (BOOL) baselineJumpDetected:(int)module;
+- (void) forceConstraintCheck;
+- (BOOL) vacuumSpike:(int)i;
+- (BOOL) fillingLN:(int)i;
 
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups;
@@ -144,6 +154,7 @@ extern NSString* ORMajoranaModelViewTypeChanged;
 extern NSString* ORMajoranaModelPollTimeChanged;
 extern NSString* ORMJDAuxTablesChanged;
 extern NSString* ORMajoranaModelLastConstraintCheckChanged;
+extern NSString* ORMajoranaModelUpdateSpikeDisplay;
 
 @interface ORMJDHeaderRecordID : NSObject
 - (NSString*) fullID;

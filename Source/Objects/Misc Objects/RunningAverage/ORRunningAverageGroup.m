@@ -157,7 +157,17 @@ NSString* ORRunningAverageChangedNotification = @"ORRunningAverageChangedNotific
         [[self runningAverageObject:idx] resetCounter:rate];
     }
 }
-
+- (void) reset
+{
+    int idx;
+    for(idx=0; idx<[runningAverages count];idx++){
+        ORRunningAverage* ra = [runningAverages objectAtIndex:idx];
+        [ra reset];
+        ORRunningAveSpike* aSpikeObj = [ra spikedInfo:NO];
+        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:aSpikeObj forKey:@"SpikeObject"];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORRunningAverageSpikeNotification object:self userInfo:userInfo];
+    }
+}
 - (int) tag
 {
     return tag;
@@ -166,24 +176,61 @@ NSString* ORRunningAverageChangedNotification = @"ORRunningAverageChangedNotific
 {
     tag=newTag;
 }
+- (int) pollTime
+{
+    return pollTime;
+}
+
+- (void) setPollTime:(int)aValue
+{
+    pollTime = aValue;
+}
 
 - (void) addNewValue:(float)aValue toIndex:(int)i
 {
     ORRunningAverage* ra         = [runningAverages objectAtIndex:i];
-    ORRunningAveSpike* aSpikeObj = [ra averageRate:aValue minSamples:windowLength triggerValue:triggerValue spikeType:triggerType];
+    ORRunningAveSpike* aSpikeObj = [ra calculateAverage:aValue minSamples:windowLength triggerValue:triggerValue spikeType:triggerType];
     if(aSpikeObj){
         NSDictionary* userInfo = [NSDictionary dictionaryWithObject:aSpikeObj forKey:@"SpikeObject"];
         [[NSNotificationCenter defaultCenter] postNotificationName:ORRunningAverageSpikeNotification object:self userInfo:userInfo];
     }
 }
 
-
-- (void) resetRates
+- (void) addValuesUsingTimer
 {
-    if(verbose)NSLog(@"ORRunningAverageGroup, - resetRates\n");
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(addValuesUsingTimer) object:nil];
+    
+    if(pollTime==0)         return;
+    if(!objectKeepingRate)  return;
+    
+    for(int idx=0; idx<[runningAverages count];idx++){
+        float rate = [objectKeepingRate getRate:idx];
+        [self addNewValue:rate toIndex:idx];
+    }
+    
+    [self performSelector:@selector(addValuesUsingTimer) withObject:nil afterDelay:pollTime];
+ }
 
-    [runningAverages makeObjectsPerformSelector:@selector(reset)];//what does this mean?
-    //[self setTotalRate:0];
+- (void) start:(id)obj pollTime:(int)aTime
+{
+    if(verbose)NSLog(@"ORRunningAverageGroup, - start, obj\n");
+    
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    [self setPollTime:aTime];
+    [self reset];
+    objectKeepingRate = obj;
+    
+    [self addValuesUsingTimer];
+    
+    //[self collectTimeRate];
+}
+- (void) stop
+{
+    if(verbose)NSLog(@"ORRunningAverageGroup, - stop\n");
+    
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    objectKeepingRate = nil;
+    [self resetCounters:0];
 }
 
 

@@ -543,7 +543,7 @@ NSString* ORMJDVacuumModelVacuumSpiked                     = @"ORMJDVacuumModelV
     
     [vacuumRunningAverages resetCounters:0];
     [vacuumRunningAverages setTriggerType:kRASpikeOnRatio];
-    [vacuumRunningAverages setTriggerValue:0.9]; //anything below 1 is for TEST TEST TEST, always trigger
+    [vacuumRunningAverages setTriggerValue:1.15]; //++++++++anything below 1 is for TEST since it will alway fire
     
     return self;
 }

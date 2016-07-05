@@ -88,6 +88,8 @@ typedef struct {
 - (NSString*)   vacSystemName;
 - (int)         module;
 - (NSString*)   moduleName;
+- (BOOL)        vacuumSpike;
+- (BOOL)        fillingLN;
 
 @property (assign) MajoranaModel*             delegate;
 @property (assign,nonatomic) BOOL             isRunning;

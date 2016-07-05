@@ -551,7 +551,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             if(breakDownPass == 0){
                 [self setState:kMJDInterlocks_CheckForBreakdown status:@"Checking..." color:normalColor];
                 [breakDownResult autorelease];
-                NSString* s = [delegate checkForBreakdown:[self module] fillingLN:fillingLN vacSystem:[self vacSystem] vacuumSpike:vacuumSpike];
+                NSString* s = [delegate checkForBreakdown:[self module] vacSystem:[self vacSystem] ];
                 breakDownResult = [s copy];
 
             }
@@ -570,6 +570,8 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
         [self performSelector:@selector(step) withObject:nil afterDelay:.3];
     }
 }
+- (BOOL)        vacuumSpike {return vacuumSpike;   }
+- (BOOL)        fillingLN   {return fillingLN;}
 
 - (void) addToReport:(NSString*)aString
 {
