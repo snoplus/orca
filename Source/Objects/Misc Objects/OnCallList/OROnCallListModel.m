@@ -579,24 +579,27 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
                 }
                 else if([anAddress rangeOfString:@"@Jabber"].location != NSNotFound){
                     NSArray* parts = [anAddress componentsSeparatedByString:@"@"];
-                    NSString* justNumber = [parts objectAtIndex:0];
-                    if([justNumber characterAtIndex:0] == '+')justNumber = [justNumber substringFromIndex:1];
-                    if([justNumber characterAtIndex:0] == '1')justNumber = [justNumber substringFromIndex:1];
-                    NSDictionary* errorDict;
-                    NSAppleEventDescriptor* returnDescriptor = NULL;
-                    
-                    NSString* template = [NSString stringWithFormat:@"\
-                                          tell application \"Messages\"\n\
-                                          send \"%@\" to buddy \"%@\" of (service 1 whose service type is Jabber)\n\
-                                          end tell\n", s,justNumber];
-                    
-                    NSAppleScript* scriptObject = [[NSAppleScript alloc] initWithSource:template ];
-                    
-                    returnDescriptor = [scriptObject executeAndReturnError: &errorDict];
-                    [scriptObject release];
-                    
-                    if (returnDescriptor == NULL){ // failed execution
-                        NSLog(@"Attempt to send message to %@ Failed with error: %@\n",anAddress,errorDict);
+                    if([parts count]>2){
+                        NSString* justNumber = [parts objectAtIndex:1];
+                        NSDictionary* errorDict;
+                        NSAppleEventDescriptor* returnDescriptor = NULL;
+                        
+                        NSString* template = [NSString stringWithFormat:@"\
+                                              tell application \"Messages\"\n\
+                                              send \"%@\" to buddy \"%@\" of (service 1 whose service type is Jabber)\n\
+                                              end tell\n", s,justNumber];
+                        
+                        NSAppleScript* scriptObject = [[NSAppleScript alloc] initWithSource:template ];
+                        
+                        returnDescriptor = [scriptObject executeAndReturnError: &errorDict];
+                        [scriptObject release];
+                        
+                        if (returnDescriptor == NULL){ // failed execution
+                            NSLog(@"Attempt to send message to %@ Failed with error: %@\n",anAddress,errorDict);
+                        }
+                    }
+                    else {
+                        NSLog(@"OnCall list: %@ not formated correctly. Format = \"phoneNumber@username@Jabber\"",anAddress);
                     }
                 }
                 else {
