@@ -180,6 +180,7 @@
 
 - (IBAction) calibrationLockAction:(id)sender;
 - (void)     confirmCloseGateValve:(int)index;
+- (IBAction) printBreakdownReport:(id)sender;
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem;
 

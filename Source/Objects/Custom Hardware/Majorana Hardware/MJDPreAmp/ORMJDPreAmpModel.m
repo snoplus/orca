@@ -1377,7 +1377,7 @@ struct {
     
     [baselineRunningAverages resetCounters:0];
     [baselineRunningAverages setVerbose:false];
-    [baselineRunningAverages setTriggerValue:0.5];
+    [baselineRunningAverages setTriggerValue:1.5];
     [baselineRunningAverages setTriggerType:kRASpikeOnThreshold];
     
     [self registerNotificationObservers];

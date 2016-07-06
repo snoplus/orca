@@ -78,9 +78,11 @@
 - (void) rampDownHV:(int)aCrate vac:(int)aVacSystem;
 - (NSString*) checkForBreakdown:(int)aCrate vacSystem:(int)aVacSystem;
 - (void) setupBreakDownDictionary;
+- (NSDictionary*)breakDownDictionary;
 - (NSDictionary*) rateSpikes;
 - (NSDictionary*) baselineSpikes;
 - (BOOL) breakdownAlarmPosted:(int)alarmIndex;
+- (NSString*) breakdownReportFor:(NSDictionary*)detectorEntry;
 
 - (id) mjdInterlocks:(int)index;
 - (void) runStarted:(NSNotification*) aNote;
@@ -96,11 +98,10 @@
 - (void) baselineSpike:(NSNotification*) aNote;
 - (BOOL) breakdownConditionsMet:(id)aDetector;
 - (void) rampDownChannelsWithBreakdown:(int)module vac:(int)aVacSystem;
-- (BOOL) rateSpikeDetected:(int)module;
-- (BOOL) baselineJumpDetected:(int)module;
 - (void) forceConstraintCheck;
 - (BOOL) vacuumSpike:(int)i;
 - (BOOL) fillingLN:(int)i;
+- (void) printBreakdownReport;
 
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups;

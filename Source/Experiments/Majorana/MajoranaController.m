@@ -61,7 +61,7 @@
 {
 	detectorSize		 = NSMakeSize(770,770);
 	detailsSize			 = NSMakeSize(560,600);
-	subComponentViewSize = NSMakeSize(580,600);
+	subComponentViewSize = NSMakeSize(590,600);
 	detectorMapViewSize	 = NSMakeSize(900,760);
     vetoMapViewSize		 = NSMakeSize(580,565);
     calibrationViewSize	 = NSMakeSize(580,320);
@@ -419,7 +419,6 @@
 
 - (void) breakdownDetectedChanged:(NSNotification*)aNote
 {
-    //update M1
     NSDictionary* rateSpikes     = [model rateSpikes];
     if([rateSpikes count]==0){
         [rate1BiState setState:1];
@@ -876,6 +875,11 @@
             [[model segmentGroup:1] saveMapFileAs:[[savePanel URL]path]];
         }
     }];
+}
+
+- (IBAction) printBreakdownReport:(id)sender
+{
+    [model printBreakdownReport];
 }
 
 #pragma mark ¥¥¥Table Data Source

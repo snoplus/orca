@@ -994,7 +994,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" id="ETz-xJ-kRP">
-                                            <rect key="frame" x="303" y="549" width="21" height="14"/>
+                                            <rect key="frame" x="303" y="558" width="21" height="14"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="right" title="M1" id="0sk-r3-Wlq">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -1003,7 +1003,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" id="B4r-N6-Mo4">
-                                            <rect key="frame" x="329" y="556" width="238" height="28"/>
+                                            <rect key="frame" x="329" y="565" width="238" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="left" title="Rate   Baselines  Vac    Filling     Breakdown" id="OHt-bc-lL1">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -1306,19 +1306,19 @@
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         </customView>
                                         <customView id="6TY-hD-yF9" customClass="BiStateView">
-                                            <rect key="frame" x="343" y="548" width="16" height="16"/>
+                                            <rect key="frame" x="343" y="557" width="16" height="16"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         </customView>
                                         <customView id="Osb-V0-QJQ" customClass="BiStateView">
-                                            <rect key="frame" x="384" y="548" width="16" height="16"/>
+                                            <rect key="frame" x="384" y="557" width="16" height="16"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         </customView>
                                         <customView id="gC8-Sr-4zf" customClass="BiStateView">
-                                            <rect key="frame" x="425" y="548" width="16" height="16"/>
+                                            <rect key="frame" x="425" y="557" width="16" height="16"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         </customView>
                                         <textField verticalHuggingPriority="750" id="Mmh-L7-9XS">
-                                            <rect key="frame" x="304" y="524" width="21" height="14"/>
+                                            <rect key="frame" x="304" y="533" width="21" height="14"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="right" title="M2" id="o6u-Op-n3L">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -1327,15 +1327,15 @@
                                             </textFieldCell>
                                         </textField>
                                         <customView id="4sD-hj-FKd" customClass="BiStateView">
-                                            <rect key="frame" x="343" y="523" width="16" height="16"/>
+                                            <rect key="frame" x="343" y="532" width="16" height="16"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         </customView>
                                         <customView id="P4o-mn-cWu" customClass="BiStateView">
-                                            <rect key="frame" x="385" y="524" width="16" height="15"/>
+                                            <rect key="frame" x="385" y="533" width="16" height="15"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         </customView>
                                         <customView id="kZJ-Qj-HFp" customClass="BiStateView">
-                                            <rect key="frame" x="426" y="523" width="16" height="16"/>
+                                            <rect key="frame" x="426" y="532" width="16" height="16"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         </customView>
                                         <textField verticalHuggingPriority="750" id="1eb-10-UCk">
@@ -1357,7 +1357,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" id="530-PD-H7v">
-                                            <rect key="frame" x="502" y="549" width="43" height="14"/>
+                                            <rect key="frame" x="502" y="558" width="43" height="14"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="--" id="xKP-da-Tlr">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -1366,7 +1366,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" id="C05-o3-h8R">
-                                            <rect key="frame" x="447" y="549" width="43" height="14"/>
+                                            <rect key="frame" x="447" y="558" width="43" height="14"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="--" id="mMa-rO-tdX">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -1375,7 +1375,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" id="Gfu-3Y-7qc">
-                                            <rect key="frame" x="447" y="524" width="43" height="14"/>
+                                            <rect key="frame" x="447" y="533" width="43" height="14"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="--" id="XBv-ms-g9c">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -1384,7 +1384,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" id="uip-ce-gJe">
-                                            <rect key="frame" x="502" y="524" width="43" height="14"/>
+                                            <rect key="frame" x="502" y="533" width="43" height="14"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="--" id="Qcl-hj-ERu">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -1393,14 +1393,14 @@
                                             </textFieldCell>
                                         </textField>
                                         <box verticalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="gJ1-eE-v9R">
-                                            <rect key="frame" x="290" y="608" width="275" height="5"/>
+                                            <rect key="frame" x="290" y="617" width="275" height="5"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                             <font key="titleFont" metaFont="system"/>
                                         </box>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="UgX-32-BIf">
-                                            <rect key="frame" x="304" y="589" width="247" height="18"/>
+                                            <rect key="frame" x="304" y="598" width="247" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Breakdown Detection" id="0hC-el-C5u">
                                                 <font key="font" size="14" name=".AppleSystemUIFont"/>
@@ -1409,12 +1409,23 @@
                                             </textFieldCell>
                                         </textField>
                                         <box verticalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="zsg-bI-EEH">
-                                            <rect key="frame" x="27" y="509" width="538" height="5"/>
+                                            <rect key="frame" x="27" y="499" width="538" height="5"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                             <font key="titleFont" metaFont="system"/>
                                         </box>
+                                        <button verticalHuggingPriority="750" id="N5p-IU-FaX">
+                                            <rect key="frame" x="450" y="509" width="115" height="17"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="roundTextured" title="Print Breakdown Report" bezelStyle="texturedRounded" alignment="center" controlSize="mini" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="vPa-XZ-YPc">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="miniSystem"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="printBreakdownReport:" target="-2" id="sRC-JF-Hbg"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                 </view>
                             </tabViewItem>

@@ -313,7 +313,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                     }
                     if(baseLineEntry && ![detectorEntry objectForKey:@"baselineInfo"]){
                         [detectorEntry setObject:baseLineEntry forKey:@"baselineInfo"];
-                        [breakDownDictionary setObject:@"YES" forKey:@"changed"];
+                       [breakDownDictionary setObject:@"YES" forKey:@"changed"];
                     }
                     
                     [detectorEntry setObject:stringName                          forKey:@"stringName"];
@@ -339,7 +339,23 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
             }
         }
     }
-    else {
+    if(!rateSpikes){
+        //no ratespikes exist.. remove spikes from all detectors
+        NSMutableDictionary* detectorEntries = [breakDownDictionary objectForKey:@"detectorEntries"];
+        for(id aKey in detectorEntries){
+            NSMutableDictionary* anEntry = [detectorEntries objectForKey:aKey];
+            [anEntry removeObjectForKey:@"rateInfo"];
+        }
+    }
+    if(!baselineSpikes){
+        //no baselineSpikes exist.. remove spikes from all detectors
+        NSMutableDictionary* detectorEntries = [breakDownDictionary objectForKey:@"detectorEntries"];
+        for(id aKey in detectorEntries){
+            NSMutableDictionary* anEntry = [detectorEntries objectForKey:aKey];
+            [anEntry removeObjectForKey:@"baselineInfo"];
+       }
+    }
+    if(!rateSpikes && !baselineSpikes){
         [breakDownDictionary release];
         breakDownDictionary = nil;
     }
@@ -368,35 +384,10 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         NSMutableString* report = [NSMutableString stringWithString:@""];
         NSDictionary* detectorEntries = [breakDownDictionary objectForKey:@"detectorEntries"];
         BOOL concerns = NO;
-        for(id aDetector in [detectorEntries allKeys]){
-            if([self breakdownConditionsMet:aDetector]){
-                
-                NSMutableDictionary* detectorEntry   = [detectorEntries objectForKey:aDetector];
-                ORRunningAveSpike* rateInfo         = [detectorEntry objectForKey:@"rateInfo"];
-                ORRunningAveSpike* baselineInfo     = [detectorEntry objectForKey:@"baselineInfo"];
-                
-                NSString* crate         = [detectorEntry objectForKey:@"crate"];
-                NSString* card          = [detectorEntry objectForKey:@"card"];
-                NSString* chan          = [detectorEntry objectForKey:@"chan"];
-                NSString* preAmpDig     = [detectorEntry objectForKey:@"preAmpDig"];
-                NSString* preAmpChan    = [detectorEntry objectForKey:@"preAmpChan"];
-
-                NSString* stringName    = [detectorEntry objectForKey:@"stringName"];
-                NSString* detectorName  = [detectorEntry objectForKey:@"detectorName"];
-              
-                if(rateInfo){
-                    [report appendFormat:@"\nRate Spike on %@ string: %@\n",detectorName,stringName];
-                    [report appendFormat:@"Digitizer Crate: %@ Card: %@ Chan: %@\n",crate,card,chan];
-                    [report appendFormat:@"Spike detected at: %@\n",[[rateInfo timeOfSpike]stdDescription]];
-                    [report appendFormat:@"Ave Rate: %.3f  Spike Rate: %.3f\n",rateInfo.ave,rateInfo.spikeValue];
-                }
-                
-                if(baselineInfo){
-                    [report appendFormat:@"\nBaseline jump on %@ string: %@\n",detectorName,stringName];
-                    [report appendFormat:@"Crate: %@ PreAmp Digitizer: %@ PreAmp Chan: %@\n",crate,preAmpDig,preAmpChan];
-                    [report appendFormat:@"Jump detected at: %@\n",[[baselineInfo timeOfSpike]stdDescription]];
-                    [report appendFormat:@"Ave Voltage: %.3f Voltage Change: %.3f\n",baselineInfo.ave,baselineInfo.spikeValue];
-                }
+        for(id aDetectorKey in [detectorEntries allKeys]){
+            if([self breakdownConditionsMet:aDetectorKey]){
+                NSDictionary* detectorEntry   = [detectorEntries objectForKey:aDetectorKey];
+                [report appendString:[self breakdownReportFor:detectorEntry]];
                 concerns = YES;
             }
         }
@@ -423,7 +414,9 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                     NSLogColor([NSColor redColor], @"HV should be ramped down on Module %d because Vac %c spiked and event rate spiked and baseline jumped.\n",aCrate,
                                'A'+aVacSystem);
                     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORMajoranaModelUpdateSpikeDisplay" object:self];
-
+                    
+                    BOOL vacSpike  = [[self mjdInterlocks:alarmIndex] vacuumSpike];
+                    if(!vacSpike) NSLogColor([NSColor redColor],@"HV Rampdown will NOT occur on Module %d because there is NO vacuum spike on Vac %c\n",aCrate,'A'+aVacSystem);
                 }
             }
         }
@@ -445,6 +438,52 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     else                            return @"No Issues";
 }
 
+- (void) printBreakdownReport
+{
+    NSMutableString* report = [NSMutableString stringWithString:@""];
+    NSDictionary* detectorEntries = [breakDownDictionary objectForKey:@"detectorEntries"];
+    for(id aDetectorKey in [detectorEntries allKeys]){
+        NSDictionary* detectorEntry   = [detectorEntries objectForKey:aDetectorKey];
+        [report appendString:[self breakdownReportFor:detectorEntry]];
+    }
+    if([report length]){
+        NSLog(@"%@\n",report);
+    }
+    else NSLog(@"No breakdown issues to report\n");
+}
+
+- (NSString*) breakdownReportFor:(NSDictionary*)detectorEntry
+{
+    NSMutableString* report = [NSMutableString stringWithString:@""];
+    
+    ORRunningAveSpike* rateInfo         = [detectorEntry objectForKey:@"rateInfo"];
+    ORRunningAveSpike* baselineInfo     = [detectorEntry objectForKey:@"baselineInfo"];
+    
+    NSString* crate         = [detectorEntry objectForKey:@"crate"];
+    NSString* card          = [detectorEntry objectForKey:@"card"];
+    NSString* chan          = [detectorEntry objectForKey:@"chan"];
+    NSString* preAmpDig     = [detectorEntry objectForKey:@"preAmpDig"];
+    NSString* preAmpChan    = [detectorEntry objectForKey:@"preAmpChan"];
+    
+    NSString* stringName    = [detectorEntry objectForKey:@"stringName"];
+    NSString* detectorName  = [detectorEntry objectForKey:@"detectorName"];
+    
+    if(rateInfo){
+        [report appendFormat:@"\nRate Spike on %@ string: %@\n",detectorName,stringName];
+        [report appendFormat:@"Digitizer Crate: %@ Card: %@ Chan: %@\n",crate,card,chan];
+        [report appendFormat:@"Spike detected at: %@\n",[[rateInfo timeOfSpike]stdDescription]];
+        [report appendFormat:@"Ave Rate: %.3f  Spike Rate: %.3f\n",rateInfo.ave,rateInfo.spikeValue];
+    }
+    
+    if(baselineInfo){
+        [report appendFormat:@"\nBaseline jump on %@ string: %@\n",detectorName,stringName];
+        [report appendFormat:@"Crate: %@ PreAmp Digitizer: %@ PreAmp Chan: %@\n",crate,preAmpDig,preAmpChan];
+        [report appendFormat:@"Jump detected at: %@\n",[[baselineInfo timeOfSpike]stdDescription]];
+        [report appendFormat:@"Ave Voltage: %.3f Voltage Change: %.3f\n",baselineInfo.ave,baselineInfo.spikeValue];
+    }
+    return report;
+}
+
 - (BOOL) breakdownAlarmPosted:(int)alarmIndex
 {
     if(alarmIndex>=0 && alarmIndex<2)return [breakdownAlarm[alarmIndex] isPosted];
@@ -458,6 +497,9 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         [breakDownDictionary setObject:[NSMutableDictionary dictionary] forKey:@"detectorEntries"];
     }
 }
+
+- (NSDictionary*)breakDownDictionary { return breakDownDictionary; }
+
 - (BOOL) vacuumSpike:(int)i
 {
     if(i>=0 && i<2)return[[self mjdInterlocks:i] vacuumSpike];
@@ -469,35 +511,37 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     else return NO;
 }
 
-- (BOOL) breakdownConditionsMet:(id)aDetector
+- (BOOL) breakdownConditionsMet:(id)aDetectorKey
 {
     NSDictionary* detectorEntries = [breakDownDictionary objectForKey:@"detectorEntries"];
-    NSMutableDictionary* anEntry = [detectorEntries objectForKey:aDetector];
+    NSMutableDictionary* anEntry = [detectorEntries objectForKey:aDetectorKey];
     ORRunningAveSpike* rateInfo     = [anEntry objectForKey:@"rateInfo"];
     ORRunningAveSpike* baselineInfo = [anEntry objectForKey:@"baselineInfo"];
     
     int crate = [[anEntry objectForKey:@"crate"] intValue];
     BOOL fillingLN = NO;
-    BOOL vacSpike = NO;
     if(crate>=1 && crate<=2){
         fillingLN = [[self mjdInterlocks:crate-1] fillingLN];
-        vacSpike  = [[self mjdInterlocks:crate-1] vacuumSpike];
     }
-    return (rateInfo && baselineInfo && vacSpike && !fillingLN);
+    return (rateInfo && baselineInfo && !fillingLN);
 }
 
 - (void) rampDownChannelsWithBreakdown:(int)aCrate vac:(int)aVacSystem
 {
     if(aVacSystem==0 && ignorePanicOnA)return;
     if(aVacSystem==1 && ignorePanicOnB)return;
+    
 
     //use the breakDownDictionary to determine which HV to panic
     int alarmIndex = aCrate-1;
+    BOOL vacSpike  = [[self mjdInterlocks:alarmIndex] vacuumSpike];
+    if(!vacSpike) return;
+    
     if(![breakdownAlarm[alarmIndex] acknowledged] && [breakdownAlarm[alarmIndex] timeSincePosted] >= 20*60){
         //OK, we know something has breakdown or there wouldn't be an alarm. Figure out which one(s) to ramp
-        for(id aDetector in breakDownDictionary){
-            if([self breakdownConditionsMet:aDetector]){
-                NSMutableDictionary* anEntry = [breakDownDictionary objectForKey:aDetector];
+        for(id aDetectorKey in breakDownDictionary){
+            if([self breakdownConditionsMet:aDetectorKey]){
+                NSMutableDictionary* anEntry = [breakDownDictionary objectForKey:aDetectorKey];
                 int hvCrate             = [[anEntry objectForKey:@"hvCrate"]    intValue];
                 int hvCard              = [[anEntry objectForKey:@"hvCard"]     intValue];
                 int hvChannel           = [[anEntry objectForKey:@"hvChannel"]  intValue];
@@ -529,22 +573,28 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                       [dic objectForKey:@"card"],
                       [dic objectForKey:@"channel"]];
     BOOL spiked = [spikeInfo spiked];
+    BOOL changed = NO;
     if(spiked){
         if(![rateSpikes objectForKey:aKey]){
             if(!rateSpikes)rateSpikes = [[NSMutableDictionary dictionary] retain];
             [rateSpikes setObject:dic forKey:aKey];
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"ORMajoranaModelUpdateSpikeDisplay" object:self];
+            changed = YES;
         }
     }
     else {
-        [rateSpikes removeObjectForKey:aKey];
-        if([[rateSpikes allKeys] count] == 0){
-            [rateSpikes release];
-            rateSpikes = nil;
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"ORMajoranaModelUpdateSpikeDisplay" object:self];
+        if([rateSpikes objectForKey:aKey]){
+            [rateSpikes removeObjectForKey:aKey];
+           if([[rateSpikes allKeys] count] == 0){
+                [rateSpikes release];
+                rateSpikes = nil;
+            }
+            changed = YES;
         }
     }
-    [self logBreakdowns:[dic objectForKey:@"crate"]];
+    if(changed){
+        [self logBreakdowns:[[dic objectForKey:@"crate"]intValue]];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"ORMajoranaModelUpdateSpikeDisplay" object:self];
+    }
 }
 
 - (void) baselineSpike:(NSNotification*) aNote
@@ -557,22 +607,28 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                       [dic objectForKey:@"card"],
                       [dic objectForKey:@"channel"]];
     BOOL spiked = [spikeInfo spiked];
+    BOOL changed = NO;
     if(spiked){
         if(![baselineSpikes objectForKey:aKey]){
             if(!baselineSpikes)baselineSpikes = [[NSMutableDictionary dictionary] retain];
             [baselineSpikes setObject:dic forKey:aKey];
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"ORMajoranaModelUpdateSpikeDisplay" object:self];
+            changed = YES;
         }
     }
     else {
-        [baselineSpikes removeObjectForKey:aKey];
-        if([[baselineSpikes allKeys] count] == 0){
-            [baselineSpikes release];
-            baselineSpikes = nil;
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"ORMajoranaModelUpdateSpikeDisplay" object:self];
+        if([baselineSpikes objectForKey:aKey]){
+            [baselineSpikes removeObjectForKey:aKey];
+            if([[baselineSpikes allKeys] count] == 0){
+                [baselineSpikes release];
+                baselineSpikes = nil;
+            }
+            changed = YES;
         }
     }
-    [self logBreakdowns:[[dic objectForKey:@"crate"]intValue]];
+    if(changed){
+        [self logBreakdowns:[[dic objectForKey:@"crate"]intValue]];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"ORMajoranaModelUpdateSpikeDisplay" object:self];
+    }
 }
 
 - (NSDictionary*) rateSpikes
