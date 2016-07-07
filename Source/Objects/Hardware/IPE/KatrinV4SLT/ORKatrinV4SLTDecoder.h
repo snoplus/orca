@@ -31,6 +31,12 @@
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 @end
 
+@interface ORKatrinV4SLTDecoderForEnergy : ORIpeCardDecoder {
+}
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
+@end
+
 
 @interface ORKatrinV4SLTDecoderForEvent : ORIpeCardDecoder {
 }

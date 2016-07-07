@@ -70,7 +70,9 @@
 
 - (NSRange) legalSlotsForObj:(id)anObj
 {
-	if( [anObj isKindOfClass:NSClassFromString(@"ORIpeV4SLTModel")] || [anObj isKindOfClass:NSClassFromString(@"OREdelweissSLTModel")] ){
+	if(    [anObj isKindOfClass:NSClassFromString(@"ORIpeV4SLTModel")]
+        || [anObj isKindOfClass:NSClassFromString(@"OREdelweissSLTModel")]
+        || [anObj isKindOfClass:NSClassFromString(@"ORKatrinV4SLTModel")] ){
 		return NSMakeRange(2,1);
 	}
 	else {
@@ -80,7 +82,12 @@
 
 - (BOOL) slot:(int)aSlot excludedFor:(id)anObj 
 { 
-	if( !([anObj isKindOfClass:NSClassFromString(@"ORIpeV4SLTModel")]  || [anObj isKindOfClass:NSClassFromString(@"OREdelweissSLTModel")]  )    && (aSlot==2) ){
+	if( !(   [anObj isKindOfClass:NSClassFromString(@"ORIpeV4SLTModel")]
+          || [anObj isKindOfClass:NSClassFromString(@"OREdelweissSLTModel")]
+          || [anObj isKindOfClass:NSClassFromString(@"ORKatrinV4SLTModel")]
+          )
+           && (aSlot==2)
+       ){
 		return YES;
 	}
 	else return NO;

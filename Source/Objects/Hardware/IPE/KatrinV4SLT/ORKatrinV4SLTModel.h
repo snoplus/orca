@@ -285,6 +285,7 @@ static IpeRegisterNamesStruct regKatrinSLTV4[kKatrinV4SLTNumRegs] = {
 		unsigned long	eventDataId;
 		unsigned long	multiplicityId;
 		unsigned long	eventFifoId;
+		unsigned long	energyId;
 		unsigned long   eventCounter;
 		int				actualPageIndex;
         TimedWorker*    poller;
@@ -499,6 +500,8 @@ static IpeRegisterNamesStruct regKatrinSLTV4[kKatrinV4SLTNumRegs] = {
 - (void) setMultiplicityId: (unsigned long) DataId;
 - (unsigned long) eventFifoId;
 - (void) setEventFifoId: (unsigned long) DataId;
+- (unsigned long) energyId;
+- (void) setEnergyId: (unsigned long) DataId;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherCard;
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;

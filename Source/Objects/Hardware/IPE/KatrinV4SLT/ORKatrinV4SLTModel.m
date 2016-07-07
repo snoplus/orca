@@ -1803,7 +1803,16 @@ return;
 				   [NSNumber numberWithLong:-1],			    @"length",
 				   nil];
 	
-    [dataDictionary setObject:aDictionary forKey:@"KatrinV4SLTMultiplicity"];
+    [dataDictionary setObject:aDictionary forKey:@"KatrinV4SLTEventFifo"];
+    
+    aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+				   @"ORKatrinV4SLTDecoderForEnergy",			@"decoder",
+				   [NSNumber numberWithLong:energyId],          @"dataId",
+				   [NSNumber numberWithBool:YES],				@"variable",
+				   [NSNumber numberWithLong:-1],			    @"length",
+				   nil];
+	
+    [dataDictionary setObject:aDictionary forKey:@"KatrinV4SLTEnergy"];
     
     return dataDictionary;
 }
@@ -1815,18 +1824,23 @@ return;
 - (void) setMultiplicityId: (unsigned long) aDataId { multiplicityId = aDataId; }
 - (void) setEventFifoId: (unsigned long) aDataId { eventFifoId = aDataId; }
 
+- (unsigned long) energyId        { return energyId; }
+- (void) setEnergyId: (unsigned long) aDataId { energyId = aDataId; }
+
 - (void) setDataIds:(id)assigner
 {
     eventDataId     = [assigner assignDataIds:kLongForm];
     multiplicityId  = [assigner assignDataIds:kLongForm];
     eventFifoId     = [assigner assignDataIds:kLongForm];
+    energyId        = [assigner assignDataIds:kLongForm];
 }
 
 - (void) syncDataIdsWith:(id)anotherCard
 {
-    [self setEventDataId:[anotherCard eventDataId]];
+    [self setEventDataId:   [anotherCard eventDataId]];
     [self setMultiplicityId:[anotherCard multiplicityId]];
-    [self setEventFifoId:[anotherCard eventFifoId]];
+    [self setEventFifoId:   [anotherCard eventFifoId]];
+    [self setEnergyId:      [anotherCard energyId]];
 }
 
 //this goes to the Run header ...
@@ -2318,6 +2332,7 @@ return;
 	configStruct->card_info[index].hw_mask[0] 	= eventDataId;
 	configStruct->card_info[index].hw_mask[1] 	= multiplicityId;
 	configStruct->card_info[index].hw_mask[2] 	= eventFifoId;
+	configStruct->card_info[index].hw_mask[3] 	= energyId;
 	configStruct->card_info[index].slot			= [self stationNumber];
 	configStruct->card_info[index].crate		= [self crateNumber];
 	configStruct->card_info[index].add_mod		= 0;		//not needed for this HW

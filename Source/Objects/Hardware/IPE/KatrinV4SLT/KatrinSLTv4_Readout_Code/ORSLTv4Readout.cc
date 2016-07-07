@@ -36,6 +36,8 @@ extern Pbus* pbus;
 
 bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
 {
+
+         
 	uint32_t f1,f2,f3,f4,recordLength   = 4 ; 
 	uint32_t fifoReadoutBuffer32[8192]; 
 	uint32_t fifoReadoutBuffer32Len=0; 
@@ -43,6 +45,7 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
     
     //init
     uint32_t eventFifoId = GetHardwareMask()[2];
+    uint32_t energyId = GetHardwareMask()[3];
     uint32_t secondsSetSendToFLTs = GetDeviceSpecificData()[0];
     uint32_t runFlags   = GetDeviceSpecificData()[3];//this is runFlagsMask of ORKatrinV4FLTModel.m, load_HW_Config_Structure:index:
     uint32_t sltRevision = GetDeviceSpecificData()[6];
@@ -59,6 +62,7 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
     
     
                 if(runFlags & kFirstTimeFlag){// firstTime   
+                    fprintf(stdout, "KatrinSLTv4Readout called ... fast event readout using SLT buffer ... tbtb\n");
                     GetDeviceSpecificData()[3]=GetDeviceSpecificData()[3] & ~(kFirstTimeFlag);// runFlags is GetDeviceSpecificData()[3], so this clears the 'first time' flag -tb-
     GetDeviceSpecificData()[3]=0;//TODO: for testing -tb-
                
@@ -109,12 +113,13 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
 #endif
 
 
-    if(sltRevision>=0x3010003){//we have SLT event FIFO since this revision -> read FIFO
+    if(sltRevision==0x3010003){//we have SLT event FIFO since this revision -> read FIFO (one event = 4 words)
+        //DEBUG   fprintf(stdout, "sltRevision>=0x3010003\n");
         //block FIFO readout
         //has FIFO data?
         fifomode=pbus->read(FIFO0ModeReg);
         fifoavail=fifomode & 0x3fffff;
-        fifoReadoutBuffer32Len=fifoavail; 
+        fifoReadoutBuffer32Len=fifoavail;
         if(fifoReadoutBuffer32Len>8192) fifoReadoutBuffer32Len=8192;
         //testing if(fifoReadoutBuffer32Len>800) fifoReadoutBuffer32Len=800;
         if(fifoReadoutBuffer32Len % 4) fifoReadoutBuffer32Len = (fifoReadoutBuffer32Len>>2)<<2;//always read multiple of 4 word32s
@@ -128,8 +133,8 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
                 pbus->readBlock(FIFO0Addr, (unsigned long *) fifoReadoutBuffer32, fifoReadoutBuffer32Len);//read 2048 word32s
             }
             recordLength = fifoReadoutBuffer32Len+4;
-            ensureDataCanHold(recordLength); 
-            data[dataIndex++] = eventFifoId | recordLength;    
+            ensureDataCanHold(recordLength);
+            data[dataIndex++] = eventFifoId | recordLength;
             data[dataIndex++] = location  ;
             data[dataIndex++] = fifomode; //spare
             data[dataIndex++] = 0; //spare
@@ -142,8 +147,46 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
         }
         
     }
-                
-     
+    
+    
+    if(sltRevision>=0x3010004){//we have SLT event FIFO since last revision -> read FIFO (one event = 6 words)
+        //DEBUG   fprintf(stdout, "sltRevision>=0x3010003\n");
+        //block FIFO readout
+        //has FIFO data?
+        fifomode=pbus->read(FIFO0ModeReg);
+        fifoavail=fifomode & 0x3fffff;
+        fifoReadoutBuffer32Len=fifoavail;
+        if(fifoReadoutBuffer32Len>8192) fifoReadoutBuffer32Len=8192;
+        //testing if(fifoReadoutBuffer32Len>800) fifoReadoutBuffer32Len=800;
+        //if(fifoReadoutBuffer32Len % 4) fifoReadoutBuffer32Len = (fifoReadoutBuffer32Len>>2)<<2;//always read multiple of 4 word32s
+//DEBUG quick test: read always 6 words in single access mode ... -tb-
+    if(fifoReadoutBuffer32Len >= 6) fifoReadoutBuffer32Len = 6; else fifoReadoutBuffer32Len = 0;
+        if(fifoReadoutBuffer32Len>0){
+            if(fifoReadoutBuffer32Len<48){  //if there are more than 48 words, use blockread; blockread should read multiple of 8 words
+                for(i=0;i<fifoReadoutBuffer32Len; i++){
+                    fifoReadoutBuffer32[i]=pbus->read(FIFO0Addr);
+                }
+            }else{                          //there are more than 48 words -> use DMA
+                fifoReadoutBuffer32Len = (fifoReadoutBuffer32Len>>3)<<3;//always read multiple of 8 word32s
+                pbus->readBlock(FIFO0Addr, (unsigned long *) fifoReadoutBuffer32, fifoReadoutBuffer32Len);//read 2048 word32s
+            }
+            recordLength = fifoReadoutBuffer32Len+4;
+            ensureDataCanHold(recordLength);
+            data[dataIndex++] = energyId | recordLength;
+            data[dataIndex++] = location  ;
+            data[dataIndex++] = fifomode; //spare
+            data[dataIndex++] = 0; //spare
+            for(i=0;i<fifoReadoutBuffer32Len; i++){
+                data[dataIndex++] = fifoReadoutBuffer32[i];
+            }
+            
+        }else{
+            //usleep(1);
+        }
+        
+    }
+    
+    
     
     
     

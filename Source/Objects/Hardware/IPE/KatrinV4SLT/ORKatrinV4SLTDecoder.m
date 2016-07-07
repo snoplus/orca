@@ -121,25 +121,25 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
 
 //-------------------------------------------------------------
 /** Data format for event:
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
-^^^^ ^^^^ ^^^^ ^^-----------------------data id
-                 ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
-
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
-^^^^ ^^^--------------------------------spare
-        ^ ^^^---------------------------crate
-             ^ ^^^^---------------------card
-					^^^^ ^^^^-----------spare
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx Spare 1
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx Spare 2
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx EventFifo 1
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx EventFifo 2
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx EventFifo 3
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx EventFifo 4
-and optionally more blocks consisting of 4 word32s, containing EventFifo 1...4,
-max. number of blocks: 8192 (which is the max. DMA readout block) -tb-
-
-**/
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+ ^^^^ ^^^^ ^^^^ ^^-----------------------data id
+ ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
+ 
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+ ^^^^ ^^^--------------------------------spare
+ ^ ^^^---------------------------crate
+ ^ ^^^^---------------------card
+ ^^^^ ^^^^-----------spare
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx Spare 1
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx Spare 2
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx EventFifo 1
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx EventFifo 2
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx EventFifo 3
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx EventFifo 4
+ and optionally more blocks consisting of 4 word32s, containing EventFifo 1...4,
+ max. number of blocks: 8192 (which is the max. DMA readout block) -tb-
+ 
+ **/
 //-------------------------------------------------------------
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
@@ -149,16 +149,16 @@ max. number of blocks: 8192 (which is the max. DMA readout block) -tb-
 	[aDataSet loadGenericData:@" " sender:self withKeys:@"v4SLT",@"Event Fifo Records",nil];
     
     /*
-    //for debugging/testing -tb-
-    int i=0;
-    
-    NSLog(@"EventFifoRecordLen: %i\n",length);
-    int showMax=length;
-    if(showMax>12){showMax=12;}
-        for(i=2;i<showMax; i++){
-            NSLog(@"word %i: 0x%08x\n",i,*(ptr+i));
-        }
-    */
+     //for debugging/testing -tb-
+     int i=0;
+     
+     NSLog(@"EventFifoRecordLen: %i\n",length);
+     int showMax=length;
+     if(showMax>12){showMax=12;}
+     for(i=2;i<showMax; i++){
+     NSLog(@"word %i: 0x%08x\n",i,*(ptr+i));
+     }
+     */
     
     
     return length; //nothing to display at this time.. just return the length
@@ -166,12 +166,12 @@ max. number of blocks: 8192 (which is the max. DMA readout block) -tb-
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
-
+    
 	NSString* title= @"Ipe SLTv4 Event FIFO Record\n\n";
     unsigned long numEv,numCrate,numCard;
     numEv=((*ptr) & 0x3ffff)/4-1;
     NSString* content=[NSString stringWithFormat:@"Num.Eevents= %lu\n",((*ptr) & 0x3ffff)/4-1];
-
+    
     
 	++ptr;		//skip the first word (dataID and length)
     numCrate=(*ptr>>21) & 0xf;
@@ -189,6 +189,39 @@ max. number of blocks: 8192 (which is the max. DMA readout block) -tb-
     f3=ptr[2];
     f4=ptr[3];
     unsigned long flt,chan,energy,sec,subsec,multiplicity,p,toplen,ediff,evID;
+    flt   = (f1 >> 25) & 0x1f;
+    chan   = (f1 >> 20) & 0x1f;
+    energy  = f1  & 0xfffff;
+    sec = f2;
+    subsec = f3  & 0x1ffffff;
+    multiplicity  = (f3 >> 25) & 0x1f;
+    p  = (f3 >> 31) & 0x1;
+    toplen = f4  & 0x1ff;
+    ediff  = (f4 >> 9) & 0xfff;
+    evID   = (f4 >> 21) & 0x7ff;
+    
+#if 0
+    NSString* info1 = @"";
+    NSString* info2 = @"";
+#else
+    NSString* info1 = [NSString stringWithFormat:@"First event:\n"
+                       "FIFO entry:  flt: %lu,chan: %lu,energy: %lu,sec: %lu,subsec: %lu   \n",flt,chan,energy,sec,subsec ];//DEBUG -tb-
+    NSString* info2 = [NSString stringWithFormat:@"FIFO entry:  multiplicity: %lu,p: %lu,toplen: %lu,ediff: %lu,evID: %lu   \n",
+                       multiplicity,p,toplen,ediff,evID ];//DEBUG -tb-
+#endif
+    
+    
+#if 1
+    //draw full content on debugger console - for DEBUGGING -tb-
+    fprintf(stdout,"Event Record for crate %li, card/FLT %li contains %li events:\n",numCrate,numCard,numEv);
+    int i;
+    for(i=0;i<numEv;i++){
+        unsigned long f1,f2,f3,f4;
+        f1=eventPtr[0];
+        f2=eventPtr[1];
+        f3=eventPtr[2];
+        f4=eventPtr[3];
+        unsigned long flt,chan,energy,sec,subsec,multiplicity,p,toplen,ediff,evID;
         flt   = (f1 >> 25) & 0x1f;
         chan   = (f1 >> 20) & 0x1f;
         energy  = f1  & 0xfffff;
@@ -200,87 +233,253 @@ max. number of blocks: 8192 (which is the max. DMA readout block) -tb-
         ediff  = (f4 >> 9) & 0xfff;
         evID   = (f4 >> 21) & 0x7ff;
         
-        #if 0
-        NSString* info1 = @"";
-        NSString* info2 = @"";
-        #else
-        NSString* info1 = [NSString stringWithFormat:@"First event:\n"
-                      "FIFO entry:  flt: %lu,chan: %lu,energy: %lu,sec: %lu,subsec: %lu   \n",flt,chan,energy,sec,subsec ];//DEBUG -tb-
-        NSString* info2 = [NSString stringWithFormat:@"FIFO entry:  multiplicity: %lu,p: %lu,toplen: %lu,ediff: %lu,evID: %lu   \n",
-                                                                                   multiplicity,p,toplen,ediff,evID ];//DEBUG -tb-
-        #endif
+        fprintf(stdout,"FIFO entry:  flt: %li,chan: %li,energy: %li,sec: %li,subsec: %li   \n",flt,chan,energy,sec,subsec);
+        fprintf(stdout,"FIFO entry:  multiplicity: %li,p: %li,toplen: %li,ediff: %li,evID: %li   \n",  multiplicity,p,toplen,ediff,evID);
         
+        //go to next event block
+        eventPtr+=4;
         
-        #if 1
-        //draw full content on debugger console - for DEBUGGING -tb-
-        fprintf(stdout,"Event Record for crate %li, card/FLT %li contains %li events:\n",numCrate,numCard,numEv);
-        int i;
-        for(i=0;i<numEv;i++){
-            unsigned long f1,f2,f3,f4;
-            f1=eventPtr[0];
-            f2=eventPtr[1];
-            f3=eventPtr[2];
-            f4=eventPtr[3];
-            unsigned long flt,chan,energy,sec,subsec,multiplicity,p,toplen,ediff,evID;
-            flt   = (f1 >> 25) & 0x1f;
-            chan   = (f1 >> 20) & 0x1f;
-            energy  = f1  & 0xfffff;
-            sec = f2;
-            subsec = f3  & 0x1ffffff;
-            multiplicity  = (f3 >> 25) & 0x1f;
-            p  = (f3 >> 31) & 0x1;
-            toplen = f4  & 0x1ff;
-            ediff  = (f4 >> 9) & 0xfff;
-            evID   = (f4 >> 21) & 0x7ff;
-            
-            fprintf(stdout,"FIFO entry:  flt: %li,chan: %li,energy: %li,sec: %li,subsec: %li   \n",flt,chan,energy,sec,subsec);
-            fprintf(stdout,"FIFO entry:  multiplicity: %li,p: %li,toplen: %li,ediff: %li,evID: %li   \n",  multiplicity,p,toplen,ediff,evID);
-            
-            //go to next event block
-            eventPtr+=4;
-            
-        }
-        fprintf(stdout,"END of event Record.\n");
-        
-        #endif
-        
-/*	
-	int recordType = (*ptr) & 0xf;
-	int counterType = ((*ptr)>>4) & 0xf;
-	
-	++ptr;		//point to event counter
-	if (recordType == 0) {
-		NSString* eventCounter    = [NSString stringWithFormat:@"Event     = %lu\n",*ptr++];
-		NSString* timeStampHi     = [NSString stringWithFormat:@"Time Hi   = %lu\n",*ptr++];
-		NSString* timeStampLo     = [NSString stringWithFormat:@"Time Lo   = %lu\n",*ptr];
-
-		return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,crate,card,
-							eventCounter,timeStampHi,timeStampLo];               
-	}
-	
-	++ptr;		//skip event counter
-	//timestamp events
-	NSString* counterString;
-	switch (counterType) {
-		case kSecondsCounterType:	counterString    = [NSString stringWithFormat:@"Seconds Counter\n"]; break;
-		case kVetoCounterType:		counterString    = [NSString stringWithFormat:@"Veto Counter\n"]; break;
-		case kDeadCounterType:		counterString    = [NSString stringWithFormat:@"Deadtime Counter\n"]; break;
-		case kRunCounterType:		counterString    = [NSString stringWithFormat:@"Run  Counter\n"]; break;
-		default:					counterString    = [NSString stringWithFormat:@"Unknown Counter\n"]; break;
-	}
-	NSString* typeString;
-	switch (recordType) {
-		case kStartRunType:		typeString    = [NSString stringWithFormat:@"Start Run Timestamp\n"]; break;
-		case kStopRunType:		typeString    = [NSString stringWithFormat:@"Stop Run Timestamp\n"]; break;
-		case kStartSubRunType:	typeString    = [NSString stringWithFormat:@"Start SubRun Timestamp\n"]; break;
-		case kStopSubRunType:	typeString    = [NSString stringWithFormat:@"Stop SubRun Timestamp\n"]; break;
-		default:				typeString    = [NSString stringWithFormat:@"Unknown Timestamp Type\n"]; break;
-	}
-	NSString* timeStampHi     = [NSString stringWithFormat:@"Time Hi   = %lu\n",*ptr++];
-	NSString* timeStampLo     = [NSString stringWithFormat:@"Time Lo   = %lu\n",*ptr];		
-*/
+    }
+    fprintf(stdout,"END of event Record.\n");
+    
+#endif
+    
+    /*
+     int recordType = (*ptr) & 0xf;
+     int counterType = ((*ptr)>>4) & 0xf;
+     
+     ++ptr;		//point to event counter
+     if (recordType == 0) {
+     NSString* eventCounter    = [NSString stringWithFormat:@"Event     = %lu\n",*ptr++];
+     NSString* timeStampHi     = [NSString stringWithFormat:@"Time Hi   = %lu\n",*ptr++];
+     NSString* timeStampLo     = [NSString stringWithFormat:@"Time Lo   = %lu\n",*ptr];
+     
+     return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,crate,card,
+     eventCounter,timeStampHi,timeStampLo];
+     }
+     
+     ++ptr;		//skip event counter
+     //timestamp events
+     NSString* counterString;
+     switch (counterType) {
+     case kSecondsCounterType:	counterString    = [NSString stringWithFormat:@"Seconds Counter\n"]; break;
+     case kVetoCounterType:		counterString    = [NSString stringWithFormat:@"Veto Counter\n"]; break;
+     case kDeadCounterType:		counterString    = [NSString stringWithFormat:@"Deadtime Counter\n"]; break;
+     case kRunCounterType:		counterString    = [NSString stringWithFormat:@"Run  Counter\n"]; break;
+     default:					counterString    = [NSString stringWithFormat:@"Unknown Counter\n"]; break;
+     }
+     NSString* typeString;
+     switch (recordType) {
+     case kStartRunType:		typeString    = [NSString stringWithFormat:@"Start Run Timestamp\n"]; break;
+     case kStopRunType:		typeString    = [NSString stringWithFormat:@"Stop Run Timestamp\n"]; break;
+     case kStartSubRunType:	typeString    = [NSString stringWithFormat:@"Start SubRun Timestamp\n"]; break;
+     case kStopSubRunType:	typeString    = [NSString stringWithFormat:@"Stop SubRun Timestamp\n"]; break;
+     default:				typeString    = [NSString stringWithFormat:@"Unknown Timestamp Type\n"]; break;
+     }
+     NSString* timeStampHi     = [NSString stringWithFormat:@"Time Hi   = %lu\n",*ptr++];
+     NSString* timeStampLo     = [NSString stringWithFormat:@"Time Lo   = %lu\n",*ptr];
+     */
 	return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,content,crate,card,
-						 info1,info2];               
+            info1,info2];
+}
+@end
+
+
+
+
+
+
+
+
+
+
+
+
+@implementation ORKatrinV4SLTDecoderForEnergy
+
+//-------------------------------------------------------------
+/** Data format for event:
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+ ^^^^ ^^^^ ^^^^ ^^-----------------------data id
+ ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
+ 
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+ ^^^^ ^^^--------------------------------spare
+ ^ ^^^---------------------------crate
+ ^ ^^^^---------------------card
+ ^^^^ ^^^^-----------spare
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx Spare 1
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx Spare 2
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx EventFifo 1
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx EventFifo 2
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx EventFifo 3
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx EventFifo 4
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx EventFifo 5
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx EventFifo 6
+ and optionally more blocks consisting of 6 word32s, containing EventFifo 1...6,
+ max. number of bytes: 8192 (which is the max. DMA readout block) -tb-
+ 
+ **/
+//-------------------------------------------------------------
+
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
+{
+    unsigned long* ptr = (unsigned long*)someData;
+	unsigned long length	= ExtractLength(*ptr);	 //get length from first word
+	[aDataSet loadGenericData:@" " sender:self withKeys:@"v4SLT",@"Energy Records",nil];
+    
+    /*
+     //for debugging/testing -tb-
+     int i=0;
+     
+     NSLog(@"EventFifoRecordLen: %i\n",length);
+     int showMax=length;
+     if(showMax>12){showMax=12;}
+     for(i=2;i<showMax; i++){
+     NSLog(@"word %i: 0x%08x\n",i,*(ptr+i));
+     }
+     */
+    
+    
+    return length; //nothing to display at this time.. just return the length
+}
+
+- (NSString*) dataRecordDescription:(unsigned long*)ptr
+{
+    
+	NSString* title= @"Ipe SLTv4 Energy Record\n\n";
+    unsigned long numEv,numCrate,numCard;
+    numEv=((*ptr) & 0x3ffff)/4-1;
+    NSString* content=[NSString stringWithFormat:@"Num.Eevents= %lu\n",((*ptr) & 0x3ffff)/4-1];
+    
+    
+	++ptr;		//skip the first word (dataID and length)
+    numCrate=(*ptr>>21) & 0xf;
+    numCard=(*ptr>>16) & 0x1f;
+    NSString* crate = [NSString stringWithFormat:@"Crate      = %lu\n",(*ptr>>21) & 0xf];
+    NSString* card  = [NSString stringWithFormat:@"Station    = %lu\n",(*ptr>>16) & 0x1f];
+    
+    ++ptr;
+    ++ptr;
+    ++ptr;
+    unsigned long* eventPtr=ptr;
+    unsigned long f1,f2,f3,f4,f5,f6;
+    f1=ptr[0];
+    f2=ptr[1];
+    f3=ptr[2];
+    f4=ptr[3];
+    f5=ptr[4];
+    f6=ptr[5];
+    
+#if 0
+    //quickfix
+    f1=ptr[1];
+    f2=ptr[0];
+    f3=ptr[3];
+    f4=ptr[2];
+    f5=ptr[5];
+    f6=ptr[4];
+    //quickfix
+#endif
+    
+    unsigned long flt,chan,energy,sec,subsec,multiplicity,p,toplen,ediff,evID, tpeak, tvalley, apeak, avalley;
+    p  = (f1 >> 28) & 0x1;
+    subsec = (f1  & 0x0ffffff8) >> 3;
+    sec = (f2 & 0x1fffffff) | ((f1  & 0x7) << 29);
+    flt   = (f3 >> 24) & 0x1f;
+    chan   = (f3 >> 19) & 0x1f;
+    multiplicity  = (f3 >> 14) & 0x1f;
+    evID   = f3  & 0x3ff;
+    //toplen = f4  & 0x1ff;
+    //ediff  = (f4 >> 9) & 0xfff;
+    tpeak    = (f4 >> 16) & 0x1ff;
+    apeak    =  f4   & 0xfff;
+    tvalley  = (f5 >> 16) & 0x1ff;
+    avalley  =  f5   & 0xfff;
+    
+    energy  = f6  & 0xfffff;
+    
+#if 0
+    NSString* info1 = @"";
+    NSString* info2 = @"";
+#else
+    NSString* info1 = [NSString stringWithFormat:@"First event:\n"
+                       "FIFO entry:  flt: %lu,chan: %lu,energy: %lu,sec: %lu,subsec: %lu   \n",flt,chan,energy,sec,subsec ];//DEBUG -tb-
+    NSString* info2 = [NSString stringWithFormat:@"FIFO entry:  multiplicity: %lu,p: %lu,Epeak: %lu,Evalley: %lu,t_peak: %lu,t_valley: %lu,evID: %lu   \n",
+                       multiplicity,p,apeak,avalley,tpeak,tvalley,evID ];//DEBUG -tb-
+#endif
+    
+    
+#if 0
+    //draw full content on debugger console - for DEBUGGING -tb-
+    fprintf(stdout,"Event Record for crate %li, card/FLT %li contains %li events:\n",numCrate,numCard,numEv);
+    int i;
+    for(i=0;i<numEv;i++){
+        unsigned long f1,f2,f3,f4;
+        f1=eventPtr[0];
+        f2=eventPtr[1];
+        f3=eventPtr[2];
+        f4=eventPtr[3];
+        unsigned long flt,chan,energy,sec,subsec,multiplicity,p,toplen,ediff,evID;
+        flt   = (f1 >> 25) & 0x1f;
+        chan   = (f1 >> 20) & 0x1f;
+        energy  = f1  & 0xfffff;
+        sec = f2;
+        subsec = f3  & 0x1ffffff;
+        multiplicity  = (f3 >> 25) & 0x1f;
+        p  = (f3 >> 31) & 0x1;
+        toplen = f4  & 0x1ff;
+        ediff  = (f4 >> 9) & 0xfff;
+        evID   = (f4 >> 21) & 0x7ff;
+        
+        fprintf(stdout,"FIFO entry:  flt: %li,chan: %li,energy: %li,sec: %li,subsec: %li   \n",flt,chan,energy,sec,subsec);
+        fprintf(stdout,"FIFO entry:  multiplicity: %li,p: %li,toplen: %li,ediff: %li,evID: %li   \n",  multiplicity,p,toplen,ediff,evID);
+        
+        //go to next event block
+        eventPtr+=4;
+        
+    }
+    fprintf(stdout,"END of event Record.\n");
+    
+#endif
+    
+    /*
+     int recordType = (*ptr) & 0xf;
+     int counterType = ((*ptr)>>4) & 0xf;
+     
+     ++ptr;		//point to event counter
+     if (recordType == 0) {
+     NSString* eventCounter    = [NSString stringWithFormat:@"Event     = %lu\n",*ptr++];
+     NSString* timeStampHi     = [NSString stringWithFormat:@"Time Hi   = %lu\n",*ptr++];
+     NSString* timeStampLo     = [NSString stringWithFormat:@"Time Lo   = %lu\n",*ptr];
+     
+     return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,crate,card,
+     eventCounter,timeStampHi,timeStampLo];
+     }
+     
+     ++ptr;		//skip event counter
+     //timestamp events
+     NSString* counterString;
+     switch (counterType) {
+     case kSecondsCounterType:	counterString    = [NSString stringWithFormat:@"Seconds Counter\n"]; break;
+     case kVetoCounterType:		counterString    = [NSString stringWithFormat:@"Veto Counter\n"]; break;
+     case kDeadCounterType:		counterString    = [NSString stringWithFormat:@"Deadtime Counter\n"]; break;
+     case kRunCounterType:		counterString    = [NSString stringWithFormat:@"Run  Counter\n"]; break;
+     default:					counterString    = [NSString stringWithFormat:@"Unknown Counter\n"]; break;
+     }
+     NSString* typeString;
+     switch (recordType) {
+     case kStartRunType:		typeString    = [NSString stringWithFormat:@"Start Run Timestamp\n"]; break;
+     case kStopRunType:		typeString    = [NSString stringWithFormat:@"Stop Run Timestamp\n"]; break;
+     case kStartSubRunType:	typeString    = [NSString stringWithFormat:@"Start SubRun Timestamp\n"]; break;
+     case kStopSubRunType:	typeString    = [NSString stringWithFormat:@"Stop SubRun Timestamp\n"]; break;
+     default:				typeString    = [NSString stringWithFormat:@"Unknown Timestamp Type\n"]; break;
+     }
+     NSString* timeStampHi     = [NSString stringWithFormat:@"Time Hi   = %lu\n",*ptr++];
+     NSString* timeStampLo     = [NSString stringWithFormat:@"Time Lo   = %lu\n",*ptr];
+     */
+	return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,content,crate,card,
+            info1,info2];
 }
 @end
 
