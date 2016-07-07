@@ -82,16 +82,6 @@
     [inComingData removeAllObjects];
 }
 
-
-- (float) updateAverage:(float)dataPoint
-{
-    lastRateValue = dataPoint;
-    [inComingData push:[NSNumber numberWithFloat:dataPoint]];
-    runningAverage = runningAverage - [[inComingData firstObject]floatValue]/windowLength + dataPoint/windowLength;
-    
-    return runningAverage;
-}
-
 - (float) lastRateValue
 {
     return lastRateValue;
@@ -106,23 +96,30 @@
     return spikeValue;
 }
 
-- (ORRunningAveSpike*) calculateAverage:(float)rate minSamples:(int)minSamples triggerValue:(float)triggerValue spikeType:(BOOL)triggerType
+- (ORRunningAveSpike*) calculateAverage:(float)dataPoint minSamples:(int)minSamples triggerValue:(float)triggerValue spikeType:(BOOL)triggerType
 {
-    [self  updateAverage:rate];
+    lastRateValue = dataPoint;
+    [inComingData addObject:[NSNumber numberWithFloat:dataPoint]];
+    if([inComingData count] > minSamples)[inComingData removeObjectAtIndex:0];
     
-    if([inComingData count] < minSamples) return nil;
-    [inComingData removeObjectAtIndex:0];
+    unsigned long n = [inComingData count];
+    if(n==1){
+        runningAverage = dataPoint;
+        return [self spikedInfo:NO];
+    }
+    runningAverage = runningAverage + (dataPoint - runningAverage)/(float)n;
+    
     spikeValue = 0;
     switch(triggerType){
         case kRASpikeOnRatio: //trigger on the ratio of the rate over the average
             if(runningAverage != 0) {
-                spikeValue = rate/runningAverage;
+                spikeValue = dataPoint/runningAverage;
                 didSpike   = (fabs(spikeValue) >= triggerValue);
             }
             break;
             
         case kRASpikeOnThreshold:
-            spikeValue = rate-runningAverage;
+            spikeValue = dataPoint-runningAverage;
             didSpike   = (fabs(spikeValue) > triggerValue);
             break;
             

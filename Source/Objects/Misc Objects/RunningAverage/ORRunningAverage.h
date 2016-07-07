@@ -41,7 +41,6 @@
 - (id)      initWithTag:(short)aTag andLength:(short)wl;
 - (void)    dealloc;
 - (void)    setWindowLength:(int) wl;
-- (float)   updateAverage:(float)datapoint;
 - (void)    resetCounter:(float) rate;
 - (void)    reset;
 - (float)   runningAverage;
