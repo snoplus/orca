@@ -301,13 +301,13 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
 /** Data format for event:
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
  ^^^^ ^^^^ ^^^^ ^^-----------------------data id
- ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
+                  ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
  
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
  ^^^^ ^^^--------------------------------spare
- ^ ^^^---------------------------crate
- ^ ^^^^---------------------card
- ^^^^ ^^^^-----------spare
+         ^ ^^^---------------------------crate
+              ^ ^^^^---------------------card (always = SLT ID/SLT slot)
+                     ^^^^ ^^^^-----------spare
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx Spare 1
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx Spare 2
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx EventFifo 1
@@ -326,7 +326,59 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
 {
     unsigned long* ptr = (unsigned long*)someData;
 	unsigned long length	= ExtractLength(*ptr);	 //get length from first word
+	unsigned char crate		= ShiftAndExtract(ptr[1],21,0xf);
+	unsigned char card		= 0;//ShiftAndExtract(ptr[1],16,0x1f);
+	unsigned char chan		= 0;//ShiftAndExtract(ptr[1],8,0xff);
+    
+    unsigned long headerlen, f1,f2,f3,f4,f5,f6;
+    unsigned long energy,sec,subsec,multiplicity,p,toplen,ediff,evID, tpeak, tvalley, apeak, avalley;
+    headerlen = 4;
+    f1=ptr[headerlen];
+    f2=ptr[headerlen+1];
+    f3=ptr[headerlen+2];
+    f4=ptr[headerlen+3];
+    f5=ptr[headerlen+4];
+    f6=ptr[headerlen+5];
+    
+    card   = (f3 >> 24) & 0x1f;
+    chan   = (f3 >> 19) & 0x1f;
+    //multiplicity  = (f3 >> 14) & 0x1f;
+    //evID   = f3  & 0x3ff;
+    //toplen = f4  & 0x1ff;
+    //ediff  = (f4 >> 9) & 0xfff;
+    //tpeak    = (f4 >> 16) & 0x1ff;
+    apeak    =  f4   & 0xfff;
+    //tvalley  = (f5 >> 16) & 0x1ff;
+    avalley  =  f5   & 0xfff;
+    
+    energy  = f6  & 0xfffff;
+
+
+	NSString* crateKey		= [self getCrateKey: crate];
+	NSString* stationKey	= [self getStationKey: card];	
+	NSString* channelKey	= [self getChannelKey: chan];	
+    
+	unsigned long histoLen;
+	histoLen = 32768;//4096;//=max. ADC value for 12 bit ADC
+    
+    // count datasets
 	[aDataSet loadGenericData:@" " sender:self withKeys:@"v4SLT",@"Energy Records",nil];
+    
+	//channel by channel histograms 'energy'
+	[aDataSet histogram:energy
+				numBins:histoLen sender:self  
+			   withKeys:@"v4SLT", @"FLT", @"Energy", crateKey,stationKey,channelKey,nil];
+	
+	//channel by channel histograms 'bipolar energy peak'
+	[aDataSet histogram:apeak
+				numBins:4096 sender:self  
+			   withKeys:@"v4SLT", @"FLT", @"Epeak", crateKey,stationKey,channelKey,nil];
+               
+	//channel by channel histograms 'bipolar energy valley'
+	[aDataSet histogram:avalley
+				numBins:4096 sender:self  
+			   withKeys:@"v4SLT", @"FLT", @"Evalley", crateKey,stationKey,channelKey,nil];
+	
     
     /*
      //for debugging/testing -tb-
@@ -347,10 +399,12 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
     
-	NSString* title= @"Ipe SLTv4 Energy Record\n\n";
-    unsigned long numEv,numCrate,numCard;
-    numEv=((*ptr) & 0x3ffff)/4-1;
-    NSString* content=[NSString stringWithFormat:@"Num.Eevents= %lu\n",((*ptr) & 0x3ffff)/4-1];
+	unsigned long length	= ExtractLength(ptr[0]);
+    
+	NSString* title= @"Katrin SLTv4 Energy Record\n\n";
+    unsigned long numCrate,numCard;
+    unsigned long numEv=(length-4)/6;    //(((*ptr) & 0x3ffff)-4)/6;
+    NSString* content=[NSString stringWithFormat:@"Num.Eevents= %lu\n",numEv];
     
     
 	++ptr;		//skip the first word (dataID and length)

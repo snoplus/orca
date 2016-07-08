@@ -156,11 +156,18 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
         fifomode=pbus->read(FIFO0ModeReg);
         fifoavail=fifomode & 0x3fffff;
         fifoReadoutBuffer32Len=fifoavail;
-        if(fifoReadoutBuffer32Len>8192) fifoReadoutBuffer32Len=8192;
-        //testing if(fifoReadoutBuffer32Len>800) fifoReadoutBuffer32Len=800;
-        //if(fifoReadoutBuffer32Len % 4) fifoReadoutBuffer32Len = (fifoReadoutBuffer32Len>>2)<<2;//always read multiple of 4 word32s
 //DEBUG quick test: read always 6 words in single access mode ... -tb-
-    if(fifoReadoutBuffer32Len >= 6) fifoReadoutBuffer32Len = 6; else fifoReadoutBuffer32Len = 0;
+//if(fifoReadoutBuffer32Len >= 6) fifoReadoutBuffer32Len = 6; else fifoReadoutBuffer32Len = 0;
+        if(fifoReadoutBuffer32Len>8192) fifoReadoutBuffer32Len=8192;
+//for testing:
+        if(fifoReadoutBuffer32Len<60) fifoReadoutBuffer32Len=0;//read eat least 10 events in one block (to really use dma mode) -tb- 
+
+        //testing if(fifoReadoutBuffer32Len>800) fifoReadoutBuffer32Len=800;
+        #if 0
+        uint32_t modulo6 = fifoReadoutBuffer32Len % 6;//always read multiple of 6 word32s
+        if(modulo6) fifoReadoutBuffer32Len = (fifoReadoutBuffer32Len-modulo6)/6; else fifoReadoutBuffer32Len = fifoReadoutBuffer32Len/6;
+        #endif
+        fifoReadoutBuffer32Len = fifoReadoutBuffer32Len/6;//division for integers will round down -tb-
         if(fifoReadoutBuffer32Len>0){
             if(fifoReadoutBuffer32Len<48){  //if there are more than 48 words, use blockread; blockread should read multiple of 8 words
                 for(i=0;i<fifoReadoutBuffer32Len; i++){
@@ -168,13 +175,18 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
                 }
             }else{                          //there are more than 48 words -> use DMA
                 fifoReadoutBuffer32Len = (fifoReadoutBuffer32Len>>3)<<3;//always read multiple of 8 word32s
-                pbus->readBlock(FIFO0Addr, (unsigned long *) fifoReadoutBuffer32, fifoReadoutBuffer32Len);//read 2048 word32s
+                uint32_t retval =
+                pbus->readBlock(FIFO0Addr, (unsigned long *) fifoReadoutBuffer32, fifoReadoutBuffer32Len);//read up to 2048 word32s
+                //DEBUG: test it, then remove it -tb- 2016
+                if(retval!=fifoReadoutBuffer32Len) printf("ORSlLTv4Readout.cc - retval!=fifoReadoutBuffer32Len!  retval: %i fifoReadoutBuffer32Len: %i\n",retval,fifoReadoutBuffer32Len);
             }
+            //TODO: check bits 29-31!!!!!
+            
             recordLength = fifoReadoutBuffer32Len+4;
             ensureDataCanHold(recordLength);
             data[dataIndex++] = energyId | recordLength;
             data[dataIndex++] = location  ;
-            data[dataIndex++] = fifomode; //spare
+            data[dataIndex++] = fifomode; //spare //TODO: for debugging - remove it? -tb-
             data[dataIndex++] = 0; //spare
             for(i=0;i<fifoReadoutBuffer32Len; i++){
                 data[dataIndex++] = fifoReadoutBuffer32[i];
