@@ -677,8 +677,7 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
 
             else if([order length]>=5){
                 if(isRetracting){
-                    if(([[order substringFromIndex: [order length] - 5] isEqualToString: @"CCBAB"] )||
-                       ([[order substringFromIndex: [order length] - 5] isEqualToString: @"CBCAB" ])){
+                    if([[order substringFromIndex: [order length] - 5] isEqualToString: @"CCBAB"]){
                         [self setCurrentState:kMJDSource_StopMotion];
                         NSLog(@"Module %d Source fully retracted\n",slot+1);
                         self.order = [NSMutableString stringWithString:@"RETRACTED"];
