@@ -300,7 +300,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                 
                 if(rateEntry || baseLineEntry){
                     NSMutableDictionary* detectorEntries = [breakDownDictionary objectForKey:@"detectorEntries"];
-                    NSMutableDictionary* detectorEntry = [detectorEntries objectForKey:detectorName];
+                    NSMutableDictionary* detectorEntry   = [detectorEntries objectForKey:detectorName];
                     
                     if(!detectorEntry){
                         [detectorEntries setObject:[NSMutableDictionary dictionary] forKey:detectorName];
@@ -310,6 +310,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                     if(rateEntry     && ![detectorEntry objectForKey:@"rateInfo"]){
                         [detectorEntry setObject:rateEntry forKey:@"rateInfo"];
                         [breakDownDictionary setObject:@"YES" forKey:@"changed"];
+
                     }
                     if(baseLineEntry && ![detectorEntry objectForKey:@"baselineInfo"]){
                         [detectorEntry setObject:baseLineEntry forKey:@"baselineInfo"];
@@ -328,15 +329,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                     [detectorEntry setObject:[NSNumber numberWithInt:preAmpDig]  forKey:@"preAmpDig"];
                     [detectorEntry setObject:[NSNumber numberWithInt:preAmpChan] forKey:@"preAmpChan"];
                 }
-                else {
-                    NSMutableDictionary* detectorEntries = [breakDownDictionary objectForKey:@"detectorEntries"];
-                    NSMutableDictionary* detectorEntry   = [detectorEntries objectForKey:detectorName];
-                    if(detectorEntry){
-                        [breakDownDictionary setObject:@"YES" forKey:@"changed"];
-                        [detectorEntries removeObjectForKey:detectorName];
-                    }
-                }
-            }
+             }
         }
     }
     if(!rateSpikes){
@@ -584,7 +577,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     else {
         if([rateSpikes objectForKey:aKey]){
             [rateSpikes removeObjectForKey:aKey];
-           if([[rateSpikes allKeys] count] == 0){
+            if([[rateSpikes allKeys] count] == 0){
                 [rateSpikes release];
                 rateSpikes = nil;
             }
