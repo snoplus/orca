@@ -125,7 +125,6 @@ const unsigned short kchannelModeAndEventID[16][16] = {
     unsigned long waveformLengthSIS;
     
     unsigned long* dataPtr       = ptr + orcaHeaderLength;   // hold on to this here
-    unsigned long* oldDataPtr = 0;
     
     unsigned short n;
     for(n=0;n<numEvents;n++)
@@ -328,7 +327,6 @@ const unsigned short kchannelModeAndEventID[16][16] = {
                                             sender: self
                                           withKeys: @"SIS3305", @"Waveform",crateKey,cardKey,channelKey,nil];
 
-        //oldDataPtr = dataPtr;
         nextRecordPtr = dataPtr + dataLengthSingle; // take you to the start of the next SIS header
         dataPtr = nextRecordPtr;
 //        NSLog(@"    Decoded %d/%d events so far\n",n+1,numEvents);
