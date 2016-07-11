@@ -2869,7 +2869,6 @@ return 0;
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    NSLog(@"\n\n\n Gretina runTaskstarted\n\n\n");
     runNumberLocal     = [[userInfo objectForKey:@"kRunNumber"] unsignedLongValue];
     subRunNumberLocal     = [[userInfo objectForKey:@"kSubRunNumber"] unsignedLongValue];
 
@@ -2906,7 +2905,7 @@ return 0;
     fifoStateAddress= [self baseAddress] + register_information[kProgrammingDone].offset;
     
     fifoResetCount = 0;
-    NSLog(@"\n\n\n Gretina to start Rates \n\n\n");
+    //NSLog(@"\n\n\n Gretina to start Rates \n\n\n");
 
     [self startRates];
     
@@ -2928,7 +2927,6 @@ return 0;
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     isRunning = YES;
-    NSLog(@"isRunning is set to be true");
     NSString* errorLocation = @"";
     @try {
         if(![self fifoIsEmpty]){
