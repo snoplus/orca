@@ -50,7 +50,8 @@
 #define kIpeFltV4_EnergyTraceSyncDaqMode		7
 // new modes after mode redesign 2013-05 -tb-
 #define kIpeFltV4_BipolarEnergyDaqMode		    8
-#define kIpeFltV4_NumberOfDaqModes				9
+#define kIpeFltV4_BipolarEnergyTraceDaqMode		9
+#define kIpeFltV4_NumberOfDaqModes				10
 // kIpeFltV4_NumberOfDaqModes MUST be the number of daq modes; no gaps allowed! TODO: using a enum would be better -tb- <------NOTE!
 
 #else
@@ -65,6 +66,8 @@ enum daqMode {
 	kIpeFltV4_VetoEnergyAutoDaqMode = 5, //for future use
 	kIpeFltV4_VetoEnergyTraceSyncDaqMode	= 6, //for future use
 	kIpeFltV4_EnergyTraceSyncDaqMode= 7,
+	kIpeFltV4_BipolarEnergyDaqMode  = 8,
+	kIpeFltV4_BipolarEnergyTraceDaqMode  = 9,
 	kIpeFltV4_NumberOfDaqModes // do not assign a value, the compiler will do it
 };
 #endif
@@ -75,7 +78,8 @@ enum daqMode {
 #define kShipSumHistogramFlag		0x040000
 #define kSecondsSetInitWithHostFlag	0x080000
 #define kSecondsSetSendToFLTsFlag	0x100000
-#define kSkipFltEventReadoutFlag	0x200000
+//#define kSkipFltEventReadoutFlag	0x200000
+#define kForceFltReadoutFlag	    0x200000
 
 typedef struct { // -tb- 2008-02-27
 	int32_t readoutSec;
