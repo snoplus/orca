@@ -2294,7 +2294,6 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     [[self undoManager] disableUndoRegistration];
 	
     [self setEnergyOffset:[decoder decodeIntForKey:@"energyOffset"]];
-    [self setForceFLTReadout:[decoder decodeBoolForKey:@"forceFLTReadout"]];
     [self setSkipFltEventReadout:[decoder decodeIntForKey:@"skipFltEventReadout"]];
     [self setBipolarEnergyThreshTest:[decoder decodeInt32ForKey:@"bipolarEnergyThreshTest"]];
     [self setUseBipolarEnergy:[decoder decodeIntForKey:@"useBipolarEnergy"]];
@@ -2311,6 +2310,12 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     [self setShipSumHistogram:[decoder decodeIntForKey:@"shipSumHistogram"]];
     [self setActivateDebuggingDisplays:[decoder decodeBoolForKey:@"activateDebuggingDisplays"]];
 
+	if([decoder containsValueForKey:@"forceFLTReadout"]){
+        [self setForceFLTReadout:[decoder decodeBoolForKey:@"forceFLTReadout"]];
+    }else{
+        [self setForceFLTReadout:true];//old file loaded with new Orca version -> before, we always had FLT readout, so use it now, too -tb- 2016-07
+    }
+    
 	if([decoder containsValueForKey:@"filterShapingLength"]){
 		//TODO: DEBUG-REMOVE - int tmpval=[decoder decodeIntForKey:@"filterShapingLength"];
 		[self setFilterShapingLength:[decoder decodeIntForKey:@"filterShapingLength"]];
@@ -2877,7 +2882,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     if(runMode == kIpeFltV4_EnergyDaqMode | runMode == kIpeFltV4_EnergyTraceDaqMode)
         runFlagsMask |= kSyncFltWithSltTimerFlag;//bit 17 = "sync flt with slt timer" flag
     if((shipSumHistogram == 1) && (!syncWithRunControl)) runFlagsMask |= kShipSumHistogramFlag;//bit 18 = "ship sum histogram" flag   //2013-06 added (!syncWithRunControl) - if syncWithRunControl is set, this 'facility' will produce sum histograms (using the decoder) -tb-
-	if(skipFltEventReadout) runFlagsMask |= kSkipFltEventReadoutFlag;//fast event readout (SLT fifo)  //2016-05 added
+	if(forceFLTReadout) runFlagsMask |= kForceFltReadoutFlag;//fast event readout (SLT fifo)  //2016-05 added
     
 	configStruct->card_info[index].deviceSpecificData[3] = runFlagsMask;	
 //NSLog(@"RunFlags 0x%x\n",configStruct->card_info[index].deviceSpecificData[3]);

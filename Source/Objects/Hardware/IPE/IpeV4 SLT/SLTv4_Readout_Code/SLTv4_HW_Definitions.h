@@ -78,7 +78,7 @@ enum daqMode {
 #define kShipSumHistogramFlag		0x040000
 #define kSecondsSetInitWithHostFlag	0x080000
 #define kSecondsSetSendToFLTsFlag	0x100000
-#define kSkipFltEventReadoutFlag	0x200000
+#define kForceFltReadoutFlag	    0x200000
 
 typedef struct { // -tb- 2008-02-27
 	int32_t readoutSec;
