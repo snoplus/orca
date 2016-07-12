@@ -409,9 +409,29 @@
                          name : ORKatrinV4FLTModelSkipFltEventReadoutChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(forceFLTReadoutChanged:)
+                         name : ORKatrinV4FLTModelForceFLTReadoutChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(energyOffsetChanged:)
+                         name : ORKatrinV4FLTModelEnergyOffsetChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) energyOffsetChanged:(NSNotification*)aNote
+{
+	[energyOffsetTextField setIntValue: [model energyOffset]];
+}
+
+- (void) forceFLTReadoutChanged:(NSNotification*)aNote
+{
+	[forceFLTReadoutCB setIntValue: [model forceFLTReadout]];
+}
 
 - (void) skipFltEventReadoutChanged:(NSNotification*)aNote
 {
@@ -702,6 +722,8 @@
 	[self useBipolarEnergyChanged:nil];
 	[self bipolarEnergyThreshTestChanged:nil];
 	[self skipFltEventReadoutChanged:nil];
+	[self forceFLTReadoutChanged:nil];
+	[self energyOffsetChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -1092,6 +1114,16 @@
 }
 
 #pragma mark •••Actions
+
+- (void) energyOffsetTextFieldAction:(id)sender
+{
+	[model setEnergyOffset:[sender intValue]];	
+}
+
+- (void) forceFLTReadoutCBAction:(id)sender
+{
+	[model setForceFLTReadout:[sender intValue]];	
+}
 
 - (void) skipFltEventReadoutCBAction:(id)sender
 {

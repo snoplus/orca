@@ -117,6 +117,8 @@
     int useBipolarEnergy;
     unsigned long bipolarEnergyThreshTest;
     int skipFltEventReadout;
+    BOOL forceFLTReadout;  //new for bipolar firmware (SLT readout is now recommended) 2016-07 -tb-
+    int energyOffset;
 }
 
 #pragma mark •••Initialization
@@ -134,6 +136,10 @@
 - (void) syncWithRunControlCheckStopCondition;
 
 #pragma mark •••Accessors
+- (int) energyOffset;
+- (void) setEnergyOffset:(int)aEnergyOffset;
+- (BOOL) forceFLTReadout;
+- (void) setForceFLTReadout:(BOOL)aForceFLTReadout;
 - (int) skipFltEventReadout;
 - (void) setSkipFltEventReadout:(int)aSkipFltEventReadout;
 - (unsigned long) bipolarEnergyThreshTest;
@@ -427,6 +433,8 @@
 				  n:(int) n;
 @end
 
+extern NSString* ORKatrinV4FLTModelEnergyOffsetChanged;
+extern NSString* ORKatrinV4FLTModelForceFLTReadoutChanged;
 extern NSString* ORKatrinV4FLTModelSkipFltEventReadoutChanged;
 extern NSString* ORKatrinV4FLTModelBipolarEnergyThreshTestChanged;
 extern NSString* ORKatrinV4FLTModelUseBipolarEnergyChanged;

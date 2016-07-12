@@ -32,6 +32,8 @@
 #import "ORCommandList.h"
 
 
+NSString* ORKatrinV4FLTModelEnergyOffsetChanged = @"ORKatrinV4FLTModelEnergyOffsetChanged";
+NSString* ORKatrinV4FLTModelForceFLTReadoutChanged = @"ORKatrinV4FLTModelForceFLTReadoutChanged";
 NSString* ORKatrinV4FLTModelSkipFltEventReadoutChanged = @"ORKatrinV4FLTModelSkipFltEventReadoutChanged";
 NSString* ORKatrinV4FLTModelBipolarEnergyThreshTestChanged = @"ORKatrinV4FLTModelBipolarEnergyThreshTestChanged";
 NSString* ORKatrinV4FLTModelUseBipolarEnergyChanged = @"ORKatrinV4FLTModelUseBipolarEnergyChanged";
@@ -142,6 +144,7 @@ enum IpeFLTV4Enum{
 	kFLTV4HistPageNReg,
 	kFLTV4HistLastFirstReg,
 	kFLTV4TestPatternReg,
+	kFLTV4EnergyOffsetReg,
 	kFLTV4NumRegs //must be last
 };
 
@@ -182,6 +185,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	{@"HistPageN",			0x00200C>>2,		-1,				kIpeRegReadable},
 	{@"HistLastFirst",		0x002044>>2,		-1,				kIpeRegReadable},
 	{@"TestPattern",		0x001400>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"EnergyOffset",		0x00005C>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 };
 
 @interface ORKatrinV4FLTModel (private)
@@ -422,6 +426,40 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 #pragma mark •••Accessors
 
+- (int) energyOffset
+{
+    return energyOffset;
+}
+
+- (void) setEnergyOffset:(int)aEnergyOffset
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setEnergyOffset:energyOffset];
+    energyOffset = [self restrictIntValue:aEnergyOffset min:0 max:0xfffff];
+    //energyOffset = aEnergyOffset;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelEnergyOffsetChanged object:self];
+}
+
+
+
+
+
+
+
+
+- (BOOL) forceFLTReadout
+{
+    return forceFLTReadout;
+}
+
+- (void) setForceFLTReadout:(BOOL)aForceFLTReadout
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setForceFLTReadout:forceFLTReadout];
+    
+    forceFLTReadout = aForceFLTReadout;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelForceFLTReadoutChanged object:self];
+}
+
 - (int) skipFltEventReadout
 {
     return skipFltEventReadout;
@@ -506,7 +544,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     
     boxcarLength = aBoxcarLength;
 	if(boxcarLength<0) boxcarLength=0;
-	if(boxcarLength>3) boxcarLength=3;
+	//if(boxcarLength>3) boxcarLength=3; new firmware 2016 -tb-
+	if(boxcarLength>7) boxcarLength=7;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelBoxcarLengthChanged object:self];
 }
@@ -842,6 +881,15 @@ static double table[32]={
 	switch (runMode) {
 		case kIpeFltV4_EnergyDaqMode:
 			[self setFltRunMode:kIpeFltV4Katrin_Run_Mode];
+			break;
+			
+		case kIpeFltV4_BipolarEnergyDaqMode:  //new since 2016-07 -tb-
+			[self setFltRunMode:kIpeFltV4Katrin_Bipolar_Mode];
+			break;
+			
+		case kIpeFltV4_BipolarEnergyTraceDaqMode:  //new since 2016-07 -tb-
+			[self setFltRunMode:kIpeFltV4Katrin_Bipolar_Mode];
+			readWaveforms = YES;
 			break;
 			
 		case kIpeFltV4_EnergyTraceDaqMode:
@@ -1740,8 +1788,9 @@ static double table[32]={
 - (void) initBoard
 {
 	//[self writeControl]; //removed setting runmode from here -tb-
-	[self writeReg: kFLTV4HrControlReg value:hitRateLength];
-	[self writeReg: kFLTV4PostTrigger  value:postTriggerTime];
+	[self writeReg: kFLTV4HrControlReg     value:hitRateLength];
+	[self writeReg: kFLTV4PostTrigger      value:postTriggerTime];
+	[self writeReg: kFLTV4EnergyOffsetReg  value:energyOffset];//new 2016-07 - is it OK for old firmware? -tb-
 	[self loadThresholdsAndGains];
 	[self writeReg:kFLTV4AnalogOffset  value:analogOffset];
 	[self writeTriggerControl];			//TODO:   (for v4 this needs to be implemented by DENIS)-tb- //set trigger mask
@@ -1768,7 +1817,8 @@ static double table[32]={
 - (void) writeRunControl:(BOOL)startSampling
 {
 	unsigned long aValue = 
-	(((poleZeroCorrection)  & 0xf)<<24) |		//poleZeroCorrection is stored as the popup index -- NEW since 2011-06-09 -tb-
+	(((boxcarLength)        & 0x7)<<28)	|		//boxcarLength is the register value and the popup item tag -tb- extended to 3 bits in 2016, needed to be shifted to bit 28 ...
+    (((poleZeroCorrection)  & 0xf)<<24) |		//poleZeroCorrection is stored as the popup index -- NEW since 2011-06-09 -tb-
 	(((nfoldCoincidence)    & 0xf)<<20) |		//nfoldCoincidence is stored as the popup index -- NEW since 2010-11-09 -tb-
 	(((vetoOverlapTime)     & 0xf)<<16)	|		//vetoOverlapTime is stored as the popup index -- NEW since 2010-08-04 -tb-
 	(((boxcarLength)        & 0x3)<<14)	|		//boxcarLength is the register value and the popup item tag -tb-
@@ -1789,8 +1839,8 @@ static double table[32]={
 	//TODO: add fifo length -tb- <---------------------------------------------
 	unsigned long aValue =	((fltRunMode & 0x3)<<16) | 
 	((useBipolarEnergy & 0x1)<<18) |
-	((fifoLength & 0x1)<<25) |
-	((fifoBehaviour & 0x1)<<24) |
+	((fifoLength       & 0x1)<<25) |
+	((fifoBehaviour    & 0x1)<<24) |
 	((ledOff & 0x1)<<1 );
     
     
@@ -2243,6 +2293,8 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     
     [[self undoManager] disableUndoRegistration];
 	
+    [self setEnergyOffset:[decoder decodeIntForKey:@"energyOffset"]];
+    [self setForceFLTReadout:[decoder decodeBoolForKey:@"forceFLTReadout"]];
     [self setSkipFltEventReadout:[decoder decodeIntForKey:@"skipFltEventReadout"]];
     [self setBipolarEnergyThreshTest:[decoder decodeInt32ForKey:@"bipolarEnergyThreshTest"]];
     [self setUseBipolarEnergy:[decoder decodeIntForKey:@"useBipolarEnergy"]];
@@ -2286,6 +2338,8 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 {
     [super encodeWithCoder:encoder];
 	
+    [encoder encodeInt:energyOffset forKey:@"energyOffset"];
+    [encoder encodeBool:forceFLTReadout forKey:@"forceFLTReadout"];
     [encoder encodeInt:skipFltEventReadout forKey:@"skipFltEventReadout"];
     [encoder encodeInt32:bipolarEnergyThreshTest forKey:@"bipolarEnergyThreshTest"];
     [encoder encodeInt:useBipolarEnergy forKey:@"useBipolarEnergy"];
