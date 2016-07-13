@@ -1837,8 +1837,8 @@ static double table[32]={
 {
 	
 	//TODO: add fifo length -tb- <---------------------------------------------
-	unsigned long aValue =	((fltRunMode & 0x3)<<16) | 
-	((useBipolarEnergy & 0x1)<<18) |
+	unsigned long aValue =	((fltRunMode & 0xf)<<16) | 
+	//((useBipolarEnergy & 0x1)<<18) |
 	((fifoLength       & 0x1)<<25) |
 	((fifoBehaviour    & 0x1)<<24) |
 	((ledOff & 0x1)<<1 );
@@ -2296,7 +2296,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     [self setEnergyOffset:[decoder decodeIntForKey:@"energyOffset"]];
     [self setSkipFltEventReadout:[decoder decodeIntForKey:@"skipFltEventReadout"]];
     [self setBipolarEnergyThreshTest:[decoder decodeInt32ForKey:@"bipolarEnergyThreshTest"]];
-    [self setUseBipolarEnergy:[decoder decodeIntForKey:@"useBipolarEnergy"]];
+    //[self setUseBipolarEnergy:[decoder decodeIntForKey:@"useBipolarEnergy"]];
     //[self setUseSLTtime:[decoder decodeIntForKey:@"useSLTtime"]];
     [self setBoxcarLength:[decoder decodeIntForKey:@"boxcarLength"]];
     [self setUseDmaBlockRead:[decoder decodeIntForKey:@"useDmaBlockRead"]];
@@ -2347,7 +2347,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     [encoder encodeBool:forceFLTReadout forKey:@"forceFLTReadout"];
     [encoder encodeInt:skipFltEventReadout forKey:@"skipFltEventReadout"];
     [encoder encodeInt32:bipolarEnergyThreshTest forKey:@"bipolarEnergyThreshTest"];
-    [encoder encodeInt:useBipolarEnergy forKey:@"useBipolarEnergy"];
+    //[encoder encodeInt:useBipolarEnergy forKey:@"useBipolarEnergy"];
     //[encoder encodeInt:useSLTtime forKey:@"useSLTtime"];
     [encoder encodeInt:boxcarLength forKey:@"boxcarLength"];
     [encoder encodeInt:useDmaBlockRead forKey:@"useDmaBlockRead"];

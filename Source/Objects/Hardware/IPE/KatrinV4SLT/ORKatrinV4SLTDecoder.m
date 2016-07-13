@@ -343,7 +343,7 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
     card   = (f3 >> 24) & 0x1f;
     chan   = (f3 >> 19) & 0x1f;
     //multiplicity  = (f3 >> 14) & 0x1f;
-    //evID   = f3  & 0x3ff;
+    //evID   = f3  & 0x3fff;
     //toplen = f4  & 0x1ff;
     //ediff  = (f4 >> 9) & 0xfff;
     //tpeak    = (f4 >> 16) & 0x1ff;
@@ -443,13 +443,14 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
     flt   = (f3 >> 24) & 0x1f;
     chan   = (f3 >> 19) & 0x1f;
     multiplicity  = (f3 >> 14) & 0x1f;
-    evID   = f3  & 0x3ff;
+    evID   = f3  & 0x3fff;
     //toplen = f4  & 0x1ff;
     //ediff  = (f4 >> 9) & 0xfff;
     tpeak    = (f4 >> 16) & 0x1ff;
-    apeak    =  f4   & 0xfff;
+    apeak    =  f4   & 0x7ff; // & 0xfff; bit 12 unused and always 1 -tb-
     tvalley  = (f5 >> 16) & 0x1ff;
-    avalley  =  f5   & 0xfff;
+    //avalley  =  f5   & 0xfff; is negative
+    avalley  =  4096 - (f5 & 0xfff);
     
     energy  = f6  & 0xfffff;
     
