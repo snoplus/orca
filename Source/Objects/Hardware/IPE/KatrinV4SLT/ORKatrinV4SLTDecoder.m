@@ -367,17 +367,17 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
 	//channel by channel histograms 'energy'
 	[aDataSet histogram:energy
 				numBins:histoLen sender:self  
-			   withKeys:@"v4SLT", @"FLT", @"Energy", crateKey,stationKey,channelKey,nil];
+			   withKeys:@"SLT", @"FLTthruSLT", @"Energy", crateKey,stationKey,channelKey,nil];
 	
 	//channel by channel histograms 'bipolar energy peak'
 	[aDataSet histogram:apeak
 				numBins:4096 sender:self  
-			   withKeys:@"v4SLT", @"FLT", @"Epeak", crateKey,stationKey,channelKey,nil];
+			   withKeys:@"SLT", @"FLTthruSLT", @"Epeak", crateKey,stationKey,channelKey,nil];
                
 	//channel by channel histograms 'bipolar energy valley'
 	[aDataSet histogram:avalley
 				numBins:4096 sender:self  
-			   withKeys:@"v4SLT", @"FLT", @"Evalley", crateKey,stationKey,channelKey,nil];
+			   withKeys:@"SLT", @"FLTthruSLT", @"Evalley", crateKey,stationKey,channelKey,nil];
 	
     
     /*
