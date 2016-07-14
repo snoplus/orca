@@ -329,6 +329,9 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
     [super dealloc];
 }
 
+- (int) filterShapingLength //this is to  return a dummy value, if the FLT card cannot be found (see below) -tb-
+{return 8;}//I return the maximum value
+
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
@@ -389,17 +392,25 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
 		NSString* fltKey = [crateKey stringByAppendingString:stationKey];
 		ORKatrinV4FLTModel* obj = [actualFlts objectForKey:fltKey];
 		if(!obj){
+            NSLog(@"searching FLTs: fltKey %@ \n",fltKey);
 			NSArray* listOfFlts = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORKatrinV4FLTModel")];
 			for(ORKatrinV4FLTModel* aFlt in listOfFlts){
+                NSLog(@"searching FLTs: stationNum %i (searching card %i)\n",[aFlt stationNumber],card);
+
 				if(/*[aFlt crateNumber] == crate &&*/ [aFlt stationNumber] == card){
 					[actualFlts setObject:aFlt forKey:fltKey];
 					obj = aFlt;
 					break;
 				}
 			}
+            if(!obj){
+                [actualFlts setObject:self forKey:fltKey];
+                obj=self;
+            }
 		}
         int filterShapingLength = 0;
         if(obj) filterShapingLength = [obj filterShapingLength];
+        NSLog(@"   found FLTs(?): filterShapingLength %i \n",filterShapingLength);
 
 	    unsigned long histoLen;
 	    histoLen = 4096;//32768;//4096;//=max. ADC value for 12 bit ADC
@@ -408,7 +419,7 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
 	    [aDataSet loadGenericData:@" " sender:self withKeys:@"v4SLT",@"Energy Records",nil];
     
 	    //channel by channel histograms 'energy'
-	    [aDataSet histogram:energy << filterShapingLength
+	    [aDataSet histogram:energy >> filterShapingLength
 				    numBins:histoLen sender:self  
 			       withKeys:@"SLT", @"FLTthruSLT", @"Energy", crateKey,stationKey,channelKey,nil];
 	

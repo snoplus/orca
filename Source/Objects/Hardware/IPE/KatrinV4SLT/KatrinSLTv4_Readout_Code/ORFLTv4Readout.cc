@@ -1464,7 +1464,7 @@ fprintf(stdout,"4x - readpr:%i, writeptr:%i\n",readptrx,writeptrx);fflush(stdout
         
         
         // --- ENERGY MODE ------------------------------
-        if((daqRunMode == kIpeFltV4_EnergyDaqMode) || (daqRunMode == kIpeFltV4_VetoEnergyDaqMode)){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
+        if((daqRunMode == kIpeFltV4_EnergyDaqMode) || (daqRunMode == kIpeFltV4_VetoEnergyDaqMode) || (daqRunMode == kIpeFltV4_BipolarEnergyDaqMode)  ){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
             //uint32_t status         = srack->theFlt[col]->status->read();
             uint32_t fifoStatus;// = (status >> 24) & 0xf;
             uint32_t fifoFlags;// =   FF, AF, AE, EF
@@ -1538,7 +1538,7 @@ fprintf(stdout,"4x - readpr:%i, writeptr:%i\n",readptrx,writeptrx);fflush(stdout
             }//for(eventN=0; ...
         }
         // --- 'ENERGY+TRACE' MODE -------------------------tb-------   2013-05-29: THIS MODE NOW replaces 'ENERGY+TRACE' and 'ENERGY+TRACE (SYNC)'!!-tb-
-        else if((daqRunMode == kIpeFltV4_EnergyTraceDaqMode) || (daqRunMode == kIpeFltV4_VetoEnergyTraceDaqMode)){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
+        else if((daqRunMode == kIpeFltV4_EnergyTraceDaqMode) || (daqRunMode == kIpeFltV4_VetoEnergyTraceDaqMode) || (daqRunMode == kIpeFltV4_BipolarEnergyTraceDaqMode)){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
         //TODO: else if((daqRunMode == kIpeFltV4_EnergyTraceSyncDaqMode) || (daqRunMode == kIpeFltV4_VetoEnergyTraceSyncDaqMode)){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
 			
             //uint32_t status         = srack->theFlt[col]->status->read();
