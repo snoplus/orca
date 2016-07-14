@@ -20,6 +20,7 @@
 
 
 #import "ORKatrinV4SLTDecoder.h"
+#import "ORKatrinV4FLTModel.h"
 #import "ORDataPacket.h"
 #import "ORDataSet.h"
 #import "ORKatrinV4SLTDefs.h"
@@ -322,6 +323,13 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
  **/
 //-------------------------------------------------------------
 
+- (void) dealloc
+{
+	[actualFlts release];
+    [super dealloc];
+}
+
+
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr = (unsigned long*)someData;
@@ -330,68 +338,107 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
 	unsigned char card		= 0;//ShiftAndExtract(ptr[1],16,0x1f);
 	unsigned char chan		= 0;//ShiftAndExtract(ptr[1],8,0xff);
     
-    unsigned long headerlen, f1,f2,f3,f4,f5,f6;
+ 	NSString* crateKey		= [self getCrateKey: crate];
+	NSString* stationKey	= @"";	
+	NSString* channelKey	= @"";	
+    
+    unsigned long f1,f2,f3,f4,f5,f6;
     unsigned long energy,sec,subsec,multiplicity,p,toplen,ediff,evID, tpeak, tvalley, apeak, avalley;
-    headerlen = 4;
-    f1=ptr[headerlen];
-    f2=ptr[headerlen+1];
-    f3=ptr[headerlen+2];
-    f4=ptr[headerlen+3];
-    f5=ptr[headerlen+4];
-    f6=ptr[headerlen+5];
+    unsigned long headerlen = 4;
+    unsigned long numEv=(length-4)/6;    //(((*ptr) & 0x3ffff)-4)/6;
     
-    card   = (f3 >> 24) & 0x1f;
-    chan   = (f3 >> 19) & 0x1f;
-    //multiplicity  = (f3 >> 14) & 0x1f;
-    //evID   = f3  & 0x3fff;
-    //toplen = f4  & 0x1ff;
-    //ediff  = (f4 >> 9) & 0xfff;
-    //tpeak    = (f4 >> 16) & 0x1ff;
-    tpeak    = (f4 >> 16) & 0x1ff;
-    apeak    =  f4   & 0x7ff;
-    //tvalley  = (f5 >> 16) & 0x1ff;
-    tvalley  = (f5 >> 16) & 0x1ff;
-    avalley  =  4096 - (f5   & 0xfff);
-    
-    energy  = f6  & 0xfffff;
+    //prepare decoding
+    if(!actualFlts)actualFlts = [[NSMutableDictionary alloc] init];
 
+    
+    
+    
+    
+    
+    
+    ptr+=headerlen;
+    
+    int i;
+    for(i=0;i<numEv;i++){
+        f1=ptr[0];
+        f2=ptr[1];
+        f3=ptr[2];
+        f4=ptr[3];
+        f5=ptr[4];
+        f6=ptr[5];
+    
+        card   = (f3 >> 24) & 0x1f;
+        chan   = (f3 >> 19) & 0x1f;
+        //multiplicity  = (f3 >> 14) & 0x1f;
+        //evID   = f3  & 0x3fff;
+        //toplen = f4  & 0x1ff;
+        //ediff  = (f4 >> 9) & 0xfff;
+        //tpeak    = (f4 >> 16) & 0x1ff;
+        tpeak    = (f4 >> 16) & 0x1ff;
+        apeak    =  f4   & 0x7ff;
+        //tvalley  = (f5 >> 16) & 0x1ff;
+        tvalley  = (f5 >> 16) & 0x1ff;
+        avalley  =  4096 - (f5   & 0xfff);
+    
+        energy  = f6  & 0xfffff;
 
-	NSString* crateKey		= [self getCrateKey: crate];
-	NSString* stationKey	= [self getStationKey: card];	
-	NSString* channelKey	= [self getChannelKey: chan];	
+        
+	    stationKey	= [self getStationKey: card];	
+	    channelKey	= [self getChannelKey: chan];	
+        
+		NSString* fltKey = [crateKey stringByAppendingString:stationKey];
+		ORKatrinV4FLTModel* obj = [actualFlts objectForKey:fltKey];
+		if(!obj){
+			NSArray* listOfFlts = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORKatrinV4FLTModel")];
+			for(ORKatrinV4FLTModel* aFlt in listOfFlts){
+				if(/*[aFlt crateNumber] == crate &&*/ [aFlt stationNumber] == card){
+					[actualFlts setObject:aFlt forKey:fltKey];
+					obj = aFlt;
+					break;
+				}
+			}
+		}
+        int filterShapingLength = 0;
+        if(obj) filterShapingLength = [obj filterShapingLength];
+
+	    unsigned long histoLen;
+	    histoLen = 4096;//32768;//4096;//=max. ADC value for 12 bit ADC
     
-	unsigned long histoLen;
-	histoLen = 32768;//4096;//=max. ADC value for 12 bit ADC
+        // count datasets
+	    [aDataSet loadGenericData:@" " sender:self withKeys:@"v4SLT",@"Energy Records",nil];
     
-    // count datasets
-	[aDataSet loadGenericData:@" " sender:self withKeys:@"v4SLT",@"Energy Records",nil];
-    
-	//channel by channel histograms 'energy'
-	[aDataSet histogram:energy
-				numBins:histoLen sender:self  
-			   withKeys:@"SLT", @"FLTthruSLT", @"Energy", crateKey,stationKey,channelKey,nil];
+	    //channel by channel histograms 'energy'
+	    [aDataSet histogram:energy << filterShapingLength
+				    numBins:histoLen sender:self  
+			       withKeys:@"SLT", @"FLTthruSLT", @"Energy", crateKey,stationKey,channelKey,nil];
 	
-	//channel by channel histograms 'bipolar energy peak'
-	[aDataSet histogram:apeak
-				numBins:4096 sender:self  
-			   withKeys:@"SLT", @"FLTthruSLT", @"PeakADC", crateKey,stationKey,channelKey,nil];
+	    //channel by channel histograms 'bipolar energy peak'
+	    [aDataSet histogram:apeak
+	    			numBins:4096 sender:self  
+	    		   withKeys:@"SLT", @"FLTthruSLT", @"PeakADC", crateKey,stationKey,channelKey,nil];
                
-	//channel by channel histograms 'bipolar energy valley'
-	[aDataSet histogram:avalley
-				numBins:4096 sender:self  
-			   withKeys:@"SLT", @"FLTthruSLT", @"ValleyADC", crateKey,stationKey,channelKey,nil];
+	    //channel by channel histograms 'bipolar energy valley'
+	    [aDataSet histogram:avalley
+	    			numBins:4096 sender:self  
+	    		   withKeys:@"SLT", @"FLTthruSLT", @"ValleyADC", crateKey,stationKey,channelKey,nil];
 	
-	//channel by channel histograms 'bipolar energy peak' time
-	[aDataSet histogram:tpeak
-				numBins:4096 sender:self  
-			   withKeys:@"SLT", @"FLTthruSLT", @"PeakPos", crateKey,stationKey,channelKey,nil];
+	    //channel by channel histograms 'bipolar energy peak' time
+	    [aDataSet histogram:tpeak
+	    			numBins:4096 sender:self  
+	    		   withKeys:@"SLT", @"FLTthruSLT", @"PeakPos", crateKey,stationKey,channelKey,nil];
                
-	//channel by channel histograms 'bipolar energy valley' time
-	[aDataSet histogram:tvalley
-				numBins:4096 sender:self  
-			   withKeys:@"SLT", @"FLTthruSLT", @"ValleyPos", crateKey,stationKey,channelKey,nil];
+	    //channel by channel histograms 'bipolar energy valley' time
+	    [aDataSet histogram:tvalley
+	    			numBins:4096 sender:self  
+	    		   withKeys:@"SLT", @"FLTthruSLT", @"ValleyPos", crateKey,stationKey,channelKey,nil];
+                   
+        ptr+=6;//next event
 	
+
+    }
     
+        
+                
     /*
      //for debugging/testing -tb-
      int i=0;
@@ -428,8 +475,14 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
     ++ptr;
     ++ptr;
     ++ptr;
+    
+    
+    
     unsigned long* eventPtr=ptr;
     unsigned long f1,f2,f3,f4,f5,f6;
+    
+    //for(i=0;i<numEv;i++){
+
     f1=ptr[0];
     f2=ptr[1];
     f3=ptr[2];
