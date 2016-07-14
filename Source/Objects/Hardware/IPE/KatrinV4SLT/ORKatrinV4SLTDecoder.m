@@ -347,9 +347,11 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
     //toplen = f4  & 0x1ff;
     //ediff  = (f4 >> 9) & 0xfff;
     //tpeak    = (f4 >> 16) & 0x1ff;
-    apeak    =  f4   & 0xfff;
+    tpeak    = (f4 >> 16) & 0x1ff;
+    apeak    =  f4   & 0x7ff;
     //tvalley  = (f5 >> 16) & 0x1ff;
-    avalley  =  f5   & 0xfff;
+    tvalley  = (f5 >> 16) & 0x1ff;
+    avalley  =  4096 - (f5   & 0xfff);
     
     energy  = f6  & 0xfffff;
 
@@ -372,12 +374,22 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
 	//channel by channel histograms 'bipolar energy peak'
 	[aDataSet histogram:apeak
 				numBins:4096 sender:self  
-			   withKeys:@"SLT", @"FLTthruSLT", @"Epeak", crateKey,stationKey,channelKey,nil];
+			   withKeys:@"SLT", @"FLTthruSLT", @"PeakADC", crateKey,stationKey,channelKey,nil];
                
 	//channel by channel histograms 'bipolar energy valley'
 	[aDataSet histogram:avalley
 				numBins:4096 sender:self  
-			   withKeys:@"SLT", @"FLTthruSLT", @"Evalley", crateKey,stationKey,channelKey,nil];
+			   withKeys:@"SLT", @"FLTthruSLT", @"ValleyADC", crateKey,stationKey,channelKey,nil];
+	
+	//channel by channel histograms 'bipolar energy peak' time
+	[aDataSet histogram:tpeak
+				numBins:4096 sender:self  
+			   withKeys:@"SLT", @"FLTthruSLT", @"PeakPos", crateKey,stationKey,channelKey,nil];
+               
+	//channel by channel histograms 'bipolar energy valley' time
+	[aDataSet histogram:tvalley
+				numBins:4096 sender:self  
+			   withKeys:@"SLT", @"FLTthruSLT", @"ValleyPos", crateKey,stationKey,channelKey,nil];
 	
     
     /*
