@@ -2116,8 +2116,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 		
         //read SLT second counters after readout of the hitrates
         //  need to consider two types of SLT cards -tb- 2016-05
-        //DEBUG
-        NSLog(@"%@::%@   slt is of class %@\n  ",NSStringFromClass([self class]),NSStringFromSelector(_cmd),NSStringFromClass([[[self crate] adapter] class]));//DEBUG -tb-
+        //DEBUG        NSLog(@"%@::%@   slt is of class %@\n  ",NSStringFromClass([self class]),NSStringFromSelector(_cmd),NSStringFromClass([[[self crate] adapter] class]));//DEBUG -tb-
         id slt = [[self crate] adapter];
         unsigned long sltSubSecAddr =  0;
         unsigned long sltSecAddr    =  0;
