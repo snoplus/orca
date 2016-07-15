@@ -1768,13 +1768,18 @@ err:
 
 - (NSString*)ECA_type
 {
-    return ECA_type;
+    return [NSString stringWithFormat:@"%@",ECA_type];
 }
 
 - (void) setECA_type:(NSString*)aValue
 {
-    ECA_type = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
+    if(aValue != ECA_type)
+    {
+        NSString* temp = ECA_type;
+        ECA_type = [aValue retain];
+        [temp release];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
+    }
 }
 
 - (int)ECA_tslope_pattern
