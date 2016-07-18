@@ -1865,6 +1865,18 @@ void SwapLongBlock(void* p, int32_t n)
     CrateInitSetupArgs *setupArgs;
     CrateInitArgs *crateInitArgs;
 
+    /* Check XL3 is in init mode before init-ing with xilinx. */
+    if (([self xl3Mode] != INIT_MODE) && xilinxLoad) {
+        NSLogColor([NSColor redColor], @"XL3 %02d not in init mode.  Aborting initialization.\n", [self crateNumber]);
+        goto err;
+    }
+
+    /* Check that HV Relays for XL3 are open if performing a full crate init. */
+    if ((shiftRegOnly == 0) && ([self hvASwitch] || [self hvBSwitch])) {
+        NSLogColor([NSColor redColor], @"XL3 %02d has high voltage on.  HV must be turned off before crate initialization.\n", [self crateNumber]);
+        goto err;
+    }
+
     if (shiftRegOnly && xilinxLoad) {
         NSLogColor([NSColor redColor], @"crate %02d: warning xilinx is not loaded if shiftRegOnly != 0\n", [self crateNumber]);
     }
