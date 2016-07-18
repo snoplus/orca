@@ -1977,6 +1977,7 @@ snopGreenColor;
     if (error != nil) {
         NSLogColor([NSColor redColor], @"Error contacting database: %@\n",
                    [error localizedDescription]);
+        [model setStandardRunType:@""];
         return;
     }
 
@@ -2032,6 +2033,7 @@ snopGreenColor;
     if (error != nil) {
         NSLogColor([NSColor redColor], @"Error contacting database: %@\n",
                    [error localizedDescription]);
+        [model setStandardRunVersion:@""];
         return;
     }
 
