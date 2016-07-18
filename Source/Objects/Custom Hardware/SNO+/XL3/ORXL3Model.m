@@ -3425,7 +3425,10 @@ err:
         HVReadbackResults status;
         @try {
             [self readHVStatus:&status];
-        } @catch (NSException *exception) {
+        } @catch (NSException *e) {
+            NSLogColor([NSColor redColor],
+                       @"xl3 %i: Failed to read HV status: %@\n",
+                       [self crateNumber], [e reason]);
             return;
         }
 
