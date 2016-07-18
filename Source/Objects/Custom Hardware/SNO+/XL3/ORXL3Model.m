@@ -3419,6 +3419,8 @@ err:
      * model. */
     @synchronized(self) {
         if (![[self xl3Link] isConnected]) {
+            NSLogColor([NSColor redColor], @"xl3 %i: readHVStatus called, "
+                       "but XL3 is not connected!\n", [self crateNumber]);
             return;
         }
 
@@ -3426,9 +3428,8 @@ err:
         @try {
             [self readHVStatus:&status];
         } @catch (NSException *e) {
-            NSLogColor([NSColor redColor],
-                       @"xl3 %i: Failed to read HV status: %@\n",
-                       [self crateNumber], [e reason]);
+            NSLogColor([NSColor redColor], @"xl3 %i: Failed to read HV status: "
+                       "%@\n", [self crateNumber], [e reason]);
             return;
         }
 
