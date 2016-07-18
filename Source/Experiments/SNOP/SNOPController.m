@@ -1204,9 +1204,14 @@ snopGreenColor;
 {
     
     //Refresh values in GUI to match the model
-    NSInteger* index = [model ECA_pattern] -1;
+    int index = [model ECA_pattern] -1;
+    if(index < 0)
+    {
+        NSLogColor([NSColor redColor], @"ECA bad index returned\n");
+        return;
+    }
     [ECApatternPopUpButton selectItemAtIndex:index];
-    [ECAtypePopUpButton selectItemWithTitle:[[model ECA_type] retain]];
+    [ECAtypePopUpButton selectItemWithTitle:[model ECA_type]];
     int integ = [model ECA_tslope_pattern];
     [TSlopePatternTextField setIntValue:integ];
     integ = [model ECA_nevents];
