@@ -1953,27 +1953,38 @@ snopGreenColor;
     
 }
 
-- (IBAction)refreshStandardRuns:(id)sender {
+- (IBAction) refreshStandardRuns: (id) sender
+{
+    NSString *urlString, *link, *ret;
+    NSURLRequest *request;
+    NSURLResponse *response;
+    NSError *error = nil;
+    NSData *data;
     
-    //Clear stored SRs
+    // Clear stored SRs
     [standardRunPopupMenu deselectItemAtIndex:[standardRunPopupMenu indexOfSelectedItem]];
     [standardRunPopupMenu removeAllItems];
     
-    //Now query DB and fetch the SRs
-    NSString* urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/orca/_design/standardRuns/_view/getStandardRuns",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort]];
-    NSString* link = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-    NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:link] cachePolicy:0 timeoutInterval:2];
-    NSURLResponse* response=nil;
-    NSError* error=nil;
-    NSData* data=[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-    NSString *ret = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
-    
-    NSDictionary *standardRunTypes = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
-    
-    if(error) {
+    // Now query DB and fetch the SRs
+    urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/orca/_design/standardRuns/_view/getStandardRuns",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort]];
+    link = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    request = [NSURLRequest requestWithURL:[NSURL URLWithString:link]
+               cachePolicy:0 timeoutInterval:2];
+
+    data = [NSURLConnection sendSynchronousRequest:request
+            returningResponse:&response error:&error];
+
+    if (error != nil) {
+        NSLogColor([NSColor redColor], @"Error contacting database: %@\n",
+                   [error localizedDescription]);
         [model setStandardRunType:@""];
         return;
     }
+
+    ret = [[[NSString alloc] initWithData:data
+            encoding:NSUTF8StringEncoding] autorelease];
+
+    NSDictionary *standardRunTypes = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
     
     for(id entry in [standardRunTypes valueForKey:@"rows"]){
         NSString *runtype = [entry valueForKey:@"value"];
@@ -1999,22 +2010,41 @@ snopGreenColor;
     
 }
 
-- (void) refreshStandardRunVersions {
+- (void) refreshStandardRunVersions
+{
+    NSString *urlString, *link, *ret;
+    NSURLRequest *request;
+    NSURLResponse *response;
+    NSError *error = nil;
+    NSData *data;
     
-    //Clear stored Versions
+    // Clear stored Versions
     [standardRunVersionPopupMenu deselectItemAtIndex:[standardRunVersionPopupMenu indexOfSelectedItem]];
     [standardRunVersionPopupMenu removeAllItems];
     
-    NSString *urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/orca/_design/standardRuns/_view/getStandardRuns",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort]];
-    NSString* link = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-    NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:link] cachePolicy:0 timeoutInterval:2];
-    NSURLResponse* response=nil;
-    NSError* error=nil;
-    NSData* data=[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-    NSString *ret = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]autorelease];
+    urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/orca/_design/standardRuns/_view/getStandardRuns",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort]];
+    link = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    request = [NSURLRequest requestWithURL:[NSURL URLWithString:link]
+               cachePolicy:0 timeoutInterval:2];
+
+    data = [NSURLConnection sendSynchronousRequest:request
+            returningResponse:&response error:&error];
+
+    if (error != nil) {
+        NSLogColor([NSColor redColor], @"Error contacting database: %@\n",
+                   [error localizedDescription]);
+        [model setStandardRunVersion:@""];
+        return;
+    }
+
+    ret = [[[NSString alloc] initWithData:data
+            encoding:NSUTF8StringEncoding]autorelease];
+
     NSDictionary *standardRunVersions = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
-    
-    if(error) {
+
+    if (error != nil) {
+        NSLogColor([NSColor redColor], @"Error converting JSON response from "
+                   "database: %@\n", [error localizedDescription]);
         [model setStandardRunVersion:@""];
         return;
     }
