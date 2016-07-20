@@ -390,12 +390,13 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
 	    channelKey	= [self getChannelKey: chan];	
         
 		NSString* fltKey = [crateKey stringByAppendingString:stationKey];
-		ORKatrinV4FLTModel* obj = [actualFlts objectForKey:fltKey];
+		//ORKatrinV4FLTModel* obj = [actualFlts objectForKey:fltKey];
+		id obj = [actualFlts objectForKey:fltKey];
 		if(!obj){
-            NSLog(@"searching FLTs: fltKey %@ \n",fltKey);
+            //NSLog(@"searching FLTs: fltKey %@ \n",fltKey);
 			NSArray* listOfFlts = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORKatrinV4FLTModel")];
 			for(ORKatrinV4FLTModel* aFlt in listOfFlts){
-                NSLog(@"searching FLTs: stationNum %i (searching card %i)\n",[aFlt stationNumber],card);
+                //NSLog(@"searching FLTs: stationNum %i (searching card %i)\n",[aFlt stationNumber],card);
 
 				if(/*[aFlt crateNumber] == crate &&*/ [aFlt stationNumber] == card){
 					[actualFlts setObject:aFlt forKey:fltKey];
