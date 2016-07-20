@@ -411,7 +411,7 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
 		}
         int filterShapingLength = 0;
         if(obj) filterShapingLength = [obj filterShapingLength];
-        NSLog(@"   found FLTs(?): filterShapingLength %i \n",filterShapingLength);
+        //NSLog(@"   found FLTs(?): filterShapingLength %i \n",filterShapingLength);
 
 	    unsigned long histoLen;
 	    histoLen = 4096;//32768;//4096;//=max. ADC value for 12 bit ADC
