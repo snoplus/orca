@@ -3425,23 +3425,23 @@ err:
     [self setHvEverUpdated:YES];
 }
 
-//used from polling loop and/or ORCA script
 - (void) readHVStatus
 {
+    /* Read back the HV value and current for supplies A and B and update the
+     * model. */
     @synchronized(self) {
-        if (![[self xl3Link] isConnected]) {//ORSNOPExperiment sends a notification to all crates
+        if (![[self xl3Link] isConnected]) {
+            NSLogColor([NSColor redColor], @"xl3 %i: readHVStatus called, "
+                       "but XL3 is not connected!\n", [self crateNumber]);
             return;
         }
 
         HVReadbackResults status;
         @try {
             [self readHVStatus:&status];
-        }
-        @catch (NSException *exception) {
-            if (isPollingXl3) {
-                NSLog(@"%@ Polling loop stopped because reading XL3 local voltages failed\n", [[self xl3Link] crateName]);
-                [self setIsPollingXl3:NO];
-            }
+        } @catch (NSException *e) {
+            NSLogColor([NSColor redColor], @"xl3 %i: Failed to read HV status: "
+                       "%@\n", [self crateNumber], [e reason]);
             return;
         }
 
@@ -3450,32 +3450,12 @@ err:
         [self setHvACurrentReadValue:status.currentA * 10.];
         [self setHvBCurrentReadValue:status.currentB * 10.];
 
-        //data packet
-        const unsigned char packet_length = 6+6;
-        if (isPollingXl3 && [[ORGlobal sharedGlobal] runInProgress]) {
-            unsigned long data[packet_length];
-            data[0] = [self xl3HvDataId] | packet_length;
-            data[1] = [self crateNumber];
-            float* vlt = (float*)&data[2];
-            vlt[0] = [self hvAVoltageReadValue];
-            vlt[1] = [self hvBVoltageReadValue];
-            vlt[2] = [self hvACurrentReadValue];
-            vlt[3] = [self hvBCurrentReadValue];
-            const char* timestamp = [[self stringDate] cStringUsingEncoding:NSASCIIStringEncoding];
-            memcpy(data+6, timestamp, 6*4);
-            NSData* pdata = [[NSData alloc] initWithBytes:data length:sizeof(long)*(packet_length)];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:pdata];
-                [pdata release];
-            });
-            pdata = nil;
-        }
         dispatch_async(dispatch_get_main_queue(), ^{
-            [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
+            [[NSNotificationCenter defaultCenter]
+             postNotificationName:ORXL3ModelHvStatusChanged object:self];
         });
     }
 }
-
 
 - (void) hvUserIntervention:(BOOL)forA
 {
