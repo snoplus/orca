@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="15F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10116"/>
@@ -1171,15 +1171,6 @@
                                                             <action selector="ignorePanicOnBAction:" target="-2" id="8rY-rS-zD4"/>
                                                         </connections>
                                                     </button>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="INC-ix-fw5">
-                                                        <rect key="frame" x="1" y="56" width="174" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title=" " id="xIB-jr-5vh">
-                                                            <font key="font" metaFont="titleBar"/>
-                                                            <color key="textColor" red="0.52986826799999998" green="0.01532832416" blue="0.044266656879999998" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
                                                     <button verticalHuggingPriority="750" id="i0i-iy-mA6">
                                                         <rect key="frame" x="185" y="8" width="80" height="28"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -1191,6 +1182,15 @@
                                                             <action selector="resetInterLocksOnModule0:" target="-2" id="CdB-Li-U5l"/>
                                                         </connections>
                                                     </button>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="INC-ix-fw5">
+                                                        <rect key="frame" x="5" y="14" width="174" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title=" " id="xIB-jr-5vh">
+                                                            <font key="font" metaFont="titleBar"/>
+                                                            <color key="textColor" red="0.52986826799999998" green="0.01532832416" blue="0.044266656879999998" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
@@ -1276,15 +1276,6 @@
                                                             <action selector="ignorePanicOnAAction:" target="-2" id="vue-fF-zZJ"/>
                                                         </connections>
                                                     </button>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="jVY-6n-r5h">
-                                                        <rect key="frame" x="0.0" y="55" width="177" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title=" " id="pHO-Mg-fSN">
-                                                            <font key="font" metaFont="titleBar"/>
-                                                            <color key="textColor" red="0.52986826799999998" green="0.01532832416" blue="0.044266656879999998" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
                                                     <button verticalHuggingPriority="750" id="p65-va-aG2">
                                                         <rect key="frame" x="185" y="6" width="80" height="28"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -1296,6 +1287,15 @@
                                                             <action selector="resetInterLocksOnModule1:" target="-2" id="wl2-yU-GWL"/>
                                                         </connections>
                                                     </button>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="jVY-6n-r5h">
+                                                        <rect key="frame" x="7" y="12" width="177" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title=" " id="pHO-Mg-fSN">
+                                                            <font key="font" metaFont="titleBar"/>
+                                                            <color key="textColor" red="0.52986826799999998" green="0.01532832416" blue="0.044266656879999998" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
