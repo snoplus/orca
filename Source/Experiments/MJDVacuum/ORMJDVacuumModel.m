@@ -1985,12 +1985,12 @@ NSString* ORMJDVacuumModelVacuumSpiked                     = @"ORMJDVacuumModelV
         else {
             //nope, not operational
             if(baratronPressure < kLowValue) {
-                [self addContinuedBiasConstraints:kBaratronTooLowConstraint  reason:kBaratronTooLowReason];
-                [self addOkToBiasConstraints:     kBaratronTooLowConstraint  reason:kBaratronTooLowReason];
+                [self addContinuedBiasConstraints:kBaratronTooLowConstraint  reason:[kBaratronTooLowReason stringByAppendingFormat:@" %.1f",kLowValue]];
+                [self addOkToBiasConstraints:     kBaratronTooLowConstraint  reason:[kBaratronTooLowReason stringByAppendingFormat:@" %.1f",kLowValue]];
             }
             else if(baratronPressure > kHighValue)	{
-                [self addContinuedBiasConstraints:kBaratronTooHighConstraint reason:kBaratronTooHighReason];
-                [self addOkToBiasConstraints:     kBaratronTooHighConstraint reason:kBaratronTooHighReason];
+                [self addContinuedBiasConstraints:kBaratronTooHighConstraint reason:[kBaratronTooHighReason stringByAppendingFormat:@" %.1f",kHighValue]];
+                [self addOkToBiasConstraints:     kBaratronTooHighConstraint reason:[kBaratronTooHighReason stringByAppendingFormat:@" %.1f",kHighValue]];
             }
         }
 	}

@@ -100,10 +100,10 @@
 #define kDetectorBiasedReason					@"Detector must be protected from regions with pressure higher than 1E-5."
 
 #define kBaratronTooLowConstraint				@"BaratronTooLow"
-#define kBaratronTooLowReason					@"Baratron out of range. Pressure less than 1000."
+#define kBaratronTooLowReason					@"Baratron out of range. Pressure less than"
 
 #define kBaratronTooHighConstraint				@"BaratronTooHigh"
-#define kBaratronTooHighReason					@"Baratron out of range. Pressure greater than 2500."
+#define kBaratronTooHighReason					@"Baratron out of range. Pressure greater than"
 
 #define kG3HighConstraint						@"G3High"
 #define kG3HighReason							@"PKR G3 greater than 1E-6."
