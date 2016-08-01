@@ -33,7 +33,7 @@
 #import "ORValueBarGroupView.h"
 #import "ORQueueView.h"
 
-#define kNumChanConfigBits 5
+#define kNumBoardConfigBits 5
 #define kNumTrigSourceBits 10
 
 
@@ -86,13 +86,13 @@
                        object : nil];
 
     [notifyCenter addObserver : self
-                     selector : @selector(logicTypeChanged:)
-                         name : ORDT5725ModelLogicTypeChanged
+                     selector : @selector(inputDynamicRangeChanged:)
+                         name : ORDT5725ModelInputDynamicRangeChanged
                         object: model];
     
     [notifyCenter addObserver : self
-                     selector : @selector(zsThresholdChanged:)
-                         name : ORDT5725ZsThresholdChanged
+                     selector : @selector(selfTrigPulseWidthChanged:)
+                         name : ORDT5725ModelSelfTrigPulseWidthChanged
                        object : model];
     
     [notifyCenter addObserver : self
@@ -101,39 +101,19 @@
                        object : model];
     
     [notifyCenter addObserver : self
-                     selector : @selector(numOverUnderZsThresholdChanged:)
-                         name : ORDT5725NumOverUnderZsThresholdChanged
+                     selector : @selector(selfTrigLogicChanged:)
+                         name : ORDT5725ModelSelfTrigLogicChanged
                        object : model];
     
     [notifyCenter addObserver : self
-                     selector : @selector(nlfwdChanged:)
-                         name : ORDT5725NlfwdChanged
+                     selector : @selector(selfTrigPulseTypeChanged:)
+                         name : ORDT5725ModelSelfTrigPulseTypeChanged
                        object : model];
     
     [notifyCenter addObserver : self
-                     selector : @selector(nlbkChanged:)
-                         name : ORDT5725NlbkChanged
+                     selector : @selector(dcOffsetChanged:)
+                         name : ORDT5725ModelDCOffsetChanged
                        object : model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(numOverUnderThresholdChanged:)
-                         name : ORDT5725NumOverUnderThresholdChanged
-                       object : model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(dacChanged:)
-                         name : ORDT5725DacChanged
-                       object : model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(zsAlgorithmChanged:)
-                         name : ORDT5725ModelZsAlgorithmChanged
-                        object: model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(packedChanged:)
-                         name : ORDT5725ModelPackedChanged
-                        object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(testPatternEnabledChanged:)
@@ -166,8 +146,13 @@
                        object : model];
     
     [notifyCenter addObserver : self
-                     selector : @selector(gpiRunModeChanged:)
-                         name : ORDT5725ModelGpiRunModeChanged
+                     selector : @selector(startStopRunModeChanged:)
+                         name : ORDT5725ModelStartStopRunModeChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(memFullModeChanged:)
+                         name : ORDT5725ModelMemFullModeChanged
                         object: model];
     
     [notifyCenter addObserver : self
@@ -181,6 +166,11 @@
                         object: model];
     
     [notifyCenter addObserver : self
+                     selector : @selector(coincidenceWindowChanged:)
+                         name : ORDT5725ModelCoincidenceWindowChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
                      selector : @selector(coincidenceLevelChanged:)
                          name : ORDT5725ModelCoincidenceLevelChanged
                        object : model];
@@ -191,13 +181,13 @@
                        object : model];
     
     [notifyCenter addObserver : self
-                     selector : @selector(fpExternalTrigEnabledChanged:)
-                         name : ORDT5725ModelFpExternalTrigEnabledChanged
+                     selector : @selector(swTrigOutEnabledChanged:)
+                         name : ORDT5725ModelSwTrigOutEnabledChanged
                         object: model];
     
     [notifyCenter addObserver : self
-                     selector : @selector(fpSoftwareTrigEnabledChanged:)
-                         name : ORDT5725ModelFpSoftwareTrigEnabledChanged
+                     selector : @selector(extTrigOutEnabledChanged:)
+                         name : ORDT5725ModelExtTrigOutEnabledChanged
                         object: model];
 
     [notifyCenter addObserver : self
@@ -206,23 +196,83 @@
                        object : model];
     
     [notifyCenter addObserver : self
+                     selector : @selector(triggerOutLogicChanged:)
+                         name : ORDT5725ModelTriggerOutLogicChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(trigOutCoincidenceLevelChanged:)
+                         name : ORDT5725ModelTrigOutCoincidenceLevelChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
                      selector : @selector(postTriggerSettingChanged:)
                          name : ORDT5725ModelPostTriggerSettingChanged
                        object : model];
     
     [notifyCenter addObserver : self
-                     selector : @selector(gpoEnabledChanged:)
-                         name : ORDT5725ModelGpoEnabledChanged
+                     selector : @selector(fpLogicTypeChanged:)
+                         name : ORDT5725ModelFpLogicTypeChanged
                         object: model];
-    
+
     [notifyCenter addObserver : self
-                     selector : @selector(ttlEnabledChanged:)
-                         name : ORDT5725ModelTtlEnabledChanged
+                     selector : @selector(fpTrigInSigEdgeDisableChanged:)
+                         name : ORDT5725ModelFpTrigInSigEdgeDisableChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(fpTrigInToMezzaninesChanged:)
+                         name : ORDT5725ModelFpTrigInToMezzaninesChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(fpForceTrigOutChanged:)
+                         name : ORDT5725ModelFpForceTrigOutChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(fpTrigOutModeChanged:)
+                         name : ORDT5725ModelFpTrigOutModeChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(fpTrigOutModeSelectChanged:)
+                         name : ORDT5725ModelFpTrigOutModeSelectChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(fpMBProbeSelectChanged:)
+                         name : ORDT5725ModelFpMBProbeSelectChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(fpBusyUnlockSelectChanged:)
+                         name : ORDT5725ModelFpBusyUnlockSelectChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(fpHeaderPatternChanged:)
+                         name : ORDT5725ModelFpHeaderPatternChanged
                         object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(enabledMaskChanged:)
                          name : ORDT5725ModelEnabledMaskChanged
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(fanSpeedModeChanged:)
+                         name : ORDT5725ModelFanSpeedModeChanged
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(almostFullLevelChanged:)
+                         name : ORDT5725ModelAlmostFullLevelChanged
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(runDelayChanged:)
+                         name : ORDT5725ModelRunDelayChanged
                        object : model];
 
     [notifyCenter addObserver : self
@@ -314,23 +364,20 @@
     int i;
     for(i=0;i<kNumDT5725Channels;i++){
         
-        [[logicTypeMatrix       cellAtRow:i column:0] setTag:i];
-        [[zsThresholdMatrix     cellAtRow:i column:0] setTag:i];
-        [[nLbkMatrix            cellAtRow:i column:0] setTag:i];
-        [[nLfwdMatrix           cellAtRow:i column:0] setTag:i];
-        [[thresholdMatrix       cellAtRow:i column:0] setTag:i];
-        [[numOverUnderZsThresholdMatrix cellAtRow:i column:0] setTag:i];
-        [[numOverUnderThresholdMatrix cellAtRow:i column:0] setTag:i];
-        [[dacMatrix             cellAtRow:i column:0] setTag:i];
-        [[trigOnUnderThresholdMatrix cellAtRow:i column:0] setTag:i];
-        [[triggerSourceEnableMaskMatrix cellAtRow:i column:0] setTag:i];
-        [[triggerOutMatrix      cellAtRow:i column:0] setTag:i];
-        [[enabled2MaskMatrix    cellAtRow:i column:0] setTag:i];
+        [[inputDynamicRangeMatrix           cellAtRow:i column:0] setTag:i];
+        [[selfTrigPulseWidthMatrix          cellAtRow:i column:0] setTag:i];
+        [[thresholdMatrix                   cellAtRow:i column:0] setTag:i];
+        [[selfTrigPulseTypeMatrix           cellAtRow:i column:0] setTag:i];
+        [[dcOffsetMatrix                    cellAtRow:i column:0] setTag:i];
+        [[trigOnUnderThresholdMatrix        cellAtRow:i column:0] setTag:i];//TODO why is this here?
+        [[triggerSourceEnableMaskMatrix     cellAtRow:i column:0] setTag:i];
+        [[triggerOutMaskMatrix              cellAtRow:i column:0] setTag:i];
+        [[enabledMaskMatrix                 cellAtRow:i column:0] setTag:i];
+        [[enabled2MaskMatrix                cellAtRow:i column:0] setTag:i];
+        if (i%2 == 0){
+            [[selfTrigLogicMatrix               cellAtRow:i column:0] setTag:i];
+        }
     }
-    
-    [[eventSizePopUp itemAtIndex:0]setEnabled:NO];
-    [[eventSizePopUp itemAtIndex:1]setEnabled:NO];
-    [eventSizePopUp setAutoenablesItems:NO];
 
     [super awakeFromNib];
 
@@ -352,34 +399,44 @@
 	[self serialNumberChanged:nil];
     [self integrationChanged:nil];
    
-    [self logicTypeChanged:nil];
-    [self zsThresholdChanged:nil];
-    [self nlfwdChanged:nil];
-    [self nlbkChanged:nil];
+    [self inputDynamicRangeChanged:nil];
+    [self selfTrigPulseWidthChanged:nil];
     [self thresholdChanged:nil];
-    [self numOverUnderZsThresholdChanged:nil];
-    [self numOverUnderThresholdChanged:nil];
-    [self dacChanged:nil];
-    [self zsAlgorithmChanged:nil];
-    [self packedChanged:nil];
+    [self selfTrigLogicChanged:nil];
+    [self selfTrigPulseTypeChanged:nil];
+    [self dcOffsetChanged:nil];
     [self trigOnUnderThresholdChanged:nil];
     [self testPatternEnabledChanged:nil];
     [self trigOverlapEnabledChanged:nil];
     [self eventSizeChanged:nil];
     [self clockSourceChanged:nil];
 	[self countAllTriggersChanged:nil];
-    [self gpiRunModeChanged:nil];
+    [self startStopRunModeChanged:nil];
+    [self memFullModeChanged:nil];
     [self softwareTrigEnabledChanged:nil];
     [self externalTrigEnabledChanged:nil];
+    [self coincidenceWindowChanged:nil];
     [self coincidenceLevelChanged:nil];
     [self triggerSourceEnableMaskChanged:nil];
+    [self swTrigOutEnabledChanged:nil];
+    [self extTrigOutEnabledChanged:nil];
     [self triggerOutMaskChanged:nil];
-    [self fpExternalTrigEnabledChanged:nil];
-    [self fpSoftwareTrigEnabledChanged:nil];
+    [self triggerOutLogicChanged:nil];
+    [self trigOutCoincidenceLevelChanged:nil];
     [self postTriggerSettingChanged:nil];
-    [self gpoEnabledChanged:nil];
-    [self ttlEnabledChanged:nil];
+    [self fpLogicTypeChanged:nil];
+    [self fpTrigInSigEdgeDisableChanged:nil];
+    [self fpTrigInToMezzaninesChanged:nil];
+    [self fpForceTrigOutChanged:nil];
+    [self fpTrigOutModeChanged:nil];
+    [self fpTrigOutModeSelectChanged:nil];
+    [self fpMBProbeSelectChanged:nil];
+    [self fpBusyUnlockSelectChanged:nil];
+    [self fpHeaderPatternChanged:nil];
 	[self enabledMaskChanged:nil];
+    [self fanSpeedModeChanged:nil];
+    [self almostFullLevelChanged:nil];
+    [self runDelayChanged:nil];
     
     [self writeValueChanged:nil];
     [self totalRateChanged:nil];
@@ -511,78 +568,57 @@
     }
 }
 
-- (void) logicTypeChanged:(NSNotification*)aNote
+- (void) inputDynamicRangeChanged:(NSNotification*)aNote
 {
     if(aNote){
-        int i = [[[aNote userInfo] objectForKey:ORDT5725Chnl] intValue];
-       [[logicTypeMatrix cellAtRow:i column:0] selectItemAtIndex:[model logicType:i]];
+       int chnl = [[[aNote userInfo] objectForKey:ORDT5725Chnl] intValue];
+       [[inputDynamicRangeMatrix cellWithTag:chnl] selectItemAtIndex:[model inputDynamicRange:chnl]];
     }
     else {
         int i;
         for (i = 0; i < kNumDT5725Channels; i++){
-            [[logicTypeMatrix cellAtRow:i column:0] selectItemAtIndex:[model logicType:i]];
+            [[inputDynamicRangeMatrix cellWithTag:i] selectItemAtIndex:[model inputDynamicRange:i]];
         }
     }
 }
 
-- (void) zsThresholdChanged:(NSNotification*) aNotification
+- (void) selfTrigPulseWidthChanged:(NSNotification*)aNote
 {
-    if(aNotification){
-        int chnl = [[[aNotification userInfo] objectForKey:ORDT5725Chnl] intValue];
-        [[zsThresholdMatrix cellWithTag:chnl] setIntValue:[model zsThreshold:chnl]];
+    if(aNote){
+        int chnl = [[[aNote userInfo] objectForKey:ORDT5725Chnl] intValue];
+        [[selfTrigPulseWidthMatrix cellWithTag:chnl] setIntValue:[model selfTrigPulseWidth:chnl]];
     }
     else {
         int i;
         for (i = 0; i < kNumDT5725Channels; i++){
-            [[zsThresholdMatrix cellWithTag:i] setIntValue:[model zsThreshold:i]];
-        }
-    }
-    [self basicLockChanged:nil];
-
-}
-
-- (void) packedChanged:(NSNotification*)aNote
-{
-    [packedCB setIntValue: [model packed]];
-}
-
-- (void) numOverUnderZsThresholdChanged: (NSNotification*) aNotification
-{
-    if(aNotification){
-        int chnl = [[[aNotification userInfo] objectForKey:ORDT5725Chnl] intValue];
-        [[numOverUnderZsThresholdMatrix cellWithTag:chnl] setIntValue:[model numOverUnderZsThreshold:chnl]];
-    }
-    else {
-        int i;
-        for (i = 0; i < kNumDT5725Channels; i++){
-            [[numOverUnderZsThresholdMatrix cellWithTag:i] setIntValue:[model numOverUnderZsThreshold:i]];
+            [[selfTrigPulseWidthMatrix cellWithTag:i] setIntValue:[model selfTrigPulseWidth:i]];
         }
     }
 }
-- (void) nlfwdChanged:(NSNotification*) aNotification
+
+- (void) selfTrigLogicChanged:(NSNotification*)aNote
 {
-    if(aNotification){
-        int chnl = [[[aNotification userInfo] objectForKey:ORDT5725Chnl] intValue];
-        [[nLfwdMatrix cellWithTag:chnl] setIntValue:[model nLfwd:chnl]];
+    if(aNote){
+        int chnl = [[[aNote userInfo] objectForKey:ORDT5725Chnl] intValue] / 2;
+        [[selfTrigLogicMatrix cellWithTag:chnl] selectItemAtIndex:[model selfTrigLogic:chnl]];
     }
     else {
         int i;
-        for (i = 0; i < kNumDT5725Channels; i++){
-            [[nLfwdMatrix cellWithTag:i] setIntValue:[model nLfwd:i]];
+        for (i = 0; i < kNumDT5725Channels/2; i++){
+            [[selfTrigLogicMatrix cellWithTag:i] selectItemAtIndex:[model selfTrigLogic:i]];
         }
     }
 }
-- (void) nlbkChanged:(NSNotification*) aNotification
+- (void) selfTrigPulseTypeChanged:(NSNotification*)aNote
 {
-    // Get the channel that changed and then set the GUI value using the model value.
-    if(aNotification){
-        int chnl = [[[aNotification userInfo] objectForKey:ORDT5725Chnl] intValue];
-        [[nLbkMatrix cellWithTag:chnl] setIntValue:[model nLbk:chnl]];
+    if(aNote){
+        int chnl = [[[aNote userInfo] objectForKey:ORDT5725Chnl] intValue];
+        [[selfTrigPulseTypeMatrix cellWithTag:chnl] selectItemAtIndex:[model selfTrigPulseType:chnl]];
     }
     else {
         int i;
         for (i = 0; i < kNumDT5725Channels; i++){
-            [[nLbkMatrix cellWithTag:i] setIntValue:[model nLbk:i]];
+            [[selfTrigPulseTypeMatrix cellWithTag:i] selectItemAtIndex:[model selfTrigPulseType:i]];
         }
     }
 }
@@ -601,38 +637,18 @@
     }
 }
 
-- (void) numOverUnderThresholdChanged: (NSNotification*) aNotification
+- (void) dcOffsetChanged:(NSNotification*)aNote
 {
-    if(aNotification){
-        int chnl = [[[aNotification userInfo] objectForKey:ORDT5725Chnl] intValue];
-        [[numOverUnderThresholdMatrix cellWithTag:chnl] setIntValue:[model numOverUnderThreshold:chnl]];
+    if(aNote){
+        int chnl = [[[aNote userInfo] objectForKey:ORDT5725Chnl] intValue];
+        [[dcOffsetMatrix cellWithTag:chnl] setFloatValue:[model convertDacToVolts:[model dcOffset:chnl] range:[model inputDynamicRange:chnl]]];
     }
     else {
         int i;
         for (i = 0; i < kNumDT5725Channels; i++){
-            [[numOverUnderThresholdMatrix cellWithTag:i] setIntValue:[model numOverUnderThreshold:i]];
+            [[dcOffsetMatrix cellWithTag:i] setFloatValue:[model convertDacToVolts:[model dcOffset:i] range:[model inputDynamicRange:i]]];
         }
     }
-}
-
-- (void) dacChanged: (NSNotification*) aNotification
-{
-    if(aNotification){
-        int chnl = [[[aNotification userInfo] objectForKey:ORDT5725Chnl] intValue];
-        [[dacMatrix cellWithTag:chnl] setFloatValue:[model convertDacToVolts:[model dac:chnl]]];
-    }
-    else {
-        int i;
-        for (i = 0; i < kNumDT5725Channels; i++){
-            [[dacMatrix cellWithTag:i] setFloatValue:[model convertDacToVolts:[model dac:i]]];
-        }
-    }
-}
-
-- (void) zsAlgorithmChanged:(NSNotification*)aNote
-{
-    [zsAlgorithmPU selectItemAtIndex: [model zsAlgorithm]];
-    [self basicLockChanged:nil];
 }
 
 - (void) trigOnUnderThresholdChanged:(NSNotification*)aNote
@@ -645,10 +661,14 @@
     [trigOverlapEnabledButton setIntValue: [model trigOverlapEnabled]];
 }
 
+- (void) testPatternEnabledChanged:(NSNotification*)aNote
+{
+    [testPatternEnabledButton setIntValue: [model testPatternEnabled]];
+}
+
 - (void) eventSizeChanged:(NSNotification*)aNote
 {
-    [eventSizePopUp selectItemAtIndex:	[model eventSize]];
-    [eventSizeTextField setStringValue:	[NSString stringWithFormat:@"%d K",(int)(1024*1024./powf(2.,(float)[model eventSize]))/1024]]; //in Samples
+    [eventSizeTextField setIntValue: [model eventSize]];
 }
 
 - (void) clockSourceChanged:(NSNotification*)aNote
@@ -661,14 +681,14 @@
     [countAllTriggersMatrix selectCellWithTag: [model countAllTriggers]];
 }
 
-- (void) gpiRunModeChanged:(NSNotification*)aNote
+- (void) startStopRunModeChanged:(NSNotification*)aNote
 {
-    [gpiRunModeMatrix selectCellWithTag: [model gpiRunMode]];
+    [startStopRunModePU selectItemAtIndex: [model startStopRunMode]];
 }
 
-- (void) testPatternEnabledChanged:(NSNotification*)aNote
+- (void) memFullModeChanged:(NSNotification*)aNote
 {
-    [testPatternEnabledButton setIntValue: [model testPatternEnabled]];
+    [memFullModeMatrix selectCellWithTag: [model memFullMode]];
 }
 
 - (void) softwareTrigEnabledChanged:(NSNotification*)aNote
@@ -679,6 +699,11 @@
 - (void) externalTrigEnabledChanged:(NSNotification*)aNote
 {
     [externalTrigEnabledButton setIntValue: [model externalTrigEnabled]];
+}
+
+- (void) coincidenceWindowChanged:(NSNotification*)aNote
+{
+    [coincidenceWindowTextField setIntValue: [model coincidenceWindow]];
 }
 
 - (void) coincidenceLevelChanged:(NSNotification*)aNote
@@ -700,18 +725,28 @@
     int i;
     unsigned long mask = [model triggerOutMask];
     for(i=0;i<kNumDT5725Channels;i++){
-        [[triggerOutMatrix cellWithTag:i] setIntValue:(mask & (1L << i)) !=0];
+        [[triggerOutMaskMatrix cellWithTag:i] setIntValue:(mask & (1L << i)) !=0];
     }
  }
 
-- (void) fpExternalTrigEnabledChanged:(NSNotification*)aNote
+- (void) swTrigOutEnabledChanged:(NSNotification*)aNote
 {
-    [fpExternalTrigEnabledButton setIntValue: [model fpExternalTrigEnabled]];
+    [swTrigOutEnabledButton setIntValue:[model swTrigOutEnabled]];
 }
 
-- (void) fpSoftwareTrigEnabledChanged:(NSNotification*)aNote
+- (void) extTrigOutEnabledChanged:(NSNotification*)aNote
 {
-    [fpSoftwareTrigEnabledButton setIntValue: [model fpSoftwareTrigEnabled]];
+    [extTrigOutEnabledButton setIntValue:[model extTrigOutEnabled]];
+}
+
+- (void) triggerOutLogicChanged:(NSNotification*)aNote
+{
+    [triggerOutLogicPU selectItemAtIndex:[model triggerOutLogic]];
+}
+
+- (void) trigOutCoincidenceLevelChanged:(NSNotification*)aNote
+{
+    [trigOutCoincidenceLevelTextField setIntValue:[model trigOutCoincidenceLevel]];
 }
 
 - (void) postTriggerSettingChanged:(NSNotification*)aNote
@@ -719,14 +754,49 @@
     [postTriggerSettingTextField setIntValue:[model postTriggerSetting]];
 }
 
-- (void) gpoEnabledChanged:(NSNotification*)aNote
+- (void) fpLogicTypeChanged:(NSNotification*)aNote
 {
-    [gpoEnabledMatrix selectCellWithTag: [model gpoEnabled]];
+    [fpLogicTypeMatrix selectCellWithTag:[model fpLogicType]];
 }
 
-- (void) ttlEnabledChanged:(NSNotification*)aNote
+- (void) fpTrigInSigEdgeDisableChanged:(NSNotification*)aNote
 {
-	[ttlEnabledMatrix selectCellWithTag: [model ttlEnabled]];
+    [fpTrigInSigEdgeDisableButton setIntValue:[model fpTrigInSigEdgeDisable]];
+}
+
+- (void) fpTrigInToMezzaninesChanged:(NSNotification*)aNote
+{
+    [fpTrigInToMezzaninesButton setIntValue:[model fpTrigInToMezzanines]];
+}
+
+- (void) fpForceTrigOutChanged:(NSNotification*)aNote
+{
+    [fpForceTrigOutButton setIntValue:[model fpForceTrigOut]];
+}
+
+- (void) fpTrigOutModeChanged:(NSNotification*)aNote
+{
+    [fpTrigOutModePU selectItemAtIndex:[model fpTrigOutMode]];
+}
+
+- (void) fpTrigOutModeSelectChanged:(NSNotification*)aNote
+{
+    [fpTrigOutModeSelectPU selectItemAtIndex:[model fpTrigOutModeSelect]];
+}
+
+- (void) fpMBProbeSelectChanged:(NSNotification*)aNote
+{
+    [fpMBProbeSelectPU selectItemAtIndex:[model fpMBProbeSelect]];
+}
+
+- (void) fpBusyUnlockSelectChanged:(NSNotification*)aNote
+{
+    [fpBusyUnlockButton setIntValue:[model fpBusyUnlockSelect]];
+}
+
+- (void) fpHeaderPatternChanged:(NSNotification*)aNote
+{
+    [fpHeaderPatternMatrix selectCellWithTag:[model fpHeaderPattern]];
 }
 
 - (void) enabledMaskChanged:(NSNotification*)aNote
@@ -739,6 +809,20 @@
     }
 }
 
+- (void) fanSpeedModeChanged:(NSNotification*)aNote;
+{
+    [fanSpeedModeMatrix selectCellWithTag:[model fanSpeedMode]];
+}
+
+- (void) almostFullLevelChanged:(NSNotification*)aNote;
+{
+    [almostFullLevelTextField setIntValue:[model almostFullLevel]];
+}
+
+- (void) runDelayChanged:(NSNotification*)aNote;
+{
+    [runDelayTextField setIntValue:[model runDelay]];
+}
 
 - (void) registerRates
 {
@@ -815,7 +899,7 @@
 	[basicReadButton setEnabled:readAllowed];
 	
 	BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORDT5725BasicLock];
-	if ([model selectedRegIndex] >= kZS_Thres && [model selectedRegIndex]<=kAdcConfig){
+	if ([model selectedRegIndex] >= kInputDyRange && [model selectedRegIndex]<=kAdcTemp){
 		[channelPopUp setEnabled:!lockedOrRunningMaintenance];
 	}
 	else [channelPopUp setEnabled:NO];
@@ -877,111 +961,96 @@
     
     [serialNumberPopup setEnabled:!locked];
     
-    [logicTypeMatrix                setEnabled:!lockedOrRunningMaintenance];
-    [thresholdMatrix                setEnabled:!lockedOrRunningMaintenance];
-    
-    switch([model zsAlgorithm]){
-            
-        case kNoZeroSuppression:
-            [zsThresholdMatrix              setEnabled:NO];
-            [numOverUnderZsThresholdMatrix  setEnabled:NO];
-            [nLbkMatrix                     setEnabled:NO];
-            [nLfwdMatrix                    setEnabled:NO];
-            break;
-            
-        case kZeroLengthEncoding:
-            [zsThresholdMatrix              setEnabled:NO];
-            [numOverUnderZsThresholdMatrix  setEnabled:NO];
-            [nLbkMatrix                     setEnabled:!lockedOrRunningMaintenance];
-            [nLfwdMatrix                    setEnabled:!lockedOrRunningMaintenance];
-            break;
-            
-        case kFullSuppressionBasedOnAmplitude:
-            [zsThresholdMatrix              setEnabled:!lockedOrRunningMaintenance];
-            [numOverUnderZsThresholdMatrix  setEnabled:!lockedOrRunningMaintenance];
-            [nLbkMatrix                     setEnabled:NO];
-            [nLfwdMatrix                    setEnabled:NO];
-            break;
-    }
-    
-    [numOverUnderThresholdMatrix    setEnabled:!lockedOrRunningMaintenance];
-    [dacMatrix                      setEnabled:!lockedOrRunningMaintenance];
-    [trigOverlapEnabledButton       setEnabled:!lockedOrRunningMaintenance];
-    [testPatternEnabledButton       setEnabled:!lockedOrRunningMaintenance];
-    [triggerOutMatrix               setEnabled:!lockedOrRunningMaintenance];
-    [trigOnUnderThresholdMatrix     setEnabled:!lockedOrRunningMaintenance];
-    [fpSoftwareTrigEnabledButton    setEnabled:!lockedOrRunningMaintenance];
-    [fpExternalTrigEnabledButton    setEnabled:!lockedOrRunningMaintenance];
-    [postTriggerSettingTextField    setEnabled:!lockedOrRunningMaintenance];
-    [triggerSourceEnableMaskMatrix  setEnabled:!lockedOrRunningMaintenance];
-    [ttlEnabledMatrix               setEnabled:!lockedOrRunningMaintenance];
-    [gpoEnabledMatrix               setEnabled:!lockedOrRunningMaintenance];
-    [softwareTrigEnabledButton      setEnabled:!lockedOrRunningMaintenance];
-    [externalTrigEnabledButton      setEnabled:!lockedOrRunningMaintenance];
-    [gpiRunModeMatrix               setEnabled:!lockedOrRunningMaintenance];
-    [clockSourcePU                  setEnabled:!lockedOrRunningMaintenance];
-    
-    [coincidenceLevelTextField      setEnabled:!lockedOrRunningMaintenance];
-    [countAllTriggersMatrix         setEnabled:!lockedOrRunningMaintenance];
-    [eventSizePopUp                 setEnabled:!lockedOrRunningMaintenance];
-    [initButton                     setEnabled:!lockedOrRunningMaintenance];
+    [inputDynamicRangeMatrix            setEnabled:!lockedOrRunningMaintenance];
+    [selfTrigPulseWidthMatrix           setEnabled:!lockedOrRunningMaintenance];
+    [thresholdMatrix                    setEnabled:!lockedOrRunningMaintenance];
+    [selfTrigLogicMatrix                setEnabled:!lockedOrRunningMaintenance];
+    [selfTrigPulseWidthMatrix           setEnabled:!lockedOrRunningMaintenance];
+    [dcOffsetMatrix                     setEnabled:!lockedOrRunningMaintenance];
+
+    [trigOverlapEnabledButton           setEnabled:!lockedOrRunningMaintenance];
+    [testPatternEnabledButton           setEnabled:!lockedOrRunningMaintenance];
+    [trigOnUnderThresholdMatrix         setEnabled:!lockedOrRunningMaintenance];
+
+    [clockSourcePU                      setEnabled:!lockedOrRunningMaintenance];
+    [countAllTriggersMatrix             setEnabled:!lockedOrRunningMaintenance];
+    [startStopRunModePU                 setEnabled:!lockedOrRunningMaintenance];
+    [memFullModeMatrix                  setEnabled:!lockedOrRunningMaintenance];
+
+    [softwareTrigEnabledButton          setEnabled:!lockedOrRunningMaintenance];
+    [externalTrigEnabledButton          setEnabled:!lockedOrRunningMaintenance];
+    [coincidenceLevelTextField          setEnabled:!lockedOrRunningMaintenance];
+    [coincidenceWindowTextField         setEnabled:!lockedOrRunningMaintenance];
+    [triggerSourceEnableMaskMatrix      setEnabled:!lockedOrRunningMaintenance];
+
+    [swTrigOutEnabledButton             setEnabled:!lockedOrRunningMaintenance];
+    [extTrigOutEnabledButton            setEnabled:!lockedOrRunningMaintenance];
+    [triggerOutMaskMatrix               setEnabled:!lockedOrRunningMaintenance];
+    [triggerOutLogicPU                  setEnabled:!lockedOrRunningMaintenance];
+    [trigOutCoincidenceLevelTextField   setEnabled:!lockedOrRunningMaintenance];
+
+    [postTriggerSettingTextField        setEnabled:!lockedOrRunningMaintenance];
+
+    [fpLogicTypeMatrix                  setEnabled:!lockedOrRunningMaintenance];
+    [fpTrigInSigEdgeDisableButton       setEnabled:!lockedOrRunningMaintenance];
+    [fpTrigInToMezzaninesButton         setEnabled:!lockedOrRunningMaintenance];
+    [fpForceTrigOutButton               setEnabled:!lockedOrRunningMaintenance];
+    [fpTrigOutModePU                setEnabled:!lockedOrRunningMaintenance];
+    [fpTrigOutModeSelectPU              setEnabled:!lockedOrRunningMaintenance];
+    [fpMBProbeSelectPU                  setEnabled:!lockedOrRunningMaintenance];
+    [fpBusyUnlockButton                 setEnabled:!lockedOrRunningMaintenance];
+    [fpHeaderPatternMatrix                  setEnabled:!lockedOrRunningMaintenance];
+
+    [fanSpeedModeMatrix                 setEnabled:!lockedOrRunningMaintenance];
+    [almostFullLevelTextField           setEnabled:!lockedOrRunningMaintenance];
+    [runDelayTextField                  setEnabled:!lockedOrRunningMaintenance];
+
+    [initButton                         setEnabled:!lockedOrRunningMaintenance];
 	
-    [eventSizePopUp                 setEnabled:!locked && !runInProgress];
-    [enabledMaskMatrix              setEnabled:!locked && !runInProgress];
+    [adcCalibrateButton                 setEnabled:!locked && !runInProgress];
+    [eventSizeTextField                 setEnabled:!locked && !runInProgress];
+    [enabledMaskMatrix                  setEnabled:!locked && !runInProgress];
 }
 
 #pragma mark •••Actions
-- (IBAction) logicTypeAction:(id)sender
+- (IBAction) inputDynamicRangeAction:(id)sender
 {
-    [model setLogicType:[sender selectedRow] withValue:[[sender selectedCell] indexOfSelectedItem]];
+    [model setInputDynamicRange:[[sender selectedCell] tag] withValue:[sender indexOfSelectedItem]];
 }
 
-- (IBAction) zsThresholdAction:(id) sender
+- (IBAction) selfTrigPulseWidthAction:(id)sender
 {
-    [model setZsThreshold:[[sender selectedCell] tag] withValue:[sender intValue]]; // Set new value
+    [model setSelfTrigPulseWidth:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
-- (IBAction) numOverUnderZsThresholdAction: (id) sender
+- (IBAction) thresholdAction:(id)sender
 {
-    [model setNumOverUnderZsThreshold:[[sender selectedCell] tag] withValue:[[sender selectedCell] intValue]]; // Set new value
+    [model setThreshold:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
-- (IBAction) nLfwdAction: (id) sender
+- (IBAction) selfTrigLogicAction:(id)sender
 {
-    [model setNlfwd:[[sender selectedCell] tag] withValue:[sender intValue]]; // Set new value
+    [model setSelfTrigLogic:[[sender selectedCell] tag] withValue:[sender indexOfSelectedItem]];
 }
 
-- (IBAction) nLbkAction: (id) sender
+- (IBAction) selfTrigPulseTypeAction:(id)sender
 {
-    [model setNlbk:[[sender selectedCell] tag] withValue:[sender intValue]]; // Set new value
+    [model setSelfTrigPulseType:[[sender selectedCell] tag] withValue:[sender indexOfSelectedItem]];
 }
 
-- (IBAction) thresholdAction:(id) sender
-{
-    [model setThreshold:[[sender selectedCell] tag] withValue:[sender intValue]]; // Set new value
-}
-
-- (IBAction) numOverUnderThresholdAction: (id) sender
-{
-    [model setNumOverUnderThreshold:[[sender selectedCell] tag] withValue:[[sender selectedCell] intValue]]; // Set new value
-}
-
-- (IBAction) dacAction:(id) sender
+- (IBAction) dcOffsetAction:(id) sender
 {
     float aVoltage = [[sender selectedCell] floatValue];
-    if(aVoltage < -1)aVoltage = -1;
-    else if(aVoltage > 1)aVoltage = 1;
-    [model setDac:[[sender selectedCell] tag] withValue:[model convertVoltsToDac:aVoltage]]; // Set new value
-}
-
-- (IBAction) zsAlgorithmAction:(id)sender
-{
-    [model setZsAlgorithm:[sender indexOfSelectedItem]];
-}
-
-- (void) packedAction:(id)sender
-{
-    [model setPacked:[sender intValue]];
+    BOOL dynamicRange = [model inputDynamicRange:[[sender selectedCell] tag]];
+    if(dynamicRange){
+        if(aVoltage < -1) aVoltage = -1;
+        else if(aVoltage > 1) aVoltage = 1;
+    }
+    else{
+        if(aVoltage < -0.25) aVoltage = -0.25;
+        else if(aVoltage > 0.25) aVoltage = 0.25;
+    }
+    [model setDCOffset:[[sender selectedCell] tag] withValue:[model convertVoltsToDac:aVoltage range:dynamicRange]];
 }
 
 - (IBAction) trigOnUnderThresholdAction:(id)sender
@@ -1009,15 +1078,19 @@
     [model setClockSource:[sender indexOfSelectedItem]];
 }
 
-
 - (IBAction) countAllTriggersAction:(id)sender
 {
     [model setCountAllTriggers:[[sender selectedCell] tag]];
 }
 
-- (IBAction) gpiRunModeAction:(id)sender
+- (IBAction) startStopRunModeAction:(id)sender
 {
-    [model setGpiRunMode:[[sender selectedCell] tag]];
+    [model setStartStopRunMode:[[sender selectedCell] tag]];
+}
+
+- (IBAction) memFullModeAction:(id)sender
+{
+    [model setMemFullMode:[[sender selectedCell] tag]];
 }
 
 - (IBAction) softwareTrigEnabledAction:(id)sender
@@ -1028,6 +1101,11 @@
 - (IBAction) externalTrigEnabledAction:(id)sender
 {
     [model setExternalTrigEnabled:[sender intValue]];
+}
+
+- (IBAction) coincidenceWindowAction:(id)sender
+{
+    [model setCoincidenceWindow:[sender intValue]];
 }
 
 - (IBAction) coincidenceLevelAction:(id)sender
@@ -1042,9 +1120,17 @@
     for(i=0;i<kNumDT5725Channels;i++){
         if([[triggerSourceEnableMaskMatrix cellWithTag:i] intValue]) mask |= (1L << i);
     }
-    if([[triggerSourceEnableMaskMatrix cellWithTag:0] intValue]) mask |= (1L << 30);
-    if([[triggerSourceEnableMaskMatrix cellWithTag:1] intValue]) mask |= (1L << 31);
     [model setTriggerSourceMask:mask];
+}
+
+- (IBAction) swTrigOutEnabledAction:(id)sender
+{
+    [model setSwTrigOutEnabled:[sender intValue]];
+}
+
+- (IBAction) extTrigOutEnabledAction:(id)sender
+{
+    [model setExtTrigOutEnabled:[sender intValue]];
 }
 
 - (IBAction) triggerOutMaskAction:(id)sender
@@ -1052,31 +1138,69 @@
     int i;
     unsigned long mask = 0;
     for(i=0;i<kNumDT5725Channels;i++){
-        if([[triggerOutMatrix cellWithTag:i] intValue]) mask |= (1L << i);
+        if([[triggerOutMaskMatrix cellWithTag:i] intValue]) mask |= (1L << i);
     }
-    if([[triggerOutMatrix cellWithTag:0] intValue]) mask |= (1L << 30);
-    if([[triggerOutMatrix cellWithTag:1] intValue]) mask |= (1L << 31);
     [model setTriggerOutMask:mask];
 }
 
-- (IBAction) fpExternalTrigEnabledAction:(id)sender
+- (IBAction) triggerOutLogicAction:(id)sender
 {
-    [model setFpExternalTrigEnabled:[sender intValue]];
+    [model triggerOutLogicAction:[sender indexOfSelectedItem]];
 }
 
-- (IBAction) fpSoftwareTrigEnabledAction:(id)sender
+- (IBAction) trigOutCoincidenceLevelAction:(id)sender
 {
-    [model setFpSoftwareTrigEnabled:[sender intValue]];
+    [model trigOutCoincidenceLevelAction:[sender indexOfSelectedItem]];
 }
 
-- (IBAction) gpoEnabledAction:(id)sender
+- (IBAction) postTriggerSettingAction:(id)sender
 {
-    [model setGpoEnabled:[[sender selectedCell] tag]];
+	[model setPostTriggerSetting:[sender intValue]];
 }
 
-- (IBAction) ttlEnabledAction:(id)sender
+- (IBAction) fpLogicTypeAction:(id)sender
 {
-    [model setTtlEnabled:[[sender selectedCell] tag]];
+    [model setFpLogicType:[[sender selectedCell] tag]];
+}
+
+- (IBAction) fpTrigInSigEdgeDisableAction:(id)sender
+{
+    [model setFpTrigInSigEdgeDisable:[sender intValue]];
+}
+
+- (IBAction) fpTrigInToMezzaninesAction:(id)sender
+{
+    [model setFpTrigInToMezzanines:[sender intValue]];
+}
+
+- (IBAction) fpForceTrigOutAction:(id)sender
+{
+    [model setFpForceTrigOut:[sender intValue]];
+}
+
+- (IBAction) fpTrigOutModeAction:(id)sender
+{
+    [model setFpTrigOutMode:[[sender selectedCell] tag]];
+}
+
+- (IBAction) fpTrigOutModeSelectAction:(id)sender
+{
+    [model setFpTrigOutModeSelect:[sender indexOfSelectedItem]];
+}
+
+- (IBAction) fpMBProbeSelectAction:(id)sender
+{
+    [model setFpMBProbeSelect:[sender indexOfSelectedItem]];
+}
+
+- (IBAction) fpBusyUnlockSelectAction:(id)sender
+{
+    [model setFpBusyUnlockSelect:[[sender selectedCell] tag]];
+}
+
+- (IBAction) fpHeaderPatternAction:(id)sender
+{
+    [model setFpHeaderPattern:[sender indexOfSelectedItem]];
 }
 
 - (void) enabledMaskAction:(id)sender
@@ -1087,7 +1211,21 @@
         if([[sender cellWithTag:i] intValue]) mask |= (1 << i);
     }
     [model setEnabledMask:mask];
-    
+}
+
+- (IBAction) fanSpeedModeAction:(id)sender
+{
+    [model setFanSpeedMode:[[sender selectedCell] tag]];
+}
+
+- (IBAction) almostFullLevelAction:(id)sender
+{
+    [model setAlmostFullLevel:[sender intValue]];
+}
+
+- (IBAction) runDelayAction:(id)sender
+{
+    [model setRunDelay:[sender intValue]];
 }
 
 - (IBAction) basicReadAction:(id) pSender
@@ -1160,9 +1298,15 @@
 	}
 }
 
-- (IBAction) postTriggerSettingAction:(id)sender
+- (IBAction) adcCalibrateAction:(id)sender
 {
-	[model setPostTriggerSetting:[sender intValue]];
+    @try {
+        [model adcCalibrate];
+    }
+    @catch(NSException* localException) {
+        ORRunAlertPanel([localException name], @"%@\nADC Calibration Failed", @"OK", nil, nil,
+                        localException);
+    }
 }
 
 - (IBAction) generateTriggerAction:(id)sender
@@ -1174,6 +1318,39 @@
         ORRunAlertPanel([localException name], @"%@\nSoftware Trigger Failed", @"OK", nil, nil,
                         localException);
 	}
+}
+
+- (IBAction) softwareResetAction:(id)sender
+{
+    @try {
+        [model softwareReset];
+    }
+    @catch(NSException* localException) {
+        ORRunAlertPanel([localException name], @"%@\nSoftware Reset Failed", @"OK", nil, nil,
+                        localException);
+    }
+}
+
+- (IBAction) softwareClearAction:(id)sender
+{
+    @try {
+        [model clearAllMemory];
+    }
+    @catch(NSException* localException) {
+        ORRunAlertPanel([localException name], @"%@\nSoftware Clea Failed", @"OK", nil, nil,
+                        localException);
+    }
+}
+
+- (IBAction) configReloadAction:(id)sender
+{
+    @try {
+        [model configReload];
+    }
+    @catch(NSException* localException) {
+        ORRunAlertPanel([localException name], @"%@\nConfiguration Reload Failed", @"OK", nil, nil,
+                        localException);
+    }
 }
 
 - (IBAction) serialNumberAction:(id)sender

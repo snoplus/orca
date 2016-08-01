@@ -28,41 +28,56 @@
 {
     IBOutlet NSTabView* 	tabView;
 	IBOutlet NSPopUpButton* serialNumberPopup;
-    IBOutlet NSMatrix*		enabledMaskMatrix;
     
-    IBOutlet NSMatrix*      logicTypeMatrix;
-    IBOutlet NSMatrix*		zsThresholdMatrix;
-    IBOutlet NSMatrix*		numOverUnderZsThresholdMatrix;
-    IBOutlet NSMatrix*		nLbkMatrix;
-    IBOutlet NSMatrix*		nLfwdMatrix;
+    //By Channel
+    IBOutlet NSMatrix*      inputDynamicRangeMatrix;
+    IBOutlet NSMatrix*      selfTrigPulseWidthMatrix;
     IBOutlet NSMatrix*		thresholdMatrix;
-    IBOutlet NSMatrix*		numOverUnderThresholdMatrix;
-    IBOutlet NSMatrix*		dacMatrix;
-    IBOutlet NSPopUpButton* zsAlgorithmPU;
-    IBOutlet NSButton*      packedCB;
+    IBOutlet NSMatrix*      selfTrigLogicMatrix;
+    IBOutlet NSMatrix*      selfTrigPulseTypeMatrix;
+    IBOutlet NSMatrix*      dcOffsetMatrix;
 
     IBOutlet NSMatrix*      trigOnUnderThresholdMatrix;
     IBOutlet NSButton*      testPatternEnabledButton;
     IBOutlet NSButton*      trigOverlapEnabledButton;
-    IBOutlet NSPopUpButton* eventSizePopUp;
-    IBOutlet NSTextField*	eventSizeTextField;
 
-    IBOutlet NSTextField*	postTriggerSettingTextField;
-    IBOutlet NSMatrix*		triggerSourceEnableMaskMatrix;
-    IBOutlet NSMatrix*		triggerOutMatrix;
-    IBOutlet NSTextField*	coincidenceLevelTextField;
+    IBOutlet NSTextField*	eventSizeTextField;
 
     IBOutlet NSPopUpButton* clockSourcePU;
     IBOutlet NSMatrix*		countAllTriggersMatrix;
+	IBOutlet NSPopUpButton* startStopRunModePU; //sw, gpi, or firstTrig
+    IBOutlet NSMatrix*      memFullModeMatrix;
 
-	IBOutlet NSMatrix*      ttlEnabledMatrix;
-	IBOutlet NSMatrix*      gpoEnabledMatrix;
-	IBOutlet NSButton*      fpSoftwareTrigEnabledButton;
-	IBOutlet NSButton*      fpExternalTrigEnabledButton;
-	IBOutlet NSButton*      externalTrigEnabledButton;
 	IBOutlet NSButton*      softwareTrigEnabledButton;
-	IBOutlet NSMatrix*      gpiRunModeMatrix;
- 
+	IBOutlet NSButton*      externalTrigEnabledButton;
+    IBOutlet NSTextField*   coincidenceWindowTextField;
+    IBOutlet NSTextField*	coincidenceLevelTextField;
+    IBOutlet NSMatrix*		triggerSourceEnableMaskMatrix;
+
+    IBOutlet NSButton*      swTrigOutEnabledButton;
+    IBOutlet NSButton*      extTrigOutEnabledButton;
+    IBOutlet NSMatrix*		triggerOutMaskMatrix;
+    IBOutlet NSPopUpButton* triggerOutLogicPU;
+    IBOutlet NSTextField*   trigOutCoincidenceLevelTextField;
+
+    IBOutlet NSTextField*	postTriggerSettingTextField;
+
+    IBOutlet NSMatrix*      fpLogicTypeMatrix;
+    IBOutlet NSButton*      fpTrigInSigEdgeDisableButton;
+    IBOutlet NSButton*      fpTrigInToMezzaninesButton;
+    IBOutlet NSButton*      fpForceTrigOutButton;
+    IBOutlet NSPopUpButton* fpTrigOutModePU;
+    IBOutlet NSPopUpButton* fpTrigOutModeSelectPU;
+    IBOutlet NSPopUpButton* fpMBProbeSelectPU;
+    IBOutlet NSButton*      fpBusyUnlockButton;
+    IBOutlet NSMatrix*      fpHeaderPatternMatrix;
+
+    IBOutlet NSMatrix*		enabledMaskMatrix;
+
+    IBOutlet NSMatrix*      fanSpeedModeMatrix;
+    IBOutlet NSTextField*   almostFullLevelTextField;
+    IBOutlet NSTextField*   runDelayTextField;
+
     IBOutlet NSStepper* 	writeValueStepper;
     IBOutlet NSTextField* 	writeValueTextField;
     IBOutlet NSPopUpButton*	registerAddressPopUp;
@@ -78,8 +93,13 @@
     IBOutlet NSTextField*	registerOffsetTextField;
     IBOutlet NSTextField*	registerReadWriteTextField;
     
-    
+    IBOutlet NSMatrix*      adcTempMatrix;
+    IBOutlet NSButton*      adcCalibrateButton;
+    IBOutlet NSTextField*   adcCalibrateTextField;
     IBOutlet NSButton*		softwareTriggerButton;
+    IBOutlet NSButton*      softwareResetButton;
+    IBOutlet NSButton*      softwareClearButton;
+    IBOutlet NSButton*      configReloadButton;
 	
     IBOutlet NSButton*		initButton;
     IBOutlet NSButton*		reportButton;
@@ -123,34 +143,44 @@
 - (void) validateInterfacePopup;
 
 #pragma mark ***Interface Management
-- (void) logicTypeChanged:(NSNotification*)aNote;
-- (void) zsThresholdChanged: (NSNotification*) aNote;
-- (void) numOverUnderZsThresholdChanged: (NSNotification*) aNote;
-- (void) nlbkChanged:(NSNotification*) aNote;
-- (void) nlfwdChanged:(NSNotification*) aNote;
-- (void) thresholdChanged: (NSNotification*) aNote;
-- (void) numOverUnderThresholdChanged: (NSNotification*) aNote;
-- (void) dacChanged: (NSNotification*) aNote;
-- (void) zsAlgorithmChanged:(NSNotification*)aNote;
-- (void) packedChanged:(NSNotification*)aNote;
+- (void) inputDynamicRangeChanged:(NSNotification*)aNote;
+- (void) selfTrigPulseWidthChanged:(NSNotification*)aNote;
+- (void) thresholdChanged:(NSNotification*)aNote;
+- (void) selfTrigLogicChanged:(NSNotification*)aNote;
+- (void) selfTrigPulseTypeChanged:(NSNotification*)aNote;
+- (void) dcOffsetChanged:(NSNotification*)aNote;
 - (void) trigOnUnderThresholdChanged:(NSNotification*)aNote;
 - (void) testPatternEnabledChanged:(NSNotification*)aNote;
 - (void) trigOverlapEnabledChanged:(NSNotification*)aNote;
 - (void) eventSizeChanged:(NSNotification*)aNote;
 - (void) clockSourceChanged:(NSNotification*)aNote;
 - (void) countAllTriggersChanged:(NSNotification*)aNote;
-- (void) gpiRunModeChanged:(NSNotification*)aNote;
+- (void) startStopRunModeChanged:(NSNotification*)aNote;
+- (void) memFullModeChanged:(NSNotification*)aNote;
 - (void) softwareTrigEnabledChanged:(NSNotification*)aNote;
 - (void) externalTrigEnabledChanged:(NSNotification*)aNote;
+- (void) coincidenceWindowChanged:(NSNotification*)aNote;
 - (void) coincidenceLevelChanged:(NSNotification*)aNote;
 - (void) triggerSourceEnableMaskChanged:(NSNotification*)aNote;
-- (void) fpExternalTrigEnabledChanged:(NSNotification*)aNote;
-- (void) fpSoftwareTrigEnabledChanged:(NSNotification*)aNote;
-- (void) postTriggerSettingChanged:(NSNotification*)aNote;
+- (void) swTrigOutEnabledChanged:(NSNotification*)aNote;
+- (void) extTrigOutEnabledChanged:(NSNotification*)aNote;
 - (void) triggerOutMaskChanged:(NSNotification*)aNote;
-- (void) gpoEnabledChanged:(NSNotification*)aNote;
-- (void) ttlEnabledChanged:(NSNotification*)aNote;
+- (void) triggerOutLogicChanged:(NSNotification*)aNote;
+- (void) trigOutCoincidenceLevelChanged:(NSNotification*)aNote;
+- (void) postTriggerSettingChanged:(NSNotification*)aNote;
+- (void) fpLogicTypeChanged:(NSNotification*)aNote;
+- (void) fpTrigInSigEdgeDisableChanged:(NSNotification*)aNote;
+- (void) fpTrigInToMezzaninesChanged:(NSNotification*)aNote;
+- (void) fpForceTrigOutChanged:(NSNotification*)aNote;
+- (void) fpTrigOutModeChanged:(NSNotification*)aNote;
+- (void) fpTrigOutModeSelectChanged:(NSNotification*)aNote;
+- (void) fpMBProbeSelectChanged:(NSNotification*)aNote;
+- (void) fpBusyUnlockSelectChanged:(NSNotification*)aNote;
+- (void) fpHeaderPatternChanged:(NSNotification*)aNote;
 - (void) enabledMaskChanged:(NSNotification*)aNote;
+- (void) fanSpeedModeChanged:(NSNotification*)aNote;
+- (void) almostFullLevelChanged:(NSNotification*)aNote;
+- (void) runDelayChanged:(NSNotification*)aNote;
 
 - (void) scaleAction:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
@@ -173,36 +203,44 @@
 
 #pragma mark •••Actions
 - (IBAction) serialNumberAction:(id)sender;
-- (IBAction) logicTypeAction:(id)sender;
-- (IBAction) zsThresholdAction: (id) sender;
-- (IBAction) numOverUnderZsThresholdAction: (id) sender;
-- (IBAction) nLbkAction: (id) sender;
-- (IBAction) nLfwdAction: (id) sender;
-- (IBAction) thresholdAction: (id) sender;
-- (IBAction) numOverUnderThresholdAction: (id) sender;
-- (IBAction) dacAction: (id) sender;
-- (IBAction) zsAlgorithmAction:(id)sender;
-- (IBAction) packedAction:(id)sender;
+- (IBAction) inputDynamicRangeAction:(id)sender;
+- (IBAction) selfTrigPulseWidthAction:(id)sender;
+- (IBAction) thresholdAction:(id)sender;
+- (IBAction) selfTrigLogicAction:(id)sender;
+- (IBAction) selfTrigPulseTypeAction:(id)sender;
+- (IBAction) dcOffsetAction:(id)sender;
 - (IBAction) trigOnUnderThresholdAction:(id)sender;
 - (IBAction) testPatternEnabledAction:(id)sender;
 - (IBAction) trigOverlapEnabledAction:(id)sender;
 - (IBAction) eventSizeAction:(id)sender;
 - (IBAction) clockSourceAction:(id)sender;
 - (IBAction) countAllTriggersAction:(id)sender;
-- (IBAction) gpiRunModeAction:(id)sender;
-- (IBAction) externalTrigEnabledAction:(id)sender;
+- (IBAction) startStopRunModeAction:(id)sender;
+- (IBAction) memFullModeAction:(id)sender;
 - (IBAction) softwareTrigEnabledAction:(id)sender;
-- (IBAction) softwareTrigEnabledAction:(id)sender;
 - (IBAction) externalTrigEnabledAction:(id)sender;
+- (IBAction) coincidenceWindowAction:(id)sender;
 - (IBAction) coincidenceLevelAction:(id)sender;
 - (IBAction) triggerSourceEnableMaskAction:(id)sender;
-- (IBAction) fpExternalTrigEnabledAction:(id)sender;
-- (IBAction) fpSoftwareTrigEnabledAction:(id)sender;
+- (IBAction) swTrigOutEnabledAction:(id)sender;
+- (IBAction) extTrigOutEnabledAction:(id)sender;
 - (IBAction) triggerOutMaskAction:(id)sender;
+- (IBAction) triggerOutLogicAction:(id)sender;
+- (IBAction) trigOutCoincidenceLevelAction:(id)sender;
 - (IBAction) postTriggerSettingAction:(id)sender;
-- (IBAction) ttlEnabledAction:(id)sender;
-- (IBAction) gpoEnabledAction:(id)sender;
+- (IBAction) fpLogicTypeAction:(id)sender;
+- (IBAction) fpTrigInSigEdgeDisableAction:(id)sender;
+- (IBAction) fpTrigInToMezzaninesAction:(id)sender;
+- (IBAction) fpForceTrigOutAction:(id)sender;
+- (IBAction) fpTrigOutModeAction:(id)sender;
+- (IBAction) fpTrigOutModeSelectAction:(id)sender;
+- (IBAction) fpMBProbeSelectAction:(id)sender;
+- (IBAction) fpBusyUnlockSelectAction:(id)sender;
+- (IBAction) fpHeaderPatternAction:(id)sender;
 - (IBAction) enabledMaskAction:(id)sender;
+- (IBAction) fanSpeedModeAction:(id)sender;
+- (IBAction) almostFullLevelAction:(id)sender;
+- (IBAction) runDelayAction:(id)sender;
 
 - (IBAction) writeValueAction: (id) sender;
 - (IBAction) selectRegisterAction: (id) sender;
@@ -215,7 +253,11 @@
 
 - (IBAction) reportAction: (id) sender;
 - (IBAction) initBoardAction: (id) sender;
+- (IBAction) adcCalibrateAction:(id)sender;
 - (IBAction) generateTriggerAction:(id)sender;
+- (IBAction) softwareResetAction:(id)sender;
+- (IBAction) softwareClearAction:(id)sender;
+- (IBAction) configReloadAction:(id)sender;
 - (IBAction) integrationAction:(id)sender;
 
 #pragma mark •••Misc Helpers

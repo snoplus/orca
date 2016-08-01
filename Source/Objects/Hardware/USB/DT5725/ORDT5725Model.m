@@ -26,77 +26,90 @@
 #import "ORRateGroup.h"
 #import "ORSafeCircularBuffer.h"
 
+
 //connector names
-NSString* ORDT5725USBInConnection                     = @"ORDT5725USBInConnection";
-NSString* ORDT5725USBNextConnection                   = @"ORDT5725USBNextConnection";
+NSString* ORDT5725USBInConnection                       = @"ORDT5725USBInConnection";
+NSString* ORDT5725USBNextConnection                     = @"ORDT5725USBNextConnection";
 
 //USB Notifications
-NSString* ORDT5725ModelUSBInterfaceChanged            = @"ORDT5725ModelUSBInterfaceChanged";
-NSString* ORDT5725ModelLock                           = @"ORDT5725ModelLock";
-NSString* ORDT5725ModelSerialNumberChanged            = @"ORDT5725ModelSerialNumberChanged";
+NSString* ORDT5725ModelUSBInterfaceChanged              = @"ORDT5725ModelUSBInterfaceChanged";
+NSString* ORDT5725ModelLock                             = @"ORDT5725ModelLock";
+NSString* ORDT5725ModelSerialNumberChanged              = @"ORDT5725ModelSerialNumberChanged";
 
 //Notifications
-NSString* ORDT5725ModelLogicTypeChanged             = @"ORDT5725ModelLogicTypeChanged";
-NSString* ORDT5725ZsThresholdChanged                = @"ORDT5725ZsThresholdChanged";
-NSString* ORDT5725NumOverUnderZsThresholdChanged    = @"ORDT5725NumOverUnderZsThresholdChanged";
-NSString* ORDT5725NlbkChanged                       = @"ORDT5725NlbkChanged";
-NSString* ORDT5725NlfwdChanged                      = @"ORDT5725NlfwdChanged";
-NSString* ORDT5725ThresholdChanged                  = @"ORDT5725ThresholdChanged";
-NSString* ORDT5725NumOverUnderThresholdChanged      = @"ORDT5725NumOverUnderThresholdChanged";
-NSString* ORDT5725DacChanged                        = @"ORDT5725DacChanged";
-NSString* ORDT5725ModelZsAlgorithmChanged           = @"ORDT5725ModelZsAlgorithmChanged";
-NSString* ORDT5725ModelPackedChanged                = @"ORDT5725ModelPackedChanged";
-NSString* ORDT5725ModelTrigOnUnderThresholdChanged  = @"ORDT5725ModelTrigOnUnderThresholdChanged";
-NSString* ORDT5725ModelTestPatternEnabledChanged    = @"ORDT5725ModelTestPatternEnabledChanged";
-NSString* ORDT5725ModelTrigOverlapEnabledChanged    = @"ORDT5725ModelTrigOverlapEnabledChanged";
-NSString* ORDT5725ModelEventSizeChanged             = @"ORDT5725ModelEventSizeChanged";
-NSString* ORDT5725ModelClockSourceChanged           = @"ORDT5725ModelClockSourceChanged";
-NSString* ORDT5725ModelCountAllTriggersChanged      = @"ORDT5725ModelCountAllTriggersChanged";
-NSString* ORDT5725ModelGpiRunModeChanged            = @"ORDT5725ModelGpiRunModeChanged";
-NSString* ORDT5725ModelTriggerSourceMaskChanged     = @"ORDT5725ModelTriggerSourceMaskChanged";
-NSString* ORDT5725ModelExternalTrigEnabledChanged   = @"ORDT5725ModelExternalTrigEnabledChanged";
-NSString* ORDT5725ModelSoftwareTrigEnabledChanged   = @"ORDT5725ModelSoftwareTrigEnabledChanged";
-NSString* ORDT5725ModelCoincidenceLevelChanged      = @"ORDT5725ModelCoincidenceLevelChanged";
-NSString* ORDT5725ModelEnabledMaskChanged           = @"ORDT5725ModelEnabledMaskChanged";
-NSString* ORDT5725ModelFpSoftwareTrigEnabledChanged = @"ORDT5725ModelFpSoftwareTrigEnabledChanged";
-NSString* ORDT5725ModelFpExternalTrigEnabledChanged = @"ORDT5725ModelFpExternalTrigEnabledChanged";
-NSString* ORDT5725ModelTriggerOutMaskChanged        = @"ORDT5725ModelTriggerOutMaskChanged";
-NSString* ORDT5725ModelPostTriggerSettingChanged    = @"ORDT5725ModelPostTriggerSettingChanged";
-NSString* ORDT5725ModelGpoEnabledChanged            = @"ORDT5725ModelGpoEnabledChanged";
-NSString* ORDT5725ModelTtlEnabledChanged            = @"ORDT5725ModelTtlEnabledChanged";
+NSString* ORDT5725ModelInputDynamicRangeChanged         = @"ORDT5725ModelInputDynamicRangeChanged";
+NSString* ORDT5725ModelSelfTrigPulseWidthChanged        = @"ORDT5725ModelSelfTrigPulseWidthChanged";
+NSString* ORDT5725ThresholdChanged                      = @"ORDT5725ThresholdChanged";
+NSString* ORDT5725ModelSelfTrigLogicChanged             = @"ORDT5725ModelSelfTrigLogicChanged";
+NSString* ORDT5725ModelSelfTrigPulseTypeChanged         = @"ORDT5725ModelSelfTrigPulseTypeChanged";
+NSString* ORDT5725ModelDCOffsetChanged                  = @"ORDT5725ModelDCOffsetChanged";
+NSString* ORDT5725ModelTrigOnUnderThresholdChanged      = @"ORDT5725ModelTrigOnUnderThresholdChanged";
+NSString* ORDT5725ModelTestPatternEnabledChanged        = @"ORDT5725ModelTestPatternEnabledChanged";
+NSString* ORDT5725ModelTrigOverlapEnabledChanged        = @"ORDT5725ModelTrigOverlapEnabledChanged";
+NSString* ORDT5725ModelEventSizeChanged                 = @"ORDT5725ModelEventSizeChanged";
+NSString* ORDT5725ModelClockSourceChanged               = @"ORDT5725ModelClockSourceChanged";
+NSString* ORDT5725ModelCountAllTriggersChanged          = @"ORDT5725ModelCountAllTriggersChanged";
+NSString* ORDT5725ModelStartStopRunModeChanged          = @"ORDT5725ModelStartStopRunModeChanged";
+NSString* ORDT5725ModelMemFullModeChanged               = @"ORDT5725ModelMemFullModeChanged";
+NSString* ORDT5725ModelSoftwareTrigEnabledChanged       = @"ORDT5725ModelSoftwareTrigEnabledChanged";
+NSString* ORDT5725ModelExternalTrigEnabledChanged       = @"ORDT5725ModelExternalTrigEnabledChanged";
+NSString* ORDT5725ModelCoincidenceWindowChanged         = @"ORDT5725ModelCoincidenceWindowChanged";
+NSString* ORDT5725ModelCoincidenceLevelChanged          = @"ORDT5725ModelCoincidenceLevelChanged";
+NSString* ORDT5725ModelTriggerSourceMaskChanged         = @"ORDT5725ModelTriggerSourceMaskChanged";
+NSString* ORDT5725ModelSwTrigOutEnabledChanged          = @"ORDT5725ModelSwTrigOutEnabledChanged";
+NSString* ORDT5725ModelExtTrigOutEnabledChanged         = @"ORDT5725ModelExtTrigOutEnabledChanged";
+NSString* ORDT5725ModelTriggerOutMaskChanged            = @"ORDT5725ModelTriggerOutMaskChanged";
+NSString* ORDT5725ModelTriggerOutLogicChanged           = @"ORDT5725ModelTriggerOutLogicChanged";
+NSString* ORDT5725ModelTrigOutCoincidenceLevelChanged   = @"ORDT5725ModelTrigOutCoincidenceLevelChanged";
+NSString* ORDT5725ModelPostTriggerSettingChanged        = @"ORDT5725ModelPostTriggerSettingChanged";
+NSString* ORDT5725ModelFpLogicTypeChanged               = @"ORDT5725ModelFpLogicTypeChanged";
+NSString* ORDT5725ModelFpTrigInSigEdgeDisableChanged    = @"ORDT5725ModelFpTrigInSigEdgeDisableChanged";
+NSString* ORDT5725ModelFpTrigInToMezzaninesChanged      = @"ORDT5725ModelFpTrigInToMezzaninesChanged";
+NSString* ORDT5725ModelFpForceTrigOutChanged            = @"ORDT5725ModelFpForceTrigOutChanged";
+NSString* ORDT5725ModelFpTrigOutModeChanged             = @"ORDT5725ModelTrigOutModeChanged";
+NSString* ORDT5725ModelFpTrigOutModeSelectChanged       = @"ORDT5725ModelTrigOutModeSelectChanged";
+NSString* ORDT5725ModelFpMBProbeSelectChanged           = @"ORDT5725ModelFpMBProbeSelectChanged";
+NSString* ORDT5725ModelFpBusyUnlockSelectChanged        = @"ORDT5725ModelFpBusyUnlockSelectChanged";
+NSString* ORDT5725ModelFpHeaderPatternChanged           = @"ORDT5725ModelFpHeaderPatternChanged";
+NSString* ORDT5725ModelEnabledMaskChanged               = @"ORDT5725ModelEnabledMaskChanged";
+NSString* ORDT5725ModelFanSpeedModeChanged              = @"ORDT5725ModelFanSpeedModeChanged";
+NSString* ORDT5725ModelAlmostFullLevelChanged           = @"ORDT5725ModelAlmostFullLevelChanged";
+NSString* ORDT5725ModelRunDelayChanged                  = @"ORDT5725ModelRunDelayChanged";
 
-NSString* ORDT5725Chnl                                    = @"ORDT5725Chnl";
-NSString* ORDT5725SelectedRegIndexChanged                 = @"ORDT5725SelectedRegIndexChanged";
-NSString* ORDT5725SelectedChannelChanged                  = @"ORDT5725SelectedChannelChanged";
-NSString* ORDT5725WriteValueChanged                       = @"ORDT5725WriteValueChanged";
+NSString* ORDT5725Chnl                                  = @"ORDT5725Chnl";
+NSString* ORDT5725SelectedRegIndexChanged               = @"ORDT5725SelectedRegIndexChanged";
+NSString* ORDT5725SelectedChannelChanged                = @"ORDT5725SelectedChannelChanged";
+NSString* ORDT5725WriteValueChanged                     = @"ORDT5725WriteValueChanged";
 
-NSString* ORDT5725BasicLock                               = @"ORDT5725BasicLock";
-NSString* ORDT5725LowLevelLock                            = @"ORDT5725LowLevelLock";
-NSString* ORDT5725RateGroupChanged                        = @"ORDT5725RateGroupChanged";
-NSString* ORDT5725ModelBufferCheckChanged                 = @"ORDT5725ModelBufferCheckChanged";
+NSString* ORDT5725BasicLock                             = @"ORDT5725BasicLock";
+NSString* ORDT5725LowLevelLock                          = @"ORDT5725LowLevelLock";
+NSString* ORDT5725RateGroupChanged                      = @"ORDT5725RateGroupChanged";
+NSString* ORDT5725ModelBufferCheckChanged               = @"ORDT5725ModelBufferCheckChanged";
 
 
 
 static DT5725RegisterNamesStruct reg[kNumberDT5725Registers] = {
 //  {regName            addressOffset, accessType, hwReset, softwareReset, clr},
-    {@"ZS_Thres",               0x1024,	kReadWrite,	true,	true, 	false},
-    {@"ZS_NsAmp",               0x1028,	kReadWrite, true,	true, 	false},
+    {@"Dynamic Ranges",         0x1028,	kReadWrite, true,	true, 	false},
+    {@"Trigger Pulse Width",    0x1070, kReadWrite, true,   true,   false},
     {@"Thresholds",             0x1080,	kReadWrite, true,	true, 	false},
-    {@"Time O/U Threshold",     0x1084,	kReadWrite, true,	true, 	false},
+    {@"Self-Trigger Logic",     0x1084,	kReadWrite, true,	true, 	false},
     {@"Status",                 0x1088,	kReadOnly,  true,	true, 	false},
-    {@"Firmware Version",       0x108C,	kReadOnly,  false,	false, 	false},
-    {@"Buffer Occupancy",       0x1094,	kReadOnly,  true,	true, 	true},
-    {@"Dacs",                   0x1098,	kReadWrite, true,	true, 	false},
-    {@"Adc Config",             0x109C,	kReadWrite, true,	true, 	false},
-    {@"Chan Config",            0x8000,	kReadWrite, true,	true, 	false},
-    {@"Chan Config Bit Set",    0x8004,	kWriteOnly, true,	true, 	false},
-    {@"Chan Config Bit Clr",    0x8008, kWriteOnly, true,	true, 	false},
+    {@"AMC Revision",           0x108C,	kReadOnly,  false,	false, 	false},
+    {@"Buffer Occupancy",       0x1094, kReadOnly,  true,   true,   true},
+    {@"DC Offset",              0x1098,	kReadWrite, true,	true, 	false},
+    {@"Adc Temp",               0x10A8,	kReadOnly,  true,	true, 	false},
+    {@"Board Config",           0x8000,	kReadWrite, true,	true, 	false},
+    {@"Board Config Bit Set",   0x8004,	kWriteOnly, true,	true, 	false},
+    {@"Board Config Bit Clr",   0x8008, kWriteOnly, true,	true, 	false},
     {@"Buffer Organization",    0x800C,	kReadWrite, true,	true, 	false},
+    {@"Custom Size",            0x8020,	kReadWrite, true,	true, 	false},
+    {@"Adc Calibration",        0x809C,	kWriteOnly, true,	true, 	false},
     {@"Acq Control",            0x8100,	kReadWrite, true,	true, 	false},
     {@"Acq Status",             0x8104,	kReadOnly,  false,	false, 	false},
-    {@"SW Trigger",             0x8108,	kWriteOnly, false,	false, 	false},
+    {@"Software Trigger",       0x8108, kWriteOnly, true,   true,   false},
     {@"Trig Src Enbl Mask",     0x810C,	kReadWrite, true,	true, 	false},
-    {@"FP Trig Out Enbl Mask",  0x8110, kReadWrite, true,  true, 	false},
+    {@"FP Trig Out Enbl Mask",  0x8110, kReadWrite, true,   true, 	false},
     {@"Post Trig Setting",      0x8114,	kReadWrite, true,	true, 	false},
     {@"FP I/O Control",         0x811C,	kReadWrite, true,	true, 	false},
     {@"Chan Enable Mask",       0x8120,	kReadWrite, true,	true, 	false},
@@ -104,10 +117,11 @@ static DT5725RegisterNamesStruct reg[kNumberDT5725Registers] = {
     {@"Event Stored",           0x812C,	kReadOnly,  true,	true, 	true},
     {@"Board Info",             0x8140,	kReadOnly,  false,	false, 	false},
     {@"Event Size",             0x814C,	kReadOnly,  true,	true, 	true},
-    {@"VME Control",            0xEF00,	kReadWrite, true,	false, 	false},
-    {@"VME Status",             0xEF04,	kReadOnly,  false,	false, 	false},
-    {@"Interrupt Status ID",    0xEF14,	kReadWrite, true,	false, 	false},
-    {@"Interrupt Event Num",    0xEF18,	kReadWrite, true,	true, 	false},
+    {@"Fan Speed Control",      0x8168,	kReadWrite, true,	true, 	false},
+    {@"Buffer Almost Full",     0x816C,	kReadWrite, true,	true, 	false},
+    {@"Run Delay",              0x8170, kReadWrite, true,   true,   false},
+    {@"Board Failure",          0x8178,	kReadOnly,  true,	true, 	false},
+    {@"Readout Status",         0xEF04,	kReadOnly,  true,	true, 	false},
     {@"BLT Event Num",          0xEF1C,	kReadWrite, true,	true, 	false},
     {@"Scratch",                0xEF20,	kReadWrite, true,	true, 	false},
     {@"SW Reset",               0xEF24,	kWriteOnly, false,	false, 	false},
@@ -118,9 +132,10 @@ static DT5725RegisterNamesStruct reg[kNumberDT5725Registers] = {
 };
 
 
-static NSString* DT5725RunModeString[4] = {
+static NSString* DT5725StartStopRunModeString[4] = {
     @"Register Controlled",
     @"GPI Controlled",
+    @"First Trigger Controlled"
 };
 
 #define FBLT        0x0C    // Ver. 2.3
@@ -139,8 +154,7 @@ static NSString* DT5725RunModeString[4] = {
 {
     self = [super init];
     [[self undoManager] disableUndoRegistration];
-	[self setEnabledMask:0xF];
-    [self setEventSize:0xa];
+	[self setEnabledMask:0xFF];
     [[self undoManager] enableUndoRegistration];
     
     return self;
@@ -380,106 +394,46 @@ static NSString* DT5725RunModeString[4] = {
 
 #pragma mark Accessors
 //------------------------------
-//Reg Channel n ZS_Thres (0x1n24)
-- (int) logicType:(unsigned short) i;
+//Reg Channel n Input Dynamic Range (0x1n28)
+- (BOOL) inputDynamicRange:(unsigned short) i
 {
-    return logicType[i];
+    return inputDynamicRange[i];
 }
 
-- (void) setLogicType:(unsigned short) i withValue:(int)aLogicType
+- (void) setInputDynamicRange:(unsigned short) i withValue:(BOOL) aValue
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setLogicType:i withValue:[self logicType:i]];
-    
-    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
-    [userInfo setObject:[NSNumber numberWithInt:i] forKey:ORDT5725Chnl];
-    
-    logicType[i] = aLogicType;
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelLogicTypeChanged object:self userInfo:userInfo];
-}
+    if(aValue!=inputDynamicRange[i]){
+        [[[self undoManager] prepareWithInvocationTarget:self] setInputDynamicRange:i withValue:[self inputDynamicRange:i]];
 
-- (unsigned short) zsThreshold:(unsigned short) i
-{
-    return zsThresholds[i];
-}
+        inputDynamicRange[i] = aValue;
 
-- (void) setZsThreshold:(unsigned short) i withValue:(unsigned short) aValue
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setZsThreshold:i withValue:[self zsThreshold:i]];
-    
-    zsThresholds[i] = aValue;
-    
-    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
-    [userInfo setObject:[NSNumber numberWithInt:i] forKey:ORDT5725Chnl];
-    
-    // Send out notification that the value has changed.
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ZsThresholdChanged
-                                                        object:self
-                                                      userInfo:userInfo];
-}
+        NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+        [userInfo setObject:[NSNumber numberWithInt:i] forKey:ORDT5725Chnl];
 
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelInputDynamicRangeChanged 
+                                                            object:self
+                                                          userInfo:userInfo];
+    }
+}
 //------------------------------
-//Reg Channel n ZS_NSAmp (0x1n28)
-- (unsigned short) numOverUnderZsThreshold:(unsigned short) i
+//Reg Channel n Trigger Pulse Width (0x1n70)
+- (unsigned short) selfTrigPulseWidth:(unsigned short) i
 {
-    return numOverUnderZsThreshold[i];
+    return selfTrigPulseWidth[i];
 }
 
-- (void) setNumOverUnderZsThreshold:(unsigned short) i withValue:(unsigned short) aValue
+- (void) setSelfTrigPulseWidth:(unsigned short) i withValue:(unsigned short) aValue;
 {
-    aValue &= 0xFFF;
-    if(aValue!=numOverUnderZsThreshold[i]){
-        [[[self undoManager] prepareWithInvocationTarget:self] setNumOverUnderZsThreshold:i withValue:numOverUnderZsThreshold[i]];
-        numOverUnderZsThreshold[i] = aValue;
+    if(aValue!=selfTrigPulseWidth[i]){
+        [[[self undoManager] prepareWithInvocationTarget:self] setSelfTrigPulseWidth:i withValue:[self selfTrigPulseWidth:i]];
+
+        selfTrigPulseWidth[i] = aValue;
+
         NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
         [userInfo setObject:[NSNumber numberWithInt:i] forKey:ORDT5725Chnl];
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725NumOverUnderZsThresholdChanged
-                                                            object:self
-                                                          userInfo:userInfo];
-    }
-}
-- (unsigned short)	nLbk:(unsigned short) i
-{
-    return nLbk[i];
-}
 
-- (void) setNlbk:(unsigned short) i withValue:(unsigned short) aValue
-{
-    if(aValue<1)aValue=1;
-    if(aValue!=nLbk[i]){
-
-        [[[self undoManager] prepareWithInvocationTarget:self] setNlbk:i withValue:nLbk[i]];
-    
-        nLbk[i] = aValue;
-    
-        NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
-        [userInfo setObject:[NSNumber numberWithInt:i] forKey:ORDT5725Chnl];
-    
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725NlbkChanged
-                                                            object:self
-                                                          userInfo:userInfo];
-    }
-}
-
-- (unsigned short)	nLfwd:(unsigned short) i
-{
-    return nLfwd[i];
-    
-}
-
-- (void) setNlfwd:(unsigned short) i withValue:(unsigned short) aValue
-{
-    if(aValue<1)aValue=1;
-    if(aValue!=nLfwd[i]){
-    
-        [[[self undoManager] prepareWithInvocationTarget:self] setNlfwd:i withValue:nLfwd[i]];
-        nLfwd[i] = aValue;
-        NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
-        [userInfo setObject:[NSNumber numberWithInt:i] forKey:ORDT5725Chnl];
-    
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725NlfwdChanged
-                                                            object:self
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelSelfTrigPulseWidthChanged
+                                                             object:self
                                                           userInfo:userInfo];
     }
 }
@@ -500,85 +454,80 @@ static NSString* DT5725RunModeString[4] = {
         NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
         [userInfo setObject:[NSNumber numberWithInt:i] forKey:ORDT5725Chnl];
     
-        // Send out notification that the value has changed.
         [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ThresholdChanged
                                                             object:self
                                                           userInfo:userInfo];
     }
 }
 //------------------------------
-//Reg Channel n Num Over/Under Threshold (0x1n84)
-- (unsigned short) numOverUnderThreshold:(unsigned short) i
+//Reg Self-trigger Logic (0x1n84) 
+//  because the channels are paired this only accepts the values 0, 2, 4, 6 (unlike the normal 0-8)
+- (unsigned short) selfTrigLogic:(unsigned short) i
 {
-    return numOverUnderThreshold[i];
+    return selfTrigLogic[i];
 }
 
-- (void) setNumOverUnderThreshold:(unsigned short) i withValue:(unsigned short) aValue
+- (void) setSelfTrigLogic:(unsigned short) i withValue:(unsigned short) aValue
 {
-    aValue &= 0xFFF;
-    if(aValue!=numOverUnderThreshold[i]){
-        [[[self undoManager] prepareWithInvocationTarget:self] setNumOverUnderThreshold:i withValue:numOverUnderThreshold[i]];
-        numOverUnderThreshold[i] = aValue;
+    aValue &= 0x3;
+    if(aValue!=selfTrigLogic[i]){
+        [[[self undoManager] prepareWithInvocationTarget:self] setSelfTrigLogic:i withValue:[self selfTrigLogic:i]];
+
+        selfTrigLogic[i] = aValue;
+
         NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
         [userInfo setObject:[NSNumber numberWithInt:i] forKey:ORDT5725Chnl];
-    
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725NumOverUnderThresholdChanged
+
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelSelfTrigLogicChanged
+                                                            object:self
+                                                          userInfo:userInfo];
+    }
+}
+
+- (BOOL) selfTrigPulseType:(unsigned short) i
+{
+    return selfTrigPulseType[i];
+}
+
+- (void) setSelfTrigPulseType:(unsigned short) i withValue:(BOOL) aValue
+{
+    if(aValue!=selfTrigPulseType[i]){
+        [[[self undoManager] prepareWithInvocationTarget:self] setSelfTrigPulseType:i withValue:[self selfTrigPulseType:i]];
+
+        selfTrigPulseType[i] = aValue;
+
+        NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+        [userInfo setObject:[NSNumber numberWithInt:i] forKey:ORDT5725Chnl];
+
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelSelfTrigPulseTypeChanged
                                                             object:self
                                                           userInfo:userInfo];
     }
 }
 //------------------------------
-//Reg Channel n DAC (0x1n98)
-- (unsigned short) dac:(unsigned short) i
+//Reg Channel n DC Offset (0x1n98)
+- (unsigned short) dcOffset:(unsigned short) i
 {
-    return dac[i];
+    return dcOffset[i];
 }
 
-- (void) setDac:(unsigned short) i withValue:(unsigned short) aValue
+- (void) setDCOffset:(unsigned short) i withValue:(unsigned short) aValue
 {
+    if(aValue!=dcOffset[i]){
+        [[[self undoManager] prepareWithInvocationTarget:self] setDCOffset:i withValue:[self dcOffset:i]];
 
-    if(dac[i] != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setDac:i withValue:dac[i]];
-    
-        dac[i] = aValue;
-    
+        dcOffset[i] = aValue;
+
         NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
         [userInfo setObject:[NSNumber numberWithInt:i] forKey:ORDT5725Chnl];
-    
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725DacChanged
+
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelDCOffsetChanged
                                                             object:self
                                                           userInfo:userInfo];
     }
 }
-
 //------------------------------
 //Reg Channel Configuration (0x8000)
-- (int) zsAlgorithm
-{
-    return zsAlgorithm;
-}
-
-- (void) setZsAlgorithm:(int)aZsAlgorithm
-{
-    if(aZsAlgorithm!=zsAlgorithm){
-        [[[self undoManager] prepareWithInvocationTarget:self] setZsAlgorithm:zsAlgorithm];
-        zsAlgorithm = aZsAlgorithm;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelZsAlgorithmChanged object:self];
-    }
-}
-
-- (BOOL) packed
-{
-    return packed;
-}
-
-- (void) setPacked:(BOOL)aPacked
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setPacked:packed];
-    packed = aPacked;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelPackedChanged object:self];
-}
-
 - (BOOL) trigOnUnderThreshold
 {
     return trigOnUnderThreshold;
@@ -622,7 +571,7 @@ static NSString* DT5725RunModeString[4] = {
 }
 
 //------------------------------
-//Reg Buffer Organization (0x800C)
+//Reg Custom Size (0x8020)
 - (int) eventSize
 {
     return eventSize;
@@ -630,18 +579,13 @@ static NSString* DT5725RunModeString[4] = {
 
 - (void) setEventSize:(int)aEventSize
 {
-    //if(aEventSize == 0)aEventSize = 0xa; //default
-    aEventSize &= 0xF;
+    //customSize < bufferOrganization
     if(aEventSize!=eventSize){
         [[[self undoManager] prepareWithInvocationTarget:self] setEventSize:eventSize];
         eventSize = aEventSize;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelEventSizeChanged object:self];
     }
 }
-//------------------------------
-//Reg Custom Size (0x8020)
-//not supported
-//------------------------------
 //------------------------------
 //Reg Acquistion Control (0x8100)
 - (BOOL) clockSource
@@ -671,19 +615,34 @@ static NSString* DT5725RunModeString[4] = {
     }
 }
 
-- (BOOL) gpiRunMode
+- (unsigned short) startStopRunMode
 {
-    return gpiRunMode;
+    return startStopRunMode;
 }
 
-- (void) setGpiRunMode:(BOOL)aGpiRunMode
+- (void) setStartStopRunMode:(BOOL) aStartStopRunMode;
 {
-    if(aGpiRunMode!=gpiRunMode){
-        [[[self undoManager] prepareWithInvocationTarget:self] setGpiRunMode:gpiRunMode];
-        gpiRunMode = aGpiRunMode;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelGpiRunModeChanged object:self];
+    if(aStartStopRunMode!=startStopRunMode){
+        [[[self undoManager] prepareWithInvocationTarget:self] setStartStopRunMode:startStopRunMode];
+        startStopRunMode = aStartStopRunMode;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelStartStopRunModeChanged object:self];
     }
 }
+
+- (BOOL) memFullMode
+{
+    return memFullMode;
+}
+
+- (void) setMemFullMode:(BOOL) aMemFullMode;
+{
+    if(aMemFullMode!=memFullMode){
+        [[[self undoManager] prepareWithInvocationTarget:self] setMemFullMode:memFullMode];
+        memFullMode = aMemFullMode;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelMemFullModeChanged object:self];
+    }
+}
+
 //------------------------------
 //Reg Trigger Source Enable Mask (0x810C)
 - (BOOL) softwareTrigEnabled
@@ -711,6 +670,20 @@ static NSString* DT5725RunModeString[4] = {
         [[[self undoManager] prepareWithInvocationTarget:self] setExternalTrigEnabled:externalTrigEnabled];
         externalTrigEnabled = aExternalTrigEnabled;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelExternalTrigEnabledChanged object:self];
+    }
+}
+
+- (unsigned short) coincidenceWindow
+{
+    return coincidenceWindow;
+}
+
+- (void) setCoincidenceWindow:(unsigned short)aCoincidenceWindow
+{
+    if(aCoincidenceWindow!=coincidenceWindow){
+        [[[self undoManager] prepareWithInvocationTarget:self] setCoincidenceWindow:coincidenceWindow];
+        coincidenceWindow = aCoincidenceWindow;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelCoincidenceWindowChanged object:self];
     }
 }
 
@@ -742,31 +715,31 @@ static NSString* DT5725RunModeString[4] = {
 
 //------------------------------
 //Reg Front Panel Trigger Out Enable Mask (0x8110)
-- (BOOL) fpSoftwareTrigEnabled
+- (BOOL) swTrigOutEnabled
 {
-    return fpSoftwareTrigEnabled;
+    return swTrigOutEnabled;
 }
 
-- (void) setFpSoftwareTrigEnabled:(BOOL)aFpSoftwareTrigEnabled
+- (void) setSwTrigOutEnabled:(BOOL)aSwTrigOutEnabled
 {
-    if(aFpSoftwareTrigEnabled!=fpSoftwareTrigEnabled){
-        [[[self undoManager] prepareWithInvocationTarget:self] setFpSoftwareTrigEnabled:fpSoftwareTrigEnabled];
-        fpSoftwareTrigEnabled = aFpSoftwareTrigEnabled;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelFpSoftwareTrigEnabledChanged object:self];
+    if(aSwTrigOutEnabled!=swTrigOutEnabled){
+        [[[self undoManager] prepareWithInvocationTarget:self] setSwTrigOutEnabled:swTrigOutEnabled];
+        swTrigOutEnabled = aSwTrigOutEnabled;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelSwTrigOutEnabledChanged object:self];
     }
 }
 
-- (BOOL) fpExternalTrigEnabled
+- (BOOL) extTrigOutEnabled
 {
-    return fpExternalTrigEnabled;
+    return extTrigOutEnabled;
 }
 
-- (void) setFpExternalTrigEnabled:(BOOL)aFpExternalTrigEnabled
+- (void) setExtTrigOutEnabled:(BOOL)aExtTrigOutEnabled
 {
-    if(aFpExternalTrigEnabled!=fpExternalTrigEnabled){
-        [[[self undoManager] prepareWithInvocationTarget:self] setFpExternalTrigEnabled:fpExternalTrigEnabled];
-        fpExternalTrigEnabled = aFpExternalTrigEnabled;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelFpExternalTrigEnabledChanged object:self];
+    if(aExtTrigOutEnabled!=extTrigOutEnabled){
+        [[[self undoManager] prepareWithInvocationTarget:self] setExtTrigOutEnabled:extTrigOutEnabled];
+        extTrigOutEnabled = aExtTrigOutEnabled;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelExtTrigOutEnabledChanged object:self];
     }
 }
 
@@ -782,6 +755,34 @@ static NSString* DT5725RunModeString[4] = {
         [[[self undoManager] prepareWithInvocationTarget:self] setTriggerOutMask:triggerOutMask];
         triggerOutMask = aTriggerOutMask;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelTriggerOutMaskChanged object:self];
+    }
+}
+
+- (unsigned short) triggerOutLogic;
+{
+    return triggerOutLogic;
+}
+
+- (void) setTriggerOutLogic:(unsigned short)aTriggerOutLogic
+{
+    if(aTriggerOutLogic!=triggerOutLogic){
+        [[[self undoManager] prepareWithInvocationTarget:self] setTriggerOutLogic:triggerOutLogic];
+        triggerOutLogic = aTriggerOutLogic;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelTriggerOutLogicChanged object:self];
+    }
+}
+
+- (unsigned short) trigOutCoincidenceLevel
+{
+    return trigOutCoincidenceLevel;
+}
+
+- (void) setTrigOutCoincidenceLevel:(unsigned short)aTrigOutCoincidenceLevel
+{
+    if(aTrigOutCoincidenceLevel!=trigOutCoincidenceLevel){
+        [[[self undoManager] prepareWithInvocationTarget:self] setTrigOutCoincidenceLevel:trigOutCoincidenceLevel];
+        trigOutCoincidenceLevel = aTrigOutCoincidenceLevel;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelTrigOutCoincidenceLevelChanged object:self];
     }
 }
 
@@ -802,33 +803,132 @@ static NSString* DT5725RunModeString[4] = {
 }
 //------------------------------
 //Reg Front Panel I/O Setting (0x811C)
-- (BOOL) gpoEnabled
+- (BOOL) fpLogicType
 {
-    return gpoEnabled;
+    return fpLogicType;
 }
 
-- (void) setGpoEnabled:(BOOL)aGpoEnabled
+- (void) setFpLogicType:(BOOL)aFpLogicType
 {
-    if(aGpoEnabled!=gpoEnabled){
-        [[[self undoManager] prepareWithInvocationTarget:self] setGpoEnabled:gpoEnabled];
-        gpoEnabled = aGpoEnabled;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelGpoEnabledChanged object:self];
+    if(aFpLogicType!=fpLogicType){
+        [[[self undoManager] prepareWithInvocationTarget:self] setFpLogicType:fpLogicType];
+        fpLogicType = aFpLogicType;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelFpLogicTypeChanged object:self];
     }
 }
 
-- (int) ttlEnabled
+- (BOOL) fpTrigInSigEdgeDisable
 {
-    return ttlEnabled;
+    return fpTrigInSigEdgeDisable;
 }
 
-- (void) setTtlEnabled:(int)aTtlEnabled
+- (void) setFpTrigInSigEdgeDisable:(BOOL)aFpTrigInSigEdgeDisable
 {
-    if(aTtlEnabled!=ttlEnabled){
-        [[[self undoManager] prepareWithInvocationTarget:self] setTtlEnabled:ttlEnabled];
-        ttlEnabled = aTtlEnabled;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelTtlEnabledChanged object:self];
+    if(aFpTrigInSigEdgeDisable!=fpTrigInSigEdgeDisable){
+        [[[self undoManager] prepareWithInvocationTarget:self] setFpTrigInSigEdgeDisable:fpTrigInSigEdgeDisable];
+        fpTrigInSigEdgeDisable = aFpTrigInSigEdgeDisable;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelFpTrigInSigEdgeDisableChanged object:self];
     }
 }
+
+- (BOOL) fpTrigInToMezzanines
+{
+    return fpTrigInToMezzanines;
+}
+
+- (void) setFpTrigInToMezzanines:(BOOL)aFpTrigInToMezzanines
+{
+    if(aFpTrigInToMezzanines!=fpTrigInToMezzanines){
+        [[[self undoManager] prepareWithInvocationTarget:self] setFpTrigInToMezzanines:fpTrigInToMezzanines];
+        fpTrigInToMezzanines = aFpTrigInToMezzanines;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelFpTrigInToMezzaninesChanged object:self];
+    }
+}
+
+- (BOOL) fpForceTrigOut
+{
+    return fpForceTrigOut;
+}
+
+- (void) setFpForceTrigOut:(BOOL)aFpForceTrigOut
+{
+    if(aFpForceTrigOut!=fpForceTrigOut){
+        [[[self undoManager] prepareWithInvocationTarget:self] setFpForceTrigOut:fpForceTrigOut];
+        fpForceTrigOut = aFpForceTrigOut;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelFpForceTrigOutChanged object:self];
+    }
+}
+
+- (BOOL) fpTrigOutMode
+{
+    return fpTrigOutMode;
+}
+
+- (void) setFpTrigOutMode:(BOOL)aFpTrigOutMode
+{
+    if(aFpTrigOutMode!=fpTrigOutMode){
+        [[[self undoManager] prepareWithInvocationTarget:self] setFpTrigOutMode:fpTrigOutMode];
+        fpTrigOutMode = aFpTrigOutMode;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelFpTrigOutModeChanged object:self];
+    }
+}
+
+- (unsigned short) fpTrigOutModeSelect
+{
+    return fpTrigOutModeSelect;
+}
+
+- (void) setFpTrigOutModeSelect:(unsigned short)aFpTrigOutModeSelect
+{
+    if(aFpTrigOutModeSelect!=fpTrigOutModeSelect){
+        [[[self undoManager] prepareWithInvocationTarget:self] setFpTrigOutModeSelect:fpTrigOutModeSelect];
+        fpTrigOutModeSelect = aFpTrigOutModeSelect;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelFpTrigOutModeSelectChanged object:self];
+    }
+}
+
+- (unsigned short) fpMBProbeSelect
+{
+    return fpMBProbeSelect;
+}
+
+- (void) setFpMBProbeSelect:(unsigned short)aFpMBProbeSelect
+{
+    if(aFpMBProbeSelect!=fpMBProbeSelect){
+        [[[self undoManager] prepareWithInvocationTarget:self] setFpMBProbeSelect:fpMBProbeSelect];
+        fpMBProbeSelect = aFpMBProbeSelect;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelFpMBProbeSelectChanged object:self];
+    }
+}
+
+- (BOOL) fpBusyUnlockSelect
+{
+    return fpBusyUnlockSelect;
+}
+
+- (void) setFpBusyUnlockSelect:(BOOL)aFpBusyUnlockSelect
+{
+    if(aFpBusyUnlockSelect!=fpBusyUnlockSelect){
+        [[[self undoManager] prepareWithInvocationTarget:self] setFpBusyUnlockSelect:fpBusyUnlockSelect];
+        fpBusyUnlockSelect = aFpBusyUnlockSelect;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelFpBusyUnlockSelectChanged object:self];
+    }
+}
+
+- (unsigned short) fpHeaderPattern
+{
+    return fpHeaderPattern;
+}
+
+- (void) setFpHeaderPattern:(unsigned short)aFpHeaderPattern
+{
+    if(aFpHeaderPattern!=fpHeaderPattern){
+        [[[self undoManager] prepareWithInvocationTarget:self] setFpHeaderPattern:fpHeaderPattern];
+        fpHeaderPattern = aFpHeaderPattern;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelFpHeaderPatternChanged object:self];
+    }
+}
+
 //------------------------------
 //Reg Channel Enable Mask (0x8120)
 - (unsigned short) enabledMask
@@ -843,6 +943,52 @@ static NSString* DT5725RunModeString[4] = {
         [[[self undoManager] prepareWithInvocationTarget:self] setEnabledMask:enabledMask];
         enabledMask = aEnabledMask;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelEnabledMaskChanged object:self];
+    }
+}
+
+//------------------------------
+//Reg Fan Speed Mode (0x8168)
+-(BOOL) fanSpeedMode
+{
+    return fanSpeedMode;
+}
+
+- (void) setFanSpeedMode:(BOOL)aFanSpeedMode
+{
+    if(aFanSpeedMode!=fanSpeedMode){
+        [[[self undoManager] prepareWithInvocationTarget:self] setFanSpeedMode:fanSpeedMode];
+        fanSpeedMode = aFanSpeedMode;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelFanSpeedModeChanged object:self];
+    }
+}
+//------------------------------
+//Reg Buffer Almost Full Level (0x816C)
+- (unsigned short) almostFullLevel
+{
+    return almostFullLevel;
+}
+
+- (void) setAlmostFullLevel:(unsigned short)anAlmostFullLevel
+{
+    if(anAlmostFullLevel!=almostFullLevel){
+        [[[self undoManager] prepareWithInvocationTarget:self] setAlmostFullLevel:almostFullLevel];
+        almostFullLevel = anAlmostFullLevel;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelAlmostFullLevelChanged object:self];
+    }
+}
+//------------------------------
+//Reg Run Start/Stop Delay (0x8170)
+- (unsigned long) runDelay
+{
+    return runDelay;
+}
+
+- (void) setRunDelay:(unsigned long)aRunDelay
+{
+    if(aRunDelay!=runDelay){
+        [[[self undoManager] prepareWithInvocationTarget:self] setRunDelay:runDelay];
+        runDelay = aRunDelay;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5725ModelRunDelayChanged object:self];
     }
 }
 
@@ -995,7 +1141,7 @@ static NSString* DT5725RunModeString[4] = {
     short theRegIndex		 = [self selectedRegIndex];
     
     @try {
-        if (theRegIndex >= kZS_Thres && theRegIndex<=kAdcConfig){
+        if (theRegIndex >= kInputDyRange && theRegIndex<=kAdcTemp){
             start = theChannelIndex;
             end = theChannelIndex;
             if(theChannelIndex >= kNumDT5725Channels) {
@@ -1038,7 +1184,7 @@ static NSString* DT5725RunModeString[4] = {
         NSLog(@"Register is:%@\n", [self getRegisterName:theRegIndex]);
         NSLog(@"Value is   :0x%04x\n", theValue);
         
-        if (theRegIndex >= kZS_Thres && theRegIndex<=kAdcConfig){
+        if (theRegIndex >= kInputDyRange && theRegIndex<=kAdcTemp){
             start	= theChannelIndex;
             end 	= theChannelIndex;
             if(theChannelIndex >= kNumDT5725Channels){
@@ -1113,87 +1259,102 @@ static NSString* DT5725RunModeString[4] = {
 
 - (void) report
 {
-	unsigned long enabled, threshold, numOU, status, bufferOccupancy, dacValue,triggerSrc;
+	unsigned long enabled, threshold, dynRange, pulseWidth, trigLogic, status, dacOffset, adcTemp, triggerSrc;
 	[self read:kChanEnableMask returnValue:&enabled];
 	[self read:kTrigSrcEnblMask returnValue:&triggerSrc];
 	int chan;
     NSFont* theFont = [NSFont fontWithName:@"Monaco" size:10];
-	NSLogFont(theFont,@"-----------------------------------------------------------\n");
-	NSLogFont(theFont,@"Chan Enabled Thres  NumOver Status Buffers  Offset trigSrc\n");
-	NSLogFont(theFont,@"-----------------------------------------------------------\n");
+	NSLogFont(theFont,@"----------------------------------------------------------------------------------------------------------------\n");
+	NSLogFont(theFont,@"Chan | Enabled | Thres | Dynamic Range | Pulse Width | Self-Trigger Logic | Status | Offset | ADC Temp | trigSrc\n");
+	NSLogFont(theFont,@"----------------------------------------------------------------------------------------------------------------\n");
 	for(chan=0;chan<kNumDT5725Channels;chan++){
 		[self readChan:chan reg:kThresholds returnValue:&threshold];
-		[self readChan:chan reg:kNumOUThreshold returnValue:&numOU];
+        [self readChan:chan reg:kInputDyRange returnValue:&dynRange];
+        [self readChan:chan reg:kTrigPulseWidth returnValue:&pulseWidth];
+        [self readChan:chan reg:kSelfTrigLogic returnValue:&trigLogic];
 		[self readChan:chan reg:kStatus returnValue:&status];
-		[self readChan:chan reg:kBufferOccupancy returnValue:&bufferOccupancy];
-        [self readChan:chan reg:kDacs returnValue:&dacValue];
+        [self readChan:chan reg:kDCOffset returnValue:&dacOffset];
+        [self readChan:chan reg:kAdcTemp returnValue:&adcTemp];
+
+        NSString* dynRangeString = @"";
+        if(dynRange & 0x01) dynRangeString = @"0.5 V";
+        else                dynRangeString = @"2 V";
+
 		NSString* statusString = @"";
-		if(status & 0x20)			statusString = @"Error";
-		else if(status & 0x04)		statusString = @"Busy ";
-		else {
-			if(status & 0x02)		statusString = @"Empty";
-			else if(status & 0x01)	statusString = @"Full ";
-		}
-		NSLogFont(theFont,@"  %d     %@    %d  %d  %@  %d  %6.3f  %@\n",
-				  chan, enabled&(1<<chan)?@"E":@"X",
-				  threshold&0xfff, numOU&0xfff,statusString,
-				  bufferOccupancy&0x7ff, [self convertDacToVolts:dacValue],
-				  triggerSrc&(1<<chan)?@"Y":@"N");
+		if(status & 0x08)		statusString = [statusString stringByAppendingString:@"Calib-"];
+        else                    statusString = [statusString stringByAppendingString:@"Not Calib-"];
+		if(status & 0x04)		statusString = [statusString stringByAppendingString:@"DAC Busy-"];
+        else                    statusString = [statusString stringByAppendingString:@"DAC Set-"];
+		if(status & 0x02)		statusString = [statusString stringByAppendingString:@"Empty"];
+		else if(status & 0x01)	statusString = [statusString stringByAppendingString:@"Full"];
+
+        NSString* trigLogicString = @"";
+        if(trigLogic & 0x03){
+            if(trigLogic & 0x02){
+                if(trigLogic & 0x01)    trigLogicString = @"or";
+                else                    trigLogicString = [NSString stringWithFormat: @"%d", chan+1];
+            }
+            else                        trigLogicString = [NSString stringWithFormat: @"%d", chan];
+        }
+        else                            trigLogicString = @"and";
+        if(trigLogic & 0x4) trigLogicString = [trigLogicString stringByAppendingString:@"-over/under"];
+        else                trigLogicString = [trigLogicString stringByAppendingString:@"-pulseWidth"];
+
+		NSLogFont(theFont,@"%d | %@ | %d | %@ | %d | %@ | %@ | %6.3f | %@ | %@\n",
+				    chan, 
+                    enabled&(1<<chan)?@"E":@"X",
+				    threshold&0x3fff,
+                    dynRangeString,
+                    pulseWidth,
+                    trigLogicString,
+                    statusString,
+				    [self convertDacToVolts:dacOffset range:(BOOL)dynRange],
+                    [NSString stringWithFormat: @"%lu ºC", adcTemp],
+				    triggerSrc&(1<<chan)?@"Y":@"N");
 	}
-	NSLogFont(theFont,@"-----------------------------------------------------------\n");
-	
-    unsigned long zThres,nsAmp;
-    NSLogFont(theFont,@"-----------------------------------------------------------\n");
-    NSLogFont(theFont,@"                    Zeros Suppression                      \n");
-    NSLogFont(theFont,@"Chan logic  Thres     NumOver \n");
-    NSLogFont(theFont,@"-----------------------------------------------------------\n");
-    for(chan=0;chan<kNumDT5725Channels;chan++){
-        [self readChan:chan reg:kZS_Thres returnValue:&zThres];
-        [self readChan:chan reg:kZS_NsAmp returnValue:&nsAmp];
-        NSLogFont(theFont,@" %d   %@    %d    %d\n",
-                  chan, zThres>>31?@"Neg":@"Pos",zThres&0xFFF,nsAmp&0xFFF);
-    }
-    NSLogFont(theFont,@"-----------------------------------------------------------\n");
+	NSLogFont(theFont,@"----------------------------------------------------------------------------------------------------------------\n");
     
-	unsigned long aValue;
-	[self read:kBufferOrganization returnValue:&aValue];
-	NSLogFont(theFont,@"# Buffer Blocks : %d\n",(long)powf(2.,(float)aValue));
+	NSLogFont(theFont,@"Software Trigger  : %@\n",triggerSrc&0xf0000000?@"Enabled":@"Disabled");
+	NSLogFont(theFont,@"External Trigger  : %@\n",triggerSrc&0x80000000?@"Enabled":@"Disabled");
+	NSLogFont(theFont,@"Coincidence Level : %d\n",(triggerSrc >> 24) & 0x7);
+    NSLogFont(theFont,@"Coincidence Window: %d ns\n",((triggerSrc >> 20) & 0xf)*4);
 	
-	NSLogFont(theFont,@"Software Trigger: %@\n",triggerSrc&0x80000000?@"Enabled":@"Disabled");
-	NSLogFont(theFont,@"External Trigger: %@\n",triggerSrc&0x40000000?@"Enabled":@"Disabled");
-	NSLogFont(theFont,@"Trigger nHit    : %d\n",(triggerSrc >> 24) & 0x3);
-	
-	
+    unsigned long aValue;
 	[self read:kAcqControl returnValue:&aValue];
-	NSLogFont(theFont,@"Triggers Count  : %@\n",aValue&0x4?@"Accepted":@"All");
-	NSLogFont(theFont,@"Run Mode        : %@\n",DT5725RunModeString[aValue&0x3]);
-		
+	NSLogFont(theFont,@"Triggers Count    : %@\n",aValue&0x8?@"All":@"Accepted");
+	NSLogFont(theFont,@"Run Mode          : %@\n",DT5725StartStopRunModeString[aValue&0x3]);
+    NSLogFont(theFont,@"Memory Full Mode  : %@\n",aValue&0x10?@"OneBufferFree":@"Normal");
+	
 	[self read:kAcqStatus returnValue:&aValue];
-	NSLogFont(theFont,@"Board Ready     : %@\n",aValue&0x100?@"YES":@"NO");
-	NSLogFont(theFont,@"PLL Locked      : %@\n",aValue&0x80?@"YES":@"NO");
-	NSLogFont(theFont,@"PLL Bypass      : %@\n",aValue&0x40?@"YES":@"NO");
-	NSLogFont(theFont,@"Clock source    : %@\n",aValue&0x20?@"External":@"Internal");
-	NSLogFont(theFont,@"Buffer full     : %@\n",aValue&0x10?@"YES":@"NO");
-	NSLogFont(theFont,@"Events Ready    : %@\n",aValue&0x08?@"YES":@"NO");
-	NSLogFont(theFont,@"Run             : %@\n",aValue&0x04?@"ON":@"OFF");
+    NSLogFont(theFont,@"Channel Shutdown  : %@\n",aValue&0x80000?@"ON":@"OFF");
+    NSLogFont(theFont,@"Chan. 0-4 Overheat: %@\n",aValue&0x100000?@"YES":@"NO");
+    NSLogFont(theFont,@"Chan. 5-8 Overheat: %@\n",aValue&0x200000?@"YES":@"NO");
+	NSLogFont(theFont,@"Board Ready       : %@\n",aValue&0x100?@"YES":@"NO");
+	NSLogFont(theFont,@"PLL Locked        : %@\n",aValue&0x80?@"YES":@"NO");
+	NSLogFont(theFont,@"PLL Bypass        : %@\n",aValue&0x40?@"YES":@"NO");
+	NSLogFont(theFont,@"Clock source      : %@\n",aValue&0x20?@"External":@"Internal");
+	NSLogFont(theFont,@"Buffer full       : %@\n",aValue&0x10?@"YES":@"NO");
+	NSLogFont(theFont,@"Events Ready      : %@\n",aValue&0x08?@"YES":@"NO");
+	NSLogFont(theFont,@"Run               : %@\n",aValue&0x04?@"ON":@"OFF");
 	
 	[self read:kEventStored returnValue:&aValue];
-	NSLogFont(theFont,@"Events Stored   : %d\n",aValue);
-	
+	NSLogFont(theFont,@"Events Stored     : %d\n",aValue);
+
+    [self read:kBFStatus returnValue:&aValue];
+    NSLogFont(theFont,@"PLL Lock Loss     : %@\n",aValue&0x10?@"YES":@"NO");
+    NSLogFont(theFont,@"Temp. Failure     : %@\n",aValue&0x20?@"YES":@"NO");
+    NSLogFont(theFont,@"ADC Power Down    : %@\n",aValue&0x40?@"YES":@"NO");
+    NSLogFont(theFont,@"Internal Timeout  : %@\n",aValue&0xff?@"YES":@"NO");
 }
 
 - (void) initBoard
 {
     [self readConfigurationROM];
-    [self writeAcquistionControl:NO]; // Make sure it's off.
+    [self writeAcquisitionControl:NO]; // Make sure it's off.
     [self clearAllMemory];
-    [self writeBufferOrganization];
-    [self writeZSThresholds];
-    [self writeZSAmplReg];
+    [self writeSize];
     [self writeThresholds];
-    [self writeNumOverUnderThresholds];
-    [self writeDacs];
-	[self writeChannelConfiguration];
+	[self writeBoardConfiguration];
     [self writeTriggerSourceEnableMask];
     [self writeFrontPanelTriggerOutEnableMask];
     [self writePostTriggerSetting];
@@ -1228,42 +1389,46 @@ static NSString* DT5725RunModeString[4] = {
 
     //get digitizer version
     value = 0;
-    err = [self readLongBlock:&value atAddress:reg[kConfigROMVersion].addressOffset];
+    err = [self readLongBlock:&value atAddress:reg[kBoardInfo].addressOffset];
     if (err) {
-        NSLog(@"DT5725 read configuration ROM version at address: 0x%04x failed\n", reg[kConfigROMVersion].addressOffset);
+        NSLog(@"DT5725 read configuration ROM version at address: 0x%04x failed\n", reg[kBoardInfo].addressOffset);
         return;
     }
     switch (value & 0xFF) {
-        case 0x30: //DT5725 tested. 4 Ch. 12 bit 250 MS/s Digitizer: 1.25MS/ch, C4, SE
+        case 0x0E: //725 digitizer family
             break;
 
-        case 0x32:
-            NSLog(@"Warning: DT5725B/C is not tested\n");
-            //DT5725B is 4 Ch. 12 bit 250 MS/s Digitizer: 1.25MS/ch, C20, SE, i.e., different FPGA
-            //DT5725C is 2 Ch. 12 bit 250 MS/s Digitizer: 1.25MS/ch, C20, SE
-            //unlikely to work without testing
-            break;
-
-        case 0x34:
-            NSLog(@"Warning: DT5725A is not tested\n");
-            //DT5725A is 2 Ch. 12 bit 250 MS/s Digitizer: 1.25MS/ch, C4, SE
-            //should work fine
-            //todo: reduce number of channels in UI
-            break;
-
-        case 0x38:
-            NSLog(@"Warning: DT5725D is not tested\n");
-            //DT5725D is 4 Ch. 12 bit 250 MS/s Digitizer: 10MS/ch, C20, SE, i.e., different FPGA and RAM
-            //unlikely to work
-            break;
-
-        case 0x39:
-            NSLog(@"Warning: DT5725E is not tested\n");
-            //DT5725E is 2 Ch. 12 bit 250 MS/s Digitizer: 10MS/ch, C20, SE; two channel version of D
+        case 0x0B:
+            NSLog(@"Warning: 730 digitizer family not tested.\n");
             break;
 
         default:
-            NSLog(@"Warning: unknown digitizer version read from its configuration ROM.\n");
+            NSLog(@"Warning: Unknown digitizer family.\n");
+    }
+
+    switch ((value >> 8) & 0xFF) {
+        case 0x01: //640 kS/ch.
+            break;
+
+        case 0x08:
+            NSLog(@"Warning: 5.12 MS/ch. memory not tested.\n");
+            break;
+
+        default:
+            NSLog(@"Warning: Unknown memory size.\n");
+            break;
+    }
+
+    switch ((value >> 16) & 0xFF) {
+        case 0x08: //8 Channels (DT, NIM, and 8-chan. VME)
+            break;
+
+        case 0x10: //16 Channels (VME boards)
+            NSLog(@"Warning: 16 Channel VME boards not tested.\n");
+            break;
+
+        default:
+            NSLog(@"Warning: Unknown number of channels.\n");
             break;
     }
     
@@ -1275,58 +1440,44 @@ static NSString* DT5725RunModeString[4] = {
         return;
     }
     switch (value & 0xFF) {
-        case 0x02: //DT5725x
+        case 0x02: //Desktop model
             break;
             
         default:
-            NSLog(@"Warning: unknown digitizer Board2 ID read from its configuration ROM.\n");
+            NSLog(@"Warning: Non-desktop form factor not tested.\n");
             break;
     }
 }
 
 #pragma mark ***HW Reg Access
-- (void) writeZSThresholds
+- (void) writeDynamicRanges
 {
-    short	i;
-    for (i=0;i<kNumDT5725Channels;i++){
-        [self writeZSThreshold:i];
+    short i;
+    for (i = 0; i < kNumDT5725Channels; i++){
+        [self writeThreshold:i];
     }
 }
 
-- (void) writeZSThreshold:(unsigned short) i
+- (void) writeDynamicRange:(unsigned short) i
 {
-    unsigned long aValue = 0;
-    aValue |= logicType[i]<<31;
-    aValue |= [self zsThreshold:i] & 0xFFF;
-    
+    unsigned long aValue = [self inputDynamicRange:i];
     [self writeLongBlock:&aValue
-               atAddress:reg[kZS_Thres].addressOffset + (i * 0x100)];
+               atAddress:reg[kInputDyRange].addressOffset + (i * 0x100)];
 }
 
-- (void) writeZSAmplReg
+- (void) writeTrigPulseWidths
 {
-    short	i;
-    for (i=0;i<kNumDT5725Channels;i++){
-        [self writeZSAmplReg:i];
+    short i;
+    for (i = 0; i < kNumDT5725Channels; i++){
+        [self writeTrigPulseWidth:i];
     }
 }
 
-- (void) writeZSAmplReg:(unsigned short) i
+- (void) writeTrigPulseWidth:(unsigned short) i
 {
-    
-    if(zsAlgorithm == kFullSuppressionBasedOnAmplitude){
-        unsigned long 	aValue = [self numOverUnderZsThreshold:i] & 0xFFFFF;
-    
-        [self writeLongBlock:&aValue
-                   atAddress:reg[kZS_NsAmp].addressOffset + (i * 0x100)];
-    }
-    else if(zsAlgorithm == kZeroLengthEncoding){
-        unsigned long aValue = ([self nLbk:i] & 0xFFFF)<<16 |
-                               ([self nLfwd:i]& 0xFFFF);
-        [self writeLongBlock:&aValue
-                   atAddress:reg[kZS_NsAmp].addressOffset + (i * 0x100)];
-    }
-
+    unsigned long aValue = [self selfTrigPulseWidth:i];
+    [self writeLongBlock:&aValue
+               atAddress:reg[kTrigPulseWidth].addressOffset + (i * 0x100)];
 }
 
 - (void) writeThresholds
@@ -1344,68 +1495,83 @@ static NSString* DT5725RunModeString[4] = {
                atAddress:reg[kThresholds].addressOffset + (i * 0x100)];
 }
 
-- (void) writeNumOverUnderThresholds
+- (void) writeSelfTrigLogics
 {
-    short	i;
+    short i;
     for (i = 0; i < kNumDT5725Channels; i++){
-        [self writeNumOverUnderThreshold:i];
+        [self writeSelfTrigLogic:i];
     }
 }
-- (void) writeNumOverUnderThreshold:(unsigned short) i
+
+- (void) writeSelfTrigLogic:(unsigned short) i
 {
-    unsigned long 	aValue = [self numOverUnderThreshold:i];
+    unsigned long aValue = [self selfTrigLogic:i];
+    aValue |= ([self selfTrigPulseType:i] & 0x1) << 2;
     [self writeLongBlock:&aValue
-               atAddress:reg[kNumOUThreshold].addressOffset + (i * 0x100)];
+               atAddress:reg[kSelfTrigLogic].addressOffset + (2*(i/2) * 0x100)];
 }
 
-- (void) writeDacs
+- (void) writeDCOffsets
 {
-    short	i;
+    short i;
     for (i = 0; i < kNumDT5725Channels; i++){
-        [self writeDac:i];
+        [self writeDCOffset:i];
     }
-    //dac take effect only when
 }
 
-- (void) writeDac:(unsigned short) i
+- (void) writeDCOffset:(unsigned short) i
 {
-    unsigned long 	aValue = [self dac:i];
+    unsigned long aValue = [self dcOffset:i];
     [self writeLongBlock:&aValue
-               atAddress:reg[kDacs].addressOffset + (i * 0x100)];
+               atAddress:reg[kDCOffset].addressOffset + (i * 0x100)];
 }
 
-- (void) writeChannelConfiguration
+- (void) writeBoardConfiguration
 {
     unsigned long mask = 0;
-    if(zsAlgorithm == kNoZeroSuppression)  mask |= (0x0   << 16);
-    else if(zsAlgorithm == kZeroLengthEncoding) mask |= (0x2   << 16);
-    else                                   mask |= (0x3   << 16);
-    mask |= (packed & 0x1)                << 11;
     mask |= (trigOnUnderThreshold & 0x1)  <<  6;
     mask |= 0x1                           <<  4; //reserved bit (MUST be one)
     mask |= (testPatternEnabled & 0x1)    <<  3;
     mask |= (trigOverlapEnabled & 0x1)    <<  1;
-    
     [self writeLongBlock:&mask
-               atAddress:reg[kChanConfig].addressOffset];
+               atAddress:reg[kBoardConfig].addressOffset];
 }
 
-- (void) writeBufferOrganization
+- (void) writeSize
 {
-    unsigned long aValue = eventSize & 0xf; //(unsigned long)pow(2.,(float)eventSize);
-    [self writeLongBlock:&aValue
+    unsigned long customSize = eventSize;
+    buffCode = 0x0A;
+    unsigned long memsize = 640000; //samples/ch.
+    while ((customSize * 10) > (memsize/(unsigned long)pow(2., (float)buffCode) - 10)){
+        buffCode -= 1;
+    }
+    [self writeLongBlock:&buffCode
                atAddress:reg[kBufferOrganization].addressOffset];
+    [self writeLongBlock:&customSize
+               atAddress:reg[kCustomSize].addressOffset];
 }
 
+- (void) adcCalibrate
+{
+    unsigned long aValue = 0x446F6773;
+    for (int i = 0; i < kNumDT5725Channels; i++){
+        unsigned long chanStatus;
+        [self readLongBlock:&chanStatus 
+                  atAddress:reg[kStatus].addressOffset + (i * 0x100)];
+        while (chanStatus ^ 0x8);
+    }
+    [self writeLongBlock:&aValue
+               atAddress:reg[kChanAdcCalib].addressOffset];
+}
 
-- (void) writeAcquistionControl:(BOOL)start
+- (void) writeAcquisitionControl:(BOOL)start
 {
     unsigned long aValue = 0;
     aValue |= (clockSource & 0x1)       << 6;
+    aValue |= (memFullMode & 0x1)       << 5;
     aValue |= (countAllTriggers & 0x1)  << 3;
     if(start) aValue |= (0x1 << 2);
-    aValue |= (gpiRunMode & 0x1)        << 0;
-    
+    aValue |= (startStopRunMode & 0x3)           << 0;
     [self writeLongBlock:&aValue
                atAddress:reg[kAcqControl].addressOffset];
     
@@ -1413,7 +1579,7 @@ static NSString* DT5725RunModeString[4] = {
 
 - (void) trigger
 {
-    unsigned long aValue = 0;
+    unsigned long aValue = 0x446F6773;
     [self writeLongBlock:&aValue
                atAddress:reg[kSWTrigger].addressOffset];
    
@@ -1425,8 +1591,8 @@ static NSString* DT5725RunModeString[4] = {
     aValue |= (softwareTrigEnabled & 0x1) << 31;
     aValue |= (externalTrigEnabled & 0x1) << 30;
     aValue |= (coincidenceLevel    & 0x7) << 24;
+    aValue |= (coincidenceWindow   & 0xf) << 20;
     aValue |= (triggerSourceMask   & 0xf) <<  0;
-    
     [self writeLongBlock:&aValue
                atAddress:reg[kTrigSrcEnblMask].addressOffset];
 }
@@ -1434,9 +1600,15 @@ static NSString* DT5725RunModeString[4] = {
 - (void) writeFrontPanelIOControl
 {
     unsigned long aValue = 0;
-    aValue |= (gpoEnabled & 0x1) << 1;
-    aValue |= (ttlEnabled & 0x1) << 0;
-    
+    aValue |= (fpHeaderPattern        & 0x3) << 21;
+    aValue |= (fpBusyUnlockSelect     & 0x1) << 20;
+    aValue |= (fpMBProbeSelect        & 0x3) << 18;
+    aValue |= (fpTrigOutModeSelect    & 0x3) << 16;
+    aValue |= (fpTrigOutMode          & 0x1) << 15;
+    aValue |= (fpForceTrigOut         & 0x1) << 14;
+    aValue |= (fpTrigInToMezzanines   & 0x1) << 11;
+    aValue |= (fpTrigInSigEdgeDisable & 0x1) << 10;
+    aValue |= (fpLogicType            & 0x1) <<  0;
     [self writeLongBlock:&aValue
                atAddress:reg[kFPIOControl].addressOffset];
   
@@ -1445,19 +1617,18 @@ static NSString* DT5725RunModeString[4] = {
 - (void) writeFrontPanelTriggerOutEnableMask
 {
     unsigned long aValue = 0;
-    aValue = (fpSoftwareTrigEnabled & 0x1) << 31;
-    aValue = (fpExternalTrigEnabled & 0x1) << 30;
-    aValue = (triggerOutMask        & 0xf) <<  0;
-    
+    aValue |= (swTrigOutEnabled        & 0x1) << 31;
+    aValue |= (extTrigOutEnabled       & 0x1) << 30;
+    aValue |= (trigOutCoincidenceLevel & 0x7) << 10;
+    aValue |= (triggerOutLogic         & 0x3) <<  8;
+    aValue |= (triggerOutMask          & 0xf) <<  0;
     [self writeLongBlock:&aValue
                atAddress:reg[kFPTrigOutEnblMask].addressOffset];
 }
 
 - (void) writePostTriggerSetting
 {
-    unsigned long aValue = postTriggerSetting/4;
-    if(packed)aValue = aValue*1.25;
-    
+    unsigned long aValue = postTriggerSetting/2;
     [self writeLongBlock:&aValue
                atAddress:reg[kPostTrigSetting].addressOffset];
     
@@ -1471,34 +1642,55 @@ static NSString* DT5725RunModeString[4] = {
     
 }
 
+- (void) writeFanSpeedControl
+{
+    unsigned long aValue = 0;
+    aValue |= 0x3                  << 4; //must be 1
+    aValue |= (fanSpeedMode & 0x1) << 3;
+    [self writeLongBlock:&aValue
+               atAddress:reg[kFanSpeed].addressOffset];
+}
+
+- (void) writeBufferAlmostFull
+{
+    unsigned long aValue = (almostFullLevel & 0x4f);
+    [self writeLongBlock:&aValue
+               atAddress:reg[kBufAlmostFull].addressOffset];
+}
+
+- (void) writeRunDelay
+{
+    unsigned long aValue = runDelay;
+    [self writeLongBlock:&aValue
+               atAddress:reg[kRunDelay].addressOffset];
+}
+
 - (void) writeNumBLTEventsToReadout
 {
-    unsigned long aValue = pow(2.,eventSize);
+    unsigned long aValue = pow(2.,buffCode);
     [self writeLongBlock:&aValue
                atAddress:reg[kBLTEventNum].addressOffset];
 }
 
 - (void) softwareReset
 {
-    unsigned long aValue = 0;
+    unsigned long aValue = 0x446F6773;
     [self writeLongBlock:&aValue
                atAddress:reg[kSWReset].addressOffset];
-    
 }
 
 - (void) clearAllMemory
 {
-    unsigned long aValue = 0;
+    unsigned long aValue = 0x446F6773;
     [self writeLongBlock:&aValue
                atAddress:reg[kSWClear].addressOffset];
     
 }
 - (void) configReload
 {
-    unsigned long aValue = 0;
+    unsigned long aValue = 0x446F6773;
     [self writeLongBlock:&aValue
-               atAddress:reg[kSWClear].addressOffset];
-    
+               atAddress:reg[kConfigReload].addressOffset];
 }
 
 - (void) checkBufferAlarm
@@ -1547,16 +1739,24 @@ static NSString* DT5725RunModeString[4] = {
 
 
 #pragma mark ***Helpers
-- (float) convertDacToVolts:(unsigned short)aDacValue
+- (float) convertDacToVolts:(unsigned short)aDacValue range:(BOOL)dynamicRange
 {
-	return 2*aDacValue/65535. - 1.0;
-    //return 2*((short)aDacValue)/65535.;
+    if(dynamicRange){
+        return (float)(0.5*(2*aDacValue/65535. - 1.0));
+    }
+    else{
+        return (float)(2*aDacValue/65535. - 1.0);
+    }
 }
 
-- (unsigned short) convertVoltsToDac:(float)aVoltage
+- (unsigned short) convertVoltsToDac:(float)aVoltage range:(BOOL)dynamicRange
 {
-	return (unsigned short)(65535. * (aVoltage+1.0)/2.);
-    //return (unsigned short)((short) (65535. * (aVoltage)/2.));
+    if(dynamicRange){
+        return (unsigned short)(65535. * (aVoltage + 0.25));
+    }
+    else{
+	    return (unsigned short)(65535. * (aVoltage + 1.0) / 2.);
+    }
 }
 
 
@@ -1642,7 +1842,6 @@ static NSString* DT5725RunModeString[4] = {
     
     eventData = [[NSMutableData dataWithCapacity:totalDataSizeInLongs*sizeof(long)]retain];
     [eventData setLength:numBlts*(totalDataSizeInLongs*sizeof(long))];
-    cachedPack = packed;
     
     [NSThread detachNewThreadSelector:@selector(dataWorker:) toTarget:self withObject:nil];
 }
@@ -1651,7 +1850,7 @@ static NSString* DT5725RunModeString[4] = {
 {
     if(firstTime){
         firstTime = NO;
-        [self writeAcquistionControl:YES];
+        [self writeAcquisitionControl:YES];
     }
     else {
         if([circularBuffer dataAvailable]){
@@ -1664,7 +1863,7 @@ static NSString* DT5725RunModeString[4] = {
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     //stop data pulling thread
-    [self writeAcquistionControl:NO];
+    [self writeAcquisitionControl:NO];
 
     self.isTimeToStopDataWorker = YES;
     while (self.isDataWorkerRunning) {
@@ -1674,13 +1873,13 @@ static NSString* DT5725RunModeString[4] = {
     circularBuffer = nil;
 }
 
-- (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     [waveFormRateGroup stop];
     short i;
     for(i=0;i<kNumDT5725Channels;i++)waveFormCount[i] = 0;
     
-    [self writeAcquistionControl:NO];
+    [self writeAcquisitionControl:NO];
     isRunning = NO;
     [eventData release];
     eventData = nil;
@@ -1917,28 +2116,39 @@ static NSString* DT5725RunModeString[4] = {
 {
     self = [super initWithCoder:aDecoder];
     [[self undoManager] disableUndoRegistration];
-    [self setZsAlgorithm:           [aDecoder decodeIntForKey:      @"zsAlgorithm"]];
-    [self setPacked:                [aDecoder decodeBoolForKey:     @"packed"]];
-    [self setTrigOnUnderThreshold:  [aDecoder decodeBoolForKey:     @"trigOnUnderThreshold"]];
-    [self setTestPatternEnabled:    [aDecoder decodeBoolForKey:     @"testPatternEnabled"]];
-    [self setTrigOverlapEnabled:    [aDecoder decodeBoolForKey:     @"trigOverlapEnabled"]];
-    [self setEventSize:             [aDecoder decodeIntForKey:      @"eventSize"]];
-    [self setClockSource:           [aDecoder decodeBoolForKey:     @"clockSource"]];
-    [self setCountAllTriggers:      [aDecoder decodeBoolForKey:     @"countAllTriggers"]];
-    [self setGpiRunMode:            [aDecoder decodeBoolForKey:     @"gpiRunMode"]];
-    [self setSoftwareTrigEnabled:   [aDecoder decodeBoolForKey:     @"softwareTrigEnabled"]];
-    [self setExternalTrigEnabled:   [aDecoder decodeBoolForKey:     @"externalTrigEnabled"]];
-    [self setTriggerSourceMask:     [aDecoder decodeIntForKey:      @"triggerSourceMask"]];
-    [self setFpExternalTrigEnabled: [aDecoder decodeBoolForKey:     @"fpExternalTrigEnabled"]];
-    [self setFpSoftwareTrigEnabled: [aDecoder decodeBoolForKey:     @"fpSoftwareTrigEnabled"]];
-    [self setTriggerOutMask:        [aDecoder decodeIntForKey:      @"triggerOutMask"]];
-    [self setPostTriggerSetting:    [aDecoder decodeInt32ForKey:    @"postTriggerSetting"]];
-    [self setGpoEnabled:            [aDecoder decodeBoolForKey:     @"gpoEnabled"]];
-    [self setTtlEnabled:            [aDecoder decodeIntForKey:      @"ttlEnabled"]];
-    [self setEnabledMask:           [aDecoder decodeIntForKey:      @"enabledMask"]];
-
-    [self setCoincidenceLevel:      [aDecoder decodeIntForKey:      @"coincidenceLevel"]];
-    [self setWaveFormRateGroup:     [aDecoder decodeObjectForKey:   @"waveFormRateGroup"]];
+    [self setTrigOnUnderThreshold:      [aDecoder decodeBoolForKey:     @"trigOnUnderThreshold"]];
+    [self setTestPatternEnabled:        [aDecoder decodeBoolForKey:     @"testPatternEnabled"]];
+    [self setTrigOverlapEnabled:        [aDecoder decodeBoolForKey:     @"trigOverlapEnabled"]];
+    [self setEventSize:                 [aDecoder decodeIntForKey:      @"eventSize"]];
+    [self setClockSource:               [aDecoder decodeBoolForKey:     @"clockSource"]];
+    [self setCountAllTriggers:          [aDecoder decodeBoolForKey:     @"countAllTriggers"]];
+    [self setMemFullMode:               [aDecoder decodeBoolForKey:     @"memFullMode"]];
+    [self setStartStopRunMode:          [aDecoder decodeBoolForKey:     @"startStopRunMode"]];
+    [self setSoftwareTrigEnabled:       [aDecoder decodeBoolForKey:     @"softwareTrigEnabled"]];
+    [self setExternalTrigEnabled:       [aDecoder decodeBoolForKey:     @"externalTrigEnabled"]];
+    [self setTriggerSourceMask:         [aDecoder decodeIntForKey:      @"triggerSourceMask"]];
+    [self setExtTrigOutEnabled:         [aDecoder decodeBoolForKey:     @"fpExternalTrigEnabled"]];
+    [self setSwTrigOutEnabled:          [aDecoder decodeBoolForKey:     @"fpSoftwareTrigEnabled"]];
+    [self setTriggerOutMask:            [aDecoder decodeIntForKey:      @"triggerOutMask"]];
+    [self setTriggerOutLogic:           [aDecoder decodeIntForKey:      @"triggerOutLogic"]];
+    [self setTrigOutCoincidenceLevel:   [aDecoder decodeIntForKey:      @"trigOutCoincidenceLevel"]];
+    [self setPostTriggerSetting:        [aDecoder decodeInt32ForKey:    @"postTriggerSetting"]];
+    [self setEnabledMask:               [aDecoder decodeIntForKey:      @"enabledMask"]];
+    [self setFpLogicType:               [aDecoder decodeBoolForKey:     @"fpLogicType"]];
+    [self setFpTrigInSigEdgeDisable:    [aDecoder decodeBoolForKey:     @"fpTrigInSigEdgeDisable"]];
+    [self setFpTrigInToMezzanines:      [aDecoder decodeBoolForKey:     @"fpTrigInToMezzanines"]];
+    [self setFpForceTrigOut:            [aDecoder decodeBoolForKey:     @"fpForceTrigOut"]];
+    [self setFpTrigOutMode:             [aDecoder decodeBoolForKey:     @"fpTrigOutMode"]];
+    [self setFpTrigOutModeSelect:       [aDecoder decodeIntForKey:      @"fpTrigOutModeSelect"]];
+    [self setFpMBProbeSelect:           [aDecoder decodeIntForKey:      @"fpMBProbeSelect"]];
+    [self setFpBusyUnlockSelect:        [aDecoder decodeBoolForKey:     @"fpBusyUnlockSelect"]];
+    [self setFpHeaderPattern:           [aDecoder decodeIntForKey:      @"fpHeaderPattern"]];
+    [self setFanSpeedMode:              [aDecoder decodeBoolForKey:     @"fanSpeedMode"]];
+    [self setAlmostFullLevel:           [aDecoder decodeIntForKey:      @"almostFullLevel"]];
+    [self setRunDelay:                  [aDecoder decodeInt32ForKey:    @"runDelay"]];
+    [self setCoincidenceWindow:         [aDecoder decodeIntForKey:      @"coincidenceWindow"]];
+    [self setCoincidenceLevel:          [aDecoder decodeIntForKey:      @"coincidenceLevel"]];
+    [self setWaveFormRateGroup:         [aDecoder decodeObjectForKey:   @"waveFormRateGroup"]];
     
     if(!waveFormRateGroup){
         [self setWaveFormRateGroup:[[[ORRateGroup alloc] initGroup:8 groupTag:0] autorelease]];
@@ -1949,14 +2159,14 @@ static NSString* DT5725RunModeString[4] = {
 	
 	int i;
     for (i = 0; i < kNumDT5725Channels; i++){
-        [self setLogicType:i    withValue:           [aDecoder decodeIntForKey:  [NSString stringWithFormat:@"logicType%d", i]]];
-        [self setZsThreshold:i  withValue:           [aDecoder decodeIntForKey:  [NSString stringWithFormat:@"zsThreshold%d", i]]];
-        [self setThreshold:i    withValue:           [aDecoder decodeIntForKey:  [NSString stringWithFormat:@"threshold%d", i]]];
-        [self setNumOverUnderZsThreshold:i withValue:[aDecoder decodeIntForKey:  [NSString stringWithFormat:@"numOverUnderZsThreshold%d", i]]];
-        [self setNlbk:i         withValue:           [aDecoder decodeIntForKey:  [NSString stringWithFormat:@"nLbk%d", i]]];
-        [self setNlfwd:i        withValue:           [aDecoder decodeIntForKey:  [NSString stringWithFormat:@"nLfwd%d", i]]];
-        [self setNumOverUnderThreshold:i withValue:  [aDecoder decodeIntForKey:  [NSString stringWithFormat:@"numOverUnderThreshold%d", i]]];
-        [self setDac:i          withValue:           [aDecoder decodeIntForKey:  [NSString stringWithFormat:@"dac%d", i]]];
+        [self setInputDynamicRange:i    withValue:[aDecoder decodeBoolForKey: [NSString stringWithFormat:@"dynamicRange%d", i]]];
+        [self setSelfTrigPulseWidth:i   withValue:[aDecoder decodeIntForKey:  [NSString stringWithFormat:@"selfTrigPulseWidth%d", i]]];
+        [self setThreshold:i            withValue:[aDecoder decodeIntForKey:  [NSString stringWithFormat:@"threshold%d", i]]];
+        [self setSelfTrigPulseType:i    withValue:[aDecoder decodeBoolForKey: [NSString stringWithFormat:@"selfTrigPulseType%d", i]]];
+        [self setDCOffset:i             withValue:[aDecoder decodeIntForKey:  [NSString stringWithFormat:@"dcOffset%d", i]]];
+        if (i%2 == 0){
+            [self setSelfTrigLogic:i        withValue:[aDecoder decodeIntForKey:  [NSString stringWithFormat:@"selfTrigLogic%d", i]]];
+        }
     }
     
     [[self undoManager] enableUndoRegistration];
@@ -1968,39 +2178,50 @@ static NSString* DT5725RunModeString[4] = {
 {
     [super encodeWithCoder:anEncoder];
     
-    [anEncoder encodeInt: zsAlgorithm               forKey:@"zsAlgorithm"];
-    [anEncoder encodeBool:packed                    forKey:@"packed"];
     [anEncoder encodeBool:trigOnUnderThreshold      forKey:@"trigOnUnderThreshold"];
     [anEncoder encodeBool:testPatternEnabled        forKey:@"testPatternEnabled"];
     [anEncoder encodeBool:trigOverlapEnabled        forKey:@"trigOverlapEnabled"];
     [anEncoder encodeInt:eventSize                  forKey:@"eventSize"];
     [anEncoder encodeBool:clockSource               forKey:@"clockSource"];
     [anEncoder encodeBool:countAllTriggers          forKey:@"countAllTriggers"];
-    [anEncoder encodeBool:gpiRunMode                forKey:@"gpiRunMode"];
+    [anEncoder encodeBool:startStopRunMode          forKey:@"startStopRunMode"];
+    [anEncoder encodeBool:memFullMode               forKey:@"memFullMode"];
     [anEncoder encodeBool:softwareTrigEnabled       forKey:@"softwareTrigEnabled"];
     [anEncoder encodeBool:externalTrigEnabled       forKey:@"externalTrigEnabled"];
     [anEncoder encodeInt:triggerSourceMask          forKey:@"triggerSourceMask"];
-    [anEncoder encodeBool:fpExternalTrigEnabled     forKey:@"fpExternalTrigEnabled"];
-    [anEncoder encodeBool:fpSoftwareTrigEnabled     forKey:@"fpSoftwareTrigEnabled"];
-    [anEncoder encodeInt32:postTriggerSetting       forKey:@"postTriggerSetting"];
-    [anEncoder encodeBool:gpoEnabled                forKey:@"gpoEnabled"];
-    [anEncoder encodeInt:ttlEnabled                 forKey:@"ttlEnabled"];
+    [anEncoder encodeBool:swTrigOutEnabled          forKey:@"swTrigOutEnabled"];
+    [anEncoder encodeBool:extTrigOutEnabled         forKey:@"extTrigOutEnabled"];
     [anEncoder encodeInt:triggerOutMask             forKey:@"triggerOutMask"];
+    [anEncoder encodeInt:triggerOutLogic            forKey:@"triggerOutLogic"];
+    [anEncoder encodeInt:trigOutCoincidenceLevel    forKey:@"trigOutCoincidenceLevel"];
+    [anEncoder encodeInt32:postTriggerSetting       forKey:@"postTriggerSetting"];
     [anEncoder encodeInt:enabledMask                forKey:@"enabledMask"];
-
+    [anEncoder encodeBool:fpLogicType               forKey:@"fpLogicType"];
+    [anEncoder encodeBool:fpTrigInSigEdgeDisable    forKey:@"fpTrigInSigEdgeDisable"];
+    [anEncoder encodeBool:fpTrigInToMezzanines      forKey:@"fpTrigInToMezzanines"];
+    [anEncoder encodeBool:fpForceTrigOut            forKey:@"fpForceTrigOut"];
+    [anEncoder encodeBool:fpTrigOutMode             forKey:@"fpTrigOutMode"];
+    [anEncoder encodeInt:fpTrigOutModeSelect        forKey:@"fpTrigOutModeSelect"];
+    [anEncoder encodeInt:fpMBProbeSelect            forKey:@"fpMBProbeSelect"];
+    [anEncoder encodeBool:fpBusyUnlockSelect        forKey:@"fpBusyUnlockSelect"];
+    [anEncoder encodeInt:fpHeaderPattern            forKey:@"fpHeaderPattern"];
+    [anEncoder encodeBool:fanSpeedMode              forKey:@"fanSpeedMode"];
+    [anEncoder encodeInt:almostFullLevel            forKey:@"almostFullLevel"];
+    [anEncoder encodeInt32:runDelay                 forKey:@"runDelay"];
+    [anEncoder encodeInt:coincidenceWindow          forKey:@"coincidenceWindow"];
 	[anEncoder encodeInt:coincidenceLevel           forKey:@"coincidenceLevel"];
     [anEncoder encodeObject:waveFormRateGroup       forKey:@"waveFormRateGroup"];
     
 	int i;
 	for (i = 0; i < kNumDT5725Channels; i++){
-        [anEncoder encodeInt:logicType[i]               forKey:[NSString stringWithFormat:@"logicType%d", i]];
-        [anEncoder encodeInt:zsThresholds[i]            forKey:[NSString stringWithFormat:@"zsThreshold%d", i]];
-        [anEncoder encodeInt:numOverUnderZsThreshold[i] forKey:[NSString stringWithFormat:@"numOverUnderZsThreshold%d", i]];
-        [anEncoder encodeInt:nLbk[i]                    forKey:[NSString stringWithFormat:@"nLbk%d", i]];
-        [anEncoder encodeInt:nLfwd[i]                   forKey:[NSString stringWithFormat:@"nLfwd%d", i]];
+        [anEncoder encodeBool:inputDynamicRange[i]      forKey:[NSString stringWithFormat:@"inputDynamicRange%d", i]];
+        [anEncoder encodeInt:selfTrigPulseWidth[i]      forKey:[NSString stringWithFormat:@"selfTrigPulseWidth%d", i]];
         [anEncoder encodeInt:thresholds[i]              forKey:[NSString stringWithFormat:@"threshold%d", i]];
-        [anEncoder encodeInt:numOverUnderThreshold[i]   forKey:[NSString stringWithFormat:@"numOverUnderThreshold%d", i]];
-        [anEncoder encodeInt:dac[i]                     forKey:[NSString stringWithFormat:@"dac%d", i]];
+        [anEncoder encodeBool:selfTrigPulseType[i]      forKey:[NSString stringWithFormat:@"selfTrigPulseType%d", i]];
+        [anEncoder encodeInt:dcOffset[i]                forKey:[NSString stringWithFormat:@"dcOffset%d", i]];
+        if (i%2 == 0){
+            [anEncoder encodeInt:selfTrigLogic[i]           forKey:[NSString stringWithFormat:@"selfTrigLogic%d", i]];
+        }
     }
 }
 
@@ -2008,36 +2229,45 @@ static NSString* DT5725RunModeString[4] = {
 {
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     
-    [objDictionary setObject:[NSNumber numberWithInt:zsAlgorithm]           forKey:@"zsAlgorithm"];
-    [objDictionary setObject:[NSNumber numberWithInt:trigOverlapEnabled]    forKey:@"trigOverlapEnabled"];
-    [objDictionary setObject:[NSNumber numberWithInt:testPatternEnabled]    forKey:@"testPatternEnabled"];
-    [objDictionary setObject:[NSNumber numberWithInt:trigOnUnderThreshold]  forKey:@"trigOnUnderThreshold"];
-    [objDictionary setObject:[NSNumber numberWithInt:clockSource]           forKey:@"clockSource"];
-    [objDictionary setObject:[NSNumber numberWithInt:packEnabled]           forKey:@"packEnabled"];
-    [objDictionary setObject:[NSNumber numberWithInt:gpiRunMode]            forKey:@"gpiRunMode"];
-    [objDictionary setObject:[NSNumber numberWithInt:softwareTrigEnabled]   forKey:@"softwareTrigEnabled"];
-    [objDictionary setObject:[NSNumber numberWithInt:externalTrigEnabled]   forKey:@"externalTrigEnabled"];
-    [objDictionary setObject:[NSNumber numberWithInt:fpExternalTrigEnabled] forKey:@"fpExternalTrigEnabled"];
-    [objDictionary setObject:[NSNumber numberWithInt:fpSoftwareTrigEnabled] forKey:@"fpSoftwareTrigEnabled"];
-    [objDictionary setObject:[NSNumber numberWithInt:gpoEnabled]            forKey:@"gpoEnabled"];
-    [objDictionary setObject:[NSNumber numberWithInt:ttlEnabled]            forKey:@"ttlEnabled"];
-    [objDictionary setObject:[NSNumber numberWithInt:triggerSourceMask]     forKey:@"triggerSourceMask"];
-    [objDictionary setObject:[NSNumber numberWithInt:countAllTriggers]      forKey:@"countAllTriggers"];
-    [objDictionary setObject:[NSNumber numberWithInt:coincidenceLevel]      forKey:@"coincidenceLevel"];
-    [objDictionary setObject:[NSNumber numberWithInt:triggerOutMask]        forKey:@"triggerOutMask"];
-    [objDictionary setObject:[NSNumber numberWithInt:postTriggerSetting]    forKey:@"postTriggerSetting"];
-    [objDictionary setObject:[NSNumber numberWithInt:enabledMask]           forKey:@"enabledMask"];
-    [objDictionary setObject:[NSNumber numberWithInt:eventSize]             forKey:@"eventSize"];
+    [objDictionary setObject:[NSNumber numberWithInt:trigOnUnderThreshold]      forKey:@"trigOnUnderThreshold"];
+    [objDictionary setObject:[NSNumber numberWithInt:testPatternEnabled]        forKey:@"testPatternEnabled"];
+    [objDictionary setObject:[NSNumber numberWithInt:trigOverlapEnabled]        forKey:@"trigOverlapEnabled"];
+    [objDictionary setObject:[NSNumber numberWithInt:eventSize]                 forKey:@"eventSize"];
+    [objDictionary setObject:[NSNumber numberWithInt:clockSource]               forKey:@"clockSource"];
+    [objDictionary setObject:[NSNumber numberWithInt:countAllTriggers]          forKey:@"countAllTriggers"];
+    [objDictionary setObject:[NSNumber numberWithInt:startStopRunMode]          forKey:@"startStopRunMode"];
+    [objDictionary setObject:[NSNumber numberWithInt:memFullMode]               forKey:@"memFullMode"];
+    [objDictionary setObject:[NSNumber numberWithInt:softwareTrigEnabled]       forKey:@"softwareTrigEnabled"];
+    [objDictionary setObject:[NSNumber numberWithInt:externalTrigEnabled]       forKey:@"externalTrigEnabled"];
+    [objDictionary setObject:[NSNumber numberWithInt:triggerSourceMask]         forKey:@"triggerSourceMask"];
+    [objDictionary setObject:[NSNumber numberWithInt:swTrigOutEnabled]          forKey:@"swTrigOutEnabled"];
+    [objDictionary setObject:[NSNumber numberWithInt:extTrigOutEnabled]         forKey:@"extTrigOutEnabled"];
+    [objDictionary setObject:[NSNumber numberWithInt:triggerOutMask]            forKey:@"triggerOutMask"];
+    [objDictionary setObject:[NSNumber numberWithInt:triggerOutLogic]           forKey:@"triggerOutLogic"];
+    [objDictionary setObject:[NSNumber numberWithInt:trigOutCoincidenceLevel]   forKey:@"trigOutCoincidenceLevel"];
+    [objDictionary setObject:[NSNumber numberWithInt:postTriggerSetting]        forKey:@"postTriggerSetting"];
+    [objDictionary setObject:[NSNumber numberWithInt:enabledMask]               forKey:@"enabledMask"];
+    [objDictionary setObject:[NSNumber numberWithInt:fpLogicType]               forKey:@"fpLogicType"];
+    [objDictionary setObject:[NSNumber numberWithInt:fpTrigInSigEdgeDisable]    forKey:@"fpTrigInSigEdgeDisable"];
+    [objDictionary setObject:[NSNumber numberWithInt:fpTrigInToMezzanines]      forKey:@"fpTrigInToMezzanines"];
+    [objDictionary setObject:[NSNumber numberWithInt:fpForceTrigOut]            forKey:@"fpForceTrigOut"];
+    [objDictionary setObject:[NSNumber numberWithInt:fpTrigOutMode]             forKey:@"fpTrigOutMode"];
+    [objDictionary setObject:[NSNumber numberWithInt:fpTrigOutModeSelect]       forKey:@"fpTrigOutModeSelect"];
+    [objDictionary setObject:[NSNumber numberWithInt:fpMBProbeSelect]           forKey:@"fpMBProbeSelect"];
+    [objDictionary setObject:[NSNumber numberWithInt:fpBusyUnlockSelect]        forKey:@"fpBusyUnlockSelect"];
+    [objDictionary setObject:[NSNumber numberWithInt:fpHeaderPattern]           forKey:@"fpHeaderPatter"];
+    [objDictionary setObject:[NSNumber numberWithInt:fanSpeedMode]              forKey:@"fanSpeedMode"];
+    [objDictionary setObject:[NSNumber numberWithInt:almostFullLevel]           forKey:@"almostFullLevel"];
+    [objDictionary setObject:[NSNumber numberWithInt:runDelay]                  forKey:@"runDelay"];
+    [objDictionary setObject:[NSNumber numberWithInt:coincidenceWindow]         forKey:@"coincidenceWindow"];
+    [objDictionary setObject:[NSNumber numberWithInt:coincidenceLevel]          forKey:@"coincidenceLevel"];
     
-    [self addCurrentState:objDictionary cArray:(long*)zsThresholds         forKey:@"zsThresholds"];
-    [self addCurrentState:objDictionary cArray:(long*)thresholds           forKey:@"thresholds"];
-    [self addCurrentState:objDictionary cArray:(long*)nLbk                 forKey:@"nLbk"];
-    [self addCurrentState:objDictionary cArray:(long*)nLfwd                forKey:@"nLfwd"];
-    [self addCurrentState:objDictionary cArray:(long*)logicType            forKey:@"logicType"];
-    [self addCurrentState:objDictionary cArray:(long*)dac                  forKey:@"dac"];
-    
-    [self addCurrentState:objDictionary cArray:(long*)numOverUnderThreshold    forKey:@"numOverUnderThreshold"];
-    [self addCurrentState:objDictionary cArray:(long*)numOverUnderZsThreshold  forKey:@"numOverUnderZsThreshold"];
+    [self addCurrentState:objDictionary cArray:(long*)inputDynamicRange         forKey:@"inputDyanmicRange"];
+    [self addCurrentState:objDictionary cArray:(long*)selfTrigPulseWidth        forKey:@"selfTrigPulseWidth"];
+    [self addCurrentState:objDictionary cArray:(long*)thresholds                forKey:@"thresholds"];
+    [self addCurrentState:objDictionary cArray:(long*)selfTrigLogic             forKey:@"selfTrigLogic"];
+    [self addCurrentState:objDictionary cArray:(long*)selfTrigPulseType         forKey:@"selfTrigPulseType"];
+    [self addCurrentState:objDictionary cArray:(long*)dcOffset                  forKey:@"dcOffset"];
 
     
     return objDictionary;
@@ -2088,14 +2318,12 @@ static NSString* DT5725RunModeString[4] = {
                 unsigned long index=0;
                 do {
                     if((theData[index]>>28 & 0xf) == 0xA){
-                        unsigned long theSize = theData[index] & 0xfffffff;
+                        unsigned long theSize = theData[index] & 0x0fffffff;
                         NSMutableData* record = [NSMutableData dataWithCapacity:(theSize+2)*sizeof(long)];
                         [record setLength:(theSize+2)*sizeof(long)];
                         unsigned long* theRecord = (unsigned long*)[record bytes];
                         theRecord[0]  = dataId | theSize+2;
-                        theRecord[1]  = (([self uniqueIdNumber] & 0xf)<<16) |
-                                        ((cachedPack            & 0x1)<< 0) ;
-
+                        theRecord[1]  = (([self uniqueIdNumber] & 0xf)<<16);
                         [record replaceBytesInRange:NSMakeRange(8, theSize*sizeof(long))
                                           withBytes:(char*)&theData[index]
                                              length:theSize*sizeof(long)];

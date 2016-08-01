@@ -29,23 +29,25 @@
 @class ORRateGroup;
 @class ORSafeCircularBuffer;
 
-enum {
-	kZS_Thres,				//0x1024
-	kZS_NsAmp,				//0x1028
-    kThresholds,			//0x1080
-    kNumOUThreshold,		//0x1084
-    kStatus,				//0x1088
-    kFirmwareVersion,		//0x108C
-    kBufferOccupancy,		//0x1094
-    kDacs,					//0x1098
-    kAdcConfig,				//0x109C
-    kChanConfig,			//0x8000
-    kChanConfigBitSet,		//0x8004
-    kChanConfigBitClr,		//0x8008
+enum { //Assume all kept register implementations need reworking
+	kInputDyRange,			//0x1n28
+    kTrigPulseWidth,        //0x1n70
+    kThresholds,			//0x1n80
+    kSelfTrigLogic,         //0x1n84
+    kStatus,				//0x1n88
+    kAMCRevision,         	//0x1n8C 
+    kBufferOccupancy,		//0x1n94 
+    kDCOffset,				//0x1n98
+    kAdcTemp,               //0x1nA8
+    kBoardConfig,			//0x8000
+    kBoardConfigBitSet,		//0x8004
+    kBoardConfigBitClr,		//0x8008
     kBufferOrganization,	//0x800C
+    kCustomSize,            //0x8020
+    kChanAdcCalib,          //0x809C
     kAcqControl,			//0x8100
     kAcqStatus,				//0x8104
-    kSWTrigger,				//0x8108
+    kSWTrigger,             //0x8108
     kTrigSrcEnblMask,		//0x810C
     kFPTrigOutEnblMask,		//0x8110
     kPostTrigSetting,		//0x8114
@@ -55,10 +57,11 @@ enum {
     kEventStored,			//0x812C
     kBoardInfo,				//0x8140
     kEventSize,				//0x814C
-    kVMEControl,			//0xEF00
-    kVMEStatus,				//0xEF04
-    kInterruptStatusID,		//0xEF14
-    kInterruptEventNum,		//0xEF18
+    kFanSpeed,              //0x8168
+    kBufAlmostFull,         //0x816C
+    kRunDelay,              //0x8170
+    kBFStatus,              //0x8178
+    kReadoutStatus,			//0xEF04
     kBLTEventNum,			//0xEF1C
     kScratch,				//0xEF20
     kSWReset,				//0xEF24
@@ -78,12 +81,6 @@ typedef struct  {
 	bool			dataReset;
 } DT5725RegisterNamesStruct;
 
-
-enum {
-    kNoZeroSuppression ,
-    kZeroLengthEncoding,
-    kFullSuppressionBasedOnAmplitude
-};
 
 #define kDT5725BufferEmpty 0
 #define kDT5725BufferReady 1
@@ -107,53 +104,70 @@ typedef struct  {
 #define kNumDT5725Channels 8
 
 @interface ORDT5725Model : ORUsbDeviceModel <USBDevice,ORDataTaker> {
+    //USB
 	ORUSBInterface* usbInterface;
  	ORAlarm*		noUSBAlarm;
     NSString*		serialNumber;
-	unsigned long   dataId;
-    unsigned short  zsThresholds[kNumDT5725Channels];
-    unsigned short	numOverUnderZsThreshold[kNumDT5725Channels];
+
+    //Basic Controls
+    BOOL            inputDynamicRange[kNumDT5725Channels];
     unsigned short  thresholds[kNumDT5725Channels];
-    unsigned short  nLbk[kNumDT5725Channels];
-    unsigned short  nLfwd[kNumDT5725Channels];
-    int             logicType[kNumDT5725Channels];
-    int             zsAlgorithm;
-    BOOL            packed;
+    unsigned short  dcOffset[kNumDT5725Channels];
     BOOL            trigOverlapEnabled;
     BOOL            testPatternEnabled;
     BOOL            trigOnUnderThreshold;
-    BOOL            packEnabled;
-    BOOL            clockSource;
-    BOOL            gpiRunMode;
+    unsigned long	eventSize;
+    unsigned long   buffCode;
+    unsigned long   triggerSourceMask;
     BOOL            softwareTrigEnabled;
     BOOL            externalTrigEnabled;
-    BOOL            fpExternalTrigEnabled;
-    BOOL            fpSoftwareTrigEnabled;
-    BOOL            gpoEnabled;
-    int             ttlEnabled;
-    unsigned long   triggerSourceMask;
-
-    
-	unsigned short	dac[kNumDT5725Channels];
-	unsigned short	numOverUnderThreshold[kNumDT5725Channels];
-    BOOL			countAllTriggers;
-    unsigned short  coincidenceLevel;
-	unsigned long   triggerOutMask;
     unsigned long	postTriggerSetting;
     unsigned short	enabledMask;
+
+    //Advanced Controls
+    unsigned short  selfTrigPulseWidth[kNumDT5725Channels];
+    unsigned short  selfTrigLogic[kNumDT5725Channels/2];
+    BOOL            selfTrigPulseType[kNumDT5725Channels];
+    unsigned short  startStopRunMode;
+    BOOL			countAllTriggers;
+    BOOL            memFullMode;
+    BOOL            clockSource;
+    unsigned short  coincidenceWindow;
+    unsigned short  coincidenceLevel;
+	unsigned long   triggerOutMask;
+    unsigned short  triggerOutLogic;
+    unsigned short  trigOutCoincidenceLevel;
+    BOOL            extTrigOutEnabled;
+    BOOL            swTrigOutEnabled;
+    BOOL            fpLogicType;
+    BOOL            fpTrigInSigEdgeDisable;
+    BOOL            fpTrigInToMezzanines;
+    BOOL            fpForceTrigOut;
+    BOOL            fpTrigOutMode;
+    unsigned short  fpTrigOutModeSelect;
+    unsigned short  fpMBProbeSelect;
+    BOOL            fpBusyUnlockSelect;
+    unsigned short  fpHeaderPattern;
+    BOOL            fanSpeedMode;
+    unsigned short  almostFullLevel;
+    unsigned long   runDelay;
+    
+    //What Are these?
+    //-------------------------------------
 	ORRateGroup*	waveFormRateGroup;
 	unsigned long 	waveFormCount[kNumDT5725Channels];
     int				bufferState;
     int				lastBufferState;
 	ORAlarm*        bufferFullAlarm;
 	int				bufferEmptyCount;
-    int				eventSize;
+    //-------------------------------------
     
     unsigned short  selectedRegIndex;
     unsigned short  selectedChannel;
     unsigned long   selectedRegValue;
 
 	//data taking, some are cached and only valid during running
+    unsigned long   dataId;
 	unsigned int    statusReg;
 	unsigned long   location;
 	unsigned long	eventSizeReg;
@@ -188,31 +202,23 @@ typedef struct  {
 
 #pragma mark Accessors
 //------------------------------
-- (int)             logicType:(unsigned short) i;
-- (void)            setLogicType:(unsigned short) i withValue:(int)aLogicType;
-- (unsigned short)	zsThreshold:(unsigned short) i;
-- (void)			setZsThreshold:(unsigned short) i withValue:(unsigned short) aValue;
+- (BOOL)            inputDynamicRange:(unsigned short) i;
+- (void)            setInputDynamicRange:(unsigned short) i withValue:(BOOL) aValue;
 //------------------------------
-- (unsigned short)	numOverUnderZsThreshold:(unsigned short) i;
-- (void)			setNumOverUnderZsThreshold:(unsigned short) i withValue:(unsigned short) aValue;
-- (unsigned short)	nLbk:(unsigned short) i;
-- (void)			setNlbk:(unsigned short) i withValue:(unsigned short) aValue;
-- (unsigned short)	nLfwd:(unsigned short) i;
-- (void)			setNlfwd:(unsigned short) i withValue:(unsigned short) aValue;
+- (unsigned short)  selfTrigPulseWidth:(unsigned short) i;
+- (void)            setSelfTrigPulseWidth:(unsigned short) i withValue:(unsigned short) aValue;
 //------------------------------
 - (unsigned short)	threshold:(unsigned short) i;
 - (void)			setThreshold:(unsigned short) i withValue:(unsigned short) aValue;
 //------------------------------
-- (unsigned short)	numOverUnderThreshold:(unsigned short) i;
-- (void)			setNumOverUnderThreshold:(unsigned short) i withValue:(unsigned short) aValue;
+- (unsigned short)  selfTrigLogic:(unsigned short) i;
+- (void)            setSelfTrigLogic:(unsigned short) i withValue:(unsigned short) aValue;
+- (BOOL)            selfTrigPulseType:(unsigned short) i;
+- (void)            setSelfTrigPulseType:(unsigned short) i withValue:(BOOL) aValue;
 //------------------------------
-- (unsigned short)	dac:(unsigned short) i;
-- (void)			setDac:(unsigned short) i withValue:(unsigned short) aValue;
+- (unsigned short)  dcOffset:(unsigned short) i;
+- (void)            setDCOffset:(unsigned short) i withValue:(unsigned short) aValue;
 //------------------------------
-- (int)             zsAlgorithm;
-- (void)            setZsAlgorithm:(int)aZsAlgorithm;
-- (BOOL)            packed;
-- (void)            setPacked:(BOOL)aPacked;
 - (BOOL)            trigOnUnderThreshold;
 - (void)            setTrigOnUnderThreshold:(BOOL)aTrigOnUnderThreshold;
 - (BOOL)            testPatternEnabled;
@@ -227,35 +233,66 @@ typedef struct  {
 - (void)            setClockSource:(BOOL)aClockSource;
 - (BOOL)			countAllTriggers;
 - (void)			setCountAllTriggers:(BOOL)aCountAllTriggers;
-- (BOOL)            gpiRunMode;
-- (void)            setGpiRunMode:(BOOL)aGpiRunMode;
+- (unsigned short)  startStopRunMode;
+- (void)            setStartStopRunMode:(BOOL)aStartStopRunMode;
+- (BOOL)            memFullMode;
+- (void)            setMemFullMode:(BOOL)aMemFullMode;
 //------------------------------
 - (BOOL)            softwareTrigEnabled;
 - (void)            setSoftwareTrigEnabled:(BOOL)aSoftwareTrigEnabled;
 - (BOOL)            externalTrigEnabled;
 - (void)            setExternalTrigEnabled:(BOOL)aExternalTrigEnabled;
+- (unsigned short)  coincidenceWindow;
+- (void)            setCoincidenceWindow:(unsigned short)aCoincidenceWindow;
 - (unsigned short)	coincidenceLevel;
 - (void)			setCoincidenceLevel:(unsigned short)aCoincidenceLevel;
 - (unsigned long)	triggerSourceMask;
 - (void)			setTriggerSourceMask:(unsigned long)aTriggerSourceMask;
 //------------------------------
-- (BOOL)            fpSoftwareTrigEnabled;
-- (void)            setFpSoftwareTrigEnabled:(BOOL)aFpSoftwareTrigEnabled;
-- (BOOL)            fpExternalTrigEnabled;
-- (void)            setFpExternalTrigEnabled:(BOOL)aFpExternalTrigEnabled;
+- (BOOL)            swTrigOutEnabled;
+- (void)            setSwTrigOutEnabled:(BOOL)aSwTrigOutEnabled;
+- (BOOL)            extTrigOutEnabled;
+- (void)            setExtTrigOutEnabled:(BOOL)aExtTrigOutEnabled;
 - (unsigned long)	triggerOutMask;
 - (void)			setTriggerOutMask:(unsigned long)aTriggerOutMask;
-//------------------------------
-- (BOOL)            gpoEnabled;
-- (void)            setGpoEnabled:(BOOL)aGpoEnabled;
-- (int)             ttlEnabled;
-- (void)            setTtlEnabled:(int)aTtlEnabled;
+- (unsigned short)  triggerOutLogic;
+- (void)            setTriggerOutLogic:(unsigned short)aTriggerOutLogic;
+- (unsigned short)  trigOutCoincidenceLevel;
+- (void)            setTrigOutCoincidenceLevel:(unsigned short)aTrigOutCoincidenceLevel;
 //------------------------------
 - (unsigned long)	postTriggerSetting;
 - (void)			setPostTriggerSetting:(unsigned long)aPostTriggerSetting;
 //------------------------------
+- (BOOL)            fpLogicType;
+- (void)            setFpLogicType:(BOOL)aFpLogicType;
+- (BOOL)            fpTrigInSigEdgeDisable;
+- (void)            setFpTrigInSigEdgeDisable:(BOOL)aFpTrigInSigEdgeDisable;
+- (BOOL)            fpTrigInToMezzanines;
+- (void)            setFpTrigInToMezzanines:(BOOL)aFpTrigInToMezzanines;
+- (BOOL)            fpForceTrigOut;
+- (void)            setFpForceTrigOut:(BOOL)aFpForceTrigOut;
+- (BOOL)            fpTrigOutMode;
+- (void)            setFpTrigOutMode:(BOOL)aFpTrigOutMode;
+- (unsigned short)  fpTrigOutModeSelect;
+- (void)            setFpTrigOutModeSelect:(unsigned short)aFpTrigOutModeSelect;
+- (unsigned short)  fpMBProbeSelect;
+- (void)            setFpMBProbeSelect:(unsigned short)aFpMBProbeSelect;
+- (BOOL)            fpBusyUnlockSelect;
+- (void)            setFpBusyUnlockSelect:(BOOL)aFpBusyUnlockSelect;
+- (unsigned short)  fpHeaderPattern;
+- (void)            setFpHeaderPattern:(unsigned short)aFpHeaderPattern;
+//------------------------------
 - (unsigned short)	enabledMask;
 - (void)			setEnabledMask:(unsigned short)aEnabledMask;
+//------------------------------
+- (BOOL)            fanSpeedMode;
+- (void)            setFanSpeedMode:(BOOL)aFanSpeedMode;
+//------------------------------
+- (unsigned short)  almostFullLevel;
+- (void)            setAlmostFullLevel:(unsigned short)anAlmostFullLevel;
+//------------------------------
+- (unsigned long)   runDelay;
+- (void)            setRunDelay:(unsigned long)aRunDelay;
 //------------------------------
 
 - (int)				bufferState;
@@ -280,28 +317,33 @@ typedef struct  {
 #pragma mark ***HW Init
 - (void)			initBoard;
 
-- (void)            writeZSThresholds;
-- (void)            writeZSThreshold:(unsigned short) i;
-- (void)            writeZSAmplReg;
-- (void)            writeZSAmplReg:(unsigned short) i;
+- (void)            writeDynamicRanges;
+- (void)            writeDynamicRange:(unsigned short) pChan;
+- (void)            writeTrigPulseWidths;
+- (void)            writeTrigPulseWidth:(unsigned short) pChan;
 - (void)			writeThresholds;
 - (void)			writeThreshold:(unsigned short) pChan;
-- (void)            writeNumOverUnderThresholds;
-- (void)            writeNumOverUnderThreshold:(unsigned short) i;
-- (void)			writeDacs;
-- (void)			writeDac:(unsigned short) pChan;
-- (void)			writeChannelConfiguration;
-- (void)			writeBufferOrganization;
-- (void)			writeAcquistionControl:(BOOL)start;
+- (void)            writeSelfTrigLogics;
+- (void)            writeSelfTrigLogic:(unsigned short) pChan;
+- (void)            writeDCOffsets;
+- (void)            writeDCOffset:(unsigned short) pChan;
+- (void)			writeBoardConfiguration;
+- (void)            writeSize;
+- (void)            adcCalibrate;
+- (void)			writeAcquisitionControl:(BOOL)start;
 - (void)            trigger;
 - (void)            writeTriggerSourceEnableMask;
-- (void)            writeFrontPanelIOControl;
 - (void)            writeFrontPanelTriggerOutEnableMask;
 - (void)			writePostTriggerSetting;
+- (void)            writeFrontPanelIOControl;
 - (void)			writeChannelEnabledMask;
+- (void)            writeFanSpeedControl;
+- (void)            writeBufferAlmostFull;
+- (void)            writeRunDelay;
 - (void)			writeNumBLTEventsToReadout;
 - (void)			softwareReset;
 - (void)			clearAllMemory;
+- (void)            configReload;
 - (void)			checkBufferAlarm;
 
 - (void)            readConfigurationROM;
@@ -333,9 +375,9 @@ typedef struct  {
 - (float)           totalByteRate;
 
 #pragma mark ***Helpers
-- (float)			convertDacToVolts:(unsigned short)aDacValue;
-- (unsigned short)	convertVoltsToDac:(float)aVoltage;
-- (void) addCurrentState:(NSMutableDictionary*)dictionary cArray:(long*)anArray forKey:(NSString*)aKey;
+- (float)			convertDacToVolts:(unsigned short)aDacValue range:(BOOL)dynamicRange;
+- (unsigned short)	convertVoltsToDac:(float)aVoltage range:(BOOL)dynamicRange;
+- (void)            addCurrentState:(NSMutableDictionary*)dictionary cArray:(long*)anArray forKey:(NSString*)aKey;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -346,7 +388,7 @@ typedef struct  {
 - (int)     readLongBlock:(unsigned long*)  readValue atAddress:(unsigned int) vmeAddress;
 - (void)    writeChan:(unsigned short)chan reg:(unsigned short) pReg sendValue:(unsigned long) pValue;
 - (void)    readChan:(unsigned short)chan reg:(unsigned short) pReg returnValue:(unsigned long*) pValue;
-- (int) readFifo:(char*)destBuff numBytesToRead:(unsigned long)    numBytes;
+- (int)     readFifo:(char*)destBuff numBytesToRead:(unsigned long)    numBytes;
 
 
 @end
@@ -356,36 +398,44 @@ extern NSString* ORDT5725LowLevelLock;
 extern NSString* ORDT5725ModelUSBInterfaceChanged;
 extern NSString* ORDT5725ModelSerialNumberChanged;
 
-extern NSString* ORDT5725ModelLogicTypeChanged;
-extern NSString* ORDT5725ZsThresholdChanged;
-extern NSString* ORDT5725NumOverUnderZsThresholdChanged;
-extern NSString* ORDT5725NlbkChanged;
-extern NSString* ORDT5725NlfwdChanged;
+extern NSString* ORDT5725ModelInputDynamicRangeChanged;
+extern NSString* ORDT5725ModelSelfTrigPulseWidthChanged;
 extern NSString* ORDT5725ThresholdChanged;
-extern NSString* ORDT5725NumOverUnderThresholdChanged;
-extern NSString* ORDT5725DacChanged;
-extern NSString* ORDT5725ModelZsAlgorithmChanged;
-extern NSString* ORDT5725ModelPackedChanged;
+extern NSString* ORDT5725ModelSelfTrigLogicChanged;
+extern NSString* ORDT5725ModelSelfTrigPulseTypeChanged;
+extern NSString* ORDT5725ModelDCOffsetChanged;
 extern NSString* ORDT5725ModelTrigOnUnderThresholdChanged;
 extern NSString* ORDT5725ModelTestPatternEnabledChanged;
 extern NSString* ORDT5725ModelTrigOverlapEnabledChanged;
 extern NSString* ORDT5725ModelEventSizeChanged;
 extern NSString* ORDT5725ModelClockSourceChanged;
 extern NSString* ORDT5725ModelCountAllTriggersChanged;
-extern NSString* ORDT5725ModelGpiRunModeChanged;
-extern NSString* ORDT5725ModelTriggerSourceMaskChanged;
-extern NSString* ORDT5725ModelExternalTrigEnabledChanged;
+extern NSString* ORDT5725ModelStartStopRunModeChanged;
+extern NSString* ORDT5725ModelMemFullModeChanged;
 extern NSString* ORDT5725ModelSoftwareTrigEnabledChanged;
+extern NSString* ORDT5725ModelExternalTrigEnabledChanged;
+extern NSString* ORDT5725ModelCoincidenceWindowChanged;
 extern NSString* ORDT5725ModelCoincidenceLevelChanged;
-extern NSString* ORDT5725ModelEnabledMaskChanged;
-extern NSString* ORDT5725ModelFpSoftwareTrigEnabledChanged;
-extern NSString* ORDT5725ModelFpExternalTrigEnabledChanged;
+extern NSString* ORDT5725ModelTriggerSourceMaskChanged;
+extern NSString* ORDT5725ModelSwTrigOutEnabledChanged;
+extern NSString* ORDT5725ModelExtTrigOutEnabledChanged;
 extern NSString* ORDT5725ModelTriggerOutMaskChanged;
+extern NSString* ORDT5725ModelTriggerOutLogicChanged;
+extern NSString* ORDT5725ModelTrigOutCoincidenceLevelChanged;
 extern NSString* ORDT5725ModelPostTriggerSettingChanged;
-extern NSString* ORDT5725ModelGpoEnabledChanged;
-extern NSString* ORDT5725ModelTtlEnabledChanged;
-
-
+extern NSString* ORDT5725ModelFpLogicTypeChanged;
+extern NSString* ORDT5725ModelFpTrigInSigEdgeDisableChanged;
+extern NSString* ORDT5725ModelFpTrigInToMezzaninesChanged;
+extern NSString* ORDT5725ModelFpForceTrigOutChanged;
+extern NSString* ORDT5725ModelFpTrigOutModeChanged;
+extern NSString* ORDT5725ModelFpTrigOutModeSelectChanged;
+extern NSString* ORDT5725ModelFpMBProbeSelectChanged;
+extern NSString* ORDT5725ModelFpBusyUnlockSelectChanged;
+extern NSString* ORDT5725ModelFpHeaderPatternChanged;
+extern NSString* ORDT5725ModelEnabledMaskChanged;
+extern NSString* ORDT5725ModelFanSpeedModeChanged;
+extern NSString* ORDT5725ModelAlmostFullLevelChanged;
+extern NSString* ORDT5725ModelRunDelayChanged;
 
 extern NSString* ORDT5725Chnl;
 extern NSString* ORDT5725SelectedRegIndexChanged;

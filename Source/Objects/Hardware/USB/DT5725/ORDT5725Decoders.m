@@ -23,11 +23,10 @@
 
 /*
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
- ^^^^ ^^^^ ^^^^ ^^----------------------- Data ID (from header)
- -----------------^^ ^^^^ ^^^^ ^^^^ ^^^^- length
+ 1010 ---------------------------------- 
+ -----^^^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ event size (in # of 32 bit longs)
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
- --------^-^^^--------------------------- Unit number
- --------------------------------------^- 0=Standard, 1=Pack2.5
+ ---------------^^^^-------------------- uniqueIdNumber (added in model.m)
  ....Followed by the event as described in the manual
  */
 
@@ -48,29 +47,25 @@
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
+    unsigned long index  = 0;
     unsigned long* ptr   = (unsigned long*)someData;
-    unsigned long length = ExtractLength(ptr[0]);
+    unsigned long length = (ptr[0] & 0x0fffffff);
+    index++; //1
     
     int unitNumber       = (ptr[1]>>16 & 0xf);
-    BOOL packed          = (ptr[1]>>0  & 0x1);
     NSString* unitKey    = [NSString stringWithFormat:@"Unit %2d",unitNumber];
-    
+    index += 2; //3
+
     unsigned long eventLength = length-2;
-    unsigned long index = 2;
     while (eventLength > 4) { //make sure at least the CAEN header is there
-        if (ptr[index] == 0 || ptr[index] >> 28 != 0xa) break; //trailing zeros or
-        unsigned long eventSize = ptr[index] & 0x0fffffff;
-        if (eventSize > eventLength) return length;
-        index++;
-        int  zeroSuppression      = (ptr[index]>>24  & 0x1);
-        unsigned long channelMask = ptr[index] & 0xf;
-        index += 3;
+        unsigned long channelMask = ptr[index] & 0xff;
+        index += 3; //6 - start of data
         
         short numChans = 0;
-        short chan[4];
+        short chan[8];
         int i;
-        for(i=0;i<4;i++){
-            if(channelMask & (1<<i)){
+        for (i=0; i<8; i++) {
+            if (channelMask & (1<<i)) {
                 chan[numChans] = i;
                 numChans++;
             }
@@ -78,148 +73,20 @@
         
         //event may be empty if triggered by EXT trigger and no channel is selected
         if (numChans == 0) {
-            continue;
-            //return length;
+            break;
         }
         
-        eventSize -= 4;
-        eventSize = eventSize/numChans;
+        eventLength -= 4;
+        unsigned long eventSize = eventLength/numChans;
         
-        int j;
-        for(j=0;j<numChans;j++){
-            
-             int wordCount = 0;
-            NSMutableData* tmpData = nil;
-            if(!packed){
-                if(zeroSuppression == 0){
-                    tmpData= [[[NSMutableData alloc] initWithLength:2*eventSize*sizeof(unsigned short)] autorelease];
-                    unsigned short* dPtr = (unsigned short*)[tmpData bytes];
-                    //not packed, normal format
-                    int k;
-                    for(k=0;k<eventSize;k++){
-                        dPtr[wordCount++] =	 ptr[index] & 0x00000fff;
-                        dPtr[wordCount++] =	(ptr[index] & 0x0fff0000) >> 16;
-                        index++;
-                    }
-                }
-                else {
-                    //not packed, but using zero length encoding
-                    unsigned long size   = ptr[index];
-                    tmpData= [[[NSMutableData alloc] initWithLength:2*size*sizeof(unsigned short)] autorelease];
-                    unsigned short* dPtr = (unsigned short*)[tmpData bytes];
-                    int controlWordCount = 0;
-                    while(1){
-                        index++; //point to control word
-                        unsigned long controlWord = ptr[index];
-                        BOOL good = (controlWord >> 31);
-                        unsigned long numStoredSkippedWords = controlWord&0xfffff;
-                        int k;
-
-                        if(good || controlWordCount>62){
-                            index++; //point to data
-                            for(k=0;k<numStoredSkippedWords;k++){
-                                dPtr[wordCount++] =	 ptr[index] & 0x00000fff;
-                                if(wordCount>=2*size)break;
-
-                                dPtr[wordCount++] =	(ptr[index] & 0x0fff0000) >> 16;
-                                if(wordCount>=2*size)break;
-
-                                index++;
-                            }
-                        }
-                        else {
-                            for(k=0;k<numStoredSkippedWords;k++){
-                                dPtr[wordCount++] =	 0x0;
-                                if(wordCount>=2*size)break;
-                                dPtr[wordCount++] =	 0x0;
-                                if(wordCount>=2*size)break;
-                           }
-                        }
-                        controlWordCount++;
-                        if(wordCount>=2*size)break;
-                    }
-
-                    
-                }
-            }
-            else {
-                if(zeroSuppression == 0){
-                    tmpData= [[[NSMutableData alloc] initWithLength:2*eventSize*sizeof(unsigned short)] autorelease];
-                    unsigned short* dPtr = (unsigned short*)[tmpData bytes];
-                   //packed, no zero suppression
-                    int k;
-                    for(k=0;k<eventSize;k++){
-                        unsigned long *d = &ptr[index];
-                        
-                        dPtr[wordCount++] = (d[0]     & 0xFC0) | (d[0] & 0x7F);
-                        if(wordCount>=2*eventSize)break;
-
-                        dPtr[wordCount++] = (d[0]>>12 & 0xFC0) | (d[0]>>12 & 0x7F);
-                        if(wordCount>=2*eventSize)break;
-
-                        dPtr[wordCount++] = (d[1]<<6  & 0xFC0) | (d[0]>>24 & 0x7f);
-                        if(wordCount>=2*eventSize)break;
-
-                        dPtr[wordCount++] = (d[1]>>6  & 0xFC0) | (d[1]>>6 & 0x7F);
-                        if(wordCount>=2*eventSize)break;
-
-                        dPtr[wordCount++] = (d[1]>>18 & 0xFC0) | (d[1]>>18 & 0x7F);
-                        if(wordCount>=2*eventSize)break;
-
-                        index+=2;
-                    }
-                }
-                else {
-                    unsigned long size = ptr[index];
-                    tmpData= [[[NSMutableData alloc] initWithLength:2*size*sizeof(unsigned short)] autorelease];
-                    unsigned short* dPtr = (unsigned short*)[tmpData bytes];
-                    int controlWordCount = 0;
-                    while(1){
-                        index++; //point to control word
-                        unsigned long controlWord = ptr[index];
-                        BOOL good = (controlWord >> 31);
-                        unsigned long numStoredSkippedWords = controlWord&0xfffff;
-                        int k;
-
-                        if(good || controlWordCount>62){
-                            index++; //point to data
-                            for(k=0;k<numStoredSkippedWords;k++){
-                                unsigned long *d = &ptr[index];
-                                
-                                dPtr[wordCount++] = (d[0]     & 0xFC0) | (d[0] & 0x7F);
-                                if(wordCount>=2*size)break;
-                                
-                                dPtr[wordCount++] = (d[0]>>12 & 0xFC0) | (d[0]>>12 & 0x7F);
-                                if(wordCount>=2*size)break;
-                                
-                                dPtr[wordCount++] = (d[1]<<6  & 0xFC0) | (d[0]>>24 & 0x7f);
-                                if(wordCount>=2*size)break;
-                                
-                                dPtr[wordCount++] = (d[1]>>6  & 0xFC0) | (d[1]>>6 & 0x7F);
-                                if(wordCount>=2*size)break;
-                                
-                                dPtr[wordCount++] = (d[1]>>18 & 0xFC0) | (d[1]>>18 & 0x7F);
-                                if(wordCount>=2*size)break;
-                                
-                                
-                                index+=2;
-                                if(wordCount>=2*size)break;
-                            }
-                        }
-                        else {
-                            for(k=0;k<numStoredSkippedWords;k++){
-                                dPtr[wordCount++] =	 0x0;
-                                if(wordCount>=2*size)break;
-                                dPtr[wordCount++] =	 0x0;
-                                if(wordCount>=2*size)break;
-                           }
-                        }
-                        controlWordCount++;
-
-                        if(wordCount>=2*size)break;
-                    }
-                    
-                }
+        for (int j=0; j<numChans; j++) {
+            int wordCount = 0;
+            NSMutableData* tmpData = [[[NSMutableData alloc] initWithLength:2*eventSize*sizeof(unsigned short)] autorelease];
+            unsigned short* dPtr = (unsigned short*)[tmpData bytes];
+            for(int k=0; k<eventSize; k++){
+                dPtr[wordCount++] =	 ptr[index] & 0x00003fff;
+                dPtr[wordCount++] =	(ptr[index] & 0x3fff0000) >> 16;
+                index++;
             }
             if(tmpData)[aDataSet loadWaveform:tmpData
                             offset:0 //bytes!
@@ -228,6 +95,7 @@
                           withKeys:@"DT5725", @"Waveforms",unitKey,[self getChannelKey: chan[j]],nil];
             
             if(getRatesFromDecodeStage){
+                //Get serial number
                 if(!actualCards)actualCards = [[NSMutableDictionary alloc] init];
                 ORDT5725Model* obj = [actualCards objectForKey:unitKey];
                 if(!obj){
@@ -245,7 +113,7 @@
                 getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:chan[j]];
             }
         }
-        eventLength -= eventSize*numChans + 4;
+        eventLength -= eventSize*numChans;
     }
     
     return length; //must return number of longs processed.
@@ -253,19 +121,21 @@
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
-    unsigned long length = ExtractLength(ptr[0]);
+    unsigned long length = (ptr[0] & 0x0fffffff);
     NSMutableString* dsc = [NSMutableString string];
     
     if(length > 6) { //make sure we have at least the CAEN header
-        NSString* recordLen           = [NSString stringWithFormat:@"Record len = %lu\n",         length];
-        NSString* eventSize           = [NSString stringWithFormat:@"Event size = %lu\n",         ptr[2] & 0x0fffffff];
-        NSString* packed              = [NSString stringWithFormat:@"Packed: %@\n",              (ptr[2] & 0x1)?@"YES":@"NO"];
-        NSString* isZeroLengthEncoded = [NSString stringWithFormat:@"Zero length enc: %@\n",    ((ptr[3] >> 24) & 0x1)?@"YES":@"NO"];
-        NSString* sChannelMask        = [NSString stringWithFormat:@"Channel mask = 0x%02lx\n",   ptr[3] & 0xf];
-        NSString* eventCounter        = [NSString stringWithFormat:@"Event counter = 0x%06lx\n",  ptr[4] & 0xffffff];
-        NSString* timeTag             = [NSString stringWithFormat:@"Time tag = 0x%08lx\n\n",     ptr[5]];
+        NSString* recordLen           = [NSString stringWithFormat:@"Event size = %lu\n",           ptr[0] & 0x0fffffff];
+        NSString* boardFail           = [NSString stringWithFormat:@"Board fail = %@\n",            (ptr[1]>>26)&0x1?@YES:@NO];
+        NSString* softTrig            = [NSString stringWithFormat:@"Software Trigger = %@\n",      (ptr[1]>>18)&0x1?@YES:@NO];
+        NSString* extTrig             = [NSString stringWithFormat:@"External Trigger = %@\n",      (ptr[1]>>17)&0x1?@YES:@NO];
+        NSString* selfTrig            = [NSString stringWithFormat:@"Self Trigger = pair %lu\n",    (ptr[1]>>8)&0xf];
+        NSString* ETTT                = [NSString stringWithFormat:@"ETTT = %lu\n",                 (ptr[1]>>8)&0xffff];
+        NSString* sChannelMask        = [NSString stringWithFormat:@"Channel mask = 0x%02lx\n",     ptr[1] & 0xff];
+        NSString* eventCounter        = [NSString stringWithFormat:@"Event counter = 0x%06lx\n",    ptr[2] & 0xffffff];
+        NSString* timeTag             = [NSString stringWithFormat:@"Time tag = 0x%08lx\n\n",       ptr[3]];
         
-        [dsc appendFormat:@"%@%@%@%@%@%@%@", recordLen,eventSize, packed, isZeroLengthEncoded, sChannelMask, eventCounter, timeTag];
+        [dsc appendFormat:@"%@%@%@%@%@%@%@%@%@", recordLen, boardFail, softTrig, extTrig, selfTrig, ETTT, sChannelMask, eventCounter, timeTag];
     }
     
     return dsc;
