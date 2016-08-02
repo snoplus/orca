@@ -27,7 +27,6 @@
 @interface ORDT5725Controller : OrcaObjectController 
 {
     IBOutlet NSTabView* 	tabView;
-	IBOutlet NSPopUpButton* serialNumberPopup;
     
     //By Channel
     IBOutlet NSMatrix*      inputDynamicRangeMatrix;
@@ -122,7 +121,8 @@
     IBOutlet NSButton*		basicLockButton;
     IBOutlet NSButton*		lowLevelLockButton;
     IBOutlet ORQueueView*   queView;
-    
+    IBOutlet NSPopUpButton* serialNumberPopup;
+
     
     NSView *blankView;
     NSSize lowLevelSize;

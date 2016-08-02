@@ -363,22 +363,23 @@
     
     int i;
     for(i=0;i<kNumDT5725Channels;i++){
-        
         [[inputDynamicRangeMatrix           cellAtRow:i column:0] setTag:i];
         [[selfTrigPulseWidthMatrix          cellAtRow:i column:0] setTag:i];
         [[thresholdMatrix                   cellAtRow:i column:0] setTag:i];
         [[selfTrigPulseTypeMatrix           cellAtRow:i column:0] setTag:i];
         [[dcOffsetMatrix                    cellAtRow:i column:0] setTag:i];
-        [[trigOnUnderThresholdMatrix        cellAtRow:i column:0] setTag:i];//TODO why is this here?
-        [[triggerSourceEnableMaskMatrix     cellAtRow:i column:0] setTag:i];
-        [[triggerOutMaskMatrix              cellAtRow:i column:0] setTag:i];
         [[enabledMaskMatrix                 cellAtRow:i column:0] setTag:i];
         [[enabled2MaskMatrix                cellAtRow:i column:0] setTag:i];
-        if (i%2 == 0){
-            [[selfTrigLogicMatrix               cellAtRow:i column:0] setTag:i];
-        }
     }
-
+    for(i=0;i<2;i++){
+        [[trigOnUnderThresholdMatrix        cellAtRow:i column:0] setTag:i];
+    }
+    for(i=0;i<kNumDT5725Channels/2;i++){
+        [[selfTrigLogicMatrix               cellAtRow:i column:0] setTag:i];
+        [[triggerSourceEnableMaskMatrix     cellAtRow:i column:0] setTag:i];
+        [[triggerOutMaskMatrix              cellAtRow:i column:0] setTag:i];
+    }
+    
     [super awakeFromNib];
 
     
@@ -571,13 +572,13 @@
 - (void) inputDynamicRangeChanged:(NSNotification*)aNote
 {
     if(aNote){
-       int chnl = [[[aNote userInfo] objectForKey:ORDT5725Chnl] intValue];
-       [[inputDynamicRangeMatrix cellWithTag:chnl] selectItemAtIndex:[model inputDynamicRange:chnl]];
+       int chan = [[[aNote userInfo] objectForKey:ORDT5725Chnl] intValue];
+        [[inputDynamicRangeMatrix cellAtRow:chan column:0] selectItemAtIndex:[model inputDynamicRange:chan]];
     }
     else {
         int i;
         for (i = 0; i < kNumDT5725Channels; i++){
-            [[inputDynamicRangeMatrix cellWithTag:i] selectItemAtIndex:[model inputDynamicRange:i]];
+          [[inputDynamicRangeMatrix cellAtRow:i column:0] selectItemAtIndex:[model inputDynamicRange:i]];
         }
     }
 }
@@ -599,13 +600,13 @@
 - (void) selfTrigLogicChanged:(NSNotification*)aNote
 {
     if(aNote){
-        int chnl = [[[aNote userInfo] objectForKey:ORDT5725Chnl] intValue] / 2;
-        [[selfTrigLogicMatrix cellWithTag:chnl] selectItemAtIndex:[model selfTrigLogic:chnl]];
+        int chan = [[[aNote userInfo] objectForKey:ORDT5725Chnl] intValue];
+        [[selfTrigLogicMatrix cellAtRow:chan column:0] selectItemAtIndex:[model selfTrigLogic:chan]];
     }
     else {
         int i;
         for (i = 0; i < kNumDT5725Channels/2; i++){
-            [[selfTrigLogicMatrix cellWithTag:i] selectItemAtIndex:[model selfTrigLogic:i]];
+            [[selfTrigLogicMatrix cellAtRow:i column:0] selectItemAtIndex:[model selfTrigLogic:i]];
         }
     }
 }
@@ -715,7 +716,7 @@
 {
     int i;
     unsigned long mask = [model triggerSourceMask];
-    for(i=0;i<kNumDT5725Channels;i++){
+    for(i=0;i<kNumDT5725Channels/2;i++){
         [[triggerSourceEnableMaskMatrix cellWithTag:i] setIntValue:(mask & (1L << i)) !=0];
     }
 }
@@ -724,7 +725,7 @@
 {
     int i;
     unsigned long mask = [model triggerOutMask];
-    for(i=0;i<kNumDT5725Channels;i++){
+    for(i=0;i<kNumDT5725Channels/2;i++){
         [[triggerOutMaskMatrix cellWithTag:i] setIntValue:(mask & (1L << i)) !=0];
     }
  }
@@ -957,15 +958,10 @@
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORDT5725BasicLock];
     [basicLockButton setState: locked];
     
-	[self setStatusStrings];
-    
-    [serialNumberPopup setEnabled:!locked];
-    
     [inputDynamicRangeMatrix            setEnabled:!lockedOrRunningMaintenance];
     [selfTrigPulseWidthMatrix           setEnabled:!lockedOrRunningMaintenance];
     [thresholdMatrix                    setEnabled:!lockedOrRunningMaintenance];
     [selfTrigLogicMatrix                setEnabled:!lockedOrRunningMaintenance];
-    [selfTrigPulseWidthMatrix           setEnabled:!lockedOrRunningMaintenance];
     [dcOffsetMatrix                     setEnabled:!lockedOrRunningMaintenance];
 
     [trigOverlapEnabledButton           setEnabled:!lockedOrRunningMaintenance];
@@ -1010,12 +1006,16 @@
     [adcCalibrateButton                 setEnabled:!locked && !runInProgress];
     [eventSizeTextField                 setEnabled:!locked && !runInProgress];
     [enabledMaskMatrix                  setEnabled:!locked && !runInProgress];
+    
+    [serialNumberPopup setEnabled:!locked];
+    [self setStatusStrings];
+
 }
 
 #pragma mark •••Actions
 - (IBAction) inputDynamicRangeAction:(id)sender
 {
-    [model setInputDynamicRange:[[sender selectedCell] tag] withValue:[sender indexOfSelectedItem]];
+    [model setInputDynamicRange:[sender selectedRow] withValue:[[sender selectedCell] indexOfSelectedItem]];
 }
 
 - (IBAction) selfTrigPulseWidthAction:(id)sender
@@ -1117,7 +1117,7 @@
 {
     int i;
     unsigned long mask = 0;
-    for(i=0;i<kNumDT5725Channels;i++){
+    for(i=0;i<kNumDT5725Channels/2;i++){
         if([[triggerSourceEnableMaskMatrix cellWithTag:i] intValue]) mask |= (1L << i);
     }
     [model setTriggerSourceMask:mask];
@@ -1137,7 +1137,7 @@
 {
     int i;
     unsigned long mask = 0;
-    for(i=0;i<kNumDT5725Channels;i++){
+    for(i=0;i<kNumDT5725Channels/2;i++){
         if([[triggerOutMaskMatrix cellWithTag:i] intValue]) mask |= (1L << i);
     }
     [model setTriggerOutMask:mask];

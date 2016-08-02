@@ -110,7 +110,7 @@ typedef struct  {
     NSString*		serialNumber;
 
     //Basic Controls
-    BOOL            inputDynamicRange[kNumDT5725Channels];
+    unsigned short  inputDynamicRange[kNumDT5725Channels];
     unsigned short  thresholds[kNumDT5725Channels];
     unsigned short  dcOffset[kNumDT5725Channels];
     BOOL            trigOverlapEnabled;
@@ -127,7 +127,7 @@ typedef struct  {
     //Advanced Controls
     unsigned short  selfTrigPulseWidth[kNumDT5725Channels];
     unsigned short  selfTrigLogic[kNumDT5725Channels/2];
-    BOOL            selfTrigPulseType[kNumDT5725Channels];
+    unsigned short  selfTrigPulseType[kNumDT5725Channels];
     unsigned short  startStopRunMode;
     BOOL			countAllTriggers;
     BOOL            memFullMode;
@@ -152,7 +152,6 @@ typedef struct  {
     unsigned short  almostFullLevel;
     unsigned long   runDelay;
     
-    //What Are these?
     //-------------------------------------
 	ORRateGroup*	waveFormRateGroup;
 	unsigned long 	waveFormCount[kNumDT5725Channels];
@@ -202,8 +201,8 @@ typedef struct  {
 
 #pragma mark Accessors
 //------------------------------
-- (BOOL)            inputDynamicRange:(unsigned short) i;
-- (void)            setInputDynamicRange:(unsigned short) i withValue:(BOOL) aValue;
+- (unsigned short)  inputDynamicRange:(unsigned short) i;
+- (void)            setInputDynamicRange:(unsigned short) i withValue:(unsigned short) aValue;
 //------------------------------
 - (unsigned short)  selfTrigPulseWidth:(unsigned short) i;
 - (void)            setSelfTrigPulseWidth:(unsigned short) i withValue:(unsigned short) aValue;
@@ -213,8 +212,8 @@ typedef struct  {
 //------------------------------
 - (unsigned short)  selfTrigLogic:(unsigned short) i;
 - (void)            setSelfTrigLogic:(unsigned short) i withValue:(unsigned short) aValue;
-- (BOOL)            selfTrigPulseType:(unsigned short) i;
-- (void)            setSelfTrigPulseType:(unsigned short) i withValue:(BOOL) aValue;
+- (unsigned short)  selfTrigPulseType:(unsigned short) i;
+- (void)            setSelfTrigPulseType:(unsigned short) i withValue:(unsigned short) aValue;
 //------------------------------
 - (unsigned short)  dcOffset:(unsigned short) i;
 - (void)            setDCOffset:(unsigned short) i withValue:(unsigned short) aValue;
@@ -377,7 +376,8 @@ typedef struct  {
 #pragma mark ***Helpers
 - (float)			convertDacToVolts:(unsigned short)aDacValue range:(BOOL)dynamicRange;
 - (unsigned short)	convertVoltsToDac:(float)aVoltage range:(BOOL)dynamicRange;
-- (void)            addCurrentState:(NSMutableDictionary*)dictionary cArray:(long*)anArray forKey:(NSString*)aKey;
+- (void)            addCurrentState:(NSMutableDictionary*)dictionary longArray:(long*)anArray forKey:(NSString*)aKey;
+- (void)            addCurrentState:(NSMutableDictionary*)dictionary uShortArray:(unsigned short*)anArray forKey:(NSString*)aKey;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;

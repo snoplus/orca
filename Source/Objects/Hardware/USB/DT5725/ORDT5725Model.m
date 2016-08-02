@@ -194,12 +194,16 @@ static NSString* DT5725StartStopRunModeString[4] = {
 - (void) dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	
-	[usbInterface release];
+    [usbInterface release];
+    [waveFormRateGroup release];
     [serialNumber release];
 	[noUSBAlarm clearAlarm];
 	[noUSBAlarm release];
+    [bufferFullAlarm clearAlarm];
+    [bufferFullAlarm release];
     [lastTimeByteTotalChecked release];
+    [circularBuffer release];
+    [serialNumber release];
     [super dealloc];
 }
 
@@ -395,14 +399,15 @@ static NSString* DT5725StartStopRunModeString[4] = {
 #pragma mark Accessors
 //------------------------------
 //Reg Channel n Input Dynamic Range (0x1n28)
-- (BOOL) inputDynamicRange:(unsigned short) i
+- (unsigned short) inputDynamicRange:(unsigned short) i
 {
-    return inputDynamicRange[i];
+    if(i<kNumDT5725Channels)return inputDynamicRange[i];
+    else return 0;
 }
 
-- (void) setInputDynamicRange:(unsigned short) i withValue:(BOOL) aValue
+- (void) setInputDynamicRange:(unsigned short) i withValue:(unsigned short) aValue
 {
-    if(aValue!=inputDynamicRange[i]){
+    if(i<kNumDT5725Channels && aValue!=inputDynamicRange[i]){
         [[[self undoManager] prepareWithInvocationTarget:self] setInputDynamicRange:i withValue:[self inputDynamicRange:i]];
 
         inputDynamicRange[i] = aValue;
@@ -419,12 +424,13 @@ static NSString* DT5725StartStopRunModeString[4] = {
 //Reg Channel n Trigger Pulse Width (0x1n70)
 - (unsigned short) selfTrigPulseWidth:(unsigned short) i
 {
-    return selfTrigPulseWidth[i];
+    if(i<kNumDT5725Channels)return selfTrigPulseWidth[i];
+    else return 0;
 }
 
 - (void) setSelfTrigPulseWidth:(unsigned short) i withValue:(unsigned short) aValue;
 {
-    if(aValue!=selfTrigPulseWidth[i]){
+    if(i<kNumDT5725Channels && aValue!=selfTrigPulseWidth[i]){
         [[[self undoManager] prepareWithInvocationTarget:self] setSelfTrigPulseWidth:i withValue:[self selfTrigPulseWidth:i]];
 
         selfTrigPulseWidth[i] = aValue;
@@ -441,12 +447,13 @@ static NSString* DT5725StartStopRunModeString[4] = {
 //Reg Channel n Threshold (0x1n80)
 - (unsigned short) threshold:(unsigned short) i
 {
-    return thresholds[i];
+    if(i<kNumDT5725Channels)return thresholds[i];
+    else return 0;
 }
 
 - (void) setThreshold:(unsigned short) i withValue:(unsigned short) aValue
 {
-    if(aValue!=thresholds[i]){
+    if(i<kNumDT5725Channels && aValue!=thresholds[i]){
         [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:i withValue:[self threshold:i]];
     
         thresholds[i] = aValue;
@@ -464,13 +471,14 @@ static NSString* DT5725StartStopRunModeString[4] = {
 //  because the channels are paired this only accepts the values 0, 2, 4, 6 (unlike the normal 0-8)
 - (unsigned short) selfTrigLogic:(unsigned short) i
 {
-    return selfTrigLogic[i];
+    if(i<kNumDT5725Channels/2)return selfTrigLogic[i];
+    else return 0;
 }
 
 - (void) setSelfTrigLogic:(unsigned short) i withValue:(unsigned short) aValue
 {
-    aValue &= 0x3;
-    if(aValue!=selfTrigLogic[i]){
+    if(aValue > 0x3)aValue = 0x3;
+    if(i<kNumDT5725Channels/2 && aValue!=selfTrigLogic[i]){
         [[[self undoManager] prepareWithInvocationTarget:self] setSelfTrigLogic:i withValue:[self selfTrigLogic:i]];
 
         selfTrigLogic[i] = aValue;
@@ -484,14 +492,15 @@ static NSString* DT5725StartStopRunModeString[4] = {
     }
 }
 
-- (BOOL) selfTrigPulseType:(unsigned short) i
+- (unsigned short) selfTrigPulseType:(unsigned short) i
 {
-    return selfTrigPulseType[i];
+    if(i<kNumDT5725Channels)return selfTrigPulseType[i];
+    else return 0;
 }
 
-- (void) setSelfTrigPulseType:(unsigned short) i withValue:(BOOL) aValue
+- (void) setSelfTrigPulseType:(unsigned short) i withValue:(unsigned short) aValue
 {
-    if(aValue!=selfTrigPulseType[i]){
+    if(i<kNumDT5725Channels && aValue!=selfTrigPulseType[i]){
         [[[self undoManager] prepareWithInvocationTarget:self] setSelfTrigPulseType:i withValue:[self selfTrigPulseType:i]];
 
         selfTrigPulseType[i] = aValue;
@@ -508,12 +517,13 @@ static NSString* DT5725StartStopRunModeString[4] = {
 //Reg Channel n DC Offset (0x1n98)
 - (unsigned short) dcOffset:(unsigned short) i
 {
-    return dcOffset[i];
+    if(i<kNumDT5725Channels)return dcOffset[i];
+    else return 0;
 }
 
 - (void) setDCOffset:(unsigned short) i withValue:(unsigned short) aValue
 {
-    if(aValue!=dcOffset[i]){
+    if(i<kNumDT5725Channels && aValue!=dcOffset[i]){
         [[[self undoManager] prepareWithInvocationTarget:self] setDCOffset:i withValue:[self dcOffset:i]];
 
         dcOffset[i] = aValue;
@@ -705,7 +715,7 @@ static NSString* DT5725StartStopRunModeString[4] = {
 
  - (void) setTriggerSourceMask:(unsigned long)aTriggerSourceMask
 {
-    aTriggerSourceMask &= 0xf;
+    if(aTriggerSourceMask>0xf)aTriggerSourceMask = 0xf;
     if(aTriggerSourceMask!=triggerSourceMask){
         [[[self undoManager] prepareWithInvocationTarget:self] setTriggerSourceMask:triggerSourceMask];
         triggerSourceMask = aTriggerSourceMask;
@@ -750,7 +760,7 @@ static NSString* DT5725StartStopRunModeString[4] = {
 
 - (void) setTriggerOutMask:(unsigned long)aTriggerOutMask
 {
-    aTriggerOutMask &= 0xf;
+    if(aTriggerOutMask>0x4)aTriggerOutMask = 0xf;
     if(aTriggerOutMask!=triggerOutMask){
         [[[self undoManager] prepareWithInvocationTarget:self] setTriggerOutMask:triggerOutMask];
         triggerOutMask = aTriggerOutMask;
@@ -938,7 +948,7 @@ static NSString* DT5725StartStopRunModeString[4] = {
 
 - (void) setEnabledMask:(unsigned short)aEnabledMask
 {
-    aEnabledMask &= 0xf;
+    if(aEnabledMask>0xf)aEnabledMask = 0xf;
     if(aEnabledMask!=enabledMask){
         [[[self undoManager] prepareWithInvocationTarget:self] setEnabledMask:enabledMask];
         enabledMask = aEnabledMask;
@@ -1259,19 +1269,23 @@ static NSString* DT5725StartStopRunModeString[4] = {
 
 - (void) report
 {
-	unsigned long enabled, threshold, dynRange, pulseWidth, trigLogic, status, dacOffset, adcTemp, triggerSrc;
+	unsigned long enabled, threshold, dynRange, pulseWidth, status, dacOffset, adcTemp, triggerSrc;
+    unsigned long trigLogic = 0;
 	[self read:kChanEnableMask returnValue:&enabled];
 	[self read:kTrigSrcEnblMask returnValue:&triggerSrc];
-	int chan;
     NSFont* theFont = [NSFont fontWithName:@"Monaco" size:10];
 	NSLogFont(theFont,@"----------------------------------------------------------------------------------------------------------------\n");
 	NSLogFont(theFont,@"Chan | Enabled | Thres | Dynamic Range | Pulse Width | Self-Trigger Logic | Status | Offset | ADC Temp | trigSrc\n");
 	NSLogFont(theFont,@"----------------------------------------------------------------------------------------------------------------\n");
-	for(chan=0;chan<kNumDT5725Channels;chan++){
+    int group;
+    for(group=0;group<kNumDT5725Channels/2;group++){
+        [self readChan:group reg:kSelfTrigLogic returnValue:&trigLogic];
+    }
+    int chan;
+    for(chan=0;chan<kNumDT5725Channels;chan++){
 		[self readChan:chan reg:kThresholds returnValue:&threshold];
         [self readChan:chan reg:kInputDyRange returnValue:&dynRange];
         [self readChan:chan reg:kTrigPulseWidth returnValue:&pulseWidth];
-        [self readChan:chan reg:kSelfTrigLogic returnValue:&trigLogic];
 		[self readChan:chan reg:kStatus returnValue:&status];
         [self readChan:chan reg:kDCOffset returnValue:&dacOffset];
         [self readChan:chan reg:kAdcTemp returnValue:&adcTemp];
@@ -1289,18 +1303,20 @@ static NSString* DT5725StartStopRunModeString[4] = {
 		else if(status & 0x01)	statusString = [statusString stringByAppendingString:@"Full"];
 
         NSString* trigLogicString = @"";
-        if(trigLogic & 0x03){
-            if(trigLogic & 0x02){
-                if(trigLogic & 0x01)    trigLogicString = @"or";
-                else                    trigLogicString = [NSString stringWithFormat: @"%d", chan+1];
+       if(chan%2 == 0){
+            if(trigLogic & 0x03){
+                if(trigLogic & 0x02){
+                    if(trigLogic & 0x01)    trigLogicString = @"or";
+                    else                    trigLogicString = [NSString stringWithFormat: @"%d", chan+1];
+                }
+                else                        trigLogicString = [NSString stringWithFormat: @"%d", chan];
             }
-            else                        trigLogicString = [NSString stringWithFormat: @"%d", chan];
+            else                            trigLogicString = @"and";
+            if(trigLogic & 0x4) trigLogicString = [trigLogicString stringByAppendingString:@"-over/under"];
+            else                trigLogicString = [trigLogicString stringByAppendingString:@"-pulseWidth"];
         }
-        else                            trigLogicString = @"and";
-        if(trigLogic & 0x4) trigLogicString = [trigLogicString stringByAppendingString:@"-over/under"];
-        else                trigLogicString = [trigLogicString stringByAppendingString:@"-pulseWidth"];
 
-		NSLogFont(theFont,@"%d | %@ | %d | %@ | %d | %@ | %@ | %6.3f | %@ | %@\n",
+        NSLogFont(theFont,@"%d | %@ | %d | %@ | %d | %@ | %@ | %6.3f | %@ | %@\n",
 				    chan, 
                     enabled&(1<<chan)?@"E":@"X",
 				    threshold&0x3fff,
@@ -1497,9 +1513,9 @@ static NSString* DT5725StartStopRunModeString[4] = {
 
 - (void) writeSelfTrigLogics
 {
-    short i;
-    for (i = 0; i < kNumDT5725Channels; i++){
-        [self writeSelfTrigLogic:i];
+    short group;
+    for (group = 0; group < kNumDT5725Channels/2; group++){
+        [self writeSelfTrigLogic:group];
     }
 }
 
@@ -2159,14 +2175,15 @@ static NSString* DT5725StartStopRunModeString[4] = {
 	
 	int i;
     for (i = 0; i < kNumDT5725Channels; i++){
-        [self setInputDynamicRange:i    withValue:[aDecoder decodeBoolForKey: [NSString stringWithFormat:@"dynamicRange%d", i]]];
+        [self setInputDynamicRange:i    withValue:[aDecoder decodeIntForKey: [NSString stringWithFormat:@"dynamicRange%d", i]]];
         [self setSelfTrigPulseWidth:i   withValue:[aDecoder decodeIntForKey:  [NSString stringWithFormat:@"selfTrigPulseWidth%d", i]]];
         [self setThreshold:i            withValue:[aDecoder decodeIntForKey:  [NSString stringWithFormat:@"threshold%d", i]]];
         [self setSelfTrigPulseType:i    withValue:[aDecoder decodeBoolForKey: [NSString stringWithFormat:@"selfTrigPulseType%d", i]]];
         [self setDCOffset:i             withValue:[aDecoder decodeIntForKey:  [NSString stringWithFormat:@"dcOffset%d", i]]];
-        if (i%2 == 0){
-            [self setSelfTrigLogic:i        withValue:[aDecoder decodeIntForKey:  [NSString stringWithFormat:@"selfTrigLogic%d", i]]];
-        }
+    }
+    int group;
+    for (group = 0; group < kNumDT5725Channels/2; group++){
+        [self setSelfTrigLogic:group        withValue:[aDecoder decodeIntForKey:  [NSString stringWithFormat:@"selfTrigLogic%d", group]]];
     }
     
     [[self undoManager] enableUndoRegistration];
@@ -2214,14 +2231,15 @@ static NSString* DT5725StartStopRunModeString[4] = {
     
 	int i;
 	for (i = 0; i < kNumDT5725Channels; i++){
-        [anEncoder encodeBool:inputDynamicRange[i]      forKey:[NSString stringWithFormat:@"inputDynamicRange%d", i]];
+        [anEncoder encodeInt:inputDynamicRange[i]       forKey:[NSString stringWithFormat:@"inputDynamicRange%d", i]];
         [anEncoder encodeInt:selfTrigPulseWidth[i]      forKey:[NSString stringWithFormat:@"selfTrigPulseWidth%d", i]];
         [anEncoder encodeInt:thresholds[i]              forKey:[NSString stringWithFormat:@"threshold%d", i]];
         [anEncoder encodeBool:selfTrigPulseType[i]      forKey:[NSString stringWithFormat:@"selfTrigPulseType%d", i]];
         [anEncoder encodeInt:dcOffset[i]                forKey:[NSString stringWithFormat:@"dcOffset%d", i]];
-        if (i%2 == 0){
-            [anEncoder encodeInt:selfTrigLogic[i]           forKey:[NSString stringWithFormat:@"selfTrigLogic%d", i]];
-        }
+    }
+    int group;
+    for (group = 0; group < kNumDT5725Channels/2; group++){
+        [anEncoder encodeInt:selfTrigLogic[group]           forKey:[NSString stringWithFormat:@"selfTrigLogic%d", group]];
     }
 }
 
@@ -2262,18 +2280,18 @@ static NSString* DT5725StartStopRunModeString[4] = {
     [objDictionary setObject:[NSNumber numberWithInt:coincidenceWindow]         forKey:@"coincidenceWindow"];
     [objDictionary setObject:[NSNumber numberWithInt:coincidenceLevel]          forKey:@"coincidenceLevel"];
     
-    [self addCurrentState:objDictionary cArray:(long*)inputDynamicRange         forKey:@"inputDyanmicRange"];
-    [self addCurrentState:objDictionary cArray:(long*)selfTrigPulseWidth        forKey:@"selfTrigPulseWidth"];
-    [self addCurrentState:objDictionary cArray:(long*)thresholds                forKey:@"thresholds"];
-    [self addCurrentState:objDictionary cArray:(long*)selfTrigLogic             forKey:@"selfTrigLogic"];
-    [self addCurrentState:objDictionary cArray:(long*)selfTrigPulseType         forKey:@"selfTrigPulseType"];
-    [self addCurrentState:objDictionary cArray:(long*)dcOffset                  forKey:@"dcOffset"];
+    [self addCurrentState:objDictionary uShortArray:(unsigned short*)inputDynamicRange         forKey:@"inputDynamicRange"];
+    [self addCurrentState:objDictionary uShortArray:(unsigned short*)selfTrigPulseWidth        forKey:@"selfTrigPulseWidth"];
+    [self addCurrentState:objDictionary uShortArray:(unsigned short*)thresholds                forKey:@"thresholds"];
+    [self addCurrentState:objDictionary uShortArray:(unsigned short*)selfTrigLogic             forKey:@"selfTrigLogic"];
+    [self addCurrentState:objDictionary uShortArray:(unsigned short*)selfTrigPulseType         forKey:@"selfTrigPulseType"];
+    [self addCurrentState:objDictionary uShortArray:(unsigned short*)dcOffset                  forKey:@"dcOffset"];
 
     
     return objDictionary;
 }
 
-- (void) addCurrentState:(NSMutableDictionary*)dictionary cArray:(long*)anArray forKey:(NSString*)aKey
+- (void) addCurrentState:(NSMutableDictionary*)dictionary longArray:(long*)anArray forKey:(NSString*)aKey
 {
     NSMutableArray* ar = [NSMutableArray array];
     int i;
@@ -2284,6 +2302,16 @@ static NSString* DT5725StartStopRunModeString[4] = {
     [dictionary setObject:ar forKey:aKey];
 }
 
+- (void) addCurrentState:(NSMutableDictionary*)dictionary uShortArray:(unsigned short*)anArray forKey:(NSString*)aKey
+{
+    NSMutableArray* ar = [NSMutableArray array];
+    int i;
+    for(i=0;i<kNumDT5725Channels;i++){
+        [ar addObject:[NSNumber numberWithUnsignedShort:*anArray]];
+        anArray++;
+    }
+    [dictionary setObject:ar forKey:aKey];
+}
 
 #pragma mark ***DataSource
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue
