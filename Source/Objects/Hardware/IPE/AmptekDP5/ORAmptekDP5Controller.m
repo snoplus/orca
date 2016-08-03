@@ -352,6 +352,17 @@ NSString* fltEdelweissV4TriggerSourceNamesXXX[2][kFltNumberTriggerSources] = {
                      selector : @selector(chargeBBFileChanged:)
                          name : ORAmptekDP5ModelChargeBBFileChanged
 						object: model];
+                        
+    [notifyCenter addObserver : self
+                     selector : @selector(statusLowRegChanged:)
+                         name : ORAmptekDP5ModelStatusRegLowChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(statusHighRegChanged:)
+                         name : ORAmptekDP5ModelStatusRegHighChanged
+						object: model];
+
 #endif
 
 
@@ -369,16 +380,6 @@ NSString* fltEdelweissV4TriggerSourceNamesXXX[2][kFltNumberTriggerSources] = {
     [notifyCenter addObserver : self
                      selector : @selector(takeADCChannelDataChanged:)
                          name : ORAmptekDP5ModelTakeADCChannelDataChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(statusLowRegChanged:)
-                         name : ORAmptekDP5ModelStatusRegLowChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(statusHighRegChanged:)
-                         name : ORAmptekDP5ModelStatusRegHighChanged
 						object: model];
 
     [notifyCenter addObserver : self
@@ -462,9 +463,61 @@ NSString* fltEdelweissV4TriggerSourceNamesXXX[2][kFltNumberTriggerSources] = {
                          name : ORAmptekDP5ModelBoardTemperatureChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(deviceIDChanged:)
+                         name : ORAmptekDP5ModelDeviceIDChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(detectorTemperatureChanged:)
+                         name : ORAmptekDP5ModelDetectorTemperatureChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(FirmwareFPGAVersionChanged:)
+                         name : ORAmptekDP5ModelFirmwareFPGAVersionChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(serialNumberChanged:)
+                         name : ORAmptekDP5ModelSerialNumberChanged
+						object: model];
+
 }
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Interface Management
+
+- (void) serialNumberChanged:(NSNotification*)aNote
+{
+	[serialNumberTextField setIntValue: [model serialNumber]];
+}
+
+- (void) FirmwareFPGAVersionChanged:(NSNotification*)aNote
+{
+	//[FirmwareFPGAVersionTextField setIntValue: [model FirmwareFPGAVersion]];
+    int v=[model FirmwareFPGAVersion];
+	[FirmwareFPGAVersionTextField setStringValue: [NSString stringWithFormat: @"%i.%i - %i.%i",(v>>12)&0xf, (v>>8)&0xf, (v>>4)&0xf, (v)&0xf ]];
+}
+
+- (void) detectorTemperatureChanged:(NSNotification*)aNote
+{
+	[detectorTemperatureTextField setIntValue: [model detectorTemperature]];
+}
+
+- (void) deviceIDChanged:(NSNotification*)aNote
+{
+    if([model deviceID] == 0) [deviceIDTextField setStringValue: @"0 (DP5)"];
+    else
+    if([model deviceID] == 1) [deviceIDTextField setStringValue: @"1 (PX5)"];
+    else
+    if([model deviceID] == 2) [deviceIDTextField setStringValue: @"2 (DP5G)"];
+    else
+    if([model deviceID] == 3) [deviceIDTextField setStringValue: @"3 (MCA8000D)"];
+    else
+    if([model deviceID] == 4) [deviceIDTextField setStringValue: @"4 (TB5)"];
+    else
+	[deviceIDTextField setIntValue: [model deviceID]];
+}
 
 - (void) boardTemperatureChanged:(NSNotification*)aNote
 {
@@ -701,9 +754,11 @@ return;
 
 - (void) sltDAQModeChanged:(NSNotification*)aNote
 {
-	[sltDAQModeTextField setIntValue: [model sltDAQMode]];
+	//[sltDAQModeTextField setIntValue: [model sltDAQMode]];
 	//[sltDAQModePU setIntValue: [model sltDAQMode]];
-    [sltDAQModePU selectItemWithTag:[model sltDAQMode]];
+    //[sltDAQModePU selectItemWithTag:[model sltDAQMode]];
+    //[sltDAQModePU selectItemWithTag:0];
+    [sltDAQModePU selectItemWithTag:0];
 }
 
 
@@ -1024,11 +1079,11 @@ return;
 	[self idBBforWCommandChanged:nil];
 	[self useBroadcastIdBBChanged:nil];
 	[self chargeBBFileChanged:nil];
+	[self statusLowRegChanged:nil];
+	[self statusHighRegChanged:nil];
 #endif
 	[self takeRawUDPDataChanged:nil];
 	[self takeADCChannelDataChanged:nil];
-	[self statusLowRegChanged:nil];
-	[self statusHighRegChanged:nil];
 	[self lowLevelRegInHexChanged:nil];
 	[self resetEventCounterAtRunStartChanged:nil];
 	[self textCommandChanged:nil];
@@ -1043,6 +1098,10 @@ return;
 	[self fastCounterChanged:nil];
 	[self slowCounterChanged:nil];
 	[self boardTemperatureChanged:nil];
+	[self deviceIDChanged:nil];
+	[self detectorTemperatureChanged:nil];
+	[self FirmwareFPGAVersionChanged:nil];
+	[self serialNumberChanged:nil];
 }
 
 - (void) setWindowTitle

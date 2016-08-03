@@ -89,7 +89,7 @@
     //uint32_t traceStart16 = ShiftAndExtract(eventFlags,8,0x7ff);//start of trace in short array
 
 
-    NSString* device    = [NSString stringWithFormat:@"DeviceId-%hhu\n", location];
+    NSString* device    = [NSString stringWithFormat:@"Amptek-%d\n", location];
 
 
     
@@ -122,7 +122,7 @@
 				startIndex:	0					// first Point Index (past the header offset!!!)
 					  mask:	0xFFFFFFFF							// when displayed all values will be masked with this value
 					sender: self 
-				  withKeys: @"AmptekDP5", @"Spectrum",device,nil];
+				  withKeys: @"AmptekDP5", @"Spectrum",device, @"Spectrum", nil];
 
 #if 0
 	// Set up the waveform

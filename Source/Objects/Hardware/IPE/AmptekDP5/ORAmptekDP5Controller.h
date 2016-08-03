@@ -29,6 +29,10 @@
 @interface ORAmptekDP5Controller : OrcaObjectController {
     // status table view
 	IBOutlet   NSTextField* slowCounterTextField;
+	IBOutlet   NSTextField* serialNumberTextField;
+	IBOutlet   NSTextField* FirmwareFPGAVersionTextField;
+	IBOutlet   NSTextField* detectorTemperatureTextField;
+	IBOutlet   NSTextField* deviceIDTextField;
 	IBOutlet   NSTextField* boardTemperatureTextField;
 	IBOutlet   NSTextField* fastCounterTextField;
 	IBOutlet   NSTextField* realTimeTextField;
@@ -196,6 +200,10 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Interface Management
+- (void) serialNumberChanged:(NSNotification*)aNote;
+- (void) FirmwareFPGAVersionChanged:(NSNotification*)aNote;
+- (void) detectorTemperatureChanged:(NSNotification*)aNote;
+- (void) deviceIDChanged:(NSNotification*)aNote;
 - (void) boardTemperatureChanged:(NSNotification*)aNote;
 - (void) slowCounterChanged:(NSNotification*)aNote;
 - (void) fastCounterChanged:(NSNotification*)aNote;

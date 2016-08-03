@@ -219,24 +219,28 @@ static IpeRegisterNamesStruct regV4[kEWSltV4NumRegs] = {
 //{@"Data Block Address",	0xF00008 Data Block Address
 };
 
+
+
+
+
+#if 0
+// ... moved to header file ... -tb-
 //threading
-	    //pthread handling
-	    pthread_t dataReplyThread;
-        pthread_mutex_t dataReplyThread_mutex;
-
-
-
 #define kMaxNumUDPDataPackets 100000
 #define kMaxNumUDPStatusPackets 100  // currently (2013) we expect max. 9 packets; but size might increase and legacy opera status may appear: use min 30 -tb-
 #define kMaxUDPSizeDim 1500     //see comment below
 #define kMaxNumADCChan 720      //see comment below
+	    //pthread handling
+	    pthread_t dataReplyThread;
+        pthread_mutex_t dataReplyThread_mutex;
+        
 typedef struct{
-	    int started;
-	    int stopNow;
-		id model;
-		struct sockaddr_in sockaddr_data_from;
-		int UDP_DATA_REPLY_SERVER_SOCKET;
-        int isListeningOnDataServerSocket;
+    int started;
+    int stopNow;
+    id model;
+    struct sockaddr_in sockaddr_data_from;
+    int UDP_DATA_REPLY_SERVER_SOCKET;
+    int isListeningOnDataServerSocket;
 
     //status packet buffer (I expect max. 
     char statusBuf[2][kMaxNumUDPStatusPackets][kMaxUDPSizeDim/*1500*/];//store the status UDP packets
@@ -263,6 +267,11 @@ typedef struct{
 } THREAD_DATA;
 
 THREAD_DATA dataReplyThreadData;
+#endif
+
+
+
+
 
 void* receiveFromDataReplyServerThreadFunctionXXX (void* p);
 
@@ -568,6 +577,10 @@ void* receiveFromDataReplyServerThreadFunctionXXX (void* p)
 
 #pragma mark ***External Strings
 
+NSString* ORAmptekDP5ModelSerialNumberChanged = @"ORAmptekDP5ModelSerialNumberChanged";
+NSString* ORAmptekDP5ModelFirmwareFPGAVersionChanged = @"ORAmptekDP5ModelFirmwareFPGAVersionChanged";
+NSString* ORAmptekDP5ModelDetectorTemperatureChanged = @"ORAmptekDP5ModelDetectorTemperatureChanged";
+NSString* ORAmptekDP5ModelDeviceIDChanged = @"ORAmptekDP5ModelDeviceIDChanged";
 NSString* ORAmptekDP5ModelBoardTemperatureChanged = @"ORAmptekDP5ModelBoardTemperatureChanged";
 NSString* ORAmptekDP5ModelSlowCounterChanged = @"ORAmptekDP5ModelSlowCounterChanged";
 NSString* ORAmptekDP5ModelFastCounterChanged = @"ORAmptekDP5ModelFastCounterChanged";
@@ -685,6 +698,12 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 //    crateUDPDataIP = @"192.168.1.100";
 //    crateUDPDataReplyPort = 12345;
 	
+    deviceID = -1;
+    
+    minValue[0]=-128.0; maxValue[0]=128.0; lowLimit[0]=0.0; hiLimit[0]=80.0;
+    minValue[1]=0.0;    maxValue[1]=300.0; lowLimit[1]=0.0; hiLimit[1]=280.0;
+    { int i; for(i=2; i<10; i++){minValue[i]=-128.0; maxValue[i]=128.0; lowLimit[i]=0.0; hiLimit[i]=80.0;} }
+    
     return self;
 }
 
@@ -822,6 +841,54 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+
+- (int) serialNumber
+{
+    return serialNumber;
+}
+
+- (void) setSerialNumber:(int)aSerialNumber
+{
+    serialNumber = aSerialNumber;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelSerialNumberChanged object:self];
+}
+
+- (int) FirmwareFPGAVersion
+{
+    return FirmwareFPGAVersion;
+}
+
+- (void) setFirmwareFPGAVersion:(int)aFirmwareFPGAVersion
+{
+    FirmwareFPGAVersion = aFirmwareFPGAVersion;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelFirmwareFPGAVersionChanged object:self];
+}
+
+- (int) detectorTemperature
+{
+    return detectorTemperature;
+}
+
+- (void) setDetectorTemperature:(int)aDetectorTemperature
+{
+    detectorTemperature = aDetectorTemperature;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelDetectorTemperatureChanged object:self];
+}
+
+- (int) deviceID
+{
+    return deviceID;
+}
+
+- (void) setDeviceID:(int)aDeviceID
+{
+    deviceID = aDeviceID;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelDeviceIDChanged object:self];
+}
 
 - (int) boardTemperature
 {
@@ -1022,7 +1089,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 	
 	
     //DEBUG
-	NSLog(@"Called: %@::%@  indexName,indexValue,indexInit,indexComment,indexId is %i,%i,%i,%i,%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),indexName,indexValue,indexInit,indexComment,indexId);//TODO: debug output -tb-
+	//NSLog(@"Called: %@::%@  indexName,indexValue,indexInit,indexComment,indexId is %i,%i,%i,%i,%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),indexName,indexValue,indexInit,indexComment,indexId);//TODO: debug output -tb-
 	
 	//NSLog(@"colnames >>>%@<<<\n", colnames);
 	//NSLog(@"indexChan, indexName, indexURL, indexPath, indexLoAlarm, indexHiAlarm, indexLoLimit, indexHiLimit, indexType is %i, %i, %i, %i, %i, %i, %i, %i, %i \n", 
@@ -1058,8 +1125,8 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 
     //DEBUG
 
-	NSLog(@"Called: %@::%@: Command is: %@, %@, init:%i, Comment:%@, ID:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),
-         name, value, init,comment,id);//TODO: debug output -tb-
+	//NSLog(@"Called: %@::%@: Command is: %@, %@, init:%i, Comment:%@, ID:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),
+    //     name, value, init,comment,id);//TODO: debug output -tb-
          
         commandTableRow = [NSMutableDictionary dictionary];
 	    [commandTableRow setObject: name		    forKey:@"Name"]; //used by processing
@@ -1106,12 +1173,10 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 
 - (BOOL) saveAsCommandTableFile:(NSString*) filename
 {
-    //DEBUG    
-    	NSLog(@"Called: %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: debug output -tb-
+    //DEBUG        	NSLog(@"Called: %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: debug output -tb-
         
     int num = [commandTable count];
-    //DEBUG    
-        NSLog(@"Called %@::%@ items in list: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),num);//TODO: DEBUG -tb-
+    //DEBUG            NSLog(@"Called %@::%@ items in list: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),num);//TODO: DEBUG -tb-
         
 	NSMutableString *csvtableString = [NSMutableString stringWithString: @"Name,Setpoint,Value,Init,Comment,ID\n"];
     
@@ -1144,6 +1209,46 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 	
 	return success;
 }
+
+- (NSString*) getCommandTableAsString
+{
+        //DEBUG        	NSLog(@"Called: %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: debug output -tb-
+        
+    int num = [commandTable count];
+    //DEBUG            NSLog(@"Called %@::%@ items in list: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),num);//TODO: DEBUG -tb-
+        
+	NSMutableString *csvtableString = [NSMutableString stringWithString: @"Name,Setpoint,Value,Init,Comment,ID\n"];
+    
+    NSMutableDictionary* line;
+   	NSString *name;
+	NSString *setpoint;
+	NSString *value;
+	NSString *comment;
+    int init, id;
+
+    int i; //row index
+    for(i=0; i<num; i++){
+        line = [commandTable objectAtIndex:i];
+        name = [line objectForKey: @"Name"];
+        setpoint = [line objectForKey: @"Setpoint"];
+        value = [line objectForKey: @"Value"];
+        comment = [line objectForKey: @"Comment"];
+        init = [[line objectForKey: @"Init"] intValue];
+        id = [[line objectForKey: @"ID"] intValue];
+        
+		[csvtableString appendFormat: @"%@,%@,%@,%i,\"%@\",%i\n",name,setpoint,value,init,comment,id];
+    }
+    
+    if(csvtableString == nil)  return @"";
+    
+    return csvtableString;
+    
+
+}
+
+
+
+
 
 
 
@@ -1305,6 +1410,25 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 
 
 
+//very simple method to control ADC value display , NOT persistent (according to Norman this is OK if controllable thru scripts) -tb-
+- (double) setMaxValue: (double)val forChan:(int)channel
+{
+    if(channel>=0 && channel<10){ maxValue[channel]=val; return val;}
+    return 0.0;
+}
+
+- (double) setMinValue: (double)val forChan:(int)channel
+{
+    if(channel>=0 && channel<10){ minValue[channel]=val; return val;}
+    return 0.0;
+}
+
+- (void) setAlarmRangeLow:(double)theLowLimit high:(double)theHighLimit  forChan:(int)channel
+{
+    if(channel>=0 && channel<10){ lowLimit[channel]=theLowLimit; hiLimit[channel]=theHighLimit; }
+}
+
+
 - (void) commonScriptMethodSectionEnd { }
 //-------------end of common script methods---------------------------------
 
@@ -1370,7 +1494,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 
 - (void) setNumSpectrumBins:(int)aNumSpectrumBins
 {
-    NSLog(@"Called %@::%@! aNumSpectrumBins: %i  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aNumSpectrumBins);//TODO: DEBUG -tb-
+    //DEBUG NSLog(@"Called %@::%@! aNumSpectrumBins: %i  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aNumSpectrumBins);//TODO: DEBUG -tb-
     if(aNumSpectrumBins < 256) aNumSpectrumBins = 256;
     if(aNumSpectrumBins > 8192) aNumSpectrumBins = 8192;
     //allowed values: 256, 512, 1024, 2048, 4096, 8192
@@ -1381,7 +1505,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
             highestBit = i;
         }
     }
-    NSLog(@"Called %@::%@! highest bit: %i setTo: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),highestBit, 0x1 << highestBit);//TODO: DEBUG -tb-
+    //DEBUG NSLog(@"Called %@::%@! highest bit: %i setTo: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),highestBit, 0x1 << highestBit);//TODO: DEBUG -tb-
     aNumSpectrumBins = 0x1 << highestBit;
     [[[self undoManager] prepareWithInvocationTarget:self] setNumSpectrumBins:numSpectrumBins];
     
@@ -2585,6 +2709,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     uint16_t length = dataLenFromHeader;
     
     //check acknowledge commands
+    if(DEBUG_SPECTRUM_READOUT)
     if(PID1==0xff){
         if(PID2==0){
             NSLog(@"   MESSAGE: this was a ACKNOWLEDGE packet: OK\n");
@@ -2701,9 +2826,34 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
             
             var8signed =*( (int8_t*) (&(dp5Packet[statusOffset + kBoardTemperature])) );
             [self setBoardTemperature: var8signed];
-            NSLog(@"    kRealtimeOffset: %i  degree celsius  (0x%08x)\n",var8signed,var8signed);
+            //if(DEBUG_SPECTRUM_READOUT) 
+            //NSLog(@"    kRealtimeOffset: %i  degree celsius  (0x%08x)\n",var8signed,var8signed);
+            
+            var8signed =*( (int8_t*) (&(dp5Packet[statusOffset + kDeviceIDOffset])) );
+            [self setDeviceID: var8signed];
+            //if(DEBUG_SPECTRUM_READOUT) 
+            //NSLog(@"    kDeviceIDOffset: %i     (0x%08x)\n",var8signed,var8signed);
+            
+            var8signed =*( (int8_t*) (&(dp5Packet[statusOffset + kDetectorTemperatureMSB])) );
+            var32 = var8signed << 8;
+            var8signed =*( (int8_t*) (&(dp5Packet[statusOffset + kDetectorTemperatureLSB])) );
+            var32 |= var8signed ;
+            [self setDetectorTemperature: var32];
+            //NSLog(@"    detector temp (K): %i x 0.1  Kelvin (0x%08x)\n",var32,var32);
+
+            var8 = dp5Packet[statusOffset + kFirmwareVersionOffset] ;
+            var32 = var8 << 8;
+            //NSLog(@"    kFirmwareVersionOffset: %i.%i  \n",(var8 >>4),var8 & 0x0f);
+            var8 = dp5Packet[statusOffset + kFPGAVersionOffset] ;
+            var32 |= var8 ;
+            //NSLog(@"    kFPGAVersionOffset: %i.%i  \n",(var8 >>4),var8 & 0x0f);
+            //NSLog(@"    firmware+fpga version: %i   (0x%08x)\n",var32,var32);
+            [self setFirmwareFPGAVersion: var32];
             
             
+            var32=*( (uint32_t*) (&(dp5Packet[statusOffset + kSerialNumberOffset])) );
+            [self setSerialNumber: var32];
+            //NSLog(@"    kSerialNumberOffset: %i (0x%08x)\n",var32,var32);
         }
         
         
@@ -2876,10 +3026,10 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 //send a write ASCII command to Amptek DP5 -tb-
 - (int) sendTextCommandString:(NSString*)cmd;
 {
-	NSLog(@"Called %@::%@!  text command is: >%@< length %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),cmd,[cmd length]);//TODO: DEBUG -tb-
+	//DEBUG    NSLog(@"Called %@::%@!  text command is: >%@< length %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),cmd,[cmd length]);//TODO: DEBUG -tb-
 
     if([cmd length]>512){
-        NSLog(@"    ERROR: text command to long!\n");
+        NSLog(@"    ERROR: AmptekDP5: text command to long! Contact a ORCA developer!\n");
         return 0;
     }
 
@@ -2901,7 +3051,9 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     }
     
     
-    #if 1
+    //DEBUGGING: set to 1 -tb-
+    //DEBUGGING: ---->
+    #if 0
     {
                 //dump/debug !WARNING! SLOWS DOWN READOUT CONSIDERABLY  -tb-
             int k;
@@ -3110,13 +3262,11 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 
 - (int) writeCommandTableInitSettingsAsTextCommand
 {
-    //DEBUG    
-        NSLog(@"%@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+    //DEBUG            NSLog(@"%@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
 
 
     int num = [commandTable count], count=0;
-    //DEBUG    
-        NSLog(@"Called %@::%@ items in list: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),num);//TODO: DEBUG -tb-
+    //DEBUG            NSLog(@"Called %@::%@ items in list: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),num);//TODO: DEBUG -tb-
         
     NSMutableString *stringCommand = [[[NSMutableString alloc] initWithCapacity:100]autorelease];
     int i; //row index
@@ -3129,7 +3279,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
             [stringCommand appendString:@";"];
         }
     }
-    NSLog(@"stringCommand is:>%@<\n",stringCommand);
+    //DEBUG     NSLog(@"stringCommand is:>%@<\n",stringCommand);
     
     if(count>0)
         [self sendTextCommandString: stringCommand];
@@ -3371,7 +3521,7 @@ commands:
 {
     //taken from ipe4reader6.cpp, function int sendtoGlobalClient3(const void *buffer, size_t length, char* receiverIPAddr, uint32_t port)
 
-	NSLog(@"Called %@::%@! length: >%i<\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),  aLength);//TODO: DEBUG -tb-
+	//DEBUGGING --->  NSLog(@"Called %@::%@! length: >%i<\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),  aLength);//TODO: DEBUG -tb-
 
     if(UDP_COMMAND_CLIENT_SOCKET<=0){ NSLog(@"   socket not open\n"); return 1;}
     if(aLength==0)       return 1;
@@ -4862,6 +5012,10 @@ return ;
     [self setCommandTable:		[decoder decodeObjectForKey:@"CommandTable"]];
     if(!commandTable) [self initCommandTable];
     
+    minValue[0]=-128.0; maxValue[0]=128.0; lowLimit[0]=0.0; hiLimit[0]=80.0;
+    minValue[1]=0.0;    maxValue[1]=300.0; lowLimit[1]=0.0; hiLimit[1]=280.0;
+    { int i; for(i=2; i<10; i++){minValue[i]=-128.0; maxValue[i]=128.0; lowLimit[i]=0.0; hiLimit[i]=80.0;} }
+    
 	[[self undoManager] enableUndoRegistration];
 
 	[self registerNotificationObservers];
@@ -5005,6 +5159,18 @@ return ;
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
+    if(objDictionary==nil) objDictionary = dictionary;
+    if(objDictionary==nil) objDictionary = [NSMutableDictionary dictionary];
+
+    [objDictionary setObject:[NSNumber numberWithInt:spectrumRequestType]	forKey:@"spectrumRequestType"];
+    [objDictionary setObject:[NSNumber numberWithInt:spectrumRequestRate]	forKey:@"spectrumRequestRate"];
+    [objDictionary setObject:[NSNumber numberWithInt:crateUDPCommandPort]	forKey:@"UDPPort"];
+    [objDictionary setObject:crateUDPCommandIP	forKey:@"UDPIP"];
+    
+    
+    [objDictionary setObject: [self getCommandTableAsString]	forKey:@"SettingsCommandTable"];
+    //DEBUG NSLog(@"WARNING: %@::%@: command table is: %@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self getCommandTableAsString]);//TODO: DEBUG testing ...-tb-
+
 	return objDictionary;
 }
 
@@ -5071,28 +5237,59 @@ return ;
 
 
 
-
 - (double) maxValueForChan:(int)channel
 {
+    if(channel>=0 && channel<10) return maxValue[channel];
     return 128.0;
 }
 
 - (double) minValueForChan:(int)channel
 {
+    if(channel>=0 && channel<10) return minValue[channel];
     return -128.0;
 }
 
 - (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel
 {
-		*theLowLimit  =  0.0 ;
+    if(channel>=0 && channel<10){
+		*theLowLimit   =  lowLimit[channel] ;
+		*theHighLimit  =  hiLimit [channel] ;
+        return;
+    }
+		*theLowLimit   =   0.0 ;
 		*theHighLimit  =  80.0 ;
 
 }
 
+#if 0
+//MOVED TO COMMON SCRIPT METHODS -tb-
+
+//very simple method to control ADC value display , NOT persistent (according to Norman this is OK if controllable thru scripts) -tb-
+- (double) setMaxValue: (double)val forChan:(int)channel
+{
+    if(channel>=0 && channel<10){ maxValue[channel]=val; return val;}
+    return 0.0;
+}
+
+- (double) setMinValue: (double)val forChan:(int)channel
+{
+    if(channel>=0 && channel<10){ minValue[channel]=val; return val;}
+    return 0.0;
+}
+
+- (void) setAlarmRangeLow:(double)theLowLimit high:(double)theHighLimit  forChan:(int)channel
+{
+    if(channel>=0 && channel<10){ lowLimit[channel]=theLowLimit; hiLimit[channel]=theHighLimit; }
+}
+
+#endif
 
 
-
-
+#pragma mark •••ID Helpers (see OrcaObject)
+- (NSString*) identifier
+{
+    return [NSString stringWithFormat: @"Amptek-%lu",[self uniqueIdNumber]];
+}
 
 
 
@@ -5358,10 +5555,10 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
 	else {// the first time
 		    //./ DO SOMETHING
             //DEBUG
-    NSLog(@"Called %@::%@: FIRST TIME\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
-			NSLog(@"===================================\n");
-			NSLog(@"   Datataker Loop: first time: %f (elapsedTime %f)\n",currDiffTime,elapsedTime);
-			NSLog(@"===================================\n");
+        //DEBUGNSLog(@"Called %@::%@: FIRST TIME\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+			//DEBUGNSLog(@"===================================\n");
+			//DEBUGNSLog(@"   Datataker Loop: first time: %f (elapsedTime %f)\n",currDiffTime,elapsedTime);
+			//DEBUGNSLog(@"===================================\n");
 		//TODO: -tb- [self writePageManagerReset];
 		//TODO: -tb- [self writeClrCnt];
         

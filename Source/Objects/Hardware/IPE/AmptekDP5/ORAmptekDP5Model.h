@@ -21,10 +21,12 @@
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Imported Files
 #import "ORDataTaker.h"
+#import "ORAuxHw.h"
 #import "ORAdcProcessing.h"
 #import "ORIpeCard.h"
 #import "SBC_Linking.h"
 #import "SBC_Config.h"
+#import "ipe4structure.h"
 
 //for UDP sockets
 #include <arpa/inet.h>
@@ -82,6 +84,8 @@ enum AmptekDP5ASCIICommandEnum {
 #define kFirmwareVersionOffset   24
 #define kFPGAVersionOffset       25
 #define kSerialNumberOffset      26
+#define kDetectorTemperatureMSB  32
+#define kDetectorTemperatureLSB  33
 #define kBoardTemperature        34
 #define kFlags1Offset            35
 #define kFlags2Offset            36
@@ -156,7 +160,49 @@ enum AmptekDP5ASCIICommandEnum {
 #define kTrgTimingTrgWindow		(0x00000007 <<  16) //R/W
 #define kTrgEndPageDelay		(0x000007FF <<   0) //R/W
 
-@interface ORAmptekDP5Model : OrcaObject <ORDataTaker,ORAdcProcessing>  //added ORAdcProcessing 2016-02-11 -tb-
+
+
+//threading
+#define kMaxNumUDPDataPackets 100000
+#define kMaxNumUDPStatusPackets 100  // currently (2013) we expect max. 9 packets; but size might increase and legacy opera status may appear: use min 30 -tb-
+#define kMaxUDPSizeDim 1500     //see comment below
+#define kMaxNumADCChan 720      //see comment below
+typedef struct{
+    int started;
+    int stopNow;
+    id model;
+    struct sockaddr_in sockaddr_data_from;
+    int UDP_DATA_REPLY_SERVER_SOCKET;
+    int isListeningOnDataServerSocket;
+
+    //status packet buffer (I expect max. 
+    char statusBuf[2][kMaxNumUDPStatusPackets][kMaxUDPSizeDim/*1500*/];//store the status UDP packets
+    int statusBufSize[2][kMaxNumUDPStatusPackets];//store the size in bytes of the according status UDP packet
+    int  numStatusPackets[2];
+    TypeIpeCrateStatusBlock  crateStatusBlock[2]; //extra buffer for crate status
+    //ADC buffer: 2 seconds buffer; 20 FLT * 36 chan = 720 ADCs -> 2*720=1440 Bytes; 100 000 samples per ADC channel -> 144 000 000 Bytes / 1440 Bytes (UDP Packet Size) = 100000 Pakete bzw. 144 MB
+    //increased from 1440 to 1500 (packet size)
+    char adcBuf[2][kMaxNumUDPDataPackets][kMaxUDPSizeDim/*1500*/];//store the UDP packets
+    int adcBufSize[2][kMaxNumUDPDataPackets];//store the size in bytes of the according UDP packet
+    int  numDataPackets[2];
+    char adcBufReceivedFlag[2][kMaxNumUDPDataPackets];//flag which marks that this packet was received
+    int  hasDataPackets[2];
+    int  hasDataBytes[2];
+    int  numfifo[2];
+    int  numADCsInDataStream[2];
+    
+    int isSynchronized,wrIndex, rdIndex;
+    uint32_t dataPacketCounter;
+    //trace buffer: reorganized adcBuf to store all 100000 samples of one ADC channel (of 720 ADC channels)
+    uint16_t adcTraceBuf[2][kMaxNumADCChan/*720*/][100000];//TODO: allocate dynamically? (I want to use pure C to be able to use it in Obj-C and C++) -tb-
+    int32_t adcTraceBufCount[2][kMaxNumADCChan/*720*/];//count filled in shorts in accordingadcTraceBuf[2][720][100000]  -tb-
+    
+} THREAD_DATA;
+
+
+//inherit from ORAuxHw to get info to header -tb-
+
+@interface ORAmptekDP5Model : ORAuxHw /*OrcaObject*/ <ORDataTaker,ORAdcProcessing>  //added ORAdcProcessing 2016-02-11 -tb-
 {
 	@private
 		unsigned long	hwVersion;
@@ -260,8 +306,8 @@ enum AmptekDP5ASCIICommandEnum {
     int requestStoppingDataServerSocket;
 //TODO: from SLT        int numRequestedUDPPackets;
 	    //pthread handling
-	    pthread_t dataReplyThread;
-        pthread_mutex_t dataReplyThread_mutex;
+	    //pthread_t dataReplyThread;
+        //pthread_mutex_t dataReplyThread_mutex;
     int sltDAQMode;
     
 #if 0
@@ -302,6 +348,14 @@ enum AmptekDP5ASCIICommandEnum {
     struct timeval lastRequestTime;//    struct timezone tz; is obsolete ... -tb-
     
 
+    //thread and UDP handling
+      //pthread handling
+    pthread_t dataReplyThread;
+    pthread_mutex_t dataReplyThread_mutex;
+    THREAD_DATA dataReplyThreadData;
+
+
+
     NSMutableArray* commandTable;//content of the Amptek Command Table View
     NSMutableArray* savedCommandTable;//saved content of the Amptek Command Table View for undo etc.
     ORSafeQueue*		cmdQueue;
@@ -315,8 +369,17 @@ enum AmptekDP5ASCIICommandEnum {
     int fastCounter;
     int slowCounter;
     int boardTemperature;
+    int detectorTemperature;
+    int deviceID;
+    int FirmwareFPGAVersion;
+    int serialNumber;
     
     BOOL needToDropFirstSpectrum;
+    
+    double maxValue[10];
+    double minValue[10];
+    double lowLimit[10];
+    double hiLimit[10];
 
 }
 
@@ -339,6 +402,14 @@ enum AmptekDP5ASCIICommandEnum {
 - (void) queueStringCommand:(NSString*)aCommand;
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Accessors
+- (int) serialNumber;
+- (void) setSerialNumber:(int)aSerialNumber;
+- (int) FirmwareFPGAVersion;
+- (void) setFirmwareFPGAVersion:(int)aFirmwareFPGAVersion;
+- (int) detectorTemperature;
+- (void) setDetectorTemperature:(int)aDetectorTemperature;
+- (int) deviceID;
+- (void) setDeviceID:(int)aDeviceID;
 - (int) boardTemperature;
 - (void) setBoardTemperature:(int)aBoardTemperature;
 - (int) slowCounter;
@@ -372,6 +443,9 @@ enum AmptekDP5ASCIICommandEnum {
 - (int) setCommandTableItem:(NSString*)itemName setObject:(id)object forKey:(NSString*)key;
 - (int) setCommandTableRow:(int)row setObject:(id)object forKey:(NSString*)key;
 
+- (BOOL) loadCommandTableFile:(NSString*) filename;
+- (BOOL) saveAsCommandTableFile:(NSString*) filename; 
+- (NSString*) getCommandTableAsString; 
 
 
 #pragma mark •••Main Scripting Methods
@@ -384,8 +458,6 @@ enum AmptekDP5ASCIICommandEnum {
 - (int) spectrumRequestType;
 - (void) setSpectrumRequestType:(int)aSpectrumRequestType;
 
-- (BOOL) loadCommandTableFile:(NSString*) filename;
-- (BOOL) saveAsCommandTableFile:(NSString*) filename; 
 - (BOOL) autoReadbackSetpoint;
 - (void) setAutoReadbackSetpoint:(BOOL)aAutoReadbackSetpoint;
 
@@ -732,7 +804,13 @@ enum AmptekDP5ASCIICommandEnum {
 - (double) minValueForChan:(int)channel;
 - (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel;
 
+//custom script methods
+- (double) setMaxValue:(double)val forChan:(int)channel;
+- (double) setMinValue:(double)val forChan:(int)channel;
+- (void) setAlarmRangeLow:(double)theLowLimit high:(double)theHighLimit  forChan:(int)channel;
 
+#pragma mark •••Helpers
+- (NSString*) identifier;
 
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢DataTaker
@@ -761,6 +839,10 @@ enum AmptekDP5ASCIICommandEnum {
 
 @end
 
+extern NSString* ORAmptekDP5ModelSerialNumberChanged;
+extern NSString* ORAmptekDP5ModelFirmwareFPGAVersionChanged;
+extern NSString* ORAmptekDP5ModelDetectorTemperatureChanged;
+extern NSString* ORAmptekDP5ModelDeviceIDChanged;
 extern NSString* ORAmptekDP5ModelBoardTemperatureChanged;
 extern NSString* ORAmptekDP5ModelSlowCounterChanged;
 extern NSString* ORAmptekDP5ModelFastCounterChanged;
