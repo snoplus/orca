@@ -295,6 +295,7 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
         float bat  = [self batteryCapacity];
         if((Vin1<KMinVoltage) || (Vin2<KMinVoltage) || (Vin3<KMinVoltage)){
             if(!powerOutAlarm){
+                NSLog(@"The Main Davis UPS is reporting a power failure. Battery capacity is now %.0f%%\n",bat);
                 powerOutAlarm = [[ORAlarm alloc] initWithName:@"Davis Power Failure" severity:kEmergencyAlarm];
                 [powerOutAlarm setHelpString:@"The Davis UPS is reporting that the input voltage is less then 110V on one or more of the three phases. This Alarm can be silenced by acknowledging it, but it will not be cleared until power is restored."];
                 [powerOutAlarm setSticky:YES];
@@ -305,9 +306,16 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
                 [self startShutdownScript]; //once started, any shutdown runs -- no stopping it.
             }
             if(lastBatteryValue != bat){
-                NSLog(@"The Main Davis UPS is reporting a power failure. Battery capacity is now %.0f%%\n",bat);
+                NSLog(@"UPS Battery capacity is now %.0f%%\n",bat);
                 lastBatteryValue = bat;
             }
+            NSLog(@"UPS Time Remaining: %@\n",[self valueForBattery:0 batteryTableIndex:3]);
+            NSLog(@"UPS Load (Amps) L1:%@ L2:%@ L3:%@\n",
+                  [self valueForLoadPhase:1 loadTableIndex:1],
+                  [self valueForLoadPhase:2 loadTableIndex:1],
+                  [self valueForLoadPhase:3 loadTableIndex:1]
+                  );
+
         }
         else {
             if([powerOutAlarm isPosted]){
