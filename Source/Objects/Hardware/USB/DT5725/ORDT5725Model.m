@@ -1757,14 +1757,14 @@ static NSString* DT5725StartStopRunModeString[4] = {
 #pragma mark ***Helpers
 - (float) convertDacToVolts:(unsigned short)aDacValue dynamicRange:(BOOL)dynamicRange
 {
-    if(dynamicRange) return       (aDacValue/65535.) - 0.25;
-    else             return     2*(aDacValue/65535.) - 1.0;
+    if(dynamicRange) return 0.5*(aDacValue/65535.) - 0.25;
+    else             return 2*(aDacValue/65535.) - 1.0;
 }
 
 - (unsigned short) convertVoltsToDac:(float)aVoltage dynamicRange:(BOOL)dynamicRange
 {
-    if(dynamicRange) return (unsigned short)(65535. * (aVoltage + 0.25));
-    else             return (unsigned short)(65535 * (aVoltage+1.0)/2.);
+    if(dynamicRange) return (unsigned short)(65535. * (aVoltage + 0.25) / 0.5);
+    else             return (unsigned short)(65535. * (aVoltage + 1.0)/2.);
 }
 
 

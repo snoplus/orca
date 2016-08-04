@@ -127,7 +127,7 @@ typedef struct  {
     //Advanced Controls
     unsigned short  selfTrigPulseWidth[kNumDT5725Channels];
     unsigned short  selfTrigLogic[kNumDT5725Channels/2];
-    unsigned short  selfTrigPulseType[kNumDT5725Channels];
+    unsigned short  selfTrigPulseType[kNumDT5725Channels/2];
     unsigned short  startStopRunMode;
     BOOL			countAllTriggers;
     BOOL            memFullMode;
@@ -375,7 +375,7 @@ typedef struct  {
 
 #pragma mark ***Helpers
 - (float)			convertDacToVolts:(unsigned short)aDacValue dynamicRange:(BOOL)dynamicRange;
-- (unsigned short)	convertVoltsToDac:(float)aVoltage dynamicRange:(BOOL)range;
+- (unsigned short)	convertVoltsToDac:(float)aVoltage dynamicRange:(BOOL)dynamicRange;
 - (void)            addCurrentState:(NSMutableDictionary*)dictionary longArray:(long*)anArray forKey:(NSString*)aKey;
 - (void)            addCurrentState:(NSMutableDictionary*)dictionary uShortArray:(unsigned short*)anArray forKey:(NSString*)aKey;
 

@@ -344,7 +344,7 @@
 - (void) awakeFromNib
 {
     lowLevelSize   = NSMakeSize(300,360);
-    basicSize      = NSMakeSize(970,560);
+    basicSize      = NSMakeSize(930,630);
     monitoringSize = NSMakeSize(783,390);
     
     blankView = [[NSView alloc] init];
@@ -586,8 +586,8 @@
 - (void) selfTrigPulseWidthChanged:(NSNotification*)aNote
 {
     if(aNote){
-        int chnl = [[[aNote userInfo] objectForKey:ORDT5725Chnl] intValue];
-        [[selfTrigPulseWidthMatrix cellWithTag:chnl] setIntValue:[model selfTrigPulseWidth:chnl]];
+        int chan = [[[aNote userInfo] objectForKey:ORDT5725Chnl] intValue];
+        [[selfTrigPulseWidthMatrix cellWithTag:chan] setIntValue:[model selfTrigPulseWidth:chan]];
     }
     else {
         int i;
@@ -600,7 +600,7 @@
 - (void) selfTrigLogicChanged:(NSNotification*)aNote
 {
     if(aNote){
-        int chan = [[[aNote userInfo] objectForKey:ORDT5725Chnl] intValue];
+        int chan = [[[aNote userInfo] objectForKey:ORDT5725Chnl] intValue] / 2;
         [[selfTrigLogicMatrix cellAtRow:chan column:0] selectItemAtIndex:[model selfTrigLogic:chan]];
     }
     else {
@@ -613,13 +613,13 @@
 - (void) selfTrigPulseTypeChanged:(NSNotification*)aNote
 {
     if(aNote){
-        int chnl = [[[aNote userInfo] objectForKey:ORDT5725Chnl] intValue];
-        [[selfTrigPulseTypeMatrix cellWithTag:chnl] selectItemAtIndex:[model selfTrigPulseType:chnl]];
+        int chan = [[[aNote userInfo] objectForKey:ORDT5725Chnl] intValue] / 2;
+        [[selfTrigPulseTypeMatrix cellAtRow:chan column:0] selectItemAtIndex:[model selfTrigPulseType:chan]];
     }
     else {
         int i;
-        for (i = 0; i < kNumDT5725Channels; i++){
-            [[selfTrigPulseTypeMatrix cellWithTag:i] selectItemAtIndex:[model selfTrigPulseType:i]];
+        for (i = 0; i < kNumDT5725Channels/2; i++){
+            [[selfTrigPulseTypeMatrix cellAtRow:i column:0] selectItemAtIndex:[model selfTrigPulseType:i]];
         }
     }
 }
@@ -627,8 +627,8 @@
 - (void) thresholdChanged:(NSNotification*) aNotification
 {
     if(aNotification){
-        int chnl = [[[aNotification userInfo] objectForKey:ORDT5725Chnl] intValue];
-        [[thresholdMatrix cellWithTag:chnl] setIntValue:[model threshold:chnl]];
+        int chan = [[[aNotification userInfo] objectForKey:ORDT5725Chnl] intValue];
+        [[thresholdMatrix cellWithTag:chan] setIntValue:[model threshold:chan]];
     }
     else {
         int i;
@@ -641,8 +641,8 @@
 - (void) dcOffsetChanged:(NSNotification*)aNote
 {
     if(aNote){
-        int chnl = [[[aNote userInfo] objectForKey:ORDT5725Chnl] intValue];
-        [[dcOffsetMatrix cellWithTag:chnl] setFloatValue:[model convertDacToVolts:[model dcOffset:chnl] dynamicRange:[model inputDynamicRange:chnl]]];
+        int chan = [[[aNote userInfo] objectForKey:ORDT5725Chnl] intValue];
+        [[dcOffsetMatrix cellWithTag:chan] setFloatValue:[model convertDacToVolts:[model dcOffset:chan] dynamicRange:[model inputDynamicRange:chan]]];
     }
     else {
         int i;
@@ -797,7 +797,7 @@
 
 - (void) fpHeaderPatternChanged:(NSNotification*)aNote
 {
-    [fpHeaderPatternMatrix selectCellWithTag:[model fpHeaderPattern]];
+    [fpHeaderPatternMatrix selectCellWithTag:[model fpHeaderPattern]-1];
 }
 
 - (void) enabledMaskChanged:(NSNotification*)aNote
@@ -991,11 +991,11 @@
     [fpTrigInSigEdgeDisableButton       setEnabled:!lockedOrRunningMaintenance];
     [fpTrigInToMezzaninesButton         setEnabled:!lockedOrRunningMaintenance];
     [fpForceTrigOutButton               setEnabled:!lockedOrRunningMaintenance];
-    [fpTrigOutModePU                setEnabled:!lockedOrRunningMaintenance];
+    [fpTrigOutModePU                    setEnabled:!lockedOrRunningMaintenance];
     [fpTrigOutModeSelectPU              setEnabled:!lockedOrRunningMaintenance];
     [fpMBProbeSelectPU                  setEnabled:!lockedOrRunningMaintenance];
     [fpBusyUnlockButton                 setEnabled:!lockedOrRunningMaintenance];
-    [fpHeaderPatternMatrix                  setEnabled:!lockedOrRunningMaintenance];
+    [fpHeaderPatternMatrix              setEnabled:!lockedOrRunningMaintenance];
 
     [fanSpeedModeMatrix                 setEnabled:!lockedOrRunningMaintenance];
     [almostFullLevelTextField           setEnabled:!lockedOrRunningMaintenance];
@@ -1030,12 +1030,12 @@
 
 - (IBAction) selfTrigLogicAction:(id)sender
 {
-    [model setSelfTrigLogic:[[sender selectedCell] tag] withValue:[sender indexOfSelectedItem]];
+    [model setSelfTrigLogic:[sender selectedRow] withValue:[[sender selectedCell] indexOfSelectedItem]];
 }
 
 - (IBAction) selfTrigPulseTypeAction:(id)sender
 {
-    [model setSelfTrigPulseType:[[sender selectedCell] tag] withValue:[sender indexOfSelectedItem]];
+    [model setSelfTrigPulseType:[sender selectedRow] withValue:[[sender selectedCell] indexOfSelectedItem]];
 }
 
 - (IBAction) dcOffsetAction:(id) sender
@@ -1043,12 +1043,12 @@
     float aVoltage = [[sender selectedCell] floatValue];
     BOOL dynamicRange = [model inputDynamicRange:[[sender selectedCell] tag]];
     if(dynamicRange){
-        if(aVoltage < -1)     aVoltage = -1;
-        else if(aVoltage > 1) aVoltage = 1;
+        if(aVoltage < -0.25) aVoltage = -0.25;
+        else if(aVoltage > 0.25) aVoltage = 0.25;
     }
     else{
-        if(aVoltage < -0.25)     aVoltage = -0.25;
-        else if(aVoltage > 0.25) aVoltage = 0.25;
+        if(aVoltage < -1) aVoltage = -1;
+        else if(aVoltage > 1) aVoltage = 1;
     }
     unsigned short aValue = [model convertVoltsToDac:aVoltage dynamicRange:dynamicRange];
     [model setDCOffset:[sender selectedRow] withValue:aValue];
@@ -1071,7 +1071,7 @@
 
 - (void) eventSizeAction:(id)sender
 {
-    [model setEventSize:[sender indexOfSelectedItem]];
+    [model setEventSize:[sender intValue]];
 }
 
 - (IBAction) clockSourceAction:(id)sender
@@ -1086,7 +1086,7 @@
 
 - (IBAction) startStopRunModeAction:(id)sender
 {
-    [model setStartStopRunMode:[[sender selectedCell] tag]];
+    [model setStartStopRunMode:[sender indexOfSelectedItem]];
 }
 
 - (IBAction) memFullModeAction:(id)sender
@@ -1151,7 +1151,7 @@
 
 - (IBAction) trigOutCoincidenceLevelAction:(id)sender
 {
-    [model trigOutCoincidenceLevelAction:[sender indexOfSelectedItem]];
+    [model trigOutCoincidenceLevelAction:[sender intValue]];
 }
 
 - (IBAction) postTriggerSettingAction:(id)sender
@@ -1181,7 +1181,7 @@
 
 - (IBAction) fpTrigOutModeAction:(id)sender
 {
-    [model setFpTrigOutMode:[[sender selectedCell] tag]];
+    [model setFpTrigOutMode:[sender indexOfSelectedItem]];
 }
 
 - (IBAction) fpTrigOutModeSelectAction:(id)sender
@@ -1196,12 +1196,12 @@
 
 - (IBAction) fpBusyUnlockSelectAction:(id)sender
 {
-    [model setFpBusyUnlockSelect:[[sender selectedCell] tag]];
+    [model setFpBusyUnlockSelect:[sender intValue]];
 }
 
 - (IBAction) fpHeaderPatternAction:(id)sender
 {
-    [model setFpHeaderPattern:[sender indexOfSelectedItem]];
+    [model setFpHeaderPattern:[[sender selectedCell] tag] + 1];
 }
 
 - (void) enabledMaskAction:(id)sender

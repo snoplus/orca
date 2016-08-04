@@ -29,53 +29,54 @@
     IBOutlet NSTabView* 	tabView;
     
     //By Channel
-    IBOutlet NSMatrix*      inputDynamicRangeMatrix;
-    IBOutlet NSMatrix*      selfTrigPulseWidthMatrix;
-    IBOutlet NSMatrix*		thresholdMatrix;
-    IBOutlet NSMatrix*      selfTrigLogicMatrix;
-    IBOutlet NSMatrix*      selfTrigPulseTypeMatrix;
-    IBOutlet NSMatrix*      dcOffsetMatrix;
+    IBOutlet NSMatrix*      inputDynamicRangeMatrix; // Pop Up
+    IBOutlet NSMatrix*      selfTrigPulseWidthMatrix; //Text Box
+    IBOutlet NSMatrix*		thresholdMatrix; //Text Box
+    IBOutlet NSMatrix*      dcOffsetMatrix; //Text Box
+    IBOutlet NSMatrix*		enabledMaskMatrix; //Check box
 
-    IBOutlet NSMatrix*      trigOnUnderThresholdMatrix;
-    IBOutlet NSButton*      testPatternEnabledButton;
-    IBOutlet NSButton*      trigOverlapEnabledButton;
+    //By pair of Channels
+    IBOutlet NSMatrix*      selfTrigLogicMatrix; //PopUp
+    IBOutlet NSMatrix*      selfTrigPulseTypeMatrix; //PopUp
+    IBOutlet NSMatrix*		triggerSourceEnableMaskMatrix; //Check box
+    IBOutlet NSMatrix*		triggerOutMaskMatrix; //Check box
 
-    IBOutlet NSTextField*	eventSizeTextField;
+    //By Board
+    IBOutlet NSMatrix*      trigOnUnderThresholdMatrix; //Radio buttons
+    IBOutlet NSButton*      testPatternEnabledButton; //Check Box
+    IBOutlet NSButton*      trigOverlapEnabledButton; //Check Box
 
-    IBOutlet NSPopUpButton* clockSourcePU;
-    IBOutlet NSMatrix*		countAllTriggersMatrix;
-	IBOutlet NSPopUpButton* startStopRunModePU; //sw, gpi, or firstTrig
-    IBOutlet NSMatrix*      memFullModeMatrix;
+    IBOutlet NSPopUpButton* clockSourcePU; //popup
+    IBOutlet NSMatrix*		countAllTriggersMatrix; //Radio buttons
+	IBOutlet NSPopUpButton* startStopRunModePU; //Popup
+    IBOutlet NSMatrix*      memFullModeMatrix; //Radio
 
-	IBOutlet NSButton*      softwareTrigEnabledButton;
-	IBOutlet NSButton*      externalTrigEnabledButton;
-    IBOutlet NSTextField*   coincidenceWindowTextField;
-    IBOutlet NSTextField*	coincidenceLevelTextField;
-    IBOutlet NSMatrix*		triggerSourceEnableMaskMatrix;
+	IBOutlet NSButton*      softwareTrigEnabledButton; //Check box
+	IBOutlet NSButton*      externalTrigEnabledButton; //Check box
+    IBOutlet NSTextField*   coincidenceWindowTextField; //Text Box
+    IBOutlet NSTextField*	coincidenceLevelTextField; //Text Box
 
-    IBOutlet NSButton*      swTrigOutEnabledButton;
-    IBOutlet NSButton*      extTrigOutEnabledButton;
-    IBOutlet NSMatrix*		triggerOutMaskMatrix;
-    IBOutlet NSPopUpButton* triggerOutLogicPU;
-    IBOutlet NSTextField*   trigOutCoincidenceLevelTextField;
+    IBOutlet NSButton*      swTrigOutEnabledButton; //Check Box
+    IBOutlet NSButton*      extTrigOutEnabledButton; //Check Box
+    IBOutlet NSPopUpButton* triggerOutLogicPU; //popup
+    IBOutlet NSTextField*   trigOutCoincidenceLevelTextField; //TextBox
 
-    IBOutlet NSTextField*	postTriggerSettingTextField;
+    IBOutlet NSTextField*	postTriggerSettingTextField; //textBox
+    IBOutlet NSTextField*	eventSizeTextField; //Text Field
 
-    IBOutlet NSMatrix*      fpLogicTypeMatrix;
-    IBOutlet NSButton*      fpTrigInSigEdgeDisableButton;
-    IBOutlet NSButton*      fpTrigInToMezzaninesButton;
-    IBOutlet NSButton*      fpForceTrigOutButton;
-    IBOutlet NSPopUpButton* fpTrigOutModePU;
-    IBOutlet NSPopUpButton* fpTrigOutModeSelectPU;
-    IBOutlet NSPopUpButton* fpMBProbeSelectPU;
-    IBOutlet NSButton*      fpBusyUnlockButton;
-    IBOutlet NSMatrix*      fpHeaderPatternMatrix;
+    IBOutlet NSMatrix*      fpLogicTypeMatrix; //radio
+    IBOutlet NSButton*      fpTrigInSigEdgeDisableButton; //check box
+    IBOutlet NSButton*      fpTrigInToMezzaninesButton; //check box
+    IBOutlet NSButton*      fpForceTrigOutButton; //check box
+    IBOutlet NSPopUpButton* fpTrigOutModePU; //popup
+    IBOutlet NSPopUpButton* fpTrigOutModeSelectPU; //popup
+    IBOutlet NSPopUpButton* fpMBProbeSelectPU; //popup
+    IBOutlet NSButton*      fpBusyUnlockButton; //check box
+    IBOutlet NSMatrix*      fpHeaderPatternMatrix; //radio
 
-    IBOutlet NSMatrix*		enabledMaskMatrix;
-
-    IBOutlet NSMatrix*      fanSpeedModeMatrix;
-    IBOutlet NSTextField*   almostFullLevelTextField;
-    IBOutlet NSTextField*   runDelayTextField;
+    IBOutlet NSMatrix*      fanSpeedModeMatrix; //radio
+    IBOutlet NSTextField*   almostFullLevelTextField; //text box
+    IBOutlet NSTextField*   runDelayTextField; //text box
 
     IBOutlet NSStepper* 	writeValueStepper;
     IBOutlet NSTextField* 	writeValueTextField;
@@ -92,13 +93,13 @@
     IBOutlet NSTextField*	registerOffsetTextField;
     IBOutlet NSTextField*	registerReadWriteTextField;
     
-    IBOutlet NSMatrix*      adcTempMatrix;
-    IBOutlet NSButton*      adcCalibrateButton;
-    IBOutlet NSTextField*   adcCalibrateTextField;
-    IBOutlet NSButton*		softwareTriggerButton;
-    IBOutlet NSButton*      softwareResetButton;
-    IBOutlet NSButton*      softwareClearButton;
-    IBOutlet NSButton*      configReloadButton;
+    IBOutlet NSMatrix*      adcTempMatrix; //text box (auto update?)
+    IBOutlet NSButton*      adcCalibrateButton; //push button
+    IBOutlet NSTextField*   adcCalibrateTextField; //text box (auto update?)
+    IBOutlet NSButton*		softwareTriggerButton; //push button
+    IBOutlet NSButton*      softwareResetButton; //push button
+    IBOutlet NSButton*      softwareClearButton; //push button
+    IBOutlet NSButton*      configReloadButton; //push button
 	
     IBOutlet NSButton*		initButton;
     IBOutlet NSButton*		reportButton;
