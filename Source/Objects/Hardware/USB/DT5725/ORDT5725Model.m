@@ -1324,7 +1324,7 @@ static NSString* DT5725StartStopRunModeString[4] = {
                     pulseWidth,
                     trigLogicString,
                     statusString,
-				    [self convertDacToVolts:dacOffset range:(BOOL)dynRange],
+				    [self convertDacToVolts:dacOffset dynamicRange:(BOOL)dynRange],
                     [NSString stringWithFormat: @"%lu ºC", adcTemp],
 				    triggerSrc&(1<<chan)?@"Y":@"N");
 	}
@@ -1755,24 +1755,16 @@ static NSString* DT5725StartStopRunModeString[4] = {
 
 
 #pragma mark ***Helpers
-- (float) convertDacToVolts:(unsigned short)aDacValue range:(BOOL)dynamicRange
+- (float) convertDacToVolts:(unsigned short)aDacValue dynamicRange:(BOOL)dynamicRange
 {
-    if(dynamicRange){
-        return (float)(0.5*(2*aDacValue/65535. - 1.0));
-    }
-    else{
-        return (float)(2*aDacValue/65535. - 1.0);
-    }
+    if(dynamicRange) return       (aDacValue/65535.) - 0.25;
+    else             return     2*(aDacValue/65535.) - 1.0;
 }
 
-- (unsigned short) convertVoltsToDac:(float)aVoltage range:(BOOL)dynamicRange
+- (unsigned short) convertVoltsToDac:(float)aVoltage dynamicRange:(BOOL)dynamicRange
 {
-    if(dynamicRange){
-        return (unsigned short)(65535. * (aVoltage + 0.25));
-    }
-    else{
-	    return (unsigned short)(65535. * (aVoltage + 1.0) / 2.);
-    }
+    if(dynamicRange) return (unsigned short)(65535. * (aVoltage + 0.25));
+    else             return (unsigned short)(65535 * (aVoltage+1.0)/2.);
 }
 
 
@@ -2175,7 +2167,7 @@ static NSString* DT5725StartStopRunModeString[4] = {
 	
 	int i;
     for (i = 0; i < kNumDT5725Channels; i++){
-        [self setInputDynamicRange:i    withValue:[aDecoder decodeIntForKey: [NSString stringWithFormat:@"dynamicRange%d", i]]];
+        [self setInputDynamicRange:i    withValue:[aDecoder decodeIntForKey: [NSString stringWithFormat:@"inputDynamicRange%d", i]]];
         [self setSelfTrigPulseWidth:i   withValue:[aDecoder decodeIntForKey:  [NSString stringWithFormat:@"selfTrigPulseWidth%d", i]]];
         [self setThreshold:i            withValue:[aDecoder decodeIntForKey:  [NSString stringWithFormat:@"threshold%d", i]]];
         [self setSelfTrigPulseType:i    withValue:[aDecoder decodeBoolForKey: [NSString stringWithFormat:@"selfTrigPulseType%d", i]]];

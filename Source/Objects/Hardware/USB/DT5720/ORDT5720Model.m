@@ -1549,14 +1549,12 @@ static NSString* DT5720RunModeString[4] = {
 #pragma mark ***Helpers
 - (float) convertDacToVolts:(unsigned short)aDacValue
 {
-	return 2*aDacValue/65535. - 1.0;
-    //return 2*((short)aDacValue)/65535.;
+	return 2*(aDacValue/65535.) - 1.0;
 }
 
 - (unsigned short) convertVoltsToDac:(float)aVoltage
 {
-	return (unsigned short)(65535. * (aVoltage+1.0)/2.);
-    //return (unsigned short)((short) (65535. * (aVoltage)/2.));
+	return (unsigned short)(65535 * (aVoltage+1.0)/2.);
 }
 
 

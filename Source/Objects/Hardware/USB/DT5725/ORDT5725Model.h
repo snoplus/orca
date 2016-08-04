@@ -374,8 +374,8 @@ typedef struct  {
 - (float)           totalByteRate;
 
 #pragma mark ***Helpers
-- (float)			convertDacToVolts:(unsigned short)aDacValue range:(BOOL)dynamicRange;
-- (unsigned short)	convertVoltsToDac:(float)aVoltage range:(BOOL)dynamicRange;
+- (float)			convertDacToVolts:(unsigned short)aDacValue dynamicRange:(BOOL)dynamicRange;
+- (unsigned short)	convertVoltsToDac:(float)aVoltage dynamicRange:(BOOL)range;
 - (void)            addCurrentState:(NSMutableDictionary*)dictionary longArray:(long*)anArray forKey:(NSString*)aKey;
 - (void)            addCurrentState:(NSMutableDictionary*)dictionary uShortArray:(unsigned short*)anArray forKey:(NSString*)aKey;
 

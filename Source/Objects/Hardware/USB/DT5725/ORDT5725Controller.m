@@ -642,12 +642,12 @@
 {
     if(aNote){
         int chnl = [[[aNote userInfo] objectForKey:ORDT5725Chnl] intValue];
-        [[dcOffsetMatrix cellWithTag:chnl] setFloatValue:[model convertDacToVolts:[model dcOffset:chnl] range:[model inputDynamicRange:chnl]]];
+        [[dcOffsetMatrix cellWithTag:chnl] setFloatValue:[model convertDacToVolts:[model dcOffset:chnl] dynamicRange:[model inputDynamicRange:chnl]]];
     }
     else {
         int i;
         for (i = 0; i < kNumDT5725Channels; i++){
-            [[dcOffsetMatrix cellWithTag:i] setFloatValue:[model convertDacToVolts:[model dcOffset:i] range:[model inputDynamicRange:i]]];
+            [[dcOffsetMatrix cellWithTag:i] setFloatValue:[model convertDacToVolts:[model dcOffset:i] dynamicRange:[model inputDynamicRange:i]]];
         }
     }
 }
@@ -1043,14 +1043,15 @@
     float aVoltage = [[sender selectedCell] floatValue];
     BOOL dynamicRange = [model inputDynamicRange:[[sender selectedCell] tag]];
     if(dynamicRange){
-        if(aVoltage < -1) aVoltage = -1;
+        if(aVoltage < -1)     aVoltage = -1;
         else if(aVoltage > 1) aVoltage = 1;
     }
     else{
-        if(aVoltage < -0.25) aVoltage = -0.25;
+        if(aVoltage < -0.25)     aVoltage = -0.25;
         else if(aVoltage > 0.25) aVoltage = 0.25;
     }
-    [model setDCOffset:[[sender selectedCell] tag] withValue:[model convertVoltsToDac:aVoltage range:dynamicRange]];
+    unsigned short aValue = [model convertVoltsToDac:aVoltage dynamicRange:dynamicRange];
+    [model setDCOffset:[sender selectedRow] withValue:aValue];
 }
 
 - (IBAction) trigOnUnderThresholdAction:(id)sender
