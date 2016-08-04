@@ -1162,7 +1162,7 @@
                                                         </connections>
                                                     </matrix>
                                                     <matrix verticalHuggingPriority="750" mode="track" allowsEmptySelection="NO" autosizesCells="NO" id="2MI-fn-vLL">
-                                                        <rect key="frame" x="36" y="14" width="27" height="184"/>
+                                                        <rect key="frame" x="36" y="17" width="27" height="184"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         <size key="cellSize" width="27" height="23"/>

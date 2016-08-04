@@ -948,7 +948,7 @@ static NSString* DT5725StartStopRunModeString[4] = {
 
 - (void) setEnabledMask:(unsigned short)aEnabledMask
 {
-    if(aEnabledMask>0xf)aEnabledMask = 0xf;
+    aEnabledMask &= 0xff;
     if(aEnabledMask!=enabledMask){
         [[[self undoManager] prepareWithInvocationTarget:self] setEnabledMask:enabledMask];
         enabledMask = aEnabledMask;
@@ -1277,10 +1277,6 @@ static NSString* DT5725StartStopRunModeString[4] = {
 	NSLogFont(theFont,@"----------------------------------------------------------------------------------------------------------------\n");
 	NSLogFont(theFont,@"Chan | Enabled | Thres | Dynamic Range | Pulse Width | Self-Trigger Logic | Status | Offset | ADC Temp | trigSrc\n");
 	NSLogFont(theFont,@"----------------------------------------------------------------------------------------------------------------\n");
-    int group;
-    for(group=0;group<kNumDT5725Channels/2;group++){
-        [self readChan:group reg:kSelfTrigLogic returnValue:&trigLogic];
-    }
     int chan;
     for(chan=0;chan<kNumDT5725Channels;chan++){
 		[self readChan:chan reg:kThresholds returnValue:&threshold];
@@ -1289,32 +1285,31 @@ static NSString* DT5725StartStopRunModeString[4] = {
 		[self readChan:chan reg:kStatus returnValue:&status];
         [self readChan:chan reg:kDCOffset returnValue:&dacOffset];
         [self readChan:chan reg:kAdcTemp returnValue:&adcTemp];
+        [self readChan:chan reg:kSelfTrigLogic returnValue:&trigLogic];
 
         NSString* dynRangeString = @"";
-        if(dynRange & 0x01) dynRangeString = @"0.5 V";
+        if(dynRange & 0x1)  dynRangeString = @"0.5 V";
         else                dynRangeString = @"2 V";
 
 		NSString* statusString = @"";
-		if(status & 0x08)		statusString = [statusString stringByAppendingString:@"Calib-"];
-        else                    statusString = [statusString stringByAppendingString:@"Not Calib-"];
+		if(status & 0x08)		statusString = [statusString stringByAppendingString:@"Calib Done-"];
+        else                    statusString = [statusString stringByAppendingString:@"Calibrating-"];
 		if(status & 0x04)		statusString = [statusString stringByAppendingString:@"DAC Busy-"];
         else                    statusString = [statusString stringByAppendingString:@"DAC Set-"];
 		if(status & 0x02)		statusString = [statusString stringByAppendingString:@"Empty"];
 		else if(status & 0x01)	statusString = [statusString stringByAppendingString:@"Full"];
 
         NSString* trigLogicString = @"";
-       if(chan%2 == 0){
-            if(trigLogic & 0x03){
-                if(trigLogic & 0x02){
-                    if(trigLogic & 0x01)    trigLogicString = @"or";
-                    else                    trigLogicString = [NSString stringWithFormat: @"%d", chan+1];
-                }
-                else                        trigLogicString = [NSString stringWithFormat: @"%d", chan];
+        if(trigLogic & 0x03){
+            if(trigLogic & 0x02){
+                if(trigLogic & 0x01)    trigLogicString = @"OR";
+                else                    trigLogicString = [NSString stringWithFormat: @"%d", 2*(chan/2) + 1];
             }
-            else                            trigLogicString = @"and";
-            if(trigLogic & 0x4) trigLogicString = [trigLogicString stringByAppendingString:@"-over/under"];
-            else                trigLogicString = [trigLogicString stringByAppendingString:@"-pulseWidth"];
+            else                        trigLogicString = [NSString stringWithFormat: @"%d", 2*(chan/2)];
         }
+        else                            trigLogicString = @"AND";
+        if(trigLogic & 0x4) trigLogicString = [trigLogicString stringByAppendingString:@"-over/under"];
+        else                trigLogicString = [trigLogicString stringByAppendingString:@"-pulseWidth"];
 
         NSLogFont(theFont,@"%d | %@ | %d | %@ | %d | %@ | %@ | %6.3f | %@ | %@\n",
 				    chan, 
@@ -1326,12 +1321,12 @@ static NSString* DT5725StartStopRunModeString[4] = {
                     statusString,
 				    [self convertDacToVolts:dacOffset dynamicRange:(BOOL)dynRange],
                     [NSString stringWithFormat: @"%lu ºC", adcTemp],
-				    triggerSrc&(1<<chan)?@"Y":@"N");
+				    triggerSrc&(1<<(chan/2))?@"Y":@"N");
 	}
 	NSLogFont(theFont,@"----------------------------------------------------------------------------------------------------------------\n");
     
-	NSLogFont(theFont,@"Software Trigger  : %@\n",triggerSrc&0xf0000000?@"Enabled":@"Disabled");
-	NSLogFont(theFont,@"External Trigger  : %@\n",triggerSrc&0x80000000?@"Enabled":@"Disabled");
+	NSLogFont(theFont,@"Software Trigger  : %@\n",(triggerSrc >> 31)&0x1?@"Enabled":@"Disabled");
+	NSLogFont(theFont,@"External Trigger  : %@\n",(triggerSrc >> 30)&0x1?@"Enabled":@"Disabled");
 	NSLogFont(theFont,@"Coincidence Level : %d\n",(triggerSrc >> 24) & 0x7);
     NSLogFont(theFont,@"Coincidence Window: %d ns\n",((triggerSrc >> 20) & 0xf)*4);
 	
@@ -1368,14 +1363,21 @@ static NSString* DT5725StartStopRunModeString[4] = {
     [self readConfigurationROM];
     [self writeAcquisitionControl:NO]; // Make sure it's off.
     [self clearAllMemory];
-    [self writeSize];
+    [self writeDynamicRanges];
+    [self writeTrigPulseWidths];
     [self writeThresholds];
+    [self writeSelfTrigLogics];
+    [self writeDCOffsets];
 	[self writeBoardConfiguration];
+    [self writeSize];
     [self writeTriggerSourceEnableMask];
     [self writeFrontPanelTriggerOutEnableMask];
     [self writePostTriggerSetting];
     [self writeFrontPanelIOControl];
 	[self writeChannelEnabledMask];
+    [self writeFanSpeedControl];
+    [self writeBufferAlmostFull];
+    [self writeRunDelay];
     [self writeNumBLTEventsToReadout];
 }
 
@@ -1470,7 +1472,7 @@ static NSString* DT5725StartStopRunModeString[4] = {
 {
     short i;
     for (i = 0; i < kNumDT5725Channels; i++){
-        [self writeThreshold:i];
+        [self writeDynamicRange:i];
     }
 }
 
@@ -1524,7 +1526,7 @@ static NSString* DT5725StartStopRunModeString[4] = {
     unsigned long aValue = [self selfTrigLogic:i];
     aValue |= ([self selfTrigPulseType:i] & 0x1) << 2;
     [self writeLongBlock:&aValue
-               atAddress:reg[kSelfTrigLogic].addressOffset + (2*(i/2) * 0x100)];
+               atAddress:reg[kSelfTrigLogic].addressOffset + ((2*i) * 0x100)];
 }
 
 - (void) writeDCOffsets
@@ -1652,7 +1654,7 @@ static NSString* DT5725StartStopRunModeString[4] = {
 
 - (void) writeChannelEnabledMask
 {
-    unsigned long aValue = enabledMask & 0xf;
+    unsigned long aValue = enabledMask & 0xff;
     [self writeLongBlock:&aValue
                atAddress:reg[kChanEnableMask].addressOffset];
     
