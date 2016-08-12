@@ -754,8 +754,10 @@
 	[pulseCountField	setEnabled:!lockedOrRunningMaintenance && ![model loopForever]];
 	[enabled0PU			setEnabled:!lockedOrRunningMaintenance];
 	[enabled1PU			setEnabled:!lockedOrRunningMaintenance];
-	[finalAttenuated0PU setEnabled:!lockedOrRunningMaintenance];
-	[finalAttenuated1PU setEnabled:!lockedOrRunningMaintenance];
+    [attenuated0PU      setEnabled:!lockedOrRunningMaintenance];
+    [attenuated1PU      setEnabled:!lockedOrRunningMaintenance];
+    [finalAttenuated0PU setEnabled:!lockedOrRunningMaintenance];
+    [finalAttenuated1PU setEnabled:!lockedOrRunningMaintenance];
 	[pulseHighTimeField setEnabled:!lockedOrRunningMaintenance];
 	[pulseLowTimeField	setEnabled:!lockedOrRunningMaintenance];
 	[dacsMatrix			setEnabled:!lockedOrRunningMaintenance];
