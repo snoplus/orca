@@ -2185,6 +2185,12 @@
 		84992CB70DD21F3800E82DB4 /* ORHP3458aController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84992CB10DD21F3800E82DB4 /* ORHP3458aController.m */; };
 		84992CB80DD21F3800E82DB4 /* ORHP3458aModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84992CB20DD21F3800E82DB4 /* ORHP3458aModel.h */; };
 		84992CB90DD21F3800E82DB4 /* ORHP3458aModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84992CB30DD21F3800E82DB4 /* ORHP3458aModel.m */; };
+		849951741D5CE50700A6FA40 /* MJDBiasWatcher.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8499516C1D5CE50700A6FA40 /* MJDBiasWatcher.nib */; };
+		849951751D5CE50700A6FA40 /* MJDBiasWatcher.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8499516D1D5CE50700A6FA40 /* MJDBiasWatcher.tif */; };
+		849951761D5CE50700A6FA40 /* ORMJDBiasWatcherController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8499516E1D5CE50700A6FA40 /* ORMJDBiasWatcherController.h */; };
+		849951771D5CE50700A6FA40 /* ORMJDBiasWatcherController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8499516F1D5CE50700A6FA40 /* ORMJDBiasWatcherController.m */; };
+		8499517A1D5CE50700A6FA40 /* ORMJDBiasWatcherModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 849951721D5CE50700A6FA40 /* ORMJDBiasWatcherModel.h */; };
+		8499517B1D5CE50700A6FA40 /* ORMJDBiasWatcherModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 849951731D5CE50700A6FA40 /* ORMJDBiasWatcherModel.m */; };
 		8499786F1746C7C100BFEE3E /* ORPollingTimeStampDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 849978671746C7C100BFEE3E /* ORPollingTimeStampDecoder.h */; };
 		849978701746C7C100BFEE3E /* ORPollingTimeStampDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 849978681746C7C100BFEE3E /* ORPollingTimeStampDecoder.m */; };
 		849978711746C7C100BFEE3E /* ORPollingTimeStampModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 849978691746C7C100BFEE3E /* ORPollingTimeStampModel.h */; };
@@ -5659,6 +5665,12 @@
 		84992CB10DD21F3800E82DB4 /* ORHP3458aController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHP3458aController.m; path = Source/Objects/Hardware/GPIB/HP3458a/ORHP3458aController.m; sourceTree = SOURCE_ROOT; };
 		84992CB20DD21F3800E82DB4 /* ORHP3458aModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHP3458aModel.h; path = Source/Objects/Hardware/GPIB/HP3458a/ORHP3458aModel.h; sourceTree = SOURCE_ROOT; };
 		84992CB30DD21F3800E82DB4 /* ORHP3458aModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHP3458aModel.m; path = Source/Objects/Hardware/GPIB/HP3458a/ORHP3458aModel.m; sourceTree = SOURCE_ROOT; };
+		8499516C1D5CE50700A6FA40 /* MJDBiasWatcher.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = MJDBiasWatcher.nib; sourceTree = "<group>"; };
+		8499516D1D5CE50700A6FA40 /* MJDBiasWatcher.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = MJDBiasWatcher.tif; sourceTree = "<group>"; };
+		8499516E1D5CE50700A6FA40 /* ORMJDBiasWatcherController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORMJDBiasWatcherController.h; sourceTree = "<group>"; };
+		8499516F1D5CE50700A6FA40 /* ORMJDBiasWatcherController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORMJDBiasWatcherController.m; sourceTree = "<group>"; };
+		849951721D5CE50700A6FA40 /* ORMJDBiasWatcherModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORMJDBiasWatcherModel.h; sourceTree = "<group>"; };
+		849951731D5CE50700A6FA40 /* ORMJDBiasWatcherModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORMJDBiasWatcherModel.m; sourceTree = "<group>"; };
 		849978671746C7C100BFEE3E /* ORPollingTimeStampDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORPollingTimeStampDecoder.h; sourceTree = "<group>"; };
 		849978681746C7C100BFEE3E /* ORPollingTimeStampDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORPollingTimeStampDecoder.m; sourceTree = "<group>"; };
 		849978691746C7C100BFEE3E /* ORPollingTimeStampModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORPollingTimeStampModel.h; sourceTree = "<group>"; };
@@ -7780,6 +7792,7 @@
 			children = (
 				8402B5AB14C70522007999C1 /* MJDPreAmp */,
 				84AC14D51B70E2460071C4EF /* MjdDataScanner */,
+				8499516B1D5CE50700A6FA40 /* MJDBiasWatcher */,
 			);
 			name = "Majorana Hardware";
 			path = "Source/Objects/Custom Hardware/Majorana Hardware";
@@ -11303,6 +11316,19 @@
 			name = HP3458a;
 			path = Source/Objects/Hardware/GPIB/HP3458a;
 			sourceTree = SOURCE_ROOT;
+		};
+		8499516B1D5CE50700A6FA40 /* MJDBiasWatcher */ = {
+			isa = PBXGroup;
+			children = (
+				849951731D5CE50700A6FA40 /* ORMJDBiasWatcherModel.m */,
+				849951721D5CE50700A6FA40 /* ORMJDBiasWatcherModel.h */,
+				8499516F1D5CE50700A6FA40 /* ORMJDBiasWatcherController.m */,
+				8499516E1D5CE50700A6FA40 /* ORMJDBiasWatcherController.h */,
+				8499516D1D5CE50700A6FA40 /* MJDBiasWatcher.tif */,
+				8499516C1D5CE50700A6FA40 /* MJDBiasWatcher.nib */,
+			);
+			path = MJDBiasWatcher;
+			sourceTree = "<group>";
 		};
 		849978641746C7C100BFEE3E /* PollingTimeStamp */ = {
 			isa = PBXGroup;
@@ -15774,6 +15800,7 @@
 				8499C97515221F9800CD7AAC /* ORMJDVacuumController.h in Headers */,
 				8499C97715221F9800CD7AAC /* ORMJDVacuumModel.h in Headers */,
 				8415B6A9152223050092C975 /* ORMJDVacuumView.h in Headers */,
+				8499517A1D5CE50700A6FA40 /* ORMJDBiasWatcherModel.h in Headers */,
 				8415E586152C7C560092C975 /* ORVacuumParts.h in Headers */,
 				43135804195C5DA3007B1F15 /* ORGretinaTriggerModel.h in Headers */,
 				8415EB63152DF0970092C975 /* ORAdcProcessorController.h in Headers */,
@@ -15829,6 +15856,7 @@
 				84F909891638383C00E9FD24 /* ORPulser33500Controller.h in Headers */,
 				84F9098B1638383C00E9FD24 /* ORPulser33500Model.h in Headers */,
 				842BB6AA1639746300393470 /* ORPulser33500Chan.h in Headers */,
+				849951761D5CE50700A6FA40 /* ORMJDBiasWatcherController.h in Headers */,
 				842BB6C516397A2000393470 /* ORPulser33500ChanController.h in Headers */,
 				842BC974163ED4E300393470 /* ORGretina4MReadout.hh in Headers */,
 				CED38D1E165CDB6600358681 /* ANSIEscapeHelper.h in Headers */,
@@ -16217,6 +16245,7 @@
 				84749D1C07D6526F001553EC /* M321.nib in Resources */,
 				84749D2207D6526F001553EC /* MCarrier.nib in Resources */,
 				84749D2307D6526F001553EC /* MCarrierCard.gif in Resources */,
+				849951741D5CE50700A6FA40 /* MJDBiasWatcher.nib in Resources */,
 				1C50F9F108033CA9008D18EA /* ADC2249.nib in Resources */,
 				1C50F9F208033CA9008D18EA /* ADC2249Card.gif in Resources */,
 				84539C580807247C00615B6D /* RemoteRunControl.nib in Resources */,
@@ -16752,6 +16781,7 @@
 				842544EA12F1FF9F00472314 /* BamDetector.nib in Resources */,
 				842544EB12F1FF9F00472314 /* BamDetector.tif in Resources */,
 				842544F312F1FF9F00472314 /* edu.washington.npl.orca.BamDetector.plist in Resources */,
+				849951751D5CE50700A6FA40 /* MJDBiasWatcher.tif in Resources */,
 				84D29FDF1843EAC800D320DB /* cross.png in Resources */,
 				84258D8D12FDAA0E00A15D82 /* Heartbeat.tif in Resources */,
 				842FCCBE19784AAA00B89723 /* EDSF130p.nib in Resources */,
@@ -17773,6 +17803,7 @@
 				84F50A2F116B7151000275F2 /* ORCmdLabelController.m in Sources */,
 				84F50A31116B7151000275F2 /* ORCmdLabelModel.m in Sources */,
 				8490D2991177532C00D25B1F /* ORIpeV4MiniCrateController.m in Sources */,
+				849951771D5CE50700A6FA40 /* ORMJDBiasWatcherController.m in Sources */,
 				8490D29B1177532C00D25B1F /* ORIpeV4MiniCrateModel.m in Sources */,
 				EFCC4547117FD45E008DC12C /* ORSNOCrateDecoders.m in Sources */,
 				844FD9E01180E89B00FD5A46 /* ORKJL2200IonGaugeController.m in Sources */,
@@ -18057,6 +18088,7 @@
 				84997896174BA2F600BFEE3E /* ORiSegHVCard.m in Sources */,
 				84BF74C417590CB000AF1F56 /* OR3DScanPlatformModel.m in Sources */,
 				841DACE6175CF05B002542BD /* Katrin3DView.m in Sources */,
+				8499517B1D5CE50700A6FA40 /* ORMJDBiasWatcherModel.m in Sources */,
 				B3808A8F1700F84B0019C27D /* ORCouchDBListenerController.m in Sources */,
 				B3808A911700F84B0019C27D /* ORCouchDBListenerModel.m in Sources */,
 				841DACF2175E2CB5002542BD /* OR3DScanPlatformView.m in Sources */,
