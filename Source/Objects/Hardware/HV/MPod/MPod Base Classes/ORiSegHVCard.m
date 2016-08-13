@@ -205,7 +205,10 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardDoNotPostSafetyAlarmChanged object:self];
 }
-
+- (void) makeCurrentHistory:(short)i
+{
+    if(currentHistory[i] == nil) currentHistory[i] = [[ORTimeRate alloc] init];
+}
 - (void) setRdParamsFrom:(NSDictionary*)aDictionary
 {
     @try {

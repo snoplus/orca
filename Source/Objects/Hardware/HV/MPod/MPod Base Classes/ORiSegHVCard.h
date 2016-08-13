@@ -99,6 +99,7 @@ enum{
 }
 
 #pragma mark ***Initialization
+- (void) makeCurrentHistory:(short)index;
 - (id) init;
 - (void) dealloc;
 - (NSString*) imageName;
