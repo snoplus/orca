@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="15F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
         <development version="5100" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10116"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ORCatalogController">
@@ -2789,7 +2789,7 @@ Relay</string>
                                     <rect key="frame" x="10" y="25" width="861" height="265"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <tabView toolTip="NcdMuxBoxModel" controlSize="small" type="bottomTabsBezelBorder" id="178">
+                                        <tabView controlSize="small" type="bottomTabsBezelBorder" id="178">
                                             <rect key="frame" x="10" y="12" width="837" height="241"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <font key="font" metaFont="label"/>
@@ -2942,7 +2942,7 @@ Relay</string>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <button toolTip="MajoranaModel" id="26790" customClass="ObjectFactory">
-                                                                <rect key="frame" x="56" y="34" width="172" height="131"/>
+                                                                <rect key="frame" x="9" y="66" width="172" height="131"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" title="MAJORANA Main Dialog" bezelStyle="regularSquare" image="Majorana" imagePosition="above" alignment="center" state="on" inset="2" id="26791">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2950,7 +2950,7 @@ Relay</string>
                                                                 </buttonCell>
                                                             </button>
                                                             <button toolTip="ORMjdDataScannerModel" id="26932" customClass="ObjectFactory">
-                                                                <rect key="frame" x="345" y="101" width="94" height="91"/>
+                                                                <rect key="frame" x="189" y="16" width="94" height="91"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" title="MJD Data Scanner" bezelStyle="regularSquare" image="MjdDataScanner" imagePosition="above" alignment="center" state="on" inset="2" id="26933">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2958,7 +2958,7 @@ Relay</string>
                                                                 </buttonCell>
                                                             </button>
                                                             <button toolTip="ORMJDPreAmpModel" id="0nB-kk-3Af" customClass="ObjectFactory">
-                                                                <rect key="frame" x="236" y="101" width="94" height="91"/>
+                                                                <rect key="frame" x="181" y="114" width="94" height="91"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" title="MJD Preamp" bezelStyle="regularSquare" image="MJDPreAmp" imagePosition="above" alignment="center" state="on" inset="2" id="Mfs-c8-w91">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2982,9 +2982,17 @@ Relay</string>
                                                                 </buttonCell>
                                                             </button>
                                                             <button toolTip="ORRaidMonitorModel" id="vXN-oG-Sxb" customClass="ObjectFactory">
-                                                                <rect key="frame" x="306" y="16" width="110" height="58"/>
+                                                                <rect key="frame" x="305" y="139" width="110" height="58"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" title="RAID Monitor" bezelStyle="regularSquare" image="RaidMonitor" imagePosition="above" alignment="center" state="on" inset="2" id="O0d-G0-T1U">
+                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                    <font key="font" metaFont="system" size="10"/>
+                                                                </buttonCell>
+                                                            </button>
+                                                            <button toolTip="ORMJDBiasWatcherModel" id="c2H-8F-pxr" customClass="ObjectFactory">
+                                                                <rect key="frame" x="321" y="25" width="94" height="91"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <buttonCell key="cell" type="bevel" title="MJD Bias Watcher" bezelStyle="regularSquare" image="MJDBiasWatcher" imagePosition="above" alignment="center" state="on" inset="2" id="dgp-N4-Wt6">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="system" size="10"/>
                                                                 </buttonCell>
@@ -3326,6 +3334,7 @@ Relay</string>
         <image name="MCA927" width="26.25" height="70.5"/>
         <image name="MCarrierCard" width="16" height="128"/>
         <image name="MITPulser" width="100" height="54"/>
+        <image name="MJDBiasWatcher" width="100" height="73"/>
         <image name="MJDDewarScale" width="40" height="107"/>
         <image name="MJDPreAmp" width="40" height="55"/>
         <image name="MJDPumpCart" width="102" height="90"/>
