@@ -239,18 +239,17 @@
 #pragma mark •••Data Source
 - (NSColor*) colorForDataSet:(int)set
 {
-    switch(set%12){
+    switch(set%10){
         case 0:  return [NSColor blackColor];
         case 1:  return [NSColor redColor];
         case 2:  return [NSColor blueColor];
         case 3:  return [NSColor greenColor];
         case 4:  return [NSColor cyanColor];
-        case 5:  return [NSColor lightGrayColor];
-        case 6:  return [NSColor cyanColor];
-        case 7:  return [NSColor magentaColor];
-        case 8:  return [NSColor orangeColor];
-        case 9:  return [NSColor purpleColor];
-        case 10: return [NSColor brownColor];
+        case 5:  return [NSColor cyanColor];
+        case 6:  return [NSColor magentaColor];
+        case 7:  return [NSColor orangeColor];
+        case 8:  return [NSColor purpleColor];
+        case 9:  return [NSColor brownColor];
         default: return [NSColor redColor];
     }
     return [NSColor redColor];;
