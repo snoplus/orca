@@ -247,11 +247,10 @@
         case 4:  return [NSColor cyanColor];
         case 5:  return [NSColor lightGrayColor];
         case 6:  return [NSColor cyanColor];
-        case 7:  return [NSColor yellowColor];
-        case 8:  return [NSColor magentaColor];
-        case 9:  return [NSColor orangeColor];
-        case 10: return [NSColor purpleColor];
-        case 11: return [NSColor brownColor];
+        case 7:  return [NSColor magentaColor];
+        case 8:  return [NSColor orangeColor];
+        case 9:  return [NSColor purpleColor];
+        case 10: return [NSColor brownColor];
         default: return [NSColor redColor];
     }
     return [NSColor redColor];;
