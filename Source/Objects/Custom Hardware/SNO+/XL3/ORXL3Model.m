@@ -3061,10 +3061,8 @@ err:
             slot_idx=0;
             for (i=0; i<8; i++) {
                 if ((msk >> (i + 8)) & 0x1) {
-                    //NSLog(@"slot %d:\n", i+8);
                     for (j=0; j<32; j++) {
                         counts[j] = results_hi.count[slot_idx*32 + j];
-                        //NSLog(@"channel: %d cnt: %ld\n", j, counts[j]);
                     }
                     ORFec32Model* fec = nil;
                     for (id anObj in [[self guardian] orcaObjects]) { 

@@ -1750,11 +1750,11 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
 
 //XL3 reads the counts for half the crate and pushes them here
 //returns YES if the cmos rates were updated
-- (BOOL) processCMOSCounts:(unsigned long*)rates calcRates:(BOOL)aCalcRates withChannelMask:(unsigned long) aChannelMask
+- (BOOL) processCMOSCounts:(uint32_t*)counts calcRates:(BOOL)aCalcRates withChannelMask:(unsigned long) aChannelMask
 {
     
     long		   	theRate = kCMOSRateUnmeasured;
-	unsigned long  	theCount;
+	uint32_t        theCount;
 	
 	NSDate* thisTime = [[NSDate alloc] init];
 	NSTimeInterval timeDiff = [thisTime timeIntervalSinceDate:cmosCountTimeStamp];
@@ -1779,9 +1779,16 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
     unsigned char ch;
     for (ch=0; ch<32; ch++) {
         if (aChannelMask & 1UL << ch) {
-            theCount = rates[ch];
+            theCount = counts[ch];
 			if (calcRates) { //only good CMOS count reads get here
-					theRate = (theCount - cmosCount[ch]) * sampleFreq;
+                    if(cmosCount[ch] > theCount){
+                        // theCount rolled over
+                        theCount = (UINT32_MAX - cmosCount[ch]) + theCount;
+                        theRate = theCount * sampleFreq;
+                    }
+                    else{
+                        theRate = (theCount - cmosCount[ch]) * sampleFreq;
+                    }
 					if (theRate > 1e9) theRate = kCMOSRateCorruptRead;			//MAH 3/19/98
 			}
             else {
@@ -1795,7 +1802,6 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
             cmosRate[ch] = kCMOSRateUnmeasured;
         }
     }
-    //[[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelCmosRateChanged object:self];
     return calcRates;
 }
 

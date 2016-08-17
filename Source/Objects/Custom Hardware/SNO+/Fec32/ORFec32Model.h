@@ -376,7 +376,7 @@ typedef struct Fec32CmosShiftReg{
 - (void) scan:(SEL)aResumeSelectorInGuardian; 
 - (void) scanWorkingSlot;
 - (BOOL) readCMOSCounts:(BOOL)calcRates channelMask:(unsigned long) aChannelMask;
-- (BOOL) processCMOSCounts:(unsigned long*)rates calcRates:(BOOL)aCalcRates withChannelMask:(unsigned long) aChannelMask;
+- (BOOL) processCMOSCounts:(uint32_t*)rates calcRates:(BOOL)aCalcRates withChannelMask:(unsigned long) aChannelMask;
 - (unsigned long) channelsWithCMOSRateHigherThan:(unsigned long)cmosRateLimit;
 - (unsigned long) channelsWithErrorCMOSRate;
 
