@@ -142,7 +142,7 @@
     aSpikeObj.tag          = tag;
     aSpikeObj.ave          = runningAverage;
     aSpikeObj.spikeValue   = spikeValue;
-    return aSpikeObj;
+    return [aSpikeObj autorelease];;
 }
 
 - (void) dump
