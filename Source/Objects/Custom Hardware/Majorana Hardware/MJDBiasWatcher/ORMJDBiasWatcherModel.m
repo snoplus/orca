@@ -260,7 +260,7 @@ NSString* ORMJDBiasWatcherForceUpdate			= @"ORMJDBiasWatcherForceUpdate";
     ORTimeRate* theHistory = [theHvCard currentHistory:hvChan];
     [theHistory setSampleTime:1];
     *xValue = [theHistory timeSampledAtIndex:dataIndex];
-    *yValue = [theHistory valueAtIndex:dataIndex] * 1000000.;
+    *yValue = [theHistory valueAtIndex:dataIndex];
 }
 
 - (void) preAmpPlot:(int)index dataIndex:(int)dataIndex x:(double*)xValue y:(double*)yValue
@@ -383,6 +383,7 @@ NSString* ORMJDBiasWatcherForceUpdate			= @"ORMJDBiasWatcherForceUpdate";
 - (void) collectAllObjects
 {
     [mjd release];
+    mjd = nil;
     NSArray* mjdObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"MajoranaModel")];
     if([mjdObjects count])mjd = [[mjdObjects objectAtIndex:0] retain];
     
@@ -393,6 +394,7 @@ NSString* ORMJDBiasWatcherForceUpdate			= @"ORMJDBiasWatcherForceUpdate";
 - (void) collectHvObjs
 {
     [hvObjs release];
+    hvObjs = nil;
     hvObjs = [[NSMutableDictionary dictionary] retain];
     NSArray* hvObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORiSegHVCard")];
     for(ORiSegHVCard* anHVObj in hvObjects){
@@ -404,6 +406,7 @@ NSString* ORMJDBiasWatcherForceUpdate			= @"ORMJDBiasWatcherForceUpdate";
 - (void) collectPreAmpObjs
 {
     [preAmpObjs release];
+    preAmpObjs = nil;
     preAmpObjs = [[NSMutableDictionary dictionary] retain];
     NSArray* preAmpObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMJDPreAmpModel")];
     for(ORMJDPreAmpModel* aPreAmp in preAmpObjects){

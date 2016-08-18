@@ -48,13 +48,11 @@
     [super awakeFromNib];
 	
     [self performSelector:@selector(setUpPlots) withObject:nil afterDelay:.1];
-	
-	
 }
 
 - (void) setUpPlots
 {
-    [[hvPlotter yAxis] setRngLimitsLow:0.0 withHigh:100 withMinRng:5];
+    [[hvPlotter yAxis] setRngLimitsLow:0.0 withHigh:100 withMinRng:2];
     [[baselinePlotter yAxis] setRngLimitsLow:-11.0 withHigh:11.0 withMinRng:3];
     
     [hvPlotter removeAllPlots];
