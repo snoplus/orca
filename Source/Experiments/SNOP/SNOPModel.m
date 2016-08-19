@@ -200,7 +200,7 @@ resync;
 
     if ([host isEqualToString:mtcHost]) return;
 
-    [mtcHost release];
+    [mtcHost autorelease];//MAH -- strings should be handled like this
     mtcHost = [host copy];
     [mtc_server disconnect];
     [mtc_server setHost:host];
@@ -260,7 +260,7 @@ resync;
 
     if ([host isEqualToString:xl3Host]) return;
 
-    [xl3Host release];
+    [xl3Host autorelease];//MAH -- strings should be handled like this
     xl3Host = [host copy];
     [xl3_server disconnect];
     [xl3_server setHost:host];
@@ -1700,7 +1700,8 @@ err:
 
 - (void) setLastRunTypeWordHex:(NSString*)aValue
 {
-    lastRunTypeWordHex = aValue;
+    [lastRunTypeWordHex autorelease]; //MAH -- strings should be handled like this
+    lastRunTypeWordHex = [aValue copy];
 }
 
 - (NSString*)standardRunType
@@ -1710,9 +1711,8 @@ err:
 
 - (void) setStandardRunType:(NSString *)aValue
 {
-    [aValue retain];
-    [standardRunType release];
-    standardRunType = aValue;
+    [standardRunType autorelease];//MAH -- strings should be handled like this
+    standardRunType = [aValue copy];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelSRChangedNotification object:self];
 }
@@ -1738,9 +1738,8 @@ err:
 
 - (void) setLastStandardRunType:(NSString *)aValue
 {
-    [aValue retain];
-    [lastStandardRunType release];
-    lastStandardRunType = aValue;
+    [lastStandardRunType autorelease];//MAH -- strings should be handled like this
+    lastStandardRunType = [aValue copy];
 }
 
 - (NSString*)lastStandardRunVersion
@@ -1750,9 +1749,8 @@ err:
 
 - (void) setLastStandardRunVersion:(NSString *)aValue
 {
-    [aValue retain];
-    [lastStandardRunVersion release];
-    lastStandardRunVersion = aValue;
+    [lastStandardRunVersion autorelease];//MAH -- strings should be handled like this
+    lastStandardRunVersion = [aValue copy];
 }
 
 - (int)ECA_pattern

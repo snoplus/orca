@@ -373,8 +373,7 @@ snopGreenColor;
 {
     //Load selected SR in case the user didn't click enter
     NSString *standardRun = [standardRunPopupMenu objectValueOfSelectedItem];
-    NSString *standardRunVersion = [[standardRunVersionPopupMenu objectValueOfSelectedItem] retain];//The pointer will be unset with the next
-    //command, so we need to copy it beforehand. Will be released afterwards.
+    NSString *standardRunVersion = [standardRunVersionPopupMenu objectValueOfSelectedItem];//MAH -- fixed
     [model setStandardRunType:standardRun];
     [model setStandardRunVersion:standardRunVersion];
 
@@ -431,7 +430,7 @@ snopGreenColor;
             [model setLastStandardRunType:[model standardRunType]];
             [model setLastStandardRunVersion:[model standardRunVersion]];
             [model setLastRunTypeWord:[model runTypeWord]];
-            NSString* _lastRunTypeWord = [[NSString stringWithFormat:@"0x%X",(int)[model runTypeWord]] copy];
+            NSString* _lastRunTypeWord = [NSString stringWithFormat:@"0x%X",(int)[model runTypeWord]];
             [model setLastRunTypeWordHex:_lastRunTypeWord]; //FIXME: revisit if we go over 32 bits
         }
 		else {
