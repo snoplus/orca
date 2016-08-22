@@ -152,6 +152,7 @@
 
     ORRunningAverageGroup* vacuumRunningAverages;
     BOOL                 vacuumSpike[kNumberRegions];
+    float                spikeTriggerValue;
 }
 
 #pragma mark ***Accessors
@@ -250,7 +251,9 @@
 #pragma mark •••running average
 - (void) vacuumSpikeChanged:(NSNotification*)aNote;
 - (void)  setVacuumRunningAverages:(ORRunningAverageGroup*)newRunningAverageGroup;
-- (BOOL) vacuumSpike;
+- (BOOL)  vacuumSpike;
+- (float) spikeTriggerValue;
+- (void)  setSpikeTriggerValue:(float)aValue;
 
 @end
 
@@ -266,6 +269,7 @@ extern NSString* ORMJCVacuumLock;
 extern NSString* ORMJDVacuumModelConstraintsChanged;
 extern NSString* ORMJDVacuumModelConstraintsDisabledChanged;
 extern NSString* ORMJDVacuumModelVacuumSpiked;
+extern NSString* ORMJDVacuumModelSpikeTriggerValueChanged;
 
 
 @interface ORMJDVacuumModel (hidden)

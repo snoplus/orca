@@ -51,6 +51,7 @@
 	IBOutlet NSTextField*   constraintStatusField;
 	IBOutlet NSTextField*   constraintOverrideField;
     IBOutlet NSButton*      overRideButton;
+    IBOutlet NSTextField*   spikeValueField;
 
 	BOOL					updateScheduled;
 }
@@ -92,6 +93,7 @@
 - (IBAction) closeGVConstraintPanel:(id)sender;
 - (IBAction) overRideAction:(id)sender;
 - (IBAction) reportConstraints:(id)sender;
+- (IBAction) spikeValueAction:(id)sender;
 
 #pragma mark •••Data Source For Tables
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView;

@@ -28,17 +28,18 @@
 #define kNumDetectors       2*35*2 //2 cryostats of 35 detectors * 2 (low and hi channels)
 #define kNumVetoSegments    32
 #define kMaxNumStrings      14
-#define kNumSpecialChannels      24
+#define kNumSpecialChannels 24
 
 //component tag numbers
-#define kVacAComponent			0
-#define kVacBComponent			1
+#define kVacAComponent		 0
+#define kVacBComponent		 1
 
 @class ORRemoteSocketModel;
 @class ORAlarm;
 @class ORMJDInterlocks;
 @class ORMJDSource;
 @class ORMJDHeaderRecordID;
+@class ORRunModel;
 
 @interface MajoranaModel :  ORExperimentModel <OROrderedObjHolding>
 {
@@ -51,7 +52,9 @@
     ORAlarm*        breakdownAlarm[2];
     BOOL            ignorePanicOnA;
     BOOL            ignorePanicOnB;
-    
+    BOOL            ignoreBreakdownCheckOnA;
+    BOOL            ignoreBreakdownCheckOnB;
+    unsigned long   runType;
     ORMJDInterlocks*    mjdInterlocks[2];
     ORMJDSource*        mjdSource[2];
     ORMJDHeaderRecordID* anObjForCouchID;
@@ -59,6 +62,8 @@
     NSMutableDictionary* baselineSpikes;
     NSMutableDictionary* breakDownDictionary;
     BOOL scheduledToRunCheckBreakdown;
+    BOOL scheduledToSendRateReport;
+    BOOL scheduledToSendBaselineReport;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -68,6 +73,16 @@
 - (void) setIgnorePanicOnB:(BOOL)aIgnorePanicOnB;
 - (BOOL) ignorePanicOnA;
 - (void) setIgnorePanicOnA:(BOOL)aIgnorePanicOnA;
+
+- (BOOL) ignoreBreakdownCheckOnB;
+- (void) setIgnoreBreakdownCheckOnB:(BOOL)aIgnorePanicOnB;
+- (BOOL) ignoreBreakdownCheckOnA;
+- (void) setIgnoreBreakdownCheckOnA:(BOOL)aIgnorePanicOnA;
+- (void) sendRateSpikeReport;
+- (void) sendRateBaselineReport;
+
+- (void) getRunType:(ORRunModel*)rc;
+- (BOOL) calibrationRun:(int)aCrate;
 - (int)  pollTime;
 - (void) setPollTime:(int)aPollTime;
 - (void) setViewType:(int)aViewType;
@@ -85,6 +100,7 @@
 - (NSString*) breakdownReportFor:(NSDictionary*)detectorEntry;
 
 - (id) mjdInterlocks:(int)index;
+- (void) runTypeChanged:(NSNotification*) aNote;
 - (void) runStarted:(NSNotification*) aNote;
 - (void) hvInfoRequest:(NSNotification*)aNote;
 - (void) customInfoRequest:(NSNotification*)aNote;
@@ -149,6 +165,8 @@
 
 @end
 
+extern NSString* MajoranaModelIgnoreBreakdownCheckOnBChanged;
+extern NSString* MajoranaModelIgnoreBreakdownCheckOnAChanged;
 extern NSString* MajoranaModelIgnorePanicOnBChanged;
 extern NSString* MajoranaModelIgnorePanicOnAChanged;
 extern NSString* ORMajoranaModelViewTypeChanged;

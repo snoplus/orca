@@ -549,7 +549,7 @@ struct {
 	
 	if(pollTime){
 		[self performSelector:@selector(pollValues) withObject:nil afterDelay:2];
-        NSLog(@"new poll time%d seconds",pollTime);
+        NSLog(@"new poll time%d seconds\n",pollTime);
 
 	}
 	else {
@@ -631,9 +631,6 @@ struct {
 		[[[self undoManager] prepareWithInvocationTarget:self] setBaselineVoltage:aChan value:[self baselineVoltage:aChan]];
 		[baselineVoltages replaceObjectAtIndex:aChan withObject:[NSNumber numberWithFloat:aValue]];
         
-        [baselineRunningAverages addNewValue:aValue toIndex:aChan];
-
-        
 		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
 		[userInfo setObject:[NSNumber numberWithFloat:aChan] forKey: @"Channel"];
         
@@ -674,7 +671,8 @@ struct {
         
 		adcs[aChan] = aValue;
 	
-        
+        [baselineRunningAverages addNewValue:aValue toIndex:aChan];
+
 		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
 		[userInfo setObject:[NSNumber numberWithFloat:aChan] forKey: @"Channel"];
 
@@ -1008,7 +1006,7 @@ struct {
                 if(adcEnabledMask & (0x1<<adcIndex)){
                     unsigned long controlWord = (kControlReg << 13)    |             //sel the chan set
                     (chan<<10)         |             //set chan
-                    (0x1 << 4)             |             //use internal voltage reference for conversion
+                    (0x1 << 4)         |             //use internal voltage reference for conversion
                     (mjdPreAmpTable[adcIndex].conversionType << 5)   |
                     (mjdPreAmpTable[adcIndex].mode << 8);    //set mode, other bits are zero
                     p->adc[chan] = (mjdPreAmpTable[adcIndex].adcSelection | (controlWord<<8));

@@ -146,6 +146,11 @@
                          name : ORMJDVacuumModelCoolerModeChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(spikeValueChanged:)
+                         name : ORMJDVacuumModelSpikeTriggerValueChanged
+                        object: model];
+
 }
 
 - (void) updateWindow
@@ -161,10 +166,14 @@
 	[self lastHvUpdateTimeChanged:nil];
 	[self nextHvUpdateTimeChanged:nil];
 	[self coolerModeChanged:nil];
+    [self spikeValueChanged:nil];
 }
 
 #pragma mark •••Interface Management
-
+- (void) spikeValueChanged:(NSNotification*)aNote
+{
+    [spikeValueField setFloatValue:[model spikeTriggerValue]];
+}
 - (void) coolerModeChanged:(NSNotification*)aNote
 {
 	[coolerModePU selectItemAtIndex: [model coolerMode]];
@@ -437,6 +446,11 @@
 - (IBAction) lockAction:(id) sender
 {
     [gSecurity tryToSetLock:ORMJCVacuumLock to:[sender intValue] forWindow:[self window]];
+}
+
+- (IBAction) spikeValueAction:(id)sender
+{
+    [model setSpikeTriggerValue:[sender floatValue]];
 }
 
 - (IBAction) overRideAction:(id)sender

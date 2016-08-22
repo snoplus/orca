@@ -23,6 +23,7 @@
 #import "ORTaskSequence.h"
 #import "ORRemoteSocketModel.h"
 #import "ORAlarm.h"
+#import "OROnCallListModel.h"
 
 //do NOT change this list without changing the enum states in the .h filef
 static MJDInterlocksStateInfo state_info [kMJDInterlocks_NumStates] = {
@@ -49,7 +50,7 @@ NSString* scmIpNumber = @"151.150.226.70";
 
 @implementation ORMJDInterlocks
 
-@synthesize delegate,isRunning,currentState,stateStatus,slot,finalReport;
+@synthesize delegate,isRunning,currentState,stateStatus,slot,finalReport,vacuumSpikeStarted;
 
 NSString* ORMJDInterlocksIsRunningChanged = @"ORMJDInterlocksIsRunningChanged";
 NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
@@ -59,6 +60,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
     self = [super init];
     self.delegate = aDelegate;
     self.slot = aSlot;
+    self.vacuumSpikeStarted = nil;
     retryCount = 0;
     return self;
 }
@@ -69,6 +71,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
     self.delegate    = nil;
     self.stateStatus = nil;
     self.finalReport = nil;
+    
     [interlockFailureAlarm clearAlarm];
     [interlockFailureAlarm release];
     [breakDownResult release];
@@ -345,6 +348,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                     [self clearInterlockFailureAlarm];
                     
                     vacuumSpike  = [[remoteOpStatus objectForKey:@"vacuumSpike"] boolValue];
+                    
                     shouldUnBias = [[remoteOpStatus objectForKey:@"shouldUnBias"] boolValue];
                     if(shouldUnBias){
                         [self setState:kMJDInterlocks_GetShouldUnBias status:@"Vac says Unbias" color:badColor];
@@ -481,12 +485,24 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             [delegate setVmeCrateHVConstraint:[self module] state:lockHVDialog];
             if(lockHVDialog)[self setState:kMJDInterlocks_HandleHVDialog status:@"Locked" color:badColor];
             else [self setState:kMJDInterlocks_HandleHVDialog status:@"Unlocked" color:okColor];
-            [self setCurrentState:kMJDInterlocks_CheckLNFill];
+            
+            if((([self module] == 2) && [delegate ignoreBreakdownCheckOnA]) ||
+               (([self module] == 1) && [delegate ignoreBreakdownCheckOnB]) ){
+
+                [self setState:kMJDInterlocks_CheckLNFill       status:@"Skipped" color:badColor];
+                [self setState:kMJDInterlocks_CheckForBreakdown status:@"Skipped" color:badColor];
+                
+                [self setCurrentState:kMJDInterlocks_FinalState];
+            }
+            else {
+                [self setCurrentState:kMJDInterlocks_CheckLNFill];
+               
+            }
             break;
 
         case kMJDInterlocks_CheckLNFill:
             if(!hvIsOn){
-                [self setState:kMJDInterlocks_CheckLNFill     status:@"Skipped" color:normalColor];
+                [self setState:kMJDInterlocks_CheckLNFill           status:@"Skipped" color:normalColor];
                 [self setState:kMJDInterlocks_CheckForBreakdown     status:@"Skipped" color:normalColor];
                 [self setCurrentState:kMJDInterlocks_FinalState];
             }
@@ -542,7 +558,6 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                     sentCmds = YES;
                 }
             }
-            
             break;
             
         case kMJDInterlocks_CheckForBreakdown:
@@ -568,8 +583,57 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
         [self performSelector:@selector(step) withObject:nil afterDelay:.3];
     }
 }
+
+- (void) setVacuumSpike:(BOOL)aFlag
+{
+    if(!vacuumSpike && aFlag){
+        scheduledToSendVacReport = YES;
+        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(sendVacuumSpikeReport) object:nil];
+        [self performSelector:@selector(sendVacuumSpikeReport) withObject:nil afterDelay:15];
+        self.vacuumSpikeStarted = [NSDate date];
+    }
+    
+    if(vacuumSpike && !aFlag){
+        //-------------------------
+        //this means the spike has ended.
+        //post to the data base history using the staring spike stored earlier
+        NSMutableDictionary* record = [NSMutableDictionary dictionary];
+        NSDate*   started           = self.vacuumSpikeStarted;
+        NSNumber* startTime         = [NSNumber numberWithDouble:[started timeIntervalSince1970]];
+        NSNumber* endTime           = [NSNumber numberWithDouble:[[NSDate date] timeIntervalSince1970]];
+        NSString* iden              = [NSString stringWithFormat:@"VacuumConcernCrate%d",[self module]];
+        
+        [record setObject:iden                                      forKey:@"name"];
+        [record setObject:iden                                      forKey:@"title"];
+        [record setObject:[NSNumber numberWithInt:[self module]]    forKey:@"crate"];
+        [record setObject:startTime                                 forKey:@"startTime"];
+        [record setObject:endTime                                   forKey:@"endTime"];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddHistoryAdcRecord" object:self userInfo:record];
+        //-------------------------
+    }
+    
+    
+    vacuumSpike = aFlag;
+}
+
+- (void) sendVacuumSpikeReport
+{
+    scheduledToSendVacReport = NO;
+    if(!fillingLN){
+        if([self module] == 1 && [delegate ignoreBreakdownCheckOnB])return;
+        if([self module] == 2 && [delegate ignoreBreakdownCheckOnA])return;
+        //send out text to experts
+        OROnCallListModel* onCallObj = [[(ORAppDelegate*)[NSApp delegate] document] findObjectWithFullID:@"OROnCallListModel,1"];
+        NSString* textMessage = [NSString stringWithFormat:@"%@ is reporting a spike in the vacuum pressures. Please check the system",[self moduleName]];
+        [onCallObj broadcastMessage:textMessage];
+    }
+}
+
 - (BOOL)        vacuumSpike {return vacuumSpike;   }
 - (BOOL)        fillingLN   {return fillingLN;}
+
+
 
 - (void) addToReport:(NSString*)aString
 {

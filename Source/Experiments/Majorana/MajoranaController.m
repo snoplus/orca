@@ -185,6 +185,16 @@
 						object: model];
     
     [notifyCenter addObserver : self
+                     selector : @selector(ignoreBreakdownCheckOnAChanged:)
+                         name : MajoranaModelIgnoreBreakdownCheckOnAChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(ignoreBreakdownCheckOnBChanged:)
+                         name : MajoranaModelIgnoreBreakdownCheckOnBChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
                      selector : @selector(updateInterlockStates:)
                          name : ORMJDInterlocksStateChanged
                         object: nil];
@@ -259,6 +269,9 @@
 	[secondaryValuesView reloadData];
 	[self ignorePanicOnAChanged:nil];
 	[self ignorePanicOnBChanged:nil];
+    [self ignoreBreakdownCheckOnAChanged:nil];
+    [self ignoreBreakdownCheckOnBChanged:nil];
+
     
     //interlocks
     [self groupChanged:nil];
@@ -419,45 +432,62 @@
 
 - (void) breakdownDetectedChanged:(NSNotification*)aNote
 {
+#define kIgnore 2
     NSDictionary* rateSpikes     = [model rateSpikes];
     if([rateSpikes count]==0){
-        [rate1BiState setState:1];
-        [rate2BiState setState:1];
+        [rate1BiState setState:[model ignoreBreakdownCheckOnB]?kIgnore:1];
+        [rate2BiState setState:[model ignoreBreakdownCheckOnA]?kIgnore:1];
     }
-    for(id aKey in [rateSpikes allKeys]){
-        int crate = [aKey intValue]; //pick off the crate value
-        if(crate==1)      [rate1BiState setState:0];
-        else if(crate==2) [rate2BiState setState:0];
+    else {
+        for(id aKey in [rateSpikes allKeys]){
+            int crate = [aKey intValue]; //pick off the crate value
+            if(crate==1)      [rate1BiState setState:[model ignoreBreakdownCheckOnB ]?kIgnore:0];
+            else if(crate==2) [rate2BiState setState:[model ignoreBreakdownCheckOnA ]?kIgnore:0];
+        }
     }
     
     NSDictionary* baselineSpikes = [model baselineSpikes];
     if([baselineSpikes count]==0){
-        [baseline1BiState setState:1];
-        [baseline2BiState setState:1];
+        [baseline1BiState setState:[model ignoreBreakdownCheckOnB]?kIgnore:1];
+        [baseline2BiState setState:[model ignoreBreakdownCheckOnA]?kIgnore:1];
     }
-   for(id aKey in [baselineSpikes allKeys]){
-       int crate = [aKey intValue]; //pick off the crate value
-       if(crate==1)      [baseline1BiState setState:0];
-       else if(crate==2) [baseline2BiState setState:0];
+    else {
+        for(id aKey in [baselineSpikes allKeys]){
+           int crate = [aKey intValue]; //pick off the crate value
+            if(crate==1)      [baseline1BiState setState:[model ignoreBreakdownCheckOnB]?kIgnore:0];
+           else if(crate==2) [baseline2BiState setState: [model ignoreBreakdownCheckOnA ]?kIgnore:0];
+        }
     }
     
-    if([model fillingLN:0])     [filling1Field setStringValue:@"YES"];
-    else                        [filling1Field setStringValue:@"NO"];
-    if([model vacuumSpike:0])   [vac1BiState setState:0];
-    else                        [vac1BiState setState:1];
+    
+    if([model vacuumSpike:0])   [vac1BiState setState:[model ignoreBreakdownCheckOnB]?kIgnore:0];
+    else                        [vac1BiState setState:[model ignoreBreakdownCheckOnB]?kIgnore:1];
   
     
-    if([model fillingLN:1])     [filling2Field setStringValue:@"YES"];
-    else                        [filling2Field setStringValue:@"NO"];
-    if([model vacuumSpike:1])   [vac2BiState setState:0];
-    else                        [vac2BiState setState:1];
+    if([model vacuumSpike:1])   [vac2BiState setState:[model ignoreBreakdownCheckOnA]?kIgnore:0];
+    else                        [vac2BiState setState:[model ignoreBreakdownCheckOnA]?kIgnore:1];
     
-    
-    if([model breakdownAlarmPosted:0])  [breakdown1Field setStringValue:@"YES"];
-    else                                [breakdown1Field setStringValue:@"NO"];
+    if([model ignoreBreakdownCheckOnB]){
+        [breakdown1Field setStringValue:@"Skipped"];
+        [filling1Field   setStringValue:@"Skipped"];
+    }
+    else {
+        if([model fillingLN:0])     [filling1Field setStringValue:@"YES"];
+        else                        [filling1Field setStringValue:@"NO"];
+        if([model breakdownAlarmPosted:0])  [breakdown1Field setStringValue:@"YES"];
+        else                                [breakdown1Field setStringValue:@"NO"];
+    }
 
-    if([model breakdownAlarmPosted:1])  [breakdown2Field setStringValue:@"YES"];
-    else                                [breakdown2Field setStringValue:@"NO"];
+    if([model ignoreBreakdownCheckOnA]){
+        [breakdown2Field setStringValue:@"Skipped"];
+        [filling2Field   setStringValue:@"Skipped"];
+    }
+    else {
+        if([model fillingLN:1])     [filling2Field setStringValue:@"YES"];
+        else                        [filling2Field setStringValue:@"NO"];
+        if([model breakdownAlarmPosted:1])  [breakdown2Field setStringValue:@"YES"];
+        else                                [breakdown2Field setStringValue:@"NO"];
+    }
   
 }
 
@@ -550,7 +580,21 @@
 - (void) ignorePanicOnAChanged:(NSNotification*)aNote
 {
 	[ignorePanicOnACB setIntValue: [model ignorePanicOnA]];
-    [ignore2Field setStringValue: [model ignorePanicOnA]?@"HV Ramp will be IGNORED":@""];
+    [ignoreBreakdownCheck2Field setStringValue: [model ignorePanicOnA]?@"HV Ramp will be IGNORED":@""];
+}
+
+- (void) ignoreBreakdownCheckOnBChanged:(NSNotification*)aNote
+{
+    [ignoreBreakdownCheckOnBCB setIntValue: ![model ignoreBreakdownCheckOnB]];
+    [ignoreBreakdownCheck1Field setStringValue: [model ignoreBreakdownCheckOnB]?@"Breakdown check SKIPPED":@""];
+    [self breakdownDetectedChanged:nil];
+}
+
+- (void) ignoreBreakdownCheckOnAChanged:(NSNotification*)aNote
+{
+    [ignoreBreakdownCheckOnACB setIntValue: ![model ignoreBreakdownCheckOnA]];
+    [ignoreBreakdownCheck2Field setStringValue: [model ignoreBreakdownCheckOnA]?@"Breakdown check SKIPPED":@""];
+    [self breakdownDetectedChanged:nil];
 }
 
 - (void) specialUpdate:(NSNotification*)aNote
@@ -651,14 +695,24 @@
 }
 
 #pragma mark ***Actions
-- (void) ignorePanicOnBAction:(id)sender
-{
-    [self confirmIgnoreForModule:1];
-}
-- (void) ignorePanicOnAAction:(id)sender
+- (IBAction) ignorePanicOnAAction:(id)sender
 {
     [self confirmIgnoreForModule:0];
 }
+- (IBAction) ignorePanicOnBAction:(id)sender
+{
+    [self confirmIgnoreForModule:1];
+}
+- (IBAction) ignoreBreakdownCheckOnAAction:(id)sender
+{
+    [self confirmIgnoreBreakdownCheckForModule:0];
+}
+
+- (IBAction) ignoreBreakdownCheckOnBAction:(id)sender
+{
+    [self confirmIgnoreBreakdownCheckForModule:1];
+}
+
 
 - (void) confirmIgnoreForModule:(int)module
 {
@@ -666,7 +720,7 @@
     if(module == 0) currentState = [model ignorePanicOnA];
     else            currentState = [model ignorePanicOnB];
     
-    NSString* s1 = [NSString stringWithFormat:@"Really Turn %@ Constraint Checking for Module %d HV?",!currentState?@"OFF":@"ON",module];
+    NSString* s1 = [NSString stringWithFormat:@"Really Turn %@ Constraint Checking for Module %d HV?",!currentState?@"OFF":@"ON",module==0?2:1];
     if(!currentState)s1 = [s1 stringByAppendingFormat:@"\n\n(HV will NOT ramp down if vac is bad)"];
     else            s1 = [s1 stringByAppendingFormat:@"\n\n(HV will ramp down on next check if vac is bad)"];
     
@@ -705,6 +759,54 @@
 #endif
 }
 
+- (void) confirmIgnoreBreakdownCheckForModule:(int)module
+{
+    BOOL currentState;
+    if(module == 0) currentState = [model ignoreBreakdownCheckOnA];
+    else            currentState = [model ignoreBreakdownCheckOnB];
+    
+    NSString* s1 = [NSString stringWithFormat:@"Really %@ Breakdown Checks for Module %d?",!currentState?@"SKIP":@"Resume",module==0?2:1];
+    if(!currentState)s1 = [s1 stringByAppendingFormat:@"\n\n(Breakdown checking will be SKIPPED!)"];
+    else             s1 = [s1 stringByAppendingFormat:@"\n\n(Breakdown checking will be resumed)"];
+    
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:s1];
+    [alert setInformativeText:@""];
+    if(currentState)[alert addButtonWithTitle:[NSString stringWithFormat:@"YES/Resume Breakdown Checks"]];
+    else            [alert addButtonWithTitle:[NSString stringWithFormat:@"YES/Skip Breakdown Checks"]];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if(result == NSAlertFirstButtonReturn){
+            if(module == 0) [model setIgnoreBreakdownCheckOnA:!currentState];
+            else            [model setIgnoreBreakdownCheckOnB:!currentState];
+        }
+        else {
+            if(module == 0) [model setIgnoreBreakdownCheckOnA:currentState];
+            else            [model setIgnoreBreakdownCheckOnB:currentState];
+        }
+    }];
+#else
+    NSDictionary* context = [[NSDictionary dictionaryWithObjectsAndKeys:
+                              [NSNumber numberWithInt:module],@"module",
+                              [NSNumber numberWithInt:currentState],@"currentState",
+                              nil] retain]; //release in confirmDidFinish()
+    NSBeginAlertSheet(s1,
+                      [NSString stringWithFormat:@"YES/%@ Checks",!currentState?@"Skip Breakdown ":@"Resume Breakdown "],
+                      @"Cancel",
+                      nil,[self window],
+                      self,
+                      @selector(breakdownIgnoreConfirmDidFinish:returnCode:contextInfo:),
+                      nil,
+                      context,
+                      @"");
+#endif
+}
+
+
+
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) confirmDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
@@ -722,6 +824,24 @@
     }
     [userInfo release];
 }
+
+- (void) breakdownIgnoreConfirmDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+    int module = [[userInfo objectForKey:@"module"]intValue];
+    BOOL currentState= [[userInfo objectForKey:@"currentState"]intValue];
+    
+    if(returnCode == NSAlertDefaultReturn){
+        if(module == 0) [model setIgnoreBreakdownCheckOnA:!currentState];
+        else            [model setIgnoreBreakdownCheckOnB:!currentState];
+    }
+    else {
+        if(module == 0) [model setIgnoreBreakdownCheckOnA:currentState];
+        else            [model setIgnoreBreakdownCheckOnB:currentState];
+    }
+    [userInfo release];
+}
+
+
 #endif
 - (IBAction) initDigitizerAction:(id)sender
 {

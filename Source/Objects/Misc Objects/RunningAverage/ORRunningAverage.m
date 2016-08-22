@@ -34,6 +34,7 @@
 
 - (void) dealloc
 {
+    [spikeStartDate release];
     [inComingData release];
     [super dealloc];
 }
@@ -136,12 +137,29 @@
 
 - (ORRunningAveSpike*) spikedInfo:(BOOL)spiked
 {
+    NSTimeInterval duration;
+    if(spiked){
+        [spikeStartDate release];
+        spikeStartDate = [[NSDate date]retain];
+        duration = -1;
+    }
+    else {
+        duration = [[NSDate date] timeIntervalSinceDate:spikeStartDate];
+    }
+    
     ORRunningAveSpike* aSpikeObj = [[ORRunningAveSpike alloc] init];
-    aSpikeObj.timeOfSpike  = [NSDate date];
-    aSpikeObj.spiked       = didSpike;
-    aSpikeObj.tag          = tag;
-    aSpikeObj.ave          = runningAverage;
-    aSpikeObj.spikeValue   = spikeValue;
+    aSpikeObj.spikeStart    = spikeStartDate;
+    aSpikeObj.duration      = duration; //only valid at end of spike, else -1
+    aSpikeObj.spiked        = spiked;
+    aSpikeObj.tag           = tag;
+    aSpikeObj.ave           = runningAverage;
+    aSpikeObj.spikeValue    = spikeValue;
+    
+    if(!spiked){
+        [spikeStartDate release];
+        spikeStartDate = nil;
+    }
+    
     return [aSpikeObj autorelease];;
 }
 
@@ -156,12 +174,12 @@
 @end
 
 @implementation ORRunningAveSpike
-@synthesize tag,spiked,timeOfSpike,ave,spikeValue;
+@synthesize tag,spiked,spikeStart,ave,spikeValue,duration;
 
 - (void) dealloc
 {
     //dealloc properties like this
-    self.timeOfSpike = nil;
+    self.spikeStart = nil;
     
     [super dealloc];
 }
@@ -169,7 +187,7 @@
 - (NSString*) description
 {
     NSString* s = [NSString stringWithFormat:@"\ntime:%@\nspiked:%@\ntag:%d\nave:%.3f\nspikeValue:%.3f",
-                   self.timeOfSpike,
+                   self.spikeStart,
                    self.spiked?@"YES":@"NO",
                    self.tag,
                    self.ave,

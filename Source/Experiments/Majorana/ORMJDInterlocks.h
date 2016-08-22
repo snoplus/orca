@@ -68,6 +68,8 @@ typedef struct {
     BOOL                fillingLN;
     int                 breakDownPass;
     NSString*           breakDownResult;
+    BOOL                scheduledToSendVacReport;
+    NSDate*             vacuumSpikeStarted;
 }
 
 - (id)          initWithDelegate:(MajoranaModel*)aDelegate slot:(int)aSlot;
@@ -90,6 +92,7 @@ typedef struct {
 - (NSString*)   moduleName;
 - (BOOL)        vacuumSpike;
 - (BOOL)        fillingLN;
+- (void)        errorReport;
 
 @property (assign) MajoranaModel*             delegate;
 @property (assign,nonatomic) BOOL             isRunning;
@@ -97,6 +100,7 @@ typedef struct {
 @property (assign,nonatomic) int              slot;
 @property (retain,nonatomic) NSMutableArray*  stateStatus;
 @property (retain) NSMutableArray*            finalReport;
+@property (retain) NSDate* vacuumSpikeStarted;
 
 @end
 

@@ -88,7 +88,7 @@ NSString* ORMJDVacuumModelHvUpdateTimeChanged           = @"ORMJDVacuumModelHvUp
 NSString* ORMJDVacuumModelConstraintsDisabledChanged    = @"ORMJDVacuumModelConstraintsDisabledChanged";
 NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCoolerModeChanged";
 
-NSString* ORMJDVacuumModelVacuumSpiked                     = @"ORMJDVacuumModelVacuumSpiked";
+NSString* ORMJDVacuumModelSpikeTriggerValueChanged      = @"ORMJDVacuumModelSpikeTriggerValueChanged";
 
 @implementation ORMJDVacuumModel
 
@@ -146,7 +146,6 @@ NSString* ORMJDVacuumModelVacuumSpiked                     = @"ORMJDVacuumModelV
 {
     return vacuumSpike[kRegionCryostat] && vacuumSpike[kRegionRGA] && vacuumSpike[kRegionAboveTurbo];
 }
-
 
 - (void) setUpImage
 {
@@ -524,15 +523,28 @@ NSString* ORMJDVacuumModelVacuumSpiked                     = @"ORMJDVacuumModelV
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelShowGridChanged object:self];
 }
 
+- (float) spikeTriggerValue
+{
+    return spikeTriggerValue;
+}
+
+- (void)  setSpikeTriggerValue:(float)aValue
+{
+    if(aValue<100)aValue = 115;
+    [[[self undoManager] prepareWithInvocationTarget:self] setSpikeTriggerValue:spikeTriggerValue];
+    spikeTriggerValue = aValue;
+    [vacuumRunningAverages setTriggerValue:spikeTriggerValue];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelSpikeTriggerValueChanged object:self];
+}
 
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
 	
     [[self undoManager] disableUndoRegistration];
-    [self setCoolerMode:[decoder decodeIntForKey:@"coolerMode"]];
-	[self setShowGrid:	[decoder decodeBoolForKey:	@"showGrid"]];
-	
+    [self setCoolerMode:        [decoder decodeIntForKey:@"coolerMode"]];
+	[self setShowGrid:          [decoder decodeBoolForKey:	@"showGrid"]];
+    [self setSpikeTriggerValue: [decoder decodeFloatForKey: @"spikeTriggerValue"]];
 	[self makeParts];
 	[self registerNotificationObservers];
 	
@@ -543,7 +555,7 @@ NSString* ORMJDVacuumModelVacuumSpiked                     = @"ORMJDVacuumModelV
     
     [vacuumRunningAverages resetCounters:0];
     [vacuumRunningAverages setTriggerType:kRASpikeOnRatio];
-    [vacuumRunningAverages setTriggerValue:1.15]; //++++++++anything below 1 is for TEST since it will alway fire
+    [vacuumRunningAverages setTriggerValue:spikeTriggerValue]; //++++++++anything below 1 is for TEST since it will alway fire
     
     return self;
 }
@@ -551,8 +563,9 @@ NSString* ORMJDVacuumModelVacuumSpiked                     = @"ORMJDVacuumModelV
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:coolerMode forKey:@"coolerMode"];
-    [encoder encodeBool:showGrid  forKey: @"showGrid"];
+    [encoder encodeInt:coolerMode           forKey:@"coolerMode"];
+    [encoder encodeBool:showGrid            forKey: @"showGrid"];
+    [encoder encodeFloat:spikeTriggerValue  forKey: @"spikeTriggerValue"];
 }
 
 - (NSArray*) parts

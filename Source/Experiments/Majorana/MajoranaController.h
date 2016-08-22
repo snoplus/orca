@@ -27,8 +27,10 @@
 @interface MajoranaController : ORExperimentController {
  
     IBOutlet NSTextField*	detectorTitle;
-	IBOutlet NSButton*      ignorePanicOnBCB;
-	IBOutlet NSButton*      ignorePanicOnACB;
+    IBOutlet NSButton*      ignorePanicOnBCB;
+    IBOutlet NSButton*      ignorePanicOnACB;
+    IBOutlet NSButton*      ignoreBreakdownCheckOnBCB;
+    IBOutlet NSButton*      ignoreBreakdownCheckOnACB;
     IBOutlet NSPopUpButton*	viewTypePU;
     IBOutlet ORColorScale*	secondaryColorScale;
     IBOutlet NSButton*		secondaryColorAxisLogCB;
@@ -58,7 +60,9 @@
     IBOutlet NSTableView*   module2InterlockTable;
     IBOutlet NSTextField*   ignore1Field;
     IBOutlet NSTextField*   ignore2Field;
-    
+    IBOutlet NSTextField*   ignoreBreakdownCheck1Field;
+    IBOutlet NSTextField*   ignoreBreakdownCheck2Field;
+ 
     IBOutlet BiStateView*	rate1BiState;
     IBOutlet BiStateView*	rate2BiState;
     
@@ -146,6 +150,7 @@
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) confirmDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) breakdownIgnoreConfirmDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 #endif
 
 #pragma mark ¥¥¥Calibration Interface Management
@@ -156,6 +161,10 @@
 - (IBAction) initVetoAction:(id)sender;
 - (IBAction) ignorePanicOnBAction:(id)sender;
 - (IBAction) ignorePanicOnAAction:(id)sender;
+- (IBAction) ignoreBreakdownCheckOnBAction:(id)sender;
+- (IBAction) ignoreBreakdownCheckOnAAction:(id)sender;
+
+
 - (IBAction) viewTypeAction:(id)sender;
 - (IBAction) vetoMapLockAction:(id)sender;
 - (IBAction) secondaryAdcClassNameAction:(id)sender;

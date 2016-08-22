@@ -37,6 +37,7 @@
     int             groupTag;
     BOOL            didSpike;
     BOOL            lastDidSpike;
+    NSDate*         spikeStartDate;
 }
 - (id)      initWithTag:(short)aTag andLength:(short)wl;
 - (void)    dealloc;
@@ -62,16 +63,18 @@
 @interface ORRunningAveSpike : NSObject
 {
     BOOL    spiked;
-    NSDate* timeOfSpike;
+    NSDate* spikeStart;
+    NSTimeInterval  duration;   //only valid is !spiked
     int     tag;
     float   ave;
     float   spikeValue;
 }
 @property (assign) BOOL     spiked;
-@property (retain) NSDate*  timeOfSpike;
+@property (retain) NSDate*  spikeStart;
 @property (assign) int      tag;
 @property (assign) float    ave;
 @property (assign) float    spikeValue;
+@property (assign) NSTimeInterval   duration;
 
 @end
 
