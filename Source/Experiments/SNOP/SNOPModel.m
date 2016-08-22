@@ -1383,11 +1383,6 @@ err:
             [sbcLink send: &aPacket receive: &aPacket];
             unsigned long* responsePtr = (unsigned long*) aPacket.payload;
             hvStatus = responsePtr[0];
-            //NSLog(@"hv_status %ld",hvStatus);
-            /*if( errorCode )
-            {
-                @throw [NSException exceptionWithName:@"Reset All Camera error" reason:@"SBC and/or LabJack failed.\n" userInfo:nil];
-            }*/
         }
         @catch( NSException* e )
         {
@@ -1397,8 +1392,6 @@ err:
         }
     
     } //end of if statement
-    //return (BOOL)hvStatus ;
-    //NSLog(@"status");
     return (BOOL)hvStatus;
         
 }

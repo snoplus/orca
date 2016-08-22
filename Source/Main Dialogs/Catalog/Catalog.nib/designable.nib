@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6751" systemVersion="14F27" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
         <development version="5100" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6751"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ORCatalogController">
@@ -3127,14 +3127,6 @@ Relay</string>
                                                                     <font key="font" metaFont="system" size="10"/>
                                                                 </buttonCell>
                                                             </button>
-                                                            <button toolTip="ORCameraModel" id="7rg-3Y-pNH" customClass="ObjectFactory">
-                                                                <rect key="frame" x="468" y="3" width="110" height="74"/>
-                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <buttonCell key="cell" type="bevel" title="SNOPCamera" bezelStyle="regularSquare" image="CameraPic" imagePosition="above" alignment="center" state="on" inset="2" id="A9f-Xa-dRB">
-                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                                    <font key="font" metaFont="system" size="10"/>
-                                                                </buttonCell>
-                                                            </button>
                                                             <button toolTip="ResistorDBModel" id="jhu-YY-N7n" customClass="ObjectFactory">
                                                                 <rect key="frame" x="571" y="11" width="116" height="58"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -3249,7 +3241,6 @@ Relay</string>
         <image name="Caen965" width="16" height="128"/>
         <image name="CamacCrateSmall" width="283" height="154"/>
         <image name="Camera" width="75" height="75"/>
-        <image name="CameraPic" width="77" height="57"/>
         <image name="Changesfeed" width="68.400001525878906" height="53"/>
         <image name="CmdLabel" width="70" height="11"/>
         <image name="Comparator" width="70" height="41"/>
