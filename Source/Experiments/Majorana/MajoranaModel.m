@@ -18,7 +18,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #pragma mark ¥¥¥Imported Files
 #import "MajoranaModel.h"
 #import "MajoranaController.h"
@@ -41,9 +40,10 @@
 #import "OROnCallListModel.h"
 #import "ORRunModel.h"
 
-
 NSString* MajoranaModelIgnorePanicOnBChanged            = @"MajoranaModelIgnorePanicOnBChanged";
 NSString* MajoranaModelIgnorePanicOnAChanged            = @"MajoranaModelIgnorePanicOnAChanged";
+NSString* MajoranaModelIgnoreBreakdownPanicOnAChanged   = @"MajoranaModelIgnoreBreakdownPanicOnAChanged";
+NSString* MajoranaModelIgnoreBreakdownPanicOnBChanged   = @"MajoranaModelIgnoreBreakdownPanicOnBChanged";
 NSString* MajoranaModelIgnoreBreakdownCheckOnAChanged   = @"MajoranaModelIgnoreBreakdownCheckOnAChanged";
 NSString* MajoranaModelIgnoreBreakdownCheckOnBChanged   = @"MajoranaModelIgnoreBreakdownCheckOnBChanged";
 NSString* ORMajoranaModelViewTypeChanged                = @"ORMajoranaModelViewTypeChanged";
@@ -651,6 +651,9 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     if((aCrate == 2) && ignoreBreakdownCheckOnA)return;
     if((aCrate == 1) && ignoreBreakdownCheckOnB)return;
 
+    if((aCrate == 2) && ignoreBreakdownPanicOnA)return;
+    if((aCrate == 1) && ignoreBreakdownPanicOnB)return;
+    
     //use the breakDownDictionary to determine which HV to panic
     int alarmIndex = aCrate-1;
     if(![breakdownAlarm[alarmIndex] acknowledged] && [breakdownAlarm[alarmIndex] timeSincePosted] >= 20*60){
@@ -658,19 +661,16 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         for(id aDetectorKey in breakDownDictionary){
             if([self breakdownConditionsMet:aDetectorKey]){
                 NSMutableDictionary* anEntry = [breakDownDictionary objectForKey:aDetectorKey];
-//                int hvCrate             = [[anEntry objectForKey:@"hvCrate"]    intValue];
-//                int hvCard              = [[anEntry objectForKey:@"hvCard"]     intValue];
-//                int hvChannel           = [[anEntry objectForKey:@"hvChannel"]  intValue];
+                int hvCrate             = [[anEntry objectForKey:@"hvCrate"]    intValue];
+                int hvCard              = [[anEntry objectForKey:@"hvCard"]     intValue];
+                int hvChannel           = [[anEntry objectForKey:@"hvChannel"]  intValue];
                 NSString* stringName    = [anEntry  objectForKey:@"stringName"];
                 NSString* detectorName  = [anEntry  objectForKey:@"detectorName"];
                     
                 NSLogColor([NSColor redColor],@"Breakdown detected on string %@ Detector %@\n",stringName,detectorName);
-
                 
-                NSLogColor([NSColor redColor],@"Rampdown code currently commented out\n");
-                
-//                ORMPodCrateModel* hvCrateObj = [[(ORAppDelegate*)[NSApp delegate] document] findObjectWithFullID:[NSString stringWithFormat:@"ORMPodCrateModel,%d",hvCrate]];
-//                [[hvCrateObj cardInSlot:hvCard] panic:hvChannel];
+                ORMPodCrateModel* hvCrateObj = [[(ORAppDelegate*)[NSApp delegate] document] findObjectWithFullID:[NSString stringWithFormat:@"ORMPodCrateModel,%d",hvCrate]];
+                [[hvCrateObj cardInSlot:hvCard] panic:hvChannel];
             }
         }
     }
@@ -920,7 +920,55 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     [[NSNotificationCenter defaultCenter] postNotificationName:MajoranaModelIgnoreBreakdownCheckOnAChanged object:self];
 }
 
+- (BOOL) ignoreBreakdownPanicOnB
+{
+    return ignoreBreakdownPanicOnB;
+}
 
+- (void) setIgnoreBreakdownPanicOnB:(BOOL)aState
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setIgnoreBreakdownPanicOnB:ignoreBreakdownPanicOnB];
+    
+    if(ignoreBreakdownPanicOnB!= aState){
+        ignoreBreakdownPanicOnB = aState;
+        if(ignoreBreakdownPanicOnB){
+            NSLogColor([NSColor redColor],@"WARNING: Breakdowns on Module 1 will be checked, but HV will NOT ramp down\n");
+            [breakdownAlarm[0] clearAlarm];
+            [breakdownAlarm[0] release];
+            breakdownAlarm[0] = nil;
+        }
+        else {
+            NSLog(@"Breakdown panic enabled on Module 1\n");
+        }
+    }
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:MajoranaModelIgnoreBreakdownPanicOnBChanged object:self];
+}
+
+- (BOOL) ignoreBreakdownPanicOnA
+{
+    return ignoreBreakdownPanicOnA;
+}
+
+- (void) setIgnoreBreakdownPanicOnA:(BOOL)aState
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setIgnoreBreakdownPanicOnA:ignoreBreakdownPanicOnA];
+    
+    if(ignoreBreakdownPanicOnA!= aState){
+        ignoreBreakdownPanicOnA = aState;
+        if(ignoreBreakdownPanicOnA){
+            NSLogColor([NSColor redColor],@"WARNING: Breakdowns on Module 2 will be checked, but HV will NOT ramp down\n");
+            [breakdownAlarm[1] clearAlarm];
+            [breakdownAlarm[1] release];
+            breakdownAlarm[1] = nil;
+        }
+        else {
+            NSLog(@"Breakdown panic enabled on Module 2\n");
+        }
+    }
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:MajoranaModelIgnoreBreakdownPanicOnAChanged object:self];
+}
 
 - (int) pollTime
 {
@@ -1297,6 +1345,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     [self setIgnorePanicOnA:[decoder decodeBoolForKey:@"ignorePanicOnA"]];
     [self setIgnoreBreakdownCheckOnB:[decoder decodeBoolForKey:@"ignoreBreakdownCheckOnB"]];
     [self setIgnoreBreakdownCheckOnA:[decoder decodeBoolForKey:@"ignoreBreakdownCheckOnA"]];
+    [self setIgnoreBreakdownPanicOnB:[decoder decodeBoolForKey:@"ignoreBreakdownPanicOnB"]];
+    [self setIgnoreBreakdownPanicOnA:[decoder decodeBoolForKey:@"ignoreBreakdownPanicOnA"]];
     [self setViewType:[decoder decodeIntForKey:@"viewType"]];
     int i;
     for(i=0;i<2;i++){
@@ -1322,6 +1372,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     [encoder encodeBool:ignorePanicOnA forKey:@"ignorePanicOnA"];
     [encoder encodeBool:ignoreBreakdownCheckOnB forKey:@"ignoreBreakdownCheckOnB"];
     [encoder encodeBool:ignoreBreakdownCheckOnA forKey:@"ignoreBreakdownCheckOnA"];
+    [encoder encodeBool:ignoreBreakdownPanicOnB forKey:@"ignoreBreakdownPanicOnB"];
+    [encoder encodeBool:ignoreBreakdownPanicOnA forKey:@"ignoreBreakdownPanicOnA"];
     [encoder encodeInt:viewType        forKey: @"viewType"];
 	[encoder encodeInt:pollTime		   forKey: @"pollTime"];
     [encoder encodeObject:stringMap	   forKey: @"stringMap"];

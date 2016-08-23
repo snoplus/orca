@@ -61,7 +61,7 @@
 {
 	detectorSize		 = NSMakeSize(770,770);
 	detailsSize			 = NSMakeSize(560,600);
-	subComponentViewSize = NSMakeSize(590,600);
+	subComponentViewSize = NSMakeSize(590,630);
 	detectorMapViewSize	 = NSMakeSize(900,760);
     vetoMapViewSize		 = NSMakeSize(580,565);
     calibrationViewSize	 = NSMakeSize(580,320);
@@ -193,6 +193,17 @@
                      selector : @selector(ignoreBreakdownCheckOnBChanged:)
                          name : MajoranaModelIgnoreBreakdownCheckOnBChanged
                         object: model];
+ 
+    [notifyCenter addObserver : self
+                     selector : @selector(ignoreBreakdownPanicOnAChanged:)
+                         name : MajoranaModelIgnoreBreakdownPanicOnAChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(ignoreBreakdownPanicOnBChanged:)
+                         name : MajoranaModelIgnoreBreakdownPanicOnBChanged
+                        object: model];
+
     
     [notifyCenter addObserver : self
                      selector : @selector(updateInterlockStates:)
@@ -271,6 +282,8 @@
 	[self ignorePanicOnBChanged:nil];
     [self ignoreBreakdownCheckOnAChanged:nil];
     [self ignoreBreakdownCheckOnBChanged:nil];
+    [self ignoreBreakdownPanicOnAChanged:nil];
+    [self ignoreBreakdownPanicOnBChanged:nil];
 
     
     //interlocks
@@ -586,14 +599,27 @@
 - (void) ignoreBreakdownCheckOnBChanged:(NSNotification*)aNote
 {
     [ignoreBreakdownCheckOnBCB setIntValue: ![model ignoreBreakdownCheckOnB]];
-    [ignoreBreakdownCheck1Field setStringValue: [model ignoreBreakdownCheckOnB]?@"Breakdown check SKIPPED":@""];
+    [ignoreBreakdownCheck1Field setStringValue: [model ignoreBreakdownCheckOnB]?@"Breakdown checks SKIPPED":@""];
     [self breakdownDetectedChanged:nil];
 }
 
 - (void) ignoreBreakdownCheckOnAChanged:(NSNotification*)aNote
 {
     [ignoreBreakdownCheckOnACB setIntValue: ![model ignoreBreakdownCheckOnA]];
-    [ignoreBreakdownCheck2Field setStringValue: [model ignoreBreakdownCheckOnA]?@"Breakdown check SKIPPED":@""];
+    [ignoreBreakdownCheck2Field setStringValue: [model ignoreBreakdownCheckOnA]?@"Breakdown checks SKIPPED":@""];
+    [self breakdownDetectedChanged:nil];
+}
+- (void) ignoreBreakdownPanicOnBChanged:(NSNotification*)aNote
+{
+    [ignoreBreakdownPanicOnBCB setIntValue: ![model ignoreBreakdownPanicOnB]];
+    [ignoreBreakdownPanic1Field setStringValue: [model ignoreBreakdownPanicOnB]?@"Panic on breakdown Disabled":@""];
+    [self breakdownDetectedChanged:nil];
+}
+
+- (void) ignoreBreakdownPanicOnAChanged:(NSNotification*)aNote
+{
+    [ignoreBreakdownPanicOnACB setIntValue: ![model ignoreBreakdownPanicOnA]];
+    [ignoreBreakdownPanic2Field setStringValue: [model ignoreBreakdownPanicOnA]?@"Panic on breakdown Disabled":@""];
     [self breakdownDetectedChanged:nil];
 }
 
@@ -712,6 +738,15 @@
 {
     [self confirmIgnoreBreakdownCheckForModule:1];
 }
+- (IBAction) ignoreBreakdownPanicOnAAction:(id)sender
+{
+    [self confirmIgnoreBreakdownPanicForModule:0];
+}
+
+- (IBAction) ignoreBreakdownPanicOnBAction:(id)sender
+{
+    [self confirmIgnoreBreakdownPanicForModule:1];
+}
 
 
 - (void) confirmIgnoreForModule:(int)module
@@ -805,6 +840,51 @@
 #endif
 }
 
+- (void) confirmIgnoreBreakdownPanicForModule:(int)module
+{
+    BOOL currentState;
+    if(module == 0) currentState = [model ignoreBreakdownPanicOnA];
+    else            currentState = [model ignoreBreakdownPanicOnB];
+    
+    NSString* s1 = [NSString stringWithFormat:@"Really %@ Breakdown Panics for Module %d?",!currentState?@"IGNORE":@"Enable",module==0?2:1];
+    if(!currentState)s1 = [s1 stringByAppendingFormat:@"\n\n(Breakdown panics will be IGNORED!)"];
+    else             s1 = [s1 stringByAppendingFormat:@"\n\n(Breakdown panics could happen)"];
+    
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:s1];
+    [alert setInformativeText:@""];
+    if(currentState)[alert addButtonWithTitle:[NSString stringWithFormat:@"YES/Enable Breakdown Panics"]];
+    else            [alert addButtonWithTitle:[NSString stringWithFormat:@"YES/Ignore Breakdown Panics"]];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if(result == NSAlertFirstButtonReturn){
+            if(module == 0) [model setIgnoreBreakdownPanicOnA:!currentState];
+            else            [model setIgnoreBreakdownPanicOnB:!currentState];
+        }
+        else {
+            if(module == 0) [model setIgnoreBreakdownPanicOnA:currentState];
+            else            [model setIgnoreBreakdownPanicOnB:currentState];
+        }
+    }];
+#else
+    NSDictionary* context = [[NSDictionary dictionaryWithObjectsAndKeys:
+                              [NSNumber numberWithInt:module],@"module",
+                              [NSNumber numberWithInt:currentState],@"currentState",
+                              nil] retain]; //release in confirmDidFinish()
+    NSBeginAlertSheet(s1,
+                      [NSString stringWithFormat:@"YES/%@ Checks",!currentState?@"Ignore Breakdown Panics ":@"Enable Breakdown Panics "],
+                      @"Cancel",
+                      nil,[self window],
+                      self,
+                      @selector(breakdownIgnoreConfirmDidFinish:returnCode:contextInfo:),
+                      nil,
+                      context,
+                      @"");
+#endif
+}
 
 
 

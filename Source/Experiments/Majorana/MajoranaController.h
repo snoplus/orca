@@ -31,6 +31,8 @@
     IBOutlet NSButton*      ignorePanicOnACB;
     IBOutlet NSButton*      ignoreBreakdownCheckOnBCB;
     IBOutlet NSButton*      ignoreBreakdownCheckOnACB;
+    IBOutlet NSButton*      ignoreBreakdownPanicOnBCB;
+    IBOutlet NSButton*      ignoreBreakdownPanicOnACB;
     IBOutlet NSPopUpButton*	viewTypePU;
     IBOutlet ORColorScale*	secondaryColorScale;
     IBOutlet NSButton*		secondaryColorAxisLogCB;
@@ -62,7 +64,9 @@
     IBOutlet NSTextField*   ignore2Field;
     IBOutlet NSTextField*   ignoreBreakdownCheck1Field;
     IBOutlet NSTextField*   ignoreBreakdownCheck2Field;
- 
+    IBOutlet NSTextField*   ignoreBreakdownPanic1Field;
+    IBOutlet NSTextField*   ignoreBreakdownPanic2Field;
+    
     IBOutlet BiStateView*	rate1BiState;
     IBOutlet BiStateView*	rate2BiState;
     
@@ -163,6 +167,8 @@
 - (IBAction) ignorePanicOnAAction:(id)sender;
 - (IBAction) ignoreBreakdownCheckOnBAction:(id)sender;
 - (IBAction) ignoreBreakdownCheckOnAAction:(id)sender;
+- (IBAction) ignoreBreakdownPanicOnBAction:(id)sender;
+- (IBAction) ignoreBreakdownPanicOnAAction:(id)sender;
 
 
 - (IBAction) viewTypeAction:(id)sender;

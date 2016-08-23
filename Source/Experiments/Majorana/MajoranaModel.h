@@ -52,6 +52,8 @@
     ORAlarm*        breakdownAlarm[2];
     BOOL            ignorePanicOnA;
     BOOL            ignorePanicOnB;
+    BOOL            ignoreBreakdownPanicOnA;
+    BOOL            ignoreBreakdownPanicOnB;
     BOOL            ignoreBreakdownCheckOnA;
     BOOL            ignoreBreakdownCheckOnB;
     unsigned long   runType;
@@ -74,6 +76,10 @@
 - (BOOL) ignorePanicOnA;
 - (void) setIgnorePanicOnA:(BOOL)aIgnorePanicOnA;
 
+- (BOOL) ignoreBreakdownPanicOnB;
+- (void) setIgnoreBreakdownPanicOnB:(BOOL)aIgnorePanicOnB;
+- (BOOL) ignoreBreakdownPanicOnA;
+- (void) setIgnoreBreakdownPanicOnA:(BOOL)aIgnorePanicOnA;
 - (BOOL) ignoreBreakdownCheckOnB;
 - (void) setIgnoreBreakdownCheckOnB:(BOOL)aIgnorePanicOnB;
 - (BOOL) ignoreBreakdownCheckOnA;
@@ -165,6 +171,8 @@
 
 @end
 
+extern NSString* MajoranaModelIgnoreBreakdownPanicOnBChanged;
+extern NSString* MajoranaModelIgnoreBreakdownPanicOnAChanged;
 extern NSString* MajoranaModelIgnoreBreakdownCheckOnBChanged;
 extern NSString* MajoranaModelIgnoreBreakdownCheckOnAChanged;
 extern NSString* MajoranaModelIgnorePanicOnBChanged;
