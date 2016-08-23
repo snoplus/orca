@@ -721,7 +721,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
             [record setObject:[NSNumber numberWithFloat:spikeInfo.ave]             forKey:@"ave"];
             [record setObject:[NSNumber numberWithFloat:spikeInfo.duration]        forKey:@"duration"];
             [record setObject:[NSNumber numberWithFloat:spikeInfo.spikeValue]      forKey:@"spikeValue"];
-            [record setObject:spikeInfo.spikeStart                                 forKey:@"timeOfSpike"];
+            
+            [record setObject:[spikeInfo.spikeStart stdDescription]                forKey:@"timeOfSpike"];
             
             [record setObject:startTime                     forKey:@"startTime"];
             [record setObject:endTime                       forKey:@"endTime"];
