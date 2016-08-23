@@ -477,9 +477,10 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
 - (void) forceConstraintCheck
 {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(forceConstraintCheck) object:nil];
-    scheduledToRunCheckBreakdown = NO;
-    [self checkConstraints];
+    //temp fix?? until I can understand why things don't work
+    //[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(forceConstraintCheck) object:nil];
+    //scheduledToRunCheckBreakdown = NO;
+    //[self checkConstraints];
 }
 
 - (NSString*) checkForBreakdown:(int)aCrate vacSystem:(int)aVacSystem
