@@ -670,8 +670,10 @@ struct {
 	if(aChan>=0 && aChan<kMJDPreAmpAdcChannels){
         
 		adcs[aChan] = aValue;
-	
-        [baselineRunningAverages addNewValue:aValue toIndex:aChan];
+        
+        if((aChan>=0 && aChan<=4) || (aChan >=8 && aChan<=12)){
+            [baselineRunningAverages addNewValue:aValue toIndex:aChan];
+        }
 
 		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
 		[userInfo setObject:[NSNumber numberWithFloat:aChan] forKey: @"Channel"];
