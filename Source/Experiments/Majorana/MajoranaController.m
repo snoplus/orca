@@ -593,7 +593,7 @@
 - (void) ignorePanicOnAChanged:(NSNotification*)aNote
 {
 	[ignorePanicOnACB setIntValue: [model ignorePanicOnA]];
-    [ignoreBreakdownCheck2Field setStringValue: [model ignorePanicOnA]?@"HV Ramp will be IGNORED":@""];
+    [ignore2Field setStringValue: [model ignorePanicOnA]?@"HV Ramp will be IGNORED":@""];
 }
 
 - (void) ignoreBreakdownCheckOnBChanged:(NSNotification*)aNote
@@ -611,14 +611,14 @@
 }
 - (void) ignoreBreakdownPanicOnBChanged:(NSNotification*)aNote
 {
-    [ignoreBreakdownPanicOnBCB setIntValue: ![model ignoreBreakdownPanicOnB]];
+    [ignoreBreakdownPanicOnBCB setIntValue: [model ignoreBreakdownPanicOnB]];
     [ignoreBreakdownPanic1Field setStringValue: [model ignoreBreakdownPanicOnB]?@"Panic on breakdown Disabled":@""];
     [self breakdownDetectedChanged:nil];
 }
 
 - (void) ignoreBreakdownPanicOnAChanged:(NSNotification*)aNote
 {
-    [ignoreBreakdownPanicOnACB setIntValue: ![model ignoreBreakdownPanicOnA]];
+    [ignoreBreakdownPanicOnACB setIntValue: [model ignoreBreakdownPanicOnA]];
     [ignoreBreakdownPanic2Field setStringValue: [model ignoreBreakdownPanicOnA]?@"Panic on breakdown Disabled":@""];
     [self breakdownDetectedChanged:nil];
 }

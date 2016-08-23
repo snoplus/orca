@@ -1202,27 +1202,27 @@
                                                         </connections>
                                                     </button>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="INC-ix-fw5">
-                                                        <rect key="frame" x="0.0" y="55" width="174" height="17"/>
+                                                        <rect key="frame" x="4" y="53" width="174" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title=" " id="xIB-jr-5vh">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title=" " id="xIB-jr-5vh">
                                                             <font key="font" metaFont="titleBar"/>
                                                             <color key="textColor" red="0.52986826799999998" green="0.01532832416" blue="0.044266656879999998" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="gWK-1x-UfK">
-                                                        <rect key="frame" x="0.0" y="34" width="184" height="17"/>
+                                                        <rect key="frame" x="4" y="31" width="184" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title=" " id="QPv-bK-2lw">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title=" " id="QPv-bK-2lw">
                                                             <font key="font" metaFont="titleBar"/>
                                                             <color key="textColor" red="0.52986826799999998" green="0.01532832416" blue="0.044266656879999998" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="51y-Iv-gN0">
-                                                        <rect key="frame" x="0.0" y="9" width="193" height="17"/>
+                                                        <rect key="frame" x="4" y="8" width="193" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title=" " id="PCe-yn-T5d">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title=" " id="PCe-yn-T5d">
                                                             <font key="font" metaFont="titleBar"/>
                                                             <color key="textColor" red="0.52986826799999998" green="0.01532832416" blue="0.044266656879999998" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1325,18 +1325,18 @@
                                                         </connections>
                                                     </button>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="jVY-6n-r5h">
-                                                        <rect key="frame" x="3" y="55" width="174" height="17"/>
+                                                        <rect key="frame" x="5" y="54" width="174" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title=" " id="pHO-Mg-fSN">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title=" " id="pHO-Mg-fSN">
                                                             <font key="font" metaFont="titleBar"/>
                                                             <color key="textColor" red="0.52986826799999998" green="0.01532832416" blue="0.044266656879999998" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="0as-dt-Qii">
-                                                        <rect key="frame" x="3" y="34" width="181" height="17"/>
+                                                        <rect key="frame" x="5" y="32" width="181" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title=" " id="bsz-z0-ASF">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title=" " id="bsz-z0-ASF">
                                                             <font key="font" metaFont="titleBar"/>
                                                             <color key="textColor" red="0.52986826799999998" green="0.01532832416" blue="0.044266656879999998" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1354,9 +1354,9 @@
                                                         </connections>
                                                     </button>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="E0m-96-GMi">
-                                                        <rect key="frame" x="3" y="9" width="195" height="17"/>
+                                                        <rect key="frame" x="5" y="9" width="195" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title=" " id="zB5-Td-SkD">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title=" " id="zB5-Td-SkD">
                                                             <font key="font" metaFont="titleBar"/>
                                                             <color key="textColor" red="0.52986826799999998" green="0.01532832416" blue="0.044266656879999998" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
