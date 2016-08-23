@@ -1952,6 +1952,12 @@
 		848822A71D2413910030B398 /* ORDT5725Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8488229F1D2413910030B398 /* ORDT5725Model.h */; };
 		848822A81D2413910030B398 /* ORDT5725Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 848822A01D2413910030B398 /* ORDT5725Model.m */; };
 		848883CC10179CBA0043E7D6 /* EduWashingtonNplOrcaNi488PlugIn.plugin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 84888394101796C10043E7D6 /* EduWashingtonNplOrcaNi488PlugIn.plugin */; };
+		848917781D6B73D300CF5AAF /* CytecVM8.gif in Resources */ = {isa = PBXBuildFile; fileRef = 848917721D6B73D300CF5AAF /* CytecVM8.gif */; };
+		848917791D6B73D300CF5AAF /* CytecVM8.nib in Resources */ = {isa = PBXBuildFile; fileRef = 848917731D6B73D300CF5AAF /* CytecVM8.nib */; };
+		8489177A1D6B73D300CF5AAF /* ORCytecVM8Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 848917741D6B73D300CF5AAF /* ORCytecVM8Controller.h */; };
+		8489177B1D6B73D300CF5AAF /* ORCytecVM8Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 848917751D6B73D300CF5AAF /* ORCytecVM8Controller.m */; };
+		8489177C1D6B73D300CF5AAF /* ORCytecVM8Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 848917761D6B73D300CF5AAF /* ORCytecVM8Model.h */; };
+		8489177D1D6B73D300CF5AAF /* ORCytecVM8Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 848917771D6B73D300CF5AAF /* ORCytecVM8Model.m */; };
 		848A147B10BAE3D6002A80D0 /* ORFileReader.h in Headers */ = {isa = PBXBuildFile; fileRef = 848A147910BAE3D6002A80D0 /* ORFileReader.h */; };
 		848A147C10BAE3D6002A80D0 /* ORFileReader.m in Sources */ = {isa = PBXBuildFile; fileRef = 848A147A10BAE3D6002A80D0 /* ORFileReader.m */; };
 		848A147F10BAE3F8002A80D0 /* ORHeaderCollector.h in Headers */ = {isa = PBXBuildFile; fileRef = 848A147D10BAE3F8002A80D0 /* ORHeaderCollector.h */; };
@@ -5420,6 +5426,12 @@
 		8488229F1D2413910030B398 /* ORDT5725Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORDT5725Model.h; sourceTree = "<group>"; };
 		848822A01D2413910030B398 /* ORDT5725Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORDT5725Model.m; sourceTree = "<group>"; };
 		84888394101796C10043E7D6 /* EduWashingtonNplOrcaNi488PlugIn.plugin */ = {isa = PBXFileReference; lastKnownFileType = folder; name = EduWashingtonNplOrcaNi488PlugIn.plugin; path = PlugIns/Universal/EduWashingtonNplOrcaNi488PlugIn.plugin; sourceTree = SOURCE_ROOT; };
+		848917721D6B73D300CF5AAF /* CytecVM8.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = CytecVM8.gif; sourceTree = "<group>"; };
+		848917731D6B73D300CF5AAF /* CytecVM8.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = CytecVM8.nib; sourceTree = "<group>"; };
+		848917741D6B73D300CF5AAF /* ORCytecVM8Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORCytecVM8Controller.h; sourceTree = "<group>"; };
+		848917751D6B73D300CF5AAF /* ORCytecVM8Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORCytecVM8Controller.m; sourceTree = "<group>"; };
+		848917761D6B73D300CF5AAF /* ORCytecVM8Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORCytecVM8Model.h; sourceTree = "<group>"; };
+		848917771D6B73D300CF5AAF /* ORCytecVM8Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORCytecVM8Model.m; sourceTree = "<group>"; };
 		848A147910BAE3D6002A80D0 /* ORFileReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORFileReader.h; path = "Source/Objects/Data Processing/ReplayData/ORFileReader.h"; sourceTree = SOURCE_ROOT; };
 		848A147A10BAE3D6002A80D0 /* ORFileReader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORFileReader.m; path = "Source/Objects/Data Processing/ReplayData/ORFileReader.m"; sourceTree = SOURCE_ROOT; };
 		848A147D10BAE3F8002A80D0 /* ORHeaderCollector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHeaderCollector.h; path = "Source/Objects/Data Processing/HeaderExplorer/ORHeaderCollector.h"; sourceTree = SOURCE_ROOT; };
@@ -10674,6 +10686,19 @@
 			path = DT5725;
 			sourceTree = "<group>";
 		};
+		848917711D6B73D300CF5AAF /* CytecVM8 */ = {
+			isa = PBXGroup;
+			children = (
+				848917721D6B73D300CF5AAF /* CytecVM8.gif */,
+				848917731D6B73D300CF5AAF /* CytecVM8.nib */,
+				848917741D6B73D300CF5AAF /* ORCytecVM8Controller.h */,
+				848917751D6B73D300CF5AAF /* ORCytecVM8Controller.m */,
+				848917761D6B73D300CF5AAF /* ORCytecVM8Model.h */,
+				848917771D6B73D300CF5AAF /* ORCytecVM8Model.m */,
+			);
+			path = CytecVM8;
+			sourceTree = "<group>";
+		};
 		848D84230DDE060100D44B81 /* TimeMultiPlot */ = {
 			isa = PBXGroup;
 			children = (
@@ -14476,6 +14501,7 @@
 				5B5A40451A79385C00543633 /* SIS3305 */,
 				B38DEE4114E02B40003914FF /* Advanet */,
 				8493CC790C99FA4B00B46CD4 /* VMEcpu */,
+				848917711D6B73D300CF5AAF /* CytecVM8 */,
 				8497E60B180C640D00CE974A /* V2718 */,
 				8402796907397B8700972B07 /* Bit3 Adaptor */,
 				848F6CA314C75F690093E502 /* SIS3150 Adapter */,
@@ -14780,6 +14806,7 @@
 				8434A1FE055B3287002D3102 /* OR620Model.h in Headers */,
 				8434A1FF055B3287002D3102 /* ORWaveform.h in Headers */,
 				8434A200055B3287002D3102 /* ORWaveformController.h in Headers */,
+				8489177A1D6B73D300CF5AAF /* ORCytecVM8Controller.h in Headers */,
 				8434A201055B3287002D3102 /* ORGenericData.h in Headers */,
 				8434A202055B3287002D3102 /* ORGpibDeviceModel.h in Headers */,
 				8434A203055B3287002D3102 /* ORHPPulserModel.h in Headers */,
@@ -14927,6 +14954,7 @@
 				841DA667078211E70099BBF6 /* ORCC32Controller.h in Headers */,
 				841DA669078211E70099BBF6 /* ORCC32Model.h in Headers */,
 				841DA736078231B90099BBF6 /* ORCamacBusProtocol.h in Headers */,
+				8489177C1D6B73D300CF5AAF /* ORCytecVM8Model.h in Headers */,
 				841DA7D6078240420099BBF6 /* ORTRS1Controller.h in Headers */,
 				841DAA5A07838C9A0099BBF6 /* ORDGF4cController.h in Headers */,
 				841DAA5C07838C9A0099BBF6 /* ORDGF4cModel.h in Headers */,
@@ -16037,6 +16065,7 @@
 				849415861B330FEB00ED42F8 /* onOffPendingBox.tif in Resources */,
 				840C80001955E1D300E36622 /* RelaunchOrca in Resources */,
 				8434A244055B3287002D3102 /* Credits.rtf in Resources */,
+				848917781D6B73D300CF5AAF /* CytecVM8.gif in Resources */,
 				8434A246055B3287002D3102 /* InfoPlist.strings in Resources */,
 				8434A247055B3287002D3102 /* AboutBox.nib in Resources */,
 				8434A248055B3287002D3102 /* StatusWindow.nib in Resources */,
@@ -16813,6 +16842,7 @@
 				840D0ECF14BBC56A008FAC82 /* snopluslogoon.tiff in Resources */,
 				840D0ED014BBC56A008FAC82 /* snopluslogoreplay.tiff in Resources */,
 				8402B5B314C708A1007999C1 /* MJDPreAmp.gif in Resources */,
+				848917791D6B73D300CF5AAF /* CytecVM8.nib in Resources */,
 				8402B5B414C708A1007999C1 /* MJDPreAmp.nib in Resources */,
 				848F6CAE14C75F690093E502 /* SIS3150.nib in Resources */,
 				848F6CAF14C75F690093E502 /* SIS3150Card.gif in Resources */,
@@ -17024,6 +17054,7 @@
 				8434A2B7055B3287002D3102 /* ORVmeCrateController.m in Sources */,
 				8434A2B9055B3287002D3102 /* ORVmeCrateModel.m in Sources */,
 				8434A2BB055B3287002D3102 /* ORVmeAdapter.m in Sources */,
+				8489177D1D6B73D300CF5AAF /* ORCytecVM8Model.m in Sources */,
 				8434A2BC055B3287002D3102 /* ORVmeCard.m in Sources */,
 				8434A2BD055B3287002D3102 /* ORVmeIOCard.m in Sources */,
 				8434A2BE055B3287002D3102 /* OrcaObject.m in Sources */,
@@ -17550,6 +17581,7 @@
 				841C6CCF0DA1557A007BE1E9 /* ORCaen1720Controller.m in Sources */,
 				841C6CD30DA155AF007BE1E9 /* ORCaen1720Model.m in Sources */,
 				84E743450DAD5EF00099CAEE /* ORMailer.m in Sources */,
+				8489177B1D6B73D300CF5AAF /* ORCytecVM8Controller.m in Sources */,
 				84B771410DB3DFBB004798B2 /* ORCaen1720Decoder.m in Sources */,
 				8438C36E1845092600A6F4D6 /* ORConditionalStep.m in Sources */,
 				8499FE8F0DC8E9B700E82DB4 /* ORSNOCrateController.m in Sources */,
