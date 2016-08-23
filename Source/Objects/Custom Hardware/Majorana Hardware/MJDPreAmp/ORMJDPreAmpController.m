@@ -414,10 +414,10 @@
 	[self baselineVoltageChanged:nil];
 	[self feedbackResistorChanged:nil];
 	[self detectorNameChanged:nil];
+    [self doNotUseHWMapChanged:nil];
 	[self useSBCChanged:nil];
 	[self boardRevChanged:nil];
     [self adcChanged:nil];
-    [self doNotUseHWMapChanged:nil];
     [self firmwareRevChanged:nil];
 }
 
