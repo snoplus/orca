@@ -209,19 +209,19 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
 - (void) runStarted:(NSNotification*) aNote
 {
-    if(!anObjForCouchID) anObjForCouchID = [[ORMJDHeaderRecordID alloc] init];
-    NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:
-                          [anObjForCouchID fullID],                     @"name",
-                          @"MJDHeader",                                 @"title",
-                          [[aNote userInfo] objectForKey:kHeader],      kHeader,
-                          [[aNote userInfo] objectForKey:kRunNumber],   kRunNumber,
-                          [[aNote userInfo] objectForKey:kSubRunNumber],kSubRunNumber,
-                          [[aNote userInfo] objectForKey:kRunMode],     kRunMode,
-                          nil];
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:anObjForCouchID userInfo:info];
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddHistoryAdcRecord" object:anObjForCouchID userInfo:info];
+//    if(!anObjForCouchID) anObjForCouchID = [[ORMJDHeaderRecordID alloc] init];
+//    NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:
+//                          [anObjForCouchID fullID],                     @"name",
+//                          @"MJDHeader",                                 @"title",
+//                          [[aNote userInfo] objectForKey:kHeader],      kHeader,
+//                          [[aNote userInfo] objectForKey:kRunNumber],   kRunNumber,
+//                          [[aNote userInfo] objectForKey:kSubRunNumber],kSubRunNumber,
+//                          [[aNote userInfo] objectForKey:kRunMode],     kRunMode,
+//                          nil];
+//
+//    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:anObjForCouchID userInfo:info];
+//
+//    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddHistoryAdcRecord" object:anObjForCouchID userInfo:info];
 }
 
 
@@ -781,7 +781,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
             [record setObject:[NSNumber numberWithFloat:spikeInfo.duration]        forKey:@"duration"];
             [record setObject:[NSNumber numberWithFloat:spikeInfo.ave]             forKey:@"ave"];
             [record setObject:[NSNumber numberWithFloat:spikeInfo.spikeValue]      forKey:@"spikeValue"];
-            [record setObject:spikeInfo.spikeStart                                 forKey:@"timeOfSpike"];
+            [record setObject:[spikeInfo.spikeStart stdDescription]                                 forKey:@"timeOfSpike"];
             [record setObject:startTime                     forKey:@"startTime"];
             [record setObject:endTime                       forKey:@"endTime"];
             [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddHistoryAdcRecord" object:self userInfo:record];
