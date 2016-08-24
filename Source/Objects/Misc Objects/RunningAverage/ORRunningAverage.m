@@ -100,9 +100,12 @@
     if([inComingData count] > minSamples)[inComingData removeObjectAtIndex:0];
     
     unsigned long n = [inComingData count];
-    if(n==1){
+    if(n<=5){
+        didSpike = NO;
+        lastDidSpike = NO;
         runningAverage = dataPoint;
-        return [self spikedInfo:NO];
+        runningAverage = runningAverage + (dataPoint - runningAverage)/(float)n;
+        return nil;
     }
     runningAverage = runningAverage + (dataPoint - runningAverage)/(float)n;
     
