@@ -368,7 +368,7 @@ NSString* ORMJDBiasWatcherForceUpdate			= @"ORMJDBiasWatcherForceUpdate";
     NSMutableSet* watchedPreAmps = [NSMutableSet set];
     int i;
     for(i=0;i<kMaxDetectors;i++){
-        ORMJDPreAmpModel* aPreAmpObj = [self preAmpObj:index];
+        ORMJDPreAmpModel* aPreAmpObj = [self preAmpObj:i];
         if(aPreAmpObj){
             [watchedPreAmps addObject:aPreAmpObj];
         }
