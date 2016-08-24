@@ -183,6 +183,11 @@ struct {
     [super sleep];
 }
 
+- (void) awakeAfterDocumentLoaded
+{
+    [self hardwareMapChanged:nil];
+}
+
 - (int) nMaxChannels
 {
     return kMJDPreAmpAdcChannels;
@@ -672,7 +677,9 @@ struct {
 		adcs[aChan] = aValue;
         
         if((aChan>=0 && aChan<=4) || (aChan >=8 && aChan<=12)){
-            [baselineRunningAverages addNewValue:aValue toIndex:aChan];
+            if(adcEnabledMask & (0x1<<aChan)){
+                [baselineRunningAverages addNewValue:aValue toIndex:aChan];
+            }
         }
 
 		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
