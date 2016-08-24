@@ -29,6 +29,7 @@
     [self setTag: aTag];
     inComingData = [[NSMutableArray alloc] init];
     [self setWindowLength:wl];
+    spikeStartDate = nil;
     return self;
 }
 
@@ -72,11 +73,6 @@
 - (void) resetCounter:(float) rate
 {
     [inComingData removeAllObjects];
-    int idx;
-    for(idx=0; idx<windowLength;idx++){
-        [inComingData addObject:[NSNumber numberWithFloat:rate]];
-    }
-    runningAverage = rate;
 }
 - (void) reset
 {
@@ -145,6 +141,8 @@
     }
     else {
         duration = [[NSDate date] timeIntervalSinceDate:spikeStartDate];
+        [spikeStartDate release];
+        spikeStartDate = nil;
     }
     
     ORRunningAveSpike* aSpikeObj = [[ORRunningAveSpike alloc] init];
@@ -160,7 +158,7 @@
         spikeStartDate = nil;
     }
     
-    return [aSpikeObj autorelease];;
+    return [aSpikeObj autorelease];
 }
 
 - (void) dump

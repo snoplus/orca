@@ -1382,7 +1382,7 @@ struct {
         [self setBaselineRunningAverages:[[[ORRunningAverageGroup alloc] initGroup:kMJDPreAmpAdcChannels groupTag:0 withLength:10] autorelease]];
     }
     
-    [baselineRunningAverages resetCounters:0];
+   // [baselineRunningAverages resetCounters:0];
     [baselineRunningAverages setVerbose:false];
     [baselineRunningAverages setTriggerValue:1.5];
     [baselineRunningAverages setTriggerType:kRASpikeOnThreshold];

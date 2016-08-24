@@ -695,19 +695,23 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     BOOL spiked = [spikeInfo spiked];
     BOOL sendPost = NO;
     if(spiked){
+        //a spike happened..
         if(![rateSpikes objectForKey:aKey]){
+            //not noticed before, so store it
             if(!rateSpikes)rateSpikes = [[NSMutableDictionary dictionary] retain];
-            [rateSpikes setObject:dic forKey:aKey];
+            [rateSpikes setObject:dic forKey:aKey]; //<<<--note, dictionary stored has spike and crate,card, chan info
             sendPost = YES;
         }
     }
     else {
-        spikeInfo = [rateSpikes objectForKey:aKey];
-        if(spikeInfo){
-            //this means the spike has ended.
+        //the spike has ended
+        NSDictionary* spikeDic = [rateSpikes objectForKey:aKey];
+        if(spikeDic){
+            ORRunningAveSpike* oldSpikeInfo = [spikeDic objectForKey:@"spikeInfo"];
+
             //post to the data base history using the staring spike stored earlier
             NSMutableDictionary* record = [NSMutableDictionary dictionary];
-            NSDate*   started   = [spikeInfo spikeStart];
+            NSDate*   started   = [oldSpikeInfo spikeStart];
             NSNumber* startTime = [NSNumber numberWithDouble:[started timeIntervalSince1970]];
             NSNumber* endTime   = [NSNumber numberWithDouble:[[NSDate date] timeIntervalSince1970]];
             
@@ -719,11 +723,11 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
             [record setObject:[dic objectForKey:@"card"]    forKey:@"card"];
             [record setObject:[dic objectForKey:@"channel"] forKey:@"chan"];
     
-            [record setObject:[NSNumber numberWithFloat:spikeInfo.ave]             forKey:@"ave"];
-            [record setObject:[NSNumber numberWithFloat:spikeInfo.duration]        forKey:@"duration"];
-            [record setObject:[NSNumber numberWithFloat:spikeInfo.spikeValue]      forKey:@"spikeValue"];
+            [record setObject:[NSNumber numberWithFloat:oldSpikeInfo.ave]             forKey:@"ave"];
+            [record setObject:[NSNumber numberWithFloat:oldSpikeInfo.duration]        forKey:@"duration"];
+            [record setObject:[NSNumber numberWithFloat:oldSpikeInfo.spikeValue]      forKey:@"spikeValue"];
             
-            [record setObject:[spikeInfo.spikeStart stdDescription]                forKey:@"timeOfSpike"];
+            [record setObject:[oldSpikeInfo.spikeStart stdDescription]                forKey:@"timeOfSpike"];
             
             [record setObject:startTime                     forKey:@"startTime"];
             [record setObject:endTime                       forKey:@"endTime"];

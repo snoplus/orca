@@ -163,9 +163,9 @@ NSString* ORRunningAverageChangedNotification = @"ORRunningAverageChangedNotific
     for(idx=0; idx<[runningAverages count];idx++){
         ORRunningAverage* ra = [runningAverages objectAtIndex:idx];
         [ra reset];
-        ORRunningAveSpike* aSpikeObj = [ra spikedInfo:NO];
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:aSpikeObj forKey:@"SpikeObject"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORRunningAverageSpikeNotification object:self userInfo:userInfo];
+        //ORRunningAveSpike* aSpikeObj = [ra spikedInfo:NO];
+       // NSDictionary* userInfo = [NSDictionary dictionaryWithObject:aSpikeObj forKey:@"SpikeObject"];
+       // [[NSNotificationCenter defaultCenter] postNotificationName:ORRunningAverageSpikeNotification object:self userInfo:userInfo];
     }
 }
 - (int) tag
