@@ -99,6 +99,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 - (void) awakeAfterDocumentLoaded
 {
     [self getRunType:nil];
+    [super awakeAfterDocumentLoaded];
 }
 
 - (void) getRunType:(ORRunModel*)rc

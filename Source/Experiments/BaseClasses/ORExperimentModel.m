@@ -101,6 +101,7 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
 - (void) awakeAfterDocumentLoaded
 {
 	[segmentGroups makeObjectsPerformSelector:@selector(awakeAfterDocumentLoaded)];
+    [super awakeAfterDocumentLoaded];
 }
 
 - (BOOL) solitaryObject
