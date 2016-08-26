@@ -1783,8 +1783,10 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
 			if (calcRates) { //only good CMOS count reads get here
                     if(cmosCount[ch] > theCount){
                         // theCount rolled over
+                        uint32_t dumbRate = (theCount - cmosCount[ch]) * sampleFreq;
                         theCount = (UINT32_MAX - cmosCount[ch]) + theCount;
                         theRate = theCount * sampleFreq;
+                        NSLogColor([NSColor redColor], @"\nROLLOVER OCCURED\n IncorrectRate = %lu\n Correct Rate = %lu",dumbRate,theRate);
                     }
                     else{
                         theRate = (theCount - cmosCount[ch]) * sampleFreq;
