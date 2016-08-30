@@ -452,6 +452,7 @@ void loadXL2Xilinx_penn(SBC_Packet* aPacket)
 	char  errorMessage[80];
 	memset(errorMessage,'\0',80);		
 	uint32_t  errorFlag	 = 0;
+    if(errorFlag){} //fix a stupid compiler warning
 	uint8_t  finalStatus = 0; //assume failure
 
 	// these have to be adjustable and crate dependent
@@ -660,6 +661,7 @@ void loadXL2Xilinx_sharc(SBC_Packet* aPacket)
 	char  errorMessage[80];
 	memset(errorMessage,'\0',80);		
 	uint32_t  errorFlag	 = 0;
+    if(errorFlag){} //fix a stupid compiler warning
 	uint8_t  finalStatus = 0; //assume failure
 	
 	// these have to be adjustable and crate dependent
@@ -915,6 +917,7 @@ void firePedestalJobFixedTime(SBC_Packet* aPacket)
     unsigned long long pedestal_delay = p[1] * 100ULL * nsec_to_ticks; //p[1] is the delay in [100 nsec]
     uint32_t csr_mask = p[2];
     uint32_t error_code = 0;
+    if(error_code){} //fix a stupid compiler warning
 	uint32_t aValue = 0;
 	uint32_t i = 0;
 

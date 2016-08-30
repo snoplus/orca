@@ -182,19 +182,19 @@ bool ORSIS3305Card::Readout(SBC_LAM_Data* /*lam_data*/)
             // We will continue reading the SBC-packet-sized chunks out of the FIFO until we've gotten it all
             // (or alternately, we've hit 25 events - this stops this card from hogging all the read time).
             
-            uint32_t numLongsToReadNow;
+            //uint32_t numLongsToReadNow;
             uint32_t numBytesToReadNow;
             uint32_t bytesLeftToRead = bytesOfData; //numberBytesToRead;
             do
             {
                 if(bytesLeftToRead < maxSBCBufferSize)
                 {
-                    numLongsToReadNow = (numberBytesToReturn+3)/4; // adding +3 forces it to round up.
+                   // numLongsToReadNow = (numberBytesToReturn+3)/4; // adding +3 forces it to round up.
                     numBytesToReadNow = bytesLeftToRead;
                 }
                 else
                 {
-                    numLongsToReadNow = maxSBCBufferSize/4;
+                   // numLongsToReadNow = maxSBCBufferSize/4;
                     numBytesToReadNow = maxSBCBufferSize;
                     LogMessage("   Temporarily truncating bytesLeft from 0x%x to 0x%x (max buffer is 0x%x bytes)",bytesLeftToRead,numBytesToReadNow,maxSBCBufferSize);
                 }
