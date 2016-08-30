@@ -626,7 +626,7 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
         NSArray* allAlarms  = [[ORAlarmCollection sharedAlarmCollection] alarms];
         for(ORAlarm* anAlarm in allAlarms){
             if(![anAlarm acknowledged] && [anAlarm severity]>kSetupAlarm){
-                [report appendFormat:@"%@ : %@ @ %@\n",[anAlarm name],[ORAlarm alarmSeverityName:[anAlarm severity]],[anAlarm timePosted]];
+                [report appendFormat:@"From ORCA (%@)\n%@ : %@ @ %@\n",computerName(),[anAlarm name],[ORAlarm alarmSeverityName:[anAlarm severity]],[anAlarm timePosted]];
             }
         }
         
