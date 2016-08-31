@@ -134,8 +134,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 -(void)dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-    [self stopTellieRun];
-    self.ellieFireFlag = NO;
     [super dealloc];
 }
 
