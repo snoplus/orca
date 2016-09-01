@@ -252,7 +252,7 @@
     NSString* card  = [NSString stringWithFormat:@"Card  = %lu\n",(ptr[1] >> 16)&0x0000001f];
     NSString* timeStamp = @"No Timestamp\n";
     int firstDataIndex = 2;
-    if(ptr[1] | 0x1){
+    if(ptr[1] & 0x1){
         timeStamp  = [NSString stringWithFormat:@"TimeStamp = %lu.%lu\n",ptr[2],ptr[3]];
         firstDataIndex = 4;
     }
