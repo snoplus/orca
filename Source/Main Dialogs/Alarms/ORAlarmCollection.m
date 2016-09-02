@@ -47,7 +47,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmCollection);
     return self;
 }
 
-
 - (void) dealloc
 {
     [eMailList release];
@@ -59,9 +58,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmCollection);
     [super dealloc];
 }
 
-
 #pragma mark •••Accessors
-
 - (BOOL) emailEnabled
 {
     return emailEnabled;
@@ -202,13 +199,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmCollection);
     NSBeep();
 }
 
-- (void) addAlarm:(ORAlarm*)anAlarm
+- (void) addAlarm:(ORAlarm*)anAlarm 
 {
-    if(!alarms)		  [self setAlarms:[NSMutableArray array]];
-	NSEnumerator* e = [alarms objectEnumerator];
+    if(!alarms)[self setAlarms:[NSMutableArray array]];
 	BOOL alarmAlreadyPosted = NO;
-	ORAlarm* alarm;
-	while(alarm = [e nextObject]){
+	for(ORAlarm* alarm in alarms){
 		if([[alarm name] isEqualToString:[anAlarm name]]){
 			alarmAlreadyPosted = YES;
 			break;
@@ -217,9 +212,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmCollection);
 	
     if(![alarms containsObject:anAlarm] &&  !alarmAlreadyPosted){
 		BOOL added = NO;
-		NSEnumerator* e = [alarms objectEnumerator];
-		ORAlarm* alarm;
-		while(alarm = [e nextObject]){
+        for(ORAlarm* alarm in alarms){
 			if([anAlarm severity]>=[alarm severity]){
 				[alarms insertObject:anAlarm atIndex:[alarms indexOfObject:alarm]];
 				added = YES;
@@ -450,10 +443,21 @@ NSString* ORAlarmAddressChanged			  = @"ORAlarmAddressChanged";
                      selector : @selector(alarmWasCleared:)
                          name : ORAlarmWasClearedNotification
                        object : nil];
-        
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(alarmWasChanged:)
+                         name : ORAlarmWasChangedNotification
+                       object : nil];
+
+    
 }
 
 #pragma mark •••Alarm Management
+- (void) alarmWasChanged:(NSNotification*)aNotification
+{
+    [self alarmWasPosted:aNotification];
+}
+ 
 - (void) alarmWasPosted:(NSNotification*)aNotification
 {
 	[eMailLock lock];
@@ -541,7 +545,10 @@ NSString* ORAlarmAddressChanged			  = @"ORAlarmAddressChanged";
 			NSMutableString* otherRecipents = [NSMutableString stringWithString:@""];
             
 			for(id anAlarm in alarms){
-				if([anAlarm timeSincePosted] > 60 && [self wantsAlarmSeverity:[anAlarm severity]]){
+				if(![anAlarm acknowledged] &&
+                   ([anAlarm timeSincePosted] > [anAlarm mailDelay]) &&
+                    [self wantsAlarmSeverity:[anAlarm severity]]){
+                    
 					content = [content stringByAppendingFormat:@"+++++++++++++++++++++++++++++++++++\n%@\n",[anAlarm helpString]];
 					if([[anAlarm additionalInfoString] length]){
 						content = [content stringByAppendingFormat:@"\n+++++++++++++++++++++++++++++++++++\n%@\n",[anAlarm additionalInfoString]];

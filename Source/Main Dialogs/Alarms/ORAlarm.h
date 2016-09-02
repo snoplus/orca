@@ -36,6 +36,11 @@ typedef enum {
 	kNumAlarmSeverityTypes	//must be last
 } AlarmSeverityTypes;
 
+typedef enum AlarmEmailDelayTime {
+    k10SecDelay = 10,
+    k30SecDelay = 30,
+    k60SecDelay = 60,
+}AlarmEmailDelayTime;
 
 @interface ORAlarm : NSObject {
 	NSDate*         timePosted;
@@ -46,6 +51,7 @@ typedef enum {
 	BOOL			sticky;
 	BOOL			isPosted;
 	NSString*		additionalInfoString;
+    AlarmEmailDelayTime             mailDelay;
 }
 
 #pragma mark •••Initialization
@@ -59,7 +65,8 @@ typedef enum {
 
 - (NSString*) additionalInfoString;
 - (void) setAdditionalInfoString:(NSString*)aName;
-
+- (AlarmEmailDelayTime) mailDelay;
+- (void) setMailDelay:(AlarmEmailDelayTime)aTime;
 - (NSString*) timePosted;
 - (NSString*) timePostedUTC;
 - (void) setTimePosted:(NSDate*)aDate;
@@ -91,3 +98,5 @@ typedef enum {
 extern NSString* ORAlarmWasPostedNotification;
 extern NSString* ORAlarmWasClearedNotification;
 extern NSString* ORAlarmWasAcknowledgedNotification;
+extern NSString* ORAlarmWasChangedNotification;
+

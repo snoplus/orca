@@ -23,6 +23,7 @@
 NSString* ORAlarmWasPostedNotification 			= @"Alarm Posted Notification";
 NSString* ORAlarmWasClearedNotification 		= @"Alarm Cleared Notification";
 NSString* ORAlarmWasAcknowledgedNotification 	= @"ORAlarmWasAcknowledgedNotification";
+NSString* ORAlarmWasChangedNotification         = @"ORAlarmWasChangedNotification";
 
 NSString* severityName[kNumAlarmSeverityTypes] = {
 	@"Information",	
@@ -48,9 +49,10 @@ NSString* severityName[kNumAlarmSeverityTypes] = {
 {
     self = [super init];
     
-    [self setName:aName];
+    name = [aName copy];
     [self setSeverity:aSeverity];
     [self setSticky:NO];
+    [self setMailDelay:k60SecDelay];
     return self;
 }
 
@@ -96,8 +98,25 @@ NSString* severityName[kNumAlarmSeverityTypes] = {
 
 - (void) setName:(NSString*)aName
 {
+    BOOL changed = ![aName isEqualToString:name];
+    if(name && changed && !acknowledged) NSLogColor([NSColor redColor],@"Alarm changed from [%@] to [%@]\n",name,aName);
+
     [name autorelease];
-    name = [aName copy];    
+    name = [aName copy];
+    
+    if(changed){
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORAlarmWasChangedNotification object:self];
+    }
+}
+
+- (AlarmEmailDelayTime) mailDelay
+{
+    return mailDelay;
+}
+
+- (void) setMailDelay:(AlarmEmailDelayTime)aTime
+{
+    mailDelay = aTime;
 }
 
 - (int) severity

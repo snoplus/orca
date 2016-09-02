@@ -74,6 +74,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
                        object : nil];
 
     [notifyCenter addObserver : self
+                     selector : @selector(alarmsChanged:)
+                         name : ORAlarmWasChangedNotification
+                       object : nil];
+  
+    [notifyCenter addObserver : self
                      selector : @selector(severitySelectionChanged:)
                          name : ORAlarmSeveritySelectionChanged
                        object : nil];

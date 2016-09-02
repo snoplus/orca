@@ -52,9 +52,11 @@
 - (void) registerNotificationObservers;
 
 #pragma mark •••Alarm Management
+- (void) alarmWasChanged:(NSNotification*)aNotification;
 - (void) alarmWasPosted:(NSNotification*)aNotification;
 - (void) alarmWasCleared:(NSNotification*)aNotification;
 - (void) alarmWasAcknowledged:(NSNotification*)aNotification;
+- (void) alarmWasChanged:(NSNotification*)aNotification;
 - (void) beep:(NSTimer*)aTimer;
 
 - (void) addAlarm:(ORAlarm*)anAlarm;
