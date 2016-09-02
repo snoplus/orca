@@ -84,7 +84,7 @@ typedef struct {
 - (void)        setState:(int)currentState status:(NSString*)aString color:(NSColor*)aColor;
 - (void)        reset:(BOOL)continueRunning;
 - (void)        addToReport:(NSString*)aString;
-- (void)        postInterlockFailureAlarm:(NSString*)reason;
+- (void)        postInterlockFailureAlarm:(NSString*)reason hvInDanger:(BOOL)hvInDanger finalWarning:(BOOL)finalWarning;
 - (void)        clearInterlockFailureAlarm;
 - (int)         vacSystem;
 - (NSString*)   vacSystemName;

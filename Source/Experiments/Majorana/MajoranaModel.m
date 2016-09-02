@@ -672,7 +672,16 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                 NSLogColor([NSColor redColor],@"Breakdown detected on string %@ Detector %@\n",stringName,detectorName);
                 
                 ORMPodCrateModel* hvCrateObj = [[(ORAppDelegate*)[NSApp delegate] document] findObjectWithFullID:[NSString stringWithFormat:@"ORMPodCrateModel,%d",hvCrate]];
-                [[hvCrateObj cardInSlot:hvCard] panic:hvChannel];
+                
+                ORiSegHVCard* theHVCard = [hvCrateObj cardInSlot:hvCard];
+                float target = [theHVCard target:hvChannel];
+                float newTarget = .80*target;
+                [theHVCard setTarget:hvChannel withValue:newTarget];
+                [theHVCard commitTargetToHwGoal:hvChannel];
+                [theHVCard loadValues:hvChannel];
+                NSLogColor([NSColor redColor],@"Ramping %@,%d from %.2f to %.2f\n",[theHVCard fullID],hvChannel,target,newTarget);
+
+                //[[hvCrateObj cardInSlot:hvCard] panic:hvChannel];
             }
         }
     }

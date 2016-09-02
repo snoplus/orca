@@ -228,7 +228,6 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                     [self setState:kMJDInterlocks_Ping status:@"OK" color:okColor];
                     [self setState:kMJDInterlocks_PingWait status:@"Got Response" color:normalColor];
                     [self setCurrentState:kMJDInterlocks_CheckHVisOn];
-                    [self clearInterlockFailureAlarm];
                 }
                 else {
                     if(retryCount>=kAllowedPingRetry){
@@ -238,10 +237,11 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                         [self addToReport:@"Vacuum system appears unreachable"];
                         [self setCurrentState:kMJDInterlocks_CheckHVisOn];
                         retryCount = 0;
-                    }
+                        [self postInterlockFailureAlarm: [NSString stringWithFormat:@"%@ failed ALL pings",[self vacSystemName]] hvInDanger:YES finalWarning:YES];
+                   }
                     else {
                         retryCount++;
-                        [self postInterlockFailureAlarm: [NSString stringWithFormat:@"%@ failed ping. HV will rampDown.",[self vacSystemName]]];
+                        [self postInterlockFailureAlarm: [NSString stringWithFormat:@"%@ failed %d/%d pings",[self vacSystemName],retryCount,kAllowedPingRetry] hvInDanger:YES finalWarning:NO];
                         [self setState:kMJDInterlocks_PingWait status:[NSString stringWithFormat:@"Failed: %d/%d",retryCount,kAllowedPingRetry] color:badColor];
                         [self setState:kMJDInterlocks_Ping status:@"Will Retry" color:concernColor];
                         retryState = kMJDInterlocks_Ping;  //force a re-ping next time around
@@ -309,11 +309,13 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                             [self setCurrentState:kMJDInterlocks_HVRampDown];
                         }
                         retryCount = 0;
+                        [self postInterlockFailureAlarm: [NSString stringWithFormat:@"%@ unreachable",[self vacSystemName]] hvInDanger:YES finalWarning:YES];
+
                     }
                     else {
                         //no connection
                         retryCount++;
-                        [self postInterlockFailureAlarm: [NSString stringWithFormat:@"%@ unreachable. HV will rampDown.",[self vacSystemName]]];
+                        [self postInterlockFailureAlarm: [NSString stringWithFormat:@"%@ unreachable %d/%d tries",[self vacSystemName],retryCount,kAllowedConnectionRetry] hvInDanger:YES finalWarning:NO];
                         [self setState:kMJDInterlocks_UpdateVacSystem status:[NSString stringWithFormat:@"Failed: %d/%d",retryCount,kAllowedConnectionRetry] color:badColor];
                         retryState = kMJDInterlocks_UpdateVacSystem;  //force a retry of this state next time around
                         [self setCurrentState:kMJDInterlocks_Idle];
@@ -372,11 +374,13 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                         [self addToReport:@"Vac system did not respond to requests asking if HV should be unbiased"];
                         [self setCurrentState:kMJDInterlocks_HVRampDown];
                         retryCount = 0;
+                        [self postInterlockFailureAlarm: [NSString stringWithFormat:@"%@ unreachable",[self vacSystemName]] hvInDanger:YES finalWarning:YES];
+
                     }
                     else {
                         //no connection
                         retryCount++;
-                         [self postInterlockFailureAlarm: [NSString stringWithFormat:@"%@ unreachable. HV will rampDown.",[self vacSystemName]]];
+                         [self postInterlockFailureAlarm: [NSString stringWithFormat:@"%@ unreachable %d/%d tries",[self vacSystemName],retryCount,kAllowedResponseRetry] hvInDanger:YES finalWarning:NO];
                         [self setState:kMJDInterlocks_GetShouldUnBias status:[NSString stringWithFormat:@"Waited: %d/%d",retryCount,kAllowedResponseRetry] color:badColor];
                         retryState = kMJDInterlocks_GetShouldUnBias;  //force a retry of this state next time around
                         [self setCurrentState:kMJDInterlocks_Idle];
@@ -432,10 +436,11 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                         lockHVDialog = YES;
                         [self setCurrentState:kMJDInterlocks_HandleHVDialog];
                          retryCount = 0;
-                    }
+                        [self postInterlockFailureAlarm: [NSString stringWithFormat:@"%@ unreachable",[self vacSystemName]] hvInDanger:YES finalWarning:YES];
+                   }
                     else {
                         retryCount++;
-                        [self postInterlockFailureAlarm: [NSString stringWithFormat:@"%@ unreachable. HV will rampDown.",[self vacSystemName]]];
+                        [self postInterlockFailureAlarm: [NSString stringWithFormat:@"%@ unreachable %d/%d tries",[self vacSystemName],retryCount,kAllowedConnectionRetry] hvInDanger:YES finalWarning:NO];
                         [self setState:kMJDInterlocks_GetOKToBias status:[NSString stringWithFormat:@"Failed: %d/%d",retryCount,kAllowedConnectionRetry] color:badColor];
                         retryState = kMJDInterlocks_GetOKToBias;  //force a retry of this state next time around
                         [self setCurrentState:kMJDInterlocks_Idle];
@@ -496,7 +501,6 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             }
             else {
                 [self setCurrentState:kMJDInterlocks_CheckLNFill];
-               
             }
             break;
 
@@ -535,11 +539,12 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                         [self addToReport:@"Could not get LN Fill Status. Checking for breakdown anyway"];
                         [self setCurrentState:kMJDInterlocks_CheckForBreakdown];
                         retryCount = 0;
-                    }
+                        [self postInterlockFailureAlarm:[NSString stringWithFormat:@"SCM unreachable"] hvInDanger:NO finalWarning:YES];
+                   }
                     else {
                         //no connection
                         retryCount++;
-                        [self postInterlockFailureAlarm: @"SCM unreachable."];
+                        [self postInterlockFailureAlarm:[NSString stringWithFormat:@"SCM unreachable %d/%d",retryCount,kAllowedConnectionRetry] hvInDanger:NO finalWarning:NO];
                         [self setState:kMJDInterlocks_UpdateVacSystem status:[NSString stringWithFormat:@"Failed: %d/%d",retryCount,kAllowedConnectionRetry] color:badColor];
                         retryState = kMJDInterlocks_CheckLNFill;  //force a retry of this state next time around
                         [self setCurrentState:kMJDInterlocks_Idle];
@@ -653,15 +658,27 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
     NSLog(@"------------------------------------------------\n");
 }
 
-- (void) postInterlockFailureAlarm:(NSString*)reason
+- (void) postInterlockFailureAlarm:(NSString*)reason hvInDanger:(BOOL)hvInDanger finalWarning:(BOOL)finalWarning
 {
     BOOL hvOn = [delegate anyHvOnVMECrate:[self module]];
     if(hvOn){
         if(!interlockFailureAlarm){
             interlockFailureAlarm = [[ORAlarm alloc] initWithName:reason severity:kEmergencyAlarm];
             [interlockFailureAlarm setSticky:YES];
-            [interlockFailureAlarm setHelpString:[NSString stringWithFormat:@"HV will be ramped down soon on %@ because [%@].\nThis alarm will not be cleared until the condition causing it goes away.\nYou can silence this alarm by acknowledging it", [self vacSystemName],reason]];
             [interlockFailureAlarm postAlarm];
+            [interlockFailureAlarm setMailDelay:k30SecDelay];
+        }
+        else [interlockFailureAlarm setName:reason];
+        if(hvInDanger){
+            if(finalWarning){
+                [interlockFailureAlarm setHelpString:[NSString stringWithFormat:@"HV will be ramped down %@ because [%@].\nThis alarm will not be cleared until the condition causing it goes away.\nYou can silence this alarm by acknowledging it", [self vacSystemName],reason]];
+            }
+            else {
+                [interlockFailureAlarm setHelpString:[NSString stringWithFormat:@"HV could be ramped down soon on %@ because [%@].\nThis alarm will not be cleared until the condition causing it goes away.\nYou can silence this alarm by acknowledging it", [self vacSystemName],reason]];
+            }
+        }
+        else {
+            [interlockFailureAlarm setHelpString:@"This alarm will not be cleared until the condition causing it goes away.\nYou can silence this alarm by acknowledging it"];
         }
     }
     else {
