@@ -302,6 +302,9 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
 - (void) logBreakdowns:(int)aCrate
 {
+    if((aCrate == 2) &&  ignoreBreakdownCheckOnA)return;
+    if((aCrate == 1) &&  ignoreBreakdownCheckOnB)return;
+
     //the two Spike dicationaries come from notifications from the digitizers and the preamps.
     //They hold location info and a dictionary with the spike info. If they exist, there was an excursion in the running average
     if(baselineSpikes || rateSpikes){
@@ -695,8 +698,9 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
 - (void) rateSpike:(NSNotification*) aNote
 {
-    //either a spike happened or a spike cleared
     NSDictionary* dic = [aNote userInfo];
+
+    //either a spike happened or a spike cleared
     ORRunningAveSpike* spikeInfo = [dic objectForKey:@"spikeInfo"];
     NSString* aKey = [NSString stringWithFormat:@"%@,%@,%@",
                       [dic objectForKey:@"crate"],
@@ -705,6 +709,9 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     BOOL spiked = [spikeInfo spiked];
     BOOL sendPost = NO;
     if(spiked){
+        int aCrate = [[dic objectForKey:@"crate"]intValue];
+        if((aCrate == 2) &&  ignoreBreakdownCheckOnA)return;
+        if((aCrate == 1) &&  ignoreBreakdownCheckOnB)return;
         //a spike happened..
         if(![rateSpikes objectForKey:aKey]){
             //not noticed before, so store it
@@ -770,6 +777,10 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     BOOL spiked = [spikeInfo spiked];
     BOOL sendPost = NO;
     if(spiked){
+        int aCrate = [[dic objectForKey:@"crate"]intValue];
+        if((aCrate == 2) &&  ignoreBreakdownCheckOnA)return;
+        if((aCrate == 1) &&  ignoreBreakdownCheckOnB)return;
+        
         if(![baselineSpikes objectForKey:aKey]){
             if(!baselineSpikes)baselineSpikes = [[NSMutableDictionary dictionary] retain];
             [baselineSpikes setObject:dic forKey:aKey];
