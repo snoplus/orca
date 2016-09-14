@@ -51,12 +51,12 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_10
-NSString* kCrashLogDir               = @"~/Library/Logs/CrashReporter";
-NSString* kLastCrashLog              = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
-#else
+#if defined(MAC_OS_X_VERSION_10_9) && (MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_9)
 NSString* kCrashLogDir               = @"~/Library/Logs/DiagnosticReports";
 NSString* kLastCrashLog              = @"~/Library/Logs/DiagnosticReports/LastOrca.crash.log";
+#else
+NSString* kCrashLogDir               = @"~/Library/Logs/CrashReporter";
+NSString* kLastCrashLog              = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 #endif
 
 NSString* OROrcaAboutToQuitNotice    = @"OROrcaAboutToQuitNotice";
@@ -453,8 +453,8 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
     NSString *version = [[NSProcessInfo processInfo] operatingSystemVersionString];
     NSString* updateNotice = @"";
     
-    #if defined(MAC_OS_X_VERSION_10_5) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_5
-        updateNotice = @"(Note: ORCA will move to 10.6 soon. Please update)";
+    #if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+        updateNotice = @"(Note: You are using old version of MacOS. Please update)";
     #endif
 
     NSLog(@"Running MacOS %@ %@\n", version,updateNotice);
