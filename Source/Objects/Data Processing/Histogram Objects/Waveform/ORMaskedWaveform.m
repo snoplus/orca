@@ -176,6 +176,7 @@
     [[self undoManager] disableUndoRegistration];
     [self setSpecialBitMask:[decoder decodeInt32ForKey:@"specialBitMask"]];
     [self setScaleOffset:   [decoder decodeInt32ForKey:@"scaleOffset"]];
+    [self setBitNames:      [decoder decodeObjectForKey:@"bitNames"]];
     [[self undoManager] enableUndoRegistration];
 	
     return self;
@@ -186,6 +187,7 @@
     [super encodeWithCoder:encoder];
     [encoder encodeInt32:specialBitMask forKey:@"specialBitMask"];
     [encoder encodeInt32:scaleOffset    forKey:@"scaleOffset"];
+    [encoder encodeObject:bitNames      forKey:@"bitNames"];
 }
 
 @end
