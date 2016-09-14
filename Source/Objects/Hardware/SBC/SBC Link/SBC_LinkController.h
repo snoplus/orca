@@ -42,7 +42,11 @@
 	IBOutlet NSMatrix*		loadModeMatrix;
 	IBOutlet NSTextField*   filePathField;
     IBOutlet NSPanel*		passWordPanel;
+    IBOutlet NSPanel*		setTimePanel;
+
     IBOutlet NSTextField*   rootPassWordField;
+    IBOutlet NSTextField*   setTimePassWordField;
+    
 	IBOutlet NSTextField*   driverPassWordField;
 	IBOutlet NSMatrix*		rebootMatrix;
 	IBOutlet NSButton*		downloadDriverButton;
@@ -52,7 +56,10 @@
 	IBOutlet NSTextField*   shutdown2Field;
 	IBOutlet NSButton*		shutdownButton;
 	IBOutlet NSButton*		shutdownRebootButton;
-	IBOutlet NSButton*		checkVersionButton;
+    IBOutlet NSButton*		checkVersionButton;
+    IBOutlet NSButton*		checkTimeButton;
+    IBOutlet NSButton*		setTimeButton;
+    IBOutlet NSTextField*   timeSkewField;
 
 	//Monitoring
 	IBOutlet NSTextField*   runInfoField;
@@ -155,6 +162,8 @@
 - (void) cbTestChanged:(NSNotification*)aNote;
 - (void) payloadSizeChanged:(NSNotification*)aNote;
 
+- (void) timeSkewChanged:(NSNotification*)aNote;
+
 - (NSString*) errorString:(int)errNum;
 - (NSString*) literalToString:(int)aLiteral;
 - (void) setDriverInfo;
@@ -172,6 +181,7 @@
 - (IBAction) shutdownAction:(id)sender;    
 - (IBAction) closePassWordPanel:(id)sender;
 - (IBAction) rebootHaltSelectionAction:(id)sender;
+- (IBAction) closeSetTimePanel:(id)sender;
 
 - (IBAction) initAfterConnectAction:(id)sender;
 - (IBAction) ipNumberAction:(id)sender;
@@ -200,6 +210,8 @@
 - (IBAction) downloadDriverAction:(id)sender;
 - (IBAction) closeDriverInstallPanel:(id)sender;
 - (IBAction) getSbcCodeVersion:(id)sender;
+- (IBAction) checkTimeAction:(id)sender;
+- (IBAction) setTimeAction:(id)sender;
 - (IBAction) sbcPollingTimeAction:(id)sender;
 
 #pragma mark ¥¥¥DataSource

@@ -67,6 +67,7 @@
 #define kSBC_ErrorInfoRequest  0x22
 #define kSBC_GenericJob        0x23
 #define kSBC_MacAddressRequest 0x24
+#define kSBC_GetTimeRequest    0x25
 
 #define kSBC_Exit              0xFFFFFFFF /*close socket and quit application*/
 
@@ -80,12 +81,17 @@ SBC_CommandHeader;
 
 typedef 
     struct {
-        unsigned long milliSecondDelay;
+        uint32_t milliSecondDelay;
     }
 SBC_TimeDelay;
 
-
 typedef 
+    struct {
+        uint32_t unixTime;
+    }
+SBC_time_struct;
+
+typedef
     struct {
         SBC_info_struct runInfo;
     }

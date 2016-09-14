@@ -209,6 +209,7 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+    [sbcLink checkSBCTime];
 	dataTakers = [[readOutGroup allObjects] retain];									//cache of data takers.
 	
 	NSMutableDictionary* extraUserInfo = [NSMutableDictionary dictionaryWithDictionary:userInfo];		

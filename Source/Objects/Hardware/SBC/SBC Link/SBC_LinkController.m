@@ -37,6 +37,7 @@
 - (void) _killCrateDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 #endif
 - (void) _validatePasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _validateSetTimePanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) _driverInstallPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 @end
 
@@ -324,11 +325,15 @@
                          name : SBC_CodeVersionChanged
                        object : [model sbcLink]];
 	
-	[notifyCenter addObserver : self
+    [notifyCenter addObserver : self
                      selector : @selector(sbcPollingTimeChanged:)
                          name : SBC_LinkSbcPollingRateChanged
-                       object : [model sbcLink]];    
+                       object : [model sbcLink]];
     
+    [notifyCenter addObserver : self
+                     selector : @selector(timeSkewChanged:)
+                         name : SBC_LinkTimeSkewChanged
+                       object : [model sbcLink]];
 }
 
 - (void) updateWindow
@@ -366,6 +371,7 @@
 	[self errorTimeOutChanged:nil];
 	[self codeVersionChanged:nil];
 	[self sbcPollingTimeChanged:nil];
+    [self timeSkewChanged:nil];
 }
 
 - (void) sbcPollingTimeChanged:(NSNotification*)aNote
@@ -373,6 +379,15 @@
     [sbcPollingPU selectItemWithTag:[[model sbcLink] sbcPollingRate]];
 }
 
+- (void) timeSkewChanged:(NSNotification*)aNote
+{
+    if([[model sbcLink] timeSkewValid]){
+        [timeSkewField setStringValue:[NSString stringWithFormat:@"%ld Secs",[[model sbcLink] timeSkew]]];
+    }
+    else {
+        [timeSkewField setStringValue:@"Not Checked"];
+    }
+}
 
 - (void) codeVersionChanged:(NSNotification*)aNote
 {
@@ -866,6 +881,17 @@
 #endif
 }
 
+- (IBAction) closeSetTimePanel:(id)sender
+{
+    [setTimePanel orderOut:self];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    [NSApp endSheet:setTimePanel returnCode:([sender tag] == 1) ? NSModalResponseOK : NSModalResponseCancel];
+    
+#else
+    [NSApp endSheet:setTimePanel returnCode:([sender tag] == 1) ? NSOKButton : NSCancelButton];
+#endif
+}
+
 - (IBAction) closeDriverInstallPanel:(id)sender
 {
     [driverInstallPanel orderOut:self];
@@ -1153,6 +1179,22 @@
 	[[model sbcLink] setSbcCodeVersion:theVersion];
 }
 
+- (IBAction) checkTimeAction:(id)sender;
+{
+    [[model sbcLink] checkSBCTime];
+}
+
+- (IBAction) setTimeAction:(id)sender;
+{
+    [rootPassWordField setStringValue:@""];
+    [NSApp beginSheet: setTimePanel
+       modalForWindow: [self window]
+        modalDelegate: self
+       didEndSelector: @selector(_validateSetTimePanelDidEnd:returnCode:contextInfo:)
+          contextInfo: nil];
+
+}
+
 - (int)	numberPointsInPlot:(id)aPlotter
 {
 	int tag = [aPlotter tag];
@@ -1213,6 +1255,7 @@
 	}
 }
 #endif
+
 - (void) _validatePasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 #if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
@@ -1224,6 +1267,19 @@
 	}
 }
 
+- (void) _validateSetTimePanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    if(returnCode == NSModalResponseOK){
+#else
+    if(returnCode == NSOKButton){
+#endif
+        [[model sbcLink] setSBCTime:[setTimePassWordField stringValue]];
+    }
+}
+
+
+    
 - (void) _driverInstallPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 #if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific

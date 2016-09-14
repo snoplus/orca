@@ -90,7 +90,8 @@ NSString* SBC_CodeVersionChanged			= @"SBC_CodeVersionChanged";
 NSString* SBC_SocketDroppedUnexpectedly     = @"SBC_SocketDroppedUnexpectedly";
 NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 NSString* SBC_LinkErrorInfoChanged          = @"SBC_LinkErrorInfoChanged";
-NSString* SBC_MacAddressChanged             = @"SBC_MacAddressChanged";
+NSString* SBC_LinkMacAddressChanged         = @"SBC_LinkMacAddressChanged";
+NSString* SBC_LinkTimeSkewChanged           = @"SBC_LinkTimeSkewChanged";
 
 @interface SBCPacketWrapper : NSObject {
     NSMutableData* data;
@@ -228,6 +229,77 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 {
     sbcCodeVersion = aVersion;
     [[NSNotificationCenter defaultCenter] postNotificationName:SBC_CodeVersionChanged object:self];
+}
+
+- (void) checkSBCTime
+{
+    [self checkSBCTime:YES];
+}
+- (void) checkSBCTime:(BOOL)verbose
+{
+    id pw = [[SBCPacketWrapper alloc] init];
+    SBC_Packet* aPacket = [pw sbcPacket];
+    aPacket->cmdHeader.destination			= kSBC_Process;
+    aPacket->cmdHeader.cmdID                = kSBC_GetTimeRequest;
+    aPacket->cmdHeader.numberBytesinPayload	= 0;
+    @try {
+        [self send:aPacket receive:aPacket];
+        SBC_time_struct* theTimeStruct = (SBC_time_struct*)(aPacket->payload);
+        
+        unsigned long theSBCTime    = theTimeStruct->unixTime;
+        NSDate*       theSBCDate    = [NSDate dateWithTimeIntervalSince1970:theTimeStruct->unixTime];
+        
+        unsigned long theMacTime    = (unsigned long)[[NSDate date] timeIntervalSince1970];
+        NSDate*       theMacDate    = [NSDate date];
+
+        timeSkew = theSBCTime - theMacTime;
+        timeSkewValid = YES;
+        if(verbose){
+            NSLog(@"SBC %@ Time Check\n",[delegate fullID]);
+            NSLog(@"SBC Time: [%lu] %@\n",theSBCTime,[theSBCDate stdDescription]);
+            NSLog(@"Mac Time: [%lu] %@\n",theMacTime,[theMacDate stdDescription]);
+            NSLog(@"SBC - Mac: %ld seconds\n",timeSkew);
+        }
+    }
+    @catch (NSException* e){
+        timeSkewValid = NO;
+    }
+    [pw releaseAndCache];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkTimeSkewChanged object:self];
+}
+
+- (long) timeSkew       { return timeSkew;      }
+- (BOOL) timeSkewValid  { return timeSkewValid; }
+
+- (void) setSBCTime:(NSString*)rootPwd
+{
+    NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
+    
+    ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
+    NSString*       pwd       = [rootPwd length]?rootPwd:@"\n";
+    
+    NSDateComponents* c = [[NSCalendar currentCalendar] components:
+                                    NSCalendarUnitSecond    |
+                                    NSCalendarUnitMinute    |
+                                    NSCalendarUnitHour      |
+                                    NSCalendarUnitDay       |
+                                    NSCalendarUnitMonth     |
+                                    NSCalendarUnitYear
+                                        fromDate:[NSDate date]];
+
+    NSString* yearPart = [NSString stringWithFormat:@"%02d%02d%02d%02d%d.%02d",[c month],[c day],[c hour],[c minute],[c year],[c second]];
+    
+    [aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"]
+                 arguments:[NSArray arrayWithObjects:@"root",pwd,IPNumber,@"date",yearPart,nil]];
+ 
+    [aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"]
+             arguments:[NSArray arrayWithObjects:@"root",pwd,IPNumber,@"hwclock",@"--systohc",nil]];
+    
+    [aSequence setVerbose:verbose];
+    [aSequence setTextToDelegate:YES];
+    
+    [aSequence launch];
 }
 
 - (void) clearHistory
@@ -993,12 +1065,10 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
         SBC_Packet* aPacket = [pw sbcPacket];
         aPacket->cmdHeader.destination			= kSBC_Process;
         aPacket->cmdHeader.cmdID                = kSBC_MacAddressRequest;
-        aPacket->cmdHeader.numberBytesinPayload	= 6;
+        aPacket->cmdHeader.numberBytesinPayload	= 0;
         @try {
             [self send:aPacket receive:aPacket];
             unsigned char* mac = (unsigned char*)aPacket->payload;
-        
-            [sbcMacAddress release];
             
             [sbcMacAddress autorelease];
             sbcMacAddress = [[NSString alloc] initWithFormat:@"%02x:%02x:%02x:%02x:%02x:%02x",mac[0],mac[1],mac[2],mac[3],mac[4],mac[5]];
@@ -1008,7 +1078,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
         }
         [pw releaseAndCache];
         
-        [[NSNotificationCenter defaultCenter] postNotificationName:SBC_MacAddressChanged object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkMacAddressChanged object:self];
     }
 }
 
@@ -1953,7 +2023,6 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 //--------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------
-
 - (void) connect
 {
 	if(!socketfd && !irqfd && ([IPNumber length]!=0) && (portNumber!=0)){
@@ -1976,6 +2045,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 			NSLog(@"Connected to %@ <%@> port: %d\n",[self crateName],IPNumber,portNumber);
 			[[delegate crate] performSelector:@selector(connected) withObject:nil afterDelay:1];
             [self getMacAddress];
+            [self checkSBCTime:NO];
 		}
 		@catch (NSException* localException) {
 			if(socketfd){
@@ -2919,7 +2989,6 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 
 - (void) postCouchDBRecord
 {
-    
     NSMutableArray* cardErrorCounts     = [NSMutableArray arrayWithCapacity:MAX_CARDS];
     NSMutableArray* cardBusErrorCounts  = [NSMutableArray arrayWithCapacity:MAX_CARDS];
     NSMutableArray* cardMessageCounts   = [NSMutableArray arrayWithCapacity:MAX_CARDS];
@@ -2946,6 +3015,8 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
                             [NSNumber numberWithLong: runInfo.recordsTransfered],   @"recordsTransfered",
                             [NSNumber numberWithLong: byteRateReceived],            @"byteRateReceived",
                             [NSNumber numberWithLong: byteRateSent],                @"byteRateSent",
+                            [NSNumber numberWithLong: timeSkew],                    @"timeSkew",
+                            [NSNumber numberWithLong: timeSkewValid],               @"timeSkewValid",
                             [NSNumber numberWithLong: cardErrorCount],              @"cardErrorCount",
                             [NSNumber numberWithLong: cardBusErrorCount],           @"cardBusErrorCount",
                             [NSNumber numberWithLong: cardMessageCount],            @"cardMessageCount",
@@ -2968,6 +3039,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
                                     [NSDictionary dictionaryWithObject: [NSNumber numberWithLong: runInfo.recordsTransfered] forKey:@"recordsTransfered"],
                                     [NSDictionary dictionaryWithObject: [NSNumber numberWithDouble: byteRateReceived]        forKey:@"byteRateReceived"],
                                     [NSDictionary dictionaryWithObject: [NSNumber numberWithDouble: byteRateSent]           forKey:@"byteRateSent"],
+                                    [NSDictionary dictionaryWithObject: [NSNumber numberWithLong: timeSkew] forKey:@"timeSkew"],
                                     nil
                                     ],
                                    @"adcs",

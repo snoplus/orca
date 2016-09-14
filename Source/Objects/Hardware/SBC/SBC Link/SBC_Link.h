@@ -147,6 +147,8 @@ typedef enum eSBC_ThrottleConsts{
     NSDate*         lastRateUpdate;
 	unsigned long	sbcPollingRate;
     int             updateCount;
+    long            timeSkew;
+    BOOL            timeSkewValid;
 }
 
 - (id)   initWithDelegate:(ORCard*)anDelegate;
@@ -263,6 +265,11 @@ typedef enum eSBC_ThrottleConsts{
 - (void) pauseRun;
 - (void) resumeRun;
 - (void) setPollingDelay:(unsigned long)numMicroseconds;
+- (void) checkSBCTime;
+- (void) checkSBCTime:(BOOL)verbose;
+- (void) setSBCTime:(NSString*)rootPwd;
+- (long) timeSkew;
+- (BOOL) timeSkewValid;
 
 - (void) sendCommand:(long)aCmd withOptions:(SBC_CmdOptionStruct*)optionBlock expectResponse:(BOOL)askForResponse;
 - (void) sendPayloadSize:(long)aSize;
@@ -446,4 +453,6 @@ extern NSString* SBC_CodeVersionChanged;
 extern NSString* SBC_SocketDroppedUnexpectedly;
 extern NSString* SBC_LinkSbcPollingRateChanged;
 extern NSString* SBC_LinkErrorInfoChanged;
-extern NSString* SBC_MacAddressChanged;
+extern NSString* SBC_LinkMacAddressChanged;
+extern NSString* SBC_LinkTimeSkewChanged;
+

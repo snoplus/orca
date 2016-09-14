@@ -33,7 +33,6 @@
 #include "CircularBuffer.h"
 #include <pthread.h>
 #include <sys/time.h>
-#include <sys/time.h>
 #include <sys/ioctl.h>
 #include <net/if.h>   //ifreq
 #include "SBC_Readout.h"
@@ -41,6 +40,7 @@
 #include "ORVProcess.hh"
 #include "readout_code.h"
 #include "SBC_Job.h"
+
 #define BACKLOG 1     // how many pending connections queue will hold
 #ifndef TRUE
 #define TRUE  1
@@ -344,6 +344,8 @@ void processSBCCommand(SBC_Packet* aPacket,uint8_t reply)
 		case kSBC_KillJob:			killJob(aPacket);			break;
 		case kSBC_JobStatus:		jobStatus(aPacket);			break;
 		case kSBC_GenericJob:		doGenericJob(aPacket);		break;
+        case kSBC_GetTimeRequest:   sendTime();                 break;
+
         case kSBC_Exit:             timeToExit = 1;				break;
     }
 }
@@ -526,6 +528,21 @@ void sendErrorInfo(void)
     }
 }
 
+void sendTime(void)
+{
+    SBC_Packet aPacket;
+    aPacket.cmdHeader.destination          = kSBC_Process;
+    aPacket.cmdHeader.cmdID                = kSBC_GetTimeRequest;
+    aPacket.cmdHeader.numberBytesinPayload = sizeof(SBC_time_struct);
+    
+    SBC_time_struct* p  = (SBC_time_struct*)aPacket.payload;
+    time_t seconds      = time(NULL);
+    p->unixTime         = (uint32_t)seconds;
+    if(needToSwap) SwapLongBlock(p,sizeof(SBC_time_struct));
+    if (writeBuffer(&aPacket) < 0) {
+        LogError("sendTime Error: %s", strerror(errno));
+    }
+}
 
 void sendCBRecord(void)
 {
