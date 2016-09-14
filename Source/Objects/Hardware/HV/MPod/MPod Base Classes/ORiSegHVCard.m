@@ -998,7 +998,6 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
     [self setShipRecords:		[decoder decodeBoolForKey:	@"shipRecords"]];
     [self setSelectedChannel:	[decoder decodeIntForKey:	@"selectedChannel"]];
     [self setRiseRate:			[decoder decodeFloatForKey:	@"riseRate"]];
-    [self setDoNotPostSafetyLoopAlarm:			[decoder decodeBoolForKey:	@"doNotPostSafetyLoopAlarm"]];
     
 	int i;
 	for(i=0;i<[self numberOfChannels];i++){
@@ -1023,7 +1022,6 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
 	[encoder encodeBool:shipRecords                 forKey:@"shipRecords"];
 	[encoder encodeInt:selectedChannel              forKey:@"selectedChannel"];
     [encoder encodeFloat:riseRate                   forKey:@"riseRate"];
-    [encoder encodeBool:doNotPostSafetyLoopAlarm	forKey:@"doNotPostSafetyLoopAlarm"];
     
 	int i;
  	for(i=0;i<[self numberOfChannels];i++){
