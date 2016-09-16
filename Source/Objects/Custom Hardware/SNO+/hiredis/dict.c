@@ -47,7 +47,19 @@ static int _dictKeyIndex(dict *ht, const void *key);
 static int _dictInit(dict *ht, dictType *type, void *privDataPtr);
 
 /* -------------------------- hash functions -------------------------------- */
-
+static void wno_unused_myheadername(void)
+{
+    /* trick the compiler... don't need to actually call the functions to avoid the warnings */
+    (void)&dictGenHashFunction;
+    (void)&dictCreate;
+    (void)&dictReplace;
+    (void)&dictDelete;
+    (void)&dictRelease;
+    (void)&dictNext;
+    (void)&dictGetIterator;
+    (void)&dictReleaseIterator;
+    return;
+}
 /* Generic hash function (a popular one from Bernstein).
  * I tested a few and this was the best. */
 static unsigned int dictGenHashFunction(const unsigned char *buf, int len) {
@@ -71,6 +83,7 @@ static void _dictReset(dict *ht) {
 
 /* Create a new hash table */
 static dict *dictCreate(dictType *type, void *privDataPtr) {
+    wno_unused_myheadername();
     dict *ht = malloc(sizeof(*ht));
     _dictInit(ht,type,privDataPtr);
     return ht;
