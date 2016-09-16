@@ -235,7 +235,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 {
     [self checkSBCTime:YES];
 }
-- (void) checkSBCTime:(BOOL)verbose
+- (void) checkSBCTime:(BOOL)aVerbose
 {
     id pw = [[SBCPacketWrapper alloc] init];
     SBC_Packet* aPacket = [pw sbcPacket];
@@ -254,7 +254,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 
         timeSkew = theSBCTime - theMacTime;
         timeSkewValid = YES;
-        if(verbose){
+        if(aVerbose){
             NSLog(@"SBC %@ Time Check\n",[delegate fullID]);
             NSLog(@"SBC Time: [%lu] %@\n",theSBCTime,[theSBCDate stdDescription]);
             NSLog(@"Mac Time: [%lu] %@\n",theMacTime,[theMacDate stdDescription]);
