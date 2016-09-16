@@ -27,7 +27,7 @@
 #import "MajoranaModel.h"
 #import "ORCard.h"
 #import "ORRunningAverageGroup.h"
-
+#
 #pragma mark ¥¥¥Notification Strings
 NSString* ORMJDPreAmpModelBoardRevChanged   = @"ORMJDPreAmpModelBoardRevChanged";
 NSString* ORMJDPreAmpModelUseSBCChanged     = @"ORMJDPreAmpModelUseSBCChanged";
@@ -321,7 +321,7 @@ struct {
         NSArray* segments = nil;
         if(aNote)segments = [[aNote object] segments];
         else {
-            NSArray* mjdObjects = [[[NSApp delegate] document] collectObjectsWithClassName:@"MajoranaModel"];
+            NSArray* mjdObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsWithClassName:@"MajoranaModel"];
             if([mjdObjects count]){
                 MajoranaModel* mjdObject = [mjdObjects objectAtIndex:0];
                 segments = [[mjdObject segmentGroup:0] segments];
