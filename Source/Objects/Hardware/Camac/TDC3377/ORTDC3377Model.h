@@ -60,7 +60,7 @@
 		unsigned short maxFullScaleTime;
 		unsigned short requestDelay;
 		unsigned short dataOffset;
-		unsigned short timeout;
+		unsigned short timeOut;
 		unsigned short testClock;
 		unsigned short pulsesToGenerate;
 		unsigned short dataShift;
@@ -92,8 +92,8 @@
 - (void) setTestClock:(unsigned short)aTestClock;
 - (BOOL) testEnabled;
 - (void) setTestEnabled:(BOOL)aTestEnabled;
-- (unsigned short) timeout;
-- (void) setTimeout:(unsigned short)aTimeout;
+- (unsigned short) timeOut;
+- (void) setTimeOut:(unsigned short)aTimeout;
 - (unsigned short) dataOffset;
 - (void) setDataOffset:(unsigned short)aOffset;
 - (unsigned short) requestDelay;

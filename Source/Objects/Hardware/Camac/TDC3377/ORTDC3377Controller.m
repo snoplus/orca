@@ -331,7 +331,7 @@
 
 - (void) timeoutChanged:(NSNotification*)aNotification
 {
-	[timeoutField setIntValue:[model timeout]];
+	[timeoutField setIntValue:[model timeOut]];
 }
 
 - (void) testClockChanged:(NSNotification*)aNotification
@@ -481,9 +481,9 @@
 
 - (IBAction) timeoutAction:(id)sender
 {
-    if([timeoutField intValue] != [model timeout]){
+    if([timeoutField intValue] != [model timeOut]){
 		[[self undoManager] setActionName: @"Set Timeout"];
-		[model setTimeout:[timeoutField intValue]];
+		[model setTimeOut:[timeoutField intValue]];
     }
 }
 

@@ -219,16 +219,16 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelTestEnabledChanged object:self];
 }
 
-- (unsigned short) timeout
+- (unsigned short) timeOut
 {
-    return timeout;
+    return timeOut;
 }
 
-- (void) setTimeout:(unsigned short)aTimeout
+- (void) setTimeOut:(unsigned short)aTimeout
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setTimeout:timeout];
+    [[[self undoManager] prepareWithInvocationTarget:self] setTimeOut:timeOut];
     
-    timeout = aTimeout;
+    timeOut = aTimeout;
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelTimeoutChanged object:self];
 }
@@ -533,7 +533,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 	[self setPulsesToGenerate:[decoder decodeIntForKey:@"ORTDC3377ModelPulsesToGenerate"]];
 	[self setTestClock:[decoder decodeIntForKey:@"ORTDC3377ModelTestClock"]];
 	[self setTestEnabled:[decoder decodeBoolForKey:@"ORTDC3377ModelTestEnabled"]];
-	[self setTimeout:[decoder decodeIntForKey:@"ORTDC3377ModelTimeout"]];
+	[self setTimeOut:[decoder decodeIntForKey:@"ORTDC3377ModelTimeout"]];
 	[self setDataOffset:[decoder decodeIntForKey:@"ORTDC3377ModelDataOffset"]];
 	[self setRequestDelay:[decoder decodeIntForKey:@"ORTDC3377ModelRequestDelay"]];
 	[self setMaxFullScaleTime:[decoder decodeIntForKey:@"ORTDC3377ModelMaxFullScaleTime"]];
@@ -586,7 +586,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [encoder encodeInt:pulsesToGenerate forKey:@"ORTDC3377ModelPulsesToGenerate"];
     [encoder encodeInt:testClock forKey:@"ORTDC3377ModelTestClock"];
     [encoder encodeBool:testEnabled forKey:@"ORTDC3377ModelTestEnabled"];
-    [encoder encodeInt:timeout forKey:@"ORTDC3377ModelTimeout"];
+    [encoder encodeInt:timeOut forKey:@"ORTDC3377ModelTimeout"];
     [encoder encodeInt:dataOffset forKey:@"ORTDC3377ModelDataOffset"];
     [encoder encodeInt:requestDelay forKey:@"ORTDC3377ModelRequestDelay"];
     [encoder encodeInt:maxFullScaleTime forKey:@"ORTDC3377ModelMaxFullScaleTime"];
@@ -758,7 +758,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [objDictionary setObject:[NSNumber numberWithInt:maxFullScaleTime] forKey:@"maxFullScaleTime"];
     [objDictionary setObject:[NSNumber numberWithInt:requestDelay] forKey:@"requestDelay"];
     [objDictionary setObject:[NSNumber numberWithInt:dataOffset] forKey:@"dataOffset"];
-    [objDictionary setObject:[NSNumber numberWithInt:timeout] forKey:@"timeout"];
+    [objDictionary setObject:[NSNumber numberWithInt:timeOut] forKey:@"timeout"];
     [objDictionary setObject:[NSNumber numberWithInt:testClock] forKey:@"testClock"];
     [objDictionary setObject:[NSNumber numberWithInt: pulsesToGenerate] forKey:@"pulsesToGenerate"];
     [objDictionary setObject:[NSNumber numberWithInt:dataShift] forKey:@"dataShift"];
@@ -840,7 +840,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
             controlReg3 |= requestDelay&0xf;
             controlReg3 |= (maxFullScaleTime&0xfff)<<4;
             
-            controlReg4 |= (timeout&0x03FF);
+            controlReg4 |= (timeOut&0x03FF);
 			
             controlReg5 |= (pulsesToGenerate&0x001F);
             controlReg5 |= (testClock&0x003)<<5;
@@ -870,7 +870,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
             
             controlReg3 |= requestDelay&0xf;
 			
-            controlReg4 |= timeout&0x03FF;
+            controlReg4 |= timeOut&0x03FF;
 			
             controlReg5 |= (pulsesToGenerate&0x001F);
             controlReg5 |= (testClock&0x003)<<5;
