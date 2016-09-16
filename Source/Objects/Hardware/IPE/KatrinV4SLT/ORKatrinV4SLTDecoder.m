@@ -346,7 +346,7 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
 	NSString* channelKey	= @"";	
     
     unsigned long f1,f2,f3,f4,f5,f6;
-    unsigned long energy,sec,subsec,multiplicity,p,toplen,ediff,evID, tpeak, tvalley, apeak, avalley;
+    unsigned long energy,/*sec,subsec,multiplicity,p,toplen,ediff,evID,*/ tpeak, tvalley, apeak, avalley;
     unsigned long headerlen = 4;
     unsigned long numEv=(length-4)/6;    //(((*ptr) & 0x3ffff)-4)/6;
     
@@ -490,7 +490,7 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
     
     
     
-    unsigned long* eventPtr=ptr;
+    //unsigned long* eventPtr=ptr;
     unsigned long f1,f2,f3,f4,f5,f6;
     
     //for(i=0;i<numEv;i++){
@@ -513,7 +513,7 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
     //quickfix
 #endif
     
-    unsigned long flt,chan,energy,sec,subsec,multiplicity,p,toplen,ediff,evID, tpeak, tvalley, apeak, avalley;
+    unsigned long flt,chan,energy,sec,subsec,multiplicity,p,/*toplen,ediff,*/evID, tpeak, tvalley, apeak, avalley;
     p  = (f1 >> 28) & 0x1;
     subsec = (f1  & 0x0ffffff8) >> 3;
     sec = (f2 & 0x1fffffff) | ((f1  & 0x7) << 29);
