@@ -220,6 +220,7 @@ endRunNumber = _endRunNumber;
                     
                     int counter = 0;
                     for(id key in [aResult objectForKey:@"rows"]){
+                        if(key){}
                         counter = counter  + 1;
                     }
                     
