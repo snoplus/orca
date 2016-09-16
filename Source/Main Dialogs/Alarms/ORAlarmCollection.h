@@ -51,12 +51,10 @@
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
 
-#pragma mark •••Alarm Management
-- (void) alarmWasChanged:(NSNotification*)aNotification;
+#pragma mark •••Alarm ManagementB
 - (void) alarmWasPosted:(NSNotification*)aNotification;
 - (void) alarmWasCleared:(NSNotification*)aNotification;
 - (void) alarmWasAcknowledged:(NSNotification*)aNotification;
-- (void) alarmWasChanged:(NSNotification*)aNotification;
 - (void) beep:(NSTimer*)aTimer;
 
 - (void) addAlarm:(ORAlarm*)anAlarm;
@@ -109,6 +107,7 @@ extern NSString* ORAlarmCollectionAddressRemoved;
 #pragma mark •••Alarm Management
 - (void) alarmWasPosted:(NSNotification*)aNotification;
 - (void) alarmWasCleared:(NSNotification*)aNotification;
+- (void) alarmWasChanged:(NSNotification*)aNotification;
 - (void) eMailThread;
 - (void) mailSent:(NSString*)address;
 
