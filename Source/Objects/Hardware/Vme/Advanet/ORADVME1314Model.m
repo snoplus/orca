@@ -312,7 +312,7 @@ static NSString *ORADVME1314WriteValue 		= @"ADVME1314 WriteValue";
 
 - (ADVME1314ChannelDat) readHardwareState
 {
-    ADVME1314ChannelDat returnDat;
+    ADVME1314ChannelDat returnDat={};
     int chanBlock;
     for (chanBlock=0; chanBlock<kADVME1314Number32ChannelSets; chanBlock++) {    
         uint16_t temp;
