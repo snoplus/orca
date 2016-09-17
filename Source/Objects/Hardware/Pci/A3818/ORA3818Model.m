@@ -1951,7 +1951,7 @@ static NSString *ORA3818ReadWriteAddSpace		= @"A3818 Read/Write Address Space";
     
     // get PCI assigned values
     NSLog(@"Getting PCI Assigned Values\n");
-    unsigned char cdata;
+    unsigned char cdata=0;
     [self getPCIBusNumber:&cdata];
     NSLog(@"PCI Assigned Bus Number: 0x%02x\n",cdata);
     
