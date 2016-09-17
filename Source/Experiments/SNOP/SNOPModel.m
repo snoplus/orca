@@ -387,7 +387,23 @@ resync;
     
     [standardRunType release];
     [standardRunVersion release];
-
+    [_configDocument release];
+    [_debugDBConnectionHistory release];
+    [_debugDBName release];
+    [_debugDBUserName release];
+    [_debugDBPassword release];
+    [_debugDBPingTask release];
+    [_mtcConfigDoc release];
+    [_orcaDBName release];
+    [_orcaDBPassword release];
+    [_orcaDBUserName release];
+    [_orcaDBConnectionHistory release];
+    [_orcaDBPingTask release];
+    [_runDocument release];
+    [_smellieRunNameLabel release];
+    [dataHost release];
+    [logHost release];
+    [smellieRunHeaderDocList release];
     [super dealloc];
 }
 

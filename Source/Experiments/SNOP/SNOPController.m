@@ -56,7 +56,17 @@ snopGreenColor;
 
     return self;
 }
-
+- (void) dealloc
+{
+    [smellieRunFileList release];
+    [smellieRunFile release];
+    [snopBlueColor release];
+    [snopGreenColor release];
+    [snopOrangeColor release];
+    [snopRedColor release];
+    
+    [super dealloc];
+}
 - (IBAction) testMTCServer:(id)sender
 {
     int port = [mtcPort intValue];
