@@ -1744,15 +1744,14 @@ void SwapLongBlock(void* p, int32_t n)
     /* Initialize the crate in a separate thread and call the selector
      * `callback` when done. */
     int slot, channel;
-    MB *mbs;
-
-    mbs = (MB *) calloc(16, sizeof(MB));
 
     if (![[self xl3Link] isConnected]) {
         NSLogColor([NSColor redColor], @"xl3 %02d is not connected!\n",
                     [self crateNumber]);
         return;
     }
+    
+    MB* mbs = (MB *) calloc(16, sizeof(MB)); //move to avoid memory leak on early return. MAH
 
     for (slot = 0; slot < 16; slot++) {
         if ((slotMask & (1 << slot)) == 0) continue;
