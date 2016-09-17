@@ -31,7 +31,6 @@
     MajoranaModel*  mjd;
     int             watchLookup[kMaxDetectors];
     BOOL            watch[kMaxDetectors];
-    int             watchCount;
     NSMutableDictionary* hvObjs;
     NSMutableDictionary* preAmpObjs;
 }
