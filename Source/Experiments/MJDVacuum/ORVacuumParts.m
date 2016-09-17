@@ -67,9 +67,9 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 
 - (void) dealloc
 {
-	self.regionColor = nil;
-	self.rgbString   = nil;
-	[super dealloc];
+	[regionColor release];
+    [rgbString release];
+    [super dealloc];
 }
 
 - (void) setRegionColor:(NSColor*)aColor
@@ -248,6 +248,7 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 	[valveAlarm clearAlarm];
 	self.valveAlarm = nil;
 	[constraints release];
+    [controlObj release];
 	[super dealloc];
 }
 
