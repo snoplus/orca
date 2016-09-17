@@ -136,6 +136,13 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
     [self stopTellieRun];
     self.ellieFireFlag = NO;
+    [currentOrcaSettingsForSmellie release];
+    [exampleTask release];
+    [smellieConfigVersionNo release];
+    [smellieFibreSwitchToFibreMapping release];
+    [smellieLaserHeadToGainMapping release];
+    [smellieRunHeaderDocList release];
+    
     [super dealloc];
 }
 
