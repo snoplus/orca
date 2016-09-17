@@ -45,8 +45,8 @@ NSString* ORL2301AllowOverflowChangedNotification   = @"ORL2301AllowOverflowChan
 
 - (void) dealloc
 {
-    [super dealloc];
     [lastDataTS release];
+    [super dealloc];
 }
 
 - (void) setUpImage
