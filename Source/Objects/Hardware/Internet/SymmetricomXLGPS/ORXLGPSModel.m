@@ -91,7 +91,11 @@ NSString* ORXLGPSModelPpoRepeatsChanged		= @"ORXLGPSModelPpoRepeatsChanged";
 	[command release];
 	[ppoCommand release];
 	[ppsCommand release];
-
+    [processDict release];
+    [postLoginCmd release];
+    [gpsTimer release];
+    [dateToDisconnect release];
+    [postLoginSel release];
 	[super dealloc];
 }
 
