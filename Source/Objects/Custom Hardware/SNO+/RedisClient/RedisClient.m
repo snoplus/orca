@@ -23,7 +23,11 @@
         redisSetTimeout(context, tv);
     }
 }
-
+- (void) dealloc
+{
+    [host release];
+    [super dealloc];
+}
 - (long) timeout
 {
     return timeout;
