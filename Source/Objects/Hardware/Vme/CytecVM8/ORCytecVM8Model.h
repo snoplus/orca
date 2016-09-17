@@ -28,7 +28,6 @@
         unsigned long writeValue;
         unsigned short boardId;
         unsigned short deviceType;
-        unsigned short status;
         BOOL formC;
         NSLock* hwLock;
 }
