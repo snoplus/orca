@@ -38,7 +38,6 @@
     unsigned short       nHit;
     unsigned short       minimumEnergyAllowed;
     unsigned long        shaperID;
-    unsigned long        headerID;
     int runtype;
     int runnum;
     NSMutableArray* runbits;
