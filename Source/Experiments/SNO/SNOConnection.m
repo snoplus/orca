@@ -19,6 +19,8 @@
 }
 
 - (void)dealloc {
+    [receivedData release];
+    [key release];
     [super dealloc];
 }
 
