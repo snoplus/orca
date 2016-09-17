@@ -35,8 +35,8 @@
 
 - (void) dealloc
 {
+    [[[ORSqlDBQueue sharedSqlDBQueue] queue] removeObserver:self forKeyPath:@"operationCount"];
     [super dealloc];
-	[[[ORSqlDBQueue sharedSqlDBQueue] queue] removeObserver:self forKeyPath:@"operationCount"];
 }
 
 -(void) awakeFromNib
