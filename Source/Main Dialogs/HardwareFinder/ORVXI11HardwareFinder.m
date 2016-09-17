@@ -434,7 +434,8 @@ done_broad:
     [manufacturer release];
     [model release];
     [serialNumber release];
-    [ipAddress release];    
+    [ipAddress release];
+    [version release];
     [super dealloc];
 }
     
