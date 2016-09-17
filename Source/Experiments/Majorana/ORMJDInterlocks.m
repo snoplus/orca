@@ -75,7 +75,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
     [interlockFailureAlarm clearAlarm];
     [interlockFailureAlarm release];
     [breakDownResult release];
-
+    [vacuumSpikeStarted release];
     [super dealloc];
 }
 
