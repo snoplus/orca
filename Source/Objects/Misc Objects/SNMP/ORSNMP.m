@@ -466,6 +466,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNMPQueue);
 	//[ORTimer delay:.1];
     [pool release];
 }
+- (void) dealloc
+{
+    [userInfo release];
+    [super dealloc];
+}
 @end
 
 //--------------------------------------------------
