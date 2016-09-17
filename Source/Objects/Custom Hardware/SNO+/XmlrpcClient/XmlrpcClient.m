@@ -20,7 +20,12 @@
     self = [self initWithHostName:@"" withPort:@"-1"];
     return self;
 }
-
+- (void) dealloc
+{
+    [_host release];
+    [_port release];
+    [super dealloc];
+}
 -(id)initWithHostName:(NSString *)passedHost withPort:(NSString *)passedPort
 {
     self = [super init];
