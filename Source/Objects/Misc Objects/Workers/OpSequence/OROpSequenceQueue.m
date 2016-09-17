@@ -33,6 +33,8 @@ NSString * const ScriptQueueCancelledNotification = @"ScriptQueueCancelledNotifi
 
 - (void) dealloc
 {
+    [textAttributes release];
+    [errorAttributes release];
 	[queueState        release];
 	[cleanupSteps      release];    
 	[super dealloc];
