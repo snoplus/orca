@@ -26,6 +26,7 @@ resistorDocDic = _resistorDocDic;
 
 - (void)dealloc
 {
+    [_resistorDocDic release];
     [super dealloc];
 }
 
