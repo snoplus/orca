@@ -301,6 +301,10 @@ endRunNumber = _endRunNumber;
 -(void)dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
+    [_currentQueryResults release];
+    [_endRunNumber release];
+    [_resistorDocument release];
+    [_startRunNumber release];
     
 	[super dealloc];
 }
