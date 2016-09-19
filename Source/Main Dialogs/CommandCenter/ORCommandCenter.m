@@ -420,8 +420,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
     NSCharacterSet* inverteddelimiterset = [delimiterset invertedSet];
     NSCharacterSet* trimSet = [NSCharacterSet characterSetWithCharactersInString:@" [];\n\r\t"];
 	
-	aCommandString = [[aCommandString componentsSeparatedByString:@"@"] componentsJoinedByString:@""];
-	
+
 	//preprocess for plists
 	NSString* theProcessedString = @"";
 	NSMutableArray* embeddedPLists	= [NSMutableArray array];
@@ -496,10 +495,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
 
     NSArray*        allCmds         = [aCommandString componentsSeparatedByString:@";"];
     
-    NSEnumerator* e = [allCmds objectEnumerator];
-    NSString* string;
     NSString* returnStringCode = nil;
-    while(string = [e nextObject]){
+    for(NSString* string in allCmds){
         returnStringCode = nil;
         if([string length]){
             NSArray* parts = [string componentsSeparatedByString:@"="];
