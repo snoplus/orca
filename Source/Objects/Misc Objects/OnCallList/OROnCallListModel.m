@@ -76,6 +76,11 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
 {
     [self postCouchDBRecord];
 }
+- (BOOL) acceptsGuardian: (OrcaObject *)aGuardian
+{
+    return [super acceptsGuardian:aGuardian] ||
+           [aGuardian isMemberOfClass:NSClassFromString(@"ORSyncCenterModel")];
+}
 
 #pragma mark ***Accessors
 
@@ -101,6 +106,22 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
 {
     if(!onCallList)self.onCallList = [NSMutableArray array];
     [onCallList addObject:[OROnCallPerson onCallPerson]];
+    [[NSNotificationCenter defaultCenter] postNotificationName:OROnCallListPersonAdded object:self];
+}
+
+- (void) removeAll
+{
+    [onCallList release];
+    onCallList = nil;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:OROnCallListModelReloadTable object:self];
+}
+
+- (void) add:(NSString*)aName contact:(NSString*)contactInfo role:(int)aRole
+{
+    if(!onCallList)self.onCallList = [NSMutableArray array];
+    OROnCallPerson* aPerson = [OROnCallPerson onCallPerson:aName address:contactInfo role:aRole];    
+    [onCallList addObject:aPerson];
     [[NSNotificationCenter defaultCenter] postNotificationName:OROnCallListPersonAdded object:self];
 }
 
@@ -483,6 +504,20 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
     aPerson.data = data;
     return [aPerson autorelease];
 }
+
++ (id) onCallPerson:(NSString*)aName address:(NSString*)contactInfo role:(int)aRole
+{
+    OROnCallPerson* aPerson = [[OROnCallPerson alloc] init];
+    NSMutableDictionary* data        = [NSMutableDictionary dictionary];
+    [data setObject:aName forKey:kPersonName];
+    [data setObject:contactInfo forKey:kPersonAddress];
+    [data setObject:[NSNumber numberWithInt:aRole] forKey:kPersonRole];
+    [data setObject:@"" forKey:kPersonStatus];
+    aPerson.data = data;
+    return [aPerson autorelease];
+
+}
+
 - (void) dealloc
 {
     self.data = nil;

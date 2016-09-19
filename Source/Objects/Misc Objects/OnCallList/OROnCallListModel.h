@@ -46,6 +46,8 @@
 
 #pragma mark •••Accessors
 - (void) addPerson;
+- (void) removeAll;
+- (void) add:(NSString*)aName contact:(NSString*)contactInfo role:(int)aRole;
 - (void) removePersonAtIndex:(int) anIndex;
 - (id)   personAtIndex:      (int)anIndex;
 - (void) personTakingNewRole:(id)aPerson;
@@ -88,6 +90,7 @@ extern NSString* OROnCallListMessageChanged;
     NSMutableDictionary* data;
 }
 + (id) onCallPerson;
++ (id) onCallPerson:(NSString*)aName address:(NSString*)contactInfo role:(int)aRole;
 - (id)copyWithZone:(NSZone *)zone;
 - (void) setValue:(id)anObject forKey:(id)aKey;
 - (id)   valueForKey:(id)aKey;
