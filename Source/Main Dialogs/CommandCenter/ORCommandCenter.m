@@ -420,7 +420,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
     NSCharacterSet* inverteddelimiterset = [delimiterset invertedSet];
     NSCharacterSet* trimSet = [NSCharacterSet characterSetWithCharactersInString:@" [];\n\r\t"];
 	
-
+    aCommandString = [[aCommandString componentsSeparatedByString:@"@\""] componentsJoinedByString:@"\""];
+    
 	//preprocess for plists
 	NSString* theProcessedString = @"";
 	NSMutableArray* embeddedPLists	= [NSMutableArray array];
