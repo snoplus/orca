@@ -28,6 +28,7 @@
 #import "ORMailer.h"
 
 NSString* ORAlarmCollectionEmailEnabledChanged = @"ORAlarmCollectionEmailEnabledChanged";
+NSString* ORAlarmCollectionReloadAddressList = @"ORAlarmCollectionReloadAddressList";
 NSString* ORAlarmCollectionAddressAdded		= @"ORAlarmCollectionAddressAdded";
 NSString* ORAlarmCollectionAddressRemoved	= @"ORAlarmCollectionAddressRemoved";
 NSString* ORAlarmRemovedFromCollection		= @"ORAlarmRemovedFromCollection";
@@ -228,12 +229,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmCollection);
 
     }
 }
-- (void) removeAll
-{
-    for(ORAlarm* anAlarm in alarms){
-        [self removeAlarm:anAlarm];
-    }
-}
+
 - (void) removeAlarm:(ORAlarm*)anAlarm
 {
 	ORAlarm* alarm;
@@ -289,6 +285,13 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmCollection);
     [[(ORAppDelegate*)[NSApp delegate] undoManager] enableUndoRegistration];
 }
 
+- (void) removeAllAddresses
+{
+    [eMailList release];
+    eMailList = nil;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAlarmCollectionReloadAddressList object:self];
+
+}
 - (void) addAddress
 {	
 	if(!eMailList) [self setEMailList:[NSMutableArray array]];

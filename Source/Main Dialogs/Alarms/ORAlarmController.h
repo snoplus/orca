@@ -62,6 +62,7 @@
 - (void) documentLoaded:(NSNotification*)aNotification;
 - (void) addressAdded:(NSNotification*)aNote;
 - (void) addressRemoved:(NSNotification*)aNote;
+- (void) reloadAddressList:(NSNotification*)aNote;
 
 - (void) setUpHelpText;
 - (BOOL)validateMenuItem:(NSMenuItem*)menuItem;

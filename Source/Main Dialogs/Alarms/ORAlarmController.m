@@ -103,10 +103,15 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
                          name : ORAlarmCollectionAddressAdded
                        object : [self alarmCollection]];	
 	
-	[notifyCenter addObserver : self
+    [notifyCenter addObserver : self
                      selector : @selector(addressRemoved:)
                          name : ORAlarmCollectionAddressRemoved
-                       object : [self alarmCollection]];		
+                       object : [self alarmCollection]];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(reloadAddressList:)
+                         name : ORAlarmCollectionReloadAddressList
+                       object : [self alarmCollection]];
 	
 }
 
@@ -308,6 +313,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
 	}
 }
 
+- (void) reloadAddressList:(NSNotification*)aNote
+{
+    [addressList reloadData];
+    
+}
 - (void) addressAdded:(NSNotification*)aNote
 {
 	int index = [[[aNote userInfo] objectForKey:@"Index"] intValue];

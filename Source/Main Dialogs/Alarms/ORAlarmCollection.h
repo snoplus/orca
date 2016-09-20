@@ -57,12 +57,12 @@
 - (void) alarmWasAcknowledged:(NSNotification*)aNotification;
 - (void) beep:(NSTimer*)aTimer;
 
-- (void) removeAll;
 - (void) addAlarm:(ORAlarm*)anAlarm;
 - (void) removeAlarm:(ORAlarm*)anAlarm;
 - (void) removeAlarmWithName:(NSString*)aName;
 
 #pragma mark •••EMail Management
+- (void) removeAllAddresses;
 - (int) eMailCount;
 - (void) decodeEMailList:(NSCoder*) aDecoder;
 - (void) encodeEMailList:(NSCoder*) anEncoder;
@@ -75,6 +75,7 @@
 extern NSString* ORAlarmCollectionEmailEnabledChanged;
 extern NSString* ORAlarmCollectionAddressAdded;
 extern NSString* ORAlarmCollectionAddressRemoved;
+extern NSString* ORAlarmCollectionReloadAddressList;
 
 //--------------------------------------------------------------
 //--------------------------------------------------------------
