@@ -85,10 +85,16 @@
                      selector : @selector(peopleNotifiedChanged:)
                          name : OROnCallListPeopleNotifiedChanged
                         object: model];
+    
     [notifyCenter addObserver : self
                      selector : @selector(messageChanged:)
                          name : OROnCallListMessageChanged
                         object: model];
+    
+    [notifyCenter addObserver: self
+                     selector: @selector(editingDidEnd:)
+                         name: NSControlTextDidEndEditingNotification
+                       object: onCallListView];
 
 }
 
@@ -106,6 +112,11 @@
 {
 	[onCallListView reloadData];
     [self setButtonStates];
+}
+
+- (void) editingDidEnd:(NSNotification*)aNote
+{
+    [model postAGlobalNotification];
 }
 
 - (void) messageChanged:(NSNotification*)aNote

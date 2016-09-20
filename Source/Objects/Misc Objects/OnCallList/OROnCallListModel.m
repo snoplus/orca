@@ -31,6 +31,7 @@ NSString* OROnCallListListLock              = @"OROnCallListListLock";
 NSString* OROnCallListModelReloadTable      = @"OROnCallListModelReloadTable";
 NSString* OROnCallListPeopleNotifiedChanged = @"OROnCallListPeopleNotifiedChanged";
 NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
+NSString* OROnCallListModelEdited           = @"OROnCallListMessageChanged";
 
 #define kOnCallAlarmWaitTime        3*60
 #define kOnCallAcknowledgeWaitTime 10*60
@@ -83,6 +84,10 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
 }
 
 #pragma mark ***Accessors
+- (void) postAGlobalNotification
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName:OROnCallListModelEdited object:self];
+}
 
 - (void) setLastFile:(NSString*)aPath
 {
@@ -101,12 +106,12 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
     [[NSNotificationCenter defaultCenter] postNotificationName:OROnCallListMessageChanged object:self];
 }
 
-
 - (void) addPerson
 {
     if(!onCallList)self.onCallList = [NSMutableArray array];
     [onCallList addObject:[OROnCallPerson onCallPerson]];
     [[NSNotificationCenter defaultCenter] postNotificationName:OROnCallListPersonAdded object:self];
+    [self postAGlobalNotification];
 }
 
 - (void) removeAll
@@ -131,6 +136,7 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
         [onCallList removeObjectAtIndex:anIndex];
         NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Index"];
         [[NSNotificationCenter defaultCenter] postNotificationName:OROnCallListPersonRemoved object:self userInfo:userInfo];
+        [self postAGlobalNotification];
    }
 }
 
@@ -195,12 +201,15 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:OROnCallListModelReloadTable object:self];
     [self postCouchDBRecord:YES];
+    [self postAGlobalNotification];
 }
 
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
     [notifyCenter addObserver : self
                      selector : @selector(alarmPosted:)
                          name : ORAlarmWasPostedNotification
@@ -224,6 +233,7 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
         [self startContactProcess];
     }
 }
+
 - (void) startContactProcess
 {
     OROnCallPerson* primary     = [self primaryPerson];

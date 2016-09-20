@@ -43,6 +43,7 @@
 - (void) alarmCleared:      (NSNotification*)aNote;
 - (void) alarmAcknowledged: (NSNotification*)aNote;
 - (void) resetAll;
+- (void) postAGlobalNotification;
 
 #pragma mark •••Accessors
 - (void) addPerson;
@@ -85,6 +86,7 @@ extern NSString* OROnCallListModelReloadTable;
 extern NSString* OROnCallListListLock;
 extern NSString* OROnCallListPeopleNotifiedChanged;
 extern NSString* OROnCallListMessageChanged;
+extern NSString* OROnCallListModelEdited;
 
 @interface OROnCallPerson : NSObject <NSCopying> {
     NSMutableDictionary* data;

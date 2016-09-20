@@ -42,6 +42,7 @@
 - (void) listLockChanged:       (NSNotification*)aNote;
 - (void) peopleNotifiedChanged: (NSNotification*)aNote;
 - (void) messageChanged:        (NSNotification*)aNote;
+- (void) editingDidEnd:         (NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) removePersonAction:(id)sender;
