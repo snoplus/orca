@@ -538,9 +538,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
             }
             else {
                 //find the destination for the command
-				if([objName isEqualToString:@"ORTaskMaster"]){
-					theObj = [ORTaskMaster sharedTaskMaster];
-				}
+                if([objName isEqualToString:@"ORTaskMaster"]){
+                    theObj = [ORTaskMaster sharedTaskMaster];
+                }
+                else if([objName isEqualToString:@"ORAlarmCollection"]){
+                    theObj = [ORAlarmCollection sharedAlarmCollection];
+                }
                 else theObj = [destinationObjects objectForKey:objName];
                 if(!theObj){
                     //OK, the obj isn't one of the preloaded objects. It might be an object fullID identifier.
