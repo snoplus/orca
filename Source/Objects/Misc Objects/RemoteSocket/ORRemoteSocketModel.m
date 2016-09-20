@@ -84,6 +84,7 @@ NSString* ORRemoteSocketQueueCountChanged = @"ORRemoteSocketQueueCountChanged";
 {
 	return [super acceptsGuardian:aGuardian] ||
             [aGuardian isMemberOfClass:NSClassFromString(@"MajoranaModel")] ||
+            [aGuardian isMemberOfClass:NSClassFromString(@"ORSyncCenterModel")] ||
             [aGuardian isMemberOfClass:NSClassFromString(@"ORApcUpsModel")];
 }
 
@@ -102,15 +103,12 @@ NSString* ORRemoteSocketQueueCountChanged = @"ORRemoteSocketQueueCountChanged";
 
 - (void) setRemoteHost:(NSString *)newHost
 {
-    if([newHost isEqualToString:remoteHost])return;
-	if(newHost)	{	
-		[[[self undoManager] prepareWithInvocationTarget:self] setRemoteHost:remoteHost];
-		
-		[remoteHost autorelease];
-		remoteHost = [newHost copy];
-		
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORRSRemoteHostChanged object:self];
-	}
+    [[[self undoManager] prepareWithInvocationTarget:self] setRemoteHost:remoteHost];
+    
+    [remoteHost autorelease];
+    remoteHost = [newHost copy];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRSRemoteHostChanged object:self];
 }
 
 - (int) remotePort
@@ -339,6 +337,7 @@ NSString* ORRemoteSocketQueueCountChanged = @"ORRemoteSocketQueueCountChanged";
 {
     if(inNetSocket == socket){
         [self setIsConnected:NO];
+        [socket setDelegate:nil];
     }
 }
 
@@ -363,7 +362,7 @@ NSString* ORRemoteSocketQueueCountChanged = @"ORRemoteSocketQueueCountChanged";
 - (id) initWithRemoteObj:(ORRemoteSocketModel*)aRemObj commands:(NSArray*)cmdArray delegate:(ORRemoteCommander*)aDelegate
 {
     self = [super init];
-    delegate    = aDelegate;
+    delegate    = [aDelegate retain];
     remObj      = [aRemObj retain];
     cmds        = [cmdArray retain];
     [self  setQueuePriority:NSOperationQueuePriorityVeryHigh];
@@ -372,6 +371,7 @@ NSString* ORRemoteSocketQueueCountChanged = @"ORRemoteSocketQueueCountChanged";
 
 - (void) dealloc
 {
+    [delegate release];
     [cmds release];
     [remObj release];
     [super dealloc];

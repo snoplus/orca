@@ -33,6 +33,7 @@ NSString* ORAlarmCollectionAddressAdded		= @"ORAlarmCollectionAddressAdded";
 NSString* ORAlarmCollectionAddressRemoved	= @"ORAlarmCollectionAddressRemoved";
 NSString* ORAlarmRemovedFromCollection		= @"ORAlarmRemovedFromCollection";
 NSString* ORAlarmAddedToCollection			= @"ORAlarmAddedToCollection";
+NSString* ORAlarmEMailListEdited			= @"ORAlarmEMailListEdited";
 
 @implementation ORAlarmCollection
 
@@ -149,6 +150,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmCollection);
 }
 
 #pragma mark •••Alarm Management
+- (void) postAGlobalNotification
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAlarmEMailListEdited object:self];
+}
+
 - (void) alarmWasPosted:(NSNotification*)aNotification
 {
 	ORAlarm* anAlarm = [aNotification object];
@@ -306,6 +312,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmCollection);
 	if(!eMailList) [self setEMailList:[NSMutableArray array]];
 	id newAddress = [[[ORAlarmEMailDestination alloc] init] autorelease];
 	[self addAddress:newAddress atIndex:[eMailList count]];
+    [[ORAlarmCollection sharedAlarmCollection] postAGlobalNotification];
 }
 
 - (void) addAddress:(id)anAddress atIndex:(int)anIndex
@@ -326,6 +333,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmCollection);
 	[eMailList removeObjectAtIndex:anIndex];
 	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Index"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAlarmCollectionAddressRemoved object:self userInfo:userInfo];
+    [[ORAlarmCollection sharedAlarmCollection] postAGlobalNotification];
 }
 
 

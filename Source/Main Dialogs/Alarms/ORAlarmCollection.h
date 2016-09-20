@@ -52,6 +52,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark •••Alarm ManagementB
+- (void) postAGlobalNotification;
 - (void) alarmWasPosted:(NSNotification*)aNotification;
 - (void) alarmWasCleared:(NSNotification*)aNotification;
 - (void) alarmWasAcknowledged:(NSNotification*)aNotification;
@@ -116,6 +117,7 @@ extern NSString* ORAlarmCollectionReloadAddressList;
 
 @end
 
+extern NSString* ORAlarmEMailListEdited;
 extern NSString* ORAlarmSeveritySelectionChanged;
 extern NSString* ORAlarmAddressChanged;
 extern NSString* ORAlarmAddedToCollection;

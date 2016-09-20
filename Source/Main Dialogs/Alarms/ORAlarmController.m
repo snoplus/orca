@@ -112,7 +112,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
                      selector : @selector(reloadAddressList:)
                          name : ORAlarmCollectionReloadAddressList
                        object : [self alarmCollection]];
-	
+    
+    [notifyCenter addObserver: self
+                     selector: @selector(editingDidEnd:)
+                         name: NSControlTextDidEndEditingNotification
+                       object: addressList];
 }
 
 
@@ -176,6 +180,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
 			[severityMatrix setEnabled:NO];
 		}
 	}
+}
+
+- (void) editingDidEnd:(NSNotification*)aNote
+{
+    [[ORAlarmCollection sharedAlarmCollection] postAGlobalNotification];
 }
 
 - (void)drawerWillOpen:(NSNotification *)notification
@@ -271,6 +280,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
 			}
 		}
 		[addressObj setSeverityMask:aMask];
+        [[ORAlarmCollection sharedAlarmCollection] postAGlobalNotification];
 	}
 }
 
