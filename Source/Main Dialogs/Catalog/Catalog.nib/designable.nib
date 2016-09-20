@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="15G1004" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
         <development version="5100" identifier="xcode"/>
@@ -2396,7 +2396,7 @@ Can only be used with the M21 M-Module controller.</string>
                                             </buttonCell>
                                         </button>
                                         <button toolTip="ORRamperModel" id="26846" customClass="ObjectFactory">
-                                            <rect key="frame" x="394" y="156" width="69" height="71"/>
+                                            <rect key="frame" x="362" y="157" width="69" height="71"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" title="Ramper" bezelStyle="regularSquare" image="Ramper" imagePosition="above" alignment="center" state="on" inset="2" id="26847">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2477,24 +2477,24 @@ Can only be used with the M21 M-Module controller.</string>
                                                 <font key="font" metaFont="system" size="10"/>
                                             </buttonCell>
                                         </button>
-                                        <button toolTip="ORCameraModel" id="26842" customClass="ObjectFactory">
-                                            <rect key="frame" x="734" y="147" width="110" height="90"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="bevel" title="Camera" bezelStyle="regularSquare" image="Camera" imagePosition="above" alignment="center" state="on" inset="2" id="26843">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system" size="10"/>
-                                            </buttonCell>
-                                        </button>
                                         <button toolTip="OROnCallListModel" id="7sM-xS-FR6" customClass="ObjectFactory">
-                                            <rect key="frame" x="492" y="156" width="82" height="75"/>
+                                            <rect key="frame" x="477" y="157" width="82" height="75"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" title="On Call List" bezelStyle="regularSquare" image="OnCallList" imagePosition="above" alignment="center" controlSize="small" state="on" inset="2" id="0Td-0d-qTu">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
                                         </button>
+                                        <button toolTip="ORSyncCenterModel" id="vPI-Eu-IqE" customClass="ObjectFactory">
+                                            <rect key="frame" x="577" y="150" width="121" height="91"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="bevel" title="Sync Center" bezelStyle="regularSquare" image="SyncCenter" imagePosition="above" alignment="center" controlSize="small" state="on" inset="2" id="iXD-Q0-dLt">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="smallSystem"/>
+                                            </buttonCell>
+                                        </button>
                                         <button toolTip="ORPulseCheckModel" id="L2D-gu-nHy" customClass="ObjectFactory">
-                                            <rect key="frame" x="599" y="154" width="90" height="76"/>
+                                            <rect key="frame" x="731" y="152" width="90" height="76"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" title="Pulse Checker" bezelStyle="regularSquare" image="PulseCheck" imagePosition="above" alignment="center" controlSize="small" state="on" inset="2" id="YGb-MX-wKq">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -3256,7 +3256,6 @@ Relay</string>
         <image name="Caen419" width="16" height="128"/>
         <image name="Caen965" width="16" height="128"/>
         <image name="CamacCrateSmall" width="283" height="154"/>
-        <image name="Camera" width="75" height="75"/>
         <image name="CameraPic" width="77" height="57"/>
         <image name="Changesfeed" width="68.400001525878906" height="53"/>
         <image name="CmdLabel" width="70" height="11"/>
@@ -3432,6 +3431,7 @@ Relay</string>
         <image name="ShaperCard" width="16" height="128"/>
         <image name="Sql" width="105" height="74"/>
         <image name="StateLabel" width="70" height="11"/>
+        <image name="SyncCenter" width="109" height="71"/>
         <image name="TDC3377" width="16" height="128"/>
         <image name="TM700" width="50" height="58"/>
         <image name="TPG256A" width="94" height="40"/>

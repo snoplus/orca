@@ -682,12 +682,6 @@
 		840E72F0103DA7BC0070AD70 /* ORAmrelHVModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 840E72E9103DA7BC0070AD70 /* ORAmrelHVModel.m */; };
 		840E72F3103DB4980070AD70 /* AmrelHV.tif in Resources */ = {isa = PBXBuildFile; fileRef = 840E72F2103DB4980070AD70 /* AmrelHV.tif */; };
 		840F377B08F322F800FC4408 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F539C97C03A7C80D015F64B1 /* IOKit.framework */; };
-		840F5AC41222C03800D49A75 /* Camera.nib in Resources */ = {isa = PBXBuildFile; fileRef = 840F5ABE1222C03800D49A75 /* Camera.nib */; };
-		840F5AC61222C03800D49A75 /* ORCameraController.h in Headers */ = {isa = PBXBuildFile; fileRef = 840F5AC01222C03800D49A75 /* ORCameraController.h */; };
-		840F5AC71222C03800D49A75 /* ORCameraController.m in Sources */ = {isa = PBXBuildFile; fileRef = 840F5AC11222C03800D49A75 /* ORCameraController.m */; };
-		840F5AC81222C03800D49A75 /* ORCameraModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 840F5AC21222C03800D49A75 /* ORCameraModel.h */; };
-		840F5AC91222C03800D49A75 /* ORCameraModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 840F5AC31222C03800D49A75 /* ORCameraModel.m */; };
-		840F5AE81222C4CA00D49A75 /* Camera.png in Resources */ = {isa = PBXBuildFile; fileRef = 840F5AE71222C4CA00D49A75 /* Camera.png */; };
 		840F5B191222C90000D49A75 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 840F5B181222C90000D49A75 /* QTKit.framework */; };
 		8411A1DB10F6848100CD9544 /* NSWindow+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 8411A1D910F6848100CD9544 /* NSWindow+Extensions.h */; };
 		8411A1DC10F6848100CD9544 /* NSWindow+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 8411A1DA10F6848100CD9544 /* NSWindow+Extensions.m */; };
@@ -3093,6 +3087,12 @@
 		84EE83FA10D6C52A00BBCBE5 /* ORPMCReadWriteCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EE83F810D6C52A00BBCBE5 /* ORPMCReadWriteCommand.h */; };
 		84EE83FB10D6C52A00BBCBE5 /* ORPMCReadWriteCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EE83F910D6C52A00BBCBE5 /* ORPMCReadWriteCommand.m */; };
 		84EE877F10D94B3100BBCBE5 /* rightBug.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84EE877E10D94B3100BBCBE5 /* rightBug.tif */; };
+		84F021361D8ADC2E00FEB304 /* ORSyncCenterController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F021301D8ADC2E00FEB304 /* ORSyncCenterController.h */; };
+		84F021371D8ADC2E00FEB304 /* ORSyncCenterController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F021311D8ADC2E00FEB304 /* ORSyncCenterController.m */; };
+		84F021381D8ADC2E00FEB304 /* ORSyncCenterModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F021321D8ADC2E00FEB304 /* ORSyncCenterModel.h */; };
+		84F021391D8ADC2E00FEB304 /* ORSyncCenterModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F021331D8ADC2E00FEB304 /* ORSyncCenterModel.m */; };
+		84F0213A1D8ADC2E00FEB304 /* SyncCenter.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84F021341D8ADC2E00FEB304 /* SyncCenter.nib */; };
+		84F0213B1D8ADC2E00FEB304 /* SyncCenter.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84F021351D8ADC2E00FEB304 /* SyncCenter.tif */; };
 		84F03CDA059A145E00275624 /* ORGlobal.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F03CD8059A145E00275624 /* ORGlobal.h */; };
 		84F03CDB059A145E00275624 /* ORGlobal.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F03CD9059A145E00275624 /* ORGlobal.m */; };
 		84F03E6705A0995400275624 /* muxBoxSmall.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84F03E6605A0995400275624 /* muxBoxSmall.gif */; };
@@ -4385,12 +4385,6 @@
 		840EFFFD0944B28F00049827 /* ORProcessPulserModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORProcessPulserModel.m; path = Source/Objects/ProcessLogic/ProcessElements/Timers/Pulser/ORProcessPulserModel.m; sourceTree = SOURCE_ROOT; };
 		840EFFFE0944B28F00049827 /* ProcessPulser.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ProcessPulser.nib; path = Source/Objects/ProcessLogic/ProcessElements/Timers/Pulser/ProcessPulser.nib; sourceTree = SOURCE_ROOT; };
 		840EFFFF0944B28F00049827 /* ProcessPulser.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ProcessPulser.tif; path = Source/Objects/ProcessLogic/ProcessElements/Timers/Pulser/ProcessPulser.tif; sourceTree = SOURCE_ROOT; };
-		840F5ABE1222C03800D49A75 /* Camera.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Camera.nib; path = "Source/Objects/Misc Objects/Camera/Camera.nib"; sourceTree = SOURCE_ROOT; };
-		840F5AC01222C03800D49A75 /* ORCameraController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCameraController.h; path = "Source/Objects/Misc Objects/Camera/ORCameraController.h"; sourceTree = SOURCE_ROOT; };
-		840F5AC11222C03800D49A75 /* ORCameraController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCameraController.m; path = "Source/Objects/Misc Objects/Camera/ORCameraController.m"; sourceTree = SOURCE_ROOT; };
-		840F5AC21222C03800D49A75 /* ORCameraModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCameraModel.h; path = "Source/Objects/Misc Objects/Camera/ORCameraModel.h"; sourceTree = SOURCE_ROOT; };
-		840F5AC31222C03800D49A75 /* ORCameraModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCameraModel.m; path = "Source/Objects/Misc Objects/Camera/ORCameraModel.m"; sourceTree = SOURCE_ROOT; };
-		840F5AE71222C4CA00D49A75 /* Camera.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Camera.png; path = "Source/Objects/Misc Objects/Camera/Camera.png"; sourceTree = SOURCE_ROOT; };
 		840F5B181222C90000D49A75 /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = ../../../../System/Library/Frameworks/QTKit.framework; sourceTree = SOURCE_ROOT; };
 		8411A1D910F6848100CD9544 /* NSWindow+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSWindow+Extensions.h"; sourceTree = "<group>"; };
 		8411A1DA10F6848100CD9544 /* NSWindow+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSWindow+Extensions.m"; path = "Source/Cocoa Extensions/NSWindow+Extensions.m"; sourceTree = SOURCE_ROOT; };
@@ -6687,6 +6681,12 @@
 		84EE83F810D6C52A00BBCBE5 /* ORPMCReadWriteCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPMCReadWriteCommand.h; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/ORPMCReadWriteCommand.h"; sourceTree = SOURCE_ROOT; };
 		84EE83F910D6C52A00BBCBE5 /* ORPMCReadWriteCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPMCReadWriteCommand.m; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/ORPMCReadWriteCommand.m"; sourceTree = SOURCE_ROOT; };
 		84EE877E10D94B3100BBCBE5 /* rightBug.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = rightBug.tif; path = "Source/Widgets/Bar Graph/rightBug.tif"; sourceTree = SOURCE_ROOT; };
+		84F021301D8ADC2E00FEB304 /* ORSyncCenterController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSyncCenterController.h; sourceTree = "<group>"; };
+		84F021311D8ADC2E00FEB304 /* ORSyncCenterController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSyncCenterController.m; sourceTree = "<group>"; };
+		84F021321D8ADC2E00FEB304 /* ORSyncCenterModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSyncCenterModel.h; sourceTree = "<group>"; };
+		84F021331D8ADC2E00FEB304 /* ORSyncCenterModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSyncCenterModel.m; sourceTree = "<group>"; };
+		84F021341D8ADC2E00FEB304 /* SyncCenter.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = SyncCenter.nib; sourceTree = "<group>"; };
+		84F021351D8ADC2E00FEB304 /* SyncCenter.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = SyncCenter.tif; sourceTree = "<group>"; };
 		84F03CD8059A145E00275624 /* ORGlobal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORGlobal.h; sourceTree = "<group>"; };
 		84F03CD9059A145E00275624 /* ORGlobal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGlobal.m; sourceTree = "<group>"; };
 		84F03E6605A0995400275624 /* muxBoxSmall.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = muxBoxSmall.gif; path = Source/Experiments/Ncd/Detector/muxBoxSmall.gif; sourceTree = SOURCE_ROOT; };
@@ -8589,20 +8589,6 @@
 			path = Source/Objects/ProcessLogic/ProcessElements/Timers/Pulser;
 			sourceTree = SOURCE_ROOT;
 		};
-		840F5ABD1222C03800D49A75 /* Camera */ = {
-			isa = PBXGroup;
-			children = (
-				840F5ABE1222C03800D49A75 /* Camera.nib */,
-				840F5AE71222C4CA00D49A75 /* Camera.png */,
-				840F5AC01222C03800D49A75 /* ORCameraController.h */,
-				840F5AC11222C03800D49A75 /* ORCameraController.m */,
-				840F5AC21222C03800D49A75 /* ORCameraModel.h */,
-				840F5AC31222C03800D49A75 /* ORCameraModel.m */,
-			);
-			name = Camera;
-			path = "Source/Objects/Misc Objects/Camera";
-			sourceTree = SOURCE_ROOT;
-		};
 		8411A92F11063ACC00CD9544 /* USB Base Classes */ = {
 			isa = PBXGroup;
 			children = (
@@ -8881,6 +8867,7 @@
 			children = (
 				43B50A381CE260F6003D0146 /* RunningAverage */,
 				8461CAF81CB2D8DB001E4044 /* PulseCheck */,
+				84F0212F1D8ADC2E00FEB304 /* SyncCenter */,
 				84D1535A1BD53D2A005EC269 /* OnCallList */,
 				844CBDC31866010F0012AA3B /* RaidMonitor */,
 				B3808A931700F85C0019C27D /* CouchDBListener */,
@@ -8914,7 +8901,6 @@
 				8405283D13102C96007607A4 /* CouchDB */,
 				847597450B5EF26500123411 /* SQL */,
 				8471D4721588DF3C0039894D /* RemoteSocket */,
-				840F5ABD1222C03800D49A75 /* Camera */,
 				845313D01B9886B800FCEEE5 /* RemoteCommander */,
 			);
 			name = "Misc Objects";
@@ -13675,6 +13661,19 @@
 			path = Source/Objects/Hardware/Vme/CAEN/CV419;
 			sourceTree = SOURCE_ROOT;
 		};
+		84F0212F1D8ADC2E00FEB304 /* SyncCenter */ = {
+			isa = PBXGroup;
+			children = (
+				84F021301D8ADC2E00FEB304 /* ORSyncCenterController.h */,
+				84F021311D8ADC2E00FEB304 /* ORSyncCenterController.m */,
+				84F021321D8ADC2E00FEB304 /* ORSyncCenterModel.h */,
+				84F021331D8ADC2E00FEB304 /* ORSyncCenterModel.m */,
+				84F021341D8ADC2E00FEB304 /* SyncCenter.nib */,
+				84F021351D8ADC2E00FEB304 /* SyncCenter.tif */,
+			);
+			path = SyncCenter;
+			sourceTree = "<group>";
+		};
 		84F16AEC18900D530074B787 /* XTR6 */ = {
 			isa = PBXGroup;
 			children = (
@@ -15073,6 +15072,7 @@
 				840E00210944B29000049827 /* ORSPSTRelayModel.h in Headers */,
 				840E002A0944B29000049827 /* ORAndGateModel.h in Headers */,
 				0F16E3601C493B00003C9EC9 /* RedisClient.h in Headers */,
+				84F021381D8ADC2E00FEB304 /* ORSyncCenterModel.h in Headers */,
 				840E002C0944B29000049827 /* ORSimpleLogic.h in Headers */,
 				840E00320944B29000049827 /* OROrGateModel.h in Headers */,
 				840E00340944B29000049827 /* ORRSFlipFlopModel.h in Headers */,
@@ -15634,8 +15634,6 @@
 				EFAC073111E9A6CB00336793 /* XL3_Link.h in Headers */,
 				EFAC073F11E9A9DB00336793 /* XL3_LinkController.h in Headers */,
 				4342D59511ECB8AD007EFFB1 /* ORCAEN775Readout.hh in Headers */,
-				840F5AC61222C03800D49A75 /* ORCameraController.h in Headers */,
-				840F5AC81222C03800D49A75 /* ORCameraModel.h in Headers */,
 				84065D961226B600004E8970 /* ORPxi8336MacController.h in Headers */,
 				84065D981226B600004E8970 /* ORPxi8336MacModel.h in Headers */,
 				84065F1B1226E18E004E8970 /* ORPxiCrate6Controller.h in Headers */,
@@ -15829,6 +15827,7 @@
 				844EEAB215827AA100E1D7C1 /* ORCAEN830Readout.hh in Headers */,
 				8471D4791588DF3C0039894D /* ORRemoteSocketController.h in Headers */,
 				8471D47B1588DF3C0039894D /* ORRemoteSocketModel.h in Headers */,
+				84F021361D8ADC2E00FEB304 /* ORSyncCenterController.h in Headers */,
 				84FEAD1C15939393005D798C /* ORProXR16SSRController.h in Headers */,
 				84FEAD1E15939394005D798C /* ORProXR16SSRModel.h in Headers */,
 				84FEB88A15A31F42005D798C /* ORL2301Controller.h in Headers */,
@@ -16201,6 +16200,7 @@
 				84A95193077B6C8C00CAD99D /* LogLin.gif in Resources */,
 				841DA0DD0781F0740099BBF6 /* edu.washington.npl.orca.TwoDHisto.plist in Resources */,
 				841DA0E20781F0740099BBF6 /* TwoDHisto.nib in Resources */,
+				84F0213A1D8ADC2E00FEB304 /* SyncCenter.nib in Resources */,
 				841DA0F00781F09B0099BBF6 /* edu.washington.npl.orca.OneDHisto.plist in Resources */,
 				841DA0F10781F09B0099BBF6 /* OneDHisto.nib in Resources */,
 				6B325E161B2F435A002E2DD7 /* FecDaughterCard.xib in Resources */,
@@ -16481,6 +16481,7 @@
 				84DB0B830D627A0400BB9855 /* FilterScriptGuide.rtf in Resources */,
 				848B03080D6505C6007FDEBD /* OrcaFilterScript.icns in Resources */,
 				8428ADE00D7CACD00093D35E /* HeaderExplorer.gif in Resources */,
+				84F0213B1D8ADC2E00FEB304 /* SyncCenter.tif in Resources */,
 				8428ADE10D7CACD00093D35E /* HeaderExplorer.nib in Resources */,
 				8461CB041CB2D8DB001E4044 /* PulseCheck.tif in Resources */,
 				84FDF5290D7E1EAE003AE119 /* KatrinSLT.nib in Resources */,
@@ -16741,8 +16742,6 @@
 				840795EF11DA59AB00A91442 /* edu.washington.npl.orca.Prespectrometer.plist in Resources */,
 				EF7722B711E813120064A1CF /* XL3Card.gif in Resources */,
 				84B11665121ED85100BC8464 /* noHeartbeat.png in Resources */,
-				840F5AC41222C03800D49A75 /* Camera.nib in Resources */,
-				840F5AE81222C4CA00D49A75 /* Camera.png in Resources */,
 				84065D9C1226B600004E8970 /* Pxi8336Mac.nib in Resources */,
 				84065D9D1226B600004E8970 /* Pxi8336MacCard.gif in Resources */,
 				84065F1A1226E18E004E8970 /* NoPxiCrate6PowerHelp.plist in Resources */,
@@ -17060,6 +17059,7 @@
 				8434A2BE055B3287002D3102 /* OrcaObject.m in Sources */,
 				8434A2C0055B3287002D3102 /* OrcaObjectFactory.m in Sources */,
 				8434A2C3055B3287002D3102 /* OR617Model.m in Sources */,
+				84F021371D8ADC2E00FEB304 /* ORSyncCenterController.m in Sources */,
 				8434A2C4055B3287002D3102 /* ORPciCard.m in Sources */,
 				8434A2C5055B3287002D3102 /* ORShaperModel.m in Sources */,
 				8434A2C6055B3287002D3102 /* ORShaperController.m in Sources */,
@@ -17859,8 +17859,6 @@
 				EFAC074011E9A9DB00336793 /* XL3_LinkController.m in Sources */,
 				84EE03BF120AFA4400B804B3 /* ORInverterModel.m in Sources */,
 				84AC14E11B70E2460071C4EF /* ORMjdFileReader.m in Sources */,
-				840F5AC71222C03800D49A75 /* ORCameraController.m in Sources */,
-				840F5AC91222C03800D49A75 /* ORCameraModel.m in Sources */,
 				84065D971226B600004E8970 /* ORPxi8336MacController.m in Sources */,
 				84065D991226B600004E8970 /* ORPxi8336MacModel.m in Sources */,
 				84065F1C1226E18E004E8970 /* ORPxiCrate6Controller.m in Sources */,
@@ -17994,6 +17992,7 @@
 				3620202C1CBD390A0089296E /* WPXMLRPCEncoder.m in Sources */,
 				84D8556514FBDEDA00C70A00 /* ORCB37Model.m in Sources */,
 				849740E3150531410004B444 /* ORVXMMotor.m in Sources */,
+				84F021391D8ADC2E00FEB304 /* ORSyncCenterModel.m in Sources */,
 				84976E40150E77F60004B444 /* ORMks651cController.m in Sources */,
 				84D5D0681C4564DF0057C1CA /* ORSIS3316Decoders.m in Sources */,
 				84976E42150E77F60004B444 /* ORMks651cDecoders.m in Sources */,
