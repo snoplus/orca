@@ -57,6 +57,7 @@
 - (void) alarmWasAcknowledged:(NSNotification*)aNotification;
 - (void) beep:(NSTimer*)aTimer;
 
+- (void) removeAll;
 - (void) addAlarm:(ORAlarm*)anAlarm;
 - (void) removeAlarm:(ORAlarm*)anAlarm;
 - (void) removeAlarmWithName:(NSString*)aName;

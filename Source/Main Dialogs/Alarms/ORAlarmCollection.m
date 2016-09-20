@@ -228,7 +228,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmCollection);
 
     }
 }
-
+- (void) removeAll
+{
+    for(ORAlarm* anAlarm in alarms){
+        [self removeAlarm:anAlarm];
+    }
+}
 - (void) removeAlarm:(ORAlarm*)anAlarm
 {
 	ORAlarm* alarm;
