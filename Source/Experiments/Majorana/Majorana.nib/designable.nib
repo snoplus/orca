@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="15G1004" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10116"/>
@@ -1114,7 +1114,7 @@
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="15" headerView="2Q9-Ad-JTe" id="QuZ-mQ-5Gr">
-                                                                    <rect key="frame" x="3" y="0.0" width="263" height="206"/>
+                                                                    <rect key="frame" x="3" y="0.0" width="264" height="206"/>
                                                                     <autoresizingMask key="autoresizingMask"/>
                                                                     <size key="intercellSpacing" width="3" height="2"/>
                                                                     <color key="backgroundColor" red="0.81568627449999997" green="0.81568627449999997" blue="0.81568627449999997" alpha="1" colorSpace="calibratedRGB"/>
@@ -1164,12 +1164,12 @@
                                                             <autoresizingMask key="autoresizingMask"/>
                                                         </scroller>
                                                         <tableHeaderView key="headerView" id="2Q9-Ad-JTe">
-                                                            <rect key="frame" x="3" y="-3" width="263" height="20"/>
+                                                            <rect key="frame" x="3" y="-3" width="264" height="20"/>
                                                             <autoresizingMask key="autoresizingMask"/>
                                                         </tableHeaderView>
                                                     </scrollView>
                                                     <button id="n6f-pG-2jJ">
-                                                        <rect key="frame" x="21" y="323" width="191" height="20"/>
+                                                        <rect key="frame" x="21" y="323" width="210" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Don't Ramp Down on Vac Issues" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="Ykm-yQ-ToD">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1180,7 +1180,7 @@
                                                         </connections>
                                                     </button>
                                                     <button id="wOi-t3-REA">
-                                                        <rect key="frame" x="21" y="303" width="193" height="20"/>
+                                                        <rect key="frame" x="21" y="303" width="205" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Don't Ramp Down on Breakdown" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="u8y-k0-qGL">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1248,7 +1248,7 @@
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="15" headerView="lAF-uO-ErR" id="e05-mF-WWD">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="263" height="17"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="264" height="209"/>
                                                                     <autoresizingMask key="autoresizingMask"/>
                                                                     <size key="intercellSpacing" width="3" height="2"/>
                                                                     <color key="backgroundColor" red="0.81568627449999997" green="0.81568627449999997" blue="0.81568627449999997" alpha="1" colorSpace="calibratedRGB"/>
@@ -1298,7 +1298,7 @@
                                                             <autoresizingMask key="autoresizingMask"/>
                                                         </scroller>
                                                         <tableHeaderView key="headerView" id="lAF-uO-ErR">
-                                                            <rect key="frame" x="0.0" y="0.0" width="263" height="17"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="264" height="17"/>
                                                             <autoresizingMask key="autoresizingMask"/>
                                                         </tableHeaderView>
                                                     </scrollView>
