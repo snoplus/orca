@@ -290,8 +290,17 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmCollection);
     [eMailList release];
     eMailList = nil;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAlarmCollectionReloadAddressList object:self];
-
 }
+
+- (void) addAddress:(NSString*)anAddress severityMask:(unsigned long)aMask
+{
+    if(!eMailList) [self setEMailList:[NSMutableArray array]];
+    id newAddress = [[[ORAlarmEMailDestination alloc] init] autorelease];
+    [newAddress setMailAddress:anAddress];
+    [newAddress setSeverityMask:aMask];
+    [self addAddress:newAddress atIndex:[eMailList count]];
+}
+
 - (void) addAddress
 {	
 	if(!eMailList) [self setEMailList:[NSMutableArray array]];

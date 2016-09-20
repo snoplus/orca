@@ -66,6 +66,7 @@
 - (int) eMailCount;
 - (void) decodeEMailList:(NSCoder*) aDecoder;
 - (void) encodeEMailList:(NSCoder*) anEncoder;
+- (void) addAddress:(NSString*)anAddress severityMask:(unsigned long)aMask;
 - (void) addAddress;
 - (void) addAddress:(id)anAddress atIndex:(int)anIndex;
 - (void) removeAddressAtIndex:(int) anIndex;
