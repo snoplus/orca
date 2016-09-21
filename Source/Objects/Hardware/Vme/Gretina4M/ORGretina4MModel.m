@@ -3150,7 +3150,7 @@ return 0;
         [self setRateRunningAverages:[[[ORRunningAverageGroup alloc] initGroup:kNumGretina4MChannels groupTag:0 withLength:10] autorelease]];
     }
     [rateRunningAverages setTriggerType:kRASpikeOnRatio];
-    [rateRunningAverages setTriggerValue:0.9]; //this is ratio...  rate threshold could be changed
+    [rateRunningAverages setTriggerValue:5]; //this is ratio...  rate threshold could be changed
 
 	int i;
     for(i=0;i<kNumGretina4MChannels;i++){ //for running average
