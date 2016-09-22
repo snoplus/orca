@@ -131,18 +131,15 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 	[super sleep];
 }
 
--(void)dealloc
+-(void) dealloc
 {
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
-    [self stopTellieRun];
-    self.ellieFireFlag = NO;
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [currentOrcaSettingsForSmellie release];
     [exampleTask release];
     [smellieConfigVersionNo release];
     [smellieFibreSwitchToFibreMapping release];
     [smellieLaserHeadToGainMapping release];
     [smellieRunHeaderDocList release];
-    
     [super dealloc];
 }
 
