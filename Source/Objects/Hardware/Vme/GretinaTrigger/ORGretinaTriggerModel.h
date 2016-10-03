@@ -269,6 +269,7 @@ enum {
     unsigned short  timeStampA;
     unsigned short  timeStampB;
     unsigned short  timeStampC;
+    ORAlarm*        linkLostAlarm;
     
     //------------------internal use only
     int             tryNumber;
@@ -308,6 +309,7 @@ enum {
 - (void) setDoNotLock:(BOOL)aDoNotLock;
 - (BOOL) locked;
 - (void) setLocked:(BOOL)aState;
+- (void) postLinkLostAlarm;
 - (int) digitizerCount;
 - (int) digitizerLockCount;
 - (void) setErrorString:(NSString*)aString;

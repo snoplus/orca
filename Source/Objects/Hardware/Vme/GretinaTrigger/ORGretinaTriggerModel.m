@@ -351,7 +351,9 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     [noClockAlarm clearAlarm];
     [noClockAlarm release];
     noClockAlarm = nil;
-
+    [linkLostAlarm clearAlarm];
+    [linkLostAlarm release];
+    linkLostAlarm = nil;
     [super dealloc];
 }
 
@@ -361,6 +363,9 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     [noClockAlarm clearAlarm];
     [noClockAlarm release];
     noClockAlarm = nil;
+    [linkLostAlarm clearAlarm];
+    [linkLostAlarm release];
+    linkLostAlarm = nil;
 }
 
 - (void) setUpImage
@@ -639,7 +644,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     else {
         NSLogColor([NSColor redColor],@"%@: Will NOT distribute clock pulses (User Option)\n",[self fullID]);
         if(!noClockAlarm){
-            noClockAlarm = [[ORAlarm alloc] initWithName:@"No Clock Distribution (User Option)" severity:0];
+            noClockAlarm = [[ORAlarm alloc] initWithName:@"No Clock Distribution (User Option)" severity:kInformationAlarm];
             [noClockAlarm setSticky:NO];
             [noClockAlarm setHelpString:@"User has opted to NOT distribute clock pulses from the Gretina trigger master. This alarm will go away if you acknowledge it."];
         }
@@ -1264,6 +1269,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
         locked = aCurrentState;
         
         if([self isMaster] && linkWasLost){
+            [self postLinkLostAlarm];
             NSLogColor([NSColor redColor],@"%@: Trigger card was locked but lock was lost.\n",[self fullID]);
             [self printMasterDiagnosticReport];
         }
@@ -1273,6 +1279,18 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
 
         [[NSNotificationCenter defaultCenter] postNotificationName:ORGretinaTriggerLockChanged object: self];
     }
+}
+
+- (void) postLinkLostAlarm
+{
+    if(!linkLostAlarm){
+        linkLostAlarm = [[ORAlarm alloc] initWithName:@"Clock Lock Lost" severity:kImportantAlarm];
+        [linkLostAlarm setSticky:NO];
+        [linkLostAlarm setHelpString:@"The trigger card clock was locked, but lost was lost. This alarm will go away if you acknowledge it."];
+    }
+    [linkLostAlarm setAcknowledged:NO];
+    [linkLostAlarm postAlarm];
+
 }
 
 - (void) readDisplayRegs
