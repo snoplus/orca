@@ -842,7 +842,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
         if(aRunningState == eRunInProgress) [self clearProductionAlarm];
         else {
             [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(postProductionAlarm) object:nil];
-            [self performSelector:@selector(postProductionAlarm) withObject:nil afterDelay:10];
+            [self performSelector:@selector(postProductionAlarm) withObject:nil afterDelay:60*5];
         }
     }
     else [self clearProductionAlarm];
