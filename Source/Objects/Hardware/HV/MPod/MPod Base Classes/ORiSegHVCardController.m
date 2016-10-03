@@ -206,6 +206,11 @@
                          name : ORiSegHVCardDoNotPostSafetyAlarmChanged
                         object: model];
     
+    [notifyCenter addObserver : self
+                     selector : @selector(settingsLockChanged:)
+                         name : ORInProductionModeChanged
+                       object : nil];
+
     
 }
 
@@ -391,12 +396,14 @@
 - (void) settingsLockChanged:(NSNotification*)aNotification
 {
     
-   // BOOL runInProgress = [gOrcaGlobals runInProgress];
-   // BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORiSegHVCardSettingsLock];
+    BOOL inProductionMode   = [gOrcaGlobals inProductionMode];
+    //BOOL runInProgress    = [gOrcaGlobals runInProgress];
+    //BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORiSegHVCardSettingsLock];
     BOOL locked = [gSecurity isLocked:[model settingsLock]];
     	
     [settingLockButton setState: locked];
-	
+    
+    [doNotPostSafetyLoopAlarmCB setEnabled: !locked && !inProductionMode];
 	[self updateButtons];
 }
 
