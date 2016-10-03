@@ -98,6 +98,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 - (void) dealloc
 {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [objectsRequestingStateChangeWait release];
     [objectsRequestingRunStartAbort release];
     [shutDownScriptState release];
@@ -122,7 +123,10 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     
     [runFailedAlarm clearAlarm];
     [runFailedAlarm release];
-	
+    
+    [productionAlarm clearAlarm];
+    [productionAlarm release];
+
     [runStoppedByVetoAlarm clearAlarm];
 	[runStoppedByVetoAlarm release];
     
@@ -141,8 +145,18 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 - (void) sleep
 {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(postProductionAlarm) object:nil];
 	runModeCache = [self offlineRun];
 	[self setOfflineRun:NO];
+    
+    [productionAlarm clearAlarm];
+    [productionAlarm release];
+    productionAlarm = nil;
+    
+    [runStoppedByVetoAlarm clearAlarm];
+    [runStoppedByVetoAlarm release];
+    runStoppedByVetoAlarm = nil;
+
 	[super sleep];
 }
 
@@ -802,8 +816,37 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	return theState;
 }
 
+- (void) postProductionAlarm
+{
+    if(!productionAlarm){
+        productionAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Production Run Stopped"] severity:kDataFlowAlarm];
+        [productionAlarm setSticky:NO];
+        [productionAlarm setHelpString:@"Data production has stopped."];
+    }
+    [productionAlarm setAcknowledged:NO];
+    [productionAlarm postAlarm];
+
+}
+- (void) clearProductionAlarm
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(postProductionAlarm) object:nil];
+    [productionAlarm clearAlarm];
+    [productionAlarm release];
+    productionAlarm = nil;
+}
+
 - (void) setRunningState:(int)aRunningState
 {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(postProductionAlarm) object:nil];
+    if([[ORGlobal sharedGlobal]inProductionMode]){
+        if(aRunningState == eRunInProgress) [self clearProductionAlarm];
+        else {
+            [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(postProductionAlarm) object:nil];
+            [self performSelector:@selector(postProductionAlarm) withObject:nil afterDelay:10];
+        }
+    }
+    else [self clearProductionAlarm];
+    
     runningState = aRunningState;
     
     [self setUpImage];
@@ -1890,12 +1933,22 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 						 name:ORAddRunStartupAbort
 					   object:nil];
 
-    
     [notifyCenter addObserver:self 
 					 selector:@selector(releaseRunStateChangeWait:) 
 						 name:ORReleaseRunStateChangeWait 
 					   object:nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(productionModeChanged:)
+                         name : ORInProductionModeChanged
+                       object : nil];
+}
 
+- (void) productionModeChanged:(NSNotification*)aNote
+{
+    if(![[ORGlobal sharedGlobal]inProductionMode]){
+        [self clearProductionAlarm];
+    }
 }
 
 - (void) addRunStartupAbort:(NSNotification*)aNote

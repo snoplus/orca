@@ -65,6 +65,7 @@ extern NSString* ORTaskStateName[eMaxTaskState];
 	int cpuCount;
 	BOOL    forcedHalt;
 	BOOL	documentWasEdited;
+    BOOL    inProductionMode;
 }
 
 + (ORGlobal*) sharedGlobal;
@@ -84,6 +85,8 @@ extern NSString* ORTaskStateName[eMaxTaskState];
 - (BOOL) runRunning;
 - (BOOL) testInProgress;
 - (BOOL) forcedHalt;
+- (BOOL) inProductionMode;
+- (void) setInProductionMode:(BOOL)aState;
 - (void) prepareForForcedHalt;
 - (void) setTestInProgress:(BOOL)state;
 - (void) setRunInProgress:(BOOL)state;
@@ -141,6 +144,7 @@ extern NSString* ORRunVetosChanged;
 extern NSString* ORAddRunStateChangeWait;
 extern NSString* ORReleaseRunStateChangeWait;
 extern NSString* ORFlushLogsNotification;
+extern NSString* ORInProductionModeChanged;
 
 extern NSString* ORHardwareEnvironmentNoisy;
 extern NSString* ORHardwareEnvironmentQuiet;

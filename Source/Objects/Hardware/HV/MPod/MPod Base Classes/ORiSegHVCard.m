@@ -134,6 +134,19 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
                      selector : @selector(runStarted:)
                          name : ORRunStartedNotification
                        object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(productionModeChanged:)
+                         name : ORInProductionModeChanged
+                       object : nil];
+}
+
+- (void) productionModeChanged:(NSNotification*)aNote
+{
+    BOOL inProductionMode = [[ORGlobal sharedGlobal] inProductionMode];
+    if(inProductionMode){
+        [self setDoNotPostSafetyLoopAlarm:NO];
+   }
 }
 
 - (void) runStarted:(NSNotification*)aNote

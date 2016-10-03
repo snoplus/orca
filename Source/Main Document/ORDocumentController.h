@@ -21,17 +21,21 @@
 
 @interface ORDocumentController : NSWindowController 
 {
-    IBOutlet ORGroupView* groupView;
-    IBOutlet NSTextField* statusTextField;
-    IBOutlet NSTextField* lockStatusTextField;
-    IBOutlet NSButton*    lockAllButton;
-    IBOutlet NSOutlineView*    outlineView;
-    IBOutlet NSTextField* scaleFactorField;
-    IBOutlet NSTextField* logStatusField;
-    IBOutlet NSTextField* debuggingStatusField;
-    IBOutlet NSButton* documentLockButton;    
-	IBOutlet id	templates;
-	
+    IBOutlet ORGroupView*   groupView;
+    IBOutlet NSTextField*   statusTextField;
+    IBOutlet NSTextField*   lockStatusTextField;
+    IBOutlet NSButton*      lockAllButton;
+    IBOutlet NSOutlineView* outlineView;
+    IBOutlet NSTextField*   scaleFactorField;
+    IBOutlet NSTextField*   logStatusField;
+    IBOutlet NSTextField*   debuggingStatusField;
+    IBOutlet NSButton*      documentLockButton;
+    IBOutlet NSButton*      openProductionModeButton;
+    IBOutlet NSMatrix*      productionModeMatrix;
+    IBOutlet NSPanel*       productionModePanel;
+    IBOutlet NSTextField*   productionModeField;
+	IBOutlet id             templates;
+    
     NSImage* descendingSortingImage;
     NSImage* ascendingSortingImage;
     NSString *_sortColumn;
@@ -60,6 +64,7 @@
 - (void) postLogChanged:(NSNotification*)aNotification;
 - (void) debuggingSessionChanged:(NSNotification*)aNotification;
 - (void) lostFocus:(NSNotification*)aNotification;
+- (void) productionModeChanged:(NSNotification*)aNotification;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) openArchive:(NSToolbarItem*)item;
@@ -78,6 +83,9 @@
 - (IBAction) openORCARootService:(NSToolbarItem*)item;
 - (IBAction) openHelp:(NSToolbarItem*)item;
 - (IBAction) doubleClick:(id)sender;
+- (IBAction) openProductionModePanel:(id)sender;
+- (IBAction) closeProductionModePanel:(id)sender;
+- (IBAction) setProductionMode:(id)sender;
 
 #pragma mark ¥¥¥Data Source
 - (id)   outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item;

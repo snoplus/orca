@@ -108,6 +108,7 @@ enum{
 - (BOOL) polarity;
 - (void) registerNotificationObservers;
 - (void) runStarted:(NSNotification*)aNote;
+- (void) productionModeChanged:(NSNotification*)aNote;
 
 #pragma mark ***Accessors
 - (id)				adapter;

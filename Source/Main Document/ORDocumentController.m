@@ -191,23 +191,33 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
                                                  name : ORDebuggingSessionChanged
                                                object : nil];
     
-	[[NSNotificationCenter defaultCenter] addObserver : self
+    [[NSNotificationCenter defaultCenter] addObserver : self
                                              selector : @selector(lostFocus:)
                                                  name : NSWindowDidResignKeyNotification
                                                object : nil];
 
-    
-    
+    [[NSNotificationCenter defaultCenter] addObserver : self
+                                             selector : @selector(productionModeChanged:)
+                                                 name : ORInProductionModeChanged
+                                               object : nil];
 }
 
 - (void) updateWindow
 {
     [groupView setNeedsDisplay:YES];
     [self statusTextChanged:nil];
+    [self productionModeChanged:nil];
     [self numberLockedPagesChanged:nil];
 	[self postLogChanged:nil];
     [outlineView reloadData];
     [self debuggingSessionChanged:nil];
+}
+
+- (void) productionModeChanged:(NSNotification*)aNotification
+{
+    BOOL inProductionMode = [[ORGlobal sharedGlobal] inProductionMode];
+    [productionModeMatrix selectCellWithTag:inProductionMode];
+    [productionModeField setStringValue:inProductionMode?@"In Production":@""];
 }
 
 - (void) debuggingSessionChanged:(NSNotification*)aNotification
@@ -408,6 +418,26 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
     }
 }
 
+- (IBAction) openProductionModePanel:(id)sender;
+{
+    [self productionModeChanged:nil];
+    [NSApp beginSheet:productionModePanel modalForWindow:[self window]
+        modalDelegate:self didEndSelector:NULL contextInfo:nil];
+}
+
+- (IBAction) closeProductionModePanel:(id)sender;
+{
+    [productionModePanel orderOut:nil];
+    [NSApp endSheet:productionModePanel];
+}
+
+- (IBAction) setProductionMode:(id)sender
+{     
+     int tag = [[productionModeMatrix selectedCell] tag];
+     if(tag != [[ORGlobal sharedGlobal] inProductionMode]){
+         [[ORGlobal sharedGlobal] setInProductionMode:tag];
+     }
+}
 
 - (NSRect)windowWillUseStandardFrame:(NSWindow*)sender defaultFrame:(NSRect)defaultFrame
 {

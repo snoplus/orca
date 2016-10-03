@@ -86,7 +86,8 @@
 
 		ORAlarm*    runFailedAlarm;
 		ORAlarm*    runStoppedByVetoAlarm;
-	
+        ORAlarm*    productionAlarm;
+    
 		ORRunScriptModel* startScript;
 		ORRunScriptModel* shutDownScript;
 		BOOL skipShutDownScript;
@@ -220,6 +221,7 @@
 - (void) incrementTime:(NSTimer*)aTimer;
 - (void) sendHeartBeat:(NSTimer*)aTimer;
 
+- (void) productionModeChanged:(NSNotification*)aNote;
 - (void) addRunStartupAbort:(NSNotification*)aNote;
 - (void) addRunStateChangeWait:(NSNotification*)aNote;
 - (void) releaseRunStateChangeWait:(NSNotification*)aNote;
@@ -241,6 +243,8 @@
 - (NSString*) fullRunNumberString;
 - (unsigned) waitRequestersCount;
 - (id) waitRequesterAtIdex:(unsigned)index;
+- (void) postProductionAlarm;
+- (void) clearProductionAlarm;
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
@@ -268,8 +272,6 @@
 - (void) startFromRunScript;
 - (void) stopFromRunScript;
 - (void) quitSelectedRunScript;
-
-
 @end
 
 @interface ORRunModel (OROrderedObjHolding)

@@ -68,10 +68,11 @@ NSString* ORRunSecondChanceForWait          = @"ORRunSecondChanceForWait";
 NSString* ORAddRunStartupAbort              = @"ORAddRunStartupAbort";
 NSString* ORFlushLogsNotification           = @"ORFlushLogsNotification";
 
-NSString* ORRunTypeMask			    = @"ORRunTypeMask";
-NSString* ORRunStatusValue		    = @"Run Status Value";
-NSString* ORRunStatusString		    = @"Run Status String";
-NSString* ORRunVetosChanged			= @"ORRunVetosChanged";
+NSString* ORRunTypeMask                 = @"ORRunTypeMask";
+NSString* ORRunStatusValue              = @"Run Status Value";
+NSString* ORRunStatusString             = @"Run Status String";
+NSString* ORRunVetosChanged             = @"ORRunVetosChanged";
+NSString* ORInProductionModeChanged		= @"ORInProductionModeChanged";
 
 NSString* ORHardwareEnvironmentNoisy = @"ORHardwareEnvironmentNoisy";
 NSString* ORHardwareEnvironmentQuiet = @"ORHardwareEnvironmentQuiet";
@@ -79,9 +80,7 @@ NSString* ORHardwareEnvironmentQuiet = @"ORHardwareEnvironmentQuiet";
 NSString* ORDebuggingSessionChanged  = @"ORDebuggingSessionChanged";
 NSString* ORDebuggingSessionState    = @"ORDebuggingSessionState";
 
-
 ORGlobal* gOrcaGlobals = nil;
-
 
 @implementation ORGlobal
 
@@ -181,6 +180,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
 {
 	documentWasEdited = state;
 }
+
 - (BOOL) documentWasEdited
 {
 	return documentWasEdited;
@@ -236,6 +236,18 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
 - (void) prepareForForcedHalt
 {
 	forcedHalt = YES;
+}
+
+- (void) setInProductionMode:(BOOL)aState
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setInProductionMode:inProductionMode];
+    inProductionMode = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORInProductionModeChanged object:nil userInfo:nil waitUntilDone:NO];
+}
+
+- (BOOL) inProductionMode
+{
+    return inProductionMode;
 }
 
 - (BOOL) forcedHalt
@@ -333,19 +345,19 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
 }
 
 #pragma mark •••Archival
-static NSString* ORRunModeKey		    = @"ORRunMode";
-
 - (id)loadParams:(NSCoder*)decoder
 {
     [[self undoManager] disableUndoRegistration];
-    [self setRunMode:[decoder decodeIntForKey:ORRunModeKey]];
+    [self setRunMode:           [decoder decodeIntForKey: @"ORRunMode"]];
+    [self setInProductionMode:  [decoder decodeBoolForKey:@"ORInProductionMode"]];
     [[self undoManager] enableUndoRegistration];
     return self;
 }
 
 - (void)saveParams:(NSCoder*)encoder
 {
-    [encoder encodeInt:[self runMode] forKey:ORRunModeKey];
+    [encoder encodeInt:[self runMode]           forKey:@"ORRunMode"];
+    [encoder encodeBool:[self inProductionMode] forKey:@"ORInProductionMode"];
 }
 
 
