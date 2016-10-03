@@ -686,7 +686,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Time Out"];
     [p setFormat:@"##0" upperLimit:0xfff lowerLimit:0 stepSize:2 units:@"x50ns"];
-    [p setSetMethod:@selector(setTimeout:) getMethod:@selector(timeout)];
+    [p setSetMethod:@selector(setTimeOut:) getMethod:@selector(timeOut)];
     [a addObject:p];
 	
     [a addObject:[ORHWWizParam boolParamWithName:@"Test Enabled"  setter:@selector(setTestEnabled:)  getter:@selector(testEnabled)]];
