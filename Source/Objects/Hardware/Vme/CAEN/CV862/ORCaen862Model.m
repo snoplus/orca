@@ -273,8 +273,8 @@ static RegisterNamesStruct reg[kNumRegisters] = {
     if(eventCounterInc)         setBitMask |= kAllTrg;
     else                        clrBitMask |= kAllTrg;
     
-    if(slidingScaleEnable)      setBitMask |= kSlideSubEnable;
-    else                        clrBitMask |= kSlideSubEnable;
+    if(slidingScaleEnable)      setBitMask |= kSlideEnable;
+    else                        clrBitMask |= kSlideEnable;
     
     if(zeroSuppressEnable)      setBitMask |= kLowThres;
     else                        clrBitMask |= kLowThres;
