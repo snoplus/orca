@@ -297,8 +297,8 @@ static GretinaTriggerStateInfo master_state_info[kNumMasterTriggerStates] = {
     { kRunRouterDataCheck,      kMasterState,   @"Running Router/Gretina Setup"},
     { kWaitOnRouterDataCheck,   kMasterState,   @"Waiting on Routers and Digitizers"},
     { kFinalCheck,              kMasterState,   @"Final Check"},
-    { kReleaseImpSync,          kMasterState,   @"Turn Off IMPERATIVE_SYNC Bit"},
-    { kFinalReset,            kMasterState,     @"Final Reset of Clocks"},
+    { kReleaseImpSync,          kMasterState,   @"Ensure Imp Sync Bit State"},
+    { kFinalReset,              kMasterState,   @"Final Reset of Clocks"},
     { kMasterError,             kMasterState,   @""}
 };
 
@@ -561,9 +561,11 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     //Since there is just a couple of operations here and we want to be fast just
     //send the commands without going thru a state machine.
     unsigned long aValue = [self readRegister:kMiscCtl1];
-    [self writeRegister:kMiscCtl1 withValue:aValue &= ~(0x1<<6)];//release
+    [self writeRegister:kMiscCtl1 withValue:aValue |= (0x1<<6)];//set imp sync to hold clocks in reset
     [self resetScalerTimeStamps];
-    [self writeRegister:kPulsedCtl2 withValue:0x1000]; //send one imp syn
+    [self writeRegister:kMiscCtl1 withValue:aValue &= ~(0x1<<6)];//release imp sync
+
+    //    [self writeRegister:kPulsedCtl2 withValue:0x1000]; //send one imp syn
     [self readDisplayRegs];
 }
 
@@ -1534,15 +1536,15 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
                     
         
         case kReleaseImpSync:
-            //release the Imp. Sync. bit
             aValue = [self readRegister:kMiscCtl1];
-            [self writeRegister:kMiscCtl1 withValue:aValue &= ~(0x1<<6)];
+            [self writeRegister:kMiscCtl1 withValue:aValue |= (0x1<<6)]; //ensure the imp sync is high
             [self setInitState:kFinalReset];
             break;
 
         case kFinalReset:
             [self resetScaler];
-            [self writeRegister:kPulsedCtl2 withValue:0x1000]; //send one imp syn
+            aValue = [self readRegister:kMiscCtl1];
+            [self writeRegister:kMiscCtl1 withValue:aValue &= ~(0x1<<6)]; //lower imp sync to start everything
             [self setInitState:kMasterIdle];
             break;
     }
