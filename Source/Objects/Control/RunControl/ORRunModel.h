@@ -257,6 +257,7 @@
 
 #pragma mark ¥¥¥Script Helpers
 - (void) forceClearWaits;
+- (void) abortRunFromWait;
 - (NSString*) commonScriptMethods;
 
 #pragma mark ¥¥¥Bit Processing protocol

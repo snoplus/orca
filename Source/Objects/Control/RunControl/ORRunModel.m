@@ -2016,6 +2016,12 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 }
 
+- (void) abortRunFromWait
+{
+    [self forceClearWaits];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORRequestRunHalt object:self];
+}
+
 - (unsigned) waitRequestersCount
 {
     unsigned count;

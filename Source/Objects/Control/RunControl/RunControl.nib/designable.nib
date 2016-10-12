@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9531" systemVersion="15D21" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="15G1004" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
         <development version="5100" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9531"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10116"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ORRunController">
             <connections>
+                <outlet property="abortRunFromWaitButton" destination="ecS-N3-w0Z" id="nWf-Me-nbW"/>
                 <outlet property="clearAllTypesButton" destination="1722" id="2046"/>
                 <outlet property="definitionsFileTextField" destination="2039" id="2041"/>
                 <outlet property="elapsedBetweenSubRunTimeField" destination="2547" id="2550"/>
@@ -1121,11 +1122,11 @@
                     </textFieldCell>
                 </textField>
                 <button verticalHuggingPriority="750" id="2650">
-                    <rect key="frame" x="171" y="9" width="147" height="25"/>
+                    <rect key="frame" x="138" y="7" width="124" height="25"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <buttonCell key="cell" type="square" title="Force Clear All Waits" bezelStyle="shadowlessSquare" imagePosition="overlaps" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2651">
+                    <buttonCell key="cell" type="square" title="Force Clear All Waits" bezelStyle="shadowlessSquare" imagePosition="overlaps" alignment="center" controlSize="small" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2651">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="system"/>
+                        <font key="font" metaFont="smallSystem"/>
                     </buttonCell>
                     <connections>
                         <action selector="forceClearWaitsAction:" target="-2" id="2664"/>
@@ -1140,6 +1141,17 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
+                <button verticalHuggingPriority="750" id="ecS-N3-w0Z">
+                    <rect key="frame" x="278" y="7" width="103" height="25"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="square" title="Abort Run" bezelStyle="shadowlessSquare" imagePosition="overlaps" alignment="center" controlSize="small" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="FBz-sq-1zi">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="smallSystem"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="abortRunFromWaitAction:" target="-2" id="tQH-vl-Pck"/>
+                    </connections>
+                </button>
             </subviews>
         </customView>
         <drawer trailingOffset="15" id="2633" userLabel="WaitRequestersDrawer">
@@ -1170,10 +1182,10 @@
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <clipView key="contentView" id="EDo-Ay-y08">
                         <rect key="frame" x="0.0" y="0.0" width="144" height="285"/>
-                        <autoresizingMask key="autoresizingMask"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <customView id="2733" customClass="ORCardContainerView">
-                                <rect key="frame" x="0.0" y="-258.5" width="147" height="800"/>
+                                <rect key="frame" x="0.0" y="-259" width="147" height="801"/>
                                 <autoresizingMask key="autoresizingMask"/>
                             </customView>
                         </subviews>
@@ -1182,7 +1194,7 @@
                         <rect key="frame" x="-100" y="-100" width="169" height="16"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
-                    <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="0.49805825242718449" horizontal="NO" id="2757">
+                    <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="0.99903100775193798" horizontal="NO" id="2757">
                         <rect key="frame" x="144" y="0.0" width="15" height="285"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>

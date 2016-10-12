@@ -87,7 +87,9 @@
     IBOutlet NSTextField*   waitCountField2;
     IBOutlet NSTableView*   waitRequestersTableView;
     IBOutlet NSButton*      forceClearWaitsButton;
-	IBOutlet ORGroupView*   scriptsView;
+    IBOutlet NSButton*      abortRunFromWaitButton;
+
+    IBOutlet ORGroupView*   scriptsView;
 	IBOutlet NSPopUpButton* runTypeScriptPU;
 
     BOOL retainingRunNotice;
@@ -122,6 +124,7 @@
 - (IBAction) startNewSubRunAction:(id)sender;
 - (IBAction) prepareForSubRunAction:(id)sender;
 - (IBAction) forceClearWaitsAction:(id)sender;
+- (IBAction) abortRunFromWaitAction:(id)sender;
 - (IBAction) chooseDir:(id)sender;
 - (void) deferredRunNumberChange;
 - (void) deferredChooseDir;

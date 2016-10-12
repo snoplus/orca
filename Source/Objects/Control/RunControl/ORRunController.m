@@ -399,6 +399,7 @@
     int n = [model waitRequestersCount];
     [showWaitRequestersButton setHidden:n==0 && ([waitRequestersDrawer state] == NSDrawerClosedState)];
     [forceClearWaitsButton setEnabled:n>0];
+    [abortRunFromWaitButton setEnabled:n>0];
     [waitCountField setIntValue:n];
     [waitCountField1 setIntValue:n];
     [waitCountField2 setStringValue:n==0?@"":@"Waits In Place"];
@@ -981,6 +982,10 @@
 - (IBAction) forceClearWaitsAction:(id)sender
 {
     [model forceClearWaits];
+}
+- (IBAction) abortRunFromWaitAction:(id)sender
+{
+    [model abortRunFromWait];
 }
 
 - (void) updateWithCurrentRunNumber
