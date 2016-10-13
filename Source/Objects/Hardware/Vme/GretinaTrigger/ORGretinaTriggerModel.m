@@ -1218,6 +1218,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
                 [routerObj printRouterDiagnosticReport];
             }
         }
+        [self dumpRegisters];
     }
     else {
         NSLogColor([NSColor redColor],@"Illegal call. Do not call %@ on a Router card.\n",NSStringFromSelector(_cmd));
@@ -1233,7 +1234,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
                 ORGretina4MModel* digitizerObj   = [[linkConnector[i] connector] objectLink];
                 if(digitizerObj){
                     if(![digitizerObj isLocked]){
-                        NSLogColor([NSColor redColor],@"%@: NOT Lock.\n",[digitizerObj fullID]);
+                        NSLogColor([NSColor redColor],@"%@: NOT Locked.\n",[digitizerObj fullID]);
                     }
                     else {
                         NSLog(@"%@: Locked.\n",[digitizerObj fullID]);
@@ -1241,6 +1242,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
                 }
             }
         }
+        [self dumpRegisters];
     }
     else {
         NSLogColor([NSColor redColor],@"Illegal call. Do not call %@ on the Master Trigger card.\n",NSStringFromSelector(_cmd));
