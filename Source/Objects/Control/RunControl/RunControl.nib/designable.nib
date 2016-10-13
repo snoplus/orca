@@ -1194,7 +1194,7 @@
                         <rect key="frame" x="-100" y="-100" width="169" height="16"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
-                    <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="0.99903100775193798" horizontal="NO" id="2757">
+                    <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="2757">
                         <rect key="frame" x="144" y="0.0" width="15" height="285"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
