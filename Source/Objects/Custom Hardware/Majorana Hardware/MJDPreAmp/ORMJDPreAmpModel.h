@@ -66,7 +66,7 @@
     BOOL            connected;
     BOOL            doNotUseHWMap;
     int             firmwareRev;
-
+    BOOL            pollRequestInFlight;
     //error counting
     BOOL            supplyOutOfBounds[4]; //only count if this goes from low to high
     unsigned long   supplyErrors[4];
@@ -108,6 +108,7 @@
 - (void) setAdcEnabledMask:(unsigned long)aAdcEnabledMask;
 - (BOOL) shipValues;
 - (void) setShipValues:(BOOL)aShipValues;
+- (void) pollRequestIsFinished;
 - (int) pollTime;
 - (void) setPollTime:(int)aPollTime;
 - (float) adc:(unsigned short) aChan;
@@ -216,4 +217,27 @@ extern NSString* ORMJDPreAmpModelRateSpiked;
 - (id) sbcLink;
 - (unsigned long) baseAddress;
 - (void) send:(SBC_Packet*)aSendPacket receive:(SBC_Packet*)aReceivePacket;
+@end
+
+@class MjdPreAmpPollRequest;
+
+@interface ORMjdPreAmpPollQueue : NSObject
+{
+    NSOperationQueue* queue;
+}
++ (ORMjdPreAmpPollQueue*) sharedMjdPreAmpPollQueue;
++ (NSOperationQueue*) queue;
++ (void) cancelAllOperations;
++ (void) addRequest:(MjdPreAmpPollRequest*)anOp;
+- (NSOperationQueue*) queue;
+- (void) addRequest:(MjdPreAmpPollRequest*)anOp;
+- (void) cancelAllOperations;
+
+@end
+@interface MjdPreAmpPollRequest : NSOperation
+{
+    ORMJDPreAmpModel* delegate;
+}
+- (id) initWithDelegate:(id)aDelegate;
+- (void) main;
 @end

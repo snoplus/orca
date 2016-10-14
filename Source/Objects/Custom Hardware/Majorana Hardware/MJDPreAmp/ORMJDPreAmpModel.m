@@ -27,7 +27,9 @@
 #import "MajoranaModel.h"
 #import "ORCard.h"
 #import "ORRunningAverageGroup.h"
-#
+#import "SynthesizeSingleton.h"
+
+
 #pragma mark ¥¥¥Notification Strings
 NSString* ORMJDPreAmpModelBoardRevChanged   = @"ORMJDPreAmpModelBoardRevChanged";
 NSString* ORMJDPreAmpModelUseSBCChanged     = @"ORMJDPreAmpModelUseSBCChanged";
@@ -144,6 +146,7 @@ struct {
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[ORMjdPreAmpPollQueue sharedMjdPreAmpPollQueue] cancelAllOperations];
     [lastDataBaseUpdate release];
     [dacs release];
 	int i;
@@ -167,11 +170,17 @@ struct {
     [super dealloc];
 }
 
+- (void) applicationIsTerminating:(NSNotification*)aNote
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    [[ORMjdPreAmpPollQueue sharedMjdPreAmpPollQueue] cancelAllOperations];
+}
+
 - (void) wakeUp
 {
     [super wakeUp];
     if(pollTime){
-        [self pollValues];
+        [self requestPoll];
     }
     [self registerNotificationObservers];
 }
@@ -180,6 +189,7 @@ struct {
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[ORMjdPreAmpPollQueue sharedMjdPreAmpPollQueue] cancelAllOperations];
     [super sleep];
 }
 
@@ -553,15 +563,20 @@ struct {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelPollTimeChanged object:self];
 	
 	if(pollTime){
-		[self performSelector:@selector(pollValues) withObject:nil afterDelay:2];
+		[self performSelector:@selector(requestPoll) withObject:nil afterDelay:2];
         NSLog(@"new poll time%d seconds\n",pollTime);
 
 	}
 	else {
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollValues) object:nil];
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(requestPoll) object:nil];
         [self clearAllAlarms];
         [baselineRunningAverages reset];
 	}
+}
+
+- (void) pollRequestIsFinished
+{
+    pollRequestInFlight = NO;
 }
 
 - (NSMutableArray*) feedBackResistors
@@ -1248,13 +1263,17 @@ struct {
     else return 0;
 }
 
-         
-- (void) pollValues
+- (void) requestPoll
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollValues) object:nil];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(requestPoll) object:nil];
     if(connected){
         @try {
-            [self readAllAdcs];
+            if(!pollRequestInFlight){
+                pollRequestInFlight = YES;
+                MjdPreAmpPollRequest* aRequest = [[MjdPreAmpPollRequest alloc] initWithDelegate:self];
+                [[ORMjdPreAmpPollQueue sharedMjdPreAmpPollQueue] addRequest:aRequest];
+                [aRequest release];
+            }
         }
         @catch(NSException* e){
             
@@ -1263,7 +1282,28 @@ struct {
         [self postCouchDBRecord];
         if(shipValues)[self shipRecords];
     }
-	if(pollTime)[self performSelector:@selector(pollValues) withObject:nil afterDelay:pollTime];
+    if(pollTime){
+        [self performSelector:@selector(requestPoll) withObject:nil afterDelay:pollTime];
+    }
+}
+
+
+
+- (void) pollValues
+{
+    if(connected){
+        @try {
+            if(!pollRequestInFlight)pollRequestInFlight = YES;
+            [self readAllAdcs];
+            pollRequestInFlight = NO;
+        }
+        @catch(NSException* e){
+            
+        }
+        [self updateTrends];
+        [self postCouchDBRecord];
+        if(shipValues)[self shipRecords];
+    }
 }
 
 
@@ -1832,3 +1872,52 @@ struct {
 }
 
 @end
+
+@implementation ORMjdPreAmpPollQueue
+SYNTHESIZE_SINGLETON_FOR_ORCLASS(MjdPreAmpPollQueue);
++ (NSOperationQueue*)   queue                   { return [[ORMjdPreAmpPollQueue sharedMjdPreAmpPollQueue] queue];  }
++ (void)                cancelAllOperations     { [[ORMjdPreAmpPollQueue sharedMjdPreAmpPollQueue] cancelAllOperations]; }
++ (void) addRequest:(MjdPreAmpPollRequest*)aRequest
+{
+   [[ORMjdPreAmpPollQueue sharedMjdPreAmpPollQueue] addRequest:aRequest];
+}
+- (id) init
+{
+    self = [super init];
+    queue = [[NSOperationQueue alloc] init];
+    [queue setMaxConcurrentOperationCount:1];
+    return self;
+}
+
+- (NSOperationQueue*) queue                 { return queue;                 }
+- (void) cancelAllOperations                { [queue cancelAllOperations];  }
+- (void) addRequest:(MjdPreAmpPollRequest*)anOp      {
+    [queue addOperation:anOp];
+}
+@end
+
+@implementation MjdPreAmpPollRequest
+- (id) initWithDelegate:(id)aDelegate
+{
+    self = [super init];
+    delegate = aDelegate;
+    return self;
+}
+     
+-(void) main
+{
+    NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init];
+    if(![self isCancelled]){
+        [delegate performSelectorOnMainThread:@selector(readAllAdcs) withObject:nil waitUntilDone:YES];
+        int i;
+        for(i=0;i<50;i++){
+            [NSThread sleepForTimeInterval:.1];
+            if([self isCancelled])break;
+        }
+    }
+    [delegate pollRequestIsFinished];
+    [thePool release];
+}
+@end
+
+
