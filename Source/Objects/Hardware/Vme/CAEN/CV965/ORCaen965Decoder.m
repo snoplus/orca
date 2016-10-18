@@ -59,7 +59,14 @@
 		if(dataType == 0x0){
 			int qdcValue = ShiftAndExtract(ptr[i],0,0xfff);
 			int channel  = [self channel:ptr[i]];
-			restOfString = [restOfString stringByAppendingFormat:@"Chan  = %d  Value = %d\n",channel,qdcValue];
+            if([self rg:ptr[i]] == 1)
+            {
+                restOfString = [restOfString stringByAppendingFormat:@"Chan  = %d (H)  Value = %d\n",channel,qdcValue];
+            }
+            else
+            {
+                restOfString = [restOfString stringByAppendingFormat:@"Chan  = %d (L)  Value = %d\n",channel,qdcValue];
+            }
         }
     }
 
