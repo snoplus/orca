@@ -39,6 +39,7 @@
 #import "ORRunningAverage.h"
 #import "OROnCallListModel.h"
 #import "ORRunModel.h"
+#import "ORCouchDBModel.h"
 
 NSString* MajoranaModelIgnorePanicOnBChanged            = @"MajoranaModelIgnorePanicOnBChanged";
 NSString* MajoranaModelIgnorePanicOnAChanged            = @"MajoranaModelIgnorePanicOnAChanged";
@@ -1081,9 +1082,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 }
 
 - (void) postCouchDBRecord
-{
-    if([[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCouchDBModel")] count]==0)return;
-    
+{    
     NSMutableDictionary*  values  = [NSMutableDictionary dictionary];
     int aSet;
     int numGroups = [segmentGroups count];
