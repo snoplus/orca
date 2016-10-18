@@ -139,14 +139,16 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 - (NSArray*) collectObjectsOfClass:(Class)aClass
 {
     NSMutableArray* collection = [NSMutableArray arrayWithCapacity:256];
-    
-    [collection addObjectsFromArray:[super collectObjectsOfClass:aClass]];
-	
-    NSEnumerator* e  = [dataSet objectEnumerator];
-    OrcaObject* anObject;
-    while(anObject = [e nextObject]){
-        [collection addObjectsFromArray:[anObject collectObjectsOfClass:aClass]];
-    }	
+    @synchronized (self) {
+        
+        [collection addObjectsFromArray:[super collectObjectsOfClass:aClass]];
+        
+        NSEnumerator* e  = [dataSet objectEnumerator];
+        OrcaObject* anObject;
+        while(anObject = [e nextObject]){
+            [collection addObjectsFromArray:[anObject collectObjectsOfClass:aClass]];
+        }
+    }
     return collection;
 }
 
