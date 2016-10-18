@@ -47,11 +47,9 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
             fifoFlag = 0x40000000;
         }
         
-        //printf("num to read: %d\n",numEventsToRead);
-       // int32_t count = 0;
         int32_t i;
         for(i=0;i<numEventsToRead;i++){
-            ensureDataCanHold(1024+2);
+            ensureDataCanHold(10*(1024+2)); //ensure we leave plenty of room. If we are that close to filling the data buffer.. to bad -- we lose the data
      
             int32_t savedIndex      = dataIndex;
             data[dataIndex++]       = dataId | 1026;
@@ -79,19 +77,13 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
                 clearFifo(fifoResetAddress);
                 break;
             }
-           // else {
-           //     count++;
-           // }
-        }
+         }
         
         //a test -- do a non-DMA read to see if the number of SBC errors is reduced
         uint32_t junk;
         VMERead(fifoStateAddress,GetAddressModifier(),(uint32_t) 4, junk);
-
-       // printf("got %d waveforms\n",count);
     }
-
-    return true; 
+    return true;
 }
 
 void ORGretina4MReadout::clearFifo(uint32_t fifoClearAddress)
