@@ -655,16 +655,18 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
             
             if(state0!=2){
                 if(isRetracting){
-                    if((state1 == 99636) ||
-                       (state1 == 96936) ||
-                       state0 == 3){
+                    if (state0 == 3){
+                    //if((state1 == 99636) ||
+                    //   (state1 == 96936) ||
+                   //    state0 == 3){
                         [self setCurrentState:kMJDSource_StopMotion];
                         NSLog(@"Module %d Source fully retracted\n",slot+1);
                         self.order = [NSMutableString stringWithString:@"RETRACTED"];
                     }
                 }
                 else {
-                    if((state1 == 63969)|| state0 == 1){ //new longer source 7/5/16
+                    if (state0 == 1){
+                    //if((state1 == 63969)|| state0 == 1){ //new longer source 7/5/16
                     //if((state1 == 36396)||
                     //   (state1 == 36936)||
                     //   state0 == 1){
