@@ -676,7 +676,7 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
                     }
                 }
             }
-
+            /*  //not needed anymore RM, 
             else if([order length]>=5){
                 if(isRetracting){
                     if([[order substringFromIndex: [order length] - 5] isEqualToString: @"CCBAB"]){
@@ -696,6 +696,7 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
                    }
                 }
             }
+            */
         }
     }
 }
