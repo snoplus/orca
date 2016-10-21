@@ -220,7 +220,7 @@ NSString* ORSyncCenterModelReloadTable      = @"ORSyncCenterModelReloadTable";
 - (void) addOrca
 {
     if(!orcaList) self.orcaList = [NSMutableArray array];
-    id entry = [[NSMutableDictionary dictionary] retain];
+    id entry = [NSMutableDictionary dictionary];
     [entry setObject:[NSNumber numberWithInt:1] forKey:@"kSyncOnCallList"];
     [entry setObject:[NSNumber numberWithInt:1] forKey:@"kSyncAlarmList"];
     [self addOrca:entry atIndex:[orcaList count]];
