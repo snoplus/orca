@@ -240,7 +240,7 @@ enum {
 {
   @private
 	NSThread*		fpgaProgrammingThread;
-	ORConnector*    linkConnector[11]; //we won't draw these connectors so we have to keep references to them
+	ORConnector*    linkConnector[9]; //we won't draw these connectors so we have to keep references to them
 	BOOL            isMaster;
     unsigned short  regWriteValue;
     int             registerIndex;
@@ -285,6 +285,7 @@ enum {
     int             digitizerLockCount;
     BOOL            linkWasLost;
     BOOL            setupNIMOutputDone;
+    BOOL            doLockRecoveryInQuckStart;
 }
 
 - (id) init;
@@ -384,6 +385,7 @@ enum {
 
 - (void) setToInternalClock;
 - (void) pulseNIMOutput;
+- (void) flushDigitizerFifos;
 
 // Register access
 - (void) dumpFpgaRegisters;

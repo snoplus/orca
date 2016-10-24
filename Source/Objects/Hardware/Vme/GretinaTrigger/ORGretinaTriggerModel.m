@@ -593,16 +593,10 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
                 ORRunModel* aRunModel = [runModelObjects objectAtIndex:0];
                 
                 NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:@"Clock Lock Lost",@"Reason",@"Master Trigger card reported lost lock",@"Details",nil];
-                if([aRunModel quickStart]){
-                    [[NSNotificationCenter defaultCenter] postNotificationName:ORRequestRunHalt
+                if([aRunModel quickStart])doLockRecoveryInQuckStart = YES;
+                [[NSNotificationCenter defaultCenter] postNotificationName:ORRequestRunRestart
                                                                         object:self
                                                                       userInfo:userInfo];
-                }
-                else {
-                    [[NSNotificationCenter defaultCenter] postNotificationName:ORRequestRunRestart
-                                                                        object:self
-                                                                      userInfo:userInfo];
-                }
                 [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollLock) object:nil];
 
             }
@@ -627,7 +621,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             @try {
                 [self readRegister:kBoardID];
                // [self pulseNIMOutput];
-                if(![(ORRunModel*)[aNote object] quickStart]){
+                if(![(ORRunModel*)[aNote object] quickStart] || doLockRecoveryInQuckStart){
                     [self initClockDistribution];
                 }
                 else {
@@ -1207,6 +1201,24 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     }
 }
 
+- (void) flushDigitizerFifos
+{
+    if(![self isMaster]){
+        int i;
+        for(i=0;i<8;i++){
+            if([linkConnector[i]  identifer] != 'L'){
+                ORConnector* otherConnector = [linkConnector[i] connector];
+                ORGretina4MModel* digitizerObj = [otherConnector objectLink];
+                if(digitizerObj){
+                    if(verbose)NSLog(@"Flush Fifo on %@\n",[digitizerObj fullID]);
+                    [digitizerObj resetSingleFIFO];
+                }
+            }
+        }
+    }
+}
+
+
 - (void) printMasterDiagnosticReport
 {
     int i;
@@ -1539,14 +1551,27 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
         
         case kReleaseImpSync:
             aValue = [self readRegister:kMiscCtl1];
-            [self writeRegister:kMiscCtl1 withValue:aValue |= (0x1<<6)]; //ensure the imp sync is high
+            [self writeRegister:kMiscCtl1 withValue:aValue |= (0x1<<6)]; //ensure the imp sync is high.. clocks held in reset
             [self setInitState:kFinalReset];
             break;
 
         case kFinalReset:
+            if(doLockRecoveryInQuckStart){
+                doLockRecoveryInQuckStart = NO;
+                //special case -- flush the digitizers
+                int i;
+                for(i=0;i<8;i++){
+                    ORConnector* otherConnector = [linkConnector[i] connector];
+                    if([otherConnector identifer] == 'L'){
+                        ORGretinaTriggerModel* routerObj = [otherConnector objectLink];
+                        [routerObj flushDigitizerFifos];
+                    }
+                }
+            }
             [self resetScaler];
+            
             aValue = [self readRegister:kMiscCtl1];
-            [self writeRegister:kMiscCtl1 withValue:aValue &= ~(0x1<<6)]; //lower imp sync to start everything
+            [self writeRegister:kMiscCtl1 withValue:aValue &= ~(0x1<<6)]; //lower imp sync to start clock
             [self setInitState:kMasterIdle];
             break;
     }
