@@ -2990,13 +2990,14 @@ return 0;
 {
     isRunning = NO;
     [waveFormRateGroup stop];
-    [rateRunningAverages resetCounters:0];
     
     //stop all channels
     short i;
     for(i=0;i<kNumGretina4MChannels;i++){					
 		waveFormCount[i] = 0;
     }
+    [waveFormRateGroup resetRates];
+    [rateRunningAverages resetCounters:0];
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(checkFifoAlarm) object:nil];
 }
 
