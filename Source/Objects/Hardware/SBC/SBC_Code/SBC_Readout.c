@@ -49,7 +49,7 @@
 #define FALSE 0
 #endif
 
-#define kCBBufferSize 1024*1024*12
+#define kCBBufferSize 1024*1024*64
 
 void* readoutThread (void* p);
 void* jobThread (void* p);
@@ -281,8 +281,16 @@ void processBuffer(SBC_Packet* aPacket, uint8_t reply)
     int32_t destination = aPacket->cmdHeader.destination;
 
     switch(destination){
-        case kSBC_Process:   processSBCCommand(aPacket,reply);    break;
-        default:             processHWCommand(aPacket);			  break;
+        case kSBC_Process:
+            pthread_mutex_lock(&hwMutex);
+            processSBCCommand(aPacket,reply);
+            pthread_mutex_unlock(&hwMutex);
+            break;
+        default:
+            pthread_mutex_lock(&hwMutex);
+           processHWCommand(aPacket);
+            pthread_mutex_unlock(&hwMutex);
+            break;
     }
 }
 
