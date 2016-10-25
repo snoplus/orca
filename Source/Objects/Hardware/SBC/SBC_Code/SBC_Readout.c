@@ -282,9 +282,7 @@ void processBuffer(SBC_Packet* aPacket, uint8_t reply)
 
     switch(destination){
         case kSBC_Process:
-            pthread_mutex_lock(&hwMutex);
             processSBCCommand(aPacket,reply);
-            pthread_mutex_unlock(&hwMutex);
             break;
         default:
             pthread_mutex_lock(&hwMutex);
