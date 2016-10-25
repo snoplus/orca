@@ -49,7 +49,7 @@
 #define FALSE 0
 #endif
 
-#define kCBBufferSize 1024*1024*64
+#define kCBBufferSize 1024*1024*12
 
 void* readoutThread (void* p);
 void* jobThread (void* p);
