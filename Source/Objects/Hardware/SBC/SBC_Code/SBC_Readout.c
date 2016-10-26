@@ -285,8 +285,8 @@ void processBuffer(SBC_Packet* aPacket, uint8_t reply)
             processSBCCommand(aPacket,reply);
             break;
         default:
-            pthread_mutex_lock(&hwMutex);
-           processHWCommand(aPacket);
+            pthread_mutex_lock(&hwMutex); //added this missing lock MAH 10/26
+            processHWCommand(aPacket);
             pthread_mutex_unlock(&hwMutex);
             break;
     }
