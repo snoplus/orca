@@ -45,6 +45,8 @@ smellieRunFile,
 snopBlueColor,
 snopRedColor,
 snopOrangeColor,
+snopBlackColor,
+snopGrayColor,
 snopGreenColor;
 
 #pragma mark ¥¥¥Initialization
@@ -206,7 +208,11 @@ snopGreenColor;
     [self setSnopRedColor:[NSColor colorWithSRGBRed:255./255. green:102./255. blue:102./255. alpha:1]];
     [self setSnopGreenColor:[NSColor colorWithSRGBRed:0./255. green:150./255. blue:0./255. alpha:1]];
     [self setSnopOrangeColor:[NSColor colorWithSRGBRed:255./255. green:178./255. blue:102./255. alpha:1]];
+    [self setSnopBlackColor:[NSColor colorWithSRGBRed:0./255. green:0./255. blue:0./255. alpha:1]];
+    [self setSnopGrayColor:[NSColor colorWithSRGBRed:0./255. green:0./255. blue:0./255. alpha:0.5]];
 
+    //Update conection settings
+    [self updateSettings:nil];
     //Sync runnumber with main RunControl
     [self updateRunInfo:nil];
     [self findRunControl:nil];
@@ -215,10 +221,14 @@ snopGreenColor;
     [self mtcDataBaseChanged:nil];
     //Update runtype word
     [self runTypeWordChanged:nil];
-    //Refresh SRs
-    [self refreshStandardRuns:nil];
-    //Update conection settings
-    [self updateSettings:nil];
+    //Lock Standard Runs menus at init
+    if([model standardRunType] == nil){
+        [standardRunPopupMenu setEnabled:false];
+        [standardRunVersionPopupMenu setEnabled:false];
+    }
+    else{
+        [self refreshStandardRunsAction:nil];
+    }
     //Pull the information from the SMELLIE DB
     [model getSmellieRunListInfo];
     [super awakeFromNib];
@@ -320,7 +330,6 @@ snopGreenColor;
     [self runStatusChanged:nil];
     [self SRTypeChanged:nil];
     [self SRVersionChanged:nil];
-    [model setIsEmergencyStopEnabled:TRUE]; //enable the emergency stop
     [self runsLockChanged:nil];
     [self runsECAChanged:nil];
     [self runTypeWordChanged:nil];
@@ -351,8 +360,9 @@ snopGreenColor;
 {
     
     NSString* standardRun = [model standardRunType];
-    if([standardRunPopupMenu indexOfItemWithObjectValue:standardRun] == NSNotFound){
+    if(standardRun != nil && ![standardRun isEqualToString:@""] && [standardRunPopupMenu indexOfItemWithObjectValue:standardRun] == NSNotFound){
         NSLogColor([NSColor redColor],@"Standard Run \"%@\" does not exist in DB. \n",standardRun);
+        return;
     }
     else{
         [standardRunPopupMenu selectItemWithObjectValue:standardRun];
@@ -360,16 +370,20 @@ snopGreenColor;
     
     if([[model standardRunType] isEqualToString:@"HIGH THRESHOLDS"]) {
         [model setStandardRunVersion:@"DEFAULT"];
-    } else {
+    }
+    else if(![standardRun isEqualToString:@""] && standardRun != nil){
         [self refreshStandardRunVersions];
     }
+
 }
 
 -(void) SRVersionChanged:(NSNotification*)aNote
 {
+    
     NSString* standardRunVersion = [model standardRunVersion];
-    if([standardRunVersionPopupMenu indexOfItemWithObjectValue:standardRunVersion] == NSNotFound){
+    if(standardRunVersion != nil && ![standardRunVersion isEqualToString:@""] && [standardRunVersionPopupMenu indexOfItemWithObjectValue:standardRunVersion] == NSNotFound){
         NSLogColor([NSColor redColor],@"Standard Run Version \"%@\" does not exist in DB. \n",standardRunVersion);
+        return;
     }
     else{
         [standardRunVersionPopupMenu selectItemWithObjectValue:standardRunVersion];
@@ -377,18 +391,33 @@ snopGreenColor;
     
     [self displayThresholdsFromDB];
     [self runTypeWordChanged:nil];
+
 }
 
 - (IBAction) startRunAction:(id)sender
 {
+    
+    //Make sure we are not running any RunScripts
+    [runControl setSelectedRunTypeScript:0];
+
     //Load selected SR in case the user didn't click enter
     NSString *standardRun = [standardRunPopupMenu objectValueOfSelectedItem];
     NSString *standardRunVersion = [standardRunVersionPopupMenu objectValueOfSelectedItem];//MAH -- fixed
     [model setStandardRunType:standardRun];
     [model setStandardRunVersion:standardRunVersion];
 
-    //Load values into model
-    [model loadStandardRun:standardRun withVersion:standardRunVersion];
+    //Load values into model:
+    //If we are in operator mode we ALWAYS load the DEFAULTs to avoid confusion
+    //The expert mode has the freedom to load whichever test run. This is dangerous
+    //but hopefully we won't need to run in expert mode for physics data and in any
+    //case the expert will know this!
+    BOOL locked = [gSecurity isLocked:ORSNOPRunsLockNotification];
+    if(locked) { //Operator Mode
+        [model setStandardRunVersion:@"DEFAULT"];
+        [model loadStandardRun:standardRun withVersion:@"DEFAULT"];
+    } else{//Expert Mode
+        [model loadStandardRun:standardRun withVersion:standardRunVersion];
+    }
 
     //Start or restart the run
     if([runControl isRunning])[runControl restartRun];
@@ -413,10 +442,11 @@ snopGreenColor;
 }
 
 - (void) runStatusChanged:(NSNotification*)aNotification
-{ dispatch_async(dispatch_get_main_queue(), ^{
+{
     
+    [startRunButton setEnabled:true];
+
     if([runControl runningState] == eRunInProgress){
-        [startRunButton setEnabled:true];
         [startRunButton setTitle:@"RESTART"];
         [lightBoardView setState:kGoLight];
         if(([model lastRunTypeWord]>>0) & 1){
@@ -426,7 +456,6 @@ snopGreenColor;
         }
 	}
 	else if([runControl runningState] == eRunStopped){
-        [startRunButton setEnabled:true];
         [startRunButton setTitle:@"START"];
         [lightBoardView setState:kStoppedLight];
         [runStatusField setStringValue:@"Stopped"];
@@ -449,7 +478,7 @@ snopGreenColor;
         [lightBoardView setState:kCautionLight];
 	}
     
-}); }
+}
 
 - (void) viewTypeChanged:(NSNotification*)aNote
 {
@@ -461,7 +490,6 @@ snopGreenColor;
 - (void) dbOrcaDBIPChanged:(NSNotification*)aNote
 {
     [orcaDBIPAddressPU setStringValue:[model orcaDBIPAddress]];
-    [self refreshStandardRuns:nil];
 }
 
 - (void) dbDebugDBIPChanged:(NSNotification*)aNote
@@ -1052,34 +1080,6 @@ snopGreenColor;
     //[NSThread detachNewThreadSelector:@selector(startSmellieRun:) toTarget:theELLIEModel withObject:smellieRunFile];
 }
 
-- (IBAction) enmergencyStopToggle:(id)sender
-{
-    /*if([emergyencyStopEnabled state] == 1){
-     [model setIsEmergencyStopEnabled:true];
-     }
-     else{
-     [model setIsEmergencyStopEnabled:false];
-     }*/
-    [model setIsEmergencyStopEnabled:(bool)[sender state]];
-}
-
--(IBAction)eStop:(id)sender
-{
-    if([model isEStopPolling]){
-        //cancel the E stop polling and change button
-        [eStopButton setTitle:@"Start Polling"];
-        [pollingStatus setStringValue:@"Not Polling"];
-        [model setIsEStopPolling:NO];
-    }
-    else{
-        [eStopButton setTitle:@"Stop Polling"];
-        [pollingStatus setStringValue:@"Polling"];
-        [model setIsEStopPolling:YES];
-        [model eStopPolling];
-    }
-    
-}
-
 - (IBAction) stopSmellieRunAction:(id)sender
 {
     [smellieLoadRunFile setEnabled:YES];
@@ -1166,7 +1166,7 @@ snopGreenColor;
 }
 
 - (void) runsLockChanged:(NSNotification*)aNotification
-{ dispatch_async(dispatch_get_main_queue(), ^{
+{
     BOOL runInProgress				= [gOrcaGlobals runInProgress];
     BOOL locked						= [gSecurity isLocked:ORSNOPRunsLockNotification];
     BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORSNOPRunsLockNotification];
@@ -1179,13 +1179,15 @@ snopGreenColor;
     [ECAtypePopUpButton setEnabled:!lockedOrNotRunningMaintenance];
     [TSlopePatternTextField setEnabled:!lockedOrNotRunningMaintenance];
     [ecaNEventsTextField setEnabled:!lockedOrNotRunningMaintenance];
+    [ecaPulserRate setEnabled:!lockedOrNotRunningMaintenance];
+    [standardRunThresCurrentValues setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunSaveButton setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunSaveDefaultsButton setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunLoadButton setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunLoadDefaultsButton setEnabled:!lockedOrNotRunningMaintenance];
     [runTypeWordMatrix setEnabled:!lockedOrNotRunningMaintenance];
-    [standardRunVersionPopupMenu setEnabled:!locked];
-    [timedRunCB setEnabled:!lockedOrNotRunningMaintenance];
+    if(locked) [standardRunVersionPopupMenu setEnabled:false];
+    [timedRunCB setEnabled:!runInProgress];
     [timeLimitField setEnabled:!lockedOrNotRunningMaintenance];
     [repeatRunCB setEnabled:!lockedOrNotRunningMaintenance];
     
@@ -1207,11 +1209,10 @@ snopGreenColor;
         [lockStatusTextField setBackgroundColor:snopOrangeColor];
     }
     
-}); }
+}
 
 - (void) runsECAChanged:(NSNotification*)aNotification
 {
-    
     //Refresh values in GUI to match the model
     int index = [model ECA_pattern] -1;
     if(index < 0)
@@ -1225,7 +1226,7 @@ snopGreenColor;
     [TSlopePatternTextField setIntValue:integ];
     integ = [model ECA_nevents];
     [ecaNEventsTextField setIntValue:integ];
-    
+    [ecaPulserRate setObjectValue:[model ECA_rate]];
 }
 
 //ECA RUNS
@@ -1249,7 +1250,7 @@ snopGreenColor;
 }
 
 - (IBAction)ecaPulserRateAction:(id)sender {
-    [model setECA_rate:sender];
+    [model setECA_rate:[ecaPulserRate objectValue]];
 }
 
 
@@ -1257,24 +1258,36 @@ snopGreenColor;
 
     NSArray* scriptList = [runControl runScriptList];
     if([scriptList containsObject:@"ECAStandardRun"]){
-        [runControl selectRunTypeScriptByName:@"ECAStandardRun"];
-        [runControl startRun];
+        if([gOrcaGlobals runInProgress]){
+            NSLogColor([NSColor redColor],@"ECA run cannot start with an ongoing run. Stop the run first.\n");
+        }
+        else{
+            [runControl selectRunTypeScriptByName:@"ECAStandardRun"];
+            [runControl startRun];
+        }
     }
     else{
         NSLogColor([NSColor redColor],@"ECA Standard Run not configured. Please, set the RunScript properly. ECA run won't start. \n");
     }
+
 }
 
 - (IBAction)startECASingleRunAction:(id)sender {
-
+    
     NSArray* scriptList = [runControl runScriptList];
     if([scriptList containsObject:@"ECASingleRun"]){
-        [runControl selectRunTypeScriptByName:@"ECASingleRun"];
-        [runControl startRun];
+        if([gOrcaGlobals runInProgress]){
+            NSLogColor([NSColor redColor],@"ECA run cannot start with an ongoing run. Stop the run first.\n");
+        }
+        else{
+            [runControl selectRunTypeScriptByName:@"ECASingleRun"];
+            [runControl startRun];
+        }
     }
     else{
         NSLogColor([NSColor redColor],@"ECA Single Run not configured. Please, set the RunScript properly. ECA run won't start. \n");
     }
+
 }
 
 
@@ -1403,120 +1416,120 @@ snopGreenColor;
     float dcOffset  = [mtcModel dbFloatByIndex:kNHit100HiThreshold + kNHitDcOffset_Offset];
     float mVperNHit = [mtcModel dbFloatByIndex:kNHit100HiThreshold + kmVoltPerNHit_Offset];
     float nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
-    [[standardRunThresNewValues cellAtRow:0 column:0] setFloatValue:nHits];
-    [[standardRunThresNewValues cellAtRow:0 column:0] setFormatter:thresholdFormatter];
+    [[standardRunThresCurrentValues cellAtRow:0 column:0] setFloatValue:nHits];
+    [[standardRunThresCurrentValues cellAtRow:0 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 2) & 1){
-        [[standardRunThresNewValues cellAtRow:0 column:0] setTextColor:[self snopGreenColor]];
+        [[standardRunThresCurrentValues cellAtRow:0 column:0] setTextColor:[self snopGreenColor]];
     } else{
-        [[standardRunThresNewValues cellAtRow:0 column:0] setTextColor:[self snopRedColor]];
+        [[standardRunThresCurrentValues cellAtRow:0 column:0] setTextColor:[self snopRedColor]];
     }
     //NHIT100MED
     mVolts = [mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kNHit100MedThreshold]];
     dcOffset  = [mtcModel dbFloatByIndex:kNHit100MedThreshold + kNHitDcOffset_Offset];
     mVperNHit = [mtcModel dbFloatByIndex:kNHit100MedThreshold + kmVoltPerNHit_Offset];
     nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
-    [[standardRunThresNewValues cellAtRow:1 column:0] setFloatValue:nHits];
-    [[standardRunThresNewValues cellAtRow:1 column:0] setFormatter:thresholdFormatter];
+    [[standardRunThresCurrentValues cellAtRow:1 column:0] setFloatValue:nHits];
+    [[standardRunThresCurrentValues cellAtRow:1 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 1) & 1){
-        [[standardRunThresNewValues cellAtRow:1 column:0] setTextColor:[self snopGreenColor]];
+        [[standardRunThresCurrentValues cellAtRow:1 column:0] setTextColor:[self snopGreenColor]];
     } else{
-        [[standardRunThresNewValues cellAtRow:1 column:0] setTextColor:[self snopRedColor]];
+        [[standardRunThresCurrentValues cellAtRow:1 column:0] setTextColor:[self snopRedColor]];
     }
     //NHIT100LO
     mVolts = [mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kNHit100LoThreshold]];
     dcOffset  = [mtcModel dbFloatByIndex:kNHit100LoThreshold + kNHitDcOffset_Offset];
     mVperNHit = [mtcModel dbFloatByIndex:kNHit100LoThreshold + kmVoltPerNHit_Offset];
     nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
-    [[standardRunThresNewValues cellAtRow:2 column:0] setFloatValue:nHits];
-    [[standardRunThresNewValues cellAtRow:2 column:0] setFormatter:thresholdFormatter];
+    [[standardRunThresCurrentValues cellAtRow:2 column:0] setFloatValue:nHits];
+    [[standardRunThresCurrentValues cellAtRow:2 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 0) & 1){
-        [[standardRunThresNewValues cellAtRow:2 column:0] setTextColor:[self snopGreenColor]];
+        [[standardRunThresCurrentValues cellAtRow:2 column:0] setTextColor:[self snopGreenColor]];
     } else{
-        [[standardRunThresNewValues cellAtRow:2 column:0] setTextColor:[self snopRedColor]];
+        [[standardRunThresCurrentValues cellAtRow:2 column:0] setTextColor:[self snopRedColor]];
     }
     //NHIT20
     mVolts = [mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kNHit20Threshold]];
     dcOffset  = [mtcModel dbFloatByIndex:kNHit20Threshold + kNHitDcOffset_Offset];
     mVperNHit = [mtcModel dbFloatByIndex:kNHit20Threshold + kmVoltPerNHit_Offset];
     nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
-    [[standardRunThresNewValues cellAtRow:3 column:0] setFloatValue:nHits];
-    [[standardRunThresNewValues cellAtRow:3 column:0] setFormatter:thresholdFormatter];
+    [[standardRunThresCurrentValues cellAtRow:3 column:0] setFloatValue:nHits];
+    [[standardRunThresCurrentValues cellAtRow:3 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 3) & 1){
-        [[standardRunThresNewValues cellAtRow:3 column:0] setTextColor:[self snopGreenColor]];
+        [[standardRunThresCurrentValues cellAtRow:3 column:0] setTextColor:[self snopGreenColor]];
     } else{
-        [[standardRunThresNewValues cellAtRow:3 column:0] setTextColor:[self snopRedColor]];
+        [[standardRunThresCurrentValues cellAtRow:3 column:0] setTextColor:[self snopRedColor]];
     }
     //NHIT20LO
     mVolts = [mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kNHit20LBThreshold]];
     dcOffset  = [mtcModel dbFloatByIndex:kNHit20LBThreshold + kNHitDcOffset_Offset];
     mVperNHit = [mtcModel dbFloatByIndex:kNHit20LBThreshold + kmVoltPerNHit_Offset];
     nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
-    [[standardRunThresNewValues cellAtRow:4 column:0] setFloatValue:nHits];
-    [[standardRunThresNewValues cellAtRow:4 column:0] setFormatter:thresholdFormatter];
+    [[standardRunThresCurrentValues cellAtRow:4 column:0] setFloatValue:nHits];
+    [[standardRunThresCurrentValues cellAtRow:4 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 4) & 1){
-        [[standardRunThresNewValues cellAtRow:4 column:0] setTextColor:[self snopGreenColor]];
+        [[standardRunThresCurrentValues cellAtRow:4 column:0] setTextColor:[self snopGreenColor]];
     } else{
-        [[standardRunThresNewValues cellAtRow:4 column:0] setTextColor:[self snopRedColor]];
+        [[standardRunThresCurrentValues cellAtRow:4 column:0] setTextColor:[self snopRedColor]];
     }
     //OWLN
     mVolts = [mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kOWLNThreshold]];
     dcOffset  = [mtcModel dbFloatByIndex:kOWLNThreshold + kNHitDcOffset_Offset];
     mVperNHit = [mtcModel dbFloatByIndex:kOWLNThreshold + kmVoltPerNHit_Offset];
     nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
-    [[standardRunThresNewValues cellAtRow:5 column:0] setFloatValue:nHits];
-    [[standardRunThresNewValues cellAtRow:5 column:0] setFormatter:thresholdFormatter];
+    [[standardRunThresCurrentValues cellAtRow:5 column:0] setFloatValue:nHits];
+    [[standardRunThresCurrentValues cellAtRow:5 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 7) & 1){
-        [[standardRunThresNewValues cellAtRow:5 column:0] setTextColor:[self snopGreenColor]];
+        [[standardRunThresCurrentValues cellAtRow:5 column:0] setTextColor:[self snopGreenColor]];
     } else{
-        [[standardRunThresNewValues cellAtRow:5 column:0] setTextColor:[self snopRedColor]];
+        [[standardRunThresCurrentValues cellAtRow:5 column:0] setTextColor:[self snopRedColor]];
     }
     //ESUMHI
-    [[standardRunThresNewValues cellAtRow:6 column:0] setFloatValue:[mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kESumHiThreshold]]];
-    [[standardRunThresNewValues cellAtRow:6 column:0] setFormatter:thresholdFormatter];
+    [[standardRunThresCurrentValues cellAtRow:6 column:0] setFloatValue:[mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kESumHiThreshold]]];
+    [[standardRunThresCurrentValues cellAtRow:6 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 6) & 1){
-        [[standardRunThresNewValues cellAtRow:6 column:0] setTextColor:[self snopGreenColor]];
+        [[standardRunThresCurrentValues cellAtRow:6 column:0] setTextColor:[self snopGreenColor]];
     } else{
-        [[standardRunThresNewValues cellAtRow:6 column:0] setTextColor:[self snopRedColor]];
+        [[standardRunThresCurrentValues cellAtRow:6 column:0] setTextColor:[self snopRedColor]];
     }
     //ESUMLO
-    [[standardRunThresNewValues cellAtRow:7 column:0] setFloatValue:[mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kESumLowThreshold]]];
-    [[standardRunThresNewValues cellAtRow:7 column:0] setFormatter:thresholdFormatter];
+    [[standardRunThresCurrentValues cellAtRow:7 column:0] setFloatValue:[mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kESumLowThreshold]]];
+    [[standardRunThresCurrentValues cellAtRow:7 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 5) & 1){
-        [[standardRunThresNewValues cellAtRow:7 column:0] setTextColor:[self snopGreenColor]];
+        [[standardRunThresCurrentValues cellAtRow:7 column:0] setTextColor:[self snopGreenColor]];
     } else{
-        [[standardRunThresNewValues cellAtRow:7 column:0] setTextColor:[self snopRedColor]];
+        [[standardRunThresCurrentValues cellAtRow:7 column:0] setTextColor:[self snopRedColor]];
     }
     //OWLEHI
-    [[standardRunThresNewValues cellAtRow:8 column:0] setFloatValue:[mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kOWLEHiThreshold]]];
-    [[standardRunThresNewValues cellAtRow:8 column:0] setFormatter:thresholdFormatter];
+    [[standardRunThresCurrentValues cellAtRow:8 column:0] setFloatValue:[mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kOWLEHiThreshold]]];
+    [[standardRunThresCurrentValues cellAtRow:8 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 9) & 1){
-        [[standardRunThresNewValues cellAtRow:8 column:0] setTextColor:[self snopGreenColor]];
+        [[standardRunThresCurrentValues cellAtRow:8 column:0] setTextColor:[self snopGreenColor]];
     } else{
-        [[standardRunThresNewValues cellAtRow:8 column:0] setTextColor:[self snopRedColor]];
+        [[standardRunThresCurrentValues cellAtRow:8 column:0] setTextColor:[self snopRedColor]];
     }
     //OWLELO
-    [[standardRunThresNewValues cellAtRow:9 column:0] setFloatValue:[mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kOWLELoThreshold]]];
-    [[standardRunThresNewValues cellAtRow:9 column:0] setFormatter:thresholdFormatter];
+    [[standardRunThresCurrentValues cellAtRow:9 column:0] setFloatValue:[mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kOWLELoThreshold]]];
+    [[standardRunThresCurrentValues cellAtRow:9 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 8) & 1){
-        [[standardRunThresNewValues cellAtRow:9 column:0] setTextColor:[self snopGreenColor]];
+        [[standardRunThresCurrentValues cellAtRow:9 column:0] setTextColor:[self snopGreenColor]];
     } else{
-        [[standardRunThresNewValues cellAtRow:9 column:0] setTextColor:[self snopRedColor]];
+        [[standardRunThresCurrentValues cellAtRow:9 column:0] setTextColor:[self snopRedColor]];
     }
     //Prescale
-    [[standardRunThresNewValues cellAtRow:10 column:0] setFloatValue:[mtcModel dbFloatByIndex:kNhit100LoPrescale]];
-    [[standardRunThresNewValues cellAtRow:10 column:0] setFormatter:thresholdFormatter];
+    [[standardRunThresCurrentValues cellAtRow:10 column:0] setFloatValue:[mtcModel dbFloatByIndex:kNhit100LoPrescale]];
+    [[standardRunThresCurrentValues cellAtRow:10 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 11) & 1){
-        [[standardRunThresNewValues cellAtRow:10 column:0] setTextColor:[self snopGreenColor]];
+        [[standardRunThresCurrentValues cellAtRow:10 column:0] setTextColor:[self snopGreenColor]];
     } else{
-        [[standardRunThresNewValues cellAtRow:10 column:0] setTextColor:[self snopRedColor]];
+        [[standardRunThresCurrentValues cellAtRow:10 column:0] setTextColor:[self snopRedColor]];
     }
     //Pulser
-    [[standardRunThresNewValues cellAtRow:11 column:0] setFloatValue:[mtcModel dbFloatByIndex:kPulserPeriod]];
-    [[standardRunThresNewValues cellAtRow:11 column:0] setFormatter:thresholdFormatter];
+    [[standardRunThresCurrentValues cellAtRow:11 column:0] setFloatValue:[mtcModel dbFloatByIndex:kPulserPeriod]];
+    [[standardRunThresCurrentValues cellAtRow:11 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 10) & 1){
-        [[standardRunThresNewValues cellAtRow:11 column:0] setTextColor:[self snopGreenColor]];
+        [[standardRunThresCurrentValues cellAtRow:11 column:0] setTextColor:[self snopGreenColor]];
     } else{
-        [[standardRunThresNewValues cellAtRow:11 column:0] setTextColor:[self snopRedColor]];
+        [[standardRunThresCurrentValues cellAtRow:11 column:0] setTextColor:[self snopRedColor]];
     }
     
 }
@@ -1620,8 +1633,8 @@ snopGreenColor;
 
 //Run Type Word
 -(void) runTypeWordChanged:(NSNotification*)aNote
-{ dispatch_async(dispatch_get_main_queue(), ^{
-
+{
+    
     unsigned long currentRunWord = [runControl runType];
 
     [model setRunTypeWord:currentRunWord];
@@ -1630,7 +1643,7 @@ snopGreenColor;
         [[runTypeWordMatrix cellAtRow:i column:0] setState:(currentRunWord &(1L<<i))!=0];
     }
     
-}); }
+}
 
 -(void) displayThresholdsFromDB {
 
@@ -1644,12 +1657,23 @@ snopGreenColor;
         return;
     }
     
-    //If no version: display null values and quit
-    if([model standardRunVersion] == nil){
+    //If no SR: display null values
+    if([model standardRunType] == nil || [[model standardRunType] isEqualToString:@""]){
         for (int i=0; i<[standardRunThresDefaultValues numberOfRows];i++) {
+            [[standardRunThresDefaultValues cellAtRow:i column:0] setStringValue:@"--"];
+        }
+        for (int i=0; i<[standardRunThresStoredValues numberOfRows];i++) {
             [[standardRunThresStoredValues cellAtRow:i column:0] setStringValue:@"--"];
         }
-        NSLogColor([NSColor redColor],@"Standard Run Version not set \n");
+        NSLogColor([NSColor redColor],@"Standard Run not set: make sure the DB is accesible and refresh the standard runs. \n");
+        return;
+    }
+    //If no version: display null values and quit
+    if([model standardRunVersion] == nil || [[model standardRunVersion] isEqualToString:@""]){
+        for (int i=0; i<[standardRunThresStoredValues numberOfRows];i++) {
+            [[standardRunThresStoredValues cellAtRow:i column:0] setStringValue:@"--"];
+        }
+        NSLogColor([NSColor redColor],@"Test Standard Run not set: make sure the DB is accesible and refresh the standard runs. \n");
         return;
     }
     
@@ -1697,8 +1721,8 @@ snopGreenColor;
         int gtmask = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,GtMask"] intValue];
         //NHIT100HI
         float mVolts = [mtcModel rawTomVolts:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Hi,Threshold"] floatValue]];
-        float dcOffset  = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Hi,dcOffset"] floatValue];
-        float mVperNHit = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Hi,mV/Hit"] floatValue];
+        float dcOffset  = [mtcModel dbFloatByIndex:kNHit100HiThreshold + kNHitDcOffset_Offset];
+        float mVperNHit = [mtcModel dbFloatByIndex:kNHit100HiThreshold + kmVoltPerNHit_Offset];
         float nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
         [[standardRunThresDefaultValues cellAtRow:0 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresDefaultValues cellAtRow:0 column:0] setFloatValue:nHits];
@@ -1709,8 +1733,8 @@ snopGreenColor;
         }
         //NHIT100MED
         mVolts = [mtcModel rawTomVolts:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Med,Threshold"] floatValue]];
-        dcOffset  = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Med,dcOffset"] floatValue];
-        mVperNHit = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Med,mV/Hit"] floatValue];
+        dcOffset  = [mtcModel dbFloatByIndex:kNHit100MedThreshold + kNHitDcOffset_Offset];
+        mVperNHit = [mtcModel dbFloatByIndex:kNHit100MedThreshold + kmVoltPerNHit_Offset];
         nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
         [[standardRunThresDefaultValues cellAtRow:1 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresDefaultValues cellAtRow:1 column:0] setFloatValue:nHits];
@@ -1721,8 +1745,8 @@ snopGreenColor;
         }
         //NHIT100LO
         mVolts = [mtcModel rawTomVolts:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Lo,Threshold"] floatValue]];
-        dcOffset  = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Lo,dcOffset"] floatValue];
-        mVperNHit = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Lo,mV/Hit"] floatValue];
+        dcOffset  = [mtcModel dbFloatByIndex:kNHit100LoThreshold + kNHitDcOffset_Offset];
+        mVperNHit = [mtcModel dbFloatByIndex:kNHit100LoThreshold + kmVoltPerNHit_Offset];
         nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
         [[standardRunThresDefaultValues cellAtRow:2 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresDefaultValues cellAtRow:2 column:0] setFloatValue:nHits];
@@ -1733,8 +1757,8 @@ snopGreenColor;
         }
         //NHIT20
         mVolts = [mtcModel rawTomVolts:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20,Threshold"] floatValue]];
-        dcOffset  = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20,dcOffset"] floatValue];
-        mVperNHit = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20,mV/Hit"] floatValue];
+        dcOffset  = [mtcModel dbFloatByIndex:kNHit20Threshold + kNHitDcOffset_Offset];
+        mVperNHit = [mtcModel dbFloatByIndex:kNHit20Threshold + kmVoltPerNHit_Offset];
         nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
         [[standardRunThresDefaultValues cellAtRow:3 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresDefaultValues cellAtRow:3 column:0] setFloatValue:nHits];
@@ -1745,8 +1769,8 @@ snopGreenColor;
         }
         //NHIT20LO
         mVolts = [mtcModel rawTomVolts:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20LB,Threshold"] floatValue]];
-        dcOffset  = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20LB,dcOffset"] floatValue];
-        mVperNHit = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20LB,mV/Hit"] floatValue];
+        dcOffset  = [mtcModel dbFloatByIndex:kNHit20LBThreshold + kNHitDcOffset_Offset];
+        mVperNHit = [mtcModel dbFloatByIndex:kNHit20LBThreshold + kmVoltPerNHit_Offset];
         nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
         [[standardRunThresDefaultValues cellAtRow:4 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresDefaultValues cellAtRow:4 column:0] setFloatValue:nHits];
@@ -1757,8 +1781,8 @@ snopGreenColor;
         }
         //OWLN
         mVolts = [mtcModel rawTomVolts:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLN,Threshold"] floatValue]];
-        dcOffset  = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLN,dcOffset"] floatValue];
-        mVperNHit = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLN,mV/Hit"] floatValue];
+        dcOffset  = [mtcModel dbFloatByIndex:kOWLNThreshold + kNHitDcOffset_Offset];
+        mVperNHit = [mtcModel dbFloatByIndex:kOWLNThreshold + kmVoltPerNHit_Offset];
         nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
         [[standardRunThresDefaultValues cellAtRow:5 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresDefaultValues cellAtRow:5 column:0] setFloatValue:nHits];
@@ -1834,8 +1858,8 @@ snopGreenColor;
         int gtmask = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,GtMask"] intValue];
         //NHIT100HI
         float mVolts = [mtcModel rawTomVolts:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Hi,Threshold"] floatValue]];
-        float dcOffset  = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Hi,dcOffset"] floatValue];
-        float mVperNHit = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Hi,mV/Hit"] floatValue];
+        float dcOffset  = [mtcModel dbFloatByIndex:kNHit100HiThreshold + kNHitDcOffset_Offset];
+        float mVperNHit = [mtcModel dbFloatByIndex:kNHit100HiThreshold + kmVoltPerNHit_Offset];
         float nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
         [[standardRunThresStoredValues cellAtRow:0 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresStoredValues cellAtRow:0 column:0] setFloatValue:nHits];
@@ -1846,8 +1870,8 @@ snopGreenColor;
         }
         //NHIT100MED
         mVolts = [mtcModel rawTomVolts:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Med,Threshold"] floatValue]];
-        dcOffset  = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Med,dcOffset"] floatValue];
-        mVperNHit = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Med,mV/Hit"] floatValue];
+        dcOffset  = [mtcModel dbFloatByIndex:kNHit100MedThreshold + kNHitDcOffset_Offset];
+        mVperNHit = [mtcModel dbFloatByIndex:kNHit100MedThreshold + kmVoltPerNHit_Offset];
         nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
         [[standardRunThresStoredValues cellAtRow:1 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresStoredValues cellAtRow:1 column:0] setFloatValue:nHits];
@@ -1858,8 +1882,8 @@ snopGreenColor;
         }
         //NHIT100LO
         mVolts = [mtcModel rawTomVolts:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Lo,Threshold"] floatValue]];
-        dcOffset  = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Lo,dcOffset"] floatValue];
-        mVperNHit = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Lo,mV/Hit"] floatValue];
+        dcOffset  = [mtcModel dbFloatByIndex:kNHit100LoThreshold + kNHitDcOffset_Offset];
+        mVperNHit = [mtcModel dbFloatByIndex:kNHit100LoThreshold + kmVoltPerNHit_Offset];
         nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
         [[standardRunThresStoredValues cellAtRow:2 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresStoredValues cellAtRow:2 column:0] setFloatValue:nHits];
@@ -1870,8 +1894,8 @@ snopGreenColor;
         }
         //NHIT20
         mVolts = [mtcModel rawTomVolts:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20,Threshold"] floatValue]];
-        dcOffset  = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20,dcOffset"] floatValue];
-        mVperNHit = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20,mV/Hit"] floatValue];
+        dcOffset  = [mtcModel dbFloatByIndex:kNHit20Threshold + kNHitDcOffset_Offset];
+        mVperNHit = [mtcModel dbFloatByIndex:kNHit20Threshold + kmVoltPerNHit_Offset];
         nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
         [[standardRunThresStoredValues cellAtRow:3 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresStoredValues cellAtRow:3 column:0] setFloatValue:nHits];
@@ -1882,8 +1906,8 @@ snopGreenColor;
         }
         //NHIT20LO
         mVolts = [mtcModel rawTomVolts:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20LB,Threshold"] floatValue]];
-        dcOffset  = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20LB,dcOffset"] floatValue];
-        mVperNHit = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20LB,mV/Hit"] floatValue];
+        dcOffset  = [mtcModel dbFloatByIndex:kNHit20LBThreshold + kNHitDcOffset_Offset];
+        mVperNHit = [mtcModel dbFloatByIndex:kNHit20LBThreshold + kmVoltPerNHit_Offset];
         nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
         [[standardRunThresStoredValues cellAtRow:4 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresStoredValues cellAtRow:4 column:0] setFloatValue:nHits];
@@ -1894,8 +1918,8 @@ snopGreenColor;
         }
         //OWLN
         mVolts = [mtcModel rawTomVolts:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLN,Threshold"] floatValue]];
-        dcOffset  = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLN,dcOffset"] floatValue];
-        mVperNHit = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLN,mV/Hit"] floatValue];
+        dcOffset  = [mtcModel dbFloatByIndex:kOWLNThreshold + kNHitDcOffset_Offset];
+        mVperNHit = [mtcModel dbFloatByIndex:kOWLNThreshold + kmVoltPerNHit_Offset];
         nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
         [[standardRunThresStoredValues cellAtRow:5 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresStoredValues cellAtRow:5 column:0] setFloatValue:nHits];
@@ -1960,9 +1984,28 @@ snopGreenColor;
         }
     }
     
+    //Display runtype word
+    unsigned long dbruntypeword = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"run_type_word"] unsignedLongValue];
+    
+    for(int ibit=0; ibit<21; ibit++){ //Data quality bits are not stored in the SR
+        if((dbruntypeword >> ibit) & 1){
+            //Changing the color of a NSButton is not simple. You need all the following junk.
+            NSDictionary *dictAttr = [NSDictionary dictionaryWithObjectsAndKeys: snopBlackColor, NSForegroundColorAttributeName, nil];
+            NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:[[runTypeWordMatrix cellAtRow:ibit column:0] title] attributes:dictAttr];
+            [[runTypeWordMatrix cellAtRow:ibit column:0] setAttributedTitle:attributedString];
+
+        } else{
+            NSDictionary *dictAttr = [NSDictionary dictionaryWithObjectsAndKeys: snopGrayColor, NSForegroundColorAttributeName, nil];
+            NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:[[runTypeWordMatrix cellAtRow:ibit column:0] title] attributes:dictAttr];
+            [[runTypeWordMatrix cellAtRow:ibit column:0] setAttributedTitle:attributedString];
+        }
+    }
+    
+    
+    
 }
 
-- (IBAction) refreshStandardRuns: (id) sender
+- (IBAction) refreshStandardRunsAction: (id) sender
 {
     NSString *urlString, *link, *ret;
     NSURLRequest *request;
@@ -1973,6 +2016,8 @@ snopGreenColor;
     // Clear stored SRs
     [standardRunPopupMenu deselectItemAtIndex:[standardRunPopupMenu indexOfSelectedItem]];
     [standardRunPopupMenu removeAllItems];
+    [standardRunVersionPopupMenu deselectItemAtIndex:[standardRunVersionPopupMenu indexOfSelectedItem]];
+    [standardRunVersionPopupMenu removeAllItems];
     
     // Now query DB and fetch the SRs
     urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/orca/_design/standardRuns/_view/getStandardRuns",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort]];
@@ -1987,6 +2032,8 @@ snopGreenColor;
         NSLogColor([NSColor redColor], @"Error contacting database: %@\n",
                    [error localizedDescription]);
         [model setStandardRunType:@""];
+        [model setStandardRunVersion:@""];
+        NSLogColor([NSColor redColor],@"Error querying couchDB, please check the settings are correct and you have connection. \n");
         return;
     }
 
@@ -1995,6 +2042,8 @@ snopGreenColor;
 
     NSDictionary *standardRunTypes = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
     
+    //Query succeded
+    [standardRunPopupMenu setEnabled:true];
     for(id entry in [standardRunTypes valueForKey:@"rows"]){
         NSString *runtype = [entry valueForKey:@"value"];
         if(runtype != (id)[NSNull null]){
@@ -2007,13 +2056,14 @@ snopGreenColor;
         [model setStandardRunType:@""];
     } else{
         //Check if old selected run exists
-        if([standardRunPopupMenu indexOfItemWithObjectValue:[model standardRunType]] == NSNotFound)
+        if([standardRunPopupMenu indexOfItemWithObjectValue:[model standardRunType]] == NSNotFound){
             //Select first item in popup menu
             [standardRunPopupMenu selectItemAtIndex:0];
-        else
+        }
+        else{
             //Recover old run
             [standardRunPopupMenu selectItemWithObjectValue:[model standardRunType]];
-
+        }
         [model setStandardRunType:[standardRunPopupMenu stringValue]];
     }
     
@@ -2050,14 +2100,15 @@ snopGreenColor;
             encoding:NSUTF8StringEncoding]autorelease];
 
     NSDictionary *standardRunVersions = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
-
     if (error != nil) {
         NSLogColor([NSColor redColor], @"Error converting JSON response from "
                    "database: %@\n", [error localizedDescription]);
         [model setStandardRunVersion:@""];
         return;
     }
-    
+
+    //Query succeded
+    [standardRunVersionPopupMenu setEnabled:true];
     for(id entry in [standardRunVersions valueForKey:@"rows"]){
         NSString *runtype = [[entry valueForKey:@"key"] objectAtIndex:0];
         NSString *runversion = [[entry valueForKey:@"key"] objectAtIndex:1];
@@ -2072,13 +2123,19 @@ snopGreenColor;
         [model setStandardRunVersion:@""];
     } else{
         //Check if old selected run exists
-        if([standardRunVersionPopupMenu indexOfItemWithObjectValue:[model standardRunVersion]] == NSNotFound)
-            //Select first item in popup menu
-            [standardRunVersionPopupMenu selectItemAtIndex:0];
-        else
+        if([standardRunVersionPopupMenu indexOfItemWithObjectValue:[model standardRunVersion]] == NSNotFound){
+            //Select DEFAULT
+            if([standardRunVersionPopupMenu indexOfItemWithObjectValue:@"DEFAULT"] == NSNotFound){
+                [standardRunVersionPopupMenu selectItemWithObjectValue:@"DEFAULT"];
+            }
+            //If everything fails, select first item
+            else{
+                [standardRunVersionPopupMenu selectItemAtIndex:0];
+            }
+        }else{
             //Recover old run
             [standardRunVersionPopupMenu selectItemWithObjectValue:[model standardRunVersion]];
-
+        }
         NSString *standardRunVersion = [standardRunVersionPopupMenu stringValue];
         if(standardRunVersion != (id)[NSNull null]){
             [model setStandardRunVersion:standardRunVersion];

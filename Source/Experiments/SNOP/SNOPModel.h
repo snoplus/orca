@@ -102,11 +102,6 @@
     NSString * lastStandardRunType;
     NSString * lastStandardRunVersion;
     
-    NSThread * eStopThread;
-    
-    bool isEmergencyStopEnabled;
-    bool isEStopPolling;
-
     bool rolloverRun;
 
     NSString *mtcHost;
@@ -168,8 +163,6 @@
 
 @property (nonatomic,assign) bool smellieDBReadInProgress;
 @property (nonatomic,assign) bool smellieDocUploaded;
-@property (nonatomic,assign) bool isEmergencyStopEnabled;
-@property (nonatomic,assign) bool isEStopPolling;
 
 @property (copy,setter=setDataServerHost:) NSString *dataHost;
 @property (setter=setDataServerPort:) int dataPort;
@@ -241,9 +234,6 @@
 - (void) updateRHDRSruct;
 - (void) shipRHDRRecord;
 
--(BOOL) eStopPoll;
--(void) eStopPolling;
-
 #pragma mark ¥¥¥Accessors
 - (void) setViewType:(int)aViewType;
 - (int) viewType;
@@ -298,7 +288,6 @@
 //smellie functions -------
 - (void) getSmellieRunListInfo;
 - (NSMutableDictionary*)smellieTestFct;
--(void) testerHv;
 
 //Standard runs functions
 -(BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;

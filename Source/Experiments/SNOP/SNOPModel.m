@@ -106,8 +106,6 @@ runDocument = _runDocument,
 smellieDBReadInProgress = _smellieDBReadInProgress,
 smellieDocUploaded = _smellieDocUploaded,
 configDocument  = _configDocument,
-isEStopPolling = isEStopPolling,
-isEmergencyStopEnabled = isEmergencyStopEnabled,
 mtcConfigDoc = _mtcConfigDoc,
 dataHost,
 dataPort,
@@ -185,8 +183,8 @@ resync;
         [caen setMTCPort:port];
     }
 
-    [[NSNotificationCenter defaultCenter]
-     postNotificationName:@"SNOPSettingsChanged" object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"SNOPSettingsChanged" object:self];
+    
 }
 
 - (int) mtcPort
@@ -225,8 +223,8 @@ resync;
         [caen setMTCHost:host];
     }
 
-    [[NSNotificationCenter defaultCenter]
-     postNotificationName:@"SNOPSettingsChanged" object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"SNOPSettingsChanged" object:self];
+
 }
 
 - (NSString *) mtcHost
@@ -243,8 +241,8 @@ resync;
     [xl3_server disconnect];
     [xl3_server setPort:port];
 
-    [[NSNotificationCenter defaultCenter]
-     postNotificationName:@"SNOPSettingsChanged" object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"SNOPSettingsChanged" object:self];
+    
 }
 
 - (int) xl3Port
@@ -275,8 +273,8 @@ resync;
         [[xl3 xl3Link] disconnectSocket];
     }
 
-    [[NSNotificationCenter defaultCenter]
-     postNotificationName:@"SNOPSettingsChanged" object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"SNOPSettingsChanged" object:self];
+
 }
 
 - (NSString *) xl3Host
@@ -317,6 +315,7 @@ resync;
     [self setECA_type:[decoder decodeObjectForKey:@"SNOPECAtype"]];
     [self setECA_tslope_pattern:[decoder decodeIntForKey:@"SNOPECAtslppattern"]];
     [self setECA_nevents:[decoder decodeIntForKey:@"SNOPECANEvents"]];
+    [self setECA_rate:[decoder decodeObjectForKey:@"SNOPECAPulserRate"]];
 
     //Settings
     [self setMTCHost:[decoder decodeObjectForKey:@"mtcHost"]];
@@ -330,10 +329,6 @@ resync;
 
     [self setLogServerHost:[decoder decodeObjectForKey:@"logHost"]];
     [self setLogServerPort:[decoder decodeIntForKey:@"logPort"]];
-
-    //Standard Runs
-    [self setStandardRunType:[decoder decodeObjectForKey:@"SNOPStandardRunType"]];
-    [self setStandardRunVersion:[decoder decodeObjectForKey:@"SNOPStandardRunVersion"]];
     
     /* Check if we actually decoded the mtc, xl3, data, and log server
      * hostnames and ports. decodeObjectForKey() will return NULL if the
@@ -648,7 +643,7 @@ err:
                                 @"", @"Reason",
                                 @"", @"Details",
                                 nil];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStartupAbort object: self userInfo: userInfo];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStartupAbort object: self userInfo: userInfo];
 
     state = STOPPED;
 }
@@ -703,7 +698,7 @@ err:
                                 @"", @"Reason",
                                 @"", @"Details",
                                 nil];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStartupAbort object: self userInfo: userInfo];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStartupAbort object: self userInfo: userInfo];
 
     state = STOPPED;
 }
@@ -784,7 +779,6 @@ err:
         NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
                                   @"waiting for MTC/XL3/CAEN data", @"Reason",
                                   nil];
-
         [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object: self userInfo: userInfo];
 
         /* detach a thread to monitor XL3/CAEN/MTC buffers */
@@ -824,7 +818,10 @@ err:
     [xl3 release];
 
     /* Go ahead and end the run. */
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
+    });
+    
 }
 
 - (void) runStopped:(NSNotification*)aNote
@@ -1082,7 +1079,8 @@ err:
 		[[NSUserDefaults standardUserDefaults] setObject:self.orcaDBConnectionHistory forKey:[NSString stringWithFormat:@"orca.%@.orcaDBConnectionHistory",[self className]]];
 		[[NSUserDefaults standardUserDefaults] setInteger:self.orcaDBIPNumberIndex forKey:[NSString stringWithFormat:@"orca.%@.orcaDBIPNumberIndex",[self className]]];
 		[[NSUserDefaults standardUserDefaults] synchronize];
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelOrcaDBIPAddressChanged object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelOrcaDBIPAddressChanged object:self];
+
 	}
 }
 
@@ -1113,7 +1111,7 @@ err:
 		[[NSUserDefaults standardUserDefaults] setObject:self.debugDBConnectionHistory forKey:[NSString stringWithFormat:@"orca.%@.debugDBConnectionHistory",[self className]]];
 		[[NSUserDefaults standardUserDefaults] setInteger:self.debugDBIPNumberIndex forKey:[NSString stringWithFormat:@"orca.%@.debugDBIPNumberIndex",[self className]]];
 		[[NSUserDefaults standardUserDefaults] synchronize];
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelDebugDBIPAddressChanged object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelDebugDBIPAddressChanged object:self];
 	}
 }
 
@@ -1335,83 +1333,6 @@ err:
     return nil;
 }
 
--(void) testerHv
-{
-    __block bool hvStatus =TRUE;
-    
-    dispatch_queue_t eStopQueue = dispatch_queue_create("eStopQueue", NULL);
-    
-    dispatch_async(eStopQueue, ^{
-        while (hvStatus) {
-            sleep(3.0); //3s
-        
-            if(!isEStopPolling) break;
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                hvStatus = (BOOL)[self eStopPoll];
-            });
-        
-        }
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            
-            if(isEStopPolling){
-            
-                if(isEmergencyStopEnabled ){
-                
-                    NSLog(@"PANIC DOWN\n");
-                    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
-                    [self setIsEStopPolling:NO];
-                }
-                else{
-                    NSLog(@"Panic Down enabled but automatic shutdown is not enabled\n");
-                }
-            }
-            else{
-                NSLog(@"Emergency Stop has stopped polling");
-            }
-        });
-    });
-}
-
--(void) eStopPolling
-{
-    NSLog(@"Started Polling Emergency Stop...");
-    [self testerHv];
-}
-
--(BOOL) eStopPoll
-{
-   SBC_Link *sbcLink = [self sbcLink];
-   long hvStatus = 1;
-    if( sbcLink != nil )
-    {
-        //NSLog(@"Made SBC Link.\n");
-        //long hvStatus = 0;
-        SBC_Packet aPacket;
-        aPacket.cmdHeader.destination = kSNO;
-        aPacket.cmdHeader.cmdID = kSNOReadHVStop;
-        aPacket.cmdHeader.numberBytesinPayload = 1 * sizeof( long );
-        unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
-        payloadPtr[0] = 0;
-        @try
-        {
-            [sbcLink send: &aPacket receive: &aPacket];
-            unsigned long* responsePtr = (unsigned long*) aPacket.payload;
-            hvStatus = responsePtr[0];
-        }
-        @catch( NSException* e )
-        {
-            NSLog( @"SBC failed pol hv\n" );
-            NSLog( @"Error: %@ with reason: %@\n", [e name], [e reason] );
-            //@throw e;
-        }
-    
-    } //end of if statement
-    return (BOOL)hvStatus;
-        
-}
-
 - (NSString*) experimentDetailsLock
 {
 	return @"SNOPDetailsLock";
@@ -1451,6 +1372,7 @@ err:
     [encoder encodeObject:[self ECA_type] forKey:@"SNOPECAtype"];
     [encoder encodeInt:[self ECA_tslope_pattern] forKey:@"SNOPECAtslppattern"];
     [encoder encodeInt:[self ECA_nevents] forKey:@"SNOPECANEvents"];
+    [encoder encodeObject:[self ECA_rate] forKey:@"SNOPECAPulserRate"];
 
     //Settings
     [encoder encodeObject:[self mtcHost] forKey:@"mtcHost"];
@@ -1464,10 +1386,6 @@ err:
 
     [encoder encodeObject:[self logHost] forKey:@"logHost"];
     [encoder encodeInt:[self logPort] forKey:@"logPort"];
-
-    //Runs tab
-    [encoder encodeObject:[self standardRunType] forKey:@"SNOPStandardRunType"];
-    [encoder encodeObject:[self standardRunVersion] forKey:@"SNOPStandardRunVersion"];
 
 }
 
@@ -1736,7 +1654,7 @@ err:
     [aValue retain];
     [standardRunVersion release];
     standardRunVersion = aValue;
-    
+
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelSRVersionChangedNotification object:self];
 }
 
@@ -1819,8 +1737,8 @@ err:
 
 - (void) setECA_rate:(NSNumber*)aValue
 {
-    if(aValue <= 0) aValue = 1;
     ECA_rate = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
 }
 
 // Load Detector Settings from the DB into the Models
@@ -1873,6 +1791,10 @@ err:
 
         //Load run type word
         unsigned long nextruntypeword = [[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"run_type_word"] unsignedLongValue];
+        unsigned long currentruntypeword = [runControlModel runType];
+        //Do not touch the data quality bits
+        currentruntypeword &= 0xFFE00000;
+        nextruntypeword |= currentruntypeword;
         [runControlModel setRunType:nextruntypeword];
         
         //Load MTC thresholds
@@ -1948,7 +1870,10 @@ err:
     [detectorSettings setObject:runVersion forKey:@"run_version"];
     NSNumber *date = [NSNumber numberWithDouble:[[NSDate date] timeIntervalSince1970]];
     [detectorSettings setObject:date forKey:@"time_stamp"];
-    [detectorSettings setObject:[NSNumber numberWithUnsignedLong:[runControlModel runType]] forKey:@"run_type_word"];
+    //Do not touch the data quality bits
+    unsigned long currentRunTypeWord = [runControlModel runType];
+    currentRunTypeWord &= ~0xFFE00000;
+    [detectorSettings setObject:[NSNumber numberWithUnsignedLong:currentRunTypeWord] forKey:@"run_type_word"];
 
     //Save MTC/D parameters, trigger masks and MTC/A+ thresholds
     for (int iparam=0; iparam<kDbLookUpTableSize; iparam++) {
@@ -2100,8 +2025,6 @@ err:
     [runDocDict setObject:@"" forKey:@"timestamp_end"];
     [runDocDict setObject:@"" forKey:@"sudbury_time_end"];
     //[runDocDict setObject:@"" forKey:@"run_stop"];
-
-    [runDocDict setObject:[self ECA_type] forKey:@"eca_type"];
 
     self.runDocument = runDocDict;
     
@@ -2669,6 +2592,7 @@ err:
     
     [configDocDict setObject:fecCardArray forKey:@"fec32_card"];
     [configDocDict setObject:caenArray forKey:@"caen"];
+    [configDocDict setObject:[self ECA_type] forKey:@"eca_type"];
     
     //collect the objects that correspond to the CAEN
     
