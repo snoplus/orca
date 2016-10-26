@@ -1549,7 +1549,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		[nextObject setInvolvedInCurrentRun:NO];
         [nextObject runTaskStopped:runInfo];
 
-		//[NSThread setThreadPriority:.8];
+		[NSThread setThreadPriority:1];
 		
 	}
 	@catch(NSException* localException) {
@@ -1817,7 +1817,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     lastRunNumberShipped	= data[2];
 	
     [self sendHeartBeat:nil];
-	[NSThread setThreadPriority:.8];
+	[NSThread setThreadPriority:1];
 	
 	[self setRunPaused:NO];
 }
