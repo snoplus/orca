@@ -1549,7 +1549,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		[nextObject setInvolvedInCurrentRun:NO];
         [nextObject runTaskStopped:runInfo];
 
-		[NSThread setThreadPriority:1];
+		//[NSThread setThreadPriority:1];
 		
 	}
 	@catch(NSException* localException) {
@@ -1817,7 +1817,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     lastRunNumberShipped	= data[2];
 	
     [self sendHeartBeat:nil];
-	[NSThread setThreadPriority:1];
+//	[NSThread setThreadPriority:1];
 	
 	[self setRunPaused:NO];
 }
@@ -1829,7 +1829,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 {
 	NSAutoreleasePool *outerpool = [[NSAutoreleasePool allocWithZone:nil] init];
 	NSLog(@"DataTaking Thread Started\n");
-	[NSThread setThreadPriority:.8];
+//	[NSThread setThreadPriority:1];
 
 	dataTakingThreadRunning = YES;
     [self performSelectorOnMainThread:@selector(clearExceptionCount) withObject:nil waitUntilDone:YES];
