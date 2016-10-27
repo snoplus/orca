@@ -409,12 +409,13 @@ NSString* KSegmentChangedNotification	  =	@"KSegmentChangedNotification";
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
 	[notifyCenter removeObserver : self];
 	
-    NSEnumerator* e = [rateProviders objectEnumerator];
-    ORCard* aCard;
-    while(aCard = [e nextObject]){
-		int theSlot = [[params objectForKey: mapKey(cardIndex)]intValue];
+    for(ORCard* aCard in rateProviders){
+        int theSlot  = [[params objectForKey: mapKey(cardIndex)]intValue];
+        int theCrate;
+        if(crateIndex>0)theCrate = [[params objectForKey: mapKey(crateIndex)]intValue];
+        else theCrate = 0;
 		if(theSlot >=0){
-			if( theSlot == [aCard displayedSlotNumber]){
+			if( theSlot == [aCard displayedSlotNumber] && theCrate == [aCard crateNumber]){
 				
 				id rateObj = [aCard rateObject:[[params objectForKey: mapKey(channelIndex)]intValue]];
 				if(rateObj)[notifyCenter addObserver : self
