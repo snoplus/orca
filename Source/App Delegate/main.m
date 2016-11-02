@@ -26,10 +26,11 @@
 int main(int argc, const char *argv[])
 {
 #if defined(MAC_OS_X_VERSION_10_9) && (MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_9)
-    [[NSProcessInfo processInfo] beginActivityWithOptions:(/*NSActivityLatencyCritical |*/ NSActivityUserInitiated)
+    [[NSProcessInfo processInfo] beginActivityWithOptions:(NSActivityLatencyCritical | NSActivityUserInitiated)
                                                    reason:@"Real-time control/DAQ"];
 #endif
 	//NSZombieEnabled = YES;
+
 	[NetSocket ignoreBrokenPipes];
 	return  NSApplicationMain(argc, argv);
 }
