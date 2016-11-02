@@ -123,7 +123,9 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
         if([launchedApps count]>1)[NSApp terminate:self];
 
 	}
- 
+    
+    [NSThread setThreadPriority:1];
+
 	return self;
 }
 

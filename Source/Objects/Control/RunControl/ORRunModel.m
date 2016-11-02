@@ -1829,7 +1829,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 {
 	NSAutoreleasePool *outerpool = [[NSAutoreleasePool allocWithZone:nil] init];
 	NSLog(@"DataTaking Thread Started\n");
-//	[NSThread setThreadPriority:1];
+	[NSThread setThreadPriority:.8];
 
 	dataTakingThreadRunning = YES;
     [self performSelectorOnMainThread:@selector(clearExceptionCount) withObject:nil waitUntilDone:YES];

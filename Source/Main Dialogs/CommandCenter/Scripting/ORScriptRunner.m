@@ -533,6 +533,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	running = YES;
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	
+    [NSThread setThreadPriority:.8];
 	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORScriptRunnerRunningChanged object:self userInfo:nil waitUntilDone:YES];
 
 	if(!suppressStartStopMessage){
