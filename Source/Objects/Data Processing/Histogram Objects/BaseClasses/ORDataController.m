@@ -284,7 +284,20 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
 
 - (void) setModel:(id)aModel
 {
-    [super setModel:aModel];
+    NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
+    if(aModel){
+        if(!model){
+            [nc postNotificationName:@"DecoderWatching" object:[aModel dataSet] userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[aModel shortName],@"DataSetKey",nil]];
+        }
+        else {
+            [nc postNotificationName:@"DecoderNotWatching" object:[model dataSet] userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[model shortName],@"DataSetKey",nil]];
+            [nc postNotificationName:@"DecoderWatching" object:[aModel dataSet] userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[aModel shortName],@"DataSetKey",nil]];
+        }
+    }
+    else {
+        [nc postNotificationName:@"DecoderNotWatching" object:[model dataSet] userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[model shortName],@"DataSetKey",nil]];
+    }
+   [super setModel:aModel];
     if([aModel fullName]){
         [[self window] setTitle:[aModel fullName]];
 		[self runStatusChanged:nil];

@@ -54,6 +54,16 @@
 
 - (void) setModel:(id)aModel
 {
+    if(!aModel){
+        int i;
+        int n = [model numberOfChildren];
+        NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
+        for(i=0;i<n;i++){
+            id oldModel = [(ORDataSet*)[model childAtIndex:i]data];
+            [nc postNotificationName:@"DecoderNotWatching" object:[oldModel dataSet] userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[oldModel shortName],@"DataSetKey",nil]];
+        }
+    }
+
     [super setModel:aModel];
     if(inited){
 		[self removeSubPlotViews];
@@ -77,7 +87,7 @@
     [minYValueField setIntValue:[model minY]];
     [minXValueField setIntValue:[model minX]];
     
-	[self setUpViews];
+	//[self setUpViews];
 }
 
 - (void) setUpViews

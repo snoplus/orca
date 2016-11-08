@@ -135,9 +135,13 @@
                 fullDecode = YES;
                 [decoderOptions setObject:[NSNumber numberWithUnsignedLongLong:now] forKey:lastTimeKey];
             }
-
+            BOOL someoneWatching = NO;
+            if([aDataSet isSomeoneLooking:[NSString stringWithFormat:@"Gretina4M,Waveforms,%d,%d,%d",crate,card,channel]]){
+                someoneWatching = YES;
+            }
+            
             NSMutableData* tmpData = nil;
-            if(fullDecode){
+            if(fullDecode && someoneWatching){
             
                 dataPtr += 11; //point to the data
 

@@ -70,6 +70,15 @@
 
 - (void) setModel:(id)aModel
 {
+    NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
+    if(aModel){
+        [nc postNotificationName:@"DecoderWatching" object:[aModel dataSet] userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[aModel shortName],@"DataSetKey",nil]];
+        
+    }
+    else {
+        [nc postNotificationName:@"DecoderNotWatching" object:[aModel dataSet] userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[aModel shortName],@"DataSetKey",nil]];
+     }
+
 	[plotView removeAllPlots];
 
 	if([aModel isKindOfClass:NSClassFromString(@"OR1DHisto")]){

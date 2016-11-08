@@ -61,9 +61,9 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 {
 	@synchronized(self){  
 		
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORDataSetRemoved
-                                                            object:self
-                                                          userInfo: nil];
+        NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
+        [nc removeObserver:self];
+		[nc postNotificationName:ORDataSetRemoved object:self userInfo: nil];
 		
         if(data!=nil){
             NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
@@ -84,8 +84,48 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 		
 		[sortedArray release];
 		sortedArray = nil;
+        [watchingDictionary release];
+        
+
 	}
     [super dealloc];
+}
+
+- (void) registerForWatchers
+{
+    NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
+    [nc removeObserver:self];//just in case
+    [nc addObserver:self selector:@selector(someoneLooking:)    name:@"DecoderWatching" object:nil];
+    [nc addObserver:self selector:@selector(someoneNotLooking:) name:@"DecoderNotWatching" object:nil];
+}
+
+//individual decoders can use the watchers to limit the amount of decoding of big data records, i.e. waveforms
+- (void) someoneLooking:(NSNotification*) aNote
+{
+    if(!watchingDictionary)watchingDictionary = [[NSMutableDictionary dictionary]retain];
+    if([aNote object]){
+        id watcherKey   = [[aNote userInfo] objectForKey:@"DataSetKey"];
+        int watcherRetainCount = [[watchingDictionary objectForKey:watcherKey]intValue];
+        watcherRetainCount++;
+        NSLog(@"%@: %d\n",watcherKey,watcherRetainCount);
+        [watchingDictionary setObject:[NSNumber numberWithInt:watcherRetainCount] forKey:watcherKey];
+    }
+}
+
+- (void) someoneNotLooking:(NSNotification*) aNote
+{
+    id watcherKey   = [[aNote userInfo] objectForKey:@"DataSetKey"];
+    int watcherRetainCount = [[watchingDictionary objectForKey:watcherKey]intValue];
+    watcherRetainCount--;
+    NSLog(@"%@: %d\n",watcherKey,watcherRetainCount);
+    if(watcherRetainCount<=0)[watchingDictionary removeObjectForKey:watcherKey];
+    else [watchingDictionary setObject:[NSNumber numberWithInt:watcherRetainCount] forKey:watcherKey];
+
+}
+
+- (BOOL) isSomeoneLooking:(NSString*)aDataSetKey
+{
+    return [watchingDictionary objectForKey:aDataSetKey]!=nil;
 }
 
 - (id) findObjectWithFullID:(NSString*)aFullID;

@@ -252,6 +252,8 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
     dataSet = aDataSet;
     [mLock unlock];
     
+    [dataSet registerForWatchers];
+    
     [multiPlots makeObjectsPerformSelector:@selector(setDataSource:) withObject:dataSet];
     
 }

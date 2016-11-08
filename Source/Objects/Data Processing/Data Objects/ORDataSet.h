@@ -24,6 +24,7 @@
 @class ORDataPacket;
 
 @interface ORDataSet : OrcaObject {
+    NSMutableDictionary*    watchingDictionary;
     NSMutableDictionary*    realDictionary;
     NSArray*                sortedArray;
     NSString*               key;		//crate x, card y, etc...
@@ -47,6 +48,10 @@
 - (void) setMaxX:(float)aValue;
 - (void) setMinY:(float)aValue;
 - (void) setMaxY:(float)aValue;
+- (void) registerForWatchers;
+- (void) someoneLooking:(NSNotification*) aNote;
+- (void) someoneNotLooking:(NSNotification*) aNote;
+- (BOOL) isSomeoneLooking:(NSString*)aDataSetKey;
 
 - (id) findObjectWithFullID:(NSString*)aFullID;
 - (NSArray*) collectObjectsOfClass:(Class)aClass;
