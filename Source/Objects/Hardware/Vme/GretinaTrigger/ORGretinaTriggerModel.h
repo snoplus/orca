@@ -281,6 +281,7 @@ enum {
     unsigned short  connectedDigitizerMask;
     NSMutableArray* stateStatus;
     NSString*       errorString;
+    int             routerCount;
     int             digitizerCount;
     int             digitizerLockCount;
     BOOL            linkWasLost;

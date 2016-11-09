@@ -73,6 +73,7 @@ NSString*  ORGretinaTriggerTimeStampChanged             = @"ORGretinaTriggerTime
 - (BOOL) controllerIsSBC;
 - (void) setFpgaDownProgress:(short)aFpgaDownProgress;
 - (void) loadFPGAUsingSBC;
+- (void) postCouchDBRecord;
 @end
 
 @implementation ORGretinaTriggerModel
@@ -1148,6 +1149,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     
     int i;
     if([self isMaster]){
+        routerCount         = 0;
         digitizerCount      = 0;
         digitizerLockCount  = 0;
         //we are the master, so loop over the routers and get their state
@@ -1155,6 +1157,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             ORConnector* otherConnector = [linkConnector[i] connector];
             if([otherConnector identifer] == 'L'){
                 ORGretinaTriggerModel* routerObj = [otherConnector objectLink];
+                if(routerObj)routerCount++;
                 lockState &= [routerObj isRouterLocked];
                 digitizerCount      += [routerObj digitizerCount];
                 digitizerLockCount  += [routerObj digitizerLockCount];
@@ -1166,7 +1169,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
         return NO;
     }
     [self setLocked:lockState];
-    
+    [self postCouchDBRecord];
     return lockState;
 }
 
@@ -2493,9 +2496,20 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             
         }
         @catch(NSException* e){
-            
         }
     }
 }
 
+- (void) postCouchDBRecord
+{
+    if([self isMaster]){
+        NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
+                            [NSNumber numberWithInt:routerCount],        @"routerCount",
+                            [NSNumber numberWithInt:digitizerCount],     @"totalDigitizers",
+                            [NSNumber numberWithInt:digitizerLockCount], @"numberDigitizersLocked",
+                            [NSNumber numberWithInt:[self isLocked]],    @"systemLocked",
+                                nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+    }
+}
 @end
