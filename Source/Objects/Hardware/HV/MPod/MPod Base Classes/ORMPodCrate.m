@@ -305,10 +305,10 @@ NSString* ORMPodCrateConstraintsChanged				= @"ORMPodCrateConstraintsChanged";
                             float voltageDiff = fabsf([anHVCard target:i] - (float)[anHVCard voltage:i]);
                             int temp = [anHVCard channel:i readParamAsInt:@"outputMeasurementTemperature"];
                             
-                            if(voltageDiff > 0.4 || [anHVCard current:i] > 0.000010 || temp > 35){
+                            if(voltageDiff > 0.4 || [anHVCard current:i] > 0.000010 || temp > 33){
                                 computedStatus = @"Yellow";
                             }
-                            if(![anHVCard isOn:i] || voltageDiff > 1.0 || [anHVCard current:i] > 0.000020 || temp > 40){
+                            if(![anHVCard isOn:i] || voltageDiff > 1.0 || [anHVCard current:i] > 0.000020 || temp > 38){
                                 computedStatus = @"Red";
                             }
                         }
