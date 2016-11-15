@@ -241,6 +241,7 @@ NSString* ORMPodCrateConstraintsChanged				= @"ORMPodCrateConstraintsChanged";
 - (void) postCouchDBRecord
 {
     NSMutableDictionary* theSupplies  = [NSMutableDictionary dictionary];
+    NSMutableDictionary* supplyComputedStatus = [NSMutableDictionary dictionary];
     NSDictionary* systemParams = nil;
     NSMutableDictionary* theModules = [NSMutableDictionary dictionary];
     
@@ -251,6 +252,14 @@ NSString* ORMPodCrateConstraintsChanged				= @"ORMPodCrateConstraintsChanged";
             if([anObj isKindOfClass:NSClassFromString(@"ORiSegHVCard")]){
                 ORiSegHVCard* anHVCard = (ORiSegHVCard*)anObj;
                 NSMutableArray* theChannels = [NSMutableArray array];
+                NSString* computedStatus; //SV
+                if([adapter power]){
+                    computedStatus  = @"Green";
+                }
+                else{
+                    computedStatus = @"Red";
+                }
+                
                 int i;
                 for(i=0;i<[anHVCard numberOfChannels];i++){
                     NSMutableDictionary* params = [[anHVCard rdParams:i]mutableCopy];
@@ -258,10 +267,55 @@ NSString* ORMPodCrateConstraintsChanged				= @"ORMPodCrateConstraintsChanged";
                         [params setObject:[NSNumber numberWithInt:[anHVCard target:i]]     forKey:@"target"];
                         [params setObject:[NSNumber numberWithFloat:[anHVCard maxCurrent:i]] forKey:@"maxCurrent"];
                         [params setObject:[NSNumber numberWithInt:i] forKey:@"Channel"];
+                        
+                        //SV
+                        int events = [anHVCard failureEvents:i];
+                        int moduleEvents = [anHVCard moduleFailureEvents];
+                        int state  = [anHVCard channel:i readParamAsInt:@"outputSwitch"];
+                        NSString* eventString = @"";
+                        
+                        if(!events && (state != kiSegHVCardOutputSetEmergencyOff) && !moduleEvents)eventString = @"No Events";
+                        else {
+                            if(state == kiSegHVCardOutputSetEmergencyOff)        eventString = [eventString stringByAppendingString:@"Panicked\n"];
+                            if(events & outputFailureMinSenseVoltageMask)        eventString = [eventString stringByAppendingString:@"Min Voltage\n"];
+                            if(events & outputFailureMaxSenseVoltageMask)        eventString = [eventString stringByAppendingString:@"Max Voltage\n"];
+                            if(events & outputFailureMaxTerminalVoltageMask)eventString = [eventString stringByAppendingString:@"Term. Voltage\n"];
+                            if(events & outputFailureMaxCurrentMask)                eventString = [eventString stringByAppendingString:@"Max Current\n"];
+                            if(events & outputFailureMaxTemperatureMask)        eventString = [eventString stringByAppendingString:@"Max Temp\n"];
+                            if(events & outputFailureMaxPowerMask)                        eventString = [eventString stringByAppendingString:@"Max Power\n"];
+                            if(events & outputFailureTimeoutMask)                        eventString = [eventString stringByAppendingString:@"Timeout\n"];
+                            if(events & outputCurrentLimitedMask)                        eventString = [eventString stringByAppendingString:@"Current Limit\n"];
+                            if(events & outputEmergencyOffMask)                                eventString = [eventString stringByAppendingString:@"Emergency Off\n"];
+                            if(moduleEvents & moduleEventPowerFail)         eventString = [eventString stringByAppendingString:@"Module Power Failure\n"];
+                            if(moduleEvents & moduleEventLiveInsertion)     eventString = [eventString stringByAppendingString:@"Module Live Insertion\n"];
+                            if(moduleEvents & moduleEventService)           eventString = [eventString stringByAppendingString:@"Module Requires Service\n"];
+                            if(moduleEvents &
+                               moduleHardwareLimitVoltageNotGood)           eventString = [eventString stringByAppendingString:@"Module Hard Limit Voltage Not Good\n"];
+                            if(moduleEvents & moduleEventInputError)        eventString = [eventString stringByAppendingString:@"Module Input Error\n"];
+                            if(moduleEvents & moduleEventSafetyLoopNotGood) eventString = [eventString stringByAppendingString:@"Module Safety Loop Not Good\n"];
+                            if(moduleEvents & moduleEventSupplyNotGood)     eventString = [eventString stringByAppendingString:@"Module Power Supply Not Good\n"];
+                            if(moduleEvents & moduleEventTemperatureNotGood)eventString = [eventString stringByAppendingString:@"Module Temperature Not Good\n"];
+                        }
+                        
+                        [params setObject:eventString forKey:@"Events"];
                         [theChannels addObject:params];
+
+                        //SV
+                        if(![computedStatus isEqual: @"Red"]){
+                            float voltageDiff = fabsf([anHVCard target:i] - (float)[anHVCard voltage:i]);
+                            int temp = [anHVCard channel:i readParamAsInt:@"outputMeasurementTemperature"];
+                            
+                            if(voltageDiff > 0.4 || [anHVCard current:i] > 0.000010 || temp > 35){
+                                computedStatus = @"Yellow";
+                            }
+                            if(![anHVCard isOn:i] || voltageDiff > 1.0 || [anHVCard current:i] > 0.000020 || temp > 40){
+                                computedStatus = @"Red";
+                            }
+                        }
                     }
                     [params release];
                 }
+                [supplyComputedStatus setObject:computedStatus forKey:[NSString stringWithFormat:@"%d",[anHVCard slot]-1]];
                 
                 NSDictionary* modParams = [anHVCard modParams];
                 if(modParams){
@@ -273,7 +327,7 @@ NSString* ORMPodCrateConstraintsChanged				= @"ORMPodCrateConstraintsChanged";
                 if(theChannels){
                     [theSupplies setObject:theChannels forKey:[NSString stringWithFormat:@"%d",[anHVCard slot]-1]];
                 }
-
+                
             }
             else if(anObj == adapter){
                 [systemParams release]; //make sure there is only one.
@@ -285,16 +339,16 @@ NSString* ORMPodCrateConstraintsChanged				= @"ORMPodCrateConstraintsChanged";
         NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
                                 systemParams, @"system",
                                 theSupplies,  @"supplies",
+                                supplyComputedStatus, @"Computed statuses",
                                 theModules, @"modules",
                                 [NSNumber numberWithInt:numChannelsWithVoltage],@"NumberChannelsOn",
                                 [NSNumber numberWithInt:numChannelsRamping],@"NumberChannelsRamping",
                                 nil];
-
+        
         [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
     }
     [systemParams release];
 }
-
 @end
 
 @implementation ORMPodCrate (OROrderedObjHolding)
