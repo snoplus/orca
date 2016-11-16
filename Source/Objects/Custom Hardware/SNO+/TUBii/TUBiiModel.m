@@ -25,6 +25,8 @@
 #define TUBII_DEFAULT_IP "192.168.80.25"
 #define TUBII_DEFAULT_PORT 4001
 
+NSString* ORTubiiLock				= @"ORTubiiLock";
+
 @implementation TUBiiModel
 #pragma mark •••Synthesized Variables
 
