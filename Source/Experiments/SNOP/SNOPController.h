@@ -39,8 +39,6 @@
 	NSSize hvMasterSize;
 	NSSize runsSize;
     
-    IBOutlet NSComboBox *orcaDBIPAddressPU;
-    IBOutlet NSComboBox *debugDBIPAddressPU;
     IBOutlet NSMatrix* hvStatusMatrix;
     
     //Run control (the rest is in the ORExperimentController)
@@ -95,27 +93,38 @@
     IBOutlet NSButton* runsLockButton;
     IBOutlet NSTextField *lockStatusTextField;
 
-    IBOutlet NSTextField *mtcPort;
-    IBOutlet NSTextField *mtcHost;
-
-    IBOutlet NSTextField *xl3Port;
-    IBOutlet NSTextField *xl3Host;
-
-    IBOutlet NSTextField *dataPort;
-    IBOutlet NSTextField *dataHost;
-
-    IBOutlet NSTextField *logPort;
-    IBOutlet NSTextField *logHost;
-
     //ECA RUNS
     IBOutlet NSPopUpButton *ECApatternPopUpButton;
     IBOutlet NSPopUpButton *ECAtypePopUpButton;
     IBOutlet NSTextField *TSlopePatternTextField;
     IBOutlet NSTextField *ecaNEventsTextField;
     IBOutlet NSTextField *ecaPulserRate;
+    IBOutlet NSButton *startSingleECAButton;
 
     NSButton *refreshRunWordNames;
     
+    //Server settings
+    IBOutlet NSComboBox *orcaDBIPAddressPU;
+    IBOutlet NSComboBox *debugDBIPAddressPU;
+    IBOutlet NSTextField *mtcPort;
+    IBOutlet NSTextField *mtcHost;
+    IBOutlet NSTextField *xl3Port;
+    IBOutlet NSTextField *xl3Host;
+    IBOutlet NSTextField *dataPort;
+    IBOutlet NSTextField *dataHost;
+    IBOutlet NSTextField *logPort;
+    IBOutlet NSTextField *logHost;
+    IBOutlet NSTextField *orcaDBUser;
+    IBOutlet NSTextField *orcaDBPswd;
+    IBOutlet NSTextField *orcaDBName;
+    IBOutlet NSTextField *orcaDBPort;
+    IBOutlet NSButton *orcaDBClearButton;
+    IBOutlet NSTextField *debugDBUser;
+    IBOutlet NSTextField *debugDBPswd;
+    IBOutlet NSTextField *debugDBName;
+    IBOutlet NSTextField *debugDBPort;
+    IBOutlet NSButton *debugDBClearButton;
+
     //Custom colors
     NSColor *snopRedColor;
     NSColor *snopBlueColor;
@@ -194,9 +203,9 @@
 //Run type
 - (IBAction) refreshRunWordLabels:(id)sender;
 - (IBAction) runTypeWordAction:(id)sender;
-
-
 @end
+
+
 @interface ORDetectorView (SNO)
 - (void) setViewType:(int)aState;
 @end

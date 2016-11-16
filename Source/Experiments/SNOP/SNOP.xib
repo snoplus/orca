@@ -16,7 +16,12 @@
                 <outlet property="clearButton" destination="2609" id="2612"/>
                 <outlet property="dataHost" destination="UWf-rc-B5V" id="XsF-fQ-J4g"/>
                 <outlet property="dataPort" destination="iRb-mE-Azg" id="q3z-dm-lJm"/>
+                <outlet property="debugDBClearButton" destination="2731" id="1EM-Mi-IT6"/>
                 <outlet property="debugDBIPAddressPU" destination="2730" id="2967"/>
+                <outlet property="debugDBName" destination="2727" id="CPD-f6-zne"/>
+                <outlet property="debugDBPort" destination="2725" id="MDK-o8-NmY"/>
+                <outlet property="debugDBPswd" destination="2729" id="juL-DA-Yh3"/>
+                <outlet property="debugDBUser" destination="2728" id="Cft-Wc-hV4"/>
                 <outlet property="detectorHVStatus" destination="fHi-qS-g5A" id="oT8-lw-7La"/>
                 <outlet property="detectorLockButton" destination="368" id="370"/>
                 <outlet property="detectorTitle" destination="1189" id="1190"/>
@@ -43,7 +48,12 @@
                 <outlet property="logPort" destination="DpW-Vd-aQd" id="9DN-uP-F1q"/>
                 <outlet property="mtcHost" destination="eaZ-tZ-5J9" id="rjH-OI-3ri"/>
                 <outlet property="mtcPort" destination="2aR-vd-DX1" id="sbN-pm-YYe"/>
+                <outlet property="orcaDBClearButton" destination="2682" id="Elw-gn-a5W"/>
                 <outlet property="orcaDBIPAddressPU" destination="2683" id="2962"/>
+                <outlet property="orcaDBName" destination="2704" id="IX3-D9-ZA1"/>
+                <outlet property="orcaDBPort" destination="2708" id="nfR-eL-xZ0"/>
+                <outlet property="orcaDBPswd" destination="2684" id="auq-iH-D45"/>
+                <outlet property="orcaDBUser" destination="2685" id="E4e-CV-d2D"/>
                 <outlet property="panicDownButton" destination="zmA-F4-wTd" id="37F-oN-VJj"/>
                 <outlet property="primaryColorAxisLogCB" destination="1149" id="1225"/>
                 <outlet property="primaryRateField" destination="867" id="1227"/>
@@ -76,6 +86,7 @@
                 <outlet property="standardRunThresStoredValues" destination="hkr-OH-tez" id="iZh-fA-WYP"/>
                 <outlet property="standardRunVersionPopupMenu" destination="0tV-8Q-LGs" id="WhV-Ow-TuV"/>
                 <outlet property="startRunButton" destination="1253" id="XdY-Mu-6m6"/>
+                <outlet property="startSingleECAButton" destination="Mzb-de-zBx" id="pka-12-igp"/>
                 <outlet property="stopRunButton" destination="1258" id="PGc-XS-Wt7"/>
                 <outlet property="tabView" destination="101" id="332"/>
                 <outlet property="timeLimitField" destination="1342" id="1353"/>
@@ -404,17 +415,6 @@
                                             </buttonCell>
                                             <connections>
                                                 <action selector="timedRunCBAction:" target="-2" id="1359"/>
-                                            </connections>
-                                        </button>
-                                        <button id="URx-nh-GMP">
-                                            <rect key="frame" x="295" y="3" width="36" height="33"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="Unlocked" imagePosition="above" alignment="center" alternateImage="Locked" inset="2" id="HE1-OC-JMz">
-                                                <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system" size="10"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="runsLockAction:" target="-2" id="MFs-mm-seY"/>
                                             </connections>
                                         </button>
                                         <textField verticalHuggingPriority="750" id="Np3-DI-Iif">
@@ -1921,6 +1921,17 @@
                                                 </tabViewItem>
                                             </tabViewItems>
                                         </tabView>
+                                        <button id="URx-nh-GMP">
+                                            <rect key="frame" x="720" y="7" width="36" height="33"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="Unlocked" imagePosition="above" alignment="center" alternateImage="Locked" inset="2" id="HE1-OC-JMz">
+                                                <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system" size="10"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="runsLockAction:" target="-2" id="MFs-mm-seY"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                 </view>
                             </tabViewItem>

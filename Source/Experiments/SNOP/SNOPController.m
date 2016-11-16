@@ -1175,6 +1175,7 @@ snopGreenColor;
     [runsLockButton setState: locked];
     
     //Enable or disable fields
+    [startSingleECAButton setEnabled:!lockedOrNotRunningMaintenance];
     [ECApatternPopUpButton setEnabled:!lockedOrNotRunningMaintenance];
     [ECAtypePopUpButton setEnabled:!lockedOrNotRunningMaintenance];
     [TSlopePatternTextField setEnabled:!lockedOrNotRunningMaintenance];
@@ -1186,10 +1187,30 @@ snopGreenColor;
     [standardRunLoadButton setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunLoadDefaultsButton setEnabled:!lockedOrNotRunningMaintenance];
     [runTypeWordMatrix setEnabled:!lockedOrNotRunningMaintenance];
-    if(locked) [standardRunVersionPopupMenu setEnabled:false];
+    [standardRunVersionPopupMenu setEnabled:!locked]; //allow to change version when in expert mode
     [timedRunCB setEnabled:!runInProgress];
     [timeLimitField setEnabled:!lockedOrNotRunningMaintenance];
     [repeatRunCB setEnabled:!lockedOrNotRunningMaintenance];
+    [orcaDBIPAddressPU setEnabled:!lockedOrNotRunningMaintenance];
+    [debugDBIPAddressPU setEnabled:!lockedOrNotRunningMaintenance];
+    [mtcPort setEnabled:!lockedOrNotRunningMaintenance];
+    [mtcHost setEnabled:!lockedOrNotRunningMaintenance];
+    [xl3Port setEnabled:!lockedOrNotRunningMaintenance];
+    [xl3Host setEnabled:!lockedOrNotRunningMaintenance];
+    [dataPort setEnabled:!lockedOrNotRunningMaintenance];
+    [dataHost setEnabled:!lockedOrNotRunningMaintenance];
+    [logPort setEnabled:!lockedOrNotRunningMaintenance];
+    [logHost setEnabled:!lockedOrNotRunningMaintenance];
+    [orcaDBUser setEnabled:!lockedOrNotRunningMaintenance];
+    [orcaDBPswd setEnabled:!lockedOrNotRunningMaintenance];
+    [orcaDBName setEnabled:!lockedOrNotRunningMaintenance];
+    [orcaDBPort setEnabled:!lockedOrNotRunningMaintenance];
+    [orcaDBClearButton setEnabled:!lockedOrNotRunningMaintenance];
+    [debugDBUser setEnabled:!lockedOrNotRunningMaintenance];
+    [debugDBPswd setEnabled:!lockedOrNotRunningMaintenance];
+    [debugDBName setEnabled:!lockedOrNotRunningMaintenance];
+    [debugDBPort setEnabled:!lockedOrNotRunningMaintenance];
+    [debugDBClearButton setEnabled:!lockedOrNotRunningMaintenance];    
     
     //Display status
     [lockStatusTextField setStringValue:@"EXPERT MODE"];
@@ -1645,6 +1666,9 @@ snopGreenColor;
     
 }
 
+
+//Query the DB for the selected Standard Run name and version
+//and display the default and 'test' values on the GUI.
 -(void) displayThresholdsFromDB {
 
     //Get MTC model
@@ -2005,6 +2029,11 @@ snopGreenColor;
     
 }
 
+
+//Reload the standard run from the DB:
+//Queries the DB and populate the 'Run Name' popup menu
+//with the SR names. It selects automatically the old
+//SR if any. SR versions are refreshed as well afterwards.
 - (IBAction) refreshStandardRunsAction: (id) sender
 {
     NSString *urlString, *link, *ret;
@@ -2069,6 +2098,10 @@ snopGreenColor;
     
 }
 
+
+//Reload the standard run versions from the DB:
+//Queries the DB for the specified Standard Run and populate
+//the 'Test run' popup menu with the SR versions
 - (void) refreshStandardRunVersions
 {
     NSString *urlString, *link, *ret;
@@ -2144,6 +2177,8 @@ snopGreenColor;
             [model setStandardRunVersion:@""];
         }
     }
+    
+    [self runsLockChanged:nil]; //this is to ensure we are locking everything properly
     
 }
 

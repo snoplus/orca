@@ -13,15 +13,15 @@
 //the contract and the program should not be copied or distributed 
 //outside your organization.  The DOE and the University of 
 //Washington reserve all rights in the program. Neither the authors,
-//University of Washington, or U.S. Government make any warranty, 
+//University of Washington, or U.S. Government make any warranty,
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
 
 @interface ORMTCController : OrcaObjectController {
 
+    IBOutlet NSView *mtcView;
     IBOutlet NSTabView*		tabView;
-    IBOutlet NSTextField* lockDocField;
 	//basic Ops
 	IBOutlet NSProgressIndicator* basicOpsRunningIndicator;
 	IBOutlet NSButton*		autoIncrementCB;
@@ -49,7 +49,6 @@
 
     
 	//standard Ops
-	IBOutlet NSButton*		standardOpsLockButton;
 	IBOutlet NSButton*		initMtcButton;
 	IBOutlet NSButton*		initNoXilinxButton;
 	IBOutlet NSButton*		initNo10MHzButton;
@@ -78,7 +77,6 @@
 	IBOutlet NSMatrix*		eSumViewTypeMatrix;
 	IBOutlet NSMatrix*		nHitViewTypeMatrix;
  	IBOutlet NSTextField*	xilinxFilePathField;
-	IBOutlet NSButton*		settingsLockButton;
 	IBOutlet NSTextField*	lastFileLoadedField;
  	IBOutlet NSTextField*	lockOutWidthField;
  	IBOutlet NSTextField*	pedestalWidthField;
@@ -97,7 +95,6 @@
 	IBOutlet NSTextField*	commentsField;
 
 	//trigger
-    IBOutlet NSButton*		triggersLockButton;
 	IBOutlet NSMatrix*		globalTriggerMaskMatrix;
 	IBOutlet NSMatrix*		globalTriggerCrateMaskMatrix;
 	IBOutlet NSMatrix*		pedCrateMaskMatrix;
@@ -147,9 +144,6 @@
 - (void) memoryOffsetChanged:(NSNotification*)aNote;
 - (void) selectedRegisterChanged:(NSNotification*)aNote;
 - (void) basicLockChanged:(NSNotification*)aNote;
-- (void) standardOpsLockChanged:(NSNotification*)aNote;
-- (void) settingsLockChanged:(NSNotification*)aNote;
-- (void) triggersLockChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
 - (void) regBaseAddressChanged:(NSNotification*)aNote;
 - (void) memBaseAddressChanged:(NSNotification*)aNote;

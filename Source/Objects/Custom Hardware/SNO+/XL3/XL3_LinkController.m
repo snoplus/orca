@@ -58,6 +58,7 @@ static NSDictionary* xl3Ops;
 	compositeSize	= NSMakeSize(485,558);
 	blankView = [[NSView alloc] init];
     [tabView setFocusRingType:NSFocusRingTypeNone];
+    [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
 
 	[super awakeFromNib];
     
