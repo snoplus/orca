@@ -403,22 +403,40 @@ snopGreenColor;
     //Load selected SR in case the user didn't click enter
     NSString *standardRun = [standardRunPopupMenu objectValueOfSelectedItem];
     NSString *standardRunVersion = [standardRunVersionPopupMenu objectValueOfSelectedItem];//MAH -- fixed
-    [model setStandardRunType:standardRun];
-    [model setStandardRunVersion:standardRunVersion];
-
-    //Load values into model:
-    //If we are in operator mode we ALWAYS load the DEFAULTs to avoid confusion
-    //The expert mode has the freedom to load whichever test run. This is dangerous
+    
+    //Load selected version run:
+    //If we are in operator mode we ALWAYS load the DEFAULTs
+    //The expert mode has the freedom to load any test run. This is dangerous
     //but hopefully we won't need to run in expert mode for physics data and in any
     //case the expert will know this!
     BOOL locked = [gSecurity isLocked:ORSNOPRunsLockNotification];
     if(locked) { //Operator Mode
-        [model setStandardRunVersion:@"DEFAULT"];
-        [model loadStandardRun:standardRun withVersion:@"DEFAULT"];
-    } else{//Expert Mode
-        [model loadStandardRun:standardRun withVersion:standardRunVersion];
+        standardRunVersion = @"DEFAULT";
+    } else{ //Expert Mode
+        //Nothing
     }
 
+    //Handle no SR cases
+    if([standardRun isEqualToString:@""] || standardRun == nil){
+        NSLogColor([NSColor redColor],@"Standard Run Not Set. Select a valid run from the drop down menu \n");
+        return;
+    }
+    if([standardRunVersion isEqualToString:@""] || standardRunVersion == nil){
+        NSLogColor([NSColor redColor],@"Standard Run Version Not Set. Select a valid run from the drop down menu \n");
+        return;
+    }
+    
+    [model setStandardRunType:standardRun];
+    [model setStandardRunVersion:standardRunVersion];
+
+    //Load the standard run and stop run initialization if failed
+    [model setLastStandardRunType:[model standardRunType]];
+    [model setLastStandardRunVersion:[model standardRunVersion]];
+    [model setLastRunTypeWord:[model runTypeWord]];
+    NSString* _lastRunTypeWord = [NSString stringWithFormat:@"0x%X",(int)[model runTypeWord]];
+    [model setLastRunTypeWordHex:_lastRunTypeWord]; //FIXME: revisit if we go over 32 bits
+    if(![model loadStandardRun:standardRun withVersion:standardRunVersion]) return;
+    
     //Start or restart the run
     if([runControl isRunning])[runControl restartRun];
     else [runControl startRun];
@@ -449,11 +467,7 @@ snopGreenColor;
     if([runControl runningState] == eRunInProgress){
         [startRunButton setTitle:@"RESTART"];
         [lightBoardView setState:kGoLight];
-        if(([model lastRunTypeWord]>>0) & 1){
-            [runStatusField setStringValue:@"Running Maintenance"];
-        } else{
-            [runStatusField setStringValue:@"Running"];
-        }
+        [runStatusField setStringValue:@"Running"];
 	}
 	else if([runControl runningState] == eRunStopped){
         [startRunButton setTitle:@"START"];
@@ -466,11 +480,6 @@ snopGreenColor;
             [runStatusField setStringValue:@"Starting"];
             [startRunButton setEnabled:false];
             [startRunButton setTitle:@"STARTING..."];
-            [model setLastStandardRunType:[model standardRunType]];
-            [model setLastStandardRunVersion:[model standardRunVersion]];
-            [model setLastRunTypeWord:[model runTypeWord]];
-            NSString* _lastRunTypeWord = [NSString stringWithFormat:@"0x%X",(int)[model runTypeWord]];
-            [model setLastRunTypeWordHex:_lastRunTypeWord]; //FIXME: revisit if we go over 32 bits
         }
 		else {
             //Do nothing
@@ -821,17 +830,6 @@ snopGreenColor;
         case kDisplayTotalCounts:	[detectorTitle setStringValue:@"Total Counts"];		break;
         default: break;
     }
-}
-
-#pragma mark ¥¥¥Details Interface Management
-- (void) detailsLockChanged:(NSNotification*)aNotification
-{
-    [super detailsLockChanged:aNotification];
-    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:[model experimentDetailsLock]];
-    BOOL locked = [gSecurity isLocked:[model experimentDetailsLock]];
-    
-    [detailsLockButton setState: locked];
-    [initButton setEnabled: !lockedOrRunningMaintenance];
 }
 
 #pragma mark ¥¥¥Table Data Source
@@ -1187,7 +1185,7 @@ snopGreenColor;
     [standardRunLoadButton setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunLoadDefaultsButton setEnabled:!lockedOrNotRunningMaintenance];
     [runTypeWordMatrix setEnabled:!lockedOrNotRunningMaintenance];
-    [standardRunVersionPopupMenu setEnabled:!locked]; //allow to change version when in expert mode
+    [standardRunVersionPopupMenu setEnabled:!locked && [standardRunVersionPopupMenu numberOfItems]>0]; //allow to change version when in expert mode
     [timedRunCB setEnabled:!runInProgress];
     [timeLimitField setEnabled:!lockedOrNotRunningMaintenance];
     [repeatRunCB setEnabled:!lockedOrNotRunningMaintenance];
@@ -2049,27 +2047,30 @@ snopGreenColor;
     [standardRunVersionPopupMenu removeAllItems];
     
     // Now query DB and fetch the SRs
-    urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/orca/_design/standardRuns/_view/getStandardRuns",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort]];
+    urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/%@/_design/standardRuns/_view/getStandardRuns",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort],[model orcaDBName]];
     link = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-    request = [NSURLRequest requestWithURL:[NSURL URLWithString:link]
-               cachePolicy:0 timeoutInterval:2];
-
-    data = [NSURLConnection sendSynchronousRequest:request
-            returningResponse:&response error:&error];
-
+    request = [NSURLRequest requestWithURL:[NSURL URLWithString:link] cachePolicy:0 timeoutInterval:2];
+    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+    ret = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
+    NSDictionary *standardRunTypes = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
+    //JSON formatting error
     if (error != nil) {
-        NSLogColor([NSColor redColor], @"Error contacting database: %@\n",
-                   [error localizedDescription]);
+        NSLogColor([NSColor redColor], @"Error converting JSON response from "
+                   "database: %@\n", [error localizedDescription]);
         [model setStandardRunType:@""];
         [model setStandardRunVersion:@""];
-        NSLogColor([NSColor redColor],@"Error querying couchDB, please check the settings are correct and you have connection. \n");
         return;
     }
 
-    ret = [[[NSString alloc] initWithData:data
-            encoding:NSUTF8StringEncoding] autorelease];
-
-    NSDictionary *standardRunTypes = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
+    //SR not found
+    if ([[standardRunTypes valueForKey:@"error"] isEqualToString:@"not_found"] || error != nil) {
+        [model setStandardRunType:@""];
+        [model setStandardRunVersion:@""];
+        NSLogColor([NSColor redColor],@"Error querying couchDB, please check the settings are correct and you have connection. \n");
+        [standardRunPopupMenu setEnabled:false];
+        [standardRunVersionPopupMenu setEnabled:false];
+        return;
+    }
     
     //Query succeded
     [standardRunPopupMenu setEnabled:true];
@@ -2084,7 +2085,7 @@ snopGreenColor;
     if ([standardRunPopupMenu numberOfItems] == 0){
         [model setStandardRunType:@""];
     } else{
-        //Check if old selected run exists
+        //Check if previous selected run exists
         if([standardRunPopupMenu indexOfItemWithObjectValue:[model standardRunType]] == NSNotFound){
             //Select first item in popup menu
             [standardRunPopupMenu selectItemAtIndex:0];
@@ -2114,25 +2115,14 @@ snopGreenColor;
     [standardRunVersionPopupMenu deselectItemAtIndex:[standardRunVersionPopupMenu indexOfSelectedItem]];
     [standardRunVersionPopupMenu removeAllItems];
     
-    urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/orca/_design/standardRuns/_view/getStandardRuns",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort]];
+    urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/%@/_design/standardRuns/_view/getStandardRuns",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort],[model orcaDBName]];
     link = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-    request = [NSURLRequest requestWithURL:[NSURL URLWithString:link]
-               cachePolicy:0 timeoutInterval:2];
-
-    data = [NSURLConnection sendSynchronousRequest:request
-            returningResponse:&response error:&error];
-
-    if (error != nil) {
-        NSLogColor([NSColor redColor], @"Error contacting database: %@\n",
-                   [error localizedDescription]);
-        [model setStandardRunVersion:@""];
-        return;
-    }
-
-    ret = [[[NSString alloc] initWithData:data
-            encoding:NSUTF8StringEncoding]autorelease];
-
+    request = [NSURLRequest requestWithURL:[NSURL URLWithString:link] cachePolicy:0 timeoutInterval:2];
+    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+    ret = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
     NSDictionary *standardRunVersions = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
+
+    //JSON formatting error
     if (error != nil) {
         NSLogColor([NSColor redColor], @"Error converting JSON response from "
                    "database: %@\n", [error localizedDescription]);
@@ -2140,8 +2130,18 @@ snopGreenColor;
         return;
     }
 
+    //SR not found
+    if ([[standardRunVersions valueForKey:@"error"] isEqualToString:@"not_found"] || error != nil)
+    {
+        [model setStandardRunVersion:@""];
+        NSLogColor([NSColor redColor],@"Error querying couchDB, please check the settings are correct and you have connection. \n");
+        [standardRunVersionPopupMenu setEnabled:false];
+        return;
+    }
+
     //Query succeded
-    [standardRunVersionPopupMenu setEnabled:true];
+    BOOL optMode	= [gSecurity isLocked:ORSNOPRunsLockNotification]; //expert or operator mode
+    [standardRunVersionPopupMenu setEnabled:!optMode];
     for(id entry in [standardRunVersions valueForKey:@"rows"]){
         NSString *runtype = [[entry valueForKey:@"key"] objectAtIndex:0];
         NSString *runversion = [[entry valueForKey:@"key"] objectAtIndex:1];
@@ -2177,8 +2177,6 @@ snopGreenColor;
             [model setStandardRunVersion:@""];
         }
     }
-    
-    [self runsLockChanged:nil]; //this is to ensure we are locking everything properly
     
 }
 
