@@ -63,6 +63,7 @@
 
     //Run Types Information
     IBOutlet NSMatrix*  runTypeWordMatrix;
+    IBOutlet NSMatrix *runTypeWordSRMatrix;
 
     //Xl3 Mode
     IBOutlet NSMatrix * globalxl3Mode;

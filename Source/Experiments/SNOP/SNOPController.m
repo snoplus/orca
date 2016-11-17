@@ -1687,6 +1687,9 @@ snopGreenColor;
         for (int i=0; i<[standardRunThresStoredValues numberOfRows];i++) {
             [[standardRunThresStoredValues cellAtRow:i column:0] setStringValue:@"--"];
         }
+        for(int ibit=0; ibit<21; ibit++){ //Data quality bits are not stored in the SR
+            [[runTypeWordSRMatrix cellAtRow:ibit column:0] setState:0];
+        }
         NSLogColor([NSColor redColor],@"Standard Run not set: make sure the DB is accesible and refresh the standard runs. \n");
         return;
     }
@@ -1694,6 +1697,9 @@ snopGreenColor;
     if([model standardRunVersion] == nil || [[model standardRunVersion] isEqualToString:@""]){
         for (int i=0; i<[standardRunThresStoredValues numberOfRows];i++) {
             [[standardRunThresStoredValues cellAtRow:i column:0] setStringValue:@"--"];
+        }
+        for(int ibit=0; ibit<21; ibit++){ //Data quality bits are not stored in the SR
+            [[runTypeWordSRMatrix cellAtRow:ibit column:0] setState:0];
         }
         NSLogColor([NSColor redColor],@"Test Standard Run not set: make sure the DB is accesible and refresh the standard runs. \n");
         return;
@@ -2006,25 +2012,24 @@ snopGreenColor;
         }
     }
     
-    //Display runtype word
-    unsigned long dbruntypeword = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"run_type_word"] unsignedLongValue];
-    
+    //Display runtype word for test run
+    unsigned long dbruntypeword = [[[[[versionSettings valueForKey:@"rows"]     objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"run_type_word"]  unsignedLongValue];
     for(int ibit=0; ibit<21; ibit++){ //Data quality bits are not stored in the SR
         if((dbruntypeword >> ibit) & 1){
-            //Changing the color of a NSButton is not simple. You need all the following junk.
-            NSDictionary *dictAttr = [NSDictionary dictionaryWithObjectsAndKeys: snopBlackColor, NSForegroundColorAttributeName, nil];
-            NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:[[runTypeWordMatrix cellAtRow:ibit column:0] title] attributes:dictAttr];
-            [[runTypeWordMatrix cellAtRow:ibit column:0] setAttributedTitle:attributedString];
-
+            [[runTypeWordSRMatrix cellAtRow:ibit column:0] setState:1];
+            /*
+             This is not used anymore but I'll leave it here as an example of how to change
+             color of an NSButton (Javi)
+             //Changing the color of a NSButton is not simple. You need all the following junk.
+             NSDictionary *dictAttr = [NSDictionary dictionaryWithObjectsAndKeys: snopBlackColor, NSForegroundColorAttributeName, nil];
+             NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:[[runTypeWordMatrix cellAtRow:ibit column:0] title] attributes:dictAttr];
+             [[runTypeWordMatrix cellAtRow:ibit column:0] setAttributedTitle:attributedString];
+             */
         } else{
-            NSDictionary *dictAttr = [NSDictionary dictionaryWithObjectsAndKeys: snopGrayColor, NSForegroundColorAttributeName, nil];
-            NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:[[runTypeWordMatrix cellAtRow:ibit column:0] title] attributes:dictAttr];
-            [[runTypeWordMatrix cellAtRow:ibit column:0] setAttributedTitle:attributedString];
+            [[runTypeWordSRMatrix cellAtRow:ibit column:0] setState:0];
         }
     }
-    
-    
-    
+
 }
 
 
