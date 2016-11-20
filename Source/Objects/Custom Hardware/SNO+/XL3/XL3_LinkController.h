@@ -170,7 +170,6 @@
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item;
 
 #pragma mark •••Interface Management
-- (void) settingsLockChanged:(NSNotification*)aNotification;
 - (void) xl3LockChanged:(NSNotification*)aNotification;
 - (void) opsRunningChanged:(NSNotification*)aNote;
 //basic ops

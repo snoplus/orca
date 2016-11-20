@@ -42,7 +42,6 @@
     IBOutlet NSTextField*	hvRefField;
     IBOutlet NSMatrix*		cmosMatrix;
     IBOutlet NSButton*		lockButton;
-	IBOutlet NSTextField*   lockDocField;
 	IBOutlet NSTextField*	crateNumberField;
 	IBOutlet NSTextField*   fecNumberField;
 	IBOutlet NSMatrix*		pmtImages0;
@@ -58,6 +57,7 @@
     IBOutlet NSMatrix*      pmtStateMatrix0_15;
     IBOutlet NSMatrix*      pmtStateLabelMatrix16_31;
     IBOutlet NSMatrix*      pmtStateMatrix16_31;
+    IBOutlet NSButton *loadPMTStateButton;
 	IBOutlet NSTextField*	boardIdField;
     IBOutlet NSButton*		initButton;
 	IBOutlet NSButton*		autoInitButton;

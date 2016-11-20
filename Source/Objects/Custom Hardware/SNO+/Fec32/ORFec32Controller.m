@@ -546,15 +546,18 @@
 
 - (void) lockChanged:(NSNotification*)aNotification
 {
-    BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL locked = [gSecurity isLocked:ORFecLock];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORFecLock];
     [lockButton setState: locked];	
-    NSString* s = @"";
-    if(lockedOrRunningMaintenance){
-		if(runInProgress && ![gSecurity isLocked:ORFecLock])s = @"Not in Maintenance Run.";
-    }
-    [lockDocField setStringValue:s];
+
+    [pmtStateMatrix0_15 setEnabled: !lockedOrRunningMaintenance];
+    [pmtStateMatrix16_31 setEnabled: !lockedOrRunningMaintenance];
+    [loadPMTStateButton setEnabled: !lockedOrRunningMaintenance];
+
+    [vResField setEnabled: !lockedOrRunningMaintenance];
+    [hvRefField setEnabled: !lockedOrRunningMaintenance];
+    [cmosMatrix setEnabled: !lockedOrRunningMaintenance];
+
 }
 
 - (void) slotChanged:(NSNotification*)aNotification
