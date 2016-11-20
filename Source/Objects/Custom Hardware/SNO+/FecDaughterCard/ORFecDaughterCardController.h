@@ -25,38 +25,44 @@
 @interface ORFecDaughterCardController : OrcaObjectController  {
 	@private
     IBOutlet NSImageView* imgView;
-		IBOutlet NSButton* setAllCmosButton;
-		IBOutlet NSMatrix* rp1Matrix;
-		IBOutlet NSMatrix* rp2Matrix;
-		IBOutlet NSMatrix* vliMatrix;
-		IBOutlet NSMatrix* vsiMatrix;
+    IBOutlet NSButton *lockButton;
+    IBOutlet NSButton* setAllCmosButton;
+	IBOutlet NSMatrix* rp1Matrix;
+	IBOutlet NSMatrix* rp2Matrix;
+	IBOutlet NSMatrix* vliMatrix;
+	IBOutlet NSMatrix* vsiMatrix;
     IBOutlet NSMatrix* vt_ecalMatrix;
     IBOutlet NSMatrix* vt_zeroMatrix;
     IBOutlet NSMatrix* vt_corrMatrix;
     IBOutlet NSTextField* vtSaferyField;
-		IBOutlet NSMatrix* vbMatrix;
-		IBOutlet NSTextField* ns100widthField;			   
-		IBOutlet NSTextField* ns20widthField; 
-		IBOutlet NSTextField* ns20delayField;
-		IBOutlet NSTextField* tac0trimField; 	   
-		IBOutlet NSTextField* tac1trimField;
-		IBOutlet NSTextField* cmosRegShownField;
-		IBOutlet NSTextField* cmosRegShownField1;
-		IBOutlet NSButton*	  showVoltsCB;
-		IBOutlet NSTextField* commentsTextField;
-		IBOutlet NSTextField* cardLabelField;
-		IBOutlet NSTextField* dcNumberField;
-		IBOutlet NSTextField* fecNumberField;
-		IBOutlet NSTextField* crateNumberField;
-		IBOutlet NSTextField* boardIdField;
+	IBOutlet NSMatrix* vbMatrix;
+	IBOutlet NSTextField* ns100widthField;
+	IBOutlet NSTextField* ns20widthField;
+	IBOutlet NSTextField* ns20delayField;
+	IBOutlet NSTextField* tac0trimField;
+	IBOutlet NSTextField* tac1trimField;
+	IBOutlet NSTextField* cmosRegShownField;
+	IBOutlet NSTextField* cmosRegShownField1;
+    IBOutlet NSButton*	  showVoltsCB;
+    IBOutlet NSTextField* commentsTextField;
+    IBOutlet NSTextField* cardLabelField;
+    IBOutlet NSTextField* dcNumberField;
+    IBOutlet NSTextField* fecNumberField;
+    IBOutlet NSTextField* crateNumberField;
+    IBOutlet NSTextField* boardIdField;
+    IBOutlet NSButton *setThresCorrButton;
+    IBOutlet NSButton *zeroCorrButton;
 		
-		NSNumberFormatter*		valueFormatter;
+    NSNumberFormatter*		valueFormatter;
 }
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
+- (void) updateWindow;
+- (void) checkGlobalSecurity;
 
 #pragma mark •••Interface Management
+- (void) lockChanged:(NSNotification*)aNotification;
 - (void) commentsChanged:(NSNotification*)aNote;
 - (void) showVoltsChanged:(NSNotification*)aNote;
 - (void) setAllCmosChanged:(NSNotification*)aNote;
@@ -76,6 +82,7 @@
 - (void) boardIdChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) lockAction:(id)sender;
 - (IBAction) showVoltsAction:(id)sender;
 - (IBAction) setAllCmosAction:(id)sender;
 - (IBAction) incCmosRegAction:(id)sender;

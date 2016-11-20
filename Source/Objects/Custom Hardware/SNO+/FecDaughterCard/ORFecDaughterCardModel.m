@@ -40,6 +40,7 @@ NSString* ORDCModelNs20widthChanged			= @"ORDCModelNs20widthChanged";
 NSString* ORDCModelNs20delayChanged			= @"ORDCModelNs20delayChanged";
 NSString* ORDCModelTac0trimChanged			= @"ORDCModelTac0trimChanged";
 NSString* ORDCModelTac1trimChanged			= @"ORDCModelTac1trimChanged";
+NSString* ORDBLock = @"ORDBLock";
 
 @implementation ORFecDaughterCardModel
 
