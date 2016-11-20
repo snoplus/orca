@@ -440,3 +440,4 @@ extern NSString* ORXL3ModelHVCMOSRateLimitChanged;
 extern NSString* ORXL3ModelHVCMOSRateIgnoreChanged;
 extern NSString* ORXL3ModelXl3VltThresholdChanged;
 extern NSString* ORXL3ModelXl3VltThresholdInInitChanged;
+extern NSString* ORXL3Lock;

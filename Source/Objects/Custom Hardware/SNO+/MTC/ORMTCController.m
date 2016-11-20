@@ -475,12 +475,11 @@
 - (void) basicLockChanged:(NSNotification*)aNotification
 {
 
-    //Basic ops
     BOOL locked						= [gSecurity isLocked:ORMTCBasicLock];
     BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORMTCBasicLock];
 
+    //Basic ops
     [basicOpsLockButton setState: locked];
-    
     [autoIncrementCB setEnabled: !lockedOrNotRunningMaintenance];
     [useMemoryMatrix setEnabled: !lockedOrNotRunningMaintenance];
     [repeatDelayField setEnabled: !lockedOrNotRunningMaintenance];

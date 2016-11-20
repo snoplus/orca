@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14F1605" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14B25" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1050" identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
@@ -21,7 +21,6 @@
                 <outlet property="compositeChargeInjMaskField" destination="3895" id="3911"/>
                 <outlet property="compositeChargeRunningIndicator" destination="3884" id="3912"/>
                 <outlet property="compositeDeselectButton" destination="3504" id="3731"/>
-                <outlet property="compositeLockButton" destination="3658" id="3716"/>
                 <outlet property="compositeQuitButton" destination="3735" id="3738"/>
                 <outlet property="compositeQuitRunningIndicator" destination="3734" id="3739"/>
                 <outlet property="compositeResetCrateAndXilinXButton" destination="3840" id="3862"/>
@@ -52,6 +51,7 @@
                 <outlet property="connectionCrateNumberField" destination="3865" id="3876"/>
                 <outlet property="connectionIPAddressField" destination="3922" id="3954"/>
                 <outlet property="connectionIPPortField" destination="3921" id="3955"/>
+                <outlet property="deselectAllSlotMaskButton" destination="3639" id="xvo-H7-fFB"/>
                 <outlet property="deselectCompositeRunningIndicator" destination="3527" id="3538"/>
                 <outlet property="errorTimeOutPU" destination="3924" id="3958"/>
                 <outlet property="hvACurrentReadField" destination="4461" id="4490"/>
@@ -83,6 +83,7 @@
                 <outlet property="hvStopRampButton" destination="4211" id="jdS-vX-rCj"/>
                 <outlet property="hvTargetValueField" destination="4495" id="4500"/>
                 <outlet property="hvTargetValueStepper" destination="4274" id="4501"/>
+                <outlet property="lockButton" destination="3658" id="KSH-qe-jJx"/>
                 <outlet property="monIsPollingCMOSRatesButton" destination="3962" id="4027"/>
                 <outlet property="monIsPollingFECVoltagesButton" destination="3968" id="4028"/>
                 <outlet property="monIsPollingPMTCurrentsButton" destination="3965" id="4030"/>
@@ -112,6 +113,8 @@
                 <outlet property="repeatCountStepper" destination="3404" id="3490"/>
                 <outlet property="repeatDelayField" destination="3403" id="3491"/>
                 <outlet property="repeatDelayStepper" destination="3402" id="3492"/>
+                <outlet property="selectAllSlotMaskButton" destination="3636" id="hKv-KT-Haz"/>
+                <outlet property="selectSlotMaskButton" destination="3642" id="18J-W7-qNC"/>
                 <outlet property="selectedRegisterPU" destination="3426" id="3454"/>
                 <outlet property="tabView" destination="841" id="3668"/>
                 <outlet property="toggleConnectButton" destination="3925" id="3959"/>

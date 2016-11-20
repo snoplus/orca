@@ -1493,7 +1493,7 @@
                                                             <popUpButton verticalHuggingPriority="750" id="i3g-ic-RZW">
                                                                 <rect key="frame" x="294" y="197" width="143" height="26"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <popUpButtonCell key="cell" type="push" title="SNO style" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" inset="2" selectedItem="n0C-Sg-4Ab" id="NBI-Qc-AFN">
+                                                                <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" borderStyle="border" inset="2" id="NBI-Qc-AFN">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="menu"/>
                                                                     <menu key="menu" id="weK-Qe-bwx">
@@ -1511,7 +1511,7 @@
                                                                             <menuItem title="Channel by channel" id="Gae-WF-sRL">
                                                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                                             </menuItem>
-                                                                            <menuItem title="SNO style" state="on" id="n0C-Sg-4Ab"/>
+                                                                            <menuItem title="SNO style" id="n0C-Sg-4Ab"/>
                                                                         </items>
                                                                     </menu>
                                                                 </popUpButtonCell>

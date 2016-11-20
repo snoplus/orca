@@ -47,7 +47,9 @@
 	IBOutlet NSTextField*		writeValueField;
 	IBOutlet NSStepper*		writeValueStepper;
 	//composite
-	IBOutlet NSButton*              compositeLockButton;
+    IBOutlet NSButton *selectAllSlotMaskButton;
+    IBOutlet NSButton *deselectAllSlotMaskButton;
+    IBOutlet NSButton *selectSlotMaskButton;    
 	IBOutlet NSProgressIndicator*	deselectCompositeRunningIndicator;
 	IBOutlet NSButton*              compositeDeselectButton;
 	IBOutlet NSMatrix*              compositeSlotMaskMatrix;
