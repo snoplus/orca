@@ -1172,6 +1172,9 @@ snopGreenColor;
     //[softwareTriggerButton setEnabled: !locked && !runInProgress];
     [runsLockButton setState: locked];
     
+    //Select default standard run if in operator mode
+    if(locked) [model setStandardRunVersion:@"DEFAULT"];
+    
     //Enable or disable fields
     [startSingleECAButton setEnabled:!lockedOrNotRunningMaintenance];
     [ECApatternPopUpButton setEnabled:!lockedOrNotRunningMaintenance];
@@ -1181,9 +1184,7 @@ snopGreenColor;
     [ecaPulserRate setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunThresCurrentValues setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunSaveButton setEnabled:!lockedOrNotRunningMaintenance];
-    [standardRunSaveDefaultsButton setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunLoadButton setEnabled:!lockedOrNotRunningMaintenance];
-    [standardRunLoadDefaultsButton setEnabled:!lockedOrNotRunningMaintenance];
     [runTypeWordMatrix setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunVersionPopupMenu setEnabled:!locked && [standardRunVersionPopupMenu numberOfItems]>0]; //allow to change version when in expert mode
     [timedRunCB setEnabled:!runInProgress];
@@ -1562,29 +1563,10 @@ snopGreenColor;
     
 }
 
-- (IBAction)loadDefaultStandardRunFromDBDefaultAction:(id)sender {
-    
-    NSString *standardRun = [standardRunPopupMenu objectValueOfSelectedItem];
-    NSString *standardRunVer = @"DEFAULT";
-    
-    [model loadStandardRun:standardRun withVersion: standardRunVer];
-    
-}
-
 - (IBAction)saveStandardRunToDBAction:(id)sender {
     
     NSString *standardRun = [standardRunPopupMenu objectValueOfSelectedItem];
     NSString *standardRunVer = [standardRunVersionPopupMenu objectValueOfSelectedItem];
-    
-    [model saveStandardRun:standardRun withVersion:standardRunVer];
-    [self displayThresholdsFromDB];
-    
-}
-
-- (IBAction)saveStandardRunToDBAsDefaultAction:(id)sender {
-    
-    NSString *standardRun = [standardRunPopupMenu objectValueOfSelectedItem];
-    NSString *standardRunVer = @"DEFAULT";
     
     [model saveStandardRun:standardRun withVersion:standardRunVer];
     [self displayThresholdsFromDB];
@@ -1681,9 +1663,6 @@ snopGreenColor;
     
     //If no SR: display null values
     if([model standardRunType] == nil || [[model standardRunType] isEqualToString:@""]){
-        for (int i=0; i<[standardRunThresDefaultValues numberOfRows];i++) {
-            [[standardRunThresDefaultValues cellAtRow:i column:0] setStringValue:@"--"];
-        }
         for (int i=0; i<[standardRunThresStoredValues numberOfRows];i++) {
             [[standardRunThresStoredValues cellAtRow:i column:0] setStringValue:@"--"];
         }
@@ -1707,28 +1686,13 @@ snopGreenColor;
     
     //Fetch DB and display trigger configuration in GUI
     //Query the OrcaDB and get a dictionary with the parameters
-    //DEFAULT
-    NSString *urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/%@/_design/standardRuns/_view/getStandardRuns?startkey=[\"%@\",\"%@\",{}]&endkey=[\"%@\",\"%@\",0]&descending=True&include_docs=True",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort],[model orcaDBName],[model standardRunType],@"DEFAULT", [model standardRunType],@"DEFAULT"];
+    NSString* urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/%@/_design/standardRuns/_view/getStandardRuns?startkey=[\"%@\",\"%@\",{}]&endkey=[\"%@\",\"%@\",0]&descending=True&include_docs=True",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort],[model orcaDBName],[model standardRunType],[model standardRunVersion], [model standardRunType],[model standardRunVersion]];
     NSString* link = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:link] cachePolicy:0 timeoutInterval:2];
     NSURLResponse* response = nil;
     NSError* error = nil;
     NSData* data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
     NSString *ret = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]autorelease];
-    NSDictionary *defaultSettings = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
-    if(error) {
-        NSLogColor([NSColor redColor],@"Couldn't retrieve SR DEFAULT values. Error querying couchDB, please check the connection is correct. Error: \n %@ \n", error);
-        return;
-    }
-    
-    //SR VERSION
-    urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/%@/_design/standardRuns/_view/getStandardRuns?startkey=[\"%@\",\"%@\",{}]&endkey=[\"%@\",\"%@\",0]&descending=True&include_docs=True",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort],[model orcaDBName],[model standardRunType],[model standardRunVersion], [model standardRunType],[model standardRunVersion]];
-    link = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-    request = [NSURLRequest requestWithURL:[NSURL URLWithString:link] cachePolicy:0 timeoutInterval:2];
-    response = nil;
-    error = nil;
-    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-    ret = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]autorelease];
     NSDictionary *versionSettings = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
     if(error) {
         NSLogColor([NSColor redColor],@"Couldn't retrieve SR VERSION values. Error querying couchDB, please check the connection is correct. Error: \n %@ \n", error);
@@ -1738,145 +1702,7 @@ snopGreenColor;
     //Setup format
     NSNumberFormatter *thresholdFormatter = [[[NSNumberFormatter alloc] init] autorelease];;
     [thresholdFormatter setFormat:@"##0.0"];
-
-    //DEFAULTS
-    if([[defaultSettings valueForKey:@"rows"] count] == 0){
-        for (int i=0; i<[standardRunThresDefaultValues numberOfRows];i++) {
-            [[standardRunThresDefaultValues cellAtRow:i column:0] setStringValue:@"--"];
-        }
-        NSLogColor([NSColor redColor],@"Cannot display DEFAULT values. There was some problem with the Standard Run DataBase. \n");
-    } else {
-        int gtmask = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,GtMask"] intValue];
-        //NHIT100HI
-        float mVolts = [mtcModel rawTomVolts:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Hi,Threshold"] floatValue]];
-        float dcOffset  = [mtcModel dbFloatByIndex:kNHit100HiThreshold + kNHitDcOffset_Offset];
-        float mVperNHit = [mtcModel dbFloatByIndex:kNHit100HiThreshold + kmVoltPerNHit_Offset];
-        float nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
-        [[standardRunThresDefaultValues cellAtRow:0 column:0] setFormatter:thresholdFormatter];
-        [[standardRunThresDefaultValues cellAtRow:0 column:0] setFloatValue:nHits];
-        if((gtmask >> 2) & 1){
-            [[standardRunThresDefaultValues cellAtRow:0 column:0] setTextColor:[self snopGreenColor]];
-        } else{
-            [[standardRunThresDefaultValues cellAtRow:0 column:0] setTextColor:[self snopRedColor]];
-        }
-        //NHIT100MED
-        mVolts = [mtcModel rawTomVolts:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Med,Threshold"] floatValue]];
-        dcOffset  = [mtcModel dbFloatByIndex:kNHit100MedThreshold + kNHitDcOffset_Offset];
-        mVperNHit = [mtcModel dbFloatByIndex:kNHit100MedThreshold + kmVoltPerNHit_Offset];
-        nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
-        [[standardRunThresDefaultValues cellAtRow:1 column:0] setFormatter:thresholdFormatter];
-        [[standardRunThresDefaultValues cellAtRow:1 column:0] setFloatValue:nHits];
-        if((gtmask >> 1) & 1){
-            [[standardRunThresDefaultValues cellAtRow:1 column:0] setTextColor:[self snopGreenColor]];
-        } else{
-            [[standardRunThresDefaultValues cellAtRow:1 column:0] setTextColor:[self snopRedColor]];
-        }
-        //NHIT100LO
-        mVolts = [mtcModel rawTomVolts:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Lo,Threshold"] floatValue]];
-        dcOffset  = [mtcModel dbFloatByIndex:kNHit100LoThreshold + kNHitDcOffset_Offset];
-        mVperNHit = [mtcModel dbFloatByIndex:kNHit100LoThreshold + kmVoltPerNHit_Offset];
-        nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
-        [[standardRunThresDefaultValues cellAtRow:2 column:0] setFormatter:thresholdFormatter];
-        [[standardRunThresDefaultValues cellAtRow:2 column:0] setFloatValue:nHits];
-        if((gtmask >> 0) & 1){
-            [[standardRunThresDefaultValues cellAtRow:2 column:0] setTextColor:[self snopGreenColor]];
-        } else{
-            [[standardRunThresDefaultValues cellAtRow:2 column:0] setTextColor:[self snopRedColor]];
-        }
-        //NHIT20
-        mVolts = [mtcModel rawTomVolts:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20,Threshold"] floatValue]];
-        dcOffset  = [mtcModel dbFloatByIndex:kNHit20Threshold + kNHitDcOffset_Offset];
-        mVperNHit = [mtcModel dbFloatByIndex:kNHit20Threshold + kmVoltPerNHit_Offset];
-        nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
-        [[standardRunThresDefaultValues cellAtRow:3 column:0] setFormatter:thresholdFormatter];
-        [[standardRunThresDefaultValues cellAtRow:3 column:0] setFloatValue:nHits];
-        if((gtmask >> 3) & 1){
-            [[standardRunThresDefaultValues cellAtRow:3 column:0] setTextColor:[self snopGreenColor]];
-        } else{
-            [[standardRunThresDefaultValues cellAtRow:3 column:0] setTextColor:[self snopRedColor]];
-        }
-        //NHIT20LO
-        mVolts = [mtcModel rawTomVolts:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20LB,Threshold"] floatValue]];
-        dcOffset  = [mtcModel dbFloatByIndex:kNHit20LBThreshold + kNHitDcOffset_Offset];
-        mVperNHit = [mtcModel dbFloatByIndex:kNHit20LBThreshold + kmVoltPerNHit_Offset];
-        nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
-        [[standardRunThresDefaultValues cellAtRow:4 column:0] setFormatter:thresholdFormatter];
-        [[standardRunThresDefaultValues cellAtRow:4 column:0] setFloatValue:nHits];
-        if((gtmask >> 4) & 1){
-            [[standardRunThresDefaultValues cellAtRow:4 column:0] setTextColor:[self snopGreenColor]];
-        } else{
-            [[standardRunThresDefaultValues cellAtRow:4 column:0] setTextColor:[self snopRedColor]];
-        }
-        //OWLN
-        mVolts = [mtcModel rawTomVolts:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLN,Threshold"] floatValue]];
-        dcOffset  = [mtcModel dbFloatByIndex:kOWLNThreshold + kNHitDcOffset_Offset];
-        mVperNHit = [mtcModel dbFloatByIndex:kOWLNThreshold + kmVoltPerNHit_Offset];
-        nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
-        [[standardRunThresDefaultValues cellAtRow:5 column:0] setFormatter:thresholdFormatter];
-        [[standardRunThresDefaultValues cellAtRow:5 column:0] setFloatValue:nHits];
-        if((gtmask >> 7) & 1){
-            [[standardRunThresDefaultValues cellAtRow:5 column:0] setTextColor:[self snopGreenColor]];
-        } else{
-            [[standardRunThresDefaultValues cellAtRow:5 column:0] setTextColor:[self snopRedColor]];
-        }
-        //ESUMHI
-        mVolts = [mtcModel rawTomVolts:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumHi,Threshold"] floatValue]];
-        [[standardRunThresDefaultValues cellAtRow:6 column:0] setFloatValue:mVolts];
-        [[standardRunThresDefaultValues cellAtRow:6 column:0] setFormatter:thresholdFormatter];
-        if((gtmask >> 6) & 1){
-            [[standardRunThresDefaultValues cellAtRow:6 column:0] setTextColor:[self snopGreenColor]];
-        } else{
-            [[standardRunThresDefaultValues cellAtRow:6 column:0] setTextColor:[self snopRedColor]];
-        }
-        //ESUMLO
-        mVolts = [mtcModel rawTomVolts:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumLow,Threshold"] floatValue]];
-        [[standardRunThresDefaultValues cellAtRow:7 column:0] setFloatValue:mVolts];
-        [[standardRunThresDefaultValues cellAtRow:7 column:0] setFormatter:thresholdFormatter];
-        if((gtmask >> 5) & 1){
-            [[standardRunThresDefaultValues cellAtRow:7 column:0] setTextColor:[self snopGreenColor]];
-        } else{
-            [[standardRunThresDefaultValues cellAtRow:7 column:0] setTextColor:[self snopRedColor]];
-        }
-        //OWLEHI
-        mVolts = [mtcModel rawTomVolts:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLEHi,Threshold"] floatValue]];
-        [[standardRunThresDefaultValues cellAtRow:8 column:0] setFloatValue:mVolts];
-        [[standardRunThresDefaultValues cellAtRow:8 column:0] setFormatter:thresholdFormatter];
-        if((gtmask >> 9) & 1){
-            [[standardRunThresDefaultValues cellAtRow:8 column:0] setTextColor:[self snopGreenColor]];
-        } else{
-            [[standardRunThresDefaultValues cellAtRow:8 column:0] setTextColor:[self snopRedColor]];
-        }
-        //OWLELO
-        mVolts = [mtcModel rawTomVolts:[[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLELo,Threshold"] floatValue]];
-        [[standardRunThresDefaultValues cellAtRow:9 column:0] setFloatValue:mVolts];
-        [[standardRunThresDefaultValues cellAtRow:9 column:0] setFormatter:thresholdFormatter];
-        if((gtmask >> 8) & 1){
-            [[standardRunThresDefaultValues cellAtRow:9 column:0] setTextColor:[self snopGreenColor]];
-        } else{
-            [[standardRunThresDefaultValues cellAtRow:9 column:0] setTextColor:[self snopRedColor]];
-        }
-        //Prescale
-        mVolts = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,Nhit100LoPrescale"] floatValue];
-        [[standardRunThresDefaultValues cellAtRow:10 column:0] setFloatValue:mVolts];
-        [[standardRunThresDefaultValues cellAtRow:10 column:0] setFormatter:thresholdFormatter];
-        if((gtmask >> 11) & 1){
-            [[standardRunThresDefaultValues cellAtRow:10 column:0] setTextColor:[self snopGreenColor]];
-        } else{
-            [[standardRunThresDefaultValues cellAtRow:10 column:0] setTextColor:[self snopRedColor]];
-        }
-        //Pulser
-        mVolts = [[[[[defaultSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,PulserPeriod"] floatValue];
-        [[standardRunThresDefaultValues cellAtRow:11 column:0] setFloatValue:mVolts];
-        [[standardRunThresDefaultValues cellAtRow:11 column:0] setFormatter:thresholdFormatter];
-        if((gtmask >> 10) & 1){
-            [[standardRunThresDefaultValues cellAtRow:11 column:0] setTextColor:[self snopGreenColor]];
-        } else{
-            [[standardRunThresDefaultValues cellAtRow:11 column:0] setTextColor:[self snopRedColor]];
-        }
-
-    }
     
-    //SR VERSION
     if([[versionSettings valueForKey:@"rows"] count] == 0){
         for (int i=0; i<[standardRunThresStoredValues numberOfRows];i++) {
             [[standardRunThresStoredValues cellAtRow:i column:0] setStringValue:@"--"];
@@ -2012,7 +1838,7 @@ snopGreenColor;
         }
     }
     
-    //Display runtype word for test run
+    //Display runtype word
     unsigned long dbruntypeword = [[[[[versionSettings valueForKey:@"rows"]     objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"run_type_word"]  unsignedLongValue];
     for(int ibit=0; ibit<21; ibit++){ //Data quality bits are not stored in the SR
         if((dbruntypeword >> ibit) & 1){
