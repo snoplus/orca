@@ -1751,17 +1751,18 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
     id pw = [[SBCPacketWrapper alloc] init];
 	@try {
 	
+        [socketLock lock]; //begin critical section
+        
         SBC_Packet* blockPacket = [pw sbcPacket];
         [aList SBCPacket:blockPacket];
 		
-		[socketLock lock]; //begin critical section
 		//Do NOT call the combo send:receive method here... we have the locks already in place
 		[self write:socketfd buffer:blockPacket];	//write the packet
 		[self read:socketfd buffer:blockPacket];	//read the response
-		[socketLock unlock]; //end critical section
 		
 		[aList extractData:blockPacket];
-	
+        [socketLock unlock]; //end critical section
+        
 	}
 	@catch (NSException* localException) {
 		[socketLock unlock]; //end critical section
@@ -1826,9 +1827,10 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 				[eCpuCBFillingAlarm postAlarm];
 			}
 			
-			if (throttle > kShrinkThrottleBy && percentBufferFilled > kAmountInBufferThreshold) {
+			if (throttle > 0 && percentBufferFilled > kAmountInBufferThreshold) {
 				/* Let's try diminishing the throttle */
 				throttle -= kShrinkThrottleBy;
+                if(throttle<0) throttle=0;
 			 }
 		}
 		if(runInfo.lostByteCount > 0 ){

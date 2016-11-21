@@ -102,7 +102,7 @@ typedef enum eSBC_ThrottleConsts{
 	float			byteRateSent;
     int				loadMode;
 	unsigned long	throttleCount;
-	unsigned long	throttle;
+    long            throttle;
 	unsigned int	readWriteType;
 	BOOL			doRange;
 	unsigned short	range;
