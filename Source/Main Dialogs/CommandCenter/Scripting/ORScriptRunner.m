@@ -579,7 +579,6 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
                                                                   userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:theLine] forKey:@"LineNum"]];
 			}
 		}
-		[innerPool release];
 		if(stopThread || failed){
 			if(stopThread){
 				NSLogColor([NSColor redColor],@"Script stopped\n");
@@ -588,7 +587,8 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
             reported = YES;
 			break;
 		}
-	}	
+        [innerPool release];
+	}
 	if(failed){
 		NSLogColor([NSColor redColor],@"Run Time Error....Abnormal Exit\n");
 	}
