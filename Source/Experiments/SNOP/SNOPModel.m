@@ -457,45 +457,45 @@ resync;
     [super registerNotificationObservers];
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     
-//    [notifyCenter addObserver : self
-//                     selector : @selector(runInitialization:)
-//                         name : ORRunInitializationNotification
-//                       object : nil];
-//
-//    [notifyCenter addObserver : self
-//                     selector : @selector(runAboutToRollOver:)
-//                         name : ORRunIsAboutToRollOver
-//                       object : nil];
-//
-//    [notifyCenter addObserver : self
-//                     selector : @selector(runAboutToStart:)
-//                         name : ORRunSecondChanceForWait
-//                       object : nil];
-//
-//    [notifyCenter addObserver : self
-//                     selector : @selector(runStarted:)
-//                         name : ORRunStartedNotification
-//                       object : nil];
-//
-//    [notifyCenter addObserver : self
-//                     selector : @selector(runAboutToStop:)
-//                         name : ORRunAboutToStopNotification
-//                       object : nil];
-//
-//    [notifyCenter addObserver : self
-//                     selector : @selector(runStopped:)
-//                         name : ORRunStoppedNotification
-//                       object : nil];
-//
-//    [notifyCenter addObserver : self
-//                     selector : @selector(subRunStarted:)
-//                         name : ORRunStartSubRunNotification
-//                       object : nil];
-//
-//    [notifyCenter addObserver : self
-//                     selector : @selector(subRunEnded:)
-//                         name : ORRunBetweenSubRunsNotification
-//                       object : nil];
+    [notifyCenter addObserver : self
+                     selector : @selector(runInitialization:)
+                         name : ORRunInitializationNotification
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(runAboutToRollOver:)
+                         name : ORRunIsAboutToRollOver
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(runAboutToStart:)
+                         name : ORRunSecondChanceForWait
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(runStarted:)
+                         name : ORRunStartedNotification
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(runAboutToStop:)
+                         name : ORRunAboutToStopNotification
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(runStopped:)
+                         name : ORRunStoppedNotification
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(subRunStarted:)
+                         name : ORRunStartSubRunNotification
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(subRunEnded:)
+                         name : ORRunBetweenSubRunsNotification
+                       object : nil];
 
 }
 
