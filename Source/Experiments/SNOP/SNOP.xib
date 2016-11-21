@@ -55,6 +55,7 @@
                 <outlet property="orcaDBPswd" destination="2684" id="auq-iH-D45"/>
                 <outlet property="orcaDBUser" destination="2685" id="E4e-CV-d2D"/>
                 <outlet property="panicDownButton" destination="zmA-F4-wTd" id="37F-oN-VJj"/>
+                <outlet property="panicDownCrateButton" destination="vcZ-IJ-Cct" id="5Ap-rK-1u4"/>
                 <outlet property="primaryColorAxisLogCB" destination="1149" id="1225"/>
                 <outlet property="primaryRateField" destination="867" id="1227"/>
                 <outlet property="rateLogCB" destination="159" id="164"/>
@@ -2717,6 +2718,104 @@
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
+                                        <matrix verticalHuggingPriority="750" mode="track" allowsEmptySelection="NO" autorecalculatesCellSize="YES" id="vcZ-IJ-Cct">
+                                            <rect key="frame" x="559" y="169" width="124" height="396"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            <size key="cellSize" width="124" height="16"/>
+                                            <size key="intercellSpacing" width="5" height="4"/>
+                                            <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" controlSize="mini" inset="2" id="giJ-Gh-5bp">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="miniSystem"/>
+                                            </buttonCell>
+                                            <cells>
+                                                <column>
+                                                    <buttonCell type="push" title="Panic Down Crate 0" bezelStyle="rounded" alignment="center" controlSize="mini" scrollable="YES" lineBreakMode="clipping" borderStyle="border" inset="2" id="BuV-Vl-Ul5">
+                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                        <font key="font" metaFont="miniSystem"/>
+                                                    </buttonCell>
+                                                    <buttonCell type="push" title="Panic Down Crate 1" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="FzL-Tx-3lR">
+                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                        <font key="font" metaFont="miniSystem"/>
+                                                    </buttonCell>
+                                                    <buttonCell type="push" title="Panic Down Crate 2" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="Jdd-ss-PrS">
+                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                        <font key="font" metaFont="miniSystem"/>
+                                                    </buttonCell>
+                                                    <buttonCell type="push" title="Panic Down Crate 3" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="Q0D-CI-08m">
+                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                        <font key="font" metaFont="miniSystem"/>
+                                                    </buttonCell>
+                                                    <buttonCell type="push" title="Panic Down Crate 4" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="ncm-Oe-De0">
+                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                        <font key="font" metaFont="miniSystem"/>
+                                                    </buttonCell>
+                                                    <buttonCell type="push" title="Panic Down Crate 5" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="n73-bg-5p6">
+                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                        <font key="font" metaFont="miniSystem"/>
+                                                    </buttonCell>
+                                                    <buttonCell type="push" title="Panic Down Crate 6" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="Pp5-gJ-FA2">
+                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                        <font key="font" metaFont="miniSystem"/>
+                                                    </buttonCell>
+                                                    <buttonCell type="push" title="Panic Down Crate 7" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="M3C-cT-6ip">
+                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                        <font key="font" metaFont="miniSystem"/>
+                                                    </buttonCell>
+                                                    <buttonCell type="push" title="Panic Down Crate 8" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="bt3-cm-stT">
+                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                        <font key="font" metaFont="miniSystem"/>
+                                                    </buttonCell>
+                                                    <buttonCell type="push" title="Panic Down Crate 9" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="VVe-UP-7eh">
+                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                        <font key="font" metaFont="miniSystem"/>
+                                                    </buttonCell>
+                                                    <buttonCell type="push" title="Panic Down Crate 10" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="Lf8-9u-6Ug">
+                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                        <font key="font" metaFont="miniSystem"/>
+                                                    </buttonCell>
+                                                    <buttonCell type="push" title="Panic Down Crate 11" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="OEE-ak-xBa">
+                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                        <font key="font" metaFont="miniSystem"/>
+                                                    </buttonCell>
+                                                    <buttonCell type="push" title="Panic Down Crate 12" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="T59-7a-zbo">
+                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                        <font key="font" metaFont="miniSystem"/>
+                                                    </buttonCell>
+                                                    <buttonCell type="push" title="Panic Down Crate 13" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="KJY-96-Luw">
+                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                        <font key="font" metaFont="miniSystem"/>
+                                                    </buttonCell>
+                                                    <buttonCell type="push" title="Panic Down Crate 14" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="1Gp-qf-Hk6">
+                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                        <font key="font" metaFont="miniSystem"/>
+                                                    </buttonCell>
+                                                    <buttonCell type="push" title="Panic Down Crate 15" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="tV6-LU-0Nk">
+                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                        <font key="font" metaFont="miniSystem"/>
+                                                    </buttonCell>
+                                                    <buttonCell type="push" title="Panic Down Crate 16A" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="K1W-nl-SWX">
+                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                        <font key="font" metaFont="miniSystem"/>
+                                                    </buttonCell>
+                                                    <buttonCell type="push" title="Panic Down Crate 16B" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="Qfl-qd-Dye">
+                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                        <font key="font" metaFont="miniSystem"/>
+                                                    </buttonCell>
+                                                    <buttonCell type="push" title="Panic Down Crate 17" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="JjV-Z3-ide">
+                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                        <font key="font" metaFont="miniSystem"/>
+                                                    </buttonCell>
+                                                    <buttonCell type="push" title="Panic Down Crate 18" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="DUk-dx-oYE">
+                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                        <font key="font" metaFont="miniSystem"/>
+                                                    </buttonCell>
+                                                </column>
+                                            </cells>
+                                            <connections>
+                                                <action selector="panicDownSingleCrateAction:" target="-2" id="ycp-aZ-Ev8"/>
+                                            </connections>
+                                        </matrix>
                                     </subviews>
                                 </view>
                             </tabViewItem>

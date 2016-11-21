@@ -64,6 +64,7 @@
 
     //Xl3 Mode
     IBOutlet NSMatrix * globalxl3Mode;
+    IBOutlet NSMatrix *panicDownCrateButton;
     
     //smellie buttons ---------
     IBOutlet NSComboBox *smellieRunFileNameField;
