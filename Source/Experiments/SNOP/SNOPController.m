@@ -712,12 +712,20 @@ snopGreenColor;
 
 - (IBAction) setHighThreholdsAction:(id)sender
 {
-    NSLogColor([NSColor redColor],@"Setting detector to a safe state...\n");
+
+    BOOL cancel = ORRunAlertPanel(@"Setting MTC High Thresholds",@"Is this really what you want?",@"Cancel",@"Yes",nil);
+    if(cancel) return;
+
+    NSLogColor([NSColor redColor],@"Setting MTC high thresholds...\n");
     [model loadHighThresholdRun];
 }
 
 - (IBAction)hvMasterPanicAction:(id)sender
 {
+
+    BOOL cancel = ORRunAlertPanel(@"Panic Down the entire detector",@"Is this really what you want?",@"Cancel",@"Yes",nil);
+    if(cancel) return;
+
     [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
     NSLogColor([NSColor redColor],@"Detector wide panic down started\n");
 }
@@ -846,11 +854,18 @@ snopGreenColor;
 
 - (IBAction)hvMasterTriggersON:(id)sender
 {
+
+    BOOL cancel = ORRunAlertPanel(@"Enabling Channel Triggers",@"Is this really what you want?",@"Cancel",@"Yes",nil);
+    if(cancel) return;
+
     [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersON)];
 }
 
 - (IBAction)hvMasterTriggersOFF:(id)sender
 {
+    BOOL cancel = ORRunAlertPanel(@"Disabling Channel Triggers",@"Is this really what you want?",@"Cancel",@"Yes",nil);
+    if(cancel) return;
+
     [model hvMasterTriggersOFF];
 }
 

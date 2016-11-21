@@ -152,7 +152,7 @@
                                         <button id="aVy-ce-rmA">
                                             <rect key="frame" x="15" y="94" width="333" height="38"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="bevel" title="SET HIGH THRESHOLDS" bezelStyle="regularSquare" imagePosition="overlaps" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Ims-Id-sNe">
+                                            <buttonCell key="cell" type="bevel" title="SET MTC HIGH THRESHOLDS" bezelStyle="regularSquare" imagePosition="overlaps" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Ims-Id-sNe">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" size="14" name="EuphemiaUCAS-Bold"/>
                                             </buttonCell>
