@@ -177,14 +177,8 @@
  If the last query was an insert in a table having a autoindex column, returns the id (autoindexed field) of the last row inserted.
  "*/
 {
+    /// stub
 	unsigned long long num = 0;
-    /* DO SOME STUFF HERE
-	@synchronized(self){
-		if (mConnection) {
-			num = PQTEST_insert_id(mConnection);
-		}
-	}
-*/
     return num;
 }
 
@@ -202,39 +196,25 @@
 
 - (ORPQResult *) listTablesFromDB:(NSString *) dbName 
 {	
+    /// stub
 	ORPQResult* theResult = nil;
-    /* DO SOME STUFF HERE
-	@synchronized(self){
-        if(mConnection){
-            NSString* theQuery   = [NSString stringWithFormat:@"SHOW TABLES FROM %@", dbName];
-            theResult = [self queryString:theQuery];
-        }
-	}*/
     return theResult;
 }
 
 
 - (ORPQResult*)listFieldsFromTable:(NSString *)tableName
 {	
+    /// stub
 	ORPQResult* theResult = nil;
-    /* DO SOME STUFF HERE (something like "SELECT * FROM information_schema.columns WHERE table_schema = 'XXXX' AND table_name = 'YYYY';"
-	@synchronized(self){
-		NSString*  theQuery = [NSString stringWithFormat:@"SHOW COLUMNS FROM %@", tableName];
-		theResult = [self queryString:theQuery];
-	}*/
     return theResult;
 }
 
 
 - (NSString*) clientInfo
 {
+    /// stub
 	NSString* result = nil;
-    /* DO SOME STUFF HERE
-	@synchronized(self){
-		result =  [NSString stringWithCString:PQTEST_get_client_info() encoding:NSISOLatin1StringEncoding];
-	}
-*/
-     return result;
+    return result;
 }
 
 - (NSString *) hostInfo
@@ -242,41 +222,23 @@
  Returns a string giving information on the host of the DB server.
  "*/
 {
+    /// stub
 	NSString* result = nil;
-    /* DO SOME STUFF HERE
-	@synchronized(self){
-		if (mConnection) {
-			result = [NSString stringWithCString:PQTEST_get_host_info(mConnection) encoding:NSISOLatin1StringEncoding];
-		}
-	}
-*/
-     return result;
+    return result;
 }
 
 
 - (NSString *) serverInfo
 {
+    /// stub
  	NSString* result = nil;
-    /* DO SOME STUFF HERE
-	@synchronized(self){
-		if (mConnection) {
-			result = [NSString stringWithCString: PQTEST_get_server_info(mConnection) encoding:NSISOLatin1StringEncoding];
-		}
-	}
-*/
     return result;
 }
 
 - (NSNumber*) protoInfo
 {
+    /// stub
 	NSNumber* result = nil;
-    /* DO SOME STUFF HERE
- 	@synchronized(self){
-		if (mConnection) {
-			result= [NSNumber numberWithUnsignedInt:PQTEST_get_proto_info(mConnection) ];
-		}
-	}
-*/
     return result;
 }
 
@@ -289,27 +251,11 @@
 	}
 	return NO;
 }
- /*
- - (BOOL)dropDBWithName:(NSString *)dbName
- {
- const char	*theDBName = [dbName UTF8String];
- if ((mConnection) && (! PQTEST_drop_db(mConnection, theDBName))) {
- return YES;
- }
- return NO;
- }
- */
 
 - (BOOL) killProcess:(unsigned long) pid
 {	
-    int theErrorCode = 0; 
-/* DO SOME STUFF HERE
-	@synchronized(self){
-        if(mConnection){
-            theErrorCode = PQTEST_kill(mConnection, pid);
-        }
-	}
-*/
+    /// stub
+    int theErrorCode = 0;
     return (theErrorCode) ? NO : YES;
 }
 @end

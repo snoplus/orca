@@ -35,7 +35,6 @@
 - (NSString*)  serverInfo;
 - (NSNumber*)  protoInfo;
 - (BOOL)createDBWithName:(NSString *)dbName;
-//- (BOOL)dropDBWithName:(NSString *)dbName;
 - (BOOL) killProcess:(unsigned long) pid;
 @end
 

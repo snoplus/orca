@@ -110,7 +110,7 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
 
 - (void) awakeAfterDocumentLoaded
 {
-
+    /// stub
 }
 - (BOOL) solitaryObject
 {
@@ -311,14 +311,17 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
 
 - (void) createDatabase
 {
+    /// stub
 }
 
 - (void) dropAllTables
 {
+    /// stub
 }
 
 - (void) removeEntry
 {
+    /// stub
 }
 
 
@@ -359,7 +362,6 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
 	} 
 	
 	if([pqConnection connectToHost:hostName userName:userName passWord:password dataBase:dataBaseName]){
-//		[self addMachineName];
 	}
 	else {
 		[self disconnectSql];
@@ -390,7 +392,6 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
 
 - (void) logQueryException:(NSException*)e
 {
-	//assert(![NSThread isMainThread]);
 	NSLogError([e reason],@"SQL",@"Query Problem",nil);
 	[pqConnection release];
 	pqConnection = nil;
