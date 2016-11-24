@@ -1618,6 +1618,7 @@ snopGreenColor;
     NSString *standardRunVer = [standardRunVersionPopupMenu objectValueOfSelectedItem];
     
     [model loadStandardRun:standardRun withVersion: standardRunVer];
+    [model loadSettingsInHW];
     
 }
 
