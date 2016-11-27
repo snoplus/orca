@@ -44,14 +44,18 @@
 - (void) registerNotificationObservers
 {
 	[super registerNotificationObservers];
-    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];   
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
 
     [notifyCenter addObserver : self
 					 selector : @selector(slotChanged:)
 						 name : ORSNOCardSlotChanged
 					   object : model];
-}
 
+    [notifyCenter addObserver : self
+					 selector : @selector(updateButtons:)
+						 name : @"ORXL3ModelStateChanged"
+					   object : [model adapter]];
+}
 
 - (void) updateWindow
 {
@@ -67,6 +71,23 @@
 	[regBaseAddressField setIntValue:[model registerBaseAddress]];
 	[iPBaseAddressField setStringValue:[model iPAddress]];
 	[crateNumberField setIntValue:[model crateNumber]];
+}
+
+- (void) updateButtons: (NSNotification *) aNote
+{
+    NSDictionary *userInfo = [aNote userInfo];
+
+    if ([[userInfo objectForKey:@"initialized"] intValue]) {
+        /* The Xilinx has been loaded, so we need to enable the load
+         * hardware button and disable the reset crate button. */
+        [loadHardwareButton setEnabled:TRUE];
+        [resetCrateButton setEnabled:FALSE];
+    } else {
+        /* The Xilinx hasn't been loaded, so we enable the reset crate
+         * button and disable the load hardware button. */
+        [loadHardwareButton setEnabled:FALSE];
+        [resetCrateButton setEnabled:TRUE];
+    }
 }
 
 - (void) setModel:(id)aModel

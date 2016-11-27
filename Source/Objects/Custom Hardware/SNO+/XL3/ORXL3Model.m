@@ -180,6 +180,17 @@ snotDb = _snotDb;
                      selector : @selector(readHVStatus)
                          name : ORSNOPRequestHVStatus
                        object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(connectionStateChanged)
+                         name : XL3_LinkConnectStateChanged
+                       object : xl3Link];
+}
+
+- (void) connectionStateChanged
+{
+    /* If we just connected, find out if Xilinx has been loaded or not. */
+    if ([xl3Link isConnected]) [self updateXl3Mode];
 }
 
 - (int) initAtRunStart
@@ -1650,11 +1661,11 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (int) updateXl3Mode
 {
-    /* Update the model with the current XL3 mode. */
+    /* Update the model with the current XL3 state. */
     char payload[XL3_PAYLOAD_SIZE];
     memset(payload, 0, XL3_PAYLOAD_SIZE);
     
-    CheckXL3StateResults* result = (CheckXL3StateResults*) payload;
+    CheckXL3StateResults* results = (CheckXL3StateResults*) payload;
     
     @try {
         [[self xl3Link] sendCommand:CHECK_XL3_STATE_ID withPayload:payload expectResponse:YES];
@@ -1664,8 +1675,19 @@ void SwapLongBlock(void* p, int32_t n)
         return -1;
     }
 
+    results->mode = ntohl(results->mode);
+    results->debuggingMode = ntohl(results->debuggingMode);
+    results->dataAvailMask = ntohl(results->dataAvailMask);
+    results->xl3Clock = ntohl(results->xl3Clock);
+    results->initialized = ntohl(results->initialized);
+
+    NSDictionary *userInfo = [NSDictionary dictionaryWithObject:
+        [NSNumber numberWithInt:results->initialized] forKey:@"initialized"];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORXL3ModelStateChanged" object:self userInfo:userInfo];
+
     [[self undoManager] disableUndoRegistration];
-    [self setXl3Mode: ntohl(result->mode)];
+    [self setXl3Mode: results->mode];
     [[self undoManager] enableUndoRegistration];
 
     return 0;
@@ -1794,6 +1816,10 @@ void SwapLongBlock(void* p, int32_t n)
     }
 
     [self checkCrateConfig:results];
+
+    /* Need to update the buttons on the GUI to disable the reset crate button
+     * and enable the load hardware button. */
+    [self updateXl3Mode];
 }
 
 - (void) initCrateAsync: (int) xilinxLoad shiftRegOnly: (uint32_t) shiftRegOnly slotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target

@@ -44,6 +44,7 @@
 #pragma mark •••Interface Management
 - (void) slotChanged:(NSNotification*)aNote;
 - (void) setModel:(id)aModel;
+- (void) updateButtons:(NSNotification *) aNote;
 
 #pragma mark •••Actions
 - (IBAction) incCrateAction:(id)sender;

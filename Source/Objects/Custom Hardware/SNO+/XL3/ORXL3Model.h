@@ -233,6 +233,7 @@ enum {
 - (void) awakeAfterDocumentLoaded;
 
 - (void) registerNotificationObservers;
+- (void) connectionStateChanged;
 - (int) initAtRunStart;
 
 #pragma mark •••Accessors
