@@ -285,7 +285,7 @@ enum {
 - (void) synthesizeFECIntoBundle:(MB*)aBundle forSlot:(unsigned short)aSlot;
 - (ORCouchDB*) debugDBRef;
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
-- (void) ecalToOrca;
+- (void) fetchECALSettings;
 - (void) ecalToOrcaDocumentsReceived;
 - (void) parseEcalDocument:(NSDictionary*)aResult;
 - (void) updateUIFromEcalBundle:(NSDictionary*)aBundle slot:(unsigned int)aSlot;
@@ -308,6 +308,8 @@ enum {
 
 - (int) updateXl3Mode;
 - (int) setSequencerMask: (uint32_t) mask forSlot: (int) slot;
+- (void) resetCrate;
+- (void) resetCrateAsync;
 - (void) initCrate: (int) xilinxLoad;
 - (void) initCrateDone: (CrateInitResults *)r;
 - (void) loadHardware;
@@ -317,10 +319,9 @@ enum {
 - (void) initCrateAsyncThread: (NSDictionary *) args;
 - (void) initCrate: (MB *) mbs xilinxLoad: (int) xilinxLoad shiftRegOnly: (uint32_t) shiftRegOnly slotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target;
 - (int) initCrate: (MB *) mbs xilinxLoad: (int) xilinxLoad shiftRegOnly: (uint32_t) shiftRegOnly slotMask: (uint32_t) slotMask results: (CrateInitResults *) results;
-- (void) checkCrateConfig: (BuildCrateConfigResults *)r;
+- (void) checkCrateConfig: (ResetCrateResults *)r;
 
 - (uint32_t) getSlotsPresent;
-- (void) orcaToHw;
 
 #pragma mark •••Basic Ops
 - (void) readBasicOps;

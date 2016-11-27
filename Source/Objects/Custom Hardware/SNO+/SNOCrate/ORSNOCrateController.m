@@ -47,25 +47,9 @@
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];   
 
     [notifyCenter addObserver : self
-                     selector : @selector(powerFailed:)
-                         name : @"VmePowerFailedNotification"
-                       object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(powerRestored:)
-                         name : @"VmePowerRestoredNotification"
-                       object : nil];
-
-    [notifyCenter addObserver : self
 					 selector : @selector(slotChanged:)
 						 name : ORSNOCardSlotChanged
 					   object : model];
-
-    [notifyCenter addObserver : self
-					 selector : @selector(xilinxLoadChanged:)
-						 name : SBC_LinkJobStatus
-					   object : nil];
-	
 }
 
 
@@ -95,37 +79,6 @@
 	[crateNumberField setIntValue:[model crateNumber]];
 }
 
-- (void) xilinxLoadChanged:(NSNotification*)aNote
-{
-	if(![model adapterIsXL3] && [aNote object] == [model adapter]){
-		ORSBCLinkJobStatus* jobStatus = [[aNote userInfo] objectForKey:@"jobStatus"];
-		if([jobStatus running]){
-			[xilinixStatusField setStringValue:@"Loading"];
-			[xilinixLoadProgress startAnimation:self];
-			[xilinixLoadProgress setDoubleValue:[jobStatus progress]];
-		}
-		else {
-			if([jobStatus finalStatus]) {
-				[xilinixStatusField setStringValue:@""];
-				[model initCrate:NO phase:1];
-			}
-			else{
-				[xilinixStatusField setStringValue:@"FAILED"];
-				NSLog(@"jobStatus screwed becouse running: %d, finalstatus: %d, message: %@\n", [jobStatus running], [jobStatus finalStatus], [jobStatus message]);
-			}
-			[xilinixLoadProgress setDoubleValue:0];
-			[xilinixLoadProgress stopAnimation:self];
-		}
-		//[probeButton setEnabled:![jobStatus running]];
-		[autoInitButton setEnabled:![jobStatus running]];
-		[initNoXilinxButton setEnabled:![jobStatus running]];
-		[initXilinxButton setEnabled:![jobStatus running]];
-	}
-	else {
-		NSLog(@"ORSNOCrateCongtroller xilinxLoadChanged error: not available for XL3\n");
-	}
-}
-
 #pragma mark •••Actions
 - (IBAction) incCrateAction:(id)sender
 {
@@ -137,50 +90,24 @@
 	[self decModelSortedBy:@selector(crateNumberCompare:)];
 }
 
-- (IBAction) autoInit:(id)sender
+- (IBAction) resetCrateAction:(id)sender
 {
 	@try {
-		[model setAutoInit:YES];
-		[model initCrate:YES phase:0];
-	}
-	@catch (NSException* localException) {
-		ORRunAlertPanel([localException name],@"Crate AutoInit Failed",@"OK",nil,nil,localException);
-		NSLog(@"AutoInit of Crate (%d) failed.\n",[model crateNumber]);
+		[model resetCrate];
+	} @catch (NSException* localException) {
+		NSLogColor([NSColor redColor], @"Crate %d reset failed.\n",
+                   [model crateNumber]);
 	}
 }
 
-- (IBAction) initXilinx:(id)sender
+- (IBAction) fetchECALSettingsAction:(id)sender
 {
-	@try {
-		[model setAutoInit:NO];
-		[model initCrate:YES phase:0];
-	}
-	@catch (NSException* localException) {
-		ORRunAlertPanel([localException name],@"Crate Init Xilinx Failed",@"OK",nil,nil,localException);
-		NSLog(@"Init Xilinx of Crate (%d) failed.\n",[model crateNumber]);
-	}
+    [model fetchECALSettings];
 }
 
-- (IBAction) initNoXilinx:(id)sender
+- (IBAction) loadHardwareAction:(id)sender
 {
-	@try {
-		[model setAutoInit:NO];
-		[model initCrate:NO phase:0];
-	}
-	@catch (NSException* localException) {
-		ORRunAlertPanel([localException name],@"Crate Init No Xilinx Failed",@"OK",nil,nil,localException);
-		NSLog(@"Init No Xilinx of Crate (%d) failed.\n",[model crateNumber]);
-	}
-}
-
-- (IBAction) ecalToOrcaAction:(id)sender
-{
-    [model ecalToOrca];
-}
-
-- (IBAction) orcaToHwAction:(id)sender
-{
-    [model orcaToHw];
+    [model loadHardware];
 }
 
 @end

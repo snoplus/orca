@@ -1739,6 +1739,63 @@ void SwapLongBlock(void* p, int32_t n)
          withCallback:callback target:target];
 }
 
+- (void) resetCrateAsync
+{
+    /* Reset the crate in a new thread. */
+    if (![[self xl3Link] isConnected]) {
+        NSLogColor([NSColor redColor], @"xl3 %02d is not connected!\n",
+                    [self crateNumber]);
+        return;
+    }
+    
+    [NSThread detachNewThreadSelector:@selector(resetCrate)
+        toTarget:self withObject:nil];
+}
+
+- (void) resetCrate
+{
+    char payload[XL3_PAYLOAD_SIZE];
+    ResetCrateArgs *args;
+    ResetCrateResults *results;
+    int i, j;
+
+    memset(payload, 0, XL3_PAYLOAD_SIZE);
+    args = (ResetCrateArgs *) payload;
+
+    /* Set xilFile to 1 to load normal xilinx file. Any other number will load
+     * charge injection xilinx file. */
+    args->xilFile = htonl(1);
+
+    @try {
+        [[self xl3Link] sendCommand:RESET_CRATE_ID withPayload:payload expectResponse:YES];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor], @"Crate %02d reset failed. error: %@ reason: %@\n", [self crateNumber], [e name], [e reason]);
+    }
+
+    results = (ResetCrateResults *) payload;
+
+    /* Swap back to native byte order. */
+    results->errors = ntohl(results->errors);
+
+    if (results->errors) {
+        NSLogColor([NSColor redColor],
+                   @"crate reset failed with errors for crate %02d.\n",
+                   [self crateNumber]);
+    }
+
+    results->fecPresent = ntohl(results->fecPresent);
+
+    for (i = 0; i < 16; i++) {
+        results->hwareVals[i].mbID = ntohl(results->hwareVals[i].mbID);
+        results->hwareVals[i].pmticID = ntohl(results->hwareVals[i].pmticID);
+        for (j = 0; j < 4; j++) {
+            results->hwareVals[i].dbID[j] = ntohl(results->hwareVals[i].dbID[j]);
+        }
+    }
+
+    [self checkCrateConfig:results];
+}
+
 - (void) initCrateAsync: (int) xilinxLoad shiftRegOnly: (uint32_t) shiftRegOnly slotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target
 {
     /* Initialize the crate in a separate thread and call the selector
@@ -1970,15 +2027,13 @@ err:
         }
     }
 
-    [self checkCrateConfig: (BuildCrateConfigResults *)r];
-
     // update XL3 alarm levels on safe init
     if ([self isXl3VltThresholdInInit]) [self setVltThreshold];
 
     free(r);
 }
 
-- (void) checkCrateConfig: (BuildCrateConfigResults *)r
+- (void) checkCrateConfig: (ResetCrateResults *)r
 {
     int slot, i;
     ORFec32Model *fec;
@@ -2020,7 +2075,7 @@ err:
     }
 }
 
-- (void) ecalToOrca
+- (void) fetchECALSettings
 {
     unsigned short slot;
     ORCouchDB *couch;
@@ -2283,11 +2338,6 @@ err:
 			NSLog(@"DebugDB %@ %@\n",[[self xl3Link] crateName], aResult);
 		}
 	}
-}
-
-- (void) orcaToHw
-{
-    [self loadHardware];
 }
 
 - (BOOL) isRelayClosedForSlot:(unsigned int)slot pc:(unsigned int)aPC
