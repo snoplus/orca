@@ -309,22 +309,6 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
 	}
 }
 
-- (void) createDatabase
-{
-    /// stub
-}
-
-- (void) dropAllTables
-{
-    /// stub
-}
-
-- (void) removeEntry
-{
-    /// stub
-}
-
-
 #pragma mark ***Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {    

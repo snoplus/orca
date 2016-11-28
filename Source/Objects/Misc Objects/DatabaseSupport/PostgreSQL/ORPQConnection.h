@@ -25,17 +25,6 @@
 - (BOOL) checkConnection;
 - (NSString *) quoteObject:(id) theObject;
 - (ORPQResult*) queryString:(NSString *) query;
-- (unsigned long long) insertId;
-- (ORPQResult *)listDBs;
-- (ORPQResult*) listTables;
-- (ORPQResult*) listTablesFromDB:(NSString *) dbName;
-- (ORPQResult*) listFieldsFromTable:(NSString *)tableName;
-- (NSString*)  clientInfo;
-- (NSString*)  hostInfo;
-- (NSString*)  serverInfo;
-- (NSNumber*)  protoInfo;
-- (BOOL)createDBWithName:(NSString *)dbName;
-- (BOOL) killProcess:(unsigned long) pid;
 @end
 
 //a thin wrapper around NSOperationQueue to make a shared queue for Sql access

@@ -112,11 +112,6 @@
 - (BOOL) connected;
 - (void) disconnectSql;
 
-#pragma mark ***Database setup
-- (void) createDatabase;
-- (void) removeEntry;
-- (void) dropAllTables;
-
 @end
 
 extern NSString* ORPQModelStealthModeChanged;

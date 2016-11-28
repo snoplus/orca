@@ -63,37 +63,6 @@ NSDate* MCPYear0000;
     return mNumOfFields = 0;
 }
 
-- (id) fetchRowAsType:(MCPReturnType) aType
-{
-    /// stub
-    return nil;
-}
-
-
-- (NSArray *) fetchRowAsArray
-{
-    NSMutableArray		*theArray = [self fetchRowAsType:MCPTypeArray];
-    if (theArray) {
-        return [NSArray arrayWithArray:theArray];
-    }
-    else {
-        return nil;
-    }
-}
-
-
-- (NSDictionary *) fetchRowAsDictionary
-{
-    NSMutableDictionary		*theDict = [self fetchRowAsType:MCPTypeDictionary];
-    if (theDict) {
-        return [NSDictionary dictionaryWithDictionary:theDict];
-    }
-    else {
-        return nil;
-    }
-}
-
-
 - (NSArray *) fetchFieldsName
 {
     unsigned int	theNumFields;

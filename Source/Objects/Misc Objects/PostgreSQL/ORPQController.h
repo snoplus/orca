@@ -31,7 +31,6 @@
     IBOutlet NSButton*    sqlLockButton;
     IBOutlet NSButton*    connectionButton;
     IBOutlet ORValueBarGroupView*  queueValueBar;
-	IBOutlet NSButton*    dropAllTablesButton;
 
 	double queueCount;
 }
@@ -56,12 +55,4 @@
 - (IBAction) databaseNameAction:(id)sender;
 - (IBAction) sqlLockAction:(id)sender;
 - (IBAction) connectionAction:(id)sender;
-- (IBAction) createAction:(id)sender;
-- (IBAction) removeEntryAction:(id)sender;
-- (IBAction) dropAllTablesAction:(id)sender;
-
-#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-- (void) createActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (void) dropActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-#endif
 @end

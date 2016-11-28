@@ -10,7 +10,6 @@
                 <outlet property="connectionButton" destination="40" id="45"/>
                 <outlet property="connectionValidField" destination="60" id="71"/>
                 <outlet property="dataBaseNameField" destination="27" id="34"/>
-                <outlet property="dropAllTablesButton" destination="115" id="148"/>
                 <outlet property="hostNameField" destination="21" id="31"/>
                 <outlet property="passwordField" destination="25" id="33"/>
                 <outlet property="queueValueBar" destination="150" id="152"/>
@@ -187,44 +186,11 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <button toolTip="Deletes and reloads this machine's entry in the DB. This is a benign operation." verticalHuggingPriority="750" id="115">
-                                            <rect key="frame" x="197" y="68" width="124" height="28"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <buttonCell key="cell" type="push" title="Drop All Tables..." bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="121">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="dropAllTablesAction:" target="-2" id="149"/>
-                                            </connections>
-                                        </button>
                                         <imageView id="137">
                                             <rect key="frame" x="12" y="124" width="91" height="73"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="PostgreSQL" id="138"/>
                                         </imageView>
-                                        <button verticalHuggingPriority="750" id="139">
-                                            <rect key="frame" x="197" y="152" width="124" height="28"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <buttonCell key="cell" type="push" title="Create Database..." bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="142">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="createAction:" target="-2" id="144"/>
-                                            </connections>
-                                        </button>
-                                        <button toolTip="Deletes and reloads this machine's entry in the DB. This is a benign operation." verticalHuggingPriority="750" id="140">
-                                            <rect key="frame" x="197" y="109" width="124" height="28"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <buttonCell key="cell" type="push" title="Force Resync" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="141">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="removeEntryAction:" target="-2" id="143"/>
-                                            </connections>
-                                        </button>
                                         <customView id="150" customClass="ORValueBarGroupView">
                                             <rect key="frame" x="24" y="16" width="351" height="29"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
