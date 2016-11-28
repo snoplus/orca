@@ -43,6 +43,7 @@
 - (void) dealloc
 {
     [hvTableView setDataSource:nil];
+    [hvTableView setDelegate:nil];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[super dealloc];
 }
