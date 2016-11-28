@@ -66,7 +66,7 @@ NSString* ORSerialPortDataReceived = @"ORSerialPortDataReceived";
 - (void)dealloc;
 {
 	if (fileDescriptor != -1) [self close];
-	
+    [self setDelegate:nil];
 	[countReadInBackgroundThreadsLock release];
 	[stopReadInBackgroundLock release];
 	[readLock release];
@@ -96,15 +96,9 @@ NSString* ORSerialPortDataReceived = @"ORSerialPortDataReceived";
 
 - (void)setDelegate:(id)newDelegate
 {
-	id old = nil;
-	
-	if (newDelegate != delegate) {
-		old = delegate;
-		delegate = [newDelegate retain];
-		[old release];
-		//delegateHandlesReadInBackground = [delegate respondsToSelector:@selector(serialPortReadData:)];
-		delegateHandlesWriteInBackground = [delegate respondsToSelector:@selector(serialPortWriteProgress:)];
-	}
+    delegate = newDelegate;
+    //delegateHandlesReadInBackground = [delegate respondsToSelector:@selector(serialPortReadData:)];
+    delegateHandlesWriteInBackground = [delegate respondsToSelector:@selector(serialPortWriteProgress:)];
 }
 
 
