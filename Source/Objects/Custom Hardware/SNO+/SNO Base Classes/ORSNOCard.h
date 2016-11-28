@@ -30,9 +30,14 @@
 - (NSString*) cardSlotChangedNotification;
 - (Class)	guardianClass;
 - (int) tagBase;
+- (int) stationNumber;
+- (NSString*) fullID;
+- (void) guardian:(id)aGuardian positionConnectorsForCard:(id)aCard;
+- (void) guardianRemovingDisplayOfConnectors:(id)aGuardian;
+- (void) guardianAssumingDisplayOfConnectors:(id)aGuardian;
+- (void) positionConnector:(ORConnector*)aConnector;
 - (NSString*) boardID;
 - (void) setBoardID:(NSString*)anId;
-- (int) stationNumber;
 
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder;

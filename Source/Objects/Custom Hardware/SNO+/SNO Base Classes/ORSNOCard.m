@@ -79,7 +79,6 @@ NSString* ORSNOCardBoardIDChanged 	= @"ORSNOCardBoardIDChanged";
 {
 }
 
-#pragma mark •••Accessors
 - (NSString*) boardID
 {
 	if(!boardID)return @"0000";
