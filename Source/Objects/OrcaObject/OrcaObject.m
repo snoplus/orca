@@ -605,6 +605,7 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 					   atIndex:1] setTarget:self];
 	[menu setDelegate:self];
     [NSMenu popUpContextMenu:menu withEvent:event forView:aView];
+    [menu release];
 }
 
 - (BOOL) validateMenuItem:(NSMenuItem *)anItem
