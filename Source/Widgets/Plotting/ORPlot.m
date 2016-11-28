@@ -40,6 +40,7 @@
 
 - (void) dealloc
 {
+    [self setDataSource:nil]; //remove any possiblity of a plot redraw after object dealloc'ed
 	[attributes release];
 	[symbolNormal release];
 	[symbolLight release];
