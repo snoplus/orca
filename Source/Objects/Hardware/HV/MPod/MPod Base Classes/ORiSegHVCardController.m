@@ -42,6 +42,7 @@
 @implementation ORiSegHVCardController
 - (void) dealloc
 {
+    [hvTableView setDataSource:nil];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[super dealloc];
 }
