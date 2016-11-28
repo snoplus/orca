@@ -122,6 +122,7 @@
 
 -(void)dealloc 
 {
+    delegate = nil;
 	[logFileHandle release];
 	[functionTable release];
 	[symbolTable release];
