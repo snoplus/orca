@@ -72,7 +72,10 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
     }
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     
-    if (delegate)[[NSNotificationCenter defaultCenter] removeObserver:delegate name:nil object:self];
+    if (delegate){
+        [[NSNotificationCenter defaultCenter] removeObserver:delegate name:nil object:self];
+        delegate = nil;
+    }
     
     [extraView removeFromSuperview];
     [view removeFromSuperview];
