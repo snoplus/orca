@@ -35,6 +35,7 @@
 #import "ORHWWizSelection.h"
 #import "ORHWWizParam.h"
 #import "ORHWWizardController.h"
+#import "ORPQModel.h"
 
 //#define VERIFY_CMOS_SHIFT_REGISTER	// uncomment this to verify CMOS shift register loads - PH 09/17/99
 
@@ -65,6 +66,10 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
 // mask for crates that need updating after Hardware Wizard action
 static unsigned long crateInitMask; // crates that need to be initialized
 static unsigned long cratePedMask;  // crates that need their pedestals set
+
+static int              sPmthvState = 0; // (0=not loaded, 1=loading, 2=loaded)
+static NSMutableData*   sPmthvData = nil;
+static NSAlert *        sReadingHvdbAlert = nil;
 
 @interface ORFec32Model (private)
 - (ORCommandList*) cmosShiftLoadAndClock:(unsigned short) registerAddress cmosRegItem:(unsigned short) cmosRegItem bitMaskStart:(short) bit_mask_start;
@@ -272,7 +277,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
 - (void) setPedEnabledMask:(unsigned long) aMask
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setPedEnabledMask:pedEnabledMask];
-    //NSLog(@"FEC (%d,%d), mask 0x%08x.\n", [self crateNumber], [self stationNumber], aMask);
+    //NSLog(@"FEC (%d,%d), mask 0x%08x\n", [self crateNumber], [self stationNumber], aMask);
     pedEnabledMask = aMask;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORFecPedEnabledMaskChanged object:self];
 }
@@ -613,7 +618,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
 
     if (config->mbID == 0) {
         NSLogColor([NSColor redColor],
-            @"crate %02d slot %02d is not plugged in according to XL3.",
+            @"crate %02d slot %02d is not plugged in according to XL3\n",
             [self crateNumber], [self stationNumber]);
         return;
     }
@@ -885,7 +890,110 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
                        object : nil];
 }
 
--(void) hwWizardActionBegin:(NSNotification*)note
+- (void) _continueHWWizard:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+    if (returnCode == NSAlertDefaultReturn) {
+        sPmthvState = 0;
+        NSLog(@"Hardware Wizard action cancelled.\n");
+    } else {
+        [self _continueHWWizard];
+    }
+}
+
+- (void) _continueHWWizard
+{
+    // all done loading database, so we can continue with our hwWizard execution now
+    if (hwWizard && [hwWizard respondsToSelector:@selector(continueExecuteControlStruct)]) {
+        [hwWizard performSelector:@selector(continueExecuteControlStruct)];
+    } else {
+        NSLog(@"Error calling continueExecuteControlStruct\n");
+    }
+}
+
+// continue HWWizard execution after reading pmthv database
+- (void) _pmthvCallback:(NSMutableData*)data
+{
+    sPmthvState = 2;
+
+    if (sReadingHvdbAlert) {
+        NSWindow *hwWindow = [hwWizard performSelector:@selector(window)];
+        [hwWindow endSheet:[hwWindow attachedSheet] returnCode:NSAlertSecondButtonReturn];
+        //[NSApp endSheet:[sReadingHvdbAlert window]];
+        sReadingHvdbAlert = nil;
+    }
+
+    NSString *s = nil;
+    NSString *m = nil;
+    NSString *w = nil;
+
+    if (data) {
+        [sPmthvData release];
+        sPmthvData = [data retain];
+        NSLog(@"Loaded pmthv database\n");
+        [self _continueHWWizard];
+    } else if (sPmthvData) {
+        NSLog(@"Error reloading pmthv database\n");
+        s = [NSString stringWithFormat:@"Error reloading pmthv database!\n\nContinue with stale data?"];
+        m = [NSString stringWithFormat:@"This should be OK as long as the detector has not changed"];
+        w = [NSString stringWithFormat:@"Running Hardware Wizard with stale database!\n"];
+    } else {
+        s = [NSString stringWithFormat:@"Error loading pmthv database!\n\nContinue anyway?"];
+        m = [NSString stringWithFormat:@"This runs the risk of enabling channels which have HV disabled!"];
+        w = [NSString stringWithFormat:@"Running Hardware Wizard with no PMT database!\n"];
+    }
+    if (s) {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+        [alert setMessageText:s];
+        [alert setInformativeText:m];
+        [alert addButtonWithTitle:@"Cancel"];
+        [alert addButtonWithTitle:@"OK, Continue"];
+        [alert setAlertStyle:NSWarningAlertStyle];
+        [alert beginSheetModalForWindow:[hwWizard performSelector:@selector(window)] completionHandler:^(NSModalResponse result){
+            if (result == NSAlertSecondButtonReturn) {
+                NSLog(w);
+                [self performSelector:@selector(_continueHWWizard) withObject:nil afterDelay:.1];
+            } else {
+                sPmthvState = 0;
+                NSLog(@"Hardware Wizard action cancelled.\n");
+            }
+        }];
+#else
+        NSBeginAlertSheet(s,
+                          @"Cancel",
+                          @"OK, Continue",
+                          nil,[hwWizard window],
+                          self,
+                          @selector(_continueHWWizard:returnCode:contextInfo:),
+                          nil,
+                          nil,m);
+#endif
+    }
+}
+
+- (void) hwWizardWaitingForDatabase
+{
+    if (sPmthvState == 1) {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+        NSString* s = [NSString stringWithFormat:@"Reading PMT database..."];
+        sReadingHvdbAlert = [[[NSAlert alloc] init] autorelease];
+        [sReadingHvdbAlert setMessageText:s];
+        [sReadingHvdbAlert addButtonWithTitle:@"Cancel"];
+        [sReadingHvdbAlert setAlertStyle:NSInformationalAlertStyle];
+        [sReadingHvdbAlert beginSheetModalForWindow:[hwWizard performSelector:@selector(window)] completionHandler:^(NSModalResponse result){
+            if (result == NSAlertFirstButtonReturn) {
+                // cancel any queued database operations
+                [[ORPQModel getCurrent] cancelDbQueries];
+                sReadingHvdbAlert = nil;
+                // continue executing HWWizard without PMT database
+                [self _pmthvCallback:nil];
+            }
+        }];
+#endif
+    }
+}
+
+- (void) hwWizardActionBegin:(NSNotification*)note
 {
     startSeqDisabledMask          = seqDisabledMask;
     startPedEnabledMask           = pedEnabledMask;
@@ -895,11 +1003,40 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
     cardChangedFlag = false;
     crateInitMask = 0;
     cratePedMask  = 0;
+
+    // interrupt hardwardWizard execution to allow time to load pmtdb if necessary
+    if (sPmthvState == 0 && [note object] && [[note object] respondsToSelector:@selector(notOkToContinue)]) {
+        sPmthvState = 1;
+        hwWizard = [note object];
+        // (we will continue after our pmthv database is loaded)
+        [hwWizard performSelector:@selector(notOkToContinue)];
+        [[ORPQModel getCurrent] pmtdbQuery:@"pmthv" object:self selector:@selector(_pmthvCallback:)];
+        // post a modal dialog after 0.1 sec if the database operation hasn't completed yet
+        [self performSelector:@selector(hwWizardWaitingForDatabase) withObject:nil afterDelay:.5];
+    }
 }
 
--(void) hwWizardActionEnd:(NSNotification*)note
+- (void) hwWizardActionEnd:(NSNotification*)note
 {
     [[self undoManager] disableUndoRegistration];
+
+    // get mask of PMT's with HV disabled
+    if (sPmthvData && [self stationNumber]<kSnoCardsPerCrate && [self crateNumber]<kSnoCrates) {
+        int32_t *pmthv = (int32_t *)[sPmthvData mutableBytes] + ([self crateNumber] * kSnoCardsPerCrate + [self stationNumber]) * kSnoChannelsPerCard;
+        int32_t pmthvDisabledMask = 0;
+        for (int i=0; i<kSnoChannelsPerCard; ++i) {
+            if (pmthv[i] == 1) pmthvDisabledMask |= (0x01 << i);
+        }
+        // sequencer must be disabled on channels with HV disabled
+        seqDisabledMask |= (seqDisabledMask ^ startSeqDisabledMask) & pmthvDisabledMask;
+        // pedestals must be disabled on channels with HV disabled
+        pedEnabledMask &= ~((pedEnabledMask ^ startPedEnabledMask) & pmthvDisabledMask);
+        // triggers must be disabled on channels with HV disabled
+        trigger20nsDisabledMask |= (trigger20nsDisabledMask ^ startTrigger20nsDisabledMask) & pmthvDisabledMask;
+        trigger100nsDisabledMask |= (trigger100nsDisabledMask ^ startTrigger100nsDisabledMask) & pmthvDisabledMask;
+        // can't be online if HV is disabled
+        onlineMask &= ~((onlineMask ^ startOnlineMask) & pmthvDisabledMask);
+    }
     // go ahead and "officially" change the masks, sending the appropriate notifications
     if (seqDisabledMask != startSeqDisabledMask) {
         unsigned long mask = seqDisabledMask;
@@ -938,9 +1075,12 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
         cardChangedFlag = false;  // clear this temporary flag
     }
     [[self undoManager] enableUndoRegistration];
+
+    // set pmthv state to reload the database on the next hwWizard action
+    sPmthvState = 0;
 }
 
--(void) hwWizardActionFinal:(NSNotification*)note
+- (void) hwWizardActionFinal:(NSNotification*)note
 {
     // now that we have updated all settings, finally go ahead and
     // set pedestals and/or initialize this crate if we haven't done so already
@@ -1056,7 +1196,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
     
     //if ([guardian adapterIsXL3]) statusChanged = [self parseVoltagesUsingXL3:result];
     if ([guardian adapterIsXL3]) [self parseVoltagesUsingXL3:result];
-    else NSLog(@"failed: FEC parse voltages implemented for XL3 only");
+    else NSLog(@"failed: FEC parse voltages implemented for XL3 only\n");
 }
 
 #pragma mark •••Archival
@@ -1418,7 +1558,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
 	}
 	@catch(NSException* localException) {
 		[[self xl2] deselectCards];
-		NSLog(@"Failure during load of crate address on FEC32 Crate %d Slot %d.", [self crateNumber], [self stationNumber]);	
+		NSLog(@"Failure during load of crate address on FEC32 Crate %d Slot %d\n", [self crateNumber], [self stationNumber]);
 		@throw;
 	}
 }
@@ -1502,7 +1642,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
 		}
 		else {
 			[[self xl2] deselectCards];
-			NSLog(@"Failure during fifo reset of FEC32 (%d,%d)/n",[self crateNumber], [self stationNumber]);	
+			NSLog(@"Failure during fifo reset of FEC32 (%d,%d)\n",[self crateNumber], [self stationNumber]);
 		}
 		@throw;
 	}
@@ -1531,7 +1671,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
 		}
 		else {
 			[[self xl2] deselectCards];
-			NSLog(@"Failure during CMOS reset of FEC32 (%d,%d)/n",[self crateNumber], [self stationNumber]);	
+			NSLog(@"Failure during CMOS reset of FEC32 (%d,%d)\n",[self crateNumber], [self stationNumber]);
 		}
 		@throw;
 	}
@@ -1554,7 +1694,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
 		}
 		else {
 			[[self xl2] deselectCards];
-			NSLog(@"Failure during Sequencer reset of FEC32 (%d,%d)/n",[self crateNumber], [self stationNumber]);	
+			NSLog(@"Failure during Sequencer reset of FEC32 (%d,%d)\n",[self crateNumber], [self stationNumber]);
 		}
 		@throw;
 	}
@@ -1578,7 +1718,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
 	}
 	@catch(NSException* localException) {
 		[[self xl2] deselectCards];
-		NSLog(@"Failure during Pedestal set of FEC32(%d,%d).\n", [self crateNumber], [self stationNumber]);			
+		NSLog(@"Failure during Pedestal set of FEC32(%d,%d)\n", [self crateNumber], [self stationNumber]);
 		
 	}	
 	
@@ -1606,7 +1746,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
 	}
 	@catch(NSException* localException) {
 		[[self xl2] deselectCards];
-		NSLog(@"Error during taking channel(s) off-line on  FEC32 (%d,%d)!", [self crateNumber], [self stationNumber]);	 
+		NSLog(@"Error during taking channel(s) off-line on  FEC32 (%d,%d)!\n", [self crateNumber], [self stationNumber]);
 		@throw;
 	}
 }
@@ -1652,7 +1792,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
 		}
 		else {
 			[[self xl2] deselectCards];
-			NSLog(@"Failure during Pmt Current read for FEC32 (%d,%d)/n",[self crateNumber], [self stationNumber]);	
+			NSLog(@"Failure during Pmt Current read for FEC32 (%d,%d)\n",[self crateNumber], [self stationNumber]);
 		}
 		@throw;
 	}
@@ -2011,7 +2151,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
 		
 		[[self xl2] deselectCards];
 		
-		//NSLog(@"CMOS Shift Registers for FEC32(%d,%d) have been loaded.\n",[selfcrateNumber],[self stationNumber]);
+		//NSLog(@"CMOS Shift Registers for FEC32(%d,%d) have been loaded\n",[selfcrateNumber],[self stationNumber]);
 		
 	}
 	@catch(NSException* localException) {

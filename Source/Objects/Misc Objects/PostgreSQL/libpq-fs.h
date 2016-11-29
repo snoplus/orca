@@ -4,10 +4,10 @@
  *	  definitions for using Inversion file system routines (ie, large objects)
  *
  *
- * Portions Copyright (c) 1996-2001, PostgreSQL Global Development Group
+ * Portions Copyright (c) 1996-2015, PostgreSQL Global Development Group
  * Portions Copyright (c) 1994, Regents of the University of California
  *
- * $Id: libpq-fs.h,v 1.1.1.1 2003/04/05 01:26:56 markhowe Exp $
+ * src/include/libpq/libpq-fs.h
  *
  *-------------------------------------------------------------------------
  */

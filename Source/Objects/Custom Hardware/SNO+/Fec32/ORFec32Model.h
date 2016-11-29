@@ -192,10 +192,10 @@ typedef struct Fec32CmosShiftReg{
     unsigned long   trigger100nsDisabledMask;
     unsigned long	cmosReadDisabledMask;
 
-    unsigned long lastSeqDisabledMask;
-    unsigned long lastTrigger100nsDisabledMask;
-    unsigned long lastTrigger20nsDisabledMask;
-    unsigned long lastCmosReadDisabledMask;
+    unsigned long   lastSeqDisabledMask;
+    unsigned long   lastTrigger100nsDisabledMask;
+    unsigned long   lastTrigger20nsDisabledMask;
+    unsigned long   lastCmosReadDisabledMask;
 
     unsigned long   seqPendingDisabledMask;
     unsigned long   trigger20nsPendingDisabledMask;
@@ -228,6 +228,7 @@ typedef struct Fec32CmosShiftReg{
     unsigned long   startTrigger100nsDisabledMask;
     unsigned long   startOnlineMask;
     BOOL            cardChangedFlag;
+    NSObject*       hwWizard;
 }
 
 - (void) setUpImage;
@@ -340,6 +341,10 @@ typedef struct Fec32CmosShiftReg{
 - (void) hwWizardActionBegin:(NSNotification*)aNote;
 - (void) hwWizardActionEnd:(NSNotification*)aNote;
 - (void) hwWizardActionFinal:(NSNotification*)aNote;
+- (void) hwWizardWaitingForDatabase;
+- (void) _pmthvCallback:(NSMutableData*)data;
+- (void) _continueHWWizard:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _continueHWWizard;
 
 #pragma mark Converted Data Methods
 - (void)	setCmosVoltage:(short)anIndex withValue:(float) value;
