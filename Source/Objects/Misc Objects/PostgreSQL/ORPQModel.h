@@ -54,8 +54,9 @@
  @brief Arbitrary detector db query
  @param anObject Callback object
  @param aSelector Callback object selector (called with an ORPQResult object, or nil on error)
+ @param aTimeoutSecs Timeout time in seconds (0 for no timeout)
  */
-- (void) dbQuery:(NSString*)aCommand object:(id)anObject selector:(SEL)aSelector;
+- (void) dbQuery:(NSString*)aCommand object:(id)anObject selector:(SEL)aSelector timeout:(float)aTimeoutSecs;
 
 /**
  @brief Get specified field from detector db
@@ -64,30 +65,6 @@
  containing an int32_t array of values in detector crate/card/channel order, or nil on error)
  */
 - (void) pmtdbQuery:(NSString*)aPmtdbField object:(id)anObject selector:(SEL)aSelector;
-
-/**
- @brief Get last run number and detector state from detector db
- @param anObject Callback object
- @param aSelector Callback object selector (called with an ORRunState object, or nil on error)
- */
-- (void) getRunNumber:(id)anObject selector:(SEL)aSelector;
-
-/**
- @brief Set last run number in detector db
- @param anObject Callback object
- @param aRunNumber Last run number used
- @param aSelector Callback object selector (called with an ORPQResult object, or nil on error)
- */
-- (void) setRunNumber:(id)anObject selector:(SEL)aSelector run:(int)aRunNumber;
-
-/**
- @brief Set last run number and detector state in detector db
- @param anObject Callback object
- @param aRunNumber Last run number used
- @param aState Detector state
- @param aSelector Callback object selector (called with an ORPQResult object, or nil on error)
- */
-- (void) setRunNumber:(id)anObject selector:(SEL)aSelector run:(int)aRunNumber state:(int)aState;
 
 - (void) cancelDbQueries;
 - (BOOL) stealthMode;
@@ -144,8 +121,6 @@ extern NSString* ORPQLock;
 enum ePQCommandType {
     kPQCommandType_General,
     kPQCommandType_GetPMT,
-    kPQCommandType_GetRunState,
-    kPQCommandType_SetRunState
 };
 
 @interface ORPQQueryOp : ORPQOperation
@@ -156,7 +131,7 @@ enum ePQCommandType {
 - (void) setCommand:(NSString*)aCommand;
 - (void) setCommandType:(int)aCommandType;
 - (void) setPmtdbFieldName:(NSString*)aFieldName;
-- (void) setRunNumber:(int)aRunNumber state:(int)aState;
+- (void) cancel;
 - (void) main;
 @end
 

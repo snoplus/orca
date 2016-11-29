@@ -173,10 +173,13 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
 	return [self objectConnectedTo:ORPQModelInConnector];
 }
 
-- (void)dbQuery:(NSString*)aCommand object:(id)anObject selector:(SEL)aSelector
+- (void)dbQuery:(NSString*)aCommand object:(id)anObject selector:(SEL)aSelector timeout:(float)aTimeoutSecs
 {
     if(!stealthMode){
         ORPQQueryOp* anOp = [[ORPQQueryOp alloc] initWithDelegate:self object:anObject selector:aSelector];
+        if (aTimeoutSecs) {
+            [anOp performSelector:@selector(cancel) withObject:nil afterDelay:aTimeoutSecs];
+        }
         [anOp setCommand:aCommand];
         [ORPQDBQueue addOperation:anOp];
         [anOp release];
@@ -188,31 +191,6 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
     if(!stealthMode){
         ORPQQueryOp* anOp = [[ORPQQueryOp alloc] initWithDelegate:self object:anObject selector:aSelector];
         [anOp setPmtdbFieldName:aPmtdbField];
-        [ORPQDBQueue addOperation:anOp];
-        [anOp release];
-    }
-}
-
-- (void)getRunNumber:(id)anObject selector:(SEL)aSelector
-{
-    if(!stealthMode){
-        ORPQQueryOp* anOp = [[ORPQQueryOp alloc] initWithDelegate:self object:anObject selector:aSelector];
-        [anOp setCommandType:kPQCommandType_GetRunState];
-        [ORPQDBQueue addOperation:anOp];
-        [anOp release];
-    }
-}
-
-- (void)setRunNumber:(id)anObject selector:(SEL)aSelector run:(int)aRunNumber
-{
-    [self setRunNumber:anObject selector:aSelector run:aRunNumber state:-1];
-}
-
-- (void)setRunNumber:(id)anObject selector:(SEL)aSelector run:(int)aRunNumber state:(int)aState
-{
-    if(!stealthMode){
-        ORPQQueryOp* anOp = [[ORPQQueryOp alloc] initWithDelegate:self object:anObject selector:aSelector];
-        [anOp setRunNumber:aRunNumber state:aState];
         [ORPQDBQueue addOperation:anOp];
         [anOp release];
     }
@@ -465,11 +443,6 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
 - (void) setCommandType:(int)aCommandType;
 {
     commandType = aCommandType;
-    switch (commandType) {
-        case kPQCommandType_GetRunState:
-            command = [[NSString stringWithFormat: @"SELECT last_run FROM current_run_state where id=0"] retain];
-            break;
-    }
 }
 
 - (void) setPmtdbFieldName:(NSString*)aFieldName;
@@ -478,14 +451,11 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
     command = [[NSString stringWithFormat: @"SELECT crate,card,channel,%@ FROM pmtdb", aFieldName] retain];
 }
 
-- (void) setRunNumber:(int)aRunNumber state:(int)aState;
+- (void) cancel
 {
-    commandType = kPQCommandType_SetRunState;
-    if (aState >= 0) {
-        command = [[NSString stringWithFormat: @"UPDATE current_run_state set last_run=%d, state=%d where id=0", aRunNumber, aState] retain];
-    } else {
-        command = [[NSString stringWithFormat: @"UPDATE current_run_state set last_run=%d where id=0", aRunNumber] retain];
-    }
+    [super cancel];
+    // do callback with nil object
+    [object performSelectorOnMainThread:selector withObject:nil waitUntilDone:YES];
 }
 
 - (void) main
@@ -519,15 +489,6 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                                 }
                                 theResultObject = data;
                             }
-                        }
-                    } break;
-
-                    case kPQCommandType_GetRunState: {
-                        if ([theResult numOfRows] && [theResult numOfFields] > 2) {
-                            ORRunState *runState = [[ORRunState init] autorelease];
-                            runState->run = [theResult getInt32atRow:0 column:1];
-                            runState->state = [theResult getInt32atRow:0 column:2];
-                            theResultObject = runState;
                         }
                     } break;
                 }
