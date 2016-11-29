@@ -63,6 +63,97 @@ NSDate* MCPYear0000;
     return mNumOfFields = 0;
 }
 
+- (id) fetchRowAsType:(MCPReturnType) aType
+{
+    int		i;
+    id		theReturn;
+    int     theRow = 0;
+
+    if (mResult == NULL || !mNumOfRows) {
+        return nil;
+    }
+
+    switch (aType) {
+        default :
+            NSLog (@"Unknown type : %d, will return an Array!\n", aType);
+            // fall through!
+        case MCPTypeArray:
+            theReturn = [NSMutableArray arrayWithCapacity:mNumOfFields];
+            break;
+        case MCPTypeDictionary:
+            if (mNames == nil) {
+                [self fetchFieldsName];
+            }
+            theReturn = [NSMutableDictionary dictionaryWithCapacity:mNumOfFields];
+            break;
+    }
+
+    for (i=0; i<mNumOfFields; i++) {
+        Oid type = PQftype(mResult,i);
+        id	theCurrentObj = nil;
+        if (!PQgetisnull(mResult,theRow,i)) {
+            char *pt = PQgetvalue(mResult,theRow,i);
+            switch (type) {
+                case kPQTypeBool:
+                    if (*pt == 'f') {
+                        theCurrentObj = [NSNumber numberWithInt:0];
+                    } else if (*pt == 't') {
+                        theCurrentObj = [NSNumber numberWithInt:1];
+                    }
+                    break;
+                case kPQTypeString:
+                    theCurrentObj = [NSString stringWithCString:pt encoding:NSISOLatin1StringEncoding];
+                    break;
+                case kPQTypeChar:
+                case kPQTypeInt64:
+                case kPQTypeInt16:
+                case kPQTypeInt32:
+                    theCurrentObj = [NSNumber numberWithLong:strtol(pt, NULL, 0)];
+                    break;
+             // case kPQTypeName: (not yet implemented)
+             // case kPQTypeArray16: (not yet implemented)
+            }
+        }
+        if (theCurrentObj == nil) {
+            theCurrentObj = [NSNull null];
+        }
+        switch (aType) {
+            case MCPTypeDictionary :
+                [theReturn setObject:theCurrentObj forKey:[mNames objectAtIndex:i]];
+                break;
+            default :
+                [theReturn addObject:theCurrentObj];
+                break;
+        }
+    }
+    return theReturn;
+}
+
+
+- (NSArray *) fetchRowAsArray
+{
+    NSMutableArray		*theArray = [self fetchRowAsType:MCPTypeArray];
+    if (theArray) {
+        return [NSArray arrayWithArray:theArray];
+    }
+    else {
+        return nil;
+    }
+}
+
+
+- (NSDictionary *) fetchRowAsDictionary
+{
+    NSMutableDictionary		*theDict = [self fetchRowAsType:MCPTypeDictionary];
+    if (theDict) {
+        return [NSDictionary dictionaryWithDictionary:theDict];
+    }
+    else {
+        return nil;
+    }
+}
+
+
 - (NSArray *) fetchFieldsName
 {
     unsigned int	theNumFields;
@@ -97,26 +188,30 @@ NSDate* MCPYear0000;
     int32_t val;
     if (mResult && aRow<mNumOfRows && aColumn<mNumOfFields) {
         Oid type = PQftype(mResult,aColumn);
-        char *pt = PQgetvalue(mResult,aRow,aColumn);
-        switch (type) {
-            case kPQTypeChar:
-            case kPQTypeInt64:
-            case kPQTypeInt16:
-            case kPQTypeInt32:
-                val = (int32_t)atol(pt);
-                break;
-            case kPQTypeBool:
-                if (*pt == 'f') {
-                    val = 0;
-                } else if (*pt == 't') {
-                    val = 1;
-                } else {
+        if (PQgetisnull(mResult,aRow,aColumn)) {
+            val = -1;
+        } else {
+            char *pt = PQgetvalue(mResult,aRow,aColumn);
+            switch (type) {
+                case kPQTypeChar:
+                case kPQTypeInt64:
+                case kPQTypeInt16:
+                case kPQTypeInt32:
+                    val = (int32_t)atol(pt);
+                    break;
+                case kPQTypeBool:
+                    if (*pt == 'f') {
+                        val = 0;
+                    } else if (*pt == 't') {
+                        val = 1;
+                    } else {
+                        val = -1;
+                    }
+                    break;
+                default:
                     val = -1;
-                }
-                break;
-            default:
-                val = -1;
-                break;
+                    break;
+            }
         }
     } else {
         val = -1;
