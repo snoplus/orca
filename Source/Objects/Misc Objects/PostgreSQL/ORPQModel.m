@@ -185,6 +185,16 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
     }
 }
 
+- (void)dbQuery:(NSString*)aCommand object:(id)anObject selector:(SEL)aSelector
+{
+    [self dbQuery:aCommand object:anObject selector:aSelector timeout:0];
+}
+
+- (void)dbQuery:(NSString*)aCommand
+{
+    [self dbQuery:aCommand object:nil selector:nil timeout:0];
+}
+
 - (void)pmtdbQuery:(NSString*)aPmtdbField object:(id)anObject selector:(SEL)aSelector
 {
     if(stealthMode){
