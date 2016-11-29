@@ -420,7 +420,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     if(!remoteControl || remoteInterface){
         NSString* fullFileName = [[[self dirName]stringByExpandingTildeInPath] stringByAppendingPathComponent:@"RunNumber"];
         NSString* s = [NSString stringWithContentsOfFile:fullFileName encoding:NSASCIIStringEncoding error:nil];
-        runNumber = [s intValue];
+        runNumber = [s longLongValue];
     }
     
     return runNumber;
@@ -1607,7 +1607,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     [[self undoManager] enableUndoRegistration];
 
     
-    if(![self offlineRun])  NSLog(@"Run %d stopped.\n",[self runNumber]);
+    if(![self offlineRun])  NSLog(@"Run %lu stopped.\n",[self runNumber]);
     else                    NSLog(@"Offline Run stopped.\n");
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORFlushLogsNotification
@@ -1777,8 +1777,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	NSLog(@"---------------------------------------\n");
     
     if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
-        if(!forceFullInit)NSLog(@"Run %d started(%@).\n",[self runNumber],doInit?@"cold start":@"quick start");
-		else NSLog(@"Run %d started(%@).\n",[self runNumber],@"Full Init because of Pwr Failure");
+        if(!forceFullInit)NSLog(@"Run %lu started(%@).\n",[self runNumber],doInit?@"cold start":@"quick start");
+		else NSLog(@"Run %lu started(%@).\n",[self runNumber],@"Full Init because of Pwr Failure");
     }
     else {
         NSLog(@"Offline Run started(%@).\n",doInit?@"cold start":@"quick start");

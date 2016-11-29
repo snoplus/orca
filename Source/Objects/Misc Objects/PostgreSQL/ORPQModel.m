@@ -172,7 +172,9 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
 
 - (void)dbQuery:(NSString*)aCommand object:(id)anObject selector:(SEL)aSelector timeout:(float)aTimeoutSecs
 {
-    if(!stealthMode){
+    if(stealthMode){
+        [anObject performSelector:aSelector withObject:nil afterDelay:0.1];
+    } else {
         ORPQQueryOp* anOp = [[ORPQQueryOp alloc] initWithDelegate:self object:anObject selector:aSelector];
         if (aTimeoutSecs) {
             [anOp performSelector:@selector(cancel) withObject:nil afterDelay:aTimeoutSecs];
@@ -185,7 +187,9 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
 
 - (void)pmtdbQuery:(NSString*)aPmtdbField object:(id)anObject selector:(SEL)aSelector
 {
-    if(!stealthMode){
+    if(stealthMode){
+        [anObject performSelector:aSelector withObject:nil afterDelay:0.1];
+    } else {
         ORPQQueryOp* anOp = [[ORPQQueryOp alloc] initWithDelegate:self object:anObject selector:aSelector];
         [anOp setPmtdbFieldName:aPmtdbField];
         [ORPQDBQueue addOperation:anOp];
@@ -451,14 +455,18 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
 - (void) cancel
 {
     [super cancel];
-    // do callback with nil object
-    [object performSelectorOnMainThread:selector withObject:nil waitUntilDone:YES];
+    if (selector) {
+        // do callback with nil object
+        [object performSelectorOnMainThread:selector withObject:nil waitUntilDone:YES];
+        selector = nil;
+    }
 }
 
 - (void) main
 {
-    if([self isCancelled])return;
-   NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
+    if([self isCancelled]) return;
+
+    NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
     NSObject *theResultObject = nil;
     @try {
         ORPQConnection* pqConnection = [[delegate pqConnection] retain];
@@ -466,9 +474,10 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
             ORPQResult *theResult = [pqConnection queryString:command];
 
             if (theResult && ![self isCancelled]) {
-
                 switch (commandType) {
-
+                    case kPQCommandType_General:
+                        theResultObject = theResult;
+                        break;
                     case kPQCommandType_GetPMT: {
                         int numRows = [theResult numOfRows];
                         int numCols = [theResult numOfFields];
@@ -502,6 +511,7 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
         // do callback on main thread if a selector was specified
         if (selector && ![self isCancelled]) {
             [object performSelectorOnMainThread:selector withObject:theResultObject waitUntilDone:YES];
+            selector = nil;
         }
         [thePool release];
     }
