@@ -315,6 +315,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     return [[(ORAppDelegate*)[NSApp delegate]document]  undoManager];
 }
 
+- (void) notOkToContinue
+{
+    okToContinue = false;
+}
+
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -1388,16 +1393,27 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 
 - (void) executeControlStruct
 {
-    [hwUndoManager startNewUndoGroup];
-    
+    okToContinue = true;
+
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHWWizGroupActionStarted object: self];
-    
+
+    // continue the execution unless interrupted by one of our notification listeners
+    // (in which case they may continue execution themselves if they want)
+    if (okToContinue) {
+        [self continueExecuteControlStruct];
+    }
+}
+
+- (void) continueExecuteControlStruct
+{
+    [hwUndoManager startNewUndoGroup];
+
     for(id actionController in actionControllers){
         [self _executeActionController:actionController];
 	}
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHWWizGroupActionFinished object: self];
-    
+
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHWWizActionFinalNotification object: self];
     
     if(useMark){
@@ -1409,7 +1425,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     
     [undoButton setEnabled:[hwUndoManager canUndo]];
     [redoButton setEnabled:[hwUndoManager canRedo]];
-	
 }
 
 - (void) doAction:(eAction)actionSelection target:(id)target parameter:(ORHWWizParam*)paramObj channel:(int)chan value:(NSNumber*)aValue 

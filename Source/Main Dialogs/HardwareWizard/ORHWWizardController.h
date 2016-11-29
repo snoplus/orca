@@ -90,6 +90,8 @@
     ORHWUndoManager* hwUndoManager;
     BOOL    useMark;
     BOOL    objectsAvailiable;
+
+    BOOL    okToContinue;
 }
 
 + (BOOL) exists;
@@ -135,6 +137,8 @@
 - (ORHWUndoManager *) hwUndoManager;
 - (void) setHwUndoManager: (ORHWUndoManager *) aHwUndoManager;
 
+- (void) notOkToContinue;
+
 - (IBAction) addAction:(id) sender;
 - (IBAction) removeAction:(id) sender;
 - (IBAction) addSelection:(id) sender;
@@ -174,7 +178,8 @@
 - (void) setUpMasks:(NSNotification*)aNote;
 - (void) setMaskBits;
 - (void) executeControlStruct;
-- (void) doAction:(eAction)actionSelection 
+- (void) continueExecuteControlStruct;
+- (void) doAction:(eAction)actionSelection
 	   target:(id)target 
 	parameter:(ORHWWizParam*)paramObj
 	  channel:(int)chan
