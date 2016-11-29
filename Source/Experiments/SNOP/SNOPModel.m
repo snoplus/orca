@@ -44,6 +44,8 @@
 #include <stdint.h>
 #import "SNOCaenModel.h"
 #import "XL3_Link.h"
+#import "ORPQModel.h"
+#import "ORPQResult.h"
 
 #define RUNNING 0
 #define STARTING 1
@@ -633,6 +635,27 @@ resync;
         break;
     }
 
+    if ([ORPQModel getCurrent]) {
+        /* Wait to start the run until we get the next run number from the
+         * database. */
+        NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                  @"querying database for run number",
+                                  @"Reason",
+                                  nil];
+
+        /* Tell the run control to wait. */
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object: self userInfo: userInfo];
+
+        [[ORPQModel getCurrent] dbQuery:@"SELECT nextval('run_number')"
+             object:self selector:@selector(waitForRunNumber:) timeout:1.0];
+    } else {
+        /* If there is no database object, just continue with the existing run
+         * number saved to Orca. */
+        NSLogColor([NSColor redColor], @"Unable to find ORCA PostgreSQL model. Please add it to the experiment. Aborting run start.\n");
+
+        goto err;
+    }
+
     return;
 
 err:
@@ -646,6 +669,69 @@ err:
         [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStartupAbort object: self userInfo: userInfo];
 
     state = STOPPED;
+}
+}
+
+- (void) waitForRunNumber: (ORPQResult *) result
+{
+    int numRows, numCols, run_number;
+
+    if (!result) {
+        NSLogColor([NSColor redColor], @"Error getting the run number from the database. Using default run number. Data is going in the bit bucket.\n");
+        goto err;
+    }
+
+    numRows = [result numOfRows];
+    numCols = [result numOfFields];
+
+    if (numRows != 1) {
+        NSLogColor([NSColor redColor], @"Error getting run number from database: got %i rows but expected 1. Using default run number. Data is going in the bit bucket.", numRows);
+        goto err;
+    }
+
+    if (numCols != 1) {
+        NSLogColor([NSColor redColor], @"Error getting run number from database: got %i columns but expected 1. Using default run number. Data is going in the bit bucket.", numCols);
+        goto err;
+    }
+
+    run_number = [result getInt32atRow:0 column:0];
+
+    NSArray*  runObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    if(![runObjects count]){
+        NSLogColor([NSColor redColor], @"waitForRunNumber: couldn't find run control object!");
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
+        /* This should never happen. */
+        return;
+    }
+
+    ORRunModel* runControl = [runObjects objectAtIndex:0];
+
+    /* We set the run to the next run number - 1 because the run control will
+     * increment the run number before the run starts. */
+    [runControl setRunNumber:run_number-1];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
+
+    return;
+
+err:
+{
+    NSArray*  runObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+
+    if(![runObjects count]){
+        NSLogColor([NSColor redColor], @"waitForRunNumber: couldn't find run control object!");
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
+        /* This should never happen. */
+        return;
+    }
+
+    ORRunModel* runControl = [runObjects objectAtIndex:0];
+
+    [runControl setRunNumber:0xffffffff - 1];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
+
+    return;
 }
 }
 

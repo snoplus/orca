@@ -59,6 +59,18 @@
 - (void) dbQuery:(NSString*)aCommand object:(id)anObject selector:(SEL)aSelector timeout:(float)aTimeoutSecs;
 
 /**
+ @brief Arbitrary detector db query with no timeout
+ @param anObject Callback object
+ @param aSelector Callback object selector (called with an ORPQResult object, or nil on error)
+ */
+- (void) dbQuery:(NSString*)aCommand object:(id)anObject selector:(SEL)aSelector;
+
+/**
+ @brief Arbitrary detector db query with no callback or timeout
+ */
+- (void) dbQuery:(NSString*)aCommand;
+
+/**
  @brief Get specified field from detector db
  @param anObject Callback object
  @param aSelector Callback object selector (called with an NSMutableData object
