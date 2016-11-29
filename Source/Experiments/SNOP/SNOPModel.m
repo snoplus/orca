@@ -44,6 +44,8 @@
 #include <stdint.h>
 #import "SNOCaenModel.h"
 #import "XL3_Link.h"
+#import "ORPQModel.h"
+#import "ORPQResult.h"
 
 #define RUNNING 0
 #define STARTING 1
@@ -633,6 +635,26 @@ resync;
         break;
     }
 
+    if ([ORPQModel getCurrent]) {
+        /* Wait to start the run until we get the next run number from the
+         * database. */
+        NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                  @"querying database for run number",
+                                  @"Reason",
+                                  nil];
+
+        /* Tell the run control to wait. */
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object: self userInfo: userInfo];
+
+        [[ORPQModel getCurrent] dbQuery:@"SELECT nextval('run_number')"
+             object:self selector:@selector(waitForRunNumber:) timeout:1.0];
+    } else {
+        /* If there is no database object, just continue with the existing run
+         * number saved to Orca. */
+        NSLogColor([NSColor redColor], @"unable to connect to the database to get the run number. Using locally stored number.\n");
+    }
+
+
     return;
 
 err:
@@ -649,6 +671,52 @@ err:
 }
 }
 
+- (void) waitForRunNumber: (ORPQResult *) result
+{
+    int numRows, numCols, run_number;
+
+    if (!result) {
+        NSLogColor([NSColor redColor], @"Error getting the run number from the database. Using locally stored number.\n");
+        goto err;
+    }
+
+    numRows = [result numOfRows];
+    numCols = [result numOfFields];
+
+    if (numRows != 1) {
+        NSLogColor([NSColor redColor], @"Error getting run number from database: got %i rows but expected 1", numRows);
+        goto err;
+    }
+
+    if (numCols != 1) {
+        NSLogColor([NSColor redColor], @"Error getting run number from database: got %i columns but expected 1", numCols);
+        goto err;
+    }
+
+    run_number = [result getInt32atRow:0 column:0];
+
+    NSArray*  runObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    if(![runObjects count]){
+        NSLogColor([NSColor redColor], @"waitForRunNumber: couldn't find run control object!");
+        goto err;
+    }
+
+    ORRunModel* runControl = [runObjects objectAtIndex:0];
+
+    [runControl setRunNumber:run_number];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
+
+    return;
+
+err:
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
+
+    return;
+}
+
+        
 - (void) runAboutToStart:(NSNotification*)aNote
 {
     NSArray* objs;
