@@ -26,6 +26,9 @@ typedef enum {
 - (void) dealloc;
 - (unsigned long long) numOfRows;
 - (unsigned int) numOfFields;
+- (id) fetchRowAsType:(MCPReturnType) aType;
+- (NSArray *) fetchRowAsArray;
+- (NSDictionary *) fetchRowAsDictionary;
 - (NSArray *) fetchFieldsName;
 - (int32_t) getInt32atRow:(int)aRow column:(int)aColumn;
 - (id) fetchTypesAsType:(MCPReturnType) aType;
