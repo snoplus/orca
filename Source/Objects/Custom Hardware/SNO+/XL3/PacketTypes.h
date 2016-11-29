@@ -228,6 +228,7 @@ typedef struct{
 
 typedef struct{
   uint32_t errorFlags;
+  uint32_t fecPresent; // each bit is 1 if that slot as a FEC, 0 if not
   FECConfiguration hwareVals[16];
 } CrateInitResults;
 
@@ -255,6 +256,7 @@ typedef struct{
 
 typedef struct{
   uint32_t errorFlags;
+  uint32_t fecPresent; // each bit is 1 if that slot as a FEC, 0 if not
   FECConfiguration hwareVals[16];
 } BuildCrateConfigResults;
 

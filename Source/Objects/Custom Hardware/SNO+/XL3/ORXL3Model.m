@@ -1725,11 +1725,10 @@ void SwapLongBlock(void* p, int32_t n)
     return 0;
 }
 
-- (void) initCrate: (int) xilinxLoad
+- (void) initCrate
 {
     /* Do a full crate init */
-    [self initCrateAsync: xilinxLoad shiftRegOnly: 0
-         slotMask: [self getSlotsPresent]
+    [self initCrateAsync: [self getSlotsPresent]
          withCallback: @selector(initCrateDone:)
          target: self];
 }
@@ -1737,15 +1736,13 @@ void SwapLongBlock(void* p, int32_t n)
 - (void) loadHardware
 {
     /* Load current ORCA settings to every single FEC */
-    [self initCrateAsync: 0 shiftRegOnly: SHIFT_AND_DAC
-         slotMask: [self getSlotsPresent] withCallback:NULL target:NULL];
+    [self initCrateAsync: [self getSlotsPresent] withCallback:NULL target:NULL];
 }
 
 - (void) loadHardwareWithSlotMask: (uint32_t) slotMask
 {
     /* Load current ORCA settings to select FECs */
-    [self initCrateAsync: 0 shiftRegOnly: SHIFT_AND_DAC slotMask: slotMask
-         withCallback:NULL target:NULL];
+    [self initCrateAsync: slotMask withCallback:NULL target:NULL];
 }
 
 - (void) loadHardwareWithSlotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target
@@ -1757,8 +1754,7 @@ void SwapLongBlock(void* p, int32_t n)
      *
      * If the crate init failed, the results pointer will be NULL. */
 
-    [self initCrateAsync: 0 shiftRegOnly: SHIFT_AND_DAC slotMask: slotMask
-         withCallback:callback target:target];
+    [self initCrateAsync: slotMask withCallback:callback target:target];
 }
 
 - (void) resetCrateAsync
@@ -1780,6 +1776,12 @@ void SwapLongBlock(void* p, int32_t n)
     ResetCrateArgs *args;
     ResetCrateResults *results;
     int i, j;
+
+    /* Check that HV Relays for XL3 are open if performing a full crate init. */
+    if ([self hvASwitch] || [self hvBSwitch]) {
+        NSLogColor([NSColor redColor], @"XL3 %02d has high voltage on.  HV must be turned off before a crate reset.\n", [self crateNumber]);
+        return;
+    }
 
     memset(payload, 0, XL3_PAYLOAD_SIZE);
     args = (ResetCrateArgs *) payload;
@@ -1822,7 +1824,7 @@ void SwapLongBlock(void* p, int32_t n)
     [self updateXl3Mode];
 }
 
-- (void) initCrateAsync: (int) xilinxLoad shiftRegOnly: (uint32_t) shiftRegOnly slotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target
+- (void) initCrateAsync: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target
 {
     /* Initialize the crate in a separate thread and call the selector
      * `callback` when done. */
@@ -1859,8 +1861,6 @@ void SwapLongBlock(void* p, int32_t n)
     }
 
     NSDictionary *args = [NSDictionary dictionaryWithObjectsAndKeys:
-                            [NSNumber numberWithInt:xilinxLoad], @"xilinxload",
-                            [NSNumber numberWithInt:shiftRegOnly], @"shiftregonly",
                             [NSNumber numberWithInt:slotMask], @"slotmask",
                             [NSValue valueWithPointer:callback], @"callback",
                             [NSValue valueWithPointer:mbs], @"mbs",
@@ -1876,7 +1876,10 @@ void SwapLongBlock(void* p, int32_t n)
      * pass the arguments in a dictionary and call them here.
      * Ugh...
      */
-    [self initCrate: [[args objectForKey:@"mbs"] pointerValue] xilinxLoad: [[args objectForKey:@"xilinxload"] intValue] shiftRegOnly: [[args objectForKey:@"shiftregonly"] intValue] slotMask: [[args objectForKey:@"slotmask"] intValue] withCallback: [[args objectForKey:@"callback"] pointerValue] target: [args objectForKey:@"target"]];
+    [self initCrate: [[args objectForKey:@"mbs"] pointerValue]
+         slotMask: [[args objectForKey:@"slotmask"] intValue]
+         withCallback: [[args objectForKey:@"callback"] pointerValue]
+         target: [args objectForKey:@"target"]];
 }
 
 - (uint32_t) getSlotsPresent
@@ -1898,7 +1901,7 @@ void SwapLongBlock(void* p, int32_t n)
     return slotMask;
 }
 
-- (void) initCrate: (MB *) mbs xilinxLoad: (int) xilinxLoad shiftRegOnly: (uint32_t) shiftRegOnly slotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target
+- (void) initCrate: (MB *) mbs slotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target
 {
     /* Initialize the crate with a callback. The callback should look like:
      *
@@ -1911,7 +1914,7 @@ void SwapLongBlock(void* p, int32_t n)
      * Note: The callback must call free() on the results pointer. */
     CrateInitResults *r = (CrateInitResults *) malloc(sizeof(CrateInitResults));
 
-    if ([self initCrate: mbs xilinxLoad: xilinxLoad shiftRegOnly: shiftRegOnly slotMask: slotMask results: r]) {
+    if ([self initCrate: mbs slotMask: slotMask results: r]) {
         free(r);
         r = NULL;
     }
@@ -1931,7 +1934,7 @@ void SwapLongBlock(void* p, int32_t n)
     }
 }
 
-- (int) initCrate: (MB *) mbs xilinxLoad: (int) xilinxLoad shiftRegOnly: (uint32_t) shiftRegOnly slotMask: (uint32_t) slotMask results: (CrateInitResults *) results
+- (int) initCrate: (MB *) mbs slotMask: (uint32_t) slotMask results: (CrateInitResults *) results
 {
     /* Low level function to perform a crate init (load hardware settings).
      *
@@ -1946,32 +1949,6 @@ void SwapLongBlock(void* p, int32_t n)
     char payload[XL3_PAYLOAD_SIZE];
     CrateInitSetupArgs *setupArgs;
     CrateInitArgs *crateInitArgs;
-
-    /* Check XL3 is in init mode before init-ing with xilinx. */
-    if (([self xl3Mode] != INIT_MODE) && xilinxLoad) {
-        NSLogColor([NSColor redColor], @"XL3 %02d not in init mode.  Aborting initialization.\n", [self crateNumber]);
-        goto err;
-    }
-
-    /* Check that HV Relays for XL3 are open if performing a full crate init. */
-    if ((shiftRegOnly == 0) && ([self hvASwitch] || [self hvBSwitch])) {
-        NSLogColor([NSColor redColor], @"XL3 %02d has high voltage on.  HV must be turned off before crate initialization.\n", [self crateNumber]);
-        goto err;
-    }
-
-    if (shiftRegOnly && xilinxLoad) {
-        NSLogColor([NSColor redColor], @"crate %02d: warning xilinx is not loaded if shiftRegOnly != 0\n", [self crateNumber]);
-    }
-
-    /* Set the sequencer masks separately because if we are doing a registers
-     * only init, they are not updated. */
-    if (shiftRegOnly) {
-        for (slot = 0; slot < 16; slot++) {
-            if ((slotMask & (1 << slot)) == 0) continue;
-            
-            [self setSequencerMask: ~(mbs[slot].disableMask) forSlot:slot];
-        }
-    }
 
     /* Send the first 16 packets which have the FEC settings. Note that
      * no hardware is updated until we send one more CrateInitArgs packet */
@@ -2002,11 +1979,8 @@ void SwapLongBlock(void* p, int32_t n)
      * using htonl(). */
     /* mbNum > 16 means this is the final packet to perform crate init */
     crateInitArgs->mbNum = htonl(0xff);
-    crateInitArgs->xilinxLoad = htonl(xilinxLoad);
-    crateInitArgs->hvReset = htonl(0);
     crateInitArgs->slotMask = htonl(slotMask);
     crateInitArgs->ctcDelay = htonl(0);
-    crateInitArgs->shiftRegOnly = htonl(shiftRegOnly);
 
     @try {
         [[self xl3Link] sendCommand:CRATE_INIT_ID withPayload:payload expectResponse:YES];

@@ -311,15 +311,15 @@ enum {
 - (int) setSequencerMask: (uint32_t) mask forSlot: (int) slot;
 - (void) resetCrate;
 - (void) resetCrateAsync;
-- (void) initCrate: (int) xilinxLoad;
+- (void) initCrate;
 - (void) initCrateDone: (CrateInitResults *)r;
 - (void) loadHardware;
 - (void) loadHardwareWithSlotMask: (uint32_t) slotMask;
 - (void) loadHardwareWithSlotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target;
-- (void) initCrateAsync: (int) xilinxLoad shiftRegOnly: (uint32_t) shiftRegOnly slotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target;
+- (void) initCrateAsync: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target;
 - (void) initCrateAsyncThread: (NSDictionary *) args;
-- (void) initCrate: (MB *) mbs xilinxLoad: (int) xilinxLoad shiftRegOnly: (uint32_t) shiftRegOnly slotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target;
-- (int) initCrate: (MB *) mbs xilinxLoad: (int) xilinxLoad shiftRegOnly: (uint32_t) shiftRegOnly slotMask: (uint32_t) slotMask results: (CrateInitResults *) results;
+- (void) initCrate: (MB *) mbs slotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target;
+- (int) initCrate: (MB *) mbs slotMask: (uint32_t) slotMask results: (CrateInitResults *) results;
 - (void) checkCrateConfig: (ResetCrateResults *)r;
 
 - (uint32_t) getSlotsPresent;
