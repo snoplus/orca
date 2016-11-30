@@ -1765,6 +1765,10 @@ static NSAlert *        sReadingHvdbAlert = nil;
 
 - (void) _continueHWWizard
 {
+    if (sCardDbState == 2 && sCardDbData) {
+        // re-post the start notification now that we can properly initialize from the detector DB
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORHWWizGroupActionStarted object:hwWizard];
+    }
     // all done loading database, so we can continue with our hwWizard execution now
     if (hwWizard && [hwWizard respondsToSelector:@selector(continueExecuteControlStruct)]) {
         [hwWizard performSelector:@selector(continueExecuteControlStruct)];
@@ -1793,8 +1797,6 @@ static NSAlert *        sReadingHvdbAlert = nil;
         [sCardDbData release];
         sCardDbData = [data retain];
         NSLog(@"Loaded detector database\n");
-        // re-post the start notification now that we can properly initialize from the detector DB
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORHWWizGroupActionStarted object:hwWizard];
         [self _continueHWWizard];
     } else if (sCardDbData) {
         NSLog(@"Error reloading detector database\n");
@@ -1876,6 +1878,7 @@ static NSAlert *        sReadingHvdbAlert = nil;
         hwWizard = [note object];
         // (we will continue after our detector database is loaded)
         [hwWizard performSelector:@selector(notOkToContinue)];
+        // initiate the PostgreSQL DB query to get the current detector state
         [[ORPQModel getCurrent] channelDbQuery:self selector:@selector(_chanDbCallback:)];
         // post a modal dialog after 0.1 sec if the database operation hasn't completed yet
         [self performSelector:@selector(hwWizardWaitingForDatabase) withObject:nil afterDelay:.5];
