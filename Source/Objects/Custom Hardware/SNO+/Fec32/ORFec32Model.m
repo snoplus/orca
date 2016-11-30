@@ -1792,20 +1792,9 @@ static NSAlert *        sReadingHvdbAlert = nil;
     if (data) {
         [sCardDbData release];
         sCardDbData = [data retain];
-        // sync variables to current hardware state from database
-        if ([self stationNumber]<kSnoCardsPerCrate && [self crateNumber]<kSnoCrates) {
-            SnoPlusCard *card = (SnoPlusCard *)[sCardDbData mutableBytes] + [self crateNumber] * kSnoCardsPerCrate + [self stationNumber];
-            startSeqDisabledMask          ^= ((int32_t)startSeqDisabledMask          ^ card->seqDisabled)    & card->valid[kSeqDisabled];
-            startPedEnabledMask           ^= ((int32_t)startPedEnabledMask           ^ card->pedEnabled)     & card->valid[kPedEnabled];
-            startTrigger100nsDisabledMask ^= ((int32_t)startTrigger100nsDisabledMask ^ card->nhit100enabled) & card->valid[kNhit100enabled];
-            startTrigger20nsDisabledMask  ^= ((int32_t)startTrigger20nsDisabledMask  ^ card->nhit20enabled)  & card->valid[kNhit20enabled];
-            for (int ch=0; ch<32; ++ch) {
-                if (card->valid[kVthr] & (1 << ch)) {
-                    [self setVth:ch withValue:card->vthr[ch]];
-                }
-            }
-        }
         NSLog(@"Loaded detector database\n");
+        // re-post the start notification now that we can properly initialize from the detector DB
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORHWWizGroupActionStarted object:hwWizard];
         [self _continueHWWizard];
     } else if (sCardDbData) {
         NSLog(@"Error reloading detector database\n");
@@ -1882,6 +1871,7 @@ static NSAlert *        sReadingHvdbAlert = nil;
     
     // interrupt hardwardWizard execution to allow time to load pmtdb if necessary
     if (sCardDbState == 0 && [note object] && [[note object] respondsToSelector:@selector(notOkToContinue)]) {
+ 
         sCardDbState = 1;
         hwWizard = [note object];
         // (we will continue after our detector database is loaded)
@@ -1889,6 +1879,22 @@ static NSAlert *        sReadingHvdbAlert = nil;
         [[ORPQModel getCurrent] channelDbQuery:self selector:@selector(_chanDbCallback:)];
         // post a modal dialog after 0.1 sec if the database operation hasn't completed yet
         [self performSelector:@selector(hwWizardWaitingForDatabase) withObject:nil afterDelay:.5];
+ 
+    } else if (sCardDbState == 2 && sCardDbData) {
+ 
+        // sync variables to current hardware state from database
+        if ([self stationNumber]<kSnoCardsPerCrate && [self crateNumber]<kSnoCrates) {
+            SnoPlusCard *card = (SnoPlusCard *)[sCardDbData mutableBytes] + [self crateNumber] * kSnoCardsPerCrate + [self stationNumber];
+            startSeqDisabledMask          ^= ((int32_t)startSeqDisabledMask          ^ card->seqDisabled)    & card->valid[kSeqDisabled];
+            startPedEnabledMask           ^= ((int32_t)startPedEnabledMask           ^ card->pedEnabled)     & card->valid[kPedEnabled];
+            startTrigger100nsDisabledMask ^= ((int32_t)startTrigger100nsDisabledMask ^ card->nhit100enabled) & card->valid[kNhit100enabled];
+            startTrigger20nsDisabledMask  ^= ((int32_t)startTrigger20nsDisabledMask  ^ card->nhit20enabled)  & card->valid[kNhit20enabled];
+            for (int ch=0; ch<32; ++ch) {
+                if (card->valid[kVthr] & (1 << ch)) {
+                    [self setVth:ch withValue:card->vthr[ch]];
+                }
+            }
+        }   
     }
 }
 
@@ -1898,7 +1904,7 @@ static NSAlert *        sReadingHvdbAlert = nil;
 
     // make sure channels with HV disabled aren't enabled
     if (sCardDbData && [self stationNumber]<kSnoCardsPerCrate && [self crateNumber]<kSnoCrates) {
-         SnoPlusCard *card = (SnoPlusCard *)[sCardDbData mutableBytes] + [self crateNumber] * kSnoCardsPerCrate + [self stationNumber];
+        SnoPlusCard *card = (SnoPlusCard *)[sCardDbData mutableBytes] + [self crateNumber] * kSnoCardsPerCrate + [self stationNumber];
         // sequencer must be disabled on channels with HV disabled
         seqDisabledMask |= (seqDisabledMask ^ startSeqDisabledMask) & card->hvDisabled;
         // pedestals must be disabled on channels with HV disabled
