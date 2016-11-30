@@ -1893,7 +1893,7 @@ err:
 -(void) loadSettingsInHW
 {
 
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     ORMTCModel* mtc;
     if ([objs count]) {
         mtc = [objs objectAtIndex:0];

@@ -735,42 +735,23 @@ snopGreenColor;
     NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
     int crateNumber = [sender selectedRow];
 
-    //Handle 16A, 16B and above
-    bool crate16A = true;
-    if(crateNumber == 17) crate16A = false;
+    //Handle crates 17 and 18
     if(crateNumber > 16) crateNumber--;
-    int crate16Count = 0;
     
     //Confirm
-    NSString *crateSuffix = @"";
-    if(crateNumber==16){
-        if(crate16A) crateSuffix = @"A";
-        else crateSuffix = @"B";
-    }
-    BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Panic Down Crate %i%@?",crateNumber,crateSuffix],@"Is this really what you want?",@"Cancel",@"Yes",nil);
+    BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Panic Down Crate %i?",crateNumber],@"Is this really what you want?",@"Cancel",@"Yes",nil);
     if (cancel) return;
     for (id xl3 in xl3s) {
 
         if ([xl3 crateNumber] != crateNumber) continue;
         
-        //Handle 16A, 16B and above
-        if([xl3 crateNumber] == 16) {
-            if(crate16A && crate16Count==0) {
-                [xl3 hvPanicDown];
-                break;
-            }
-            else if(!crate16A && crate16Count==1){
-                [xl3 hvPanicDown];
-                break;
-            }
-            else crate16Count++;
-        } else{
-            [xl3 hvPanicDown];
-            break;
-        }
+        [xl3 hvPanicDown];
+        return;
 
     }
 
+    NSLogColor([NSColor redColor],@"XL3 %i not found. Unable to Panic Down. \n",crateNumber);
+    
 }
 
 - (IBAction)updatexl3Mode:(id)sender{
