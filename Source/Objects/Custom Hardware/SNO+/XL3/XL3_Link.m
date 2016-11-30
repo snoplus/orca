@@ -714,7 +714,7 @@ static void SwapLongBlock(void* p, int32_t n)
     char err[ANET_ERR_LEN];
     char *host;
     
-    if (isConnected) {
+    if ([self isConnected]) {
         NSLogColor([NSColor redColor],@"%@ already connected, aborting reconnect.\n",[self crateName]);
         return;
     }
