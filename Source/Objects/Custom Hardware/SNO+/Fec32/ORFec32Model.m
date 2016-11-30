@@ -1886,7 +1886,7 @@ static NSAlert *        sReadingHvdbAlert = nil;
     // reconcile our settings with list of disabled channels and current detector state from database
     if (sCardDbData && [self stationNumber]<kSnoCardsPerCrate && [self crateNumber]<kSnoCrates) {
  
-        SnoPlusCard *card = (SnoPlusCard *)[sCardDbData mutableBytes] + ([self crateNumber] * kSnoCardsPerCrate + [self stationNumber]) * kSnoChannelsPerCard;
+        SnoPlusCard *card = (SnoPlusCard *)[sCardDbData mutableBytes] + [self crateNumber] * kSnoCardsPerCrate + [self stationNumber];
  
         // start from our current detector state
         startSeqDisabledMask          ^= ((int32_t)startSeqDisabledMask          ^ card->seqDisabled)    & card->valid[kSeqDisabled];
