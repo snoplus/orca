@@ -219,11 +219,8 @@ typedef struct{
 
 typedef struct{
   uint32_t mbNum;
-  uint32_t xilinxLoad;
-  uint32_t hvReset;
   uint32_t slotMask;
   uint32_t ctcDelay;
-  uint32_t shiftRegOnly;
 } CrateInitArgs;
 
 typedef struct{
