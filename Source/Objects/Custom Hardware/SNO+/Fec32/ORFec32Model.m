@@ -63,6 +63,8 @@ NSString* ORFecQllEnabledChanged					= @"ORFecQllEnabledChanged";
 NSString* ORFec32ModelAdcVoltageChanged				= @"ORFec32ModelAdcVoltageChanged";
 NSString* ORFec32ModelAdcVoltageStatusChanged		= @"ORFec32ModelAdcVoltageStatusChanged";
 NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageStatusOfCardChanged";
+NSString* ORFec32ModelCardDbChanged                 = @"ORFec32ModelCardDbChanged";
+
 // mask for crates that need updating after Hardware Wizard action
 static unsigned long crateInitMask; // crates that need to be initialized
 static unsigned long cratePedMask;  // crates that need their pedestals set
@@ -1751,6 +1753,65 @@ static NSAlert *        sReadingHvdbAlert = nil;
                      selector : @selector(hwWizardActionFinal:)
                          name : ORHWWizActionFinalNotification
                        object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(cardDbChanged:)
+                         name : ORFec32ModelCardDbChanged
+                       object : nil];
+}
+
+// sync FEC/DC variables to current hardware state from database
+// (the note object should be a NSMutableData object containing
+//  a full array of SnoPlusCard structures in crate/card order)
+- (void) cardDbChanged:(NSNotification*)note
+{
+    NSMutableData *cardDb = [note object];
+
+    if (!cardDb || ![cardDb respondsToSelector:@selector(mutableBytes)]) return;
+
+    if ([self stationNumber] >= kSnoCardsPerCrate || [self crateNumber] >= kSnoCrates) return;
+    
+    SnoPlusCard *card = (SnoPlusCard *)[cardDb mutableBytes] + [self crateNumber] * kSnoCardsPerCrate + [self stationNumber];
+    
+    startSeqDisabledMask          ^= ((int32_t)startSeqDisabledMask          ^ card->seqDisabled)    & card->valid[kSeqDisabled];
+    startPedEnabledMask           ^= ((int32_t)startPedEnabledMask           ^ card->pedEnabled)     & card->valid[kPedEnabled];
+    startTrigger100nsDisabledMask ^= ((int32_t)startTrigger100nsDisabledMask ^ card->nhit100enabled) & card->valid[kNhit100enabled];
+    startTrigger20nsDisabledMask  ^= ((int32_t)startTrigger20nsDisabledMask  ^ card->nhit20enabled)  & card->valid[kNhit20enabled];
+    
+    for (int ch=0; ch<32; ++ch) {
+        int32_t chMask = (1 << ch);
+        if (card->valid[kVthr] & chMask) {
+            [self setVth:ch withValue:card->vthr[ch]];
+        }
+        short dcNum = ch / 8;
+        if (dcPresent[dcNum]) {
+            ORFecDaughterCardModel *theDc = dc[dcNum];
+            short dcChan = ch - dcNum * 8;
+            if (card->valid[kNhit100delay] & chMask) {
+                // (there is some inconsistency in the code as to whether this
+                // is a width or delay, but they are both the same setting)
+                [theDc setNs100width:dcChan withValue:card->nhit100delay[ch]];
+            }
+            if (card->valid[kNhit20width] & chMask) {
+                [theDc setNs20width:dcChan withValue:card->nhit20width[ch]];
+            }
+            if (card->valid[kNhit20delay] & chMask) {
+                [theDc setNs20delay:dcChan withValue:card->nhit20delay[ch]];
+            }
+            if (card->valid[kVbal0] & chMask) {
+                [theDc setVb:dcChan withValue:card->vbal0[ch]];
+            }
+            if (card->valid[kVbal1] & chMask) {
+                [theDc setVb:(dcChan+8) withValue:card->vbal1[ch]];
+            }
+            if (card->valid[kTac0trim] & chMask) {
+                [theDc setTac0trim:dcChan withValue:card->tac0trim[ch]];
+            }
+            if (card->valid[kTac1trim] & chMask) {
+                [theDc setTac1trim:dcChan withValue:card->tac1trim[ch]];
+            }
+        }
+    }
 }
 
 - (void) _continueHWWizard:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
@@ -1772,9 +1833,9 @@ static NSAlert *        sReadingHvdbAlert = nil;
 - (void) _continueHWWizard
 {
     if (sCardDbState == 2 && sCardDbData) {
-        // re-post the start notification now that we can properly initialize FEC variables from the detector DB
+        // post notification so all FEC32 objects will update from the new card DB
         // (note: don't do this for stale database because in this case the current variables are more up-to-date)
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORHWWizGroupActionStarted object:hwWizard];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelCardDbChanged object:sCardDbData];
     }
     // all done loading database, so we can continue with our hwWizard execution now
     if (hwWizard && [hwWizard respondsToSelector:@selector(continueExecuteControlStruct)]) {
@@ -1890,50 +1951,6 @@ static NSAlert *        sReadingHvdbAlert = nil;
         [[ORPQModel getCurrent] channelDbQuery:self selector:@selector(_chanDbCallback:)];
         // post a modal dialog after 0.1 sec if the database operation hasn't completed yet
         [self performSelector:@selector(hwWizardWaitingForDatabase) withObject:nil afterDelay:1];
- 
-    } else if (sCardDbState == 2 && sCardDbData) {
- 
-        // (this is a re-post of this notification)
-        // sync variables to current hardware state from database
-        // (note: we won't do this for a stale database)
-        if ([self stationNumber]<kSnoCardsPerCrate && [self crateNumber]<kSnoCrates) {
-            SnoPlusCard *card = (SnoPlusCard *)[sCardDbData mutableBytes] + [self crateNumber] * kSnoCardsPerCrate + [self stationNumber];
-            startSeqDisabledMask          ^= ((int32_t)startSeqDisabledMask          ^ card->seqDisabled)    & card->valid[kSeqDisabled];
-            startPedEnabledMask           ^= ((int32_t)startPedEnabledMask           ^ card->pedEnabled)     & card->valid[kPedEnabled];
-            startTrigger100nsDisabledMask ^= ((int32_t)startTrigger100nsDisabledMask ^ card->nhit100enabled) & card->valid[kNhit100enabled];
-            startTrigger20nsDisabledMask  ^= ((int32_t)startTrigger20nsDisabledMask  ^ card->nhit20enabled)  & card->valid[kNhit20enabled];
-            for (int ch=0; ch<32; ++ch) {
-                if (card->valid[kNhit100delay] & (1 << ch)) {
-                    [self setVth:ch withValue:card->vthr[ch]];
-                }
-                if (card->valid[kNhit20width] & (1 << ch)) {
-                    [self setVth:ch withValue:card->vthr[ch]];
-                }
-                if (card->valid[kNhit20delay] & (1 << ch)) {
-                    [self setVth:ch withValue:card->vthr[ch]];
-                }
-                if (card->valid[kVthr] & (1 << ch)) {
-                    [self setVth:ch withValue:card->vthr[ch]];
-                }
-                short dcNum = ch / 8;
-                if (dcPresent[dcNum]) {
-                    ORFecDaughterCardModel *theDc = dc[dcNum];
-                    short dcChan = ch - dcNum * 8;
-                    if (card->valid[kVbal0] & (1 << ch)) {
-                        [theDc setVb:dcChan withValue:card->vbal0[ch]];
-                    }
-                    if (card->valid[kVbal1] & (1 << ch)) {
-                        [theDc setVb:(dcChan+8) withValue:card->vbal1[ch]];
-                    }
-                    if (card->valid[kTac0trim] & (1 << ch)) {
-                        [theDc setTac0trim:dcChan withValue:card->tac0trim[ch]];
-                    }
-                    if (card->valid[kTac1trim] & (1 << ch)) {
-                        [theDc setTac1trim:dcChan withValue:card->tac1trim[ch]];
-                    }
-                }
-            }
-        }   
     }
 }
 

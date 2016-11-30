@@ -58,7 +58,7 @@ typedef struct {
     unsigned char   vthr[kSnoChannelsPerCard];
     int32_t         pedEnabled;
     int32_t         seqDisabled;
-    int32_t         valid[kNumCardDbColumns];   // valid flags (see enum above)
+    int32_t         valid[kNumCardDbColumns];   // bitmasks for settings loaded from hardware (see enum above)
 } SnoPlusCard;
 
 @class ORPQConnection;

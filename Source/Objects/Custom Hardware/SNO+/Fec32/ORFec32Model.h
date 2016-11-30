@@ -430,6 +430,8 @@ extern NSString* ORFec32ModelAdcVoltageChanged;
 extern NSString* ORFec32ModelAdcVoltageStatusChanged;
 extern NSString* ORFec32ModelAdcVoltageStatusOfCardChanged;
 
+extern NSString* ORFec32CardDbChangedNotification;
+
 extern NSString* ORFecLock;
 
 
