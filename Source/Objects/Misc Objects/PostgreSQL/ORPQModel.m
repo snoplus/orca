@@ -517,8 +517,9 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
 
                     // continue with next call to database
                     [command autorelease];
-                    //      0     1    2          3         4    5             6
-                    cols = "crate,slot,tr100_mask,tr20_mask,vthr,pedestal_mask,disable_mask";
+                    // (funny, but tcmos_tacshift=tac0trim and scmos=tac1trim)
+                    //      0     1    2          3           4         5          6          7      8      9              10    11   12            13
+                    cols = "crate,slot,tr100_mask,tr100_delay,tr20_mask,tr20_width,tr20_delay,vbal_0,vbal_1,tcmos_tacshift,scmos,vthr,pedestal_mask,disable_mask";
                     command = [[NSString stringWithFormat: @"SELECT %s FROM current_detector_state",cols] retain];
                     theResult = [pqConnection queryString:command];
                     if (!theResult || [self isCancelled]) break;
@@ -539,20 +540,41 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                             for (int ch=0; ch<n; ++ch) {
                                 theCard->valid[col] |= (1 << ch);
                                 switch (col) {
-                                    case 2:
+                                    case kNhit100enabled:
                                         if (val[ch]) theCard->nhit100enabled |= (1 << ch);
                                         break;
-                                    case 3:
+                                    case kNhit100delay:
+                                        theCard->nhit100delay[ch] = val[ch];
+                                        break;
+                                    case kNhit20enabled:
                                         if (val[ch]) theCard->nhit20enabled |= (1 << ch);
                                         break;
-                                    case 4:
+                                    case kNhit20width:
+                                        theCard->nhit20width[ch] = val[ch];
+                                        break;
+                                    case kNhit20delay:
+                                        theCard->nhit20delay[ch] = val[ch];
+                                        break;
+                                    case kVbal0:
+                                        theCard->vbal0[ch] = val[ch];
+                                        break;
+                                    case kVbal1:
+                                        theCard->vbal1[ch] = val[ch];
+                                        break;
+                                    case kTac0trim:
+                                        theCard->tac0trim[ch] = val[ch];
+                                        break;
+                                    case kTac1trim:
+                                        theCard->tac1trim[ch] = val[ch];
+                                        break;
+                                    case kVthr:
                                         theCard->vthr[ch] = val[ch];
                                         break;
-                                    case 5:
+                                    case kPedEnabled:
                                         theCard->pedEnabled = val[0];
                                         theCard->valid[col] = 0xffffffff;
                                         break;
-                                    case 6:
+                                    case kSeqDisabled:
                                         theCard->seqDisabled = val[0];
                                         theCard->valid[col] = 0xffffffff;
                                         break;

@@ -25,25 +25,41 @@
 #define kSnoCardsTotal      (kSnoCrates * kSnoCardsPerCrate)
 #define kSnoChannels        (kSnoCardsTotal * kSnoChannelsPerCard)
 
-typedef struct {
-    int32_t hvDisabled;   // resistor pulled or no cable
-    int32_t pedEnabled;
-    int32_t seqDisabled;
-    int32_t nhit100enabled;
-    int32_t nhit20enabled;
-    unsigned char vthr[kSnoChannelsPerCard];
-    int32_t valid[8];   // valid flags (see enum below)
-} SnoPlusCard;
-
 // indices for SnoPlusCard valid flags
+// (all except hvDisabled must have the same numbers as the column numbers when reading the detector db)
 enum {
     kHvDisabled     = 1,
-    kNhit100enabled = 2,
-    kNhit20enabled  = 3,
-    kVthr           = 4,
-    kPedEnabled     = 5,
-    kSeqDisabled    = 6,
+    kNhit100enabled,
+    kNhit100delay,
+    kNhit20enabled,
+    kNhit20width,
+    kNhit20delay,
+    kVbal0,
+    kVbal1,
+    kTac0trim,
+    kTac1trim,
+    kVthr,
+    kPedEnabled,
+    kSeqDisabled,
+    kNumCardDbColumns
 };
+
+typedef struct {
+    int32_t         hvDisabled;   // resistor pulled or no cable
+    int32_t         nhit100enabled;
+    unsigned char   nhit100delay[kSnoChannelsPerCard];
+    int32_t         nhit20enabled;
+    unsigned char   nhit20width[kSnoChannelsPerCard];
+    unsigned char   nhit20delay[kSnoChannelsPerCard];
+    unsigned char   vbal0[kSnoChannelsPerCard];
+    unsigned char   vbal1[kSnoChannelsPerCard];
+    unsigned char   tac0trim[kSnoChannelsPerCard];
+    unsigned char   tac1trim[kSnoChannelsPerCard];
+    unsigned char   vthr[kSnoChannelsPerCard];
+    int32_t         pedEnabled;
+    int32_t         seqDisabled;
+    int32_t         valid[kNumCardDbColumns];   // valid flags (see enum above)
+} SnoPlusCard;
 
 @class ORPQConnection;
 @class ORPQModel;

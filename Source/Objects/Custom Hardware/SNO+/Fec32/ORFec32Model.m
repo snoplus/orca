@@ -1903,8 +1903,34 @@ static NSAlert *        sReadingHvdbAlert = nil;
             startTrigger100nsDisabledMask ^= ((int32_t)startTrigger100nsDisabledMask ^ card->nhit100enabled) & card->valid[kNhit100enabled];
             startTrigger20nsDisabledMask  ^= ((int32_t)startTrigger20nsDisabledMask  ^ card->nhit20enabled)  & card->valid[kNhit20enabled];
             for (int ch=0; ch<32; ++ch) {
+                if (card->valid[kNhit100delay] & (1 << ch)) {
+                    [self setVth:ch withValue:card->vthr[ch]];
+                }
+                if (card->valid[kNhit20width] & (1 << ch)) {
+                    [self setVth:ch withValue:card->vthr[ch]];
+                }
+                if (card->valid[kNhit20delay] & (1 << ch)) {
+                    [self setVth:ch withValue:card->vthr[ch]];
+                }
                 if (card->valid[kVthr] & (1 << ch)) {
                     [self setVth:ch withValue:card->vthr[ch]];
+                }
+                short dcNum = ch / 8;
+                if (dcPresent[dcNum]) {
+                    ORFecDaughterCardModel *theDc = dc[dcNum];
+                    short dcChan = ch - dcNum * 8;
+                    if (card->valid[kVbal0] & (1 << ch)) {
+                        [theDc setVb:dcChan withValue:card->vbal0[ch]];
+                    }
+                    if (card->valid[kVbal1] & (1 << ch)) {
+                        [theDc setVb:(dcChan+8) withValue:card->vbal1[ch]];
+                    }
+                    if (card->valid[kTac0trim] & (1 << ch)) {
+                        [theDc setTac0trim:dcChan withValue:card->tac0trim[ch]];
+                    }
+                    if (card->valid[kTac1trim] & (1 << ch)) {
+                        [theDc setTac1trim:dcChan withValue:card->tac1trim[ch]];
+                    }
                 }
             }
         }   
