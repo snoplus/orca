@@ -183,7 +183,7 @@ snotDb = _snotDb;
 
     [notifyCenter addObserver : self
                      selector : @selector(connectionStateChanged)
-                         name : XL3_LinkConnectStateChanged
+                         name : XL3_LinkConnectionChanged
                        object : xl3Link];
 }
 

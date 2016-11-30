@@ -52,7 +52,7 @@
 					   object : model];
 
     [notifyCenter addObserver : self
-					 selector : @selector(updateButtons:)
+					 selector : @selector(updateWindow)
 						 name : @"ORXL3ModelStateChanged"
 					   object : [model adapter]];
 }

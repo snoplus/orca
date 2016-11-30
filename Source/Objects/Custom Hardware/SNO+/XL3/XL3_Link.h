@@ -45,6 +45,7 @@ typedef enum eXL3_ConnectStates {
 	NSString*	crateName;
 	unsigned long	portNumber;
     BOOL        autoConnect;
+    BOOL		isConnected;
 	int		connectState;
 	int		_errorTimeOut;
 	NSDate*	timeConnected;
@@ -72,6 +73,7 @@ typedef enum eXL3_ConnectStates {
     long            bundleFreeSpace;
 }
 
+@property (assign,nonatomic) BOOL isConnected;
 @property (assign,nonatomic) int pendingThreads;
 @property (assign,nonatomic) BOOL autoConnect;
 @property (copy,nonatomic) NSArray* fifoStatus;
@@ -93,7 +95,6 @@ typedef enum eXL3_ConnectStates {
 - (void)encodeWithCoder:(NSCoder*)encoder;
 
 #pragma mark •••Accessors
-- (BOOL) isConnected;
 - (int)  workingSocket;
 - (void) setWorkingSocket:(int) aSocket;
 - (BOOL) needToSwap;
