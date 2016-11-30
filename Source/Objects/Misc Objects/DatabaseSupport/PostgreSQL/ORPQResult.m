@@ -3,7 +3,7 @@
 //
 //  2016-06-01 Created by Phil Harvey (Based on ORSqlResult.m by M.Howe)
 //
-// Ref: https://www.postgresql.org/docs/9.0/static/libpq-exec.html
+// Ref: https://www.postgresql.org/docs/9.5/static/libpq-exec.html
 //
 
 #import "ORPQConnection.h"
@@ -12,14 +12,18 @@
 // (constants are from postgresql/src/include/catalog/pg_type.h,
 //  but that header doesn't compile, so define them here instead - PH)
 enum {
-    kPQTypeBool = 16,   // 8 bit boolean
-    kPQTypeString = 17, // variable-length string
-    kPQTypeChar = 18,   // single 8 bit character
-    kPQTypeName = 19,   // 63-byte name
-    kPQTypeInt64 = 20,  // 8-byte integer
-    kPQTypeInt16 = 21,  // 2-byte integer
-    kPQTypeArray16 = 22,// array of 2-byte integers
-    kPQTypeInt32 = 23,  // 4-byte integer
+    kPQTypeBool     = 16,   // 8 bit boolean
+    kPQTypeString   = 17,   // variable-length string
+    kPQTypeChar     = 18,   // single 8 bit character
+    kPQTypeName     = 19,   // 63-byte name
+    kPQTypeInt64    = 20,   // 8-byte integer
+    kPQTypeInt16    = 21,   // 2-byte integer
+    kPQTypeVector16 = 22,   // vector of 2-byte integers
+    kPQTypeInt32    = 23,   // 4-byte integer
+    kPQTypeArrayChar= 1002, // array of 8-bit characters
+    kPQTypeArray16  = 1005, // array of 2-byte integers
+    kPQTypeArray32  = 1007, // array of 4-byte integers
+    kPQTypeArray64  = 1016, // array of 8-byte integers
 };
 
 NSDate* MCPYear0000;
@@ -65,9 +69,13 @@ NSDate* MCPYear0000;
 
 - (id) fetchRowAsType:(MCPReturnType) aType
 {
+    return [self fetchRowAsType:aType row:0];
+}
+
+- (id) fetchRowAsType:(MCPReturnType)aType row:(int)aRow
+{
     int		i;
     id		theReturn;
-    int     theRow = 0;
 
     if (mResult == NULL || !mNumOfRows) {
         return nil;
@@ -91,8 +99,8 @@ NSDate* MCPYear0000;
     for (i=0; i<mNumOfFields; i++) {
         Oid type = PQftype(mResult,i);
         id	theCurrentObj = nil;
-        if (!PQgetisnull(mResult,theRow,i)) {
-            char *pt = PQgetvalue(mResult,theRow,i);
+        if (!PQgetisnull(mResult,aRow,i)) {
+            char *pt = PQgetvalue(mResult,aRow,i);
             switch (type) {
                 case kPQTypeBool:
                     if (*pt == 'f') {
@@ -108,10 +116,26 @@ NSDate* MCPYear0000;
                 case kPQTypeInt64:
                 case kPQTypeInt16:
                 case kPQTypeInt32:
-                    theCurrentObj = [NSNumber numberWithLong:strtol(pt, NULL, 0)];
+                    theCurrentObj = [NSNumber numberWithLong:strtoll(pt, NULL, 0)];
                     break;
-             // case kPQTypeName: (not yet implemented)
-             // case kPQTypeArray16: (not yet implemented)
+                case kPQTypeArrayChar:
+                case kPQTypeArray16:
+                case kPQTypeArray32:
+                case kPQTypeArray64: {
+                    int len = PQgetlength(mResult,aRow,i);
+                    if (!len) break;
+                    NSMutableArray *array = [NSMutableArray arrayWithCapacity:32];
+                    char *tmp = (char *)malloc(len+1);
+                    memcpy(tmp, pt, len);
+                    tmp[len] = '\0';    // (add null terminator just to be safe)
+                    char *last;
+                    char *tok = strtok_r(tmp, "{}, ", &last);
+                    while (tok) {
+                        [array addObject:[NSNumber numberWithLong:strtoll(tok, NULL, 0)]];
+                        tok = strtok_r(NULL, "{}, ", &last);
+                    }
+                    free(tmp);
+                } break;
             }
         }
         if (theCurrentObj == nil) {
@@ -183,38 +207,85 @@ NSDate* MCPYear0000;
     return (mNames = [[NSArray arrayWithArray:theNamesArray] retain]);
 }
 
+// (returns 0 if there is no value at those coordinates)
 - (int32_t) getInt32atRow:(int)aRow column:(int)aColumn;
 {
-    int32_t val;
+    int32_t val = 0;
     if (mResult && aRow<mNumOfRows && aColumn<mNumOfFields) {
         Oid type = PQftype(mResult,aColumn);
-        if (PQgetisnull(mResult,aRow,aColumn)) {
-            val = -1;
-        } else {
+        if (!PQgetisnull(mResult,aRow,aColumn)) {
             char *pt = PQgetvalue(mResult,aRow,aColumn);
             switch (type) {
                 case kPQTypeChar:
-                case kPQTypeInt64:
                 case kPQTypeInt16:
                 case kPQTypeInt32:
+                case kPQTypeInt64:
                     val = (int32_t)atol(pt);
                     break;
                 case kPQTypeBool:
-                    if (*pt == 'f') {
-                        val = 0;
-                    } else if (*pt == 't') {
+                    if (*pt == 't') {
                         val = 1;
+                    } else if (*pt == 'f') {
+                        val = 0;
                     } else {
                         val = -1;
                     }
                     break;
-                default:
-                    val = -1;
-                    break;
             }
         }
-    } else {
-        val = -1;
+    }
+    return val;
+}
+
+- (NSMutableData *) getInt32arrayAtRow:(int)aRow column:(int)aColumn;
+{
+    NSMutableData *val = nil;
+    int32_t value;
+    if (mResult && aRow<mNumOfRows && aColumn<mNumOfFields) {
+        Oid type = PQftype(mResult,aColumn);
+        if (!PQgetisnull(mResult,aRow,aColumn)) {
+            val = [[[NSMutableData alloc] initWithLength:0] autorelease];
+            char *pt = PQgetvalue(mResult,aRow,aColumn);
+            switch (type) {
+                case kPQTypeChar:
+                case kPQTypeInt16:
+                case kPQTypeInt32:
+                case kPQTypeInt64: {
+                    value = (int32_t)atol(pt);
+                    [val appendBytes:&value length:sizeof(int32_t)];
+                    break;
+                }
+                case kPQTypeBool:
+                    if (*pt == 'f') {
+                        value = 0;
+                    } else if (*pt == 't') {
+                        value = 1;
+                    } else {
+                        break;
+                    }
+                    [val appendBytes:&value length:sizeof(int32_t)];
+                    break;
+                case kPQTypeArrayChar:
+                case kPQTypeArray16:
+                case kPQTypeArray32:
+                case kPQTypeArray64: {
+                    int len = PQgetlength(mResult,aRow,aColumn);
+                    if (!len) break;
+                    char *tmp = (char *)malloc(len+1);
+                    memcpy(tmp, pt, len);
+                    tmp[len] = '\0';    // (add null terminator just to be safe)
+                    char *last;
+                    char *tok = strtok_r(tmp, "{}, ", &last);
+                    while (tok) {
+                        value = strtoll(tok, NULL, 0);
+                        [val appendBytes:&value length:sizeof(int32_t)];
+                        tok = strtok_r(NULL, "{}, ", &last);
+                    }
+                    free(tmp);
+                    break;
+                }
+            }
+        }
     }
     return val;
 }
@@ -229,6 +300,9 @@ NSDate* MCPYear0000;
     }
 
     switch (aType) {
+        default :
+            NSLog (@"Unknown type : %d, will return an Array!\n", aType);
+            // fall through!
         case MCPTypeArray:
             theTypes = [NSMutableArray arrayWithCapacity:mNumOfFields];
             break;
@@ -237,10 +311,6 @@ NSDate* MCPYear0000;
                 [self fetchFieldsName];
             }
             theTypes = [NSMutableDictionary dictionaryWithCapacity:mNumOfFields];
-            break;
-        default :
-            NSLog (@"Unknown type : %d, will return an Array!\n", aType);
-            theTypes = [NSMutableArray arrayWithCapacity:mNumOfFields];
             break;
     }
     for (i=0; i<mNumOfFields; i++) {
@@ -259,11 +329,14 @@ NSDate* MCPYear0000;
             case kPQTypeName:
                 theType = @"name";
                 break;
-            case kPQTypeInt64:
-                theType = @"int8";
-                break;
             case kPQTypeInt16:
                 theType = @"int2";
+                break;
+            case kPQTypeInt32:
+                theType = @"int4";
+                break;
+            case kPQTypeInt64:
+                theType = @"int8";
                 break;
             default:
                 theType = @"unknown";
@@ -271,9 +344,6 @@ NSDate* MCPYear0000;
                 break;
         }
         switch (aType) {
-            case MCPTypeArray :
-                [theTypes addObject:theType];
-                break;
             case MCPTypeDictionary :
                 [theTypes setObject:theType forKey:[mNames objectAtIndex:i]];
                 break;

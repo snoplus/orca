@@ -22,7 +22,28 @@
 #define kSnoCrates          20
 #define kSnoCardsPerCrate   16
 #define kSnoChannelsPerCard 32
-#define kSnoChannels        (kSnoCrates * kSnoCardsPerCrate * kSnoChannelsPerCard)
+#define kSnoCardsTotal      (kSnoCrates * kSnoCardsPerCrate)
+#define kSnoChannels        (kSnoCardsTotal * kSnoChannelsPerCard)
+
+typedef struct {
+    int32_t hvDisabled;   // resistor pulled or no cable
+    int32_t pedEnabled;
+    int32_t seqDisabled;
+    int32_t nhit100enabled;
+    int32_t nhit20enabled;
+    unsigned char vthr[kSnoChannelsPerCard];
+    int32_t valid[8];   // valid flags (see enum below)
+} SnoPlusCard;
+
+// indices for SnoPlusCard valid flags
+enum {
+    kHvDisabled     = 1,
+    kNhit100enabled = 2,
+    kNhit20enabled  = 3,
+    kVthr           = 4,
+    kPedEnabled     = 5,
+    kSeqDisabled    = 6,
+};
 
 @class ORPQConnection;
 @class ORPQModel;
@@ -52,6 +73,7 @@
 
 /**
  @brief Arbitrary detector db query
+ @param aCommand PostgreSQL command string
  @param anObject Callback object
  @param aSelector Callback object selector (called with an ORPQResult object, or nil on error)
  @param aTimeoutSecs Timeout time in seconds (0 for no timeout)
@@ -60,6 +82,7 @@
 
 /**
  @brief Arbitrary detector db query with no timeout
+ @param aCommand PostgreSQL command string
  @param anObject Callback object
  @param aSelector Callback object selector (called with an ORPQResult object, or nil on error)
  */
@@ -67,16 +90,17 @@
 
 /**
  @brief Arbitrary detector db query with no callback or timeout
+ @param aCommand PostgreSQL command string
  */
 - (void) dbQuery:(NSString*)aCommand;
 
 /**
- @brief Get specified field from detector db
+ @brief Get SNO+ channel database
  @param anObject Callback object
  @param aSelector Callback object selector (called with an NSMutableData object
- containing an int32_t array of values in detector crate/card/channel order, or nil on error)
+ containing an array of SnoPlusCard structures in detector crate/card/channel order, or nil on error)
  */
-- (void) pmtdbQuery:(NSString*)aPmtdbField object:(id)anObject selector:(SEL)aSelector;
+- (void) channelDbQuery:(id)anObject selector:(SEL)aSelector;
 
 - (void) cancelDbQueries;
 - (BOOL) stealthMode;
@@ -132,7 +156,7 @@ extern NSString* ORPQLock;
 
 enum ePQCommandType {
     kPQCommandType_General,
-    kPQCommandType_GetPMT,
+    kPQCommandType_GetChannelDB,
 };
 
 @interface ORPQQueryOp : ORPQOperation
@@ -142,7 +166,6 @@ enum ePQCommandType {
 }
 - (void) setCommand:(NSString*)aCommand;
 - (void) setCommandType:(int)aCommandType;
-- (void) setPmtdbFieldName:(NSString*)aFieldName;
 - (void) cancel;
 - (void) main;
 @end

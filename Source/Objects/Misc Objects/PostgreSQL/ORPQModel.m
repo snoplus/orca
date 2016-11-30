@@ -195,13 +195,13 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
     [self dbQuery:aCommand object:nil selector:nil timeout:0];
 }
 
-- (void)pmtdbQuery:(NSString*)aPmtdbField object:(id)anObject selector:(SEL)aSelector
+- (void)channelDbQuery:(id)anObject selector:(SEL)aSelector
 {
     if(stealthMode){
         [anObject performSelector:aSelector withObject:nil afterDelay:0.1];
     } else {
         ORPQQueryOp* anOp = [[ORPQQueryOp alloc] initWithDelegate:self object:anObject selector:aSelector];
-        [anOp setPmtdbFieldName:aPmtdbField];
+        [anOp setCommandType:kPQCommandType_GetChannelDB];
         [ORPQDBQueue addOperation:anOp];
         [anOp release];
     }
@@ -456,12 +456,6 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
     commandType = aCommandType;
 }
 
-- (void) setPmtdbFieldName:(NSString*)aFieldName;
-{
-    commandType = kPQCommandType_GetPMT;
-    command = [[NSString stringWithFormat: @"SELECT crate,card,channel,%@ FROM pmtdb", aFieldName] retain];
-}
-
 - (void) cancel
 {
     [super cancel];
@@ -474,6 +468,9 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
 
 - (void) main
 {
+    int i;
+    ORPQResult *theResult;
+
     if([self isCancelled]) return;
 
     NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
@@ -481,33 +478,86 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
     @try {
         ORPQConnection* pqConnection = [[delegate pqConnection] retain];
         if([pqConnection isConnected] && ![self isCancelled]){
-            ORPQResult *theResult = [pqConnection queryString:command];
 
-            if (theResult && ![self isCancelled]) {
-                switch (commandType) {
-                    case kPQCommandType_General:
+            switch (commandType) {
+                
+                case kPQCommandType_General:
+                    theResult = [pqConnection queryString:command];
+                    if (theResult && ![self isCancelled]) {
                         theResultObject = theResult;
-                        break;
-                    case kPQCommandType_GetPMT: {
-                        int numRows = [theResult numOfRows];
-                        int numCols = [theResult numOfFields];
-                        if (numCols == 4) {
-                            NSMutableData *data = [[[NSMutableData alloc] initWithCapacity:(kSnoChannels * sizeof(int32_t))] autorelease];
-                            int32_t *pt = [data mutableBytes];
-                            memset(pt, 0xff, (kSnoChannels * sizeof(int32_t)));
-                            for (int i=0; i<numRows; ++i) {
-                                int crate = [theResult getInt32atRow:i column:0];
-                                int card = [theResult getInt32atRow:i column:1];
-                                int channel = [theResult getInt32atRow:i column:2];
-                                if (crate < kSnoCrates && card < kSnoCardsPerCrate && channel < kSnoChannelsPerCard) {
-                                    int n = (crate * kSnoCardsPerCrate + card) * kSnoChannelsPerCard + channel;
-                                    pt[n] = [theResult getInt32atRow:i column:3];
+                    }
+                    break;
+
+                case kPQCommandType_GetChannelDB: {
+                    [command autorelease];
+                    command = [[NSString stringWithFormat: @"SELECT crate,card,channel,pmthv FROM pmtdb"] retain];
+                    theResult = [pqConnection queryString:command];
+                    if (!theResult || [self isCancelled]) break;
+                    int numRows = [theResult numOfRows];
+                    int numCols = [theResult numOfFields];
+                    if (numCols != 4) break;
+                    NSMutableData *dataOut = [[[NSMutableData alloc] initWithCapacity:(kSnoCardsTotal * sizeof(SnoPlusCard))] autorelease];
+                    SnoPlusCard *cardPt = [dataOut mutableBytes];
+                    memset(cardPt, 0, kSnoCardsTotal * sizeof(SnoPlusCard));
+                    for (i=0; i<numRows; ++i) {
+                        int32_t val = [theResult getInt32atRow:i column:3];
+                        if (val < 0) continue;
+                        int crate = [theResult getInt32atRow:i column:0];
+                        int card = [theResult getInt32atRow:i column:1];
+                        int channel = [theResult getInt32atRow:i column:2];
+                        if (crate < kSnoCrates && card < kSnoCardsPerCrate && channel < kSnoChannelsPerCard) {
+                            SnoPlusCard *theCard = cardPt + crate * kSnoCardsPerCrate + card;
+                            theCard->valid[kHvDisabled] |= (1 << channel);
+                            if (val == 1) theCard->hvDisabled |= (1 << channel);
+                        }
+                    }
+                    if ([self isCancelled]) break;
+
+                    // continue with next call to database
+                    [command autorelease];
+                    command = [[NSString stringWithFormat: @"SELECT crate,slot,tr100_mask,tr20_mask,vthr,pedestal_mask,disable_mask FROM current_detector_state"] retain];
+                    theResult = [pqConnection queryString:command];
+                    if (!theResult || [self isCancelled]) break;
+                    numRows = [theResult numOfRows];
+                    numCols = [theResult numOfFields];
+                    if (numCols != 7) break;
+                    for (i=0; i<numRows; ++i) {
+                        int crate = [theResult getInt32atRow:i column:0];
+                        int card = [theResult getInt32atRow:i column:1];
+                        if (crate >= kSnoCrates || card >= kSnoCardsPerCrate) continue;
+                        SnoPlusCard *theCard = cardPt + crate * kSnoCardsPerCrate + card;
+                        for (int col=2; col<=6; ++col) {
+                            NSMutableData *dat = [theResult getInt32arrayAtRow:i column:col];
+                            if (!dat) continue;
+                            int n = [dat length] / sizeof(int32_t);
+                            if (n > kSnoChannelsPerCard) n = kSnoChannelsPerCard;
+                            int32_t *val = (int32_t *)[dat mutableBytes];
+                            for (int ch=0; ch<n; ++ch) {
+                                theCard->valid[col] |= (1 << ch);
+                                switch (col) {
+                                    case 2:
+                                        if (val[ch]) theCard->nhit100enabled |= (1 << ch);
+                                        break;
+                                    case 3:
+                                        if (val[ch]) theCard->nhit20enabled |= (1 << ch);
+                                        break;
+                                    case 4:
+                                        theCard->vthr[ch] = val[ch];
+                                        break;
+                                    case 5:
+                                        theCard->pedEnabled = val[0];
+                                        theCard->valid[col] = 0xffffffff;
+                                        break;
+                                    case 6:
+                                        theCard->seqDisabled = val[0];
+                                        theCard->valid[col] = 0xffffffff;
+                                        break;
                                 }
-                                theResultObject = data;
                             }
                         }
-                    } break;
-                }
+                    }
+                    theResultObject = dataOut;
+                }   break;
             }
         }
         [pqConnection release];
