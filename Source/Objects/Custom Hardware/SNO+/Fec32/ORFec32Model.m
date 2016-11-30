@@ -1788,8 +1788,8 @@ static NSAlert *        sReadingHvdbAlert = nil;
             ORFecDaughterCardModel *theDc = dc[dcNum];
             short dcChan = ch - dcNum * 8;
             if (card->valid[kNhit100delay] & chMask) {
-                // (there is some inconsistency in the code as to whether this
-                // is a width or delay, but they are both the same setting)
+                // (there is some inconsistency between ORFecDaughterCardModel and ORXL3Model
+                // as to whether this is a width or delay, but they are both the same setting)
                 [theDc setNs100width:dcChan withValue:card->nhit100delay[ch]];
             }
             if (card->valid[kNhit20width] & chMask) {
@@ -1942,13 +1942,12 @@ static NSAlert *        sReadingHvdbAlert = nil;
     
     // interrupt hardwardWizard execution to allow time to load pmtdb if necessary
     if (sCardDbState == 0 && [note object] && [[note object] respondsToSelector:@selector(notOkToContinue)]) {
- 
         sCardDbState = 1;
         hwWizard = [note object];
         // (we will continue after our detector database is loaded)
         [hwWizard performSelector:@selector(notOkToContinue)];
         // initiate the PostgreSQL DB query to get the current detector state
-        [[ORPQModel getCurrent] channelDbQuery:self selector:@selector(_chanDbCallback:)];
+        [[ORPQModel getCurrent] cardDbQuery:self selector:@selector(_chanDbCallback:)];
         // post a modal dialog after 0.1 sec if the database operation hasn't completed yet
         [self performSelector:@selector(hwWizardWaitingForDatabase) withObject:nil afterDelay:1];
     }

@@ -195,7 +195,7 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
     [self dbQuery:aCommand object:nil selector:nil timeout:0];
 }
 
-- (void)channelDbQuery:(id)anObject selector:(SEL)aSelector
+- (void)cardDbQuery:(id)anObject selector:(SEL)aSelector
 {
     if(stealthMode){
         [anObject performSelector:aSelector withObject:nil afterDelay:0.1];

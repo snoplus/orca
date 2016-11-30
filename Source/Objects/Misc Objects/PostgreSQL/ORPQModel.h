@@ -111,12 +111,12 @@ typedef struct {
 - (void) dbQuery:(NSString*)aCommand;
 
 /**
- @brief Get SNO+ channel database
+ @brief Get SNO+ card database
  @param anObject Callback object
  @param aSelector Callback object selector (called with an NSMutableData object
- containing an array of SnoPlusCard structures in detector crate/card/channel order, or nil on error)
+ containing an array of SnoPlusCard structures in detector crate/card order, or nil on error)
  */
-- (void) channelDbQuery:(id)anObject selector:(SEL)aSelector;
+- (void) cardDbQuery:(id)anObject selector:(SEL)aSelector;
 
 - (void) cancelDbQueries;
 - (BOOL) stealthMode;
