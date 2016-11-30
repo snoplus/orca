@@ -150,6 +150,8 @@ enum {
     MB ui_bundle[16];
     unsigned long _ecal_received;
     bool _ecalToOrcaInProgress;
+
+    bool initialized;
 }
 
 @property (nonatomic,assign) unsigned long xl3MegaBundleDataId;
@@ -237,6 +239,7 @@ enum {
 - (int) initAtRunStart;
 
 #pragma mark •••Accessors
+- (bool) initialized;
 - (NSString*) shortName;
 - (id) controllerCard;
 - (void) setSlot:(int)aSlot;

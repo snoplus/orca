@@ -288,6 +288,11 @@ snotDb = _snotDb;
 	return @"XL3";
 }
 
+- (bool) initialized
+{
+    return initialized;
+}
+
 - (id) controllerCard
 {
 	return self;
@@ -1432,6 +1437,8 @@ void SwapLongBlock(void* p, int32_t n)
     [self setXl3Mode:           [decoder decodeIntForKey:@"Xl3Mode"]];
     [self setIsTriggerON:       [decoder decodeBoolForKey:@"isTriggerON"]];
 
+    initialized = FALSE;
+
     if ([self isTriggerON]) {
         [self setTriggerStatus:@"ON"];
     } else {
@@ -1466,7 +1473,7 @@ void SwapLongBlock(void* p, int32_t n)
 
     self.hvANeedsUserIntervention = false;
     self.hvBNeedsUserIntervention = false;
-    
+
     [self safeHvInit];
      
     [[self undoManager] enableUndoRegistration];
@@ -1681,10 +1688,14 @@ void SwapLongBlock(void* p, int32_t n)
     results->xl3Clock = ntohl(results->xl3Clock);
     results->initialized = ntohl(results->initialized);
 
-    NSDictionary *userInfo = [NSDictionary dictionaryWithObject:
-        [NSNumber numberWithInt:results->initialized] forKey:@"initialized"];
+    if (results->initialized) {
+        initialized = TRUE;
+    } else {
+        initialized = FALSE;
+    }
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORXL3ModelStateChanged" object:self userInfo:userInfo];
+    NSLog(@"posting notification\n");
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORXL3ModelStateChanged" object:self userInfo:nil];
 
     [[self undoManager] disableUndoRegistration];
     [self setXl3Mode: results->mode];

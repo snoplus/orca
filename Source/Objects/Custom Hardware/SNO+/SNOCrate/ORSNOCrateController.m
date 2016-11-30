@@ -25,7 +25,7 @@
 #import "ORSNOCrateModel.h"
 #import "ORSNOCard.h"
 #import "SBC_Link.h"
-#import "ORXL2Model.h"
+#import "ORXL3Model.h"
 
 @implementation ORSNOCrateController
 
@@ -61,6 +61,26 @@
 {
     [super updateWindow];
 	[self slotChanged:nil];
+
+    ORXL3Model *xl3 = [model adapter];
+
+    if ([[xl3 xl3Link] isConnected]) {
+        if ([xl3 initialized]) {
+            /* The Xilinx has been loaded, so we need to enable the load
+             * hardware button and disable the reset crate button. */
+            [loadHardwareButton setEnabled:TRUE];
+            [resetCrateButton setEnabled:FALSE];
+        } else {
+            /* The Xilinx hasn't been loaded, so we enable the reset crate
+             * button and disable the load hardware button. */
+            [loadHardwareButton setEnabled:FALSE];
+            [resetCrateButton setEnabled:TRUE];
+        }
+    } else {
+        /* XL3 isn't connected, so don't enable any buttons. */
+        [loadHardwareButton setEnabled:FALSE];
+        [resetCrateButton setEnabled:FALSE];
+    }
 }
 
 #pragma mark •••Interface Management
@@ -75,19 +95,7 @@
 
 - (void) updateButtons: (NSNotification *) aNote
 {
-    NSDictionary *userInfo = [aNote userInfo];
-
-    if ([[userInfo objectForKey:@"initialized"] intValue]) {
-        /* The Xilinx has been loaded, so we need to enable the load
-         * hardware button and disable the reset crate button. */
-        [loadHardwareButton setEnabled:TRUE];
-        [resetCrateButton setEnabled:FALSE];
-    } else {
-        /* The Xilinx hasn't been loaded, so we enable the reset crate
-         * button and disable the load hardware button. */
-        [loadHardwareButton setEnabled:FALSE];
-        [resetCrateButton setEnabled:TRUE];
-    }
+    [self updateWindow];
 }
 
 - (void) setModel:(id)aModel
