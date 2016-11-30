@@ -490,7 +490,9 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
 
                 case kPQCommandType_GetChannelDB: {
                     [command autorelease];
-                    command = [[NSString stringWithFormat: @"SELECT crate,card,channel,pmthv FROM pmtdb"] retain];
+                    // column:    0     1    2       3
+                    char *cols = "crate,card,channel,pmthv";
+                    command = [[NSString stringWithFormat: @"SELECT %s FROM pmtdb",cols] retain];
                     theResult = [pqConnection queryString:command];
                     if (!theResult || [self isCancelled]) break;
                     int numRows = [theResult numOfRows];
@@ -502,8 +504,8 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                     for (i=0; i<numRows; ++i) {
                         int32_t val = [theResult getInt32atRow:i column:3];
                         if (val < 0) continue;
-                        int crate = [theResult getInt32atRow:i column:0];
-                        int card = [theResult getInt32atRow:i column:1];
+                        int crate   = [theResult getInt32atRow:i column:0];
+                        int card    = [theResult getInt32atRow:i column:1];
                         int channel = [theResult getInt32atRow:i column:2];
                         if (crate < kSnoCrates && card < kSnoCardsPerCrate && channel < kSnoChannelsPerCard) {
                             SnoPlusCard *theCard = cardPt + crate * kSnoCardsPerCrate + card;
@@ -515,7 +517,9 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
 
                     // continue with next call to database
                     [command autorelease];
-                    command = [[NSString stringWithFormat: @"SELECT crate,slot,tr100_mask,tr20_mask,vthr,pedestal_mask,disable_mask FROM current_detector_state"] retain];
+                    //      0     1    2          3         4    5             6
+                    cols = "crate,slot,tr100_mask,tr20_mask,vthr,pedestal_mask,disable_mask";
+                    command = [[NSString stringWithFormat: @"SELECT %s FROM current_detector_state",cols] retain];
                     theResult = [pqConnection queryString:command];
                     if (!theResult || [self isCancelled]) break;
                     numRows = [theResult numOfRows];
@@ -523,7 +527,7 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                     if (numCols != 7) break;
                     for (i=0; i<numRows; ++i) {
                         int crate = [theResult getInt32atRow:i column:0];
-                        int card = [theResult getInt32atRow:i column:1];
+                        int card  = [theResult getInt32atRow:i column:1];
                         if (crate >= kSnoCrates || card >= kSnoCardsPerCrate) continue;
                         SnoPlusCard *theCard = cardPt + crate * kSnoCardsPerCrate + card;
                         for (int col=2; col<=6; ++col) {

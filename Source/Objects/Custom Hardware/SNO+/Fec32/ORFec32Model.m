@@ -67,7 +67,7 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
 static unsigned long crateInitMask; // crates that need to be initialized
 static unsigned long cratePedMask;  // crates that need their pedestals set
 
-static int              sCardDbState = 0; // (0=not loaded, 1=loading, 2=loaded)
+static int              sCardDbState = 0; // (0=not loaded, 1=loading, 2=loaded (or not), 3=stale (or none))
 static NSMutableData*   sCardDbData = nil;
 static NSAlert *        sReadingHvdbAlert = nil;
 
@@ -1759,6 +1759,12 @@ static NSAlert *        sReadingHvdbAlert = nil;
         sCardDbState = 0;
         NSLog(@"Hardware Wizard action cancelled.\n");
     } else {
+        sCardDbState = 3;
+        if (sCardDbData) {
+            NSLog(@"Running Hardware Wizard with stale database!\n");
+        } else {
+            NSLog(@"Running Hardware Wizard with no detector database!\n");
+        }
         [self _continueHWWizard];
     }
 }
@@ -1766,7 +1772,8 @@ static NSAlert *        sReadingHvdbAlert = nil;
 - (void) _continueHWWizard
 {
     if (sCardDbState == 2 && sCardDbData) {
-        // re-post the start notification now that we can properly initialize from the detector DB
+        // re-post the start notification now that we can properly initialize FEC variables from the detector DB
+        // (note: don't do this for stale database because in this case the current variables are more up-to-date)
         [[NSNotificationCenter defaultCenter] postNotificationName:ORHWWizGroupActionStarted object:hwWizard];
     }
     // all done loading database, so we can continue with our hwWizard execution now
@@ -1818,6 +1825,7 @@ static NSAlert *        sReadingHvdbAlert = nil;
         [alert setAlertStyle:NSWarningAlertStyle];
         [alert beginSheetModalForWindow:[hwWizard performSelector:@selector(window)] completionHandler:^(NSModalResponse result){
             if (result == NSAlertSecondButtonReturn) {
+                sCardDbState = 3;
                 NSLog(w);
                 [self performSelector:@selector(_continueHWWizard) withObject:nil afterDelay:.1];
             } else {
@@ -1881,11 +1889,13 @@ static NSAlert *        sReadingHvdbAlert = nil;
         // initiate the PostgreSQL DB query to get the current detector state
         [[ORPQModel getCurrent] channelDbQuery:self selector:@selector(_chanDbCallback:)];
         // post a modal dialog after 0.1 sec if the database operation hasn't completed yet
-        [self performSelector:@selector(hwWizardWaitingForDatabase) withObject:nil afterDelay:.5];
+        [self performSelector:@selector(hwWizardWaitingForDatabase) withObject:nil afterDelay:1];
  
     } else if (sCardDbState == 2 && sCardDbData) {
  
+        // (this is a re-post of this notification)
         // sync variables to current hardware state from database
+        // (note: we won't do this for a stale database)
         if ([self stationNumber]<kSnoCardsPerCrate && [self crateNumber]<kSnoCrates) {
             SnoPlusCard *card = (SnoPlusCard *)[sCardDbData mutableBytes] + [self crateNumber] * kSnoCardsPerCrate + [self stationNumber];
             startSeqDisabledMask          ^= ((int32_t)startSeqDisabledMask          ^ card->seqDisabled)    & card->valid[kSeqDisabled];
@@ -1906,6 +1916,7 @@ static NSAlert *        sReadingHvdbAlert = nil;
     [[self undoManager] disableUndoRegistration];
 
     // make sure channels with HV disabled aren't enabled
+    // (note: we do this even if the database is stale)
     if (sCardDbData && [self stationNumber]<kSnoCardsPerCrate && [self crateNumber]<kSnoCrates) {
         SnoPlusCard *card = (SnoPlusCard *)[sCardDbData mutableBytes] + [self crateNumber] * kSnoCardsPerCrate + [self stationNumber];
         // sequencer must be disabled on channels with HV disabled
