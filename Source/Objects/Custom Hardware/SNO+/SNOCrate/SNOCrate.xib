@@ -8,13 +8,15 @@
         <customObject id="-2" userLabel="File's Owner" customClass="ORSNOCrateController">
             <connections>
                 <outlet property="crateNumberField" destination="62" id="79"/>
+                <outlet property="fetchECALSettingsButton" destination="215" id="66J-YB-o1k"/>
                 <outlet property="groupView" destination="22" id="33"/>
                 <outlet property="iPBaseAddressField" destination="204" id="209"/>
-                <outlet property="initXilinxButton" destination="171" id="181"/>
+                <outlet property="loadHardwareButton" destination="216" id="Mle-Gg-Dfe"/>
                 <outlet property="lockDocField" destination="34" id="35"/>
                 <outlet property="memBaseAddressField" destination="64" id="77"/>
                 <outlet property="powerField" destination="36" id="37"/>
                 <outlet property="regBaseAddressField" destination="66" id="78"/>
+                <outlet property="resetCrateButton" destination="171" id="hz3-7x-0CU"/>
                 <outlet property="window" destination="5" id="16"/>
             </connections>
         </customObject>
