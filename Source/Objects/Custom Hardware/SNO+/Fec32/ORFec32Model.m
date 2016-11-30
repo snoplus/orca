@@ -1792,6 +1792,19 @@ static NSAlert *        sReadingHvdbAlert = nil;
     if (data) {
         [sCardDbData release];
         sCardDbData = [data retain];
+        // sync variables to current hardware state from database
+        if ([self stationNumber]<kSnoCardsPerCrate && [self crateNumber]<kSnoCrates) {
+            SnoPlusCard *card = (SnoPlusCard *)[sCardDbData mutableBytes] + [self crateNumber] * kSnoCardsPerCrate + [self stationNumber];
+            startSeqDisabledMask          ^= ((int32_t)startSeqDisabledMask          ^ card->seqDisabled)    & card->valid[kSeqDisabled];
+            startPedEnabledMask           ^= ((int32_t)startPedEnabledMask           ^ card->pedEnabled)     & card->valid[kPedEnabled];
+            startTrigger100nsDisabledMask ^= ((int32_t)startTrigger100nsDisabledMask ^ card->nhit100enabled) & card->valid[kNhit100enabled];
+            startTrigger20nsDisabledMask  ^= ((int32_t)startTrigger20nsDisabledMask  ^ card->nhit20enabled)  & card->valid[kNhit20enabled];
+            for (int ch=0; ch<32; ++ch) {
+                if (card->valid[kVthr] & (1 << ch)) {
+                    [self setVth:ch withValue:card->vthr[ch]];
+                }
+            }
+        }
         NSLog(@"Loaded detector database\n");
         [self _continueHWWizard];
     } else if (sCardDbData) {
@@ -1883,20 +1896,9 @@ static NSAlert *        sReadingHvdbAlert = nil;
 {
     [[self undoManager] disableUndoRegistration];
 
-    // reconcile our settings with list of disabled channels and current detector state from database
+    // make sure channels with HV disabled aren't enabled
     if (sCardDbData && [self stationNumber]<kSnoCardsPerCrate && [self crateNumber]<kSnoCrates) {
- 
-        SnoPlusCard *card = (SnoPlusCard *)[sCardDbData mutableBytes] + [self crateNumber] * kSnoCardsPerCrate + [self stationNumber];
- 
-        // start from our current detector state
-        startSeqDisabledMask          ^= ((int32_t)startSeqDisabledMask          ^ card->seqDisabled)    & card->valid[kSeqDisabled];
-        startPedEnabledMask           ^= ((int32_t)startPedEnabledMask           ^ card->pedEnabled)     & card->valid[kPedEnabled];
-        startTrigger100nsDisabledMask ^= ((int32_t)startTrigger100nsDisabledMask ^ card->nhit100enabled) & card->valid[kNhit100enabled];
-        startTrigger20nsDisabledMask  ^= ((int32_t)startTrigger20nsDisabledMask  ^ card->nhit20enabled)  & card->valid[kNhit20enabled];
-        for (int ch=0; ch<32; ++ch) {
-            if (card->valid[kVthr] & (1 << ch)) [self setVth:ch withValue:card->vthr];
-        }
-
+         SnoPlusCard *card = (SnoPlusCard *)[sCardDbData mutableBytes] + [self crateNumber] * kSnoCardsPerCrate + [self stationNumber];
         // sequencer must be disabled on channels with HV disabled
         seqDisabledMask |= (seqDisabledMask ^ startSeqDisabledMask) & card->hvDisabled;
         // pedestals must be disabled on channels with HV disabled
