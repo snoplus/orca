@@ -72,6 +72,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
 static int              sCardDbState = 0; // (0=not loaded, 1=loading, 2=loaded (or not), 3=stale (or none))
 static NSMutableData*   sCardDbData = nil;
 static NSAlert *        sReadingHvdbAlert = nil;
+static int              sChannelsNotChangedCount = 0;
 
 @interface ORFec32Model (private)
 - (ORCommandList*) cmosShiftLoadAndClock:(unsigned short) registerAddress cmosRegItem:(unsigned short) cmosRegItem bitMaskStart:(short) bit_mask_start;
@@ -1760,7 +1761,7 @@ static NSAlert *        sReadingHvdbAlert = nil;
                        object : nil];
 }
 
-// sync FEC/DC variables to current hardware state from database
+// sync FEC/DC settings from the specified hardware state
 // (the note object should be a NSMutableData object containing
 //  a full array of SnoPlusCard structures in crate/card order)
 - (void) cardDbChanged:(NSNotification*)note
@@ -1833,7 +1834,7 @@ static NSAlert *        sReadingHvdbAlert = nil;
 - (void) _continueHWWizard
 {
     if (sCardDbState == 2 && sCardDbData) {
-        // post notification so all FEC32 objects will update from the new card DB
+        // post notification to sync all FEC/DC settings from the current hardware state of the detector database
         // (note: don't do this for stale database because in this case the current variables are more up-to-date)
         [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelCardDbChanged object:sCardDbData];
     }
@@ -1857,9 +1858,9 @@ static NSAlert *        sReadingHvdbAlert = nil;
         sReadingHvdbAlert = nil;
     }
     
-    NSString *s = nil;
-    NSString *m = nil;
-    NSString *w = nil;
+    NSString *s = nil;  // short message for dialog box
+    NSString *m = nil;  // message details
+    NSString *w = nil;  // warning for status log
     
     if (data) {
         [sCardDbData release];
@@ -1931,6 +1932,7 @@ static NSAlert *        sReadingHvdbAlert = nil;
 
 - (void) hwWizardActionBegin:(NSNotification*)note
 {
+    sChannelsNotChangedCount      = 0;
     startSeqDisabledMask          = seqDisabledMask;
     startPedEnabledMask           = pedEnabledMask;
     startTrigger20nsDisabledMask  = trigger20nsDisabledMask;
@@ -1939,7 +1941,7 @@ static NSAlert *        sReadingHvdbAlert = nil;
     cardChangedFlag = false;
     crateInitMask = 0;
     cratePedMask  = 0;
-    
+
     // interrupt hardwardWizard execution to allow time to load pmtdb if necessary
     if (sCardDbState == 0 && [note object] && [[note object] respondsToSelector:@selector(notOkToContinue)]) {
         sCardDbState = 1;
@@ -1960,16 +1962,33 @@ static NSAlert *        sReadingHvdbAlert = nil;
     // make sure channels with HV disabled aren't enabled
     // (note: we do this even if the database is stale)
     if (sCardDbData && [self stationNumber]<kSnoCardsPerCrate && [self crateNumber]<kSnoCrates) {
+        int32_t notChanged = 0;
         SnoPlusCard *card = (SnoPlusCard *)[sCardDbData mutableBytes] + [self crateNumber] * kSnoCardsPerCrate + [self stationNumber];
         // sequencer must be disabled on channels with HV disabled
+        int32_t wanted = seqDisabledMask;
         seqDisabledMask |= (seqDisabledMask ^ startSeqDisabledMask) & card->hvDisabled;
+        notChanged |= (wanted ^ seqDisabledMask);
         // pedestals must be disabled on channels with HV disabled
+        wanted = pedEnabledMask;
         pedEnabledMask &= ~((pedEnabledMask ^ startPedEnabledMask) & card->hvDisabled);
+        notChanged |= (wanted ^ pedEnabledMask);
         // triggers must be disabled on channels with HV disabled
+        wanted = trigger20nsDisabledMask;
         trigger20nsDisabledMask |= (trigger20nsDisabledMask ^ startTrigger20nsDisabledMask) & card->hvDisabled;
+        notChanged |= (wanted ^ trigger20nsDisabledMask);
+        wanted = trigger100nsDisabledMask;
         trigger100nsDisabledMask |= (trigger100nsDisabledMask ^ startTrigger100nsDisabledMask) & card->hvDisabled;
+        notChanged |= (wanted ^ trigger100nsDisabledMask);
         // can't be online if HV is disabled
+        wanted = onlineMask;
         onlineMask &= ~((onlineMask ^ startOnlineMask) & card->hvDisabled);
+        notChanged |= (wanted ^ onlineMask);
+        // keep count of the number of channels we didn't change due to HV disabled
+        if (notChanged) {
+            for (int32_t mask=1; mask; mask<<=1) {
+                if (mask & notChanged) ++sChannelsNotChangedCount;
+            }
+        }
     }
     // go ahead and "officially" change the masks, sending the appropriate notifications
     if (seqDisabledMask != startSeqDisabledMask) {
@@ -2028,6 +2047,9 @@ static NSAlert *        sReadingHvdbAlert = nil;
         [[[self guardian] adapter] loadHardware];
         // make sure we don't do this crate again
         crateInitMask &= ~(1UL << [self crateNumber]);
+    }
+    if (sChannelsNotChangedCount) {
+        NSLog(@"Warning: Settings for %d channels not made because they have HV disabled\n", sChannelsNotChangedCount);
     }
 }
 
