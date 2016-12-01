@@ -525,7 +525,10 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                     if (!theResult || [self isCancelled]) break;
                     numRows = [theResult numOfRows];
                     numCols = [theResult numOfFields];
-                    if (numCols != 7) break;
+                    if (numCols != kNumCardDbColumns) {
+                        NSLog(@"Expected %d columns from detector database, but got %d\n", kNumCardDbColumns, numCols);
+                        break;
+                    }
                     for (i=0; i<numRows; ++i) {
                         int crate = [theResult getInt32atRow:i column:0];
                         int card  = [theResult getInt32atRow:i column:1];
