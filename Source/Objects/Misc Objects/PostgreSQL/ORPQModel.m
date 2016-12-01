@@ -498,9 +498,8 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                     int numRows = [theResult numOfRows];
                     int numCols = [theResult numOfFields];
                     if (numCols != 4) break;
-                    NSMutableData *dataOut = [[[NSMutableData alloc] initWithCapacity:(kSnoCardsTotal * sizeof(SnoPlusCard))] autorelease];
+                    NSMutableData *dataOut = [[[NSMutableData alloc] initWithLength:(kSnoCardsTotal * sizeof(SnoPlusCard))] autorelease];
                     SnoPlusCard *cardPt = [dataOut mutableBytes];
-                    memset(cardPt, 0, kSnoCardsTotal * sizeof(SnoPlusCard));
                     for (i=0; i<numRows; ++i) {
                         int32_t val = [theResult getInt32atRow:i column:3];
                         if (val < 0) continue;
@@ -534,7 +533,7 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                         int card  = [theResult getInt32atRow:i column:1];
                         if (crate >= kSnoCrates || card >= kSnoCardsPerCrate) continue;
                         SnoPlusCard *theCard = cardPt + crate * kSnoCardsPerCrate + card;
-                        for (int col=2; col<=6; ++col) {
+                        for (int col=2; col<kNumCardDbColumns; ++col) {
                             NSMutableData *dat = [theResult getInt32arrayAtRow:i column:col];
                             if (!dat) continue;
                             int n = [dat length] / sizeof(int32_t);

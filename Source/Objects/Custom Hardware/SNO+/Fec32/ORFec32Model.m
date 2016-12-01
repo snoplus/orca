@@ -1774,10 +1774,26 @@ static int              sChannelsNotChangedCount = 0;
     
     SnoPlusCard *card = (SnoPlusCard *)[cardDb mutableBytes] + [self crateNumber] * kSnoCardsPerCrate + [self stationNumber];
     
-    startSeqDisabledMask          ^= ((int32_t)startSeqDisabledMask          ^ card->seqDisabled)    & card->valid[kSeqDisabled];
-    startPedEnabledMask           ^= ((int32_t)startPedEnabledMask           ^ card->pedEnabled)     & card->valid[kPedEnabled];
-    startTrigger100nsDisabledMask ^= ((int32_t)startTrigger100nsDisabledMask ^ card->nhit100enabled) & card->valid[kNhit100enabled];
-    startTrigger20nsDisabledMask  ^= ((int32_t)startTrigger20nsDisabledMask  ^ card->nhit20enabled)  & card->valid[kNhit20enabled];
+    seqDisabledMask          ^= ((int32_t)seqDisabledMask          ^ card->seqDisabled)    & card->valid[kSeqDisabled];
+    pedEnabledMask           ^= ((int32_t)pedEnabledMask           ^ card->pedEnabled)     & card->valid[kPedEnabled];
+    trigger100nsDisabledMask ^= ((int32_t)trigger100nsDisabledMask ^ card->nhit100enabled) & card->valid[kNhit100enabled];
+    trigger20nsDisabledMask  ^= ((int32_t)trigger20nsDisabledMask  ^ card->nhit20enabled)  & card->valid[kNhit20enabled];
+    
+    startSeqDisabledMask          = seqDisabledMask;
+    startPedEnabledMask           = pedEnabledMask;
+    startTrigger20nsDisabledMask  = trigger20nsDisabledMask;
+    startTrigger100nsDisabledMask = trigger100nsDisabledMask;
+
+    // update GUI with new values
+    [self setSeqDisabledMask: seqDisabledMask];
+    [self setPedEnabledMask: pedEnabledMask];
+    [self setTrigger20nsDisabledMask: trigger20nsDisabledMask];
+    [self setTrigger100nsDisabledMask: trigger100nsDisabledMask];
+
+    startSeqDisabledMask          = seqDisabledMask;
+    startPedEnabledMask           = pedEnabledMask;
+    startTrigger20nsDisabledMask  = trigger20nsDisabledMask;
+    startTrigger100nsDisabledMask = trigger100nsDisabledMask;
     
     for (int ch=0; ch<32; ++ch) {
         int32_t chMask = (1 << ch);
