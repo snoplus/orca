@@ -28,7 +28,8 @@
 // indices for SnoPlusCard valid flags
 // (all except hvDisabled must have the same numbers as the column numbers when reading the detector db)
 enum {
-    kHvDisabled     = 1,
+    kCardExists,        // set to 1 if card exists in current detector state
+    kHvDisabled,
     kNhit100enabled,
     kNhit100delay,
     kNhit20enabled,

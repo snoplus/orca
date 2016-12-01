@@ -501,11 +501,11 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                     NSMutableData *dataOut = [[[NSMutableData alloc] initWithLength:(kSnoCardsTotal * sizeof(SnoPlusCard))] autorelease];
                     SnoPlusCard *cardPt = [dataOut mutableBytes];
                     for (i=0; i<numRows; ++i) {
-                        int32_t val = [theResult getInt64atRow:i column:3];
-                        if (val < 0) continue;
-                        int crate   = [theResult getInt64atRow:i column:0];
-                        int card    = [theResult getInt64atRow:i column:1];
-                        int channel = [theResult getInt64atRow:i column:2];
+                        int64_t val = [theResult getInt64atRow:i column:3];
+                        if (val == kPQBadValue) continue;
+                        unsigned crate   = [theResult getInt64atRow:i column:0];
+                        unsigned card    = [theResult getInt64atRow:i column:1];
+                        unsigned channel = [theResult getInt64atRow:i column:2];
                         if (crate < kSnoCrates && card < kSnoCardsPerCrate && channel < kSnoChannelsPerCard) {
                             SnoPlusCard *theCard = cardPt + crate * kSnoCardsPerCrate + card;
                             theCard->valid[kHvDisabled] |= (1 << channel);
@@ -529,10 +529,12 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                         break;
                     }
                     for (i=0; i<numRows; ++i) {
-                        int crate = [theResult getInt64atRow:i column:0];
-                        int card  = [theResult getInt64atRow:i column:1];
+                        unsigned crate = [theResult getInt64atRow:i column:0];
+                        unsigned card  = [theResult getInt64atRow:i column:1];
                         if (crate >= kSnoCrates || card >= kSnoCardsPerCrate) continue;
                         SnoPlusCard *theCard = cardPt + crate * kSnoCardsPerCrate + card;
+                        // set flag indicating that the card exists in the current detector state
+                        theCard->valid[kCardExists] = 1;
                         for (int col=2; col<kNumCardDbColumns; ++col) {
                             NSMutableData *dat = [theResult getInt64arrayAtRow:i column:col];
                             if (!dat) continue;
@@ -540,9 +542,10 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                             if (n > kSnoChannelsPerCard) n = kSnoChannelsPerCard;
                             int64_t *valPt = (int64_t *)[dat mutableBytes];
                             for (int ch=0; ch<n; ++ch) {
-                                int32_t val = (int32_t)valPt[ch];
                                 // ignore out-of-range (incl. null) values
-                                if (val != valPt[ch]) continue;
+                                if (valPt[ch] == kPQBadValue) continue;
+                                int32_t val = (int32_t)valPt[ch];
+                                // set valid flag for this setting for this channel
                                 theCard->valid[col] |= (1 << ch);
                                 switch (col) {
                                     case kNhit100enabled:

@@ -1766,6 +1766,7 @@ static int              sChannelsNotChangedCount = 0;
 //  a full array of SnoPlusCard structures in crate/card order)
 - (void) cardDbChanged:(NSNotification*)note
 {
+    int32_t mask, valid;
     NSMutableData *cardDb = [note object];
 
     if (!cardDb || ![cardDb respondsToSelector:@selector(mutableBytes)]) return;
@@ -1773,28 +1774,29 @@ static int              sChannelsNotChangedCount = 0;
     if ([self stationNumber] >= kSnoCardsPerCrate || [self crateNumber] >= kSnoCrates) return;
     
     SnoPlusCard *card = (SnoPlusCard *)[cardDb mutableBytes] + [self crateNumber] * kSnoCardsPerCrate + [self stationNumber];
-    
-    seqDisabledMask          ^= ((int32_t)seqDisabledMask          ^ card->seqDisabled)    & card->valid[kSeqDisabled];
-    pedEnabledMask           ^= ((int32_t)pedEnabledMask           ^ card->pedEnabled)     & card->valid[kPedEnabled];
-    trigger100nsDisabledMask ^= ((int32_t)trigger100nsDisabledMask ^ card->nhit100enabled) & card->valid[kNhit100enabled];
-    trigger20nsDisabledMask  ^= ((int32_t)trigger20nsDisabledMask  ^ card->nhit20enabled)  & card->valid[kNhit20enabled];
-    
-    startSeqDisabledMask          = seqDisabledMask;
-    startPedEnabledMask           = pedEnabledMask;
-    startTrigger20nsDisabledMask  = trigger20nsDisabledMask;
-    startTrigger100nsDisabledMask = trigger100nsDisabledMask;
 
-    // update GUI with new values
-    [self setSeqDisabledMask: seqDisabledMask];
-    [self setPedEnabledMask: pedEnabledMask];
-    [self setTrigger20nsDisabledMask: trigger20nsDisabledMask];
-    [self setTrigger100nsDisabledMask: trigger100nsDisabledMask];
+    if (!card->valid[kCardExists]) return;  // nothing to do if card doesn't exist in the current detector state
 
-    startSeqDisabledMask          = seqDisabledMask;
-    startPedEnabledMask           = pedEnabledMask;
-    startTrigger20nsDisabledMask  = trigger20nsDisabledMask;
-    startTrigger100nsDisabledMask = trigger100nsDisabledMask;
-    
+    if ((valid = card->valid[kSeqDisabled]) != 0) {
+        mask = (int32_t)seqDisabledMask ^ (((int32_t)seqDisabledMask ^ card->seqDisabled) & valid);
+        [self setSeqDisabledMask: mask];
+        startSeqDisabledMask = seqDisabledMask;
+    }
+    if ((valid = card->valid[kPedEnabled]) != 0) {
+        mask = (int32_t)pedEnabledMask ^ (((int32_t)pedEnabledMask ^ card->pedEnabled) & valid);
+        [self setPedEnabledMask: mask];
+        startPedEnabledMask = pedEnabledMask;
+    }
+    if ((valid = card->valid[kNhit100enabled]) != 0) {
+        mask = (int32_t)trigger100nsDisabledMask ^ (((int32_t)trigger100nsDisabledMask ^ card->nhit100enabled) & valid);
+        [self setTrigger100nsDisabledMask: mask];
+        startTrigger100nsDisabledMask = trigger100nsDisabledMask;
+    }
+    if ((valid = card->valid[kNhit20enabled]) != 0) {
+        mask = (int32_t)trigger20nsDisabledMask ^ (((int32_t)trigger20nsDisabledMask ^ card->nhit20enabled) & valid);
+        [self setTrigger20nsDisabledMask: mask];
+        startTrigger20nsDisabledMask = trigger20nsDisabledMask;
+    }
     for (int ch=0; ch<32; ++ch) {
         int32_t chMask = (1 << ch);
         if (card->valid[kVthr] & chMask) {
