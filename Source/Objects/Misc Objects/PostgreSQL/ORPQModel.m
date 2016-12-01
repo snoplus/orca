@@ -538,46 +538,49 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                             if (!dat) continue;
                             int n = [dat length] / sizeof(int64_t);
                             if (n > kSnoChannelsPerCard) n = kSnoChannelsPerCard;
-                            int64_t *val = (int64_t *)[dat mutableBytes];
+                            int64_t *valPt = (int64_t *)[dat mutableBytes];
                             for (int ch=0; ch<n; ++ch) {
+                                int32_t val = (int32_t)valPt[ch];
+                                // ignore out-of-range (incl. null) values
+                                if (val != valPt[ch]) continue;
                                 theCard->valid[col] |= (1 << ch);
                                 switch (col) {
                                     case kNhit100enabled:
-                                        if (val[ch]) theCard->nhit100enabled |= (1 << ch);
+                                        if (val) theCard->nhit100enabled |= (1 << ch);
                                         break;
                                     case kNhit100delay:
-                                        theCard->nhit100delay[ch] = val[ch];
+                                        theCard->nhit100delay[ch] = val;
                                         break;
                                     case kNhit20enabled:
-                                        if (val[ch]) theCard->nhit20enabled |= (1 << ch);
+                                        if (val) theCard->nhit20enabled |= (1 << ch);
                                         break;
                                     case kNhit20width:
-                                        theCard->nhit20width[ch] = val[ch];
+                                        theCard->nhit20width[ch] = val;
                                         break;
                                     case kNhit20delay:
-                                        theCard->nhit20delay[ch] = val[ch];
+                                        theCard->nhit20delay[ch] = val;
                                         break;
                                     case kVbal0:
-                                        theCard->vbal0[ch] = val[ch];
+                                        theCard->vbal0[ch] = val;
                                         break;
                                     case kVbal1:
-                                        theCard->vbal1[ch] = val[ch];
+                                        theCard->vbal1[ch] = val;
                                         break;
                                     case kTac0trim:
-                                        theCard->tac0trim[ch] = val[ch];
+                                        theCard->tac0trim[ch] = val;
                                         break;
                                     case kTac1trim:
-                                        theCard->tac1trim[ch] = val[ch];
+                                        theCard->tac1trim[ch] = val;
                                         break;
                                     case kVthr:
-                                        theCard->vthr[ch] = val[ch];
+                                        theCard->vthr[ch] = val;
                                         break;
                                     case kPedEnabled:
-                                        theCard->pedEnabled = val[0];
+                                        theCard->pedEnabled = val;
                                         theCard->valid[col] = 0xffffffff;
                                         break;
                                     case kSeqDisabled:
-                                        theCard->seqDisabled = val[0];
+                                        theCard->seqDisabled = val;
                                         theCard->valid[col] = 0xffffffff;
                                         break;
                                 }

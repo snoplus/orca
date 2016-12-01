@@ -210,7 +210,7 @@ NSDate* MCPYear0000;
 // (returns 0 if there is no value at those coordinates)
 - (int64_t) getInt64atRow:(int)aRow column:(int)aColumn;
 {
-    int64_t val = 0;
+    int64_t val = kPQBadValue;
     if (mResult && aRow<mNumOfRows && aColumn<mNumOfFields) {
         Oid type = PQftype(mResult,aColumn);
         if (!PQgetisnull(mResult,aRow,aColumn)) {
@@ -219,16 +219,18 @@ NSDate* MCPYear0000;
                 case kPQTypeChar:
                 case kPQTypeInt16:
                 case kPQTypeInt32:
-                case kPQTypeInt64:
-                    val = (int64_t)strtoll(pt, NULL, 0);
-                    break;
+                case kPQTypeInt64: {
+                    char *end;
+                    val = strtoll(pt, &end, 0);
+                    if (*pt == 0 || *end != 0) {
+                        val = kPQBadValue;
+                    }
+                }   break;
                 case kPQTypeBool:
                     if (*pt == 't') {
                         val = 1;
                     } else if (*pt == 'f') {
                         val = 0;
-                    } else {
-                        val = -1;
                     }
                     break;
             }
@@ -239,31 +241,31 @@ NSDate* MCPYear0000;
 
 - (NSMutableData *) getInt64arrayAtRow:(int)aRow column:(int)aColumn;
 {
-    NSMutableData *val = nil;
-    int64_t value;
+    NSMutableData *theData = nil;
+    int64_t val;
     if (mResult && aRow<mNumOfRows && aColumn<mNumOfFields) {
         Oid type = PQftype(mResult,aColumn);
         if (!PQgetisnull(mResult,aRow,aColumn)) {
-            val = [[[NSMutableData alloc] initWithLength:0] autorelease];
+            theData = [[[NSMutableData alloc] initWithLength:0] autorelease];
             char *pt = PQgetvalue(mResult,aRow,aColumn);
             switch (type) {
                 case kPQTypeChar:
                 case kPQTypeInt16:
                 case kPQTypeInt32:
                 case kPQTypeInt64: {
-                    value = (int64_t)strtoll(pt, NULL, 0);
-                    [val appendBytes:&value length:sizeof(int64_t)];
+                    val = (int64_t)strtoll(pt, NULL, 0);
+                    [theData appendBytes:&val length:sizeof(int64_t)];
                     break;
                 }
                 case kPQTypeBool:
                     if (*pt == 'f') {
-                        value = 0;
+                        val = 0;
                     } else if (*pt == 't') {
-                        value = 1;
+                        val = 1;
                     } else {
                         break;
                     }
-                    [val appendBytes:&value length:sizeof(int64_t)];
+                    [theData appendBytes:&val length:sizeof(int64_t)];
                     break;
                 case kPQTypeArrayChar:
                 case kPQTypeArray16:
@@ -277,8 +279,12 @@ NSDate* MCPYear0000;
                     char *last;
                     char *tok = strtok_r(tmp, "{}, ", &last);
                     while (tok) {
-                        value = strtoll(tok, NULL, 0);
-                        [val appendBytes:&value length:sizeof(int64_t)];
+                        char *end;
+                        val = strtoll(tok, &end, 0);
+                        if (*tok == 0 || *end != 0) {
+                            val = kPQBadValue;
+                        }
+                        [theData appendBytes:&val length:sizeof(int64_t)];
                         tok = strtok_r(NULL, "{}, ", &last);
                     }
                     free(tmp);
@@ -287,7 +293,7 @@ NSDate* MCPYear0000;
             }
         }
     }
-    return val;
+    return theData;
 }
 
 - (id) fetchTypesAsType:(MCPReturnType) aType
