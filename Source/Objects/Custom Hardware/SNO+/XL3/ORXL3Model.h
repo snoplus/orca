@@ -108,6 +108,8 @@ enum {
     BOOL hvBSwitch;
     BOOL hvARamping;
     BOOL hvBRamping;
+    BOOL hvAFromDB;
+    BOOL hvBFromDB;
     BOOL hvEverUpdated;
     BOOL hvSwitchEverUpdated;
     BOOL hvANeedsUserIntervention;
@@ -115,6 +117,25 @@ enum {
     
     NSString* triggerStatus;
     BOOL _isTriggerON;
+    
+    unsigned long _hvNominalVoltageA;
+    float _hvramp_a_up;
+    float _hvramp_a_down;
+    float _vsetalarm_a_vtol;
+    float _ilowalarm_a_vmin;
+    float _ilowalarm_a_imin;
+    float _vhighalarm_a_vmax;
+    float _ihighalarm_a_imax;
+    
+    unsigned long _hvNominalVoltageB;
+    float _hvramp_b_up;
+    float _hvramp_b_down;
+    float _vsetalarm_b_vtol;
+    float _ilowalarm_b_vmin;
+    float _ilowalarm_b_imin;
+    float _vhighalarm_b_vmax;
+    float _ihighalarm_b_imax;
+    
 
     unsigned long hvAVoltageDACSetValue;
     unsigned long hvBVoltageDACSetValue;
@@ -132,8 +153,6 @@ enum {
     unsigned long _hvBCMOSRateIgnore;
     unsigned long _hvANextStepValue;
     unsigned long _hvBNextStepValue;
-    unsigned long _hvNominalVoltageA;
-    unsigned long _hvNominalVoltageB;
     NSLock* hvInitLock;
     NSThread* hvInitThread;
     NSThread* hvThread;
@@ -215,6 +234,25 @@ enum {
 @property (nonatomic,assign) bool ecalToOrcaInProgress;
 @property (assign) id snotDb;//I replaced 'weak' by 'assign' to get Orca compiled under 10.6 (-tb- 2013-09)
 
+
+@property float hvramp_a_up;
+@property float hvramp_a_down;
+@property float vsetalarm_a_vtol;
+@property float ilowalarm_a_vmin;
+@property float ilowalarm_a_imin;
+@property float vhighalarm_a_vmax;
+@property float ihighalarm_a_imax;
+
+@property float hvramp_b_up;
+@property float hvramp_b_down;
+@property float vsetalarm_b_vtol;
+@property float ilowalarm_b_vmin;
+@property float ilowalarm_b_imin;
+@property float vhighalarm_b_vmax;
+@property float ihighalarm_b_imax;
+
+@property BOOL hvAFromDB;
+@property BOOL hvBFromDB;
 @property BOOL hvEverUpdated;
 @property BOOL hvSwitchEverUpdated;
 @property BOOL hvARamping;

@@ -31,6 +31,8 @@
 #import "ObjectFactory.h"
 #import "ORDataTypeAssigner.h"
 #import "ORCouchDB.h"
+#import "ORPQModel.h"
+#import "ORPQResult.h"
 
 static Xl3RegNamesStruct reg[kXl3NumRegisters] = {
 	{ @"SelectReg",		RESET_REG },
@@ -102,6 +104,9 @@ extern NSString* ORSNOPRequestHVStatus;
 - (void) _hvInit;
 - (void) _hvXl3;
 - (void) _setPedestalInParallelWorker;
+- (void) _post_heartbeat:(int)crate;
+- (void) _trigger_edge_alarm:(int)alarmid;
+- (void) _update_level_alarm:(int)alarmid level:(bool)state;
 @end
 
 @implementation ORXL3Model
@@ -118,6 +123,20 @@ isPollingForced,
 calcCMOSRatesFromCounts = _calcCMOSRatesFromCounts,
 hvANextStepValue = _hvANextStepValue,
 hvBNextStepValue = _hvBNextStepValue,
+hvramp_a_up = _hvramp_a_up,
+hvramp_a_down = _hvramp_a_down,
+vsetalarm_a_vtol = _vsetalarm_a_vtol,
+ilowalarm_a_vmin = _ilowalarm_a_vmin,
+ilowalarm_a_imin = _ilowalarm_a_imin,
+vhighalarm_a_vmax = _vhighalarm_a_vmax,
+ihighalarm_a_imax = _ihighalarm_a_imax,
+hvramp_b_up = _hvramp_b_up,
+hvramp_b_down = _hvramp_b_down,
+vsetalarm_b_vtol = _vsetalarm_b_vtol,
+ilowalarm_b_vmin = _ilowalarm_b_vmin,
+ilowalarm_b_imin = _ilowalarm_b_imin,
+vhighalarm_b_vmax = _vhighalarm_b_vmax,
+ihighalarm_b_imax = _ihighalarm_b_imax,
 hvCMOSReadsCounter = _hvCMOSReadsCounter,
 xl3LinkTimeOut = _xl3LinkTimeOut,
 xl3InitInProgress = _xl3InitInProgress,
@@ -758,6 +777,32 @@ snotDb = _snotDb;
     hvSwitchEverUpdated = ever;
 }
 
+- (BOOL) hvAFromDB
+{
+    return hvAFromDB;
+}
+
+- (void) setHvAFromDB:(BOOL)fromdb
+{
+    hvAFromDB = fromdb;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
+    });
+}
+
+- (BOOL) hvBFromDB
+{
+    return hvBFromDB;
+}
+
+- (void) setHvBFromDB:(BOOL)fromdb
+{
+    hvBFromDB = fromdb;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
+    });
+}
+
 - (BOOL) hvARamping
 {
     return hvARamping;
@@ -1374,7 +1419,7 @@ void SwapLongBlock(void* p, int32_t n)
 - (id)initWithCoder:(NSCoder*)decoder
 {
     int i;
-
+    
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
 
@@ -1393,7 +1438,6 @@ void SwapLongBlock(void* p, int32_t n)
     [self setXl3PedestalMask:       [decoder decodeIntForKey:@"ORXL3ModelXl3PedestalMask"]];
     [self setXl3ChargeInjMask:      [decoder decodeIntForKey:@"ORXL3ModelXl3ChargeInjMask"]];
     [self setXl3ChargeInjCharge:    [decoder decodeIntForKey:@"ORXL3ModelXl3ChargeInjCharge"]];
-
     [self setPollXl3Time:           [decoder decodeIntForKey:@"ORXL3ModelPollXl3Time"]];
     //[self setIsPollingXl3:          [decoder decodeBoolForKey:@"ORXL3ModelIsPollingXl3"]];
     [self setIsPollingXl3:NO];
@@ -1417,8 +1461,6 @@ void SwapLongBlock(void* p, int32_t n)
     [self setHvBCMOSRateLimit:  [decoder decodeIntForKey:@"ORXL3ModelhvBCMOSRateLimit"]];
     [self setHvACMOSRateIgnore: [decoder decodeIntForKey:@"ORXL3ModelhvACMOSRateIgnore"]];
     [self setHvBCMOSRateIgnore: [decoder decodeIntForKey:@"ORXL3ModelhvBCMOSRateIgnore"]];
-    [self setHvNominalVoltageA: [decoder decodeIntForKey:@"ORXL3ModelHvNominalVoltageA"]];
-    [self setHvNominalVoltageB: [decoder decodeIntForKey:@"ORXL3ModelHvNominalVoltageB"]];
     [self setXl3Mode:           [decoder decodeIntForKey:@"Xl3Mode"]];
     [self setIsTriggerON:       [decoder decodeBoolForKey:@"isTriggerON"]];
 
@@ -1428,15 +1470,7 @@ void SwapLongBlock(void* p, int32_t n)
         [self setTriggerStatus:@"OFF"];
     }
     
-    //FIXME from ORCADB
-    if ([self hvNominalVoltageA] == 0) {
-        [self setHvNominalVoltageA:2500];
-    }
-    if ([self hvNominalVoltageB] == 0) {
-        [self setHvNominalVoltageB:2500];
-    }
-
-    for (i = 0; i < 12; i++) {
+    for (i=0; i<12; i++) {
         [self setXl3VltThreshold:i withValue:[decoder decodeFloatForKey:[NSString stringWithFormat:@"ORXL3ModelVltThreshold%i", i]]];
     }
     [self setIsXl3VltThresholdInInit:[decoder decodeBoolForKey:@"ORXL3ModelXl3VltThresholdInInit"]];
@@ -4435,6 +4469,11 @@ err:
     [pollPool release];
 }
 
+
+float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170.0,
+                    2060.0, 2435.0, 2240.0, 2370.0, 2220.0, 2270.0, 1970.0, 2025.0,
+                    1995.0, 1945.0, 2010.0, 2000.0}; //crates 0-19 supply a
+
 // This method is started as a thread when a new ORXL3Model is created. It waits
 // for the XL3 to connect AND for the XL3 to report that it the xilinx chip
 // is properly initialized (necessary for HV readback) before launching the high
@@ -4447,6 +4486,26 @@ err:
         //do nothing without an xl3 connected
         if ([self xl3Link] && [[self xl3Link] isConnected]) {
             
+            //B.J.L. 11/22/16 - this block is a temporary to hardcode parameters pending DB access
+            [self setHvNominalVoltageA:nominals[[self crateNumber]]];
+            [self setHvramp_a_up:10.0];
+            [self setHvramp_a_down:50.0];
+            [self setVsetalarm_a_vtol:50.0];
+            [self setIlowalarm_a_vmin:500.0];
+            [self setIlowalarm_a_imin:10.0];
+            [self setIhighalarm_a_imax:1000.0];
+            [self setVhighalarm_a_vmax:nominals[[self crateNumber]]+50.0];
+            [self setHvNominalVoltageB:(int)([self crateNumber]==16 ? 2445.0 : 0.0)];
+            [self setHvramp_b_up:10.0];
+            [self setHvramp_b_down:50.0];
+            [self setVsetalarm_b_vtol:50.0];
+            [self setIlowalarm_b_vmin:500.0];
+            [self setIlowalarm_b_imin:10.0];
+            [self setIhighalarm_b_imax:1000.0];
+            [self setVhighalarm_b_vmax:(int)([self crateNumber]==16 ? 2445.0 : 0.0)+50.0];
+            hvAFromDB = true; //flag to indicate params were loaded
+            hvBFromDB = true; //flag to indicate params were loaded
+
             //now readback the HV settings according to the XL3
             @try {
                 [self readHVSwitchOn];
@@ -4464,8 +4523,8 @@ err:
             if (!self.hvANeedsUserIntervention) {
                 if ([self hvASwitch]) {
                     double next = [self hvAVoltageReadValue]*4096/3000.;
-                    if (next > [self hvAVoltageTargetValue])
-                        next = [self hvAVoltageTargetValue];
+                    if (next > [self hvNominalVoltageA]*4096/3000)
+                        next = [self hvNominalVoltageA]*4096/3000;
                     [self setHvAVoltageDACSetValue:next];
                     [self setHvANextStepValue:next];
                 } else {
@@ -4476,8 +4535,8 @@ err:
             if (!self.hvBNeedsUserIntervention) {
                 if ([self hvBSwitch]) {
                     double next = [self hvBVoltageReadValue]*4096/3000.;
-                    if (next > [self hvBVoltageTargetValue])
-                        next = [self hvBVoltageTargetValue];
+                    if (next > [self hvNominalVoltageB]*4096/3000)
+                        next = [self hvNominalVoltageB]*4096/3000;
                     [self setHvBVoltageDACSetValue:next];
                     [self setHvBNextStepValue:next];
                 } else {
@@ -4494,8 +4553,12 @@ err:
                 [hvThread release];
                 hvThread = nil;
             }
-            hvThread = [[NSThread alloc] initWithTarget:self selector:@selector(_hvXl3) object:nil];
-            [hvThread start];
+            if (hvAFromDB && hvBFromDB) {
+                hvThread = [[NSThread alloc] initWithTarget:self selector:@selector(_hvXl3) object:nil];
+                [hvThread start];
+            } else {
+                continue;
+            }
             
             //let everyone know that we now have HV control
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -4505,6 +4568,35 @@ err:
         }
     }
     [hvPool release];
+}
+
+- (void) _trigger_edge_alarm:(int)alarmid
+{
+    @try {
+        NSString* msg = [NSString stringWithFormat:@"SELECT * FROM post_alarm(%i)", alarmid];
+        [[ORPQModel getCurrent] dbQuery:msg object:nil selector:nil];
+    } @catch (NSException *exception) { }
+}
+
+- (void) _update_level_alarm:(int)alarmid level:(bool)level
+{
+    @try {
+        NSString* msg;
+        if (level) {
+            msg = [NSString stringWithFormat:@"SELECT * FROM post_alarm(%i)", alarmid];
+        } else {
+            msg = [NSString stringWithFormat:@"SELECT * FROM clear_alarm(%i)", alarmid];
+        }
+        [[ORPQModel getCurrent] dbQuery:msg object:nil selector:nil];
+    } @catch (NSException *exception) { }
+}
+
+- (void) _post_heartbeat:(int)crate
+{
+    @try {
+        NSString* msg = [NSString stringWithFormat:@"SELECT * FROM post_heartbeat('orca_crate_%i_hv')", crate];
+        [[ORPQModel getCurrent] dbQuery:msg object:nil selector:nil];
+    } @catch (NSException *exception) { }
 }
 
 // This is the historical HV control and monitoring thread. It effectively ramps
@@ -4523,6 +4615,11 @@ err:
 // condition.
 - (void) _hvXl3
 {
+    if (![self hvAFromDB] && ![self hvBFromDB]) {
+        NSLog(@"%@ trying to start HV control thread without parameters!\n",[[self xl3Link] crateName]);
+        return;
+    }
+    
     NSAutoreleasePool* hvPool = [[NSAutoreleasePool alloc] init];
     
     NSLog(@"%@ starting HV control thread\n",[[self xl3Link] crateName]);
@@ -4538,7 +4635,6 @@ err:
         NSLog(msg);
     }
     
-    
     //Runs until the thread is cancelled
     while (![[NSThread currentThread] isCancelled] ) {
         
@@ -4549,11 +4645,11 @@ err:
             unsigned long aValueToSet = [self hvANextStepValue];
             changing = true;
             
-            if ([self hvANextStepValue] > [self hvAVoltageDACSetValue] + 10 / 3000. * 4096) {
-                aValueToSet = [self hvAVoltageDACSetValue] + 10 / 3000. * 4096;
+            if ([self hvANextStepValue] > [self hvAVoltageDACSetValue] + [self hvramp_a_up] / 3000. * 4096) {
+                aValueToSet = [self hvAVoltageDACSetValue] + [self hvramp_a_up] / 3000. * 4096;
             }
-            if ([self hvANextStepValue] < [self hvAVoltageDACSetValue] - 50 / 3000. * 4096) {
-                aValueToSet = [self hvAVoltageDACSetValue] - 50 / 3000. * 4096;
+            if ([self hvANextStepValue] < [self hvAVoltageDACSetValue] - [self hvramp_b_down] / 3000. * 4096) {
+                aValueToSet = [self hvAVoltageDACSetValue] - [self hvramp_b_down] / 3000. * 4096;
             }
             if (aValueToSet > [self hvAVoltageTargetValue]) { //never go above target (?)
                 aValueToSet = [self hvAVoltageTargetValue];
@@ -4570,15 +4666,15 @@ err:
             }
         }
         
-        if (!self.hvBNeedsUserIntervention && [self hvBNextStepValue] != [self hvBVoltageDACSetValue]) {
+        if ([self crateNumber] == 16 && !self.hvBNeedsUserIntervention && [self hvBNextStepValue] != [self hvBVoltageDACSetValue]) {
             unsigned long aValueToSet = [self hvBNextStepValue];
             changing = true;
             
-            if ([self hvBNextStepValue] > [self hvBVoltageDACSetValue] + 10 / 3000. * 4096) {
-                aValueToSet = [self hvBVoltageDACSetValue] + 10 / 3000. * 4096;
+            if ([self hvBNextStepValue] > [self hvBVoltageDACSetValue] + [self hvramp_a_up] / 3000. * 4096) {
+                aValueToSet = [self hvBVoltageDACSetValue] + [self hvramp_a_up] / 3000. * 4096;
             }
-            if ([self hvBNextStepValue] < [self hvBVoltageDACSetValue] - 50 / 3000. * 4096) {
-                aValueToSet = [self hvBVoltageDACSetValue] - 50 / 3000. * 4096;
+            if ([self hvBNextStepValue] < [self hvBVoltageDACSetValue] - [self hvramp_b_down] / 3000. * 4096) {
+                aValueToSet = [self hvBVoltageDACSetValue] - [self hvramp_b_down] / 3000. * 4096;
             }
             if (aValueToSet > [self hvBVoltageTargetValue]) { // never go above target (?)
                 aValueToSet = [self hvBVoltageTargetValue];
@@ -4618,10 +4714,12 @@ err:
 
             //check for ramps that aren't tracking the setpoints
             if ([self hvASwitch] && aUp && fabs([self hvAVoltageReadValue] - [self hvAVoltageDACSetValue]/4096.*3000.) > 100) {
+                [self _trigger_edge_alarm:80100+[self crateNumber]*2+0];
                 NSLogColor([NSColor redColor],@"%@ HV A read value differs from the setpoint. stopping!\nPress Ramp UP to continue.\n", [[self xl3Link] crateName]);
                 [self setHvANextStepValue:[self hvAVoltageDACSetValue]];
             }
-            if ([self hvBSwitch] && bUp && fabs([self hvBVoltageReadValue] - [self hvBVoltageDACSetValue]/4096.*3000.) > 100) {
+            if ([self crateNumber] == 16 && [self hvBSwitch] && bUp && fabs([self hvBVoltageReadValue] - [self hvBVoltageDACSetValue]/4096.*3000.) > 100) {
+                [self _trigger_edge_alarm:80100+[self crateNumber]*2+0];
                 NSLogColor([NSColor redColor],@"%@ HV B read value differs from the setpoint. stopping!\nPress Ramp UP to continue.\n", [[self xl3Link] crateName]);
                 [self setHvBNextStepValue:[self hvBVoltageDACSetValue]];
             }
@@ -4631,38 +4729,63 @@ err:
             [self setHvARamping:false];
             [self setHvBRamping:false];
 
-            //check for voltage dropout (FIXME: add current checking)
+            //check hv setpoint alarm
+            bool supplyASetpointDiscrepancy = false;
             if (self.hvANeedsUserIntervention) {
-                if (fabs([self hvAVoltageReadValue] - [self hvAVoltageDACSetValue]/4096.*3000.) <= 100) {
+                if (fabs([self hvAVoltageReadValue] - [self hvAVoltageDACSetValue]/4096.*3000.) <= [self vsetalarm_a_vtol]) {
                     NSLogColor([NSColor redColor],@"%@ HV A read value recovered.", [[self xl3Link] crateName]);
                     self.hvANeedsUserIntervention = false;
+                } else {
+                    supplyASetpointDiscrepancy = true;
                 }
             } else {
-                if ([self hvASwitch] && (fabs([self hvAVoltageReadValue] - [self hvAVoltageDACSetValue]/4096.*3000.) > 100)) {
+                if ([self hvASwitch] && (fabs([self hvAVoltageReadValue] - [self hvAVoltageDACSetValue]/4096.*3000.) > [self vsetalarm_a_vtol])) {
                     self.hvANeedsUserIntervention = true;
-                    NSString* alarmString = [NSString stringWithFormat:@"%@ HV A Setpoint Discrepancy",[[self xl3Link] crateName]];
-                    ORAlarm *hvHighCurrentAlarm = [[ORAlarm alloc] initWithName:alarmString severity:kEmergencyAlarm];
-                    [hvHighCurrentAlarm setAcknowledged:NO];
-                    [hvHighCurrentAlarm postAlarm];
+                    supplyASetpointDiscrepancy = true;
                     NSLogColor([NSColor redColor],@"%@ HV A read value differs from the setpoint! Suspending HV monitoring and control. Press 'Accept Readback' to resume.\n", [[self xl3Link] crateName]);
                 }
             }
-            if (self.hvBNeedsUserIntervention) {
-                if (fabs([self hvBVoltageReadValue] - [self hvBVoltageDACSetValue]/4096.*3000.) <= 100) {
-                    NSLog(@"%@ HV B read value recovered", [[self xl3Link] crateName]);
-                    self.hvBNeedsUserIntervention = false;
+            [self _update_level_alarm:80200+2*[self crateNumber]+0 level:supplyASetpointDiscrepancy];
+            
+            if ([self crateNumber] == 16) {
+                bool supplyBSetpointDiscrepancy = false;
+                if (self.hvBNeedsUserIntervention) {
+                    if (fabs([self hvBVoltageReadValue] - [self hvBVoltageDACSetValue]/4096.*3000.) <= [self vsetalarm_b_vtol]) {
+                        NSLog(@"%@ HV B read value recovered", [[self xl3Link] crateName]);
+                        self.hvBNeedsUserIntervention = false;
+                    } else {
+                        supplyBSetpointDiscrepancy = true;
+                    }
+                } else {
+                    if ([self hvBSwitch] && (fabs([self hvBVoltageReadValue] - [self hvBVoltageDACSetValue]/4096.*3000.) > 100)) {
+                        self.hvBNeedsUserIntervention = true;
+                        supplyBSetpointDiscrepancy = true;
+                        NSLogColor([NSColor redColor],@"%@ HV B read value differs from the setpoint! Suspending HV monitoring and control. Press 'Accept Readback' to resume.\n", [[self xl3Link] crateName]);
+                    }
                 }
-            } else {
-                if ([self hvBSwitch] && (fabs([self hvBVoltageReadValue] - [self hvBVoltageDACSetValue]/4096.*3000.) > 100)) {
-                    self.hvBNeedsUserIntervention = true;
-                    NSString* alarmString = [NSString stringWithFormat:@"%@ HV B Setpoint Discrepancy",[[self xl3Link] crateName]];
-                    ORAlarm *hvHighCurrentAlarm = [[ORAlarm alloc] initWithName:alarmString severity:kEmergencyAlarm];
-                    [hvHighCurrentAlarm setAcknowledged:NO];
-                    [hvHighCurrentAlarm postAlarm];
-                    NSLogColor([NSColor redColor],@"%@ HV B read value differs from the setpoint! Suspending HV monitoring and control. Press 'Accept Readback' to resume.\n", [[self xl3Link] crateName]);
-                }
+                [self _update_level_alarm:80200+2*[self crateNumber]+1 level:supplyBSetpointDiscrepancy];
             }
         }
+        
+        bool supplyACurrentDropout = [self hvAVoltageReadValue] > [self ilowalarm_a_vmin] && [self hvACurrentReadValue] < [self ilowalarm_a_imin];
+        bool supplyAOverVoltage = [self hvAVoltageReadValue] > [self vhighalarm_a_vmax];
+        bool supplyAOverCurrent = [self hvACurrentReadValue] > [self ihighalarm_a_imax];
+        int aoffset = 2*[self crateNumber] + 0;
+        [self _update_level_alarm:80000+aoffset level:supplyACurrentDropout];
+        [self _update_level_alarm:80300+aoffset level:supplyAOverCurrent];
+        [self _update_level_alarm:80400+aoffset level:supplyAOverVoltage];
+        
+        if ([self crateNumber] == 16) {
+            bool supplyBCurrentDropout = [self hvBVoltageReadValue] > [self ilowalarm_b_vmin] && [self hvBCurrentReadValue] < [self ilowalarm_a_imin];
+            bool supplyBOverVoltage = [self hvBVoltageReadValue] > [self vhighalarm_b_vmax];
+            bool supplyBOverCurrent = [self hvBCurrentReadValue] > [self ihighalarm_b_imax];
+            int boffset = 2*[self crateNumber] + 1;
+            [self _update_level_alarm:80000+boffset level:supplyBCurrentDropout];
+            [self _update_level_alarm:80300+boffset level:supplyBOverCurrent];
+            [self _update_level_alarm:80400+boffset level:supplyBOverVoltage];
+        }
+        
+        [self _post_heartbeat:[self crateNumber]];
         
         //We can't do anything if the XL3 disconnects anyway
         if (![[self xl3Link] isConnected]) break;

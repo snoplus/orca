@@ -708,23 +708,23 @@ static NSDictionary* xl3Ops;
 - (void) updateHVButtons
 {
     if ([hvPowerSupplyMatrix selectedColumn] == 0) { //A
-        [hvOnButton setEnabled:![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && ![model hvASwitch]];
-        [hvOffButton setEnabled:![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch]];
-        [hvStepUpButton setEnabled:![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping]];
-        [hvStepDownButton setEnabled:![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping]];
-        [hvRampUpButton setEnabled:![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping]];
-        [hvRampDownButton setEnabled:![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping]];
-        [hvStopRampButton setEnabled:![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && [model hvARamping]];
-        [hvAcceptReadbackButton setEnabled:[model hvANeedsUserIntervention]];
+        [hvOnButton setEnabled:![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && ![model hvASwitch] && [model hvAFromDB]];
+        [hvOffButton setEnabled:![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && [model hvAFromDB]];
+        [hvStepUpButton setEnabled:![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping] && [model hvAFromDB]];
+        [hvStepDownButton setEnabled:![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping] && [model hvAFromDB]];
+        [hvRampUpButton setEnabled:![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping] && [model hvAFromDB]];
+        [hvRampDownButton setEnabled:![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping] && [model hvAFromDB]];
+        [hvStopRampButton setEnabled:![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && [model hvARamping] && [model hvAFromDB]];
+        [hvAcceptReadbackButton setEnabled:[model hvANeedsUserIntervention] && [model hvAFromDB]];
     } else {
-        [hvOnButton setEnabled:![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && ![model hvBSwitch]];
-        [hvOffButton setEnabled:![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch]];
-        [hvStepUpButton setEnabled:![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && ![model hvBRamping]];
-        [hvStepDownButton setEnabled:![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && ![model hvBRamping]];
-        [hvRampUpButton setEnabled:![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && ![model hvBRamping]];
-        [hvRampDownButton setEnabled:![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && ![model hvBRamping]];
-        [hvStopRampButton setEnabled:![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && [model hvBRamping]];
-        [hvAcceptReadbackButton setEnabled:[model hvBNeedsUserIntervention]];
+        [hvOnButton setEnabled:![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && ![model hvBSwitch] && [model hvBFromDB]];
+        [hvOffButton setEnabled:![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && [model hvBFromDB]];
+        [hvStepUpButton setEnabled:![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && ![model hvBRamping] && [model hvBFromDB]];
+        [hvStepDownButton setEnabled:![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && ![model hvBRamping] && [model hvBFromDB]];
+        [hvRampUpButton setEnabled:![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && ![model hvBRamping] && [model hvBFromDB]];
+        [hvRampDownButton setEnabled:![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && ![model hvBRamping] && [model hvBFromDB]];
+        [hvStopRampButton setEnabled:![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && [model hvBRamping] && [model hvBFromDB]];
+        [hvAcceptReadbackButton setEnabled:[model hvBNeedsUserIntervention] && [model hvBFromDB]];
     }
     
 }
