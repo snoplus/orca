@@ -182,36 +182,36 @@
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <button verticalHuggingPriority="750" id="171">
-                                    <rect key="frame" x="13" y="34" width="115" height="28"/>
+                                    <rect key="frame" x="48" y="57" width="207" height="32"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <buttonCell key="cell" type="push" title="Reset Crate" bezelStyle="rounded" alignment="center" controlSize="small" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="201">
+                                    <buttonCell key="cell" type="push" title="Reset Crate" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="201">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="smallSystem"/>
+                                        <font key="font" metaFont="system"/>
                                     </buttonCell>
                                     <connections>
                                         <action selector="resetCrateAction:" target="-2" id="6r8-3e-PIf"/>
                                     </connections>
                                 </button>
-                                <button verticalHuggingPriority="750" id="216">
-                                    <rect key="frame" x="183" y="34" width="107" height="28"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <buttonCell key="cell" type="push" title="Load Hardware" bezelStyle="rounded" alignment="center" controlSize="small" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="217">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="smallSystem"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="loadHardwareAction:" target="-2" id="gUX-NF-bos"/>
-                                    </connections>
-                                </button>
                                 <button verticalHuggingPriority="750" id="215">
-                                    <rect key="frame" x="67" y="8" width="168" height="28"/>
+                                    <rect key="frame" x="48" y="7" width="207" height="32"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <buttonCell key="cell" type="push" title="Fetch ECAL Settings to GUI" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="218">
+                                    <buttonCell key="cell" type="push" title="Fetch ECAL Settings to GUI" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="218">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="smallSystem"/>
+                                        <font key="font" metaFont="system"/>
                                     </buttonCell>
                                     <connections>
                                         <action selector="fetchECALSettingsAction:" target="-2" id="49O-yJ-pV1"/>
+                                    </connections>
+                                </button>
+                                <button verticalHuggingPriority="750" id="216">
+                                    <rect key="frame" x="48" y="32" width="207" height="32"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <buttonCell key="cell" type="push" title="Load Hardware" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="217">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="loadHardwareAction:" target="-2" id="gUX-NF-bos"/>
                                     </connections>
                                 </button>
                             </subviews>
