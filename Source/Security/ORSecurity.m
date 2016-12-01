@@ -88,8 +88,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Security);
     //note that an entry in the locks dictionary means that the item is UNLOCKED.
     if(!locks)[self setLocks:[NSMutableDictionary dictionary]];
     
-    if(aState)[locks removeObjectForKey:aLockName];
-    else [locks setObject:[NSNumber numberWithLong:0] forKey:aLockName];
+    if(aState)  [locks removeObjectForKey:aLockName];
+    else        [locks setObject:[NSNumber numberWithLong:0] forKey:aLockName];
     
     [[NSNotificationCenter defaultCenter]
          postNotificationName:aLockName
@@ -98,9 +98,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Security);
     [[NSNotificationCenter defaultCenter]
          postNotificationName:ORSecurityNumberLockPagesChanged
                        object:self];
-    
-    
-    
 }
 
 - (BOOL) isLocked:(NSString*)aLockName
@@ -130,9 +127,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Security);
 
 - (void) lockAll
 {
-    NSEnumerator* e = [locks keyEnumerator];
-    id key;
-    while(key=[e nextObject]){
+    NSArray* allToLock = [locks allKeys];
+    for(id key in allToLock){
         [self setLock:key to:YES];
     }
 }
