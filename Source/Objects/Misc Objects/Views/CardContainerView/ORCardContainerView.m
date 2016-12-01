@@ -78,7 +78,9 @@
 
 - (BOOL) canAddObject:(id) obj atPoint:(NSPoint)aPoint
 {
-    return [[OROrderedObjManager for:group] canAddObject:obj atPoint:aPoint]; 
+    if(![[(ORAppDelegate*)[NSApp delegate]document] documentCanBeChanged])return NO;
+
+    else return [[OROrderedObjManager for:group] canAddObject:obj atPoint:aPoint];
 }
 
 - (void) moveObject:(id)obj to:(NSPoint)aPoint

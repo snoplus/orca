@@ -985,7 +985,7 @@
 
 - (BOOL) canAddObject:(id) obj atPoint:(NSPoint)aPoint
 {
-    return YES; 
+    return [[(ORAppDelegate*)[NSApp delegate]document] documentCanBeChanged];
 }
 
 - (id) dataSource
