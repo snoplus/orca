@@ -1766,7 +1766,7 @@ static int              sChannelsNotChangedCount = 0;
 //  a full array of SnoPlusCard structures in crate/card order)
 - (void) cardDbChanged:(NSNotification*)note
 {
-    int32_t mask, valid;
+    int32_t valid;
     NSMutableData *cardDb = [note object];
 
     if (!cardDb || ![cardDb respondsToSelector:@selector(mutableBytes)]) return;
@@ -1778,23 +1778,19 @@ static int              sChannelsNotChangedCount = 0;
     if (!card->valid[kCardExists]) return;  // nothing to do if card doesn't exist in the current detector state
 
     if ((valid = card->valid[kSeqDisabled]) != 0) {
-        mask = (int32_t)seqDisabledMask ^ (((int32_t)seqDisabledMask ^ card->seqDisabled) & valid);
-        [self setSeqDisabledMask: mask];
+        [self setSeqDisabledMask: (card->seqDisabled & valid) | ((int32_t)seqDisabledMask & ~valid)];
         startSeqDisabledMask = seqDisabledMask;
     }
     if ((valid = card->valid[kPedEnabled]) != 0) {
-        mask = (int32_t)pedEnabledMask ^ (((int32_t)pedEnabledMask ^ card->pedEnabled) & valid);
-        [self setPedEnabledMask: mask];
+        [self setPedEnabledMask: (card->pedEnabled & valid) | ((int32_t)pedEnabledMask & ~valid)];
         startPedEnabledMask = pedEnabledMask;
     }
     if ((valid = card->valid[kNhit100enabled]) != 0) {
-        mask = (int32_t)trigger100nsDisabledMask ^ (((int32_t)trigger100nsDisabledMask ^ card->nhit100enabled) & valid);
-        [self setTrigger100nsDisabledMask: mask];
+        [self setTrigger100nsDisabledMask: (card->nhit100enabled & valid) | ((int32_t)trigger100nsDisabledMask & ~valid)];
         startTrigger100nsDisabledMask = trigger100nsDisabledMask;
     }
     if ((valid = card->valid[kNhit20enabled]) != 0) {
-        mask = (int32_t)trigger20nsDisabledMask ^ (((int32_t)trigger20nsDisabledMask ^ card->nhit20enabled) & valid);
-        [self setTrigger20nsDisabledMask: mask];
+        [self setTrigger20nsDisabledMask: (card->nhit20enabled & valid) | ((int32_t)trigger20nsDisabledMask & ~valid)];
         startTrigger20nsDisabledMask = trigger20nsDisabledMask;
     }
     for (int ch=0; ch<32; ++ch) {
