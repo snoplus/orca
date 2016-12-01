@@ -5,7 +5,7 @@
 //
 #import "libpq-fe.h"
 
-#define kPQBadValue 0x8000000000000000ll
+#define kPQBadValue 0x80000000ffffffffll
 
 typedef enum {
     MCPTypeArray = 1,
