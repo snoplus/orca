@@ -131,7 +131,7 @@
 - (IBAction) resetCrateAction:(id)sender
 {
 	@try {
-		[model resetCrate];
+		[model resetCrateAsync];
 	} @catch (NSException* localException) {
 		NSLogColor([NSColor redColor], @"Crate %d reset failed.\n",
                    [model crateNumber]);
