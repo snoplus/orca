@@ -163,4 +163,5 @@ extern NSString* ORDCModelNs20widthChanged;
 extern NSString* ORDCModelNs20delayChanged;
 extern NSString* ORDCModelTac0trimChanged;
 extern NSString* ORDCModelTac1trimChanged;
+extern NSString* ORDBLock;
 

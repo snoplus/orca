@@ -68,11 +68,9 @@
 - (void) awakeFromNib
 {
     basicOpsSize    = NSMakeSize(400,350);
-    //standardOpsSize	= NSMakeSize(390,530);
-	standardOpsSize	= NSMakeSize(560,510);
-    settingsSize	= NSMakeSize(790,610);
-    triggerSize		= NSMakeSize(790,630);
-  
+    standardOpsSize	= NSMakeSize(560,530);
+    settingsSize	= NSMakeSize(810,600);
+    triggerSize		= NSMakeSize(800,640);
     blankView = [[NSView alloc] init];
     [tabView setFocusRingType:NSFocusRingTypeNone];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
@@ -84,8 +82,10 @@
     NSString* key = [NSString stringWithFormat: @"orca.ORMTC%d.selectedtab",[model slot]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
+
     [tabView selectTabViewItemAtIndex: index];
     [self populatePullDown];
+    [self updateWindow];
 
 }
 
@@ -108,40 +108,10 @@
                      selector : @selector(basicLockChanged:)
                          name : ORRunStatusChangedNotification
                        object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(standardOpsLockChanged:)
-                         name : ORRunStatusChangedNotification
-                       object : nil];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(settingsLockChanged:)
-                         name : ORRunStatusChangedNotification
-                       object : nil];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(triggersLockChanged:)
-                         name : ORRunStatusChangedNotification
-                       object : nil];
     
     [notifyCenter addObserver : self
                      selector : @selector(basicLockChanged:)
                          name : ORMTCBasicLock
-                        object: nil];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(standardOpsLockChanged:)
-                         name : ORMTCStandardOpsLock
-                        object: nil];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(settingsLockChanged:)
-                         name : ORMTCSettingsLock
-                        object: nil];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(triggersLockChanged:)
-                         name : ORMTCTriggersLock
                         object: nil];
     
     [notifyCenter addObserver : self
@@ -258,9 +228,6 @@
     [self memBaseAddressChanged:nil];
     [self slotChanged:nil];
     [self basicLockChanged:nil];
-    [self standardOpsLockChanged:nil];
-    [self settingsLockChanged:nil];
-    [self triggersLockChanged:nil];
 	[self selectedRegisterChanged:nil];
 	[self memoryOffsetChanged:nil];
 	[self writeValueChanged:nil];
@@ -285,12 +252,6 @@
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
     [gSecurity setLock:ORMTCBasicLock to:secure];
     [basicOpsLockButton setEnabled:secure];
-    [gSecurity setLock:ORMTCStandardOpsLock to:secure];
-    [standardOpsLockButton setEnabled:secure];
-    [gSecurity setLock:ORMTCSettingsLock to:secure];
-    [settingsLockButton setEnabled:secure];
-    [gSecurity setLock:ORMTCTriggersLock to:secure];
-    [triggersLockButton setEnabled:secure];
 }
 
 #pragma mark •••Interface Management
@@ -301,7 +262,7 @@
 	[initProgressBar setDoubleValue:0];
 	[initProgressField setHidden:NO];
 	[initProgressField setDoubleValue:0];
-    [self standardOpsLockChanged:nil];
+    [self basicLockChanged:nil];
     //hack to unlock UI if the sequence couldn't finish and didn't raise an exception (MTCD feature)
     [self performSelector:@selector(sequenceStopped:) withObject:nil afterDelay:5];
 }
@@ -313,7 +274,7 @@
 	[initProgressBar setDoubleValue:0];
 	[initProgressBar stopAnimation:self];
 	sequenceRunning = NO;
-    [self standardOpsLockChanged:nil];
+    [self basicLockChanged:nil];
 }
 
 - (void) sequenceProgress:(NSNotification*)aNote
@@ -498,7 +459,7 @@
 {
 	[[isPulserFixedRateMatrix cellWithTag:1] setIntValue:[model isPulserFixedRate]];
 	[[isPulserFixedRateMatrix cellWithTag:0] setIntValue:![model isPulserFixedRate]];
-    [self standardOpsLockChanged:nil];
+    [self basicLockChanged:nil];
 }
 
 - (void) fixedPulserRateCountChanged:(NSNotification*)aNote
@@ -517,8 +478,8 @@
     BOOL locked						= [gSecurity isLocked:ORMTCBasicLock];
     BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORMTCBasicLock];
 
+    //Basic ops
     [basicOpsLockButton setState: locked];
-    
     [autoIncrementCB setEnabled: !lockedOrNotRunningMaintenance];
     [useMemoryMatrix setEnabled: !lockedOrNotRunningMaintenance];
     [repeatDelayField setEnabled: !lockedOrNotRunningMaintenance];
@@ -536,15 +497,8 @@
     [stopButton setEnabled: !lockedOrNotRunningMaintenance];
     [statusButton setEnabled: !lockedOrNotRunningMaintenance];
     
-}
-
-- (void) standardOpsLockChanged:(NSNotification*)aNotification
-{
-    
-    BOOL locked						= [gSecurity isLocked:ORMTCStandardOpsLock];
-    BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORMTCStandardOpsLock] | sequenceRunning;
-    
-    [standardOpsLockButton setState: locked];
+    //Standards ops
+    lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORMTCBasicLock] | sequenceRunning;
     
     [initMtcButton				setEnabled: !lockedOrNotRunningMaintenance];
     [initNoXilinxButton			setEnabled: !lockedOrNotRunningMaintenance];
@@ -564,17 +518,8 @@
     [findTriggerZerosButton		setEnabled: !lockedOrNotRunningMaintenance];
     [continuousButton			setEnabled: !lockedOrNotRunningMaintenance];
     [stopTriggerZeroButton		setEnabled: !lockedOrNotRunningMaintenance];
-    
-}
 
-- (void) settingsLockChanged:(NSNotification*)aNotification
-{
-    
-    BOOL locked						= [gSecurity isLocked:ORMTCSettingsLock];
-    BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORMTCSettingsLock] | sequenceRunning;
-    
-    [settingsLockButton setState: locked];
-   
+    //Settings
     [load10MhzCounterButton		    setEnabled: !lockedOrNotRunningMaintenance];
     [setCoarseDelayButton           setEnabled: !lockedOrNotRunningMaintenance];
     [setFineDelayButton				setEnabled: !lockedOrNotRunningMaintenance];
@@ -592,17 +537,8 @@
     [minDelayOffsetField            setEnabled: !lockedOrNotRunningMaintenance];
     [fineDelayField                 setEnabled: !lockedOrNotRunningMaintenance];
     [coarseDelayField               setEnabled: !lockedOrNotRunningMaintenance];
-    
-}
 
-- (void) triggersLockChanged:(NSNotification*)aNotification
-{
-    
-    BOOL locked						= [gSecurity isLocked:ORMTCTriggersLock];
-    BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORMTCTriggersLock] | sequenceRunning;
-    
-    [triggersLockButton setState: locked];
-    
+    //Triggers
     [globalTriggerCrateMaskMatrix setEnabled: !lockedOrNotRunningMaintenance];
     [globalTriggerMaskMatrix setEnabled: !lockedOrNotRunningMaintenance];
     [pedCrateMaskMatrix setEnabled: !lockedOrNotRunningMaintenance];
@@ -613,7 +549,7 @@
     [mtcaOEHIMatrix setEnabled: !lockedOrNotRunningMaintenance];
     [mtcaOELOMatrix setEnabled: !lockedOrNotRunningMaintenance];
     [mtcaOWLNMatrix setEnabled: !lockedOrNotRunningMaintenance];
-
+    
     [loadGTCrateMaskButton setEnabled: !lockedOrNotRunningMaintenance];
     [loadMTCACrateMaskButton setEnabled: !lockedOrNotRunningMaintenance];
     [loadPEDCrateMaskButton setEnabled: !lockedOrNotRunningMaintenance];
@@ -622,7 +558,7 @@
     [clearMTCAMaskButton setEnabled: !lockedOrNotRunningMaintenance];
     [clearPEDCratesButton setEnabled: !lockedOrNotRunningMaintenance];
     [clearTriggersButton setEnabled: !lockedOrNotRunningMaintenance];
-
+    
 }
 
 - (void) isPedestalEnabledInCSRChanged:(NSNotification*)aNotification
@@ -642,22 +578,22 @@
     if([tabView indexOfTabViewItem:item] == 0){
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:basicOpsSize];
-		[[self window] setContentView:tabView];
+		[[self window] setContentView:mtcView];
     }
     else if([tabView indexOfTabViewItem:item] == 1){
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:standardOpsSize];
-		[[self window] setContentView:tabView];
+		[[self window] setContentView:mtcView];
     }
     else if([tabView indexOfTabViewItem:item] == 2){
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:settingsSize];
-		[[self window] setContentView:tabView];
+		[[self window] setContentView:mtcView];
     }
     else if([tabView indexOfTabViewItem:item] == 3){
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:triggerSize];
-		[[self window] setContentView:tabView];
+		[[self window] setContentView:mtcView];
     }
 
 
@@ -767,21 +703,6 @@
 - (IBAction) basicLockAction:(id)sender
 {
     [gSecurity tryToSetLock:ORMTCBasicLock to:[sender intValue] forWindow:[self window]];
-}
-
-- (IBAction) standardOpsLockAction:(id)sender
-{
-    [gSecurity tryToSetLock:ORMTCStandardOpsLock to:[sender intValue] forWindow:[self window]];
-}
-
-- (IBAction) settingsLockAction:(id)sender
-{
-    [gSecurity tryToSetLock:ORMTCSettingsLock to:[sender intValue] forWindow:[self window]];
-}
-
-- (IBAction) triggersLockAction:(id)sender
-{
-    [gSecurity tryToSetLock:ORMTCTriggersLock to:[sender intValue] forWindow:[self window]];
 }
 
 - (void) populatePullDown

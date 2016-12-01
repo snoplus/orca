@@ -24,25 +24,170 @@
     self = [super initWithWindowNibName:@"TUBii"];
     return self;
 }
-- (void) awakeFromNib{
-    [tabView setFocusRingType:NSFocusRingTypeNone];
-    
+- (void) awakeFromNib
+{
+    Tubii_size = NSMakeSize(450, 400);
     PulserAndDelays_size = NSMakeSize(500, 350);
     Triggers_size = NSMakeSize(500, 610);
-    Tubii_size = NSMakeSize(450, 400);
     Analog_size = NSMakeSize(615, 445);
     GTDelays_size = NSMakeSize(500, 250);
     SpeakerCounter_size_small = NSMakeSize(575,550);
     SpeakerCounter_size_big = NSMakeSize(575,650);
     ClockMonitor_size = NSMakeSize(500, 175);
-
+    blankView = [[NSView alloc] init];
+    [tabView setFocusRingType:NSFocusRingTypeNone];
+    [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
+    
+    [super awakeFromNib];
+    
     [tabView setDelegate:self];
 
-    [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
     [CounterAdvancedOptionsBox setHidden:YES];
     [caenChannelSelect_3 setEnabled:NO];//Not currently working on board
+    [self updateWindow];
+
 }
-- (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item{
+
+#pragma mark •••Notifications
+- (void) registerNotificationObservers
+{
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    
+    [super registerNotificationObservers];
+    
+    //we don't want this notification
+    [notifyCenter removeObserver:self name:NSWindowDidResignKeyNotification object:nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(tubiiLockChanged:)
+                         name : ORRunStatusChangedNotification
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(tubiiLockChanged:)
+                         name : ORTubiiLock
+                       object : nil];
+    
+}
+
+- (void) checkGlobalSecurity
+{
+    BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
+    [gSecurity setLock:ORTubiiLock to:secure];
+    [tubiiLockButton setEnabled:secure];
+}
+
+- (void) tubiiLockChanged:(NSNotification*)aNotification
+{
+    
+    //Basic ops
+    BOOL locked						= [gSecurity isLocked:ORTubiiLock];
+    BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORTubiiLock];
+    
+    //Tubii
+    [tubiiLockButton setState: locked];
+    [tubiiIPField setEnabled: !lockedOrNotRunningMaintenance];
+    [tubiiPortField setEnabled: !lockedOrNotRunningMaintenance];
+    [tubiiInitButton setEnabled: !lockedOrNotRunningMaintenance];
+    [tubiiDataReadoutButton setEnabled: !lockedOrNotRunningMaintenance];
+    [ECA_EnableButton setEnabled: !lockedOrNotRunningMaintenance];
+
+    //Pulsers & Delays
+    [SmellieRate_TextField setEnabled: !lockedOrNotRunningMaintenance];
+    [SmellieWidth_TextField setEnabled: !lockedOrNotRunningMaintenance];
+    [SmellieNPulses_TextField setEnabled: !lockedOrNotRunningMaintenance];
+    [TellieRate_TextField setEnabled: !lockedOrNotRunningMaintenance];
+    [TellieWidth_TextField setEnabled: !lockedOrNotRunningMaintenance];
+    [TellieNPulses_TextField setEnabled: !lockedOrNotRunningMaintenance];
+    [fireSmellieButton setEnabled: !lockedOrNotRunningMaintenance];
+    [stopSmellieButton setEnabled: !lockedOrNotRunningMaintenance];
+    [fireTellieButton setEnabled: !lockedOrNotRunningMaintenance];
+    [stopTellieButton setEnabled: !lockedOrNotRunningMaintenance];
+    [SmellieDelay_TextField setEnabled: !lockedOrNotRunningMaintenance];
+    [TellieDelay_TextField setEnabled: !lockedOrNotRunningMaintenance];
+    [GenericDelay_TextField setEnabled: !lockedOrNotRunningMaintenance];
+    [GenericRate_TextField setEnabled: !lockedOrNotRunningMaintenance];
+    [GenericWidth_TextField setEnabled: !lockedOrNotRunningMaintenance];
+    [GenericNPulses_TextField setEnabled: !lockedOrNotRunningMaintenance];
+    [loadSmellieButton setEnabled: !lockedOrNotRunningMaintenance];
+    [loadTellieButton setEnabled: !lockedOrNotRunningMaintenance];
+    [loadDelayButton setEnabled: !lockedOrNotRunningMaintenance];
+    [firePulserButton setEnabled: !lockedOrNotRunningMaintenance];
+    [stopPulserButton setEnabled: !lockedOrNotRunningMaintenance];
+    
+    //Triggers
+    [TrigMaskSelect setEnabled: !lockedOrNotRunningMaintenance];
+    [sendTriggerMaskButton setEnabled: !lockedOrNotRunningMaintenance];
+    [matchHWButton setEnabled: !lockedOrNotRunningMaintenance];
+    [BurstRate setEnabled: !lockedOrNotRunningMaintenance];
+    [BurstTriggerMask setEnabled: !lockedOrNotRunningMaintenance];
+    [sendBurstButton setEnabled: !lockedOrNotRunningMaintenance];
+    [ComboEnableMask setEnabled: !lockedOrNotRunningMaintenance];
+    [ComboTriggerMask setEnabled: !lockedOrNotRunningMaintenance];
+    [sendComboButton setEnabled: !lockedOrNotRunningMaintenance];
+    [PrescaleFactor setEnabled: !lockedOrNotRunningMaintenance];
+    [PrescaleTriggerMask setEnabled: !lockedOrNotRunningMaintenance];
+    [sendPrescaleButton setEnabled: !lockedOrNotRunningMaintenance];
+    [MTCAMimic_Slider setEnabled: !lockedOrNotRunningMaintenance];
+    [MTCAMimic_TextField setEnabled: !lockedOrNotRunningMaintenance];
+    [sendMTCAButton setEnabled: !lockedOrNotRunningMaintenance];
+    [matchMTCAButton setEnabled: !lockedOrNotRunningMaintenance];
+
+    //Analog
+    [caenChannelSelect_0 setEnabled: !lockedOrNotRunningMaintenance];
+    [caenChannelSelect_1 setEnabled: !lockedOrNotRunningMaintenance];
+    [caenChannelSelect_2 setEnabled: !lockedOrNotRunningMaintenance];
+    [caenChannelSelect_3 setEnabled: !lockedOrNotRunningMaintenance];
+    [caenGainSelect_0 setEnabled: !lockedOrNotRunningMaintenance];
+    [caenGainSelect_1 setEnabled: !lockedOrNotRunningMaintenance];
+    [caenGainSelect_2 setEnabled: !lockedOrNotRunningMaintenance];
+    [caenGainSelect_3 setEnabled: !lockedOrNotRunningMaintenance];
+    [caenGainSelect_4 setEnabled: !lockedOrNotRunningMaintenance];
+    [caenGainSelect_5 setEnabled: !lockedOrNotRunningMaintenance];
+    [caenGainSelect_6 setEnabled: !lockedOrNotRunningMaintenance];
+    [caenGainSelect_7 setEnabled: !lockedOrNotRunningMaintenance];
+    [matchAnalogButton setEnabled: !lockedOrNotRunningMaintenance];
+    [sendAnalogButton setEnabled: !lockedOrNotRunningMaintenance];
+
+    //GT Delays
+    [LO_SrcSelect setEnabled: !lockedOrNotRunningMaintenance];
+    [LO_Field setEnabled: !lockedOrNotRunningMaintenance];
+    [DGT_Field setEnabled: !lockedOrNotRunningMaintenance];
+    [LO_Slider setEnabled: !lockedOrNotRunningMaintenance];
+    [DGT_Slider setEnabled: !lockedOrNotRunningMaintenance];
+    [sendGTDelaysButton setEnabled: !lockedOrNotRunningMaintenance];
+    [matchGTDelaysButton setEnabled: !lockedOrNotRunningMaintenance];
+
+    //Speaker & Counter
+    [SpeakerMaskSelect_1 setEnabled: !lockedOrNotRunningMaintenance];
+    [SpeakerMaskSelect_2 setEnabled: !lockedOrNotRunningMaintenance];
+    [SpeakerMaskField setEnabled: !lockedOrNotRunningMaintenance];
+    [matchSpeakerButton setEnabled: !lockedOrNotRunningMaintenance];
+    [sendSpeakerButton setEnabled: !lockedOrNotRunningMaintenance];
+    [checkSpeakerButton setEnabled: !lockedOrNotRunningMaintenance];
+    [uncheckSpeakerButton setEnabled: !lockedOrNotRunningMaintenance];
+    [CounterMaskSelect_1 setEnabled: !lockedOrNotRunningMaintenance];
+    [CounterMaskSelect_2 setEnabled: !lockedOrNotRunningMaintenance];
+    [CounterMaskField setEnabled: !lockedOrNotRunningMaintenance];
+    [matchCounterButton setEnabled: !lockedOrNotRunningMaintenance];
+    [sendCounterButton setEnabled: !lockedOrNotRunningMaintenance];
+    [checkCounterButton setEnabled: !lockedOrNotRunningMaintenance];
+    [uncheckCounterButton setEnabled: !lockedOrNotRunningMaintenance];
+    [CounterLZBSelect setEnabled: !lockedOrNotRunningMaintenance];
+    [CounterTestModeSelect setEnabled: !lockedOrNotRunningMaintenance];
+    [CounterInhibitSelect setEnabled: !lockedOrNotRunningMaintenance];
+    [CounterModeSelect setEnabled: !lockedOrNotRunningMaintenance];
+
+    //Clock Monitor
+    [DefaultClockSelect setEnabled: !lockedOrNotRunningMaintenance];
+    [sendClockButton setEnabled: !lockedOrNotRunningMaintenance];
+    [matchClockButton setEnabled: !lockedOrNotRunningMaintenance];
+    [resetClockButton setEnabled: !lockedOrNotRunningMaintenance];
+    
+}
+
+- (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
+{
     int tabIndex = [aTabView indexOfTabViewItem:item];
     NSSize* newSize = nil;
     switch (tabIndex) {
@@ -80,9 +225,13 @@
         [self resizeWindowToSize:*newSize];
         [[self window] setContentView:tabView];
     }
+
 }
 
 #pragma mark •••Actions
+- (IBAction)tubiiLockAction:(id)sender {
+    [gSecurity tryToSetLock:ORTubiiLock to:[sender intValue] forWindow:[self window]];
+}
 - (IBAction)InitializeClicked:(id)sender {
     [model Initialize];
 }

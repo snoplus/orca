@@ -187,3 +187,5 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
                                   CounterTestOn: (bool) TestMode
                                CounterInhibitOn: (bool) Inhibit;
 @end
+
+extern NSString* ORTubiiLock;

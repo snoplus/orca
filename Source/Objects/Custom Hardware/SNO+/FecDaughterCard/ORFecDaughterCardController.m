@@ -69,6 +69,17 @@
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
 	[super registerNotificationObservers];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(lockChanged:)
+                         name : ORRunStatusChangedNotification
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(lockChanged:)
+                         name : ORDBLock
+                        object: nil];
+
     [notifyCenter addObserver : self
 					 selector : @selector(slotChanged:)
 						 name : ORSNOCardSlotChanged
@@ -160,6 +171,7 @@
 -(void)updateWindow
 {
 	[super updateWindow];
+    [self lockChanged:nil];
 	[self showVoltsChanged:nil];
 	[self slotChanged:nil];
 	[self rp1Changed:nil];
@@ -173,6 +185,38 @@
 	[self boardIdChanged:nil];
 
 	[self cmosRegShownChanged:nil];
+}
+
+- (void) checkGlobalSecurity
+{
+    BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
+    [gSecurity setLock:ORDBLock to:secure];
+    [lockButton setEnabled:secure];
+}
+
+- (void) lockChanged:(NSNotification*)aNotification
+{
+    BOOL locked						= [gSecurity isLocked:ORDBLock];
+    BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORDBLock];
+    [lockButton setState: locked];
+
+    [setAllCmosButton setEnabled: !lockedOrNotRunningMaintenance];
+    [rp1Matrix setEnabled: !lockedOrNotRunningMaintenance];
+    [rp2Matrix setEnabled: !lockedOrNotRunningMaintenance];
+    [vliMatrix setEnabled: !lockedOrNotRunningMaintenance];
+    [vsiMatrix setEnabled: !lockedOrNotRunningMaintenance];
+    [vt_ecalMatrix setEnabled: !lockedOrNotRunningMaintenance];
+    [vt_corrMatrix setEnabled: !lockedOrNotRunningMaintenance];
+    [vtSaferyField setEnabled: !lockedOrNotRunningMaintenance];
+    [vbMatrix setEnabled: !lockedOrNotRunningMaintenance];
+    [ns100widthField setEnabled: !lockedOrNotRunningMaintenance];
+    [ns20widthField setEnabled: !lockedOrNotRunningMaintenance];
+    [ns20delayField setEnabled: !lockedOrNotRunningMaintenance];
+    [tac0trimField setEnabled: !lockedOrNotRunningMaintenance];
+    [tac1trimField setEnabled: !lockedOrNotRunningMaintenance];
+    [setThresCorrButton setEnabled: !lockedOrNotRunningMaintenance];
+    [zeroCorrButton setEnabled: !lockedOrNotRunningMaintenance];
+
 }
 
 - (void) setModel:(OrcaObject*)aModel
@@ -321,6 +365,11 @@
 }
 
 #pragma mark •••Actions
+- (IBAction) lockAction:(id)sender
+{
+    [gSecurity tryToSetLock:ORDBLock to:[sender intValue] forWindow:[self window]];
+}
+
 - (IBAction) commentsTextFieldAction:(id)sender
 {
 	[model setComments:[sender stringValue]];	

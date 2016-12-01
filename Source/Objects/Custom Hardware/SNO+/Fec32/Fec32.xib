@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14B25" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
         <development version="5100" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ORFec32Controller">
@@ -27,8 +27,8 @@
                 <outlet property="fecNumberField" destination="372" id="385"/>
                 <outlet property="groupView" destination="160" id="165"/>
                 <outlet property="hvRefField" destination="195" id="248"/>
+                <outlet property="loadPMTStateButton" destination="xM5-Lj-R8b" id="j45-ko-CDk"/>
                 <outlet property="lockButton" destination="244" id="257"/>
-                <outlet property="lockDocField" destination="243" id="286"/>
                 <outlet property="onlineSwitches0" destination="878" id="888"/>
                 <outlet property="onlineSwitches1" destination="917" id="927"/>
                 <outlet property="onlineSwitches2" destination="900" id="928"/>
@@ -2659,15 +2659,6 @@
                             </tabViewItem>
                         </tabViewItems>
                     </tabView>
-                    <textField verticalHuggingPriority="750" id="243">
-                        <rect key="frame" x="45" y="23" width="125" height="13"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxY="YES"/>
-                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Not In Maintenance Run" id="1907">
-                            <font key="font" metaFont="label"/>
-                            <color key="textColor" red="0.037237584999999997" green="0.045257747000000001" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
                     <button id="244">
                         <rect key="frame" x="8" y="12" width="33" height="53"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -2752,7 +2743,7 @@
                     <popUpButton verticalHuggingPriority="750" id="1381">
                         <rect key="frame" x="495" y="552" width="183" height="22"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <popUpButtonCell key="cell" type="push" title="PMT States" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="ytn-L2-3Hn" id="1919">
+                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="1919">
                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="smallSystem"/>
                             <menu key="menu" title="OtherViews" id="1383">
@@ -2763,7 +2754,7 @@
                                     <menuItem title="Thresholds" id="1385"/>
                                     <menuItem title="VBals" id="1602"/>
                                     <menuItem title="CMOS Rates" id="1808"/>
-                                    <menuItem title="PMT States" state="on" id="ytn-L2-3Hn"/>
+                                    <menuItem title="PMT States" id="ytn-L2-3Hn"/>
                                 </items>
                             </menu>
                         </popUpButtonCell>
@@ -2771,14 +2762,14 @@
                             <action selector="variableDisplayPUAction:" target="-2" id="1887"/>
                         </connections>
                     </popUpButton>
-                    <tabView type="noTabsBezelBorder" id="1387">
+                    <tabView type="noTabsBezelBorder" initialItem="1388" id="1387">
                         <rect key="frame" x="494" y="189" width="185" height="366"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
                             <tabViewItem label="Voltages" identifier="1" id="1388">
                                 <view key="view" id="1389">
-                                    <rect key="frame" x="10" y="7" width="165" height="346"/>
+                                    <rect key="frame" x="10" y="33" width="171" height="330"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" autosizesCells="NO" id="1241">
@@ -3127,7 +3118,7 @@
                                             </cells>
                                         </matrix>
                                         <button verticalHuggingPriority="750" id="1142">
-                                            <rect key="frame" x="8" y="40" width="120" height="32"/>
+                                            <rect key="frame" x="8" y="24" width="120" height="32"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Read Voltages" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1918">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -3142,7 +3133,7 @@
                             </tabViewItem>
                             <tabViewItem label="Thresholds" identifier="2" id="1390">
                                 <view key="view" id="1391">
-                                    <rect key="frame" x="10" y="7" width="165" height="346"/>
+                                    <rect key="frame" x="32" y="7" width="147" height="354"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" id="1394">
@@ -3530,7 +3521,7 @@
                             </tabViewItem>
                             <tabViewItem label="VBals" identifier="3" id="1487" userLabel="VBals">
                                 <view key="view" id="1488">
-                                    <rect key="frame" x="10" y="7" width="165" height="346"/>
+                                    <rect key="frame" x="10" y="33" width="171" height="330"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" autosizesCells="NO" id="1561">
@@ -3914,7 +3905,7 @@
                                             </cells>
                                         </matrix>
                                         <textField verticalHuggingPriority="750" id="1598">
-                                            <rect key="frame" x="18" y="329" width="146" height="14"/>
+                                            <rect key="frame" x="18" y="313" width="146" height="14"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="   H      L              H      L" id="1920">
                                                 <font key="font" metaFont="smallSystem"/>

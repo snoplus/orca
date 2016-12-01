@@ -1858,7 +1858,7 @@ err:
     }
 
     //Query the OrcaDB and get a dictionary with the parameters
-    NSString *urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/orca/_design/standardRuns/_view/getStandardRuns?startkey=[\"%@\",\"%@\",{}]&endkey=[\"%@\",\"%@\",0]&descending=True&include_docs=True",[self orcaDBUserName],[self orcaDBPassword],[self orcaDBIPAddress],[self orcaDBPort],runTypeName,runVersion,runTypeName,runVersion];
+    NSString *urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/%@/_design/standardRuns/_view/getStandardRuns?startkey=[\"%@\",\"%@\",{}]&endkey=[\"%@\",\"%@\",0]&descending=True&include_docs=True",[self orcaDBUserName],[self orcaDBPassword],[self orcaDBIPAddress],[self orcaDBPort],[self orcaDBName],runTypeName,runVersion,runTypeName,runVersion];
 
     NSString* urlStringScaped = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     NSURL *url = [NSURL URLWithString:urlStringScaped];
@@ -1904,7 +1904,7 @@ err:
         BOOL pedpgtmode = [[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"PED_PGT_Mode"] boolValue];
         [mtc setIsPedestalEnabledInCSR:pedpgtmode];
         
-        NSLog(@"Standard run %@ settings loaded. \n",runTypeName);
+        NSLog(@"Standard run %@ (%@) settings loaded. \n",runTypeName,runVersion);
         return true;
     }
     @catch (NSException *e) {
@@ -1975,6 +1975,26 @@ err:
 
 }
 
+//Ship GUI settings to hardware
+-(void) loadSettingsInHW
+{
+
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    ORMTCModel* mtc;
+    if ([objs count]) {
+        mtc = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find MTC model. Please add it to the experiment and restart the run.\n");
+        return;
+    }
+
+    //Load MTC settings
+    [mtc loadTheMTCADacs];
+    [mtc setGlobalTriggerWordMask];
+    [mtc setThePulserRate:[mtc dbFloatByIndex:kPulserPeriod]];
+
+}
+
 -(void) loadHighThresholdRun
 {
 
@@ -1987,6 +2007,7 @@ err:
         NSLogColor([NSColor redColor], @"couldn't find MTC model. Please add it to the experiment and restart the run.\n");
         return;
     }
+    
     //Get MTC model
     objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     ORMTCModel* mtc;
@@ -2009,11 +2030,8 @@ err:
     [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kOWLEHiThreshold];
     [mtc setDbObject:[NSNumber numberWithDouble:100.0] forIndex:kNhit100LoPrescale];
     [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kPulserPeriod];
+    [runControlModel setRunType:0x0]; //Zero run type word since this run is not valid
 
-    //Send to HW
-    [mtc loadTheMTCADacs];
-    [mtc setGlobalTriggerWordMask];
-    
     //Restart the run if the run is ongoing and do nothing if there is no run happening
     if([runControlModel isRunning]){
         [self setStandardRunType:@"HIGH THRESHOLDS"];

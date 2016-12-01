@@ -58,6 +58,7 @@ static NSDictionary* xl3Ops;
 	compositeSize	= NSMakeSize(485,558);
 	blankView = [[NSView alloc] init];
     [tabView setFocusRingType:NSFocusRingTypeNone];
+    [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
 
 	[super awakeFromNib];
     
@@ -110,6 +111,16 @@ static NSDictionary* xl3Ops;
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
 	[super registerNotificationObservers];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(xl3LockChanged:)
+                         name : ORRunStatusChangedNotification
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(xl3LockChanged:)
+                         name : ORXL3Lock
+                        object: nil];
 
 	[notifyCenter addObserver : self
 			 selector : @selector(linkConnectionChanged:)
@@ -316,7 +327,7 @@ static NSDictionary* xl3Ops;
 {
 	[super updateWindow];
 
-	[self settingsLockChanged:nil];
+	[self xl3LockChanged:nil];
 	[self opsRunningChanged:nil];
 	//basic ops
 	[self selectedRegisterChanged:nil];
@@ -367,7 +378,7 @@ static NSDictionary* xl3Ops;
 - (void) checkGlobalSecurity
 {
 	BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
-	[gSecurity setLock:[model xl3LockName] to:secure];
+	[gSecurity setLock:ORXL3Lock to:secure];
 	[lockButton setEnabled:secure];
 }
 
@@ -390,39 +401,122 @@ static NSDictionary* xl3Ops;
 }
 
 #pragma mark •••Interface Management
-- (void) settingsLockChanged:(NSNotification*)aNotification
-{ dispatch_async(dispatch_get_main_queue(), ^{
-	BOOL locked = [gSecurity isLocked:[model xl3LockName]];   
-	[lockButton setState: locked];
-	[self xl3LockChanged:aNotification];
-}); }
-
 - (void) xl3LockChanged:(NSNotification*)aNotification
-{ dispatch_async(dispatch_get_main_queue(), ^{
-	
-	//BOOL runInProgress = [gOrcaGlobals runInProgress];
-	BOOL locked = [gSecurity isLocked:[model xl3LockName]];
-	//BOOL connected		 = [[model xl3Link] isConnected];
-/*	
-	[clearHistoryButton setEnabled:!locked  && !connected];
-	[ipNumberComboBox setEnabled:!locked  && !connected];
-	[portNumberField setEnabled:!locked  && !connected];
-	[passWordField setEnabled:!locked && !connected];
-	[userNameField setEnabled:!locked && !connected];
-	[pingButton setEnabled:!locked && !runInProgress];
-	[cbTestButton setEnabled:!locked && !runInProgress && connected];
-	[payloadSizeSlider setEnabled:!locked && !runInProgress && connected];
-	[connectButton setEnabled:!locked && !runInProgress];
-	[connect1Button setEnabled:!locked && !runInProgress];
-	[killCrateButton setEnabled:!locked && !runInProgress];
-	[loadModeMatrix setEnabled:!locked && !runInProgress];
-	[forceReloadButton setEnabled:!locked && !runInProgress];
-	[verboseButton setEnabled:!locked && !runInProgress];
-*/
-	[errorTimeOutPU setEnabled:!locked];
-	//[self setToggleCrateButtonState];
+{
+    BOOL locked						= [gSecurity isLocked:ORXL3Lock];
+    BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORXL3Lock];
 
-}); }
+    //Basic
+    [lockButton setState: locked];
+    [basicReadButton setEnabled: !lockedOrNotRunningMaintenance];
+    [basicWriteButton setEnabled: !lockedOrNotRunningMaintenance];
+    [basicStopButton setEnabled: !lockedOrNotRunningMaintenance];
+    [basicStatusButton setEnabled: !lockedOrNotRunningMaintenance];
+    [repeatDelayField setEnabled: !lockedOrNotRunningMaintenance];
+    [repeatDelayStepper setEnabled: !lockedOrNotRunningMaintenance];
+    [repeatCountField setEnabled: !lockedOrNotRunningMaintenance];
+    [repeatCountStepper setEnabled: !lockedOrNotRunningMaintenance];
+    [writeValueField setEnabled: !lockedOrNotRunningMaintenance];
+    [writeValueStepper setEnabled: !lockedOrNotRunningMaintenance];
+
+    //Ops
+    [selectAllSlotMaskButton setEnabled: !lockedOrNotRunningMaintenance];
+    [deselectAllSlotMaskButton setEnabled: !lockedOrNotRunningMaintenance];
+    [selectSlotMaskButton setEnabled: !lockedOrNotRunningMaintenance];
+    [compositeDeselectButton setEnabled: !lockedOrNotRunningMaintenance];
+    [compositeSlotMaskMatrix setEnabled: !lockedOrNotRunningMaintenance];
+    [compositeSlotMaskField setEnabled: !lockedOrNotRunningMaintenance];
+    [compositeXl3ModePU setEnabled: !lockedOrNotRunningMaintenance];
+    [compositeXl3RWAddressValueField setEnabled: !lockedOrNotRunningMaintenance];
+    [compositeSetXl3ModeButton setEnabled: !lockedOrNotRunningMaintenance];
+    [compositeXl3RWModePU setEnabled: !lockedOrNotRunningMaintenance];
+    [compositeXl3RWSelectPU setEnabled: !lockedOrNotRunningMaintenance];
+    [compositeXl3RWRegisterPU setEnabled: !lockedOrNotRunningMaintenance];
+    [compositeXl3RWDataValueField setEnabled: !lockedOrNotRunningMaintenance];
+    [compositeXl3RWButton setEnabled: !lockedOrNotRunningMaintenance];
+    [compositeQuitButton setEnabled: !lockedOrNotRunningMaintenance];
+    [compositeSetPedestalField setEnabled: !lockedOrNotRunningMaintenance];
+    [compositeSetPedestalButton setEnabled: !lockedOrNotRunningMaintenance];
+    [compositeBoardIDButton setEnabled: !lockedOrNotRunningMaintenance];
+    [compositeResetCrateButton setEnabled: !lockedOrNotRunningMaintenance];
+    [compositeResetCrateAndXilinXButton setEnabled: !lockedOrNotRunningMaintenance];
+    [compositeResetFIFOAndSequencerButton setEnabled: !lockedOrNotRunningMaintenance];
+    [compositeResetXL3StateMachineButton setEnabled: !lockedOrNotRunningMaintenance];
+    [compositeChargeInjMaskField setEnabled: !lockedOrNotRunningMaintenance];
+    [compositeChargeInjChargeField setEnabled: !lockedOrNotRunningMaintenance];
+    [compositeChargeInjButton setEnabled: !lockedOrNotRunningMaintenance];
+
+    //Monitor
+//    [monIsPollingCMOSRatesButton setEnabled: !lockedOrNotRunningMaintenance];
+//    [monIsPollingPMTCurrentsButton setEnabled: !lockedOrNotRunningMaintenance];
+//    [monIsPollingFECVoltagesButton setEnabled: !lockedOrNotRunningMaintenance];
+//    [monIsPollingXl3VoltagesButton setEnabled: !lockedOrNotRunningMaintenance];
+//    [monIsPollingHVSupplyButton setEnabled: !lockedOrNotRunningMaintenance];
+//    [monPollCMOSRatesMaskField setEnabled: !lockedOrNotRunningMaintenance];
+//    [monPollPMTCurrentsMaskField setEnabled: !lockedOrNotRunningMaintenance];
+//    [monPollFECVoltagesMaskField setEnabled: !lockedOrNotRunningMaintenance];
+//    [monPollingRatePU setEnabled: !lockedOrNotRunningMaintenance];
+//    [monIsPollingVerboseButton setEnabled: !lockedOrNotRunningMaintenance];
+//    [monIsPollingWithRunButton setEnabled: !lockedOrNotRunningMaintenance];
+//    [monPollingStatusField setEnabled: !lockedOrNotRunningMaintenance];
+    [monVltThresholdTextField0 setEnabled: !lockedOrNotRunningMaintenance];
+    [monVltThresholdTextField1 setEnabled: !lockedOrNotRunningMaintenance];
+    [monVltThresholdTextField2 setEnabled: !lockedOrNotRunningMaintenance];
+    [monVltThresholdTextField3 setEnabled: !lockedOrNotRunningMaintenance];
+    [monVltThresholdTextField4 setEnabled: !lockedOrNotRunningMaintenance];
+    [monVltThresholdTextField5 setEnabled: !lockedOrNotRunningMaintenance];
+    [monVltThresholdTextField6 setEnabled: !lockedOrNotRunningMaintenance];
+    [monVltThresholdTextField7 setEnabled: !lockedOrNotRunningMaintenance];
+    [monVltThresholdTextField8 setEnabled: !lockedOrNotRunningMaintenance];
+    [monVltThresholdTextField9 setEnabled: !lockedOrNotRunningMaintenance];
+    [monVltThresholdTextField10 setEnabled: !lockedOrNotRunningMaintenance];
+    [monVltThresholdTextField11 setEnabled: !lockedOrNotRunningMaintenance];
+    [monVltThresholdInInitButton setEnabled: !lockedOrNotRunningMaintenance];
+    [monVltThresholdSetButton setEnabled: !lockedOrNotRunningMaintenance];
+
+    //HV
+    [hvAcceptReadbackButton setEnabled: !lockedOrNotRunningMaintenance];
+    [hvOnButton setEnabled: !lockedOrNotRunningMaintenance];
+    [hvOffButton setEnabled: !lockedOrNotRunningMaintenance];
+    [hvStepUpButton setEnabled: !lockedOrNotRunningMaintenance];
+    [hvStepDownButton setEnabled: !lockedOrNotRunningMaintenance];
+    [hvRampUpButton setEnabled: !lockedOrNotRunningMaintenance];
+    [hvRampDownButton setEnabled: !lockedOrNotRunningMaintenance];
+    [hvStopRampButton setEnabled: !lockedOrNotRunningMaintenance];
+    [hvRelayMaskLowField setEnabled: !lockedOrNotRunningMaintenance];
+    [hvRelayMaskHighField setEnabled: !lockedOrNotRunningMaintenance];
+    [hvRelayStatusField setEnabled: !lockedOrNotRunningMaintenance];
+    [hvRelayMaskMatrix setEnabled: !lockedOrNotRunningMaintenance];
+    [hvRelayOpenButton setEnabled: !lockedOrNotRunningMaintenance];
+    [hvRelayCloseButton setEnabled: !lockedOrNotRunningMaintenance];
+    [hvPowerSupplyMatrix setEnabled: !lockedOrNotRunningMaintenance];
+    [hvAOnStatusField setEnabled: !lockedOrNotRunningMaintenance];
+    [hvBOnStatusField setEnabled: !lockedOrNotRunningMaintenance];
+    [hvATriggerStatusField setEnabled: !lockedOrNotRunningMaintenance];
+    [hvBTriggerStatusField setEnabled: !lockedOrNotRunningMaintenance];
+    [hvAVoltageSetField setEnabled: !lockedOrNotRunningMaintenance];
+    [hvBVoltageSetField setEnabled: !lockedOrNotRunningMaintenance];
+    [hvAVoltageReadField setEnabled: !lockedOrNotRunningMaintenance];
+    [hvBVoltageReadField setEnabled: !lockedOrNotRunningMaintenance];
+    [hvACurrentReadField setEnabled: !lockedOrNotRunningMaintenance];
+    [hvBCurrentReadField setEnabled: !lockedOrNotRunningMaintenance];
+    [hvTargetValueField setEnabled: !lockedOrNotRunningMaintenance];
+    [hvTargetValueStepper setEnabled: !lockedOrNotRunningMaintenance];
+    [hvCMOSRateLimitField setEnabled: !lockedOrNotRunningMaintenance];
+    [hvCMOSRateLimitStepper setEnabled: !lockedOrNotRunningMaintenance];
+    [hvCMOSRateIgnoreField setEnabled: !lockedOrNotRunningMaintenance];
+    [hvCMOSRateIgnoreStepper setEnabled: !lockedOrNotRunningMaintenance];
+
+    //Connection
+    [toggleConnectButton setEnabled: !lockedOrNotRunningMaintenance];
+    [errorTimeOutPU setEnabled: !lockedOrNotRunningMaintenance];
+    [connectionIPAddressField setEnabled: !lockedOrNotRunningMaintenance];
+    [connectionIPPortField setEnabled: !lockedOrNotRunningMaintenance];
+    [connectionCrateNumberField setEnabled: !lockedOrNotRunningMaintenance];
+    [connectionAutoConnectButton setEnabled: !lockedOrNotRunningMaintenance];
+    [connectionAutoInitCrateButton setEnabled: !lockedOrNotRunningMaintenance];
+    
+}
 
 - (void) opsRunningChanged:(NSNotification*)aNote
 { dispatch_async(dispatch_get_main_queue(), ^{
@@ -695,6 +789,8 @@ static NSDictionary* xl3Ops;
         [hvBCurrentReadField setStringValue:@""];
     }
 
+    BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORXL3Lock];
+
     //todo: add exception for OWLs
     //if ([hvPowerSupplyMatrix selectedColumn] == 0 && [model hvASwitch]) {
     if ([model hvASwitch] || //A ON or
@@ -706,14 +802,16 @@ static NSDictionary* xl3Ops;
         [hvRelayOpenButton setEnabled:NO];
         [hvRelayCloseButton setEnabled:NO];
     }
-    else {
+    else if(!lockedOrNotRunningMaintenance){
         [hvRelayMaskHighField setEnabled:YES];
         [hvRelayMaskLowField setEnabled:YES];
         [hvRelayMaskMatrix setEnabled:YES];
         [hvRelayOpenButton setEnabled:YES];
         [hvRelayCloseButton setEnabled:YES];        
     }
-    [self updateHVButtons];
+    
+    if(!lockedOrNotRunningMaintenance) [self updateHVButtons];
+
 }); }
 
 - (void) hvTriggerStatusChanged:(NSNotification*)aNote
@@ -969,7 +1067,7 @@ static NSDictionary* xl3Ops;
 
 - (IBAction) lockAction:(id)sender
 {
-	[gSecurity tryToSetLock:[model xl3LockName] to:[sender intValue] forWindow:[self window]];
+	[gSecurity tryToSetLock:ORXL3Lock to:[sender intValue] forWindow:[self window]];
 }
 
 - (IBAction) opsAction:(id)sender

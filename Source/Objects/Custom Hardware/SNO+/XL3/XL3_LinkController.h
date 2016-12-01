@@ -47,7 +47,9 @@
 	IBOutlet NSTextField*		writeValueField;
 	IBOutlet NSStepper*		writeValueStepper;
 	//composite
-	IBOutlet NSButton*              compositeLockButton;
+    IBOutlet NSButton *selectAllSlotMaskButton;
+    IBOutlet NSButton *deselectAllSlotMaskButton;
+    IBOutlet NSButton *selectSlotMaskButton;    
 	IBOutlet NSProgressIndicator*	deselectCompositeRunningIndicator;
 	IBOutlet NSButton*              compositeDeselectButton;
 	IBOutlet NSMatrix*              compositeSlotMaskMatrix;
@@ -168,7 +170,6 @@
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item;
 
 #pragma mark •••Interface Management
-- (void) settingsLockChanged:(NSNotification*)aNotification;
 - (void) xl3LockChanged:(NSNotification*)aNotification;
 - (void) opsRunningChanged:(NSNotification*)aNote;
 //basic ops

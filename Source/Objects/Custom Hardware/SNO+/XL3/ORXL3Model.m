@@ -91,6 +91,7 @@ NSString* ORXL3ModelHVCMOSRateLimitChanged = @"ORXL3ModelHVCMOSRateLimitChanged"
 NSString* ORXL3ModelHVCMOSRateIgnoreChanged = @"ORXL3ModelHVCMOSRateIgnoreChanged";
 NSString* ORXL3ModelXl3VltThresholdChanged = @"ORXL3ModelXl3VltThresholdChanged";
 NSString* ORXL3ModelXl3VltThresholdInInitChanged = @"ORXL3ModelXl3VltThresholdInInitChanged";
+NSString* ORXL3Lock = @"ORXL3Lock";
 
 extern NSString* ORSNOPRequestHVStatus;
 
@@ -4727,3 +4728,4 @@ err:
 }
 
 @end
+
