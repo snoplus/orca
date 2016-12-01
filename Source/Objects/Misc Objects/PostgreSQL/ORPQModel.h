@@ -172,7 +172,7 @@ extern NSString* ORPQLock;
 
 enum ePQCommandType {
     kPQCommandType_General,
-    kPQCommandType_GetChannelDB,
+    kPQCommandType_GetCardDB,
 };
 
 @interface ORPQQueryOp : ORPQOperation

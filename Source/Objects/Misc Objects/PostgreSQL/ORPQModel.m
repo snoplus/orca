@@ -201,7 +201,7 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
         [anObject performSelector:aSelector withObject:nil afterDelay:0.1];
     } else {
         ORPQQueryOp* anOp = [[ORPQQueryOp alloc] initWithDelegate:self object:anObject selector:aSelector];
-        [anOp setCommandType:kPQCommandType_GetChannelDB];
+        [anOp setCommandType:kPQCommandType_GetCardDB];
         [ORPQDBQueue addOperation:anOp];
         [anOp release];
     }
@@ -488,7 +488,7 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                     }
                     break;
 
-                case kPQCommandType_GetChannelDB: {
+                case kPQCommandType_GetCardDB: {
                     [command autorelease];
                     // column:    0     1    2       3
                     char *cols = "crate,card,channel,pmthv";
