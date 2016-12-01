@@ -208,9 +208,9 @@ NSDate* MCPYear0000;
 }
 
 // (returns 0 if there is no value at those coordinates)
-- (int32_t) getInt32atRow:(int)aRow column:(int)aColumn;
+- (int64_t) getInt64atRow:(int)aRow column:(int)aColumn;
 {
-    int32_t val = 0;
+    int64_t val = 0;
     if (mResult && aRow<mNumOfRows && aColumn<mNumOfFields) {
         Oid type = PQftype(mResult,aColumn);
         if (!PQgetisnull(mResult,aRow,aColumn)) {
@@ -220,7 +220,7 @@ NSDate* MCPYear0000;
                 case kPQTypeInt16:
                 case kPQTypeInt32:
                 case kPQTypeInt64:
-                    val = (int32_t)atol(pt);
+                    val = (int64_t)strtoll(pt, NULL, 0);
                     break;
                 case kPQTypeBool:
                     if (*pt == 't') {
@@ -237,10 +237,10 @@ NSDate* MCPYear0000;
     return val;
 }
 
-- (NSMutableData *) getInt32arrayAtRow:(int)aRow column:(int)aColumn;
+- (NSMutableData *) getInt64arrayAtRow:(int)aRow column:(int)aColumn;
 {
     NSMutableData *val = nil;
-    int32_t value;
+    int64_t value;
     if (mResult && aRow<mNumOfRows && aColumn<mNumOfFields) {
         Oid type = PQftype(mResult,aColumn);
         if (!PQgetisnull(mResult,aRow,aColumn)) {
@@ -251,8 +251,8 @@ NSDate* MCPYear0000;
                 case kPQTypeInt16:
                 case kPQTypeInt32:
                 case kPQTypeInt64: {
-                    value = (int32_t)atol(pt);
-                    [val appendBytes:&value length:sizeof(int32_t)];
+                    value = (int64_t)strtoll(pt, NULL, 0);
+                    [val appendBytes:&value length:sizeof(int64_t)];
                     break;
                 }
                 case kPQTypeBool:
@@ -263,7 +263,7 @@ NSDate* MCPYear0000;
                     } else {
                         break;
                     }
-                    [val appendBytes:&value length:sizeof(int32_t)];
+                    [val appendBytes:&value length:sizeof(int64_t)];
                     break;
                 case kPQTypeArrayChar:
                 case kPQTypeArray16:
@@ -278,7 +278,7 @@ NSDate* MCPYear0000;
                     char *tok = strtok_r(tmp, "{}, ", &last);
                     while (tok) {
                         value = strtoll(tok, NULL, 0);
-                        [val appendBytes:&value length:sizeof(int32_t)];
+                        [val appendBytes:&value length:sizeof(int64_t)];
                         tok = strtok_r(NULL, "{}, ", &last);
                     }
                     free(tmp);

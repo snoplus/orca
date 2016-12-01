@@ -694,7 +694,7 @@ err:
         goto err;
     }
 
-    run_number = [result getInt32atRow:0 column:0];
+    run_number = [result getInt64atRow:0 column:0];
 
     NSArray*  runObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runObjects count]){

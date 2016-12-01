@@ -31,8 +31,8 @@ typedef enum {
 - (NSArray *) fetchRowAsArray;
 - (NSDictionary *) fetchRowAsDictionary;
 - (NSArray *) fetchFieldsName;
-- (int32_t) getInt32atRow:(int)aRow column:(int)aColumn;
-- (NSMutableData *) getInt32arrayAtRow:(int)aRow column:(int)aColumn;
+- (int64_t) getInt64atRow:(int)aRow column:(int)aColumn;
+- (NSMutableData *) getInt64arrayAtRow:(int)aRow column:(int)aColumn;
 - (id) fetchTypesAsType:(MCPReturnType) aType;
 - (NSArray *) fetchTypesAsArray;
 - (NSDictionary*) fetchTypesAsDictionary;

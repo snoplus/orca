@@ -501,11 +501,11 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                     NSMutableData *dataOut = [[[NSMutableData alloc] initWithLength:(kSnoCardsTotal * sizeof(SnoPlusCard))] autorelease];
                     SnoPlusCard *cardPt = [dataOut mutableBytes];
                     for (i=0; i<numRows; ++i) {
-                        int32_t val = [theResult getInt32atRow:i column:3];
+                        int32_t val = [theResult getInt64atRow:i column:3];
                         if (val < 0) continue;
-                        int crate   = [theResult getInt32atRow:i column:0];
-                        int card    = [theResult getInt32atRow:i column:1];
-                        int channel = [theResult getInt32atRow:i column:2];
+                        int crate   = [theResult getInt64atRow:i column:0];
+                        int card    = [theResult getInt64atRow:i column:1];
+                        int channel = [theResult getInt64atRow:i column:2];
                         if (crate < kSnoCrates && card < kSnoCardsPerCrate && channel < kSnoChannelsPerCard) {
                             SnoPlusCard *theCard = cardPt + crate * kSnoCardsPerCrate + card;
                             theCard->valid[kHvDisabled] |= (1 << channel);
@@ -529,16 +529,16 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                         break;
                     }
                     for (i=0; i<numRows; ++i) {
-                        int crate = [theResult getInt32atRow:i column:0];
-                        int card  = [theResult getInt32atRow:i column:1];
+                        int crate = [theResult getInt64atRow:i column:0];
+                        int card  = [theResult getInt64atRow:i column:1];
                         if (crate >= kSnoCrates || card >= kSnoCardsPerCrate) continue;
                         SnoPlusCard *theCard = cardPt + crate * kSnoCardsPerCrate + card;
                         for (int col=2; col<kNumCardDbColumns; ++col) {
-                            NSMutableData *dat = [theResult getInt32arrayAtRow:i column:col];
+                            NSMutableData *dat = [theResult getInt64arrayAtRow:i column:col];
                             if (!dat) continue;
-                            int n = [dat length] / sizeof(int32_t);
+                            int n = [dat length] / sizeof(int64_t);
                             if (n > kSnoChannelsPerCard) n = kSnoChannelsPerCard;
-                            int32_t *val = (int32_t *)[dat mutableBytes];
+                            int64_t *val = (int64_t *)[dat mutableBytes];
                             for (int ch=0; ch<n; ++ch) {
                                 theCard->valid[col] |= (1 << ch);
                                 switch (col) {
