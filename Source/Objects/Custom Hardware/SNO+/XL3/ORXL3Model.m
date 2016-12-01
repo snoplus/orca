@@ -91,6 +91,7 @@ NSString* ORXL3ModelHVCMOSRateLimitChanged = @"ORXL3ModelHVCMOSRateLimitChanged"
 NSString* ORXL3ModelHVCMOSRateIgnoreChanged = @"ORXL3ModelHVCMOSRateIgnoreChanged";
 NSString* ORXL3ModelXl3VltThresholdChanged = @"ORXL3ModelXl3VltThresholdChanged";
 NSString* ORXL3ModelXl3VltThresholdInInitChanged = @"ORXL3ModelXl3VltThresholdInInitChanged";
+NSString* ORXL3ModelStateChanged = @"ORXL3ModelStateChanged";
 
 extern NSString* ORSNOPRequestHVStatus;
 
@@ -1694,8 +1695,8 @@ void SwapLongBlock(void* p, int32_t n)
         initialized = FALSE;
     }
 
-    NSLog(@"posting notification\n");
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORXL3ModelStateChanged" object:self userInfo:nil];
+    [[NSNotificationCenter defaultCenter]
+        postNotificationName:ORXL3ModelStateChanged object:self userInfo:nil];
 
     [[self undoManager] disableUndoRegistration];
     [self setXl3Mode: results->mode];

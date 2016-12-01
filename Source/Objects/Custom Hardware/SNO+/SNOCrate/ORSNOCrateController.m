@@ -53,7 +53,12 @@
 
     [notifyCenter addObserver : self
 					 selector : @selector(updateWindow)
-						 name : @"ORXL3ModelStateChanged"
+						 name : ORXL3ModelStateChanged
+					   object : [model adapter]];
+
+    [notifyCenter addObserver : self
+					 selector : @selector(updateWindow)
+						 name : ORXL3ModelHvStatusChanged
 					   object : [model adapter]];
 }
 
@@ -67,14 +72,23 @@
     if ([[xl3 xl3Link] isConnected]) {
         if ([xl3 initialized]) {
             /* The Xilinx has been loaded, so we need to enable the load
-             * hardware button and disable the reset crate button. */
+             * hardware button. */
             [loadHardwareButton setEnabled:TRUE];
-            [resetCrateButton setEnabled:FALSE];
         } else {
-            /* The Xilinx hasn't been loaded, so we enable the reset crate
-             * button and disable the load hardware button. */
+            /* The Xilinx hasn't been loaded, so we disable the load hardware
+             * button. */
             [loadHardwareButton setEnabled:FALSE];
-            [resetCrateButton setEnabled:TRUE];
+        }
+
+        if ([xl3 hvSwitchEverUpdated]) {
+            if (![xl3 hvASwitch] && ![xl3 hvBSwitch]) {
+                /* HV is off, so enable crate reset button. */
+                [resetCrateButton setEnabled:TRUE];
+            } else {
+                [resetCrateButton setEnabled:FALSE];
+            }
+        } else {
+            [resetCrateButton setEnabled:FALSE];
         }
     } else {
         /* XL3 isn't connected, so don't enable any buttons. */
@@ -91,11 +105,6 @@
 	[regBaseAddressField setIntValue:[model registerBaseAddress]];
 	[iPBaseAddressField setStringValue:[model iPAddress]];
 	[crateNumberField setIntValue:[model crateNumber]];
-}
-
-- (void) updateButtons: (NSNotification *) aNote
-{
-    [self updateWindow];
 }
 
 - (void) setModel:(id)aModel
