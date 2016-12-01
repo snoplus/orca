@@ -342,7 +342,7 @@ typedef struct Fec32CmosShiftReg{
 - (void) hwWizardActionEnd:(NSNotification*)aNote;
 - (void) hwWizardActionFinal:(NSNotification*)aNote;
 - (void) hwWizardWaitingForDatabase;
-- (void) _pmthvCallback:(NSMutableData*)data;
+- (void) _chanDbCallback:(NSMutableData*)data;
 - (void) _continueHWWizard:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) _continueHWWizard;
 
@@ -429,6 +429,8 @@ extern NSString* ORFecQllEnabledChanged;
 extern NSString* ORFec32ModelAdcVoltageChanged;
 extern NSString* ORFec32ModelAdcVoltageStatusChanged;
 extern NSString* ORFec32ModelAdcVoltageStatusOfCardChanged;
+
+extern NSString* ORFec32CardDbChangedNotification;
 
 extern NSString* ORFecLock;
 

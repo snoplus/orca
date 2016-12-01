@@ -22,7 +22,45 @@
 #define kSnoCrates          20
 #define kSnoCardsPerCrate   16
 #define kSnoChannelsPerCard 32
-#define kSnoChannels        (kSnoCrates * kSnoCardsPerCrate * kSnoChannelsPerCard)
+#define kSnoCardsTotal      (kSnoCrates * kSnoCardsPerCrate)
+#define kSnoChannels        (kSnoCardsTotal * kSnoChannelsPerCard)
+
+// indices for SnoPlusCard valid flags
+// (all except hvDisabled must have the same numbers as the column numbers when reading the detector db)
+enum {
+    kCardExists,        // set to 1 if card exists in current detector state
+    kHvDisabled,
+    kNhit100enabled,
+    kNhit100delay,
+    kNhit20enabled,
+    kNhit20width,
+    kNhit20delay,
+    kVbal0,
+    kVbal1,
+    kTac0trim,
+    kTac1trim,
+    kVthr,
+    kPedEnabled,
+    kSeqDisabled,
+    kNumCardDbColumns
+};
+
+typedef struct {
+    int32_t         hvDisabled;   // resistor pulled or no cable
+    int32_t         nhit100enabled;
+    unsigned char   nhit100delay[kSnoChannelsPerCard];
+    int32_t         nhit20enabled;
+    unsigned char   nhit20width[kSnoChannelsPerCard];
+    unsigned char   nhit20delay[kSnoChannelsPerCard];
+    unsigned char   vbal0[kSnoChannelsPerCard];
+    unsigned char   vbal1[kSnoChannelsPerCard];
+    unsigned char   tac0trim[kSnoChannelsPerCard];
+    unsigned char   tac1trim[kSnoChannelsPerCard];
+    unsigned char   vthr[kSnoChannelsPerCard];
+    int32_t         pedEnabled;
+    int32_t         seqDisabled;
+    int32_t         valid[kNumCardDbColumns];   // bitmasks for settings loaded from hardware (see enum above)
+} SnoPlusCard;
 
 @class ORPQConnection;
 @class ORPQModel;
@@ -52,6 +90,7 @@
 
 /**
  @brief Arbitrary detector db query
+ @param aCommand PostgreSQL command string
  @param anObject Callback object
  @param aSelector Callback object selector (called with an ORPQResult object, or nil on error)
  @param aTimeoutSecs Timeout time in seconds (0 for no timeout)
@@ -60,6 +99,7 @@
 
 /**
  @brief Arbitrary detector db query with no timeout
+ @param aCommand PostgreSQL command string
  @param anObject Callback object
  @param aSelector Callback object selector (called with an ORPQResult object, or nil on error)
  */
@@ -67,16 +107,17 @@
 
 /**
  @brief Arbitrary detector db query with no callback or timeout
+ @param aCommand PostgreSQL command string
  */
 - (void) dbQuery:(NSString*)aCommand;
 
 /**
- @brief Get specified field from detector db
+ @brief Get SNO+ card database
  @param anObject Callback object
  @param aSelector Callback object selector (called with an NSMutableData object
- containing an int32_t array of values in detector crate/card/channel order, or nil on error)
+ containing an array of SnoPlusCard structures in detector crate/card order, or nil on error)
  */
-- (void) pmtdbQuery:(NSString*)aPmtdbField object:(id)anObject selector:(SEL)aSelector;
+- (void) cardDbQuery:(id)anObject selector:(SEL)aSelector;
 
 - (void) cancelDbQueries;
 - (BOOL) stealthMode;
@@ -132,7 +173,7 @@ extern NSString* ORPQLock;
 
 enum ePQCommandType {
     kPQCommandType_General,
-    kPQCommandType_GetPMT,
+    kPQCommandType_GetCardDB,
 };
 
 @interface ORPQQueryOp : ORPQOperation
@@ -142,7 +183,6 @@ enum ePQCommandType {
 }
 - (void) setCommand:(NSString*)aCommand;
 - (void) setCommandType:(int)aCommandType;
-- (void) setPmtdbFieldName:(NSString*)aFieldName;
 - (void) cancel;
 - (void) main;
 @end

@@ -63,13 +63,16 @@ NSString* ORFecQllEnabledChanged					= @"ORFecQllEnabledChanged";
 NSString* ORFec32ModelAdcVoltageChanged				= @"ORFec32ModelAdcVoltageChanged";
 NSString* ORFec32ModelAdcVoltageStatusChanged		= @"ORFec32ModelAdcVoltageStatusChanged";
 NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageStatusOfCardChanged";
+NSString* ORFec32ModelCardDbChanged                 = @"ORFec32ModelCardDbChanged";
+
 // mask for crates that need updating after Hardware Wizard action
 static unsigned long crateInitMask; // crates that need to be initialized
 static unsigned long cratePedMask;  // crates that need their pedestals set
 
-static int              sPmthvState = 0; // (0=not loaded, 1=loading, 2=loaded)
-static NSMutableData*   sPmthvData = nil;
+static int              sCardDbState = 0; // (0=not loaded, 1=loading, 2=loaded (or not), 3=stale (or none))
+static NSMutableData*   sCardDbData = nil;
 static NSAlert *        sReadingHvdbAlert = nil;
+static int              sChannelsNotChangedCount = 0;
 
 @interface ORFec32Model (private)
 - (ORCommandList*) cmosShiftLoadAndClock:(unsigned short) registerAddress cmosRegItem:(unsigned short) cmosRegItem bitMaskStart:(short) bit_mask_start;
@@ -868,233 +871,6 @@ static NSAlert *        sReadingHvdbAlert = nil;
     [[[self undoManager] prepareWithInvocationTarget:self] setHVRef:hVRef];
 	hVRef = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORFecHVRefChanged object:self];
-}
-
-#pragma mark •••Notifications
-- (void) registerNotificationObservers
-{
-    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    [notifyCenter addObserver : self
-                     selector : @selector(hwWizardActionBegin:)
-                         name : ORHWWizGroupActionStarted
-                       object : nil];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(hwWizardActionEnd:)
-                         name : ORHWWizGroupActionFinished
-                       object : nil];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(hwWizardActionFinal:)
-                         name : ORHWWizActionFinalNotification
-                       object : nil];
-}
-
-- (void) _continueHWWizard:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
-{
-    if (returnCode == NSAlertDefaultReturn) {
-        sPmthvState = 0;
-        NSLog(@"Hardware Wizard action cancelled.\n");
-    } else {
-        [self _continueHWWizard];
-    }
-}
-
-- (void) _continueHWWizard
-{
-    // all done loading database, so we can continue with our hwWizard execution now
-    if (hwWizard && [hwWizard respondsToSelector:@selector(continueExecuteControlStruct)]) {
-        [hwWizard performSelector:@selector(continueExecuteControlStruct)];
-    } else {
-        NSLog(@"Error calling continueExecuteControlStruct\n");
-    }
-}
-
-// continue HWWizard execution after reading pmthv database
-- (void) _pmthvCallback:(NSMutableData*)data
-{
-    sPmthvState = 2;
-
-    if (sReadingHvdbAlert) {
-        NSWindow *hwWindow = [hwWizard performSelector:@selector(window)];
-        [hwWindow endSheet:[hwWindow attachedSheet] returnCode:NSAlertSecondButtonReturn];
-        //[NSApp endSheet:[sReadingHvdbAlert window]];
-        sReadingHvdbAlert = nil;
-    }
-
-    NSString *s = nil;
-    NSString *m = nil;
-    NSString *w = nil;
-
-    if (data) {
-        [sPmthvData release];
-        sPmthvData = [data retain];
-        NSLog(@"Loaded pmthv database\n");
-        [self _continueHWWizard];
-    } else if (sPmthvData) {
-        NSLog(@"Error reloading pmthv database\n");
-        s = [NSString stringWithFormat:@"Error reloading pmthv database!\n\nContinue with stale data?"];
-        m = [NSString stringWithFormat:@"This should be OK as long as the detector has not changed"];
-        w = [NSString stringWithFormat:@"Running Hardware Wizard with stale database!\n"];
-    } else {
-        s = [NSString stringWithFormat:@"Error loading pmthv database!\n\nContinue anyway?"];
-        m = [NSString stringWithFormat:@"This runs the risk of enabling channels which have HV disabled!"];
-        w = [NSString stringWithFormat:@"Running Hardware Wizard with no PMT database!\n"];
-    }
-    if (s) {
-#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
-        [alert setMessageText:s];
-        [alert setInformativeText:m];
-        [alert addButtonWithTitle:@"Cancel"];
-        [alert addButtonWithTitle:@"OK, Continue"];
-        [alert setAlertStyle:NSWarningAlertStyle];
-        [alert beginSheetModalForWindow:[hwWizard performSelector:@selector(window)] completionHandler:^(NSModalResponse result){
-            if (result == NSAlertSecondButtonReturn) {
-                NSLog(w);
-                [self performSelector:@selector(_continueHWWizard) withObject:nil afterDelay:.1];
-            } else {
-                sPmthvState = 0;
-                NSLog(@"Hardware Wizard action cancelled.\n");
-            }
-        }];
-#else
-        NSBeginAlertSheet(s,
-                          @"Cancel",
-                          @"OK, Continue",
-                          nil,[hwWizard window],
-                          self,
-                          @selector(_continueHWWizard:returnCode:contextInfo:),
-                          nil,
-                          nil,m);
-#endif
-    }
-}
-
-- (void) hwWizardWaitingForDatabase
-{
-    if (sPmthvState == 1) {
-#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-        NSString* s = [NSString stringWithFormat:@"Reading PMT database..."];
-        sReadingHvdbAlert = [[[NSAlert alloc] init] autorelease];
-        [sReadingHvdbAlert setMessageText:s];
-        [sReadingHvdbAlert addButtonWithTitle:@"Cancel"];
-        [sReadingHvdbAlert setAlertStyle:NSInformationalAlertStyle];
-        [sReadingHvdbAlert beginSheetModalForWindow:[hwWizard performSelector:@selector(window)] completionHandler:^(NSModalResponse result){
-            if (result == NSAlertFirstButtonReturn) {
-                // cancel any queued database operations
-                [[ORPQModel getCurrent] cancelDbQueries];
-                sReadingHvdbAlert = nil;
-                // continue executing HWWizard without PMT database
-                [self _pmthvCallback:nil];
-            }
-        }];
-#endif
-    }
-}
-
-- (void) hwWizardActionBegin:(NSNotification*)note
-{
-    startSeqDisabledMask          = seqDisabledMask;
-    startPedEnabledMask           = pedEnabledMask;
-    startTrigger20nsDisabledMask  = trigger20nsDisabledMask;
-    startTrigger100nsDisabledMask = trigger100nsDisabledMask;
-    startOnlineMask               = onlineMask;
-    cardChangedFlag = false;
-    crateInitMask = 0;
-    cratePedMask  = 0;
-
-    // interrupt hardwardWizard execution to allow time to load pmtdb if necessary
-    if (sPmthvState == 0 && [note object] && [[note object] respondsToSelector:@selector(notOkToContinue)]) {
-        sPmthvState = 1;
-        hwWizard = [note object];
-        // (we will continue after our pmthv database is loaded)
-        [hwWizard performSelector:@selector(notOkToContinue)];
-        [[ORPQModel getCurrent] pmtdbQuery:@"pmthv" object:self selector:@selector(_pmthvCallback:)];
-        // post a modal dialog after 0.1 sec if the database operation hasn't completed yet
-        [self performSelector:@selector(hwWizardWaitingForDatabase) withObject:nil afterDelay:.5];
-    }
-}
-
-- (void) hwWizardActionEnd:(NSNotification*)note
-{
-    [[self undoManager] disableUndoRegistration];
-
-    // get mask of PMT's with HV disabled
-    if (sPmthvData && [self stationNumber]<kSnoCardsPerCrate && [self crateNumber]<kSnoCrates) {
-        int32_t *pmthv = (int32_t *)[sPmthvData mutableBytes] + ([self crateNumber] * kSnoCardsPerCrate + [self stationNumber]) * kSnoChannelsPerCard;
-        int32_t pmthvDisabledMask = 0;
-        for (int i=0; i<kSnoChannelsPerCard; ++i) {
-            if (pmthv[i] == 1) pmthvDisabledMask |= (0x01 << i);
-        }
-        // sequencer must be disabled on channels with HV disabled
-        seqDisabledMask |= (seqDisabledMask ^ startSeqDisabledMask) & pmthvDisabledMask;
-        // pedestals must be disabled on channels with HV disabled
-        pedEnabledMask &= ~((pedEnabledMask ^ startPedEnabledMask) & pmthvDisabledMask);
-        // triggers must be disabled on channels with HV disabled
-        trigger20nsDisabledMask |= (trigger20nsDisabledMask ^ startTrigger20nsDisabledMask) & pmthvDisabledMask;
-        trigger100nsDisabledMask |= (trigger100nsDisabledMask ^ startTrigger100nsDisabledMask) & pmthvDisabledMask;
-        // can't be online if HV is disabled
-        onlineMask &= ~((onlineMask ^ startOnlineMask) & pmthvDisabledMask);
-    }
-    // go ahead and "officially" change the masks, sending the appropriate notifications
-    if (seqDisabledMask != startSeqDisabledMask) {
-        unsigned long mask = seqDisabledMask;
-        seqDisabledMask = startSeqDisabledMask;
-        [self setSeqDisabledMask: mask];
-        cardChangedFlag = true;
-    }
-    if (pedEnabledMask != startPedEnabledMask) {
-        unsigned long mask = pedEnabledMask;
-        pedEnabledMask = startPedEnabledMask;
-        [self setPedEnabledMask: mask];
-        // pedestals are set differently, not by a crate init, so handle these separately
-        cratePedMask |= (1UL << [self crateNumber]);
-    }
-    if (trigger20nsDisabledMask != startTrigger20nsDisabledMask) {
-        unsigned long mask = trigger20nsDisabledMask;
-        trigger20nsDisabledMask = startTrigger20nsDisabledMask;
-        [self setTrigger20nsDisabledMask: mask];
-        cardChangedFlag = true;
-    }
-    if (trigger100nsDisabledMask != startTrigger100nsDisabledMask) {
-        unsigned long mask = trigger100nsDisabledMask;
-        trigger100nsDisabledMask = startTrigger100nsDisabledMask;
-        [self setTrigger100nsDisabledMask: mask];
-        cardChangedFlag = true;
-    }
-    if (onlineMask != startOnlineMask) {
-        unsigned long mask = onlineMask;
-        onlineMask = startOnlineMask;
-        [self setOnlineMaskNoInit: mask];
-        cardChangedFlag = true;
-    }
-    if (cardChangedFlag) {
-        // set bit in crateInitMask to init this crate as the final step
-        crateInitMask |= (1UL << [self crateNumber]);
-        cardChangedFlag = false;  // clear this temporary flag
-    }
-    [[self undoManager] enableUndoRegistration];
-
-    // set pmthv state to reload the database on the next hwWizard action
-    sPmthvState = 0;
-}
-
-- (void) hwWizardActionFinal:(NSNotification*)note
-{
-    // now that we have updated all settings, finally go ahead and
-    // set pedestals and/or initialize this crate if we haven't done so already
-    if (cratePedMask & (1UL << [self crateNumber])) {
-        [[[self guardian] adapter] setPedestalInParallel];
-        // make sure we don't do this crate again
-        cratePedMask &= ~(1UL << [self crateNumber]);
-    }
-    if (crateInitMask & (1UL << [self crateNumber])) {
-        // initialize the crate registers from our current settings
-        [[[self guardian] adapter] loadHardware];
-        // make sure we don't do this crate again
-        crateInitMask &= ~(1UL << [self crateNumber]);
-    }
 }
 
 #pragma mark •••Converted Data Methods
@@ -1958,6 +1734,337 @@ static NSAlert *        sReadingHvdbAlert = nil;
         if (cmosRate[ch] < 0) count++;
     }
     return count;    
+}
+
+#pragma mark •••Notifications
+- (void) registerNotificationObservers
+{
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    [notifyCenter addObserver : self
+                     selector : @selector(hwWizardActionBegin:)
+                         name : ORHWWizGroupActionStarted
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(hwWizardActionEnd:)
+                         name : ORHWWizGroupActionFinished
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(hwWizardActionFinal:)
+                         name : ORHWWizActionFinalNotification
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(cardDbChanged:)
+                         name : ORFec32ModelCardDbChanged
+                       object : nil];
+}
+
+// sync FEC/DC settings from the specified hardware state
+// (the note object should be a NSMutableData object containing
+//  a full array of SnoPlusCard structures in crate/card order)
+- (void) cardDbChanged:(NSNotification*)note
+{
+    int32_t valid;
+    NSMutableData *cardDb = [note object];
+
+    if (!cardDb || ![cardDb respondsToSelector:@selector(mutableBytes)]) return;
+
+    if ([self stationNumber] >= kSnoCardsPerCrate || [self crateNumber] >= kSnoCrates) return;
+    
+    SnoPlusCard *card = (SnoPlusCard *)[cardDb mutableBytes] + [self crateNumber] * kSnoCardsPerCrate + [self stationNumber];
+
+    if (!card->valid[kCardExists]) return;  // nothing to do if card doesn't exist in the current detector state
+
+    if ((valid = card->valid[kSeqDisabled]) != 0) {
+        [self setSeqDisabledMask: (card->seqDisabled & valid) | ((int32_t)seqDisabledMask & ~valid)];
+        startSeqDisabledMask = seqDisabledMask;
+    }
+    if ((valid = card->valid[kPedEnabled]) != 0) {
+        [self setPedEnabledMask: (card->pedEnabled & valid) | ((int32_t)pedEnabledMask & ~valid)];
+        startPedEnabledMask = pedEnabledMask;
+    }
+    if ((valid = card->valid[kNhit100enabled]) != 0) {
+        [self setTrigger100nsDisabledMask: (card->nhit100enabled & valid) | ((int32_t)trigger100nsDisabledMask & ~valid)];
+        startTrigger100nsDisabledMask = trigger100nsDisabledMask;
+    }
+    if ((valid = card->valid[kNhit20enabled]) != 0) {
+        [self setTrigger20nsDisabledMask: (card->nhit20enabled & valid) | ((int32_t)trigger20nsDisabledMask & ~valid)];
+        startTrigger20nsDisabledMask = trigger20nsDisabledMask;
+    }
+    for (int ch=0; ch<32; ++ch) {
+        int32_t chMask = (1 << ch);
+        if (card->valid[kVthr] & chMask) {
+            [self setVth:ch withValue:card->vthr[ch]];
+        }
+        short dcNum = ch / 8;
+        if (dcPresent[dcNum]) {
+            ORFecDaughterCardModel *theDc = dc[dcNum];
+            short dcChan = ch - dcNum * 8;
+            if (card->valid[kNhit100delay] & chMask) {
+                // (there is some inconsistency between ORFecDaughterCardModel and ORXL3Model
+                // as to whether this is a width or delay, but they are both the same setting)
+                [theDc setNs100width:dcChan withValue:card->nhit100delay[ch]];
+            }
+            if (card->valid[kNhit20width] & chMask) {
+                [theDc setNs20width:dcChan withValue:card->nhit20width[ch]];
+            }
+            if (card->valid[kNhit20delay] & chMask) {
+                [theDc setNs20delay:dcChan withValue:card->nhit20delay[ch]];
+            }
+            if (card->valid[kVbal0] & chMask) {
+                [theDc setVb:dcChan withValue:card->vbal0[ch]];
+            }
+            if (card->valid[kVbal1] & chMask) {
+                [theDc setVb:(dcChan+8) withValue:card->vbal1[ch]];
+            }
+            if (card->valid[kTac0trim] & chMask) {
+                [theDc setTac0trim:dcChan withValue:card->tac0trim[ch]];
+            }
+            if (card->valid[kTac1trim] & chMask) {
+                [theDc setTac1trim:dcChan withValue:card->tac1trim[ch]];
+            }
+        }
+    }
+}
+
+- (void) _continueHWWizard:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+    if (returnCode == NSAlertDefaultReturn) {
+        sCardDbState = 0;
+        NSLog(@"Hardware Wizard action cancelled.\n");
+    } else {
+        sCardDbState = 3;
+        if (sCardDbData) {
+            NSLog(@"Running Hardware Wizard with stale database!\n");
+        } else {
+            NSLog(@"Running Hardware Wizard with no detector database!\n");
+        }
+        [self _continueHWWizard];
+    }
+}
+
+- (void) _continueHWWizard
+{
+    if (sCardDbState == 2 && sCardDbData) {
+        // post notification to sync all FEC/DC settings from the current hardware state of the detector database
+        // (note: don't do this for stale database because in this case the current variables are more up-to-date)
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelCardDbChanged object:sCardDbData];
+    }
+    // all done loading database, so we can continue with our hwWizard execution now
+    if (hwWizard && [hwWizard respondsToSelector:@selector(continueExecuteControlStruct)]) {
+        [hwWizard performSelector:@selector(continueExecuteControlStruct)];
+    } else {
+        NSLog(@"Error calling continueExecuteControlStruct\n");
+    }
+}
+
+// continue HWWizard execution after reading detector database
+- (void) _chanDbCallback:(NSMutableData*)data
+{
+    sCardDbState = 2;
+    
+    if (sReadingHvdbAlert) {
+        NSWindow *hwWindow = [hwWizard performSelector:@selector(window)];
+        [hwWindow endSheet:[hwWindow attachedSheet] returnCode:NSAlertSecondButtonReturn];
+        //[NSApp endSheet:[sReadingHvdbAlert window]];
+        sReadingHvdbAlert = nil;
+    }
+    
+    NSString *s = nil;  // short message for dialog box
+    NSString *m = nil;  // message details
+    NSString *w = nil;  // warning for status log
+    
+    if (data) {
+        [sCardDbData release];
+        sCardDbData = [data retain];
+        NSLog(@"Loaded detector database\n");
+        [self _continueHWWizard];
+    } else if (sCardDbData) {
+        NSLog(@"Error reloading detector database\n");
+        s = [NSString stringWithFormat:@"Error reloading detector database!\n\nContinue with stale data?"];
+        m = [NSString stringWithFormat:@"This should be OK as long as the detector has not changed"];
+        w = [NSString stringWithFormat:@"Running Hardware Wizard with stale database!\n"];
+    } else {
+        s = [NSString stringWithFormat:@"Error loading detector database!\n\nContinue anyway?"];
+        m = [NSString stringWithFormat:@"This runs the risk of enabling channels which have HV disabled!"];
+        w = [NSString stringWithFormat:@"Running Hardware Wizard with no detector database!\n"];
+    }
+    if (s) {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+        [alert setMessageText:s];
+        [alert setInformativeText:m];
+        [alert addButtonWithTitle:@"Cancel"];
+        [alert addButtonWithTitle:@"OK, Continue"];
+        [alert setAlertStyle:NSWarningAlertStyle];
+        [alert beginSheetModalForWindow:[hwWizard performSelector:@selector(window)] completionHandler:^(NSModalResponse result){
+            if (result == NSAlertSecondButtonReturn) {
+                sCardDbState = 3;
+                NSLog(w);
+                [self performSelector:@selector(_continueHWWizard) withObject:nil afterDelay:.1];
+            } else {
+                sCardDbState = 0;
+                NSLog(@"Hardware Wizard action cancelled.\n");
+            }
+        }];
+#else
+        NSBeginAlertSheet(s,
+                          @"Cancel",
+                          @"OK, Continue",
+                          nil,[hwWizard window],
+                          self,
+                          @selector(_continueHWWizard:returnCode:contextInfo:),
+                          nil,
+                          nil,m);
+#endif
+    }
+}
+
+- (void) hwWizardWaitingForDatabase
+{
+    if (sCardDbState == 1) {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+        NSString* s = [NSString stringWithFormat:@"Reading PMT database..."];
+        sReadingHvdbAlert = [[[NSAlert alloc] init] autorelease];
+        [sReadingHvdbAlert setMessageText:s];
+        [sReadingHvdbAlert addButtonWithTitle:@"Cancel"];
+        [sReadingHvdbAlert setAlertStyle:NSInformationalAlertStyle];
+        [sReadingHvdbAlert beginSheetModalForWindow:[hwWizard performSelector:@selector(window)] completionHandler:^(NSModalResponse result){
+            if (result == NSAlertFirstButtonReturn) {
+                // cancel any queued database operations
+                [[ORPQModel getCurrent] cancelDbQueries];
+                sReadingHvdbAlert = nil;
+                // continue executing HWWizard without PMT database
+                [self _chanDbCallback:nil];
+            }
+        }];
+#endif
+    }
+}
+
+- (void) hwWizardActionBegin:(NSNotification*)note
+{
+    sChannelsNotChangedCount      = 0;
+    startSeqDisabledMask          = seqDisabledMask;
+    startPedEnabledMask           = pedEnabledMask;
+    startTrigger20nsDisabledMask  = trigger20nsDisabledMask;
+    startTrigger100nsDisabledMask = trigger100nsDisabledMask;
+    startOnlineMask               = onlineMask;
+    cardChangedFlag = false;
+    crateInitMask = 0;
+    cratePedMask  = 0;
+
+    // interrupt hardwardWizard execution to allow time to load pmtdb if necessary
+    if (sCardDbState == 0 && [note object] && [[note object] respondsToSelector:@selector(notOkToContinue)]) {
+        sCardDbState = 1;
+        hwWizard = [note object];
+        // (we will continue after our detector database is loaded)
+        [hwWizard performSelector:@selector(notOkToContinue)];
+        // initiate the PostgreSQL DB query to get the current detector state
+        [[ORPQModel getCurrent] cardDbQuery:self selector:@selector(_chanDbCallback:)];
+        // post a modal dialog after 0.1 sec if the database operation hasn't completed yet
+        [self performSelector:@selector(hwWizardWaitingForDatabase) withObject:nil afterDelay:1];
+    }
+}
+
+- (void) hwWizardActionEnd:(NSNotification*)note
+{
+    [[self undoManager] disableUndoRegistration];
+
+    // make sure channels with HV disabled aren't enabled
+    // (note: we do this even if the database is stale)
+    if (sCardDbData && [self stationNumber]<kSnoCardsPerCrate && [self crateNumber]<kSnoCrates) {
+        int32_t notChanged = 0;
+        SnoPlusCard *card = (SnoPlusCard *)[sCardDbData mutableBytes] + [self crateNumber] * kSnoCardsPerCrate + [self stationNumber];
+        // sequencer must be disabled on channels with HV disabled
+        int32_t wanted = seqDisabledMask;
+        seqDisabledMask |= (seqDisabledMask ^ startSeqDisabledMask) & card->hvDisabled;
+        notChanged |= (wanted ^ seqDisabledMask);
+        // pedestals must be disabled on channels with HV disabled
+        wanted = pedEnabledMask;
+        pedEnabledMask &= ~((pedEnabledMask ^ startPedEnabledMask) & card->hvDisabled);
+        notChanged |= (wanted ^ pedEnabledMask);
+        // triggers must be disabled on channels with HV disabled
+        wanted = trigger20nsDisabledMask;
+        trigger20nsDisabledMask |= (trigger20nsDisabledMask ^ startTrigger20nsDisabledMask) & card->hvDisabled;
+        notChanged |= (wanted ^ trigger20nsDisabledMask);
+        wanted = trigger100nsDisabledMask;
+        trigger100nsDisabledMask |= (trigger100nsDisabledMask ^ startTrigger100nsDisabledMask) & card->hvDisabled;
+        notChanged |= (wanted ^ trigger100nsDisabledMask);
+        // can't be online if HV is disabled
+        wanted = onlineMask;
+        onlineMask &= ~((onlineMask ^ startOnlineMask) & card->hvDisabled);
+        notChanged |= (wanted ^ onlineMask);
+        // keep count of the number of channels we didn't change due to HV disabled
+        if (notChanged) {
+            for (int32_t mask=1; mask; mask<<=1) {
+                if (mask & notChanged) ++sChannelsNotChangedCount;
+            }
+        }
+    }
+    // go ahead and "officially" change the masks, sending the appropriate notifications
+    if (seqDisabledMask != startSeqDisabledMask) {
+        unsigned long mask = seqDisabledMask;
+        seqDisabledMask = startSeqDisabledMask;
+        [self setSeqDisabledMask: mask];
+        cardChangedFlag = true;
+    }
+    if (pedEnabledMask != startPedEnabledMask) {
+        unsigned long mask = pedEnabledMask;
+        pedEnabledMask = startPedEnabledMask;
+        [self setPedEnabledMask: mask];
+        // pedestals are set differently, not by a crate init, so handle these separately
+        cratePedMask |= (1UL << [self crateNumber]);
+    }
+    if (trigger20nsDisabledMask != startTrigger20nsDisabledMask) {
+        unsigned long mask = trigger20nsDisabledMask;
+        trigger20nsDisabledMask = startTrigger20nsDisabledMask;
+        [self setTrigger20nsDisabledMask: mask];
+        cardChangedFlag = true;
+    }
+    if (trigger100nsDisabledMask != startTrigger100nsDisabledMask) {
+        unsigned long mask = trigger100nsDisabledMask;
+        trigger100nsDisabledMask = startTrigger100nsDisabledMask;
+        [self setTrigger100nsDisabledMask: mask];
+        cardChangedFlag = true;
+    }
+    if (onlineMask != startOnlineMask) {
+        unsigned long mask = onlineMask;
+        onlineMask = startOnlineMask;
+        [self setOnlineMaskNoInit: mask];
+        cardChangedFlag = true;
+    }
+    if (cardChangedFlag) {
+        // set bit in crateInitMask to init this crate as the final step
+        crateInitMask |= (1UL << [self crateNumber]);
+        cardChangedFlag = false;  // clear this temporary flag
+    }
+    [[self undoManager] enableUndoRegistration];
+
+    // set pmthv state to reload the database on the next hwWizard action
+    sCardDbState = 0;
+}
+
+- (void) hwWizardActionFinal:(NSNotification*)note
+{
+    // now that we have updated all settings, finally go ahead and
+    // set pedestals and/or initialize this crate if we haven't done so already
+    if (cratePedMask & (1UL << [self crateNumber])) {
+        [[[self guardian] adapter] setPedestalInParallel];
+        // make sure we don't do this crate again
+        cratePedMask &= ~(1UL << [self crateNumber]);
+    }
+    if (crateInitMask & (1UL << [self crateNumber])) {
+        // initialize the crate registers from our current settings
+        [[[self guardian] adapter] loadHardware];
+        // make sure we don't do this crate again
+        crateInitMask &= ~(1UL << [self crateNumber]);
+    }
+    if (sChannelsNotChangedCount) {
+        NSLog(@"Warning: Settings for %d channels not made because they have HV disabled\n", sChannelsNotChangedCount);
+    }
 }
 
 #pragma mark •••HWWizard

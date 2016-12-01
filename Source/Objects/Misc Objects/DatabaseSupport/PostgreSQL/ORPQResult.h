@@ -5,6 +5,8 @@
 //
 #import "libpq-fe.h"
 
+#define kPQBadValue 0x80000000ffffffffll
+
 typedef enum {
     MCPTypeArray = 1,
     MCPTypeDictionary = 2,
@@ -26,8 +28,13 @@ typedef enum {
 - (void) dealloc;
 - (unsigned long long) numOfRows;
 - (unsigned int) numOfFields;
+- (id) fetchRowAsType:(MCPReturnType) aType;
+- (id) fetchRowAsType:(MCPReturnType) aType row:(int)aRow;
+- (NSArray *) fetchRowAsArray;
+- (NSDictionary *) fetchRowAsDictionary;
 - (NSArray *) fetchFieldsName;
-- (int32_t) getInt32atRow:(int)aRow column:(int)aColumn;
+- (int64_t) getInt64atRow:(int)aRow column:(int)aColumn;
+- (NSMutableData *) getInt64arrayAtRow:(int)aRow column:(int)aColumn;
 - (id) fetchTypesAsType:(MCPReturnType) aType;
 - (NSArray *) fetchTypesAsArray;
 - (NSDictionary*) fetchTypesAsDictionary;
