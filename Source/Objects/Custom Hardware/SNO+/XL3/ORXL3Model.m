@@ -4801,6 +4801,13 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
 
 - (void) _setPedestalInParallelWorker
 {
+    char payload[XL3_PAYLOAD_SIZE];
+    MultiSetCratePedsArgs *args;
+    MultiSetCratePedsResults *results;
+    int i;
+
+    args = (MultiSetCratePedsArgs *) payload;
+
     NSAutoreleasePool* pedPool = [[NSAutoreleasePool alloc] init];
 
     if (![[self xl3Link] isConnected]) {
@@ -4808,45 +4815,37 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
         return;
     }
 
-    char payload[XL3_PAYLOAD_SIZE];
-	unsigned long* data = (unsigned long*) payload;
-    BOOL error_flag = NO;
+    NSArray* fecs = [[self guardian]
+        collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
 
-    NSArray* fecs = [[self guardian] collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
     for (id aFec in fecs) {
-        data[0] = 1 << [aFec stationNumber];
-        data[1] = [aFec pedEnabledMask];
+        args->slotMask |= 1 << [aFec stationNumber];
+        args->channelMasks[[aFec stationNumber]] = [aFec pedEnabledMask];
+    }
 
-        //NSLog(@"%@ Set Pedestal slot %d, mask 0x%08x.\n", [[self xl3Link] crateName], [aFec stationNumber], [aFec pedEnabledMask]);
-        
-        if ([xl3Link needToSwap]) {
-            data[0] = swapLong(data[0]);
-            data[1] = swapLong(data[1]);
-        }
+    args->slotMask = htonl(args->slotMask);
 
-        @try {
-            //[[self xl3Link] sendCommand:SET_CRATE_PEDESTALS_ID withPayload:payload expectResponse:YES];
-            //if ([xl3Link needToSwap]) *data = swapLong(*data);
-            //if (*data != 0) error_flag = YES;
-            
-            //the following is a workaround until set_crate_pedestal is fixed on XL3 side
-            uint32_t aValue = [aFec pedEnabledMask];
-            uint32_t xl3Address = FEC_SEL * [aFec stationNumber] | 0x23 | WRITE_REG; //FEC PED ENABLE
-            [xl3Link sendCommand:0UL toAddress:xl3Address withData:&aValue];
-            if ([xl3Link needToSwap]) aValue = swapLong(aValue);
-            //if (aValue != 0) error_flag = YES;
-        }
-        @catch (NSException* e) {
-            error_flag = YES;
-        }
-        
-        if (error_flag) break;
+    for (i = 0; i < 16; i++) {
+        args->channelMasks[i] = htonl(args->channelMasks[i]);
+    }
+
+    @try {
+        [[self xl3Link] sendCommand:MULTI_SET_CRATE_PEDS_ID
+             withPayload:payload expectResponse:YES];
+    } @catch (NSException* e) {
+        NSLog(@"%@ error setting pedestal masks. error: %@ reason: %@.\n",
+              [[self xl3Link] crateName], [e name], [e reason]);
+        goto err;
+    }
+
+    results = (MultiSetCratePedsResults *) payload;
+
+    if (results->errorMask) {
+        NSLog(@"%@ error setting pedestal masks.\n",
+              [[self xl3Link] crateName]);
     }
     
-    if (error_flag) {
-        NSLog(@"%@ Set Pedestal failed.\n", [[self xl3Link] crateName]);
-    }
-    
+err:
     [pedPool release];
 }
 
