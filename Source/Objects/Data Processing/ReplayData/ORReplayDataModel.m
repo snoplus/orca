@@ -210,7 +210,8 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 	stop = NO;
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORReplayRunningNotification object: self];
-	
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"NeedFullDecode" object:self];
+
 	sentRunStart = NO;
 	if(!queue){
 		queue = [[NSOperationQueue alloc] init];
@@ -371,7 +372,8 @@ static NSString* ORLastFilePath 			= @"ORLastFilePath";
 - (void) replayFinished
 {
     [self fileFinished];
-    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"DoneWithFullDecode" object:self];
+
     [nextObject runTaskStopped:nil];
     [nextObject closeOutRun:nil];
 	[nextObject setInvolvedInCurrentRun:NO];
