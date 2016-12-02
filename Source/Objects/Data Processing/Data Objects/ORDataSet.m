@@ -85,8 +85,7 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 		[sortedArray release];
 		sortedArray = nil;
         [watchingDictionary release];
-        
-
+        [globalWatchers release];
 	}
     [super dealloc];
 }
@@ -95,8 +94,10 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 {
     NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
     [nc removeObserver:self];//just in case
-    [nc addObserver:self selector:@selector(someoneLooking:)    name:@"DecoderWatching" object:nil];
-    [nc addObserver:self selector:@selector(someoneNotLooking:) name:@"DecoderNotWatching" object:nil];
+    [nc addObserver:self selector:@selector(someoneLooking:)      name:@"DecoderWatching"    object:nil];
+    [nc addObserver:self selector:@selector(someoneNotLooking:)   name:@"DecoderNotWatching" object:nil];
+    [nc addObserver:self selector:@selector(removeGlobalWatcher:) name:@"DoneWithFullDecode" object:nil];
+    [nc addObserver:self selector:@selector(addGlobalWatcher:)    name:@"NeedFullDecode"     object:nil];
 }
 
 //individual decoders can use the watchers to limit the amount of decoding of big data records, i.e. waveforms
@@ -107,7 +108,6 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
         id watcherKey   = [[aNote userInfo] objectForKey:@"DataSetKey"];
         int watcherRetainCount = [[watchingDictionary objectForKey:watcherKey]intValue];
         watcherRetainCount++;
-        NSLog(@"%@: %d\n",watcherKey,watcherRetainCount);
         [watchingDictionary setObject:[NSNumber numberWithInt:watcherRetainCount] forKey:watcherKey];
     }
 }
@@ -117,15 +117,31 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
     id watcherKey   = [[aNote userInfo] objectForKey:@"DataSetKey"];
     int watcherRetainCount = [[watchingDictionary objectForKey:watcherKey]intValue];
     watcherRetainCount--;
-    NSLog(@"%@: %d\n",watcherKey,watcherRetainCount);
     if(watcherRetainCount<=0)[watchingDictionary removeObjectForKey:watcherKey];
     else [watchingDictionary setObject:[NSNumber numberWithInt:watcherRetainCount] forKey:watcherKey];
-
 }
-
+- (void) addGlobalWatcher:(NSNotification*) aNote
+{
+    if(!globalWatchers)globalWatchers = [[NSMutableDictionary dictionary]retain];
+    if([aNote object]){
+        id watcherKey   = [NSNumber numberWithLong:(unsigned long)[aNote object]];
+        [globalWatchers setObject:watcherKey forKey:watcherKey]; //just care if an entry exists
+    }
+}
+- (void) removeGlobalWatcher:(NSNotification*) aNote
+{
+    if([aNote object]){
+        id watcherKey   = [NSNumber numberWithLong:(unsigned long)[aNote object]];
+        [globalWatchers removeObjectForKey:watcherKey]; //just care if an entry exists
+    }
+    if([globalWatchers count]==0){
+        [globalWatchers release];
+        globalWatchers = nil;
+    }
+}
 - (BOOL) isSomeoneLooking:(NSString*)aDataSetKey
 {
-    return [watchingDictionary objectForKey:aDataSetKey]!=nil;
+    return [globalWatchers count] || [watchingDictionary objectForKey:aDataSetKey]!=nil;
 }
 
 - (id) findObjectWithFullID:(NSString*)aFullID;

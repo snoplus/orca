@@ -24,6 +24,7 @@
 @class ORDataPacket;
 
 @interface ORDataSet : OrcaObject {
+    NSMutableDictionary*    globalWatchers;
     NSMutableDictionary*    watchingDictionary;
     NSMutableDictionary*    realDictionary;
     NSArray*                sortedArray;
@@ -52,6 +53,8 @@
 - (void) someoneLooking:(NSNotification*) aNote;
 - (void) someoneNotLooking:(NSNotification*) aNote;
 - (BOOL) isSomeoneLooking:(NSString*)aDataSetKey;
+- (void) addGlobalWatcher:(NSNotification*) aNote;
+- (void) removeGlobalWatcher:(NSNotification*) aNote;
 
 - (id) findObjectWithFullID:(NSString*)aFullID;
 - (NSArray*) collectObjectsOfClass:(Class)aClass;
