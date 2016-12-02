@@ -53,14 +53,13 @@
 #pragma mark ¥¥¥Accessors
 - (void) setScanInProgress:(BOOL)state
 {
+    scheduledToUpdate = NO;
     scanInProgress = state;
-    
     if(!scanInProgress){
         [[NSNotificationCenter defaultCenter]
 			    postNotificationName:NSTableViewSelectionDidChangeNotification
                               object: dataView
                             userInfo: nil];
-
     }
     [self updateButtons];
 }
@@ -260,10 +259,12 @@
 
 - (IBAction) catalogAllAction:(id)sender
 {
+    if(![model dataSet])[model createDataSet];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"NeedFullDecode" object:self];
 	currentSearchIndex = 0;
 	stopScan = NO;
+    [self setScanInProgress:YES];
 	[self performSelector:@selector(catalogAll) withObject:nil afterDelay:0];
-	[self setScanInProgress:YES];
 }
 
 - (void) catalogAll
@@ -277,6 +278,7 @@
 			[self setScanInProgress:NO];
 			[dataView selectRowIndexes:[NSIndexSet indexSetWithIndex:num-1] byExtendingSelection:NO];
 			[dataView scrollRowToVisible:num-1];
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"DoneWithFullDecode" object:self];
 			return;
 		}
 

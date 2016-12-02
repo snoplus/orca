@@ -109,13 +109,11 @@
 			aKey		  = [NSNumber  numberWithLong:ExtractDataId(val)];
 			decodedLength = ExtractLength(val);
 			anObj		  = [[currentDecoder objectLookup] objectForKey:aKey];
-			if(!anObj)anObj = self;
 			
-			if(anObj){
 				NSString* shortName = [nameCatalog objectForKey:aKey];
 				if(!shortName){
 					NSString* sname = [[NSStringFromClass([anObj class]) componentsSeparatedByString:@"DecoderFor"] componentsJoinedByString:@" "];
-					if([sname rangeOfString:@"Record"].location!=NSNotFound){
+					if([aKey intValue]==0 && [sname rangeOfString:@"Record"].location!=NSNotFound){
 						sname = @"Header";
 					}
 					else if([sname hasPrefix:@"OR"]){
@@ -125,7 +123,9 @@
 						sname = [sname substringToIndex:[sname length]-3];
 						sname = [sname stringByAppendingString:@"Control"];
 					}
-					
+                    else {
+                        sname = [NSString stringWithFormat:@"unKnown(%d)",[aKey intValue]];
+                    }
 					[nameCatalog setObject:sname forKey:aKey]; 
 					shortName = sname;
 				}
@@ -161,11 +161,7 @@
 				if([delegate respondsToSelector:@selector(setLengthDecoded:)]){
 					[delegate setLengthDecoded:length];
 				}
-			}
-			else {
-				[innerPool release];
-				break;
-			}
+			
 			[innerPool release];
 		} while( length>0 );
 	}
@@ -201,13 +197,14 @@
     unsigned long* dataPtr = ((unsigned long*)[fileAsData bytes]) + anOffset;
 	id anObj = [[currentDecoder objectLookup] objectForKey:aKey];
 	if(anObj)return [anObj dataRecordDescription:dataPtr];
-	else return [self dataRecordDescription:dataPtr];
+    else if([aKey intValue]==0)return @"Header";
+	else return @"Not In DataDescription";
 }
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
-{    
-    return @"Header";
-}	
+{
+    return @"?"; //place holder for compiler warning
+}
 
 - (NSString*) nameForDataID:(long)anID
 {	

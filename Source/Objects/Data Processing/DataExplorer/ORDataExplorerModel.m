@@ -113,6 +113,7 @@ NSString* ORDataExplorerDataChanged                 = @"ORDataExplorerDataChange
     [aDataSet retain];
     [dataSet release];
     dataSet = aDataSet;
+    [dataSet registerForWatchers];
 }
 
 - (NSArray *) dataRecords
