@@ -1786,11 +1786,11 @@ static int              sChannelsNotChangedCount = 0;
         startPedEnabledMask = pedEnabledMask;
     }
     if ((valid = card->valid[kNhit100enabled]) != 0) {
-        [self setTrigger100nsDisabledMask: (card->nhit100enabled & valid) | ((int32_t)trigger100nsDisabledMask & ~valid)];
+        [self setTrigger100nsDisabledMask: (~card->nhit100enabled & valid) | ((int32_t)trigger100nsDisabledMask & ~valid)];
         startTrigger100nsDisabledMask = trigger100nsDisabledMask;
     }
     if ((valid = card->valid[kNhit20enabled]) != 0) {
-        [self setTrigger20nsDisabledMask: (card->nhit20enabled & valid) | ((int32_t)trigger20nsDisabledMask & ~valid)];
+        [self setTrigger20nsDisabledMask: (~card->nhit20enabled & valid) | ((int32_t)trigger20nsDisabledMask & ~valid)];
         startTrigger20nsDisabledMask = trigger20nsDisabledMask;
     }
     for (int ch=0; ch<32; ++ch) {
@@ -1964,7 +1964,7 @@ static int              sChannelsNotChangedCount = 0;
         [hwWizard performSelector:@selector(notOkToContinue)];
         // initiate the PostgreSQL DB query to get the current detector state
         [[ORPQModel getCurrent] cardDbQuery:self selector:@selector(_chanDbCallback:)];
-        // post a modal dialog after 0.1 sec if the database operation hasn't completed yet
+        // post a modal dialog after 1 sec if the database operation hasn't completed yet
         [self performSelector:@selector(hwWizardWaitingForDatabase) withObject:nil afterDelay:1];
     }
 }

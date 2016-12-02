@@ -542,7 +542,7 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                             if (n > kSnoChannelsPerCard) n = kSnoChannelsPerCard;
                             int64_t *valPt = (int64_t *)[dat mutableBytes];
                             for (int ch=0; ch<n; ++ch) {
-                                // ignore out-of-range (incl. null) values
+                                // ignore bad values (includes NULL values)
                                 if (valPt[ch] == kPQBadValue) continue;
                                 int32_t val = (int32_t)valPt[ch];
                                 // set valid flag for this setting for this channel
