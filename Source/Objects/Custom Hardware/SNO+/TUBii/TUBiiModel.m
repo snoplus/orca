@@ -388,10 +388,40 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
     // DGT delay on TUBii
     return [self ConvertValueToBits:Nanoseconds NBits:8 MinVal:0 MaxVal:510];
 }
-- (void) setTrigMask:(NSUInteger)_trigMask {
+- (void) setTrigMask:(NSUInteger)_trigMask syncMask:(NSUInteger)_syncMask{
     // Sets which trigger inputs are capable causing TUBii to issue a Raw Trigger
     // This function is handled entierly within the MicroZed processing logic.
-    NSString * const command = [NSString stringWithFormat:@"SetTriggerMask %d",_trigMask];
+    
+    NSUInteger syncMask=0, asyncMask=0;
+    for(int i=0; i<24; i++)
+    {
+        if(_syncMask & (1<<i))
+        {
+            if(_trigMask & (1<<i))
+            {
+                syncMask |= 1 << i;
+            }
+            else
+            {
+                syncMask &= ~(1 << i);
+            }
+            asyncMask &= ~(1 << i);
+        }
+        else
+        {
+            if(_trigMask & (1<<i))
+            {
+                asyncMask |= 1 << i;
+            }
+            else
+            {
+                asyncMask &= ~(1 << i);
+            }
+            syncMask &= ~(1 << i);
+        }
+    }
+    
+    NSString * const command = [NSString stringWithFormat:@"SetTriggerMask %d %d",syncMask,asyncMask];
     [self sendOkCmd:command];
 }
 - (NSUInteger) trigMask {

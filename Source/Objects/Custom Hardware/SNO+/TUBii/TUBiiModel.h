@@ -63,9 +63,12 @@ typedef NS_OPTIONS(uint32_t, TRIG_MASK)
     Mimic1 = 1<<16,
     Mimic2 = 1<<17,
     Burst = 1<<18,
-    Prescale = 1<<19,
-    Combo = 1<<20,
-    GT = 1<<21
+    Combo = 1<<19,
+    Prescale = 1<<20,
+    Button = 1<<21,
+    Tellie = 1<<22,
+    Smellie = 1<<23,
+    GT = 1<<24
 };
 struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of TUBii's state at once.
     float smellieRate;
