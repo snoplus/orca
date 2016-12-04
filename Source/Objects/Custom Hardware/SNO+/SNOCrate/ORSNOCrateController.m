@@ -25,7 +25,7 @@
 #import "ORSNOCrateModel.h"
 #import "ORSNOCard.h"
 #import "SBC_Link.h"
-#import "ORXL2Model.h"
+#import "ORXL3Model.h"
 
 @implementation ORSNOCrateController
 
@@ -44,17 +44,7 @@
 - (void) registerNotificationObservers
 {
 	[super registerNotificationObservers];
-    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];   
-
-    [notifyCenter addObserver : self
-                     selector : @selector(powerFailed:)
-                         name : @"VmePowerFailedNotification"
-                       object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(powerRestored:)
-                         name : @"VmePowerRestoredNotification"
-                       object : nil];
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
 
     [notifyCenter addObserver : self
 					 selector : @selector(slotChanged:)
@@ -62,17 +52,49 @@
 					   object : model];
 
     [notifyCenter addObserver : self
-					 selector : @selector(xilinxLoadChanged:)
-						 name : SBC_LinkJobStatus
-					   object : nil];
-	
-}
+					 selector : @selector(updateWindow)
+						 name : ORXL3ModelStateChanged
+					   object : [model adapter]];
 
+    [notifyCenter addObserver : self
+					 selector : @selector(updateWindow)
+						 name : ORXL3ModelHvStatusChanged
+					   object : [model adapter]];
+}
 
 - (void) updateWindow
 {
     [super updateWindow];
 	[self slotChanged:nil];
+
+    ORXL3Model *xl3 = [model adapter];
+
+    if ([[xl3 xl3Link] isConnected]) {
+        if ([xl3 initialized]) {
+            /* The Xilinx has been loaded, so we need to enable the load
+             * hardware button. */
+            [loadHardwareButton setEnabled:TRUE];
+        } else {
+            /* The Xilinx hasn't been loaded, so we disable the load hardware
+             * button. */
+            [loadHardwareButton setEnabled:FALSE];
+        }
+
+        if ([xl3 hvSwitchEverUpdated]) {
+            if (![xl3 hvASwitch] && ![xl3 hvBSwitch]) {
+                /* HV is off, so enable crate reset button. */
+                [resetCrateButton setEnabled:TRUE];
+            } else {
+                [resetCrateButton setEnabled:FALSE];
+            }
+        } else {
+            [resetCrateButton setEnabled:FALSE];
+        }
+    } else {
+        /* XL3 isn't connected, so don't enable any buttons. */
+        [loadHardwareButton setEnabled:FALSE];
+        [resetCrateButton setEnabled:FALSE];
+    }
 }
 
 #pragma mark •••Interface Management
@@ -95,37 +117,6 @@
 	[crateNumberField setIntValue:[model crateNumber]];
 }
 
-- (void) xilinxLoadChanged:(NSNotification*)aNote
-{
-	if(![model adapterIsXL3] && [aNote object] == [model adapter]){
-		ORSBCLinkJobStatus* jobStatus = [[aNote userInfo] objectForKey:@"jobStatus"];
-		if([jobStatus running]){
-			[xilinixStatusField setStringValue:@"Loading"];
-			[xilinixLoadProgress startAnimation:self];
-			[xilinixLoadProgress setDoubleValue:[jobStatus progress]];
-		}
-		else {
-			if([jobStatus finalStatus]) {
-				[xilinixStatusField setStringValue:@""];
-				[model initCrate:NO phase:1];
-			}
-			else{
-				[xilinixStatusField setStringValue:@"FAILED"];
-				NSLog(@"jobStatus screwed becouse running: %d, finalstatus: %d, message: %@\n", [jobStatus running], [jobStatus finalStatus], [jobStatus message]);
-			}
-			[xilinixLoadProgress setDoubleValue:0];
-			[xilinixLoadProgress stopAnimation:self];
-		}
-		//[probeButton setEnabled:![jobStatus running]];
-		[autoInitButton setEnabled:![jobStatus running]];
-		[initNoXilinxButton setEnabled:![jobStatus running]];
-		[initXilinxButton setEnabled:![jobStatus running]];
-	}
-	else {
-		NSLog(@"ORSNOCrateCongtroller xilinxLoadChanged error: not available for XL3\n");
-	}
-}
-
 #pragma mark •••Actions
 - (IBAction) incCrateAction:(id)sender
 {
@@ -137,50 +128,24 @@
 	[self decModelSortedBy:@selector(crateNumberCompare:)];
 }
 
-- (IBAction) autoInit:(id)sender
+- (IBAction) resetCrateAction:(id)sender
 {
 	@try {
-		[model setAutoInit:YES];
-		[model initCrate:YES phase:0];
-	}
-	@catch (NSException* localException) {
-		ORRunAlertPanel([localException name],@"Crate AutoInit Failed",@"OK",nil,nil,localException);
-		NSLog(@"AutoInit of Crate (%d) failed.\n",[model crateNumber]);
+		[model resetCrateAsync];
+	} @catch (NSException* localException) {
+		NSLogColor([NSColor redColor], @"Crate %d reset failed.\n",
+                   [model crateNumber]);
 	}
 }
 
-- (IBAction) initXilinx:(id)sender
+- (IBAction) fetchECALSettingsAction:(id)sender
 {
-	@try {
-		[model setAutoInit:NO];
-		[model initCrate:YES phase:0];
-	}
-	@catch (NSException* localException) {
-		ORRunAlertPanel([localException name],@"Crate Init Xilinx Failed",@"OK",nil,nil,localException);
-		NSLog(@"Init Xilinx of Crate (%d) failed.\n",[model crateNumber]);
-	}
+    [model fetchECALSettings];
 }
 
-- (IBAction) initNoXilinx:(id)sender
+- (IBAction) loadHardwareAction:(id)sender
 {
-	@try {
-		[model setAutoInit:NO];
-		[model initCrate:NO phase:0];
-	}
-	@catch (NSException* localException) {
-		ORRunAlertPanel([localException name],@"Crate Init No Xilinx Failed",@"OK",nil,nil,localException);
-		NSLog(@"Init No Xilinx of Crate (%d) failed.\n",[model crateNumber]);
-	}
-}
-
-- (IBAction) ecalToOrcaAction:(id)sender
-{
-    [model ecalToOrca];
-}
-
-- (IBAction) orcaToHwAction:(id)sender
-{
-    [model orcaToHw];
+    [model loadHardware];
 }
 
 @end

@@ -28,12 +28,9 @@
 	IBOutlet NSTextField* regBaseAddressField;
 	IBOutlet NSTextField* iPBaseAddressField;
 	IBOutlet NSTextField* crateNumberField;
-	IBOutlet NSProgressIndicator* xilinixLoadProgress;
-	IBOutlet NSTextField* xilinixStatusField;
-	IBOutlet NSButton*  initXilinxButton;
-	IBOutlet NSButton*  initNoXilinxButton;
-	IBOutlet NSButton*  autoInitButton;
-	IBOutlet NSButton*  probeButton;
+	IBOutlet NSButton*  resetCrateButton;
+	IBOutlet NSButton*  loadHardwareButton;
+	IBOutlet NSButton*  fetchECALSettingsButton;
 }
 
 #pragma mark •••Initializations
@@ -47,15 +44,12 @@
 #pragma mark •••Interface Management
 - (void) slotChanged:(NSNotification*)aNote;
 - (void) setModel:(id)aModel;
-- (void) xilinxLoadChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) incCrateAction:(id)sender;
 - (IBAction) decCrateAction:(id)sender;
-- (IBAction) autoInit:(id)sender;
-- (IBAction) initXilinx:(id)sender;
-- (IBAction) initNoXilinx:(id)sender;
-- (IBAction) ecalToOrcaAction:(id)sender;
-- (IBAction) orcaToHwAction:(id)sender;
+- (IBAction) resetCrateAction:(id)sender;
+- (IBAction) fetchECALSettingsAction:(id)sender;
+- (IBAction) loadHardwareAction:(id)sender;
 
 @end

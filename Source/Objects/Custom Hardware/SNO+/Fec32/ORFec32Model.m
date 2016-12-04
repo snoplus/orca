@@ -917,62 +917,12 @@ static int              sChannelsNotChangedCount = 0;
 {	
     bool statusChanged = false;
 
-    if ([guardian adapterIsXL3]) statusChanged = [self readVoltagesUsingXL3];
-    else statusChanged = [self readVoltagesUsingXL2];
-            
-    if(statusChanged){
-        //sync up the card status
-        [self setAdcVoltageStatusOfCard:kFecMonitorInRange];
-        short whichADC;
-        for(whichADC=0;whichADC<kNumFecMonitorAdcs;whichADC++){
-            if([self adcVoltageStatus:whichADC] == kFecMonitorReadError){
-                [self setAdcVoltageStatusOfCard:kFecMonitorReadError];
-                break;
-            }
-            else if([self adcVoltageStatus:whichADC] == kFecMonitorOutOfRange){
-                [self setAdcVoltageStatusOfCard:kFecMonitorOutOfRange];
-                break;
-            }
-        }
-        
-        //sync up the crate status
-        [[self crate] setVoltageStatus: kFecMonitorInRange];
-        unsigned short card;
-        for(card=0;card<16;card++){
-            if([self adcVoltageStatusOfCard] == kFecMonitorReadError){
-                [[self crate] setVoltageStatus:kFecMonitorReadError];
-                break;
-            }
-            else if([self adcVoltageStatusOfCard] == kFecMonitorOutOfRange){
-                [[self crate] setVoltageStatus:kFecMonitorOutOfRange];
-                break;
-            }
-        }
-/*			//sync up the system status (TBD... 12/15/2008 MAH)
-        theConfigDB->VoltageStatusOfSystem(kFecMonitorInRange);
-        unsigned short crate;
-        for(crate=0;crate<kNumSCs;crate++){
-            if(theConfigDB->VoltageStatusOfCrate(theCrate)== kFecMonitorReadError){
-                theConfigDB->VoltageStatusOfSystem(kFecMonitorReadError);
-                break;
-            }
-            else if(theConfigDB->VoltageStatusOfCrate(theCrate) == kFecMonitorOutOfRange){
-                theConfigDB->VoltageStatusOfSystem(kFecMonitorOutOfRange);
-                break;
-            }
-        }
-*/
-        
-    }	
+    statusChanged = [self readVoltagesUsingXL3];
 }
 
 -(void) parseVoltages:(VMonResults*)result;
 {
-    //bool statusChanged = false;
-    
-    //if ([guardian adapterIsXL3]) statusChanged = [self parseVoltagesUsingXL3:result];
-    if ([guardian adapterIsXL3]) [self parseVoltagesUsingXL3:result];
-    else NSLog(@"failed: FEC parse voltages implemented for XL3 only\n");
+    [self parseVoltagesUsingXL3:result];
 }
 
 #pragma mark •••Archival
@@ -1642,21 +1592,10 @@ static int              sChannelsNotChangedCount = 0;
 - (BOOL) readCMOSCounts:(BOOL)calcRates channelMask:(unsigned long) aChannelMask
 {
     
-    if ([guardian adapterIsXL3]) {
-        if (calcRates) {
-            [self readCMOSRatesUsingXL3:aChannelMask];
-        }
-        else {
-            [self readCMOSCountsUsingXL3:aChannelMask];            
-        }
-    }
-    else {
-        @try {
-            [self readCMOSCountsUsingXL2:calcRates channelMask:aChannelMask];
-        }
-        @catch (NSException *exception) {
-            NSLog(@"readCMOSCounts failed\n");
-        }
+    if (calcRates) {
+        [self readCMOSRatesUsingXL3:aChannelMask];
+    } else {
+        [self readCMOSCountsUsingXL3:aChannelMask];            
     }
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:@"ORFec32ModelCmosRateChanged" object:self userInfo:nil];

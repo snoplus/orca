@@ -169,6 +169,8 @@ enum {
     MB ui_bundle[16];
     unsigned long _ecal_received;
     bool _ecalToOrcaInProgress;
+
+    bool initialized;
 }
 
 @property (nonatomic,assign) unsigned long xl3MegaBundleDataId;
@@ -271,9 +273,11 @@ enum {
 - (void) awakeAfterDocumentLoaded;
 
 - (void) registerNotificationObservers;
+- (void) connectionStateChanged;
 - (int) initAtRunStart;
 
 #pragma mark •••Accessors
+- (bool) initialized;
 - (NSString*) shortName;
 - (id) controllerCard;
 - (void) setSlot:(int)aSlot;
@@ -323,7 +327,7 @@ enum {
 - (void) synthesizeFECIntoBundle:(MB*)aBundle forSlot:(unsigned short)aSlot;
 - (ORCouchDB*) debugDBRef;
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
-- (void) ecalToOrca;
+- (void) fetchECALSettings;
 - (void) ecalToOrcaDocumentsReceived;
 - (void) parseEcalDocument:(NSDictionary*)aResult;
 - (void) updateUIFromEcalBundle:(NSDictionary*)aBundle slot:(unsigned int)aSlot;
@@ -346,19 +350,20 @@ enum {
 
 - (int) updateXl3Mode;
 - (int) setSequencerMask: (uint32_t) mask forSlot: (int) slot;
-- (void) initCrate: (int) xilinxLoad;
+- (void) resetCrate;
+- (void) resetCrateAsync;
+- (void) initCrate;
 - (void) initCrateDone: (CrateInitResults *)r;
 - (void) loadHardware;
 - (void) loadHardwareWithSlotMask: (uint32_t) slotMask;
 - (void) loadHardwareWithSlotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target;
-- (void) initCrateAsync: (int) xilinxLoad shiftRegOnly: (uint32_t) shiftRegOnly slotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target;
+- (void) initCrateAsync: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target;
 - (void) initCrateAsyncThread: (NSDictionary *) args;
-- (void) initCrate: (MB *) mbs xilinxLoad: (int) xilinxLoad shiftRegOnly: (uint32_t) shiftRegOnly slotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target;
-- (int) initCrate: (MB *) mbs xilinxLoad: (int) xilinxLoad shiftRegOnly: (uint32_t) shiftRegOnly slotMask: (uint32_t) slotMask results: (CrateInitResults *) results;
-- (void) checkCrateConfig: (BuildCrateConfigResults *)r;
+- (void) initCrate: (MB *) mbs slotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target;
+- (int) initCrate: (MB *) mbs slotMask: (uint32_t) slotMask results: (CrateInitResults *) results;
+- (void) checkCrateConfig: (ResetCrateResults *)r;
 
 - (uint32_t) getSlotsPresent;
-- (void) orcaToHw;
 
 #pragma mark •••Basic Ops
 - (void) readBasicOps;
@@ -479,3 +484,4 @@ extern NSString* ORXL3ModelHVCMOSRateIgnoreChanged;
 extern NSString* ORXL3ModelXl3VltThresholdChanged;
 extern NSString* ORXL3ModelXl3VltThresholdInInitChanged;
 extern NSString* ORXL3Lock;
+extern NSString* ORXL3ModelStateChanged;

@@ -210,7 +210,11 @@ readFifoFlag = _readFifoFlag;
 {
     @synchronized(self) {
         isConnected = aNewIsConnected;
-        [[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectionChanged object: self];
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectionChanged object: self];
+        });
+
         [self setTimeConnected:isConnected?[NSDate date]:nil];
     }
 }

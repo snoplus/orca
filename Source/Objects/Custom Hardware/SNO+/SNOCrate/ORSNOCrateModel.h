@@ -24,15 +24,11 @@
 #import "VME_eCPU_Config.h"
 #import "SBC_Config.h"
 
-@interface ORSNOCrateModel : ORCrate <ORDataTaker> {
+@interface ORSNOCrateModel : ORCrate {
 	int slot;
 	int workingSlot;
 	BOOL working;
 	BOOL pauseWork;
-	BOOL autoInit;
-	eFecMonitorState  voltageStatus;
-
-	unsigned long dataId;
 }
 
 - (void) setUpImage;
@@ -43,8 +39,6 @@
 - (BOOL) acceptsGuardian: (OrcaObject *)aGuardian;
 - (void) setSlot:(int)aSlot;
 - (int)  slot;
-- (BOOL) autoInit;
-- (void) setAutoInit:(BOOL)anAutoInit;
 
 #pragma mark •••Accessors
 - (unsigned long) memoryBaseAddress;
@@ -58,26 +52,11 @@
 #pragma mark •••HW Access
 - (void) scanWorkingSlot;
 - (short) numberSlotsUsed;
-- (BOOL) adapterIsXL3;
-- (void) initCrate:(BOOL) loadTheFEC32XilinxFile phase:(int) phase;
-- (void) initCrateDone;
-- (void) ecalToOrca;
-- (void) orcaToHw;
 - (void) resetCrate;
-- (eFecMonitorState) voltageStatus;
-- (void) setVoltageStatus:(eFecMonitorState)aState;
+- (void) initCrateDone;
+- (void) fetchECALSettings;
+- (void) loadHardware;
 
-#pragma mark •••Data Taker
-- (unsigned long) dataId;
-- (void) setDataId: (unsigned long) DataId;
-- (NSDictionary*) dataRecordDescription;
-- (void) setDataIds:(id)assigner;
-- (void) syncDataIdsWith:(id)anotherSNOCrate;
-- (void) reset;
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
 @end
 
 @interface ORSNOCrateModel (OROrderedObjHolding)

@@ -94,6 +94,7 @@ NSString* ORXL3ModelHVCMOSRateIgnoreChanged = @"ORXL3ModelHVCMOSRateIgnoreChange
 NSString* ORXL3ModelXl3VltThresholdChanged = @"ORXL3ModelXl3VltThresholdChanged";
 NSString* ORXL3ModelXl3VltThresholdInInitChanged = @"ORXL3ModelXl3VltThresholdInInitChanged";
 NSString* ORXL3Lock = @"ORXL3Lock";
+NSString* ORXL3ModelStateChanged = @"ORXL3ModelStateChanged";
 
 extern NSString* ORSNOPRequestHVStatus;
 
@@ -200,6 +201,17 @@ snotDb = _snotDb;
                      selector : @selector(readHVStatus)
                          name : ORSNOPRequestHVStatus
                        object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(connectionStateChanged)
+                         name : XL3_LinkConnectionChanged
+                       object : xl3Link];
+}
+
+- (void) connectionStateChanged
+{
+    /* If we just connected, find out if Xilinx has been loaded or not. */
+    if ([xl3Link isConnected]) [self updateXl3Mode];
 }
 
 - (int) initAtRunStart
@@ -295,6 +307,11 @@ snotDb = _snotDb;
 - (NSString*) shortName
 {
 	return @"XL3";
+}
+
+- (bool) initialized
+{
+    return initialized;
 }
 
 - (id) controllerCard
@@ -1464,6 +1481,8 @@ void SwapLongBlock(void* p, int32_t n)
     [self setXl3Mode:           [decoder decodeIntForKey:@"Xl3Mode"]];
     [self setIsTriggerON:       [decoder decodeBoolForKey:@"isTriggerON"]];
 
+    initialized = FALSE;
+
     if ([self isTriggerON]) {
         [self setTriggerStatus:@"ON"];
     } else {
@@ -1490,7 +1509,7 @@ void SwapLongBlock(void* p, int32_t n)
 
     self.hvANeedsUserIntervention = false;
     self.hvBNeedsUserIntervention = false;
-    
+
     [self safeHvInit];
      
     [[self undoManager] enableUndoRegistration];
@@ -1685,11 +1704,11 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (int) updateXl3Mode
 {
-    /* Update the model with the current XL3 mode. */
+    /* Update the model with the current XL3 state. */
     char payload[XL3_PAYLOAD_SIZE];
     memset(payload, 0, XL3_PAYLOAD_SIZE);
     
-    CheckXL3StateResults* result = (CheckXL3StateResults*) payload;
+    CheckXL3StateResults* results = (CheckXL3StateResults*) payload;
     
     @try {
         [[self xl3Link] sendCommand:CHECK_XL3_STATE_ID withPayload:payload expectResponse:YES];
@@ -1699,8 +1718,23 @@ void SwapLongBlock(void* p, int32_t n)
         return -1;
     }
 
+    results->mode = ntohl(results->mode);
+    results->debuggingMode = ntohl(results->debuggingMode);
+    results->dataAvailMask = ntohl(results->dataAvailMask);
+    results->xl3Clock = ntohl(results->xl3Clock);
+    results->initialized = ntohl(results->initialized);
+
+    if (results->initialized) {
+        initialized = TRUE;
+    } else {
+        initialized = FALSE;
+    }
+
+    [[NSNotificationCenter defaultCenter]
+        postNotificationName:ORXL3ModelStateChanged object:self userInfo:nil];
+
     [[self undoManager] disableUndoRegistration];
-    [self setXl3Mode: ntohl(result->mode)];
+    [self setXl3Mode: results->mode];
     [[self undoManager] enableUndoRegistration];
 
     return 0;
@@ -1738,11 +1772,10 @@ void SwapLongBlock(void* p, int32_t n)
     return 0;
 }
 
-- (void) initCrate: (int) xilinxLoad
+- (void) initCrate
 {
     /* Do a full crate init */
-    [self initCrateAsync: xilinxLoad shiftRegOnly: 0
-         slotMask: [self getSlotsPresent]
+    [self initCrateAsync: [self getSlotsPresent]
          withCallback: @selector(initCrateDone:)
          target: self];
 }
@@ -1750,15 +1783,13 @@ void SwapLongBlock(void* p, int32_t n)
 - (void) loadHardware
 {
     /* Load current ORCA settings to every single FEC */
-    [self initCrateAsync: 0 shiftRegOnly: SHIFT_AND_DAC
-         slotMask: [self getSlotsPresent] withCallback:NULL target:NULL];
+    [self initCrateAsync: [self getSlotsPresent] withCallback:NULL target:NULL];
 }
 
 - (void) loadHardwareWithSlotMask: (uint32_t) slotMask
 {
     /* Load current ORCA settings to select FECs */
-    [self initCrateAsync: 0 shiftRegOnly: SHIFT_AND_DAC slotMask: slotMask
-         withCallback:NULL target:NULL];
+    [self initCrateAsync: slotMask withCallback:NULL target:NULL];
 }
 
 - (void) loadHardwareWithSlotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target
@@ -1770,11 +1801,77 @@ void SwapLongBlock(void* p, int32_t n)
      *
      * If the crate init failed, the results pointer will be NULL. */
 
-    [self initCrateAsync: 0 shiftRegOnly: SHIFT_AND_DAC slotMask: slotMask
-         withCallback:callback target:target];
+    [self initCrateAsync: slotMask withCallback:callback target:target];
 }
 
-- (void) initCrateAsync: (int) xilinxLoad shiftRegOnly: (uint32_t) shiftRegOnly slotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target
+- (void) resetCrateAsync
+{
+    /* Reset the crate in a new thread. */
+    if (![[self xl3Link] isConnected]) {
+        NSLogColor([NSColor redColor], @"xl3 %02d is not connected!\n",
+                    [self crateNumber]);
+        return;
+    }
+    
+    [NSThread detachNewThreadSelector:@selector(resetCrate)
+        toTarget:self withObject:nil];
+}
+
+- (void) resetCrate
+{
+    char payload[XL3_PAYLOAD_SIZE];
+    ResetCrateArgs *args;
+    ResetCrateResults *results;
+    int i, j;
+
+    /* Check that HV Relays for XL3 are open if performing a full crate init. */
+    if ([self hvASwitch] || [self hvBSwitch]) {
+        NSLogColor([NSColor redColor], @"XL3 %02d has high voltage on.  HV must be turned off before a crate reset.\n", [self crateNumber]);
+        return;
+    }
+
+    memset(payload, 0, XL3_PAYLOAD_SIZE);
+    args = (ResetCrateArgs *) payload;
+
+    /* Set xilFile to 1 to load normal xilinx file. Any other number will load
+     * charge injection xilinx file. */
+    args->xilFile = htonl(1);
+
+    @try {
+        [[self xl3Link] sendCommand:RESET_CRATE_ID withPayload:payload expectResponse:YES];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor], @"Crate %02d reset failed. error: %@ reason: %@\n", [self crateNumber], [e name], [e reason]);
+    }
+
+    results = (ResetCrateResults *) payload;
+
+    /* Swap back to native byte order. */
+    results->errors = ntohl(results->errors);
+
+    if (results->errors) {
+        NSLogColor([NSColor redColor],
+                   @"crate reset failed with errors for crate %02d.\n",
+                   [self crateNumber]);
+    }
+
+    results->fecPresent = ntohl(results->fecPresent);
+
+    for (i = 0; i < 16; i++) {
+        results->hwareVals[i].mbID = ntohl(results->hwareVals[i].mbID);
+        results->hwareVals[i].pmticID = ntohl(results->hwareVals[i].pmticID);
+        for (j = 0; j < 4; j++) {
+            results->hwareVals[i].dbID[j] = ntohl(results->hwareVals[i].dbID[j]);
+        }
+    }
+
+    [self checkCrateConfig:results];
+
+    /* Need to update the buttons on the GUI to disable the reset crate button
+     * and enable the load hardware button. */
+    [self updateXl3Mode];
+}
+
+- (void) initCrateAsync: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target
 {
     /* Initialize the crate in a separate thread and call the selector
      * `callback` when done. */
@@ -1811,8 +1908,6 @@ void SwapLongBlock(void* p, int32_t n)
     }
 
     NSDictionary *args = [NSDictionary dictionaryWithObjectsAndKeys:
-                            [NSNumber numberWithInt:xilinxLoad], @"xilinxload",
-                            [NSNumber numberWithInt:shiftRegOnly], @"shiftregonly",
                             [NSNumber numberWithInt:slotMask], @"slotmask",
                             [NSValue valueWithPointer:callback], @"callback",
                             [NSValue valueWithPointer:mbs], @"mbs",
@@ -1828,7 +1923,10 @@ void SwapLongBlock(void* p, int32_t n)
      * pass the arguments in a dictionary and call them here.
      * Ugh...
      */
-    [self initCrate: [[args objectForKey:@"mbs"] pointerValue] xilinxLoad: [[args objectForKey:@"xilinxload"] intValue] shiftRegOnly: [[args objectForKey:@"shiftregonly"] intValue] slotMask: [[args objectForKey:@"slotmask"] intValue] withCallback: [[args objectForKey:@"callback"] pointerValue] target: [args objectForKey:@"target"]];
+    [self initCrate: [[args objectForKey:@"mbs"] pointerValue]
+         slotMask: [[args objectForKey:@"slotmask"] intValue]
+         withCallback: [[args objectForKey:@"callback"] pointerValue]
+         target: [args objectForKey:@"target"]];
 }
 
 - (uint32_t) getSlotsPresent
@@ -1850,7 +1948,7 @@ void SwapLongBlock(void* p, int32_t n)
     return slotMask;
 }
 
-- (void) initCrate: (MB *) mbs xilinxLoad: (int) xilinxLoad shiftRegOnly: (uint32_t) shiftRegOnly slotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target
+- (void) initCrate: (MB *) mbs slotMask: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target
 {
     /* Initialize the crate with a callback. The callback should look like:
      *
@@ -1863,7 +1961,7 @@ void SwapLongBlock(void* p, int32_t n)
      * Note: The callback must call free() on the results pointer. */
     CrateInitResults *r = (CrateInitResults *) malloc(sizeof(CrateInitResults));
 
-    if ([self initCrate: mbs xilinxLoad: xilinxLoad shiftRegOnly: shiftRegOnly slotMask: slotMask results: r]) {
+    if ([self initCrate: mbs slotMask: slotMask results: r]) {
         free(r);
         r = NULL;
     }
@@ -1883,7 +1981,7 @@ void SwapLongBlock(void* p, int32_t n)
     }
 }
 
-- (int) initCrate: (MB *) mbs xilinxLoad: (int) xilinxLoad shiftRegOnly: (uint32_t) shiftRegOnly slotMask: (uint32_t) slotMask results: (CrateInitResults *) results
+- (int) initCrate: (MB *) mbs slotMask: (uint32_t) slotMask results: (CrateInitResults *) results
 {
     /* Low level function to perform a crate init (load hardware settings).
      *
@@ -1898,32 +1996,6 @@ void SwapLongBlock(void* p, int32_t n)
     char payload[XL3_PAYLOAD_SIZE];
     CrateInitSetupArgs *setupArgs;
     CrateInitArgs *crateInitArgs;
-
-    /* Check XL3 is in init mode before init-ing with xilinx. */
-    if (([self xl3Mode] != INIT_MODE) && xilinxLoad) {
-        NSLogColor([NSColor redColor], @"XL3 %02d not in init mode.  Aborting initialization.\n", [self crateNumber]);
-        goto err;
-    }
-
-    /* Check that HV Relays for XL3 are open if performing a full crate init. */
-    if ((shiftRegOnly == 0) && ([self hvASwitch] || [self hvBSwitch])) {
-        NSLogColor([NSColor redColor], @"XL3 %02d has high voltage on.  HV must be turned off before crate initialization.\n", [self crateNumber]);
-        goto err;
-    }
-
-    if (shiftRegOnly && xilinxLoad) {
-        NSLogColor([NSColor redColor], @"crate %02d: warning xilinx is not loaded if shiftRegOnly != 0\n", [self crateNumber]);
-    }
-
-    /* Set the sequencer masks separately because if we are doing a registers
-     * only init, they are not updated. */
-    if (shiftRegOnly) {
-        for (slot = 0; slot < 16; slot++) {
-            if ((slotMask & (1 << slot)) == 0) continue;
-            
-            [self setSequencerMask: ~(mbs[slot].disableMask) forSlot:slot];
-        }
-    }
 
     /* Send the first 16 packets which have the FEC settings. Note that
      * no hardware is updated until we send one more CrateInitArgs packet */
@@ -1954,11 +2026,8 @@ void SwapLongBlock(void* p, int32_t n)
      * using htonl(). */
     /* mbNum > 16 means this is the final packet to perform crate init */
     crateInitArgs->mbNum = htonl(0xff);
-    crateInitArgs->xilinxLoad = htonl(xilinxLoad);
-    crateInitArgs->hvReset = htonl(0);
     crateInitArgs->slotMask = htonl(slotMask);
     crateInitArgs->ctcDelay = htonl(0);
-    crateInitArgs->shiftRegOnly = htonl(shiftRegOnly);
 
     @try {
         [[self xl3Link] sendCommand:CRATE_INIT_ID withPayload:payload expectResponse:YES];
@@ -2005,15 +2074,13 @@ err:
         }
     }
 
-    [self checkCrateConfig: (BuildCrateConfigResults *)r];
-
     // update XL3 alarm levels on safe init
     if ([self isXl3VltThresholdInInit]) [self setVltThreshold];
 
     free(r);
 }
 
-- (void) checkCrateConfig: (BuildCrateConfigResults *)r
+- (void) checkCrateConfig: (ResetCrateResults *)r
 {
     int slot, i;
     ORFec32Model *fec;
@@ -2055,7 +2122,7 @@ err:
     }
 }
 
-- (void) ecalToOrca
+- (void) fetchECALSettings
 {
     unsigned short slot;
     ORCouchDB *couch;
@@ -2318,11 +2385,6 @@ err:
 			NSLog(@"DebugDB %@ %@\n",[[self xl3Link] crateName], aResult);
 		}
 	}
-}
-
-- (void) orcaToHw
-{
-    [self loadHardware];
 }
 
 - (BOOL) isRelayClosedForSlot:(unsigned int)slot pc:(unsigned int)aPC

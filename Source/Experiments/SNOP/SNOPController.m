@@ -789,28 +789,23 @@ snopGreenColor;
     
 }
 
-- (IBAction)initCratesWithXilinx:(id)sender {
+- (IBAction) initCratesWithXilinx: (id) sender
+{
     
-    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORSNOCrateModel")] makeObjectsPerformSelector:@selector(setAutoInit:) withObject:NO];
-    
-    NSArray *crates = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass: NSClassFromString(@"ORSNOCrateModel")];
-    for (id crate in crates) {
-        [crate performSelector:@selector(setXl3Mode:) withObject:INIT_MODE];
-        [crate performSelector:@selector(writeXl3Mode)];
-        [crate performSelector:@selector(initCrate:phase:) withObject:YES withObject:0];
-    }
-    
+    /* The XL3s no longer support loading Xilinx while initializing.  Instead,
+     * the procedure is to reset the crate which loads the Xilinx for each FEC,
+     * and then to load the hardware settings. This action could potentially be
+     * changed to reset all the crates, but this is dangerous since resetting a
+     * crate will automatically cause all the HV to be reset.  */
 }
 
-- (IBAction)initCratesWithOutXilinx:(id)sender {
-    
-    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORSNOCrateModel")] makeObjectsPerformSelector:@selector(setAutoInit:) withObject:NO];
-    
+- (IBAction) initCratesWithOutXilinx: (id) sender
+{
     NSArray *crates = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass: NSClassFromString(@"ORSNOCrateModel")];
+
     for (id crate in crates) {
-        [crate performSelector:@selector(initCrate:phase:) withObject:NO withObject:0];
+        [crate performSelector:@selector(loadHardware)];
     }
-    
 }
 
 - (IBAction) reportAction:(id)sender {
