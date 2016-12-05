@@ -195,13 +195,13 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
     [self dbQuery:aCommand object:nil selector:nil timeout:0];
 }
 
-- (void)cardDbQuery:(id)anObject selector:(SEL)aSelector
+- (void)detectorDbQuery:(id)anObject selector:(SEL)aSelector
 {
     if(stealthMode){
         [anObject performSelector:aSelector withObject:nil afterDelay:0.1];
     } else {
         ORPQQueryOp* anOp = [[ORPQQueryOp alloc] initWithDelegate:self object:anObject selector:aSelector];
-        [anOp setCommandType:kPQCommandType_GetCardDB];
+        [anOp setCommandType:kPQCommandType_GetDetectorDB];
         [ORPQDBQueue addOperation:anOp];
         [anOp release];
     }
@@ -438,6 +438,25 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
 
 @end
 
+// utility routines to get PQ database pointers from the returned NSMutableData object
+PQ_FEC *getFEC(NSMutableData *data, int crate, int card)
+{
+    if (crate >= kSnoCrates || card >= kSnoCardsPerCrate || !data || [data length] < sizeof(PQ_FEC) * kSnoCardsTotal) return nil;
+    return (PQ_FEC *)[data mutableBytes] + crate * kSnoCardsPerCrate + card;
+}
+
+PQ_MTC *getMTC(NSMutableData *data)
+{
+    if (!data || [data length] < sizeof(PQ_FEC)*kSnoCardsTotal + sizeof(PQ_MTC)) return nil;
+    return (PQ_MTC *)((PQ_FEC *)[data mutableBytes] + kSnoCardsTotal);
+}
+
+PQ_CAEN *getCAEN(NSMutableData *data)
+{
+    if (!data || [data length] < sizeof(PQ_FEC)*kSnoCardsTotal + sizeof(PQ_MTC) + sizeof(PQ_CAEN)) return nil;
+    return (PQ_CAEN *)((PQ_MTC *)((PQ_FEC *)[data mutableBytes] + kSnoCardsTotal) + 1);
+}
+
 @implementation ORPQQueryOp
 - (void) dealloc
 {
@@ -488,7 +507,7 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                     }
                     break;
 
-                case kPQCommandType_GetCardDB: {
+                case kPQCommandType_GetDetectorDB: {
                     [command autorelease];
                     // column:    0     1    2       3
                     char *cols = "crate,card,channel,pmthv";
@@ -498,8 +517,8 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                     int numRows = [theResult numOfRows];
                     int numCols = [theResult numOfFields];
                     if (numCols != 4) break;
-                    NSMutableData *dataOut = [[[NSMutableData alloc] initWithLength:(kSnoCardsTotal * sizeof(SnoPlusCard))] autorelease];
-                    SnoPlusCard *cardPt = [dataOut mutableBytes];
+                    NSMutableData *dataOut = [[[NSMutableData alloc] initWithLength:(kSnoCardsTotal * sizeof(PQ_FEC) + sizeof(PQ_MTC) + sizeof(PQ_CAEN))] autorelease];
+                    PQ_FEC *cardPt = [dataOut mutableBytes];
                     for (i=0; i<numRows; ++i) {
                         int64_t val = [theResult getInt64atRow:i column:3];
                         if (val == kPQBadValue) continue;
@@ -507,8 +526,8 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                         unsigned card    = [theResult getInt64atRow:i column:1];
                         unsigned channel = [theResult getInt64atRow:i column:2];
                         if (crate < kSnoCrates && card < kSnoCardsPerCrate && channel < kSnoChannelsPerCard) {
-                            SnoPlusCard *theCard = cardPt + crate * kSnoCardsPerCrate + card;
-                            theCard->valid[kHvDisabled] |= (1 << channel);
+                            PQ_FEC *theCard = cardPt + crate * kSnoCardsPerCrate + card;
+                            theCard->valid[kFEC_hvDisabled] |= (1 << channel);
                             if (val == 1) theCard->hvDisabled |= (1 << channel);
                         }
                     }
@@ -517,25 +536,25 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                     // continue with next call to database
                     [command autorelease];
                     // (funny, but tcmos_tacshift=tac0trim and scmos=tac1trim)
-                    //      0     1    2          3           4         5          6          7      8      9              10    11   12            13
-                    cols = "crate,slot,tr100_mask,tr100_delay,tr20_mask,tr20_width,tr20_delay,vbal_0,vbal_1,tcmos_tacshift,scmos,vthr,pedestal_mask,disable_mask";
+                    //      0     1    2          3           4         5          6          7      8      9              10    11   12            13           14          15        16        17        18         19           20          21          22   23
+                    cols = "crate,slot,tr100_mask,tr100_delay,tr20_mask,tr20_width,tr20_delay,vbal_0,vbal_1,tcmos_tacshift,scmos,vthr,pedestal_mask,disable_mask,tdisc_rmpup,tdisc_rmp,tdisc_vsi,tdisc_vli,tcmos_vmax,tcmos_tacref,tcmos_isetm,tcmos_iseta,vint,hvref";
                     command = [[NSString stringWithFormat: @"SELECT %s FROM current_detector_state",cols] retain];
                     theResult = [pqConnection queryString:command];
                     if (!theResult || [self isCancelled]) break;
                     numRows = [theResult numOfRows];
                     numCols = [theResult numOfFields];
-                    if (numCols != kNumCardDbColumns) {
-                        NSLog(@"Expected %d columns from detector database, but got %d\n", kNumCardDbColumns, numCols);
+                    if (numCols != kFEC_numDbColumns) {
+                        NSLog(@"Expected %d columns from detector database, but got %d\n", kFEC_numDbColumns, numCols);
                         break;
                     }
                     for (i=0; i<numRows; ++i) {
                         unsigned crate = [theResult getInt64atRow:i column:0];
                         unsigned card  = [theResult getInt64atRow:i column:1];
                         if (crate >= kSnoCrates || card >= kSnoCardsPerCrate) continue;
-                        SnoPlusCard *theCard = cardPt + crate * kSnoCardsPerCrate + card;
+                        PQ_FEC *theCard = cardPt + crate * kSnoCardsPerCrate + card;
                         // set flag indicating that the card exists in the current detector state
-                        theCard->valid[kCardExists] = 1;
-                        for (int col=2; col<kNumCardDbColumns; ++col) {
+                        theCard->valid[kFEC_exists] = 1;
+                        for (int col=2; col<kFEC_numDbColumns; ++col) {
                             NSMutableData *dat = [theResult getInt64arrayAtRow:i column:col];
                             if (!dat) continue;
                             int n = [dat length] / sizeof(int64_t);
@@ -548,47 +567,89 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                                 // set valid flag for this setting for this channel
                                 theCard->valid[col] |= (1 << ch);
                                 switch (col) {
-                                    case kNhit100enabled:
+                                    case kFEC_nhit100enabled:
                                         if (val) theCard->nhit100enabled |= (1 << ch);
                                         break;
-                                    case kNhit100delay:
+                                    case kFEC_nhit100delay:
                                         theCard->nhit100delay[ch] = val;
                                         break;
-                                    case kNhit20enabled:
+                                    case kFEC_nhit20enabled:
                                         if (val) theCard->nhit20enabled |= (1 << ch);
                                         break;
-                                    case kNhit20width:
+                                    case kFEC_nhit20width:
                                         theCard->nhit20width[ch] = val;
                                         break;
-                                    case kNhit20delay:
+                                    case kFEC_nhit20delay:
                                         theCard->nhit20delay[ch] = val;
                                         break;
-                                    case kVbal0:
+                                    case kFEC_vbal0:
                                         theCard->vbal0[ch] = val;
                                         break;
-                                    case kVbal1:
+                                    case kFEC_vbal1:
                                         theCard->vbal1[ch] = val;
                                         break;
-                                    case kTac0trim:
+                                    case kFEC_tac0trim:
                                         theCard->tac0trim[ch] = val;
                                         break;
-                                    case kTac1trim:
+                                    case kFEC_tac1trim:
                                         theCard->tac1trim[ch] = val;
                                         break;
-                                    case kVthr:
+                                    case kFEC_vthr:
                                         theCard->vthr[ch] = val;
                                         break;
-                                    case kPedEnabled:
+                                    case kFEC_pedEnabled:
                                         theCard->pedEnabled = val;
                                         theCard->valid[col] = 0xffffffff;
                                         break;
-                                    case kSeqDisabled:
+                                    case kFEC_seqDisabled:
                                         theCard->seqDisabled = val;
                                         theCard->valid[col] = 0xffffffff;
+                                        break;
+                                    case kFEC_tdiscRp1:
+                                        if (ch < 8) theCard->tdiscRp1[ch] = val;
+                                        break;
+                                    case kFEC_tdiscRp2:
+                                        if (ch < 8) theCard->tdiscRp2[ch] = val;
+                                        break;
+                                    case kFEC_tdiscVsi:
+                                        if (ch < 8) theCard->tdiscVsi[ch] = val;
+                                        break;
+                                    case kFEC_tdiscVli:
+                                        if (ch < 8) theCard->tdiscVli[ch] = val;
+                                        break;
+                                    case kFEC_tcmosVmax:
+                                        theCard->tcmosVmax = val;
+                                        break;
+                                    case kFEC_tcmosTacref:
+                                        theCard->tcmosTacref = val;
+                                        break;
+                                    case kFEC_tcmosIsetm:
+                                        if (ch < 2) theCard->tcmosIsetm[ch] = val;
+                                        break;
+                                    case kFEC_tcmosIseta:
+                                        if (ch < 2) theCard->tcmosIseta[ch] = val;
+                                        break;
+                                    case kFEC_vres:
+                                        theCard->vres = val;
+                                        break;
+                                    case kFEC_hvref:
+                                        theCard->hvref = val;
                                         break;
                                 }
                             }
                         }
+                    }
+                    // continue with next call to database
+                    [command autorelease];
+                    cols = "control_register,mtca_dacs,pedestal_width,coarse_delay,fine_delay,pedestal_mask,prescale,lockout_width";
+                    command = [[NSString stringWithFormat: @"SELECT %s FROM current_detector_state",cols] retain];
+                    theResult = [pqConnection queryString:command];
+                    if (!theResult || [self isCancelled]) break;
+                    numRows = [theResult numOfRows];
+                    numCols = [theResult numOfFields];
+                    if (numCols != kFEC_numDbColumns) {
+                        NSLog(@"Expected %d columns from detector database, but got %d\n", kFEC_numDbColumns, numCols);
+                        break;
                     }
                     theResultObject = dataOut;
                 }   break;

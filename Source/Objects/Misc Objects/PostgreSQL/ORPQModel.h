@@ -25,24 +25,34 @@
 #define kSnoCardsTotal      (kSnoCrates * kSnoCardsPerCrate)
 #define kSnoChannels        (kSnoCardsTotal * kSnoChannelsPerCard)
 
-// indices for SnoPlusCard valid flags
+// indices for PQ_FEC valid flags
 // (all except hvDisabled must have the same numbers as the column numbers when reading the detector db)
 enum {
-    kCardExists,        // set to 1 if card exists in current detector state
-    kHvDisabled,
-    kNhit100enabled,
-    kNhit100delay,
-    kNhit20enabled,
-    kNhit20width,
-    kNhit20delay,
-    kVbal0,
-    kVbal1,
-    kTac0trim,
-    kTac1trim,
-    kVthr,
-    kPedEnabled,
-    kSeqDisabled,
-    kNumCardDbColumns
+    kFEC_exists,    // set to 1 if card exists in current detector state (if 0, all elements except hvDisabled will be invalid)
+    kFEC_hvDisabled,
+    kFEC_nhit100enabled,
+    kFEC_nhit100delay,
+    kFEC_nhit20enabled,
+    kFEC_nhit20width,
+    kFEC_nhit20delay,
+    kFEC_vbal0,
+    kFEC_vbal1,
+    kFEC_tac0trim,  // (tcmos_tacshift in the database)
+    kFEC_tac1trim,  // (scmos in the database)
+    kFEC_vthr,
+    kFEC_pedEnabled,
+    kFEC_seqDisabled,
+    kFEC_tdiscRp1,  // (tdisc_rmpup in the database)
+    kFEC_tdiscRp2,  // (tdisc_rmp in the database)
+    kFEC_tdiscVsi,
+    kFEC_tdiscVli,
+    kFEC_tcmosVmax,
+    kFEC_tcmosTacref,
+    kFEC_tcmosIsetm,
+    kFEC_tcmosIseta,
+    kFEC_vres,      // (vint in the database)
+    kFEC_hvref,
+    kFEC_numDbColumns
 };
 
 typedef struct {
@@ -59,11 +69,63 @@ typedef struct {
     unsigned char   vthr[kSnoChannelsPerCard];
     int32_t         pedEnabled;
     int32_t         seqDisabled;
-    int32_t         valid[kNumCardDbColumns];   // bitmasks for settings loaded from hardware (see enum above)
-} SnoPlusCard;
+    unsigned char   tdiscRp1[8];
+    unsigned char   tdiscRp2[8];
+    unsigned char   tdiscVsi[8];
+    unsigned char   tdiscVli[8];
+    int32_t         tcmosVmax;
+    int32_t         tcmosTacref;
+    int32_t         tcmosIsetm[2];
+    int32_t         tcmosIseta[2];
+    int32_t         vres;
+    int32_t         hvref;
+    int32_t         valid[kFEC_numDbColumns];   // bitmasks for settings loaded from hardware (see enum above)
+} PQ_FEC;
+
+enum {
+    kMTC_controlReg,
+    kMTC_mtcaDacs,
+    kMTC_pedWidth,
+    kMTC_coarseDelay,
+    kMTC_fineDelay,
+    kMTC_pedMask,
+    kMTC_prescale,
+    kMTC_lockoutWidth,
+    kMTC_gtMask,
+    kMTC_gtCrateMask,
+    kMTC_mtcaRelays,
+    kMTC_numDbColumns,
+};
+
+typedef struct {
+    int32_t     controlReg;
+    int32_t     mtcaDacs[14];
+    int32_t     pedWidth;
+    int32_t     coarseDelay;
+    int32_t     fineDelay;
+    int32_t     pedMask;
+    int32_t     prescale;
+    int32_t     lockoutWidth;
+    int32_t     gtMask;
+    int32_t     gtCrateMask;
+    int32_t     mtcaRelays[7];
+} PQ_MTC;
+
+enum {
+    kCAEN_NumDbColumns,
+};
+
+typedef struct {
+
+} PQ_CAEN;
 
 @class ORPQConnection;
 @class ORPQModel;
+@class NSMutableData;
+
+PQ_FEC *getFEC(NSMutableData *data, int crate, int card);
+PQ_MTC *getMTC(NSMutableData *data);
+PQ_CAEN *getCAEN(NSMutableData *data);
 
 @interface ORPQModel : OrcaObject
 {
@@ -112,12 +174,12 @@ typedef struct {
 - (void) dbQuery:(NSString*)aCommand;
 
 /**
- @brief Get SNO+ card database
+ @brief Get SNO+ detector database
  @param anObject Callback object
  @param aSelector Callback object selector (called with an NSMutableData object
- containing an array of SnoPlusCard structures in detector crate/card order, or nil on error)
+ containing an PQ_FEC, PQ_MTC and PQ_CAEN structures, or nil on error)
  */
-- (void) cardDbQuery:(id)anObject selector:(SEL)aSelector;
+- (void) detectorDbQuery:(id)anObject selector:(SEL)aSelector;
 
 - (void) cancelDbQueries;
 - (BOOL) stealthMode;
@@ -173,7 +235,7 @@ extern NSString* ORPQLock;
 
 enum ePQCommandType {
     kPQCommandType_General,
-    kPQCommandType_GetCardDB,
+    kPQCommandType_GetDetectorDB,
 };
 
 @interface ORPQQueryOp : ORPQOperation
