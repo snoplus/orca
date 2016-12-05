@@ -507,6 +507,11 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
                        object : nil];
     
     [notifyCenter addObserver : self
+                     selector : @selector(runStarted:)
+                         name : ORRunStartedNotification
+                       object : nil];
+
+    [notifyCenter addObserver : self
                      selector : @selector(runStopped:)
                          name : ORRunStoppedNotification
                        object : nil];
@@ -542,16 +547,17 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
         }
      }
 }
+- (void) runStarted:(NSNotification*)aNote
+{
+    if([self isMaster]){
+        [self shipDataRecord];
+    }
+}
 
 - (void) runStopped:(NSNotification*)aNote
 {
     if([self isMaster]){
-        //At Jason's request reset the clock at the end of run
-        NSArray*  runModelObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-        ORRunModel* aRunModel = [runModelObjects objectAtIndex:0];
-        if([aRunModel quickStart]){
-            [self shipDataRecord];
-        }
+        [self shipDataRecord];
     }
 }
 

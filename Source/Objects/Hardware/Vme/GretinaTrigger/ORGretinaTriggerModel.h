@@ -301,6 +301,8 @@ enum {
 - (void) startPollingLock:(NSNotification*)aNote;
 - (void) endPollingLock:(NSNotification*)aNote;
 - (void) pollLock;
+- (void) runStarted:(NSNotification*)aNote;
+- (void) runStopped:(NSNotification*)aNote;
 
 #pragma mark ***Accessors
 - (unsigned long long) timeStamp;
