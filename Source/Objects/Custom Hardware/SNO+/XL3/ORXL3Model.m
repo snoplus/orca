@@ -108,6 +108,8 @@ extern NSString* ORSNOPRequestHVStatus;
 - (void) _post_heartbeat:(int)crate;
 - (void) _trigger_edge_alarm:(int)alarmid;
 - (void) _update_level_alarm:(int)alarmid level:(bool)state;
+- (void)_hv_a_dbparams:(ORPQResult*)result;
+- (void)_hv_b_dbparams:(ORPQResult*)result;
 @end
 
 @implementation ORXL3Model
@@ -4532,9 +4534,39 @@ err:
 }
 
 
-float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170.0,
-                    2060.0, 2435.0, 2240.0, 2370.0, 2220.0, 2270.0, 1970.0, 2025.0,
-                    1995.0, 1945.0, 2010.0, 2000.0}; //crates 0-19 supply a
+//Callback for database access to hv params for supply a
+- (void)_hv_a_dbparams:(ORPQResult*)result
+{
+    if (result && !hvAFromDB) { // Only do this once
+        [self setHvAFromDB:true];
+        NSDictionary* dict = [result fetchRowAsDictionary];
+        [self setHvNominalVoltageA:[(NSNumber*)[dict valueForKey:@"nominal"] floatValue]];
+        [self setHvramp_a_up:[(NSNumber*)[dict valueForKey:@"hvramp_up"] floatValue]];
+        [self setHvramp_a_down:[(NSNumber*)[dict valueForKey:@"hvramp_down"] floatValue]];
+        [self setVsetalarm_a_vtol:[(NSNumber*)[dict valueForKey:@"vsetalarm_vtol"] floatValue]];
+        [self setIlowalarm_a_vmin:[(NSNumber*)[dict valueForKey:@"ilowalarm_vmin"] floatValue]];
+        [self setIlowalarm_a_imin:[(NSNumber*)[dict valueForKey:@"ilowalarm_imin"] floatValue]];
+        [self setVhighalarm_a_vmax:[(NSNumber*)[dict valueForKey:@"vhighalarm_vmax"] floatValue]];
+        [self setIhighalarm_a_imax:[(NSNumber*)[dict valueForKey:@"ihighalarm_imax"] floatValue]];
+    }
+}
+
+//Callback for database access to hv params for supply b
+- (void)_hv_b_dbparams:(ORPQResult*)result
+{
+    if (result && !hvBFromDB) { // Only do this once
+        [self setHvBFromDB:true];
+        NSDictionary* dict = [result fetchRowAsDictionary];
+        [self setHvNominalVoltageB:[(NSNumber*)[dict valueForKey:@"nominal"] floatValue]];
+        [self setHvramp_b_up:[(NSNumber*)[dict valueForKey:@"hvramp_up"] floatValue]];
+        [self setHvramp_b_down:[(NSNumber*)[dict valueForKey:@"hvramp_down"] floatValue]];
+        [self setVsetalarm_b_vtol:[(NSNumber*)[dict valueForKey:@"vsetalarm_vtol"] floatValue]];
+        [self setIlowalarm_b_vmin:[(NSNumber*)[dict valueForKey:@"ilowalarm_vmin"] floatValue]];
+        [self setIlowalarm_b_imin:[(NSNumber*)[dict valueForKey:@"ilowalarm_imin"] floatValue]];
+        [self setVhighalarm_b_vmax:[(NSNumber*)[dict valueForKey:@"vhighalarm_vmax"] floatValue]];
+        [self setIhighalarm_b_imax:[(NSNumber*)[dict valueForKey:@"ihighalarm_imax"] floatValue]];
+    }
+}
 
 // This method is started as a thread when a new ORXL3Model is created. It waits
 // for the XL3 to connect AND for the XL3 to report that it the xilinx chip
@@ -4545,28 +4577,12 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
     NSAutoreleasePool* hvPool = [[NSAutoreleasePool alloc] init];
     while (true) {
         sleep(1);
+        
         //do nothing without an xl3 connected
         if ([self xl3Link] && [[self xl3Link] isConnected]) {
-            
-            //B.J.L. 11/22/16 - this block is a temporary to hardcode parameters pending DB access
-            [self setHvNominalVoltageA:nominals[[self crateNumber]]];
-            [self setHvramp_a_up:10.0];
-            [self setHvramp_a_down:50.0];
-            [self setVsetalarm_a_vtol:50.0];
-            [self setIlowalarm_a_vmin:500.0];
-            [self setIlowalarm_a_imin:10.0];
-            [self setIhighalarm_a_imax:1000.0];
-            [self setVhighalarm_a_vmax:nominals[[self crateNumber]]+50.0];
-            [self setHvNominalVoltageB:(int)([self crateNumber]==16 ? 2445.0 : 0.0)];
-            [self setHvramp_b_up:10.0];
-            [self setHvramp_b_down:50.0];
-            [self setVsetalarm_b_vtol:50.0];
-            [self setIlowalarm_b_vmin:500.0];
-            [self setIlowalarm_b_imin:10.0];
-            [self setIhighalarm_b_imax:1000.0];
-            [self setVhighalarm_b_vmax:(int)([self crateNumber]==16 ? 2445.0 : 0.0)+50.0];
-            hvAFromDB = true; //flag to indicate params were loaded
-            hvBFromDB = true; //flag to indicate params were loaded
+ 
+            if (!hvAFromDB) [[ORPQModel getCurrent] dbQuery:[NSString stringWithFormat:@"SELECT * FROM hvparams WHERE crate=%i AND supply='A'", [self crateNumber]] object:self selector:@selector(_hv_a_dbparams:)];
+            if (!hvBFromDB) [[ORPQModel getCurrent] dbQuery:[NSString stringWithFormat:@"SELECT * FROM hvparams WHERE crate=%i AND supply='B'", [self crateNumber]] object:self selector:@selector(_hv_b_dbparams:)];
 
             //now readback the HV settings according to the XL3
             @try {
