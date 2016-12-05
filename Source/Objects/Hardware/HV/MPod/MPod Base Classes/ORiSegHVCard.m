@@ -983,18 +983,17 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
 {
     //----------------------------------------------------------------------------------------
     // first add our description to the data description
-    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORiSegHVCard"];
+    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:[self className]];
 }
 
 - (NSDictionary*) dataRecordDescription
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
-    int n = 5+[self numberOfChannels]*2;
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
 								 @"ORiSegHVCardDecoderForHV",			@"decoder",
 								 [NSNumber numberWithLong:dataId],      @"dataId",
-								 [NSNumber numberWithBool:NO],          @"variable",
-								 [NSNumber numberWithLong:n],			@"length",
+								 [NSNumber numberWithBool:YES],         @"variable",
+								 [NSNumber numberWithLong:-1],			@"length",
 								 nil];
     [dataDictionary setObject:aDictionary forKey:@"State"];
     
