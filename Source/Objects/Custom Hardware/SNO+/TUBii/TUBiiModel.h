@@ -89,7 +89,8 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
     uint8_t LO_Bits;
     uint32_t speakerMask;
     uint32_t counterMask;
-    uint32_t trigMask;
+    uint32_t syncTrigMask;
+    uint32_t asyncTrigMask;
     CONTROL_REG_MASK controlReg;
     BOOL CounterMode;
 };
@@ -126,7 +127,8 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
 @property (nonatomic,readonly) int DGTInNS;
 @property (nonatomic) NSUInteger speakerMask;
 @property (nonatomic) NSUInteger counterMask;
-@property (nonatomic) NSUInteger trigMask;
+@property (nonatomic,readonly) NSUInteger syncTrigMask;
+@property (nonatomic,readonly) NSUInteger asyncTrigMask;
 @property (nonatomic) CONTROL_REG_MASK controlReg;
 @property (nonatomic) BOOL TUBiiIsDefaultClock;
 @property (nonatomic) BOOL TUBiiIsLOSrc;
@@ -151,6 +153,7 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
 - (float) MTCAMimic_BitsToVolts: (NSUInteger) BitValue;
 - (void) Initialize;
 - (void) Ping;
+- (void) setTrigMask:(NSUInteger)trigMask setAsyncMask:(NSUInteger)asyncMask;
 - (void) setBurstTrigger;
 - (void) setComboTrigger_EnableMask:(uint32_t) enableMask TriggerMask:(uint32_t) triggerMask;
 - (void) setPrescaleTrigger_Mask: (uint32_t) mask ByFactor:(uint32_t) factor;

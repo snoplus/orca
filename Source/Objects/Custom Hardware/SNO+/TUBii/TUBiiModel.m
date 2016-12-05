@@ -388,45 +388,20 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
     // DGT delay on TUBii
     return [self ConvertValueToBits:Nanoseconds NBits:8 MinVal:0 MaxVal:510];
 }
-- (void) setTrigMask:(NSUInteger)_trigMask syncMask:(NSUInteger)_syncMask{
+- (void) setTrigMask:(NSUInteger)_syncTrigMask setAsyncMask:(NSUInteger)_asyncTrigMask{
     // Sets which trigger inputs are capable causing TUBii to issue a Raw Trigger
     // This function is handled entierly within the MicroZed processing logic.
     
-    NSUInteger syncMask=0, asyncMask=0;
-    for(int i=0; i<24; i++)
-    {
-        if(_syncMask & (1<<i))
-        {
-            if(_trigMask & (1<<i))
-            {
-                syncMask |= 1 << i;
-            }
-            else
-            {
-                syncMask &= ~(1 << i);
-            }
-            asyncMask &= ~(1 << i);
-        }
-        else
-        {
-            if(_trigMask & (1<<i))
-            {
-                asyncMask |= 1 << i;
-            }
-            else
-            {
-                asyncMask &= ~(1 << i);
-            }
-            syncMask &= ~(1 << i);
-        }
-    }
-    
-    NSString * const command = [NSString stringWithFormat:@"SetTriggerMask %d %d",syncMask,asyncMask];
+    NSString * const command = [NSString stringWithFormat:@"SetTriggerMask %d %d",_syncTrigMask,_asyncTrigMask];
     [self sendOkCmd:command];
 }
-- (NSUInteger) trigMask {
+- (NSUInteger) syncTrigMask {
     // See comment in setTrigMask for info.
-    return [connection intCommand: "GetTriggerMask"];
+    return [connection intCommand: "GetSyncTriggerMask"];
+}
+- (NSUInteger) asyncTrigMask {
+    // See comment in setTrigMask for info.
+    return [connection intCommand: "GetAsyncTriggerMask"];
 }
 - (void) setSmellieDelay:(NSUInteger)_smellieDelay {
     // This specifies (in nanoseconds) how long the MicroZed should delay a pulse that
@@ -736,7 +711,7 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
     [self setGTDelaysBits:aState.DGT_Bits LOBits:aState.LO_Bits];
     [self setSpeakerMask: aState.speakerMask];
     [self setCounterMask: aState.counterMask];
-    [self setTrigMask: aState.trigMask];
+    [self setTrigMask: aState.syncTrigMask setAsyncMask:aState.asyncTrigMask];
     [self setCounterMode: aState.CounterMode];
     [self setControlReg: aState.controlReg];
 }
@@ -765,7 +740,8 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
     aState.LO_Bits = [self LODelayBits];
     aState.speakerMask = [self speakerMask];
     aState.counterMask = [self counterMask];
-    aState.trigMask = [self trigMask];
+    aState.syncTrigMask = [self syncTrigMask];
+    aState.asyncTrigMask = [self asyncTrigMask];
     aState.CounterMode = [self CounterMode];
     aState.controlReg = [self controlReg];
     return aState;

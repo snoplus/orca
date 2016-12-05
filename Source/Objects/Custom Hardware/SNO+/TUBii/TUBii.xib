@@ -122,7 +122,7 @@
         <window title="TUBii" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" animationBehavior="default" id="F0z-JX-Cv5">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="407" y="199" width="621" height="748"/>
+            <rect key="contentRect" x="0.0" y="29" width="621" height="748"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
             <view key="contentView" id="se5-gp-TjO">
                 <rect key="frame" x="0.0" y="-1" width="621" height="748"/>
@@ -260,8 +260,8 @@
                                             </connections>
                                         </matrix>
                                         <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="w0X-hT-uEH">
-                                            <rect key="frame" x="23" y="609" width="33" height="37"/>
-                                            <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="Unlocked" imagePosition="above" alignment="center" alternateImage="Locked" inset="2" id="iLY-pS-cXs">
+                                            <rect key="frame" x="17" y="606" width="33" height="37"/>
+                                            <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="Unlocked" imagePosition="only" alignment="center" alternateImage="Locked" inset="2" id="iLY-pS-cXs">
                                                 <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="label"/>
                                             </buttonCell>
