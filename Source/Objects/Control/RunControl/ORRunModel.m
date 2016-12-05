@@ -1188,6 +1188,11 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
         NSLogColor([NSColor redColor],@"Start a run while one is already in progress.\n");
         return;
     }
+
+    [self setDataTypeAssigner:[[[ORDataTypeAssigner alloc] init]autorelease]];
+    
+    [dataTypeAssigner assignDataIds];
+
     //first call to see if any object needs to stop the run or do something to cause the run start process to wait
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunInitializationNotification
                                                         object: self
@@ -1195,9 +1200,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 							  [NSNumber numberWithInt:doInit||forceFullInit], @"doinit",
     nil]];
 
-    [self setDataTypeAssigner:[[[ORDataTypeAssigner alloc] init]autorelease]];
-    
-    [dataTypeAssigner assignDataIds];
 
     //------
     //at this stage, some object may need extra time. If so they will post a wait request
