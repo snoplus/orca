@@ -124,7 +124,7 @@
 						sname = [sname stringByAppendingString:@"Control"];
 					}
                     else {
-                        sname = [NSString stringWithFormat:@"unKnown(%d)",[aKey intValue]];
+                        sname = [NSString stringWithFormat:@"unKnown(0x%x %lu)",[aKey intValue],decodedLength];
                     }
 					[nameCatalog setObject:sname forKey:aKey]; 
 					shortName = sname;
