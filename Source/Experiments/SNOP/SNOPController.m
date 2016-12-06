@@ -360,21 +360,18 @@ snopGreenColor;
 {
     
     NSString* standardRun = [model standardRunType];
-    if(standardRun != nil && ![standardRun isEqualToString:@""] && [standardRunPopupMenu indexOfItemWithObjectValue:standardRun] == NSNotFound){
+    if([[model standardRunType] isEqualToString:@"HIGH THRESHOLDS"]) {
+        [model setStandardRunVersion:@"DEFAULT"];
+    }
+    else if(standardRun != nil && ![standardRun isEqualToString:@""] && [standardRunPopupMenu indexOfItemWithObjectValue:standardRun] == NSNotFound){
         NSLogColor([NSColor redColor],@"Standard Run \"%@\" does not exist in DB. \n",standardRun);
         return;
     }
     else{
         [standardRunPopupMenu selectItemWithObjectValue:standardRun];
-    }
-    
-    if([[model standardRunType] isEqualToString:@"HIGH THRESHOLDS"]) {
-        [model setStandardRunVersion:@"DEFAULT"];
-    }
-    else if(![standardRun isEqualToString:@""] && standardRun != nil){
         [self refreshStandardRunVersions];
     }
-
+    
 }
 
 -(void) SRVersionChanged:(NSNotification*)aNote

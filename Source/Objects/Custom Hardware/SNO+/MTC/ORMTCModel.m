@@ -1783,7 +1783,7 @@ resetFifoOnStart = _resetFifoOnStart;
     @try {
         [mtc okCommand:"load_mtca_dacs %d %d %d %d %d %d %d %d %d %d %d %d %d %d", dacs[0], dacs[1], dacs[2], dacs[3], dacs[4], dacs[5], dacs[6], dacs[7], dacs[8], dacs[9], dacs[10], dacs[11], dacs[12], dacs[13]];
     } @catch(NSException* e) {
-        NSLog(@"failed to load the MTCA dacs: %@", [e reason]);     
+        NSLogColor([NSColor redColor],@"failed to load the MTCA dacs: %@\n", [e reason]);
         [e raise];
     }
 }
