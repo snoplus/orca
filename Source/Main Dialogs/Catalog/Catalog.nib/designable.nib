@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5056" systemVersion="14F2009" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6254" systemVersion="13F1077" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
         <development version="5100" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="5056"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6254"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ORCatalogController">
@@ -1792,7 +1792,7 @@ Controller</string>
                                         <button toolTip="ORUSBtoGPIBModel" id="26690" customClass="ObjectFactory">
                                             <rect key="frame" x="44" y="1" width="69" height="76"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="bevel" title="USB-&gt;GPIB" bezelStyle="regularSquare" image="USBtoGPIB" imagePosition="above" alignment="center" state="on" inset="2" id="26691">
+                                            <buttonCell key="cell" type="bevel" title="USB->GPIB" bezelStyle="regularSquare" image="USBtoGPIB" imagePosition="above" alignment="center" state="on" inset="2" id="26691">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system" size="10"/>
                                             </buttonCell>
@@ -1881,7 +1881,7 @@ Controller</string>
                                         <button toolTip="ORUSBtoGPIBModel" id="26725" customClass="ObjectFactory">
                                             <rect key="frame" x="705" y="185" width="69" height="76"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="bevel" title="USB-&gt;GPIB" bezelStyle="regularSquare" image="USBtoGPIB" imagePosition="above" alignment="center" state="on" inset="2" id="26726">
+                                            <buttonCell key="cell" type="bevel" title="USB->GPIB" bezelStyle="regularSquare" image="USBtoGPIB" imagePosition="above" alignment="center" state="on" inset="2" id="26726">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system" size="10"/>
                                             </buttonCell>
@@ -2501,7 +2501,7 @@ Can only be used with the M21 M-Module controller.</string>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
                                         </button>
-                                        <button toolTip="ORPQModel" appearanceType="aqua" id="Vmc-ZO-Qle" customClass="ObjectFactory">
+                                        <button toolTip="ORPQModel" id="Vmc-ZO-Qle" customClass="ObjectFactory">
                                             <rect key="frame" x="466" y="23" width="105" height="89"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" title="PostgreSQL DB" bezelStyle="regularSquare" image="PostgreSQL" imagePosition="above" alignment="center" state="on" inset="2" id="Zbr-PD-AXW">
@@ -3024,7 +3024,7 @@ Relay</string>
                                                             <textField verticalHuggingPriority="750" id="13941">
                                                                 <rect key="frame" x="325" y="186" width="57" height="14"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <textFieldCell key="cell" controlSize="small" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="VME--&gt;" id="25951">
+                                                                <textFieldCell key="cell" controlSize="small" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="VME-->" id="25951">
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -3143,14 +3143,6 @@ Relay</string>
                                                                     <font key="font" metaFont="system" size="10"/>
                                                                 </buttonCell>
                                                             </button>
-                                                            <button toolTip="ORCameraModel" id="7rg-3Y-pNH" customClass="ObjectFactory">
-                                                                <rect key="frame" x="468" y="3" width="110" height="74"/>
-                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <buttonCell key="cell" type="bevel" title="SNOPCamera" bezelStyle="regularSquare" image="CameraPic" imagePosition="above" alignment="center" state="on" inset="2" id="A9f-Xa-dRB">
-                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                                    <font key="font" metaFont="system" size="10"/>
-                                                                </buttonCell>
-                                                            </button>
                                                             <button toolTip="ResistorDBModel" id="jhu-YY-N7n" customClass="ObjectFactory">
                                                                 <rect key="frame" x="571" y="11" width="116" height="58"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -3264,7 +3256,6 @@ Relay</string>
         <image name="Caen419" width="16" height="128"/>
         <image name="Caen965" width="16" height="128"/>
         <image name="CamacCrateSmall" width="283" height="154"/>
-        <image name="CameraPic" width="77" height="57"/>
         <image name="Changesfeed" width="68.400001525878906" height="53"/>
         <image name="CmdLabel" width="70" height="11"/>
         <image name="Comparator" width="70" height="41"/>
