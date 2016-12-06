@@ -427,9 +427,8 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
     
 	
     [aDataPacket addCachedData];
-    [self putDataInQueue:aDataPacket force:NO];   
-    
-    [self putDataInQueue:aDataPacket force:YES];   
+   //[self putDataInQueue:aDataPacket force:NO];
+    [self putDataInQueue:aDataPacket force:YES];
 	
 	if(enableTimer){
 		[timerLock lock];	//start critical section
