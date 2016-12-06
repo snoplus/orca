@@ -207,7 +207,7 @@ int32_t main(int32_t argc, char *argv[])
         memset(&lam_info ,0,sizeof(SBC_LAM_info_struct)*kMaxNumberLams);
         pthread_mutex_unlock (&lamInfoMutex);//end critical section
 
-        //high rate crashes -tb- pthread_mutex_init(&hwMutex, NULL);
+        pthread_mutex_init(&hwMutex, NULL);
 
         /*-------------------------------*/
 
@@ -255,7 +255,7 @@ int32_t main(int32_t argc, char *argv[])
 
         /* Take care of pthread variables. */
         pthread_mutex_destroy(&runInfoMutex);
-        //high rate crashes -tb- pthread_mutex_destroy(&hwMutex);
+        pthread_mutex_destroy(&hwMutex);
         pthread_attr_destroy(&readoutThreadAttr);
         pthread_mutex_destroy(&jobInfoMutex);
         pthread_attr_destroy(&sbc_job.jobThreadAttr);
@@ -285,9 +285,9 @@ void processBuffer(SBC_Packet* aPacket, uint8_t reply)
             processSBCCommand(aPacket,reply);
             break;
         default:
-            //high rate crashes -tb- pthread_mutex_lock(&hwMutex); //added this missing lock MAH 10/26
+            pthread_mutex_lock(&hwMutex); //added this missing lock MAH 10/26
             processHWCommand(aPacket);
-            //high rate crashes -tb- pthread_mutex_unlock(&hwMutex);
+            pthread_mutex_unlock(&hwMutex);
             break;
     }
 }
@@ -296,27 +296,27 @@ void processSBCCommand(SBC_Packet* aPacket,uint8_t reply)
 {
     switch(aPacket->cmdHeader.cmdID){
         case kSBC_WriteBlock:        
-            //high rate crashes -tb- pthread_mutex_lock(&hwMutex);
+            pthread_mutex_lock(&hwMutex);
             doWriteBlock(aPacket,reply);
-            //high rate crashes -tb- pthread_mutex_unlock(&hwMutex);
+            pthread_mutex_unlock(&hwMutex);
             break;
         
         case kSBC_ReadBlock:
-            //high rate crashes -tb- pthread_mutex_lock(&hwMutex);
+            pthread_mutex_lock(&hwMutex);
             doReadBlock(aPacket,reply);
-            //high rate crashes -tb- pthread_mutex_unlock(&hwMutex);
+            pthread_mutex_unlock(&hwMutex);
             break;
 		
 		case kSBC_GeneralWrite:        
-            //high rate crashes -tb- pthread_mutex_lock(&hwMutex);
+            pthread_mutex_lock(&hwMutex);
             doGeneralWriteOp(aPacket,reply);
-            //high rate crashes -tb- pthread_mutex_unlock(&hwMutex);
+            pthread_mutex_unlock(&hwMutex);
             break;
         
         case kSBC_GeneralRead:
-            //high rate crashes -tb- pthread_mutex_lock(&hwMutex);
+            pthread_mutex_lock(&hwMutex);
             doGeneralReadOp(aPacket,reply);
-            //high rate crashes -tb- pthread_mutex_unlock(&hwMutex);
+            pthread_mutex_unlock(&hwMutex);
             break;
           
         case kSBC_LoadConfig:
@@ -861,9 +861,9 @@ void* readoutThread (void* p)
             
             
             if(timeToCycle){
-                //high rate crashes -tb- pthread_mutex_lock(&hwMutex);
+                pthread_mutex_lock(&hwMutex);
                 index = readHW(&crate_config,index,0); //nil for the lam data
-                //high rate crashes -tb- pthread_mutex_unlock(&hwMutex);
+                pthread_mutex_unlock(&hwMutex);
                 cycles++;
                 commitData();
             }
