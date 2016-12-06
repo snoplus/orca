@@ -1855,18 +1855,26 @@ void SwapLongBlock(void* p, int32_t n)
     results->fecPresent = ntohl(results->fecPresent);
 
     for (i = 0; i < 16; i++) {
-        results->hwareVals[i].mbID = ntohl(results->hwareVals[i].mbID);
-        results->hwareVals[i].pmticID = ntohl(results->hwareVals[i].pmticID);
+        results->hwareVals[i].mbID = ntohs(results->hwareVals[i].mbID);
+        results->hwareVals[i].pmticID = ntohs(results->hwareVals[i].pmticID);
         for (j = 0; j < 4; j++) {
-            results->hwareVals[i].dbID[j] = ntohl(results->hwareVals[i].dbID[j]);
+            results->hwareVals[i].dbID[j] = ntohs(results->hwareVals[i].dbID[j]);
         }
     }
 
-    [self checkCrateConfig:results];
+    if ([NSThread isMainThread]) {
+        [self checkCrateConfig:results];
+    } else {
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [self checkCrateConfig:results];
+        });
+    }
 
     /* Need to update the buttons on the GUI to disable the reset crate button
      * and enable the load hardware button. */
-    [self updateXl3Mode];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self updateXl3Mode];
+    });
 }
 
 - (void) initCrateAsync: (uint32_t) slotMask withCallback: (SEL) callback target: (id) target
