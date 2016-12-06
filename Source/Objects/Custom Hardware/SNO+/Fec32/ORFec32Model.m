@@ -63,14 +63,13 @@ NSString* ORFecQllEnabledChanged					= @"ORFecQllEnabledChanged";
 NSString* ORFec32ModelAdcVoltageChanged				= @"ORFec32ModelAdcVoltageChanged";
 NSString* ORFec32ModelAdcVoltageStatusChanged		= @"ORFec32ModelAdcVoltageStatusChanged";
 NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageStatusOfCardChanged";
-NSString* ORFec32ModelCardDbChanged                 = @"ORFec32ModelCardDbChanged";
 
 // mask for crates that need updating after Hardware Wizard action
 static unsigned long crateInitMask; // crates that need to be initialized
 static unsigned long cratePedMask;  // crates that need their pedestals set
 
 static int              sDetectorDbState = 0; // (0=not loaded, 1=loading, 2=loaded (or not), 3=stale (or none))
-static NSMutableData*   sDetectorDbData = nil;
+static ORPQDetectorDB*  sDetectorDbData = nil;
 static NSAlert *        sReadingHvdbAlert = nil;
 static int              sChannelsNotChangedCount = 0;
 
@@ -1695,15 +1694,15 @@ static int              sChannelsNotChangedCount = 0;
                        object : nil];
 
     [notifyCenter addObserver : self
-                     selector : @selector(cardDbChanged:)
-                         name : ORFec32ModelCardDbChanged
+                     selector : @selector(detectorStateChanged:)
+                         name : ORPQDetectorStateChanged
                        object : nil];
 }
 
 // sync FEC/DC settings from the specified hardware state
 // (the note object should be a NSMutableData object containing
 //  a full array of PQ_FEC structures in crate/card order)
-- (void) cardDbChanged:(NSNotification*)note
+- (void) detectorStateChanged:(NSNotification*)note
 {
     int32_t valid;
     NSMutableData *cardDb = [note object];
@@ -1830,11 +1829,6 @@ static int              sChannelsNotChangedCount = 0;
 
 - (void) _continueHWWizard
 {
-    if (sDetectorDbState == 2 && sDetectorDbData) {
-        // post notification to sync all FEC/DC settings from the current hardware state of the detector database
-        // (note: don't do this for stale database because in this case the current variables are more up-to-date)
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelCardDbChanged object:sDetectorDbData];
-    }
     // all done loading database, so we can continue with our hwWizard execution now
     if (hwWizard && [hwWizard respondsToSelector:@selector(continueExecuteControlStruct)]) {
         [hwWizard performSelector:@selector(continueExecuteControlStruct)];
@@ -1844,7 +1838,7 @@ static int              sChannelsNotChangedCount = 0;
 }
 
 // continue HWWizard execution after reading detector database
-- (void) _chanDbCallback:(NSMutableData*)data
+- (void) _chanDbCallback:(ORPQDetectorDB*)data
 {
     sDetectorDbState = 2;
     
@@ -1958,7 +1952,7 @@ static int              sChannelsNotChangedCount = 0;
 
     // make sure channels with HV disabled aren't enabled
     // (note: we do this even if the database is stale)
-    PQ_FEC *fec = getFEC(sDetectorDbData, [self crateNumber], [self stationNumber]);
+    PQ_FEC *fec = [sDetectorDbData getFEC:[self stationNumber] crate:[self crateNumber]];
     if (fec) {
         int32_t notChanged = 0;
         // sequencer must be disabled on channels with HV disabled

@@ -27,6 +27,7 @@
 
 @class ORFecDaughterCardModel;
 @class ORCommandList;
+@class ORPQDetectorDB;
 
 #define kISetA1 0
 #define kISetA0	1
@@ -342,7 +343,7 @@ typedef struct Fec32CmosShiftReg{
 - (void) hwWizardActionEnd:(NSNotification*)aNote;
 - (void) hwWizardActionFinal:(NSNotification*)aNote;
 - (void) hwWizardWaitingForDatabase;
-- (void) _chanDbCallback:(NSMutableData*)data;
+- (void) _chanDbCallback:(ORPQDetectorDB*)data;
 - (void) _continueHWWizard:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) _continueHWWizard;
 
@@ -429,8 +430,6 @@ extern NSString* ORFecQllEnabledChanged;
 extern NSString* ORFec32ModelAdcVoltageChanged;
 extern NSString* ORFec32ModelAdcVoltageStatusChanged;
 extern NSString* ORFec32ModelAdcVoltageStatusOfCardChanged;
-
-extern NSString* ORFec32CardDbChangedNotification;
 
 extern NSString* ORFecLock;
 

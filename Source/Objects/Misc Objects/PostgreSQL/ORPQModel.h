@@ -109,23 +109,62 @@ typedef struct {
     int32_t     gtMask;
     int32_t     gtCrateMask;
     int32_t     mtcaRelays[7];
+    int32_t     valid[kMTC_numDbColumns];
 } PQ_MTC;
 
 enum {
-    kCAEN_NumDbColumns,
+    kCAEN_channelConfiguration,
+    kCAEN_bufferOrganization,
+    kCAEN_customSize,
+    kCAEN_acquisitionControl,
+    kCAEN_triggerMask,
+    kCAEN_triggerOutMask,
+    kCAEN_postTrigger,
+    kCAEN_frontPanelIoControl,
+    kCAEN_channelMask,
+    kCAEN_channelDacs,
+    kCAEN_numDbColumns,
 };
 
 typedef struct {
-
+    int32_t     channelConfiguration;
+    int32_t     bufferOrganization;
+    int32_t     customSize;
+    int32_t     acquisitionControl;
+    int32_t     triggerMask;
+    int32_t     triggerOutMask;
+    int32_t     postTrigger;
+    int32_t     frontPanelIoControl;
+    int32_t     channelMask;
+    int32_t     channelDacs[8];
+    int32_t     valid[kCAEN_numDbColumns];
 } PQ_CAEN;
+
+//----------------------------------------------------------------------------------------------------
+@interface ORPQDetectorDB : NSMutableData
+{
+@private
+    NSMutableData * data;
+@public
+    bool        fecLoaded;
+    bool        pmthvLoaded;
+    bool        mtcLoaded;
+    bool        caenLoaded;
+}
+
+- (id)          init;
+- (void)        dealloc;
+- (PQ_FEC *)    getFEC:(int)aCard crate:(int)aCrate;
+- (PQ_MTC *)    getMTC;
+- (PQ_CAEN *)   getCAEN;
+
+@end
+//----------------------------------------------------------------------------------------------------
 
 @class ORPQConnection;
 @class ORPQModel;
+@class ORPQResult;
 @class NSMutableData;
-
-PQ_FEC *getFEC(NSMutableData *data, int crate, int card);
-PQ_MTC *getMTC(NSMutableData *data);
-PQ_CAEN *getCAEN(NSMutableData *data);
 
 @interface ORPQModel : OrcaObject
 {
@@ -176,8 +215,7 @@ PQ_CAEN *getCAEN(NSMutableData *data);
 /**
  @brief Get SNO+ detector database
  @param anObject Callback object
- @param aSelector Callback object selector (called with an NSMutableData object
- containing an PQ_FEC, PQ_MTC and PQ_CAEN structures, or nil on error)
+ @param aSelector Callback object selector (called with an ORPQDetectorDB object, or nil on error)
  */
 - (void) detectorDbQuery:(id)anObject selector:(SEL)aSelector;
 
@@ -212,7 +250,9 @@ extern NSString* ORPQPasswordChanged;
 extern NSString* ORPQUserNameChanged;
 extern NSString* ORPQHostNameChanged;
 extern NSString* ORPQConnectionValidChanged;
+extern NSString* ORPQDetectorStateChanged;
 extern NSString* ORPQLock;
+
 
 @interface ORPQOperation : NSOperation
 {
@@ -245,6 +285,8 @@ enum ePQCommandType {
 }
 - (void) setCommand:(NSString*)aCommand;
 - (void) setCommandType:(int)aCommandType;
+- (ORPQDetectorDB *) loadDetectorDB:(ORPQConnection*)pqConnection;
+- (void) _detectorDbCallback:(NSMutableData*)data;
 - (void) cancel;
 - (void) main;
 @end
