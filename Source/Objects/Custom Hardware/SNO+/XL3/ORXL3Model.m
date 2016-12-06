@@ -1009,7 +1009,6 @@ snotDb = _snotDb;
 
 - (void) setHvNominalVoltageA:(unsigned long)hvNominalVoltageA
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setHvNominalVoltageA:[self hvNominalVoltageA]];
     _hvNominalVoltageA = hvNominalVoltageA;
     dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHVNominalVoltageChanged object:self];
@@ -1023,7 +1022,6 @@ snotDb = _snotDb;
 
 - (void) setHvNominalVoltageB:(unsigned long)hvNominalVoltageB
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setHvNominalVoltageB:[self hvNominalVoltageB]];
     _hvNominalVoltageB = hvNominalVoltageB;
     dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHVNominalVoltageChanged object:self];
