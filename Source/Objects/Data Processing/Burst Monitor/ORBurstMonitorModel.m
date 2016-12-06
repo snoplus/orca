@@ -687,7 +687,7 @@ double facto(unsigned long long num)
                                                 int n;
                                                 for(n=1; n<[Nadcs count]; n++)
                                                 {
-                                                    if([[Nadcs objectAtIndex:n] intValue]>400 && [[Nadcs objectAtIndex:n] intValue]<900)
+                                                    if([[Nadcs objectAtIndex:n] intValue]>380 && [[Nadcs objectAtIndex:n] intValue]<900)
                                                     {
                                                         lowN = lowN + 1;
                                                     }
@@ -1384,7 +1384,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
             level = 1;
             NSLog(@"Level reduced to 1 (possible)\n");
         }
-        NSInteger signif = (multInBurst-0.74)*0.850; //cbmod current background and best (round) fit with likelyhood as of oct 8 2015 with logaritmic rounding
+        NSInteger signif = (multInBurst*0.5)+3; //cbmod current background and best (round) fit with likelyhood as of dec 2016 with logaritmic rounding
         burstcommand = [burstcommand stringByAppendingFormat:@"cd snews/coinccode/ ; ./ctestgcli %i %i 0 %i %i 9", dateint, timeint, level, signif];  //maybe add nanoseconds? 9 is halo
         NSLog(@"burstcommand witha a space on each side: | %@ |\n", burstcommand);
         NSTask* Cping;
