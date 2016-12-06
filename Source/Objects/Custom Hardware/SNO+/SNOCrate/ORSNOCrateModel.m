@@ -341,7 +341,7 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
      * and dacs, tries to load the Xilinx for all the FEC slots, loads default
      * values for the FEC dacs, shift registers, and sequencer. */
     NSLog(@"Resetting crate %d\n", [self crateNumber]);
-	[[self adapter] resetCrate];
+	[[self adapter] resetCrateAsync];
 }
 
 - (void) initCrateDone
