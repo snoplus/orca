@@ -309,7 +309,6 @@
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 @end
 
-extern NSString* ORSNOPModelViewTypeChanged;
 extern NSString* ORSNOPModelOrcaDBIPAddressChanged;
 extern NSString* ORSNOPModelDebugDBIPAddressChanged;
 extern NSString* ORSNOPRunTypeWordChangedNotification;

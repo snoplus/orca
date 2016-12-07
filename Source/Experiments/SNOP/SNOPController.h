@@ -19,17 +19,15 @@
 //-------------------------------------------------------------
 
 #import "ORExperimentController.h"
-#import "SNOPDetectorView.h"
 #import "StopLightView.h"
 #import "RunStatusIcon.h"
 #include <stdint.h>
+#import <WebKit/WebKit.h>
 
 @class ORColorScale;
 @class ORSegmentGroup;
 
 @interface SNOPController : ORExperimentController {
-	IBOutlet NSTextField* detectorTitle;
-	IBOutlet NSPopUpButton*	viewTypePU;
     IBOutlet NSView *snopView;
     
     NSView *blankView;
@@ -137,6 +135,9 @@
     uint32_t hvMask;
 
     RunStatusIcon* doggy_icon;
+
+    // Detector State
+    IBOutlet WebView* detectorState;
 }
 
 @property (nonatomic,retain) NSMutableDictionary *smellieRunFileList;
@@ -165,7 +166,6 @@
 - (void) updateSettings: (NSNotification *) aNote;
 
 #pragma mark ¥¥¥Actions
-- (IBAction) viewTypeAction:(id)sender;
 
 - (IBAction) orcaDBIPAddressAction:(id)sender;
 - (IBAction) orcaDBClearHistoryAction:(id)sender;
@@ -195,8 +195,6 @@
 - (IBAction)updatexl3Mode:(id)sender;
 
 #pragma mark ¥¥¥Details Interface Management
-- (void) setDetectorTitle;
-- (void) viewTypeChanged:(NSNotification*)aNote;
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem;
 -(void) windowDidLoad;
 
@@ -205,11 +203,6 @@
 //Run type
 - (IBAction) refreshRunWordLabels:(id)sender;
 - (IBAction) runTypeWordAction:(id)sender;
-@end
-
-
-@interface ORDetectorView (SNO)
-- (void) setViewType:(int)aState;
 @end
 
 extern NSString* ORSNOPRequestHVStatus;
