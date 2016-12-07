@@ -43,6 +43,16 @@
 		0FB2022F1CDFCF4E0083F552 /* TUBiiController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0FB202291CDFCF4E0083F552 /* TUBiiController.m */; };
 		0FB202301CDFCF4E0083F552 /* TUBiiModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 0FB2022A1CDFCF4E0083F552 /* TUBiiModel.h */; };
 		0FB202311CDFCF4E0083F552 /* TUBiiModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0FB2022B1CDFCF4E0083F552 /* TUBiiModel.m */; };
+		0FF177B61DF7A09900BA783B /* RunStatusIcon.h in Headers */ = {isa = PBXBuildFile; fileRef = 0FF177B41DF7A09900BA783B /* RunStatusIcon.h */; settings = {ASSET_TAGS = (); }; };
+		0FF177B71DF7A09900BA783B /* RunStatusIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 0FF177B51DF7A09900BA783B /* RunStatusIcon.m */; settings = {ASSET_TAGS = (); }; };
+		0FF177C31DF7AEA000BA783B /* run_dog_frame_0.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 0FF177BC1DF7AEA000BA783B /* run_dog_frame_0.tiff */; settings = {ASSET_TAGS = (); }; };
+		0FF177C41DF7AEA000BA783B /* run_dog_frame_1.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 0FF177BD1DF7AEA000BA783B /* run_dog_frame_1.tiff */; settings = {ASSET_TAGS = (); }; };
+		0FF177C51DF7AEA000BA783B /* run_dog_frame_2.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 0FF177BE1DF7AEA000BA783B /* run_dog_frame_2.tiff */; settings = {ASSET_TAGS = (); }; };
+		0FF177C61DF7AEA000BA783B /* run_dog_frame_3.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 0FF177BF1DF7AEA000BA783B /* run_dog_frame_3.tiff */; settings = {ASSET_TAGS = (); }; };
+		0FF177C71DF7AEA000BA783B /* run_dog_frame_4.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 0FF177C01DF7AEA000BA783B /* run_dog_frame_4.tiff */; settings = {ASSET_TAGS = (); }; };
+		0FF177C81DF7AEA000BA783B /* run_dog_frame_5.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 0FF177C11DF7AEA000BA783B /* run_dog_frame_5.tiff */; settings = {ASSET_TAGS = (); }; };
+		0FF177C91DF7AEA000BA783B /* run_dog_frame_6.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 0FF177C21DF7AEA000BA783B /* run_dog_frame_6.tiff */; settings = {ASSET_TAGS = (); }; };
+		0FF177CB1DF7AF2F00BA783B /* waiting_dog.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 0FF177CA1DF7AF2F00BA783B /* waiting_dog.tiff */; settings = {ASSET_TAGS = (); }; };
 		146822430FC4799C0082BD70 /* ORCircularBufferUV.h in Headers */ = {isa = PBXBuildFile; fileRef = 146822410FC4799C0082BD70 /* ORCircularBufferUV.h */; };
 		146822440FC4799C0082BD70 /* ORCircularBufferUV.m in Sources */ = {isa = PBXBuildFile; fileRef = 146822420FC4799C0082BD70 /* ORCircularBufferUV.m */; };
 		1C50F9F108033CA9008D18EA /* ADC2249.nib in Resources */ = {isa = PBXBuildFile; fileRef = 1C50F9E608033CA9008D18EA /* ADC2249.nib */; };
@@ -3794,6 +3804,16 @@
 		0FB202291CDFCF4E0083F552 /* TUBiiController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TUBiiController.m; sourceTree = "<group>"; };
 		0FB2022A1CDFCF4E0083F552 /* TUBiiModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TUBiiModel.h; sourceTree = "<group>"; };
 		0FB2022B1CDFCF4E0083F552 /* TUBiiModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TUBiiModel.m; sourceTree = "<group>"; };
+		0FF177B41DF7A09900BA783B /* RunStatusIcon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RunStatusIcon.h; sourceTree = "<group>"; };
+		0FF177B51DF7A09900BA783B /* RunStatusIcon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RunStatusIcon.m; sourceTree = "<group>"; };
+		0FF177BC1DF7AEA000BA783B /* run_dog_frame_0.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = run_dog_frame_0.tiff; sourceTree = "<group>"; };
+		0FF177BD1DF7AEA000BA783B /* run_dog_frame_1.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = run_dog_frame_1.tiff; sourceTree = "<group>"; };
+		0FF177BE1DF7AEA000BA783B /* run_dog_frame_2.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = run_dog_frame_2.tiff; sourceTree = "<group>"; };
+		0FF177BF1DF7AEA000BA783B /* run_dog_frame_3.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = run_dog_frame_3.tiff; sourceTree = "<group>"; };
+		0FF177C01DF7AEA000BA783B /* run_dog_frame_4.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = run_dog_frame_4.tiff; sourceTree = "<group>"; };
+		0FF177C11DF7AEA000BA783B /* run_dog_frame_5.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = run_dog_frame_5.tiff; sourceTree = "<group>"; };
+		0FF177C21DF7AEA000BA783B /* run_dog_frame_6.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = run_dog_frame_6.tiff; sourceTree = "<group>"; };
+		0FF177CA1DF7AF2F00BA783B /* waiting_dog.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = waiting_dog.tiff; sourceTree = "<group>"; };
 		146822410FC4799C0082BD70 /* ORCircularBufferUV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCircularBufferUV.h; path = Source/Objects/Hardware/HV/UnivVoltHV/ORCircularBufferUV.h; sourceTree = SOURCE_ROOT; };
 		146822420FC4799C0082BD70 /* ORCircularBufferUV.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCircularBufferUV.m; path = Source/Objects/Hardware/HV/UnivVoltHV/ORCircularBufferUV.m; sourceTree = SOURCE_ROOT; };
 		1C50F9E608033CA9008D18EA /* ADC2249.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = ADC2249.nib; sourceTree = "<group>"; };
@@ -7218,6 +7238,21 @@
 				0FB2022B1CDFCF4E0083F552 /* TUBiiModel.m */,
 			);
 			path = TUBii;
+			sourceTree = "<group>";
+		};
+		0FF177A51DF79F5600BA783B /* run_dog_images */ = {
+			isa = PBXGroup;
+			children = (
+				0FF177BC1DF7AEA000BA783B /* run_dog_frame_0.tiff */,
+				0FF177BD1DF7AEA000BA783B /* run_dog_frame_1.tiff */,
+				0FF177BE1DF7AEA000BA783B /* run_dog_frame_2.tiff */,
+				0FF177BF1DF7AEA000BA783B /* run_dog_frame_3.tiff */,
+				0FF177C01DF7AEA000BA783B /* run_dog_frame_4.tiff */,
+				0FF177C11DF7AEA000BA783B /* run_dog_frame_5.tiff */,
+				0FF177CA1DF7AF2F00BA783B /* waiting_dog.tiff */,
+				0FF177C21DF7AEA000BA783B /* run_dog_frame_6.tiff */,
+			);
+			path = run_dog_images;
 			sourceTree = "<group>";
 		};
 		1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */ = {
@@ -14323,12 +14358,15 @@
 			children = (
 				6B325E071B2F4241002E2DD7 /* SNOP.xib */,
 				EFB39FC6130BA1C5001220AC /* SNOP.gif */,
+				0FF177B41DF7A09900BA783B /* RunStatusIcon.h */,
+				0FF177B51DF7A09900BA783B /* RunStatusIcon.m */,
 				EFB39FC8130BA1C5001220AC /* SNOPController.h */,
 				EFB39FC9130BA1C5001220AC /* SNOPController.m */,
 				EFB39FCA130BA1C5001220AC /* SNOPDetectorView.h */,
 				EFB39FCB130BA1C5001220AC /* SNOPDetectorView.m */,
 				EFB39FCC130BA1C5001220AC /* SNOPModel.h */,
 				EFB39FCD130BA1C5001220AC /* SNOPModel.m */,
+				0FF177A51DF79F5600BA783B /* run_dog_images */,
 			);
 			path = SNOP;
 			sourceTree = "<group>";
@@ -15677,6 +15715,7 @@
 				84BF43D2118793FA00F55216 /* ORCaen1785Model.h in Headers */,
 				84BF445F1187ACEE00F55216 /* ORCAEN1785Readout.hh in Headers */,
 				849F0A9318D0973B00FF3F36 /* ORDT5720Model.h in Headers */,
+				0FF177B61DF7A09900BA783B /* RunStatusIcon.h in Headers */,
 				84762012118CD53D00016A8D /* OR1dFit.h in Headers */,
 				362020251CBD390A0089296E /* WPXMLRPCDataCleaner.h in Headers */,
 				84762014118CD53D00016A8D /* OR1dFitController.h in Headers */,
@@ -16172,6 +16211,7 @@
 				8434A263055B3287002D3102 /* AlarmWindow.nib in Resources */,
 				8434A264055B3287002D3102 /* FanOut.nib in Resources */,
 				8434A265055B3287002D3102 /* IP408.gif in Resources */,
+				0FF177CB1DF7AF2F00BA783B /* waiting_dog.tiff in Resources */,
 				8434A266055B3287002D3102 /* IP408.nib in Resources */,
 				8434A267055B3287002D3102 /* IPCarrier.gif in Resources */,
 				8434A268055B3287002D3102 /* IPCarrier.nib in Resources */,
@@ -16277,6 +16317,7 @@
 				847946CE07330E5300C5E1FA /* PciBit3.nib in Resources */,
 				847946CF07330E5300C5E1FA /* PciBit3Card.gif in Resources */,
 				8402797007397B8700972B07 /* Bit3.nib in Resources */,
+				0FF177C51DF7AEA000BA783B /* run_dog_frame_2.tiff in Resources */,
 				8402797107397B8700972B07 /* Bit3Card.gif in Resources */,
 				849F4C740768DA920087E9A8 /* DataExplorer.gif in Resources */,
 				849F4C750768DA930087E9A8 /* DataExplorer.nib in Resources */,
@@ -16397,6 +16438,7 @@
 				840E001D0944B29000049827 /* SPDTRelayOff.tif in Resources */,
 				840E001E0944B29000049827 /* SPDTRelayOn.tif in Resources */,
 				840E00230944B29000049827 /* SPSTRelay.nib in Resources */,
+				0FF177C91DF7AEA000BA783B /* run_dog_frame_6.tiff in Resources */,
 				84AC14DF1B70E2460071C4EF /* MjdDataScanner.nib in Resources */,
 				840E00270944B29000049827 /* AndGate.tif in Resources */,
 				840E002F0944B29000049827 /* ORGate.tif in Resources */,
@@ -16408,6 +16450,7 @@
 				840E00440944B29000049827 /* OutputRelay.nib in Resources */,
 				840E00450944B29000049827 /* OutputRelayOff.tif in Resources */,
 				840E00460944B29000049827 /* OutputRelayOn.tif in Resources */,
+				0FF177C81DF7AEA000BA783B /* run_dog_frame_5.tiff in Resources */,
 				840E004B0944B29000049827 /* ProcessPulser.nib in Resources */,
 				840E004C0944B29000049827 /* ProcessPulser.tif in Resources */,
 				84B488C90944B9E000DFC618 /* SPSTRelayOff.tif in Resources */,
@@ -16465,6 +16508,7 @@
 				8472AD6E0A82BD8E0069A069 /* BiRa3251O.nib in Resources */,
 				8472AD6F0A82BD8F0069A069 /* BiRa3251OCard.gif in Resources */,
 				6B325E0E1B2F4306002E2DD7 /* XL1.xib in Resources */,
+				0FF177C71DF7AEA000BA783B /* run_dog_frame_4.tiff in Resources */,
 				842DAEBB0A82CA8400C942A2 /* BiRa2351I.nib in Resources */,
 				6B325E121B2F4334002E2DD7 /* MTC.xib in Resources */,
 				842DAEBC0A82CA8400C942A2 /* BiRa2351ICard.gif in Resources */,
@@ -16660,6 +16704,7 @@
 				84B28D9E0F4C684200E2B056 /* Motor.nib in Resources */,
 				84B28D9F0F4C684200E2B056 /* Motor.tif in Resources */,
 				84B28DA00F4C684200E2B056 /* MotorBreakpointHelp.plist in Resources */,
+				0FF177C61DF7AEA000BA783B /* run_dog_frame_3.tiff in Resources */,
 				84B28DE10F4C6FED00E2B056 /* dash.tif in Resources */,
 				84B28DE20F4C6FED00E2B056 /* eye.tif in Resources */,
 				84B28DED0F4C6FED00E2B056 /* Ramp.tif in Resources */,
@@ -16829,6 +16874,7 @@
 				840795DE11DA562300A91442 /* edu.washington.npl.orca.Katrin.plist in Resources */,
 				84E9C357194F42140028B7E2 /* PacFP.nib in Resources */,
 				840795EF11DA59AB00A91442 /* edu.washington.npl.orca.Prespectrometer.plist in Resources */,
+				0FF177C41DF7AEA000BA783B /* run_dog_frame_1.tiff in Resources */,
 				EF7722B711E813120064A1CF /* XL3Card.gif in Resources */,
 				84B11665121ED85100BC8464 /* noHeartbeat.png in Resources */,
 				84065D9C1226B600004E8970 /* Pxi8336Mac.nib in Resources */,
@@ -17054,6 +17100,7 @@
 				2D7731A2181188F400070A4A /* LanNetio230.nib in Resources */,
 				2D7731A3181188F400070A4A /* LanNetio230.tif in Resources */,
 				2D7731A4181188F400070A4A /* LanNetio230Big.tif in Resources */,
+				0FF177C31DF7AEA000BA783B /* run_dog_frame_0.tiff in Resources */,
 				844CBDCF1866010F0012AA3B /* RaidMonitor.gif in Resources */,
 				844CBDD01866010F0012AA3B /* RaidMonitor.nib in Resources */,
 				844CBDD11866010F0012AA3B /* scpExpectGetScript in Resources */,
@@ -17895,6 +17942,7 @@
 				843175D51152766E005643AB /* HaloModel.m in Sources */,
 				840DEA26115D7981006AF231 /* ORWindowSaveSet.m in Sources */,
 				84B754601160E01C00667631 /* ORCC4189Controller.m in Sources */,
+				0FF177B71DF7A09900BA783B /* RunStatusIcon.m in Sources */,
 				84B754621160E01C00667631 /* ORCC4189Decoders.m in Sources */,
 				84B754641160E01C00667631 /* ORCC4189Model.m in Sources */,
 				84F50A2F116B7151000275F2 /* ORCmdLabelController.m in Sources */,

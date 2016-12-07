@@ -55,7 +55,7 @@ snopGreenColor;
     self = [super initWithWindowNibName:@"SNOP"];
 
     hvMask = 0;
-
+    doggy_icon = [[RunStatusIcon alloc] init];
     return self;
 }
 - (void) dealloc
@@ -66,6 +66,7 @@ snopGreenColor;
     [snopGreenColor release];
     [snopOrangeColor release];
     [snopRedColor release];
+    [doggy_icon release];
     
     [super dealloc];
 }
@@ -218,6 +219,9 @@ snopGreenColor;
     [self findRunControl:nil];
     [runControl getCurrentRunNumber]; //this should be done by the base clase... but it is not
     //Sync SR with MTC
+
+    [doggy_icon start_animation];
+
     [self mtcDataBaseChanged:nil];
     //Update runtype word
     [self runTypeWordChanged:nil];
@@ -228,6 +232,10 @@ snopGreenColor;
     }
     else{
         [self refreshStandardRunsAction:nil];
+    }
+    if(!doggy_icon)
+    {
+        doggy_icon = [[RunStatusIcon alloc] init];
     }
     //Pull the information from the SMELLIE DB
     [model getSmellieRunListInfo];
@@ -468,11 +476,13 @@ snopGreenColor;
         [startRunButton setTitle:@"RESTART"];
         [lightBoardView setState:kGoLight];
         [runStatusField setStringValue:@"Running"];
+        [doggy_icon start_animation];
 	}
 	else if([runControl runningState] == eRunStopped){
         [startRunButton setTitle:@"START"];
         [lightBoardView setState:kStoppedLight];
         [runStatusField setStringValue:@"Stopped"];
+        [doggy_icon stop_animation];
 	}
 	else if([runControl runningState] == eRunStarting || [runControl runningState] == eRunStopping || [runControl runningState] == eRunBetweenSubRuns){
         if([runControl runningState] == eRunStarting){
