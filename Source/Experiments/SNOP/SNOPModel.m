@@ -2003,7 +2003,7 @@ err:
 
 }
 
--(void) loadHighThresholdRun
+-(void) loadHighThresholds
 {
 
     //Get RC model

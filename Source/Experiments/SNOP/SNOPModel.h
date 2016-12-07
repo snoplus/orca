@@ -293,7 +293,7 @@
 -(BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
 -(BOOL) saveStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
 -(void) loadSettingsInHW;
--(void) loadHighThresholdRun;
+-(void) loadHighThresholds;
 
 @end
 
