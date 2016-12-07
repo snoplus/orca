@@ -25,6 +25,7 @@
 
 @interface ORDataSet : OrcaObject {
     NSMutableDictionary*    globalWatchers;
+    NSMutableDictionary*    decodedOnceDictionary;
     NSMutableDictionary*    watchingDictionary;
     NSMutableDictionary*    realDictionary;
     NSArray*                sortedArray;

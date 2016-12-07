@@ -47,6 +47,7 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 {
     self = [super init];
     if (self != nil) {
+        globalWatchers = nil;
         realDictionary = [[NSMutableDictionary alloc] initWithCapacity: 32];
         [self setKey:aKey];
         [self setGuardian:aGuardian]; //we don't retain the guardian, so just set it here.
@@ -86,6 +87,7 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 		sortedArray = nil;
         [watchingDictionary release];
         [globalWatchers release];
+        [decodedOnceDictionary release];
 	}
     [super dealloc];
 }
@@ -141,7 +143,15 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 }
 - (BOOL) isSomeoneLooking:(NSString*)aDataSetKey
 {
-    return [globalWatchers count] || [watchingDictionary objectForKey:aDataSetKey]!=nil;
+    if(!decodedOnceDictionary){
+        decodedOnceDictionary = [[NSMutableDictionary dictionary]retain];
+    }
+    BOOL decodedAtLeastOnce = YES;
+    if(![decodedOnceDictionary objectForKey:aDataSetKey]){
+        [decodedOnceDictionary setObject:[NSNull null] forKey:aDataSetKey];
+        decodedAtLeastOnce = NO;
+    }
+    return !decodedAtLeastOnce || [globalWatchers count] || [watchingDictionary objectForKey:aDataSetKey]!=nil;
 }
 
 - (id) findObjectWithFullID:(NSString*)aFullID;
