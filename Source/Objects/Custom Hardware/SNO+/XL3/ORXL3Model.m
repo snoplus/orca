@@ -4874,6 +4874,8 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
     MultiSetCratePedsResults *results;
     int i;
 
+    memset(&payload, 0, XL3_PAYLOAD_SIZE);
+
     args = (MultiSetCratePedsArgs *) payload;
 
     NSAutoreleasePool* pedPool = [[NSAutoreleasePool alloc] init];
@@ -4885,6 +4887,8 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
 
     NSArray* fecs = [[self guardian]
         collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
+
+    args->slotMask = 0;
 
     for (id aFec in fecs) {
         args->slotMask |= 1 << [aFec stationNumber];
@@ -4918,4 +4922,3 @@ err:
 }
 
 @end
-
