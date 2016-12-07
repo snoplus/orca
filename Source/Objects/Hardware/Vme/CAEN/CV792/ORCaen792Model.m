@@ -20,7 +20,7 @@
 #import "ORRateGroup.h"
 
 #define k792DefaultBaseAddress 		0xa00000
-#define k792DefaultAddressModifier 	0x9
+#define k792DefaultAddressModifier 	0x39 //changed from 0x9 12/7/16 MAH. 0x09 works at MJD, but not at UNC or NCS.?!??
 
 
 // Define all the registers available to this unit.
@@ -432,6 +432,11 @@ NSString* ORCaen792ModelShipTimeStampChanged          = @"ORCaen792ModelShipTime
 - (short) getThresholdIndex
 {
     return(kThresholds);
+}
+
+- (unsigned long) getThresholdOffset
+{
+    return reg[kThresholds].addressOffset;
 }
 
 - (short) getOutputBufferIndex
