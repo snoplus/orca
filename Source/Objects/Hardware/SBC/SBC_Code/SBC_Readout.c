@@ -78,7 +78,13 @@ pthread_attr_t readoutThreadAttr;
 pthread_mutex_t runInfoMutex;
 pthread_mutex_t lamInfoMutex;
 pthread_mutex_t jobInfoMutex;
-//high rate crashes -tb-pthread_mutex_t hwMutex;
+
+//the following hw mutex can be turned on in the hardware specific make file
+//it is not used by default
+#if NeedHwMutex
+pthread_mutex_t hwMutex;
+#endif
+
 int32_t  workingSocket;
 int32_t  workingIRQSocket;
 char needToSwap;
@@ -207,8 +213,9 @@ int32_t main(int32_t argc, char *argv[])
         memset(&lam_info ,0,sizeof(SBC_LAM_info_struct)*kMaxNumberLams);
         pthread_mutex_unlock (&lamInfoMutex);//end critical section
 
+#if NeedHwMutex
         pthread_mutex_init(&hwMutex, NULL);
-
+#endif
         /*-------------------------------*/
 
         data = (int32_t*)malloc(kMaxDataBufferSizeLongs*sizeof(int32_t));
@@ -255,7 +262,9 @@ int32_t main(int32_t argc, char *argv[])
 
         /* Take care of pthread variables. */
         pthread_mutex_destroy(&runInfoMutex);
+#if NeedHwMutex
         pthread_mutex_destroy(&hwMutex);
+#endif
         pthread_attr_destroy(&readoutThreadAttr);
         pthread_mutex_destroy(&jobInfoMutex);
         pthread_attr_destroy(&sbc_job.jobThreadAttr);
@@ -285,9 +294,15 @@ void processBuffer(SBC_Packet* aPacket, uint8_t reply)
             processSBCCommand(aPacket,reply);
             break;
         default:
+#if NeedHwMutex
             pthread_mutex_lock(&hwMutex); //added this missing lock MAH 10/26
+#endif
+
             processHWCommand(aPacket);
+            
+#if NeedHwMutex
             pthread_mutex_unlock(&hwMutex);
+#endif
             break;
     }
 }
@@ -296,27 +311,43 @@ void processSBCCommand(SBC_Packet* aPacket,uint8_t reply)
 {
     switch(aPacket->cmdHeader.cmdID){
         case kSBC_WriteBlock:        
-            pthread_mutex_lock(&hwMutex);
+#if NeedHwMutex
+           pthread_mutex_lock(&hwMutex);
+#endif
             doWriteBlock(aPacket,reply);
+#if NeedHwMutex
             pthread_mutex_unlock(&hwMutex);
+#endif
             break;
         
         case kSBC_ReadBlock:
-            pthread_mutex_lock(&hwMutex);
+#if NeedHwMutex
+           pthread_mutex_lock(&hwMutex);
+#endif
             doReadBlock(aPacket,reply);
+#if NeedHwMutex
             pthread_mutex_unlock(&hwMutex);
+#endif
             break;
 		
 		case kSBC_GeneralWrite:        
+#if NeedHwMutex
             pthread_mutex_lock(&hwMutex);
+#endif
             doGeneralWriteOp(aPacket,reply);
+#if NeedHwMutex
             pthread_mutex_unlock(&hwMutex);
+#endif
             break;
         
         case kSBC_GeneralRead:
+#if NeedHwMutex
             pthread_mutex_lock(&hwMutex);
+#endif
             doGeneralReadOp(aPacket,reply);
+#if NeedHwMutex
             pthread_mutex_unlock(&hwMutex);
+#endif
             break;
           
         case kSBC_LoadConfig:
@@ -861,9 +892,13 @@ void* readoutThread (void* p)
             
             
             if(timeToCycle){
+#if NeedHwMutex
                 pthread_mutex_lock(&hwMutex);
+#endif
                 index = readHW(&crate_config,index,0); //nil for the lam data
+#if NeedHwMutex
                 pthread_mutex_unlock(&hwMutex);
+#endif
                 cycles++;
                 commitData();
             }
