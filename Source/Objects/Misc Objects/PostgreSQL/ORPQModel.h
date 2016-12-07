@@ -55,6 +55,9 @@ enum {
     kFEC_numDbColumns
 };
 
+#define kNumFecTdisc    8
+#define kNumFecIset     2
+
 typedef struct {
     int32_t         hvDisabled;   // resistor pulled or no cable
     int32_t         nhit100enabled;
@@ -69,14 +72,14 @@ typedef struct {
     unsigned char   vthr[kSnoChannelsPerCard];
     int32_t         pedEnabled;
     int32_t         seqDisabled;
-    unsigned char   tdiscRp1[8];
-    unsigned char   tdiscRp2[8];
-    unsigned char   tdiscVsi[8];
-    unsigned char   tdiscVli[8];
+    unsigned char   tdiscRp1[kNumFecTdisc];
+    unsigned char   tdiscRp2[kNumFecTdisc];
+    unsigned char   tdiscVsi[kNumFecTdisc];
+    unsigned char   tdiscVli[kNumFecTdisc];
     int32_t         tcmosVmax;
     int32_t         tcmosTacref;
-    int32_t         tcmosIsetm[2];
-    int32_t         tcmosIseta[2];
+    int32_t         tcmosIsetm[kNumFecIset];
+    int32_t         tcmosIseta[kNumFecIset];
     int32_t         vres;
     int32_t         hvref;
     int32_t         valid[kFEC_numDbColumns];   // bitmasks for settings loaded from hardware (see enum above)
@@ -97,9 +100,12 @@ enum {
     kMTC_numDbColumns,
 };
 
+#define kNumMtcDacs     14
+#define kNumMtcRelays   7
+
 typedef struct {
     int32_t     controlReg;
-    int32_t     mtcaDacs[14];
+    int32_t     mtcaDacs[kNumMtcDacs];
     int32_t     pedWidth;
     int32_t     coarseDelay;
     int32_t     fineDelay;
@@ -108,9 +114,37 @@ typedef struct {
     int32_t     lockoutWidth;
     int32_t     gtMask;
     int32_t     gtCrateMask;
-    int32_t     mtcaRelays[7];
+    int32_t     mtcaRelays[kNumMtcRelays];
     int32_t     valid[kMTC_numDbColumns];
 } PQ_MTC;
+
+enum {
+    kCrate_exists,
+    kCrate_ctcDelay,
+    kCrate_hvRelayMask1,
+    kCrate_hvRelayMask2,
+    kCrate_hvAOn,
+    kCrate_hvBOn,
+    kCrate_hvDacA,
+    kCrate_hvDacB,
+    kCrate_xl3ReadoutMask,
+    kCrate_xl3Mode,
+    kCrate_numDbColumns,
+};
+
+typedef struct {
+    int32_t     exists;
+    int32_t     ctcDelay;
+    int32_t     hvRelayMask1;
+    int32_t     hvRelayMask2;
+    int32_t     hvAOn;
+    int32_t     hvBOn;
+    int32_t     hvDacA;
+    int32_t     hvDacB;
+    int32_t     xl3ReadoutMask;
+    int32_t     xl3Mode;
+    int32_t     valid[kCrate_numDbColumns];
+} PQ_Crate;
 
 enum {
     kCAEN_channelConfiguration,
@@ -126,6 +160,8 @@ enum {
     kCAEN_numDbColumns,
 };
 
+#define kNumCaenChannelDacs 8
+
 typedef struct {
     int32_t     channelConfiguration;
     int32_t     bufferOrganization;
@@ -136,7 +172,7 @@ typedef struct {
     int32_t     postTrigger;
     int32_t     frontPanelIoControl;
     int32_t     channelMask;
-    int32_t     channelDacs[8];
+    int32_t     channelDacs[kNumCaenChannelDacs];
     int32_t     valid[kCAEN_numDbColumns];
 } PQ_CAEN;
 
@@ -146,8 +182,9 @@ typedef struct {
 @private
     NSMutableData * data;
 @public
-    bool        fecLoaded;
     bool        pmthvLoaded;
+    bool        fecLoaded;
+    bool        crateLoaded;
     bool        mtcLoaded;
     bool        caenLoaded;
 }
@@ -155,6 +192,7 @@ typedef struct {
 - (id)          init;
 - (void)        dealloc;
 - (PQ_FEC *)    getFEC:(int)aCard crate:(int)aCrate;
+- (PQ_Crate *)  getCrate:(int)aCrate;
 - (PQ_MTC *)    getMTC;
 - (PQ_CAEN *)   getCAEN;
 

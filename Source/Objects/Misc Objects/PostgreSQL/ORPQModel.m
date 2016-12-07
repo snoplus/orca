@@ -451,26 +451,32 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
 - (void) dealloc
 {
     [data release];
-    pmthvLoaded = fecLoaded = mtcLoaded = caenLoaded = NO;
+    pmthvLoaded = fecLoaded = crateLoaded = mtcLoaded = caenLoaded = NO;
     [super dealloc];
 }
 
 - (PQ_FEC *) getFEC:(int)aCard crate:(int)aCrate
 {
-    if (!fecLoaded || aCrate >= kSnoCrates || aCard >= kSnoCardsPerCrate) return nil;
+    if (!(pmthvLoaded || fecLoaded) || aCrate >= kSnoCrates || aCard >= kSnoCardsPerCrate) return nil;
     return (PQ_FEC *)[data mutableBytes] + aCrate * kSnoCardsPerCrate + aCard;
+}
+
+- (PQ_Crate *) getCrate:(int)aCrate
+{
+    if (!crateLoaded || aCrate >= kSnoCrates) return nil;
+    return (PQ_Crate *)((PQ_FEC *)[data mutableBytes] + kSnoCardsTotal) + aCrate;
 }
 
 - (PQ_MTC *) getMTC
 {
     if (!mtcLoaded) return nil;
-    return (PQ_MTC *)((PQ_FEC *)[data mutableBytes] + kSnoCardsTotal);
+    return (PQ_MTC *)((PQ_Crate *)((PQ_FEC *)[data mutableBytes] + kSnoCardsTotal) + kSnoCrates);
 }
 
 - (PQ_CAEN *) getCAEN
 {
     if (!caenLoaded) return nil;
-    return (PQ_CAEN *)((PQ_MTC *)((PQ_FEC *)[data mutableBytes] + kSnoCardsTotal) + 1);
+    return (PQ_CAEN *)((PQ_MTC *)((PQ_Crate *)((PQ_FEC *)[data mutableBytes] + kSnoCardsTotal) + kSnoCrates) + 1);
 }
 
 @end
@@ -495,14 +501,21 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
 
 - (void) _detectorDbCallback:(ORPQDetectorDB *)detDB
 {
-    // inform everyone that our detector state has changed
-    if (detDB) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORPQDetectorStateChanged object:detDB];
+    @try {
+        // inform everyone that our detector state has changed
+        if (detDB) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORPQDetectorStateChanged object:detDB];
+        }
     }
-    // finally do our callback
-    if (![self isCancelled] && selector) {
-        [object performSelectorOnMainThread:selector withObject:detDB waitUntilDone:YES];
-        selector = nil;
+    @catch(NSException* e){
+        NSLogColor([NSColor redColor],@"Exception caught! (problem updating ORCA GUI)\n");
+    }
+    @finally {
+        // finally do our callback
+        if (![self isCancelled] && selector) {
+            [object performSelector:selector withObject:detDB];
+            selector = nil;
+        }
     }
 }
 
@@ -519,9 +532,9 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
 // load and parse the full detector database from the PostgreSQL server
 - (ORPQDetectorDB *) loadDetectorDB: (ORPQConnection *)pqConnection
 {
-    int i;
-
-    /**** load PMT HV database ****/
+//
+// load PMT HV database
+//
     [command autorelease];
     // column:    0     1    2       3
     char *cols = "crate,card,channel,pmthv";
@@ -536,25 +549,24 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
             NSLog(@"Expected %d columns from PMT HV database, but got %d\n", 4, numCols);
             return nil;
         }
-        for (i=0; i<numRows; ++i) {
+        if (numRows) detDB->pmthvLoaded = YES;
+        for (int i=0; i<numRows; ++i) {
             int64_t val = [theResult getInt64atRow:i column:3];
             if (val == kPQBadValue) continue;
             unsigned crate   = [theResult getInt64atRow:i column:0];
             unsigned card    = [theResult getInt64atRow:i column:1];
             unsigned channel = [theResult getInt64atRow:i column:2];
             if (crate < kSnoCrates && card < kSnoCardsPerCrate && channel < kSnoChannelsPerCard) {
-                PQ_FEC *theCard = [detDB getFEC:card crate:crate];
-                theCard->valid[kFEC_hvDisabled] |= (1 << channel);
-                if (val == 1) theCard->hvDisabled |= (1 << channel);
+                PQ_FEC *pqFEC = [detDB getFEC:card crate:crate];
+                pqFEC->valid[kFEC_hvDisabled] |= (1 << channel);
+                if (val == 1) pqFEC->hvDisabled |= (1 << channel);
             }
-        }
-        if (numRows) {
-            detDB->pmthvLoaded = YES;
         }
     }
     if ([self isCancelled]) return nil;
-
-    /**** load FEC database ****/
+//
+// load FEC database
+//
     [command autorelease];
     // (funny, but tcmos_tacshift=tac0trim and scmos=tac1trim)
     //      0     1    2          3           4         5          6          7      8      9              10    11   12            13           14          15        16        17        18         19           20          21          22   23
@@ -569,13 +581,14 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
             NSLog(@"Expected %d columns from detector database, but got %d\n", kFEC_numDbColumns, numCols);
             return nil;
         }
-        for (i=0; i<numRows; ++i) {
+        if (numRows) detDB->fecLoaded = YES;
+        for (int i=0; i<numRows; ++i) {
             unsigned crate = [theResult getInt64atRow:i column:0];
             unsigned card  = [theResult getInt64atRow:i column:1];
             if (crate >= kSnoCrates || card >= kSnoCardsPerCrate) continue;
-            PQ_FEC *theCard = [detDB getFEC:card crate:crate];
+            PQ_FEC *pqFEC = [detDB getFEC:card crate:crate];
             // set flag indicating that the card exists in the current detector state
-            theCard->valid[kFEC_exists] = 1;
+            pqFEC->valid[kFEC_exists] = 1;
             for (int col=2; col<kFEC_numDbColumns; ++col) {
                 NSMutableData *dat = [theResult getInt64arrayAtRow:i column:col];
                 if (!dat) continue;
@@ -587,88 +600,150 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                     if (valPt[ch] == kPQBadValue) continue;
                     int32_t val = (int32_t)valPt[ch];
                     // set valid flag for this setting for this channel
-                    theCard->valid[col] |= (1 << ch);
+                    pqFEC->valid[col] |= (1 << ch);
                     switch (col) {
                         case kFEC_nhit100enabled:
-                            if (val) theCard->nhit100enabled |= (1 << ch);
+                            if (val) pqFEC->nhit100enabled |= (1 << ch);
                             break;
                         case kFEC_nhit100delay:
-                            theCard->nhit100delay[ch] = val;
+                            pqFEC->nhit100delay[ch] = val;
                             break;
                         case kFEC_nhit20enabled:
-                            if (val) theCard->nhit20enabled |= (1 << ch);
+                            if (val) pqFEC->nhit20enabled |= (1 << ch);
                             break;
                         case kFEC_nhit20width:
-                            theCard->nhit20width[ch] = val;
+                            pqFEC->nhit20width[ch] = val;
                             break;
                         case kFEC_nhit20delay:
-                            theCard->nhit20delay[ch] = val;
+                            pqFEC->nhit20delay[ch] = val;
                             break;
                         case kFEC_vbal0:
-                            theCard->vbal0[ch] = val;
+                            pqFEC->vbal0[ch] = val;
                             break;
                         case kFEC_vbal1:
-                            theCard->vbal1[ch] = val;
+                            pqFEC->vbal1[ch] = val;
                             break;
                         case kFEC_tac0trim:
-                            theCard->tac0trim[ch] = val;
+                            pqFEC->tac0trim[ch] = val;
                             break;
                         case kFEC_tac1trim:
-                            theCard->tac1trim[ch] = val;
+                            pqFEC->tac1trim[ch] = val;
                             break;
                         case kFEC_vthr:
-                            theCard->vthr[ch] = val;
+                            pqFEC->vthr[ch] = val;
                             break;
                         case kFEC_pedEnabled:
-                            theCard->pedEnabled = val;
-                            theCard->valid[col] = 0xffffffff;
+                            pqFEC->pedEnabled = val;
+                            pqFEC->valid[col] = 0xffffffff;
                             break;
                         case kFEC_seqDisabled:
-                            theCard->seqDisabled = val;
-                            theCard->valid[col] = 0xffffffff;
+                            pqFEC->seqDisabled = val;
+                            pqFEC->valid[col] = 0xffffffff;
                             break;
                         case kFEC_tdiscRp1:
-                            if (ch < 8) theCard->tdiscRp1[ch] = val;
+                            if (ch < kNumFecTdisc) pqFEC->tdiscRp1[ch] = val;
                             break;
                         case kFEC_tdiscRp2:
-                            if (ch < 8) theCard->tdiscRp2[ch] = val;
+                            if (ch < kNumFecTdisc) pqFEC->tdiscRp2[ch] = val;
                             break;
                         case kFEC_tdiscVsi:
-                            if (ch < 8) theCard->tdiscVsi[ch] = val;
+                            if (ch < kNumFecTdisc) pqFEC->tdiscVsi[ch] = val;
                             break;
                         case kFEC_tdiscVli:
-                            if (ch < 8) theCard->tdiscVli[ch] = val;
+                            if (ch < kNumFecTdisc) pqFEC->tdiscVli[ch] = val;
                             break;
                         case kFEC_tcmosVmax:
-                            theCard->tcmosVmax = val;
+                            pqFEC->tcmosVmax = val;
                             break;
                         case kFEC_tcmosTacref:
-                            theCard->tcmosTacref = val;
+                            pqFEC->tcmosTacref = val;
                             break;
                         case kFEC_tcmosIsetm:
-                            if (ch < 2) theCard->tcmosIsetm[ch] = val;
+                            if (ch < kNumFecIset) pqFEC->tcmosIsetm[ch] = val;
                             break;
                         case kFEC_tcmosIseta:
-                            if (ch < 2) theCard->tcmosIseta[ch] = val;
+                            if (ch < kNumFecIset) pqFEC->tcmosIseta[ch] = val;
                             break;
                         case kFEC_vres:
-                            theCard->vres = val;
+                            pqFEC->vres = val;
                             break;
                         case kFEC_hvref:
-                            theCard->hvref = val;
+                            pqFEC->hvref = val;
                             break;
                     }
                 }
             }
         }
-        if (numRows) {
-            detDB->fecLoaded = YES;
+    }
+//
+// load Crate database
+//
+    [command autorelease];
+    cols = "crate,ctc_delay,hv_relay_mask1,hv_relay_mask2,hv_a_on,hv_b_on,hv_dac_a,hv_dac_b,xl3_readout_mask,xl3_mode";
+    command = [[NSString stringWithFormat: @"SELECT %s FROM current_crate_state",cols] retain];
+    theResult = [pqConnection queryString:command];
+    if ([self isCancelled]) return nil;
+    if (theResult) {
+        int numRows = [theResult numOfRows];
+        int numCols = [theResult numOfFields];
+        if (numCols != kCrate_numDbColumns) {
+            NSLog(@"Expected %d columns from crate database, but got %d\n", kCrate_numDbColumns, numCols);
+            return nil;
+        }
+        if (numRows) detDB->crateLoaded = YES;
+        for (int i=0; i<numRows; ++i) {
+            unsigned crate = [theResult getInt64atRow:i column:0];
+            if (crate >= kSnoCrates) continue;
+            PQ_Crate *pqCrate = [detDB getCrate:crate];
+            // set flag indicating that the crate exists in the current detector state
+            pqCrate->valid[kCrate_exists] = pqCrate->exists = 1;
+            for (int col=1; col<kCrate_numDbColumns; ++col) {
+                NSMutableData *dat = [theResult getInt64arrayAtRow:i column:col];
+                if (!dat || [dat length] < sizeof(int64_t)) continue;
+                int64_t *valPt = (int64_t *)[dat mutableBytes];
+                if (*valPt == kPQBadValue) continue;
+                int32_t val = (int32_t)*valPt;
+                pqCrate->valid[col] = 1;   // set valid flag for this setting
+                switch (col) {
+                    case kCrate_ctcDelay:
+                        pqCrate->ctcDelay = val;
+                        break;
+                    case kCrate_hvRelayMask1:
+                        pqCrate->hvRelayMask1 = val;
+                        pqCrate->valid[col] = 0xffffffff;
+                        break;
+                    case kCrate_hvRelayMask2:
+                        pqCrate->hvRelayMask2 = val;
+                        pqCrate->valid[col] = 0xffffffff;
+                        break;
+                    case kCrate_hvAOn:
+                        pqCrate->hvAOn = val;
+                        break;
+                    case kCrate_hvBOn:
+                        pqCrate->hvBOn = val;
+                        break;
+                    case kCrate_hvDacA:
+                        pqCrate->hvDacA = val;
+                        break;
+                    case kCrate_hvDacB:
+                        pqCrate->hvDacB = val;
+                        break;
+                    case kCrate_xl3ReadoutMask:
+                        pqCrate->xl3ReadoutMask = val;
+                        pqCrate->valid[col] = 0xffffffff;
+                        break;
+                    case kCrate_xl3Mode:
+                        pqCrate->xl3Mode = val;
+                        break;
+                }
+            }
         }
     }
-
-    /**** load MTC database ****/
+//
+// load MTC database
+//
     [command autorelease];
-    cols = "control_register,mtca_dacs,pedestal_width,coarse_delay,fine_delay,pedestal_mask,prescale,lockout_width";
+    cols = "control_register,mtca_dacs,pedestal_width,coarse_delay,fine_delay,pedestal_mask,prescale,lockout_width,gt_mask,gt_crate_mask,mtca_relays";
     command = [[NSString stringWithFormat: @"select %s from mtc where key = (select mtc from run_state where run = 0)",cols] retain];
     theResult = [pqConnection queryString:command];
     if ([self isCancelled]) return nil;
@@ -680,68 +755,69 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
             return nil;
         }
         if (numRows) {
-            PQ_MTC *mtc = [detDB getMTC];
+            detDB->mtcLoaded = YES;
+            PQ_MTC *pqMTC = [detDB getMTC];
             for (int col=0; col<kMTC_numDbColumns; ++col) {
                 NSMutableData *dat = [theResult getInt64arrayAtRow:0 column:col];
                 if (!dat) continue;
                 int n = [dat length] / sizeof(int64_t);
                 if (col == kMTC_mtcaDacs) {
-                    if (n > 14) n = 14;
+                    if (n > kNumMtcDacs) n = kNumMtcDacs;
                 } else if (col == kMTC_mtcaRelays) {
-                    if (n > 7) n = 7;
+                    if (n > kNumMtcRelays) n = kNumMtcRelays;
                 } else {
                     if (n > 1) n = 1;
                 }
                 for (int j=0; j<n; ++j) {
                     int64_t *valPt = (int64_t *)[dat mutableBytes];
                     if (valPt[j] == kPQBadValue) continue;
-                    mtc->valid[col] |= (1 << j);    // set valid flag
+                    pqMTC->valid[col] |= (1 << j);    // set valid flag
                     int32_t val = (int32_t)valPt[j];
                     switch (col) {
                         case kMTC_controlReg:
-                            mtc->controlReg = val;
+                            pqMTC->controlReg = val;
                             break;
                         case kMTC_mtcaDacs:
-                            mtc->mtcaDacs[j] = val;
+                            pqMTC->mtcaDacs[j] = val;
                             break;
                         case kMTC_pedWidth:
-                            mtc->pedWidth = val;
+                            pqMTC->pedWidth = val;
                             break;
                         case kMTC_coarseDelay:
-                            mtc->coarseDelay = val;
+                            pqMTC->coarseDelay = val;
                             break;
                         case kMTC_fineDelay:
-                            mtc->fineDelay = val;
+                            pqMTC->fineDelay = val;
                             break;
                         case kMTC_pedMask:
-                            mtc->pedMask = val;
-                            mtc->valid[kMTC_pedMask] = 0xffffffff;
+                            pqMTC->pedMask = val;
+                            pqMTC->valid[kMTC_pedMask] = 0xffffffff;
                             break;
                         case kMTC_prescale:
-                            mtc->prescale = val;
+                            pqMTC->prescale = val;
                             break;
                         case kMTC_lockoutWidth:
-                            mtc->lockoutWidth = val;
+                            pqMTC->lockoutWidth = val;
                             break;
                         case kMTC_gtMask:
-                            mtc->gtMask = val;
-                            mtc->valid[kMTC_gtMask] = 0xffffffff;
+                            pqMTC->gtMask = val;
+                            pqMTC->valid[kMTC_gtMask] = 0xffffffff;
                             break;
                         case kMTC_gtCrateMask:
-                            mtc->gtCrateMask = val;
-                            mtc->valid[kMTC_gtCrateMask] = 0xffffffff;
+                            pqMTC->gtCrateMask = val;
+                            pqMTC->valid[kMTC_gtCrateMask] = 0xffffffff;
                             break;
                         case kMTC_mtcaRelays:
-                            mtc->mtcaRelays[j] = val;
+                            pqMTC->mtcaRelays[j] = val;
                             break;
                     }
                 }
             }
-            detDB->mtcLoaded = YES;
         }
     }
-
-    /**** load CAEN database ****/
+//
+// load CAEN database
+//
     [command autorelease];
     cols = "channel_configuration,buffer_organization,custom_size,acquisition_control,trigger_mask,trigger_out_mask,post_trigger,front_panel_io_control,channel_mask,channel_dacs";
     command = [[NSString stringWithFormat: @"select %s from caen where key = (select caen from run_state where run = 0)",cols] retain];
@@ -755,63 +831,65 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
             return nil;
         }
         if (numRows) {
-            PQ_CAEN *caen = [detDB getCAEN];
+            detDB->caenLoaded = YES;
+            PQ_CAEN *pqCAEN = [detDB getCAEN];
             for (int col=0; col<kCAEN_numDbColumns; ++col) {
                 NSMutableData *dat = [theResult getInt64arrayAtRow:0 column:col];
                 if (!dat) continue;
                 int n = [dat length] / sizeof(int64_t);
                 if (col == kCAEN_channelDacs) {
-                    if (n > 8) n = 8;
+                    if (n > kNumCaenChannelDacs) n = kNumCaenChannelDacs;
                 } else {
                     if (n > 1) n = 1;
                 }
                 for (int j=0; j<n; ++j) {
                     int64_t *valPt = (int64_t *)[dat mutableBytes];
                     if (valPt[j] == kPQBadValue) continue;
-                    caen->valid[col] |= (1 << j);    // set valid flag
+                    pqCAEN->valid[col] |= (1 << j);    // set valid flag
                     int32_t val = (int32_t)valPt[j];
                     switch (col) {
                         case kCAEN_channelConfiguration:
-                            caen->channelConfiguration = val;
+                            pqCAEN->channelConfiguration = val;
                             break;
                         case kCAEN_bufferOrganization:
-                            caen->bufferOrganization = val;
+                            pqCAEN->bufferOrganization = val;
                             break;
                         case kCAEN_customSize:
-                            caen->customSize = val;
+                            pqCAEN->customSize = val;
                             break;
                         case kCAEN_acquisitionControl:
-                            caen->acquisitionControl = val;
+                            pqCAEN->acquisitionControl = val;
                             break;
                         case kCAEN_triggerMask:
-                            caen->triggerMask = val;
-                            caen->valid[kCAEN_triggerMask] = 0xffffffff;
+                            pqCAEN->triggerMask = val;
+                            pqCAEN->valid[kCAEN_triggerMask] = 0xffffffff;
                             break;
                         case kCAEN_triggerOutMask:
-                            caen->triggerOutMask = val;
-                            caen->valid[kCAEN_triggerOutMask] = 0xffffffff;
+                            pqCAEN->triggerOutMask = val;
+                            pqCAEN->valid[kCAEN_triggerOutMask] = 0xffffffff;
                             break;
                         case kCAEN_postTrigger:
-                            caen->postTrigger = val;
+                            pqCAEN->postTrigger = val;
                             break;
                         case kCAEN_frontPanelIoControl:
-                            caen->frontPanelIoControl = val;
+                            pqCAEN->frontPanelIoControl = val;
                             break;
                         case kCAEN_channelMask:
-                            caen->channelMask = val;
-                            caen->valid[kCAEN_channelMask] = 0xffffffff;
+                            pqCAEN->channelMask = val;
+                            pqCAEN->valid[kCAEN_channelMask] = 0xffffffff;
                             break;
                         case kCAEN_channelDacs:
-                            caen->channelDacs[j] = val;
+                            pqCAEN->channelDacs[j] = val;
                             break;
                     }
                 }
             }
-            detDB->caenLoaded = YES;
         }
     }
     // all done
-    if (detDB->pmthvLoaded || detDB->fecLoaded || detDB->mtcLoaded || detDB->caenLoaded) {
+    if (detDB->pmthvLoaded || detDB->fecLoaded || detDB->crateLoaded ||
+        detDB->mtcLoaded || detDB->caenLoaded)
+    {
         return detDB;
     } else {
         [detDB release];

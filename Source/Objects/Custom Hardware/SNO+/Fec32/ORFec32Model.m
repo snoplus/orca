@@ -1705,13 +1705,11 @@ static int              sChannelsNotChangedCount = 0;
 - (void) detectorStateChanged:(NSNotification*)note
 {
     int32_t valid;
-    NSMutableData *cardDb = [note object];
+    ORPQDetectorDB *detDB = [note object];
 
-    if (!cardDb || ![cardDb respondsToSelector:@selector(mutableBytes)]) return;
+    if (!detDB || !detDB->fecLoaded) return;
 
-    if ([self stationNumber] >= kSnoCardsPerCrate || [self crateNumber] >= kSnoCrates) return;
-    
-    PQ_FEC *fec = (PQ_FEC *)[cardDb mutableBytes] + [self crateNumber] * kSnoCardsPerCrate + [self stationNumber];
+    PQ_FEC *fec = (PQ_FEC *)[detDB getFEC:[self stationNumber] crate:[self crateNumber] ];
 
     if (!fec->valid[kFEC_exists]) return;  // nothing to do if fec doesn't exist in the current detector state
 
