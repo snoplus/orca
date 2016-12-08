@@ -1988,14 +1988,22 @@ err:
         return;
     }
 
-    //Load MTC settings
-    [mtc loadTheMTCADacs];
-    [mtc setGlobalTriggerWordMask];
-    [mtc setThePulserRate:[mtc dbFloatByIndex:kPulserPeriod]];
+    @try{
+        //Load MTC settings
+        [mtc loadTheMTCADacs];
+        [mtc setGlobalTriggerWordMask];
+        [mtc setThePulserRate:[mtc dbFloatByIndex:kPulserPeriod]];
+    }
+    @catch(NSException *e){
+        NSLogColor([NSColor redColor], @"Problem loading settings into Hardware: %@\n",[e reason]);
+        return;
+    }
+    
+    NSLogColor([NSColor redColor], @"Settings loaded in Hardware \n");
 
 }
 
--(void) loadHighThresholdRun
+-(void) loadHighThresholds
 {
 
     //Get RC model
@@ -2032,12 +2040,8 @@ err:
     [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kPulserPeriod];
     [runControlModel setRunType:0x0]; //Zero run type word since this run is not valid
 
-    //Restart the run if the run is ongoing and do nothing if there is no run happening
-    if([runControlModel isRunning]){
-        [self setStandardRunType:@"HIGH THRESHOLDS"];
-        [runControlModel restartRun];
-    }
-    
+    [self loadSettingsInHW];
+
 }
 
 @end

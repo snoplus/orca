@@ -374,15 +374,9 @@ snopGreenColor;
     }
     else{
         [standardRunPopupMenu selectItemWithObjectValue:standardRun];
-    }
-    
-    if([[model standardRunType] isEqualToString:@"HIGH THRESHOLDS"]) {
-        [model setStandardRunVersion:@"DEFAULT"];
-    }
-    else if(![standardRun isEqualToString:@""] && standardRun != nil){
         [self refreshStandardRunVersions];
     }
-
+    
 }
 
 -(void) SRVersionChanged:(NSNotification*)aNote
@@ -727,7 +721,7 @@ snopGreenColor;
     if(cancel) return;
 
     NSLogColor([NSColor redColor],@"Setting MTC high thresholds...\n");
-    [model loadHighThresholdRun];
+    [model loadHighThresholds];
 }
 
 - (IBAction)hvMasterPanicAction:(id)sender
@@ -1623,11 +1617,6 @@ snopGreenColor;
     
     NSString *standardRun = [[standardRunPopupMenu stringValue] uppercaseString];
     [standardRunPopupMenu setStringValue:standardRun];
-    //Do not allow to overwrite the detector safe offline run
-    if ([standardRun isEqualTo:@"HIGH THRESHOLDS"]){
-        ORRunAlertPanel([NSString stringWithFormat:@"Cannot create a version called HIGH THRESHOLDS"], @"It is a protected word",@"Cancel",@"OK",nil);
-        return;
-    }
     //Create new SR if does not exist
     if ([standardRunPopupMenu indexOfItemWithObjectValue:standardRun] == NSNotFound && [standardRun isNotEqualTo:@""]){
         BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Creating new Standard Run: \"%@\"", standardRun],@"Is this really what you want?",@"Cancel",@"Yes, Make New Standard Run",nil);
