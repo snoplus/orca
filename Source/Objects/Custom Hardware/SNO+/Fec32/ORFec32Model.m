@@ -1702,16 +1702,18 @@ static int              sChannelsNotChangedCount = 0;
 // sync FEC/DC settings from the specified hardware state
 // (the note object should be a NSMutableData object containing
 //  a full array of PQ_FEC structures in crate/card order)
-- (void) detectorStateChanged:(NSNotification*)note
+- (void) detectorStateChanged:(NSNotification*)aNote
 {
     int32_t valid;
-    ORPQDetectorDB *detDB = [note object];
+    ORPQDetectorDB *detDB = [aNote object];
 
-    if (!detDB || !detDB->fecLoaded) return;
+    if (!detDB) return;
 
     PQ_FEC *fec = (PQ_FEC *)[detDB getFEC:[self stationNumber] crate:[self crateNumber] ];
 
-    if (!fec->valid[kFEC_exists]) return;  // nothing to do if fec doesn't exist in the current detector state
+    if (!fec || !fec->valid[kFEC_exists]) return;  // nothing to do if fec doesn't exist in the current detector state
+
+    [[self undoManager] disableUndoRegistration];
 
     if ((valid = fec->valid[kFEC_seqDisabled]) != 0) {
         [self setSeqDisabledMask: (fec->seqDisabled & valid) | ((int32_t)seqDisabledMask & ~valid)];
@@ -1807,6 +1809,7 @@ static int              sChannelsNotChangedCount = 0;
     if (fec->valid[kFEC_hvref]) {
         [self setHVRef:fec->hvref];
     }
+    [[self undoManager] enableUndoRegistration];
 }
 
 - (void) _continueHWWizard:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
@@ -1911,15 +1914,13 @@ static int              sChannelsNotChangedCount = 0;
                 // cancel any queued database operations
                 [[ORPQModel getCurrent] cancelDbQueries];
                 sReadingHvdbAlert = nil;
-                // continue executing HWWizard without PMT database
-                [self _chanDbCallback:nil];
             }
         }];
 #endif
     }
 }
 
-- (void) hwWizardActionBegin:(NSNotification*)note
+- (void) hwWizardActionBegin:(NSNotification*)aNote
 {
     sChannelsNotChangedCount      = 0;
     startSeqDisabledMask          = seqDisabledMask;
@@ -1932,9 +1933,9 @@ static int              sChannelsNotChangedCount = 0;
     cratePedMask  = 0;
 
     // interrupt hardwardWizard execution to allow time to load pmtdb if necessary
-    if (sDetectorDbState == 0 && [note object] && [[note object] respondsToSelector:@selector(notOkToContinue)]) {
+    if (sDetectorDbState == 0 && [aNote object] && [[aNote object] respondsToSelector:@selector(notOkToContinue)]) {
         sDetectorDbState = 1;
-        hwWizard = [note object];
+        hwWizard = [aNote object];
         // (we will continue after our detector database is loaded)
         [hwWizard performSelector:@selector(notOkToContinue)];
         // initiate the PostgreSQL DB query to get the current detector state
@@ -1944,13 +1945,13 @@ static int              sChannelsNotChangedCount = 0;
     }
 }
 
-- (void) hwWizardActionEnd:(NSNotification*)note
+- (void) hwWizardActionEnd:(NSNotification*)aNote
 {
     [[self undoManager] disableUndoRegistration];
 
     // make sure channels with HV disabled aren't enabled
     // (note: we do this even if the database is stale)
-    PQ_FEC *fec = [sDetectorDbData getFEC:[self stationNumber] crate:[self crateNumber]];
+    PQ_FEC *fec = [sDetectorDbData getPmthv:[self stationNumber] crate:[self crateNumber]];
     if (fec) {
         int32_t notChanged = 0;
         // sequencer must be disabled on channels with HV disabled
@@ -2022,7 +2023,7 @@ static int              sChannelsNotChangedCount = 0;
     sDetectorDbState = 0;
 }
 
-- (void) hwWizardActionFinal:(NSNotification*)note
+- (void) hwWizardActionFinal:(NSNotification*)aNote
 {
     // now that we have updated all settings, finally go ahead and
     // set pedestals and/or initialize this crate if we haven't done so already

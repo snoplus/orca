@@ -28,6 +28,7 @@
 #import "ORRateGroup.h"
 #import "VME_HW_Definitions.h"
 #import "ORRunModel.h"
+#import "ORPQModel.h"
 #import "SNOPModel.h"
 
 // Address information for this unit.
@@ -196,6 +197,12 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 
 - (void) registerNotificationObservers
 {
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(detectorStateChanged:)
+                         name : ORPQDetectorStateChanged
+                       object : nil];
 }
 
 - (int) initAtRunStart
@@ -215,6 +222,59 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     }
 
     return 0;
+}
+
+- (void) detectorStateChanged:(NSNotification*)aNote
+{
+    ORPQDetectorDB *detDB = [aNote object];
+
+    if (!detDB) return;
+
+    PQ_CAEN *pqCAEN = (PQ_CAEN *)[detDB getCAEN];
+
+    if (!pqCAEN) return; // nothing to do if CAEN doesn't exist in the current state
+
+    [[self undoManager] disableUndoRegistration];
+
+    if (pqCAEN->valid[kCAEN_channelConfiguration]) {
+        [self setChannelConfigMask:pqCAEN->channelConfiguration];
+    }
+    if (pqCAEN->valid[kCAEN_bufferOrganization]) {
+        [self setEventSize:pqCAEN->bufferOrganization];
+    }
+    if (pqCAEN->valid[kCAEN_customSize]) {
+        [self setCustomSize:pqCAEN->customSize];
+        [self setIsCustomSize:(pqCAEN->customSize ? YES : NO)];
+        //TO_DO what about setIsFixedSize?
+    }
+    if (pqCAEN->valid[kCAEN_acquisitionControl]) {
+        [self setAcquisitionMode:pqCAEN->acquisitionControl];
+    }
+    if (pqCAEN->valid[kCAEN_triggerMask]) {
+        [self setTriggerSourceMask:pqCAEN->triggerMask];
+        //TO_DO is it the source in the DB?
+    }
+    if (pqCAEN->valid[kCAEN_triggerOutMask]) {
+        [self setTriggerOutMask:pqCAEN->triggerOutMask];
+    }
+    if (pqCAEN->valid[kCAEN_postTrigger]) {
+        [self setPostTriggerSetting:pqCAEN->postTrigger];
+    }
+    if (pqCAEN->valid[kCAEN_frontPanelIoControl]) {
+        [self setFrontPanelControlMask:pqCAEN->frontPanelIoControl];
+    }
+    if (pqCAEN->valid[kCAEN_channelMask]) {
+        [self setChannelConfigMask:pqCAEN->channelMask];
+    }
+    for (int i=0; i<kNumCaenChannelDacs; ++i) {
+        if (pqCAEN->valid[kCAEN_channelDacs] & (1 << i)) {
+            [self setDac:i withValue:pqCAEN->channelDacs[i]];
+            //TO_DO what about setThreshold and setOverUnderThreshold?
+        }
+    }
+    //TO_DO what about?: setEnabledMask, setCoincidenceLevel, setCountAllTriggers,
+    // setWaveFormRateGroup, setNumberBLTEventsToReadout, setContinuousMode
+    [[self undoManager] enableUndoRegistration];
 }
 
 #pragma mark ***Accessors

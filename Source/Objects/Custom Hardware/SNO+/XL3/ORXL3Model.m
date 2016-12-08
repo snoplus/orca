@@ -206,12 +206,60 @@ snotDb = _snotDb;
                      selector : @selector(connectionStateChanged)
                          name : XL3_LinkConnectionChanged
                        object : xl3Link];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(detectorStateChanged:)
+                         name : ORPQDetectorStateChanged
+                       object : nil];
 }
 
 - (void) connectionStateChanged
 {
     /* If we just connected, find out if Xilinx has been loaded or not. */
     if ([xl3Link isConnected]) [self updateXl3Mode];
+}
+
+- (void) detectorStateChanged:(NSNotification*)aNote
+{
+    ORPQDetectorDB *detDB = [aNote object];
+
+    if (!detDB) return;
+
+    PQ_Crate *pqCrate = (PQ_Crate *)[detDB getCrate:[self crateNumber] ];
+
+    if (!pqCrate || !pqCrate->valid[kCrate_exists]) return; // nothing to do if crate doesn't exist in the current state
+
+    [[self undoManager] disableUndoRegistration];
+
+    if (pqCrate->valid[kCrate_ctcDelay]) {
+        //TO_DO init from pqCrate->ctcDelay (seems to be forced to 0 in the code?)
+    }
+    if (pqCrate->valid[kCrate_hvRelayMask1] && pqCrate->valid[kCrate_hvRelayMask2]) {
+        //TO_DO is mask1 the lower 32 bits?
+        unsigned long long mask = ((unsigned long long)(uint32_t)pqCrate->hvRelayMask2 << 32) | (uint32_t)pqCrate->hvRelayMask1;
+        [self setRelayMask:mask];
+        //TO_DO what about setRelayViewMask?
+    }
+    if (pqCrate->valid[kCrate_hvAOn]) {
+        //TO_DO init from pqCrate->hvAOn
+    }
+    if (pqCrate->valid[kCrate_hvBOn]) {
+        //TO_DO init from pqCrate->hvBOn
+    }
+    if (pqCrate->valid[kCrate_hvDacA]) {
+        [self setHvAVoltageDACSetValue:pqCrate->hvDacA];
+    }
+    if (pqCrate->valid[kCrate_hvDacB]) {
+        [self setHvBVoltageDACSetValue:pqCrate->hvDacB];
+    }
+    if (pqCrate->valid[kCrate_xl3ReadoutMask]) {
+        [self setSlotMask:pqCrate->xl3ReadoutMask]; //TO_DO is this correct?
+    }
+    if (pqCrate->valid[kCrate_xl3Mode]) {
+        //TO_DO init from pqCrate->xl3Mode
+    }
+    //TO_DO there are a lot more settings that aren't found in the MTC database
+    [[self undoManager] enableUndoRegistration];
 }
 
 - (int) initAtRunStart

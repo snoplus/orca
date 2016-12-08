@@ -460,7 +460,13 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
 
 - (PQ_FEC *) getFEC:(int)aCard crate:(int)aCrate
 {
-    if (!(pmthvLoaded || fecLoaded) || aCrate >= kSnoCrates || aCard >= kSnoCardsPerCrate) return nil;
+    if (!fecLoaded || aCrate >= kSnoCrates || aCard >= kSnoCardsPerCrate) return nil;
+    return (PQ_FEC *)[data mutableBytes] + aCrate * kSnoCardsPerCrate + aCard;
+}
+
+- (PQ_FEC *) getPmthv:(int)aCard crate:(int)aCrate
+{
+    if (!pmthvLoaded || aCrate >= kSnoCrates || aCard >= kSnoCardsPerCrate) return nil;
     return (PQ_FEC *)[data mutableBytes] + aCrate * kSnoCardsPerCrate + aCard;
 }
 
@@ -560,7 +566,7 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
             unsigned card    = [theResult getInt64atRow:i column:1];
             unsigned channel = [theResult getInt64atRow:i column:2];
             if (crate < kSnoCrates && card < kSnoCardsPerCrate && channel < kSnoChannelsPerCard) {
-                PQ_FEC *pqFEC = [detDB getFEC:card crate:crate];
+                PQ_FEC *pqFEC = [detDB getPmthv:card crate:crate];
                 pqFEC->valid[kFEC_hvDisabled] |= (1 << channel);
                 if (val == 1) pqFEC->hvDisabled |= (1 << channel);
             }

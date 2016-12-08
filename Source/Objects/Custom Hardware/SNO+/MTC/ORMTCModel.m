@@ -29,6 +29,7 @@
 #import "ORSelectorSequence.h"
 #import "ORRunModel.h"
 #import "ORRunController.h"
+#import "ORPQModel.h"
 #import "SNOPModel.h"
 
 #define uShortDBValue(A) [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] unsignedShortValue]
@@ -297,6 +298,12 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (void) registerNotificationObservers
 {
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(detectorStateChanged:)
+                         name : ORPQDetectorStateChanged
+                       object : nil];
 }
 
 - (int) initAtRunStart:(int) loadTriggers
@@ -341,6 +348,83 @@ resetFifoOnStart = _resetFifoOnStart;
     }
 
     return 0;
+}
+
+- (void) detectorStateChanged:(NSNotification*)aNote
+{
+    ORPQDetectorDB *detDB = [aNote object];
+
+    if (!detDB) return;
+
+    PQ_MTC *pqMTC = (PQ_MTC *)[detDB getMTC];
+
+    if (!pqMTC) return;     // nothing to do if MTC doesn't exist in the current state
+
+    [[self undoManager] disableUndoRegistration];
+
+    if (pqMTC->valid[kMTC_controlReg]) {
+        [self setDbLong:pqMTC->controlReg forIndex:kControlMask];   //TO_DO is this correct?
+    }
+    //TO_DO the last 4 dacs are spares? But then why are the masks in these spots in mtcDacIndexes[]?
+    for (int i=0; i<10; ++i) { // (don't update the last 4 dac settings)
+        if (pqMTC->valid[kMTC_mtcaDacs] & (1 << i)) {
+            int32_t val = pqMTC->mtcaDacs[i];
+            [self setDbLong:val forIndex:mtcDacIndexes[i]]; //TO_DO verify that this order is correct
+        }
+    }
+    if (pqMTC->valid[kMTC_pedWidth]) {
+        [self setDbLong:pqMTC->pedWidth forIndex:kPedestalWidth];
+    }
+    if (pqMTC->valid[kMTC_coarseDelay]) {
+        [self setDbLong:pqMTC->coarseDelay forIndex:kCoarseDelay];
+    }
+    if (pqMTC->valid[kMTC_fineDelay]) {
+        [self setDbLong:pqMTC->fineDelay forIndex:kFineDelay];
+    }
+    if (pqMTC->valid[kMTC_pedMask]) {
+        [self setDbLong:pqMTC->pedMask forIndex:kPEDCrateMask];
+    }
+    if (pqMTC->valid[kMTC_prescale]) {
+        [self setDbLong:pqMTC->prescale forIndex:kNhit100LoPrescale];
+    }
+    if (pqMTC->valid[kMTC_lockoutWidth]) {
+        [self setDbLong:pqMTC->lockoutWidth forIndex:kLockOutWidth];
+    }
+    if (pqMTC->valid[kMTC_gtMask]) {
+        [self setDbLong:pqMTC->gtMask forIndex:kGtMask];
+    }
+    if (pqMTC->valid[kMTC_gtCrateMask]) {
+        [self setDbLong:pqMTC->gtCrateMask forIndex:kGtCrateMask];
+    }
+    for (int i=0; i<kNumMtcRelays; ++i) {
+        if (pqMTC->valid[kMTC_mtcaRelays] & (1 << i)) {
+            int32_t val = pqMTC->mtcaRelays[i];
+            switch (i) {
+                case 0:
+                    [self setMtcaN100Mask:val];
+                    break;
+                case 1:
+                    [self setMtcaN20Mask:val];
+                    break;
+                case 2:
+                    [self setMtcaELOMask:val];
+                    break;
+                case 3:
+                    [self setMtcaEHIMask:val];
+                    break;
+                case 4:
+                    [self setMtcaOELOMask:val];
+                    break;
+                case 5:
+                    [self setMtcaOEHIMask:val];
+                    break;
+                case 6:
+                    [self setMtcaOWLNMask:val];
+                    break;
+            }
+        }
+    }
+    [[self undoManager] enableUndoRegistration];
 }
 
 #pragma mark •••Accessors

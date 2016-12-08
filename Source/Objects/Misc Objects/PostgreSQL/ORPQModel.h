@@ -133,7 +133,7 @@ enum {
 };
 
 typedef struct {
-    int32_t     exists;
+    int32_t     exists; // (essentially a dummy variable to pad for column 0)
     int32_t     ctcDelay;
     int32_t     hvRelayMask1;
     int32_t     hvRelayMask2;
@@ -192,6 +192,7 @@ typedef struct {
 - (id)          init;
 - (void)        dealloc;
 - (PQ_FEC *)    getFEC:(int)aCard crate:(int)aCrate;
+- (PQ_FEC *)    getPmthv:(int)aCard crate:(int)aCrate;
 - (PQ_Crate *)  getCrate:(int)aCrate;
 - (PQ_MTC *)    getMTC;
 - (PQ_CAEN *)   getCAEN;

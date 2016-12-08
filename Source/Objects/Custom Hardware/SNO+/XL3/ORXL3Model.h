@@ -274,6 +274,7 @@ enum {
 
 - (void) registerNotificationObservers;
 - (void) connectionStateChanged;
+- (void) detectorStateChanged:(NSNotification*)aNote;
 - (int) initAtRunStart;
 
 #pragma mark •••Accessors

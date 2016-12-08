@@ -339,6 +339,7 @@ typedef struct Fec32CmosShiftReg{
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
+- (void) detectorStateChanged:(NSNotification*)aNote;
 - (void) hwWizardActionBegin:(NSNotification*)aNote;
 - (void) hwWizardActionEnd:(NSNotification*)aNote;
 - (void) hwWizardActionFinal:(NSNotification*)aNote;

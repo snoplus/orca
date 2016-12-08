@@ -121,6 +121,7 @@
 
 - (void) registerNotificationObservers;
 - (int) initAtRunStart: (int) loadTriggers;
+- (void) detectorStateChanged:(NSNotification*)aNote;
 
 #pragma mark •••Accessors
 - (int) eSumViewType;
