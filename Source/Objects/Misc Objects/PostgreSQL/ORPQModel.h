@@ -59,10 +59,10 @@ enum {
 #define kNumFecIset     2
 
 typedef struct {
-    int32_t         hvDisabled;   // resistor pulled or no cable
-    int32_t         nhit100enabled;
+    uint32_t        hvDisabled;   // resistor pulled or no cable
+    uint32_t        nhit100enabled;
     unsigned char   nhit100delay[kSnoChannelsPerCard];
-    int32_t         nhit20enabled;
+    uint32_t        nhit20enabled;
     unsigned char   nhit20width[kSnoChannelsPerCard];
     unsigned char   nhit20delay[kSnoChannelsPerCard];
     unsigned char   vbal0[kSnoChannelsPerCard];
@@ -70,19 +70,19 @@ typedef struct {
     unsigned char   tac0trim[kSnoChannelsPerCard];
     unsigned char   tac1trim[kSnoChannelsPerCard];
     unsigned char   vthr[kSnoChannelsPerCard];
-    int32_t         pedEnabled;
-    int32_t         seqDisabled;
+    uint32_t        pedEnabled;
+    uint32_t        seqDisabled;
     unsigned char   tdiscRp1[kNumFecTdisc];
     unsigned char   tdiscRp2[kNumFecTdisc];
     unsigned char   tdiscVsi[kNumFecTdisc];
     unsigned char   tdiscVli[kNumFecTdisc];
-    int32_t         tcmosVmax;
-    int32_t         tcmosTacref;
-    int32_t         tcmosIsetm[kNumFecIset];
-    int32_t         tcmosIseta[kNumFecIset];
-    int32_t         vres;
-    int32_t         hvref;
-    int32_t         valid[kFEC_numDbColumns];   // bitmasks for settings loaded from hardware (see enum above)
+    uint32_t        tcmosVmax;
+    uint32_t        tcmosTacref;
+    uint32_t        tcmosIsetm[kNumFecIset];
+    uint32_t        tcmosIseta[kNumFecIset];
+    uint32_t        vres;
+    uint32_t        hvref;
+    uint32_t        valid[kFEC_numDbColumns];   // bitmasks for settings loaded from hardware (see enum above)
 } PQ_FEC;
 
 enum {
@@ -104,18 +104,18 @@ enum {
 #define kNumMtcRelays   7
 
 typedef struct {
-    int32_t     controlReg;
-    int32_t     mtcaDacs[kNumMtcDacs];
-    int32_t     pedWidth;
-    int32_t     coarseDelay;
-    int32_t     fineDelay;
-    int32_t     pedMask;
-    int32_t     prescale;
-    int32_t     lockoutWidth;
-    int32_t     gtMask;
-    int32_t     gtCrateMask;
-    int32_t     mtcaRelays[kNumMtcRelays];
-    int32_t     valid[kMTC_numDbColumns];
+    uint32_t    controlReg;
+    uint32_t    mtcaDacs[kNumMtcDacs];
+    uint32_t    pedWidth;
+    uint32_t    coarseDelay;
+    uint32_t    fineDelay;
+    uint32_t    pedMask;
+    uint32_t    prescale;
+    uint32_t    lockoutWidth;
+    uint32_t    gtMask;
+    uint32_t    gtCrateMask;
+    uint32_t    mtcaRelays[kNumMtcRelays];
+    uint32_t    valid[kMTC_numDbColumns];
 } PQ_MTC;
 
 enum {
@@ -133,17 +133,17 @@ enum {
 };
 
 typedef struct {
-    int32_t     exists; // (essentially a dummy variable to pad for column 0)
-    int32_t     ctcDelay;
-    int32_t     hvRelayMask1;
-    int32_t     hvRelayMask2;
-    int32_t     hvAOn;
-    int32_t     hvBOn;
-    int32_t     hvDacA;
-    int32_t     hvDacB;
-    int32_t     xl3ReadoutMask;
-    int32_t     xl3Mode;
-    int32_t     valid[kCrate_numDbColumns];
+    uint32_t    exists; // (essentially a dummy variable to pad for column 0)
+    uint32_t    ctcDelay;
+    uint32_t    hvRelayMask1;
+    uint32_t    hvRelayMask2;
+    uint32_t    hvAOn;
+    uint32_t    hvBOn;
+    uint32_t    hvDacA;
+    uint32_t    hvDacB;
+    uint32_t    xl3ReadoutMask;
+    uint32_t    xl3Mode;
+    uint32_t    valid[kCrate_numDbColumns];
 } PQ_Crate;
 
 enum {
@@ -163,17 +163,17 @@ enum {
 #define kNumCaenChannelDacs 8
 
 typedef struct {
-    int32_t     channelConfiguration;
-    int32_t     bufferOrganization;
-    int32_t     customSize;
-    int32_t     acquisitionControl;
-    int32_t     triggerMask;
-    int32_t     triggerOutMask;
-    int32_t     postTrigger;
-    int32_t     frontPanelIoControl;
-    int32_t     channelMask;
-    int32_t     channelDacs[kNumCaenChannelDacs];
-    int32_t     valid[kCAEN_numDbColumns];
+    uint32_t    channelConfiguration;
+    uint32_t    bufferOrganization;
+    uint32_t    customSize;
+    uint32_t    acquisitionControl;
+    uint32_t    triggerMask;
+    uint32_t    triggerOutMask;
+    uint32_t    postTrigger;
+    uint32_t    frontPanelIoControl;
+    uint32_t    channelMask;
+    uint32_t    channelDacs[kNumCaenChannelDacs];
+    uint32_t    valid[kCAEN_numDbColumns];
 } PQ_CAEN;
 
 //----------------------------------------------------------------------------------------------------

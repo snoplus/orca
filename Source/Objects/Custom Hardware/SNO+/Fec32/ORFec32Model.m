@@ -1704,7 +1704,7 @@ static int              sChannelsNotChangedCount = 0;
 //  a full array of PQ_FEC structures in crate/card order)
 - (void) detectorStateChanged:(NSNotification*)aNote
 {
-    int32_t valid;
+    uint32_t valid;
     ORPQDetectorDB *detDB = [aNote object];
 
     if (!detDB) return;
@@ -1716,23 +1716,23 @@ static int              sChannelsNotChangedCount = 0;
     [[self undoManager] disableUndoRegistration];
 
     if ((valid = fec->valid[kFEC_seqDisabled]) != 0) {
-        [self setSeqDisabledMask: (fec->seqDisabled & valid) | ((int32_t)seqDisabledMask & ~valid)];
+        [self setSeqDisabledMask: (fec->seqDisabled & valid) | ((uint32_t)seqDisabledMask & ~valid)];
         startSeqDisabledMask = seqDisabledMask;
     }
     if ((valid = fec->valid[kFEC_pedEnabled]) != 0) {
-        [self setPedEnabledMask: (fec->pedEnabled & valid) | ((int32_t)pedEnabledMask & ~valid)];
+        [self setPedEnabledMask: (fec->pedEnabled & valid) | ((uint32_t)pedEnabledMask & ~valid)];
         startPedEnabledMask = pedEnabledMask;
     }
     if ((valid = fec->valid[kFEC_nhit100enabled]) != 0) {
-        [self setTrigger100nsDisabledMask: (~fec->nhit100enabled & valid) | ((int32_t)trigger100nsDisabledMask & ~valid)];
+        [self setTrigger100nsDisabledMask: (~fec->nhit100enabled & valid) | ((uint32_t)trigger100nsDisabledMask & ~valid)];
         startTrigger100nsDisabledMask = trigger100nsDisabledMask;
     }
     if ((valid = fec->valid[kFEC_nhit20enabled]) != 0) {
-        [self setTrigger20nsDisabledMask: (~fec->nhit20enabled & valid) | ((int32_t)trigger20nsDisabledMask & ~valid)];
+        [self setTrigger20nsDisabledMask: (~fec->nhit20enabled & valid) | ((uint32_t)trigger20nsDisabledMask & ~valid)];
         startTrigger20nsDisabledMask = trigger20nsDisabledMask;
     }
     for (int ch=0; ch<32; ++ch) {
-        int32_t chMask = (1 << ch);
+        uint32_t chMask = (1 << ch);
         if (fec->valid[kFEC_vthr] & chMask) {
             [self setVth:ch withValue:fec->vthr[ch]];
         }
@@ -1766,7 +1766,7 @@ static int              sChannelsNotChangedCount = 0;
         }
     }
     for (int i=0; i<8; ++i) {
-        int32_t msk = (1 << i);
+        uint32_t msk = (1 << i);
         short dcNum = i / 2;
         if (dcPresent[dcNum]) {
             short j = i - dcNum * 2;
@@ -1953,9 +1953,9 @@ static int              sChannelsNotChangedCount = 0;
     // (note: we do this even if the database is stale)
     PQ_FEC *fec = [sDetectorDbData getPmthv:[self stationNumber] crate:[self crateNumber]];
     if (fec) {
-        int32_t notChanged = 0;
+        uint32_t notChanged = 0;
         // sequencer must be disabled on channels with HV disabled
-        int32_t wanted = seqDisabledMask;
+        uint32_t wanted = seqDisabledMask;
         seqDisabledMask |= (seqDisabledMask ^ startSeqDisabledMask) & fec->hvDisabled;
         notChanged |= (wanted ^ seqDisabledMask);
         // pedestals must be disabled on channels with HV disabled
@@ -1975,7 +1975,7 @@ static int              sChannelsNotChangedCount = 0;
         notChanged |= (wanted ^ onlineMask);
         // keep count of the number of channels we didn't change due to HV disabled
         if (notChanged) {
-            for (int32_t mask=1; mask; mask<<=1) {
+            for (uint32_t mask=1; mask; mask<<=1) {
                 if (mask & notChanged) ++sChannelsNotChangedCount;
             }
         }

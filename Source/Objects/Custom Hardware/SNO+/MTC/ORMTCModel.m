@@ -368,7 +368,7 @@ resetFifoOnStart = _resetFifoOnStart;
     //TO_DO the last 4 dacs are spares? But then why are the masks in these spots in mtcDacIndexes[]?
     for (int i=0; i<10; ++i) { // (don't update the last 4 dac settings)
         if (pqMTC->valid[kMTC_mtcaDacs] & (1 << i)) {
-            int32_t val = pqMTC->mtcaDacs[i];
+            uint32_t val = pqMTC->mtcaDacs[i];
             [self setDbLong:val forIndex:mtcDacIndexes[i]]; //TO_DO verify that this order is correct
         }
     }
@@ -398,7 +398,7 @@ resetFifoOnStart = _resetFifoOnStart;
     }
     for (int i=0; i<kNumMtcRelays; ++i) {
         if (pqMTC->valid[kMTC_mtcaRelays] & (1 << i)) {
-            int32_t val = pqMTC->mtcaRelays[i];
+            uint32_t val = pqMTC->mtcaRelays[i];
             switch (i) {
                 case 0:
                     [self setMtcaN100Mask:val];

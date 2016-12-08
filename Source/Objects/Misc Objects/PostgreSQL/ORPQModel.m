@@ -607,7 +607,7 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                 for (int ch=0; ch<n; ++ch) {
                     // ignore bad values (includes NULL values)
                     if (valPt[ch] == kPQBadValue) continue;
-                    int32_t val = (int32_t)valPt[ch];
+                    uint32_t val = (uint32_t)valPt[ch];
                     // set valid flag for this setting for this channel
                     pqFEC->valid[col] |= (1 << ch);
                     switch (col) {
@@ -711,7 +711,7 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                 if (!dat || [dat length] < sizeof(int64_t)) continue;
                 int64_t *valPt = (int64_t *)[dat mutableBytes];
                 if (*valPt == kPQBadValue) continue;
-                int32_t val = (int32_t)*valPt;
+                uint32_t val = (uint32_t)*valPt;
                 pqCrate->valid[col] = 1;   // set valid flag for this setting
                 switch (col) {
                     case kCrate_ctcDelay:
@@ -781,7 +781,7 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                     int64_t *valPt = (int64_t *)[dat mutableBytes];
                     if (valPt[j] == kPQBadValue) continue;
                     pqMTC->valid[col] |= (1 << j);    // set valid flag
-                    int32_t val = (int32_t)valPt[j];
+                    uint32_t val = (uint32_t)valPt[j];
                     switch (col) {
                         case kMTC_controlReg:
                             pqMTC->controlReg = val;
@@ -855,7 +855,7 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                     int64_t *valPt = (int64_t *)[dat mutableBytes];
                     if (valPt[j] == kPQBadValue) continue;
                     pqCAEN->valid[col] |= (1 << j);    // set valid flag
-                    int32_t val = (int32_t)valPt[j];
+                    uint32_t val = (uint32_t)valPt[j];
                     switch (col) {
                         case kCAEN_channelConfiguration:
                             pqCAEN->channelConfiguration = val;

@@ -236,7 +236,7 @@ snotDb = _snotDb;
     }
     if (pqCrate->valid[kCrate_hvRelayMask1] && pqCrate->valid[kCrate_hvRelayMask2]) {
         //TO_DO is mask1 the lower 32 bits?
-        unsigned long long mask = ((unsigned long long)(uint32_t)pqCrate->hvRelayMask2 << 32) | (uint32_t)pqCrate->hvRelayMask1;
+        unsigned long long mask = ((unsigned long long)pqCrate->hvRelayMask2 << 32) | pqCrate->hvRelayMask1;
         [self setRelayMask:mask];
         //TO_DO what about setRelayViewMask?
     }
