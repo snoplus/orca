@@ -4582,7 +4582,10 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
                 NSLogColor([NSColor redColor],@"%@ error reading XL3 hv status; error: %@ reason: %@\n", [[self xl3Link] crateName], [e name], [e reason]);
                 continue; // try again later if there was an error
             }
-            
+
+            //the above methods can fail without an exception, but the flags never lie
+            if (![self hvEverUpdated] || ![self hvSwitchEverUpdated]) continue;
+
             //set model values to hv readback or 0 if switch is off
             //N.B. readback can be arbitrarily offset from the previous setpoint
             //so we can't trust it enough to update the real setpoint. Never
