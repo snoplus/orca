@@ -24,6 +24,8 @@
 
 @interface ORSecurity : NSObject {
     NSMutableDictionary* locks;
+    unsigned long superUnlockMask;
+    NSMutableDictionary* superUnlockMaskRequests;
 	id					 passWordPanel;
 }
 + (ORSecurity*) sharedSecurity;
@@ -38,6 +40,9 @@
 - (BOOL) runInProgressOrIsLocked:(NSString*)aLockName;
 - (BOOL) runInProgressButNotType:(unsigned long)aMask orIsLocked:(NSString*)aLockName;
 - (void) lockAll;
+- (unsigned long)superUnlockMask;
+- (void) addSuperUnlockMask:(unsigned long)aMask forObject:(id)anObj;
+- (void) removeSuperUnlockMaskForObject:(id)anObj;
 
 @end
 

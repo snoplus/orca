@@ -28,6 +28,7 @@ ORSecurity* gSecurity = nil;
 
 @interface ORSecurity (private)
 - (void) _validatePWDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _formSuperUnlockMask;
 @end
 
 @implementation ORSecurity
@@ -45,6 +46,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Security);
 -(void)dealloc
 {
     [locks release];
+    [superUnlockMaskRequests release];
     [super dealloc];
 }
 
@@ -119,6 +121,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Security);
 {
     if([self isLocked:aLockName])return YES;
     else if([gOrcaGlobals runInProgress]){
+        aMask |= [self superUnlockMask];
         if(!([gOrcaGlobals runType] & aMask))return YES;
         else return NO;
     }
@@ -133,11 +136,42 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Security);
     }
 }
 
+- (unsigned long)superUnlockMask;
+{
+    return superUnlockMask;
+}
+
+- (void) addSuperUnlockMask:(unsigned long)aMask forObject:(id)anObj
+{
+    if(anObj){
+        if(!superUnlockMaskRequests)superUnlockMaskRequests = [[NSMutableDictionary dictionary]retain];
+        NSNumber* theMask = [NSNumber numberWithUnsignedLong:aMask];
+        NSNumber* aKey = [NSNumber numberWithUnsignedLong:(unsigned long)anObj];
+        [superUnlockMaskRequests setObject:theMask forKey:aKey];
+        [self _formSuperUnlockMask];
+    }
+}
+
+- (void) removeSuperUnlockMaskForObject:(id)anObj
+{
+    if(anObj){
+        NSNumber* aKey = [NSNumber numberWithUnsignedLong:(unsigned long)anObj];
+        [superUnlockMaskRequests removeObjectForKey:aKey];
+        [self _formSuperUnlockMask];
+    }
+}
 
 @end
 
 @implementation ORSecurity (private)
-
+- (void) _formSuperUnlockMask
+{
+    superUnlockMask = 0;
+    for(id aKey in superUnlockMaskRequests){
+        unsigned long aMask = [[superUnlockMaskRequests objectForKey:aKey] unsignedLongValue];
+        superUnlockMask |= aMask;
+    }
+}
 - (void) _validatePWDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
     //set the lock according to the result.
