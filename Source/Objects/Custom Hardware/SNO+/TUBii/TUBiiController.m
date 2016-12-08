@@ -28,7 +28,7 @@
 {
     Tubii_size = NSMakeSize(450, 400);
     PulserAndDelays_size = NSMakeSize(500, 350);
-    Triggers_size = NSMakeSize(500, 610);
+    Triggers_size = NSMakeSize(500, 680);
     Analog_size = NSMakeSize(615, 445);
     GTDelays_size = NSMakeSize(500, 250);
     SpeakerCounter_size_small = NSMakeSize(575,550);
@@ -296,13 +296,39 @@
 }
 - (IBAction)TrigMaskMatchHardware:(id)sender {
     //Makes the trigger mask GUI element match TUBii's hardware state
-    NSUInteger maskVal = [model trigMask];
-    [self SendBitInfo:maskVal FromBit:0 ToBit:21 ToCheckBoxes:TrigMaskSelect];
+    NSUInteger trigMaskVal = ([model syncTrigMask] | [model asyncTrigMask]);
+    NSUInteger syncMaskVal = 16777215 - [model asyncTrigMask];
+    NSLog(@"%d %d %d\n",[model syncTrigMask], [model asyncTrigMask], syncMaskVal);
+    [self SendBitInfo:trigMaskVal FromBit:0 ToBit:24 ToCheckBoxes:TrigMaskSelect];
+    [self SendBitInfo:syncMaskVal FromBit:24 ToBit:48 ToCheckBoxes:TrigMaskSelect];
 }
 - (IBAction)TrigMaskLoad:(id)sender {
     //Makes the trigger mask hardware state match the corresponding GUI element
-    NSUInteger maskVal = [self GetBitInfoFromCheckBoxes:TrigMaskSelect FromBit:0 ToBit:21];
-    [model setTrigMask:maskVal];
+    NSUInteger trigMaskVal = [self GetBitInfoFromCheckBoxes:TrigMaskSelect FromBit:0 ToBit:24];
+    NSUInteger syncMaskVal = [self GetBitInfoFromCheckBoxes:TrigMaskSelect FromBit:24 ToBit:48];
+
+    NSUInteger syncMask=0, asyncMask=0;
+    for(int i=0; i<24; i++)
+    {
+        if(syncMaskVal & (1<<i))
+        {
+            if(trigMaskVal & (1<<i))
+                syncMask |= 1<<i;
+            else
+                syncMask &= ~(1<<i);
+            asyncMask &= ~(1<<i);
+        }
+        else
+        {
+            if(trigMaskVal & (1<<i))
+                asyncMask |= 1<<i;
+            else
+                asyncMask &= ~(1<<i);
+            syncMask &= ~(1<<i);
+        }
+    }
+    
+    [model setTrigMask:syncMask setAsyncMask:asyncMask];
 }
 - (IBAction)BurstTriggerLoad:(id)sender {
     NSLog(@"Not yet implemented. :(");
@@ -649,7 +675,7 @@
     for (int i=low; i<high; i++) {
         if([[aMatrix cellWithTag:i] intValue]>0)
         {
-            maskVal |= (1<<i);
+            maskVal |= (1<<(i-low));
         }
     }
     return maskVal;
@@ -658,7 +684,7 @@
     //Helper function to send a bit value to a bunch of check boxes
     for (int i=low;i<high;i++)
     {
-        if((maskVal & 1<<i) >0)
+        if((maskVal & 1<<(i-low)) >0)
         {
             [[aMatrix cellWithTag:i] setState:1];
         }
