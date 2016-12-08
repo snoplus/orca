@@ -21,6 +21,7 @@
 #import "ORExperimentController.h"
 #import "SNOPDetectorView.h"
 #import "StopLightView.h"
+#import "RunStatusIcon.h"
 #include <stdint.h>
 
 @class ORColorScale;
@@ -134,6 +135,8 @@
 
     /* Mask of which HV supplies are on. Power supply B on crate 16 is bit 19 */
     uint32_t hvMask;
+
+    RunStatusIcon* doggy_icon;
 }
 
 @property (nonatomic,retain) NSMutableDictionary *smellieRunFileList;
