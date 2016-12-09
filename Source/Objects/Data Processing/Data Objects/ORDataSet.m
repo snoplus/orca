@@ -108,26 +108,32 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
     if(!watchingDictionary)watchingDictionary = [[NSMutableDictionary dictionary]retain];
     if([aNote object]){
         id watcherKey   = [[aNote userInfo] objectForKey:@"DataSetKey"];
-        int watcherRetainCount = [[watchingDictionary objectForKey:watcherKey]intValue];
-        watcherRetainCount++;
-        [watchingDictionary setObject:[NSNumber numberWithInt:watcherRetainCount] forKey:watcherKey];
+        if(watcherKey!=nil){
+            int watcherRetainCount = [[watchingDictionary objectForKey:watcherKey]intValue];
+            watcherRetainCount++;
+            [watchingDictionary setObject:[NSNumber numberWithInt:watcherRetainCount] forKey:watcherKey];
+        }
     }
 }
 
 - (void) someoneNotLooking:(NSNotification*) aNote
 {
     id watcherKey   = [[aNote userInfo] objectForKey:@"DataSetKey"];
-    int watcherRetainCount = [[watchingDictionary objectForKey:watcherKey]intValue];
-    watcherRetainCount--;
-    if(watcherRetainCount<=0)[watchingDictionary removeObjectForKey:watcherKey];
-    else [watchingDictionary setObject:[NSNumber numberWithInt:watcherRetainCount] forKey:watcherKey];
+    if(watcherKey!=nil){
+        int watcherRetainCount = [[watchingDictionary objectForKey:watcherKey]intValue];
+        watcherRetainCount--;
+        if(watcherRetainCount<=0)[watchingDictionary removeObjectForKey:watcherKey];
+        else [watchingDictionary setObject:[NSNumber numberWithInt:watcherRetainCount] forKey:watcherKey];
+    }
 }
 - (void) addGlobalWatcher:(NSNotification*) aNote
 {
     if(!globalWatchers)globalWatchers = [[NSMutableDictionary dictionary]retain];
     if([aNote object]){
         id watcherKey   = [NSNumber numberWithLong:(unsigned long)[aNote object]];
-        [globalWatchers setObject:watcherKey forKey:watcherKey]; //just care if an entry exists
+        if(watcherKey!=nil){
+            [globalWatchers setObject:watcherKey forKey:watcherKey]; //just care if an entry exists
+        }
     }
 }
 - (void) removeGlobalWatcher:(NSNotification*) aNote
