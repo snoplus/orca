@@ -3571,7 +3571,7 @@ err:
         [self setHvBNeedsUserIntervention:false];
     }
     @try {
-        [self setHVDacA:[self hvBVoltageDACSetValue] dacB:[self hvBVoltageDACSetValue]];
+        [self setHVDacA:[self hvAVoltageDACSetValue] dacB:[self hvBVoltageDACSetValue]];
     }
     @catch (NSException *exception) {
         NSLogColor([NSColor redColor],@"%@ HV failed to set HV!\n", [[self xl3Link] crateName]);
@@ -4558,19 +4558,19 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
             [self setHvNominalVoltageA:nominals[[self crateNumber]]];
             [self setHvramp_a_up:10.0];
             [self setHvramp_a_down:50.0];
-            [self setVsetalarm_a_vtol:50.0];
+            [self setVsetalarm_a_vtol:100.0];
             [self setIlowalarm_a_vmin:500.0];
             [self setIlowalarm_a_imin:10.0];
             [self setIhighalarm_a_imax:1000.0];
-            [self setVhighalarm_a_vmax:nominals[[self crateNumber]]+50.0];
+            [self setVhighalarm_a_vmax:nominals[[self crateNumber]]+100.0];
             [self setHvNominalVoltageB:(int)([self crateNumber]==16 ? 2445.0 : 0.0)];
             [self setHvramp_b_up:10.0];
             [self setHvramp_b_down:50.0];
-            [self setVsetalarm_b_vtol:50.0];
+            [self setVsetalarm_b_vtol:100.0];
             [self setIlowalarm_b_vmin:500.0];
             [self setIlowalarm_b_imin:10.0];
             [self setIhighalarm_b_imax:1000.0];
-            [self setVhighalarm_b_vmax:(int)([self crateNumber]==16 ? 2445.0 : 0.0)+50.0];
+            [self setVhighalarm_b_vmax:(int)([self crateNumber]==16 ? 2445.0 : 0.0)+100.0];
             hvAFromDB = true; //flag to indicate params were loaded
             hvBFromDB = true; //flag to indicate params were loaded
 
