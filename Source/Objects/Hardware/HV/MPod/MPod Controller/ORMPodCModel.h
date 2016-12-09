@@ -105,11 +105,11 @@ extern NSString* ORMPodCQueueCountChanged;
 - (void) main;
 - (void)decodeValueArray:(NSArray*)parts;
 - (void) decode:(NSString*)aName value:(NSString*)aValue;
-- (NSMutableDictionary*) decodeValue:(NSString*)aValue name:(NSString*)aName;
-- (NSMutableDictionary*) decodeFloat:(NSString*)aValue;
-- (NSMutableDictionary*) decodeInteger:(NSString*)aValue;
-- (NSMutableDictionary*) decodeBits:(NSString*)aValue name:(NSString*)aName;
-- (NSMutableDictionary*) decodeString:(NSString*)aValue name:(NSString*)aName;
+- (NSDictionary*) decodeValue:(NSString*)aValue name:(NSString*)aName;
+- (NSDictionary*) decodeFloat:(NSString*)aValue;
+- (NSDictionary*) decodeInteger:(NSString*)aValue;
+- (NSDictionary*) decodeBits:(NSString*)aValue name:(NSString*)aName;
+- (NSDictionary*) decodeString:(NSString*)aValue name:(NSString*)aName;
 @end
 
 @interface NSObject (ORSNMPOps)

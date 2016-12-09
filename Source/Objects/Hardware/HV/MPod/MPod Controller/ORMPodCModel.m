@@ -518,7 +518,7 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 	}
 }
 
-- (NSMutableDictionary*) decodeValue:(NSString*)aValue name:(NSString*)aName
+- (NSDictionary*) decodeValue:(NSString*)aValue name:(NSString*)aName
 {
 	if([aValue hasPrefix:@" Opaque: Float:"]){
 		return [self decodeFloat:[aValue substringFromIndex:15]];
@@ -532,9 +532,9 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 	else if([aValue hasPrefix:@" STRING:"]){
 		return [self decodeString:[aValue substringFromIndex:8] name:aName];
 	}
-	else if([aValue hasPrefix:@" IpAddress:"]){
-		return [self decodeString:[aValue substringFromIndex:11] name:aName];
-	}
+    else if([aValue hasPrefix:@" IpAddress:"]){
+        return [self decodeString:[aValue substringFromIndex:11] name:aName];
+    }
 	else if([aValue hasPrefix:@" Hex-STRING:"]){
 		return [self decodeString:[aValue substringFromIndex:12] name:aName];
 	}
@@ -544,74 +544,64 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 	else return nil;
 }
 
-- (NSMutableDictionary*) decodeFloat:(NSString*)aValue
+- (NSDictionary*) decodeFloat:(NSString*)aValue
 {
-	aValue = [aValue trimSpacesFromEnds];
-	NSArray*  parts  = [aValue componentsSeparatedByString:@" "];
-	NSString* number = [parts objectAtIndex:0];
-	NSMutableDictionary* dict = [NSMutableDictionary dictionary];
-	if([parts count]==2){
-		NSString* units = [parts objectAtIndex:1];
-		if([units hasSuffix:@"C"])units = [units substringFromIndex:[units length]-1];
-		
-		if([units isEqualToString:@"mV"]){
-			float theValue = [number floatValue];
-			theValue = theValue/1000.;
-			number = [NSString stringWithFormat:@"%f",theValue];
-			units    = @"V";
-		}
-		else if([units isEqualToString:@"nA"]){
-			float theValue = [number floatValue];
-			theValue = theValue/1000.;
-			number = [NSString stringWithFormat:@"%f",theValue];
-			units    = @"uA";
-		}
-		else if([units isEqualToString:@"mA"]){
-			float theValue = [number floatValue];
-			theValue = theValue*1000.;
-			number = [NSString stringWithFormat:@"%f",theValue];
-			units    = @"uA";
-		}
-		
-		
-		
-		[dict setObject:units forKey:@"Units"];
-		
-		
+	NSArray*  parts  = [[aValue trimSpacesFromEnds] componentsSeparatedByString:@" "];
+    if([parts count]!=0){
+        NSString* number = [parts objectAtIndex:0];
+        NSString* units = @"";
+        if([parts count]==2){
+            units = [parts objectAtIndex:1];
+            if([units hasSuffix:@"C"])units = [units substringFromIndex:[units length]-1];
+            
+            if([units isEqualToString:@"mV"]){
+                float theValue = [number floatValue];
+                theValue = theValue/1000.;
+                number = [NSString stringWithFormat:@"%f",theValue];
+                units    = @"V";
+            }
+            else if([units isEqualToString:@"nA"]){
+                float theValue = [number floatValue];
+                theValue = theValue/1000.;
+                number = [NSString stringWithFormat:@"%f",theValue];
+                units    = @"uA";
+            }
+            else if([units isEqualToString:@"mA"]){
+                float theValue = [number floatValue];
+                theValue = theValue*1000.;
+                number = [NSString stringWithFormat:@"%f",theValue];
+                units    = @"uA";
+            }
+        }
+        return [NSDictionary dictionaryWithObjectsAndKeys:units,@"Units",number,@"Value", nil];
 		
 	}
-	[dict setObject:number forKey:@"Value"];
-	return dict;
+	else return nil;
 }
 
-- (NSMutableDictionary*) decodeString:(NSString*)aValue  name:(NSString*)aName;
+- (NSDictionary*) decodeString:(NSString*)aValue  name:(NSString*)aName;
 {
-	aValue = [aValue trimSpacesFromEnds];
-	NSMutableDictionary* dict = [NSMutableDictionary dictionary];
-	[dict setObject:aValue forKey:@"Value"];
-	return dict;
+	return [NSDictionary dictionaryWithObject:[aValue trimSpacesFromEnds] forKey:@"Value"];
 }
 
-- (NSMutableDictionary*) decodeInteger:(NSString*)aValue
+- (NSDictionary*) decodeInteger:(NSString*)aValue
 {
-	NSMutableDictionary* dict = [NSMutableDictionary dictionary];
 	aValue = [aValue trimSpacesFromEnds];
-	if([aValue hasPrefix:@"on"])		[dict setObject:@"1" forKey:@"Value"];
-	else if([aValue hasPrefix:@"off"])	[dict setObject:@"0" forKey:@"Value"];
+    if([aValue hasPrefix:@"on"])		return [NSDictionary dictionaryWithObject:@"1" forKey:@"Value"];
+	else if([aValue hasPrefix:@"off"])	return [NSDictionary dictionaryWithObject:@"0" forKey:@"Value"];
 	else {
-		NSArray* parts            = [aValue componentsSeparatedByString:@" "];
+		NSArray* parts = [aValue componentsSeparatedByString:@" "];
 		if([parts count]==2){
-			[dict setObject:[parts objectAtIndex:1] forKey:@"Units"];
-			[dict setObject:[parts objectAtIndex:0] forKey:@"Value"];
+            return [NSDictionary dictionaryWithObjectsAndKeys:[parts objectAtIndex:0],@"Value",[parts objectAtIndex:1],@"Units", nil];
 		}
 		else {
-			[dict setObject:aValue forKey:@"Value"];
+            return [NSDictionary dictionaryWithObject:aValue forKey:@"Value"];
 		}
 	}
-	return dict;
+    return nil;
 }
 
-- (NSMutableDictionary*) decodeBits:(NSString*)aValue name:(NSString*)aName
+- (NSDictionary*) decodeBits:(NSString*)aValue name:(NSString*)aName
 {
 	NSMutableDictionary* dict = [NSMutableDictionary dictionary];
 	aValue = [aValue trimSpacesFromEnds];
@@ -625,7 +615,6 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 			bitMask |= (0x1L << setBitLocation);
 			[descriptionArray addObject:[aPart substringToIndex:parRange.location]];
 		}
-		
 	}
 	
 	[dict setObject:[NSString stringWithFormat:@"%lu",bitMask] forKey:@"Value"];
