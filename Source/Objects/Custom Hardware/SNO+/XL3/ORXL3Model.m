@@ -4706,6 +4706,19 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
         NSLog(msg);
     }
     
+    //Remember state of alarm and only send alarm query on change
+    bool lastSupplyACurrentDropout = false;
+    bool lastSupplyAOverVoltage = false;
+    bool lastSupplyAOverCurrent = false;
+    bool lastSupplyASetpointDiscrepancy = false;
+    bool lastSupplyBCurrentDropout = false;
+    bool lastSupplyBOverVoltage = false;
+    bool lastSupplyBOverCurrent = false;
+    bool lastSupplyBSetpointDiscrepancy = false;
+    //The above are updated with level alarms whenever loopCounter = 0 (it rolls over eventually)
+    //Heartbeat sent on multiples of 10, incremented each loop (~1s)
+    uint32_t loopCounter = 0;
+    
     //Runs until the thread is cancelled
     while (![[NSThread currentThread] isCancelled] ) {
         
@@ -4816,7 +4829,10 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
                     NSLogColor([NSColor redColor],@"%@ HV A read value differs from the setpoint! Suspending HV monitoring and control. Press 'Accept Readback' to resume.\n", [[self xl3Link] crateName]);
                 }
             }
-            [self _update_level_alarm:80200+2*[self crateNumber]+0 level:supplyASetpointDiscrepancy];
+            if (!loopCounter || supplyASetpointDiscrepancy != lastSupplyASetpointDiscrepancy) {
+                lastSupplyASetpointDiscrepancy = supplyASetpointDiscrepancy;
+                [self _update_level_alarm:80200+2*[self crateNumber]+0 level:supplyASetpointDiscrepancy];
+            }
             
             if ([self crateNumber] == 16) {
                 bool supplyBSetpointDiscrepancy = false;
@@ -4834,7 +4850,10 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
                         NSLogColor([NSColor redColor],@"%@ HV B read value differs from the setpoint! Suspending HV monitoring and control. Press 'Accept Readback' to resume.\n", [[self xl3Link] crateName]);
                     }
                 }
-                [self _update_level_alarm:80200+2*[self crateNumber]+1 level:supplyBSetpointDiscrepancy];
+                if (!loopCounter || supplyBSetpointDiscrepancy != lastSupplyBSetpointDiscrepancy) {
+                    lastSupplyBSetpointDiscrepancy = supplyBSetpointDiscrepancy;
+                    [self _update_level_alarm:80200+2*[self crateNumber]+1 level:supplyBSetpointDiscrepancy];
+                }
             }
         }
         
@@ -4842,21 +4861,39 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
         bool supplyAOverVoltage = [self hvAVoltageReadValue] > [self vhighalarm_a_vmax];
         bool supplyAOverCurrent = [self hvACurrentReadValue] > [self ihighalarm_a_imax];
         int aoffset = 2*[self crateNumber] + 0;
-        [self _update_level_alarm:80000+aoffset level:supplyACurrentDropout];
-        [self _update_level_alarm:80300+aoffset level:supplyAOverCurrent];
-        [self _update_level_alarm:80400+aoffset level:supplyAOverVoltage];
+        if (!loopCounter || supplyACurrentDropout != lastSupplyACurrentDropout) {
+            lastSupplyACurrentDropout = supplyACurrentDropout;
+            [self _update_level_alarm:80000+aoffset level:supplyACurrentDropout];
+        }
+        if (!loopCounter || supplyAOverCurrent != lastSupplyAOverCurrent) {
+            lastSupplyBOverCurrent = supplyAOverCurrent;
+            [self _update_level_alarm:80300+aoffset level:supplyAOverCurrent];
+        }
+        if (!loopCounter || supplyAOverVoltage != lastSupplyAOverVoltage) {
+            lastSupplyAOverVoltage = supplyAOverVoltage;
+            [self _update_level_alarm:80400+aoffset level:supplyAOverVoltage];
+        }
         
         if ([self crateNumber] == 16) {
             bool supplyBCurrentDropout = [self hvBVoltageReadValue] > [self ilowalarm_b_vmin] && [self hvBCurrentReadValue] < [self ilowalarm_a_imin];
             bool supplyBOverVoltage = [self hvBVoltageReadValue] > [self vhighalarm_b_vmax];
             bool supplyBOverCurrent = [self hvBCurrentReadValue] > [self ihighalarm_b_imax];
             int boffset = 2*[self crateNumber] + 1;
-            [self _update_level_alarm:80000+boffset level:supplyBCurrentDropout];
-            [self _update_level_alarm:80300+boffset level:supplyBOverCurrent];
-            [self _update_level_alarm:80400+boffset level:supplyBOverVoltage];
+            if (!loopCounter || supplyBCurrentDropout != lastSupplyBCurrentDropout) {
+                lastSupplyBCurrentDropout = supplyBCurrentDropout;
+                [self _update_level_alarm:80000+boffset level:supplyBCurrentDropout];
+            }
+            if (!loopCounter || supplyBOverCurrent != lastSupplyBOverCurrent) {
+                lastSupplyBOverCurrent = supplyBOverCurrent;
+                [self _update_level_alarm:80300+boffset level:supplyBOverCurrent];
+            }
+            if (!loopCounter || supplyBOverVoltage != lastSupplyBOverVoltage) {
+                lastSupplyBOverVoltage = supplyBOverVoltage;
+                [self _update_level_alarm:80400+boffset level:supplyBOverVoltage];
+            }
         }
         
-        [self _post_heartbeat:[self crateNumber]];
+        if ((loopCounter++) % 10 == 0) [self _post_heartbeat:[self crateNumber]];
         
         //We can't do anything if the XL3 disconnects anyway
         if (![[self xl3Link] isConnected]) break;
