@@ -108,12 +108,15 @@ enum {
     BOOL hvBSwitch;
     BOOL hvARamping;
     BOOL hvBRamping;
+    BOOL hvAQueryWaiting;
+    BOOL hvBQueryWaiting;
     BOOL hvAFromDB;
     BOOL hvBFromDB;
     BOOL hvEverUpdated;
     BOOL hvSwitchEverUpdated;
     BOOL hvANeedsUserIntervention;
     BOOL hvBNeedsUserIntervention;
+    
     
     NSString* triggerStatus;
     BOOL _isTriggerON;
@@ -253,6 +256,8 @@ enum {
 @property float vhighalarm_b_vmax;
 @property float ihighalarm_b_imax;
 
+@property BOOL hvAQueryWaiting;
+@property BOOL hvBQueryWaiting;
 @property BOOL hvAFromDB;
 @property BOOL hvBFromDB;
 @property BOOL hvEverUpdated;
@@ -416,6 +421,8 @@ enum {
 - (void) readHVSwitchOnForA:(BOOL*)aIsOn forB:(BOOL*)bIsOn;
 - (void) readHVSwitchOn;
 
+
++ (bool) requestHVParams:(ORXL3Model *)model;
 - (void) safeHvInit;
 - (void) setHVSwitch:(BOOL)aOn forPowerSupply:(unsigned char)sup;
 - (void) hvPanicDown;

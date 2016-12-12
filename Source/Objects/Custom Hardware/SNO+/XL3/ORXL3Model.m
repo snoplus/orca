@@ -108,6 +108,8 @@ extern NSString* ORSNOPRequestHVStatus;
 - (void) _post_heartbeat:(int)crate;
 - (void) _trigger_edge_alarm:(int)alarmid;
 - (void) _update_level_alarm:(int)alarmid level:(bool)state;
+- (void) _hv_a_dbparams:(ORPQResult*)result;
+- (void) _hv_b_dbparams:(ORPQResult*)result;
 @end
 
 @implementation ORXL3Model
@@ -144,7 +146,9 @@ xl3InitInProgress = _xl3InitInProgress,
 ecal_received = _ecal_received,
 ecalToOrcaInProgress = _ecalToOrcaInProgress,
 isTriggerON = _isTriggerON,
-snotDb = _snotDb;
+snotDb = _snotDb,
+hvAQueryWaiting = hvAQueryWaiting,
+hvBQueryWaiting = hvBQueryWaiting;
 
 
 #pragma mark •••Initialization
@@ -1505,6 +1509,8 @@ void SwapLongBlock(void* p, int32_t n)
         memcpy(&safe_bundle[i], &aConfigBundle, sizeof(MB));
     }
 
+    self.hvAQueryWaiting = false;
+    self.hvBQueryWaiting = false;
     self.hvANeedsUserIntervention = false;
     self.hvBNeedsUserIntervention = false;
 
@@ -4401,6 +4407,71 @@ err:
     }
 }
 
+//Static method for the XL3's to request their HV paramters from the database
+//Static and synchronized to bottle neck the access to the DB from all HV threads and only
+//inform the user once of a missing DB object. Each thread requires independent confirmation
+//before using hardcoded values (see _hv_*_dbparams)
++ (bool) requestHVParams:(ORXL3Model*)model
+{
+    static uint32_t nodb = 0;
+    //Synchronized on the class instance (self in static method)
+    @synchronized (self) {
+        ORPQModel *db = [ORPQModel getCurrent];
+        // If no database object and we haven't informed the user yet
+        if (!db && nodb < 10) {
+            nodb++;
+            // inform user of missing db object
+            if (nodb == 10) { //exactly how long this takes depends on the number of XL3's connected - max 10s from first connect
+                ORRunAlertPanel(@"PostgresDB object not found",@"Cannot get the PostgresDB object, please add one to the experiment and restart ORCA.",@"OK",nil,nil);
+            }
+            return false;
+        }
+        //We previously could not find the db object
+        if (nodb >= 10) {
+            [model _hv_a_dbparams:nil];
+            if ([model crateNumber] == 16) {
+                [model _hv_b_dbparams:nil];
+            } else {
+                //hardcode non-16 supply B values
+                [model setHvBFromDB:true];
+                [model setHvNominalVoltageB:0];
+                [model setHvramp_b_up:10.0];
+                [model setHvramp_b_down:50.0];
+                [model setVsetalarm_b_vtol:100.0];
+                [model setIlowalarm_b_vmin:500.0];
+                [model setIlowalarm_b_imin:0.0];
+                [model setIhighalarm_b_imax:0.0];
+                [model setVhighalarm_b_vmax:0.0];
+            }
+            return true;
+        }
+        //DB exists, send query for supplies
+        if (![model hvAFromDB] && ![model hvAQueryWaiting]) {
+            [model setHvAQueryWaiting:true];
+            [db dbQuery:[NSString stringWithFormat:@"SELECT * FROM hvparams WHERE crate=%i AND supply='A'", [model crateNumber]] object:model selector:@selector(_hv_a_dbparams:)];
+        }
+        //crate 16 is special
+        if ([model crateNumber] == 16) {
+            if (![model hvBFromDB] && ![model hvBQueryWaiting]) {
+                [model setHvBQueryWaiting:true];
+                [db dbQuery:[NSString stringWithFormat:@"SELECT * FROM hvparams WHERE crate=%i AND supply='B'", [model crateNumber]] object:model selector:@selector(_hv_b_dbparams:)];
+            }
+        } else {
+            //hardcode non-16 supply B values
+            [model setHvBFromDB:true];
+            [model setHvNominalVoltageB:0];
+            [model setHvramp_b_up:10.0];
+            [model setHvramp_b_down:50.0];
+            [model setVsetalarm_b_vtol:100.0];
+            [model setIlowalarm_b_vmin:500.0];
+            [model setIlowalarm_b_imin:0.0];
+            [model setIhighalarm_b_imax:0.0];
+            [model setVhighalarm_b_vmax:0.0];
+        }
+        return true;
+    }
+}
+
 @end
 
 
@@ -4537,10 +4608,91 @@ err:
     [pollPool release];
 }
 
-
+//hardcoded nominal voltages Dec 2016
 float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170.0,
                     2060.0, 2435.0, 2240.0, 2370.0, 2220.0, 2270.0, 1970.0, 2025.0,
                     1995.0, 1945.0, 2010.0, 2000.0}; //crates 0-19 supply a
+
+
+//Callback for database access to hv params for supply a
+- (void)_hv_a_dbparams:(ORPQResult*)result
+{
+    if (!hvAFromDB) { // Only do this once per init loop
+        if (!result) { // Query failed for some reason
+            BOOL res = ORRunAlertPanel(
+                @"HV parameter query failed",
+                [NSString stringWithFormat:@"Could not get HV parameters for supply %iA, use hardcoded defaults or try to load from DB again?", [self crateNumber]],
+                @"Hardcoded Defaults",
+                @"Try Again",
+                nil);
+            if (res) {
+                NSLogColor([NSColor redColor],@"Using HARDCODED DEFAULTS for supply %iA\n", [self crateNumber]);
+                [self setHvNominalVoltageA:nominals[[self crateNumber]]];
+                [self setHvramp_a_up:10.0];
+                [self setHvramp_a_down:50.0];
+                [self setVsetalarm_a_vtol:100.0];
+                [self setIlowalarm_a_vmin:100.0];
+                [self setIlowalarm_a_imin:1.0];
+                [self setIhighalarm_a_imax:65.0];
+                [self setVhighalarm_a_vmax:nominals[[self crateNumber]]+100.0];
+                [self setHvAFromDB:true];
+            } else {
+                sleep(10); //wait a bit before trying again
+            }
+        } else { // Only do this once, assume non-nil means the request was good
+            NSDictionary* dict = [result fetchRowAsDictionary];
+            [self setHvNominalVoltageA:[(NSNumber*)[dict valueForKey:@"nominal"] floatValue]];
+            [self setHvramp_a_up:[(NSNumber*)[dict valueForKey:@"hvramp_up"] floatValue]];
+            [self setHvramp_a_down:[(NSNumber*)[dict valueForKey:@"hvramp_down"] floatValue]];
+            [self setVsetalarm_a_vtol:[(NSNumber*)[dict valueForKey:@"vsetalarm_vtol"] floatValue]];
+            [self setIlowalarm_a_vmin:[(NSNumber*)[dict valueForKey:@"ilowalarm_vmin"] floatValue]];
+            [self setIlowalarm_a_imin:[(NSNumber*)[dict valueForKey:@"ilowalarm_imin"] floatValue]];
+            [self setVhighalarm_a_vmax:[(NSNumber*)[dict valueForKey:@"vhighalarm_vmax"] floatValue]];
+            [self setIhighalarm_a_imax:[(NSNumber*)[dict valueForKey:@"ihighalarm_imax"] floatValue]];
+            [self setHvAFromDB:true];
+        }
+    }
+    [self setHvAQueryWaiting:false];
+}
+
+//Callback for database access to hv params for supply b
+- (void)_hv_b_dbparams:(ORPQResult*)result
+{
+    if (!hvBFromDB) { // Only do this once per init loop
+        if (!result) { // Query failed for some reason
+            BOOL res = ORRunAlertPanel(
+                @"HV parameter query failed",
+                [NSString stringWithFormat:@"Could not get HV parameters for supply %iB, use hardcoded defaults or try to load from DB again?", [self crateNumber]],
+                @"Hardcoded Defaults",
+                @"Try Again",
+                nil);
+            if (res) {
+                NSLogColor([NSColor redColor],@"Using HARDCODED DEFAULTS for supply %iB\n", [self crateNumber]);
+                [self setHvNominalVoltageB:(int)([self crateNumber]==16 ? 2445.0 : 0.0)];
+                [self setHvramp_b_up:10.0];
+                [self setHvramp_b_down:50.0];
+                [self setVsetalarm_b_vtol:100.0];
+                [self setIlowalarm_b_vmin:100.0];
+                [self setIlowalarm_b_imin:1.0];
+                [self setIhighalarm_b_imax:65.0];
+                [self setVhighalarm_b_vmax:(int)([self crateNumber]==16 ? 2445.0 : 0.0)+100.0];
+                [self setHvBFromDB:true];
+            }
+        } else {
+            NSDictionary* dict = [result fetchRowAsDictionary];
+            [self setHvNominalVoltageB:[(NSNumber*)[dict valueForKey:@"nominal"] floatValue]];
+            [self setHvramp_b_up:[(NSNumber*)[dict valueForKey:@"hvramp_up"] floatValue]];
+            [self setHvramp_b_down:[(NSNumber*)[dict valueForKey:@"hvramp_down"] floatValue]];
+            [self setVsetalarm_b_vtol:[(NSNumber*)[dict valueForKey:@"vsetalarm_vtol"] floatValue]];
+            [self setIlowalarm_b_vmin:[(NSNumber*)[dict valueForKey:@"ilowalarm_vmin"] floatValue]];
+            [self setIlowalarm_b_imin:[(NSNumber*)[dict valueForKey:@"ilowalarm_imin"] floatValue]];
+            [self setVhighalarm_b_vmax:[(NSNumber*)[dict valueForKey:@"vhighalarm_vmax"] floatValue]];
+            [self setIhighalarm_b_imax:[(NSNumber*)[dict valueForKey:@"ihighalarm_imax"] floatValue]];
+            [self setHvBFromDB:true];
+        }
+    }
+    [self setHvBQueryWaiting:false];
+}
 
 // This method is started as a thread when a new ORXL3Model is created. It waits
 // for the XL3 to connect AND for the XL3 to report that it the xilinx chip
@@ -4556,26 +4708,18 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
         //do nothing without an xl3 connected
         if ([self xl3Link] && [[self xl3Link] isConnected]) {
             
-            //B.J.L. 11/22/16 - this block is a temporary to hardcode parameters pending DB access
-            [self setHvNominalVoltageA:nominals[[self crateNumber]]];
-            [self setHvramp_a_up:10.0];
-            [self setHvramp_a_down:50.0];
-            [self setVsetalarm_a_vtol:100.0];
-            [self setIlowalarm_a_vmin:500.0];
-            [self setIlowalarm_a_imin:10.0];
-            [self setIhighalarm_a_imax:1000.0];
-            [self setVhighalarm_a_vmax:nominals[[self crateNumber]]+100.0];
-            [self setHvNominalVoltageB:(int)([self crateNumber]==16 ? 2445.0 : 0.0)];
-            [self setHvramp_b_up:10.0];
-            [self setHvramp_b_down:50.0];
-            [self setVsetalarm_b_vtol:100.0];
-            [self setIlowalarm_b_vmin:500.0];
-            [self setIlowalarm_b_imin:10.0];
-            [self setIhighalarm_b_imax:1000.0];
-            [self setVhighalarm_b_vmax:(int)([self crateNumber]==16 ? 2445.0 : 0.0)+100.0];
-            hvAFromDB = true; //flag to indicate params were loaded
-            hvBFromDB = true; //flag to indicate params were loaded
-
+            //Request the hv parameters (N.B. true does not mean they were loaded, check hvAFromDB and hvBFromDB)
+            if (![ORXL3Model requestHVParams:self]) {
+                [hvLoopPool release];
+                continue;
+            }
+            
+            //Give up early if no control params yet (will not duplicate db queries)
+            if (!hvAFromDB || !hvBFromDB) {
+                [hvLoopPool release];
+                continue;
+            }
+            
             //now readback the HV settings according to the XL3
             @try {
                 [self readHVSwitchOn];
@@ -4622,7 +4766,7 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
                 }
             }
             
-            //finally launch a new HV thread
+            //free the previous thread if it exists
             if (hvThread) {
                 if (![hvThread isFinished]) {
                     [hvThread cancel];
@@ -4630,6 +4774,8 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
                 [hvThread release];
                 hvThread = nil;
             }
+            
+            // do we have control parameters?
             if (hvAFromDB && hvBFromDB) {
                 hvThread = [[NSThread alloc] initWithTarget:self selector:@selector(_hvXl3) object:nil];
                 [hvThread start];
@@ -4706,10 +4852,16 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
     
     //Update log with new values
     [self readHVStatus];
+    NSLog(@"%@ HV A Params: Nominal: %.1f V, RampUp: %.1f V/s, RampDown: %.1f V/s, Vtol: %.1f V, IlowVmin: %.1f V, IlowImin: %.1f mA, Ihigh: %.1f mA, Vhigh: %.1f V\n",
+          [[self xl3Link] crateName], (float)[self hvNominalVoltageA], [self hvramp_a_up], [self hvramp_a_down], [self vsetalarm_a_vtol],
+          [self ilowalarm_a_vmin], [self ilowalarm_a_imin], [self ihighalarm_a_imax], [self vhighalarm_a_vmax]);
     NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ HV A Status: ", [[self xl3Link] crateName]];
     [msg appendFormat:@"Setpoint: %.2f V, Voltage: %.2f V, Current: %.2f mA\n", [self hvAVoltageDACSetValue]/4096.*3000., [self hvAVoltageReadValue], [self hvACurrentReadValue]];
     NSLog(msg);
     if ([self crateNumber] == 16) {
+        NSLog(@"%@ HV B Params: Nominal: %.1f V, RampUp: %.1f V/s, RampDown: %.1f V/s, Vtol: %.1f V, IlowVmin: %.1f V, IlowImin: %.1f mA, Ihigh: %.1f mA, Vhigh: %.1f V\n",
+              [[self xl3Link] crateName], (float)[self hvNominalVoltageB], [self hvramp_b_up], [self hvramp_b_down], [self vsetalarm_b_vtol],
+              [self ilowalarm_b_vmin], [self ilowalarm_b_imin], [self ihighalarm_b_imax], [self vhighalarm_b_vmax]);
         NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ HV B Status: ", [[self xl3Link] crateName]];
         [msg appendFormat:@"Setpoint: %.2f V, Voltage: %.2f V, I: %.2f mA\n", [self hvBVoltageDACSetValue]/4096.*3000., [self hvAVoltageReadValue], [self hvACurrentReadValue]];
         NSLog(msg);
@@ -4830,7 +4982,7 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
             bool supplyASetpointDiscrepancy = false;
             if (self.hvANeedsUserIntervention) {
                 if (fabs([self hvAVoltageReadValue] - [self hvAVoltageDACSetValue]/4096.*3000.) <= [self vsetalarm_a_vtol]) {
-                    NSLogColor([NSColor redColor],@"%@ HV A read value recovered.", [[self xl3Link] crateName]);
+                    NSLogColor([NSColor redColor],@"%@ HV A read value recovered.\n", [[self xl3Link] crateName]);
                     self.hvANeedsUserIntervention = false;
                 } else {
                     supplyASetpointDiscrepancy = true;
@@ -4851,7 +5003,7 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
                 bool supplyBSetpointDiscrepancy = false;
                 if (self.hvBNeedsUserIntervention) {
                     if (fabs([self hvBVoltageReadValue] - [self hvBVoltageDACSetValue]/4096.*3000.) <= [self vsetalarm_b_vtol]) {
-                        NSLog(@"%@ HV B read value recovered", [[self xl3Link] crateName]);
+                        NSLogColor([NSColor redColor],@"%@ HV B read value recovered.\n", [[self xl3Link] crateName]);
                         self.hvBNeedsUserIntervention = false;
                     } else {
                         supplyBSetpointDiscrepancy = true;
