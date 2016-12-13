@@ -20,6 +20,8 @@ enum {
     kPQTypeInt16    = 21,   // 2-byte integer
     kPQTypeVector16 = 22,   // vector of 2-byte integers
     kPQTypeInt32    = 23,   // 4-byte integer
+    kPQTypeFloat4   = 700,  // 4-byte single precision float
+    kPQTypeFloat8   = 701,  // 8-byte double precision float
     kPQTypeArrayChar= 1002, // array of 8-bit characters
     kPQTypeArray16  = 1005, // array of 2-byte integers
     kPQTypeArray32  = 1007, // array of 4-byte integers
@@ -117,6 +119,12 @@ NSDate* MCPYear0000;
                 case kPQTypeInt16:
                 case kPQTypeInt32:
                     theCurrentObj = [NSNumber numberWithLong:strtoll(pt, NULL, 0)];
+                    break;
+                case kPQTypeFloat4:
+                    theCurrentObj = [NSNumber numberWithFloat:strtof(pt,NULL)];
+                    break;
+                case kPQTypeFloat8:
+                    theCurrentObj = [NSNumber numberWithDouble:strtod(pt,NULL)];
                     break;
                 case kPQTypeArrayChar:
                 case kPQTypeArray16:
@@ -343,6 +351,12 @@ NSDate* MCPYear0000;
                 break;
             case kPQTypeInt64:
                 theType = @"int8";
+                break;
+            case kPQTypeFloat4:
+                theType = @"float4";
+                break;
+            case kPQTypeFloat8:
+                theType = @"float8";
                 break;
             default:
                 theType = @"unknown";
