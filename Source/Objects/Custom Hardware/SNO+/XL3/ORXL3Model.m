@@ -4548,8 +4548,10 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
 // voltage control thread.
 - (void) _hvInit
 {
-    NSAutoreleasePool* hvPool = [[NSAutoreleasePool alloc] init];
     while (true) {
+        //N.B. it is very important this is released before the loop continues/breaks
+        NSAutoreleasePool* hvLoopPool = [[NSAutoreleasePool alloc] init];
+        
         sleep(1);
         //do nothing without an xl3 connected
         if ([self xl3Link] && [[self xl3Link] isConnected]) {
@@ -4580,11 +4582,15 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
                 [self readHVStatus];
             } @catch (NSException *e) {
                 NSLogColor([NSColor redColor],@"%@ error reading XL3 hv status; error: %@ reason: %@\n", [[self xl3Link] crateName], [e name], [e reason]);
+                [hvLoopPool release];
                 continue; // try again later if there was an error
             }
 
             //the above methods can fail without an exception, but the flags never lie
-            if (![self hvEverUpdated] || ![self hvSwitchEverUpdated]) continue;
+            if (![self hvEverUpdated] || ![self hvSwitchEverUpdated]) {
+                [hvLoopPool release];
+                continue;
+            }
 
             //set model values to hv readback or 0 if switch is off
             //N.B. readback can be arbitrarily offset from the previous setpoint
@@ -4628,6 +4634,7 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
                 hvThread = [[NSThread alloc] initWithTarget:self selector:@selector(_hvXl3) object:nil];
                 [hvThread start];
             } else {
+                [hvLoopPool release];
                 continue;
             }
             
@@ -4635,10 +4642,12 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
             dispatch_async(dispatch_get_main_queue(), ^{
                 [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
             });
+            
+            [hvLoopPool release];
             break; //exit loop
         }
+        
     }
-    [hvPool release];
 }
 
 - (void) _trigger_edge_alarm:(int)alarmid
@@ -4715,12 +4724,16 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
     bool lastSupplyBOverVoltage = false;
     bool lastSupplyBOverCurrent = false;
     bool lastSupplyBSetpointDiscrepancy = false;
-    //The above are updated with level alarms whenever loopCounter = 0 (it rolls over eventually)
+    //The above are updated with level alarms whenever:
+    //   loopCounter = 0 to update on first loop (rolls over every 2^32 loops)
+    //   the status of the alarm changes, along with updating the DB
     //Heartbeat sent on multiples of 10, incremented each loop (~1s)
     uint32_t loopCounter = 0;
     
-    //Runs until the thread is cancelled
-    while (![[NSThread currentThread] isCancelled] ) {
+    //Runs until the thread is cancelled or xl3 disconnects
+    while (![[NSThread currentThread] isCancelled] && [self xl3Link] && [[self xl3Link] isConnected]) {
+        
+        NSAutoreleasePool *hvLoopPool = [[NSAutoreleasePool alloc] init];
         
         //state variables
         bool aUp = false, bUp = false, changing = false;
@@ -4857,6 +4870,7 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
             }
         }
         
+        //Voltage and current limit alarms
         bool supplyACurrentDropout = [self hvAVoltageReadValue] > [self ilowalarm_a_vmin] && [self hvACurrentReadValue] < [self ilowalarm_a_imin];
         bool supplyAOverVoltage = [self hvAVoltageReadValue] > [self vhighalarm_a_vmax];
         bool supplyAOverCurrent = [self hvACurrentReadValue] > [self ihighalarm_a_imax];
@@ -4895,8 +4909,7 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
         
         if ((loopCounter++) % 10 == 0) [self _post_heartbeat:[self crateNumber]];
         
-        //We can't do anything if the XL3 disconnects anyway
-        if (![[self xl3Link] isConnected]) break;
+        [hvLoopPool release];
     }
     
     NSLog(@"%@ exiting HV control thread\n",[[self xl3Link] crateName]);
