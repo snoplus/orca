@@ -462,7 +462,7 @@ snopGreenColor;
 }
 
 - (void) runStatusChanged:(NSNotification*)aNotification
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     
     [startRunButton setEnabled:true];
 
@@ -491,7 +491,7 @@ snopGreenColor;
         [lightBoardView setState:kCautionLight];
 	}
     
-}
+}); }
 
 - (void) viewTypeChanged:(NSNotification*)aNote
 {
@@ -501,17 +501,17 @@ snopGreenColor;
 }
 
 - (void) dbOrcaDBIPChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [orcaDBIPAddressPU setStringValue:[model orcaDBIPAddress]];
-}
+}); }
 
 - (void) dbDebugDBIPChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     [debugDBIPAddressPU setStringValue:[model debugDBIPAddress]];
-}
+}); }
 
 - (void) hvStatusChanged:(NSNotification*)aNote
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     if (!aNote) {
         //collect all instances of xl3 objects in Orca
         NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
@@ -649,7 +649,7 @@ snopGreenColor;
         [detectorHVStatus setBackgroundColor:snopBlueColor];
         [panicDownButton setEnabled:0];
     }
-}
+}); }
 
 
 #pragma mark ¥¥¥Interface Management
@@ -1451,7 +1451,7 @@ snopGreenColor;
 }
 
 - (void) mtcDataBaseChanged:(NSNotification*)aNotification
-{
+{ dispatch_async(dispatch_get_main_queue(), ^{
     
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     ORMTCModel* mtcModel;
@@ -1590,7 +1590,7 @@ snopGreenColor;
         [[standardRunThresCurrentValues cellAtRow:11 column:0] setTextColor:[self snopRedColor]];
     }
     
-}
+}); }
 
 - (IBAction)loadStandardRunFromDBAction:(id)sender {
     
@@ -1683,7 +1683,8 @@ snopGreenColor;
 
 //Query the DB for the selected Standard Run name and version
 //and display the default and 'test' values on the GUI.
--(void) displayThresholdsFromDB {
+-(void) displayThresholdsFromDB
+{ dispatch_async(dispatch_get_main_queue(), ^{
 
     //Get MTC model
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
@@ -1890,7 +1891,7 @@ snopGreenColor;
         }
     }
 
-}
+}); }
 
 
 //Reload the standard run from the DB:
