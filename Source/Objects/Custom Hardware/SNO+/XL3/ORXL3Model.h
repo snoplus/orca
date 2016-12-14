@@ -174,6 +174,7 @@ enum {
     bool _ecalToOrcaInProgress;
 
     bool initialized;
+    bool stateUpdated;
 }
 
 @property (nonatomic,assign) unsigned long xl3MegaBundleDataId;
@@ -283,6 +284,7 @@ enum {
 
 #pragma mark •••Accessors
 - (bool) initialized;
+- (bool) stateUpdated;
 - (NSString*) shortName;
 - (id) controllerCard;
 - (void) setSlot:(int)aSlot;
