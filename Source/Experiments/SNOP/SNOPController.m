@@ -701,8 +701,11 @@ snopGreenColor;
 - (IBAction) debugDBTestAction:(id)sender
 {
     [[NSWorkspace sharedWorkspace]
-     openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@:%@@%@:%d", [model debugDBUserName], [model debugDBPassword], [model debugDBIPAddress], [model debugDBPort]]]];
+     openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@:%@@%@:%d",
+                                   [model debugDBUserName], [model debugDBPassword],
+                                   [model debugDBIPAddress], [model debugDBPort]]]];
 }
+
 
 - (IBAction) orcaDBPingAction:(id)sender
 {
