@@ -34,6 +34,7 @@
 #import "ORMTCModel.h"
 #import "SNOP_Run_Constants.h"
 #import "SNOCaenModel.h"
+#import "SNOPGlobals.h"
 
 NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 
@@ -1733,6 +1734,9 @@ snopGreenColor;
         return;
     }
 
+    //Get run type word first
+    unsigned long dbruntypeword = [[[[[versionSettings valueForKey:@"rows"]     objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"run_type_word"]  unsignedLongValue];
+
     //Setup format
     NSNumberFormatter *thresholdFormatter = [[[NSNumberFormatter alloc] init] autorelease];;
     [thresholdFormatter setFormat:@"##0.0"];
@@ -1742,6 +1746,17 @@ snopGreenColor;
             [[standardRunThresStoredValues cellAtRow:i column:0] setStringValue:@"--"];
         }
         NSLogColor([NSColor redColor],@"Cannot display TEST RUN values. There was some problem with the Standard Run DataBase. \n");
+    }
+    //If in DIAGNOSTIC run: display null threshold values
+    else if(dbruntypeword & kDiagnosticRunType){
+        for (int i=0; i<[standardRunThresStoredValues numberOfRows];i++) {
+            [[standardRunThresStoredValues cellAtRow:i column:0] setStringValue:@"--"];
+            [[standardRunThresStoredValues cellAtRow:i column:0] setTextColor:[self snopRedColor]];
+        }
+        for(int ibit=0; ibit<21; ibit++){ //Data quality bits are not stored in the SR
+            [[runTypeWordSRMatrix cellAtRow:ibit column:0] setState:0];
+        }
+    //If in non-DIAGNOSTIC run: display DB threshold values
     } else {
         int gtmask = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,GtMask"] intValue];
         //NHIT100HI
@@ -1873,7 +1888,6 @@ snopGreenColor;
     }
     
     //Display runtype word
-    unsigned long dbruntypeword = [[[[[versionSettings valueForKey:@"rows"]     objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"run_type_word"]  unsignedLongValue];
     for(int ibit=0; ibit<21; ibit++){ //Data quality bits are not stored in the SR
         if((dbruntypeword >> ibit) & 1){
             [[runTypeWordSRMatrix cellAtRow:ibit column:0] setState:1];

@@ -46,6 +46,7 @@
 #import "XL3_Link.h"
 #import "ORPQModel.h"
 #import "ORPQResult.h"
+#import "SNOPGlobals.h"
 
 #define RUNNING 0
 #define STARTING 1
@@ -121,6 +122,7 @@ resync;
 
 - (id) init
 {
+    
     self = [super init];
 
     rolloverRun = NO;
@@ -346,6 +348,9 @@ resync;
     if ([self logPort] == 0) [self setLogServerPort:4001];
 
     [[self undoManager] enableUndoRegistration];
+
+    //Set extra security
+    [gSecurity addSuperUnlockMask:kDiagnosticRunType forObject:self];
 
     /* initialize our connection to the MTC server */
     mtc_server = [[RedisClient alloc] initWithHostName:mtcHost withPort:mtcPort];
@@ -1836,7 +1841,12 @@ err:
         NSLog(@"Please, set a valid name and click enter. \n");
         return false;
     }
-    NSLog(@"Loading settings for standard run: %@ - Version: %@ ........ \n",runTypeName, runVersion);
+    else if([runTypeName isEqualToString:@"DIAGNOSTIC"]){
+        NSLog(@"Going to DIAGNOSTIC run: the trigger settings will not change \n",runTypeName, runVersion);
+    }
+    else{
+        NSLog(@"Loading settings for standard run: %@ - Version: %@ ........ \n",runTypeName, runVersion);
+    }
 
     //Get RC model
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
@@ -1883,6 +1893,9 @@ err:
         nextruntypeword |= currentruntypeword;
         [runControlModel setRunType:nextruntypeword];
         
+        //Do not load thresholds if in Diagnostic run
+        if(nextruntypeword & kDiagnosticRunType) return true;
+
         //Load MTC thresholds
         [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kNHit100HiThreshold]] forIndex:kNHit100HiThreshold];
         [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kNHit100MedThreshold]] forIndex:kNHit100MedThreshold];
