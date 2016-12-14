@@ -57,7 +57,6 @@
 #define CONTINUOUS_START 1
 #define ROLLOVER_START 2
 
-NSString* ORSNOPModelViewTypeChanged	= @"ORSNOPModelViewTypeChanged";
 static NSString* SNOPDbConnector	= @"SNOPDbConnector";
 NSString* ORSNOPModelOrcaDBIPAddressChanged = @"ORSNOPModelOrcaDBIPAddressChanged";
 NSString* ORSNOPModelDebugDBIPAddressChanged = @"ORSNOPModelDebugDBIPAddressChanged";
@@ -1433,7 +1432,6 @@ err:
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setViewType:aViewType];
 	viewType = aViewType;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelViewTypeChanged object:self userInfo:nil];
 }
 
 - (int) viewType
