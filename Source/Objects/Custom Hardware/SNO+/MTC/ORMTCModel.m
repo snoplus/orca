@@ -1786,6 +1786,8 @@ resetFifoOnStart = _resetFifoOnStart;
         NSLogColor([NSColor redColor],@"failed to load the MTCA dacs: %@\n", [e reason]);
         [e raise];
     }
+
+    NSLog(@"Successfully loaded MTCA+ thresholds\n");
 }
 
 - (BOOL) adapterIsSBC
