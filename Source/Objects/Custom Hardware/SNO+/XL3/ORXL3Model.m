@@ -33,6 +33,7 @@
 #import "ORCouchDB.h"
 #import "ORPQModel.h"
 #import "ORPQResult.h"
+#import "math.h"
 
 static Xl3RegNamesStruct reg[kXl3NumRegisters] = {
 	{ @"SelectReg",		RESET_REG },
@@ -3862,14 +3863,30 @@ err:
 
 - (void) hvTriggersON
 {
-    if ([[self xl3Link] isConnected]) {
-        [self setIsTriggerON:YES];
-        [self loadHardware];
-        NSLog(@"%@ triggers ON\n", [[self xl3Link] crateName]);
-    }
-    else {
+    if (![[self xl3Link] isConnected]) {
         NSLog(@"%@ triggers ON ignored, xl3 is not connected.\n", [[self xl3Link] crateName]);
+        return;
     }
+
+    if (![self hvEverUpdated]) {
+        BOOL result = ORRunAlertPanel([NSString stringWithFormat:@"Crate %i HV status is unknown", [self crateNumber]], @"Are you sure you want to enable triggers for this crate?", @"Yes", @"No", nil);
+
+        if (!result) {
+            NSLog(@"Crate %02d cancelling triggers ON\n.", [self crateNumber]);
+            return;
+        }
+    } else if ([self hvAVoltageReadValue] < ([self hvNominalVoltageA] - 100)) {
+        BOOL result = ORRunAlertPanel([NSString stringWithFormat:@"Crate %i HV is not at nominal voltage", [self crateNumber]], @"Are you sure you want to enable triggers for this crate?", @"Yes", @"No", nil);
+
+        if (!result) {
+            NSLog(@"Crate %02d cancelling triggers ON\n.", [self crateNumber]);
+            return;
+        }
+    }
+
+    [self setIsTriggerON:YES];
+    [self loadHardware];
+    NSLog(@"%@ triggers ON\n", [[self xl3Link] crateName]);
 }
 
 - (void) hvTriggersOFF
