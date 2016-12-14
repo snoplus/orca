@@ -2014,47 +2014,6 @@ err:
 
 }
 
--(void) loadHighThresholds
-{
-
-    //Get RC model
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* runControlModel;
-    if ([objs count]) {
-        runControlModel = [objs objectAtIndex:0];
-    } else {
-        NSLogColor([NSColor redColor], @"couldn't find MTC model. Please add it to the experiment and restart the run.\n");
-        return;
-    }
-    
-    //Get MTC model
-    objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    ORMTCModel* mtc;
-    if ([objs count]) {
-        mtc = [objs objectAtIndex:0];
-    } else {
-        NSLogColor([NSColor redColor], @"couldn't find MTC model. Please add it to the experiment and restart the run.\n");
-        return;
-    }
-    //FIXME: Set correct hardcoded values!!!
-    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kNHit100HiThreshold];
-    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kNHit100MedThreshold];
-    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kNHit100LoThreshold];
-    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kNHit20Threshold];
-    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kNHit20LBThreshold];
-    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kOWLNThreshold];
-    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kESumLowThreshold];
-    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kESumHiThreshold];
-    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kOWLELoThreshold];
-    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kOWLEHiThreshold];
-    [mtc setDbObject:[NSNumber numberWithDouble:100.0] forIndex:kNhit100LoPrescale];
-    [mtc setDbObject:[NSNumber numberWithDouble:0.0] forIndex:kPulserPeriod];
-    [runControlModel setRunType:0x0]; //Zero run type word since this run is not valid
-
-    [self loadSettingsInHW];
-
-}
-
 @end
 
 

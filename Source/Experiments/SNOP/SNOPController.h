@@ -181,7 +181,6 @@
 
 - (IBAction) hvMasterPanicAction:(id)sender;
 - (IBAction) hvMasterTriggersOFF:(id)sender;
-- (IBAction) hvMasterTriggersON:(id)sender;
 - (IBAction) hvMasterStatus:(id)sender;
 
 //smellie functions -------------------

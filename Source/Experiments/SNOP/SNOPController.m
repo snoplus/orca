@@ -697,16 +697,6 @@ snopGreenColor;
     [model debugDBPing];
 }
 
-- (IBAction) setHighThreholdsAction:(id)sender
-{
-
-    BOOL cancel = ORRunAlertPanel(@"Setting MTC High Thresholds",@"Is this really what you want?",@"Cancel",@"Yes",nil);
-    if(cancel) return;
-
-    NSLogColor([NSColor redColor],@"Setting MTC high thresholds...\n");
-    [model loadHighThresholds];
-}
-
 - (IBAction)hvMasterPanicAction:(id)sender
 {
 
@@ -776,25 +766,6 @@ snopGreenColor;
     
 }
 
-- (IBAction) initCratesWithXilinx: (id) sender
-{
-    
-    /* The XL3s no longer support loading Xilinx while initializing.  Instead,
-     * the procedure is to reset the crate which loads the Xilinx for each FEC,
-     * and then to load the hardware settings. This action could potentially be
-     * changed to reset all the crates, but this is dangerous since resetting a
-     * crate will automatically cause all the HV to be reset.  */
-}
-
-- (IBAction) initCratesWithOutXilinx: (id) sender
-{
-    NSArray *crates = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass: NSClassFromString(@"ORSNOCrateModel")];
-
-    for (id crate in crates) {
-        [crate performSelector:@selector(loadHardware)];
-    }
-}
-
 - (IBAction) reportAction:(id)sender {
     NSString *url = [NSString stringWithFormat:@"https://github.com/snoplus/orca/issues/new"];
     NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
@@ -811,17 +782,6 @@ snopGreenColor;
     NSString *url = [NSString stringWithFormat:@"http://snopl.us/detector/operator_manual/operator_manual.html"];
     NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlScaped]];
-}
-
-
-
-- (IBAction)hvMasterTriggersON:(id)sender
-{
-
-    BOOL cancel = ORRunAlertPanel(@"Enabling Channel Triggers",@"Is this really what you want?",@"Cancel",@"Yes",nil);
-    if(cancel) return;
-
-    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersON)];
 }
 
 - (IBAction)hvMasterTriggersOFF:(id)sender
