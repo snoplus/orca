@@ -253,11 +253,6 @@ snopGreenColor;
     [super registerNotificationObservers];
     
     [notifyCenter addObserver : self
-                     selector : @selector(viewTypeChanged:)
-                         name : ORSNOPModelViewTypeChanged
-                        object: nil];
-    
-    [notifyCenter addObserver : self
                      selector : @selector(dbOrcaDBIPChanged:)
                          name : ORSNOPModelOrcaDBIPAddressChanged
                         object: nil];
@@ -332,7 +327,6 @@ snopGreenColor;
 - (void) updateWindow
 {
     [super updateWindow];
-    [self viewTypeChanged:nil];
     [self hvStatusChanged:nil];
     [self dbOrcaDBIPChanged:nil];
     [self dbDebugDBIPChanged:nil];
@@ -494,13 +488,6 @@ snopGreenColor;
     
 }
 
-- (void) viewTypeChanged:(NSNotification*)aNote
-{
-    [viewTypePU selectItemAtIndex:[model viewType]];
-    [detectorView setViewType:[model viewType]];
-    [detectorView makeAllSegments];
-}
-
 - (void) dbOrcaDBIPChanged:(NSNotification*)aNote
 {
     [orcaDBIPAddressPU setStringValue:[model orcaDBIPAddress]];
@@ -654,11 +641,6 @@ snopGreenColor;
 
 
 #pragma mark ¥¥¥Interface Management
-- (IBAction) viewTypeAction:(id)sender
-{
-    [model setViewType:[sender indexOfSelectedItem]];
-}
-
 - (IBAction) orcaDBIPAddressAction:(id)sender {
     [model setOrcaDBIPAddress:[sender stringValue]];
 }
@@ -855,21 +837,7 @@ snopGreenColor;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPRequestHVStatus object:self];
 }
 
-- (void) specialUpdate:(NSNotification*)aNote
-{
-    [super specialUpdate:aNote];
-    [detectorView makeAllSegments];
-}
 
-- (void) setDetectorTitle
-{
-    switch([model displayType]){
-        case kDisplayRates:		[detectorTitle setStringValue:@"Detector Rate"];	break;
-        case kDisplayThresholds:	[detectorTitle setStringValue:@"Thresholds"];		break;
-        case kDisplayTotalCounts:	[detectorTitle setStringValue:@"Total Counts"];		break;
-        default: break;
-    }
-}
 
 #pragma mark ¥¥¥Table Data Source
 
@@ -877,36 +845,31 @@ snopGreenColor;
 {
     
     if([tabView indexOfTabViewItem:tabViewItem] == 0){
-        [[self window] setContentView:blankView];
-        [self resizeWindowToSize:detectorSize];
-        [[self window] setContentView:snopView];
-    }
-    else if([tabView indexOfTabViewItem:tabViewItem] == 5){
+        //StandardRuns
         [[self window] setContentView:blankView];
         [self resizeWindowToSize:runsSize];
         [[self window] setContentView:snopView];
     }
+    else if([tabView indexOfTabViewItem:tabViewItem] == 1){
+        //HV
+        [self resizeWindowToSize:hvMasterSize];
+        [[self window] setContentView:blankView];
+        [[self window] setContentView:snopView];
+    }
     else if([tabView indexOfTabViewItem:tabViewItem] == 2){
+        //State
+        [[detectorState mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://snopl.us/monitoring/state"] ] ];
+        [[self window] setContentView:blankView];
+        [self resizeWindowToSize:detectorSize];
+        [[self window] setContentView:snopView];
+    }
+    else if([tabView indexOfTabViewItem:tabViewItem] == 3){
+        //Settings
         [[self window] setContentView:blankView];
         [self resizeWindowToSize:detailsSize];
         [[self window] setContentView:snopView];
     }
-    else if([tabView indexOfTabViewItem:tabViewItem] == 3){
-        [[self window] setContentView:blankView];
-        [self resizeWindowToSize:focalPlaneSize];
-        [[self window] setContentView:snopView];
-    }
-    else if([tabView indexOfTabViewItem:tabViewItem] == 4){
-        [[self window] setContentView:blankView];
-        [self resizeWindowToSize:couchDBSize];
-        [[self window] setContentView:snopView];
-    }
-    else if([tabView indexOfTabViewItem:tabViewItem] == 5){
-        [[self window] setContentView:blankView];
-        [self resizeWindowToSize:hvMasterSize];
-        [[self window] setContentView:snopView];
-    }
-    
+
     int index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:@"orca.SNOPController.selectedtab"];
 }
