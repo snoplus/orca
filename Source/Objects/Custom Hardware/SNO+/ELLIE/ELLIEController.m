@@ -447,7 +447,7 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
         float pulseSeparation = 1000.*(1./[telliePulseFreqTf floatValue]); // TELLIE accepts pulse rate in ms
         NSMutableDictionary* settingsDict = [NSMutableDictionary dictionaryWithCapacity:100];
         [settingsDict setValue:[tellieExpertFibreSelectPb titleOfSelectedItem] forKey:@"fibre"];
-        [settingsDict setValue:[tellieChannelTf stringValue] forKey:@"channel"];
+        [settingsDict setValue:[NSNumber numberWithInteger:[tellieChannelTf integerValue]]  forKey:@"channel"];
         [settingsDict setValue:[tellieExpertOperationModePb titleOfSelectedItem] forKey:@"run_mode"];
         //[settingsDict setValue:[NSNumber numberWithInteger:[telliePhotonsTf integerValue]] forKey:@"photons"];
         [settingsDict setValue:[NSNumber numberWithInteger:[telliePulseWidthTf integerValue]] forKey:@"pulse_width"];

@@ -328,7 +328,8 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     if(photons < min_photons){
         NSLog(@"Calibration curve for channel %lu does not go as low as %lu photons\n", channel, photons);
         NSLog(@"Using a linear interpolation of 5ph/IPW from min_photons = %.1f to estimate requested %d photon settings\n",min_photons,photons);
-        float floatPulseWidth = min_x + (min_photons-photons)/5.;
+        float intercept = min_photons - (-5.*min_x);
+        float floatPulseWidth = (min_photons - intercept)/(-5.);
         NSNumber* pulseWidth = [NSNumber numberWithInteger:floatPulseWidth];
         NSLog(@"IPW setting calculated as: %d\n",[pulseWidth intValue]);
         return pulseWidth;
@@ -643,7 +644,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     NSLog(@"Rate: %1.1f Hz\n", rate);
     BOOL safety_check = [self photonIntensityCheck:[photonOutput integerValue] atFrequency:rate];
     if(safety_check == NO){
-        NSLogColor([NSColor redColor], @"[TELLIE] The request number of photons (%lu), is not detector safe at %lu Hz. This setting will not be run.\n", [photonOutput integerValue], rate);
+        NSLogColor([NSColor redColor], @"[TELLIE] The request number of photons (%lu), is not detector safe at %f Hz. This setting will not be run.\n", [photonOutput integerValue], rate);
         return;
     }
     
@@ -754,8 +755,9 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
                 [theTubiiModel setTellieRate:rate];
                 [theTubiiModel setTelliePulseWidth:100e-9];
                 [theTubiiModel setTellieNPulses:[noShots intValue]];
-                [theTubiiModel fireTelliePulser];
-                //[theTubiiModel fireTelliePulser_rate:rate pulseWidth:100e-9 NPulses:([noShots intValue]*1.)];
+                //[theTubiiModel fireTelliePulser];
+                //noShots = [NSNumber numberWithInteger:[noShots intValue] + 5000];
+                [theTubiiModel fireTelliePulser_rate:rate pulseWidth:200e-9 NPulses:[noShots intValue]];
             } @catch(NSException* e){
                 errorString = [NSString stringWithFormat:@"[TELLIE] Problem setting tubii parameters: %@\n", [e reason]];
                 NSLogColor([NSColor redColor], errorString);
