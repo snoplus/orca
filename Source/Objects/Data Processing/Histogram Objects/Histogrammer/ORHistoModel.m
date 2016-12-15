@@ -38,6 +38,7 @@ NSString* ORHistoModelDirChangedNotification		= @"The Histogram Model Dir Change
 NSString* ORHistoModelFileChangedNotification		= @"The Histogram Model File Has Changed";
 NSString* ORHistoModelWriteFileChangedNotification	= @"The Histogram Model WriteFile Has Changed";
 NSString* ORHistoModelMultiPlotsChangedNotification = @"ORHistoModelMultiPlotsChangedNotification";
+NSString* ORHistoModelDecodingDisabledChanged       = @"ORHistoModelDecodingDisabledChanged";
 
 #pragma mark ¥¥¥Definitions
 static NSString *ORHistoDataConnection 		= @"Histogrammer Data Connector";
@@ -202,6 +203,20 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 }
 
 #pragma mark ¥¥¥Accessors
+- (BOOL) decodingDisabled
+{
+    return decodingDisabled;
+}
+
+- (void) setDecodingDisabled:(BOOL)aFlag
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setDecodingDisabled:decodingDisabled];
+    
+    decodingDisabled = aFlag;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORHistoModelDecodingDisabledChanged object:self];
+  
+}
 
 - (BOOL) accumulate
 {
@@ -363,21 +378,23 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 
 - (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder
 {
-     if(!dataSet){
-        [self setDataSet:[[[ORDataSet alloc]initWithKey:@"System" guardian:nil] autorelease] ];
-    }
-        
-    [mLock lock];
-    @try {
-        //process the data
-        for(id someData in dataArray){
-            [aDecoder decode:someData intoDataSet:dataSet];
+    if(!decodingDisabled){
+         if(!dataSet){
+            [self setDataSet:[[[ORDataSet alloc]initWithKey:@"System" guardian:nil] autorelease] ];
+        }
+            
+        [mLock lock];
+        @try {
+            //process the data
+            for(id someData in dataArray){
+                [aDecoder decode:someData intoDataSet:dataSet];
+            }
+        }
+        @finally {
+             [mLock unlock];
         }
     }
-    @finally {
-         [mLock unlock];
-    }
-
+    
 	//pass it on
 	id theNextObject = [self objectConnectedTo:ORHistoPassThruConnection];
 	[theNextObject processData:dataArray decoder:aDecoder];
@@ -581,6 +598,7 @@ static NSString *ORHistoMultiPlots 				= @"Histo Multiplot Set";
     
     [[self undoManager] disableUndoRegistration];
     [self setAccumulate:[decoder decodeBoolForKey:@"accumulate"]];
+    [self setDecodingDisabled:[decoder decodeBoolForKey:@"decodingDisabled"]];
     [self setShipFinalHistograms:[decoder decodeBoolForKey:@"shipFinalHistograms"]];
     [self setDirectoryName:[decoder decodeObjectForKey:ORHistoDirName]];
     [self setWriteFile:[decoder decodeIntForKey:ORHistoWriteFile]];
@@ -596,6 +614,7 @@ static NSString *ORHistoMultiPlots 				= @"Histo Multiplot Set";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:decodingDisabled forKey:@"decodingDisabled"];
     [encoder encodeBool:accumulate forKey:@"accumulate"];
     [encoder encodeBool:shipFinalHistograms forKey:@"shipFinalHistograms"];
     [encoder encodeObject:[self directoryName] forKey:ORHistoDirName];

@@ -139,7 +139,12 @@
     [notifyCenter addObserver : self
                      selector : @selector(accumulateChanged:)
                          name : ORHistoModelAccumulateChanged
-						object: model];
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(decodingDisabledChanged:)
+                         name : ORHistoModelDecodingDisabledChanged
+                        object: model];
 
 }
 
@@ -147,18 +152,25 @@
 {
 	[super updateWindow];
     [self modelChanged:nil];
+    [self decodingDisabledChanged:nil];
     [self dataChanged:nil];
     [self dirChanged:nil];
     [self fileChanged:nil];
     [self writeFileChanged:nil];
 	[self shipFinalHistogramsChanged:nil];
 	[self involvedInCurrentRunChanged:nil];
-	[self accumulateChanged:nil];
+    [self accumulateChanged:nil];
 }
 
 
 
 #pragma  mark ¥¥¥Interface Management
+- (void) decodingDisabledChanged:(NSNotification *)notification
+{
+    [decodingDisabledField setStringValue:[model decodingDisabled]?@"Decoding Disabled":@""];
+    [disableDecodingButton setTitle:[model decodingDisabled]?@"Enable Decoding":@"Disable Decoding"];
+}
+
 - (void)involvedInCurrentRunChanged:(NSNotification *)notification
 {
 	[involvedInRunField setStringValue:[model involvedInCurrentRun]?@"Running -- Deletions not Allowed":@""];
@@ -253,6 +265,12 @@
 }
 
 #pragma  mark ¥¥¥Actions
+- (IBAction) decodingDisabledAction:(id)sender;
+{
+    BOOL aFlag = ![model decodingDisabled];
+    [model setDecodingDisabled:aFlag];
+}
+
 - (void) accumulateAction:(id)sender
 {
 	[model setAccumulate:[sender intValue]];	

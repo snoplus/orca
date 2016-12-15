@@ -33,12 +33,15 @@
     IBOutlet NSButton* 		writeFileButton;
     IBOutlet NSButton* 		clearAllButton;
     IBOutlet NSButton* 		plotGroupButton;
+    IBOutlet NSButton* 		disableDecodingButton;
+    IBOutlet NSTextField*   decodingDisabledField;
     BOOL                    scheduledToUpdate;
 }
 
 #pragma mark ¥¥¥Interface Management
+- (void) decodingDisabledChanged:(NSNotification *)aNote;
 - (void) accumulateChanged:(NSNotification*)aNote;
-- (void)involvedInCurrentRunChanged:(NSNotification *)aNote;
+- (void) involvedInCurrentRunChanged:(NSNotification *)aNote;
 - (void) shipFinalHistogramsChanged:(NSNotification*)aNote;
 - (void) registerNotificationObservers;
 - (void) modelChanged:(NSNotification*)aNotification;
@@ -54,6 +57,7 @@
 - (void)splitViewDidResizeSubviews:(NSNotification *)aNotification;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) decodingDisabledAction:(id)sender;
 - (IBAction) accumulateAction:(id)sender;
 - (IBAction) getInfo:(id)sender;
 - (IBAction) shipFinalHistogramsAction:(id)sender;
