@@ -59,7 +59,7 @@
 
 - (void) awakeFromNib
 {
-	detectorSize		 = NSMakeSize(770,770);
+	detectorSize		 = NSMakeSize(770,740);
 	detailsSize			 = NSMakeSize(560,600);
 	subComponentViewSize = NSMakeSize(590,630);
 	detectorMapViewSize	 = NSMakeSize(900,760);
@@ -259,7 +259,12 @@
                      selector : @selector(breakdownDetectedChanged:)
                          name : ORMajoranaModelUpdateSpikeDisplay
                        object : nil];
- }
+
+    [notifyCenter addObserver : self
+                     selector : @selector(maxNonCalibrationRateChanged:)
+                         name : ORMajoranaModelMaxNonCalibrationRate
+                       object : nil];
+}
 
 
 - (void) updateWindow
@@ -270,7 +275,8 @@
     //detector
     [self secondaryColorAxisAttributesChanged:nil];
     [self auxTablesChanged:nil];
-
+    [self maxNonCalibrationRateChanged:nil];
+    
 	//veto hw map
     [self vetoMapLockChanged:nil];
 	[self secondaryMapFileChanged:nil];
@@ -583,6 +589,12 @@
     [detectorView makeAllSegments];
 }
 
+- (void) maxNonCalibrationRateChanged:(NSNotification*)aNote
+{
+    [maxNonCalibrationRateField setFloatValue:[model maxNonCalibrationRate]];
+}
+
+
 #pragma mark ¥¥¥Interface Management
 - (void) ignorePanicOnBChanged:(NSNotification*)aNote
 {
@@ -721,6 +733,10 @@
 }
 
 #pragma mark ***Actions
+- (IBAction) maxNonCalibrationRateAction:(id)sender;
+{
+    [model setMaxNonCalibrationRate:[sender floatValue]];
+}
 - (IBAction) ignorePanicOnAAction:(id)sender
 {
     [self confirmIgnoreForModule:0];

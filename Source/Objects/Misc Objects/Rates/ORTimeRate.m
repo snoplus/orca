@@ -20,6 +20,7 @@
 
 
 #import "ORTimeRate.h"
+#import "ORAlarm.h"
 
 NSString* ORRateAverageChangedNotification 	= @"ORRateAverageChangedNotification";
 
@@ -182,5 +183,72 @@ static NSString *ORTimeRate_SampleTime 	= @"ORTimeRate_SampleTime";
 	}
 	else return 0;
 }
+
+@end
+
+
+//---------------------------------------------------------------------------------------
+@implementation ORHighRateChecker
+
+@synthesize highRateStartTime,name,timeFrame,sum,maxValue;
+
+- (id) init:(NSString*)aName timeFrame:(float)aTimeFrame
+{
+    self = [super init];
+    self.name       = aName;
+    self.timeFrame  = aTimeFrame;
+    self.sum = 0;
+    return self;
+}
+
+- (void) dealloc
+{
+    self.name               = nil;
+    self.highRateStartTime  = nil;
+    
+    [highRateAlarm clearAlarm];
+    [highRateAlarm release];
+    [super dealloc];
+}
+
+- (void) reset
+{
+    self.highRateStartTime= nil;
+    [highRateAlarm clearAlarm];
+    [highRateAlarm release];
+    highRateAlarm = nil;
+}
+
+- (void) checkRate:(float)aValue
+{
+    if((aValue > maxValue) && !highRateStartTime) {
+        self.highRateStartTime = [NSDate date];
+        sum = aValue;
+        count = 1;
+    }
+    if(highRateStartTime) {
+        sum += aValue;
+        count++;
+        float ave = sum/(float)count;
+        if([[NSDate date] timeIntervalSinceDate:highRateStartTime] > timeFrame){
+            if(ave > maxValue){
+                if(!highRateAlarm){
+                    highRateAlarm = [[ORAlarm alloc] initWithName:name severity:kDataFlowAlarm];
+                    [highRateAlarm postAlarm];
+                    self.highRateStartTime= nil;
+                    sum = aValue;
+                    count=1;
+                }
+            }
+            else {
+                self.highRateStartTime= nil;
+                [highRateAlarm clearAlarm];
+                [highRateAlarm release];
+                highRateAlarm = nil;
+            }
+        }
+    }
+}
+
 
 @end

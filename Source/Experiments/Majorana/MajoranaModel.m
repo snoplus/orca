@@ -52,6 +52,7 @@ NSString* ORMajoranaModelPollTimeChanged                = @"ORMajoranaModelPollT
 NSString* ORMJDAuxTablesChanged                         = @"ORMJDAuxTablesChanged";
 NSString* ORMajoranaModelLastConstraintCheckChanged     = @"ORMajoranaModelLastConstraintCheckChanged";
 NSString* ORMajoranaModelUpdateSpikeDisplay             = @"ORMajoranaModelUpdateSpikeDisplay";
+NSString* ORMajoranaModelMaxNonCalibrationRate          = @"ORMajoranaModelMaxNonCalibrationRate";
 
 static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
@@ -88,7 +89,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         [mjdSource[i] setDelegate:nil];
         [mjdSource[i] release];
     }
-    
+    [highRateChecker release];
     [anObjForCouchID release];
     [stringMap release];
     [specialMap release];
@@ -203,6 +204,22 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
 
 }
+- (void) runStatusChanged:(NSNotification*)aNote
+{
+    [super runStatusChanged:aNote];
+    int running     = [[[aNote userInfo] objectForKey:ORRunStatusValue] intValue];
+    int runTypeMask = [[[aNote userInfo] objectForKey:ORRunTypeMask] intValue];
+    if((running == eRunInProgress) && !(runTypeMask & 0x00010018)){
+        if(!highRateChecker){
+            highRateChecker = [[ORHighRateChecker alloc] init:@"Sustained High Rate" timeFrame:60*10];
+        }
+    }
+    else if((running == eRunStopped) || (running == eRunStopping)){
+        [highRateChecker release];
+        highRateChecker = nil;
+    }
+
+}
 
 - (void) runTypeChanged:(NSNotification*) aNote
 {
@@ -226,6 +243,12 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 //    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddHistoryAdcRecord" object:anObjForCouchID userInfo:info];
 }
 
+- (void) collectRates
+{
+    [super collectRates];
+    highRateChecker.maxValue = maxNonCalibrationRate;
+    if(maxNonCalibrationRate!=0)[highRateChecker checkRate:[[self segmentGroup:0] rate]];
+}
 
 - (void) customInfoRequest:(NSNotification*)aNote
 {
@@ -776,6 +799,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                       [dic objectForKey:@"card"],
                       [dic objectForKey:@"channel"]];
     BOOL spiked = [spikeInfo spiked];
+    if(!spikeInfo.spikeStart)return;
     BOOL sendPost = NO;
     if(spiked){
         int aCrate = [[dic objectForKey:@"crate"]intValue];
@@ -839,6 +863,19 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 - (NSDictionary*) baselineSpikes
 {
     return baselineSpikes;
+}
+
+- (float) maxNonCalibrationRate
+{
+    return maxNonCalibrationRate;
+}
+
+- (void) setMaxNonCalibrationRate:(float)aValue
+{
+    if(aValue>3000)aValue=3000;
+    [[[self undoManager] prepareWithInvocationTarget:self] setMaxNonCalibrationRate:maxNonCalibrationRate];
+    maxNonCalibrationRate = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORMajoranaModelMaxNonCalibrationRate" object:self];
 }
 
 #pragma mark ***Accessors
@@ -1391,6 +1428,10 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     [self validateStringMap];
     [self validateSpecialMap];
     [self setDetectorStringPositions];
+    
+    float maxCalRate = [decoder decodeFloatForKey:@"maxNonCalibrationRate"];
+    if(maxCalRate==0)maxCalRate = 1000;
+    [self setMaxNonCalibrationRate:maxCalRate];
 	[[self undoManager] enableUndoRegistration];
 
     return self;
@@ -1409,6 +1450,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 	[encoder encodeInt:pollTime		   forKey: @"pollTime"];
     [encoder encodeObject:stringMap	   forKey: @"stringMap"];
     [encoder encodeObject:specialMap   forKey: @"specialMap"];
+    [encoder encodeFloat:maxNonCalibrationRate   forKey: @"maxNonCalibrationRate"];
 }
 
 - (NSString*) reformatSelectionString:(NSString*)aString forSet:(int)aSet

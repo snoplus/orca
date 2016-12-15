@@ -40,6 +40,7 @@
 @class ORMJDSource;
 @class ORMJDHeaderRecordID;
 @class ORRunModel;
+@class ORHighRateChecker;
 
 @interface MajoranaModel :  ORExperimentModel <OROrderedObjHolding>
 {
@@ -66,6 +67,8 @@
     BOOL scheduledToRunCheckBreakdown;
     BOOL scheduledToSendRateReport;
     BOOL scheduledToSendBaselineReport;
+    float maxNonCalibrationRate;
+    ORHighRateChecker*    highRateChecker;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -113,6 +116,8 @@
 - (void) setDetectorStringPositions;
 - (NSString*) detectorLocation:(int)index;
 - (NSString*) objectNameForCrate:(NSString*)aCrateName andCard:(NSString*)aCardName;
+- (float) maxNonCalibrationRate;
+- (void) setMaxNonCalibrationRate:(float)aValue;
 
 //in the case of being asked to checkBreakdown, it should event rate and baseline, leave the vacuum to the MJD interlock
 - (void) logBreakdowns:(int)aCrate;
@@ -182,6 +187,7 @@ extern NSString* ORMajoranaModelPollTimeChanged;
 extern NSString* ORMJDAuxTablesChanged;
 extern NSString* ORMajoranaModelLastConstraintCheckChanged;
 extern NSString* ORMajoranaModelUpdateSpikeDisplay;
+extern NSString* ORMajoranaModelMaxNonCalibrationRate;
 
 @interface ORMJDHeaderRecordID : NSObject
 - (NSString*) fullID;
