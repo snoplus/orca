@@ -88,6 +88,9 @@
     IBOutlet NSButton *smellieBuildCustomRun;
     IBOutlet NSButton *smellieChangeConfiguration;
 
+    //TELLIE
+    NSThread* tellieThread;
+    
     IBOutlet NSButton* runsLockButton;
     IBOutlet NSTextField *lockStatusTextField;
 
@@ -185,10 +188,16 @@
 
 //smellie functions -------------------
 - (IBAction) loadSmellieRunAction:(id)sender;
-- (IBAction) callSmellieSettings:(id)sender;
+- (IBAction) fetchRunFiles:(id)sender;
+- (void) fetchRunFilesFinish:(NSNotification *)aNote;
 - (IBAction) startSmellieRunAction:(id)sender;
 - (IBAction) stopSmellieRunAction:(id)sender;
 - (IBAction) emergencySmellieStopAction:(id)sender;
+
+//tellie functions ---------------------
+-(IBAction)startTellieRunAction:(id)sender;
+- (IBAction) stopTellieRunAction:(id)sender;
+-(void)startTellieRunNotification:(NSNotification *)notification;
 
 //xl3 mode status
 - (IBAction)updatexl3Mode:(id)sender;

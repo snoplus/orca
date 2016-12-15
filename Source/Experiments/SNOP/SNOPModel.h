@@ -93,7 +93,7 @@
     NSDictionary* _configDocument;
     NSDictionary* _mtcConfigDoc;
     NSMutableDictionary* _runTypeDocumentPhysics;
-    NSMutableDictionary* smellieRunHeaderDocList;
+    NSMutableDictionary* smellieRunFiles;
     
     bool _smellieDBReadInProgress;
     bool _smellieDocUploaded;
@@ -137,7 +137,7 @@
     
 }
 
-@property (nonatomic,retain) NSMutableDictionary* smellieRunHeaderDocList;
+@property (nonatomic,retain) NSMutableDictionary* smellieRunFiles;
 
 @property (nonatomic,copy) NSString* orcaDBUserName;
 @property (nonatomic,copy) NSString* orcaDBPassword;
@@ -190,7 +190,6 @@
 - (void) setXL3Host: (NSString *) host;
 - (NSString *) xl3Host;
 
-- (void) initSmellieRunDocsDic;
 - (void) initOrcaDBConnectionHistory;
 - (void) clearOrcaDBConnectionHistory;
 - (id) orcaDBConnectionHistoryItem:(unsigned int)index;
@@ -286,8 +285,7 @@
 - (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
 
 //smellie functions -------
-- (void) getSmellieRunListInfo;
-- (NSMutableDictionary*)smellieTestFct;
+-(void) getSmellieRunFiles;
 
 //Standard runs functions
 -(BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
