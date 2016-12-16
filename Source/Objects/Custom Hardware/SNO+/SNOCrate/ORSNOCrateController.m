@@ -69,26 +69,28 @@
 
     ORXL3Model *xl3 = [model adapter];
 
-    if ([[xl3 xl3Link] isConnected]) {
+    if ([[xl3 xl3Link] isConnected] && [xl3 stateUpdated]) {
         if ([xl3 initialized]) {
             /* The Xilinx has been loaded, so we need to enable the load
              * hardware button. */
             [loadHardwareButton setEnabled:TRUE];
-        } else {
-            /* The Xilinx hasn't been loaded, so we disable the load hardware
-             * button. */
-            [loadHardwareButton setEnabled:FALSE];
-        }
 
-        if ([xl3 hvSwitchEverUpdated]) {
-            if (![xl3 hvASwitch] && ![xl3 hvBSwitch]) {
-                /* HV is off, so enable crate reset button. */
-                [resetCrateButton setEnabled:TRUE];
+            if ([xl3 hvSwitchEverUpdated]) {
+                if (![xl3 hvASwitch] && ![xl3 hvBSwitch]) {
+                    /* HV is off, so enable crate reset button. */
+                    [resetCrateButton setEnabled:TRUE];
+                } else {
+                    [resetCrateButton setEnabled:FALSE];
+                }
             } else {
+                /* HV switch isn't known, so disable the reset crate button. */
                 [resetCrateButton setEnabled:FALSE];
             }
         } else {
-            [resetCrateButton setEnabled:FALSE];
+            /* The Xilinx hasn't been loaded, so we disable the load hardware
+             * button, and enable the reset crate button. */
+            [loadHardwareButton setEnabled:FALSE];
+            [resetCrateButton setEnabled:TRUE];
         }
     } else {
         /* XL3 isn't connected, so don't enable any buttons. */

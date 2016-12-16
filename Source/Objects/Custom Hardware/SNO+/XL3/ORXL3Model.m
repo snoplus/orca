@@ -216,7 +216,13 @@ hvBQueryWaiting = hvBQueryWaiting;
 - (void) connectionStateChanged
 {
     /* If we just connected, find out if Xilinx has been loaded or not. */
-    if ([xl3Link isConnected]) [self updateXl3Mode];
+    if ([xl3Link isConnected]) {
+        [self updateXl3Mode];
+    } else {
+        /* If we disconnected, assume we don't know the state any more. */
+        initialized = FALSE;
+        stateUpdated = FALSE;
+    }
 }
 
 - (int) initAtRunStart
@@ -317,6 +323,11 @@ hvBQueryWaiting = hvBQueryWaiting;
 - (bool) initialized
 {
     return initialized;
+}
+
+- (bool) stateUpdated
+{
+    return stateUpdated;
 }
 
 - (id) controllerCard
@@ -1485,6 +1496,7 @@ void SwapLongBlock(void* p, int32_t n)
     [self setIsTriggerON:       [decoder decodeBoolForKey:@"isTriggerON"]];
 
     initialized = FALSE;
+    stateUpdated = FALSE;
 
     if ([self isTriggerON]) {
         [self setTriggerStatus:@"ON"];
@@ -1734,6 +1746,8 @@ void SwapLongBlock(void* p, int32_t n)
     } else {
         initialized = FALSE;
     }
+
+    stateUpdated = TRUE;
 
     [[NSNotificationCenter defaultCenter]
         postNotificationName:ORXL3ModelStateChanged object:self userInfo:nil];
@@ -4755,6 +4769,13 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
         sleep(1);
         //do nothing without an xl3 connected
         if ([self xl3Link] && [[self xl3Link] isConnected]) {
+            if (![self stateUpdated] || ![self initialized]) {
+                /* If the XL3 hasn't been initialized, then the registers are
+                 * just random bytes, so we need to wait for a crate reset
+                 * before checking the switches. */
+                [hvLoopPool release];
+                continue;
+            }
             
             //Request the hv parameters (N.B. true does not mean they were loaded, check hvAFromDB and hvBFromDB)
             if (![ORXL3Model requestHVParams:self]) {
