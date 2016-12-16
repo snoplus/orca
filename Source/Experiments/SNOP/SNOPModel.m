@@ -1740,9 +1740,8 @@ err:
 
 - (void) setStandardRunVersion:(NSString *)aValue
 {
-    [aValue retain];
-    [standardRunVersion release];
-    standardRunVersion = aValue;
+    [standardRunVersion autorelease];//MAH -- strings should be handled like this
+    standardRunVersion = [aValue copy];
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelSRVersionChangedNotification object:self];
 }
@@ -1981,7 +1980,7 @@ err:
     
     [[self orcaDbRefWithEntryDB:self withDB:@"orca"] addDocument:detectorSettings tag:@"kStandardRunDocumentAdded"];
 
-    NSLog(@"%@ run saved as standard run. \n",runTypeName);
+    NSLog(@"%@ run saved as standard run. \n",runTypeName);    
     return true;
 
 }
