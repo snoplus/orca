@@ -1044,6 +1044,17 @@ err:
     }
 }
 
+static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void *context)
+{
+    if ([xl3_1 crateNumber] < [xl3_2 crateNumber]) {
+        return NSOrderedAscending;
+    } else if ([xl3_1 crateNumber] > [xl3_2 crateNumber]) {
+        return NSOrderedDescending;
+    } else {
+        return NSOrderedSame;
+    }
+}
+
 - (void) pingCrates
 {
     /* Enables pedestals for all channels in each crate one at a time and sends
@@ -1055,6 +1066,8 @@ err:
          collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
     NSArray* mtcs = [[(ORAppDelegate*)[NSApp delegate] document]
          collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+
+    xl3s = [xl3s sortedArrayUsingFunction:compareXL3s context:nil];
 
     ORMTCModel* mtc;
     ORXL3Model* xl3;
