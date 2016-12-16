@@ -488,6 +488,11 @@ snopGreenColor;
     
 }
 
+- (IBAction) pingCratesAction: (id) sender
+{
+    [model pingCrates];
+}
+
 - (void) dbOrcaDBIPChanged:(NSNotification*)aNote
 {
     [orcaDBIPAddressPU setStringValue:[model orcaDBIPAddress]];

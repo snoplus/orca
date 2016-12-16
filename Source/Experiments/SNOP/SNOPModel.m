@@ -1044,6 +1044,70 @@ err:
     }
 }
 
+- (void) pingCrates
+{
+    /* Enables pedestals for all channels in each crate one at a time and sends
+     * a pedestal pulse. This is useful to check that triggers are enabled for
+     * crates that are at high voltage. */
+    int i;
+
+    NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+    NSArray* mtcs = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+
+    ORMTCModel* mtc;
+    ORXL3Model* xl3;
+
+    if ([mtcs count] == 0) {
+        NSLogColor([NSColor redColor], @"pingCrates: couldn't find MTC object.\n");
+        return;
+    }
+
+    mtc = [mtcs objectAtIndex:0];
+
+    /* Set all the pedestal masks to 0. */
+    for (i = 0; i < [xl3s count]; i++) {
+        xl3 = [xl3s objectAtIndex:i];
+
+        if ([[xl3 xl3Link] isConnected]) {
+            if ([xl3 setPedestalMask:[xl3 getSlotsPresent] pattern:0]) {
+                NSLog(@"failed to set pedestal mask for crate %02d\n", i);
+                continue;
+            }
+        }
+    }
+
+    /* Enable all pedestals for each crate, and then fire a single pedestal
+     * pulse. */
+    for (i = 0; i < [xl3s count]; i++) {
+        xl3 = [xl3s objectAtIndex:i];
+
+        if ([[xl3 xl3Link] isConnected]) {
+            if ([xl3 setPedestalMask:[xl3 getSlotsPresent]
+                 pattern:0xffffffff]) {
+                NSLog(@"failed to set pedestal mask for crate %02d\n", i);
+                continue;
+            }
+
+            @try {
+                [mtc firePedestals:1 withRate:1];
+            } @catch (NSException *e) {
+                NSLog(@"failed to fire pedestal. error: %@ reason: %@\n",
+                      [e name], [e reason]);
+            }
+
+            /* Set pedestal mask to 0. */
+            if ([xl3 setPedestalMask:[xl3 getSlotsPresent] pattern:0]) {
+                NSLog(@"failed to set pedestal mask for crate %02d\n", i);
+                continue;
+            }
+
+            NSLog(@"PING crate %02d\n", i);
+        }
+    }
+}
+
 - (void) updateRHDRSruct
 {
     //form run info
