@@ -1102,7 +1102,8 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 
         if ([[xl3 xl3Link] isConnected]) {
             if ([xl3 setPedestalMask:[xl3 getSlotsPresent] pattern:0]) {
-                NSLog(@"failed to set pedestal mask for crate %02d\n", i);
+                NSLogColor([NSColor redColor],
+                           @"failed to set pedestal mask for crate %02d\n", i);
                 continue;
             }
         }
@@ -1116,15 +1117,17 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         if ([[xl3 xl3Link] isConnected]) {
             if ([xl3 setPedestalMask:[xl3 getSlotsPresent]
                  pattern:0xffffffff]) {
-                NSLog(@"failed to set pedestal mask for crate %02d\n", i);
+                NSLogColor([NSColor redColor],
+                           @"failed to set pedestal mask for crate %02d\n", i);
                 continue;
             }
 
             @try {
                 [mtc firePedestals:1 withRate:1];
             } @catch (NSException *e) {
-                NSLog(@"failed to fire pedestal. error: %@ reason: %@\n",
-                      [e name], [e reason]);
+                NSLogColor([NSColor redColor],
+                           @"failed to fire pedestal. error: %@ reason: %@\n",
+                           [e name], [e reason]);
             }
 
             /* Set pedestal mask back to what it was before. */
