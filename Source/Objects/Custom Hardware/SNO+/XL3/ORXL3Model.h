@@ -381,6 +381,7 @@ enum {
 - (void) writeXl3Mode;
 - (void) compositeXl3RW;
 - (void) compositeQuit;
+- (int) setPedestalMask: (uint32_t) slotMask pattern: (uint32_t) pattern;
 - (void) compositeSetPedestal;
 - (void) setPedestalInParallel;
 - (void) zeroPedestalMasks;

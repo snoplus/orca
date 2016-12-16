@@ -1142,6 +1142,11 @@ resetFifoOnStart = _resetFifoOnStart;
 	}	
 }
 
+- (long) getPedestalCrateMask
+{
+    return uLongDBValue(kPEDCrateMask);
+}
+
 - (void) setPedestalCrateMask
 {
 	@try {
@@ -1567,6 +1572,11 @@ resetFifoOnStart = _resetFifoOnStart;
 	}
 }
 
+- (float) getThePulserRate
+{
+    return floatDBValue(kPulserPeriod);
+}
+
 - (void) setThePulserRate:(float) pulserRate
 {
 	@try {
@@ -1731,11 +1741,15 @@ resetFifoOnStart = _resetFifoOnStart;
     long timeout = [mtc timeout];
 
     /* Temporarily increase the timeout since it might take a while */
-    [mtc setTimeout:(long) 1.5*count/rate];
+    [mtc setTimeout:(long) 1500*count/rate];
 
-    [mtc okCommand:"fire_pedestals %d %f", count, rate];
-
-    [mtc setTimeout:timeout];
+    @try {
+        [mtc okCommand:"fire_pedestals %d %f", count, rate];
+    } @catch (NSException *e) {
+        @throw e;
+    } @finally {
+        [mtc setTimeout:timeout];
+    }
 }
 
 - (void) basicMTCReset

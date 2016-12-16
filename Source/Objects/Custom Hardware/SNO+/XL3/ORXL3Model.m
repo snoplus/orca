@@ -2535,6 +2535,37 @@ err:
 	[self setXl3OpsRunning:NO forKey:@"compositeQuit"];
 }
 
+- (int) setPedestalMask: (uint32_t) slotMask pattern: (uint32_t) pattern
+{
+    /* Set the pedestal mask for a given slot mask. Any slots not in the mask
+     * will have pedestals disabled. Returns 0 on success, -1 on error. */
+    char payload[XL3_PAYLOAD_SIZE];
+    SetCratePedestalsArgs *args;
+    SetCratePedestalsResults *results;
+
+    memset(&payload, 0, XL3_PAYLOAD_SIZE);
+
+    args = (SetCratePedestalsArgs *) payload;
+
+    args->slotMask = htonl(slotMask);
+    args->pattern = htonl(pattern);
+
+    @try {
+        [[self xl3Link] sendCommand:SET_CRATE_PEDESTALS_ID withPayload:payload
+                        expectResponse:YES];
+    } @catch (NSException *e) {
+        return -1;
+    }
+
+    results = (SetCratePedestalsResults *) payload;
+
+    if (ntohl(results->errorMask)) {
+        return -1;
+    }
+
+    return 0;
+}
+
 - (void) compositeSetPedestal
 {
 	char payload[XL3_PAYLOAD_SIZE];

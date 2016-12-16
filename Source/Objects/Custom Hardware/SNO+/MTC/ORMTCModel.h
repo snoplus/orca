@@ -207,6 +207,7 @@
 - (void) setSingleGTWordMask:(unsigned long) gtWordMask;
 - (void) clearSingleGTWordMask:(unsigned long) gtWordMask;
 - (void) clearPedestalCrateMask;
+- (long) getPedestalCrateMask;
 - (void) setPedestalCrateMask;
 - (void) clearGTCrateMask;
 - (void) setGTCrateMask;
@@ -228,6 +229,7 @@
 - (void) setupGTCorseDelay;
 - (void) setupGTFineDelay:(unsigned short) theAddelValue;
 - (void) setupGTFineDelay;
+- (float) getThePulserRate;
 - (void) setThePulserRate:(float) pulserRate;
 - (void) enablePulser;
 - (void) disablePulser;

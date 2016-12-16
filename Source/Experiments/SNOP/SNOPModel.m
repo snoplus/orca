@@ -1044,6 +1044,120 @@ err:
     }
 }
 
+static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void *context)
+{
+    if ([xl3_1 crateNumber] < [xl3_2 crateNumber]) {
+        return NSOrderedAscending;
+    } else if ([xl3_1 crateNumber] > [xl3_2 crateNumber]) {
+        return NSOrderedDescending;
+    } else {
+        return NSOrderedSame;
+    }
+}
+
+- (void) pingCrates
+{
+    /* Enables pedestals for all channels in each crate one at a time and sends
+     * a pedestal pulse. This is useful to check that triggers are enabled for
+     * crates that are at high voltage. */
+    int i;
+    uint32_t crate_pedestal_mask;
+    float pulser_rate;
+
+    NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+    NSArray* mtcs = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+
+    xl3s = [xl3s sortedArrayUsingFunction:compareXL3s context:nil];
+
+    ORMTCModel* mtc;
+    ORXL3Model* xl3;
+
+    if ([mtcs count] == 0) {
+        NSLogColor([NSColor redColor], @"pingCrates: couldn't find MTC object.\n");
+        return;
+    }
+
+    mtc = [mtcs objectAtIndex:0];
+
+    crate_pedestal_mask = [mtc getPedestalCrateMask];
+
+    pulser_rate = [mtc getThePulserRate];
+
+    /* Enable all crates in the MTCD pedestal mask. */
+    [mtc setDbLong:0xffffff forIndex:kPEDCrateMask];
+    @try {
+        [mtc setPedestalCrateMask];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"error setting the MTCD crate pedestal mask. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+        return;
+    }
+
+    /* Set all the pedestal masks to 0. */
+    for (i = 0; i < [xl3s count]; i++) {
+        xl3 = [xl3s objectAtIndex:i];
+
+        if ([[xl3 xl3Link] isConnected]) {
+            if ([xl3 setPedestalMask:[xl3 getSlotsPresent] pattern:0]) {
+                NSLogColor([NSColor redColor],
+                           @"failed to set pedestal mask for crate %02d\n", i);
+                continue;
+            }
+        }
+    }
+
+    /* Enable all pedestals for each crate, and then fire a single pedestal
+     * pulse. */
+    for (i = 0; i < [xl3s count]; i++) {
+        xl3 = [xl3s objectAtIndex:i];
+
+        if ([[xl3 xl3Link] isConnected]) {
+            if ([xl3 setPedestalMask:[xl3 getSlotsPresent]
+                 pattern:0xffffffff]) {
+                NSLogColor([NSColor redColor],
+                           @"failed to set pedestal mask for crate %02d\n", i);
+                continue;
+            }
+
+            @try {
+                [mtc firePedestals:1 withRate:1];
+            } @catch (NSException *e) {
+                NSLogColor([NSColor redColor],
+                           @"failed to fire pedestal. error: %@ reason: %@\n",
+                           [e name], [e reason]);
+            }
+
+            /* Set pedestal mask back to what it was before. */
+            [xl3 setPedestalInParallel];
+
+            NSLog(@"PING crate %02d\n", i);
+        }
+    }
+
+    /* Reset the crate pedestal all crates in the MTCD pedestal mask. */
+    [mtc setDbLong:crate_pedestal_mask forIndex:kPEDCrateMask];
+    @try {
+        [mtc setPedestalCrateMask];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"error setting the MTCD crate pedestal mask. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+    }
+
+    /* Reset the pulser rate since the firePedestals function sets the pulser
+     * rate to 0. */
+    @try {
+        [mtc setThePulserRate:pulser_rate];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"error setting the pulser rate. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+    }
+}
+
 - (void) updateRHDRSruct
 {
     //form run info

@@ -458,7 +458,6 @@ snopGreenColor;
 
 - (void) runStatusChanged:(NSNotification*)aNotification
 {
-    
     [startRunButton setEnabled:true];
 
     if([runControl runningState] == eRunInProgress){
@@ -485,7 +484,18 @@ snopGreenColor;
 		}
         [lightBoardView setState:kCautionLight];
 	}
-    
+
+    if ([runControl isRunning] && ([runControl runType] & ECA_RUN)) {
+        /* Disable the ping crates button if we are in an ECA run. */
+        [pingCratesButton setEnabled:FALSE];
+    } else {
+        [pingCratesButton setEnabled:TRUE];
+    }
+}
+
+- (IBAction) pingCratesAction: (id) sender
+{
+    [model pingCrates];
 }
 
 - (void) dbOrcaDBIPChanged:(NSNotification*)aNote
