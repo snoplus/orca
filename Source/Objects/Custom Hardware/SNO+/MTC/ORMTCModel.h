@@ -207,6 +207,7 @@
 - (void) setSingleGTWordMask:(unsigned long) gtWordMask;
 - (void) clearSingleGTWordMask:(unsigned long) gtWordMask;
 - (void) clearPedestalCrateMask;
+- (long) getPedestalCrateMask;
 - (void) setPedestalCrateMask;
 - (void) clearGTCrateMask;
 - (void) setGTCrateMask;

@@ -1142,6 +1142,11 @@ resetFifoOnStart = _resetFifoOnStart;
 	}	
 }
 
+- (long) getPedestalCrateMask
+{
+    return uLongDBValue(kPEDCrateMask);
+}
+
 - (void) setPedestalCrateMask
 {
 	@try {

@@ -1061,6 +1061,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
      * a pedestal pulse. This is useful to check that triggers are enabled for
      * crates that are at high voltage. */
     int i;
+    uint32_t crate_pedestal_mask;
 
     NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document]
          collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
@@ -1078,6 +1079,19 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     }
 
     mtc = [mtcs objectAtIndex:0];
+
+    crate_pedestal_mask = [mtc getPedestalCrateMask];
+
+    /* Enable all crates in the MTCD pedestal mask. */
+    [mtc setDbLong:0xffffff forIndex:kPEDCrateMask];
+    @try {
+        [mtc setPedestalCrateMask];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"error setting the MTCD crate pedestal mask. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+        return;
+    }
 
     /* Set all the pedestal masks to 0. */
     for (i = 0; i < [xl3s count]; i++) {
@@ -1119,6 +1133,18 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
             NSLog(@"PING crate %02d\n", i);
         }
     }
+
+    /* Reset the crate pedestal all crates in the MTCD pedestal mask. */
+    [mtc setDbLong:crate_pedestal_mask forIndex:kPEDCrateMask];
+    @try {
+        [mtc setPedestalCrateMask];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"error setting the MTCD crate pedestal mask. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+        return;
+    }
+
 }
 
 - (void) updateRHDRSruct
