@@ -1124,11 +1124,8 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
                       [e name], [e reason]);
             }
 
-            /* Set pedestal mask to 0. */
-            if ([xl3 setPedestalMask:[xl3 getSlotsPresent] pattern:0]) {
-                NSLog(@"failed to set pedestal mask for crate %02d\n", i);
-                continue;
-            }
+            /* Set pedestal mask back to what it was before. */
+            [xl3 setPedestalInParallel];
 
             NSLog(@"PING crate %02d\n", i);
         }
