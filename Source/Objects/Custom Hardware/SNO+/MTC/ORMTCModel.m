@@ -1572,6 +1572,11 @@ resetFifoOnStart = _resetFifoOnStart;
 	}
 }
 
+- (float) getThePulserRate
+{
+    return floatDBValue(kPulserPeriod);
+}
+
 - (void) setThePulserRate:(float) pulserRate
 {
 	@try {

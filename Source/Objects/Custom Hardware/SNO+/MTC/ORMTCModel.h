@@ -229,6 +229,7 @@
 - (void) setupGTCorseDelay;
 - (void) setupGTFineDelay:(unsigned short) theAddelValue;
 - (void) setupGTFineDelay;
+- (float) getThePulserRate;
 - (void) setThePulserRate:(float) pulserRate;
 - (void) enablePulser;
 - (void) disablePulser;

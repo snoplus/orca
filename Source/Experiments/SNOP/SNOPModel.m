@@ -1062,6 +1062,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
      * crates that are at high voltage. */
     int i;
     uint32_t crate_pedestal_mask;
+    float pulser_rate;
 
     NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document]
          collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
@@ -1081,6 +1082,8 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     mtc = [mtcs objectAtIndex:0];
 
     crate_pedestal_mask = [mtc getPedestalCrateMask];
+
+    pulser_rate = [mtc getThePulserRate];
 
     /* Enable all crates in the MTCD pedestal mask. */
     [mtc setDbLong:0xffffff forIndex:kPEDCrateMask];
@@ -1139,9 +1142,17 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         NSLogColor([NSColor redColor],
                    @"error setting the MTCD crate pedestal mask. error: "
                     "%@ reason: %@\n", [e name], [e reason]);
-        return;
     }
 
+    /* Reset the pulser rate since the firePedestals function sets the pulser
+     * rate to 0. */
+    @try {
+        [mtc setThePulserRate:pulser_rate];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"error setting the pulser rate. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+    }
 }
 
 - (void) updateRHDRSruct
