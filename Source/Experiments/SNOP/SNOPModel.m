@@ -833,6 +833,14 @@ err:
             goto err;
         }
 
+        @try {
+            [mtc_server okCommand:"disable_pulser"];
+        } @catch (NSException *e) {
+            NSLogColor([NSColor redColor], @"error sending disable_pulser "
+                       "command to mtc_server: %@\n", [e reason]);
+            goto err;
+        }
+
         NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
                                   @"waiting for MTC/XL3/CAEN data", @"Reason",
                                   nil];

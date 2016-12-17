@@ -53,6 +53,8 @@
 		unsigned long			fixedPulserRateCount;
 		float				fixedPulserRateDelay;
     BOOL _isPedestalEnabledInCSR;
+
+    BOOL _pulserEnabled;
 		
 		//settings
 		NSString*				lastFileLoaded;
@@ -106,6 +108,7 @@
 @property (nonatomic,assign) unsigned long mtcStatusNumEventsInMem;
 @property (nonatomic,assign) BOOL isPedestalEnabledInCSR;
 @property (nonatomic,assign) BOOL resetFifoOnStart;
+@property (nonatomic,assign) BOOL pulserEnabled;
 
 #pragma mark •••Initialization
 - (id) init;
