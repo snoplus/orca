@@ -1755,9 +1755,8 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 
 - (void) setStandardRunVersion:(NSString *)aValue
 {
-    [aValue retain];
-    [standardRunVersion release];
-    standardRunVersion = aValue;
+    [standardRunVersion autorelease];//MAH -- strings should be handled like this
+    standardRunVersion = [aValue copy];
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelSRVersionChangedNotification object:self];
 }
@@ -1996,7 +1995,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     
     [[self orcaDbRefWithEntryDB:self withDB:@"orca"] addDocument:detectorSettings tag:@"kStandardRunDocumentAdded"];
 
-    NSLog(@"%@ run saved as standard run. \n",runTypeName);
+    NSLog(@"%@ run saved as standard run. \n",runTypeName);    
     return true;
 
 }

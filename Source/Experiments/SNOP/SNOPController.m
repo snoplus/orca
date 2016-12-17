@@ -71,6 +71,14 @@ snopGreenColor;
     
     [super dealloc];
 }
+
+- (IBAction) orcaDBTestAction:(id)sender {
+    [[NSWorkspace sharedWorkspace]
+     openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@:%@@%@:%d",
+                                   [model orcaDBUserName], [model orcaDBPassword],
+                                   [model orcaDBIPAddress], [model orcaDBPort]]]];
+}
+
 - (IBAction) testMTCServer:(id)sender
 {
     int port = [mtcPort intValue];
@@ -218,7 +226,7 @@ snopGreenColor;
     //Sync runnumber with main RunControl
     [self updateRunInfo:nil];
     [self findRunControl:nil];
-    [runControl getCurrentRunNumber]; //this should be done by the base clase... but it is not
+    [runControl getCurrentRunNumber]; //this should be done by the base class... but it is not
     //Sync SR with MTC
 
     [doggy_icon start_animation];
@@ -359,11 +367,15 @@ snopGreenColor;
     
 }
 
+//Select SR and look for versions
 -(void) SRTypeChanged:(NSNotification*)aNote
 {
-    
     NSString* standardRun = [model standardRunType];
-    if(standardRun != nil && ![standardRun isEqualToString:@""] && [standardRunPopupMenu indexOfItemWithObjectValue:standardRun] == NSNotFound){
+    if([standardRunPopupMenu numberOfItems] == 0 || standardRun == nil || [standardRun isEqualToString:@""]){
+        NSLogColor([NSColor redColor],@"Please refresh the Standard Runs DB. \n");
+        return;
+    }
+    if([standardRunPopupMenu indexOfItemWithObjectValue:standardRun] == NSNotFound){
         NSLogColor([NSColor redColor],@"Standard Run \"%@\" does not exist in DB. \n",standardRun);
         return;
     }
@@ -374,11 +386,15 @@ snopGreenColor;
     
 }
 
+//Update the SR diplay when SR changes
 -(void) SRVersionChanged:(NSNotification*)aNote
 {
-    
     NSString* standardRunVersion = [model standardRunVersion];
-    if(standardRunVersion != nil && ![standardRunVersion isEqualToString:@""] && [standardRunVersionPopupMenu indexOfItemWithObjectValue:standardRunVersion] == NSNotFound){
+    if([standardRunVersionPopupMenu numberOfItems] == 0 || standardRunVersion == nil || [standardRunVersion isEqualToString:@""]){
+        NSLogColor([NSColor redColor],@"Please refresh the Standard Runs DB. \n",standardRunVersion);
+        return;
+    }
+    if([standardRunVersionPopupMenu indexOfItemWithObjectValue:standardRunVersion] == NSNotFound){
         NSLogColor([NSColor redColor],@"Standard Run Version \"%@\" does not exist in DB. \n",standardRunVersion);
         return;
     }
@@ -398,8 +414,8 @@ snopGreenColor;
     [runControl setSelectedRunTypeScript:0];
 
     //Load selected SR in case the user didn't click enter
-    NSString *standardRun = [standardRunPopupMenu objectValueOfSelectedItem];
-    NSString *standardRunVersion = [standardRunVersionPopupMenu objectValueOfSelectedItem];//MAH -- fixed
+    NSString *standardRun = [[standardRunPopupMenu objectValueOfSelectedItem] copy];
+    NSString *standardRunVersion = [[standardRunVersionPopupMenu objectValueOfSelectedItem] copy];
     
     //Load selected version run:
     //If we are in operator mode we ALWAYS load the DEFAULTs
@@ -438,9 +454,12 @@ snopGreenColor;
     if([runControl isRunning])[runControl restartRun];
     else [runControl startRun];
     
+    [standardRun release];
+    [standardRunVersion release];
 }
 
-- (IBAction)resyncRunAction:(id)sender {
+- (IBAction)resyncRunAction:(id)sender
+{
     /* A resync run does a hard stop and start without the user having to hit
      * stop run and then start run. Doing this resets the GTID, which resyncs
      * crate 9 after it goes out of sync :).
@@ -453,13 +472,15 @@ snopGreenColor;
 
 - (IBAction) stopRunAction:(id)sender
 {
-    [runControl haltRun];
+    [runControl quitSelectedRunScript];
+    [self endEditing];
+    [runControl performSelector:@selector(haltRun)withObject:nil afterDelay:.1];
 }
 
 - (void) runStatusChanged:(NSNotification*)aNotification
 {
     [startRunButton setEnabled:true];
-
+    
     if([runControl runningState] == eRunInProgress){
         [startRunButton setTitle:@"RESTART"];
         [lightBoardView setState:kGoLight];
@@ -479,9 +500,9 @@ snopGreenColor;
             [startRunButton setEnabled:false];
             [startRunButton setTitle:@"STARTING..."];
         }
-		else {
+        else {
             //Do nothing
-		}
+        }
         [lightBoardView setState:kCautionLight];
 	}
 
@@ -651,11 +672,13 @@ snopGreenColor;
 
 
 #pragma mark ¥¥¥Interface Management
-- (IBAction) orcaDBIPAddressAction:(id)sender {
+- (IBAction) orcaDBIPAddressAction:(id)sender
+{
     [model setOrcaDBIPAddress:[sender stringValue]];
 }
 
-- (IBAction) debugDBIPAddressAction:(id)sender {
+- (IBAction) debugDBIPAddressAction:(id)sender
+{
     [model setDebugDBIPAddress:[sender stringValue]];
 }
 
@@ -669,7 +692,8 @@ snopGreenColor;
     [model clearDebugDBConnectionHistory];
 }
 
-- (IBAction) orcaDBFutonAction:(id)sender {
+- (IBAction) orcaDBFutonAction:(id)sender
+{
     
     NSString *url = [NSString stringWithFormat:@"http://%@:%@@%@:%d/_utils/database.html?%@",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort],[model orcaDBName]];
     NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
@@ -677,7 +701,8 @@ snopGreenColor;
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlScaped]];
 }
 
-- (IBAction) debugDBFutonAction:(id)sender {
+- (IBAction) debugDBFutonAction:(id)sender
+{
     
     NSString *url = [NSString stringWithFormat:@"http://%@:%@@%@:%d/_utils/database.html?%@", [model debugDBUserName], [model debugDBPassword],[model debugDBIPAddress],[model debugDBPort], [model debugDBName]];
     NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
@@ -685,25 +710,22 @@ snopGreenColor;
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlScaped]];
 }
 
-- (IBAction) orcaDBTestAction:(id)sender {
-    [[NSWorkspace sharedWorkspace]
-     openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@:%@@%@:%d",
-                                   [model orcaDBUserName], [model orcaDBPassword],
-                                   [model orcaDBIPAddress], [model orcaDBPort]]]];
-}
-
-- (IBAction) debugDBTestAction:(id)sender {
+- (IBAction) debugDBTestAction:(id)sender
+{
     [[NSWorkspace sharedWorkspace]
      openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@:%@@%@:%d",
                                    [model debugDBUserName], [model debugDBPassword],
                                    [model debugDBIPAddress], [model debugDBPort]]]];
 }
 
-- (IBAction) orcaDBPingAction:(id)sender {
+
+- (IBAction) orcaDBPingAction:(id)sender
+{
     [model orcaDBPing];
 }
 
-- (IBAction) debugDBPingAction:(id)sender {
+- (IBAction) debugDBPingAction:(id)sender
+{
     [model debugDBPing];
 }
 
@@ -717,7 +739,8 @@ snopGreenColor;
     NSLogColor([NSColor redColor],@"Detector wide panic down started\n");
 }
 
-- (IBAction)panicDownSingleCrateAction:(id)sender {
+- (IBAction)panicDownSingleCrateAction:(id)sender
+{
 
     NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
     int crateNumber = [sender selectedRow];
@@ -741,8 +764,8 @@ snopGreenColor;
     
 }
 
-- (IBAction)updatexl3Mode:(id)sender{
-    
+- (IBAction)updatexl3Mode:(id)sender
+{
     int i =0;
     NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
     for (id xl3 in xl3s) {
@@ -773,22 +796,24 @@ snopGreenColor;
          [[globalxl3Mode cellAtRow:[anXl3 crateNumber] column:0] setStringValue:xl3ModeDescription];
          }*/
     }
-    
 }
 
-- (IBAction) reportAction:(id)sender {
+- (IBAction) reportAction:(id)sender
+{
     NSString *url = [NSString stringWithFormat:@"https://github.com/snoplus/orca/issues/new"];
     NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlScaped]];
 }
 
-- (IBAction) logAction:(id)sender {
+- (IBAction) logAction:(id)sender
+{
     NSString *url = [NSString stringWithFormat:@"http://snopl.us/shift/"];
     NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlScaped]];
 }
 
-- (IBAction) opManualAction:(id)sender {
+- (IBAction) opManualAction:(id)sender
+{
     NSString *url = [NSString stringWithFormat:@"http://snopl.us/detector/operator_manual/operator_manual.html"];
     NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlScaped]];
@@ -806,8 +831,6 @@ snopGreenColor;
 {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPRequestHVStatus object:self];
 }
-
-
 
 #pragma mark ¥¥¥Table Data Source
 
@@ -1108,7 +1131,8 @@ snopGreenColor;
     [gSecurity tryToSetLock:ORSNOPRunsLockNotification to:[sender intValue] forWindow:[self window]];
 }
 
-- (IBAction)refreshRunWordLabels:(id)sender {
+- (IBAction)refreshRunWordLabels:(id)sender
+{
     NSArray* theNames = [runControl runTypeNames];
     int n = [theNames count];
     for(int i=1;i<n;i++){
@@ -1117,7 +1141,8 @@ snopGreenColor;
 
 }
 
-- (IBAction)runTypeWordAction:(id)sender {
+- (IBAction)runTypeWordAction:(id)sender
+{
     short bit = [sender selectedRow];
     BOOL state  = [[sender selectedCell] state];
     unsigned long currentRunMask = [model runTypeWord];
@@ -1145,7 +1170,9 @@ snopGreenColor;
     [runsLockButton setState: locked];
     
     //Select default standard run if in operator mode
-    if(locked) [model setStandardRunVersion:@"DEFAULT"];
+    if(locked
+       && [standardRunPopupMenu numberOfItems] != 0
+       && ![[model standardRunVersion] isEqualToString:@"DEFAULT"]) [model setStandardRunVersion:@"DEFAULT"];
     
     //Enable or disable fields
     [startSingleECAButton setEnabled:!lockedOrNotRunningMaintenance];
@@ -1222,31 +1249,37 @@ snopGreenColor;
 }
 
 //ECA RUNS
-- (IBAction)ecaPatternChangedAction:(id)sender {
+- (IBAction)ecaPatternChangedAction:(id)sender
+{
     int value = (int)[ECApatternPopUpButton indexOfSelectedItem];
     [model setECA_pattern:value+1];
 }
 
-- (IBAction)ecaTypeChangedAction:(id)sender {
+- (IBAction)ecaTypeChangedAction:(id)sender
+{
     [model setECA_type:[ECAtypePopUpButton titleOfSelectedItem]];
 }
 
-- (IBAction)ecaTSlopePatternChangedAction:(id)sender {
+- (IBAction)ecaTSlopePatternChangedAction:(id)sender
+{
     int value = [TSlopePatternTextField intValue];
     [model setECA_tslope_pattern:value];
 }
 
-- (IBAction)ecaNEventsChangedAction:(id)sender {
+- (IBAction)ecaNEventsChangedAction:(id)sender
+{
     int value = [ecaNEventsTextField intValue];
     [model setECA_nevents:value];
 }
 
-- (IBAction)ecaPulserRateAction:(id)sender {
+- (IBAction)ecaPulserRateAction:(id)sender
+{
     [model setECA_rate:[ecaPulserRate objectValue]];
 }
 
 
-- (IBAction)startECAStandardRunAction:(id)sender {
+- (IBAction)startECAStandardRunAction:(id)sender
+{
 
     NSArray* scriptList = [runControl runScriptList];
     if([scriptList containsObject:@"ECAStandardRun"]){
@@ -1264,7 +1297,8 @@ snopGreenColor;
 
 }
 
-- (IBAction)startECASingleRunAction:(id)sender {
+- (IBAction)startECASingleRunAction:(id)sender
+{
     
     NSArray* scriptList = [runControl runScriptList];
     if([scriptList containsObject:@"ECASingleRun"]){
@@ -1284,7 +1318,8 @@ snopGreenColor;
 
 
 //STANDARD RUNS
-- (IBAction)standardRunNewValueAction:(id)sender {
+- (IBAction)standardRunNewValueAction:(id)sender
+{
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     ORMTCModel* mtcModel;
     if ([objs count]) {
@@ -1386,7 +1421,6 @@ snopGreenColor;
 
 - (void) mtcDataBaseChanged:(NSNotification*)aNotification
 {
-    
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     ORMTCModel* mtcModel;
     if ([objs count]) {
@@ -1526,7 +1560,8 @@ snopGreenColor;
     
 }
 
-- (IBAction)loadStandardRunFromDBAction:(id)sender {
+- (IBAction)loadStandardRunFromDBAction:(id)sender
+{
     
     NSString *standardRun = [standardRunPopupMenu objectValueOfSelectedItem];
     NSString *standardRunVer = [standardRunVersionPopupMenu objectValueOfSelectedItem];
@@ -1536,7 +1571,8 @@ snopGreenColor;
     
 }
 
-- (IBAction)saveStandardRunToDBAction:(id)sender {
+- (IBAction)saveStandardRunToDBAction:(id)sender
+{
     
     NSString *standardRun = [standardRunPopupMenu objectValueOfSelectedItem];
     NSString *standardRunVer = [standardRunVersionPopupMenu objectValueOfSelectedItem];
@@ -1547,7 +1583,8 @@ snopGreenColor;
 }
 
 // Create a new SR item if doesn't exist, set the runType string value and query the DB to display the trigger configuration
-- (IBAction)standardRunPopupAction:(id)sender {
+- (IBAction)standardRunPopupAction:(id)sender
+{
     
     NSString *standardRun = [[standardRunPopupMenu stringValue] uppercaseString];
     [standardRunPopupMenu setStringValue:standardRun];
@@ -1561,9 +1598,7 @@ snopGreenColor;
         }
         else{
             [standardRunPopupMenu addItemWithObjectValue:standardRun];
-            [standardRunPopupMenu selectItemWithObjectValue:standardRun];
             [standardRunVersionPopupMenu addItemWithObjectValue:@"DEFAULT"];
-            [standardRunVersionPopupMenu selectItemWithObjectValue:@"DEFAULT"];
             [model saveStandardRun:standardRun withVersion:@"DEFAULT"];
         }
     }
@@ -1614,11 +1649,11 @@ snopGreenColor;
     
 }
 
-
 //Query the DB for the selected Standard Run name and version
-//and display the default and 'test' values on the GUI.
--(void) displayThresholdsFromDB {
-
+//and display the values in the GUI.
+-(void) displayThresholdsFromDB
+{
+    
     //Get MTC model
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     ORMTCModel* mtcModel;
@@ -1911,8 +1946,7 @@ snopGreenColor;
     
 }
 
-
-//Reload the standard run versions from the DB:
+//Read the standard run versions from the DB:
 //Queries the DB for the specified Standard Run and populate
 //the 'Test run' popup menu with the SR versions
 - (void) refreshStandardRunVersions
@@ -1991,5 +2025,4 @@ snopGreenColor;
     }
     
 }
-
 @end
