@@ -89,10 +89,6 @@
         unsigned long gtCrateMask;
     } _rhdrStruct;
     
-    NSDictionary* _runDocument;
-    NSDictionary* _configDocument;
-    NSDictionary* _mtcConfigDoc;
-    NSMutableDictionary* _runTypeDocumentPhysics;
     NSMutableDictionary* smellieRunHeaderDocList;
     
     bool _smellieDBReadInProgress;
@@ -170,11 +166,6 @@
 @property (copy,setter=setLogServerHost:) NSString *logHost;
 @property (setter=setLogServerPort:) int logPort;
 @property (nonatomic,assign) bool resync;
-
-@property (copy) NSDictionary* runDocument;
-@property (copy) NSDictionary* configDocument;
-@property (copy) NSDictionary* mtcConfigDoc;
-
 
 - (id) init;
 
