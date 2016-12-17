@@ -1689,6 +1689,8 @@ resetFifoOnStart = _resetFifoOnStart;
 		//[self clearGlobalTriggerWordMask];							//STEP 0a:	//added 01/24/98 QRA
         if ([self isPedestalEnabledInCSR]) {
             [self enablePedestal];											// STEP 1 : Enable Pedestal
+        } else {
+            [self disablePedestal];
         }
 		[self setPedestalCrateMask];									// STEP 2: Mask in crates for pedestals (PMSK)
 		[self setGTCrateMask];											// STEP 3: Mask  Mask in crates fo GTRIGs (GMSK)
