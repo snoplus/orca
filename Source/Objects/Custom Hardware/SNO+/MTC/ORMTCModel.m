@@ -334,13 +334,13 @@ pulserEnabled = _pulserEnabled;
         /* Setup MTCA Thresholds */
         [self loadTheMTCADacs];
 
+        /* Setup MTCA relays */
+        [self mtcatLoadCrateMasks];
+
         if (loadTriggers) {
             /* Setup the GT mask */
             [self setSingleGTWordMask: uLongDBValue(kGtMask)];
         }
-
-        /* Setup MTCA relays */
-        [self mtcatLoadCrateMasks];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor], @"error loading MTC hardware at run start: %@\n", [e reason]);
         return -1;
