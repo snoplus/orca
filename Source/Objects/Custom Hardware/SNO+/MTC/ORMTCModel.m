@@ -203,7 +203,8 @@ mtcStatusReadPtr = _mtcStatusReadPtr,
 mtcStatusWritePtr = _mtcStatusWritePtr,
 mtcStatusDataAvailable = _mtcStatusDataAvailable,
 mtcStatusNumEventsInMem = _mtcStatusNumEventsInMem,
-resetFifoOnStart = _resetFifoOnStart;
+resetFifoOnStart = _resetFifoOnStart,
+pulserEnabled = _pulserEnabled;
 
 - (id) init //designated initializer
 {
@@ -307,7 +308,12 @@ resetFifoOnStart = _resetFifoOnStart;
 
     @try {
         /* Setup MTCD pedestal/pulser settings */
-        if ([self isPedestalEnabledInCSR]) [self enablePedestal];
+        if ([self isPedestalEnabledInCSR]) {
+            [self enablePedestal];
+        } else {
+            [self disablePedestal];
+        }
+        if ([self pulserEnabled]) [self enablePulser];
         [self setupPulseGTDelaysCoarse: uLongDBValue(kCoarseDelay) fine:uLongDBValue(kFineDelay)];
         [self setTheLockoutWidth: uLongDBValue(kLockOutWidth)];
         [self setThePedestalWidth: uLongDBValue(kPedestalWidth)];
@@ -320,9 +326,9 @@ resetFifoOnStart = _resetFifoOnStart;
         /* Setup GT Crate Mask */
         [self setGTCrateMask];
 
-	/* Clear the GT mask before setting the trigger thresholds because
-	 * we've noticed that changing the thresholds results in a brief
-	 * burst of events. */
+        /* Clear the GT mask before setting the trigger thresholds because
+         * we've noticed that changing the thresholds results in a brief
+         * burst of events. */
         [self clearGlobalTriggerWordMask];
 
         /* Setup MTCA Thresholds */
@@ -806,6 +812,7 @@ resetFifoOnStart = _resetFifoOnStart;
     [self setMtcaOEHIMask:[decoder decodeIntForKey:@"mtcaOEHIMask"]];
     [self setMtcaOWLNMask:[decoder decodeIntForKey:@"mtcaOWLNMask"]];
     [self setIsPedestalEnabledInCSR:[decoder decodeBoolForKey:@"isPedestalEnabledInCSR"]];
+    [self setPulserEnabled:[decoder decodeBoolForKey:@"pulserEnabled"]];
 
 	if(!mtcDataBase)[self setupDefaults];
     [[self undoManager] enableUndoRegistration];
@@ -848,6 +855,7 @@ resetFifoOnStart = _resetFifoOnStart;
     [encoder encodeInt:[self mtcaOEHIMask] forKey:@"mtcaOEHIMask"];
     [encoder encodeInt:[self mtcaOWLNMask] forKey:@"mtcaOWLNMask"];
     [encoder encodeBool:[self isPedestalEnabledInCSR] forKey:@"isPedestalEnabledInCSR"];
+    [encoder encodeBool:[self pulserEnabled] forKey:@"pulserEnabled"];
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
@@ -1601,6 +1609,8 @@ resetFifoOnStart = _resetFifoOnStart;
 		NSLog(@"Unable to enable the pulser!\n");		
 		[localException raise];	
 	}
+
+    [self setPulserEnabled:YES];
 }
 
 - (void) disablePulser
@@ -1613,6 +1623,8 @@ resetFifoOnStart = _resetFifoOnStart;
 		NSLog(@"Unable to disable the pulser!\n");		
 		[localException raise];	
 	}
+
+    [self setPulserEnabled:NO];
 }
 
 - (void)  enablePedestal
@@ -1656,6 +1668,8 @@ resetFifoOnStart = _resetFifoOnStart;
 	@try {
         if ([self isPedestalEnabledInCSR]) {
             [self enablePedestal];
+        } else {
+            [self disablePedestal];
         }
 		[self enablePulser];
 	}
