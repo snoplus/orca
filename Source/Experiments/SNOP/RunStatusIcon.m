@@ -23,6 +23,8 @@
     [statusIcon setEnabled:NO];
     [statusIcon setTarget:self];
 
+    animate_timer = nil;
+
     return self;
 }
 
@@ -37,7 +39,9 @@
     if([statusIcon image])
     {
         //Timer doggy
-        animate_timer = [NSTimer scheduledTimerWithTimeInterval:1.0/20.0 target:self selector:@selector(animate_icon) userInfo:nil repeats:YES];
+        if (!animate_timer) {
+            animate_timer = [NSTimer scheduledTimerWithTimeInterval:1.0/20.0 target:self selector:@selector(animate_icon) userInfo:nil repeats:YES];
+        }
         isRunning =true;
         [statusIcon setEnabled:YES];
 
@@ -49,6 +53,7 @@
     if(isRunning)
     {
         [animate_timer invalidate];
+        animate_timer = nil;
         isRunning = NO;
         [statusIcon setImage:[NSImage imageNamed:@"waiting_dog.tiff"]];
         [statusIcon setEnabled:NO];

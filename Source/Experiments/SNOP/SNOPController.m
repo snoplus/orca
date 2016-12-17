@@ -67,6 +67,7 @@ snopGreenColor;
     [snopGreenColor release];
     [snopOrangeColor release];
     [snopRedColor release];
+    [doggy_icon stop_animation];
     [doggy_icon release];
     
     [super dealloc];
