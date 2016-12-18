@@ -865,28 +865,29 @@ err:
 {
     /* Since we are running in a separate thread, we just open a new
      * connection to the MTC and XL3 servers. */
-    RedisClient *mtc = [[RedisClient alloc] initWithHostName:mtcHost withPort:mtcPort];
-    RedisClient *xl3 = [[RedisClient alloc] initWithHostName:xl3Host withPort:xl3Port];
+    @autoreleasepool {
+        RedisClient *mtc = [[RedisClient alloc] initWithHostName:mtcHost withPort:mtcPort];
+        RedisClient *xl3 = [[RedisClient alloc] initWithHostName:xl3Host withPort:xl3Port];
 
-    while (1) {
-        @try {
-            if (([mtc intCommand:"data_available"] == 0) &&
-                ([xl3 intCommand:"data_available"] == 0))
+        while (1) {
+            @try {
+                if (([mtc intCommand:"data_available"] == 0) &&
+                    ([xl3 intCommand:"data_available"] == 0))
+                    break;
+            } @catch (NSException *e) {
+                NSLog(@"Failed to check MTC/XL3 data buffers. Quitting run...\n");
                 break;
-        } @catch (NSException *e) {
-            NSLog(@"Failed to check MTC/XL3 data buffers. Quitting run...\n");
-            break;
+            }
         }
+
+        [mtc release];
+        [xl3 release];
+
+        /* Go ahead and end the run. */
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
+        });
     }
-
-    [mtc release];
-    [xl3 release];
-
-    /* Go ahead and end the run. */
-    dispatch_sync(dispatch_get_main_queue(), ^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
-    });
-    
 }
 
 - (void) runStopped:(NSNotification*)aNote
