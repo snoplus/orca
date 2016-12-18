@@ -1846,7 +1846,7 @@ void SwapLongBlock(void* p, int32_t n)
     int i, j;
 
     /* Check that HV Relays for XL3 are open if performing a full crate init. */
-    if ([self hvASwitch] || [self hvBSwitch]) {
+    if ([self hvEverUpdated] && ([self hvASwitch] || [self hvBSwitch])) {
         NSLogColor([NSColor redColor], @"XL3 %02d has high voltage on.  HV must be turned off before a crate reset.\n", [self crateNumber]);
         return;
     }
