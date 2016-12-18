@@ -190,8 +190,26 @@ snotDb = _snotDb;
 
 - (void) runAboutToStart:(NSNotification*)aNote
 {
-    [self initCrateRegistersOnly];
+    NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                              @"waiting for XL3 init", @"Reason",
+                              nil];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object: self userInfo: userInfo];
+
+    [NSThread detachNewThreadSelector:@selector(_initXL3)
+                             toTarget:self
+                           withObject:nil];
 }
+
+- (void) _initXL3
+{
+    @synchronized (self) {
+        [self initCrateRegistersOnly];
+    }
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
+}
+
 
 - (void) makeMainController
 {

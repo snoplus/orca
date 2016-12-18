@@ -198,6 +198,9 @@ enum {
 @property (nonatomic,assign) bool ecalToOrcaInProgress;
 @property (assign) id snotDb;//I replaced 'weak' by 'assign' to get Orca compiled under 10.6 (-tb- 2013-09)
 
+- (void) registerNotificationObservers;
+- (void) runAboutToStart:(NSNotification*)aNote;
+- (void) _initXL3;
 
 #pragma mark •••Initialization
 - (id)   init;
