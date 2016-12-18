@@ -293,6 +293,8 @@ hvBQueryWaiting = hvBQueryWaiting;
                         [[self xl3Link] crateName]);
     }
 
+    free(results);
+
     /* Switch XL3 to normal mode if it isn't already. In normal mode, the XL3
      * reads out data from the FECs, which is usually what we want during
      * a run. */
