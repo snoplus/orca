@@ -5103,7 +5103,7 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
             [self _update_level_alarm:80000+aoffset level:supplyACurrentDropout];
         }
         if (!loopCounter || supplyAOverCurrent != lastSupplyAOverCurrent) {
-            lastSupplyBOverCurrent = supplyAOverCurrent;
+            lastSupplyAOverCurrent = supplyAOverCurrent;
             [self _update_level_alarm:80300+aoffset level:supplyAOverCurrent];
         }
         if (!loopCounter || supplyAOverVoltage != lastSupplyAOverVoltage) {
