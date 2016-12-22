@@ -170,6 +170,9 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
     
 	autoReconnect = aAutoReconnect;
     
+    if(!autoReconnect)[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(reConnect) object:nil];
+
+    
 	[[NSNotificationCenter defaultCenter]
 	 postNotificationName:ORListenerAutoReconnectChanged
 	 object:self];
@@ -375,7 +378,6 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
     do {
         NSAutoreleasePool *pool = [[NSAutoreleasePool allocWithZone:nil] init];
         @synchronized(self){
-            [self processDataBuffer];
 
             if(timeToQuit){
                 unsigned long numBytesLeft = [dataToProcess length];
@@ -385,6 +387,8 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
                 }
                 if(numBytesLeft == 0)break;
             }
+            else [self processDataBuffer];
+
         }
         [NSThread sleepForTimeInterval:.01];
         [pool release];
@@ -510,6 +514,7 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(reConnect) object:nil];
     [self connectSocket:YES];
+    if(autoReconnect)[self performSelector:@selector(reConnect) withObject:nil afterDelay:10];
 }
 
 @end
