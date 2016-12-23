@@ -49,6 +49,8 @@
     IBOutlet NSButton *panicDownButton;
     IBOutlet NSTextField *detectorHVStatus;
     
+    IBOutlet NSButton *pingCratesButton;
+
     //Standard Runs
     IBOutlet NSComboBox *standardRunPopupMenu;
     IBOutlet NSComboBox *standardRunVersionPopupMenu;
@@ -185,6 +187,8 @@
 - (IBAction) hvMasterPanicAction:(id)sender;
 - (IBAction) hvMasterTriggersOFF:(id)sender;
 - (IBAction) hvMasterStatus:(id)sender;
+
+- (IBAction) pingCratesAction:(id)sender;
 
 //smellie functions -------------------
 - (IBAction) loadSmellieRunAction:(id)sender;

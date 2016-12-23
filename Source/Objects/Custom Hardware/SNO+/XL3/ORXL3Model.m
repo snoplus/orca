@@ -216,7 +216,13 @@ hvBQueryWaiting = hvBQueryWaiting;
 - (void) connectionStateChanged
 {
     /* If we just connected, find out if Xilinx has been loaded or not. */
-    if ([xl3Link isConnected]) [self updateXl3Mode];
+    if ([xl3Link isConnected]) {
+        [self updateXl3Mode];
+    } else {
+        /* If we disconnected, assume we don't know the state any more. */
+        initialized = FALSE;
+        stateUpdated = FALSE;
+    }
 }
 
 - (int) initAtRunStart
@@ -287,6 +293,8 @@ hvBQueryWaiting = hvBQueryWaiting;
                         [[self xl3Link] crateName]);
     }
 
+    free(results);
+
     /* Switch XL3 to normal mode if it isn't already. In normal mode, the XL3
      * reads out data from the FECs, which is usually what we want during
      * a run. */
@@ -317,6 +325,11 @@ hvBQueryWaiting = hvBQueryWaiting;
 - (bool) initialized
 {
     return initialized;
+}
+
+- (bool) stateUpdated
+{
+    return stateUpdated;
 }
 
 - (id) controllerCard
@@ -1485,6 +1498,7 @@ void SwapLongBlock(void* p, int32_t n)
     [self setIsTriggerON:       [decoder decodeBoolForKey:@"isTriggerON"]];
 
     initialized = FALSE;
+    stateUpdated = FALSE;
 
     if ([self isTriggerON]) {
         [self setTriggerStatus:@"ON"];
@@ -1735,6 +1749,8 @@ void SwapLongBlock(void* p, int32_t n)
         initialized = FALSE;
     }
 
+    stateUpdated = TRUE;
+
     [[NSNotificationCenter defaultCenter]
         postNotificationName:ORXL3ModelStateChanged object:self userInfo:nil];
 
@@ -1830,7 +1846,7 @@ void SwapLongBlock(void* p, int32_t n)
     int i, j;
 
     /* Check that HV Relays for XL3 are open if performing a full crate init. */
-    if ([self hvASwitch] || [self hvBSwitch]) {
+    if ([self hvEverUpdated] && ([self hvASwitch] || [self hvBSwitch])) {
         NSLogColor([NSColor redColor], @"XL3 %02d has high voltage on.  HV must be turned off before a crate reset.\n", [self crateNumber]);
         return;
     }
@@ -2533,6 +2549,37 @@ err:
 		NSLog(@"Send XL3 Quit failed; error: %@ reason: %@\n", [e name], [e reason]);
 	}
 	[self setXl3OpsRunning:NO forKey:@"compositeQuit"];
+}
+
+- (int) setPedestalMask: (uint32_t) slotMask pattern: (uint32_t) pattern
+{
+    /* Set the pedestal mask for a given slot mask. Any slots not in the mask
+     * will have pedestals disabled. Returns 0 on success, -1 on error. */
+    char payload[XL3_PAYLOAD_SIZE];
+    SetCratePedestalsArgs *args;
+    SetCratePedestalsResults *results;
+
+    memset(&payload, 0, XL3_PAYLOAD_SIZE);
+
+    args = (SetCratePedestalsArgs *) payload;
+
+    args->slotMask = htonl(slotMask);
+    args->pattern = htonl(pattern);
+
+    @try {
+        [[self xl3Link] sendCommand:SET_CRATE_PEDESTALS_ID withPayload:payload
+                        expectResponse:YES];
+    } @catch (NSException *e) {
+        return -1;
+    }
+
+    results = (SetCratePedestalsResults *) payload;
+
+    if (ntohl(results->errorMask)) {
+        return -1;
+    }
+
+    return 0;
 }
 
 - (void) compositeSetPedestal
@@ -4724,6 +4771,13 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
         sleep(1);
         //do nothing without an xl3 connected
         if ([self xl3Link] && [[self xl3Link] isConnected]) {
+            if (![self stateUpdated] || ![self initialized]) {
+                /* If the XL3 hasn't been initialized, then the registers are
+                 * just random bytes, so we need to wait for a crate reset
+                 * before checking the switches. */
+                [hvLoopPool release];
+                continue;
+            }
             
             //Request the hv parameters (N.B. true does not mean they were loaded, check hvAFromDB and hvBFromDB)
             if (![ORXL3Model requestHVParams:self]) {

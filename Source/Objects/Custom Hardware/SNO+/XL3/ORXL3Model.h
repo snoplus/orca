@@ -174,6 +174,7 @@ enum {
     bool _ecalToOrcaInProgress;
 
     bool initialized;
+    bool stateUpdated;
 }
 
 @property (nonatomic,assign) unsigned long xl3MegaBundleDataId;
@@ -283,6 +284,7 @@ enum {
 
 #pragma mark •••Accessors
 - (bool) initialized;
+- (bool) stateUpdated;
 - (NSString*) shortName;
 - (id) controllerCard;
 - (void) setSlot:(int)aSlot;
@@ -381,6 +383,7 @@ enum {
 - (void) writeXl3Mode;
 - (void) compositeXl3RW;
 - (void) compositeQuit;
+- (int) setPedestalMask: (uint32_t) slotMask pattern: (uint32_t) pattern;
 - (void) compositeSetPedestal;
 - (void) setPedestalInParallel;
 - (void) zeroPedestalMasks;

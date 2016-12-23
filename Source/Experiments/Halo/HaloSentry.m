@@ -554,6 +554,7 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 //SV
 - (NSString*) nextToggleTime
 {
+    if(!nextToggleTime) nextToggleTime = @"None scheduled"; //MAH -- can never have nil string
     return nextToggleTime;
 }
 

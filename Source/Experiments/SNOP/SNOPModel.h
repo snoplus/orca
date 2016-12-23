@@ -19,7 +19,7 @@
 //-------------------------------------------------------------
 
 
-#pragma mark ⅴ쩒mported Files
+#pragma mark 짜짜짜Imported Files
 #import "ORExperimentModel.h"
 #import "ORVmeCardDecoder.h"
 #import "RedisClient.h"
@@ -171,11 +171,6 @@
 @property (setter=setLogServerPort:) int logPort;
 @property (nonatomic,assign) bool resync;
 
-@property (copy) NSDictionary* runDocument;
-@property (copy) NSDictionary* configDocument;
-@property (copy) NSDictionary* mtcConfigDoc;
-
-
 - (id) init;
 
 - (void) setMTCPort: (int) port;
@@ -203,12 +198,14 @@
 - (void) taskFinished:(NSTask*)aTask;
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
 
-#pragma mark ⅴorcascript helpers
+- (void) pingCrates;
+
+#pragma mark 짜짜orcascript helpers
 - (void) zeroPedestalMasks;
 - (void) updatePedestalMasks:(unsigned int)pattern;
 - (void) hvMasterTriggersOFF;
 
-#pragma mark ⅴ쩘otifications
+#pragma mark 짜짜짜Notifications
 - (void) registerNotificationObservers;
 
 - (void) runInitialization:(NSNotification*)aNote;
@@ -233,7 +230,7 @@
 - (void) updateRHDRSruct;
 - (void) shipRHDRRecord;
 
-#pragma mark ⅴ쩇ccessors
+#pragma mark 짜짜짜Accessors
 - (void) setViewType:(int)aViewType;
 - (int) viewType;
 - (unsigned long) runTypeWord;
@@ -261,25 +258,25 @@
 - (void) setECA_nevents:(int)aValue;
 - (void) setECA_rate:(NSNumber*)aValue;
 
-#pragma mark ⅴ쩇rchival
+#pragma mark 짜짜짜Archival
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
 
-#pragma mark ⅴ쩢egment Group Methods
+#pragma mark 짜짜짜Segment Group Methods
 - (void) makeSegmentGroups;
 
-#pragma mark ⅴ쩢pecific Dialog Lock Methods
+#pragma mark 짜짜짜Specific Dialog Lock Methods
 - (NSString*) experimentMapLock;
 - (NSString*) experimentDetectorLock;
 - (NSString*) experimentDetailsLock;
 
-#pragma mark ⅴ쩊ataTaker
+#pragma mark 짜짜짜DataTaker
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherObj;
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (NSDictionary*) dataRecordDescription;
 
-#pragma mark ⅴ쩢notDbDelegate
+#pragma mark 짜짜짜SnotDbDelegate
 - (ORCouchDB*) orcaDbRef:(id)aCouchDelegate;
 - (ORCouchDB*) debugDBRef:(id)aCouchDelegate;
 - (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
@@ -291,7 +288,6 @@
 -(BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
 -(BOOL) saveStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
 -(void) loadSettingsInHW;
--(void) loadHighThresholds;
 
 @end
 
