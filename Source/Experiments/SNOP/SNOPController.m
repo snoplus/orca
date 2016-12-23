@@ -1016,11 +1016,20 @@ snopGreenColor;
 
 - (IBAction) startSmellieRunAction:(id)sender
 {
+    //////////////////
+    // Check if a run is already ongoing
+    // If so tell the user and ignore this
+    // button press
+    if([smellieThread isExecuting]){
+        NSLogColor([NSColor redColor], @"[SMELLIE]: A Smellie fire sequence is already on going. Cannot launch a new one until current sequence has finished\n");
+        return;
+    }
+    
     [smellieLoadRunFile setEnabled:NO];
     [smellieRunFileNameField setEnabled:NO];
     [smellieStopRunButton setEnabled:YES];
     [smellieStartRunButton setEnabled:NO];
-
+    
     //assign the run type as a SMELLIE run
     //[model setRunType:kRunSmellie];
 
@@ -1058,22 +1067,25 @@ snopGreenColor;
     [smellieStopRunButton setEnabled:NO];
     //[smellieCheckInterlock setEnabled:YES];
 
-    // First up kill the thread (if it's still ongoing, this will stop the run method in its tracks)
-    if(smellieThread){
+    //////////////////////
+    // Check if the thread is still running,
+    // if not cancel the thread and let the
+    // catch statements in [ellieModel startSmellieRun]
+    // cause a goto err;
+    if([smellieThread isExecuting]){
         [smellieThread cancel];
-        [smellieThread release];
-        smellieThread = nil;
+        return;
     }
     
     //Collect a series of objects from the ELLIEModel
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
     if (![objs count]) {
-      NSString* reasonStr = @"ELLIE model not available, add an ELLIE model to your experiment";
-      NSException* e = [NSException
-                        exceptionWithName:@"NoEllieModel"
-                        reason:reasonStr
-                        userInfo:nil];
-      [e raise];
+        NSString* reasonStr = @"ELLIE model not available, add an ELLIE model to your experiment";
+        NSException* e = [NSException
+                          exceptionWithName:@"NoEllieModel"
+                          reason:reasonStr
+                          userInfo:nil];
+        [e raise];
     }
     ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
 
@@ -1083,11 +1095,6 @@ snopGreenColor;
     } @catch(NSException* e){
         [e raise];
     }
-    
-    //wait for the current loop to finish
-    //move straight to a maintainence run
-    //communicate with smellie model
-    //TODO:Make a note in the datastream that this happened
 }
 
 - (IBAction) emergencySmellieStopAction:(id)sender
@@ -1113,6 +1120,18 @@ snopGreenColor;
 
 -(void)startTellieRunNotification:(NSNotification *)note;
 {
+    //////////////////
+    // Check if a run is already ongoing
+    // If so tell the user and ignore this
+    // button press
+    if([tellieThread isExecuting]){
+        NSLogColor([NSColor redColor], @"[TELLIE]: A tellie fire sequence is already on going. Cannot launch a new one until current sequence has finished\n");
+        return;
+    }
+    
+    //////////////////
+    // Get ellie model and launch a fire
+    // sequence
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
     if (![objs count]) {
         NSString* reasonStr = @"ELLIE model not available, add an ELLIE model to your experiment";
@@ -1131,12 +1150,15 @@ snopGreenColor;
 
 - (IBAction) stopTellieRunAction:(id)sender
 {
-    
-    // First up kill the thread (if it's still ongoing, this will stop the run method in its tracks)
-    if(tellieThread){
+    //////////////////////
+    // Check if the thread is still running,
+    // if so cancel the thread and let the
+    // catch statements in [ellieModel startTellieRun]
+    // cause a goto err;
+    if([tellieThread isExecuting]){
         [tellieThread cancel];
-        [tellieThread release];
         tellieThread = nil;
+        return;
     }
     
     //Collect a series of objects from the ELLIEModel
@@ -1151,7 +1173,7 @@ snopGreenColor;
     }
     ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
     
-    //Call stopTellie run to tidy up
+    //Call stop smellie run method to tidy up TELLIE's hardware state
     @try{
         [theELLIEModel stopTellieRun];
     } @catch(NSException* e){

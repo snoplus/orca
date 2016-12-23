@@ -325,7 +325,7 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     }
     
     NSLog(@"Selected Item: %@\n", [tellieExpertFibreSelectPb titleOfSelectedItem]);
-    NSMutableDictionary* settings = [model returnTellieFireCommands:[tellieExpertFibreSelectPb titleOfSelectedItem] withNPhotons:[telliePhotonsTf integerValue] withFireFrequency:1000 withNPulses:100 withTriggerDelay:550 inSlave:(BOOL)inSlave];
+    NSMutableDictionary* settings = [model returnTellieFireCommands:[tellieExpertFibreSelectPb titleOfSelectedItem] withNPhotons:[telliePhotonsTf integerValue] withFireFrequency:1000 withNPulses:100 withTriggerDelay:700 inSlave:(BOOL)inSlave];
     if(settings){
         float frequency = (1. / [[settings objectForKey:@"pulse_separation"] floatValue])*1000;
         //Set text fields appropriately

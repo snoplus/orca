@@ -107,8 +107,9 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
 {
     self = [super init];
     if (self){
-        XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"builder1" withPort:@"5030"];
-        XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:@"0.0.0.0" withPort:@"5020"];
+        //XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"builder1" withPort:@"5030"];
+        XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"localhost" withPort:@"5030"];
+        XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:@"snodrop1" withPort:@"5020"];
         [self setTellieClient:tellieCli];
         [self setSmellieClient:smellieCli];
         [[self tellieClient] setTimeout:10];
@@ -123,8 +124,9 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
 {
     self = [super initWithCoder:aCoder];
     if (self){
-        XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"builder1" withPort:@"5030"];
-        XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:@"0.0.0.0" withPort:@"5020"];
+        //XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"builder1" withPort:@"5030"];
+        XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"localhost" withPort:@"5030"];
+        XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:@"snodrop1" withPort:@"5020"];
         [self setTellieClient:tellieCli];
         [self setSmellieClient:smellieCli];
         [[self tellieClient] setTimeout:10];
@@ -215,6 +217,10 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     int count = 0;
     NSLog(@"[TELLIE]: Will poll for pin response for the next %1.1f s\n", timeOutSeconds);
     while ([pollResponse isKindOfClass:[NSString class]] && count < timeOutSeconds){
+        // Check the thread hasn't been cancelled
+        if([[NSThread currentThread] isCancelled]){
+            return blankResponse;
+        }
         [NSThread sleepForTimeInterval:1.0];
         pollResponse = [[self tellieClient] command:@"read_pin_sequence"];
         count = count + 1;
@@ -299,7 +305,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     // Run photon intensity check
     bool safety_check = [self photonIntensityCheck:photons atFrequency:frequency];
     if(safety_check == NO){
-        NSLogColor([NSColor redColor], @"[TELLIE] The request number of photons (%lu), is not detector safe at %lu Hz. This setting will not be run.\n", photons, frequency);
+        NSLogColor([NSColor redColor], @"[TELLIE] The requested number of photons (%lu), is not detector safe at %lu Hz. This setting will not be run.\n", photons, frequency);
         return [NSNumber numberWithInt:-1];
     }
     
@@ -327,9 +333,9 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     int min_x = [[IPW_values objectAtIndex:[photon_values indexOfObject:[photon_values valueForKeyPath:@"@min.self"]]] intValue];
     if(photons < min_photons){
         NSLog(@"Calibration curve for channel %lu does not go as low as %lu photons\n", channel, photons);
-        NSLog(@"Using a linear interpolation of 5ph/IPW from min_photons = %.1f to estimate requested %d photon settings\n",min_photons,photons);
+        NSLog(@"Using a linear interpolation of -5ph/IPW from min_photons = %.1f to estimate requested %d photon settings\n",min_photons,photons);
         float intercept = min_photons - (-5.*min_x);
-        float floatPulseWidth = (min_photons - intercept)/(-5.);
+        float floatPulseWidth = (photons - intercept)/(-5.);
         NSNumber* pulseWidth = [NSNumber numberWithInteger:floatPulseWidth];
         NSLog(@"IPW setting calculated as: %d\n",[pulseWidth intValue]);
         return pulseWidth;
@@ -403,11 +409,13 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     // Appropriate setting will be estiamated with a linear interpolation between these points.
     int index = 0;
     for(NSNumber* val in IPW_values){
+        index = index + 1;
         if([val intValue] > ipw){
             break;
         }
-        index = index + 1;
     }
+    index = index - 1;
+    
     float x1 = [[IPW_values objectAtIndex:(index-1)] floatValue];
     float x2 = [[IPW_values objectAtIndex:(index)] floatValue];
     float y1 = [[photon_values objectAtIndex:(index-1)] floatValue];
@@ -429,7 +437,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
      A detector safety check. At high frequencies the maximum tellie output must be small
      to avoid pushing too much current through individual channels / trigger sums.
      */
-    float safe_gradient = -1e3;
+    float safe_gradient = -999;
     float safe_intercept = 1.0011e6;
     float max_photons = safe_gradient*frequency + safe_intercept;
     if(photons > max_photons){
@@ -644,7 +652,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     NSLog(@"Rate: %1.1f Hz\n", rate);
     BOOL safety_check = [self photonIntensityCheck:[photonOutput integerValue] atFrequency:rate];
     if(safety_check == NO){
-        NSLogColor([NSColor redColor], @"[TELLIE] The request number of photons (%lu), is not detector safe at %f Hz. This setting will not be run.\n", [photonOutput integerValue], rate);
+        NSLogColor([NSColor redColor], @"[TELLIE] The requested number of photons (%lu), is not detector safe at %f Hz. This setting will not be run.\n", [photonOutput integerValue], rate);
         return;
     }
     
@@ -675,8 +683,8 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     // Fire loop! Pass variables to the tellie server.
     NSLog(@"Firing in %@ loops\n", loops);
     for(int i = 0; i<[loops integerValue]; i++){
-        if([self ellieFireFlag] == NO){
-            errorString = @"ELLIE fire flag set to @NO";
+        if([self ellieFireFlag] == NO || [[NSThread currentThread] isCancelled] == YES){
+            //errorString = @"ELLIE fire flag set to @NO";
             goto err;
         }
 
@@ -717,6 +725,13 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
             }
         }
         
+        ////////////////////
+        // Init can take a while. Make sure no-one hit
+        // a stop button
+        if([[NSThread currentThread] isCancelled]){
+            goto err;
+        }
+        
         /////////////////////
         // Set loop dependent tellie channel settings
         @try{
@@ -755,9 +770,9 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
                 [theTubiiModel setTellieRate:rate];
                 [theTubiiModel setTelliePulseWidth:100e-9];
                 [theTubiiModel setTellieNPulses:[noShots intValue]];
-                //[theTubiiModel fireTelliePulser];
+                [theTubiiModel fireTelliePulser];
                 //noShots = [NSNumber numberWithInteger:[noShots intValue] + 5000];
-                [theTubiiModel fireTelliePulser_rate:rate pulseWidth:200e-9 NPulses:[noShots intValue]];
+                //[theTubiiModel fireTelliePulser_rate:rate pulseWidth:200e-9 NPulses:[noShots intValue]];
             } @catch(NSException* e){
                 errorString = [NSString stringWithFormat:@"[TELLIE] Problem setting tubii parameters: %@\n", [e reason]];
                 NSLogColor([NSColor redColor], errorString);
@@ -777,6 +792,12 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
             }
         }
 
+        //////////////////
+        // Before we poll, check thread is still alive.
+        // polling can take a while so worth doing here first.
+        if([[NSThread currentThread] isCancelled]){
+            goto err;
+        }
         //////////////////
         // Poll tellie for a pin reading. Give the sequence a 3s grace period to finish
         // long for some reason
@@ -811,7 +832,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     
     ////////////
     // Finish and tidy up
-    NSLog(@"[TELLIE]: End of TELLIE Run\n");
+    NSLog(@"[TELLIE]: TELLIE fire sequence completed\n");
     dispatch_sync(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunFinished object:self];
     });
@@ -821,7 +842,7 @@ err:
     {
         [pool release];
         //Resetting the mtcd to settings before the smellie run
-        NSLog(@"[TELLIE]: ERROR encountered. Killing TELLIE run.\n");
+        NSLog(@"[TELLIE]: Killing TELLIE run.\n");
         
         //Make a dictionary to push into sub-run array to indicate error.
         //NSMutableDictionary* errorDict = [NSMutableDictionary dictionaryWithCapacity:10];
@@ -882,7 +903,7 @@ err:
         [runControl performSelectorOnMainThread:@selector(restartRun) withObject:nil waitUntilDone:YES];
     }
     */
-    NSLog(@"[TELLIE]: Run finished\n");
+    NSLog(@"[TELLIE]: Run stopped\n");
     [pool release];
 }
 
@@ -1538,9 +1559,8 @@ err:
                     // Gain loop
                     //
                     for(NSNumber* gain in gainArray){
-                        if(([[NSThread currentThread] isCancelled])){// || ![runControl isRunning]){
-                            endOfRun = YES;
-                            break;
+                        if(([[NSThread currentThread] isCancelled])){
+                            goto err;
                         }
                         
                         ///////////////////////
@@ -1606,7 +1626,7 @@ err:
 
                         //Push record of sub-run settings to db
                         [self updateSmellieRunDocument:valuesToFillPerSubRun];
-
+                        
                         //Check if run file requests a sleep time between sub_runs
                         if([smellieSettings objectForKey:@"sleep_between_sub_run"]){
                             NSTimeInterval sleepTime = [[smellieSettings objectForKey:@"sleep_between_sub_run"] floatValue];
@@ -1633,7 +1653,7 @@ err:
 err:
 {
     //Resetting the mtcd to settings before the smellie run
-    NSLogColor([NSColor redColor], @"[SMELLIE]: Error occurred in run sequence. Stopping smellie run\n");
+    NSLogColor([NSColor redColor], @"[SMELLIE]: Sent to err statement. Stopping smellie run\n");
     [pool release];
     
     //Post a note. on the main thread to request a call to stopSmellieRun
