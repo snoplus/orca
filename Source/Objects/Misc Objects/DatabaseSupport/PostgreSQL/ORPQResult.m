@@ -20,7 +20,7 @@ enum {
     kPQTypeInt16    = 21,   // 2-byte integer
     kPQTypeVector16 = 22,   // vector of 2-byte integers
     kPQTypeInt32    = 23,   // 4-byte integer
-    kPQTypeString   = 17,   // variable-length string
+    kPQTypeString   = 25,   // variable-length string
     kPQTypeArrayChar= 1002, // array of 8-bit characters
     kPQTypeArray16  = 1005, // array of 2-byte integers
     kPQTypeArray32  = 1007, // array of 4-byte integers
