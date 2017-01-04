@@ -27,8 +27,6 @@ enum {
     kPQTypeArray64  = 1016, // array of 8-byte integers
 };
 
-NSDate* MCPYear0000;
-
 @implementation ORPQResult
 
 - (id) initWithResPtr:(PGresult *) PQResPtr
