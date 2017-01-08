@@ -215,7 +215,7 @@ snopGreenColor;
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
 
     //Custom colors
-    [self setSnopBlueColor:[NSColor colorWithSRGBRed:153./255. green:204./255. blue:255./255. alpha:1]];
+    [self setSnopBlueColor:[NSColor colorWithSRGBRed:0./255. green:73./255. blue:153./255. alpha:1]];
     [self setSnopRedColor:[NSColor colorWithSRGBRed:255./255. green:102./255. blue:102./255. alpha:1]];
     [self setSnopGreenColor:[NSColor colorWithSRGBRed:0./255. green:150./255. blue:0./255. alpha:1]];
     [self setSnopOrangeColor:[NSColor colorWithSRGBRed:255./255. green:178./255. blue:102./255. alpha:1]];
@@ -229,6 +229,9 @@ snopGreenColor;
     [self findRunControl:nil];
     [runControl getCurrentRunNumber]; //this should be done by the base class... but it is not
     //Sync SR with MTC
+
+    //Update XL3 state
+    [self updatexl3Mode:nil];
 
     [doggy_icon start_animation];
 
@@ -432,11 +435,11 @@ snopGreenColor;
 
     //Handle no SR cases
     if([standardRun isEqualToString:@""] || standardRun == nil){
-        NSLogColor([NSColor redColor],@"Standard Run Not Set. Select a valid run from the drop down menu \n");
+        NSLogColor([NSColor redColor],@"Standard Run not set. Please, refresh the Standard Runs. \n");
         return;
     }
     if([standardRunVersion isEqualToString:@""] || standardRunVersion == nil){
-        NSLogColor([NSColor redColor],@"Standard Run Version Not Set. Select a valid run from the drop down menu \n");
+        NSLogColor([NSColor redColor],@"Standard Run Version not set. Please, refresh the Standard Runs. \n");
         return;
     }
     
@@ -481,17 +484,19 @@ snopGreenColor;
 - (void) runStatusChanged:(NSNotification*)aNotification
 {
     [startRunButton setEnabled:true];
-    
+
     if([runControl runningState] == eRunInProgress){
         [startRunButton setTitle:@"RESTART"];
         [lightBoardView setState:kGoLight];
         [runStatusField setStringValue:@"Running"];
+        [resyncRunButton setEnabled:true];
         [doggy_icon start_animation];
 	}
 	else if([runControl runningState] == eRunStopped){
         [startRunButton setTitle:@"START"];
         [lightBoardView setState:kStoppedLight];
         [runStatusField setStringValue:@"Stopped"];
+        [resyncRunButton setEnabled:false];
         [doggy_icon stop_animation];
 	}
 	else if([runControl runningState] == eRunStarting || [runControl runningState] == eRunStopping || [runControl runningState] == eRunBetweenSubRuns){
@@ -499,6 +504,7 @@ snopGreenColor;
             //The run started so update the display
             [runStatusField setStringValue:@"Starting"];
             [startRunButton setEnabled:false];
+            [resyncRunButton setEnabled:false];
             [startRunButton setTitle:@"STARTING..."];
         }
         else {
@@ -1132,16 +1138,6 @@ snopGreenColor;
     [gSecurity tryToSetLock:ORSNOPRunsLockNotification to:[sender intValue] forWindow:[self window]];
 }
 
-- (IBAction)refreshRunWordLabels:(id)sender
-{
-    NSArray* theNames = [runControl runTypeNames];
-    int n = [theNames count];
-    for(int i=1;i<n;i++){
-        [[runTypeWordMatrix cellAtRow:i column:0] setTitle:[theNames objectAtIndex:i]];
-    }
-
-}
-
 - (IBAction)runTypeWordAction:(id)sender
 {
     short bit = [sender selectedRow];
@@ -1185,7 +1181,10 @@ snopGreenColor;
     [standardRunThresCurrentValues setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunSaveButton setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunLoadButton setEnabled:!lockedOrNotRunningMaintenance];
-    [runTypeWordMatrix setEnabled:!lockedOrNotRunningMaintenance];
+    //Do not lock detector state bits to the operator
+    for(int irow=0;irow<21;irow++){
+        [[runTypeWordMatrix cellAtRow:irow column:0] setEnabled:!lockedOrNotRunningMaintenance];
+    }
     [standardRunVersionPopupMenu setEnabled:!locked && [standardRunVersionPopupMenu numberOfItems]>0]; //allow to change version when in expert mode
     [timedRunCB setEnabled:!runInProgress];
     [timeLimitField setEnabled:!lockedOrNotRunningMaintenance];
@@ -1212,21 +1211,27 @@ snopGreenColor;
     [debugDBClearButton setEnabled:!lockedOrNotRunningMaintenance];    
     
     //Display status
-    [lockStatusTextField setStringValue:@"EXPERT MODE"];
-    [lockStatusTextField setBackgroundColor:snopRedColor];
-    if(lockedOrNotRunningMaintenance){
-        if(locked){
-            [lockStatusTextField setStringValue:@"OPERATOR MODE"];
-            [lockStatusTextField setBackgroundColor:snopBlueColor];
-        }
-        else{
-            [lockStatusTextField setStringValue:@"RUN IN PROGRESS"];
-            [lockStatusTextField setBackgroundColor:snopGreenColor];
-        }
+    if(locked){
+        [lockStatusTextField setStringValue:@"OPERATOR MODE"];
+        [lockStatusTextField setBackgroundColor:snopBlueColor];
     }
     else if(runInProgress){
-        [lockStatusTextField setStringValue:@"RUNNING IN MAINTENACE"];
-        [lockStatusTextField setBackgroundColor:snopOrangeColor];
+        [lockStatusTextField setStringValue:@"RUN IN PROGRESS"];
+        [lockStatusTextField setBackgroundColor:snopGreenColor];
+
+        if([runControl runType] & MAINTENANCE_RUN){
+            [lockStatusTextField setStringValue:@"RUN IN MAINTENANCE"];
+            [lockStatusTextField setBackgroundColor:snopOrangeColor];
+        }
+        else if ([runControl runType] & DIAGNOSTIC_RUN){
+            [lockStatusTextField setStringValue:@"DIAGNOSTIC RUN"];
+            [lockStatusTextField setBackgroundColor:snopOrangeColor];
+        }
+
+    }
+    else{
+        [lockStatusTextField setStringValue:@"EXPERT MODE"];
+        [lockStatusTextField setBackgroundColor:snopRedColor];
     }
     
 }
@@ -1446,7 +1451,7 @@ snopGreenColor;
     [[standardRunThresCurrentValues cellAtRow:0 column:0] setFloatValue:nHits];
     [[standardRunThresCurrentValues cellAtRow:0 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 2) & 1){
-        [[standardRunThresCurrentValues cellAtRow:0 column:0] setTextColor:[self snopGreenColor]];
+        [[standardRunThresCurrentValues cellAtRow:0 column:0] setTextColor:[self snopBlueColor]];
     } else{
         [[standardRunThresCurrentValues cellAtRow:0 column:0] setTextColor:[self snopRedColor]];
     }
@@ -1458,7 +1463,7 @@ snopGreenColor;
     [[standardRunThresCurrentValues cellAtRow:1 column:0] setFloatValue:nHits];
     [[standardRunThresCurrentValues cellAtRow:1 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 1) & 1){
-        [[standardRunThresCurrentValues cellAtRow:1 column:0] setTextColor:[self snopGreenColor]];
+        [[standardRunThresCurrentValues cellAtRow:1 column:0] setTextColor:[self snopBlueColor]];
     } else{
         [[standardRunThresCurrentValues cellAtRow:1 column:0] setTextColor:[self snopRedColor]];
     }
@@ -1470,7 +1475,7 @@ snopGreenColor;
     [[standardRunThresCurrentValues cellAtRow:2 column:0] setFloatValue:nHits];
     [[standardRunThresCurrentValues cellAtRow:2 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 0) & 1){
-        [[standardRunThresCurrentValues cellAtRow:2 column:0] setTextColor:[self snopGreenColor]];
+        [[standardRunThresCurrentValues cellAtRow:2 column:0] setTextColor:[self snopBlueColor]];
     } else{
         [[standardRunThresCurrentValues cellAtRow:2 column:0] setTextColor:[self snopRedColor]];
     }
@@ -1482,7 +1487,7 @@ snopGreenColor;
     [[standardRunThresCurrentValues cellAtRow:3 column:0] setFloatValue:nHits];
     [[standardRunThresCurrentValues cellAtRow:3 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 3) & 1){
-        [[standardRunThresCurrentValues cellAtRow:3 column:0] setTextColor:[self snopGreenColor]];
+        [[standardRunThresCurrentValues cellAtRow:3 column:0] setTextColor:[self snopBlueColor]];
     } else{
         [[standardRunThresCurrentValues cellAtRow:3 column:0] setTextColor:[self snopRedColor]];
     }
@@ -1494,7 +1499,7 @@ snopGreenColor;
     [[standardRunThresCurrentValues cellAtRow:4 column:0] setFloatValue:nHits];
     [[standardRunThresCurrentValues cellAtRow:4 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 4) & 1){
-        [[standardRunThresCurrentValues cellAtRow:4 column:0] setTextColor:[self snopGreenColor]];
+        [[standardRunThresCurrentValues cellAtRow:4 column:0] setTextColor:[self snopBlueColor]];
     } else{
         [[standardRunThresCurrentValues cellAtRow:4 column:0] setTextColor:[self snopRedColor]];
     }
@@ -1506,7 +1511,7 @@ snopGreenColor;
     [[standardRunThresCurrentValues cellAtRow:5 column:0] setFloatValue:nHits];
     [[standardRunThresCurrentValues cellAtRow:5 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 7) & 1){
-        [[standardRunThresCurrentValues cellAtRow:5 column:0] setTextColor:[self snopGreenColor]];
+        [[standardRunThresCurrentValues cellAtRow:5 column:0] setTextColor:[self snopBlueColor]];
     } else{
         [[standardRunThresCurrentValues cellAtRow:5 column:0] setTextColor:[self snopRedColor]];
     }
@@ -1514,7 +1519,7 @@ snopGreenColor;
     [[standardRunThresCurrentValues cellAtRow:6 column:0] setFloatValue:[mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kESumHiThreshold]]];
     [[standardRunThresCurrentValues cellAtRow:6 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 6) & 1){
-        [[standardRunThresCurrentValues cellAtRow:6 column:0] setTextColor:[self snopGreenColor]];
+        [[standardRunThresCurrentValues cellAtRow:6 column:0] setTextColor:[self snopBlueColor]];
     } else{
         [[standardRunThresCurrentValues cellAtRow:6 column:0] setTextColor:[self snopRedColor]];
     }
@@ -1522,7 +1527,7 @@ snopGreenColor;
     [[standardRunThresCurrentValues cellAtRow:7 column:0] setFloatValue:[mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kESumLowThreshold]]];
     [[standardRunThresCurrentValues cellAtRow:7 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 5) & 1){
-        [[standardRunThresCurrentValues cellAtRow:7 column:0] setTextColor:[self snopGreenColor]];
+        [[standardRunThresCurrentValues cellAtRow:7 column:0] setTextColor:[self snopBlueColor]];
     } else{
         [[standardRunThresCurrentValues cellAtRow:7 column:0] setTextColor:[self snopRedColor]];
     }
@@ -1530,7 +1535,7 @@ snopGreenColor;
     [[standardRunThresCurrentValues cellAtRow:8 column:0] setFloatValue:[mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kOWLEHiThreshold]]];
     [[standardRunThresCurrentValues cellAtRow:8 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 9) & 1){
-        [[standardRunThresCurrentValues cellAtRow:8 column:0] setTextColor:[self snopGreenColor]];
+        [[standardRunThresCurrentValues cellAtRow:8 column:0] setTextColor:[self snopBlueColor]];
     } else{
         [[standardRunThresCurrentValues cellAtRow:8 column:0] setTextColor:[self snopRedColor]];
     }
@@ -1538,7 +1543,7 @@ snopGreenColor;
     [[standardRunThresCurrentValues cellAtRow:9 column:0] setFloatValue:[mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kOWLELoThreshold]]];
     [[standardRunThresCurrentValues cellAtRow:9 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 8) & 1){
-        [[standardRunThresCurrentValues cellAtRow:9 column:0] setTextColor:[self snopGreenColor]];
+        [[standardRunThresCurrentValues cellAtRow:9 column:0] setTextColor:[self snopBlueColor]];
     } else{
         [[standardRunThresCurrentValues cellAtRow:9 column:0] setTextColor:[self snopRedColor]];
     }
@@ -1546,7 +1551,7 @@ snopGreenColor;
     [[standardRunThresCurrentValues cellAtRow:10 column:0] setFloatValue:[mtcModel dbFloatByIndex:kNhit100LoPrescale]];
     [[standardRunThresCurrentValues cellAtRow:10 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 11) & 1){
-        [[standardRunThresCurrentValues cellAtRow:10 column:0] setTextColor:[self snopGreenColor]];
+        [[standardRunThresCurrentValues cellAtRow:10 column:0] setTextColor:[self snopBlueColor]];
     } else{
         [[standardRunThresCurrentValues cellAtRow:10 column:0] setTextColor:[self snopRedColor]];
     }
@@ -1554,7 +1559,7 @@ snopGreenColor;
     [[standardRunThresCurrentValues cellAtRow:11 column:0] setFloatValue:[mtcModel dbFloatByIndex:kPulserPeriod]];
     [[standardRunThresCurrentValues cellAtRow:11 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 10) & 1){
-        [[standardRunThresCurrentValues cellAtRow:11 column:0] setTextColor:[self snopGreenColor]];
+        [[standardRunThresCurrentValues cellAtRow:11 column:0] setTextColor:[self snopBlueColor]];
     } else{
         [[standardRunThresCurrentValues cellAtRow:11 column:0] setTextColor:[self snopRedColor]];
     }
@@ -1736,7 +1741,7 @@ snopGreenColor;
         [[standardRunThresStoredValues cellAtRow:0 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresStoredValues cellAtRow:0 column:0] setFloatValue:nHits];
         if((gtmask >> 2) & 1){
-            [[standardRunThresStoredValues cellAtRow:0 column:0] setTextColor:[self snopGreenColor]];
+            [[standardRunThresStoredValues cellAtRow:0 column:0] setTextColor:[self snopBlueColor]];
         } else{
             [[standardRunThresStoredValues cellAtRow:0 column:0] setTextColor:[self snopRedColor]];
         }
@@ -1748,7 +1753,7 @@ snopGreenColor;
         [[standardRunThresStoredValues cellAtRow:1 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresStoredValues cellAtRow:1 column:0] setFloatValue:nHits];
         if((gtmask >> 1) & 1){
-            [[standardRunThresStoredValues cellAtRow:1 column:0] setTextColor:[self snopGreenColor]];
+            [[standardRunThresStoredValues cellAtRow:1 column:0] setTextColor:[self snopBlueColor]];
         } else{
             [[standardRunThresStoredValues cellAtRow:1 column:0] setTextColor:[self snopRedColor]];
         }
@@ -1760,7 +1765,7 @@ snopGreenColor;
         [[standardRunThresStoredValues cellAtRow:2 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresStoredValues cellAtRow:2 column:0] setFloatValue:nHits];
         if((gtmask >> 0) & 1){
-            [[standardRunThresStoredValues cellAtRow:2 column:0] setTextColor:[self snopGreenColor]];
+            [[standardRunThresStoredValues cellAtRow:2 column:0] setTextColor:[self snopBlueColor]];
         } else{
             [[standardRunThresStoredValues cellAtRow:2 column:0] setTextColor:[self snopRedColor]];
         }
@@ -1772,7 +1777,7 @@ snopGreenColor;
         [[standardRunThresStoredValues cellAtRow:3 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresStoredValues cellAtRow:3 column:0] setFloatValue:nHits];
         if((gtmask >> 3) & 1){
-            [[standardRunThresStoredValues cellAtRow:3 column:0] setTextColor:[self snopGreenColor]];
+            [[standardRunThresStoredValues cellAtRow:3 column:0] setTextColor:[self snopBlueColor]];
         } else{
             [[standardRunThresStoredValues cellAtRow:3 column:0] setTextColor:[self snopRedColor]];
         }
@@ -1784,7 +1789,7 @@ snopGreenColor;
         [[standardRunThresStoredValues cellAtRow:4 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresStoredValues cellAtRow:4 column:0] setFloatValue:nHits];
         if((gtmask >> 4) & 1){
-            [[standardRunThresStoredValues cellAtRow:4 column:0] setTextColor:[self snopGreenColor]];
+            [[standardRunThresStoredValues cellAtRow:4 column:0] setTextColor:[self snopBlueColor]];
         } else{
             [[standardRunThresStoredValues cellAtRow:4 column:0] setTextColor:[self snopRedColor]];
         }
@@ -1796,7 +1801,7 @@ snopGreenColor;
         [[standardRunThresStoredValues cellAtRow:5 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresStoredValues cellAtRow:5 column:0] setFloatValue:nHits];
         if((gtmask >> 7) & 1){
-            [[standardRunThresStoredValues cellAtRow:5 column:0] setTextColor:[self snopGreenColor]];
+            [[standardRunThresStoredValues cellAtRow:5 column:0] setTextColor:[self snopBlueColor]];
         } else{
             [[standardRunThresStoredValues cellAtRow:5 column:0] setTextColor:[self snopRedColor]];
         }
@@ -1805,7 +1810,7 @@ snopGreenColor;
         [[standardRunThresStoredValues cellAtRow:6 column:0] setFloatValue:mVolts];
         [[standardRunThresStoredValues cellAtRow:6 column:0] setFormatter:thresholdFormatter];
         if((gtmask >> 6) & 1){
-            [[standardRunThresStoredValues cellAtRow:6 column:0] setTextColor:[self snopGreenColor]];
+            [[standardRunThresStoredValues cellAtRow:6 column:0] setTextColor:[self snopBlueColor]];
         } else{
             [[standardRunThresStoredValues cellAtRow:6 column:0] setTextColor:[self snopRedColor]];
         }
@@ -1814,7 +1819,7 @@ snopGreenColor;
         [[standardRunThresStoredValues cellAtRow:7 column:0] setFloatValue:mVolts];
         [[standardRunThresStoredValues cellAtRow:7 column:0] setFormatter:thresholdFormatter];
         if((gtmask >> 5) & 1){
-            [[standardRunThresStoredValues cellAtRow:7 column:0] setTextColor:[self snopGreenColor]];
+            [[standardRunThresStoredValues cellAtRow:7 column:0] setTextColor:[self snopBlueColor]];
         } else{
             [[standardRunThresStoredValues cellAtRow:7 column:0] setTextColor:[self snopRedColor]];
         }
@@ -1823,7 +1828,7 @@ snopGreenColor;
         [[standardRunThresStoredValues cellAtRow:8 column:0] setFloatValue:mVolts];
         [[standardRunThresStoredValues cellAtRow:8 column:0] setFormatter:thresholdFormatter];
         if((gtmask >> 9) & 1){
-            [[standardRunThresStoredValues cellAtRow:8 column:0] setTextColor:[self snopGreenColor]];
+            [[standardRunThresStoredValues cellAtRow:8 column:0] setTextColor:[self snopBlueColor]];
         } else{
             [[standardRunThresStoredValues cellAtRow:8 column:0] setTextColor:[self snopRedColor]];
         }
@@ -1832,7 +1837,7 @@ snopGreenColor;
         [[standardRunThresStoredValues cellAtRow:9 column:0] setFloatValue:mVolts];
         [[standardRunThresStoredValues cellAtRow:9 column:0] setFormatter:thresholdFormatter];
         if((gtmask >> 8) & 1){
-            [[standardRunThresStoredValues cellAtRow:9 column:0] setTextColor:[self snopGreenColor]];
+            [[standardRunThresStoredValues cellAtRow:9 column:0] setTextColor:[self snopBlueColor]];
         } else{
             [[standardRunThresStoredValues cellAtRow:9 column:0] setTextColor:[self snopRedColor]];
         }
@@ -1841,7 +1846,7 @@ snopGreenColor;
         [[standardRunThresStoredValues cellAtRow:10 column:0] setFloatValue:mVolts];
         [[standardRunThresStoredValues cellAtRow:10 column:0] setFormatter:thresholdFormatter];
         if((gtmask >> 11) & 1){
-            [[standardRunThresStoredValues cellAtRow:10 column:0] setTextColor:[self snopGreenColor]];
+            [[standardRunThresStoredValues cellAtRow:10 column:0] setTextColor:[self snopBlueColor]];
         } else{
             [[standardRunThresStoredValues cellAtRow:10 column:0] setTextColor:[self snopRedColor]];
         }
@@ -1850,7 +1855,7 @@ snopGreenColor;
         [[standardRunThresStoredValues cellAtRow:11 column:0] setFloatValue:mVolts];
         [[standardRunThresStoredValues cellAtRow:11 column:0] setFormatter:thresholdFormatter];
         if((gtmask >> 10) & 1){
-            [[standardRunThresStoredValues cellAtRow:11 column:0] setTextColor:[self snopGreenColor]];
+            [[standardRunThresStoredValues cellAtRow:11 column:0] setTextColor:[self snopBlueColor]];
         } else{
             [[standardRunThresStoredValues cellAtRow:11 column:0] setTextColor:[self snopRedColor]];
         }
