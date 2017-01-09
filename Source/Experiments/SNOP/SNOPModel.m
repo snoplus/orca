@@ -46,7 +46,7 @@
 #import "XL3_Link.h"
 #import "ORPQModel.h"
 #import "ORPQResult.h"
-#import "SNOPGlobals.h"
+#import "RunTypeWordBits.hh"
 
 #define RUNNING 0
 #define STARTING 1
@@ -329,7 +329,7 @@ resync;
     [[self undoManager] enableUndoRegistration];
 
     //Set extra security
-    [gSecurity addSuperUnlockMask:kDiagnosticRunType forObject:self];
+    [gSecurity addSuperUnlockMask:kDiagnosticRun forObject:self];
 
     /* initialize our connection to the MTC server */
     mtc_server = [[RedisClient alloc] initWithHostName:mtcHost withPort:mtcPort];
@@ -1920,7 +1920,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         [runControlModel setRunType:nextruntypeword];
         
         //Do not load thresholds if in Diagnostic run
-        if(nextruntypeword & kDiagnosticRunType) return true;
+        if(nextruntypeword & kDiagnosticRun) return true;
 
         //Load MTC thresholds
         [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kNHit100HiThreshold]] forIndex:kNHit100HiThreshold];

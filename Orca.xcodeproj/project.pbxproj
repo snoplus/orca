@@ -53,7 +53,6 @@
 		0FF177C81DF7AEA000BA783B /* run_dog_frame_5.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 0FF177C11DF7AEA000BA783B /* run_dog_frame_5.tiff */; };
 		0FF177C91DF7AEA000BA783B /* run_dog_frame_6.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 0FF177C21DF7AEA000BA783B /* run_dog_frame_6.tiff */; };
 		0FF177CB1DF7AF2F00BA783B /* waiting_dog.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 0FF177CA1DF7AF2F00BA783B /* waiting_dog.tiff */; };
-		10B849ED1DFA3B2400959930 /* SNOPGlobals.h in Headers */ = {isa = PBXBuildFile; fileRef = 10B849EC1DFA3B2400959930 /* SNOPGlobals.h */; };
 		146822430FC4799C0082BD70 /* ORCircularBufferUV.h in Headers */ = {isa = PBXBuildFile; fileRef = 146822410FC4799C0082BD70 /* ORCircularBufferUV.h */; };
 		146822440FC4799C0082BD70 /* ORCircularBufferUV.m in Sources */ = {isa = PBXBuildFile; fileRef = 146822420FC4799C0082BD70 /* ORCircularBufferUV.m */; };
 		1C50F9F108033CA9008D18EA /* ADC2249.nib in Resources */ = {isa = PBXBuildFile; fileRef = 1C50F9E608033CA9008D18EA /* ADC2249.nib */; };
@@ -3815,7 +3814,7 @@
 		0FF177C11DF7AEA000BA783B /* run_dog_frame_5.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = run_dog_frame_5.tiff; sourceTree = "<group>"; };
 		0FF177C21DF7AEA000BA783B /* run_dog_frame_6.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = run_dog_frame_6.tiff; sourceTree = "<group>"; };
 		0FF177CA1DF7AF2F00BA783B /* waiting_dog.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = waiting_dog.tiff; sourceTree = "<group>"; };
-		10B849EC1DFA3B2400959930 /* SNOPGlobals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNOPGlobals.h; sourceTree = "<group>"; };
+		1038D8841E23160D009FFDFB /* RunTypeWordBits.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RunTypeWordBits.hh; sourceTree = "<group>"; };
 		146822410FC4799C0082BD70 /* ORCircularBufferUV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCircularBufferUV.h; path = Source/Objects/Hardware/HV/UnivVoltHV/ORCircularBufferUV.h; sourceTree = SOURCE_ROOT; };
 		146822420FC4799C0082BD70 /* ORCircularBufferUV.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCircularBufferUV.m; path = Source/Objects/Hardware/HV/UnivVoltHV/ORCircularBufferUV.m; sourceTree = SOURCE_ROOT; };
 		1C50F9E608033CA9008D18EA /* ADC2249.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = ADC2249.nib; sourceTree = "<group>"; };
@@ -14358,7 +14357,7 @@
 		EFB39FC5130BA1C5001220AC /* SNOP */ = {
 			isa = PBXGroup;
 			children = (
-				10B849EC1DFA3B2400959930 /* SNOPGlobals.h */,
+				1038D8841E23160D009FFDFB /* RunTypeWordBits.hh */,
 				6B325E071B2F4241002E2DD7 /* SNOP.xib */,
 				EFB39FC6130BA1C5001220AC /* SNOP.gif */,
 				0FF177B41DF7A09900BA783B /* RunStatusIcon.h */,
@@ -15374,7 +15373,6 @@
 				4AB9E5311DE5D820007C75E0 /* ORPQModel.h in Headers */,
 				84F46F530CA44255007EFADA /* ORIpeSLTDefs.h in Headers */,
 				84F46F540CA44255007EFADA /* ORIpeSLTModel.h in Headers */,
-				10B849ED1DFA3B2400959930 /* SNOPGlobals.h in Headers */,
 				84F46F580CA44255007EFADA /* ORKatrinFLTController.h in Headers */,
 				84F46F5A0CA44255007EFADA /* ORKatrinFLTDecoder.h in Headers */,
 				84F46F5C0CA44255007EFADA /* ORKatrinFLTDefs.h in Headers */,
