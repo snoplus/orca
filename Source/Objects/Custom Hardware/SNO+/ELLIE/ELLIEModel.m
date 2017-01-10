@@ -108,8 +108,8 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
 {
     self = [super init];
     if (self){
-        //XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"builder1" withPort:@"5030"];
-        XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"localhost" withPort:@"5030"];
+        XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"builder1" withPort:@"5030"];
+        //XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"localhost" withPort:@"5030"];
         XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:@"snodrop1" withPort:@"5020"];
         [self setTellieClient:tellieCli];
         [self setSmellieClient:smellieCli];
@@ -125,8 +125,8 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
 {
     self = [super initWithCoder:aCoder];
     if (self){
-        //XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"builder1" withPort:@"5030"];
-        XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"localhost" withPort:@"5030"];
+        XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"builder1" withPort:@"5030"];
+        //XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"localhost" withPort:@"5030"];
         XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:@"snodrop1" withPort:@"5020"];
         [self setTellieClient:tellieCli];
         [self setSmellieClient:smellieCli];
@@ -809,9 +809,9 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
                 [theTubiiModel setTellieRate:rate];
                 [theTubiiModel setTelliePulseWidth:100e-9];
                 [theTubiiModel setTellieNPulses:[noShots intValue]];
-                [theTubiiModel fireTelliePulser];
+                //[theTubiiModel fireTelliePulser];
                 //noShots = [NSNumber numberWithInteger:[noShots intValue] + 5000];
-                //[theTubiiModel fireTelliePulser_rate:rate pulseWidth:200e-9 NPulses:[noShots intValue]];
+                [theTubiiModel fireTelliePulser_rate:rate pulseWidth:100e-9 NPulses:[noShots intValue]];
             } @catch(NSException* e){
                 errorString = [NSString stringWithFormat:@"[TELLIE] Problem setting tubii parameters: %@\n", [e reason]];
                 NSLogColor([NSColor redColor], errorString);
