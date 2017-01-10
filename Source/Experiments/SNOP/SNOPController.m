@@ -19,7 +19,7 @@
 //-------------------------------------------------------------
 
 
-#pragma mark ⅴ쩒mported Files
+#pragma mark 짜짜짜Imported Files
 #import "SNOPController.h"
 #import "SNOPModel.h"
 #import "ORColorScale.h"
@@ -50,7 +50,7 @@ snopBlackColor,
 snopGrayColor,
 snopGreenColor;
 
-#pragma mark ⅴ쩒nitialization
+#pragma mark 짜짜짜Initialization
 -(id)init
 {
     self = [super initWithWindowNibName:@"SNOP"];
@@ -254,7 +254,7 @@ snopGreenColor;
 }
 
 
-#pragma mark ⅴ쩘otifications
+#pragma mark 짜짜짜Notifications
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -673,7 +673,7 @@ snopGreenColor;
 }
 
 
-#pragma mark ⅴ쩒nterface Management
+#pragma mark 짜짜짜Interface Management
 - (IBAction) orcaDBIPAddressAction:(id)sender
 {
     [model setOrcaDBIPAddress:[sender stringValue]];
@@ -834,7 +834,7 @@ snopGreenColor;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPRequestHVStatus object:self];
 }
 
-#pragma mark ⅴ쩣able Data Source
+#pragma mark 짜짜짜Table Data Source
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem
 {
@@ -869,7 +869,7 @@ snopGreenColor;
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:@"orca.SNOPController.selectedtab"];
 }
 
-#pragma mark ⅴ쩉omboBox Data Source
+#pragma mark 짜짜짜ComboBox Data Source
 - (NSInteger) numberOfItemsInComboBox:(NSComboBox *)aComboBox
 {
     if (aComboBox == orcaDBIPAddressPU) {
