@@ -33,6 +33,7 @@
 #import "ORRunController.h"
 #import "ORMTC_Constants.h"
 #import "SNOP_Run_Constants.h"
+#import "SNOPGlobals.h"
 
 //tags to define that an ELLIE run file has been updated
 #define kSmellieRunDocumentAdded   @"kSmellieRunDocumentAdded"
@@ -435,11 +436,12 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
 {
     /*
      A detector safety check. At high frequencies the maximum tellie output must be small
-     to avoid pushing too much current through individual channels / trigger sums.
+     to avoid pushing too much current through individual channels / trigger sums. Use a
+     loglog curve to define what counts as detector safe.
      */
-    float safe_gradient = -999;
-    float safe_intercept = 1.0011e6;
-    float max_photons = safe_gradient*frequency + safe_intercept;
+    float safe_gradient = -1;
+    float safe_intercept = 1.05e6;
+    float max_photons = safe_intercept*pow(frequency, safe_gradient);
     if(photons > max_photons){
         return NO;
     } else {
@@ -622,21 +624,10 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     
     ///////////////////////
     // Check TELLIE run type is masked in
-    NSArray* runTypeNames = [runControl runTypeNames];
-    unsigned long runType = [runControl runType];
-    BOOL runTypeCheck = NO;
-    for(NSString* name in runTypeNames){
-        NSLog(@"%@, %u\n" ,name, runType);
-        if([name isEqualToString:@"TELLIE"]){
-            runTypeCheck = YES;
-        }
-    }
-    if(runTypeCheck == NO){
-        NSLogColor([NSColor redColor], @"[TELLIE] TELLIE does not appear in run type word. Exiting...");
+    if(!([runControl runType] & TELLIE_RUN)){
+        NSLogColor([NSColor redColor], @"[TELLIE] TELLIE bit is not masked into the run type word\n");
         goto err;
-        
     }
-    
     //////////////
     // Get run mode boolean
     BOOL isSlave = YES;
@@ -663,8 +654,8 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     // It's a quirk of TELLIE that entering slave mode can sometimes leave
     // the system in an undefined state. This can be avoided if we always
     // force a master mode operation, first. For this purpose a 1 shot master
-    // mode sequence is fired at this point with an IPW setting which will
-    // never produce light.
+    // mode sequence is fired herre with the max possible IPW setting - ensuring
+    // it will never produce light.
     NSArray* fireArgs = @[[[fireCommands objectForKey:@"channel"] stringValue],
                           [NSNumber numberWithInt:1],
                           [[fireCommands objectForKey:@"pulse_separation"] stringValue],
@@ -676,6 +667,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     NSLog(@"[TELLIE] Setting to definitive master state - will change to slave later in the sequence if it has been requested\n");
     @try{
         [[self tellieClient] command:@"init_channel" withArgs:fireArgs];
+        [NSThread sleepForTimeInterval:4.0f];
     } @catch(NSException *e){
         errorString = [NSString stringWithFormat:@"[TELLIE]: Problem init-ing channel: %@\n", [e reason]];
         NSLogColor([NSColor redColor], errorString);
@@ -696,7 +688,6 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     NSNumber* loops = [NSNumber numberWithInteger:1];
     int totalShots = [[fireCommands objectForKey:@"number_of_shots"] integerValue];
     float fRemainder = fmod(totalShots, 5e3);
-    //NSLog(@"fRemainder = %@\n", fRemainder);
     if( totalShots > 5e3){
         if (fRemainder > 0){
             int iLoops = (totalShots - fRemainder) / 5e3;
@@ -733,13 +724,26 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
         NSLog(@"***** FIRING %d TELLIE PULSES in Fibre %@ *****\n",[noShots integerValue], [fireCommands objectForKey:@"fibre"]);
         
         //////////////////
-        //Start a new subrun
+        // Start a new subrun
         [runControl performSelectorOnMainThread:@selector(prepareForNewSubRun) withObject:nil waitUntilDone:YES];
         [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
         
         //////////////////////
         // Set loop independent tellie channel settings
         if(i == 0){
+
+            ////////
+            // Send stop command to ensure buffer is clear
+            @try{
+                NSString* responseFromTellie = [[self tellieClient] command:@"stop"];
+                NSLog(@"Sent stop command to tellie, received: %@\n",responseFromTellie);
+            } @catch(NSException* e){
+                // This should only ever be called from the main thread so can raise
+                NSLogColor([NSColor redColor], @"[TELLIE]: Problem with tellie server interpreting stop command!\n");
+            }
+            
+            ////////
+            // Init channel using fireCommands
             NSArray* fireArgs = @[[[fireCommands objectForKey:@"channel"] stringValue],
                                   [noShots stringValue],
                                   [[fireCommands objectForKey:@"pulse_separation"] stringValue],
@@ -752,7 +756,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
             NSLog(@"Init-ing tellie with settings\n");
             @try{
                 [[self tellieClient] command:@"init_channel" withArgs:fireArgs];
-                [NSThread sleepForTimeInterval:5.0f];
+                [NSThread sleepForTimeInterval:2.0f]; // Shouldn't take long as most settings are already set
             } @catch(NSException *e){
                 errorString = [NSString stringWithFormat:@"[TELLIE]: Problem init-ing channel on server: %@\n", [e reason]];
                 NSLogColor([NSColor redColor], errorString);
@@ -866,18 +870,22 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     ////////////
     // Release pooled memory
     [pool release];
-    
+    [self setEllieFireFlag:NO];
+
     ////////////
     // Finish and tidy up
     NSLog(@"[TELLIE]: TELLIE fire sequence completed\n");
+    
+    [[NSThread currentThread] cancel];
     dispatch_sync(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunFinished object:self];
     });
     return;
-
 err:
     {
         [pool release];
+        [self setEllieFireFlag:NO];
+        
         //Resetting the mtcd to settings before the smellie run
         NSLog(@"[TELLIE]: Killing TELLIE run.\n");
         
@@ -885,8 +893,9 @@ err:
         //NSMutableDictionary* errorDict = [NSMutableDictionary dictionaryWithCapacity:10];
         //[errorDict setObject:errorString forKey:@"tellie_error"];
         //[self updateTellieRunDocument:errorDict];
-      
+        
         //Post a note. on the main thread to request a call to stopTellieRun
+        [[NSThread currentThread] cancel];
         dispatch_sync(dispatch_get_main_queue(), ^{
             [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunFinished object:self];
         });
@@ -911,7 +920,7 @@ err:
     // Send stop command to tellie hardware
     @try{
         NSString* responseFromTellie = [[self tellieClient] command:@"stop"];
-        NSLog(@"Sent stop command to tellie, received: %@\n",responseFromTellie);
+        NSLog(@"[TELLIE] Sent stop command to tellie, received: %@\n",responseFromTellie);
     } @catch(NSException* e){
         // This should only ever be called from the main thread so can raise
         NSLogColor([NSColor redColor], @"[TELLIE]: Problem with tellie server interpreting stop command!\n");
@@ -1477,19 +1486,12 @@ err:
     // RUN CONTROL
     //
     //Set up run control
-    // As with tellie this should be replaced with a check to see if we are in a smellie run. Issue #205.
-    /*
-    if(![runControl isRunning]){
-        //start the run controller
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Starting our own run! \n");
-        [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
-        
-    }else{
-        //Stop the current run and start a new run
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Restarting run! \n");
-        [runControl performSelectorOnMainThread:@selector(restartRun) withObject:nil waitUntilDone:YES];
+    ///////////////////////
+    // Check SMELLIE run type is masked in
+    if(!([runControl runType] & SMELLIE_RUN)){
+        NSLogColor([NSColor redColor], @"[SMELLIE] SMELLIE bit is not masked into the run type word\n");
+        goto err;
     }
-    */
 
     // SET MASTER / SLAVE MODE
     //
@@ -1682,6 +1684,7 @@ err:
     [pool release];
     
     //Post a note. on the main thread to request a call to stopSmellieRun
+    [[NSThread currentThread] cancel];
     dispatch_sync(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:ORSMELLIERunFinished object:self];
     });
@@ -1694,6 +1697,7 @@ err:
     [pool release];
     
     //Post a note. on the main thread to request a call to stopSmellieRun
+    [[NSThread currentThread] release];
     dispatch_sync(dispatch_get_main_queue(), ^{
 	    [[NSNotificationCenter defaultCenter] postNotificationName:ORSMELLIERunFinished object:self];
     });

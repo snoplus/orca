@@ -729,7 +729,6 @@
                                                                                                 </textFieldCell>
                                                                                                 <connections>
                                                                                                     <outlet property="delegate" destination="-2" id="sjN-tl-RoO"/>
-                                                                                                    <outlet property="formatter" destination="GE2-Zm-Zng" id="Gr9-ck-Eyd"/>
                                                                                                 </connections>
                                                                                             </textField>
                                                                                         </subviews>

@@ -210,6 +210,13 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 
 -(IBAction)tellieGeneralFireAction:(id)sender
 {
+    ////////////
+    // Check a run isn't ongoing
+    if([model ellieFireFlag]){
+        NSLogColor([NSColor redColor], @"[TELLIE] Fire button will not work while an ELLIE run is underway\n");
+        return;
+    }
+    
     [tellieGeneralStopButton setEnabled:YES];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunStart object:nil userInfo:[self guiFireSettings]];
     [tellieGeneralFireButton setEnabled:NO];
@@ -217,6 +224,13 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 
 -(IBAction)tellieExpertFireAction:(id)sender
 {
+    ////////////
+    // Check a run isn't ongoing
+    if([model ellieFireFlag]){
+        NSLogColor([NSColor redColor], @"[TELLIE] Fire button will not work while an ELLIE run is underway\n");
+        return;
+    }
+    
     [tellieExpertStopButton setEnabled:YES];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunStart object:nil userInfo:[self guiFireSettings]];
     [tellieExpertFireButton setEnabled:NO];
@@ -302,6 +316,17 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 }
 
 - (IBAction)tellieExpertAutoFillAction:(id)sender {
+    // Clear all current values
+    [tellieChannelTf setStringValue:@""];
+    [telliePulseWidthTf setStringValue:@""];
+    [telliePulseFreqTf setStringValue:@""];
+    [telliePulseHeightTf setStringValue:@"16383"];
+    [tellieFibreDelayTf setStringValue:@""];
+    [tellieTriggerDelayTf setStringValue:@""];
+    [tellieNoPulsesTf setStringValue:@""];
+    [tellieGeneralFireButton setEnabled:NO];
+    [tellieGeneralStopButton setEnabled:NO];
+    
     //Check if inputs are valid
     NSString* msg = nil;
     /*
@@ -317,15 +342,30 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
         return;
     }
     
-    //Calulate settings
+    // Calulate settings
     BOOL inSlave = YES;
     NSLog(@"Mode setting: %@\n", [tellieExpertOperationModePb   titleOfSelectedItem]);
     if([[tellieExpertOperationModePb titleOfSelectedItem] isEqual:@"Master"]){
         inSlave = NO;
     }
     
+    ////////////////
+    // Find the max safe frequency to flash at, considering requested photons
+    float photons = [telliePhotonsTf floatValue];
+    float safe_gradient = -1.;
+    float safe_intercept = 1e6;
+    int freq = round(pow((photons / safe_intercept), safe_gradient));
+    if(freq > 1000){
+        freq = 1000;
+    }
+    
+    int noPulses = 100;
+    if(freq < noPulses){
+        noPulses = freq;
+    }
+    
     NSLog(@"Selected Item: %@\n", [tellieExpertFibreSelectPb titleOfSelectedItem]);
-    NSMutableDictionary* settings = [model returnTellieFireCommands:[tellieExpertFibreSelectPb titleOfSelectedItem] withNPhotons:[telliePhotonsTf integerValue] withFireFrequency:1000 withNPulses:100 withTriggerDelay:700 inSlave:(BOOL)inSlave];
+    NSMutableDictionary* settings = [model returnTellieFireCommands:[tellieExpertFibreSelectPb titleOfSelectedItem] withNPhotons:[telliePhotonsTf integerValue] withFireFrequency:freq withNPulses:noPulses withTriggerDelay:700 inSlave:(BOOL)inSlave];
     if(settings){
         float frequency = (1. / [[settings objectForKey:@"pulse_separation"] floatValue])*1000;
         //Set text fields appropriately
@@ -576,9 +616,24 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     if([note object] == tellieExpertNodeTf){
         expertMsg = [self validateExpertTellieNode:currentString];
         gotInside = YES;
+        [tellieChannelTf setStringValue:@""];
+        [tellieTriggerDelayTf setStringValue:@""];
+        [telliePulseFreqTf setStringValue:@""];
+        [telliePulseHeightTf setStringValue:@"16383"];
+        [telliePulseWidthTf setStringValue:@""];
+        [tellieNoPulsesTf setStringValue:@""];
+        [tellieFibreDelayTf setStringValue:@""];
+        [tellieExpertFireButton setEnabled:NO];
+        [tellieExpertStopButton setEnabled:NO];
         if([[telliePhotonsTf stringValue] isEqualToString:@""]){
             [telliePhotonsTf setStringValue:@"1000"];
         }
+    } else if ([note object] == telliePhotonsTf) {
+        expertMsg = [self validateGeneralTelliePhotons:currentString];
+        gotInside = YES;
+        [tellieExpertFireButton setEnabled:NO];
+        [tellieExpertStopButton setEnabled:NO];
+        [telliePulseWidthTf setStringValue:@""];
     } else if ([note object] == tellieChannelTf){
         expertMsg = [self validateTellieChannel:currentString];
         gotInside = YES;
@@ -592,6 +647,8 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
         [telliePhotonsTf setStringValue:@""];
         [tellieExpertFibreSelectPb removeAllItems];
         [tellieExpertFibreSelectPb setEnabled:NO];
+        [tellieExpertFireButton setEnabled:NO];
+        [tellieExpertStopButton setEnabled:NO];
     } else if([note object] == tellieTriggerDelayTf){
         expertMsg = [self validateTellieTriggerDelay:currentString];
         gotInside = YES;
@@ -607,6 +664,17 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     } else if ([note object] == telliePulseWidthTf){
         expertMsg = [self validateTelliePulseWidth:currentString];
         gotInside = YES;
+        // Calculate what this new Value may equate to in photons
+        if(expertMsg == nil){
+            if([tellieChannelTf integerValue]){
+                BOOL inSlave = YES;
+                if([[tellieExpertOperationModePb titleOfSelectedItem] isEqual:@"Master"]){
+                    inSlave = NO;
+                }
+                NSNumber* photons = [model calcPhotonsForIPW:[telliePulseWidthTf integerValue] forChannel:[tellieChannelTf integerValue] inSlave:inSlave];
+                [telliePhotonsTf setStringValue:[NSString stringWithFormat:@"%@", photons]];
+            }
+        }
     } else if ([note object] == tellieNoPulsesTf){
         expertMsg = [self validateTellieNoPulses:currentString];
         gotInside = YES;

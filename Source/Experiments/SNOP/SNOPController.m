@@ -1105,7 +1105,7 @@ snopGreenColor;
     // if not cancel the thread and let the
     // catch statements in [ellieModel startSmellieRun]
     // cause a goto err;
-    if([smellieThread isExecuting]){
+    if(![smellieThread isCancelled]){
         [smellieThread cancel];
         return;
     }
@@ -1184,16 +1184,15 @@ snopGreenColor;
 - (IBAction) stopTellieRunAction:(id)sender
 {
     //////////////////////
-    // Check if the thread is still running,
-    // if so cancel the thread and let the
+    // Check if the thread has been cancelled,
+    // if not cancel the thread and let the
     // catch statements in [ellieModel startTellieRun]
     // cause a goto err;
-    if([tellieThread isExecuting]){
+    if(![tellieThread isCancelled]){
         [tellieThread cancel];
-        tellieThread = nil;
         return;
     }
-    
+
     //Collect a series of objects from the ELLIEModel
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
     if (![objs count]) {
