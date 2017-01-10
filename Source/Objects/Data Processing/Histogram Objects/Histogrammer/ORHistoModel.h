@@ -44,8 +44,8 @@
 		BOOL		shipFinalHistograms;
 		OR1DHisto*  dummy1DHisto;
 		OR2DHisto*  dummy2DHisto;
-	
-    BOOL accumulate;
+        BOOL        decodingDisabled;
+        BOOL        accumulate;
 }
 
 
@@ -55,6 +55,8 @@
 #pragma mark ¥¥¥Accessors
 - (BOOL) accumulate;
 - (void) setAccumulate:(BOOL)aAccumulate;
+- (BOOL) decodingDisabled;
+- (void) setDecodingDisabled:(BOOL)aFlag;
 - (BOOL)		shipFinalHistograms;
 - (void)		setShipFinalHistograms:(BOOL)aShipFinalHistograms;
 - (id)			objectForKeyArray:(NSMutableArray*)anArray;
@@ -108,4 +110,5 @@ extern NSString* ORHistoModelDirChangedNotification;
 extern NSString* ORHistoModelFileChangedNotification;
 extern NSString* ORHistoModelWriteFileChangedNotification;
 extern NSString* ORHistoModelMultiPlotsChangedNotification;
+extern NSString* ORHistoModelDecodingDisabledChanged;
 

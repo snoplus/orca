@@ -25,6 +25,7 @@
 }
 - (void) dealloc
 {
+    [self disconnect];
     [host release];
     [super dealloc];
 }

@@ -24,6 +24,9 @@
 #define kTimeAverageBufferSize 4096
 #define kAverageStackSize 512
 
+@class ORAlarm;
+
+
 @interface ORTimeRate : NSObject {
 	
 	double averageStack[kAverageStackSize];
@@ -54,3 +57,24 @@
 extern NSString* ORRateAverageChangedNotification;
 
 
+@interface ORHighRateChecker : NSObject {
+    NSString*       name;
+    NSTimeInterval  timeFrame;
+    NSDate*         highRateStartTime;
+    float           maxValue;
+    float           sum;
+    ORAlarm*        highRateAlarm;
+    int             count;
+}
+- (id) init:(NSString*)aName timeFrame:(float)aTimeFrame;
+- (void) dealloc;
+- (void) checkRate:(float)aValue;
+- (void) reset;
+
+@property (copy)   NSString*        name;
+@property (retain) NSDate*          highRateStartTime;
+@property (assign) NSTimeInterval   timeFrame;
+@property (assign) float            sum;
+@property (assign) float            maxValue;
+
+@end

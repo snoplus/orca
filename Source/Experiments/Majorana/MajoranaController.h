@@ -37,6 +37,7 @@
     IBOutlet ORColorScale*	secondaryColorScale;
     IBOutlet NSButton*		secondaryColorAxisLogCB;
     IBOutlet NSTextField*	secondaryRateField;
+    IBOutlet NSTextField*	maxNonCalibrationRateField;
 
     //items in the  HW map tab view
 	IBOutlet NSPopUpButton* secondaryAdcClassNamePopup;
@@ -150,6 +151,7 @@
 - (NSString*) order:(int)index;
 - (NSString*) sourceGateValveState:(int)index;
 - (NSString*) sourceIsInState:(int)index;
+- (void) maxNonCalibrationRateChanged:(NSNotification*)aNote;
 
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
@@ -196,6 +198,7 @@
 - (IBAction) calibrationLockAction:(id)sender;
 - (void)     confirmCloseGateValve:(int)index;
 - (IBAction) printBreakdownReport:(id)sender;
+- (IBAction) maxNonCalibrationRateAction:(id)sender;
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem;
 

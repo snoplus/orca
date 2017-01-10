@@ -89,10 +89,6 @@
         unsigned long gtCrateMask;
     } _rhdrStruct;
     
-    NSDictionary* _runDocument;
-    NSDictionary* _configDocument;
-    NSDictionary* _mtcConfigDoc;
-    NSMutableDictionary* _runTypeDocumentPhysics;
     NSMutableDictionary* smellieRunFiles;
     
     bool _smellieDBReadInProgress;
@@ -171,11 +167,6 @@
 @property (setter=setLogServerPort:) int logPort;
 @property (nonatomic,assign) bool resync;
 
-@property (copy) NSDictionary* runDocument;
-@property (copy) NSDictionary* configDocument;
-@property (copy) NSDictionary* mtcConfigDoc;
-
-
 - (id) init;
 
 - (void) setMTCPort: (int) port;
@@ -202,6 +193,8 @@
 
 - (void) taskFinished:(NSTask*)aTask;
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
+
+- (void) pingCrates;
 
 #pragma mark ¥¥orcascript helpers
 - (void) zeroPedestalMasks;
@@ -291,7 +284,6 @@
 -(BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
 -(BOOL) saveStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
 -(void) loadSettingsInHW;
--(void) loadHighThresholds;
 
 @end
 
