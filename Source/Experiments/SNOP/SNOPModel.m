@@ -1849,8 +1849,13 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 
 - (void) setECA_rate:(NSNumber*)aValue
 {
-    ECA_rate = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
+    if(aValue != ECA_rate)
+    {
+        NSNumber* temp = ECA_rate;
+        ECA_rate = [aValue retain];
+        [temp release];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
+    }
 }
 
 // Load Detector Settings from the DB into the Models
