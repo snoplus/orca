@@ -605,7 +605,8 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
         return;
     }
     TUBiiModel* theTubiiModel = [tubiiModels objectAtIndex:0];
- 
+
+    ///////////////
     //Add run control object
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
@@ -619,20 +620,22 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     }
     ORRunModel* runControl = [runModels objectAtIndex:0];
     
-    // RUN CONTROL
-    //
-    //Set up run control
-    // This is temporarily commented out as it needs to be replaced with a check on standard run type.
-    // We need to make sure that we're in a tellie run (run type word properly set etc) else exit.
-    /*
-    if(![runControl isRunning]){
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Starting our own run! \n");
-        [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
-    }else{
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Restarting run! \n");
-        [runControl performSelectorOnMainThread:@selector(restartRun) withObject:nil waitUntilDone:YES];
+    ///////////////////////
+    // Check TELLIE run type is masked in
+    NSArray* runTypeNames = [runControl runTypeNames];
+    unsigned long runType = [runControl runType];
+    BOOL runTypeCheck = NO;
+    for(NSString* name in runTypeNames){
+        NSLog(@"%@, %u\n" ,name, runType);
+        if([name isEqualToString:@"TELLIE"]){
+            runTypeCheck = YES;
+        }
     }
-    */
+    if(runTypeCheck == NO){
+        NSLogColor([NSColor redColor], @"[TELLIE] TELLIE does not appear in run type word. Exiting...");
+        goto err;
+        
+    }
     
     //////////////
     // Get run mode boolean
@@ -656,6 +659,36 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
         return;
     }
     
+    ///////////////
+    // It's a quirk of TELLIE that entering slave mode can sometimes leave
+    // the system in an undefined state. This can be avoided if we always
+    // force a master mode operation, first. For this purpose a 1 shot master
+    // mode sequence is fired at this point with an IPW setting which will
+    // never produce light.
+    NSArray* fireArgs = @[[[fireCommands objectForKey:@"channel"] stringValue],
+                          [NSNumber numberWithInt:1],
+                          [[fireCommands objectForKey:@"pulse_separation"] stringValue],
+                          [[fireCommands objectForKey:@"trigger_delay"] stringValue],
+                          [NSNumber numberWithInt:16383],
+                          [[fireCommands objectForKey:@"pulse_height"] stringValue],
+                          [[fireCommands objectForKey:@"fibre_delay"] stringValue],
+                          ];
+    NSLog(@"[TELLIE] Setting to definitive master state - will change to slave later in the sequence if it has been requested\n");
+    @try{
+        [[self tellieClient] command:@"init_channel" withArgs:fireArgs];
+    } @catch(NSException *e){
+        errorString = [NSString stringWithFormat:@"[TELLIE]: Problem init-ing channel: %@\n", [e reason]];
+        NSLogColor([NSColor redColor], errorString);
+        goto err;
+    }
+    @try{
+        [[self tellieClient] command:@"fire_sequence"];
+    } @catch(NSException* e){
+        errorString = [NSString stringWithFormat: @"[TELLIE] Problem with dummy fire: %@\n", [e reason]];
+        NSLogColor([NSColor redColor],errorString);
+        goto err;
+    }
+    
     /////////////
     // TELLIE pin readout is an average measurement of the passed "number_of_shots".
     // If a large number of shots are requested it is useful to split the data into smaller chunks,
@@ -671,13 +704,15 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
         } else {
             int iLoops = totalShots / 5e3;
             loops =[NSNumber numberWithInteger:iLoops];
-
+            
         }
     }
     
     ///////////////
     // Now set-up is done, push initial run document
-    [self pushInitialTellieRunDocument];
+    if([runControl isRunning]){
+        [self pushInitialTellieRunDocument];
+    }
     
     ///////////////
     // Fire loop! Pass variables to the tellie server.
@@ -717,7 +752,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
             NSLog(@"Init-ing tellie with settings\n");
             @try{
                 [[self tellieClient] command:@"init_channel" withArgs:fireArgs];
-                [NSThread sleepForTimeInterval:7.0f];
+                [NSThread sleepForTimeInterval:5.0f];
             } @catch(NSException *e){
                 errorString = [NSString stringWithFormat:@"[TELLIE]: Problem init-ing channel on server: %@\n", [e reason]];
                 NSLogColor([NSColor redColor], errorString);
@@ -823,7 +858,9 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
         
         ////////////
         // Update run document
-        [self updateTellieRunDocument:valuesToFillPerSubRun];
+        if([runControl isRunning]){
+            [self updateTellieRunDocument:valuesToFillPerSubRun];
+        }
     }
 
     ////////////
@@ -1051,7 +1088,7 @@ err:
     // **********************************
     // Load latest fibre-channel mapping doc.
     // **********************************
-    NSString* mapUrlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/telliedb/_design/tellieQuery/_view/fetchCurrentMapping?key=0",[aSnotModel orcaDBUserName], [aSnotModel orcaDBPassword], [aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
+    NSString* mapUrlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/telliedb/_design/tellieQuery/_view/fetchCurrentMapping?key=2147483647",[aSnotModel orcaDBUserName], [aSnotModel orcaDBPassword], [aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
 
     NSString* webMapString = [mapUrlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     NSURL* mapUrl = [NSURL URLWithString:webMapString];
@@ -1070,7 +1107,7 @@ err:
                                             options:NSDataReadingMapped
                                               error:&mapDataError];
     */
-     if(mapDataError){
+    if(mapDataError){
         NSLog(@"\n%@\n\n",mapDataError);
     }
     NSString* mapReturnStr = [[NSString alloc] initWithData:mapData encoding:NSUTF8StringEncoding];
@@ -1871,8 +1908,7 @@ err:
     [runDocDict setObject:[NSString stringWithFormat:@"%i",0] forKey:@"version"];
     [runDocDict setObject:[NSString stringWithFormat:@"%lu",[runControl runNumber]] forKey:@"index"];
     [runDocDict setObject:smellieRunNameLabel forKey:@"run_description_used"];
-    [runDocDict setObject:[self stringUnixFromDate:nil] forKey:@"issue_time_unix"];
-    [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"issue_time_iso"];
+    [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"timestamp"];
     NSNumber *smellieConfigurationVersion = [self smellieConfigVersionNo];
     [runDocDict setObject:smellieConfigurationVersion forKey:@"configuration_version"];
     [runDocDict setObject:[NSNumber numberWithInt:[runControl runNumber]] forKey:@"run"];
