@@ -577,6 +577,15 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
 }
 
+- (void) postCouchDBRecordToHistory:(NSDictionary*)aRecord
+{
+    NSMutableDictionary* values;
+    if(aRecord) values = [NSMutableDictionary dictionaryWithDictionary:aRecord];
+    else        values = [NSMutableDictionary dictionary];
+    [values setObject:@"Scripts" forKey:@"title"];
+    if([values objectForKey:@"scriptName"]==nil) [values setObject:scriptName forKey:@"scriptName"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddHistoryAdcRecord" object:self userInfo:values];
+}
 
 - (BOOL) runScriptWithMessage:(NSString*) startMessage
 {
