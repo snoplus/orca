@@ -1857,7 +1857,8 @@ static int              sChannelsNotChangedCount = 0;
     if (data) {
         [sDetectorDbData release];
         sDetectorDbData = [data retain];
-        NSLog(@"Loaded detector db tables: PMTHV(%d), FEC(%d), Crate(%d), MTC(%d), CAEN(%d)\n",
+        NSLog(@"Loaded %@ db tables: PMTHV(%d), FEC(%d), Crate(%d), MTC(%d), CAEN(%d)\n",
+              [[ORPQModel getCurrent] dataBaseName],
               data->pmthvLoaded, data->fecLoaded, data->crateLoaded, data->mtcLoaded, data->caenLoaded);
         [self _continueHWWizard];
     } else if (sDetectorDbData) {
