@@ -1866,7 +1866,7 @@ static int              sChannelsNotChangedCount = 0;
         strcat((data->mtcLoaded   ? yes : no), ",MTC");
         strcat((data->caenLoaded  ? yes : no), ",CAEN");
         if (yes[0]) yes[0] = ' ';
-        if (no[0]) sprintf(noStr," (didn't load %s)", no);
+        if (no[0]) sprintf(noStr," (didn't load %s)", no+1);
         NSLog([NSString stringWithFormat:@"Loaded detector db tables%s%s\n",yes,noStr]);
 
         [self _continueHWWizard];
