@@ -1857,18 +1857,8 @@ static int              sChannelsNotChangedCount = 0;
     if (data) {
         [sDetectorDbData release];
         sDetectorDbData = [data retain];
-        char yes[128] = "";
-        char no[128] = "";
-        char noStr[128] = "";
-        strcat((data->pmthvLoaded ? yes : no), ",PMTHV");
-        strcat((data->fecLoaded   ? yes : no), ",FEC");
-        strcat((data->crateLoaded ? yes : no), ",Crate");
-        strcat((data->mtcLoaded   ? yes : no), ",MTC");
-        strcat((data->caenLoaded  ? yes : no), ",CAEN");
-        if (yes[0]) yes[0] = ' ';
-        if (no[0]) sprintf(noStr," (didn't load %s)", no+1);
-        NSLog([NSString stringWithFormat:@"Loaded detector db tables%s%s\n",yes,noStr]);
-
+        NSLog(@"Loaded detector db tables: PMTHV(%d), FEC(%d), Crate(%d), MTC(%d), CAEN(%d)\n",
+              data->pmthvLoaded, data->fecLoaded, data->crateLoaded, data->mtcLoaded, data->caenLoaded);
         [self _continueHWWizard];
     } else if (sDetectorDbData) {
         NSLog(@"Error reloading detector database\n");

@@ -185,11 +185,11 @@ typedef struct {
 @private
     NSMutableData * data;
 @public
-    bool        pmthvLoaded;
-    bool        fecLoaded;
-    bool        crateLoaded;
-    bool        mtcLoaded;
-    bool        caenLoaded;
+    int         pmthvLoaded;    // number of PMT HV channels loaded from db
+    int         fecLoaded;      // number of FEC cards loaded from db
+    int         crateLoaded;    // number of crates loaded from db
+    int         mtcLoaded;      // 1 if MTC settings were loaded from db
+    int         caenLoaded;     // 1 if CAEN settings were loaded from db
 }
 
 - (id)          init;

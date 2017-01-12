@@ -438,7 +438,7 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
 - (void) dealloc
 {
     [data release];
-    pmthvLoaded = fecLoaded = crateLoaded = mtcLoaded = caenLoaded = NO;
+    pmthvLoaded = fecLoaded = crateLoaded = mtcLoaded = caenLoaded = 0;
     [super dealloc];
 }
 
@@ -542,7 +542,7 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
             NSLog(@"Expected %d columns from PMT HV database, but got %d\n", 4, numCols);
             return nil;
         }
-        if (numRows) detDB->pmthvLoaded = YES;
+        detDB->pmthvLoaded = numRows;
         for (int i=0; i<numRows; ++i) {
             int64_t val = [theResult getInt64atRow:i column:3];
             if (val == kPQBadValue) continue;
@@ -574,7 +574,7 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
             NSLog(@"Expected %d columns from detector database, but got %d\n", kFEC_numDbColumns, numCols);
             return nil;
         }
-        if (numRows) detDB->fecLoaded = YES;
+        detDB->fecLoaded = numRows;
         for (int i=0; i<numRows; ++i) {
             unsigned crate = [theResult getInt64atRow:i column:0];
             unsigned card  = [theResult getInt64atRow:i column:1];
@@ -683,7 +683,7 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
             NSLog(@"Expected %d columns from crate database, but got %d\n", kCrate_numDbColumns, numCols);
             return nil;
         }
-        if (numRows) detDB->crateLoaded = YES;
+        detDB->crateLoaded = numRows;
         for (int i=0; i<numRows; ++i) {
             unsigned crate = [theResult getInt64atRow:i column:0];
             if (crate >= kSnoCrates) continue;
@@ -748,7 +748,7 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
             return nil;
         }
         if (numRows) {
-            detDB->mtcLoaded = YES;
+            detDB->mtcLoaded = 1;
             PQ_MTC *pqMTC = [detDB getMTC];
             for (int col=0; col<kMTC_numDbColumns; ++col) {
                 NSMutableData *dat = [theResult getInt64arrayAtRow:0 column:col];
@@ -824,7 +824,7 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
             return nil;
         }
         if (numRows) {
-            detDB->caenLoaded = YES;
+            detDB->caenLoaded = 1;
             PQ_CAEN *pqCAEN = [detDB getCAEN];
             for (int col=0; col<kCAEN_numDbColumns; ++col) {
                 NSMutableData *dat = [theResult getInt64arrayAtRow:0 column:col];
