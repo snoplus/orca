@@ -1839,7 +1839,7 @@ static int              sChannelsNotChangedCount = 0;
 }
 
 // continue HWWizard execution after reading detector database
-- (void) _chanDbCallback:(ORPQDetectorDB*)data
+- (void) _detDbCallback:(ORPQDetectorDB*)data
 {
     sDetectorDbState = 2;
     
@@ -1857,7 +1857,18 @@ static int              sChannelsNotChangedCount = 0;
     if (data) {
         [sDetectorDbData release];
         sDetectorDbData = [data retain];
-        NSLog(@"Loaded detector database\n");
+        char yes[128] = "";
+        char no[128] = "";
+        char noStr[128] = "";
+        strcat((data->pmthvLoaded ? yes : no), ",PMTHV");
+        strcat((data->fecLoaded   ? yes : no), ",FEC");
+        strcat((data->crateLoaded ? yes : no), ",Crate");
+        strcat((data->mtcLoaded   ? yes : no), ",MTC");
+        strcat((data->caenLoaded  ? yes : no), ",CAEN");
+        if (yes[0]) yes[0] = ' ';
+        if (no[0]) sprintf(noStr," (didn't load %s)", no);
+        NSLog([NSString stringWithFormat:@"Loaded detector db tables%s%s\n",yes,noStr]);
+
         [self _continueHWWizard];
     } else if (sDetectorDbData) {
         NSLog(@"Error reloading detector database\n");
@@ -1939,7 +1950,7 @@ static int              sChannelsNotChangedCount = 0;
         // (we will continue after our detector database is loaded)
         [hwWizard performSelector:@selector(notOkToContinue)];
         // initiate the PostgreSQL DB query to get the current detector state
-        [[ORPQModel getCurrent] detectorDbQuery:self selector:@selector(_chanDbCallback:)];
+        [[ORPQModel getCurrent] detectorDbQuery:self selector:@selector(_detDbCallback:)];
         // post a modal dialog after 1 sec if the database operation hasn't completed yet
         [self performSelector:@selector(hwWizardWaitingForDatabase) withObject:nil afterDelay:1];
     }

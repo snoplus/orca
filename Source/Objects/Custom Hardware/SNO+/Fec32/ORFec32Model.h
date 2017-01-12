@@ -344,7 +344,7 @@ typedef struct Fec32CmosShiftReg{
 - (void) hwWizardActionEnd:(NSNotification*)aNote;
 - (void) hwWizardActionFinal:(NSNotification*)aNote;
 - (void) hwWizardWaitingForDatabase;
-- (void) _chanDbCallback:(ORPQDetectorDB*)data;
+- (void) _detDbCallback:(ORPQDetectorDB*)data;
 - (void) _continueHWWizard:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) _continueHWWizard;
 
