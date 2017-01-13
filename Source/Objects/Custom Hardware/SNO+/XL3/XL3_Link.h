@@ -30,7 +30,7 @@ typedef enum eXL3_ConnectStates {
 
 @interface XL3_Link : ORGroup
 {
-	int         workingSocket;
+	int         workingSocket;      //handle to the current socket connection
 	NSLock*		commandSocketLock;	//avoids clashes between commands. Wrap an XL3 packet write,
                                     //so you know a possible write error comes from your command.
 	NSLock*		coreSocketLock;		//protects the socket, to guarantee that full packet is read/written
@@ -40,7 +40,7 @@ typedef enum eXL3_ConnectStates {
                                     //and XL3Model pulling/distributing the responses
     int         pendingThreads;     //Number of threads waiting on a response
     NSLock*     connectionLock;     //Must be held before modifying pendingThreads
-	BOOL		needToSwap;
+	BOOL		needToSwap;         //Whether byte order needs swapping to communicate with the XL3
 	NSString*	IPNumber;
 	NSString*	crateName;
 	unsigned long	portNumber;
@@ -49,28 +49,14 @@ typedef enum eXL3_ConnectStates {
 	int		connectState;
 	int		_errorTimeOut;
 	NSDate*	timeConnected;
-	NSMutableArray*	cmdArray;
-	uint16_t num_cmd_packets;
+	NSMutableArray*	cmdArray;       //Array of cmd packet responses received from XL3 but not yet dispatched to requesters
+	uint16_t numPackets;
 	unsigned long long num_dat_packets;
 	XL3Packet	aMultiCmdPacket;
     NSArray*    fifoStatus;         //array of 16 diffs between write and read FEC pointers, NSNumbers for MORCA
     NSDate*     _fifoTimeStamp;     //time stamp when fifoStatus received
     BOOL _readFifoFlag;             //a flag check by Xl3Model::takeData;
     unsigned long _fifoBundle[16];  //an array to enter data stream
-    
-@private
-    //memory optimized circular buffer, motivated by ORSafeCirularBuffer. Thanks Mark.
-    //XL3_Link allocates and pushes megabundles as NSData, cb stores pointers to NSData*
-    //ORXL3_Model takeData memcopies into the data stream and releases
-    //it's not design to buffer, it's used to reverse the data stream direction
-    //if we went with ORSafeCircularBuffer the 20 pool releases caused noticable interruptions
-    NSMutableData*  bundleBuffer;
-    unsigned long*	dataPtr;
-    unsigned        bundleBufferSize;
-    unsigned        bundleReadMark;
-    unsigned        bundleWriteMark;
-    NSLock*         bundleBufferLock;
-    long            bundleFreeSpace;
 }
 
 @property (assign,nonatomic) BOOL isConnected;
@@ -84,19 +70,13 @@ typedef enum eXL3_ConnectStates {
 - (id)   init;
 - (void) dealloc;
 - (void) wakeUp; 
-- (void) sleep ;	
-
-#pragma mark •••DataTaker Helpers
-- (BOOL) bundleAvailable;
-- (NSMutableData*) readNextBundle;
+- (void) sleep ;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
 
 #pragma mark •••Accessors
-- (int)  workingSocket;
-- (void) setWorkingSocket:(int) aSocket;
 - (BOOL) needToSwap;
 - (void) setNeedToSwap;
 - (int)  connectState;
@@ -128,9 +108,8 @@ typedef enum eXL3_ConnectStates {
 - (void) connectSocket;
 - (void) disconnectSocket;
 - (void) connectToPort;
-- (void) writePacket:(char*)aPacket;
-- (void) readPacket:(char*)aPacket;
-- (BOOL) canWriteTo:(int)aSocket;
+- (void) writePacket:(XL3Packet*)aPacket;
+- (void) readPacket:(XL3Packet*)aPacket;
 
 @end
 
