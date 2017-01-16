@@ -50,7 +50,7 @@
 {
     NSDictionary *statedict = [NSDictionary dictionaryWithObjectsAndKeys:
                                [NSColor redColor], @"disabled",
-                               [NSColor blueColor], @"enabled",
+                               [NSColor colorWithCalibratedRed:(30.0/255.0) green:(144.0/255.0) blue:1.0 alpha:1.0], @"enabled",
                                [NSColor blackColor], @"unknwon",
                                nil];
     msbox = [[ORMultiStateBox alloc] initWithStates:statedict size:20 pad:0 bevel:2];
