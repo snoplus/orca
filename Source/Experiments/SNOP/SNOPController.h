@@ -42,6 +42,7 @@
     
     //Run control (the rest is in the ORExperimentController)
     IBOutlet StopLightView *lightBoardView;
+    IBOutlet NSButton *resyncRunButton;
 
     //Quick links
     
@@ -100,8 +101,6 @@
     IBOutlet NSTextField *ecaNEventsTextField;
     IBOutlet NSTextField *ecaPulserRate;
     IBOutlet NSButton *startSingleECAButton;
-
-    NSButton *refreshRunWordNames;
     
     //Server settings
     IBOutlet NSComboBox *orcaDBIPAddressPU;
@@ -204,7 +203,6 @@
 - (IBAction) runsLockAction:(id)sender;
 
 //Run type
-- (IBAction) refreshRunWordLabels:(id)sender;
 - (IBAction) runTypeWordAction:(id)sender;
 @end
 
