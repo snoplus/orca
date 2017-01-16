@@ -149,7 +149,8 @@ ecalToOrcaInProgress = _ecalToOrcaInProgress,
 isTriggerON = _isTriggerON,
 snotDb = _snotDb,
 hvAQueryWaiting = hvAQueryWaiting,
-hvBQueryWaiting = hvBQueryWaiting;
+hvBQueryWaiting = hvBQueryWaiting,
+isLoaded = isLoaded;
 
 
 #pragma mark •••Initialization
@@ -211,6 +212,35 @@ hvBQueryWaiting = hvBQueryWaiting;
                      selector : @selector(connectionStateChanged)
                          name : XL3_LinkConnectionChanged
                        object : xl3Link];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(documentLoaded)
+                         name : ORDocumentLoadedNotification
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(documentClosed)
+                         name : ORDocumentClosedNotification
+                       object : nil];
+}
+
+- (void) documentLoaded
+{
+    NSLog(@"Notified!\n");
+    self.isLoaded = true;
+}
+
+- (void) documentClosed
+{
+    NSLog(@"De-notified!\n");
+    self.isLoaded = false;
+    if (hvThread) {
+        //NSThread doesn't have api to wait until done!?
+        while (![hvThread isFinished]) {
+            sleep(1);
+        }
+    }
+    
 }
 
 - (void) connectionStateChanged
@@ -1528,7 +1558,8 @@ void SwapLongBlock(void* p, int32_t n)
     self.hvBQueryWaiting = false;
     self.hvANeedsUserIntervention = false;
     self.hvBNeedsUserIntervention = false;
-
+    self.isLoaded = false;
+    
     [self safeHvInit];
      
     [[self undoManager] enableUndoRegistration];
@@ -4475,6 +4506,7 @@ err:
 //Static and synchronized to bottle neck the access to the DB from all HV threads and only
 //inform the user once of a missing DB object. Each thread requires independent confirmation
 //before using hardcoded values (see _hv_*_dbparams)
+//N.B. this method should NEVER be called from the main thread - it could deadlock
 + (bool) requestHVParams:(ORXL3Model*)model
 {
     static uint32_t nodb = 0;
@@ -4486,15 +4518,22 @@ err:
             nodb++;
             // inform user of missing db object
             if (nodb == 10) { //exactly how long this takes depends on the number of XL3's connected - max 10s from first connect
-                ORRunAlertPanel(@"PostgresDB object not found",@"Cannot get the PostgresDB object, please add one to the experiment and restart ORCA.",@"OK",nil,nil);
+                dispatch_sync(dispatch_get_main_queue(), ^{
+                    ORRunAlertPanel(@"PostgresDB object not found",@"Cannot get the PostgresDB object, please add one to the experiment and restart ORCA.",@"OK",nil,nil);
+            
+                });
             }
             return false;
         }
         //We previously could not find the db object
         if (nodb >= 10) {
-            [model _hv_a_dbparams:nil];
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                [model _hv_a_dbparams:nil];
+            });
             if ([model crateNumber] == 16) {
-                [model _hv_b_dbparams:nil];
+                dispatch_sync(dispatch_get_main_queue(), ^{
+                    [model _hv_b_dbparams:nil];
+                });
             } else {
                 //hardcode non-16 supply B values
                 [model setHvBFromDB:true];
@@ -4512,13 +4551,22 @@ err:
         //DB exists, send query for supplies
         if (![model hvAFromDB] && ![model hvAQueryWaiting]) {
             [model setHvAQueryWaiting:true];
-            [db dbQuery:[NSString stringWithFormat:@"SELECT * FROM hvparams WHERE crate=%i AND supply='A'", [model crateNumber]] object:model selector:@selector(_hv_a_dbparams:)];
+            //N.B. timeout doesn't work as I expected
+            //performSelector:withObject:afterDelay requires the thread it was called on to eventually exit to its event queue
+            //_ONLY_ then will the cancel selector be called assuming the timeout has expired
+            //Work around: call it on the main thread
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                [db dbQuery:[NSString stringWithFormat:@"SELECT * FROM hvparams WHERE crate=%i AND supply='A'", [model crateNumber]] object:model selector:@selector(_hv_a_dbparams:) timeout:5.0];
+            });
         }
         //crate 16 is special
         if ([model crateNumber] == 16) {
             if (![model hvBFromDB] && ![model hvBQueryWaiting]) {
                 [model setHvBQueryWaiting:true];
-                [db dbQuery:[NSString stringWithFormat:@"SELECT * FROM hvparams WHERE crate=%i AND supply='B'", [model crateNumber]] object:model selector:@selector(_hv_b_dbparams:)];
+                dispatch_sync(dispatch_get_main_queue(), ^{
+                    [db dbQuery:[NSString stringWithFormat:@"SELECT * FROM hvparams WHERE crate=%i AND supply='B'", [model crateNumber]] object:model selector:@selector(_hv_b_dbparams:) timeout:5.0];
+            
+                });
             }
         } else {
             //hardcode non-16 supply B values
@@ -4678,7 +4726,7 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
                     1995.0, 1945.0, 2010.0, 2000.0}; //crates 0-19 supply a
 
 
-//Callback for database access to hv params for supply a
+//Callback for database access to hv params for supply a (runs on main thread)
 - (void)_hv_a_dbparams:(ORPQResult*)result
 {
     if (!hvAFromDB) { // Only do this once per init loop
@@ -4719,7 +4767,7 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
     [self setHvAQueryWaiting:false];
 }
 
-//Callback for database access to hv params for supply b
+//Callback for database access to hv params for supply b (runs on main thread)
 - (void)_hv_b_dbparams:(ORPQResult*)result
 {
     if (!hvBFromDB) { // Only do this once per init loop
@@ -4769,18 +4817,19 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
         NSAutoreleasePool* hvLoopPool = [[NSAutoreleasePool alloc] init];
         
         sleep(1);
+        
+        //Request the hv parameters (N.B. true does not mean they were loaded, check hvAFromDB and hvBFromDB)
+        if ((!hvAFromDB || !hvBFromDB) && !(isLoaded && [ORXL3Model requestHVParams:self])) {
+            [hvLoopPool release];
+            continue;
+        }
+        
         //do nothing without an xl3 connected
         if ([self xl3Link] && [[self xl3Link] isConnected]) {
             if (![self stateUpdated] || ![self initialized]) {
                 /* If the XL3 hasn't been initialized, then the registers are
                  * just random bytes, so we need to wait for a crate reset
                  * before checking the switches. */
-                [hvLoopPool release];
-                continue;
-            }
-            
-            //Request the hv parameters (N.B. true does not mean they were loaded, check hvAFromDB and hvBFromDB)
-            if (![ORXL3Model requestHVParams:self]) {
                 [hvLoopPool release];
                 continue;
             }
@@ -4952,9 +5001,8 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
     //   the status of the alarm changes, along with updating the DB
     //Heartbeat sent on multiples of 10, incremented each loop (~1s)
     uint32_t loopCounter = 0;
-    
     //Runs until the thread is cancelled or xl3 disconnects
-    while (![[NSThread currentThread] isCancelled] && [self xl3Link] && [[self xl3Link] isConnected]) {
+    while (![[NSThread currentThread] isCancelled] && [self xl3Link] && [[self xl3Link] isConnected] && [self isLoaded]) {
         
         NSAutoreleasePool *hvLoopPool = [[NSAutoreleasePool alloc] init];
         
@@ -5138,7 +5186,7 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
     NSLog(@"%@ exiting HV control thread\n",[[self xl3Link] crateName]);
     
     //Try to restart if we can
-    [self safeHvInit];
+    if (![self isLoaded]) [self safeHvInit];
 
     [hvPool release];
 }
