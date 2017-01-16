@@ -226,13 +226,11 @@ isLoaded = isLoaded;
 
 - (void) documentLoaded
 {
-    NSLog(@"Notified!\n");
     self.isLoaded = true;
 }
 
 - (void) documentClosed
 {
-    NSLog(@"De-notified!\n");
     self.isLoaded = false;
     if (hvThread) {
         //NSThread doesn't have api to wait until done!?
@@ -5186,7 +5184,7 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
     NSLog(@"%@ exiting HV control thread\n",[[self xl3Link] crateName]);
     
     //Try to restart if we can
-    if (![self isLoaded]) [self safeHvInit];
+    if ([self isLoaded]) [self safeHvInit];
 
     [hvPool release];
 }
