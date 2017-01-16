@@ -1176,12 +1176,6 @@ snopGreenColor;
        && ![[model standardRunVersion] isEqualToString:@"DEFAULT"]) [model setStandardRunVersion:@"DEFAULT"];
     
     //Enable or disable fields
-    [startSingleECAButton setEnabled:!lockedOrNotRunningMaintenance];
-    [ECApatternPopUpButton setEnabled:!lockedOrNotRunningMaintenance];
-    [ECAtypePopUpButton setEnabled:!lockedOrNotRunningMaintenance];
-    [TSlopePatternTextField setEnabled:!lockedOrNotRunningMaintenance];
-    [ecaNEventsTextField setEnabled:!lockedOrNotRunningMaintenance];
-    [ecaPulserRate setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunThresCurrentValues setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunSaveButton setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunLoadButton setEnabled:!lockedOrNotRunningMaintenance];
@@ -1303,13 +1297,10 @@ snopGreenColor;
     
     NSArray* scriptList = [runControl runScriptList];
     if([scriptList containsObject:@"ECASingleRun"]){
-        if([gOrcaGlobals runInProgress]){
-            NSLogColor([NSColor redColor],@"ECA run cannot start with an ongoing run. Stop the run first.\n");
-        }
-        else{
-            [runControl selectRunTypeScriptByName:@"ECASingleRun"];
-            [runControl startRun];
-        }
+        //Start or restart the run
+        [runControl selectRunTypeScriptByName:@"ECASingleRun"];
+        if([runControl isRunning]) [runControl restartRun];
+        else [runControl startRun];
     }
     else{
         NSLogColor([NSColor redColor],@"ECA Single Run not configured. Please, set the RunScript properly. ECA run won't start. \n");
