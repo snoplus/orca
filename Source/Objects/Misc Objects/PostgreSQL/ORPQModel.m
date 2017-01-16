@@ -92,7 +92,7 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
 
 - (void) awakeAfterDocumentLoaded
 {
-    /// stub
+    [self detectorDbQuery:NULL selector:NULL];   // load our current detector state
 }
 - (BOOL) solitaryObject
 {
@@ -310,25 +310,16 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
 }
 
 #pragma mark ***SQL Access
-- (BOOL) testConnection
+- (void) testConnection
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
-	
-	if(!pqConnection) pqConnection = [[ORPQConnection alloc] init];
-	if([pqConnection isConnected]){
-		[pqConnection disconnect];
-	} 
-	
-	if([pqConnection connectToHost:hostName userName:userName passWord:password dataBase:dataBaseName]){
-	}
-	else {
-		[self disconnectSql];
-	}
-	
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORPQConnectionValidChanged object:self];
-	
 
-	return [pqConnection isConnected];
+    if(!stealthMode){
+        ORPQQueryOp* anOp = [[ORPQQueryOp alloc] initWithDelegate:self];
+        [anOp setCommandType:kPQCommandType_TestConnection];
+        [ORPQDBQueue addOperation:anOp];
+        [anOp release];
+    }
 }
 
 - (void) disconnectSql
@@ -337,8 +328,7 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
 		[pqConnection disconnect];
 		[pqConnection release];
 		pqConnection = nil;
-		if([dataBaseName length] && [hostName length])NSLog(@"Disconnected from DataBase %@ on %@\n",dataBaseName,hostName);
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORPQConnectionValidChanged object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORPQConnectionValidChanged object:self];
 	}
 }
 
@@ -883,9 +873,13 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
     if (detDB->pmthvLoaded || detDB->fecLoaded || detDB->crateLoaded ||
         detDB->mtcLoaded || detDB->caenLoaded)
     {
+        NSLog(@"Loaded %@ DB: PMTHV(%d), FEC(%d), Crate(%d), MTC(%d), CAEN(%d)\n",
+              [delegate dataBaseName],
+              detDB->pmthvLoaded, detDB->fecLoaded, detDB->crateLoaded, detDB->mtcLoaded, detDB->caenLoaded);
         return detDB;
     } else {
         [detDB release];
+        NSLog(@"Error loading %@ DB!\n");
         return nil;
     }
 }
@@ -898,7 +892,12 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
 
     NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
     NSObject *theResultObject = nil;
+    BOOL isConnected = NO;
+
     @try {
+        if (commandType == kPQCommandType_TestConnection) {
+            [delegate disconnectSql];   // disconnect then reconnect to test the connection
+        }
         ORPQConnection* pqConnection = [[delegate pqConnection] retain];
         if([pqConnection isConnected] && ![self isCancelled]){
 
@@ -914,6 +913,12 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                 case kPQCommandType_GetDetectorDB:
                     theResultObject = [self loadDetectorDB:pqConnection];
                     break;
+
+                case kPQCommandType_TestConnection:
+                    NSLog(@"PostgreSQL connected to %@ DB on %@\n", [delegate dataBaseName], [delegate hostName]);
+                    [delegate detectorDbQuery:NULL selector:NULL];
+                    isConnected = YES;
+                    break;
             }
         }
         [pqConnection release];
@@ -928,6 +933,8 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
         if (![self isCancelled]) {
             if (commandType == kPQCommandType_GetDetectorDB) {
                 [self performSelectorOnMainThread:@selector(_detectorDbCallback:) withObject:theResultObject waitUntilDone:YES];
+            } else if (commandType == kPQCommandType_TestConnection && !isConnected) {
+                NSLogColor([NSColor redColor], @"PostgreSQL ERROR connecting to %@ DB on %@\n", [delegate dataBaseName], [delegate hostName]);
             } else if (selector) {
                 [object performSelectorOnMainThread:selector withObject:theResultObject waitUntilDone:YES];
                 selector = nil;

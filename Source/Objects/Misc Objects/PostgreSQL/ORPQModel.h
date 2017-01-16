@@ -280,7 +280,7 @@ typedef struct {
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
 #pragma mark ***SQL Access
-- (BOOL) testConnection;
+- (void) testConnection;
 - (BOOL) connected;
 - (void) disconnectSql;
 
@@ -318,6 +318,7 @@ extern NSString* ORPQLock;
 enum ePQCommandType {
     kPQCommandType_General,
     kPQCommandType_GetDetectorDB,
+    kPQCommandType_TestConnection,
 };
 
 @interface ORPQQueryOp : ORPQOperation
