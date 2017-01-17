@@ -144,6 +144,7 @@
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
 - (void) postCouchDBRecord:(NSDictionary*)aRecord;
+- (void) postCouchDBRecordToHistory:(NSDictionary*)aRecord;
 
 #pragma mark ***Data ID
 - (unsigned long) dataId;

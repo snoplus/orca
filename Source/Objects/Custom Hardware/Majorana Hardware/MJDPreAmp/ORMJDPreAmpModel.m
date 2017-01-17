@@ -1910,10 +1910,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(MjdPreAmpPollQueue);
     if(![self isCancelled]){
         [delegate performSelectorOnMainThread:@selector(readAllAdcs) withObject:nil waitUntilDone:YES];
         int i;
-        for(i=0;i<50;i++){
-            [NSThread sleepForTimeInterval:.1];
+        for(i=0;i<25;i++){
+            [NSThread sleepForTimeInterval:.2];
             if([self isCancelled])break;
         }
+
     }
     [delegate pollRequestIsFinished];
     [thePool release];

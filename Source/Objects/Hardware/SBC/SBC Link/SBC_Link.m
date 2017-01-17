@@ -1240,6 +1240,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 
 - (void) taskData:(NSString*)text
 {
+    NSLog(@"%@\n",text);
 	if([text rangeOfString:@"error:"].location!=NSNotFound){
 		[self setCompilerErrors:compilerErrors+1];
 		NSLogColor([NSColor redColor], @"%@\n",text);

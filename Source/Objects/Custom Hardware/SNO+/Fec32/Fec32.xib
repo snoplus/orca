@@ -5303,7 +5303,7 @@
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Enabled" id="cjT-x5-bNd">
                                                 <font key="font" metaFont="smallSystem"/>
-                                                <color key="textColor" red="0.0" green="0.0" blue="1" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
+                                                <color key="textColor" red="0.11764705882352941" green="0.56470588235294117" blue="1" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>

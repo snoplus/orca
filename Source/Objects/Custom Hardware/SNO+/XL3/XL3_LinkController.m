@@ -63,7 +63,7 @@ static NSDictionary* xl3Ops;
 	[super awakeFromNib];
     
     NSDictionary *statedict = [NSDictionary dictionaryWithObjectsAndKeys:
-                               [NSColor blueColor], @"closed",
+                               [NSColor colorWithCalibratedRed:(30.0/255.0) green:(144.0/255.0) blue:1.0 alpha:1.0], @"closed",
                                [NSColor redColor], @"open",
                                [NSColor blackColor], @"unk",
                                nil];

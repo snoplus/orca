@@ -503,8 +503,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setIntegrateTime:(short)aIntegrateTime
 {
-    if(aIntegrateTime>0x3ff)
-        aIntegrateTime = 0x3ff;
+    if(aIntegrateTime>0x1ff)
+        aIntegrateTime = 0x1ff;
     else if(aIntegrateTime<0)
         aIntegrateTime = 0;
     [[[self undoManager] prepareWithInvocationTarget:self] setIntegrateTime:integrateTime];
@@ -521,8 +521,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setCollectionTime:(short)aCollectionTime
 {
-    if(aCollectionTime>0x3ff)
-        aCollectionTime = 0x3ff;
+    if(aCollectionTime>0x1ff)
+        aCollectionTime = 0x1ff;
     else if(aCollectionTime<0)
         aCollectionTime = 0;
     [[[self undoManager] prepareWithInvocationTarget:self] setCollectionTime:collectionTime];
@@ -1978,7 +1978,7 @@ return 0;
 {
     [self writeAndCheckLong:collectionTime
               addressOffset:register_information[kCollectionTime].offset
-                       mask:0x3ff
+                       mask:0x1ff
                   reportKey:@"CollectionTime"
               forceFullInit:forceFullInitCard];
 
@@ -1991,9 +1991,9 @@ return 0;
                         numToRead:1
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
-    if((aValue & 0x3ff) == collectionTime) return YES;
+    if((aValue & 0x1ff) == collectionTime) return YES;
     else {
-        if(verbose)NSLog(@"collectionTime mismatch: 0x%x != 0x%x\n",aValue & 0x3ff,collectionTime);
+        if(verbose)NSLog(@"collectionTime mismatch: 0x%x != 0x%x\n",aValue & 0x1ff,collectionTime);
         return NO;
     }
 }
@@ -2003,7 +2003,7 @@ return 0;
 {
     [self writeAndCheckLong:integrateTime
               addressOffset:register_information[kIntegrateTime].offset
-                       mask:0x3ff
+                       mask:0x1ff
                   reportKey:@"IntegrationTime"
               forceFullInit:forceFullInitCard];
 
@@ -2017,9 +2017,9 @@ return 0;
                         numToRead:1
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
-    if((aValue & 0x3ff) == integrateTime) return YES;
+    if((aValue & 0x1ff) == integrateTime) return YES;
     else {
-        if(verbose)NSLog(@"integrateTime mismatch: 0x%x != 0x%x\n",aValue & 0x3ff,integrateTime);
+        if(verbose)NSLog(@"integrateTime mismatch: 0x%x != 0x%x\n",aValue & 0x1ff,integrateTime);
         return NO;
     }
 }
@@ -2252,7 +2252,7 @@ return 0;
                         numToRead:1
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
-    return theValue & 0x3ff;
+    return theValue & 0x1ff;
 }
 
 - (short) readIntegrateTime
@@ -2263,7 +2263,7 @@ return 0;
                         numToRead:1
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
-    return theValue & 0x3ff;
+    return theValue & 0x1ff;
 }
 
 - (short) readDownSample
@@ -2694,7 +2694,7 @@ return 0;
     
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Integration Time"];
-    [p setFormat:@"##0" upperLimit:0xff lowerLimit:0 stepSize:1 units:@"µs"];
+    [p setFormat:@"##0" upperLimit:0x1ff lowerLimit:0 stepSize:1 units:@"µs"];
     [p setSetMethod:@selector(setIntegrateTimeConverted:) getMethod:@selector(integrateTimeConverted)];
     [p setActionMask:kAction_Set_Mask];
     [a addObject:p];
