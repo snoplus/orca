@@ -1211,6 +1211,10 @@ snopGreenColor;
     } @catch(NSException* e){
         [e raise];
     }
+    
+    ////////////
+    // Roll over into maintinance run
+    [model setStandardRunType:@"MAINTENANCE"];
 }
 
 - (IBAction) runsLockAction:(id)sender

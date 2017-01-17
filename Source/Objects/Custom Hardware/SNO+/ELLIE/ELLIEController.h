@@ -155,8 +155,6 @@
 @property (nonatomic, strong) NSThread* tellieThread;
 @property (nonatomic, strong) NSThread* smellieThread;
 
-
-
 -(id)init;
 -(void)dealloc;
 -(void)updateWindow;
@@ -215,7 +213,8 @@
 
 //-(void)validateTellieGeneralSettings:(NSNotification *)note;
 //-(void)validateTellieExpertSettings:(NSNotification *)note;
--(BOOL)areTellieSettingsValid;
+-(void)tellieRunStarted:(NSNotification *)aNote;
+-(void)tellieRunFinished:(NSNotification *)aNote;
 -(BOOL)isTellieRunning;
 -(void)initialiseTellie;
 

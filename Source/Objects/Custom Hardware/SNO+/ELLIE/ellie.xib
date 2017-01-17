@@ -37,7 +37,6 @@
                 <outlet property="tellieExpertNodeTf" destination="1404" id="c9I-kv-TEq"/>
                 <outlet property="tellieExpertOpTViewItem" destination="1122" id="1379"/>
                 <outlet property="tellieExpertOperationModePb" destination="fCF-HW-P1M" id="SCf-yc-vpe"/>
-                <outlet property="tellieExpertRunStatusTf" destination="1204" id="ZNN-fd-MfL"/>
                 <outlet property="tellieExpertStopButton" destination="1207" id="1390"/>
                 <outlet property="tellieExpertValidateSettingsButton" destination="1206" id="fLS-Bc-uBD"/>
                 <outlet property="tellieExpertValidationStatusTf" destination="1205" id="gzZ-6M-LW3"/>
@@ -51,7 +50,6 @@
                 <outlet property="tellieGeneralOpTViewItem" destination="1123" id="1400"/>
                 <outlet property="tellieGeneralOperationModePb" destination="1Ii-7J-bsd" id="lwG-aH-mrR"/>
                 <outlet property="tellieGeneralPhotonsTf" destination="1275" id="1329"/>
-                <outlet property="tellieGeneralRunStatusTf" destination="1302" id="1334"/>
                 <outlet property="tellieGeneralStopButton" destination="1299" id="1392"/>
                 <outlet property="tellieGeneralTriggerDelayTf" destination="1285" id="1330"/>
                 <outlet property="tellieGeneralValidateSettingsButton" destination="1300" id="dXT-rJ-xgx"/>
@@ -155,31 +153,11 @@
                                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                                 </textFieldCell>
                                                                                             </textField>
-                                                                                            <textField verticalHuggingPriority="750" id="1301">
-                                                                                                <rect key="frame" x="16" y="95" width="102" height="22"/>
-                                                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                                                <animations/>
-                                                                                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Run Status:" id="1308">
-                                                                                                    <font key="font" metaFont="system"/>
-                                                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                                                </textFieldCell>
-                                                                                            </textField>
                                                                                             <textField verticalHuggingPriority="750" id="1304">
-                                                                                                <rect key="frame" x="131" y="127" width="309" height="43"/>
+                                                                                                <rect key="frame" x="131" y="95" width="309" height="75"/>
                                                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                                                 <animations/>
                                                                                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" placeholderString="Waiting For Validation" id="1305">
-                                                                                                    <font key="font" metaFont="system"/>
-                                                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                                                </textFieldCell>
-                                                                                            </textField>
-                                                                                            <textField verticalHuggingPriority="750" id="1302">
-                                                                                                <rect key="frame" x="132" y="97" width="269" height="22"/>
-                                                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                                                <animations/>
-                                                                                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" placeholderString="Unknown" id="1307">
                                                                                                     <font key="font" metaFont="system"/>
                                                                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -372,7 +350,7 @@
                                                                                                 <rect key="frame" x="4" y="50" width="127" height="17"/>
                                                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                                                 <animations/>
-                                                                                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Photons per pulse:" id="1280">
+                                                                                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Photons per Pulse:" id="1280">
                                                                                                     <font key="font" metaFont="system"/>
                                                                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -382,17 +360,17 @@
                                                                                                 <rect key="frame" x="4" y="14" width="127" height="17"/>
                                                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                                                 <animations/>
-                                                                                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Trigger delay (ns):" id="1288">
+                                                                                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Trigger Delay (ns):" id="1288">
                                                                                                     <font key="font" metaFont="system"/>
                                                                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                                 </textFieldCell>
                                                                                             </textField>
                                                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="1291">
-                                                                                                <rect key="frame" x="239" y="14" width="135" height="17"/>
+                                                                                                <rect key="frame" x="262" y="14" width="112" height="17"/>
                                                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                                                 <animations/>
-                                                                                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Pulse frequency (Hz):" id="1292">
+                                                                                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Trigger Rate (Hz):" id="1292">
                                                                                                     <font key="font" metaFont="system"/>
                                                                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -402,7 +380,7 @@
                                                                                                 <rect key="frame" x="247" y="47" width="127" height="17"/>
                                                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                                                 <animations/>
-                                                                                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Number of pulses:" id="1284">
+                                                                                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Number of Pulses:" id="1284">
                                                                                                     <font key="font" metaFont="system"/>
                                                                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -463,7 +441,7 @@
                                                                                                 <rect key="frame" x="-20" y="93" width="153" height="34"/>
                                                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                                                 <animations/>
-                                                                                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Trigger Freq. (Hz):" id="1240">
+                                                                                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Trigger Rate (Hz):" id="1240">
                                                                                                     <font key="font" metaFont="system"/>
                                                                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -580,31 +558,11 @@
                                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                                 </textFieldCell>
                                                                                             </textField>
-                                                                                            <textField verticalHuggingPriority="750" id="1203">
-                                                                                                <rect key="frame" x="16" y="91" width="102" height="22"/>
-                                                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                                                <animations/>
-                                                                                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Run Status:" id="1214">
-                                                                                                    <font key="font" metaFont="system"/>
-                                                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                                                </textFieldCell>
-                                                                                            </textField>
                                                                                             <textField verticalHuggingPriority="750" id="1205">
-                                                                                                <rect key="frame" x="131" y="120" width="309" height="49"/>
+                                                                                                <rect key="frame" x="131" y="91" width="309" height="78"/>
                                                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                                                 <animations/>
                                                                                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" placeholderString="Waiting For Validation" id="1212">
-                                                                                                    <font key="font" metaFont="system"/>
-                                                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                                                </textFieldCell>
-                                                                                            </textField>
-                                                                                            <textField verticalHuggingPriority="750" id="1204">
-                                                                                                <rect key="frame" x="132" y="93" width="269" height="22"/>
-                                                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                                                <animations/>
-                                                                                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" placeholderString="Unknown" id="1213">
                                                                                                     <font key="font" metaFont="system"/>
                                                                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>

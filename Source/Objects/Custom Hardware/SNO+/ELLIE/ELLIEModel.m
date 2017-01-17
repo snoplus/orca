@@ -25,11 +25,11 @@
 #import "ELLIEModel.h"
 #import "ORTaskSequence.h"
 #import "ORCouchDB.h"
-#import "SNOPModel.h"
 #import "ORRunModel.h"
-#import "SNOPController.h"
+#import "SNOPModel.h"
 #import "ORMTCModel.h"
 #import "TUBiiModel.h"
+#import "TUBiiController.h"
 #import "ORRunController.h"
 #import "ORMTC_Constants.h"
 #import "SNOP_Run_Constants.h"
@@ -108,9 +108,10 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
 {
     self = [super init];
     if (self){
-        XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"builder1" withPort:@"5030"];
-        //XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"localhost" withPort:@"5030"];
-        XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:@"snodrop1" withPort:@"5020"];
+        //XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"builder1" withPort:@"5030"];
+        //XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:@"snodrop1" withPort:@"5020"];
+        XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"localhost" withPort:@"5030"];
+        XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:@"localhost" withPort:@"5020"];
         [self setTellieClient:tellieCli];
         [self setSmellieClient:smellieCli];
         [[self tellieClient] setTimeout:10];
@@ -125,9 +126,10 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
 {
     self = [super initWithCoder:aCoder];
     if (self){
-        XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"builder1" withPort:@"5030"];
-        //XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"localhost" withPort:@"5030"];
-        XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:@"snodrop1" withPort:@"5020"];
+        //XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"builder1" withPort:@"5030"];
+        //XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:@"snodrop1" withPort:@"5020"];
+        XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"localhost" withPort:@"5030"];
+        XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:@"localhost" withPort:@"5020"];
         [self setTellieClient:tellieCli];
         [self setSmellieClient:smellieCli];
         [[self tellieClient] setTimeout:10];
@@ -229,20 +231,10 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     
     // Some checks on the response
     if ([pollResponse isKindOfClass:[NSString class]]){
-        NSString* reasonStr = [NSString stringWithFormat:@"*** PIN diode poll returned %@. Likely that the sequence didn't finish before timeout.", pollResponse];
-        NSException* e = [NSException
-                          exceptionWithName:@"stringPinResponse"
-                          reason:reasonStr
-                          userInfo:nil];
-        NSLogColor([NSColor redColor], @"[TELLIE]: %@\n", [e reason]);
+        NSLogColor([NSColor redColor], @"[TELLIE]: PIN diode poll returned %@. Likely that the sequence didn't finish before timeout.", pollResponse);
         return blankResponse;
     } else if ([pollResponse count] != 3) {
-        NSString* reasonStr = [NSString stringWithFormat:@"*** PIN diode poll returned array of len %i - expected 3", [pollResponse count]];
-        NSException* e = [NSException
-                          exceptionWithName:@"PinResponseBadArrayLength"
-                          reason:reasonStr
-                          userInfo:nil];
-        NSLogColor([NSColor redColor], @"[TELLIE]: %@\n", [e reason]);
+        NSLogColor([NSColor redColor], @"[TELLIE]: PIN diode poll returned array of len %i - expected 3", [pollResponse count]);
         return blankResponse;
     }
     return pollResponse;
@@ -283,7 +275,6 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     [settingsDict setValue:[NSNumber numberWithInteger:delay] forKey:@"trigger_delay"];
     [settingsDict setValue:[NSNumber numberWithFloat:[fibre_delay floatValue]] forKey:@"fibre_delay"];
     [settingsDict setValue:[NSNumber numberWithInteger:16383] forKey:@"pulse_height"];
-    NSLog(@"Tellie settings dict sucessfully created!\n");
     return settingsDict;
 }
 
@@ -295,24 +286,20 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     */
     // Check if fire parameters have been successfully loaded
     if([self tellieFireParameters] == nil){
-        NSException* e = [NSException
-                          exceptionWithName:@"NoTellieFireParameters"
-                          reason:@"*** TELLIE_FIRE_PARMETERS doc has not been loaded from telliedb - you need to call loadTellieStaticsFromDB"
-                          userInfo:nil];
-        NSLogColor([NSColor redColor], @"[TELLIE]: %@\n", [e reason]);
+        NSLogColor([NSColor redColor], @"[TELLIE]: TELLIE_FIRE_PARMETERS doc has not been loaded from telliedb - you need to call loadTellieStaticsFromDB");
         return 0;
     }
     
     // Run photon intensity check
     bool safety_check = [self photonIntensityCheck:photons atFrequency:frequency];
     if(safety_check == NO){
-        NSLogColor([NSColor redColor], @"[TELLIE] The requested number of photons (%lu), is not detector safe at %lu Hz. This setting will not be run.\n", photons, frequency);
+        NSLogColor([NSColor redColor], @"[TELLIE]: The requested number of photons (%lu), is not detector safe at %lu Hz. This setting will not be run.\n", photons, frequency);
         return [NSNumber numberWithInt:-1];
     }
     
     // Frequency check
     if(frequency != 1000){
-        NSLogColor([NSColor redColor], @"[TELLIE] CAUTION: calibrations are only valid at 1kHz. Photon output may not be vary from requested setting\n");
+        NSLogColor([NSColor orangeColor], @"[TELLIE]: CAUTION calibrations are only valid at 1kHz. Photon output may vary from requested setting\n");
     }
     
     // Used modality to define a string prefix for reading from database file
@@ -333,12 +320,11 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     float min_photons = [[photon_values valueForKeyPath:@"@min.self"] floatValue];
     int min_x = [[IPW_values objectAtIndex:[photon_values indexOfObject:[photon_values valueForKeyPath:@"@min.self"]]] intValue];
     if(photons < min_photons){
-        NSLog(@"Calibration curve for channel %lu does not go as low as %lu photons\n", channel, photons);
-        NSLog(@"Using a linear interpolation of -5ph/IPW from min_photons = %.1f to estimate requested %d photon settings\n",min_photons,photons);
+        NSLog(@"[TELLIE]: Calibration curve for channel %lu does not go as low as %lu photons\n", channel, photons);
+        NSLog(@"[TELLIE]: Using a linear interpolation of -5ph/IPW from min_photons = %.1f to estimate requested %d photon settings\n",min_photons,photons);
         float intercept = min_photons - (-5.*min_x);
         float floatPulseWidth = (photons - intercept)/(-5.);
         NSNumber* pulseWidth = [NSNumber numberWithInteger:floatPulseWidth];
-        NSLog(@"IPW setting calculated as: %d\n",[pulseWidth intValue]);
         return pulseWidth;
     }
     
@@ -362,7 +348,6 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     float intercept = y1 - dydx*x1;
     float floatPulseWidth = (photons - intercept) / dydx;
     NSNumber* pulseWidth = [NSNumber numberWithInteger:floatPulseWidth];
-    NSLog(@"IPW setting calculated as: %d\n",[pulseWidth intValue]);
 
     return pulseWidth;
 }
@@ -393,15 +378,14 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     float min_photons = [[photon_values valueForKeyPath:@"@min.self"] floatValue];
     int max_ipw = [[IPW_values objectAtIndex:[photon_values indexOfObject:[photon_values valueForKeyPath:@"@min.self"]]] intValue];
     if(ipw > max_ipw){
-        NSLog(@"Requested IPW is larger than any value in the calibration curve.\n");
-        NSLog(@"Using a linear interpolation of 5ph/IPW from min_photons = %.1f (IPW = %d) to estimate photon output at requested setting\n",min_photons, max_ipw);
+        NSLog(@"[TELLIE]: Requested IPW is larger than any value in the calibration curve.\n");
+        NSLog(@"[TELLIE]: Using a linear interpolation of 5ph/IPW from min_photons = %.1f (IPW = %d) to estimate photon output at requested setting\n",min_photons, max_ipw);
         float intercept = min_photons - (-5.*max_ipw);
         float photonsFloat = (-5.*ipw) + intercept;
         if(photonsFloat < 0){
             photonsFloat = 0.;
         }
         NSNumber* photons = [NSNumber numberWithFloat:photonsFloat];
-        NSLog(@"Photons output calculated as: %1.2f\n",[photons floatValue]);
         return photons;
     }
     
@@ -427,7 +411,6 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     float intercept = y1 - dydx*x1;
     float photonsFloat = (dydx*ipw) + intercept;
     NSNumber* photons = [NSNumber numberWithInteger:photonsFloat];
-    NSLog(@"Photon output calculated as: %1.1f\n",[photons floatValue]);
     
     return photons;
 }
@@ -454,12 +437,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
      Use node-to-fibre map loaded from the telliedb to find the priority fibre on a node.
      */
     if(![[self tellieNodeMapping] objectForKey:[NSString stringWithFormat:@"panel_%d",node]]){
-        NSString* reasonStr = [NSString stringWithFormat:@"*** Node map does not include a reference to node: %d",node];
-        NSException* eNode = [NSException
-                               exceptionWithName:@"NoFibresFoundOnNode"
-                               reason:reasonStr
-                               userInfo:nil];
-        NSLogColor([NSColor redColor], @"[TELLIE] %@\n", [eNode reason]);
+        NSLogColor([NSColor redColor], @"[TELLIE]: Node map does not include a reference to node: %d",node);
         return nil;
     }
     
@@ -507,27 +485,16 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
      Use patch pannel map loaded from the telliedb to map a given fibre to the correct tellie channel.
     */
     if([self tellieFibreMapping] == nil){
-        NSException* e = [NSException
-                          exceptionWithName:@"EmptyFibreMappingProperty"
-                          reason:@"*** Fibre map has not been loaded from couchdb - you need to call loadTellieStaticsFromDB"
-                          userInfo:nil];
-        NSLogColor([NSColor redColor], @"[TELLIE]: %@\n", [e reason]);
+        NSLogColor([NSColor redColor], @"[TELLIE]: fibre map has not been loaded from couchdb - you need to call loadTellieStaticsFromDB\n");
         return [NSNumber numberWithInt:-1];
     }
     if(![[[self tellieFibreMapping] objectForKey:@"fibres"] containsObject:fibre]){
-        NSString* reasonStr = [NSString stringWithFormat:@"*** Patch map does not include a reference to fibre: %@",fibre];
-        NSException* eFibre = [NSException
-                               exceptionWithName:@"FibreNotPatched"
-                               reason:reasonStr
-                               userInfo:nil];
-        NSLogColor([NSColor redColor], @"[TELLIE]: %@\n", [eFibre reason]);
+        NSLogColor([NSColor redColor], @"[TELLIE]: Patch map does not include a reference to fibre: %@\n",fibre);
         return [NSNumber numberWithInt:-2];
-        //[eFibre raise];
     }
     NSUInteger fibreIndex = [[[self tellieFibreMapping] objectForKey:@"fibres"] indexOfObject:fibre];
     NSUInteger channelInt = [[[[self tellieFibreMapping] objectForKey:@"channels"] objectAtIndex:fibreIndex] integerValue];
     NSNumber* channel = [NSNumber numberWithInt:channelInt];
-    NSLog(@"Fibre: %@ corresponds to tellie channel %d\n",fibre, channelInt);
     return channel;
 }
 
@@ -588,7 +555,6 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     ///////////
     //Set tellieFiring flag
     [self setEllieFireFlag:YES];
-    NSLog(@"ELLIE fire flag set to: %@\n",@YES);
 
     //////////
     /// This will likely be run in a thread so set-up an auto release pool
@@ -597,7 +563,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     ///////////
     // Make a sting accessable inside err; incase of error.
     NSString* errorString;
-
+    
     //////////////
     //Get a Tubii object
     NSArray*  tubiiModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
@@ -612,49 +578,78 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     //Add run control object
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
-        NSException* e = [NSException
-                          exceptionWithName:@"noRunModel"
-                          reason:@"*** Please add a ORRunModel to the experiment"
-                          userInfo:nil];
-        NSLogColor([NSColor redColor], @"[TELLIE]: Couldn't find ORRunModel %@\n", [e reason]);
+        NSLogColor([NSColor redColor], @"[TELLIE]: Couldn't find ORRunModel please add one to the experiment\n");
         [pool release];
         return;
     }
     ORRunModel* runControl = [runModels objectAtIndex:0];
     
+    ///////////////
+    //Add SNOPModel object
+    NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    if(![snopModels count]){
+        NSLogColor([NSColor redColor], @"[TELLIE]: Couldn't find SNOPModel\n");
+        [pool release];
+        return;
+    }
+    SNOPModel* snopModel = [snopModels objectAtIndex:0];
+
     ///////////////////////
     // Check TELLIE run type is masked in
-    if(!([runControl runType] & TELLIE_RUN)){
-        NSLogColor([NSColor redColor], @"[TELLIE] TELLIE bit is not masked into the run type word\n");
-        goto err;
-    }
+    //if(!([snopModel lastRunTypeWord] & TELLIE_RUN)){
+    //    NSLogColor([NSColor redColor], @"[TELLIE]: TELLIE bit is not masked into the run type word.\n");
+    //    NSLogColor([NSColor redColor], @"[TELLIE]: Please load the TELLIE standard run type.\n");
+    //    goto err;
+    //}
+    
+    ///////////////////////
+    // Check trigger is being sent to asyncronus port of the MTC/D (EXT_A)
+    //if(!([theTubiiModel asyncTrigMask] & 0x400000)){
+    //    NSLogColor([NSColor redColor], @"[TELLIE]: Triggers as not being sent to asynchronous MTC/D port\n");
+    //    NSLogColor([NSColor redColor], @"[TELLIE]: Please amend via the TUBii GUI (triggers tab)\n");
+    //    goto err;
+    //}
+    
     //////////////
     // Get run mode boolean
     BOOL isSlave = YES;
-    NSLog(@"Run mode: %@\n", [fireCommands objectForKey:@"run_mode"]);
     if([[fireCommands objectForKey:@"run_mode"] isEqualToString:@"Master"]){
         isSlave = NO;
     }
     
     /////////////
     // Final settings check
-    NSLog(@"Pulse sep: %1.1f ms\n", [[fireCommands objectForKey:@"pulse_separation"] floatValue]);
-    NSLog(@"Pulse width: %d\n", [[fireCommands objectForKey:@"pulse_width"] integerValue]);
     NSNumber* photonOutput = [self calcPhotonsForIPW:[[fireCommands objectForKey:@"pulse_width"] integerValue] forChannel:[[fireCommands objectForKey:@"channel"] integerValue] inSlave:isSlave];
     float rate = 1000.*(1./[[fireCommands objectForKey:@"pulse_separation"] floatValue]);
-    NSLog(@"photon Output: %i photons / pulse\n", [photonOutput integerValue]);
-    NSLog(@"Rate: %1.1f Hz\n", rate);
+    NSLog(@"---------------------------Single Fibre Settings Summary-------------------------\n");
+    NSLog(@"[TELLIE]: Fibre: %@\n", [fireCommands objectForKey:@"fibre"]);
+    NSLog(@"[TELLIE]: Channel: %i\n", [[fireCommands objectForKey:@"channel"] intValue]);
+    if (isSlave){
+        NSLog(@"[TELLIE]: Mode: slave\n");
+    } else {
+        NSLog(@"[TELLIE]: Mode: master\n");
+    }
+    NSLog(@"[TELLIE]: IPW: %d\n", [[fireCommands objectForKey:@"pulse_width"] integerValue]);
+    NSLog(@"[TELLIE]: Trigger delay: %1.1f ns\n", [[fireCommands objectForKey:@"trigger_delay"] floatValue]);
+    NSLog(@"[TELLIE]: Fibre delay: %1.2f ns\n", [[fireCommands objectForKey:@"fibre_delay"] floatValue]);
+    NSLog(@"[TELLIE]: No. triggers %d\n", [[fireCommands objectForKey:@"number_of_shots"] integerValue]);
+    NSLog(@"[TELLIE]: Rate %1.1f Hz\n", rate);
+    NSLog(@"[TELLIE]: Expected photon output: %i photons / pulse\n", [photonOutput integerValue]);
+    NSLog(@"------------\n");
+    NSLog(@"[TELLIE]: Estimated excecution time %1.1f mins\n", (([[fireCommands objectForKey:@"number_of_shots"] integerValue] / rate) + 10) / 60.);
+    NSLog(@"---------------------------------------------------------------------------------------------\n");
+
     BOOL safety_check = [self photonIntensityCheck:[photonOutput integerValue] atFrequency:rate];
     if(safety_check == NO){
-        NSLogColor([NSColor redColor], @"[TELLIE] The requested number of photons (%lu), is not detector safe at %f Hz. This setting will not be run.\n", [photonOutput integerValue], rate);
+        NSLogColor([NSColor redColor], @"[TELLIE]: The requested number of photons (%lu), is not detector safe at %f Hz. This setting will not be run.\n", [photonOutput integerValue], rate);
         return;
     }
     
     ///////////////
     // It's a quirk of TELLIE that entering slave mode can sometimes leave
     // the system in an undefined state. This can be avoided if we always
-    // force a master mode operation, first. For this purpose a 1 shot master
-    // mode sequence is fired herre with the max possible IPW setting - ensuring
+    // force a master mode operation first. For this purpose a 1 shot master
+    // mode sequence is fired here with the max possible IPW setting - ensuring
     // it will never produce light.
     NSArray* fireArgs = @[[[fireCommands objectForKey:@"channel"] stringValue],
                           [NSNumber numberWithInt:1],
@@ -664,7 +659,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
                           [[fireCommands objectForKey:@"pulse_height"] stringValue],
                           [[fireCommands objectForKey:@"fibre_delay"] stringValue],
                           ];
-    NSLog(@"[TELLIE] Setting to definitive master state - will change to slave later in the sequence if it has been requested\n");
+    NSLog(@"[TELLIE]: Forcing tellie into known state. Includes 4s thread sleep to ensure commands poperly processed at hardware\n");
     @try{
         [[self tellieClient] command:@"init_channel" withArgs:fireArgs];
         [NSThread sleepForTimeInterval:4.0f];
@@ -676,7 +671,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     @try{
         [[self tellieClient] command:@"fire_sequence"];
     } @catch(NSException* e){
-        errorString = [NSString stringWithFormat: @"[TELLIE] Problem with dummy fire: %@\n", [e reason]];
+        errorString = [NSString stringWithFormat: @"[TELLIE]: Problem with dummy fire: %@\n", [e reason]];
         NSLogColor([NSColor redColor],errorString);
         goto err;
     }
@@ -695,19 +690,28 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
         } else {
             int iLoops = totalShots / 5e3;
             loops =[NSNumber numberWithInteger:iLoops];
-            
         }
+    }
+    
+    ////////////////
+    // Start new run
+    if([runControl isRunning]){
+        [runControl performSelectorOnMainThread:@selector(restartRun) withObject:nil waitUntilDone:YES];
     }
     
     ///////////////
     // Now set-up is done, push initial run document
     if([runControl isRunning]){
-        [self pushInitialTellieRunDocument];
+        @try{
+            [self pushInitialTellieRunDocument];
+        }@catch(NSException* e){
+            NSLogColor([NSColor redColor],@"[TELLIE]: Problem pushing initial tellie run description document: %@\n", [e reason]);
+            goto err;
+        }
     }
     
     ///////////////
     // Fire loop! Pass variables to the tellie server.
-    NSLog(@"Firing in %@ loops\n", loops);
     for(int i = 0; i<[loops integerValue]; i++){
         if([self ellieFireFlag] == NO || [[NSThread currentThread] isCancelled] == YES){
             //errorString = @"ELLIE fire flag set to @NO";
@@ -720,13 +724,6 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
         if(i == ([loops integerValue]-1) && fRemainder > 0){
             noShots = [NSNumber numberWithInt:fRemainder];
         }
-
-        NSLog(@"***** FIRING %d TELLIE PULSES in Fibre %@ *****\n",[noShots integerValue], [fireCommands objectForKey:@"fibre"]);
-        
-        //////////////////
-        // Start a new subrun
-        [runControl performSelectorOnMainThread:@selector(prepareForNewSubRun) withObject:nil waitUntilDone:YES];
-        [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
         
         //////////////////////
         // Set loop independent tellie channel settings
@@ -735,8 +732,9 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
             ////////
             // Send stop command to ensure buffer is clear
             @try{
-                NSString* responseFromTellie = [[self tellieClient] command:@"stop"];
-                NSLog(@"Sent stop command to tellie, received: %@\n",responseFromTellie);
+                [[self tellieClient] command:@"stop"];
+                [NSThread sleepForTimeInterval:1.0f]; // Wait a short time to ensure command is accepted
+                //NSLog(@"[TELLIE]: Sent stop command to tellie, received: %@\n",responseFromTellie);
             } @catch(NSException* e){
                 // This should only ever be called from the main thread so can raise
                 NSLogColor([NSColor redColor], @"[TELLIE]: Problem with tellie server interpreting stop command!\n");
@@ -753,15 +751,20 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
                                   [[fireCommands objectForKey:@"fibre_delay"] stringValue],
                                   ];
             
-            NSLog(@"Init-ing tellie with settings\n");
+            NSLog(@"[TELLIE]: Init-ing tellie with settings\n");
             @try{
                 [[self tellieClient] command:@"init_channel" withArgs:fireArgs];
-                [NSThread sleepForTimeInterval:2.0f]; // Shouldn't take long as most settings are already set
+                [NSThread sleepForTimeInterval:1.0f]; // Shouldn't take long as most settings are already set
             } @catch(NSException *e){
                 errorString = [NSString stringWithFormat:@"[TELLIE]: Problem init-ing channel on server: %@\n", [e reason]];
                 NSLogColor([NSColor redColor], errorString);
                 goto err;
             }
+        } else {
+            //////////////////
+            // Start a new subrun
+            [runControl performSelectorOnMainThread:@selector(prepareForNewSubRun) withObject:nil waitUntilDone:YES];
+            [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
         }
         
         ////////////////////
@@ -775,9 +778,9 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
         // Set loop dependent tellie channel settings
         @try{
             [[self tellieClient] command:@"set_pulse_number" withArgs:@[noShots]];
-            [NSThread sleepForTimeInterval:1.0f];
+            [NSThread sleepForTimeInterval:0.5f];
         } @catch(NSException* e) {
-            errorString = @"[TELLIE] Problem setting pulse number on server.\n";
+            errorString = @"[TELLIE]: Problem setting pulse number on server.\n";
             NSLogColor([NSColor redColor], errorString);
             goto err;
         }
@@ -789,6 +792,8 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
         [valuesToFillPerSubRun setObject:noShots forKey:@"number_of_shots"];
         [valuesToFillPerSubRun setObject:photonOutput forKey:@"photons"];
         
+        NSLog(@"[TELLIE]: Firing fibre %@: %d pulses, %1.0f Hz\n", [fireCommands objectForKey:@"fibre"], [noShots integerValue], rate);
+        
         ///////////////
         // Handle master / slave mode firing
         //////////////
@@ -799,21 +804,16 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
             @try{
                 [[self tellieClient] command:@"trigger_averaged"];
             } @catch(NSException* e) {
-                errorString = [NSString stringWithFormat:@"[TELLIE] Problem setting pulse number on server: %@\n", [e reason]];
+                errorString = [NSString stringWithFormat:@"[TELLIE]: Problem setting pulse number on server: %@\n", [e reason]];
                 NSLogColor([NSColor redColor], errorString);
                 goto err;
             }
             ////////////
             // Set the tubii model as ask it to fire
             @try{
-                [theTubiiModel setTellieRate:rate];
-                [theTubiiModel setTelliePulseWidth:100e-9];
-                [theTubiiModel setTellieNPulses:[noShots intValue]];
-                //[theTubiiModel fireTelliePulser];
-                //noShots = [NSNumber numberWithInteger:[noShots intValue] + 5000];
                 [theTubiiModel fireTelliePulser_rate:rate pulseWidth:100e-9 NPulses:[noShots intValue]];
             } @catch(NSException* e){
-                errorString = [NSString stringWithFormat:@"[TELLIE] Problem setting tubii parameters: %@\n", [e reason]];
+                errorString = [NSString stringWithFormat:@"[TELLIE]: Problem setting TUBii parameters: %@\n", [e reason]];
                 NSLogColor([NSColor redColor], errorString);
                 goto err;
             }
@@ -825,7 +825,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
             @try{
                 [[self tellieClient] command:@"fire_sequence"];
             } @catch(NSException* e){
-                errorString = [NSString stringWithFormat: @"[TELLIE] Problem requesting tellie master to fire: %@\n", [e reason]];
+                errorString = [NSString stringWithFormat: @"[TELLIE]: Problem requesting tellie master to fire: %@\n", [e reason]];
                 NSLogColor([NSColor redColor],errorString);
                 goto err;
             }
@@ -840,7 +840,6 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
         //////////////////
         // Poll tellie for a pin reading. Give the sequence a 3s grace period to finish
         // long for some reason
-        NSLog(@"Polling for tellie pin response...\n");
         float pollTimeOut = (1./rate)*[noShots floatValue] + 3.;
         NSArray* pinReading = nil;
         @try{
@@ -850,12 +849,12 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
             NSLogColor([NSColor redColor], errorString);
             goto err;
         }
-        NSLog(@"Pin response received %@ +/- %@\n", [pinReading objectAtIndex:0], [pinReading objectAtIndex:1]);
+        NSLog(@"[TELLIE]: Pin response received %i +/- %1.1f\n", [[pinReading objectAtIndex:0] integerValue], [pinReading objectAtIndex:1]);
         @try {
             [valuesToFillPerSubRun setObject:[pinReading objectAtIndex:0] forKey:@"pin_value"];
             [valuesToFillPerSubRun setObject:[pinReading objectAtIndex:1] forKey:@"pin_rms"];
         } @catch (NSException *e) {
-            errorString = [NSString stringWithFormat:@"[TELLIE] Unable to add pin readout to sub_run file due to error: %@\n",[e reason]];
+            errorString = [NSString stringWithFormat:@"[TELLIE]: Unable to add pin readout to sub_run file due to error: %@\n",[e reason]];
             NSLogColor([NSColor redColor], errorString);
             goto err;
         }
@@ -863,7 +862,12 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
         ////////////
         // Update run document
         if([runControl isRunning]){
-            [self updateTellieRunDocument:valuesToFillPerSubRun];
+            @try{
+                [self updateTellieRunDocument:valuesToFillPerSubRun];
+            } @catch(NSException* e){
+                NSLogColor([NSColor redColor],@"[TELLIE]: Problem updating tellie run description document: %@\n", [e reason]);
+                goto err;
+            }
         }
     }
 
@@ -887,7 +891,7 @@ err:
         [self setEllieFireFlag:NO];
         
         //Resetting the mtcd to settings before the smellie run
-        NSLog(@"[TELLIE]: Killing TELLIE run.\n");
+        NSLog(@"[TELLIE]: Killing requested flash sequence\n");
         
         //Make a dictionary to push into sub-run array to indicate error.
         //NSMutableDictionary* errorDict = [NSMutableDictionary dictionaryWithCapacity:10];
@@ -905,7 +909,7 @@ err:
 -(void) stopTellieRun
 {
     /*
-     Make tellie stop firing
+     Make tellie stop firing, tidy up and ensure system is in a well defined state.
     */
 
     //////////////////////
@@ -920,10 +924,12 @@ err:
     // Send stop command to tellie hardware
     @try{
         NSString* responseFromTellie = [[self tellieClient] command:@"stop"];
-        NSLog(@"[TELLIE] Sent stop command to tellie, received: %@\n",responseFromTellie);
+        NSLog(@"[TELLIE]: Sent stop command to tellie, received: %@\n",responseFromTellie);
     } @catch(NSException* e){
         // This should only ever be called from the main thread so can raise
         NSLogColor([NSColor redColor], @"[TELLIE]: Problem with tellie server interpreting stop command!\n");
+        [pool release];
+        return;
     }
 
     ///////////////////
@@ -939,17 +945,11 @@ err:
         [theTubiiModel stopTelliePulser];
     } @catch(NSException* e) {
         NSLogColor([NSColor redColor], @"[TELLIE]: Problem stopping TUBii pulser!\n");
+        [pool release];
+        return;
     }
     
-    // How we want to handle run transtions is currently unclear. It's best not affect the run without the operators
-    // express understanding of what that is doing to the detector state. For now I'll comment out this line. That
-    // leaves the operator to handle run control themselves .
-    /*
-    if([runControl isRunning]){
-        [runControl performSelectorOnMainThread:@selector(restartRun) withObject:nil waitUntilDone:YES];
-    }
-    */
-    NSLog(@"[TELLIE]: Run stopped\n");
+    NSLog(@"[TELLIE]: Stop commands sucessfully sent to tellie and TUBii\n");
     [pool release];
 }
 
@@ -967,14 +967,14 @@ err:
     
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
-        NSLogColor([NSColor redColor], @"[TELLIE]: Couldn't find ORRunModel\n");
+        NSLogColor([NSColor redColor], @"[TELLIE_UPLOAD]: Couldn't find ORRunModel\n");
         return;
     }
     ORRunModel* runControl = [runModels objectAtIndex:0];
 
     NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     if(![snopModels count]){
-        NSLogColor([NSColor redColor], @"[TELLIE] Couldn't find SNOPModel\n");
+        NSLogColor([NSColor redColor], @"[TELLIE_UPLOAD]: Couldn't find SNOPModel\n");
         return;
     }
     SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
@@ -1014,7 +1014,7 @@ err:
     // Get run control
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
-        NSLogColor([NSColor redColor], @"[TELLIE] Couldn't find ORRunModel\n");
+        NSLogColor([NSColor redColor], @"[TELLIE_UPLOAD]: Couldn't find ORRunModel\n");
         return;
     }
     ORRunModel* runControl = [runModels objectAtIndex:0];
@@ -1055,7 +1055,7 @@ err:
     // Load the SNOPModel to access orcaDBIPAddress and orcaDBPort variables
     NSArray* snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     if(![snopModels count]){
-        NSLogColor([NSColor redColor], @"[TELLIE]: Couldn't find SNOPModel %@\n");
+        NSLogColor([NSColor redColor], @"[TELLIE_DATABASE]: Couldn't find SNOPModel\n");
         return;
     }
     SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
@@ -1079,19 +1079,19 @@ err:
                                                         error:&parsDataError];
 
     if(parsDataError){
-        NSLog(@"\n%@\n\n",parsDataError);
+        NSLog(@"[TELLIE_DATABASE]: %@\n\n",parsDataError);
     }
     NSString* parsReturnStr = [[NSString alloc] initWithData:parsData encoding:NSUTF8StringEncoding];
     // Format queried data to dictionary
     NSError* parsDictError =  nil;
     NSMutableDictionary* parsDict = [NSJSONSerialization JSONObjectWithData:[parsReturnStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&parsDictError];
     if(parsDictError){
-        NSLog(@"Error querying couchDB, please check the connection is correct %@\n",parsDictError);
+        NSLog(@"[TELLIE_DATABASE]: Error querying couchDB, please check the connection is correct %@\n",parsDictError);
     }
     [parsReturnStr release];
 
     NSMutableDictionary* fireParametersDoc =[[[parsDict objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"];
-    NSLog(@"%TELLIE channel calibrations sucessfully loaded!\n");
+    NSLog(@"[TELLIE_DATABASE]: channel calibrations sucessfully loaded!\n");
     [self setTellieFireParameters:fireParametersDoc];
 
     // **********************************
@@ -1124,12 +1124,12 @@ err:
     NSError* mapDictError =  nil;
     NSMutableDictionary* mapDict = [NSJSONSerialization JSONObjectWithData:[mapReturnStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&mapDictError];
     if(mapDictError){
-        NSLog(@"Error querying couchDB, please check the connection is correct %@\n",mapDictError);
+        NSLog(@"[TELLIE_DATABASE]: Error querying couchDB, please check the connection is correct %@\n",mapDictError);
     }
     [mapReturnStr release];
 
     NSMutableDictionary* mappingDoc =[[[mapDict objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"];
-    NSLog(@"TELLIE mapping document sucessfully loaded!\n");
+    NSLog(@"[TELLIE_DATABASE]: mapping document sucessfully loaded!\n");
     [self setTellieFibreMapping:mappingDoc];
     
     // **********************************
@@ -1150,7 +1150,7 @@ err:
                                              returningResponse:&nodeUrlResponse
                                                          error:&nodeDataError];
     if(nodeDataError){
-        NSLog(@"\n%@\n\n",nodeDataError);
+        NSLog(@"[TELLIE_DATABASE]: %@\n",nodeDataError);
     }
     NSString* nodeReturnStr = [[NSString alloc] initWithData:nodeData encoding:NSUTF8StringEncoding];
     
@@ -1158,11 +1158,11 @@ err:
     NSError* nodeDictError =  nil;
     NSMutableDictionary* nodeDict = [NSJSONSerialization JSONObjectWithData:[nodeReturnStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&nodeDictError];
     if(nodeDictError){
-        NSLog(@"Error querying couchDB, please check the connection is correct %@\n",nodeDictError);
+        NSLog(@"[TELLIE_DATABASE]: Error querying couchDB, please check the connection is correct %@\n",nodeDictError);
     }
     
     NSMutableDictionary* nodeDoc =[[[nodeDict objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"];
-    NSLog(@"TELLIE node mapping document sucessfully loaded!\n");
+    NSLog(@"[TELLIE_DATABASE]: node mapping document sucessfully loaded!\n");
     [self setTellieNodeMapping:nodeDoc];
     
     [nodeReturnStr release];
@@ -1248,22 +1248,24 @@ err:
     [[self smellieClient] command:@"set_gain_control" withArgs:args];
 }
 
--(void)setSmellieLaserHeadMasterMode:(NSNumber*)laserSwitchChan withIntensity:(NSNumber*)intensity withFibreInput:(NSNumber*)fibreInChan withFibreOutput:(NSNumber*)fibreOutChan withNPulses:(NSNumber*)noPulses withGainVoltage:(NSNumber *)gain
+-(void)setSmellieLaserHeadMasterMode:(NSNumber*)laserSwitchChan withIntensity:(NSNumber*)intensity withRepRate:(NSNumber*)rate withFibreInput:(NSNumber*)fibreInChan withFibreOutput:(NSNumber*)fibreOutChan withNPulses:(NSNumber*)noPulses withGainVoltage:(NSNumber *)gain
 {
     /*
     Run the SMELLIE system in Master Mode (NI Unit provides the trigger signal for both the lasers and the detector) using the PicoQuant Laser Heads
     
     :param ls_chan: the laser switch channel
     :param intensity: the laser intensity in per mil
+    :param rep_rate: the repition rate of requested laser sequence
     :param fs_input_channel: the fibre switch input channel
     :param fs_output_channel: the fibre switch output channel
     :param n_pulses: the number of pulses
+    :param gain: the gain setting to be applied at the MPU
     */
-    NSArray* args = @[laserSwitchChan, intensity, fibreInChan, fibreOutChan, noPulses];
+    NSArray* args = @[laserSwitchChan, intensity, rate, fibreInChan, fibreOutChan, noPulses, gain];
     [[self smellieClient] command:@"laserheads_master_mode" withArgs:args];
 }
 
--(void)setSmellieLaserHeadSlaveMode:(NSNumber*)laserSwitchChan withIntensity:(NSNumber*)intensity withFibreInput:(NSNumber*)fibreInChan withFibreOutput:(NSNumber*)fibreOutChan withNPulses:(NSNumber*)noPulses withGainVoltage:(NSNumber*)gain
+-(void)setSmellieLaserHeadSlaveMode:(NSNumber*)laserSwitchChan withIntensity:(NSNumber*)intensity withFibreInput:(NSNumber*)fibreInChan withFibreOutput:(NSNumber*)fibreOutChan witTime:(NSNumber*)time withGainVoltage:(NSNumber*)gain
 {
     /*
     Run the SMELLIE system in Slave Mode (SNO+ MTC/D provides the trigger signal for both the lasers and the detector) using the PicoQuant Laser Heads
@@ -1274,24 +1276,28 @@ err:
     :param fs_output_channel: the fibre switch output channel
     :param n_pulses: the number of pulses
     :param time: time until SNODROP exits slave mode
+    :param gain: the gain setting to be applied at the MPU
     */
-    NSArray* args = @[laserSwitchChan, intensity, fibreInChan, fibreOutChan, noPulses, gain];
+    NSArray* args = @[laserSwitchChan, intensity, fibreInChan, fibreOutChan, time, gain];
     [[self smellieClient] command:@"laserheads_slave_mode" withArgs:args];
 }
 
--(void)setSmellieSuperkMasterMode:(NSNumber*)laserSwitchChan withIntensity:(NSNumber*)intensity withFibreInput:(NSNumber*)fibreInChan withFibreOutput:(NSNumber*)fibreOutChan withNPulses:(NSNumber*)noPulses withGainVoltage:(NSNumber *)gain
+-(void)setSmellieSuperkMasterMode:(NSNumber*)intensity withRepRate:(NSNumber*)rate withWavelengthLow:(NSNumber*)wavelengthLow withWavelengthHi:(NSNumber*)wavelengthHi withFibreInput:(NSNumber*)fibreInChan withFibreOutput:(NSNumber*)fibreOutChan withNPulses:(NSNumber*)noPulses withGainVoltage:(NSNumber *)gain
 {
     /*
      Run the SMELLIE superK laser in Master Mode
      
-     :param ls_chan: the laser switch channel
      :param intensity: the laser intensity in per mil
+     :param rep_rate: the repetition rate of requested laser sequence
+     :param wavelength_low: the low edge of the wavelength window
+     :param wavelength_hi: the high edge of the wavelength window
      :param fs_input_channel: the fibre switch input channel
      :param fs_output_channel: the fibre switch output channel
      :param n_pulses: the number of pulses
+     :param gain: the gain setting to be applied at the MPU
      */
-    NSArray* args = @[laserSwitchChan, intensity, fibreInChan, fibreOutChan, noPulses, gain];
-    [[self smellieClient] command:@"superK_master_mode" withArgs:args];
+    NSArray* args = @[intensity, rate, wavelengthLow, wavelengthHi, fibreInChan, fibreOutChan, noPulses, gain];
+    [[self smellieClient] command:@"superk_master_mode" withArgs:args];
 }
 
 
@@ -1376,11 +1382,6 @@ err:
     return fibreArray;
 }
 
--(NSArray*)getSmellieRunFrequencyArray:(NSDictionary*)smellieSettings
-{
-    return nil;
-}
-
 -(NSMutableArray*)getSmellieLowEdgeWavelengthArray:(NSDictionary*)smellieSettings
 {
     //Read data
@@ -1444,44 +1445,47 @@ err:
     /*
      Form a smellie run using the passed smellie run file, stored in smellieSettings dictionary.
     */
-    NSLog(@"%@",smellieSettings);
-    NSLog(@"SMELLIE_RUN:Setting up a SMELLIE Run\n");
+    NSLog(@"%@\n",smellieSettings);
+    NSLog(@"[SMELLIE]:Setting up a SMELLIE Run\n");
 
     //////////////
     // This will likely run in thread so make an auto release pool
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    
-    //   GET TUBii, MTC & RunControl MODELS
-    //
+
+    //////////////
+    //   GET TUBii & RunControl MODELS
+    //////////////
     //Get a Tubii object
     NSArray*  tubiiModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
     if(![tubiiModels count]){
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find MTC model. Please add it to the experiment and restart the run.\n");
-        goto err;
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find Tubii model.\n");
+        [pool release];
+        return;
     }
     TUBiiModel* theTubiiModel = [tubiiModels objectAtIndex:0];
 
+    ///////////////
     //Get the run controller
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
         NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find ORRunModel. Please add it to the experiment and restart the run.\n");
-        goto err;
-    } 
+        [pool release];
+        return;
+    }
     ORRunModel* runControl = [runModels objectAtIndex:0];
 
     // FIND AND LOAD RELEVANT CONFIG
     //
     NSNumber* configVersionNo;
     if([smellieSettings objectForKey:@"config_name"]){
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Loading config file: %@\n", [smellieSettings objectForKey:@"config_name"]);
+        NSLog( @"[SMELLIE]: Loading config file: %@\n", [smellieSettings objectForKey:@"config_name"]);
         configVersionNo = [self fetchConfigVersionFor:[smellieSettings objectForKey:@"config_name"]];
     } else {
         configVersionNo = [self fetchRecentConfigVersion];
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Loading config file: %i\n", [configVersionNo intValue]);
+        NSLog( @"[SMELLIE]: Loading config file: %i\n", [configVersionNo intValue]);
     }
     [self setSmellieConfigVersionNo:configVersionNo];
     [self fetchConfigurationFile:configVersionNo];
-    NSLog(@"Config loaded!\n");
 
     // RUN CONTROL
     //
@@ -1492,24 +1496,40 @@ err:
         NSLogColor([NSColor redColor], @"[SMELLIE] SMELLIE bit is not masked into the run type word\n");
         goto err;
     }
-
+    
+    ///////////////////////
+    // Check trigger is being sent to asyncronus port (EXT_A)
+    //if(!([theTubiiModel asyncTrigMask] & 0x800000)){
+    //    NSLogColor([NSColor redColor], @"[SMELLIE]: Triggers as not being sent to asynchronous MTC/D port\n");
+    //    NSLogColor([NSColor redColor], @"[SMELLIE]: Please amend via the TUBii GUI (triggers tab)\n");
+    //    goto err;
+    //}
+    
     // SET MASTER / SLAVE MODE
     //
     NSString *operationMode = [NSString stringWithFormat:@"%@",[smellieSettings objectForKey:@"operation_mode"]];
     if([operationMode isEqualToString:@"Slave Mode"]){
         [self setSmellieSlaveMode:YES];
-        NSLog(@"SMELLIE_RUN:Running in SLAVE mode\n");
+        NSLog(@"[SMELLIE]: Running in SLAVE mode\n");
     }else if([operationMode isEqualToString:@"Master Mode"]){
         [self setSmellieSlaveMode:NO];
-        NSLog(@"SMELIE_RUN:Running in MASTER mode\n");
+        NSLog(@"[SMELIE]: Running in MASTER mode\n");
     }else{
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Slave / master mode could not be read in config file.\n");
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Slave / master mode could not be read in run plan file.\n");
         goto err;
     }
     
     // CREATE AND PUSH SMELLIE RUN DOC
     //
-    [self pushInitialSmellieRunDocument];
+    if([runControl isRunning]){
+        @try{
+            [self pushInitialSmellieRunDocument];
+        } @catch(NSException* e){
+            NSLogColor([NSColor redColor],@"[SMELLIE]: Problem pushing initial run log: %@\n", [e reason]);
+            goto err;
+        }
+
+    }
     
     // GET SMELLIE LASERS AND FIBRES TO LOOP OVER
     // Wavelengths, intensities and gains variables
@@ -1526,11 +1546,12 @@ err:
     // BEGIN LOOPING!
     // laser loop
     //
-    BOOL endOfRun = NO;
     for(NSString* laserKey in laserArray){
-        if(endOfRun == YES){
-            break; //if the end of the run is reached then break the run loop
+        if(([[NSThread currentThread] isCancelled])){
+            NSLogColor([NSColor redColor], @"[SMELLIE]: thread has been cancelled, killing sequence.\n");
+            goto err;
         }
+        NSLog(@"[SMELLIE]: Fire sequence requested for laser: %@\n", laserKey);
         
         // Add laser to the subrun file
         [valuesToFillPerSubRun setObject:laserKey forKey:@"laser"];
@@ -1547,14 +1568,17 @@ err:
         if([laserKey isEqual:@"superK"]){
             lowEdgeWavelengthArray = [self getSmellieLowEdgeWavelengthArray:smellieSettings];
         }
+        NSNumber* rate = [smellieSettings objectForKey:@"trigger_frequency"];
 
         // ***********
         // Fibre loop
         //
         for(NSString* fibreKey in fibreArray){
-            if(endOfRun == YES){
-                break;
+            if(([[NSThread currentThread] isCancelled])){
+                NSLogColor([NSColor redColor], @"[SMELLIE]: thread has been cancelled, killing sequence.\n");
+                goto err;
             }
+            NSLog(@"[SMELLIE]: Fire sequence requested for fibre: %@\n", fibreKey);
 
             // Add fibre to the subRun file
             [valuesToFillPerSubRun setObject:fibreKey forKey:@"fibre"];
@@ -1563,32 +1587,31 @@ err:
             // Wavelength loop
             //
             for(NSNumber* wavelength in lowEdgeWavelengthArray){
-                if(([[NSThread currentThread] isCancelled])){// || ![runControl isRunning]){
-                    endOfRun = YES;
-                    break;
+                if(([[NSThread currentThread] isCancelled])){
+                    NSLogColor([NSColor redColor], @"[SMELLIE]: thread has been cancelled, killing sequence.\n");
+                    goto err;
                 }
                 
-                // By defauly set the wavelength window to nil in rundoc
-                [valuesToFillPerSubRun setObject:@0 forKey:@"wavelength_low_edge"];
-                [valuesToFillPerSubRun setObject:@0 forKey:@"wavelength_high_edge"];
+                // By default set the wavelength window to nil in rundoc
+                NSNumber* wavelengthLowEdge = [NSNumber numberWithInt:0];
+                NSNumber* wavelengthHighEdge = [NSNumber numberWithInt:0];
                 
-                // If this is the superK loop, make sure the wavelength window is set
+                // If this is the superK loop, make sure the wavelength window is set apropriately
                 if([laserKey isEqualToString:@"superK"]){
-                    NSNumber* wavelengthLowEdge = [wavelength integerValue];
-                    NSNumber* wavelengthHighEdge = [wavelengthLowEdge intValue] + [[smellieSettings objectForKey:@"superK_wavelength_bandwidth"] intValue];
-                    
-                    // Add superK wavelength values to run doc
-                    [valuesToFillPerSubRun setObject:wavelengthLowEdge forKey:@"wavelength_low_edge"];
-                    [valuesToFillPerSubRun setObject:wavelengthHighEdge forKey:@"wavelength_high_edge"];
+                    wavelengthLowEdge = wavelength;
+                    wavelengthHighEdge = [NSNumber numberWithInt:([wavelength integerValue] + [[smellieSettings objectForKey:@"superK_wavelength_bandwidth"] integerValue])];
                 }
+
+                [valuesToFillPerSubRun setObject:wavelengthLowEdge forKey:@"wavelength_low_edge"];
+                [valuesToFillPerSubRun setObject:wavelengthHighEdge forKey:@"wavelength_high_edge"];
                 
                 // **************
                 // Intensity loop
                 //
                 for(NSNumber* intensity in intensityArray){
-                    if(([[NSThread currentThread] isCancelled])){// || ![runControl isRunning]){
-                        endOfRun = YES;
-                        break;
+                    if(([[NSThread currentThread] isCancelled])){
+                        NSLogColor([NSColor redColor], @"[SMELLIE]: thread has been cancelled, killing sequence.\n");
+                        goto err;
                     }
                     
                     // Add intensity value into runDoc
@@ -1599,6 +1622,7 @@ err:
                     //
                     for(NSNumber* gain in gainArray){
                         if(([[NSThread currentThread] isCancelled])){
+                            NSLogColor([NSColor redColor], @"[SMELLIE]: thread has been cancelled, killing sequence.\n");
                             goto err;
                         }
                         
@@ -1611,9 +1635,11 @@ err:
                         
                         // RUN CONTROL
                         //Prepare new subrun - will produce a subrun boundrary in the zdab.
-                        [runControl performSelectorOnMainThread:@selector(prepareForNewSubRun) withObject:nil waitUntilDone:YES];
-                        [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
-
+                        if([runControl isRunning]){
+                            [runControl performSelectorOnMainThread:@selector(prepareForNewSubRun) withObject:nil waitUntilDone:YES];
+                            [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
+                        }
+                        
                         //////////////////////
                         // GET FINAL SMELLIE SETTINGS
                         [valuesToFillPerSubRun setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
@@ -1628,17 +1654,16 @@ err:
                         //////////////
                         // Slave mode
                         if([self smellieSlaveMode]){
-
-                            //Set tubii up for sending correct triggers
-                            [theTubiiModel setSmellieRate:[triggerFrequency floatValue]];
-                            [theTubiiModel setSmelliePulseWidth:100];
-                            [theTubiiModel setSmellieNPulses:numOfPulses];
-
-                            //Set SMELLIE settings
                             if([laserKey isEqualTo:@"superK"]){
                                 NSLogColor([NSColor redColor], @"[SMELLIE]: SuperK laser cannot be run in slave mode\n");
                             } else {
-                                [self setSmellieLaserHeadSlaveMode:laserSwitchChannel withIntensity:intensity withFibreInput:fibreInputSwitchChannel withFibreOutput:fibreOutputSwitchChannel withNPulses:numOfPulses withGainVoltage:gain];
+                                @try{
+                                    [self setSmellieLaserHeadSlaveMode:laserSwitchChannel withIntensity:intensity withFibreInput:fibreInputSwitchChannel withFibreOutput:fibreOutputSwitchChannel withTime:time withGainVoltage:gain];
+                                } @catch(NSException* e){
+                                    NSLogColor([NSColor redColor], @"[SMELLIE]: Problem with smellie server request: %@\n", [e reason]);
+                                    goto err;
+                                }
+
                             }
 
                             //// **NOTE** ////
@@ -1647,8 +1672,17 @@ err:
                             // hardware is properly set
                             // before TUBii sends triggers
                             
-                            //Fire trigger pulses!
-                            [theTubiiModel fireSmelliePulser];
+                            //Set tubii up for sending correct triggers
+                            @try{
+                                [theTubiiModel setSmellieRate:[triggerFrequency floatValue]];
+                                [theTubiiModel setSmelliePulseWidth:100];
+                                [theTubiiModel setSmellieNPulses:numOfPulses];
+                                //Fire trigger pulses!
+                                [theTubiiModel fireSmelliePulser];
+                            } @catch(NSException* e) {
+                                NSLogColor([NSColor redColor], @"[SMELLIE]: Problem with TUBii server request: %@\n", [e reason]);
+                                goto err;
+                            }
 
                         //////////////
                         // Master mode
@@ -1656,22 +1690,37 @@ err:
 
                             //Set SMELLIE settings
                             if([laserKey isEqualTo:@"superK"]){
-                                [self setSmellieSuperkMasterMode:laserSwitchChannel withIntensity:intensity withFibreInput:fibreInputSwitchChannel withFibreOutput:fibreOutputSwitchChannel withNPulses:numOfPulses withGainVoltage:gain];
+                                @try{
+                                    [self setSmellieSuperkMasterMode:intensity withRepRate:rate withWavelengthLow:wavelengthLowEdge withWavelengthHi:wavelengthHighEdge withFibreInput:fibreInputSwitchChannel withFibreOutput:fibreOutputSwitchChannel withNPulses:numOfPulses withGainVoltage:gain];
+                                } @catch(NSException* e){
+                                    NSLogColor([NSColor redColor], @"[SMELLIE]: Problem with smellie server request: %@\n", [e reason]);
+                                    goto err;
+                                }
                             } else {
-                                [self setSmellieLaserHeadMasterMode:laserSwitchChannel withIntensity:intensity withFibreInput:fibreInputSwitchChannel withFibreOutput:fibreOutputSwitchChannel withNPulses:numOfPulses withGainVoltage:gain];
+                                @try{
+                                    [self setSmellieLaserHeadMasterMode:laserSwitchChannel withIntensity:intensity withRepRate:rate withFibreInput:fibreInputSwitchChannel withFibreOutput:fibreOutputSwitchChannel withNPulses:numOfPulses withGainVoltage:gain];
+                                } @catch(NSException* e){
+                                    NSLogColor([NSColor redColor], @"[SMELLIE]: Problem with smellie server request: %@\n", [e reason]);
+                                    goto err;
+                                }
                             }
                             
                         }
 
                         //Push record of sub-run settings to db
-                        [self updateSmellieRunDocument:valuesToFillPerSubRun];
+                        if([runControl isRunning]){
+                            @try{
+                                [self updateSmellieRunDocument:valuesToFillPerSubRun];
+                            } @catch(NSException* e){
+                                NSLogColor([NSColor redColor], @"[SMELLIE]: Problem updating couchdb run file: %@\n", [e reason]);
+                                goto err;
+                            }
+                        }
                         
                         //Check if run file requests a sleep time between sub_runs
                         if([smellieSettings objectForKey:@"sleep_between_sub_run"]){
                             NSTimeInterval sleepTime = [[smellieSettings objectForKey:@"sleep_between_sub_run"] floatValue];
                             [NSThread sleepForTimeInterval:sleepTime];
-                        } else {
-                            [NSThread sleepForTimeInterval:1.0f];
                         }
                     }//end of GAIN loop
                 }//end of INTENSITY loop
@@ -1693,11 +1742,11 @@ err:
 err:
 {
     //Resetting the mtcd to settings before the smellie run
-    NSLogColor([NSColor redColor], @"[SMELLIE]: Sent to err statement. Stopping smellie run\n");
+    NSLogColor([NSColor redColor], @"[SMELLIE]: Sent to err statement. Stopping fire sequence.\n");
     [pool release];
-    
+
     //Post a note. on the main thread to request a call to stopSmellieRun
-    [[NSThread currentThread] release];
+    [[NSThread currentThread] cancel];
     dispatch_sync(dispatch_get_main_queue(), ^{
 	    [[NSNotificationCenter defaultCenter] postNotificationName:ORSMELLIERunFinished object:self];
     });
@@ -1716,34 +1765,22 @@ err:
     // This could be run in a thread, so set-up an auto release pool
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     
-    [self setSmellieSafeStates];
-    [self setSuperKSafeStates];
-    
     //Get a Tubii object
     NSArray*  tubiiModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
     if(![tubiiModels count]){
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find MTC model. Please add it to the experiment and restart the run.\n");
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find TUBii model. Please add it to the experiment and restart the run.\n");
         goto err;
     }
     TUBiiModel* theTubiiModel = [tubiiModels objectAtIndex:0];
     [theTubiiModel stopSmelliePulser];
     
-    
-    // How we want to handle run transtions is currently unclear. It's best not affect the run without the operators
-    // express understanding of what that is doing to the detector state. For now I'll comment out this line. That
-    // leaves the operator to handle run control themselves .
-    /*
-     if([runControl isRunning]){
-     [runControl performSelectorOnMainThread:@selector(restartRun) withObject:nil waitUntilDone:YES];
-     }
-     */
-    NSLog(@"SMELLIE_RUN:Stopping SMELLIE Run\n");
+    NSLog(@"[SMELLIE]: Run sequence stopped.\n");
     [pool release];
     return;
     
 err:
     [pool release];
-    NSLog(@"SMELLIE_RUN:Error stopping run\n");
+    NSLog(@"[SMELLIE]: Run sequence stopped - TUBii is in an undefined state (may still be sending triggers).\n");
 }
 
 /*****************************/
@@ -1786,21 +1823,15 @@ err:
 
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
-        NSException* e = [NSException
-                          exceptionWithName:@"noRunModel"
-                          reason:@"*** Please add a ORRunModel to the experiment"
-                          userInfo:nil];
-        [e raise];
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find ORRunModel. Please add one to the experiment and restart the run.\n");
+        return;
     }
     ORRunModel* runControl = [runModels objectAtIndex:0];
 
     NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     if(![snopModels count]){
-        NSException* e = [NSException
-                          exceptionWithName:@"noSNOPModel"
-                          reason:@"*** Please add a SNOPModel to the experiment"
-                          userInfo:nil];
-        [e raise];
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find SNOPModel. Please add one to the experiment and restart the run.\n");
+        return;
     }
     SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
 
@@ -1839,22 +1870,15 @@ err:
      */
     NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     if(![snopModels count]){
-        NSException* e = [NSException
-                          exceptionWithName:@"noSNOPModel"
-                          reason:@"*** Please add a SNOPModel to the experiment"
-                          userInfo:nil];
-        [e raise];
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find SNOPModel. Please add one to the experiment and restart the run.\n");
+        return;
     }
     SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
 
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
-        NSException* e = [NSException
-                          exceptionWithName:@"noRunModel"
-                          reason:@"*** Please add a ORRunModel to the experiment"
-                          userInfo:nil];
-        [e raise];
-    }
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find ORRunModel. Please add it to the experiment and restart the run.\n");
+        return;    }
     ORRunModel* runControl = [runModels objectAtIndex:0];
     
     NSMutableDictionary* runDocDict = [[self smellieRunDoc] mutableCopy];
@@ -1887,21 +1911,15 @@ err:
     //Collect a series of objects from the SNOPModel
     NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     if(![snopModels count]){
-        NSException* e = [NSException
-                          exceptionWithName:@"noSNOPModel"
-                          reason:@"*** Please add a SNOPModel to the experiment"
-                          userInfo:nil];
-        [e raise];
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find SNOPModel. Please add one to the experiment and restart the run.\n");
+        return;
     }
     SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
 
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
-        NSException* e = [NSException
-                          exceptionWithName:@"noRunModel"
-                          reason:@"*** Please add a ORRunModel to the experiment"
-                          userInfo:nil];
-        [e raise];
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find ORRunModel. Please add one to the experiment and restart the run.\n");
+        return;
     }
     ORRunModel* runControl = [runModels objectAtIndex:0];
 
@@ -1943,11 +1961,8 @@ err:
     //Collect a series of objects from the SNOPModel
     NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     if(![snopModels count]){
-        NSException* e = [NSException
-                          exceptionWithName:@"noSNOPModel"
-                          reason:@"*** Please add a SNOPModel to the experiment"
-                          userInfo:nil];
-        [e raise];
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find SNOPModel. Please add one to the experiment and restart the run.\n");
+        return;
     }
     //Initialise the SNOPModel
     SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
@@ -1999,11 +2014,8 @@ err:
     //Collect a series of objects from the SNOPModel
     NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     if(![snopModels count]){
-        NSException* e = [NSException
-                          exceptionWithName:@"noSNOPModel"
-                          reason:@"*** Please add a SNOPModel to the experiment"
-                          userInfo:nil];
-        [e raise];
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find SNOPModel. Please add one to the experiment and restart the run.\n");
+        return @-1;
     }
     SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
     
@@ -2015,7 +2027,7 @@ err:
     NSError *error =  nil;
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
     if(error){
-        NSLog(@"Error querying couchDB, please check the connection is correct %@",error);
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Error in querying couchDB: %@\n", error);
     }
 
     @try{
@@ -2024,10 +2036,10 @@ err:
         currentVersionNumber = [NSNumber numberWithInt:[stringValueOfCurrentVersion intValue]];
     }
     @catch (NSException *e) {
-        NSLog(@"Error in fetching the SMELLIE CONFIGURATION FILE: %@ . Please fix this before changing the configuration file",e);
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Error in fetching the SMELLIE CONFIGURATION FILE: %@\n", [e reason]);
         return @-1;
     }
-    NSLog(@"SMELLIE config version sucessfully loaded!\n");
+    NSLog(@"[SMELLIE]: config version sucessfully loaded!\n");
     return currentVersionNumber;
 }
 
@@ -2100,9 +2112,8 @@ err:
     NSError *error =  nil;
     NSMutableDictionary *currentConfig = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
     if(error){
-        NSLog(@"Error querying couchDB, please check the connection is correct %@",error);
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Error querying the couchDB: %@\n", error);
     }
-
     [ret release];
 
     NSMutableDictionary* configForSmellie = [[[[currentConfig objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"] objectForKey:@"configuration_info"];
@@ -2167,7 +2178,7 @@ err:
     [self setSmellieFibreSwitchToFibreMapping:fibreSwitchOutputToFibre];
     [fibreSwitchOutputToFibre release];
     
-    NSLog(@"SMELLIE config file (version %i) sucessfully loaded!\n", [currentVersion intValue]);
+    NSLog(@"[SMELLIE] config file (version %i) sucessfully loaded!\n", [currentVersion intValue]);
     return configForSmellie;
 }
 
