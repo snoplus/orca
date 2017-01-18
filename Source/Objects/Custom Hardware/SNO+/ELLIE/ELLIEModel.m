@@ -596,11 +596,11 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
 
     ///////////////////////
     // Check TELLIE run type is masked in
-    //if(!([snopModel lastRunTypeWord] & TELLIE_RUN)){
-    //    NSLogColor([NSColor redColor], @"[TELLIE]: TELLIE bit is not masked into the run type word.\n");
-    //    NSLogColor([NSColor redColor], @"[TELLIE]: Please load the TELLIE standard run type.\n");
-    //    goto err;
-    //}
+    if(!([snopModel lastRunTypeWord] & TELLIE_RUN)){
+        NSLogColor([NSColor redColor], @"[TELLIE]: TELLIE bit is not masked into the run type word.\n");
+        NSLogColor([NSColor redColor], @"[TELLIE]: Please load the TELLIE standard run type.\n");
+        goto err;
+    }
     
     ///////////////////////
     // Check trigger is being sent to asyncronus port of the MTC/D (EXT_A)
@@ -693,12 +693,6 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
         }
     }
     
-    ////////////////
-    // Start new run
-    if([runControl isRunning]){
-        [runControl performSelectorOnMainThread:@selector(restartRun) withObject:nil waitUntilDone:YES];
-    }
-    
     ///////////////
     // Now set-up is done, push initial run document
     if([runControl isRunning]){
@@ -745,7 +739,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
             NSArray* fireArgs = @[[[fireCommands objectForKey:@"channel"] stringValue],
                                   [noShots stringValue],
                                   [[fireCommands objectForKey:@"pulse_separation"] stringValue],
-                                  [[fireCommands objectForKey:@"trigger_delay"] stringValue],
+                                  [NSNumber numberWithInt:0], // Trigger delay now handled by TUBii
                                   [[fireCommands objectForKey:@"pulse_width"] stringValue],
                                   [[fireCommands objectForKey:@"pulse_height"] stringValue],
                                   [[fireCommands objectForKey:@"fibre_delay"] stringValue],
@@ -760,6 +754,15 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
                 NSLogColor([NSColor redColor], errorString);
                 goto err;
             }
+            
+            @try{
+                [theTubiiModel setTellieDelay:[[fireCommands objectForKey:@"trigger_delay"] intValue]];
+            } @catch(NSException* e) {
+                errorString = [NSString stringWithFormat:@"[TELLIE]: Problem setting trigger delay at TUBii: %@\n", [e reason]];
+                NSLogColor([NSColor redColor], errorString);
+                goto err;
+            }
+            
         } else {
             //////////////////
             // Start a new subrun
@@ -809,7 +812,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
                 goto err;
             }
             ////////////
-            // Set the tubii model as ask it to fire
+            // Set the tubii model aand ask it to fire
             @try{
                 [theTubiiModel fireTelliePulser_rate:rate pulseWidth:100e-9 NPulses:[noShots intValue]];
             } @catch(NSException* e){
@@ -1171,81 +1174,9 @@ err:
 /*********************************************************/
 /*                  Smellie Functions                    */
 /*********************************************************/
--(void)setSmellieSafeStates
-{
-    [[self smellieClient] command:@"set_safe_states"];
-}
-
--(void)setLaserSwitch:(NSNumber*)laserSwitchChannel
-{
-    NSArray* args = @[laserSwitchChannel];
-    [[self smellieClient] command:@"set_laser_switch" withArgs:args];
-}
-
--(void)setFibreSwitch:(NSNumber*)fibreSwitchInputChannel withOutputChannel:(NSNumber*)fibreSwitchOutputChannel
-{
-    NSArray* args = @[fibreSwitchInputChannel, fibreSwitchOutputChannel];
-    [[self smellieClient] command:@"set_fibre_switch" withArgs:args];
-}
-
--(void)setLaserIntensity:(NSNumber*)laserIntensity
-{
-    NSArray* args = @[laserIntensity];
-    [[self smellieClient] command:@"set_laser_intensity" withArgs:args];
-}
-
--(void)setPMTGain:(NSNumber *)gainVoltage
-{
-    //Currently do nothing
-}
-
--(void)setLaserSoftLockOn
-{
-    [[self smellieClient] command:@"set_soft_lock_on"];
-}
-
--(void)setLaserSoftLockOff
-{
-    [[self smellieClient] command:@"set_soft_lock_off"];
-}
-
-//this function kills any external software that will block the functions of a smellie run
--(void)killBlockingSoftware
-{
-    [[self smellieClient] command:@"kill_sepia_and_nimax"];
-}
-
--(void)setSmellieMasterMode:(NSNumber*)triggerFrequency withNumOfPulses:(NSNumber*)numOfPulses
-{
-    NSArray* args = @[triggerFrequency, numOfPulses];
-    [[self smellieClient] command:@"pulse_master_mode" withArgs:args];
-}
-
--(void)setSuperKSafeStates
-{
-    [[self smellieClient] command:@"set_superk_safe_states"];
-}
-
--(void)setSuperKSoftLockOn
-{
-    [[self smellieClient] command:@"set_superk_lock_on"];
-}
-
--(void)setSuperKSoftLockOff
-{
-    [[self smellieClient] command:@"set_superk_lock_off"];
-}
-
--(void) setSuperKWavelegth:(NSNumber*)lowBin withHighEdge:(NSNumber*)highBin
-{
-    NSArray* args = @[lowBin, highBin];
-    [[self smellieClient] command:@"set_superk_wavelength" withArgs:args];
-}
-
--(void)setGainControlWithGainVoltage:(NSNumber*)gainVoltage
-{
-    NSArray* args = @[gainVoltage];
-    [[self smellieClient] command:@"set_gain_control" withArgs:args];
+-(void) setSmellieNewRun:(NSNumber *)runNumber{
+    NSArray* args = @[runNumber];
+    [[self smellieClient] command:@"new_run" withArgs:args];
 }
 
 -(void)setSmellieLaserHeadMasterMode:(NSNumber*)laserSwitchChan withIntensity:(NSNumber*)intensity withRepRate:(NSNumber*)rate withFibreInput:(NSNumber*)fibreInChan withFibreOutput:(NSNumber*)fibreOutChan withNPulses:(NSNumber*)noPulses withGainVoltage:(NSNumber *)gain
@@ -1265,7 +1196,7 @@ err:
     [[self smellieClient] command:@"laserheads_master_mode" withArgs:args];
 }
 
--(void)setSmellieLaserHeadSlaveMode:(NSNumber*)laserSwitchChan withIntensity:(NSNumber*)intensity withFibreInput:(NSNumber*)fibreInChan withFibreOutput:(NSNumber*)fibreOutChan witTime:(NSNumber*)time withGainVoltage:(NSNumber*)gain
+-(void)setSmellieLaserHeadSlaveMode:(NSNumber*)laserSwitchChan withIntensity:(NSNumber*)intensity withFibreInput:(NSNumber*)fibreInChan withFibreOutput:(NSNumber*)fibreOutChan withTime:(NSNumber*)time withGainVoltage:(NSNumber*)gain
 {
     /*
     Run the SMELLIE system in Slave Mode (SNO+ MTC/D provides the trigger signal for both the lasers and the detector) using the PicoQuant Laser Heads
@@ -1425,8 +1356,8 @@ err:
 -(NSMutableArray*)getSmellieRunGainArray:(NSDictionary*)smellieSettings forLaser:(NSString *)laser
 {
     //Extract bounds
-    float minIntensity = [[smellieSettings objectForKey:[NSString stringWithFormat:@"%@_gain_minimum",laser]] intValue];
-    float increment = [[smellieSettings objectForKey:[NSString stringWithFormat:@"%@_gain_increment",laser]] intValue];
+    float minIntensity = [[smellieSettings objectForKey:[NSString stringWithFormat:@"%@_gain_minimum",laser]] floatValue];
+    float increment = [[smellieSettings objectForKey:[NSString stringWithFormat:@"%@_gain_increment",laser]] floatValue];
     int noSteps = [[smellieSettings objectForKey:[NSString stringWithFormat:@"%@_gain_no_steps",laser]] intValue];
     
     //Check to see if the maximum intensity is the same as the minimum intensity
@@ -1445,7 +1376,6 @@ err:
     /*
      Form a smellie run using the passed smellie run file, stored in smellieSettings dictionary.
     */
-    NSLog(@"%@\n",smellieSettings);
     NSLog(@"[SMELLIE]:Setting up a SMELLIE Run\n");
 
     //////////////
@@ -1474,8 +1404,8 @@ err:
     }
     ORRunModel* runControl = [runModels objectAtIndex:0];
 
+    ///////////////
     // FIND AND LOAD RELEVANT CONFIG
-    //
     NSNumber* configVersionNo;
     if([smellieSettings objectForKey:@"config_name"]){
         NSLog( @"[SMELLIE]: Loading config file: %@\n", [smellieSettings objectForKey:@"config_name"]);
@@ -1487,13 +1417,13 @@ err:
     [self setSmellieConfigVersionNo:configVersionNo];
     [self fetchConfigurationFile:configVersionNo];
 
+    ///////////////
     // RUN CONTROL
-    //
-    //Set up run control
     ///////////////////////
     // Check SMELLIE run type is masked in
     if(!([runControl runType] & SMELLIE_RUN)){
         NSLogColor([NSColor redColor], @"[SMELLIE] SMELLIE bit is not masked into the run type word\n");
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Please load the SMELLIE standard run type.\n");
         goto err;
     }
     
@@ -1513,24 +1443,13 @@ err:
         NSLog(@"[SMELLIE]: Running in SLAVE mode\n");
     }else if([operationMode isEqualToString:@"Master Mode"]){
         [self setSmellieSlaveMode:NO];
-        NSLog(@"[SMELIE]: Running in MASTER mode\n");
+        NSLog(@"[SMELLIE]: Running in MASTER mode\n");
     }else{
         NSLogColor([NSColor redColor], @"[SMELLIE]: Slave / master mode could not be read in run plan file.\n");
         goto err;
     }
     
-    // CREATE AND PUSH SMELLIE RUN DOC
-    //
-    if([runControl isRunning]){
-        @try{
-            [self pushInitialSmellieRunDocument];
-        } @catch(NSException* e){
-            NSLogColor([NSColor redColor],@"[SMELLIE]: Problem pushing initial run log: %@\n", [e reason]);
-            goto err;
-        }
-
-    }
-    
+    /////////////////////
     // GET SMELLIE LASERS AND FIBRES TO LOOP OVER
     // Wavelengths, intensities and gains variables
     // for each fibre are generated within the laser
@@ -1541,6 +1460,32 @@ err:
 
     // Make a dictionary to hold settings for pushing upto database
     NSMutableDictionary *valuesToFillPerSubRun = [[NSMutableDictionary alloc] initWithCapacity:100];
+    
+    //////////////////////
+    // Define some parameters for overheads calculation
+    NSNumber* changeIntensity = [NSNumber numberWithFloat:0.5];
+    NSNumber* changeFibre = [NSNumber numberWithFloat:0.1];
+    NSNumber* changeFixedLaser = [NSNumber numberWithFloat:45];
+    NSNumber* changeSKWavelength = [NSNumber numberWithFloat:1];
+    NSNumber* changeGain = [NSNumber numberWithFloat:0.5];
+    
+    /////////////////////
+    // Create and push initial smellie run doc and tell smellie which run we're in
+    if([runControl isRunning]){
+        @try{
+            [self setSmellieNewRun:[runControl runNumber]];
+        } @catch(NSException* e) {
+            NSLogColor([NSColor redColor], @"[SMELLIE]: Problem with server request: %@\n", [e reason]);
+            goto err;
+        }
+        
+        @try{
+            [self pushInitialSmellieRunDocument];
+        } @catch(NSException* e){
+            NSLogColor([NSColor redColor],@"[SMELLIE]: Problem pushing initial run log: %@\n", [e reason]);
+            goto err;
+        }
+    }
     
     // ***********************
     // BEGIN LOOPING!
@@ -1649,8 +1594,44 @@ err:
                         NSNumber* fibreOutputSwitchChannel = [[self smellieFibreSwitchToFibreMapping] objectForKey:fibreKey];
                         NSNumber* numOfPulses = [smellieSettings objectForKey:@"triggers_per_loop"];
                         NSNumber* triggerFrequency = [smellieSettings objectForKey:@"trigger_frequency"];
-
-                      
+                        
+                        //////////////////////
+                        // Calculate how long we expect this run loop to take
+                        // Active firing time
+                        float fireTime = [rate floatValue]*[numOfPulses floatValue];
+                        // Overheads
+                        // Assuption is that at the start of a new outer loop, all the inner
+                        // loops must start from the first object in their array.
+                        float overheads = [changeGain floatValue];
+                        if([gain isEqualTo:[gainArray firstObject]]){ // New intensity
+                            overheads = overheads + [changeIntensity floatValue];
+                            if([intensity isEqualTo:[intensityArray firstObject]]){ // New wavelength
+                                if([laserKey isEqualTo:@"superK"]){ // only important for superK
+                                    overheads = overheads + [changeSKWavelength floatValue];
+                                }
+                                if([wavelength isEqualTo:[lowEdgeWavelengthArray firstObject]]){ // New fibre
+                                    overheads = overheads + [changeFibre floatValue];
+                                    if([fibreKey isEqualTo:[fibreArray firstObject]]){ // New laser
+                                        if(![laserKey isEqualTo:@"superK"]){ // Only changing fixed lasers takes time
+                                            overheads = overheads + [changeFixedLaser floatValue];
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        NSNumber* sequenceTime = [NSNumber numberWithFloat:(fireTime+overheads)];
+                        
+                        //// **NOTE** ////
+                        // Need to add a call to TUBii
+                        // to set the trigger delay. This
+                        // will be done using:
+                        // [theTUBiiModel setSmellieDelay]
+                        //
+                        // The delay field isn't currently
+                        // included in the run description
+                        // doc - needs discussion with
+                        // smellie group
+                        
                         //////////////
                         // Slave mode
                         if([self smellieSlaveMode]){
@@ -1658,7 +1639,7 @@ err:
                                 NSLogColor([NSColor redColor], @"[SMELLIE]: SuperK laser cannot be run in slave mode\n");
                             } else {
                                 @try{
-                                    [self setSmellieLaserHeadSlaveMode:laserSwitchChannel withIntensity:intensity withFibreInput:fibreInputSwitchChannel withFibreOutput:fibreOutputSwitchChannel withTime:time withGainVoltage:gain];
+                                    [self setSmellieLaserHeadSlaveMode:laserSwitchChannel withIntensity:intensity withFibreInput:fibreInputSwitchChannel withFibreOutput:fibreOutputSwitchChannel withTime:sequenceTime withGainVoltage:gain];
                                 } @catch(NSException* e){
                                     NSLogColor([NSColor redColor], @"[SMELLIE]: Problem with smellie server request: %@\n", [e reason]);
                                     goto err;

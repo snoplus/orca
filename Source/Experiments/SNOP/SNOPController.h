@@ -92,6 +92,7 @@
     IBOutlet NSButton *smellieChangeConfiguration;
 
     //TELLIE
+    NSDictionary* tellieFireSettings;
     NSThread* tellieThread;
     
     IBOutlet NSButton* runsLockButton;
@@ -144,6 +145,7 @@
     IBOutlet WebView* detectorState;
 }
 
+@property (nonatomic,retain) NSDictionary *tellieFireSettings;
 @property (nonatomic,retain) NSMutableDictionary *smellieRunFileList;
 @property (nonatomic,retain) NSDictionary *smellieRunFile;
 @property (nonatomic,retain) NSColor *snopRedColor;

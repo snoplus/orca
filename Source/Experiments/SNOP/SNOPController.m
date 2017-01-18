@@ -41,6 +41,7 @@ NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 @implementation SNOPController
 
 @synthesize
+tellieFireSettings,
 smellieRunFileList,
 smellieRunFile,
 snopBlueColor,
@@ -906,6 +907,8 @@ snopGreenColor;
 - (IBAction) fetchRunFiles:(id)sender
 {
     // Temporarily disable drop down list and remove old items
+    [smellieRunFileNameField addItemWithObjectValue:@""];
+    [smellieRunFileNameField selectItemWithObjectValue:@""];
     [smellieRunFileNameField setEnabled:NO];
     [smellieRunFileNameField removeAllItems];
     [smellieStartRunButton setEnabled:NO];
@@ -1064,6 +1067,13 @@ snopGreenColor;
         return;
     }
     
+    if(![[model standardRunType] isEqualToString:@"SMELLIE"]){
+        [model setStandardRunType:@"SMELLIE"];
+        [self loadStandardRunFromDBAction:self];
+        [self startRunAction:self];
+        NSLogColor([NSColor blackColor], @"[SMELLIE]: Standard run type has been programatically set to SMELLIE\n");
+    }
+    
     [smellieLoadRunFile setEnabled:NO];
     [smellieRunFileNameField setEnabled:NO];
     [smellieStopRunButton setEnabled:YES];
@@ -1083,26 +1093,15 @@ snopGreenColor;
       [e raise];
     }
     ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
-    //Method for completing this without a new thread
-    //[theELLIEModel startSmellieRun:smellieRunFile];
-    
-    //if([model isRunTypeMaskedIn:@"Smellie"]){
     
     smellieThread = [[NSThread alloc] initWithTarget:theELLIEModel selector:@selector(startSmellieRun:) object:smellieRunFile];
     [smellieThread start];
-
-    //}
-    //else{
-    //    NSLog(@"Smellie Run Type is not masked in. Please mask this in and try again \n");
-    //}
-    //[NSThread detachNewThreadSelector:@selector(startSmellieRun:) toTarget:theELLIEModel withObject:smellieRunFile];
 }
 
 - (IBAction) stopSmellieRunAction:(id)sender
 {
     [smellieLoadRunFile setEnabled:YES];
     [smellieRunFileNameField setEnabled:YES];
-    [smellieStartRunButton setEnabled:YES];
     [smellieStopRunButton setEnabled:NO];
     //[smellieCheckInterlock setEnabled:YES];
 
@@ -1134,6 +1133,14 @@ snopGreenColor;
     } @catch(NSException* e){
         [e raise];
     }
+    
+    ////////////
+    // Roll over into maintinance run
+    if([[model standardRunType] isEqualToString:@"SMELLIE"]){
+        [model setStandardRunType:@"MAINTENANCE"];
+        [self loadStandardRunFromDBAction:self];
+        [self startRunAction:self];
+    }
 }
 
 - (IBAction) emergencySmellieStopAction:(id)sender
@@ -1152,11 +1159,6 @@ snopGreenColor;
     //TODO:Make a note in the datastream that this happened
 }
 
--(IBAction)startTellieRunAction:(id)sender
-{
-
-}
-
 -(void)startTellieRunNotification:(NSNotification *)note;
 {
     //////////////////
@@ -1166,6 +1168,13 @@ snopGreenColor;
     if([tellieThread isExecuting]){
         NSLogColor([NSColor redColor], @"[TELLIE]: A tellie fire sequence is already on going. Cannot launch a new one until current sequence has finished\n");
         return;
+    }
+    
+    if(![[model standardRunType] isEqualToString:@"TELLIE"]){
+        [model setStandardRunType:@"TELLIE"];
+        [self loadStandardRunFromDBAction:self];
+        [self startRunAction:self];
+        NSLogColor([NSColor blackColor], @"[TELLIE]: Standard run type has been programatically set to TELLIE.\n");
     }
     
     //////////////////
@@ -1182,9 +1191,13 @@ snopGreenColor;
     }
     ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
     
-    NSDictionary* fireSettings = [note userInfo];
-    tellieThread = [[NSThread alloc] initWithTarget:theELLIEModel selector:@selector(startTellieRun:) object:fireSettings];
-    [tellieThread start];
+    [self setTellieFireSettings:[note userInfo]];
+    tellieThread = [[NSThread alloc] initWithTarget:theELLIEModel selector:@selector(startTellieRun:) object:[self tellieFireSettings]];
+    [tellieThread start];}
+
+-(IBAction)startTellieRunAction:(id)sender
+{
+
 }
 
 - (IBAction) stopTellieRunAction:(id)sender
@@ -1220,7 +1233,13 @@ snopGreenColor;
     
     ////////////
     // Roll over into maintinance run
-    [model setStandardRunType:@"MAINTENANCE"];
+    if([[model standardRunType] isEqualToString:@"TELLIE"]){
+        [model setStandardRunType:@"MAINTENANCE"];
+        [self loadStandardRunFromDBAction:self];
+        [self startRunAction:self];
+    }
+    
+    [self setTellieFireSettings:nil];
 }
 
 - (IBAction) runsLockAction:(id)sender

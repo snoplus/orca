@@ -110,22 +110,11 @@
 /************************/
 
 //SMELLIE Control Functions
--(void) setSmellieSafeStates;
--(void) setLaserSwitch:(NSNumber*)laserSwitchChannel;
--(void) setFibreSwitch:(NSNumber*)fibreSwitchInputChannel withOutputChannel:(NSNumber*)fibreSwitchOutputChannel;
--(void) setLaserIntensity:(NSNumber*)laserIntensity;
--(void) setLaserSoftLockOn;
--(void) setLaserSoftLockOff;
--(void) setPMTGain:(NSNumber*)gainVoltage;
--(void) setSmellieMasterMode:(NSString*)triggerFrequency withNumOfPulses:(NSString*)numOfPulses;
--(void) setSuperKSafeStates;
--(void) setSuperKSoftLockOn;
--(void) setSuperKSoftLockOff;
--(void) setSuperKWavelegth:(NSNumber*)lowBin withHighEdge:(NSNumber*)highBin;
+-(void) setSmellieNewRun:(NSNumber *)runNumber;
 
 -(void) setSmellieLaserHeadMasterMode:(NSNumber*)laserSwitchChan withIntensity:(NSNumber*)intensity withRepRate:(NSNumber*)rate withFibreInput:(NSNumber*)fibreInChan withFibreOutput:(NSNumber*)fibreOutChan withNPulses:(NSNumber*)noPulses withGainVoltage:(NSNumber*)gain;
 
--(void) setSmellieLaserHeadSlaveMode:(NSNumber*)laserSwitchChan withIntensity:(NSNumber*)intensity withFibreInput:(NSNumber*)fibreInChan withFibreOutput:(NSNumber*)fibreOutChan witTime:(NSNumber*)time withGainVoltage:(NSNumber*)gain;
+-(void) setSmellieLaserHeadSlaveMode:(NSNumber*)laserSwitchChan withIntensity:(NSNumber*)intensity withFibreInput:(NSNumber*)fibreInChan withFibreOutput:(NSNumber*)fibreOutChan withTime:(NSNumber*)time withGainVoltage:(NSNumber*)gain;
 
 -(void)setSmellieSuperkMasterMode:(NSNumber*)intensity withRepRate:(NSNumber*)rate withWavelengthLow:(NSNumber*)wavelengthLow withWavelengthHi:(NSNumber*)wavelengthHi withFibreInput:(NSNumber*)fibreInChan withFibreOutput:(NSNumber*)fibreOutChan withNPulses:(NSNumber*)noPulses withGainVoltage:(NSNumber *)gain;
 
