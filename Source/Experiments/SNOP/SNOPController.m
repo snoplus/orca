@@ -41,6 +41,7 @@ NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 @implementation SNOPController
 
 @synthesize
+tellieStandardSequenceFlag,
 tellieFireSettings,
 smellieRunFileList,
 smellieRunFile,
@@ -1067,11 +1068,9 @@ snopGreenColor;
         return;
     }
     
-    if(![[model standardRunType] isEqualToString:@"SMELLIE"]){
-        [model setStandardRunType:@"SMELLIE"];
-        [self loadStandardRunFromDBAction:self];
-        [self startRunAction:self];
-        NSLogColor([NSColor blackColor], @"[SMELLIE]: Standard run type has been programatically set to SMELLIE\n");
+    if(![[model lastStandardRunType] isEqualToString:@"SMELLIE"]){
+        ORRunAlertPanel(@"The SMELLIE standard run is not loaded.",@"You must load a SMELLIE standard run and start a new run before starting a fire sequence",@"OK",nil,nil);
+        return;
     }
     
     [smellieLoadRunFile setEnabled:NO];
@@ -1133,10 +1132,10 @@ snopGreenColor;
     } @catch(NSException* e){
         [e raise];
     }
-    
+
     ////////////
     // Roll over into maintinance run
-    if([[model standardRunType] isEqualToString:@"SMELLIE"]){
+    if([[model lastStandardRunType] isEqualToString:@"SMELLIE"]){
         [model setStandardRunType:@"MAINTENANCE"];
         [self loadStandardRunFromDBAction:self];
         [self startRunAction:self];
@@ -1161,6 +1160,12 @@ snopGreenColor;
 
 -(void)startTellieRunNotification:(NSNotification *)note;
 {
+    [self setTellieFireSettings:[note userInfo]];
+    [self startTellieRunAction:nil];
+}
+
+-(IBAction)startTellieRunAction:(id)sender
+{
     //////////////////
     // Check if a run is already ongoing
     // If so tell the user and ignore this
@@ -1170,11 +1175,9 @@ snopGreenColor;
         return;
     }
     
-    if(![[model standardRunType] isEqualToString:@"TELLIE"]){
-        [model setStandardRunType:@"TELLIE"];
-        [self loadStandardRunFromDBAction:self];
-        [self startRunAction:self];
-        NSLogColor([NSColor blackColor], @"[TELLIE]: Standard run type has been programatically set to TELLIE.\n");
+    if(![[model lastStandardRunType] isEqualToString:@"TELLIE"]){
+        ORRunAlertPanel(@"The TELLIE standard run is not loaded.",@"You must load a TELLIE standard run and start a new run before starting a fire sequence",@"OK",nil,nil);
+        return;
     }
     
     //////////////////
@@ -1191,13 +1194,13 @@ snopGreenColor;
     }
     ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
     
-    [self setTellieFireSettings:[note userInfo]];
-    tellieThread = [[NSThread alloc] initWithTarget:theELLIEModel selector:@selector(startTellieRun:) object:[self tellieFireSettings]];
-    [tellieThread start];}
-
--(IBAction)startTellieRunAction:(id)sender
-{
-
+    // Handle if this came from an ELLIE GUI call
+    if(!sender){
+        [self setTellieStandardSequenceFlag:NO];
+        tellieThread = [[NSThread alloc] initWithTarget:theELLIEModel selector:@selector(startTellieRun:) object:[self tellieFireSettings]];
+        [tellieThread start];
+        return;
+    }
 }
 
 - (IBAction) stopTellieRunAction:(id)sender
@@ -1232,11 +1235,19 @@ snopGreenColor;
     }
     
     ////////////
-    // Roll over into maintinance run
-    if([[model standardRunType] isEqualToString:@"TELLIE"]){
-        [model setStandardRunType:@"MAINTENANCE"];
-        [self loadStandardRunFromDBAction:self];
-        [self startRunAction:self];
+    // Handle end of run sqeuencing
+    if([[model lastStandardRunType] isEqualToString:@"TELLIE"]){
+        // If user was running a TELLIE standard sequence, roll over into maintinance run
+        if([self tellieStandardSequenceFlag]){
+            [model setStandardRunType:@"MAINTENANCE"];
+            [self loadStandardRunFromDBAction:self];
+            [self startRunAction:self];
+        // If user is using the ellie gui simply start a new run as they'll likely need to run
+        // more sequences. Reasonable as this is an 'expert' level operation. Proceedures
+        // will dictate the user should start a new standard run manualy when they're finished
+        } else {
+            [self startRunAction:self];
+        }
     }
     
     [self setTellieFireSettings:nil];

@@ -94,7 +94,7 @@
     //TELLIE
     NSDictionary* tellieFireSettings;
     NSThread* tellieThread;
-    
+    BOOL tellieStandardSequenceFlag;
     IBOutlet NSButton* runsLockButton;
     IBOutlet NSTextField *lockStatusTextField;
 
@@ -145,6 +145,7 @@
     IBOutlet WebView* detectorState;
 }
 
+@property (nonatomic) BOOL tellieStandardSequenceFlag;
 @property (nonatomic,retain) NSDictionary *tellieFireSettings;
 @property (nonatomic,retain) NSMutableDictionary *smellieRunFileList;
 @property (nonatomic,retain) NSDictionary *smellieRunFile;

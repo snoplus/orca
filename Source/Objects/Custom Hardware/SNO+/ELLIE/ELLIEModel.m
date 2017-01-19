@@ -108,10 +108,8 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
 {
     self = [super init];
     if (self){
-        //XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"builder1" withPort:@"5030"];
-        //XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:@"snodrop1" withPort:@"5020"];
-        XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"localhost" withPort:@"5030"];
-        XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:@"localhost" withPort:@"5020"];
+        XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"builder1" withPort:@"5030"];
+        XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:@"snodrop1" withPort:@"5020"];
         [self setTellieClient:tellieCli];
         [self setSmellieClient:smellieCli];
         [[self tellieClient] setTimeout:10];
@@ -126,10 +124,8 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
 {
     self = [super initWithCoder:aCoder];
     if (self){
-        //XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"builder1" withPort:@"5030"];
-        //XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:@"snodrop1" withPort:@"5020"];
-        XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"localhost" withPort:@"5030"];
-        XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:@"localhost" withPort:@"5020"];
+        XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"builder1" withPort:@"5030"];
+        XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:@"snodrop1" withPort:@"5020"];
         [self setTellieClient:tellieCli];
         [self setSmellieClient:smellieCli];
         [[self tellieClient] setTimeout:10];
@@ -599,16 +595,18 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     if(!([snopModel lastRunTypeWord] & TELLIE_RUN)){
         NSLogColor([NSColor redColor], @"[TELLIE]: TELLIE bit is not masked into the run type word.\n");
         NSLogColor([NSColor redColor], @"[TELLIE]: Please load the TELLIE standard run type.\n");
-        goto err;
+        [pool release];
+        return;
     }
     
     ///////////////////////
     // Check trigger is being sent to asyncronus port of the MTC/D (EXT_A)
-    //if(!([theTubiiModel asyncTrigMask] & 0x400000)){
-    //    NSLogColor([NSColor redColor], @"[TELLIE]: Triggers as not being sent to asynchronous MTC/D port\n");
-    //    NSLogColor([NSColor redColor], @"[TELLIE]: Please amend via the TUBii GUI (triggers tab)\n");
-    //    goto err;
-    //}
+    if(!([theTubiiModel asyncTrigMask] & 0x400000)){
+        NSLogColor([NSColor redColor], @"[TELLIE]: Triggers as not being sent to asynchronous MTC/D port\n");
+        NSLogColor([NSColor redColor], @"[TELLIE]: Please amend via the TUBii GUI (triggers tab)\n");
+        [pool release];
+        return;
+    }
     
     //////////////
     // Get run mode boolean
@@ -642,6 +640,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     BOOL safety_check = [self photonIntensityCheck:[photonOutput integerValue] atFrequency:rate];
     if(safety_check == NO){
         NSLogColor([NSColor redColor], @"[TELLIE]: The requested number of photons (%lu), is not detector safe at %f Hz. This setting will not be run.\n", [photonOutput integerValue], rate);
+        [pool release];
         return;
     }
     
@@ -652,9 +651,9 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     // mode sequence is fired here with the max possible IPW setting - ensuring
     // it will never produce light.
     NSArray* fireArgs = @[[[fireCommands objectForKey:@"channel"] stringValue],
-                          [NSNumber numberWithInt:1],
-                          [[fireCommands objectForKey:@"pulse_separation"] stringValue],
-                          [[fireCommands objectForKey:@"trigger_delay"] stringValue],
+                          [NSString stringWithFormat:@"2"],    // number of pulses
+                          [NSString stringWithFormat:@"0.01"], // pulse separation (1/rate)
+                          [NSString stringWithFormat:@"0"],    // trigger delay (now handled by TUBii)
                           [NSNumber numberWithInt:16383],
                           [[fireCommands objectForKey:@"pulse_height"] stringValue],
                           [[fireCommands objectForKey:@"fibre_delay"] stringValue],
@@ -748,7 +747,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
             NSLog(@"[TELLIE]: Init-ing tellie with settings\n");
             @try{
                 [[self tellieClient] command:@"init_channel" withArgs:fireArgs];
-                [NSThread sleepForTimeInterval:1.0f]; // Shouldn't take long as most settings are already set
+                [NSThread sleepForTimeInterval:2.0f]; // Shouldn't take long as most settings are already set
             } @catch(NSException *e){
                 errorString = [NSString stringWithFormat:@"[TELLIE]: Problem init-ing channel on server: %@\n", [e reason]];
                 NSLogColor([NSColor redColor], errorString);
@@ -936,7 +935,7 @@ err:
     }
 
     ///////////////////
-    //Incase of slave, also get a Tubii object so we can stop Tubii sending pulses
+    // Incase of slave, also get a Tubii object so we can stop Tubii sending pulses
     NSArray*  tubiiModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
     if(![tubiiModels count]){
         NSLogColor([NSColor redColor], @"[TELLIE]: Couldn't find TUBii model in stopRun.\n");
@@ -1429,11 +1428,11 @@ err:
     
     ///////////////////////
     // Check trigger is being sent to asyncronus port (EXT_A)
-    //if(!([theTubiiModel asyncTrigMask] & 0x800000)){
-    //    NSLogColor([NSColor redColor], @"[SMELLIE]: Triggers as not being sent to asynchronous MTC/D port\n");
-    //    NSLogColor([NSColor redColor], @"[SMELLIE]: Please amend via the TUBii GUI (triggers tab)\n");
-    //    goto err;
-    //}
+    if(!([theTubiiModel asyncTrigMask] & 0x800000)){
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Triggers as not being sent to asynchronous MTC/D port\n");
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Please amend via the TUBii GUI (triggers tab)\n");
+        goto err;
+    }
     
     // SET MASTER / SLAVE MODE
     //
@@ -1655,11 +1654,8 @@ err:
                             
                             //Set tubii up for sending correct triggers
                             @try{
-                                [theTubiiModel setSmellieRate:[triggerFrequency floatValue]];
-                                [theTubiiModel setSmelliePulseWidth:100];
-                                [theTubiiModel setSmellieNPulses:numOfPulses];
                                 //Fire trigger pulses!
-                                [theTubiiModel fireSmelliePulser];
+                                [theTubiiModel fireSmelliePulser_rate:[rate floatValue] pulseWidth:100e-9 NPulses:numOfPulses];
                             } @catch(NSException* e) {
                                 NSLogColor([NSColor redColor], @"[SMELLIE]: Problem with TUBii server request: %@\n", [e reason]);
                                 goto err;
