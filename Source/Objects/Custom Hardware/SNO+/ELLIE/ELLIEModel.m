@@ -109,11 +109,11 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     self = [super init];
     if (self){
         XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"builder1" withPort:@"5030"];
-        XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:@"snodrop1" withPort:@"5020"];
+        XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:@"snodrop" withPort:@"5020"];
         [self setTellieClient:tellieCli];
         [self setSmellieClient:smellieCli];
         [[self tellieClient] setTimeout:10];
-        [[self smellieClient] setTimeout:20];
+        [[self smellieClient] setTimeout:360];
         [tellieCli release];
         [smellieCli release];
     }
@@ -125,11 +125,11 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     self = [super initWithCoder:aCoder];
     if (self){
         XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"builder1" withPort:@"5030"];
-        XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:@"snodrop1" withPort:@"5020"];
+        XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:@"snodrop" withPort:@"5020"];
         [self setTellieClient:tellieCli];
         [self setSmellieClient:smellieCli];
         [[self tellieClient] setTimeout:10];
-        [[self smellieClient] setTimeout:20];
+        [[self smellieClient] setTimeout:360];
         [tellieCli release];
         [smellieCli release];
     }
@@ -1434,8 +1434,8 @@ err:
         goto err;
     }
     
+    ////////////////////////
     // SET MASTER / SLAVE MODE
-    //
     NSString *operationMode = [NSString stringWithFormat:@"%@",[smellieSettings objectForKey:@"operation_mode"]];
     if([operationMode isEqualToString:@"Slave Mode"]){
         [self setSmellieSlaveMode:YES];
@@ -1472,7 +1472,7 @@ err:
     // Create and push initial smellie run doc and tell smellie which run we're in
     if([runControl isRunning]){
         @try{
-            [self setSmellieNewRun:[runControl runNumber]];
+            [self setSmellieNewRun:[NSNumber numberWithUnsignedLong:[runControl runNumber]]];
         } @catch(NSException* e) {
             NSLogColor([NSColor redColor], @"[SMELLIE]: Problem with server request: %@\n", [e reason]);
             goto err;
@@ -1577,22 +1577,15 @@ err:
                         // what it should be running
                         //
                         
-                        // RUN CONTROL
-                        //Prepare new subrun - will produce a subrun boundrary in the zdab.
-                        if([runControl isRunning]){
-                            [runControl performSelectorOnMainThread:@selector(prepareForNewSubRun) withObject:nil waitUntilDone:YES];
-                            [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
-                        }
-                        
                         //////////////////////
                         // GET FINAL SMELLIE SETTINGS
                         [valuesToFillPerSubRun setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
-                        
+                        [valuesToFillPerSubRun setObject:gain forKey:@"gain"];
+
                         NSNumber* laserSwitchChannel = [[self smellieLaserHeadToSepiaMapping] objectForKey:laserKey];
                         NSNumber* fibreInputSwitchChannel = [[self smellieLaserToInputFibreMapping] objectForKey:laserKey];
                         NSNumber* fibreOutputSwitchChannel = [[self smellieFibreSwitchToFibreMapping] objectForKey:fibreKey];
                         NSNumber* numOfPulses = [smellieSettings objectForKey:@"triggers_per_loop"];
-                        NSNumber* triggerFrequency = [smellieSettings objectForKey:@"trigger_frequency"];
                         
                         //////////////////////
                         // Calculate how long we expect this run loop to take
@@ -1684,6 +1677,7 @@ err:
                             
                         }
 
+                        //////////////////
                         //Push record of sub-run settings to db
                         if([runControl isRunning]){
                             @try{
@@ -1694,10 +1688,19 @@ err:
                             }
                         }
                         
+                        //////////////////
                         //Check if run file requests a sleep time between sub_runs
                         if([smellieSettings objectForKey:@"sleep_between_sub_run"]){
                             NSTimeInterval sleepTime = [[smellieSettings objectForKey:@"sleep_between_sub_run"] floatValue];
                             [NSThread sleepForTimeInterval:sleepTime];
+                        }
+                        
+                        //////////////////
+                        // RUN CONTROL
+                        //Prepare new subrun - will produce a subrun boundrary in the zdab.
+                        if([runControl isRunning]){
+                            [runControl performSelectorOnMainThread:@selector(prepareForNewSubRun) withObject:nil waitUntilDone:YES];
+                            [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
                         }
                     }//end of GAIN loop
                 }//end of INTENSITY loop
@@ -2143,7 +2146,7 @@ err:
     [laserToInputFibreMapping release];
 
     //Set fibre switch to fibre mapping
-    NSMutableDictionary *fibreSwitchOutputToFibre = [[NSMutableDictionary alloc] initWithCapacity:10];
+    NSMutableDictionary *fibreSwitchOutputToFibre = [[NSMutableDictionary alloc] initWithCapacity:20];
     for(int outputChannelIndex = 1; outputChannelIndex < 15; outputChannelIndex++){
         for (id specificConfigValue in configForSmellie){
             if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"Channel%i",outputChannelIndex]]){
