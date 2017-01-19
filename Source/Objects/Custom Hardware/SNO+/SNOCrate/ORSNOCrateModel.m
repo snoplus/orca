@@ -352,13 +352,20 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 - (void) fetchECALSettings
 {
     /* Fetch the latest ECAL settings and load them to the GUI. */
-	[[self adapter] fetchECALSettings];
+    [[self adapter] fetchECALSettings];
 }
 
 - (void) loadHardware
 {
     /* Loads hardware settings from the GUI -> XL3. */
-	[[self adapter] loadHardware];
+    [[self adapter] loadHardware];
+
+    /* Put the XL3 in NORMAL mode and set the readout mask to all cards which
+     * are present. */
+    [[self undoManager] disableUndoRegistration];
+    [[self adapter] setXl3Mode:NORMAL_MODE];
+    [[self undoManager] enableUndoRegistration];
+    [[self adapter] writeXl3Mode:NORMAL_MODE];
 }
 
 @end
