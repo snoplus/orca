@@ -651,17 +651,16 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     // mode sequence is fired here with the max possible IPW setting - ensuring
     // it will never produce light.
     NSArray* fireArgs = @[[[fireCommands objectForKey:@"channel"] stringValue],
-                          [NSString stringWithFormat:@"2"],    // number of pulses
+                          [NSString stringWithFormat:@"1"],    // number of pulses
                           [NSString stringWithFormat:@"0.01"], // pulse separation (1/rate)
                           [NSString stringWithFormat:@"0"],    // trigger delay (now handled by TUBii)
                           [NSNumber numberWithInt:16383],
                           [[fireCommands objectForKey:@"pulse_height"] stringValue],
                           [[fireCommands objectForKey:@"fibre_delay"] stringValue],
                           ];
-    NSLog(@"[TELLIE]: Forcing tellie into known state. Includes 4s thread sleep to ensure commands poperly processed at hardware\n");
+    NSLog(@"[TELLIE]: Forcing tellie into known state. May take upto 30s while hardware settings are applied\n");
     @try{
         [[self tellieClient] command:@"init_channel" withArgs:fireArgs];
-        [NSThread sleepForTimeInterval:4.0f];
     } @catch(NSException *e){
         errorString = [NSString stringWithFormat:@"[TELLIE]: Problem init-ing channel: %@\n", [e reason]];
         NSLogColor([NSColor redColor], errorString);
@@ -726,8 +725,6 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
             // Send stop command to ensure buffer is clear
             @try{
                 [[self tellieClient] command:@"stop"];
-                [NSThread sleepForTimeInterval:1.0f]; // Wait a short time to ensure command is accepted
-                //NSLog(@"[TELLIE]: Sent stop command to tellie, received: %@\n",responseFromTellie);
             } @catch(NSException* e){
                 // This should only ever be called from the main thread so can raise
                 NSLogColor([NSColor redColor], @"[TELLIE]: Problem with tellie server interpreting stop command!\n");
@@ -747,7 +744,6 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
             NSLog(@"[TELLIE]: Init-ing tellie with settings\n");
             @try{
                 [[self tellieClient] command:@"init_channel" withArgs:fireArgs];
-                [NSThread sleepForTimeInterval:2.0f]; // Shouldn't take long as most settings are already set
             } @catch(NSException *e){
                 errorString = [NSString stringWithFormat:@"[TELLIE]: Problem init-ing channel on server: %@\n", [e reason]];
                 NSLogColor([NSColor redColor], errorString);
@@ -762,12 +758,12 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
                 goto err;
             }
             
-        } else {
-            //////////////////
-            // Start a new subrun
-            [runControl performSelectorOnMainThread:@selector(prepareForNewSubRun) withObject:nil waitUntilDone:YES];
-            [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
         }
+
+        //////////////////
+        // Start a new subrun
+        [runControl performSelectorOnMainThread:@selector(prepareForNewSubRun) withObject:nil waitUntilDone:YES];
+        [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
         
         ////////////////////
         // Init can take a while. Make sure no-one hit
@@ -780,7 +776,6 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
         // Set loop dependent tellie channel settings
         @try{
             [[self tellieClient] command:@"set_pulse_number" withArgs:@[noShots]];
-            [NSThread sleepForTimeInterval:0.5f];
         } @catch(NSException* e) {
             errorString = @"[TELLIE]: Problem setting pulse number on server.\n";
             NSLogColor([NSColor redColor], errorString);

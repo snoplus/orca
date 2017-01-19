@@ -334,6 +334,10 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 }
 
 - (IBAction)tellieExpertAutoFillAction:(id)sender {
+    
+    // Deselect the node text field
+    [tellieExpertNodeTf resignFirstResponder];
+
     // Clear all current values
     [tellieChannelTf setStringValue:@""];
     [telliePulseWidthTf setStringValue:@""];
@@ -614,6 +618,17 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
         [telliePulseWidthTf setStringValue:@""];
     }
 
+    if([note object] == tellieExpertNodeTf){
+        [tellieChannelTf setStringValue:@""];
+        [tellieTriggerDelayTf setStringValue:@""];
+        [telliePulseFreqTf setStringValue:@""];
+        [telliePulseHeightTf setStringValue:@"16383"];
+        [telliePulseWidthTf setStringValue:@""];
+        [tellieNoPulsesTf setStringValue:@""];
+        [tellieFibreDelayTf setStringValue:@""];
+        [tellieExpertFireButton setEnabled:NO];
+    }
+    
     [tellieExpertFireButton setEnabled:NO];
     [tellieGeneralValidationStatusTf setStringValue:@""];
 
@@ -646,15 +661,6 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     if([note object] == tellieExpertNodeTf){
         expertMsg = [self validateExpertTellieNode:currentString];
         gotInside = YES;
-        [tellieChannelTf setStringValue:@""];
-        [tellieTriggerDelayTf setStringValue:@""];
-        [telliePulseFreqTf setStringValue:@""];
-        [telliePulseHeightTf setStringValue:@"16383"];
-        [telliePulseWidthTf setStringValue:@""];
-        [tellieNoPulsesTf setStringValue:@""];
-        [tellieFibreDelayTf setStringValue:@""];
-        [tellieExpertFireButton setEnabled:NO];
-        [tellieExpertStopButton setEnabled:NO];
         if([[telliePhotonsTf stringValue] isEqualToString:@""]){
             [telliePhotonsTf setStringValue:@"1000"];
         }
