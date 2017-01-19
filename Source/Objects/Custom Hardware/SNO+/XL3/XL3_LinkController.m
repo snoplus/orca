@@ -1186,7 +1186,7 @@ static NSDictionary* xl3Ops;
 
 - (IBAction) compositeXl3ModeSetAction:(id) sender
 {
-	[model writeXl3Mode];
+	[model writeXl3Mode:[model xl3Mode] withSlotMask:[model slotMask]];
 }
 
 - (IBAction) compositeXl3RWAddressValueAction:(id)sender

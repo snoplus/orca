@@ -380,7 +380,8 @@ enum {
 
 #pragma mark •••Composite
 - (void) deselectComposite;
-- (void) writeXl3Mode;
+- (void) writeXl3Mode: (uint32_t) mode;
+- (void) writeXl3Mode: (uint32_t) mode withSlotMask: (uint32_t) slotMask;
 - (void) compositeXl3RW;
 - (void) compositeQuit;
 - (int) setPedestalMask: (uint32_t) slotMask pattern: (uint32_t) pattern;
