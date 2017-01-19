@@ -1929,10 +1929,10 @@ static int              sChannelsNotChangedCount = 0;
         // triggers must be disabled on channels with HV disabled or if the
         // relay is open
         wanted = trigger20nsDisabledMask;
-        trigger20nsDisabledMask |= (trigger20nsDisabledMask ^ startTrigger20nsDisabledMask) & card->hvDisabled & ~[self relayChannelMask];
+        trigger20nsDisabledMask |= (trigger20nsDisabledMask ^ startTrigger20nsDisabledMask) & (card->hvDisabled | ~[self relayChannelMask]);
         notChanged |= (wanted ^ trigger20nsDisabledMask);
         wanted = trigger100nsDisabledMask;
-        trigger100nsDisabledMask |= (trigger100nsDisabledMask ^ startTrigger100nsDisabledMask) & card->hvDisabled & ~[self relayChannelMask];
+        trigger100nsDisabledMask |= (trigger100nsDisabledMask ^ startTrigger100nsDisabledMask) & (card->hvDisabled | ~[self relayChannelMask]);
         notChanged |= (wanted ^ trigger100nsDisabledMask);
         // can't be online if HV is disabled
         wanted = onlineMask;
@@ -2904,7 +2904,7 @@ const short kVoltageADCMaximumAttempts = 10;
     uint32_t hv = 0;
 
     for (i = 0; i < 4; i++) {
-        if (([guardian relayMask] >> ([self stationNumber]*4 + (3-i))) & 0x1) {
+        if (([[[self guardian] adapter] relayMask] >> ([self stationNumber]*4 + (3-i))) & 0x1) {
             hv |= 0xff << i*8;
         }
     }
