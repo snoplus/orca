@@ -53,18 +53,12 @@ typedef enum eXL3_ConnectStates {
 	uint16_t numPackets;
 	unsigned long long num_dat_packets;
 	XL3Packet	aMultiCmdPacket;
-    NSArray*    fifoStatus;         //array of 16 diffs between write and read FEC pointers, NSNumbers for MORCA
-    NSDate*     _fifoTimeStamp;     //time stamp when fifoStatus received
-    BOOL _readFifoFlag;             //a flag check by Xl3Model::takeData;
     unsigned long _fifoBundle[16];  //an array to enter data stream
 }
 
 @property (assign,nonatomic) BOOL isConnected;
 @property (assign,nonatomic) int pendingThreads;
 @property (assign,nonatomic) BOOL autoConnect;
-@property (copy,nonatomic) NSArray* fifoStatus;
-@property (copy,nonatomic) NSDate* fifoTimeStamp;
-@property (assign,nonatomic) BOOL readFifoFlag;
 @property (assign,nonatomic) int errorTimeOut;
 
 - (id)   init;
@@ -92,7 +86,6 @@ typedef enum eXL3_ConnectStates {
 - (void) setPortNumber:(unsigned long)aPortNumber;
 - (NSString*) crateName;
 - (void) setCrateName:(NSString*)aCrateName;
-- (unsigned long*) fifoBundle;
 
 - (void) newMultiCmd;
 - (void) addMultiCmdToAddress:(long)anAddress withValue:(long)aValue;
