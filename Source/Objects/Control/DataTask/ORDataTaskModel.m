@@ -527,7 +527,7 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
     while([transferQueue count]){
 		[ORTimer delay:.1];
 		totalTime += .1;
-		if(totalTime > 2){
+		if(totalTime > 4){
 			NSLogColor([NSColor redColor], @"Continuing after data que didn't flush after 2 seconds.\n");
 			break;
 		}
