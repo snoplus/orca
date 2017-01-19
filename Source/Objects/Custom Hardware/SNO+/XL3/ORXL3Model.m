@@ -5024,7 +5024,7 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
             NSLog(msg);
             if ([self crateNumber] == 16) {
                 NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ HV B Status: ", [[self xl3Link] crateName]];
-                [msg appendFormat:@"Setpoint: %.2f V, Voltage: %.2f V, I: %.2f mA\n", [self hvBVoltageDACSetValue]/4096.*3000., [self hvAVoltageReadValue], [self hvACurrentReadValue]];
+                [msg appendFormat:@"Setpoint: %.2f V, Voltage: %.2f V, I: %.2f mA\n", [self hvBVoltageDACSetValue]/4096.*3000., [self hvBVoltageReadValue], [self hvBCurrentReadValue]];
                 NSLog(msg);
             }
 
