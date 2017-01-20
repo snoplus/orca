@@ -98,6 +98,7 @@ static int              sChannelsNotChangedCount = 0;
 @end
 
 @interface ORFec32Model (XL3)
+- (uint32_t) relayChannelMask;
 -(BOOL) parseVoltagesUsingXL3:(VMonResults*)result;
 -(BOOL) readVoltagesUsingXL3;
 -(void) readCMOSCountsUsingXL3:(unsigned long)aChannelMask;
@@ -1925,12 +1926,13 @@ static int              sChannelsNotChangedCount = 0;
         wanted = pedEnabledMask;
         pedEnabledMask &= ~((pedEnabledMask ^ startPedEnabledMask) & card->hvDisabled);
         notChanged |= (wanted ^ pedEnabledMask);
-        // triggers must be disabled on channels with HV disabled
+        // triggers must be disabled on channels with HV disabled or if the
+        // relay is open
         wanted = trigger20nsDisabledMask;
-        trigger20nsDisabledMask |= (trigger20nsDisabledMask ^ startTrigger20nsDisabledMask) & card->hvDisabled;
+        trigger20nsDisabledMask |= (trigger20nsDisabledMask ^ startTrigger20nsDisabledMask) & (card->hvDisabled | ~[self relayChannelMask]);
         notChanged |= (wanted ^ trigger20nsDisabledMask);
         wanted = trigger100nsDisabledMask;
-        trigger100nsDisabledMask |= (trigger100nsDisabledMask ^ startTrigger100nsDisabledMask) & card->hvDisabled;
+        trigger100nsDisabledMask |= (trigger100nsDisabledMask ^ startTrigger100nsDisabledMask) & (card->hvDisabled | ~[self relayChannelMask]);
         notChanged |= (wanted ^ trigger100nsDisabledMask);
         // can't be online if HV is disabled
         wanted = onlineMask;
@@ -2893,6 +2895,23 @@ const short kVoltageADCMaximumAttempts = 10;
 
 
 @implementation ORFec32Model (XL3)
+
+- (uint32_t) relayChannelMask
+{
+    /* Returns a 32 bit mask indicating which channels are connected to a
+     * closed relay. */
+    int i;
+    uint32_t hv = 0;
+
+    for (i = 0; i < 4; i++) {
+        if (([[[self guardian] adapter] relayMask] >> ([self stationNumber]*4 + (3-i))) & 0x1) {
+            hv |= 0xff << i*8;
+        }
+    }
+
+    return hv;
+}
+
 
 -(BOOL) parseVoltagesUsingXL3:(VMonResults*) result
 {
