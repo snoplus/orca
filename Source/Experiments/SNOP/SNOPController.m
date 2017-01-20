@@ -413,7 +413,6 @@ snopGreenColor;
 
 - (IBAction) startRunAction:(id)sender
 {
-    
     //Make sure we are not running any RunScripts
     [runControl setSelectedRunTypeScript:0];
 
@@ -454,9 +453,24 @@ snopGreenColor;
     [model setLastRunTypeWordHex:_lastRunTypeWord]; //FIXME: revisit if we go over 32 bits
     if(![model loadStandardRun:standardRun withVersion:standardRunVersion]) return;
     
-    //Start or restart the run
-    if([runControl isRunning])[runControl restartRun];
-    else [runControl startRun];
+    if ([runControl isRunning]) {
+        /* If there is already a run going, then we restart the run. */
+        if ([[model document] isDocumentEdited]) {
+            /* If the GUI has changed, save the document first. */
+            [[model document] afterSaveDo: @selector(restartRun) withTarget:runControl];
+            [[model document] saveDocument:nil];
+        } else {
+            [runControl restartRun];
+        }
+    } else {
+        /* If there is no run going, then we start a new run. */
+        if ([[model document] isDocumentEdited]) {
+            [[model document] afterSaveDo: @selector(startRun) withTarget:runControl];
+            [[model document] saveDocument:nil];
+        } else {
+            [runControl startRun];
+        }
+    }
     
     [standardRun release];
     [standardRunVersion release];
@@ -470,7 +484,13 @@ snopGreenColor;
      *
      * Does not load the standard run settings. */
     [model setResync:YES];
-    [runControl restartRun];
+
+    if ([[model document] isDocumentEdited]) {
+        [[model document] afterSaveDo:@selector(restartRun) withTarget:runControl];
+        [[model document] saveDocument:nil];
+    } else {
+        [runControl restartRun];
+    }
 }
 
 
