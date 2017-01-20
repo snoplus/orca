@@ -295,18 +295,6 @@ hvBQueryWaiting = hvBQueryWaiting;
 
     free(results);
 
-    /* Switch XL3 to normal mode if it isn't already. In normal mode, the XL3
-     * reads out data from the FECs, which is usually what we want during
-     * a run. */
-    [self updateXl3Mode];
-    if ([self xl3Mode] != NORMAL_MODE) {
-        NSLog(@"xl3 %02d switching to normal mode.\n", [self crateNumber]);
-        [[self undoManager] disableUndoRegistration];
-        [self setXl3Mode: NORMAL_MODE];
-        [[self undoManager] enableUndoRegistration];
-        [self writeXl3Mode];
-    }
-
     /* Tell ORCA that we have finished initializing */
     [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object:self];
 }
@@ -2476,7 +2464,15 @@ err:
 	[self setXl3OpsRunning:NO forKey:@"compositeDeselect"];
 }
 
-- (void) writeXl3Mode
+- (void) writeXl3Mode: (uint32_t) mode
+{
+    /* Set the XL3 mode and set the data available mask to whichever cards
+     * ORCA thinks are present. */
+
+    [self writeXl3Mode: mode withSlotMask: [self getSlotsPresent]];
+}
+
+- (void) writeXl3Mode: (uint32_t) mode withSlotMask: (uint32_t) slotMask
 {
     /* Change the mode of the XL3. In init mode, the XL3 does not read out
      * the front end cards, while in normal mode it reads out whichever
@@ -2486,13 +2482,8 @@ err:
     char payload[XL3_PAYLOAD_SIZE];
     ChangeModeArgs* args = (ChangeModeArgs *) payload;
 
-    args->mode = [self xl3Mode];
-    args->dataAvailMask = [self getSlotsPresent];
-
-    if ([xl3Link needToSwap]) {
-        args->mode = swapLong(args->mode);
-        args->dataAvailMask = swapLong(args->dataAvailMask);
-    }
+    args->mode = htonl(mode);
+    args->dataAvailMask = htonl(slotMask);
 
     [self setXl3ModeRunning:YES];
     @try {

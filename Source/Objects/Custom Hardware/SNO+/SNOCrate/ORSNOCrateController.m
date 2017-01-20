@@ -148,6 +148,10 @@
 - (IBAction) loadHardwareAction:(id)sender
 {
     [model loadHardware];
+    [[self undoManager] disableUndoRegistration];
+    [model setXl3Mode:NORMAL_MODE];
+    [[self undoManager] enableUndoRegistration];
+    [model writeXl3Mode:NORMAL_MODE];
 }
 
 @end
