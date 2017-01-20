@@ -2039,6 +2039,7 @@ static int              sChannelsNotChangedCount = 0;
     }
     if (sChannelsNotChangedCount) {
         NSLog(@"Warning: Settings for %d channels not made because they have HV disabled\n", sChannelsNotChangedCount);
+        sChannelsNotChangedCount = 0;
     }
 }
 
