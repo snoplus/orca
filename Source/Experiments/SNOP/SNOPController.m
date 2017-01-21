@@ -34,7 +34,7 @@
 #import "ORMTCModel.h"
 #import "SNOP_Run_Constants.h"
 #import "SNOCaenModel.h"
-#import "SNOPGlobals.h"
+#import "RunTypeWordBits.hh"
 
 NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 
@@ -237,6 +237,7 @@ snopGreenColor;
 
     [self mtcDataBaseChanged:nil];
     //Update runtype word
+    [self refreshRunWordLabels:nil];
     [self runTypeWordChanged:nil];
     //Lock Standard Runs menus at init
     if([model standardRunType] == nil){
@@ -533,7 +534,7 @@ snopGreenColor;
         [lightBoardView setState:kCautionLight];
 	}
 
-    if ([runControl isRunning] && ([runControl runType] & ECA_RUN)) {
+    if ([runControl isRunning] && ([runControl runType] & kECARun)) {
         /* Disable the ping crates button if we are in an ECA run. */
         [pingCratesButton setEnabled:FALSE];
     } else {
@@ -1158,6 +1159,14 @@ snopGreenColor;
     [gSecurity tryToSetLock:ORSNOPRunsLockNotification to:[sender intValue] forWindow:[self window]];
 }
 
+- (IBAction)refreshRunWordLabels:(id)sender
+{
+    for(int ibit=0;ibit<32;ibit++){
+        NSString *aName = [NSString stringWithUTF8String:RunTypeWordBitNames[ibit]];
+        [[runTypeWordMatrix cellAtRow:ibit column:0] setTitle:aName];
+    }
+}
+
 - (IBAction)runTypeWordAction:(id)sender
 {
     short bit = [sender selectedRow];
@@ -1233,11 +1242,11 @@ snopGreenColor;
         [lockStatusTextField setStringValue:@"RUN IN PROGRESS"];
         [lockStatusTextField setBackgroundColor:snopGreenColor];
 
-        if([runControl runType] & MAINTENANCE_RUN){
+        if([runControl runType] & kMaintenanceRun){
             [lockStatusTextField setStringValue:@"RUN IN MAINTENANCE"];
             [lockStatusTextField setBackgroundColor:snopOrangeColor];
         }
-        else if ([runControl runType] & DIAGNOSTIC_RUN){
+        else if ([runControl runType] & kDiagnosticRun){
             [lockStatusTextField setStringValue:@"DIAGNOSTIC RUN"];
             [lockStatusTextField setBackgroundColor:snopOrangeColor];
         }
@@ -1733,7 +1742,7 @@ snopGreenColor;
         NSLogColor([NSColor redColor],@"Cannot display TEST RUN values. There was some problem with the Standard Run DataBase. \n");
     }
     //If in DIAGNOSTIC run: display null threshold values
-    else if(dbruntypeword & kDiagnosticRunType){
+    else if(dbruntypeword & kDiagnosticRun){
         for (int i=0; i<[standardRunThresStoredValues numberOfRows];i++) {
             [[standardRunThresStoredValues cellAtRow:i column:0] setStringValue:@"--"];
             [[standardRunThresStoredValues cellAtRow:i column:0] setTextColor:[self snopRedColor]];
