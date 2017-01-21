@@ -143,6 +143,7 @@ NSDate* MCPYear0000;
                         tok = strtok_r(NULL, "{}, ", &last);
                     }
                     free(tmp);
+                    theCurrentObj = array;
                 } break;
             }
         }
