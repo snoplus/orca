@@ -91,8 +91,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 {
     self = [super init];
     if (self){
-        _tellieClient = [[XmlrpcClient alloc] initWithHostName:@"daq1" withPort:@"5030"];
-        _smellieClient = [[XmlrpcClient alloc] initWithHostName:@"SNODROP2" withPort:@"5020"];
+        _tellieClient = [[XmlrpcClient alloc] initWithHostName:@"localhost" withPort:@"5030"];
+        _smellieClient = [[XmlrpcClient alloc] initWithHostName:@"localhost" withPort:@"5020"];
+        [_smellieClient setTimeout:60];
     }
     return self;
 }
@@ -102,8 +103,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     self = [super initWithCoder:aCoder];
 
     if (self){
-        _tellieClient = [[XmlrpcClient alloc] initWithHostName:@"daq1" withPort:@"5030"];
-        _smellieClient = [[XmlrpcClient alloc] initWithHostName:@"SNODROP2" withPort:@"5020"];
+        _tellieClient = [[XmlrpcClient alloc] initWithHostName:@"localhost" withPort:@"5030"];
+        _smellieClient = [[XmlrpcClient alloc] initWithHostName:@"localhost" withPort:@"5020"];
+        [_smellieClient setTimeout:60];
     }
     return self;
 }
@@ -860,21 +862,19 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 {
     //Read data
     int wavelengthLow = [[smellieSettings objectForKey:@"superK_wavelength_low"] intValue];
-    int wavelengthHigh = [[smellieSettings objectForKey:@"superK_wavelength_high"] intValue];
-    int delta = [[smellieSettings objectForKey:@"superK_wavelength_step"] intValue];
+    int delta = [[smellieSettings objectForKey:@"superK_wavelength_delta"] intValue];
+    int stepSize = [[smellieSettings objectForKey:@"superK_wavelength_step_size"] intValue];
     float noSteps = [[smellieSettings objectForKey:@"superK_num_wavelength_steps"] floatValue];
-
-    float increment;
+    
     NSMutableArray* highEdges = [NSMutableArray arrayWithCapacity:noSteps];
-    if(wavelengthHigh != 0 && wavelengthHigh - wavelengthLow >= delta){
-        increment = (wavelengthHigh - wavelengthLow) / noSteps;
-    } else {
-        [highEdges addObject:[NSNumber numberWithInteger:wavelengthHigh]];
+    if(wavelengthLow == 0 || noSteps == 0){
+        [highEdges addObject:[NSNumber numberWithInteger:(wavelengthLow+delta)]];
         return highEdges;
     }
 
     //Create array
-    for(float edge = (wavelengthLow + delta);edge <= wavelengthHigh; edge = edge + increment){
+    for(int i=0;i<noSteps;i++){
+        int edge = wavelengthLow + delta + i*stepSize;
         [highEdges addObject:[NSNumber numberWithInt:edge]];
     }
     return highEdges;
@@ -884,21 +884,19 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 {
     //Read data
     int wavelengthLow = [[smellieSettings objectForKey:@"superK_wavelength_low"] intValue];
-    int wavelengthHigh = [[smellieSettings objectForKey:@"superK_wavelength_high"] intValue];
-    int delta = [[smellieSettings objectForKey:@"superK_wavelength_step"] intValue];
+    int delta = [[smellieSettings objectForKey:@"superK_wavelength_delta"] intValue];
+    int stepSize = [[smellieSettings objectForKey:@"superK_wavelength_step_size"] intValue];
     float noSteps = [[smellieSettings objectForKey:@"superK_num_wavelength_steps"] floatValue];
     
-    float increment;
     NSMutableArray* lowEdges = [NSMutableArray arrayWithCapacity:noSteps];
-    if(wavelengthHigh != 0 && wavelengthHigh - wavelengthLow >= delta){
-        increment = (wavelengthHigh - wavelengthLow) / noSteps;
-    } else {
+    if(wavelengthLow == 0 || noSteps == 0){
         [lowEdges addObject:[NSNumber numberWithInteger:wavelengthLow]];
         return lowEdges;
     }
     
     //Create array
-    for(float edge = wavelengthLow;edge <= (wavelengthHigh - delta); edge = edge + increment){
+    for(int i=0;i<noSteps;i++){
+        int edge = wavelengthLow + i*stepSize;
         [lowEdges addObject:[NSNumber numberWithInt:edge]];
     }
     return lowEdges;
@@ -914,6 +912,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
      method. I'll look into doing this after the DAQ meeting in Jan - Once I know the tellie
      one works!
      */
+    NSLog(@"%@",smellieSettings);
     NSLog(@"SMELLIE_RUN:Setting up a SMELLIE Run\n");
     NSLog(@"SMELLIE_RUN:Stopping any Blocking Software on SMELLIE computer(SNODROP)\n");
     [self killBlockingSoftware];
@@ -925,24 +924,24 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //Get the MTC Object (will only be used in Slave Mode)
     NSArray*  mtcModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     if(![mtcModels count]){
-        NSException* e = [NSException
-                          exceptionWithName:@"noMTCModel"
-                          reason:@"*** Please add a ORMTCModel to the experiment"
-                          userInfo:nil];
-        [e raise];
-    }
+        NSLogColor([NSColor redColor], @"couldn't find MTC model. Please add it to the experiment and restart the run.\n");
+        goto err;
+    } 
+
     ORMTCModel* theMTCModel = [mtcModels objectAtIndex:0];
-    [theMTCModel stopMTCPedestalsFixedRate]; //stop any pedestals that are currently running
-    
+    @try { 
+      [theMTCModel stopMTCPedestalsFixedRate]; //stop any pedestals that are currently running
+    } @catch {
+        NSLogColor([NSColor redColor], @"couldn't stop MTC ped fixed rate.\n");
+        goto err;
+    }
+     
     //Get the run controller
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
-        NSException* e = [NSException
-                          exceptionWithName:@"noRunModel"
-                          reason:@"*** Please add a ORRunModel to the experiment"
-                          userInfo:nil];
-        [e raise];
-    }
+        NSLogColor([NSColor redColor], @"couldn't find ORRunModel. Please add it to the experiment and restart the run.\n");
+        goto err;
+    } 
     runControl = [runModels objectAtIndex:0];
 
     // FIND AND LOAD RELEVANT CONFIG
@@ -986,9 +985,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     }else{
         //Stop the current run and start a new run
         NSLogColor([NSColor redColor], @"Resetting run! \n");
-        [runControl setForceRestart:YES];
-        [runControl performSelectorOnMainThread:@selector(stopRun) withObject:nil waitUntilDone:YES];
-        [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
+        [runControl performSelectorOnMainThread:@selector(restartRun) withObject:nil waitUntilDone:YES];
     }
 
     // GET SMELLIE RUN SETTINGS TO LOOP OVER
@@ -1012,12 +1009,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         [self setSmellieSlaveMode:NO];
         NSLog(@"SMELIE_RUN:Running n MASTER mode\n");
     }else{
-        NSException* e = [NSException
-                          exceptionWithName:@"badConfigEntry"
-                          reason:@"*** Slave / Master mode does not appear to be included in config file"
-                          userInfo:nil];
-        [e raise];
-    }
+        NSLogColor([NSColor redColor], @"Slave / master mode does not appewar to be included in config file.\n");
+        goto err;
+    } 
 
     //How long do we need to run pulser? - TO BE REPACED AFTER TUBII INTEGRATION
     NSNumberFormatter * f = [[NSNumberFormatter alloc] init];
@@ -1038,9 +1032,10 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
             break; //if the end of the run is reached then break the run loop
         }
 
+        NSLog(@"%@",[self smellieLaserHeadToSepiaMapping]);
         //Set the laser switch which corresponds to the laserHead mapping to Sepia
         NSLog(@"SMELLIE_RUN:Setting the Laser Switch to Channel:%@ which corresponds to the %@ Laser\n",[NSString stringWithFormat:@"%@",[[self smellieLaserHeadToSepiaMapping] objectForKey:laserKey]],laserKey);
-        [self setLaserSwitch:[NSString stringWithFormat:@"%@",[[ self smellieLaserHeadToSepiaMapping] objectForKey:laserKey]]];
+        [self setLaserSwitch:[NSString stringWithFormat:@"%@",[[self smellieLaserHeadToSepiaMapping] objectForKey:laserKey]]];
 
         //Set the gain Control
         NSLog(@"SMELLIE_RUN:Setting the gain control to: %f V\n",[[[self smellieLaserHeadToGainMapping] objectForKey:laserKey] floatValue]);
@@ -1077,12 +1072,14 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                 softLockOnCommand = @"set_soft_lock_on";
                 softLockOffCommand = @"set_soft_lock_off";
             }
+            NSLog(@"laser key : %@\n", laserKey);
+            NSLog(@"loopLength : %i\n",loopLength);
             //Loop through each intensity of a SMELLIE run
             for(int i=0; i < loopLength; i++){
-
-                if([[NSThread currentThread] isCancelled] || ![runControl isRunning]){
-                    endOfRun = YES;
-                    break;
+                NSLog(@"Inside loop : %i\n",i);
+                if([[NSThread currentThread] isCancelled]) || ![runControl isRunning]){
+									endOfRun = YES;
+									break;
                 }
                 
                 //Deactivate software locks
@@ -1108,8 +1105,12 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                     [valuesToFillPerSubRun setObject:[NSNumber numberWithInt:0] forKey:@"intensity"];
                     [valuesToFillPerSubRun setObject:lowBin forKey:@"wavelength_low_edge"];
                     [valuesToFillPerSubRun setObject:highBin forKey:@"wavelength_high_edge"];
-
-                    [self setSuperKWavelegth:lowBinAsString withHighEdge:highBinAsString];
+		    @try{
+		      [self setSuperKWavelegth:lowBinAsString withHighEdge:highBinAsString];
+		    } @catch {
+		      NSLogColor([NSColor redColor], @" Problem setting superK wavelength.\n");
+		      goto err;
+		    } 
                 } else {
                     NSNumber* laserIntensity = [intensityArray objectAtIndex:i];
                     NSString* laserIntensityAsString = [NSString stringWithFormat:@"%i",[laserIntensity intValue]];
@@ -1118,8 +1119,12 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                     [valuesToFillPerSubRun setObject:laserIntensity forKey:@"intensity"];
                     [valuesToFillPerSubRun setObject:[NSNumber numberWithInt:0] forKey:@"wavelength_low_edge"];
                     [valuesToFillPerSubRun setObject:[NSNumber numberWithInt:0] forKey:@"wavelength_high_edge"];
-                    
-                    [self setLaserIntensity:laserIntensityAsString];
+                    @try{
+		      [self setLaserIntensity:laserIntensityAsString];
+		    } @catch {
+		      NSLogColor([NSColor redColor], @" Problem setting laser intensity.\n");
+		      goto err;
+		    } 
                 }
 
                 //this used to be 10.0,  Slave mode in Orca requires time (unknown reason) - Chris J
@@ -1133,11 +1138,20 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                     [f release];
 
                     NSLog(@"SMELLIE_RUN:Intensity:Firing Pedestals\n");
-                    [theMTCModel fireMTCPedestalsFixedRate];
+		    @try{
+		      [theMTCModel fireMTCPedestalsFixedRate];
+		    } @catch {
+		      NSLogColor([NSColor redColor], @"Exception setting mtc ped rate.\n");
+		      goto err;
+		    } 
 
                     float pulserRate = [numericTriggerFrequencyInSlaveMode floatValue];
-                    [theMTCModel setThePulserRate:pulserRate];
-                 
+		    @try{
+		      [theMTCModel setThePulserRate:pulserRate];
+		    } @catch {
+		      NSLogColor([NSColor redColor], @"Exception setting mtc pulser rate.\n");
+		      goto err;
+		    }
                     NSLog(@"SMELLIE_RUN: Pulsing at %f Hz for %f seconds \n",[triggerFrequencyInSlaveMode floatValue],timeToPulse);
                     //THIS IS CRAZY - FIND SOME BETTER WAY OF DOING IT USING TUBII COUNTERS
                     [NSThread sleepForTimeInterval:timeToPulse];
@@ -1147,22 +1161,35 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                     NSString* numOfPulses = [NSString stringWithFormat:@"%@",[smellieSettings objectForKey:@"triggers_per_loop"]];
                     NSString* triggerFrequency = [NSString stringWithFormat:@"%@",[smellieSettings objectForKey:@"trigger_frequency"]];
                     NSLog(@"SMELLIE_RUN:%@ Pulses at %@ Hz \n",numOfPulses,triggerFrequency);
-                    [self sendCustomSmellieCmd:masterModeCommand withArgs:@[triggerFrequency, numOfPulses]];
+		    @try{
+		      [self sendCustomSmellieCmd:masterModeCommand withArgs:@[triggerFrequency, numOfPulses]];
+		    } @catch {
+		      NSLogColor([NSColor redColor], @"Problem setting master mode trigger frequency.\n");
+		      goto err;
+		    }
                 }
 
                 if([self smellieSlaveMode]){
                     NSLog(@"SMELLIE_RUN:Stopping MTCPedestals\n");
-                    [theMTCModel stopMTCPedestalsFixedRate];
-                    [self sendCustomSmellieCmd:softLockOnCommand withArgs:nil];
-                }
+		    @try{
+		      [theMTCModel stopMTCPedestalsFixedRate];
+		    } @catch {
+		      NSLogColor([NSColor redColor], @"Exception stopping MTC ped rate.\n");
+		      goto err;
+		    }
+		}
 
                 //Keep record of sub-run settings
                 [self updateSmellieRunDocument:valuesToFillPerSubRun];
                 [valuesToFillPerSubRun release];
 
                 //Activate software locks
-                [self sendCustomSmellieCmd:softLockOnCommand withArgs:nil];
-
+		@try {
+		  [self sendCustomSmellieCmd:softLockOnCommand withArgs:nil];
+		} @catch {
+		  NSLogColor([NSColor redColor], @"Problem sending softlock.\n");
+		  goto err;									
+		}
                 //Check if run file requests a sleep time between sub_runs
                 if([smellieSettings objectForKey:@"sleep_between_sub_run"]){
                     NSTimeInterval sleepTime = [[smellieSettings objectForKey:@"sleep_between_sub_run"] floatValue];
@@ -1177,9 +1204,74 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //stop the pedestals if required
     if([self smellieSlaveMode]){
         NSLog(@"SMELLIE_RUN:Stopping MTCPedestals\n");
-        [theMTCModel stopMTCPedestalsFixedRate];
+	@try {
+	  [theMTCModel stopMTCPedestalsFixedRate];
+	} @catch {
+	  NSLogColor([NSColor redColor], @"Exception stopping MTC ped rate.\n");
+	  goto err;
+	}
     }
 
+    goto err;
+}
+
+-(void)stopSmellieRun
+{
+    /*
+     Some sign off / tidy up stuff to be called at the end of a smellie run. Again, I think this
+     should be moved to a runscript.
+     */
+    [self setSmellieSafeStates];
+    [self setSuperKSafeStates];
+
+    NSArray*  mtcModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    if(![mtcModels count]){
+      NSLogColor([NSColor redColor], @"Could not get MTC model.\n");
+      goto err;
+    }
+    ORMTCModel* theMTCModel = [mtcModels objectAtIndex:0];
+
+    NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    if(![runModels count]){
+      NSLogColor([NSColor redColor], @"Could not get ORRunModel.\n");
+      goto err;
+    }
+    runControl = [runModels objectAtIndex:0];
+
+    //Set the Mtcd for back to original settings
+    @try{
+      [theMTCModel setThePulserRate:[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_pulser_period"] floatValue]];
+    }@catch {
+      NSLogColor([NSColor redColor],@"Problem setting the MTC pulser rate.\n");
+      goto err;
+    }
+    
+    @try{
+      [theMTCModel enablePulser];
+    } @catch {
+      NSLogColor([NSColor redColor],@"Could not enable pulser \n");
+      goto err;
+    }
+    NSLog(@"SMELLIE_RUN:Setting the mtcd pulser back to %f Hz\n",[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_pulser_period"] floatValue]);
+    [theMTCModel stopMTCPedestalsFixedRate];
+
+    @try{
+      [theMTCModel setupGTCorseDelay:[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_coarse_delay"] intValue]];
+    } @catch {
+      NSLogColor([NSColor redColor],@"Could not set the MTC coarse delay\n");
+      goto err;
+    }
+    NSLog(@"SMELLIE_RUN:Setting the mtcd coarse delay back to %i \n",[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_coarse_delay"] intValue]);
+
+    if([runControl isRunning]){
+        [runControl performSelectorOnMainThread:@selector(restartRun) withObject:nil waitUntilDone:YES];
+    }
+
+    NSLog(@"SMELLIE_RUN:Stopping SMELLIE Run\n");
+}
+
+err:
+{
     //Resetting the mtcd to settings before the smellie run
     NSLog(@"SMELLIE_RUN:Returning SMELLIE into Safe States after finishing a Run\n");
     [self setSmellieSafeStates];
@@ -1190,55 +1282,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         dispatch_sync(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:ORELLIERunFinished object:self];
         });
-    }
 }
 
--(void)stopSmellieRun
-{
-    /*
-     Some sign off / tidy up stuff to be called at the end of a smellie run. Again, I think this
-     should be moved to a runscript.
-     */
-    NSArray*  mtcModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    if(![mtcModels count]){
-        NSException* e = [NSException
-                          exceptionWithName:@"noMTCModel"
-                          reason:@"*** Please add a MTCModel to the experiment"
-                          userInfo:nil];
-        [e raise];
-    }
-    ORMTCModel* theMTCModel = [mtcModels objectAtIndex:0];
 
-    NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    if(![runModels count]){
-        NSException* e = [NSException
-                          exceptionWithName:@"noRunModel"
-                          reason:@"*** Please add a ORRunModel to the experiment"
-                          userInfo:nil];
-        [e raise];
-    }
-    runControl = [runModels objectAtIndex:0];
-
-    //Set the Mtcd for back to original settings
-    [theMTCModel setThePulserRate:[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_pulser_period"] floatValue]];
-    [theMTCModel enablePulser];
-    NSLog(@"SMELLIE_RUN:Setting the mtcd pulser back to %f Hz\n",[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_pulser_period"] floatValue]);
-    [theMTCModel stopMTCPedestalsFixedRate];
-
-    [theMTCModel setupGTCorseDelay:[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_coarse_delay"] intValue]];
-    NSLog(@"SMELLIE_RUN:Setting the mtcd coarse delay back to %i \n",[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_coarse_delay"] intValue]);
-
-    [self setSmellieSafeStates];
-    [self setSuperKSafeStates];
-
-    if([runControl isRunning]){
-        [runControl setForceRestart:YES];
-        [runControl performSelectorOnMainThread:@selector(stopRun) withObject:nil waitUntilDone:YES];
-        [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
-    }
-
-    NSLog(@"SMELLIE_RUN:Stopping SMELLIE Run\n");
-}
 
 /*****************************/
 /*  smellie db interactions  */
@@ -1656,7 +1702,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     }
     [self setSmellieFibreSwitchToFibreMapping:fibreSwitchOutputToFibre];
     [fibreSwitchOutputToFibre release];
-
+    
+    NSLog(@"%@", fibreSwitchOutputToFibre);
     return configForSmellie;
 }
 
