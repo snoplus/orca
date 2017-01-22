@@ -328,6 +328,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 {
     if((aCrate == 2) &&  ignoreBreakdownCheckOnA)return;
     if((aCrate == 1) &&  ignoreBreakdownCheckOnB)return;
+    
+    if([self fillingLN:aCrate-1])return;
 
     //the two Spike dicationaries come from notifications from the digitizers and the preamps.
     //They hold location info and a dictionary with the spike info. If they exist, there was an excursion in the running average
