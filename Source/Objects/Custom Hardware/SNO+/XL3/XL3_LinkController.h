@@ -151,7 +151,6 @@
     IBOutlet NSButton*              connectionAutoConnectButton;
     IBOutlet NSButton*              connectionAutoInitCrateButton;
     
-    id owl_crate_master;
     NSBox *hvBStatusPanel;
     NSBox *hvAStatusPanel;
 }	

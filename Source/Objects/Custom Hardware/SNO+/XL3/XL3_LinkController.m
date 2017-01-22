@@ -760,12 +760,6 @@ static NSDictionary* xl3Ops;
 
 - (void) hvStatusChanged:(NSNotification*)aNote
 { dispatch_async(dispatch_get_main_queue(), ^{
-    if (!owl_crate_master) { //cache owl master
-        NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
-        for (id xl3 in xl3s) {
-            if ([xl3 crateNumber] == 16) owl_crate_master = xl3;
-        }
-    }
     
     [hvAOnStatusField setStringValue:[model hvASwitch]?@"ON":@"OFF"];
     [hvAVoltageSetField setStringValue:[NSString stringWithFormat:@"%lu V",[model hvAVoltageDACSetValue]*3000/4096]];
@@ -791,11 +785,7 @@ static NSDictionary* xl3Ops;
 
     BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORXL3Lock];
 
-    //todo: add exception for OWLs
-    //if ([hvPowerSupplyMatrix selectedColumn] == 0 && [model hvASwitch]) {
-    if ([model hvASwitch] || //A ON or
-        (([model crateNumber] == 3 || [model crateNumber] == 13 || [model crateNumber] == 18) && //OWL crate
-         ([owl_crate_master hvBSwitch]))) { //and crate 16 HV B ON
+    if ([model hvASwitch] || ([model isOwlCrate] && [ORXL3Model owlSupplyOn])) {
         [hvRelayMaskHighField setEnabled:NO];
         [hvRelayMaskLowField setEnabled:NO];
         [hvRelayMaskMatrix setEnabled:NO];
