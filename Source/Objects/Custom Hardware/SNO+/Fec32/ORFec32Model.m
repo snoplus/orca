@@ -1606,11 +1606,11 @@ static int              sChannelsNotChangedCount = 0;
 
 //XL3 reads the counts for half the crate and pushes them here
 //returns YES if the cmos rates were updated
-- (BOOL) processCMOSCounts:(unsigned long*)rates calcRates:(BOOL)aCalcRates withChannelMask:(unsigned long) aChannelMask
+- (BOOL) processCMOSCounts:(uint32_t*)counts calcRates:(BOOL)aCalcRates withChannelMask:(unsigned long) aChannelMask
 {
     
     long		   	theRate = kCMOSRateUnmeasured;
-	unsigned long  	theCount;
+	uint32_t        theCount;
 	
 	NSDate* thisTime = [[NSDate alloc] init];
 	NSTimeInterval timeDiff = [thisTime timeIntervalSinceDate:cmosCountTimeStamp];
@@ -1635,9 +1635,18 @@ static int              sChannelsNotChangedCount = 0;
     unsigned char ch;
     for (ch=0; ch<32; ch++) {
         if (aChannelMask & 1UL << ch) {
-            theCount = rates[ch];
+            theCount = counts[ch];
 			if (calcRates) { //only good CMOS count reads get here
-					theRate = (theCount - cmosCount[ch]) * sampleFreq;
+                    if(cmosCount[ch] > theCount){
+                        // theCount rolled over
+                        uint32_t dumbRate = (theCount - cmosCount[ch]) * sampleFreq;
+                        theCount = (UINT32_MAX - cmosCount[ch]) + theCount;
+                        theRate = theCount * sampleFreq;
+                        NSLogColor([NSColor redColor], @"\nROLLOVER OCCURED\n IncorrectRate = %lu\n Correct Rate = %lu",dumbRate,theRate);
+                    }
+                    else{
+                        theRate = (theCount - cmosCount[ch]) * sampleFreq;
+                    }
 					if (theRate > 1e9) theRate = kCMOSRateCorruptRead;			//MAH 3/19/98
 			}
             else {
@@ -1651,7 +1660,6 @@ static int              sChannelsNotChangedCount = 0;
             cmosRate[ch] = kCMOSRateUnmeasured;
         }
     }
-    //[[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelCmosRateChanged object:self];
     return calcRates;
 }
 
