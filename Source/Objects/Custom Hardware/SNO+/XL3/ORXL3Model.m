@@ -4746,8 +4746,6 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
                 [self setIhighalarm_a_imax:65.0];
                 [self setVhighalarm_a_vmax:nominals[[self crateNumber]]+100.0];
                 [self setHvAFromDB:true];
-            } else {
-                sleep(10); //wait a bit before trying again
             }
         } else { // Only do this once, assume non-nil means the request was good
             NSDictionary* dict = [result fetchRowAsDictionary];
