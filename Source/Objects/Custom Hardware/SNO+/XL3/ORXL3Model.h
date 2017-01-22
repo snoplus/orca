@@ -116,6 +116,7 @@ enum {
     BOOL hvSwitchEverUpdated;
     BOOL hvANeedsUserIntervention;
     BOOL hvBNeedsUserIntervention;
+    BOOL isLoaded; //Whether the experiment is open or not (false to start, false at end)
     
     
     NSString* triggerStatus;
@@ -267,6 +268,7 @@ enum {
 @property BOOL hvBRamping;
 @property BOOL hvANeedsUserIntervention;
 @property BOOL hvBNeedsUserIntervention;
+@property BOOL isLoaded;
 
 #pragma mark •••Initialization
 - (id)   init;
@@ -280,6 +282,8 @@ enum {
 
 - (void) registerNotificationObservers;
 - (void) connectionStateChanged;
+- (void) documentLoaded;
+- (void) documentClosed;
 - (int) initAtRunStart;
 
 #pragma mark •••Accessors
