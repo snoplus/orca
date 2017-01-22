@@ -796,9 +796,12 @@ BOOL owlSupplyState = true; //better safe than sorry
         owlSupplyState = isOn;
         NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
         for (uint32_t i = 0; i < [objs count]; i++) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:[objs objectAtIndex:i]];
-            });
+            ORXL3Model *xl3 = [objs objectAtIndex:i];
+            if ([xl3 isOwlCrate]) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:xl3];
+                });
+            }
         }
     }
 }
