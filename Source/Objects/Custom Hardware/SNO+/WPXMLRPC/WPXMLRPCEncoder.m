@@ -214,8 +214,8 @@
 
 - (void)encodeNumber:(NSNumber *)number {
     NSString *numberType = [NSString stringWithCString:[number objCType] encoding:NSUTF8StringEncoding];
-    
-    if ([numberType isEqualToString:@"d"]) {
+
+    if ([numberType isEqualToString:@"d"] || [numberType isEqualToString:@"f"]) {
         [self valueTag:@"double" value:[number stringValue]];
     } else {
         [self valueTag:@"i4" value:[number stringValue]];

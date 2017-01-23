@@ -87,11 +87,11 @@
                                             returningResponse:&response
                                                         error:&error];
     if(error){
-        NSLog(@"Error with xmlrpc client request");
-        NSLog(@"Domain: %@", error.domain);
-        NSLog(@"Error Code: %ld", (long)error.code);
-        NSLog(@"Description: %@", [error localizedDescription]);
-        NSLog(@"Reason: %@", [error localizedFailureReason]);
+        NSLog(@"Error with xmlrpc client request\n");
+        NSLog(@"Domain: %@\n", error.domain);
+        NSLog(@"Error Code: %ld\n", (long)error.code);
+        NSLog(@"Description: %@\n", [error localizedDescription]);
+        NSLog(@"Reason: %@\n", [error localizedFailureReason]);
         NSException *excep = [NSException exceptionWithName:@"XmlrpcClient"
                                                      reason:[error localizedDescription]
                                                    userInfo:nil];
@@ -131,7 +131,7 @@
     // Append the new data to the instance variable you declared
     WPXMLRPCDecoder *decoder = [[[WPXMLRPCDecoder alloc] initWithData:data]autorelease];
     NSMutableString* returnString = [NSMutableString stringWithFormat:@"%@",[decoder object]];
-    NSLog(@"XML-RPC response: %@", returnString);
+    NSLog(@"XML-RPC response: %@\n", returnString);
     _response = [decoder object];
     [_responseData appendData:data];
 }
@@ -153,10 +153,10 @@
     // The request has failed for some reason!
     // Check the error var
     NSLog(@"Error with xmlrpc client request");
-    NSLog(@"Domain: %@", error.domain);
-    NSLog(@"Error Code: %ld", (long)error.code);
-    NSLog(@"Description: %@", [error localizedDescription]);
-    NSLog(@"Reason: %@", [error localizedFailureReason]);
+    NSLog(@"Domain: %@\n", error.domain);
+    NSLog(@"Error Code: %ld\n", (long)error.code);
+    NSLog(@"Description: %@\n", [error localizedDescription]);
+    NSLog(@"Reason: %@\n", [error localizedFailureReason]);
 }
 
 @end

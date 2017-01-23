@@ -91,6 +91,10 @@
     IBOutlet NSButton *smellieBuildCustomRun;
     IBOutlet NSButton *smellieChangeConfiguration;
 
+    //TELLIE
+    NSDictionary* tellieFireSettings;
+    NSThread* tellieThread;
+    BOOL tellieStandardSequenceFlag;
     IBOutlet NSButton* runsLockButton;
     IBOutlet NSTextField *lockStatusTextField;
 
@@ -141,6 +145,8 @@
     IBOutlet WebView* detectorState;
 }
 
+@property (nonatomic) BOOL tellieStandardSequenceFlag;
+@property (nonatomic,retain) NSDictionary *tellieFireSettings;
 @property (nonatomic,retain) NSMutableDictionary *smellieRunFileList;
 @property (nonatomic,retain) NSDictionary *smellieRunFile;
 @property (nonatomic,retain) NSColor *snopRedColor;
@@ -188,10 +194,16 @@
 
 //smellie functions -------------------
 - (IBAction) loadSmellieRunAction:(id)sender;
-- (IBAction) callSmellieSettings:(id)sender;
+- (IBAction) fetchRunFiles:(id)sender;
+- (void) fetchRunFilesFinish:(NSNotification *)aNote;
 - (IBAction) startSmellieRunAction:(id)sender;
 - (IBAction) stopSmellieRunAction:(id)sender;
 - (IBAction) emergencySmellieStopAction:(id)sender;
+
+//tellie functions ---------------------
+-(IBAction)startTellieRunAction:(id)sender;
+- (IBAction) stopTellieRunAction:(id)sender;
+-(void)startTellieRunNotification:(NSNotification *)notification;
 
 //xl3 mode status
 - (IBAction)updatexl3Mode:(id)sender;

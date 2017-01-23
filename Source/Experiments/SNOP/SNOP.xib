@@ -1691,7 +1691,7 @@
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
                                                                 <connections>
-                                                                    <action selector="callSmellieSettings:" target="-2" id="3583"/>
+                                                                    <action selector="fetchRunFiles:" target="-2" id="RAs-k7-vKo"/>
                                                                 </connections>
                                                             </button>
                                                             <button verticalHuggingPriority="750" id="3546">
@@ -2872,6 +2872,7 @@
                                         <webView id="rCO-DX-2zv">
                                             <rect key="frame" x="33" y="51" width="708" height="573"/>
                                             <autoresizingMask key="autoresizingMask"/>
+                                            <animations/>
                                             <webPreferences key="preferences" defaultFontSize="16" defaultFixedFontSize="13" minimumFontSize="0">
                                                 <nil key="identifier"/>
                                             </webPreferences>
@@ -3616,6 +3617,7 @@
                                         <button id="drG-95-YYb">
                                             <rect key="frame" x="15" y="169" width="158" height="47"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <animations/>
                                             <buttonCell key="cell" type="bevel" title="Ping Crates" bezelStyle="regularSquare" imagePosition="overlaps" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Nbm-1z-7bg">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>

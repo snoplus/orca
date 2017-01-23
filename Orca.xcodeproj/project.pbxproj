@@ -280,6 +280,8 @@
 		369E73451C7B5E8E00A7F89E /* NSLogTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 369E73441C7B5E8E00A7F89E /* NSLogTest.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc -Wno-gnu"; }; };
 		369E734E1C7B66E000A7F89E /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 841491F11958AD03009F5E40 /* Cocoa.framework */; };
 		369E734F1C7B66E600A7F89E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 840C7FE71955CA5A00E36622 /* Foundation.framework */; };
+		3AFC9E211D2AACFB00190989 /* NodeMap.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3AFC9E201D2AACFB00190989 /* NodeMap.xib */; };
+		3AFC9E231D2AAD4600190989 /* NodePanelMap.png in Resources */ = {isa = PBXBuildFile; fileRef = 3AFC9E221D2AAD4600190989 /* NodePanelMap.png */; };
 		43135802195C5D89007B1F15 /* ORGretinaTriggerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 43135801195C5D89007B1F15 /* ORGretinaTriggerModel.m */; };
 		43135804195C5DA3007B1F15 /* ORGretinaTriggerModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 43135803195C5DA3007B1F15 /* ORGretinaTriggerModel.h */; };
 		4322E9B217830004008E78A4 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4322E9B117830004008E78A4 /* GLUT.framework */; };
@@ -4020,6 +4022,8 @@
 		369E733B1C7B5E6400A7F89E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		369E73441C7B5E8E00A7F89E /* NSLogTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSLogTest.m; sourceTree = "<group>"; };
 		369E734B1C7B64FF00A7F89E /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		3AFC9E201D2AACFB00190989 /* NodeMap.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = NodeMap.xib; path = "Source/Objects/Custom Hardware/SNO+/ELLIE/NodeMap.xib"; sourceTree = SOURCE_ROOT; };
+		3AFC9E221D2AAD4600190989 /* NodePanelMap.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = NodePanelMap.png; sourceTree = "<group>"; };
 		43135801195C5D89007B1F15 /* ORGretinaTriggerModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGretinaTriggerModel.m; sourceTree = "<group>"; };
 		43135803195C5DA3007B1F15 /* ORGretinaTriggerModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORGretinaTriggerModel.h; sourceTree = "<group>"; };
 		4322E9B117830004008E78A4 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../../System/Library/Frameworks/GLUT.framework; sourceTree = "<group>"; };
@@ -14327,6 +14331,8 @@
 				DB704A0E18EBA4D100839B42 /* ELLIEController.m */,
 				DB704A1118EBA4E100839B42 /* ELLIEModel.h */,
 				DB704A1218EBA4E100839B42 /* ELLIEModel.m */,
+				3AFC9E201D2AACFB00190989 /* NodeMap.xib */,
+				3AFC9E221D2AAD4600190989 /* NodePanelMap.png */,
 				DB704A1518EBA61E00839B42 /* ellie.xib */,
 			);
 			path = ELLIE;
@@ -17013,6 +17019,7 @@
 				8415EB5E152DF0970092C975 /* adcProcessor.tif in Resources */,
 				8415EB61152DF0970092C975 /* AdcProcessor.nib in Resources */,
 				8491303115334EAA00597004 /* BitProcessor.nib in Resources */,
+				3AFC9E231D2AAD4600190989 /* NodePanelMap.png in Resources */,
 				8491303215334EAA00597004 /* BitProcessor.tif in Resources */,
 				8491303B15334EAA00597004 /* TwoBitProcessor.nib in Resources */,
 				84D29FE01843EAC800D320DB /* warn.png in Resources */,
@@ -17078,6 +17085,7 @@
 				6B325E081B2F4241002E2DD7 /* SNOP.xib in Resources */,
 				8499788B174BA11400BFEE3E /* EHS130n.nib in Resources */,
 				8499788C174BA11400BFEE3E /* EHS130n.tif in Resources */,
+				3AFC9E211D2AACFB00190989 /* NodeMap.xib in Resources */,
 				84BF74BE17590CB000AF1F56 /* 3DScanPlatform.nib in Resources */,
 				B3808A8C1700F84B0019C27D /* CouchDBListener.nib in Resources */,
 				B3805611172BE4A100B5B134 /* Changesfeed.tif in Resources */,
