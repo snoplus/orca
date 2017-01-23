@@ -810,11 +810,53 @@ isLoaded = isLoaded;
     
 }
 
+/**
+ * Global variable to store the state of the OWL supply
+ */
+BOOL owlSupplyState = true; //better safe than sorry
+
+/**
+ * Called by the owl supply to set the state. Also posts a ORXL3HVStatusChanged 
+ * notification to make sure all GUIs are properly updated in the event of a change.
+ */
++ (void) setOwlSupplyOn:(BOOL)isOn {
+    if (owlSupplyState != isOn) {
+        owlSupplyState = isOn;
+        NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+        for (uint32_t i = 0; i < [objs count]; i++) {
+            ORXL3Model *xl3 = [objs objectAtIndex:i];
+            if ([xl3 isOwlCrate]) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:xl3];
+                });
+            }
+        }
+    }
+}
+
+/**
+ * Returns true if the OWL supply is on
+ */
++ (BOOL) owlSupplyOn {
+    return owlSupplyState;
+}
+
+/**
+ * Returns true if the crate has OWL PTMs connected
+ */
+- (BOOL) isOwlCrate {
+    uint32_t n = [self crateNumber];
+    if (n == 3 || n == 13 || n == 18) {
+        return true;
+    }
+    return false;
+}
+
 - (void) setHvEverUpdated:(BOOL)ever
 {
     hvEverUpdated = ever;
     dispatch_async(dispatch_get_main_queue(), ^{
-     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
     });
 }
 
@@ -887,10 +929,12 @@ isLoaded = isLoaded;
 
 - (void) setHvASwitch:(BOOL)aHvASwitch
 {
-    hvASwitch = aHvASwitch;
-	dispatch_async(dispatch_get_main_queue(), ^{
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
-    });
+    if (hvASwitch != aHvASwitch) {
+        hvASwitch = aHvASwitch;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
+        });
+    }
 }
 
 - (BOOL) hvBSwitch
@@ -900,10 +944,17 @@ isLoaded = isLoaded;
 
 - (void) setHvBSwitch:(BOOL)aHvBSwitch
 {
-    hvBSwitch = aHvBSwitch;
-    dispatch_async(dispatch_get_main_queue(), ^{
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];        
-    });
+    if (hvBSwitch != aHvBSwitch) {
+        hvBSwitch = aHvBSwitch;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];        
+        });
+    }
+    if ([self crateNumber] == 16) {
+        //Should be called even if the model value appears not to change to
+        //properly update the GUI and keep everything consistent
+        [ORXL3Model setOwlSupplyOn:aHvBSwitch];
+    }
 }
 
 - (BOOL) hvANeedsUserIntervention
@@ -3817,24 +3868,49 @@ err:
     [self setHvASwitch:xl3SwitchA];
     [self setHvBSwitch:xl3SwitchB];
         
-    BOOL interlockIsGood;
-    
-    @try {
-        [self readHVInterlockGood:&interlockIsGood];
+        
+    BOOL interlockIsGood = false;
+    if ([self crateNumber] == 16 && sup != 0) { //16B
+        //Checks interlocks for any crates with connected OWL tubes
+        //Assumes that all relevant crates are represented in the open experiment
+        uint32_t checkedInterlocks = 0;
+        uint32_t goodInterlocks = 0;
+        NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+        for (uint32_t i = 0; i < [objs count]; i++) {
+            ORXL3Model *xl3 = [objs objectAtIndex:i];
+            if ([xl3 isOwlCrate]) {
+                checkedInterlocks++;
+                @try {
+                    BOOL good = false;
+                    [xl3 readHVInterlockGood:&good];
+                    if (good) {
+                        goodInterlocks++;
+                    } else {
+                        NSLogColor([NSColor redColor],@"%@ HV interlock BAD\n",[[xl3 xl3Link] crateName]);
+                    }
+                }
+                @catch (NSException *exception) {
+                    NSLogColor([NSColor redColor],@"%@ error in readHVInterlock\n",[[xl3 xl3Link] crateName]);
+                }
+            }
+        }
+        interlockIsGood = checkedInterlocks == goodInterlocks;
+    } else {
+        //Checks the interlock for this crate only
+        @try {
+            [self readHVInterlockGood:&interlockIsGood];
+            if (!interlockIsGood) NSLogColor([NSColor redColor],@"%@ HV interlock BAD\n",[[self xl3Link] crateName]);
+        }
+        @catch (NSException *exception) {
+            NSLogColor([NSColor redColor],@"%@ error in readHVInterlock\n",[[self xl3Link] crateName]);
+        }
     }
-    @catch (NSException *exception) {
-        NSLogColor([NSColor redColor],@"%@ error in readHVInterlock\n",[[self xl3Link] crateName]);
-        return;
-    }
-
     if (!interlockIsGood) {
-        NSLogColor([NSColor redColor],@"%@ HV interlock BAD\n",[[self xl3Link] crateName]);
         if (aOn) {
             NSLog(@"%@ NOT turning ON the HV power supply.\n",[[self xl3Link] crateName]);
             return;
-        }
-        else {
-            NSLog(@"%@ continuing to turn OFF the HV power supply.\n",[[self xl3Link] crateName]);            
+        } else {
+            NSLog(@"%@ continuing to turn OFF the HV power supply.\n",[[self xl3Link] crateName]);
         }
     }
         

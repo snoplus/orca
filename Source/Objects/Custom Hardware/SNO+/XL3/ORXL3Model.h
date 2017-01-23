@@ -332,6 +332,10 @@ enum {
 - (NSString*) xl3LockName;
 - (NSComparisonResult) XL3NumberCompare:(id)aCard;
 
++ (void) setOwlSupplyOn:(BOOL)isOn;
++ (BOOL) owlSupplyOn;
+- (BOOL) isOwlCrate;
+
 #pragma mark •••DB Helpers
 - (void) synthesizeDefaultsIntoBundle:(MB*)aBundle forSlot:(unsigned short)aSlot;
 - (void) byteSwapBundle:(MB*)aBundle;
