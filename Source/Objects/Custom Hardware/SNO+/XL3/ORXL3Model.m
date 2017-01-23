@@ -3876,7 +3876,7 @@ err:
             NSLogColor([NSColor redColor],@"%@ error in readHVInterlock\n",[[self xl3Link] crateName]);
         }
     }
-    if (interlockIsGood) {
+    if (!interlockIsGood) {
         if (aOn) {
             NSLog(@"%@ NOT turning ON the HV power supply.\n",[[self xl3Link] crateName]);
             return;
