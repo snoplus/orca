@@ -123,6 +123,7 @@ enum {
     BOOL _isTriggerON;
     
     unsigned long _hvNominalVoltageA;
+    float _hvReadbackCorrA;
     float _hvramp_a_up;
     float _hvramp_a_down;
     float _vsetalarm_a_vtol;
@@ -132,6 +133,7 @@ enum {
     float _ihighalarm_a_imax;
     
     unsigned long _hvNominalVoltageB;
+    float _hvReadbackCorrB;
     float _hvramp_b_up;
     float _hvramp_b_down;
     float _vsetalarm_b_vtol;
@@ -242,6 +244,7 @@ enum {
 @property (assign) id snotDb;//I replaced 'weak' by 'assign' to get Orca compiled under 10.6 (-tb- 2013-09)
 
 
+@property float hvReadbackCorrA;
 @property float hvramp_a_up;
 @property float hvramp_a_down;
 @property float vsetalarm_a_vtol;
@@ -250,6 +253,7 @@ enum {
 @property float vhighalarm_a_vmax;
 @property float ihighalarm_a_imax;
 
+@property float hvReadbackCorrB;
 @property float hvramp_b_up;
 @property float hvramp_b_down;
 @property float vsetalarm_b_vtol;

@@ -127,6 +127,7 @@ isPollingForced,
 calcCMOSRatesFromCounts = _calcCMOSRatesFromCounts,
 hvANextStepValue = _hvANextStepValue,
 hvBNextStepValue = _hvBNextStepValue,
+hvReadbackCorrA = _hvReadbackCorrA,
 hvramp_a_up = _hvramp_a_up,
 hvramp_a_down = _hvramp_a_down,
 vsetalarm_a_vtol = _vsetalarm_a_vtol,
@@ -134,6 +135,7 @@ ilowalarm_a_vmin = _ilowalarm_a_vmin,
 ilowalarm_a_imin = _ilowalarm_a_imin,
 vhighalarm_a_vmax = _vhighalarm_a_vmax,
 ihighalarm_a_imax = _ihighalarm_a_imax,
+hvReadbackCorrB = _hvReadbackCorrB,
 hvramp_b_up = _hvramp_b_up,
 hvramp_b_down = _hvramp_b_down,
 vsetalarm_b_vtol = _vsetalarm_b_vtol,
@@ -3672,8 +3674,8 @@ err:
             return;
         }
 
-        [self setHvAVoltageReadValue:status.voltageA * 300.];
-        [self setHvBVoltageReadValue:status.voltageB * 300.];
+        [self setHvAVoltageReadValue:status.voltageA * 300. * self.hvReadbackCorrA];
+        [self setHvBVoltageReadValue:status.voltageB * 300. * self.hvReadbackCorrB];
         [self setHvACurrentReadValue:status.currentA * 10.];
         [self setHvBCurrentReadValue:status.currentB * 10.];
 
@@ -4602,6 +4604,7 @@ err:
             } else {
                 //hardcode non-16 supply B values
                 [model setHvBFromDB:true];
+                [model setHvReadbackCorrB:1.0];
                 [model setHvNominalVoltageB:0];
                 [model setHvramp_b_up:10.0];
                 [model setHvramp_b_down:50.0];
@@ -4636,6 +4639,7 @@ err:
         } else {
             //hardcode non-16 supply B values
             [model setHvBFromDB:true];
+            [model setHvReadbackCorrB:1.0];
             [model setHvNominalVoltageB:0];
             [model setHvramp_b_up:10.0];
             [model setHvramp_b_down:50.0];
@@ -4805,6 +4809,7 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
             if (res) {
                 NSLogColor([NSColor redColor],@"Using HARDCODED DEFAULTS for supply %iA\n", [self crateNumber]);
                 [self setHvNominalVoltageA:nominals[[self crateNumber]]];
+                [self setHvReadbackCorrA:1.0];
                 [self setHvramp_a_up:10.0];
                 [self setHvramp_a_down:50.0];
                 [self setVsetalarm_a_vtol:100.0];
@@ -4817,6 +4822,7 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
         } else { // Only do this once, assume non-nil means the request was good
             NSDictionary* dict = [result fetchRowAsDictionary];
             [self setHvNominalVoltageA:[(NSNumber*)[dict valueForKey:@"nominal"] floatValue]];
+            [self setHvReadbackCorrA:[(NSNumber*)[dict valueForKey:@"readback_corr"] floatValue]];
             [self setHvramp_a_up:[(NSNumber*)[dict valueForKey:@"hvramp_up"] floatValue]];
             [self setHvramp_a_down:[(NSNumber*)[dict valueForKey:@"hvramp_down"] floatValue]];
             [self setVsetalarm_a_vtol:[(NSNumber*)[dict valueForKey:@"vsetalarm_vtol"] floatValue]];
@@ -4844,6 +4850,7 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
             if (res) {
                 NSLogColor([NSColor redColor],@"Using HARDCODED DEFAULTS for supply %iB\n", [self crateNumber]);
                 [self setHvNominalVoltageB:(int)([self crateNumber]==16 ? 2445.0 : 0.0)];
+                [self setHvReadbackCorrB:1.0];
                 [self setHvramp_b_up:10.0];
                 [self setHvramp_b_down:50.0];
                 [self setVsetalarm_b_vtol:100.0];
@@ -4856,6 +4863,7 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
         } else {
             NSDictionary* dict = [result fetchRowAsDictionary];
             [self setHvNominalVoltageB:[(NSNumber*)[dict valueForKey:@"nominal"] floatValue]];
+            [self setHvReadbackCorrB:[(NSNumber*)[dict valueForKey:@"readback_corr"] floatValue]];
             [self setHvramp_b_up:[(NSNumber*)[dict valueForKey:@"hvramp_up"] floatValue]];
             [self setHvramp_b_down:[(NSNumber*)[dict valueForKey:@"hvramp_down"] floatValue]];
             [self setVsetalarm_b_vtol:[(NSNumber*)[dict valueForKey:@"vsetalarm_vtol"] floatValue]];
@@ -5035,15 +5043,15 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
     
     //Update log with new values
     [self readHVStatus];
-    NSLog(@"%@ HV A Params: Nominal: %.1f V, RampUp: %.1f V/s, RampDown: %.1f V/s, Vtol: %.1f V, IlowVmin: %.1f V, IlowImin: %.1f mA, Ihigh: %.1f mA, Vhigh: %.1f V\n",
-          [[self xl3Link] crateName], (float)[self hvNominalVoltageA], [self hvramp_a_up], [self hvramp_a_down], [self vsetalarm_a_vtol],
+    NSLog(@"%@ HV A Params: Nominal: %.1f V, ReadbackCorr: %.3f, RampUp: %.1f V/s, RampDown: %.1f V/s, Vtol: %.1f V, IlowVmin: %.1f V, IlowImin: %.1f mA, Ihigh: %.1f mA, Vhigh: %.1f V\n",
+          [[self xl3Link] crateName], (float)[self hvNominalVoltageA], (float)[self hvReadbackCorrA], [self hvramp_a_up], [self hvramp_a_down], [self vsetalarm_a_vtol],
           [self ilowalarm_a_vmin], [self ilowalarm_a_imin], [self ihighalarm_a_imax], [self vhighalarm_a_vmax]);
     NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ HV A Status: ", [[self xl3Link] crateName]];
     [msg appendFormat:@"Setpoint: %.2f V, Voltage: %.2f V, Current: %.2f mA\n", [self hvAVoltageDACSetValue]/4096.*3000., [self hvAVoltageReadValue], [self hvACurrentReadValue]];
     NSLog(msg);
     if ([self crateNumber] == 16) {
-        NSLog(@"%@ HV B Params: Nominal: %.1f V, RampUp: %.1f V/s, RampDown: %.1f V/s, Vtol: %.1f V, IlowVmin: %.1f V, IlowImin: %.1f mA, Ihigh: %.1f mA, Vhigh: %.1f V\n",
-              [[self xl3Link] crateName], (float)[self hvNominalVoltageB], [self hvramp_b_up], [self hvramp_b_down], [self vsetalarm_b_vtol],
+        NSLog(@"%@ HV B Params: Nominal: %.1f V, ReadbackCorr: %.3f, RampUp: %.1f V/s, RampDown: %.1f V/s, Vtol: %.1f V, IlowVmin: %.1f V, IlowImin: %.1f mA, Ihigh: %.1f mA, Vhigh: %.1f V\n",
+              [[self xl3Link] crateName], (float)[self hvNominalVoltageB], (float)[self hvReadbackCorrB], [self hvramp_b_up], [self hvramp_b_down], [self vsetalarm_b_vtol],
               [self ilowalarm_b_vmin], [self ilowalarm_b_imin], [self ihighalarm_b_imax], [self vhighalarm_b_vmax]);
         NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ HV B Status: ", [[self xl3Link] crateName]];
         [msg appendFormat:@"Setpoint: %.2f V, Voltage: %.2f V, I: %.2f mA\n", [self hvBVoltageDACSetValue]/4096.*3000., [self hvAVoltageReadValue], [self hvACurrentReadValue]];
