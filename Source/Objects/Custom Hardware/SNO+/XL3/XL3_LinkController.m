@@ -689,7 +689,8 @@ static NSDictionary* xl3Ops;
     }
     
     BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORXL3Lock];
-    BOOL notRunningOrInMaintenance = [aSNOPModel isNotRunningOrInMaintenance];
+    BOOL notRunningOrInMaintenance = true; //default if no snopmodel found
+    if (aSNOPModel) notRunningOrInMaintenance = [aSNOPModel isNotRunningOrInMaintenance];
     
     if ([hvPowerSupplyMatrix selectedColumn] == 0) { //A
         bool unlock = ![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && ![model hvASwitch] && [model hvAFromDB] && !lockedOrNotRunningMaintenance;
