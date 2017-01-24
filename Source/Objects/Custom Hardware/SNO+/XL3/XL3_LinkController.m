@@ -1405,11 +1405,13 @@ static NSDictionary* xl3Ops;
 
 - (IBAction)hvTurnOnAction:(id)sender
 {
+    [[sender window] makeFirstResponder:tabView];
     [model setHVSwitch:YES forPowerSupply:[hvPowerSupplyMatrix selectedColumn]];
 }
 
 - (IBAction)hvTurnOffAction:(id)sender
 {
+    [[sender window] makeFirstResponder:tabView];
     unsigned int sup = [hvPowerSupplyMatrix selectedColumn];
 
     if (sup == 0 && [model hvASwitch]) {
@@ -1518,6 +1520,7 @@ static NSDictionary* xl3Ops;
 
 - (IBAction)hvStepUpAction:(id)sender;
 {
+    [[sender window] makeFirstResponder:tabView];
     unsigned long aVoltageDACValue;
     if ([hvPowerSupplyMatrix selectedColumn] == 0) {
         aVoltageDACValue = [model hvANextStepValue];
@@ -1535,6 +1538,7 @@ static NSDictionary* xl3Ops;
 
 - (IBAction)hvStepDownAction:(id)sender
 {
+    [[sender window] makeFirstResponder:tabView];
     unsigned long aVoltageDACValue;
     if ([hvPowerSupplyMatrix selectedColumn] == 0) {
         aVoltageDACValue = [model hvANextStepValue];
@@ -1552,16 +1556,18 @@ static NSDictionary* xl3Ops;
 
 - (IBAction)hvRampUpAction:(id)sender
 {
-        if ([hvPowerSupplyMatrix selectedColumn] == 0) {
-            [model setHvANextStepValue:[model hvAVoltageTargetValue]];
-        }
-        else {
-            [model setHvBNextStepValue:[model hvBVoltageTargetValue]];
-        }
+    [[sender window] makeFirstResponder:tabView];
+    if ([hvPowerSupplyMatrix selectedColumn] == 0) {
+        [model setHvANextStepValue:[model hvAVoltageTargetValue]];
+    }
+    else {
+        [model setHvBNextStepValue:[model hvBVoltageTargetValue]];
+    }
 }
 
 - (IBAction)hvRampDownAction:(id)sender
 {
+    [[sender window] makeFirstResponder:tabView];
     if ([model isTriggerON]) {
         [model hvTriggersOFF];
     }
@@ -1575,6 +1581,7 @@ static NSDictionary* xl3Ops;
 
 - (IBAction)hvRampPauseAction:(id)sender
 {
+    [[sender window] makeFirstResponder:tabView];
     if ([hvPowerSupplyMatrix selectedColumn] == 0) {
         [model setHvANextStepValue:[model hvAVoltageDACSetValue]];
     }
