@@ -201,7 +201,8 @@
 
 - (void) pingCrates;
 
-#pragma mark Â¥Â¥orcascript helpers
+#pragma mark ¥¥orcascript helpers
+- (BOOL) isNotRunningOrInMaintenance;
 - (void) zeroPedestalMasks;
 - (void) updatePedestalMasks:(unsigned int)pattern;
 - (void) hvMasterTriggersOFF;

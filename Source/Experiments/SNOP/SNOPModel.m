@@ -2010,6 +2010,16 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 
 }
 
+- (BOOL) isNotRunningOrInMaintenance
+{
+    
+    return (![gOrcaGlobals runInProgress] ||
+            (([gOrcaGlobals runType] & kMaintenanceRun) ||
+            ([gOrcaGlobals runType] & kDiagnosticRun)));
+    
+}
+
+
 @end
 
 @implementation SNOPDecoderForRHDR
