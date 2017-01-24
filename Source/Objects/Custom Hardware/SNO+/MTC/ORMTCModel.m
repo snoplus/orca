@@ -363,7 +363,7 @@ resetFifoOnStart = _resetFifoOnStart;
     [[self undoManager] disableUndoRegistration];
 
     if (pqMTC->valid[kMTC_controlReg]) {
-        [self setDbLong:pqMTC->controlReg forIndex:kControlMask];   //TO_DO is this correct?
+        [self setDbLong:pqMTC->controlReg forIndex:kControlMask]; // TO_DO NO -- only update pedestals
     }
     //TO_DO the last 4 dacs are spares? But then why are the masks in these spots in mtcDacIndexes[]?
     for (int i=0; i<10; ++i) { // (don't update the last 4 dac settings)
@@ -385,7 +385,7 @@ resetFifoOnStart = _resetFifoOnStart;
         [self setDbLong:pqMTC->pedMask forIndex:kPEDCrateMask];
     }
     if (pqMTC->valid[kMTC_prescale]) {
-        [self setDbLong:pqMTC->prescale forIndex:kNhit100LoPrescale];
+        [self setDbLong:(0x10000 - pqMTC->prescale) forIndex:kNhit100LoPrescale];
     }
     if (pqMTC->valid[kMTC_lockoutWidth]) {
         [self setDbLong:pqMTC->lockoutWidth forIndex:kLockOutWidth];

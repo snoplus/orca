@@ -248,7 +248,8 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
         //TO_DO what about setIsFixedSize?
     }
     if (pqCAEN->valid[kCAEN_acquisitionControl]) {
-        [self setAcquisitionMode:pqCAEN->acquisitionControl];
+        [self setAcquisitionMode:pqCAEN->acquisitionControl & 0x03];
+        [self setCountAllTriggers:(pqCAEN->acquisitionControl >> 3) & 0x01];
     }
     if (pqCAEN->valid[kCAEN_triggerMask]) {
         [self setTriggerSourceMask:pqCAEN->triggerMask];
@@ -264,7 +265,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
         [self setFrontPanelControlMask:pqCAEN->frontPanelIoControl];
     }
     if (pqCAEN->valid[kCAEN_channelMask]) {
-        [self setChannelConfigMask:pqCAEN->channelMask];
+        [self setEnabledMask:pqCAEN->channelMask];
     }
     for (int i=0; i<kNumCaenChannelDacs; ++i) {
         if (pqCAEN->valid[kCAEN_channelDacs] & (1 << i)) {
@@ -272,7 +273,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
             //TO_DO what about setThreshold and setOverUnderThreshold?
         }
     }
-    //TO_DO what about?: setEnabledMask, setCoincidenceLevel, setCountAllTriggers,
+    //TO_DO what about?: , setCoincidenceLevel, setCountAllTriggers,
     // setWaveFormRateGroup, setNumberBLTEventsToReadout, setContinuousMode
     [[self undoManager] enableUndoRegistration];
 }

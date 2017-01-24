@@ -232,33 +232,32 @@ snotDb = _snotDb;
     [[self undoManager] disableUndoRegistration];
 
     if (pqCrate->valid[kCrate_ctcDelay]) {
-        //TO_DO init from pqCrate->ctcDelay (seems to be forced to 0 in the code?)
+        // currently this is always 0, but write this if we ever add it to the GUI
     }
     if (pqCrate->valid[kCrate_hvRelayMask1] && pqCrate->valid[kCrate_hvRelayMask2]) {
-        //TO_DO is mask1 the lower 32 bits?
         unsigned long long mask = ((unsigned long long)pqCrate->hvRelayMask2 << 32) | pqCrate->hvRelayMask1;
         [self setRelayMask:mask];
-        //TO_DO what about setRelayViewMask?
+        [self setRelayStatus:@"status: set"];
     }
     if (pqCrate->valid[kCrate_hvAOn]) {
-        //TO_DO init from pqCrate->hvAOn
+        // don't set this
     }
     if (pqCrate->valid[kCrate_hvBOn]) {
-        //TO_DO init from pqCrate->hvBOn
+        // don't set this
     }
     if (pqCrate->valid[kCrate_hvDacA]) {
-        [self setHvAVoltageDACSetValue:pqCrate->hvDacA];
+        // don't set this [self setHvAVoltageDACSetValue:pqCrate->hvDacA];
     }
     if (pqCrate->valid[kCrate_hvDacB]) {
-        [self setHvBVoltageDACSetValue:pqCrate->hvDacB];
+        // don't set this [self setHvBVoltageDACSetValue:pqCrate->hvDacB];
     }
     if (pqCrate->valid[kCrate_xl3ReadoutMask]) {
-        [self setSlotMask:pqCrate->xl3ReadoutMask]; //TO_DO is this correct?
+        [self setSlotMask:pqCrate->xl3ReadoutMask]; // note that this affects all GUI slot operations, not only readout
     }
     if (pqCrate->valid[kCrate_xl3Mode]) {
-        //TO_DO init from pqCrate->xl3Mode
+        [self setXl3Mode:pqCrate->xl3Mode];
     }
-    //TO_DO there are a lot more settings that aren't found in the MTC database
+    //TO_DO there are a lot more settings that aren't found in the XL3 database
     [[self undoManager] enableUndoRegistration];
 }
 
