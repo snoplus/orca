@@ -33,6 +33,7 @@
 #import "ORCouchDB.h"
 #import "ORPQModel.h"
 #import "ORPQResult.h"
+#import "RunTypeWordBits.hh"
 #import "math.h"
 
 static Xl3RegNamesStruct reg[kXl3NumRegisters] = {
@@ -5078,11 +5079,11 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
         NSAutoreleasePool *hvLoopPool = [[NSAutoreleasePool alloc] init];
         
         //state variables
-        bool aUp = false, bUp = false, changing = false;
+        bool aUp = false, bUp = false, achanging = false, bchanging = false;
         
         if (!self.hvANeedsUserIntervention && [self hvANextStepValue] != [self hvAVoltageDACSetValue]) {
             unsigned long aValueToSet = [self hvANextStepValue];
-            changing = true;
+            achanging = true;
             
             if ([self hvANextStepValue] > [self hvAVoltageDACSetValue] + [self hvramp_a_up] / 3000. * 4096) {
                 aValueToSet = [self hvAVoltageDACSetValue] + [self hvramp_a_up] / 3000. * 4096;
@@ -5094,7 +5095,6 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
                 aValueToSet = [self hvAVoltageTargetValue];
             }
             aUp = aValueToSet > [self hvAVoltageDACSetValue];
-            if ([self hvAVoltageDACSetValue] != aValueToSet) changing = true;
             @try {
                 [self setHVDacA:aValueToSet dacB:[self hvBVoltageDACSetValue]];
                 //assume it worked
@@ -5107,7 +5107,7 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
         
         if ([self crateNumber] == 16 && !self.hvBNeedsUserIntervention && [self hvBNextStepValue] != [self hvBVoltageDACSetValue]) {
             unsigned long aValueToSet = [self hvBNextStepValue];
-            changing = true;
+            bchanging = true;
             
             if ([self hvBNextStepValue] > [self hvBVoltageDACSetValue] + [self hvramp_a_up] / 3000. * 4096) {
                 aValueToSet = [self hvBVoltageDACSetValue] + [self hvramp_a_up] / 3000. * 4096;
@@ -5119,7 +5119,6 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
                 aValueToSet = [self hvBVoltageTargetValue];
             }
             bUp = aValueToSet > [self hvBVoltageDACSetValue];
-            if ([self hvAVoltageDACSetValue] != aValueToSet) changing = true;
             @try {
                 [self setHVDacA:[self hvAVoltageDACSetValue] dacB:aValueToSet];
                 //assume it worked
@@ -5136,7 +5135,12 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
         //get the current status
         [self readHVStatus];
 
-        if (changing) {
+        if (achanging || bchanging) {
+            if ([gOrcaGlobals runInProgress] && ([gOrcaGlobals runType] & kPhysicsRun)) {
+                if (achanging) [self _trigger_edge_alarm:80500+[self crateNumber]*2+0];
+                if (bchanging) [self _trigger_edge_alarm:80500+[self crateNumber]*2+1];
+            }
+            
             //Update log with new values
             NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ HV A Status: ", [[self xl3Link] crateName]];
             [msg appendFormat:@"Setpoint: %.2f V, Voltage: %.2f V, Current: %.2f mA\n", [self hvAVoltageDACSetValue]/4096.*3000., [self hvAVoltageReadValue], [self hvACurrentReadValue]];
