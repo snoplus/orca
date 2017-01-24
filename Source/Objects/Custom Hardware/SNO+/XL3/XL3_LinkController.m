@@ -403,9 +403,10 @@ static NSDictionary* xl3Ops;
 #pragma mark •••Interface Management
 - (void) xl3LockChanged:(NSNotification*)aNotification
 {
+
     BOOL locked						= [gSecurity isLocked:ORXL3Lock];
     BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORXL3Lock];
-
+    
     //Basic
     [lockButton setState: locked];
     [basicReadButton setEnabled: !lockedOrNotRunningMaintenance];
@@ -475,38 +476,8 @@ static NSDictionary* xl3Ops;
     [monVltThresholdSetButton setEnabled: !lockedOrNotRunningMaintenance];
 
     //HV
-    [hvAcceptReadbackButton setEnabled: !lockedOrNotRunningMaintenance];
-    [hvOnButton setEnabled: !lockedOrNotRunningMaintenance];
-    [hvOffButton setEnabled: !lockedOrNotRunningMaintenance];
-    [hvStepUpButton setEnabled: !lockedOrNotRunningMaintenance];
-    [hvStepDownButton setEnabled: !lockedOrNotRunningMaintenance];
-    [hvRampUpButton setEnabled: !lockedOrNotRunningMaintenance];
-    [hvRampDownButton setEnabled: !lockedOrNotRunningMaintenance];
-    [hvStopRampButton setEnabled: !lockedOrNotRunningMaintenance];
-    [hvRelayMaskLowField setEnabled: !lockedOrNotRunningMaintenance];
-    [hvRelayMaskHighField setEnabled: !lockedOrNotRunningMaintenance];
-    [hvRelayStatusField setEnabled: !lockedOrNotRunningMaintenance];
-    [hvRelayMaskMatrix setEnabled: !lockedOrNotRunningMaintenance];
-    [hvRelayOpenButton setEnabled: !lockedOrNotRunningMaintenance];
-    [hvRelayCloseButton setEnabled: !lockedOrNotRunningMaintenance];
-    [hvPowerSupplyMatrix setEnabled: !lockedOrNotRunningMaintenance];
-    [hvAOnStatusField setEnabled: !lockedOrNotRunningMaintenance];
-    [hvBOnStatusField setEnabled: !lockedOrNotRunningMaintenance];
-    [hvATriggerStatusField setEnabled: !lockedOrNotRunningMaintenance];
-    [hvBTriggerStatusField setEnabled: !lockedOrNotRunningMaintenance];
-    [hvAVoltageSetField setEnabled: !lockedOrNotRunningMaintenance];
-    [hvBVoltageSetField setEnabled: !lockedOrNotRunningMaintenance];
-    [hvAVoltageReadField setEnabled: !lockedOrNotRunningMaintenance];
-    [hvBVoltageReadField setEnabled: !lockedOrNotRunningMaintenance];
-    [hvACurrentReadField setEnabled: !lockedOrNotRunningMaintenance];
-    [hvBCurrentReadField setEnabled: !lockedOrNotRunningMaintenance];
-    [hvTargetValueField setEnabled: !lockedOrNotRunningMaintenance];
-    [hvTargetValueStepper setEnabled: !lockedOrNotRunningMaintenance];
-    [hvCMOSRateLimitField setEnabled: !lockedOrNotRunningMaintenance];
-    [hvCMOSRateLimitStepper setEnabled: !lockedOrNotRunningMaintenance];
-    [hvCMOSRateIgnoreField setEnabled: !lockedOrNotRunningMaintenance];
-    [hvCMOSRateIgnoreStepper setEnabled: !lockedOrNotRunningMaintenance];
-
+    [self hvStatusChanged:nil];
+    
     //Connection
     [toggleConnectButton setEnabled: !lockedOrNotRunningMaintenance];
     [errorTimeOutPU setEnabled: !lockedOrNotRunningMaintenance];
@@ -707,24 +678,66 @@ static NSDictionary* xl3Ops;
 
 - (void) updateHVButtons
 {
-    if ([hvPowerSupplyMatrix selectedColumn] == 0) { //A
-        [hvOnButton setEnabled:![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && ![model hvASwitch] && [model hvAFromDB]];
-        [hvOffButton setEnabled:![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && [model hvAFromDB]];
-        [hvStepUpButton setEnabled:![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping] && [model hvAFromDB]];
-        [hvStepDownButton setEnabled:![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping] && [model hvAFromDB]];
-        [hvRampUpButton setEnabled:![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping] && [model hvAFromDB]];
-        [hvRampDownButton setEnabled:![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping] && [model hvAFromDB]];
-        [hvStopRampButton setEnabled:![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && [model hvARamping] && [model hvAFromDB]];
-        [hvAcceptReadbackButton setEnabled:[model hvANeedsUserIntervention] && [model hvAFromDB]];
+ 
+    //Get SNOP Model
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    SNOPModel* aSNOPModel = nil;
+    if ([objs count]) {
+        aSNOPModel = [objs objectAtIndex:0];
     } else {
-        [hvOnButton setEnabled:![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && ![model hvBSwitch] && [model hvBFromDB]];
-        [hvOffButton setEnabled:![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && [model hvBFromDB]];
-        [hvStepUpButton setEnabled:![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && ![model hvBRamping] && [model hvBFromDB]];
-        [hvStepDownButton setEnabled:![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && ![model hvBRamping] && [model hvBFromDB]];
-        [hvRampUpButton setEnabled:![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && ![model hvBRamping] && [model hvBFromDB]];
-        [hvRampDownButton setEnabled:![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && ![model hvBRamping] && [model hvBFromDB]];
-        [hvStopRampButton setEnabled:![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && [model hvBRamping] && [model hvBFromDB]];
-        [hvAcceptReadbackButton setEnabled:[model hvBNeedsUserIntervention] && [model hvBFromDB]];
+        NSLogColor([NSColor redColor], @"xl3LockChanged: Couldn't find SNOP model. Please add it to the experiment and restart the run.\n");
+    }
+    
+    BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORXL3Lock];
+    BOOL notRunningOrInMaintenance = true; //default if no snopmodel found
+    if (aSNOPModel) notRunningOrInMaintenance = [aSNOPModel isNotRunningOrInMaintenance];
+    
+    if ([hvPowerSupplyMatrix selectedColumn] == 0) { //A
+        bool unlock = ![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && ![model hvASwitch] && [model hvAFromDB] && !lockedOrNotRunningMaintenance;
+        [hvOnButton setEnabled:unlock];
+
+        unlock = ![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && [model hvAFromDB] && !lockedOrNotRunningMaintenance;
+        [hvOffButton setEnabled:unlock];
+
+        unlock = ![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping] && [model hvAFromDB] && !lockedOrNotRunningMaintenance;
+        [hvStepUpButton setEnabled:unlock];
+        [hvStepDownButton setEnabled:unlock];
+        [hvRampUpButton setEnabled:unlock];
+        [hvTargetValueStepper setEnabled:unlock];
+        [hvTargetValueField setEnabled:unlock];
+        
+        unlock = ![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && [model hvARamping] && [model hvAFromDB] && !lockedOrNotRunningMaintenance;
+        [hvStopRampButton setEnabled:unlock];
+        
+        unlock = ![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping] && [model hvAFromDB] && notRunningOrInMaintenance;
+        [hvRampDownButton setEnabled:unlock];
+        
+        unlock = [model hvANeedsUserIntervention] && [model hvAFromDB] && notRunningOrInMaintenance;
+        [hvAcceptReadbackButton setEnabled:unlock];
+
+    } else {
+        bool unlock = ![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && ![model hvBSwitch] && [model hvBFromDB] && !lockedOrNotRunningMaintenance;
+        [hvOnButton setEnabled:unlock];
+        
+        unlock = ![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && [model hvBFromDB] && !lockedOrNotRunningMaintenance;
+        [hvOffButton setEnabled:unlock];
+        
+        unlock = ![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && ![model hvBRamping] && [model hvBFromDB] && !lockedOrNotRunningMaintenance;
+        [hvStepUpButton setEnabled:unlock];
+        [hvStepDownButton setEnabled:unlock];
+        [hvRampUpButton setEnabled:unlock];
+        [hvTargetValueStepper setEnabled:unlock];
+        [hvTargetValueField setEnabled:unlock];
+
+        unlock = ![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && [model hvBRamping] && [model hvBFromDB] && !lockedOrNotRunningMaintenance;
+        [hvStopRampButton setEnabled:unlock];
+        
+        unlock = ![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && ![model hvBRamping] && [model hvBFromDB] && notRunningOrInMaintenance;
+        [hvRampDownButton setEnabled:unlock];
+        
+        unlock = [model hvBNeedsUserIntervention] && [model hvBFromDB] && notRunningOrInMaintenance;
+        [hvAcceptReadbackButton setEnabled:unlock];
+
     }
     
 }
@@ -785,14 +798,14 @@ static NSDictionary* xl3Ops;
 
     BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORXL3Lock];
 
-    if ([model hvASwitch] || ([model isOwlCrate] && [ORXL3Model owlSupplyOn])) {
+    if ([model hvASwitch] || ([model isOwlCrate] && [ORXL3Model owlSupplyOn]) || lockedOrNotRunningMaintenance) {
         [hvRelayMaskHighField setEnabled:NO];
         [hvRelayMaskLowField setEnabled:NO];
         [hvRelayMaskMatrix setEnabled:NO];
         [hvRelayOpenButton setEnabled:NO];
         [hvRelayCloseButton setEnabled:NO];
     }
-    else if(!lockedOrNotRunningMaintenance){
+    else {
         [hvRelayMaskHighField setEnabled:YES];
         [hvRelayMaskLowField setEnabled:YES];
         [hvRelayMaskMatrix setEnabled:YES];
@@ -800,7 +813,7 @@ static NSDictionary* xl3Ops;
         [hvRelayCloseButton setEnabled:YES];        
     }
     
-    if(!lockedOrNotRunningMaintenance) [self updateHVButtons];
+    [self updateHVButtons];
 
 }); }
 
