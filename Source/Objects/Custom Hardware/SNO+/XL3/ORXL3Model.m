@@ -816,7 +816,7 @@ isLoaded = isLoaded;
 /**
  * Global variable to store the state of the OWL supply
  */
-BOOL owlSupplyState = true; //better safe than sorry
+BOOL owlSupplyState = false;
 
 /**
  * Called by the owl supply to set the state. Also posts a ORXL3HVStatusChanged 

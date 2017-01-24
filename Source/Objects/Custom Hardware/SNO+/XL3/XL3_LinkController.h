@@ -142,6 +142,18 @@
     IBOutlet NSStepper *hvCMOSRateLimitStepper;
     IBOutlet NSTextField *hvCMOSRateIgnoreField;
     IBOutlet NSStepper *hvCMOSRateIgnoreStepper;
+    
+    IBOutlet NSTextField *owlStatus;
+    IBOutlet NSTextField *nominalStatus;
+    IBOutlet NSTextField *rampUpStatus;
+    IBOutlet NSTextField *rampDownStatus;
+    IBOutlet NSTextField *correctionStatus;
+    IBOutlet NSTextField *overCurentStatus;
+    IBOutlet NSTextField *overVoltageStatus;
+    IBOutlet NSTextField *currentZeroStatus;
+    IBOutlet NSTextField *currentZeroWhenStatus;
+    IBOutlet NSTextField *setpointTolStatus;
+    
     //connection
 	IBOutlet NSButton*              toggleConnectButton;
 	IBOutlet NSPopUpButton*         errorTimeOutPU;

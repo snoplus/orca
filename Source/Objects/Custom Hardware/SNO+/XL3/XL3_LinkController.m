@@ -771,15 +771,42 @@ static NSDictionary* xl3Ops;
     [hvRelayStatusField setStringValue:[model relayStatus]];
 }); }
 
+- (void) updateStatusFields
+{
+    [owlStatus setHidden:!([model isOwlCrate] && [ORXL3Model owlSupplyOn])];
+    if ([hvPowerSupplyMatrix selectedColumn] == 0) { //A
+        [nominalStatus setStringValue:[NSString stringWithFormat:@"Nominal: %u V",(uint32_t)[model hvNominalVoltageA]]];
+        [rampUpStatus setStringValue:[NSString stringWithFormat:@"Ramp Up: %u V/s",(uint32_t)[model hvramp_a_up]]];
+        [rampDownStatus setStringValue:[NSString stringWithFormat:@"Ramp Down: %u V/s",(uint32_t)[model hvramp_a_down]]];
+        [correctionStatus setStringValue:[NSString stringWithFormat:@"Correction: %3.2f V/s",(float)[model hvReadbackCorrA]]];
+        [overCurentStatus setStringValue:[NSString stringWithFormat:@"Over Current: > %3.1f mA",(float)[model ihighalarm_a_imax]]];
+        [overVoltageStatus setStringValue:[NSString stringWithFormat:@"Over Voltage: > %u V",(uint32_t)[model vhighalarm_a_vmax]]];
+        [currentZeroStatus setStringValue:[NSString stringWithFormat:@"Current Near Zero: < %2.1f mA",(float)[model ilowalarm_a_imin]]];
+        [currentZeroWhenStatus setStringValue:[NSString stringWithFormat:@"When: > %u V",(uint32_t)[model ilowalarm_a_vmin]]];
+        [setpointTolStatus setStringValue:[NSString stringWithFormat:@"Setpoint Tolerance: %u V",(uint32_t)[model vsetalarm_a_vtol]]];
+    } else { //B
+        [nominalStatus setStringValue:[NSString stringWithFormat:@"Nominal: %u V",(uint32_t)[model hvNominalVoltageB]]];
+        [rampUpStatus setStringValue:[NSString stringWithFormat:@"Ramp Up: %u V/s",(uint32_t)[model hvramp_b_up]]];
+        [rampDownStatus setStringValue:[NSString stringWithFormat:@"Ramp Down: %u V/s",(uint32_t)[model hvramp_b_down]]];
+        [correctionStatus setStringValue:[NSString stringWithFormat:@"Correction: %3.2f V/s",(float)[model hvReadbackCorrB]]];
+        [overCurentStatus setStringValue:[NSString stringWithFormat:@"Over Current: > %3.1f mA",(float)[model ihighalarm_b_imax]]];
+        [overVoltageStatus setStringValue:[NSString stringWithFormat:@"Over Voltage: > %u V",(uint32_t)[model vhighalarm_b_vmax]]];
+        [currentZeroStatus setStringValue:[NSString stringWithFormat:@"Current Near Zero: < %2.1f mA",(float)[model ilowalarm_b_imin]]];
+        [currentZeroWhenStatus setStringValue:[NSString stringWithFormat:@"When: > %u V",(uint32_t)[model ilowalarm_b_vmin]]];
+        [setpointTolStatus setStringValue:[NSString stringWithFormat:@"Setpoint Tolerance: %u V",(uint32_t)[model vsetalarm_b_vtol]]];
+    }
+}
+
 - (void) hvStatusChanged:(NSNotification*)aNote
 { dispatch_async(dispatch_get_main_queue(), ^{
     
+    [self updateStatusFields];
     [hvAOnStatusField setStringValue:[model hvASwitch]?@"ON":@"OFF"];
     [hvAVoltageSetField setStringValue:[NSString stringWithFormat:@"%lu V",[model hvAVoltageDACSetValue]*3000/4096]];
     [hvAVoltageReadField setStringValue:[NSString stringWithFormat:@"%d V",(unsigned int)[model hvAVoltageReadValue]]];
     [hvACurrentReadField setStringValue:[NSString stringWithFormat:@"%3.1f mA",[model hvACurrentReadValue]]];
     
-    // Only crate 16 has an HV B (apparently)
+    // Only crate 16 has an HV B
     if ([model crateNumber] == 16) {
         [hvAStatusPanel setHidden:(![model hvEverUpdated] || ![model hvSwitchEverUpdated])];
         [hvBStatusPanel setHidden:(![model hvEverUpdated] || ![model hvSwitchEverUpdated])];
@@ -861,6 +888,7 @@ static NSDictionary* xl3Ops;
 
 - (void) hvChangePowerSupplyChanged:(NSNotification*)aNote
 { dispatch_async(dispatch_get_main_queue(), ^{
+    [self updateStatusFields];
     [self hvTargetValueChanged:aNote];
     [self hvCMOSRateLimitChanged:aNote];
     [self hvCMOSRateIgnoreChanged:aNote];
