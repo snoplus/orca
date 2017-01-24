@@ -95,7 +95,7 @@ logHost,
 logPort,
 resync;
 
-@synthesize smellieRunHeaderDocList;
+@synthesize smellieRunFiles;
 
 #pragma mark ¥¥¥Initialization
 
@@ -129,7 +129,6 @@ resync;
 
 	[self initOrcaDBConnectionHistory];
 	[self initDebugDBConnectionHistory];
-    [self initSmellieRunDocsDic];
 
     [[self undoManager] enableUndoRegistration];
 
@@ -277,7 +276,6 @@ resync;
     [[self undoManager] disableUndoRegistration];
 	[self initOrcaDBConnectionHistory];
 	[self initDebugDBConnectionHistory];
-    [self initSmellieRunDocsDic];
 
     [self setViewType:[decoder decodeIntForKey:@"viewType"]];
 
@@ -381,23 +379,12 @@ resync;
     [_smellieRunNameLabel release];
     [dataHost release];
     [logHost release];
-    [smellieRunHeaderDocList release];
     [super dealloc];
 }
 
 - (void) sleep
 {
     [super sleep];
-}
-
-
-- (void) initSmellieRunDocsDic
-{
-    [self setSmellieDBReadInProgress:NO];
-    
-    if(!self.smellieRunHeaderDocList) {
-        self.smellieRunHeaderDocList = nil;//[[NSMutableDictionary alloc] init];
-    }
 }
 
 -(void) initRunMaskHistory
@@ -1349,11 +1336,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
             //This is called when smellie run header is queried from CouchDB
             else if ([aTag isEqualToString:@"kSmellieRunHeaderRetrieved"])
             {
-                //NSLog(@"here\n");
-                //NSLog(@"Object: %@\n",aResult);
-                //NSLog(@"result1: %@\n",[aResult objectForKey:@"rows"]);
-                //NSLog(@"result2: %@\n",[[aResult objectForKey:@"rows"] objectAtIndexedSubscript:0]);
-                [self parseSmellieRunHeaderDoc:aResult];
+                [self parseSmellieRunFileDocs:aResult];
             }
             else if ([aTag isEqualToString:@"Message"]) {
                 [aResult prettyPrint:@"CouchDB Message:"];
@@ -1642,27 +1625,28 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersOFF)];
 }
 
-- (void) getSmellieRunListInfo
+- (void) getSmellieRunFiles
 {
-    //Collect a series of objects from the ORMTCModel
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
-    if([objs count]){
-        //Initialise the MTCModal
-        ELLIEModel* anELLIEModel = [objs objectAtIndex:0];
-        
-        //NSMutableDictionary *state = [[NSMutableDictionary alloc] initWithDictionary:[anELLIEModel pullEllieCustomRunFromDB:@"smellie"]];
-        
-        NSString *requestString = [NSString stringWithFormat:@"_design/smellieMainQuery/_view/pullEllieRunHeaders"];
-        
-        [[anELLIEModel generalDBRef:@"smellie"] getDocumentId:requestString tag:@"kSmellieRunHeaderRetrieved"];
-        
-        [self setSmellieDBReadInProgress:YES];
-        [self performSelector:@selector(smellieDocumentsRecieved) withObject:nil afterDelay:10.0];
-    }
-    else {
+    //Set SmellieRunFiles to nil
+    [self setSmellieRunFiles:nil];
+    
+    // Check there is an ELLIE model in the current configuration
+    NSArray*  ellieModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
+    if(![ellieModels count]){
         NSLogColor([NSColor redColor], @"Must have an ELLIE object in the configuration\n");
+        return;
     }
     
+    ELLIEModel* anELLIEModel = [ellieModels objectAtIndex:0];
+    NSString *requestString = [NSString stringWithFormat:@"_design/smellieMainQuery/_view/pullEllieRunHeaders?startkey=1"];
+
+    // This line calls [self couchDBresult], which in turn calls [self parseSmellieRunFileDocs] where the
+    // [self smellieRunFiles] property variable gets set.
+    [[anELLIEModel generalDBRef:@"smellie"] getDocumentId:requestString tag:@"kSmellieRunHeaderRetrieved"];
+        
+    // CouchDB interactions are spawned in a separate thread
+    [self setSmellieDBReadInProgress:YES];
+    [self performSelector:@selector(smellieDocumentsRecieved) withObject:nil afterDelay:0.0];
 }
 
 //complete this after the smellie documents have been recieved 
@@ -1674,42 +1658,26 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     }
     
     [self setSmellieDBReadInProgress:NO];
-    
 }
 
--(void) parseSmellieRunHeaderDoc:(id)aResult
+-(void) parseSmellieRunFileDocs:(id)aResult
 {
-    unsigned int i,cnt = [[aResult objectForKey:@"rows"] count];
-    
-    NSMutableDictionary *tmp = [[NSMutableDictionary alloc] init];
-    
-    for(i=0;i<cnt;i++){
-        NSMutableDictionary* smellieRunHeaderDocIterator = [[[aResult objectForKey:@"rows"] objectAtIndex:i] objectForKey:@"value"];
-        NSString *keyForSmellieDocs = [NSString stringWithFormat:@"%u",i];
-        [tmp setObject:smellieRunHeaderDocIterator forKey:keyForSmellieDocs];
-    }
+    // Use the result returned from the smellie database query to fill a dictionary with all the available
+    // run file documents.
+    unsigned int nFiles = [[aResult objectForKey:@"rows"] count];
+    NSMutableDictionary *runFiles = [[NSMutableDictionary alloc] init];
 
-    [self setSmellieRunHeaderDocList:tmp];
-    [tmp release];
+    for(int i=0;i<nFiles;i++){
+        NSMutableDictionary* smellieRunFileIterator = [[[aResult objectForKey:@"rows"] objectAtIndex:i] objectForKey:@"value"];
+        NSString *keyForSmellieDocs = [NSString stringWithFormat:@"%u",i];
+        [runFiles setObject:smellieRunFileIterator forKey:keyForSmellieDocs];
+    }
+    
+    [self setSmellieRunFiles:runFiles];
+    [runFiles release];
     
     [self setSmellieDocUploaded:YES];
-}
-
-/*-(void)setSmellieRunNameLabel:(NSString*)aRunNameLabel
-{
-    [self setSmellieRunNameLabel:aRunNameLabel];
-}*/
-
-
-- (NSMutableDictionary*)smellieTestFct
-{
-    if([self smellieDocUploaded] == YES){
-        return smellieRunHeaderDocList;
-    }
-    else{
-        NSLog(@"Document no loaded yet\n");
-        return nil;
-    }
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"SmellieRunFilesLoaded" object:nil];
 }
 
 - (unsigned long) runTypeWord

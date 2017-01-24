@@ -17,39 +17,44 @@
 @class ORRunController;
 
 @interface ELLIEModel :  OrcaObject{
-    NSMutableDictionary* smellieRunSettings;
-    NSMutableDictionary* currentOrcaSettingsForSmellie;
-    NSMutableDictionary* tellieRunDoc;
-    NSMutableDictionary* smellieRunDoc;
-    NSTask* exampleTask;
-    NSMutableDictionary* smellieRunHeaderDocList;
-    ORRunModel* runControl;
-    ORRunController* theRunController;
-    NSMutableArray* smellieSubRunInfo;
+    ///////////////////////////////////////////
+    //Define instance variables for ELLIEModel
+    
+    NSMutableDictionary* _smellieRunSettings;
+    NSMutableDictionary* _currentOrcaSettingsForSmellie;
+    NSMutableDictionary* _tellieRunDoc;
+    NSMutableDictionary* _smellieRunDoc;
+    NSTask* _exampleTask;
+    NSMutableDictionary* _smellieRunHeaderDocList;
+    //ORRunModel* _runControl;
+    //ORRunController* _theRunController;
+    NSMutableArray* _smellieSubRunInfo;
     bool _smellieDBReadInProgress;
-    float pulseByPulseDelay;
+    float _pulseByPulseDelay;
 
     //Server Clients
     XmlrpcClient* _tellieClient;
     XmlrpcClient* _smellieClient;
 
     //tellie settings
-    NSMutableDictionary* tellieSubRunSettings;
-    NSMutableDictionary* tellieFireParameters;
-    NSMutableDictionary* tellieFibreMapping;
-    BOOL ellieFireFlag;
+    NSMutableDictionary* _tellieSubRunSettings;
+    NSMutableDictionary* _tellieFireParameters;
+    NSMutableDictionary* _tellieFibreMapping;
+    NSMutableDictionary* _tellieNodeMapping;
+    BOOL _ellieFireFlag;
 
     //smellie config mappings
-    NSMutableDictionary* smellieLaserHeadToSepiaMapping;
-    NSMutableDictionary* smellieLaserHeadToGainMapping;
-    NSMutableDictionary* smellieLaserToInputFibreMapping;
-    NSMutableDictionary* smellieFibreSwitchToFibreMapping;
-    NSNumber* smellieConfigVersionNo;
-    BOOL smellieSlaveMode;
+    NSMutableDictionary* _smellieLaserHeadToSepiaMapping;
+    NSMutableDictionary* _smellieLaserHeadToGainMapping;
+    NSMutableDictionary* _smellieLaserToInputFibreMapping;
+    NSMutableDictionary* _smellieFibreSwitchToFibreMapping;
+    NSNumber* _smellieConfigVersionNo;
+    BOOL _smellieSlaveMode;
 }
 
 @property (nonatomic,retain) NSMutableDictionary* tellieFireParameters;
 @property (nonatomic,retain) NSMutableDictionary* tellieFibreMapping;
+@property (nonatomic,retain) NSMutableDictionary* tellieNodeMapping;
 @property (nonatomic,retain) NSMutableDictionary* tellieSubRunSettings;
 @property (nonatomic,retain) NSMutableDictionary* smellieRunSettings;
 @property (nonatomic,retain) NSMutableDictionary* currentOrcaSettingsForSmellie;
@@ -67,6 +72,8 @@
 @property (nonatomic,retain) NSMutableArray* smellieSubRunInfo;
 @property (nonatomic,assign) bool smellieDBReadInProgress;
 @property (nonatomic,assign) float pulseByPulseDelay;
+@property (nonatomic,retain) XmlrpcClient* tellieClient;
+@property (nonatomic,retain) XmlrpcClient* smellieClient;
 
 -(id) init;
 -(id) initWithCoder:(NSCoder *)aCoder;
@@ -82,15 +89,16 @@
 /************************/
 
 // TELLIE calc & control functons
--(void) startTellieRun:(BOOL)scriptFlag;
--(void) stopTellieRun;
 -(NSArray*) pollTellieFibre:(double)seconds;
--(NSMutableDictionary*) returnTellieFireCommands:(NSString*)fibreName  withNPhotons:(NSUInteger)photons withFireFrequency:(NSUInteger)frequency withNPulses:(NSUInteger)pulses;
--(NSNumber*) calcTellieChannelPulseSettings:(NSUInteger)channel withNPhotons:(NSUInteger)photons withFireFrequency:(NSUInteger)frequency;
+-(BOOL)photonIntensityCheck:(NSUInteger)photons atFrequency:(NSUInteger)frequency;
+-(NSMutableDictionary*) returnTellieFireCommands:(NSString*)fibre  withNPhotons:(NSUInteger)photons withFireFrequency:(NSUInteger)frequency withNPulses:(NSUInteger)pulses withTriggerDelay:(NSUInteger)delay inSlave:(BOOL)mode;
+-(NSNumber*) calcTellieChannelPulseSettings:(NSUInteger)channel withNPhotons:(NSUInteger)photons withFireFrequency:(NSUInteger)frequency inSlave:(BOOL)mode;
 -(NSNumber*) calcTellieChannelForFibre:(NSString*)fibre;
--(void) fireTellieFibreMaster:(NSMutableDictionary*)fireCommands;
--(void) stopTellieFibre:(NSArray*)fireCommands;
--(bool)isELLIEFiring;
+-(NSString*) calcTellieFibreForNode:(NSUInteger)node;
+-(NSNumber*)calcPhotonsForIPW:(NSUInteger)ipw forChannel:(NSUInteger)channel inSlave:(BOOL)inSlave;
+-(NSString*)selectPriorityFibre:(NSArray*)fibres forNode:(NSUInteger)node;
+-(void) startTellieRun:(NSMutableDictionary*)fireCommands;
+-(void) stopTellieRun;
 
 // TELLIE database interactions
 -(void) pushInitialTellieRunDocument;
@@ -102,25 +110,21 @@
 /************************/
 
 //SMELLIE Control Functions
--(void) setSmellieSafeStates;
--(void) setLaserSwitch:(NSString*)laserSwitchChannel;
--(void) setFibreSwitch:(NSString*)fibreSwitchInputChannel withOutputChannel:(NSString*)fibreSwitchOutputChannel;
--(void) setLaserIntensity:(NSString*)laserIntensity;
--(void) setLaserSoftLockOn;
--(void) setLaserSoftLockOff;
--(void) setSmellieMasterMode:(NSString*)triggerFrequency withNumOfPulses:(NSString*)numOfPulses;
--(void) setSuperKSafeStates;
--(void) setSuperKSoftLockOn;
--(void) setSuperKSoftLockOff;
--(void) setSuperKWavelegth:(NSString*)lowBin withHighEdge:(NSString*)highBin;
+-(void) setSmellieNewRun:(NSNumber *)runNumber;
+
+-(void) setSmellieLaserHeadMasterMode:(NSNumber*)laserSwitchChan withIntensity:(NSNumber*)intensity withRepRate:(NSNumber*)rate withFibreInput:(NSNumber*)fibreInChan withFibreOutput:(NSNumber*)fibreOutChan withNPulses:(NSNumber*)noPulses withGainVoltage:(NSNumber*)gain;
+
+-(void) setSmellieLaserHeadSlaveMode:(NSNumber*)laserSwitchChan withIntensity:(NSNumber*)intensity withFibreInput:(NSNumber*)fibreInChan withFibreOutput:(NSNumber*)fibreOutChan withTime:(NSNumber*)time withGainVoltage:(NSNumber*)gain;
+
+-(void)setSmellieSuperkMasterMode:(NSNumber*)intensity withRepRate:(NSNumber*)rate withWavelengthLow:(NSNumber*)wavelengthLow withWavelengthHi:(NSNumber*)wavelengthHi withFibreInput:(NSNumber*)fibreInChan withFibreOutput:(NSNumber*)fibreOutChan withNPulses:(NSNumber*)noPulses withGainVoltage:(NSNumber *)gain;
+
 -(void) sendCustomSmellieCmd:(NSString*)customCmd withArgs:(NSArray*)argsArray;
 
 -(NSMutableArray*)getSmellieRunLaserArray:(NSDictionary*)smellieSettings;
 -(NSMutableArray*)getSmellieRunFibreArray:(NSDictionary*)smellieSettings;
--(NSMutableArray*)getSmellieRunFrequencyArray:(NSDictionary*)smellieSettings;
--(NSMutableArray*)getSmellieRunIntensityArray:(NSDictionary*)smellieSettings;
+-(NSMutableArray*)getSmellieRunIntensityArray:(NSDictionary*)smellieSettings forLaser:(NSString*)laser;
+-(NSMutableArray*)getSmellieRunGainArray:(NSDictionary*)smellieSettings forLaser:(NSString*)laser;
 -(NSMutableArray*)getSmellieLowEdgeWavelengthArray:(NSDictionary*)smellieSettings;
--(NSMutableArray*)getSmellieHighEdgeWavelengthArray:(NSDictionary*)smellieSettings;
 -(void) startSmellieRunInBackground:(NSDictionary*)smellieSettings;
 -(void) startSmellieRun:(NSDictionary*)smellieSettings;
 -(void) stopSmellieRun;
@@ -149,4 +153,3 @@
 extern NSString* ELLIEAllLasersChanged;
 extern NSString* ELLIEAllFibresChanged;
 extern NSString* smellieRunDocsPresent;
-extern NSString* ORELLIERunFinished;

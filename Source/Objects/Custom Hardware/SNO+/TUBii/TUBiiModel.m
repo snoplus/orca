@@ -78,10 +78,10 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
         pulserRate = 0;
         smelliePulseWidth = 0;
         telliePulseWidth = 0;
-        pulseWidth = 0;
+        pulserPulseWidth = 0;
         smellieNPulses=0;
         tellieNPulses=0;
-        NPulses=0;
+        pulserNPulses=0;
         connection = [[RedisClient alloc] init]; // Connection must be allocated before port and host name are set
         portNumber =TUBII_DEFAULT_PORT;
         strHostName = [[NSString alloc]initWithUTF8String:TUBII_DEFAULT_IP];
@@ -104,8 +104,8 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
         telliePulseWidth =[ aCoder decodeFloatForKey:@"TUBiiModelTelliePulseWidth"];
         tellieNPulses =   [ aCoder decodeIntForKey:@"TUBiiModelTellieNPulses"];
         pulserRate =      [ aCoder decodeFloatForKey:@"TUBiiModelPulserRate"];
-        pulseWidth =      [ aCoder decodeFloatForKey:@"TUBiiModelPulseWidth"];
-        NPulses =         [ aCoder decodeIntForKey:@"TUBiiModelNPulses"];
+        pulserPulseWidth =[ aCoder decodeFloatForKey:@"TUBiiModelPulseWidth"];
+        pulserNPulses =   [ aCoder decodeIntForKey:@"TUBiiModelNPulses"];
         portNumber =      [ aCoder decodeIntForKey:@"TUBiiModelPortNumber"];
         
         //Connection must be made before port and host name are set.
@@ -129,8 +129,8 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
     [aCoder encodeFloat:telliePulseWidth    forKey:@"TUBiiModelTelliePulseWidth"];
     [aCoder encodeInt:tellieNPulses         forKey:@"TUBiiModelTellieNPulses"];
     [aCoder encodeFloat:pulserRate          forKey:@"TUBiiModelPulserRate"];
-    [aCoder encodeFloat:pulseWidth          forKey:@"TUBiiModelPulseWidth"];
-    [aCoder encodeInt:NPulses               forKey:@"TUBiiModelNPulses"];
+    [aCoder encodeFloat:pulserPulseWidth          forKey:@"TUBiiModelPulseWidth"];
+    [aCoder encodeInt:pulserNPulses               forKey:@"TUBiiModelNPulses"];
     [aCoder encodeInt:portNumber            forKey:@"TUBiiModelPortNumber"];
     [aCoder encodeObject:strHostName        forKey:@"TUBiiModelStrHostName"];
 }
@@ -190,97 +190,88 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
     [self sendOkCmd:command];
 }
 
-- (void) setSmellieRate:(float)rate {
+- (void) setSmellieRate:(float)_rate {
     // Specifies the frequency (in Hz) that the smellie pulser will pulse at
     // once fireSmelliePulser is called.
-    NSString* const command=[NSString stringWithFormat:@"SetSmellieRate %f",rate];
-    [self sendOkCmd:command];
+    smellieRate = _rate;
 }
 - (void) setSmelliePulseWidth:(double) _pulseWidth {
     // Specifies the width the of the pulses that the smellie pulser will pulse at
     // once fireSmelliePulser is called
-    NSString * const command = [NSString stringWithFormat:@"SetSmelliePulseWidth %e",_pulseWidth];
-    [self sendOkCmd:command];
+    smelliePulseWidth = _pulseWidth;
 }
 - (void) setSmellieNPulses:(int) _NPulses {
     // Specifies the number of pulses that will be fired off by the Smellie pulser
     // once fireSmellie pulser is called
-    NSString * const command = [NSString stringWithFormat:@"SetSmellieNPulses %d", _NPulses];
-    [self sendOkCmd:command];
+    smellieNPulses = _NPulses;
 }
 - (void) setTellieRate:(float)_rate {
     // Specifies the frequency (in Hz) that the tellie pulser will pulse at
     // once fireTelliePulser is called.
-    NSString * const command = [NSString stringWithFormat:@"SetTellieRate %f", _rate];
-    [self sendOkCmd:command];
+    tellieRate = _rate;
 }
 - (void) setTelliePulseWidth:(double)_pulseWidth {
     // Specifies the width the of the pulses that the tellie pulser will pulse at
     // once fireTelliePulser is called
-    NSString * const command = [NSString stringWithFormat:@"SetTelliePulseWidth %e",_pulseWidth];
-    [self sendOkCmd:command];
+    telliePulseWidth = _pulseWidth;
 }
 - (void) setTellieNPulses:(int) _NPulses {
     // Specifies the number of pulses that will be fired off by the Tellie pulser
     // once fireTellie pulser is called
-    NSString * const command = [NSString stringWithFormat:@"SetTellieNPulses %d", _NPulses];
-    [self sendOkCmd:command];
+    tellieNPulses = _NPulses;
 }
 - (void) setPulserRate:(float) _rate {
     // Specifies the frequency (in Hz) that the generic pulser will pulse at
     // once firePulser is called.
-    NSString * const command = [NSString stringWithFormat:@"SetGenericRate %f", _rate];
-    [self sendOkCmd:command];
+    pulserRate = _rate;
 }
 - (void) setPulseWidth:(double) _pulseWidth {
     // Specifies the width the of the pulses that the generic pulser will pulse at
     // once firePulser is called
-    NSString * const command = [NSString stringWithFormat:@"SetGenericPulseWidth %e",_pulseWidth];
-    [self sendOkCmd:command];
+    pulserPulseWidth = _pulseWidth;
 }
 - (void) setNPulses:(int) _NPulses {
     // Specifies the number of pulses that will be fired off by the generic pulser
     // once firePulser pulser is called
-    NSString * const command = [NSString stringWithFormat:@"SetGenericNPulses %d", _NPulses];
-    [self sendOkCmd:command];
+    pulserNPulses = _NPulses;
 }
 - (void) fireSmelliePulser {
     // Causes the SMELLIE pulser to fire off pulses at a rate/duty cycle as
     // specified by it's internal variables which can be set with
     // setSmellieRate setSmelliePulseWidth setSmellieNPulses
-    NSString* const command= @"FireSmelliePulser";
+    NSString* command = [NSString stringWithFormat:@"SetSmelliePulser %f %f %d", smellieRate,smelliePulseWidth,smellieNPulses];
     [self sendOkCmd:command];
 }
 - (void) stopSmelliePulser {
     // Stops the smellie pulser by setting the number of pulses to be fired to zero.
     [self setSmellieNPulses:0];
-    NSString* const command=@"FireSmelliePulser";
+    NSString* const command=@"SetSmelliePulser 1 0.1 0";
     [self sendOkCmd:command];
 }
 - (void) fireTelliePulser{
     // Causes the TELLIE pulser to fire off pulses at a rate/duty cycle as
     // specified by it's internal variables which can be set with
     // setTellieRate setTelliePulseWidth setTellieNPulses
-    NSString* const command= @"FireTelliePulser";
+    NSString* command = [NSString stringWithFormat:@"SetTelliePulser %f %f %d", tellieRate,telliePulseWidth,tellieNPulses];
     [self sendOkCmd:command];
 }
 - (void) stopTelliePulser {
     // Stops the Tellie pulser by setting the number of pulses to be fired to zero.
     [self setTellieNPulses:0];
-    NSString* const command=@"FireTelliePulser";
+    NSString* const command=@"SetTelliePulser 1 0.1 0";
     [self sendOkCmd:command];
 }
 - (void) firePulser{
     // Causes the generic pulser to fire off pulses at a rate/duty cycle as
     // specified by it's internal variables which can be set with
     // setPulserRate setPulseWidth setNPulses
-    NSString* const command=@"FireGenericPulser";
+    NSString* command = [NSString stringWithFormat:@"SetGenericPulser %f %f %d", pulserRate,pulserPulseWidth,pulserNPulses];
     [self sendOkCmd:command];
 }
 - (void) stopPulser {
     // Stops the generic pulser by setting the number of pulses to be fired to zero.
     [self setNPulses:0];
-    NSString* const command=@"FireGenericPulser";
+    NSString* const command=@"SetGenericPulser 1 0.1 0";
     [self sendOkCmd:command];
 }
 - (void) fireSmelliePulser_rate: (float)rate pulseWidth:(double)_pulseWidth NPulses:(int)_NPulses {
@@ -700,10 +691,10 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
     [self setPulserRate: aState.pulserRate];
     [self setSmelliePulseWidth: aState.smelliePulseWidth];
     [self setTelliePulseWidth: aState.telliePulseWidth];
-    [self setPulseWidth: aState.pulseWidth];
+    [self setPulseWidth: aState.pulserPulseWidth];
     [self setSmellieNPulses: aState.smellieNPulses];
     [self setTellieNPulses: aState.tellieNPulses];
-    [self setNPulses: aState.NPulses];
+    [self setNPulses: aState.pulserNPulses];
     [self setTellieDelay: aState.tellieDelay];
     [self setSmellieDelay: aState.smellieDelay];
     [self setGenericDelay: aState.genericDelay];
@@ -726,10 +717,10 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
     aState.pulserRate = 0;
     aState.smelliePulseWidth = 0;
     aState.telliePulseWidth = 0;
-    aState.pulseWidth = 0;
+    aState.pulserPulseWidth = 0;
     aState.smellieNPulses = 0;
     aState.tellieNPulses = 0;
-    aState.NPulses = 0;
+    aState.pulserNPulses = 0;
     //Get the rest from the TUBiiServer
     aState.tellieDelay = [self tellieDelay];
     aState.smellieDelay = [self smellieDelay];

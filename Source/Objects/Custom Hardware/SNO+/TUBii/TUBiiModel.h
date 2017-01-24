@@ -76,10 +76,10 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
     float pulserRate;
     float smelliePulseWidth;
     float telliePulseWidth;
-    float pulseWidth;
+    float pulserPulseWidth;
     int smellieNPulses;
     int tellieNPulses;
-    int NPulses;
+    int pulserNPulses;
     uint64_t tellieDelay;
     uint64_t smellieDelay;
     uint64_t genericDelay;
@@ -100,10 +100,10 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
     float pulserRate;
     float smelliePulseWidth;
     float telliePulseWidth;
-    float pulseWidth;
+    float pulserPulseWidth;
     int smellieNPulses;
     int tellieNPulses;
-    int NPulses;
+    int pulserNPulses;
     BOOL CounterMode_memoryVal;//Hack b/c tubii server doesn't yet have GetCounterMode command
 
     RedisClient *connection;

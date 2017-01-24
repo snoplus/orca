@@ -19,7 +19,7 @@
 //-------------------------------------------------------------
 
 
-#pragma mark ⅴ쩒mported Files
+#pragma mark 짜짜짜Imported Files
 #import "SNOPController.h"
 #import "SNOPModel.h"
 #import "ORColorScale.h"
@@ -41,6 +41,8 @@ NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 @implementation SNOPController
 
 @synthesize
+tellieStandardSequenceFlag,
+tellieFireSettings,
 smellieRunFileList,
 smellieRunFile,
 snopBlueColor,
@@ -50,7 +52,7 @@ snopBlackColor,
 snopGrayColor,
 snopGreenColor;
 
-#pragma mark ⅴ쩒nitialization
+#pragma mark 짜짜짜Initialization
 -(id)init
 {
     self = [super initWithWindowNibName:@"SNOP"];
@@ -247,18 +249,18 @@ snopGreenColor;
     else{
         [self refreshStandardRunsAction:nil];
     }
+
     if(!doggy_icon)
     {
         doggy_icon = [[RunStatusIcon alloc] init];
     }
     //Pull the information from the SMELLIE DB
-    [model getSmellieRunListInfo];
     [super awakeFromNib];
     [self performSelector:@selector(updateWindow)withObject:self afterDelay:0.1];
 }
 
 
-#pragma mark ⅴ쩘otifications
+#pragma mark 짜짜짜Notifications
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -287,7 +289,18 @@ snopGreenColor;
     
     [notifyCenter addObserver :self
                      selector : @selector(stopSmellieRunAction:)
-                         name : ORELLIERunFinished
+                         name : ORSMELLIERunFinished
+                        object: nil];
+    
+    [notifyCenter addObserver :self
+                     selector : @selector(startTellieRunNotification:)
+                         name : ORTELLIERunStart
+                        object: nil];
+    
+    
+    [notifyCenter addObserver :self
+                     selector : @selector(stopTellieRunAction:)
+                         name : ORTELLIERunFinished
                         object: nil];
     
     [notifyCenter addObserver: self
@@ -335,6 +348,11 @@ snopGreenColor;
                          name : @"SNOPSettingsChanged"
                         object: nil];
     
+    [notifyCenter addObserver : self
+                     selector : @selector(fetchRunFilesFinish:)
+                         name : @"SmellieRunFilesLoaded"
+                        object: nil];
+    
 }
 
 - (void) updateWindow
@@ -358,21 +376,6 @@ snopGreenColor;
     [runsLockButton setEnabled:secure];
 }
 
--(IBAction)setTellie:(id)sender
-{
-    //Collect a series of objects from the ELLIEModel
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
-    ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
-    NSArray * setSafeStates = @[@"0",@"0",@"0"]; //30 is the flag for setting smellie to its safe states
-    [theELLIEModel callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_orca_script.py" withCmdLineArgs:setSafeStates];
-}
-
--(IBAction)fireTellie:(id)sender
-{
-    
-}
-
-//Select SR and look for versions
 -(void) SRTypeChanged:(NSNotification*)aNote
 {
     NSString* standardRun = [model standardRunType];
@@ -699,7 +702,7 @@ snopGreenColor;
 }
 
 
-#pragma mark ⅴ쩒nterface Management
+#pragma mark 짜짜짜Interface Management
 - (IBAction) orcaDBIPAddressAction:(id)sender
 {
     [model setOrcaDBIPAddress:[sender stringValue]];
@@ -860,7 +863,7 @@ snopGreenColor;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPRequestHVStatus object:self];
 }
 
-#pragma mark ⅴ쩣able Data Source
+#pragma mark 짜짜짜Table Data Source
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem
 {
@@ -895,7 +898,7 @@ snopGreenColor;
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:@"orca.SNOPController.selectedtab"];
 }
 
-#pragma mark ⅴ쩉omboBox Data Source
+#pragma mark 짜짜짜ComboBox Data Source
 - (NSInteger) numberOfItemsInComboBox:(NSComboBox *)aComboBox
 {
     if (aComboBox == orcaDBIPAddressPU) {
@@ -923,64 +926,63 @@ snopGreenColor;
 //smellie functions ----------------------------------------------
 
 //this fetches the smellie run file information
-- (IBAction) callSmellieSettings:(id)sender
+- (IBAction) fetchRunFiles:(id)sender
 {
-    //remove any old smellie file values
-    self.smellieRunFileList = nil;
-    NSMutableDictionary *tmp = [[NSMutableDictionary alloc] initWithDictionary:[model smellieTestFct]];
-    
-    //remove all the old items
+    // Temporarily disable drop down list and remove old items
+    [smellieRunFileNameField addItemWithObjectValue:@""];
+    [smellieRunFileNameField selectItemWithObjectValue:@""];
+    [smellieRunFileNameField setEnabled:NO];
     [smellieRunFileNameField removeAllItems];
+    [smellieStartRunButton setEnabled:NO];
+    [smellieStopRunButton setEnabled:NO];
+    [smellieEmergencyStop setEnabled:NO];
+    
+    // Set the smellieRunFileList to nil
+    [self setSmellieRunFileList:nil];
+    
+    // Call getSmellieRunFiles from the model. This queries the DB and sets the smellieRunFiles
+    // property. This function runs asyncronously so we have to wait for a notification to be
+    // posted back before we can fill and re-activate the dropdown list (see below).
+    [model getSmellieRunFiles];
+}
+
+-(void) fetchRunFilesFinish:(NSNotification *)aNote
+{
+   // When we get a noticication that the database read has finished, set local variables
+    NSMutableDictionary *runFileDict = [[NSMutableDictionary alloc] initWithDictionary:[model smellieRunFiles]];
     
     //Fill lthe combo box with information
-    for(id key in tmp){
-        id loopValue = [tmp objectForKey:key];
+    for(id key in runFileDict){
+        id loopValue = [runFileDict objectForKey:key];
         [smellieRunFileNameField addItemWithObjectValue:[NSString stringWithFormat:@"%@",[loopValue objectForKey:@"run_name"]]];
     }
     
     [smellieRunFileNameField setEnabled:YES];
     [smellieLoadRunFile setEnabled:YES];
     
-    self.smellieRunFileList = tmp;
-    [tmp release];
-    
+    [self setSmellieRunFileList:runFileDict];
+    [runFileDict release];
 }
 
 -(IBAction)loadSmellieRunAction:(id)sender
 {
     if([smellieRunFileNameField objectValueOfSelectedItem]!= nil)
     {
-        [smellieStartRunButton setEnabled:YES];
-        [smellieStopRunButton setEnabled:YES];
-        [smellieEmergencyStop setEnabled:YES];
-        
         //Loop through all the smellie files in the run list
-        for(id key in self.smellieRunFileList){
+        for(id key in [self smellieRunFileList]){
             
-            id currentRunFile = [self.smellieRunFileList objectForKey:key];
+            id currentRunFile = [[self smellieRunFileList] objectForKey:key];
             
             NSString *thisRunFile = [currentRunFile objectForKey:@"run_name"];
             NSString *requestedRunFile = [smellieRunFileNameField objectValueOfSelectedItem];
             
             if( [thisRunFile isEqualToString:requestedRunFile]){
                 
-                NSLog(@"%", [self smellieRunFile]);
-                // If it's an old run file, add superK fields, set to zero
-                if(![smellieRunFile objectForKey:@"superK_laser_on"]){
-                    [smellieRunFile setValue:0 forKey:@"superK_laser_on"];
-                    [smellieRunFile setValue:0 forKey:@"superK_wavelength_low"];
-                    [smellieRunFile setValue:0 forKey:@"superK_wavelength_high"];
-                    [smellieRunFile setValue:0 forKey:@"superK_wavelength_step"];
-                    [smellieRunFile setValue:0 forKey:@"superK_num_wavelength_steps"];
-                }
                 [self setSmellieRunFile:currentRunFile];
-
                 [loadedSmellieRunNameLabel setStringValue:[smellieRunFile objectForKey:@"run_name"]];
                 [model setSmellieRunNameLabel:[NSString stringWithFormat:@"%@",[smellieRunFile objectForKey:@"run_name"]]];
                 [loadedSmellieTriggerFrequencyLabel setStringValue:[smellieRunFile objectForKey:@"trigger_frequency"]];
                 [loadedSmellieOperationModeLabel setStringValue:[smellieRunFile objectForKey:@"operation_mode"]];
-                [loadedSmellieMaxIntensityLaser setStringValue:[smellieRunFile objectForKey:@"max_laser_intensity"]];
-                [loadedSmellieMinIntensityLaser setStringValue:[smellieRunFile objectForKey:@"min_laser_intensity"]];
                 
                 //counters of fibres and Lasers
                 int fibreCounter=  0;
@@ -1003,7 +1005,7 @@ snopGreenColor;
                 laserCounter = laserCounter + [[self.smellieRunFile objectForKey:@"405nm_laser_on"] intValue];
                 laserCounter = laserCounter + [[self.smellieRunFile objectForKey:@"440nm_laser_on"] intValue];
                 laserCounter = laserCounter + [[self.smellieRunFile objectForKey:@"500nm_laser_on"] intValue];
-                laserCounter = laserCounter + [[self.smellieRunFile objectForKey:@"SuperK_laser_on"] intValue];
+                laserCounter = laserCounter + [[self.smellieRunFile objectForKey:@"superK_laser_on"] intValue];
                 
                 [loadedSmellieFibresLabel setStringValue:[NSString stringWithFormat:@"%i",fibreCounter]];
                 
@@ -1038,26 +1040,37 @@ snopGreenColor;
                 //Calculate the approximate time of the run
                 float triggerFrequency = [[smellieRunFile objectForKey:@"trigger_frequency"] floatValue];
                 float numberTriggersPerLoop = [[smellieRunFile objectForKey:@"triggers_per_loop"] floatValue];
-                float timePerLaserPerFibrePerIntensity = (1.0/triggerFrequency)*numberTriggersPerLoop + 1.0; //13.0seconds forthe sub run incrementations
-                float numberOfIntensities = [[smellieRunFile objectForKey:@"num_intensity_steps"] floatValue];
-                float timePerLaserPerFibre = timePerLaserPerFibrePerIntensity*numberOfIntensities;
-                float timePerLaser = timePerLaserPerFibre*(1.0*fibreCounter);
-                
-                //final approx time plus the laser switchover time
-                float totalTime = timePerLaser*(1.0*laserCounter) + (30*laserCounter);
-                
-                //return total approx time in minutes
-                totalTime = totalTime/60.0;
-                
+                // superK time
+                float superKTimeScale = (1 * fibreCounter * [[self.smellieRunFile objectForKey:@"superK_wavelength_no_steps"] intValue] *
+                                     [[self.smellieRunFile objectForKey:@"superK_intensity_no_steps"] intValue] *
+                                     [[self.smellieRunFile objectForKey:@"superK_gain_no_steps"] intValue]);
+                // Fixed wavelength time
+                float numberIntensityLoops = (([[self.smellieRunFile objectForKey:@"375nm_intensity_no_steps"] intValue] +
+                                          [[self.smellieRunFile objectForKey:@"405nm_intensity_no_steps"] intValue] +
+                                          [[self.smellieRunFile objectForKey:@"440nm_intensity_no_steps"] intValue] +
+                                          [[self.smellieRunFile objectForKey:@"500nm_intensity_no_steps"] intValue]) / 4.);
+                float numberGainLoops = (([[self.smellieRunFile objectForKey:@"375nm_gain_no_steps"] intValue] +
+                                     [[self.smellieRunFile objectForKey:@"405nm_gain_no_steps"] intValue] +
+                                     [[self.smellieRunFile objectForKey:@"440nm_gain_no_steps"] intValue] +
+                                     [[self.smellieRunFile objectForKey:@"500nm_gain_no_steps"] intValue]) / 4.);
+                float numberFixedlasers = ([[self.smellieRunFile objectForKey:@"375nm_laser_on"] intValue] +
+                                           [[self.smellieRunFile objectForKey:@"405nm_laser_on"] intValue] +
+                                           [[self.smellieRunFile objectForKey:@"440nm_laser_on"] intValue] +
+                                           [[self.smellieRunFile objectForKey:@"500nm_laser_on"] intValue]);
+                float fixedTimeScale = (numberFixedlasers * fibreCounter * numberIntensityLoops * numberGainLoops);
+                float totalTime = ((superKTimeScale + fixedTimeScale)*numberTriggersPerLoop) / (triggerFrequency*60);
                 [loadedSmellieApproxTimeLabel setStringValue:[NSString stringWithFormat:@"%0.1f",totalTime]];
                 [loadedSmellieLasersLabel setStringValue:smellieLaserString];
                 
                 //unlock the control buttons
                 //[smellieCheckInterlock setEnabled:YES];
                 [smellieLaserString release];
-                
             }
         }
+        //Activate run buttons
+        [smellieStartRunButton setEnabled:YES];
+        [smellieStopRunButton setEnabled:YES];
+        [smellieEmergencyStop setEnabled:YES];
     }
     else{
         //[smellieCheckInterlock setEnabled:NO];
@@ -1067,11 +1080,25 @@ snopGreenColor;
 
 - (IBAction) startSmellieRunAction:(id)sender
 {
+    //////////////////
+    // Check if a run is already ongoing
+    // If so tell the user and ignore this
+    // button press
+    if([smellieThread isExecuting]){
+        NSLogColor([NSColor redColor], @"[SMELLIE]: A Smellie fire sequence is already on going. Cannot launch a new one until current sequence has finished\n");
+        return;
+    }
+    
+    if(![[model lastStandardRunType] isEqualToString:@"SMELLIE"]){
+        ORRunAlertPanel(@"The SMELLIE standard run is not loaded.",@"You must load a SMELLIE standard run and start a new run before starting a fire sequence",@"OK",nil,nil);
+        return;
+    }
+    
     [smellieLoadRunFile setEnabled:NO];
     [smellieRunFileNameField setEnabled:NO];
     [smellieStopRunButton setEnabled:YES];
     [smellieStartRunButton setEnabled:NO];
-
+    
     //assign the run type as a SMELLIE run
     //[model setRunType:kRunSmellie];
 
@@ -1086,56 +1113,54 @@ snopGreenColor;
       [e raise];
     }
     ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
-    //Method for completing this without a new thread
-    //[theELLIEModel startSmellieRun:smellieRunFile];
-    
-    //if([model isRunTypeMaskedIn:@"Smellie"]){
     
     smellieThread = [[NSThread alloc] initWithTarget:theELLIEModel selector:@selector(startSmellieRun:) object:smellieRunFile];
     [smellieThread start];
-
-    //}
-    //else{
-    //    NSLog(@"Smellie Run Type is not masked in. Please mask this in and try again \n");
-    //}
-    //[NSThread detachNewThreadSelector:@selector(startSmellieRun:) toTarget:theELLIEModel withObject:smellieRunFile];
 }
 
 - (IBAction) stopSmellieRunAction:(id)sender
 {
     [smellieLoadRunFile setEnabled:YES];
     [smellieRunFileNameField setEnabled:YES];
-    [smellieStartRunButton setEnabled:YES];
     [smellieStopRunButton setEnabled:NO];
     //[smellieCheckInterlock setEnabled:YES];
 
-    //unassign the run type as a SMELLIE run
-    //[model setRunType:kRunUndefined];
-
+    //////////////////////
+    // Check if the thread is still running,
+    // if not cancel the thread and let the
+    // catch statements in [ellieModel startSmellieRun]
+    // cause a goto err;
+    if(![smellieThread isCancelled]){
+        [smellieThread cancel];
+        return;
+    }
+    
     //Collect a series of objects from the ELLIEModel
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
     if (![objs count]) {
-      NSString* reasonStr = @"ELLIE model not available, add an ELLIE model to your experiment";
-      NSException* e = [NSException
-                        exceptionWithName:@"NoEllieModel"
-                        reason:reasonStr
-                        userInfo:nil];
-      [e raise];
+        NSString* reasonStr = @"ELLIE model not available, add an ELLIE model to your experiment";
+        NSException* e = [NSException
+                          exceptionWithName:@"NoEllieModel"
+                          reason:reasonStr
+                          userInfo:nil];
+        [e raise];
     }
     ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
 
-    //Method for completing this without a new thread
-    [theELLIEModel stopSmellieRun];
+    //Call stop smellie run method to tidy up SMELLIE's hardware state
+    @try{
+        [theELLIEModel stopSmellieRun];
+    } @catch(NSException* e){
+        [e raise];
+    }
 
-    [smellieThread cancel];
-    NSLog(@"IS THREAD CANCELED? : %@", [[NSThread currentThread] isCancelled]);
-    [smellieThread release];
-    smellieThread = nil;
-
-    //wait for the current loop to finish
-    //move straight to a maintainence run
-    //communicate with smellie model
-    //TODO:Make a note in the datastream that this happened
+    ////////////
+    // Roll over into maintinance run
+    if([[model lastStandardRunType] isEqualToString:@"SMELLIE"]){
+        [model setStandardRunType:@"MAINTENANCE"];
+        [self loadStandardRunFromDBAction:self];
+        [self startRunAction:self];
+    }
 }
 
 - (IBAction) emergencySmellieStopAction:(id)sender
@@ -1152,6 +1177,101 @@ snopGreenColor;
     //(if a smellie run is currently operating) start a maintainence run
     //reset the smellie laser system
     //TODO:Make a note in the datastream that this happened
+}
+
+-(void)startTellieRunNotification:(NSNotification *)note;
+{
+    [self setTellieFireSettings:[note userInfo]];
+    [self startTellieRunAction:nil];
+}
+
+-(IBAction)startTellieRunAction:(id)sender
+{
+    //////////////////
+    // Check if a run is already ongoing
+    // If so tell the user and ignore this
+    // button press
+    if([tellieThread isExecuting]){
+        NSLogColor([NSColor redColor], @"[TELLIE]: A tellie fire sequence is already on going. Cannot launch a new one until current sequence has finished\n");
+        return;
+    }
+    
+    if(![[model lastStandardRunType] isEqualToString:@"TELLIE"]){
+        ORRunAlertPanel(@"The TELLIE standard run is not loaded.",@"You must load a TELLIE standard run and start a new run before starting a fire sequence",@"OK",nil,nil);
+        return;
+    }
+    
+    //////////////////
+    // Get ellie model and launch a fire
+    // sequence
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
+    if (![objs count]) {
+        NSString* reasonStr = @"ELLIE model not available, add an ELLIE model to your experiment";
+        NSException* e = [NSException
+                          exceptionWithName:@"NoEllieModel"
+                          reason:reasonStr
+                          userInfo:nil];
+        [e raise];
+    }
+    ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
+    
+    // Handle if this came from an ELLIE GUI call
+    if(!sender){
+        [self setTellieStandardSequenceFlag:NO];
+        tellieThread = [[NSThread alloc] initWithTarget:theELLIEModel selector:@selector(startTellieRun:) object:[self tellieFireSettings]];
+        [tellieThread start];
+        return;
+    }
+}
+
+- (IBAction) stopTellieRunAction:(id)sender
+{
+    //////////////////////
+    // Check if the thread has been cancelled,
+    // if not cancel the thread and let the
+    // catch statements in [ellieModel startTellieRun]
+    // cause a goto err;
+    if(![tellieThread isCancelled]){
+        [tellieThread cancel];
+        return;
+    }
+
+    //Collect a series of objects from the ELLIEModel
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
+    if (![objs count]) {
+        NSString* reasonStr = @"ELLIE model not available, add an ELLIE model to your experiment";
+        NSException* e = [NSException
+                          exceptionWithName:@"NoEllieModel"
+                          reason:reasonStr
+                          userInfo:nil];
+        [e raise];
+    }
+    ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
+    
+    //Call stop smellie run method to tidy up TELLIE's hardware state
+    @try{
+        [theELLIEModel stopTellieRun];
+    } @catch(NSException* e){
+        [e raise];
+    }
+    
+    ////////////
+    // Handle end of run sqeuencing
+    if([[model lastStandardRunType] isEqualToString:@"TELLIE"]){
+        // If user was running a TELLIE standard sequence, roll over into maintinance run
+        if([self tellieStandardSequenceFlag]){
+            [model setStandardRunType:@"MAINTENANCE"];
+            [self loadStandardRunFromDBAction:self];
+            [self startRunAction:self];
+        // If user is using the ellie gui simply start a new run as they'll likely need to run
+        // more sequences. Reasonable as this is an 'expert' level operation. Proceedures
+        // will dictate the user should start a new standard run manualy when they're finished
+        } else {
+            [self startRunAction:self];
+        }
+    }
+    
+    [self setTellieFireSettings:nil];
 }
 
 - (IBAction) runsLockAction:(id)sender
