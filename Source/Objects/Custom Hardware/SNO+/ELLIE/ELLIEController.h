@@ -175,7 +175,6 @@
 -(IBAction)validationSmellieRunAction:(id)sender;
 -(IBAction)allLaserValidator:(id)sender;
 -(IBAction)makeNewSmellieRun:(id)sender;
--(IBAction)executeSmellieCmdDirectAction:(id)sender;
 
 //TELLIE functions -----------------------------
 
@@ -215,7 +214,6 @@
 //-(void)validateTellieExpertSettings:(NSNotification *)note;
 -(void)tellieRunStarted:(NSNotification *)aNote;
 -(void)tellieRunFinished:(NSNotification *)aNote;
--(BOOL)isTellieRunning;
 -(void)initialiseTellie;
 
 @end
