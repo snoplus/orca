@@ -257,7 +257,10 @@ snotDb = _snotDb;
     if (pqCrate->valid[kCrate_xl3Mode]) {
         [self setXl3Mode:pqCrate->xl3Mode];
     }
-    //TO_DO there are a lot more settings that aren't found in the XL3 database
+    //TO_DO settings that aren't found in the XL3 database:
+    // pedestal mask
+    // voltage thresholds
+    // what about HV setpoints?
     [[self undoManager] enableUndoRegistration];
 }
 

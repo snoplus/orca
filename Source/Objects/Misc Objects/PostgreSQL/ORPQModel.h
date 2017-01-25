@@ -29,6 +29,7 @@
 #define kSnoChannels        (kSnoCardsTotal * kSnoChannelsPerCard)
 
 // indices for PQ_FEC valid flags
+// (same as order of columns as extracted from the FEC database)
 // (all except hvDisabled must have the same numbers as the column numbers when reading the detector db)
 enum {
     kFEC_exists,    // set to 1 if card exists in current detector state (if 0, all elements except hvDisabled will be invalid)
@@ -88,6 +89,8 @@ typedef struct {
     uint32_t        valid[kFEC_numDbColumns];   // bitmasks for settings loaded from hardware (see enum above)
 } PQ_FEC;
 
+// indices for PQ_MTC valid flags
+// (same as order of columns as extracted from the MTC database)
 enum {
     kMTC_controlReg,
     kMTC_mtcaDacs,
@@ -106,6 +109,24 @@ enum {
 #define kNumMtcDacs     14
 #define kNumMtcRelays   7
 
+// order of MTCA DAC entries in the mtca_dacs entry of the database
+enum {
+    kMTCA_DAC_NHit100Lo,
+    kMTCA_DAC_NHit100Med,
+    kMTCA_DAC_NHit100Hi,
+    kMTCA_DAC_NHit20,
+    kMTCA_DAC_NHit20LB,
+    kMTCA_DAC_ESumLo,
+    kMTCA_DAC_ESumHi,
+    kMTCA_DAC_OWLN,
+    kMTCA_DAC_OWLELo,
+    kMTCA_DAC_OWLEHi,
+    kMTCA_DAC_Spare1,
+    kMTCA_DAC_Spare2,
+    kMTCA_DAC_Spare3,
+    kMTCA_DAC_Spare4,
+};
+
 typedef struct {
     uint32_t    controlReg;
     uint32_t    mtcaDacs[kNumMtcDacs];
@@ -121,6 +142,8 @@ typedef struct {
     uint32_t    valid[kMTC_numDbColumns];
 } PQ_MTC;
 
+// indices for PQ_Crate valid flags
+// (same as order of columns as extracted from the crate database)
 enum {
     kCrate_exists,
     kCrate_ctcDelay,
@@ -149,6 +172,8 @@ typedef struct {
     uint32_t    valid[kCrate_numDbColumns];
 } PQ_Crate;
 
+// indices for PQ_CAEN valid flags
+// (same as order of columns as extracted from the CAEN database)
 enum {
     kCAEN_channelConfiguration,
     kCAEN_bufferOrganization,

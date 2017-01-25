@@ -186,6 +186,21 @@ kGtCrateMask,
 kPEDCrateMask
 };
 
+// MTCA DAC index based on order from detector DB
+int mtcDacIndexFromDetectorDB[10]=
+{
+    kNHit100LoThreshold,    // NHIT100Lo is the first entry in the mtac_dacs entry of the detector database!
+    kNHit100MedThreshold,
+    kNHit100HiThreshold,
+    kNHit20Threshold,
+    kNHit20LBThreshold,
+    kESumLowThreshold,
+    kESumHiThreshold,
+    kOWLNThreshold,
+    kOWLELoThreshold,
+    kOWLEHiThreshold,
+};
+
 @interface ORMTCModel (private)
 - (void) doBasicOp;
 - (void) setupDefaults;
@@ -350,6 +365,7 @@ resetFifoOnStart = _resetFifoOnStart;
     return 0;
 }
 
+// update MTC GUI based on current detector state
 - (void) detectorStateChanged:(NSNotification*)aNote
 {
     ORPQDetectorDB *detDB = [aNote object];
@@ -363,13 +379,14 @@ resetFifoOnStart = _resetFifoOnStart;
     [[self undoManager] disableUndoRegistration];
 
     if (pqMTC->valid[kMTC_controlReg]) {
-        [self setDbLong:pqMTC->controlReg forIndex:kControlMask]; // TO_DO NO -- only update pedestals
+        // TO_DO currently only updating pedestal enabled flag -- what about pulser enable bit (0x02)?
+        [self setIsPedestalEnabledInCSR:(pqMTC->controlReg & 0x01)];
     }
-    //TO_DO the last 4 dacs are spares? But then why are the masks in these spots in mtcDacIndexes[]?
-    for (int i=0; i<10; ++i) { // (don't update the last 4 dac settings)
+    //TO_DO verify that order of MTCA DACs is correct
+    for (int i=0; i<10; ++i) {
         if (pqMTC->valid[kMTC_mtcaDacs] & (1 << i)) {
             uint32_t val = pqMTC->mtcaDacs[i];
-            [self setDbLong:val forIndex:mtcDacIndexes[i]]; //TO_DO verify that this order is correct
+            [self setDbLong:val forIndex:mtcDacIndexFromDetectorDB[i]];
         }
     }
     if (pqMTC->valid[kMTC_pedWidth]) {
@@ -396,6 +413,7 @@ resetFifoOnStart = _resetFifoOnStart;
     if (pqMTC->valid[kMTC_gtCrateMask]) {
         [self setDbLong:pqMTC->gtCrateMask forIndex:kGtCrateMask];
     }
+    //TO_DO verify that order of relays is correct
     for (int i=0; i<kNumMtcRelays; ++i) {
         if (pqMTC->valid[kMTC_mtcaRelays] & (1 << i)) {
             uint32_t val = pqMTC->mtcaRelays[i];
@@ -424,6 +442,10 @@ resetFifoOnStart = _resetFifoOnStart;
             }
         }
     }
+    //TO_DO not found in detector MTC database to set in GUI:
+    // kPulserPeriod
+    // kFineSlope
+    // kMinDelayOffset
     [[self undoManager] enableUndoRegistration];
 }
 
