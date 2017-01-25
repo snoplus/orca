@@ -1057,6 +1057,11 @@ err:
     }
     SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
 
+    //Set all to be nil
+    [self setTellieFireParameters:nil];
+    [self setTellieFibreMapping:nil];
+    [self setTellieNodeMapping:nil];
+    
     // **********************************
     // Load latest calibration constants
     // **********************************
@@ -1076,7 +1081,8 @@ err:
                                                         error:&parsDataError];
 
     if(parsDataError){
-        NSLog(@"[TELLIE_DATABASE]: %@\n\n",parsDataError);
+        NSLog(@"[TELLIE_DATABASE]: Error connecting to couchdb database\n");
+        return;
     }
     NSString* parsReturnStr = [[NSString alloc] initWithData:parsData encoding:NSUTF8StringEncoding];
     // Format queried data to dictionary
@@ -1084,6 +1090,7 @@ err:
     NSMutableDictionary* parsDict = [NSJSONSerialization JSONObjectWithData:[parsReturnStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&parsDictError];
     if(parsDictError){
         NSLog(@"[TELLIE_DATABASE]: Error querying couchDB, please check the connection is correct %@\n",parsDictError);
+        return;
     }
     [parsReturnStr release];
 
@@ -1114,7 +1121,8 @@ err:
                                               error:&mapDataError];
     */
     if(mapDataError){
-        NSLog(@"\n%@\n\n",mapDataError);
+        NSLog(@"[TELLIE_DATABASE]: Error connecting to couchdb database\n");
+        return;
     }
     NSString* mapReturnStr = [[NSString alloc] initWithData:mapData encoding:NSUTF8StringEncoding];
     // Format queried data to dictionary
@@ -1148,6 +1156,7 @@ err:
                                                          error:&nodeDataError];
     if(nodeDataError){
         NSLog(@"[TELLIE_DATABASE]: %@\n",nodeDataError);
+        return;
     }
     NSString* nodeReturnStr = [[NSString alloc] initWithData:nodeData encoding:NSUTF8StringEncoding];
     
@@ -2003,6 +2012,7 @@ err:
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
     if(error){
         NSLogColor([NSColor redColor], @"[SMELLIE]: Error in querying couchDB: %@\n", error);
+        return @-1;
     }
 
     @try{
@@ -2025,11 +2035,8 @@ err:
     */
     NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     if(![snopModels count]){
-        NSException* e = [NSException
-                          exceptionWithName:@"noSNOPModel"
-                          reason:@"*** Please add a SNOPModel to the experiment"
-                          userInfo:nil];
-        [e raise];
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Could not find SNOPModel\n");
+        return @-1;
     }
     SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
 
@@ -2040,11 +2047,8 @@ err:
     NSError *error =  nil;
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
     if(error){
-        NSException* e = [NSException
-                          exceptionWithName:@"jsonReadError"
-                          reason:@"*** Database JSON could not be read properly"
-                          userInfo:nil];
-        [e raise];
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Error in querying couchDB: %@\n", error);
+        return @-1;
     }
     
     NSDictionary* entries = [json objectForKey:@"rows"];
@@ -2071,11 +2075,8 @@ err:
     */
     NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     if(![snopModels count]){
-        NSException* e = [NSException
-                          exceptionWithName:@"noSNOPModel"
-                          reason:@"*** Please add a SNOPModel to the experiment"
-                          userInfo:nil];
-        [e raise];
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Could not find SNOPModel\n");
+        return nil;
     }
     SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
 
@@ -2087,7 +2088,8 @@ err:
     NSError *error =  nil;
     NSMutableDictionary *currentConfig = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
     if(error){
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Error querying the couchDB: %@\n", error);
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Error in querying couchDB: %@\n", error);
+        return nil;
     }
     [ret release];
 

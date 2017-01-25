@@ -432,6 +432,17 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     [tellieNoPulsesTf.window makeFirstResponder:nil];
     [tellieExpertOperationModePb.window makeFirstResponder:nil];
 
+    //Check if fibre mapping has been loaded from the tellieDB
+    if(![model tellieNodeMapping]){
+        [model loadTELLIEStaticsFromDB];
+    }
+    //If still can't get reference, return
+    if(![model tellieNodeMapping]){
+        NSLogColor([NSColor redColor], @"[TELLIE]: Cannot connect to couchdb database\n");
+        return;
+    }
+    
+    
     NSString* msg = nil;
     NSMutableArray* msgs = [NSMutableArray arrayWithCapacity:7];
     NSLog(@"---------------------------- Tellie Validation messages ----------------------------\n");
@@ -534,6 +545,16 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     [tellieGeneralFreqTf.window makeFirstResponder:nil];
     [tellieGeneralOperationModePb.window makeFirstResponder:nil];
 
+    //Check if fibre mapping has been loaded from the tellieDB
+    if(![model tellieNodeMapping]){
+        [model loadTELLIEStaticsFromDB];
+    }
+    //If still can't get reference, return
+    if(![model tellieNodeMapping]){
+        NSLogColor([NSColor redColor], @"[TELLIE]: Cannot connect to couchdb database\n");
+        return;
+    }
+    
     NSString* msg = nil;
     NSMutableArray* msgs = [NSMutableArray arrayWithCapacity:4];
 
@@ -645,6 +666,17 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
      edited.
      */
     //Get a reference to whichever field was changed
+    //Check if fibre mapping has been loaded from the tellieDB
+
+    if(![model tellieNodeMapping]){
+        [model loadTELLIEStaticsFromDB];
+    }
+    //If still can't get reference, return
+    if(![model tellieNodeMapping]){
+        NSLogColor([NSColor redColor], @"[TELLIE]: Cannot connect to couchdb database\n");
+        return;
+    }
+    
     NSTextField * editedField = [note object];
     NSString* currentString = [editedField stringValue];
     
@@ -779,6 +811,7 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     if(![model tellieNodeMapping]){
         [model loadTELLIEStaticsFromDB];
     }
+    
     //Clear out any old data
     [tellieGeneralFibreSelectPb removeAllItems];
     [tellieGeneralFibreSelectPb setEnabled:NO];
@@ -1441,33 +1474,6 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     
 }
 
--(void) fetchCurrentTellieSubRunFile
-{
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* aSnotModel = [objs objectAtIndex:0];
-    NSString *urlString = [NSString stringWithFormat:@"http://%@:%u/smellie/_design/smellieMainQuery/_view/fetchMostRecentConfigVersion?descending=True&limit=1",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
-    NSURL *url = [NSURL URLWithString:urlString];
-    NSNumber *currentVersionNumber;
-    NSData *data = [NSData dataWithContentsOfURL:url];
-    NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    NSError *error =  nil;
-    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
-    if(!error){
-        @try{
-            //format the json response
-            NSString *stringValueOfCurrentVersion = [NSString stringWithFormat:@"%@",[[[json valueForKey:@"rows"] valueForKey:@"value"]objectAtIndex:0]];
-            currentVersionNumber = [NSNumber numberWithInt:[stringValueOfCurrentVersion intValue]];
-        }
-        @catch (NSException *e) {
-            NSLog(@"Error in fetching from the TellieDb: %@",e);
-        }
-    }
-    else{
-        NSLog(@"Error querying couchDB, please check the connection is correct %@",error);
-    }
-
-}
-
 //Submit Smellie configuration file to the Database
 -(IBAction)onSelectOfSepiaInput:(id)sender
 {
@@ -1798,69 +1804,6 @@ BOOL isNumeric(NSString *s)
     [self close];
 }
 
-
-//Custom Command for Smellie
--(IBAction)executeSmellieCmdDirectAction:(id)sender
-{
-    NSString * cmd = [[[NSString alloc] init] autorelease];
-    NSLog(@"CMD %@",[executeCmdBox stringValue]);
-    NSLog(@"CMD %i",[executeCmdBox indexOfSelectedItem]);
-    
-    int cmdIndex = [executeCmdBox indexOfSelectedItem];
-    
-    if(cmdIndex == 0){
-        cmd = @"10";
-    }
-    else if (cmdIndex == 1){
-        cmd = @"20";
-    }
-    else if (cmdIndex == 2){
-        cmd = @"30";
-    }
-    else if (cmdIndex == 3){
-        cmd = @"2050";
-    }
-    else if (cmdIndex == 4){
-        cmd = @"40";
-    }
-    else if (cmdIndex == 5){
-        cmd = @"50";
-    }
-    else if(cmdIndex == 6){
-        cmd = @"60";
-    }
-    else if(cmdIndex == 7){
-        cmd = @"70";
-    }
-    else if(cmdIndex == 8){
-        [model setSmellieMasterMode:[NSString stringWithString:[smellieDirectArg1 stringValue]] withNumOfPulses:[NSString stringWithString:[smellieDirectArg2 stringValue]]];
-        //cmd = @"80";
-    }
-    else if(cmdIndex == 9){
-        //hardcoded command to kill external software on SNODROp (SMELLIE DAQ software)
-        cmd = @"110";
-    }
-    else if(cmdIndex == 10){
-        cmd = @"22110"; //c
-    }
-    else{
-        cmd = @"0"; //not sure what is going on here
-    }
-    
-    
-    //NSString * cmd = [NSString stringWithString:[smellieDirectCmd stringValue]];
-    NSString * arg1 = [NSString stringWithString:[smellieDirectArg1 stringValue]];
-    NSString * arg2 = [NSString stringWithString:[smellieDirectArg2 stringValue]];
-    if(arg1 == NULL){
-        arg1 = @"0";
-    }
-    
-    if(arg2 == NULL){
-        arg2 = @"0";
-    }
-    
-    [model sendCustomSmellieCmd:cmd withArgs:@[arg1, arg2]];
-}
 //TELLIE functions -------------------------
 
 
