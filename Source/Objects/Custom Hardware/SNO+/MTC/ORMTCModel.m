@@ -369,50 +369,65 @@ resetFifoOnStart = _resetFifoOnStart;
 - (void) detectorStateChanged:(NSNotification*)aNote
 {
     ORPQDetectorDB *detDB = [aNote object];
+    PQ_MTC *pqMTC = NULL;
 
-    if (!detDB) return;
+    if (detDB) pqMTC = (PQ_MTC *)[detDB getMTC];
 
-    PQ_MTC *pqMTC = (PQ_MTC *)[detDB getMTC];
+    if (!pqMTC) {     // nothing to do if MTC doesn't exist in the current state
+        NSLogColor([NSColor redColor], @"MTC settings not loaded!\n");
+        return;
+    }
 
-    if (!pqMTC) return;     // nothing to do if MTC doesn't exist in the current state
+    int countInvalid = 0;
 
     [[self undoManager] disableUndoRegistration];
 
     if (pqMTC->valid[kMTC_controlReg]) {
         // TO_DO currently only updating pedestal enabled flag -- what about pulser enable bit (0x02)?
         [self setIsPedestalEnabledInCSR:(pqMTC->controlReg & 0x01)];
-    }
+    } else ++countInvalid;
+
     //TO_DO verify that order of MTCA DACs is correct
     for (int i=0; i<10; ++i) {
         if (pqMTC->valid[kMTC_mtcaDacs] & (1 << i)) {
             uint32_t val = pqMTC->mtcaDacs[i];
             [self setDbLong:val forIndex:mtcDacIndexFromDetectorDB[i]];
-        }
+        } else ++countInvalid;
     }
+
     if (pqMTC->valid[kMTC_pedWidth]) {
         [self setDbLong:pqMTC->pedWidth forIndex:kPedestalWidth];
-    }
+    } else ++countInvalid;
+
+
     if (pqMTC->valid[kMTC_coarseDelay]) {
         [self setDbLong:pqMTC->coarseDelay forIndex:kCoarseDelay];
-    }
+    } else ++countInvalid;
+
     if (pqMTC->valid[kMTC_fineDelay]) {
         [self setDbLong:pqMTC->fineDelay forIndex:kFineDelay];
-    }
+    } else ++countInvalid;
+
     if (pqMTC->valid[kMTC_pedMask]) {
         [self setDbLong:pqMTC->pedMask forIndex:kPEDCrateMask];
-    }
+    } else ++countInvalid;
+
     if (pqMTC->valid[kMTC_prescale]) {
         [self setDbLong:(0x10000 - pqMTC->prescale) forIndex:kNhit100LoPrescale];
-    }
+    } else ++countInvalid;
+
     if (pqMTC->valid[kMTC_lockoutWidth]) {
         [self setDbLong:pqMTC->lockoutWidth forIndex:kLockOutWidth];
-    }
+    } else ++countInvalid;
+
     if (pqMTC->valid[kMTC_gtMask]) {
         [self setDbLong:pqMTC->gtMask forIndex:kGtMask];
-    }
+    } else ++countInvalid;
+
     if (pqMTC->valid[kMTC_gtCrateMask]) {
         [self setDbLong:pqMTC->gtCrateMask forIndex:kGtCrateMask];
-    }
+    } else ++countInvalid;
+
     //TO_DO verify that order of relays is correct
     for (int i=0; i<kNumMtcRelays; ++i) {
         if (pqMTC->valid[kMTC_mtcaRelays] & (1 << i)) {
@@ -440,13 +455,17 @@ resetFifoOnStart = _resetFifoOnStart;
                     [self setMtcaOWLNMask:val];
                     break;
             }
-        }
+        } else ++countInvalid;
     }
     //TO_DO not found in detector MTC database to set in GUI:
     // kPulserPeriod
     // kFineSlope
     // kMinDelayOffset
     [[self undoManager] enableUndoRegistration];
+
+    if (countInvalid) {
+        NSLogColor([NSColor redColor], @"%d MTC settings not loaded!\n", countInvalid);
+    }
 }
 
 #pragma mark •••Accessors
