@@ -147,6 +147,10 @@ tubRegister;
     sno = [objs objectAtIndex:0];
     [self setMTCHost:[sno mtcHost]];
     [self setMTCPort:[sno mtcPort]];
+    for(int i=0;i<MTC_NUM_THRESHOLDS;i++)
+    {
+        mtca_conversion_is_valid[i] = NO;
+    }
 }
 
 - (void) awakeAfterDocumentLoaded
@@ -862,6 +866,10 @@ tubRegister;
     {
         return aThreshold;
     }
+    if(![self ConversionIsValidForThreshold:type])
+    {
+        [NSException raise:@"ConversionNotValidError" format:@"Conversion for threhsold %i is not valid",type];
+    }
     float DAC_per_nhit = [self DAC_per_NHIT_ofType:type];
     float DAC_per_mv = [self DAC_per_mV_ofType:type];
     float mv_per_nhit = DAC_per_nhit/DAC_per_mv;
@@ -938,6 +946,16 @@ tubRegister;
     {
         mtca_dac_per_mV[type] = _val;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCAConversionChanged object:self];
+    }
+}
+
+- (BOOL) ConversionIsValidForThreshold:(int) type {
+    return mtca_conversion_is_valid[type];
+}
+- (void) setConversionIsValidForThreshold:(int) type isValid:(BOOL) _val {
+    if(mtca_conversion_is_valid[type] != _val) {
+        mtca_conversion_is_valid[type] = _val;
+        //Notification?
     }
 }
 
@@ -1876,6 +1894,11 @@ tubRegister;
     [self setGtMask:0];
     [self setGTCrateMask: 0];
     [self setPedCrateMask:0];
+    for(int i=0;i<MTC_NUM_THRESHOLDS;i++)
+    {
+        mtca_conversion_is_valid[i] = NO;
+        mtca_thresholds[i] = 0;
+    }
 }
 @end
 

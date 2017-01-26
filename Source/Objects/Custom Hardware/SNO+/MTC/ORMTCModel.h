@@ -107,6 +107,7 @@
     uint16_t mtca_baselines[MTC_NUM_THRESHOLDS];
     float mtca_dac_per_nhit[MTC_NUM_THRESHOLDS]; //Let the ESUMs have a conversion in case we ever need it
     float mtca_dac_per_mV[MTC_NUM_THRESHOLDS];
+    BOOL mtca_conversion_is_valid[MTC_NUM_THRESHOLDS];
     RedisClient *mtc;
 }
 
@@ -185,6 +186,9 @@
 
 - (float) DAC_per_mV_ofType:(int) type;
 - (void) setDAC_per_mV_OfType:(int) type toValue:(float) _val;
+
+- (BOOL) ConversionIsValidForThreshold:(int) type;
+- (void) setConversionIsValidForThreshold:(int) type isValid:(BOOL) _val;
 
 - (void) loadFromSearialization:(NSMutableDictionary*) serial;
 - (NSMutableDictionary*) serializeToDictionary;
