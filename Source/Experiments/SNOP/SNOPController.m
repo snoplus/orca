@@ -1573,7 +1573,7 @@ snopGreenColor;
         return;
     }
     @try{
-        if([mtcModel ConversionIsValidForThreshold:threshold_index])
+        if(![mtcModel ConversionIsValidForThreshold:threshold_index])
         {
             units = MTC_RAW_UNITS;
         }
