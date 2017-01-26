@@ -515,6 +515,10 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
 // load and parse the full detector database from the PostgreSQL server
 - (ORPQDetectorDB *) loadDetectorDB: (ORPQConnection *)pqConnection
 {
+    int countBadNhit100Enabled = 0;
+    int countBadNhit20Enabled = 0;
+    int countBadSequencerEnabled = 0;
+    int countBadThresholdNotMax = 0;
 //
 // load PMT HV database
 //
@@ -586,13 +590,19 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                     pqFEC->valid[col] |= (1 << ch);
                     switch (col) {
                         case kFEC_nhit100enabled:
-                            if (val) pqFEC->nhit100enabled |= (1 << ch);
+                            if (val) {
+                                pqFEC->nhit100enabled |= (1 << ch);
+                                if (pqFEC->valid[kFEC_hvDisabled] & pqFEC->hvDisabled & (1 << ch)) ++countBadNhit100Enabled;
+                            }
                             break;
                         case kFEC_nhit100delay:
                             pqFEC->nhit100delay[ch] = val;
                             break;
                         case kFEC_nhit20enabled:
-                            if (val) pqFEC->nhit20enabled |= (1 << ch);
+                            if (val) {
+                                pqFEC->nhit20enabled |= (1 << ch);
+                                if (pqFEC->valid[kFEC_hvDisabled] & pqFEC->hvDisabled & (1 << ch)) ++countBadNhit20Enabled;
+                            }
                             break;
                         case kFEC_nhit20width:
                             pqFEC->nhit20width[ch] = val;
@@ -614,15 +624,24 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                             break;
                         case kFEC_vthr:
                             pqFEC->vthr[ch] = val;
+                            if ((pqFEC->valid[kFEC_hvDisabled] & pqFEC->hvDisabled & (1 << ch)) && (val != 255)) {
+                                ++countBadThresholdNotMax;
+                            }
                             break;
                         case kFEC_pedEnabled:
                             pqFEC->pedEnabled = val;
                             pqFEC->valid[col] = 0xffffffff;
                             break;
-                        case kFEC_seqDisabled:
+                        case kFEC_seqDisabled: {
                             pqFEC->seqDisabled = val;
                             pqFEC->valid[col] = 0xffffffff;
-                            break;
+                            uint32_t bad = pqFEC->valid[kFEC_hvDisabled] & (pqFEC->hvDisabled & ~val);
+                            if (bad) {
+                                for (int i=0; i<32; ++i) {
+                                    if (bad & (1 << i)) ++countBadSequencerEnabled;
+                                }
+                            }
+                        }   break;
                         case kFEC_tdiscRp1:
                             if (ch < kNumFecTdisc) pqFEC->tdiscRp1[ch] = val;
                             break;
@@ -876,10 +895,19 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
         NSLog(@"Loaded %@ DB: PMTHV(%d), FEC(%d), Crate(%d), MTC(%d), CAEN(%d)\n",
               [delegate dataBaseName],
               detDB->pmthvLoaded, detDB->fecLoaded, detDB->crateLoaded, detDB->mtcLoaded, detDB->caenLoaded);
+        if (countBadNhit100Enabled || countBadNhit20Enabled) {
+            NSLogColor([NSColor redColor], @"Warning!  Some bad channels have triggers enabled:\n");
+            if (countBadNhit100Enabled) NSLogColor([NSColor redColor], @"  - %d bad channels with NHIT100 enabled\n", countBadNhit100Enabled);
+            if (countBadNhit20Enabled)  NSLogColor([NSColor redColor], @"  - %d bad channels with NHIT20 enabled\n", countBadNhit20Enabled);
+        } else if (countBadSequencerEnabled || countBadThresholdNotMax) {
+            NSLog(@"Note!  Some bad channels are enabled:\n");
+        }
+        if (countBadSequencerEnabled) NSLog(@"  - %d bad channels with sequencer enabled\n", countBadSequencerEnabled);
+        if (countBadThresholdNotMax)  NSLog(@"  - %d bad channels with threshold not set to max\n", countBadThresholdNotMax);
         return detDB;
     } else {
         [detDB release];
-        NSLog(@"Error loading %@ DB!\n");
+        NSLogColor([NSColor redColor], @"Error loading %@ DB!\n");
         return nil;
     }
 }
