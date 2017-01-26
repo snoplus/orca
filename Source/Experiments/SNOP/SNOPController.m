@@ -340,9 +340,17 @@ snopGreenColor;
     
     [notifyCenter addObserver : self
                      selector : @selector(mtcDataBaseChanged:)
-                         name : ORMTCModelMtcDataBaseChanged
+                         name : ORMTCAThresholdChanged
                         object: nil];
-    
+    [notifyCenter addObserver : self
+                     selector : @selector(mtcDataBaseChanged:)
+                         name : ORMTCAConversionChanged
+                        object: nil];
+    [notifyCenter addObserver : self
+                     selector : @selector(mtcDataBaseChanged:)
+                         name : ORMTCABaselineChanged
+                        object: nil];
+
     [notifyCenter addObserver : self
                      selector : @selector(updateSettings:)
                          name : @"SNOPSettingsChanged"
