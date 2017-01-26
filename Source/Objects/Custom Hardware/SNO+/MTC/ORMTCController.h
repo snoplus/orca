@@ -123,9 +123,6 @@
 
 }
 
-//Getter Method for the Text fields in the View
-- (NSMutableDictionary*) getMatriciesFromNib;
-
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management

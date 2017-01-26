@@ -71,16 +71,6 @@
     return self;
 }
 
-//This pulls any names from the Nib
-- (NSMutableDictionary*) getMatriciesFromNib;
-{
-    NSMutableDictionary* returnDictionary= [NSMutableDictionary dictionaryWithCapacity:100];
-    [returnDictionary setObject:globalTriggerMaskMatrix forKey:@"globalTriggerMaskMatrix"];
-    [returnDictionary setObject:globalTriggerCrateMaskMatrix forKey:@"globalTriggerCrateMaskMatrix"];
-    [returnDictionary setObject:pedCrateMaskMatrix forKey:@"pedCrateMaskMatrix"];
-    return returnDictionary;
-}
-
 - (void) awakeFromNib
 {
     standardOpsSizeSmall = NSMakeSize(460,440);
