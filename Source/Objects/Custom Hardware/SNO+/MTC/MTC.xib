@@ -1236,7 +1236,7 @@
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
-                                        <box title="MTC/D" borderType="line" id="1488">
+                                        <box title="  MTC/D Advanced Options" borderType="line" id="1488">
                                             <rect key="frame" x="14" y="13" width="548" height="220"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView">
@@ -1532,7 +1532,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <button horizontalHuggingPriority="750" verticalHuggingPriority="750" id="xQJ-T4-8iw">
-                                            <rect key="frame" x="14" y="220" width="13" height="13"/>
+                                            <rect key="frame" x="17" y="220" width="13" height="13"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="disclosureTriangle" bezelStyle="disclosure" imagePosition="above" alignment="left" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="aqQ-Vh-EfE">
                                                 <behavior key="behavior" pushIn="YES" changeBackground="YES" changeGray="YES" lightByContents="YES"/>
