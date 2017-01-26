@@ -955,7 +955,7 @@ tubRegister;
 - (void) setConversionIsValidForThreshold:(int) type isValid:(BOOL) _val {
     if(mtca_conversion_is_valid[type] != _val) {
         mtca_conversion_is_valid[type] = _val;
-        //Notification?
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCAConversionChanged object:self];
     }
 }
 
