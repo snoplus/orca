@@ -1678,6 +1678,14 @@ tubRegister;
 	}
 }
 
+- (void) validateMTCADAC:(uint16_t) dac_value {
+    if( dac_value < 0 ) {
+        [NSException raise:@"MTCModelError" format:@"MTCA DAC value %u is not valid. DAC values must be non-negative",dac_value];
+    }
+    if( dac_value > 4095) {
+        [NSException raise:@"MTCModelError" format:@"MTCA DAC value %u is not valid. DAC values must be less than 4095",dac_value];
+    }
+}
 - (void) loadTheMTCADacs
 {
     /* Load the MTCA thresholds to hardware. */
@@ -1689,6 +1697,7 @@ tubRegister;
         @try {
             server_index = [self model_index_to_server_index:i];
             dacs[server_index] = [self getThresholdOfType:i inUnits:MTC_RAW_UNITS];
+            [self validateMTCADAC:dacs[server_index]];
         } @catch (NSException* excep) {
             @throw; //Let it bubble up
         }

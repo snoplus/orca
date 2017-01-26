@@ -253,6 +253,7 @@
 - (void) stopMTCPedestalsFixedTime;
 - (void) firePedestals:(unsigned long) count withRate:(float) rate;
 - (void) basicMTCReset;
+- (void) validateMTCADAC:(uint16_t) dac_value;
 - (void) loadTheMTCADacs;
 - (void) loadMTCXilinx;
 - (void) loadTubRegister;
