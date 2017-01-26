@@ -821,6 +821,7 @@
     float value;
     for(int i=FIRST_ESUM_TAG;i<=LAST_ESUM_TAG;i++)
     {
+        tempType = type;
         @try {
             threshold_index = [self convert_view_thresold_index_to_model_index:i];
             if(![model ConversionIsValidForThreshold:threshold_index]) {
