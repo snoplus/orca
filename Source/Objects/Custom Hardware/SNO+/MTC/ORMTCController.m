@@ -73,10 +73,10 @@
 
 - (void) awakeFromNib
 {
-    standardOpsSizeSmall = NSMakeSize(685,320);
-    standardOpsSizeLarge = NSMakeSize(685,620);
-    settingsSizeSmall	 = NSMakeSize(600,430);
-    settingsSizeLarge	 = NSMakeSize(600,580);
+    standardOpsSizeSmall = NSMakeSize(650,320);
+    standardOpsSizeLarge = NSMakeSize(650,620);
+    settingsSizeSmall	 = NSMakeSize(580,400);
+    settingsSizeLarge	 = NSMakeSize(580,580);
     triggerSize          = NSMakeSize(800,655);
     blankView = [[NSView alloc] init];
     [tabView setFocusRingType:NSFocusRingTypeNone];
