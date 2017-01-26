@@ -790,10 +790,31 @@
         }
     }
 }
+- (void) setNHitUnitConversionEnabled:(BOOL) enabled {
+    [nHitViewTypeMatrix setEnabled:enabled];
+    if(!enabled) {
+        [nHitViewTypeMatrix selectCellWithTag:VIEW_RAW_UNITS_TAG];
+    }
+}
+- (void) setEsumUnitConversionEnabled:(BOOL) enabled {
+    [eSumViewTypeMatrix setEnabled:enabled];
+    if(!enabled) {
+        [eSumViewTypeMatrix selectCellWithTag:VIEW_RAW_UNITS_TAG];
+    }
+}
 - (void) changeNhitThresholdsDisplay: (int) type
 {
     int threshold_index;
     float value;
+    BOOL valid = YES;
+    //First check that all the units conversions are valid
+    for(int i=FIRST_NHIT_TAG;i<=LAST_NHIT_TAG;i++)
+    {
+        valid &= [model ConversionIsValidForThreshold:i];
+    }
+    [self setNHitUnitConversionEnabled:valid];
+    if(!valid) { type = MTC_RAW_UNITS; }
+
     for(int i=FIRST_NHIT_TAG;i<=LAST_NHIT_TAG;i++)
     {
         @try {
@@ -810,6 +831,15 @@
 {
     int threshold_index;
     float value;
+    BOOL valid = YES;
+    //First check that all the units conversions are valid
+    for(int i=FIRST_ESUM_TAG;i<=LAST_ESUM_TAG;i++)
+    {
+        valid &= [model ConversionIsValidForThreshold:i];
+    }
+    [self setEsumUnitConversionEnabled:valid];
+    if(!valid) { type = MTC_RAW_UNITS; }
+
     for(int i=FIRST_ESUM_TAG;i<=LAST_ESUM_TAG;i++)
     {
         @try {
