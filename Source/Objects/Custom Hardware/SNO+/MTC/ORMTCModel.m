@@ -1202,7 +1202,8 @@ tubRegister;
 - (void) clearGlobalTriggerWordMask
 {
 	@try {
-		[self write:kMtcMaskReg value:0];
+        [self setGtMask:0];
+        [self setGlobalTriggerWordMask];
 		NSLog(@"Cleared GT Mask\n");
 	}
 	@catch(NSException* localException) {
@@ -1215,8 +1216,7 @@ tubRegister;
 - (void) setGlobalTriggerWordMask
 {
 	@try {
-        [self gtMask];
-		[self write:kMtcMaskReg value:[self gtMask]];
+		[mtc okCommand:"set_gt_mask %lu",[self gtMask]];
 		NSLog(@"Set GT Mask: 0x%08x\n",[self gtMask]);
 	}
 	@catch(NSException* localException) {
@@ -1231,7 +1231,7 @@ tubRegister;
 {
 	unsigned long aValue = 0;
 	@try {	
-		aValue =  [self read:kMtcMaskReg] & 0x03FFFFFF;
+        aValue =  [mtc intCommand:"get_gt_mask"];
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Could not get GT word mask!\n");					
