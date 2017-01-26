@@ -1555,7 +1555,7 @@ snopGreenColor;
         [mtcModel setThresholdOfType:threshold_index fromUnits:units toValue:threshold_value];
     }
     @catch(NSException *excep) {
-        NSLogColor([NSColor redColor], @"Error while trying to set the MTC threshold, reason: %s\n",[excep reason]);
+        NSLogColor([NSColor redColor], @"Error while trying to set the MTC threshold, reason: %@\n",[excep reason]);
     }
 }
 
@@ -1672,7 +1672,7 @@ snopGreenColor;
         [[standardRunThresCurrentValues cellAtRow:9 column:0] setTextColor:[self snopRedColor]];
     }
     } @catch (NSException *exception) {
-        NSLogColor([NSColor redColor], @"Error while retrieving threshold. Reason:%s\n.",[exception reason]);
+        NSLogColor([NSColor redColor], @"Error while retrieving threshold. Reason:%@\n.",[exception reason]);
     }
     //Prescale
     [[standardRunThresCurrentValues cellAtRow:10 column:0] setFloatValue:[mtcModel dbFloatByIndex:kNhit100LoPrescale]];
@@ -1867,7 +1867,7 @@ snopGreenColor;
         @try {
              nHits = [mtcModel convertThreshold:raw OfType:MTC_N100_HI_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toUnits:MTC_NHIT_UNITS];
         } @catch (NSException *excep) {
-            NSLogColor([NSColor redColor], @"Failed to convert the N100H threhsolds from raw units. Reason: %s\n",[excep reason]);
+            NSLogColor([NSColor redColor], @"Failed to convert the N100H threhsolds from raw units. Reason: %@\n",[excep reason]);
         }
         [[standardRunThresStoredValues cellAtRow:0 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresStoredValues cellAtRow:0 column:0] setFloatValue:nHits];
@@ -1881,7 +1881,7 @@ snopGreenColor;
         @try {
         nHits = [mtcModel convertThreshold:raw OfType:MTC_N100_MED_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toUnits:MTC_NHIT_UNITS];
         } @catch (NSException *excep) {
-            NSLogColor([NSColor redColor],@"Failed to convert the NHit100Med thresholds from raw units. Reason: %s\n", [excep reason]);
+            NSLogColor([NSColor redColor],@"Failed to convert the NHit100Med thresholds from raw units. Reason: %@\n", [excep reason]);
         }
         [[standardRunThresStoredValues cellAtRow:1 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresStoredValues cellAtRow:1 column:0] setFloatValue:nHits];
@@ -1895,7 +1895,7 @@ snopGreenColor;
         @try {
         nHits = [mtcModel convertThreshold:raw OfType:MTC_N100_LO_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toUnits:MTC_NHIT_UNITS];
         } @catch (NSException *excep) {
-            NSLogColor([NSColor redColor],@"Failed to convert the NHit100Lo thresholds from raw units. Reason: %s\n", [excep reason]);
+            NSLogColor([NSColor redColor],@"Failed to convert the NHit100Lo thresholds from raw units. Reason: %@\n", [excep reason]);
         }
         [[standardRunThresStoredValues cellAtRow:2 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresStoredValues cellAtRow:2 column:0] setFloatValue:nHits];
@@ -1910,7 +1910,7 @@ snopGreenColor;
         @try {
         nHits = [mtcModel convertThreshold:raw OfType:MTC_N20_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toUnits:MTC_NHIT_UNITS];
         } @catch (NSException *excep) {
-            NSLogColor([NSColor redColor],@"Failed to convert the NHit20 threshold from raw units. Reason %s\n", [excep reason]);
+            NSLogColor([NSColor redColor],@"Failed to convert the NHit20 threshold from raw units. Reason %@\n", [excep reason]);
         }
         [[standardRunThresStoredValues cellAtRow:3 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresStoredValues cellAtRow:3 column:0] setFloatValue:nHits];
@@ -1924,7 +1924,7 @@ snopGreenColor;
         @try {
         nHits = [mtcModel convertThreshold:raw OfType:MTC_N20LB_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toUnits:MTC_NHIT_UNITS];
         } @catch (NSException *excep) {
-            NSLogColor([NSColor redColor],@"Failed to convert the NHit20LB thresholds from raw units. Reason: %s\n", [excep reason]);
+            NSLogColor([NSColor redColor],@"Failed to convert the NHit20LB thresholds from raw units. Reason: %@\n", [excep reason]);
         }
         [[standardRunThresStoredValues cellAtRow:4 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresStoredValues cellAtRow:4 column:0] setFloatValue:nHits];
@@ -1939,7 +1939,7 @@ snopGreenColor;
         @try {
         nHits = [mtcModel convertThreshold:raw OfType:MTC_OWLN_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toUnits:MTC_NHIT_UNITS];
         } @catch (NSException *excep) {
-            NSLogColor([NSColor redColor],@"Failed to convert the OWLN thresholds from raw units. Reason: %s\n", [excep reason]);
+            NSLogColor([NSColor redColor],@"Failed to convert the OWLN thresholds from raw units. Reason: %@\n", [excep reason]);
         }
         [[standardRunThresStoredValues cellAtRow:5 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresStoredValues cellAtRow:5 column:0] setFloatValue:nHits];
@@ -1953,7 +1953,7 @@ snopGreenColor;
         @try {
             mVolts = [mtcModel convertThreshold:raw OfType:MTC_ESUMH_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toUnits:MTC_mV_UNITS];
         } @catch (NSException *excep) {
-            NSLogColor([NSColor redColor],@"Failed to convert the ESumHi thresholds from raw units. Reason: %s\n", [excep reason]);
+            NSLogColor([NSColor redColor],@"Failed to convert the ESumHi thresholds from raw units. Reason: %@\n", [excep reason]);
         }
 
         [[standardRunThresStoredValues cellAtRow:6 column:0] setFloatValue:mVolts];
@@ -1968,7 +1968,7 @@ snopGreenColor;
         @try {
         mVolts = [mtcModel convertThreshold:raw OfType:MTC_ESUML_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toUnits:MTC_mV_UNITS];
         } @catch (NSException *excep) {
-            NSLogColor([NSColor redColor],@"Failed to convert the ESumLow thresholds from raw units. Reason: %s\n", [excep reason]);
+            NSLogColor([NSColor redColor],@"Failed to convert the ESumLow thresholds from raw units. Reason: %@\n", [excep reason]);
         }
 
         [[standardRunThresStoredValues cellAtRow:7 column:0] setFloatValue:mVolts];
@@ -1983,7 +1983,7 @@ snopGreenColor;
         @try {
         mVolts = [mtcModel convertThreshold:raw OfType:MTC_OWLEHI_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toUnits:MTC_mV_UNITS];
         } @catch (NSException *excep) {
-            NSLogColor([NSColor redColor],@"Failed to convert the OWLEHi thresholds from raw units. Reason: %s\n", [excep reason]);
+            NSLogColor([NSColor redColor],@"Failed to convert the OWLEHi thresholds from raw units. Reason: %@\n", [excep reason]);
         }
 
         [[standardRunThresStoredValues cellAtRow:8 column:0] setFloatValue:mVolts];
@@ -1998,7 +1998,7 @@ snopGreenColor;
         @try {
         mVolts = [mtcModel convertThreshold:raw OfType:MTC_OWLELO_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toUnits:MTC_mV_UNITS];
         } @catch (NSException *excep) {
-            NSLogColor([NSColor redColor],@"Failed to convert the OWLELo thresholds from raw units. Reason: %s\n", [excep reason]);
+            NSLogColor([NSColor redColor],@"Failed to convert the OWLELo thresholds from raw units. Reason: %@\n", [excep reason]);
         }
 
         [[standardRunThresStoredValues cellAtRow:9 column:0] setFloatValue:mVolts];

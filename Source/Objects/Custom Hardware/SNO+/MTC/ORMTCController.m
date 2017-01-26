@@ -314,7 +314,7 @@
     @try {
         units = [self convert_view_unit_index_to_model_index: view_index];
     } @catch (NSException *exception) {
-        NSLogColor([NSColor redColor], @"Improve this error message later. %s\n",[exception reason]);
+        NSLogColor([NSColor redColor], @"Improve this error message later. %@\n",[exception reason]);
         return;
     }
     [self changeNhitThresholdsDisplay:units];
@@ -697,7 +697,7 @@
 	[model loadTheMTCADacs];
 }
     @catch(NSException *excep) {
-        NSLogColor([NSColor redColor], @"Error loading the MTCA DACs. Reason: %s\n.",[excep reason]);
+        NSLogColor([NSColor redColor], @"Error loading the MTCA DACs. Reason: %@\n.",[excep reason]);
     }
 }
 
@@ -773,7 +773,7 @@
     @try {
         unit_index = [self convert_view_unit_index_to_model_index:view_index];
     } @catch (NSException *exception) {
-        NSLogColor([NSColor redColor], @"Could not change views. Reason:%s\n",[exception reason]);
+        NSLogColor([NSColor redColor], @"Could not change views. Reason:%@\n",[exception reason]);
         return;
     }
     [self changeESUMThresholdDisplay:unit_index];
@@ -823,7 +823,7 @@
             threshold_index = [self convert_view_thresold_index_to_model_index:i];
             value = [model getThresholdOfType: threshold_index inUnits:type];
         } @catch (NSException *exception) {
-            NSLogColor([NSColor redColor], @"Failed to interpret field with tag %i, Reason: %s\n. Aborting after %i changes already made", i,[exception reason],i-FIRST_NHIT_TAG);
+            NSLogColor([NSColor redColor], @"Failed to interpret field with tag %i, Reason: %@\n. Aborting after %i changes already made", i,[exception reason],i-FIRST_NHIT_TAG);
             return;
         }
         [[nhitMatrix cellWithTag:i] setFloatValue: value];
@@ -839,7 +839,7 @@
             threshold_index = [self convert_view_thresold_index_to_model_index:i];
             value = [model getThresholdOfType: threshold_index inUnits:type];
         } @catch (NSException *exception) {
-            NSLogColor([NSColor redColor], @"Failed to interpret field with tag %i, Reason: %s\n. Aborting after %i changes already made", i,[exception reason],i-FIRST_ESUM_TAG);
+            NSLogColor([NSColor redColor], @"Failed to interpret field with tag %i, Reason: %@\n. Aborting after %i changes already made", i,[exception reason],i-FIRST_ESUM_TAG);
             return;
         }
         [[esumMatrix cellWithTag:i] setFloatValue: value];
@@ -969,7 +969,7 @@
         float threshold = [[sender selectedCell] floatValue];
         [model setThresholdOfType:threshold_index fromUnits:unit_index toValue:threshold];
     } @catch (NSException *exception) {
-        NSLogColor([NSColor redColor], @"Error when setting threshold. Reason: %s\n Aborting\n",[exception reason]);
+        NSLogColor([NSColor redColor], @"Error when setting threshold. Reason: %@\n Aborting\n",[exception reason]);
         return;
     }
 
@@ -997,7 +997,7 @@
         @try {
             threshold_index = [self convert_view_thresold_index_to_model_index:i];
         } @catch (NSException *exception) {
-            NSLogColor([NSColor redColor], @"Loaded %i trigge_scans then encountered an error:\n%s\n",i-FIRST_NHIT_TAG,[exception reason]);
+            NSLogColor([NSColor redColor], @"Loaded %i trigge_scans then encountered an error:\n%@\n",i-FIRST_NHIT_TAG,[exception reason]);
             return;
         }
         [self load_settings_from_trigger_scan_for_type:threshold_index];
