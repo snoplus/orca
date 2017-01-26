@@ -68,7 +68,7 @@
 @private
     uint16_t                lockoutWidth;
     uint16_t                pedestalWidth;
-    uint32_t                pgt_rate;
+    float                   pgt_rate;
     uint32_t                gtMask;
     uint32_t                GTCrateMask;
     uint32_t                pedCrateMask;
@@ -113,7 +113,7 @@
 
 @property (nonatomic,assign) uint16_t lockoutWidth;
 @property (nonatomic,assign) uint16_t pedestalWidth;
-@property (nonatomic,assign) uint32_t pgt_rate;
+@property (nonatomic,assign) float    pgt_rate;
 @property (nonatomic,assign) float pedestalDelay;
 @property (nonatomic,assign) uint32_t gtMask;
 @property (nonatomic,assign) uint16_t prescaleValue;

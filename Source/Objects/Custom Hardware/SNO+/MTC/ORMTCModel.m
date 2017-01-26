@@ -539,11 +539,11 @@ tubRegister;
 - (uint32_t) gtMask {
     return gtMask;
 }
-- (void) setPgt_rate:(uint32_t)rate {
+- (void) setPgt_rate:(float)rate {
     pgt_rate = rate;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCPulserRateChanged object:self];
 }
-- (uint32_t) pgt_rate {
+- (float) pgt_rate {
     return pgt_rate;
 }
 - (void) setPrescaleValue:(uint16_t)newVal {
