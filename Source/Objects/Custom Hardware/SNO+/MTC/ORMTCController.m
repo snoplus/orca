@@ -544,37 +544,19 @@
 
 - (void) triggerMTCAMaskChanged:(NSNotification*)aNotification
 {
-    unsigned long maskValue = [model mtcaN100Mask];
-    unsigned short i;
-	for(i=0;i<20;i++) [[mtcaN100Matrix cellWithTag:i] setIntValue: maskValue & (1<<i)];
-
-    maskValue = [model mtcaN20Mask];
-	for(i=0;i<20;i++) [[mtcaN20Matrix cellWithTag:i] setIntValue: maskValue & (1<<i)];
-
-    maskValue = [model mtcaEHIMask];
-	for(i=0;i<20;i++) [[mtcaEHIMatrix cellWithTag:i] setIntValue: maskValue & (1<<i)];
-
-    maskValue = [model mtcaELOMask];
-	for(i=0;i<20;i++) [[mtcaELOMatrix cellWithTag:i] setIntValue: maskValue & (1<<i)];
-    
-    maskValue = [model mtcaOELOMask];
-	for(i=0;i<20;i++) {
-        if ([mtcaOELOMatrix cellWithTag:i]) {
-            [[mtcaOELOMatrix cellWithTag:i]  setIntValue: maskValue & (1<<i)];
-        }
-    }
-
-    maskValue = [model mtcaOEHIMask];
-	for(i=0;i<20;i++) {
-        if ([mtcaOEHIMatrix cellWithTag:i]) {
-            [[mtcaOEHIMatrix cellWithTag:i]  setIntValue: maskValue & (1<<i)];
-        }
-    }
-
-    maskValue = [model mtcaOWLNMask];
-	for(i=0;i<20;i++) {
-        if ([mtcaOWLNMatrix cellWithTag:i]) {
-            [[mtcaOWLNMatrix cellWithTag:i]  setIntValue: maskValue & (1<<i)];
+    NSArray* matrices = @[mtcaN100Matrix, mtcaN20Matrix, mtcaEHIMatrix, mtcaELOMatrix,
+                          mtcaOWLNMatrix,mtcaOEHIMatrix,mtcaOELOMatrix];
+    uint32_t masks[7] = {[model mtcaN100Mask],[model mtcaN20Mask],[model mtcaEHIMask],
+                            [model mtcaELOMask],[model mtcaOWLNMask],[model mtcaOEHIMask],
+                            [model mtcaOELOMask]};
+    for(int matrix_index=0;matrix_index < [matrices count]; matrix_index++)
+    {
+        uint32_t maskValue = masks[matrix_index];
+        NSMatrix* thisMatrix = matrices[matrix_index];
+        for(int i=0;i<[thisMatrix numberOfRows];i++) {
+            NSCell* thisCell = [thisMatrix cellAtRow:i column:0];
+            int bitPos = [thisCell tag];
+            [thisCell setIntValue:(maskValue & (1<<bitPos))];
         }
     }
 }
