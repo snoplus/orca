@@ -790,36 +790,23 @@
         }
     }
 }
-- (void) setNHitUnitConversionEnabled:(BOOL) enabled {
-    [nHitViewTypeMatrix setEnabled:enabled];
-    if(!enabled) {
-        [nHitViewTypeMatrix selectCellWithTag:VIEW_RAW_UNITS_TAG];
-    }
-}
-- (void) setEsumUnitConversionEnabled:(BOOL) enabled {
-    [eSumViewTypeMatrix setEnabled:enabled];
-    if(!enabled) {
-        [eSumViewTypeMatrix selectCellWithTag:VIEW_RAW_UNITS_TAG];
-    }
-}
+
 - (void) changeNhitThresholdsDisplay: (int) type
 {
     int threshold_index;
     float value;
-    BOOL valid = YES;
-    //First check that all the units conversions are valid
     for(int i=FIRST_NHIT_TAG;i<=LAST_NHIT_TAG;i++)
     {
-        valid &= [model ConversionIsValidForThreshold:i];
-    }
-    [self setNHitUnitConversionEnabled:valid];
-    if(!valid) { type = MTC_RAW_UNITS; }
+        int tempType = type;
 
-    for(int i=FIRST_NHIT_TAG;i<=LAST_NHIT_TAG;i++)
-    {
         @try {
             threshold_index = [self convert_view_thresold_index_to_model_index:i];
-            value = [model getThresholdOfType: threshold_index inUnits:type];
+            if(![model ConversionIsValidForThreshold:threshold_index]) {
+                    [[nhitMatrix cellWithTag:i] setEnabled:type==MTC_RAW_UNITS];
+
+                tempType = MTC_RAW_UNITS;
+            }
+            value = [model getThresholdOfType: threshold_index inUnits:tempType];
         } @catch (NSException *exception) {
             NSLogColor([NSColor redColor], @"Failed to interpret field with tag %i, Reason: %@\n. Aborting after %i changes already made\n", i,[exception reason],i-FIRST_NHIT_TAG);
             return;
@@ -827,24 +814,20 @@
         [[nhitMatrix cellWithTag:i] setFloatValue: value];
     }
 }
+
 - (void) changeESUMThresholdDisplay: (int) type
 {
-    int threshold_index;
+    int threshold_index, tempType;
     float value;
-    BOOL valid = YES;
-    //First check that all the units conversions are valid
-    for(int i=FIRST_ESUM_TAG;i<=LAST_ESUM_TAG;i++)
-    {
-        valid &= [model ConversionIsValidForThreshold:i];
-    }
-    [self setEsumUnitConversionEnabled:valid];
-    if(!valid) { type = MTC_RAW_UNITS; }
-
     for(int i=FIRST_ESUM_TAG;i<=LAST_ESUM_TAG;i++)
     {
         @try {
             threshold_index = [self convert_view_thresold_index_to_model_index:i];
-            value = [model getThresholdOfType: threshold_index inUnits:type];
+            if(![model ConversionIsValidForThreshold:threshold_index]) {
+                [[esumMatrix cellWithTag:i] setEnabled:type==MTC_RAW_UNITS];
+                tempType = MTC_RAW_UNITS;
+            }
+            value = [model getThresholdOfType: threshold_index inUnits:tempType];
         } @catch (NSException *exception) {
             NSLogColor([NSColor redColor], @"Failed to interpret field with tag %i, Reason: %@\n. Aborting after %i changes already made\n", i,[exception reason],i-FIRST_ESUM_TAG);
             return;
