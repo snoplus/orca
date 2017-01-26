@@ -39,9 +39,6 @@
 #pragma mark •••Definitions
 NSString* ORMTCModelESumViewTypeChanged		= @"ORMTCModelESumViewTypeChanged";
 NSString* ORMTCModelNHitViewTypeChanged		= @"ORMTCModelNHitViewTypeChanged";
-NSString* ORMTCModelDefaultFileChanged		= @"ORMTCModelDefaultFileChanged";
-NSString* ORMTCModelLastFileChanged			= @"ORMTCModelLastFileChanged";
-NSString* ORMTCModelLastFileChangedLoaded	= @"ORMTCModelLastFileLoadedChanged";
 NSString* ORMTCModelBasicOpsRunningChanged	= @"ORMTCModelBasicOpsRunningChanged";
 NSString* ORMTCModelAutoIncrementChanged	= @"ORMTCModelAutoIncrementChanged";
 NSString* ORMTCModelUseMemoryChanged		= @"ORMTCModelUseMemoryChanged";
@@ -52,7 +49,6 @@ NSString* ORMTCModelMemoryOffsetChanged		= @"ORMTCModelMemoryOffsetChanged";
 NSString* ORMTCModelSelectedRegisterChanged	= @"ORMTCModelSelectedRegisterChanged";
 NSString* ORMTCModelXilinxPathChanged		= @"ORMTCModelXilinxPathChanged";
 NSString* ORMTCModelMtcDataBaseChanged		= @"ORMTCModelMtcDataBaseChanged";
-NSString* ORMTCModelLastFileLoadedChanged	= @"ORMTCModelLastFileLoadedChanged";
 NSString* ORMTCModelIsPulserFixedRateChanged	= @"ORMTCModelIsPulserFixedRateChanged";
 NSString* ORMTCModelFixedPulserRateCountChanged = @"ORMTCModelFixedPulserRateCountChanged";
 NSString* ORMTCModelFixedPulserRateDelayChanged = @"ORMTCModelFixedPulserRateDelayChanged";
@@ -112,6 +108,7 @@ static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
 { @"MTC/D,ControlMask",			@"0" },		//13
 
 //defaults for the MTC A NHit
+    /*
 { @"MTC/A,NHit100Hi,Threshold",	@"1"},		//14
 { @"MTC/A,NHit100Med,Threshold",@"2"},		//15
 { @"MTC/A,NHit100Lo,Threshold",	@"3"},		//16
@@ -139,7 +136,7 @@ static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
 { @"MTC/A,NHit20,dcOffset",		@"40"},		//35
 { @"MTC/A,NHit20LB,dcOffset",	@"50"},		//36
 { @"MTC/A,OWLN,dcOffset",		@"60"},		//37
-
+*/
 //defaults for the MTC A ESUM
 { @"MTC/A,ESumLow,Threshold",	@"10"},		//38
 { @"MTC/A,ESumHi,Threshold",	@"20"},		//39
@@ -164,13 +161,26 @@ static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
 { @"MTC,tub",					@"40"},		//54
 
 {@"Comments",					@"Nothing Noted"},		//55
-{@"XilinxFilePath",				@"--"},		//56
 
 };
 
-int mtcDacIndexes[14]=
+
+#define MTC_N100_LO_THRESHOLD_INDEX  1
+#define MTC_N100_MED_THRESHOLD_INDEX 2
+#define MTC_N100_HI_THRESHOLD_INDEX  3
+#define MTC_N20LB_THRESHOLD_INDEX    4
+#define MTC_ESUML_THRESHOLD_INDEX    5
+#define MTC_ESUMH_THRESHOLD_INDEX    6
+#define MTC_OWLN_THRESHOLD_INDEX     7
+#define MTC_OWLELO_THRESHOLD_INDEX   8
+#define MTC_OWLEHi_THRESHOLD_INDEX   9
+#define MTC_RAW_UNITS 1
+#define MTC_mV_UNITS 2
+#define MTC_NHIT_UNITS 3
+
+/*int mtcDacIndexes[14]=
 {
-kNHit100HiThreshold,	
+kNHit100HiThreshold,
 kNHit100MedThreshold,
 kNHit100LoThreshold,	
 kNHit20Threshold,	
@@ -184,7 +194,7 @@ kControlMask,
 kGtMask,
 kGtCrateMask,
 kPEDCrateMask
-};
+};*/
 
 // MTCA DAC index based on order from detector DB
 int mtcDacIndexFromDetectorDB[10]=
@@ -212,7 +222,6 @@ int mtcDacIndexFromDetectorDB[10]=
 dataId = _dataId,
 mtcStatusDataId = _mtcStatusDataId,
 mtcStatusGTID = _mtcStatusGTID,
-mtcStatusGTIDRate = _mtcStatusGTIDRate,
 mtcStatusCnt10MHz = _mtcStatusCnt10MHz,
 mtcStatusTime10Mhz = _mtcStatusTime10Mhz,
 mtcStatusReadPtr = _mtcStatusReadPtr,
@@ -281,9 +290,6 @@ pulserEnabled = _pulserEnabled;
 - (void) dealloc
 {
     [mtc release];
-    [defaultFile release];
-    [lastFile release];
-    [lastFileLoaded release];
     [mtcDataBase release];
     [_mtcStatusTime10Mhz release];
     [super dealloc];
@@ -488,88 +494,6 @@ pulserEnabled = _pulserEnabled;
 - (unsigned short) addressModifier
 {
 	return 0x29;
-}
-
-- (int) eSumViewType
-{
-    return eSumViewType;
-}
-
-- (void) setESumViewType:(int)aESumViewType
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setESumViewType:eSumViewType];
-    
-    eSumViewType = aESumViewType;
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelESumViewTypeChanged object:self];
-}
-
-- (int) nHitViewType
-{
-    return nHitViewType;
-}
-
-- (void) setNHitViewType:(int)aNHitViewType
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setNHitViewType:nHitViewType];
-    
-    nHitViewType = aNHitViewType;
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelNHitViewTypeChanged object:self];
-}
-
-- (NSString*) xilinxFilePath
-{
-    return [self dbObjectByIndex:kXilinxFile];
-}
-
-- (void) setXilinxFilePath:(NSString*)aDefaultFile
-{
- 	if(!aDefaultFile)aDefaultFile = @"--";
-	[self setDbObject:aDefaultFile forIndex:kXilinxFile];
-}
-
-- (NSString*) defaultFile
-{
-    return defaultFile;
-}
-
-- (void) setDefaultFile:(NSString*)aDefaultFile
-{
- 	if(!aDefaultFile)aDefaultFile = @"--";
-    [[[self undoManager] prepareWithInvocationTarget:self] setDefaultFile:defaultFile];
-	
-    [defaultFile autorelease];
-    defaultFile = [aDefaultFile copy];    
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelDefaultFileChanged object:self];
-}
-
-- (NSString*) lastFile
-{
-    return lastFile;
-}
-
-- (void) setLastFile:(NSString*)aLastFile
-{
-    [lastFile autorelease];
-    lastFile = [aLastFile copy];    
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelLastFileChanged object:self];
-}
-
-- (NSString*) lastFileLoaded
-{
-    return lastFileLoaded;
-}
-
-- (void) setLastFileLoaded:(NSString*)aFile
-{
-	if(!aFile)aFile = @"--";
-    [lastFileLoaded autorelease];
-    lastFileLoaded = [aFile copy];    
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelLastFileLoadedChanged object:self];
 }
 
 
@@ -921,11 +845,6 @@ pulserEnabled = _pulserEnabled;
     mtc = [[RedisClient alloc] init];
 	
     [[self undoManager] disableUndoRegistration];
-    [self setESumViewType:	[decoder decodeIntForKey:		@"ORMTCModelESumViewType"]];
-    [self setNHitViewType:	[decoder decodeIntForKey:		@"ORMTCModelNHitViewType"]];
-    [self setDefaultFile:	[decoder decodeObjectForKey:	@"ORMTCModelDefaultFile"]];
-    [self setLastFile:		[decoder decodeObjectForKey:	@"ORMTCModelLastFile"]];
-    [self setLastFileLoaded:[decoder decodeObjectForKey:	@"ORMTCModelLastFileLoaded"]];
     [self setAutoIncrement:	[decoder decodeBoolForKey:		@"ORMTCModelAutoIncrement"]];
     [self setUseMemory:		[decoder decodeIntForKey:		@"ORMTCModelUseMemory"]];
     [self setRepeatDelay:	[decoder decodeIntForKey:		@"ORMTCModelRepeatDelay"]];
@@ -965,11 +884,6 @@ pulserEnabled = _pulserEnabled;
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-	[encoder encodeInt:eSumViewType		forKey:@"ORMTCModelESumViewType"];
-	[encoder encodeInt:nHitViewType		forKey:@"ORMTCModelNHitViewType"];
-	[encoder encodeObject:defaultFile	forKey:@"ORMTCModelDefaultFile"];
-	[encoder encodeObject:lastFile		forKey:@"ORMTCModelLastFile"];
-	[encoder encodeObject:lastFileLoaded forKey:@"ORMTCModelLastFileLoaded"];
 	[encoder encodeBool:autoIncrement	forKey:@"ORMTCModelAutoIncrement"];
 	[encoder encodeInt:useMemory		forKey:@"ORMTCModelUseMemory"];
 	[encoder encodeInt:repeatDelay		forKey:@"ORMTCModelRepeatDelay"];
@@ -1030,8 +944,20 @@ pulserEnabled = _pulserEnabled;
 - (id)        dbObjectByName:(NSString*)aKey	  { return [mtcDataBase objectForNestedKey:aKey]; }
 - (NSString*) getDBKeyByIndex:(short) anIndex	  { return dbLookUpTable[anIndex].key; }
 - (NSString*) getDBDefaultByIndex:(short) anIndex { return dbLookUpTable[anIndex].defaultValue;  }
-- (int)       dacValueByIndex:(short)anIndex	  { return [self dbIntByIndex:mtcDacIndexes[anIndex]]; }
 
+- (float) getThresholdOfType:(int) type inUnits:(int) units
+{
+    if(type<0 || type > MTC_NUM_USED_THRESHOLDS)
+    {
+     //Raise exception?
+    }
+    uint16_t threshold = mtca_thresholds[type];
+    return convert_threshold_from:MTC_RAW_UNITS
+}
+- (void) setThresholdOfType:(int)type fromUnits:(int)units
+{
+    
+}
 #pragma mark •••HW Access
 - (short) getNumberRegisters
 {
@@ -1927,21 +1853,23 @@ pulserEnabled = _pulserEnabled;
     /* Load the MTCA thresholds to hardware. */
     int i;
     uint16_t dacs[14];
-
-    dacs[0] = [self dbIntByIndex:kNHit100LoThreshold];
-    dacs[1] = [self dbIntByIndex:kNHit100MedThreshold];
-    dacs[2] = [self dbIntByIndex:kNHit100HiThreshold];
-    dacs[3] = [self dbIntByIndex:kNHit20Threshold];
-    dacs[4] = [self dbIntByIndex:kNHit20LBThreshold];
-    dacs[5] = [self dbIntByIndex:kESumLowThreshold];
-    dacs[6] = [self dbIntByIndex:kESumHiThreshold];
-    dacs[7] = [self dbIntByIndex:kOWLNThreshold];
-    dacs[8] = [self dbIntByIndex:kOWLELoThreshold];
-    dacs[9] = [self dbIntByIndex:kOWLEHiThreshold];
+    
+    // Get all the DAC values...a bit verbose perhaps but whatever.
+    dacs[0] = [self getThresholdOfType:MTC_N100_LO_THRESHOLD_INDEX inUnits:MTC_RAW_UNITS];
+    dacs[1] = [self getThresholdOfType:MTC_N100_MED_THRESHOLD_INDEX inUnits:MTC_RAW_UNITS];
+    dacs[2] = [self getThresholdOfType:MTC_N100_HI_THRESHOLD_INDEX inUnits:MTC_RAW_UNITS];
+    dacs[3] = [self getThresholdOfType:MTC_N20_THRESHOLD_INDEX inUnits: MTC_RAW_UNITS];
+    dacs[4] = [self getThresholdOfType:MTC_N20LB_THRESHOLD_INDEX inUnits: MTC_RAW_UNITS];
+    dacs[5] = [self getThresholdOfType:MTC_ESUM_LO_MASK inUnits: MTC_RAW_UNITS];
+    dacs[6] = [self getThresholdOfType:MTC_ESUM_HI_MASK inUnits: MTC_RAW_UNITS];
+    dacs[7] = [self getThresholdOfType:MTC_OWLN_THRESHOLD_INDEX inUnits: MTC_RAW_UNITS];
+    dacs[8] = [self getThresholdOfType:MTC_OWLELO_THRESHOLD_INDEX inUnits: MTC_RAW_UNITS];
+    dacs[9] = [self getThresholdOfType:MTC_OWLEHI_THRESHOLD_INDEX inUnits: MTC_RAW_UNITS];
+    
 
     /* Last four DAC values are spares? */
     for (i = 10; i < 14; i++) {
-	dacs[i] = 0;
+        dacs[i] = 0;
     }
 
     @try {
@@ -2092,16 +2020,6 @@ pulserEnabled = _pulserEnabled;
 	NSLog(@"Mtc control reg: 0x%0x\n", [self getMTC_CSR]);
 }
 
-- (void) saveSet:(NSString*)filePath
-{
-	[mtcDataBase writeToFile:filePath atomically:NO];
-} 
-
-- (void) loadSet:(NSString*)filePath
-{	
-	[self setMtcDataBase:[NSMutableDictionary dictionaryWithContentsOfFile: filePath]];
-	[self setLastFileLoaded:filePath];
-}
 
 @end
 

@@ -41,7 +41,6 @@
     IBOutlet NSTextField* 	memBaseAddressText;
     IBOutlet NSStepper* 	memBaseAddressStepper;
 	IBOutlet NSButton*		basicOpsLockButton;
- 	IBOutlet NSTextField*	defaultFileField;
     IBOutlet NSButton *readButton;
     IBOutlet NSButton *writteButton;
     IBOutlet NSButton *stopButton;
@@ -76,8 +75,6 @@
 	//settings
 	IBOutlet NSMatrix*		eSumViewTypeMatrix;
 	IBOutlet NSMatrix*		nHitViewTypeMatrix;
- 	IBOutlet NSTextField*	xilinxFilePathField;
-	IBOutlet NSTextField*	lastFileLoadedField;
  	IBOutlet NSTextField*	lockOutWidthField;
  	IBOutlet NSTextField*	pedestalWidthField;
  	IBOutlet NSTextField*	nhit100LoPrescaleField;
@@ -132,9 +129,7 @@
 
 #pragma mark •••Interface Management
 - (void) eSumViewTypeChanged:(NSNotification*)aNote;
-- (void) nHitViewTypeChanged:(NSNotification*)aNote;
 - (void) mtcDataBaseChanged:(NSNotification*)aNote;
-- (void) defaultFileChanged:(NSNotification*)aNote;
 - (void) basicOpsRunningChanged:(NSNotification*)aNote;
 - (void) autoIncrementChanged:(NSNotification*)aNote;
 - (void) useMemoryChanged:(NSNotification*)aNote;
@@ -152,12 +147,15 @@
 - (void) fixedPulserRateDelayChanged:(NSNotification*)aNote;
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item;
 - (void) displayMasks;
-- (void) lastFileLoadedChanged:(NSNotification*)aNote;
 - (void) sequenceRunning:(NSNotification*)aNote;
 - (void) sequenceStopped:(NSNotification*)aNote;
 - (void) sequenceProgress:(NSNotification*)aNote;
 - (void) triggerMTCAMaskChanged:(NSNotification*)aNotification;
 - (void) isPedestalEnabledInCSRChanged:(NSNotification*)aNotification;
+- (int) convert_view_thresold_index_to_model_index: (int) view_index;
+- (int) convert_model_threshold_index_to_view_index: (int) model_index;
+- (int) convert_view_unit_index_to_model_index: (int) view_index;
+- (int) convert_model_unit_index_to_view_index: (int) model_index;
 
 #pragma mark •••Helper
 - (void) populatePullDown;
@@ -206,9 +204,6 @@
 //Settings
 - (IBAction) eSumViewTypeAction:(id)sender;
 - (IBAction) nHitViewTypeAction:(id)sender;
-- (IBAction) settingsLoadDBFile:(id) sender;
-- (IBAction) settingsDefValFile:(id) sender;
-- (IBAction) settingsXilinxFile:(id) sender;
 - (IBAction) settingsMTCDAction:(id) sender;
 - (IBAction) settingsNHitAction:(id) sender;
 - (IBAction) settingsESumAction:(id) sender;

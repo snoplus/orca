@@ -30,14 +30,7 @@
 
 #pragma mark •••PrivateInterface
 @interface ORMTCController (private)
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 //pre 10.6-specific
-- (void) setXilinxFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void) setDefaultFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void) saveDefaultSetDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void) selectAndLoadDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void) loadDBFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-#endif
-- (void) selectAndLoadDBFile:(NSString*)aStartPath;
+
 - (void) setupNHitFormats;
 - (void) setupESumFormats;
 - (void) storeUserNHitValue:(float)value index:(int) thresholdIndex;
@@ -153,30 +146,10 @@
                      selector : @selector(basicOpsRunningChanged:)
                          name : ORMTCModelBasicOpsRunningChanged
 						object: model];
-						
-    [notifyCenter addObserver : self
-                     selector : @selector(defaultFileChanged:)
-                         name : ORMTCModelDefaultFileChanged
-						object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(mtcDataBaseChanged:)
                          name : ORMTCModelMtcDataBaseChanged
-						object: model];
-						
-    [notifyCenter addObserver : self
-                     selector : @selector(lastFileLoadedChanged:)
-                         name : ORMTCModelLastFileLoadedChanged
-						object: model];
-						
-   [notifyCenter addObserver : self
-                     selector : @selector(nHitViewTypeChanged:)
-                         name : ORMTCModelNHitViewTypeChanged
-						object: model];
-
-	[notifyCenter addObserver : self
-                     selector : @selector(eSumViewTypeChanged:)
-                         name : ORMTCModelESumViewTypeChanged
 						object: model];
 
 	[notifyCenter addObserver : self
@@ -223,7 +196,6 @@
 - (void) updateWindow
 {
     [super updateWindow];
- 	[self nHitViewTypeChanged:nil];
     [self regBaseAddressChanged:nil];
     [self memBaseAddressChanged:nil];
     [self slotChanged:nil];
@@ -236,9 +208,7 @@
 	[self useMemoryChanged:nil];
 	[self autoIncrementChanged:nil];
 	[self basicOpsRunningChanged:nil];
-	[self defaultFileChanged:nil];
 	[self mtcDataBaseChanged:nil];
-	[self lastFileLoadedChanged:nil];
 	[self eSumViewTypeChanged:nil];
 	[self isPulserFixedRateChanged:nil];
 	[self fixedPulserRateCountChanged:nil];
@@ -284,21 +254,6 @@
 	[initProgressField setFloatValue:progress/100.];
 }
 
-- (void) eSumViewTypeChanged:(NSNotification*)aNote
-{
-	[eSumViewTypeMatrix selectCellWithTag: [model eSumViewType]];
-	[self setupESumFormats];
-	[self mtcDataBaseChanged:nil];
-}
-
-- (void) nHitViewTypeChanged:(NSNotification*)aNote
-{
-	[nHitViewTypeMatrix selectCellWithTag: [model nHitViewType]];
-	[self setupNHitFormats];
-	[self mtcDataBaseChanged:nil];
-}
-
-
 - (void) mtcDataBaseChanged:(NSNotification*)aNote
 {
 	[lockOutWidthField		setFloatValue:	[model dbFloatByIndex: kLockOutWidth]];
@@ -314,7 +269,8 @@
 	[self displayMasks];
 
 	//load the nhit values
-	int col,row;
+	/*
+    int col,row;
 	float displayValue=0;
 	for(col=0;col<4;col++){
 		for(row=0;row<6;row++){
@@ -370,14 +326,10 @@
 			[[esumMatrix cellAtRow:row column:col] setFloatValue:displayValue];
 		}
 	}
-	
+	*/
 	NSString* ss = [model dbObjectByIndex: kDBComments];
 	if(!ss) ss = @"---";
 	[commentsField setStringValue: ss];
-	
-	NSString* xilinxFile = [model dbObjectByIndex: kXilinxFile];
-	if(!xilinxFile) xilinxFile = @"---";
-	[xilinxFilePathField setStringValue: [xilinxFile stringByAbbreviatingWithTildeInPath]];
 }
 
 - (void) displayMasks
@@ -395,16 +347,6 @@
 	for(i=0;i<25;i++){
 		[[pedCrateMaskMatrix cellWithTag:i]  setIntValue: maskValue & (1<<i)];
 	}
-}
-
-- (void) lastFileLoadedChanged:(NSNotification*)aNote
-{
-	[lastFileLoadedField setStringValue: [[[model lastFileLoaded] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]];
-}
-
-- (void) defaultFileChanged:(NSNotification*)aNote
-{
-	[defaultFileField setStringValue: [[[model defaultFile] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]];
 }
 
 - (void) basicOpsRunningChanged:(NSNotification*)aNote
@@ -448,11 +390,6 @@
 - (void) selectedRegisterChanged:(NSNotification*)aNote
 {
 	[selectedRegisterPU selectItemAtIndex: [model selectedRegister]];
-}
-
-- (void) loadXilinxPathChanged:(NSNotification*)aNote
-{
-	[xilinxFilePathField setStringValue: [[model xilinxFilePath] stringByAbbreviatingWithTildeInPath]];
 }
 
 - (void) isPulserFixedRateChanged:(NSNotification*)aNote
@@ -864,70 +801,41 @@
 - (IBAction) nHitViewTypeAction:(id)sender
 {
 	[self endEditing];
-	[model setNHitViewType:[[sender selectedCell] tag]];
+	// TODO: Make this not use a model variable,
+    // btw it's rediculous that someone would use a model variable for this.
+    [self changeNhitThresholdsDisplay: [sender tag]];
 }
 
-- (IBAction) settingsLoadDBFile:(id) sender 
+- (void) changeNhitThresholdsDisplay: (int) type
 {
-	[self selectAndLoadDBFile:[model lastFileLoaded]];
+    for(int i=0;i<7;i++)
+    {
+        [[nhitMatrix cellWithTag:i] setFloatValue:
+         [model getThresholdOfType:[self convert_view_thresold_index_to_model_index:i]
+                           inUnits:type]];
+    }
+}
+- (int) convert_view_thresold_index_to_model_index: (int) view_index {
+    return view_index;
+}
+- (int) convert_model_threshold_index_to_view_index: (int) model_index{
+    return model_index;
+}
+- (int) convert_view_unit_index_to_model_index: (int) view_index {
+    return view_index;
+}
+- (int) convert_model_unit_index_to_view_index: (int) model_index{
+    return model_index;
 }
 
-- (IBAction) settingsXilinxFile:(id) sender 
-{
-	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
-    [openPanel setCanChooseDirectories:NO];
-    [openPanel setCanChooseFiles:YES];
-    [openPanel setAllowsMultipleSelection:NO];
-    [openPanel setPrompt:@"Choose"];
-    NSString* startingDir;
-	
-	NSString* fullPath = [[model xilinxFilePath] stringByExpandingTildeInPath];
-    if(fullPath)	startingDir = [[model xilinxFilePath] stringByDeletingLastPathComponent];
-    else			startingDir = NSHomeDirectory();
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
-    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
-        if (result == NSFileHandlingPanelOKButton){
-            [model setXilinxFilePath:[[openPanel URL]path]];
-            NSLog(@"MTC Xilinx default file set to: %@\n",[[[[[openPanel URLs] objectAtIndex:0]path] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
-        }
-    }];
-    
-#else 		
-    [openPanel beginSheetForDirectory:startingDir
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(setXilinxFileDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
-}
-
-- (IBAction) settingsMTCDAction:(id) sender 
+- (IBAction) settingsMTCDAction:(id) sender
 {
 	[model setDbObject:[sender stringValue] forIndex:[sender tag]];
 }
 
 - (IBAction) settingsNHitAction:(id) sender 
 {
-	int row = [sender selectedRow];
-	int col = [sender selectedColumn];
-	int index = kNHit100HiThreshold + row + (col * 6);
-	
-	//get the value the user entered
-	float theValue = [[sender cellAtRow:row column:col] floatValue];
-	if((index >= kNHit100HimVperNHit) && (index <= kOWLNdcOffset)) {
-		[model setDbFloat:theValue forIndex:index];
-		[self calcNHitValueForRow:row];
-	}
-	else if((index >= kNHit100HiThreshold) && (index <= kOWLNThreshold)){
-		[self storeUserNHitValue:theValue index:index];
-	}
-	else {
-		[model setDbFloat:theValue forIndex:index];	
-	}
-    [[sender window] makeFirstResponder:tabView];
+    
 }
 
 
@@ -987,83 +895,6 @@
 	[model setDbLong:mask forIndex:kPEDCrateMask];
 }
 
-- (IBAction) settingsDefValFile:(id) sender 
-{
-    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
-    [openPanel setCanChooseDirectories:NO];
-    [openPanel setCanChooseFiles:YES];
-    [openPanel setAllowsMultipleSelection:NO];
-    [openPanel setPrompt:@"Choose"];
-    NSString* startingDir;
-	
-	NSString* fullPath = [[model defaultFile] stringByExpandingTildeInPath];
-    if(fullPath)	startingDir = [[model defaultFile] stringByDeletingLastPathComponent];
-    else			startingDir = NSHomeDirectory();
-	
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
-    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
-        if (result == NSFileHandlingPanelOKButton){
-            [model setDefaultFile:[[openPanel URL]path]];
-            NSLog(@"MTC DataBase default file set to: %@\n",[[[[[openPanel URLs] objectAtIndex:0]path]stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
-        }
-    }];
-    
-#else 	
-	[openPanel setRequiredFileType:@"mtcdb"];
-    [openPanel beginSheetForDirectory:startingDir
-                                 file:nil
-                                types:[NSArray arrayWithObject:@"mtcdb"]
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(setDefaultFileDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
-}
-
-
-
-
-- (IBAction) settingsDefaultSaveSet:(id) sender 
-{
-    NSSavePanel *savePanel = [NSSavePanel savePanel];
-    [savePanel setPrompt:@"Save As"];
-    [savePanel setCanCreateDirectories:YES];
-   
-    NSString* startingDir;
-    NSString* defaultFile;
-	defaultFile = nil; //to make both 10.5 and 10.8 compilers happy
-    
-	NSString* fullPath = [[model lastFile] stringByExpandingTildeInPath];
-    if(fullPath){
-        startingDir = [fullPath stringByDeletingLastPathComponent];
-        //defaultFile = [fullPath lastPathComponent];
-    }
-    else {
-        startingDir = NSHomeDirectory();
-        //defaultFile = @"MtcDataBase";
-    }
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-  	[savePanel setAllowedFileTypes:[NSArray arrayWithObject:@"mtcdb"]];
-    [savePanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
-    [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
-        if (result == NSFileHandlingPanelOKButton){
-            [model saveSet:[[savePanel URL] path]];
-            NSLog(@"MTC DataBase saved into: %@\n",[[[[savePanel URL] path] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
-        }
-    }];
-    
-#else 	
-
- 	[savePanel setRequiredFileType:@"mtcdb"];
-    [savePanel beginSheetForDirectory:startingDir
-                                 file:[defaultFile stringByExpandingTildeInPath]
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(saveDefaultSetDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif	
-}
 
 - (IBAction) triggerMTCAN100:(id) sender
 {
@@ -1193,188 +1024,35 @@
 
 #pragma mark •••PrivateInterface
 @implementation ORMTCController (private)
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 //pre 10.6-specific
-- (void) setXilinxFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [model setXilinxFilePath:[[sheet filenames] objectAtIndex:0]];
-		NSLog(@"MTC Xilinx default file set to: %@\n",[[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
-    }
-}
-- (void) setDefaultFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [model setDefaultFile:[[sheet filenames] objectAtIndex:0]];
-		NSLog(@"MTC DataBase default file set to: %@\n",[[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
-    }
-}
-
-- (void) saveDefaultSetDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [model saveSet:[[sheet filenames] objectAtIndex:0]];
-		NSLog(@"MTC DataBase saved into: %@\n",[[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
-    }
-}
-
-- (void) selectAndLoadDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [model loadSet:[[sheet filenames] objectAtIndex:0]];
-		NSLog(@"MTC DataBase loaded from: %@\n",[[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
-    }
-}
-
-- (void) loadDBFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [model loadSet:[[sheet filenames] objectAtIndex:0]];
-		NSLog(@"MTC DataBase loaded from: %@\n",[[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
-    }
-}
-#endif
-
-- (void) selectAndLoadDBFile:(NSString*)aStartPath
-{
-    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
-    [openPanel setCanChooseDirectories:NO];
-    [openPanel setCanChooseFiles:YES];
-    [openPanel setAllowsMultipleSelection:NO];
-    [openPanel setPrompt:@"Choose"];
-	NSString* startingDir;
-	
-	NSString* fullPath = [aStartPath stringByExpandingTildeInPath];
-    if(fullPath)	startingDir = [fullPath stringByDeletingLastPathComponent];
-    else			startingDir = NSHomeDirectory();
-    
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
- 	[openPanel setAllowedFileTypes:[NSArray arrayWithObject:@"mtcdb"]];
-    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
-    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
-        if (result == NSFileHandlingPanelOKButton){
-            [model loadSet:[[openPanel URL]path]];
-            NSLog(@"MTC DataBase loaded from: %@\n",[[[[[openPanel URLs] objectAtIndex:0] path]stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
-        }
-    }];
-    
-#else 	
- 	[openPanel setRequiredFileType:@"mtcdb"];
-    [openPanel beginSheetForDirectory:startingDir
-                                 file:nil
-                                types:[NSArray arrayWithObject:@"mtcdb"]
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(selectAndLoadDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
-}
 
 - (void) setupNHitFormats
 {
-	NSNumberFormatter *thresholdFormatter = [[[NSNumberFormatter alloc] init] autorelease];;
-	
-	if([model nHitViewType] == kNHitsViewRaw) [thresholdFormatter setFormat:@"##0"];
-	else [thresholdFormatter setFormat:@"##0.0"];
-	
-	NSNumberFormatter *numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
-	[numberFormatter setFormat:@"##0.0;0;-##0.0"];
-	
-	int row,col;
-	for(col=0;col<4;col++){
-		for(row=0;row<6;row++){
-			NSCell* theCell = [nhitMatrix cellAtRow:row column:col];
-			if(col==0)	[theCell setFormatter:thresholdFormatter];
-			else		[theCell setFormatter:numberFormatter];
-		}
-	}
-	[nhitMatrix setNeedsDisplay:YES];
+    NSLog(@"setupNHitFormats -> Needs implemenation\n");
 }
 
 - (void) setupESumFormats
 {
-	NSNumberFormatter *thresholdFormatter = [[[NSNumberFormatter alloc] init] autorelease];;
-	
-	if([model eSumViewType] == kESumViewRaw) [thresholdFormatter setFormat:@"##0"];
-	else [thresholdFormatter setFormat:@"##0.0"];
-	
-	NSNumberFormatter *numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
-	[numberFormatter setFormat:@"##0.0;0;-##0.0"];
-	
-	int row,col;
-	for(col=0;col<4;col++){
-		for(row=0;row<4;row++){
-			NSCell* theCell = [esumMatrix cellAtRow:row column:col];
-			if(col==0)	[theCell setFormatter:thresholdFormatter];
-			else		[theCell setFormatter:numberFormatter];
-		}
-	}
-	[esumMatrix setNeedsDisplay:YES];
+    NSLog(@"setupESumFormats -> Needs implemenation\n");
 }
 
 - (void) storeUserNHitValue:(float)userValue index:(int) thresholdIndex
 {
 	//user changed the NHit threshold -- convert from the displayed value to the raw value and store
-	float numberToStore=0;
-	int viewType = [model nHitViewType];
-	if((thresholdIndex >= kNHit100HiThreshold) && (thresholdIndex <= kOWLNThreshold)){
-		if(viewType == kNHitsViewRaw) {
-			numberToStore = userValue;
-		}
-		else if(viewType == kNHitsViewmVolts) {
-			numberToStore = [model mVoltsToRaw:userValue];
-		}
-		else if(viewType == kNHitsViewNHits) {
-			float dcOffset  = [model dbFloatByIndex:thresholdIndex + kNHitDcOffset_Offset];
-			float mVperNHit = [model dbFloatByIndex:thresholdIndex + kmVoltPerNHit_Offset];
-			numberToStore = [model NHitsToRaw:userValue dcOffset:dcOffset mVperNHit:mVperNHit];
-		}
-        if (numberToStore < 0) numberToStore = 0;
-        if (numberToStore > 4095) numberToStore = 4095;
-		[model setDbFloat:numberToStore forIndex:thresholdIndex];
-	}
+    NSLog(@"storeUserNHitValue -> Needs implemenation\n");
+
 }
 
 - (void) calcNHitValueForRow:(int) aRow
 {
-	float numberToStore;
-	int index = kNHit100HiThreshold + aRow;
-	if((index >= kNHit100HiThreshold) && (index <= kOWLNThreshold)){
-		float mVolts    = [model rawTomVolts:[model dbFloatByIndex:index]];
-		float dcOffset  = [model dbFloatByIndex:index + kNHitDcOffset_Offset];
-		float mVperNHit = [model dbFloatByIndex:index + kmVoltPerNHit_Offset];
-		float newNHits  = [model mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
-		float newMilliVolts = [model NHitsTomVolts:newNHits dcOffset:dcOffset mVperNHit:mVperNHit];
-		numberToStore = [model mVoltsToRaw:newMilliVolts];
+    NSLog(@"calcNHitValueForRow -> Needs implemenation\n");
 
-        if (numberToStore < 0) numberToStore = 0;
-        if (numberToStore > 4095) numberToStore = 4095;
-		[model setDbFloat:numberToStore forIndex:index];
-	}
 }
 
 - (void) storeUserESumValue:(float)userValue index:(int) thresholdIndex
 {
 	//user changed the ESum threshold -- convert from the displayed value to the raw value and store
-	float numberToStore=0;
-	int viewType = [model eSumViewType];
-	if((thresholdIndex >= kESumLowThreshold) && (thresholdIndex <= kOWLEHiThreshold)){
-		if(viewType == kESumViewRaw) {
-			numberToStore = userValue;
-		}
-		else if(viewType == kESumViewmVolts) {
-			numberToStore = [model mVoltsToRaw:userValue];
-		}
-		else if(viewType == kESumVieweSumRel) {
-			float dcOffset  = [model dbFloatByIndex:thresholdIndex + kESumDcOffset_Offset];
-			numberToStore = [model mVoltsToRaw:dcOffset - userValue];
-		}
-		else if(viewType == kESumViewpC) {
-			float dcOffset  = [model dbFloatByIndex:thresholdIndex + kESumDcOffset_Offset];
-			float mVperpC	= [model dbFloatByIndex:thresholdIndex + kmVoltPerpC_Offset];
-			numberToStore   = [model pCToRaw:userValue dcOffset:dcOffset mVperpC:mVperpC];
-		}
-		[model setDbFloat:numberToStore forIndex:thresholdIndex];	
-	}
+    NSLog(@"storeUserEsumValue -> Needs implemenation\n");
+
 	
 }
 
@@ -1396,4 +1074,3 @@
 }
 
 @end
-

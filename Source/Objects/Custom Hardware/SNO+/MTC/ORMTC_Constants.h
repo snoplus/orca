@@ -76,7 +76,7 @@ enum {
 	kControlMask,
 	
 	//NHit -- note the offsets (defined below).. if you add anything you MUST adjust the offsets also
-	kNHit100HiThreshold, //+0	
+	/*kNHit100HiThreshold, //+0
 	kNHit100MedThreshold,
 	kNHit100LoThreshold,	
 	kNHit20Threshold,	
@@ -102,7 +102,7 @@ enum {
 	kNHit100LodcOffset,	
 	kNHit20dcOffset,		
 	kNHit20LBdcOffset,	
-	kOWLNdcOffset,		
+	kOWLNdcOffset,	*/
 	
 	//ESUM
 	kESumLowThreshold,	
@@ -134,14 +134,14 @@ enum {
 	kDbLookUpTableSize //must be last
 };
 
-#define kNHitDcOffset_Offset	18
-#define kmVoltPerNHit_Offset	12
+//#define kNHitDcOffset_Offset	18
+//#define kmVoltPerNHit_Offset	12
 
 #define kmVoltPerpC_Offset		 8
 #define kESumDcOffset_Offset	12
 
 
-// GTWrod Masks for the MTC
+// GTWord Masks for the MTC
 #define MTC_NHIT_100_LO_MASK				0x00000001
 #define MTC_NHIT_100_MED_MASK				0x00000002
 #define MTC_NHIT_100_HI_MASK				0x00000004
@@ -222,6 +222,8 @@ enum {
 #define TUB_SCLK  						 	0x00000800
 #define TUB_SLATCH 							0x00001000
 
+/*
+ These are not MTC constants...
 #define kNHitsViewRaw    0
 #define kNHitsViewmVolts 1
 #define kNHitsViewNHits  2
@@ -230,21 +232,4 @@ enum {
 #define kESumViewmVolts		1
 #define kESumVieweSumRel	2
 #define kESumViewpC			3
-
-
-/*#pragma mark •••Param Names
-#define kMtcLockOutWidth		 @"MtcLockOutWidth"
-#define kPulserPeriod			 @"PulserPeriod"
-#define kPulserWidth			 @"PulserWidth"
-#define kGtMask					 @"GtMask"
-#define kPedCrateMask			 @"PedCrateMask"
-#define kGTCrateMask			 @"GTCrateMask"
-#define kNH100_Low_Prescale		 @"NH100_Low_Prescale"
-#define kPed_GT_Coarse_Delay	 @"Ped_GT_Coarse_Delay"
-#define kPed_GT_Fine_Delay		 @"Ped_GT_Fine_Delay"
-#define kLockOut_Width			 @"LockOut_Width"
-#define kPed_Width				 @"Ped_Width"
-#define kTubRegister			 @"TubRegister"
-#define	kPed_GT_Fine_Slope		 @"Ped_GT_Fine_Slope"
-#define kPed_GT_Min_Delay_Offset @"Ped_GT_Min_Delay_Offset"
 */

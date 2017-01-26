@@ -30,6 +30,23 @@
 @class ORReadOutList;
 
 #define MTCLockOutWidth @"MTCLockOutWidth"
+#define MTC_N100_LO_THRESHOLD_INDEX  0
+#define MTC_N100_MED_THRESHOLD_INDEX 1
+#define MTC_N100_HI_THRESHOLD_INDEX  2
+#define MTC_N20_THRESHOLD_INDEX      3
+#define MTC_N20LB_THRESHOLD_INDEX    4
+#define MTC_ESUML_THRESHOLD_INDEX    5
+#define MTC_ESUMH_THRESHOLD_INDEX    6
+#define MTC_OWLN_THRESHOLD_INDEX     7
+#define MTC_OWLELO_THRESHOLD_INDEX   8
+#define MTC_OWLEHI_THRESHOLD_INDEX   9
+#define MTC_NUM_THRESHOLDS 14  // The number of thresholds that can be set
+#define MTC_NUM_USED_THRESHOLDS 10 // The number of thresholds that are actually used
+
+#define MTC_RAW_UNITS 1
+#define MTC_mV_UNITS 2
+#define MTC_NHIT_UNITS 3
+#define MTC_
 
 @interface ORMTCModel :  ORVmeIOCard
 {
@@ -53,16 +70,7 @@
 		unsigned long			fixedPulserRateCount;
 		float				fixedPulserRateDelay;
     BOOL _isPedestalEnabledInCSR;
-
     BOOL _pulserEnabled;
-		
-		//settings
-		NSString*				lastFileLoaded;
-		NSString*				lastFile;
-		NSString*				defaultFile;
-		
-		int						nHitViewType;
-		int						eSumViewType;
     
     //MTCA+ crate masks
     unsigned long _mtcaN100Mask;
@@ -82,6 +90,7 @@
     BOOL _mtcStatusDataAvailable;
     unsigned long _mtcStatusNumEventsInMem;
     BOOL _resetFifoOnStart;
+    uint16_t mtca_thresholds[MTC_NUM_THRESHOLDS];
 
     RedisClient *mtc;
 }
@@ -99,7 +108,6 @@
 @property (nonatomic,assign) unsigned long dataId;
 @property (nonatomic,assign) unsigned long mtcStatusDataId;
 @property (nonatomic,assign) unsigned long mtcStatusGTID;
-@property (nonatomic,assign) double mtcStatusGTIDRate;
 @property (nonatomic,assign) unsigned long long mtcStatusCnt10MHz;
 @property (nonatomic,copy) NSString* mtcStatusTime10Mhz;
 @property (nonatomic,assign) unsigned long mtcStatusReadPtr;
@@ -127,18 +135,6 @@
 - (void) detectorStateChanged:(NSNotification*)aNote;
 
 #pragma mark •••Accessors
-- (int) eSumViewType;
-- (void) setESumViewType:(int)aESumViewType;
-- (int) nHitViewType;
-- (void) setNHitViewType:(int)aNHitViewType;
-- (NSString*) xilinxFilePath;
-- (void) setXilinxFilePath:(NSString*)aDefaultFile;
-- (NSString*) defaultFile;
-- (void) setDefaultFile:(NSString*)aDefaultFile;
-- (NSString*) lastFile;
-- (void) setLastFile:(NSString*)aLastFile;
-- (NSString*) lastFileLoaded;
-- (void) setLastFileLoaded:(NSString*)aLastFile;
 - (BOOL) basicOpsRunning;
 - (void) setBasicOpsRunning:(BOOL)aBasicOpsRunning;
 - (BOOL) autoIncrement;
@@ -172,6 +168,8 @@
 - (float) dbFloatByIndex:(int)anIndex;
 - (int) dbIntByIndex:(int)anIndex;
 - (int) dacValueByIndex:(short)anIndex;
+- (float) getThresholdOfType:(int) type inUnits:(int) units;
+- (void) setThresholdOfType:(int) type fromUnits: (int)units;
 
 #pragma mark •••Converters
 - (unsigned long) mVoltsToRaw:(float) mVolts;
@@ -267,18 +265,10 @@
 //Extra getter functions
 -(NSMutableDictionary*) get_MTCDataBase;
 
-#pragma mark •••Settings
-- (void) saveSet:(NSString*)filePath;
-- (void) loadSet:(NSString*)filePath;
 @end
 
 
 
-extern NSString* ORMTCModelESumViewTypeChanged;
-extern NSString* ORMTCModelNHitViewTypeChanged;
-extern NSString* ORMTCModelDefaultFileChanged;
-extern NSString* ORMTCModelLastFileChanged;
-extern NSString* ORMTCModelLastFileLoadedChanged;
 extern NSString* ORMTCModelBasicOpsRunningChanged;
 extern NSString* ORMTCModelAutoIncrementChanged;
 extern NSString* ORMTCModelUseMemoryChanged;
