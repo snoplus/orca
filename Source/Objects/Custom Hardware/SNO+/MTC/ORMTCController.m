@@ -1141,8 +1141,9 @@
 
 - (IBAction) settingsGTMaskAction:(id) sender
 {
-	uint32_t mask = 0;
-	int i;
+    uint32_t mask = 0;
+    int i;
+    [self CheckBoxMatrixCellClicked:sender newState:![[sender selectedCell] nextState]];
 	for(i=0;i<26;i++){
 		if([[sender cellWithTag:i] intValue]){	
 			mask |= (1L << i);
@@ -1155,6 +1156,7 @@
 {
 	uint32_t mask = 0;
 	int i;
+    [self CheckBoxMatrixCellClicked:sender newState:![[sender selectedCell] nextState]];
 	for(i=0;i<25;i++){
 		if([[sender cellWithTag:i] intValue]){	
 			mask |= (1L << i);
@@ -1163,100 +1165,108 @@
 	[model setGTCrateMask:mask];
 }
 
-- (IBAction) settingsPEDCrateMaskAction:(id) sender 
+- (IBAction) settingsPEDCrateMaskAction:(id) sender
 {
-	uint32_t mask = 0;
-	int i;
-	for(i=0;i<25;i++){
-		if([[sender cellWithTag:i] intValue]){	
-			mask |= (1L << i);
-		}
-	}
-	[model setPedCrateMask:mask];
+    uint32_t mask = 0;
+    int i;
+    [self CheckBoxMatrixCellClicked:sender newState:![[sender selectedCell] nextState]];
+    for(i=0;i<25;i++){
+        if([[sender cellWithTag:i] intValue]){
+            mask |= (1L << i);
+        }
+    }
+    [model setPedCrateMask:mask];
 }
 
 
 - (IBAction) triggerMTCAN100:(id) sender
 {
     unsigned long mask = 0;
-	int i;
-	for(i=0;i<20;i++){
-		if([[sender cellWithTag:i] intValue]){
-			mask |= (1L << i);
-		}
-	}
+    int i;
+    [self CheckBoxMatrixCellClicked:sender newState:![[sender selectedCell] nextState]];
+    for(i=0;i<20;i++){
+        if([[sender cellWithTag:i] intValue]){
+            mask |= (1L << i);
+        }
+    }
     [model setMtcaN100Mask:mask];
 }
 
 - (IBAction) triggerMTCAN20:(id) sender
 {
     unsigned long mask = 0;
-	int i;
-	for(i=0;i<20;i++){
-		if([[sender cellWithTag:i] intValue]){
-			mask |= (1L << i);
-		}
-	}
+    int i;
+    [self CheckBoxMatrixCellClicked:sender newState:![[sender selectedCell] nextState]];
+    for(i=0;i<20;i++){
+        if([[sender cellWithTag:i] intValue]){
+            mask |= (1L << i);
+        }
+    }
     [model setMtcaN20Mask:mask];
 }
 
 - (IBAction) triggerMTCAEHI:(id) sender
 {
     unsigned long mask = 0;
-	int i;
-	for(i=0;i<20;i++){
-		if([[sender cellWithTag:i] intValue]){
-			mask |= (1L << i);
-		}
-	}
+    int i;
+    [self CheckBoxMatrixCellClicked:sender newState:![[sender selectedCell] nextState]];
+    for(i=0;i<20;i++){
+        if([[sender cellWithTag:i] intValue]){
+            mask |= (1L << i);
+        }
+    }
     [model setMtcaEHIMask:mask];
 }
 
 - (IBAction) triggerMTCAELO:(id) sender
 {
     unsigned long mask = 0;
-	int i;
-	for(i=0;i<20;i++){
-		if([[sender cellWithTag:i] intValue]){
-			mask |= (1L << i);
-		}
-	}
+    int i;
+    [self CheckBoxMatrixCellClicked:sender newState:![[sender selectedCell] nextState]];
+    for(i=0;i<20;i++){
+        if([[sender cellWithTag:i] intValue]){
+            mask |= (1L << i);
+        }
+    }
     [model setMtcaELOMask:mask];
 }
 
 - (IBAction) triggerMTCAOELO:(id) sender
 {
     unsigned long mask = 0;
-	int i;
-	for(i=0;i<20;i++){
-		if([sender cellWithTag:i] && [[sender cellWithTag:i] intValue]){
-			mask |= (1L << i);
-		}
-	}
+    int i;
+    [self CheckBoxMatrixCellClicked:sender newState:![[sender selectedCell] nextState]];
+    for(i=0;i<20;i++){
+        if([sender cellWithTag:i] && [[sender cellWithTag:i] intValue]){
+            mask |= (1L << i);
+        }
+    }
     [model setMtcaOELOMask:mask];
 }
 
 - (IBAction) triggerMTCAOEHI:(id) sender
 {
     unsigned long mask = 0;
-	int i;
-	for(i=0;i<20;i++){
-		if([sender cellWithTag:i] && [[sender cellWithTag:i] intValue]){
-			mask |= (1L << i);
-		}
-	}
+    int i;
+    [self CheckBoxMatrixCellClicked:sender newState:![[sender selectedCell] nextState]];
+    for(i=0;i<20;i++){
+        if([sender cellWithTag:i] && [[sender cellWithTag:i] intValue]){
+            mask |= (1L << i);
+        }
+    }
     [model setMtcaOEHIMask:mask];
 }
 
 - (IBAction) triggerMTCAOWLN:(id) sender
 {
     unsigned long mask = 0;
-	int i;
-	for(i=0;i<20;i++){
-		if([sender cellWithTag:i] && [[sender cellWithTag:i] intValue]){
-			mask |= (1L << i);
-		}
-	}
+    int i;
+    [self CheckBoxMatrixCellClicked:sender newState:![[sender selectedCell] nextState]];
+    for(i=0;i<20;i++){
+        if([sender cellWithTag:i] && [[sender cellWithTag:i] intValue]){
+            mask |= (1L << i);
+        }
+    }
     [model setMtcaOWLNMask:mask];
 }
 
@@ -1279,39 +1289,6 @@
 {
     [model mtcatLoadCrateMasks];
 }
-
-- (IBAction)triggerMaskCheckBoxClicked:(id)sender {
-    [self CheckBoxMatrixCellClicked:globalTriggerMaskMatrix newState:![[sender selectedCell] nextState]];
-}
-- (IBAction)gtCratesCheckBoxClicked:(id)sender {
-    [self CheckBoxMatrixCellClicked:globalTriggerCrateMaskMatrix newState:![[sender selectedCell] nextState]];
-}
-- (IBAction)pedCrateCheckBoxClicked:(id)sender {
-    [self CheckBoxMatrixCellClicked:pedCrateMaskMatrix newState:![[sender selectedCell] nextState]];
-}
-- (IBAction)n100RelayCheckBoxClicked:(id)sender {
-    [self CheckBoxMatrixCellClicked:mtcaN100Matrix newState:![[sender selectedCell] nextState]];
-}
-- (IBAction)n20RelayCheckBoxClicked:(id)sender {
-    [self CheckBoxMatrixCellClicked:mtcaN20Matrix newState:![[sender selectedCell] nextState]];
-}
-- (IBAction)esumhRelayCheckBoxClicked:(id)sender {
-    [self CheckBoxMatrixCellClicked:mtcaEHIMatrix newState:![[sender selectedCell] nextState]];
-}
-- (IBAction)esumlRelayCheckBoxClicked:(id)sender {
-    [self CheckBoxMatrixCellClicked:mtcaELOMatrix newState:![[sender selectedCell] nextState]];
-
-}
-- (IBAction)owlehRelayCheckBoxClicked:(id)sender {
-    [self CheckBoxMatrixCellClicked:mtcaOEHIMatrix newState:![[sender selectedCell] nextState]];
-}
-- (IBAction)owlelRelayCheckBoxClicked:(id)sender {
-    [self CheckBoxMatrixCellClicked:mtcaOELOMatrix newState:![[sender selectedCell] nextState]];
-}
-- (IBAction)owlnRelayCheckBoxClicked:(id)sender {
-    [self CheckBoxMatrixCellClicked:mtcaOWLNMatrix newState:![[sender selectedCell] nextState]];
-}
-
 
 - (void)CheckBoxMatrixCellClicked:(NSMatrix*) checkBoxes newState:(int)state {
 
