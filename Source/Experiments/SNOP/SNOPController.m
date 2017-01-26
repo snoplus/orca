@@ -1495,82 +1495,83 @@ snopGreenColor;
     }
 
     int activeCell = [sender selectedRow];
-    //NHIT100HI
     float raw;
     int threshold_index;
     float threshold_value;
     int units;
-
-    if(activeCell == 0) {
-        threshold_value = [[sender cellAtRow:0 column:0] floatValue];
-        threshold_index = MTC_N100_HI_THRESHOLD_INDEX;
-        units = MTC_NHIT_UNITS;
-    }
-    //NHIT100MED
-    if(activeCell == 1) {
-        threshold_value = [[sender cellAtRow:1 column:0] floatValue];
-        threshold_index = MTC_N100_LO_THRESHOLD_INDEX;
-        units = MTC_NHIT_UNITS;
-    }
-    //NHIT100LO
-    if(activeCell == 2) {
-        threshold_value = [[sender cellAtRow:2 column:0] floatValue];
-        threshold_index = MTC_N100_LO_THRESHOLD_INDEX;
-        units =  MTC_NHIT_UNITS;
-    }
-    //NHIT20
-    if(activeCell == 3) {
-        threshold_value = [[sender cellAtRow:3 column:0] floatValue];
-        threshold_index = MTC_N20_THRESHOLD_INDEX;
-        units =  MTC_NHIT_UNITS;
-    }
-    //NHIT20LO
-    if(activeCell == 4) {
-        threshold_value = [[sender cellAtRow:4 column:0] floatValue];
-        threshold_index = MTC_N20LB_THRESHOLD_INDEX;
-        units =  MTC_NHIT_UNITS;
-    }
-    //OWLN
-    if(activeCell == 5) {
-        threshold_value = [[sender cellAtRow:5 column:0] floatValue];
-        threshold_index = MTC_OWLN_THRESHOLD_INDEX;
-        units =  MTC_NHIT_UNITS;
-    }
-    //ESUMHI
-    if(activeCell == 6) {
-        threshold_value = [[sender cellAtRow:6 column:0] floatValue];
-        threshold_index = MTC_ESUMH_THRESHOLD_INDEX;
-        units =  MTC_mV_UNITS;
-    }
-    //ESUMLO
-    if(activeCell == 7) {
-        threshold_value = [[sender cellAtRow:7 column:0] floatValue];
-        threshold_index = MTC_ESUML_THRESHOLD_INDEX;
-        units =  MTC_mV_UNITS;
-    }
-    //OWLEHI
-    if(activeCell == 8) {
-        threshold_value = [[sender cellAtRow:8 column:0] floatValue];
-        threshold_index = MTC_OWLEHI_THRESHOLD_INDEX;
-        units =  MTC_mV_UNITS;
-    }
-    //OWLELO
-    if(activeCell == 9) {
-        threshold_value = [[sender cellAtRow:9 column:0] floatValue];
-        threshold_index = MTC_OWLELO_THRESHOLD_INDEX;
-        units =  MTC_mV_UNITS;
-    }
-    //Prescale
-    if(activeCell == 10) {
-        raw = [[sender cellAtRow:10 column:0] floatValue];
-        [mtcModel setPrescaleValue:raw];
-        return;
-    }
-    //Pulser
-    if(activeCell == 11) {
-        raw = [[sender cellAtRow:11 column:0] floatValue];
-        [mtcModel setPgt_rate:raw];
-        return;
+    switch (activeCell) {
+        //NHIT100HI
+        case 0:
+            threshold_value = [[sender cellAtRow:0 column:0] floatValue];
+            threshold_index = MTC_N100_HI_THRESHOLD_INDEX;
+            units = MTC_NHIT_UNITS;
+            break;
+            //NHIT100MED
+        case 1:
+            threshold_value = [[sender cellAtRow:1 column:0] floatValue];
+            threshold_index = MTC_N100_LO_THRESHOLD_INDEX;
+            units = MTC_NHIT_UNITS;
+            break;
+            //NHIT100LO
+        case 2:
+            threshold_value = [[sender cellAtRow:2 column:0] floatValue];
+            threshold_index = MTC_N100_LO_THRESHOLD_INDEX;
+            units =  MTC_NHIT_UNITS;
+            break;
+            //NHIT20
+        case 3:
+            threshold_value = [[sender cellAtRow:3 column:0] floatValue];
+            threshold_index = MTC_N20_THRESHOLD_INDEX;
+            units =  MTC_NHIT_UNITS;
+            break;
+            //NHIT20LO
+        case 4:
+            threshold_value = [[sender cellAtRow:4 column:0] floatValue];
+            threshold_index = MTC_N20LB_THRESHOLD_INDEX;
+            units =  MTC_NHIT_UNITS;
+            break;
+            //OWLN
+        case 5:
+            threshold_value = [[sender cellAtRow:5 column:0] floatValue];
+            threshold_index = MTC_OWLN_THRESHOLD_INDEX;
+            units =  MTC_NHIT_UNITS;
+            break;
+            //ESUMHI
+        case 6:
+            threshold_value = [[sender cellAtRow:6 column:0] floatValue];
+            threshold_index = MTC_ESUMH_THRESHOLD_INDEX;
+            units =  MTC_mV_UNITS;
+            break;
+            //ESUMLO
+        case 7:
+            threshold_value = [[sender cellAtRow:7 column:0] floatValue];
+            threshold_index = MTC_ESUML_THRESHOLD_INDEX;
+            units =  MTC_mV_UNITS;
+            break;
+            //OWLEHI
+        case 8:
+            threshold_value = [[sender cellAtRow:8 column:0] floatValue];
+            threshold_index = MTC_OWLEHI_THRESHOLD_INDEX;
+            units =  MTC_mV_UNITS;
+            break;
+            //OWLELO
+        case 9:
+            threshold_value = [[sender cellAtRow:9 column:0] floatValue];
+            threshold_index = MTC_OWLELO_THRESHOLD_INDEX;
+            units =  MTC_mV_UNITS;
+            break;
+            //Prescale
+        case 10:
+            raw = [[sender cellAtRow:10 column:0] floatValue];
+            [mtcModel setPrescaleValue:raw];
+            return;
+            break;
+            //Pulser
+        case 11:
+            raw = [[sender cellAtRow:11 column:0] floatValue];
+            [mtcModel setPgt_rate:raw];
+            return;
+            break;
     }
     @try{
         if(![mtcModel ConversionIsValidForThreshold:threshold_index])

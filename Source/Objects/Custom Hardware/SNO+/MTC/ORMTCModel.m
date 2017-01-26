@@ -893,18 +893,14 @@ tubRegister;
             return (((aThreshold) * DAC_per_mv)+[self getBaselineOfType:type]);
         }
         else if(out_units == MTC_NHIT_UNITS) {
-            int baseline = [self getBaselineOfType:type];
-            float baseline_in_mV = [self convertThreshold:baseline OfType:type fromUnits:MTC_RAW_UNITS toUnits:MTC_mV_UNITS];
-            
+
             //Note the following conversion is in relative units for absolute units add 5000mV
             // and replace the [self getbaseline] with just 4096
-            return (aThreshold - baseline_in_mV)/mv_per_nhit;
+            return aThreshold/mv_per_nhit;
         }
     }
     else if (in_units == MTC_NHIT_UNITS) {
-        int baseline = [self getBaselineOfType:type];
-        float baseline_in_mV = [self convertThreshold:baseline OfType:type fromUnits:MTC_RAW_UNITS toUnits:MTC_mV_UNITS];
-        float value_in_mv = mv_per_nhit * aThreshold+baseline_in_mV;
+        float value_in_mv = mv_per_nhit * aThreshold;
         
         if(out_units == MTC_mV_UNITS) {
             return value_in_mv;
