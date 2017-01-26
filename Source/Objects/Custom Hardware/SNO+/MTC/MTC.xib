@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6254" systemVersion="13F1077" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6751" systemVersion="13F1603" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6254"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6751"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ORMTCController">
@@ -61,7 +61,6 @@
                 <outlet property="selectedRegisterPU" destination="1261" id="1267"/>
                 <outlet property="setAdvancedOptionsButton" destination="4158" id="ZJ1-Cs-Hpe"/>
                 <outlet property="settingsAdvancedOptionsBox" destination="1488" id="21a-jG-j46"/>
-                <outlet property="statusButton" destination="1257" id="vCe-N0-3RA"/>
                 <outlet property="stopButton" destination="1259" id="kkn-k7-bsR"/>
                 <outlet property="stopFixedTimePedestalsButton" destination="4054" id="4100"/>
                 <outlet property="stopPedestalsButton" destination="4057" id="4088"/>
@@ -287,17 +286,6 @@
                                                         </buttonCell>
                                                         <connections>
                                                             <action selector="basicWriteAction:" target="-2" id="2851"/>
-                                                        </connections>
-                                                    </button>
-                                                    <button verticalHuggingPriority="750" id="1257">
-                                                        <rect key="frame" x="265" y="21" width="96" height="28"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="push" title="Status" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="3936">
-                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="basicStatusAction:" target="-2" id="2844"/>
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" id="1259">
