@@ -1038,14 +1038,15 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 
     mtc = [mtcs objectAtIndex:0];
 
-    crate_pedestal_mask = [mtc getPedestalCrateMask];
+    crate_pedestal_mask = [mtc pedCrateMask];
 
-    pulser_rate = [mtc getThePulserRate];
+    pulser_rate = [mtc pgt_rate];
 
     /* Enable all crates in the MTCD pedestal mask. */
-    [mtc setDbLong:0xffffff forIndex:kPEDCrateMask];
+    [mtc setPedCrateMask:0xffffff];
+
     @try {
-        [mtc setPedestalCrateMask];
+        [mtc loadPedestalCrateMaskToHardware];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
                    @"error setting the MTCD crate pedestal mask. error: "
@@ -1095,9 +1096,9 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     }
 
     /* Reset the crate pedestal all crates in the MTCD pedestal mask. */
-    [mtc setDbLong:crate_pedestal_mask forIndex:kPEDCrateMask];
+    [mtc setPedCrateMask:crate_pedestal_mask];
     @try {
-        [mtc setPedestalCrateMask];
+        [mtc loadPedestalCrateMaskToHardware];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
                    @"error setting the MTCD crate pedestal mask. error: "
@@ -1107,7 +1108,8 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     /* Reset the pulser rate since the firePedestals function sets the pulser
      * rate to 0. */
     @try {
-        [mtc setThePulserRate:pulser_rate];
+        [mtc setPgt_rate:pulser_rate];
+        [mtc loadPulserRateToHardware];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
                    @"error setting the pulser rate. error: "
@@ -1894,13 +1896,6 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         //Load MTC thresholds
         [mtc loadFromSearialization:detectorSettings];
         
-        //Load MTC GT Mask
-        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kGtMask]] forIndex:kGtMask];
-
-        //Load the PED/PGT mode
-        BOOL pedpgtmode = [[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"PED_PGT_Mode"] boolValue];
-        [mtc setIsPedestalEnabledInCSR:pedpgtmode];
-        
         NSLog(@"Standard run %@ (%@) settings loaded. \n",runTypeName,runVersion);
         return true;
     }
@@ -1991,7 +1986,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         //Load MTC settings
         [mtc loadTheMTCADacs];
         [mtc setGlobalTriggerWordMask];
-        [mtc setThePulserRate:[mtc dbFloatByIndex:kPulserPeriod]];
+        [mtc loadPulserRateToHardware];
     }
     @catch(NSException *e){
         NSLogColor([NSColor redColor], @"Problem loading settings into Hardware: %@\n",[e reason]);

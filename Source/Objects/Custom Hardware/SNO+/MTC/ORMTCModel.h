@@ -65,23 +65,33 @@
 
 @interface ORMTCModel :  ORVmeIOCard
 {
-    @private
-		NSMutableDictionary*	mtcDataBase;
-		
-		//basic ops
-		int						selectedRegister;
-		unsigned long			memoryOffset;
-		unsigned long			writeValue;
-		short					repeatOpCount;
-		unsigned short			repeatDelay;
-		int						useMemory;
-		unsigned long			workingCount;
-		BOOL				doReadOp;
-		BOOL				autoIncrement;
-		BOOL				basicOpsRunning;
-		BOOL				isPulserFixedRate;
-		unsigned long			fixedPulserRateCount;
-		float				fixedPulserRateDelay;
+@private
+    NSMutableDictionary*	mtcDataBase;
+    
+    uint32_t                lockoutWidth;
+    uint16_t                pedestalWidth;
+    uint32_t                pgt_rate;
+    uint32_t                gtMask;
+    uint32_t                GTCrateMask;
+    uint32_t                pedCrateMask;
+    uint32_t                prescaleValue;
+    uint16_t                coarseDelay;
+    uint16_t                fineDelay;
+
+    //basic ops
+    int                     selectedRegister;
+    unsigned long			memoryOffset;
+    unsigned long			writeValue;
+    short					repeatOpCount;
+    unsigned short			repeatDelay;
+    int						useMemory;
+    unsigned long			workingCount;
+    BOOL				doReadOp;
+    BOOL				autoIncrement;
+    BOOL				basicOpsRunning;
+    BOOL				isPulserFixedRate;
+    unsigned long			fixedPulserRateCount;
+    float				fixedPulserRateDelay;
     BOOL _isPedestalEnabledInCSR;
     BOOL _pulserEnabled;
     
@@ -103,9 +113,20 @@
     RedisClient *mtc;
 }
 
+@property (nonatomic,assign) uint32_t lockoutWidth;
+@property (nonatomic,assign) uint16_t pedestalWidth;
+@property (nonatomic,assign) uint32_t pgt_rate;
+@property (nonatomic,assign) uint16_t coarseDelay;
+@property (nonatomic,assign) uint16_t fineDelay;
+@property (nonatomic,assign) uint32_t gtMask;
+@property (nonatomic,assign) uint32_t prescaleValue;
+@property (nonatomic,assign) uint32_t GTCrateMask;
+@property (nonatomic,assign) uint32_t pedCrateMask;
+
 @property (nonatomic,assign) BOOL isPulserFixedRate;
 @property (nonatomic,assign) unsigned long fixedPulserRateCount;
 @property (nonatomic,assign) float fixedPulserRateDelay;
+
 @property (nonatomic,assign) unsigned long mtcaN100Mask;
 @property (nonatomic,assign) unsigned long mtcaN20Mask;
 @property (nonatomic,assign) unsigned long mtcaEHIMask;
@@ -197,22 +218,10 @@
 - (void) setMemoryOffset:(unsigned long)aMemoryOffset;
 - (int) selectedRegister;
 - (void) setSelectedRegister:(int)aSelectedRegister;
-- (NSMutableDictionary*) mtcDataBase;
-- (id) dbObjectByName:(NSString*)aKey;
-- (void) setMtcDataBase:(NSMutableDictionary*)aNestedDictionary;
 - (unsigned long) memBaseAddress;
 - (unsigned long) memAddressModifier;
 - (unsigned long) baseAddress;
 
-- (short) dbLookTableSize;
-- (NSString*) getDBKeyByIndex:(short) anIndex;
-- (NSString*) getDBDefaultByIndex:(short) anIndex;
-- (id) dbObjectByIndex:(int)anIndex;
-- (void) setDbLong:(long) aValue forIndex:(int)anIndex;
-- (void) setDbFloat:(float) aValue forIndex:(int)anIndex;
-- (void) setDbObject:(id) anObject forIndex:(int)anIndex;
-- (float) dbFloatByIndex:(int)anIndex;
-- (int) dbIntByIndex:(int)anIndex;
 - (float) getThresholdOfType:(int) type inUnits:(int) units;
 - (void) setThresholdOfType:(int) type fromUnits: (int) units toValue:(float) aThreshold;
 
@@ -237,7 +246,6 @@
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
-- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 
 #pragma mark •••HW Access
 - (BOOL) adapterIsSBC;
@@ -258,15 +266,15 @@
 - (void) initializeMtcDone;
 - (void) clearGlobalTriggerWordMask;
 - (void) setGlobalTriggerWordMask;
-- (unsigned long) getMTC_GTWordMask;
+- (uint32_t) getGTMaskFromHardware;
 - (void) setSingleGTWordMask:(unsigned long) gtWordMask;
 - (void) clearSingleGTWordMask:(unsigned long) gtWordMask;
 - (void) clearPedestalCrateMask;
-- (long) getPedestalCrateMask;
-- (void) setPedestalCrateMask;
 - (void) clearGTCrateMask;
-- (void) setGTCrateMask;
-- (unsigned long) getGTCrateMask;
+- (uint32_t) getGTCrateMaskFromHardware;
+- (void) loadPedestalCrateMaskToHardware;
+- (void) loadGTCrateMaskToHardware;
+
 - (void) clearTheControlRegister;
 - (void) resetTheMemory;
 - (void) setTheGTCounter:(unsigned long) theGTCounterValue;
@@ -276,16 +284,11 @@
 - (unsigned long) getMtcTime;
 - (void) setThe10MHzCounterLow:(unsigned long) lowerValue high:(unsigned long) upperValue;
 - (void) getThe10MHzCounterLow:(unsigned long*) lowerValue high:(unsigned long*) upperValue;
-- (void) setTheLockoutWidth:(unsigned short) theLockoutWidthValue;
-- (void) setThePedestalWidth:(unsigned short) thePedestalWidthValue;
-- (void) setThePrescaleValue;
+- (void) loadPrescaleValueToHardware;
 - (void) setupPulseGTDelaysCoarse:(unsigned short) theCoarseDelay fine:(unsigned short) theAddelValue;
-- (void) setupGTCorseDelay:(unsigned short) theCoarseDelay;
-- (void) setupGTCorseDelay;
-- (void) setupGTFineDelay:(unsigned short) theAddelValue;
-- (void) setupGTFineDelay;
-- (float) getThePulserRate;
-- (void) setThePulserRate:(float) pulserRate;
+- (void) loadCoarseDelayToHardware;
+- (void) loadFineDelayToHardware;
+- (void) loadPulserRateToHardware;
 - (void) enablePulser;
 - (void) disablePulser;
 - (void) enablePedestal;
@@ -301,7 +304,6 @@
 - (void) loadTheMTCADacs;
 - (void) loadMTCXilinx;
 - (void) loadTubRegister;
-- (void) load10MHzClock;
 
 - (void) mtcatResetMtcat:(unsigned char) mtcat;
 - (void) mtcatResetAll;

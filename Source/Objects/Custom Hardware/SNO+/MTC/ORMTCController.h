@@ -82,8 +82,6 @@
     IBOutlet NSTextField*   extraPulserPeriodField;
  	IBOutlet NSTextField*	low10MhzClockField;
  	IBOutlet NSTextField*	high10MhzClockField;
- 	IBOutlet NSTextField*	fineSlopeField;
- 	IBOutlet NSTextField*	minDelayOffsetField;
  	IBOutlet NSTextField*	coarseDelayField;
  	IBOutlet NSTextField*	fineDelayField;
 
@@ -145,7 +143,7 @@
 - (void) sequenceProgress:(NSNotification*)aNote;
 - (void) triggerMTCAMaskChanged:(NSNotification*)aNotification;
 - (void) isPedestalEnabledInCSRChanged:(NSNotification*)aNotification;
-- (void) placeholder:(NSNotification*) aNote;
+- (void) updateThresholdsDisplay:(NSNotification*) aNote;
 
 - (int) convert_view_thresold_index_to_model_index: (int) view_index;
 - (int) convert_model_threshold_index_to_view_index: (int) model_index;
@@ -188,8 +186,6 @@
 - (IBAction) standardInitMTCnoXilinx:(id) sender;
 - (IBAction) standardInitMTCno10MHz:(id) sender;
 - (IBAction) standardInitMTCnoXilinxno10MHz:(id) sender;
-- (IBAction) standardLoad10MHzCounter:(id) sender;
-- (IBAction) standardLoadMTCADacs:(id) sender;
 - (IBAction) standardSetCoarseDelay:(id) sender;
 - (IBAction) standardSetFineDelay:(id) sender;
 - (IBAction) standardIsPulserFixedRate:(id) sender;

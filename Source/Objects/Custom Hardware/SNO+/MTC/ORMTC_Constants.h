@@ -53,33 +53,6 @@ enum {
 	kMtcNumRegisters //must be last
 };
 
-
-typedef struct  {
-	NSString*   key;
-	NSString*	defaultValue;
-} SnoMtcDBInfoStruct; 
-
-enum {
-	kLockOutWidth,   
-	kPedestalWidth,
-	kNhit100LoPrescale,
-	kPulserPeriod,
-	kLow10MhzClock,
-	kHigh10MhzClock,
-	kFineSlope,
-	kMinDelayOffset,
-	kCoarseDelay,
-	kFineDelay,
-	kGtMask,
-	kGtCrateMask,
-	kPEDCrateMask,
-	kControlMask,
-
-	//other -- numbers go ABOVE this
-	kDBComments,
-	kDbLookUpTableSize //must be last
-};
-
 // GTWord Masks for the MTC
 #define MTC_NHIT_100_LO_MASK				0x00000001
 #define MTC_NHIT_100_MED_MASK				0x00000002

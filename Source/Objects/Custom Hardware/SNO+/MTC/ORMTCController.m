@@ -205,17 +205,17 @@
                          name : ORMTCModelMTCAMaskChanged
                        object : nil];
     [notifyCenter addObserver : self
-                     selector : @selector(placeholder:)
+                     selector : @selector(updateThresholdsDisplay:)
                          name : ORMTCAThresholdChanged
                        object : nil];
     
     [notifyCenter addObserver : self
-                     selector : @selector(placeholder:)
+                     selector : @selector(updateThresholdsDisplay:)
                          name : ORMTCABaselineChanged
                        object : nil];
     
     [notifyCenter addObserver : self
-                     selector : @selector(placeholder:)
+                     selector : @selector(updateThresholdsDisplay:)
                          name : ORMTCAConversionChanged
                        object : nil];
     [notifyCenter addObserver : self
@@ -290,31 +290,24 @@
 
 - (void) mtcDataBaseChanged:(NSNotification*)aNote
 {
-	[lockOutWidthField		setFloatValue:	[model dbFloatByIndex: kLockOutWidth]];
-	[pedestalWidthField		setFloatValue:	[model dbFloatByIndex: kPedestalWidth]];
-	[nhit100LoPrescaleField setFloatValue:	[model dbFloatByIndex: kNhit100LoPrescale]];
-	[pulserPeriodField		setFloatValue:	[model dbFloatByIndex: kPulserPeriod]];
-    [extraPulserPeriodField	setFloatValue:	[model dbFloatByIndex: kPulserPeriod]];
-    [fineSlopeField			setFloatValue:	[model dbFloatByIndex: kFineSlope]];
-	[minDelayOffsetField	setFloatValue:	[model dbFloatByIndex: kMinDelayOffset]];
-	[coarseDelayField		setFloatValue:	[model dbFloatByIndex: kCoarseDelay]];
-	[fineDelayField			setFloatValue:	[model dbFloatByIndex: kFineDelay]];
+	[lockOutWidthField		setFloatValue:	[model lockoutWidth]];
+	[pedestalWidthField		setFloatValue:	[model pedestalWidth]];
+    [nhit100LoPrescaleField setFloatValue:  [model prescaleValue]];
+    [pulserPeriodField      setFloatValue:  [model pgt_rate]];
+    [extraPulserPeriodField setFloatValue:  [model pgt_rate]];
+	[coarseDelayField		setFloatValue:	[model coarseDelay]];
+	[fineDelayField			setFloatValue:	[model fineDelay]];
 	
 	[self displayMasks];
-
-	
-	NSString* ss = [model dbObjectByIndex: kDBComments];
-	if(!ss) ss = @"---";
-	[commentsField setStringValue: ss];
 }
-- (void) placeholder:(NSNotification *)aNote {
-    NSLog(@"Placeholder\n");
+
+- (void) updateThresholdsDisplay:(NSNotification *)aNote {
     int units;
     int view_index = [[nHitViewTypeMatrix selectedCell] tag];
     @try {
         units = [self convert_view_unit_index_to_model_index: view_index];
     } @catch (NSException *exception) {
-        NSLogColor([NSColor redColor], @"Improve this error message later. %@\n",[exception reason]);
+        NSLogColor([NSColor redColor], @"Error displaying updated threshold information. Reason: %@\n",[exception reason]);
         return;
     }
     [self changeNhitThresholdsDisplay:units];
@@ -325,15 +318,15 @@
 - (void) displayMasks
 {
 	int i;
-	int maskValue = [model dbIntByIndex: kGtMask];
+	int maskValue = [model gtMask];
 	for(i=0;i<26;i++){
 		[[globalTriggerMaskMatrix cellWithTag:i]  setIntValue: maskValue & (1<<i)];
 	}
-	maskValue = [model dbIntByIndex: kGtCrateMask];
+	maskValue = [model GTCrateMask];
 	for(i=0;i<25;i++){
 		[[globalTriggerCrateMaskMatrix cellWithTag:i]  setIntValue: maskValue & (1<<i)];
 	}
-	maskValue = [model dbIntByIndex: kPEDCrateMask];
+	maskValue = [model pedCrateMask];
 	for(i=0;i<25;i++){
 		[[pedCrateMaskMatrix cellWithTag:i]  setIntValue: maskValue & (1<<i)];
 	}
@@ -455,8 +448,6 @@
     [nhit100LoPrescaleField         setEnabled: !lockedOrNotRunningMaintenance];
     [pulserPeriodField              setEnabled: !lockedOrNotRunningMaintenance];
     [extraPulserPeriodField         setEnabled: !lockedOrNotRunningMaintenance];
-    [fineSlopeField                 setEnabled: !lockedOrNotRunningMaintenance];
-    [minDelayOffsetField            setEnabled: !lockedOrNotRunningMaintenance];
     [fineDelayField                 setEnabled: !lockedOrNotRunningMaintenance];
     [coarseDelayField               setEnabled: !lockedOrNotRunningMaintenance];
 
@@ -678,13 +669,9 @@
 
 - (IBAction) standardInitMTCnoXilinxno10MHz:(id) sender 
 {
-	[model initializeMtc:NO load10MHzClock:NO]; 
+	[model initializeMtc:NO load10MHzClock:NO];
 }
 
-- (IBAction) standardLoad10MHzCounter:(id) sender 
-{
-	[model load10MHzClock];
-}
 
 - (IBAction) standardLoadOnlineGTMasks:(id) sender 
 {
@@ -703,12 +690,14 @@
 
 - (IBAction) standardSetCoarseDelay:(id) sender 
 {
-	[model setupGTCorseDelay];
+    [model setCoarseDelay:[coarseDelayField intValue]];
+	[model loadCoarseDelayToHardware];
 }
 
 - (IBAction) standardSetFineDelay:(id) sender
 {
-    [model setupGTFineDelay];
+    [model setFineDelay:[fineDelayField intValue]];
+    [model loadFineDelayToHardware];
 }
 
 - (IBAction) standardIsPulserFixedRate:(id) sender
@@ -955,10 +944,7 @@
     }
     return -1;
 }
-- (IBAction) settingsMTCDAction:(id) sender
-{
-	[model setDbObject:[sender stringValue] forIndex:[sender tag]];
-}
+
 
 - (IBAction) settingsNHitAction:(id) sender 
 {
@@ -1164,38 +1150,38 @@
 
 - (IBAction) settingsGTMaskAction:(id) sender
 {
-	unsigned long mask = 0;
+	uint32_t mask = 0;
 	int i;
 	for(i=0;i<26;i++){
 		if([[sender cellWithTag:i] intValue]){	
 			mask |= (1L << i);
 		}
 	}
-	[model setDbLong:mask forIndex:kGtMask];
+	[model setGtMask:mask];
 }
 
 - (IBAction) settingsGTCrateMaskAction:(id) sender 
 {
-	unsigned long mask = 0;
+	uint32_t mask = 0;
 	int i;
 	for(i=0;i<25;i++){
 		if([[sender cellWithTag:i] intValue]){	
 			mask |= (1L << i);
 		}
 	}
-	[model setDbLong:mask forIndex:kGtCrateMask];
+	[model setGTCrateMask:mask];
 }
 
 - (IBAction) settingsPEDCrateMaskAction:(id) sender 
 {
-	unsigned long mask = 0;
+	uint32_t mask = 0;
 	int i;
 	for(i=0;i<25;i++){
 		if([[sender cellWithTag:i] intValue]){	
 			mask |= (1L << i);
 		}
 	}
-	[model setDbLong:mask forIndex:kPEDCrateMask];
+	[model setPedCrateMask:mask];
 }
 
 
@@ -1290,12 +1276,12 @@
 
 - (IBAction) triggersLoadGTCrateMask:(id) sender
 {
-    [model setGTCrateMask];
+    [model loadGTCrateMaskToHardware];
 }
 
 - (IBAction) triggersLoadPEDCrateMask:(id) sender
 {
-    [model setPedestalCrateMask];
+    [model loadPedestalCrateMaskToHardware];
 }
 
 - (IBAction) triggersLoadMTCACrateMask:(id) sender

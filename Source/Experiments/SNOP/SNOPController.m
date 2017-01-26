@@ -1544,12 +1544,12 @@ snopGreenColor;
     //Prescale
     if(activeCell == 10) {
         raw = [[sender cellAtRow:10 column:0] floatValue];
-        [mtcModel setDbFloat: raw forIndex:kNhit100LoPrescale];
+        [mtcModel setPrescaleValue:raw];
     }
     //Pulser
     if(activeCell == 11) {
         raw = [[sender cellAtRow:11 column:0] floatValue];
-        [mtcModel setDbFloat: raw forIndex:kPulserPeriod];
+        [mtcModel setPgt_rate:raw];
     }
     @try{
         [mtcModel setThresholdOfType:threshold_index fromUnits:units toValue:threshold_value];
@@ -1575,7 +1575,7 @@ snopGreenColor;
     [thresholdFormatter setFormat:@"##0.0"];
 
     //GTMask
-    int gtmask = [mtcModel dbIntByIndex:kGtMask];
+    int gtmask = [mtcModel gtMask];
     
     float nHits;
 
@@ -1675,7 +1675,7 @@ snopGreenColor;
         NSLogColor([NSColor redColor], @"Error while retrieving threshold. Reason:%@\n.",[exception reason]);
     }
     //Prescale
-    [[standardRunThresCurrentValues cellAtRow:10 column:0] setFloatValue:[mtcModel dbFloatByIndex:kNhit100LoPrescale]];
+    [[standardRunThresCurrentValues cellAtRow:10 column:0] setFloatValue:[mtcModel prescaleValue]];
     [[standardRunThresCurrentValues cellAtRow:10 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 11) & 1){
         [[standardRunThresCurrentValues cellAtRow:10 column:0] setTextColor:[self snopBlueColor]];
@@ -1683,7 +1683,7 @@ snopGreenColor;
         [[standardRunThresCurrentValues cellAtRow:10 column:0] setTextColor:[self snopRedColor]];
     }
     //Pulser
-    [[standardRunThresCurrentValues cellAtRow:11 column:0] setFloatValue:[mtcModel dbFloatByIndex:kPulserPeriod]];
+    [[standardRunThresCurrentValues cellAtRow:11 column:0] setFloatValue:[mtcModel pgt_rate]];
     [[standardRunThresCurrentValues cellAtRow:11 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 10) & 1){
         [[standardRunThresCurrentValues cellAtRow:11 column:0] setTextColor:[self snopBlueColor]];
