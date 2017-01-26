@@ -1273,6 +1273,51 @@
     [model mtcatClearCrateMasks];
 }
 
+- (IBAction)triggerMaskCheckBoxClicked:(id)sender {
+    [self CheckBoxMatrixCellClicked:globalTriggerMaskMatrix newState:![[sender selectedCell] nextState]];
+}
+- (IBAction)gtCratesCheckBoxClicked:(id)sender {
+    [self CheckBoxMatrixCellClicked:globalTriggerCrateMaskMatrix newState:![[sender selectedCell] nextState]];
+}
+- (IBAction)pedCrateCheckBoxClicked:(id)sender {
+    [self CheckBoxMatrixCellClicked:pedCrateMaskMatrix newState:![[sender selectedCell] nextState]];
+}
+- (IBAction)n100RelayCheckBoxClicked:(id)sender {
+    [self CheckBoxMatrixCellClicked:mtcaN100Matrix newState:![[sender selectedCell] nextState]];
+}
+- (IBAction)n20RelayCheckBoxClicked:(id)sender {
+    [self CheckBoxMatrixCellClicked:mtcaN20Matrix newState:![[sender selectedCell] nextState]];
+}
+- (IBAction)esumhRelayCheckBoxClicked:(id)sender {
+    [self CheckBoxMatrixCellClicked:mtcaEHIMatrix newState:![[sender selectedCell] nextState]];
+}
+- (IBAction)esumlRelayCheckBoxClicked:(id)sender {
+    [self CheckBoxMatrixCellClicked:mtcaELOMatrix newState:![[sender selectedCell] nextState]];
+
+}
+- (IBAction)owlehRelayCheckBoxClicked:(id)sender {
+    [self CheckBoxMatrixCellClicked:mtcaOEHIMatrix newState:![[sender selectedCell] nextState]];
+}
+- (IBAction)owlelRelayCheckBoxClicked:(id)sender {
+    [self CheckBoxMatrixCellClicked:mtcaOELOMatrix newState:![[sender selectedCell] nextState]];
+}
+- (IBAction)owlnRelayCheckBoxClicked:(id)sender {
+    [self CheckBoxMatrixCellClicked:mtcaOWLNMatrix newState:![[sender selectedCell] nextState]];
+}
+
+
+- (void)CheckBoxMatrixCellClicked:(NSMatrix*) checkBoxes newState:(int)state {
+
+    BOOL cmdKeyDown = ([[NSApp currentEvent] modifierFlags] & NSCommandKeyMask) != 0;
+    if(cmdKeyDown){
+        for(int i=0; i<[checkBoxes numberOfRows]; i++)
+        {
+            [[checkBoxes cellWithTag:i] setState: state];
+        }
+    }
+    return;
+}
+
 @end
 
 #pragma mark •••PrivateInterface
