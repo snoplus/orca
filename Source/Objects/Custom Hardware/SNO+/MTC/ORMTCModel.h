@@ -50,6 +50,17 @@
 #define MTC_mV_UNITS 2
 #define MTC_NHIT_UNITS 3
 
+//This defines the order at which the MTC server and database expects MTCA thresholds
+#define SERVER_N100L_INDEX 0
+#define SERVER_N100M_INDEX 1
+#define SERVER_N100H_INDEX 2
+#define SERVER_N20_INDEX   3
+#define SERVER_N20LB_INDEX 4
+#define SERVER_ESUML_INDEX 5
+#define SERVER_ESUMH_INDEX 6
+#define SERVER_OWLN_INDEX  7
+#define SERVER_OWLEL_INDEX 8
+#define SERVER_OWLEH_INDEX 9
 
 
 @interface ORMTCModel :  ORVmeIOCard
