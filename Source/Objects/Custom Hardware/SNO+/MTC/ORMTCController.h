@@ -65,10 +65,6 @@
 	IBOutlet NSButton*		stopFixedTimePedestalsButton;
 	IBOutlet NSTextField*		fixedTimePedestalsCountField;
 	IBOutlet NSTextField*		fixedTimePedestalsDelayField;
-	IBOutlet NSMatrix*		triggerZeroMatrix;
-	IBOutlet NSButton*		findTriggerZerosButton;
-	IBOutlet NSButton*		continuousButton;
-	IBOutlet NSButton*		stopTriggerZeroButton;
 	IBOutlet NSProgressIndicator* initProgressBar;
 	IBOutlet NSTextField*	initProgressField;
 	IBOutlet NSMatrix*		isPulserFixedRateMatrix;
@@ -212,8 +208,6 @@
 - (IBAction) standardStopPedestalsFixedTime:(id) sender;
 - (IBAction) standardSetPedestalsCount:(id) sender;
 - (IBAction) standardSetPedestalsDelay:(id) sender;
-- (IBAction) standardFindTriggerZeroes:(id) sender;
-- (IBAction) standardStopFindTriggerZeroes:(id) sender;
 - (IBAction) standardPulserFeeds:(id)sender;
 
 //Settings

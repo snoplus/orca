@@ -439,11 +439,6 @@
     [fixedTimePedestalsCountField	setEnabled: !lockedOrNotRunningMaintenance && ![model isPulserFixedRate]];
     [fixedTimePedestalsDelayField	setEnabled: !lockedOrNotRunningMaintenance && ![model isPulserFixedRate]];
     
-    [triggerZeroMatrix			setEnabled: !lockedOrNotRunningMaintenance];
-    [findTriggerZerosButton		setEnabled: !lockedOrNotRunningMaintenance];
-    [continuousButton			setEnabled: !lockedOrNotRunningMaintenance];
-    [stopTriggerZeroButton		setEnabled: !lockedOrNotRunningMaintenance];
-
     //Settings
     [load10MhzCounterButton		    setEnabled: !lockedOrNotRunningMaintenance];
     [setCoarseDelayButton           setEnabled: !lockedOrNotRunningMaintenance];
@@ -644,12 +639,6 @@
 
 }
 
-- (void) buttonPushed:(id) sender 
-{
-	NSLog(@"Input received from %@\n", [sender title] );	//This is the only real method.  The other button push methods just call this one.
-	NSLogColor([NSColor redColor], @"implementation needed\n");
-}
-
 //basic ops Actions
 - (IBAction) basicReadAction:(id) sender
 {
@@ -764,15 +753,6 @@
 	[model setFixedPulserRateDelay:aValue];
 }
 
-- (IBAction) standardFindTriggerZeroes:(id) sender 
-{
-	[self buttonPushed:sender];
-}
-
-- (IBAction) standardStopFindTriggerZeroes:(id) sender 
-{
-	[self buttonPushed:sender];
-}
 
 - (IBAction) standardPulserFeeds:(id)sender
 {
