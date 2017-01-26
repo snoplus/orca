@@ -657,7 +657,12 @@
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                         <connections>
-                                                            <outlet property="formatter" destination="fcg-We-po1" id="UMd-ER-2nx"/>
+                                                            <binding destination="4516" name="value" keyPath="selection.pgt_rate" id="gLT-C5-Olz">
+                                                                <dictionary key="options">
+                                                                    <bool key="NSContinuouslyUpdatesValue" value="YES"/>
+                                                                    <bool key="NSRaisesForNotApplicableKeys" value="NO"/>
+                                                                </dictionary>
+                                                            </binding>
                                                         </connections>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="XkZ-Gt-JXi">
@@ -1210,7 +1215,7 @@
                                                                     <bool key="NSRaisesForNotApplicableKeys" value="NO"/>
                                                                 </dictionary>
                                                             </binding>
-                                                            <outlet property="formatter" destination="fcg-We-po1" id="0nF-1A-C0I"/>
+                                                            <outlet property="formatter" destination="fcg-We-po1" id="u8L-Lo-2kS"/>
                                                         </connections>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="1813">
