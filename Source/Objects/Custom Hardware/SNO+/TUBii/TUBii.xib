@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14A389" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6254" systemVersion="13F1077" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
         <development version="5100" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6254"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="TUBiiController">
@@ -123,7 +123,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="0.0" y="29" width="621" height="748"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="3840" height="2138"/>
             <view key="contentView" id="se5-gp-TjO">
                 <rect key="frame" x="0.0" y="-1" width="621" height="748"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -133,11 +133,10 @@
                         <tabViewItems>
                             <tabViewItem label="TUBii" identifier="" id="T81-Ks-egO">
                                 <view key="view" id="tgY-du-t2x">
-                                    <rect key="frame" x="10" y="25" width="575" height="660"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="o6D-C9-MfD">
-                                            <rect key="frame" x="64" y="606" width="137" height="22"/>
+                                            <rect key="frame" x="64" y="-54" width="137" height="22"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="" drawsBackground="YES" id="k6h-Fw-gTo">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -152,7 +151,7 @@
                                             </connections>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fw8-QQ-H0F">
-                                            <rect key="frame" x="64" y="629" width="54" height="17"/>
+                                            <rect key="frame" x="64" y="-31" width="54" height="17"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="TUBii IP" id="EFE-oa-VtN">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -160,7 +159,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fXd-cQ-We0">
-                                            <rect key="frame" x="231" y="629" width="30" height="17"/>
+                                            <rect key="frame" x="231" y="-31" width="30" height="17"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Port" id="JST-8r-J4g">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -168,7 +167,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Lgn-4t-R8b">
-                                            <rect key="frame" x="356" y="600" width="68" height="32"/>
+                                            <rect key="frame" x="356" y="-60" width="68" height="32"/>
                                             <buttonCell key="cell" type="push" title="Ping" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="NlH-dt-PjR">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -178,7 +177,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="STE-s6-s7D">
-                                            <rect key="frame" x="56" y="556" width="90" height="32"/>
+                                            <rect key="frame" x="56" y="-104" width="90" height="32"/>
                                             <buttonCell key="cell" type="push" title="Initialize" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="aEy-eQ-ZTb">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -188,9 +187,9 @@
                                             </connections>
                                         </button>
                                         <matrix toolTip="Tells TUBii to begine reading out it's data." verticalHuggingPriority="750" fixedFrame="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CrM-oe-jTF">
-                                            <rect key="frame" x="62" y="491" width="89" height="58"/>
+                                            <rect key="frame" x="62" y="-169" width="89" height="58"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            <size key="cellSize" width="76.573170731707322" height="18"/>
+                                            <size key="cellSize" width="75.76318359375" height="18"/>
                                             <size key="intercellSpacing" width="4" height="2"/>
                                             <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" inset="2" id="yAS-jt-R6p">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -218,7 +217,7 @@
                                             </connections>
                                         </matrix>
                                         <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TSo-02-c2u">
-                                            <rect key="frame" x="233" y="606" width="96" height="22"/>
+                                            <rect key="frame" x="233" y="-54" width="96" height="22"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="J1d-dr-fE0">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -230,9 +229,9 @@
                                             </connections>
                                         </textField>
                                         <matrix toolTip="Use this to enable TUBii's ECA mode. This re-routes GT to EXT PED OUT and causes EXT PED IN to be ignored." verticalHuggingPriority="750" fixedFrame="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iur-DA-0o0">
-                                            <rect key="frame" x="62" y="419" width="89" height="58"/>
+                                            <rect key="frame" x="62" y="-241" width="89" height="58"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            <size key="cellSize" width="72.951219512195109" height="18"/>
+                                            <size key="cellSize" width="69.548828125" height="18"/>
                                             <size key="intercellSpacing" width="4" height="2"/>
                                             <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" inset="2" id="3zt-51-xz5">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -260,7 +259,7 @@
                                             </connections>
                                         </matrix>
                                         <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="w0X-hT-uEH">
-                                            <rect key="frame" x="17" y="606" width="33" height="37"/>
+                                            <rect key="frame" x="17" y="-54" width="33" height="37"/>
                                             <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="Unlocked" imagePosition="only" alignment="center" alternateImage="Locked" inset="2" id="iLY-pS-cXs">
                                                 <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="label"/>
@@ -1078,7 +1077,7 @@
                                     <rect key="frame" x="10" y="25" width="575" height="660"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <button toolTip="Make the hardware match the current state of the GUI" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="A6P-hJ-pOg">
+                                        <button toolTip="Make the hardware match the current state of the GUI" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="A6P-hJ-pOg">
                                             <rect key="frame" x="354" y="265" width="126" height="32"/>
                                             <buttonCell key="cell" type="push" title="Send to TUBii" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="iVo-AI-xmb">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1095,14 +1094,14 @@
                                                 <rect key="frame" x="1" y="1" width="345" height="324"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <box autoresizesSubviews="NO" title="CAEN Channel 0" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="zrw-AU-UxX">
+                                                    <box autoresizesSubviews="NO" misplaced="YES" title="CAEN Channel 0" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="zrw-AU-UxX">
                                                         <rect key="frame" x="7" y="236" width="162" height="78"/>
                                                         <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                         <view key="contentView">
                                                             <rect key="frame" x="1" y="1" width="160" height="62"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <matrix verticalHuggingPriority="750" tag="5" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aqg-CE-a2D">
+                                                                <matrix verticalHuggingPriority="750" misplaced="YES" tag="5" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aqg-CE-a2D">
                                                                     <rect key="frame" x="11" y="14" width="124" height="38"/>
                                                                     <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1135,14 +1134,14 @@
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                     </box>
-                                                    <box autoresizesSubviews="NO" title="CAEN Channel 2" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="SKI-Hf-bWI">
+                                                    <box autoresizesSubviews="NO" misplaced="YES" title="CAEN Channel 2" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="SKI-Hf-bWI">
                                                         <rect key="frame" x="7" y="87" width="162" height="78"/>
                                                         <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                         <view key="contentView">
                                                             <rect key="frame" x="1" y="1" width="160" height="62"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <matrix verticalHuggingPriority="750" tag="7" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="B40-uq-gVg">
+                                                                <matrix verticalHuggingPriority="750" misplaced="YES" tag="7" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="B40-uq-gVg">
                                                                     <rect key="frame" x="12" y="14" width="124" height="38"/>
                                                                     <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1175,14 +1174,14 @@
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                     </box>
-                                                    <box autoresizesSubviews="NO" title="CAEN Channel 3" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="3se-oC-GaP">
+                                                    <box autoresizesSubviews="NO" misplaced="YES" title="CAEN Channel 3" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="3se-oC-GaP">
                                                         <rect key="frame" x="7" y="14" width="162" height="78"/>
                                                         <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                         <view key="contentView">
                                                             <rect key="frame" x="1" y="1" width="160" height="62"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <matrix verticalHuggingPriority="750" tag="8" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8dE-u0-lxl">
+                                                                <matrix verticalHuggingPriority="750" misplaced="YES" tag="8" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8dE-u0-lxl">
                                                                     <rect key="frame" x="11" y="14" width="124" height="38"/>
                                                                     <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1215,14 +1214,14 @@
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                     </box>
-                                                    <box autoresizesSubviews="NO" title="CAEN Channel 4" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="JoE-Pz-BDd">
+                                                    <box autoresizesSubviews="NO" misplaced="YES" title="CAEN Channel 4" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="JoE-Pz-BDd">
                                                         <rect key="frame" x="176" y="236" width="162" height="78"/>
                                                         <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                         <view key="contentView">
                                                             <rect key="frame" x="1" y="1" width="160" height="62"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <matrix verticalHuggingPriority="750" tag="9" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="W6O-Jv-c1U">
+                                                                <matrix verticalHuggingPriority="750" misplaced="YES" tag="9" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="W6O-Jv-c1U">
                                                                     <rect key="frame" x="12" y="14" width="124" height="38"/>
                                                                     <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1254,14 +1253,14 @@
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                     </box>
-                                                    <box autoresizesSubviews="NO" title="CAEN Channel 5" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="2Jd-UZ-YBc">
+                                                    <box autoresizesSubviews="NO" misplaced="YES" title="CAEN Channel 5" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="2Jd-UZ-YBc">
                                                         <rect key="frame" x="176" y="163" width="162" height="78"/>
                                                         <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                         <view key="contentView">
                                                             <rect key="frame" x="1" y="1" width="160" height="62"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <matrix verticalHuggingPriority="750" tag="10" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Zx1-Q2-Eum">
+                                                                <matrix verticalHuggingPriority="750" misplaced="YES" tag="10" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Zx1-Q2-Eum">
                                                                     <rect key="frame" x="11" y="14" width="124" height="38"/>
                                                                     <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1293,14 +1292,14 @@
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                     </box>
-                                                    <box autoresizesSubviews="NO" title="CAEN Channel 6" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="cVh-ap-S53">
+                                                    <box autoresizesSubviews="NO" misplaced="YES" title="CAEN Channel 6" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="cVh-ap-S53">
                                                         <rect key="frame" x="176" y="87" width="162" height="78"/>
                                                         <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                         <view key="contentView">
                                                             <rect key="frame" x="1" y="1" width="160" height="62"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <matrix verticalHuggingPriority="750" tag="11" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EHc-7k-VaY">
+                                                                <matrix verticalHuggingPriority="750" misplaced="YES" tag="11" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EHc-7k-VaY">
                                                                     <rect key="frame" x="12" y="14" width="124" height="38"/>
                                                                     <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1332,14 +1331,14 @@
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                     </box>
-                                                    <box autoresizesSubviews="NO" title="CAEN Channel 7" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="DVZ-iZ-kbn">
+                                                    <box autoresizesSubviews="NO" misplaced="YES" title="CAEN Channel 7" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="DVZ-iZ-kbn">
                                                         <rect key="frame" x="176" y="14" width="162" height="78"/>
                                                         <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                         <view key="contentView">
                                                             <rect key="frame" x="1" y="1" width="160" height="62"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <matrix verticalHuggingPriority="750" tag="12" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kzS-4A-YVq">
+                                                                <matrix verticalHuggingPriority="750" misplaced="YES" tag="12" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kzS-4A-YVq">
                                                                     <rect key="frame" x="12" y="14" width="124" height="38"/>
                                                                     <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1371,14 +1370,14 @@
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                     </box>
-                                                    <box autoresizesSubviews="NO" title="CAEN Channel 1" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="BbY-PC-CYx">
+                                                    <box autoresizesSubviews="NO" misplaced="YES" title="CAEN Channel 1" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="BbY-PC-CYx">
                                                         <rect key="frame" x="7" y="163" width="162" height="78"/>
                                                         <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                         <view key="contentView">
                                                             <rect key="frame" x="1" y="1" width="160" height="62"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <matrix verticalHuggingPriority="750" tag="6" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nIq-5b-d9Q">
+                                                                <matrix verticalHuggingPriority="750" misplaced="YES" tag="6" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nIq-5b-d9Q">
                                                                     <rect key="frame" x="12" y="14" width="124" height="38"/>
                                                                     <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1447,7 +1446,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                             <font key="titleFont" metaFont="system"/>
                                         </box>
-                                        <button toolTip="Make the GUI show the current state of the hardware" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ejp-qe-xfg">
+                                        <button toolTip="Make the GUI show the current state of the hardware" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ejp-qe-xfg">
                                             <rect key="frame" x="117" y="265" width="142" height="32"/>
                                             <buttonCell key="cell" type="push" title="Match Hardware" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="L2t-LY-qcy">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1693,7 +1692,7 @@
                                                 <outlet property="formatter" destination="win-26-dRT" id="MjG-s1-k55"/>
                                             </connections>
                                         </textField>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VW3-lN-l8n">
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VW3-lN-l8n">
                                             <rect key="frame" x="28" y="547" width="143" height="17"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="DGT Delay Length (ns)" id="NMZ-dg-zss">
                                                 <font key="font" metaFont="system"/>
@@ -1755,7 +1754,7 @@
                                                 <action selector="LOSrcSelectChanged:" target="-2" id="6ye-5T-lvv"/>
                                             </connections>
                                         </matrix>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Gvm-rz-K8T">
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Gvm-rz-K8T">
                                             <rect key="frame" x="30" y="637" width="144" height="17"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Select Lockout Source" id="iAa-G0-EeJ">
                                                 <font key="font" metaFont="system"/>
@@ -1781,7 +1780,7 @@
                                                 <action selector="LODelayLengthSliderChagned:" target="-2" id="awU-VV-aZc"/>
                                             </connections>
                                         </slider>
-                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dLE-wM-7aQ">
+                                        <button verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dLE-wM-7aQ">
                                             <rect key="frame" x="159" y="486" width="142" height="32"/>
                                             <string key="toolTip">Retrieve the following values from TUBii. LO Source Select, DGT Delay Length, Lockout Length. Makes the GUI reflect those values.</string>
                                             <buttonCell key="cell" type="push" title="Match Hardware" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="qUd-lH-ZAU">
@@ -1792,7 +1791,7 @@
                                                 <action selector="GTDelaysMatchHardware:" target="-2" id="25g-lG-VVn"/>
                                             </connections>
                                         </button>
-                                        <button toolTip="Send the following values (as specified by the GUI) to TUBii. LO Source Select, DGT Delay Length, Lockout Length." verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Zx1-PU-au1">
+                                        <button toolTip="Send the following values (as specified by the GUI) to TUBii. LO Source Select, DGT Delay Length, Lockout Length." verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Zx1-PU-au1">
                                             <rect key="frame" x="26" y="486" width="128" height="32"/>
                                             <buttonCell key="cell" type="push" title="Send To TUBii" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Xlz-mv-qwg">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2389,7 +2388,7 @@
                                                                 <matrix verticalHuggingPriority="750" fixedFrame="YES" tag="1" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="j2I-tx-Kgy">
                                                                     <rect key="frame" x="200" y="37" width="156" height="19"/>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                    <size key="cellSize" width="74" height="18"/>
+                                                                    <size key="cellSize" width="77" height="18"/>
                                                                     <size key="intercellSpacing" width="4" height="2"/>
                                                                     <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" inset="2" id="w4E-IF-rYH">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
