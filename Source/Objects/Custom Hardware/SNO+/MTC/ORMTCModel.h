@@ -66,8 +66,6 @@
 @interface ORMTCModel :  ORVmeIOCard
 {
     @private
-		unsigned long			_dataId;
-        unsigned long			_mtcStatusDataId;
 		NSMutableDictionary*	mtcDataBase;
 		
 		//basic ops
@@ -96,16 +94,6 @@
     unsigned long _mtcaOEHIMask;
     unsigned long _mtcaOWLNMask;
 
-    unsigned long _mtcStatusGTID;
-    double _mtcStatusGTIDRate;
-    unsigned long long _mtcStatusCnt10MHz;
-    NSString* _mtcStatusTime10Mhz;
-    unsigned long _mtcStatusReadPtr;
-    unsigned long _mtcStatusWritePtr;
-    BOOL _mtcStatusDataAvailable;
-    unsigned long _mtcStatusNumEventsInMem;
-    BOOL _resetFifoOnStart;
-
     int tubRegister;
 
     uint16_t mtca_thresholds[MTC_NUM_THRESHOLDS];
@@ -125,20 +113,13 @@
 @property (nonatomic,assign) unsigned long mtcaOELOMask;
 @property (nonatomic,assign) unsigned long mtcaOEHIMask;
 @property (nonatomic,assign) unsigned long mtcaOWLNMask;
-@property (nonatomic,assign) unsigned long dataId;
-@property (nonatomic,assign) unsigned long mtcStatusDataId;
-@property (nonatomic,assign) unsigned long mtcStatusGTID;
-@property (nonatomic,assign) unsigned long long mtcStatusCnt10MHz;
-@property (nonatomic,copy) NSString* mtcStatusTime10Mhz;
-@property (nonatomic,assign) unsigned long mtcStatusReadPtr;
-@property (nonatomic,assign) unsigned long mtcStatusWritePtr;
-@property (nonatomic,assign) BOOL mtcStatusDataAvailable;
-@property (nonatomic,assign) unsigned long mtcStatusNumEventsInMem;
 @property (nonatomic,assign) BOOL isPedestalEnabledInCSR;
-@property (nonatomic,assign) BOOL resetFifoOnStart;
 @property (nonatomic,assign) BOOL pulserEnabled;
 
+// The TUB register is no longer used in SNO+
+// but maybe someday it will be. So I'll leave it in here.
 @property (nonatomic,assign) int tubRegister;
+
 
 //TODO refactor all this MTCA crap into it's own class/struct
 @property (nonatomic) uint16_t N100H_Threshold;
