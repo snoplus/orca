@@ -1573,13 +1573,40 @@ snopGreenColor;
         return;
     }
     @try{
+        if([mtcModel ConversionIsValidForThreshold:threshold_index])
+        {
+            units = MTC_RAW_UNITS;
+        }
         [mtcModel setThresholdOfType:threshold_index fromUnits:units toValue:threshold_value];
     }
     @catch(NSException *excep) {
         NSLogColor([NSColor redColor], @"Error while trying to set the MTC threshold, reason: %@\n",[excep reason]);
     }
 }
+-(void) updateThresholdDisplayAt:(int) row forThreshold:(int) type isNHit:(BOOL) isNhit isInMask:(BOOL) inMask usingModel:(id) mtcModel andFormatter:(NSFormatter*) formatter
+{
+    float value;
+    [formatter retain]; // Not sure if necessary, but shouldn't hurt.
+    if([mtcModel ConversionIsValidForThreshold:type]) {
+        NSString* label = isNhit ? @"NHits" : @"mV";
+        int units = isNhit ? MTC_NHIT_UNITS : MTC_mV_UNITS;
+        value = [mtcModel getThresholdOfType:type inUnits:units];
+        [[standardRunThreshLabels cellAtRow:row column:0] setStringValue:label];
+    }
+    else {
+        value = [mtcModel getThresholdOfType:type inUnits:MTC_RAW_UNITS];
+        [[standardRunThreshLabels cellAtRow:row column:0] setStringValue:@"Raw DAC Counts"];
+    }
+    [[standardRunThresCurrentValues cellAtRow:row column:0] setFloatValue:value];
+    [[standardRunThresCurrentValues cellAtRow:row column:0] setFormatter:formatter];
 
+    if(inMask) {
+        [[standardRunThresCurrentValues cellAtRow:row column:0] setTextColor:[self snopBlueColor]];
+    } else{
+        [[standardRunThresCurrentValues cellAtRow:row column:0] setTextColor:[self snopRedColor]];
+    }
+    [formatter release];
+}
 - (void) mtcDataBaseChanged:(NSNotification*)aNotification
 {
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
@@ -1597,104 +1624,35 @@ snopGreenColor;
 
     //GTMask
     int gtmask = [mtcModel gtMask];
-    
-    float nHits;
+    // The following defines the map between the view threshold ordering and the
+    // mtc model indices
+    int view_model_map[10] = {
+        MTC_N100_HI_THRESHOLD_INDEX,
+        MTC_N100_MED_THRESHOLD_INDEX,
+        MTC_N100_LO_THRESHOLD_INDEX,
+        MTC_N20_THRESHOLD_INDEX,
+        MTC_N20LB_THRESHOLD_INDEX,
+        MTC_OWLN_THRESHOLD_INDEX,
+        MTC_ESUMH_THRESHOLD_INDEX,
+        MTC_ESUML_THRESHOLD_INDEX,
+        MTC_OWLEHI_THRESHOLD_INDEX,
+        MTC_OWLELO_THRESHOLD_INDEX};
 
-    // getThresholdOfType can throw an exception so wrap it in a try catch
-    @try {
-        //NHIT100HI
-        nHits = [mtcModel getThresholdOfType:MTC_N100_HI_THRESHOLD_INDEX inUnits:MTC_NHIT_UNITS];
-    [[standardRunThresCurrentValues cellAtRow:0 column:0] setFloatValue:nHits];
+    // The following defines the map between view ordering of triggers and gt mask ordering
+    int view_mask_map[10] = {2,1,0,3,4,7,6,5,9,8};
 
+    for(int i=0;i<10;i++)
+    {
+        @try {
+            BOOL isNhit = i<6; // All the NHit type thresholds are the first 7...i realize this is a bit weird but it works
+            // ...for now
+            BOOL inMask = ((1<<view_mask_map[i]) & gtmask) !=0;
+            [self updateThresholdDisplayAt:i forThreshold:view_model_map[i] isNHit:isNhit isInMask:inMask usingModel:mtcModel andFormatter:thresholdFormatter];
+        } @catch (NSException *exception) {
+            NSLogColor([NSColor redColor], @"Error while retrieving threshold. Reason:%@\n.",[exception reason]);
+        }
+    }
 
-    [[standardRunThresCurrentValues cellAtRow:0 column:0] setFormatter:thresholdFormatter];
-    if((gtmask >> 2) & 1){
-        [[standardRunThresCurrentValues cellAtRow:0 column:0] setTextColor:[self snopBlueColor]];
-    } else{
-        [[standardRunThresCurrentValues cellAtRow:0 column:0] setTextColor:[self snopRedColor]];
-    }
-    //NHIT100MED
-
-    nHits = [mtcModel getThresholdOfType:MTC_N100_MED_THRESHOLD_INDEX inUnits:MTC_NHIT_UNITS];
-    [[standardRunThresCurrentValues cellAtRow:1 column:0] setFloatValue:nHits];
-    [[standardRunThresCurrentValues cellAtRow:1 column:0] setFormatter:thresholdFormatter];
-    if((gtmask >> 1) & 1){
-        [[standardRunThresCurrentValues cellAtRow:1 column:0] setTextColor:[self snopBlueColor]];
-    } else{
-        [[standardRunThresCurrentValues cellAtRow:1 column:0] setTextColor:[self snopRedColor]];
-    }
-    //NHIT100LO
-
-    nHits = [mtcModel getThresholdOfType:MTC_N100_LO_THRESHOLD_INDEX inUnits:MTC_NHIT_UNITS];
-    [[standardRunThresCurrentValues cellAtRow:2 column:0] setFloatValue:nHits];
-    [[standardRunThresCurrentValues cellAtRow:2 column:0] setFormatter:thresholdFormatter];
-    if((gtmask >> 0) & 1){
-        [[standardRunThresCurrentValues cellAtRow:2 column:0] setTextColor:[self snopBlueColor]];
-    } else{
-        [[standardRunThresCurrentValues cellAtRow:2 column:0] setTextColor:[self snopRedColor]];
-    }
-    //NHIT20
-    nHits = [mtcModel getThresholdOfType:MTC_N20_THRESHOLD_INDEX inUnits:MTC_NHIT_UNITS];
-    [[standardRunThresCurrentValues cellAtRow:3 column:0] setFloatValue:nHits];
-    [[standardRunThresCurrentValues cellAtRow:3 column:0] setFormatter:thresholdFormatter];
-    if((gtmask >> 3) & 1){
-        [[standardRunThresCurrentValues cellAtRow:3 column:0] setTextColor:[self snopBlueColor]];
-    } else{
-        [[standardRunThresCurrentValues cellAtRow:3 column:0] setTextColor:[self snopRedColor]];
-    }
-    //NHIT20LO
-    nHits = [mtcModel getThresholdOfType:MTC_N20LB_THRESHOLD_INDEX inUnits:MTC_NHIT_UNITS];
-    [[standardRunThresCurrentValues cellAtRow:4 column:0] setFloatValue:nHits];
-    [[standardRunThresCurrentValues cellAtRow:4 column:0] setFormatter:thresholdFormatter];
-    if((gtmask >> 4) & 1){
-        [[standardRunThresCurrentValues cellAtRow:4 column:0] setTextColor:[self snopBlueColor]];
-    } else{
-        [[standardRunThresCurrentValues cellAtRow:4 column:0] setTextColor:[self snopRedColor]];
-    }
-    //OWLN
-    nHits = [mtcModel getThresholdOfType:MTC_OWLN_THRESHOLD_INDEX inUnits:MTC_NHIT_UNITS];
-    [[standardRunThresCurrentValues cellAtRow:5 column:0] setFloatValue:nHits];
-    [[standardRunThresCurrentValues cellAtRow:5 column:0] setFormatter:thresholdFormatter];
-    if((gtmask >> 7) & 1){
-        [[standardRunThresCurrentValues cellAtRow:5 column:0] setTextColor:[self snopBlueColor]];
-    } else{
-        [[standardRunThresCurrentValues cellAtRow:5 column:0] setTextColor:[self snopRedColor]];
-    }
-    //ESUMHI
-    [[standardRunThresCurrentValues cellAtRow:6 column:0] setFloatValue:[mtcModel getThresholdOfType:MTC_ESUMH_THRESHOLD_INDEX inUnits:MTC_mV_UNITS]];
-    [[standardRunThresCurrentValues cellAtRow:6 column:0] setFormatter:thresholdFormatter];
-    if((gtmask >> 6) & 1){
-        [[standardRunThresCurrentValues cellAtRow:6 column:0] setTextColor:[self snopBlueColor]];
-    } else{
-        [[standardRunThresCurrentValues cellAtRow:6 column:0] setTextColor:[self snopRedColor]];
-    }
-    //ESUMLO
-    [[standardRunThresCurrentValues cellAtRow:7 column:0] setFloatValue:[mtcModel getThresholdOfType:MTC_ESUML_THRESHOLD_INDEX inUnits:MTC_mV_UNITS]];
-    [[standardRunThresCurrentValues cellAtRow:7 column:0] setFormatter:thresholdFormatter];
-    if((gtmask >> 5) & 1){
-        [[standardRunThresCurrentValues cellAtRow:7 column:0] setTextColor:[self snopBlueColor]];
-    } else{
-        [[standardRunThresCurrentValues cellAtRow:7 column:0] setTextColor:[self snopRedColor]];
-    }
-    //OWLEHI
-    [[standardRunThresCurrentValues cellAtRow:8 column:0] setFloatValue:[mtcModel getThresholdOfType:MTC_OWLEHI_THRESHOLD_INDEX inUnits:MTC_mV_UNITS]];
-    [[standardRunThresCurrentValues cellAtRow:8 column:0] setFormatter:thresholdFormatter];
-    if((gtmask >> 9) & 1){
-        [[standardRunThresCurrentValues cellAtRow:8 column:0] setTextColor:[self snopBlueColor]];
-    } else{
-        [[standardRunThresCurrentValues cellAtRow:8 column:0] setTextColor:[self snopRedColor]];
-    }
-    //OWLELO
-    [[standardRunThresCurrentValues cellAtRow:9 column:0] setFloatValue:[mtcModel getThresholdOfType:MTC_OWLELO_THRESHOLD_INDEX inUnits:MTC_mV_UNITS]];
-    [[standardRunThresCurrentValues cellAtRow:9 column:0] setFormatter:thresholdFormatter];
-    if((gtmask >> 8) & 1){
-        [[standardRunThresCurrentValues cellAtRow:9 column:0] setTextColor:[self snopBlueColor]];
-    } else{
-        [[standardRunThresCurrentValues cellAtRow:9 column:0] setTextColor:[self snopRedColor]];
-    }
-    } @catch (NSException *exception) {
-        NSLogColor([NSColor redColor], @"Error while retrieving threshold. Reason:%@\n.",[exception reason]);
-    }
     //Prescale
     [[standardRunThresCurrentValues cellAtRow:10 column:0] setFloatValue:[mtcModel prescaleValue]];
     [[standardRunThresCurrentValues cellAtRow:10 column:0] setFormatter:thresholdFormatter];
@@ -1802,7 +1760,27 @@ snopGreenColor;
     }
     
 }
-
+-(void) updateSingleDBThresholdDisplay:(int) row ofType:(int) type toUnits:(int) units inMask:(BOOL) inMask withModel:(id) mtcModel withFormatter:(NSFormatter*) formatter toValue:(float) raw {
+    float nHits;
+    @try {
+        if([mtcModel ConversionIsValidForThreshold:type])
+        {
+            nHits = [mtcModel convertThreshold:raw OfType:type fromUnits:MTC_RAW_UNITS toUnits:units];
+        }
+        else {
+            nHits = raw;
+        }
+    } @catch (NSException *excep) {
+        NSLogColor([NSColor redColor], @"Failed to convert the N100H threhsolds from raw units. Reason: %@\n",[excep reason]);
+    }
+    [[standardRunThresStoredValues cellAtRow:row column:0] setFormatter:formatter];
+    [[standardRunThresStoredValues cellAtRow:row column:0] setFloatValue:nHits];
+    if(inMask) {
+        [[standardRunThresStoredValues cellAtRow:row column:0] setTextColor:[self snopBlueColor]];
+    } else{
+        [[standardRunThresStoredValues cellAtRow:row column:0] setTextColor:[self snopRedColor]];
+    }
+}
 //Query the DB for the selected Standard Run name and version
 //and display the values in the GUI.
 -(void) displayThresholdsFromDB
@@ -1880,155 +1858,43 @@ snopGreenColor;
         }
     //If in non-DIAGNOSTIC run: display DB threshold values
     } else {
-        float nHits;
         float mVolts;
         int gtmask = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,GtMask"] intValue];
-        //NHIT100HI
-        float raw = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Hi,Threshold"] floatValue];
-        @try {
-             nHits = [mtcModel convertThreshold:raw OfType:MTC_N100_HI_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toUnits:MTC_NHIT_UNITS];
-        } @catch (NSException *excep) {
-            NSLogColor([NSColor redColor], @"Failed to convert the N100H threhsolds from raw units. Reason: %@\n",[excep reason]);
-        }
-        [[standardRunThresStoredValues cellAtRow:0 column:0] setFormatter:thresholdFormatter];
-        [[standardRunThresStoredValues cellAtRow:0 column:0] setFloatValue:nHits];
-        if((gtmask >> 2) & 1){
-            [[standardRunThresStoredValues cellAtRow:0 column:0] setTextColor:[self snopBlueColor]];
-        } else{
-            [[standardRunThresStoredValues cellAtRow:0 column:0] setTextColor:[self snopRedColor]];
-        }
-        //NHIT100MED
-        raw = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Med,Threshold"] floatValue];
-        @try {
-        nHits = [mtcModel convertThreshold:raw OfType:MTC_N100_MED_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toUnits:MTC_NHIT_UNITS];
-        } @catch (NSException *excep) {
-            NSLogColor([NSColor redColor],@"Failed to convert the NHit100Med thresholds from raw units. Reason: %@\n", [excep reason]);
-        }
-        [[standardRunThresStoredValues cellAtRow:1 column:0] setFormatter:thresholdFormatter];
-        [[standardRunThresStoredValues cellAtRow:1 column:0] setFloatValue:nHits];
-        if((gtmask >> 1) & 1){
-            [[standardRunThresStoredValues cellAtRow:1 column:0] setTextColor:[self snopBlueColor]];
-        } else{
-            [[standardRunThresStoredValues cellAtRow:1 column:0] setTextColor:[self snopRedColor]];
-        }
-        //NHIT100LO
-        raw = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Lo,Threshold"] floatValue];
-        @try {
-        nHits = [mtcModel convertThreshold:raw OfType:MTC_N100_LO_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toUnits:MTC_NHIT_UNITS];
-        } @catch (NSException *excep) {
-            NSLogColor([NSColor redColor],@"Failed to convert the NHit100Lo thresholds from raw units. Reason: %@\n", [excep reason]);
-        }
-        [[standardRunThresStoredValues cellAtRow:2 column:0] setFormatter:thresholdFormatter];
-        [[standardRunThresStoredValues cellAtRow:2 column:0] setFloatValue:nHits];
-        if((gtmask >> 0) & 1){
-            [[standardRunThresStoredValues cellAtRow:2 column:0] setTextColor:[self snopBlueColor]];
-        } else{
-            [[standardRunThresStoredValues cellAtRow:2 column:0] setTextColor:[self snopRedColor]];
-        }
-        //NHIT20
-        raw = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20,Threshold"] floatValue];
         
-        @try {
-        nHits = [mtcModel convertThreshold:raw OfType:MTC_N20_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toUnits:MTC_NHIT_UNITS];
-        } @catch (NSException *excep) {
-            NSLogColor([NSColor redColor],@"Failed to convert the NHit20 threshold from raw units. Reason %@\n", [excep reason]);
-        }
-        [[standardRunThresStoredValues cellAtRow:3 column:0] setFormatter:thresholdFormatter];
-        [[standardRunThresStoredValues cellAtRow:3 column:0] setFloatValue:nHits];
-        if((gtmask >> 3) & 1){
-            [[standardRunThresStoredValues cellAtRow:3 column:0] setTextColor:[self snopBlueColor]];
-        } else{
-            [[standardRunThresStoredValues cellAtRow:3 column:0] setTextColor:[self snopRedColor]];
-        }
-        //NHIT20LO
-        raw = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20LB,Threshold"] floatValue];
-        @try {
-        nHits = [mtcModel convertThreshold:raw OfType:MTC_N20LB_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toUnits:MTC_NHIT_UNITS];
-        } @catch (NSException *excep) {
-            NSLogColor([NSColor redColor],@"Failed to convert the NHit20LB thresholds from raw units. Reason: %@\n", [excep reason]);
-        }
-        [[standardRunThresStoredValues cellAtRow:4 column:0] setFormatter:thresholdFormatter];
-        [[standardRunThresStoredValues cellAtRow:4 column:0] setFloatValue:nHits];
-        if((gtmask >> 4) & 1){
-            [[standardRunThresStoredValues cellAtRow:4 column:0] setTextColor:[self snopBlueColor]];
-        } else{
-            
-            [[standardRunThresStoredValues cellAtRow:4 column:0] setTextColor:[self snopRedColor]];
-        }
-        //OWLN
-        raw = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLN,Threshold"] floatValue];
-        @try {
-        nHits = [mtcModel convertThreshold:raw OfType:MTC_OWLN_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toUnits:MTC_NHIT_UNITS];
-        } @catch (NSException *excep) {
-            NSLogColor([NSColor redColor],@"Failed to convert the OWLN thresholds from raw units. Reason: %@\n", [excep reason]);
-        }
-        [[standardRunThresStoredValues cellAtRow:5 column:0] setFormatter:thresholdFormatter];
-        [[standardRunThresStoredValues cellAtRow:5 column:0] setFloatValue:nHits];
-        if((gtmask >> 7) & 1){
-            [[standardRunThresStoredValues cellAtRow:5 column:0] setTextColor:[self snopBlueColor]];
-        } else{
-            [[standardRunThresStoredValues cellAtRow:5 column:0] setTextColor:[self snopRedColor]];
-        }
-        //ESUMHI
-        raw = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumHi,Threshold"] floatValue];
-        @try {
-            mVolts = [mtcModel convertThreshold:raw OfType:MTC_ESUMH_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toUnits:MTC_mV_UNITS];
-        } @catch (NSException *excep) {
-            NSLogColor([NSColor redColor],@"Failed to convert the ESumHi thresholds from raw units. Reason: %@\n", [excep reason]);
+        // The following defines the map between the view threshold ordering and the
+        // mtc model indices
+        int view_model_map[10] = {
+            MTC_N100_HI_THRESHOLD_INDEX,
+            MTC_N100_MED_THRESHOLD_INDEX,
+            MTC_N100_LO_THRESHOLD_INDEX,
+            MTC_N20_THRESHOLD_INDEX,
+            MTC_N20LB_THRESHOLD_INDEX,
+            MTC_OWLN_THRESHOLD_INDEX,
+            MTC_ESUMH_THRESHOLD_INDEX,
+            MTC_ESUML_THRESHOLD_INDEX,
+            MTC_OWLEHI_THRESHOLD_INDEX,
+            MTC_OWLELO_THRESHOLD_INDEX};
+        //The following defines the map between view order and the DB keys
+        int view_db_map[10] = {
+            @"MTC/A,NHit100Hi,Threshold",
+            @"MTC/A,NHit100Med,Threshold",
+            @"MTC/A,NHit100Lo,Threshold",
+            @"MTC/A,NHit20,Threshold",
+            @"MTC/A,NHit20LB,Threshold",
+            @"MTC/A,OWLN,Threshold",
+            @"MTC/A,ESumHi,Threshold",
+            @"MTC/A,ESumLow,Threshold",
+            @"MTC/A,OWLEHi,Threshold",
+            @"MTC/A,OWLELow,Threshold"};
+        //This defines the mapping between the view order and the GT mask positions
+        int view_mask_map[10] = {2,1,0,3,4,7,6,5,9,8};
+        for(int i=0;i<10;i++) {
+            float raw = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:view_db_map[i]] floatValue];
+            int units = i<=6 ? MTC_NHIT_UNITS : MTC_mV_UNITS;
+            BOOL inMask = ((1<< view_mask_map[i]) & gtmask) != 0;
+            [self updateSingleDBThresholdDisplay:i ofType:view_model_map[i] toUnits: units inMask:inMask withModel:mtcModel withFormatter:thresholdFormatter toValue:raw];
         }
 
-        [[standardRunThresStoredValues cellAtRow:6 column:0] setFloatValue:mVolts];
-        [[standardRunThresStoredValues cellAtRow:6 column:0] setFormatter:thresholdFormatter];
-        if((gtmask >> 6) & 1){
-            [[standardRunThresStoredValues cellAtRow:6 column:0] setTextColor:[self snopBlueColor]];
-        } else{
-            [[standardRunThresStoredValues cellAtRow:6 column:0] setTextColor:[self snopRedColor]];
-        }
-        //ESUMLO
-        raw = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumLow,Threshold"] floatValue];
-        @try {
-        mVolts = [mtcModel convertThreshold:raw OfType:MTC_ESUML_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toUnits:MTC_mV_UNITS];
-        } @catch (NSException *excep) {
-            NSLogColor([NSColor redColor],@"Failed to convert the ESumLow thresholds from raw units. Reason: %@\n", [excep reason]);
-        }
-
-        [[standardRunThresStoredValues cellAtRow:7 column:0] setFloatValue:mVolts];
-        [[standardRunThresStoredValues cellAtRow:7 column:0] setFormatter:thresholdFormatter];
-        if((gtmask >> 5) & 1){
-            [[standardRunThresStoredValues cellAtRow:7 column:0] setTextColor:[self snopBlueColor]];
-        } else{
-            [[standardRunThresStoredValues cellAtRow:7 column:0] setTextColor:[self snopRedColor]];
-        }
-        //OWLEHI
-        raw = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLEHi,Threshold"] floatValue];
-        @try {
-        mVolts = [mtcModel convertThreshold:raw OfType:MTC_OWLEHI_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toUnits:MTC_mV_UNITS];
-        } @catch (NSException *excep) {
-            NSLogColor([NSColor redColor],@"Failed to convert the OWLEHi thresholds from raw units. Reason: %@\n", [excep reason]);
-        }
-
-        [[standardRunThresStoredValues cellAtRow:8 column:0] setFloatValue:mVolts];
-        [[standardRunThresStoredValues cellAtRow:8 column:0] setFormatter:thresholdFormatter];
-        if((gtmask >> 9) & 1){
-            [[standardRunThresStoredValues cellAtRow:8 column:0] setTextColor:[self snopBlueColor]];
-        } else{
-            [[standardRunThresStoredValues cellAtRow:8 column:0] setTextColor:[self snopRedColor]];
-        }
-        //OWLELO
-        raw = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLELo,Threshold"] floatValue];
-        @try {
-        mVolts = [mtcModel convertThreshold:raw OfType:MTC_OWLELO_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toUnits:MTC_mV_UNITS];
-        } @catch (NSException *excep) {
-            NSLogColor([NSColor redColor],@"Failed to convert the OWLELo thresholds from raw units. Reason: %@\n", [excep reason]);
-        }
-
-        [[standardRunThresStoredValues cellAtRow:9 column:0] setFloatValue:mVolts];
-        [[standardRunThresStoredValues cellAtRow:9 column:0] setFormatter:thresholdFormatter];
-        if((gtmask >> 8) & 1){
-            [[standardRunThresStoredValues cellAtRow:9 column:0] setTextColor:[self snopBlueColor]];
-        } else{
-            [[standardRunThresStoredValues cellAtRow:9 column:0] setTextColor:[self snopRedColor]];
-        }
         //Prescale
         mVolts = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,Nhit100LoPrescale"] floatValue];
         [[standardRunThresStoredValues cellAtRow:10 column:0] setFloatValue:mVolts];

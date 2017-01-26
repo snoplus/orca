@@ -59,6 +59,8 @@
     IBOutlet NSButton *standardRunSaveButton;
     IBOutlet NSMatrix *standardRunThresCurrentValues;
     IBOutlet NSMatrix *standardRunThresStoredValues;
+    IBOutlet NSMatrix *standardRunThreshLabels;
+
 
     //Run Types Information
     IBOutlet NSMatrix*  runTypeWordMatrix;
