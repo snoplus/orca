@@ -75,8 +75,7 @@
     uint32_t                GTCrateMask;
     uint32_t                pedCrateMask;
     uint16_t                prescaleValue;
-    uint16_t                coarseDelay;
-    uint16_t                fineDelay;
+    float                pedestalDelay;
 
     //basic ops
     int                     selectedRegister;
@@ -116,8 +115,7 @@
 @property (nonatomic,assign) uint16_t lockoutWidth;
 @property (nonatomic,assign) uint16_t pedestalWidth;
 @property (nonatomic,assign) uint32_t pgt_rate;
-@property (nonatomic,assign) uint16_t coarseDelay;
-@property (nonatomic,assign) uint16_t fineDelay;
+@property (nonatomic,assign) float pedestalDelay;
 @property (nonatomic,assign) uint32_t gtMask;
 @property (nonatomic,assign) uint16_t prescaleValue;
 @property (nonatomic,assign) uint32_t GTCrateMask;
@@ -237,9 +235,7 @@
 - (void) zeroTheGTCounter;
 - (void) setThe10MHzCounter:(uint64_t) newValue;
 - (void) loadPrescaleValueToHardware;
-- (void) setupPulseGTDelaysCoarse:(unsigned short) theCoarseDelay fine:(unsigned short) theAddelValue;
-- (void) loadCoarseDelayToHardware;
-- (void) loadFineDelayToHardware;
+- (void) loadPedestalDelayToHardware;
 - (void) loadPulserRateToHardware;
 - (void) enablePulser;
 - (void) disablePulser;

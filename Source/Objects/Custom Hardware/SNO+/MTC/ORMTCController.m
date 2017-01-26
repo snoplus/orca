@@ -295,8 +295,7 @@
     [nhit100LoPrescaleField setFloatValue:  [model prescaleValue]];
     [pulserPeriodField      setFloatValue:  [model pgt_rate]];
     [extraPulserPeriodField setFloatValue:  [model pgt_rate]];
-	[coarseDelayField		setFloatValue:	[model coarseDelay]];
-	[fineDelayField			setFloatValue:	[model fineDelay]];
+	[pedDelayField          setFloatValue:	[model pedestalDelay]];
 	
 	[self displayMasks];
 }
@@ -435,8 +434,7 @@
     [fixedTimePedestalsDelayField	setEnabled: !lockedOrNotRunningMaintenance && ![model isPulserFixedRate]];
     
     //Settings
-    [setCoarseDelayButton           setEnabled: !lockedOrNotRunningMaintenance];
-    [setFineDelayButton				setEnabled: !lockedOrNotRunningMaintenance];
+    [setPedestalDelayButton           setEnabled: !lockedOrNotRunningMaintenance];
     [loadMTCADacsButton				setEnabled: !lockedOrNotRunningMaintenance];
     [nhitMatrix                     setEnabled: !lockedOrNotRunningMaintenance];
     [esumMatrix                     setEnabled: !lockedOrNotRunningMaintenance];
@@ -445,8 +443,7 @@
     [nhit100LoPrescaleField         setEnabled: !lockedOrNotRunningMaintenance];
     [pulserPeriodField              setEnabled: !lockedOrNotRunningMaintenance];
     [extraPulserPeriodField         setEnabled: !lockedOrNotRunningMaintenance];
-    [fineDelayField                 setEnabled: !lockedOrNotRunningMaintenance];
-    [coarseDelayField               setEnabled: !lockedOrNotRunningMaintenance];
+    [pedDelayField                 setEnabled: !lockedOrNotRunningMaintenance];
 
     //Triggers
     [globalTriggerCrateMaskMatrix setEnabled: !lockedOrNotRunningMaintenance];
@@ -673,23 +670,22 @@
 {
     @try {
 	[model loadTheMTCADacs];
-}
+    }
     @catch(NSException *excep) {
         NSLogColor([NSColor redColor], @"Error loading the MTCA DACs. Reason: %@\n.",[excep reason]);
     }
 }
 
-- (IBAction) standardSetCoarseDelay:(id) sender 
+- (IBAction) standardSetPedestalDelay:(id)sender
 {
-    [model setCoarseDelay:[coarseDelayField intValue]];
-	[model loadCoarseDelayToHardware];
+    @try{
+        [model loadPedestalDelayToHardware];
+    } @catch (NSException *excep) {
+            // Do nothing
+            // loadPedestalDelay will catch and warn about any error already
+    }
 }
 
-- (IBAction) standardSetFineDelay:(id) sender
-{
-    [model setFineDelay:[fineDelayField intValue]];
-    [model loadFineDelayToHardware];
-}
 
 - (IBAction) standardIsPulserFixedRate:(id) sender
 {

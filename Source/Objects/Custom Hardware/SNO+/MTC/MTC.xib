@@ -10,12 +10,10 @@
                 <outlet property="autoIncrementCB" destination="1316" id="1318"/>
                 <outlet property="basicOpsLockButton" destination="2944" id="1f4-pI-0c8"/>
                 <outlet property="basicOpsRunningIndicator" destination="1324" id="1326"/>
-                <outlet property="coarseDelayField" destination="1834" id="2516"/>
                 <outlet property="continuePedestalsButton" destination="4056" id="4089"/>
                 <outlet property="eSumViewTypeMatrix" destination="R5c-j8-UOB" id="g16-Dj-XiB"/>
                 <outlet property="esumMatrix" destination="AUU-Ta-E3F" id="6wc-1l-r5m"/>
                 <outlet property="extraPulserPeriodField" destination="M4V-7Q-nR2" id="MDr-RK-uzS"/>
-                <outlet property="fineDelayField" destination="1833" id="2515"/>
                 <outlet property="fireFixedTimePedestalsButton" destination="4055" id="4099"/>
                 <outlet property="firePedestalsButton" destination="4058" id="4087"/>
                 <outlet property="fixedTimePedestalsCountField" destination="4073" id="4097"/>
@@ -53,6 +51,7 @@
                 <outlet property="nhitMatrix" destination="3Sr-S3-X4Y" id="Vih-YI-BWQ"/>
                 <outlet property="opAdvancedOptionsBox" destination="uOx-3t-AfW" id="q7U-9m-VWA"/>
                 <outlet property="pedCrateMaskMatrix" destination="Mno-Cd-fe2" id="SQY-sJ-fah"/>
+                <outlet property="pedDelayField" destination="1834" id="p1B-ug-xAI"/>
                 <outlet property="pedestalWidthField" destination="1803" id="2507"/>
                 <outlet property="pulserPeriodField" destination="1806" id="2509"/>
                 <outlet property="readButton" destination="1253" id="YOa-8v-Q9c"/>
@@ -62,8 +61,7 @@
                 <outlet property="repeatDelayField" destination="1243" id="2826"/>
                 <outlet property="repeatDelayStepper" destination="1245" id="1304"/>
                 <outlet property="selectedRegisterPU" destination="1261" id="1267"/>
-                <outlet property="setCoarseDelayButton" destination="4158" id="4434"/>
-                <outlet property="setFineDelayButton" destination="4170" id="4433"/>
+                <outlet property="setPedestalDelayButton" destination="4158" id="kPF-h6-a7t"/>
                 <outlet property="settingsAdvancedOptionsBox" destination="1488" id="21a-jG-j46"/>
                 <outlet property="statusButton" destination="1257" id="vCe-N0-3RA"/>
                 <outlet property="stopButton" destination="1259" id="kkn-k7-bsR"/>
@@ -1186,20 +1184,11 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" id="1813">
-                                                        <rect key="frame" x="308" y="85" width="91" height="15"/>
-                                                        <autoresizingMask key="autoresizingMask"/>
-                                                        <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="right" title="Pulser rate [Hz]" id="3982">
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
-                                                    <textField verticalHuggingPriority="750" tag="9" id="1833">
-                                                        <rect key="frame" x="404" y="54" width="44" height="19"/>
+                                                    <textField verticalHuggingPriority="750" tag="2" id="1808">
+                                                        <rect key="frame" x="133" y="83" width="44" height="19"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" tag="9" drawsBackground="YES" id="3991">
-                                                            <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="##0.###" negativeFormat="#0.###" numberStyle="decimal" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="309" maximumFractionDigits="3" decimalSeparator="." groupingSeparator="" currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="2877">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="3981">
+                                                            <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="##0.###" negativeFormat="#0.###" numberStyle="decimal" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="309" maximumFractionDigits="3" decimalSeparator="." groupingSeparator="" currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="2870">
                                                                 <nil key="negativeInfinitySymbol"/>
                                                                 <nil key="positiveInfinitySymbol"/>
                                                             </numberFormatter>
@@ -1208,13 +1197,22 @@
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                         <connections>
-                                                            <binding destination="4516" name="value" keyPath="selection.fineDelay" id="FQC-z6-hK6">
+                                                            <binding destination="4516" name="value" keyPath="selection.prescaleValue" id="cyj-hc-d30">
                                                                 <dictionary key="options">
                                                                     <bool key="NSContinuouslyUpdatesValue" value="YES"/>
                                                                     <bool key="NSRaisesForNotApplicableKeys" value="NO"/>
                                                                 </dictionary>
                                                             </binding>
                                                         </connections>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" id="1813">
+                                                        <rect key="frame" x="308" y="85" width="91" height="15"/>
+                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="right" title="Pulser rate [Hz]" id="3982">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" tag="8" id="1834">
                                                         <rect key="frame" x="133" y="54" width="44" height="19"/>
@@ -1229,7 +1227,7 @@
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                         <connections>
-                                                            <binding destination="4516" name="value" keyPath="selection.coarseDelay" id="P30-8g-1pd">
+                                                            <binding destination="4516" name="value" keyPath="selection.pedestalDelay" id="ylN-hg-Lgc">
                                                                 <dictionary key="options">
                                                                     <bool key="NSContinuouslyUpdatesValue" value="YES"/>
                                                                     <bool key="NSRaisesForNotApplicableKeys" value="NO"/>
@@ -1240,41 +1238,21 @@
                                                     <textField verticalHuggingPriority="750" id="1835">
                                                         <rect key="frame" x="21" y="56" width="106" height="15"/>
                                                         <autoresizingMask key="autoresizingMask"/>
-                                                        <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="right" title="Coarse delay [ns]" id="3993">
+                                                        <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="right" title="PED Delay (ns)" id="3993">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" id="1836">
-                                                        <rect key="frame" x="292" y="54" width="106" height="16"/>
-                                                        <autoresizingMask key="autoresizingMask"/>
-                                                        <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="right" title="Fine delay [clicks]" id="3994">
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
-                                                    <button verticalHuggingPriority="750" id="4170">
-                                                        <rect key="frame" x="293" y="16" width="160" height="28"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="push" title="Set Fine Delay" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4171">
-                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="standardSetFineDelay:" target="-2" id="4436"/>
-                                                        </connections>
-                                                    </button>
                                                     <button verticalHuggingPriority="750" id="4158">
                                                         <rect key="frame" x="20" y="16" width="160" height="28"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="push" title="Set Coarse Delay" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4159">
+                                                        <buttonCell key="cell" type="push" title="Set Pedestal Delay" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4159">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
                                                         <connections>
-                                                            <action selector="standardSetCoarseDelay:" target="-2" id="4163"/>
+                                                            <action selector="standardSetPedestalDelay:" target="-2" id="5ky-hD-VSk"/>
                                                         </connections>
                                                     </button>
                                                     <textField verticalHuggingPriority="750" tag="3" id="1806">
@@ -1291,27 +1269,6 @@
                                                         </textFieldCell>
                                                         <connections>
                                                             <binding destination="4516" name="value" keyPath="selection.pgt_rate" id="d1o-oc-pgS">
-                                                                <dictionary key="options">
-                                                                    <bool key="NSContinuouslyUpdatesValue" value="YES"/>
-                                                                    <bool key="NSRaisesForNotApplicableKeys" value="NO"/>
-                                                                </dictionary>
-                                                            </binding>
-                                                        </connections>
-                                                    </textField>
-                                                    <textField verticalHuggingPriority="750" tag="2" id="1808">
-                                                        <rect key="frame" x="133" y="83" width="44" height="19"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="3981">
-                                                            <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="##0.###" negativeFormat="#0.###" numberStyle="decimal" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="309" maximumFractionDigits="3" decimalSeparator="." groupingSeparator="" currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="2870">
-                                                                <nil key="negativeInfinitySymbol"/>
-                                                                <nil key="positiveInfinitySymbol"/>
-                                                            </numberFormatter>
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                        <connections>
-                                                            <binding destination="4516" name="value" keyPath="selection.prescaleValue" id="cyj-hc-d30">
                                                                 <dictionary key="options">
                                                                     <bool key="NSContinuouslyUpdatesValue" value="YES"/>
                                                                     <bool key="NSRaisesForNotApplicableKeys" value="NO"/>

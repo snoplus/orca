@@ -110,8 +110,7 @@ static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
 pgt_rate,
 pedestalWidth,
 prescaleValue,
-fineDelay,
-coarseDelay,
+pedestalDelay,
 pedCrateMask,
 GTCrateMask,
 gtMask,
@@ -229,8 +228,7 @@ tubRegister;
         }
         if ([self pulserEnabled]) [self enablePulser];
 
-        [self loadCoarseDelayToHardware];
-        [self loadFineDelayToHardware];
+        [self loadPedestalDelayToHardware];
         [self loadLockOutWidthToHardware];
         [self loadPedWidthToHardware];
         [self loadPulserRateToHardware];
@@ -773,8 +771,7 @@ tubRegister;
     [self setPedestalWidth:[decoder decodeIntForKey:@"MTCPedestalWidth"]];
     [self setPrescaleValue:[decoder decodeIntForKey:@"MTCPrescaleValue"]];
     [self setPgt_rate:[decoder decodeIntForKey:@"MTCPulserRate"]];
-    [self setFineDelay: [decoder decodeIntForKey:@"MTCFineDelay"]];
-    [self setCoarseDelay:[decoder decodeIntForKey:@"MTCCoarseDelay"]];
+    [self setPedestalDelay: [decoder decodeFloatForKey:@"MTCPedestalDelay"]];
     [self setGtMask:[decoder decodeIntForKey:@"MTCGTMask"]];
     [self setGTCrateMask: [decoder decodeIntForKey:@"MTCGTCrateMask"]];
     [self setPedCrateMask:[decoder decodeIntForKey:@"MTCPedCrateMask"]];
@@ -820,8 +817,7 @@ tubRegister;
     [encoder encodeInt:[self pedestalWidth] forKey:@"MTCPedestalWidth"];
     [encoder encodeInt:[self prescaleValue] forKey:@"MTCPrescaleValue"];
     [encoder encodeInt:[self pgt_rate] forKey:@"MTCPulserRate"];
-    [encoder encodeInt:[self fineDelay] forKey:@"MTCFineDelay"];
-    [encoder encodeInt:[self coarseDelay] forKey:@"MTCCoarseDelay"];
+    [encoder encodeFloat:[self pedestalDelay] forKey:@"@MTCPedestalDelay"];
     [encoder encodeInt:[self gtMask] forKey:@"MTCGTMask"];
     [encoder encodeInt:[self GTCrateMask] forKey:@"MTCGTCrateMask"];
     [encoder encodeInt:[self pedCrateMask] forKey:@"MTCPedCrateMask"];
@@ -1178,7 +1174,7 @@ tubRegister;
 		[[seq forTarget:self] loadPrescaleValueToHardware];									// STEP 9:  Load the NHIT 100 LO prescale value
 		[[seq forTarget:self] loadPulserRateToHardware];                            // STEP 10: Load the Pulser
 		[[seq forTarget:self] loadPedWidthToHardware];                              // STEP 11: Set the Pedestal Width
-		[[seq forTarget:self] setupPulseGTDelaysCoarse:[self coarseDelay] fine:[self fineDelay]]; // STEP 12: Setup the Pulse GT Delays
+		[[seq forTarget:self] loadPedestalDelayToHardware];                         // STEP 12: Setup the Pulse GT Delays
 		if( loadThe10MHzClock)[self setThe10MHzCounter:0];                          // STEP 13: Load the 10MHz Counter
 		[[seq forTarget:self] resetTheMemory];										// STEP 14: Reset the Memory	 
 		//[[seq forTarget:self] setGTCrateMask];									// STEP 15: Set the GT Crate Mask from MTC database
@@ -1434,55 +1430,17 @@ tubRegister;
 	}
 }
 
-- (void) setupPulseGTDelaysCoarse:(uint16_t) theCoarseDelay fine:(uint16_t) theAddelValue
-{		
-	@try {
-        [self setCoarseDelay:theCoarseDelay];
-		[self setFineDelay:theAddelValue];
-        [self loadCoarseDelayToHardware];
-        [self loadFineDelayToHardware];
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Could not setup the MTC PULSE_GT delays!\n");	
-		NSLog(@"Exception: %@\n",localException);
-		[localException raise];			
-		
-	}
-}
-
-- (void) loadCoarseDelayToHardware
+- (void) loadPedestalDelayToHardware
 {
-    uint32_t theCoarseDelay = [self coarseDelay];
+    float pedDelay = [self pedestalDelay];
     @try {
 		// Set the coarse GTRIG/PED delay in ns
-		unsigned long aValue = (0xff - theCoarseDelay/10);
-		
-		[self write:kMtcRtdelReg value:aValue];
-		// now load it : assert and de-assert LOAD_ENPW in CONTROL REG  
-		// and  preserving the state of the register at the same time
-		[self clrBits:kMtcControlReg mask:MTC_CSR_LOAD_ENPW];
-		[self setBits:kMtcControlReg mask:MTC_CSR_LOAD_ENPW];
-		[self clrBits:kMtcControlReg mask:MTC_CSR_LOAD_ENPW];
-		NSLog(@"Set GT Coarse Delay to 0x%02x\n",aValue);
+        [mtc okCommand:"set_gt_delay %f", pedDelay];
+		NSLog(@"Set GT Coarse Delay to %f\n",pedDelay);
 		
 	}
 	@catch(NSException* localException) {
-		NSLog(@"Could not setup the MTC GT coarse delay!\n");			
-		NSLog(@"Exception: %@\n",localException);
-		[localException raise];			
-		
-	}
-}
-
-- (void) loadFineDelayToHardware
-{
-    uint16_t fineDelayValue = [self fineDelay];
-    @try {
-		[self write:kMtcAddelReg value:fineDelayValue];
-		NSLog(@"Set GT Fine Delay to 0x%02x\n",fineDelayValue);
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Could not set GT fine delay!\n");			
+		NSLog(@"Could not setup the MTC GT-PED delay!\n");
 		NSLog(@"Exception: %@\n",localException);
 		[localException raise];			
 		
@@ -1613,16 +1571,16 @@ tubRegister;
 	@try {
 		//[self clearGlobalTriggerWordMask];							//STEP 0a:	//added 01/24/98 QRA
         if ([self isPedestalEnabledInCSR]) {
-            [self enablePedestal];											// STEP 1 : Enable Pedestal
+            [self enablePedestal];										// STEP 1 : Enable Pedestal
         } else {
             [self disablePedestal];
         }
-		[self loadPedestalCrateMaskToHardware];									// STEP 2: Mask in crates for pedestals (PMSK)
+		[self loadPedestalCrateMaskToHardware];							// STEP 2: Mask in crates for pedestals (PMSK)
 		[self loadGTCrateMaskToHardware];								// STEP 3: Mask  Mask in crates fo GTRIGs (GMSK)
-		[self setupPulseGTDelaysCoarse: [self coarseDelay] fine:[self fineDelay]]; // STEP 4: Set thSet the GTRIG/PED delay in ns
+        [self loadPedestalDelayToHardware];                            // STEP 4: Set thSet the GTRIG/PED delay in ns
 		[self loadLockOutWidthToHardware];                              // STEP 5: Set the GT lockout width in ns
-        [self loadPedWidthToHardware];
-		[self setSingleGTWordMask: [self gtMask]];				// STEP 7:Mask in global trigger word(MASK)
+        [self loadPedWidthToHardware];                                  // STEP 7: Set the width of the PED signal
+		[self setSingleGTWordMask: [self gtMask]];                      // STEP 7: Mask in global trigger word(MASK)
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Failure during MTC pedestal setup!\n");
@@ -1912,8 +1870,7 @@ tubRegister;
     [self setPedestalWidth:52];
     [self setPrescaleValue:1];
     [self setPgt_rate:10];
-    [self setFineDelay: 0];
-    [self setCoarseDelay:60];
+    [self setPedestalDelay:60];
     [self setGtMask:0];
     [self setGTCrateMask: 0];
     [self setPedCrateMask:0];

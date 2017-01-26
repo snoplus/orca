@@ -54,8 +54,7 @@
 	IBOutlet NSButton*		initNoXilinxButton;
 	IBOutlet NSButton*		initNo10MHzButton;
 	IBOutlet NSButton*		initNoXilinxNo100MHzButton;
-	IBOutlet NSButton*		setFineDelayButton;
-	IBOutlet NSButton*		setCoarseDelayButton;
+	IBOutlet NSButton*		setPedestalDelayButton;
 	IBOutlet NSButton*		loadMTCADacsButton;
 	IBOutlet NSButton*		firePedestalsButton;
 	IBOutlet NSButton*		stopPedestalsButton;
@@ -78,8 +77,7 @@
  	IBOutlet NSTextField*	nhit100LoPrescaleField;
  	IBOutlet NSTextField*	pulserPeriodField;
     IBOutlet NSTextField*   extraPulserPeriodField;
- 	IBOutlet NSTextField*	coarseDelayField;
- 	IBOutlet NSTextField*	fineDelayField;
+ 	IBOutlet NSTextField*	pedDelayField;
 
 	IBOutlet NSMatrix*		nhitMatrix;
 	IBOutlet NSMatrix*		esumMatrix;
@@ -180,8 +178,7 @@
 - (IBAction) standardInitMTCnoXilinx:(id) sender;
 - (IBAction) standardInitMTCno10MHz:(id) sender;
 - (IBAction) standardInitMTCnoXilinxno10MHz:(id) sender;
-- (IBAction) standardSetCoarseDelay:(id) sender;
-- (IBAction) standardSetFineDelay:(id) sender;
+- (IBAction) standardSetPedestalDelay:(id) sender;
 - (IBAction) standardIsPulserFixedRate:(id) sender;
 - (IBAction) standardFirePedestals:(id) sender;
 - (IBAction) standardStopPedestals:(id) sender;
