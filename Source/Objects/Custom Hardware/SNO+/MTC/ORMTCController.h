@@ -18,6 +18,8 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
+#import "ORPQResult.h"
+
 @interface ORMTCController : OrcaObjectController {
 
     IBOutlet NSView *mtcView;
@@ -158,8 +160,20 @@
 - (int) convert_view_unit_index_to_model_index: (int) view_index;
 - (int) convert_model_unit_index_to_view_index: (int) model_index;
 
+
+//DB Access
+- (void) load_settings_from_trigger_scan_for_type:(int) type;
+- (void) grab_current_thresholds;
+
+- (void) waitForTriggerScan: (ORPQResult *) result;
+- (void) waitForThresholds: (ORPQResult *) result;
+
 #pragma mark •••Helper
 - (void) populatePullDown;
+- (int) trigger_scan_name_to_index:(NSString*) name;
+- (int) index_to_trigger_scan_name:(int) index;
+
+
 
 #pragma mark •••Button Stubs
 //Actions for the various buttons in the MTC dialog.  There is a generic "buttonPushed()" method that

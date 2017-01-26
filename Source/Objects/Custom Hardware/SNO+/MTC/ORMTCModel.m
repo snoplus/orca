@@ -31,8 +31,6 @@
 #import "ORRunController.h"
 #import "ORPQModel.h"
 #import "SNOPModel.h"
-#import "ORPQModel.h"
-#import "ORPQResult.h"
 
 #define uShortDBValue(A) [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] unsignedShortValue]
 #define uLongDBValue(A)  [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] unsignedLongValue]
@@ -776,6 +774,80 @@ pulserEnabled = _pulserEnabled;
 }
 
 #pragma mark •••Converters
+- (int) server_index_to_model_index:(int) server_index {
+    switch (server_index) {
+        case SERVER_N100L_INDEX:
+            return MTC_N100_LO_THRESHOLD_INDEX;
+            break;
+        case SERVER_N100M_INDEX:
+            return MTC_N100_MED_THRESHOLD_INDEX;
+            break;
+        case SERVER_N100H_INDEX:
+            return MTC_N100_HI_THRESHOLD_INDEX;
+            break;
+        case SERVER_N20_INDEX:
+            return MTC_N20_THRESHOLD_INDEX;
+            break;
+        case SERVER_N20LB_INDEX:
+            return MTC_N20LB_THRESHOLD_INDEX;
+            break;
+        case SERVER_ESUMH_INDEX:
+            return MTC_ESUMH_THRESHOLD_INDEX;
+            break;
+        case SERVER_ESUML_INDEX:
+            return MTC_ESUML_THRESHOLD_INDEX;
+            break;
+        case SERVER_OWLEL_INDEX:
+            return MTC_OWLELO_THRESHOLD_INDEX;
+            break;
+        case SERVER_OWLEH_INDEX:
+            return MTC_OWLEHI_THRESHOLD_INDEX;
+            break;
+        case SERVER_OWLN_INDEX:
+            return MTC_OWLN_THRESHOLD_INDEX;
+            break;
+            
+    }
+    //raise exception?
+    return -1;
+}
+- (int) model_index_to_server_index:(int) model_index {
+    switch (model_index) {
+        case MTC_N100_LO_THRESHOLD_INDEX:
+            return SERVER_N100L_INDEX;
+            break;
+            
+        case MTC_N100_MED_THRESHOLD_INDEX:
+            return SERVER_N100M_INDEX;
+            break;
+        case MTC_N100_HI_THRESHOLD_INDEX:
+            return SERVER_N100H_INDEX;
+            break;
+        case MTC_N20_THRESHOLD_INDEX:
+            return SERVER_N20_INDEX;
+            break;
+        case MTC_N20LB_THRESHOLD_INDEX:
+            return SERVER_N20LB_INDEX;
+            break;
+        case MTC_ESUMH_THRESHOLD_INDEX:
+            return SERVER_ESUMH_INDEX;
+            break;
+        case MTC_ESUML_THRESHOLD_INDEX:
+            return SERVER_ESUML_INDEX;
+            break;
+        case MTC_OWLELO_THRESHOLD_INDEX:
+            return SERVER_OWLEL_INDEX;
+            break;
+        case MTC_OWLEHI_THRESHOLD_INDEX:
+            return SERVER_OWLEH_INDEX;
+            break;
+        case MTC_OWLN_THRESHOLD_INDEX:
+            return SERVER_OWLN_INDEX;
+            break;
+    }
+    //raise exception?
+    return -1;
+}
 -(NSMutableDictionary*) get_MTCDataBase
 {
     return mtcDataBase;
@@ -915,7 +987,6 @@ pulserEnabled = _pulserEnabled;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCAThresholdChanged object:self];
     }
 }
-
 - (float) convertThreshold:(float)aThreshold OfType:(int) type fromUnits:(int)in_units toUnits:(int) out_units{
     
     if(type<0 || type > MTC_NUM_USED_THRESHOLDS)
@@ -931,7 +1002,10 @@ pulserEnabled = _pulserEnabled;
     float mv_per_nhit = DAC_per_nhit/DAC_per_mv;
 
     if(in_units == MTC_RAW_UNITS) {
-        float value_in_mv = (aThreshold - 4095)/DAC_per_mv - 5000; //TODO less magic
+        // Note the following conversion is in relative units for absolute units subtract 5000mV
+        // and replace the [self getbaseline] with just 4096
+        float value_in_mv = ((aThreshold - [self getBaselineOfType:type])/DAC_per_mv); //TODO less magic
+        
         if(out_units == MTC_mV_UNITS)
         {
             return value_in_mv;
@@ -943,12 +1017,14 @@ pulserEnabled = _pulserEnabled;
     }
     else if (in_units == MTC_mV_UNITS) {
         if(out_units == MTC_RAW_UNITS) {
-            return (((aThreshold+5000) * DAC_per_mv)+4095);
+            return (((aThreshold) * DAC_per_mv)+[self getBaselineOfType:type]);
         }
         else if(out_units == MTC_NHIT_UNITS) {
             int baseline = [self getBaselineOfType:type];
             float baseline_in_mV = [self convertThreshold:baseline OfType:type fromUnits:MTC_RAW_UNITS toUnits:MTC_mV_UNITS];
             
+            //Note the following conversion is in relative units for absolute units add 5000mV
+            // and replace the [self getbaseline] with just 4096
             return (aThreshold - baseline_in_mV)/mv_per_nhit;
         }
     }
@@ -969,8 +1045,6 @@ pulserEnabled = _pulserEnabled;
 }
 
 //The following ~150 lines is verbose mess. I blame that on objective C and I take no responsibility --Eric M.
-
-
 
 - (uint16_t) N100H_Threshold {
     return [self getThresholdOfType:MTC_N100_HI_THRESHOLD_INDEX inUnits:MTC_RAW_UNITS];
@@ -1182,7 +1256,7 @@ pulserEnabled = _pulserEnabled;
 - (NSMutableDictionary*) serializeToDictionary {
     NSMutableDictionary *serial = [NSMutableDictionary dictionaryWithCapacity:30];
     [serial autorelease];
-    NSLog(@"SerializeToJSON Needs implementation\n");
+    NSLog(@"SerializeToDictionary Needs implementation\n");
     [serial setObject:[NSNumber numberWithInt:(int) [self N100H_Threshold]] forKey:[self StringForThreshold:MTC_N100_HI_THRESHOLD_INDEX]];
     [serial setObject:[NSNumber numberWithInt:(int) [self N100M_Threshold]] forKey:[self StringForThreshold:MTC_N100_MED_THRESHOLD_INDEX]];
     [serial setObject:[NSNumber numberWithInt:(int) [self N100L_Threshold]] forKey:[self StringForThreshold:MTC_N100_LO_THRESHOLD_INDEX]];
@@ -1197,95 +1271,6 @@ pulserEnabled = _pulserEnabled;
     return serial;
 }
 
-- (int) trigger_scan_name_to_index:(NSString*) name {
-    int ret = -1;
-    if([name isEqual:@"N100LO"]){ ret = MTC_N100_LO_THRESHOLD_INDEX; }
-    else if([name isEqual:@"N100MED"]){ ret = MTC_N100_MED_THRESHOLD_INDEX; }
-    else if([name isEqual:@"N100HI"]){ ret = MTC_N100_HI_THRESHOLD_INDEX; }
-    else if([name isEqual:@"N20"]){ ret = MTC_N20_THRESHOLD_INDEX; }
-    else if([name isEqual:@"N20LB"]){ ret = MTC_N20LB_THRESHOLD_INDEX; }
-    else if([name isEqual:@"OWLN"]){ ret = MTC_OWLN_THRESHOLD_INDEX; }
-    else {/*raise exception?*/}
-    return ret;
-}
-- (int) index_to_trigger_scan_name:(int) index {
-    NSString *ret = @"";
-    switch (index) {
-        case MTC_N100_HI_THRESHOLD_INDEX:
-            ret = @"N100HI";
-            break;
-        case MTC_N100_MED_THRESHOLD_INDEX:
-            ret = @"N100MED";
-            break;
-        case MTC_N100_LO_THRESHOLD_INDEX:
-            ret = @"N100LO";
-            break;
-        case MTC_N20_THRESHOLD_INDEX:
-            ret = @"N20";
-            break;
-        case MTC_N20LB_THRESHOLD_INDEX:
-            ret = @"N20LB";
-            break;
-        case MTC_OWLN_THRESHOLD_INDEX:
-            ret = @"OWLN";
-            break;
-        default:
-            //Raise exception?
-            break;
-    }
-    return ret;
-}
-- (void) waitForTriggerScan: (ORPQResult *) result
-{
-    int numRows, numCols;
-    
-    if (!result) {
-        //Handle this
-        
-    }
-    
-    numRows = [result numOfRows];
-    numCols = [result numOfFields];
-    
-    if (numRows != 1) {
-        //Handle error
-    }
-    
-    if (numCols != 3) {
-        // Handle error
-    }
-    NSDictionary* result_dict = [result fetchRowAsDictionary];
-    if(!result_dict)
-    {
-        //No row exists
-        //Handle error
-        
-    }
-    NSLog(@"%@\n",result_dict);
-    NSString* name = [result_dict objectForKey:@"name"];
-    NSString* baseline = [[result_dict objectForKey:@"baseline"] stringValue];
-
-    NSString* dac_per_nhit =[[result_dict objectForKey:@"adc_per_nhit"] stringValue];
-    [self setBaselineOfType:[self trigger_scan_name_to_index:name] toValue:[baseline intValue]];
-    [self setDAC_per_NHIT_OfType:[self trigger_scan_name_to_index:name] toValue:[dac_per_nhit floatValue]];
-    [self setDAC_per_mV_OfType:[self trigger_scan_name_to_index:name] toValue:-4096/10000.0];
-
-
-    return;
-}
-- (void) load_settings_from_trigger_scan_for_type:(int) type {
-
-    ORPQModel* pgsql_connec = [ORPQModel getCurrent];
-    if(!pgsql_connec)
-    {
-        NSLog(@"Shitsbad\n");
-        return;
-        //Raise exception
-    }
-    NSString* trig_scan_name = [self index_to_trigger_scan_name:type];
-    NSString* db_cmd = [NSString stringWithFormat:@"select name,baseline,adc_per_nhit from trigger_scan where name='%@' and timestamp=(SELECT max(timestamp) from trigger_scan where name='%@')",trig_scan_name,trig_scan_name];
-    [pgsql_connec dbQuery:db_cmd object:self selector:@selector(waitForTriggerScan:) timeout:2.0];
-}
 
 
 #pragma mark •••HW Access
@@ -2117,20 +2102,10 @@ pulserEnabled = _pulserEnabled;
     /* Load the MTCA thresholds to hardware. */
     int i;
     uint16_t dacs[14];
-    
-    // Get all the DAC values...a bit verbose perhaps but whatever.
-    dacs[0] = [self getThresholdOfType:MTC_N100_LO_THRESHOLD_INDEX inUnits:MTC_RAW_UNITS];
-    dacs[1] = [self getThresholdOfType:MTC_N100_MED_THRESHOLD_INDEX inUnits:MTC_RAW_UNITS];
-    dacs[2] = [self getThresholdOfType:MTC_N100_HI_THRESHOLD_INDEX inUnits:MTC_RAW_UNITS];
-    dacs[3] = [self getThresholdOfType:MTC_N20_THRESHOLD_INDEX inUnits: MTC_RAW_UNITS];
-    dacs[4] = [self getThresholdOfType:MTC_N20LB_THRESHOLD_INDEX inUnits: MTC_RAW_UNITS];
-    dacs[5] = [self getThresholdOfType:MTC_ESUM_LO_MASK inUnits: MTC_RAW_UNITS];
-    dacs[6] = [self getThresholdOfType:MTC_ESUM_HI_MASK inUnits: MTC_RAW_UNITS];
-    dacs[7] = [self getThresholdOfType:MTC_OWLN_THRESHOLD_INDEX inUnits: MTC_RAW_UNITS];
-    dacs[8] = [self getThresholdOfType:MTC_OWLELO_THRESHOLD_INDEX inUnits: MTC_RAW_UNITS];
-    dacs[9] = [self getThresholdOfType:MTC_OWLEHI_THRESHOLD_INDEX inUnits: MTC_RAW_UNITS];
-    
-
+    for(i=FIRST_MTC_THRESHOLD_INDEX;i<=LAST_MTC_THRESHOLD_INDEX;i++)
+    {
+        dacs[[self model_index_to_server_index:i]] = [self getThresholdOfType:i inUnits:MTC_RAW_UNITS];
+    }
     /* Last four DAC values are spares? */
     for (i = 10; i < 14; i++) {
         dacs[i] = 0;
@@ -2142,7 +2117,6 @@ pulserEnabled = _pulserEnabled;
         NSLogColor([NSColor redColor],@"failed to load the MTCA dacs: %@\n", [e reason]);
         [e raise];
     }
-
     NSLog(@"Successfully loaded MTCA+ thresholds\n");
 }
 

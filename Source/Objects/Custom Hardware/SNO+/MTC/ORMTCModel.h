@@ -24,12 +24,14 @@
 
 #import "ORVmeIOCard.h"
 #import "RedisClient.h"
+#import "ORPQResult.h"
 #include <stdint.h>
 
 @class ORMTC_DB;
 @class ORReadOutList;
 
 #define MTCLockOutWidth @"MTCLockOutWidth"
+#define FIRST_MTC_THRESHOLD_INDEX 0
 #define MTC_N100_LO_THRESHOLD_INDEX  0
 #define MTC_N100_MED_THRESHOLD_INDEX 1
 #define MTC_N100_HI_THRESHOLD_INDEX  2
@@ -40,6 +42,7 @@
 #define MTC_OWLN_THRESHOLD_INDEX     7
 #define MTC_OWLELO_THRESHOLD_INDEX   8
 #define MTC_OWLEHI_THRESHOLD_INDEX   9
+#define LAST_MTC_THRESHOLD_INDEX 9
 #define MTC_NUM_THRESHOLDS 14  // The number of thresholds that exist
 #define MTC_NUM_USED_THRESHOLDS 10 // The number of thresholds that are actually used
 
@@ -226,19 +229,14 @@
 - (float) DAC_per_mV_ofType:(int) type;
 - (void) setDAC_per_mV_OfType:(int) type toValue:(float) _val;
 
-- (float) convertThreshold:(float)aThreshold OfType:(int) type fromUnits:(int)in_units toUnits:(int) out_units;
 - (void) loadFromSearialization:(NSMutableDictionary*) serial;
 - (NSMutableDictionary*) serializeToDictionary;
-- (void) load_settings_from_trigger_scan_for_type:(int) type;
-/*#pragma mark •••Converters
-- (unsigned long) mVoltsToRaw:(float) mVolts;
-- (float) rawTomVolts:(long) aRawValue;
-- (float) mVoltsToNHits:(float) mVolts dcOffset:(float)dcOffset mVperNHit:(float)mVperNHit;
-- (float) NHitsTomVolts:(float) NHits dcOffset:(float)dcOffset mVperNHit:(float)mVperNHit;
-- (long) NHitsToRaw:(float) NHits dcOffset:(float)dcOffset mVperNHit:(float)mVperNHit;
-- (float) mVoltsTopC:(float) mVolts dcOffset:(float)dcOffset mVperpC:(float)mVperp;
-- (float) pCTomVolts:(float) pC dcOffset:(float)dcOffset mVperpC:(float)mVperp;
-- (long) pCToRaw:(float) pC dcOffset:(float)dcOffset mVperpC:(float)mVperp;*/
+
+
+#pragma mark •••Converters
+- (float) convertThreshold:(float)aThreshold OfType:(int) type fromUnits:(int)in_units toUnits:(int) out_units;
+- (int) server_index_to_model_index:(int) server_index;
+- (int) model_index_to_server_index:(int) model_index;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;

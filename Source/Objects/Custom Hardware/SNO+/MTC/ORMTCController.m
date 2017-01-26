@@ -27,6 +27,8 @@
 #import "ORTimeRate.h"
 #import "ORMTC_Constants.h"
 #import "ORSelectorSequence.h"
+#import "ORPQModel.h"
+
 
 #define VIEW_RAW_UNITS_TAG 0
 #define VIEW_mV_UNITS_TAG 1
@@ -41,12 +43,13 @@
 #define VIEW_OWLN_TAG 6
 #define LAST_NHIT_TAG 6
 
-#define FIRST ESUM_TAG 7
+#define FIRST_ESUM_TAG 7
 #define VIEW_ESUMH_TAG 7
 #define VIEW_ESUML_TAG 8
 #define VIEW_OWLEH_TAG 9
 #define VIEW_OWLEL_TAG 10
 #define LAST_ESUM_TAG 10
+
 
 #pragma mark •••PrivateInterface
 @interface ORMTCController (private)
@@ -99,6 +102,8 @@
     [tabView selectTabViewItemAtIndex: index];
     [self populatePullDown];
     [self updateWindow];
+    [self grab_current_thresholds];
+    [self trigger_scan_update_nhit];
 
 }
 
@@ -311,14 +316,8 @@
 }
 - (void) placeholder:(NSNotification *)aNote {
     NSLog(@"Placeholder\n");
-    for(int i=FIRST_NHIT_TAG;i<LAST_NHIT_TAG;i++)
-    {
-        int units = [self convert_view_unit_index_to_model_index:[[nHitViewTypeMatrix selectedCell] tag]];
-        float thresh = [model getThresholdOfType:[self convert_view_thresold_index_to_model_index:i] inUnits:units ];
-        NSLog(@"%f\n",thresh);
-        [[nhitMatrix cellWithTag:i] setFloatValue:thresh];
-    }
-    [nhitMatrix setNeedsDisplay:YES];
+    int units = [self convert_view_unit_index_to_model_index:[[nHitViewTypeMatrix selectedCell] tag]];
+    [self changeNhitThresholdsDisplay:units];
 }
 
 - (void) displayMasks
@@ -778,33 +777,36 @@
 - (IBAction) standardPulserFeeds:(id)sender
 {
     [model setIsPedestalEnabledInCSR:[[sender selectedCell] tag]];
+    [self endEditing];
 }
 
 //Settings buttons.
 - (IBAction) eSumViewTypeAction:(id)sender
 {
-	//[self endEditing];
-    [self changeNhitThresholdsDisplay:[self convert_view_unit_index_to_model_index:[[sender selectedCell] tag]]];
+    [self changeESUMThresholdDisplay:[self convert_view_unit_index_to_model_index:[[sender selectedCell] tag]]];
 }
 
 - (IBAction) nHitViewTypeAction:(id)sender
 {
-	//[self endEditing];
-    NSLog(@"THE TAG = %i\n",[[sender selectedCell] tag]);
     [self changeNhitThresholdsDisplay: [self convert_view_unit_index_to_model_index:[[sender selectedCell] tag]]];
+
 }
 
 - (void) changeNhitThresholdsDisplay: (int) type
 {
-    for(int i=FIRST_NHIT_TAG;i<LAST_NHIT_TAG;i++)
+    for(int i=FIRST_NHIT_TAG;i<=LAST_NHIT_TAG;i++)
     {
-        [[nhitMatrix cellWithTag:i] setFloatValue:
-         [model getThresholdOfType:[self convert_view_thresold_index_to_model_index:i] inUnits:type]];
+        float value = [model getThresholdOfType:[self convert_view_thresold_index_to_model_index:i] inUnits:type];
+        /*if(type == MTC_mV_UNITS)
+        {
+            value -= [model convertThreshold:[model getBaselineOfType:i] OfType:i fromUnits:MTC_RAW_UNITS toUnits:MTC_mV_UNITS];
+        }*/
+        [[nhitMatrix cellWithTag:i] setFloatValue: value];
     }
 }
 - (void) changeESUMThresholdDisplay: (int) type
 {
-    for(int i=0;i<7;i++)
+    for(int i=FIRST_ESUM_TAG;i<=LAST_ESUM_TAG;i++)
     {
         [[nhitMatrix cellWithTag:i] setFloatValue:
          [model getThresholdOfType:[self convert_view_thresold_index_to_model_index:i]
@@ -928,11 +930,16 @@
 
 - (IBAction) settingsNHitAction:(id) sender 
 {
-    NSLog(@"SettingsNHItAction needs implementation\n");
     int threshold_index = [self convert_view_thresold_index_to_model_index:[[sender selectedCell] tag]];
     int unit_index = [self convert_view_unit_index_to_model_index:[[nHitViewTypeMatrix selectedCell] tag]];
     NSLog(@"Setting threshold %i to %f from units %i\n",threshold_index,[[sender selectedCell] floatValue],unit_index);
-    [model setThresholdOfType:threshold_index fromUnits:unit_index toValue:[[sender selectedCell] floatValue]];
+    float threshold = [[sender selectedCell] floatValue];
+    /*if(unit_index == MTC_mV_UNITS)
+    {
+        threshold += [model convertThreshold:[model getBaselineOfType:threshold_index] OfType:threshold_index fromUnits:MTC_RAW_UNITS toUnits:MTC_mV_UNITS];
+    }*/
+    
+    [model setThresholdOfType:threshold_index fromUnits:unit_index toValue:threshold];
 }
 
 
@@ -941,8 +948,176 @@
     NSLog(@"SettingsESUMAction needs implementation\n");
 
 }
+- (IBAction)TestShit:(id)sender{
+    NSLog(@"fdjklasfjds\n");
+    [self trigger_scan_update_nhit];
 
-- (IBAction) settingsGTMaskAction:(id) sender 
+}
+- (IBAction)TestShit2:(id)sender{
+    for(int i = FIRST_NHIT_TAG;i<LAST_NHIT_TAG+1;i++)
+    {
+        NSLog(@"%i %i %f %f\n",i,[model getBaselineOfType:i],[model DAC_per_NHIT_ofType:i],[model DAC_per_mV_ofType:i]);
+    }
+}
+- (IBAction) EditingWindow:(id)sender
+{
+    NSWindowController *newWindow = [[NSWindowController alloc] init];
+    [newWindow showWindow:self];
+}
+- (void) trigger_scan_update_nhit {
+    for(int i = FIRST_NHIT_TAG;i<LAST_NHIT_TAG+1;i++)
+    {
+        [self load_settings_from_trigger_scan_for_type:[self convert_view_thresold_index_to_model_index:i]];
+    }
+}
+
+
+- (IBAction)grab_current_thresholds:(id)sender {
+    [self grab_current_thresholds];
+}
+
+- (void) waitForTriggerScan: (ORPQResult *) result
+{
+    int numRows, numCols;
+    
+    if (!result) {
+        //Handle this
+        
+    }
+    
+    numRows = [result numOfRows];
+    numCols = [result numOfFields];
+    if (numRows != 1) {
+        //Handle error
+    }
+    
+    if (numCols != 3) {
+        // Handle error
+    }
+    NSDictionary* result_dict = [result fetchRowAsDictionary];
+    if(!result_dict)
+    {
+        //No row exists
+        //Handle error
+        
+    }
+    NSLog(@"%@\n",result_dict);
+    NSString* name = [result_dict objectForKey:@"name"];
+    NSString* baseline = [[result_dict objectForKey:@"baseline"] stringValue];
+    
+    NSString* dac_per_nhit =[[result_dict objectForKey:@"adc_per_nhit"] stringValue];
+    [model setBaselineOfType:[self trigger_scan_name_to_index:name] toValue:[baseline intValue]];
+    [model setDAC_per_NHIT_OfType:[self trigger_scan_name_to_index:name] toValue:[dac_per_nhit floatValue]];
+    [model setDAC_per_mV_OfType:[self trigger_scan_name_to_index:name] toValue:-4096/10000.0];
+    
+    
+    return;
+}
+- (int) trigger_scan_name_to_index:(NSString*) name {
+    int ret = -1;
+    if([name isEqual:@"N100LO"]){ ret = MTC_N100_LO_THRESHOLD_INDEX; }
+    else if([name isEqual:@"N100MED"]){ ret = MTC_N100_MED_THRESHOLD_INDEX; }
+    else if([name isEqual:@"N100HI"]){ ret = MTC_N100_HI_THRESHOLD_INDEX; }
+    else if([name isEqual:@"N20"]){ ret = MTC_N20_THRESHOLD_INDEX; }
+    else if([name isEqual:@"N20LB"]){ ret = MTC_N20LB_THRESHOLD_INDEX; }
+    else if([name isEqual:@"OWLN"]){ ret = MTC_OWLN_THRESHOLD_INDEX; }
+    else {/*raise exception?*/}
+    return ret;
+}
+- (int) index_to_trigger_scan_name:(int) index {
+    NSString *ret = @"";
+    switch (index) {
+        case MTC_N100_HI_THRESHOLD_INDEX:
+            ret = @"N100HI";
+            break;
+        case MTC_N100_MED_THRESHOLD_INDEX:
+            ret = @"N100MED";
+            break;
+        case MTC_N100_LO_THRESHOLD_INDEX:
+            ret = @"N100LO";
+            break;
+        case MTC_N20_THRESHOLD_INDEX:
+            ret = @"N20";
+            break;
+        case MTC_N20LB_THRESHOLD_INDEX:
+            ret = @"N20LB";
+            break;
+        case MTC_OWLN_THRESHOLD_INDEX:
+            ret = @"OWLN";
+            break;
+        default:
+            //Raise exception?
+            break;
+    }
+    return ret;
+}
+- (void) waitForThresholds: (ORPQResult *) result
+{
+    int numRows, numCols;
+    
+    if (!result) {
+        //Handle this
+        
+    }
+    
+    numRows = [result numOfRows];
+    numCols = [result numOfFields];
+    if (numRows != 1) {
+        //Handle error
+    }
+    
+    if (numCols != 1) {
+        // Handle error
+    }
+    NSArray* result_arr = [[result fetchRowAsDictionary] objectForKey:@"mtca_dacs"];
+    if(!result_arr)
+    {
+        //No row exists
+        //Handle error
+    }
+
+    
+    // Note this could be done with a for loop, but I think this is more readable.
+    [model setThresholdOfType:MTC_N100_LO_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_N100L_INDEX] floatValue]];
+    [model setThresholdOfType:MTC_N100_MED_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_N100M_INDEX] floatValue]];
+    [model setThresholdOfType:MTC_N100_HI_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_N100H_INDEX] floatValue]];
+    [model setThresholdOfType:MTC_N20_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_N20_INDEX] floatValue]];
+    [model setThresholdOfType:MTC_N20LB_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_N20LB_INDEX] floatValue]];
+    [model setThresholdOfType:MTC_ESUML_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_ESUML_INDEX] floatValue]];
+    [model setThresholdOfType:MTC_ESUMH_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_ESUMH_INDEX] floatValue]];
+    [model setThresholdOfType:MTC_OWLN_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_OWLN_INDEX] floatValue]];
+    [model setThresholdOfType:MTC_OWLELO_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_OWLEL_INDEX] floatValue]];
+    [model setThresholdOfType:MTC_OWLEHI_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_OWLEH_INDEX] floatValue]];
+    
+    NSLog(@"%@\n",result_arr);
+}
+- (void) load_settings_from_trigger_scan_for_type:(int) type {
+    //Note perhaps this should be moved out of the model??
+    ORPQModel* pgsql_connec = [ORPQModel getCurrent];
+    if(!pgsql_connec)
+    {
+        NSLog(@"Shitsbad\n");
+        return;
+        //Raise exception
+    }
+    NSString* trig_scan_name = [self index_to_trigger_scan_name:type];
+    NSString* db_cmd = [NSString stringWithFormat:@"select name,baseline,adc_per_nhit from trigger_scan where name='%@' and timestamp=(SELECT max(timestamp) from trigger_scan where name='%@')",trig_scan_name,trig_scan_name];
+    [pgsql_connec dbQuery:db_cmd object:self selector:@selector(waitForTriggerScan:) timeout:2.0];
+}
+
+- (void) grab_current_thresholds {
+    ORPQModel* pgsql_connec = [ORPQModel getCurrent];
+    if(!pgsql_connec)
+    {
+        NSLog(@"Shitsbad\n");
+        return;
+        //Raise exception
+    }
+    NSString* db_cmd = [NSString stringWithFormat:@"select mtca_dacs from mtc where key=0"];
+    [pgsql_connec dbQuery:db_cmd object:self selector:@selector(waitForThresholds:) timeout:2.0];
+}
+
+- (IBAction) settingsGTMaskAction:(id) sender
 {
 	unsigned long mask = 0;
 	int i;
