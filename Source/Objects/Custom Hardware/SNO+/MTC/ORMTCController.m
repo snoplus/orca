@@ -1310,9 +1310,9 @@
 
     BOOL cmdKeyDown = ([[NSApp currentEvent] modifierFlags] & NSCommandKeyMask) != 0;
     if(cmdKeyDown){
-        for(int i=0; i<[checkBoxes numberOfRows]; i++)
+        for (int i=0; i<[checkBoxes numberOfRows]; i++)
         {
-            [[checkBoxes cellWithTag:i] setState: state];
+            [[checkBoxes cellAtRow:i column:0] setState: state];
         }
     }
     return;
