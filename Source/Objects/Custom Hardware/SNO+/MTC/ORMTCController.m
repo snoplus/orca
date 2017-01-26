@@ -307,7 +307,6 @@
 {
     int rate = [model pgt_rate];
     [extraPulserPeriodField setIntValue:rate];
-    [pulserPeriodField setIntValue:rate];
 }
 - (void) mtcGTMaskChanged:(NSNotification *) aNote {
     int maskValue = [model gtMask];
@@ -453,7 +452,6 @@
     [lockOutWidthField              setEnabled: !lockedOrNotRunningMaintenance];
     [pedestalWidthField             setEnabled: !lockedOrNotRunningMaintenance];
     [nhit100LoPrescaleField         setEnabled: !lockedOrNotRunningMaintenance];
-    [pulserPeriodField              setEnabled: !lockedOrNotRunningMaintenance];
     [extraPulserPeriodField         setEnabled: !lockedOrNotRunningMaintenance];
     [pedDelayField                 setEnabled: !lockedOrNotRunningMaintenance];
 

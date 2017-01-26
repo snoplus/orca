@@ -51,7 +51,6 @@
                 <outlet property="pedCrateMaskMatrix" destination="Mno-Cd-fe2" id="SQY-sJ-fah"/>
                 <outlet property="pedDelayField" destination="1834" id="p1B-ug-xAI"/>
                 <outlet property="pedestalWidthField" destination="1803" id="2507"/>
-                <outlet property="pulserPeriodField" destination="1806" id="2509"/>
                 <outlet property="readButton" destination="1253" id="YOa-8v-Q9c"/>
                 <outlet property="regBaseAddressText" destination="1282" id="1290"/>
                 <outlet property="repeatCountField" destination="1237" id="2825"/>
@@ -1159,17 +1158,19 @@
                                                             <outlet property="formatter" destination="fcg-We-po1" id="u8L-Lo-2kS"/>
                                                         </connections>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" id="1813">
-                                                        <rect key="frame" x="308" y="85" width="91" height="15"/>
-                                                        <autoresizingMask key="autoresizingMask"/>
-                                                        <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="right" title="Pulser rate [Hz]" id="3982">
+                                                    <button verticalHuggingPriority="750" id="4158">
+                                                        <rect key="frame" x="173" y="8" width="160" height="28"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Load Settings" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4159">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="setAdvancedOptions:" target="-2" id="gi8-lv-NLp"/>
+                                                        </connections>
+                                                    </button>
                                                     <textField verticalHuggingPriority="750" tag="8" id="1834">
-                                                        <rect key="frame" x="133" y="54" width="44" height="19"/>
+                                                        <rect key="frame" x="404" y="83" width="44" height="19"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" tag="8" drawsBackground="YES" id="3992">
                                                             <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="##0.###" negativeFormat="#0.###" numberStyle="decimal" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="309" maximumFractionDigits="3" decimalSeparator="." groupingSeparator="" currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="2876">
@@ -1191,7 +1192,7 @@
                                                         </connections>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="1835">
-                                                        <rect key="frame" x="21" y="56" width="106" height="15"/>
+                                                        <rect key="frame" x="292" y="85" width="106" height="15"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="right" title="PED Delay (ns)" id="3993">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1199,39 +1200,6 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" tag="3" id="1806">
-                                                        <rect key="frame" x="404" y="83" width="44" height="19"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="3979">
-                                                            <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="##0.###" negativeFormat="#0.###" numberStyle="decimal" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="309" maximumFractionDigits="3" decimalSeparator="." groupingSeparator="" currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="2871">
-                                                                <nil key="negativeInfinitySymbol"/>
-                                                                <nil key="positiveInfinitySymbol"/>
-                                                            </numberFormatter>
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                        <connections>
-                                                            <binding destination="4516" name="value" keyPath="selection.pgt_rate" id="d1o-oc-pgS">
-                                                                <dictionary key="options">
-                                                                    <bool key="NSContinuouslyUpdatesValue" value="YES"/>
-                                                                    <bool key="NSRaisesForNotApplicableKeys" value="NO"/>
-                                                                </dictionary>
-                                                            </binding>
-                                                            <outlet property="formatter" destination="fcg-We-po1" id="T5i-en-oT2"/>
-                                                        </connections>
-                                                    </textField>
-                                                    <button verticalHuggingPriority="750" id="4158">
-                                                        <rect key="frame" x="173" y="8" width="160" height="28"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="push" title="Load Settings" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4159">
-                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="setAdvancedOptions:" target="-2" id="gi8-lv-NLp"/>
-                                                        </connections>
-                                                    </button>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
