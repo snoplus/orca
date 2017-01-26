@@ -1527,7 +1527,7 @@ snopGreenColor;
     //NHIT20LO
     if(activeCell == 4) {
         threshold_value = [[sender cellAtRow:4 column:0] floatValue];
-        threshold_index = MTC_NHIT_20_LB_MASK;
+        threshold_index = MTC_N20LB_THRESHOLD_INDEX;
         units =  MTC_NHIT_UNITS;
     }
     //OWLN
