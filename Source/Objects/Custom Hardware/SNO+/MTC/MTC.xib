@@ -1816,7 +1816,7 @@
                                                                                     <action selector="gtCratesCheckBoxClicked:" target="-2" id="xy4-Xb-T7o"/>
                                                                                 </connections>
                                                                             </buttonCell>
-                                                                            <buttonCell type="check" title="spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="19" inset="2" id="9Od-cd-eJD">
+                                                                            <buttonCell type="check" title="TUB bot" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="19" inset="2" id="9Od-cd-eJD">
                                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                                 <font key="font" metaFont="smallSystem"/>
                                                                                 <connections>
@@ -1830,7 +1830,7 @@
                                                                                     <action selector="gtCratesCheckBoxClicked:" target="-2" id="zuA-5d-onn"/>
                                                                                 </connections>
                                                                             </buttonCell>
-                                                                            <buttonCell type="check" title="TUB bot" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="21" inset="2" id="LIO-WH-1JZ">
+                                                                            <buttonCell type="check" title="spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="21" inset="2" id="LIO-WH-1JZ">
                                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                                 <font key="font" metaFont="smallSystem"/>
                                                                                 <connections>
@@ -1844,7 +1844,7 @@
                                                                                     <action selector="gtCratesCheckBoxClicked:" target="-2" id="bFg-kk-Dut"/>
                                                                                 </connections>
                                                                             </buttonCell>
-                                                                            <buttonCell type="check" title="spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="23" inset="2" id="8EO-wn-Yxk">
+                                                                            <buttonCell type="check" title="TUBii" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="23" inset="2" id="8EO-wn-Yxk">
                                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                                 <font key="font" metaFont="smallSystem"/>
                                                                                 <connections>
@@ -2028,7 +2028,7 @@
                                                                                     <action selector="pedCrateCheckBoxClicked:" target="-2" id="pJv-di-Lku"/>
                                                                                 </connections>
                                                                             </buttonCell>
-                                                                            <buttonCell type="check" title="spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="19" inset="2" id="4TW-Uz-eSW">
+                                                                            <buttonCell type="check" title="TUB bot" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="19" inset="2" id="4TW-Uz-eSW">
                                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                                 <font key="font" metaFont="smallSystem"/>
                                                                                 <connections>
@@ -2042,7 +2042,7 @@
                                                                                     <action selector="pedCrateCheckBoxClicked:" target="-2" id="s4C-z3-Ip1"/>
                                                                                 </connections>
                                                                             </buttonCell>
-                                                                            <buttonCell type="check" title="TUB bot" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="21" inset="2" id="OIU-e7-Jda">
+                                                                            <buttonCell type="check" title="spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="21" inset="2" id="OIU-e7-Jda">
                                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                                 <font key="font" metaFont="smallSystem"/>
                                                                                 <connections>
@@ -2056,7 +2056,7 @@
                                                                                     <action selector="pedCrateCheckBoxClicked:" target="-2" id="oDP-Bh-tUW"/>
                                                                                 </connections>
                                                                             </buttonCell>
-                                                                            <buttonCell type="check" title="spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="23" inset="2" id="YZh-9P-4GR">
+                                                                            <buttonCell type="check" title="TUBii" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="23" inset="2" id="YZh-9P-4GR">
                                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                                 <font key="font" metaFont="smallSystem"/>
                                                                                 <connections>
