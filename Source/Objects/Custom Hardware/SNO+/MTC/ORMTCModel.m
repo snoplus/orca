@@ -1296,7 +1296,8 @@ tubRegister;
 - (void) clearGTCrateMask
 {
 	@try {
-		[self write:kMtcGmskReg value:0];
+        [self setGTCrateMask:0];
+        [self loadGTCrateMaskToHardware];
 		NSLog(@"Cleared GT Crate Mask\n");
 	}
 	@catch(NSException* localException) {
