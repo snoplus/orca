@@ -87,7 +87,8 @@
 
 	IBOutlet NSMatrix*		nhitMatrix;
 	IBOutlet NSMatrix*		esumMatrix;
-	IBOutlet NSTextField*	commentsField;
+    IBOutlet NSTextField*   commentsField;
+    IBOutlet NSBox*         advancedOptionsBox;
 
 	//trigger
 	IBOutlet NSMatrix*		globalTriggerMaskMatrix;
@@ -115,7 +116,8 @@
     NSView* blankView;
     NSSize  basicOpsSize;
     NSSize  standardOpsSize;
-    NSSize  settingsSize;
+    NSSize  settingsSizeSmall;
+    NSSize  settingsSizeLarge;
     NSSize  triggerSize;
 
 }
@@ -212,6 +214,7 @@
 - (IBAction) settingsGTMaskAction:(id) sender;
 - (IBAction) settingsGTCrateMaskAction:(id) sender;
 - (IBAction) settingsPEDCrateMaskAction:(id) sender;
+- (IBAction) advancedOptionsTriangeChanged:(id)sender;
 
 //Triggers
 - (IBAction) triggerMTCAN100:(id) sender;

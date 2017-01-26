@@ -83,16 +83,18 @@
 
 - (void) awakeFromNib
 {
-    basicOpsSize    = NSMakeSize(400,350);
-    standardOpsSize	= NSMakeSize(560,530);
-    settingsSize	= NSMakeSize(810,600);
-    triggerSize		= NSMakeSize(800,640);
+    basicOpsSize        = NSMakeSize(400,350);
+    standardOpsSize     = NSMakeSize(560,530);
+    settingsSizeSmall	= NSMakeSize(600,440);
+    settingsSizeLarge	= NSMakeSize(600,650);
+    triggerSize         = NSMakeSize(800,640);
     blankView = [[NSView alloc] init];
     [tabView setFocusRingType:NSFocusRingTypeNone];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
 
 	[initProgressField setHidden:YES];
-	
+    [advancedOptionsBox setHidden:YES];
+
     [super awakeFromNib];
 	
     NSString* key = [NSString stringWithFormat: @"orca.ORMTC%d.selectedtab",[model slot]];
@@ -506,8 +508,15 @@
 		[[self window] setContentView:mtcView];
     }
     else if([tabView indexOfTabViewItem:item] == 2){
+        NSSize* newSize = nil;
+        if([advancedOptionsBox isHidden]) {
+            newSize = &settingsSizeSmall;
+        }
+        else {
+            newSize = &settingsSizeLarge;
+        }
 		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:settingsSize];
+		[self resizeWindowToSize:*newSize];
 		[[self window] setContentView:mtcView];
     }
     else if([tabView indexOfTabViewItem:item] == 3){
@@ -771,7 +780,19 @@
     [self changeNhitThresholdsDisplay: [self convert_view_unit_index_to_model_index:[[sender selectedCell] tag]]];
 
 }
-
+- (IBAction)advancedOptionsTriangeChanged:(id)sender {
+    if([sender state] == NSOffState) {
+        [advancedOptionsBox setHidden:YES];
+        [self resizeWindowToSize:settingsSizeSmall];
+    }
+    else {
+        [advancedOptionsBox setHidden:NO];
+        // Don't resize if the window is already large enough
+        if (self.window.frame.size.height < settingsSizeLarge.height) {
+            [self resizeWindowToSize:settingsSizeLarge];
+        }
+    }
+}
 - (void) changeNhitThresholdsDisplay: (int) type
 {
     for(int i=FIRST_NHIT_TAG;i<=LAST_NHIT_TAG;i++)
