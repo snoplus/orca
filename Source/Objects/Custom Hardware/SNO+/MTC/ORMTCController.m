@@ -698,7 +698,12 @@
 	
 - (IBAction) standardLoadMTCADacs:(id) sender 
 {
+    @try {
 	[model loadTheMTCADacs];
+}
+    @catch(NSException *excep) {
+        NSLogColor([NSColor redColor], @"Error loading the MTCA DACs. Reason: %s\n.",[excep reason]);
+    }
 }
 
 - (IBAction) standardSetCoarseDelay:(id) sender 
@@ -815,30 +820,32 @@
 - (void) changeNhitThresholdsDisplay: (int) type
 {
     int threshold_index;
+    float value;
     for(int i=FIRST_NHIT_TAG;i<=LAST_NHIT_TAG;i++)
     {
         @try {
             threshold_index = [self convert_view_thresold_index_to_model_index:i];
+            value = [model getThresholdOfType: threshold_index inUnits:type];
         } @catch (NSException *exception) {
-            NSLogColor([NSColor redColor], @"Failed to interpret a tag, Reason: %s\n. Someone must have changed the MTC view or something. Aborting after %i changes",[exception reason],i-FIRST_NHIT_TAG);
+            NSLogColor([NSColor redColor], @"Failed to interpret field with tag %i, Reason: %s\n. Aborting after %i changes already made", i,[exception reason],i-FIRST_NHIT_TAG);
             return;
         }
-        float value = [model getThresholdOfType: threshold_index inUnits:type];
         [[nhitMatrix cellWithTag:i] setFloatValue: value];
     }
 }
 - (void) changeESUMThresholdDisplay: (int) type
 {
     int threshold_index;
+    float value;
     for(int i=FIRST_ESUM_TAG;i<=LAST_ESUM_TAG;i++)
     {
         @try {
             threshold_index = [self convert_view_thresold_index_to_model_index:i];
+            value = [model getThresholdOfType: threshold_index inUnits:type];
         } @catch (NSException *exception) {
-            NSLogColor([NSColor redColor], @"Failed to interpret a tag, Reason: %s\n. Someone must have changed the MTC view or something. Aborting after %i changes",[exception reason],i-FIRST_ESUM_TAG);
+            NSLogColor([NSColor redColor], @"Failed to interpret field with tag %i, Reason: %s\n. Aborting after %i changes already made", i,[exception reason],i-FIRST_ESUM_TAG);
             return;
         }
-        float value = [model getThresholdOfType: threshold_index inUnits:type];
         [[esumMatrix cellWithTag:i] setFloatValue: value];
     }
 }
@@ -963,12 +970,13 @@
     @try {
         threshold_index = [self convert_view_thresold_index_to_model_index:[[sender selectedCell] tag]];
         unit_index = [self convert_view_unit_index_to_model_index:[[nHitViewTypeMatrix selectedCell] tag]];
+        float threshold = [[sender selectedCell] floatValue];
+        [model setThresholdOfType:threshold_index fromUnits:unit_index toValue:threshold];
     } @catch (NSException *exception) {
-        NSLogColor([NSColor redColor], @"%s\n Aborting\n",[exception reason]);
+        NSLogColor([NSColor redColor], @"Error when setting threshold. Reason: %s\n Aborting\n",[exception reason]);
         return;
     }
-    float threshold = [[sender selectedCell] floatValue];
-    [model setThresholdOfType:threshold_index fromUnits:unit_index toValue:threshold];
+
 }
 
 
@@ -1008,36 +1016,41 @@
 - (void) waitForTriggerScan: (ORPQResult *) result
 {
     int numRows, numCols;
-    
+    int threshold_index;
+    NSString* name =nil;
+    NSString* baseline=nil;
+    NSString* dac_per_nhit=nil;
+    @try {
     if (!result) {
-        //Handle this
-        
+            [NSException raise:@"MTCControllerError" format:@"NULL result returned from database"];
     }
     
     numRows = [result numOfRows];
     numCols = [result numOfFields];
     if (numRows != 1) {
-        //Handle error
+            [NSException raise:@"MTCControllerError" format:@"Unexpected number of rows returned from database. Expected 1 got %i.",numRows];
     }
     
     if (numCols != 3) {
-        // Handle error
+            [NSException raise:@"MTCControllerError" format:@"Unexpected number of columns returned from database. Expected 3 got %i", numCols];
     }
     NSDictionary* result_dict = [result fetchRowAsDictionary];
     if(!result_dict)
     {
-        //No row exists
-        //Handle error
-        
+            [NSException raise:@"MTCControllerError" format:@"Failed to interpret database results as dictionary"];
     }
-    NSLog(@"%@\n",result_dict);
-    NSString* name = [result_dict objectForKey:@"name"];
-    NSString* baseline = [[result_dict objectForKey:@"baseline"] stringValue];
+        name = [result_dict objectForKey:@"name"];
+        baseline = [[result_dict objectForKey:@"baseline"] stringValue];
+        dac_per_nhit =[[result_dict objectForKey:@"adc_per_nhit"] stringValue];
     
-    NSString* dac_per_nhit =[[result_dict objectForKey:@"adc_per_nhit"] stringValue];
-    [model setBaselineOfType:[self trigger_scan_name_to_index:name] toValue:[baseline intValue]];
-    [model setDAC_per_NHIT_OfType:[self trigger_scan_name_to_index:name] toValue:[dac_per_nhit floatValue]];
-    [model setDAC_per_mV_OfType:[self trigger_scan_name_to_index:name] toValue:-4096/10000.0];
+        threshold_index = [self trigger_scan_name_to_index:name];
+    } @catch (NSException *exception) {
+        NSLogColor([NSColor redColor], @"Error interpreting trigger scan results from database. Reason: %@\nAborting\n",[exception reason]);
+        return;
+    }
+    [model setBaselineOfType:threshold_index toValue:[baseline intValue]];
+    [model setDAC_per_NHIT_OfType:threshold_index toValue:[dac_per_nhit floatValue]];
+    [model setDAC_per_mV_OfType:threshold_index toValue:-4096/10000.0];
     
     
     return;
@@ -1050,7 +1063,9 @@
     else if([name isEqual:@"N20"]){ ret = MTC_N20_THRESHOLD_INDEX; }
     else if([name isEqual:@"N20LB"]){ ret = MTC_N20LB_THRESHOLD_INDEX; }
     else if([name isEqual:@"OWLN"]){ ret = MTC_OWLN_THRESHOLD_INDEX; }
-    else {/*raise exception?*/}
+    else {
+        [NSException raise:@"MTCControllerError" format:@"Invalid trigger scan name ( %@ ) cannot get a valid threshold id", name];
+    }
     return ret;
 }
 - (int) index_to_trigger_scan_name:(int) index {
@@ -1075,7 +1090,7 @@
             ret = @"OWLN";
             break;
         default:
-            //Raise exception?
+            [NSException raise:@"MTCControllerError" format:@"Invalid threhsold index ( %i ) cannot get a valid trigger scan name", index];
             break;
     }
     return ret;
@@ -1083,29 +1098,27 @@
 - (void) waitForThresholds: (ORPQResult *) result
 {
     int numRows, numCols;
-    
+    @try {
     if (!result) {
-        //Handle this
-        
+            [NSException raise:@"MTCControllerError" format:@"Database returned NULL value."];
     }
     
     numRows = [result numOfRows];
     numCols = [result numOfFields];
     if (numRows != 1) {
-        //Handle error
+            [NSException raise:@"MTCControllerError" format:@"Database returned unexpected number of rows. 1 expected, %i returned.",numRows];
     }
     
     if (numCols != 1) {
-        // Handle error
-    }
-    NSArray* result_arr = [[result fetchRowAsDictionary] objectForKey:@"mtca_dacs"];
-    if(!result_arr)
-    {
-        //No row exists
-        //Handle error
+            [NSException raise:@"MTCControllerError" format:@"Database returned unexpected number of columns. 1 expected, %i returned.",numCols];
     }
 
-    
+    NSArray* result_arr = [[result fetchRowAsDictionary] objectForKey:@"mtca_dacs"];
+        if(!result_arr || [result_arr count] == 0)
+    {
+            [NSException raise:@"MTCControllerError" format:@"Error while converting DB result to array"];
+    }
+
     // Note this could be done with a for loop, but I think this is more readable.
     [model setThresholdOfType:MTC_N100_LO_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_N100L_INDEX] floatValue]];
     [model setThresholdOfType:MTC_N100_MED_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_N100M_INDEX] floatValue]];
@@ -1117,19 +1130,27 @@
     [model setThresholdOfType:MTC_OWLN_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_OWLN_INDEX] floatValue]];
     [model setThresholdOfType:MTC_OWLELO_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_OWLEL_INDEX] floatValue]];
     [model setThresholdOfType:MTC_OWLEHI_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_OWLEH_INDEX] floatValue]];
-    
-    NSLog(@"%@\n",result_arr);
+    } @catch(NSException* excep) {
+        NSLogColor([NSColor redColor], @"Error while retrieving threhsolds. Operation failed, Reason: %s\n");
+        return;
+    }
 }
 - (void) load_settings_from_trigger_scan_for_type:(int) type {
     //Note perhaps this should be moved out of the model??
     ORPQModel* pgsql_connec = [ORPQModel getCurrent];
+    NSString* trig_scan_name;
+
     if(!pgsql_connec)
     {
-        NSLog(@"Shitsbad\n");
+        NSLogColor([NSColor redColor], @"Postgres connection not available. Aborting");
         return;
-        //Raise exception
     }
-    NSString* trig_scan_name = [self index_to_trigger_scan_name:type];
+    @try {
+        trig_scan_name = [self index_to_trigger_scan_name:type];
+    } @catch (NSException *exception) {
+        NSLogColor([NSColor redColor], @"Cannot get name for requested threshold. Reason: %@\nAborting.\n",[exception reason]);
+        return;
+    }
     NSString* db_cmd = [NSString stringWithFormat:@"select name,baseline,adc_per_nhit from trigger_scan where name='%@' and timestamp=(SELECT max(timestamp) from trigger_scan where name='%@')",trig_scan_name,trig_scan_name];
     [pgsql_connec dbQuery:db_cmd object:self selector:@selector(waitForTriggerScan:) timeout:2.0];
 }
@@ -1138,9 +1159,8 @@
     ORPQModel* pgsql_connec = [ORPQModel getCurrent];
     if(!pgsql_connec)
     {
-        NSLog(@"Shitsbad\n");
+        NSLogColor([NSColor redColor], @"Postgres connection not available. Aborting");
         return;
-        //Raise exception
     }
     NSString* db_cmd = [NSString stringWithFormat:@"select mtca_dacs from mtc where key=0"];
     [pgsql_connec dbQuery:db_cmd object:self selector:@selector(waitForThresholds:) timeout:2.0];

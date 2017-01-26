@@ -708,7 +708,7 @@ tubRegister;
             break;
             
     }
-    //raise exception?
+    [NSException raise:@"MTCModelError" format:@"Cannot convert server index %i to model index",server_index];
     return -1;
 }
 - (int) model_index_to_server_index:(int) model_index {
@@ -745,7 +745,7 @@ tubRegister;
             return SERVER_OWLN_INDEX;
             break;
     }
-    //raise exception?
+    [NSException raise:@"MTCModelError" format:@"Cannot convert model index %i to server index",model_index];
     return -1;
 }
 -(NSMutableDictionary*) get_MTCDataBase
@@ -868,18 +868,18 @@ tubRegister;
 {
     if(type<0 || type > MTC_NUM_USED_THRESHOLDS)
     {
-     //Raise exception?
+        [NSException raise:@"MTCModelError" format:@"Unknown threshold index specified. Cannot continue."];
     }
     uint16_t threshold = mtca_thresholds[type];
+    // The following could let an exception bubble up
     return [self convertThreshold:threshold OfType:type fromUnits:MTC_RAW_UNITS toUnits:units];
 }
 
 - (void) setThresholdOfType:(int)type fromUnits:(int)units toValue:(float) aThreshold
 {
-    //Conversions need improvment
     if(type<0 || type > MTC_NUM_USED_THRESHOLDS)
     {
-        //Raise exception?
+        [NSException raise:@"MTCModelError" format:@"Unknown threshold index specified. Cannot continue."];
     }
     uint16_t threshold_in_dac_counts = (uint16)[self convertThreshold:aThreshold OfType:type fromUnits:units toUnits:MTC_RAW_UNITS];
     if(mtca_thresholds[type] != threshold_in_dac_counts) {
@@ -891,7 +891,7 @@ tubRegister;
     
     if(type<0 || type > MTC_NUM_USED_THRESHOLDS)
     {
-        //Raise exception?
+        [NSException raise:@"MTCModelError" format:@"Unknown threshold index specified. Cannot continue."];
     }
     if(in_units == out_units)
     {
@@ -940,12 +940,12 @@ tubRegister;
             return [self convertThreshold:value_in_mv OfType:type fromUnits:MTC_mV_UNITS toUnits:out_units];
         }
     }
-    //Raise exception?
+    [NSException raise:@"MTCModelError" format:@"Unknown threshold index specified. Cannot continue."];
     return -1.0;
 }
 
 //The following ~150 lines is verbose mess. I blame that on objective C and I take no responsibility --Eric M.
-
+// These functions all let exceptions bubble up.
 - (uint16_t) N100H_Threshold {
     return [self getThresholdOfType:MTC_N100_HI_THRESHOLD_INDEX inUnits:MTC_RAW_UNITS];
 }
@@ -1133,7 +1133,7 @@ tubRegister;
             break;
         default:
             ret =@"";
-            //Raise exception
+            [NSException raise:@"MTCModelError" format:@"Given index ( %i ) is not a valid threshold index",threshold_index];
             break;
     }
     return ret;
@@ -1141,6 +1141,7 @@ tubRegister;
 
 - (void) loadFromSearialization:(NSMutableDictionary*) serial {
     NSLog(@"loadFromSerialization Needs implementation\n");
+    //This function will let any exceptions from below bubble up
     [self setN100H_Threshold:[[self valueForKey:[self StringForThreshold:MTC_N100_HI_THRESHOLD_INDEX] fromSerialization:serial] intValue]];
     [self setN100M_Threshold:[[self valueForKey:[self StringForThreshold:MTC_N100_MED_THRESHOLD_INDEX] fromSerialization:serial] intValue]];
     [self setN100L_Threshold:[[self valueForKey:[self StringForThreshold:MTC_N100_LO_THRESHOLD_INDEX] fromSerialization:serial] intValue]];
@@ -1157,6 +1158,7 @@ tubRegister;
     NSMutableDictionary *serial = [NSMutableDictionary dictionaryWithCapacity:30];
     [serial autorelease];
     NSLog(@"SerializeToDictionary Needs implementation\n");
+    //This function will let any exceptions from below bubble up
     [serial setObject:[NSNumber numberWithInt:(int) [self N100H_Threshold]] forKey:[self StringForThreshold:MTC_N100_HI_THRESHOLD_INDEX]];
     [serial setObject:[NSNumber numberWithInt:(int) [self N100M_Threshold]] forKey:[self StringForThreshold:MTC_N100_MED_THRESHOLD_INDEX]];
     [serial setObject:[NSNumber numberWithInt:(int) [self N100L_Threshold]] forKey:[self StringForThreshold:MTC_N100_LO_THRESHOLD_INDEX]];
@@ -1725,14 +1727,6 @@ tubRegister;
 		
 		[self setupGTCorseDelay:theCoarseDelay];	
 		[self setupGTFineDelay:theAddelValue];
-		
-		// calculate the total delay and display
-		//float theTotalDelay = (theAddelValue * [parameters uLongForKey:kPed_GT_Fine_Slope])
-		//				+ (float)theCoarseDelay + [parameters uLongForKey: kPed_GT_Min_Delay_Offset];
-		
-		//		NSLog(@"MTC total delay set to %3.2f ns.\n", theTotalDelay);
-		
-		
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Could not setup the MTC PULSE_GT delays!\n");	
@@ -2002,9 +1996,15 @@ tubRegister;
     /* Load the MTCA thresholds to hardware. */
     int i;
     uint16_t dacs[14];
+    int server_index;
     for(i=FIRST_MTC_THRESHOLD_INDEX;i<=LAST_MTC_THRESHOLD_INDEX;i++)
     {
-        dacs[[self model_index_to_server_index:i]] = [self getThresholdOfType:i inUnits:MTC_RAW_UNITS];
+        @try {
+            server_index = [self model_index_to_server_index:i];
+            dacs[server_index] = [self getThresholdOfType:i inUnits:MTC_RAW_UNITS];
+        } @catch (NSException* excep) {
+            @throw; //Let it bubble up
+        }
     }
     /* Last four DAC values are spares? */
     for (i = 10; i < 14; i++) {
