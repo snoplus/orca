@@ -18,8 +18,6 @@
                 <outlet property="firePedestalsButton" destination="4058" id="4087"/>
                 <outlet property="fixedTimePedestalsCountField" destination="4073" id="4097"/>
                 <outlet property="fixedTimePedestalsDelayField" destination="4078" id="4098"/>
-                <outlet property="globalTriggerCrateMaskMatrix" destination="w6U-Ny-3gU" id="fJh-HX-mqf"/>
-                <outlet property="globalTriggerMaskMatrix" destination="hmy-qw-sLG" id="5PK-3g-Ygx"/>
                 <outlet property="includePedestalsCheckBox" destination="v0h-1C-uUl" id="C7u-kX-XAb"/>
                 <outlet property="initMtcButton" destination="1436" id="3868"/>
                 <outlet property="initNo10MHzButton" destination="1440" id="3870"/>
@@ -28,10 +26,7 @@
                 <outlet property="initProgressBar" destination="3885" id="3890"/>
                 <outlet property="initProgressField" destination="3886" id="3891"/>
                 <outlet property="isPulserFixedRateMatrix" destination="4091" id="4096"/>
-                <outlet property="loadGTCrateMaskButton" destination="qYT-6f-zEw" id="7Y0-9k-gi2"/>
                 <outlet property="loadMTCACrateMaskButton" destination="Ge6-pq-Cs8" id="ARa-Rw-DuD"/>
-                <outlet property="loadPEDCrateMaskButton" destination="qFl-aH-3Vm" id="7uD-KC-tnD"/>
-                <outlet property="loadTriggerMaskButton" destination="aQf-la-ny4" id="AWK-7P-gu7"/>
                 <outlet property="lockOutWidthField" destination="1801" id="2506"/>
                 <outlet property="memBaseAddressStepper" destination="1210" id="2822"/>
                 <outlet property="memBaseAddressText" destination="1284" id="1291"/>
@@ -47,7 +42,6 @@
                 <outlet property="mtcaOWLNMatrix" destination="hN4-fq-BVv" id="QHR-6A-SJ4"/>
                 <outlet property="nhit100LoPrescaleField" destination="1808" id="2508"/>
                 <outlet property="opAdvancedOptionsBox" destination="uOx-3t-AfW" id="q7U-9m-VWA"/>
-                <outlet property="pedCrateMaskMatrix" destination="DXv-mi-tzB" id="JSJ-H5-FNG"/>
                 <outlet property="pedestalWidthField" destination="1803" id="2507"/>
                 <outlet property="pulserPeriodField" destination="1806" id="2509"/>
                 <outlet property="readButton" destination="1253" id="YOa-8v-Q9c"/>
@@ -1308,667 +1302,6 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                         </button>
-                                        <box autoresizesSubviews="NO" title="MTC/D" borderType="line" id="Hie-mr-UOq">
-                                            <rect key="frame" x="14" y="77" width="370" height="561"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView">
-                                                <rect key="frame" x="1" y="1" width="368" height="545"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                <subviews>
-                                                    <box autoresizesSubviews="NO" toolTip="Sets which signals can cause global triggers" title="Triggers" borderType="line" id="ncs-mm-ajX">
-                                                        <rect key="frame" x="6" y="10" width="123" height="527"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <view key="contentView">
-                                                            <rect key="frame" x="1" y="1" width="121" height="511"/>
-                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                            <subviews>
-                                                                <button verticalHuggingPriority="750" id="aQf-la-ny4">
-                                                                    <rect key="frame" x="2" y="6" width="117" height="28"/>
-                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                    <buttonCell key="cell" type="push" title="Load" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="uG1-32-2yp">
-                                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                                        <font key="font" metaFont="smallSystem"/>
-                                                                    </buttonCell>
-                                                                    <connections>
-                                                                        <action selector="triggersLoadTriggerMask:" target="-2" id="i99-sZ-VYu"/>
-                                                                    </connections>
-                                                                </button>
-                                                                <matrix verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="hmy-qw-sLG">
-                                                                    <rect key="frame" x="10" y="38" width="101" height="468"/>
-                                                                    <autoresizingMask key="autoresizingMask"/>
-                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                    <size key="cellSize" width="101" height="18"/>
-                                                                    <buttonCell key="prototype" type="check" title="Check" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="ADr-mc-tUB">
-                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                        <font key="font" metaFont="smallSystem"/>
-                                                                    </buttonCell>
-                                                                    <cells>
-                                                                        <column>
-                                                                            <buttonCell type="check" title="NHit 100 Lo" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="w7f-CY-f70">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="triggerMaskCheckBoxClicked:" target="-2" id="fpS-ic-BWd"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="NHit 100 Med" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="1" inset="2" id="vm7-ui-j2n">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="triggerMaskCheckBoxClicked:" target="-2" id="DE1-T0-g2C"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="NHit 100 Hi" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="2" inset="2" id="Olr-M7-0VB">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="triggerMaskCheckBoxClicked:" target="-2" id="1a0-rD-ZRE"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="NHit 20" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="3" inset="2" id="KAh-O3-9e9">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="triggerMaskCheckBoxClicked:" target="-2" id="sgX-Qn-CNj"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="NHit 20 Lo" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="4" inset="2" id="Qg8-Ov-D0e">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="triggerMaskCheckBoxClicked:" target="-2" id="qfi-Ah-A7W"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="ESum Lo" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="5" inset="2" id="QVa-Z5-AE9">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="triggerMaskCheckBoxClicked:" target="-2" id="btO-93-eOs"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="ESum Hi" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="6" inset="2" id="Ol4-PO-GkY">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="triggerMaskCheckBoxClicked:" target="-2" id="dg4-7j-oaO"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="OWLN" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="7" inset="2" id="tFt-7q-msk">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="triggerMaskCheckBoxClicked:" target="-2" id="ZUx-uc-2tM"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="OWLE Lo" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="8" inset="2" id="YGV-l2-cQu">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="triggerMaskCheckBoxClicked:" target="-2" id="FNJ-Sc-L32"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="OWLE Hi" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="9" inset="2" id="X13-mw-h6V">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="triggerMaskCheckBoxClicked:" target="-2" id="bdx-tB-wL0"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="Pulse GT" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="10" inset="2" id="EOm-VK-0JA">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="triggerMaskCheckBoxClicked:" target="-2" id="ioQ-4H-Y7H"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="Prescale" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="11" inset="2" id="Tvf-CL-Wli">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="triggerMaskCheckBoxClicked:" target="-2" id="jwu-kd-oyx"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="Ped no delay" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="12" inset="2" id="Idg-Mp-3A3">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="triggerMaskCheckBoxClicked:" target="-2" id="cWd-E9-ruT"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="GPS Pong" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="13" inset="2" id="msg-da-6kE">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="triggerMaskCheckBoxClicked:" target="-2" id="G2D-p6-hek"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="GPS Sync" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="14" inset="2" id="FI8-7Z-Qgj">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="triggerMaskCheckBoxClicked:" target="-2" id="8dD-dm-3AM"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="Ext Async" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="15" inset="2" id="rBg-F8-UGA">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="triggerMaskCheckBoxClicked:" target="-2" id="qkq-F1-OHh"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="Hydrophone" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="16" inset="2" id="OKu-42-jMO">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="triggerMaskCheckBoxClicked:" target="-2" id="vlv-ds-84I"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="Ext 3" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="17" inset="2" id="iH5-Sk-riZ">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="triggerMaskCheckBoxClicked:" target="-2" id="3WI-H8-zsp"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="Ext 4" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="18" inset="2" id="vTU-Vf-84e">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="triggerMaskCheckBoxClicked:" target="-2" id="LPd-QB-7hc"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="Ext 5" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="19" inset="2" id="5fb-l8-Ftq">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="triggerMaskCheckBoxClicked:" target="-2" id="dcb-N6-q1b"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="Ext 6" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="20" inset="2" id="bHz-6f-Qzb">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="triggerMaskCheckBoxClicked:" target="-2" id="vWY-Ha-Kj9"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="Ext 7" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="21" inset="2" id="2Qm-Tq-6og">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="triggerMaskCheckBoxClicked:" target="-2" id="ZIv-wK-T0a"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="Ext 8 PED" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="22" inset="2" id="joF-me-LJX">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="triggerMaskCheckBoxClicked:" target="-2" id="YMA-I5-KIE"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="SP Raw" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="23" inset="2" id="Ge0-mO-CC1">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="triggerMaskCheckBoxClicked:" target="-2" id="e2D-tJ-JQn"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="NCD" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="24" inset="2" id="QoG-ja-sYP">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="triggerMaskCheckBoxClicked:" target="-2" id="Tzi-Lh-fBD"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="Soft GT" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="25" inset="2" id="buE-ec-zMy">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="triggerMaskCheckBoxClicked:" target="-2" id="vUZ-Yq-veU"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                        </column>
-                                                                    </cells>
-                                                                    <connections>
-                                                                        <action selector="settingsGTMaskAction:" target="-2" id="oF6-jg-jWe"/>
-                                                                    </connections>
-                                                                </matrix>
-                                                            </subviews>
-                                                        </view>
-                                                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                                                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                                    </box>
-                                                    <box autoresizesSubviews="NO" toolTip="Sets which crates recieve the Global Trigger" title="GT Crates" borderType="line" id="AMC-Oi-pjC">
-                                                        <rect key="frame" x="125" y="10" width="117" height="527"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <view key="contentView">
-                                                            <rect key="frame" x="1" y="1" width="115" height="511"/>
-                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                            <subviews>
-                                                                <matrix verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="w6U-Ny-3gU">
-                                                                    <rect key="frame" x="18" y="55" width="70" height="450"/>
-                                                                    <autoresizingMask key="autoresizingMask"/>
-                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                    <size key="cellSize" width="70" height="18"/>
-                                                                    <buttonCell key="prototype" type="check" title="Check" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="X4o-x4-VFP">
-                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                        <font key="font" metaFont="smallSystem"/>
-                                                                    </buttonCell>
-                                                                    <cells>
-                                                                        <column>
-                                                                            <buttonCell type="check" title="0" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="y5W-G6-MSH">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="gtCratesCheckBoxClicked:" target="-2" id="oR0-ci-tud"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="1" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="1" inset="2" id="2Pf-CV-3df">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="gtCratesCheckBoxClicked:" target="-2" id="ndz-3M-Cqy"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="2" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="2" inset="2" id="wJN-p9-0iF">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="gtCratesCheckBoxClicked:" target="-2" id="B9k-90-9th"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="3" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="3" inset="2" id="nAh-jC-G58">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="gtCratesCheckBoxClicked:" target="-2" id="Uau-2j-YA9"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="4" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="4" inset="2" id="gUX-2g-28L">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="gtCratesCheckBoxClicked:" target="-2" id="EMK-Yb-J9T"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="5" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="5" inset="2" id="TJf-nH-ynU">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="gtCratesCheckBoxClicked:" target="-2" id="yoT-ff-t5V"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="6" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="6" inset="2" id="08N-Nf-L86">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="gtCratesCheckBoxClicked:" target="-2" id="Nf6-mM-EoS"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="7" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="7" inset="2" id="9gT-sM-hDV">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="gtCratesCheckBoxClicked:" target="-2" id="bYM-fn-QYs"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="8" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="8" inset="2" id="5jv-Nl-GRc">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="gtCratesCheckBoxClicked:" target="-2" id="gnC-E3-mOb"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="9" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="9" inset="2" id="aZh-n6-YCo">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="gtCratesCheckBoxClicked:" target="-2" id="Rst-xc-4x0"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="10" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="10" inset="2" id="ska-Aa-F1w">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="gtCratesCheckBoxClicked:" target="-2" id="4On-jt-Enz"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="11" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="11" inset="2" id="3bD-3g-VXh">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="gtCratesCheckBoxClicked:" target="-2" id="aB6-MO-sm8"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="12" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="12" inset="2" id="7Am-sw-lb4">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="gtCratesCheckBoxClicked:" target="-2" id="6No-TS-TsG"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="13" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="13" inset="2" id="KiS-LF-Sm2">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="gtCratesCheckBoxClicked:" target="-2" id="x07-LZ-sfq"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="14" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="14" inset="2" id="YBk-Sj-qMA">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="gtCratesCheckBoxClicked:" target="-2" id="Zg4-rc-MC5"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="15" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="15" inset="2" id="UPY-kD-yCC">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="gtCratesCheckBoxClicked:" target="-2" id="vn4-18-HTc"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="16" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="16" inset="2" id="4MG-iQ-kFI">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="gtCratesCheckBoxClicked:" target="-2" id="BKW-e4-fvS"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="17" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="17" inset="2" id="W2c-sh-c39">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="gtCratesCheckBoxClicked:" target="-2" id="OdQ-aZ-8zC"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="18" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="18" inset="2" id="XzQ-fJ-0Il">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="gtCratesCheckBoxClicked:" target="-2" id="xy4-Xb-T7o"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="TUB bot" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="19" inset="2" id="9Od-cd-eJD">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="gtCratesCheckBoxClicked:" target="-2" id="B2A-DU-CSe"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="TUB top" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="20" inset="2" id="t5G-IY-bnj">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="gtCratesCheckBoxClicked:" target="-2" id="zuA-5d-onn"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="21" inset="2" id="LIO-WH-1JZ">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="gtCratesCheckBoxClicked:" target="-2" id="IcH-54-JI1"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="22" inset="2" id="Ote-ej-2RD">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="gtCratesCheckBoxClicked:" target="-2" id="bFg-kk-Dut"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="TUBii" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="23" inset="2" id="8EO-wn-Yxk">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="gtCratesCheckBoxClicked:" target="-2" id="HZy-hN-TLg"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="24" inset="2" id="uUL-uq-T4N">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="gtCratesCheckBoxClicked:" target="-2" id="fN3-ck-mzq"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                        </column>
-                                                                    </cells>
-                                                                </matrix>
-                                                                <button verticalHuggingPriority="750" id="qYT-6f-zEw">
-                                                                    <rect key="frame" x="8" y="6" width="98" height="28"/>
-                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                    <buttonCell key="cell" type="push" title="Load" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="siw-e9-2Qs">
-                                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                                        <font key="font" metaFont="smallSystem"/>
-                                                                    </buttonCell>
-                                                                    <connections>
-                                                                        <action selector="triggersLoadGTCrateMask:" target="-2" id="8Yu-bT-puE"/>
-                                                                    </connections>
-                                                                </button>
-                                                            </subviews>
-                                                        </view>
-                                                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                                                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                                    </box>
-                                                    <box autoresizesSubviews="NO" toolTip="Sets which crates recieve the Pedestal signal" title="PED Crates" borderType="line" id="bMv-nr-EIb">
-                                                        <rect key="frame" x="239" y="10" width="122" height="527"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <view key="contentView">
-                                                            <rect key="frame" x="1" y="1" width="120" height="511"/>
-                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                            <subviews>
-                                                                <matrix verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="DXv-mi-tzB">
-                                                                    <rect key="frame" x="18" y="56" width="75" height="450"/>
-                                                                    <autoresizingMask key="autoresizingMask"/>
-                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                    <size key="cellSize" width="75" height="18"/>
-                                                                    <buttonCell key="prototype" type="check" title="Check" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="aBZ-JC-ros">
-                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                        <font key="font" metaFont="smallSystem"/>
-                                                                    </buttonCell>
-                                                                    <cells>
-                                                                        <column>
-                                                                            <buttonCell type="check" title="0" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="3kc-P6-jd5">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="pedCrateCheckBoxClicked:" target="-2" id="10k-Wn-qYI"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="1" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="1" inset="2" id="WtE-zD-8EE">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="pedCrateCheckBoxClicked:" target="-2" id="9Vu-jY-tem"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="2" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="2" inset="2" id="ewd-rJ-WN0">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="pedCrateCheckBoxClicked:" target="-2" id="5A4-QJ-jUX"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="3" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="3" inset="2" id="YlO-vK-zwh">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="pedCrateCheckBoxClicked:" target="-2" id="ZRk-gX-JR5"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="4" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="4" inset="2" id="9GI-ja-b3a">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="pedCrateCheckBoxClicked:" target="-2" id="gVj-ZL-lXD"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="5" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="5" inset="2" id="7Dc-81-Ybh">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="pedCrateCheckBoxClicked:" target="-2" id="asA-dS-LUy"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="6" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="6" inset="2" id="bIG-C1-PbQ">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="pedCrateCheckBoxClicked:" target="-2" id="J8j-An-b1v"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="7" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="7" inset="2" id="eIA-mq-W7D">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="pedCrateCheckBoxClicked:" target="-2" id="Dqi-22-PhZ"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="8" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="8" inset="2" id="3Un-17-R5g">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="pedCrateCheckBoxClicked:" target="-2" id="bI4-Wy-xQV"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="9" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="9" inset="2" id="O2k-bw-kPp">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="pedCrateCheckBoxClicked:" target="-2" id="GUn-nf-f1H"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="10" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="10" inset="2" id="DS7-1C-N36">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="pedCrateCheckBoxClicked:" target="-2" id="8Hl-6i-WV9"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="11" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="11" inset="2" id="oKE-s5-urE">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="pedCrateCheckBoxClicked:" target="-2" id="r5f-N5-TG8"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="12" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="12" inset="2" id="016-Ou-Sv6">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="pedCrateCheckBoxClicked:" target="-2" id="mrv-Gv-NBD"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="13" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="13" inset="2" id="5Sl-dc-8Ji">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="pedCrateCheckBoxClicked:" target="-2" id="NQa-zG-C4B"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="14" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="14" inset="2" id="08f-OG-saH">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="pedCrateCheckBoxClicked:" target="-2" id="32W-R3-A4E"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="15" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="15" inset="2" id="4m4-rH-1jO">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="pedCrateCheckBoxClicked:" target="-2" id="gVl-eS-cbP"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="16" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="16" inset="2" id="JXu-Ug-Uwy">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="pedCrateCheckBoxClicked:" target="-2" id="Bu7-YU-OdE"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="17" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="17" inset="2" id="qPB-TI-3CX">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="pedCrateCheckBoxClicked:" target="-2" id="9Aa-AF-ZwY"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="18" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="18" inset="2" id="4er-J1-h1s">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="pedCrateCheckBoxClicked:" target="-2" id="pJv-di-Lku"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="TUB bot" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="19" inset="2" id="4TW-Uz-eSW">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="pedCrateCheckBoxClicked:" target="-2" id="3Dx-1V-Cbw"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="TUB top" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="20" inset="2" id="LbO-Uq-cKe">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="pedCrateCheckBoxClicked:" target="-2" id="s4C-z3-Ip1"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="21" inset="2" id="OIU-e7-Jda">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="pedCrateCheckBoxClicked:" target="-2" id="qFo-UI-Y9i"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="22" inset="2" id="rm1-JS-kHB">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="pedCrateCheckBoxClicked:" target="-2" id="oDP-Bh-tUW"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="TUBii" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="23" inset="2" id="YZh-9P-4GR">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="pedCrateCheckBoxClicked:" target="-2" id="nLI-RC-WCb"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                            <buttonCell type="check" title="spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="24" inset="2" id="ayD-4H-D68">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <connections>
-                                                                                    <action selector="pedCrateCheckBoxClicked:" target="-2" id="54D-XF-1Ad"/>
-                                                                                </connections>
-                                                                            </buttonCell>
-                                                                        </column>
-                                                                    </cells>
-                                                                    <connections>
-                                                                        <action selector="settingsPEDCrateMaskAction:" target="-2" id="Mo9-GR-H0b"/>
-                                                                    </connections>
-                                                                </matrix>
-                                                                <button verticalHuggingPriority="750" id="qFl-aH-3Vm">
-                                                                    <rect key="frame" x="4" y="6" width="112" height="28"/>
-                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                    <buttonCell key="cell" type="push" title="Load" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="CEW-sq-AMH">
-                                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                                        <font key="font" metaFont="smallSystem"/>
-                                                                    </buttonCell>
-                                                                    <connections>
-                                                                        <action selector="triggersLoadPEDCrateMask:" target="-2" id="pgF-ta-aXp"/>
-                                                                    </connections>
-                                                                </button>
-                                                            </subviews>
-                                                        </view>
-                                                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                                                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                                    </box>
-                                                </subviews>
-                                            </view>
-                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                        </box>
                                         <box autoresizesSubviews="NO" toolTip="Sets which crates are in each MTC/A trigger sum" title="MTC/A Relays" borderType="line" id="P58-2C-mhS">
                                             <rect key="frame" x="386" y="170" width="355" height="468"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -2813,6 +2146,672 @@
                                                             <action selector="triggersLoadMTCACrateMask:" target="-2" id="xzD-vT-JdK"/>
                                                         </connections>
                                                     </button>
+                                                </subviews>
+                                            </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </box>
+                                        <box autoresizesSubviews="NO" title="MTC/D" borderType="line" id="Hie-mr-UOq">
+                                            <rect key="frame" x="14" y="77" width="370" height="561"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView">
+                                                <rect key="frame" x="1" y="1" width="368" height="545"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <matrix verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="Mno-Cd-fe2">
+                                                        <rect key="frame" x="262" y="71" width="75" height="450"/>
+                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        <size key="cellSize" width="75" height="18"/>
+                                                        <buttonCell key="prototype" type="check" title="Check" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="TPq-D8-xGs">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <cells>
+                                                            <column>
+                                                                <buttonCell type="check" title="0" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="g30-l7-fyg">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="pedCrateCheckBoxClicked:" target="-2" id="ZXc-vm-0Rb"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="1" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="1" inset="2" id="4cA-TZ-YFW">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="pedCrateCheckBoxClicked:" target="-2" id="NHs-KF-lRY"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="2" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="2" inset="2" id="BlW-A0-8Tm">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="pedCrateCheckBoxClicked:" target="-2" id="d0T-Fd-zZo"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="3" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="3" inset="2" id="seB-do-mlG">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="pedCrateCheckBoxClicked:" target="-2" id="GXX-tg-yLZ"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="4" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="4" inset="2" id="Wdg-Gy-I9M">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="pedCrateCheckBoxClicked:" target="-2" id="dkn-V5-i5T"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="5" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="5" inset="2" id="b5r-qd-aiZ">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="pedCrateCheckBoxClicked:" target="-2" id="hkE-Fg-DaL"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="6" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="6" inset="2" id="6Hz-cz-4FC">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="pedCrateCheckBoxClicked:" target="-2" id="Wme-Z5-0k1"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="7" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="7" inset="2" id="wRg-6C-5KN">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="pedCrateCheckBoxClicked:" target="-2" id="k3C-b9-tHI"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="8" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="8" inset="2" id="lHB-dm-voX">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="pedCrateCheckBoxClicked:" target="-2" id="c2j-Ud-BFx"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="9" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="9" inset="2" id="8mV-fI-fve">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="pedCrateCheckBoxClicked:" target="-2" id="s8o-dY-Q2i"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="10" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="10" inset="2" id="jkd-dy-YdK">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="pedCrateCheckBoxClicked:" target="-2" id="Yql-12-ivV"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="11" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="11" inset="2" id="GPT-g0-27b">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="pedCrateCheckBoxClicked:" target="-2" id="3zH-Bq-a3e"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="12" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="12" inset="2" id="dEV-gE-VKq">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="pedCrateCheckBoxClicked:" target="-2" id="dTG-gO-QAG"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="13" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="13" inset="2" id="XyE-c0-GZ4">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="pedCrateCheckBoxClicked:" target="-2" id="c1t-4L-dgd"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="14" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="14" inset="2" id="33t-Kb-nFw">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="pedCrateCheckBoxClicked:" target="-2" id="DlW-r1-hQv"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="15" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="15" inset="2" id="2zG-cO-ANf">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="pedCrateCheckBoxClicked:" target="-2" id="bJc-Tr-MoB"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="16" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="16" inset="2" id="anT-cn-hea">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="pedCrateCheckBoxClicked:" target="-2" id="eyc-GG-miS"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="17" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="17" inset="2" id="N5w-LT-Kof">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="pedCrateCheckBoxClicked:" target="-2" id="2NC-EE-6LP"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="18" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="18" inset="2" id="43x-Et-N67">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="pedCrateCheckBoxClicked:" target="-2" id="lsj-O6-uDF"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="TUB bot" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="19" inset="2" id="DoU-aB-zWy">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="pedCrateCheckBoxClicked:" target="-2" id="pi9-ZP-hI1"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="TUB top" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="20" inset="2" id="W2c-fQ-hpv">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="pedCrateCheckBoxClicked:" target="-2" id="hns-kP-hlR"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="21" inset="2" id="1zG-Tr-dQ5">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="pedCrateCheckBoxClicked:" target="-2" id="fI3-Nt-3aA"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="22" inset="2" id="WT2-bN-lla">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="pedCrateCheckBoxClicked:" target="-2" id="sMl-u2-4RX"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="TUBii" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="23" inset="2" id="0ES-p3-CHM">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="pedCrateCheckBoxClicked:" target="-2" id="FZe-5d-a35"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="24" inset="2" id="YQ0-AY-N3i">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="pedCrateCheckBoxClicked:" target="-2" id="TET-Ub-qjP"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                            </column>
+                                                        </cells>
+                                                        <connections>
+                                                            <action selector="settingsPEDCrateMaskAction:" target="-2" id="v5S-5f-mhM"/>
+                                                        </connections>
+                                                    </matrix>
+                                                    <button verticalHuggingPriority="750" id="fHv-tp-3wX">
+                                                        <rect key="frame" x="248" y="21" width="112" height="28"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Load" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Uh5-yL-09k">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="triggersLoadPEDCrateMask:" target="-2" id="Y2D-me-cpK"/>
+                                                        </connections>
+                                                    </button>
+                                                    <matrix verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="39t-6x-ShF">
+                                                        <rect key="frame" x="143" y="70" width="70" height="450"/>
+                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        <size key="cellSize" width="70" height="18"/>
+                                                        <buttonCell key="prototype" type="check" title="Check" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="TBr-Il-LcV">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <cells>
+                                                            <column>
+                                                                <buttonCell type="check" title="0" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="ghU-lX-IFb">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="gtCratesCheckBoxClicked:" target="-2" id="8te-ig-7Cr"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="1" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="1" inset="2" id="msd-WT-MhQ">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="gtCratesCheckBoxClicked:" target="-2" id="dj5-2K-QxO"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="2" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="2" inset="2" id="Vwh-5F-3Tt">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="gtCratesCheckBoxClicked:" target="-2" id="Pk1-Nz-uKi"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="3" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="3" inset="2" id="CI3-hd-lOB">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="gtCratesCheckBoxClicked:" target="-2" id="eW6-B6-UaH"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="4" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="4" inset="2" id="JEw-Fe-ucT">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="gtCratesCheckBoxClicked:" target="-2" id="sWZ-B6-nxr"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="5" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="5" inset="2" id="JVj-IT-HSu">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="gtCratesCheckBoxClicked:" target="-2" id="85f-q1-aLR"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="6" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="6" inset="2" id="BZp-A5-2D4">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="gtCratesCheckBoxClicked:" target="-2" id="DfY-C8-2qB"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="7" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="7" inset="2" id="MW4-DU-Ubl">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="gtCratesCheckBoxClicked:" target="-2" id="NR4-Pp-AsH"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="8" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="8" inset="2" id="rRq-Rk-ZJM">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="gtCratesCheckBoxClicked:" target="-2" id="WxL-hz-993"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="9" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="9" inset="2" id="Cvh-qo-dko">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="gtCratesCheckBoxClicked:" target="-2" id="YfB-IT-gqO"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="10" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="10" inset="2" id="806-bp-Iz3">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="gtCratesCheckBoxClicked:" target="-2" id="Z55-Yh-lkF"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="11" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="11" inset="2" id="rc2-E7-Ohr">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="gtCratesCheckBoxClicked:" target="-2" id="H0M-QK-drJ"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="12" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="12" inset="2" id="FuO-Dl-utc">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="gtCratesCheckBoxClicked:" target="-2" id="KEf-iF-IgL"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="13" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="13" inset="2" id="gHu-0a-dMa">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="gtCratesCheckBoxClicked:" target="-2" id="1hp-v6-sqV"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="14" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="14" inset="2" id="AZd-v9-iq1">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="gtCratesCheckBoxClicked:" target="-2" id="66u-2f-aYn"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="15" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="15" inset="2" id="dnM-S4-gfA">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="gtCratesCheckBoxClicked:" target="-2" id="Vtz-5v-9r8"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="16" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="16" inset="2" id="DSO-c3-mIr">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="gtCratesCheckBoxClicked:" target="-2" id="7Oh-a7-Rhp"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="17" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="17" inset="2" id="chD-Xs-JGi">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="gtCratesCheckBoxClicked:" target="-2" id="tcA-2r-fuA"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="18" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="18" inset="2" id="Jow-8F-nNT">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="gtCratesCheckBoxClicked:" target="-2" id="mD9-oh-Hgx"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="TUB bot" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="19" inset="2" id="g8e-Ee-RGY">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="gtCratesCheckBoxClicked:" target="-2" id="LEM-De-geD"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="TUB top" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="20" inset="2" id="I6I-Bd-Cs8">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="gtCratesCheckBoxClicked:" target="-2" id="dLi-Vn-X2x"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="21" inset="2" id="9bQ-el-DdL">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="gtCratesCheckBoxClicked:" target="-2" id="fmP-AY-x1x"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="22" inset="2" id="yWn-ZJ-v3i">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="gtCratesCheckBoxClicked:" target="-2" id="eMb-7H-iKN"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="TUBii" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="23" inset="2" id="R0O-DT-Cur">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="gtCratesCheckBoxClicked:" target="-2" id="REr-o8-ptL"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="24" inset="2" id="2Ba-R0-oKe">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="gtCratesCheckBoxClicked:" target="-2" id="f62-EQ-Tuc"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                            </column>
+                                                        </cells>
+                                                    </matrix>
+                                                    <button verticalHuggingPriority="750" id="hMd-oF-3rP">
+                                                        <rect key="frame" x="133" y="21" width="98" height="28"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Load" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="DVi-hb-vWr">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="triggersLoadGTCrateMask:" target="-2" id="ka6-V7-DTe"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" id="f7w-lz-PNx">
+                                                        <rect key="frame" x="5" y="21" width="114" height="28"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Load" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="MrH-nm-1Xe">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="triggersLoadTriggerMask:" target="-2" id="rDu-qp-zYk"/>
+                                                        </connections>
+                                                    </button>
+                                                    <matrix verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="kFA-7K-oIO">
+                                                        <rect key="frame" x="13" y="53" width="101" height="468"/>
+                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        <size key="cellSize" width="101" height="18"/>
+                                                        <buttonCell key="prototype" type="check" title="Check" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="94j-e9-GeJ">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <cells>
+                                                            <column>
+                                                                <buttonCell type="check" title="NHit 100 Lo" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="1jT-oz-Mfb">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="triggerMaskCheckBoxClicked:" target="-2" id="v1E-9d-u4T"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="NHit 100 Med" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="1" inset="2" id="uaW-xO-4jU">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="triggerMaskCheckBoxClicked:" target="-2" id="dzm-Bg-pQI"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="NHit 100 Hi" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="2" inset="2" id="NIJ-RY-eMr">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="triggerMaskCheckBoxClicked:" target="-2" id="UxV-ZI-fiL"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="NHit 20" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="3" inset="2" id="xRy-Ux-P8F">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="triggerMaskCheckBoxClicked:" target="-2" id="ZuX-7K-jx0"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="NHit 20 Lo" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="4" inset="2" id="Ldx-KI-r3W">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="triggerMaskCheckBoxClicked:" target="-2" id="rLn-eL-GlZ"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ESum Lo" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="5" inset="2" id="eZ5-0I-VP0">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="triggerMaskCheckBoxClicked:" target="-2" id="VJa-mK-XWO"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ESum Hi" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="6" inset="2" id="bnV-89-d1i">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="triggerMaskCheckBoxClicked:" target="-2" id="on4-1w-Tob"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="OWLN" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="7" inset="2" id="9iZ-rB-R8J">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="triggerMaskCheckBoxClicked:" target="-2" id="4r8-y7-5Go"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="OWLE Lo" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="8" inset="2" id="4u1-b7-Ule">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="triggerMaskCheckBoxClicked:" target="-2" id="gbt-j8-HHW"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="OWLE Hi" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="9" inset="2" id="AZw-h3-2iI">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="triggerMaskCheckBoxClicked:" target="-2" id="e3h-vb-ls6"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="Pulse GT" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="10" inset="2" id="vzg-Hb-HFg">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="triggerMaskCheckBoxClicked:" target="-2" id="L83-3I-w7S"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="Prescale" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="11" inset="2" id="LXT-Qx-sOP">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="triggerMaskCheckBoxClicked:" target="-2" id="ZpS-kI-1TS"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="Ped no delay" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="12" inset="2" id="hcB-Sa-Ey2">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="triggerMaskCheckBoxClicked:" target="-2" id="mYQ-ks-xRH"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="GPS Pong" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="13" inset="2" id="Xb4-0k-QxI">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="triggerMaskCheckBoxClicked:" target="-2" id="0Sp-ab-2A3"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="GPS Sync" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="14" inset="2" id="UQP-Ha-cfH">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="triggerMaskCheckBoxClicked:" target="-2" id="Onw-ek-GuB"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="Ext Async" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="15" inset="2" id="lrc-nR-mae">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="triggerMaskCheckBoxClicked:" target="-2" id="pNu-0c-Pe6"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="Hydrophone" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="16" inset="2" id="HJn-4O-V4U">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="triggerMaskCheckBoxClicked:" target="-2" id="bYo-S1-HvV"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="Ext 3" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="17" inset="2" id="jFv-is-wcm">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="triggerMaskCheckBoxClicked:" target="-2" id="uPz-rz-kBf"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="Ext 4" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="18" inset="2" id="ZKm-MX-aNl">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="triggerMaskCheckBoxClicked:" target="-2" id="Tzl-E3-z6b"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="Ext 5" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="19" inset="2" id="lkT-A2-vdA">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="triggerMaskCheckBoxClicked:" target="-2" id="dt2-j7-1lL"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="Ext 6" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="20" inset="2" id="sYx-ZA-S5k">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="triggerMaskCheckBoxClicked:" target="-2" id="DF3-vv-JEi"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="Ext 7" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="21" inset="2" id="HLi-Uz-bZ7">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="triggerMaskCheckBoxClicked:" target="-2" id="p9k-rF-tWz"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="Ext 8 PED" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="22" inset="2" id="7cv-yW-PWC">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="triggerMaskCheckBoxClicked:" target="-2" id="PlJ-2e-0FS"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="SP Raw" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="23" inset="2" id="aWB-0k-Lm6">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="triggerMaskCheckBoxClicked:" target="-2" id="NHI-4i-xog"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="NCD" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="24" inset="2" id="KxS-C9-NZv">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="triggerMaskCheckBoxClicked:" target="-2" id="30s-wX-972"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="Soft GT" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="25" inset="2" id="4g1-EV-8yI">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <connections>
+                                                                        <action selector="triggerMaskCheckBoxClicked:" target="-2" id="8ZQ-Ac-sPY"/>
+                                                                    </connections>
+                                                                </buttonCell>
+                                                            </column>
+                                                        </cells>
+                                                        <connections>
+                                                            <action selector="settingsGTMaskAction:" target="-2" id="SIb-Sc-2cs"/>
+                                                        </connections>
+                                                    </matrix>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="5bN-Wr-Kuh">
+                                                        <rect key="frame" x="140" y="524" width="56" height="14"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="GT Crates" id="5uC-lO-enn">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="rgI-z1-D5T">
+                                                        <rect key="frame" x="257" y="524" width="62" height="14"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="PED Crates" id="G98-BL-mX9">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <box autoresizesSubviews="NO" horizontalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="BRE-pP-Wcl">
+                                                        <rect key="frame" x="123" y="27" width="5" height="508"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                        <font key="titleFont" metaFont="system"/>
+                                                    </box>
+                                                    <box autoresizesSubviews="NO" horizontalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="gJf-vK-aa7">
+                                                        <rect key="frame" x="238" y="27" width="5" height="508"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                        <font key="titleFont" metaFont="system"/>
+                                                    </box>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="tmr-3L-Jdj">
+                                                        <rect key="frame" x="16" y="524" width="49" height="14"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="GT Mask" id="prE-Nx-Ob4">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
