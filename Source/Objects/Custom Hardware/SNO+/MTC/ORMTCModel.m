@@ -1161,40 +1161,36 @@ tubRegister;
 	}
 }
 
-- (void) initializeMtc:(BOOL) loadTheMTCXilinxFile load10MHzClock:(BOOL) loadThe10MHzClock
+- (void) initializeMtc
 {
 	ORSelectorSequence* seq = [ORSelectorSequence selectorSequenceWithDelegate:self];
 
 	@try {		
-		NSLog(@"Starting MTC init process....(load Xilinx: %@) (10MHzClock: %@)\n",loadTheMTCXilinxFile?@"YES":@"NO",loadThe10MHzClock?@"YES":@"NO");
-		
-		if (loadTheMTCXilinxFile) [[seq forTarget:self] loadMTCXilinx];				// STEP 1 : Load the Xilinx
-		[[seq forTarget:self] clearGlobalTriggerWordMask];							// STEP 2: Clear the GT Word Mask
-		[[seq forTarget:self] clearPedestalCrateMask];								// STEP 3: Clear the Pedestal Crate Mask
-		[[seq forTarget:self] clearGTCrateMask];									// STEP 4: Clear the GT Crate Mask
-		[[seq forTarget:self] loadTheMTCADacs];										// STEP 5: Load the DACs	
-		[[seq forTarget:self] clearTheControlRegister];								// STEP 6: Clear the Control Register
-		[[seq forTarget:self] zeroTheGTCounter];									// STEP 7: Clear the GT Counter
-        [[seq forTarget:self] loadLockOutWidthToHardware];                          // STEP 8: Set the Lockout Width
-		[[seq forTarget:self] loadPrescaleValueToHardware];									// STEP 9:  Load the NHIT 100 LO prescale value
-		[[seq forTarget:self] loadPulserRateToHardware];                            // STEP 10: Load the Pulser
-		[[seq forTarget:self] loadPedWidthToHardware];                              // STEP 11: Set the Pedestal Width
-		[[seq forTarget:self] loadPedestalDelayToHardware];                         // STEP 12: Setup the Pulse GT Delays
-		if( loadThe10MHzClock)[self setThe10MHzCounter:0];                          // STEP 13: Load the 10MHz Counter
-		[[seq forTarget:self] resetTheMemory];										// STEP 14: Reset the Memory	 
-		//[[seq forTarget:self] setGTCrateMask];									// STEP 15: Set the GT Crate Mask from MTC database
+		NSLog(@"Starting MTC init process....");
+
+        [[seq forTarget:self] server_init];                                         // STEP 1: Let the server init
+		[[seq forTarget:self] zeroTheGTCounter];									// STEP 2: Clear the GT Counter
+        [[seq forTarget:self] loadLockOutWidthToHardware];                          // STEP 3: Set the Lockout Width
+		[[seq forTarget:self] loadPrescaleValueToHardware];							// STEP 4:  Load the NHIT 100 LO prescale value
+		[[seq forTarget:self] loadPulserRateToHardware];                            // STEP 5: Load the Pulser
+		[[seq forTarget:self] loadPedWidthToHardware];                              // STEP 6: Set the Pedestal Width
+		[[seq forTarget:self] loadPedestalDelayToHardware];                         // STEP 7: Setup the Pulse GT Delays
+        [[seq forTarget:self] setGlobalTriggerWordMask];                            // STEP 8: Load GT mask
+        [[seq forTarget:self] loadGTCrateMaskToHardware];                           // STEP 9: Load GT crate mask
+        [[seq forTarget:self] loadPedestalCrateMaskToHardware];                     // STEP 10: Load ped crate mask
 		[[seq forTarget:self] initializeMtcDone];
 		[seq startSequence];
 		
 	}
 	@catch(NSException* localException) {
-		NSLog(@"***Initialization of the MTC (%@ Xilinx, %@ 10MHz clock) failed!***\n", 
-			  loadTheMTCXilinxFile?@"with":@"no", loadThe10MHzClock?@"load":@"don't load");
+		NSLog(@"***Initialization of the MTC (%@ Xilinx, %@ 10MHz clock) failed!***\n");
 		NSLog(@"Exception: %@\n",localException);
 		[seq stopSequence];
 	}
 }
-
+- (void) server_init {
+    [mtc okCommand:"mtcd_init"];
+}
 - (void) initializeMtcDone
 {
 	NSLog(@"Initialization of the MTC complete.\n");

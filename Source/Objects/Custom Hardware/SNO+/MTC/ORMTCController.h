@@ -51,9 +51,6 @@
     
 	//standard Ops
 	IBOutlet NSButton*		initMtcButton;
-	IBOutlet NSButton*		initNoXilinxButton;
-	IBOutlet NSButton*		initNo10MHzButton;
-	IBOutlet NSButton*		initNoXilinxNo100MHzButton;
 	IBOutlet NSButton*		setAdvancedOptionsButton;
 	IBOutlet NSButton*		loadMTCADacsButton;
 	IBOutlet NSButton*		firePedestalsButton;
@@ -177,9 +174,6 @@
 - (IBAction) updateConversionSettingsAction:(id)sender;
 //MTC Init Ops
 - (IBAction) standardInitMTC:(id) sender;
-- (IBAction) standardInitMTCnoXilinx:(id) sender;
-- (IBAction) standardInitMTCno10MHz:(id) sender;
-- (IBAction) standardInitMTCnoXilinxno10MHz:(id) sender;
 - (IBAction) setAdvancedOptions:(id)sender;
 - (IBAction) standardIsPulserFixedRate:(id) sender;
 - (IBAction) standardFirePedestals:(id) sender;

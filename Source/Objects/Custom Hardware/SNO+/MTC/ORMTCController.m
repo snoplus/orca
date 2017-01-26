@@ -436,9 +436,6 @@
     lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORMTCBasicLock] | sequenceRunning;
     
     [initMtcButton				setEnabled: !lockedOrNotRunningMaintenance];
-    [initNoXilinxButton			setEnabled: !lockedOrNotRunningMaintenance];
-    [initNo10MHzButton			setEnabled: !lockedOrNotRunningMaintenance];
-    [initNoXilinxNo100MHzButton setEnabled: !lockedOrNotRunningMaintenance];
     [includePedestalsCheckBox   setEnabled: !lockedOrNotRunningMaintenance];
     
     [firePedestalsButton		setEnabled: !lockedOrNotRunningMaintenance && [model isPulserFixedRate]];
@@ -664,22 +661,7 @@
 //MTC Init Ops buttons.
 - (IBAction) standardInitMTC:(id) sender 
 {
-	[model initializeMtc:YES load10MHzClock:YES]; 
-}
-
-- (IBAction) standardInitMTCnoXilinx:(id) sender 
-{
-	[model initializeMtc:NO load10MHzClock:YES]; 
-}
-
-- (IBAction) standardInitMTCno10MHz:(id) sender 
-{
-	[model initializeMtc:YES load10MHzClock:NO]; 
-}
-
-- (IBAction) standardInitMTCnoXilinxno10MHz:(id) sender 
-{
-	[model initializeMtc:NO load10MHzClock:NO];
+	[model initializeMtc];
 }
 	
 - (IBAction) standardLoadMTCADacs:(id) sender 

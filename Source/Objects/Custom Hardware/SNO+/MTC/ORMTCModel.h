@@ -214,8 +214,9 @@
 - (unsigned long) getMTC_FineDelay;
 - (void) sendMTC_SoftGt;
 - (void) sendMTC_SoftGt:(BOOL) setGTMask;
-- (void) initializeMtc:(BOOL) loadTheMTCXilinxFile load10MHzClock:(BOOL) loadThe10MHzClock;
+- (void) initializeMtc;
 - (void) initializeMtcDone;
+- (void) server_init;
 - (void) clearGlobalTriggerWordMask;
 - (void) setGlobalTriggerWordMask;
 - (uint32_t) getGTMaskFromHardware;
@@ -226,7 +227,6 @@
 - (uint32_t) getGTCrateMaskFromHardware;
 - (void) loadPedestalCrateMaskToHardware;
 - (void) loadGTCrateMaskToHardware;
-
 - (void) clearTheControlRegister;
 - (void) resetTheMemory;
 - (void) setTheGTCounter:(unsigned long) theGTCounterValue;
