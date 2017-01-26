@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14B25" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6254" systemVersion="13F1077" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6254"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ORMTCController">
@@ -17,7 +17,6 @@
                 <outlet property="coarseDelayField" destination="1834" id="2516"/>
                 <outlet property="continuePedestalsButton" destination="4056" id="4089"/>
                 <outlet property="continuousButton" destination="1473" id="3882"/>
-                <outlet property="defaultFileField" destination="2062" id="2819"/>
                 <outlet property="eSumViewTypeMatrix" destination="2008" id="3244"/>
                 <outlet property="esumMatrix" destination="2015" id="3407"/>
                 <outlet property="extraPulserPeriodField" destination="M4V-7Q-nR2" id="MDr-RK-uzS"/>
@@ -38,7 +37,6 @@
                 <outlet property="initProgressBar" destination="3885" id="3890"/>
                 <outlet property="initProgressField" destination="3886" id="3891"/>
                 <outlet property="isPulserFixedRateMatrix" destination="4091" id="4096"/>
-                <outlet property="lastFileLoadedField" destination="2059" id="2942"/>
                 <outlet property="load10MhzCounterButton" destination="4155" id="4432"/>
                 <outlet property="loadGTCrateMaskButton" destination="4423" id="4450"/>
                 <outlet property="loadMTCACrateMaskButton" destination="4429" id="4452"/>
@@ -88,7 +86,6 @@
                 <outlet property="writeValueField" destination="1228" id="2824"/>
                 <outlet property="writeValueStepper" destination="1227" id="1297"/>
                 <outlet property="writteButton" destination="1255" id="HS0-aS-53u"/>
-                <outlet property="xilinxFilePathField" destination="2066" id="3568"/>
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
@@ -102,6 +99,17 @@
                 <rect key="frame" x="0.0" y="-5" width="813" height="642"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
+                    <button id="2944">
+                        <rect key="frame" x="20" y="601" width="33" height="37"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="Unlocked" imagePosition="above" alignment="center" alternateImage="Locked" inset="2" id="3938">
+                            <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                            <font key="font" metaFont="label"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="basicLockAction:" target="-2" id="vtq-xf-bWj"/>
+                        </connections>
+                    </button>
                     <tabView focusRingType="none" controlSize="small" id="599">
                         <rect key="frame" x="7" y="10" width="793" height="586"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES"/>
@@ -1807,104 +1815,6 @@
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
-                                        <button verticalHuggingPriority="750" id="2057">
-                                            <rect key="frame" x="15" y="465" width="115" height="28"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="push" title="Load from DB" bezelStyle="rounded" alignment="center" controlSize="small" enabled="NO" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4011">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="settingsLoadDBFile:" target="-2" id="2229"/>
-                                            </connections>
-                                        </button>
-                                        <button verticalHuggingPriority="750" id="4176">
-                                            <rect key="frame" x="15" y="385" width="115" height="28"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="push" title="Verify settings" bezelStyle="rounded" alignment="center" controlSize="small" enabled="NO" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4177">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="settingsLoadDBFile:" target="-2" id="4178"/>
-                                            </connections>
-                                        </button>
-                                        <button verticalHuggingPriority="750" id="4181">
-                                            <rect key="frame" x="15" y="345" width="115" height="28"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="push" title="Open in browser" bezelStyle="rounded" alignment="center" controlSize="small" enabled="NO" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4182">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="settingsLoadDBFile:" target="-2" id="4183"/>
-                                            </connections>
-                                        </button>
-                                        <button verticalHuggingPriority="750" id="2061">
-                                            <rect key="frame" x="15" y="424" width="115" height="28"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="push" title="Upload to DB" bezelStyle="rounded" alignment="center" controlSize="small" enabled="NO" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4013">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="settingsDefValFile:" target="-2" id="2230"/>
-                                            </connections>
-                                        </button>
-                                        <textField verticalHuggingPriority="750" id="2062">
-                                            <rect key="frame" x="137" y="430" width="220" height="17"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingMiddle" sendsActionOnEndEditing="YES" title="Label" id="4014">
-                                                <font key="font" metaFont="smallSystem"/>
-                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <textField verticalHuggingPriority="750" id="4179">
-                                            <rect key="frame" x="137" y="391" width="220" height="17"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingMiddle" sendsActionOnEndEditing="YES" title="Label" id="4180">
-                                                <font key="font" metaFont="smallSystem"/>
-                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <button verticalHuggingPriority="750" id="2065">
-                                            <rect key="frame" x="15" y="509" width="115" height="28"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="push" title="XiLinx File..." bezelStyle="rounded" alignment="center" controlSize="small" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4015">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="settingsXilinxFile:" target="-2" id="3569"/>
-                                            </connections>
-                                        </button>
-                                        <textField verticalHuggingPriority="750" id="2066">
-                                            <rect key="frame" x="137" y="514" width="212" height="17"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingMiddle" sendsActionOnEndEditing="YES" title="Label" id="4016">
-                                                <font key="font" metaFont="smallSystem"/>
-                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <box verticalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="3241">
-                                            <rect key="frame" x="10" y="497" width="355" height="5"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <font key="titleFont" metaFont="system"/>
-                                        </box>
-                                        <textField verticalHuggingPriority="750" id="2059">
-                                            <rect key="frame" x="137" y="471" width="220" height="17"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingMiddle" sendsActionOnEndEditing="YES" title="Label" id="4012">
-                                                <font key="font" metaFont="smallSystem"/>
-                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
                                         <button verticalHuggingPriority="750" id="4155">
                                             <rect key="frame" x="5" y="60" width="160" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -3009,17 +2919,6 @@
                             <outlet property="delegate" destination="-2" id="810"/>
                         </connections>
                     </tabView>
-                    <button id="2944">
-                        <rect key="frame" x="20" y="601" width="33" height="37"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="Unlocked" imagePosition="above" alignment="center" alternateImage="Locked" inset="2" id="3938">
-                            <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                            <font key="font" metaFont="label"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="basicLockAction:" target="-2" id="vtq-xf-bWj"/>
-                        </connections>
-                    </button>
                 </subviews>
             </view>
             <connections>
