@@ -1150,15 +1150,14 @@ tubRegister;
 - (void) sendMTC_SoftGt:(BOOL) setGTMask
 {
 	@try {
-		if(setGTMask)[self setSingleGTWordMask:MTC_SOFT_GT_MASK];   // Step 1: set the SOFT_GT mask
-		[self write:kMtcSoftGtReg value:1];							// Step 2: write to the soft gt register (doesn't matter what you write to it)
-		[self clearSingleGTWordMask:MTC_SOFT_GT_MASK];				// Step 3: clear the SOFT_GT mask
+        if(setGTMask) { [self setSingleGTWordMask:MTC_SOFT_GT_MASK]; }   // Step 1: set the SOFT_GT mask
+        [mtc okCommand:"soft_gt"];                                       // Step 2: send soft_gt command
+        if(setGTMask) { [self clearSingleGTWordMask:MTC_SOFT_GT_MASK]; } // Step 3: clear the SOFT_GT mask
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Couldn't send a MTC SOFT_GT!\n");
 		NSLog(@"Exception: %@\n",localException);
 	}
-	
 }
 
 - (void) initializeMtc:(BOOL) loadTheMTCXilinxFile load10MHzClock:(BOOL) loadThe10MHzClock
