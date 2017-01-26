@@ -83,17 +83,18 @@
 
 - (void) awakeFromNib
 {
-    basicOpsSize        = NSMakeSize(400,350);
-    standardOpsSize     = NSMakeSize(440,410);
-    settingsSizeSmall	= NSMakeSize(600,430);
-    settingsSizeLarge	= NSMakeSize(600,630);
-    triggerSize         = NSMakeSize(800,640);
+    standardOpsSizeSmall = NSMakeSize(460,440);
+    standardOpsSizeLarge = NSMakeSize(460,760);
+    settingsSizeSmall	 = NSMakeSize(600,430);
+    settingsSizeLarge	 = NSMakeSize(600,630);
+    triggerSize          = NSMakeSize(800,640);
     blankView = [[NSView alloc] init];
     [tabView setFocusRingType:NSFocusRingTypeNone];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
 
 	[initProgressField setHidden:YES];
-    [advancedOptionsBox setHidden:YES];
+    [settingsAdvancedOptionsBox setHidden:YES];
+    [opAdvancedOptionsBox setHidden:YES];
 
     [super awakeFromNib];
 	
@@ -497,19 +498,22 @@
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
 {
-    if([tabView indexOfTabViewItem:item] == 0){
+
+    if ([tabView indexOfTabViewItem:item] == 0){
+        NSSize* newSize =nil;
+        if([opAdvancedOptionsBox isHidden]) {
+            newSize = &standardOpsSizeSmall;
+        }
+        else {
+            newSize = &standardOpsSizeLarge;
+        }
 		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:basicOpsSize];
+		[self resizeWindowToSize:*newSize];
 		[[self window] setContentView:mtcView];
     }
     else if([tabView indexOfTabViewItem:item] == 1){
-		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:standardOpsSize];
-		[[self window] setContentView:mtcView];
-    }
-    else if([tabView indexOfTabViewItem:item] == 2){
         NSSize* newSize = nil;
-        if([advancedOptionsBox isHidden]) {
+        if([settingsAdvancedOptionsBox isHidden]) {
             newSize = &settingsSizeSmall;
         }
         else {
@@ -519,7 +523,7 @@
 		[self resizeWindowToSize:*newSize];
 		[[self window] setContentView:mtcView];
     }
-    else if([tabView indexOfTabViewItem:item] == 3){
+    else if([tabView indexOfTabViewItem:item] == 2){
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:triggerSize];
 		[[self window] setContentView:mtcView];
@@ -780,16 +784,23 @@
     [self changeNhitThresholdsDisplay: [self convert_view_unit_index_to_model_index:[[sender selectedCell] tag]]];
 
 }
-- (IBAction)advancedOptionsTriangeChanged:(id)sender {
+- (IBAction)opsAdvancedOptionsTriangeChanged:(id)sender {
+    [self showHideOptions:sender Box:opAdvancedOptionsBox resizeSmall:standardOpsSizeSmall resizeLarge:standardOpsSizeLarge];
+}
+- (IBAction)settingsAdvancedOptionsTriangeChanged:(id)sender {
+    [self showHideOptions:sender Box:settingsAdvancedOptionsBox resizeSmall:settingsSizeSmall resizeLarge:settingsSizeLarge];
+}
+- (void) showHideOptions:(id) sender Box:(id)box resizeSmall:(NSSize) smallSize resizeLarge:(NSSize) largeSize {
     if([sender state] == NSOffState) {
-        [advancedOptionsBox setHidden:YES];
-        [self resizeWindowToSize:settingsSizeSmall];
+        [box setHidden:YES];
+        [self resizeWindowToSize:smallSize];
     }
     else {
-        [advancedOptionsBox setHidden:NO];
+        [box setHidden:NO];
         // Don't resize if the window is already large enough
-        if (self.window.frame.size.height < settingsSizeLarge.height) {
-            [self resizeWindowToSize:settingsSizeLarge];
+        if(self.window.frame.size.height <  largeSize.height || self.window.frame.size.width < largeSize.width)
+        {
+            [self resizeWindowToSize:largeSize];
         }
     }
 }

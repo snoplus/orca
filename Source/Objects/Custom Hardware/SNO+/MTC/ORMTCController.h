@@ -69,6 +69,7 @@
 	IBOutlet NSTextField*	initProgressField;
 	IBOutlet NSMatrix*		isPulserFixedRateMatrix;
     IBOutlet NSMatrix* pulserFeedsMatrix;
+    IBOutlet NSBox*         opAdvancedOptionsBox;
 	
 	//settings
 	IBOutlet NSMatrix*		eSumViewTypeMatrix;
@@ -88,7 +89,7 @@
 	IBOutlet NSMatrix*		nhitMatrix;
 	IBOutlet NSMatrix*		esumMatrix;
     IBOutlet NSTextField*   commentsField;
-    IBOutlet NSBox*         advancedOptionsBox;
+    IBOutlet NSBox*         settingsAdvancedOptionsBox;
 
 	//trigger
 	IBOutlet NSMatrix*		globalTriggerMaskMatrix;
@@ -114,8 +115,8 @@
     
 	BOOL	sequenceRunning;
     NSView* blankView;
-    NSSize  basicOpsSize;
-    NSSize  standardOpsSize;
+    NSSize  standardOpsSizeSmall;
+    NSSize  standardOpsSizeLarge;
     NSSize  settingsSizeSmall;
     NSSize  settingsSizeLarge;
     NSSize  triggerSize;
@@ -170,6 +171,8 @@
 - (void) populatePullDown;
 - (int) trigger_scan_name_to_index:(NSString*) name;
 - (int) index_to_trigger_scan_name:(int) index;
+- (void) showHideOptions:(id) sender Box:(id)box resizeSmall:(NSSize) smallSize resizeLarge:(NSSize) largeSize;
+
 
 #pragma mark •••Actions
 
@@ -205,6 +208,8 @@
 - (IBAction) standardSetPedestalsCount:(id) sender;
 - (IBAction) standardSetPedestalsDelay:(id) sender;
 - (IBAction) standardPulserFeeds:(id)sender;
+- (IBAction) opsAdvancedOptionsTriangeChanged:(id)sender;
+
 
 //Settings
 - (IBAction) eSumViewTypeAction:(id)sender;
@@ -215,7 +220,7 @@
 - (IBAction) settingsGTMaskAction:(id) sender;
 - (IBAction) settingsGTCrateMaskAction:(id) sender;
 - (IBAction) settingsPEDCrateMaskAction:(id) sender;
-- (IBAction) advancedOptionsTriangeChanged:(id)sender;
+- (IBAction) settingsAdvancedOptionsTriangeChanged:(id)sender;
 
 //Triggers
 - (IBAction) triggerMTCAN100:(id) sender;
