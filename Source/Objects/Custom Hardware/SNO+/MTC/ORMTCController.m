@@ -76,7 +76,7 @@
     standardOpsSizeSmall = NSMakeSize(685,320);
     standardOpsSizeLarge = NSMakeSize(685,620);
     settingsSizeSmall	 = NSMakeSize(600,430);
-    settingsSizeLarge	 = NSMakeSize(600,630);
+    settingsSizeLarge	 = NSMakeSize(600,580);
     triggerSize          = NSMakeSize(800,655);
     blankView = [[NSView alloc] init];
     [tabView setFocusRingType:NSFocusRingTypeNone];

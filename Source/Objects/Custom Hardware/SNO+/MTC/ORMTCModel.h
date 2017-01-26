@@ -279,7 +279,7 @@
 - (void) resetTheMemory;
 - (void) setTheGTCounter:(unsigned long) theGTCounterValue;
 - (void) zeroTheGTCounter;
-- (void) setThe10MHzCounterLow:(unsigned long) lowerValue high:(unsigned long) upperValue;
+- (void) setThe10MHzCounter:(uint64_t) newValue;
 - (void) loadPrescaleValueToHardware;
 - (void) setupPulseGTDelaysCoarse:(unsigned short) theCoarseDelay fine:(unsigned short) theAddelValue;
 - (void) loadCoarseDelayToHardware;

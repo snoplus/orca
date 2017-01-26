@@ -175,7 +175,6 @@
 - (IBAction) basicMemoryOffsetAction:(id)sender;
 - (IBAction) basicSelectedRegisterAction:(id)sender;
 - (IBAction) updateConversionSettingsAction:(id)sender;
-- (IBAction) EditingWindow:(id)sender;
 //MTC Init Ops
 - (IBAction) standardInitMTC:(id) sender;
 - (IBAction) standardInitMTCnoXilinx:(id) sender;
@@ -198,7 +197,6 @@
 //Settings
 - (IBAction) eSumViewTypeAction:(id)sender;
 - (IBAction) nHitViewTypeAction:(id)sender;
-- (IBAction) settingsMTCDAction:(id) sender;
 - (IBAction) settingsNHitAction:(id) sender;
 - (IBAction) settingsESumAction:(id) sender;
 - (IBAction) settingsGTMaskAction:(id) sender;
