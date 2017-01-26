@@ -598,12 +598,6 @@
                                                         </textFieldCell>
                                                         <connections>
                                                             <action selector="standardPulserRateFieldChanged:" target="-2" id="GhS-cb-mfe"/>
-                                                            <binding destination="4516" name="value" keyPath="selection.pgt_rate" id="gLT-C5-Olz">
-                                                                <dictionary key="options">
-                                                                    <bool key="NSContinuouslyUpdatesValue" value="YES"/>
-                                                                    <bool key="NSRaisesForNotApplicableKeys" value="NO"/>
-                                                                </dictionary>
-                                                            </binding>
                                                         </connections>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="XkZ-Gt-JXi">
