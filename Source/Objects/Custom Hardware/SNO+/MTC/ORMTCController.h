@@ -97,6 +97,8 @@
     IBOutlet NSButton* loadPEDCrateMaskButton;
     IBOutlet NSButton* loadMTCACrateMaskButton;
     
+    IBOutlet NSTextField*   helpText;
+
 	BOOL	sequenceRunning;
     NSView* blankView;
     NSSize  standardOpsSizeSmall;
@@ -210,4 +212,5 @@
 - (IBAction) triggersLoadGTCrateMask:(id) sender;
 - (IBAction) triggersLoadPEDCrateMask:(id) sender;
 - (IBAction) triggersLoadMTCACrateMask:(id) sender;
+- (IBAction) helpButtonClicked:(id) sender;
 @end

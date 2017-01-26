@@ -1267,6 +1267,10 @@
     [model mtcatLoadCrateMasks];
 }
 
+- (IBAction) helpButtonClicked:(id)sender {
+    [helpText setHidden:![helpText isHidden]];
+}
+
 - (void)CheckBoxMatrixCellClicked:(NSMatrix*) checkBoxes newState:(int)state {
 
     BOOL cmdKeyDown = ([[NSApp currentEvent] modifierFlags] & NSCommandKeyMask) != 0;
