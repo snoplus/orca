@@ -70,6 +70,9 @@ NSString* ORMTCModelIsPedestalEnabledInCSR = @"ORMTCModelIsPedestalEnabledInCSR"
 #define kMTCMemAddressModifier	0x09
 #define kMTCMemAddressSpace		0x02
 
+#define PulserRateSerializationString @"PulserRate"
+#define PGT_PED_Mode_SerializationString @"PulserRate"
+
 static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
 { @"ControlReg"	    , 0   ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //0
 { @"SerialReg"		, 4   ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //1
@@ -1100,7 +1103,6 @@ tubRegister;
 }
 
 - (void) loadFromSearialization:(NSMutableDictionary*) serial {
-    NSLog(@"loadFromSerialization Needs implementation\n");
     //This function will let any exceptions from below bubble up
     [self setN100H_Threshold:[[self valueForKey:[self StringForThreshold:MTC_N100_HI_THRESHOLD_INDEX] fromSerialization:serial] intValue]];
     [self setN100M_Threshold:[[self valueForKey:[self StringForThreshold:MTC_N100_MED_THRESHOLD_INDEX] fromSerialization:serial] intValue]];
@@ -1112,14 +1114,13 @@ tubRegister;
     [self setOWLN_Threshold:[[self valueForKey:[self StringForThreshold:MTC_OWLN_THRESHOLD_INDEX] fromSerialization:serial] intValue]];
     [self setOWLEH_Threshold:[[self valueForKey:[self StringForThreshold:MTC_OWLEHI_THRESHOLD_INDEX] fromSerialization:serial] intValue]];
     [self setOWLEL_Threshold:[[self valueForKey:[self StringForThreshold:MTC_OWLELO_THRESHOLD_INDEX] fromSerialization:serial] intValue]];
-    [self setPgt_rate:[self valueForKey:@"PulerRate" fromSerialization:serial]];
-    [self setIsPedestalEnabledInCSR:[self valueForKey:@"PED_PGT_Mode" fromSerialization:serial]];
+    [self setPgt_rate:[[self valueForKey:PulserRateSerializationString fromSerialization:serial] intValue]];
+    [self setIsPedestalEnabledInCSR:[[self valueForKey:PGT_PED_Mode_SerializationString fromSerialization:serial] boolValue]];
 }
 
 - (NSMutableDictionary*) serializeToDictionary {
     NSMutableDictionary *serial = [NSMutableDictionary dictionaryWithCapacity:30];
     [serial autorelease];
-    NSLog(@"SerializeToDictionary Needs implementation\n");
     //This function will let any exceptions from below bubble up
     [serial setObject:[NSNumber numberWithInt:(int) [self N100H_Threshold]] forKey:[self StringForThreshold:MTC_N100_HI_THRESHOLD_INDEX]];
     [serial setObject:[NSNumber numberWithInt:(int) [self N100M_Threshold]] forKey:[self StringForThreshold:MTC_N100_MED_THRESHOLD_INDEX]];
@@ -1131,7 +1132,8 @@ tubRegister;
     [serial setObject:[NSNumber numberWithInt:(int) [self OWLN_Threshold]] forKey:[self StringForThreshold:MTC_OWLN_THRESHOLD_INDEX]];
     [serial setObject:[NSNumber numberWithInt:(int) [self OWLEH_Threshold]] forKey:[self StringForThreshold:MTC_OWLEHI_THRESHOLD_INDEX]];
     [serial setObject:[NSNumber numberWithInt:(int) [self OWLEL_Threshold]] forKey:[self StringForThreshold:MTC_OWLELO_THRESHOLD_INDEX]];
-    
+    [serial setObject:[NSNumber numberWithUnsignedLong:[self pgt_rate]] forKey:PulserRateSerializationString];
+    [serial setObject:[NSNumber numberWithBool:[self isPedestalEnabledInCSR]] forKey:PGT_PED_Mode_SerializationString];
     return serial;
 }
 

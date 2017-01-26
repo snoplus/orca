@@ -1954,13 +1954,10 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     [detectorSettings setObject:[NSNumber numberWithUnsignedLong:currentRunTypeWord] forKey:@"run_type_word"];
 
     //Save MTC/D parameters, trigger masks and MTC/A+ thresholds
-    NSMutableDictionary* mtc_serial = [[mtc serializeToDictionary]retain];
+    NSMutableDictionary* mtc_serial = [[mtc serializeToDictionary] retain];
     [detectorSettings addEntriesFromDictionary:mtc_serial];
     [mtc_serial release];
     NSLog(@"savestandardrun %@\n",detectorSettings);
-    
-    //Save PED/PGT mode
-    [detectorSettings setObject:[NSNumber numberWithBool:[mtc isPedestalEnabledInCSR]] forKey:@"PED_PGT_Mode"];
     
     [[self orcaDbRefWithEntryDB:self withDB:@"orca"] addDocument:detectorSettings tag:@"kStandardRunDocumentAdded"];
 
