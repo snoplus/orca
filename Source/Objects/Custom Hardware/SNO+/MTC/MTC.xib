@@ -1857,6 +1857,14 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
+                                                    <button toolTip="Cmd-Click to set/unset all boxes in a column" horizontalHuggingPriority="750" verticalHuggingPriority="750" id="lOt-Vs-JPZ">
+                                                        <rect key="frame" x="16" y="11" width="25" height="25"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="help" bezelStyle="helpButton" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ZyZ-2Y-bbA">
+                                                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                    </button>
                                                     <matrix verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="w6U-Ny-3gU">
                                                         <rect key="frame" x="151" y="55" width="70" height="450"/>
                                                         <autoresizingMask key="autoresizingMask"/>
