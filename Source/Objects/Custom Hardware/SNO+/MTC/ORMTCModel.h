@@ -213,7 +213,6 @@
 - (void) write:(int)aReg value:(uint32_t)aValue;
 - (void) setBits:(int)aReg mask:(uint32_t)aMask;
 - (void) clrBits:(int)aReg mask:(uint32_t)aMask;
-- (unsigned long) getMTC_CSR;
 - (void) sendMTC_SoftGt;
 - (void) sendMTC_SoftGt:(BOOL) setGTMask;
 - (void) initializeMtc;
@@ -266,7 +265,6 @@
 - (void) readBasicOps;
 - (void) writeBasicOps;
 - (void) stopBasicOps;
-- (void) reportStatus;
 @end
 
 extern NSString* ORMTCModelBasicOpsRunningChanged;

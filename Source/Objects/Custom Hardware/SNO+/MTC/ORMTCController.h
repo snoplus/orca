@@ -46,7 +46,6 @@
     IBOutlet NSButton       *readButton;
     IBOutlet NSButton       *writteButton;
     IBOutlet NSButton       *stopButton;
-    IBOutlet NSButton       *statusButton;
 
     
 	//standard Ops
@@ -164,7 +163,6 @@
 //Basic Ops
 - (IBAction) basicReadAction:(id) sender;
 - (IBAction) basicWriteAction:(id) sender;
-- (IBAction) basicStatusAction:(id) sender;
 - (IBAction) basicStopAction:(id) sender;
 - (IBAction) basicAutoIncrementAction:(id)sender;
 - (IBAction) basicUseMemoryAction:(id)sender;

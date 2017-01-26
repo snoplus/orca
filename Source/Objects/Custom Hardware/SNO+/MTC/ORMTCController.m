@@ -430,7 +430,6 @@
     [readButton setEnabled: !lockedOrNotRunningMaintenance];
     [writteButton setEnabled: !lockedOrNotRunningMaintenance];
     [stopButton setEnabled: !lockedOrNotRunningMaintenance];
-    [statusButton setEnabled: !lockedOrNotRunningMaintenance];
     
     //Standards ops
     lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORMTCBasicLock] | sequenceRunning;
@@ -646,11 +645,6 @@
 - (IBAction) basicWriteAction:(id) sender
 {
 	[model writeBasicOps];
-}
-
-- (IBAction) basicStatusAction:(id) sender
-{
-	[model reportStatus];
 }
 
 - (IBAction) basicStopAction:(id) sender
