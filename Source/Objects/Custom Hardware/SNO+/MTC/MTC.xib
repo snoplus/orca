@@ -667,7 +667,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <button id="v0h-1C-uUl">
-                                                        <rect key="frame" x="11" y="145" width="60" height="18"/>
+                                                        <rect key="frame" x="7" y="145" width="60" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="PEDs" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="nVL-b3-xdi">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
