@@ -800,8 +800,6 @@
 - (IBAction) nHitViewTypeAction:(id)sender
 {
 	[self endEditing];
-	// TODO: Make this not use a model variable,
-    // btw it's rediculous that someone would use a model variable for this.
     [self changeNhitThresholdsDisplay: [sender tag]];
 }
 

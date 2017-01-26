@@ -91,8 +91,11 @@
     BOOL _mtcStatusDataAvailable;
     unsigned long _mtcStatusNumEventsInMem;
     BOOL _resetFifoOnStart;
-    uint16_t mtca_thresholds[MTC_NUM_THRESHOLDS];
 
+    uint16_t mtca_thresholds[MTC_NUM_THRESHOLDS];
+    uint16_t mtca_baselines[MTC_NUM_THRESHOLDS];
+    float mtca_dac_per_nhit[MTC_NUM_THRESHOLDS]; //Let the ESUMs have a conversion in case we ever need it
+    float mtca_dac_per_mV[MTC_NUM_THRESHOLDS];
     RedisClient *mtc;
 }
 
@@ -118,6 +121,8 @@
 @property (nonatomic,assign) BOOL isPedestalEnabledInCSR;
 @property (nonatomic,assign) BOOL resetFifoOnStart;
 @property (nonatomic,assign) BOOL pulserEnabled;
+
+//TODO refactor all this MTCA crap into it's own class/struct
 @property (nonatomic) uint16_t N100H_Threshold;
 @property (nonatomic) uint16_t N100M_Threshold;
 @property (nonatomic) uint16_t N100L_Threshold;
@@ -128,6 +133,37 @@
 @property (nonatomic) uint16_t OWLEL_Threshold;
 @property (nonatomic) uint16_t OWLEH_Threshold;
 @property (nonatomic) uint16_t OWLN_Threshold;
+
+@property (nonatomic) uint16_t N100H_Baseline;
+@property (nonatomic) uint16_t N100M_Baseline;
+@property (nonatomic) uint16_t N100L_Baseline;
+@property (nonatomic) uint16_t N20_Baseline;
+@property (nonatomic) uint16_t N20LB_Baseline;
+@property (nonatomic) uint16_t ESUML_Baseline;
+@property (nonatomic) uint16_t ESUMH_Baseline;
+@property (nonatomic) uint16_t OWLEL_Baseline;
+@property (nonatomic) uint16_t OWLEH_Baseline;
+@property (nonatomic) uint16_t OWLN_Baseline;
+
+@property (nonatomic) float N100H_DAC_per_NHIT;
+@property (nonatomic) float N100M_DAC_per_NHIT;
+@property (nonatomic) float N100L_DAC_per_NHIT;
+@property (nonatomic) float N20_DAC_per_NHIT;
+@property (nonatomic) float N20LB_DAC_per_NHIT;
+@property (nonatomic) float OWLN_DAC_per_NHIT;
+
+@property (nonatomic) float N100H_DAC_per_mV;
+@property (nonatomic) float N100M_DAC_per_mV;
+@property (nonatomic) float N100L_DAC_per_mV;
+@property (nonatomic) float N20_DAC_per_mV;
+@property (nonatomic) float N20LB_DAC_per_mV;
+@property (nonatomic) float ESUML_DAC_per_mV;
+@property (nonatomic) float ESUMH_DAC_per_mV;
+@property (nonatomic) float OWLEL_DAC_per_mV;
+@property (nonatomic) float OWLEH_DAC_per_mV;
+@property (nonatomic) float OWLN_DAC_per_mV;
+
+
 
 #pragma mark •••Initialization
 - (id) init;
@@ -180,10 +216,20 @@
 - (int) dbIntByIndex:(int)anIndex;
 - (float) getThresholdOfType:(int) type inUnits:(int) units;
 - (void) setThresholdOfType:(int) type fromUnits: (int) units toValue:(float) aThreshold;
+
+- (uint16_t) getBaselineOfType:(int) type;
+- (void) setBaselineOfType:(int) type toValue:(uint16_t) _val;
+
+- (float) DAC_per_NHIT_ofType:(int) type;
+- (void) setDAC_per_NHIT_OfType:(int) type toValue:(float) _val;
+
+- (float) DAC_per_mV_ofType:(int) type;
+- (void) setDAC_per_mV_OfType:(int) type toValue:(float) _val;
+
 - (float) convertThreshold:(float)aThreshold OfType:(int) type fromUnits:(int)in_units toUnits:(int) out_units;
 - (void) loadFromSearialization:(NSMutableDictionary*) serial;
 - (NSMutableDictionary*) serializeToDictionary;
-
+- (void) load_settings_from_trigger_scan_for_type:(int) type;
 /*#pragma mark •••Converters
 - (unsigned long) mVoltsToRaw:(float) mVolts;
 - (float) rawTomVolts:(long) aRawValue;

@@ -31,6 +31,8 @@
 #import "ORRunController.h"
 #import "ORPQModel.h"
 #import "SNOPModel.h"
+#import "ORPQModel.h"
+#import "ORPQResult.h"
 
 #define uShortDBValue(A) [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] unsignedShortValue]
 #define uLongDBValue(A)  [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] unsignedLongValue]
@@ -979,14 +981,16 @@ pulserEnabled = _pulserEnabled;
     return -1.0;
 }
 
+//The following ~150 lines is verbose mess. I blame that on objective C and I take no responsibility --Eric M.
+
+
+
 - (uint16_t) N100H_Threshold {
     return [self getThresholdOfType:MTC_N100_HI_THRESHOLD_INDEX inUnits:MTC_RAW_UNITS];
 }
 - (void) setN100H_Threshold:(uint16_t)threshold {
     [self setThresholdOfType:MTC_N100_HI_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:threshold];
 }
-
-
 - (uint16_t) N100M_Threshold { return [self getThresholdOfType:MTC_N100_MED_THRESHOLD_INDEX inUnits:MTC_RAW_UNITS]; }
 - (void) setN100M_Threshold:(uint16_t)threshold { [self setThresholdOfType:MTC_N100_MED_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:threshold]; }
 
@@ -1014,7 +1018,108 @@ pulserEnabled = _pulserEnabled;
 - (uint16_t) OWLEL_Threshold { return [self getThresholdOfType:MTC_OWLELO_THRESHOLD_INDEX inUnits:MTC_RAW_UNITS]; }
 - (void) setOWLEL_Threshold:(uint16_t)threshold { [self setThresholdOfType:MTC_OWLELO_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:threshold]; }
 
+
+- (uint16_t) getBaselineOfType:(int) type {
+    return mtca_baselines[type];
+}
+- (void) setBaselineOfType:(int) type toValue:(uint16_t) _val {
+    mtca_baselines[type] = _val;
+}
+- (uint16_t) N100H_Baseline {return [self getBaselineOfType:MTC_N100_HI_THRESHOLD_INDEX];}
+- (void) setN100H_Baseline:(uint16_t)_val { return [self setBaselineOfType:MTC_N100_HI_THRESHOLD_INDEX toValue: _val]; }
+
+- (uint16_t) N100M_Baseline {return [self getBaselineOfType:MTC_N100_MED_THRESHOLD_INDEX];}
+- (void) setN100M_Baseline:(uint16_t)_val { return [self setBaselineOfType:MTC_N100_MED_THRESHOLD_INDEX toValue: _val]; }
+
+- (uint16_t) N100L_Baseline {return [self getBaselineOfType:MTC_N100_LO_THRESHOLD_INDEX];}
+- (void) setN100L_Baseline:(uint16_t)_val { return [self setBaselineOfType:MTC_N100_LO_THRESHOLD_INDEX toValue:_val]; }
+
+- (uint16_t) N20_Baseline   {return [self getBaselineOfType:MTC_N20_THRESHOLD_INDEX];}
+- (void) setN20_Baseline: (uint16_t) _val { return [self setBaselineOfType:MTC_N20_THRESHOLD_INDEX toValue: _val]; }
+
+- (uint16_t) N20LB_Baseline {return [self getBaselineOfType:MTC_N20LB_THRESHOLD_INDEX];}
+- (void) setN20LB_Baseline: (uint16_t) _val { return [self setBaselineOfType:MTC_N20LB_THRESHOLD_INDEX toValue: _val]; }
+
+- (uint16_t) ESUML_Baseline {return [self getBaselineOfType:MTC_ESUML_THRESHOLD_INDEX];}
+- (void) setESUMH_Baseline:(uint16_t) _val { return [self setBaselineOfType:MTC_ESUMH_THRESHOLD_INDEX toValue: _val]; }
+
+- (uint16_t) ESUMH_Baseline {return [self getBaselineOfType:MTC_ESUMH_THRESHOLD_INDEX];}
+- (void) setESUML_Baseline:(uint16_t) _val { return [self setBaselineOfType:MTC_ESUML_THRESHOLD_INDEX toValue: _val]; }
+
+- (uint16_t) OWLEL_Baseline {return [self getBaselineOfType:MTC_OWLELO_THRESHOLD_INDEX];}
+- (void) setOWLEH_Baseline:(uint16_t) _val { return [self setBaselineOfType:MTC_OWLEHI_THRESHOLD_INDEX toValue: _val]; }
+
+- (uint16_t) OWLEH_Baseline {return [self getBaselineOfType:MTC_OWLEHI_THRESHOLD_INDEX];}
+- (void) setOWLEL_Baseline:(uint16_t) _val { return [self setBaselineOfType:MTC_OWLELO_THRESHOLD_INDEX toValue: _val]; }
+
+- (uint16_t) OWLN_Baseline  {return [self getBaselineOfType:MTC_OWLN_THRESHOLD_INDEX];}
+- (void) setOWLN_Baseline:(uint16_t) _val  { return [self setBaselineOfType:MTC_OWLN_THRESHOLD_INDEX toValue: _val]; }
+
+
+- (float) DAC_per_NHIT_ofType:(int) type {
+    return mtca_dac_per_nhit[type];
+}
+- (void) setDAC_per_NHIT_OfType:(int) type toValue:(float) _val {
+    mtca_dac_per_nhit[type] = _val;
+}
+- (float) N100H_DAC_per_NHIT { return [self DAC_per_NHIT_ofType: MTC_N100_HI_THRESHOLD_INDEX]; }
+- (void) setN100H_DAC_per_NHIT:(float) _val { [self setDAC_per_NHIT_OfType:MTC_N100_HI_THRESHOLD_INDEX toValue:_val]; }
+
+- (float) N100M_DAC_per_NHIT { return [self DAC_per_NHIT_ofType: MTC_N100_MED_THRESHOLD_INDEX]; }
+- (void) setN100M_DAC_per_NHIT:(float) _val { [self setDAC_per_NHIT_OfType:MTC_N100_MED_THRESHOLD_INDEX toValue:_val]; }
+
+- (float) N100L_DAC_per_NHIT { return [self DAC_per_NHIT_ofType: MTC_N100_LO_THRESHOLD_INDEX]; }
+- (void) setN100L_DAC_per_NHIT: (float) _val { return [self setDAC_per_NHIT_OfType:MTC_N100_LO_THRESHOLD_INDEX toValue:_val]; }
+
+- (float) N20_DAC_per_NHIT { return [self DAC_per_NHIT_ofType: MTC_N20_THRESHOLD_INDEX]; }
+- (void) setN20_DAC_per_NHIT:(float) _val { [self setDAC_per_NHIT_OfType:MTC_N20_THRESHOLD_INDEX toValue: _val]; }
+
+- (float) N20LB_DAC_per_NHIT {return [self DAC_per_NHIT_ofType: MTC_N20LB_THRESHOLD_INDEX]; }
+- (void) setN20LB_DAC_per_NHIT:(float) _val { [self setDAC_per_NHIT_OfType: MTC_N20LB_THRESHOLD_INDEX toValue: _val]; }
+
+- (float) OWLN_DAC_per_NHIT { return  [self DAC_per_NHIT_ofType: MTC_OWLN_THRESHOLD_INDEX]; }
+- (void) setOWLN_DAC_per_NHIT:(float) _val { [self setDAC_per_NHIT_OfType: MTC_OWLN_THRESHOLD_INDEX toValue: _val]; }
+
+
+- (float) DAC_per_mV_ofType:(int) type {
+    return mtca_dac_per_mV[type];
+}
+- (void) setDAC_per_mV_OfType:(int) type toValue:(float) _val {
+    mtca_dac_per_mV[type] = _val;
+}
+- (float) N100H_DAC_per_mV { return [self DAC_per_mV_ofType:MTC_N100_HI_THRESHOLD_INDEX]; }
+- (void) setN100H_DAC_per_mV:(float) _val { [self setDAC_per_mV_OfType:MTC_N100_HI_THRESHOLD_INDEX toValue: _val]; }
+
+- (float) N100M_DAC_per_mV { return [self DAC_per_mV_ofType:MTC_N100_MED_THRESHOLD_INDEX]; }
+- (void) setN100M_DAC_per_mV:(float) _val { [self setDAC_per_mV_OfType:MTC_N100_MED_THRESHOLD_INDEX toValue: _val]; }
+
+- (float) N100L_DAC_per_mV { return [self DAC_per_mV_ofType:MTC_N100_LO_THRESHOLD_INDEX]; }
+- (void) setN100L_DAC_per_mV:(float) _val { [self setDAC_per_mV_OfType:MTC_N100_LO_THRESHOLD_INDEX toValue: _val]; }
+
+- (float) N20_DAC_per_mV { return [self DAC_per_mV_ofType:MTC_N20_THRESHOLD_INDEX]; }
+- (void) setN20_DAC_per_mV:(float) _val { [self setDAC_per_mV_OfType:MTC_N20_THRESHOLD_INDEX toValue: _val]; }
+
+- (float) N20LB_DAC_per_mV { return [self DAC_per_mV_ofType:MTC_N20LB_THRESHOLD_INDEX]; }
+- (void) setN20LB_DAC_per_mV:(float) _val { [self setDAC_per_mV_OfType:MTC_N20LB_THRESHOLD_INDEX toValue: _val]; }
+
+- (float) ESUML_DAC_per_mV { return [self DAC_per_mV_ofType:MTC_ESUML_THRESHOLD_INDEX]; }
+- (void) setESUML_DAC_per_mV:(float) _val { [self setDAC_per_mV_OfType:MTC_ESUML_THRESHOLD_INDEX toValue: _val]; }
+
+- (float) ESUMH_DAC_per_mV { return [self DAC_per_mV_ofType:MTC_ESUMH_THRESHOLD_INDEX]; }
+- (void) setESUMH_DAC_per_mV:(float) _val { [self setDAC_per_mV_OfType:MTC_ESUMH_THRESHOLD_INDEX toValue: _val]; }
+
+- (float) OWLEL_DAC_per_mV { return [self DAC_per_mV_ofType:MTC_OWLEHI_THRESHOLD_INDEX]; }
+- (void) setOWLEL_DAC_per_mV:(float) _val { [self setDAC_per_mV_OfType:MTC_OWLEHI_THRESHOLD_INDEX toValue: _val]; }
+
+- (float) OWLEH_DAC_per_mV { return [self DAC_per_mV_ofType:MTC_OWLELO_THRESHOLD_INDEX]; }
+- (void) setOWLEH_DAC_per_mV:(float) _val { [self setDAC_per_mV_OfType:MTC_OWLELO_THRESHOLD_INDEX toValue: _val]; }
+
+- (float) OWLN_DAC_per_mV { return [self DAC_per_mV_ofType:MTC_OWLN_THRESHOLD_INDEX]; }
+- (void) setOWLN_DAC_per_mV:(float) _val { [self setDAC_per_mV_OfType:MTC_OWLN_THRESHOLD_INDEX toValue: _val]; }
+
+
 - (id) valueForKey:(NSString*) str fromSerialization:(NSMutableDictionary*)serial {
+    NSLog(@"Note to self finish this\n");
     [[serial valueForKey:@"rows"] intValue];
     return [[[[serial valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"N100H_Threshold"];
 }
@@ -1092,6 +1197,99 @@ pulserEnabled = _pulserEnabled;
     
     return serial;
 }
+
+- (int) trigger_scan_name_to_index:(NSString*) name {
+    int ret = -1;
+    if([name isEqual:@"N100LO"]){ ret = MTC_N100_LO_THRESHOLD_INDEX; }
+    else if([name isEqual:@"N100MED"]){ ret = MTC_N100_MED_THRESHOLD_INDEX; }
+    else if([name isEqual:@"N100HI"]){ ret = MTC_N100_HI_THRESHOLD_INDEX; }
+    else if([name isEqual:@"N20"]){ ret = MTC_N20_THRESHOLD_INDEX; }
+    else if([name isEqual:@"N20LB"]){ ret = MTC_N20LB_THRESHOLD_INDEX; }
+    else if([name isEqual:@"OWLN"]){ ret = MTC_OWLN_THRESHOLD_INDEX; }
+    else {/*raise exception?*/}
+    return ret;
+}
+- (int) index_to_trigger_scan_name:(int) index {
+    NSString *ret = @"";
+    switch (index) {
+        case MTC_N100_HI_THRESHOLD_INDEX:
+            ret = @"N100HI";
+            break;
+        case MTC_N100_MED_THRESHOLD_INDEX:
+            ret = @"N100MED";
+            break;
+        case MTC_N100_LO_THRESHOLD_INDEX:
+            ret = @"N100LO";
+            break;
+        case MTC_N20_THRESHOLD_INDEX:
+            ret = @"N20";
+            break;
+        case MTC_N20LB_THRESHOLD_INDEX:
+            ret = @"N20LB";
+            break;
+        case MTC_OWLN_THRESHOLD_INDEX:
+            ret = @"OWLN";
+            break;
+        default:
+            //Raise exception?
+            break;
+    }
+    return ret;
+}
+- (void) waitForTriggerScan: (ORPQResult *) result
+{
+    int numRows, numCols;
+    
+    if (!result) {
+        //Handle this
+        
+    }
+    
+    numRows = [result numOfRows];
+    numCols = [result numOfFields];
+    
+    if (numRows != 1) {
+        //Handle error
+    }
+    
+    if (numCols != 3) {
+        // Handle error
+    }
+    NSDictionary* result_dict = [result fetchRowAsDictionary];
+    if(!result_dict)
+    {
+        //No row exists
+        //Handle error
+        
+    }
+    NSLog(@"%@\n",result_dict);
+    NSString* name = [result_dict objectForKey:@"name"];
+    NSString* baseline = [[result_dict objectForKey:@"baseline"] stringValue];
+
+    NSString* dac_per_nhit =[[result_dict objectForKey:@"adc_per_nhit"] stringValue];
+    [self setBaselineOfType:[self trigger_scan_name_to_index:name] toValue:[baseline intValue]];
+    [self setDAC_per_NHIT_OfType:[self trigger_scan_name_to_index:name] toValue:[dac_per_nhit floatValue]];
+
+
+    return;
+}
+- (void) load_settings_from_trigger_scan_for_type:(int) type {
+    NSLog(@"fuuuuudge\n");
+
+    ORPQModel* pgsql_connec = [ORPQModel getCurrent];
+    if(!pgsql_connec)
+    {
+        NSLog(@"Shitsbad\n");
+        return;
+        //Raise exception
+    }
+    NSLog(@"shitsgood\n");
+    NSString* trig_scan_name = [self index_to_trigger_scan_name:type];
+    NSString* db_cmd = [NSString stringWithFormat:@"select name,baseline,adc_per_nhit from trigger_scan where name='%@' and timestamp=(SELECT max(timestamp) from trigger_scan where name='%@')",trig_scan_name,trig_scan_name];
+    NSLog(@"%@\n",db_cmd);
+    [pgsql_connec dbQuery:db_cmd object:self selector:@selector(waitForTriggerScan:) timeout:1.0];
+}
+
 
 #pragma mark •••HW Access
 - (short) getNumberRegisters
@@ -1479,72 +1677,6 @@ pulserEnabled = _pulserEnabled;
     unsigned long theUpperBits  = (unsigned long)(theTicks10MHz/4294967296.0);
 
     [self setThe10MHzCounterLow:theLowerBits high:theUpperBits];
-    
-    /*
- 	if( theSecondsToSubtract == 0 ) {
-		theSecondsToSubtract =  (unsigned long)[[NSDate date] timeIntervalSinceDate:[NSCalendarDate dateWithYear:1996 month:1 day:1 hour:0 minute:0 second:0 timeZone:[NSTimeZone timeZoneWithAbbreviation:@"GMT"]]];
- 	}
-    */
-    
-	/* 
-	 //load the 10MHz clock from mac time....eventually we will 
-	 //get the time from the GPS.
-	 time_t theGPSSeconds = 0;
-	 time_t theMacSeconds = 0;
-	 short theGPSAddress = 0;
-	 unsigned long theMacMtcSetTimeInSeconds = 0;
-	 unsigned long theGPSMtcSetTimeInSeconds = 0;
-	 CDatumGPS *theGPS = NULL;
-	 if( gConfiguration->GetObject('SC1A' ) ) {
-	 CRunControl * theRunControl = (CRunControl *)(gConfiguration->GetTheObject());
-	 theGPSAddress = theRunControl->GetGPSAddress();
-	 if( theGPSAddress > 0 ) {
-	 // load from GPS if the GPS exists
-	 // note if the GPS has already been created with the correct address
-	 // then the method just returns mDatumGPS otherwise it creates a new one
-	 theGPS = theRunControl->CreateDatumGPS();
-	 if( theGPS ) {
-	 if( theGPS->ReadTime(&theGPSSeconds ) == noErr) {
-	 theGPSMtcSetTimeInSeconds = theGPSSeconds + kDelaySetTime - theSecondsToSubtract;
-	 }
-	 else {
-	 theGPS = NULL;
-	 }
-	 }
-	 }
-	 }
-	 time(&theMacSeconds);
-	 theMacMtcSetTimeInSeconds = theMacSeconds - theSecondsToSubtract - OffsetFromGMT();
-	 
-	 unsigned long theSeconds = 0;
-	 if( theGPS == NULL && (theGPSAddress > 0) ) {
-	 SysBeep(10);
-	 NSLog(@"Communication with the GPS at address %d failed.\n",theGPSAddress);
-	 NSLog(@"Can not set the 10MHz clock!\n");
-	 }
-	 else {
-	 if( theGPS == NULL )	theSeconds = theMacMtcSetTimeInSeconds;
-	 else					theSeconds = theGPSMtcSetTimeInSeconds;
-	 double        theTicks10MHz = theSeconds/100.E-9;
-	 unsigned long theLowerBits  = (unsigned long) fmod(theTicks10MHz,4294967296.0);
-	 unsigned long theUpperBits  = (unsigned long)(theTicks10MHz/4294967296.0);
-	 [self setThe10MHzCounterLow:theLowerBits high:theUpperBits];
-	 if( theGPS != NULL ) {
-	 if( theGPS->WritePresetCoincidence(theGPSSeconds + kDelaySetTime) != noErr ) {
-	 NSLog(@"The preset write to the GPS failed\n" );
-	 NSLog(@"The MTC 10MHz clock has been loaded but not set\n" );
-	 NSLog(@"The MTC MUST receive a sync pulse for the clock to latch\n" );
-	 }
-	 else {
-	 NSLog(@"The MTC 10MHz clock will be loaded within %d seconds\n", kDelaySetTime);
-	 }
-	 }
-	 else {
-	 NSLog(@"The MTC 10MHz clock has been set to the Mac time\n" );
-	 NSLog(@"The sync cable on the GPS MUST be connected to 1pps for this to work\n" );
-	 }
-	 }
-	 */
 }
 
 - (double) get10MHzSeconds
