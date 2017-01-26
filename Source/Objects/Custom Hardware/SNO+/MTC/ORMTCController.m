@@ -429,7 +429,7 @@
     [initNoXilinxButton			setEnabled: !lockedOrNotRunningMaintenance];
     [initNo10MHzButton			setEnabled: !lockedOrNotRunningMaintenance];
     [initNoXilinxNo100MHzButton setEnabled: !lockedOrNotRunningMaintenance];
-    [pulserFeedsMatrix          setEnabled: !lockedOrNotRunningMaintenance];
+    [includePedestalsCheckBox   setEnabled: !lockedOrNotRunningMaintenance];
     
     [firePedestalsButton		setEnabled: !lockedOrNotRunningMaintenance && [model isPulserFixedRate]];
     [stopPedestalsButton		setEnabled: !lockedOrNotRunningMaintenance && [model isPulserFixedRate]];
@@ -478,14 +478,7 @@
 
 - (void) isPedestalEnabledInCSRChanged:(NSNotification*)aNotification
 {
-    if ([model isPedestalEnabledInCSR]) {
-        [[pulserFeedsMatrix cellWithTag:0] setIntegerValue:0];
-        [[pulserFeedsMatrix cellWithTag:1] setIntegerValue:1];
-    }
-    else {
-        [[pulserFeedsMatrix cellWithTag:0] setIntegerValue:1];
-        [[pulserFeedsMatrix cellWithTag:1] setIntegerValue:0];
-    }
+    [includePedestalsCheckBox setState:[model isPedestalEnabledInCSR]];
 }
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
@@ -766,7 +759,7 @@
 
 - (IBAction) standardPulserFeeds:(id)sender
 {
-    [model setIsPedestalEnabledInCSR:[[sender selectedCell] tag]];
+    [model setIsPedestalEnabledInCSR:[includePedestalsCheckBox state]];
     [self endEditing];
 }
 
