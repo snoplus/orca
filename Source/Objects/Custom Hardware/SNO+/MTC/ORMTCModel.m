@@ -72,6 +72,7 @@ NSString* ORMTCModelIsPedestalEnabledInCSR = @"ORMTCModelIsPedestalEnabledInCSR"
 
 #define PulserRateSerializationString @"PulserRate"
 #define PGT_PED_Mode_SerializationString @"PulserRate"
+#define PulserEnabledSerializationString @"PulserEnabled"
 
 static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
 { @"ControlReg"	    , 0   ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //0
@@ -1116,6 +1117,7 @@ tubRegister;
     [self setOWLEL_Threshold:[[self valueForKey:[self StringForThreshold:MTC_OWLELO_THRESHOLD_INDEX] fromSerialization:serial] intValue]];
     [self setPgt_rate:[[self valueForKey:PulserRateSerializationString fromSerialization:serial] intValue]];
     [self setIsPedestalEnabledInCSR:[[self valueForKey:PGT_PED_Mode_SerializationString fromSerialization:serial] boolValue]];
+    [self setPulserEnabled:[[self valueForKey:PulserEnabledSerializationString fromSerialization:serial] boolValue]];
 }
 
 - (NSMutableDictionary*) serializeToDictionary {
@@ -1134,6 +1136,7 @@ tubRegister;
     [serial setObject:[NSNumber numberWithInt:(int) [self OWLEL_Threshold]] forKey:[self StringForThreshold:MTC_OWLELO_THRESHOLD_INDEX]];
     [serial setObject:[NSNumber numberWithUnsignedLong:[self pgt_rate]] forKey:PulserRateSerializationString];
     [serial setObject:[NSNumber numberWithBool:[self isPedestalEnabledInCSR]] forKey:PGT_PED_Mode_SerializationString];
+    [serial setObject:[NSNumber numberWithBool:[self pulserEnabled] ] forKey:PulserEnabledSerializationString];
     return serial;
 }
 
