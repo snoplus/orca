@@ -1545,11 +1545,13 @@ snopGreenColor;
     if(activeCell == 10) {
         raw = [[sender cellAtRow:10 column:0] floatValue];
         [mtcModel setPrescaleValue:raw];
+        return;
     }
     //Pulser
     if(activeCell == 11) {
         raw = [[sender cellAtRow:11 column:0] floatValue];
         [mtcModel setPgt_rate:raw];
+        return;
     }
     @try{
         [mtcModel setThresholdOfType:threshold_index fromUnits:units toValue:threshold_value];

@@ -12,12 +12,16 @@
                 <outlet property="basicOpsRunningIndicator" destination="1324" id="1326"/>
                 <outlet property="coarseDelayField" destination="1834" id="2516"/>
                 <outlet property="continuePedestalsButton" destination="4056" id="4089"/>
+                <outlet property="eSumViewTypeMatrix" destination="R5c-j8-UOB" id="g16-Dj-XiB"/>
+                <outlet property="esumMatrix" destination="AUU-Ta-E3F" id="6wc-1l-r5m"/>
                 <outlet property="extraPulserPeriodField" destination="M4V-7Q-nR2" id="MDr-RK-uzS"/>
                 <outlet property="fineDelayField" destination="1833" id="2515"/>
                 <outlet property="fireFixedTimePedestalsButton" destination="4055" id="4099"/>
                 <outlet property="firePedestalsButton" destination="4058" id="4087"/>
                 <outlet property="fixedTimePedestalsCountField" destination="4073" id="4097"/>
                 <outlet property="fixedTimePedestalsDelayField" destination="4078" id="4098"/>
+                <outlet property="globalTriggerCrateMaskMatrix" destination="39t-6x-ShF" id="NbU-oI-DQo"/>
+                <outlet property="globalTriggerMaskMatrix" destination="kFA-7K-oIO" id="rDg-KR-YB9"/>
                 <outlet property="includePedestalsCheckBox" destination="v0h-1C-uUl" id="C7u-kX-XAb"/>
                 <outlet property="initMtcButton" destination="1436" id="3868"/>
                 <outlet property="initNo10MHzButton" destination="1440" id="3870"/>
@@ -26,7 +30,11 @@
                 <outlet property="initProgressBar" destination="3885" id="3890"/>
                 <outlet property="initProgressField" destination="3886" id="3891"/>
                 <outlet property="isPulserFixedRateMatrix" destination="4091" id="4096"/>
+                <outlet property="loadGTCrateMaskButton" destination="hMd-oF-3rP" id="49b-Js-OVU"/>
                 <outlet property="loadMTCACrateMaskButton" destination="Ge6-pq-Cs8" id="ARa-Rw-DuD"/>
+                <outlet property="loadMTCADacsButton" destination="lSV-pJ-ajX" id="BVt-yo-66c"/>
+                <outlet property="loadPEDCrateMaskButton" destination="fHv-tp-3wX" id="byX-Xa-F9i"/>
+                <outlet property="loadTriggerMaskButton" destination="f7w-lz-PNx" id="MWn-Px-rGi"/>
                 <outlet property="lockOutWidthField" destination="1801" id="2506"/>
                 <outlet property="memBaseAddressStepper" destination="1210" id="2822"/>
                 <outlet property="memBaseAddressText" destination="1284" id="1291"/>
@@ -40,8 +48,11 @@
                 <outlet property="mtcaOEHIMatrix" destination="lZq-AY-0cp" id="yhL-w3-WrS"/>
                 <outlet property="mtcaOELOMatrix" destination="5oq-Ir-Kgd" id="N7x-r9-zQV"/>
                 <outlet property="mtcaOWLNMatrix" destination="hN4-fq-BVv" id="QHR-6A-SJ4"/>
+                <outlet property="nHitViewTypeMatrix" destination="Xfv-jE-5RS" id="8Mw-Od-XTl"/>
                 <outlet property="nhit100LoPrescaleField" destination="1808" id="2508"/>
+                <outlet property="nhitMatrix" destination="3Sr-S3-X4Y" id="Vih-YI-BWQ"/>
                 <outlet property="opAdvancedOptionsBox" destination="uOx-3t-AfW" id="q7U-9m-VWA"/>
+                <outlet property="pedCrateMaskMatrix" destination="Mno-Cd-fe2" id="SQY-sJ-fah"/>
                 <outlet property="pedestalWidthField" destination="1803" id="2507"/>
                 <outlet property="pulserPeriodField" destination="1806" id="2509"/>
                 <outlet property="readButton" destination="1253" id="YOa-8v-Q9c"/>
@@ -717,55 +728,6 @@
                                                 <rect key="frame" x="1" y="1" width="253" height="221"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <matrix verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="3Sr-S3-X4Y">
-                                                        <rect key="frame" x="105" y="49" width="62" height="144"/>
-                                                        <autoresizingMask key="autoresizingMask"/>
-                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        <size key="cellSize" width="62" height="19"/>
-                                                        <size key="intercellSpacing" width="4" height="6"/>
-                                                        <textFieldCell key="prototype" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="bXs-5k-UXi">
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                        <cells>
-                                                            <column>
-                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" tag="1" drawsBackground="YES" id="nzA-2f-pvG">
-                                                                    <font key="font" metaFont="smallSystem"/>
-                                                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                </textFieldCell>
-                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" tag="2" drawsBackground="YES" id="LJH-Em-XKz">
-                                                                    <font key="font" metaFont="smallSystem"/>
-                                                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                </textFieldCell>
-                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" tag="3" drawsBackground="YES" id="7Au-Rf-xmF">
-                                                                    <font key="font" metaFont="smallSystem"/>
-                                                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                </textFieldCell>
-                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" tag="4" drawsBackground="YES" id="kgp-tb-PKg">
-                                                                    <font key="font" metaFont="smallSystem"/>
-                                                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                </textFieldCell>
-                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" tag="5" drawsBackground="YES" id="8EV-qY-Cuk">
-                                                                    <font key="font" metaFont="smallSystem"/>
-                                                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                </textFieldCell>
-                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" tag="6" drawsBackground="YES" id="NBI-WV-6S6">
-                                                                    <font key="font" metaFont="smallSystem"/>
-                                                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                </textFieldCell>
-                                                            </column>
-                                                        </cells>
-                                                        <connections>
-                                                            <action selector="settingsNHitAction:" target="-2" id="bbr-6P-Bmj"/>
-                                                        </connections>
-                                                    </matrix>
                                                     <textField verticalHuggingPriority="750" id="1k7-Y9-awN">
                                                         <rect key="frame" x="20" y="173" width="80" height="18"/>
                                                         <autoresizingMask key="autoresizingMask"/>
@@ -877,6 +839,73 @@
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                         <font key="titleFont" metaFont="system"/>
                                                     </box>
+                                                    <matrix verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="3Sr-S3-X4Y">
+                                                        <rect key="frame" x="105" y="49" width="62" height="144"/>
+                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        <size key="cellSize" width="62" height="19"/>
+                                                        <size key="intercellSpacing" width="4" height="6"/>
+                                                        <textFieldCell key="prototype" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="bXs-5k-UXi">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <cells>
+                                                            <column>
+                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" tag="1" drawsBackground="YES" id="nzA-2f-pvG">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                    <connections>
+                                                                        <outlet property="formatter" destination="fcg-We-po1" id="mGL-ah-KHJ"/>
+                                                                    </connections>
+                                                                </textFieldCell>
+                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" tag="2" drawsBackground="YES" id="LJH-Em-XKz">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                    <connections>
+                                                                        <outlet property="formatter" destination="fcg-We-po1" id="dN4-zg-YhQ"/>
+                                                                    </connections>
+                                                                </textFieldCell>
+                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" tag="3" drawsBackground="YES" id="7Au-Rf-xmF">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                    <connections>
+                                                                        <outlet property="formatter" destination="fcg-We-po1" id="CYv-ZH-792"/>
+                                                                    </connections>
+                                                                </textFieldCell>
+                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" tag="4" drawsBackground="YES" id="kgp-tb-PKg">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                    <connections>
+                                                                        <outlet property="formatter" destination="fcg-We-po1" id="znF-de-Sce"/>
+                                                                    </connections>
+                                                                </textFieldCell>
+                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" tag="5" drawsBackground="YES" id="8EV-qY-Cuk">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                    <connections>
+                                                                        <outlet property="formatter" destination="fcg-We-po1" id="kfc-gS-FXQ"/>
+                                                                    </connections>
+                                                                </textFieldCell>
+                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" tag="6" drawsBackground="YES" id="NBI-WV-6S6">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                    <connections>
+                                                                        <outlet property="formatter" destination="fcg-We-po1" id="Cjo-Wo-dKz"/>
+                                                                    </connections>
+                                                                </textFieldCell>
+                                                            </column>
+                                                        </cells>
+                                                        <connections>
+                                                            <action selector="settingsNHitAction:" target="-2" id="bbr-6P-Bmj"/>
+                                                        </connections>
+                                                    </matrix>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
@@ -1008,6 +1037,9 @@
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                    <connections>
+                                                                        <outlet property="formatter" destination="fcg-We-po1" id="DSW-c8-1P7"/>
+                                                                    </connections>
                                                                 </textFieldCell>
                                                                 <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" tag="8" drawsBackground="YES" id="8VU-RX-ECt">
                                                                     <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="###0.###" negativeFormat="#0.###" numberStyle="decimal" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="309" maximumFractionDigits="3" decimalSeparator="." groupingSeparator="" currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="c6Q-FE-erk">
@@ -1017,6 +1049,9 @@
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                    <connections>
+                                                                        <outlet property="formatter" destination="fcg-We-po1" id="v8v-lg-kbJ"/>
+                                                                    </connections>
                                                                 </textFieldCell>
                                                                 <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" tag="9" drawsBackground="YES" id="hpO-rc-Sba">
                                                                     <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="##0.###" negativeFormat="#0.###" numberStyle="decimal" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="309" maximumFractionDigits="3" decimalSeparator="." groupingSeparator="" currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="3eo-FW-j4C">
@@ -1026,6 +1061,9 @@
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                    <connections>
+                                                                        <outlet property="formatter" destination="fcg-We-po1" id="Duq-v8-rGy"/>
+                                                                    </connections>
                                                                 </textFieldCell>
                                                                 <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" tag="10" drawsBackground="YES" id="74b-Wq-FXu">
                                                                     <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="###0.###" negativeFormat="#0.###" numberStyle="decimal" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="309" maximumFractionDigits="3" decimalSeparator="." groupingSeparator="" currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="A4N-os-6U6">
@@ -1035,6 +1073,9 @@
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                    <connections>
+                                                                        <outlet property="formatter" destination="fcg-We-po1" id="ZPT-lt-z0l"/>
+                                                                    </connections>
                                                                 </textFieldCell>
                                                             </column>
                                                         </cells>
@@ -1145,27 +1186,6 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" tag="2" id="1808">
-                                                        <rect key="frame" x="133" y="83" width="44" height="19"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="3981">
-                                                            <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="##0.###" negativeFormat="#0.###" numberStyle="decimal" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="309" maximumFractionDigits="3" decimalSeparator="." groupingSeparator="" currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="2870">
-                                                                <nil key="negativeInfinitySymbol"/>
-                                                                <nil key="positiveInfinitySymbol"/>
-                                                            </numberFormatter>
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                        <connections>
-                                                            <binding destination="4516" name="value" keyPath="selection.prescaleValue" id="cyj-hc-d30">
-                                                                <dictionary key="options">
-                                                                    <bool key="NSContinuouslyUpdatesValue" value="YES"/>
-                                                                    <bool key="NSRaisesForNotApplicableKeys" value="NO"/>
-                                                                </dictionary>
-                                                            </binding>
-                                                        </connections>
-                                                    </textField>
                                                     <textField verticalHuggingPriority="750" id="1813">
                                                         <rect key="frame" x="308" y="85" width="91" height="15"/>
                                                         <autoresizingMask key="autoresizingMask"/>
@@ -1271,6 +1291,27 @@
                                                         </textFieldCell>
                                                         <connections>
                                                             <binding destination="4516" name="value" keyPath="selection.pgt_rate" id="d1o-oc-pgS">
+                                                                <dictionary key="options">
+                                                                    <bool key="NSContinuouslyUpdatesValue" value="YES"/>
+                                                                    <bool key="NSRaisesForNotApplicableKeys" value="NO"/>
+                                                                </dictionary>
+                                                            </binding>
+                                                        </connections>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" tag="2" id="1808">
+                                                        <rect key="frame" x="133" y="83" width="44" height="19"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="3981">
+                                                            <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="##0.###" negativeFormat="#0.###" numberStyle="decimal" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="309" maximumFractionDigits="3" decimalSeparator="." groupingSeparator="" currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="2870">
+                                                                <nil key="negativeInfinitySymbol"/>
+                                                                <nil key="positiveInfinitySymbol"/>
+                                                            </numberFormatter>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <binding destination="4516" name="value" keyPath="selection.prescaleValue" id="cyj-hc-d30">
                                                                 <dictionary key="options">
                                                                     <bool key="NSContinuouslyUpdatesValue" value="YES"/>
                                                                     <bool key="NSRaisesForNotApplicableKeys" value="NO"/>
@@ -2331,6 +2372,7 @@
                 <binding destination="-2" name="contentObject" keyPath="self.model" id="4518"/>
             </connections>
         </objectController>
+        <numberFormatter formatterBehavior="default10_4" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="42" id="fcg-We-po1"/>
     </objects>
     <resources>
         <image name="Locked" width="33" height="36"/>
