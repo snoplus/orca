@@ -185,7 +185,8 @@
 - (IBAction) basicWriteValueAction:(id)sender;
 - (IBAction) basicMemoryOffsetAction:(id)sender;
 - (IBAction) basicSelectedRegisterAction:(id)sender;
-
+- (IBAction) updateConversionSettingsAction:(id)sender;
+- (IBAction) EditingWindow:(id)sender;
 //MTC Init Ops
 - (IBAction) standardInitMTC:(id) sender;
 - (IBAction) standardInitMTCnoXilinx:(id) sender;

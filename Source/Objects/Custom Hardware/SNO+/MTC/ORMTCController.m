@@ -949,16 +949,9 @@
     NSLog(@"SettingsESUMAction needs implementation\n");
 
 }
-- (IBAction)TestShit:(id)sender{
-    NSLog(@"fdjklasfjds\n");
+- (IBAction)updateConversionSettingsAction:(id)sender{
     [self trigger_scan_update_nhit];
 
-}
-- (IBAction)TestShit2:(id)sender{
-    for(int i = FIRST_NHIT_TAG;i<LAST_NHIT_TAG+1;i++)
-    {
-        NSLog(@"%i %i %f %f\n",i,[model getBaselineOfType:i],[model DAC_per_NHIT_ofType:i],[model DAC_per_mV_ofType:i]);
-    }
 }
 - (IBAction) EditingWindow:(id)sender
 {
