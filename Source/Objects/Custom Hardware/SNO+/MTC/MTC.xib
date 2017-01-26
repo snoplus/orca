@@ -2288,7 +2288,7 @@
                         </connections>
                     </tabView>
                     <button id="2944">
-                        <rect key="frame" x="0.0" y="0.0" width="33" height="37"/>
+                        <rect key="frame" x="17" y="0.0" width="33" height="37"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="Unlocked" imagePosition="above" alignment="center" alternateImage="Locked" inset="2" id="3938">
                             <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
