@@ -671,7 +671,7 @@
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="PEDs" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="nVL-b3-xdi">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
+                                                            <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
                                                         <connections>
                                                             <action selector="standardPulserFeeds:" target="-2" id="IA1-iX-9Iz"/>
