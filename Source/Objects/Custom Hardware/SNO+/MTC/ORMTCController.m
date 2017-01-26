@@ -309,7 +309,14 @@
 }
 - (void) placeholder:(NSNotification *)aNote {
     NSLog(@"Placeholder\n");
-    int units = [self convert_view_unit_index_to_model_index:[[nHitViewTypeMatrix selectedCell] tag]];
+    int units;
+    int view_index = [[nHitViewTypeMatrix selectedCell] tag];
+    @try {
+        units = [self convert_view_unit_index_to_model_index: view_index];
+    } @catch (NSException *exception) {
+        NSLogColor([NSColor redColor], @"Improve this error message later. %s\n",[exception reason]);
+        return;
+    }
     [self changeNhitThresholdsDisplay:units];
 }
 
@@ -761,12 +768,28 @@
 //Settings buttons.
 - (IBAction) eSumViewTypeAction:(id)sender
 {
-    [self changeESUMThresholdDisplay:[self convert_view_unit_index_to_model_index:[[sender selectedCell] tag]]];
+    int unit_index;
+    int view_index = [[sender selectedCell] tag];
+    @try {
+        unit_index = [self convert_view_unit_index_to_model_index:view_index];
+    } @catch (NSException *exception) {
+        NSLogColor([NSColor redColor], @"Could not change views. Reason:%s\n",[exception reason]);
+        return;
+    }
+    [self changeESUMThresholdDisplay:unit_index];
 }
 
 - (IBAction) nHitViewTypeAction:(id)sender
 {
-    [self changeNhitThresholdsDisplay: [self convert_view_unit_index_to_model_index:[[sender selectedCell] tag]]];
+    int unit_index;
+    int view_index = [[sender selectedCell] tag];
+    @try {
+        unit_index = [self convert_view_unit_index_to_model_index:view_index];
+    } @catch (NSException *exception) {
+        NSLogColor([NSColor redColor], @"Could not change views. Reason:%s\n",[exception reason]);
+        return;
+    }
+    [self changeNhitThresholdsDisplay: [self convert_view_unit_index_to_model_index:unit_index]];
 
 }
 - (IBAction)opsAdvancedOptionsTriangeChanged:(id)sender {
@@ -791,23 +814,32 @@
 }
 - (void) changeNhitThresholdsDisplay: (int) type
 {
+    int threshold_index;
     for(int i=FIRST_NHIT_TAG;i<=LAST_NHIT_TAG;i++)
     {
-        float value = [model getThresholdOfType:[self convert_view_thresold_index_to_model_index:i] inUnits:type];
-        /*if(type == MTC_mV_UNITS)
-        {
-            value -= [model convertThreshold:[model getBaselineOfType:i] OfType:i fromUnits:MTC_RAW_UNITS toUnits:MTC_mV_UNITS];
-        }*/
+        @try {
+            threshold_index = [self convert_view_thresold_index_to_model_index:i];
+        } @catch (NSException *exception) {
+            NSLogColor([NSColor redColor], @"Failed to interpret a tag, Reason: %s\n. Someone must have changed the MTC view or something. Aborting after %i changes",[exception reason],i-FIRST_NHIT_TAG);
+            return;
+        }
+        float value = [model getThresholdOfType: threshold_index inUnits:type];
         [[nhitMatrix cellWithTag:i] setFloatValue: value];
     }
 }
 - (void) changeESUMThresholdDisplay: (int) type
 {
+    int threshold_index;
     for(int i=FIRST_ESUM_TAG;i<=LAST_ESUM_TAG;i++)
     {
-        [[nhitMatrix cellWithTag:i] setFloatValue:
-         [model getThresholdOfType:[self convert_view_thresold_index_to_model_index:i]
-                           inUnits:type]];
+        @try {
+            threshold_index = [self convert_view_thresold_index_to_model_index:i];
+        } @catch (NSException *exception) {
+            NSLogColor([NSColor redColor], @"Failed to interpret a tag, Reason: %s\n. Someone must have changed the MTC view or something. Aborting after %i changes",[exception reason],i-FIRST_ESUM_TAG);
+            return;
+        }
+        float value = [model getThresholdOfType: threshold_index inUnits:type];
+        [[esumMatrix cellWithTag:i] setFloatValue: value];
     }
 }
 - (int) convert_view_thresold_index_to_model_index: (int) view_index {
@@ -843,10 +875,10 @@
             return MTC_OWLN_THRESHOLD_INDEX;
             break;
         default:
-            //Raise exception?
-            return -1;
+            [NSException raise:@"MTCController" format:@"Cannot convert threshold index %i to model index",view_index];
             break;
     }
+    return -1; // Will never reach here
 }
 - (int) convert_model_threshold_index_to_view_index: (int) model_index{
     switch (model_index) {
@@ -881,10 +913,10 @@
             return VIEW_OWLN_TAG;
             break;
         default:
-            //Raise exception?
-            return -1;
+            [NSException raise:@"MTCController" format:@"Cannot convert threshold  index %i to view index",model_index];
         break;
     }
+    return -1;
 }
 - (int) convert_view_unit_index_to_model_index: (int) view_index {
     switch (view_index) {
@@ -898,10 +930,10 @@
             return MTC_NHIT_UNITS;
             break;
         default:
-            // Raise exception?
-            return -1;
+            [NSException raise:@"MTCController" format:@"Cannot convert units index %i to model index",view_index];
             break;
     }
+    return -1;
 }
 - (int) convert_model_unit_index_to_view_index: (int) model_index {
     switch (model_index) {
@@ -915,10 +947,10 @@
             return VIEW_NHIT_UNITS_TAG;
             break;
         default:
-            // Raise exception?
-            return -1;
+            [NSException raise:@"MTCController" format:@"Cannot convert units index %i to view index",model_index];
             break;
     }
+    return -1;
 }
 - (IBAction) settingsMTCDAction:(id) sender
 {
@@ -927,15 +959,15 @@
 
 - (IBAction) settingsNHitAction:(id) sender 
 {
-    int threshold_index = [self convert_view_thresold_index_to_model_index:[[sender selectedCell] tag]];
-    int unit_index = [self convert_view_unit_index_to_model_index:[[nHitViewTypeMatrix selectedCell] tag]];
-    NSLog(@"Setting threshold %i to %f from units %i\n",threshold_index,[[sender selectedCell] floatValue],unit_index);
+    int threshold_index, unit_index;
+    @try {
+        threshold_index = [self convert_view_thresold_index_to_model_index:[[sender selectedCell] tag]];
+        unit_index = [self convert_view_unit_index_to_model_index:[[nHitViewTypeMatrix selectedCell] tag]];
+    } @catch (NSException *exception) {
+        NSLogColor([NSColor redColor], @"%s\n Aborting\n",[exception reason]);
+        return;
+    }
     float threshold = [[sender selectedCell] floatValue];
-    /*if(unit_index == MTC_mV_UNITS)
-    {
-        threshold += [model convertThreshold:[model getBaselineOfType:threshold_index] OfType:threshold_index fromUnits:MTC_RAW_UNITS toUnits:MTC_mV_UNITS];
-    }*/
-    
     [model setThresholdOfType:threshold_index fromUnits:unit_index toValue:threshold];
 }
 
@@ -955,9 +987,16 @@
     [newWindow showWindow:self];
 }
 - (void) trigger_scan_update_nhit {
+    int threshold_index;
     for(int i = FIRST_NHIT_TAG;i<LAST_NHIT_TAG+1;i++)
     {
-        [self load_settings_from_trigger_scan_for_type:[self convert_view_thresold_index_to_model_index:i]];
+        @try {
+            threshold_index = [self convert_view_thresold_index_to_model_index:i];
+        } @catch (NSException *exception) {
+            NSLogColor([NSColor redColor], @"Loaded %i trigge_scans then encountered an error:\n%s\n",i-FIRST_NHIT_TAG,[exception reason]);
+            return;
+        }
+        [self load_settings_from_trigger_scan_for_type:threshold_index];
     }
 }
 
