@@ -1023,11 +1023,12 @@
             }
             name = [result_dict objectForKey:@"name"];
             baseline = [[result_dict objectForKey:@"baseline"] stringValue];
-            dac_per_nhit =[[result_dict objectForKey:@"adc_per_nhit"] stringValue];
             threshold_index = [self trigger_scan_name_to_index:name];
-
+            if ([model thresholdIsNHit:threshold_index]) {
+                dac_per_nhit =[[result_dict objectForKey:@"adc_per_nhit"] stringValue];
+                [model setDAC_per_NHIT_OfType:threshold_index toValue:[dac_per_nhit floatValue]];
+            }
             [model setBaselineOfType:threshold_index toValue:[baseline intValue]];
-            [model setDAC_per_NHIT_OfType:threshold_index toValue:[dac_per_nhit floatValue]];
             [model setDAC_per_mV_OfType:threshold_index toValue:-4096/10000.0];
             [model setConversionIsValidForThreshold:threshold_index isValid:YES];
         } @catch (NSException* exception) {
@@ -1044,6 +1045,10 @@
     else if([name isEqual:@"N20"]){ ret = MTC_N20_THRESHOLD_INDEX; }
     else if([name isEqual:@"N20LB"]){ ret = MTC_N20LB_THRESHOLD_INDEX; }
     else if([name isEqual:@"OWLN"]){ ret = MTC_OWLN_THRESHOLD_INDEX; }
+    else if([name isEqual:@"ESUMLO"]){ ret = MTC_ESUML_THRESHOLD_INDEX; }
+    else if([name isEqual:@"ESUMHI"]){ ret = MTC_ESUMH_THRESHOLD_INDEX; }
+    else if([name isEqual:@"OWLELO"]){ ret = MTC_OWLELO_THRESHOLD_INDEX; }
+    else if([name isEqual:@"OWLEHI"]){ ret = MTC_OWLEHI_THRESHOLD_INDEX; }
     else {
         [NSException raise:@"MTCControllerError" format:@"Invalid trigger scan name ( %@ ) cannot get a valid threshold id", name];
     }
@@ -1069,6 +1074,18 @@
             break;
         case MTC_OWLN_THRESHOLD_INDEX:
             ret = @"OWLN";
+            break;
+        case MTC_ESUMH_THRESHOLD_INDEX:
+            ret = @"ESUMHI";
+            break;
+        case MTC_ESUML_THRESHOLD_INDEX:
+            ret = @"ESUMHLO";
+            break;
+        case MTC_OWLEHI_THRESHOLD_INDEX:
+            ret = @"OWLEHI";
+            break;
+        case MTC_OWLELO_THRESHOLD_INDEX:
+            ret = @"OWLELO";
             break;
         default:
             [NSException raise:@"MTCControllerError" format:@"Invalid threhsold index ( %i ) cannot get a valid trigger scan name", index];

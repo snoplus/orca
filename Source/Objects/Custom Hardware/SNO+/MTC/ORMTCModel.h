@@ -193,6 +193,8 @@
 - (void) loadFromSearialization:(NSMutableDictionary*) serial;
 - (NSMutableDictionary*) serializeToDictionary;
 
+- (BOOL) thresholdIndexIsValid:(int) index;
+- (BOOL) thresholdIsNHit:(int) index;
 
 #pragma mark •••Converters
 - (float) convertThreshold:(float)aThreshold OfType:(int) type fromUnits:(int)in_units toUnits:(int) out_units;
