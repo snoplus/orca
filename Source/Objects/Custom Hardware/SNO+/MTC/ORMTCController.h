@@ -238,4 +238,14 @@
 - (IBAction) triggersClearPEDCrateMask:(id) sender;
 - (IBAction) triggersClearMTCACrateMask:(id) sender;
 
+- (IBAction)triggerMaskCheckBoxClicked:(id)sender;
+- (IBAction)gtCratesCheckBoxClicked:(id)sender;
+- (IBAction)pedCrateCheckBoxClicked:(id)sender;
+- (IBAction)n100RelayCheckBoxClicked:(id)sender;
+- (IBAction)n20RelayCheckBoxClicked:(id)sender;
+- (IBAction)esumhRelayCheckBoxClicked:(id)sender;
+- (IBAction)esumlRelayCheckBoxClicked:(id)sender;
+- (IBAction)owlehRelayCheckBoxClicked:(id)sender;
+- (IBAction)owlelRelayCheckBoxClicked:(id)sender;
+- (IBAction)owlnRelayCheckBoxClicked:(id)sender;
 @end
