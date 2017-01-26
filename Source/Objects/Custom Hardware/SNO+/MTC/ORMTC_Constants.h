@@ -75,69 +75,12 @@ enum {
 	kPEDCrateMask,
 	kControlMask,
 	
-	//NHit -- note the offsets (defined below).. if you add anything you MUST adjust the offsets also
-	/*kNHit100HiThreshold, //+0
-	kNHit100MedThreshold,
-	kNHit100LoThreshold,	
-	kNHit20Threshold,	
-	kNHit20LBThreshold,	
-	kOWLNThreshold,		
-	
-	kNHit100HimVperAdc,	//+6
-	kNHit100MedmVperVAdc,	
-	kNHit100LomVperAdc,	
-	kNHit20mVperAdc,		
-	kNHit20LBmVperAdc,		
-	kOWLNmVperAdc,			
-
-	kNHit100HimVperNHit, //kmVoltPerNHit_Offset
-	kNHit100MedmVperNHit,	
-	kNHit100LomVperNHit,	
-	kNHit20mVperNHit,		
-	kNHit20LBmVperNHit,		
-	kOWLNmVperNHit,			
-	
-	kNHit100HidcOffset,	//kNHitDcOffset_Offset
-	kNHit100MeddcOffset,	
-	kNHit100LodcOffset,	
-	kNHit20dcOffset,		
-	kNHit20LBdcOffset,	
-	kOWLNdcOffset,
-	
-	//ESUM
-	kESumLowThreshold,	
-	kESumHiThreshold,	
-	kOWLELoThreshold,	
-	kOWLEHiThreshold,	
-
-	kESumLowmVperAdc,//+4	
-	kESumHimVperAdc,		
-	kOWLELomVperAdc,
-	kOWLEHimVperAdc,
-
-	kESumLowmVperpC, //+kmVoltPerpC_Offset
-	kESumHimVperpC,
-	kOWLELomVperpC,
-	kOWLEHimVperpC,
-
-	kESumLowdcOffset, //+kESumDcOffset_Offset
-	kESumHidcOffset,
-	kOWLELodcOffset,
-	kOWLEHidcOffset,*/
-	
 	kTub,
 	
 	//other -- numbers go ABOVE this
 	kDBComments,
 	kDbLookUpTableSize //must be last
 };
-
-//#define kNHitDcOffset_Offset	18
-//#define kmVoltPerNHit_Offset	12
-
-#define kmVoltPerpC_Offset		 8
-#define kESumDcOffset_Offset	12
-
 
 // GTWord Masks for the MTC
 #define MTC_NHIT_100_LO_MASK				0x00000001

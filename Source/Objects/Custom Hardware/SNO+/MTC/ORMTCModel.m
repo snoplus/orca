@@ -112,96 +112,10 @@ static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
 { @"MTC/D,PEDCrateMask",		@"0" },	//12
 { @"MTC/D,ControlMask",			@"0" },		//13
 
-//defaults for the MTC A NHit
-    /*
-{ @"MTC/A,NHit100Hi,Threshold",	@"1"},		//14
-{ @"MTC/A,NHit100Med,Threshold",@"2"},		//15
-{ @"MTC/A,NHit100Lo,Threshold",	@"3"},		//16
-{ @"MTC/A,NHit20,Threshold",	@"4"},		//17
-{ @"MTC/A,NHit20LB,Threshold",	@"5"},		//18
-{ @"MTC/A,OWLN,Threshold",		@"6"},		//19
-
-{ @"MTC/A,NHit100Hi,mV/Adc",	@"10"},		//20
-{ @"MTC/A,NHit100Med,m/VAdc",	@"20"},		//21
-{ @"MTC/A,NHit100Lo,mV/Adc",	@"30"},		//22
-{ @"MTC/A,NHit20,mV/Adc",		@"40"},		//23
-{ @"MTC/A,NHit20LB,mV/Adc",		@"50"},		//24
-{ @"MTC/A,OWLN,mV/Adc",			@"60"},		//25
-
-{ @"MTC/A,NHit100Hi,mV/Hit",	@"10"},		//26
-{ @"MTC/A,NHit100Med,mV/Hit",	@"20"},		//27
-{ @"MTC/A,NHit100Lo,mV/Hit",	@"30"},		//28
-{ @"MTC/A,NHit20,mV/Hit",		@"40"},		//29
-{ @"MTC/A,NHit20LB,mV/Hit",		@"50"},		//30
-{ @"MTC/A,OWLN,mV/Hit",			@"60"},		//31
-
-{ @"MTC/A,NHit100Hi,dcOffset",	@"10"},		//32
-{ @"MTC/A,NHit100Med,dcOffset",	@"20"},		//33
-{ @"MTC/A,NHit100Lo,dcOffset",	@"30"},		//34
-{ @"MTC/A,NHit20,dcOffset",		@"40"},		//35
-{ @"MTC/A,NHit20LB,dcOffset",	@"50"},		//36
-{ @"MTC/A,OWLN,dcOffset",		@"60"},		//37
-
-//defaults for the MTC A ESUM
-{ @"MTC/A,ESumLow,Threshold",	@"10"},		//38
-{ @"MTC/A,ESumHi,Threshold",	@"20"},		//39
-{ @"MTC/A,OWLELo,Threshold",	@"30"},		//40
-{ @"MTC/A,OWLEHi,Threshold",	@"40"},		//41
-
-{ @"MTC/A,ESumLow,mV/Adc",		@"10"},		//42
-{ @"MTC/A,ESumHi,mV/Adc",		@"20"},		//43
-{ @"MTC/A,OWLELo,mV/Adc",		@"30"},		//44
-{ @"MTC/A,OWLEHi,mV/Adc",		@"40"},		//45
-
-{ @"MTC/A,ESumLow,mV/pC",		@"10"},		//46
-{ @"MTC/A,ESumHi,mV/pC",		@"20"},		//47
-{ @"MTC/A,OWLELo,mV/pC",		@"30"},		//48
-{ @"MTC/A,OWLEHi,mV/pC",		@"40"},		//49
-
-{ @"MTC/A,ESumLow,dcOffset",	@"10"},		//50
-{ @"MTC/A,ESumHi,dcOffset",		@"20"},		//51
-{ @"MTC/A,OWLELo,dcOffset",		@"30"},		//52
-{ @"MTC/A,OWLEHi,dcOffset",		@"40"},		//53
-*/
 { @"MTC,tub",					@"40"},		//54
 
 {@"Comments",					@"Nothing Noted"},		//55
 
-};
-
-
-
-/*int mtcDacIndexes[14]=
-{
-kNHit100HiThreshold,
-kNHit100MedThreshold,
-kNHit100LoThreshold,	
-kNHit20Threshold,	
-kNHit20LBThreshold,	
-kOWLNThreshold,		
-kESumLowThreshold,	
-kESumHiThreshold,	
-kOWLELoThreshold,	
-kOWLEHiThreshold,
-kControlMask,
-kGtMask,
-kGtCrateMask,
-kPEDCrateMask
-};*/
-
-// MTCA DAC index based on order from detector DB
-int mtcDacIndexFromDetectorDB[10]=
-{
-    kNHit100LoThreshold,    // NHIT100Lo is the first entry in the mtac_dacs entry of the detector database!
-    kNHit100MedThreshold,
-    kNHit100HiThreshold,
-    kNHit20Threshold,
-    kNHit20LBThreshold,
-    kESumLowThreshold,
-    kESumHiThreshold,
-    kOWLNThreshold,
-    kOWLELoThreshold,
-    kOWLEHiThreshold,
 };
 
 @interface ORMTCModel (private)
