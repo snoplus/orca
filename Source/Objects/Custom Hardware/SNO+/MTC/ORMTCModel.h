@@ -66,8 +66,6 @@
 @interface ORMTCModel :  ORVmeIOCard
 {
 @private
-    NSMutableDictionary*	mtcDataBase;
-    
     uint16_t                lockoutWidth;
     uint16_t                pedestalWidth;
     uint32_t                pgt_rate;
@@ -237,6 +235,8 @@
 - (void) loadPrescaleValueToHardware;
 - (void) loadPedestalDelayToHardware;
 - (void) loadPulserRateToHardware;
+- (void) loadLockOutWidthToHardware;
+- (void) loadPedWidthToHardware;
 - (void) enablePulser;
 - (void) disablePulser;
 - (void) enablePedestal;
@@ -264,13 +264,7 @@
 - (void) writeBasicOps;
 - (void) stopBasicOps;
 - (void) reportStatus;
-
-//Extra getter functions
--(NSMutableDictionary*) get_MTCDataBase;
-
 @end
-
-
 
 extern NSString* ORMTCModelBasicOpsRunningChanged;
 extern NSString* ORMTCABaselineChanged;
@@ -283,8 +277,6 @@ extern NSString* ORMTCModelRepeatCountChanged;
 extern NSString* ORMTCModelWriteValueChanged;
 extern NSString* ORMTCModelMemoryOffsetChanged;
 extern NSString* ORMTCModelSelectedRegisterChanged;
-extern NSString* ORMTCModelXlinixPathChanged;
-extern NSString* ORMTCModelMtcDataBaseChanged;
 extern NSString* ORMTCModelIsPulserFixedRateChanged;
 extern NSString* ORMTCModelFixedPulserRateCountChanged;
 extern NSString* ORMTCModelFixedPulserRateDelayChanged;
@@ -295,3 +287,6 @@ extern NSString* ORMTCSettingsLock;
 extern NSString* ORMTCTriggersLock;
 extern NSString* ORMTCModelMTCAMaskChanged;
 extern NSString* ORMTCModelIsPedestalEnabledInCSR;
+extern NSString* ORMTCPulserRateChanged;
+extern NSString* ORMTCPrescaleValueChanged;
+extern NSString* ORMTCGTMaskChanged;

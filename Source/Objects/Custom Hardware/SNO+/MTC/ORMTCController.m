@@ -166,9 +166,14 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(mtcDataBaseChanged:)
-                         name : ORMTCModelMtcDataBaseChanged
+                     selector : @selector(mtcPulserRateChanged:)
+                         name : ORMTCPulserRateChanged
 						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(mtcGTMaskChanged:)
+                         name : ORMTCGTMaskChanged
+                        object: model];
 
 	[notifyCenter addObserver : self
 			 selector : @selector(isPulserFixedRateChanged:)
@@ -184,7 +189,7 @@
 			 selector : @selector(fixedPulserRateDelayChanged:)
 			     name : ORMTCModelFixedPulserRateDelayChanged
 			    object: model];
-	
+
     [notifyCenter addObserver : self
                      selector : @selector(sequenceRunning:)
                          name : ORSequenceRunning
@@ -213,7 +218,7 @@
                      selector : @selector(updateThresholdsDisplay:)
                          name : ORMTCABaselineChanged
                        object : nil];
-    
+
     [notifyCenter addObserver : self
                      selector : @selector(updateThresholdsDisplay:)
                          name : ORMTCAConversionChanged
@@ -243,12 +248,19 @@
 	[self useMemoryChanged:nil];
 	[self autoIncrementChanged:nil];
 	[self basicOpsRunningChanged:nil];
-	[self mtcDataBaseChanged:nil];
+    [self mtcGTMaskChanged:nil];
+    [self updateThresholdsDisplay:nil];
+    [self mtcPulserRateChanged:nil];
+    [self mtcPrescaleValueChanged:nil];
 	[self isPulserFixedRateChanged:nil];
 	[self fixedPulserRateCountChanged:nil];
 	[self fixedPulserRateDelayChanged:nil];
     [self triggerMTCAMaskChanged:nil];
     [self isPedestalEnabledInCSRChanged:nil];
+    [self displayMasks];
+    [lockOutWidthField setIntValue:[model lockoutWidth]];
+    [pedestalWidthField setIntValue:[model pedestalWidth]];
+    [pedDelayField setIntValue:[model pedestalDelay]];
 }
 
 - (void) checkGlobalSecurity
@@ -287,17 +299,21 @@
 	[initProgressBar setDoubleValue:progress];
 	[initProgressField setFloatValue:progress/100.];
 }
-
-- (void) mtcDataBaseChanged:(NSNotification*)aNote
+- (void) mtcPrescaleValueChanged:(NSNotification *)aNote
 {
-	[lockOutWidthField		setFloatValue:	[model lockoutWidth]];
-	[pedestalWidthField		setFloatValue:	[model pedestalWidth]];
-    [nhit100LoPrescaleField setFloatValue:  [model prescaleValue]];
-    [pulserPeriodField      setFloatValue:  [model pgt_rate]];
-    [extraPulserPeriodField setFloatValue:  [model pgt_rate]];
-	[pedDelayField          setFloatValue:	[model pedestalDelay]];
-	
-	[self displayMasks];
+    [nhit100LoPrescaleField setIntValue:[model prescaleValue]];
+}
+- (void) mtcPulserRateChanged:(NSNotification *)aNote
+{
+    int rate = [model pgt_rate];
+    [extraPulserPeriodField setIntValue:rate];
+    [pulserPeriodField setIntValue:rate];
+}
+- (void) mtcGTMaskChanged:(NSNotification *) aNote {
+    int maskValue = [model gtMask];
+    for(int i=0;i<26;i++){
+        [[globalTriggerMaskMatrix cellWithTag:i]  setIntValue: maskValue & (1<<i)];
+    }
 }
 
 - (void) updateThresholdsDisplay:(NSNotification *)aNote {

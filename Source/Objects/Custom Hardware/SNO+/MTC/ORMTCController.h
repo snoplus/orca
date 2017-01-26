@@ -113,7 +113,9 @@
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management
-- (void) mtcDataBaseChanged:(NSNotification*)aNote;
+- (void) mtcGTMaskChanged:(NSNotification *) aNote;
+- (void) mtcPulserRateChanged:(NSNotification*)aNote;
+- (void) mtcPrescaleValueChanged:(NSNotification*)aNote;
 - (void) basicOpsRunningChanged:(NSNotification*)aNote;
 - (void) autoIncrementChanged:(NSNotification*)aNote;
 - (void) useMemoryChanged:(NSNotification*)aNote;
