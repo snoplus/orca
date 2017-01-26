@@ -107,12 +107,6 @@
     NSSize  settingsSizeLarge;
     NSSize  triggerSize;
 
-    NSRect  standardOpsSmallLockPosition;
-    NSRect  standardOpsLargeLockPosition;
-    NSRect  settingsSmallLockPosition;
-    NSRect  settingsLargeLockPosition;
-    NSRect  triggerLockPosition;
-
 }
 
 - (void) registerNotificationObservers;
@@ -162,7 +156,7 @@
 - (void) populatePullDown;
 - (int) trigger_scan_name_to_index:(NSString*) name;
 - (int) index_to_trigger_scan_name:(int) index;
-- (void) showHideOptions:(id) sender Box:(id)box resizeSmall:(NSSize) smallSize resizeLarge:(NSSize) largeSize lockPosSmall:(NSRect)smallPos lockPosLarge:(NSRect) largePos;
+- (void) showHideOptions:(id) sender Box:(id)box resizeSmall:(NSSize) smallSize resizeLarge:(NSSize) largeSize;
 
 
 #pragma mark •••Actions

@@ -73,17 +73,11 @@
 
 - (void) awakeFromNib
 {
-    standardOpsSizeSmall = NSMakeSize(580,290);
-    standardOpsSizeLarge = NSMakeSize(580,590);
-    settingsSizeSmall	 = NSMakeSize(580,380);
-    settingsSizeLarge	 = NSMakeSize(580,530);
-    triggerSize          = NSMakeSize(800,635);
-
-    standardOpsSmallLockPosition = NSMakeRect(535, 0, 33, 37);
-    standardOpsLargeLockPosition = NSMakeRect(535, 10, 33, 37);
-    settingsSmallLockPosition    = NSMakeRect(528, 3, 33, 37);
-    settingsLargeLockPosition    = NSMakeRect(528, 5, 33, 37);
-    triggerLockPosition          = NSMakeRect(735, 10, 33, 37);
+    standardOpsSizeSmall = NSMakeSize(590,320);
+    standardOpsSizeLarge = NSMakeSize(590,620);
+    settingsSizeSmall	 = NSMakeSize(580,400);
+    settingsSizeLarge	 = NSMakeSize(580,550);
+    triggerSize          = NSMakeSize(800,655);
     blankView = [[NSView alloc] init];
     [tabView setFocusRingType:NSFocusRingTypeNone];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
@@ -489,17 +483,15 @@
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
 {
+
     if ([tabView indexOfTabViewItem:item] == 0){
         NSSize* newSize =nil;
         if([opAdvancedOptionsBox isHidden]) {
-            [basicOpsLockButton setFrame:standardOpsSmallLockPosition];
             newSize = &standardOpsSizeSmall;
         }
         else {
-            [basicOpsLockButton setFrame:standardOpsLargeLockPosition];
             newSize = &standardOpsSizeLarge;
         }
-
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:*newSize];
 		[[self window] setContentView:mtcView];
@@ -507,19 +499,16 @@
     else if([tabView indexOfTabViewItem:item] == 1){
         NSSize* newSize = nil;
         if([settingsAdvancedOptionsBox isHidden]) {
-            [basicOpsLockButton setFrame:settingsSmallLockPosition];
             newSize = &settingsSizeSmall;
         }
         else {
-            [basicOpsLockButton setFrame:settingsLargeLockPosition];
             newSize = &settingsSizeLarge;
         }
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:*newSize];
 		[[self window] setContentView:mtcView];
     }
-    else if([tabView indexOfTabViewItem:item] == 2) {
-        [basicOpsLockButton setFrame:triggerLockPosition];
+    else if([tabView indexOfTabViewItem:item] == 2){
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:triggerSize];
 		[[self window] setContentView:mtcView];
@@ -782,23 +771,21 @@
 
 }
 - (IBAction)opsAdvancedOptionsTriangeChanged:(id)sender {
-    [self showHideOptions:sender Box:opAdvancedOptionsBox resizeSmall:standardOpsSizeSmall resizeLarge:standardOpsSizeLarge lockPosSmall:standardOpsSmallLockPosition lockPosLarge:standardOpsLargeLockPosition];
+    [self showHideOptions:sender Box:opAdvancedOptionsBox resizeSmall:standardOpsSizeSmall resizeLarge:standardOpsSizeLarge];
 }
 - (IBAction)settingsAdvancedOptionsTriangeChanged:(id)sender {
-    [self showHideOptions:sender Box:settingsAdvancedOptionsBox resizeSmall:settingsSizeSmall resizeLarge:settingsSizeLarge lockPosSmall:settingsSmallLockPosition lockPosLarge:settingsLargeLockPosition];
+    [self showHideOptions:sender Box:settingsAdvancedOptionsBox resizeSmall:settingsSizeSmall resizeLarge:settingsSizeLarge];
 }
-- (void) showHideOptions:(id) sender Box:(id)box resizeSmall:(NSSize) smallSize resizeLarge:(NSSize) largeSize lockPosSmall:(NSRect)smallPos lockPosLarge:(NSRect) largePos {
+- (void) showHideOptions:(id) sender Box:(id)box resizeSmall:(NSSize) smallSize resizeLarge:(NSSize) largeSize {
     if([sender state] == NSOffState) {
         [box setHidden:YES];
         [self resizeWindowToSize:smallSize];
-        [basicOpsLockButton setFrame:smallPos];
     }
     else {
         [box setHidden:NO];
         // Don't resize if the window is already large enough
         if(self.window.frame.size.height <  largeSize.height || self.window.frame.size.width < largeSize.width)
         {
-            [basicOpsLockButton setFrame:largePos];
             [self resizeWindowToSize:largeSize];
         }
     }
