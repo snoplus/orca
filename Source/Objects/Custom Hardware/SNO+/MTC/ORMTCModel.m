@@ -33,6 +33,11 @@
 #import "SNOPModel.h"
 
 #pragma mark •••Definitions
+NSString* GTMaskSerializationString             = @"MTC_GTMask";
+NSString* PrescaleValueSerializationString      = @"MTC_PrescaleValue";
+NSString* PulserRateSerializationString         = @"MTC_PulserRate";
+NSString* PGT_PED_Mode_SerializationString      = @"MTC_PulserMode";
+NSString* PulserEnabledSerializationString      = @"MTC_PulserEnabled";
 NSString* ORMTCModelBasicOpsRunningChanged      = @"ORMTCModelBasicOpsRunningChanged";
 NSString* ORMTCABaselineChanged                 = @"ORMTCABaselineChanged";
 NSString* ORMTCAThresholdChanged                = @"ORMTCAThresholdChanged";
@@ -65,10 +70,6 @@ NSString* ORMTCGTMaskChanged                    = @"ORMTCGTMaskChanged";
 #define kMTCMemAddressBase		0x03800000
 #define kMTCMemAddressModifier	0x09
 #define kMTCMemAddressSpace		0x02
-
-#define PulserRateSerializationString @"PulserRate"
-#define PGT_PED_Mode_SerializationString @"PulserRate"
-#define PulserEnabledSerializationString @"PulserEnabled"
 
 static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
 { @"ControlReg"	    , 0   ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //0
@@ -1010,6 +1011,8 @@ tubRegister;
     [self setPgt_rate:[[serial objectForNestedKey:PulserRateSerializationString] intValue]];
     [self setIsPedestalEnabledInCSR:[[serial objectForNestedKey:PGT_PED_Mode_SerializationString] boolValue]];
     [self setPulserEnabled:[[serial objectForNestedKey:PulserEnabledSerializationString] boolValue]];
+    [self setPrescaleValue:[[serial objectForNestedKey:PrescaleValueSerializationString] intValue]];
+    [self setGtMask:[[serial objectForNestedKey:GTMaskSerializationString] unsignedIntValue]];
 }
 
 - (NSMutableDictionary*) serializeToDictionary {
@@ -1029,6 +1032,8 @@ tubRegister;
     [serial setObject:[NSNumber numberWithUnsignedLong:[self pgt_rate]] forKey:PulserRateSerializationString];
     [serial setObject:[NSNumber numberWithBool:[self isPedestalEnabledInCSR]] forKey:PGT_PED_Mode_SerializationString];
     [serial setObject:[NSNumber numberWithBool:[self pulserEnabled] ] forKey:PulserEnabledSerializationString];
+    [serial setObject:[NSNumber numberWithUnsignedShort:[self prescaleValue]] forKey:PrescaleValueSerializationString];
+    [serial setObject:[NSNumber numberWithUnsignedInt: [self gtMask]] forKey:GTMaskSerializationString];
     return serial;
 }
 

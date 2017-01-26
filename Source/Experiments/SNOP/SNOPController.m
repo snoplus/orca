@@ -1860,7 +1860,7 @@ snopGreenColor;
     //If in non-DIAGNOSTIC run: display DB threshold values
     } else {
         float mVolts;
-        int gtmask = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,GtMask"] intValue];
+        int gtmask = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:GTMaskSerializationString] intValue];
         
         // The following defines the map between the view threshold ordering and the
         // mtc model indices
@@ -1875,29 +1875,17 @@ snopGreenColor;
             MTC_ESUML_THRESHOLD_INDEX,
             MTC_OWLEHI_THRESHOLD_INDEX,
             MTC_OWLELO_THRESHOLD_INDEX};
-        //The following defines the map between view order and the DB keys
-        int view_db_map[10] = {
-            @"MTC/A,NHit100Hi,Threshold",
-            @"MTC/A,NHit100Med,Threshold",
-            @"MTC/A,NHit100Lo,Threshold",
-            @"MTC/A,NHit20,Threshold",
-            @"MTC/A,NHit20LB,Threshold",
-            @"MTC/A,OWLN,Threshold",
-            @"MTC/A,ESumHi,Threshold",
-            @"MTC/A,ESumLow,Threshold",
-            @"MTC/A,OWLEHi,Threshold",
-            @"MTC/A,OWLELow,Threshold"};
         //This defines the mapping between the view order and the GT mask positions
         int view_mask_map[10] = {2,1,0,3,4,7,6,5,9,8};
         for(int i=0;i<10;i++) {
-            float raw = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:view_db_map[i]] floatValue];
+            float raw = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtcModel StringForThreshold:i]] floatValue];
             int units = i<=6 ? MTC_NHIT_UNITS : MTC_mV_UNITS;
             BOOL inMask = ((1<< view_mask_map[i]) & gtmask) != 0;
             [self updateSingleDBThresholdDisplay:i ofType:view_model_map[i] toUnits: units inMask:inMask withModel:mtcModel withFormatter:thresholdFormatter toValue:raw];
         }
 
         //Prescale
-        mVolts = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,Nhit100LoPrescale"] floatValue];
+        mVolts = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:PrescaleValueSerializationString] floatValue];
         [[standardRunThresStoredValues cellAtRow:10 column:0] setFloatValue:mVolts];
         [[standardRunThresStoredValues cellAtRow:10 column:0] setFormatter:thresholdFormatter];
         if((gtmask >> 11) & 1){
@@ -1906,7 +1894,7 @@ snopGreenColor;
             [[standardRunThresStoredValues cellAtRow:10 column:0] setTextColor:[self snopRedColor]];
         }
         //Pulser
-        mVolts = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,PulserPeriod"] floatValue];
+        mVolts = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:PulserRateSerializationString] floatValue];
         [[standardRunThresStoredValues cellAtRow:11 column:0] setFloatValue:mVolts];
         [[standardRunThresStoredValues cellAtRow:11 column:0] setFormatter:thresholdFormatter];
         if((gtmask >> 10) & 1){
