@@ -44,6 +44,9 @@
 NSString* ORMTCModelESumViewTypeChanged		= @"ORMTCModelESumViewTypeChanged";
 NSString* ORMTCModelNHitViewTypeChanged		= @"ORMTCModelNHitViewTypeChanged";
 NSString* ORMTCModelBasicOpsRunningChanged	= @"ORMTCModelBasicOpsRunningChanged";
+NSString* ORMTCABaselineChanged             = @"ORMTCABaselineChanged";
+NSString* ORMTCAThresholdChanged            = @"ORMTCAThresholdChanged";
+NSString* ORMTCAConversionChanged           = @"ORMTCAConversionChanged";
 NSString* ORMTCModelAutoIncrementChanged	= @"ORMTCModelAutoIncrementChanged";
 NSString* ORMTCModelUseMemoryChanged		= @"ORMTCModelUseMemoryChanged";
 NSString* ORMTCModelRepeatDelayChanged		= @"ORMTCModelRepeatDelayChanged";
@@ -896,22 +899,9 @@ pulserEnabled = _pulserEnabled;
      //Raise exception?
     }
     uint16_t threshold = mtca_thresholds[type];
-    if(units == MTC_RAW_UNITS) {
-        return threshold;
-    }
-    else if (units == MTC_mV_UNITS || units == MTC_NHIT_UNITS) {
-        //Need to improve these conversions later...needs trigger scan input and such
-        float mVThreshold = (4095 - threshold)*(10000.0/4096) - 5000.0;
-        if(units == MTC_NHIT_UNITS) {
-            return (mVThreshold + 5000)/38.0;
-        }
-        return mVThreshold;
-    }
-   
-    //Raise exception?
-    return CGFLOAT_MIN;
-    
+    return [self convertThreshold:threshold OfType:type fromUnits:MTC_RAW_UNITS toUnits:units];
 }
+
 - (void) setThresholdOfType:(int)type fromUnits:(int)units toValue:(float) aThreshold
 {
     //Conversions need improvment
@@ -919,27 +909,14 @@ pulserEnabled = _pulserEnabled;
     {
         //Raise exception?
     }
-    uint16_t threshold_in_dac_counts=0;
-    if(units == MTC_RAW_UNITS)
-    {
-        threshold_in_dac_counts = (uint16_t) aThreshold;
+    uint16_t threshold_in_dac_counts = (uint16)[self convertThreshold:aThreshold OfType:type fromUnits:units toUnits:MTC_RAW_UNITS];
+    if(mtca_thresholds[type] != threshold_in_dac_counts) {
+        mtca_thresholds[type] = threshold_in_dac_counts;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCAThresholdChanged object:self];
     }
-    else if(units == MTC_NHIT_UNITS || units == MTC_mV_UNITS)
-    {
-        float threshold_in_mv = aThreshold;
-        if(units == MTC_NHIT_UNITS)
-        {
-            threshold_in_mv = 38.0*aThreshold - 5000;
-        }
-        threshold_in_dac_counts = (threshold_in_mv + 5000)/(10/4096);
-    }
-    else{ //Raise exception?
-    }
-    mtca_thresholds[type] = threshold_in_dac_counts;
 }
+
 - (float) convertThreshold:(float)aThreshold OfType:(int) type fromUnits:(int)in_units toUnits:(int) out_units{
-    float mv_per_nhit = 38.0;
-    float dac_per_mv = 4096/10000.0;
     
     if(type<0 || type > MTC_NUM_USED_THRESHOLDS)
     {
@@ -949,8 +926,12 @@ pulserEnabled = _pulserEnabled;
     {
         return aThreshold;
     }
+    float DAC_per_nhit = [self DAC_per_NHIT_ofType:type];
+    float DAC_per_mv = [self DAC_per_mV_ofType:type];
+    float mv_per_nhit = DAC_per_nhit/DAC_per_mv;
+
     if(in_units == MTC_RAW_UNITS) {
-        float value_in_mv = (4095 - aThreshold)/dac_per_mv - 5000;
+        float value_in_mv = (aThreshold - 4095)/DAC_per_mv - 5000; //TODO less magic
         if(out_units == MTC_mV_UNITS)
         {
             return value_in_mv;
@@ -962,14 +943,20 @@ pulserEnabled = _pulserEnabled;
     }
     else if (in_units == MTC_mV_UNITS) {
         if(out_units == MTC_RAW_UNITS) {
-            return 4095 - (aThreshold+5000 * dac_per_mv);
+            return (((aThreshold+5000) * DAC_per_mv)+4095);
         }
         else if(out_units == MTC_NHIT_UNITS) {
-            return aThreshold/mv_per_nhit;
+            int baseline = [self getBaselineOfType:type];
+            float baseline_in_mV = [self convertThreshold:baseline OfType:type fromUnits:MTC_RAW_UNITS toUnits:MTC_mV_UNITS];
+            
+            return (aThreshold - baseline_in_mV)/mv_per_nhit;
         }
     }
     else if (in_units == MTC_NHIT_UNITS) {
-        float value_in_mv = mv_per_nhit * aThreshold;
+        int baseline = [self getBaselineOfType:type];
+        float baseline_in_mV = [self convertThreshold:baseline OfType:type fromUnits:MTC_RAW_UNITS toUnits:MTC_mV_UNITS];
+        float value_in_mv = mv_per_nhit * aThreshold+baseline_in_mV;
+        
         if(out_units == MTC_mV_UNITS) {
             return value_in_mv;
         }
@@ -1023,7 +1010,11 @@ pulserEnabled = _pulserEnabled;
     return mtca_baselines[type];
 }
 - (void) setBaselineOfType:(int) type toValue:(uint16_t) _val {
-    mtca_baselines[type] = _val;
+    if(mtca_baselines[type] != _val)
+    {
+        mtca_baselines[type] = _val;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCABaselineChanged object:self];
+    }
 }
 - (uint16_t) N100H_Baseline {return [self getBaselineOfType:MTC_N100_HI_THRESHOLD_INDEX];}
 - (void) setN100H_Baseline:(uint16_t)_val { return [self setBaselineOfType:MTC_N100_HI_THRESHOLD_INDEX toValue: _val]; }
@@ -1060,7 +1051,11 @@ pulserEnabled = _pulserEnabled;
     return mtca_dac_per_nhit[type];
 }
 - (void) setDAC_per_NHIT_OfType:(int) type toValue:(float) _val {
-    mtca_dac_per_nhit[type] = _val;
+    if(mtca_dac_per_nhit[type] != _val)
+    {
+        mtca_dac_per_nhit[type] = _val;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCAConversionChanged object:self];
+    }
 }
 - (float) N100H_DAC_per_NHIT { return [self DAC_per_NHIT_ofType: MTC_N100_HI_THRESHOLD_INDEX]; }
 - (void) setN100H_DAC_per_NHIT:(float) _val { [self setDAC_per_NHIT_OfType:MTC_N100_HI_THRESHOLD_INDEX toValue:_val]; }
@@ -1085,7 +1080,11 @@ pulserEnabled = _pulserEnabled;
     return mtca_dac_per_mV[type];
 }
 - (void) setDAC_per_mV_OfType:(int) type toValue:(float) _val {
-    mtca_dac_per_mV[type] = _val;
+    if(mtca_dac_per_mV[type] != _val)
+    {
+        mtca_dac_per_mV[type] = _val;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCAConversionChanged object:self];
+    }
 }
 - (float) N100H_DAC_per_mV { return [self DAC_per_mV_ofType:MTC_N100_HI_THRESHOLD_INDEX]; }
 - (void) setN100H_DAC_per_mV:(float) _val { [self setDAC_per_mV_OfType:MTC_N100_HI_THRESHOLD_INDEX toValue: _val]; }
@@ -1269,12 +1268,12 @@ pulserEnabled = _pulserEnabled;
     NSString* dac_per_nhit =[[result_dict objectForKey:@"adc_per_nhit"] stringValue];
     [self setBaselineOfType:[self trigger_scan_name_to_index:name] toValue:[baseline intValue]];
     [self setDAC_per_NHIT_OfType:[self trigger_scan_name_to_index:name] toValue:[dac_per_nhit floatValue]];
+    [self setDAC_per_mV_OfType:[self trigger_scan_name_to_index:name] toValue:-4096/10000.0];
 
 
     return;
 }
 - (void) load_settings_from_trigger_scan_for_type:(int) type {
-    NSLog(@"fuuuuudge\n");
 
     ORPQModel* pgsql_connec = [ORPQModel getCurrent];
     if(!pgsql_connec)
@@ -1283,11 +1282,9 @@ pulserEnabled = _pulserEnabled;
         return;
         //Raise exception
     }
-    NSLog(@"shitsgood\n");
     NSString* trig_scan_name = [self index_to_trigger_scan_name:type];
     NSString* db_cmd = [NSString stringWithFormat:@"select name,baseline,adc_per_nhit from trigger_scan where name='%@' and timestamp=(SELECT max(timestamp) from trigger_scan where name='%@')",trig_scan_name,trig_scan_name];
-    NSLog(@"%@\n",db_cmd);
-    [pgsql_connec dbQuery:db_cmd object:self selector:@selector(waitForTriggerScan:) timeout:1.0];
+    [pgsql_connec dbQuery:db_cmd object:self selector:@selector(waitForTriggerScan:) timeout:2.0];
 }
 
 

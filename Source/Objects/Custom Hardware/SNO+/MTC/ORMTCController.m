@@ -28,6 +28,26 @@
 #import "ORMTC_Constants.h"
 #import "ORSelectorSequence.h"
 
+#define VIEW_RAW_UNITS_TAG 0
+#define VIEW_mV_UNITS_TAG 1
+#define VIEW_NHIT_UNITS_TAG 2
+
+#define FIRST_NHIT_TAG 1
+#define VIEW_N100H_TAG 1
+#define VIEW_N100M_TAG 2
+#define VIEW_N100L_TAG 3
+#define VIEW_N20_TAG 4
+#define VIEW_N20LB_TAG 5
+#define VIEW_OWLN_TAG 6
+#define LAST_NHIT_TAG 6
+
+#define FIRST ESUM_TAG 7
+#define VIEW_ESUMH_TAG 7
+#define VIEW_ESUML_TAG 8
+#define VIEW_OWLEH_TAG 9
+#define VIEW_OWLEL_TAG 10
+#define LAST_ESUM_TAG 10
+
 #pragma mark •••PrivateInterface
 @interface ORMTCController (private)
 
@@ -186,7 +206,24 @@
                      selector : @selector(triggerMTCAMaskChanged:)
                          name : ORMTCModelMTCAMaskChanged
                        object : nil];
-
+    [notifyCenter addObserver : self
+                     selector : @selector(placeholder:)
+                         name : ORMTCAThresholdChanged
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(placeholder:)
+                         name : ORMTCABaselineChanged
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(placeholder:)
+                         name : ORMTCAConversionChanged
+                       object : nil];
+    [notifyCenter addObserver : self
+                     selector : @selector(triggerMTCAMaskChanged:)
+                         name : ORMTCAThresholdChanged
+                       object : nil];
     [notifyCenter addObserver : self
                      selector : @selector(isPedestalEnabledInCSRChanged:)
                          name : ORMTCModelIsPedestalEnabledInCSR
@@ -267,68 +304,21 @@
 	
 	[self displayMasks];
 
-	//load the nhit values
-	/*
-    int col,row;
-	float displayValue=0;
-	for(col=0;col<4;col++){
-		for(row=0;row<6;row++){
-			int index = kNHit100HiThreshold + row + (col * 6);
-			if(col == 0){
-				int type = [model nHitViewType];
-				if(type == kNHitsViewRaw) {
-					displayValue = [model dbFloatByIndex: index];
-				}	
-				else if(type == kNHitsViewmVolts) { 
-					float rawValue = [model dbFloatByIndex: index];
-					displayValue = [model rawTomVolts:rawValue];
-				}
-				else if(type == kNHitsViewNHits) {
-					int rawValue    = [model dbFloatByIndex: index];
-					float mVolts    = [model rawTomVolts:rawValue];
-					float dcOffset  = [model dbFloatByIndex:index + kNHitDcOffset_Offset];
-					float mVperNHit = [model dbFloatByIndex:index + kmVoltPerNHit_Offset];
-					displayValue    = [model mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];			
-				}
-			}
-			else displayValue = [model dbFloatByIndex: index];
-			[[nhitMatrix cellAtRow:row column:col] setFloatValue:displayValue];
-		}
-	}
 	
-	//now the esum values
-	for(col=0;col<4;col++){
-		for(row=0;row<4;row++){
-			int index = kESumLowThreshold + row + (col * 4);
-			if(col == 0){
-				int type = [model eSumViewType];
-				if(type == kESumViewRaw) {
-					displayValue = [model dbFloatByIndex: index];
-				}	
-				else if(type == kESumViewmVolts) { 
-					float rawValue = [model dbFloatByIndex: index];
-					displayValue = [model rawTomVolts:rawValue];
-				}
-				else if(type == kESumVieweSumRel) {					
-					float dcOffset = [model dbFloatByIndex:index + kESumDcOffset_Offset];
-					displayValue = dcOffset - [model dbFloatByIndex: index];
-				}
-				else if(type == kESumViewpC) {
-					int rawValue   = [model dbFloatByIndex: index];
-					float mVolts   = [model rawTomVolts:rawValue];
-					float dcOffset = [model dbFloatByIndex:index + kESumDcOffset_Offset];
-					float mVperpC  = [model dbFloatByIndex:index + kmVoltPerpC_Offset];
-					displayValue   = [model mVoltsTopC:mVolts dcOffset:dcOffset mVperpC:mVperpC];			
-				}
-			}
-			else displayValue = [model dbFloatByIndex: index];
-			[[esumMatrix cellAtRow:row column:col] setFloatValue:displayValue];
-		}
-	}
-	*/
 	NSString* ss = [model dbObjectByIndex: kDBComments];
 	if(!ss) ss = @"---";
 	[commentsField setStringValue: ss];
+}
+- (void) placeholder:(NSNotification *)aNote {
+    NSLog(@"Placeholder\n");
+    for(int i=FIRST_NHIT_TAG;i<LAST_NHIT_TAG;i++)
+    {
+        int units = [self convert_view_unit_index_to_model_index:[[nHitViewTypeMatrix selectedCell] tag]];
+        float thresh = [model getThresholdOfType:[self convert_view_thresold_index_to_model_index:i] inUnits:units ];
+        NSLog(@"%f\n",thresh);
+        [[nhitMatrix cellWithTag:i] setFloatValue:thresh];
+    }
+    [nhitMatrix setNeedsDisplay:YES];
 }
 
 - (void) displayMasks
@@ -793,23 +783,23 @@
 //Settings buttons.
 - (IBAction) eSumViewTypeAction:(id)sender
 {
-	[self endEditing];
-    [self changeNhitThresholdsDisplay:[sender tag]];
+	//[self endEditing];
+    [self changeNhitThresholdsDisplay:[self convert_view_unit_index_to_model_index:[[sender selectedCell] tag]]];
 }
 
 - (IBAction) nHitViewTypeAction:(id)sender
 {
-	[self endEditing];
-    [self changeNhitThresholdsDisplay: [sender tag]];
+	//[self endEditing];
+    NSLog(@"THE TAG = %i\n",[[sender selectedCell] tag]);
+    [self changeNhitThresholdsDisplay: [self convert_view_unit_index_to_model_index:[[sender selectedCell] tag]]];
 }
 
 - (void) changeNhitThresholdsDisplay: (int) type
 {
-    for(int i=0;i<7;i++)
+    for(int i=FIRST_NHIT_TAG;i<LAST_NHIT_TAG;i++)
     {
         [[nhitMatrix cellWithTag:i] setFloatValue:
-         [model getThresholdOfType:[self convert_view_thresold_index_to_model_index:i]
-                           inUnits:type]];
+         [model getThresholdOfType:[self convert_view_thresold_index_to_model_index:i] inUnits:type]];
     }
 }
 - (void) changeESUMThresholdDisplay: (int) type
@@ -822,18 +812,115 @@
     }
 }
 - (int) convert_view_thresold_index_to_model_index: (int) view_index {
-    return view_index;
+    switch (view_index) {
+        case VIEW_N100H_TAG:
+            return MTC_N100_HI_THRESHOLD_INDEX;
+            break;
+        case VIEW_N100M_TAG:
+            return MTC_N100_MED_THRESHOLD_INDEX;
+            break;
+        case VIEW_N100L_TAG:
+            return MTC_N100_LO_THRESHOLD_INDEX;
+            break;
+        case VIEW_N20_TAG:
+            return MTC_N20_THRESHOLD_INDEX;
+            break;
+        case VIEW_N20LB_TAG:
+            return MTC_N20LB_THRESHOLD_INDEX;
+            break;
+        case VIEW_ESUMH_TAG:
+            return MTC_ESUMH_THRESHOLD_INDEX;
+            break;
+        case VIEW_ESUML_TAG:
+            return MTC_ESUML_THRESHOLD_INDEX;
+            break;
+        case VIEW_OWLEH_TAG:
+            return MTC_OWLEHI_THRESHOLD_INDEX;
+            break;
+        case VIEW_OWLEL_TAG:
+            return MTC_OWLELO_THRESHOLD_INDEX;
+            break;
+        case VIEW_OWLN_TAG:
+            return MTC_OWLN_THRESHOLD_INDEX;
+            break;
+        default:
+            //Raise exception?
+            return -1;
+            break;
+    }
 }
 - (int) convert_model_threshold_index_to_view_index: (int) model_index{
-    return model_index;
+    switch (model_index) {
+        case MTC_N100_HI_THRESHOLD_INDEX:
+            return VIEW_N100H_TAG;
+            break;
+        case MTC_N100_MED_THRESHOLD_INDEX:
+            return VIEW_N100M_TAG;
+            break;
+        case MTC_N100_LO_THRESHOLD_INDEX:
+            return VIEW_N100L_TAG;
+            break;
+        case MTC_N20_THRESHOLD_INDEX:
+            return VIEW_N20_TAG;
+            break;
+        case MTC_N20LB_THRESHOLD_INDEX:
+            return VIEW_N20LB_TAG;
+            break;
+        case MTC_ESUMH_THRESHOLD_INDEX:
+            return VIEW_ESUMH_TAG;
+            break;
+        case MTC_ESUML_THRESHOLD_INDEX:
+            return VIEW_ESUML_TAG;
+            break;
+        case MTC_OWLEHI_THRESHOLD_INDEX:
+            return VIEW_OWLEH_TAG;
+            break;
+        case MTC_OWLELO_THRESHOLD_INDEX:
+            return VIEW_OWLEL_TAG;
+            break;
+        case MTC_OWLN_THRESHOLD_INDEX:
+            return VIEW_OWLN_TAG;
+            break;
+        default:
+            //Raise exception?
+            return -1;
+        break;
+    }
 }
 - (int) convert_view_unit_index_to_model_index: (int) view_index {
-    return view_index;
+    switch (view_index) {
+        case VIEW_RAW_UNITS_TAG:
+            return MTC_RAW_UNITS;
+            break;
+        case VIEW_mV_UNITS_TAG:
+            return MTC_mV_UNITS;
+            break;
+        case VIEW_NHIT_UNITS_TAG:
+            return MTC_NHIT_UNITS;
+            break;
+        default:
+            // Raise exception?
+            return -1;
+            break;
+    }
 }
-- (int) convert_model_unit_index_to_view_index: (int) model_index{
-    return model_index;
+- (int) convert_model_unit_index_to_view_index: (int) model_index {
+    switch (model_index) {
+        case MTC_RAW_UNITS:
+            return VIEW_RAW_UNITS_TAG;
+            break;
+        case MTC_mV_UNITS:
+            return VIEW_NHIT_UNITS_TAG;
+            break;
+        case MTC_NHIT_UNITS:
+            return VIEW_NHIT_UNITS_TAG;
+            break;
+        default:
+            // Raise exception?
+            return -1;
+            break;
+    }
 }
-
 - (IBAction) settingsMTCDAction:(id) sender
 {
 	[model setDbObject:[sender stringValue] forIndex:[sender tag]];
@@ -842,6 +929,10 @@
 - (IBAction) settingsNHitAction:(id) sender 
 {
     NSLog(@"SettingsNHItAction needs implementation\n");
+    int threshold_index = [self convert_view_thresold_index_to_model_index:[[sender selectedCell] tag]];
+    int unit_index = [self convert_view_unit_index_to_model_index:[[nHitViewTypeMatrix selectedCell] tag]];
+    NSLog(@"Setting threshold %i to %f from units %i\n",threshold_index,[[sender selectedCell] floatValue],unit_index);
+    [model setThresholdOfType:threshold_index fromUnits:unit_index toValue:[[sender selectedCell] floatValue]];
 }
 
 
