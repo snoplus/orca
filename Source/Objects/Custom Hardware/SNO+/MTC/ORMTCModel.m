@@ -111,11 +111,7 @@ static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
 { @"MTC/D,GtCrateMask",			@"0" },	//11
 { @"MTC/D,PEDCrateMask",		@"0" },	//12
 { @"MTC/D,ControlMask",			@"0" },		//13
-
-{ @"MTC,tub",					@"40"},		//54
-
 {@"Comments",					@"Nothing Noted"},		//55
-
 };
 
 @interface ORMTCModel (private)
@@ -136,7 +132,8 @@ mtcStatusWritePtr = _mtcStatusWritePtr,
 mtcStatusDataAvailable = _mtcStatusDataAvailable,
 mtcStatusNumEventsInMem = _mtcStatusNumEventsInMem,
 resetFifoOnStart = _resetFifoOnStart,
-pulserEnabled = _pulserEnabled;
+pulserEnabled = _pulserEnabled,
+tubRegister;
 
 - (id) init //designated initializer
 {
@@ -2044,11 +2041,11 @@ pulserEnabled = _pulserEnabled;
     [mtc okCommand:"load_xilinx"];
 }
 
-- (void) setTubRegister
+- (void) loadTubRegister
 {
 	@try {
 		
-		unsigned long aValue = [self  dbIntByIndex:kTub];
+		unsigned long aValue = [self tubRegister];
 		
 		unsigned long shift_value;
 		unsigned long theRegValue;

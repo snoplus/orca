@@ -106,6 +106,8 @@
     unsigned long _mtcStatusNumEventsInMem;
     BOOL _resetFifoOnStart;
 
+    int tubRegister;
+
     uint16_t mtca_thresholds[MTC_NUM_THRESHOLDS];
     uint16_t mtca_baselines[MTC_NUM_THRESHOLDS];
     float mtca_dac_per_nhit[MTC_NUM_THRESHOLDS]; //Let the ESUMs have a conversion in case we ever need it
@@ -135,6 +137,8 @@
 @property (nonatomic,assign) BOOL isPedestalEnabledInCSR;
 @property (nonatomic,assign) BOOL resetFifoOnStart;
 @property (nonatomic,assign) BOOL pulserEnabled;
+
+@property (nonatomic,assign) int tubRegister;
 
 //TODO refactor all this MTCA crap into it's own class/struct
 @property (nonatomic) uint16_t N100H_Threshold;
@@ -315,7 +319,7 @@
 - (void) basicMTCReset;
 - (void) loadTheMTCADacs;
 - (void) loadMTCXilinx;
-- (void) setTubRegister;
+- (void) loadTubRegister;
 - (void) load10MHzClock;
 
 - (void) mtcatResetMtcat:(unsigned char) mtcat;

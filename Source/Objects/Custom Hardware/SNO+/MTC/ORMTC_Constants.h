@@ -74,9 +74,7 @@ enum {
 	kGtCrateMask,
 	kPEDCrateMask,
 	kControlMask,
-	
-	kTub,
-	
+
 	//other -- numbers go ABOVE this
 	kDBComments,
 	kDbLookUpTableSize //must be last
