@@ -69,6 +69,7 @@
 	IBOutlet NSTextField*	initProgressField;
 	IBOutlet NSMatrix*		isPulserFixedRateMatrix;
     IBOutlet NSMatrix* pulserFeedsMatrix;
+    IBOutlet NSButton*      includePedestalsCheckBox;
     IBOutlet NSBox*         opAdvancedOptionsBox;
 	
 	//settings
