@@ -877,7 +877,7 @@ tubRegister;
     if(in_units == MTC_RAW_UNITS) {
         // Note the following conversion is in relative units for absolute units subtract 5000mV
         // and replace the [self getbaseline] with just 4096
-        float value_in_mv = ((aThreshold - [self getBaselineOfType:type])/DAC_per_mv); //TODO less magic
+        float value_in_mv = ((aThreshold - [self getBaselineOfType:type])/DAC_per_mv);
         
         if(out_units == MTC_mV_UNITS)
         {
@@ -890,12 +890,9 @@ tubRegister;
     }
     else if (in_units == MTC_mV_UNITS) {
         if(out_units == MTC_RAW_UNITS) {
-            return (((aThreshold) * DAC_per_mv)+[self getBaselineOfType:type]);
+            return ((aThreshold * DAC_per_mv)+[self getBaselineOfType:type]);
         }
         else if(out_units == MTC_NHIT_UNITS) {
-
-            //Note the following conversion is in relative units for absolute units add 5000mV
-            // and replace the [self getbaseline] with just 4096
             return aThreshold/mv_per_nhit;
         }
     }
