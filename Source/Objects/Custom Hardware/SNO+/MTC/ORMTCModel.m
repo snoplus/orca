@@ -1010,7 +1010,6 @@ tubRegister;
 
 - (NSMutableDictionary*) serializeToDictionary {
     NSMutableDictionary *serial = [NSMutableDictionary dictionaryWithCapacity:30];
-    [serial autorelease];
     //This function will let any exceptions from below bubble up
     [serial setObject:[NSNumber numberWithInt:(int) [self getThresholdOfType:MTC_N100_HI_THRESHOLD_INDEX inUnits:MTC_RAW_UNITS]] forKey:[self StringForThreshold:MTC_N100_HI_THRESHOLD_INDEX]];
     [serial setObject:[NSNumber numberWithInt:(int) [self getThresholdOfType:MTC_N100_MED_THRESHOLD_INDEX inUnits:MTC_RAW_UNITS]] forKey:[self StringForThreshold:MTC_N100_MED_THRESHOLD_INDEX]];
