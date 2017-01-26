@@ -434,7 +434,7 @@
     [fixedTimePedestalsDelayField	setEnabled: !lockedOrNotRunningMaintenance && ![model isPulserFixedRate]];
     
     //Settings
-    [setPedestalDelayButton           setEnabled: !lockedOrNotRunningMaintenance];
+    [setAdvancedOptionsButton           setEnabled: !lockedOrNotRunningMaintenance];
     [loadMTCADacsButton				setEnabled: !lockedOrNotRunningMaintenance];
     [nhitMatrix                     setEnabled: !lockedOrNotRunningMaintenance];
     [esumMatrix                     setEnabled: !lockedOrNotRunningMaintenance];
@@ -676,13 +676,16 @@
     }
 }
 
-- (IBAction) standardSetPedestalDelay:(id)sender
+- (IBAction) setAdvancedOptions:(id)sender
 {
     @try{
         [model loadPedestalDelayToHardware];
+        [model loadPrescaleValueToHardware];
+        [model loadLockOutWidthToHardware];
+        [model loadPedWidthToHardware];
     } @catch (NSException *excep) {
-            // Do nothing
-            // loadPedestalDelay will catch and warn about any error already
+        // Do nothing
+        // The above will all catch and warn about any error already
     }
 }
 

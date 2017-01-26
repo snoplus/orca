@@ -61,7 +61,7 @@
                 <outlet property="repeatDelayField" destination="1243" id="2826"/>
                 <outlet property="repeatDelayStepper" destination="1245" id="1304"/>
                 <outlet property="selectedRegisterPU" destination="1261" id="1267"/>
-                <outlet property="setPedestalDelayButton" destination="4158" id="kPF-h6-a7t"/>
+                <outlet property="setAdvancedOptionsButton" destination="4158" id="ZJ1-Cs-Hpe"/>
                 <outlet property="settingsAdvancedOptionsBox" destination="1488" id="21a-jG-j46"/>
                 <outlet property="statusButton" destination="1257" id="vCe-N0-3RA"/>
                 <outlet property="stopButton" destination="1259" id="kkn-k7-bsR"/>
@@ -609,6 +609,7 @@
                                                         </textFieldCell>
                                                         <connections>
                                                             <action selector="standardSetPedestalsCount:" target="-2" id="4103"/>
+                                                            <outlet property="formatter" destination="fcg-We-po1" id="lls-0y-la8"/>
                                                         </connections>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="4076">
@@ -631,6 +632,7 @@
                                                         </textFieldCell>
                                                         <connections>
                                                             <action selector="standardSetPedestalsDelay:" target="-2" id="4104"/>
+                                                            <outlet property="formatter" destination="fcg-We-po1" id="bT2-oA-vl2"/>
                                                         </connections>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="4079">
@@ -654,6 +656,9 @@
                                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
+                                                        <connections>
+                                                            <outlet property="formatter" destination="fcg-We-po1" id="UMd-ER-2nx"/>
+                                                        </connections>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="XkZ-Gt-JXi">
                                                         <rect key="frame" x="87" y="14" width="19" height="14"/>
@@ -1152,6 +1157,7 @@
                                                                     <bool key="NSRaisesForNotApplicableKeys" value="NO"/>
                                                                 </dictionary>
                                                             </binding>
+                                                            <outlet property="formatter" destination="fcg-We-po1" id="ExE-n6-NOb"/>
                                                         </connections>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" tag="1" id="1803">
@@ -1173,6 +1179,7 @@
                                                                     <bool key="NSRaisesForNotApplicableKeys" value="NO"/>
                                                                 </dictionary>
                                                             </binding>
+                                                            <outlet property="formatter" destination="fcg-We-po1" id="f7S-0m-1bf"/>
                                                         </connections>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="1807">
@@ -1203,6 +1210,7 @@
                                                                     <bool key="NSRaisesForNotApplicableKeys" value="NO"/>
                                                                 </dictionary>
                                                             </binding>
+                                                            <outlet property="formatter" destination="fcg-We-po1" id="0nF-1A-C0I"/>
                                                         </connections>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="1813">
@@ -1233,6 +1241,7 @@
                                                                     <bool key="NSRaisesForNotApplicableKeys" value="NO"/>
                                                                 </dictionary>
                                                             </binding>
+                                                            <outlet property="formatter" destination="fcg-We-po1" id="2dy-af-AQj"/>
                                                         </connections>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="1835">
@@ -1244,17 +1253,6 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <button verticalHuggingPriority="750" id="4158">
-                                                        <rect key="frame" x="20" y="16" width="160" height="28"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="push" title="Set Pedestal Delay" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4159">
-                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="standardSetPedestalDelay:" target="-2" id="5ky-hD-VSk"/>
-                                                        </connections>
-                                                    </button>
                                                     <textField verticalHuggingPriority="750" tag="3" id="1806">
                                                         <rect key="frame" x="404" y="83" width="44" height="19"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -1274,8 +1272,20 @@
                                                                     <bool key="NSRaisesForNotApplicableKeys" value="NO"/>
                                                                 </dictionary>
                                                             </binding>
+                                                            <outlet property="formatter" destination="fcg-We-po1" id="T5i-en-oT2"/>
                                                         </connections>
                                                     </textField>
+                                                    <button verticalHuggingPriority="750" id="4158">
+                                                        <rect key="frame" x="173" y="8" width="160" height="28"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Load Settings" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4159">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="setAdvancedOptions:" target="-2" id="gi8-lv-NLp"/>
+                                                        </connections>
+                                                    </button>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>

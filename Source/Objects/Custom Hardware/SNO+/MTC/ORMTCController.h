@@ -54,7 +54,7 @@
 	IBOutlet NSButton*		initNoXilinxButton;
 	IBOutlet NSButton*		initNo10MHzButton;
 	IBOutlet NSButton*		initNoXilinxNo100MHzButton;
-	IBOutlet NSButton*		setPedestalDelayButton;
+	IBOutlet NSButton*		setAdvancedOptionsButton;
 	IBOutlet NSButton*		loadMTCADacsButton;
 	IBOutlet NSButton*		firePedestalsButton;
 	IBOutlet NSButton*		stopPedestalsButton;
@@ -178,7 +178,7 @@
 - (IBAction) standardInitMTCnoXilinx:(id) sender;
 - (IBAction) standardInitMTCno10MHz:(id) sender;
 - (IBAction) standardInitMTCnoXilinxno10MHz:(id) sender;
-- (IBAction) standardSetPedestalDelay:(id) sender;
+- (IBAction) setAdvancedOptions:(id)sender;
 - (IBAction) standardIsPulserFixedRate:(id) sender;
 - (IBAction) standardFirePedestals:(id) sender;
 - (IBAction) standardStopPedestals:(id) sender;
