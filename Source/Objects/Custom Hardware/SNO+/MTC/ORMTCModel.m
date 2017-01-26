@@ -1412,24 +1412,13 @@ tubRegister;
 
 - (void) loadPedWidthToHardware
 {
-    uint16_t thePedestalWidthValue = [self pedestalWidth];
 	@try {
-		unsigned long write_value = (0xff - thePedestalWidthValue/5); //value in nano-seconds
-		
-		// write the GT lockout value in SMTC_GT_LOCK_REG
-		[self write:kMtcPwIdReg value:write_value];
-		
-		// now assert and de-assert LOAD_ENPW in CONTROL REG and  
-		// preserving the state of the register at the same time		
-		[self setBits:kMtcControlReg mask:MTC_CSR_LOAD_ENPW];
-		[self clrBits:kMtcControlReg mask:MTC_CSR_LOAD_ENPW];
-		
+        [mtc okCommand:"set_pedestal_width %u", [self pedestalWidth]];
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Could not load the MTC pedestal width!\n");	
 		NSLog(@"Exception: %@\n",localException);
 		[localException raise];
-		
 	}
 }
 
