@@ -318,6 +318,8 @@
         return;
     }
     [self changeNhitThresholdsDisplay:units];
+    [self changeESUMThresholdDisplay:units];
+
 }
 
 - (void) displayMasks
@@ -783,11 +785,12 @@
     int view_index = [[sender selectedCell] tag];
     @try {
         unit_index = [self convert_view_unit_index_to_model_index:view_index];
+        [self changeNhitThresholdsDisplay: unit_index];
+
     } @catch (NSException *exception) {
-        NSLogColor([NSColor redColor], @"Could not change views. Reason:%s\n",[exception reason]);
+        NSLogColor([NSColor redColor], @"Could not change views. Reason:%@\n",[exception reason]);
         return;
     }
-    [self changeNhitThresholdsDisplay: [self convert_view_unit_index_to_model_index:unit_index]];
 
 }
 - (IBAction)opsAdvancedOptionsTriangeChanged:(id)sender {
