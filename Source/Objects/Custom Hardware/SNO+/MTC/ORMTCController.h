@@ -71,7 +71,7 @@
  	IBOutlet NSTextField*	lockOutWidthField;
  	IBOutlet NSTextField*	pedestalWidthField;
  	IBOutlet NSTextField*	nhit100LoPrescaleField;
-    IBOutlet NSTextField*   extraPulserPeriodField;
+    IBOutlet NSTextField*   pulserPeriodField;
  	IBOutlet NSTextField*	pedDelayField;
 
 	IBOutlet NSMatrix*		nhitMatrix;

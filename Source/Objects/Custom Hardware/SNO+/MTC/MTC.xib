@@ -13,7 +13,6 @@
                 <outlet property="continuePedestalsButton" destination="4056" id="4089"/>
                 <outlet property="eSumViewTypeMatrix" destination="R5c-j8-UOB" id="g16-Dj-XiB"/>
                 <outlet property="esumMatrix" destination="AUU-Ta-E3F" id="6wc-1l-r5m"/>
-                <outlet property="extraPulserPeriodField" destination="M4V-7Q-nR2" id="MDr-RK-uzS"/>
                 <outlet property="fireFixedTimePedestalsButton" destination="4055" id="4099"/>
                 <outlet property="firePedestalsButton" destination="4058" id="4087"/>
                 <outlet property="fixedTimePedestalsCountField" destination="4073" id="4097"/>
@@ -51,6 +50,7 @@
                 <outlet property="pedCrateMaskMatrix" destination="Mno-Cd-fe2" id="SQY-sJ-fah"/>
                 <outlet property="pedDelayField" destination="1834" id="p1B-ug-xAI"/>
                 <outlet property="pedestalWidthField" destination="1803" id="2507"/>
+                <outlet property="pulserPeriodField" destination="M4V-7Q-nR2" id="8x3-EU-Zph"/>
                 <outlet property="readButton" destination="1253" id="YOa-8v-Q9c"/>
                 <outlet property="regBaseAddressText" destination="1282" id="1290"/>
                 <outlet property="repeatCountField" destination="1237" id="2825"/>
