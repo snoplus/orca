@@ -36,6 +36,8 @@
 #define uLongDBValue(A)  [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] unsignedLongValue]
 #define floatDBValue(A)  [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] floatValue]
 
+#define MTC_INTERNAL_UNITS MTC_RAW_UNITS
+
 #pragma mark •••Definitions
 NSString* ORMTCModelESumViewTypeChanged		= @"ORMTCModelESumViewTypeChanged";
 NSString* ORMTCModelNHitViewTypeChanged		= @"ORMTCModelNHitViewTypeChanged";
@@ -136,7 +138,7 @@ static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
 { @"MTC/A,NHit20,dcOffset",		@"40"},		//35
 { @"MTC/A,NHit20LB,dcOffset",	@"50"},		//36
 { @"MTC/A,OWLN,dcOffset",		@"60"},		//37
-*/
+
 //defaults for the MTC A ESUM
 { @"MTC/A,ESumLow,Threshold",	@"10"},		//38
 { @"MTC/A,ESumHi,Threshold",	@"20"},		//39
@@ -157,7 +159,7 @@ static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
 { @"MTC/A,ESumHi,dcOffset",		@"20"},		//51
 { @"MTC/A,OWLELo,dcOffset",		@"30"},		//52
 { @"MTC/A,OWLEHi,dcOffset",		@"40"},		//53
-
+*/
 { @"MTC,tub",					@"40"},		//54
 
 {@"Comments",					@"Nothing Noted"},		//55
@@ -165,18 +167,6 @@ static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
 };
 
 
-#define MTC_N100_LO_THRESHOLD_INDEX  1
-#define MTC_N100_MED_THRESHOLD_INDEX 2
-#define MTC_N100_HI_THRESHOLD_INDEX  3
-#define MTC_N20LB_THRESHOLD_INDEX    4
-#define MTC_ESUML_THRESHOLD_INDEX    5
-#define MTC_ESUMH_THRESHOLD_INDEX    6
-#define MTC_OWLN_THRESHOLD_INDEX     7
-#define MTC_OWLELO_THRESHOLD_INDEX   8
-#define MTC_OWLEHi_THRESHOLD_INDEX   9
-#define MTC_RAW_UNITS 1
-#define MTC_mV_UNITS 2
-#define MTC_NHIT_UNITS 3
 
 /*int mtcDacIndexes[14]=
 {
@@ -239,7 +229,6 @@ pulserEnabled = _pulserEnabled;
 
     /* initialize our connection to the MTC server */
     mtc = [[RedisClient alloc] init];
-
     [[self undoManager] disableUndoRegistration];
 
     [[self undoManager] enableUndoRegistration];
@@ -952,11 +941,136 @@ pulserEnabled = _pulserEnabled;
      //Raise exception?
     }
     uint16_t threshold = mtca_thresholds[type];
-    return convert_threshold_from:MTC_RAW_UNITS
-}
-- (void) setThresholdOfType:(int)type fromUnits:(int)units
-{
+    if(units == MTC_RAW_UNITS) {
+        return threshold;
+    }
+    else if (units == MTC_mV_UNITS || units == MTC_NHIT_UNITS) {
+        //Need to improve these conversions later...needs trigger scan input and such
+        float mVThreshold = (4095 - threshold)*(10000.0/4096) - 5000.0;
+        if(units == MTC_NHIT_UNITS) {
+            return (mVThreshold + 5000)/38.0;
+        }
+        return mVThreshold;
+    }
+   
+    //Raise exception?
+    return CGFLOAT_MIN;
     
+}
+- (void) setThresholdOfType:(int)type fromUnits:(int)units toValue:(float) aThreshold
+{
+    //Conversions need improvment
+    if(type<0 || type > MTC_NUM_USED_THRESHOLDS)
+    {
+        //Raise exception?
+    }
+    uint16_t threshold_in_dac_counts=0;
+    if(units == MTC_RAW_UNITS)
+    {
+        threshold_in_dac_counts = (uint16_t) aThreshold;
+    }
+    else if(units == MTC_NHIT_UNITS || units == MTC_mV_UNITS)
+    {
+        float threshold_in_mv = aThreshold;
+        if(units == MTC_NHIT_UNITS)
+        {
+            threshold_in_mv = 38.0*aThreshold - 5000;
+        }
+        threshold_in_dac_counts = (threshold_in_mv + 5000)/(10/4096);
+    }
+    else{ //Raise exception?
+    }
+    mtca_thresholds[type] = threshold_in_dac_counts;
+}
+- (float) convertThreshold:(float)aThreshold OfType:(int) type fromUnits:(int)in_units toUnits:(int) out_units{
+    float mv_per_nhit = 38.0;
+    float dac_per_mv = 4096/10000.0;
+    
+    if(type<0 || type > MTC_NUM_USED_THRESHOLDS)
+    {
+        //Raise exception?
+    }
+    if(in_units == out_units)
+    {
+        return aThreshold;
+    }
+    if(in_units == MTC_RAW_UNITS) {
+        float value_in_mv = (4095 - aThreshold)/dac_per_mv - 5000;
+        if(out_units == MTC_mV_UNITS)
+        {
+            return value_in_mv;
+        }
+        else if (out_units == MTC_NHIT_UNITS)
+        {
+            return [self convertThreshold:value_in_mv OfType:type fromUnits:MTC_mV_UNITS toUnits:out_units];
+        }
+    }
+    else if (in_units == MTC_mV_UNITS) {
+        if(out_units == MTC_RAW_UNITS) {
+            return 4095 - (aThreshold+5000 * dac_per_mv);
+        }
+        else if(out_units == MTC_NHIT_UNITS) {
+            return aThreshold/mv_per_nhit;
+        }
+    }
+    else if (in_units == MTC_NHIT_UNITS) {
+        float value_in_mv = mv_per_nhit * aThreshold;
+        if(out_units == MTC_mV_UNITS) {
+            return value_in_mv;
+        }
+        else if (out_units == MTC_RAW_UNITS) {
+            return [self convertThreshold:value_in_mv OfType:type fromUnits:MTC_mV_UNITS toUnits:out_units];
+        }
+    }
+    //Raise exception?
+    return -1.0;
+}
+
+- (uint16_t) N100H_Threshold {
+    return [self getThresholdOfType:MTC_N100_HI_THRESHOLD_INDEX inUnits:MTC_RAW_UNITS];
+}
+- (void) setN100H_Threshold:(uint16_t)threshold {
+    [self setThresholdOfType:MTC_N100_HI_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:threshold];
+}
+
+
+- (uint16_t) N100M_Threshold { return [self getThresholdOfType:MTC_N100_MED_THRESHOLD_INDEX inUnits:MTC_RAW_UNITS]; }
+- (void) setN100M_Threshold:(uint16_t)threshold { [self setThresholdOfType:MTC_N100_MED_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:threshold]; }
+
+- (uint16_t) N100L_Threshold { return [self getThresholdOfType:MTC_N100_LO_THRESHOLD_INDEX inUnits:MTC_RAW_UNITS]; }
+- (void) setN100L_Threshold:(uint16_t)threshold { [self setThresholdOfType:MTC_N100_LO_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:threshold];}
+
+- (uint16_t) N20_Threshold { return [self getThresholdOfType:MTC_N20_THRESHOLD_INDEX inUnits:MTC_RAW_UNITS]; }
+- (void) setN20_Threshold:(uint16_t)threshold { [self setThresholdOfType:MTC_N20_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:threshold]; }
+
+- (uint16_t) N20LB_Threshold { return [self getThresholdOfType:MTC_N20LB_THRESHOLD_INDEX inUnits:MTC_RAW_UNITS]; }
+- (void) setN20LB_Threshold:(uint16_t)threshold {[self setThresholdOfType:MTC_N20LB_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:threshold]; }
+
+- (uint16_t) ESUMH_Threshold { return [self getThresholdOfType:MTC_ESUMH_THRESHOLD_INDEX inUnits:MTC_RAW_UNITS]; }
+- (void) setESUMH_Threshold:(uint16_t)threshold { [self setThresholdOfType:MTC_ESUMH_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:threshold];}
+
+- (uint16_t) ESUML_Threshold { return [self getThresholdOfType:MTC_ESUML_THRESHOLD_INDEX inUnits:MTC_RAW_UNITS];}
+- (void) setESUML_Threshold:(uint16_t)threshold { [self setThresholdOfType:MTC_ESUML_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:threshold]; }
+
+- (uint16_t) OWLN_Threshold { return [self getThresholdOfType:MTC_OWLN_THRESHOLD_INDEX inUnits:MTC_RAW_UNITS];}
+- (void) setOWLN_Threshold:(uint16_t)threshold { [self setThresholdOfType:MTC_OWLN_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:threshold];}
+
+- (uint16_t) OWLEH_Threshold { return [self getThresholdOfType:MTC_OWLEHI_THRESHOLD_INDEX inUnits:MTC_RAW_UNITS];}
+- (void) setOWLEH_Threshold:(uint16_t)threshold { [self setThresholdOfType:MTC_OWLEHI_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:threshold];}
+
+- (uint16_t) OWLEL_Threshold { return [self getThresholdOfType:MTC_OWLELO_THRESHOLD_INDEX inUnits:MTC_RAW_UNITS]; }
+- (void) setOWLEL_Threshold:(uint16_t)threshold { [self setThresholdOfType:MTC_OWLELO_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:threshold]; }
+
+- (id) valueForKey:(NSString*) str fromSerialization:(NSJSONSerialization*)serial {
+    [[serial valueForKey:@"rows"] intValue];
+    return [[[[serial valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"N100H_Threshold"];
+}
+
+- (void) loadFromSearialization:(NSJSONSerialization*) serial {
+    //[mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kNHit100MedThreshold]] forIndex:kNHit100MedThreshold ];
+
+    [self setN100H_Threshold:[[self valueForKey:@"N100H_Threshold" fromSerialization:serial] intValue]];
+    [self setN100M_Threshold:[[self valueForKey:@"N100M_THreshold" fromSerialization:serial] intValue]];
 }
 #pragma mark •••HW Access
 - (short) getNumberRegisters

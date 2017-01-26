@@ -102,7 +102,7 @@ enum {
 	kNHit100LodcOffset,	
 	kNHit20dcOffset,		
 	kNHit20LBdcOffset,	
-	kOWLNdcOffset,	*/
+	kOWLNdcOffset,
 	
 	//ESUM
 	kESumLowThreshold,	
@@ -123,7 +123,7 @@ enum {
 	kESumLowdcOffset, //+kESumDcOffset_Offset
 	kESumHidcOffset,
 	kOWLELodcOffset,
-	kOWLEHidcOffset,
+	kOWLEHidcOffset,*/
 	
 	kTub,
 	

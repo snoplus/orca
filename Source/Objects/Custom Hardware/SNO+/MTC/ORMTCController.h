@@ -128,7 +128,6 @@
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management
-- (void) eSumViewTypeChanged:(NSNotification*)aNote;
 - (void) mtcDataBaseChanged:(NSNotification*)aNote;
 - (void) basicOpsRunningChanged:(NSNotification*)aNote;
 - (void) autoIncrementChanged:(NSNotification*)aNote;

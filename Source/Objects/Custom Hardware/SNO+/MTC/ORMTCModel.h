@@ -40,13 +40,14 @@
 #define MTC_OWLN_THRESHOLD_INDEX     7
 #define MTC_OWLELO_THRESHOLD_INDEX   8
 #define MTC_OWLEHI_THRESHOLD_INDEX   9
-#define MTC_NUM_THRESHOLDS 14  // The number of thresholds that can be set
+#define MTC_NUM_THRESHOLDS 14  // The number of thresholds that exist
 #define MTC_NUM_USED_THRESHOLDS 10 // The number of thresholds that are actually used
 
 #define MTC_RAW_UNITS 1
 #define MTC_mV_UNITS 2
 #define MTC_NHIT_UNITS 3
-#define MTC_
+
+
 
 @interface ORMTCModel :  ORVmeIOCard
 {
@@ -117,6 +118,16 @@
 @property (nonatomic,assign) BOOL isPedestalEnabledInCSR;
 @property (nonatomic,assign) BOOL resetFifoOnStart;
 @property (nonatomic,assign) BOOL pulserEnabled;
+@property (nonatomic) uint16_t N100H_Threshold;
+@property (nonatomic) uint16_t N100M_Threshold;
+@property (nonatomic) uint16_t N100L_Threshold;
+@property (nonatomic) uint16_t N20_Threshold;
+@property (nonatomic) uint16_t N20LB_Threshold;
+@property (nonatomic) uint16_t ESUML_Threshold;
+@property (nonatomic) uint16_t ESUMH_Threshold;
+@property (nonatomic) uint16_t OWLEL_Threshold;
+@property (nonatomic) uint16_t OWLEH_Threshold;
+@property (nonatomic) uint16_t OWLN_Threshold;
 
 #pragma mark •••Initialization
 - (id) init;
@@ -167,10 +178,10 @@
 - (void) setDbObject:(id) anObject forIndex:(int)anIndex;
 - (float) dbFloatByIndex:(int)anIndex;
 - (int) dbIntByIndex:(int)anIndex;
-- (int) dacValueByIndex:(short)anIndex;
 - (float) getThresholdOfType:(int) type inUnits:(int) units;
-- (void) setThresholdOfType:(int) type fromUnits: (int)units;
-
+- (void) setThresholdOfType:(int) type fromUnits: (int) units toValue:(float) aThreshold;
+- (float) convertThreshold:(float)aThreshold OfType:(int) type fromUnits:(int)in_units toUnits:(int) out_units;
+- (void) loadFromSearialization:(NSJSONSerialization*) serial;
 #pragma mark •••Converters
 - (unsigned long) mVoltsToRaw:(float) mVolts;
 - (float) rawTomVolts:(long) aRawValue;

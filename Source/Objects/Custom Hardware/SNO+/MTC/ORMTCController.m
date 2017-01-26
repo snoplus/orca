@@ -209,7 +209,6 @@
 	[self autoIncrementChanged:nil];
 	[self basicOpsRunningChanged:nil];
 	[self mtcDataBaseChanged:nil];
-	[self eSumViewTypeChanged:nil];
 	[self isPulserFixedRateChanged:nil];
 	[self fixedPulserRateCountChanged:nil];
 	[self fixedPulserRateDelayChanged:nil];
@@ -795,7 +794,7 @@
 - (IBAction) eSumViewTypeAction:(id)sender
 {
 	[self endEditing];
-	[model setESumViewType:[[sender selectedCell] tag]];	
+    [self changeNhitThresholdsDisplay:[sender tag]];
 }
 
 - (IBAction) nHitViewTypeAction:(id)sender
@@ -807,6 +806,15 @@
 }
 
 - (void) changeNhitThresholdsDisplay: (int) type
+{
+    for(int i=0;i<7;i++)
+    {
+        [[nhitMatrix cellWithTag:i] setFloatValue:
+         [model getThresholdOfType:[self convert_view_thresold_index_to_model_index:i]
+                           inUnits:type]];
+    }
+}
+- (void) changeESUMThresholdDisplay: (int) type
 {
     for(int i=0;i<7;i++)
     {
