@@ -76,7 +76,7 @@
     standardOpsSizeSmall = NSMakeSize(590,300);
     standardOpsSizeLarge = NSMakeSize(590,620);
     settingsSizeSmall	 = NSMakeSize(580,400);
-    settingsSizeLarge	 = NSMakeSize(580,550);
+    settingsSizeLarge	 = NSMakeSize(580,520);
     triggerSize          = NSMakeSize(800,655);
     blankView = [[NSView alloc] init];
     [tabView setFocusRingType:NSFocusRingTypeNone];
@@ -765,6 +765,29 @@
     }
 }
 
+- (IBAction) settingsLockoutWidthFieldChanged:(id)sender {
+    int lockout_width = [lockOutWidthField intValue];
+    [model setLockoutWidth:lockout_width];
+}
+- (IBAction) settingsPedWidthFieldChanged:(id)sender {
+    int ped_width = [pedestalWidthField intValue];
+    [model setPedestalWidth:ped_width];
+}
+
+- (IBAction) settingsPrescaleFieldChanged:(id)sender {
+    int prescale_value = [nhit100LoPrescaleField intValue];
+    [model setPrescaleValue:prescale_value];
+}
+
+- (IBAction) settingsPedDelayFieldChanged:(id)sender {
+    float delay_value = [pedDelayField intValue];
+    [model setPedestalDelay:delay_value];
+}
+
+- (IBAction)standardPulserRateFieldChanged:(id)sender {
+    float pulser_rate = [pulserPeriodField floatValue];
+    [model setPgt_rate:pulser_rate];
+}
 - (void) changeNhitThresholdsDisplay: (int) type
 {
     int threshold_index;

@@ -184,6 +184,7 @@
 - (IBAction) standardSetPedestalsDelay:(id) sender;
 - (IBAction) standardPulserFeeds:(id)sender;
 - (IBAction) opsAdvancedOptionsTriangeChanged:(id)sender;
+- (IBAction)standardPulserRateFieldChanged:(id)sender;
 
 
 //Settings
@@ -195,6 +196,13 @@
 - (IBAction) settingsGTCrateMaskAction:(id) sender;
 - (IBAction) settingsPEDCrateMaskAction:(id) sender;
 - (IBAction) settingsAdvancedOptionsTriangeChanged:(id)sender;
+- (IBAction) settingsLockoutWidthFieldChanged:(id)sender;
+- (IBAction) settingsPedWidthFieldChanged:(id)sender;
+- (IBAction) settingsPrescaleFieldChanged:(id)sender;
+- (IBAction) settingsPedDelayFieldChanged:(id)sender;
+
+
+
 
 //Triggers
 - (IBAction) triggerMTCAN100:(id) sender;
