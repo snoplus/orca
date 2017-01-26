@@ -965,17 +965,7 @@
 }
 
 - (void) trigger_scan_update_nhit {
-    int threshold_index;
-    for(int i = FIRST_NHIT_TAG;i<LAST_NHIT_TAG+1;i++)
-    {
-        @try {
-            threshold_index = [self convert_view_thresold_index_to_model_index:i];
-        } @catch (NSException *exception) {
-            NSLogColor([NSColor redColor], @"Loaded %i trigge_scans then encountered an error:\n%@\n",i-FIRST_NHIT_TAG,[exception reason]);
-            return;
-        }
-        [self load_settings_from_trigger_scan_for_type:threshold_index];
-    }
+        [self load_settings_from_trigger_scan_for_type];
 }
 
 
@@ -991,38 +981,44 @@
     NSString* baseline=nil;
     NSString* dac_per_nhit=nil;
     @try {
-    if (!result) {
+        if (!result) {
             [NSException raise:@"MTCControllerError" format:@"NULL result returned from database"];
-    }
-    
-    numRows = [result numOfRows];
-    numCols = [result numOfFields];
-    if (numRows != 1) {
-            [NSException raise:@"MTCControllerError" format:@"Unexpected number of rows returned from database. Expected 1 got %i.",numRows];
-    }
-    
-    if (numCols != 3) {
+        }
+        
+        numRows = [result numOfRows];
+        numCols = [result numOfFields];
+        if (numRows <= 0) {
+            [NSException raise:@"MTCControllerError" format:@"No rows returned from database"];
+        }
+        
+        if (numCols != 3) {
             [NSException raise:@"MTCControllerError" format:@"Unexpected number of columns returned from database. Expected 3 got %i", numCols];
+        }
     }
-    NSDictionary* result_dict = [result fetchRowAsDictionary];
-    if(!result_dict)
-    {
-            [NSException raise:@"MTCControllerError" format:@"Failed to interpret database results as dictionary"];
-    }
-        name = [result_dict objectForKey:@"name"];
-        baseline = [[result_dict objectForKey:@"baseline"] stringValue];
-        dac_per_nhit =[[result_dict objectForKey:@"adc_per_nhit"] stringValue];
-    
-        threshold_index = [self trigger_scan_name_to_index:name];
-    } @catch (NSException *exception) {
+    @catch (NSException *exception) {
         NSLogColor([NSColor redColor], @"Error interpreting trigger scan results from database. Reason: %@\nAborting\n",[exception reason]);
         return;
     }
-    [model setBaselineOfType:threshold_index toValue:[baseline intValue]];
-    [model setDAC_per_NHIT_OfType:threshold_index toValue:[dac_per_nhit floatValue]];
-    [model setDAC_per_mV_OfType:threshold_index toValue:-4096/10000.0];
-    
-    
+    for(int i=0; i< numRows;i++)
+    {
+        @try{
+            NSDictionary* result_dict = [result fetchRowAsType:MCPTypeDictionary row:i];
+            if(!result_dict)
+            {
+                [NSException raise:@"MTCControllerError" format:@"Failed to interpret database row as dictionary"];
+            }
+            name = [result_dict objectForKey:@"name"];
+            baseline = [[result_dict objectForKey:@"baseline"] stringValue];
+            dac_per_nhit =[[result_dict objectForKey:@"adc_per_nhit"] stringValue];
+            threshold_index = [self trigger_scan_name_to_index:name];
+
+            [model setBaselineOfType:threshold_index toValue:[baseline intValue]];
+            [model setDAC_per_NHIT_OfType:threshold_index toValue:[dac_per_nhit floatValue]];
+            [model setDAC_per_mV_OfType:threshold_index toValue:-4096/10000.0];
+        } @catch (NSException* exception) {
+            NSLogColor([NSColor redColor], @"Error interpreting trigger scan result. Reason: %@\n",[exception reason]);
+        }
+    }
     return;
 }
 - (int) trigger_scan_name_to_index:(NSString*) name {
@@ -1105,24 +1101,16 @@
         return;
     }
 }
-- (void) load_settings_from_trigger_scan_for_type:(int) type {
+- (void) load_settings_from_trigger_scan_for_type {
     //Note perhaps this should be moved out of the model??
     ORPQModel* pgsql_connec = [ORPQModel getCurrent];
-    NSString* trig_scan_name;
-
     if(!pgsql_connec)
     {
         NSLogColor([NSColor redColor], @"Postgres connection not available. Aborting");
         return;
     }
-    @try {
-        trig_scan_name = [self index_to_trigger_scan_name:type];
-    } @catch (NSException *exception) {
-        NSLogColor([NSColor redColor], @"Cannot get name for requested threshold. Reason: %@\nAborting.\n",[exception reason]);
-        return;
-    }
-    NSString* db_cmd = [NSString stringWithFormat:@"select name,baseline,adc_per_nhit from trigger_scan where name='%@' and timestamp=(SELECT max(timestamp) from trigger_scan where name='%@')",trig_scan_name,trig_scan_name];
-    [pgsql_connec dbQuery:db_cmd object:self selector:@selector(waitForTriggerScan:) timeout:2.0];
+    NSString* cmd = [NSString stringWithFormat:@"select distinct on (name) name,baseline,adc_per_nhit from trigger_scan order by name,timestamp desc"];
+    [pgsql_connec dbQuery:cmd object:self selector:@selector(waitForTriggerScan:) timeout:2.0];
 }
 
 - (void) grab_current_thresholds {

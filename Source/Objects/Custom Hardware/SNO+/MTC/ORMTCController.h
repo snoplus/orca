@@ -144,7 +144,7 @@
 
 
 //DB Access
-- (void) load_settings_from_trigger_scan_for_type:(int) type;
+- (void) load_settings_from_trigger_scan_for_type;
 - (void) grab_current_thresholds;
 
 - (void) waitForTriggerScan: (ORPQResult *) result;
