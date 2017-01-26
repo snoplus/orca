@@ -181,8 +181,10 @@
 - (float) getThresholdOfType:(int) type inUnits:(int) units;
 - (void) setThresholdOfType:(int) type fromUnits: (int) units toValue:(float) aThreshold;
 - (float) convertThreshold:(float)aThreshold OfType:(int) type fromUnits:(int)in_units toUnits:(int) out_units;
-- (void) loadFromSearialization:(NSJSONSerialization*) serial;
-#pragma mark •••Converters
+- (void) loadFromSearialization:(NSMutableDictionary*) serial;
+- (NSMutableDictionary*) serializeToDictionary;
+
+/*#pragma mark •••Converters
 - (unsigned long) mVoltsToRaw:(float) mVolts;
 - (float) rawTomVolts:(long) aRawValue;
 - (float) mVoltsToNHits:(float) mVolts dcOffset:(float)dcOffset mVperNHit:(float)mVperNHit;
@@ -190,7 +192,7 @@
 - (long) NHitsToRaw:(float) NHits dcOffset:(float)dcOffset mVperNHit:(float)mVperNHit;
 - (float) mVoltsTopC:(float) mVolts dcOffset:(float)dcOffset mVperpC:(float)mVperp;
 - (float) pCTomVolts:(float) pC dcOffset:(float)dcOffset mVperpC:(float)mVperp;
-- (long) pCToRaw:(float) pC dcOffset:(float)dcOffset mVperpC:(float)mVperp;
+- (long) pCToRaw:(float) pC dcOffset:(float)dcOffset mVperpC:(float)mVperp;*/
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;

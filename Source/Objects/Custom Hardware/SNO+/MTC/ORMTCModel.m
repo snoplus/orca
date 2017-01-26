@@ -771,53 +771,6 @@ pulserEnabled = _pulserEnabled;
 }
 
 #pragma mark •••Converters
-- (unsigned long) mVoltsToRaw:(float) mVolts
-{
-	return (long)(((mVolts + 5000.0)*0.4096)+.5);
-}
-
-- (float) rawTomVolts:(long) aRawValue
-{
-	return (aRawValue*2.44140625)-5000.0;
-}
-
-- (float) mVoltsToNHits:(float) mVolts dcOffset:(float)dcOffset mVperNHit:(float)mVperNHit
-{
-	float NHits_per_mVolts = 0.0;
-	if(mVperNHit)NHits_per_mVolts = 1/mVperNHit;
-	//return (mVolts - dcOffset)*NHits_per_mVolts +.5;
-	return (mVolts - dcOffset)*NHits_per_mVolts;
-}
-
-- (float) NHitsTomVolts:(float) NHits dcOffset:(float)dcOffset mVperNHit:(float)mVperNHit
-{
-	return dcOffset + (mVperNHit*NHits);
-}
-
-- (long) NHitsToRaw:(float) NHits dcOffset:(float)dcOffset mVperNHit:(float)mVperNHit
-{
-	float mVolts = [self NHitsTomVolts:NHits dcOffset:dcOffset mVperNHit:mVperNHit];
-	return [self mVoltsToRaw:mVolts];
-}
-
-- (float) mVoltsTopC:(float) mVolts dcOffset:(float)dcOffset mVperpC:(float)mVperpC
-{
-	float pC_per_mVolts = 0.0;
-	if(mVperpC)pC_per_mVolts = 1/mVperpC;
-	return (mVolts - dcOffset)*pC_per_mVolts;	
-}
-
-- (float) pCTomVolts:(float) pC dcOffset:(float)dcOffset mVperpC:(float)mVperpC
-{
-	return (float)dcOffset + (mVperpC*pC);
-}
-
-- (long) pCToRaw:(float) pC dcOffset:(float)dcOffset mVperpC:(float)mVperpC
-{
-	float mVolts = [self pCTomVolts:pC dcOffset:dcOffset mVperpC:mVperpC];
-	return [self mVoltsToRaw:mVolts];
-}
-
 -(NSMutableDictionary*) get_MTCDataBase
 {
     return mtcDataBase;
@@ -1061,17 +1014,85 @@ pulserEnabled = _pulserEnabled;
 - (uint16_t) OWLEL_Threshold { return [self getThresholdOfType:MTC_OWLELO_THRESHOLD_INDEX inUnits:MTC_RAW_UNITS]; }
 - (void) setOWLEL_Threshold:(uint16_t)threshold { [self setThresholdOfType:MTC_OWLELO_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:threshold]; }
 
-- (id) valueForKey:(NSString*) str fromSerialization:(NSJSONSerialization*)serial {
+- (id) valueForKey:(NSString*) str fromSerialization:(NSMutableDictionary*)serial {
     [[serial valueForKey:@"rows"] intValue];
     return [[[[serial valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"N100H_Threshold"];
 }
+- (NSString*) StringForThreshold:(int) threshold_index {
+    NSString *ret;
+    
+    switch (threshold_index) {
+        case MTC_N100_HI_THRESHOLD_INDEX:
+            ret = @"N100H_Threshold";
+            break;
 
-- (void) loadFromSearialization:(NSJSONSerialization*) serial {
-    //[mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kNHit100MedThreshold]] forIndex:kNHit100MedThreshold ];
-
-    [self setN100H_Threshold:[[self valueForKey:@"N100H_Threshold" fromSerialization:serial] intValue]];
-    [self setN100M_Threshold:[[self valueForKey:@"N100M_THreshold" fromSerialization:serial] intValue]];
+        case MTC_N100_MED_THRESHOLD_INDEX:
+            ret = @"N100M_Threshold";
+            break;
+        case MTC_N100_LO_THRESHOLD_INDEX:
+            ret = @"N100L_Threshold";
+            break;
+        case MTC_N20_THRESHOLD_INDEX:
+            ret = @"N20_Threshold";
+            break;
+        case MTC_N20LB_THRESHOLD_INDEX:
+            ret = @"N20LB_Threshold";
+            break;
+        case MTC_ESUMH_THRESHOLD_INDEX:
+            ret = @"ESUMH_Threshold";
+            break;
+        case MTC_ESUML_THRESHOLD_INDEX:
+            ret = @"ESUML_Threshold";
+            break;
+        case MTC_OWLN_THRESHOLD_INDEX:
+            ret = @"OWLN_Threshold";
+            break;
+        case MTC_OWLEHI_THRESHOLD_INDEX:
+            ret = @"OWLEH_Threshold";
+            break;
+        case MTC_OWLELO_THRESHOLD_INDEX:
+            ret = @"OWLEL_Threshold";
+            break;
+        default:
+            ret =@"";
+            //Raise exception
+            break;
+    }
+    return ret;
 }
+
+- (void) loadFromSearialization:(NSMutableDictionary*) serial {
+    NSLog(@"loadFromSerialization Needs implementation\n");
+    [self setN100H_Threshold:[[self valueForKey:[self StringForThreshold:MTC_N100_HI_THRESHOLD_INDEX] fromSerialization:serial] intValue]];
+    [self setN100M_Threshold:[[self valueForKey:[self StringForThreshold:MTC_N100_MED_THRESHOLD_INDEX] fromSerialization:serial] intValue]];
+    [self setN100L_Threshold:[[self valueForKey:[self StringForThreshold:MTC_N100_LO_THRESHOLD_INDEX] fromSerialization:serial] intValue]];
+    [self setN20_Threshold:[[self valueForKey:[self StringForThreshold:MTC_N20_THRESHOLD_INDEX] fromSerialization:serial] intValue]];
+    [self setN20LB_Threshold:[[self valueForKey:[self StringForThreshold:MTC_N20LB_THRESHOLD_INDEX] fromSerialization:serial] intValue]];
+    [self setESUMH_Threshold:[[self valueForKey:[self StringForThreshold:MTC_ESUMH_THRESHOLD_INDEX] fromSerialization:serial] intValue]];
+    [self setESUML_Threshold:[[self valueForKey:[self StringForThreshold:MTC_ESUML_THRESHOLD_INDEX] fromSerialization:serial] intValue]];
+    [self setOWLN_Threshold:[[self valueForKey:[self StringForThreshold:MTC_OWLN_THRESHOLD_INDEX] fromSerialization:serial] intValue]];
+    [self setOWLEH_Threshold:[[self valueForKey:[self StringForThreshold:MTC_OWLEHI_THRESHOLD_INDEX] fromSerialization:serial] intValue]];
+    [self setOWLEL_Threshold:[[self valueForKey:[self StringForThreshold:MTC_OWLELO_THRESHOLD_INDEX] fromSerialization:serial] intValue]];
+}
+
+- (NSMutableDictionary*) serializeToDictionary {
+    NSMutableDictionary *serial = [NSMutableDictionary dictionaryWithCapacity:30];
+    [serial autorelease];
+    NSLog(@"SerializeToJSON Needs implementation\n");
+    [serial setObject:[NSNumber numberWithInt:(int) [self N100H_Threshold]] forKey:[self StringForThreshold:MTC_N100_HI_THRESHOLD_INDEX]];
+    [serial setObject:[NSNumber numberWithInt:(int) [self N100M_Threshold]] forKey:[self StringForThreshold:MTC_N100_MED_THRESHOLD_INDEX]];
+    [serial setObject:[NSNumber numberWithInt:(int) [self N100L_Threshold]] forKey:[self StringForThreshold:MTC_N100_LO_THRESHOLD_INDEX]];
+    [serial setObject:[NSNumber numberWithInt:(int) [self N20_Threshold]] forKey:[self StringForThreshold:MTC_N20_THRESHOLD_INDEX]];
+    [serial setObject:[NSNumber numberWithInt:(int) [self N20LB_Threshold]] forKey:[self StringForThreshold:MTC_N20LB_THRESHOLD_INDEX]];
+    [serial setObject:[NSNumber numberWithInt:(int) [self ESUMH_Threshold]] forKey:[self StringForThreshold:MTC_ESUMH_THRESHOLD_INDEX]];
+    [serial setObject:[NSNumber numberWithInt:(int) [self ESUML_Threshold]] forKey:[self StringForThreshold:MTC_ESUML_THRESHOLD_INDEX]];
+    [serial setObject:[NSNumber numberWithInt:(int) [self OWLN_Threshold]] forKey:[self StringForThreshold:MTC_OWLN_THRESHOLD_INDEX]];
+    [serial setObject:[NSNumber numberWithInt:(int) [self OWLEH_Threshold]] forKey:[self StringForThreshold:MTC_OWLEHI_THRESHOLD_INDEX]];
+    [serial setObject:[NSNumber numberWithInt:(int) [self OWLEL_Threshold]] forKey:[self StringForThreshold:MTC_OWLELO_THRESHOLD_INDEX]];
+    
+    return serial;
+}
+
 #pragma mark •••HW Access
 - (short) getNumberRegisters
 {
@@ -2177,14 +2198,16 @@ pulserEnabled = _pulserEnabled;
 {
 	NSMutableDictionary* aDictionary = [NSMutableDictionary dictionaryWithCapacity:100];
 	int i;
-	for(i=0;i<kDBComments;i++){
+    for(i=0;i<kDBComments;i++){
 		NSDecimalNumber* defaultValue = [NSDecimalNumber decimalNumberWithString:[self getDBDefaultByIndex:i]];
 		[aDictionary setObject:defaultValue forNestedKey:[self getDBKeyByIndex:i]];
 	}
+
 	for(i=kDBComments;i<kDbLookUpTableSize;i++){
 		[aDictionary setObject:[self getDBDefaultByIndex:i] forNestedKey:[self getDBKeyByIndex:i]];
 	}
 	[self setMtcDataBase:aDictionary];
+
 }
 @end
 

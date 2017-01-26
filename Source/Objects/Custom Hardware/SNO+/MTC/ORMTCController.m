@@ -843,28 +843,14 @@
 
 - (IBAction) settingsNHitAction:(id) sender 
 {
-    
+    NSLog(@"SettingsNHItAction needs implementation\n");
 }
 
 
 - (IBAction) settingsESumAction:(id) sender 
 {
-	int row = [sender selectedRow];
-	int col = [sender selectedColumn];
-	int index = kESumLowThreshold + row + (col * 4);
-	//get the value the user entered
-	float theValue = [[sender cellAtRow:row column:col] floatValue];
-	if((index >= kESumLowmVperpC) && (index <= kOWLEHidcOffset)) {
-		[model setDbFloat:theValue forIndex:index];
-		[self calcESumValueForRow:row];
-	}
-	else if((index >= kESumLowThreshold) && (index <= kOWLEHiThreshold)){
-		[self storeUserESumValue:theValue index:index];
-	}
-	else {
-		[model setDbFloat:theValue forIndex:index];	
-	}
-    [[sender window] makeFirstResponder:tabView];
+    NSLog(@"SettingsESUMAction needs implementation\n");
+
 }
 
 - (IBAction) settingsGTMaskAction:(id) sender 
@@ -1060,25 +1046,11 @@
 {
 	//user changed the ESum threshold -- convert from the displayed value to the raw value and store
     NSLog(@"storeUserEsumValue -> Needs implemenation\n");
-
-	
 }
 
 - (void) calcESumValueForRow:(int) aRow
 {
-	float numberToStore;
-	int index = kESumLowThreshold + aRow;
-	if((index >= kESumLowThreshold) && (index <= kOWLEHiThreshold)){
-		float mVolts    = [model rawTomVolts:[model dbFloatByIndex:index]];
-		float dcOffset  = [model dbFloatByIndex:index + kESumDcOffset_Offset];
-		float mVperpC   = [model dbFloatByIndex:index + kmVoltPerpC_Offset];
-		
-		float newpC		= [model mVoltsTopC:mVolts dcOffset:dcOffset mVperpC:mVperpC];
-		float newMilliVolts = [model pCTomVolts:newpC dcOffset:dcOffset mVperpC:mVperpC];
-		numberToStore = [model mVoltsToRaw:newMilliVolts];
-		
-		[model setDbFloat:numberToStore forIndex:index];	
-	}
+    NSLog(@"calcESUMValueForRow -> Needs implemenation\n");
 }
 
 @end

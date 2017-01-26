@@ -129,8 +129,6 @@ enum {
 	
 	//other -- numbers go ABOVE this
 	kDBComments,
-	kXilinxFile,
-	
 	kDbLookUpTableSize //must be last
 };
 
@@ -221,15 +219,3 @@ enum {
 #define TUB_SDATA  							0x00000400
 #define TUB_SCLK  						 	0x00000800
 #define TUB_SLATCH 							0x00001000
-
-/*
- These are not MTC constants...
-#define kNHitsViewRaw    0
-#define kNHitsViewmVolts 1
-#define kNHitsViewNHits  2
-
-#define kESumViewRaw		0
-#define kESumViewmVolts		1
-#define kESumVieweSumRel	2
-#define kESumViewpC			3
-*/
