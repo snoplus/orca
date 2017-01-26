@@ -1506,67 +1506,67 @@ snopGreenColor;
             threshold_index = MTC_N100_HI_THRESHOLD_INDEX;
             units = MTC_NHIT_UNITS;
             break;
-            //NHIT100MED
+        //NHIT100MED
         case 1:
             threshold_value = [[sender cellAtRow:1 column:0] floatValue];
-            threshold_index = MTC_N100_LO_THRESHOLD_INDEX;
+            threshold_index = MTC_N100_MED_THRESHOLD_INDEX;
             units = MTC_NHIT_UNITS;
             break;
-            //NHIT100LO
+        //NHIT100LO
         case 2:
             threshold_value = [[sender cellAtRow:2 column:0] floatValue];
             threshold_index = MTC_N100_LO_THRESHOLD_INDEX;
             units =  MTC_NHIT_UNITS;
             break;
-            //NHIT20
+        //NHIT20
         case 3:
             threshold_value = [[sender cellAtRow:3 column:0] floatValue];
             threshold_index = MTC_N20_THRESHOLD_INDEX;
             units =  MTC_NHIT_UNITS;
             break;
-            //NHIT20LO
+        //NHIT20LO
         case 4:
             threshold_value = [[sender cellAtRow:4 column:0] floatValue];
             threshold_index = MTC_N20LB_THRESHOLD_INDEX;
             units =  MTC_NHIT_UNITS;
             break;
-            //OWLN
+        //OWLN
         case 5:
             threshold_value = [[sender cellAtRow:5 column:0] floatValue];
             threshold_index = MTC_OWLN_THRESHOLD_INDEX;
             units =  MTC_NHIT_UNITS;
             break;
-            //ESUMHI
+        //ESUMHI
         case 6:
             threshold_value = [[sender cellAtRow:6 column:0] floatValue];
             threshold_index = MTC_ESUMH_THRESHOLD_INDEX;
             units =  MTC_mV_UNITS;
             break;
-            //ESUMLO
+        //ESUMLO
         case 7:
             threshold_value = [[sender cellAtRow:7 column:0] floatValue];
             threshold_index = MTC_ESUML_THRESHOLD_INDEX;
             units =  MTC_mV_UNITS;
             break;
-            //OWLEHI
+        //OWLEHI
         case 8:
             threshold_value = [[sender cellAtRow:8 column:0] floatValue];
             threshold_index = MTC_OWLEHI_THRESHOLD_INDEX;
             units =  MTC_mV_UNITS;
             break;
-            //OWLELO
+        //OWLELO
         case 9:
             threshold_value = [[sender cellAtRow:9 column:0] floatValue];
             threshold_index = MTC_OWLELO_THRESHOLD_INDEX;
             units =  MTC_mV_UNITS;
             break;
-            //Prescale
+        //Prescale
         case 10:
             raw = [[sender cellAtRow:10 column:0] floatValue];
             [mtcModel setPrescaleValue:raw];
             return;
             break;
-            //Pulser
+        //Pulser
         case 11:
             raw = [[sender cellAtRow:11 column:0] floatValue];
             [mtcModel setPgt_rate:raw];
