@@ -1479,79 +1479,57 @@ snopGreenColor;
     //NHIT100HI
     float nHits;
     float mVolts;
-    float dcOffset;
-    float mVperNHit;
     float raw;
     if(activeCell == 0) {
         nHits = [[sender cellAtRow:0 column:0] floatValue];
-        dcOffset  = [mtcModel dbFloatByIndex:kNHit100HiThreshold + kNHitDcOffset_Offset];
-        mVperNHit = [mtcModel dbFloatByIndex:kNHit100HiThreshold + kmVoltPerNHit_Offset];
-        raw = [mtcModel NHitsToRaw:nHits dcOffset:dcOffset mVperNHit:mVperNHit];
-        [mtcModel setDbFloat: raw forIndex:kNHit100HiThreshold];
+        [mtcModel setThresholdOfType:MTC_N100_HI_THRESHOLD_INDEX fromUnits:MTC_NHIT_UNITS toValue:nHits];
     }
     //NHIT100MED
     if(activeCell == 1) {
         nHits = [[sender cellAtRow:1 column:0] floatValue];
-        dcOffset  = [mtcModel dbFloatByIndex:kNHit100MedThreshold + kNHitDcOffset_Offset];
-        mVperNHit = [mtcModel dbFloatByIndex:kNHit100MedThreshold + kmVoltPerNHit_Offset];
-        raw = [mtcModel NHitsToRaw:nHits dcOffset:dcOffset mVperNHit:mVperNHit];
-        [mtcModel setDbFloat: raw forIndex:kNHit100MedThreshold];
+        [mtcModel setThresholdOfType:MTC_N100_MED_THRESHOLD_INDEX fromUnits:MTC_NHIT_UNITS toValue:nHits];
     }
     //NHIT100LO
     if(activeCell == 2) {
         nHits = [[sender cellAtRow:2 column:0] floatValue];
-        dcOffset  = [mtcModel dbFloatByIndex:kNHit100LoThreshold + kNHitDcOffset_Offset];
-        mVperNHit = [mtcModel dbFloatByIndex:kNHit100LoThreshold + kmVoltPerNHit_Offset];
-        raw = [mtcModel NHitsToRaw:nHits dcOffset:dcOffset mVperNHit:mVperNHit];
-        [mtcModel setDbFloat: raw forIndex:kNHit100LoThreshold];
+        [mtcModel setThresholdOfType:MTC_N100_LO_THRESHOLD_INDEX fromUnits:MTC_NHIT_UNITS toValue:nHits];
+        nHits = [[sender cellAtRow:2 column:0] floatValue];
+
     }
     //NHIT20
     if(activeCell == 3) {
         nHits = [[sender cellAtRow:3 column:0] floatValue];
-        dcOffset  = [mtcModel dbFloatByIndex:kNHit20Threshold + kNHitDcOffset_Offset];
-        mVperNHit = [mtcModel dbFloatByIndex:kNHit20Threshold + kmVoltPerNHit_Offset];
-        raw = [mtcModel NHitsToRaw:nHits dcOffset:dcOffset mVperNHit:mVperNHit];
-        [mtcModel setDbFloat: raw forIndex:kNHit20Threshold];
+        [mtcModel setThresholdOfType:MTC_N20_THRESHOLD_INDEX fromUnits:MTC_NHIT_UNITS toValue:nHits];
     }
     //NHIT20LO
     if(activeCell == 4) {
         nHits = [[sender cellAtRow:4 column:0] floatValue];
-        dcOffset  = [mtcModel dbFloatByIndex:kNHit20LBThreshold + kNHitDcOffset_Offset];
-        mVperNHit = [mtcModel dbFloatByIndex:kNHit20LBThreshold + kmVoltPerNHit_Offset];
-        raw = [mtcModel NHitsToRaw:nHits dcOffset:dcOffset mVperNHit:mVperNHit];
-        [mtcModel setDbFloat: raw forIndex:kNHit20LBThreshold];
+        [mtcModel setThresholdOfType:MTC_NHIT_20_LB_MASK fromUnits:MTC_NHIT_UNITS toValue:nHits];
     }
     //OWLN
     if(activeCell == 5) {
         nHits = [[sender cellAtRow:5 column:0] floatValue];
-        dcOffset  = [mtcModel dbFloatByIndex:kOWLNThreshold + kNHitDcOffset_Offset];
-        mVperNHit = [mtcModel dbFloatByIndex:kOWLNThreshold + kmVoltPerNHit_Offset];
-        raw = [mtcModel NHitsToRaw:nHits dcOffset:dcOffset mVperNHit:mVperNHit];
-        [mtcModel setDbFloat: raw forIndex:kOWLNThreshold];
+        [mtcModel setThresholdOfType:MTC_OWLN_THRESHOLD_INDEX fromUnits:MTC_NHIT_UNITS toValue:nHits];
     }
     //ESUMHI
     if(activeCell == 6) {
         mVolts = [[sender cellAtRow:6 column:0] floatValue];
-        raw = [mtcModel mVoltsToRaw:mVolts];
-        [mtcModel setDbFloat: raw forIndex:kESumHiThreshold];
+        [mtcModel setThresholdOfType:MTC_ESUMH_THRESHOLD_INDEX fromUnits:MTC_mV_UNITS toValue:mVolts];
     }
     //ESUMLO
     if(activeCell == 7) {
         mVolts = [[sender cellAtRow:7 column:0] floatValue];
-        raw = [mtcModel mVoltsToRaw:mVolts];
-        [mtcModel setDbFloat: raw forIndex:kESumLowThreshold];
+        [mtcModel setThresholdOfType:MTC_ESUML_THRESHOLD_INDEX fromUnits:MTC_mV_UNITS toValue:mVolts];
     }
     //OWLEHI
     if(activeCell == 8) {
         mVolts = [[sender cellAtRow:8 column:0] floatValue];
-        raw = [mtcModel mVoltsToRaw:mVolts];
-        [mtcModel setDbFloat: raw forIndex:kOWLEHiThreshold];
+        [mtcModel setThresholdOfType:MTC_OWLEHI_THRESHOLD_INDEX fromUnits:MTC_mV_UNITS toValue:mVolts];
     }
     //OWLELO
     if(activeCell == 9) {
         mVolts = [[sender cellAtRow:9 column:0] floatValue];
-        raw = [mtcModel mVoltsToRaw:mVolts];
-        [mtcModel setDbFloat: raw forIndex:kOWLELoThreshold];
+        [mtcModel setThresholdOfType:MTC_OWLELO_THRESHOLD_INDEX fromUnits:MTC_mV_UNITS toValue:mVolts];
     }
     //Prescale
     if(activeCell == 10) {
@@ -1584,10 +1562,8 @@ snopGreenColor;
     int gtmask = [mtcModel dbIntByIndex:kGtMask];
     
     //NHIT100HI
-    float mVolts = [mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kNHit100HiThreshold]];
-    float dcOffset  = [mtcModel dbFloatByIndex:kNHit100HiThreshold + kNHitDcOffset_Offset];
-    float mVperNHit = [mtcModel dbFloatByIndex:kNHit100HiThreshold + kmVoltPerNHit_Offset];
-    float nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
+
+    float nHits = [mtcModel getThresholdOfType:MTC_N100_HI_THRESHOLD_INDEX inUnits:MTC_NHIT_UNITS];
     [[standardRunThresCurrentValues cellAtRow:0 column:0] setFloatValue:nHits];
     [[standardRunThresCurrentValues cellAtRow:0 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 2) & 1){
@@ -1596,10 +1572,8 @@ snopGreenColor;
         [[standardRunThresCurrentValues cellAtRow:0 column:0] setTextColor:[self snopRedColor]];
     }
     //NHIT100MED
-    mVolts = [mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kNHit100MedThreshold]];
-    dcOffset  = [mtcModel dbFloatByIndex:kNHit100MedThreshold + kNHitDcOffset_Offset];
-    mVperNHit = [mtcModel dbFloatByIndex:kNHit100MedThreshold + kmVoltPerNHit_Offset];
-    nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
+
+    nHits = [mtcModel getThresholdOfType:MTC_N100_MED_THRESHOLD_INDEX inUnits:MTC_NHIT_UNITS];
     [[standardRunThresCurrentValues cellAtRow:1 column:0] setFloatValue:nHits];
     [[standardRunThresCurrentValues cellAtRow:1 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 1) & 1){
@@ -1608,10 +1582,8 @@ snopGreenColor;
         [[standardRunThresCurrentValues cellAtRow:1 column:0] setTextColor:[self snopRedColor]];
     }
     //NHIT100LO
-    mVolts = [mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kNHit100LoThreshold]];
-    dcOffset  = [mtcModel dbFloatByIndex:kNHit100LoThreshold + kNHitDcOffset_Offset];
-    mVperNHit = [mtcModel dbFloatByIndex:kNHit100LoThreshold + kmVoltPerNHit_Offset];
-    nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
+
+    nHits = [mtcModel getThresholdOfType:MTC_N100_LO_THRESHOLD_INDEX inUnits:MTC_NHIT_UNITS];
     [[standardRunThresCurrentValues cellAtRow:2 column:0] setFloatValue:nHits];
     [[standardRunThresCurrentValues cellAtRow:2 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 0) & 1){
@@ -1620,10 +1592,7 @@ snopGreenColor;
         [[standardRunThresCurrentValues cellAtRow:2 column:0] setTextColor:[self snopRedColor]];
     }
     //NHIT20
-    mVolts = [mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kNHit20Threshold]];
-    dcOffset  = [mtcModel dbFloatByIndex:kNHit20Threshold + kNHitDcOffset_Offset];
-    mVperNHit = [mtcModel dbFloatByIndex:kNHit20Threshold + kmVoltPerNHit_Offset];
-    nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
+    nHits = [mtcModel getThresholdOfType:MTC_N20_THRESHOLD_INDEX inUnits:MTC_NHIT_UNITS];
     [[standardRunThresCurrentValues cellAtRow:3 column:0] setFloatValue:nHits];
     [[standardRunThresCurrentValues cellAtRow:3 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 3) & 1){
@@ -1632,10 +1601,7 @@ snopGreenColor;
         [[standardRunThresCurrentValues cellAtRow:3 column:0] setTextColor:[self snopRedColor]];
     }
     //NHIT20LO
-    mVolts = [mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kNHit20LBThreshold]];
-    dcOffset  = [mtcModel dbFloatByIndex:kNHit20LBThreshold + kNHitDcOffset_Offset];
-    mVperNHit = [mtcModel dbFloatByIndex:kNHit20LBThreshold + kmVoltPerNHit_Offset];
-    nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
+    nHits = [mtcModel getThresholdOfType:MTC_N20LB_THRESHOLD_INDEX inUnits:MTC_NHIT_UNITS];
     [[standardRunThresCurrentValues cellAtRow:4 column:0] setFloatValue:nHits];
     [[standardRunThresCurrentValues cellAtRow:4 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 4) & 1){
@@ -1644,10 +1610,7 @@ snopGreenColor;
         [[standardRunThresCurrentValues cellAtRow:4 column:0] setTextColor:[self snopRedColor]];
     }
     //OWLN
-    mVolts = [mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kOWLNThreshold]];
-    dcOffset  = [mtcModel dbFloatByIndex:kOWLNThreshold + kNHitDcOffset_Offset];
-    mVperNHit = [mtcModel dbFloatByIndex:kOWLNThreshold + kmVoltPerNHit_Offset];
-    nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
+    nHits = [mtcModel getThresholdOfType:MTC_OWLN_THRESHOLD_INDEX inUnits:MTC_NHIT_UNITS];
     [[standardRunThresCurrentValues cellAtRow:5 column:0] setFloatValue:nHits];
     [[standardRunThresCurrentValues cellAtRow:5 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 7) & 1){
@@ -1656,7 +1619,7 @@ snopGreenColor;
         [[standardRunThresCurrentValues cellAtRow:5 column:0] setTextColor:[self snopRedColor]];
     }
     //ESUMHI
-    [[standardRunThresCurrentValues cellAtRow:6 column:0] setFloatValue:[mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kESumHiThreshold]]];
+    [[standardRunThresCurrentValues cellAtRow:6 column:0] setFloatValue:[mtcModel getThresholdOfType:MTC_ESUMH_THRESHOLD_INDEX inUnits:MTC_mV_UNITS]];
     [[standardRunThresCurrentValues cellAtRow:6 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 6) & 1){
         [[standardRunThresCurrentValues cellAtRow:6 column:0] setTextColor:[self snopBlueColor]];
@@ -1664,7 +1627,7 @@ snopGreenColor;
         [[standardRunThresCurrentValues cellAtRow:6 column:0] setTextColor:[self snopRedColor]];
     }
     //ESUMLO
-    [[standardRunThresCurrentValues cellAtRow:7 column:0] setFloatValue:[mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kESumLowThreshold]]];
+    [[standardRunThresCurrentValues cellAtRow:7 column:0] setFloatValue:[mtcModel getThresholdOfType:MTC_ESUML_THRESHOLD_INDEX inUnits:MTC_mV_UNITS]];
     [[standardRunThresCurrentValues cellAtRow:7 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 5) & 1){
         [[standardRunThresCurrentValues cellAtRow:7 column:0] setTextColor:[self snopBlueColor]];
@@ -1672,7 +1635,7 @@ snopGreenColor;
         [[standardRunThresCurrentValues cellAtRow:7 column:0] setTextColor:[self snopRedColor]];
     }
     //OWLEHI
-    [[standardRunThresCurrentValues cellAtRow:8 column:0] setFloatValue:[mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kOWLEHiThreshold]]];
+    [[standardRunThresCurrentValues cellAtRow:8 column:0] setFloatValue:[mtcModel getThresholdOfType:MTC_OWLEHI_THRESHOLD_INDEX inUnits:MTC_mV_UNITS]];
     [[standardRunThresCurrentValues cellAtRow:8 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 9) & 1){
         [[standardRunThresCurrentValues cellAtRow:8 column:0] setTextColor:[self snopBlueColor]];
@@ -1680,7 +1643,7 @@ snopGreenColor;
         [[standardRunThresCurrentValues cellAtRow:8 column:0] setTextColor:[self snopRedColor]];
     }
     //OWLELO
-    [[standardRunThresCurrentValues cellAtRow:9 column:0] setFloatValue:[mtcModel rawTomVolts:[mtcModel dbFloatByIndex:kOWLELoThreshold]]];
+    [[standardRunThresCurrentValues cellAtRow:9 column:0] setFloatValue:[mtcModel getThresholdOfType:MTC_OWLELO_THRESHOLD_INDEX inUnits:MTC_mV_UNITS]];
     [[standardRunThresCurrentValues cellAtRow:9 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 8) & 1){
         [[standardRunThresCurrentValues cellAtRow:9 column:0] setTextColor:[self snopBlueColor]];
@@ -1874,10 +1837,9 @@ snopGreenColor;
     } else {
         int gtmask = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/D,GtMask"] intValue];
         //NHIT100HI
-        float mVolts = [mtcModel rawTomVolts:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Hi,Threshold"] floatValue]];
-        float dcOffset  = [mtcModel dbFloatByIndex:kNHit100HiThreshold + kNHitDcOffset_Offset];
-        float mVperNHit = [mtcModel dbFloatByIndex:kNHit100HiThreshold + kmVoltPerNHit_Offset];
-        float nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
+        float raw = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Hi,Threshold"] floatValue];
+        
+        float nHits = [mtcModel convertThreshold:raw OfType:MTC_N100_HI_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toUnits:MTC_NHIT_UNITS];
         [[standardRunThresStoredValues cellAtRow:0 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresStoredValues cellAtRow:0 column:0] setFloatValue:nHits];
         if((gtmask >> 2) & 1){
@@ -1886,10 +1848,8 @@ snopGreenColor;
             [[standardRunThresStoredValues cellAtRow:0 column:0] setTextColor:[self snopRedColor]];
         }
         //NHIT100MED
-        mVolts = [mtcModel rawTomVolts:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Med,Threshold"] floatValue]];
-        dcOffset  = [mtcModel dbFloatByIndex:kNHit100MedThreshold + kNHitDcOffset_Offset];
-        mVperNHit = [mtcModel dbFloatByIndex:kNHit100MedThreshold + kmVoltPerNHit_Offset];
-        nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
+        raw = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Med,Threshold"] floatValue];
+        nHits = [mtcModel convertThreshold:raw OfType:MTC_N100_MED_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toUnits:MTC_NHIT_UNITS];
         [[standardRunThresStoredValues cellAtRow:1 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresStoredValues cellAtRow:1 column:0] setFloatValue:nHits];
         if((gtmask >> 1) & 1){
@@ -1898,10 +1858,8 @@ snopGreenColor;
             [[standardRunThresStoredValues cellAtRow:1 column:0] setTextColor:[self snopRedColor]];
         }
         //NHIT100LO
-        mVolts = [mtcModel rawTomVolts:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Lo,Threshold"] floatValue]];
-        dcOffset  = [mtcModel dbFloatByIndex:kNHit100LoThreshold + kNHitDcOffset_Offset];
-        mVperNHit = [mtcModel dbFloatByIndex:kNHit100LoThreshold + kmVoltPerNHit_Offset];
-        nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
+        raw = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit100Lo,Threshold"] floatValue];
+        nHits = [mtcModel convertThreshold:raw OfType:MTC_N100_LO_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toUnits:MTC_NHIT_UNITS];
         [[standardRunThresStoredValues cellAtRow:2 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresStoredValues cellAtRow:2 column:0] setFloatValue:nHits];
         if((gtmask >> 0) & 1){
@@ -1910,10 +1868,9 @@ snopGreenColor;
             [[standardRunThresStoredValues cellAtRow:2 column:0] setTextColor:[self snopRedColor]];
         }
         //NHIT20
-        mVolts = [mtcModel rawTomVolts:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20,Threshold"] floatValue]];
-        dcOffset  = [mtcModel dbFloatByIndex:kNHit20Threshold + kNHitDcOffset_Offset];
-        mVperNHit = [mtcModel dbFloatByIndex:kNHit20Threshold + kmVoltPerNHit_Offset];
-        nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
+        raw = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20,Threshold"] floatValue];
+        
+        nHits = [mtcModel convertThreshold:raw OfType:MTC_N20_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toUnits:MTC_NHIT_UNITS];
         [[standardRunThresStoredValues cellAtRow:3 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresStoredValues cellAtRow:3 column:0] setFloatValue:nHits];
         if((gtmask >> 3) & 1){
@@ -1922,22 +1879,19 @@ snopGreenColor;
             [[standardRunThresStoredValues cellAtRow:3 column:0] setTextColor:[self snopRedColor]];
         }
         //NHIT20LO
-        mVolts = [mtcModel rawTomVolts:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20LB,Threshold"] floatValue]];
-        dcOffset  = [mtcModel dbFloatByIndex:kNHit20LBThreshold + kNHitDcOffset_Offset];
-        mVperNHit = [mtcModel dbFloatByIndex:kNHit20LBThreshold + kmVoltPerNHit_Offset];
-        nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
+        raw = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,NHit20LB,Threshold"] floatValue];
+        nHits = [mtcModel convertThreshold:raw OfType:MTC_N20LB_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toUnits:MTC_NHIT_UNITS];
         [[standardRunThresStoredValues cellAtRow:4 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresStoredValues cellAtRow:4 column:0] setFloatValue:nHits];
         if((gtmask >> 4) & 1){
             [[standardRunThresStoredValues cellAtRow:4 column:0] setTextColor:[self snopBlueColor]];
         } else{
+            
             [[standardRunThresStoredValues cellAtRow:4 column:0] setTextColor:[self snopRedColor]];
         }
         //OWLN
-        mVolts = [mtcModel rawTomVolts:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLN,Threshold"] floatValue]];
-        dcOffset  = [mtcModel dbFloatByIndex:kOWLNThreshold + kNHitDcOffset_Offset];
-        mVperNHit = [mtcModel dbFloatByIndex:kOWLNThreshold + kmVoltPerNHit_Offset];
-        nHits = [mtcModel mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
+        raw = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLN,Threshold"] floatValue];
+        nHits = [mtcModel convertThreshold:raw OfType:MTC_OWLN_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toUnits:MTC_NHIT_UNITS];
         [[standardRunThresStoredValues cellAtRow:5 column:0] setFormatter:thresholdFormatter];
         [[standardRunThresStoredValues cellAtRow:5 column:0] setFloatValue:nHits];
         if((gtmask >> 7) & 1){
@@ -1946,7 +1900,9 @@ snopGreenColor;
             [[standardRunThresStoredValues cellAtRow:5 column:0] setTextColor:[self snopRedColor]];
         }
         //ESUMHI
-        mVolts = [mtcModel rawTomVolts:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumHi,Threshold"] floatValue]];
+        raw = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumHi,Threshold"] floatValue];
+        float mVolts = [mtcModel convertThreshold:raw OfType:MTC_ESUMH_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toUnits:MTC_mV_UNITS];
+
         [[standardRunThresStoredValues cellAtRow:6 column:0] setFloatValue:mVolts];
         [[standardRunThresStoredValues cellAtRow:6 column:0] setFormatter:thresholdFormatter];
         if((gtmask >> 6) & 1){
@@ -1955,7 +1911,9 @@ snopGreenColor;
             [[standardRunThresStoredValues cellAtRow:6 column:0] setTextColor:[self snopRedColor]];
         }
         //ESUMLO
-        mVolts = [mtcModel rawTomVolts:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumLow,Threshold"] floatValue]];
+        raw = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,ESumLow,Threshold"] floatValue];
+        mVolts = [mtcModel convertThreshold:raw OfType:MTC_ESUML_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toUnits:MTC_mV_UNITS];
+
         [[standardRunThresStoredValues cellAtRow:7 column:0] setFloatValue:mVolts];
         [[standardRunThresStoredValues cellAtRow:7 column:0] setFormatter:thresholdFormatter];
         if((gtmask >> 5) & 1){
@@ -1964,7 +1922,9 @@ snopGreenColor;
             [[standardRunThresStoredValues cellAtRow:7 column:0] setTextColor:[self snopRedColor]];
         }
         //OWLEHI
-        mVolts = [mtcModel rawTomVolts:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLEHi,Threshold"] floatValue]];
+        raw = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLEHi,Threshold"] floatValue];
+        mVolts = [mtcModel convertThreshold:raw OfType:MTC_OWLEHI_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toUnits:MTC_mV_UNITS];
+
         [[standardRunThresStoredValues cellAtRow:8 column:0] setFloatValue:mVolts];
         [[standardRunThresStoredValues cellAtRow:8 column:0] setFormatter:thresholdFormatter];
         if((gtmask >> 9) & 1){
@@ -1973,7 +1933,9 @@ snopGreenColor;
             [[standardRunThresStoredValues cellAtRow:8 column:0] setTextColor:[self snopRedColor]];
         }
         //OWLELO
-        mVolts = [mtcModel rawTomVolts:[[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLELo,Threshold"] floatValue]];
+        raw = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"MTC/A,OWLELo,Threshold"] floatValue];
+        mVolts = [mtcModel convertThreshold:raw OfType:MTC_OWLELO_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toUnits:MTC_mV_UNITS];
+
         [[standardRunThresStoredValues cellAtRow:9 column:0] setFloatValue:mVolts];
         [[standardRunThresStoredValues cellAtRow:9 column:0] setFormatter:thresholdFormatter];
         if((gtmask >> 8) & 1){

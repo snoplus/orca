@@ -1869,10 +1869,11 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     NSData *data = [NSData dataWithContentsOfURL:url];
     NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     NSError *error =  nil;
-    NSDictionary *detectorSettings = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
+    NSMutableDictionary *detectorSettings = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
 
     if(error) {
         NSLog(@"Error querying couchDB, please check the connection is correct: \n %@ \n", ret);
+        [ret release];
         return false;
     }
     
@@ -1891,18 +1892,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         if(nextruntypeword & kDiagnosticRun) return true;
 
         //Load MTC thresholds
-        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kNHit100HiThreshold]] forIndex:kNHit100HiThreshold];
-        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kNHit100MedThreshold]] forIndex:kNHit100MedThreshold];
-        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kNHit100LoThreshold]] forIndex:kNHit100LoThreshold];
-        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kNHit20Threshold]] forIndex:kNHit20Threshold];
-        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kNHit20LBThreshold]] forIndex:kNHit20LBThreshold];
-        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kOWLNThreshold]] forIndex:kOWLNThreshold];
-        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kESumLowThreshold]] forIndex:kESumLowThreshold];
-        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kESumHiThreshold]] forIndex:kESumHiThreshold];
-        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kOWLELoThreshold]] forIndex:kOWLELoThreshold];
-        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kOWLEHiThreshold]] forIndex:kOWLEHiThreshold];
-        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kNhit100LoPrescale]] forIndex:kNhit100LoPrescale];
-        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kPulserPeriod]] forIndex:kPulserPeriod];
+        [mtc loadFromSearialization:detectorSettings];
         
         //Load MTC GT Mask
         [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kGtMask]] forIndex:kGtMask];
@@ -1969,9 +1959,11 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     [detectorSettings setObject:[NSNumber numberWithUnsignedLong:currentRunTypeWord] forKey:@"run_type_word"];
 
     //Save MTC/D parameters, trigger masks and MTC/A+ thresholds
-    for (int iparam=0; iparam<kDbLookUpTableSize; iparam++) {
-        [detectorSettings setObject:[mtc dbObjectByIndex:iparam] forKey:[mtc getDBKeyByIndex:iparam]];
-    }
+    NSMutableDictionary* mtc_serial = [[mtc serializeToDictionary]retain];
+    [detectorSettings addEntriesFromDictionary:mtc_serial];
+    [mtc_serial release];
+    NSLog(@"savestandardrun %@\n",detectorSettings);
+    
     //Save PED/PGT mode
     [detectorSettings setObject:[NSNumber numberWithBool:[mtc isPedestalEnabledInCSR]] forKey:@"PED_PGT_Mode"];
     
@@ -2021,7 +2013,6 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 
 
 @end
-
 @implementation SNOPDecoderForRHDR
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
