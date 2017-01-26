@@ -1428,14 +1428,6 @@
                                     <rect key="frame" x="10" y="25" width="773" height="644"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <button toolTip="Cmd-Click to set/unset all boxes in a column" horizontalHuggingPriority="750" verticalHuggingPriority="750" id="lOt-Vs-JPZ">
-                                            <rect key="frame" x="406" y="86" width="25" height="25"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="help" bezelStyle="helpButton" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ZyZ-2Y-bbA">
-                                                <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                        </button>
                                         <box autoresizesSubviews="NO" title="MTC/A Relays" borderType="line" id="P58-2C-mhS">
                                             <rect key="frame" x="386" y="170" width="355" height="468"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -2292,7 +2284,7 @@
                                                 <rect key="frame" x="1" y="1" width="368" height="545"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <box autoresizesSubviews="NO" title="Triggers" borderType="line" id="ncs-mm-ajX">
+                                                    <box autoresizesSubviews="NO" toolTip="Sets which signals can cause global triggers" title="Triggers" borderType="line" id="ncs-mm-ajX">
                                                         <rect key="frame" x="6" y="10" width="123" height="527"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView">
@@ -2514,7 +2506,7 @@
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                     </box>
-                                                    <box autoresizesSubviews="NO" title="GT Crates" borderType="line" id="AMC-Oi-pjC">
+                                                    <box autoresizesSubviews="NO" toolTip="Sets which crates recieve the Global Trigger" title="GT Crates" borderType="line" id="AMC-Oi-pjC">
                                                         <rect key="frame" x="125" y="10" width="117" height="527"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView">
@@ -2726,7 +2718,7 @@
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                     </box>
-                                                    <box autoresizesSubviews="NO" title="PED Crates" borderType="line" id="bMv-nr-EIb">
+                                                    <box autoresizesSubviews="NO" toolTip="Sets which crates recieve the Pedestal signal" title="PED Crates" borderType="line" id="bMv-nr-EIb">
                                                         <rect key="frame" x="239" y="10" width="122" height="527"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView">
@@ -2946,6 +2938,14 @@
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
+                                        <button toolTip="Cmd-Click to set/unset all boxes in a column" horizontalHuggingPriority="750" verticalHuggingPriority="750" id="lOt-Vs-JPZ">
+                                            <rect key="frame" x="391" y="97" width="25" height="25"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="help" bezelStyle="helpButton" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ZyZ-2Y-bbA">
+                                                <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                        </button>
                                     </subviews>
                                 </view>
                             </tabViewItem>
