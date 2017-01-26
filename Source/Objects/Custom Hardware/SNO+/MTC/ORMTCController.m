@@ -395,7 +395,7 @@
 - (void) basicLockChanged:(NSNotification*)aNotification
 {
 
-    BOOL locked						= [gSecurity isLocked:ORMTCBasicLock];
+    BOOL locked                        = [gSecurity isLocked:ORMTCBasicLock];
     BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORMTCBasicLock];
 
     //Basic ops
@@ -435,7 +435,6 @@
     [fixedTimePedestalsDelayField	setEnabled: !lockedOrNotRunningMaintenance && ![model isPulserFixedRate]];
     
     //Settings
-    [load10MhzCounterButton		    setEnabled: !lockedOrNotRunningMaintenance];
     [setCoarseDelayButton           setEnabled: !lockedOrNotRunningMaintenance];
     [setFineDelayButton				setEnabled: !lockedOrNotRunningMaintenance];
     [loadMTCADacsButton				setEnabled: !lockedOrNotRunningMaintenance];
@@ -443,8 +442,6 @@
     [esumMatrix                     setEnabled: !lockedOrNotRunningMaintenance];
     [lockOutWidthField              setEnabled: !lockedOrNotRunningMaintenance];
     [pedestalWidthField             setEnabled: !lockedOrNotRunningMaintenance];
-    [low10MhzClockField             setEnabled: !lockedOrNotRunningMaintenance];
-    [high10MhzClockField            setEnabled: !lockedOrNotRunningMaintenance];
     [nhit100LoPrescaleField         setEnabled: !lockedOrNotRunningMaintenance];
     [pulserPeriodField              setEnabled: !lockedOrNotRunningMaintenance];
     [extraPulserPeriodField         setEnabled: !lockedOrNotRunningMaintenance];
@@ -670,12 +667,6 @@
 - (IBAction) standardInitMTCnoXilinxno10MHz:(id) sender 
 {
 	[model initializeMtc:NO load10MHzClock:NO];
-}
-
-
-- (IBAction) standardLoadOnlineGTMasks:(id) sender 
-{
-	[model setGlobalTriggerWordMask];
 }
 	
 - (IBAction) standardLoadMTCADacs:(id) sender 
@@ -945,7 +936,6 @@
     return -1;
 }
 
-
 - (IBAction) settingsNHitAction:(id) sender 
 {
     int threshold_index, unit_index;
@@ -958,9 +948,7 @@
         NSLogColor([NSColor redColor], @"Error when setting threshold. Reason: %@\n Aborting\n",[exception reason]);
         return;
     }
-
 }
-
 
 - (IBAction) settingsESumAction:(id) sender 
 {
@@ -971,11 +959,7 @@
     [self trigger_scan_update_nhit];
 
 }
-- (IBAction) EditingWindow:(id)sender
-{
-    NSWindowController *newWindow = [[NSWindowController alloc] init];
-    [newWindow showWindow:self];
-}
+
 - (void) trigger_scan_update_nhit {
     int threshold_index;
     for(int i = FIRST_NHIT_TAG;i<LAST_NHIT_TAG+1;i++)

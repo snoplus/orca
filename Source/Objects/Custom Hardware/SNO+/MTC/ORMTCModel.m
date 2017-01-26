@@ -1290,7 +1290,7 @@ tubRegister;
 		[[seq forTarget:self] loadPulserRateToHardware];                            // STEP 10: Load the Pulser
 		[[seq forTarget:self] loadPedWidthToHardware];                              // STEP 11: Set the Pedestal Width
 		[[seq forTarget:self] setupPulseGTDelaysCoarse:[self coarseDelay] fine:[self fineDelay]]; // STEP 12: Setup the Pulse GT Delays
-		if( loadThe10MHzClock)[[seq forTarget:self] setMtcTime];					// STEP 13: Load the 10MHz Counter
+		if( loadThe10MHzClock)[self setThe10MHzCounter:0];                          // STEP 13: Load the 10MHz Counter
 		[[seq forTarget:self] resetTheMemory];										// STEP 14: Reset the Memory	 
 		//[[seq forTarget:self] setGTCrateMask];									// STEP 15: Set the GT Crate Mask from MTC database
 		[[seq forTarget:self] initializeMtcDone];
@@ -1494,98 +1494,16 @@ tubRegister;
 	[self setTheGTCounter:0UL];
 }
 
-- (void) setMtcTime
+- (void) setThe10MHzCounter:(uint64_t) newValue
 {
-	//set the 10MHz counter to a time based on the number of seconds since 1/1/1996 (GMT)
-	//static unsigned long theSecondsToSubtract = 0;
-    
-
-    double theTicks10MHz = [[NSDate date] timeIntervalSinceDate:[NSDate dateUsingYear:1996 month:1 day:1 hour:0 minute:0 second:0 timeZone:@"GMT"]];
-	
-    theTicks10MHz /= 100.E-9;
-    unsigned long theLowerBits  = (unsigned long) fmod(theTicks10MHz,4294967296.0);
-    unsigned long theUpperBits  = (unsigned long)(theTicks10MHz/4294967296.0);
-
-    [self setThe10MHzCounterLow:theLowerBits high:theUpperBits];
-}
-
-- (double) get10MHzSeconds
-{
-	//get the 10MHz clock time expressed in seconds relative to SNO time zero
-	unsigned long	lower, upper;
-	double theValue = 0;
-	@try {
-		[self getThe10MHzCounterLow:&lower high:&upper];
-		theValue =  ((double) 4294967296.0 * (double)upper + (double)lower) * 1e-7;
-	}
-	@catch(NSException* localException) {
-		[localException raise];
-	}
-	return theValue;
-}
-
-- (unsigned long) getMtcTime
-{
-	//--get the 10MHz clock. seconds since 01/01/1904
-	static unsigned long theSecondsToAdd = 0;
-	
- 	if( theSecondsToAdd == 0 ) {
-		theSecondsToAdd =  (unsigned long)[[NSDate date] timeIntervalSinceDate:[NSDate dateUsingYear:1996 month:1 day:1 hour:0 minute:0 second:0 timeZone:@"GMT"]];
- 	}
-	
-    return theSecondsToAdd + (unsigned long)[self get10MHzSeconds];
-	
-}
-
-// SetThe10MHzCounter
-- (void) setThe10MHzCounterLow:(unsigned long) lowerValue high:(unsigned long) upperValue
-{
-	unsigned long	aValue;
-	
-	@try {
-		
-		// Now load the serial shift register	
-		short j;
-		for (j = 52; j >= 0; j--){							
-			
-			aValue = 0UL;
-			
-			if ( j < 32) {
-				if ( (1UL << j ) & lowerValue ) aValue |= ( 1UL << 1 );		// build the data word
-			}
- 			else {
-				if ( (1UL << (j - 32) ) & upperValue ) aValue |= ( 1UL << 1 );		// build the data word
-			}
-			[self write:kMtcSerialReg value:aValue + MTC_SERIAL_REG_SEN];	// Bit 0 is always high
-			[self write:kMtcSerialReg value:aValue + MTC_SERIAL_SHFTCLK10];	// clock in data value, BIT 0 = high
-		}
-		
-		// Now load enable by clearing and setting the appropriate bit		
-		[self clrBits:kMtcControlReg mask:MTC_CSR_LOAD_EN10];
-		[self setBits:kMtcControlReg mask:MTC_CSR_LOAD_EN10];
-		[self clrBits:kMtcControlReg mask:MTC_CSR_LOAD_EN10];
+    @try {
+        [mtc okCommand:"load_10mhz_clock %llu",newValue];
 		NSLog(@"Loaded 10MHz counter\n");
 		
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Could not load the 10MHz counter!\n");
-		NSLog(@"Exception: %@\n",localException);
-		[localException raise];
-	}
-}
-
-
-- (void) getThe10MHzCounterLow:(unsigned long*) lowerValue high:(unsigned long*) upperValue
-{
-	*lowerValue = 0;
-	*upperValue  = 0;
-	@try {
-		*lowerValue = [self read:kMtcC10_0_31Reg];
-		*upperValue = [self read:kMtcC10_32_52Reg] & 0x001fffffUL;
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Could not get 10MHz counter values!\n");		
-		NSLog(@"Exception: %@\n",localException);
+		NSLog(@"Exception: %@\n",[localException reason]);
 		[localException raise];
 	}
 }

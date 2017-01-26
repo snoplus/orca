@@ -22,7 +22,7 @@
 
 @interface ORMTCController : OrcaObjectController {
 
-    IBOutlet NSView *mtcView;
+    IBOutlet NSView         *mtcView;
     IBOutlet NSTabView*		tabView;
 	//basic Ops
 	IBOutlet NSProgressIndicator* basicOpsRunningIndicator;
@@ -43,10 +43,10 @@
     IBOutlet NSTextField* 	memBaseAddressText;
     IBOutlet NSStepper* 	memBaseAddressStepper;
 	IBOutlet NSButton*		basicOpsLockButton;
-    IBOutlet NSButton *readButton;
-    IBOutlet NSButton *writteButton;
-    IBOutlet NSButton *stopButton;
-    IBOutlet NSButton *statusButton;
+    IBOutlet NSButton       *readButton;
+    IBOutlet NSButton       *writteButton;
+    IBOutlet NSButton       *stopButton;
+    IBOutlet NSButton       *statusButton;
 
     
 	//standard Ops
@@ -54,7 +54,6 @@
 	IBOutlet NSButton*		initNoXilinxButton;
 	IBOutlet NSButton*		initNo10MHzButton;
 	IBOutlet NSButton*		initNoXilinxNo100MHzButton;
-	IBOutlet NSButton*		load10MhzCounterButton;
 	IBOutlet NSButton*		setFineDelayButton;
 	IBOutlet NSButton*		setCoarseDelayButton;
 	IBOutlet NSButton*		loadMTCADacsButton;
@@ -68,7 +67,6 @@
 	IBOutlet NSProgressIndicator* initProgressBar;
 	IBOutlet NSTextField*	initProgressField;
 	IBOutlet NSMatrix*		isPulserFixedRateMatrix;
-    IBOutlet NSMatrix* pulserFeedsMatrix;
     IBOutlet NSButton*      includePedestalsCheckBox;
     IBOutlet NSBox*         opAdvancedOptionsBox;
 	
@@ -80,14 +78,11 @@
  	IBOutlet NSTextField*	nhit100LoPrescaleField;
  	IBOutlet NSTextField*	pulserPeriodField;
     IBOutlet NSTextField*   extraPulserPeriodField;
- 	IBOutlet NSTextField*	low10MhzClockField;
- 	IBOutlet NSTextField*	high10MhzClockField;
  	IBOutlet NSTextField*	coarseDelayField;
  	IBOutlet NSTextField*	fineDelayField;
 
 	IBOutlet NSMatrix*		nhitMatrix;
 	IBOutlet NSMatrix*		esumMatrix;
-    IBOutlet NSTextField*   commentsField;
     IBOutlet NSBox*         settingsAdvancedOptionsBox;
 
 	//trigger
