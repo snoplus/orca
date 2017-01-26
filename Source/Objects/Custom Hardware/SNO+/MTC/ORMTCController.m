@@ -76,7 +76,7 @@
     standardOpsSizeSmall = NSMakeSize(650,320);
     standardOpsSizeLarge = NSMakeSize(650,620);
     settingsSizeSmall	 = NSMakeSize(580,400);
-    settingsSizeLarge	 = NSMakeSize(580,580);
+    settingsSizeLarge	 = NSMakeSize(580,550);
     triggerSize          = NSMakeSize(800,655);
     blankView = [[NSView alloc] init];
     [tabView setFocusRingType:NSFocusRingTypeNone];
@@ -946,13 +946,20 @@
         [model setThresholdOfType:threshold_index fromUnits:unit_index toValue:threshold];
     } @catch (NSException *exception) {
         NSLogColor([NSColor redColor], @"Error when setting threshold. Reason: %@\n Aborting\n",[exception reason]);
-        return;
     }
 }
 
 - (IBAction) settingsESumAction:(id) sender 
 {
-    NSLog(@"SettingsESUMAction needs implementation\n");
+    int threshold_index, unit_index;
+    @try {
+        threshold_index = [self convert_view_thresold_index_to_model_index:[[sender selectedCell]tag]];
+        unit_index = [self convert_view_unit_index_to_model_index:[[eSumViewTypeMatrix selectedCell] tag]];
+        float threshold = [[sender selectedCell] floatValue];
+        [model setThresholdOfType:threshold_index fromUnits:unit_index toValue:threshold];
+    } @catch (NSException *excep) {
+        NSLogColor([NSColor redColor], @"Error when setting threshold. Reason: %@\n Aborting\n",[excep reason]);
+    }
 
 }
 - (IBAction)updateConversionSettingsAction:(id)sender{
