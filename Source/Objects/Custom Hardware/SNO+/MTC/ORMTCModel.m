@@ -913,7 +913,8 @@ tubRegister;
     if(mtca_baselines[type] != _val)
     {
         mtca_baselines[type] = _val;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCABaselineChanged object:self];
+        NSNotification* note = [NSNotification notificationWithName:ORMTCABaselineChanged object:self];
+        [[NSNotificationQueue defaultQueue] enqueueNotification:note postingStyle:NSPostASAP coalesceMask:NSNotificationCoalescingOnName forModes:nil];
     }
 }
 
@@ -924,7 +925,8 @@ tubRegister;
     if(mtca_dac_per_nhit[type] != _val)
     {
         mtca_dac_per_nhit[type] = _val;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCAConversionChanged object:self];
+        NSNotification* note = [NSNotification notificationWithName:ORMTCAConversionChanged object:self];
+        [[NSNotificationQueue defaultQueue] enqueueNotification:note postingStyle:NSPostASAP coalesceMask:NSNotificationCoalescingOnName forModes:nil];
     }
 }
 - (float) DAC_per_mV_ofType:(int) type {
@@ -934,7 +936,8 @@ tubRegister;
     if(mtca_dac_per_mV[type] != _val)
     {
         mtca_dac_per_mV[type] = _val;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCAConversionChanged object:self];
+        NSNotification* note = [NSNotification notificationWithName:ORMTCAConversionChanged object:self];
+        [[NSNotificationQueue defaultQueue] enqueueNotification:note postingStyle:NSPostASAP coalesceMask:NSNotificationCoalescingOnName forModes:nil];
     }
 }
 
@@ -944,7 +947,8 @@ tubRegister;
 - (void) setConversionIsValidForThreshold:(int) type isValid:(BOOL) _val {
     if(mtca_conversion_is_valid[type] != _val) {
         mtca_conversion_is_valid[type] = _val;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCAConversionChanged object:self];
+        NSNotification* note = [NSNotification notificationWithName:ORMTCAConversionChanged object:self];
+        [[NSNotificationQueue defaultQueue] enqueueNotification:note postingStyle:NSPostASAP coalesceMask:NSNotificationCoalescingOnName forModes:nil];
     }
 }
 
