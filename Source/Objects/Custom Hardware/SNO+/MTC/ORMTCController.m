@@ -1158,8 +1158,9 @@
 - (uint32_t) gatherMaskFromCheckBoxes:(NSMatrix *) boxes {
     uint32_t mask = 0;
     for(int i=0;i<[boxes numberOfRows];i++){
-        if([[boxes cellWithTag:i] intValue]){
-            mask |= (1L << i);
+        if([[boxes cellAtRow:i column:0] intValue]) {
+            int position = [[boxes cellAtRow:i column:0] tag];
+            mask |= (1L << position);
         }
     }
     return mask;
