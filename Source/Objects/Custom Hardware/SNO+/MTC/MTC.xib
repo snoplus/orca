@@ -1064,6 +1064,9 @@
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
+                                                        <connections>
+                                                            <action selector="updateConversionSettingsAction:" target="-2" id="8Wz-7d-6P4"/>
+                                                        </connections>
                                                     </button>
                                                     <button toolTip="Loads threshold values from the database to the GUI" verticalHuggingPriority="750" id="p00-2T-V6f">
                                                         <rect key="frame" x="395" y="8" width="80" height="28"/>
