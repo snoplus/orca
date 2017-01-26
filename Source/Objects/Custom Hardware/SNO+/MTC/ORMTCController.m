@@ -467,11 +467,6 @@
     [loadMTCACrateMaskButton setEnabled: !lockedOrNotRunningMaintenance];
     [loadPEDCrateMaskButton setEnabled: !lockedOrNotRunningMaintenance];
     [loadTriggerMaskButton setEnabled: !lockedOrNotRunningMaintenance];
-    [clearGTCratesButton setEnabled: !lockedOrNotRunningMaintenance];
-    [clearMTCAMaskButton setEnabled: !lockedOrNotRunningMaintenance];
-    [clearPEDCratesButton setEnabled: !lockedOrNotRunningMaintenance];
-    [clearTriggersButton setEnabled: !lockedOrNotRunningMaintenance];
-    
 }
 
 - (void) isPedestalEnabledInCSRChanged:(NSNotification*)aNotification
@@ -1251,26 +1246,6 @@
 - (IBAction) triggersLoadMTCACrateMask:(id) sender
 {
     [model mtcatLoadCrateMasks];
-}
-
-- (IBAction) triggersClearTriggerMask:(id) sender
-{
-    [model clearGlobalTriggerWordMask];
-}
-
-- (IBAction) triggersClearGTCrateMask:(id) sender
-{
-    [model clearGTCrateMask];
-}
-
-- (IBAction) triggersClearPEDCrateMask:(id) sender
-{
-    [model clearPedestalCrateMask];
-}
-
-- (IBAction) triggersClearMTCACrateMask:(id) sender
-{
-    [model mtcatClearCrateMasks];
 }
 
 - (IBAction)triggerMaskCheckBoxClicked:(id)sender {

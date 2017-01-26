@@ -108,11 +108,6 @@
     IBOutlet NSButton* loadPEDCrateMaskButton;
     IBOutlet NSButton* loadMTCACrateMaskButton;
     
-    IBOutlet NSButton *clearTriggersButton;
-    IBOutlet NSButton *clearGTCratesButton;
-    IBOutlet NSButton *clearPEDCratesButton;
-    IBOutlet NSButton *clearMTCAMaskButton;
-    
 	BOOL	sequenceRunning;
     NSView* blankView;
     NSSize  standardOpsSizeSmall;
@@ -232,11 +227,6 @@
 - (IBAction) triggersLoadGTCrateMask:(id) sender;
 - (IBAction) triggersLoadPEDCrateMask:(id) sender;
 - (IBAction) triggersLoadMTCACrateMask:(id) sender;
-
-- (IBAction) triggersClearTriggerMask:(id) sender;
-- (IBAction) triggersClearGTCrateMask:(id) sender;
-- (IBAction) triggersClearPEDCrateMask:(id) sender;
-- (IBAction) triggersClearMTCACrateMask:(id) sender;
 
 - (IBAction)triggerMaskCheckBoxClicked:(id)sender;
 - (IBAction)gtCratesCheckBoxClicked:(id)sender;
