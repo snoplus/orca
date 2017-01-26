@@ -169,13 +169,6 @@
 - (int) trigger_scan_name_to_index:(NSString*) name;
 - (int) index_to_trigger_scan_name:(int) index;
 
-
-
-#pragma mark •••Button Stubs
-//Actions for the various buttons in the MTC dialog.  There is a generic "buttonPushed()" method that
-//is called by each of the individual actions to avoid redundant code.
-- (IBAction) buttonPushed:(id) sender;
-
 #pragma mark •••Actions
 
 //Basic Ops
