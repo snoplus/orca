@@ -73,8 +73,8 @@
 
 - (void) awakeFromNib
 {
-    standardOpsSizeSmall = NSMakeSize(460,440);
-    standardOpsSizeLarge = NSMakeSize(460,760);
+    standardOpsSizeSmall = NSMakeSize(685,320);
+    standardOpsSizeLarge = NSMakeSize(685,620);
     settingsSizeSmall	 = NSMakeSize(600,430);
     settingsSizeLarge	 = NSMakeSize(600,630);
     triggerSize          = NSMakeSize(800,655);
