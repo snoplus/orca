@@ -1400,21 +1400,8 @@ tubRegister;
 
 - (void) loadLockOutWidthToHardware
 {
-    uint32_t theLockoutWidthValue = [self lockoutWidth];
 	@try {
-		unsigned long lockout_index = (theLockoutWidthValue/20);
-		unsigned long write_value   = (0xff - lockout_index);  //value in nano-seconds
-		
-		// write the GT lockout value in SMTC_GT_LOCK_REG
-		[self write:kMtcGtLockReg value:write_value];
-		
-		// now assert and de-assert LOAD_ENLK in CONTROL REG and  
-		// preserving the state of the register at the same time		
-		[self clrBits:kMtcControlReg mask:MTC_CSR_LOAD_ENLK];
-		[self setBits:kMtcControlReg mask:MTC_CSR_LOAD_ENLK];
-		[self clrBits:kMtcControlReg mask:MTC_CSR_LOAD_ENLK];
-		
-		
+        [mtc okCommand:"set_lockout_width %u", [self lockoutWidth]];
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Could not load the MTC GT lockout width!\n");		

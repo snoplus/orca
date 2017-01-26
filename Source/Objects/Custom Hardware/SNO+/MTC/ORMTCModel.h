@@ -68,7 +68,7 @@
 @private
     NSMutableDictionary*	mtcDataBase;
     
-    uint32_t                lockoutWidth;
+    uint16_t                lockoutWidth;
     uint16_t                pedestalWidth;
     uint32_t                pgt_rate;
     uint32_t                gtMask;
@@ -113,7 +113,7 @@
     RedisClient *mtc;
 }
 
-@property (nonatomic,assign) uint32_t lockoutWidth;
+@property (nonatomic,assign) uint16_t lockoutWidth;
 @property (nonatomic,assign) uint16_t pedestalWidth;
 @property (nonatomic,assign) uint32_t pgt_rate;
 @property (nonatomic,assign) uint16_t coarseDelay;
