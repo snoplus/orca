@@ -1102,57 +1102,6 @@ tubRegister;
 	return aValue;
 }
 
-- (unsigned long) getMTC_GTID
-{
-	unsigned long aValue = 0;
-	@try {
-		aValue =  [self read:kMtcOcGtReg] & 0xffffff;
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Couldn't get a MTC GTID!\n");
-		NSLog(@"Exception: %@\n",localException);
-	}
-	return aValue;
-}
-
-- (unsigned long) getMTC_PedWidth
-{
-	unsigned long aValue = 0;
-	@try {
-		aValue =  [self read:kMtcPwIdReg] & 0xff;
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Couldn't get a MTC Ped Width!\n");
-		NSLog(@"Exception: %@\n",localException);
-	}
-	return aValue;
-}
-
-- (unsigned long) getMTC_CoarseDelay
-{
-	unsigned long aValue = 0;
-	@try {
-		aValue = [self read:kMtcRtdelReg] & 0xff;
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Couldn't get a MTC Coarse Delay!\n");
-		NSLog(@"Exception: %@\n",localException);
-	}
-	return aValue;
-}
-
-- (unsigned long) getMTC_FineDelay
-{
-	unsigned long aValue = 0;
-	@try {
-		aValue = [self read:kMtcAddelReg] & 0xff;
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Couldn't get a MTC Fine Delay!\n");
-		NSLog(@"Exception: %@\n",localException);
-	}
-	return aValue;
-}
 
 - (void) sendMTC_SoftGt
 {
