@@ -1507,12 +1507,13 @@ tubRegister;
 - (void) enablePulser
 {
 	@try {
-		[self setBits:kMtcControlReg mask:MTC_CSR_PULSE_EN];
+        [mtc okCommand:"enable_pulser"];
 		NSLog(@"Enabled Pulser.\n");		
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Unable to enable the pulser!\n");		
-		[localException raise];	
+		[localException raise];
+        return;
 	}
 
     [self setPulserEnabled:YES];
@@ -1521,12 +1522,13 @@ tubRegister;
 - (void) disablePulser
 {
 	@try {
-		[self clrBits:kMtcControlReg mask:MTC_CSR_PULSE_EN];
-		NSLog(@"Disabled Pulser.\n");		
+        [mtc okCommand:"disable_pulser"];
+        NSLog(@"Disabled Pulser.\n");
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Unable to disable the pulser!\n");		
-		[localException raise];	
+		[localException raise];
+        return;
 	}
 
     [self setPulserEnabled:NO];
@@ -1535,25 +1537,29 @@ tubRegister;
 - (void)  enablePedestal
 {
 	@try {
-		[self setBits:kMtcControlReg mask:MTC_CSR_PED_EN];
+        [mtc okCommand:"enable_pedestals"];
 		NSLog(@"Enabled Pedestals.\n");		
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Unable to enable the Pedestals!\n");		
-		[localException raise];	
+		[localException raise];
+        return;
 	}
+    [self setIsPedestalEnabledInCSR:YES];
 }
 
 - (void)  disablePedestal
 {
 	@try {
-		[self clrBits:kMtcControlReg mask:MTC_CSR_PED_EN];
-		NSLog(@"Disabled Pedestals.\n");		
+        [mtc okCommand:"enable_pedestals"];
+		NSLog(@"Disabled Pedestals.\n");
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Unable to disable the Pedestals!\n");		
-		[localException raise];	
+		[localException raise];
+        return;
 	}
+    [self setIsPedestalEnabledInCSR:NO];
 }
 
 - (void) stopMTCPedestalsFixedRate
