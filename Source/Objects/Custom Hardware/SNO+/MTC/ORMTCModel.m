@@ -1424,30 +1424,15 @@ tubRegister;
 
 - (void) loadPrescaleValueToHardware
 {
-    uint32_t N100PrescaleValue = [self prescaleValue];
 	@try {
-		//value from 1 to 65535
-		unsigned long write_value = (0xffff - N100PrescaleValue - 1);// 1 prescale/~N+1 NHIT_100_LOs
-		
-		// write the prescale  value in MTC_SCALE_REG
-		[self write:kMtcScaleReg value:write_value];
-		
-		// now load it : assert and de-assert LOAD_ENPR in CONTROL REG  
-		// and  preserving the state of the register at the same time		
-		[self clrBits:kMtcControlReg mask:MTC_CSR_LOAD_ENPR];
-		[self setBits:kMtcControlReg mask:MTC_CSR_LOAD_ENPR];
-		[self clrBits:kMtcControlReg mask:MTC_CSR_LOAD_ENPR];
-		
+        [mtc okCommand:"set_prescale_value", [self prescaleValue]];
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Could not load the MTC prescale value!\n");		
 		NSLog(@"Exception: %@\n",localException);
 		[localException raise];
-		
 	}
-	
 }
-
 
 - (void) setupPulseGTDelaysCoarse:(uint16_t) theCoarseDelay fine:(uint16_t) theAddelValue
 {		

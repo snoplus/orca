@@ -74,7 +74,7 @@
     uint32_t                gtMask;
     uint32_t                GTCrateMask;
     uint32_t                pedCrateMask;
-    uint32_t                prescaleValue;
+    uint16_t                prescaleValue;
     uint16_t                coarseDelay;
     uint16_t                fineDelay;
 
@@ -119,7 +119,7 @@
 @property (nonatomic,assign) uint16_t coarseDelay;
 @property (nonatomic,assign) uint16_t fineDelay;
 @property (nonatomic,assign) uint32_t gtMask;
-@property (nonatomic,assign) uint32_t prescaleValue;
+@property (nonatomic,assign) uint16_t prescaleValue;
 @property (nonatomic,assign) uint32_t GTCrateMask;
 @property (nonatomic,assign) uint32_t pedCrateMask;
 
