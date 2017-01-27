@@ -35,7 +35,6 @@
 #import "ORHWWizSelection.h"
 #import "ORHWWizParam.h"
 #import "ORHWWizardController.h"
-#import "ORHWUndoManager.h"
 #import "ORPQModel.h"
 
 //#define VERIFY_CMOS_SHIFT_REGISTER	// uncomment this to verify CMOS shift register loads - PH 09/17/99
