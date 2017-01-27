@@ -359,68 +359,6 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
         }
         if(chunkDict && mainKey)[resultDict setObject:chunkDict forKey:mainKey];
     }
-    NSLog(@"%@\n",resultDict);
-//    for(id aLine in lines){
-//        if([aLine length]<=1)continue;
-//        aLine = [aLine stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-//        aLine = [aLine stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-//        aLine = [aLine stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-//
-//        //collect lines between { and }
-//        
-//        
-//        if([aLine rangeOfString:@"{"].location != NSNotFound){
-//            workingOnInner = YES;
-//            innerDict    = [NSMutableDictionary dictionary];
-//            aLine = [aLine stringByReplacingOccurrencesOfString:@"}" withString:@""];
-//            NSArray* parts  = [aLine componentsSeparatedByString:@":"];
-//            if([parts count] == 2){
-//                innerDictKey = [parts objectAtIndex:1];
-//                
-//            }
-//
-//        }
-//        else if([aLine rangeOfString:@"}"].location != NSNotFound){
-//            workingOnInner = NO;
-//            [resultDict setObject:innerDict forKey:innerDictKey];
-//        }
-//
-//        
-//        
-//        if([aLine rangeOfString:@"Date"].location != NSNotFound){
-//            NSString* ds = [aLine substringFromIndex:7];
-//            NSDate* scriptLastRan = [dateConvertFormatter dateFromString:ds];
-//            NSString* scriptLastRanString = [dateFormatter stringFromDate:scriptLastRan];
-//            if(scriptLastRanString)[resultDict setObject:scriptLastRanString forKey:@"scriptRan"];
-//            NSString* s =[dateFormatter stringFromDate:[NSDate date]];
-//            if(s)[resultDict setObject:s forKey:@"lastChecked"];
-//        }
-//        else {
-//            aLine = [aLine stringByReplacingOccurrencesOfString:@" " withString:@""];
-//            aLine = [aLine stringByReplacingOccurrencesOfString:@"Slot:81:"  withString:@"raidDrive:"];
-//            aLine = [aLine stringByReplacingOccurrencesOfString:@"Slot:252:" withString:@"virtualDrive:"];
-//            NSArray* parts  = [aLine componentsSeparatedByString:@","];
-//            NSMutableDictionary* partDictionary = [NSMutableDictionary dictionary];
-//            for(id aPart in parts){
-//                NSArray* items = [aPart componentsSeparatedByString:@":"];
-//                if([items count] ==2){
-//                    [partDictionary setObject:[items objectAtIndex:1] forKey:[items objectAtIndex:0]];
-//                }
-//            }
-//            if([aLine rangeOfString:@"Mount_point"].location != NSNotFound){
-//                NSString* mountPoint = [partDictionary objectForKey:@"Mount_point"];
-//                [resultDict setObject:partDictionary forKey:mountPoint];
-//            }
-//            else if([aLine rangeOfString:@"raidDrive"].location != NSNotFound){
-//                int slot = [[partDictionary objectForKey:@"raidDrive"]intValue];
-//                [resultDict setObject:partDictionary forKey:[NSString stringWithFormat:@"raidDrive%d",slot]];
-//            }
-//            else if([aLine rangeOfString:@"virtualDrive"].location != NSNotFound){
-//                int slot = [[partDictionary objectForKey:@"virtualDrive"]intValue];
-//                [resultDict setObject:partDictionary forKey:[NSString stringWithFormat:@"virtualDrive%d",slot]];
-//            }
-//        }
- //   }
     
     [self checkAlarms];
     
