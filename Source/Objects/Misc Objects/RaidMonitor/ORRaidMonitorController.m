@@ -96,23 +96,25 @@
     [self fillIn:lastCheckedField   with:@"lastChecked"];
     [self fillIn:scriptRanField     with:@"scriptRan"];
     
-    [self fillIn:statusField        with:@"Status"       from:@"/Data/mjddata"];
-    [self fillIn:usedField          with:@"Used"         from:@"/Data/mjddata"];
-    [self fillIn:availableField     with:@"Available"    from:@"/Data/mjddata"];
-    [self fillIn:usedPercentField   with:@"Used_percent" from:@"/Data/mjddata"];
+    [self fillIn:statusField        with:@"Status"       from:@"/home"];
+    [self fillIn:usedField          with:@"Used"         from:@"/home"];
+    [self fillIn:availableField     with:@"Available"    from:@"/home"];
+    [self fillIn:usedPercentField   with:@"Used_percent" from:@"/home"];
 
-    [self fillInDisk:disk0          index:0 with:@"raidDrive0"];
-    [self fillInDisk:disk1          index:1 with:@"raidDrive1"];
-    [self fillInDisk:disk2          index:2 with:@"raidDrive2"];
-    [self fillInDisk:disk3          index:3 with:@"raidDrive3"];
-    [self fillInDisk:disk4          index:4 with:@"raidDrive4"];
-    [self fillInDisk:disk5          index:5 with:@"raidDrive5"];
-    [self fillInDisk:disk6          index:6 with:@"raidDrive6"];
-    [self fillInDisk:disk7          index:7 with:@"raidDrive7"];
-    [self fillInDisk:disk8          index:8 with:@"raidDrive8"];
-    [self fillInDisk:disk9          index:9 with:@"raidDrive9"];
-    [self fillInDisk:disk10         index:10 with:@"raidDrive10"];
-    [self fillInDisk:disk11         index:11 with:@"raidDrive11"];
+    [self fillInDisk:disk0          index:0 with:@"Disk00"];
+    [self fillInDisk:disk1          index:1 with:@"Disk01"];
+    [self fillInDisk:disk2          index:2 with:@"Disk02"];
+    [self fillInDisk:disk3          index:3 with:@"Disk03"];
+    [self fillInDisk:disk4          index:4 with:@"Disk04"];
+    [self fillInDisk:disk5          index:5 with:@"Disk05"];
+    [self fillInDisk:disk6          index:6 with:@"Disk06"];
+    [self fillInDisk:disk7          index:7 with:@"Disk07"];
+    [self fillInDisk:disk8          index:8 with:@"Disk08"];
+    [self fillInDisk:disk9          index:9 with:@"Disk09"];
+    [self fillInDisk:disk10         index:10 with:@"Disk10"];
+    [self fillInDisk:disk11         index:11 with:@"Disk11"];
+    [self fillInDisk:disk12         index:12 with:@"Disk12"];
+    [self fillInDisk:disk13         index:13 with:@"Disk13"];
 }
 
 - (void) fillInDisk:(NSTextField*)aField index:(int)anIndex with:(NSString*)aDiskKey
@@ -120,13 +122,11 @@
     NSDictionary* resultDict = [model resultDictionary];
     NSDictionary* diskDict = [resultDict objectForKey:aDiskKey];
     NSString* status    = [diskDict objectForKey:@"Status"];
-    NSString* operation = [diskDict objectForKey:@"Operation"];
     if(!status)status = @"?";
-    if(!operation)operation = @"?";
     
-    NSString* s = [NSString stringWithFormat:@"%2d: %@/%@",anIndex,operation,status];
-    NSColor* aColor = [NSColor blackColor];
-    if([status isEqualToString:@"Offline"])aColor = [NSColor redColor];
+    NSString* s = [NSString stringWithFormat:@"%2d: %@",anIndex,status];
+    NSColor* aColor = [NSColor colorWithRed:0 green:.6 blue:0 alpha:1];
+    if(![status isEqualToString:@"NORMAL"])aColor = [NSColor redColor];
     [aField setStringValue: s];
     [aField setTextColor:aColor];
 }

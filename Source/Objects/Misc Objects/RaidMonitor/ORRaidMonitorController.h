@@ -47,6 +47,8 @@
     IBOutlet NSTextField*       disk9;
     IBOutlet NSTextField*       disk10;
     IBOutlet NSTextField*       disk11;
+    IBOutlet NSTextField*       disk12;
+    IBOutlet NSTextField*       disk13;
 }
 
 - (id)   init;
