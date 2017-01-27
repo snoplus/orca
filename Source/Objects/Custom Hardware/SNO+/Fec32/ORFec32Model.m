@@ -35,6 +35,7 @@
 #import "ORHWWizSelection.h"
 #import "ORHWWizParam.h"
 #import "ORHWWizardController.h"
+#import "ORHWUndoManager.h"
 #import "ORPQModel.h"
 
 //#define VERIFY_CMOS_SHIFT_REGISTER	// uncomment this to verify CMOS shift register loads - PH 09/17/99
@@ -1921,6 +1922,8 @@ static int              sChannelsNotChangedCount = 0;
 
 - (void) hwWizardActionBegin:(NSNotification*)aNote
 {
+    [[self undoManager] disableUndoRegistration];
+
     sChannelsNotChangedCount      = 0;
     startSeqDisabledMask          = seqDisabledMask;
     startPedEnabledMask           = pedEnabledMask;
@@ -1946,8 +1949,6 @@ static int              sChannelsNotChangedCount = 0;
 
 - (void) hwWizardActionEnd:(NSNotification*)aNote
 {
-    [[self undoManager] disableUndoRegistration];
-
     // make sure channels with HV disabled aren't enabled
     // (note: we do this even if the database is stale)
     PQ_FEC *fec = [sDetectorDbData getPmthv:[self stationNumber] crate:[self crateNumber]];
@@ -2016,8 +2017,6 @@ static int              sChannelsNotChangedCount = 0;
         crateInitMask |= (1UL << [self crateNumber]);
         cardChangedFlag = false;  // clear this temporary flag
     }
-    [[self undoManager] enableUndoRegistration];
-
     // set pmthv state to reload the database on the next hwWizard action
     sDetectorDbState = 0;
 }
@@ -2041,6 +2040,8 @@ static int              sChannelsNotChangedCount = 0;
         NSLog(@"Warning: Settings for %d channels not made because they have HV disabled\n", sChannelsNotChangedCount);
         sChannelsNotChangedCount = 0;
     }
+
+    [[self undoManager] enableUndoRegistration];
 }
 
 #pragma mark •••HWWizard
