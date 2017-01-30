@@ -253,7 +253,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     }
     if (pqCAEN->valid[kCAEN_triggerMask]) {
         [self setTriggerSourceMask:pqCAEN->triggerMask];
-        //TO_DO is it the source in the DB?
+        //TO_DO is it the source in the DB? <-- also contains coincidencelevel bits!
     }
     if (pqCAEN->valid[kCAEN_triggerOutMask]) {
         [self setTriggerOutMask:pqCAEN->triggerOutMask];
@@ -273,8 +273,8 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
             //TO_DO what about setThreshold and setOverUnderThreshold?
         }
     }
-    //TO_DO what about?: , setCoincidenceLevel, setCountAllTriggers,
-    // setWaveFormRateGroup, setNumberBLTEventsToReadout, setContinuousMode
+    //TO_DO what about?: , setCoincidenceLevel,
+    // setNumberBLTEventsToReadout (not used)
     [[self undoManager] enableUndoRegistration];
 }
 

@@ -405,7 +405,7 @@ resetFifoOnStart = _resetFifoOnStart;
     } else ++countInvalid;
 
     if (pqMTC->valid[kMTC_fineDelay]) {
-        [self setDbLong:pqMTC->fineDelay forIndex:kFineDelay];
+        [self setDbLong:pqMTC->fineDelay/100 forIndex:kFineDelay];
     } else ++countInvalid;
 
     if (pqMTC->valid[kMTC_pedMask]) {
@@ -413,7 +413,7 @@ resetFifoOnStart = _resetFifoOnStart;
     } else ++countInvalid;
 
     if (pqMTC->valid[kMTC_prescale]) {
-        [self setDbLong:(0x10000 - pqMTC->prescale) forIndex:kNhit100LoPrescale];
+        [self setDbLong:pqMTC->prescale forIndex:kNhit100LoPrescale];
     } else ++countInvalid;
 
     if (pqMTC->valid[kMTC_lockoutWidth]) {
