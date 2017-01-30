@@ -41,7 +41,7 @@ static char *RunTypeWordBitNames[32] = {
     "Spare",
     "Spare",
     "DCR Activity",
-    "Comp. Coils",
+    "Comp. Coils OFF",
     "PMTs OFF",
     "Bubblers ON",
     "Recirculation",
