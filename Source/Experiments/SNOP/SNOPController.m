@@ -35,6 +35,7 @@
 #import "SNOP_Run_Constants.h"
 #import "SNOCaenModel.h"
 #import "RunTypeWordBits.hh"
+#import "ECARun.h"
 
 NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 
@@ -362,9 +363,19 @@ snopGreenColor;
     
     [notifyCenter addObserver : self
                      selector : @selector(runsECAChanged:)
-                         name : ORSNOPModelRunsECAChangedNotification
+                         name : ORECARunChangedNotification
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(runsECAChanged:)
+                         name : ORECARunStartedNotification
                         object: nil];
     
+    [notifyCenter addObserver : self
+                     selector : @selector(runsECAChanged:)
+                         name : ORECARunFinishedNotification
+                        object: nil];
+
     [notifyCenter addObserver : self
                      selector : @selector(mtcDataBaseChanged:)
                          name : ORMTCAThresholdChanged
@@ -463,8 +474,6 @@ snopGreenColor;
 
 - (IBAction) startRunAction:(id)sender
 {
-    //Make sure we are not running any RunScripts
-    [runControl setSelectedRunTypeScript:0];
 
     //Load selected SR in case the user didn't click enter
     NSString *standardRun = [[standardRunPopupMenu objectValueOfSelectedItem] copy];
@@ -492,36 +501,7 @@ snopGreenColor;
         return;
     }
     
-    [model setStandardRunType:standardRun];
-    [model setStandardRunVersion:standardRunVersion];
-
-    //Load the standard run and stop run initialization if failed
-    [model setLastStandardRunType:[model standardRunType]];
-    [model setLastStandardRunVersion:[model standardRunVersion]];
-    [model setLastRunTypeWord:[model runTypeWord]];
-    NSString* _lastRunTypeWord = [NSString stringWithFormat:@"0x%X",(int)[model runTypeWord]];
-    [model setLastRunTypeWordHex:_lastRunTypeWord]; //FIXME: revisit if we go over 32 bits
-    if(![model loadStandardRun:standardRun withVersion:standardRunVersion]) return;
-    
-    if ([runControl isRunning]) {
-        /* If there is already a run going, then we restart the run. */
-        if ([[model document] isDocumentEdited]) {
-            /* If the GUI has changed, save the document first. */
-            [[model document] afterSaveDo: @selector(restartRun) withTarget:runControl];
-            [[model document] saveDocument:nil];
-        } else {
-            [runControl restartRun];
-        }
-    } else {
-        /* If there is no run going, then we start a new run. */
-        if ([[model document] isDocumentEdited]) {
-            [[model document] afterSaveDo: @selector(startRun) withTarget:runControl];
-            [[model document] saveDocument:nil];
-        } else {
-            [runControl startRun];
-        }
-    }
-    
+    [model startStandardRun:standardRun withVersion:standardRunVersion];
     [standardRun release];
     [standardRunVersion release];
 }
@@ -546,9 +526,10 @@ snopGreenColor;
 
 - (IBAction) stopRunAction:(id)sender
 {
-    [runControl quitSelectedRunScript];
+
     [self endEditing];
-    [runControl performSelector:@selector(haltRun)withObject:nil afterDelay:.1];
+    [model stopRun];
+
 }
 
 - (void) runStatusChanged:(NSNotification*)aNotification
@@ -1427,84 +1408,68 @@ snopGreenColor;
 
 - (void) runsECAChanged:(NSNotification*)aNotification
 {
+
     //Refresh values in GUI to match the model
-    int index = [model ECA_pattern] -1;
+    int index = [[model anECARun] ECA_pattern];
     if(index < 0)
     {
         NSLogColor([NSColor redColor], @"ECA bad index returned\n");
         return;
     }
     [ECApatternPopUpButton selectItemAtIndex:index];
-    [ECAtypePopUpButton selectItemWithTitle:[model ECA_type]];
-    int integ = [model ECA_tslope_pattern];
+    [ECAtypePopUpButton selectItemWithTitle:[[model anECARun] ECA_type]];
+    int integ = [[model anECARun] ECA_tslope_pattern];
     [TSlopePatternTextField setIntValue:integ];
-    integ = [model ECA_nevents];
+    integ = [[model anECARun] ECA_nevents];
     [ecaNEventsTextField setIntValue:integ];
-    [ecaPulserRate setObjectValue:[model ECA_rate]];
+    [ecaPulserRate setObjectValue:[[model anECARun] ECA_rate]];
+
+    if([[aNotification name] isEqualTo:ORECARunStartedNotification]) [startSingleECAButton setEnabled:false];
+    else if([[aNotification name] isEqualTo:ORECARunFinishedNotification]) [startSingleECAButton setEnabled:true];
+
 }
 
 //ECA RUNS
 - (IBAction)ecaPatternChangedAction:(id)sender
 {
     int value = (int)[ECApatternPopUpButton indexOfSelectedItem];
-    [model setECA_pattern:value+1];
+    [[model anECARun] setECA_pattern:value];
 }
 
 - (IBAction)ecaTypeChangedAction:(id)sender
 {
-    [model setECA_type:[ECAtypePopUpButton titleOfSelectedItem]];
+    [[model anECARun] setECA_type:[ECAtypePopUpButton titleOfSelectedItem]];
 }
 
 - (IBAction)ecaTSlopePatternChangedAction:(id)sender
 {
     int value = [TSlopePatternTextField intValue];
-    [model setECA_tslope_pattern:value];
+    [[model anECARun] setECA_tslope_pattern:value];
 }
 
 - (IBAction)ecaNEventsChangedAction:(id)sender
 {
     int value = [ecaNEventsTextField intValue];
-    [model setECA_nevents:value];
+    [[model anECARun] setECA_nevents:value];
 }
 
 - (IBAction)ecaPulserRateAction:(id)sender
 {
-    [model setECA_rate:[ecaPulserRate objectValue]];
+    [[model anECARun] setECA_rate:[ecaPulserRate objectValue]];
 }
 
 
 - (IBAction)startECAStandardRunAction:(id)sender
 {
 
-    NSArray* scriptList = [runControl runScriptList];
-    if([scriptList containsObject:@"ECAStandardRun"]){
-        if([gOrcaGlobals runInProgress]){
-            NSLogColor([NSColor redColor],@"ECA run cannot start with an ongoing run. Stop the run first.\n");
-        }
-        else{
-            [runControl selectRunTypeScriptByName:@"ECAStandardRun"];
-            [runControl startRun];
-        }
-    }
-    else{
-        NSLogColor([NSColor redColor],@"ECA Standard Run not configured. Please, set the RunScript properly. ECA run won't start. \n");
-    }
+    NSLogColor([NSColor redColor],@"Not implemented yet. Use the Start Single ECA Run button below. \n");
 
 }
 
 - (IBAction)startECASingleRunAction:(id)sender
 {
     
-    NSArray* scriptList = [runControl runScriptList];
-    if([scriptList containsObject:@"ECASingleRun"]){
-        //Start or restart the run
-        [runControl selectRunTypeScriptByName:@"ECASingleRun"];
-        if([runControl isRunning]) [runControl restartRun];
-        else [runControl startRun];
-    }
-    else{
-        NSLogColor([NSColor redColor],@"ECA Single Run not configured. Please, set the RunScript properly. ECA run won't start. \n");
-    }
+    [model startECARunInParallel];
 
 }
 

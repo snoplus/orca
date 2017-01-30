@@ -178,6 +178,8 @@ enum {
 
     bool initialized;
     bool stateUpdated;
+
+    BOOL changingPedMask;
 }
 
 @property (nonatomic,assign) unsigned long xl3MegaBundleDataId;
@@ -336,10 +338,10 @@ enum {
 - (void) setSelectedRegister:(int)aSelectedRegister;
 - (NSString*) xl3LockName;
 - (NSComparisonResult) XL3NumberCompare:(id)aCard;
-
 + (void) setOwlSupplyOn:(BOOL)isOn;
 + (BOOL) owlSupplyOn;
 - (BOOL) isOwlCrate;
+- (BOOL) changingPedMask;
 
 #pragma mark •••DB Helpers
 - (void) synthesizeDefaultsIntoBundle:(MB*)aBundle forSlot:(unsigned short)aSlot;

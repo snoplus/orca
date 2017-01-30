@@ -53,6 +53,8 @@
 		0FF177C81DF7AEA000BA783B /* run_dog_frame_5.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 0FF177C11DF7AEA000BA783B /* run_dog_frame_5.tiff */; };
 		0FF177C91DF7AEA000BA783B /* run_dog_frame_6.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 0FF177C21DF7AEA000BA783B /* run_dog_frame_6.tiff */; };
 		0FF177CB1DF7AF2F00BA783B /* waiting_dog.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 0FF177CA1DF7AF2F00BA783B /* waiting_dog.tiff */; };
+		10E455911E283AC000FB37A5 /* ECARun.h in Headers */ = {isa = PBXBuildFile; fileRef = 10E4558F1E283AC000FB37A5 /* ECARun.h */; };
+		10E455921E283AC000FB37A5 /* ECARun.m in Sources */ = {isa = PBXBuildFile; fileRef = 10E455901E283AC000FB37A5 /* ECARun.m */; };
 		146822430FC4799C0082BD70 /* ORCircularBufferUV.h in Headers */ = {isa = PBXBuildFile; fileRef = 146822410FC4799C0082BD70 /* ORCircularBufferUV.h */; };
 		146822440FC4799C0082BD70 /* ORCircularBufferUV.m in Sources */ = {isa = PBXBuildFile; fileRef = 146822420FC4799C0082BD70 /* ORCircularBufferUV.m */; };
 		1C50F9F108033CA9008D18EA /* ADC2249.nib in Resources */ = {isa = PBXBuildFile; fileRef = 1C50F9E608033CA9008D18EA /* ADC2249.nib */; };
@@ -3827,6 +3829,9 @@
 		0FF177C21DF7AEA000BA783B /* run_dog_frame_6.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = run_dog_frame_6.tiff; sourceTree = "<group>"; };
 		0FF177CA1DF7AF2F00BA783B /* waiting_dog.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = waiting_dog.tiff; sourceTree = "<group>"; };
 		1038D8841E23160D009FFDFB /* RunTypeWordBits.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RunTypeWordBits.hh; sourceTree = "<group>"; };
+		10E4558F1E283AC000FB37A5 /* ECARun.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ECARun.h; sourceTree = "<group>"; };
+		10E455901E283AC000FB37A5 /* ECARun.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ECARun.m; sourceTree = "<group>"; };
+		10E455931E28439B00FB37A5 /* ECAPatterns.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ECAPatterns.h; sourceTree = "<group>"; };
 		146822410FC4799C0082BD70 /* ORCircularBufferUV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCircularBufferUV.h; path = Source/Objects/Hardware/HV/UnivVoltHV/ORCircularBufferUV.h; sourceTree = SOURCE_ROOT; };
 		146822420FC4799C0082BD70 /* ORCircularBufferUV.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCircularBufferUV.m; path = Source/Objects/Hardware/HV/UnivVoltHV/ORCircularBufferUV.m; sourceTree = SOURCE_ROOT; };
 		1C50F9E608033CA9008D18EA /* ADC2249.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = ADC2249.nib; sourceTree = "<group>"; };
@@ -14425,6 +14430,9 @@
 				EFB39FCC130BA1C5001220AC /* SNOPModel.h */,
 				EFB39FCD130BA1C5001220AC /* SNOPModel.m */,
 				0FF177A51DF79F5600BA783B /* run_dog_images */,
+				10E4558F1E283AC000FB37A5 /* ECARun.h */,
+				10E455931E28439B00FB37A5 /* ECAPatterns.h */,
+				10E455901E283AC000FB37A5 /* ECARun.m */,
 			);
 			path = SNOP;
 			sourceTree = "<group>";
@@ -16087,6 +16095,7 @@
 				B3808A901700F84B0019C27D /* ORCouchDBListenerModel.h in Headers */,
 				841DACF1175E2CB5002542BD /* OR3DScanPlatformView.h in Headers */,
 				43D7CB89177C84AC00ED4736 /* OROpenGLObject.h in Headers */,
+				10E455911E283AC000FB37A5 /* ECARun.h in Headers */,
 				43D7CB8D177CBDF600ED4736 /* ORVertex.h in Headers */,
 				84C3B28D17CBBF28002916F5 /* MJDCmds.h in Headers */,
 				84C3B29217CCD1BF002916F5 /* MJD.h in Headers */,
@@ -17908,6 +17917,7 @@
 				6B40D6651B2B79960000F7C1 /* ResistorDBViewController.m in Sources */,
 				84B28E570F4C835500E2B056 /* ORUnivVoltDecoders.m in Sources */,
 				84B28E590F4C835500E2B056 /* ORUnivVoltModel.m in Sources */,
+				10E455921E283AC000FB37A5 /* ECARun.m in Sources */,
 				84B28E5F0F4C835500E2B056 /* ORUnivVoltHVCrateController.m in Sources */,
 				84B28E620F4C835500E2B056 /* ORUnivVoltHVCrateModel.m in Sources */,
 				2D2C84080F4EC6650005D69F /* ORIpeSlowControlDecoder.m in Sources */,

@@ -1321,6 +1321,12 @@ BOOL owlSupplyState = false;
     return [self crateNumber] - [aCard crateNumber];
 }
 
+- (BOOL) changingPedMask
+{
+    return changingPedMask;
+}
+
+
 #pragma mark •••DB Helpers
 
 #define swapLong(x) (((uint32_t)(x) << 24) | (((uint32_t)(x) & 0x0000FF00) <<  8) | (((uint32_t)(x) & 0x00FF0000) >>  8) | ((uint32_t)(x) >> 24))
@@ -5511,56 +5517,65 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
 
 - (void) _setPedestalInParallelWorker
 {
-    char payload[XL3_PAYLOAD_SIZE];
-    MultiSetCratePedsArgs *args;
-    MultiSetCratePedsResults *results;
-    int i;
 
-    memset(&payload, 0, XL3_PAYLOAD_SIZE);
+    @synchronized(self) {
+        //Keep track of how many XL3s are changing ped mask
+        changingPedMask = TRUE;
 
-    args = (MultiSetCratePedsArgs *) payload;
+        char payload[XL3_PAYLOAD_SIZE];
+        MultiSetCratePedsArgs *args;
+        MultiSetCratePedsResults *results;
+        int i;
 
-    NSAutoreleasePool* pedPool = [[NSAutoreleasePool alloc] init];
+        memset(&payload, 0, XL3_PAYLOAD_SIZE);
 
-    if (![[self xl3Link] isConnected]) {
+        args = (MultiSetCratePedsArgs *) payload;
+
+        NSAutoreleasePool* pedPool = [[NSAutoreleasePool alloc] init];
+
+        if (![[self xl3Link] isConnected]) {
+            [pedPool release];
+            changingPedMask = FALSE;
+            return;
+        }
+
+        NSArray* fecs = [[self guardian]
+                         collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
+
+        args->slotMask = 0;
+
+        for (id aFec in fecs) {
+            args->slotMask |= 1 << [aFec stationNumber];
+            args->channelMasks[[aFec stationNumber]] = [aFec pedEnabledMask];
+        }
+
+        args->slotMask = htonl(args->slotMask);
+
+        for (i = 0; i < 16; i++) {
+            args->channelMasks[i] = htonl(args->channelMasks[i]);
+        }
+
+        @try {
+            [[self xl3Link] sendCommand:MULTI_SET_CRATE_PEDS_ID
+                            withPayload:payload expectResponse:YES];
+        } @catch (NSException* e) {
+            NSLog(@"%@ error setting pedestal masks. error: %@ reason: %@.\n",
+                  [[self xl3Link] crateName], [e name], [e reason]);
+            goto err;
+        }
+
+        results = (MultiSetCratePedsResults *) payload;
+
+        if (results->errorMask) {
+            NSLog(@"%@ error setting pedestal masks.\n",
+                  [[self xl3Link] crateName]);
+        }
+
+    err:
         [pedPool release];
-        return;
+        changingPedMask = FALSE;
     }
 
-    NSArray* fecs = [[self guardian]
-        collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
-
-    args->slotMask = 0;
-
-    for (id aFec in fecs) {
-        args->slotMask |= 1 << [aFec stationNumber];
-        args->channelMasks[[aFec stationNumber]] = [aFec pedEnabledMask];
-    }
-
-    args->slotMask = htonl(args->slotMask);
-
-    for (i = 0; i < 16; i++) {
-        args->channelMasks[i] = htonl(args->channelMasks[i]);
-    }
-
-    @try {
-        [[self xl3Link] sendCommand:MULTI_SET_CRATE_PEDS_ID
-             withPayload:payload expectResponse:YES];
-    } @catch (NSException* e) {
-        NSLog(@"%@ error setting pedestal masks. error: %@ reason: %@.\n",
-              [[self xl3Link] crateName], [e name], [e reason]);
-        goto err;
-    }
-
-    results = (MultiSetCratePedsResults *) payload;
-
-    if (results->errorMask) {
-        NSLog(@"%@ error setting pedestal masks.\n",
-              [[self xl3Link] crateName]);
-    }
-    
-err:
-    [pedPool release];
 }
 
 @end

@@ -23,6 +23,7 @@
 #import "ORExperimentModel.h"
 #import "ORVmeCardDecoder.h"
 #import "RedisClient.h"
+#import "ECARun.h"
 
 @class ORDataPacket;
 @class ORDataSet;
@@ -129,12 +130,7 @@
         unsigned long runTypeWord;
         unsigned long lastRunTypeWord;
         NSString* lastRunTypeWordHex;
-        //ECA stuff
-        int ECA_pattern;
-        NSString* ECA_type;
-        int ECA_tslope_pattern;
-        int ECA_nevents;
-        NSNumber* ECA_rate;
+        ECARun* anECARun;
     
 }
 
@@ -249,16 +245,6 @@
 - (void) setLastStandardRunType:(NSString*)aValue;
 - (NSString*) lastStandardRunVersion;
 - (void) setLastStandardRunVersion:(NSString*)aValue;
-- (int) ECA_pattern;
-- (NSString*) ECA_type;
-- (int) ECA_tslope_pattern;
-- (int) ECA_nevents;
-- (NSNumber*) ECA_rate;
-- (void) setECA_pattern:(int)aValue;
-- (void) setECA_type:(NSString*)aValue;
-- (void) setECA_tslope_pattern:(int)aValue;
-- (void) setECA_nevents:(int)aValue;
-- (void) setECA_rate:(NSNumber*)aValue;
 
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder;
@@ -286,10 +272,17 @@
 //smellie functions -------
 -(void) getSmellieRunFiles;
 
+//ECA
+-(ECARun*) anECARun;
+
+-(void) startECARunInParallel;
+
 //Standard runs functions
+-(BOOL) startStandardRun:(NSString*)_standardRun withVersion:(NSString*)_standardRunVersion;
 -(BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
 -(BOOL) saveStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
 -(void) loadSettingsInHW;
+-(void) stopRun;
 
 @end
 
@@ -310,6 +303,5 @@ extern NSString* ORSNOPModelDebugDBIPAddressChanged;
 extern NSString* ORSNOPRunTypeWordChangedNotification;
 extern NSString* SNOPRunTypeChangedNotification;
 extern NSString* ORSNOPRunsLockNotification;
-extern NSString* ORSNOPModelRunsECAChangedNotification;
 extern NSString* ORSNOPModelSRChangedNotification;
 extern NSString* ORSNOPModelSRVersionChangedNotification;
