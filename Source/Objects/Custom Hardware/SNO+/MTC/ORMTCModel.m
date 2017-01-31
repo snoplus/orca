@@ -1205,7 +1205,6 @@ tubRegister;
 {	
 	@try {
 		[self setBits:kMtcMaskReg mask:gtWordMask];
-        //NSLog(@"Set GT Mask: 0x%08x\n",uLongDBValue(kGtMask)); This isn't right fixit
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Could not set a MTC GT word mask!\n");					
@@ -1217,9 +1216,7 @@ tubRegister;
 - (void) clearSingleGTWordMask:(unsigned long) gtWordMask
 {
 	@try {
-		//[self clrBits:kMtcGmskReg mask:gtWordMask];
 		[self clrBits:kMtcMaskReg mask:gtWordMask];
-        //NSLog(@"Set GT Mask: 0x%08x\n",uLongDBValue(kGtMask)); This isn't right fixit
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Could not clear a MTC GT word mask!\n");					
