@@ -796,7 +796,7 @@
         int tempType = type;
 
         @try {
-            threshold_index = [self convert_view_thresold_index_to_model_index:i];
+            threshold_index = [self convert_view_threshold_index_to_model_index:i];
             if(![model ConversionIsValidForThreshold:threshold_index]) {
                     [[nhitMatrix cellWithTag:i] setEnabled:type==MTC_RAW_UNITS];
 
@@ -819,7 +819,7 @@
     {
         tempType = type;
         @try {
-            threshold_index = [self convert_view_thresold_index_to_model_index:i];
+            threshold_index = [self convert_view_threshold_index_to_model_index:i];
             if(![model ConversionIsValidForThreshold:threshold_index]) {
                 [[esumMatrix cellWithTag:i] setEnabled:type==MTC_RAW_UNITS];
                 tempType = MTC_RAW_UNITS;
@@ -832,7 +832,7 @@
         [[esumMatrix cellWithTag:i] setFloatValue: value];
     }
 }
-- (int) convert_view_thresold_index_to_model_index: (int) view_index {
+- (int) convert_view_threshold_index_to_model_index: (int) view_index {
     switch (view_index) {
         case VIEW_N100H_TAG:
             return MTC_N100_HI_THRESHOLD_INDEX;
@@ -947,7 +947,7 @@
 {
     int threshold_index, unit_index;
     @try {
-        threshold_index = [self convert_view_thresold_index_to_model_index:[[sender selectedCell] tag]];
+        threshold_index = [self convert_view_threshold_index_to_model_index:[[sender selectedCell] tag]];
         unit_index = [self convert_view_unit_index_to_model_index:[[nHitViewTypeMatrix selectedCell] tag]];
         float threshold = [[sender selectedCell] floatValue];
         [model setThresholdOfType:threshold_index fromUnits:unit_index toValue:threshold];
@@ -960,7 +960,7 @@
 {
     int threshold_index, unit_index;
     @try {
-        threshold_index = [self convert_view_thresold_index_to_model_index:[[sender selectedCell]tag]];
+        threshold_index = [self convert_view_threshold_index_to_model_index:[[sender selectedCell]tag]];
         unit_index = [self convert_view_unit_index_to_model_index:[[eSumViewTypeMatrix selectedCell] tag]];
         float threshold = [[sender selectedCell] floatValue];
         [model setThresholdOfType:threshold_index fromUnits:unit_index toValue:threshold];

@@ -137,7 +137,7 @@
 - (void) isPedestalEnabledInCSRChanged:(NSNotification*)aNotification;
 - (void) updateThresholdsDisplay:(NSNotification*) aNote;
 
-- (int) convert_view_thresold_index_to_model_index: (int) view_index;
+- (int) convert_view_threshold_index_to_model_index: (int) view_index;
 - (int) convert_model_threshold_index_to_view_index: (int) model_index;
 - (int) convert_view_unit_index_to_model_index: (int) view_index;
 - (int) convert_model_unit_index_to_view_index: (int) model_index;
