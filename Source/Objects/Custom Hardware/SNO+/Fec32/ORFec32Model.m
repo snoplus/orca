@@ -1717,9 +1717,9 @@ static int              sChannelsNotChangedCount = 0;
     @try {
         // PH - The disableNotifications hack stops ORCA from throwing around notifications like feces
         // in a chimpanzee exhibit (ref https://davidnix.io/post/stop-using-nsnotificationcenter/ ).
-        // Without this, each GUI element in the daughtercard window would get set more than 1000 times!
-        // Instead we send EverythingChanged notifications at the bottom, and use a bit of sense before
-        // acting on these messages in the controller objects.
+        // Without this, each GUI element in the daughtercard window would be set more than 1000 times!
+        // Instead we send "EverythingChanged" notifications after all of the settings have been updated,
+        // and use a bit of sense before acting on these messages in the controller objects.
         [ORSNOCard disableNotifications];
 
         [[self undoManager] disableUndoRegistration];

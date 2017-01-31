@@ -556,7 +556,6 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
             }
         }
     }
-    if ([self isCancelled]) return nil;
 //
 // load FEC database
 //
