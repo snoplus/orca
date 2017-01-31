@@ -537,20 +537,25 @@ tubRegister;
     gtMask = _mask;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCGTMaskChanged object:self];
 }
+
 - (uint32_t) gtMask {
     return gtMask;
 }
+
 - (void) setPgt_rate:(float)rate {
     pgt_rate = rate;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCPulserRateChanged object:self];
 }
+
 - (float) pgt_rate {
     return pgt_rate;
 }
+
 - (void) setPrescaleValue:(uint16_t)newVal {
     prescaleValue = newVal;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCPrescaleValueChanged object:self];
 }
+
 - (uint16_t) prescaleValue {
     return prescaleValue;
 }
