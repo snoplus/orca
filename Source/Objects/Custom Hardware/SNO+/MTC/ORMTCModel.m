@@ -673,6 +673,8 @@ tubRegister;
 }
 
 #pragma mark •••Converters
+// This function converts the thresholds indices as they're ordered by
+// the MTC Server to the indices used here
 - (int) server_index_to_model_index:(int) server_index {
     switch (server_index) {
         case SERVER_N100L_INDEX:
@@ -709,6 +711,8 @@ tubRegister;
     [NSException raise:@"MTCModelError" format:@"Cannot convert server index %i to model index",server_index];
     return -1;
 }
+
+// This function performs the inverse operation to server_index_to_model_index
 - (int) model_index_to_server_index:(int) model_index {
     switch (model_index) {
         case MTC_N100_LO_THRESHOLD_INDEX:
