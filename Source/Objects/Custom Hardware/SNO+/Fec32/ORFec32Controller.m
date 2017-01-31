@@ -251,11 +251,16 @@
                         object: nil];
 
 
-	[notifyCenter addObserver : self
+    [notifyCenter addObserver : self
                      selector : @selector(cmosRatesChanged:)
                          name : ORFec32ModelCmosRateChanged
-						object: nil];
-	
+                        object: nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(everythingChanged:)
+                         name : ORFec32ModelEverythingChanged
+                        object: nil];
+    
 }
 
 - (void) updateWindow
@@ -313,6 +318,13 @@
 }
 
 #pragma mark •••Interface Management
+- (void) everythingChanged:(NSNotification*)aNote
+{
+    if (model == [aNote object]) {
+        [self updateWindow];
+    }
+}
+
 - (void) updatePMTInfo:(NSNotification*)aNote
 {
 	int crate = [model crateNumber];
@@ -428,7 +440,6 @@
 		if(displayRow>15)displayRow=0;
 	}
 }
-
 
 - (void) dcVBsChanged:(NSNotification*)aNote
 {

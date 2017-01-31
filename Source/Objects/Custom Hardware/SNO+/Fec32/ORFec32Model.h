@@ -416,6 +416,7 @@ extern NSString* ORFec32ModelCmosReadDisabledMaskChanged;
 extern NSString* ORFec32ModelCmosRateChanged;
 extern NSString* ORFec32ModelBaseCurrentChanged;
 extern NSString* ORFec32ModelVariableDisplayChanged;
+extern NSString* ORFec32ModelEverythingChanged;
 extern NSString* ORFecShowVoltsChanged;
 extern NSString* ORFecCommentsChanged;
 extern NSString* ORFecCmosChanged;

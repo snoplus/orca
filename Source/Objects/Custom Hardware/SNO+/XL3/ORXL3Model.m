@@ -229,39 +229,42 @@ snotDb = _snotDb;
 
     if (!pqCrate || !pqCrate->valid[kCrate_exists]) return; // nothing to do if crate doesn't exist in the current state
 
-    [[self undoManager] disableUndoRegistration];
-
-    if (pqCrate->valid[kCrate_ctcDelay]) {
-        // currently this is always 0, but write this if we ever add it to the GUI
+    @try {
+        [[self undoManager] disableUndoRegistration];
+        
+        if (pqCrate->valid[kCrate_ctcDelay]) {
+            // currently this is always 0, but write this if we ever add it to the GUI
+        }
+        if (pqCrate->valid[kCrate_hvRelayMask1] && pqCrate->valid[kCrate_hvRelayMask2]) {
+            unsigned long long mask = ((unsigned long long)pqCrate->hvRelayMask2 << 32) | pqCrate->hvRelayMask1;
+            [self setRelayMask:mask];
+            [self setRelayStatus:@"status: set"];
+        }
+        if (pqCrate->valid[kCrate_hvAOn]) {
+            // don't set this
+        }
+        if (pqCrate->valid[kCrate_hvBOn]) {
+            // don't set this
+        }
+        if (pqCrate->valid[kCrate_hvDacA]) {
+            // don't set this [self setHvAVoltageDACSetValue:pqCrate->hvDacA];
+        }
+        if (pqCrate->valid[kCrate_hvDacB]) {
+            // don't set this [self setHvBVoltageDACSetValue:pqCrate->hvDacB];
+        }
+        if (pqCrate->valid[kCrate_xl3ReadoutMask]) {
+            [self setSlotMask:pqCrate->xl3ReadoutMask]; // note that this affects all GUI slot operations, not only readout
+        }
+        if (pqCrate->valid[kCrate_xl3Mode]) {
+            [self setXl3Mode:pqCrate->xl3Mode];
+        }
+        // (voltage alarm thresholds aren't currently used)
+        // (don't change HV setpoints)
+        // (pedestal mask is set in the FEC32)
     }
-    if (pqCrate->valid[kCrate_hvRelayMask1] && pqCrate->valid[kCrate_hvRelayMask2]) {
-        unsigned long long mask = ((unsigned long long)pqCrate->hvRelayMask2 << 32) | pqCrate->hvRelayMask1;
-        [self setRelayMask:mask];
-        [self setRelayStatus:@"status: set"];
+    @finally {
+        [[self undoManager] enableUndoRegistration];
     }
-    if (pqCrate->valid[kCrate_hvAOn]) {
-        // don't set this
-    }
-    if (pqCrate->valid[kCrate_hvBOn]) {
-        // don't set this
-    }
-    if (pqCrate->valid[kCrate_hvDacA]) {
-        // don't set this [self setHvAVoltageDACSetValue:pqCrate->hvDacA];
-    }
-    if (pqCrate->valid[kCrate_hvDacB]) {
-        // don't set this [self setHvBVoltageDACSetValue:pqCrate->hvDacB];
-    }
-    if (pqCrate->valid[kCrate_xl3ReadoutMask]) {
-        [self setSlotMask:pqCrate->xl3ReadoutMask]; // note that this affects all GUI slot operations, not only readout
-    }
-    if (pqCrate->valid[kCrate_xl3Mode]) {
-        [self setXl3Mode:pqCrate->xl3Mode];
-    }
-    //TO_DO settings that aren't found in the XL3 database:
-    // pedestal mask
-    // voltage thresholds
-    // what about HV setpoints?
-    [[self undoManager] enableUndoRegistration];
 }
 
 - (int) initAtRunStart
@@ -418,9 +421,7 @@ snotDb = _snotDb;
     [[[self undoManager] prepareWithInvocationTarget:self] setSlot:[self slot]];
     [self setTag:aSlot];
     
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORSNOCardSlotChanged
-	 object: self];
+    [self postNotificationName:ORSNOCardSlotChanged];
 }
 
 - (short) getNumberRegisters

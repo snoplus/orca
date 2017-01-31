@@ -380,89 +380,96 @@ resetFifoOnStart = _resetFifoOnStart;
 
     int countInvalid = 0;
 
-    [[self undoManager] disableUndoRegistration];
+    @try {
+        [[self undoManager] disableUndoRegistration];
 
-    if (pqMTC->valid[kMTC_controlReg]) {
-        // TO_DO currently only updating pedestal enabled flag -- what about pulser enable bit (0x02)?
-        [self setIsPedestalEnabledInCSR:(pqMTC->controlReg & 0x01)];
-    } else ++countInvalid;
-
-    //TO_DO verify that order of MTCA DACs is correct
-    for (int i=0; i<10; ++i) {
-        if (pqMTC->valid[kMTC_mtcaDacs] & (1 << i)) {
-            uint32_t val = pqMTC->mtcaDacs[i];
-            [self setDbLong:val forIndex:mtcDacIndexFromDetectorDB[i]];
+        if (pqMTC->valid[kMTC_controlReg]) {
+            // TO_DO currently only updating pedestal enabled flag -- what about pulser enable bit (0x02)?
+            [self setIsPedestalEnabledInCSR:(pqMTC->controlReg & 0x01)];
         } else ++countInvalid;
-    }
 
-    if (pqMTC->valid[kMTC_pedWidth]) {
-        [self setDbLong:pqMTC->pedWidth forIndex:kPedestalWidth];
-    } else ++countInvalid;
+        //TO_DO verify that order of MTCA DACs is correct
+        for (int i=0; i<10; ++i) {
+            if (pqMTC->valid[kMTC_mtcaDacs] & (1 << i)) {
+                uint32_t val = pqMTC->mtcaDacs[i];
+                [self setDbLong:val forIndex:mtcDacIndexFromDetectorDB[i]];
+            } else ++countInvalid;
+        }
 
-
-    if (pqMTC->valid[kMTC_coarseDelay]) {
-        [self setDbLong:pqMTC->coarseDelay forIndex:kCoarseDelay];
-    } else ++countInvalid;
-
-    if (pqMTC->valid[kMTC_fineDelay]) {
-        [self setDbLong:pqMTC->fineDelay/100 forIndex:kFineDelay];
-    } else ++countInvalid;
-
-    if (pqMTC->valid[kMTC_pedMask]) {
-        [self setDbLong:pqMTC->pedMask forIndex:kPEDCrateMask];
-    } else ++countInvalid;
-
-    if (pqMTC->valid[kMTC_prescale]) {
-        [self setDbLong:pqMTC->prescale forIndex:kNhit100LoPrescale];
-    } else ++countInvalid;
-
-    if (pqMTC->valid[kMTC_lockoutWidth]) {
-        [self setDbLong:pqMTC->lockoutWidth forIndex:kLockOutWidth];
-    } else ++countInvalid;
-
-    if (pqMTC->valid[kMTC_gtMask]) {
-        [self setDbLong:pqMTC->gtMask forIndex:kGtMask];
-    } else ++countInvalid;
-
-    if (pqMTC->valid[kMTC_gtCrateMask]) {
-        [self setDbLong:pqMTC->gtCrateMask forIndex:kGtCrateMask];
-    } else ++countInvalid;
-
-    //TO_DO verify that order of relays is correct
-    for (int i=0; i<kNumMtcRelays; ++i) {
-        if (pqMTC->valid[kMTC_mtcaRelays] & (1 << i)) {
-            uint32_t val = pqMTC->mtcaRelays[i];
-            switch (i) {
-                case 0:
-                    [self setMtcaN100Mask:val];
-                    break;
-                case 1:
-                    [self setMtcaN20Mask:val];
-                    break;
-                case 2:
-                    [self setMtcaELOMask:val];
-                    break;
-                case 3:
-                    [self setMtcaEHIMask:val];
-                    break;
-                case 4:
-                    [self setMtcaOELOMask:val];
-                    break;
-                case 5:
-                    [self setMtcaOEHIMask:val];
-                    break;
-                case 6:
-                    [self setMtcaOWLNMask:val];
-                    break;
-            }
+        if (pqMTC->valid[kMTC_pedWidth]) {
+            [self setDbLong:pqMTC->pedWidth forIndex:kPedestalWidth];
         } else ++countInvalid;
-    }
-    //TO_DO not found in detector MTC database to set in GUI:
-    // kPulserPeriod
-    // kFineSlope
-    // kMinDelayOffset
-    [[self undoManager] enableUndoRegistration];
 
+
+        if (pqMTC->valid[kMTC_coarseDelay]) {
+            [self setDbLong:pqMTC->coarseDelay forIndex:kCoarseDelay];
+        } else ++countInvalid;
+
+        if (pqMTC->valid[kMTC_fineDelay]) {
+            [self setDbLong:pqMTC->fineDelay/100 forIndex:kFineDelay];
+        } else ++countInvalid;
+
+        if (pqMTC->valid[kMTC_pedMask]) {
+            [self setDbLong:pqMTC->pedMask forIndex:kPEDCrateMask];
+        } else ++countInvalid;
+
+        if (pqMTC->valid[kMTC_prescale]) {
+            [self setDbLong:pqMTC->prescale forIndex:kNhit100LoPrescale];
+        } else ++countInvalid;
+
+        if (pqMTC->valid[kMTC_lockoutWidth]) {
+            [self setDbLong:pqMTC->lockoutWidth forIndex:kLockOutWidth];
+        } else ++countInvalid;
+
+        if (pqMTC->valid[kMTC_gtMask]) {
+            [self setDbLong:pqMTC->gtMask forIndex:kGtMask];
+        } else ++countInvalid;
+
+        if (pqMTC->valid[kMTC_gtCrateMask]) {
+            [self setDbLong:pqMTC->gtCrateMask forIndex:kGtCrateMask];
+        } else ++countInvalid;
+
+        //TO_DO verify that order of relays is correct
+        for (int i=0; i<kNumMtcRelays; ++i) {
+            if (pqMTC->valid[kMTC_mtcaRelays] & (1 << i)) {
+                uint32_t val = pqMTC->mtcaRelays[i];
+                switch (i) {
+                    case 0:
+                        [self setMtcaN100Mask:val];
+                        break;
+                    case 1:
+                        [self setMtcaN20Mask:val];
+                        break;
+                    case 2:
+                        [self setMtcaELOMask:val];
+                        break;
+                    case 3:
+                        [self setMtcaEHIMask:val];
+                        break;
+                    case 4:
+                        [self setMtcaOELOMask:val];
+                        break;
+                    case 5:
+                        [self setMtcaOEHIMask:val];
+                        break;
+                    case 6:
+                        [self setMtcaOWLNMask:val];
+                        break;
+                }
+            } else ++countInvalid;
+        }
+
+        if (pqMTC->valid[kMTC_pulserRate] && pqMTC->pulserRate) { // (don't set if rate is 0)
+            [self setDbLong:pqMTC->pulserRate forIndex:kPulserPeriod];
+        } else ++countInvalid;
+
+        // set find slope and min delay offset to constant values (aren't used anyway)
+        [self setDbFloat:0.1 forIndex:kFineSlope];
+        [self setDbFloat:18.35 forIndex:kMinDelayOffset];
+    }
+    @finally {
+        [[self undoManager] enableUndoRegistration];
+    }
     if (countInvalid) {
         NSLogColor([NSColor redColor], @"%d MTC settings not loaded!\n", countInvalid);
     }

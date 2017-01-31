@@ -234,48 +234,52 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 
     if (!pqCAEN) return; // nothing to do if CAEN doesn't exist in the current state
 
-    [[self undoManager] disableUndoRegistration];
+    @try{
+        [[self undoManager] disableUndoRegistration];
 
-    if (pqCAEN->valid[kCAEN_channelConfiguration]) {
-        [self setChannelConfigMask:pqCAEN->channelConfiguration];
-    }
-    if (pqCAEN->valid[kCAEN_bufferOrganization]) {
-        [self setEventSize:pqCAEN->bufferOrganization];
-    }
-    if (pqCAEN->valid[kCAEN_customSize]) {
-        [self setCustomSize:pqCAEN->customSize];
-        [self setIsCustomSize:(pqCAEN->customSize ? YES : NO)];
-        //TO_DO what about setIsFixedSize?
-    }
-    if (pqCAEN->valid[kCAEN_acquisitionControl]) {
-        [self setAcquisitionMode:pqCAEN->acquisitionControl & 0x03];
-        [self setCountAllTriggers:(pqCAEN->acquisitionControl >> 3) & 0x01];
-    }
-    if (pqCAEN->valid[kCAEN_triggerMask]) {
-        [self setTriggerSourceMask:pqCAEN->triggerMask];
-        //TO_DO is it the source in the DB? <-- also contains coincidencelevel bits!
-    }
-    if (pqCAEN->valid[kCAEN_triggerOutMask]) {
-        [self setTriggerOutMask:pqCAEN->triggerOutMask];
-    }
-    if (pqCAEN->valid[kCAEN_postTrigger]) {
-        [self setPostTriggerSetting:pqCAEN->postTrigger];
-    }
-    if (pqCAEN->valid[kCAEN_frontPanelIoControl]) {
-        [self setFrontPanelControlMask:pqCAEN->frontPanelIoControl];
-    }
-    if (pqCAEN->valid[kCAEN_channelMask]) {
-        [self setEnabledMask:pqCAEN->channelMask];
-    }
-    for (int i=0; i<kNumCaenChannelDacs; ++i) {
-        if (pqCAEN->valid[kCAEN_channelDacs] & (1 << i)) {
-            [self setDac:i withValue:pqCAEN->channelDacs[i]];
-            //TO_DO what about setThreshold and setOverUnderThreshold?
+        if (pqCAEN->valid[kCAEN_channelConfiguration]) {
+            [self setChannelConfigMask:pqCAEN->channelConfiguration];
         }
+        if (pqCAEN->valid[kCAEN_bufferOrganization]) {
+            [self setEventSize:pqCAEN->bufferOrganization];
+        }
+        if (pqCAEN->valid[kCAEN_customSize]) {
+            [self setCustomSize:pqCAEN->customSize];
+            [self setIsCustomSize:(pqCAEN->customSize ? YES : NO)];
+            // (setIsFixedSize is not used)
+        }
+        if (pqCAEN->valid[kCAEN_acquisitionControl]) {
+            [self setAcquisitionMode:pqCAEN->acquisitionControl & 0x03];
+            [self setCountAllTriggers:(pqCAEN->acquisitionControl >> 3) & 0x01];
+        }
+        if (pqCAEN->valid[kCAEN_triggerMask]) {
+            [self setTriggerSourceMask:(pqCAEN->triggerMask & 0xffffffff)]; // for bits 0-7 and 30-31
+            [self setCoincidenceLevel:((pqCAEN->triggerMask >> 24) & 0x7)]; // for bits 24-26
+        }
+        if (pqCAEN->valid[kCAEN_triggerOutMask]) {
+            [self setTriggerOutMask:pqCAEN->triggerOutMask];
+        }
+        if (pqCAEN->valid[kCAEN_postTrigger]) {
+            [self setPostTriggerSetting:pqCAEN->postTrigger];
+        }
+        if (pqCAEN->valid[kCAEN_frontPanelIoControl]) {
+            [self setFrontPanelControlMask:pqCAEN->frontPanelIoControl];
+        }
+        if (pqCAEN->valid[kCAEN_channelMask]) {
+            [self setEnabledMask:pqCAEN->channelMask];
+        }
+        for (int i=0; i<kNumCaenChannelDacs; ++i) {
+            if (pqCAEN->valid[kCAEN_channelDacs] & (1 << i)) {
+                [self setDac:i withValue:pqCAEN->channelDacs[i]];
+                // (we don't currently use the thresholds because we use an external trigger,
+                //  so don't yet call setThreshold and setOverUnderThreshold)
+            }
+        }
+        // setNumberBLTEventsToReadout (not used)
     }
-    //TO_DO what about?: , setCoincidenceLevel,
-    // setNumberBLTEventsToReadout (not used)
-    [[self undoManager] enableUndoRegistration];
+    @finally {
+        [[self undoManager] enableUndoRegistration];
+    }
 }
 
 #pragma mark ***Accessors

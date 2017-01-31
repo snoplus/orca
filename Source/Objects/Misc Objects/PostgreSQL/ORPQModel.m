@@ -526,7 +526,13 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
     // column:    0     1    2       3
     char *cols = "crate,card,channel,pmthv";
     command = [[NSString stringWithFormat: @"SELECT %s FROM pmtdb",cols] retain];
-    ORPQResult *theResult = [pqConnection queryString:command];
+    ORPQResult *theResult;
+    @try {
+        theResult = [pqConnection queryString:command];
+    }
+    @catch (NSException* e) {
+        theResult = nil;
+    }
     if ([self isCancelled]) return nil;
     ORPQDetectorDB *detDB = [[[ORPQDetectorDB alloc] init] autorelease];
     if (theResult) {
@@ -534,7 +540,7 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
         int numCols = [theResult numOfFields];
         if (numCols != 4) {
             NSLog(@"Expected %d columns from PMT HV database, but got %d\n", 4, numCols);
-            return nil;
+            numRows = 0;
         }
         detDB->pmthvLoaded = numRows;
         for (int i=0; i<numRows; ++i) {
@@ -559,14 +565,19 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
     //      0     1    2          3           4         5          6          7      8      9              10    11   12            13           14          15        16        17        18         19           20          21          22   23
     cols = "crate,slot,tr100_mask,tr100_delay,tr20_mask,tr20_width,tr20_delay,vbal_0,vbal_1,tcmos_tacshift,scmos,vthr,pedestal_mask,disable_mask,tdisc_rmpup,tdisc_rmp,tdisc_vsi,tdisc_vli,tcmos_vmax,tcmos_tacref,tcmos_isetm,tcmos_iseta,vint,hvref";
     command = [[NSString stringWithFormat: @"SELECT %s FROM current_detector_state",cols] retain];
-    theResult = [pqConnection queryString:command];
+    @try {
+        theResult = [pqConnection queryString:command];
+    }
+    @catch (NSException* e) {
+        theResult = nil;
+    }
     if ([self isCancelled]) return nil;
     if (theResult) {
         int numRows = [theResult numOfRows];
         int numCols = [theResult numOfFields];
         if (numCols != kFEC_numDbColumns) {
             NSLog(@"Expected %d columns from detector database, but got %d\n", kFEC_numDbColumns, numCols);
-            return nil;
+            numRows = 0;
         }
         detDB->fecLoaded = numRows;
         for (int i=0; i<numRows; ++i) {
@@ -683,14 +694,19 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
     [command autorelease];
     cols = "crate,ctc_delay,hv_relay_mask1,hv_relay_mask2,hv_a_on,hv_b_on,hv_dac_a,hv_dac_b,xl3_readout_mask,xl3_mode";
     command = [[NSString stringWithFormat: @"SELECT %s FROM current_crate_state",cols] retain];
-    theResult = [pqConnection queryString:command];
+    @try {
+        theResult = [pqConnection queryString:command];
+    }
+    @catch (NSException* e) {
+        theResult = nil;
+    }
     if ([self isCancelled]) return nil;
     if (theResult) {
         int numRows = [theResult numOfRows];
         int numCols = [theResult numOfFields];
         if (numCols != kCrate_numDbColumns) {
             NSLog(@"Expected %d columns from crate database, but got %d\n", kCrate_numDbColumns, numCols);
-            return nil;
+            numRows = 0;
         }
         detDB->crateLoaded = numRows;
         for (int i=0; i<numRows; ++i) {
@@ -745,18 +761,21 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
 // load MTC database
 //
     [command autorelease];
-    cols = "control_register,mtca_dacs,pedestal_width,coarse_delay,fine_delay,pedestal_mask,prescale,lockout_width,gt_mask,gt_crate_mask,mtca_relays";
-    command = [[NSString stringWithFormat: @"select %s from mtc where key = (select mtc from run_state where run = 0)",cols] retain];
-    theResult = [pqConnection queryString:command];
+    cols = "control_register,mtca_dacs,pedestal_width,coarse_delay,fine_delay,pedestal_mask,prescale,lockout_width,gt_mask,gt_crate_mask,mtca_relays,pulser_rate";
+    command = [[NSString stringWithFormat: @"SELECT %s FROM mtc WHERE key = (SELECT mtc FROM run_state WHERE run = 0)",cols] retain];
+    @try {
+        theResult = [pqConnection queryString:command];
+    }
+    @catch (NSException* e) {
+        theResult = nil;
+    }
     if ([self isCancelled]) return nil;
     if (theResult) {
         int numRows = [theResult numOfRows];
         int numCols = [theResult numOfFields];
         if (numCols != kMTC_numDbColumns) {
             NSLog(@"Expected %d columns from MTC database, but got %d\n", kMTC_numDbColumns, numCols);
-            return nil;
-        }
-        if (numRows) {
+        } else if (numRows) {
             detDB->mtcLoaded = 1;
             PQ_MTC *pqMTC = [detDB getMTC];
             for (int col=0; col<kMTC_numDbColumns; ++col) {
@@ -812,6 +831,9 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                         case kMTC_mtcaRelays:
                             pqMTC->mtcaRelays[j] = val;
                             break;
+                        case kMTC_pulserRate:
+                            pqMTC->pulserRate = val;
+                            break;
                     }
                 }
             }
@@ -822,17 +844,20 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
 //
     [command autorelease];
     cols = "channel_configuration,buffer_organization,custom_size,acquisition_control,trigger_mask,trigger_out_mask,post_trigger,front_panel_io_control,channel_mask,channel_dacs";
-    command = [[NSString stringWithFormat: @"select %s from caen where key = (select caen from run_state where run = 0)",cols] retain];
-    theResult = [pqConnection queryString:command];
+    command = [[NSString stringWithFormat: @"SELECT %s FROM caen WHERE key = (SELECT caen FROM run_state WHERE run = 0)",cols] retain];
+    @try {
+        theResult = [pqConnection queryString:command];
+    }
+    @catch (NSException* e) {
+        theResult = nil;
+    }
     if ([self isCancelled]) return nil;
     if (theResult) {
         int numRows = [theResult numOfRows];
         int numCols = [theResult numOfFields];
         if (numCols != kCAEN_numDbColumns) {
             NSLog(@"Expected %d columns from CAEN database, but got %d\n", kCAEN_numDbColumns, numCols);
-            return nil;
-        }
-        if (numRows) {
+        } else if (numRows) {
             detDB->caenLoaded = 1;
             PQ_CAEN *pqCAEN = [detDB getCAEN];
             for (int col=0; col<kCAEN_numDbColumns; ++col) {
@@ -892,8 +917,7 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
     if (detDB->pmthvLoaded || detDB->fecLoaded || detDB->crateLoaded ||
         detDB->mtcLoaded || detDB->caenLoaded)
     {
-        NSLog(@"Loaded %@ DB: PMTHV(%d), FEC(%d), Crate(%d), MTC(%d), CAEN(%d)\n",
-              [delegate dataBaseName],
+        NSLog(@"Loaded %@ DB: PMTHV(%d), FEC(%d), Crate(%d), MTC(%d), CAEN(%d)\n", [delegate dataBaseName],
               detDB->pmthvLoaded, detDB->fecLoaded, detDB->crateLoaded, detDB->mtcLoaded, detDB->caenLoaded);
         if (countBadNhit100Enabled || countBadNhit20Enabled) {
             NSLogColor([NSColor redColor], @"Warning!  Some bad channels have triggers enabled:\n");
@@ -907,7 +931,7 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
         return detDB;
     } else {
         [detDB release];
-        NSLogColor([NSColor redColor], @"Error loading %@ DB!\n");
+        NSLogColor([NSColor redColor], @"Error loading %@ DB!\n", [delegate dataBaseName]);
         return nil;
     }
 }

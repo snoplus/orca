@@ -103,6 +103,7 @@ enum {
     kMTC_gtMask,
     kMTC_gtCrateMask,
     kMTC_mtcaRelays,
+    kMTC_pulserRate,
     kMTC_numDbColumns,
 };
 
@@ -139,6 +140,7 @@ typedef struct {
     uint32_t    gtMask;
     uint32_t    gtCrateMask;
     uint32_t    mtcaRelays[kNumMtcRelays];
+    uint32_t    pulserRate;
     uint32_t    valid[kMTC_numDbColumns];
 } PQ_MTC;
 

@@ -159,12 +159,16 @@
                      selector : @selector(commentsChanged:)
                          name : ORDCModelCommentsChanged
 						object: model];
-	
+
+    [notifyCenter addObserver : self
+                     selector : @selector(everythingChanged:)
+                         name : ORDCModelEverythingChanged
+                        object: model];
+
     [notifyCenter addObserver : self
                      selector : @selector(boardIdChanged:)
                          name : ORSNOCardBoardIDChanged
-						object: model];
-	
+                        object: model];
 }
 
 #pragma mark •••Interface Management
@@ -192,6 +196,13 @@
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
     [gSecurity setLock:ORDBLock to:secure];
     [lockButton setEnabled:secure];
+}
+
+- (void) everythingChanged:(NSNotification*)aNote
+{
+    if (model == [aNote object]) {
+        [self updateWindow];
+    }
 }
 
 - (void) lockChanged:(NSNotification*)aNotification

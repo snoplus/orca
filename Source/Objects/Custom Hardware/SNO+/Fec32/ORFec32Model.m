@@ -44,6 +44,7 @@
 #define UPPER_CHANNELS	1
 
 
+NSString* ORFec32ModelEverythingChanged             = @"ORFec32ModelEverythingChanged";
 NSString* ORFec32ModelCmosRateChanged				= @"ORFec32ModelCmosRateChanged";
 NSString* ORFec32ModelBaseCurrentChanged			= @"ORFec32ModelBaseCurrentChanged";
 NSString* ORFec32ModelVariableDisplayChanged		= @"ORFec32ModelVariableDisplayChanged";
@@ -161,7 +162,7 @@ static int              sChannelsNotChangedCount = 0;
 {
     cmosRate[index] = aCmosRate;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelCmosRateChanged object:self];
+    [self postNotificationName:ORFec32ModelCmosRateChanged];
 }
 
 - (float) baseCurrent:(short)index
@@ -173,7 +174,7 @@ static int              sChannelsNotChangedCount = 0;
 {
     baseCurrent[index] = aBaseCurrent;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelBaseCurrentChanged object:self];
+    [self postNotificationName:ORFec32ModelBaseCurrentChanged];
 }
 
 - (int) variableDisplay
@@ -187,7 +188,7 @@ static int              sChannelsNotChangedCount = 0;
     
     variableDisplay = aVariableDisplay;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelVariableDisplayChanged object:self];
+    [self postNotificationName:ORFec32ModelVariableDisplayChanged];
 }
 
 - (float) adcVoltage:(int)index
@@ -262,7 +263,7 @@ static int              sChannelsNotChangedCount = 0;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setQllEnabled:qllEnabled];
 	qllEnabled = state;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORFecQllEnabledChanged object:self];
+	[self postNotificationName:ORFecQllEnabledChanged];
 }
 
 - (BOOL) pmtOnline:(unsigned short)index
@@ -281,7 +282,7 @@ static int              sChannelsNotChangedCount = 0;
     [[[self undoManager] prepareWithInvocationTarget:self] setPedEnabledMask:pedEnabledMask];
     //NSLog(@"FEC (%d,%d), mask 0x%08x\n", [self crateNumber], [self stationNumber], aMask);
     pedEnabledMask = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecPedEnabledMaskChanged object:self];
+    [self postNotificationName:ORFecPedEnabledMaskChanged];
 }
 
 - (void) setPed:(short)chan enabled:(short)state
@@ -304,7 +305,7 @@ static int              sChannelsNotChangedCount = 0;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setSeqDisabledMask:seqDisabledMask];
     seqDisabledMask = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecSeqDisabledMaskChanged object:self];
+    [self postNotificationName:ORFecSeqDisabledMaskChanged];
 }
 
 - (BOOL) seqEnabled:(short)chan
@@ -334,7 +335,7 @@ static int              sChannelsNotChangedCount = 0;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setSeqPendingDisabledMask:seqPendingDisabledMask];
     seqPendingDisabledMask = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecSeqDisabledMaskChanged object:self];
+    [self postNotificationName:ORFecSeqDisabledMaskChanged];
 }
 
 - (BOOL) seqPendingEnabled:(short)chan
@@ -372,7 +373,7 @@ static int              sChannelsNotChangedCount = 0;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setTrigger20nsDisabledMask:trigger20nsDisabledMask];
     trigger20nsDisabledMask = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecTrigger20nsDisabledMaskChanged object:self];
+    [self postNotificationName:ORFecTrigger20nsDisabledMaskChanged];
 }
 
 - (BOOL) trigger20nsDisabled:(short)chan
@@ -410,7 +411,7 @@ static int              sChannelsNotChangedCount = 0;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setTrigger20nsPendingDisabledMask:trigger20nsPendingDisabledMask];
     trigger20nsPendingDisabledMask = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecTrigger20nsDisabledMaskChanged object:self];
+    [self postNotificationName:ORFecTrigger20nsDisabledMaskChanged];
 }
 
 - (BOOL) trigger20nsPendingEnabled:(short)chan
@@ -448,7 +449,7 @@ static int              sChannelsNotChangedCount = 0;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setTrigger100nsDisabledMask:trigger100nsDisabledMask];
     trigger100nsDisabledMask = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecTrigger100nsDisabledMaskChanged object:self];
+    [self postNotificationName:ORFecTrigger100nsDisabledMaskChanged];
 }
 
 - (BOOL) trigger100nsDisabled:(short)chan
@@ -486,7 +487,7 @@ static int              sChannelsNotChangedCount = 0;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setTrigger100nsPendingDisabledMask:trigger100nsPendingDisabledMask];
     trigger100nsPendingDisabledMask = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecTrigger100nsDisabledMaskChanged object:self];
+    [self postNotificationName:ORFecTrigger100nsDisabledMaskChanged];
 }
 - (BOOL) trigger100nsPendingDisabled:(short)chan
 {
@@ -521,7 +522,7 @@ static int              sChannelsNotChangedCount = 0;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setCmosReadDisabledMask:cmosReadDisabledMask];
     cmosReadDisabledMask = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecCmosReadDisabledMaskChanged object:self];
+    [self postNotificationName:ORFecCmosReadDisabledMaskChanged];
 }
 
 - (BOOL) cmosReadDisabled:(short)chan
@@ -559,7 +560,7 @@ static int              sChannelsNotChangedCount = 0;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setCmosReadPendingDisabledMask:cmosReadPendingDisabledMask];
     cmosReadPendingDisabledMask = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecCmosReadDisabledMaskChanged object:self];
+    [self postNotificationName:ORFecCmosReadDisabledMaskChanged];
 }
 - (BOOL) cmosReadPendingDisabled:(short)chan
 {
@@ -704,7 +705,7 @@ static int              sChannelsNotChangedCount = 0;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setOnlineMask:onlineMask];
     onlineMask = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecOnlineMaskChanged object:self];
+    [self postNotificationName:ORFecOnlineMaskChanged];
     cardChangedFlag = true;
 }
 - (BOOL) getOnline:(short)chan
@@ -808,7 +809,7 @@ static int              sChannelsNotChangedCount = 0;
     
     showVolts = aShowVolts;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecShowVoltsChanged object:self];
+    [self postNotificationName:ORFecShowVoltsChanged];
 }
 
 - (NSString*) comments
@@ -824,7 +825,7 @@ static int              sChannelsNotChangedCount = 0;
     [comments autorelease];
     comments = [aComments copy];    
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecCommentsChanged object:self];
+    [self postNotificationName:ORFecCommentsChanged];
 }
 
 - (void) setUpImage
@@ -845,7 +846,7 @@ static int              sChannelsNotChangedCount = 0;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setCmos:anIndex withValue:cmos[anIndex]];
 	cmos[anIndex] = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecCmosChanged object:self];
+    [self postNotificationName:ORFecCmosChanged];
 }
 
 - (float) vRes
@@ -857,7 +858,7 @@ static int              sChannelsNotChangedCount = 0;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setVRes:vRes];
 	vRes = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecVResChanged object:self];
+    [self postNotificationName:ORFecVResChanged];
 }
 
 - (float) hVRef
@@ -869,7 +870,7 @@ static int              sChannelsNotChangedCount = 0;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setHVRef:hVRef];
 	hVRef = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecHVRefChanged object:self];
+    [self postNotificationName:ORFecHVRefChanged];
 }
 
 #pragma mark •••Converted Data Methods
@@ -1649,7 +1650,7 @@ static int              sChannelsNotChangedCount = 0;
             cmosRate[ch] = kCMOSRateUnmeasured;
         }
     }
-    //[[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelCmosRateChanged object:self];
+    //[self postNotificationName:ORFec32ModelCmosRateChanged];
     return calcRates;
 }
 
@@ -1713,103 +1714,121 @@ static int              sChannelsNotChangedCount = 0;
 
     if (!fec || !fec->valid[kFEC_exists]) return;  // nothing to do if fec doesn't exist in the current detector state
 
-    [[self undoManager] disableUndoRegistration];
+    @try {
+        // PH - The disableNotifications hack stops ORCA from throwing around notifications like feces
+        // in a chimpanzee exhibit (ref https://davidnix.io/post/stop-using-nsnotificationcenter/ ).
+        // Without this, each GUI element in the daughtercard window would get set more than 1000 times!
+        // Instead we send EverythingChanged notifications at the bottom, and use a bit of sense before
+        // acting on these messages in the controller objects.
+        [ORSNOCard disableNotifications];
 
-    if ((valid = fec->valid[kFEC_seqDisabled]) != 0) {
-        [self setSeqDisabledMask: (fec->seqDisabled & valid) | ((uint32_t)seqDisabledMask & ~valid)];
-        startSeqDisabledMask = seqDisabledMask;
-    }
-    if ((valid = fec->valid[kFEC_pedEnabled]) != 0) {
-        [self setPedEnabledMask: (fec->pedEnabled & valid) | ((uint32_t)pedEnabledMask & ~valid)];
-        startPedEnabledMask = pedEnabledMask;
-    }
-    if ((valid = fec->valid[kFEC_nhit100enabled]) != 0) {
-        [self setTrigger100nsDisabledMask: (~fec->nhit100enabled & valid) | ((uint32_t)trigger100nsDisabledMask & ~valid)];
-        startTrigger100nsDisabledMask = trigger100nsDisabledMask;
-    }
-    if ((valid = fec->valid[kFEC_nhit20enabled]) != 0) {
-        [self setTrigger20nsDisabledMask: (~fec->nhit20enabled & valid) | ((uint32_t)trigger20nsDisabledMask & ~valid)];
-        startTrigger20nsDisabledMask = trigger20nsDisabledMask;
-    }
-    for (int ch=0; ch<32; ++ch) {
-        uint32_t chMask = (1 << ch);
-        if (fec->valid[kFEC_vthr] & chMask) {
-            [self setVth:ch withValue:fec->vthr[ch]];
+        [[self undoManager] disableUndoRegistration];
+
+        if ((valid = fec->valid[kFEC_seqDisabled]) != 0) {
+            [self setSeqDisabledMask: (fec->seqDisabled & valid) | ((uint32_t)seqDisabledMask & ~valid)];
+            startSeqDisabledMask = seqDisabledMask;
         }
-        short dcNum = ch / 8;
-        if (dcPresent[dcNum]) {
-            ORFecDaughterCardModel *theDc = dc[dcNum];
-            short dcChan = ch - dcNum * 8;
-            if (fec->valid[kFEC_nhit100delay] & chMask) {
-                // (there is some inconsistency between ORFecDaughterCardModel and ORXL3Model
-                // as to whether this is a width or delay, but they are both the same setting)
-                [theDc setNs100width:dcChan withValue:fec->nhit100delay[ch]];
-            }
-            if (fec->valid[kFEC_nhit20width] & chMask) {
-                [theDc setNs20width:dcChan withValue:fec->nhit20width[ch]];
-            }
-            if (fec->valid[kFEC_nhit20delay] & chMask) {
-                [theDc setNs20delay:dcChan withValue:fec->nhit20delay[ch]];
-            }
-            if (fec->valid[kFEC_vbal0] & chMask) {
-                [theDc setVb:dcChan withValue:fec->vbal0[ch]];
-            }
-            if (fec->valid[kFEC_vbal1] & chMask) {
-                [theDc setVb:(dcChan+8) withValue:fec->vbal1[ch]];
-            }
-            if (fec->valid[kFEC_tac0trim] & chMask) {
-                [theDc setTac0trim:dcChan withValue:fec->tac0trim[ch]];
-            }
-            if (fec->valid[kFEC_tac1trim] & chMask) {
-                [theDc setTac1trim:dcChan withValue:fec->tac1trim[ch]];
-            }
+        if ((valid = fec->valid[kFEC_pedEnabled]) != 0) {
+            [self setPedEnabledMask: (fec->pedEnabled & valid) | ((uint32_t)pedEnabledMask & ~valid)];
+            startPedEnabledMask = pedEnabledMask;
         }
-    }
-    for (int i=0; i<8; ++i) {
-        uint32_t msk = (1 << i);
-        short dcNum = i / 2;
-        if (dcPresent[dcNum]) {
-            short j = i - dcNum * 2;
-            ORFecDaughterCardModel *theDc = dc[dcNum];
-            if (fec->valid[kFEC_tdiscRp1] & msk) {
-                [theDc setRp1:j withValue:fec->tdiscRp1[i]];
+        if ((valid = fec->valid[kFEC_nhit100enabled]) != 0) {
+            [self setTrigger100nsDisabledMask: (~fec->nhit100enabled & valid) | ((uint32_t)trigger100nsDisabledMask & ~valid)];
+            startTrigger100nsDisabledMask = trigger100nsDisabledMask;
+        }
+        if ((valid = fec->valid[kFEC_nhit20enabled]) != 0) {
+            [self setTrigger20nsDisabledMask: (~fec->nhit20enabled & valid) | ((uint32_t)trigger20nsDisabledMask & ~valid)];
+            startTrigger20nsDisabledMask = trigger20nsDisabledMask;
+        }
+        for (int ch=0; ch<32; ++ch) {
+            uint32_t chMask = (1 << ch);
+            if (fec->valid[kFEC_vthr] & chMask) {
+                [self setVth:ch withValue:fec->vthr[ch]];
             }
-            if (fec->valid[kFEC_tdiscRp2] & msk) {
-                [theDc setRp2:j withValue:fec->tdiscRp2[i]];
-            }
-            if (fec->valid[kFEC_tdiscVsi] & msk) {
-                [theDc setVsi:j withValue:fec->tdiscVsi[i]];
-            }
-            if (fec->valid[kFEC_tdiscVli] & msk) {
-                [theDc setVli:j withValue:fec->tdiscVli[i]];
+            short dcNum = ch / 8;
+            if (dcPresent[dcNum]) {
+                ORFecDaughterCardModel *theDc = dc[dcNum];
+                short dcChan = ch - dcNum * 8;
+                if (fec->valid[kFEC_nhit100delay] & chMask) {
+                    // (there is some inconsistency between ORFecDaughterCardModel and ORXL3Model
+                    // as to whether this is a width or delay, but they are both the same setting)
+                    [theDc setNs100width:dcChan withValue:fec->nhit100delay[ch]];
+                }
+                if (fec->valid[kFEC_nhit20width] & chMask) {
+                    [theDc setNs20width:dcChan withValue:fec->nhit20width[ch]];
+                }
+                if (fec->valid[kFEC_nhit20delay] & chMask) {
+                    [theDc setNs20delay:dcChan withValue:fec->nhit20delay[ch]];
+                }
+                if (fec->valid[kFEC_vbal0] & chMask) {
+                    [theDc setVb:dcChan withValue:fec->vbal0[ch]];
+                }
+                if (fec->valid[kFEC_vbal1] & chMask) {
+                    [theDc setVb:(dcChan+8) withValue:fec->vbal1[ch]];
+                }
+                if (fec->valid[kFEC_tac0trim] & chMask) {
+                    [theDc setTac0trim:dcChan withValue:fec->tac0trim[ch]];
+                }
+                if (fec->valid[kFEC_tac1trim] & chMask) {
+                    [theDc setTac1trim:dcChan withValue:fec->tac1trim[ch]];
+                }
             }
         }
+        for (int i=0; i<8; ++i) {
+            uint32_t msk = (1 << i);
+            short dcNum = i / 2;
+            if (dcPresent[dcNum]) {
+                short j = i - dcNum * 2;
+                ORFecDaughterCardModel *theDc = dc[dcNum];
+                if (fec->valid[kFEC_tdiscRp1] & msk) {
+                    [theDc setRp1:j withValue:fec->tdiscRp1[i]];
+                }
+                if (fec->valid[kFEC_tdiscRp2] & msk) {
+                    [theDc setRp2:j withValue:fec->tdiscRp2[i]];
+                }
+                if (fec->valid[kFEC_tdiscVsi] & msk) {
+                    [theDc setVsi:j withValue:fec->tdiscVsi[i]];
+                }
+                if (fec->valid[kFEC_tdiscVli] & msk) {
+                    [theDc setVli:j withValue:fec->tdiscVli[i]];
+                }
+            }
+        }
+        if (fec->valid[kFEC_tcmosVmax]) {
+            [self setCmos:kVMax withValue:fec->tcmosVmax];
+        }
+        if (fec->valid[kFEC_tcmosTacref]) {
+            [self setCmos:kTACRef withValue:fec->tcmosTacref];
+        }
+        if (fec->valid[kFEC_tcmosIseta] & 0x01) {
+            [self setCmos:kISetA0 withValue:fec->tcmosIseta[0]];
+        }
+        if (fec->valid[kFEC_tcmosIseta] & 0x02) {
+            [self setCmos:kISetA1 withValue:fec->tcmosIseta[1]];
+        }
+        if (fec->valid[kFEC_tcmosIsetm] & 0x01) {
+            [self setCmos:kISetM0 withValue:fec->tcmosIsetm[0]];
+        }
+        if (fec->valid[kFEC_tcmosIsetm] & 0x02) {
+            [self setCmos:kISetM1 withValue:fec->tcmosIsetm[1]];
+        }
+        if (fec->valid[kFEC_vres]) {
+            [self setVRes:fec->vres];
+        }
+        if (fec->valid[kFEC_hvref]) {
+            [self setHVRef:fec->hvref];
+        }
     }
-    if (fec->valid[kFEC_tcmosVmax]) {
-        [self setCmos:kVMax withValue:fec->tcmosVmax];
+    @finally {
+        [ORSNOCard enableNotifications];
+        [self postNotificationName:ORFec32ModelEverythingChanged];
+        for (int i=0; i<4; ++i) {
+            if (dcPresent[i]) {
+                [dc[i] postNotificationName:ORDCModelEverythingChanged];
+            }
+        }
+        [[self undoManager] enableUndoRegistration];
     }
-    if (fec->valid[kFEC_tcmosTacref]) {
-        [self setCmos:kTACRef withValue:fec->tcmosTacref];
-    }
-    if (fec->valid[kFEC_tcmosIseta] & 0x01) {
-        [self setCmos:kISetA0 withValue:fec->tcmosIseta[0]];
-    }
-    if (fec->valid[kFEC_tcmosIseta] & 0x02) {
-        [self setCmos:kISetA1 withValue:fec->tcmosIseta[1]];
-    }
-    if (fec->valid[kFEC_tcmosIsetm] & 0x01) {
-        [self setCmos:kISetM0 withValue:fec->tcmosIsetm[0]];
-    }
-    if (fec->valid[kFEC_tcmosIsetm] & 0x02) {
-        [self setCmos:kISetM1 withValue:fec->tcmosIsetm[1]];
-    }
-    if (fec->valid[kFEC_vres]) {
-        [self setVRes:fec->vres];
-    }
-    if (fec->valid[kFEC_hvref]) {
-        [self setHVRef:fec->hvref];
-    }
-    [[self undoManager] enableUndoRegistration];
 }
 
 - (void) _continueHWWizard:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo

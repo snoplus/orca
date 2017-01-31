@@ -148,6 +148,7 @@
 
 
 #pragma mark •••External String Definitions
+extern NSString* ORDCModelEverythingChanged;
 extern NSString* ORDCModelCommentsChanged;
 extern NSString* ORDCModelShowVoltsChanged;
 extern NSString* ORDCModelSetAllCmosChanged;
