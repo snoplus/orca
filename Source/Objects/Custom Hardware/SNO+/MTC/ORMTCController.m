@@ -1025,7 +1025,13 @@
                 [model setDAC_per_NHIT_OfType:threshold_index toValue:[dac_per_nhit floatValue]];
             }
             [model setBaselineOfType:threshold_index toValue:[baseline intValue]];
+
+            // Hard code the DAC conversion to match the datasheet for the AD7243
+            // http://www.analog.com/media/en/technical-documentation/data-sheets/AD7243.pdf
+            // It's usage on the MTCA can be seen on page 8 of the MTCA+ schematics.
+            // http://snopl.us/detector/schematics/pdf/mtcaplus.pdf
             [model setDAC_per_mV_OfType:threshold_index toValue:-4096/10000.0];
+
             [model setConversionIsValidForThreshold:threshold_index isValid:YES];
         } @catch (NSException* exception) {
             NSLogColor([NSColor redColor], @"Error interpreting trigger scan result. Reason: %@\n",[exception reason]);
