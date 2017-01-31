@@ -987,35 +987,34 @@
 {
     int numRows, numCols;
     int threshold_index;
+    int error_count=0;
     NSString* name =nil;
     NSString* baseline=nil;
     NSString* dac_per_nhit=nil;
-    @try {
-        if (!result) {
-            [NSException raise:@"MTCControllerError" format:@"NULL result returned from database"];
-        }
-        
-        numRows = [result numOfRows];
-        numCols = [result numOfFields];
-        if (numRows <= 0) {
-            [NSException raise:@"MTCControllerError" format:@"No rows returned from database"];
-        }
-        
-        if (numCols != 3) {
-            [NSException raise:@"MTCControllerError" format:@"Unexpected number of columns returned from database. Expected 3 got %i", numCols];
-        }
-    }
-    @catch (NSException *exception) {
-        NSLogColor([NSColor redColor], @"Error interpreting trigger scan results from database. Reason: %@\nAborting\n",[exception reason]);
+
+    if (!result) {
+        NSLog(@"Failed to recieve trigger scan results from database.\n");
         return;
     }
+
+    numRows = [result numOfRows];
+    numCols = [result numOfFields];
+    if (numRows <= 0) {
+        NSLog(@"Empty result returned from database. No trigger scans are available\n");
+        return;
+    }
+    if (numCols != 3) {
+        NSLog(@"Unexpected number of columns returned from database for trigger scan. Expected 3 got %i\n", numCols);
+        return;
+    }
+
     for(int i=0; i< numRows;i++)
     {
         @try{
             NSDictionary* result_dict = [result fetchRowAsType:MCPTypeDictionary row:i];
-            if(!result_dict)
-            {
-                [NSException raise:@"MTCControllerError" format:@"Failed to interpret database row as dictionary"];
+            if(!result_dict) {
+                error_count++;
+                continue;
             }
             name = [result_dict objectForKey:@"name"];
             baseline = [[result_dict objectForKey:@"baseline"] stringValue];
@@ -1036,6 +1035,9 @@
         } @catch (NSException* exception) {
             NSLogColor([NSColor redColor], @"Error interpreting trigger scan result. Reason: %@\n",[exception reason]);
         }
+    }
+    if(error_count > 0) {
+        NSLog(@"An error occurred while try to retrieve %i of the %i rows returned from the database\n",error_count,numRows);
     }
 }
 - (int) trigger_scan_name_to_index:(NSString*) name {
