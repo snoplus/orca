@@ -1622,9 +1622,6 @@ tubRegister;
 }
 
 - (void) validateMTCADAC:(uint16_t) dac_value {
-    if( dac_value < 0 ) {
-        [NSException raise:@"MTCModelError" format:@"MTCA DAC value %u is not valid. DAC values must be non-negative",dac_value];
-    }
     if( dac_value > 4095) {
         [NSException raise:@"MTCModelError" format:@"MTCA DAC value %u is not valid. DAC values must be less than 4095",dac_value];
     }
