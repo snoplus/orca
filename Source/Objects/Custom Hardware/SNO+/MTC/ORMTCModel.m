@@ -1459,7 +1459,6 @@ tubRegister;
 	@catch(NSException* localException) {
 		NSLog(@"Unable to enable the Pedestals!\n");		
 		[localException raise];
-        return;
 	}
 }
 
@@ -1472,7 +1471,6 @@ tubRegister;
 	@catch(NSException* localException) {
 		NSLog(@"Unable to disable the Pedestals!\n");		
 		[localException raise];
-        return;
 	}
 }
 

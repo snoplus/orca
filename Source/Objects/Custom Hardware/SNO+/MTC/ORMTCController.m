@@ -740,7 +740,6 @@
 
     } @catch (NSException *exception) {
         NSLogColor([NSColor redColor], @"Could not change views. Reason:%@\n",[exception reason]);
-        return;
     }
 
 }
@@ -1032,7 +1031,6 @@
             NSLogColor([NSColor redColor], @"Error interpreting trigger scan result. Reason: %@\n",[exception reason]);
         }
     }
-    return;
 }
 - (int) trigger_scan_name_to_index:(NSString*) name {
     int ret = -1;
@@ -1127,7 +1125,6 @@
     [model setThresholdOfType:MTC_OWLEHI_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_OWLEH_INDEX] floatValue]];
     } @catch(NSException* excep) {
         NSLogColor([NSColor redColor], @"Error while retrieving threhsolds. Operation failed, Reason: %@\n",[excep reason]);
-        return;
     }
 }
 - (void) load_settings_from_trigger_scan_for_type {
@@ -1279,6 +1276,5 @@
             [[checkBoxes cellAtRow:i column:0] setState: state];
         }
     }
-    return;
 }
 @end
