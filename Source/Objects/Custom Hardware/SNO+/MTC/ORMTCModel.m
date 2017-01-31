@@ -1631,19 +1631,17 @@ tubRegister;
 }
 - (void) loadTheMTCADacs
 {
-    /* Load the MTCA thresholds to hardware. */
-    int i;
+    /* Load the MTCA thresholds to hardware.
+     This function lets exceptions bubble up. */
+     int i;
     uint16_t dacs[14];
     int server_index;
     for(i=FIRST_MTC_THRESHOLD_INDEX;i<=LAST_MTC_THRESHOLD_INDEX;i++)
     {
-        @try {
             server_index = [self model_index_to_server_index:i];
             dacs[server_index] = [self getThresholdOfType:i inUnits:MTC_RAW_UNITS];
             [self validateMTCADAC:dacs[server_index]];
-        } @catch (NSException* excep) {
-            @throw; //Let it bubble up
-        }
+
     }
     /* Last four DAC values are spares? */
     for (i = 10; i < 14; i++) {
