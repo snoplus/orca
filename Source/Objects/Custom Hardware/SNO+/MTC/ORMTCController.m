@@ -1099,38 +1099,41 @@
 - (void) waitForThresholds: (ORPQResult *) result
 {
     int numRows, numCols;
-    @try {
+
     if (!result) {
-            [NSException raise:@"MTCControllerError" format:@"Database returned NULL value."];
+        NSLog(@"Failed to recieve threshold results from database.\n");
+        return;
     }
-    
+
     numRows = [result numOfRows];
     numCols = [result numOfFields];
     if (numRows != 1) {
-            [NSException raise:@"MTCControllerError" format:@"Database returned unexpected number of rows. 1 expected, %i returned.",numRows];
+        NSLog(@"Database returned unexpected number of rows for MTC threhsolds. 1 expected, %i returned.\n",numRows);
+        return;
     }
-    
     if (numCols != 1) {
-            [NSException raise:@"MTCControllerError" format:@"Database returned unexpected number of columns. 1 expected, %i returned.",numCols];
+        NSLog(@"Database returned unexpected number of columns for MTC thresholds. 1 expected, %i returned.\n",numCols);
+        return;
     }
 
     NSArray* result_arr = [[result fetchRowAsDictionary] objectForKey:@"mtca_dacs"];
-        if(!result_arr || [result_arr count] == 0)
+    if(!result_arr || [result_arr count] == 0)
     {
-            [NSException raise:@"MTCControllerError" format:@"Error while converting DB result to array"];
+        NSLog(@"Error while converting MTC threshold DB result to array.\n");
+        return;
     }
-
-    // Note this could be done with a for loop, but I think this is more readable.
-    [model setThresholdOfType:MTC_N100_LO_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_N100L_INDEX] floatValue]];
-    [model setThresholdOfType:MTC_N100_MED_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_N100M_INDEX] floatValue]];
-    [model setThresholdOfType:MTC_N100_HI_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_N100H_INDEX] floatValue]];
-    [model setThresholdOfType:MTC_N20_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_N20_INDEX] floatValue]];
-    [model setThresholdOfType:MTC_N20LB_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_N20LB_INDEX] floatValue]];
-    [model setThresholdOfType:MTC_ESUML_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_ESUML_INDEX] floatValue]];
-    [model setThresholdOfType:MTC_ESUMH_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_ESUMH_INDEX] floatValue]];
-    [model setThresholdOfType:MTC_OWLN_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_OWLN_INDEX] floatValue]];
-    [model setThresholdOfType:MTC_OWLELO_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_OWLEL_INDEX] floatValue]];
-    [model setThresholdOfType:MTC_OWLEHI_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_OWLEH_INDEX] floatValue]];
+    @try {
+        // Note this could be done with a for loop, but I think this is more readable.
+        [model setThresholdOfType:MTC_N100_LO_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_N100L_INDEX] floatValue]];
+        [model setThresholdOfType:MTC_N100_MED_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_N100M_INDEX] floatValue]];
+        [model setThresholdOfType:MTC_N100_HI_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_N100H_INDEX] floatValue]];
+        [model setThresholdOfType:MTC_N20_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_N20_INDEX] floatValue]];
+        [model setThresholdOfType:MTC_N20LB_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_N20LB_INDEX] floatValue]];
+        [model setThresholdOfType:MTC_ESUML_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_ESUML_INDEX] floatValue]];
+        [model setThresholdOfType:MTC_ESUMH_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_ESUMH_INDEX] floatValue]];
+        [model setThresholdOfType:MTC_OWLN_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_OWLN_INDEX] floatValue]];
+        [model setThresholdOfType:MTC_OWLELO_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_OWLEL_INDEX] floatValue]];
+        [model setThresholdOfType:MTC_OWLEHI_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_OWLEH_INDEX] floatValue]];
     } @catch(NSException* excep) {
         NSLogColor([NSColor redColor], @"Error while retrieving threhsolds. Operation failed, Reason: %@\n",[excep reason]);
     }
