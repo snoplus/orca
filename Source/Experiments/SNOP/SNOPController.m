@@ -1569,7 +1569,7 @@ snopGreenColor;
         //Pulser
         case 11:
             raw = [[sender cellAtRow:11 column:0] floatValue];
-            [mtcModel setPgt_rate:raw];
+            [mtcModel setPgtRate:raw];
             return;
             break;
     }
@@ -1663,7 +1663,7 @@ snopGreenColor;
         [[standardRunThresCurrentValues cellAtRow:10 column:0] setTextColor:[self snopRedColor]];
     }
     //Pulser
-    [[standardRunThresCurrentValues cellAtRow:11 column:0] setFloatValue:[mtcModel pgt_rate]];
+    [[standardRunThresCurrentValues cellAtRow:11 column:0] setFloatValue:[mtcModel pgtRate]];
     [[standardRunThresCurrentValues cellAtRow:11 column:0] setFormatter:thresholdFormatter];
     if((gtmask >> 10) & 1){
         [[standardRunThresCurrentValues cellAtRow:11 column:0] setTextColor:[self snopBlueColor]];

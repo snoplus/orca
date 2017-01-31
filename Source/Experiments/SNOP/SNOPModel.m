@@ -1040,7 +1040,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 
     crate_pedestal_mask = [mtc pedCrateMask];
 
-    pulser_rate = [mtc pgt_rate];
+    pulser_rate = [mtc pgtRate];
 
     /* Enable all crates in the MTCD pedestal mask. */
     [mtc setPedCrateMask:0xffffff];
@@ -1108,7 +1108,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     /* Reset the pulser rate since the firePedestals function sets the pulser
      * rate to 0. */
     @try {
-        [mtc setPgt_rate:pulser_rate];
+        [mtc setPgtRate:pulser_rate];
         [mtc loadPulserRateToHardware];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],

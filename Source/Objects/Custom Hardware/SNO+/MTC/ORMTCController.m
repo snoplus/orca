@@ -305,7 +305,7 @@
 }
 - (void) mtcPulserRateChanged:(NSNotification *)aNote
 {
-    int rate = [model pgt_rate];
+    int rate = [model pgtRate];
     [pulserPeriodField setIntValue:rate];
 }
 - (void) mtcGTMaskChanged:(NSNotification *) aNote {
@@ -785,7 +785,7 @@
 
 - (IBAction)standardPulserRateFieldChanged:(id)sender {
     float pulser_rate = [pulserPeriodField floatValue];
-    [model setPgt_rate:pulser_rate];
+    [model setPgtRate:pulser_rate];
 }
 - (void) changeNhitThresholdsDisplay: (int) type
 {

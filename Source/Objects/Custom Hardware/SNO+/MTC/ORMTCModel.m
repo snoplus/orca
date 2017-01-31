@@ -542,13 +542,13 @@ tubRegister;
     return gtMask;
 }
 
-- (void) setPgt_rate:(float)rate {
-    pgt_rate = rate;
+- (void) setPgtRate:(float)rate {
+    pgtRate = rate;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCPulserRateChanged object:self];
 }
 
-- (float) pgt_rate {
-    return pgt_rate;
+- (float) pgtRate {
+    return pgtRate;
 }
 
 - (void) setPrescaleValue:(uint16_t)newVal {
@@ -782,7 +782,7 @@ tubRegister;
     [self setLockoutWidth:[decoder decodeIntForKey:@"MTCLockoutWidth"]];
     [self setPedestalWidth:[decoder decodeIntForKey:@"MTCPedestalWidth"]];
     [self setPrescaleValue:[decoder decodeIntForKey:@"MTCPrescaleValue"]];
-    [self setPgt_rate:[decoder decodeIntForKey:@"MTCPulserRate"]];
+    [self setPgtRate:[decoder decodeIntForKey:@"MTCPulserRate"]];
     [self setPedestalDelay: [decoder decodeFloatForKey:@"MTCPedestalDelay"]];
     [self setGtMask:[decoder decodeIntForKey:@"MTCGTMask"]];
     [self setGTCrateMask: [decoder decodeIntForKey:@"MTCGTCrateMask"]];
@@ -827,7 +827,7 @@ tubRegister;
     [encoder encodeInt:[self lockoutWidth] forKey:@"MTCLockoutWidth"];
     [encoder encodeInt:[self pedestalWidth] forKey:@"MTCPedestalWidth"];
     [encoder encodeInt:[self prescaleValue] forKey:@"MTCPrescaleValue"];
-    [encoder encodeInt:[self pgt_rate] forKey:@"MTCPulserRate"];
+    [encoder encodeInt:[self pgtRate] forKey:@"MTCPulserRate"];
     [encoder encodeFloat:[self pedestalDelay] forKey:@"MTCPedestalDelay"];
     [encoder encodeInt:[self gtMask] forKey:@"MTCGTMask"];
     [encoder encodeInt:[self GTCrateMask] forKey:@"MTCGTCrateMask"];
@@ -1013,7 +1013,7 @@ tubRegister;
     [self setThresholdOfType:MTC_OWLEHI_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[serial objectForNestedKey:[self StringForThreshold:MTC_OWLEHI_THRESHOLD_INDEX] ] intValue]];
     [self setThresholdOfType:MTC_OWLELO_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[serial objectForNestedKey:[self StringForThreshold:MTC_OWLELO_THRESHOLD_INDEX] ] intValue]];
 
-    [self setPgt_rate:[[serial objectForNestedKey:PulserRateSerializationString] intValue]];
+    [self setPgtRate:[[serial objectForNestedKey:PulserRateSerializationString] intValue]];
     [self setIsPedestalEnabledInCSR:[[serial objectForNestedKey:PGT_PED_Mode_SerializationString] boolValue]];
     [self setPulserEnabled:[[serial objectForNestedKey:PulserEnabledSerializationString] boolValue]];
     [self setPrescaleValue:[[serial objectForNestedKey:PrescaleValueSerializationString] intValue]];
@@ -1034,7 +1034,7 @@ tubRegister;
     [serial setObject:[NSNumber numberWithInt:(int) [self getThresholdOfType:MTC_OWLEHI_THRESHOLD_INDEX inUnits:MTC_RAW_UNITS]] forKey:[self StringForThreshold:MTC_OWLEHI_THRESHOLD_INDEX]];
     [serial setObject:[NSNumber numberWithInt:(int) [self getThresholdOfType:MTC_OWLELO_THRESHOLD_INDEX inUnits:MTC_RAW_UNITS]] forKey:[self StringForThreshold:MTC_OWLELO_THRESHOLD_INDEX]];
 
-    [serial setObject:[NSNumber numberWithUnsignedLong:[self pgt_rate]] forKey:PulserRateSerializationString];
+    [serial setObject:[NSNumber numberWithUnsignedLong:[self pgtRate]] forKey:PulserRateSerializationString];
     [serial setObject:[NSNumber numberWithBool:[self isPedestalEnabledInCSR]] forKey:PGT_PED_Mode_SerializationString];
     [serial setObject:[NSNumber numberWithBool:[self pulserEnabled] ] forKey:PulserEnabledSerializationString];
     [serial setObject:[NSNumber numberWithUnsignedShort:[self prescaleValue]] forKey:PrescaleValueSerializationString];
@@ -1413,7 +1413,7 @@ tubRegister;
 
 - (void) loadPulserRateToHardware
 {
-    float pulserRate = [self pgt_rate];
+    float pulserRate = [self pgtRate];
 	@try {
         [mtc okCommand:"set_pulser_freq %f", pulserRate];
 		NSLog(@"mtc: pulser rate set to %.2f Hz\n", pulserRate);			
@@ -1558,7 +1558,7 @@ tubRegister;
 
         /* set the pulser rate to 0, which will enable SOFT_GT to trigger
          * pedestals */
-        [self setPgt_rate:0];
+        [self setPgtRate:0];
         [self loadPulserRateToHardware];
 
         [self enablePulser];
@@ -1830,7 +1830,7 @@ tubRegister;
     [self setLockoutWidth:420];
     [self setPedestalWidth:52];
     [self setPrescaleValue:1];
-    [self setPgt_rate:10];
+    [self setPgtRate:10];
     [self setPedestalDelay:60];
     [self setGtMask:0];
     [self setGTCrateMask: 0];
