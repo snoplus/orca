@@ -3688,7 +3688,7 @@ err:
             dispatch_sync(dispatch_get_main_queue(), ^{
                 BOOL result = ORRunAlertPanel([NSString stringWithFormat:@"Crate %i HV is not at nominal voltage, but triggers are currently enabled.", [self crateNumber]], @"Would you like to disable triggers?", @"Yes", @"No", nil);
 
-                if (!result) {
+                if (result) {
                     [self setIsTriggerON:NO];
                     [self setTriggerStatus:@"OFF"];
                     NSLog(@"Crate %02d disabling triggers\n.", [self crateNumber]);
