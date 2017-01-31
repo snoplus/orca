@@ -1587,7 +1587,6 @@ snopGreenColor;
 -(void) updateThresholdDisplayAt:(int) row forThreshold:(int) type isNHit:(BOOL) isNhit isInMask:(BOOL) inMask usingModel:(id) mtcModel andFormatter:(NSFormatter*) formatter
 {
     float value;
-    [formatter retain]; // Not sure if necessary, but shouldn't hurt.
     if([mtcModel ConversionIsValidForThreshold:type]) {
         NSString* label = isNhit ? @"NHits" : @"mV";
         int units = isNhit ? MTC_NHIT_UNITS : MTC_mV_UNITS;
@@ -1606,7 +1605,6 @@ snopGreenColor;
     } else{
         [[standardRunThresCurrentValues cellAtRow:row column:0] setTextColor:[self snopRedColor]];
     }
-    [formatter release];
 }
 - (void) mtcDataBaseChanged:(NSNotification*)aNotification
 {
