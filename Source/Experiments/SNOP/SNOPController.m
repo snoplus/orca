@@ -1642,6 +1642,10 @@ snopGreenColor;
 
 - (void) mtcDataBaseChanged:(NSNotification*)aNotification
 {
+    if(aNotification && [[aNotification name] isEqualToString:ORMTCAConversionChanged])
+    {
+        [self initializeUnits];
+    }
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     ORMTCModel* mtcModel;
     if ([objs count]) {
