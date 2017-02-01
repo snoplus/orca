@@ -231,6 +231,10 @@
                      selector : @selector(isPedestalEnabledInCSRChanged:)
                          name : ORMTCModelIsPedestalEnabledInCSR
                        object : nil];
+    [notifyCenter addObserver : self
+                     selector : @selector(pedestalDelayValueChanged:)
+                         name : ORMTCPedestalDelayChanged
+                       object : nil];
 }
 
 - (void) updateWindow
@@ -258,9 +262,9 @@
     [self triggerMTCAMaskChanged:nil];
     [self isPedestalEnabledInCSRChanged:nil];
     [self displayMasks];
+    [self pedestalDelayValueChanged:nil];
     [lockOutWidthField setIntValue:[model lockoutWidth]];
     [pedestalWidthField setIntValue:[model pedestalWidth]];
-    [pedDelayField setIntValue:[model pedestalDelay]];
 }
 
 - (void) checkGlobalSecurity
@@ -476,6 +480,11 @@
 - (void) isPedestalEnabledInCSRChanged:(NSNotification*)aNotification
 {
     [includePedestalsCheckBox setState:[model isPedestalEnabledInCSR]];
+}
+
+- (void) pedestalDelayValueChanged:(NSNotification*)aNotification
+{
+    [pedDelayField setFloatValue:[model pedestalDelay]];
 }
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item

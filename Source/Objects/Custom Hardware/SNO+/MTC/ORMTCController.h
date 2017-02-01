@@ -135,6 +135,7 @@
 - (void) sequenceProgress:(NSNotification*)aNote;
 - (void) triggerMTCAMaskChanged:(NSNotification*)aNotification;
 - (void) isPedestalEnabledInCSRChanged:(NSNotification*)aNotification;
+- (void) pedestalDelayValueChanged:(NSNotification*)aNotification;
 - (void) updateThresholdsDisplay:(NSNotification*) aNote;
 
 - (int) convert_view_threshold_index_to_model_index: (int) view_index;

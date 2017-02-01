@@ -237,6 +237,8 @@
 - (void) setThe10MHzCounter:(uint64_t) newValue;
 - (void) loadPrescaleValueToHardware;
 - (void) loadPedestalDelayToHardware;
+- (void) loadCoarseDelayToHardware: (uint16_t) coarse_delay;
+- (void) loadFineDelayToHardware: (float) fine_delay;
 - (void) loadPulserRateToHardware;
 - (void) loadLockOutWidthToHardware;
 - (void) loadPedWidthToHardware;
@@ -297,3 +299,4 @@ extern NSString* ORMTCModelIsPedestalEnabledInCSR;
 extern NSString* ORMTCPulserRateChanged;
 extern NSString* ORMTCPrescaleValueChanged;
 extern NSString* ORMTCGTMaskChanged;
+extern NSString* ORMTCPedestalDelayChanged;

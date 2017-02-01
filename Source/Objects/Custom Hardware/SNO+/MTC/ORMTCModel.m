@@ -62,6 +62,7 @@ NSString* ORMTCModelIsPedestalEnabledInCSR      = @"ORMTCModelIsPedestalEnabledI
 NSString* ORMTCPulserRateChanged                = @"ORMTCPulserRateChanged";
 NSString* ORMTCPrescaleValueChanged             = @"ORMTCPrescaleValueChanged";
 NSString* ORMTCGTMaskChanged                    = @"ORMTCGTMaskChanged";
+NSString* ORMTCPedestalDelayChanged             = @"ORMTCPedestalDelayChanged";
 
 
 #define kMTCRegAddressBase		0x00007000
@@ -105,7 +106,6 @@ static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
 
 @synthesize
 pedestalWidth,
-pedestalDelay,
 pedCrateMask,
 GTCrateMask,
 lockoutWidth,
@@ -551,6 +551,15 @@ tubRegister;
     return pgtRate;
 }
 
+- (float) pedestalDelay {
+    return pedestalDelay;
+}
+
+- (void) setPedestalDelay: (float) delay {
+    pedestalDelay = delay;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCPedestalDelayChanged object:self];
+
+}
 - (void) setPrescaleValue:(uint16_t)newVal {
     prescaleValue = newVal;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCPrescaleValueChanged object:self];
@@ -1410,6 +1419,40 @@ tubRegister;
 		[localException raise];			
 		
 	}
+}
+
+- (void) loadCoarseDelayToHardware: (uint16_t) coarse_delay {
+
+    @try {
+        [mtc okCommand:"set_coarse_delay %i", coarse_delay];
+        NSLog(@"mtc: coarse delay %ins\n", coarse_delay);
+    }
+    @catch(NSException* localException) {
+        NSLog(@"Could not set coarse delay\n");
+        NSLog(@"Exception: %@\n",localException);
+        [localException raise];
+    }
+    // Update the model variables apropriately
+    float current_delay = [self pedestalDelay];
+    uint16_t current_coarse_delay = (int)current_delay % 10;
+    [self setPedestalDelay:current_delay-current_coarse_delay+coarse_delay];
+}
+
+- (void) loadFineDelayToHardware: (float) fine_delay {
+    @try {
+        [mtc okCommand:"set_fine_delay %f", fine_delay];
+        NSLog(@"mtc: coarse delay %.2fns\n", fine_delay);
+
+    }
+    @catch(NSException* localException) {
+        NSLog(@"Could not set coarse delay\n");
+        NSLog(@"Exception: %@\n",localException);
+        [localException raise];
+    }
+    // Update the model variables apropriately
+    float current_delay = [self pedestalDelay];
+    float current_fine_delay = current_delay/10.0;
+    [self setPedestalDelay:current_delay-current_fine_delay+fine_delay];
 }
 
 - (void) loadPulserRateToHardware
