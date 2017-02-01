@@ -1876,7 +1876,7 @@ snopGreenColor;
         //This defines the mapping between the view order and the GT mask positions
         int view_mask_map[10] = {2,1,0,3,4,7,6,5,9,8};
         for(int i=0;i<10;i++) {
-            float raw = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtcModel StringForThreshold:i]] floatValue];
+            float raw = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtcModel stringForThreshold:i]] floatValue];
             int units = i<=6 ? MTC_NHIT_UNITS : MTC_mV_UNITS;
             BOOL inMask = ((1<< view_mask_map[i]) & gtmask) != 0;
             [self updateSingleDBThresholdDisplay:i ofType:view_model_map[i] toUnits: units inMask:inMask withModel:mtcModel withFormatter:thresholdFormatter toValue:raw];

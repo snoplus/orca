@@ -191,7 +191,7 @@
 - (void) setConversionIsValidForThreshold:(int) type isValid:(BOOL) _val;
 
 
-- (NSString*) StringForThreshold:(int) threshold_index;
+- (NSString*) stringForThreshold:(int) threshold_index;
 - (void) loadFromSearialization:(NSMutableDictionary*) serial;
 - (NSMutableDictionary*) serializeToDictionary;
 
