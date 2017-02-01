@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6254" systemVersion="13F1077" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="15G1217" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
         <development version="5100" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6254"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10116"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ORCatalogController">
@@ -1792,7 +1792,7 @@ Controller</string>
                                         <button toolTip="ORUSBtoGPIBModel" id="26690" customClass="ObjectFactory">
                                             <rect key="frame" x="44" y="1" width="69" height="76"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="bevel" title="USB->GPIB" bezelStyle="regularSquare" image="USBtoGPIB" imagePosition="above" alignment="center" state="on" inset="2" id="26691">
+                                            <buttonCell key="cell" type="bevel" title="USB-&gt;GPIB" bezelStyle="regularSquare" image="USBtoGPIB" imagePosition="above" alignment="center" state="on" inset="2" id="26691">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system" size="10"/>
                                             </buttonCell>
@@ -1838,9 +1838,17 @@ Controller</string>
                                             </buttonCell>
                                         </button>
                                         <button toolTip="ORLabJackModel" id="26716" customClass="ObjectFactory">
-                                            <rect key="frame" x="211" y="42" width="75" height="115"/>
+                                            <rect key="frame" x="185" y="18" width="75" height="115"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" title="LabJack" bezelStyle="regularSquare" image="LabJack" imagePosition="above" alignment="center" inset="2" id="26717">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system" size="10"/>
+                                            </buttonCell>
+                                        </button>
+                                        <button toolTip="ORLabJackU6Model" id="fZ1-jM-Hph" customClass="ObjectFactory">
+                                            <rect key="frame" x="268" y="24" width="137" height="65"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="bevel" title="LabJack U6" bezelStyle="regularSquare" image="LabJackU6" imagePosition="above" alignment="center" inset="2" id="tJk-4i-HLj">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system" size="10"/>
                                             </buttonCell>
@@ -1853,16 +1861,8 @@ Controller</string>
                                                 <font key="font" metaFont="system" size="10"/>
                                             </buttonCell>
                                         </button>
-                                        <button toolTip="ORLakeShore336Model" id="27049" customClass="ObjectFactory">
-                                            <rect key="frame" x="375" y="90" width="83" height="43"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="bevel" title="LakeShore336" bezelStyle="regularSquare" image="LakeShore336" imagePosition="above" alignment="center" state="on" inset="2" id="27050">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system" size="10"/>
-                                            </buttonCell>
-                                        </button>
                                         <button toolTip="ORDT5720Model" id="meR-3w-ssb" customClass="ObjectFactory">
-                                            <rect key="frame" x="506" y="90" width="111" height="43"/>
+                                            <rect key="frame" x="647" y="102" width="111" height="43"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" title="DT5720" bezelStyle="regularSquare" image="DT5720" imagePosition="above" alignment="center" state="on" inset="2" id="qz0-jB-8g3">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1881,7 +1881,7 @@ Controller</string>
                                         <button toolTip="ORUSBtoGPIBModel" id="26725" customClass="ObjectFactory">
                                             <rect key="frame" x="705" y="185" width="69" height="76"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="bevel" title="USB->GPIB" bezelStyle="regularSquare" image="USBtoGPIB" imagePosition="above" alignment="center" state="on" inset="2" id="26726">
+                                            <buttonCell key="cell" type="bevel" title="USB-&gt;GPIB" bezelStyle="regularSquare" image="USBtoGPIB" imagePosition="above" alignment="center" state="on" inset="2" id="26726">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system" size="10"/>
                                             </buttonCell>
@@ -1895,9 +1895,17 @@ Controller</string>
                                             </buttonCell>
                                         </button>
                                         <button toolTip="ORDT5725Model" id="xUx-og-SeF" customClass="ObjectFactory">
-                                            <rect key="frame" x="645" y="83" width="111" height="50"/>
+                                            <rect key="frame" x="647" y="44" width="111" height="50"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" title="DT5725" bezelStyle="regularSquare" image="DT5720" imagePosition="above" alignment="center" state="on" inset="2" id="PpW-m3-QlR">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system" size="10"/>
+                                            </buttonCell>
+                                        </button>
+                                        <button toolTip="ORLakeShore336Model" id="27049" customClass="ObjectFactory">
+                                            <rect key="frame" x="376" y="114" width="83" height="43"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="bevel" title="LakeShore336" bezelStyle="regularSquare" image="LakeShore336" imagePosition="above" alignment="center" state="on" inset="2" id="27050">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system" size="10"/>
                                             </buttonCell>
@@ -3024,7 +3032,7 @@ Relay</string>
                                                             <textField verticalHuggingPriority="750" id="13941">
                                                                 <rect key="frame" x="325" y="186" width="57" height="14"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <textFieldCell key="cell" controlSize="small" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="VME-->" id="25951">
+                                                                <textFieldCell key="cell" controlSize="small" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="VME--&gt;" id="25951">
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -3331,6 +3339,7 @@ Relay</string>
         <image name="LC950Oscilloscope" width="100" height="66"/>
         <image name="LDA102" width="75" height="48"/>
         <image name="LabJack" width="75" height="100"/>
+        <image name="LabJackU6" width="123" height="50"/>
         <image name="LabJackUE9" width="40" height="89"/>
         <image name="Label" width="74" height="14"/>
         <image name="LakeShore210" width="118" height="58"/>
