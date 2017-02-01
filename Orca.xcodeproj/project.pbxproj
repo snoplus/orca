@@ -1863,7 +1863,6 @@
 		847BC83B05E2940D0054841E /* ORHWUndoManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 847BC83705E2940D0054841E /* ORHWUndoManager.h */; };
 		847BC83E05E2941D0054841E /* preferences.tif in Resources */ = {isa = PBXBuildFile; fileRef = 847BC83C05E2941D0054841E /* preferences.tif */; };
 		847BC83F05E2941D0054841E /* PasswordLock.tif in Resources */ = {isa = PBXBuildFile; fileRef = 847BC83D05E2941D0054841E /* PasswordLock.tif */; };
-		847C66231E3BC6B2002696C3 /* liblabjackusb.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 847C66221E3BC6B2002696C3 /* liblabjackusb.dylib */; };
 		847C66271E3BC6D5002696C3 /* libusb.h in Headers */ = {isa = PBXBuildFile; fileRef = 847C66261E3BC6D5002696C3 /* libusb.h */; };
 		847C662F1E3BCB48002696C3 /* labjackusb.h in Headers */ = {isa = PBXBuildFile; fileRef = 847C662E1E3BCB48002696C3 /* labjackusb.h */; };
 		847CCA66058E8C75003522C8 /* ORLinkedList.h in Headers */ = {isa = PBXBuildFile; fileRef = 847CCA60058E8C75003522C8 /* ORLinkedList.h */; };
@@ -3057,6 +3056,7 @@
 		84E5B23B0715C65500C7B798 /* NcdCableCheckTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E5B2370715C65500C7B798 /* NcdCableCheckTask.m */; };
 		84E5B30F0715E16700C7B798 /* NcdCableCheckTask.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84E5B30E0715E16700C7B798 /* NcdCableCheckTask.nib */; };
 		84E6CD001E4247BD004D6978 /* libusb-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 84E6CCFF1E4247BD004D6978 /* libusb-1.0.a */; };
+		84E6CD021E426E7A004D6978 /* liblabjackusb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 84E6CD011E426E7A004D6978 /* liblabjackusb.a */; };
 		84E6E5DB10BC570800187AF6 /* ORSISRegisterDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E6E5DA10BC570800187AF6 /* ORSISRegisterDefs.h */; };
 		84E6FB220B2DDC6000CAA7C5 /* ObjectFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E6FB200B2DDC5F00CAA7C5 /* ObjectFactory.m */; };
 		84E6FB230B2DDC6100CAA7C5 /* ObjectFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E6FB210B2DDC6000CAA7C5 /* ObjectFactory.h */; };
@@ -5380,7 +5380,6 @@
 		847BC83705E2940D0054841E /* ORHWUndoManager.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORHWUndoManager.h; path = "Source/Main Dialogs/HardwareWizard/ORHWUndoManager.h"; sourceTree = SOURCE_ROOT; };
 		847BC83C05E2941D0054841E /* preferences.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = preferences.tif; path = Source/Preferences/preferences.tif; sourceTree = SOURCE_ROOT; };
 		847BC83D05E2941D0054841E /* PasswordLock.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = PasswordLock.tif; path = Source/Preferences/PasswordLock.tif; sourceTree = SOURCE_ROOT; };
-		847C66221E3BC6B2002696C3 /* liblabjackusb.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = liblabjackusb.dylib; sourceTree = "<group>"; };
 		847C66261E3BC6D5002696C3 /* libusb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libusb.h; sourceTree = "<group>"; };
 		847C662E1E3BCB48002696C3 /* labjackusb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = labjackusb.h; sourceTree = "<group>"; };
 		847CCA60058E8C75003522C8 /* ORLinkedList.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORLinkedList.h; path = "Source/Objects/Misc Objects/DataStructures/ORLinkedList.h"; sourceTree = SOURCE_ROOT; };
@@ -6697,6 +6696,7 @@
 		84E5B2370715C65500C7B798 /* NcdCableCheckTask.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = NcdCableCheckTask.m; sourceTree = "<group>"; };
 		84E5B30E0715E16700C7B798 /* NcdCableCheckTask.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = NcdCableCheckTask.nib; path = Source/Experiments/Ncd/CableCheckTask/NcdCableCheckTask.nib; sourceTree = SOURCE_ROOT; };
 		84E6CCFF1E4247BD004D6978 /* libusb-1.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libusb-1.0.a"; sourceTree = "<group>"; };
+		84E6CD011E426E7A004D6978 /* liblabjackusb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = liblabjackusb.a; sourceTree = "<group>"; };
 		84E6E5DA10BC570800187AF6 /* ORSISRegisterDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSISRegisterDefs.h; sourceTree = "<group>"; };
 		84E6FB200B2DDC5F00CAA7C5 /* ObjectFactory.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ObjectFactory.m; path = Source/Objects/OrcaObject/ObjectFactory.m; sourceTree = SOURCE_ROOT; };
 		84E6FB210B2DDC6000CAA7C5 /* ObjectFactory.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ObjectFactory.h; path = Source/Objects/OrcaObject/ObjectFactory.h; sourceTree = SOURCE_ROOT; };
@@ -7188,6 +7188,7 @@
 				8439D5EF05BEFF3A0077EFF2 /* Carbon.framework in Frameworks */,
 				840F377B08F322F800FC4408 /* IOKit.framework in Frameworks */,
 				84F5E11B0A151E0B00707A0F /* OpenGL.framework in Frameworks */,
+				84E6CD021E426E7A004D6978 /* liblabjackusb.a in Frameworks */,
 				847599860B5FF26500123411 /* QuartzCore.framework in Frameworks */,
 				2AE87C600D6E636700A839FC /* libmysqlclient.a in Frameworks */,
 				3620200E1CBD38EE0089296E /* libiconv.2.dylib in Frameworks */,
@@ -7198,7 +7199,6 @@
 				8458E91515DA8A2A005C43A9 /* ScriptingBridge.framework in Frameworks */,
 				8481E67917653766001AB905 /* SystemConfiguration.framework in Frameworks */,
 				4AB9E5401DE5D9DB007C75E0 /* libpq.a in Frameworks */,
-				847C66231E3BC6B2002696C3 /* liblabjackusb.dylib in Frameworks */,
 				4322E9B217830004008E78A4 /* GLUT.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -10603,7 +10603,7 @@
 			isa = PBXGroup;
 			children = (
 				847C662E1E3BCB48002696C3 /* labjackusb.h */,
-				847C66221E3BC6B2002696C3 /* liblabjackusb.dylib */,
+				84E6CD011E426E7A004D6978 /* liblabjackusb.a */,
 			);
 			path = exodriver;
 			sourceTree = "<group>";
