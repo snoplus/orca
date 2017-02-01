@@ -463,6 +463,9 @@
 		840463C3183515AC00F69B23 /* ORGretinaTriggerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 840463BB183515AC00F69B23 /* ORGretinaTriggerController.h */; };
 		840463C4183515AC00F69B23 /* ORGretinaTriggerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 840463BC183515AC00F69B23 /* ORGretinaTriggerController.m */; };
 		840463CA183515FF00F69B23 /* GretinaTrigger.gif in Resources */ = {isa = PBXBuildFile; fileRef = 840463C9183515FF00F69B23 /* GretinaTrigger.gif */; };
+		8404EB771E3F818F00370C33 /* LabJackU6.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8404EB761E3F818F00370C33 /* LabJackU6.tif */; };
+		8404EB7A1E3F836B00370C33 /* u6.m in Sources */ = {isa = PBXBuildFile; fileRef = 8404EB781E3F836B00370C33 /* u6.m */; };
+		8404EB7B1E3F836B00370C33 /* u6.h in Headers */ = {isa = PBXBuildFile; fileRef = 8404EB791E3F836B00370C33 /* u6.h */; };
 		84052A2C13106B65007607A4 /* CouchDB.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84052A2613106B65007607A4 /* CouchDB.nib */; };
 		84052A2D13106B65007607A4 /* CouchDB.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84052A2713106B65007607A4 /* CouchDB.tif */; };
 		84052A2E13106B65007607A4 /* ORCouchDBController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84052A2813106B65007607A4 /* ORCouchDBController.h */; };
@@ -1748,8 +1751,6 @@
 		84759E9B0B6189E700123411 /* OrcaScriptGuide.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 84759A990B6025E200123411 /* OrcaScriptGuide.rtf */; };
 		8475D8171A3665BC00EE4DE4 /* ORMJDInterlocks.h in Headers */ = {isa = PBXBuildFile; fileRef = 8475D8151A3665BC00EE4DE4 /* ORMJDInterlocks.h */; };
 		8475D8181A3665BC00EE4DE4 /* ORMJDInterlocks.m in Sources */ = {isa = PBXBuildFile; fileRef = 8475D8161A3665BC00EE4DE4 /* ORMJDInterlocks.m */; };
-		8475EC0B14759D53003A165D /* libusb-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8475EC0714759D53003A165D /* libusb-1.0.a */; };
-		8475EC0C14759D53003A165D /* libusb.h in Headers */ = {isa = PBXBuildFile; fileRef = 8475EC0814759D53003A165D /* libusb.h */; };
 		8475EC3A1475A66F003A165D /* LabJack.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8475EC271475A66F003A165D /* LabJack.nib */; };
 		8475EC3B1475A66F003A165D /* LabJack.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8475EC281475A66F003A165D /* LabJack.tif */; };
 		8475EC3C1475A66F003A165D /* NoLabJackDriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8475EC291475A66F003A165D /* NoLabJackDriverHelp.plist */; };
@@ -1767,7 +1768,6 @@
 		8475EC491475A66F003A165D /* ORLabJackUE9Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 8475EC371475A66F003A165D /* ORLabJackUE9Decoders.m */; };
 		8475EC4A1475A66F003A165D /* ORLabJackUE9Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8475EC381475A66F003A165D /* ORLabJackUE9Model.h */; };
 		8475EC4B1475A66F003A165D /* ORLabJackUE9Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8475EC391475A66F003A165D /* ORLabJackUE9Model.m */; };
-		8475EC8B147693E8003A165D /* libusb-1.0.a in Frameworks_Copy */ = {isa = PBXBuildFile; fileRef = 8475EC0714759D53003A165D /* libusb-1.0.a */; };
 		8476004C18DF1EB40097E790 /* warning.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8476004A18DF1EB40097E790 /* warning.tif */; };
 		84760CC20B370E0A00512F67 /* ORExperimentModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84760CC00B370E0A00512F67 /* ORExperimentModel.h */; };
 		84760CC30B370E0A00512F67 /* ORExperimentModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84760CC10B370E0A00512F67 /* ORExperimentModel.m */; };
@@ -1863,6 +1863,9 @@
 		847BC83B05E2940D0054841E /* ORHWUndoManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 847BC83705E2940D0054841E /* ORHWUndoManager.h */; };
 		847BC83E05E2941D0054841E /* preferences.tif in Resources */ = {isa = PBXBuildFile; fileRef = 847BC83C05E2941D0054841E /* preferences.tif */; };
 		847BC83F05E2941D0054841E /* PasswordLock.tif in Resources */ = {isa = PBXBuildFile; fileRef = 847BC83D05E2941D0054841E /* PasswordLock.tif */; };
+		847C66231E3BC6B2002696C3 /* liblabjackusb.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 847C66221E3BC6B2002696C3 /* liblabjackusb.dylib */; };
+		847C66271E3BC6D5002696C3 /* libusb.h in Headers */ = {isa = PBXBuildFile; fileRef = 847C66261E3BC6D5002696C3 /* libusb.h */; };
+		847C662F1E3BCB48002696C3 /* labjackusb.h in Headers */ = {isa = PBXBuildFile; fileRef = 847C662E1E3BCB48002696C3 /* labjackusb.h */; };
 		847CCA66058E8C75003522C8 /* ORLinkedList.h in Headers */ = {isa = PBXBuildFile; fileRef = 847CCA60058E8C75003522C8 /* ORLinkedList.h */; };
 		847CCA68058E8C75003522C8 /* ORQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 847CCA62058E8C75003522C8 /* ORQueue.h */; };
 		847CCA69058E8C75003522C8 /* ORQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 847CCA63058E8C75003522C8 /* ORQueue.m */; };
@@ -3053,6 +3056,7 @@
 		84E5B23A0715C65500C7B798 /* NcdCableCheckTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E5B2360715C65500C7B798 /* NcdCableCheckTask.h */; };
 		84E5B23B0715C65500C7B798 /* NcdCableCheckTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E5B2370715C65500C7B798 /* NcdCableCheckTask.m */; };
 		84E5B30F0715E16700C7B798 /* NcdCableCheckTask.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84E5B30E0715E16700C7B798 /* NcdCableCheckTask.nib */; };
+		84E6CD001E4247BD004D6978 /* libusb-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 84E6CCFF1E4247BD004D6978 /* libusb-1.0.a */; };
 		84E6E5DB10BC570800187AF6 /* ORSISRegisterDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E6E5DA10BC570800187AF6 /* ORSISRegisterDefs.h */; };
 		84E6FB220B2DDC6000CAA7C5 /* ObjectFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E6FB200B2DDC5F00CAA7C5 /* ObjectFactory.m */; };
 		84E6FB230B2DDC6100CAA7C5 /* ObjectFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E6FB210B2DDC6000CAA7C5 /* ObjectFactory.h */; };
@@ -3096,6 +3100,13 @@
 		84EA6CA50C73D11200083319 /* nTPCModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EA6C9B0C73D11200083319 /* nTPCModel.m */; };
 		84EA6CAC0C73D15B00083319 /* ORAcqirisDC440Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EA6CAA0C73D15B00083319 /* ORAcqirisDC440Decoders.h */; };
 		84EA6CAD0C73D15B00083319 /* ORAcqirisDC440Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EA6CAB0C73D15B00083319 /* ORAcqirisDC440Decoders.m */; };
+		84EB2DDE1E32990D00C273AA /* LabJackU6.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84EB2DD51E32990D00C273AA /* LabJackU6.nib */; };
+		84EB2DE11E32990D00C273AA /* ORLabJackU6Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EB2DD81E32990D00C273AA /* ORLabJackU6Controller.h */; };
+		84EB2DE21E32990D00C273AA /* ORLabJackU6Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EB2DD91E32990D00C273AA /* ORLabJackU6Controller.m */; };
+		84EB2DE31E32990D00C273AA /* ORLabJackU6Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EB2DDA1E32990D00C273AA /* ORLabJackU6Decoders.h */; };
+		84EB2DE41E32990D00C273AA /* ORLabJackU6Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EB2DDB1E32990D00C273AA /* ORLabJackU6Decoders.m */; };
+		84EB2DE51E32990D00C273AA /* ORLabJackU6Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EB2DDC1E32990D00C273AA /* ORLabJackU6Model.h */; };
+		84EB2DE61E32990D00C273AA /* ORLabJackU6Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EB2DDD1E32990D00C273AA /* ORLabJackU6Model.m */; };
 		84EBBE681282E2B700234313 /* Archive.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84EBBE641282E2B700234313 /* Archive.nib */; };
 		84EBBE6A1282E2B700234313 /* ORArchive.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EBBE661282E2B700234313 /* ORArchive.h */; };
 		84EBBE6B1282E2B700234313 /* ORArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EBBE671282E2B700234313 /* ORArchive.m */; };
@@ -3760,7 +3771,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				8475EC8B147693E8003A165D /* libusb-1.0.a in Frameworks_Copy */,
 				EF3787A012DFFF90003C814E /* YAJL.framework in Frameworks_Copy */,
 			);
 			name = Frameworks_Copy;
@@ -4188,6 +4198,9 @@
 		840463BB183515AC00F69B23 /* ORGretinaTriggerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORGretinaTriggerController.h; sourceTree = "<group>"; };
 		840463BC183515AC00F69B23 /* ORGretinaTriggerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGretinaTriggerController.m; sourceTree = "<group>"; };
 		840463C9183515FF00F69B23 /* GretinaTrigger.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = GretinaTrigger.gif; sourceTree = "<group>"; };
+		8404EB761E3F818F00370C33 /* LabJackU6.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = LabJackU6.tif; sourceTree = "<group>"; };
+		8404EB781E3F836B00370C33 /* u6.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = u6.m; sourceTree = "<group>"; };
+		8404EB791E3F836B00370C33 /* u6.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = u6.h; sourceTree = "<group>"; };
 		84052A2613106B65007607A4 /* CouchDB.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = CouchDB.nib; path = "Source/Objects/Misc Objects/CouchDB/CouchDB.nib"; sourceTree = SOURCE_ROOT; };
 		84052A2713106B65007607A4 /* CouchDB.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = CouchDB.tif; path = "Source/Objects/Misc Objects/CouchDB/CouchDB.tif"; sourceTree = SOURCE_ROOT; };
 		84052A2813106B65007607A4 /* ORCouchDBController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCouchDBController.h; path = "Source/Objects/Misc Objects/CouchDB/ORCouchDBController.h"; sourceTree = SOURCE_ROOT; };
@@ -5254,8 +5267,6 @@
 		84759CF40B6036D600123411 /* OrcaScript.ym */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.yacc; name = OrcaScript.ym; path = "Source/Main Dialogs/CommandCenter/Scripting/OrcaScript.ym"; sourceTree = SOURCE_ROOT; };
 		8475D8151A3665BC00EE4DE4 /* ORMJDInterlocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORMJDInterlocks.h; sourceTree = "<group>"; };
 		8475D8161A3665BC00EE4DE4 /* ORMJDInterlocks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORMJDInterlocks.m; sourceTree = "<group>"; };
-		8475EC0714759D53003A165D /* libusb-1.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libusb-1.0.a"; sourceTree = "<group>"; };
-		8475EC0814759D53003A165D /* libusb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libusb.h; sourceTree = "<group>"; };
 		8475EC271475A66F003A165D /* LabJack.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = LabJack.nib; path = Source/Objects/Hardware/USB/LabJack/LabJackU12/LabJack.nib; sourceTree = SOURCE_ROOT; };
 		8475EC281475A66F003A165D /* LabJack.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = LabJack.tif; path = Source/Objects/Hardware/USB/LabJack/LabJackU12/LabJack.tif; sourceTree = SOURCE_ROOT; };
 		8475EC291475A66F003A165D /* NoLabJackDriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = NoLabJackDriverHelp.plist; path = Source/Objects/Hardware/USB/LabJack/LabJackU12/NoLabJackDriverHelp.plist; sourceTree = SOURCE_ROOT; };
@@ -5369,6 +5380,9 @@
 		847BC83705E2940D0054841E /* ORHWUndoManager.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORHWUndoManager.h; path = "Source/Main Dialogs/HardwareWizard/ORHWUndoManager.h"; sourceTree = SOURCE_ROOT; };
 		847BC83C05E2941D0054841E /* preferences.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = preferences.tif; path = Source/Preferences/preferences.tif; sourceTree = SOURCE_ROOT; };
 		847BC83D05E2941D0054841E /* PasswordLock.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = PasswordLock.tif; path = Source/Preferences/PasswordLock.tif; sourceTree = SOURCE_ROOT; };
+		847C66221E3BC6B2002696C3 /* liblabjackusb.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = liblabjackusb.dylib; sourceTree = "<group>"; };
+		847C66261E3BC6D5002696C3 /* libusb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libusb.h; sourceTree = "<group>"; };
+		847C662E1E3BCB48002696C3 /* labjackusb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = labjackusb.h; sourceTree = "<group>"; };
 		847CCA60058E8C75003522C8 /* ORLinkedList.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORLinkedList.h; path = "Source/Objects/Misc Objects/DataStructures/ORLinkedList.h"; sourceTree = SOURCE_ROOT; };
 		847CCA62058E8C75003522C8 /* ORQueue.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORQueue.h; path = "Source/Objects/Misc Objects/DataStructures/ORQueue.h"; sourceTree = SOURCE_ROOT; };
 		847CCA63058E8C75003522C8 /* ORQueue.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORQueue.m; path = "Source/Objects/Misc Objects/DataStructures/ORQueue.m"; sourceTree = SOURCE_ROOT; };
@@ -6682,6 +6696,7 @@
 		84E5B2360715C65500C7B798 /* NcdCableCheckTask.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = NcdCableCheckTask.h; sourceTree = "<group>"; };
 		84E5B2370715C65500C7B798 /* NcdCableCheckTask.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = NcdCableCheckTask.m; sourceTree = "<group>"; };
 		84E5B30E0715E16700C7B798 /* NcdCableCheckTask.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = NcdCableCheckTask.nib; path = Source/Experiments/Ncd/CableCheckTask/NcdCableCheckTask.nib; sourceTree = SOURCE_ROOT; };
+		84E6CCFF1E4247BD004D6978 /* libusb-1.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libusb-1.0.a"; sourceTree = "<group>"; };
 		84E6E5DA10BC570800187AF6 /* ORSISRegisterDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSISRegisterDefs.h; sourceTree = "<group>"; };
 		84E6FB200B2DDC5F00CAA7C5 /* ObjectFactory.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ObjectFactory.m; path = Source/Objects/OrcaObject/ObjectFactory.m; sourceTree = SOURCE_ROOT; };
 		84E6FB210B2DDC6000CAA7C5 /* ObjectFactory.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ObjectFactory.h; path = Source/Objects/OrcaObject/ObjectFactory.h; sourceTree = SOURCE_ROOT; };
@@ -6723,6 +6738,13 @@
 		84EA6C9B0C73D11200083319 /* nTPCModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = nTPCModel.m; path = Source/Experiments/nTPC/nTPCModel.m; sourceTree = SOURCE_ROOT; };
 		84EA6CAA0C73D15B00083319 /* ORAcqirisDC440Decoders.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAcqirisDC440Decoders.h; path = Source/Objects/Hardware/CompactPCI/AcqirisDC440/ORAcqirisDC440Decoders.h; sourceTree = SOURCE_ROOT; };
 		84EA6CAB0C73D15B00083319 /* ORAcqirisDC440Decoders.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORAcqirisDC440Decoders.m; path = Source/Objects/Hardware/CompactPCI/AcqirisDC440/ORAcqirisDC440Decoders.m; sourceTree = SOURCE_ROOT; };
+		84EB2DD51E32990D00C273AA /* LabJackU6.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = LabJackU6.nib; sourceTree = "<group>"; };
+		84EB2DD81E32990D00C273AA /* ORLabJackU6Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORLabJackU6Controller.h; sourceTree = "<group>"; };
+		84EB2DD91E32990D00C273AA /* ORLabJackU6Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORLabJackU6Controller.m; sourceTree = "<group>"; };
+		84EB2DDA1E32990D00C273AA /* ORLabJackU6Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORLabJackU6Decoders.h; sourceTree = "<group>"; };
+		84EB2DDB1E32990D00C273AA /* ORLabJackU6Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORLabJackU6Decoders.m; sourceTree = "<group>"; };
+		84EB2DDC1E32990D00C273AA /* ORLabJackU6Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORLabJackU6Model.h; sourceTree = "<group>"; };
+		84EB2DDD1E32990D00C273AA /* ORLabJackU6Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORLabJackU6Model.m; sourceTree = "<group>"; };
 		84EBBE641282E2B700234313 /* Archive.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Archive.nib; path = "Source/Main Dialogs/Archive/Archive.nib"; sourceTree = SOURCE_ROOT; };
 		84EBBE661282E2B700234313 /* ORArchive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORArchive.h; path = "Source/Main Dialogs/Archive/ORArchive.h"; sourceTree = SOURCE_ROOT; };
 		84EBBE671282E2B700234313 /* ORArchive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORArchive.m; path = "Source/Main Dialogs/Archive/ORArchive.m"; sourceTree = SOURCE_ROOT; };
@@ -7172,10 +7194,11 @@
 				2DC1EE800F33724E00E93C75 /* WebKit.framework in Frameworks */,
 				840F5B191222C90000D49A75 /* QTKit.framework in Frameworks */,
 				EF37879212DFFF81003C814E /* YAJL.framework in Frameworks */,
-				8475EC0B14759D53003A165D /* libusb-1.0.a in Frameworks */,
+				84E6CD001E4247BD004D6978 /* libusb-1.0.a in Frameworks */,
 				8458E91515DA8A2A005C43A9 /* ScriptingBridge.framework in Frameworks */,
 				8481E67917653766001AB905 /* SystemConfiguration.framework in Frameworks */,
 				4AB9E5401DE5D9DB007C75E0 /* libpq.a in Frameworks */,
+				847C66231E3BC6B2002696C3 /* liblabjackusb.dylib in Frameworks */,
 				4322E9B217830004008E78A4 /* GLUT.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -10380,8 +10403,8 @@
 		8475EC0414759D53003A165D /* libusb */ = {
 			isa = PBXGroup;
 			children = (
-				8475EC0714759D53003A165D /* libusb-1.0.a */,
-				8475EC0814759D53003A165D /* libusb.h */,
+				84E6CCFF1E4247BD004D6978 /* libusb-1.0.a */,
+				847C66261E3BC6D5002696C3 /* libusb.h */,
 			);
 			path = libusb;
 			sourceTree = "<group>";
@@ -10389,6 +10412,7 @@
 		8475EC251475A66F003A165D /* LabJack */ = {
 			isa = PBXGroup;
 			children = (
+				84EB2DD41E32990D00C273AA /* LabJackU6 */,
 				8475EC261475A66F003A165D /* LabJackU12 */,
 				8475EC301475A66F003A165D /* LabJackUE9 */,
 			);
@@ -10574,6 +10598,15 @@
 			name = SplashScreen;
 			path = "Source/Main Dialogs/SplashScreen";
 			sourceTree = SOURCE_ROOT;
+		};
+		847C660F1E364196002696C3 /* exodriver */ = {
+			isa = PBXGroup;
+			children = (
+				847C662E1E3BCB48002696C3 /* labjackusb.h */,
+				847C66221E3BC6B2002696C3 /* liblabjackusb.dylib */,
+			);
+			path = exodriver;
+			sourceTree = "<group>";
 		};
 		847CCA5F058E8C1B003522C8 /* DataStructures */ = {
 			isa = PBXGroup;
@@ -13751,6 +13784,23 @@
 			path = Source/Experiments/nTPC;
 			sourceTree = SOURCE_ROOT;
 		};
+		84EB2DD41E32990D00C273AA /* LabJackU6 */ = {
+			isa = PBXGroup;
+			children = (
+				84EB2DD51E32990D00C273AA /* LabJackU6.nib */,
+				8404EB761E3F818F00370C33 /* LabJackU6.tif */,
+				8404EB781E3F836B00370C33 /* u6.m */,
+				8404EB791E3F836B00370C33 /* u6.h */,
+				84EB2DD81E32990D00C273AA /* ORLabJackU6Controller.h */,
+				84EB2DD91E32990D00C273AA /* ORLabJackU6Controller.m */,
+				84EB2DDA1E32990D00C273AA /* ORLabJackU6Decoders.h */,
+				84EB2DDB1E32990D00C273AA /* ORLabJackU6Decoders.m */,
+				84EB2DDC1E32990D00C273AA /* ORLabJackU6Model.h */,
+				84EB2DDD1E32990D00C273AA /* ORLabJackU6Model.m */,
+			);
+			path = LabJackU6;
+			sourceTree = "<group>";
+		};
 		84EBBE631282E2B700234313 /* Archive */ = {
 			isa = PBXGroup;
 			children = (
@@ -13994,6 +14044,7 @@
 		84F7FB520AE5558900A5AA4C /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				847C660F1E364196002696C3 /* exodriver */,
 				3620200C1CBD38EE0089296E /* libSNO+ */,
 				8475EC0414759D53003A165D /* libusb */,
 				2AE87BDC0D6E486900A839FC /* libUniversal */,
@@ -15140,6 +15191,7 @@
 				2A943A6608A8194B00D04541 /* ORSerialPortAdditions.h in Headers */,
 				2A943A6808A8194B00D04541 /* ORSerialPortList.h in Headers */,
 				4AB9E5281DE5D820007C75E0 /* libpq-fs.h in Headers */,
+				84EB2DE31E32990D00C273AA /* ORLabJackU6Decoders.h in Headers */,
 				4AB9E5291DE5D820007C75E0 /* NKDPostgreSQLConnection.h in Headers */,
 				2A4553E308BCE9A3004BB15E /* ORTDC3377Controller.h in Headers */,
 				2A4553E508BCE9A3004BB15E /* ORTDC3377Decoders.h in Headers */,
@@ -15394,6 +15446,7 @@
 				84CEDD1C0CDA7D9E002CFD3A /* ORGretina4Model.h in Headers */,
 				84CEDD1F0CDA7DB7002CFD3A /* VME_HW_Definitions.h in Headers */,
 				84997E850CE37CBA002CFA70 /* ORVme64CrateController.h in Headers */,
+				84EB2DE11E32990D00C273AA /* ORLabJackU6Controller.h in Headers */,
 				84997E860CE37CBA002CFA70 /* ORVme64CrateModel.h in Headers */,
 				8407751E0CEE7CAD0073F5A9 /* ORHelpCenter.h in Headers */,
 				847E6C100CFF4BF400E963C6 /* ORObjectProxy.h in Headers */,
@@ -15435,6 +15488,7 @@
 				8422513C0D8845390048D331 /* HW_Readout.h in Headers */,
 				8422513E0D8845390048D331 /* SLTv4_HW_Definitions.h in Headers */,
 				84FB4E230D92F7560055813E /* ORBugReporter.h in Headers */,
+				8404EB7B1E3F836B00370C33 /* u6.h in Headers */,
 				9CDEF5C90D9456A800FEE85A /* ORCalibration.h in Headers */,
 				847A46D80D9C3C18002125DE /* ORJAMFDecoders.h in Headers */,
 				847A48550D9C5D30002125DE /* ORFilterPluginBaseClass.h in Headers */,
@@ -15615,6 +15669,7 @@
 				8408A22A0FD85B3A00B0206D /* ORTemplates.h in Headers */,
 				84B74CE90FEBE9B90033E658 /* ORCaen965Controller.h in Headers */,
 				84B74CEB0FEBE9B90033E658 /* ORCaen965Model.h in Headers */,
+				84EB2DE51E32990D00C273AA /* ORLabJackU6Model.h in Headers */,
 				84A1ACAD0FF3A4EE00D7F946 /* ORPlotPublisher.h in Headers */,
 				84A1B1890FF3CE7400D7F946 /* ApplicationSupport.h in Headers */,
 				84D7913D0FFA4CD000DC81D2 /* ORKeithley6487Controller.h in Headers */,
@@ -15658,6 +15713,7 @@
 				43ADFE8110B6DBCF0044617C /* ORGretinaReadout.hh in Headers */,
 				43ADFE8310B6DBCF0044617C /* ORLAMData.hh in Headers */,
 				43ADFE8510B6DBCF0044617C /* ORMTCReadout.hh in Headers */,
+				847C66271E3BC6D5002696C3 /* libusb.h in Headers */,
 				43ADFE8710B6DBCF0044617C /* ORShaperReadout.hh in Headers */,
 				43ADFE8910B6DBCF0044617C /* ORSIS3300Readout.hh in Headers */,
 				43ADFE8B10B6DBCF0044617C /* ORSIS3302Card.hh in Headers */,
@@ -15879,7 +15935,6 @@
 				848E59171472B34400A70AB4 /* ORTTCPX400DPController.h in Headers */,
 				848E59191472B34400A70AB4 /* ORTTCPX400DPModel.h in Headers */,
 				84F604841B8F399200C4C554 /* ORBurstMonitorDecoders.h in Headers */,
-				8475EC0C14759D53003A165D /* libusb.h in Headers */,
 				8475EC3D1475A66F003A165D /* ORLabJackController.h in Headers */,
 				8475EC3F1475A66F003A165D /* ORLabJackDecoders.h in Headers */,
 				8475EC411475A66F003A165D /* ORLabJackModel.h in Headers */,
@@ -16003,6 +16058,7 @@
 				8449A53C16AEDF5B00296104 /* ORCV1721Model.h in Headers */,
 				8449A54216AEE44300296104 /* ORCAEN1721Readout.hh in Headers */,
 				5B5A40531A79385C00543633 /* ORSIS3305Model.h in Headers */,
+				847C662F1E3BCB48002696C3 /* labjackusb.h in Headers */,
 				8449A55116B0781B00296104 /* ORGretinaCntView.h in Headers */,
 				84DA76C216B803E00045F22A /* ORAdcRateController.h in Headers */,
 				84DA76C416B803E00045F22A /* ORAdcRateModel.h in Headers */,
@@ -16784,6 +16840,7 @@
 				84B74CE70FEBE9B90033E658 /* Caen965.gif in Resources */,
 				84B74CE80FEBE9B90033E658 /* Caen965.nib in Resources */,
 				84A1ACAC0FF3A4EE00D7F946 /* PlotPublisher.nib in Resources */,
+				84EB2DDE1E32990D00C273AA /* LabJackU6.nib in Resources */,
 				84D7913B0FFA4CD000DC81D2 /* Keithley6487.gif in Resources */,
 				84D7913C0FFA4CD000DC81D2 /* Keithley6487.nib in Resources */,
 				84D79B860FFD347400DC81D2 /* leftBug.tif in Resources */,
@@ -17055,6 +17112,7 @@
 				8458EA3A15DBCFF6005C43A9 /* MPodCrate.nib in Resources */,
 				8458EA3B15DBCFF6005C43A9 /* MPodCrate.tif in Resources */,
 				8458EA3C15DBCFF6005C43A9 /* MPodCrateSmall.tif in Resources */,
+				8404EB771E3F818F00370C33 /* LabJackU6.tif in Resources */,
 				2DAB012115EF988C00BC2540 /* EdelweissLogo.tif in Resources */,
 				2DAB012215EF988C00BC2540 /* KITLogo.tif in Resources */,
 				84150EDC1615FF9C0054FF08 /* Rad7Buttons.png in Resources */,
@@ -17654,6 +17712,7 @@
 				84EA6CA30C73D11200083319 /* nTPCController.m in Sources */,
 				84EA6CA50C73D11200083319 /* nTPCModel.m in Sources */,
 				84EA6CAD0C73D15B00083319 /* ORAcqirisDC440Decoders.m in Sources */,
+				84EB2DE41E32990D00C273AA /* ORLabJackU6Decoders.m in Sources */,
 				9C38E5580C775F2A00255848 /* ORcPCICardDecoder.m in Sources */,
 				2A7685BA0C7B3A9C000C942F /* ORUSBtoGPIBController.m in Sources */,
 				2A7685C00C7B3AA4000C942F /* ORUSBtoGPIBModel.m in Sources */,
@@ -17863,6 +17922,7 @@
 				840973630F81136F00036BE8 /* ORManualPlotModel.m in Sources */,
 				840975E10F8242B300036BE8 /* ORIP408Decoders.m in Sources */,
 				8409825F0F84EA5900036BE8 /* ORTek220Controller.m in Sources */,
+				84EB2DE61E32990D00C273AA /* ORLabJackU6Model.m in Sources */,
 				840982610F84EA5900036BE8 /* ORTek220Data.m in Sources */,
 				840982630F84EA5900036BE8 /* ORTek220Model.m in Sources */,
 				84098F570F964F0100036BE8 /* ORPDcuController.m in Sources */,
@@ -17969,6 +18029,7 @@
 				84E966D411848BEF008D9119 /* MajoranaDetectorView.m in Sources */,
 				84E966D611848BEF008D9119 /* MajoranaModel.m in Sources */,
 				84BF43CF118793FA00F55216 /* ORCaen1785Controller.m in Sources */,
+				84EB2DE21E32990D00C273AA /* ORLabJackU6Controller.m in Sources */,
 				84BF43D1118793FA00F55216 /* ORCaen1785Decoder.m in Sources */,
 				84BF43D3118793FA00F55216 /* ORCaen1785Model.m in Sources */,
 				84762013118CD53D00016A8D /* OR1dFit.m in Sources */,
@@ -18101,6 +18162,7 @@
 				CE10F0121451674C0084C15D /* ORXYCom200Controller.m in Sources */,
 				CE10F0141451674C0084C15D /* ORXYCom200Model.m in Sources */,
 				CE10F0161451674C0084C15D /* ORXYCom564Controller.m in Sources */,
+				8404EB7A1E3F836B00370C33 /* u6.m in Sources */,
 				CE10F0181451674C0084C15D /* ORXYCom564Model.m in Sources */,
 				CE20A5C4145EE1CD00B8862D /* ORXYCom564Decoder.m in Sources */,
 				84CA8AFC14608A180072BB24 /* ObjWithHistoryController.m in Sources */,
@@ -18734,6 +18796,8 @@
 					"$(SRCROOT)/Libraries/libusb",
 					"$(PROJECT_DIR)/Libraries/libSNO+",
 					"$(PROJECT_DIR)/Libraries/libIntel",
+					"$(PROJECT_DIR)/Libraries/exodriver",
+					"$(PROJECT_DIR)/Libraries/libusb",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Libraries/libUniversal\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_2 = "\"$(SRCROOT)/Libraries\"";
@@ -18810,6 +18874,8 @@
 					"\"$(SRCROOT)/Libraries/libusb\"",
 					"$(PROJECT_DIR)/Libraries/libSNO+",
 					"$(PROJECT_DIR)/Libraries/libIntel",
+					"$(PROJECT_DIR)/Libraries/exodriver",
+					"$(PROJECT_DIR)/Libraries/libusb",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/Libraries\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Libraries/libUniversal\"";
@@ -18883,6 +18949,8 @@
 					"\"$(SRCROOT)/Libraries/libusb\"",
 					"$(PROJECT_DIR)/Libraries/libSNO+",
 					"$(PROJECT_DIR)/Libraries/libIntel",
+					"$(PROJECT_DIR)/Libraries/exodriver",
+					"$(PROJECT_DIR)/Libraries/libusb",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/Libraries\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Libraries/libUniversal\"";
