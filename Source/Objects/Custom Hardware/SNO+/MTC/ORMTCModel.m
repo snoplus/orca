@@ -384,8 +384,10 @@ resetFifoOnStart = _resetFifoOnStart;
         [[self undoManager] disableUndoRegistration];
 
         if (pqMTC->valid[kMTC_controlReg]) {
-            // TO_DO currently only updating pedestal enabled flag -- what about pulser enable bit (0x02)?
-            [self setIsPedestalEnabledInCSR:(pqMTC->controlReg & 0x01)];
+            // TO_DO is this the best way to handle the pedestal enable (bit 0x01) and pulser enable (bit 0x02)?
+            if (((pqMTC->controlReg >> 1) ^ pqMTC->controlReg) & 0x01) {
+                [self setIsPedestalEnabledInCSR:(pqMTC->controlReg & 0x01)];
+            }
         } else ++countInvalid;
 
         //TO_DO verify that order of MTCA DACs is correct
