@@ -1441,11 +1441,11 @@ tubRegister;
 - (void) loadFineDelayToHardware: (float) fine_delay {
     @try {
         [mtc okCommand:"set_fine_delay %f", fine_delay];
-        NSLog(@"mtc: coarse delay %.2fns\n", fine_delay);
+        NSLog(@"mtc: fine delay %.2fns\n", fine_delay);
 
     }
     @catch(NSException* localException) {
-        NSLog(@"Could not set coarse delay\n");
+        NSLog(@"Could not set fine delay\n");
         NSLog(@"Exception: %@\n",localException);
         [localException raise];
     }
