@@ -1478,7 +1478,6 @@ tubRegister;
 	@catch(NSException* localException) {
 		NSLog(@"Unable to enable the pulser!\n");		
 		[localException raise];
-        return;
 	}
 
     [self setPulserEnabled:YES];
@@ -1493,7 +1492,6 @@ tubRegister;
 	@catch(NSException* localException) {
 		NSLog(@"Unable to disable the pulser!\n");		
 		[localException raise];
-        return;
 	}
 
     [self setPulserEnabled:NO];
