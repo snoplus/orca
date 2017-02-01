@@ -56,6 +56,9 @@ const int view_model_map[10] = {
     MTC_OWLEHI_THRESHOLD_INDEX,
     MTC_OWLELO_THRESHOLD_INDEX};
 
+// The following defines the map between view ordering of triggers and gt mask ordering
+const int view_mask_map[10] = {2,1,0,3,4,7,6,5,9,8};
+
 @implementation SNOPController
 
 @synthesize
@@ -1662,9 +1665,6 @@ snopGreenColor;
     //GTMask
     int gtmask = [mtcModel gtMask];
 
-    // The following defines the map between view ordering of triggers and gt mask ordering
-    int view_mask_map[10] = {2,1,0,3,4,7,6,5,9,8};
-
     for(int i=0;i<10;i++)
     {
         @try {
@@ -1690,6 +1690,10 @@ snopGreenColor;
         [[standardRunThresCurrentValues cellAtRow:11 column:0] setTextColor:[self snopBlueColor]];
     } else{
         [[standardRunThresCurrentValues cellAtRow:11 column:0] setTextColor:[self snopRedColor]];
+    }
+    if(aNotification && [[aNotification name] isEqualToString:ORMTCAConversionChanged])
+    {
+        [self redisplayThresholdValuesUsingModel:mtcModel];
     }
     
 }
@@ -1782,7 +1786,20 @@ snopGreenColor;
     }
     
 }
--(void) updateSingleDBThresholdDisplayForRow:(int) row inMask:(BOOL) inMask withModel:(id) mtcModel withFormatter:(NSFormatter*) formatter toValue:(float) raw {
+
+- (void) redisplayThresholdValuesUsingModel: (id)mtcModel {
+    int units;
+    float value;
+    for(int i=0; i<10; i++) {
+        if(thresholdsFromDB[i] > 0) {
+            units = [self decideUnitsToUseForRow:i usingModel:mtcModel];
+            value = [mtcModel convertThreshold:thresholdsFromDB[i] OfType:view_model_map[i] fromUnits:MTC_RAW_UNITS toUnits:units];
+            [[standardRunThresStoredValues cellAtRow:i column:0] setFloatValue:value];
+        }
+    }
+}
+
+- (void) updateSingleDBThresholdDisplayForRow:(int) row inMask:(BOOL) inMask withModel:(id) mtcModel withFormatter:(NSFormatter*) formatter toValue:(float) raw {
     float value;
     int units;
     @try {
@@ -1798,6 +1815,7 @@ snopGreenColor;
     } else{
         [[standardRunThresStoredValues cellAtRow:row column:0] setTextColor:[self snopRedColor]];
     }
+    thresholdsFromDB[row] = raw;
 }
 //Query the DB for the selected Standard Run name and version
 //and display the values in the GUI.
@@ -1862,6 +1880,7 @@ snopGreenColor;
     if([[versionSettings valueForKey:@"rows"] count] == 0){
         for (int i=0; i<[standardRunThresStoredValues numberOfRows];i++) {
             [[standardRunThresStoredValues cellAtRow:i column:0] setStringValue:@"--"];
+            thresholdsFromDB[i] = -1;
         }
         NSLogColor([NSColor redColor],@"Cannot display TEST RUN values. There was some problem with the Standard Run DataBase. \n");
     }
@@ -1870,6 +1889,9 @@ snopGreenColor;
         for (int i=0; i<[standardRunThresStoredValues numberOfRows];i++) {
             [[standardRunThresStoredValues cellAtRow:i column:0] setStringValue:@"--"];
             [[standardRunThresStoredValues cellAtRow:i column:0] setTextColor:[self snopRedColor]];
+            if(i <10){
+                thresholdsFromDB[i] = -1;
+            }
         }
         for(int ibit=0; ibit<21; ibit++){ //Data quality bits are not stored in the SR
             [[runTypeWordSRMatrix cellAtRow:ibit column:0] setState:0];
@@ -1879,8 +1901,6 @@ snopGreenColor;
         float mVolts;
         int gtmask = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:GTMaskSerializationString] intValue];
         
-        //This defines the mapping between the view order and the GT mask positions
-        int view_mask_map[10] = {2,1,0,3,4,7,6,5,9,8};
         for(int i=0;i<10;i++) {
             float raw = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtcModel stringForThreshold:i]] floatValue];
             BOOL inMask = ((1<< view_mask_map[i]) & gtmask) != 0;

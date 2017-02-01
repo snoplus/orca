@@ -40,6 +40,7 @@
     
     // Used for deciding what units to use displaying thresholds
     int displayUnitsDecider[10];
+    int thresholdsFromDB[10];
 
     IBOutlet NSMatrix* hvStatusMatrix;
     
