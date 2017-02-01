@@ -887,8 +887,8 @@ tubRegister;
     {
         [NSException raise:@"ConversionNotValidError" format:@"Conversion for threshold %i is not valid",type];
     }
-    float DAC_per_nhit = [self DAC_per_NHIT_ofType:type];
-    float DAC_per_mv = [self DAC_per_mV_ofType:type];
+    float DAC_per_nhit = [self dacPerNHit:type];
+    float DAC_per_mv = [self DacPerMilliVoltOfType:type];
     float mv_per_nhit = DAC_per_nhit/DAC_per_mv;
 
     if(in_units == MTC_RAW_UNITS) {
@@ -937,10 +937,10 @@ tubRegister;
     }
 }
 
-- (float) DAC_per_NHIT_ofType:(int) type {
+- (float) dacPerNHit:(int) type {
     return mtca_dac_per_nhit[type];
 }
-- (void) setDAC_per_NHIT_OfType:(int) type toValue:(float) _val {
+- (void) setDacPerNHit:(int) type toValue:(float) _val {
     if(mtca_dac_per_nhit[type] != _val)
     {
         mtca_dac_per_nhit[type] = _val;
@@ -948,10 +948,10 @@ tubRegister;
         [[NSNotificationQueue defaultQueue] enqueueNotification:note postingStyle:NSPostASAP coalesceMask:NSNotificationCoalescingOnName forModes:nil];
     }
 }
-- (float) DAC_per_mV_ofType:(int) type {
+- (float) DacPerMilliVoltOfType:(int) type {
     return mtca_dac_per_mV[type];
 }
-- (void) setDAC_per_mV_OfType:(int) type toValue:(float) _val {
+- (void) setDacPerMilliVoltOfType:(int) type toValue:(float) _val {
     if(mtca_dac_per_mV[type] != _val)
     {
         mtca_dac_per_mV[type] = _val;

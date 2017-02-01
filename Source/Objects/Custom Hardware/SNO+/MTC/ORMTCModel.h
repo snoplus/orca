@@ -181,11 +181,11 @@
 - (uint16_t) getBaselineOfType:(int) type;
 - (void) setBaselineOfType:(int) type toValue:(uint16_t) _val;
 
-- (float) DAC_per_NHIT_ofType:(int) type;
-- (void) setDAC_per_NHIT_OfType:(int) type toValue:(float) _val;
+- (float) dacPerNHit:(int) type;
+- (void) setDacPerNHit:(int) type toValue:(float) _val;
 
-- (float) DAC_per_mV_ofType:(int) type;
-- (void) setDAC_per_mV_OfType:(int) type toValue:(float) _val;
+- (float) DacPerMilliVoltOfType:(int) type;
+- (void) setDacPerMilliVoltOfType:(int) type toValue:(float) _val;
 
 - (BOOL) ConversionIsValidForThreshold:(int) type;
 - (void) setConversionIsValidForThreshold:(int) type isValid:(BOOL) _val;

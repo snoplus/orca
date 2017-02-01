@@ -1030,7 +1030,7 @@
             threshold_index = [self trigger_scan_name_to_index:name];
             if ([model thresholdIsNHit:threshold_index]) {
                 dac_per_nhit =[[result_dict objectForKey:@"adc_per_nhit"] stringValue];
-                [model setDAC_per_NHIT_OfType:threshold_index toValue:[dac_per_nhit floatValue]];
+                [model setDacPerNHit:threshold_index toValue:[dac_per_nhit floatValue]];
             }
             [model setBaselineOfType:threshold_index toValue:[baseline intValue]];
 
@@ -1038,7 +1038,7 @@
             // http://www.analog.com/media/en/technical-documentation/data-sheets/AD7243.pdf
             // It's usage on the MTCA can be seen on page 8 of the MTCA+ schematics.
             // http://snopl.us/detector/schematics/pdf/mtcaplus.pdf
-            [model setDAC_per_mV_OfType:threshold_index toValue:-4096/10000.0];
+            [model setDacPerMilliVoltOfType:threshold_index toValue:-4096/10000.0];
 
             [model setConversionIsValidForThreshold:threshold_index isValid:YES];
         } @catch (NSException* exception) {
