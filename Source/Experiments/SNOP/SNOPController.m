@@ -38,6 +38,20 @@
 
 NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 
+// This holds the map between thresholds as ordered by the
+// window and as indexed by the MTC model
+int view_model_map[10] = {
+    MTC_N100_HI_THRESHOLD_INDEX,
+    MTC_N100_MED_THRESHOLD_INDEX,
+    MTC_N100_LO_THRESHOLD_INDEX,
+    MTC_N20_THRESHOLD_INDEX,
+    MTC_N20LB_THRESHOLD_INDEX,
+    MTC_OWLN_THRESHOLD_INDEX,
+    MTC_ESUMH_THRESHOLD_INDEX,
+    MTC_ESUML_THRESHOLD_INDEX,
+    MTC_OWLEHI_THRESHOLD_INDEX,
+    MTC_OWLELO_THRESHOLD_INDEX};
+
 @implementation SNOPController
 
 @synthesize
@@ -1623,19 +1637,6 @@ snopGreenColor;
 
     //GTMask
     int gtmask = [mtcModel gtMask];
-    // The following defines the map between the view threshold ordering and the
-    // mtc model indices
-    int view_model_map[10] = {
-        MTC_N100_HI_THRESHOLD_INDEX,
-        MTC_N100_MED_THRESHOLD_INDEX,
-        MTC_N100_LO_THRESHOLD_INDEX,
-        MTC_N20_THRESHOLD_INDEX,
-        MTC_N20LB_THRESHOLD_INDEX,
-        MTC_OWLN_THRESHOLD_INDEX,
-        MTC_ESUMH_THRESHOLD_INDEX,
-        MTC_ESUML_THRESHOLD_INDEX,
-        MTC_OWLEHI_THRESHOLD_INDEX,
-        MTC_OWLELO_THRESHOLD_INDEX};
 
     // The following defines the map between view ordering of triggers and gt mask ordering
     int view_mask_map[10] = {2,1,0,3,4,7,6,5,9,8};
@@ -1860,19 +1861,6 @@ snopGreenColor;
         float mVolts;
         int gtmask = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:GTMaskSerializationString] intValue];
         
-        // The following defines the map between the view threshold ordering and the
-        // mtc model indices
-        int view_model_map[10] = {
-            MTC_N100_HI_THRESHOLD_INDEX,
-            MTC_N100_MED_THRESHOLD_INDEX,
-            MTC_N100_LO_THRESHOLD_INDEX,
-            MTC_N20_THRESHOLD_INDEX,
-            MTC_N20LB_THRESHOLD_INDEX,
-            MTC_OWLN_THRESHOLD_INDEX,
-            MTC_ESUMH_THRESHOLD_INDEX,
-            MTC_ESUML_THRESHOLD_INDEX,
-            MTC_OWLEHI_THRESHOLD_INDEX,
-            MTC_OWLELO_THRESHOLD_INDEX};
         //This defines the mapping between the view order and the GT mask positions
         int view_mask_map[10] = {2,1,0,3,4,7,6,5,9,8};
         for(int i=0;i<10;i++) {
