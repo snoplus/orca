@@ -1592,6 +1592,7 @@ tubRegister;
 
 - (void) fireMTCPedestalsFixedTime
 {
+    float cachedRate;
     @try {
 		/* setup pedestals and global trigger */
         [self basicMTCPedestalGTrigSetup];
@@ -1600,6 +1601,7 @@ tubRegister;
 
         /* set the pulser rate to 0, which will enable SOFT_GT to trigger
          * pedestals */
+        cachedRate = [self pgtRate];
         [self setPgtRate:0];
         [self loadPulserRateToHardware];
 
@@ -1612,6 +1614,8 @@ tubRegister;
         NSLog(@"MTC failed to fire pedestals at the specified settings!\n");
         NSLog(@"fireMTCPedestalsFixedRate: %@\n", [e reason]);
     }
+    // Put the rate back to where we found it.
+    [self setPgtRate:cachedRate];
 }
 
 - (void) stopMTCPedestalsFixedTime
