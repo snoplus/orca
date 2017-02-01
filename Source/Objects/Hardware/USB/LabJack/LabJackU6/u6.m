@@ -196,7 +196,7 @@ HANDLE openUSBConnection(int searchValue, BOOL verbose) //-1 is probe only
                 NSLog(@"  FirmwareVersion = %d.%02d\n", recBuffer[10], recBuffer[9]);
                 NSLog(@"  BootloaderVersion = %d.%02d\n", recBuffer[12], recBuffer[11]);
                 NSLog(@"  HardwareVersion = %d.%02d\n", recBuffer[14], recBuffer[13]);
-                NSLog(@"  SerialNumber = %d\n", makeInt(recBuffer, 15));
+                NSLog(@"  SerialNumber = 0x%x\n", makeInt(recBuffer, 15));
                 NSLog(@"  ProductID = %d\n", makeShort(recBuffer, 19));
                 NSLog(@"  LocalID = %d\n", recBuffer[21]);
                 NSLog(@"  VersionInfo = %d\n", recBuffer[37]);
