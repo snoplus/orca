@@ -3056,7 +3056,7 @@
 		84E5B23B0715C65500C7B798 /* NcdCableCheckTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E5B2370715C65500C7B798 /* NcdCableCheckTask.m */; };
 		84E5B30F0715E16700C7B798 /* NcdCableCheckTask.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84E5B30E0715E16700C7B798 /* NcdCableCheckTask.nib */; };
 		84E6CD001E4247BD004D6978 /* libusb-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 84E6CCFF1E4247BD004D6978 /* libusb-1.0.a */; };
-		84E6CD021E426E7A004D6978 /* liblabjackusb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 84E6CD011E426E7A004D6978 /* liblabjackusb.a */; };
+		84E6CD061E4276CE004D6978 /* labjackusb.c in Sources */ = {isa = PBXBuildFile; fileRef = 84E6CD051E4276CE004D6978 /* labjackusb.c */; };
 		84E6E5DB10BC570800187AF6 /* ORSISRegisterDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E6E5DA10BC570800187AF6 /* ORSISRegisterDefs.h */; };
 		84E6FB220B2DDC6000CAA7C5 /* ObjectFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E6FB200B2DDC5F00CAA7C5 /* ObjectFactory.m */; };
 		84E6FB230B2DDC6100CAA7C5 /* ObjectFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E6FB210B2DDC6000CAA7C5 /* ObjectFactory.h */; };
@@ -6696,7 +6696,7 @@
 		84E5B2370715C65500C7B798 /* NcdCableCheckTask.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = NcdCableCheckTask.m; sourceTree = "<group>"; };
 		84E5B30E0715E16700C7B798 /* NcdCableCheckTask.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = NcdCableCheckTask.nib; path = Source/Experiments/Ncd/CableCheckTask/NcdCableCheckTask.nib; sourceTree = SOURCE_ROOT; };
 		84E6CCFF1E4247BD004D6978 /* libusb-1.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libusb-1.0.a"; sourceTree = "<group>"; };
-		84E6CD011E426E7A004D6978 /* liblabjackusb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = liblabjackusb.a; sourceTree = "<group>"; };
+		84E6CD051E4276CE004D6978 /* labjackusb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = labjackusb.c; sourceTree = "<group>"; };
 		84E6E5DA10BC570800187AF6 /* ORSISRegisterDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSISRegisterDefs.h; sourceTree = "<group>"; };
 		84E6FB200B2DDC5F00CAA7C5 /* ObjectFactory.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ObjectFactory.m; path = Source/Objects/OrcaObject/ObjectFactory.m; sourceTree = SOURCE_ROOT; };
 		84E6FB210B2DDC6000CAA7C5 /* ObjectFactory.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ObjectFactory.h; path = Source/Objects/OrcaObject/ObjectFactory.h; sourceTree = SOURCE_ROOT; };
@@ -7188,7 +7188,6 @@
 				8439D5EF05BEFF3A0077EFF2 /* Carbon.framework in Frameworks */,
 				840F377B08F322F800FC4408 /* IOKit.framework in Frameworks */,
 				84F5E11B0A151E0B00707A0F /* OpenGL.framework in Frameworks */,
-				84E6CD021E426E7A004D6978 /* liblabjackusb.a in Frameworks */,
 				847599860B5FF26500123411 /* QuartzCore.framework in Frameworks */,
 				2AE87C600D6E636700A839FC /* libmysqlclient.a in Frameworks */,
 				3620200E1CBD38EE0089296E /* libiconv.2.dylib in Frameworks */,
@@ -10602,8 +10601,8 @@
 		847C660F1E364196002696C3 /* exodriver */ = {
 			isa = PBXGroup;
 			children = (
+				84E6CD051E4276CE004D6978 /* labjackusb.c */,
 				847C662E1E3BCB48002696C3 /* labjackusb.h */,
-				84E6CD011E426E7A004D6978 /* liblabjackusb.a */,
 			);
 			path = exodriver;
 			sourceTree = "<group>";
@@ -17330,6 +17329,7 @@
 				8434A31E055B3287002D3102 /* ORHPPulserController.m in Sources */,
 				8434A31F055B3287002D3102 /* ORTek754DData.m in Sources */,
 				8434A324055B3287002D3102 /* ThreadWorker.m in Sources */,
+				84E6CD061E4276CE004D6978 /* labjackusb.c in Sources */,
 				8434A326055B3287002D3102 /* ORReadOutList.m in Sources */,
 				8434A327055B3287002D3102 /* NSOutlineView+Extensions.m in Sources */,
 				8434A328055B3287002D3102 /* NSArray+Extensions.m in Sources */,
