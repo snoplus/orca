@@ -76,7 +76,7 @@
     
     blankView = [[NSView alloc] init];
     ioSize			= NSMakeSize(630,665);
-    setupSize		= NSMakeSize(570,665);
+    setupSize		= NSMakeSize(630,665);
     
     NSString* key = [NSString stringWithFormat: @"orca.ORLabJac%ld.selectedtab",[model uniqueIdNumber]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];

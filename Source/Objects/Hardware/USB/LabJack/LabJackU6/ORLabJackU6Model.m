@@ -906,7 +906,8 @@ NSString* ORLabJackU6CounterEnabledChanged      = @"ORLabJackU6CounterEnabledCha
  
         [self setAdcRange:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"adcRange%d",i]]];
         [self setEnabled:i withValue:[decoder decodeBoolForKey:[NSString stringWithFormat:@"enabled%d",i]]];
-
+        [self setChannel:i unit:[decoder decodeObjectForKey:[NSString stringWithFormat:@"channelUnit%d",i]]];
+        
 	}
     for(i=0;i<kNumU6IOChannels;i++) {
         NSString* aName = [decoder decodeObjectForKey:[NSString stringWithFormat:@"DO%d",i]];
@@ -953,6 +954,7 @@ NSString* ORLabJackU6CounterEnabledChanged      = @"ORLabJackU6CounterEnabledCha
         [encoder encodeFloat:maxValue[i] forKey:[NSString stringWithFormat:@"maxValue%d",i]];
         [encoder encodeInt:adcRange[i] forKey:[NSString stringWithFormat:@"adcRange%d",i]];
         [encoder encodeBool:enabled[i] forKey:[NSString stringWithFormat:@"enabled%d",i]];
+        [encoder encodeObject:channelUnit[i] forKey:[NSString stringWithFormat:@"channelUnit%d",i]];
     }
     for(i=0;i<kNumU6IOChannels;i++) {
         [encoder encodeObject:doName[i] forKey:[NSString stringWithFormat:@"DO%d",i]];
