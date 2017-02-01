@@ -38,6 +38,9 @@
 	NSSize hvMasterSize;
 	NSSize runsSize;
     
+    // Used for deciding what units to use displaying thresholds
+    int displayUnitsDecider[10];
+
     IBOutlet NSMatrix* hvStatusMatrix;
     
     //Run control (the rest is in the ORExperimentController)
@@ -173,7 +176,7 @@
 - (IBAction) testLogServer:(id)sender;
 
 - (void) updateSettings: (NSNotification *) aNote;
-
+- (void) initializeUnits;
 #pragma mark ¥¥¥Actions
 
 - (IBAction) orcaDBIPAddressAction:(id)sender;

@@ -38,9 +38,13 @@
 
 NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 
+#define UNITS_UNDECIDED 0
+#define UNITS_RAW       1
+#define UNITS_CONVERTED 2
+
 // This holds the map between thresholds as ordered by the
 // window and as indexed by the MTC model
-int view_model_map[10] = {
+const int view_model_map[10] = {
     MTC_N100_HI_THRESHOLD_INDEX,
     MTC_N100_MED_THRESHOLD_INDEX,
     MTC_N100_LO_THRESHOLD_INDEX,
@@ -73,6 +77,7 @@ snopGreenColor;
 
     hvMask = 0;
     doggy_icon = [[RunStatusIcon alloc] init];
+    [self initializeUnits];
     return self;
 }
 - (void) dealloc
@@ -251,6 +256,7 @@ snopGreenColor;
 
     [doggy_icon start_animation];
 
+    [self initializeUnits];
     [self mtcDataBaseChanged:nil];
     //Update runtype word
     [self refreshRunWordLabels:nil];
@@ -272,7 +278,11 @@ snopGreenColor;
     [super awakeFromNib];
     [self performSelector:@selector(updateWindow)withObject:self afterDelay:0.1];
 }
-
+- (void) initializeUnits {
+    for(int i=0;i<10;i++) {
+        displayUnitsDecider[i] = UNITS_UNDECIDED;
+    }
+}
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers
@@ -1598,19 +1608,41 @@ snopGreenColor;
         NSLogColor([NSColor redColor], @"Error while trying to set the MTC threshold, reason: %@\n",[excep reason]);
     }
 }
--(void) updateThresholdDisplayAt:(int) row forThreshold:(int) type isNHit:(BOOL) isNhit isInMask:(BOOL) inMask usingModel:(id) mtcModel andFormatter:(NSFormatter*) formatter
-{
-    float value;
-    if([mtcModel ConversionIsValidForThreshold:type]) {
-        NSString* label = isNhit ? @"NHits" : @"mV";
-        int units = isNhit ? MTC_NHIT_UNITS : MTC_mV_UNITS;
-        value = [mtcModel getThresholdOfType:type inUnits:units];
-        [[standardRunThreshLabels cellAtRow:row column:0] setStringValue:label];
+- (BOOL) isRowNHit: (int) row {
+    return row<6; // All the NHit type thresholds are the first 7...i realize this is a bit weird but it works
+    // ...for now
+}
+
+- (int) decideUnitsToUseForRow: (int) row usingModel:(id) mtcModel {
+    int units;
+    if(displayUnitsDecider[row] == UNITS_UNDECIDED)
+    {
+        if([mtcModel ConversionIsValidForThreshold:view_model_map[row]]) {
+            NSString* label = [self isRowNHit:row] ? @"NHits" : @"mV";
+            units = [self isRowNHit:row] ? MTC_NHIT_UNITS : MTC_mV_UNITS;
+            [[standardRunThreshLabels cellAtRow:row column:0] setStringValue:label];
+            displayUnitsDecider[row] = UNITS_CONVERTED;
+        }
+        else {
+            units=  MTC_RAW_UNITS;
+            [[standardRunThreshLabels cellAtRow:row column:0] setStringValue:@"Raw DAC Counts"];
+            displayUnitsDecider[row] = UNITS_RAW;
+        }
+    }
+    else if (displayUnitsDecider[row] == UNITS_CONVERTED) {
+        units = [self isRowNHit:row] ? MTC_NHIT_UNITS : MTC_mV_UNITS;
     }
     else {
-        value = [mtcModel getThresholdOfType:type inUnits:MTC_RAW_UNITS];
-        [[standardRunThreshLabels cellAtRow:row column:0] setStringValue:@"Raw DAC Counts"];
+        units = MTC_RAW_UNITS;
     }
+    return units;
+}
+
+-(void) updateThresholdDisplayAt:(int) row isInMask:(BOOL) inMask usingModel:(id) mtcModel andFormatter:(NSFormatter*) formatter
+{
+    int units = [self decideUnitsToUseForRow:row usingModel:mtcModel];
+    float value = [mtcModel getThresholdOfType:view_model_map[row] inUnits:units];
+
     [[standardRunThresCurrentValues cellAtRow:row column:0] setFloatValue:value];
     [[standardRunThresCurrentValues cellAtRow:row column:0] setFormatter:formatter];
 
@@ -1620,6 +1652,7 @@ snopGreenColor;
         [[standardRunThresCurrentValues cellAtRow:row column:0] setTextColor:[self snopRedColor]];
     }
 }
+
 - (void) mtcDataBaseChanged:(NSNotification*)aNotification
 {
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
@@ -1644,12 +1677,10 @@ snopGreenColor;
     for(int i=0;i<10;i++)
     {
         @try {
-            BOOL isNhit = i<6; // All the NHit type thresholds are the first 7...i realize this is a bit weird but it works
-            // ...for now
             BOOL inMask = ((1<<view_mask_map[i]) & gtmask) !=0;
-            [self updateThresholdDisplayAt:i forThreshold:view_model_map[i] isNHit:isNhit isInMask:inMask usingModel:mtcModel andFormatter:thresholdFormatter];
+            [self updateThresholdDisplayAt:i isInMask:inMask usingModel:mtcModel andFormatter:thresholdFormatter];
         } @catch (NSException *exception) {
-            NSLogColor([NSColor redColor], @"Error while retrieving threshold. Reason:%@\n.",[exception reason]);
+            NSLogColor([NSColor redColor], @"Error while displaying threshold. Reason:%@\n.",[exception reason]);
         }
     }
 
@@ -1760,21 +1791,17 @@ snopGreenColor;
     }
     
 }
--(void) updateSingleDBThresholdDisplay:(int) row ofType:(int) type toUnits:(int) units inMask:(BOOL) inMask withModel:(id) mtcModel withFormatter:(NSFormatter*) formatter toValue:(float) raw {
-    float nHits;
+-(void) updateSingleDBThresholdDisplayForRow:(int) row inMask:(BOOL) inMask withModel:(id) mtcModel withFormatter:(NSFormatter*) formatter toValue:(float) raw {
+    float value;
+    int units;
     @try {
-        if([mtcModel ConversionIsValidForThreshold:type])
-        {
-            nHits = [mtcModel convertThreshold:raw OfType:type fromUnits:MTC_RAW_UNITS toUnits:units];
-        }
-        else {
-            nHits = raw;
-        }
+        units = [self decideUnitsToUseForRow:row usingModel:mtcModel];
+        value = [mtcModel convertThreshold:raw OfType:view_model_map[row] fromUnits:MTC_RAW_UNITS toUnits:units];
     } @catch (NSException *excep) {
         NSLogColor([NSColor redColor], @"Failed to convert the N100H threhsolds from raw units. Reason: %@\n",[excep reason]);
     }
     [[standardRunThresStoredValues cellAtRow:row column:0] setFormatter:formatter];
-    [[standardRunThresStoredValues cellAtRow:row column:0] setFloatValue:nHits];
+    [[standardRunThresStoredValues cellAtRow:row column:0] setFloatValue:value];
     if(inMask) {
         [[standardRunThresStoredValues cellAtRow:row column:0] setTextColor:[self snopBlueColor]];
     } else{
@@ -1865,9 +1892,8 @@ snopGreenColor;
         int view_mask_map[10] = {2,1,0,3,4,7,6,5,9,8};
         for(int i=0;i<10;i++) {
             float raw = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtcModel stringForThreshold:i]] floatValue];
-            int units = i<=6 ? MTC_NHIT_UNITS : MTC_mV_UNITS;
             BOOL inMask = ((1<< view_mask_map[i]) & gtmask) != 0;
-            [self updateSingleDBThresholdDisplay:i ofType:view_model_map[i] toUnits: units inMask:inMask withModel:mtcModel withFormatter:thresholdFormatter toValue:raw];
+            [self updateSingleDBThresholdDisplayForRow:i inMask:inMask withModel:mtcModel withFormatter:thresholdFormatter toValue:raw];
         }
 
         //Prescale
