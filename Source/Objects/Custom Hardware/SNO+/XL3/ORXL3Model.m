@@ -3652,7 +3652,6 @@ err:
         SwapLongBlock(payload, sizeof(HVReadbackResults)/4);
     }
     memcpy(status, payload, sizeof(HVReadbackResults));
-    [self setHvEverUpdated:YES];
 }
 
 - (void) readHVStatus
@@ -3679,6 +3678,26 @@ err:
         [self setHvBVoltageReadValue:status.voltageB * 300. * self.hvReadbackCorrB];
         [self setHvACurrentReadValue:status.currentA * 10.];
         [self setHvBCurrentReadValue:status.currentB * 10.];
+
+        if (![self hvEverUpdated] &&
+            ([self hvAVoltageReadValue] < ([self hvNominalVoltageA] - 100)) &&
+            [self isTriggerON]) {
+            /* If this is the first time we've read back HV, the crate is not
+             * at nominal voltage, and the triggers are enabled, we prompt the
+             * user to disable triggers. */
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                BOOL result = ORRunAlertPanel([NSString stringWithFormat:@"Crate %i HV is not at nominal voltage, but triggers are currently enabled.", [self crateNumber]], @"Would you like to disable triggers?", @"Yes", @"No", nil);
+
+                if (result) {
+                    [self setIsTriggerON:NO];
+                    [self setTriggerStatus:@"OFF"];
+                    NSLog(@"Crate %02d disabling triggers\n.", [self crateNumber]);
+                    return;
+                }
+            });
+        }
+
+        [self setHvEverUpdated:YES];
 
         dispatch_async(dispatch_get_main_queue(), ^{
             [[NSNotificationCenter defaultCenter]
