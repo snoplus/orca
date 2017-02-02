@@ -1069,7 +1069,6 @@ BOOL owlSupplyState = false;
 
 - (void) setHvAVoltageTargetValue:(unsigned long)hvAVoltageTargetValue
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setHvAVoltageTargetValue:_hvAVoltageTargetValue];
     _hvAVoltageTargetValue = hvAVoltageTargetValue;
     dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHVTargetValueChanged object:self];        
@@ -1083,7 +1082,6 @@ BOOL owlSupplyState = false;
 
 - (void) setHvBVoltageTargetValue:(unsigned long)hvBVoltageTargetValue
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setHvBVoltageTargetValue:_hvBVoltageTargetValue];
     _hvBVoltageTargetValue = hvBVoltageTargetValue;
     dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHVTargetValueChanged object:self];        
@@ -4940,6 +4938,9 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
                         next = [self hvNominalVoltageA]*4096/3000;
                     [self setHvAVoltageDACSetValue:next];
                     [self setHvANextStepValue:next];
+                    if ([self hvAVoltageTargetValue] < next){
+                        [self setHvAVoltageTargetValue:next];
+                    }
                 } else {
                     [self setHvAVoltageDACSetValue:0];
                     [self setHvANextStepValue:0];
@@ -4952,6 +4953,9 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
                         next = [self hvNominalVoltageB]*4096/3000;
                     [self setHvBVoltageDACSetValue:next];
                     [self setHvBNextStepValue:next];
+                    if ([self hvBVoltageTargetValue] < next){
+                        [self setHvBVoltageTargetValue:next];
+                    }
                 } else {
                     [self setHvBVoltageDACSetValue:0];
                     [self setHvBNextStepValue:0];
