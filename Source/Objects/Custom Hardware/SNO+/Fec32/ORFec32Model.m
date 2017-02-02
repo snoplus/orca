@@ -970,16 +970,18 @@ static int              sChannelsNotChangedCount = 0;
 
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
-	[super encodeWithCoder:encoder];
-	
-	[encoder encodeInt:variableDisplay              forKey: @"variableDisplay"];
-	[encoder encodeBool:showVolts                   forKey: @"showVolts"];
-	[encoder encodeObject:comments                  forKey: @"comments"];
-	[encoder encodeFloat:vRes                       forKey: @"vRes"];
-	[encoder encodeFloat:hVRef                      forKey: @"hVRef"];
-	[encoder encodeInt32:onlineMask                 forKey: @"onlineMask"];
+    int i;
+
+    [super encodeWithCoder:encoder];
+
+    [encoder encodeInt:variableDisplay              forKey: @"variableDisplay"];
+    [encoder encodeBool:showVolts                   forKey: @"showVolts"];
+    [encoder encodeObject:comments                  forKey: @"comments"];
+    [encoder encodeFloat:vRes                       forKey: @"vRes"];
+    [encoder encodeFloat:hVRef                      forKey: @"hVRef"];
+    [encoder encodeInt32:onlineMask                 forKey: @"onlineMask"];
     [encoder encodeInt:adcVoltageStatusOfCard       forKey: @"adcVoltageStatusOfCard"];
-	[encoder encodeInt32:pedEnabledMask             forKey: @"pedEnabledMask"];
+    [encoder encodeInt32:pedEnabledMask             forKey: @"pedEnabledMask"];
     [encoder encodeInt32:seqDisabledMask                    forKey: @"seqDisabledMask"];
     [encoder encodeInt32:cmosReadDisabledMask               forKey: @"cmosReadDisabledMask"];
     [encoder encodeInt32:trigger20nsDisabledMask            forKey: @"trigger20nsDisabledMask"];
@@ -987,23 +989,25 @@ static int              sChannelsNotChangedCount = 0;
     [encoder encodeInt32:seqPendingDisabledMask             forKey: @"seqDisabledPendingMask"];
     [encoder encodeInt32:cmosReadPendingDisabledMask        forKey: @"cmosReadPendingDisabledMask"];
     [encoder encodeInt32:trigger20nsPendingDisabledMask     forKey: @"trigger20nsPendingDisabledMask"];
-    [encoder encodeInt32:trigger100nsPendingDisabledMask	forKey: @"trigge100nsPendingDisabledMask"];
+    [encoder encodeInt32:trigger100nsPendingDisabledMask    forKey: @"trigger100nsPendingDisabledMask"];
 
-	
-	int i;
-	for(i=0;i<6;i++){
-		[encoder encodeFloat:cmos[i] forKey:[NSString stringWithFormat:@"cmos%d",i]];
-	}	
-	for(i=0;i<kNumFecMonitorAdcs;i++){
-		[encoder encodeFloat:adcVoltage[i] forKey:[NSString stringWithFormat:@"adcVoltage%d",i]];
-		[encoder encodeInt:adcVoltageStatus[i] forKey:[NSString stringWithFormat:@"adcStatus%d",i]];
-	}
-	for(i=0;i<32;i++){
-		[encoder encodeInt32:cmosRate[i]			forKey: [NSString stringWithFormat:@"cmosRate%d",i]];
-		[encoder encodeFloat:baseCurrent[i]			forKey: [NSString stringWithFormat:@"baseCurrent%d",i]];
-	}
+    for(i = 0; i < 6; i++) {
+        [encoder encodeFloat:cmos[i] forKey:[NSString stringWithFormat:@"cmos%d",i]];
+    }
+
+    for(i = 0; i < kNumFecMonitorAdcs; i++) {
+        [encoder encodeFloat:adcVoltage[i] forKey:[NSString stringWithFormat:@"adcVoltage%d",i]];
+        [encoder encodeInt:adcVoltageStatus[i] forKey:[NSString stringWithFormat:@"adcStatus%d",i]];
+    }
+
+    for(i = 0; i < 32; i++){
+        [encoder encodeInt32:cmosRate[i] forKey: [NSString stringWithFormat:@"cmosRate%d",i]];
+        [encoder encodeFloat:baseCurrent[i] forKey: [NSString stringWithFormat:@"baseCurrent%d",i]];
+    }
 }
+
 #pragma mark •••Hardware Access
+
 - (id) adapter
 {
 	id anAdapter = [[self guardian] adapter]; //should be the XL2 for this objects crate
