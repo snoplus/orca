@@ -5205,6 +5205,22 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
                     self.hvANeedsUserIntervention = true;
                     supplyASetpointDiscrepancy = true;
                     NSLogColor([NSColor redColor],@"%@ HV A read value differs from the setpoint! Suspending HV monitoring and control. Press 'Accept Readback' to resume.\n", [[self xl3Link] crateName]);
+
+                    if ([self isTriggerON]) {
+                        /* If the triggers are enabled, prompt the user to
+                         * disable them.
+                         *
+                         * Note: dispatch this asynchronously so that the HV
+                         * thread continues. */
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            BOOL result = ORRunAlertPanel([NSString stringWithFormat:@"Crate %i HV readback differs from the setpoint. This might indicate a tripped HV power supply. Triggers are currently enabled, which is not safe for the hardware unless the crate is at HV.", [self crateNumber]], @"Would you like to disable triggers?", @"Yes", @"No", nil);
+
+                            if (result) {
+                                [self hvTriggersOFF];
+                                NSLog(@"Crate %02d disabling triggers\n.", [self crateNumber]);
+                            }
+                        });
+                    }
                 }
             }
             if (!loopCounter || supplyASetpointDiscrepancy != lastSupplyASetpointDiscrepancy) {
