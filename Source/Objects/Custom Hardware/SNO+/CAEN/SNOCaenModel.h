@@ -15,7 +15,7 @@
 //outside your organization.  The DOE and the University of 
 //Washington reserve all rights in the program. Neither the authors,
 //University of Washington, or U.S. Government make any warranty, 
-//express or implied, or assume any liability or responsibility 
+//express or implied, or assume any liability or responsibility
 //for the use of this software.
 //-------------------------------------------------------------
 
@@ -140,6 +140,7 @@ enum {
 
 - (void) registerNotificationObservers;
 - (int) initAtRunStart;
+- (void) detectorStateChanged:(NSNotification*)aNote;
 
 - (void) awakeAfterDocumentLoaded;
 

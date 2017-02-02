@@ -29,6 +29,7 @@
 #import "ORSelectorSequence.h"
 #import "ORRunModel.h"
 #import "ORRunController.h"
+#import "ORPQModel.h"
 #import "SNOPModel.h"
 
 #define uShortDBValue(A) [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] unsignedShortValue]
@@ -185,6 +186,21 @@ kGtCrateMask,
 kPEDCrateMask
 };
 
+// MTCA DAC index based on order from detector DB
+int mtcDacIndexFromDetectorDB[10]=
+{
+    kNHit100LoThreshold,    // NHIT100Lo is the first entry in the mtac_dacs entry of the detector database!
+    kNHit100MedThreshold,
+    kNHit100HiThreshold,
+    kNHit20Threshold,
+    kNHit20LBThreshold,
+    kESumLowThreshold,
+    kESumHiThreshold,
+    kOWLNThreshold,
+    kOWLELoThreshold,
+    kOWLEHiThreshold,
+};
+
 @interface ORMTCModel (private)
 - (void) doBasicOp;
 - (void) setupDefaults;
@@ -298,6 +314,12 @@ pulserEnabled = _pulserEnabled;
 
 - (void) registerNotificationObservers
 {
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(detectorStateChanged:)
+                         name : ORPQDetectorStateChanged
+                       object : nil];
 }
 
 - (int) initAtRunStart:(int) loadTriggers
@@ -347,6 +369,118 @@ pulserEnabled = _pulserEnabled;
     }
 
     return 0;
+}
+
+// update MTC GUI based on current detector state
+- (void) detectorStateChanged:(NSNotification*)aNote
+{
+    ORPQDetectorDB *detDB = [aNote object];
+    PQ_MTC *pqMTC = NULL;
+
+    if (detDB) pqMTC = (PQ_MTC *)[detDB getMTC];
+
+    if (!pqMTC) {     // nothing to do if MTC doesn't exist in the current state
+        NSLogColor([NSColor redColor], @"MTC settings not loaded!\n");
+        return;
+    }
+
+    int countInvalid = 0;
+
+    @try {
+        [[self undoManager] disableUndoRegistration];
+
+        if (pqMTC->valid[kMTC_controlReg]) {
+            // TO_DO is this the best way to handle the pedestal enable (bit 0x01) and pulser enable (bit 0x02)?
+            if (((pqMTC->controlReg >> 1) ^ pqMTC->controlReg) & 0x01) {
+                [self setIsPedestalEnabledInCSR:(pqMTC->controlReg & 0x01)];
+            }
+        } else ++countInvalid;
+
+        //TO_DO verify that order of MTCA DACs is correct
+        for (int i=0; i<10; ++i) {
+            if (pqMTC->valid[kMTC_mtcaDacs] & (1 << i)) {
+                uint32_t val = pqMTC->mtcaDacs[i];
+                [self setDbLong:val forIndex:mtcDacIndexFromDetectorDB[i]];
+            } else ++countInvalid;
+        }
+
+        if (pqMTC->valid[kMTC_pedWidth]) {
+            [self setDbLong:pqMTC->pedWidth forIndex:kPedestalWidth];
+        } else ++countInvalid;
+
+
+        if (pqMTC->valid[kMTC_coarseDelay]) {
+            [self setDbLong:pqMTC->coarseDelay forIndex:kCoarseDelay];
+        } else ++countInvalid;
+
+        if (pqMTC->valid[kMTC_fineDelay]) {
+            [self setDbLong:pqMTC->fineDelay/100 forIndex:kFineDelay];
+        } else ++countInvalid;
+
+        if (pqMTC->valid[kMTC_pedMask]) {
+            [self setDbLong:pqMTC->pedMask forIndex:kPEDCrateMask];
+        } else ++countInvalid;
+
+        if (pqMTC->valid[kMTC_prescale]) {
+            [self setDbLong:pqMTC->prescale forIndex:kNhit100LoPrescale];
+        } else ++countInvalid;
+
+        if (pqMTC->valid[kMTC_lockoutWidth]) {
+            [self setDbLong:pqMTC->lockoutWidth forIndex:kLockOutWidth];
+        } else ++countInvalid;
+
+        if (pqMTC->valid[kMTC_gtMask]) {
+            [self setDbLong:pqMTC->gtMask forIndex:kGtMask];
+        } else ++countInvalid;
+
+        if (pqMTC->valid[kMTC_gtCrateMask]) {
+            [self setDbLong:pqMTC->gtCrateMask forIndex:kGtCrateMask];
+        } else ++countInvalid;
+
+        //TO_DO verify that order of relays is correct
+        for (int i=0; i<kNumMtcRelays; ++i) {
+            if (pqMTC->valid[kMTC_mtcaRelays] & (1 << i)) {
+                uint32_t val = pqMTC->mtcaRelays[i];
+                switch (i) {
+                    case 0:
+                        [self setMtcaN100Mask:val];
+                        break;
+                    case 1:
+                        [self setMtcaN20Mask:val];
+                        break;
+                    case 2:
+                        [self setMtcaELOMask:val];
+                        break;
+                    case 3:
+                        [self setMtcaEHIMask:val];
+                        break;
+                    case 4:
+                        [self setMtcaOELOMask:val];
+                        break;
+                    case 5:
+                        [self setMtcaOEHIMask:val];
+                        break;
+                    case 6:
+                        [self setMtcaOWLNMask:val];
+                        break;
+                }
+            } else ++countInvalid;
+        }
+
+        if (pqMTC->valid[kMTC_pulserRate] && pqMTC->pulserRate) { // (don't set if rate is 0)
+            [self setDbLong:pqMTC->pulserRate forIndex:kPulserPeriod];
+        } else ++countInvalid;
+
+        // set find slope and min delay offset to constant values (aren't used anyway)
+        [self setDbFloat:0.1 forIndex:kFineSlope];
+        [self setDbFloat:18.35 forIndex:kMinDelayOffset];
+    }
+    @finally {
+        [[self undoManager] enableUndoRegistration];
+    }
+    if (countInvalid) {
+        NSLogColor([NSColor redColor], @"%d MTC settings not loaded!\n", countInvalid);
+    }
 }
 
 #pragma mark •••Accessors

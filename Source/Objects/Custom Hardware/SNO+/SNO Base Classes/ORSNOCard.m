@@ -22,6 +22,8 @@
 #import "ORSNOCard.h"
 #import "ORSNOCrateModel.h"
 
+BOOL sEnableNotifications = YES;
+
 #pragma mark •••Notification Strings
 NSString* ORSNOCardSlotChanged		= @"ORSNOCardSlotChanged";
 NSString* ORSNOCardBoardIDChanged 	= @"ORSNOCardBoardIDChanged";
@@ -91,8 +93,25 @@ NSString* ORSNOCardBoardIDChanged 	= @"ORSNOCardBoardIDChanged";
 	[boardID autorelease];
     boardID = [anId copy];    
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOCardBoardIDChanged object:self];
+    [self postNotificationName:ORSNOCardBoardIDChanged];
 	
+}
+
+- (void) postNotificationName: (NSString*)name
+{
+    if (sEnableNotifications) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:name object:self];
+    }
+}
+
++ (void) disableNotifications
+{
+    sEnableNotifications = NO;
+}
+
++ (void) enableNotifications
+{
+    sEnableNotifications = YES;
 }
 
 #pragma mark •••Archival

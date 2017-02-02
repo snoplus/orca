@@ -288,6 +288,7 @@ enum {
 - (void) connectionStateChanged;
 - (void) documentLoaded;
 - (void) documentClosed;
+- (void) detectorStateChanged:(NSNotification*)aNote;
 - (int) initAtRunStart;
 
 #pragma mark •••Accessors

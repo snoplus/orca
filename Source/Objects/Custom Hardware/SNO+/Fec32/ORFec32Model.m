@@ -44,6 +44,7 @@
 #define UPPER_CHANNELS	1
 
 
+NSString* ORFec32ModelEverythingChanged             = @"ORFec32ModelEverythingChanged";
 NSString* ORFec32ModelCmosRateChanged				= @"ORFec32ModelCmosRateChanged";
 NSString* ORFec32ModelBaseCurrentChanged			= @"ORFec32ModelBaseCurrentChanged";
 NSString* ORFec32ModelVariableDisplayChanged		= @"ORFec32ModelVariableDisplayChanged";
@@ -63,14 +64,13 @@ NSString* ORFecQllEnabledChanged					= @"ORFecQllEnabledChanged";
 NSString* ORFec32ModelAdcVoltageChanged				= @"ORFec32ModelAdcVoltageChanged";
 NSString* ORFec32ModelAdcVoltageStatusChanged		= @"ORFec32ModelAdcVoltageStatusChanged";
 NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageStatusOfCardChanged";
-NSString* ORFec32ModelCardDbChanged                 = @"ORFec32ModelCardDbChanged";
 
 // mask for crates that need updating after Hardware Wizard action
 static unsigned long crateInitMask; // crates that need to be initialized
 static unsigned long cratePedMask;  // crates that need their pedestals set
 
-static int              sCardDbState = 0; // (0=not loaded, 1=loading, 2=loaded (or not), 3=stale (or none))
-static NSMutableData*   sCardDbData = nil;
+static int              sDetectorDbState = 0; // (0=not loaded, 1=loading, 2=loaded (or not), 3=stale (or none))
+static ORPQDetectorDB*  sDetectorDbData = nil;
 static NSAlert *        sReadingHvdbAlert = nil;
 static int              sChannelsNotChangedCount = 0;
 
@@ -163,7 +163,7 @@ static int              sChannelsNotChangedCount = 0;
 {
     cmosRate[index] = aCmosRate;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelCmosRateChanged object:self];
+    [self postNotificationName:ORFec32ModelCmosRateChanged];
 }
 
 - (float) baseCurrent:(short)index
@@ -175,7 +175,7 @@ static int              sChannelsNotChangedCount = 0;
 {
     baseCurrent[index] = aBaseCurrent;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelBaseCurrentChanged object:self];
+    [self postNotificationName:ORFec32ModelBaseCurrentChanged];
 }
 
 - (int) variableDisplay
@@ -189,7 +189,7 @@ static int              sChannelsNotChangedCount = 0;
     
     variableDisplay = aVariableDisplay;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelVariableDisplayChanged object:self];
+    [self postNotificationName:ORFec32ModelVariableDisplayChanged];
 }
 
 - (float) adcVoltage:(int)index
@@ -264,7 +264,7 @@ static int              sChannelsNotChangedCount = 0;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setQllEnabled:qllEnabled];
 	qllEnabled = state;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORFecQllEnabledChanged object:self];
+	[self postNotificationName:ORFecQllEnabledChanged];
 }
 
 - (BOOL) pmtOnline:(unsigned short)index
@@ -283,7 +283,7 @@ static int              sChannelsNotChangedCount = 0;
     [[[self undoManager] prepareWithInvocationTarget:self] setPedEnabledMask:pedEnabledMask];
     //NSLog(@"FEC (%d,%d), mask 0x%08x\n", [self crateNumber], [self stationNumber], aMask);
     pedEnabledMask = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecPedEnabledMaskChanged object:self];
+    [self postNotificationName:ORFecPedEnabledMaskChanged];
 }
 
 - (void) setPed:(short)chan enabled:(short)state
@@ -306,7 +306,7 @@ static int              sChannelsNotChangedCount = 0;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setSeqDisabledMask:seqDisabledMask];
     seqDisabledMask = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecSeqDisabledMaskChanged object:self];
+    [self postNotificationName:ORFecSeqDisabledMaskChanged];
 }
 
 - (BOOL) seqEnabled:(short)chan
@@ -336,7 +336,7 @@ static int              sChannelsNotChangedCount = 0;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setSeqPendingDisabledMask:seqPendingDisabledMask];
     seqPendingDisabledMask = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecSeqDisabledMaskChanged object:self];
+    [self postNotificationName:ORFecSeqDisabledMaskChanged];
 }
 
 - (BOOL) seqPendingEnabled:(short)chan
@@ -374,7 +374,7 @@ static int              sChannelsNotChangedCount = 0;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setTrigger20nsDisabledMask:trigger20nsDisabledMask];
     trigger20nsDisabledMask = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecTrigger20nsDisabledMaskChanged object:self];
+    [self postNotificationName:ORFecTrigger20nsDisabledMaskChanged];
 }
 
 - (BOOL) trigger20nsDisabled:(short)chan
@@ -412,7 +412,7 @@ static int              sChannelsNotChangedCount = 0;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setTrigger20nsPendingDisabledMask:trigger20nsPendingDisabledMask];
     trigger20nsPendingDisabledMask = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecTrigger20nsDisabledMaskChanged object:self];
+    [self postNotificationName:ORFecTrigger20nsDisabledMaskChanged];
 }
 
 - (BOOL) trigger20nsPendingEnabled:(short)chan
@@ -450,7 +450,7 @@ static int              sChannelsNotChangedCount = 0;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setTrigger100nsDisabledMask:trigger100nsDisabledMask];
     trigger100nsDisabledMask = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecTrigger100nsDisabledMaskChanged object:self];
+    [self postNotificationName:ORFecTrigger100nsDisabledMaskChanged];
 }
 
 - (BOOL) trigger100nsDisabled:(short)chan
@@ -488,7 +488,7 @@ static int              sChannelsNotChangedCount = 0;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setTrigger100nsPendingDisabledMask:trigger100nsPendingDisabledMask];
     trigger100nsPendingDisabledMask = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecTrigger100nsDisabledMaskChanged object:self];
+    [self postNotificationName:ORFecTrigger100nsDisabledMaskChanged];
 }
 - (BOOL) trigger100nsPendingDisabled:(short)chan
 {
@@ -523,7 +523,7 @@ static int              sChannelsNotChangedCount = 0;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setCmosReadDisabledMask:cmosReadDisabledMask];
     cmosReadDisabledMask = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecCmosReadDisabledMaskChanged object:self];
+    [self postNotificationName:ORFecCmosReadDisabledMaskChanged];
 }
 
 - (BOOL) cmosReadDisabled:(short)chan
@@ -561,7 +561,7 @@ static int              sChannelsNotChangedCount = 0;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setCmosReadPendingDisabledMask:cmosReadPendingDisabledMask];
     cmosReadPendingDisabledMask = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecCmosReadDisabledMaskChanged object:self];
+    [self postNotificationName:ORFecCmosReadDisabledMaskChanged];
 }
 - (BOOL) cmosReadPendingDisabled:(short)chan
 {
@@ -706,7 +706,7 @@ static int              sChannelsNotChangedCount = 0;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setOnlineMask:onlineMask];
     onlineMask = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecOnlineMaskChanged object:self];
+    [self postNotificationName:ORFecOnlineMaskChanged];
     cardChangedFlag = true;
 }
 - (BOOL) getOnline:(short)chan
@@ -810,7 +810,7 @@ static int              sChannelsNotChangedCount = 0;
     
     showVolts = aShowVolts;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecShowVoltsChanged object:self];
+    [self postNotificationName:ORFecShowVoltsChanged];
 }
 
 - (NSString*) comments
@@ -826,7 +826,7 @@ static int              sChannelsNotChangedCount = 0;
     [comments autorelease];
     comments = [aComments copy];    
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecCommentsChanged object:self];
+    [self postNotificationName:ORFecCommentsChanged];
 }
 
 - (void) setUpImage
@@ -847,7 +847,7 @@ static int              sChannelsNotChangedCount = 0;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setCmos:anIndex withValue:cmos[anIndex]];
 	cmos[anIndex] = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecCmosChanged object:self];
+    [self postNotificationName:ORFecCmosChanged];
 }
 
 - (float) vRes
@@ -859,7 +859,7 @@ static int              sChannelsNotChangedCount = 0;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setVRes:vRes];
 	vRes = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecVResChanged object:self];
+    [self postNotificationName:ORFecVResChanged];
 }
 
 - (float) hVRef
@@ -871,7 +871,7 @@ static int              sChannelsNotChangedCount = 0;
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setHVRef:hVRef];
 	hVRef = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecHVRefChanged object:self];
+    [self postNotificationName:ORFecHVRefChanged];
 }
 
 #pragma mark •••Converted Data Methods
@@ -1655,7 +1655,7 @@ static int              sChannelsNotChangedCount = 0;
             cmosRate[ch] = kCMOSRateUnmeasured;
         }
     }
-    //[[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelCmosRateChanged object:self];
+    //[self postNotificationName:ORFec32ModelCmosRateChanged];
     return calcRates;
 }
 
@@ -1700,87 +1700,150 @@ static int              sChannelsNotChangedCount = 0;
                        object : nil];
 
     [notifyCenter addObserver : self
-                     selector : @selector(cardDbChanged:)
-                         name : ORFec32ModelCardDbChanged
+                     selector : @selector(detectorStateChanged:)
+                         name : ORPQDetectorStateChanged
                        object : nil];
 }
 
 // sync FEC/DC settings from the specified hardware state
 // (the note object should be a NSMutableData object containing
-//  a full array of SnoPlusCard structures in crate/card order)
-- (void) cardDbChanged:(NSNotification*)note
+//  a full array of PQ_FEC structures in crate/card order)
+- (void) detectorStateChanged:(NSNotification*)aNote
 {
-    int32_t valid;
-    NSMutableData *cardDb = [note object];
+    uint32_t valid;
+    ORPQDetectorDB *detDB = [aNote object];
 
-    if (!cardDb || ![cardDb respondsToSelector:@selector(mutableBytes)]) return;
+    if (!detDB) return;
 
-    if ([self stationNumber] >= kSnoCardsPerCrate || [self crateNumber] >= kSnoCrates) return;
-    
-    SnoPlusCard *card = (SnoPlusCard *)[cardDb mutableBytes] + [self crateNumber] * kSnoCardsPerCrate + [self stationNumber];
+    PQ_FEC *fec = (PQ_FEC *)[detDB getFEC:[self stationNumber] crate:[self crateNumber] ];
 
-    if (!card->valid[kCardExists]) return;  // nothing to do if card doesn't exist in the current detector state
+    if (!fec || !fec->valid[kFEC_exists]) return;  // nothing to do if fec doesn't exist in the current detector state
 
-    if ((valid = card->valid[kSeqDisabled]) != 0) {
-        [self setSeqDisabledMask: (card->seqDisabled & valid) | ((int32_t)seqDisabledMask & ~valid)];
-        startSeqDisabledMask = seqDisabledMask;
-    }
-    if ((valid = card->valid[kPedEnabled]) != 0) {
-        [self setPedEnabledMask: (card->pedEnabled & valid) | ((int32_t)pedEnabledMask & ~valid)];
-        startPedEnabledMask = pedEnabledMask;
-    }
-    if ((valid = card->valid[kNhit100enabled]) != 0) {
-        [self setTrigger100nsDisabledMask: (~card->nhit100enabled & valid) | ((int32_t)trigger100nsDisabledMask & ~valid)];
-        startTrigger100nsDisabledMask = trigger100nsDisabledMask;
-    }
-    if ((valid = card->valid[kNhit20enabled]) != 0) {
-        [self setTrigger20nsDisabledMask: (~card->nhit20enabled & valid) | ((int32_t)trigger20nsDisabledMask & ~valid)];
-        startTrigger20nsDisabledMask = trigger20nsDisabledMask;
-    }
-    for (int ch=0; ch<32; ++ch) {
-        int32_t chMask = (1 << ch);
-        if (card->valid[kVthr] & chMask) {
-            [self setVth:ch withValue:card->vthr[ch]];
+    @try {
+        // PH - The disableNotifications hack stops ORCA from throwing around notifications like feces
+        // in a chimpanzee exhibit (ref https://davidnix.io/post/stop-using-nsnotificationcenter/ ).
+        // Without this, each GUI element in the daughtercard window would be set more than 1000 times!
+        // Instead we send "EverythingChanged" notifications after all of the settings have been updated,
+        // and use a bit of sense before acting on these messages in the controller objects.
+        [ORSNOCard disableNotifications];
+
+        [[self undoManager] disableUndoRegistration];
+
+        if ((valid = fec->valid[kFEC_seqDisabled]) != 0) {
+            [self setSeqDisabledMask: (fec->seqDisabled & valid) | ((uint32_t)seqDisabledMask & ~valid)];
+            startSeqDisabledMask = seqDisabledMask;
         }
-        short dcNum = ch / 8;
-        if (dcPresent[dcNum]) {
-            ORFecDaughterCardModel *theDc = dc[dcNum];
-            short dcChan = ch - dcNum * 8;
-            if (card->valid[kNhit100delay] & chMask) {
-                // (there is some inconsistency between ORFecDaughterCardModel and ORXL3Model
-                // as to whether this is a width or delay, but they are both the same setting)
-                [theDc setNs100width:dcChan withValue:card->nhit100delay[ch]];
+        if ((valid = fec->valid[kFEC_pedEnabled]) != 0) {
+            [self setPedEnabledMask: (fec->pedEnabled & valid) | ((uint32_t)pedEnabledMask & ~valid)];
+            startPedEnabledMask = pedEnabledMask;
+        }
+        if ((valid = fec->valid[kFEC_nhit100enabled]) != 0) {
+            [self setTrigger100nsDisabledMask: (~fec->nhit100enabled & valid) | ((uint32_t)trigger100nsDisabledMask & ~valid)];
+            startTrigger100nsDisabledMask = trigger100nsDisabledMask;
+        }
+        if ((valid = fec->valid[kFEC_nhit20enabled]) != 0) {
+            [self setTrigger20nsDisabledMask: (~fec->nhit20enabled & valid) | ((uint32_t)trigger20nsDisabledMask & ~valid)];
+            startTrigger20nsDisabledMask = trigger20nsDisabledMask;
+        }
+        for (int ch=0; ch<32; ++ch) {
+            uint32_t chMask = (1 << ch);
+            if (fec->valid[kFEC_vthr] & chMask) {
+                [self setVth:ch withValue:fec->vthr[ch]];
             }
-            if (card->valid[kNhit20width] & chMask) {
-                [theDc setNs20width:dcChan withValue:card->nhit20width[ch]];
-            }
-            if (card->valid[kNhit20delay] & chMask) {
-                [theDc setNs20delay:dcChan withValue:card->nhit20delay[ch]];
-            }
-            if (card->valid[kVbal0] & chMask) {
-                [theDc setVb:dcChan withValue:card->vbal0[ch]];
-            }
-            if (card->valid[kVbal1] & chMask) {
-                [theDc setVb:(dcChan+8) withValue:card->vbal1[ch]];
-            }
-            if (card->valid[kTac0trim] & chMask) {
-                [theDc setTac0trim:dcChan withValue:card->tac0trim[ch]];
-            }
-            if (card->valid[kTac1trim] & chMask) {
-                [theDc setTac1trim:dcChan withValue:card->tac1trim[ch]];
+            short dcNum = ch / 8;
+            if (dcPresent[dcNum]) {
+                ORFecDaughterCardModel *theDc = dc[dcNum];
+                short dcChan = ch - dcNum * 8;
+                if (fec->valid[kFEC_nhit100delay] & chMask) {
+                    // (there is some inconsistency between ORFecDaughterCardModel and ORXL3Model
+                    // as to whether this is a width or delay, but they are both the same setting)
+                    [theDc setNs100width:dcChan withValue:fec->nhit100delay[ch]];
+                }
+                if (fec->valid[kFEC_nhit20width] & chMask) {
+                    [theDc setNs20width:dcChan withValue:fec->nhit20width[ch]];
+                }
+                if (fec->valid[kFEC_nhit20delay] & chMask) {
+                    [theDc setNs20delay:dcChan withValue:fec->nhit20delay[ch]];
+                }
+                if (fec->valid[kFEC_vbal0] & chMask) {
+                    [theDc setVb:dcChan withValue:fec->vbal0[ch]];
+                }
+                if (fec->valid[kFEC_vbal1] & chMask) {
+                    [theDc setVb:(dcChan+8) withValue:fec->vbal1[ch]];
+                }
+                if (fec->valid[kFEC_tac0trim] & chMask) {
+                    [theDc setTac0trim:dcChan withValue:fec->tac0trim[ch]];
+                }
+                if (fec->valid[kFEC_tac1trim] & chMask) {
+                    [theDc setTac1trim:dcChan withValue:fec->tac1trim[ch]];
+                }
             }
         }
+        for (int i=0; i<8; ++i) {
+            uint32_t msk = (1 << i);
+            short dcNum = i / 2;
+            if (dcPresent[dcNum]) {
+                short j = i - dcNum * 2;
+                ORFecDaughterCardModel *theDc = dc[dcNum];
+                if (fec->valid[kFEC_tdiscRp1] & msk) {
+                    [theDc setRp1:j withValue:fec->tdiscRp1[i]];
+                }
+                if (fec->valid[kFEC_tdiscRp2] & msk) {
+                    [theDc setRp2:j withValue:fec->tdiscRp2[i]];
+                }
+                if (fec->valid[kFEC_tdiscVsi] & msk) {
+                    [theDc setVsi:j withValue:fec->tdiscVsi[i]];
+                }
+                if (fec->valid[kFEC_tdiscVli] & msk) {
+                    [theDc setVli:j withValue:fec->tdiscVli[i]];
+                }
+            }
+        }
+        if (fec->valid[kFEC_tcmosVmax]) {
+            [self setCmos:kVMax withValue:fec->tcmosVmax];
+        }
+        if (fec->valid[kFEC_tcmosTacref]) {
+            [self setCmos:kTACRef withValue:fec->tcmosTacref];
+        }
+        if (fec->valid[kFEC_tcmosIseta] & 0x01) {
+            [self setCmos:kISetA0 withValue:fec->tcmosIseta[0]];
+        }
+        if (fec->valid[kFEC_tcmosIseta] & 0x02) {
+            [self setCmos:kISetA1 withValue:fec->tcmosIseta[1]];
+        }
+        if (fec->valid[kFEC_tcmosIsetm] & 0x01) {
+            [self setCmos:kISetM0 withValue:fec->tcmosIsetm[0]];
+        }
+        if (fec->valid[kFEC_tcmosIsetm] & 0x02) {
+            [self setCmos:kISetM1 withValue:fec->tcmosIsetm[1]];
+        }
+        if (fec->valid[kFEC_vres]) {
+            [self setVRes:fec->vres];
+        }
+        if (fec->valid[kFEC_hvref]) {
+            [self setHVRef:fec->hvref];
+        }
+    }
+    @finally {
+        [ORSNOCard enableNotifications];
+        [self postNotificationName:ORFec32ModelEverythingChanged];
+        for (int i=0; i<4; ++i) {
+            if (dcPresent[i]) {
+                [dc[i] postNotificationName:ORDCModelEverythingChanged];
+            }
+        }
+        [[self undoManager] enableUndoRegistration];
     }
 }
 
 - (void) _continueHWWizard:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
     if (returnCode == NSAlertDefaultReturn) {
-        sCardDbState = 0;
+        sDetectorDbState = 0;
         NSLog(@"Hardware Wizard action cancelled.\n");
     } else {
-        sCardDbState = 3;
-        if (sCardDbData) {
+        sDetectorDbState = 3;
+        if (sDetectorDbData) {
             NSLog(@"Running Hardware Wizard with stale database!\n");
         } else {
             NSLog(@"Running Hardware Wizard with no detector database!\n");
@@ -1791,11 +1854,6 @@ static int              sChannelsNotChangedCount = 0;
 
 - (void) _continueHWWizard
 {
-    if (sCardDbState == 2 && sCardDbData) {
-        // post notification to sync all FEC/DC settings from the current hardware state of the detector database
-        // (note: don't do this for stale database because in this case the current variables are more up-to-date)
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelCardDbChanged object:sCardDbData];
-    }
     // all done loading database, so we can continue with our hwWizard execution now
     if (hwWizard && [hwWizard respondsToSelector:@selector(continueExecuteControlStruct)]) {
         [hwWizard performSelector:@selector(continueExecuteControlStruct)];
@@ -1805,9 +1863,9 @@ static int              sChannelsNotChangedCount = 0;
 }
 
 // continue HWWizard execution after reading detector database
-- (void) _chanDbCallback:(NSMutableData*)data
+- (void) _detDbCallback:(ORPQDetectorDB*)data
 {
-    sCardDbState = 2;
+    sDetectorDbState = 2;
     
     if (sReadingHvdbAlert) {
         NSWindow *hwWindow = [hwWizard performSelector:@selector(window)];
@@ -1821,11 +1879,10 @@ static int              sChannelsNotChangedCount = 0;
     NSString *w = nil;  // warning for status log
     
     if (data) {
-        [sCardDbData release];
-        sCardDbData = [data retain];
-        NSLog(@"Loaded detector database\n");
+        [sDetectorDbData release];
+        sDetectorDbData = [data retain];
         [self _continueHWWizard];
-    } else if (sCardDbData) {
+    } else if (sDetectorDbData) {
         NSLog(@"Error reloading detector database\n");
         s = [NSString stringWithFormat:@"Error reloading detector database!\n\nContinue with stale data?"];
         m = [NSString stringWithFormat:@"This should be OK as long as the detector has not changed"];
@@ -1845,11 +1902,11 @@ static int              sChannelsNotChangedCount = 0;
         [alert setAlertStyle:NSWarningAlertStyle];
         [alert beginSheetModalForWindow:[hwWizard performSelector:@selector(window)] completionHandler:^(NSModalResponse result){
             if (result == NSAlertSecondButtonReturn) {
-                sCardDbState = 3;
+                sDetectorDbState = 3;
                 NSLog(w);
                 [self performSelector:@selector(_continueHWWizard) withObject:nil afterDelay:.1];
             } else {
-                sCardDbState = 0;
+                sDetectorDbState = 0;
                 NSLog(@"Hardware Wizard action cancelled.\n");
             }
         }];
@@ -1868,7 +1925,7 @@ static int              sChannelsNotChangedCount = 0;
 
 - (void) hwWizardWaitingForDatabase
 {
-    if (sCardDbState == 1) {
+    if (sDetectorDbState == 1) {
 #if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
         NSString* s = [NSString stringWithFormat:@"Reading PMT database..."];
         sReadingHvdbAlert = [[[NSAlert alloc] init] autorelease];
@@ -1880,16 +1937,16 @@ static int              sChannelsNotChangedCount = 0;
                 // cancel any queued database operations
                 [[ORPQModel getCurrent] cancelDbQueries];
                 sReadingHvdbAlert = nil;
-                // continue executing HWWizard without PMT database
-                [self _chanDbCallback:nil];
             }
         }];
 #endif
     }
 }
 
-- (void) hwWizardActionBegin:(NSNotification*)note
+- (void) hwWizardActionBegin:(NSNotification*)aNote
 {
+    [[self undoManager] disableUndoRegistration];
+
     sChannelsNotChangedCount      = 0;
     startSeqDisabledMask          = seqDisabledMask;
     startPedEnabledMask           = pedEnabledMask;
@@ -1901,50 +1958,48 @@ static int              sChannelsNotChangedCount = 0;
     cratePedMask  = 0;
 
     // interrupt hardwardWizard execution to allow time to load pmtdb if necessary
-    if (sCardDbState == 0 && [note object] && [[note object] respondsToSelector:@selector(notOkToContinue)]) {
-        sCardDbState = 1;
-        hwWizard = [note object];
+    if (sDetectorDbState == 0 && [aNote object] && [[aNote object] respondsToSelector:@selector(notOkToContinue)]) {
+        sDetectorDbState = 1;
+        hwWizard = [aNote object];
         // (we will continue after our detector database is loaded)
         [hwWizard performSelector:@selector(notOkToContinue)];
         // initiate the PostgreSQL DB query to get the current detector state
-        [[ORPQModel getCurrent] cardDbQuery:self selector:@selector(_chanDbCallback:)];
+        [[ORPQModel getCurrent] detectorDbQuery:self selector:@selector(_detDbCallback:)];
         // post a modal dialog after 1 sec if the database operation hasn't completed yet
         [self performSelector:@selector(hwWizardWaitingForDatabase) withObject:nil afterDelay:1];
     }
 }
 
-- (void) hwWizardActionEnd:(NSNotification*)note
+- (void) hwWizardActionEnd:(NSNotification*)aNote
 {
-    [[self undoManager] disableUndoRegistration];
-
     // make sure channels with HV disabled aren't enabled
     // (note: we do this even if the database is stale)
-    if (sCardDbData && [self stationNumber]<kSnoCardsPerCrate && [self crateNumber]<kSnoCrates) {
-        int32_t notChanged = 0;
-        SnoPlusCard *card = (SnoPlusCard *)[sCardDbData mutableBytes] + [self crateNumber] * kSnoCardsPerCrate + [self stationNumber];
+    PQ_FEC *fec = [sDetectorDbData getPmthv:[self stationNumber] crate:[self crateNumber]];
+    if (fec) {
+        uint32_t notChanged = 0;
         // sequencer must be disabled on channels with HV disabled
-        int32_t wanted = seqDisabledMask;
-        seqDisabledMask |= (seqDisabledMask ^ startSeqDisabledMask) & card->hvDisabled;
+        uint32_t wanted = seqDisabledMask;
+        seqDisabledMask |= (seqDisabledMask ^ startSeqDisabledMask) & fec->hvDisabled;
         notChanged |= (wanted ^ seqDisabledMask);
         // pedestals must be disabled on channels with HV disabled
         wanted = pedEnabledMask;
-        pedEnabledMask &= ~((pedEnabledMask ^ startPedEnabledMask) & card->hvDisabled);
+        pedEnabledMask &= ~((pedEnabledMask ^ startPedEnabledMask) & fec->hvDisabled);
         notChanged |= (wanted ^ pedEnabledMask);
         // triggers must be disabled on channels with HV disabled or if the
         // relay is open
         wanted = trigger20nsDisabledMask;
-        trigger20nsDisabledMask |= (trigger20nsDisabledMask ^ startTrigger20nsDisabledMask) & (card->hvDisabled | ~[self relayChannelMask]);
+        trigger20nsDisabledMask |= (trigger20nsDisabledMask ^ startTrigger20nsDisabledMask) & (fec->hvDisabled | ~[self relayChannelMask]);
         notChanged |= (wanted ^ trigger20nsDisabledMask);
         wanted = trigger100nsDisabledMask;
-        trigger100nsDisabledMask |= (trigger100nsDisabledMask ^ startTrigger100nsDisabledMask) & (card->hvDisabled | ~[self relayChannelMask]);
+        trigger100nsDisabledMask |= (trigger100nsDisabledMask ^ startTrigger100nsDisabledMask) & (fec->hvDisabled | ~[self relayChannelMask]);
         notChanged |= (wanted ^ trigger100nsDisabledMask);
         // can't be online if HV is disabled
         wanted = onlineMask;
-        onlineMask &= ~((onlineMask ^ startOnlineMask) & card->hvDisabled);
+        onlineMask &= ~((onlineMask ^ startOnlineMask) & fec->hvDisabled);
         notChanged |= (wanted ^ onlineMask);
         // keep count of the number of channels we didn't change due to HV disabled
         if (notChanged) {
-            for (int32_t mask=1; mask; mask<<=1) {
+            for (uint32_t mask=1; mask; mask<<=1) {
                 if (mask & notChanged) ++sChannelsNotChangedCount;
             }
         }
@@ -1986,13 +2041,11 @@ static int              sChannelsNotChangedCount = 0;
         crateInitMask |= (1UL << [self crateNumber]);
         cardChangedFlag = false;  // clear this temporary flag
     }
-    [[self undoManager] enableUndoRegistration];
-
     // set pmthv state to reload the database on the next hwWizard action
-    sCardDbState = 0;
+    sDetectorDbState = 0;
 }
 
-- (void) hwWizardActionFinal:(NSNotification*)note
+- (void) hwWizardActionFinal:(NSNotification*)aNote
 {
     // now that we have updated all settings, finally go ahead and
     // set pedestals and/or initialize this crate if we haven't done so already
@@ -2009,7 +2062,10 @@ static int              sChannelsNotChangedCount = 0;
     }
     if (sChannelsNotChangedCount) {
         NSLog(@"Warning: Settings for %d channels not made because they have HV disabled\n", sChannelsNotChangedCount);
+        sChannelsNotChangedCount = 0;
     }
+
+    [[self undoManager] enableUndoRegistration];
 }
 
 #pragma mark •••HWWizard

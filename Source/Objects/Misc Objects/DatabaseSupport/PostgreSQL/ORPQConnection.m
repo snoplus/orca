@@ -43,9 +43,15 @@
 {
     @synchronized(self){
         if(!mConnection && [aHostName length] && [aUserName length] && [aPassWord length] && [aDataBase length]) {
-            NSString *conninfo = [NSString stringWithFormat:@"host='%@' user='%@' password='%@' dbname='%@'",
+            NSArray *parts = [aHostName componentsSeparatedByString:@":"];
+            NSString *conninfo;
+            if ([parts count] > 1) {
+                conninfo = [NSString stringWithFormat:@"host='%@' port='%@' user='%@' password='%@' dbname='%@'",
+                            (NSString*)parts[0], (NSString *)parts[1], aUserName, aPassWord, aDataBase];
+            } else {
+                conninfo = [NSString stringWithFormat:@"host='%@' user='%@' password='%@' dbname='%@'",
                                   aHostName, aUserName, aPassWord, aDataBase];
-            
+            }
             mConnection = PQconnectdb([conninfo UTF8String]);
             if (!mConnection || PQstatus(mConnection) != CONNECTION_OK){
                 if (verbose) {

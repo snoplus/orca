@@ -62,6 +62,7 @@
 - (void) checkGlobalSecurity;
 
 #pragma mark •••Interface Management
+- (void) everythingChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNotification;
 - (void) commentsChanged:(NSNotification*)aNote;
 - (void) showVoltsChanged:(NSNotification*)aNote;

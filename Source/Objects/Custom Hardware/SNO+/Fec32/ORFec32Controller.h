@@ -118,6 +118,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management
+- (void) everythingChanged:(NSNotification*)aNote;
 - (void) updatePMTInfo:(NSNotification*)aNote;
 - (void) dcVBsChanged:(NSNotification*)aNote;
 - (void) dcThresholdsChanged:(NSNotification*)aNote;
