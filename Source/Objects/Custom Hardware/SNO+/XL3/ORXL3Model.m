@@ -5196,7 +5196,7 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
                         dispatch_async(dispatch_get_main_queue(), ^{
                             BOOL result = ORRunAlertPanel([NSString stringWithFormat:@"Crate %i HV readback differs from the setpoint. This might indicate a tripped HV power supply. Triggers are currently enabled, which is not safe for the hardware unless the crate is at HV.", [self crateNumber]], @"Would you like to disable triggers?", @"Yes", @"No", nil);
 
-                            if (!result) {
+                            if (result) {
                                 [self hvTriggersOFF];
                                 NSLog(@"Crate %02d disabling triggers\n.", [self crateNumber]);
                             }
