@@ -1508,7 +1508,7 @@ void SwapLongBlock(void* p, int32_t n)
         if (![fec dcPresent:dbNum]) continue;
 
         db = [fec dc:dbNum];
-            
+
         for (channel = 0; channel < 8; channel++) {
             mb->vThr[dbNum*8+channel] = [db vt:channel];
             mb->tCmos.tacShift[dbNum*8+channel] = [db tac0trim:channel];
@@ -1710,6 +1710,164 @@ void SwapLongBlock(void* p, int32_t n)
 }
 
 #pragma mark •••Hardware Access
+
+- (void) loadTriggers
+{
+    /* Loads the current GUI channel trigger settings to the hardware. This
+     * function will block and so should only be called on a separate thread.
+     * This function will raise an exception if any error occurs. */
+    int slot, dbNum, channel;
+    char payload[XL3_PAYLOAD_SIZE];
+    ORFec32Model *fec;
+    ORFecDaughterCardModel *db;
+
+    memset(&payload, 0, sizeof(payload));
+
+    MultiSetCrateTriggersArgs *args = (MultiSetCrateTriggersArgs *) payload;
+
+    args->slotMask = 0;
+
+    for (slot = 0; slot < 16; slot++) {
+        args->tr100Masks[slot] = 0;
+        args->tr20Masks[slot] = 0;
+    }
+
+    for (slot = 0; slot < 16; slot++) {
+        fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
+
+        if (!fec) continue;
+
+        args->slotMask |= 1 << slot;
+
+        if ([self isTriggerON]) {
+            for (dbNum = 0; dbNum < 4; dbNum++) {
+                if (![fec dcPresent:dbNum]) continue;
+
+                db = [fec dc:dbNum];
+
+                for (channel = 0; channel < 8; channel++) {
+                    if ([fec trigger100nsEnabled: (dbNum*8 + channel)]) {
+                        args->tr100Masks[slot] |= 1 << (dbNum*8+channel);
+                    }
+
+                    if ([fec trigger20nsEnabled: (dbNum*8 + channel)]) {
+                        args->tr20Masks[slot] |= 1 << (dbNum*8+channel);
+                    }
+                }
+            }
+        }
+    }
+
+    /* Convert args to network byte order. */
+    args->slotMask = htonl(args->slotMask);
+
+    for (slot = 0; slot < 16; slot++) {
+        args->tr100Masks[slot] = htonl(args->tr100Masks[slot]);
+        args->tr20Masks[slot] = htonl(args->tr20Masks[slot]);
+    }
+
+    [[self xl3Link] sendCommand:MULTI_SET_CRATE_TRIGGERS_ID withPayload:payload expectResponse:YES];
+
+    MultiSetCrateTriggersResults *results = (MultiSetCrateTriggersResults *) payload;
+
+    if (ntohl(results->errorMask)) {
+        NSException *e = [NSException exceptionWithName:@"loadTriggersError"
+                          reason:@"failed to load channel triggers"
+                          userInfo:nil];
+        [e raise];
+    }
+}
+
+- (void) disableTriggers
+{
+    /* Turns off all channel level triggers. This function does *not* update
+     * the GUI so once this function is called, the GUI will most likely be in
+     * an inconsistent state. This can be useful in certain situations like ECA
+     * runs where you want to disable channel triggers but then load them back
+     * at the end of the run. This function will block until the operation
+     * completes. This function will raise an exception if any error occurs. */
+    int slot;
+    char payload[XL3_PAYLOAD_SIZE];
+
+    memset(&payload, 0, sizeof(payload));
+
+    MultiSetCrateTriggersArgs *args = (MultiSetCrateTriggersArgs *) payload;
+
+    args->slotMask = [self getSlotsPresent];
+
+    for (slot = 0; slot < 16; slot++) {
+        args->tr100Masks[slot] = 0;
+        args->tr20Masks[slot] = 0;
+    }
+
+    /* Convert args to network byte order. */
+    args->slotMask = htonl(args->slotMask);
+
+    for (slot = 0; slot < 16; slot++) {
+        args->tr100Masks[slot] = htonl(args->tr100Masks[slot]);
+        args->tr20Masks[slot] = htonl(args->tr20Masks[slot]);
+    }
+
+    [[self xl3Link] sendCommand:MULTI_SET_CRATE_TRIGGERS_ID withPayload:payload expectResponse:YES];
+
+    MultiSetCrateTriggersResults *results = (MultiSetCrateTriggersResults *) payload;
+
+    if (ntohl(results->errorMask)) {
+        NSException *e = [NSException exceptionWithName:@"loadTriggersError"
+                          reason:@"failed to load channel triggers"
+                          userInfo:nil];
+        [e raise];
+    }
+}
+
+- (void) loadSequencers
+{
+    /* Loads the current GUI channel sequencer settings to the hardware. This
+     * function will block and so should only be called on a separate thread.
+     * This function will raise an exception if any error occurs. */
+    int slot;
+    char payload[XL3_PAYLOAD_SIZE];
+    ORFec32Model *fec;
+
+    memset(&payload, 0, sizeof(payload));
+
+    MultiSetCrateSequencersArgs *args = (MultiSetCrateSequencersArgs *) payload;
+
+    args->slotMask = 0;
+
+    for (slot = 0; slot < 16; slot++) {
+        args->channelMasks[slot] = 0;
+    }
+
+    for (slot = 0; slot < 16; slot++) {
+        fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
+
+        if (!fec) continue;
+
+        args->slotMask |= 1 << slot;
+
+        args->channelMasks[slot] = ~[fec seqDisabledMask];
+    }
+
+    /* Convert args to network byte order. */
+    args->slotMask = htonl(args->slotMask);
+
+    for (slot = 0; slot < 16; slot++) {
+        args->channelMasks[slot] = htonl(args->channelMasks[slot]);
+    }
+
+    [[self xl3Link] sendCommand:MULTI_SET_CRATE_SEQUENCERS_ID withPayload:payload expectResponse:YES];
+
+    MultiSetCrateSequencersResults *results = (MultiSetCrateSequencersResults *) payload;
+
+    if (ntohl(results->errorMask)) {
+        NSException *e = [NSException exceptionWithName:@"loadSequencersError"
+                          reason:@"failed to load channel sequencers"
+                          userInfo:nil];
+        [e raise];
+    }
+}
+
 - (void) deselectCards
 {
 	[[self xl3Link] sendCommand:DESELECT_FECS_ID expectResponse:YES];

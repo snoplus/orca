@@ -358,6 +358,9 @@ enum {
 - (void)encodeWithCoder:(NSCoder*)encoder;
 
 #pragma mark •••Hardware Access
+- (void) loadTriggers;
+- (void) disableTriggers;
+- (void) loadSequencers;
 - (void) selectCards:(unsigned long) selectBits;
 - (void) deselectCards;
 - (void) select:(ORSNOCard*) aCard;
