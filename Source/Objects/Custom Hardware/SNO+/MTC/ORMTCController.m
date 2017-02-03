@@ -479,7 +479,8 @@
 }
 
 - (void) mtcSettingsChanged:(NSNotification*)aNotification {
-    [coarseDelayField setFloatValue:[model pedestalDelay]];
+    [coarseDelayField setFloatValue:[model coarseDelay]];
+    [fineDelayField setFloatValue:[model fineDelay]/1000.0];
     [lockOutWidthField setIntValue:[model lockoutWidth]];
     [pedestalWidthField setIntValue:[model pedestalWidth]];
     [nhit100LoPrescaleField setIntValue:[model prescaleValue]];
@@ -795,7 +796,8 @@
     float fine_delay = [fineDelayField floatValue];
     int fine_delay_ps = fine_delay*1000.0;
 
-    [model setPedestalDelay:delay_value];
+    [model setCoarseDelay:coarse_delay];
+    [model setFineDelay:fine_delay_ps];
 }
 
 - (IBAction)standardPulserRateFieldChanged:(id)sender {

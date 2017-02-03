@@ -238,9 +238,8 @@
 - (void) zeroTheGTCounter;
 - (void) setThe10MHzCounter:(uint64_t) newValue;
 - (void) loadPrescaleValueToHardware;
-- (void) loadPedestalDelayToHardware;
-- (void) loadCoarseDelayToHardware: (uint16_t) coarse_delay;
-- (void) loadFineDelayToHardware: (float) fine_delay;
+- (void) loadCoarseDelayToHardware;
+- (void) loadFineDelayToHardware;
 - (void) loadPulserRateToHardware;
 - (void) loadLockOutWidthToHardware;
 - (void) loadPedWidthToHardware;
