@@ -44,10 +44,10 @@
 #define LAST_NHIT_TAG 6
 
 #define FIRST_ESUM_TAG 7
-#define VIEW_ESUMH_TAG 7
-#define VIEW_ESUML_TAG 8
-#define VIEW_OWLEH_TAG 9
-#define VIEW_OWLEL_TAG 10
+#define VIEW_ESUML_TAG 7
+#define VIEW_ESUMH_TAG 8
+#define VIEW_OWLEL_TAG 9
+#define VIEW_OWLEH_TAG 10
 #define LAST_ESUM_TAG 10
 
 
