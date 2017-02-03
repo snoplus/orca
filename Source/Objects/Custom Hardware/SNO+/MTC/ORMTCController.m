@@ -321,7 +321,7 @@
     int esum_view_unit_index = [[eSumViewTypeMatrix selectedCell] tag];
     @try {
         nhit_units = [self convert_view_unit_index_to_model_index: nhit_view_unit_index];
-        esum_view_unit_index = [self convert_view_unit_index_to_model_index: esum_view_unit_index];
+        esum_units = [self convert_view_unit_index_to_model_index: esum_view_unit_index];
     } @catch (NSException *exception) {
         NSLogColor([NSColor redColor], @"Error displaying updated threshold information. Reason: %@\n",[exception reason]);
         return;
