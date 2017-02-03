@@ -310,6 +310,7 @@
                                             </textFieldCell>
                                             <connections>
                                                 <action selector="timeLimitTextAction:" target="-2" id="1360"/>
+                                                <outlet property="formatter" destination="smT-jd-CZZ" id="23s-68-81g"/>
                                             </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" id="1343">
