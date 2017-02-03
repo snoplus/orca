@@ -61,7 +61,6 @@ NSString* ORMTCTriggersLock                     = @"ORMTCTriggersLock";
 NSString* ORMTCModelMTCAMaskChanged             = @"ORMTCModelMTCAMaskChanged";
 NSString* ORMTCModelIsPedestalEnabledInCSR      = @"ORMTCModelIsPedestalEnabledInCSR";
 NSString* ORMTCPulserRateChanged                = @"ORMTCPulserRateChanged";
-NSString* ORMTCPrescaleValueChanged             = @"ORMTCPrescaleValueChanged";
 NSString* ORMTCGTMaskChanged                    = @"ORMTCGTMaskChanged";
 
 
@@ -553,7 +552,7 @@ tubRegister;
 
 - (void) setPrescaleValue:(uint16_t)newVal {
     prescaleValue = newVal;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCPrescaleValueChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCSettingsChanged object:self];
 }
 
 - (uint16_t) prescaleValue {

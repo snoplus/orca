@@ -383,7 +383,7 @@ snopGreenColor;
                         object: nil];
     [notifyCenter addObserver : self
                      selector : @selector(mtcDataBaseChanged:)
-                         name : ORMTCPrescaleValueChanged
+                         name : ORMTCSettingsChanged
                         object: nil];
     [notifyCenter addObserver : self
                      selector : @selector(mtcDataBaseChanged:)

@@ -298,5 +298,4 @@ extern NSString* ORMTCTriggersLock;
 extern NSString* ORMTCModelMTCAMaskChanged;
 extern NSString* ORMTCModelIsPedestalEnabledInCSR;
 extern NSString* ORMTCPulserRateChanged;
-extern NSString* ORMTCPrescaleValueChanged;
 extern NSString* ORMTCGTMaskChanged;

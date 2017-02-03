@@ -256,7 +256,6 @@
     [self mtcGTMaskChanged:nil];
     [self updateThresholdsDisplay:nil];
     [self mtcPulserRateChanged:nil];
-    [self mtcPrescaleValueChanged:nil];
 	[self isPulserFixedRateChanged:nil];
 	[self fixedPulserRateCountChanged:nil];
 	[self fixedPulserRateDelayChanged:nil];
@@ -303,10 +302,7 @@
 	[initProgressBar setDoubleValue:progress];
 	[initProgressField setFloatValue:progress/100.];
 }
-- (void) mtcPrescaleValueChanged:(NSNotification *)aNote
-{
-    [nhit100LoPrescaleField setIntValue:[model prescaleValue]];
-}
+
 - (void) mtcPulserRateChanged:(NSNotification *)aNote
 {
     int rate = [model pgtRate];
@@ -486,6 +482,7 @@
     [pedDelayField setFloatValue:[model pedestalDelay]];
     [lockOutWidthField setIntValue:[model lockoutWidth]];
     [pedestalWidthField setIntValue:[model pedestalWidth]];
+    [nhit100LoPrescaleField setIntValue:[model prescaleValue]];
     [self displayMasks];
 }
 
