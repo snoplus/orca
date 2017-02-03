@@ -287,41 +287,38 @@ tubRegister;
         for (int i=0; i<10; ++i) {
             if (pqMTC->valid[kMTC_mtcaDacs] & (1 << i)) {
                 uint32_t val = pqMTC->mtcaDacs[i];
-                [self setDbLong:val forIndex:mtcDacIndexFromDetectorDB[i]];
+                [self setThresholdOfType:[self server_index_to_model_index:i] fromUnits:MTC_RAW_UNITS toValue:val];
             } else ++countInvalid;
         }
 
         if (pqMTC->valid[kMTC_pedWidth]) {
-            [self setDbLong:pqMTC->pedWidth forIndex:kPedestalWidth];
+            [self setPedestalWidth:pqMTC->pedWidth];
         } else ++countInvalid;
 
 
-        if (pqMTC->valid[kMTC_coarseDelay]) {
-            [self setDbLong:pqMTC->coarseDelay forIndex:kCoarseDelay];
-        } else ++countInvalid;
-
-        if (pqMTC->valid[kMTC_fineDelay]) {
-            [self setDbLong:pqMTC->fineDelay/100 forIndex:kFineDelay];
+        if (pqMTC->valid[kMTC_coarseDelay] && pqMTC->valid[kMTC_fineDelay]) {
+            // TODO check with Tony about how coarse and fine are stored.
+            [self setPedestalDelay:pqMTC->coarseDelay+pqMTC->fineDelay];
         } else ++countInvalid;
 
         if (pqMTC->valid[kMTC_pedMask]) {
-            [self setDbLong:pqMTC->pedMask forIndex:kPEDCrateMask];
+            [self setPedCrateMask:pqMTC->pedMask];
         } else ++countInvalid;
 
         if (pqMTC->valid[kMTC_prescale]) {
-            [self setDbLong:pqMTC->prescale forIndex:kNhit100LoPrescale];
+            [self setPrescaleValue:pqMTC->prescale];
         } else ++countInvalid;
 
         if (pqMTC->valid[kMTC_lockoutWidth]) {
-            [self setDbLong:pqMTC->lockoutWidth forIndex:kLockOutWidth];
+            [self setLockoutWidth:pqMTC->lockoutWidth];
         } else ++countInvalid;
 
         if (pqMTC->valid[kMTC_gtMask]) {
-            [self setDbLong:pqMTC->gtMask forIndex:kGtMask];
+            [self setGtMask:pqMTC->gtMask];
         } else ++countInvalid;
 
         if (pqMTC->valid[kMTC_gtCrateMask]) {
-            [self setDbLong:pqMTC->gtCrateMask forIndex:kGtCrateMask];
+            [self setGTCrateMask:pqMTC->gtCrateMask];
         } else ++countInvalid;
 
         //TO_DO verify that order of relays is correct
@@ -355,12 +352,8 @@ tubRegister;
         }
 
         if (pqMTC->valid[kMTC_pulserRate] && pqMTC->pulserRate) { // (don't set if rate is 0)
-            [self setDbLong:pqMTC->pulserRate forIndex:kPulserPeriod];
+            [self setPgtRate:pqMTC->pulserRate];
         } else ++countInvalid;
-
-        // set find slope and min delay offset to constant values (aren't used anyway)
-        [self setDbFloat:0.1 forIndex:kFineSlope];
-        [self setDbFloat:18.35 forIndex:kMinDelayOffset];
     }
     @finally {
         [[self undoManager] enableUndoRegistration];
