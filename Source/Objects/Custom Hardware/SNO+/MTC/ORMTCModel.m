@@ -293,7 +293,7 @@ tubRegister;
 
         if (pqMTC->valid[kMTC_coarseDelay] && pqMTC->valid[kMTC_fineDelay]) {
             // TODO check with Tony about how coarse and fine are stored.
-            [self setPedestalDelay:pqMTC->coarseDelay+pqMTC->fineDelay];
+            [self setPedestalDelay:pqMTC->coarseDelay+pqMTC->fineDelay/1000.0];
         } else ++countInvalid;
 
         if (pqMTC->valid[kMTC_pedMask]) {
