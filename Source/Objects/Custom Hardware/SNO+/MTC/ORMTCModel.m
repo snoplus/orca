@@ -1175,7 +1175,7 @@ tubRegister;
 	ORSelectorSequence* seq = [ORSelectorSequence selectorSequenceWithDelegate:self];
 
 	@try {		
-		NSLog(@"Starting MTC init process....");
+		NSLog(@"Starting MTC init process....\n");
 
         [[seq forTarget:self] server_init];                                         // STEP 1: Let the server init
 		[[seq forTarget:self] zeroTheGTCounter];									// STEP 2: Clear the GT Counter

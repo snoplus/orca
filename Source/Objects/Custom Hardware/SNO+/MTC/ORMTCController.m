@@ -646,9 +646,9 @@
 //MTC Init Ops buttons.
 - (IBAction) standardInitMTC:(id) sender 
 {
-	[model initializeMtc];
+        [model initializeMtc];
 }
-	
+
 - (IBAction) standardLoadMTCADacs:(id) sender 
 {
     @try {
@@ -701,7 +701,11 @@
 
 - (IBAction) standardStopPedestalsFixedTime:(id) sender
 {
-	[model stopMTCPedestalsFixedTime];
+    @try {
+        [model stopMTCPedestalsFixedTime];
+    } @catch (NSException* excep) {
+        NSLog(@"Failed to stop pulser: %@\n",[excep reason]);
+    }
 }
 
 - (IBAction) standardSetPedestalsCount:(id) sender
@@ -1267,22 +1271,38 @@
 
 - (IBAction) triggersLoadTriggerMask:(id) sender
 {
-    [model setGlobalTriggerWordMask];
+    @try {
+        [model setGlobalTriggerWordMask];
+    } @catch (NSException* excep) {
+        //pass, the model already warns
+    }
 }
 
 - (IBAction) triggersLoadGTCrateMask:(id) sender
 {
-    [model loadGTCrateMaskToHardware];
+    @try {
+        [model loadGTCrateMaskToHardware];
+    } @catch (NSException* excep) {
+        // pass, the model already warns
+    }
 }
 
 - (IBAction) triggersLoadPEDCrateMask:(id) sender
 {
-    [model loadPedestalCrateMaskToHardware];
+    @try {
+        [model loadPedestalCrateMaskToHardware];
+    } @catch (NSException* excep) {
+        // pass, the model already warns
+    }
 }
 
 - (IBAction) triggersLoadMTCACrateMask:(id) sender
 {
-    [model mtcatLoadCrateMasks];
+    @try {
+        [model mtcatLoadCrateMasks];
+    } @catch (NSException* excep) {
+        //pass, the model already warns
+    }
 }
 
 - (IBAction) helpButtonClicked:(id)sender {
