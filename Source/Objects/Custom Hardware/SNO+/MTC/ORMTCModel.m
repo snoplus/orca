@@ -38,6 +38,7 @@ NSString* PrescaleValueSerializationString      = @"MTC_PrescaleValue";
 NSString* PulserRateSerializationString         = @"MTC_PulserRate";
 NSString* PGT_PED_Mode_SerializationString      = @"MTC_PulserMode";
 NSString* PulserEnabledSerializationString      = @"MTC_PulserEnabled";
+NSString* ORMTCSettingsChanged                  = @"ORMTCSettingsChanged";
 NSString* ORMTCModelBasicOpsRunningChanged      = @"ORMTCModelBasicOpsRunningChanged";
 NSString* ORMTCABaselineChanged                 = @"ORMTCABaselineChanged";
 NSString* ORMTCAThresholdChanged                = @"ORMTCAThresholdChanged";
@@ -62,7 +63,6 @@ NSString* ORMTCModelIsPedestalEnabledInCSR      = @"ORMTCModelIsPedestalEnabledI
 NSString* ORMTCPulserRateChanged                = @"ORMTCPulserRateChanged";
 NSString* ORMTCPrescaleValueChanged             = @"ORMTCPrescaleValueChanged";
 NSString* ORMTCGTMaskChanged                    = @"ORMTCGTMaskChanged";
-NSString* ORMTCPedestalDelayChanged             = @"ORMTCPedestalDelayChanged";
 
 
 #define kMTCRegAddressBase		0x00007000
@@ -105,10 +105,6 @@ static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
 @implementation ORMTCModel
 
 @synthesize
-pedestalWidth,
-pedCrateMask,
-GTCrateMask,
-lockoutWidth,
 pulserEnabled = _pulserEnabled,
 tubRegister;
 
@@ -549,10 +545,12 @@ tubRegister;
 }
 
 - (void) setPedestalDelay: (float) delay {
-    pedestalDelay = delay;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCPedestalDelayChanged object:self];
-
+    if(pedestalDelay != delay) {
+        pedestalDelay = delay;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCSettingsChanged object:self];
+    }
 }
+
 - (void) setPrescaleValue:(uint16_t)newVal {
     prescaleValue = newVal;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCPrescaleValueChanged object:self];
@@ -672,6 +670,52 @@ tubRegister;
 	[[[self undoManager] prepareWithInvocationTarget:self] setIsPedestalEnabledInCSR:[self isPedestalEnabledInCSR]];
     _isPedestalEnabledInCSR = isPedestalEnabledInCSR;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelIsPedestalEnabledInCSR object:self];
+}
+
+- (void) setLockoutWidth:(uint16_t)width {
+    if(lockoutWidth != width) {
+        lockoutWidth = width;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCSettingsChanged object:self];
+    }
+}
+
+- (uint16_t) lockoutWidth {
+    return lockoutWidth;
+}
+
+- (void) setPedestalWidth:(uint16_t) width {
+    if(pedestalWidth != width)
+    {
+        pedestalWidth = width;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCSettingsChanged object:self];
+    }
+}
+
+- (uint16_t) pedestalWidth {
+    return pedestalWidth;
+}
+
+- (void) setGTCrateMask:(uint32_t)mask {
+    if (GTCrateMask != mask) {
+        GTCrateMask = mask;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCSettingsChanged object:self];
+    }
+}
+
+- (uint32_t) GTCrateMask {
+    return GTCrateMask;
+}
+
+- (void) setPedCrateMask:(uint32_t)mask {
+    if( pedCrateMask != mask)
+    {
+        pedCrateMask = mask;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCSettingsChanged object:self];
+    }
+}
+
+- (uint32_t) pedCrateMask {
+    return pedCrateMask;
 }
 
 #pragma mark •••Converters

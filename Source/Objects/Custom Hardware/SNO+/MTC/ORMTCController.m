@@ -232,9 +232,10 @@
                          name : ORMTCModelIsPedestalEnabledInCSR
                        object : nil];
     [notifyCenter addObserver : self
-                     selector : @selector(pedestalDelayValueChanged:)
-                         name : ORMTCPedestalDelayChanged
+                     selector : @selector(mtcSettingsChanged:)
+                         name : ORMTCSettingsChanged
                        object : nil];
+
 }
 
 - (void) updateWindow
@@ -261,8 +262,7 @@
 	[self fixedPulserRateDelayChanged:nil];
     [self triggerMTCAMaskChanged:nil];
     [self isPedestalEnabledInCSRChanged:nil];
-    [self displayMasks];
-    [self pedestalDelayValueChanged:nil];
+    [self mtcSettingsChanged:nil];
     [lockOutWidthField setIntValue:[model lockoutWidth]];
     [pedestalWidthField setIntValue:[model pedestalWidth]];
 }
@@ -482,9 +482,11 @@
     [includePedestalsCheckBox setState:[model isPedestalEnabledInCSR]];
 }
 
-- (void) pedestalDelayValueChanged:(NSNotification*)aNotification
-{
+- (void) mtcSettingsChanged:(NSNotification*)aNotification {
     [pedDelayField setFloatValue:[model pedestalDelay]];
+    [lockOutWidthField setIntValue:[model lockoutWidth]];
+    [pedestalWidthField setIntValue:[model pedestalWidth]];
+    [self displayMasks];
 }
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
