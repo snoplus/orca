@@ -660,7 +660,8 @@
 - (IBAction) setAdvancedOptions:(id)sender
 {
     @try{
-        [model loadPedestalDelayToHardware];
+        [model loadCoarseDelayToHardware];
+        [model loadFineDelayToHardware];
         [model loadPrescaleValueToHardware];
         [model loadLockOutWidthToHardware];
         [model loadPedWidthToHardware];
