@@ -73,7 +73,8 @@
     uint32_t                GTCrateMask;
     uint32_t                pedCrateMask;
     uint16_t                prescaleValue;
-    float                pedestalDelay;
+    int                     fineDelay;
+    int                     coarseDelay;
 
     //basic ops
     int                     selectedRegister;
@@ -114,7 +115,8 @@
 @property (nonatomic,assign) uint16_t lockoutWidth;
 @property (nonatomic,assign) uint16_t pedestalWidth;
 @property (nonatomic,assign) float    pgtRate;
-@property (nonatomic,assign) float pedestalDelay;
+@property (nonatomic,assign) int      fineDelay;
+@property (nonatomic,assign) int      coarseDelay;
 @property (nonatomic,assign) uint32_t gtMask;
 @property (nonatomic,assign) uint16_t prescaleValue;
 @property (nonatomic,assign) uint32_t GTCrateMask;

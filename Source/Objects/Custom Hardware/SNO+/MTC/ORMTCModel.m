@@ -539,13 +539,13 @@ tubRegister;
     return pgtRate;
 }
 
-- (float) pedestalDelay {
-    return pedestalDelay;
+- (int) coarseDelay {
+    return coarseDelay;
 }
 
-- (void) setPedestalDelay: (float) delay {
-    if(pedestalDelay != delay) {
-        pedestalDelay = delay;
+- (void) setCoarseDelay:(int) delay
+    if(coarseDelay != delay) {
+        coarseDelay = delay;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCSettingsChanged object:self];
     }
 }

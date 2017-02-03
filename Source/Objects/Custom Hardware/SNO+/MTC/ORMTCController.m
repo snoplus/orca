@@ -453,7 +453,7 @@
     [pedestalWidthField             setEnabled: !lockedOrNotRunningMaintenance];
     [nhit100LoPrescaleField         setEnabled: !lockedOrNotRunningMaintenance];
     [pulserPeriodField         setEnabled: !lockedOrNotRunningMaintenance];
-    [pedDelayField                 setEnabled: !lockedOrNotRunningMaintenance];
+    [coarseDelayField                 setEnabled: !lockedOrNotRunningMaintenance];
 
     //Triggers
     [globalTriggerCrateMaskMatrix setEnabled: !lockedOrNotRunningMaintenance];
@@ -479,7 +479,7 @@
 }
 
 - (void) mtcSettingsChanged:(NSNotification*)aNotification {
-    [pedDelayField setFloatValue:[model pedestalDelay]];
+    [coarseDelayField setFloatValue:[model pedestalDelay]];
     [lockOutWidthField setIntValue:[model lockoutWidth]];
     [pedestalWidthField setIntValue:[model pedestalWidth]];
     [nhit100LoPrescaleField setIntValue:[model prescaleValue]];
@@ -791,7 +791,10 @@
 }
 
 - (IBAction) settingsPedDelayFieldChanged:(id)sender {
-    float delay_value = [pedDelayField intValue];
+    int coarse_delay = [coarseDelayField intValue];
+    float fine_delay = [fineDelayField floatValue];
+    int fine_delay_ps = fine_delay*1000.0;
+
     [model setPedestalDelay:delay_value];
 }
 
