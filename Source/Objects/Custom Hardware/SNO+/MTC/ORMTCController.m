@@ -316,16 +316,18 @@
 }
 
 - (void) updateThresholdsDisplay:(NSNotification *)aNote {
-    int units;
-    int view_index = [[nHitViewTypeMatrix selectedCell] tag];
+    int nhit_units,esum_units;
+    int nhit_view_unit_index = [[nHitViewTypeMatrix selectedCell] tag];
+    int esum_view_unit_index = [[eSumViewTypeMatrix selectedCell] tag];
     @try {
-        units = [self convert_view_unit_index_to_model_index: view_index];
+        nhit_units = [self convert_view_unit_index_to_model_index: nhit_view_unit_index];
+        esum_view_unit_index = [self convert_view_unit_index_to_model_index: esum_view_unit_index];
     } @catch (NSException *exception) {
         NSLogColor([NSColor redColor], @"Error displaying updated threshold information. Reason: %@\n",[exception reason]);
         return;
     }
-    [self changeNhitThresholdsDisplay:units];
-    [self changeESUMThresholdDisplay:units];
+    [self changeNhitThresholdsDisplay:nhit_units];
+    [self changeESUMThresholdDisplay:esum_units];
 
 }
 
@@ -817,8 +819,10 @@
             threshold_index = [self convert_view_threshold_index_to_model_index:i];
             if(![model ConversionIsValidForThreshold:threshold_index]) {
                     [[nhitMatrix cellWithTag:i] setEnabled:type==MTC_RAW_UNITS];
-
                 tempType = MTC_RAW_UNITS;
+            }
+            else {
+                [[nhitMatrix cellWithTag:i] setEnabled:YES];
             }
             value = [model getThresholdOfType: threshold_index inUnits:tempType];
         } @catch (NSException *exception) {
@@ -841,6 +845,9 @@
             if(![model ConversionIsValidForThreshold:threshold_index]) {
                 [[esumMatrix cellWithTag:i] setEnabled:type==MTC_RAW_UNITS];
                 tempType = MTC_RAW_UNITS;
+            }
+            else {
+                [[esumMatrix cellWithTag:i] setEnabled:YES];
             }
             value = [model getThresholdOfType: threshold_index inUnits:tempType];
         } @catch (NSException *exception) {
