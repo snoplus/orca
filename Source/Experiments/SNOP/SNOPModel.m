@@ -1038,14 +1038,15 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 
     mtc = [mtcs objectAtIndex:0];
 
-    crate_pedestal_mask = [mtc getPedestalCrateMask];
+    crate_pedestal_mask = [mtc pedCrateMask];
 
-    pulser_rate = [mtc getThePulserRate];
+    pulser_rate = [mtc pgtRate];
 
     /* Enable all crates in the MTCD pedestal mask. */
-    [mtc setDbLong:0xffffff forIndex:kPEDCrateMask];
+    [mtc setPedCrateMask:0xffffff];
+
     @try {
-        [mtc setPedestalCrateMask];
+        [mtc loadPedestalCrateMaskToHardware];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
                    @"error setting the MTCD crate pedestal mask. error: "
@@ -1095,9 +1096,9 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     }
 
     /* Reset the crate pedestal all crates in the MTCD pedestal mask. */
-    [mtc setDbLong:crate_pedestal_mask forIndex:kPEDCrateMask];
+    [mtc setPedCrateMask:crate_pedestal_mask];
     @try {
-        [mtc setPedestalCrateMask];
+        [mtc loadPedestalCrateMaskToHardware];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
                    @"error setting the MTCD crate pedestal mask. error: "
@@ -1107,7 +1108,8 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     /* Reset the pulser rate since the firePedestals function sets the pulser
      * rate to 0. */
     @try {
-        [mtc setThePulserRate:pulser_rate];
+        [mtc setPgtRate:pulser_rate];
+        [mtc loadPulserRateToHardware];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
                    @"error setting the pulser rate. error: "
@@ -1869,10 +1871,11 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     NSData *data = [NSData dataWithContentsOfURL:url];
     NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     NSError *error =  nil;
-    NSDictionary *detectorSettings = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
+    NSMutableDictionary *detectorSettings = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
 
     if(error) {
         NSLog(@"Error querying couchDB, please check the connection is correct: \n %@ \n", ret);
+        [ret release];
         return false;
     }
     
@@ -1891,25 +1894,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         if(nextruntypeword & kDiagnosticRun) return true;
 
         //Load MTC thresholds
-        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kNHit100HiThreshold]] forIndex:kNHit100HiThreshold];
-        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kNHit100MedThreshold]] forIndex:kNHit100MedThreshold];
-        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kNHit100LoThreshold]] forIndex:kNHit100LoThreshold];
-        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kNHit20Threshold]] forIndex:kNHit20Threshold];
-        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kNHit20LBThreshold]] forIndex:kNHit20LBThreshold];
-        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kOWLNThreshold]] forIndex:kOWLNThreshold];
-        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kESumLowThreshold]] forIndex:kESumLowThreshold];
-        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kESumHiThreshold]] forIndex:kESumHiThreshold];
-        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kOWLELoThreshold]] forIndex:kOWLELoThreshold];
-        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kOWLEHiThreshold]] forIndex:kOWLEHiThreshold];
-        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kNhit100LoPrescale]] forIndex:kNhit100LoPrescale];
-        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kPulserPeriod]] forIndex:kPulserPeriod];
-        
-        //Load MTC GT Mask
-        [mtc setDbObject:[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtc getDBKeyByIndex:kGtMask]] forIndex:kGtMask];
-
-        //Load the PED/PGT mode
-        BOOL pedpgtmode = [[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"PED_PGT_Mode"] boolValue];
-        [mtc setIsPedestalEnabledInCSR:pedpgtmode];
+        [mtc loadFromSearialization:detectorSettings];
         
         NSLog(@"Standard run %@ (%@) settings loaded. \n",runTypeName,runVersion);
         return true;
@@ -1969,11 +1954,10 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     [detectorSettings setObject:[NSNumber numberWithUnsignedLong:currentRunTypeWord] forKey:@"run_type_word"];
 
     //Save MTC/D parameters, trigger masks and MTC/A+ thresholds
-    for (int iparam=0; iparam<kDbLookUpTableSize; iparam++) {
-        [detectorSettings setObject:[mtc dbObjectByIndex:iparam] forKey:[mtc getDBKeyByIndex:iparam]];
-    }
-    //Save PED/PGT mode
-    [detectorSettings setObject:[NSNumber numberWithBool:[mtc isPedestalEnabledInCSR]] forKey:@"PED_PGT_Mode"];
+    NSMutableDictionary* mtc_serial = [[mtc serializeToDictionary] retain];
+    [detectorSettings addEntriesFromDictionary:mtc_serial];
+    [mtc_serial release];
+    NSLog(@"savestandardrun %@\n",detectorSettings);
     
     [[self orcaDbRefWithEntryDB:self withDB:@"orca"] addDocument:detectorSettings tag:@"kStandardRunDocumentAdded"];
 
@@ -1999,7 +1983,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         //Load MTC settings
         [mtc loadTheMTCADacs];
         [mtc setGlobalTriggerWordMask];
-        [mtc setThePulserRate:[mtc dbFloatByIndex:kPulserPeriod]];
+        [mtc loadPulserRateToHardware];
     }
     @catch(NSException *e){
         NSLogColor([NSColor redColor], @"Problem loading settings into Hardware: %@\n",[e reason]);
@@ -2021,7 +2005,6 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 
 
 @end
-
 @implementation SNOPDecoderForRHDR
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
