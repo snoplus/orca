@@ -1586,6 +1586,8 @@ err:
                         // GET FINAL SMELLIE SETTINGS
                         [valuesToFillPerSubRun setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
                         [valuesToFillPerSubRun setObject:gain forKey:@"gain"];
+                        [valuesToFillPerSubRun setObject:[smellieSettings objectForKey:@"trigger_frequency"] forKey:@"pulse_rate"];
+                        [valuesToFillPerSubRun setObject:[smellieSettings objectForKey:@"triggers_per_loop"] forKey:@"number_of_shots"];
 
                         NSNumber* laserSwitchChannel = [[self smellieLaserHeadToSepiaMapping] objectForKey:laserKey];
                         NSNumber* fibreInputSwitchChannel = [[self smellieLaserToInputFibreMapping] objectForKey:laserKey];
@@ -1618,23 +1620,19 @@ err:
                         }
                         NSNumber* sequenceTime = [NSNumber numberWithFloat:(fireTime+overheads)];
                         
-                        //// **NOTE** ////
-                        // Need to add a call to TUBii
-                        // to set the trigger delay. This
-                        // will be done using:
-                        // [theTUBiiModel setSmellieDelay]
-                        //
-                        // The delay field isn't currently
-                        // included in the run description
-                        // doc - needs discussion with
-                        // smellie group
-                        
                         //////////////
                         // Slave mode
                         if([self smellieSlaveMode]){
                             if([laserKey isEqualTo:@"superK"]){
                                 NSLogColor([NSColor redColor], @"[SMELLIE]: SuperK laser cannot be run in slave mode\n");
                             } else {
+                                @try{
+                                    [theTubiiModel setSmellieDelay:[[smellieSettings objectForKey:@"delay_fixed_wavelength"] intValue]];
+                                } @catch(NSException* e) {
+                                    NSLogColor([NSColor redColor], @"[SMELLIE]: Problem setting trigger delay at TUBii: %@\n", [e reason]);
+                                    goto err;
+                                }
+                                
                                 @try{
                                     [self setSmellieLaserHeadSlaveMode:laserSwitchChannel withIntensity:intensity withFibreInput:fibreInputSwitchChannel withFibreOutput:fibreOutputSwitchChannel withTime:sequenceTime withGainVoltage:gain];
                                 } @catch(NSException* e){
@@ -1666,12 +1664,26 @@ err:
                             //Set SMELLIE settings
                             if([laserKey isEqualTo:@"superK"]){
                                 @try{
+                                    [theTubiiModel setSmellieDelay:[[smellieSettings objectForKey:@"delay_superK"] intValue]];
+                                } @catch(NSException* e) {
+                                    NSLogColor([NSColor redColor], @"[SMELLIE]: Problem setting trigger delay at TUBii: %@\n", [e reason]);
+                                    goto err;
+                                }
+                                
+                                @try{
                                     [self setSmellieSuperkMasterMode:intensity withRepRate:rate withWavelengthLow:wavelengthLowEdge withWavelengthHi:wavelengthHighEdge withFibreInput:fibreInputSwitchChannel withFibreOutput:fibreOutputSwitchChannel withNPulses:numOfPulses withGainVoltage:gain];
                                 } @catch(NSException* e){
                                     NSLogColor([NSColor redColor], @"[SMELLIE]: Problem with smellie server request: %@\n", [e reason]);
                                     goto err;
                                 }
                             } else {
+                                @try{
+                                    [theTubiiModel setSmellieDelay:[[smellieSettings objectForKey:@"delay_fixed_wavelength"] intValue]];
+                                } @catch(NSException* e) {
+                                    NSLogColor([NSColor redColor], @"[SMELLIE]: Problem setting trigger delay at TUBii: %@\n", [e reason]);
+                                    goto err;
+                                }
+                                
                                 @try{
                                     [self setSmellieLaserHeadMasterMode:laserSwitchChannel withIntensity:intensity withRepRate:rate withFibreInput:fibreInputSwitchChannel withFibreOutput:fibreOutputSwitchChannel withNPulses:numOfPulses withGainVoltage:gain];
                                 } @catch(NSException* e){
