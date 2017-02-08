@@ -111,6 +111,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
         XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:@"snodrop" withPort:@"5020"];
         [self setTellieClient:tellieCli];
         [self setSmellieClient:smellieCli];
+
         [[self tellieClient] setTimeout:10];
         [[self smellieClient] setTimeout:360];
         [tellieCli release];

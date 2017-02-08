@@ -74,6 +74,7 @@
 @property (nonatomic,retain) XmlrpcClient* tellieClient;
 @property (nonatomic,retain) XmlrpcClient* smellieClient;
 
+
 -(id) init;
 -(id) initWithCoder:(NSCoder *)aCoder;
 -(void) setUpImage;
