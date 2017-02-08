@@ -194,6 +194,7 @@
 
 
 - (NSString*) stringForThreshold:(int) threshold_index;
+- (id) objectFromSerialization: (NSMutableDictionary*) serial withKey:(NSString*)str;
 - (void) loadFromSearialization:(NSMutableDictionary*) serial;
 - (NSMutableDictionary*) serializeToDictionary;
 

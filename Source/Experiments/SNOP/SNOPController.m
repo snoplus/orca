@@ -1806,7 +1806,7 @@ snopGreenColor;
         units = [self decideUnitsToUseForRow:row usingModel:mtcModel];
         value = [mtcModel convertThreshold:raw OfType:view_model_map[row] fromUnits:MTC_RAW_UNITS toUnits:units];
     } @catch (NSException *excep) {
-        NSLogColor([NSColor redColor], @"Failed to convert the N100H threhsolds from raw units. Reason: %@\n",[excep reason]);
+        NSLogColor([NSColor redColor], @"Failed to convert the thresholds from raw units. Reason: %@\n",[excep reason]);
     }
     [[standardRunThresStoredValues cellAtRow:row column:0] setFormatter:formatter];
     [[standardRunThresStoredValues cellAtRow:row column:0] setFloatValue:value];
@@ -1902,7 +1902,7 @@ snopGreenColor;
         int gtmask = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:GTMaskSerializationString] intValue];
         
         for(int i=0;i<10;i++) {
-            float raw = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtcModel stringForThreshold:i]] floatValue];
+            float raw = [[[[[versionSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:[mtcModel stringForThreshold:view_model_map[i]]] floatValue];
             BOOL inMask = ((1<< view_mask_map[i]) & gtmask) != 0;
             [self updateSingleDBThresholdDisplayForRow:i inMask:inMask withModel:mtcModel withFormatter:thresholdFormatter toValue:raw];
         }
