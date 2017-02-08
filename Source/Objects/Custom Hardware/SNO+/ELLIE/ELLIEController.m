@@ -47,18 +47,10 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
         }
         ELLIEModel* anELLIEModel = [ellieModels objectAtIndex:0];
      
-        NSNumber *currentConfigurationVersion = [[NSNumber alloc] initWithInt:0];
-
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             //fetch the data associated with the current configuration
-            configForSmellie = [[anELLIEModel fetchConfigurationFile:
-                                    [anELLIEModel fetchRecentConfigVersion]] mutableCopy];
+            [[anELLIEModel fetchConfigurationFile:[anELLIEModel fetchRecentConfigVersion]] mutableCopy];
         });
-    
-        //increment the current version of the incrementation
-        currentConfigurationVersion = [NSNumber numberWithInt:[currentConfigurationVersion intValue] + 1];
-
-        [configForSmellie setObject:currentConfigurationVersion forKey:@"configuration_version"];
     
         //SMELLIE Configuration file
         //Make sure these buttons are working on start up for Smellie

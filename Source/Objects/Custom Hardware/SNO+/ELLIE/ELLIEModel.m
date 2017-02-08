@@ -84,7 +84,6 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
 @synthesize smellieRunHeaderDocList = _smellieRunHeaderDocList;
 @synthesize smellieSubRunInfo = _smellieSubRunInfo;
 @synthesize smellieLaserHeadToSepiaMapping = _smellieLaserHeadToSepiaMapping;
-@synthesize smellieLaserHeadToGainMapping = _smellieLaserHeadToGainMapping;
 @synthesize smellieLaserToInputFibreMapping = _smellieLaserToInputFibreMapping;
 @synthesize smellieFibreSwitchToFibreMapping = _smellieFibreSwitchToFibreMapping;
 @synthesize smellieSlaveMode = _smellieSlaveMode;
@@ -1264,14 +1263,14 @@ err:
 {
     //Extract the lasers to be fired into an array
     NSMutableArray* laserArray = [NSMutableArray arrayWithCapacity:5];
-    if([[smellieSettings objectForKey:@"375nm_laser_on"] intValue] == 1){
-        [laserArray addObject:@"375nm"];
-    } if([[smellieSettings objectForKey:@"405nm_laser_on"] intValue] == 1) {
-        [laserArray addObject:@"405nm"];
-    } if([[smellieSettings objectForKey:@"440nm_laser_on"] intValue] == 1) {
-        [laserArray addObject:@"440nm"];
-    } if([[smellieSettings objectForKey:@"500nm_laser_on"] intValue] == 1) {
-        [laserArray addObject:@"500nm"];
+    if([[smellieSettings objectForKey:@"PQ375_laser_on"] intValue] == 1){
+        [laserArray addObject:@"PQ375"];
+    } if([[smellieSettings objectForKey:@"PQ405_laser_on"] intValue] == 1) {
+        [laserArray addObject:@"PQ405"];
+    } if([[smellieSettings objectForKey:@"PQ440_laser_on"] intValue] == 1) {
+        [laserArray addObject:@"PQ440"];
+    } if([[smellieSettings objectForKey:@"PQ500_laser_on"] intValue] == 1) {
+        [laserArray addObject:@"PQ500"];
     } if([[smellieSettings objectForKey:@"superK_laser_on"] intValue] == 1) {
         [laserArray addObject:@"superK"];
     }
@@ -1410,13 +1409,8 @@ err:
     ///////////////
     // FIND AND LOAD RELEVANT CONFIG
     NSNumber* configVersionNo;
-    if([smellieSettings objectForKey:@"config_name"]){
-        NSLog( @"[SMELLIE]: Loading config file: %@\n", [smellieSettings objectForKey:@"config_name"]);
-        configVersionNo = [self fetchConfigVersionFor:[smellieSettings objectForKey:@"config_name"]];
-    } else {
-        configVersionNo = [self fetchRecentConfigVersion];
-        NSLog( @"[SMELLIE]: Loading config file: %i\n", [configVersionNo intValue]);
-    }
+    configVersionNo = [self fetchRecentConfigVersion];
+    NSLog( @"[SMELLIE]: Loading config file: %i\n", [configVersionNo intValue]);
     [self setSmellieConfigVersionNo:configVersionNo];
     [self fetchConfigurationFile:configVersionNo];
 
@@ -1432,12 +1426,19 @@ err:
     
     ///////////////////////
     // Check trigger is being sent to asyncronus port (EXT_A)
-    if(!([theTubiiModel asyncTrigMask] & 0x800000)){
+    NSUInteger asyncTrigMask;
+    @try{
+        asyncTrigMask = [theTubiiModel asyncTrigMask];
+    } @catch(NSException* e) {
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Error requesting asyncTrigMask from Tubii.\n");
+        goto err;
+    }
+    if(!(asyncTrigMask & 0x800000)){
         NSLogColor([NSColor redColor], @"[SMELLIE]: Triggers as not being sent to asynchronous MTC/D port\n");
         NSLogColor([NSColor redColor], @"[SMELLIE]: Please amend via the TUBii GUI (triggers tab)\n");
         goto err;
     }
-    
+
     ////////////////////////
     // SET MASTER / SLAVE MODE
     NSString *operationMode = [NSString stringWithFormat:@"%@",[smellieSettings objectForKey:@"operation_mode"]];
@@ -2024,7 +2025,7 @@ err:
         NSLogColor([NSColor redColor], @"[SMELLIE]: Error in fetching the SMELLIE CONFIGURATION FILE: %@\n", [e reason]);
         return @-1;
     }
-    NSLog(@"[SMELLIE]: config version sucessfully loaded!\n");
+    NSLog(@"[SMELLIE]: config version number: %@\n", currentVersionNumber);
     return currentVersionNumber;
 }
 
@@ -2095,70 +2096,47 @@ err:
 
     NSMutableDictionary* configForSmellie = [[[[currentConfig objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"] objectForKey:@"configuration_info"];
 
-    //Set laser head to sepia mapping
+    //Set laser head to 'sepia' laser switch mapping
+    NSMutableDictionary *laserHeadDict = [configForSmellie objectForKey:@"laserSwitchChannels"];
     NSMutableDictionary *laserHeadToSepiaMapping = [[NSMutableDictionary alloc] initWithCapacity:10];
-    for(int laserHeadIndex =0; laserHeadIndex < 6; laserHeadIndex++){
-        for (id specificConfigValue in configForSmellie){
-            if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput%i",laserHeadIndex]]){
-                NSString *laserHeadConnected = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"laserHeadConnected"]];
-                [laserHeadToSepiaMapping setObject:[NSNumber numberWithInt:laserHeadIndex] forKey:laserHeadConnected];
-            }
-        }
+    for (NSString* laserChannel in laserHeadDict){
+        NSNumber* laserHeadIndex = [NSNumber numberWithInt:[[self extractNumberFromText:laserChannel] intValue]];
+        NSString *laserHeadConnected = [NSString stringWithFormat:@"%@",[laserHeadDict objectForKey:laserChannel]];
+        [laserHeadToSepiaMapping setObject:laserHeadIndex forKey:laserHeadConnected];
     }
-    //NSLog(@"setSmellieLaserHeadToSepiaMapping: %@\n", laserHeadToSepiaMapping);
     [self setSmellieLaserHeadToSepiaMapping:laserHeadToSepiaMapping];
-    [laserHeadToSepiaMapping release];
-
-    //Set laser head to gain control mapping
-    NSMutableDictionary *laserHeadToGainControlMapping = [[NSMutableDictionary alloc] initWithCapacity:10];
-    for(int laserHeadIndex =0; laserHeadIndex < 6; laserHeadIndex++){
-        for (id specificConfigValue in configForSmellie){
-            if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput%i",laserHeadIndex]]){
-                NSString *laserHeadConnected = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"laserHeadConnected"]];
-                NSNumber *laserGainControl = [NSNumber numberWithFloat:[[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"gainControlFactor"] floatValue]];
-                [laserHeadToGainControlMapping setObject:laserGainControl forKey:laserHeadConnected];
-            }
-        }
-    }
-    //NSLog(@"setSmellieLaserHeadToGainMapping: %@\n", laserHeadToGainControlMapping);
-    [self setSmellieLaserHeadToGainMapping:laserHeadToGainControlMapping];
-    [laserHeadToGainControlMapping release];
-
+    
     //Set laser to input fibre mapping
+    NSMutableDictionary *fibreSwitchDict = [configForSmellie objectForKey:@"fibreSwitchChannels"];
     NSMutableDictionary *laserToInputFibreMapping = [[NSMutableDictionary alloc] initWithCapacity:10];
-    for (id specificConfigValue in configForSmellie){
-        if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput0"]]
-           || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput1"]]
-           || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput2"]]
-           || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput3"]]
-           || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput4"]]
-           || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput5"]]){
-            NSString *fibreSwitchInputConnected = [[configForSmellie objectForKey:specificConfigValue] objectForKey:@"fibreSwitchInputConnected"];
-            NSNumber* parsedFibreReference = [NSNumber numberWithInt:[[fibreSwitchInputConnected stringByReplacingOccurrencesOfString:@"Channel" withString:@""] intValue]];
-            NSString * laserHeadReference = [[configForSmellie objectForKey:specificConfigValue] objectForKey:@"laserHeadConnected"];
-            [laserToInputFibreMapping setObject:parsedFibreReference forKey:laserHeadReference];
+    NSMutableDictionary *fibreSwitchOutputToFibre = [[NSMutableDictionary alloc] initWithCapacity:10];
+    for (NSString* switchChannel in fibreSwitchDict){
+        NSString* firstChar = [switchChannel substringWithRange:NSMakeRange(0, 1)];
+        NSNumber* numInString = [NSNumber numberWithInt:[[self extractNumberFromText:switchChannel] intValue]];
+        if ([firstChar isEqualToString:@"i"]) { // Input channels
+            NSString *laserHeadConnected = [NSString stringWithFormat:@"%@",[fibreSwitchDict objectForKey:switchChannel]];
+            [laserToInputFibreMapping setObject:numInString forKey:laserHeadConnected];
+        } else if ([firstChar isEqualToString:@"o"]) { // Output channels
+            NSString *fibreConnected = [NSString stringWithFormat:@"%@",[fibreSwitchDict objectForKey:switchChannel]];
+            [fibreSwitchOutputToFibre setObject:numInString forKey:fibreConnected];
         }
     }
     [self setSmellieLaserToInputFibreMapping:laserToInputFibreMapping];
-    [laserToInputFibreMapping release];
-
-    //Set fibre switch to fibre mapping
-    NSMutableDictionary *fibreSwitchOutputToFibre = [[NSMutableDictionary alloc] initWithCapacity:20];
-    for(int outputChannelIndex = 1; outputChannelIndex < 15; outputChannelIndex++){
-        for (id specificConfigValue in configForSmellie){
-            if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"Channel%i",outputChannelIndex]]){
-                NSString *fibreReference = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"detectorFibreReference"]];
-                [fibreSwitchOutputToFibre setObject:[NSNumber numberWithInt:outputChannelIndex] forKey:fibreReference];
-            }
-        }
-    }
     [self setSmellieFibreSwitchToFibreMapping:fibreSwitchOutputToFibre];
+
+    [laserHeadToSepiaMapping release];
+    [laserToInputFibreMapping release];
     [fibreSwitchOutputToFibre release];
     
     NSLog(@"[SMELLIE] config file (version %i) sucessfully loaded!\n", [currentVersion intValue]);
     return configForSmellie;
 }
 
+- (NSString *)extractNumberFromText:(NSString *)text
+{
+    NSCharacterSet *nonDigitCharacterSet = [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
+    return [[text componentsSeparatedByCharactersInSet:nonDigitCharacterSet] componentsJoinedByString:@""];
+}
 
 /****************************************/
 /*        Misc generic methods          */
