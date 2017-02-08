@@ -214,7 +214,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
         [self initBoard];
         [self writeNumberBLTEvents:0];
         [self writeEnableBerr:0];
-        [self writeAcquistionControl:YES];
+        [self writeAcquisitionControl:YES];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor], @"error loading CAEN hardware: %@\n",
                    [e reason]);
@@ -1017,20 +1017,19 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 
 - (void) initBoard
 {
-    [self writeAcquistionControl:NO]; // Make sure it's off.
-	[self clearAllMemory];
-	[self softwareReset];
-	[self writeThresholds];
-	[self writeChannelConfiguration];
-	[self writeCustomSize];
-	[self writeTriggerSource];
-	[self writeTriggerOut];
-	[self writeFrontPanelControl];
-	[self writeChannelEnabledMask];
-	[self writeBufferOrganization];
-	[self writeOverUnderThresholds];
-	[self writeDacs];
-	[self writePostTriggerSetting];
+    [self softwareReset];
+    [self writeAcquisitionControl:NO]; // Make sure it's off.
+    [self writeThresholds];
+    [self writeChannelConfiguration];
+    [self writeCustomSize];
+    [self writeTriggerSource];
+    [self writeTriggerOut];
+    [self writeFrontPanelControl];
+    [self writeChannelEnabledMask];
+    [self writeBufferOrganization];
+    [self writeOverUnderThresholds];
+    [self writeDacs];
+    [self writePostTriggerSetting];
 }
 
 - (float) convertDacToVolts:(unsigned short)aDacValue 
@@ -1110,7 +1109,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     [self write:kPostTrigSetting sendValue:postTriggerSetting];
 }
 
-- (void) writeAcquistionControl:(BOOL)start
+- (void) writeAcquisitionControl:(BOOL)start
 {
 	unsigned long aValue = (countAllTriggers<<3) | (start<<2) | (acquisitionMode&0x3);
     [self write:kAcqControl sendValue:aValue];
