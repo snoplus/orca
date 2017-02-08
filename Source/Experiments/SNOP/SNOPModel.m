@@ -1652,7 +1652,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     }
     
     ELLIEModel* anELLIEModel = [ellieModels objectAtIndex:0];
-    NSString *requestString = [NSString stringWithFormat:@"_design/smellieMainQuery/_view/pullEllieRunHeaders?startkey=1"];
+    NSString *requestString = [NSString stringWithFormat:@"_design/smellieMainQuery/_view/pullEllieRunHeaders?startkey=2"];
 
     // This line calls [self couchDBresult], which in turn calls [self parseSmellieRunFileDocs] where the
     // [self smellieRunFiles] property variable gets set.
