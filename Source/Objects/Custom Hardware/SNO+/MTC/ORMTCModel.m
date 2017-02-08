@@ -1483,7 +1483,7 @@ tubRegister;
     int fine_delay = [self fineDelay];
     @try {
         [mtc okCommand:"set_fine_delay %i", fine_delay];
-        NSLog(@"mtc: fine delay %.2fns\n", fine_delay);
+        NSLog(@"mtc: fine delay %ips\n", fine_delay);
 
     }
     @catch(NSException* localException) {
