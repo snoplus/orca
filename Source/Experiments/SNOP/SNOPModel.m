@@ -63,7 +63,6 @@ NSString* ORSNOPModelDebugDBIPAddressChanged = @"ORSNOPModelDebugDBIPAddressChan
 NSString* ORSNOPRunTypeWordChangedNotification = @"ORSNOPRunTypeWordChangedNotification";
 NSString* ORSNOPRunTypeChangedNotification = @"ORSNOPRunTypeChangedNotification";
 NSString* ORSNOPRunsLockNotification = @"ORSNOPRunsLockNotification";
-NSString* ORSNOPModelRunsECAChangedNotification = @"ORSNOPModelRunsECAChangedNotification";
 NSString* ORSNOPModelSRChangedNotification = @"ORSNOPModelSRChangedNotification";
 NSString* ORSNOPModelSRVersionChangedNotification = @"ORSNOPModelSRVersionChangedNotification";
 
@@ -99,6 +98,8 @@ resync;
 
 #pragma mark ¥¥¥Initialization
 
+/* This method is obsolete and rarely called.
+ For initialization you should use initWithCoder */
 - (id) init
 {
     
@@ -129,7 +130,6 @@ resync;
 
 	[self initOrcaDBConnectionHistory];
 	[self initDebugDBConnectionHistory];
-
     [[self undoManager] enableUndoRegistration];
 
     return self;
@@ -273,6 +273,9 @@ resync;
     start = COLD_START;
     resync = NO;
 
+    /* Initialize ECARun object: this doesn't start the run */
+    anECARun = [[ECARun alloc] init];
+
     [[self undoManager] disableUndoRegistration];
 	[self initOrcaDBConnectionHistory];
 	[self initDebugDBConnectionHistory];
@@ -292,11 +295,11 @@ resync;
     self.debugDBIPAddress = [decoder decodeObjectForKey:@"ORSNOPModelDebugDBIPAddress"];
 
     //ECA
-    [self setECA_pattern:[decoder decodeIntForKey:@"SNOPECApattern"]];
-    [self setECA_type:[decoder decodeObjectForKey:@"SNOPECAtype"]];
-    [self setECA_tslope_pattern:[decoder decodeIntForKey:@"SNOPECAtslppattern"]];
-    [self setECA_nevents:[decoder decodeIntForKey:@"SNOPECANEvents"]];
-    [self setECA_rate:[decoder decodeObjectForKey:@"SNOPECAPulserRate"]];
+    [anECARun setECA_pattern:[decoder decodeIntForKey:@"SNOPECApattern"]];
+    [anECARun setECA_type:[decoder decodeObjectForKey:@"SNOPECAtype"]];
+    [anECARun setECA_tslope_pattern:[decoder decodeIntForKey:@"SNOPECAtslppattern"]];
+    [anECARun setECA_nevents:[decoder decodeIntForKey:@"SNOPECANEvents"]];
+    [anECARun setECA_rate:[decoder decodeObjectForKey:@"SNOPECAPulserRate"]];
 
     //Settings
     [self setMTCHost:[decoder decodeObjectForKey:@"mtcHost"]];
@@ -379,6 +382,7 @@ resync;
     [_smellieRunNameLabel release];
     [dataHost release];
     [logHost release];
+    [anECARun release];
     [super dealloc];
 }
 
@@ -803,6 +807,14 @@ err:
      * will fire a SOFT_GT and turn triggers off. Then we need to wait
      * until the MTC/CAEN/XL3s have read out all the data. */
 
+    //Stop the ECA thread
+    /* This will send a cancel signal to the ECAThread which will exit
+     at the end of the current ECA step. This makes the run wait until
+     the ECAThread is stopped */
+    if([anECARun isExecuting] && ![anECARun isFinishing]){
+        [anECARun stop];
+    }
+
     NSDictionary *userInfo = [aNote userInfo];
 
     if (![[userInfo objectForKey:@"willRestart"] boolValue] || resync) {
@@ -916,10 +928,10 @@ err:
                                  calType: (unsigned long) calType
 {
     _epedStruct.coarseDelay = coarseDelay; // nsec
-    _epedStruct.fineDelay = fineDelay; // clicks
+    _epedStruct.fineDelay = fineDelay; // psec
     _epedStruct.chargePulseAmp = chargePulseAmp; // clicks
     _epedStruct.pedestalWidth = pedestalWidth; // nsec
-    _epedStruct.calType = calType; // nsec
+    _epedStruct.calType = calType; // ECA_Type * 10 + ECA_Pattern
 }
 
 - (void) updateEPEDStructWithStepNumber: (unsigned long) stepNumber
@@ -964,7 +976,7 @@ err:
                  0x01000000 /* subRun flag */
                  ];
             } @catch (NSException *e) {
-                NSLogColor([NSColor redColor], @"failed to send EPED record: %@",
+                NSLogColor([NSColor redColor], @"failed to send EPED record: %@ \n",
                            [e reason]);
             }
         }
@@ -995,7 +1007,7 @@ err:
                 0 /* flags */
             ];
         } @catch (NSException *e) {
-            NSLogColor([NSColor redColor], @"failed to send EPED record: %@",
+            NSLogColor([NSColor redColor], @"failed to send EPED record: %@ \n",
                        [e reason]);
         }
     }
@@ -1466,11 +1478,11 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     [encoder encodeObject:self.debugDBIPAddress forKey:@"ORSNOPModelDebugDBIPAddress"];
 
     //ECA
-    [encoder encodeInt:[self ECA_pattern] forKey:@"SNOPECApattern"];
-    [encoder encodeObject:[self ECA_type] forKey:@"SNOPECAtype"];
-    [encoder encodeInt:[self ECA_tslope_pattern] forKey:@"SNOPECAtslppattern"];
-    [encoder encodeInt:[self ECA_nevents] forKey:@"SNOPECANEvents"];
-    [encoder encodeObject:[self ECA_rate] forKey:@"SNOPECAPulserRate"];
+    [encoder encodeInt:[anECARun ECA_pattern] forKey:@"SNOPECApattern"];
+    [encoder encodeObject:[anECARun ECA_type] forKey:@"SNOPECAtype"];
+    [encoder encodeInt:[anECARun ECA_tslope_pattern] forKey:@"SNOPECAtslppattern"];
+    [encoder encodeInt:[anECARun ECA_nevents] forKey:@"SNOPECANEvents"];
+    [encoder encodeObject:[anECARun ECA_rate] forKey:@"SNOPECAPulserRate"];
 
     //Settings
     [encoder encodeObject:[self mtcHost] forKey:@"mtcHost"];
@@ -1762,71 +1774,86 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     lastStandardRunVersion = [aValue copy];
 }
 
-- (int)ECA_pattern
-{
-    return ECA_pattern;
+- (ECARun*) anECARun{
+    return anECARun;
 }
 
-- (void) setECA_pattern:(int)aValue
+- (void) startECARunInParallel
 {
-    ECA_pattern = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
+
+    [anECARun start];
+
 }
 
-- (NSString*)ECA_type
+-(BOOL) startStandardRun:(NSString*)_standardRun withVersion:(NSString*)_standardRunVersion
 {
-    return [NSString stringWithFormat:@"%@",ECA_type];
-}
 
-- (void) setECA_type:(NSString*)aValue
-{
-    if(aValue != ECA_type)
-    {
-        NSString* temp = ECA_type;
-        ECA_type = [aValue retain];
-        [temp release];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
+    /* Get RC model */
+    ORRunModel *aRunModel = nil;
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    if ([objs count]) {
+        aRunModel = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"SNOPModel: couldn't find Run Model. \n");
+        return 0;
     }
-}
 
-- (int)ECA_tslope_pattern
-{
-    return ECA_tslope_pattern;
-}
+    //Make sure we are not running any RunScripts
+    [aRunModel setSelectedRunTypeScript:0];
 
-- (void) setECA_tslope_pattern:(int)aValue
-{
-    ECA_tslope_pattern = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
-}
+    [self setStandardRunType:_standardRun];
+    [self setStandardRunVersion:_standardRunVersion];
 
-- (int)ECA_nevents
-{
-    return ECA_nevents;
-}
+    //Load the standard run and stop run initialization if failed
+    [self setLastStandardRunType:[self standardRunType]];
+    [self setLastStandardRunVersion:[self standardRunVersion]];
+    [self setLastRunTypeWord:[self runTypeWord]];
+    NSString* _lastRunTypeWord = [NSString stringWithFormat:@"0x%X",(int)[self runTypeWord]];
+    [self setLastRunTypeWordHex:_lastRunTypeWord]; //FIXME: revisit if we go over 32 bits
+    if(![self loadStandardRun:_standardRun withVersion:_standardRunVersion]) return false;
 
-- (void) setECA_nevents:(int)aValue
-{
-    if(aValue <= 0) aValue = 1;
-    ECA_nevents = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
-}
-
-- (NSNumber*)ECA_rate
-{
-    return ECA_rate;
-}
-
-- (void) setECA_rate:(NSNumber*)aValue
-{
-    if(aValue != ECA_rate)
-    {
-        NSNumber* temp = ECA_rate;
-        ECA_rate = [aValue retain];
-        [temp release];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelRunsECAChangedNotification object:self];
+    //Start or restart the run
+    if ([aRunModel isRunning]) {
+        /* If there is already a run going, then we restart the run. */
+        if ([[self document] isDocumentEdited]) {
+            /* If the GUI has changed, save the document first. */
+            [[self document] afterSaveDo: @selector(restartRun) withTarget:aRunModel];
+            [[self document] saveDocument:nil];
+        } else {
+            [aRunModel restartRun];
+        }
+    } else {
+        /* If there is no run going, then we start a new run. */
+        if ([[self document] isDocumentEdited]) {
+            [[self document] afterSaveDo: @selector(startRun) withTarget:aRunModel];
+            [[self document] saveDocument:nil];
+        } else {
+            [aRunModel startRun];
+        }
     }
+
+    return true;
+
 }
+
+
+-(void) stopRun
+{
+
+    ORRunModel *aRunModel = nil;
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    if ([objs count]) {
+        aRunModel = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"SNOPModel: couldn't find Run Model. \n");
+        return;
+    }
+
+    [aRunModel quitSelectedRunScript];
+    [aRunModel performSelector:@selector(haltRun)withObject:nil afterDelay:.1];
+
+}
+
 
 // Load Detector Settings from the DB into the Models
 -(BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion
@@ -1927,7 +1954,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     if ([objs count]) {
         runControlModel = [objs objectAtIndex:0];
     } else {
-        NSLogColor([NSColor redColor], @"couldn't find MTC model. Please add it to the experiment and restart the run.\n");
+        NSLogColor([NSColor redColor], @"couldn't find RC model. Please add it to the experiment and restart the run.\n");
         return 0;
     }
     //Get MTC model
