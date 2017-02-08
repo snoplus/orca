@@ -35,7 +35,9 @@
     //Server Clients
     XmlrpcClient* _tellieClient;
     XmlrpcClient* _smellieClient;
-
+    XmlrpcClient* _interlockClient;
+    NSThread* interlockThread;
+    
     //tellie settings
     NSMutableDictionary* _tellieSubRunSettings;
     NSMutableDictionary* _tellieFireParameters;
@@ -74,6 +76,8 @@
 @property (nonatomic,assign) float pulseByPulseDelay;
 @property (nonatomic,retain) XmlrpcClient* tellieClient;
 @property (nonatomic,retain) XmlrpcClient* smellieClient;
+@property (nonatomic,retain) XmlrpcClient* interlockClient;
+
 
 -(id) init;
 -(id) initWithCoder:(NSCoder *)aCoder;

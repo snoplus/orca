@@ -94,6 +94,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
 
 @synthesize tellieClient = _tellieClient;
 @synthesize smellieClient = _smellieClient;
+@synthesize interlockClient = _interlockClient;
 
 @synthesize ellieFireFlag = _ellieFireFlag;
 @synthesize exampleTask = _exampleTask;
@@ -110,12 +111,16 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     if (self){
         XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"builder1" withPort:@"5030"];
         XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:@"snodrop" withPort:@"5020"];
+        XmlrpcClient* interlockCli = [[XmlrpcClient alloc] initWithHostName:@"snodrop" withPort:@"5021"];
         [self setTellieClient:tellieCli];
         [self setSmellieClient:smellieCli];
+        [self setInterlockClient:interlockCli];
         [[self tellieClient] setTimeout:10];
         [[self smellieClient] setTimeout:360];
+        [[self smellieClient] setTimeout:1];
         [tellieCli release];
         [smellieCli release];
+        [interlockCli release];
     }
     return self;
 }
@@ -126,12 +131,16 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     if (self){
         XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"builder1" withPort:@"5030"];
         XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:@"snodrop" withPort:@"5020"];
+        XmlrpcClient* interlockCli = [[XmlrpcClient alloc] initWithHostName:@"snodrop" withPort:@"5021"];
         [self setTellieClient:tellieCli];
         [self setSmellieClient:smellieCli];
+        [self setInterlockClient:interlockCli];
         [[self tellieClient] setTimeout:10];
         [[self smellieClient] setTimeout:360];
+        [[self smellieClient] setTimeout:1];
         [tellieCli release];
         [smellieCli release];
+        [interlockCli release];
     }
     return self;
 }

@@ -19,8 +19,8 @@
     IBOutlet NSTabView *tellieOperatorTabView;
     //TabViewItems
     IBOutlet NSTabViewItem *tellieTViewItem;
-    IBOutlet NSTabViewItem *smellieTViewItem;
     IBOutlet NSTabViewItem *amellieTViewItem;
+    IBOutlet NSTabViewItem *serversTViewItem;
     //TabViewItems
     IBOutlet NSTabViewItem *tellieFireFibreTViewItem;
     IBOutlet NSTabViewItem *tellieBuildConfigTViewItem;
