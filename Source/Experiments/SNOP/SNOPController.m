@@ -1822,7 +1822,19 @@ snopGreenColor;
     
     //Fetch DB and display trigger configuration in GUI
     //Query the OrcaDB and get a dictionary with the parameters
-    NSString* urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/%@/_design/standardRuns/_view/getStandardRuns?startkey=[\"%@\",\"%@\",{}]&endkey=[\"%@\",\"%@\",0]&descending=True&include_docs=True",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort],[model orcaDBName],[model standardRunType],[model standardRunVersion], [model standardRunType],[model standardRunVersion]];
+    NSString* urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/%@/_design/standardRuns/_view/getStandardRunsWithVersion?startkey=[%@,\"%@\",\"%@\",{}]&endkey=[%@,\"%@\",\"%@\",0]&descending=True&include_docs=True",
+                           [model orcaDBUserName],
+                           [model orcaDBPassword],
+                           [model orcaDBIPAddress],
+                           [model orcaDBPort],
+                           [model orcaDBName],
+                           [model standardRunTableVersion],
+                           [model standardRunType],
+                           [model standardRunVersion],
+                           [model standardRunTableVersion],
+                           [model standardRunType],
+                           [model standardRunVersion]];
+
     NSString* link = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:link] cachePolicy:0 timeoutInterval:2];
     NSURLResponse* response = nil;
@@ -1931,7 +1943,15 @@ snopGreenColor;
     [standardRunVersionPopupMenu removeAllItems];
     
     // Now query DB and fetch the SRs
-    urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/%@/_design/standardRuns/_view/getStandardRuns",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort],[model orcaDBName]];
+    urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/%@/_design/standardRuns/_view/getStandardRunsWithVersion?startkey=[%@, \"\", \"\", 0]&endkey=[%@,\"\ufff0\",\"\ufff0\",{}]",
+                 [model orcaDBUserName],
+                 [model orcaDBPassword],
+                 [model orcaDBIPAddress],
+                 [model orcaDBPort],
+                 [model orcaDBName],
+                 [model standardRunTableVersion],
+                 [model standardRunTableVersion]];
+
     link = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     request = [NSURLRequest requestWithURL:[NSURL URLWithString:link] cachePolicy:0 timeoutInterval:2];
     data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
@@ -1998,7 +2018,15 @@ snopGreenColor;
     [standardRunVersionPopupMenu deselectItemAtIndex:[standardRunVersionPopupMenu indexOfSelectedItem]];
     [standardRunVersionPopupMenu removeAllItems];
     
-    urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/%@/_design/standardRuns/_view/getStandardRuns",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort],[model orcaDBName]];
+    urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/%@/_design/standardRuns/_view/getStandardRunsWithVersion?startkey=[%@, \"\", \"\", 0]&endkey=[%@,\"\ufff0\",\"\ufff0\",{}]",
+                 [model orcaDBUserName],
+                 [model orcaDBPassword],
+                 [model orcaDBIPAddress],
+                 [model orcaDBPort],
+                 [model orcaDBName],
+                 [model standardRunTableVersion],
+                 [model standardRunTableVersion]];
+
     link = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     request = [NSURLRequest requestWithURL:[NSURL URLWithString:link] cachePolicy:0 timeoutInterval:2];
     data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
@@ -2026,8 +2054,8 @@ snopGreenColor;
     BOOL optMode	= [gSecurity isLocked:ORSNOPRunsLockNotification]; //expert or operator mode
     [standardRunVersionPopupMenu setEnabled:!optMode];
     for(id entry in [standardRunVersions valueForKey:@"rows"]){
-        NSString *runtype = [[entry valueForKey:@"key"] objectAtIndex:0];
-        NSString *runversion = [[entry valueForKey:@"key"] objectAtIndex:1];
+        NSString *runtype = [[entry valueForKey:@"key"] objectAtIndex:1];
+        NSString *runversion = [[entry valueForKey:@"key"] objectAtIndex:2];
         if(runversion != (id)[NSNull null]){
             if([runtype isEqualToString:[model standardRunType]])
                 if([standardRunVersionPopupMenu indexOfItemWithObjectValue:runversion]==NSNotFound)[standardRunVersionPopupMenu addItemWithObjectValue:runversion];

@@ -42,6 +42,7 @@
 #define kUsePSUPView	2
 #define kNumTubes	20 //XL3s
 #define kNumOfCrates 19 //number of Crates in SNO+
+#define STANDARD_RUN_VERSION 1 //Increase if Standard Runs table structure is changed
 
 @interface SNOPModel: ORExperimentModel <snotDbDelegate>
 {
@@ -103,7 +104,8 @@
     NSString * standardRunVersion;
     NSString * lastStandardRunType;
     NSString * lastStandardRunVersion;
-    
+    NSNumber * standardRunTableVersion;
+
     bool rolloverRun;
 
     NSString *mtcHost;
@@ -245,6 +247,7 @@
 - (void) setLastStandardRunType:(NSString*)aValue;
 - (NSString*) lastStandardRunVersion;
 - (void) setLastStandardRunVersion:(NSString*)aValue;
+- (NSNumber*) standardRunTableVersion;
 
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder;
