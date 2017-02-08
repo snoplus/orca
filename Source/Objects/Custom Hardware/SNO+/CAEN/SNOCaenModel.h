@@ -208,7 +208,7 @@ enum {
 - (void)			initBoard;
 - (void)			writeChannelConfiguration;
 - (void)			writeCustomSize;
-- (void)			writeAcquistionControl:(BOOL)start;
+- (void)			writeAcquisitionControl:(BOOL)start;
 - (void)			writeTriggerSource;
 - (void)			writeTriggerOut;
 - (void)			writeFrontPanelControl;
