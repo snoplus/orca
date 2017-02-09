@@ -292,7 +292,7 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
     // switches over to the backup clock you need to reset the system with this command
     // in order to go back to using the default clock
     // See TUBii schematics page 7,7A, and 7B for more info.
-    [self sendOkCmd:@"ResetCommand"];
+    [self sendOkCmd:@"clockReset"];
 }
 -(void) setCaenMasks: (CAEN_CHANNEL_MASK)aChannelMask
             GainMask:(CAEN_GAIN_MASK) aGainMask; {

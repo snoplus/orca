@@ -61,7 +61,6 @@
 @property (nonatomic,retain) NSMutableDictionary* smellieRunSettings;
 @property (nonatomic,retain) NSMutableDictionary* currentOrcaSettingsForSmellie;
 @property (nonatomic,retain) NSMutableDictionary* smellieLaserHeadToSepiaMapping;
-@property (nonatomic,retain) NSMutableDictionary* smellieLaserHeadToGainMapping;
 @property (nonatomic,retain) NSMutableDictionary* smellieLaserToInputFibreMapping;
 @property (nonatomic,retain) NSMutableDictionary* smellieFibreSwitchToFibreMapping;
 @property (nonatomic,retain) NSNumber* smellieConfigVersionNo;
@@ -77,6 +76,7 @@
 @property (nonatomic,retain) XmlrpcClient* tellieClient;
 @property (nonatomic,retain) XmlrpcClient* smellieClient;
 @property (nonatomic,retain) XmlrpcClient* interlockClient;
+
 
 
 -(id) init;
