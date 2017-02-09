@@ -91,6 +91,13 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
 @synthesize smellieRunDoc = _smellieRunDoc;
 @synthesize smellieDBReadInProgress = _smellieDBReadInProgress;
 
+@synthesize tellieHost = _tellieHost;
+@synthesize smellieHost = _smellieHost;
+@synthesize interlockHost = _interlockHost;
+@synthesize telliePort = _telliePort;
+@synthesize smelliePort = _smelliePort;
+@synthesize interlockPort = _interlockPort;
+
 @synthesize tellieClient = _tellieClient;
 @synthesize smellieClient = _smellieClient;
 @synthesize interlockClient = _interlockClient;
@@ -108,6 +115,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
 {
     self = [super init];
     if (self){
+    /*
         XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"builder1" withPort:@"5030"];
         XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:@"snodrop" withPort:@"5020"];
         XmlrpcClient* interlockCli = [[XmlrpcClient alloc] initWithHostName:@"snodrop" withPort:@"5021"];
@@ -118,6 +126,51 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
         [[self tellieClient] setTimeout:10];
         [[self smellieClient] setTimeout:360];
         [[self smellieClient] setTimeout:1];
+        [tellieCli release];
+        [smellieCli release];
+        [interlockCli release];
+     */
+     }
+    return self;
+}
+
+-(id) initWithCoder:(NSCoder *)decoder
+{
+    self = [super initWithCoder:decoder];
+    if (self){
+        
+        //Settings
+        [self setTellieHost:[decoder decodeObjectForKey:@"tellieHost"]];
+        [self setTelliePort:[decoder decodeObjectForKey:@"telliePort"]];
+        
+        [self setSmellieHost:[decoder decodeObjectForKey:@"smellieHost"]];
+        [self setSmelliePort:[decoder decodeObjectForKey:@"smelliePort"]];
+        
+        [self setInterlockHost:[decoder decodeObjectForKey:@"interlockHost"]];
+        [self setInterlockPort:[decoder decodeObjectForKey:@"interlockPort"]];
+        
+        /* Check if we actually decoded the various server hostnames
+         * and ports. decodeObjectForKey() will return NULL if the
+         * key doesn't exist, and decodeIntForKey() will return 0. */
+        if ([self tellieHost] == NULL) [self setTellieHost:@""];
+        if ([self smellieHost] == NULL) [self setSmellieHost:@""];
+        if ([self interlockHost] == NULL) [self setInterlockHost:@""];
+        
+        if ([self telliePort] == NULL) [self setTelliePort:@"5030"];
+        if ([self smelliePort] == NULL) [self setSmelliePort:@"5020"];
+        if ([self interlockPort] == NULL) [self setInterlockPort:@"5021"];
+        
+        XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:[self tellieHost] withPort:[self telliePort]];
+        XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:[self smellieHost] withPort:[self smelliePort]];
+        XmlrpcClient* interlockCli = [[XmlrpcClient alloc] initWithHostName:[self interlockHost] withPort:[self interlockPort]];
+
+        [self setTellieClient:tellieCli];
+        [self setSmellieClient:smellieCli];
+        [self setInterlockClient:interlockCli];
+        [[self tellieClient] setTimeout:10];
+        [[self smellieClient] setTimeout:360];
+        [[self interlockClient] setTimeout:1];
+
         [tellieCli release];
         [smellieCli release];
         [interlockCli release];
@@ -125,24 +178,19 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     return self;
 }
 
--(id) initWithCoder:(NSCoder *)aCoder
+- (void)encodeWithCoder:(NSCoder*)encoder
 {
-    self = [super initWithCoder:aCoder];
-    if (self){
-        XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"builder1" withPort:@"5030"];
-        XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:@"snodrop" withPort:@"5020"];
-        XmlrpcClient* interlockCli = [[XmlrpcClient alloc] initWithHostName:@"snodrop" withPort:@"5021"];
-        [self setTellieClient:tellieCli];
-        [self setSmellieClient:smellieCli];
-        [self setInterlockClient:interlockCli];
-        [[self tellieClient] setTimeout:10];
-        [[self smellieClient] setTimeout:360];
-        [[self smellieClient] setTimeout:1];
-        [tellieCli release];
-        [smellieCli release];
-        [interlockCli release];
-    }
-    return self;
+    [super encodeWithCoder:encoder];
+
+    //Settings
+    [encoder encodeObject:[self tellieHost] forKey:@"tellieHost"];
+    [encoder encodeObject:[self telliePort] forKey:@"telliePort"];
+
+    [encoder encodeObject:[self smellieHost] forKey:@"smellieHost"];
+    [encoder encodeObject:[self smelliePort] forKey:@"smelliePort"];
+
+    [encoder encodeObject:[self interlockHost] forKey:@"interlockHost"];
+    [encoder encodeObject:[self interlockPort] forKey:@"interlockPort"];
 }
 
 - (void) setUpImage
@@ -191,7 +239,6 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     
     //smellie config mappings
     [_smellieLaserHeadToSepiaMapping release];
-    [_smellieLaserHeadToGainMapping release];
     [_smellieLaserToInputFibreMapping release];
     [_smellieFibreSwitchToFibreMapping release];
     [_smellieConfigVersionNo release];
@@ -2320,5 +2367,109 @@ err:
 
     return result;
 }
+
+/****************************************/
+/*            Server settings           */
+/****************************************/
+- (void) setTelliePort: (NSString*) port
+{
+    /* Set the port number for the tellie server XMLRPC client. */
+    if ([port isEqualToString:[self telliePort]]) return;
+    
+    _telliePort = port;
+    [[self tellieClient] setPort:port];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ELLIEServerSettingsChanged" object:self];
+}
+
+- (void) setSmelliePort: (NSString*) port
+{
+    /* Set the port number for the smellie server XMLRPC client. */
+    if ([port isEqualToString:[self smelliePort]]) return;
+    
+    _smelliePort = port;
+    [[self smellieClient] setPort:port];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ELLIEServerSettingsChanged" object:self];
+}
+
+- (void) setInterlockPort: (NSString*) port
+{
+    /* Set the port number for the interlock server XMLRPC client. */
+    if ([port isEqualToString:[self interlockPort]]) return;
+    
+    _interlockPort = port;
+    [[self interlockClient] setPort:port];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ELLIEServerSettingsChanged" object:self];
+}
+
+- (void) setTellieHost: (NSString*) host
+{
+    /* Set the host for the tellie server XMLRPC client. */
+    if (host == [self tellieHost]) return;
+    
+    _tellieHost = host;
+    [[self tellieClient] setHost:host];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ELLIEServerSettingsChanged" object:self];
+}
+
+- (void) setSmellieHost: (NSString*) host
+{
+    /* Set the host for the smellie server XMLRPC client. */
+    if (host == [self smellieHost]) return;
+    
+    _smellieHost = host;
+    [[self smellieClient] setHost:host];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ELLIEServerSettingsChanged" object:self];
+}
+
+- (void) setInterlockHost: (NSString*) host
+{
+    /* Set the host for the interlock server XMLRPC client. */
+    if (host == [self interlockHost]) return;
+    
+    _interlockHost = host;
+    [[self interlockClient] setHost:host];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ELLIEServerSettingsChanged" object:self];
+}
+
+-(BOOL)pingTellie
+{
+    @try{
+        [[self tellieClient] command:@"is_connected"];
+    } @catch(NSException* e) {
+        NSLogColor([NSColor redColor], @"Could not ping tellie server, reason: %@", [e reason]);
+        return NO;
+    }
+    return YES;
+}
+
+-(BOOL)pingSmellie
+{
+    @try{
+        [[self smellieClient] command:@"is_connected"];
+    } @catch(NSException* e) {
+        NSLogColor([NSColor redColor], @"Could not ping smellie server, reason: %@", [e reason]);
+        return NO;
+    }
+    return YES;
+}
+
+-(BOOL)pingInterlock
+{
+    @try{
+        [[self interlockClient] command:@"is_connected"];
+    } @catch(NSException* e) {
+        NSLogColor([NSColor redColor], @"Could not ping interlock server, reason: %@", [e reason]);
+        return NO;
+    }
+    return YES;
+}
+
+
 
 @end

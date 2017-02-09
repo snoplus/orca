@@ -45,7 +45,6 @@
     IBOutlet NSButton *tellieGeneralValidateSettingsButton;
     
     IBOutlet NSTextField *tellieGeneralValidationStatusTf;
-    IBOutlet NSTextField *tellieGeneralRunStatusTf;
     
     ////////////////////
     //Expert interface
@@ -63,12 +62,25 @@
     IBOutlet NSPopUpButton *tellieExpertOperationModePb; //Operation mode (master or slave)
     
     IBOutlet NSTextField *tellieExpertValidationStatusTf;
-    IBOutlet NSTextField *tellieExpertRunStatusTf;
     
     IBOutlet NSButton *tellieExpertFireButton;
     IBOutlet NSButton *tellieExpertStopButton;
     IBOutlet NSButton *tellieExpertValidateSettingsButton;
    
+    //Server interface ------------------------------------------
+
+    IBOutlet NSTextField *tellieHostTf;
+    IBOutlet NSTextField *smellieHostTf;
+    IBOutlet NSTextField *interlockHostTf;
+    
+    IBOutlet NSTextField *telliePortTf;
+    IBOutlet NSTextField *smelliePortTf;
+    IBOutlet NSTextField *interlockPortTf;
+
+    IBOutlet NSTextField *tellieServerResponseTf;
+    IBOutlet NSTextField *smellieServerResponseTf;
+    IBOutlet NSTextField *interlockServerResponseTf;
+
     // Instance variables
     NSThread *tellieThread;
     NSButton *tellieExpertConvertAction;
@@ -76,6 +88,7 @@
     NSMutableDictionary* _guiFireSettings;
     NSThread* _tellieThread;
     NSThread* _smellieThread;
+    NSButton *interlockPing;
 }
 
 // Properties
@@ -89,21 +102,8 @@
 -(void)updateWindow;
 -(void)registerNotificationObservers;
 -(void)awakeFromNib;
+-(void)updateServerSettings:(NSNotification *)aNote;
 -(BOOL)isNumeric:(NSString *)s;
-
-//SMELLIE functions ----------------------------
-
-//Button clicked to validate the new run type settings for smellie 
--(IBAction)setAllLasersAction:(id)sender;
--(IBAction)setAllFibresAction:(id)sender;
--(IBAction)validateLaserMaxIntensity:(id)sender;
--(IBAction)validateLaserMinIntensity:(id)sender;
--(IBAction)validateIntensitySteps:(id)sender;
--(IBAction)validateSmellieTriggerFrequency:(id)sender;
--(IBAction)validateNumTriggersPerStep:(id)sender;
--(IBAction)validationSmellieRunAction:(id)sender;
--(IBAction)allLaserValidator:(id)sender;
--(IBAction)makeNewSmellieRun:(id)sender;
 
 //TELLIE functions -----------------------------
 
@@ -141,9 +141,15 @@
 
 //-(void)validateTellieGeneralSettings:(NSNotification *)note;
 //-(void)validateTellieExpertSettings:(NSNotification *)note;
--(void)tellieRunStarted:(NSNotification *)aNote;
+//-(void)tellieRunStarted:(NSNotification *)aNote;
 -(void)tellieRunFinished:(NSNotification *)aNote;
 -(void)initialiseTellie;
+
+//Server tab functions -----------------------------
+- (IBAction)telliePing:(id)sender;
+- (IBAction)smelliePing:(id)sender;
+- (IBAction)interlockPing:(id)sender;
+- (IBAction) serverSettingsChanged:(id)sender;
 
 @end
 

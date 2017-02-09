@@ -18,10 +18,6 @@
 NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 
 @implementation ELLIEController
-    NSMutableDictionary *configForSmellie;
-    BOOL *laserHeadSelected;
-    BOOL *fibreSwitchOutputSelected;
-//smellie maxiumum trigger frequency
 
 @synthesize nodeMapWC = _nodeMapWC;
 @synthesize guiFireSettings = _guiFireSettings;
@@ -32,11 +28,6 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 -(id)init
 {
     self = [super initWithWindowNibName:@"ellie"];
-    //[smellieConfigAttenutationFactor setKeyboardType:UIKeyboardTypeNumberPad]
-    
-    laserHeadSelected = NO;
-    fibreSwitchOutputSelected = NO;
-    
     @try{
 
         // Check there is an ELLIE model in the current configuration
@@ -49,7 +40,6 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
      
         // This is not strictly necessary, but it's a good check of smellie database connectivity.
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            //fetch the data associated with the current configuration
             [[anELLIEModel fetchConfigurationFile:[anELLIEModel fetchRecentConfigVersion]] mutableCopy];
         });
     
@@ -61,6 +51,10 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 
     /*Setting up TELLIE GUI */
     [self initialiseTellie];
+
+    [tellieServerResponseTf setEditable:NO];
+    [smellieServerResponseTf setEditable:NO];
+    [interlockServerResponseTf setEditable:NO];
     return self;
 }
 
@@ -68,7 +62,11 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 {
     [super awakeFromNib];
     [super updateWindow];
+    [self updateServerSettings:nil];
     [self initialiseTellie];
+    [tellieServerResponseTf setEditable:NO];
+    [smellieServerResponseTf setEditable:NO];
+    [interlockServerResponseTf setEditable:NO];
 }
 
 - (void)dealloc
@@ -81,6 +79,30 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 	[super updateWindow];
 }
 
+- (void) updateServerSettings: (NSNotification *) aNote
+{
+    [tellieHostTf setStringValue:[model tellieHost]];
+    [telliePortTf setStringValue:[model telliePort]];
+    
+    [smellieHostTf setStringValue:[model smellieHost]];
+    [smelliePortTf setStringValue:[model smelliePort]];
+
+    [interlockHostTf setStringValue:[model interlockHost]];
+    [interlockPortTf setStringValue:[model interlockPort]];
+}
+
+- (IBAction) serverSettingsChanged:(id)sender {
+    /* Settings tab changed. Set the model variables in SNOPModel. */
+    [model setTelliePort:[telliePortTf stringValue]];
+    [model setTellieHost:[tellieHostTf stringValue]];
+    
+    [model setSmelliePort:[smelliePortTf stringValue]];
+    [model setSmellieHost:[smellieHostTf stringValue]];
+    
+    [model setInterlockPort:[interlockPortTf stringValue]];
+    [model setInterlockHost:[interlockHostTf stringValue]];
+}
+
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -90,23 +112,13 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 	[notifyCenter removeObserver:self name:NSWindowDidResignKeyNotification object:nil];
     
     [notifyCenter addObserver : self
-					 selector : @selector(setAllLasersAction:)
-						 name : ELLIEAllLasersChanged
-					   object : model];
-    
-    [notifyCenter addObserver : self
-					 selector : @selector(setAllFibresAction:)
-						 name : ELLIEAllFibresChanged
-					   object : model];
-    
-    [notifyCenter addObserver : self
                      selector : @selector(tellieRunFinished:)
                          name : ORTELLIERunFinished
                         object: nil];
     
     [notifyCenter addObserver : self
-                     selector : @selector(tellieRunStarted:)
-                         name : ORTELLIERunStart
+                     selector : @selector(updateServerSettings:)
+                         name : @"ELLIEServerSettingsChanged"
                         object: nil];
     
 }
@@ -221,15 +233,6 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 {
     [tellieGeneralStopButton setEnabled:NO];
     [tellieExpertStopButton setEnabled:NO];
-    [tellieExpertRunStatusTf setStringValue:@"No light"];
-    [tellieGeneralRunStatusTf setStringValue:@"No light"];
-}
-
--(void)tellieRunStarted:(NSNotification *)aNote
-{
-    [tellieExpertRunStatusTf setStringValue:@"Firing!"];
-    [tellieGeneralRunStatusTf setStringValue:@"Firing!"];
-
 }
 
 - (BOOL) isNumeric:(NSString *)s{
@@ -1047,5 +1050,47 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     return nil;
 }
 
+
+/////////////////////////////////////////////
+// Server tab functions
+/////////////////////////////////////////////
+- (IBAction)telliePing:(id)sender {
+    if([model pingTellie]){
+        NSString* response = [NSString stringWithFormat:@"Connected to tellie at:\n\n%@:%@", [model tellieHost], [model telliePort]];
+        [tellieServerResponseTf setStringValue:response];
+        [tellieServerResponseTf setBackgroundColor:[NSColor greenColor]];
+        return;
+    }
+    NSString* response = [NSString stringWithFormat:@"Could not connect to tellie at:\n\n%@:%@", [model tellieHost], [model telliePort]];
+    [tellieServerResponseTf setStringValue:response];
+    [tellieServerResponseTf setBackgroundColor:[NSColor redColor]];
+    return;
+}
+
+- (IBAction)smelliePing:(id)sender {
+    if([model pingSmellie]){
+        NSString* response = [NSString stringWithFormat:@"Connected to smellie at:\n\n%@:%@", [model smellieHost], [model smelliePort]];
+        [smellieServerResponseTf setStringValue:response];
+        [smellieServerResponseTf setBackgroundColor:[NSColor greenColor]];
+        return;
+    }
+    NSString* response = [NSString stringWithFormat:@"Could not connect to smellie at:\n\n%@:%@", [model smellieHost], [model smelliePort]];
+    [smellieServerResponseTf setStringValue:response];
+    [smellieServerResponseTf setBackgroundColor:[NSColor redColor]];
+    return;
+}
+
+- (IBAction)interlockPing:(id)sender {
+    if([model pingInterlock]){
+        NSString* response = [NSString stringWithFormat:@"Connected to interlock at:\n\n%@:%@", [model interlockHost], [model interlockPort]];
+        [interlockServerResponseTf setStringValue:response];
+        [interlockServerResponseTf setBackgroundColor:[NSColor greenColor]];
+        return;
+    }
+    NSString* response = [NSString stringWithFormat:@"Could not connect to interlock at:\n\n%@:%@", [model interlockHost], [model interlockPort]];
+    [interlockServerResponseTf setStringValue:response];
+    [interlockServerResponseTf setBackgroundColor:[NSColor redColor]];
+    return;
+}
 
 @end

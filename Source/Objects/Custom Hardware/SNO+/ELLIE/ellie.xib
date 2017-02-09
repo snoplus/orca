@@ -10,7 +10,14 @@
             <connections>
                 <outlet property="amellieTViewItem" destination="150" id="Aog-HX-zFA"/>
                 <outlet property="ellieTabView" destination="148" id="1369"/>
+                <outlet property="interlockHostTf" destination="LKr-RC-LbQ" id="4Bt-Y6-s6x"/>
+                <outlet property="interlockPing" destination="8PW-9X-Ifs" id="sYh-9e-6M6"/>
+                <outlet property="interlockPortTf" destination="Xdq-nR-X6Z" id="tVl-ce-htL"/>
+                <outlet property="interlockServerResponseTf" destination="mcQ-O7-amI" id="jcf-3C-W2M"/>
                 <outlet property="serversTViewItem" destination="894" id="bPD-I9-KeC"/>
+                <outlet property="smellieHostTf" destination="dia-Hx-Q14" id="R6C-aP-Mpy"/>
+                <outlet property="smelliePortTf" destination="6te-Tj-hxF" id="2Xm-j2-yFw"/>
+                <outlet property="smellieServerResponseTf" destination="VYd-Pq-JXq" id="IOn-gM-8xr"/>
                 <outlet property="tellieBuildConfigTViewItem" destination="17" id="1376"/>
                 <outlet property="tellieChannelTf" destination="1242" id="1339"/>
                 <outlet property="tellieExpertFibreSelectPb" destination="FbF-eO-v9X" id="ono-Cs-eRy"/>
@@ -35,9 +42,11 @@
                 <outlet property="tellieGeneralTriggerDelayTf" destination="1285" id="1330"/>
                 <outlet property="tellieGeneralValidateSettingsButton" destination="1300" id="dXT-rJ-xgx"/>
                 <outlet property="tellieGeneralValidationStatusTf" destination="1304" id="1380"/>
+                <outlet property="tellieHostTf" destination="RvI-ar-usS" id="2CB-za-ehh"/>
                 <outlet property="tellieNoPulsesTf" destination="1224" id="1353"/>
                 <outlet property="tellieOperatorTabView" destination="1121" id="1371"/>
                 <outlet property="telliePhotonsTf" destination="1416" id="1421"/>
+                <outlet property="telliePortTf" destination="1ju-cR-bNX" id="6cj-bw-WiI"/>
                 <outlet property="telliePulseFreqTf" destination="1217" id="1354"/>
                 <outlet property="telliePulseHeightTf" destination="1243" id="1340"/>
                 <outlet property="telliePulseWidthTf" destination="1244" id="1351"/>
@@ -1889,6 +1898,9 @@
                                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
+                                                        <connections>
+                                                            <action selector="serverSettingsChanged:" target="-2" id="4TT-5c-umE"/>
+                                                        </connections>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="1ju-cR-bNX">
                                                         <rect key="frame" x="213" y="106" width="96" height="22"/>
@@ -1899,6 +1911,9 @@
                                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
+                                                        <connections>
+                                                            <action selector="serverSettingsChanged:" target="-2" id="i2r-Dh-INE"/>
+                                                        </connections>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="DKP-BF-DFT">
                                                         <rect key="frame" x="16" y="134" width="88" height="17"/>
@@ -1918,6 +1933,9 @@
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
+                                                        <connections>
+                                                            <action selector="telliePing:" target="-2" id="DFY-hg-pku"/>
+                                                        </connections>
                                                     </button>
                                                     <textField verticalHuggingPriority="750" id="HpJ-zH-aEj">
                                                         <rect key="frame" x="18" y="14" width="443" height="66"/>
@@ -1962,6 +1980,9 @@
                                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
+                                                        <connections>
+                                                            <action selector="serverSettingsChanged:" target="-2" id="iZL-Jx-dck"/>
+                                                        </connections>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="6te-Tj-hxF">
                                                         <rect key="frame" x="213" y="106" width="96" height="22"/>
@@ -1972,6 +1993,9 @@
                                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
+                                                        <connections>
+                                                            <action selector="serverSettingsChanged:" target="-2" id="tzU-pu-S55"/>
+                                                        </connections>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Zh8-VE-vdX">
                                                         <rect key="frame" x="16" y="134" width="88" height="17"/>
@@ -1991,6 +2015,9 @@
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
+                                                        <connections>
+                                                            <action selector="smelliePing:" target="-2" id="Vhv-RG-aDG"/>
+                                                        </connections>
                                                     </button>
                                                     <textField verticalHuggingPriority="750" id="VYd-Pq-JXq">
                                                         <rect key="frame" x="18" y="14" width="443" height="66"/>
@@ -2035,6 +2062,9 @@
                                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
+                                                        <connections>
+                                                            <action selector="serverSettingsChanged:" target="-2" id="vxU-iw-MB7"/>
+                                                        </connections>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="Xdq-nR-X6Z">
                                                         <rect key="frame" x="213" y="106" width="96" height="22"/>
@@ -2045,6 +2075,9 @@
                                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
+                                                        <connections>
+                                                            <action selector="serverSettingsChanged:" target="-2" id="17t-gq-4YS"/>
+                                                        </connections>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="bb2-S1-LMm">
                                                         <rect key="frame" x="16" y="134" width="88" height="17"/>
@@ -2064,6 +2097,9 @@
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
+                                                        <connections>
+                                                            <action selector="interlockPing:" target="-2" id="HwF-yk-2ge"/>
+                                                        </connections>
                                                     </button>
                                                     <textField verticalHuggingPriority="750" id="mcQ-O7-amI">
                                                         <rect key="frame" x="18" y="14" width="443" height="66"/>
