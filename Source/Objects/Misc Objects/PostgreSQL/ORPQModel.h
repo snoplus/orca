@@ -56,11 +56,15 @@ enum {
     kFEC_tcmosIseta,
     kFEC_vres,      // (vint in the database)
     kFEC_hvref,
+    kFEC_mbid,
+    kFEC_dbid,
+    kFEC_pmticid,
     kFEC_numDbColumns
 };
 
 #define kNumFecTdisc    8
 #define kNumFecIset     2
+#define kNumDbPerFec    4
 
 typedef struct {
     uint32_t        hvDisabled;   // resistor pulled or no cable
@@ -86,6 +90,9 @@ typedef struct {
     uint32_t        tcmosIseta[kNumFecIset];
     uint32_t        vres;
     uint32_t        hvref;
+    uint32_t        mbid;                       // motherboard ID
+    uint32_t        dbid[kNumDbPerFec];         // daughterboard ID's
+    uint32_t        pmticid;                    // PMTIC ID
     uint32_t        valid[kFEC_numDbColumns];   // bitmasks for settings loaded from hardware (see enum above)
 } PQ_FEC;
 

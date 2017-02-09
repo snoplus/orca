@@ -1823,6 +1823,15 @@ static int              sChannelsNotChangedCount = 0;
         if (fec->valid[kFEC_hvref]) {
             [self setHVRef:fec->hvref];
         }
+        if (fec->valid[kFEC_mbid]) {
+            [self setBoardID:[NSString stringWithFormat:@"%x", fec->mbid]];
+        }
+        for (int i=0; i<kNumDbPerFec; ++i) {
+            if ((fec->valid[kFEC_dbid] & (1 << i)) && dcPresent[i]) {
+                [dc[i] setBoardID:[NSString stringWithFormat:@"%x", fec->dbid[i]]];
+            }
+        }
+        //TODO: set PMTIC ID's
     }
     @finally {
         [ORSNOCard enableNotifications];
