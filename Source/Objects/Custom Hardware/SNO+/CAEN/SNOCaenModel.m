@@ -1031,6 +1031,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 	[self writeOverUnderThresholds];
 	[self writeDacs];
 	[self writePostTriggerSetting];
+    [self writeAcquistionControl:NO]; // must do this again since it was cleared by the software reset
 }
 
 - (float) convertDacToVolts:(unsigned short)aDacValue 
