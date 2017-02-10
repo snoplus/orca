@@ -696,7 +696,7 @@ static NSDictionary* xl3Ops;
         bool unlock = ![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && ![model hvASwitch] && [model hvAFromDB] && !lockedOrNotRunningMaintenance;
         [hvOnButton setEnabled:unlock];
 
-        unlock = ![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && [model hvAFromDB] && !lockedOrNotRunningMaintenance;
+        unlock = ![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && [model hvAFromDB] && notRunningOrInMaintenance;
         [hvOffButton setEnabled:unlock];
 
         unlock = ![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping] && [model hvAFromDB] && !lockedOrNotRunningMaintenance;
@@ -719,7 +719,7 @@ static NSDictionary* xl3Ops;
         bool unlock = ![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && ![model hvBSwitch] && [model hvBFromDB] && !lockedOrNotRunningMaintenance;
         [hvOnButton setEnabled:unlock];
         
-        unlock = ![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && [model hvBFromDB] && !lockedOrNotRunningMaintenance;
+        unlock = ![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && [model hvBFromDB] && notRunningOrInMaintenance;
         [hvOffButton setEnabled:unlock];
         
         unlock = ![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && ![model hvBRamping] && [model hvBFromDB] && !lockedOrNotRunningMaintenance;
