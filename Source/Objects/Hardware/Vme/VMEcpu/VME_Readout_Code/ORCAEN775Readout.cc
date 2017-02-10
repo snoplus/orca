@@ -113,7 +113,7 @@ bool ORCAEN775Readout::Readout(SBC_LAM_Data* lamData)
         }
         
     }
-    else if(numWordsRead<0) {
+    else if(numBytesRead<0) {
         LogBusErrorForCard(GetSlot(),"CAEN 0x%0x dma read error",GetBaseAddress());
         return false; 
     }
