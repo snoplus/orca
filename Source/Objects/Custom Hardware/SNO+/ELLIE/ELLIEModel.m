@@ -228,28 +228,21 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     [_smellieRunHeaderDocList release];
     [_smellieSubRunInfo release];
     
-    //Server Clients
+    // Server Clients
     [_tellieClient release];
     [_smellieClient release];
     
-    //tellie settings
+    // tellie settings
     [_tellieSubRunSettings release];
     [_tellieFireParameters release];
     [_tellieFibreMapping release];
     
-    //smellie config mappings
+    // smellie config mappings
     [_smellieLaserHeadToSepiaMapping release];
     [_smellieLaserToInputFibreMapping release];
     [_smellieFibreSwitchToFibreMapping release];
     [_smellieConfigVersionNo release];
     [super dealloc];
-}
-
-- (void) registerNotificationObservers
-{
-     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    //we don't want this notification
-	[notifyCenter removeObserver:self name:NSWindowDidResignKeyNotification object:nil];
 }
 
 /*********************************************************/
@@ -761,7 +754,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     ///////////////
     // Fire loop! Pass variables to the tellie server.
     for(int i = 0; i<[loops integerValue]; i++){
-        if([self ellieFireFlag] == NO || [[NSThread currentThread] isCancelled] == YES){
+        if(![self ellieFireFlag] || [[NSThread currentThread] isCancelled]){
             //errorString = @"ELLIE fire flag set to @NO";
             goto err;
         }
@@ -1290,25 +1283,62 @@ err:
     [[self smellieClient] command:@"superk_master_mode" withArgs:args];
 }
 
-
--(void)sendCustomSmellieCmd:(NSString*)customCmd withArgs:(NSArray*)argsArray
-{
-    [[self smellieClient] command:customCmd withArgs:argsArray];
-}
-
-
-//complete this after the smellie documents have been recieved
--(void) smellieDocumentsRecieved
+-(void)activateKeepAlive:(NSNumber *)runNumber
 {
     /*
-     Update smeillieDBReadInProgress property bool.
+     Start a thread to constantly send a keep alive signal to the smellie interlock server
      */
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(smellieDocumentsRecieved) object:nil];
-    if (![self smellieDBReadInProgress]) { //killed already
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    NSArray* args = @[runNumber];
+    @try {
+        [[self interlockClient] command:@"new_run" withArgs:args];
+        [[self interlockClient] command:@"set_arm"];
+    }
+    @catch (NSException *e) {
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Problem activating interlock server, reason: %@\n", [e reason]);
+        [self setEllieFireFlag:NO];
+        [pool release];
         return;
     }
-    
-    [self setSmellieDBReadInProgress:NO];
+    interlockThread = [[NSThread alloc] initWithTarget:self selector:@selector(pulseKeepAlive:) object:nil];
+    [interlockThread start];
+    [pool release];
+}
+
+-(void)killKeepAlive
+{
+    /*
+     Stop pulsing the keep alive and disarm the interlock
+    */
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    [interlockThread cancel];
+    @try {
+        [[self interlockClient] command:@"set_disarm"];
+    }
+    @catch (NSException *e) {
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Problem disarming interlock server, reason: %@\n", [e reason]);
+    }
+    [self setEllieFireFlag:NO];
+    NSLog(@"[SMELLIE]: Smellie laser interlock server disarmed\n");
+    [pool release];
+}
+
+-(void)pulseKeepAlive:(id)passed
+{
+    /*
+     A fuction to be run in a thread, continually sending keep alive pulses to the interlock server
+    */
+    while (![interlockThread isCancelled]) {
+        @try{
+            [[self interlockClient] command:@"send_keepalive"];
+        } @catch(NSException* e) {
+            NSLogColor([NSColor redColor], @"[SMELLIE]: Problem sending keep alive to interlock server\n");
+            [self setEllieFireFlag:NO];
+            return;
+        }
+        [NSThread sleepForTimeInterval:0.05];
+    }
+    NSLog(@"[SMELLIE]: Stopped sending keep-alive to interlock server\n");
 }
 
 -(void)startSmellieRunInBackground:(NSDictionary*)smellieSettings
@@ -1376,7 +1406,6 @@ err:
 {
     //Read data
     int wavelengthLow = [[smellieSettings objectForKey:@"superK_wavelength_start"] intValue];
-    //int bandwidth = [[smellieSettings objectForKey:@"superK_wavelength_bandwidth"] intValue];
     int stepSize = [[smellieSettings objectForKey:@"superK_wavelength_step_length"] intValue];
     float noSteps = [[smellieSettings objectForKey:@"superK_wavelength_no_steps"] floatValue];
     
@@ -1440,7 +1469,7 @@ err:
     //////////////
     // This will likely run in thread so make an auto release pool
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-
+    
     //////////////
     //   GET TUBii & RunControl MODELS
     //////////////
@@ -1532,7 +1561,17 @@ err:
     
     /////////////////////
     // Create and push initial smellie run doc and tell smellie which run we're in
+    [self setEllieFireFlag:YES];
+    
     if([runControl isRunning]){
+
+        @try{
+            [self activateKeepAlive:[NSNumber numberWithUnsignedLong:[runControl runNumber]]];
+        } @catch(NSException* e) {
+            NSLogColor([NSColor redColor], @"[SMELLIE]: Problem activating interlock server: %@\n", [e reason]);
+            goto err;
+        }
+        
         @try{
             [self setSmellieNewRun:[NSNumber numberWithUnsignedLong:[runControl runNumber]]];
         } @catch(NSException* e) {
@@ -1553,7 +1592,7 @@ err:
     // laser loop
     //
     for(NSString* laserKey in laserArray){
-        if(([[NSThread currentThread] isCancelled])){
+        if([self ellieFireFlag] == NO || [[NSThread currentThread] isCancelled]){
             NSLogColor([NSColor redColor], @"[SMELLIE]: thread has been cancelled, killing sequence.\n");
             goto err;
         }
@@ -1580,7 +1619,7 @@ err:
         // Fibre loop
         //
         for(NSString* fibreKey in fibreArray){
-            if(([[NSThread currentThread] isCancelled])){
+            if([self ellieFireFlag] == NO || [[NSThread currentThread] isCancelled]){
                 NSLogColor([NSColor redColor], @"[SMELLIE]: thread has been cancelled, killing sequence.\n");
                 goto err;
             }
@@ -1593,7 +1632,7 @@ err:
             // Wavelength loop
             //
             for(NSNumber* wavelength in lowEdgeWavelengthArray){
-                if(([[NSThread currentThread] isCancelled])){
+                if([self ellieFireFlag] == NO || [[NSThread currentThread] isCancelled]){
                     NSLogColor([NSColor redColor], @"[SMELLIE]: thread has been cancelled, killing sequence.\n");
                     goto err;
                 }
@@ -1615,7 +1654,7 @@ err:
                 // Intensity loop
                 //
                 for(NSNumber* intensity in intensityArray){
-                    if(([[NSThread currentThread] isCancelled])){
+                    if([self ellieFireFlag] == NO || [[NSThread currentThread] isCancelled]){
                         NSLogColor([NSColor redColor], @"[SMELLIE]: thread has been cancelled, killing sequence.\n");
                         goto err;
                     }
@@ -1627,7 +1666,7 @@ err:
                     // Gain loop
                     //
                     for(NSNumber* gain in gainArray){
-                        if(([[NSThread currentThread] isCancelled])){
+                        if([self ellieFireFlag] == NO || [[NSThread currentThread] isCancelled]){
                             NSLogColor([NSColor redColor], @"[SMELLIE]: thread has been cancelled, killing sequence.\n");
                             goto err;
                         }
@@ -1703,7 +1742,7 @@ err:
                             // hardware is properly set
                             // before TUBii sends triggers
                             
-                            //Set tubii up for sending correct triggers
+                            //Set up tubii to send triggers
                             @try{
                                 //Fire trigger pulses!
                                 [theTubiiModel fireSmelliePulser_rate:[rate floatValue] pulseWidth:100e-9 NPulses:numOfPulses];
@@ -1817,6 +1856,9 @@ err:
     ///////////
     // This could be run in a thread, so set-up an auto release pool
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+
+    // Kill the keepalive
+    [self killKeepAlive];
     
     //Get a Tubii object
     NSArray*  tubiiModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
@@ -1853,6 +1895,20 @@ err:
     [self setSmellieDBReadInProgress:YES];
     // Is there a better way to do this... Do we know it's received after the delay?
     [self performSelector:@selector(smellieDocumentsRecieved) withObject:nil afterDelay:10.0];
+}
+
+//complete this after the smellie documents have been recieved
+-(void) smellieDocumentsRecieved
+{
+    /*
+     Update smeillieDBReadInProgress property bool.
+     */
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(smellieDocumentsRecieved) object:nil];
+    if (![self smellieDBReadInProgress]) { //killed already
+        return;
+    }
+    
+    [self setSmellieDBReadInProgress:NO];
 }
 
 -(void) smellieDBpush:(NSMutableDictionary*)dbDic
@@ -2442,7 +2498,7 @@ err:
     @try{
         [[self tellieClient] command:@"is_connected"];
     } @catch(NSException* e) {
-        NSLogColor([NSColor redColor], @"Could not ping tellie server, reason: %@", [e reason]);
+        NSLogColor([NSColor redColor], @"Could not ping tellie server, reason: %@\n", [e reason]);
         return NO;
     }
     return YES;
@@ -2453,7 +2509,7 @@ err:
     @try{
         [[self smellieClient] command:@"is_connected"];
     } @catch(NSException* e) {
-        NSLogColor([NSColor redColor], @"Could not ping smellie server, reason: %@", [e reason]);
+        NSLogColor([NSColor redColor], @"Could not ping smellie server, reason: %@\n", [e reason]);
         return NO;
     }
     return YES;
@@ -2464,7 +2520,7 @@ err:
     @try{
         [[self interlockClient] command:@"is_connected"];
     } @catch(NSException* e) {
-        NSLogColor([NSColor redColor], @"Could not ping interlock server, reason: %@", [e reason]);
+        NSLogColor([NSColor redColor], @"Could not ping interlock server, reason: %@\n", [e reason]);
         return NO;
     }
     return YES;

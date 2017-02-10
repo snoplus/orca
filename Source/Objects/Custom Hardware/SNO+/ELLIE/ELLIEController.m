@@ -101,6 +101,10 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     
     [model setInterlockPort:[interlockPortTf stringValue]];
     [model setInterlockHost:[interlockHostTf stringValue]];
+    
+    [self telliePing:nil];
+    [self smelliePing:nil];
+    [self interlockPing:nil];
 }
 
 - (void) registerNotificationObservers
@@ -119,6 +123,11 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     [notifyCenter addObserver : self
                      selector : @selector(updateServerSettings:)
                          name : @"ELLIEServerSettingsChanged"
+                        object: nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(killInterlock:)
+                         name : @"SMELLIEEmergencyStop"
                         object: nil];
     
 }
@@ -1093,4 +1102,8 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     return;
 }
 
+-(void)killInterlock:(NSNotification *)aNote
+{
+    [model killKeepAlive];
+}
 @end

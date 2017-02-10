@@ -1096,8 +1096,8 @@ snopGreenColor;
         }
         //Activate run buttons
         [smellieStartRunButton setEnabled:YES];
-        [smellieStopRunButton setEnabled:YES];
-        [smellieEmergencyStop setEnabled:YES];
+        [smellieStopRunButton setEnabled:NO];
+        [smellieEmergencyStop setEnabled:NO];
     }
     else{
         //[smellieCheckInterlock setEnabled:NO];
@@ -1124,6 +1124,7 @@ snopGreenColor;
     [smellieLoadRunFile setEnabled:NO];
     [smellieRunFileNameField setEnabled:NO];
     [smellieStopRunButton setEnabled:YES];
+    [smellieEmergencyStop setEnabled:YES];
     [smellieStartRunButton setEnabled:NO];
     
     //assign the run type as a SMELLIE run
@@ -1192,18 +1193,12 @@ snopGreenColor;
 
 - (IBAction) emergencySmellieStopAction:(id)sender
 {
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"SMELLIEEmergencyStop" object:self];
     [smellieLoadRunFile setEnabled:NO];
     [smellieRunFileNameField setEnabled:NO];
     [smellieStartRunButton setEnabled:NO];
     [smellieStopRunButton setEnabled:YES];
     
-    //unassign the run type as a SMELLIE run
-    //[model setRunType:kRunUndefined];
-    //[smellieCheckInterlock setEnabled:NO];
-    //turn the interlock off
-    //(if a smellie run is currently operating) start a maintainence run
-    //reset the smellie laser system
-    //TODO:Make a note in the datastream that this happened
 }
 
 -(void)startTellieRunNotification:(NSNotification *)note;

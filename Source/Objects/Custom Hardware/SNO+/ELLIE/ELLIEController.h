@@ -150,6 +150,7 @@
 - (IBAction)smelliePing:(id)sender;
 - (IBAction)interlockPing:(id)sender;
 - (IBAction) serverSettingsChanged:(id)sender;
+-(void)killInterlock:(NSNotification *)aNote;
 
 @end
 

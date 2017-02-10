@@ -99,7 +99,6 @@
 -(void) wakeUp;
 -(void) sleep;
 -(void) dealloc;
--(void) registerNotificationObservers;
 
 /************************/
 /* SERVER tab Functions */
@@ -142,14 +141,15 @@
 
 -(void)setSmellieSuperkMasterMode:(NSNumber*)intensity withRepRate:(NSNumber*)rate withWavelengthLow:(NSNumber*)wavelengthLow withWavelengthHi:(NSNumber*)wavelengthHi withFibreInput:(NSNumber*)fibreInChan withFibreOutput:(NSNumber*)fibreOutChan withNPulses:(NSNumber*)noPulses withGainVoltage:(NSNumber *)gain;
 
--(void) sendCustomSmellieCmd:(NSString*)customCmd withArgs:(NSArray*)argsArray;
-
 -(NSMutableArray*)getSmellieRunLaserArray:(NSDictionary*)smellieSettings;
 -(NSMutableArray*)getSmellieRunFibreArray:(NSDictionary*)smellieSettings;
 -(NSMutableArray*)getSmellieRunIntensityArray:(NSDictionary*)smellieSettings forLaser:(NSString*)laser;
 -(NSMutableArray*)getSmellieRunGainArray:(NSDictionary*)smellieSettings forLaser:(NSString*)laser;
 -(NSMutableArray*)getSmellieLowEdgeWavelengthArray:(NSDictionary*)smellieSettings;
 -(void) startSmellieRunInBackground:(NSDictionary*)smellieSettings;
+-(void) activateKeepAlive:(NSNumber *)runNumber;
+-(void) killKeepAlive;
+-(void) pulseKeepAlive:(id)passed;
 -(void) startSmellieRun:(NSDictionary*)smellieSettings;
 -(void) stopSmellieRun;
 

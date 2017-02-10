@@ -50,6 +50,7 @@
                 <outlet property="telliePulseFreqTf" destination="1217" id="1354"/>
                 <outlet property="telliePulseHeightTf" destination="1243" id="1340"/>
                 <outlet property="telliePulseWidthTf" destination="1244" id="1351"/>
+                <outlet property="tellieServerResponseTf" destination="HpJ-zH-aEj" id="lEK-Us-fhz"/>
                 <outlet property="tellieTViewItem" destination="149" id="1372"/>
                 <outlet property="tellieTabView" destination="15" id="1370"/>
                 <outlet property="tellieTriggerDelayTf" destination="1219" id="1348"/>
