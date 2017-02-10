@@ -2496,7 +2496,7 @@ err:
 -(BOOL)pingTellie
 {
     @try{
-        [[self tellieClient] command:@"is_connected"];
+        [[self tellieClient] command:@"test"];
     } @catch(NSException* e) {
         NSLogColor([NSColor redColor], @"Could not ping tellie server, reason: %@\n", [e reason]);
         return NO;
