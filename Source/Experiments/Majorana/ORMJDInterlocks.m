@@ -545,7 +545,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                         //no connection
                         retryCount++;
                         [self postInterlockFailureAlarm:[NSString stringWithFormat:@"SCM unreachable %d/%d",retryCount,kAllowedConnectionRetry] hvInDanger:NO finalWarning:NO];
-                        [self setState:kMJDInterlocks_UpdateVacSystem status:[NSString stringWithFormat:@"Failed: %d/%d",retryCount,kAllowedConnectionRetry] color:badColor];
+                        [self setState:kMJDInterlocks_CheckLNFill status:[NSString stringWithFormat:@"Failed: %d/%d",retryCount,kAllowedConnectionRetry] color:badColor];
                         retryState = kMJDInterlocks_CheckLNFill;  //force a retry of this state next time around
                         [self setCurrentState:kMJDInterlocks_Idle];
                     }
