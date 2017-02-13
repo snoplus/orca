@@ -1230,16 +1230,15 @@ tubRegister;
 
 - (void) clearGlobalTriggerWordMask
 {
-	@try {
-        [self setGtMask:0];
-        [self setGlobalTriggerWordMask];
-		NSLog(@"Cleared GT Mask\n");
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Could not clear GT word mask!\n");					
-		NSLog(@"Exception: %@\n",localException);
-		[localException raise];
-	}
+    @try {
+        [mtc okCommand:"set_gt_mask %lu", 0];
+        NSLog(@"Cleared GT Mask\n");
+    }
+    @catch(NSException* localException) {
+        NSLog(@"Could not clear GT word mask!\n");
+        NSLog(@"Exception: %@\n",localException);
+        [localException raise];
+    }
 }
 
 - (void) setGlobalTriggerWordMask
