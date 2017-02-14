@@ -222,6 +222,7 @@
 
 //Run type
 - (IBAction) runTypeWordAction:(id)sender;
+- (void) refreshStandardRunVersions;
 @end
 
 extern NSString* ORSNOPRequestHVStatus;

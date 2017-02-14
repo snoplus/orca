@@ -170,6 +170,7 @@
 @property (nonatomic,assign) bool resync;
 
 - (id) init;
+- (void) awakeAfterDocumentLoaded;
 
 - (void) setMTCPort: (int) port;
 - (int) mtcPort;
