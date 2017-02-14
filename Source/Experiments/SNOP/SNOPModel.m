@@ -394,7 +394,7 @@ resync;
 
 - (void) awakeAfterDocumentLoaded
 {
-    [[self findController] refreshStandardRunVersions];
+    [[self findController] refreshStandardRunsAction:nil];
 }
 
 -(void) initRunMaskHistory

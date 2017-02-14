@@ -219,6 +219,7 @@
 -(void) windowDidLoad;
 
 - (IBAction) runsLockAction:(id)sender;
+- (IBAction) refreshStandardRunsAction: (id) sender;
 
 //Run type
 - (IBAction) runTypeWordAction:(id)sender;
