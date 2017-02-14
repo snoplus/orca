@@ -121,6 +121,24 @@ NSString* ORDispatcherLock                      = @"ORDispatcherLock";
 }
 
 #pragma mark ¥¥¥Notifications
+- (void) registerNotificationObservers
+{
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    
+    [notifyCenter removeObserver:self];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(runAboutToStop:)
+                         name : ORRunAboutToStopNotification
+                       object : nil];
+}
+
+- (void) runAboutToStop:(NSNotification*) aNote
+{
+    //force all records out even if the socket will block
+    ignoreBlock = YES;
+}
+
 - (void) setRunMode:(int)aMode
 {
 	runMode = aMode;
@@ -391,7 +409,7 @@ NSString* ORDispatcherLock                      = @"ORDispatcherLock";
 	if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
         for(id d in dataArray){
             for(ORDispatcherClient* aClient in clients){
-                if([aClient socketStatus] != kNetSocketBlocked){
+                if(ignoreBlock || [aClient socketStatus] != kNetSocketBlocked){
                     [aClient writeData:d];
                 }
                 else [aClient setAmountBlocked:[d length]];
@@ -404,6 +422,7 @@ NSString* ORDispatcherLock                      = @"ORDispatcherLock";
 - (void) runTaskStarted:(id)userInfo
 {	
 	runInProgress = YES;
+    ignoreBlock = NO;
 	[currentHeader release];
 	currentHeader = [userInfo objectForKey:kHeader];
 	//[clients makeObjectsPerformSelector:@selector(writeData:) withObject:dataHeader];
@@ -457,7 +476,7 @@ static NSString *ORDispatcherRefusedList	 	= @"ORDispatcherRefusedList";
     [self setClients:[NSMutableArray array]];
     
     _ignoreMode = NO;
-    
+    ignoreBlock = NO;
     return self;
 }
 
