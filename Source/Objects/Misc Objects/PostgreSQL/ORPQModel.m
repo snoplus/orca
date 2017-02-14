@@ -462,6 +462,12 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
     return (PQ_CAEN *)((PQ_MTC *)((PQ_Crate *)((PQ_FEC *)[data mutableBytes] + kSnoCardsTotal) + kSnoCrates) + 1);
 }
 
+- (PQ_Run *) getRun
+{
+    if (!runLoaded) return nil;
+    return (PQ_Run *)((PQ_CAEN *)((PQ_MTC *)((PQ_Crate *)((PQ_FEC *)[data mutableBytes] + kSnoCardsTotal) + kSnoCrates) + 1) + 1);
+}
+
 @end
 
 @implementation ORPQQueryOp
@@ -909,6 +915,63 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                             break;
                     }
                 }
+            }
+        }
+    }
+//
+// load run state
+//
+    [command autorelease];
+    command = [[NSString stringWithFormat: @"SELECT run_type,end_timestamp FROM run_state WHERE run=0"] retain];
+    @try {
+        theResult = [pqConnection queryString:command];
+    }
+    @catch (NSException* e) {
+        theResult = nil;
+    }
+    if ([self isCancelled]) return nil;
+    if (theResult) {
+        int numRows = [theResult numOfRows];
+        int numCols = [theResult numOfFields];
+        if (numRows != 1 || numCols != 2) {
+            NSLogColor([NSColor redColor], @"Error getting run state from database\n");
+        } else {
+            detDB->runLoaded = 1;
+            PQ_Run *pqRun = [detDB getRun];
+            int64_t run_type = [theResult getInt64atRow:0 column:0];
+            if (run_type != kPQBadValue) {
+                pqRun->runType = run_type;
+                pqRun->valid[kRun_runType] = 1;
+                // (don't try to set run in progress flag unless run type is valid)
+                pqRun->runInProgress = [theResult isNullAtRow:0 column:1];
+                pqRun->valid[kRun_runInProgress] = 1;
+            }
+        }
+    }
+    //
+    // load run number
+    //
+    [command autorelease];
+    command = [[NSString stringWithFormat: @"SELECT last_value FROM run_number"] retain];
+    @try {
+        theResult = [pqConnection queryString:command];
+    }
+    @catch (NSException* e) {
+        theResult = nil;
+    }
+    if ([self isCancelled]) return nil;
+    if (theResult) {
+        int numRows = [theResult numOfRows];
+        int numCols = [theResult numOfFields];
+        if (numRows != 1 || numCols != 1) {
+            NSLogColor([NSColor redColor], @"Error getting run number from database\n");
+        } else {
+            detDB->runLoaded = 1;
+            PQ_Run *pqRun = [detDB getRun];
+            int64_t run_number = [theResult getInt64atRow:0 column:0];
+            if (run_number != kPQBadValue) {
+                pqRun->runNumber = run_number;
+                pqRun->valid[kRun_runNumber] = 1;
             }
         }
     }

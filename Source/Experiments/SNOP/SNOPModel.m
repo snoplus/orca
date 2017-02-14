@@ -28,6 +28,7 @@
 #import "ORXL3Model.h"
 #import "ORDataTaker.h"
 #import "ORDataTypeAssigner.h"
+#import "ORGlobal.h"
 #import "ORRunModel.h"
 #import "ORMTCModel.h"
 #import "ORMTCController.h"
@@ -470,6 +471,10 @@ resync;
                          name : ORRunBetweenSubRunsNotification
                        object : nil];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(detectorStateChanged:)
+                         name : ORPQDetectorStateChanged
+                       object : nil];
 }
 
 - (void) runAboutToRollOver:(NSNotification*)aNote
@@ -918,6 +923,39 @@ err:
 - (void) subRunEnded:(NSNotification*)aNote
 {
     //update calibration documents (TELLIE temp)
+}
+
+- (void) detectorStateChanged:(NSNotification*)aNote
+{
+    ORPQDetectorDB *detDB = [aNote object];
+
+    if (!detDB) return;
+
+    PQ_Run *pqRun = (PQ_Run *)[detDB getRun];
+
+    if (!pqRun) return;
+
+    // update run state
+    if (pqRun->valid[kRun_runInProgress]) {
+        [[ORGlobal sharedGlobal] setRunInProgress:pqRun->runInProgress];
+    }
+
+    NSArray*  runObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    if(![runObjects count]){
+        NSLogColor([NSColor redColor], @"initRunNumber: couldn't find run control object!");
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
+        return;     // (should never happen)
+    }
+    ORRunModel* runControl = [runObjects objectAtIndex:0];
+
+    // update current run number and type
+    if (pqRun->valid[kRun_runNumber]) {
+        [runControl setRunNumber:pqRun->runNumber];
+    }
+    if (pqRun->valid[kRun_runType]) {
+        [runControl setRunType:pqRun->runType];
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
 }
 
 // orca script helper (will come from DB)

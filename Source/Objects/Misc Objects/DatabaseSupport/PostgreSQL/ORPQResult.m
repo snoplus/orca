@@ -216,8 +216,16 @@ enum {
     return (mNames = [[NSArray arrayWithArray:theNamesArray] retain]);
 }
 
+- (BOOL) isNullAtRow:(int)aRow column:(int)aColumn
+{
+    if (mResult && aRow<mNumOfRows && aColumn<mNumOfFields) {
+        return PQgetisnull(mResult,aRow,aColumn);
+    }
+    return YES;
+}
+
 // (returns 0 if there is no value at those coordinates)
-- (int64_t) getInt64atRow:(int)aRow column:(int)aColumn;
+- (int64_t) getInt64atRow:(int)aRow column:(int)aColumn
 {
     int64_t val = kPQBadValue;
     if (mResult && aRow<mNumOfRows && aColumn<mNumOfFields) {
@@ -248,7 +256,7 @@ enum {
     return val;
 }
 
-- (NSMutableData *) getInt64arrayAtRow:(int)aRow column:(int)aColumn;
+- (NSMutableData *) getInt64arrayAtRow:(int)aRow column:(int)aColumn
 {
     NSMutableData *theData = nil;
     int64_t val;

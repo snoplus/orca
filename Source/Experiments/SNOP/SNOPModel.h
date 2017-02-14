@@ -29,6 +29,7 @@
 @class ORDataSet;
 @class ORCouchDB;
 @class ORRunModel;
+@class ORPQResult;
 
 @protocol snotDbDelegate <NSObject>
 @required
@@ -216,6 +217,7 @@
 
 - (void) subRunStarted:(NSNotification*)aNote;
 - (void) subRunEnded:(NSNotification*)aNote;
+- (void) detectorStateChanged:(NSNotification*)aNote;
 
 - (void) updateEPEDStructWithCoarseDelay: (unsigned long) coarseDelay
                                fineDelay: (unsigned long) fineDelay
