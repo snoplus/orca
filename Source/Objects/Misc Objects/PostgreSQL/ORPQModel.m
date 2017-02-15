@@ -420,7 +420,7 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
     self = [super init];
     // this may look a bit odd, but calculating the size like this will account for
     // any padding the compiler may add between the structures
-    int len = (int)((PQ_CAEN *)((PQ_MTC *)((PQ_Crate *)((PQ_FEC *)0 + kSnoCardsTotal) + kSnoCrates) + 1) + 1);
+    int len = (int)((PQ_Run *)((PQ_CAEN *)((PQ_MTC *)((PQ_Crate *)((PQ_FEC *)0 + kSnoCardsTotal) + kSnoCrates) + 1) + 1) + 1);
     data = [[[NSMutableData alloc] initWithLength:len] retain];
     return self;
 }
