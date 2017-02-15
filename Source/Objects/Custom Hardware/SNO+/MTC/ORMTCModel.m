@@ -273,13 +273,9 @@ tubRegister;
         [[self undoManager] disableUndoRegistration];
 
         if (pqMTC->valid[kMTC_controlReg]) {
-            // TO_DO is this the best way to handle the pedestal enable (bit 0x01) and pulser enable (bit 0x02)?
-            if (((pqMTC->controlReg >> 1) ^ pqMTC->controlReg) & 0x01) {
-                [self setIsPedestalEnabledInCSR:(pqMTC->controlReg & 0x01)];
-            }
+            [self setIsPedestalEnabledInCSR:(pqMTC->controlReg & 0x01)];
         } else ++countInvalid;
 
-        //TO_DO verify that order of MTCA DACs is correct
         for (int i=0; i<10; ++i) {
             if (pqMTC->valid[kMTC_mtcaDacs] & (1 << i)) {
                 uint32_t val = pqMTC->mtcaDacs[i];
@@ -293,11 +289,9 @@ tubRegister;
 
 
         if (pqMTC->valid[kMTC_fineDelay]) {
-            // TODO check with Tony about how coarse and fine are stored.
             [self setFineDelay:pqMTC->fineDelay];
         } else ++countInvalid;
         if (pqMTC->valid[kMTC_coarseDelay]) {
-            // TODO check with Tony about how coarse and fine are stored.
             [self setCoarseDelay:pqMTC->coarseDelay];
         } else ++countInvalid;
 
@@ -321,7 +315,6 @@ tubRegister;
             [self setGTCrateMask:pqMTC->gtCrateMask];
         } else ++countInvalid;
 
-        //TO_DO verify that order of relays is correct
         for (int i=0; i<kNumMtcRelays; ++i) {
             if (pqMTC->valid[kMTC_mtcaRelays] & (1 << i)) {
                 uint32_t val = pqMTC->mtcaRelays[i];
@@ -1562,7 +1555,6 @@ tubRegister;
 {
 	@try {
 		[self disablePulser];
-		[self disablePedestal];
 	}
 	@catch(NSException* e) {
 		NSLog(@"MTC failed to stop pedestals!\n");
