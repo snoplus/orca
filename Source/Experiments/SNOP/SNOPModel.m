@@ -294,6 +294,9 @@ resync;
     self.debugDBPort = [decoder decodeInt32ForKey:@"ORSNOPModelDebugDBPort"];
     self.debugDBIPAddress = [decoder decodeObjectForKey:@"ORSNOPModelDebugDBIPAddress"];
 
+    //Standard Runs
+    [self setStandardRunTableVersion:[[NSNumber alloc] initWithInt:STANDARD_RUN_VERSION]];
+
     //ECA
     [anECARun setECA_pattern:[decoder decodeIntForKey:@"SNOPECApattern"]];
     [anECARun setECA_type:[decoder decodeObjectForKey:@"SNOPECAtype"]];
@@ -369,6 +372,7 @@ resync;
     
     [standardRunType release];
     [standardRunVersion release];
+    [standardRunTableVersion release];
     [_debugDBConnectionHistory release];
     [_debugDBName release];
     [_debugDBUserName release];
@@ -1774,6 +1778,17 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     lastStandardRunVersion = [aValue copy];
 }
 
+- (NSNumber*)standardRunTableVersion
+{
+    return standardRunTableVersion;
+}
+
+- (void)setStandardRunTableVersion:(NSNumber *)aValue
+{
+    [standardRunTableVersion autorelease];
+    standardRunTableVersion = [aValue copy];
+}
+
 - (ECARun*) anECARun{
     return anECARun;
 }
@@ -1891,7 +1906,18 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     }
 
     //Query the OrcaDB and get a dictionary with the parameters
-    NSString *urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/%@/_design/standardRuns/_view/getStandardRuns?startkey=[\"%@\",\"%@\",{}]&endkey=[\"%@\",\"%@\",0]&descending=True&include_docs=True",[self orcaDBUserName],[self orcaDBPassword],[self orcaDBIPAddress],[self orcaDBPort],[self orcaDBName],runTypeName,runVersion,runTypeName,runVersion];
+    NSString *urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/%@/_design/standardRuns/_view/getStandardRunsWithVersion?startkey=[%@,\"%@\",\"%@\",{}]&endkey=[%@,\"%@\",\"%@\",0]&descending=True&include_docs=True",
+                           [self orcaDBUserName],
+                           [self orcaDBPassword],
+                           [self orcaDBIPAddress],
+                           [self orcaDBPort],
+                           [self orcaDBName],
+                           [self standardRunTableVersion],
+                           runTypeName,
+                           runVersion,
+                           [self standardRunTableVersion],
+                           runTypeName,
+                           runVersion];
 
     NSString* urlStringScaped = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     NSURL *url = [NSURL URLWithString:urlStringScaped];
@@ -1969,8 +1995,9 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 
     //Build run table
     NSMutableDictionary *detectorSettings = [NSMutableDictionary dictionaryWithCapacity:200];
-    
+
     [detectorSettings setObject:@"standard_run" forKey:@"type"];
+    [detectorSettings setObject:standardRunTableVersion forKey:@"version"];
     [detectorSettings setObject:runTypeName forKey:@"run_type"];
     [detectorSettings setObject:runVersion forKey:@"run_version"];
     NSNumber *date = [NSNumber numberWithDouble:[[NSDate date] timeIntervalSince1970]];
