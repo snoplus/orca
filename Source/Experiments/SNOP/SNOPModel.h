@@ -29,7 +29,6 @@
 @class ORDataSet;
 @class ORCouchDB;
 @class ORRunModel;
-@class ORPQResult;
 
 @protocol snotDbDelegate <NSObject>
 @required
