@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="15G1217" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
         <development version="5100" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10116"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ORCatalogController">
@@ -2820,11 +2820,11 @@ Relay</string>
                                             <tabViewItems>
                                                 <tabViewItem label="SNO/Ncd" identifier="" id="179">
                                                     <view key="view" id="181">
-                                                        <rect key="frame" x="10" y="7" width="817" height="205"/>
+                                                        <rect key="frame" x="10" y="7" width="817" height="209"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <button toolTip="NcdModel" id="26766" customClass="ObjectFactory">
-                                                                <rect key="frame" x="25" y="25" width="101" height="153"/>
+                                                                <rect key="frame" x="25" y="29" width="101" height="153"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="Ncd" imagePosition="above" alignment="center" state="on" inset="2" id="26767">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2834,7 +2834,7 @@ Relay</string>
                                                                 </buttonCell>
                                                             </button>
                                                             <button toolTip="ORPulserDistribModel" id="26768" customClass="ObjectFactory">
-                                                                <rect key="frame" x="260" y="109" width="100" height="76"/>
+                                                                <rect key="frame" x="260" y="113" width="100" height="76"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" title="Pulser Distribution" bezelStyle="regularSquare" image="ORPulserDistrib" imagePosition="above" alignment="center" state="on" inset="2" id="26769">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2842,7 +2842,7 @@ Relay</string>
                                                                 </buttonCell>
                                                             </button>
                                                             <button toolTip="NcdMuxBoxModel" id="26772" customClass="ObjectFactory">
-                                                                <rect key="frame" x="400" y="117" width="100" height="62"/>
+                                                                <rect key="frame" x="400" y="121" width="100" height="62"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" title="Ncd Mux Box" bezelStyle="regularSquare" image="NcdMuxBox" imagePosition="above" alignment="center" inset="2" id="26773">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2850,7 +2850,7 @@ Relay</string>
                                                                 </buttonCell>
                                                             </button>
                                                             <button toolTip="NcdMuxModel" id="26776" customClass="ObjectFactory">
-                                                                <rect key="frame" x="568" y="76" width="100" height="62"/>
+                                                                <rect key="frame" x="568" y="80" width="100" height="62"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" title="Ncd Multiplexer" bezelStyle="regularSquare" image="NcdMux" imagePosition="above" alignment="center" inset="2" id="26777">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2858,7 +2858,7 @@ Relay</string>
                                                                 </buttonCell>
                                                             </button>
                                                             <button toolTip="ORHVRampModel" id="26774" customClass="ObjectFactory">
-                                                                <rect key="frame" x="418" y="33" width="64" height="70"/>
+                                                                <rect key="frame" x="418" y="37" width="64" height="70"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="HVRamp" imagePosition="above" alignment="center" state="on" inset="2" id="26775">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2868,7 +2868,7 @@ Relay</string>
                                                                 </buttonCell>
                                                             </button>
                                                             <button toolTip="ORRandomPulserModel" id="26770" customClass="ObjectFactory">
-                                                                <rect key="frame" x="245" y="32" width="130" height="50"/>
+                                                                <rect key="frame" x="245" y="36" width="130" height="50"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" title="Random Pulser" bezelStyle="regularSquare" image="RandomPulser" imagePosition="above" alignment="center" inset="2" id="26771">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2892,7 +2892,7 @@ Relay</string>
                                                                 </buttonCell>
                                                             </button>
                                                             <button toolTip="OReGunModel" id="26780" customClass="ObjectFactory">
-                                                                <rect key="frame" x="292" y="71" width="106" height="101"/>
+                                                                <rect key="frame" x="292" y="88" width="106" height="101"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" title="eGun" bezelStyle="regularSquare" image="eGun" imagePosition="above" alignment="center" state="on" inset="2" id="26781">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2900,7 +2900,7 @@ Relay</string>
                                                                 </buttonCell>
                                                             </button>
                                                             <button toolTip="PrespectrometerModel" id="26782" customClass="ObjectFactory">
-                                                                <rect key="frame" x="420" y="76" width="89" height="72"/>
+                                                                <rect key="frame" x="420" y="102" width="89" height="72"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" title="Prespectrometer" bezelStyle="regularSquare" image="prespectrometer" imagePosition="above" alignment="center" state="on" inset="2" id="26783">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2908,7 +2908,7 @@ Relay</string>
                                                                 </buttonCell>
                                                             </button>
                                                             <button toolTip="MonspectrometerModel" id="26784" customClass="ObjectFactory">
-                                                                <rect key="frame" x="519" y="79" width="110" height="69"/>
+                                                                <rect key="frame" x="519" y="103" width="110" height="69"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="monspectrometer" imagePosition="above" alignment="center" state="on" inset="2" id="26785">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2939,6 +2939,14 @@ Relay</string>
                                                                 <buttonCell key="cell" type="bevel" title="PAC (Field Point)" bezelStyle="regularSquare" image="PacFP" imagePosition="above" alignment="center" state="on" inset="2" id="MmA-s5-LFY">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="system" size="10"/>
+                                                                </buttonCell>
+                                                            </button>
+                                                            <button toolTip="ORHVcRIOModel" id="CmX-tB-bNQ" customClass="ObjectFactory">
+                                                                <rect key="frame" x="552" y="20" width="45" height="74"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <buttonCell key="cell" type="bevel" title="HVcRIO" bezelStyle="regularSquare" image="HVcRIO" imagePosition="above" alignment="center" controlSize="mini" state="on" imageScaling="proportionallyDown" inset="2" id="dyf-7p-7Hk">
+                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                    <font key="font" metaFont="miniSystem"/>
                                                                 </buttonCell>
                                                             </button>
                                                         </subviews>
@@ -3304,6 +3312,7 @@ Relay</string>
         <image name="HV2132Card" width="16" height="128"/>
         <image name="HV4032Off" width="90" height="45"/>
         <image name="HVRamp" width="50" height="42"/>
+        <image name="HVcRIO" width="65.275650024414062" height="83.514434814453125"/>
         <image name="Halo" width="100" height="68"/>
         <image name="HeaderExplorer" width="77" height="83"/>
         <image name="Histo" width="85" height="72"/>
