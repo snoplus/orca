@@ -330,7 +330,7 @@ startIndex=traceStart16;
 	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
 					offset: 9*sizeof(long)					// Offset in bytes (past header words)
 				  unitSize: sizeof(short)					// unit size in bytes
-				startIndex:	startIndex					// first Point Index (past the header offset!!!)
+				startIndex:	startIndex+6					// first Point Index (past the header offset!!!)
 					  mask:	0x0FFF							// when displayed all values will be masked with this value
 			   specialBits:0xF000						
 				  bitNames: [NSArray arrayWithObjects:@"---",@"appPg",@"inhibit", @"trigger",nil]
