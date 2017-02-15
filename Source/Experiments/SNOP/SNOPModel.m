@@ -957,8 +957,8 @@ err:
         [runControl setRunType:pqRun->runType];
     }
     // update run state
-    if (pqRun->valid[kRun_runInProgress]) {
-        [runControl setRunningState:pqRun->runInProgress ? eRunInProgress : eRunStopped];
+    if (pqRun->valid[kRun_runInProgress] && pqRun->runInProgress && [runControl runningState] == eRunStopped) {
+        [runControl setRunningState:eRunInProgress];
     }
 }
 
