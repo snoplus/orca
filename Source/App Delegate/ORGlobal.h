@@ -66,6 +66,7 @@ extern NSString* ORTaskStateName[eMaxTaskState];
 	BOOL    forcedHalt;
 	BOOL	documentWasEdited;
     BOOL    inProductionMode;
+    BOOL    canQuitDuringRun;
 }
 
 + (ORGlobal*) sharedGlobal;
@@ -86,6 +87,7 @@ extern NSString* ORTaskStateName[eMaxTaskState];
 - (BOOL) testInProgress;
 - (BOOL) forcedHalt;
 - (BOOL) inProductionMode;
+- (BOOL) canQuitDuringRun;
 - (void) setInProductionMode:(BOOL)aState;
 - (void) prepareForForcedHalt;
 - (void) setTestInProgress:(BOOL)state;
@@ -98,6 +100,7 @@ extern NSString* ORTaskStateName[eMaxTaskState];
 - (void) checkRunMode;
 - (BOOL) documentWasEdited;
 - (void) setDocumentWasEdited:(BOOL)state;
+- (void) setCanQuitDuringRun:(BOOL)canQuit;
 
 #pragma mark •••Helpers
 - (NSUndoManager*) undoManager;

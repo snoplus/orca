@@ -395,6 +395,7 @@ resync;
 - (void) awakeAfterDocumentLoaded
 {
     [[self findController] refreshStandardRunsAction:nil];
+    [[ORGlobal sharedGlobal] setCanQuitDuringRun:YES];
 }
 
 -(void) initRunMaskHistory
@@ -940,27 +941,25 @@ err:
 
     if (!pqRun) return;
 
-    // update run state
-    if (pqRun->valid[kRun_runInProgress]) {
-        [[ORGlobal sharedGlobal] setRunInProgress:pqRun->runInProgress];
-    }
-
-    NSArray*  runObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    NSArray *runObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runObjects count]){
         NSLogColor([NSColor redColor], @"initRunNumber: couldn't find run control object!");
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
         return;     // (should never happen)
     }
     ORRunModel* runControl = [runObjects objectAtIndex:0];
 
-    // update current run number and type
+    // update current run number
     if (pqRun->valid[kRun_runNumber]) {
         [runControl setRunNumber:pqRun->runNumber];
     }
+    // update run type
     if (pqRun->valid[kRun_runType]) {
         [runControl setRunType:pqRun->runType];
     }
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
+    // update run state
+    if (pqRun->valid[kRun_runInProgress]) {
+        [runControl setRunningState:pqRun->runInProgress ? eRunInProgress : eRunStopped];
+    }
 }
 
 // orca script helper (will come from DB)
