@@ -256,6 +256,7 @@ enum {
     return val;
 }
 
+// get date from database assuming time is a local sudbury time
 // (returns nil if there is no valid date at those coordinates)
 - (NSDate *) getDateAtRow:(int)aRow column:(int)aColumn
 {
@@ -263,7 +264,7 @@ enum {
     if (mResult && aRow<mNumOfRows && aColumn<mNumOfFields) {
         char *pt = PQgetvalue(mResult,aRow,aColumn);
         NSString *val = [NSString stringWithCString:pt encoding:NSASCIIStringEncoding];
-        NSTimeZone *localZone = [NSTimeZone localTimeZone];
+        NSTimeZone *localZone = [NSTimeZone timeZoneWithName:@"America/Toronto"];
         NSDateFormatter *formatter = [[[NSDateFormatter alloc] init] autorelease];
         [formatter setTimeZone:localZone];
         [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss.SSSSSS"];

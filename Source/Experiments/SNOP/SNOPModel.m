@@ -962,6 +962,7 @@ err:
         if (pqRun->valid[kRun_runStartTime]) {
             [runControl setStartTime:pqRun->runStartTime];
         }
+        state = RUNNING;
     }
 }
 
