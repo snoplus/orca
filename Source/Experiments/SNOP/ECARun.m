@@ -494,15 +494,19 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
     BOOL triggersSetOK = TRUE;
 
     for (ORXL3Model *xl3 in anXL3Model) {
-        @try {
-            [xl3 disableTriggers];
+        if([[xl3 xl3Link] isConnected]){
+            @try {
+                [xl3 disableTriggers];
+            }
+            @catch (NSException *exception) {
+                NSLogColor([NSColor redColor], @"ECA: triggers could not be disabled for crate %d \n",[xl3 crateNumber]);
+                triggersSetOK = FALSE;
+            }
         }
-        @catch (NSException *exception) {
-            NSLogColor([NSColor redColor], @"ECA: triggers could not be disabled for crate %d \n",[xl3 crateNumber]);
-            triggersSetOK = FALSE;
+        else{
+            NSLog(@"ECA: triggers could not be disabled for crate %d because XL3 is not connected\n",[xl3 crateNumber]);
         }
     }
-
     return triggersSetOK;
 }
 
@@ -511,15 +515,19 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
     BOOL triggersSetOK = TRUE;
 
     for (ORXL3Model *xl3 in anXL3Model) {
-        @try {
-            [xl3 loadTriggers];
+        if([[xl3 xl3Link] isConnected]){
+            @try {
+                [xl3 loadTriggers];
+            }
+            @catch (NSException *exception) {
+                NSLogColor([NSColor redColor], @"ECA: triggers could not be enabled for crate %d \n",[xl3 crateNumber]);
+                triggersSetOK = FALSE;
+            }
         }
-        @catch (NSException *exception) {
-            NSLogColor([NSColor redColor], @"ECA: triggers could not be enabled for crate %d \n",[xl3 crateNumber]);
-            triggersSetOK = FALSE;
+        else{
+            NSLog(@"ECA: triggers could not be enabled for crate %d because XL3 is not connected\n",[xl3 crateNumber]);
         }
     }
-
     return triggersSetOK;
 }
 
