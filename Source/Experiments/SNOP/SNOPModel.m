@@ -956,9 +956,12 @@ err:
     if (pqRun->valid[kRun_runType]) {
         [runControl setRunType:pqRun->runType];
     }
-    // update run state
+    // update run state and run start time
     if (pqRun->valid[kRun_runInProgress] && pqRun->runInProgress && [runControl runningState] == eRunStopped) {
         [runControl setRunningState:eRunInProgress];
+        if (pqRun->valid[kRun_runStartTime]) {
+            [runControl setStartTime:pqRun->runStartTime];
+        }
     }
 }
 

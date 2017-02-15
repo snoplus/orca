@@ -211,6 +211,7 @@ enum {
     kRun_runNumber,
     kRun_runType,
     kRun_runInProgress,
+    kRun_runStartTime,
     kRun_numDbColumns,
 };
 
@@ -218,6 +219,7 @@ typedef struct {
     uint32_t    runNumber;
     uint32_t    runType;
     uint32_t    runInProgress;
+    NSDate    * runStartTime;
     uint32_t    valid[kRun_numDbColumns];
 } PQ_Run;
 
