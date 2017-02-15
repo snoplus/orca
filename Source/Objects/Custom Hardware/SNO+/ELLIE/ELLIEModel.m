@@ -1398,6 +1398,8 @@ err:
         [fibreArray addObject:@"FS193"];
     } if ([[smellieSettings objectForKey:@"FS293"] intValue] == 1){
         [fibreArray addObject:@"FS293"];
+    } if ([[smellieSettings objectForKey:@"Power Meter"] intValue] == 1){
+        [fibreArray addObject:@"Power Meter"];
     }
     return fibreArray;
 }
