@@ -937,7 +937,7 @@ err:
 
     if (!detDB) return;
 
-    PQ_Run *pqRun = (PQ_Run *)[detDB getRun];
+    PQ_Run *pqRun = [detDB getRun];
 
     if (!pqRun) return;
 
@@ -957,8 +957,13 @@ err:
         [runControl setRunType:pqRun->runType];
     }
     // update run state
-    if (pqRun->valid[kRun_runInProgress]) {
-        [runControl setRunningState:pqRun->runInProgress ? eRunInProgress : eRunStopped];
+    // (use the MTC trigger word instead -- it may be more reliable)
+    //if (pqRun->valid[kRun_runInProgress]) {
+    //    [runControl setRunningState:pqRun->runInProgress ? eRunInProgress : eRunStopped];
+    //}
+    PQ_MTC *pqMTC = [detDB getMTC];
+    if (pqMTC && pqMTC->valid[kMTC_gtMask] && pqMTC->gtMask && [runControl runningState] == eRunStopped) {
+        [runControl setRunningState:eRunInProgress];
     }
 }
 
