@@ -561,8 +561,8 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
 //
     [command autorelease];
     // (funny, but tcmos_tacshift=tac0trim and scmos=tac1trim)
-    //      0     1    2          3           4         5          6          7      8      9              10    11   12            13           14          15        16        17        18         19           20          21          22   23
-    cols = "crate,slot,tr100_mask,tr100_delay,tr20_mask,tr20_width,tr20_delay,vbal_0,vbal_1,tcmos_tacshift,scmos,vthr,pedestal_mask,disable_mask,tdisc_rmpup,tdisc_rmp,tdisc_vsi,tdisc_vli,tcmos_vmax,tcmos_tacref,tcmos_isetm,tcmos_iseta,vint,hvref";
+    //      0     1    2          3           4         5          6          7      8      9              10    11   12            13           14          15        16        17        18         19           20          21          22   23    24   25   26
+    cols = "crate,slot,tr100_mask,tr100_delay,tr20_mask,tr20_width,tr20_delay,vbal_0,vbal_1,tcmos_tacshift,scmos,vthr,pedestal_mask,disable_mask,tdisc_rmpup,tdisc_rmp,tdisc_vsi,tdisc_vli,tcmos_vmax,tcmos_tacref,tcmos_isetm,tcmos_iseta,vint,hvref,mbid,dbid,pmticid";
     command = [[NSString stringWithFormat: @"SELECT %s FROM current_detector_state",cols] retain];
     @try {
         theResult = [pqConnection queryString:command];
@@ -681,6 +681,15 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                             break;
                         case kFEC_hvref:
                             pqFEC->hvref = val;
+                            break;
+                        case kFEC_mbid:
+                            pqFEC->mbid = val;
+                            break;
+                        case kFEC_dbid:
+                            if (ch < kNumDbPerFec) pqFEC->dbid[ch] = val;
+                            break;
+                        case kFEC_pmticid:
+                            pqFEC->pmticid = val;
                             break;
                     }
                 }
