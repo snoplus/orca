@@ -409,6 +409,14 @@
 		4AB9E53D1DE5D955007C75E0 /* ORPQResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 4AB9E5391DE5D955007C75E0 /* ORPQResult.h */; };
 		4AB9E53E1DE5D955007C75E0 /* ORPQResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AB9E53A1DE5D955007C75E0 /* ORPQResult.m */; };
 		4AB9E5401DE5D9DB007C75E0 /* libpq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4AB9E53F1DE5D9DB007C75E0 /* libpq.a */; };
+		543BF2031E5481C3003E4582 /* HVcRIO.nib in Resources */ = {isa = PBXBuildFile; fileRef = 543BF1FB1E5481C3003E4582 /* HVcRIO.nib */; };
+		543BF2041E5481C3003E4582 /* HVcRIO.tif in Resources */ = {isa = PBXBuildFile; fileRef = 543BF1FC1E5481C3003E4582 /* HVcRIO.tif */; };
+		543BF2051E5481C3003E4582 /* ORHVcRIOController.h in Headers */ = {isa = PBXBuildFile; fileRef = 543BF1FD1E5481C3003E4582 /* ORHVcRIOController.h */; };
+		543BF2061E5481C3003E4582 /* ORHVcRIOController.m in Sources */ = {isa = PBXBuildFile; fileRef = 543BF1FE1E5481C3003E4582 /* ORHVcRIOController.m */; };
+		543BF2071E5481C3003E4582 /* ORHVcRIODecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 543BF1FF1E5481C3003E4582 /* ORHVcRIODecoders.h */; };
+		543BF2081E5481C3003E4582 /* ORHVcRIODecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 543BF2001E5481C3003E4582 /* ORHVcRIODecoders.m */; };
+		543BF2091E5481C3003E4582 /* ORHVcRIOModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 543BF2011E5481C3003E4582 /* ORHVcRIOModel.h */; };
+		543BF20A1E5481C3003E4582 /* ORHVcRIOModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 543BF2021E5481C3003E4582 /* ORHVcRIOModel.m */; };
 		546D9DAF0874BDD60072A274 /* 2228A.nib in Resources */ = {isa = PBXBuildFile; fileRef = 546D9DA70874BDD60072A274 /* 2228A.nib */; };
 		546D9DB00874BDD60072A274 /* 2228ACard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 546D9DA80874BDD60072A274 /* 2228ACard.gif */; };
 		546D9DB10874BDD60072A274 /* OR2228AController.h in Headers */ = {isa = PBXBuildFile; fileRef = 546D9DA90874BDD60072A274 /* OR2228AController.h */; };
@@ -4142,6 +4150,14 @@
 		4AB9E5391DE5D955007C75E0 /* ORPQResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORPQResult.h; sourceTree = "<group>"; };
 		4AB9E53A1DE5D955007C75E0 /* ORPQResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORPQResult.m; sourceTree = "<group>"; };
 		4AB9E53F1DE5D9DB007C75E0 /* libpq.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpq.a; path = Libraries/libIntel/libpq.a; sourceTree = SOURCE_ROOT; };
+		543BF1FB1E5481C3003E4582 /* HVcRIO.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = HVcRIO.nib; path = HVcRIO/HVcRIO.nib; sourceTree = "<group>"; };
+		543BF1FC1E5481C3003E4582 /* HVcRIO.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = HVcRIO.tif; path = HVcRIO/HVcRIO.tif; sourceTree = "<group>"; };
+		543BF1FD1E5481C3003E4582 /* ORHVcRIOController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHVcRIOController.h; path = HVcRIO/ORHVcRIOController.h; sourceTree = "<group>"; };
+		543BF1FE1E5481C3003E4582 /* ORHVcRIOController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHVcRIOController.m; path = HVcRIO/ORHVcRIOController.m; sourceTree = "<group>"; };
+		543BF1FF1E5481C3003E4582 /* ORHVcRIODecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHVcRIODecoders.h; path = HVcRIO/ORHVcRIODecoders.h; sourceTree = "<group>"; };
+		543BF2001E5481C3003E4582 /* ORHVcRIODecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHVcRIODecoders.m; path = HVcRIO/ORHVcRIODecoders.m; sourceTree = "<group>"; };
+		543BF2011E5481C3003E4582 /* ORHVcRIOModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHVcRIOModel.h; path = HVcRIO/ORHVcRIOModel.h; sourceTree = "<group>"; };
+		543BF2021E5481C3003E4582 /* ORHVcRIOModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHVcRIOModel.m; path = HVcRIO/ORHVcRIOModel.m; sourceTree = "<group>"; };
 		546D9DA70874BDD60072A274 /* 2228A.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = 2228A.nib; path = Source/Objects/Hardware/Camac/TDC2228A/2228A.nib; sourceTree = SOURCE_ROOT; };
 		546D9DA80874BDD60072A274 /* 2228ACard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = 2228ACard.gif; path = Source/Objects/Hardware/Camac/TDC2228A/2228ACard.gif; sourceTree = SOURCE_ROOT; };
 		546D9DA90874BDD60072A274 /* OR2228AController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OR2228AController.h; path = Source/Objects/Hardware/Camac/TDC2228A/OR2228AController.h; sourceTree = SOURCE_ROOT; };
@@ -7824,6 +7840,21 @@
 				4AB9E53A1DE5D955007C75E0 /* ORPQResult.m */,
 			);
 			path = PostgreSQL;
+			sourceTree = "<group>";
+		};
+		543BF1FA1E548158003E4582 /* HVcRIO */ = {
+			isa = PBXGroup;
+			children = (
+				543BF1FB1E5481C3003E4582 /* HVcRIO.nib */,
+				543BF1FC1E5481C3003E4582 /* HVcRIO.tif */,
+				543BF1FD1E5481C3003E4582 /* ORHVcRIOController.h */,
+				543BF1FE1E5481C3003E4582 /* ORHVcRIOController.m */,
+				543BF1FF1E5481C3003E4582 /* ORHVcRIODecoders.h */,
+				543BF2001E5481C3003E4582 /* ORHVcRIODecoders.m */,
+				543BF2011E5481C3003E4582 /* ORHVcRIOModel.h */,
+				543BF2021E5481C3003E4582 /* ORHVcRIOModel.m */,
+			);
+			name = HVcRIO;
 			sourceTree = "<group>";
 		};
 		546D9DA60874BDD60072A274 /* TDC2228A */ = {
@@ -12208,6 +12239,7 @@
 		84B28D4C0F4C651C00E2B056 /* Internet */ = {
 			isa = PBXGroup;
 			children = (
+				543BF1FA1E548158003E4582 /* HVcRIO */,
 				84E9C348194F42140028B7E2 /* PacFP */,
 				846F313517E8819000A5F1DA /* ApcUps */,
 				848E59101472B34400A70AB4 /* TTCPX400DP */,
@@ -15072,6 +15104,7 @@
 				847F8B35063DB29E00A8597A /* ORTimer.h in Headers */,
 				0F16E3531C493AD7003C9EC9 /* hiredis.h in Headers */,
 				8467E6AC06480F0A00A35E6A /* ORTrigger32Controller.h in Headers */,
+				543BF2091E5481C3003E4582 /* ORHVcRIOModel.h in Headers */,
 				8467E6AE06480F0A00A35E6A /* ORTrigger32Model.h in Headers */,
 				844514860674DF9600A19654 /* ORLC950Controller.h in Headers */,
 				844514880674DF9600A19654 /* ORLC950Data.h in Headers */,
@@ -15478,6 +15511,7 @@
 				84A5CD5B0D464F4600D9833C /* ORFilterController.h in Headers */,
 				84A5CD5D0D464F4600D9833C /* ORFilterModel.h in Headers */,
 				9C2595B00D5172180039C5DF /* ORHashTable.h in Headers */,
+				543BF2071E5481C3003E4582 /* ORHVcRIODecoders.h in Headers */,
 				9C2595B70D5172460039C5DF /* FilterScript.h in Headers */,
 				84FBB5710D5401BD00780DBD /* ORFilterSymbolTable.h in Headers */,
 				8428ADE20D7CACD00093D35E /* ORHeaderExplorerController.h in Headers */,
@@ -15620,6 +15654,7 @@
 				84B28D900F4C66BE00E2B056 /* ORVXMModel.h in Headers */,
 				84B28DA10F4C684200E2B056 /* ORMotorController.h in Headers */,
 				84B28DA30F4C684200E2B056 /* ORMotorDecoders.h in Headers */,
+				543BF2051E5481C3003E4582 /* ORHVcRIOController.h in Headers */,
 				84B28DA50F4C684200E2B056 /* ORMotorModel.h in Headers */,
 				84B28DE30F4C6FED00E2B056 /* ORRamperController.h in Headers */,
 				0F16E33B1C493AD7003C9EC9 /* ivykis.h in Headers */,
@@ -16441,6 +16476,7 @@
 				843A54D807BBE7A500534C27 /* 4ChanTriggerCard.gif in Resources */,
 				84ED49CA07BD244B00B1B9B1 /* 4ChanTrigger.nib in Resources */,
 				84DDEBA207BD3E080060D0B4 /* edu.washington.npl.orca.MultiPlot.plist in Resources */,
+				543BF2031E5481C3003E4582 /* HVcRIO.nib in Resources */,
 				84DDEBA307BD3E080060D0B4 /* MultiPlot.nib in Resources */,
 				8428BC3107CBC05600C53671 /* ORDGF4cDefaultParams.plist in Resources */,
 				84749D1B07D6526F001553EC /* M321.gif in Resources */,
@@ -17159,6 +17195,7 @@
 				432D17EC17820CD500557918 /* AngularComponent.mtl in Resources */,
 				432D17EE17820CDB00557918 /* AngularComponent.obj in Resources */,
 				432D17F117820D0700557918 /* ZComponent.mtl in Resources */,
+				543BF2041E5481C3003E4582 /* HVcRIO.tif in Resources */,
 				432D17F217820D0700557918 /* ZComponent.obj in Resources */,
 				846F313C17E8819000A5F1DA /* ApcUps.nib in Resources */,
 				846F313D17E8819000A5F1DA /* ApcUpsIcon.tif in Resources */,
@@ -17746,6 +17783,7 @@
 				84F46F5B0CA44255007EFADA /* ORKatrinFLTDecoder.m in Sources */,
 				84F46F5E0CA44255007EFADA /* ORKatrinFLTModel.m in Sources */,
 				84F480560CB047C1007EFADA /* ORIpeSLTDecoder.m in Sources */,
+				543BF20A1E5481C3003E4582 /* ORHVcRIOModel.m in Sources */,
 				9CF2C1B90CC195E2002B279B /* ORL8013CrateController.m in Sources */,
 				9CF2C1BB0CC195E2002B279B /* ORL8013CrateModel.m in Sources */,
 				840590EC0CCE5E9C0000DBF3 /* ORLevelMonitor.m in Sources */,
@@ -18076,6 +18114,7 @@
 				8457BE3811B0183500C4082D /* ORSIS3820Decoders.m in Sources */,
 				8457BE3A11B0183500C4082D /* ORSIS3820Model.m in Sources */,
 				8457C2DF11B59DEC00C4082D /* ORCaen785Decoders.m in Sources */,
+				543BF2081E5481C3003E4582 /* ORHVcRIODecoders.m in Sources */,
 				4398E7CD11B81B8B00FC4DDE /* ORCaen775Controller.m in Sources */,
 				4398E7E111B81BBD00FC4DDE /* ORCaen775Decoders.m in Sources */,
 				EF7722B611E813120064A1CF /* ORXL3Model.m in Sources */,
@@ -18204,6 +18243,7 @@
 				840D0ED214BBC56A008FAC82 /* SNOSlowControl.m in Sources */,
 				840D0ED614BBC5DD008FAC82 /* SNODetectorView.m in Sources */,
 				8402B5B614C708A1007999C1 /* ORMJDPreAmpController.m in Sources */,
+				543BF2061E5481C3003E4582 /* ORHVcRIOController.m in Sources */,
 				8402B5B814C708A1007999C1 /* ORMJDPreAmpModel.m in Sources */,
 				848F6CAB14C75F690093E502 /* ORSIS3150Controller.m in Sources */,
 				848F6CAD14C75F690093E502 /* ORSIS3150Model.m in Sources */,
