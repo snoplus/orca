@@ -99,6 +99,8 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 		[initialUserDefaults setObject:[NSNumber numberWithInt:1] forKey:ORPrefPostLogEnabled];
 		[initialUserDefaults setObject:@"" forKey:ORPrefHeartBeatPath];
 
+        //default to using Apple Mail
+        [initialUserDefaults setObject:[NSNumber numberWithBool:0] forKey:ORMailSelectionPreference];
 		
         [defaults registerDefaults:initialUserDefaults];
         initialized = YES;
