@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="15G1217" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
         <development version="5100" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10116"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ORCatalogController">
@@ -64,14 +64,6 @@
                                                 <font key="font" metaFont="system" size="10"/>
                                             </buttonCell>
                                         </button>
-                                        <button toolTip="ORDispatcherModel" id="26415" customClass="ObjectFactory">
-                                            <rect key="frame" x="580" y="157" width="88" height="83"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="bevel" title="Data Broadcaster" bezelStyle="regularSquare" image="Dispatcher" imagePosition="above" alignment="center" state="on" inset="2" id="26416">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system" size="10"/>
-                                            </buttonCell>
-                                        </button>
                                         <button toolTip="ORDataFileModel" id="26417" customClass="ObjectFactory">
                                             <rect key="frame" x="306" y="159" width="77" height="80"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -81,7 +73,7 @@
                                             </buttonCell>
                                         </button>
                                         <button toolTip="ORReplayDataModel" id="26419" customClass="ObjectFactory">
-                                            <rect key="frame" x="399" y="163" width="80" height="70"/>
+                                            <rect key="frame" x="388" y="159" width="80" height="70"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" title="Data Replay" bezelStyle="regularSquare" image="ReplayData" imagePosition="above" alignment="center" state="on" inset="2" id="26420">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -112,10 +104,10 @@
                                                 <font key="font" metaFont="system" size="10"/>
                                             </buttonCell>
                                         </button>
-                                        <button toolTip="ORListenerModel" id="26429" customClass="ObjectFactory">
-                                            <rect key="frame" x="493" y="159" width="93" height="47"/>
+                                        <button toolTip="ORDataPipeModel" id="lzF-YJ-OYs" customClass="ObjectFactory">
+                                            <rect key="frame" x="493" y="149" width="93" height="47"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="bevel" title="Data Listener" bezelStyle="regularSquare" image="Listener" imagePosition="above" alignment="center" state="on" inset="2" id="26430">
+                                            <buttonCell key="cell" type="bevel" title="Data Pipe" bezelStyle="regularSquare" image="DataPipe" imagePosition="above" alignment="center" state="on" inset="2" id="gBS-cd-nuH">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system" size="10"/>
                                             </buttonCell>
@@ -148,6 +140,22 @@
                                             <rect key="frame" x="706" y="153" width="102" height="91"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" title="Remote Run Control" bezelStyle="regularSquare" image="RemoteRunControl" imagePosition="above" alignment="center" state="on" inset="2" id="26422">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system" size="10"/>
+                                            </buttonCell>
+                                        </button>
+                                        <button toolTip="ORDispatcherModel" id="26415" customClass="ObjectFactory">
+                                            <rect key="frame" x="603" y="150" width="88" height="83"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="bevel" title="Data Broadcaster" bezelStyle="regularSquare" image="Dispatcher" imagePosition="above" alignment="center" state="on" inset="2" id="26416">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system" size="10"/>
+                                            </buttonCell>
+                                        </button>
+                                        <button toolTip="ORListenerModel" id="26429" customClass="ObjectFactory">
+                                            <rect key="frame" x="488" y="199" width="93" height="47"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="bevel" title="Data Listener" bezelStyle="regularSquare" image="Listener" imagePosition="above" alignment="center" state="on" inset="2" id="26430">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system" size="10"/>
                                             </buttonCell>
@@ -3288,6 +3296,7 @@ Relay</string>
         <image name="DataExplorer" width="70" height="83"/>
         <image name="DataFile" width="60" height="65"/>
         <image name="DataGen" width="74" height="51"/>
+        <image name="DataPipe" width="75" height="31"/>
         <image name="DataTask" width="120" height="95"/>
         <image name="Dispatcher" width="40" height="57"/>
         <image name="DualPortLAM" width="48" height="16"/>
