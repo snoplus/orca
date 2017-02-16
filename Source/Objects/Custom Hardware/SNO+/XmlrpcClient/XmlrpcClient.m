@@ -87,11 +87,6 @@
                                             returningResponse:&response
                                                         error:&error];
     if(error){
-        NSLog(@"Error with xmlrpc client request\n");
-        NSLog(@"Domain: %@\n", error.domain);
-        NSLog(@"Error Code: %ld\n", (long)error.code);
-        NSLog(@"Description: %@\n", [error localizedDescription]);
-        NSLog(@"Reason: %@\n", [error localizedFailureReason]);
         NSException *excep = [NSException exceptionWithName:@"XmlrpcClient"
                                                      reason:[error localizedDescription]
                                                    userInfo:nil];

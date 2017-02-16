@@ -33,8 +33,19 @@
     float _pulseByPulseDelay;
 
     //Server Clients
+    NSString* _tellieHost;
+    NSString* _telliePort;
+
+    NSString* _smellieHost;
+    NSString* _smelliePort;
+
+    NSString* _interlockHost;
+    NSString* _interlockPort;
+    NSThread* interlockThread;
+
     XmlrpcClient* _tellieClient;
     XmlrpcClient* _smellieClient;
+    XmlrpcClient* _interlockClient;
 
     //tellie settings
     NSMutableDictionary* _tellieSubRunSettings;
@@ -45,7 +56,6 @@
 
     //smellie config mappings
     NSMutableDictionary* _smellieLaserHeadToSepiaMapping;
-    NSMutableDictionary* _smellieLaserHeadToGainMapping;
     NSMutableDictionary* _smellieLaserToInputFibreMapping;
     NSMutableDictionary* _smellieFibreSwitchToFibreMapping;
     NSNumber* _smellieConfigVersionNo;
@@ -71,18 +81,31 @@
 @property (nonatomic,retain) NSMutableArray* smellieSubRunInfo;
 @property (nonatomic,assign) bool smellieDBReadInProgress;
 @property (nonatomic,assign) float pulseByPulseDelay;
+@property (nonatomic,retain) NSString* tellieHost;
+@property (nonatomic,retain) NSString* smellieHost;
+@property (nonatomic,retain) NSString* interlockHost;
+@property (nonatomic,retain) NSString* telliePort;
+@property (nonatomic,retain) NSString* smelliePort;
+@property (nonatomic,retain) NSString* interlockPort;
 @property (nonatomic,retain) XmlrpcClient* tellieClient;
 @property (nonatomic,retain) XmlrpcClient* smellieClient;
-
+@property (nonatomic,retain) XmlrpcClient* interlockClient;
 
 -(id) init;
--(id) initWithCoder:(NSCoder *)aCoder;
+-(id) initWithCoder:(NSCoder*)deoder;
+-(void)encodeWithCoder:(NSCoder*)encoder;
 -(void) setUpImage;
 -(void) makeMainController;
 -(void) wakeUp;
 -(void) sleep;
 -(void) dealloc;
--(void) registerNotificationObservers;
+
+/************************/
+/* SERVER tab Functions */
+/************************/
+-(BOOL)pingTellie;
+-(BOOL)pingSmellie;
+-(BOOL)pingInterlock;
 
 /************************/
 /*   TELLIE Functions   */
@@ -118,14 +141,15 @@
 
 -(void)setSmellieSuperkMasterMode:(NSNumber*)intensity withRepRate:(NSNumber*)rate withWavelengthLow:(NSNumber*)wavelengthLow withWavelengthHi:(NSNumber*)wavelengthHi withFibreInput:(NSNumber*)fibreInChan withFibreOutput:(NSNumber*)fibreOutChan withNPulses:(NSNumber*)noPulses withGainVoltage:(NSNumber *)gain;
 
--(void) sendCustomSmellieCmd:(NSString*)customCmd withArgs:(NSArray*)argsArray;
-
 -(NSMutableArray*)getSmellieRunLaserArray:(NSDictionary*)smellieSettings;
 -(NSMutableArray*)getSmellieRunFibreArray:(NSDictionary*)smellieSettings;
 -(NSMutableArray*)getSmellieRunIntensityArray:(NSDictionary*)smellieSettings forLaser:(NSString*)laser;
 -(NSMutableArray*)getSmellieRunGainArray:(NSDictionary*)smellieSettings forLaser:(NSString*)laser;
 -(NSMutableArray*)getSmellieLowEdgeWavelengthArray:(NSDictionary*)smellieSettings;
 -(void) startSmellieRunInBackground:(NSDictionary*)smellieSettings;
+-(void) activateKeepAlive:(NSNumber *)runNumber;
+-(void) killKeepAlive;
+-(void) pulseKeepAlive:(id)passed;
 -(void) startSmellieRun:(NSDictionary*)smellieSettings;
 -(void) stopSmellieRun;
 
@@ -147,6 +171,7 @@
 - (ORCouchDB*) generalDBRef:(NSString*)aCouchDb;
 - (NSString*) stringDateFromDate:(NSDate*)aDate;
 - (NSString*) stringUnixFromDate:(NSDate*)aDate;
+
 
 @end
 
