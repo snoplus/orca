@@ -1332,7 +1332,7 @@ err:
         @try{
             [[self interlockClient] command:@"send_keepalive"];
         } @catch(NSException* e) {
-            NSLogColor([NSColor redColor], @"[SMELLIE]: Problem sending keep alive to interlock server\n");
+            NSLogColor([NSColor redColor], @"[SMELLIE]: Problem sending keep alive to interlock server, reason: %@\n", [e reason]);
             [self setEllieFireFlag:NO];
             return;
         }
