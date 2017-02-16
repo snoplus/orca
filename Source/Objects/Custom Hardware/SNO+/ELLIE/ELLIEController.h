@@ -139,9 +139,6 @@
 -(NSString*)validateTellieTriggerDelay:(NSString *)currentText;
 -(NSString*)validateTellieNoPulses:(NSString *)currentText;
 
-//-(void)validateTellieGeneralSettings:(NSNotification *)note;
-//-(void)validateTellieExpertSettings:(NSNotification *)note;
-//-(void)tellieRunStarted:(NSNotification *)aNote;
 -(void)tellieRunFinished:(NSNotification *)aNote;
 -(void)initialiseTellie;
 

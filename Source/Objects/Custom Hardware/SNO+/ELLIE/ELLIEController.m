@@ -40,7 +40,8 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
      
         // This is not strictly necessary, but it's a good check of smellie database connectivity.
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            [[anELLIEModel fetchConfigurationFile:[anELLIEModel fetchRecentConfigVersion]] mutableCopy];
+            NSNumber* configVersion = [[anELLIEModel fetchRecentConfigVersion] autorelease];
+            [anELLIEModel fetchConfigurationFile:configVersion];
         });
     
     }
@@ -92,7 +93,7 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 }
 
 - (IBAction) serverSettingsChanged:(id)sender {
-    /* Settings tab changed. Set the model variables in SNOPModel. */
+    /* Settings tab changed. Set the model variables in ELLIEModel. */
     [model setTelliePort:[telliePortTf stringValue]];
     [model setTellieHost:[tellieHostTf stringValue]];
     
@@ -101,10 +102,6 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     
     [model setInterlockPort:[interlockPortTf stringValue]];
     [model setInterlockHost:[interlockHostTf stringValue]];
-    
-    [self telliePing:nil];
-    [self smelliePing:nil];
-    [self interlockPing:nil];
 }
 
 - (void) registerNotificationObservers
@@ -1068,11 +1065,11 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
         NSString* response = [NSString stringWithFormat:@"Connected to tellie at:\n\n%@:%@", [model tellieHost], [model telliePort]];
         [tellieServerResponseTf setStringValue:response];
         [tellieServerResponseTf setBackgroundColor:[NSColor greenColor]];
-        return;
+    } else {
+        NSString* response = [NSString stringWithFormat:@"Could not connect to tellie at:\n\n%@:%@", [model tellieHost], [model telliePort]];
+        [tellieServerResponseTf setStringValue:response];
+        [tellieServerResponseTf setBackgroundColor:[NSColor redColor]];
     }
-    NSString* response = [NSString stringWithFormat:@"Could not connect to tellie at:\n\n%@:%@", [model tellieHost], [model telliePort]];
-    [tellieServerResponseTf setStringValue:response];
-    [tellieServerResponseTf setBackgroundColor:[NSColor redColor]];
     return;
 }
 
@@ -1081,11 +1078,11 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
         NSString* response = [NSString stringWithFormat:@"Connected to smellie at:\n\n%@:%@", [model smellieHost], [model smelliePort]];
         [smellieServerResponseTf setStringValue:response];
         [smellieServerResponseTf setBackgroundColor:[NSColor greenColor]];
-        return;
+    } else {
+        NSString* response = [NSString stringWithFormat:@"Could not connect to smellie at:\n\n%@:%@", [model smellieHost], [model smelliePort]];
+        [smellieServerResponseTf setStringValue:response];
+        [smellieServerResponseTf setBackgroundColor:[NSColor redColor]];
     }
-    NSString* response = [NSString stringWithFormat:@"Could not connect to smellie at:\n\n%@:%@", [model smellieHost], [model smelliePort]];
-    [smellieServerResponseTf setStringValue:response];
-    [smellieServerResponseTf setBackgroundColor:[NSColor redColor]];
     return;
 }
 
@@ -1094,11 +1091,11 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
         NSString* response = [NSString stringWithFormat:@"Connected to interlock at:\n\n%@:%@", [model interlockHost], [model interlockPort]];
         [interlockServerResponseTf setStringValue:response];
         [interlockServerResponseTf setBackgroundColor:[NSColor greenColor]];
-        return;
+    } else {
+        NSString* response = [NSString stringWithFormat:@"Could not connect to interlock at:\n\n%@:%@", [model interlockHost], [model interlockPort]];
+        [interlockServerResponseTf setStringValue:response];
+        [interlockServerResponseTf setBackgroundColor:[NSColor redColor]];
     }
-    NSString* response = [NSString stringWithFormat:@"Could not connect to interlock at:\n\n%@:%@", [model interlockHost], [model interlockPort]];
-    [interlockServerResponseTf setStringValue:response];
-    [interlockServerResponseTf setBackgroundColor:[NSColor redColor]];
     return;
 }
 
