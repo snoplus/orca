@@ -142,24 +142,24 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
         //Settings
         [self setTellieHost:[decoder decodeObjectForKey:@"tellieHost"]];
         [self setTelliePort:[decoder decodeObjectForKey:@"telliePort"]];
-        
+
         [self setSmellieHost:[decoder decodeObjectForKey:@"smellieHost"]];
         [self setSmelliePort:[decoder decodeObjectForKey:@"smelliePort"]];
-        
+
         [self setInterlockHost:[decoder decodeObjectForKey:@"interlockHost"]];
         [self setInterlockPort:[decoder decodeObjectForKey:@"interlockPort"]];
-        
+
         /* Check if we actually decoded the various server hostnames
          * and ports. decodeObjectForKey() will return NULL if the
          * key doesn't exist, and decodeIntForKey() will return 0. */
         if ([self tellieHost] == NULL) [self setTellieHost:@""];
         if ([self smellieHost] == NULL) [self setSmellieHost:@""];
         if ([self interlockHost] == NULL) [self setInterlockHost:@""];
-        
+
         if ([self telliePort] == NULL) [self setTelliePort:@"5030"];
         if ([self smelliePort] == NULL) [self setSmelliePort:@"5020"];
         if ([self interlockPort] == NULL) [self setInterlockPort:@"5021"];
-        
+
         XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:[self tellieHost] withPort:[self telliePort]];
         XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:[self smellieHost] withPort:[self smelliePort]];
         XmlrpcClient* interlockCli = [[XmlrpcClient alloc] initWithHostName:[self interlockHost] withPort:[self interlockPort]];
@@ -604,7 +604,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     //////////
     /// This will likely be run in a thread so set-up an auto release pool
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    
+
     ///////////
     // Make a sting accessable inside err; incase of error.
     NSString* errorString;
@@ -1564,7 +1564,7 @@ err:
     /////////////////////
     // Create and push initial smellie run doc and tell smellie which run we're in
     [self setEllieFireFlag:YES];
-    
+
     if([runControl isRunning]){
 
         @try{
@@ -1909,7 +1909,7 @@ err:
     if (![self smellieDBReadInProgress]) { //killed already
         return;
     }
-    
+
     [self setSmellieDBReadInProgress:NO];
 }
 
@@ -2433,10 +2433,10 @@ err:
 {
     /* Set the port number for the tellie server XMLRPC client. */
     if ([port isEqualToString:[self telliePort]]) return;
-    
+
     _telliePort = port;
     [[self tellieClient] setPort:port];
-    
+
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ELLIEServerSettingsChanged" object:self];
 }
 
@@ -2444,10 +2444,10 @@ err:
 {
     /* Set the port number for the smellie server XMLRPC client. */
     if ([port isEqualToString:[self smelliePort]]) return;
-    
+
     _smelliePort = port;
     [[self smellieClient] setPort:port];
-    
+
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ELLIEServerSettingsChanged" object:self];
 }
 
@@ -2455,10 +2455,10 @@ err:
 {
     /* Set the port number for the interlock server XMLRPC client. */
     if ([port isEqualToString:[self interlockPort]]) return;
-    
+
     _interlockPort = port;
     [[self interlockClient] setPort:port];
-    
+
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ELLIEServerSettingsChanged" object:self];
 }
 
@@ -2466,10 +2466,10 @@ err:
 {
     /* Set the host for the tellie server XMLRPC client. */
     if (host == [self tellieHost]) return;
-    
+
     _tellieHost = host;
     [[self tellieClient] setHost:host];
-    
+
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ELLIEServerSettingsChanged" object:self];
 }
 
@@ -2477,10 +2477,10 @@ err:
 {
     /* Set the host for the smellie server XMLRPC client. */
     if (host == [self smellieHost]) return;
-    
+
     _smellieHost = host;
     [[self smellieClient] setHost:host];
-    
+
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ELLIEServerSettingsChanged" object:self];
 }
 
@@ -2488,10 +2488,10 @@ err:
 {
     /* Set the host for the interlock server XMLRPC client. */
     if (host == [self interlockHost]) return;
-    
+
     _interlockHost = host;
     [[self interlockClient] setHost:host];
-    
+
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ELLIEServerSettingsChanged" object:self];
 }
 

@@ -35,7 +35,7 @@
     //Server Clients
     NSString* _tellieHost;
     NSString* _telliePort;
-    
+
     NSString* _smellieHost;
     NSString* _smelliePort;
 
@@ -46,7 +46,7 @@
     XmlrpcClient* _tellieClient;
     XmlrpcClient* _smellieClient;
     XmlrpcClient* _interlockClient;
-    
+
     //tellie settings
     NSMutableDictionary* _tellieSubRunSettings;
     NSMutableDictionary* _tellieFireParameters;

@@ -84,7 +84,7 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 {
     [tellieHostTf setStringValue:[model tellieHost]];
     [telliePortTf setStringValue:[model telliePort]];
-    
+
     [smellieHostTf setStringValue:[model smellieHost]];
     [smelliePortTf setStringValue:[model smelliePort]];
 
@@ -96,10 +96,10 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     /* Settings tab changed. Set the model variables in ELLIEModel. */
     [model setTelliePort:[telliePortTf stringValue]];
     [model setTellieHost:[tellieHostTf stringValue]];
-    
+
     [model setSmelliePort:[smelliePortTf stringValue]];
     [model setSmellieHost:[smellieHostTf stringValue]];
-    
+
     [model setInterlockPort:[interlockPortTf stringValue]];
     [model setInterlockHost:[interlockHostTf stringValue]];
 }
