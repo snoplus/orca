@@ -49,6 +49,11 @@
 #define  ORPrefHeartBeatPath		@"ORPrefHeartBeatPath"
 #define  ORPrefPostLogEnabled		@"ORPrefPostLogEnabled"
 
+#define ORMailSelectionPreference   @"ORMailSelectionPreference"
+#define ORMailServer                @"ORMailServer"
+#define ORMailAddress               @"ORMailAddress"
+#define ORMailPassword              @"ORMailPassword"
+
 enum {
     straightLines,
     squareLines,
