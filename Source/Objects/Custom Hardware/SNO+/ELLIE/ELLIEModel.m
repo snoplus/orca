@@ -91,8 +91,16 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
 @synthesize smellieRunDoc = _smellieRunDoc;
 @synthesize smellieDBReadInProgress = _smellieDBReadInProgress;
 
+@synthesize tellieHost = _tellieHost;
+@synthesize smellieHost = _smellieHost;
+@synthesize interlockHost = _interlockHost;
+@synthesize telliePort = _telliePort;
+@synthesize smelliePort = _smelliePort;
+@synthesize interlockPort = _interlockPort;
+
 @synthesize tellieClient = _tellieClient;
 @synthesize smellieClient = _smellieClient;
+@synthesize interlockClient = _interlockClient;
 
 @synthesize ellieFireFlag = _ellieFireFlag;
 @synthesize exampleTask = _exampleTask;
@@ -107,33 +115,81 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
 {
     self = [super init];
     if (self){
+    /*
         XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"builder1" withPort:@"5030"];
         XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:@"snodrop" withPort:@"5020"];
+        XmlrpcClient* interlockCli = [[XmlrpcClient alloc] initWithHostName:@"snodrop" withPort:@"5021"];
         [self setTellieClient:tellieCli];
         [self setSmellieClient:smellieCli];
+        [self setInterlockClient:interlockCli];
 
         [[self tellieClient] setTimeout:10];
         [[self smellieClient] setTimeout:360];
+        [[self smellieClient] setTimeout:1];
         [tellieCli release];
         [smellieCli release];
+        [interlockCli release];
+     */
+     }
+    return self;
+}
+
+-(id) initWithCoder:(NSCoder *)decoder
+{
+    self = [super initWithCoder:decoder];
+    if (self){
+        //Settings
+        [self setTellieHost:[decoder decodeObjectForKey:@"tellieHost"]];
+        [self setTelliePort:[decoder decodeObjectForKey:@"telliePort"]];
+
+        [self setSmellieHost:[decoder decodeObjectForKey:@"smellieHost"]];
+        [self setSmelliePort:[decoder decodeObjectForKey:@"smelliePort"]];
+
+        [self setInterlockHost:[decoder decodeObjectForKey:@"interlockHost"]];
+        [self setInterlockPort:[decoder decodeObjectForKey:@"interlockPort"]];
+
+        /* Check if we actually decoded the various server hostnames
+         * and ports. decodeObjectForKey() will return NULL if the
+         * key doesn't exist, and decodeIntForKey() will return 0. */
+        if ([self tellieHost] == NULL) [self setTellieHost:@""];
+        if ([self smellieHost] == NULL) [self setSmellieHost:@""];
+        if ([self interlockHost] == NULL) [self setInterlockHost:@""];
+
+        if ([self telliePort] == NULL) [self setTelliePort:@"5030"];
+        if ([self smelliePort] == NULL) [self setSmelliePort:@"5020"];
+        if ([self interlockPort] == NULL) [self setInterlockPort:@"5021"];
+
+        XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:[self tellieHost] withPort:[self telliePort]];
+        XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:[self smellieHost] withPort:[self smelliePort]];
+        XmlrpcClient* interlockCli = [[XmlrpcClient alloc] initWithHostName:[self interlockHost] withPort:[self interlockPort]];
+
+        [self setTellieClient:tellieCli];
+        [self setSmellieClient:smellieCli];
+        [self setInterlockClient:interlockCli];
+        [[self tellieClient] setTimeout:10];
+        [[self smellieClient] setTimeout:360];
+        [[self interlockClient] setTimeout:1];
+
+        [tellieCli release];
+        [smellieCli release];
+        [interlockCli release];
     }
     return self;
 }
 
--(id) initWithCoder:(NSCoder *)aCoder
+- (void)encodeWithCoder:(NSCoder*)encoder
 {
-    self = [super initWithCoder:aCoder];
-    if (self){
-        XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"builder1" withPort:@"5030"];
-        XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:@"snodrop" withPort:@"5020"];
-        [self setTellieClient:tellieCli];
-        [self setSmellieClient:smellieCli];
-        [[self tellieClient] setTimeout:10];
-        [[self smellieClient] setTimeout:360];
-        [tellieCli release];
-        [smellieCli release];
-    }
-    return self;
+    [super encodeWithCoder:encoder];
+
+    //Settings
+    [encoder encodeObject:[self tellieHost] forKey:@"tellieHost"];
+    [encoder encodeObject:[self telliePort] forKey:@"telliePort"];
+
+    [encoder encodeObject:[self smellieHost] forKey:@"smellieHost"];
+    [encoder encodeObject:[self smelliePort] forKey:@"smelliePort"];
+
+    [encoder encodeObject:[self interlockHost] forKey:@"interlockHost"];
+    [encoder encodeObject:[self interlockPort] forKey:@"interlockPort"];
 }
 
 - (void) setUpImage
@@ -171,29 +227,21 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     [_smellieRunHeaderDocList release];
     [_smellieSubRunInfo release];
     
-    //Server Clients
+    // Server Clients
     [_tellieClient release];
     [_smellieClient release];
     
-    //tellie settings
+    // tellie settings
     [_tellieSubRunSettings release];
     [_tellieFireParameters release];
     [_tellieFibreMapping release];
     
-    //smellie config mappings
+    // smellie config mappings
     [_smellieLaserHeadToSepiaMapping release];
-    [_smellieLaserHeadToGainMapping release];
     [_smellieLaserToInputFibreMapping release];
     [_smellieFibreSwitchToFibreMapping release];
     [_smellieConfigVersionNo release];
     [super dealloc];
-}
-
-- (void) registerNotificationObservers
-{
-     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    //we don't want this notification
-	[notifyCenter removeObserver:self name:NSWindowDidResignKeyNotification object:nil];
 }
 
 /*********************************************************/
@@ -555,7 +603,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     //////////
     /// This will likely be run in a thread so set-up an auto release pool
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    
+
     ///////////
     // Make a sting accessable inside err; incase of error.
     NSString* errorString;
@@ -705,7 +753,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     ///////////////
     // Fire loop! Pass variables to the tellie server.
     for(int i = 0; i<[loops integerValue]; i++){
-        if([self ellieFireFlag] == NO || [[NSThread currentThread] isCancelled] == YES){
+        if(![self ellieFireFlag] || [[NSThread currentThread] isCancelled]){
             //errorString = @"ELLIE fire flag set to @NO";
             goto err;
         }
@@ -1234,25 +1282,62 @@ err:
     [[self smellieClient] command:@"superk_master_mode" withArgs:args];
 }
 
-
--(void)sendCustomSmellieCmd:(NSString*)customCmd withArgs:(NSArray*)argsArray
-{
-    [[self smellieClient] command:customCmd withArgs:argsArray];
-}
-
-
-//complete this after the smellie documents have been recieved
--(void) smellieDocumentsRecieved
+-(void)activateKeepAlive:(NSNumber *)runNumber
 {
     /*
-     Update smeillieDBReadInProgress property bool.
+     Start a thread to constantly send a keep alive signal to the smellie interlock server
      */
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(smellieDocumentsRecieved) object:nil];
-    if (![self smellieDBReadInProgress]) { //killed already
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    NSArray* args = @[runNumber];
+    @try {
+        [[self interlockClient] command:@"new_run" withArgs:args];
+        [[self interlockClient] command:@"set_arm"];
+    }
+    @catch (NSException *e) {
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Problem activating interlock server, reason: %@\n", [e reason]);
+        [self setEllieFireFlag:NO];
+        [pool release];
         return;
     }
-    
-    [self setSmellieDBReadInProgress:NO];
+    interlockThread = [[NSThread alloc] initWithTarget:self selector:@selector(pulseKeepAlive:) object:nil];
+    [interlockThread start];
+    [pool release];
+}
+
+-(void)killKeepAlive
+{
+    /*
+     Stop pulsing the keep alive and disarm the interlock
+    */
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    [interlockThread cancel];
+    @try {
+        [[self interlockClient] command:@"set_disarm"];
+    }
+    @catch (NSException *e) {
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Problem disarming interlock server, reason: %@\n", [e reason]);
+    }
+    [self setEllieFireFlag:NO];
+    NSLog(@"[SMELLIE]: Smellie laser interlock server disarmed\n");
+    [pool release];
+}
+
+-(void)pulseKeepAlive:(id)passed
+{
+    /*
+     A fuction to be run in a thread, continually sending keep alive pulses to the interlock server
+    */
+    while (![interlockThread isCancelled]) {
+        @try{
+            [[self interlockClient] command:@"send_keepalive"];
+        } @catch(NSException* e) {
+            NSLogColor([NSColor redColor], @"[SMELLIE]: Problem sending keep alive to interlock server, reason: %@\n", [e reason]);
+            [self setEllieFireFlag:NO];
+            return;
+        }
+        [NSThread sleepForTimeInterval:0.05];
+    }
+    NSLog(@"[SMELLIE]: Stopped sending keep-alive to interlock server\n");
 }
 
 -(void)startSmellieRunInBackground:(NSDictionary*)smellieSettings
@@ -1312,6 +1397,8 @@ err:
         [fibreArray addObject:@"FS193"];
     } if ([[smellieSettings objectForKey:@"FS293"] intValue] == 1){
         [fibreArray addObject:@"FS293"];
+    } if ([[smellieSettings objectForKey:@"Power Meter"] intValue] == 1){
+        [fibreArray addObject:@"Power Meter"];
     }
     return fibreArray;
 }
@@ -1320,7 +1407,6 @@ err:
 {
     //Read data
     int wavelengthLow = [[smellieSettings objectForKey:@"superK_wavelength_start"] intValue];
-    //int bandwidth = [[smellieSettings objectForKey:@"superK_wavelength_bandwidth"] intValue];
     int stepSize = [[smellieSettings objectForKey:@"superK_wavelength_step_length"] intValue];
     float noSteps = [[smellieSettings objectForKey:@"superK_wavelength_no_steps"] floatValue];
     
@@ -1476,7 +1562,16 @@ err:
     
     /////////////////////
     // Create and push initial smellie run doc and tell smellie which run we're in
+    [self setEllieFireFlag:YES];
+
     if([runControl isRunning]){
+        @try{
+            [self activateKeepAlive:[NSNumber numberWithUnsignedLong:[runControl runNumber]]];
+        } @catch(NSException* e) {
+            NSLogColor([NSColor redColor], @"[SMELLIE]: Problem activating interlock server: %@\n", [e reason]);
+            goto err;
+        }
+
         @try{
             [self setSmellieNewRun:[NSNumber numberWithUnsignedLong:[runControl runNumber]]];
         } @catch(NSException* e) {
@@ -1497,7 +1592,7 @@ err:
     // laser loop
     //
     for(NSString* laserKey in laserArray){
-        if(([[NSThread currentThread] isCancelled])){
+        if([self ellieFireFlag] == NO || [[NSThread currentThread] isCancelled]){
             NSLogColor([NSColor redColor], @"[SMELLIE]: thread has been cancelled, killing sequence.\n");
             goto err;
         }
@@ -1524,7 +1619,7 @@ err:
         // Fibre loop
         //
         for(NSString* fibreKey in fibreArray){
-            if(([[NSThread currentThread] isCancelled])){
+            if([self ellieFireFlag] == NO || [[NSThread currentThread] isCancelled]){
                 NSLogColor([NSColor redColor], @"[SMELLIE]: thread has been cancelled, killing sequence.\n");
                 goto err;
             }
@@ -1537,7 +1632,7 @@ err:
             // Wavelength loop
             //
             for(NSNumber* wavelength in lowEdgeWavelengthArray){
-                if(([[NSThread currentThread] isCancelled])){
+                if([self ellieFireFlag] == NO || [[NSThread currentThread] isCancelled]){
                     NSLogColor([NSColor redColor], @"[SMELLIE]: thread has been cancelled, killing sequence.\n");
                     goto err;
                 }
@@ -1559,7 +1654,7 @@ err:
                 // Intensity loop
                 //
                 for(NSNumber* intensity in intensityArray){
-                    if(([[NSThread currentThread] isCancelled])){
+                    if([self ellieFireFlag] == NO || [[NSThread currentThread] isCancelled]){
                         NSLogColor([NSColor redColor], @"[SMELLIE]: thread has been cancelled, killing sequence.\n");
                         goto err;
                     }
@@ -1571,7 +1666,7 @@ err:
                     // Gain loop
                     //
                     for(NSNumber* gain in gainArray){
-                        if(([[NSThread currentThread] isCancelled])){
+                        if([self ellieFireFlag] == NO || [[NSThread currentThread] isCancelled]){
                             NSLogColor([NSColor redColor], @"[SMELLIE]: thread has been cancelled, killing sequence.\n");
                             goto err;
                         }
@@ -1647,7 +1742,7 @@ err:
                             // hardware is properly set
                             // before TUBii sends triggers
                             
-                            //Set tubii up for sending correct triggers
+                            //Set up tubii to send triggers
                             @try{
                                 //Fire trigger pulses!
                                 [theTubiiModel fireSmelliePulser_rate:[rate floatValue] pulseWidth:100e-9 NPulses:numOfPulses];
@@ -1761,6 +1856,9 @@ err:
     ///////////
     // This could be run in a thread, so set-up an auto release pool
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+
+    // Kill the keepalive
+    [self killKeepAlive];
     
     //Get a Tubii object
     NSArray*  tubiiModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
@@ -1797,6 +1895,20 @@ err:
     [self setSmellieDBReadInProgress:YES];
     // Is there a better way to do this... Do we know it's received after the delay?
     [self performSelector:@selector(smellieDocumentsRecieved) withObject:nil afterDelay:10.0];
+}
+
+//complete this after the smellie documents have been recieved
+-(void) smellieDocumentsRecieved
+{
+    /*
+     Update smeillieDBReadInProgress property bool.
+     */
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(smellieDocumentsRecieved) object:nil];
+    if (![self smellieDBReadInProgress]) { //killed already
+        return;
+    }
+
+    [self setSmellieDBReadInProgress:NO];
 }
 
 -(void) smellieDBpush:(NSMutableDictionary*)dbDic
@@ -2311,5 +2423,109 @@ err:
 
     return result;
 }
+
+/****************************************/
+/*            Server settings           */
+/****************************************/
+- (void) setTelliePort: (NSString*) port
+{
+    /* Set the port number for the tellie server XMLRPC client. */
+    if ([port isEqualToString:[self telliePort]]) return;
+
+    _telliePort = port;
+    [[self tellieClient] setPort:port];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ELLIEServerSettingsChanged" object:self];
+}
+
+- (void) setSmelliePort: (NSString*) port
+{
+    /* Set the port number for the smellie server XMLRPC client. */
+    if ([port isEqualToString:[self smelliePort]]) return;
+
+    _smelliePort = port;
+    [[self smellieClient] setPort:port];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ELLIEServerSettingsChanged" object:self];
+}
+
+- (void) setInterlockPort: (NSString*) port
+{
+    /* Set the port number for the interlock server XMLRPC client. */
+    if ([port isEqualToString:[self interlockPort]]) return;
+
+    _interlockPort = port;
+    [[self interlockClient] setPort:port];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ELLIEServerSettingsChanged" object:self];
+}
+
+- (void) setTellieHost: (NSString*) host
+{
+    /* Set the host for the tellie server XMLRPC client. */
+    if (host == [self tellieHost]) return;
+
+    _tellieHost = host;
+    [[self tellieClient] setHost:host];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ELLIEServerSettingsChanged" object:self];
+}
+
+- (void) setSmellieHost: (NSString*) host
+{
+    /* Set the host for the smellie server XMLRPC client. */
+    if (host == [self smellieHost]) return;
+
+    _smellieHost = host;
+    [[self smellieClient] setHost:host];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ELLIEServerSettingsChanged" object:self];
+}
+
+- (void) setInterlockHost: (NSString*) host
+{
+    /* Set the host for the interlock server XMLRPC client. */
+    if (host == [self interlockHost]) return;
+
+    _interlockHost = host;
+    [[self interlockClient] setHost:host];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ELLIEServerSettingsChanged" object:self];
+}
+
+-(BOOL)pingTellie
+{
+    @try{
+        [[self tellieClient] command:@"test"];
+    } @catch(NSException* e) {
+        NSLogColor([NSColor redColor], @"Could not ping tellie server, reason: %@\n", [e reason]);
+        return NO;
+    }
+    return YES;
+}
+
+-(BOOL)pingSmellie
+{
+    @try{
+        [[self smellieClient] command:@"is_connected"];
+    } @catch(NSException* e) {
+        NSLogColor([NSColor redColor], @"Could not ping smellie server, reason: %@\n", [e reason]);
+        return NO;
+    }
+    return YES;
+}
+
+-(BOOL)pingInterlock
+{
+    @try{
+        [[self interlockClient] command:@"is_connected"];
+    } @catch(NSException* e) {
+        NSLogColor([NSColor redColor], @"Could not ping interlock server, reason: %@\n", [e reason]);
+        return NO;
+    }
+    return YES;
+}
+
+
 
 @end
