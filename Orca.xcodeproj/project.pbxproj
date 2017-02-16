@@ -1648,6 +1648,14 @@
 		846799570694B82200DF8B2A /* NcdThresholdTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 846799540694B82200DF8B2A /* NcdThresholdTask.h */; };
 		846799580694B82200DF8B2A /* NcdThresholdTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 846799550694B82200DF8B2A /* NcdThresholdTask.m */; };
 		846799590694B82200DF8B2A /* NcdThresholdTask.nib in Resources */ = {isa = PBXBuildFile; fileRef = 846799560694B82200DF8B2A /* NcdThresholdTask.nib */; };
+		8467DE421E4E631900DDF735 /* DataPipe.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8467DE3A1E4E631900DDF735 /* DataPipe.nib */; };
+		8467DE431E4E631900DDF735 /* DataPipe.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8467DE3B1E4E631900DDF735 /* DataPipe.tif */; };
+		8467DE461E4E631900DDF735 /* ORDataPipeController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8467DE3E1E4E631900DDF735 /* ORDataPipeController.h */; };
+		8467DE471E4E631900DDF735 /* ORDataPipeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8467DE3F1E4E631900DDF735 /* ORDataPipeController.m */; };
+		8467DE481E4E631900DDF735 /* ORDataPipeModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8467DE401E4E631900DDF735 /* ORDataPipeModel.h */; };
+		8467DE491E4E631900DDF735 /* ORDataPipeModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8467DE411E4E631900DDF735 /* ORDataPipeModel.m */; };
+		8467DE6A1E525EF800DDF735 /* Mail.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8467DE691E525EF800DDF735 /* Mail.tif */; };
+		8467DE6C1E534C2D00DDF735 /* sendMail.py in Resources */ = {isa = PBXBuildFile; fileRef = 8467DE6B1E534C2D00DDF735 /* sendMail.py */; };
 		8467E6AC06480F0A00A35E6A /* ORTrigger32Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 8467E6A506480F0A00A35E6A /* ORTrigger32Controller.h */; };
 		8467E6AD06480F0A00A35E6A /* ORTrigger32Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 8467E6A606480F0A00A35E6A /* ORTrigger32Controller.m */; };
 		8467E6AE06480F0A00A35E6A /* ORTrigger32Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8467E6A706480F0A00A35E6A /* ORTrigger32Model.h */; };
@@ -5171,6 +5179,14 @@
 		846799540694B82200DF8B2A /* NcdThresholdTask.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = NcdThresholdTask.h; sourceTree = "<group>"; };
 		846799550694B82200DF8B2A /* NcdThresholdTask.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = NcdThresholdTask.m; sourceTree = "<group>"; };
 		846799560694B82200DF8B2A /* NcdThresholdTask.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = NcdThresholdTask.nib; sourceTree = "<group>"; };
+		8467DE3A1E4E631900DDF735 /* DataPipe.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = DataPipe.nib; sourceTree = "<group>"; };
+		8467DE3B1E4E631900DDF735 /* DataPipe.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = DataPipe.tif; sourceTree = "<group>"; };
+		8467DE3E1E4E631900DDF735 /* ORDataPipeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORDataPipeController.h; sourceTree = "<group>"; };
+		8467DE3F1E4E631900DDF735 /* ORDataPipeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORDataPipeController.m; sourceTree = "<group>"; };
+		8467DE401E4E631900DDF735 /* ORDataPipeModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORDataPipeModel.h; sourceTree = "<group>"; };
+		8467DE411E4E631900DDF735 /* ORDataPipeModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORDataPipeModel.m; sourceTree = "<group>"; };
+		8467DE691E525EF800DDF735 /* Mail.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Mail.tif; sourceTree = "<group>"; };
+		8467DE6B1E534C2D00DDF735 /* sendMail.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = sendMail.py; sourceTree = "<group>"; };
 		8467E6A506480F0A00A35E6A /* ORTrigger32Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORTrigger32Controller.h; sourceTree = "<group>"; };
 		8467E6A606480F0A00A35E6A /* ORTrigger32Controller.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORTrigger32Controller.m; sourceTree = "<group>"; };
 		8467E6A706480F0A00A35E6A /* ORTrigger32Model.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORTrigger32Model.h; sourceTree = "<group>"; };
@@ -9515,6 +9531,7 @@
 				84CF3B2305E6B60700C5C320 /* Appearance.tif */,
 				84C859040665624C00FBAF9C /* Bugs.tif */,
 				840B20C50B4D7CE80021220C /* Editing.tif */,
+				8467DE691E525EF800DDF735 /* Mail.tif */,
 				843CDEDC03BE307400C39F5F /* ORPreferences.nib */,
 			);
 			name = Preferences;
@@ -10169,6 +10186,19 @@
 			name = ThresholdTask;
 			path = Source/Experiments/Ncd/ThresholdTask;
 			sourceTree = SOURCE_ROOT;
+		};
+		8467DE391E4E631900DDF735 /* DataPipe */ = {
+			isa = PBXGroup;
+			children = (
+				8467DE3A1E4E631900DDF735 /* DataPipe.nib */,
+				8467DE3B1E4E631900DDF735 /* DataPipe.tif */,
+				8467DE3E1E4E631900DDF735 /* ORDataPipeController.h */,
+				8467DE3F1E4E631900DDF735 /* ORDataPipeController.m */,
+				8467DE401E4E631900DDF735 /* ORDataPipeModel.h */,
+				8467DE411E4E631900DDF735 /* ORDataPipeModel.m */,
+			);
+			path = DataPipe;
+			sourceTree = "<group>";
 		};
 		8467E6A406480F0A00A35E6A /* Trigger32 */ = {
 			isa = PBXGroup;
@@ -10916,6 +10946,7 @@
 				84E743430DAD5EEF0099CAEE /* ORMailer.m */,
 				848E3BC609DB0B3E0003F7A2 /* ORMailCenter.h */,
 				848E3BC709DB0B3E0003F7A2 /* ORMailCenter.m */,
+				8467DE6B1E534C2D00DDF735 /* sendMail.py */,
 				848E3BC809DB0B3E0003F7A2 /* MailCenter.nib */,
 			);
 			name = MailCenter;
@@ -12109,6 +12140,7 @@
 				84C6071103C25C5E005F64B1 /* Data Objects */,
 				84C6072003C25C9F005F64B1 /* Histogram Objects */,
 				84A5CD520D464F4600D9833C /* Filter */,
+				8467DE391E4E631900DDF735 /* DataPipe */,
 				84B51975191D285A003A580B /* Burst Monitor */,
 			);
 			name = "Data Processing";
@@ -15632,6 +15664,7 @@
 				840D56E20F39E9BF00F9A274 /* ORPacDecoders.h in Headers */,
 				840D56E40F39E9BF00F9A274 /* ORPacModel.h in Headers */,
 				84B28CE00F4C597900E2B056 /* ORBocTIC3Controller.h in Headers */,
+				8467DE481E4E631900DDF735 /* ORDataPipeModel.h in Headers */,
 				84B28CE20F4C597900E2B056 /* ORBocTIC3Decoders.h in Headers */,
 				84B28CE40F4C597900E2B056 /* ORBocTIC3Model.h in Headers */,
 				84B28CFA0F4C5DBB00E2B056 /* ORAmi286Controller.h in Headers */,
@@ -16045,6 +16078,7 @@
 				84BBE099153CB5110084E6B1 /* ORTPG256ADecoders.h in Headers */,
 				84BBE09B153CB5110084E6B1 /* ORTPG256AModel.h in Headers */,
 				84F3085215483A4000663573 /* ORMks660BController.h in Headers */,
+				8467DE461E4E631900DDF735 /* ORDataPipeController.h in Headers */,
 				84F3085415483A4000663573 /* ORMks660BDecoders.h in Headers */,
 				84F3085615483A4000663573 /* ORMks660BModel.h in Headers */,
 				8418301D156153D2004EC81F /* ORTM700Controller.h in Headers */,
@@ -16394,6 +16428,7 @@
 				84C5332A0652BA6B00E4731F /* MainMenu.nib in Resources */,
 				84C859050665624C00FBAF9C /* Bugs.tif in Resources */,
 				844514840674DF9600A19654 /* LC950Oscilloscope.gif in Resources */,
+				8467DE6A1E525EF800DDF735 /* Mail.tif in Resources */,
 				844514850674DF9600A19654 /* ORLC950.nib in Resources */,
 				844567220687A7C80055DDFA /* IP320.gif in Resources */,
 				844567230687A7C80055DDFA /* IP320.nib in Resources */,
@@ -16510,6 +16545,7 @@
 				848627AA08E4A6FD00301049 /* Dispatcher.tif in Resources */,
 				848627AC08E4A9F900301049 /* Listener.tif in Resources */,
 				848627AE08E4B5EB00301049 /* GpibEnetBox.tif in Resources */,
+				8467DE421E4E631900DDF735 /* DataPipe.nib in Resources */,
 				848627B308E4BC4800301049 /* HPPulserIcon.tif in Resources */,
 				848629CE08E4C4CA00301049 /* OrcaLeft.tif in Resources */,
 				848629CF08E4C4CA00301049 /* OrcaRight.tif in Resources */,
@@ -16858,6 +16894,7 @@
 				844484D10F8FB2B60013E933 /* ZupRampItem.nib in Resources */,
 				84098F5C0F964F0100036BE8 /* PDcu.nib in Resources */,
 				84098F5D0F964F0100036BE8 /* PDcu.tif in Resources */,
+				8467DE6C1E534C2D00DDF735 /* sendMail.py in Resources */,
 				84098F6F0F96589B00036BE8 /* Turbo.gif in Resources */,
 				84BC89C20F9CE75F00336DF1 /* SerialPortControls.nib in Resources */,
 				84CD6BF51A1E34D90089026F /* Gretina4ACard.gif in Resources */,
@@ -17135,6 +17172,7 @@
 				84F3085115483A4000663573 /* Mks660B.tif in Resources */,
 				84183023156153D2004EC81F /* TM700.nib in Resources */,
 				84183024156153D2004EC81F /* TM700.tif in Resources */,
+				8467DE431E4E631900DDF735 /* DataPipe.tif in Resources */,
 				8418481D157FA478004EC81F /* CV830.gif in Resources */,
 				8418481E157FA478004EC81F /* CV830.nib in Resources */,
 				8471D47D1588DF3C0039894D /* RemoteSocket.nib in Resources */,
@@ -17371,6 +17409,7 @@
 				8434A31A055B3287002D3102 /* ORGpibDeviceModel.m in Sources */,
 				8434A31B055B3287002D3102 /* ORHPPulserModel.m in Sources */,
 				8434A31C055B3287002D3102 /* Utilities.m in Sources */,
+				8467DE471E4E631900DDF735 /* ORDataPipeController.m in Sources */,
 				8434A31D055B3287002D3102 /* OROscBaseController.m in Sources */,
 				8434A31E055B3287002D3102 /* ORHPPulserController.m in Sources */,
 				8434A31F055B3287002D3102 /* ORTek754DData.m in Sources */,
@@ -17999,6 +18038,7 @@
 				84D7913E0FFA4CD000DC81D2 /* ORKeithley6487Controller.m in Sources */,
 				84D791400FFA4CD000DC81D2 /* ORKeithley6487Decoders.m in Sources */,
 				84D791420FFA4CD000DC81D2 /* ORKeithley6487Model.m in Sources */,
+				8467DE491E4E631900DDF735 /* ORDataPipeModel.m in Sources */,
 				84D29FE41843EAC800D320DB /* ORRemoteSocketStep.m in Sources */,
 				84AFC24E1029F35E009F4139 /* ORVHQ224LController.m in Sources */,
 				84AFC2501029F35E009F4139 /* ORVHQ224LDecoders.m in Sources */,
