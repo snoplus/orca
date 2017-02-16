@@ -171,6 +171,7 @@
 @property (nonatomic,assign) bool resync;
 
 - (id) init;
+- (void) awakeAfterDocumentLoaded;
 
 - (void) setMTCPort: (int) port;
 - (int) mtcPort;
@@ -218,6 +219,7 @@
 
 - (void) subRunStarted:(NSNotification*)aNote;
 - (void) subRunEnded:(NSNotification*)aNote;
+- (void) detectorStateChanged:(NSNotification*)aNote;
 
 - (void) updateEPEDStructWithCoarseDelay: (unsigned long) coarseDelay
                                fineDelay: (unsigned long) fineDelay

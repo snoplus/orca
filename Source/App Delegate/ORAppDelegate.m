@@ -587,10 +587,10 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
     BOOL documentIsOpen = [[NSApp orderedDocuments] count]>0;
     SEL theAction = [menuItem action];
     if(theAction == @selector(terminate:)){
-        return ![[ORGlobal sharedGlobal] runInProgress];
+        return [[ORGlobal sharedGlobal] canQuitDuringRun] || ![[ORGlobal sharedGlobal] runInProgress];
     }
     if(theAction == @selector(performClose:)){
-        return ![[ORGlobal sharedGlobal] runInProgress];
+        return [[ORGlobal sharedGlobal] canQuitDuringRun] || ![[ORGlobal sharedGlobal] runInProgress];
     }
     if(theAction == @selector(newDocument:)){
         return documentIsOpen ? NO : YES;

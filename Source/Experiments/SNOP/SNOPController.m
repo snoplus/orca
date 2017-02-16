@@ -437,7 +437,7 @@ snopGreenColor;
 {
     NSString* standardRun = [model standardRunType];
     if([standardRunPopupMenu numberOfItems] == 0 || standardRun == nil || [standardRun isEqualToString:@""]){
-        NSLogColor([NSColor redColor],@"Please refresh the Standard Runs DB. \n");
+        //NSLogColor([NSColor redColor],@"Please refresh the Standard Runs DB. \n");
         return;
     }
     if([standardRunPopupMenu indexOfItemWithObjectValue:standardRun] == NSNotFound){
@@ -456,7 +456,7 @@ snopGreenColor;
 {
     NSString* standardRunVersion = [model standardRunVersion];
     if([standardRunVersionPopupMenu numberOfItems] == 0 || standardRunVersion == nil || [standardRunVersion isEqualToString:@""]){
-        NSLogColor([NSColor redColor],@"Please refresh the Standard Runs DB. \n",standardRunVersion);
+        //NSLogColor([NSColor redColor],@"Please refresh the Standard Runs DB. \n",standardRunVersion);
         return;
     }
     if([standardRunVersionPopupMenu indexOfItemWithObjectValue:standardRunVersion] == NSNotFound){
@@ -1959,7 +1959,7 @@ snopGreenColor;
     NSDictionary *standardRunTypes = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
     //JSON formatting error
     if (error != nil) {
-        NSLogColor([NSColor redColor], @"Error converting JSON response from "
+        NSLogColor([NSColor redColor], @"Error reading standard runs from "
                    "database: %@\n", [error localizedDescription]);
         [model setStandardRunType:@""];
         [model setStandardRunVersion:@""];
@@ -2035,7 +2035,7 @@ snopGreenColor;
 
     //JSON formatting error
     if (error != nil) {
-        NSLogColor([NSColor redColor], @"Error converting JSON response from "
+        NSLogColor([NSColor redColor], @"Error reading standard runs from "
                    "database: %@\n", [error localizedDescription]);
         [model setStandardRunVersion:@""];
         return;

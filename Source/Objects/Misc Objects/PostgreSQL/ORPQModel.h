@@ -213,6 +213,23 @@ typedef struct {
     uint32_t    valid[kCAEN_numDbColumns];
 } PQ_CAEN;
 
+// indices for PQ_RUN valid flags
+enum {
+    kRun_runNumber,
+    kRun_runType,
+    kRun_runInProgress,
+    kRun_runStartTime,
+    kRun_numDbColumns,
+};
+
+typedef struct {
+    uint32_t    runNumber;
+    uint32_t    runType;
+    uint32_t    runInProgress;
+    NSDate    * runStartTime;
+    uint32_t    valid[kRun_numDbColumns];
+} PQ_Run;
+
 //----------------------------------------------------------------------------------------------------
 @interface ORPQDetectorDB : NSMutableData
 {
@@ -224,6 +241,7 @@ typedef struct {
     int         crateLoaded;    // number of crates loaded from db
     int         mtcLoaded;      // 1 if MTC settings were loaded from db
     int         caenLoaded;     // 1 if CAEN settings were loaded from db
+    int         runLoaded;      // 1 if run state was loaded from db
 }
 
 - (id)          init;
@@ -233,6 +251,7 @@ typedef struct {
 - (PQ_Crate *)  getCrate:(int)aCrate;
 - (PQ_MTC *)    getMTC;
 - (PQ_CAEN *)   getCAEN;
+- (PQ_Run *)    getRun;
 
 @end
 //----------------------------------------------------------------------------------------------------
@@ -258,6 +277,7 @@ typedef struct {
 #pragma mark ***Initialization
 - (id)   init;
 - (void) dealloc;
+- (void) awakeAfterDocumentLoaded;
 
 #pragma mark ***Notifications
 - (void) registerNotificationObservers;

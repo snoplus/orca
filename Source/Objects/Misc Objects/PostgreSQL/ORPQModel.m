@@ -420,7 +420,7 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
     self = [super init];
     // this may look a bit odd, but calculating the size like this will account for
     // any padding the compiler may add between the structures
-    int len = (int)((PQ_CAEN *)((PQ_MTC *)((PQ_Crate *)((PQ_FEC *)0 + kSnoCardsTotal) + kSnoCrates) + 1) + 1);
+    int len = (int)((PQ_Run *)((PQ_CAEN *)((PQ_MTC *)((PQ_Crate *)((PQ_FEC *)0 + kSnoCardsTotal) + kSnoCrates) + 1) + 1) + 1);
     data = [[[NSMutableData alloc] initWithLength:len] retain];
     return self;
 }
@@ -460,6 +460,12 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
 {
     if (!caenLoaded) return nil;
     return (PQ_CAEN *)((PQ_MTC *)((PQ_Crate *)((PQ_FEC *)[data mutableBytes] + kSnoCardsTotal) + kSnoCrates) + 1);
+}
+
+- (PQ_Run *) getRun
+{
+    if (!runLoaded) return nil;
+    return (PQ_Run *)((PQ_CAEN *)((PQ_MTC *)((PQ_Crate *)((PQ_FEC *)[data mutableBytes] + kSnoCardsTotal) + kSnoCrates) + 1) + 1);
 }
 
 @end
@@ -918,6 +924,65 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
                             break;
                     }
                 }
+            }
+        }
+    }
+//
+// load run state
+//
+    [command autorelease];
+    command = [[NSString stringWithFormat: @"SELECT run_type,timestamp,end_timestamp FROM run_state WHERE run=(SELECT last_value FROM run_number)"] retain];
+    @try {
+        theResult = [pqConnection queryString:command];
+    }
+    @catch (NSException* e) {
+        theResult = nil;
+    }
+    if ([self isCancelled]) return nil;
+    if (theResult) {
+        int numRows = [theResult numOfRows];
+        int numCols = [theResult numOfFields];
+        if (numRows != 1 || numCols != 3) {
+            NSLogColor([NSColor redColor], @"Error getting run state from database\n");
+        } else {
+            detDB->runLoaded = 1;
+            PQ_Run *pqRun = [detDB getRun];
+            int64_t run_type = [theResult getInt64atRow:0 column:0];
+            // (don't try to set run state unless run type is valid)
+            if (run_type != kPQBadValue) {
+                pqRun->runType = run_type;
+                pqRun->valid[kRun_runType] = 1;
+                pqRun->runStartTime = [theResult getDateAtRow:0 column:1];
+                if (pqRun->runStartTime) pqRun->valid[kRun_runStartTime] = 1;
+                pqRun->runInProgress = [theResult isNullAtRow:0 column:2];
+                pqRun->valid[kRun_runInProgress] = 1;
+            }
+        }
+    }
+//
+// load run number
+//
+    [command autorelease];
+    command = [[NSString stringWithFormat: @"SELECT last_value FROM run_number"] retain];
+    @try {
+        theResult = [pqConnection queryString:command];
+    }
+    @catch (NSException* e) {
+        theResult = nil;
+    }
+    if ([self isCancelled]) return nil;
+    if (theResult) {
+        int numRows = [theResult numOfRows];
+        int numCols = [theResult numOfFields];
+        if (numRows != 1 || numCols != 1) {
+            NSLogColor([NSColor redColor], @"Error getting run number from database\n");
+        } else {
+            detDB->runLoaded = 1;
+            PQ_Run *pqRun = [detDB getRun];
+            int64_t run_number = [theResult getInt64atRow:0 column:0];
+            if (run_number != kPQBadValue) {
+                pqRun->runNumber = run_number;
+                pqRun->valid[kRun_runNumber] = 1;
             }
         }
     }

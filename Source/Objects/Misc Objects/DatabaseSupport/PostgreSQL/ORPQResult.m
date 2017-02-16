@@ -217,7 +217,7 @@ enum {
 }
 
 // (returns 0 if there is no value at those coordinates)
-- (int64_t) getInt64atRow:(int)aRow column:(int)aColumn;
+- (int64_t) getInt64atRow:(int)aRow column:(int)aColumn
 {
     int64_t val = kPQBadValue;
     if (mResult && aRow<mNumOfRows && aColumn<mNumOfFields) {
@@ -248,7 +248,7 @@ enum {
     return val;
 }
 
-- (NSMutableData *) getInt64arrayAtRow:(int)aRow column:(int)aColumn;
+- (NSMutableData *) getInt64arrayAtRow:(int)aRow column:(int)aColumn
 {
     NSMutableData *theData = nil;
     int64_t val;
@@ -303,6 +303,31 @@ enum {
         }
     }
     return theData;
+}
+
+// get date from database assuming time is a local sudbury time
+// (returns nil if there is no valid date at those coordinates)
+- (NSDate *) getDateAtRow:(int)aRow column:(int)aColumn
+{
+    NSDate *date = nil;
+    if (mResult && aRow<mNumOfRows && aColumn<mNumOfFields) {
+        char *pt = PQgetvalue(mResult,aRow,aColumn);
+        NSString *val = [NSString stringWithCString:pt encoding:NSASCIIStringEncoding];
+        NSTimeZone *localZone = [NSTimeZone timeZoneWithName:@"America/Toronto"];
+        NSDateFormatter *formatter = [[[NSDateFormatter alloc] init] autorelease];
+        [formatter setTimeZone:localZone];
+        [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss.SSSSSS"];
+        date = [formatter dateFromString:val];
+    }
+    return date;
+}
+
+- (BOOL) isNullAtRow:(int)aRow column:(int)aColumn
+{
+    if (mResult && aRow<mNumOfRows && aColumn<mNumOfFields) {
+        return PQgetisnull(mResult,aRow,aColumn);
+    }
+    return YES;
 }
 
 - (id) fetchTypesAsType:(MCPReturnType) aType
