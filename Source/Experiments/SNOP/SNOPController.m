@@ -288,6 +288,9 @@ snopGreenColor;
     }
 }
 
+- (void) duplicateDialog:(id)dialog {
+    return;
+}
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers
 {

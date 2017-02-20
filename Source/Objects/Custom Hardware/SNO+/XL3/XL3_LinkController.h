@@ -190,6 +190,7 @@
 - (void) autoIncrementChanged:(NSNotification*)aNote;
 - (void) basicOpsRunningChanged:(NSNotification*)aNote;
 - (void) writeValueChanged:(NSNotification*)aNote;
+- (void) duplicateDialog:(id)dialog;
 //composite
 - (void) compositeXl3ModeRunningChanged:(NSNotification*)aNote;
 - (void) compositeXl3ModeChanged:(NSNotification*)aNote;

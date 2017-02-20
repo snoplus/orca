@@ -537,7 +537,9 @@ static NSDictionary* xl3Ops;
 	[selectedRegisterPU selectItemAtIndex: [model selectedRegister]];
 }); }
 
-
+- (void) duplicateDialog:(id)dialog {
+    return;
+}
 #pragma mark •composite
 - (void) compositeXl3ModeChanged:(NSNotification*)aNote
 { dispatch_async(dispatch_get_main_queue(), ^{

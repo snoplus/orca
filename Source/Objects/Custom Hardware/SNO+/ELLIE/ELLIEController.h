@@ -141,6 +141,7 @@
 
 -(void)tellieRunFinished:(NSNotification *)aNote;
 -(void)initialiseTellie;
+- (void) duplicateDialog:(id)dialog;
 
 //Server tab functions -----------------------------
 - (IBAction)telliePing:(id)sender;

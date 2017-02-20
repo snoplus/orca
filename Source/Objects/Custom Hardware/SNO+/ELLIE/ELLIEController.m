@@ -193,6 +193,10 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     [tellieTriggerDelayTf setStringValue:@"700"];
 }
 
+- (void) duplicateDialog:(id)dialog {
+    return;
+}
+
 -(IBAction)tellieGeneralFireAction:(id)sender
 {
     ////////////

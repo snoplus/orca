@@ -48,6 +48,7 @@
 - (BOOL) validateMenuItem:(NSMenuItem*)aMenuItem;
 - (void) documentLockChanged:(NSNotification*)aNote;
 - (void) setCrateLabels;
+- (void) duplicateDialog:(id)dialog;
 
 - (IBAction) delete:(id)sender; 
 - (IBAction) cut:(id)sender; 

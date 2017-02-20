@@ -81,7 +81,7 @@
 - (void) tac0trimChanged:(NSNotification*)aNote; 	   
 - (void) tac1trimChanged:(NSNotification*)aNote;
 - (void) boardIdChanged:(NSNotification*)aNote;
-
+- (void) duplicateDialog:(id)dialog;
 #pragma mark •••Actions
 - (IBAction) lockAction:(id)sender;
 - (IBAction) showVoltsAction:(id)sender;

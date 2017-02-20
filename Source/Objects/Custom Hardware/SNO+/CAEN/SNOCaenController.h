@@ -148,9 +148,8 @@
 - (void) totalRateChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
 - (void) continousRunsChanged:(NSNotification*)aNote;
-
 - (void) setBufferStateLabel;
-
+- (void) duplicateDialog:(id)dialog;
 #pragma mark •••Actions
 - (IBAction) eventSizeAction:(id)sender;
 - (IBAction) integrationAction:(id)sender;

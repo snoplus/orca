@@ -178,6 +178,7 @@
 
 - (void) updateSettings: (NSNotification *) aNote;
 - (void) initializeUnits;
+- (void) duplicateDialog:(id)dialog;
 #pragma mark ¥¥¥Actions
 
 - (IBAction) orcaDBIPAddressAction:(id)sender;

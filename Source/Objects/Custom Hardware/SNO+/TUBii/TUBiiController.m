@@ -186,6 +186,10 @@
     
 }
 
+- (void) duplicateDialog:(id)dialog {
+    return;
+}
+
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
 {
     int tabIndex = [aTabView indexOfTabViewItem:item];

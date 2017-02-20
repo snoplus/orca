@@ -410,6 +410,10 @@
     }
 }
 
+- (void) duplicateDialog:(id)dialog {
+    return;
+}
+
 - (void) dcThresholdsChanged:(NSNotification*)aNote
 {
 	int i;

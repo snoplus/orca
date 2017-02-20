@@ -157,6 +157,7 @@
 - (int) trigger_scan_name_to_index:(NSString*) name;
 - (int) index_to_trigger_scan_name:(int) index;
 - (void) showHideOptions:(id) sender Box:(id)box resizeSmall:(NSSize) smallSize resizeLarge:(NSSize) largeSize;
+- (void) duplicateDialog:(id)dialog;
 
 
 #pragma mark •••Actions
