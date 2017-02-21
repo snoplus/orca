@@ -1867,7 +1867,7 @@ err:
     @try{
         [self deactivateSmellie];
     } @catch(NSException* e) {
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Deactivate signal could not be send, reason: %@\n", [e reason]);
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Deactivate command could not be sent to the SMELLIE server, reason: %@\n", [e reason]);
     }
 
     // Kill the keepalive
