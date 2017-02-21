@@ -502,6 +502,9 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             else {
                 [self setCurrentState:kMJDInterlocks_CheckLNFill];
             }
+            sentCmds = NO;
+            self.remoteOpStatus=nil;
+
             break;
 
         case kMJDInterlocks_CheckLNFill:
