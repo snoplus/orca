@@ -384,6 +384,9 @@ static NSString *OROrcaObjectControllerFrame 	= @"OROrcaObjectControllerFrame";
 static NSString *OROrcaObjectControllerModel	= @"OROrcaObjectControllerModel";
 static NSString *OROrcaObjectControllerNibName	= @"OROrcaObjectControllerNibName";
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-designated-initializers"
+
 - (id)initWithCoder:(NSCoder*)decoder
 {
     NSString* nibName = @"??";
@@ -400,6 +403,7 @@ static NSString *OROrcaObjectControllerNibName	= @"OROrcaObjectControllerNibName
     }
     return self;
 }
+#pragma clang diagnostic pop
 
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
