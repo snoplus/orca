@@ -346,7 +346,7 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
 	NSString* channelKey	= @"";	
     
     unsigned long f1,f2,f3,f4,f5,f6;
-    unsigned long energy,/*sec,subsec,multiplicity,p,toplen,ediff,evID,*/ tpeak, tvalley, apeak, avalley;
+    unsigned long energy,sec,subsec,multiplicity,p,toplen,ediff,evID, tpeak, tvalley, apeak, avalley;
     unsigned long headerlen = 4;
     unsigned long numEv=(length-4)/6;    //(((*ptr) & 0x3ffff)-4)/6;
     
@@ -490,9 +490,51 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
     
     
     
-    //unsigned long* eventPtr=ptr;
+    unsigned long* eventPtr=ptr;
     unsigned long f1,f2,f3,f4,f5,f6;
     
+    
+    int i;
+    if(1){
+        NSString* infoall = [NSString stringWithString: @""];
+        for(i=0;i<numEv;i++){
+            f1=ptr[i*6+0];
+            f2=ptr[i*6+1];
+            f3=ptr[i*6+2];
+            f4=ptr[i*6+3];
+            f5=ptr[i*6+4];
+            f6=ptr[i*6+5];
+            NSLog(@"Tpeak Apeak 0x%x       Tvalley Avalley 0x%x       \n",f4,f5);
+            unsigned long flt,chan,energy,sec,subsec,multiplicity,p,toplen,ediff,evID, tpeak, tvalley, apeak, avalley;
+            p  = (f1 >> 28) & 0x1;
+            subsec = (f1  & 0x0ffffff8) >> 3;
+            sec = (f2 & 0x1fffffff) | ((f1  & 0x7) << 29);
+            flt   = (f3 >> 24) & 0x1f;
+            chan   = (f3 >> 19) & 0x1f;
+            multiplicity  = (f3 >> 14) & 0x1f;
+            evID   = f3  & 0x3fff;
+            //toplen = f4  & 0x1ff;
+            //ediff  = (f4 >> 9) & 0xfff;
+            tpeak    = (f4 >> 16) & 0x1ff;
+            apeak    =  f4   & 0x7ff; // & 0xfff; bit 12 unused and always 1 -tb-
+            tvalley  = (f5 >> 16) & 0x1ff;
+            //avalley  =  f5   & 0xfff; is negative
+            avalley  =  4096 - (f5 & 0xfff);
+            
+            energy  = f6  & 0xfffff;
+            NSString* info1 = [NSString stringWithFormat:@"Event %i:\n"
+                               "FIFO entry:  flt: %lu,chan: %lu,energy: %lu,sec: %lu,subsec: %lu   \n",i,        flt,chan,energy,sec,subsec ];//DEBUG -tb-
+            NSString* info2 = [NSString stringWithFormat:@"FIFO entry:  multiplicity: %lu,p: %lu,Epeak: %lu,Evalley: %lu,t_peak: %lu,t_valley: %lu,evID: %lu   \n",
+                               multiplicity,p,apeak,avalley,tpeak,tvalley,evID ];//DEBUG -tb-
+            
+            infoall = [infoall stringByAppendingString: info1];
+            infoall = [infoall stringByAppendingString: info2];
+            
+        }
+        return [NSString stringWithFormat:@"%@%@%@%@%@",title,content,crate,card,
+                infoall];
+    
+    }
     //for(i=0;i<numEv;i++){
 
     f1=ptr[0];
@@ -513,7 +555,7 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
     //quickfix
 #endif
     
-    unsigned long flt,chan,energy,sec,subsec,multiplicity,p,/*toplen,ediff,*/evID, tpeak, tvalley, apeak, avalley;
+    unsigned long flt,chan,energy,sec,subsec,multiplicity,p,toplen,ediff,evID, tpeak, tvalley, apeak, avalley;
     p  = (f1 >> 28) & 0x1;
     subsec = (f1  & 0x0ffffff8) >> 3;
     sec = (f2 & 0x1fffffff) | ((f1  & 0x7) << 29);
