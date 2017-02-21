@@ -16,6 +16,7 @@
 //express or implied, or assume any liability or responsibility
 //for the use of this software.
 //-------------------------------------------------------------
+#import "OrcaObjectController.h"
 
 @interface ORDataPipeController : OrcaObjectController {
     IBOutlet NSButton*      lockButton;
@@ -23,24 +24,27 @@
     IBOutlet NSTextField*   readerPathField;
     IBOutlet NSTextField*   readerStatusField;
     IBOutlet NSTextField*   byteCountField;
+    IBOutlet NSTextField*   runTypeValidField;
     IBOutlet NSTextField*   runStatusField;
+    IBOutlet NSMatrix*      runTypeMatrix;
  }
 
 #pragma mark •••Initialization
 - (void) registerNotificationObservers;
+- (void) setupRunTypeNames:(NSNotification*)aNote;
 
-#pragma mark •••Accessors
+#pragma mark •••Interface Management
+- (void) lockChanged:(NSNotification*)aNotification;
+- (void) runTypeChanged:(NSNotification *)notification;
 - (void) pipeNameChanged:(NSNotification*)aNote;
 - (void) readerPathChanged:(NSNotification*)aNote;
 - (void) updateStatus:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) lockAction:(id)sender;
-- (IBAction) reportAction:(id) sender;
 - (IBAction) readerPathAction:(id) sender;
 - (IBAction) pipeNameAction:(id) sender;
+- (IBAction) runTypeAction:(id)sender;
 
-#pragma mark •••Interface Management
-- (void) lockChanged:(NSNotification*)aNotification;
 @end
 
