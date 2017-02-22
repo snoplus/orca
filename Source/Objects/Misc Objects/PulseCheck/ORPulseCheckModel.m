@@ -279,11 +279,11 @@ NSString* ORPulseCheckModelReloadTable      = @"ORPulseCheckModelReloadTable";
         else if([lines count]>=2){
             time_t postTime = [[[lines objectAtIndex:0] substringFromIndex:5] unsignedLongValue];
             time_t nextTime = [[[lines objectAtIndex:1] substringFromIndex:5] unsignedLongValue];
-            time_t maxDelta    = nextTime - postTime;
+            time_t maxDelta    = abs(nextTime - postTime);
             //if the postTime is older than the delta, then something is wrong
             time_t	now;
             time(&now);
-            time_t deltaFromNow = now-postTime;
+            time_t deltaFromNow = abs(now-nextTime);
             if(deltaFromNow > 3*maxDelta){
                 [self setStatus:@"No Pulse"];
                 [self postHeartbeatAlarm];
