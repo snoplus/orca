@@ -257,7 +257,9 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             [self setState:kMJDInterlocks_CheckHVisOn status:[NSString stringWithFormat:@"HV is %@",hvIsOn?@"ON":@"OFF"] color:normalColor];
             if(pingedSuccessfully){
                 [self setCurrentState:kMJDInterlocks_UpdateVacSystem];
-            }
+                sentCmds = NO;
+                self.remoteOpStatus=nil;
+           }
             else {
                 //couldn't reach the Vac system. no point int trying to get the status
                 [self setState:kMJDInterlocks_UpdateVacSystem     status:@"Skipped" color:normalColor];
@@ -274,6 +276,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                     [self setCurrentState:kMJDInterlocks_HandleHVDialog];
                 }
             }
+
             break;
         
         //send the HV Bias state to the Vac system
