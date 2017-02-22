@@ -20,6 +20,14 @@
 @class ORCompositeTimeLineView;
 @class ORValueBarGroupView;
 
+
+typedef struct HVcRIOSetpointNamesStruct {
+    NSString*       item;
+    NSString*       daten;
+    NSString*       value;
+} HVcRIOSetpointNamesStruct;
+
+
 @interface ORHVcRIOController : OrcaObjectController
 {
     
@@ -126,6 +134,8 @@
 - (IBAction) lockAction:(id) sender;
 - (IBAction) getGainsAction:(id)sender;
 - (IBAction) setGainsAction:(id)sender;
+- (IBAction) writeSetpointsAction:(id)sender;
+- (IBAction) readBackSetpointsAction:(id)sender;
 
 - (IBAction) selectFileAction:(id)sender;
 - (IBAction) setPollingAction:(id)sender;

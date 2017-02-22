@@ -27,6 +27,10 @@
 #import "OHexFormatter.h"
 #import "ORValueBarGroupView.h"
 
+
+
+
+
 @implementation ORHVcRIOController
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -463,6 +467,7 @@
 	[gainTableView reloadData];
 }
 
+//warning! readback is now the 4th column of the setpoint table view, not the second table view! -tb-
 - (void) gainsReadBackChanged:(NSNotification*)aNote
 {
 	[gainReadBackTableView reloadData];
@@ -557,11 +562,23 @@
     [model writeModuleSelect];
 }
 
-
+//TODO rename to writeSetpoints or so ... -tb-
 - (IBAction) setGainsAction:(id)sender
 {
-	[model setGains];
-	[self lockChanged:nil];
+    [model setGains];
+    [self lockChanged:nil];
+}
+
+- (IBAction) writeSetpointsAction:(id)sender
+{
+    [model writeSetpoints];
+    [self lockChanged:nil];
+}
+
+- (IBAction) readBackSetpointsAction:(id)sender
+{
+    [model readBackSetpoints];
+    [self lockChanged:nil];
 }
 
 - (IBAction) getGainsAction:(id)sender
@@ -639,7 +656,20 @@
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
 {
     if(gainTableView == aTableView){
-        if([[aTableColumn identifier] isEqualToString:@"Channel"]) return [NSNumber numberWithInt:rowIndex];
+        if([[aTableColumn identifier] isEqualToString:@"Item"]){
+            return [model setpointItem:rowIndex];
+        }
+        else if([[aTableColumn identifier] isEqualToString:@"Data"]){
+            return [model setpointData:rowIndex];
+        }
+        else if([[aTableColumn identifier] isEqualToString:@"Setpoint"]){
+            return [NSNumber numberWithDouble:[model setpointValue:rowIndex]];
+        }
+        else if([[aTableColumn identifier] isEqualToString:@"Readback"]){
+            return [NSNumber numberWithDouble:[model setpointReadbackValue:rowIndex]];
+        }
+        //TODO remove it -tb-
+        else if([[aTableColumn identifier] isEqualToString:@"Channel"]) return [NSNumber numberWithInt:rowIndex];
         else {
             int board;
             if([[aTableColumn identifier] isEqualToString:@"Board0"])board = 0;
@@ -677,7 +707,7 @@
 // just returns the number of items we have.
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView
 {
-	if(gainTableView == aTableView)return 37;
+	if(gainTableView == aTableView)return [model numSetpoints];
 	else if(gainReadBackTableView == aTableView)return 37;
     else if(processLimitsTableView == aTableView)return 5;
 	else return 0;
@@ -688,14 +718,28 @@
     if(anObject == nil)return;
     
     if(gainTableView == aTableView){
+        //DEBUG
+        NSLog(@"%@::%@:  identifier: %@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd), [aTableColumn identifier]);//TODO: DEBUG testing ...-tb-
+        if([[aTableColumn identifier] isEqualToString:@"Item"]) return;
+        if([[aTableColumn identifier] isEqualToString:@"Data"]) return;
+        if([[aTableColumn identifier] isEqualToString:@"Readback"]) return;
+        if([[aTableColumn identifier] isEqualToString:@"Setpoint"]){
+            [model setSetpoint:rowIndex  withValue:[anObject doubleValue]];
+            return;
+        }
+        
+        /*
         if([[aTableColumn identifier] isEqualToString:@"Channel"]) return;
-        int board;
+        int board=-1;
         if([[aTableColumn identifier] isEqualToString:@"Board0"])board = 0;
         else if([[aTableColumn identifier] isEqualToString:@"Board1"])board = 1;
         else if([[aTableColumn identifier] isEqualToString:@"Board2"])board = 2;
         else board = 3;
-        [model setGain:rowIndex+(board*37) withValue:[anObject intValue]];
-        [model setGain:rowIndex+(board*37) withValue:[anObject intValue]];
+        if(board >=0){
+            [model setGain:rowIndex+(board*37) withValue:[anObject intValue]];
+            //???[model setGain:rowIndex+(board*37) withValue:[anObject intValue]];
+        }
+         */
 
     }
     else if(processLimitsTableView == aTableView){

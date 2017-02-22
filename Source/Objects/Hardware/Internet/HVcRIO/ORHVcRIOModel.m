@@ -53,6 +53,210 @@ NSString* ORHVcRIOModelVetoChanged           = @"ORHVcRIOModelVetoChanged";
 
 NSString* ORHVcRIOLock						= @"ORHVcRIOLock";
 
+
+
+static NSString* setpointList[] = {
+    @"SOLL_PXI_MODUL#WestModul0",@"Rampe",@"0",
+    @"SOLL_PXI_MODUL#WestModul1",@"Rampe",@"0",
+    @"SOLL_PXI_MODUL#WestModul2",@"Rampe",@"0",
+    @"SOLL_PXI_MODUL#EastModul0",@"Rampe",@"0",
+    @"SOLL_PXI_MODUL#EastModul1",@"Rampe",@"0",
+    @"SOLL_PXI_MODUL#EastModul2",@"Rampe",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh0",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh0",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh0",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh1",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh1",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh1",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh2",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh2",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh2",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh3",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh3",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh3",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh4",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh4",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh4",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh5",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh5",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh5",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh6",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh6",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh6",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh7",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh7",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh7",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh8",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh8",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh8",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh9",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh9",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh9",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh10",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh10",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh10",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh11",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh11",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh11",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh12",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh12",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh12",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh13",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh13",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh13",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh14",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh14",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh14",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh15",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh15",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh15",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh16",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh16",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh16",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh17",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh17",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh17",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh18",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh18",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh18",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh19",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh19",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh19",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh20",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh20",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh20",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh21",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh21",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh21",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh22",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh22",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh22",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh23",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh23",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#WestCh23",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh0",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh0",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh0",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh1",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh1",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh1",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh2",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh2",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh2",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh3",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh3",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh3",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh4",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh4",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh4",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh5",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh5",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh5",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh6",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh6",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh6",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh7",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh7",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh7",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh8",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh8",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh8",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh9",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh9",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh9",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh10",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh10",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh10",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh11",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh11",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh11",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh12",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh12",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh12",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh13",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh13",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh13",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh14",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh14",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh14",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh15",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh15",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh15",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh16",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh16",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh16",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh17",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh17",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh17",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh18",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh18",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh18",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh19",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh19",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh19",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh20",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh20",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh20",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh21",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh21",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh21",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh22",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh22",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh22",@"U_EXAKT",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh23",@"U_SOLL",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh23",@"I_MAX",@"0",
+    @"SOLL_PXI_CHANNEL#EastCh23",@"U_EXAKT",@"0",
+    @"SOLL_EHV#mainSpecVesel",@"U_Soll",@"0",
+    @"SOLL_EHV#mainSpecVesel",@"I_MAX",@"0",
+    @"SOLL_EHV#mainSpecVesel",@"Rampe",@"0",
+    @"SOLL_EHV#mainSpecElektrode",@"U_Soll",@"0",
+    @"SOLL_EHV#mainSpecElektrode",@"I_MAX",@"0",
+    @"SOLL_EHV#mainSpecElektrode",@"Rampe",@"0",
+    @"SOLL_EHV#mainSpecCorrSouth",@"U_Soll",@"0",
+    @"SOLL_EHV#mainSpecCorrSouth",@"I_MAX",@"0",
+    @"SOLL_EHV#mainSpecCorrSouth",@"Rampe",@"0",
+    @"SOLL_EHV#mainSpecCorrWest",@"U_Soll",@"0",
+    @"SOLL_EHV#mainSpecCorrWest",@"I_MAX",@"0",
+    @"SOLL_EHV#mainSpecCorrWest",@"Rampe",@"0",
+    @"SOLL_EHV#mainSpecDipolWest",@"U_Soll",@"0",
+    @"SOLL_EHV#mainSpecDipolWest",@"I_MAX",@"0",
+    @"SOLL_EHV#mainSpecDipolWest",@"Rampe",@"0",
+    @"SOLL_EHV#mainSpecDipolEast",@"U_Soll",@"0",
+    @"SOLL_EHV#mainSpecDipolEast",@"I_MAX",@"0",
+    @"SOLL_EHV#mainSpecDipolEast",@"Rampe",@"0",
+    @"SOLL_EHV#IECommon",@"U_Soll",@"0",
+    @"SOLL_EHV#IECommon",@"I_MAX",@"0",
+    @"SOLL_EHV#IECommon",@"Rampe",@"0",
+    @"SOLL_EHV#preSpecVesel",@"U_Soll",@"0",
+    @"SOLL_EHV#preSpecVesel",@"I_MAX",@"0",
+    @"SOLL_EHV#preSpecVesel",@"Rampe",@"0",
+    @"SOLL_EHV#preSpecIE1",@"U_Soll",@"0",
+    @"SOLL_EHV#preSpecIE1",@"I_MAX",@"0",
+    @"SOLL_EHV#preSpecIE1",@"Rampe",@"0",
+    @"SOLL_EHV#preSpecIE2",@"U_Soll",@"0",
+    @"SOLL_EHV#preSpecIE2",@"I_MAX",@"0",
+    @"SOLL_EHV#preSpecIE2",@"Rampe",@"0",
+    @"SOLL_EHV#preSpecIE3",@"U_Soll",@"0",
+    @"SOLL_EHV#preSpecIE3",@"I_MAX",@"0",
+    @"SOLL_EHV#preSpecIE3",@"Rampe",@"0",
+    @"SOLL_EHV#preSpecIE4",@"U_Soll",@"0",
+    @"SOLL_EHV#preSpecIE4",@"I_MAX",@"0",
+    @"SOLL_EHV#preSpecIE4",@"Rampe",@"0",
+    @"SOLL_STATUS#Ost_Relais",@"Bed",@"0",
+    @"SOLL_STATUS#Ost_Relais",@"Modus",@"0",
+    @"SOLL_STATUS#Ost_Relais",@"Time_On",@"0",
+    @"SOLL_STATUS#Ost_Relais",@"Time_Off",@"0",
+    @"SOLL_STATUS#West_Relais",@"Bed",@"0",
+    @"SOLL_STATUS#West_Relais",@"Modus",@"0",
+    @"SOLL_STATUS#West_Relais",@"Time_On",@"0",
+    @"SOLL_STATUS#West_Relais",@"Time_Off",@"0",
+    @"", @"", @""
+};
+
+
+
+
+
 @interface ORHVcRIOModel (private)
 - (void) timeout;
 - (void) processNextCommandFromQueue;
@@ -119,7 +323,23 @@ NSString* ORHVcRIOLock						= @"ORHVcRIOLock";
 			[self performSelector:@selector(writeLogBufferToFile) withObject:nil afterDelay:60];		
 		}
     }
-	[self checkVetoCondition];
+    int i;
+    for(i=0; i<10000; i++){
+        NSLog(@"%@::%@:  setpointList : %i is %@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),i, setpointList[i]);//TODO: DEBUG testing ...-tb-
+       
+        
+        
+        if( [ setpointList[i] isEqualToString:@""] ){
+        //if( setpointList[i]==nil){
+            //reached end of list
+            numSetpoints = (i+1)/3;
+            break;
+        }
+    }
+    //DEBUG
+    NSLog(@"%@::%@:  numSetpoints is: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),numSetpoints);//TODO: DEBUG testing ...-tb-
+
+	//-tb- 2016 TODO: unused, remove it:[self checkVetoCondition];
     [super wakeUp];
 }
 
@@ -142,6 +362,67 @@ NSString* ORHVcRIOLock						= @"ORHVcRIOLock";
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (int) numSetpoints
+{
+    return numSetpoints;
+}
+
+- (void) setNumSetpoints: (int) aValue
+{
+    numSetpoints = aValue;
+}
+
+
+- (NSString*) setpointItem: (int) aIndex
+{
+    return setpointList[aIndex*3];
+}
+
+- (NSString*) setpointData: (int) aIndex
+{
+    return setpointList[aIndex*3+1];
+}
+
+- (double) setpointValue: (int) aIndex
+{
+    return setpoints[aIndex]; //TODO -tb- check aIndex range!
+}
+- (void) setSetpoint: (int)aIndex withValue: (double)value
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSetpoint:aIndex withValue:setpoints[aIndex]];
+    //DEBUG
+    NSLog(@"%@::%@: set setpoint %i to %f\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd), aIndex, value);//TODO: DEBUG testing ...-tb-
+    setpoints[aIndex] = value;
+
+    // I am misusing the notification ORHVcRIOModelGainsChanged ... -tb-
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelGainsChanged object:self];
+
+}
+
+
+
+- (double) setpointReadbackValue: (int) aIndex
+{
+    return setpointsReadback[aIndex];
+}
+
+- (void) setSetpointReadback: (int)aIndex withValue: (double)value
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSetpointReadback:aIndex withValue:setpointsReadback[aIndex]];
+    //DEBUG     NSLog(@"%@::%@: set setpoint %i to %f\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd), aIndex, value);//TODO: DEBUG testing ...-tb-
+
+    setpointsReadback[aIndex] = value;
+
+    // I am misusing the notification ORHVcRIOModelGainsChanged ... -tb-
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelGainsChanged object:self];
+
+}
+
+
+
+
+
+
 - (BOOL) lcmEnabled
 {
     return lcmEnabled;
@@ -149,6 +430,11 @@ NSString* ORHVcRIOLock						= @"ORHVcRIOLock";
 
 - (void) setLcmEnabled:(BOOL)aLcmEnabled
 {
+    //DEBUG
+    NSLog(@"WARNING: %@::%@: called, but unused, argument is: %@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aLcmEnabled);//TODO: DEBUG testing ...-tb-
+
+return;//TODO -tb-
+
     [[[self undoManager] prepareWithInvocationTarget:self] setLcmEnabled:lcmEnabled];
     lcmEnabled = aLcmEnabled;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelLcmEnabledChanged object:self];
@@ -288,7 +574,7 @@ NSString* ORHVcRIOLock						= @"ORHVcRIOLock";
         
         [cmdQueue removeAllObjects];
         [self setLastRequest:nil];
-        [self checkVetoCondition];
+        //TODO remove it -tb- [self checkVetoCondition];
     }
 }
 
@@ -312,7 +598,7 @@ NSString* ORHVcRIOLock						= @"ORHVcRIOLock";
 		socket = nil;
         [cmdQueue removeAllObjects];
         [self setLastRequest:nil];
-        [self checkVetoCondition];
+        //TODO remove it -tb- [self checkVetoCondition];
     }
 }
 
@@ -328,13 +614,22 @@ NSString* ORHVcRIOLock						= @"ORHVcRIOLock";
 
 }
 
+
+
+
+
+
+
+//-----------------> parseString
 - (void) parseString:(NSString*)theString
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-    //
-    NSLog(@"Received: %@",theString);
+    
     theString = [theString trimSpacesFromEnds];
     theString = [theString lowercaseString];
+    
+    // DEBUG
+    NSLog(@"Received: %@",theString);
     NSArray* lines = [theString componentsSeparatedByString:@"\n"];
     for(NSString* aLine in lines){
         
@@ -352,10 +647,42 @@ NSString* ORHVcRIOLock						= @"ORHVcRIOLock";
         }
         
         else {
-            //
+            //DEBUG
             NSLog(@"Processing Last Request: %@\n",lastRequest);
 
-            if([lastRequest hasPrefix:@"get gains"]){
+            if([lastRequest hasPrefix:@"command:"]){
+                NSLog(@"Received 'command:' with arguemnts:  \n");
+                aLine = [aLine substringFromIndex:8];
+                NSArray* theParts = [aLine componentsSeparatedByString:@","];
+                int i=0;
+                for(id aValue in theParts){
+                    NSLog(@"    arguemnt: %@\n",aValue);
+
+                    //[self setGainReadBack:i withValue:[aValue intValue]];
+                    //i++;
+                }
+                [self setLastRequest:nil];
+            }
+            else if([lastRequest hasPrefix:@"write sp"]){
+                //DEBUG
+                NSLog(@"write sp: aknowledged\n");
+                [self setLastRequest:nil];
+            }
+            else if([lastRequest hasPrefix:@"read sp"]){
+                aLine = [aLine substringFromIndex:10];
+                NSArray* theParts = [aLine componentsSeparatedByString:@","];
+                int i=0;
+                for(id aValue in theParts){
+                    //DEBUG
+                    NSLog(@"%@::%@: readback setpoint %i to %f\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd), i, [aValue doubleValue]);//TODO: DEBUG testing ...-tb-
+                    [self setSetpointReadback:i withValue:[aValue doubleValue]];
+                    //[self setGainReadBack:i withValue:[aValue intValue]];
+                    i++;
+                    if(i>numSetpoints) break;
+                }
+                [self setLastRequest:nil];
+            }
+            else if([lastRequest hasPrefix:@"get gains"]){
                 aLine = [aLine substringFromIndex:10];
                 NSArray* theParts = [aLine componentsSeparatedByString:@","];
                 int i=0;
@@ -721,25 +1048,55 @@ NSString* ORHVcRIOLock						= @"ORHVcRIOLock";
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢ Commands
+//remove it -tb-
 - (void) getGains
 {
     if([self isConnected]){
         [self writeCmdString:@"get gains"];
     }
 }
+
+//TODO remove it -tb-
 - (void) setGains
 {
     if([self isConnected]){
-        NSMutableString* cmd = [NSMutableString stringWithString:@"set gains"];
+        NSMutableString* cmd = [NSMutableString stringWithString:@"write sp"];
         [cmd appendString:@":"];
         int i;
-        for(i=0;i<148;i++){
-            [cmd appendFormat:@"%d",gain[i]];
-            if(i!=147)[cmd appendString:@","];
+        for(i=0;i<numSetpoints;i++){
+            [cmd appendFormat:@"%f",setpoints[i]/*test 1.00001*i*/];
+            if(i!=numSetpoints-1)[cmd appendString:@","];
         }
+        //DEBUG         NSLog(@"%@::%@: send command: \n%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd), cmd);//TODO: DEBUG testing ...-tb-
         [self writeCmdString:cmd];
     }
 }
+
+
+- (void) writeSetpoints
+{
+    if([self isConnected]){
+        NSMutableString* cmd = [NSMutableString stringWithString:@"write sp"];
+        [cmd appendString:@":"];
+        int i;
+        for(i=0;i<numSetpoints;i++){
+            [cmd appendFormat:@"%f",setpoints[i]/*test 1.00001*i*/];
+            if(i!=numSetpoints-1)[cmd appendString:@","];
+        }
+        //DEBUG         NSLog(@"%@::%@: send command: \n%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd), cmd);//TODO: DEBUG testing ...-tb-
+        [self writeCmdString:cmd];
+    }
+}
+
+
+
+- (void) readBackSetpoints
+{
+    if([self isConnected]){
+        [self writeCmdString:@"read sp"];
+    }
+}
+
 - (void) getTemperatures
 {
     if([self isConnected]){
@@ -1131,6 +1488,14 @@ NSString* ORHVcRIOLock						= @"ORHVcRIOLock";
 @implementation ORHVcRIOModel (private)
 - (void) checkVetoCondition
 {
+    //DEBUG
+    NSLog(@"WARNING: %@::%@: should NOT be called any more!! -tb-  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+    
+    
+    return;//TODO remove it -tb-
+
+    
+    
     if(![self readingTemperatures] && [self isConnected]){
         [[ORGlobal sharedGlobal] addRunVeto:@"LCM Enabled" comment:@"Leakage Current Measurement Enabled in PAC Board"];
         NSLog(@"%@ put run veto in place for leakage current measurement.\n",[self fullID]);
@@ -1219,7 +1584,7 @@ NSString* ORHVcRIOLock						= @"ORHVcRIOLock";
             //NSLog(@"sending: %@\n",cmd);
 			[self setLastRequest:cmd];
             [socket writeString:cmd encoding:NSASCIIStringEncoding];
-			[self performSelector:@selector(timeout) withObject:nil afterDelay:1];
+			[self performSelector:@selector(timeout) withObject:nil afterDelay:100];//<----timeout !!!!!!!!!!!!!!!!!!!!
 		}
 	}
 }

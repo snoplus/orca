@@ -65,12 +65,29 @@
         unsigned short      channelSelection;
         ORAlarm*            lcmEnabledAlarm;
         BOOL                lcmEnabled;
+    
+    
+        //new for HVcRIO -tb-
+        int                 numSetpoints;
+        //use dictionary for later -tb-
+        double setpoints[2000];
+        double setpointsReadback[2000];
+        double measuredValues[4000];
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
 - (void) dealloc;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (int) numSetpoints;
+- (void) setNumSetpoints: (int) aValue;
+- (NSString*) setpointItem: (int) aIndex;
+- (NSString*) setpointData: (int) aIndex;
+- (double) setpointValue: (int) aIndex;
+- (void) setSetpoint: (int)aIndex withValue: (double)value   ;
+- (double) setpointReadbackValue: (int) aIndex;
+- (void) setSetpointReadback: (int)aIndex withValue: (double)value   ;
+
 - (BOOL) lcmEnabled;
 - (void) setLcmEnabled:(BOOL)aLcmEnabled;
 - (BOOL) readingTemperatures;
@@ -140,6 +157,8 @@
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Commands
 - (void) getGains;
 - (void) setGains;
+- (void) writeSetpoints;
+- (void) readBackSetpoints;
 - (void) getTemperatures;
 - (void) getCurrent;
 - (void) writeShipCmd;
