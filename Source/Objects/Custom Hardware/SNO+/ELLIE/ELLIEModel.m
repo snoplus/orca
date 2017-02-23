@@ -1005,13 +1005,6 @@ err:
     }
     ORRunModel* runControl = [runModels objectAtIndex:0];
 
-    NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    if(![snopModels count]){
-        NSLogColor([NSColor redColor], @"[TELLIE_UPLOAD]: Couldn't find SNOPModel\n");
-        return;
-    }
-    SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
-
     NSString* docType = [NSMutableString stringWithFormat:@"TELLIE_RUN"];
     NSMutableArray* subRunArray = [NSMutableArray arrayWithCapacity:10];
 
@@ -1026,7 +1019,7 @@ err:
 
     [self setTellieRunDoc:runDocDict];
 
-    [[aSnotModel orcaDbRefWithEntryDB:self withDB:@"telliedb"] addDocument:runDocDict tag:kTellieRunDocumentAdded];
+    [[self couchDBRef:self withDB:@"telliedb"] addDocument:runDocDict tag:kTellieRunDocumentAdded];
 
     //wait for main thread to receive acknowledgement from couchdb
     NSDate* timeout = [NSDate dateWithTimeIntervalSinceNow:2.0];
@@ -1066,7 +1059,7 @@ err:
 
     //check to see if run is offline or not
     if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
-        [[self orcaDbRefWithEntryDB:self withDB:@"telliedb"]
+        [[self couchDBRef:self withDB:@"telliedb"]
          updateDocument:runDocDict
          documentId:[runDocDict objectForKey:@"_id"]
          tag:kTellieRunDocumentUpdated];
@@ -1811,7 +1804,7 @@ err:
 
     [self setSmellieRunDoc:runDocDict];
 
-    [[aSnotModel couchDBRef:self withDB:@"smellie"] addDocument:runDocDict tag:kSmellieRunDocumentAdded];
+    [[self couchDBRef:self withDB:@"smellie"] addDocument:runDocDict tag:kSmellieRunDocumentAdded];
 
     //wait for main thread to receive acknowledgement from couchdb
     NSDate* timeout = [NSDate dateWithTimeIntervalSinceNow:5.0];
@@ -1828,13 +1821,6 @@ err:
      Arguments:
      NSDictionary* subRunDoc:  Subrun information to be added to the current [self tellieRunDoc].
      */
-    NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    if(![snopModels count]){
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find SNOPModel. Please add one to the experiment and restart the run.\n");
-        return;
-    }
-    SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
-
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
         NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find ORRunModel. Please add it to the experiment and restart the run.\n");
@@ -1854,7 +1840,7 @@ err:
     [self setSmellieRunDoc:runDocDict];
 
     //check to see if run is offline or not
-    [[aSnotModel couchDBRef:self withDB:@"smellie"] updateDocument:runDocDict documentId:[runDocDict objectForKey:@"_id"] tag:kTellieRunDocumentUpdated];
+    [[self couchDBRef:self withDB:@"smellie"] updateDocument:runDocDict documentId:[runDocDict objectForKey:@"_id"] tag:kTellieRunDocumentUpdated];
     [subRunInfo release];
     [runDocDict release];
     [subRunDocDict release];
