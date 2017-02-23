@@ -129,15 +129,8 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 -(void)initialiseTellie
 {
     // Load static (calibration and mapping) parameters from DB.
-    // May take a while so try to run asyncronously
-    //dispatch_queue_t tellie_queue;
-    //tellie_queue = dispatch_queue_create("tellie_database", NULL);
-    //dispatch_set_target_queue(tellie_queue, DISPATCH_QUEUE_PRIORITY_HIGH);
-    //dispatch_async(tellie_queue, ^{
-    //dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     [model loadTELLIEStaticsFromDB];
-    //});
-    
+
     //Make sure sensible tabs are selected to begin with
     [ellieTabView selectTabViewItem:tellieTViewItem];
     [tellieTabView selectTabViewItem:tellieFireFibreTViewItem];

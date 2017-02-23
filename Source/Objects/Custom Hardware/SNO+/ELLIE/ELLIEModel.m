@@ -1993,7 +1993,7 @@ err:
             if(message){
                 [aResult prettyPrint:@"CouchDB Message:"];
             }
-            
+
             //Look through all of the possible tags for ellie couchDB results
             //This is called when smellie run header is queried from CouchDB
             if ([aTag isEqualToString:kSmellieRunHeaderRetrieved]){
