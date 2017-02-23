@@ -460,6 +460,10 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         if(rateInfo){
             if([[anEntry objectForKey:@"crate"] intValue] == 1 && ignoreBreakdownCheckOnB)continue;
             if([[anEntry objectForKey:@"crate"] intValue] == 2 && ignoreBreakdownCheckOnA)continue;
+            
+            if([[anEntry objectForKey:@"crate"] intValue] == 1 && [self fillingLN:0]) continue;
+            if([[anEntry objectForKey:@"crate"] intValue] == 2 && [self fillingLN:1]) continue;
+            
             //ok, append this detector
             [report appendFormat:@"Detector: %@ (%@,%@,%@)\n",[anEntry objectForKey:@"detectorName"],[anEntry objectForKey:@"crate"],[anEntry objectForKey:@"card"],[anEntry objectForKey:@"chan"]];
             [report appendFormat:@"Ave: %.1f  Spiked: %.1f (%@ MT)\n",[rateInfo ave],[rateInfo spikeValue],[[rateInfo spikeStart] stdDescription]];
