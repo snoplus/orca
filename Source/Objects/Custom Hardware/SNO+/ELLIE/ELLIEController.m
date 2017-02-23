@@ -29,30 +29,12 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 {
     self = [super initWithWindowNibName:@"ellie"];
     @try{
-
-        // Check there is an ELLIE model in the current configuration
-        NSArray*  ellieModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
-        if(![ellieModels count]){
-            NSLogColor([NSColor redColor], @"Must have an ELLIE object in the configuration\n");
-            return nil;
-        }
-        ELLIEModel* anELLIEModel = [ellieModels objectAtIndex:0];
-     
-        // This is not strictly necessary, but it's a good check of smellie database connectivity.
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            NSNumber* configVersion = [[anELLIEModel fetchRecentConfigVersion] autorelease];
-            [anELLIEModel fetchConfigurationFile:configVersion];
-        });
-    
-    }
-    @catch (NSException *e) {
+        [self fetchConfigurationFile:nil];
+        [self initialiseTellie];
+    } @catch (NSException *e) {
         NSLog(@"CouchDB for ELLIE isn't connected properly. Please reload the ELLIE Gui and check the database connections\n");
         NSLog(@"Reason for error %@ \n",e);
     }
-
-    /*Setting up TELLIE GUI */
-    [self initialiseTellie];
-
     [tellieServerResponseTf setEditable:NO];
     [smellieServerResponseTf setEditable:NO];
     [interlockServerResponseTf setEditable:NO];
@@ -64,6 +46,7 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     [super awakeFromNib];
     [super updateWindow];
     [self updateServerSettings:nil];
+    [self fetchConfigurationFile:nil];
     [self initialiseTellie];
     [tellieServerResponseTf setEditable:NO];
     [smellieServerResponseTf setEditable:NO];
@@ -126,6 +109,18 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
                      selector : @selector(killInterlock:)
                          name : @"SMELLIEEmergencyStop"
                         object: nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(fetchConfigurationFile:)
+                         name : @"SmellieRunFilesLoaded"
+                        object: nil];
+}
+
+-(void)fetchConfigurationFile:(NSNotification *)aNote{
+    /*
+     When the run files are loaded we re-load the smellie config file, just incase
+    */
+    [model fetchCurrentSmellieConfig];
 }
 
 ///////////////////////////////////////////
@@ -135,9 +130,13 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 {
     // Load static (calibration and mapping) parameters from DB.
     // May take a while so try to run asyncronously
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [model loadTELLIEStaticsFromDB];
-    });
+    //dispatch_queue_t tellie_queue;
+    //tellie_queue = dispatch_queue_create("tellie_database", NULL);
+    //dispatch_set_target_queue(tellie_queue, DISPATCH_QUEUE_PRIORITY_HIGH);
+    //dispatch_async(tellie_queue, ^{
+    //dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    [model loadTELLIEStaticsFromDB];
+    //});
     
     //Make sure sensible tabs are selected to begin with
     [ellieTabView selectTabViewItem:tellieTViewItem];
