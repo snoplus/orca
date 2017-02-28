@@ -134,6 +134,7 @@
 
 //SMELLIE Control Functions
 -(void) setSmellieNewRun:(NSNumber *)runNumber;
+-(void) deactivateSmellie;
 
 -(void) setSmellieLaserHeadMasterMode:(NSNumber*)laserSwitchChan withIntensity:(NSNumber*)intensity withRepRate:(NSNumber*)rate withFibreInput:(NSNumber*)fibreInChan withFibreOutput:(NSNumber*)fibreOutChan withNPulses:(NSNumber*)noPulses withGainVoltage:(NSNumber*)gain;
 

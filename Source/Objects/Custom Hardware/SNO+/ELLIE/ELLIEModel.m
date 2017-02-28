@@ -1230,6 +1230,11 @@ err:
     [[self smellieClient] command:@"new_run" withArgs:args];
 }
 
+-(void) deactivateSmellie
+{
+    [[self smellieClient] command:@"deactivate"];
+}
+
 -(void)setSmellieLaserHeadMasterMode:(NSNumber*)laserSwitchChan withIntensity:(NSNumber*)intensity withRepRate:(NSNumber*)rate withFibreInput:(NSNumber*)fibreInChan withFibreOutput:(NSNumber*)fibreOutChan withNPulses:(NSNumber*)noPulses withGainVoltage:(NSNumber *)gain
 {
     /*
@@ -1355,8 +1360,8 @@ err:
         [laserArray addObject:@"PQ405"];
     } if([[smellieSettings objectForKey:@"PQ440_laser_on"] intValue] == 1) {
         [laserArray addObject:@"PQ440"];
-    } if([[smellieSettings objectForKey:@"PQ500_laser_on"] intValue] == 1) {
-        [laserArray addObject:@"PQ500"];
+    } if([[smellieSettings objectForKey:@"PQ495_laser_on"] intValue] == 1) {
+        [laserArray addObject:@"PQ495"];
     } if([[smellieSettings objectForKey:@"superK_laser_on"] intValue] == 1) {
         [laserArray addObject:@"superK"];
     }
@@ -1397,8 +1402,10 @@ err:
         [fibreArray addObject:@"FS193"];
     } if ([[smellieSettings objectForKey:@"FS293"] intValue] == 1){
         [fibreArray addObject:@"FS293"];
-    } if ([[smellieSettings objectForKey:@"Power Meter"] intValue] == 1){
-        [fibreArray addObject:@"Power Meter"];
+    } if ([[smellieSettings objectForKey:@"FS021"] intValue] == 1){
+        [fibreArray addObject:@"FS021"];
+    } if ([[smellieSettings objectForKey:@"powerMeter"] intValue] == 1){
+        [fibreArray addObject:@"powerMeter"];
     }
     return fibreArray;
 }
@@ -1823,7 +1830,7 @@ err:
     //Release dict holding sub-run info
     [valuesToFillPerSubRun release];
     [pool release];
-    
+
     //Post a note. on the main thread to request a call to stopSmellieRun
     [[NSThread currentThread] cancel];
     dispatch_sync(dispatch_get_main_queue(), ^{
@@ -1856,6 +1863,12 @@ err:
     ///////////
     // This could be run in a thread, so set-up an auto release pool
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+
+    @try{
+        [self deactivateSmellie];
+    } @catch(NSException* e) {
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Deactivate command could not be sent to the SMELLIE server, reason: %@\n", [e reason]);
+    }
 
     // Kill the keepalive
     [self killKeepAlive];
