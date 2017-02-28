@@ -5484,7 +5484,7 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
         }
         
         if ([self crateNumber] == 16) {
-            bool supplyBCurrentDropout = [self hvBVoltageReadValue] > [self ilowalarm_b_vmin] && [self hvBCurrentReadValue] < [self ilowalarm_a_imin];
+            bool supplyBCurrentDropout = [self hvBVoltageReadValue] > [self ilowalarm_b_vmin] && [self hvBCurrentReadValue] < [self ilowalarm_b_imin];
             bool supplyBOverVoltage = [self hvBVoltageReadValue] > [self vhighalarm_b_vmax];
             bool supplyBOverCurrent = [self hvBCurrentReadValue] > [self ihighalarm_b_imax];
             int boffset = 2*[self crateNumber] + 1;
