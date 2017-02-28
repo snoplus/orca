@@ -138,6 +138,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         if ([objs count]) {
             anMTCModel = [objs objectAtIndex:0];
             [anMTCModel setPgtRate:[[self ECA_rate] floatValue]]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
+            [anMTCModel loadPulserRateToHardware];
         }
     }
 
@@ -380,6 +381,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         NSLogColor([NSColor redColor], @"ECA: Error loading pedestal mask for pattern: %d \n", ECA_pattern);
         return false;
     }
+
     @try{
         for (int step=0; step < eca_pattern_num_steps; step++) {
 
@@ -405,7 +407,9 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 
                 dispatch_sync(dispatch_get_main_queue(), ^{
                     [anMTCModel setCoarseDelay:current_coarse_delay]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
+                    [anMTCModel loadCoarseDelayToHardware]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
                     [anMTCModel setFineDelay:current_fine_delay]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
+                    [anMTCModel loadFineDelayToHardware]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
                 });
 
                 [aSNOPModel updateEPEDStructWithCoarseDelay:current_coarse_delay fineDelay:current_fine_delay chargePulseAmp:0x0 pedestalWidth:pedestal_width calType:20 + (ECA_pattern+1)];
