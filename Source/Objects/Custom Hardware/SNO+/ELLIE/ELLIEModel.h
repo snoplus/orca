@@ -156,11 +156,8 @@
 -(void) stopSmellieRun;
 
 // SMELLIE database interactions
--(void) fetchSmellieConfigurationInformation;
 -(void) pushInitialSmellieRunDocument;
 -(void) updateSmellieRunDocument:(NSDictionary*)subRunDoc;
--(void) smellieDBpush:(NSMutableDictionary*)dbDic;
--(void) smellieConfigurationDBpush:(NSMutableDictionary*)dbDic;
 -(void) fetchCurrentSmellieConfig;
 -(void) parseCurrentConfigVersion:(id)aResult;
 -(void) fetchConfigurationFile:(NSNumber*)currentVersion;
