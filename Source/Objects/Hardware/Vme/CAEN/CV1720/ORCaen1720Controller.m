@@ -315,7 +315,7 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     /* Set the text field in samples. For the conversion between the buffer
      * organization register and the number of samples see Section 4.15 in the
      * user manual. */
-    [eventSizeTextField setIntValue: (1 << (20-[model eventSize])];
+    [eventSizeTextField setIntValue: (1 << (20-[model eventSize]))];
 }
 
 - (void) checkGlobalSecurity
