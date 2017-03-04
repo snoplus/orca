@@ -1699,6 +1699,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     // This line calls [self couchDBresult], which in turn calls [self parseSmellieRunFileDocs] where the
     // [self smellieRunFiles] property variable gets set.
     [[anELLIEModel couchDBRef:self withDB:@"smellie"] getDocumentId:requestString tag:@"kSmellieRunHeaderRetrieved"];
+    [anELLIEModel fetchCurrentSmellieConfig];
 }
 
 -(void) parseSmellieRunFileDocs:(id)aResult
@@ -1720,7 +1721,6 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     [runFiles release];
     
     [self setSmellieDocUploaded:YES];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"SmellieRunFilesLoaded" object:nil];
 }
 
 - (unsigned long) runTypeWord

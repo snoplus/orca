@@ -109,11 +109,6 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
                      selector : @selector(killInterlock:)
                          name : @"SMELLIEEmergencyStop"
                         object: nil];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(fetchConfigurationFile:)
-                         name : @"SmellieRunFilesLoaded"
-                        object: nil];
 }
 
 -(void)fetchConfigurationFile:(NSNotification *)aNote{
