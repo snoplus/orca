@@ -5395,7 +5395,7 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
                 [self setHvANextStepValue:[self hvAVoltageDACSetValue]];
             }
             if ([self crateNumber] == 16 && [self hvBSwitch] && bUp && fabs([self hvBVoltageReadValue] - [self hvBVoltageDACSetValue]/4096.*3000.) > 100) {
-                [self _trigger_edge_alarm:80100+[self crateNumber]*2+0];
+                [self _trigger_edge_alarm:80100+[self crateNumber]*2+1];
                 NSLogColor([NSColor redColor],@"%@ HV B read value differs from the setpoint. stopping!\nPress Ramp UP to continue.\n", [[self xl3Link] crateName]);
                 [self setHvBNextStepValue:[self hvBVoltageDACSetValue]];
             }
