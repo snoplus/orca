@@ -482,6 +482,11 @@ resync;
                        object : nil];
 
     [notifyCenter addObserver : self
+                     selector : @selector(aboutToQuit:)
+                         name : OROrcaAboutToQuitNotice
+                       object : nil];
+
+    [notifyCenter addObserver : self
                      selector : @selector(detectorStateChanged:)
                          name : ORPQDetectorStateChanged
                        object : nil];
@@ -935,6 +940,23 @@ err:
     //update calibration documents (TELLIE temp)
 }
 
+// we are about to quit, so pretend to stop running
+// (avoids problems associated with quitting while running)
+- (void) aboutToQuit:(NSNotification*)aNote
+{
+    NSArray *runObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    if(![runObjects count]){
+        NSLogColor([NSColor redColor], @"aboutToQuit: couldn't find run control object!");
+        return;     // (should never happen)
+    }
+    ORRunModel* runControl = [runObjects objectAtIndex:0];
+
+    if ([runControl runningState] != eRunStopped) {
+        [runControl setRunningState:eRunStopped];
+        state = STOPPED;
+    }
+}
+
 - (void) detectorStateChanged:(NSNotification*)aNote
 {
     ORPQDetectorDB *detDB = [aNote object];
@@ -947,7 +969,7 @@ err:
 
     NSArray *runObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runObjects count]){
-        NSLogColor([NSColor redColor], @"initRunNumber: couldn't find run control object!");
+        NSLogColor([NSColor redColor], @"detectorStateChanged: couldn't find run control object!");
         return;     // (should never happen)
     }
     ORRunModel* runControl = [runObjects objectAtIndex:0];
