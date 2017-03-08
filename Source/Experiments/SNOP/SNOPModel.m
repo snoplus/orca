@@ -296,7 +296,8 @@ resync;
     self.debugDBIPAddress = [decoder decodeObjectForKey:@"ORSNOPModelDebugDBIPAddress"];
 
     //Standard Runs
-    [self setStandardRunTableVersion:[[NSNumber alloc] initWithInt:STANDARD_RUN_VERSION]];
+    //fixed memory leak -- no matching release for alloc MAH 03/08/2017
+    [self setStandardRunTableVersion:[[[NSNumber alloc] initWithInt:STANDARD_RUN_VERSION] autorelease]];
 
     //ECA
     [anECARun setECA_pattern:[decoder decodeIntForKey:@"SNOPECApattern"]];
