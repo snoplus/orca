@@ -27,6 +27,7 @@
 @class ORSafeQueue;
 @class NetSocket;
 @class ORLabJackUE9Cmd;
+@class ORAlarm;
 
 #define kUE9NumAdcs		84
 #define kUE9NumTimers	6
@@ -37,6 +38,7 @@
 #define kUE9ResetCounters	0x2
 
 @interface ORLabJackUE9Model : ORGroup <OROrderedObjHolding,ORAdcProcessing,ORBitProcessing> {
+    ORAlarm* socketClosedAlarm;
 	NSOperationQueue* queue;
 	ORSafeQueue*   cmdQueue;
 	ORLabJackUE9Cmd*  lastRequest;
