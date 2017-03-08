@@ -1132,7 +1132,8 @@ err:
         NSLog(@"[TELLIE_DATABASE]: Error connecting to couchdb database\n");
         return;
     }
-    NSString* parsReturnStr = [[NSString alloc] initWithData:parsData encoding:NSUTF8StringEncoding];
+    //fixed memory leak on early return.. MAH 03/08/2017
+    NSString* parsReturnStr = [[[NSString alloc] initWithData:parsData encoding:NSUTF8StringEncoding] autorelease];
     // Format queried data to dictionary
     NSError* parsDictError =  nil;
     NSMutableDictionary* parsDict = [NSJSONSerialization JSONObjectWithData:[parsReturnStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&parsDictError];
@@ -1140,7 +1141,7 @@ err:
         NSLog(@"[TELLIE_DATABASE]: Error querying couchDB, please check the connection is correct %@\n",parsDictError);
         return;
     }
-    [parsReturnStr release];
+    //[parsReturnStr release]; should have been autoreleased because of early return above
 
     NSMutableDictionary* fireParametersDoc =[[[parsDict objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"];
     NSLog(@"[TELLIE_DATABASE]: channel calibrations sucessfully loaded!\n");
@@ -2222,14 +2223,15 @@ err:
 
     NSURL *url = [NSURL URLWithString:urlString];
     NSData *data = [NSData dataWithContentsOfURL:url];
-    NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    //fixed memory leak on early return MAH 03/08/2017
+    NSString *ret = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
     NSError *error =  nil;
     NSMutableDictionary *currentConfig = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
     if(error){
         NSLogColor([NSColor redColor], @"[SMELLIE]: Error in querying couchDB: %@\n", error);
         return nil;
     }
-    [ret release];
+    //[ret release]; should have been autoreleased in case of early return
 
     NSMutableDictionary* configForSmellie = [[[[currentConfig objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"] objectForKey:@"configuration_info"];
 
