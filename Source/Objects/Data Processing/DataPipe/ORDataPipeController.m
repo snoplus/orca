@@ -21,7 +21,7 @@
 #pragma mark •••Imported Files
 #import "ORDataPipeController.h"
 #import "ORDataPipeModel.h"
-#import "ORVmeCrateModel.h"
+#import "ORRunModel.h"
 
 @implementation ORDataPipeController
 
@@ -31,10 +31,6 @@
     self = [super initWithWindowNibName:@"DataPipe"];
 	return self;
 }
-
-
-
-#pragma mark •••Accessors
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers
@@ -62,12 +58,64 @@
                      selector : @selector(readerPathChanged:)
                          name : ORDataPipeReaderPathChanged
                        object : nil];
+    
     [notifyCenter addObserver : self
                      selector : @selector(updateStatus:)
                          name : ORDataPipeUpdate
                        object : nil];
     
+    [notifyCenter addObserver : self
+                     selector : @selector(setupRunTypeNames:)
+                         name : ORDataPipeLoadRunTypeNames
+                       object : nil];
     
+    [notifyCenter addObserver: self
+                     selector: @selector(runTypeChanged:)
+                         name: ORDataPipeTypeChangedNotification
+                       object: model];
+    
+}
+
+- (void) awakeFromNib
+{
+     [super awakeFromNib];
+
+    int i=0;
+    int row;
+    int column;
+    for(row=0;row<4;row++){
+        for(column=0;column<4;column++){
+            [[runTypeMatrix cellAtRow:row column:column] setTag:i];
+            i++;
+        }
+    }
+}
+
+- (void) runTypeChanged:(NSNotification *)notification
+{
+    unsigned long runType = [model runType];
+    int i;
+    for(i=0;i<32;i++){
+        [[runTypeMatrix cellWithTag:i] setState:(runType &(1L<<i))!=0];
+    }
+}
+
+- (void) setupRunTypeNames:(NSNotification*)aNote
+{
+    NSArray* theNames = [[model runModel] runTypeNames];
+    int n = [theNames count];
+    int i;
+    [[runTypeMatrix cellWithTag:0] setTitle:@"DAQExpertMode"];
+    if(n){
+        for(i=1;i<n;i++){
+            [[runTypeMatrix cellWithTag:i] setTitle:[theNames objectAtIndex:i]];
+        }
+    }
+    else {
+        for(i=1;i<32;i++){
+            [[runTypeMatrix cellWithTag:i] setTitle:[NSString stringWithFormat:@"Bit %d",i]];
+        }
+    }
 }
 
 #pragma mark •••Interface Management
@@ -77,8 +125,9 @@
     [self pipeNameChanged:nil];
     [self readerPathChanged:nil];
     [self updateStatus:nil];
+    [self runTypeChanged:nil];
+    [self setupRunTypeNames:nil];
 }
-
 
 - (void) lockChanged:(NSNotification*)aNotification
 {
@@ -87,6 +136,7 @@
     [lockButton setState: locked];
     [pipeNameField setEnabled:!locked && !runInProgress];
     [readerPathField setEnabled:!locked && !runInProgress];
+    [runTypeMatrix setEnabled:!locked && !runInProgress];
 }
 
 - (void) updateStatus:(NSNotification*)aNotification
@@ -95,6 +145,8 @@
     if(rate>1E6)[byteCountField setStringValue:[NSString stringWithFormat:@"%.2f MB/s",rate/1E6]];
     else if(rate>1E3)[byteCountField setStringValue:[NSString stringWithFormat:@"%.2f KB/s",rate/1E3]];
     else [byteCountField setStringValue:[NSString stringWithFormat:@"%.2f B/s",rate]];
+    if(![model validRunType]) [runTypeValidField setStringValue:@"Run Type Prohibits Sending"];
+    else                      [runTypeValidField setStringValue:@""];
     [runStatusField setStringValue: [model runInProgress]?@"Running":@"NOT Running"];
     BOOL readerRunning = [model readerIsRunning];
     [readerStatusField setStringValue:readerRunning?@"Running":@"NOT Running"];
@@ -122,11 +174,6 @@
     [gSecurity tryToSetLock:ORDataPipeLock to:[sender intValue] forWindow:[self window]];
 }
 
-- (IBAction) reportAction:(id) sender
-{
-    [model report];
-}
-
 - (IBAction) readerPathAction:(id) sender
 {
     [model setReaderPath:[sender stringValue]];
@@ -135,6 +182,16 @@
 - (IBAction) pipeNameAction:(id) sender
 {
     [model setPipeName:[sender stringValue]];
-   
 }
+
+- (IBAction) runTypeAction:(id)sender
+{
+    unsigned long aMask = 0;
+    int i;
+    for(i=0;i<32;i++){
+        if([[runTypeMatrix cellWithTag:i] intValue])aMask |= (1<<i);
+    }
+    [model setRunType:aMask];
+}
+
 @end

@@ -287,6 +287,8 @@ enum {
     BOOL            linkWasLost;
     BOOL            setupNIMOutputDone;
     BOOL            doLockRecoveryInQuckStart;
+    int             linkLostCount;
+    BOOL            wasLocked;
 }
 
 - (id) init;
@@ -368,6 +370,7 @@ enum {
 - (void) setupStateArray;
 - (NSString*) stateStatus:(int)aStateIndex;
 - (int) initializationState;
+- (void) checkForLostLinkCondition;
 
 #pragma mark •••set up routines
 - (void) initClockDistribution;

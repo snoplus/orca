@@ -150,6 +150,7 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
     
     
     if(sltRevision>=0x3010004){//we have SLT event FIFO since last revision -> read FIFO (one event = 6 words)
+        uint32_t fifoOverflow, numMissingWords=0, numToSkip=0, numMisaligned=0;
         //DEBUG   fprintf(stdout, "sltRevision>=0x3010003\n");
         //block FIFO readout
         //has FIFO data?
@@ -158,30 +159,89 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
         fifoReadoutBuffer32Len=fifoavail;
 //DEBUG quick test: read always 6 words in single access mode ... -tb-
 //if(fifoReadoutBuffer32Len >= 6) fifoReadoutBuffer32Len = 6; else fifoReadoutBuffer32Len = 0;
-        if(fifoReadoutBuffer32Len>8192) fifoReadoutBuffer32Len=8192;
+        //if(fifoReadoutBuffer32Len>8192) fifoReadoutBuffer32Len=8192;
+        if(fifoReadoutBuffer32Len>8160) fifoReadoutBuffer32Len=8160;//8160 is 170*48, smallest multiple of 48 smaller than 8192 (8192=max.readout block)
 //for testing:
-        if(fifoReadoutBuffer32Len<60) fifoReadoutBuffer32Len=0;//read eat least 10 events in one block (to really use dma mode) -tb- 
+        //if(fifoReadoutBuffer32Len<60) fifoReadoutBuffer32Len=0;//read eat least 10 events in one block (to really use dma mode) -tb-
 
         //testing if(fifoReadoutBuffer32Len>800) fifoReadoutBuffer32Len=800;
         #if 0
         uint32_t modulo6 = fifoReadoutBuffer32Len % 6;//always read multiple of 6 word32s
         if(modulo6) fifoReadoutBuffer32Len = (fifoReadoutBuffer32Len-modulo6)/6; else fifoReadoutBuffer32Len = fifoReadoutBuffer32Len/6;
         #endif
-        fifoReadoutBuffer32Len = fifoReadoutBuffer32Len/6;//division for integers will round down -tb-
+        fifoReadoutBuffer32Len = (fifoReadoutBuffer32Len/6)*6;//division for integers will round down -tb-
         if(fifoReadoutBuffer32Len>0){
             if(fifoReadoutBuffer32Len<48){  //if there are more than 48 words, use blockread; blockread should read multiple of 8 words
                 for(i=0;i<fifoReadoutBuffer32Len; i++){
                     fifoReadoutBuffer32[i]=pbus->read(FIFO0Addr);
                 }
             }else{                          //there are more than 48 words -> use DMA
-                fifoReadoutBuffer32Len = (fifoReadoutBuffer32Len>>3)<<3;//always read multiple of 8 word32s
+                //fifoReadoutBuffer32Len = (fifoReadoutBuffer32Len>>3)<<3;//always read multiple of 8 word32s
+                fifoReadoutBuffer32Len = (fifoReadoutBuffer32Len/48)*48;//always read multiple of 48 word32s
                 uint32_t retval =
-                pbus->readBlock(FIFO0Addr, (unsigned long *) fifoReadoutBuffer32, fifoReadoutBuffer32Len);//read up to 2048 word32s
+                pbus->readBlock(FIFO0Addr, (unsigned long *) fifoReadoutBuffer32, fifoReadoutBuffer32Len);//read up to 4*2048 word32s
+                #if 0
                 //DEBUG: test it, then remove it -tb- 2016
-                if(retval!=fifoReadoutBuffer32Len) printf("ORSlLTv4Readout.cc - retval!=fifoReadoutBuffer32Len!  retval: %i fifoReadoutBuffer32Len: %i\n",retval,fifoReadoutBuffer32Len);
+                //DEBUG: retval is always 0 - should fix it in the fdhwlib!!!!!  -tb- 2017
+                if(retval!=fifoReadoutBuffer32Len) printf("ORSlLTv4Readout.cc - retval!=fifoReadoutBuffer32Len!  retval: %i fifoReadoutBuffer32Len: %i (fifoavail:%i)\n",retval,fifoReadoutBuffer32Len,fifoavail);
+                if(retval!=0) printf("ORSlLTv4Readout.cc - retval  : %i  \n",retval);
+                #endif
             }
-            //TODO: check bits 29-31!!!!!
             
+            
+            
+            numMissingWords=0;
+
+#if 0
+            //check bits 29-31
+            uint32_t f,pattern=0x1;
+            for(i=0;i<fifoReadoutBuffer32Len; i++){
+                f = fifoReadoutBuffer32[i];
+                if((f >> 29) != pattern){
+                    //if(i<3000)
+                    printf("ORSLTv4Readout.cc - error at index %i: 0x%08x (%i)   pattern is %i should be %i\n",i, fifoReadoutBuffer32[i],fifoReadoutBuffer32[i],(f >> 29),pattern);
+                }
+                
+#if 0
+                //check missing words
+                //if(i<12 || i>(fifoReadoutBuffer32Len-13))                printf("ORSLTv4Readout.cc - %i: 0x%08x (%i)\n",i, fifoReadoutBuffer32[i+numMissingWords],fifoReadoutBuffer32[i+numMissingWords]);
+                if((f >> 29) == 0x3){
+                    printf("ORSLTv4Readout.cc - %i: 0x%08x (%i)   eventID %i\n",i, fifoReadoutBuffer32[i+numMissingWords],fifoReadoutBuffer32[i+numMissingWords],  fifoReadoutBuffer32[i+numMissingWords] & 0x3fff);
+                }else{
+                    printf("ORSLTv4Readout.cc - %i: 0x%08x (%i)\n",i, fifoReadoutBuffer32[i+numMissingWords],fifoReadoutBuffer32[i+numMissingWords]);
+                }
+#endif
+                
+                pattern ++;
+                if(pattern==0x7) pattern=0x1;
+            }
+            
+#endif
+      
+            
+            
+#if 1
+            numToSkip=0;
+            //correct data record alignment (check bits 29-31)
+            uint32_t f,pattern=0x1;
+            for(i=0;i<6/*fifoReadoutBuffer32Len*/; i++){
+                f = fifoReadoutBuffer32[i];
+                if((f >> 29) == 0x1){
+                    if(i)
+                    printf("ORSLTv4Readout.cc - error; found  alignment error at index %i: 0x%08x (%i)   pattern is %i should be %i\n",i, fifoReadoutBuffer32[i],fifoReadoutBuffer32[i],(f >> 29),pattern);
+                }
+                
+                
+                pattern ++;
+                if(pattern==0x7) pattern=0x1;
+            }
+            numToSkip=i%6;
+            
+#endif
+            if(numToSkip>0 /*&& numToSkip<6*/){
+                printf("ORSLTv4Readout.cc - error; found  alignment error: numToSkip   %i:  (fifoReadoutBuffer32Len %i) (read instead %i)\n",numToSkip, fifoReadoutBuffer32Len,fifoReadoutBuffer32Len-6);
+                fifoReadoutBuffer32Len-=6;//drop one event
+            }
             recordLength = fifoReadoutBuffer32Len+4;
             ensureDataCanHold(recordLength);
             data[dataIndex++] = energyId | recordLength;
@@ -189,8 +249,11 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
             data[dataIndex++] = fifomode; //spare //TODO: for debugging - remove it? -tb-
             data[dataIndex++] = 0; //spare
             for(i=0;i<fifoReadoutBuffer32Len; i++){
-                data[dataIndex++] = fifoReadoutBuffer32[i];
+                data[dataIndex++] = fifoReadoutBuffer32[i+numToSkip];
+                //DEBUG printf("fifoReadoutBuffer32[%i+%i]: 0x%08x\n",i,numToSkip, fifoReadoutBuffer32[i+numToSkip]);//DEBUGGING -tb-
             }
+            //DEBUG printf(" \n" );//DEBUGGING -tb-
+
             
         }else{
             //usleep(1);

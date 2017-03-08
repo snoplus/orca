@@ -6,7 +6,7 @@
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner" customClass="ORPacFPController">
+        <customObject id="-2" userLabel="File's Owner" customClass="ORHVcRIOController">
             <connections>
                 <outlet property="adcMatrix" destination="2225" id="2325"/>
                 <outlet property="adcNameMatrix" destination="3136" id="3181"/>
@@ -48,7 +48,7 @@
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
-        <customObject id="-3" userLabel="Application"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <window title="HV-cRIO-Control" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="5" userLabel="Window">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
@@ -111,7 +111,7 @@
                         <tabViewItems>
                             <tabViewItem label="Connection" identifier="1" id="2459">
                                 <view key="view" id="2460">
-                                    <rect key="frame" x="10" y="25" width="681" height="450"/>
+                                    <rect key="frame" x="10" y="25" width="776" height="450"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField hidden="YES" verticalHuggingPriority="750" id="2232">
@@ -758,6 +758,15 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
+                                        <textField verticalHuggingPriority="750" id="ybf-HU-bTL">
+                                            <rect key="frame" x="180" y="198" width="200" height="80"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="UNDER DEVELOPMENT!" id="Co8-lP-eUA">
+                                                <font key="font" size="24" name=".AppleSystemUIFont"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
                                     </subviews>
                                 </view>
                             </tabViewItem>
@@ -795,14 +804,14 @@
                                             </connections>
                                         </matrix>
                                         <button verticalHuggingPriority="750" tag="4" id="3008">
-                                            <rect key="frame" x="45" y="125" width="248" height="32"/>
+                                            <rect key="frame" x="45" y="125" width="88" height="32"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Write All" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="3026">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="miniSystem"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="setGainsAction:" target="-2" id="lEE-4v-Zbw"/>
+                                                <action selector="writeSetpointsAction:" target="-2" id="wdG-LJ-51Y"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" tag="4" id="3054">
@@ -831,8 +840,8 @@
                                                         <tableViewGridLines key="gridStyleMask" vertical="YES" horizontal="YES"/>
                                                         <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                         <tableColumns>
-                                                            <tableColumn identifier="Channel" editable="NO" width="43.43359375" minWidth="40" maxWidth="1000" id="3015">
-                                                                <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Chan">
+                                                            <tableColumn identifier="Item" editable="NO" width="96.43359375" minWidth="40" maxWidth="1000" id="3015">
+                                                                <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Item">
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
@@ -844,8 +853,8 @@
                                                                 </textFieldCell>
                                                                 <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
                                                             </tableColumn>
-                                                            <tableColumn identifier="Board0" width="56.5859375" minWidth="40" maxWidth="1000" id="3016">
-                                                                <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="right" title="Board 0">
+                                                            <tableColumn identifier="Data" width="64.5859375" minWidth="40" maxWidth="1000" id="3016">
+                                                                <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="right" title="Data">
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
@@ -857,8 +866,8 @@
                                                                 </textFieldCell>
                                                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                             </tableColumn>
-                                                            <tableColumn identifier="Board1" width="60" minWidth="10" maxWidth="3.4028234663852886e+38" id="3017">
-                                                                <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="right" title="Board 1">
+                                                            <tableColumn identifier="Setpoint" width="72" minWidth="10" maxWidth="3.4028234663852886e+38" id="3017">
+                                                                <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="right" title="Setpoint">
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -870,26 +879,13 @@
                                                                 </textFieldCell>
                                                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                             </tableColumn>
-                                                            <tableColumn identifier="Board2" width="56.48828125" minWidth="10" maxWidth="3.4028234663852886e+38" id="3018">
-                                                                <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="right" title="Board 2">
+                                                            <tableColumn identifier="Readback" width="58" minWidth="10" maxWidth="3.4028234663852886e+38" id="3018">
+                                                                <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="right" title="Readback">
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                 </tableHeaderCell>
                                                                 <textFieldCell key="dataCell" controlSize="small" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="right" title="Text Cell" id="3021">
-                                                                    <font key="font" metaFont="smallSystem"/>
-                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                                    <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                </textFieldCell>
-                                                                <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
-                                                            </tableColumn>
-                                                            <tableColumn identifier="Board3" width="62.85546875" minWidth="10" maxWidth="3.4028234663852886e+38" id="3019">
-                                                                <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="right" title="Board 3">
-                                                                    <font key="font" metaFont="smallSystem"/>
-                                                                    <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
-                                                                    <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
-                                                                </tableHeaderCell>
-                                                                <textFieldCell key="dataCell" controlSize="small" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="right" title="Text Cell" id="3020">
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -926,7 +922,7 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" headerView="3038" id="3041">
-                                                        <rect key="frame" x="0.0" y="0.0" width="321" height="222"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="296" height="19"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" red="0.82780295999999998" green="1" blue="0.80054939000000003" alpha="1" colorSpace="calibratedRGB"/>
@@ -1060,11 +1056,11 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <progressIndicator maxValue="100" indeterminate="YES" controlSize="small" style="bar" id="uTT-b4-CmB">
+                                        <progressIndicator hidden="YES" maxValue="100" indeterminate="YES" controlSize="small" style="bar" id="uTT-b4-CmB">
                                             <rect key="frame" x="46" y="111" width="167" height="12"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         </progressIndicator>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="tz7-VV-LWt">
+                                        <textField hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="tz7-VV-LWt">
                                             <rect key="frame" x="219" y="110" width="59" height="14"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="--" id="n7Y-5e-NeN">
@@ -1073,7 +1069,7 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="QyS-hD-B0C">
+                                        <textField hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="QyS-hD-B0C">
                                             <rect key="frame" x="219" y="88" width="59" height="14"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="--" id="MJj-cu-HJw">
@@ -1082,7 +1078,7 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="YJF-1d-u9Z">
+                                        <textField hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="YJF-1d-u9Z">
                                             <rect key="frame" x="98" y="89" width="117" height="14"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Set Gains Result:" id="Si1-Vr-3RY">
@@ -1094,12 +1090,23 @@
                                         <textField verticalHuggingPriority="750" id="3059">
                                             <rect key="frame" x="339" y="405" width="304" height="44"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="IST/ReadBack Values" id="3060">
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Measured Values" id="3060">
                                                 <font key="font" size="23" name="Papyrus"/>
                                                 <color key="textColor" red="0.078694656449999997" green="0.1157358394" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
+                                        <button verticalHuggingPriority="750" tag="4" id="aZh-T3-lcY">
+                                            <rect key="frame" x="189" y="126" width="88" height="32"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="push" title="Read Back" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="WiR-2S-Yyn">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="miniSystem"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="readBackSetpointsAction:" target="-2" id="d2e-XF-Lg7"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                 </view>
                             </tabViewItem>
@@ -1171,7 +1178,7 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" autosaveColumns="NO" headerView="2904" id="2905">
-                                                        <rect key="frame" x="0.0" y="0.0" width="438" height="149"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="414" height="19"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" red="0.77615756000000002" green="0.84355026" blue="0.86413044000000006" alpha="1" colorSpace="calibratedRGB"/>
@@ -1269,7 +1276,7 @@
                                                 <rect key="frame" x="-100" y="-100" width="426" height="15"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
-                                            <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="37" horizontal="NO" id="2907">
+                                            <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="2907">
                                                 <rect key="frame" x="-100" y="-100" width="15" height="142"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>

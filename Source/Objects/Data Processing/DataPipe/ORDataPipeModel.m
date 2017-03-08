@@ -21,14 +21,17 @@
 #pragma mark •••Imported Files
 #import "ORDataPipeModel.h"
 #import "ORDecoder.h"
+#import "ORRunModel.h"
 #import <libproc.h>
 
-static NSString* ORDataPipeConnector           = @"DataPipe Connector";
+static NSString* ORDataPipeConnector        = @"DataPipe Connector";
 
-NSString* ORDataPipeLock                  = @"ORDataPipeLock";
-NSString* ORDataPipeReaderPathChanged     = @"ORDataPipeReaderPathChanged";
-NSString* ORDataPipeNameChanged           = @"ORDataPipeNameChanged";
-NSString* ORDataPipeUpdate                = @"ORDataPipeUpdate";
+NSString* ORDataPipeLock                    = @"ORDataPipeLock";
+NSString* ORDataPipeReaderPathChanged       = @"ORDataPipeReaderPathChanged";
+NSString* ORDataPipeNameChanged             = @"ORDataPipeNameChanged";
+NSString* ORDataPipeUpdate                  = @"ORDataPipeUpdate";
+NSString* ORDataPipeLoadRunTypeNames        = @"ORDataPipeLoadRunTypeNames";
+NSString* ORDataPipeTypeChangedNotification = @"ORDataPipeTypeChangedNotification";
 
 #define byteCheckPollRate 2
 
@@ -43,7 +46,7 @@ NSString* ORDataPipeUpdate                = @"ORDataPipeUpdate";
     [[self undoManager] disableUndoRegistration];
     [[self undoManager] enableUndoRegistration];
     
-    _ignoreMode = YES;
+    validRunType = YES;
     
 	return self;
 }
@@ -53,12 +56,37 @@ NSString* ORDataPipeUpdate                = @"ORDataPipeUpdate";
     if(fifoFD)close(fifoFD);
     fifoFD = 0;
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [runModel release];
 	[super dealloc];
 }
 
 - (void) setUpImage
 {
-    [self setImage:[NSImage imageNamed:@"DataPipe"]];
+    //---------------------------------------------------------------------------------------------------
+    //arghhh....NSImage caches one image. The NSImage setCachMode:NSImageNeverCache appears to not work.
+    //so, we cache the image here so we can draw into it.
+    //---------------------------------------------------------------------------------------------------
+    
+    NSImage* aCachedImage = [NSImage imageNamed:@"DataPipe"];
+ 
+    NSSize theIconSize = [aCachedImage size];
+    NSPoint theOffset  = NSZeroPoint;
+    
+    NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
+    [i lockFocus];
+    [aCachedImage drawAtPoint:theOffset fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+    if([[ORGlobal sharedGlobal] runMode] == kOfflineRun && !validRunType){
+        NSImage* aNoticeImage = [NSImage imageNamed:@"notice"];
+        [aNoticeImage drawAtPoint:NSMakePoint(theOffset.x/2.+[i size].width/2-[aNoticeImage size].width/2 ,[i size].height/2-[aNoticeImage size].height/2) fromRect:[aNoticeImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+    }
+
+    [i unlockFocus];
+    
+    [self setImage:i];
+    [i release];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORForceRedraw object: self];
 }
 
 - (void) makeMainController
@@ -69,6 +97,12 @@ NSString* ORDataPipeUpdate                = @"ORDataPipeUpdate";
 - (NSString*) helpURL
 {
 	return @"Data_Chain/Broadcaster.html";
+}
+
+- (void) awakeAfterDocumentLoaded
+{
+    [self getRunModel];
+    
 }
 
 - (void) makeConnectors
@@ -91,6 +125,16 @@ NSString* ORDataPipeUpdate                = @"ORDataPipeUpdate";
                      selector : @selector(runAboutToStop:)
                          name : ORRunAboutToStopNotification
                        object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(getRunModel)
+                         name : ORGroupObjectsAdded
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(getRunModel)
+                         name : ORGroupObjectsRemoved
+                       object : nil];
 }
 
 - (void) runAboutToStop:(NSNotification*) aNote
@@ -103,13 +147,44 @@ NSString* ORDataPipeUpdate                = @"ORDataPipeUpdate";
     [self setUpImage];
 }
 
+- (BOOL) validRunType
+{
+    return validRunType;
+}
+
+- (void) getRunModel
+{
+    NSArray* runObjects = [[self document] collectObjectsOfClass:[ORRunModel class]];
+    [runModel release];
+    runModel = nil;
+    if([runObjects count]){
+        runModel = [[runObjects objectAtIndex:0] retain];
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDataPipeLoadRunTypeNames object: self];
+}
 
 #pragma mark •••Accessors
 
+- (unsigned long)	runType
+{
+    return runType;
+}
+- (void) setRunType:(unsigned long)aMask
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setRunType:runType];
+    runType = aMask;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDataPipeTypeChangedNotification object: self];
+}
+
+- (ORRunModel*)runModel
+{
+    return runModel;
+}
 - (BOOL) readerIsRunning
 {
     return readerIsRunning;
 }
+
 - (BOOL) runInProgress
 {
    return runInProgress;
@@ -119,6 +194,7 @@ NSString* ORDataPipeUpdate                = @"ORDataPipeUpdate";
 {
     return numberBytesSent;
 }
+
 - (float) sendRate
 {
     return sendRate;
@@ -171,29 +247,25 @@ NSString* ORDataPipeUpdate                = @"ORDataPipeUpdate";
     if(runInProgress)[self performSelector:@selector(postUpdate) withObject:nil afterDelay:byteCheckPollRate];
 }
 
-
-- (void) report
-{
-    NSLog(@"Pipe report\n");
-}
-
 - (BOOL) checkReader
 {
-    int numberOfProcesses = proc_listpids(PROC_ALL_PIDS, 0, NULL, 0);
-    pid_t pids[1024];
-    bzero(pids, 1024);
-    proc_listpids(PROC_ALL_PIDS, 0, pids, sizeof(pids));
-    const char* fullPath = [[readerPath stringByExpandingTildeInPath] cStringUsingEncoding:NSASCIIStringEncoding];
-    for (int i = 0; i < numberOfProcesses; ++i) {
-        if (pids[i] == 0) { continue; }
-        char pathBuffer[PROC_PIDPATHINFO_MAXSIZE];
-        bzero(pathBuffer, PROC_PIDPATHINFO_MAXSIZE);
-        proc_pidpath(pids[i], pathBuffer, sizeof(pathBuffer));
-        
-        if (strlen(pathBuffer) > 0) {
-            if(!strcmp(pathBuffer,fullPath)){
-                readerIsRunning = YES;
-                return YES;
+    if([readerPath length]){
+        int numberOfProcesses = proc_listpids(PROC_ALL_PIDS, 0, NULL, 0);
+        pid_t pids[1024];
+        bzero(pids, 1024);
+        proc_listpids(PROC_ALL_PIDS, 0, pids, sizeof(pids));
+        const char* fullPath = [[readerPath stringByExpandingTildeInPath] cStringUsingEncoding:NSASCIIStringEncoding];
+        for (int i = 0; i < numberOfProcesses; ++i) {
+            if (pids[i] == 0) { continue; }
+            char pathBuffer[PROC_PIDPATHINFO_MAXSIZE];
+            bzero(pathBuffer, PROC_PIDPATHINFO_MAXSIZE);
+            proc_pidpath(pids[i], pathBuffer, sizeof(pathBuffer));
+            
+            if (strlen(pathBuffer) > 0) {
+                if(!strcmp(pathBuffer,fullPath)){
+                    readerIsRunning = YES;
+                    return YES;
+                }
             }
         }
     }
@@ -204,19 +276,24 @@ NSString* ORDataPipeUpdate                = @"ORDataPipeUpdate";
 
 - (void) runTaskStarted:(id)userInfo
 {
+    unsigned long runModelRunType = [runModel runType];
+    validRunType = !(runModelRunType & runType);
+    [self setUpImage];
+
     runInProgress = YES;
     numberBytesSent = 0;
     
     [self startUpdates];
-    
-    NSFileManager* fm = [NSFileManager defaultManager];
-    const char* cPipeName = [pipeName cStringUsingEncoding:NSASCIIStringEncoding];
-    if(![fm fileExistsAtPath:pipeName]) {
-        mkfifo(cPipeName, S_IRWXU);
+    if([pipeName length]){
+        NSFileManager* fm = [NSFileManager defaultManager];
+        const char* cPipeName = [pipeName cStringUsingEncoding:NSASCIIStringEncoding];
+        if(![fm fileExistsAtPath:pipeName]) {
+            mkfifo(cPipeName, S_IRWXU);
+        }
+        // Open and use the fifo as you would any file in Cocoa, but remember that it's a FIFO
+        fifoFD = open(cPipeName,O_RDWR);
+        fcntl(fifoFD, F_SETFL, fcntl(fifoFD, F_GETFL) | O_NONBLOCK);
     }
-    // Open and use the fifo as you would any file in Cocoa, but remember that it's a FIFO
-    fifoFD = open(cPipeName,O_RDWR);
-    fcntl(fifoFD, F_SETFL, fcntl(fifoFD, F_GETFL) | O_NONBLOCK);
 }
 
 - (void) subRunTaskStarted:(id)userInfo
@@ -248,7 +325,10 @@ NSString* ORDataPipeUpdate                = @"ORDataPipeUpdate";
     [[self undoManager] disableUndoRegistration];
     [self setPipeName:     [decoder decodeObjectForKey:   @"pipeName"]];
     [self setReaderPath:   [decoder decodeObjectForKey:   @"readerPath"]];
+    [self setRunType:   [decoder decodeInt32ForKey:   @"runType"]];
     [[self undoManager] enableUndoRegistration];
+    
+    validRunType = YES; //assume ok. Check again when run starts
     
     return self;
 }
@@ -256,6 +336,7 @@ NSString* ORDataPipeUpdate                = @"ORDataPipeUpdate";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt32:runType            forKey:@"runType"];
     [encoder encodeObject:readerPath         forKey:@"readerPath"];
     [encoder encodeObject:pipeName           forKey:@"pipeName"];
 }
@@ -266,7 +347,7 @@ NSString* ORDataPipeUpdate                = @"ORDataPipeUpdate";
 #pragma mark •••Data Handling
 - (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
 {
-    if(([[ORGlobal sharedGlobal] runMode] == kNormalRun) && [self readerIsRunning]){
+    if(([[ORGlobal sharedGlobal] runMode] == kNormalRun) && [self readerIsRunning] && validRunType){
         for(NSData* d in dataArray){
             @try {
                 if(fifoFD){

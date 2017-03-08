@@ -25,13 +25,12 @@
 #pragma mark •••Forward Declarations
 @class ORDataPipeClient;
 @class ORDecoder;
-
-
+@class ORRunModel;
 
 @interface ORDataPipeModel :  ORDataChainObject <ORDataProcessing>  
 {
     @private
-	BOOL            _ignoreMode;
+	BOOL            validRunType;
 	BOOL            runInProgress;
 	int             runMode;
     int             fifoFD;
@@ -42,10 +41,14 @@
     BOOL            readerIsRunning;
     long            numberBytesSent;
     float           sendRate;
+    ORRunModel*     runModel;
+    unsigned long	runType;
+  
 }
+#pragma mark •••Init Stuff
+- (void) getRunModel;
 
 #pragma mark •••Accessors
-- (void) report;
 - (void) startUpdates;
 - (void) postUpdate;
 - (NSString*) readerPath;
@@ -56,6 +59,10 @@
 - (long) numberBytesSent;
 - (BOOL) readerIsRunning;
 - (BOOL) runInProgress;
+- (ORRunModel*)runModel;
+- (unsigned long)runType;
+- (void)	setRunType:(unsigned long)aMask;
+- (BOOL) validRunType;
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
@@ -79,3 +86,5 @@ extern NSString* ORDataPipeLock;
 extern NSString* ORDataPipeReaderPathChanged;
 extern NSString* ORDataPipeNameChanged;
 extern NSString* ORDataPipeUpdate;
+extern NSString* ORDataPipeLoadRunTypeNames;
+extern NSString* ORDataPipeTypeChangedNotification;
