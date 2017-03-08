@@ -476,8 +476,9 @@ snopGreenColor;
 {
 
     //Load selected SR in case the user didn't click enter
-    NSString *standardRun = [[standardRunPopupMenu objectValueOfSelectedItem] copy];
-    NSString *standardRunVersion = [[standardRunVersionPopupMenu objectValueOfSelectedItem] copy];
+    //fixed memory leak in the next two lines -- don't 'copy without a matching release MAH 03/8/2017
+    NSString *standardRun = [standardRunPopupMenu objectValueOfSelectedItem];
+    NSString *standardRunVersion = [standardRunVersionPopupMenu objectValueOfSelectedItem];
     
     //Load selected version run:
     //If we are in operator mode we ALWAYS load the DEFAULTs
