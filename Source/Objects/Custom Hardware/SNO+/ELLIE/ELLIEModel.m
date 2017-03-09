@@ -156,7 +156,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
         [self setInterlockClient:interlockCli];
         [[self tellieClient] setTimeout:10];
         [[self smellieClient] setTimeout:360];
-        [[self interlockClient] setTimeout:1];
+        [[self interlockClient] setTimeout:10];
 
         [tellieCli release];
         [smellieCli release];
