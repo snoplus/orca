@@ -1153,7 +1153,6 @@ snopGreenColor;
       [e raise];
     }
     ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
-    
     smellieThread = [[NSThread alloc] initWithTarget:theELLIEModel selector:@selector(startSmellieRun:) object:smellieRunFile];
     [smellieThread start];
 }

@@ -104,6 +104,7 @@
 -(void)awakeFromNib;
 -(void)updateServerSettings:(NSNotification *)aNote;
 -(BOOL)isNumeric:(NSString *)s;
+-(void)fetchConfigurationFile:(NSNotification *)aNote;
 
 //TELLIE functions -----------------------------
 

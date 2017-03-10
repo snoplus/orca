@@ -38,8 +38,15 @@
 //tags to define that an ELLIE run file has been updated
 #define kSmellieRunDocumentAdded   @"kSmellieRunDocumentAdded"
 #define kSmellieRunDocumentUpdated   @"kSmellieRunDocumentUpdated"
+#define kSmellieConigVersionRetrieved @"kSmellieConfigVersionRetrieved"
+#define kSmellieConigRetrieved @"kSmellieConfigRetrieved"
+
 #define kTellieRunDocumentAdded   @"kTellieRunDocumentAdded"
 #define kTellieRunDocumentUpdated   @"kTellieRunDocumentUpdated"
+#define kTellieParsRetrieved @"kTellieParsRetrieved"
+#define kTellieMapRetrieved @"kTellieMapRetrieved"
+#define kTellieNodeRetrieved @"kTellieNodeRetrieved"
+
 #define kAmellieRunDocumentAdded   @"kAmellieRunDocumentAdded"
 #define kAmellieRunDocumentUpdated   @"kAmellieRunDocumentUpdated"
 #define kSmellieRunHeaderRetrieved   @"kSmellieRunHeaderRetrieved"
@@ -62,8 +69,6 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
 -(void) _pushEllieCustomRunToDB:(NSString*)aCouchDBName runFiletoPush:(NSMutableDictionary*)customRunFile withDocType:(NSString*)aDocType;
 -(void) _pushEllieConfigDocToDB:(NSString*)aCouchDBName runFiletoPush:(NSMutableDictionary*)customRunFile withDocType:(NSString*)aDocType;
 -(NSString*) stringDateFromDate:(NSDate*)aDate;
--(void) _pushSmellieRunDocument;
-//-(void) _pushSmellieConfigDocument;
 @end
 
 
@@ -114,23 +119,6 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
 - (id) init
 {
     self = [super init];
-    if (self){
-    /*
-        XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:@"builder1" withPort:@"5030"];
-        XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:@"snodrop" withPort:@"5020"];
-        XmlrpcClient* interlockCli = [[XmlrpcClient alloc] initWithHostName:@"snodrop" withPort:@"5021"];
-        [self setTellieClient:tellieCli];
-        [self setSmellieClient:smellieCli];
-        [self setInterlockClient:interlockCli];
-
-        [[self tellieClient] setTimeout:10];
-        [[self smellieClient] setTimeout:360];
-        [[self smellieClient] setTimeout:1];
-        [tellieCli release];
-        [smellieCli release];
-        [interlockCli release];
-     */
-     }
     return self;
 }
 
@@ -168,7 +156,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
         [self setInterlockClient:interlockCli];
         [[self tellieClient] setTimeout:10];
         [[self smellieClient] setTimeout:360];
-        [[self interlockClient] setTimeout:1];
+        [[self interlockClient] setTimeout:10];
 
         [tellieCli release];
         [smellieCli release];
@@ -1017,13 +1005,6 @@ err:
     }
     ORRunModel* runControl = [runModels objectAtIndex:0];
 
-    NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    if(![snopModels count]){
-        NSLogColor([NSColor redColor], @"[TELLIE_UPLOAD]: Couldn't find SNOPModel\n");
-        return;
-    }
-    SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
-
     NSString* docType = [NSMutableString stringWithFormat:@"TELLIE_RUN"];
     NSMutableArray* subRunArray = [NSMutableArray arrayWithCapacity:10];
 
@@ -1038,7 +1019,7 @@ err:
 
     [self setTellieRunDoc:runDocDict];
 
-    [[aSnotModel orcaDbRefWithEntryDB:self withDB:@"telliedb"] addDocument:runDocDict tag:kTellieRunDocumentAdded];
+    [[self couchDBRef:self withDB:@"telliedb"] addDocument:runDocDict tag:kTellieRunDocumentAdded];
 
     //wait for main thread to receive acknowledgement from couchdb
     NSDate* timeout = [NSDate dateWithTimeIntervalSinceNow:2.0];
@@ -1078,7 +1059,7 @@ err:
 
     //check to see if run is offline or not
     if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
-        [[self orcaDbRefWithEntryDB:self withDB:@"telliedb"]
+        [[self couchDBRef:self withDB:@"telliedb"]
          updateDocument:runDocDict
          documentId:[runDocDict objectForKey:@"_id"]
          tag:kTellieRunDocumentUpdated];
@@ -1091,136 +1072,46 @@ err:
 -(void) loadTELLIEStaticsFromDB
 {
     /*
-     Load current tellie channel calibration and patch map settings from telliedb. 
-     This function accesses the telliedb and pulls down the most recent fireParameters
-     and patchMapping documents. The data is then saved to the member variables 
-     tellieFireParameters and tellieFibreMapping.
+     Load current tellie channel calibration and patch map settings from telliedb.
+     This function accesses the telliedb and pulls down the most recent fireParameters,
+     fibreMapping and nodeMapping documents. The data is then saved to the member variables
+     tellieFireParameters, tellieFibreMapping and tellieNodeMapping.
      */
-
-    // Load the SNOPModel to access orcaDBIPAddress and orcaDBPort variables
-    NSArray* snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    if(![snopModels count]){
-        NSLogColor([NSColor redColor], @"[TELLIE_DATABASE]: Couldn't find SNOPModel\n");
-        return;
-    }
-    SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
-
+    
     //Set all to be nil
     [self setTellieFireParameters:nil];
     [self setTellieFibreMapping:nil];
     [self setTellieNodeMapping:nil];
-    
-    // **********************************
-    // Load latest calibration constants
-    // **********************************
-    NSString* parsUrlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/telliedb/_design/tellieQuery/_view/fetchFireParameters?descending=False&limit=1",[aSnotModel orcaDBUserName], [aSnotModel orcaDBPassword], [aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
-    
-    NSString* webParsString = [parsUrlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-    NSURL* parsUrl = [NSURL URLWithString:webParsString];
-    NSMutableURLRequest* parsUrlRequest = [NSMutableURLRequest requestWithURL:parsUrl
-                                                                  cachePolicy:0
-                                                              timeoutInterval:20];
-    
-    // Get data string from URL
-    NSError* parsDataError =  nil;
-    NSURLResponse* parsUrlResponse;
-    NSData* parsData = [NSURLConnection sendSynchronousRequest:parsUrlRequest
-                                            returningResponse:&parsUrlResponse
-                                                        error:&parsDataError];
 
-    if(parsDataError){
-        NSLog(@"[TELLIE_DATABASE]: Error connecting to couchdb database\n");
-        return;
-    }
-    //fixed memory leak on early return.. MAH 03/08/2017
-    NSString* parsReturnStr = [[[NSString alloc] initWithData:parsData encoding:NSUTF8StringEncoding] autorelease];
-    // Format queried data to dictionary
-    NSError* parsDictError =  nil;
-    NSMutableDictionary* parsDict = [NSJSONSerialization JSONObjectWithData:[parsReturnStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&parsDictError];
-    if(parsDictError){
-        NSLog(@"[TELLIE_DATABASE]: Error querying couchDB, please check the connection is correct %@\n",parsDictError);
-        return;
-    }
-    //[parsReturnStr release]; should have been autoreleased because of early return above
+    NSString* parsString = [NSString stringWithFormat:@"_design/tellieQuery/_view/fetchFireParameters?descending=False&limit=1"];
+    NSString* mapString = [NSString stringWithFormat:@"_design/tellieQuery/_view/fetchCurrentMapping?key=2147483647"];
+    NSString* nodeString = [NSString stringWithFormat:@"_design/mapping/_view/node_to_fibre?descending=True&limit=1"];
 
-    NSMutableDictionary* fireParametersDoc =[[[parsDict objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"];
-    NSLog(@"[TELLIE_DATABASE]: channel calibrations sucessfully loaded!\n");
+    //
+    [[self couchDBRef:self withDB:@"telliedb"] getDocumentId:parsString tag:kTellieParsRetrieved];
+    [[self couchDBRef:self withDB:@"telliedb"] getDocumentId:mapString tag:kTellieMapRetrieved];
+    [[self couchDBRef:self withDB:@"telliedb"] getDocumentId:nodeString tag:kTellieNodeRetrieved];
+}
+
+-(void)parseTellieFirePars:(id)aResult
+{
+    NSMutableDictionary* fireParametersDoc =[[[aResult objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"];
+    NSLog(@"[TELLIE_DATABASE]: channel calibrations sucessfully loaded\n");
     [self setTellieFireParameters:fireParametersDoc];
+}
 
-    // **********************************
-    // Load latest fibre-channel mapping doc.
-    // **********************************
-    NSString* mapUrlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/telliedb/_design/tellieQuery/_view/fetchCurrentMapping?key=2147483647",[aSnotModel orcaDBUserName], [aSnotModel orcaDBPassword], [aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
-
-    NSString* webMapString = [mapUrlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-    NSURL* mapUrl = [NSURL URLWithString:webMapString];
-    NSMutableURLRequest* mapUrlRequest = [NSMutableURLRequest requestWithURL:mapUrl
-                                                                 cachePolicy:0
-                                                             timeoutInterval:20];
-
-    // Get data string from URL
-    NSError* mapDataError =  nil;
-    NSURLResponse* mapUrlResponse;
-    NSData* mapData = [NSURLConnection sendSynchronousRequest:mapUrlRequest
-                                            returningResponse:&mapUrlResponse
-                                                        error:&mapDataError];
-    /*
-    NSData* mapData = [NSData dataWithContentsOfURL:mapUrl
-                                            options:NSDataReadingMapped
-                                              error:&mapDataError];
-    */
-    if(mapDataError){
-        NSLog(@"[TELLIE_DATABASE]: Error connecting to couchdb database\n");
-        return;
-    }
-    NSString* mapReturnStr = [[NSString alloc] initWithData:mapData encoding:NSUTF8StringEncoding];
-    // Format queried data to dictionary
-    NSError* mapDictError =  nil;
-    NSMutableDictionary* mapDict = [NSJSONSerialization JSONObjectWithData:[mapReturnStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&mapDictError];
-    if(mapDictError){
-        NSLog(@"[TELLIE_DATABASE]: Error querying couchDB, please check the connection is correct %@\n",mapDictError);
-    }
-    [mapReturnStr release];
-
-    NSMutableDictionary* mappingDoc =[[[mapDict objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"];
-    NSLog(@"[TELLIE_DATABASE]: mapping document sucessfully loaded!\n");
+-(void)parseTellieFibreMap:(id)aResult
+{
+    NSMutableDictionary* mappingDoc =[[[aResult objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"];
+    NSLog(@"[TELLIE_DATABASE]: mapping document sucessfully loaded\n");
     [self setTellieFibreMapping:mappingDoc];
-    
-    // **********************************
-    // Load latest node-fibre mapping doc.
-    // **********************************
-    NSString* nodeUrlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/telliedb/_design/mapping/_view/node_to_fibre?descending=True&limit=1",[aSnotModel orcaDBUserName], [aSnotModel orcaDBPassword], [aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
-    
-    NSString* webNodeString = [nodeUrlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-    NSURL* nodeUrl = [NSURL URLWithString:webNodeString];
-    NSMutableURLRequest* nodeUrlRequest = [NSMutableURLRequest requestWithURL:nodeUrl
-                                                                  cachePolicy:0
-                                                              timeoutInterval:20];
-    
-    // Get data string from URL
-    NSError* nodeDataError =  nil;
-    NSURLResponse* nodeUrlResponse;
-    NSData* nodeData = [NSURLConnection sendSynchronousRequest:nodeUrlRequest
-                                             returningResponse:&nodeUrlResponse
-                                                         error:&nodeDataError];
-    if(nodeDataError){
-        NSLog(@"[TELLIE_DATABASE]: %@\n",nodeDataError);
-        return;
-    }
-    NSString* nodeReturnStr = [[NSString alloc] initWithData:nodeData encoding:NSUTF8StringEncoding];
-    
-    // Format queried data to dictionary
-    NSError* nodeDictError =  nil;
-    NSMutableDictionary* nodeDict = [NSJSONSerialization JSONObjectWithData:[nodeReturnStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&nodeDictError];
-    if(nodeDictError){
-        NSLog(@"[TELLIE_DATABASE]: Error querying couchDB, please check the connection is correct %@\n",nodeDictError);
-    }
-    
-    NSMutableDictionary* nodeDoc =[[[nodeDict objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"];
-    NSLog(@"[TELLIE_DATABASE]: node mapping document sucessfully loaded!\n");
+}
+
+-(void)parseTellieNodeMap:(id)aResult
+{
+    NSMutableDictionary* nodeDoc =[[[aResult objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"];
+    NSLog(@"[TELLIE_DATABASE]: node mapping document sucessfully loaded\n");
     [self setTellieNodeMapping:nodeDoc];
-    
-    [nodeReturnStr release];
 }
 
 /*********************************************************/
@@ -1500,14 +1391,6 @@ err:
         return;
     }
     ORRunModel* runControl = [runModels objectAtIndex:0];
-
-    ///////////////
-    // FIND AND LOAD RELEVANT CONFIG
-    NSNumber* configVersionNo;
-    configVersionNo = [self fetchRecentConfigVersion];
-    NSLog( @"[SMELLIE]: Loading config file: %i\n", [configVersionNo intValue]);
-    [self setSmellieConfigVersionNo:configVersionNo];
-    [self fetchConfigurationFile:configVersionNo];
 
     ///////////////
     // RUN CONTROL
@@ -1895,46 +1778,6 @@ err:
 /*****************************/
 /*  smellie db interactions  */
 /*****************************/
-- (void) fetchSmellieConfigurationInformation
-{
-    /*
-        Get smellie config information from the smelliedb.
-    */
-
-    //this is dependant upon the current couchDB view that exsists within the database
-    NSString *requestString = [NSString stringWithFormat:@"_design/smellieMainQuery/_view/pullEllieConfigHeaders"];
-    
-    [[self generalDBRef:@"smellie"] getDocumentId:requestString tag:kSmellieConfigHeaderRetrieved];
-    
-    [self setSmellieDBReadInProgress:YES];
-    // Is there a better way to do this... Do we know it's received after the delay?
-    [self performSelector:@selector(smellieDocumentsRecieved) withObject:nil afterDelay:10.0];
-}
-
-//complete this after the smellie documents have been recieved
--(void) smellieDocumentsRecieved
-{
-    /*
-     Update smeillieDBReadInProgress property bool.
-     */
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(smellieDocumentsRecieved) object:nil];
-    if (![self smellieDBReadInProgress]) { //killed already
-        return;
-    }
-
-    [self setSmellieDBReadInProgress:NO];
-}
-
--(void) smellieDBpush:(NSMutableDictionary*)dbDic
-{
-    [self _pushEllieCustomRunToDB:@"smellie" runFiletoPush:dbDic withDocType:@"smellie_run_description"];
-}
-
--(void) smellieConfigurationDBpush:(NSMutableDictionary*)dbDic
-{
-    [self _pushEllieConfigDocToDB:@"smellie" runFiletoPush:dbDic withDocType:@"smellie_run_configuration"];
-}
-
 -(void) pushInitialSmellieRunDocument
 {
     /*
@@ -1974,7 +1817,7 @@ err:
 
     [self setSmellieRunDoc:runDocDict];
 
-    [[aSnotModel orcaDbRefWithEntryDB:self withDB:@"smellie"] addDocument:runDocDict tag:kSmellieRunDocumentAdded];
+    [[self couchDBRef:self withDB:@"smellie"] addDocument:runDocDict tag:kSmellieRunDocumentAdded];
 
     //wait for main thread to receive acknowledgement from couchdb
     NSDate* timeout = [NSDate dateWithTimeIntervalSinceNow:5.0];
@@ -1991,13 +1834,6 @@ err:
      Arguments:
      NSDictionary* subRunDoc:  Subrun information to be added to the current [self tellieRunDoc].
      */
-    NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    if(![snopModels count]){
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find SNOPModel. Please add one to the experiment and restart the run.\n");
-        return;
-    }
-    SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
-
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
         NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find ORRunModel. Please add it to the experiment and restart the run.\n");
@@ -2017,194 +1853,37 @@ err:
     [self setSmellieRunDoc:runDocDict];
 
     //check to see if run is offline or not
-    [[aSnotModel orcaDbRefWithEntryDB:self withDB:@"smellie"] updateDocument:runDocDict documentId:[runDocDict objectForKey:@"_id"] tag:kTellieRunDocumentUpdated];
+    [[self couchDBRef:self withDB:@"smellie"] updateDocument:runDocDict documentId:[runDocDict objectForKey:@"_id"] tag:kTellieRunDocumentUpdated];
     [subRunInfo release];
     [runDocDict release];
     [subRunDocDict release];
 }
 
--(void) _pushSmellieRunDocument
-{
-    /*
-     Creat a standard smellie run doc using ELLIEModel / SNOPModel / ORRunModel class
-     variables and push up to the smelliedb.
-     */
-    NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:100];
-
-    //Collect a series of objects from the SNOPModel
-    NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    if(![snopModels count]){
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find SNOPModel. Please add one to the experiment and restart the run.\n");
-        return;
-    }
-    SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
-
-    NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    if(![runModels count]){
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find ORRunModel. Please add one to the experiment and restart the run.\n");
-        return;
-    }
-    ORRunModel* runControl = [runModels objectAtIndex:0];
-
-    NSString* docType = [NSMutableString stringWithFormat:@"smellie_run"];
-    NSString* smellieRunNameLabel = [aSnotModel smellieRunNameLabel];
-
-    [runDocDict setObject:docType forKey:@"type"];
-    [runDocDict setObject:[NSString stringWithFormat:@"%i",0] forKey:@"version"];
-    [runDocDict setObject:[NSString stringWithFormat:@"%lu",[runControl runNumber]] forKey:@"index"];
-    [runDocDict setObject:smellieRunNameLabel forKey:@"run_description_used"];
-    [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"timestamp"];
-    NSNumber *smellieConfigurationVersion = [self smellieConfigVersionNo];
-    [runDocDict setObject:smellieConfigurationVersion forKey:@"configuration_version"];
-    [runDocDict setObject:[NSNumber numberWithInt:[runControl runNumber]] forKey:@"run"];
-
-    // Sub run info
-    if([runDocDict objectForKey:@"sub_run_info"]){
-        [runDocDict setObject:[self smellieSubRunInfo] forKey:@"sub_run_info"];
-    } else {
-        [runDocDict setObject:[NSNumber numberWithInt:0] forKey:@"sub_run_info"];
-    }
-
-    [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:@"smellie"] addDocument:runDocDict tag:kSmellieSubRunDocumentAdded];
-}
-
--(void) _pushEllieConfigDocToDB:(NSString*)aCouchDBName runFiletoPush:(NSMutableDictionary*)customRunFile withDocType:(NSString*)aDocType
-{
-    /*
-     Create and push a smellie config file to couchdb.
-     
-     Arguments:
-     NSString* aCouchDBName:             Name of the couchdb repo the document will be uploaded to.
-     NSMutableDictionary customRunFile:  Custom run settings to be uploaded to db.
-     NSString* aDocType:                 Name to be used in the 'doc_type' field of the uploaded doc.
-     
-     */
-    NSMutableDictionary* configDocDic = [NSMutableDictionary dictionaryWithCapacity:100];
-
-    //Collect a series of objects from the SNOPModel
-    NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    if(![snopModels count]){
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find SNOPModel. Please add one to the experiment and restart the run.\n");
-        return;
-    }
-    //Initialise the SNOPModel
-    SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
-
-    NSString* docType = [NSMutableString stringWithFormat:@"%@",aDocType];
-
-    NSLog(@"document_type: %@",docType);
-
-    [configDocDic setObject:docType forKey:@"doc_type"];
-    [configDocDic setObject:[self stringDateFromDate:nil] forKey:@"time_stamp"];
-    [configDocDic setObject:customRunFile forKey:@"configuration_info"];
-
-    [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:aCouchDBName] addDocument:configDocDic tag:kSmellieRunDocumentAdded];
-}
-
-
--(void) _pushEllieCustomRunToDB:(NSString*)aCouchDBName runFiletoPush:(NSMutableDictionary*)customRunFile withDocType:(NSString*)aDocType
-{
-    /*
-     Push custom run information from the GUI to a couchDB database.
-     
-     Arguments:
-     NSString* aCouchDBName            : The couchdb database name.
-     NSMutableDictionary* customRunFile: GUI settings stored in a dictionary.
-     NSString* aDocType                : Type of document being uploaded.
-     */
-    NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:100];
-
-    //Collect a series of objects from the SNOPModel
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* aSnotModel = [objs objectAtIndex:0];
-
-    NSString* docType = [NSMutableString stringWithFormat:@"%@",aDocType];
-    NSLog(@"document_type: %@",docType);
-
-    [runDocDict setObject:docType forKey:@"doc_type"];
-    [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"time_stamp"];
-    [runDocDict setObject:customRunFile forKey:@"run_info"];
-
-    [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:aCouchDBName] addDocument:runDocDict tag:kSmellieRunDocumentAdded];
-}
-
--(NSNumber*) fetchRecentConfigVersion
+-(void) fetchCurrentSmellieConfig
 {
     /*
      Query smellie config documenets on the smelliedb to find the most recent config versioning
      number.
     */
-    //Collect a series of objects from the SNOPModel
-    NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    if(![snopModels count]){
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find SNOPModel. Please add one to the experiment and restart the run.\n");
-        return @-1;
-    }
-    SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
-    
-    NSString *urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/smellie/_design/smellieMainQuery/_view/fetchMostRecentConfigVersion?descending=True&limit=1",[aSnotModel orcaDBUserName],[aSnotModel orcaDBPassword],[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
-    NSURL *url = [NSURL URLWithString:urlString];
-    NSNumber *currentVersionNumber;
-    NSData *data = [NSData dataWithContentsOfURL:url];
-    NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    NSError *error =  nil;
-    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
-    if(error){
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Error in querying couchDB: %@\n", error);
-        return @-1;
-    }
-
-    @try{
-        //format the json response
-        NSString *stringValueOfCurrentVersion = [NSString stringWithFormat:@"%@",[[[json valueForKey:@"rows"] valueForKey:@"value"]objectAtIndex:0]];
-        currentVersionNumber = [NSNumber numberWithInt:[stringValueOfCurrentVersion intValue]];
-    }
-    @catch (NSException *e) {
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Error in fetching the SMELLIE CONFIGURATION FILE: %@\n", [e reason]);
-        return @-1;
-    }
-    NSLog(@"[SMELLIE]: config version number: %@\n", currentVersionNumber);
-    return currentVersionNumber;
+    NSString *requestString = [NSString stringWithFormat:@"_design/smellieMainQuery/_view/fetchMostRecentConfigVersion?descending=True&limit=1"];
+    // Set config version number to be nil
+    [self setSmellieConfigVersionNo:nil];
+    [[self couchDBRef:self withDB:@"smellie"] getDocumentId:requestString tag:kSmellieConigVersionRetrieved];
 }
 
--(NSNumber*) fetchConfigVersionFor:(NSString*)name
+-(void) parseCurrentConfigVersion:(id)aResult
 {
-    /* 
-     Find and return the version number of a named config doc
+    /*
+     Parse the relavent information from the couch result given by fetchRecentSmellieConfig (above).
     */
-    NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    if(![snopModels count]){
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Could not find SNOPModel\n");
-        return @-1;
-    }
-    SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
-
-    NSString *urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/smellie/_design/smellieMainQuery/_view/pullEllieConfigHeaders",[aSnotModel orcaDBUserName],[aSnotModel orcaDBPassword],[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
-    NSURL *url = [NSURL URLWithString:urlString];
-    NSData *data = [NSData dataWithContentsOfURL:url];
-    NSString *ret = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
-    NSError *error =  nil;
-    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
-    if(error){
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Error in querying couchDB: %@\n", error);
-        return @-1;
-    }
+    NSNumber* configVersion  = [[[aResult objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"key"];
+    [self setSmellieConfigVersionNo:configVersion];
     
-    NSDictionary* entries = [json objectForKey:@"rows"];
-    for(NSDictionary* entry in entries){
-        if([[entry valueForKey:@"value"] valueForKey:@"config_name"]){
-            NSString* configName = [NSString stringWithFormat:@"%@",[[entry valueForKey:@"value"] valueForKey:@"config_name"]];
-            if([configName isEqualToString:name]){
-                NSString* stringValueOfCurrentVersion = [NSString stringWithFormat:@"%@",[[[entry valueForKey:@"value"] valueForKey:@"configuration_info"] valueForKey:@"configuration_version"]];
-                return [NSNumber numberWithInt:[stringValueOfCurrentVersion intValue]];
-            }
-        }
-    }
-    NSLogColor([NSColor redColor], @"[SMELLIE]: WARNING No config file found for %@\n", name);
-    return [self fetchRecentConfigVersion];
+    // Now we have the most recent version number, go get the relavent file.
+    [self fetchConfigurationFile:configVersion];
 }
 
--(NSMutableDictionary*) fetchConfigurationFile:(NSNumber*)currentVersion
+-(void) fetchConfigurationFile:(NSNumber*)currentVersion
 {
     /*
      Fetch the current configuration document of a given version number.
@@ -2212,28 +1891,19 @@ err:
      Arguments:
         NSNumber* currentVersion: The version number to be used with the query.
     */
-    NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    if(![snopModels count]){
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Could not find SNOPModel\n");
-        return nil;
-    }
-    SNOPModel* aSnotModel = [snopModels objectAtIndex:0];
+    NSString *requestString = [NSString stringWithFormat:@"_design/smellieMainQuery/_view/pullEllieConfigHeaders?key=[%i]&limit=1",
+                               [currentVersion intValue]];
 
-    NSString *urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/smellie/_design/smellieMainQuery/_view/pullEllieConfigHeaders?key=[%i]&limit=1",[aSnotModel orcaDBUserName],[aSnotModel orcaDBPassword],[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort],[currentVersion intValue]];
+    [[self couchDBRef:self withDB:@"smellie"] getDocumentId:requestString tag:kSmellieConigRetrieved];
+}
 
-    NSURL *url = [NSURL URLWithString:urlString];
-    NSData *data = [NSData dataWithContentsOfURL:url];
-    //fixed memory leak on early return MAH 03/08/2017
-    NSString *ret = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
-    NSError *error =  nil;
-    NSMutableDictionary *currentConfig = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
-    if(error){
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Error in querying couchDB: %@\n", error);
-        return nil;
-    }
-    //[ret release]; should have been autoreleased in case of early return
-
-    NSMutableDictionary* configForSmellie = [[[[currentConfig objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"] objectForKey:@"configuration_info"];
+-(void) parseConfigurationFile:(id)aResult
+{
+    /*
+     Use the result returned by the couchdb querey prouced in fetchConfigurationFile (above) to
+     fill dictionaries defining smellie's hardware configuration.
+    */
+    NSMutableDictionary* configForSmellie = [[[[aResult objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"] objectForKey:@"configuration_info"];
 
     //Set laser head to 'sepia' laser switch mapping
     NSMutableDictionary *laserHeadDict = [configForSmellie objectForKey:@"laserSwitchChannels"];
@@ -2267,24 +1937,49 @@ err:
     [laserToInputFibreMapping release];
     [fibreSwitchOutputToFibre release];
     
-    NSLog(@"[SMELLIE] config file (version %i) sucessfully loaded!\n", [currentVersion intValue]);
-    return configForSmellie;
+    NSLog(@"[SMELLIE] config file (version %i) sucessfully loaded\n", [[self smellieConfigVersionNo] intValue]);
 }
 
-- (NSString *)extractNumberFromText:(NSString *)text
+/*********************************************************/
+/*              General Database Functions               */
+/*********************************************************/
+- (ORCouchDB*) couchDBRef:(id)aCouchDelegate withDB:(NSString*)entryDB;
 {
-    NSCharacterSet *nonDigitCharacterSet = [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
-    return [[text componentsSeparatedByCharactersInSet:nonDigitCharacterSet] componentsJoinedByString:@""];
+    /*
+     Get an ORCouchDB object pointing to a sno+ couchDB repo.
+     
+     Arguments:
+     id aCouchDelegate:  An OrcaObject which will be delgated some functionality during
+     ORCouchDB function calls. This is used to select which model
+     handels the returned result via a couchDBResult method.
+     NSString* entryDB:  The SNO+ couchDB repo to be assocated with the ORCouchDB object.
+     
+     Returns:
+     ORCouchDB* result:  An ORCouchDB object pointing to the entryDB repo.
+     */
+    //Collect a series of objects from the SNOPModel
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    
+    ORCouchDB* result = [ORCouchDB couchHost:aSnotModel.orcaDBIPAddress
+                                        port:aSnotModel.orcaDBPort
+                                    username:aSnotModel.orcaDBUserName
+                                         pwd:aSnotModel.orcaDBPassword
+                                    database:entryDB
+                                    delegate:self];
+    
+    if (aCouchDelegate)
+        [result setDelegate:aCouchDelegate];
+    
+    return result;
 }
 
-/****************************************/
-/*        Misc generic methods          */
-/****************************************/
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp
 {
     /*
-     Checks a result returned from a couchdb query for ellie doocument add / retrieval
-     tags.
+     A delagate function which catches the result of couchdb queries.
+     The relavent follow up function (normally to parse the returned data)
+     is called based on the tag that was sent with the request.
      
      Arguments:
      id aResult:     Object returned by cauchdb query.
@@ -2299,7 +1994,6 @@ err:
             }
 
             //Look through all of the possible tags for ellie couchDB results
-
             //This is called when smellie run header is queried from CouchDB
             if ([aTag isEqualToString:kSmellieRunHeaderRetrieved]){
                 NSLog(@"Object: %@\n",aResult);
@@ -2318,6 +2012,16 @@ err:
                 [runDoc setObject:[aResult objectForKey:@"id"] forKey:@"_id"];
                 [self setSmellieRunDoc:runDoc];
                 [runDoc release];
+            } else if ([aTag isEqualToString:kSmellieConigVersionRetrieved]){
+                [self parseCurrentConfigVersion:aResult];
+            } else if ([aTag isEqualToString:kSmellieConigRetrieved]){
+                [self parseConfigurationFile:aResult];
+            } else if ([aTag isEqualToString:kTellieParsRetrieved]){
+                [self parseTellieFirePars:aResult];
+            } else if ([aTag isEqualToString:kTellieMapRetrieved]){
+                [self parseTellieFibreMap:aResult];
+            } else if ([aTag isEqualToString:kTellieNodeRetrieved]){
+                [self parseTellieNodeMap:aResult];
             }
             //If no tag is found for the query result
             else {
@@ -2328,68 +2032,23 @@ err:
 
         else if([aResult isKindOfClass:[NSArray class]]){
             [aResult prettyPrint:@"CouchDB"];
-        }else{
+        }
+        else{
             //no docs found 
         }
     }
 }
 
-- (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
-{
-    /*
-     Get an ORCouchDB object pointing to a sno+ couchDB repo.
-     
-     Arguments:
-     id aCouchDelegate:  An ELLIEModel object which will be delgated some functionality during
-     ORCouchDB function calls.
-     NSString* entryDB:  The SNO+ couchDB repo to be assocated with the ORCouchDB object.
-     
-     Returns:
-     ORCouchDB* result:  An ORCouchDB object pointing to the entryDB repo.
-     
-     COMMENT:
-     I'm not sure why this is here? There is an identical method in SNOPModel. Might be worth
-     deleting this method and replacing any reference to it with the SNOPModel version.
-     */
-    //Collect a series of objects from the SNOPModel
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+/****************************************/
+/*        Misc generic methods          */
+/****************************************/
 
-    ORCouchDB* result = [ORCouchDB couchHost:aSnotModel.orcaDBIPAddress
-                                        port:aSnotModel.orcaDBPort
-                                    username:aSnotModel.orcaDBUserName
-                                         pwd:aSnotModel.orcaDBPassword
-                                    database:entryDB
-                                    delegate:self];
-    
-    if (aCouchDelegate)
-        [result setDelegate:aCouchDelegate];
-    
-    return result;
+- (NSString *)extractNumberFromText:(NSString *)text
+{
+    NSCharacterSet *nonDigitCharacterSet = [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
+    return [[text componentsSeparatedByCharactersInSet:nonDigitCharacterSet] componentsJoinedByString:@""];
 }
 
-- (ORCouchDB*) generalDBRef:(NSString*)aCouchDb
-{
-    /*
-     Get and return a reference to a couchDB repo.
-     
-     Arguments:
-     NSString* aCouchDb : The database name e.g. telliedb/rat
-     */
-    //Collect a series of objects from the SNOPModel
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-
-    //Initialise the SNOPModel
-    SNOPModel* aSnotModel = [objs objectAtIndex:0];
-
-    //Commented out for testing
-    return [ORCouchDB couchHost:[aSnotModel orcaDBIPAddress]
-                           port:[aSnotModel orcaDBPort]
-                       username:[aSnotModel orcaDBUserName]
-                            pwd:[aSnotModel orcaDBPassword]
-                       database:aCouchDb
-                       delegate:aSnotModel];
-}
 
 - (NSString*) stringDateFromDate:(NSDate*)aDate
 {

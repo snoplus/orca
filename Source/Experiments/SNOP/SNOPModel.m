@@ -1418,36 +1418,28 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
             if (message) {
                 [aResult prettyPrint:@"CouchDB Message:"];
                 return;
-            }
-            //This is called when smellie run header is queried from CouchDB
-            else if ([aTag isEqualToString:@"kSmellieRunHeaderRetrieved"])
-            {
+            } else if ([aTag isEqualToString:@"kSmellieRunHeaderRetrieved"]) {
                 [self parseSmellieRunFileDocs:aResult];
-            }
-            else if ([aTag isEqualToString:@"Message"]) {
+            } else if ([aTag isEqualToString:@"Message"]) {
                 [aResult prettyPrint:@"CouchDB Message:"];
             }
             //Standard Runs querying
             else if ([aTag isEqualToString:@"kStandardRunPosted"]) {
                 NSLog(@"Standard Run saved. \n");
                 [self refreshStandardRunsFromDB];
-            }
-            else {
+            } else {
                 [aResult prettyPrint:@"CouchDB"];
             }
-        }
-        else if ([aResult isKindOfClass:[NSArray class]]) {
+        } else if ([aResult isKindOfClass:[NSArray class]]) {
             /*
             if([aTag isEqualToString:kListDB]){
                 [aResult prettyPrint:@"CouchDB List:"];
             else [aResult prettyPrint:@"CouchDB"];
              */
             [aResult prettyPrint:@"CouchDB"];
-        }
-        else {
+        } else {
             NSLog(@"%@\n",aResult);
         }
-
 	} // synchronized
 }
 
@@ -1717,7 +1709,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 - (void)hvMasterTriggersOFF
 {
     [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(setIsPollingXl3:) withObject:NO];
-    
+
     [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersOFF)];
 }
 
@@ -1732,34 +1724,24 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         NSLogColor([NSColor redColor], @"Must have an ELLIE object in the configuration\n");
         return;
     }
-    
+
     ELLIEModel* anELLIEModel = [ellieModels objectAtIndex:0];
     NSString *requestString = [NSString stringWithFormat:@"_design/smellieMainQuery/_view/pullEllieRunHeaders?startkey=2"];
 
     // This line calls [self couchDBresult], which in turn calls [self parseSmellieRunFileDocs] where the
     // [self smellieRunFiles] property variable gets set.
-    [[anELLIEModel generalDBRef:@"smellie"] getDocumentId:requestString tag:@"kSmellieRunHeaderRetrieved"];
-        
-    // CouchDB interactions are spawned in a separate thread
-    [self setSmellieDBReadInProgress:YES];
-    [self performSelector:@selector(smellieDocumentsRecieved) withObject:nil afterDelay:0.0];
-}
+    [[anELLIEModel couchDBRef:self withDB:@"smellie"] getDocumentId:requestString tag:@"kSmellieRunHeaderRetrieved"];
 
-//complete this after the smellie documents have been recieved 
--(void)smellieDocumentsRecieved
-{
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(smellieDocumentsRecieved) object:nil];
-    if (![self smellieDBReadInProgress]) { //killed already
-        return;
-    }
-    
-    [self setSmellieDBReadInProgress:NO];
+    // Also force the smellie config to be loaded into the ellie model
+    [anELLIEModel fetchCurrentSmellieConfig];
 }
 
 -(void) parseSmellieRunFileDocs:(id)aResult
 {
-    // Use the result returned from the smellie database query to fill a dictionary with all the available
-    // run file documents.
+    /*
+    Use the result returned from the smellie database query to fill a dictionary with all the available
+    run file documents.
+    */
     unsigned int nFiles = [[aResult objectForKey:@"rows"] count];
     NSMutableDictionary *runFiles = [[NSMutableDictionary alloc] init];
 
