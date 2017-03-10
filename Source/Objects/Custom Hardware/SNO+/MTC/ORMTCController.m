@@ -999,7 +999,7 @@
 
 - (IBAction) updateConversionSettingsAction:(id)sender
 {
-    [model getLatestTriggerScan];
+    [model getLatestTriggerScans];
 }
 
 - (IBAction) grab_current_thresholds:(id)sender
