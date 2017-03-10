@@ -172,20 +172,20 @@
                          name : ORMTCGTMaskChanged
                         object: model];
 
-	[notifyCenter addObserver : self
-			 selector : @selector(isPulserFixedRateChanged:)
-			     name : ORMTCModelIsPulserFixedRateChanged
-			    object: model];
+    [notifyCenter addObserver : self
+                     selector : @selector(isPulserFixedRateChanged:)
+                         name : ORMTCModelIsPulserFixedRateChanged
+                        object: model];
 
-	[notifyCenter addObserver : self
-			 selector : @selector(fixedPulserRateCountChanged:)
-			     name : ORMTCModelFixedPulserRateCountChanged
-			    object: model];
+    [notifyCenter addObserver : self
+                     selector : @selector(fixedPulserRateCountChanged:)
+                         name : ORMTCModelFixedPulserRateCountChanged
+                        object: model];
 
-	[notifyCenter addObserver : self
-			 selector : @selector(fixedPulserRateDelayChanged:)
-			     name : ORMTCModelFixedPulserRateDelayChanged
-			    object: model];
+    [notifyCenter addObserver : self
+                     selector : @selector(fixedPulserRateDelayChanged:)
+                         name : ORMTCModelFixedPulserRateDelayChanged
+                        object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(sequenceRunning:)
@@ -205,34 +205,37 @@
     [notifyCenter addObserver : self
                      selector : @selector(triggerMTCAMaskChanged:)
                          name : ORMTCModelMTCAMaskChanged
-                       object : nil];
+                       object : model];
+
     [notifyCenter addObserver : self
                      selector : @selector(updateThresholdsDisplay:)
                          name : ORMTCAThresholdChanged
-                       object : nil];
+                       object : model];
     
     [notifyCenter addObserver : self
                      selector : @selector(updateThresholdsDisplay:)
                          name : ORMTCABaselineChanged
-                       object : nil];
+                       object : model];
 
     [notifyCenter addObserver : self
                      selector : @selector(updateThresholdsDisplay:)
                          name : ORMTCAConversionChanged
-                       object : nil];
+                       object : model];
+
     [notifyCenter addObserver : self
                      selector : @selector(triggerMTCAMaskChanged:)
                          name : ORMTCAThresholdChanged
-                       object : nil];
+                       object : model];
+
     [notifyCenter addObserver : self
                      selector : @selector(isPedestalEnabledInCSRChanged:)
                          name : ORMTCModelIsPedestalEnabledInCSR
-                       object : nil];
+                       object : model];
+
     [notifyCenter addObserver : self
                      selector : @selector(mtcSettingsChanged:)
                          name : ORMTCSettingsChanged
-                       object : nil];
-
+                       object : model];
 }
 
 - (void) updateWindow
@@ -305,14 +308,17 @@
     int rate = [model pgtRate];
     [pulserPeriodField setIntValue:rate];
 }
-- (void) mtcGTMaskChanged:(NSNotification *) aNote {
+
+- (void) mtcGTMaskChanged:(NSNotification *) aNote
+{
     int maskValue = [model gtMask];
     for(int i=0;i<26;i++){
         [[globalTriggerMaskMatrix cellWithTag:i]  setIntValue: maskValue & (1<<i)];
     }
 }
 
-- (void) updateThresholdsDisplay:(NSNotification *)aNote {
+- (void) updateThresholdsDisplay:(NSNotification *)aNote
+{
     int nhit_units,esum_units;
     int nhit_view_unit_index = [[nHitViewTypeMatrix selectedCell] tag];
     int esum_view_unit_index = [[eSumViewTypeMatrix selectedCell] tag];
@@ -325,7 +331,6 @@
     }
     [self changeNhitThresholdsDisplay:nhit_units];
     [self changeESUMThresholdDisplay:esum_units];
-
 }
 
 - (void) displayMasks
@@ -406,7 +411,6 @@
 }
 
 - (void) basicLockChanged:(NSNotification*)aNotification
-{
 
     BOOL locked                        = [gSecurity isLocked:ORMTCBasicLock];
     BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORMTCBasicLock];
@@ -477,7 +481,8 @@
     [includePedestalsCheckBox setState:[model isPedestalEnabledInCSR]];
 }
 
-- (void) mtcSettingsChanged:(NSNotification*)aNotification {
+- (void) mtcSettingsChanged:(NSNotification*)aNotification
+{
     [coarseDelayField setFloatValue:[model coarseDelay]];
     [fineDelayField setFloatValue:[model fineDelay]/1000.0];
     [lockOutWidthField setIntValue:[model lockoutWidth]];
@@ -488,7 +493,6 @@
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
 {
-
     if ([tabView indexOfTabViewItem:item] == 0){
         NSSize* newSize =nil;
         if([opAdvancedOptionsBox isHidden]) {
@@ -519,11 +523,9 @@
 		[[self window] setContentView:mtcView];
     }
 
-
     NSString* key = [NSString stringWithFormat: @"orca.ORMTC%d.selectedtab",[model slot]];
     int index = [tabView indexOfTabViewItem:item];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
-	
 }
 
 - (void) slotChanged:(NSNotification*)aNotification
@@ -612,7 +614,7 @@
 
 - (void) populatePullDown
 {
-    short	i;
+    short i;
         
     [selectedRegisterPU removeAllItems];
     
@@ -621,7 +623,6 @@
     }
      
     [self selectedRegisterChanged:nil];
-
 }
 
 //basic ops Actions
@@ -643,22 +644,21 @@
 //MTC Init Ops buttons.
 - (IBAction) standardInitMTC:(id) sender 
 {
-        [model initializeMtc];
+    [model initializeMtc];
 }
 
 - (IBAction) standardLoadMTCADacs:(id) sender 
 {
     @try {
-	[model loadTheMTCADacs];
-    }
-    @catch(NSException *excep) {
+	    [model loadTheMTCADacs];
+    } @catch(NSException *excep) {
         NSLogColor([NSColor redColor], @"Error loading the MTCA DACs. Reason: %@\n.",[excep reason]);
     }
 }
 
 - (IBAction) setAdvancedOptions:(id)sender
 {
-    @try{
+    @try {
         [model loadCoarseDelayToHardware];
         [model loadFineDelayToHardware];
         [model loadPrescaleValueToHardware];
@@ -669,7 +669,6 @@
         // The above will all catch and warn about any error already
     }
 }
-
 
 - (IBAction) standardIsPulserFixedRate:(id) sender
 {
@@ -749,18 +748,18 @@
     @try {
         unit_index = [self convert_view_unit_index_to_model_index:view_index];
         [self changeNhitThresholdsDisplay: unit_index];
-
     } @catch (NSException *exception) {
         NSLogColor([NSColor redColor], @"Could not change views. Reason:%@\n",[exception reason]);
     }
-
 }
 
-- (IBAction)opsAdvancedOptionsTriangeChanged:(id)sender {
+- (IBAction)opsAdvancedOptionsTriangeChanged:(id)sender
+{
     [self showHideOptions:sender Box:opAdvancedOptionsBox resizeSmall:standardOpsSizeSmall resizeLarge:standardOpsSizeLarge];
 }
 
-- (IBAction)settingsAdvancedOptionsTriangeChanged:(id)sender {
+- (IBAction)settingsAdvancedOptionsTriangeChanged:(id)sender
+{
     [self showHideOptions:sender Box:settingsAdvancedOptionsBox resizeSmall:settingsSizeSmall resizeLarge:settingsSizeLarge];
 }
 
@@ -768,32 +767,35 @@
     if([sender state] == NSOffState) {
         [box setHidden:YES];
         [self resizeWindowToSize:smallSize];
-    }
-    else {
+    } else {
         [box setHidden:NO];
         // Don't resize if the window is already large enough
-        if(self.window.frame.size.height <  largeSize.height || self.window.frame.size.width < largeSize.width)
-        {
+        if(self.window.frame.size.height <  largeSize.height || self.window.frame.size.width < largeSize.width) {
             [self resizeWindowToSize:largeSize];
         }
     }
 }
 
-- (IBAction) settingsLockoutWidthFieldChanged:(id)sender {
+- (IBAction) settingsLockoutWidthFieldChanged:(id)sender
+{
     int lockout_width = [lockOutWidthField intValue];
     [model setLockoutWidth:lockout_width];
 }
-- (IBAction) settingsPedWidthFieldChanged:(id)sender {
+
+- (IBAction) settingsPedWidthFieldChanged:(id)sender
+{
     int ped_width = [pedestalWidthField intValue];
     [model setPedestalWidth:ped_width];
 }
 
-- (IBAction) settingsPrescaleFieldChanged:(id)sender {
+- (IBAction) settingsPrescaleFieldChanged:(id)sender
+{
     int prescale_value = [nhit100LoPrescaleField intValue];
     [model setPrescaleValue:prescale_value];
 }
 
-- (IBAction) settingsPedDelayFieldChanged:(id)sender {
+- (IBAction) settingsPedDelayFieldChanged:(id)sender
+{
     int coarse_delay = [coarseDelayField intValue];
     float fine_delay = [fineDelayField floatValue];
     int fine_delay_ps = fine_delay*1000.0;
@@ -802,7 +804,8 @@
     [model setFineDelay:fine_delay_ps];
 }
 
-- (IBAction)standardPulserRateFieldChanged:(id)sender {
+- (IBAction)standardPulserRateFieldChanged:(id)sender
+{
     float pulser_rate = [pulserPeriodField floatValue];
     [model setPgtRate:pulser_rate];
 }
@@ -811,8 +814,7 @@
 {
     int threshold_index;
     float value;
-    for(int i=FIRST_NHIT_TAG;i<=LAST_NHIT_TAG;i++)
-    {
+    for(int i=FIRST_NHIT_TAG;i<=LAST_NHIT_TAG;i++) {
         @try {
             threshold_index = [self convert_view_threshold_index_to_model_index:i];
             if(![model ConversionIsValidForThreshold:threshold_index] && units!=MTC_RAW_UNITS) {
@@ -1178,12 +1180,13 @@
     }
 }
 
-- (IBAction) helpButtonClicked:(id)sender {
+- (IBAction) helpButtonClicked:(id)sender
+{
     [helpText setHidden:![helpText isHidden]];
 }
 
-- (void)CheckBoxMatrixCellClicked:(NSMatrix*) checkBoxes newState:(int)state {
-
+- (void)CheckBoxMatrixCellClicked:(NSMatrix*) checkBoxes newState:(int)state
+{
     BOOL cmdKeyDown = ([[NSApp currentEvent] modifierFlags] & NSCommandKeyMask) != 0;
     if(cmdKeyDown){
         for (int i=0; i<[checkBoxes numberOfRows]; i++)
