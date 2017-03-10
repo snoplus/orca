@@ -152,6 +152,7 @@ tubRegister;
 - (void) awakeAfterDocumentLoaded
 {
     [self updateSettings];
+    [self updateTriggerScans];
 }
 
 - (void) setMTCPort: (int) port
@@ -356,13 +357,160 @@ tubRegister;
     }
 }
 
+- (int) triggerScanNameToIndex:(NSString*) name
+{
+    int ret = -1;
+    if([name isEqual:@"N100LO"]){ ret = MTC_N100_LO_THRESHOLD_INDEX; }
+    else if([name isEqual:@"N100MED"]){ ret = MTC_N100_MED_THRESHOLD_INDEX; }
+    else if([name isEqual:@"N100HI"]){ ret = MTC_N100_HI_THRESHOLD_INDEX; }
+    else if([name isEqual:@"N20"]){ ret = MTC_N20_THRESHOLD_INDEX; }
+    else if([name isEqual:@"N20LB"]){ ret = MTC_N20LB_THRESHOLD_INDEX; }
+    else if([name isEqual:@"OWLN"]){ ret = MTC_OWLN_THRESHOLD_INDEX; }
+    else if([name isEqual:@"ESUMLO"]){ ret = MTC_ESUML_THRESHOLD_INDEX; }
+    else if([name isEqual:@"ESUMHI"]){ ret = MTC_ESUMH_THRESHOLD_INDEX; }
+    else if([name isEqual:@"OWLELO"]){ ret = MTC_OWLELO_THRESHOLD_INDEX; }
+    else if([name isEqual:@"OWLEHI"]){ ret = MTC_OWLEHI_THRESHOLD_INDEX; }
+    else {
+        [NSException raise:@"MTCControllerError" format:@"Invalid trigger scan name ( %@ ) cannot get a valid threshold id", name];
+    }
+    return ret;
+}
+
+- (void) waitForTriggerScan: (ORPQResult *) result
+{
+    int numRows, numCols;
+    int threshold_index;
+    int error_count = 0;
+    NSString* name = nil;
+    NSString* baseline = nil;
+    NSString* dac_per_nhit = nil;
+
+    if (!result) {
+        NSLog(@"Failed to recieve trigger scan results from database.\n");
+        return;
+    }
+
+    numRows = [result numOfRows];
+    numCols = [result numOfFields];
+    if (numRows <= 0) {
+        NSLog(@"Empty result returned from database. No trigger scans are available\n");
+        return;
+    }
+    if (numCols != 3) {
+        NSLog(@"Unexpected number of columns returned from database for trigger scan. Expected 3 got %i\n", numCols);
+        return;
+    }
+
+    for (int i = 0; i < numRows; i++) {
+        @try {
+            NSDictionary* result_dict = [result fetchRowAsType:MCPTypeDictionary row:i];
+            if(!result_dict) {
+                error_count++;
+                continue;
+            }
+            name = [result_dict objectForKey:@"name"];
+            baseline = [[result_dict objectForKey:@"baseline"] stringValue];
+            threshold_index = [self triggerScanNameToIndex:name];
+            if ([self thresholdIsNHit:threshold_index]) {
+                dac_per_nhit =[[result_dict objectForKey:@"adc_per_nhit"] stringValue];
+                [self setDacPerNHit:threshold_index toValue:[dac_per_nhit floatValue]];
+            }
+            [self setBaselineOfType:threshold_index toValue:[baseline intValue]];
+
+            // Hard code the DAC conversion to match the datasheet for the AD7243
+            // http://www.analog.com/media/en/technical-documentation/data-sheets/AD7243.pdf
+            // It's usage on the MTCA can be seen on page 8 of the MTCA+ schematics.
+            // http://snopl.us/detector/schematics/pdf/mtcaplus.pdf
+            [self setDacPerMilliVoltOfType:threshold_index toValue:-4096/10000.0];
+
+            [self setConversionIsValidForThreshold:threshold_index isValid:YES];
+        } @catch (NSException* exception) {
+            NSLogColor([NSColor redColor], @"Error interpreting trigger scan result. Reason: %@\n",[exception reason]);
+        }
+    }
+
+    if (error_count > 0) {
+        NSLog(@"An error occurred while try to retrieve %i of the %i rows returned from the database\n",error_count,numRows);
+    }
+}
+
+- (void) getLatestTriggerScan
+{
+    /* Update the dac -> nhit conversions by querying the database for the
+     * latest trigger scans. */
+    ORPQModel* pgsql_connec = [ORPQModel getCurrent];
+    if(!pgsql_connec)
+    {
+        NSLogColor([NSColor redColor], @"Postgres connection not available. Aborting");
+        return;
+    }
+    NSString* cmd = [NSString stringWithFormat:@"select distinct on (name) name,baseline,adc_per_nhit from trigger_scan order by name,timestamp desc"];
+    [pgsql_connec dbQuery:cmd object:self selector:@selector(waitForTriggerScan:) timeout:2.0];
+}
+
+- (void) waitForThresholds: (ORPQResult *) result
+{
+    int numRows, numCols;
+
+    if (!result) {
+        NSLog(@"Failed to recieve threshold results from database.\n");
+        return;
+    }
+
+    numRows = [result numOfRows];
+    numCols = [result numOfFields];
+    if (numRows != 1) {
+        NSLog(@"Database returned unexpected number of rows for MTC threhsolds. 1 expected, %i returned.\n",numRows);
+        return;
+    }
+    if (numCols != 1) {
+        NSLog(@"Database returned unexpected number of columns for MTC thresholds. 1 expected, %i returned.\n",numCols);
+        return;
+    }
+
+    NSArray* result_arr = [[result fetchRowAsDictionary] objectForKey:@"mtca_dacs"];
+    if(!result_arr || [result_arr count] == 0)
+    {
+        NSLog(@"Error while converting MTC threshold DB result to array.\n");
+        return;
+    }
+    @try {
+        // Note this could be done with a for loop, but I think this is more readable.
+        [self setThresholdOfType:MTC_N100_LO_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_N100L_INDEX] floatValue]];
+        [self setThresholdOfType:MTC_N100_MED_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_N100M_INDEX] floatValue]];
+        [self setThresholdOfType:MTC_N100_HI_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_N100H_INDEX] floatValue]];
+        [self setThresholdOfType:MTC_N20_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_N20_INDEX] floatValue]];
+        [self setThresholdOfType:MTC_N20LB_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_N20LB_INDEX] floatValue]];
+        [self setThresholdOfType:MTC_ESUML_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_ESUML_INDEX] floatValue]];
+        [self setThresholdOfType:MTC_ESUMH_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_ESUMH_INDEX] floatValue]];
+        [self setThresholdOfType:MTC_OWLN_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_OWLN_INDEX] floatValue]];
+        [self setThresholdOfType:MTC_OWLELO_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_OWLEL_INDEX] floatValue]];
+        [self setThresholdOfType:MTC_OWLEHI_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_OWLEH_INDEX] floatValue]];
+    } @catch(NSException* excep) {
+        NSLogColor([NSColor redColor], @"Error while retrieving threhsolds. Operation failed, Reason: %@\n",[excep reason]);
+    }
+}
+
+- (void) updateTriggerThresholds
+{
+    /* Get the current MTCA+ thresholds from the detector database and update
+     * the model. */
+    ORPQModel* pgsql_connec = [ORPQModel getCurrent];
+    if(!pgsql_connec)
+    {
+        NSLogColor([NSColor redColor], @"Postgres connection not available. Aborting");
+        return;
+    }
+    NSString* db_cmd = [NSString stringWithFormat:@"select mtca_dacs from mtc where key=0"];
+    [pgsql_connec dbQuery:db_cmd object:self selector:@selector(waitForThresholds:) timeout:2.0];
+}
+
 #pragma mark •••Accessors
 
 - (unsigned short) addressModifier
 {
 	return 0x29;
 }
-
 
 - (BOOL) basicOpsRunning
 {
