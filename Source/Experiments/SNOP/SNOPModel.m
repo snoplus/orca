@@ -1172,10 +1172,23 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
                            [e name], [e reason]);
             }
 
-            /* Set pedestal mask back to what it was before. */
-            [xl3 setPedestalInParallel];
+            /* Set pedestal mask back to 0. */
+            if ([xl3 setPedestalMask:[xl3 getSlotsPresent] pattern:0]) {
+                NSLogColor([NSColor redColor],
+                           @"failed to set pedestal mask for crate %02d\n", i);
+                continue;
+            }
 
             NSLog(@"PING crate %02d\n", i);
+        }
+    }
+
+    /* Set the pedestal mask for each crate back. */
+    for (i = 0; i < [xl3s count]; i++) {
+        xl3 = [xl3s objectAtIndex:i];
+
+        if ([[xl3 xl3Link] isConnected]) {
+            [xl3 setPedestals];
         }
     }
 
