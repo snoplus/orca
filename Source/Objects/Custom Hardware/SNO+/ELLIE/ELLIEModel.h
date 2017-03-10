@@ -16,7 +16,8 @@
 @class ORRunModel;
 @class ORRunController;
 
-@interface ELLIEModel :  OrcaObject{
+@interface ELLIEModel :  OrcaObject
+{
     ///////////////////////////////////////////
     //Define instance variables for ELLIEModel
     
@@ -26,8 +27,6 @@
     NSMutableDictionary* _smellieRunDoc;
     NSTask* _exampleTask;
     NSMutableDictionary* _smellieRunHeaderDocList;
-    //ORRunModel* _runControl;
-    //ORRunController* _theRunController;
     NSMutableArray* _smellieSubRunInfo;
     bool _smellieDBReadInProgress;
     float _pulseByPulseDelay;
@@ -127,6 +126,9 @@
 -(void) pushInitialTellieRunDocument;
 -(void) updateTellieRunDocument:(NSDictionary*)subRunDoc;
 -(void) loadTELLIEStaticsFromDB;
+-(void)parseTellieFirePars:(id)aResult;
+-(void)parseTellieFibreMap:(id)aResult;
+-(void)parseTellieNodeMap:(id)aResult;
 
 /************************/
 /*  SMELLIE Functions   */
@@ -155,21 +157,18 @@
 -(void) stopSmellieRun;
 
 // SMELLIE database interactions
--(void) fetchSmellieConfigurationInformation;
 -(void) pushInitialSmellieRunDocument;
 -(void) updateSmellieRunDocument:(NSDictionary*)subRunDoc;
--(void) smellieDBpush:(NSMutableDictionary*)dbDic;
--(void) smellieConfigurationDBpush:(NSMutableDictionary*)dbDic;
--(NSNumber*) fetchRecentConfigVersion;
--(NSNumber*) fetchConfigVersionFor:(NSString*)name;
--(NSMutableDictionary*) fetchConfigurationFile:(NSNumber*)currentVersion;
+-(void) fetchCurrentSmellieConfig;
+-(void) parseCurrentConfigVersion:(id)aResult;
+-(void) fetchConfigurationFile:(NSNumber*)currentVersion;
+-(void) parseConfigurationFile:(id)aResult;
 
 /*************************/
 /* Misc generic methods  */
 /*************************/
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
-- (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
-- (ORCouchDB*) generalDBRef:(NSString*)aCouchDb;
+- (ORCouchDB*) couchDBRef:(id)aCouchDelegate withDB:(NSString*)entryDB;
 - (NSString*) stringDateFromDate:(NSDate*)aDate;
 - (NSString*) stringUnixFromDate:(NSDate*)aDate;
 
