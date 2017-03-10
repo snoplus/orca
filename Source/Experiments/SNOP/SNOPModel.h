@@ -100,11 +100,12 @@
     
     bool _smellieDBReadInProgress;
     bool _smellieDocUploaded;
-    NSString * standardRunType;
-    NSString * standardRunVersion;
-    NSString * lastStandardRunType;
-    NSString * lastStandardRunVersion;
-    NSNumber * standardRunTableVersion;
+    NSMutableDictionary* standardRunCollection;
+    NSString* standardRunType;
+    NSString* standardRunVersion;
+    NSString* lastStandardRunType;
+    NSString* lastStandardRunVersion;
+    NSNumber* standardRunTableVersion;
 
     bool rolloverRun;
 
@@ -220,6 +221,7 @@
 - (void) subRunStarted:(NSNotification*)aNote;
 - (void) subRunEnded:(NSNotification*)aNote;
 - (void) detectorStateChanged:(NSNotification*)aNote;
+- (void) enableGlobalSecurity;
 
 - (void) updateEPEDStructWithCoarseDelay: (unsigned long) coarseDelay
                                fineDelay: (unsigned long) fineDelay
@@ -241,6 +243,7 @@
 - (void) setLastRunTypeWord:(unsigned long)aMask;
 - (NSString*) lastRunTypeWordHex;
 - (void) setLastRunTypeWordHex:(NSString*)aValue;
+- (NSMutableDictionary*) standardRunCollection;
 - (NSString*) standardRunType;
 - (void) setStandardRunType:(NSString*)aValue;
 - (NSString*) standardRunVersion;
@@ -283,6 +286,7 @@
 -(void) startECARunInParallel;
 
 //Standard runs functions
+-(BOOL) refreshStandardRunsFromDB;
 -(BOOL) startStandardRun:(NSString*)_standardRun withVersion:(NSString*)_standardRunVersion;
 -(BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
 -(BOOL) saveStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
@@ -308,5 +312,6 @@ extern NSString* ORSNOPModelDebugDBIPAddressChanged;
 extern NSString* ORSNOPRunTypeWordChangedNotification;
 extern NSString* SNOPRunTypeChangedNotification;
 extern NSString* ORSNOPRunsLockNotification;
+extern NSString* ORSNOPModelSRCollectionChangedNotification;
 extern NSString* ORSNOPModelSRChangedNotification;
 extern NSString* ORSNOPModelSRVersionChangedNotification;
