@@ -409,8 +409,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(PreferencesController);
     int tag = [[mailSelectionMatrix selectedCell] tag];
     [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:tag] forKey:ORMailSelectionPreference];
     
-    [mailAddressField setEnabled:tag == 1];
-    [mailPasswordField setEnabled:tag == 1];
+    [mailServerField   setEnabled: tag == 1];
+    [mailAddressField  setEnabled: tag == 1];
+    [mailPasswordField setEnabled: tag == 1];
     
 }
 
