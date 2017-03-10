@@ -207,23 +207,23 @@
 - (IBAction) emergencySmellieStopAction:(id)sender;
 
 //tellie functions ---------------------
--(IBAction)startTellieRunAction:(id)sender;
+- (IBAction)startTellieRunAction:(id)sender;
 - (IBAction) stopTellieRunAction:(id)sender;
--(void)startTellieRunNotification:(NSNotification *)notification;
+- (void)startTellieRunNotification:(NSNotification *)notification;
 
 //xl3 mode status
 - (IBAction)updatexl3Mode:(id)sender;
 
 #pragma mark ¥¥¥Details Interface Management
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem;
--(void) windowDidLoad;
+- (void) windowDidLoad;
 
 - (IBAction) runsLockAction:(id)sender;
 - (IBAction) refreshStandardRunsAction: (id) sender;
+- (void) refreshStandardRunVersions;
 
 //Run type
 - (IBAction) runTypeWordAction:(id)sender;
-- (void) refreshStandardRunVersions;
 @end
 
 extern NSString* ORSNOPRequestHVStatus;

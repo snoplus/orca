@@ -1059,11 +1059,12 @@ tubRegister;
     }
     return ret;
 }
-- (id) objectFromSerialization: (NSMutableDictionary*) serial withKey:(NSString*)str {
-    id obj=[[[[serial valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:str];
-    return obj;
 
+- (id) objectFromSerialization: (NSMutableDictionary*) serial withKey:(NSString*)str {
+    id obj=[serial valueForKey:str];
+    return obj;
 }
+
 - (void) loadFromSearialization:(NSMutableDictionary*) serial {
     //This function will let any exceptions from below bubble up
 

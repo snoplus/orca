@@ -64,6 +64,7 @@ NSString* ORSNOPModelDebugDBIPAddressChanged = @"ORSNOPModelDebugDBIPAddressChan
 NSString* ORSNOPRunTypeWordChangedNotification = @"ORSNOPRunTypeWordChangedNotification";
 NSString* ORSNOPRunTypeChangedNotification = @"ORSNOPRunTypeChangedNotification";
 NSString* ORSNOPRunsLockNotification = @"ORSNOPRunsLockNotification";
+NSString* ORSNOPModelSRCollectionChangedNotification = @"ORSNOPModelSRCollectionChangedNotification";
 NSString* ORSNOPModelSRChangedNotification = @"ORSNOPModelSRChangedNotification";
 NSString* ORSNOPModelSRVersionChangedNotification = @"ORSNOPModelSRVersionChangedNotification";
 
@@ -273,6 +274,7 @@ resync;
     state = STOPPED;
     start = COLD_START;
     resync = NO;
+    [self enableGlobalSecurity];
 
     /* Initialize ECARun object: this doesn't start the run */
     anECARun = [[ECARun alloc] init];
@@ -298,6 +300,10 @@ resync;
     //Standard Runs
     //fixed memory leak -- no matching release for alloc MAH 03/08/2017
     [self setStandardRunTableVersion:[[[NSNumber alloc] initWithInt:STANDARD_RUN_VERSION] autorelease]];
+    standardRunCollection = [[NSMutableDictionary alloc] init];
+    [self setLastStandardRunType:[decoder decodeObjectForKey:@"SNOPlastStandardRunType"]];
+    [self setLastStandardRunVersion:[decoder decodeObjectForKey:@"SNOPlastStandardRunVersion"]];
+    [self setLastRunTypeWordHex:[decoder decodeObjectForKey:@"SNOPlastRunTypeWordHex"]];
 
     //ECA
     [anECARun setECA_pattern:[decoder decodeIntForKey:@"SNOPECApattern"]];
@@ -372,6 +378,8 @@ resync;
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
+    [standardRunCollection removeAllObjects];
+    [standardRunCollection release];
     [standardRunType release];
     [standardRunVersion release];
     [standardRunTableVersion release];
@@ -797,6 +805,11 @@ err:
     }
 
     state = RUNNING;
+    [self setLastStandardRunType:[self standardRunType]];
+    [self setLastStandardRunVersion:[self standardRunVersion]];
+    [self setLastRunTypeWord:[self runTypeWord]];
+    NSString* _lastRunTypeWord = [NSString stringWithFormat:@"0x%X",(int)[self runTypeWord]];
+    [self setLastRunTypeWordHex:_lastRunTypeWord]; //FIXME: revisit if we go over 32 bits
 
     [self updateRHDRSruct];
     [self shipRHDRRecord];
@@ -969,6 +982,14 @@ err:
         }
         state = RUNNING;
     }
+}
+
+- (void) enableGlobalSecurity
+{
+
+    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:YES] forKey:OROrcaSecurityEnabled];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGlobalSecurityStateChanged object:self userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES] forKey:OROrcaSecurityEnabled]];
+
 }
 
 // orca script helper (will come from DB)
@@ -1406,6 +1427,11 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
             else if ([aTag isEqualToString:@"Message"]) {
                 [aResult prettyPrint:@"CouchDB Message:"];
             }
+            //Standard Runs querying
+            else if ([aTag isEqualToString:@"kStandardRunPosted"]) {
+                NSLog(@"Standard Run saved. \n");
+                [self refreshStandardRunsFromDB];
+            }
             else {
                 [aResult prettyPrint:@"CouchDB"];
             }
@@ -1527,6 +1553,11 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     [encoder encodeObject:self.debugDBName forKey:@"ORSNOPModelDebugDBName"];
     [encoder encodeInt32:self.debugDBPort forKey:@"ORSNOPModelDebugDBPort"];
     [encoder encodeObject:self.debugDBIPAddress forKey:@"ORSNOPModelDebugDBIPAddress"];
+
+    //Run status
+    [encoder encodeObject:[self lastStandardRunType] forKey:@"SNOPlastStandardRunType"];
+    [encoder encodeObject:[self lastStandardRunVersion] forKey:@"SNOPlastStandardRunVersion"];
+    [encoder encodeObject:[self lastRunTypeWordHex] forKey:@"SNOPlastRunTypeWordHex"];
 
     //ECA
     [encoder encodeInt:[anECARun ECA_pattern] forKey:@"SNOPECApattern"];
@@ -1777,6 +1808,11 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     lastRunTypeWordHex = [aValue copy];
 }
 
+- (NSMutableDictionary*)standardRunCollection
+{
+    return standardRunCollection;
+}
+
 - (NSString*)standardRunType
 {
     return standardRunType;
@@ -1786,8 +1822,23 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 {
     [standardRunType autorelease];//MAH -- strings should be handled like this
     standardRunType = [aValue copy];
-    
+
+    /* Update standard run version */
+    //Check if DB is empty
+    if([[standardRunCollection objectForKey:standardRunType] count] == 0){
+        [self setStandardRunVersion:@""];
+    }
+    //Check if previous selected run version exists
+    else if([[standardRunCollection objectForKey:standardRunType] objectForKey:standardRunVersion] == nil){
+        //If not, select first on the list
+        [self setStandardRunVersion:[[[standardRunCollection objectForKey:standardRunType] keyEnumerator] nextObject]];
+    }
+    else{
+        [self setStandardRunVersion:[self standardRunVersion]];
+    }
+
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelSRChangedNotification object:self];
+
 }
 
 - (NSString*)standardRunVersion
@@ -1867,11 +1918,6 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     [self setStandardRunVersion:_standardRunVersion];
 
     //Load the standard run and stop run initialization if failed
-    [self setLastStandardRunType:[self standardRunType]];
-    [self setLastStandardRunVersion:[self standardRunVersion]];
-    [self setLastRunTypeWord:[self runTypeWord]];
-    NSString* _lastRunTypeWord = [NSString stringWithFormat:@"0x%X",(int)[self runTypeWord]];
-    [self setLastRunTypeWordHex:_lastRunTypeWord]; //FIXME: revisit if we go over 32 bits
     if(![self loadStandardRun:_standardRun withVersion:_standardRunVersion]) return false;
 
     //Start or restart the run
@@ -1916,74 +1962,144 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 
 }
 
+-(BOOL) refreshStandardRunsFromDB
+{
+
+    //Prune the Standard Runs collection
+    [standardRunCollection removeAllObjects];
+
+    //First add Off-line standard runs
+    NSMutableDictionary* runSettings = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary* versionCollection = [[NSMutableDictionary alloc] init];
+    NSNumber* diagRunType = [[NSNumber alloc] initWithInt:kDiagnosticRun];
+    [runSettings setObject:diagRunType forKey:@"run_type_word"];
+    [versionCollection setObject:[runSettings copy] forKey:@"DEFAULT"];
+    [standardRunCollection setObject:[versionCollection copy] forKey:@"DIAGNOSTIC"];
+    [versionCollection release];
+    [runSettings release];
+    [diagRunType release];
+
+    // Now query DB and fetch the SRs
+    NSString *urlString, *link, *ret;
+    NSURLRequest *request;
+    NSURLResponse *response;
+    NSError *error = nil;
+    NSData *data;
+
+    urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/%@/_design/standardRuns/_view/getStandardRunsWithVersion?startkey=[%@, \"\", \"\", 0]&endkey=[%@,\"\ufff0\",\"\ufff0\",{}]&include_docs=True",
+                 [self orcaDBUserName],
+                 [self orcaDBPassword],
+                 [self orcaDBIPAddress],
+                 [self orcaDBPort],
+                 [self orcaDBName],
+                 [self standardRunTableVersion],
+                 [self standardRunTableVersion]];
+
+    link = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    request = [NSURLRequest requestWithURL:[NSURL URLWithString:link] cachePolicy:0 timeoutInterval:2];
+    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+    ret = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
+    NSDictionary *theStandardRuns = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
+    //JSON formatting error
+    if (error != nil) {
+        NSLogColor([NSColor redColor], @"Error reading standard runs from "
+                   "database: %@\n", [error localizedDescription]);
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelSRCollectionChangedNotification object:self];
+        [self setStandardRunType:@"DIAGNOSTIC"];
+        [self setStandardRunVersion:@"DEFAULT"];
+        return false;
+    }
+
+    //If SR not found select diagnostic run
+    if ([[theStandardRuns valueForKey:@"error"] isEqualToString:@"not_found"] || error != nil) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelSRCollectionChangedNotification object:self];
+        [self setStandardRunType:@"DIAGNOSTIC"];
+        NSLogColor([NSColor redColor],@"Error querying couchDB, please check the settings are correct and you have connection. \n");
+        return false;
+    }
+
+    //Query succeded
+    for(id aStandardRun in [theStandardRuns valueForKey:@"rows"]){
+        NSString *runtype = [[aStandardRun valueForKey:@"key"] objectAtIndex:1];
+        NSString *runversion = [[aStandardRun valueForKey:@"key"] objectAtIndex:2];
+        NSDictionary *runsettings = [aStandardRun valueForKey:@"doc"];
+        if([runtype isEqualToString:@"DIAGNOSTIC"]) continue; //Diagnostic is a protected name
+        if([standardRunCollection objectForKey:runtype] == nil){
+            [standardRunCollection setObject:[[NSMutableDictionary alloc] init] forKey:runtype];
+        }
+        [[standardRunCollection objectForKey:runtype] setObject:runsettings forKey:runversion];
+    }
+
+    /* Notify the controller to update the popup menu */
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelSRCollectionChangedNotification object:self];
+
+    /* Update standard run type */
+    //Check if DB is empty
+    if([standardRunCollection count] == 0){
+        [self setStandardRunType:@""];
+        return false;
+    }
+    //Check if previous selected run exists
+    else if([standardRunCollection objectForKey:[self standardRunType]] == nil){
+        //If not, select first on the list
+        [self setStandardRunType:[[standardRunCollection keyEnumerator] nextObject]];
+    }
+    else{
+        [self setStandardRunType:[self standardRunType]];
+    }
+
+    /* Update standard run version */
+    //Check if DB is empty
+    if([[standardRunCollection objectForKey:[self standardRunType]] count] == 0){
+        [self setStandardRunVersion:@""];
+    }
+    //Check if previous selected run exists
+    else if([standardRunCollection objectForKey:[self standardRunType]] == nil){
+        //If not, select first on the list
+        [self setStandardRunVersion:[[[standardRunCollection objectForKey:[self standardRunType]] keyEnumerator] nextObject]];
+    }
+    else{
+        [self setStandardRunVersion:[self standardRunVersion]];
+    }
+
+    return true;
+
+}
 
 // Load Detector Settings from the DB into the Models
 -(BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion
 {
 
-    //Alert the operator
-    if(runTypeName == nil || runVersion == nil){
-        NSLog(@"Please, set a valid name and click enter. \n");
+    NSMutableDictionary* runSettings = [[[self standardRunCollection] objectForKey:runTypeName] objectForKey:runVersion];
+    if(runSettings == nil){
+        NSLogColor([NSColor redColor], @"Standard run %@(%@) does NOT exists in DB. \n",runTypeName, runVersion);
         return false;
     }
-    else if([runTypeName isEqualToString:@"DIAGNOSTIC"]){
-        NSLog(@"Going to DIAGNOSTIC run: the trigger settings will not change \n",runTypeName, runVersion);
-    }
-    else{
-        NSLog(@"Loading settings for standard run: %@ - Version: %@ ........ \n",runTypeName, runVersion);
+
+    /* Get models */
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    ORMTCModel* mtcModel;
+    if ([objs count]) {
+        mtcModel = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find MTC model. Please add it to the experiment and restart the run.\n");
+        return false;
     }
 
-    //Get RC model
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* runControlModel;
     if ([objs count]) {
         runControlModel = [objs objectAtIndex:0];
     } else {
-        NSLogColor([NSColor redColor], @"couldn't find MTC model. Please add it to the experiment and restart the run.\n");
-        return 0;
-    }
-    //Get MTC model
-    objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    ORMTCModel* mtc;
-    if ([objs count]) {
-        mtc = [objs objectAtIndex:0];
-    } else {
-        NSLogColor([NSColor redColor], @"couldn't find MTC model. Please add it to the experiment and restart the run.\n");
-        return 0;
-    }
-
-    //Query the OrcaDB and get a dictionary with the parameters
-    NSString *urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/%@/_design/standardRuns/_view/getStandardRunsWithVersion?startkey=[%@,\"%@\",\"%@\",{}]&endkey=[%@,\"%@\",\"%@\",0]&descending=True&include_docs=True",
-                           [self orcaDBUserName],
-                           [self orcaDBPassword],
-                           [self orcaDBIPAddress],
-                           [self orcaDBPort],
-                           [self orcaDBName],
-                           [self standardRunTableVersion],
-                           runTypeName,
-                           runVersion,
-                           [self standardRunTableVersion],
-                           runTypeName,
-                           runVersion];
-
-    NSString* urlStringScaped = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-    NSURL *url = [NSURL URLWithString:urlStringScaped];
-    NSData *data = [NSData dataWithContentsOfURL:url];
-    NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    NSError *error =  nil;
-    NSMutableDictionary *detectorSettings = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
-
-    if(error) {
-        NSLog(@"Error querying couchDB, please check the connection is correct: \n %@ \n", ret);
-        [ret release];
+        NSLogColor([NSColor redColor], @"couldn't find RC model. Please add it to the experiment and restart the run.\n");
         return false;
     }
-    
+
+
     //Load values
     @try{
-
         //Load run type word
-        unsigned long nextruntypeword = [[[[[detectorSettings valueForKey:@"rows"] objectAtIndex:0] valueForKey:@"doc"] valueForKey:@"run_type_word"] unsignedLongValue];
+        unsigned long nextruntypeword = [[runSettings valueForKey:@"run_type_word"] unsignedLongValue];
         unsigned long currentruntypeword = [runControlModel runType];
         //Do not touch the data quality bits
         currentruntypeword &= 0xFFE00000;
@@ -1994,7 +2110,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         if(nextruntypeword & kDiagnosticRun) return true;
 
         //Load MTC thresholds
-        [mtc loadFromSearialization:detectorSettings];
+        [mtcModel loadFromSearialization:runSettings];
         
         NSLog(@"Standard run %@ (%@) settings loaded. \n",runTypeName,runVersion);
         return true;
@@ -2015,11 +2131,16 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         ORRunAlertPanel(@"Invalid Standard Run Name",@"Please, set a valid name in the popup menus and click enter",@"OK",nil,nil);
         return false;
     }
+    else if([runTypeName isEqualToString:@"DIAGNOSTIC"]){
+        NSLog(@"You cannot save a DIAGNOSTIC run. \n");
+        return false;
+    }
     else{
-        BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Overwriting stored values for run \"%@\" with version \"%@\"", runTypeName,runVersion],@"Is this really what you want?",@"Cancel",@"Yes, Save it",nil);
+        BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Overwriting stored values for run \"%@\" with version \"%@\"",
+                                       runTypeName,runVersion],
+                                      @"Is this really what you want?",@"Cancel",@"Yes, Save it",nil);
         if(cancel) return false;
     }
-    NSLog(@"Saving settings for Standard Run: %@ - Version: %@ ........ \n",runTypeName,runVersion);
 
     //Get RC model
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
@@ -2058,11 +2179,10 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     NSMutableDictionary* mtc_serial = [[mtc serializeToDictionary] retain];
     [detectorSettings addEntriesFromDictionary:mtc_serial];
     [mtc_serial release];
-    NSLog(@"savestandardrun %@\n",detectorSettings);
-    
-    [[self orcaDbRefWithEntryDB:self withDB:@"orca"] addDocument:detectorSettings tag:@"kStandardRunDocumentAdded"];
+    NSLog(@"Saving settings for Standard Run %@ - Version %@: \n %@ \n",runTypeName,runVersion,detectorSettings);
 
-    NSLog(@"%@ run saved as standard run. \n",runTypeName);    
+    [[self orcaDbRefWithEntryDB:self withDB:[self orcaDBName]] addDocument:detectorSettings tag:@"kStandardRunPosted"];
+
     return true;
 
 }
@@ -2091,7 +2211,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         return;
     }
     
-    NSLogColor([NSColor redColor], @"Settings loaded in Hardware \n");
+    NSLog(@"Settings loaded in Hardware \n");
 
 }
 
