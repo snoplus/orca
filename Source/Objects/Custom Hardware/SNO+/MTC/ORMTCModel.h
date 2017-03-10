@@ -157,7 +157,7 @@
 - (void) detectorStateChanged:(NSNotification*)aNote;
 
 // DB Access
-- (void) getLatestTriggerScan;
+- (void) getLatestTriggerScans;
 - (void) updateTriggerThresholds;
 
 - (int) triggerScanNameToIndex:(NSString*) name;

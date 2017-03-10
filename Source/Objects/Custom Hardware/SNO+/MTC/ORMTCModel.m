@@ -152,7 +152,7 @@ tubRegister;
 - (void) awakeAfterDocumentLoaded
 {
     [self updateSettings];
-    [self updateTriggerScans];
+    [self getLatestTriggerScans];
 }
 
 - (void) setMTCPort: (int) port
@@ -434,7 +434,7 @@ tubRegister;
     }
 }
 
-- (void) getLatestTriggerScan
+- (void) getLatestTriggerScans
 {
     /* Update the dac -> nhit conversions by querying the database for the
      * latest trigger scans. */
