@@ -743,6 +743,8 @@ static int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 
 - (IBAction) initBoard: (id) sender
 {
+    [self endEditing];
+
 	@try {
 		[model initBoard];
 		NSLog(@"Caen 1720 Card %d inited\n",[model slot]);
