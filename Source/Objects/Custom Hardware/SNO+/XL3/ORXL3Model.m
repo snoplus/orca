@@ -2842,13 +2842,14 @@ err:
 - (int) setPedestals
 {
     /* Set the pedestal mask. Returns 0 on success, -1 on error. */
+    int i;
     char payload[XL3_PAYLOAD_SIZE];
-    MultiSetCratePedestalsArgs *args;
-    MultiSetCratePedestalsResults *results;
+    MultiSetCratePedsArgs *args;
+    MultiSetCratePedsResults *results;
 
     memset(&payload, 0, XL3_PAYLOAD_SIZE);
 
-    args = (MultiSetCratePedestalsArgs *) payload;
+    args = (MultiSetCratePedsArgs *) payload;
 
     NSArray* fecs = [[self guardian]
                      collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
@@ -2873,7 +2874,7 @@ err:
         return -1;
     }
 
-    results = (MultiSetCratePedestalsResults *) payload;
+    results = (MultiSetCratePedsResults *) payload;
 
     if (ntohl(results->errorMask)) {
         return -1;
