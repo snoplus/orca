@@ -100,8 +100,6 @@ resync;
 
 #pragma mark ¥¥¥Initialization
 
-/* This method is obsolete and rarely called.
- For initialization you should use initWithCoder */
 - (id) init
 {
     
@@ -304,6 +302,8 @@ resync;
     [self setLastStandardRunType:[decoder decodeObjectForKey:@"SNOPlastStandardRunType"]];
     [self setLastStandardRunVersion:[decoder decodeObjectForKey:@"SNOPlastStandardRunVersion"]];
     [self setLastRunTypeWordHex:[decoder decodeObjectForKey:@"SNOPlastRunTypeWordHex"]];
+    [self setStandardRunType:[decoder decodeObjectForKey:@"SNOPStandardRunType"]];
+    [self setStandardRunVersion:[decoder decodeObjectForKey:@"SNOPStandardRunVersion"]];
 
     //ECA
     [anECARun setECA_pattern:[decoder decodeIntForKey:@"SNOPECApattern"]];
@@ -409,11 +409,6 @@ resync;
 {
     /* Get the standard runs from the database. */
     [self refreshStandardRunsFromDB];
-
-    /* Load the last standard run. */
-    [self setStandardRunType:[self lastStandardRunType]];
-    [self setStandardRunVersion:[self lastStandardRunVersion]];
-
     [[ORGlobal sharedGlobal] setCanQuitDuringRun:YES];
 }
 
@@ -1556,6 +1551,8 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     [encoder encodeObject:[self lastStandardRunType] forKey:@"SNOPlastStandardRunType"];
     [encoder encodeObject:[self lastStandardRunVersion] forKey:@"SNOPlastStandardRunVersion"];
     [encoder encodeObject:[self lastRunTypeWordHex] forKey:@"SNOPlastRunTypeWordHex"];
+    [encoder encodeObject:[self standardRunType] forKey:@"SNOPStandardRunType"];
+    [encoder encodeObject:[self standardRunVersion] forKey:@"SNOPStandardRunVersion"];
 
     //ECA
     [encoder encodeInt:[anECARun ECA_pattern] forKey:@"SNOPECApattern"];
@@ -1952,11 +1949,10 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 
 -(BOOL) refreshStandardRunsFromDB
 {
-
-    //Prune the Standard Runs collection
+    // Prune the Standard Runs collection
     [standardRunCollection removeAllObjects];
 
-    //First add Off-line standard runs
+    // First add Off-line standard runs
     NSMutableDictionary* runSettings = [[NSMutableDictionary alloc] init];
     NSMutableDictionary* versionCollection = [[NSMutableDictionary alloc] init];
     NSNumber* diagRunType = [[NSNumber alloc] initWithInt:kDiagnosticRun];
@@ -1988,7 +1984,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
     ret = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
     NSDictionary *theStandardRuns = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
-    //JSON formatting error
+    // JSON formatting error
     if (error != nil) {
         NSLogColor([NSColor redColor], @"Error reading standard runs from "
                    "database: %@\n", [error localizedDescription]);
@@ -1998,21 +1994,21 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         return false;
     }
 
-    //If SR not found select diagnostic run
-    if ([[theStandardRuns valueForKey:@"error"] isEqualToString:@"not_found"] || error != nil) {
+    // If SR not found select diagnostic run
+    if ([[theStandardRuns valueForKey:@"error"] isEqualToString:@"not_found"]) {
         [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelSRCollectionChangedNotification object:self];
         [self setStandardRunType:@"DIAGNOSTIC"];
         NSLogColor([NSColor redColor],@"Error querying couchDB, please check the settings are correct and you have connection. \n");
         return false;
     }
 
-    //Query succeded
-    for(id aStandardRun in [theStandardRuns valueForKey:@"rows"]){
+    // Query succeded
+    for (id aStandardRun in [theStandardRuns valueForKey:@"rows"]) {
         NSString *runtype = [[aStandardRun valueForKey:@"key"] objectAtIndex:1];
         NSString *runversion = [[aStandardRun valueForKey:@"key"] objectAtIndex:2];
         NSDictionary *runsettings = [aStandardRun valueForKey:@"doc"];
-        if([runtype isEqualToString:@"DIAGNOSTIC"]) continue; //Diagnostic is a protected name
-        if([standardRunCollection objectForKey:runtype] == nil){
+        if ([runtype isEqualToString:@"DIAGNOSTIC"]) continue; // Diagnostic is a protected name
+        if ([standardRunCollection objectForKey:runtype] == nil) {
             [standardRunCollection setObject:[[NSMutableDictionary alloc] init] forKey:runtype];
         }
         [[standardRunCollection objectForKey:runtype] setObject:runsettings forKey:runversion];
@@ -2022,42 +2018,34 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelSRCollectionChangedNotification object:self];
 
     /* Update standard run type */
-    //Check if DB is empty
-    if([standardRunCollection count] == 0){
+    if ([standardRunCollection count] == 0) {
+        /* Database is empty, so we set the standard run version to the empty string. */
         [self setStandardRunType:@""];
         return false;
-    }
-    //Check if previous selected run exists
-    else if([standardRunCollection objectForKey:[self standardRunType]] == nil){
-        //If not, select first on the list
+    } else if([standardRunCollection objectForKey:[self standardRunType]] == nil){
+        /* The current type is not in the standard runs anymore, so we select the first version. */
         [self setStandardRunType:[[standardRunCollection keyEnumerator] nextObject]];
-    }
-    else{
+    } else {
         [self setStandardRunType:[self standardRunType]];
     }
 
     /* Update standard run version */
-    //Check if DB is empty
-    if([[standardRunCollection objectForKey:[self standardRunType]] count] == 0){
+    if ([[standardRunCollection objectForKey:[self standardRunType]] count] == 0){
+        /* Database is empty, so we set the standard run version to the empty string. */
         [self setStandardRunVersion:@""];
-    }
-    //Check if previous selected run exists
-    else if([standardRunCollection objectForKey:[self standardRunType]] == nil){
-        //If not, select first on the list
+    } else if ([[standardRunCollection objectForKey:[self standardRunType]] objectForKey:[self standardRunVersion]] == nil) {
+        /* The current version is not in the standard runs anymore, so we select the first version. */
         [self setStandardRunVersion:[[[standardRunCollection objectForKey:[self standardRunType]] keyEnumerator] nextObject]];
-    }
-    else{
+    } else {
         [self setStandardRunVersion:[self standardRunVersion]];
     }
 
     return true;
-
 }
 
 // Load Detector Settings from the DB into the Models
 -(BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion
 {
-
     NSMutableDictionary* runSettings = [[[self standardRunCollection] objectForKey:runTypeName] objectForKey:runVersion];
     if(runSettings == nil){
         NSLogColor([NSColor redColor], @"Standard run %@(%@) does NOT exists in DB. \n",runTypeName, runVersion);
@@ -2107,7 +2095,6 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         NSLog(@"Error retrieving Standard Runs information: \n %@ \n", e);
         return false;
     }
-    
 }
 
 //Save MTC settings in a Standard Run table in CouchDB for later use by the Run Scripts or the user
