@@ -385,18 +385,18 @@ tubRegister;
     NSString* dac_per_nhit = nil;
 
     if (!result) {
-        NSLog(@"Failed to recieve trigger scan results from database.\n");
+        NSLogColor([NSColor redColor], @"Failed to recieve trigger scan results from database.\n");
         return;
     }
 
     numRows = [result numOfRows];
     numCols = [result numOfFields];
     if (numRows <= 0) {
-        NSLog(@"Empty result returned from database. No trigger scans are available\n");
+        NSLogColor([NSColor redColor], @"Empty result returned from database. No trigger scans are available\n");
         return;
     }
     if (numCols != 3) {
-        NSLog(@"Unexpected number of columns returned from database for trigger scan. Expected 3 got %i\n", numCols);
+        NSLogColor([NSColor redColor], @"Unexpected number of columns returned from database for trigger scan. Expected 3 got %i\n", numCols);
         return;
     }
 
@@ -430,6 +430,8 @@ tubRegister;
 
     if (error_count > 0) {
         NSLog(@"An error occurred while try to retrieve %i of the %i rows returned from the database\n",error_count,numRows);
+    } else {
+        NSLog(@"Successfully loaded all trigger scans from the database.\n");
     }
 }
 
@@ -452,25 +454,25 @@ tubRegister;
     int numRows, numCols;
 
     if (!result) {
-        NSLog(@"Failed to recieve threshold results from database.\n");
+        NSLogColor([NSColor redColor], @"Failed to recieve threshold results from database.\n");
         return;
     }
 
     numRows = [result numOfRows];
     numCols = [result numOfFields];
     if (numRows != 1) {
-        NSLog(@"Database returned unexpected number of rows for MTC threhsolds. 1 expected, %i returned.\n",numRows);
+        NSLogColor([NSColor redColor], @"Database returned unexpected number of rows for MTC threhsolds. 1 expected, %i returned.\n",numRows);
         return;
     }
     if (numCols != 1) {
-        NSLog(@"Database returned unexpected number of columns for MTC thresholds. 1 expected, %i returned.\n",numCols);
+        NSLogColor([NSColor redColor], @"Database returned unexpected number of columns for MTC thresholds. 1 expected, %i returned.\n",numCols);
         return;
     }
 
     NSArray* result_arr = [[result fetchRowAsDictionary] objectForKey:@"mtca_dacs"];
     if(!result_arr || [result_arr count] == 0)
     {
-        NSLog(@"Error while converting MTC threshold DB result to array.\n");
+        NSLogColor([NSColor redColor], @"Error while converting MTC threshold DB result to array.\n");
         return;
     }
     @try {
@@ -486,8 +488,11 @@ tubRegister;
         [self setThresholdOfType:MTC_OWLELO_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_OWLEL_INDEX] floatValue]];
         [self setThresholdOfType:MTC_OWLEHI_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_OWLEH_INDEX] floatValue]];
     } @catch(NSException* excep) {
-        NSLogColor([NSColor redColor], @"Error while retrieving threhsolds. Operation failed, Reason: %@\n",[excep reason]);
+        NSLogColor([NSColor redColor], @"Error while retrieving thresholds. Operation failed, Reason: %@\n",[excep reason]);
+        return;
     }
+
+    NSLog(@"Successfully loaded the current MTCA+ trigger thresholds from the database.\n");
 }
 
 - (void) updateTriggerThresholds
