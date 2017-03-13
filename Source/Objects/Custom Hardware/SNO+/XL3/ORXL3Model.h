@@ -448,8 +448,8 @@ enum {
 + (bool) requestHVParams:(ORXL3Model *)model;
 - (void) safeHvInit;
 - (void) setHVSwitch:(BOOL)aOn forPowerSupply:(unsigned char)sup;
+- (void) _hvPanicDown;
 - (void) hvPanicDown;
-- (void) hvMasterPanicDown;
 - (void) hvTriggersON;
 - (void) hvTriggersOFF;
 - (void) readHVInterlockGood:(BOOL*)isGood;

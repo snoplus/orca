@@ -4246,42 +4246,53 @@ err:
     }//synchronized
 }
 
-- (void) hvPanicDown
+- (void) _hvPanicDown
 {
-    [self setIsPollingXl3:NO];
-    //triggers turned off in DoPanicDown command
-
+    /* Panic down method which is called in a separate thread. */
     XL3Packet packet;
     memset(packet.payload, 0, XL3_PAYLOAD_SIZE);
 
-    DoPanicDownResults* result = (DoPanicDownResults*)packet.payload;
+    DoPanicDownResults* result = (DoPanicDownResults*) packet.payload;
 
     @try {
         [[self xl3Link] sendCommand:DO_PANIC_DOWN withPayload:packet.payload expectResponse:YES];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],@"crate %02d: error while performing panic down; error: %@ reason: %@\n",
+                   [self crateNumber], [e name], [e reason]);
+        goto err;
     }
-    @catch (NSException *e) {
-        NSLogColor([NSColor redColor],@"%@ error while performing panic down; error: %@ reason: %@\n",
-              [[self xl3Link] crateName], [e name], [e reason]);
+
+    result->errorFlags = ntohl(result->errorFlags);
+
+    if (result->errorFlags) {
+        NSLogColor([NSColor redColor], @"crate %02d: There was a problem performing panic down. Try again or ramp crate manually",
+                   [self crateNumber]);
+        goto err;
+    }
+
+    /* Restart the HV thread. Need to post on the main thread. */
+    dispatch_async(dispatch_get_main_queue(), ^{
         [self safeHvInit];
-        return;
-    }
-    if ([xl3Link needToSwap]) {
-        result->errorFlags = swapLong(result->errorFlags);
-    }
-    if(result->errorFlags)
-    {
-        NSLogColor([NSColor redColor],@"There was a problem performing panic down. Try again or ramp crate manually");
+    });
+
+    NSLog(@"crate %02d: panic down completed.\n", [self crateNumber]);
+
+    return;
+
+err:
+    /* Restart the HV thread. Need to post on the main thread. */
+    dispatch_async(dispatch_get_main_queue(), ^{
         [self safeHvInit];
-        return;
-    }
-    [self safeHvInit];
-    NSLog(@"%@ panic down completed.\n", [[self xl3Link] crateName]);
+    });
 }
 
-//not used, we collect the objects from the controller now
-- (void) hvMasterPanicDown
+- (void) hvPanicDown
 {
-    [[[self document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
+    /* Asynchronously send a panic down command to the XL3. The panic down
+     * command will turn triggers off and then ramp down the HV. */
+    [self setIsPollingXl3:NO];
+
+    [NSThread detachNewThreadSelector:@selector(_hvPanicDown) toTarget:self withObject:nil];
 }
 
 - (void) hvTriggersON
