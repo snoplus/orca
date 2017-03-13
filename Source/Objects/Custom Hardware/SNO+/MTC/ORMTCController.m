@@ -411,7 +411,7 @@
 }
 
 - (void) basicLockChanged:(NSNotification*)aNotification
-
+{
     BOOL locked                        = [gSecurity isLocked:ORMTCBasicLock];
     BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORMTCBasicLock];
 
