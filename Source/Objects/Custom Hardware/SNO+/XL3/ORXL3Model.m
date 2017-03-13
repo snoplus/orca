@@ -2839,6 +2839,50 @@ err:
 	[self setXl3OpsRunning:NO forKey:@"compositeQuit"];
 }
 
+- (int) setPedestals
+{
+    /* Set the pedestal mask. Returns 0 on success, -1 on error. */
+    int i;
+    char payload[XL3_PAYLOAD_SIZE];
+    MultiSetCratePedsArgs *args;
+    MultiSetCratePedsResults *results;
+
+    memset(&payload, 0, XL3_PAYLOAD_SIZE);
+
+    args = (MultiSetCratePedsArgs *) payload;
+
+    NSArray* fecs = [[self guardian]
+                     collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
+
+    args->slotMask = 0;
+
+    for (id aFec in fecs) {
+        args->slotMask |= 1 << [aFec stationNumber];
+        args->channelMasks[[aFec stationNumber]] = [aFec pedEnabledMask];
+    }
+
+    args->slotMask = htonl(args->slotMask);
+
+    for (i = 0; i < 16; i++) {
+        args->channelMasks[i] = htonl(args->channelMasks[i]);
+    }
+
+    @try {
+        [[self xl3Link] sendCommand:MULTI_SET_CRATE_PEDS_ID withPayload:payload
+                        expectResponse:YES];
+    } @catch (NSException *e) {
+        return -1;
+    }
+
+    results = (MultiSetCratePedsResults *) payload;
+
+    if (ntohl(results->errorMask)) {
+        return -1;
+    }
+
+    return 0;
+}
+
 - (int) setPedestalMask: (uint32_t) slotMask pattern: (uint32_t) pattern
 {
     /* Set the pedestal mask for a given slot mask. Any slots not in the mask
