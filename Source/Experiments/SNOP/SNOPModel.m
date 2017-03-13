@@ -2100,24 +2100,21 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 //Save MTC settings in a Standard Run table in CouchDB for later use by the Run Scripts or the user
 -(BOOL) saveStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion
 {
-    
-    //Check that runTypeName is properly set:
-    if(runTypeName == nil || runVersion == nil){
+    // Check that runTypeName is properly set:
+    if (runTypeName == nil || runVersion == nil) {
         ORRunAlertPanel(@"Invalid Standard Run Name",@"Please, set a valid name in the popup menus and click enter",@"OK",nil,nil);
         return false;
-    }
-    else if([runTypeName isEqualToString:@"DIAGNOSTIC"]){
+    } else if([runTypeName isEqualToString:@"DIAGNOSTIC"]) {
         NSLog(@"You cannot save a DIAGNOSTIC run. \n");
         return false;
-    }
-    else{
+    } else {
         BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Overwriting stored values for run \"%@\" with version \"%@\"",
                                        runTypeName,runVersion],
                                       @"Is this really what you want?",@"Cancel",@"Yes, Save it",nil);
-        if(cancel) return false;
+        if (cancel) return false;
     }
 
-    //Get RC model
+    // Get RC model
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* runControlModel;
     if ([objs count]) {
@@ -2126,7 +2123,8 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         NSLogColor([NSColor redColor], @"couldn't find RC model. Please add it to the experiment and restart the run.\n");
         return 0;
     }
-    //Get MTC model
+
+    // Get MTC model
     objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     ORMTCModel* mtc;
     if ([objs count]) {
@@ -2136,7 +2134,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         return 0;
     }
 
-    //Build run table
+    // Build run table
     NSMutableDictionary *detectorSettings = [NSMutableDictionary dictionaryWithCapacity:200];
 
     [detectorSettings setObject:@"standard_run" forKey:@"type"];
@@ -2145,12 +2143,12 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     [detectorSettings setObject:runVersion forKey:@"run_version"];
     NSNumber *date = [NSNumber numberWithDouble:[[NSDate date] timeIntervalSince1970]];
     [detectorSettings setObject:date forKey:@"time_stamp"];
-    //Do not touch the data quality bits
+    // Do not touch the data quality bits
     unsigned long currentRunTypeWord = [runControlModel runType];
     currentRunTypeWord &= ~0xFFE00000;
     [detectorSettings setObject:[NSNumber numberWithUnsignedLong:currentRunTypeWord] forKey:@"run_type_word"];
 
-    //Save MTC/D parameters, trigger masks and MTC/A+ thresholds
+    // Save MTC/D parameters, trigger masks and MTC/A+ thresholds
     NSMutableDictionary* mtc_serial = [[mtc serializeToDictionary] retain];
     [detectorSettings addEntriesFromDictionary:mtc_serial];
     [mtc_serial release];
@@ -2159,7 +2157,6 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     [[self orcaDbRefWithEntryDB:self withDB:[self orcaDBName]] addDocument:detectorSettings tag:@"kStandardRunPosted"];
 
     return true;
-
 }
 
 //Ship GUI settings to hardware

@@ -1671,24 +1671,19 @@ snopGreenColor;
 
 - (IBAction)loadStandardRunFromDBAction:(id)sender
 {
-    
     NSString *standardRun = [standardRunPopupMenu objectValueOfSelectedItem];
     NSString *standardRunVer = [standardRunVersionPopupMenu objectValueOfSelectedItem];
 
     [model loadStandardRun:standardRun withVersion: standardRunVer];
     [model loadSettingsInHW];
-    
 }
 
 - (IBAction)saveStandardRunToDBAction:(id)sender
 {
-    
     NSString *standardRun = [standardRunPopupMenu objectValueOfSelectedItem];
     NSString *standardRunVer = [standardRunVersionPopupMenu objectValueOfSelectedItem];
     
     [model saveStandardRun:standardRun withVersion:standardRunVer];
-    [self displayThresholdsFromDB];
-    
 }
 
 // Create a new SR item if doesn't exist, set the runType string value and query the DB to display the trigger configuration
