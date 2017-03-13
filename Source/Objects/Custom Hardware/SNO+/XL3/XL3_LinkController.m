@@ -1596,13 +1596,13 @@ static NSDictionary* xl3Ops;
 - (IBAction)hvRampDownAction:(id)sender
 {
     [[sender window] makeFirstResponder:tabView];
-    if ([model isTriggerON]) {
-        [model hvTriggersOFF];
-    }
     if ([hvPowerSupplyMatrix selectedColumn] == 0) {
+        if ([model isTriggerON]) {
+            [model hvTriggersOFF];
+        }
         [model setHvANextStepValue:0];
-    }
-    else {
+    } else {
+        //FIXME: do we handle triggers for supply B?
         [model setHvBNextStepValue:0];
     }
 }
