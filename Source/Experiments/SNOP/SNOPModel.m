@@ -1423,10 +1423,9 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
                 [self parseSmellieRunFileDocs:aResult];
             } else if ([aTag isEqualToString:@"Message"]) {
                 [aResult prettyPrint:@"CouchDB Message:"];
-            }
-            //Standard Runs querying
-            else if ([aTag isEqualToString:@"kStandardRunPosted"]) {
-                NSLog(@"Standard Run saved. \n");
+            } else if ([aTag isEqualToString:@"kStandardRunPosted"]) {
+                /* Standard run was successfully posted. */
+                NSLog(@"Standard Run saved.\n");
                 [self refreshStandardRunsFromDB];
             } else {
                 [aResult prettyPrint:@"CouchDB"];
