@@ -493,31 +493,27 @@
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
 {
-    if ([tabView indexOfTabViewItem:item] == 0){
+    if ([tabView indexOfTabViewItem:item] == 0) {
         NSSize* newSize =nil;
-        if([opAdvancedOptionsBox isHidden]) {
+        if ([opAdvancedOptionsBox isHidden]) {
             newSize = &standardOpsSizeSmall;
-        }
-        else {
+        } else {
             newSize = &standardOpsSizeLarge;
         }
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:*newSize];
 		[[self window] setContentView:mtcView];
-    }
-    else if([tabView indexOfTabViewItem:item] == 1){
+    } else if ([tabView indexOfTabViewItem:item] == 1) {
         NSSize* newSize = nil;
-        if([settingsAdvancedOptionsBox isHidden]) {
+        if ([settingsAdvancedOptionsBox isHidden]) {
             newSize = &settingsSizeSmall;
-        }
-        else {
+        } else {
             newSize = &settingsSizeLarge;
         }
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:*newSize];
 		[[self window] setContentView:mtcView];
-    }
-    else if([tabView indexOfTabViewItem:item] == 2){
+    } else if ([tabView indexOfTabViewItem:item] == 2) {
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:triggerSize];
 		[[self window] setContentView:mtcView];
@@ -557,11 +553,10 @@
     uint32_t masks[7] = {[model mtcaN100Mask],[model mtcaN20Mask],[model mtcaEHIMask],
                             [model mtcaELOMask],[model mtcaOWLNMask],[model mtcaOEHIMask],
                             [model mtcaOELOMask]};
-    for(int matrix_index=0;matrix_index < [matrices count]; matrix_index++)
-    {
+    for (int matrix_index = 0; matrix_index < [matrices count]; matrix_index++) {
         uint32_t maskValue = masks[matrix_index];
         NSMatrix* thisMatrix = matrices[matrix_index];
-        for(int i=0;i<[thisMatrix numberOfRows];i++) {
+        for (int i = 0; i < [thisMatrix numberOfRows]; i++) {
             NSCell* thisCell = [thisMatrix cellAtRow:i column:0];
             int bitPos = [thisCell tag];
             [thisCell setIntValue:(maskValue & (1<<bitPos))];
@@ -763,8 +758,9 @@
     [self showHideOptions:sender Box:settingsAdvancedOptionsBox resizeSmall:settingsSizeSmall resizeLarge:settingsSizeLarge];
 }
 
-- (void) showHideOptions:(id) sender Box:(id)box resizeSmall:(NSSize) smallSize resizeLarge:(NSSize) largeSize {
-    if([sender state] == NSOffState) {
+- (void) showHideOptions:(id) sender Box:(id)box resizeSmall:(NSSize) smallSize resizeLarge:(NSSize) largeSize
+{
+    if ([sender state] == NSOffState) {
         [box setHidden:YES];
         [self resizeWindowToSize:smallSize];
     } else {
@@ -804,7 +800,7 @@
     [model setFineDelay:fine_delay_ps];
 }
 
-- (IBAction)standardPulserRateFieldChanged:(id)sender
+- (IBAction) standardPulserRateFieldChanged:(id)sender
 {
     float pulser_rate = [pulserPeriodField floatValue];
     [model setPgtRate:pulser_rate];
@@ -836,11 +832,10 @@
 {
     int threshold_index;
     float value;
-    for(int i=FIRST_ESUM_TAG;i<=LAST_ESUM_TAG;i++)
-    {
+    for (int i = FIRST_ESUM_TAG; i <= LAST_ESUM_TAG; i++) {
         @try {
             threshold_index = [self convert_view_threshold_index_to_model_index:i];
-            if(![model ConversionIsValidForThreshold:threshold_index] && units!=MTC_RAW_UNITS) {
+            if (![model ConversionIsValidForThreshold:threshold_index] && units!=MTC_RAW_UNITS) {
                 [[esumMatrix cellWithTag:i] setEnabled:NO];
                 [[esumMatrix cellWithTag:i] setStringValue:@"--"];
                 continue;
@@ -1053,7 +1048,7 @@
 - (uint32_t) gatherMaskFromCheckBoxes:(NSMatrix *) boxes
 {
     uint32_t mask = 0;
-    for(int i=0;i<[boxes numberOfRows];i++){
+    for (int i = 0; i < [boxes numberOfRows]; i++){
         if([[boxes cellAtRow:i column:0] intValue]) {
             int position = [[boxes cellAtRow:i column:0] tag];
             mask |= (1L << position);
@@ -1188,9 +1183,8 @@
 - (void)CheckBoxMatrixCellClicked:(NSMatrix*) checkBoxes newState:(int)state
 {
     BOOL cmdKeyDown = ([[NSApp currentEvent] modifierFlags] & NSCommandKeyMask) != 0;
-    if(cmdKeyDown){
-        for (int i=0; i<[checkBoxes numberOfRows]; i++)
-        {
+    if (cmdKeyDown) {
+        for (int i = 0; i < [checkBoxes numberOfRows]; i++) {
             [[checkBoxes cellAtRow:i column:0] setState: state];
         }
     }

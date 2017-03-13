@@ -143,8 +143,8 @@ tubRegister;
     sno = [objs objectAtIndex:0];
     [self setMTCHost:[sno mtcHost]];
     [self setMTCPort:[sno mtcPort]];
-    for(int i=0;i<MTC_NUM_THRESHOLDS;i++)
-    {
+
+    for (int i = 0; i < MTC_NUM_THRESHOLDS; i++) {
         mtca_conversion_is_valid[i] = NO;
     }
 }
@@ -403,7 +403,7 @@ tubRegister;
     for (int i = 0; i < numRows; i++) {
         @try {
             NSDictionary* result_dict = [result fetchRowAsType:MCPTypeDictionary row:i];
-            if(!result_dict) {
+            if (!result_dict) {
                 error_count++;
                 continue;
             }
@@ -695,7 +695,7 @@ tubRegister;
 
 - (void) setCoarseDelay:(int) delay
 {
-    if(coarseDelay != delay) {
+    if (coarseDelay != delay) {
         coarseDelay = delay;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCSettingsChanged object:self];
     }
@@ -708,7 +708,7 @@ tubRegister;
 
 - (void) setFineDelay:(int)delay
 {
-    if(fineDelay != delay) {
+    if (fineDelay != delay) {
         fineDelay = delay;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCSettingsChanged object:self];
     }
@@ -852,8 +852,7 @@ tubRegister;
 
 - (void) setPedestalWidth:(uint16_t) width
 {
-    if(pedestalWidth != width)
-    {
+    if (pedestalWidth != width) {
         pedestalWidth = width;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCSettingsChanged object:self];
     }
@@ -879,8 +878,7 @@ tubRegister;
 
 - (void) setPedCrateMask:(uint32_t)mask
 {
-    if( pedCrateMask != mask)
-    {
+    if (pedCrateMask != mask) {
         pedCrateMask = mask;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCSettingsChanged object:self];
     }
@@ -1064,8 +1062,7 @@ tubRegister;
 
 - (float) getThresholdOfType:(int) type inUnits:(int) units
 {
-    if(![self thresholdIndexIsValid:type])
-    {
+    if (![self thresholdIndexIsValid:type]) {
         [NSException raise:@"MTCModelError" format:@"Unknown threshold index specified. Cannot continue."];
     }
     uint16_t threshold = mtca_thresholds[type];
@@ -1077,61 +1074,51 @@ tubRegister;
 {
     // This function serves for all threshold setting needs. You can set any threshold in any units (provided a trigger scan was successfully gotten).
     // One can specify the thresold they'd like to set and the units they're using with the indexes #defined at the top of this file
-    if(type<0 || type > MTC_NUM_USED_THRESHOLDS)
-    {
+    if (type < 0 || type > MTC_NUM_USED_THRESHOLDS) {
         [NSException raise:@"MTCModelError" format:@"Unknown threshold index specified. Cannot continue."];
     }
     uint16_t threshold_in_dac_counts = (uint16)[self convertThreshold:aThreshold OfType:type fromUnits:units toUnits:MTC_RAW_UNITS];
-    if(mtca_thresholds[type] != threshold_in_dac_counts) {
+    if (mtca_thresholds[type] != threshold_in_dac_counts) {
         mtca_thresholds[type] = threshold_in_dac_counts;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCAThresholdChanged object:self];
     }
 }
 - (float) convertThreshold:(float)aThreshold OfType:(int) type fromUnits:(int)in_units toUnits:(int) out_units
 {
-    if(type<0 || type > MTC_NUM_USED_THRESHOLDS)
-    {
+    if (type < 0 || type > MTC_NUM_USED_THRESHOLDS) {
         [NSException raise:@"MTCModelError" format:@"Unknown threshold index specified. Cannot continue."];
     }
-    if(in_units == out_units)
-    {
+    if (in_units == out_units) {
         return aThreshold;
     }
-    if(![self ConversionIsValidForThreshold:type])
-    {
+    if (![self ConversionIsValidForThreshold:type]) {
         [NSException raise:@"ConversionNotValidError" format:@"Conversion for threshold %i is not valid",type];
     }
     float DAC_per_nhit = [self dacPerNHit:type];
     float DAC_per_mv = [self DacPerMilliVoltOfType:type];
     float mv_per_nhit = DAC_per_nhit/DAC_per_mv;
 
-    if(in_units == MTC_RAW_UNITS) {
+    if (in_units == MTC_RAW_UNITS) {
         float value_in_mv = ((aThreshold - [self getBaselineOfType:type])/DAC_per_mv);
         
-        if(out_units == MTC_mV_UNITS)
-        {
+        if (out_units == MTC_mV_UNITS) {
             return value_in_mv;
-        }
-        else if (out_units == MTC_NHIT_UNITS)
-        {
+        } else if (out_units == MTC_NHIT_UNITS) {
             return [self convertThreshold:value_in_mv OfType:type fromUnits:MTC_mV_UNITS toUnits:out_units];
         }
-    }
-    else if (in_units == MTC_mV_UNITS) {
-        if(out_units == MTC_RAW_UNITS) {
+    } else if (in_units == MTC_mV_UNITS) {
+        if (out_units == MTC_RAW_UNITS) {
             return ((aThreshold * DAC_per_mv)+[self getBaselineOfType:type]);
         }
-        else if(out_units == MTC_NHIT_UNITS) {
+        else if (out_units == MTC_NHIT_UNITS) {
             return aThreshold/mv_per_nhit;
         }
-    }
-    else if (in_units == MTC_NHIT_UNITS) {
+    } else if (in_units == MTC_NHIT_UNITS) {
         float value_in_mv = mv_per_nhit * aThreshold;
         
-        if(out_units == MTC_mV_UNITS) {
+        if (out_units == MTC_mV_UNITS) {
             return value_in_mv;
-        }
-        else if (out_units == MTC_RAW_UNITS) {
+        } else if (out_units == MTC_RAW_UNITS) {
             return [self convertThreshold:value_in_mv OfType:type fromUnits:MTC_mV_UNITS toUnits:out_units];
         }
     }
@@ -1146,8 +1133,7 @@ tubRegister;
 
 - (void) setBaselineOfType:(int) type toValue:(uint16_t) _val
 {
-    if(mtca_baselines[type] != _val)
-    {
+    if (mtca_baselines[type] != _val) {
         mtca_baselines[type] = _val;
         NSNotification* note = [NSNotification notificationWithName:ORMTCABaselineChanged object:self];
         [[NSNotificationQueue defaultQueue] enqueueNotification:note postingStyle:NSPostASAP coalesceMask:NSNotificationCoalescingOnName forModes:nil];
@@ -1161,8 +1147,7 @@ tubRegister;
 
 - (void) setDacPerNHit:(int) type toValue:(float) _val
 {
-    if(mtca_dac_per_nhit[type] != _val)
-    {
+    if (mtca_dac_per_nhit[type] != _val) {
         mtca_dac_per_nhit[type] = _val;
         NSNotification* note = [NSNotification notificationWithName:ORMTCAConversionChanged object:self];
         [[NSNotificationQueue defaultQueue] enqueueNotification:note postingStyle:NSPostASAP coalesceMask:NSNotificationCoalescingOnName forModes:nil];
@@ -1176,8 +1161,7 @@ tubRegister;
 
 - (void) setDacPerMilliVoltOfType:(int) type toValue:(float) _val
 {
-    if(mtca_dac_per_mV[type] != _val)
-    {
+    if (mtca_dac_per_mV[type] != _val) {
         mtca_dac_per_mV[type] = _val;
         NSNotification* note = [NSNotification notificationWithName:ORMTCAConversionChanged object:self];
         [[NSNotificationQueue defaultQueue] enqueueNotification:note postingStyle:NSPostASAP coalesceMask:NSNotificationCoalescingOnName forModes:nil];
@@ -1191,7 +1175,7 @@ tubRegister;
 
 - (void) setConversionIsValidForThreshold:(int) type isValid:(BOOL) _val
 {
-    if(mtca_conversion_is_valid[type] != _val) {
+    if (mtca_conversion_is_valid[type] != _val) {
         mtca_conversion_is_valid[type] = _val;
         NSNotification* note = [NSNotification notificationWithName:ORMTCAConversionChanged object:self];
         [[NSNotificationQueue defaultQueue] enqueueNotification:note postingStyle:NSPostASAP coalesceMask:NSNotificationCoalescingOnName forModes:nil];
@@ -1243,7 +1227,7 @@ tubRegister;
 
 - (id) objectFromSerialization: (NSMutableDictionary*) serial withKey:(NSString*)str
 {
-    id obj=[serial valueForKey:str];
+    id obj = [serial valueForKey:str];
     return obj;
 }
 
@@ -1394,9 +1378,7 @@ tubRegister;
         [[seq forTarget:self] loadPedestalCrateMaskToHardware];                     // STEP 10: Load ped crate mask
 		[[seq forTarget:self] initializeMtcDone];
 		[seq startSequence];
-		
-	}
-	@catch(NSException* localException) {
+	} @catch(NSException* localException) {
 		NSLog(@"***Initialization of the MTC (%@ Xilinx, %@ 10MHz clock) failed!***\n");
 		NSLog(@"Exception: %@\n",localException);
 		[seq stopSequence];
@@ -1418,8 +1400,7 @@ tubRegister;
     @try {
         [mtc okCommand:"set_gt_mask %lu", 0];
         NSLog(@"Cleared GT Mask\n");
-    }
-    @catch(NSException* localException) {
+    } @catch(NSException* localException) {
         NSLog(@"Could not clear GT word mask!\n");
         NSLog(@"Exception: %@\n",localException);
         [localException raise];
@@ -1431,8 +1412,7 @@ tubRegister;
 	@try {
 		[mtc okCommand:"set_gt_mask %lu",[self gtMask]];
 		NSLog(@"Set GT Mask: 0x%08x\n",[self gtMask]);
-	}
-	@catch(NSException* localException) {
+	} @catch(NSException* localException) {
 		NSLog(@"Could not set a set GT word mask!\n");					
 		NSLog(@"Exception: %@\n",localException);
 		[localException raise];
@@ -1444,8 +1424,7 @@ tubRegister;
 	unsigned long aValue = 0;
 	@try {	
         aValue =  [mtc intCommand:"get_gt_mask"];
-	}
-	@catch(NSException* localException) {
+	} @catch(NSException* localException) {
 		NSLog(@"Could not get GT word mask!\n");					
 		NSLog(@"Exception: %@\n",localException);
 		[localException raise];
@@ -1457,8 +1436,7 @@ tubRegister;
 {	
 	@try {
 		[self setBits:kMtcMaskReg mask:gtWordMask];
-	}
-	@catch(NSException* localException) {
+	} @catch(NSException* localException) {
 		NSLog(@"Could not set a MTC GT word mask!\n");					
 		NSLog(@"Exception: %@\n",localException);
 		[localException raise];
@@ -1469,8 +1447,7 @@ tubRegister;
 {
 	@try {
 		[self clrBits:kMtcMaskReg mask:gtWordMask];
-	}
-	@catch(NSException* localException) {
+	} @catch(NSException* localException) {
 		NSLog(@"Could not clear a MTC GT word mask!\n");					
 		NSLog(@"Exception: %@\n",localException);
 		[localException raise];
@@ -1483,8 +1460,7 @@ tubRegister;
         [self setPedCrateMask:0];
         [self loadPedestalCrateMaskToHardware];
         NSLog(@"Cleared Ped Mask\n");
-	}
-	@catch(NSException* localException) {
+	} @catch(NSException* localException) {
 		NSLog(@"Could not clear a Ped mask!\n");					
 		NSLog(@"Exception: %@\n",localException);
 		[localException raise];
@@ -1495,11 +1471,11 @@ tubRegister;
 - (void) loadPedestalCrateMaskToHardware
 {
     uint32_t pedMaskValue = [self pedCrateMask];
+
 	@try {
 		[mtc okCommand:"set_ped_crate_mask %lu", pedMaskValue];
 		NSLog(@"Set Ped Mask: 0x%08x\n",pedMaskValue);
-	}
-	@catch(NSException* localException) {
+	} @catch(NSException* localException) {
 		NSLog(@"Could not set a Ped crate mask!\n");					
 		NSLog(@"Exception: %@\n",localException);
 		[localException raise];
@@ -1512,8 +1488,7 @@ tubRegister;
         [self setGTCrateMask:0];
         [self loadGTCrateMaskToHardware];
 		NSLog(@"Cleared GT Crate Mask\n");
-	}
-	@catch(NSException* localException) {
+	} @catch(NSException* localException) {
 		NSLog(@"Could not clear GT crate mask!\n");					
 		NSLog(@"Exception: %@\n",localException);
 		[localException raise];
@@ -1523,11 +1498,11 @@ tubRegister;
 - (void) loadGTCrateMaskToHardware
 {
     uint32_t gtCrateMaskValue = [self GTCrateMask];
+
 	@try {
         [mtc okCommand:"set_gt_crate_mask %lu", gtCrateMaskValue];
         NSLog(@"Set GT Crate Mask: 0x%08x\n",gtCrateMaskValue);
-	}
-	@catch(NSException* localException) {
+	} @catch(NSException* localException) {
 		NSLog(@"Could not set GT crate mask!\n");					
 		NSLog(@"Exception: %@\n",localException);
 		[localException raise];
@@ -1537,14 +1512,15 @@ tubRegister;
 - (uint32_t) getGTCrateMaskFromHardware
 {
 	unsigned long aValue = 0;
+
 	@try {
 		aValue = [mtc intCommand:"get_gt_crate_mask"];
-	}
-	@catch(NSException* localException) {
+	} @catch(NSException* localException) {
 		NSLog(@"Could not get GT crate mask!\n");					
 		NSLog(@"Exception: %@\n",localException);
 		[localException raise];
 	}
+
 	return aValue;	
 }
 
@@ -1553,8 +1529,7 @@ tubRegister;
 	@try {
 		[self write:kMtcControlReg value:0];
 		NSLog(@"Cleared Control Reg\n");
-	}
-	@catch(NSException* localException) {
+	} @catch(NSException* localException) {
 		NSLog(@"Could not clear control reg!\n");					
 		NSLog(@"Exception: %@\n",localException);
 		[localException raise];
@@ -1569,8 +1544,7 @@ tubRegister;
 		[self setBits:kMtcControlReg mask:MTC_CSR_FIFO_RESET];
 		[self clrBits:kMtcControlReg mask:MTC_CSR_FIFO_RESET];
 		NSLog(@"Reset MTC memory\n");
-	}
-	@catch(NSException* localException) {
+	} @catch(NSException* localException) {
 		NSLog(@"Could not reset MTC memory!\n");					
 		NSLog(@"Exception: %@\n",localException);
 		[localException raise];
@@ -1581,8 +1555,7 @@ tubRegister;
 {
 	@try {
         [mtc okCommand:"set_gtid %lu",theGTCounterValue];
-	}
-	@catch(NSException* localException) {
+	} @catch(NSException* localException) {
 		NSLog(@"Could not load the MTC GT counter!\n");			
 		[localException raise];
 	}
@@ -1598,9 +1571,7 @@ tubRegister;
     @try {
         [mtc okCommand:"load_10mhz_clock %llu",newValue];
 		NSLog(@"Loaded 10MHz counter\n");
-		
-	}
-	@catch(NSException* localException) {
+	} @catch(NSException* localException) {
 		NSLog(@"Could not load the 10MHz counter!\n");
 		NSLog(@"Exception: %@\n",[localException reason]);
 		[localException raise];
@@ -1612,8 +1583,7 @@ tubRegister;
 	@try {
         [mtc okCommand:"set_lockout_width %u", [self lockoutWidth]];
         NSLog(@"Set lockout width to %u\n",[self lockoutWidth]);
-	}
-	@catch(NSException* localException) {
+	} @catch(NSException* localException) {
 		NSLog(@"Could not load the MTC GT lockout width!\n");		
 		NSLog(@"Exception: %@\n",localException);
 		[localException raise];
@@ -1625,8 +1595,7 @@ tubRegister;
 	@try {
         [mtc okCommand:"set_pedestal_width %u", [self pedestalWidth]];
         NSLog(@"Set ped width to %u\n",[self pedestalWidth]);
-	}
-	@catch(NSException* localException) {
+	} @catch(NSException* localException) {
 		NSLog(@"Could not load the MTC pedestal width!\n");	
 		NSLog(@"Exception: %@\n",localException);
 		[localException raise];
@@ -1638,9 +1607,7 @@ tubRegister;
 	@try {
         [mtc okCommand:"set_prescale %u", [self prescaleValue]];
         NSLog(@"Set N100Lo prescale to %u\n", [self prescaleValue]);
-
-	}
-	@catch(NSException* localException) {
+	} @catch(NSException* localException) {
 		NSLog(@"Could not load the MTC prescale value!\n");
 		NSLog(@"Exception: %@\n",localException);
 		[localException raise];
@@ -1650,11 +1617,11 @@ tubRegister;
 - (void) loadCoarseDelayToHardware
 {
     int coarse_delay = [self coarseDelay];
+
     @try {
         [mtc okCommand:"set_coarse_delay %i", coarse_delay];
         NSLog(@"mtc: coarse delay %ins\n", coarse_delay);
-    }
-    @catch(NSException* localException) {
+    } @catch(NSException* localException) {
         NSLog(@"Could not set coarse delay\n");
         NSLog(@"Exception: %@\n",localException);
         [localException raise];
@@ -1664,12 +1631,11 @@ tubRegister;
 - (void) loadFineDelayToHardware
 {
     int fine_delay = [self fineDelay];
+
     @try {
         [mtc okCommand:"set_fine_delay %i", fine_delay];
         NSLog(@"mtc: fine delay %ips\n", fine_delay);
-
-    }
-    @catch(NSException* localException) {
+    } @catch(NSException* localException) {
         NSLog(@"Could not set fine delay\n");
         NSLog(@"Exception: %@\n",localException);
         [localException raise];
@@ -1679,11 +1645,11 @@ tubRegister;
 - (void) loadPulserRateToHardware
 {
     float pulserRate = [self pgtRate];
+
 	@try {
         [mtc okCommand:"set_pulser_freq %f", pulserRate];
 		NSLog(@"mtc: pulser rate set to %.2f Hz\n", pulserRate);			
-	}
-	@catch(NSException* localException) {
+	} @catch(NSException* localException) {
 		NSLog(@"Could not set GT Pusler rate!\n");			
 		NSLog(@"Exception: %@\n",localException);
 		[localException raise];
@@ -1695,8 +1661,7 @@ tubRegister;
 	@try {
         [mtc okCommand:"enable_pulser"];
 		NSLog(@"Enabled Pulser.\n");		
-	}
-	@catch(NSException* localException) {
+	} @catch(NSException* localException) {
 		NSLog(@"Unable to enable the pulser!\n");		
 		[localException raise];
 	}
@@ -1709,8 +1674,7 @@ tubRegister;
 	@try {
         [mtc okCommand:"disable_pulser"];
         NSLog(@"Disabled Pulser.\n");
-	}
-	@catch(NSException* localException) {
+	} @catch(NSException* localException) {
 		NSLog(@"Unable to disable the pulser!\n");		
 		[localException raise];
 	}
@@ -1723,8 +1687,7 @@ tubRegister;
 	@try {
         [mtc okCommand:"enable_pedestals"];
 		NSLog(@"Enabled Pedestals.\n");		
-	}
-	@catch(NSException* localException) {
+	} @catch(NSException* localException) {
 		NSLog(@"Unable to enable the Pedestals!\n");		
 		[localException raise];
 	}
@@ -1735,8 +1698,7 @@ tubRegister;
 	@try {
         [mtc okCommand:"disable_pedestals"];
 		NSLog(@"Disabled Pedestals.\n");
-	}
-	@catch(NSException* localException) {
+	} @catch(NSException* localException) {
 		NSLog(@"Unable to disable the Pedestals!\n");		
 		[localException raise];
 	}
@@ -1746,8 +1708,7 @@ tubRegister;
 {
 	@try {
 		[self disablePulser];
-	}
-	@catch(NSException* e) {
+	} @catch(NSException* e) {
 		NSLog(@"MTC failed to stop pedestals!\n");
 		NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
 	}
@@ -1762,8 +1723,7 @@ tubRegister;
             [self disablePedestal];
         }
 		[self enablePulser];
-	}
-	@catch(NSException* e) {
+	} @catch(NSException* e) {
 		NSLog(@"MTC failed to continue pedestals!\n");
 		NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
 	}
@@ -1788,7 +1748,6 @@ tubRegister;
 
 - (void) basicMTCPedestalGTrigSetup
 {
-	
 	@try {
 		//[self clearGlobalTriggerWordMask];							//STEP 0a:	//added 01/24/98 QRA
         if ([self isPedestalEnabledInCSR]) {
@@ -1803,17 +1762,16 @@ tubRegister;
         [self loadLockOutWidthToHardware];                              // STEP 5: Set the GT lockout width in ns
         [self loadPedWidthToHardware];                                  // STEP 7: Set the width of the PED signal
 		[self setSingleGTWordMask: [self gtMask]];                      // STEP 7: Mask in global trigger word(MASK)
-	}
-	@catch(NSException* localException) {
+	} @catch(NSException* localException) {
 		NSLog(@"Failure during MTC pedestal setup!\n");
 		[localException raise];
-		
 	}
 }
 
 - (void) fireMTCPedestalsFixedTime
 {
     float cachedRate;
+
     @try {
 		/* setup pedestals and global trigger */
         [self basicMTCPedestalGTrigSetup];
@@ -1867,7 +1825,6 @@ tubRegister;
 - (void) basicMTCReset
 {
 	@try {
-		
 		[self disablePulser];
 		[self clearGTCrateMask];
 		[self clearPedestalCrateMask];		
@@ -1876,9 +1833,7 @@ tubRegister;
 		[self zeroTheGTCounter];
         [self loadLockOutWidthToHardware];
 		[self loadPrescaleValueToHardware];
-		
-	}
-	@catch(NSException* localException) {
+	} @catch(NSException* localException) {
 		NSLog(@"Could not perform basic MTC reset!\n");
 		[localException raise];
 	}
@@ -1890,6 +1845,7 @@ tubRegister;
         [NSException raise:@"MTCModelError" format:@"MTCA DAC value %u is not valid. DAC values must be less than 4095",dac_value];
     }
 }
+
 - (void) loadTheMTCADacs
 {
     /* Load the MTCA thresholds to hardware.
@@ -1897,13 +1853,13 @@ tubRegister;
     int i;
     uint16_t dacs[14];
     int server_index;
-    for(i=FIRST_MTC_THRESHOLD_INDEX;i<=LAST_MTC_THRESHOLD_INDEX;i++)
-    {
-            server_index = [self model_index_to_server_index:i];
-            dacs[server_index] = [self getThresholdOfType:i inUnits:MTC_RAW_UNITS];
-            [self validateMTCADAC:dacs[server_index]];
 
+    for (i = FIRST_MTC_THRESHOLD_INDEX; i <= LAST_MTC_THRESHOLD_INDEX; i++) {
+        server_index = [self model_index_to_server_index:i];
+        dacs[server_index] = [self getThresholdOfType:i inUnits:MTC_RAW_UNITS];
+        [self validateMTCADAC:dacs[server_index]];
     }
+
     /* Last four DAC values are spares? */
     for (i = 10; i < 14; i++) {
         dacs[i] = 0;
@@ -1956,8 +1912,7 @@ tubRegister;
 		[self write:kMtcDacCntReg value:theRegValue];
 		
 		NSLog(@"0x%x was shifted into the TUB serial register\n", aValue);
-	}
-	@catch(NSException* localException) {
+	} @catch(NSException* localException) {
 		NSLog(@"Failed to load Tub serial register\n");
 		[localException raise];
 	}
@@ -2061,22 +2016,19 @@ tubRegister;
 			}
 		}
 		else {
-			if(doReadOp){
+			if (doReadOp) {
 				NSLog(@"%@: 0x%08x\n",reg[selectedRegister].regName,[self read:selectedRegister]);
-			}
-			else {
+			} else {
 				[self write:selectedRegister value:writeValue];
 				NSLog(@"Wrote 0x%08x to %@\n",writeValue,reg[selectedRegister].regName);
 			}
 		}
-		if(++workingCount<repeatOpCount){
+		if (++workingCount < repeatOpCount) {
 			[self performSelector:@selector(doBasicOp) withObject:nil afterDelay:repeatDelay/1000.];
-		}
-		else {
+		} else {
 			[self setBasicOpsRunning:NO];
 		}
-	}
-	@catch(NSException* localException) {
+	} @catch(NSException* localException) {
 		[self setBasicOpsRunning:NO];
 		NSLog(@"Mtc basic op exception: %@\n",localException);
 		[localException raise];
@@ -2094,8 +2046,7 @@ tubRegister;
     [self setGtMask:0];
     [self setGTCrateMask: 0];
     [self setPedCrateMask:0];
-    for(int i=0;i<MTC_NUM_THRESHOLDS;i++)
-    {
+    for (int i = 0; i < MTC_NUM_THRESHOLDS; i++) {
         mtca_conversion_is_valid[i] = NO;
         mtca_thresholds[i] = 0;
     }
