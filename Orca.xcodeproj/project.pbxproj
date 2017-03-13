@@ -1364,6 +1364,8 @@
 		844049C308353B65000D03DB /* MemoryWatcherController.h in Headers */ = {isa = PBXBuildFile; fileRef = 844049C108353B65000D03DB /* MemoryWatcherController.h */; };
 		844049C408353B65000D03DB /* MemoryWatcherController.m in Sources */ = {isa = PBXBuildFile; fileRef = 844049C208353B65000D03DB /* MemoryWatcherController.m */; };
 		844049D408353D47000D03DB /* MemoryWatcher.nib in Resources */ = {isa = PBXBuildFile; fileRef = 844049D308353D47000D03DB /* MemoryWatcher.nib */; };
+		84414BC51E770F980014EE41 /* ORFileGetterOp.h in Headers */ = {isa = PBXBuildFile; fileRef = 84414BC31E770F980014EE41 /* ORFileGetterOp.h */; };
+		84414BC61E770F980014EE41 /* ORFileGetterOp.m in Sources */ = {isa = PBXBuildFile; fileRef = 84414BC41E770F980014EE41 /* ORFileGetterOp.m */; };
 		844352090B56E9360033B918 /* FindPanel.nib in Resources */ = {isa = PBXBuildFile; fileRef = 844352060B56E9360033B918 /* FindPanel.nib */; };
 		8443520A0B56E9360033B918 /* TextFinder.h in Headers */ = {isa = PBXBuildFile; fileRef = 844352070B56E9360033B918 /* TextFinder.h */; };
 		8443520B0B56E9360033B918 /* TextFinder.m in Sources */ = {isa = PBXBuildFile; fileRef = 844352080B56E9360033B918 /* TextFinder.m */; };
@@ -3028,8 +3030,6 @@
 		84DF4CA1162F1B2100261144 /* ORArduinoUNOController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84DF4C9B162F1B2100261144 /* ORArduinoUNOController.m */; };
 		84DF4CA2162F1B2100261144 /* ORArduinoUNOModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84DF4C9C162F1B2100261144 /* ORArduinoUNOModel.h */; };
 		84DF4CA3162F1B2100261144 /* ORArduinoUNOModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84DF4C9D162F1B2100261144 /* ORArduinoUNOModel.m */; };
-		84E00577186637F9002E38F7 /* ORFileGetterOp.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E00575186637F9002E38F7 /* ORFileGetterOp.h */; };
-		84E00578186637F9002E38F7 /* ORFileGetterOp.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E00576186637F9002E38F7 /* ORFileGetterOp.m */; };
 		84E0968609F44E3200EFE044 /* ORTek754DModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C493B204059AEA005F64B1 /* ORTek754DModel.m */; };
 		84E099620CC934CC00EFBC8F /* play.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 84E099600CC934CB00EFBC8F /* play.tiff */; };
 		84E099630CC934CC00EFBC8F /* stop.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 84E099610CC934CB00EFBC8F /* stop.tiff */; };
@@ -4848,6 +4848,8 @@
 		844049C108353B65000D03DB /* MemoryWatcherController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MemoryWatcherController.h; sourceTree = "<group>"; };
 		844049C208353B65000D03DB /* MemoryWatcherController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MemoryWatcherController.m; sourceTree = "<group>"; };
 		844049D308353D47000D03DB /* MemoryWatcher.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = MemoryWatcher.nib; path = "Source/Objects/Misc Objects/MemoryWatcher/MemoryWatcher.nib"; sourceTree = SOURCE_ROOT; };
+		84414BC31E770F980014EE41 /* ORFileGetterOp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORFileGetterOp.h; sourceTree = "<group>"; };
+		84414BC41E770F980014EE41 /* ORFileGetterOp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORFileGetterOp.m; sourceTree = "<group>"; };
 		8441B66F03CC9F33005F64B1 /* ORConnector.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORConnector.h; sourceTree = "<group>"; };
 		8441B67003CC9F33005F64B1 /* ORConnector.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORConnector.m; sourceTree = "<group>"; };
 		844352060B56E9360033B918 /* FindPanel.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = FindPanel.nib; path = "Source/Objects/Misc Objects/Views/TextFinder/FindPanel.nib"; sourceTree = SOURCE_ROOT; };
@@ -6642,8 +6644,6 @@
 		84DF4C9D162F1B2100261144 /* ORArduinoUNOModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORArduinoUNOModel.m; sourceTree = "<group>"; };
 		84DF917204D6D53C005F64B1 /* ORFileMover.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORFileMover.h; sourceTree = "<group>"; };
 		84DF917304D6D53C005F64B1 /* ORFileMover.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORFileMover.m; sourceTree = "<group>"; };
-		84E00575186637F9002E38F7 /* ORFileGetterOp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORFileGetterOp.h; sourceTree = "<group>"; };
-		84E00576186637F9002E38F7 /* ORFileGetterOp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORFileGetterOp.m; sourceTree = "<group>"; };
 		84E099600CC934CB00EFBC8F /* play.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = play.tiff; path = Source/Objects/Control/RunControl/play.tiff; sourceTree = SOURCE_ROOT; };
 		84E099610CC934CB00EFBC8F /* stop.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = stop.tiff; path = Source/Objects/Control/RunControl/stop.tiff; sourceTree = SOURCE_ROOT; };
 		84E09A200CCD1AA400EFBC8F /* dec.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = dec.tif; path = Source/Objects/OrcaObject/dec.tif; sourceTree = SOURCE_ROOT; };
@@ -9832,8 +9832,6 @@
 				844CBDC51866010F0012AA3B /* ORRaidMonitorModel.m */,
 				844CBDC61866010F0012AA3B /* ORRaidMonitorController.h */,
 				844CBDC71866010F0012AA3B /* ORRaidMonitorController.m */,
-				84E00575186637F9002E38F7 /* ORFileGetterOp.h */,
-				84E00576186637F9002E38F7 /* ORFileGetterOp.m */,
 				844CBDC81866010F0012AA3B /* RaidMonitor.gif */,
 				844CBDC91866010F0012AA3B /* RaidMonitor.nib */,
 				844CBDCA1866010F0012AA3B /* scpExpectGetScript */,
@@ -13650,6 +13648,8 @@
 				84DF917304D6D53C005F64B1 /* ORFileMover.m */,
 				8434C379167FB0F40068DB04 /* ORFileMoverOp.h */,
 				8434C37A167FB0F40068DB04 /* ORFileMoverOp.m */,
+				84414BC31E770F980014EE41 /* ORFileGetterOp.h */,
+				84414BC41E770F980014EE41 /* ORFileGetterOp.m */,
 				848463A90625D65F00128299 /* ORSmartFolder.h */,
 				848463A60625D65F00128299 /* ORSmartFolder.m */,
 				845498C310628DF400F8DE1C /* scpExpectScript */,
@@ -15184,6 +15184,7 @@
 				8446CE2607B847B8006CD9C4 /* ORAD413AModel.h in Headers */,
 				843A54DA07BBE7A500534C27 /* OR4ChanTriggerController.h in Headers */,
 				843A54DC07BBE7A500534C27 /* OR4ChanTriggerDecoders.h in Headers */,
+				84414BC51E770F980014EE41 /* ORFileGetterOp.h in Headers */,
 				843A54DE07BBE7A500534C27 /* OR4ChanTriggerModel.h in Headers */,
 				84DDEBA507BD3E080060D0B4 /* ORMultiPlot.h in Headers */,
 				84DDEBA707BD3E080060D0B4 /* ORMultiPlotController.h in Headers */,
@@ -16153,7 +16154,6 @@
 				2D7731A7181188F400070A4A /* ORLanNetio230Model.h in Headers */,
 				844CBDCB1866010F0012AA3B /* ORRaidMonitorModel.h in Headers */,
 				844CBDCD1866010F0012AA3B /* ORRaidMonitorController.h in Headers */,
-				84E00577186637F9002E38F7 /* ORFileGetterOp.h in Headers */,
 				DB704A0F18EBA4D100839B42 /* ELLIEController.h in Headers */,
 				DB704A1318EBA4E100839B42 /* ELLIEModel.h in Headers */,
 				2DD0C8B9193FBAE4009112B2 /* HW_Readout.h in Headers */,
@@ -17783,6 +17783,7 @@
 				84F46F590CA44255007EFADA /* ORKatrinFLTController.m in Sources */,
 				84F46F5B0CA44255007EFADA /* ORKatrinFLTDecoder.m in Sources */,
 				84F46F5E0CA44255007EFADA /* ORKatrinFLTModel.m in Sources */,
+				84414BC61E770F980014EE41 /* ORFileGetterOp.m in Sources */,
 				84F480560CB047C1007EFADA /* ORIpeSLTDecoder.m in Sources */,
 				543BF20A1E5481C3003E4582 /* ORHVcRIOModel.m in Sources */,
 				9CF2C1B90CC195E2002B279B /* ORL8013CrateController.m in Sources */,
@@ -18380,7 +18381,6 @@
 				2D7731A8181188F400070A4A /* ORLanNetio230Model.m in Sources */,
 				844CBDCC1866010F0012AA3B /* ORRaidMonitorModel.m in Sources */,
 				844CBDCE1866010F0012AA3B /* ORRaidMonitorController.m in Sources */,
-				84E00578186637F9002E38F7 /* ORFileGetterOp.m in Sources */,
 				DB704A1018EBA4D100839B42 /* ELLIEController.m in Sources */,
 				DB704A1418EBA4E100839B42 /* ELLIEModel.m in Sources */,
 				2DD0C8C6193FBAE4009112B2 /* ORKatrinV4SLTController.m in Sources */,
