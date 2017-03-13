@@ -156,6 +156,14 @@
 - (int) initAtRunStart: (int) loadTriggers;
 - (void) detectorStateChanged:(NSNotification*)aNote;
 
+// DB Access
+- (void) getLatestTriggerScans;
+- (void) updateTriggerThresholds;
+
+- (int) triggerScanNameToIndex:(NSString*) name;
+- (void) waitForTriggerScan: (ORPQResult *) result;
+- (void) waitForThresholds: (ORPQResult *) result;
+
 #pragma mark •••Accessors
 - (BOOL) basicOpsRunning;
 - (void) setBasicOpsRunning:(BOOL)aBasicOpsRunning;

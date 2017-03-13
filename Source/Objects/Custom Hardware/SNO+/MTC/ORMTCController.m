@@ -95,9 +95,6 @@
     [tabView selectTabViewItemAtIndex: index];
     [self populatePullDown];
     [self updateWindow];
-    [self grab_current_thresholds];
-    [self trigger_scan_update_nhit];
-
 }
 
 #pragma mark •••Notifications
@@ -175,20 +172,20 @@
                          name : ORMTCGTMaskChanged
                         object: model];
 
-	[notifyCenter addObserver : self
-			 selector : @selector(isPulserFixedRateChanged:)
-			     name : ORMTCModelIsPulserFixedRateChanged
-			    object: model];
+    [notifyCenter addObserver : self
+                     selector : @selector(isPulserFixedRateChanged:)
+                         name : ORMTCModelIsPulserFixedRateChanged
+                        object: model];
 
-	[notifyCenter addObserver : self
-			 selector : @selector(fixedPulserRateCountChanged:)
-			     name : ORMTCModelFixedPulserRateCountChanged
-			    object: model];
+    [notifyCenter addObserver : self
+                     selector : @selector(fixedPulserRateCountChanged:)
+                         name : ORMTCModelFixedPulserRateCountChanged
+                        object: model];
 
-	[notifyCenter addObserver : self
-			 selector : @selector(fixedPulserRateDelayChanged:)
-			     name : ORMTCModelFixedPulserRateDelayChanged
-			    object: model];
+    [notifyCenter addObserver : self
+                     selector : @selector(fixedPulserRateDelayChanged:)
+                         name : ORMTCModelFixedPulserRateDelayChanged
+                        object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(sequenceRunning:)
@@ -208,34 +205,37 @@
     [notifyCenter addObserver : self
                      selector : @selector(triggerMTCAMaskChanged:)
                          name : ORMTCModelMTCAMaskChanged
-                       object : nil];
+                       object : model];
+
     [notifyCenter addObserver : self
                      selector : @selector(updateThresholdsDisplay:)
                          name : ORMTCAThresholdChanged
-                       object : nil];
+                       object : model];
     
     [notifyCenter addObserver : self
                      selector : @selector(updateThresholdsDisplay:)
                          name : ORMTCABaselineChanged
-                       object : nil];
+                       object : model];
 
     [notifyCenter addObserver : self
                      selector : @selector(updateThresholdsDisplay:)
                          name : ORMTCAConversionChanged
-                       object : nil];
+                       object : model];
+
     [notifyCenter addObserver : self
                      selector : @selector(triggerMTCAMaskChanged:)
                          name : ORMTCAThresholdChanged
-                       object : nil];
+                       object : model];
+
     [notifyCenter addObserver : self
                      selector : @selector(isPedestalEnabledInCSRChanged:)
                          name : ORMTCModelIsPedestalEnabledInCSR
-                       object : nil];
+                       object : model];
+
     [notifyCenter addObserver : self
                      selector : @selector(mtcSettingsChanged:)
                          name : ORMTCSettingsChanged
-                       object : nil];
-
+                       object : model];
 }
 
 - (void) updateWindow
@@ -308,14 +308,17 @@
     int rate = [model pgtRate];
     [pulserPeriodField setIntValue:rate];
 }
-- (void) mtcGTMaskChanged:(NSNotification *) aNote {
+
+- (void) mtcGTMaskChanged:(NSNotification *) aNote
+{
     int maskValue = [model gtMask];
     for(int i=0;i<26;i++){
         [[globalTriggerMaskMatrix cellWithTag:i]  setIntValue: maskValue & (1<<i)];
     }
 }
 
-- (void) updateThresholdsDisplay:(NSNotification *)aNote {
+- (void) updateThresholdsDisplay:(NSNotification *)aNote
+{
     int nhit_units,esum_units;
     int nhit_view_unit_index = [[nHitViewTypeMatrix selectedCell] tag];
     int esum_view_unit_index = [[eSumViewTypeMatrix selectedCell] tag];
@@ -328,7 +331,6 @@
     }
     [self changeNhitThresholdsDisplay:nhit_units];
     [self changeESUMThresholdDisplay:esum_units];
-
 }
 
 - (void) displayMasks
@@ -410,7 +412,6 @@
 
 - (void) basicLockChanged:(NSNotification*)aNotification
 {
-
     BOOL locked                        = [gSecurity isLocked:ORMTCBasicLock];
     BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORMTCBasicLock];
 
@@ -480,7 +481,8 @@
     [includePedestalsCheckBox setState:[model isPedestalEnabledInCSR]];
 }
 
-- (void) mtcSettingsChanged:(NSNotification*)aNotification {
+- (void) mtcSettingsChanged:(NSNotification*)aNotification
+{
     [coarseDelayField setFloatValue:[model coarseDelay]];
     [fineDelayField setFloatValue:[model fineDelay]/1000.0];
     [lockOutWidthField setIntValue:[model lockoutWidth]];
@@ -491,42 +493,35 @@
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
 {
-
-    if ([tabView indexOfTabViewItem:item] == 0){
+    if ([tabView indexOfTabViewItem:item] == 0) {
         NSSize* newSize =nil;
-        if([opAdvancedOptionsBox isHidden]) {
+        if ([opAdvancedOptionsBox isHidden]) {
             newSize = &standardOpsSizeSmall;
-        }
-        else {
+        } else {
             newSize = &standardOpsSizeLarge;
         }
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:*newSize];
 		[[self window] setContentView:mtcView];
-    }
-    else if([tabView indexOfTabViewItem:item] == 1){
+    } else if ([tabView indexOfTabViewItem:item] == 1) {
         NSSize* newSize = nil;
-        if([settingsAdvancedOptionsBox isHidden]) {
+        if ([settingsAdvancedOptionsBox isHidden]) {
             newSize = &settingsSizeSmall;
-        }
-        else {
+        } else {
             newSize = &settingsSizeLarge;
         }
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:*newSize];
 		[[self window] setContentView:mtcView];
-    }
-    else if([tabView indexOfTabViewItem:item] == 2){
+    } else if ([tabView indexOfTabViewItem:item] == 2) {
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:triggerSize];
 		[[self window] setContentView:mtcView];
     }
 
-
     NSString* key = [NSString stringWithFormat: @"orca.ORMTC%d.selectedtab",[model slot]];
     int index = [tabView indexOfTabViewItem:item];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
-	
 }
 
 - (void) slotChanged:(NSNotification*)aNotification
@@ -558,11 +553,10 @@
     uint32_t masks[7] = {[model mtcaN100Mask],[model mtcaN20Mask],[model mtcaEHIMask],
                             [model mtcaELOMask],[model mtcaOWLNMask],[model mtcaOEHIMask],
                             [model mtcaOELOMask]};
-    for(int matrix_index=0;matrix_index < [matrices count]; matrix_index++)
-    {
+    for (int matrix_index = 0; matrix_index < [matrices count]; matrix_index++) {
         uint32_t maskValue = masks[matrix_index];
         NSMatrix* thisMatrix = matrices[matrix_index];
-        for(int i=0;i<[thisMatrix numberOfRows];i++) {
+        for (int i = 0; i < [thisMatrix numberOfRows]; i++) {
             NSCell* thisCell = [thisMatrix cellAtRow:i column:0];
             int bitPos = [thisCell tag];
             [thisCell setIntValue:(maskValue & (1<<bitPos))];
@@ -615,7 +609,7 @@
 
 - (void) populatePullDown
 {
-    short	i;
+    short i;
         
     [selectedRegisterPU removeAllItems];
     
@@ -624,7 +618,6 @@
     }
      
     [self selectedRegisterChanged:nil];
-
 }
 
 //basic ops Actions
@@ -646,22 +639,21 @@
 //MTC Init Ops buttons.
 - (IBAction) standardInitMTC:(id) sender 
 {
-        [model initializeMtc];
+    [model initializeMtc];
 }
 
 - (IBAction) standardLoadMTCADacs:(id) sender 
 {
     @try {
-	[model loadTheMTCADacs];
-    }
-    @catch(NSException *excep) {
+	    [model loadTheMTCADacs];
+    } @catch(NSException *excep) {
         NSLogColor([NSColor redColor], @"Error loading the MTCA DACs. Reason: %@\n.",[excep reason]);
     }
 }
 
 - (IBAction) setAdvancedOptions:(id)sender
 {
-    @try{
+    @try {
         [model loadCoarseDelayToHardware];
         [model loadFineDelayToHardware];
         [model loadPrescaleValueToHardware];
@@ -672,7 +664,6 @@
         // The above will all catch and warn about any error already
     }
 }
-
 
 - (IBAction) standardIsPulserFixedRate:(id) sender
 {
@@ -725,7 +716,6 @@
 	[model setFixedPulserRateDelay:aValue];
 }
 
-
 - (IBAction) standardPulserFeeds:(id)sender
 {
     [model setIsPedestalEnabledInCSR:[includePedestalsCheckBox state]];
@@ -753,48 +743,55 @@
     @try {
         unit_index = [self convert_view_unit_index_to_model_index:view_index];
         [self changeNhitThresholdsDisplay: unit_index];
-
     } @catch (NSException *exception) {
         NSLogColor([NSColor redColor], @"Could not change views. Reason:%@\n",[exception reason]);
     }
-
 }
-- (IBAction)opsAdvancedOptionsTriangeChanged:(id)sender {
+
+- (IBAction)opsAdvancedOptionsTriangeChanged:(id)sender
+{
     [self showHideOptions:sender Box:opAdvancedOptionsBox resizeSmall:standardOpsSizeSmall resizeLarge:standardOpsSizeLarge];
 }
-- (IBAction)settingsAdvancedOptionsTriangeChanged:(id)sender {
+
+- (IBAction)settingsAdvancedOptionsTriangeChanged:(id)sender
+{
     [self showHideOptions:sender Box:settingsAdvancedOptionsBox resizeSmall:settingsSizeSmall resizeLarge:settingsSizeLarge];
 }
-- (void) showHideOptions:(id) sender Box:(id)box resizeSmall:(NSSize) smallSize resizeLarge:(NSSize) largeSize {
-    if([sender state] == NSOffState) {
+
+- (void) showHideOptions:(id) sender Box:(id)box resizeSmall:(NSSize) smallSize resizeLarge:(NSSize) largeSize
+{
+    if ([sender state] == NSOffState) {
         [box setHidden:YES];
         [self resizeWindowToSize:smallSize];
-    }
-    else {
+    } else {
         [box setHidden:NO];
         // Don't resize if the window is already large enough
-        if(self.window.frame.size.height <  largeSize.height || self.window.frame.size.width < largeSize.width)
-        {
+        if(self.window.frame.size.height <  largeSize.height || self.window.frame.size.width < largeSize.width) {
             [self resizeWindowToSize:largeSize];
         }
     }
 }
 
-- (IBAction) settingsLockoutWidthFieldChanged:(id)sender {
+- (IBAction) settingsLockoutWidthFieldChanged:(id)sender
+{
     int lockout_width = [lockOutWidthField intValue];
     [model setLockoutWidth:lockout_width];
 }
-- (IBAction) settingsPedWidthFieldChanged:(id)sender {
+
+- (IBAction) settingsPedWidthFieldChanged:(id)sender
+{
     int ped_width = [pedestalWidthField intValue];
     [model setPedestalWidth:ped_width];
 }
 
-- (IBAction) settingsPrescaleFieldChanged:(id)sender {
+- (IBAction) settingsPrescaleFieldChanged:(id)sender
+{
     int prescale_value = [nhit100LoPrescaleField intValue];
     [model setPrescaleValue:prescale_value];
 }
 
-- (IBAction) settingsPedDelayFieldChanged:(id)sender {
+- (IBAction) settingsPedDelayFieldChanged:(id)sender
+{
     int coarse_delay = [coarseDelayField intValue];
     float fine_delay = [fineDelayField floatValue];
     int fine_delay_ps = fine_delay*1000.0;
@@ -803,16 +800,17 @@
     [model setFineDelay:fine_delay_ps];
 }
 
-- (IBAction)standardPulserRateFieldChanged:(id)sender {
+- (IBAction) standardPulserRateFieldChanged:(id)sender
+{
     float pulser_rate = [pulserPeriodField floatValue];
     [model setPgtRate:pulser_rate];
 }
+
 - (void) changeNhitThresholdsDisplay: (int) units
 {
     int threshold_index;
     float value;
-    for(int i=FIRST_NHIT_TAG;i<=LAST_NHIT_TAG;i++)
-    {
+    for(int i=FIRST_NHIT_TAG;i<=LAST_NHIT_TAG;i++) {
         @try {
             threshold_index = [self convert_view_threshold_index_to_model_index:i];
             if(![model ConversionIsValidForThreshold:threshold_index] && units!=MTC_RAW_UNITS) {
@@ -834,11 +832,10 @@
 {
     int threshold_index;
     float value;
-    for(int i=FIRST_ESUM_TAG;i<=LAST_ESUM_TAG;i++)
-    {
+    for (int i = FIRST_ESUM_TAG; i <= LAST_ESUM_TAG; i++) {
         @try {
             threshold_index = [self convert_view_threshold_index_to_model_index:i];
-            if(![model ConversionIsValidForThreshold:threshold_index] && units!=MTC_RAW_UNITS) {
+            if (![model ConversionIsValidForThreshold:threshold_index] && units!=MTC_RAW_UNITS) {
                 [[esumMatrix cellWithTag:i] setEnabled:NO];
                 [[esumMatrix cellWithTag:i] setStringValue:@"--"];
                 continue;
@@ -852,7 +849,9 @@
         [[esumMatrix cellWithTag:i] setFloatValue: value];
     }
 }
-- (int) convert_view_threshold_index_to_model_index: (int) view_index {
+
+- (int) convert_view_threshold_index_to_model_index: (int) view_index
+{
     switch (view_index) {
         case VIEW_N100H_TAG:
             return MTC_N100_HI_THRESHOLD_INDEX;
@@ -890,7 +889,9 @@
     }
     return -1; // Will never reach here
 }
-- (int) convert_model_threshold_index_to_view_index: (int) model_index{
+
+- (int) convert_model_threshold_index_to_view_index: (int) model_index
+{
     switch (model_index) {
         case MTC_N100_HI_THRESHOLD_INDEX:
             return VIEW_N100H_TAG;
@@ -928,7 +929,9 @@
     }
     return -1;
 }
-- (int) convert_view_unit_index_to_model_index: (int) view_index {
+
+- (int) convert_view_unit_index_to_model_index: (int) view_index
+{
     switch (view_index) {
         case VIEW_RAW_UNITS_TAG:
             return MTC_RAW_UNITS;
@@ -945,7 +948,9 @@
     }
     return -1;
 }
-- (int) convert_model_unit_index_to_view_index: (int) model_index {
+
+- (int) convert_model_unit_index_to_view_index: (int) model_index
+{
     switch (model_index) {
         case MTC_RAW_UNITS:
             return VIEW_RAW_UNITS_TAG;
@@ -987,203 +992,22 @@
     } @catch (NSException *excep) {
         NSLogColor([NSColor redColor], @"Error when setting threshold. Reason: %@\n Aborting\n",[excep reason]);
     }
-
-}
-- (IBAction)updateConversionSettingsAction:(id)sender{
-    [self trigger_scan_update_nhit];
-
 }
 
-- (void) trigger_scan_update_nhit {
-        [self load_settings_from_trigger_scan_for_type];
-}
-
-
-- (IBAction)grab_current_thresholds:(id)sender {
-    [self grab_current_thresholds];
-}
-
-- (void) waitForTriggerScan: (ORPQResult *) result
+- (IBAction) updateConversionSettingsAction:(id)sender
 {
-    int numRows, numCols;
-    int threshold_index;
-    int error_count=0;
-    NSString* name =nil;
-    NSString* baseline=nil;
-    NSString* dac_per_nhit=nil;
-
-    if (!result) {
-        NSLog(@"Failed to recieve trigger scan results from database.\n");
-        return;
-    }
-
-    numRows = [result numOfRows];
-    numCols = [result numOfFields];
-    if (numRows <= 0) {
-        NSLog(@"Empty result returned from database. No trigger scans are available\n");
-        return;
-    }
-    if (numCols != 3) {
-        NSLog(@"Unexpected number of columns returned from database for trigger scan. Expected 3 got %i\n", numCols);
-        return;
-    }
-
-    for(int i=0; i< numRows;i++)
-    {
-        @try{
-            NSDictionary* result_dict = [result fetchRowAsType:MCPTypeDictionary row:i];
-            if(!result_dict) {
-                error_count++;
-                continue;
-            }
-            name = [result_dict objectForKey:@"name"];
-            baseline = [[result_dict objectForKey:@"baseline"] stringValue];
-            threshold_index = [self trigger_scan_name_to_index:name];
-            if ([model thresholdIsNHit:threshold_index]) {
-                dac_per_nhit =[[result_dict objectForKey:@"adc_per_nhit"] stringValue];
-                [model setDacPerNHit:threshold_index toValue:[dac_per_nhit floatValue]];
-            }
-            [model setBaselineOfType:threshold_index toValue:[baseline intValue]];
-
-            // Hard code the DAC conversion to match the datasheet for the AD7243
-            // http://www.analog.com/media/en/technical-documentation/data-sheets/AD7243.pdf
-            // It's usage on the MTCA can be seen on page 8 of the MTCA+ schematics.
-            // http://snopl.us/detector/schematics/pdf/mtcaplus.pdf
-            [model setDacPerMilliVoltOfType:threshold_index toValue:-4096/10000.0];
-
-            [model setConversionIsValidForThreshold:threshold_index isValid:YES];
-        } @catch (NSException* exception) {
-            NSLogColor([NSColor redColor], @"Error interpreting trigger scan result. Reason: %@\n",[exception reason]);
-        }
-    }
-    if(error_count > 0) {
-        NSLog(@"An error occurred while try to retrieve %i of the %i rows returned from the database\n",error_count,numRows);
-    }
+    [model getLatestTriggerScans];
 }
-- (int) trigger_scan_name_to_index:(NSString*) name {
-    int ret = -1;
-    if([name isEqual:@"N100LO"]){ ret = MTC_N100_LO_THRESHOLD_INDEX; }
-    else if([name isEqual:@"N100MED"]){ ret = MTC_N100_MED_THRESHOLD_INDEX; }
-    else if([name isEqual:@"N100HI"]){ ret = MTC_N100_HI_THRESHOLD_INDEX; }
-    else if([name isEqual:@"N20"]){ ret = MTC_N20_THRESHOLD_INDEX; }
-    else if([name isEqual:@"N20LB"]){ ret = MTC_N20LB_THRESHOLD_INDEX; }
-    else if([name isEqual:@"OWLN"]){ ret = MTC_OWLN_THRESHOLD_INDEX; }
-    else if([name isEqual:@"ESUMLO"]){ ret = MTC_ESUML_THRESHOLD_INDEX; }
-    else if([name isEqual:@"ESUMHI"]){ ret = MTC_ESUMH_THRESHOLD_INDEX; }
-    else if([name isEqual:@"OWLELO"]){ ret = MTC_OWLELO_THRESHOLD_INDEX; }
-    else if([name isEqual:@"OWLEHI"]){ ret = MTC_OWLEHI_THRESHOLD_INDEX; }
-    else {
-        [NSException raise:@"MTCControllerError" format:@"Invalid trigger scan name ( %@ ) cannot get a valid threshold id", name];
-    }
-    return ret;
-}
-- (int) index_to_trigger_scan_name:(int) index {
-    NSString *ret = @"";
-    switch (index) {
-        case MTC_N100_HI_THRESHOLD_INDEX:
-            ret = @"N100HI";
-            break;
-        case MTC_N100_MED_THRESHOLD_INDEX:
-            ret = @"N100MED";
-            break;
-        case MTC_N100_LO_THRESHOLD_INDEX:
-            ret = @"N100LO";
-            break;
-        case MTC_N20_THRESHOLD_INDEX:
-            ret = @"N20";
-            break;
-        case MTC_N20LB_THRESHOLD_INDEX:
-            ret = @"N20LB";
-            break;
-        case MTC_OWLN_THRESHOLD_INDEX:
-            ret = @"OWLN";
-            break;
-        case MTC_ESUMH_THRESHOLD_INDEX:
-            ret = @"ESUMHI";
-            break;
-        case MTC_ESUML_THRESHOLD_INDEX:
-            ret = @"ESUMHLO";
-            break;
-        case MTC_OWLEHI_THRESHOLD_INDEX:
-            ret = @"OWLEHI";
-            break;
-        case MTC_OWLELO_THRESHOLD_INDEX:
-            ret = @"OWLELO";
-            break;
-        default:
-            [NSException raise:@"MTCControllerError" format:@"Invalid threhsold index ( %i ) cannot get a valid trigger scan name", index];
-            break;
-    }
-    return ret;
-}
-- (void) waitForThresholds: (ORPQResult *) result
+
+- (IBAction) grab_current_thresholds:(id)sender
 {
-    int numRows, numCols;
-
-    if (!result) {
-        NSLog(@"Failed to recieve threshold results from database.\n");
-        return;
-    }
-
-    numRows = [result numOfRows];
-    numCols = [result numOfFields];
-    if (numRows != 1) {
-        NSLog(@"Database returned unexpected number of rows for MTC threhsolds. 1 expected, %i returned.\n",numRows);
-        return;
-    }
-    if (numCols != 1) {
-        NSLog(@"Database returned unexpected number of columns for MTC thresholds. 1 expected, %i returned.\n",numCols);
-        return;
-    }
-
-    NSArray* result_arr = [[result fetchRowAsDictionary] objectForKey:@"mtca_dacs"];
-    if(!result_arr || [result_arr count] == 0)
-    {
-        NSLog(@"Error while converting MTC threshold DB result to array.\n");
-        return;
-    }
-    @try {
-        // Note this could be done with a for loop, but I think this is more readable.
-        [model setThresholdOfType:MTC_N100_LO_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_N100L_INDEX] floatValue]];
-        [model setThresholdOfType:MTC_N100_MED_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_N100M_INDEX] floatValue]];
-        [model setThresholdOfType:MTC_N100_HI_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_N100H_INDEX] floatValue]];
-        [model setThresholdOfType:MTC_N20_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_N20_INDEX] floatValue]];
-        [model setThresholdOfType:MTC_N20LB_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_N20LB_INDEX] floatValue]];
-        [model setThresholdOfType:MTC_ESUML_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_ESUML_INDEX] floatValue]];
-        [model setThresholdOfType:MTC_ESUMH_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_ESUMH_INDEX] floatValue]];
-        [model setThresholdOfType:MTC_OWLN_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_OWLN_INDEX] floatValue]];
-        [model setThresholdOfType:MTC_OWLELO_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_OWLEL_INDEX] floatValue]];
-        [model setThresholdOfType:MTC_OWLEHI_THRESHOLD_INDEX fromUnits:MTC_RAW_UNITS toValue:[[result_arr objectAtIndex:SERVER_OWLEH_INDEX] floatValue]];
-    } @catch(NSException* excep) {
-        NSLogColor([NSColor redColor], @"Error while retrieving threhsolds. Operation failed, Reason: %@\n",[excep reason]);
-    }
-}
-- (void) load_settings_from_trigger_scan_for_type {
-    //Note perhaps this should be moved out of the model??
-    ORPQModel* pgsql_connec = [ORPQModel getCurrent];
-    if(!pgsql_connec)
-    {
-        NSLogColor([NSColor redColor], @"Postgres connection not available. Aborting");
-        return;
-    }
-    NSString* cmd = [NSString stringWithFormat:@"select distinct on (name) name,baseline,adc_per_nhit from trigger_scan order by name,timestamp desc"];
-    [pgsql_connec dbQuery:cmd object:self selector:@selector(waitForTriggerScan:) timeout:2.0];
+    [model updateTriggerThresholds];
 }
 
-- (void) grab_current_thresholds {
-    ORPQModel* pgsql_connec = [ORPQModel getCurrent];
-    if(!pgsql_connec)
-    {
-        NSLogColor([NSColor redColor], @"Postgres connection not available. Aborting");
-        return;
-    }
-    NSString* db_cmd = [NSString stringWithFormat:@"select mtca_dacs from mtc where key=0"];
-    [pgsql_connec dbQuery:db_cmd object:self selector:@selector(waitForThresholds:) timeout:2.0];
-}
-
-- (uint32_t) gatherMaskFromCheckBoxes:(NSMatrix *) boxes {
+- (uint32_t) gatherMaskFromCheckBoxes:(NSMatrix *) boxes
+{
     uint32_t mask = 0;
-    for(int i=0;i<[boxes numberOfRows];i++){
+    for (int i = 0; i < [boxes numberOfRows]; i++){
         if([[boxes cellAtRow:i column:0] intValue]) {
             int position = [[boxes cellAtRow:i column:0] tag];
             mask |= (1L << position);
@@ -1310,16 +1134,16 @@
     }
 }
 
-- (IBAction) helpButtonClicked:(id)sender {
+- (IBAction) helpButtonClicked:(id)sender
+{
     [helpText setHidden:![helpText isHidden]];
 }
 
-- (void)CheckBoxMatrixCellClicked:(NSMatrix*) checkBoxes newState:(int)state {
-
+- (void)CheckBoxMatrixCellClicked:(NSMatrix*) checkBoxes newState:(int)state
+{
     BOOL cmdKeyDown = ([[NSApp currentEvent] modifierFlags] & NSCommandKeyMask) != 0;
-    if(cmdKeyDown){
-        for (int i=0; i<[checkBoxes numberOfRows]; i++)
-        {
+    if (cmdKeyDown) {
+        for (int i = 0; i < [checkBoxes numberOfRows]; i++) {
             [[checkBoxes cellAtRow:i column:0] setState: state];
         }
     }

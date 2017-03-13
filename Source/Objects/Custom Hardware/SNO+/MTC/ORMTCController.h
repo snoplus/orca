@@ -144,20 +144,9 @@
 - (int) convert_view_unit_index_to_model_index: (int) view_index;
 - (int) convert_model_unit_index_to_view_index: (int) model_index;
 
-
-//DB Access
-- (void) load_settings_from_trigger_scan_for_type;
-- (void) grab_current_thresholds;
-
-- (void) waitForTriggerScan: (ORPQResult *) result;
-- (void) waitForThresholds: (ORPQResult *) result;
-
 #pragma mark •••Helper
 - (void) populatePullDown;
-- (int) trigger_scan_name_to_index:(NSString*) name;
-- (int) index_to_trigger_scan_name:(int) index;
 - (void) showHideOptions:(id) sender Box:(id)box resizeSmall:(NSSize) smallSize resizeLarge:(NSSize) largeSize;
-
 
 #pragma mark •••Actions
 
