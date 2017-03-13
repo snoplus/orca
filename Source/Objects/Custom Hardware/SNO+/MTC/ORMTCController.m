@@ -1004,47 +1004,6 @@
     [model updateTriggerThresholds];
 }
 
-- (int) index_to_trigger_scan_name:(int) index
-{
-    NSString *ret = @"";
-    switch (index) {
-        case MTC_N100_HI_THRESHOLD_INDEX:
-            ret = @"N100HI";
-            break;
-        case MTC_N100_MED_THRESHOLD_INDEX:
-            ret = @"N100MED";
-            break;
-        case MTC_N100_LO_THRESHOLD_INDEX:
-            ret = @"N100LO";
-            break;
-        case MTC_N20_THRESHOLD_INDEX:
-            ret = @"N20";
-            break;
-        case MTC_N20LB_THRESHOLD_INDEX:
-            ret = @"N20LB";
-            break;
-        case MTC_OWLN_THRESHOLD_INDEX:
-            ret = @"OWLN";
-            break;
-        case MTC_ESUMH_THRESHOLD_INDEX:
-            ret = @"ESUMHI";
-            break;
-        case MTC_ESUML_THRESHOLD_INDEX:
-            ret = @"ESUMHLO";
-            break;
-        case MTC_OWLEHI_THRESHOLD_INDEX:
-            ret = @"OWLEHI";
-            break;
-        case MTC_OWLELO_THRESHOLD_INDEX:
-            ret = @"OWLELO";
-            break;
-        default:
-            [NSException raise:@"MTCControllerError" format:@"Invalid threhsold index ( %i ) cannot get a valid trigger scan name", index];
-            break;
-    }
-    return ret;
-}
-
 - (uint32_t) gatherMaskFromCheckBoxes:(NSMatrix *) boxes
 {
     uint32_t mask = 0;
