@@ -461,29 +461,25 @@ snopGreenColor;
 }
 
 //Update the SR diplay when SR changes
--(void) SRVersionChanged:(NSNotification*)aNote
+- (void) SRVersionChanged:(NSNotification*)aNote
 {
-
     NSString* standardRunVersion = [model standardRunVersion];
-    if([standardRunVersionPopupMenu numberOfItems] == 0 || standardRunVersion == nil || [standardRunVersion isEqualToString:@""]){
+    if ([standardRunVersionPopupMenu numberOfItems] == 0 || standardRunVersion == nil || [standardRunVersion isEqualToString:@""]) {
         return;
     }
-    if([standardRunVersionPopupMenu indexOfItemWithObjectValue:standardRunVersion] == NSNotFound){
+    if ([standardRunVersionPopupMenu indexOfItemWithObjectValue:standardRunVersion] == NSNotFound) {
         NSLogColor([NSColor redColor],@"Standard Run Version \"%@\" does not exist. \n",standardRunVersion);
         return;
-    }
-    else{
+    } else {
         [standardRunVersionPopupMenu selectItemWithObjectValue:standardRunVersion];
     }
     
     [self displayThresholdsFromDB];
     [self runTypeWordChanged:nil];
-
 }
 
 - (IBAction) startRunAction:(id)sender
 {
-
     //Load selected SR in case the user didn't click enter
     //fixed memory leak in the next two lines -- don't 'copy without a matching release MAH 03/8/2017
     NSString *standardRun = [standardRunPopupMenu objectValueOfSelectedItem];
@@ -1671,81 +1667,72 @@ snopGreenColor;
 
 - (IBAction)loadStandardRunFromDBAction:(id)sender
 {
-    
     NSString *standardRun = [standardRunPopupMenu objectValueOfSelectedItem];
     NSString *standardRunVer = [standardRunVersionPopupMenu objectValueOfSelectedItem];
 
     [model loadStandardRun:standardRun withVersion: standardRunVer];
     [model loadSettingsInHW];
-    
 }
 
 - (IBAction)saveStandardRunToDBAction:(id)sender
 {
-    
     NSString *standardRun = [standardRunPopupMenu objectValueOfSelectedItem];
     NSString *standardRunVer = [standardRunVersionPopupMenu objectValueOfSelectedItem];
     
     [model saveStandardRun:standardRun withVersion:standardRunVer];
-    [self displayThresholdsFromDB];
-    
 }
 
 // Create a new SR item if doesn't exist, set the runType string value and query the DB to display the trigger configuration
 - (IBAction)standardRunPopupAction:(id)sender
 {
-    
     NSString *standardRun = [[standardRunPopupMenu stringValue] uppercaseString];
     [standardRunPopupMenu setStringValue:standardRun];
-    //Create new SR if does not exist
-    if ([standardRunPopupMenu indexOfItemWithObjectValue:standardRun] == NSNotFound && [standardRun isNotEqualTo:@""]){
+
+    // Create new SR if does not exist
+    if ([standardRunPopupMenu indexOfItemWithObjectValue:standardRun] == NSNotFound && [standardRun isNotEqualTo:@""]) {
         BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Creating new Standard Run: \"%@\"", standardRun],@"Is this really what you want?",@"Cancel",@"Yes, Make New Standard Run",nil);
-        if(cancel){
+        if (cancel) {
             [standardRunPopupMenu selectItemWithObjectValue:[model standardRunType]];
             [standardRunVersionPopupMenu selectItemWithObjectValue:[model standardRunVersion]];
             return;
-        }
-        else{
+        } else {
             [standardRunPopupMenu addItemWithObjectValue:standardRun];
             [standardRunVersionPopupMenu addItemWithObjectValue:@"DEFAULT"];
             [model saveStandardRun:standardRun withVersion:@"DEFAULT"];
         }
     }
     
-    //Set run type name
-    if(![[model standardRunType] isEqualToString:standardRun]){
+    // Set run type name
+    if(![[model standardRunType] isEqualToString:standardRun]) {
         [model setStandardRunType:standardRun];
     }
-    
 }
 
-- (IBAction)standardRunVersionPopupAction:(id)sender {
-    
+- (IBAction)standardRunVersionPopupAction:(id)sender
+{
     NSString *standardRun = [[standardRunPopupMenu stringValue] uppercaseString];
     NSString *standardRunVer = [[standardRunVersionPopupMenu stringValue] uppercaseString];
     [standardRunVersionPopupMenu setStringValue:standardRunVer];
 
-    //Create new SR version if does not exist
-    if ([standardRunVersionPopupMenu indexOfItemWithObjectValue:standardRunVer] == NSNotFound && [standardRunVer isNotEqualTo:@""]){
-
-        if([standardRun isEqualToString:@"DIAGNOSTIC"]){
+    // Create new SR version if does not exist
+    if ([standardRunVersionPopupMenu indexOfItemWithObjectValue:standardRunVer] == NSNotFound && [standardRunVer isNotEqualTo:@""]) {
+        if ([standardRun isEqualToString:@"DIAGNOSTIC"]) {
             NSLog(@"You cannot create a version for a DIAGNOSTIC run.\n");
             return;
         }
 
         BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Creating new Version: \"%@\" of Standard Run: \"%@\"", standardRunVer, standardRun], @"Is this really what you want?",@"Cancel",@"Yes, Make New Version",nil);
-        if(cancel){
+        if (cancel) {
             [standardRunVersionPopupMenu selectItemWithObjectValue:[model standardRunVersion]];
-        }
-        else{
+        } else {
             [standardRunVersionPopupMenu addItemWithObjectValue:standardRunVer];
             [standardRunVersionPopupMenu selectItemWithObjectValue:standardRunVer];
             [model saveStandardRun:standardRun withVersion:standardRunVer];
         }
     }
     
-    //Set run type name
-    if(![[model standardRunVersion] isEqualToString:standardRunVer]){
+    // Set run type name
+    if (![[model standardRunVersion] isEqualToString:standardRunVer]) {
         [model setStandardRunVersion:standardRunVer];
     }
 }
@@ -1799,7 +1786,6 @@ snopGreenColor;
 //and display the values in the GUI.
 -(void) displayThresholdsFromDB
 {
-
     /* Get models */
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     ORMTCModel* mtcModel;
@@ -1884,7 +1870,6 @@ snopGreenColor;
             [[runTypeWordSRMatrix cellAtRow:ibit column:0] setState:0];
         }
     }
-
 }
 
 - (IBAction) refreshStandardRunsAction:(id)sender
@@ -1898,7 +1883,7 @@ snopGreenColor;
     [standardRunPopupMenu removeAllItems];
     [standardRunVersionPopupMenu removeAllItems];
 
-    //Populate run type popup menu
+    // Populate run type popup menu
     for(NSString* aStandardRunType in [model standardRunCollection]){
         [standardRunPopupMenu addItemWithObjectValue:aStandardRunType];
     }
@@ -1906,26 +1891,23 @@ snopGreenColor;
 
 -(void) refreshStandardRunVersions
 {
-
     [standardRunVersionPopupMenu deselectItemAtIndex:[standardRunVersionPopupMenu indexOfSelectedItem]];
     [standardRunVersionPopupMenu removeAllItems];
 
     NSString* standardRunVersion = [model standardRunVersion];
-    //Populate run version popup menu
-    for(NSString* aStandardRunVersion in [[model standardRunCollection] objectForKey:[model standardRunType]]){
+    // Populate run version popup menu
+    for (NSString* aStandardRunVersion in [[model standardRunCollection] objectForKey:[model standardRunType]]) {
         [standardRunVersionPopupMenu addItemWithObjectValue:aStandardRunVersion];
     }
 
-    if([standardRunVersionPopupMenu numberOfItems] == 0 || standardRunVersion == nil || [standardRunVersion isEqualToString:@""]){
+    if ([standardRunVersionPopupMenu numberOfItems] == 0 || standardRunVersion == nil || [standardRunVersion isEqualToString:@""]) {
         return;
     }
-    if([standardRunVersionPopupMenu indexOfItemWithObjectValue:standardRunVersion] == NSNotFound){
+    if ([standardRunVersionPopupMenu indexOfItemWithObjectValue:standardRunVersion] == NSNotFound) {
         [standardRunVersionPopupMenu selectItemWithObjectValue:standardRunVersion];
         return;
-    }
-    else{
+    } else {
         [standardRunVersionPopupMenu selectItemWithObjectValue:standardRunVersion];
     }
-
 }
 @end
