@@ -385,7 +385,7 @@ tubRegister;
     NSString* dac_per_nhit = nil;
 
     if (!result) {
-        NSLogColor([NSColor redColor], @"Failed to recieve trigger scan results from database.\n");
+        NSLogColor([NSColor redColor], @"Failed to receive trigger scan results from database.\n");
         return;
     }
 
@@ -454,7 +454,7 @@ tubRegister;
     int numRows, numCols;
 
     if (!result) {
-        NSLogColor([NSColor redColor], @"Failed to recieve threshold results from database.\n");
+        NSLogColor([NSColor redColor], @"Failed to receive threshold results from database.\n");
         return;
     }
 
