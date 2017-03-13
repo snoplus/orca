@@ -407,7 +407,13 @@ resync;
 
 - (void) awakeAfterDocumentLoaded
 {
-    [[self findController] refreshStandardRunsAction:nil];
+    /* Get the standard runs from the database. */
+    [self refreshStandardRunsFromDB];
+
+    /* Load the last standard run. */
+    [self setStandardRunType:[self lastStandardRunType]];
+    [self setStandardRunVersion:[self lastStandardRunVersion]];
+
     [[ORGlobal sharedGlobal] setCanQuitDuringRun:YES];
 }
 
