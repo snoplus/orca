@@ -232,20 +232,24 @@ NSString* ORPulseCheckModelReloadTable      = @"ORPulseCheckModelReloadTable";
 - (void) doCheck
 {
     [[NSFileManager defaultManager] removeItemAtPath:[self localPath] error:nil];
-    if(mover)[mover cancel];
-    else {
-        mover = [[ORFileGetterOp alloc] init];
-        mover.delegate     = self;
-        
-        [mover setParams: [self heartbeatPath]
-               localPath: [self localPath]
-               ipAddress: [self ipNumber]
-                userName: [self username]
-                passWord: [self password]];
-        
-        [mover setDoneSelectorName:@"fileGetterIsDone"];
-        [[NSOperationQueue mainQueue] addOperation:mover];
+    if(mover){
+        [mover cancel];
+        [mover release];
+        mover = nil;
     }
+    
+    mover = [[ORFileGetterOp alloc] init];
+    mover.delegate     = self;
+    
+    [mover setParams: [self heartbeatPath]
+           localPath: [self localPath]
+           ipAddress: [self ipNumber]
+            userName: [self username]
+            passWord: [self password]];
+    
+    [mover setDoneSelectorName:@"fileGetterIsDone"];
+    [[NSOperationQueue mainQueue] addOperation:mover];
+    
 }
 
 - (NSString*)localPath
