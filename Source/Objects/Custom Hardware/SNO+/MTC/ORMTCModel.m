@@ -185,8 +185,6 @@ tubRegister;
 
 - (void) wakeUp
 {
-    if(![self aWake]){
-    }
     [super wakeUp];
 }
 
@@ -440,8 +438,7 @@ tubRegister;
     /* Update the dac -> nhit conversions by querying the database for the
      * latest trigger scans. */
     ORPQModel* pgsql_connec = [ORPQModel getCurrent];
-    if(!pgsql_connec)
-    {
+    if (!pgsql_connec) {
         NSLogColor([NSColor redColor], @"Postgres connection not available. Aborting");
         return;
     }
@@ -470,8 +467,7 @@ tubRegister;
     }
 
     NSArray* result_arr = [[result fetchRowAsDictionary] objectForKey:@"mtca_dacs"];
-    if(!result_arr || [result_arr count] == 0)
-    {
+    if (!result_arr || [result_arr count] == 0) {
         NSLogColor([NSColor redColor], @"Error while converting MTC threshold DB result to array.\n");
         return;
     }
@@ -500,8 +496,7 @@ tubRegister;
     /* Get the current MTCA+ thresholds from the detector database and update
      * the model. */
     ORPQModel* pgsql_connec = [ORPQModel getCurrent];
-    if(!pgsql_connec)
-    {
+    if (!pgsql_connec) {
         NSLogColor([NSColor redColor], @"Postgres connection not available. Aborting");
         return;
     }
@@ -563,7 +558,7 @@ tubRegister;
 
 - (void) setRepeatDelay:(unsigned short)aRepeatDelay
 {
-	if(aRepeatDelay<=0)aRepeatDelay = 1;
+	if (aRepeatDelay <= 0) aRepeatDelay = 1;
     [[[self undoManager] prepareWithInvocationTarget:self] setRepeatDelay:repeatDelay];
     
     repeatDelay = aRepeatDelay;
@@ -578,7 +573,7 @@ tubRegister;
 
 - (void) setRepeatOpCount:(short)aRepeatCount
 {
-	if(aRepeatCount<=0)aRepeatCount = 1;
+	if (aRepeatCount <= 0) aRepeatCount = 1;
     [[[self undoManager] prepareWithInvocationTarget:self] setRepeatOpCount:repeatOpCount];
     
     repeatOpCount = aRepeatCount;
@@ -844,7 +839,7 @@ tubRegister;
 
 - (void) setLockoutWidth:(uint16_t)width
 {
-    if(lockoutWidth != width) {
+    if (lockoutWidth != width) {
         lockoutWidth = width;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCSettingsChanged object:self];
     }
