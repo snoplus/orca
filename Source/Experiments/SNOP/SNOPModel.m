@@ -272,7 +272,6 @@ resync;
     state = STOPPED;
     start = COLD_START;
     resync = NO;
-    [self enableGlobalSecurity];
 
     /* Initialize ECARun object: this doesn't start the run */
     anECARun = [[ECARun alloc] init];
@@ -409,6 +408,7 @@ resync;
 {
     /* Get the standard runs from the database. */
     [self refreshStandardRunsFromDB];
+    [self enableGlobalSecurity];
     [[ORGlobal sharedGlobal] setCanQuitDuringRun:YES];
 }
 

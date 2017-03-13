@@ -1798,7 +1798,6 @@ snopGreenColor;
 
     NSMutableDictionary* runSettings = [[[model standardRunCollection] objectForKey:[model standardRunType]] objectForKey:[model standardRunVersion]];
     if(runSettings == nil){
-        NSLogColor([NSColor redColor], @"An error occurred: Refresh manually standard runs. \n");
         for (int i=0; i<[standardRunThresStoredValues numberOfRows];i++) {
             [[standardRunThresStoredValues cellAtRow:i column:0] setStringValue:@"--"];
             [[standardRunThresStoredValues cellAtRow:i column:0] setTextColor:[self snopRedColor]];
