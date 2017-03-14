@@ -69,6 +69,7 @@
     BOOL scheduledToSendBaselineReport;
     float maxNonCalibrationRate;
     ORHighRateChecker*    highRateChecker;
+    NSDictionary*  savedSpikeInfo[2];
 }
 
 #pragma mark ¥¥¥Accessors
@@ -129,6 +130,7 @@
 - (BOOL) vacuumSpike:(int)i;
 - (BOOL) fillingLN:(int)i;
 - (void) printBreakdownReport;
+- (void) constraintCheckFinished:(int)module;
 
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups;

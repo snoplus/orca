@@ -88,6 +88,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
         [mjdSource[i] setDelegate:nil];
         [mjdSource[i] release];
+        
+        [savedSpikeInfo[i] release];
     }
     [highRateChecker release];
     [anObjForCouchID release];
@@ -728,8 +730,22 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
 - (void) rateSpike:(NSNotification*) aNote
 {
+    //save the dic for posting after constraints checked... only care if NO LN2 fill is going on.
     NSDictionary* dic = [aNote userInfo];
+    int index =  [[dic objectForKey:@"crate"] intValue] - 1;
+    if(index>=0 && index<=1){
+        [savedSpikeInfo[index] release];
+        savedSpikeInfo[index] = [dic retain];
+    }
+}
 
+- (void) processSavedSpikeInfo:(int)index
+{
+    if(index<0 || index>1)return;
+    
+    NSDictionary* dic = savedSpikeInfo[index];
+    if(!dic)return;
+    
     //either a spike happened or a spike cleared
     ORRunningAveSpike* spikeInfo = [dic objectForKey:@"spikeInfo"];
     NSString* aKey = [NSString stringWithFormat:@"%@,%@,%@",
@@ -1426,6 +1442,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     for(i=0;i<2;i++){
         mjdInterlocks[i] = [[ORMJDInterlocks alloc] initWithDelegate:self slot:i];
         mjdSource[i] = [[ORMJDSource alloc] initWithDelegate:self slot:i];
+        savedSpikeInfo[i] = nil;
     }
     pollTime   = [decoder  decodeIntForKey:	@"pollTime"];
     stringMap  = [[decoder decodeObjectForKey:@"stringMap"] retain];
@@ -1836,6 +1853,18 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     }
 }
 
+- (void) constraintCheckFinished:(int)module
+{
+    int index = module - 1;
+    if(index>=0 && index<=1){
+        if(![self fillingLN:index]){
+            [self processSavedSpikeInfo:index];
+        }
+        [savedSpikeInfo[index] release];
+        savedSpikeInfo[index] = nil;
+    }
+}
+
 @end
 
 @implementation MajoranaModel (private)
@@ -1858,6 +1887,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
        
     }
 }
+
+
 
 - (void) validateStringMap
 {

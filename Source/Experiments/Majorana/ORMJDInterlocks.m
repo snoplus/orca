@@ -588,6 +588,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             
         case kMJDInterlocks_FinalState:
             if([finalReport count])[self errorReport];
+            [delegate constraintCheckFinished:[self module]];
             break;
     }
     if(currentState != kMJDInterlocks_Idle){
