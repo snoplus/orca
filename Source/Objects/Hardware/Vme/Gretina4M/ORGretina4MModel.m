@@ -3253,6 +3253,7 @@ return 0;
     [objDictionary setObject:[NSNumber numberWithInt:extTrigLength] forKey:@"Ext Trig Length"];
     [objDictionary setObject:[NSNumber numberWithInt:collectionTime] forKey:@"Collection Time"];
     [objDictionary setObject:[NSNumber numberWithInt:integrateTime] forKey:@"Integration Time"];
+    [objDictionary setObject:[NSNumber numberWithInt:serialNumber] forKey:@"Serial Number"];
     
     [self addCurrentState:objDictionary boolArray:(BOOL*)enabled       forKey:@"Enabled"];
     [self addCurrentState:objDictionary boolArray:(BOOL*)forceFullInit forKey:@"forceFullInit"];
