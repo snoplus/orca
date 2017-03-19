@@ -481,9 +481,8 @@ snopGreenColor;
 - (IBAction) startRunAction:(id)sender
 {
     //Load selected SR in case the user didn't click enter
-    //fixed memory leak in the next two lines -- don't 'copy without a matching release MAH 03/8/2017
-    NSString *standardRun = [standardRunPopupMenu objectValueOfSelectedItem];
-    NSString *standardRunVersion = [standardRunVersionPopupMenu objectValueOfSelectedItem];
+    NSString *standardRun = [[standardRunPopupMenu objectValueOfSelectedItem] copy];
+    NSString *standardRunVersion = [[standardRunVersionPopupMenu objectValueOfSelectedItem] copy];
     
     //Load selected version run:
     //If we are in operator mode we ALWAYS load the DEFAULTs
@@ -500,10 +499,14 @@ snopGreenColor;
     //Handle no SR cases
     if([standardRun isEqualToString:@""] || standardRun == nil){
         NSLogColor([NSColor redColor],@"Standard Run not set. Enter a valid name. \n");
+        [standardRun release];
+        [standardRunVersion release];
         return;
     }
     if([standardRunVersion isEqualToString:@""] || standardRunVersion == nil){
         NSLogColor([NSColor redColor],@"Standard Run Version not set. Enter a valid name. \n");
+        [standardRun release];
+        [standardRunVersion release];
         return;
     }
     
@@ -1685,7 +1688,7 @@ snopGreenColor;
 // Create a new SR item if doesn't exist, set the runType string value and query the DB to display the trigger configuration
 - (IBAction)standardRunPopupAction:(id)sender
 {
-    NSString *standardRun = [[standardRunPopupMenu stringValue] uppercaseString];
+    NSString *standardRun = [[[standardRunPopupMenu stringValue] uppercaseString] copy];
     [standardRunPopupMenu setStringValue:standardRun];
 
     // Create new SR if does not exist
@@ -1694,6 +1697,7 @@ snopGreenColor;
         if (cancel) {
             [standardRunPopupMenu selectItemWithObjectValue:[model standardRunType]];
             [standardRunVersionPopupMenu selectItemWithObjectValue:[model standardRunVersion]];
+            [standardRun release];
             return;
         } else {
             [standardRunPopupMenu addItemWithObjectValue:standardRun];
@@ -1706,18 +1710,22 @@ snopGreenColor;
     if(![[model standardRunType] isEqualToString:standardRun]) {
         [model setStandardRunType:standardRun];
     }
+
+    [standardRun release];
 }
 
 - (IBAction)standardRunVersionPopupAction:(id)sender
 {
-    NSString *standardRun = [[standardRunPopupMenu stringValue] uppercaseString];
-    NSString *standardRunVer = [[standardRunVersionPopupMenu stringValue] uppercaseString];
+    NSString *standardRun = [[[standardRunPopupMenu stringValue] uppercaseString] copy];
+    NSString *standardRunVer = [[[standardRunVersionPopupMenu stringValue] uppercaseString] copy];
     [standardRunVersionPopupMenu setStringValue:standardRunVer];
 
     // Create new SR version if does not exist
     if ([standardRunVersionPopupMenu indexOfItemWithObjectValue:standardRunVer] == NSNotFound && [standardRunVer isNotEqualTo:@""]) {
         if ([standardRun isEqualToString:@"DIAGNOSTIC"]) {
             NSLog(@"You cannot create a version for a DIAGNOSTIC run.\n");
+            [standardRun release];
+            [standardRunVer release];
             return;
         }
 
@@ -1735,6 +1743,9 @@ snopGreenColor;
     if (![[model standardRunVersion] isEqualToString:standardRunVer]) {
         [model setStandardRunVersion:standardRunVer];
     }
+
+    [standardRun release];
+    [standardRunVer release];
 }
 
 //Run Type Word
