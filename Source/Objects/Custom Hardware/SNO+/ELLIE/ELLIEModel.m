@@ -1010,7 +1010,7 @@ err:
 
     [runDocDict setObject:docType forKey:@"type"];
     [runDocDict setObject:[NSString stringWithFormat:@"%i",0] forKey:@"version"];
-    [runDocDict setObject:[NSString stringWithFormat:@"%lu",[runControl runNumber]] forKey:@"index"];
+    [runDocDict setObject:[NSString stringWithFormat:@""] forKey:@"index"];
     [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"timestamp"];
 
     [runDocDict setObject:[NSMutableArray arrayWithObjects:[NSNumber numberWithUnsignedLong:[runControl runNumber]],[NSNumber numberWithUnsignedLong:[runControl runNumber]], nil] forKey:@"run_range"];
@@ -1806,7 +1806,7 @@ err:
 
     [runDocDict setObject:docType forKey:@"type"];
     [runDocDict setObject:[NSString stringWithFormat:@"%i",0] forKey:@"version"];
-    [runDocDict setObject:[NSString stringWithFormat:@"%lu",[runControl runNumber]] forKey:@"index"];
+    [runDocDict setObject:[NSString stringWithFormat:@""] forKey:@"index"];
     [runDocDict setObject:[aSnotModel smellieRunNameLabel] forKey:@"run_description_used"];
     [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"timestamp"];
     [runDocDict setObject:[self smellieConfigVersionNo] forKey:@"configuration_version"];
