@@ -172,9 +172,7 @@ void registryChanged(
 - (void) turnOnAllOutputBuffer:(BOOL)state
 {
     useAllOutputBuffer = state;
-    if(state == NO){
-        [self clearAllOutput];
-    }
+    [self clearAllOutput];
 }
 
 - (NSString*) lastStringReceived
