@@ -178,7 +178,33 @@ void registryChanged(
 - (void) setLastStringReceived:(NSString*)aLastStringReceived
 {
     [lastStringReceived autorelease];
-    lastStringReceived = [aLastStringReceived copy];    
+    lastStringReceived = [aLastStringReceived copy];
+    @synchronized (self) {
+        if(!allOutput) allOutput = [[NSMutableString string]retain];
+        [allOutput appendString:aLastStringReceived];
+    }
+}
+
+- (NSString*) allOutput
+{
+    NSString* s;
+    @synchronized (self) {
+        s = [allOutput copy];
+    }
+    return [s autorelease];
+}
+
+- (void) clearAllOutput
+{
+    @synchronized (self) {
+        [allOutput release];
+        allOutput = nil;
+    }
+}
+
+- (BOOL) allOutputHasSubstring:(NSString*)s
+{
+    return [allOutput rangeOfString:s].location != NSNotFound;
 }
 
 - (NSString*) commandByAppendingEOL:(NSString*) aCmd
