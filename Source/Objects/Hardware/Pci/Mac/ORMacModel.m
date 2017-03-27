@@ -169,6 +169,13 @@ void registryChanged(
 
 
 #pragma mark ¥¥¥Accessors
+- (void) turnOnAllOutputBuffer:(BOOL)state
+{
+    useAllOutputBuffer = state;
+    if(state == NO){
+        [self clearAllOutput];
+    }
+}
 
 - (NSString*) lastStringReceived
 {
@@ -180,8 +187,10 @@ void registryChanged(
     [lastStringReceived autorelease];
     lastStringReceived = [aLastStringReceived copy];
     @synchronized (self) {
-        if(!allOutput) allOutput = [[NSMutableString string]retain];
-        [allOutput appendString:aLastStringReceived];
+        if(useAllOutputBuffer){
+            if(!allOutput) allOutput = [[NSMutableString string]retain];
+            [allOutput appendString:aLastStringReceived];
+        }
     }
 }
 

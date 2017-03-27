@@ -33,6 +33,7 @@
 	ORUSB*			usb;
     int				eolType;
     NSString* lastStringReceived;
+    BOOL   useAllOutputBuffer;
     NSMutableString*  allOutput;
 }
 
@@ -42,6 +43,7 @@
 - (NSString*) allOutput;
 - (void) clearAllOutput;
 - (BOOL) allOutputHasSubstring:(NSString*)s;
+- (void) turnOnAllOutputBuffer;
 
 - (NSString*) commandByAppendingEOL:(NSString*) aCmd;
 - (int) eolType;
