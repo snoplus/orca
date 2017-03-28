@@ -65,8 +65,10 @@ const int view_mask_map[10] = {2,1,0,3,4,7,6,5,9,8};
 @synthesize
 tellieStandardSequenceFlag,
 tellieFireSettings,
-smellieRunFileList,
+smellieRunFileList = _smellieRunFileList,
+tellieRunFileList = _tellieRunFileList,
 smellieRunFile,
+tellieRunFile,
 snopBlueColor,
 snopRedColor,
 snopOrangeColor,
@@ -86,7 +88,6 @@ snopGreenColor;
 }
 - (void) dealloc
 {
-    [smellieRunFileList release];
     [smellieRunFile release];
     [snopBlueColor release];
     [snopGreenColor release];
@@ -415,10 +416,15 @@ snopGreenColor;
                         object: nil];
     
     [notifyCenter addObserver : self
-                     selector : @selector(fetchRunFilesFinish:)
+                     selector : @selector(fetchSmellieRunFilesFinish:)
                          name : @"SmellieRunFilesLoaded"
                         object: nil];
     
+    [notifyCenter addObserver : self
+                     selector : @selector(fetchTellieRunFilesFinish:)
+                         name : @"TellieRunFilesLoaded"
+                        object: nil];
+
 }
 
 - (void) updateWindow
@@ -537,10 +543,8 @@ snopGreenColor;
 
 - (IBAction) stopRunAction:(id)sender
 {
-
     [self endEditing];
     [model stopRun];
-
 }
 
 - (void) runStatusChanged:(NSNotification*)aNotification
@@ -964,7 +968,7 @@ snopGreenColor;
 //smellie functions ----------------------------------------------
 
 //this fetches the smellie run file information
-- (IBAction) fetchRunFiles:(id)sender
+- (IBAction) fetchSmellieRunFiles:(id)sender
 {
     // Temporarily disable drop down list and remove old items
     [smellieRunFileNameField addItemWithObjectValue:@""];
@@ -972,8 +976,6 @@ snopGreenColor;
     [smellieRunFileNameField setEnabled:NO];
     [smellieRunFileNameField removeAllItems];
     [smellieStartRunButton setEnabled:NO];
-    [smellieStopRunButton setEnabled:NO];
-    [smellieEmergencyStop setEnabled:NO];
     
     // Set the smellieRunFileList to nil
     [self setSmellieRunFileList:nil];
@@ -984,7 +986,7 @@ snopGreenColor;
     [model getSmellieRunFiles];
 }
 
--(void) fetchRunFilesFinish:(NSNotification *)aNote
+-(void) fetchSmellieRunFilesFinish:(NSNotification *)aNote
 {
    // When we get a noticication that the database read has finished, set local variables
     NSMutableDictionary *runFileDict = [[NSMutableDictionary alloc] initWithDictionary:[model smellieRunFiles]];
@@ -1002,107 +1004,92 @@ snopGreenColor;
     [runFileDict release];
 }
 
+- (IBAction) fetchTellieRunFiles:(id)sender
+{
+    // Temporarily disable drop down list and remove old items
+    [tellieRunFileNameField addItemWithObjectValue:@""];
+    [tellieRunFileNameField selectItemWithObjectValue:@""];
+    [tellieRunFileNameField setEnabled:NO];
+    [tellieRunFileNameField removeAllItems];
+    [tellieStartRunButton setEnabled:NO];
+
+    // Set the smellieRunFileList to nil
+    [self setTellieRunFileList:nil];
+
+    // Call getTmellieRunFiles from the model. This queries the DB and sets the tellieRunFiles
+    // property. This function runs asyncronously so we have to wait for a notification to be
+    // posted back before we can fill and re-activate the dropdown list (see below).
+    [model getTellieRunFiles];
+}
+
+-(void) fetchTellieRunFilesFinish:(NSNotification *)aNote
+{
+    // When we get a noticication that the database read has finished, set local variables
+    NSMutableDictionary *runFileDict = [[NSMutableDictionary alloc] initWithDictionary:[model tellieRunFiles]];
+
+    //Fill lthe combo box with information
+    for(id key in runFileDict){
+        id loopValue = [runFileDict objectForKey:key];
+        [tellieRunFileNameField addItemWithObjectValue:[NSString stringWithFormat:@"%@",[loopValue objectForKey:@"name"]]];
+    }
+
+    [tellieRunFileNameField setEnabled:YES];
+    [tellieLoadRunFile setEnabled:YES];
+
+    [self setTellieRunFileList:runFileDict];
+    [runFileDict release];
+}
+
 -(IBAction)loadSmellieRunAction:(id)sender
 {
     if([smellieRunFileNameField objectValueOfSelectedItem]!= nil)
     {
         //Loop through all the smellie files in the run list
         for(id key in [self smellieRunFileList]){
-            
+
             id currentRunFile = [[self smellieRunFileList] objectForKey:key];
-            
+
             NSString *thisRunFile = [currentRunFile objectForKey:@"run_name"];
             NSString *requestedRunFile = [smellieRunFileNameField objectValueOfSelectedItem];
-            
+
             if( [thisRunFile isEqualToString:requestedRunFile]){
-                
+
+                NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
+                if (![objs count]) {
+                    NSLogColor([NSColor redColor], @"ELLIE model not available, add an ELLIE model to your experiment\n");
+                    return;
+                }
+                ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
+
+                // Set this to be the current smellie run file
                 [self setSmellieRunFile:currentRunFile];
-                [loadedSmellieRunNameLabel setStringValue:[smellieRunFile objectForKey:@"run_name"]];
                 [model setSmellieRunNameLabel:[NSString stringWithFormat:@"%@",[smellieRunFile objectForKey:@"run_name"]]];
+
+                // Set some gui labels straight from the settings dict
+                [loadedSmellieRunNameLabel setStringValue:[smellieRunFile objectForKey:@"run_name"]];
                 [loadedSmellieTriggerFrequencyLabel setStringValue:[smellieRunFile objectForKey:@"trigger_frequency"]];
                 [loadedSmellieOperationModeLabel setStringValue:[smellieRunFile objectForKey:@"operation_mode"]];
-                
-                //counters of fibres and Lasers
-                int fibreCounter=  0;
-                int laserCounter = 0;
-                
-                fibreCounter = fibreCounter + [[self.smellieRunFile objectForKey:@"FS007"] intValue];
-                fibreCounter = fibreCounter + [[self.smellieRunFile objectForKey:@"FS107"] intValue];
-                fibreCounter = fibreCounter + [[self.smellieRunFile objectForKey:@"FS207"] intValue];
-                fibreCounter = fibreCounter + [[self.smellieRunFile objectForKey:@"FS025"] intValue];
-                fibreCounter = fibreCounter + [[self.smellieRunFile objectForKey:@"FS125"] intValue];
-                fibreCounter = fibreCounter + [[self.smellieRunFile objectForKey:@"FS225"] intValue];
-                fibreCounter = fibreCounter + [[self.smellieRunFile objectForKey:@"FS037"] intValue];
-                fibreCounter = fibreCounter + [[self.smellieRunFile objectForKey:@"FS137"] intValue];
-                fibreCounter = fibreCounter + [[self.smellieRunFile objectForKey:@"FS237"] intValue];
-                fibreCounter = fibreCounter + [[self.smellieRunFile objectForKey:@"FS055"] intValue];
-                fibreCounter = fibreCounter + [[self.smellieRunFile objectForKey:@"FS155"] intValue];
-                fibreCounter = fibreCounter + [[self.smellieRunFile objectForKey:@"FS255"] intValue];
-                
-                laserCounter = laserCounter + [[self.smellieRunFile objectForKey:@"375nm_laser_on"] intValue];
-                laserCounter = laserCounter + [[self.smellieRunFile objectForKey:@"405nm_laser_on"] intValue];
-                laserCounter = laserCounter + [[self.smellieRunFile objectForKey:@"440nm_laser_on"] intValue];
-                laserCounter = laserCounter + [[self.smellieRunFile objectForKey:@"500nm_laser_on"] intValue];
-                laserCounter = laserCounter + [[self.smellieRunFile objectForKey:@"superK_laser_on"] intValue];
-                
-                [loadedSmellieFibresLabel setStringValue:[NSString stringWithFormat:@"%i",fibreCounter]];
-                
-                //Concatenate the laser string
-                NSMutableString * smellieLaserString = [[NSMutableString alloc] init];
-                
-                //see if the 375nm laser is on
-                if([[self.smellieRunFile objectForKey:@"375nm_laser_on"] intValue] == 1){
-                    [smellieLaserString appendString:@" 375nm "];
-                }
-                
-                //see if the 405nm laser is on
-                if([[self.smellieRunFile objectForKey:@"405nm_laser_on"] intValue] == 1){
-                    [smellieLaserString appendString:@" 405nm "];
-                }
-                
-                //see if the 440nm laser is on
-                if([[self.smellieRunFile objectForKey:@"440nm_laser_on"] intValue] == 1){
-                    [smellieLaserString appendString:@" 440nm "];
-                }
-                
-                //see if the 500nm laser is on
-                if([[self.smellieRunFile objectForKey:@"500nm_laser_on"] intValue] == 1){
-                    [smellieLaserString appendString:@" 500nm "];
-                }
 
-                //see if the 500nm laser is on
-                if([[self.smellieRunFile objectForKey:@"superK_laser_on"] intValue] == 1){
-                    [smellieLaserString appendString:@" superK "];
+                // Set fibres and Lasers labels
+                NSArray* smellieLaserArray = [theELLIEModel getSmellieRunLaserArray:[self smellieRunFile]];
+                NSArray* smellieFibreArray = [theELLIEModel getSmellieRunFibreArray:[self smellieRunFile]];
+                NSString* laserString = [smellieLaserArray componentsJoinedByString:@", "];
+                NSString* fibreString = [smellieFibreArray componentsJoinedByString:@", "];
+                [loadedSmellieLasersLabel setStringValue:laserString];
+                [loadedSmellieFibresLabel setStringValue:fibreString];
+
+                // Set wavelength labels
+                NSArray* wavelengthsArray = [theELLIEModel getSmellieLowEdgeWavelengthArray:[self smellieRunFile]];
+                NSString* wavelengthString = @"";
+                for(NSNumber* wave in wavelengthsArray){
+                    NSString* w = [NSString stringWithFormat:@"%i, ",([wave intValue]/10)];
+                    wavelengthString = [wavelengthString stringByAppendingString:w];
                 }
-                
-                //Calculate the approximate time of the run
-                float triggerFrequency = [[smellieRunFile objectForKey:@"trigger_frequency"] floatValue];
-                float numberTriggersPerLoop = [[smellieRunFile objectForKey:@"triggers_per_loop"] floatValue];
-                // superK time
-                float superKTimeScale = (1 * fibreCounter * [[self.smellieRunFile objectForKey:@"superK_wavelength_no_steps"] intValue] *
-                                     [[self.smellieRunFile objectForKey:@"superK_intensity_no_steps"] intValue] *
-                                     [[self.smellieRunFile objectForKey:@"superK_gain_no_steps"] intValue]);
-                // Fixed wavelength time
-                float numberIntensityLoops = (([[self.smellieRunFile objectForKey:@"375nm_intensity_no_steps"] intValue] +
-                                          [[self.smellieRunFile objectForKey:@"405nm_intensity_no_steps"] intValue] +
-                                          [[self.smellieRunFile objectForKey:@"440nm_intensity_no_steps"] intValue] +
-                                          [[self.smellieRunFile objectForKey:@"500nm_intensity_no_steps"] intValue]) / 4.);
-                float numberGainLoops = (([[self.smellieRunFile objectForKey:@"375nm_gain_no_steps"] intValue] +
-                                     [[self.smellieRunFile objectForKey:@"405nm_gain_no_steps"] intValue] +
-                                     [[self.smellieRunFile objectForKey:@"440nm_gain_no_steps"] intValue] +
-                                     [[self.smellieRunFile objectForKey:@"500nm_gain_no_steps"] intValue]) / 4.);
-                float numberFixedlasers = ([[self.smellieRunFile objectForKey:@"375nm_laser_on"] intValue] +
-                                           [[self.smellieRunFile objectForKey:@"405nm_laser_on"] intValue] +
-                                           [[self.smellieRunFile objectForKey:@"440nm_laser_on"] intValue] +
-                                           [[self.smellieRunFile objectForKey:@"500nm_laser_on"] intValue]);
-                float fixedTimeScale = (numberFixedlasers * fibreCounter * numberIntensityLoops * numberGainLoops);
-                float totalTime = ((superKTimeScale + fixedTimeScale)*numberTriggersPerLoop) / (triggerFrequency*60);
-                [loadedSmellieApproxTimeLabel setStringValue:[NSString stringWithFormat:@"%0.1f",totalTime]];
-                [loadedSmellieLasersLabel setStringValue:smellieLaserString];
-                
-                //unlock the control buttons
-                //[smellieCheckInterlock setEnabled:YES];
-                [smellieLaserString release];
+                [loadedSmellieSuperKwavelengths setStringValue:[wavelengthString substringToIndex:([wavelengthString length]-2)]];
+
+                // Set time estimate label
+                NSNumber* totalTime = [theELLIEModel estimateSmellieRunTime:[self smellieRunFile]];
+                [loadedSmellieApproxTimeLabel setStringValue:[NSString stringWithFormat:@"%0.1f",[totalTime floatValue]]];
             }
         }
         //Activate run buttons
@@ -1111,49 +1098,54 @@ snopGreenColor;
         [smellieEmergencyStop setEnabled:NO];
     }
     else{
-        //[smellieCheckInterlock setEnabled:NO];
-        NSLog(@"Main SNO+ Control:Please choose a Smellie Run File from selection\n");
+        [loadedSmellieRunNameLabel setStringValue:@""];
+        [loadedSmellieApproxTimeLabel setStringValue:@""];
+        [loadedSmellieLasersLabel setStringValue:@""];
+        [loadedSmellieFibresLabel setStringValue:@""];
+        [loadedSmellieTriggerFrequencyLabel setStringValue:@""];
+        [loadedSmellieSuperKwavelengths setStringValue:@""];
+        [loadedSmellieOperationModeLabel setStringValue:@""];
+        NSLog(@"Main SNO+ Control: Please choose a Smellie Run File from selection\n");
     }
 }
 
 - (IBAction) startSmellieRunAction:(id)sender
 {
+    /////////////////////
+    // Get the ELLIE model
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
+    if (![objs count]) {
+        NSLogColor([NSColor redColor], @"ELLIE model not available, add an ELLIE model to your experiment\n");
+        return;
+    }
+    ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
+
     //////////////////
     // Check if a run is already ongoing
     // If so tell the user and ignore this
     // button press
-    if([smellieThread isExecuting]){
+    if([[theELLIEModel smellieThread] isExecuting]){
         NSLogColor([NSColor redColor], @"[SMELLIE]: A Smellie fire sequence is already on going. Cannot launch a new one until current sequence has finished\n");
         return;
     }
-    
+
+    //////////////////
+    // Check if we're in the correct
+    // standard run type
     if(![[model lastStandardRunType] isEqualToString:@"SMELLIE"]){
         ORRunAlertPanel(@"The SMELLIE standard run is not loaded.",@"You must load a SMELLIE standard run and start a new run before starting a fire sequence",@"OK",nil,nil);
         return;
     }
-    
+
     [smellieLoadRunFile setEnabled:NO];
     [smellieRunFileNameField setEnabled:NO];
     [smellieStopRunButton setEnabled:YES];
     [smellieEmergencyStop setEnabled:YES];
     [smellieStartRunButton setEnabled:NO];
-    
-    //assign the run type as a SMELLIE run
-    //[model setRunType:kRunSmellie];
 
-    //Collect a series of objects from the ELLIEModel
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
-    if (![objs count]) {
-      NSString* reasonStr = @"ELLIE model not available, add an ELLIE model to your experiment";
-      NSException* e = [NSException
-			exceptionWithName:@"NoEllieModel"
-			reason:reasonStr
-			userInfo:nil];
-      [e raise];
-    }
-    ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
-    smellieThread = [[NSThread alloc] initWithTarget:theELLIEModel selector:@selector(startSmellieRun:) object:smellieRunFile];
-    [smellieThread start];
+    //////////////////////
+    // Start smellie thread
+    [theELLIEModel startSmellieRunThread:smellieRunFile];
 }
 
 - (IBAction) stopSmellieRunAction:(id)sender
@@ -1161,35 +1153,32 @@ snopGreenColor;
     [smellieLoadRunFile setEnabled:YES];
     [smellieRunFileNameField setEnabled:YES];
     [smellieStopRunButton setEnabled:NO];
-    //[smellieCheckInterlock setEnabled:YES];
+
+    ///////////////////////
+    // Get the ELLIEModel
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
+    if (![objs count]) {
+        NSLogColor([NSColor redColor], @"ELLIE model not available, add an ELLIE model to your experiment\n");
+        return;
+    }
+    ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
 
     //////////////////////
     // Check if the thread is still running,
     // if not cancel the thread and let the
     // catch statements in [ellieModel startSmellieRun]
     // cause a goto err;
-    if(![smellieThread isCancelled]){
-        [smellieThread cancel];
+    if(![[theELLIEModel smellieThread] isCancelled]){
+        [[theELLIEModel smellieThread] cancel];
         return;
     }
-    
-    //Collect a series of objects from the ELLIEModel
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
-    if (![objs count]) {
-        NSString* reasonStr = @"ELLIE model not available, add an ELLIE model to your experiment";
-        NSException* e = [NSException
-                          exceptionWithName:@"NoEllieModel"
-                          reason:reasonStr
-                          userInfo:nil];
-        [e raise];
-    }
-    ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
 
     //Call stop smellie run method to tidy up SMELLIE's hardware state
     @try{
         [theELLIEModel stopSmellieRun];
     } @catch(NSException* e){
-        [e raise];
+        NSLogColor([NSColor redColor], @"Problem stopping smellie run: %@\n", [e reason]);
+        return;
     }
 
     ////////////
@@ -1208,83 +1197,200 @@ snopGreenColor;
     [smellieRunFileNameField setEnabled:NO];
     [smellieStartRunButton setEnabled:NO];
     [smellieStopRunButton setEnabled:YES];
-    
+}
+
+-(IBAction)loadTellieRunAction:(id)sender
+{
+    if([tellieRunFileNameField objectValueOfSelectedItem]!= nil)
+    {
+        //Loop through all the smellie files in the run list
+        for(id key in [self tellieRunFileList]){
+
+            id currentRunFile = [[self tellieRunFileList] objectForKey:key];
+
+            NSString *thisRunFile = [currentRunFile objectForKey:@"name"];
+            NSString *requestedRunFile = [tellieRunFileNameField objectValueOfSelectedItem];
+
+            if( [thisRunFile isEqualToString:requestedRunFile]){
+
+                [self setTellieRunFile:currentRunFile];
+                [loadedTellieRunNameLabel setStringValue:[tellieRunFile objectForKey:@"name"]];
+                [model setTellieRunNameLabel:[NSString stringWithFormat:@"%@",[tellieRunFile objectForKey:@"name"]]];
+
+                NSArray* nodes = [[self tellieRunFile] objectForKey:@"nodes"];
+                NSString* nodesString = [nodes componentsJoinedByString:@", "];
+
+                [loadedTellieNodesLabel setStringValue:nodesString];
+                [loadedTellieIntensityLabel setStringValue:[tellieRunFile objectForKey:@"photons_per_pulse"]];
+                [loadedTellieFireRateLabel setStringValue:[tellieRunFile objectForKey:@"trigger_rate"]];
+                [loadedTellieNoPulsesLabel setStringValue:[tellieRunFile objectForKey:@"trigger_per_node"]];
+
+                BOOL slaveCheck = [[tellieRunFile objectForKey:@"slave_mode"] boolValue];
+                if(slaveCheck){
+                    [loadedTellieOperationLabel setStringValue:@"Slave"];
+                } else {
+                    [loadedTellieOperationLabel setStringValue:@"Master"];
+                }
+
+                // Estimate run time
+                int no_pulses = [[tellieRunFile objectForKey:@"trigger_per_node"] intValue];
+                int no_nodes = [nodes count];
+                int rate = [[tellieRunFile objectForKey:@"trigger_rate"] intValue];
+                float total_time = (no_nodes*no_pulses)/(rate*60)*1.1;
+                [loadedTellieRunTimeLabel setStringValue:[NSString stringWithFormat:@"%0.1f",total_time]];
+            }
+        }
+        //Activate run buttons
+        [tellieStartRunButton setEnabled:YES];
+        [tellieStopRunButton setEnabled:NO];
+    }
+    else{
+        [loadedTellieRunNameLabel setStringValue:@""];
+        [loadedTellieRunTimeLabel setStringValue:@""];
+        [loadedTellieNodesLabel setStringValue:@""];
+        [loadedTellieIntensityLabel setStringValue:@""];
+        [loadedTellieFireRateLabel setStringValue:@""];
+        [loadedTellieNoPulsesLabel setStringValue:@""];
+        [loadedTellieOperationLabel setStringValue:@""];
+        NSLog(@"Main SNO+ Control: Please choose a Tellie Run File from selection\n");
+    }
 }
 
 -(void)startTellieRunNotification:(NSNotification *)note;
 {
     [self setTellieFireSettings:[note userInfo]];
-    [self startTellieRunAction:nil];
-}
 
--(IBAction)startTellieRunAction:(id)sender
-{
-    //////////////////
-    // Check if a run is already ongoing
-    // If so tell the user and ignore this
-    // button press
-    if([tellieThread isExecuting]){
-        NSLogColor([NSColor redColor], @"[TELLIE]: A tellie fire sequence is already on going. Cannot launch a new one until current sequence has finished\n");
-        return;
-    }
-    
-    if(![[model lastStandardRunType] isEqualToString:@"TELLIE"]){
-        ORRunAlertPanel(@"The TELLIE standard run is not loaded.",@"You must load a TELLIE standard run and start a new run before starting a fire sequence",@"OK",nil,nil);
-        return;
-    }
-    
     //////////////////
     // Get ellie model and launch a fire
     // sequence
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
     if (![objs count]) {
-        NSString* reasonStr = @"ELLIE model not available, add an ELLIE model to your experiment";
-        NSException* e = [NSException
-                          exceptionWithName:@"NoEllieModel"
-                          reason:reasonStr
-                          userInfo:nil];
-        [e raise];
+        NSLogColor([NSColor redColor], @"ELLIE model not available, add an ELLIE model to your experiment\n");
+        return;
+    }
+    ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
+
+    //////////////////
+    // Check if a run is already ongoing
+    // If so tell the user and ignore this
+    // button press
+    if([[theELLIEModel tellieThread] isExecuting]){
+        NSLogColor([NSColor redColor], @"[TELLIE]: A tellie fire sequence is already on going. Cannot launch a new one until current sequence has finished\n");
+        return;
+    }
+
+    if(![[model lastStandardRunType] isEqualToString:@"TELLIE"]){
+        ORRunAlertPanel(@"The TELLIE standard run is not loaded.",@"You must load a TELLIE standard run and start a new run before starting a fire sequence",@"OK",nil,nil);
+        return;
+    }
+
+    /////////////////////
+    // Set a flag which defines if we should
+    // roll over into maintenance or not.
+    [self setTellieStandardSequenceFlag:NO];
+
+    [tellieLoadRunFile setEnabled:NO];
+    [tellieRunFileNameField setEnabled:NO];
+    [tellieStopRunButton setEnabled:YES];
+    [tellieStartRunButton setEnabled:NO];
+
+    //////////////////////
+    // Start tellie thread
+    [theELLIEModel startTellieRunThread:[self tellieFireSettings]];
+}
+
+
+-(IBAction)startTellieRunAction:(id)sender
+{
+    
+    //////////////////
+    // Get ellie model
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
+    if (![objs count]) {
+        NSLogColor([NSColor redColor], @"ELLIE model not available, add an ELLIE model to your experiment\n");
+        return;
     }
     ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
     
-    // Handle if this came from an ELLIE GUI call
-    if(!sender){
-        [self setTellieStandardSequenceFlag:NO];
-        tellieThread = [[NSThread alloc] initWithTarget:theELLIEModel selector:@selector(startTellieRun:) object:[self tellieFireSettings]];
-        [tellieThread start];
+    //////////////////
+    // Check if a run is already ongoing
+    // If so tell the user and ignore this
+    // button press
+    if([[theELLIEModel tellieThread] isExecuting]){
+        NSLogColor([NSColor redColor], @"[TELLIE]: A tellie fire sequence is already on going. Cannot launch a new one until current sequence has finished\n");
         return;
     }
+
+    if(![[model lastStandardRunType] isEqualToString:@"TELLIE"]){
+        ORRunAlertPanel(@"The TELLIE standard run is not loaded.",@"You must load a TELLIE standard run and start a new run before starting a fire sequence",@"OK",nil,nil);
+        return;
+    }
+
+    /////////////////////////
+    // Get settings for each node
+    NSArray* nodes = [[self tellieRunFile] objectForKey:@"nodes"];
+    NSUInteger photons = [[[self tellieRunFile] objectForKey:@"photons_per_pulse"] integerValue];
+    NSUInteger no_pulses = [[[self tellieRunFile] objectForKey:@"trigger_per_node"] integerValue];
+    NSUInteger rate = [[[self tellieRunFile] objectForKey:@"trigger_rate"] integerValue];
+    NSUInteger delay = [[[self tellieRunFile] objectForKey:@"trigger_delay"] integerValue];
+    NSUInteger slaveValue = [[[self tellieRunFile] objectForKey:@"slave_mode"] integerValue];
+    BOOL inSlave = NO;
+    if(slaveValue == 1){
+        inSlave = YES;
+    }
+    NSMutableArray* settingsArray = [[NSMutableArray alloc] init];
+    for(NSNumber* node in nodes){
+        NSString* fibre = [theELLIEModel calcTellieFibreForNode:[node integerValue]];
+        NSMutableDictionary* settings = [theELLIEModel returnTellieFireCommands:fibre
+                                                                   withNPhotons:photons
+                                                              withFireFrequency:rate
+                                                                    withNPulses:no_pulses
+                                                               withTriggerDelay:delay
+                                                                        inSlave:inSlave];
+
+        [settingsArray addObject:settings];
+    }
+
+    /////////////////////
+    // Set a flag which defines if we should
+    // roll over into maintenance or not.
+    [self setTellieStandardSequenceFlag:YES];
+
+    [tellieRunFileNameField setEnabled:NO];
+    [tellieStopRunButton setEnabled:YES];
+    [tellieStartRunButton setEnabled:NO];
+
+    //////////////////////
+    // Start tellie thread
+    [theELLIEModel startTellieMultiRunThread:settingsArray];
 }
 
 - (IBAction) stopTellieRunAction:(id)sender
 {
+    //Collect a series of objects from the ELLIEModel
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
+    if (![objs count]) {
+        NSLogColor([NSColor redColor], @"ELLIE model not available, add an ELLIE model to your experiment\n");
+        return;
+    }
+    ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
+
     //////////////////////
     // Check if the thread has been cancelled,
     // if not cancel the thread and let the
     // catch statements in [ellieModel startTellieRun]
     // cause a goto err;
-    if(![tellieThread isCancelled]){
-        [tellieThread cancel];
+    if(![[theELLIEModel tellieThread] isCancelled]){
+        [[theELLIEModel tellieThread] cancel];
         return;
     }
-
-    //Collect a series of objects from the ELLIEModel
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
-    if (![objs count]) {
-        NSString* reasonStr = @"ELLIE model not available, add an ELLIE model to your experiment";
-        NSException* e = [NSException
-                          exceptionWithName:@"NoEllieModel"
-                          reason:reasonStr
-                          userInfo:nil];
-        [e raise];
-    }
-    ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
     
     //Call stop smellie run method to tidy up TELLIE's hardware state
     @try{
         [theELLIEModel stopTellieRun];
     } @catch(NSException* e){
-        [e raise];
+        NSLogColor([NSColor redColor], @"Problem stopping tellie run: %@\n", [e reason]);
+        return;
     }
     
     ////////////

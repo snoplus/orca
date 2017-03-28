@@ -82,24 +82,33 @@
     IBOutlet NSTextField *loadedSmellieLasersLabel;
     IBOutlet NSTextField *loadedSmellieFibresLabel;
     IBOutlet NSTextField *loadedSmellieOperationModeLabel;
-    IBOutlet NSTextField *loadedSmellieMaxIntensityLaser;
-    IBOutlet NSTextField *loadedSmellieMinIntensityLaser;
+    IBOutlet NSTextField *loadedSmellieSuperKwavelengths;
     
     //SMELLIE
-    NSMutableDictionary *smellieRunFileList;
+    NSMutableDictionary *_smellieRunFileList;
     NSDictionary *smellieRunFile;
-    NSThread *smellieThread;
     IBOutlet NSButton *smellieLoadRunFile;
-    IBOutlet NSButton *smellieCheckInterlock;
     IBOutlet NSButton *smellieStartRunButton;
     IBOutlet NSButton *smellieStopRunButton;
     IBOutlet NSButton *smellieEmergencyStop;
-    IBOutlet NSButton *smellieBuildCustomRun;
-    IBOutlet NSButton *smellieChangeConfiguration;
 
     //TELLIE
+    IBOutlet NSComboBox *tellieRunFileNameField;
+    IBOutlet NSTextField *loadedTellieRunNameLabel;
+    IBOutlet NSTextField *loadedTellieFireRateLabel;
+    IBOutlet NSTextField *loadedTellieIntensityLabel;
+    IBOutlet NSTextField *loadedTellieNoPulsesLabel;
+    IBOutlet NSTextField *loadedTellieNodesLabel;
+    IBOutlet NSTextField *loadedTellieRunTimeLabel;
+    IBOutlet NSTextField *loadedTellieOperationLabel;
+
+    IBOutlet NSButton *tellieLoadRunFile;
+    IBOutlet NSButton *tellieStartRunButton;
+    IBOutlet NSButton *tellieStopRunButton;
+
+    NSMutableDictionary *_tellieRunFileList;
+    NSDictionary *tellieRunFile;
     NSDictionary* tellieFireSettings;
-    NSThread* tellieThread;
     BOOL tellieStandardSequenceFlag;
     IBOutlet NSButton* runsLockButton;
     IBOutlet NSTextField *lockStatusTextField;
@@ -153,8 +162,10 @@
 
 @property (nonatomic) BOOL tellieStandardSequenceFlag;
 @property (nonatomic,retain) NSDictionary *tellieFireSettings;
+@property (nonatomic,retain) NSMutableDictionary *tellieRunFileList;
 @property (nonatomic,retain) NSMutableDictionary *smellieRunFileList;
 @property (nonatomic,retain) NSDictionary *smellieRunFile;
+@property (nonatomic,retain) NSDictionary *tellieRunFile;
 @property (nonatomic,retain) NSColor *snopRedColor;
 @property (nonatomic,retain) NSColor *snopBlueColor;
 @property (nonatomic,retain) NSColor *snopGreenColor;
@@ -200,13 +211,16 @@
 
 //smellie functions -------------------
 - (IBAction) loadSmellieRunAction:(id)sender;
-- (IBAction) fetchRunFiles:(id)sender;
-- (void) fetchRunFilesFinish:(NSNotification *)aNote;
+- (IBAction) fetchSmellieRunFiles:(id)sender;
+- (void) fetchSmellieRunFilesFinish:(NSNotification *)aNote;
 - (IBAction) startSmellieRunAction:(id)sender;
 - (IBAction) stopSmellieRunAction:(id)sender;
 - (IBAction) emergencySmellieStopAction:(id)sender;
 
 //tellie functions ---------------------
+- (IBAction) loadTellieRunAction:(id)sender;
+- (IBAction) fetchTellieRunFiles:(id)sender;
+- (void) fetchTellieRunFilesFinish:(NSNotification *)aNote;
 - (IBAction)startTellieRunAction:(id)sender;
 - (IBAction) stopTellieRunAction:(id)sender;
 - (void)startTellieRunNotification:(NSNotification *)notification;
