@@ -557,16 +557,9 @@ resync;
 
     switch (start) {
     case ROLLOVER_START:
-        @try {
-            /* Tell the MTC server to queue the run start. This will suspend
-             * the MTC readout and fire a SOFT_GT. When the run starts, we will
-             * resume the MTC readout */
-            [mtc_server okCommand:"queue_run_start"];
-        } @catch (NSException *e) {
-            NSLogColor([NSColor redColor], @"error sending queue_run_start "
-                       "command to mtc_server: %@\n", [e reason]);
-            goto err;
-        }
+        /* We don't queue the run start here for rollover runs. Since we don't
+         * send a queue_run_start command to the mtc server, the first gtid and
+         * the valid gtid fields in the run header will be the same. */
         break;
     case CONTINUOUS_START:
         @try {
