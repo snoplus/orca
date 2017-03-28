@@ -466,7 +466,7 @@
     }
 - (IBAction)SpeakerCheckBoxChanged:(id)sender {
     NSUInteger maskVal = [self GetBitInfoFromCheckBoxes:SpeakerMaskSelect_1 FromBit:0 ToBit:16];
-    maskVal |= [self GetBitInfoFromCheckBoxes:SpeakerMaskSelect_2 FromBit:16 ToBit:32];
+    maskVal |= [self GetBitInfoFromCheckBoxes:SpeakerMaskSelect_2 FromBit:16 ToBit:32]<<16;
     [SpeakerMaskField setStringValue:[NSString stringWithFormat:@"%@",@(maskVal)]];
 }
 - (IBAction)SpeakerFieldChanged:(id)sender {
@@ -476,7 +476,7 @@
 }
 - (IBAction)CounterCheckBoxChanged:(id)sender {
     NSUInteger maskVal = [self GetBitInfoFromCheckBoxes:CounterMaskSelect_1 FromBit:0 ToBit:16];
-    maskVal |= [self GetBitInfoFromCheckBoxes:CounterMaskSelect_2 FromBit:16 ToBit:32];
+    maskVal |= [self GetBitInfoFromCheckBoxes:CounterMaskSelect_2 FromBit:16 ToBit:32]<<16;
     [CounterMaskField setStringValue:[NSString stringWithFormat:@"%@",@(maskVal)]];
 }
 - (IBAction)CounterFieldChanged:(id)sender {
@@ -509,7 +509,7 @@
     [maskSelect_1 selectAll:nil];
     [maskSelect_2 selectAll:nil];
     maskVal = [self GetBitInfoFromCheckBoxes:maskSelect_1 FromBit:0 ToBit:16];
-    maskVal |= [self GetBitInfoFromCheckBoxes:maskSelect_2 FromBit:16 ToBit:32];
+    maskVal |= [self GetBitInfoFromCheckBoxes:maskSelect_2 FromBit:16 ToBit:32]<<16;
     [maskField setStringValue:[NSString stringWithFormat:@"%@",@(maskVal)]];
 
 }
