@@ -54,6 +54,8 @@
 
 #pragma mark *Accessors
 - (ORGroupView *)groupView;
+- (NSTabView*) tabView;
+- (void) selectPortAtIndex:(int)index;
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
