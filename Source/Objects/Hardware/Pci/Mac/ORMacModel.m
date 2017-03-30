@@ -196,9 +196,9 @@ void registryChanged(
 {
     NSString* s;
     @synchronized (self) {
-        s = [allOutput copy];
+        s = [allOutput stringByReplacingOccurrencesOfString:@"\n" withString:@""];
     }
-    return [s autorelease];
+    return s;
 }
 
 - (void) clearAllOutput
