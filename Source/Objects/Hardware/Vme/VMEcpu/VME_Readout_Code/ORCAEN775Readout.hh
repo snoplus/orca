@@ -9,6 +9,7 @@ class ORCAEN775Readout : public ORCAENReadout
     ORCAEN775Readout(SBC_card_info* ci) : ORCAENReadout(ci) {}
     virtual ~ORCAEN775Readout() {}
     virtual bool Readout(SBC_LAM_Data*);
+    virtual void FlushDataBuffer();
 };
 
 #endif /* _ORCAENReadout_hh_*/
