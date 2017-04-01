@@ -43,7 +43,7 @@
 - (NSString*) allOutput;
 - (void) clearAllOutput;
 - (BOOL) allOutputHasSubstring:(NSString*)s;
-- (void) turnOnAllOutputBuffer;
+- (void) turnOnAllOutputBuffer:(BOOL)state;
 
 - (NSString*) commandByAppendingEOL:(NSString*) aCmd;
 - (int) eolType;
