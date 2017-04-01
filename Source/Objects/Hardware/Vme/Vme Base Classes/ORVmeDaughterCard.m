@@ -20,7 +20,7 @@
 
 
 #import "ORVmeDaughterCard.h"
-#import "ORVMECarrierCard.h"
+#import "ORVmeCarrierCard.h"
 
 @implementation ORVmeDaughterCard
 

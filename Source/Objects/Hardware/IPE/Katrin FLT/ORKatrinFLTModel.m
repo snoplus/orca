@@ -19,7 +19,7 @@
 //-------------------------------------------------------------
 
 
-#import "ORKatrinFltDefs.h"
+#import "ORKatrinFLTDefs.h"
 #import "ORKatrinFLTModel.h"
 #import "ORKatrinSLTModel.h"
 #import "ORIpeSLTModel.h"
