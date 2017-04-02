@@ -27,10 +27,12 @@
 
 @synthesize drawSlotNumbers,drawSlots;
 
-- (void) awakeFromNib
-{
-	[[self window] makeFirstResponder:self];
-}
+
+//flagged as a crasher by XCode 8. Removed MAH 4/1/17
+//- (void) awakeFromNib
+//{
+//	[[self window] makeFirstResponder:self];
+//}
 
 - (BOOL) validateLayoutItems:(NSMenuItem*)menuItem
 {
