@@ -1717,6 +1717,46 @@ void SwapLongBlock(void* p, int32_t n)
 
 #pragma mark •••Hardware Access
 
+- (void) nominalSettingsCallback: (ORPQResult) *result
+{
+    int i, nrows, ncols, slot, channel;
+    bool n100, n20, sequencer;
+
+    if (!result) {
+        NSLog(@"crate %02d: database request for nominal settings failed!\n", [self crateNumber]);
+        return;
+    }
+
+    nrows = [result numOfRows];
+    ncols = [result numOfCols];
+
+    if (ncols != 4) {
+        NSLog(@"crate %02d: expected 4 columns from the database, but got %i!\n", ncols);
+        return;
+    }
+
+    if (nrows != 512) {
+        NSLog(@"crate %02d: expected 512 rows from the database, but got %i!\n", nrows);
+        return;
+    }
+
+    for (i = 0; i < nrows; i++) {
+        slot = [result getInt64atRow:
+
+- (void) loadNominalSettings
+{
+    /* Set the channel triggers and sequencers according to the nominal
+     * settings from the database. */
+    ORPQModel *db = [ORPQModel getCurrent];
+
+    if (!db) {
+        NSLog(@"Postgres object not found, please add it to the experiment!\n");
+        return;
+    }
+
+    [db dbQuery:[NSString stringWithFormat:@"SELECT slot, channel, n100, n20, sequencer FROM current_nominal_settings WHERE crate = %i", [self crateNumber]] object:self selector:@selector(nominalSettingsCallback) timeout:10.0];
+}
+
 - (void) loadTriggers
 {
     /* Loads the current GUI channel trigger settings to the hardware. This
