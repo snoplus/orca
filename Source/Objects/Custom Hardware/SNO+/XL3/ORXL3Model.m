@@ -1732,12 +1732,12 @@ void SwapLongBlock(void* p, int32_t n)
     ncols = [result numOfFields];
 
     if (ncols != 5) {
-        NSLog(@"crate %02d: expected 5 columns from the database, but got %i!\n", ncols);
+        NSLog(@"crate %02d: expected 5 columns from the database, but got %i!\n", [self crateNumber], ncols);
         return;
     }
 
     if (nrows != 512) {
-        NSLog(@"crate %02d: expected 512 rows from the database, but got %i!\n", nrows);
+        NSLog(@"crate %02d: expected 512 rows from the database, but got %i!\n", [self crateNumber], nrows);
         return;
     }
 
@@ -1758,6 +1758,10 @@ void SwapLongBlock(void* p, int32_t n)
 
     /* Set the hardware state. */
     [NSThread detachNewThreadSelector:@selector(loadTriggers)
+        toTarget:self
+        withObject:nil];
+
+    [NSThread detachNewThreadSelector:@selector(loadSequencers)
         toTarget:self
         withObject:nil];
 }
