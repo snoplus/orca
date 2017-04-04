@@ -51,7 +51,9 @@
     NSMutableDictionary* _tellieFireParameters;
     NSMutableDictionary* _tellieFibreMapping;
     NSMutableDictionary* _tellieNodeMapping;
+    NSArray* _tellieRunNames;
     BOOL _ellieFireFlag;
+    BOOL _tellieMultiFlag;
 
     //smellie config mappings
     NSMutableDictionary* _smellieLaserHeadToSepiaMapping;
@@ -59,11 +61,16 @@
     NSMutableDictionary* _smellieFibreSwitchToFibreMapping;
     NSNumber* _smellieConfigVersionNo;
     BOOL _smellieSlaveMode;
+
+    // Run threads
+    NSThread* _tellieThread;
+    NSThread* _smellieThread;
 }
 
 @property (nonatomic,retain) NSMutableDictionary* tellieFireParameters;
 @property (nonatomic,retain) NSMutableDictionary* tellieFibreMapping;
 @property (nonatomic,retain) NSMutableDictionary* tellieNodeMapping;
+@property (nonatomic,retain) NSArray* tellieRunNames;
 @property (nonatomic,retain) NSMutableDictionary* tellieSubRunSettings;
 @property (nonatomic,retain) NSMutableDictionary* smellieRunSettings;
 @property (nonatomic,retain) NSMutableDictionary* currentOrcaSettingsForSmellie;
@@ -75,6 +82,7 @@
 @property (nonatomic,retain) NSMutableDictionary* tellieRunDoc;
 @property (nonatomic,retain) NSMutableDictionary* smellieRunDoc;
 @property (nonatomic,assign) BOOL ellieFireFlag;
+@property (nonatomic,assign) BOOL tellieMultiFlag;
 @property (nonatomic,retain) NSTask* exampleTask;
 @property (nonatomic,retain) NSMutableDictionary* smellieRunHeaderDocList;
 @property (nonatomic,retain) NSMutableArray* smellieSubRunInfo;
@@ -89,6 +97,9 @@
 @property (nonatomic,retain) XmlrpcClient* tellieClient;
 @property (nonatomic,retain) XmlrpcClient* smellieClient;
 @property (nonatomic,retain) XmlrpcClient* interlockClient;
+@property (nonatomic,retain) NSThread* tellieThread;
+@property (nonatomic,retain) NSThread* smellieThread;
+
 
 -(id) init;
 -(id) initWithCoder:(NSCoder*)deoder;
@@ -119,13 +130,17 @@
 -(NSString*) calcTellieFibreForNode:(NSUInteger)node;
 -(NSNumber*)calcPhotonsForIPW:(NSUInteger)ipw forChannel:(NSUInteger)channel inSlave:(BOOL)inSlave;
 -(NSString*)selectPriorityFibre:(NSArray*)fibres forNode:(NSUInteger)node;
--(void) startTellieRun:(NSMutableDictionary*)fireCommands;
+-(void) startTellieRunThread:(NSDictionary*)fireCommands;
+-(void)startTellieMultiRunThread:(NSArray*)fireCommandArray;
+-(void) startTellieMultiRun:(NSArray*)fireCommandArray;
+-(void) startTellieRun:(NSDictionary*)fireCommands;
 -(void) stopTellieRun;
 
 // TELLIE database interactions
 -(void) pushInitialTellieRunDocument;
 -(void) updateTellieRunDocument:(NSDictionary*)subRunDoc;
 -(void) loadTELLIEStaticsFromDB;
+-(void) loadTELLIERunPlansFromDB;
 -(void)parseTellieFirePars:(id)aResult;
 -(void)parseTellieFibreMap:(id)aResult;
 -(void)parseTellieNodeMap:(id)aResult;
@@ -153,8 +168,10 @@
 -(void) activateKeepAlive:(NSNumber *)runNumber;
 -(void) killKeepAlive;
 -(void) pulseKeepAlive:(id)passed;
+-(void) startSmellieRunThread:(NSDictionary*)smellieSettings;
 -(void) startSmellieRun:(NSDictionary*)smellieSettings;
 -(void) stopSmellieRun;
+-(NSNumber*)estimateSmellieRunTime:(NSDictionary*)smellieSettings;
 
 // SMELLIE database interactions
 -(void) pushInitialSmellieRunDocument;

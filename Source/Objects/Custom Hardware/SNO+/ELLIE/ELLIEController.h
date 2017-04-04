@@ -67,6 +67,19 @@
     IBOutlet NSButton *tellieExpertStopButton;
     IBOutlet NSButton *tellieExpertValidateSettingsButton;
    
+    ////////////////////
+    //Custom sequence
+    IBOutlet NSMatrix *tellieBuildNodeSelection;
+    IBOutlet NSTextField *tellieBuildPhotons;
+    IBOutlet NSTextField *tellieBuildTrigDelay;
+
+    IBOutlet NSTextField *tellieBuildNoPulses;
+    IBOutlet NSTextField *tellieBuildRate;
+    IBOutlet NSTextField *tellieBuildRunName;
+    IBOutlet NSPopUpButton *tellieBuildOpMode;
+    IBOutlet NSButton *tellieBuildValidate;
+    IBOutlet NSButton *tellieBuildPushToDB;
+
     //Server interface ------------------------------------------
 
     IBOutlet NSTextField *tellieHostTf;
@@ -131,6 +144,7 @@
 -(NSString*)validateGeneralTellieTriggerDelay:(NSString *)currentText;
 -(NSString*)validateGeneralTellieNoPulses:(NSString *)currentText;
 -(NSString*)validateGeneralTelliePulseFreq:(NSString *)currentText;
+
 //Expert gui
 -(NSString*)validateTellieChannel:(NSString *)currentText;
 -(NSString*)validateTelliePulseWidth:(NSString *)currentText;
@@ -142,6 +156,11 @@
 
 -(void)tellieRunFinished:(NSNotification *)aNote;
 -(void)initialiseTellie;
+
+//Build Custom sequence
+-(IBAction)tellieBuildValidateAction:(id)sender;
+-(IBAction)tellieBuildPushToDBAction:(id)sender;
+
 
 //Server tab functions -----------------------------
 - (IBAction)telliePing:(id)sender;

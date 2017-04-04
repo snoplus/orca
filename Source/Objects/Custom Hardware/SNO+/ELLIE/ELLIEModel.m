@@ -46,6 +46,7 @@
 #define kTellieParsRetrieved @"kTellieParsRetrieved"
 #define kTellieMapRetrieved @"kTellieMapRetrieved"
 #define kTellieNodeRetrieved @"kTellieNodeRetrieved"
+#define kTellieRunPlansRetrieved @"kTellieRunPlansRetrieved"
 
 #define kAmellieRunDocumentAdded   @"kAmellieRunDocumentAdded"
 #define kAmellieRunDocumentUpdated   @"kAmellieRunDocumentUpdated"
@@ -82,6 +83,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
 @synthesize tellieFireParameters = _tellieFireParameters;
 @synthesize tellieFibreMapping = _tellieFibreMapping;
 @synthesize tellieNodeMapping = _tellieNodeMapping;
+@synthesize tellieRunNames = _tellieRunNames;
 @synthesize tellieRunDoc = _tellieRunDoc;
 @synthesize tellieSubRunSettings = _tellieSubRunSettings;
 
@@ -108,10 +110,13 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
 @synthesize interlockClient = _interlockClient;
 
 @synthesize ellieFireFlag = _ellieFireFlag;
+@synthesize tellieMultiFlag = _tellieMultiFlag;
 @synthesize exampleTask = _exampleTask;
 @synthesize pulseByPulseDelay = _pulseByPulseDelay;
 @synthesize currentOrcaSettingsForSmellie = _currentOrcaSettingsForSmellie;
 
+@synthesize tellieThread = _tellieThread;
+@synthesize smellieThread = _smellieThread;
 
 /*********************************************************/
 /*                  Class control methods                */
@@ -570,7 +575,73 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     return returnFibre;
 }
 
--(void) startTellieRun:(NSMutableDictionary*)fireCommands
+-(void)startTellieRunThread:(NSDictionary*)fireCommands
+{
+    /*
+     Launch a thread to host the tellie run functionality.
+    */
+
+    //////////////////////
+    // Start tellie thread
+    [self setTellieThread:[[NSThread alloc] initWithTarget:self selector:@selector(startTellieRun:) object:fireCommands]];
+    [[self tellieThread] start];
+}
+
+-(void)startTellieMultiRunThread:(NSArray*)fireCommandArray
+{
+    /*
+     Launch a thread to host the tellie multi run functionality.
+     */
+
+    //////////////////////
+    // Start tellie thread
+    [self setTellieThread:[[NSThread alloc] initWithTarget:self selector:@selector(startTellieMultiRun:) object:fireCommandArray]];
+    [[self tellieThread] start];
+}
+
+-(void) startTellieMultiRun:(NSArray*)fireCommandArray
+{
+    /*
+     Fire light down one or more fibres using fireCommands given in the passed array.
+     Calls startTellieRun on each element in the array.
+
+     Arguments:
+     NSMutableDictionary fireCommandArray :     An a array of dictionaries containing
+                                                hardware settings to be passed to the
+                                                tellie hardware.
+     */
+    //////////////////////////////
+    // Set a flag so startTellieRun
+    // knows not to finish the run
+    // on completion.
+    [self setTellieMultiFlag:YES];
+
+    //////////////////////////////
+    // Loop over all objects in
+    // passed array
+    for(NSDictionary* fireCommands in fireCommandArray){
+        if([[NSThread currentThread] isCancelled]){
+            goto err;
+        }
+        [self startTellieRun:fireCommands];
+    }
+
+err:
+{
+    ////////////////////////////
+    // Reset flag and tidy
+    [self setTellieMultiFlag:NO];
+
+    ////////////
+    // Finish and tidy up
+    [[NSThread currentThread] cancel];
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunFinished object:self];
+    });
+}
+}
+
+-(void) startTellieRun:(NSDictionary*)fireCommands
 {
     /*
      Fire a tellie using hardware settings passed as dictionary. This function
@@ -643,7 +714,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
         [pool release];
         return;
     }
-    
+
     //////////////
     // Get run mode boolean
     BOOL isSlave = YES;
@@ -909,19 +980,23 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     [pool release];
     [self setEllieFireFlag:NO];
 
-    ////////////
-    // Finish and tidy up
     NSLog(@"[TELLIE]: TELLIE fire sequence completed\n");
-    
-    [[NSThread currentThread] cancel];
-    dispatch_sync(dispatch_get_main_queue(), ^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunFinished object:self];
-    });
+    if(![self tellieMultiFlag]){
+        ////////////
+        // Finish and tidy up
+        [[NSThread currentThread] cancel];
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunFinished object:self];
+        });
+
+    }
     return;
+
 err:
     {
         [pool release];
         [self setEllieFireFlag:NO];
+        [self setTellieMultiFlag:NO];
         
         //Resetting the mtcd to settings before the smellie run
         NSLog(@"[TELLIE]: Killing requested flash sequence\n");
@@ -948,6 +1023,7 @@ err:
     //////////////////////
     // Set fire flag to no. If a run sequence is currently underway, this will stop
     [self setEllieFireFlag:NO];
+    [self setTellieMultiFlag:NO];
     
     /////////////
     // This may run in a thread so add release pool
@@ -1087,10 +1163,18 @@ err:
     NSString* mapString = [NSString stringWithFormat:@"_design/tellieQuery/_view/fetchCurrentMapping?key=2147483647"];
     NSString* nodeString = [NSString stringWithFormat:@"_design/mapping/_view/node_to_fibre?descending=True&limit=1"];
 
-    //
+    // Make requests
     [[self couchDBRef:self withDB:@"telliedb"] getDocumentId:parsString tag:kTellieParsRetrieved];
     [[self couchDBRef:self withDB:@"telliedb"] getDocumentId:mapString tag:kTellieMapRetrieved];
     [[self couchDBRef:self withDB:@"telliedb"] getDocumentId:nodeString tag:kTellieNodeRetrieved];
+    [self loadTELLIERunPlansFromDB];
+}
+
+-(void) loadTELLIERunPlansFromDB
+{
+    [self setTellieRunNames:nil];
+    NSString* runPlansString = [NSString stringWithFormat:@"_design/runs/_view/run_plans"];
+    [[self couchDBRef:self withDB:@"telliedb"] getDocumentId:runPlansString tag:kTellieRunPlansRetrieved];
 }
 
 -(void)parseTellieFirePars:(id)aResult
@@ -1112,6 +1196,17 @@ err:
     NSMutableDictionary* nodeDoc =[[[aResult objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"];
     NSLog(@"[TELLIE_DATABASE]: node mapping document sucessfully loaded\n");
     [self setTellieNodeMapping:nodeDoc];
+}
+
+-(void)parseTellieRunPlans:(id)aResult
+{
+    NSArray* rows = [aResult objectForKey:@"rows"];
+    NSMutableArray* names = [NSMutableArray arrayWithCapacity:[rows count]];
+    for(NSDictionary* row in rows){
+        [names addObject:[[row objectForKey:@"value"] objectForKey:@"name"]];
+    }
+    NSLog(@"[TELLIE_DATABASE]: run plan lables sucessfully loaded\n");
+    [self setTellieRunNames:names];
 }
 
 /*********************************************************/
@@ -1242,6 +1337,74 @@ err:
     [self performSelectorOnMainThread:@selector(startSmellieRun:) withObject:smellieSettings waitUntilDone:NO];
 }
 
+-(NSNumber*)estimateSmellieRunTime:(NSDictionary *)smellieSettings
+{
+    /*
+        Use a dictionary of run settings to estimate the execution time of a smellie sequence
+    */
+
+    ////////////////////////////
+    // Globals
+    float triggerFrequency = [[smellieSettings objectForKey:@"trigger_frequency"] floatValue];
+    float numberTriggersPerLoop = [[smellieSettings objectForKey:@"triggers_per_loop"] floatValue];
+
+    ////////////////////////////
+    // Fixed wavelength pars and time calc
+
+    // Get laser / fibre arrays
+    NSArray* smellieLaserArray = [self getSmellieRunLaserArray:smellieSettings];
+    NSArray* smellieFibreArray = [self getSmellieRunFibreArray:smellieSettings];
+
+    int numberIntensityLoops = 0;
+    for(NSString* laser in smellieLaserArray){
+        NSString* intensityString = [NSString stringWithFormat:@"%@_intensity_no_steps", laser];
+        numberIntensityLoops = numberIntensityLoops + [[smellieSettings objectForKey:intensityString] intValue];
+    }
+
+    int numberGainLoops = 0;
+    for(NSString* laser in smellieLaserArray){
+        NSString* gainString = [NSString stringWithFormat:@"%@_gain_no_steps", laser];
+        numberGainLoops = numberGainLoops + [[smellieSettings objectForKey:gainString] intValue];
+    }
+
+    int numberFixedLasers = 0;
+    for(NSString* laser in smellieLaserArray){
+        if([laser isEqualToString:@"superK"]){
+            continue;
+        }
+        NSString* laserString = [NSString stringWithFormat:@"%@_laser_on", laser];
+        numberFixedLasers = numberFixedLasers + [[smellieSettings objectForKey:laserString] intValue];
+    }
+
+    // Fixed wavelength laser time
+    int fibreCounter = [smellieFibreArray count];
+    float fixedTimeScale = (numberFixedLasers * fibreCounter * numberIntensityLoops * numberGainLoops);
+
+    ///////////////////
+    // superK time
+    float superKTimeScale = (1 * fibreCounter * [[smellieSettings objectForKey:@"superK_wavelength_no_steps"] intValue] *
+                             [[smellieSettings objectForKey:@"superK_intensity_no_steps"] intValue] *
+                             [[smellieSettings objectForKey:@"superK_gain_no_steps"] intValue]);
+
+    //////////////////////
+    // Define some parameters for overheads calculation
+    float changeIntensity = 0.5;
+    float changeFibre = 0.1;
+    float changeFixedLaser = 45;
+    float changeSKWavelength = 1;
+    float changeGain = 0.5;
+
+    float laserOverhead = numberFixedLasers*changeFixedLaser;
+    float fibreOverhead = fibreCounter*changeFibre;
+    float wavelengthOverhead = [[smellieSettings objectForKey:@"superK_gain_no_steps"] intValue]*changeSKWavelength;
+    float intensityOverhead = numberIntensityLoops*changeIntensity;
+    float gainOverhead = numberGainLoops*changeGain;
+    float totalOverhead = laserOverhead + fibreOverhead + wavelengthOverhead + intensityOverhead + gainOverhead;
+
+    float totalTime = (((superKTimeScale + fixedTimeScale)*numberTriggersPerLoop) + totalOverhead)/ (triggerFrequency*60);
+    return [NSNumber numberWithFloat:totalTime];
+}
+
 -(NSArray*)getSmellieRunLaserArray:(NSDictionary*)smellieSettings
 {
     //Extract the lasers to be fired into an array
@@ -1357,6 +1520,18 @@ err:
     }
     
     return gains;
+}
+
+-(void) startSmellieRunThread:(NSDictionary*)smellieSettings;
+{
+    /*
+     Launch a thread to host the smellie run functionality.
+    */
+
+    //////////////////////
+    // Start tellie thread
+    [self setSmellieThread:[[NSThread alloc] initWithTarget:self selector:@selector(startSmellieRun:) object:smellieSettings]];
+    [[self smellieThread] start];
 }
 
 -(void)startSmellieRun:(NSDictionary*)smellieSettings
@@ -2022,7 +2197,10 @@ err:
                 [self parseTellieFibreMap:aResult];
             } else if ([aTag isEqualToString:kTellieNodeRetrieved]){
                 [self parseTellieNodeMap:aResult];
+            } else if ([aTag isEqualToString:kTellieRunPlansRetrieved]){
+                [self parseTellieRunPlans:aResult];
             }
+
             //If no tag is found for the query result
             else {
                 NSLog(@"No Tag assigned to that query/couchDB View \n");

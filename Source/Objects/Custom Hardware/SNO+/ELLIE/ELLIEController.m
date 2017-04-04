@@ -14,6 +14,7 @@
 #import "SNOPModel.h"
 #import "SNOP_Run_Constants.h"
 #import "ORRunModel.h"
+#import "ORCouchDB.h"
 
 NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 
@@ -178,6 +179,21 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     [tellieExpertNodeTf setDelegate:self];
     [telliePhotonsTf setDelegate:self];
     [tellieTriggerDelayTf setStringValue:@"700"];
+
+    // Build custom run tab
+    [tellieBuildPushToDB setEnabled:NO];
+    [tellieBuildOpMode removeAllItems];
+    [tellieBuildOpMode addItemsWithTitles:@[@"Slave", @"Master"]];
+    [tellieBuildTrigDelay setStringValue:@"700"];
+    for(int i=0; i<100; i++){
+        if(i<92){
+            [[tellieBuildNodeSelection cellWithTag:i] setEnabled:YES];
+            [[tellieBuildNodeSelection cellWithTag:i] setState:1];
+        } else {
+            [[tellieBuildNodeSelection cellWithTag:i] setEnabled:NO];
+            [[tellieBuildNodeSelection cellWithTag:i] setState:0];
+        }
+    }
 }
 
 -(IBAction)tellieGeneralFireAction:(id)sender
@@ -244,7 +260,6 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     NSWindowController* tmpWc = [[NSWindowController alloc] initWithWindowNibName:@"NodeMap"];
     
     if([self nodeMapWC] != nil){
-        //[[self nodeMapWC] release];
         [self setNodeMapWC:nil];
         [self setNodeMapWC:tmpWc];
         [[self nodeMapWC] showWindow:self];
@@ -303,13 +318,6 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     
     //Check if inputs are valid
     NSString* msg = nil;
-    /*
-    msg = [self validateExpertTellieNode:[tellieExpertNodeTf stringValue]];
-    if ([msg isNotEqualTo:nil]){
-        [tellieExpertValidationStatusTf setStringValue:msg];
-        return;
-    }
-    */
     msg = [self validateGeneralTelliePhotons:[telliePhotonsTf stringValue]];
     if ([msg isNotEqualTo:nil]){
         [tellieExpertValidationStatusTf setStringValue:msg];
@@ -368,6 +376,55 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     [tellieTriggerDelayTf setBackgroundColor:[NSColor whiteColor]];
     [tellieNoPulsesTf setBackgroundColor:[NSColor whiteColor]];
 }
+
+- (IBAction)tellieBuildPushToDBAction:(id)sender {
+    /*
+     Format a dictionary into a TELLIE_RUN_PLAN document. All database
+     interactions are then handled from within the models
+     */
+
+    // Make a dictionary to act as the document
+    NSMutableDictionary* document = [[NSMutableDictionary alloc] init];
+
+    // Loop over cells in matrix and find which were selected.
+    NSMutableArray* nodes = [NSMutableArray arrayWithCapacity:92];
+    for(int i=0; i<92; i++){
+        if([[tellieBuildNodeSelection cellWithTag:i] intValue] > 0){
+            [nodes addObject:[NSNumber numberWithInt:([[NSNumber numberWithInt:i] intValue] + 1)]];
+        }
+    }
+
+    // Get other parameters
+    NSNumber* photons = [NSNumber numberWithInteger:[tellieBuildPhotons integerValue]];
+    NSNumber* noPulses = [NSNumber numberWithInteger:[tellieBuildNoPulses integerValue]];
+    NSNumber* triggerDelay = [NSNumber numberWithFloat:[tellieTriggerDelayTf floatValue]];
+    NSNumber* pulseRate = [NSNumber numberWithInteger:[tellieBuildRate integerValue]];
+    NSString* name = [tellieBuildRunName stringValue];
+    BOOL slave = YES;
+    if([[tellieBuildOpMode titleOfSelectedItem] isEqualToString:@"Master"]){
+        slave = NO;
+    }
+
+    [document setObject:@"TELLIE_RUN_PLAN" forKey:@"type"];
+    [document setObject:@"" forKey:@"index"];
+    [document setObject:@"" forKey:@"comment"];
+    [document setObject:[model stringDateFromDate:nil] forKey:@"timestamp"];
+    [document setObject:[NSNumber numberWithInt:0] forKey:@"version"];
+    [document setObject:[NSNumber numberWithInt:0] forKey:@"pass"];
+    [document setObject:photons forKey:@"photons_per_pulse"];
+    [document setObject:noPulses forKey:@"trigger_per_node"];
+    [document setObject:triggerDelay forKey:@"trigger_delay"];
+    [document setObject:pulseRate forKey:@"trigger_rate"];
+    [document setObject:nodes forKey:@"nodes"];
+    [document setObject:[NSNumber numberWithBool:slave] forKey:@"slave_mode"];
+    [document setObject:name forKey:@"name"];
+
+    [[model couchDBRef:model withDB:@"telliedb"] addDocument:document tag:@"kTellieRunPlanAdded"];
+
+    [tellieBuildPushToDB setEnabled:NO];
+    [document release];
+}
+
 ////////////////////////////////////////////////////////
 //
 // TELLIE Validation button functions
@@ -394,8 +451,7 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
         NSLogColor([NSColor redColor], @"[TELLIE]: Cannot connect to couchdb database\n");
         return;
     }
-    
-    
+
     NSString* msg = nil;
     NSMutableArray* msgs = [NSMutableArray arrayWithCapacity:7];
     NSLog(@"---------------------------- Tellie Validation messages ----------------------------\n");
@@ -582,7 +638,110 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     NSLog(@"---------------------------------------------------------------------------------------------\n");
 }
 
-///////////////////////////////////////////
+-(void) tellieBuildValidateAction:(id)sender
+{
+    [model loadTELLIERunPlansFromDB];
+    [tellieBuildNoPulses.window makeFirstResponder:nil];
+    [tellieBuildPhotons.window makeFirstResponder:nil];
+    [tellieBuildRate.window makeFirstResponder:nil];
+    [tellieBuildTrigDelay.window makeFirstResponder:nil];
+
+    //Check if fibre mapping has been loaded from the tellieDB
+    if(![model tellieNodeMapping]){
+        [model loadTELLIEStaticsFromDB];
+    }
+    //If still can't get reference, return
+    if(![model tellieNodeMapping]){
+        NSLogColor([NSColor redColor], @"[TELLIE]: Cannot connect to couchdb database\n");
+        return;
+    }
+    [NSThread sleepForTimeInterval:1.0f];
+
+    NSString* msg = nil;
+    NSMutableArray* msgs = [NSMutableArray arrayWithCapacity:6];
+
+    ///////////////
+    // Run checks
+    NSLog(@"---------------------------- Tellie Validation messages ----------------------------\n");
+
+    msg = [self validateGeneralTellieNoPulses:[tellieBuildNoPulses stringValue]];
+    if(msg){
+        [msgs insertObject:msg atIndex:0];
+    } else {
+        [msgs insertObject:[NSNull null] atIndex:0];
+    }
+
+    msg = [self validateGeneralTelliePhotons:[tellieBuildPhotons stringValue]];
+    if(msg){
+        [msgs insertObject:msg atIndex:1];
+    } else {
+        [msgs insertObject:[NSNull null] atIndex:1];
+    }
+
+    msg = [self validateGeneralTelliePulseFreq:[tellieBuildRate stringValue]];
+    if(msg){
+        [msgs insertObject:msg atIndex:2];
+    } else {
+        [msgs insertObject:[NSNull null] atIndex:2];
+    }
+
+    msg = [self validateGeneralTellieTriggerDelay:[tellieBuildTrigDelay stringValue]];
+    if(msg){
+        [msgs insertObject:msg atIndex:3];
+    } else {
+        [msgs insertObject:[NSNull null] atIndex:3];
+    }
+
+    // Calculate settings and check any issues in
+    BOOL inSlave = YES;
+    if([[tellieBuildOpMode titleOfSelectedItem] isEqualToString:@"Master"]){
+        inSlave = NO;
+    }
+
+    BOOL safety_check = [model photonIntensityCheck:[tellieBuildPhotons integerValue] atFrequency:[tellieBuildRate integerValue]];
+    if(safety_check == NO){
+        msg = @"Requested photon output is not detector safe at requested frequncy\n";
+        NSLog(@"%@",msg);
+        [msgs insertObject:msg atIndex:4];
+    } else {
+        [msgs insertObject:[NSNull null] atIndex:4];
+    }
+
+    ///////////////////////////////////
+    // Check file name against database
+    msg = nil;
+    for(NSString* name in [model tellieRunNames]){
+        if([name isEqualToString:[tellieBuildRunName stringValue]]){
+            msg = @"[TELLIE]: Run plan name already exists on database\n";
+            NSLog(msg);
+        }
+    }
+    if(msg){
+        [msgs insertObject:msg atIndex:5];
+    } else {
+        [msgs insertObject:[NSNull null] atIndex:5];
+    }
+
+    //////////////////////////
+    // Remove any null objects
+    for(int i = 0; i < [msgs count]; i++){
+        if([msgs objectAtIndex:i] == [NSNull null]){
+            [msgs removeObject:[msgs objectAtIndex:i]];
+        }
+    }
+
+    // Check validations passed
+    if([msgs count] == 0){
+        NSLog(@"[TELLIE]: Build custom sequence - settings are valid\n");
+        [tellieBuildPushToDB setEnabled:YES];
+    } else {
+        [tellieBuildPushToDB setEnabled:NO];
+        NSLog(@"[TELLIE]: Build custom sequence - settings invalid please resolve issues.\n");
+    }
+    NSLog(@"---------------------------------------------------------------------------------------------\n");
+}
+
+////////////////////////////////////////////
 // Delagate funcs waiting to observe edits
 ////////////////////////////////////////////
 -(void)controlTextDidBeginEditing:(NSNotification *)note {
@@ -609,6 +768,7 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     [tellieGeneralFireButton setEnabled:NO];
     [tellieExpertValidationStatusTf setStringValue:@""];
 
+    [tellieBuildPushToDB setEnabled:NO];
 }
 
 -(void)controlTextDidEndEditing:(NSNotification *)note {
@@ -624,6 +784,7 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     if(![model tellieNodeMapping]){
         [model loadTELLIEStaticsFromDB];
     }
+
     //If still can't get reference, return
     if(![model tellieNodeMapping]){
         NSLogColor([NSColor redColor], @"[TELLIE]: Cannot connect to couchdb database\n");
@@ -635,12 +796,11 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     
     NSString* expertMsg = nil;
     NSString* generalMsg = nil;
+    NSString* buildMsg = nil;
     BOOL gotInside = NO;
     
     //Make sure background gets drawn
     [editedField setDrawsBackground:YES];
-    //[tellieExpertStopButton setEnabled:NO];
-    //[tellieGeneralStopButton setEnabled:NO];
 
     //check if this notification originated from the expert tab
     if([note object] == tellieExpertNodeTf){
@@ -745,6 +905,38 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     } else if(generalMsg == nil && gotInside == YES){
         [tellieGeneralFireButton setEnabled:NO];
         [tellieGeneralValidationStatusTf setStringValue:@""];
+        [editedField setBackgroundColor:[NSColor whiteColor]];
+        [editedField setNeedsDisplay:YES];
+        return;
+    }
+
+    ///////////////////////////
+    // check if this notification originated from tellie run plan tab
+
+    //Re-set got inside.
+    gotInside = NO;
+
+    if([note object] == tellieBuildPhotons){
+        buildMsg = [self validateGeneralTelliePhotons:currentString];
+        gotInside = YES;
+    } else if ([note object] == tellieBuildNoPulses){
+        buildMsg = [self validateGeneralTellieNoPulses:currentString];
+        gotInside = YES;
+    } else if ([note object] == tellieBuildRate) {
+        buildMsg = [self validateGeneralTelliePulseFreq:currentString];
+        gotInside = YES;
+    } else if ([note object] == tellieBuildTrigDelay){
+        buildMsg = [self validateGeneralTellieTriggerDelay:currentString];
+        gotInside = YES;
+    }
+
+    if(buildMsg){
+        [tellieBuildPushToDB setEnabled:NO];
+        [editedField setBackgroundColor:[NSColor orangeColor]];
+        [editedField setNeedsDisplay:YES];
+        return;
+    } else if(expertMsg == nil && gotInside == YES){
+        [tellieBuildPushToDB setEnabled:NO];
         [editedField setBackgroundColor:[NSColor whiteColor]];
         [editedField setNeedsDisplay:YES];
         return;
