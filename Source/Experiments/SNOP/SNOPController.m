@@ -812,7 +812,7 @@ snopGreenColor;
     NSLogColor([NSColor redColor],@"Detector wide panic down started\n");
 }
 
-- (IBAction)panicDownSingleCrateAction:(id)sender
+- (IBAction)rampDownSingleCrateAction:(id)sender
 {
 
     NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
@@ -822,18 +822,22 @@ snopGreenColor;
     if(crateNumber > 16) crateNumber--;
     
     //Confirm
-    BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Panic Down Crate %i?",crateNumber],@"Is this really what you want?",@"Cancel",@"Yes",nil);
+    BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Ramp Down Crate %i?",crateNumber],@"Is this really what you want?",@"Cancel",@"Yes",nil);
     if (cancel) return;
     for (id xl3 in xl3s) {
 
         if ([xl3 crateNumber] != crateNumber) continue;
         
-        [xl3 hvPanicDown];
+        if ([xl3 isTriggerON]) {
+            [xl3 hvTriggersOFF];
+        }
+        [xl3 setHvANextStepValue:0];
+        [xl3 setHvBNextStepValue:0];
         return;
 
     }
 
-    NSLogColor([NSColor redColor],@"XL3 %i not found. Unable to Panic Down. \n",crateNumber);
+    NSLogColor([NSColor redColor],@"XL3 %i not found. Unable to Ramp Down. \n",crateNumber);
     
 }
 
@@ -1449,7 +1453,8 @@ snopGreenColor;
     BOOL runInProgress				= [gOrcaGlobals runInProgress];
     BOOL locked						= [gSecurity isLocked:ORSNOPRunsLockNotification];
     BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORSNOPRunsLockNotification];
-    
+    BOOL notRunningOrInMaintenance = [model isNotRunningOrInMaintenance];
+
     //[softwareTriggerButton setEnabled: !locked && !runInProgress];
     [runsLockButton setState: locked];
     
@@ -1490,7 +1495,10 @@ snopGreenColor;
     [debugDBName setEnabled:!lockedOrNotRunningMaintenance];
     [debugDBPort setEnabled:!lockedOrNotRunningMaintenance];
     [debugDBClearButton setEnabled:!lockedOrNotRunningMaintenance];    
-    
+    [rampDownCrateButton setEnabled:notRunningOrInMaintenance];
+    [[rampDownCrateButton cellAtRow:17 column:0] setEnabled:false]; //Never enable 16B button
+    [inMaintenanceLabel setHidden:notRunningOrInMaintenance];
+
     //Display status
     if(![gSecurity numberItemsUnlocked]){
         [lockStatusTextField setStringValue:@"OPERATOR MODE"];

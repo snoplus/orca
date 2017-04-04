@@ -69,10 +69,11 @@
     //Run Types Information
     IBOutlet NSMatrix*  runTypeWordMatrix;
     IBOutlet NSMatrix *runTypeWordSRMatrix;
+    IBOutlet NSTextField *inMaintenanceLabel;
 
     //Xl3 Mode
     IBOutlet NSMatrix * globalxl3Mode;
-    IBOutlet NSMatrix *panicDownCrateButton;
+    IBOutlet NSMatrix *rampDownCrateButton;
     
     //smellie buttons ---------
     IBOutlet NSComboBox *smellieRunFileNameField;

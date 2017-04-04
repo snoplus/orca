@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9060" systemVersion="15G1004" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14B25" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
         <development version="5100" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9060"/>
-        <plugIn identifier="com.apple.WebKitIBPlugin" version="9060"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
+        <plugIn identifier="com.apple.WebKitIBPlugin" version="7706"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SNOPController">
@@ -28,6 +28,7 @@
                 <outlet property="elapsedTimeField" destination="3771" id="ZCv-hI-YYv"/>
                 <outlet property="globalxl3Mode" destination="4194" id="4216"/>
                 <outlet property="hvStatusMatrix" destination="2830" id="2912"/>
+                <outlet property="inMaintenanceLabel" destination="ZIv-V5-16l" id="aaL-TT-0jx"/>
                 <outlet property="lightBoardView" destination="URf-Um-n84" id="fpR-9q-LuL"/>
                 <outlet property="loadedSmellieApproxTimeLabel" destination="PeT-34-yHR" id="gQW-5a-gij"/>
                 <outlet property="loadedSmellieFibresLabel" destination="3574" id="3599"/>
@@ -55,8 +56,8 @@
                 <outlet property="orcaDBPswd" destination="2684" id="auq-iH-D45"/>
                 <outlet property="orcaDBUser" destination="2685" id="E4e-CV-d2D"/>
                 <outlet property="panicDownButton" destination="zmA-F4-wTd" id="37F-oN-VJj"/>
-                <outlet property="panicDownCrateButton" destination="vcZ-IJ-Cct" id="5Ap-rK-1u4"/>
                 <outlet property="pingCratesButton" destination="drG-95-YYb" id="Aug-97-auQ"/>
+                <outlet property="rampDownCrateButton" destination="vcZ-IJ-Cct" id="noe-Li-2Q6"/>
                 <outlet property="repeatRunCB" destination="1339" id="1354"/>
                 <outlet property="resyncRunButton" destination="VHx-5C-HlN" id="t2u-ao-6Ph"/>
                 <outlet property="runBar" destination="MBu-zu-x36" id="iTV-aT-8hr"/>
@@ -2717,12 +2718,21 @@
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
+                                        <textField hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="ZIv-V5-16l">
+                                            <rect key="frame" x="565" y="574" width="115" height="14"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Not in Maintenance" id="v4r-4r-nCv">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" red="0.90382339020000002" green="0.0" blue="0.0090847987979999992" alpha="1" colorSpace="calibratedRGB"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
                                         <matrix verticalHuggingPriority="750" mode="track" allowsEmptySelection="NO" autorecalculatesCellSize="YES" id="vcZ-IJ-Cct">
                                             <rect key="frame" x="559" y="169" width="124" height="396"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <animations/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            <size key="cellSize" width="118" height="16"/>
+                                            <size key="cellSize" width="119" height="16"/>
                                             <size key="intercellSpacing" width="5" height="4"/>
                                             <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" controlSize="mini" inset="2" id="giJ-Gh-5bp">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2730,71 +2740,71 @@
                                             </buttonCell>
                                             <cells>
                                                 <column>
-                                                    <buttonCell type="push" title="Panic Down Crate 0" bezelStyle="rounded" alignment="center" controlSize="mini" scrollable="YES" lineBreakMode="clipping" borderStyle="border" inset="2" id="BuV-Vl-Ul5">
+                                                    <buttonCell type="push" title="Ramp Down Crate 0" bezelStyle="rounded" alignment="center" controlSize="mini" scrollable="YES" lineBreakMode="clipping" borderStyle="border" inset="2" id="BuV-Vl-Ul5">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
                                                     </buttonCell>
-                                                    <buttonCell type="push" title="Panic Down Crate 1" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="FzL-Tx-3lR">
+                                                    <buttonCell type="push" title="Ramp Down Crate 1" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="FzL-Tx-3lR">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
                                                     </buttonCell>
-                                                    <buttonCell type="push" title="Panic Down Crate 2" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="Jdd-ss-PrS">
+                                                    <buttonCell type="push" title="Ramp Down Crate 2" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="Jdd-ss-PrS">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
                                                     </buttonCell>
-                                                    <buttonCell type="push" title="Panic Down Crate 3" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="Q0D-CI-08m">
+                                                    <buttonCell type="push" title="Ramp Down Crate 3" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="Q0D-CI-08m">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
                                                     </buttonCell>
-                                                    <buttonCell type="push" title="Panic Down Crate 4" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="ncm-Oe-De0">
+                                                    <buttonCell type="push" title="Ramp Down Crate 4" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="ncm-Oe-De0">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
                                                     </buttonCell>
-                                                    <buttonCell type="push" title="Panic Down Crate 5" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="n73-bg-5p6">
+                                                    <buttonCell type="push" title="Ramp Down Crate 5" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="n73-bg-5p6">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
                                                     </buttonCell>
-                                                    <buttonCell type="push" title="Panic Down Crate 6" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="Pp5-gJ-FA2">
+                                                    <buttonCell type="push" title="Ramp Down Crate 6" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="Pp5-gJ-FA2">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
                                                     </buttonCell>
-                                                    <buttonCell type="push" title="Panic Down Crate 7" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="M3C-cT-6ip">
+                                                    <buttonCell type="push" title="Ramp Down Crate 7" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="M3C-cT-6ip">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
                                                     </buttonCell>
-                                                    <buttonCell type="push" title="Panic Down Crate 8" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="bt3-cm-stT">
+                                                    <buttonCell type="push" title="Ramp Down Crate 8" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="bt3-cm-stT">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
                                                     </buttonCell>
-                                                    <buttonCell type="push" title="Panic Down Crate 9" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="VVe-UP-7eh">
+                                                    <buttonCell type="push" title="Ramp Down Crate 9" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="VVe-UP-7eh">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
                                                     </buttonCell>
-                                                    <buttonCell type="push" title="Panic Down Crate 10" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="Lf8-9u-6Ug">
+                                                    <buttonCell type="push" title="Ramp Down Crate 10" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="Lf8-9u-6Ug">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
                                                     </buttonCell>
-                                                    <buttonCell type="push" title="Panic Down Crate 11" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="OEE-ak-xBa">
+                                                    <buttonCell type="push" title="Ramp Down Crate 11" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="OEE-ak-xBa">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
                                                     </buttonCell>
-                                                    <buttonCell type="push" title="Panic Down Crate 12" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="T59-7a-zbo">
+                                                    <buttonCell type="push" title="Ramp Down Crate 12" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="T59-7a-zbo">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
                                                     </buttonCell>
-                                                    <buttonCell type="push" title="Panic Down Crate 13" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="KJY-96-Luw">
+                                                    <buttonCell type="push" title="Ramp Down Crate 13" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="KJY-96-Luw">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
                                                     </buttonCell>
-                                                    <buttonCell type="push" title="Panic Down Crate 14" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="1Gp-qf-Hk6">
+                                                    <buttonCell type="push" title="Ramp Down Crate 14" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="1Gp-qf-Hk6">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
                                                     </buttonCell>
-                                                    <buttonCell type="push" title="Panic Down Crate 15" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="tV6-LU-0Nk">
+                                                    <buttonCell type="push" title="Ramp Down Crate 15" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="tV6-LU-0Nk">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
                                                     </buttonCell>
-                                                    <buttonCell type="push" title="Panic Down Crate 16" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="K1W-nl-SWX">
+                                                    <buttonCell type="push" title="Ramp Down Crate 16" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="K1W-nl-SWX">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
                                                     </buttonCell>
@@ -2802,18 +2812,18 @@
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
                                                     </buttonCell>
-                                                    <buttonCell type="push" title="Panic Down Crate 17" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="JjV-Z3-ide">
+                                                    <buttonCell type="push" title="Ramp Down Crate 17" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="JjV-Z3-ide">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
                                                     </buttonCell>
-                                                    <buttonCell type="push" title="Panic Down Crate 18" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="DUk-dx-oYE">
+                                                    <buttonCell type="push" title="Ramp Down Crate 18" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="DUk-dx-oYE">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="miniSystem"/>
                                                     </buttonCell>
                                                 </column>
                                             </cells>
                                             <connections>
-                                                <action selector="panicDownSingleCrateAction:" target="-2" id="ycp-aZ-Ev8"/>
+                                                <action selector="rampDownSingleCrateAction:" target="-2" id="IqH-vw-fjZ"/>
                                             </connections>
                                         </matrix>
                                     </subviews>
