@@ -407,7 +407,7 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
 {
-	return ![[ORGlobal sharedGlobal] runInProgress];
+	return [[ORGlobal sharedGlobal] canQuitDuringRun] || ![[ORGlobal sharedGlobal] runInProgress];
 }
 
 #pragma mark ¥¥¥Accessors
