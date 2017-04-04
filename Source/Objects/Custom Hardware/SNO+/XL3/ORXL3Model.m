@@ -1757,13 +1757,7 @@ void SwapLongBlock(void* p, int32_t n)
     }
 
     /* Set the hardware state. */
-    [NSThread detachNewThreadSelector:@selector(loadTriggers)
-        toTarget:self
-        withObject:nil];
-
-    [NSThread detachNewThreadSelector:@selector(loadSequencers)
-        toTarget:self
-        withObject:nil];
+    [self loadTriggersAndSequencers];
 }
 
 - (void) loadNominalSettings
@@ -1778,6 +1772,41 @@ void SwapLongBlock(void* p, int32_t n)
     }
 
     [db dbQuery:[NSString stringWithFormat:@"SELECT slot, channel, n100, n20, sequencer FROM current_nominal_settings WHERE crate = %i", [self crateNumber]] object:self selector:@selector(nominalSettingsCallback:) timeout:10.0];
+}
+
+- (void) _loadTriggersAndSequencers
+{
+    /* Function to actually load the current GUI channel trigger and sequencer
+     * settings. This should be called in a separate thread since it will
+     * block. Any exceptions will be caught and logged. */
+    @try {
+        [self loadTriggers];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor], @"crate %02d: failed to set triggers. error: %@ reason: %@\n",
+                   [self crateNumber], [e name], [e reason]);
+    }
+
+    @try {
+        [self loadSequencers];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor], @"crate %02d: failed to set sequencers. error: %@ reason: %@\n",
+                   [self crateNumber], [e name], [e reason]);
+    }
+}
+
+- (void) loadTriggersAndSequencers
+{
+    /* Loads the current GUI channel trigger and sequencer settings to the
+     * hardware asynchronously. */
+    if (![[self xl3Link] isConnected]) {
+        NSLogColor([NSColor redColor], @"xl3 %02d is not connected!\n",
+                    [self crateNumber]);
+        return;
+    }
+
+    [NSThread detachNewThreadSelector:@selector(_loadTriggersAndSequencers)
+        toTarget:self
+        withObject:nil];
 }
 
 - (void) loadTriggers

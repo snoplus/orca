@@ -363,6 +363,8 @@ enum {
 #pragma mark •••Hardware Access
 - (void) nominalSettingsCallback: (ORPQResult *) result;
 - (void) loadNominalSettings;
+- (void) _loadTriggersAndSequencers;
+- (void) loadTriggersAndSequencers;
 - (void) loadTriggers;
 - (void) disableTriggers;
 - (void) loadSequencers;
