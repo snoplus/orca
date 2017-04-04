@@ -29,6 +29,9 @@
     NSString *previousSRVersion;
     bool start_eca_run;
     bool start_new_run;
+    int prev_coarsedelay;
+    int prev_finedelay;
+    uint16_t prev_pedwidth;
 
     //ECA thread
     NSThread *ECAThread;

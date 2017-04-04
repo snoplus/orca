@@ -19,6 +19,11 @@ NSString* ORECARunChangedNotification = @"ORECARunChangedNotification";
 NSString* ORECARunStartedNotification = @"ORECARunStartedNotification";
 NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 
+//Definitions
+#define ECA_COARSE_DELAY 150 //ns
+#define ECA_FINE_DELAY 0 //ps
+#define ECA_PEDESTAL_WIDTH 50 //ns
+
 @implementation ECARun
 
 - (id) init
@@ -190,17 +195,26 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
             goto stop;
         }
 
-        /*Check whether PED EXT bit is enabled. Otherwise the GT will latch the 10MHz
-         clock and cause a 20ns uncertainty in the TAC measurements*/
-        if(!([anMTCModel gtMask] & MTC_EXT_8_MASK)){
-            NSLogColor([NSColor redColor], @" Enable EXT PED bit in the MTC trigger mask. Stopping ECAs... \n");
-            goto stop;
-        }
-
         /* Disable channel triggers and stop if it fails */
         if(![self triggersOFF]){
             goto stop;
         }
+
+        /* Get previous settings */
+        prev_coarsedelay = [anMTCModel coarseDelay];
+        prev_finedelay = [anMTCModel fineDelay];
+        prev_pedwidth = [anMTCModel pedestalWidth];
+
+        /* Set MTC correct settings for ECAs */
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [anMTCModel stopMTCPedestalsFixedRate];
+            [anMTCModel setCoarseDelay:ECA_COARSE_DELAY]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
+            [anMTCModel loadCoarseDelayToHardware]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
+            [anMTCModel setFineDelay:ECA_FINE_DELAY]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
+            [anMTCModel loadFineDelayToHardware]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
+            [anMTCModel setPedestalWidth:ECA_PEDESTAL_WIDTH]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
+            [anMTCModel loadPedWidthToHardware]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
+        });
 
         NSLog(@"************************* \n");
         NSLog(@"Starting ECA Run \n");
@@ -215,6 +229,13 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 
         //Do ECAs
         if([ECA_type isEqualToString:@"PDST"]){
+            /*Check whether PED EXT bit is enabled. Otherwise the GT will latch the 10MHz
+             clock and cause a 20ns uncertainty in the TAC measurements*/
+            if(([anMTCModel gtMask] & MTC_EXT_8_MASK) || !([anMTCModel gtMask] & MTC_PULSE_GT_MASK)){
+                NSLogColor([NSColor redColor], @" Enable PGT and disable EXT PED bit in the MTC trigger mask. Stopping ECAs... \n");
+                goto stop;
+            }
+
             if(![self doPedestals]) {
                 // User stopped manually
                 start_new_run = false;
@@ -222,6 +243,14 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
             }
         }
         else if([ECA_type isEqualToString:@"TSLP"]){
+
+            /*Check whether PED EXT bit is enabled. Otherwise the GT will latch the 10MHz
+             clock and cause a 20ns uncertainty in the TAC measurements*/
+            if(!([anMTCModel gtMask] & MTC_EXT_8_MASK)){
+                NSLogColor([NSColor redColor], @" Enable EXT PED bit in the MTC trigger mask. Stopping ECAs... \n");
+                goto stop;
+            }
+
             if(![self doTSlopes]) {
                 // User stopped manually
                 start_new_run = false;
@@ -240,8 +269,16 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         NSLog(@"Finishing ECA Run \n");
         NSLog(@"************************* \n");
 
-        //Unset pedestal masks
-        [aSNOPModel zeroPedestalMasks];
+        //Unset settings
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [aSNOPModel zeroPedestalMasks];
+            [anMTCModel setCoarseDelay:prev_coarsedelay]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
+            [anMTCModel loadCoarseDelayToHardware]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
+            [anMTCModel setFineDelay:prev_finedelay]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
+            [anMTCModel loadFineDelayToHardware]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
+            [anMTCModel setPedestalWidth:prev_pedwidth]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
+            [anMTCModel loadPedWidthToHardware]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
+        });
 
         //Turn triggers back ON
         if(![self triggersON]){
@@ -310,11 +347,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         //Update Pedestal mask
         [self changePedestalMask:[pedestal_mask objectAtIndex:step]];
 
-        //Inject subrun (we don't do this anymore, but leave it here until
-        //tested at the detector)
-        //[aRunModel prepareForNewSubRun];
         [aSNOPModel updateEPEDStructWithStepNumber:step];
-        //[aRunModel startNewSubRun];
 
         //Ship EPED Headers
         dispatch_sync(dispatch_get_main_queue(), ^{
@@ -332,7 +365,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
             [anMTCModel stopMTCPedestalsFixedRate];
         });
 
-        //Check if user has cancel ECAs and quit in that case
+        //Check if user has cancelled ECAs and quit in that case
         if([ECAThread isCancelled]) {
             NSLog(@"ECA cancelled by user... \n");
             start_eca_run = FALSE;
@@ -350,7 +383,6 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 
 - (BOOL) doTSlopes
 {
-
     NSLog(@"Starting ECA TSlope Run... \n");
 
     unsigned long coarse_delay = [anMTCModel coarseDelay];
@@ -390,11 +422,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 
             for (int ipoint=0; ipoint<tslope_nsteps; ipoint++) {
 
-                //Inject subrun (we don't do this anymore, but leave it here until
-                //tested at the detector)
-                //[aRunModel prepareForNewSubRun];
                 [aSNOPModel updateEPEDStructWithStepNumber:step];
-                //[aRunModel startNewSubRun];
 
                 unsigned long current_coarse_delay = [[tslope_delays_coarse objectAtIndex:ipoint] unsignedLongValue];
                 unsigned long current_fine_delay = [[tslope_delays_fine objectAtIndex:ipoint] unsignedLongValue];
@@ -430,7 +458,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
                     [anMTCModel stopMTCPedestalsFixedRate];
                 });
 
-                //Check if user has cancel ECAs and quit in that case
+                //Check if user has cancelled ECAs and quit in that case
                 if([ECAThread isCancelled]) {
                     NSLog(@"ECA cancelled by user... \n");
                     //Don't leak memory
