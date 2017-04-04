@@ -1720,7 +1720,7 @@ void SwapLongBlock(void* p, int32_t n)
 - (void) nominalSettingsCallback: (ORPQResult *) result
 {
     int i, nrows, ncols, slot, channel;
-    int n100, n20, sequencer;
+    int n100, n20, sequencer, hv;
     ORFec32Model *fec;
 
     if (!result) {
@@ -1751,9 +1751,19 @@ void SwapLongBlock(void* p, int32_t n)
         fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
 
         if (!fec) continue;
+
+        /* Check if the relay is open. */
+        hv = ([self relayMask] >> (slot*4 + (3-channel/8))) & 0x1;
+
         [fec setSeq:channel enabled:sequencer];
-        [fec setTrigger100ns:channel enabled:n100];
-        [fec setTrigger20ns:channel enabled:n20];
+
+        if (hv) {
+            [fec setTrigger100ns:channel enabled:n100];
+            [fec setTrigger20ns:channel enabled:n20];
+        } else {
+            [fec setTrigger100ns:channel enabled:NO];
+            [fec setTrigger20ns:channel enabled:NO];
+        }
     }
 
     /* Set the hardware state. */
