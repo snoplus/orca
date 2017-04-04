@@ -1633,6 +1633,11 @@ static NSDictionary* xl3Ops;
     [model hvTriggersON];
 }
 
+- (IBAction)triggerToNominalAction:(id)sender
+{
+    [model loadNominalSettings];
+}
+
 //connection
 - (void) toggleConnectAction:(id)sender
 {
