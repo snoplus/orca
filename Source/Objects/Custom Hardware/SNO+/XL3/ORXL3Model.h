@@ -22,6 +22,7 @@
 #import "ORSNOCard.h"
 #import "PacketTypes.h"
 #import "SNOPModel.h"
+#import "ORPQResult.h"
 
 typedef struct  {
 	NSString*	regName;
@@ -360,6 +361,8 @@ enum {
 - (void)encodeWithCoder:(NSCoder*)encoder;
 
 #pragma mark •••Hardware Access
+- (void) nominalSettingsCallback: (ORPQResult *) result;
+- (void) loadNominalSettings;
 - (void) loadTriggers;
 - (void) disableTriggers;
 - (void) loadSequencers;

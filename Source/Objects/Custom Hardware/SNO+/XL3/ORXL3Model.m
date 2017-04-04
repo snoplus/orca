@@ -1717,10 +1717,11 @@ void SwapLongBlock(void* p, int32_t n)
 
 #pragma mark •••Hardware Access
 
-- (void) nominalSettingsCallback: (ORPQResult) *result
+- (void) nominalSettingsCallback: (ORPQResult *) result
 {
     int i, nrows, ncols, slot, channel;
-    bool n100, n20, sequencer;
+    int n100, n20, sequencer;
+    ORFec32Model *fec;
 
     if (!result) {
         NSLog(@"crate %02d: database request for nominal settings failed!\n", [self crateNumber]);
@@ -1728,10 +1729,10 @@ void SwapLongBlock(void* p, int32_t n)
     }
 
     nrows = [result numOfRows];
-    ncols = [result numOfCols];
+    ncols = [result numOfFields];
 
-    if (ncols != 4) {
-        NSLog(@"crate %02d: expected 4 columns from the database, but got %i!\n", ncols);
+    if (ncols != 5) {
+        NSLog(@"crate %02d: expected 5 columns from the database, but got %i!\n", ncols);
         return;
     }
 
@@ -1741,7 +1742,25 @@ void SwapLongBlock(void* p, int32_t n)
     }
 
     for (i = 0; i < nrows; i++) {
-        slot = [result getInt64atRow:
+        slot = [result getInt64atRow:i column:0];
+        channel = [result getInt64atRow:i column:1];
+        n100 = [result getInt64atRow:i column:2];
+        n20 = [result getInt64atRow:i column:3];
+        sequencer = [result getInt64atRow:i column:4];
+
+        fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
+
+        if (!fec) continue;
+        [fec setSeq:channel enabled:sequencer];
+        [fec setTrigger100ns:channel enabled:n100];
+        [fec setTrigger20ns:channel enabled:n20];
+    }
+
+    /* Set the hardware state. */
+    [NSThread detachNewThreadSelector:@selector(loadTriggers)
+        toTarget:self
+        withObject:nil];
+}
 
 - (void) loadNominalSettings
 {
@@ -1754,7 +1773,7 @@ void SwapLongBlock(void* p, int32_t n)
         return;
     }
 
-    [db dbQuery:[NSString stringWithFormat:@"SELECT slot, channel, n100, n20, sequencer FROM current_nominal_settings WHERE crate = %i", [self crateNumber]] object:self selector:@selector(nominalSettingsCallback) timeout:10.0];
+    [db dbQuery:[NSString stringWithFormat:@"SELECT slot, channel, n100, n20, sequencer FROM current_nominal_settings WHERE crate = %i", [self crateNumber]] object:self selector:@selector(nominalSettingsCallback:) timeout:10.0];
 }
 
 - (void) loadTriggers
