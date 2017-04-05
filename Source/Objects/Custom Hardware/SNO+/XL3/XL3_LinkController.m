@@ -501,6 +501,29 @@ static NSDictionary* xl3Ops;
 	}
 }); }
 
+-(void) keyDown:(NSEvent*)event {
+    NSString* keys = [event charactersIgnoringModifiers];
+    if([keys length] == 0) {
+        return;
+    }
+    if([keys length] == 1) {
+        unichar key = [keys characterAtIndex:0];
+        if(key == NSLeftArrowFunctionKey || key == 'h' || key == 'H') {
+            [self decXL3Action:self];
+            return;
+        }
+        if(key == NSRightArrowFunctionKey || key == 'l' || key == 'L') {
+            [self incXL3Action:self];
+            return;
+        }
+    }
+    [super keyDown:event];
+}
+
+- (void) cancelOperation:(id)sender {
+    [self endEditing];
+    [[self window] makeFirstResponder:nil];
+}
 
 #pragma mark •basic ops
 - (void) repeatCountChanged:(NSNotification*)aNote

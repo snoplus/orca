@@ -81,6 +81,8 @@
 - (void) tac0trimChanged:(NSNotification*)aNote; 	   
 - (void) tac1trimChanged:(NSNotification*)aNote;
 - (void) boardIdChanged:(NSNotification*)aNote;
+- (void) keyDown:(NSEvent*)event;
+- (void) cancelOperation:(id)sender;
 
 #pragma mark •••Actions
 - (IBAction) lockAction:(id)sender;

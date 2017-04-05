@@ -135,6 +135,25 @@
 	else [crate1Field setStringValue:@""];
 }
 
+- (void) keyDown:(NSEvent*)event {
+    NSString* keys = [event charactersIgnoringModifiers];
+    if([keys length] == 0) {
+        return;
+    }
+    if([keys length] == 1) {
+        unichar key = [[event charactersIgnoringModifiers] characterAtIndex:0];
+        // Arrow keys already taken by GroupView
+        if(key == 'h' || key == 'H') {
+            [self decDialog:self];
+            return;
+        }
+        if(key == 'l' || key == 'L') {
+            [self incDialog:self];
+            return;
+        }
+    }
+}
+
 - (void) setCrateTitle
 {
 	[[self window] setTitle:[NSString stringWithFormat:@"SNO crate %lu",[model uniqueIdNumber]]];

@@ -138,6 +138,7 @@
 - (void) isPedestalEnabledInCSRChanged:(NSNotification*)aNotification;
 - (void) mtcSettingsChanged:(NSNotification*)aNotification;
 - (void) updateThresholdsDisplay:(NSNotification*) aNote;
+- (void) cancelOperation:(id)sender;
 
 - (int) convert_view_threshold_index_to_model_index: (int) view_index;
 - (int) convert_model_threshold_index_to_view_index: (int) model_index;
@@ -191,8 +192,6 @@
 - (IBAction) settingsPedWidthFieldChanged:(id)sender;
 - (IBAction) settingsPrescaleFieldChanged:(id)sender;
 - (IBAction) settingsPedDelayFieldChanged:(id)sender;
-
-
 
 
 //Triggers
