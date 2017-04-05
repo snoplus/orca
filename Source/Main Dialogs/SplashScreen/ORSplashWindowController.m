@@ -86,7 +86,7 @@
 
 @implementation ORSplashWindow
 - (id) initWithContentRect: (NSRect) contentRect
-                 styleMask: (NSWindowStyleMask) aStyle
+                 styleMask: (unsigned int) aStyle
                    backing: (NSBackingStoreType) bufferingType
                      defer: (BOOL) flag
 {
