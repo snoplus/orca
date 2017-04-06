@@ -238,6 +238,10 @@
 	[crateNumberField setIntValue:[[[model guardian] guardian] crateNumber]];
 }
 
+- (void) duplicateDialog:(id)dialog {
+    return;
+}
+
 - (void) boardIdChanged:(NSNotification*)aNote
 {
 	[boardIdField setStringValue:[model boardID]];

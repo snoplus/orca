@@ -156,6 +156,7 @@
 
 -(void)tellieRunFinished:(NSNotification *)aNote;
 -(void)initialiseTellie;
+- (void) duplicateDialog:(id)dialog;
 
 //Build Custom sequence
 -(IBAction)tellieBuildValidateAction:(id)sender;

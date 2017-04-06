@@ -135,6 +135,10 @@
 	else [crate1Field setStringValue:@""];
 }
 
+- (void) duplicateDialog:(id)dialog {
+    return;
+}
+
 - (void) setCrateTitle
 {
 	[[self window] setTitle:[NSString stringWithFormat:@"SNO crate %lu",[model uniqueIdNumber]]];

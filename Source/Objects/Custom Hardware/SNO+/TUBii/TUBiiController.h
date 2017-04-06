@@ -138,7 +138,7 @@
 - (void) SendBitInfo:(NSUInteger) maskVal FromBit:(int)low ToBit:(int) high ToCheckBoxes: (NSMatrix*) aMatrix;
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item;
 - (void) tubiiLockChanged:(NSNotification*)aNote;
-
+- (void) duplicateDialog:(id)dialog;
 - (IBAction)InitializeClicked:(id)sender;
 - (IBAction)SendPing:(id)sender;
 - (IBAction)DataReadoutChanged:(id)sender;

@@ -1148,4 +1148,8 @@
         }
     }
 }
+- (void) duplicateDialog:(id)dialog {
+    return;
+}
+
 @end

@@ -613,7 +613,10 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 #pragma mark ¥¥¥Orca Dialog Management
 - (void) duplicateDialog:(id)dialog
 {
-    
+    if ([[dialog class] instancesRespondToSelector:@selector(duplicateDialog:)]) {
+        [dialog duplicateDialog:dialog];
+        return;
+    }
     id controller = [[NSClassFromString([dialog className]) alloc] init];
     
     if([controller isKindOfClass:[OrcaObjectController class]]){

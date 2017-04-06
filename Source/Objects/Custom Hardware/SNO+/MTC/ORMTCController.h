@@ -147,6 +147,7 @@
 #pragma mark •••Helper
 - (void) populatePullDown;
 - (void) showHideOptions:(id) sender Box:(id)box resizeSmall:(NSSize) smallSize resizeLarge:(NSSize) largeSize;
+- (void) duplicateDialog:(id)dialog;
 
 #pragma mark •••Actions
 

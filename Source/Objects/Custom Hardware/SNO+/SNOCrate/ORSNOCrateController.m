@@ -119,6 +119,10 @@
 	[crateNumberField setIntValue:[model crateNumber]];
 }
 
+- (void) duplicateDialog:(id)dialog {
+    return;
+}
+
 #pragma mark •••Actions
 - (IBAction) incCrateAction:(id)sender
 {

@@ -196,6 +196,10 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     }
 }
 
+- (void) duplicateDialog:(id)dialog {
+    return;
+}
+
 -(IBAction)tellieGeneralFireAction:(id)sender
 {
     ////////////
