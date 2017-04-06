@@ -3384,7 +3384,7 @@ return 0;
     for(i=0;i<kNumberOfFPGARegisters;i++){
         unsigned long theValue = [self readFPGARegister:i];
         if(fpgaSnapShot[i] != theValue){
-            NSLogFont([NSFont fontWithName:@"Monaco" size:10.0],@"0x%04x 0x%08x != 0x%08x %@\n",register_information[i].offset,fpgaSnapShot[i],theValue,register_information[i].name);
+            NSLogFont([NSFont fontWithName:@"Monaco" size:10.0],@"0x%04x 0x%08x != 0x%08x %@\n",fpga_register_information[i].offset,fpgaSnapShot[i],theValue,fpga_register_information[i].name);
             
         }
     }
