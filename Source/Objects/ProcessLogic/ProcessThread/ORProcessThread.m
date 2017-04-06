@@ -94,8 +94,22 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessThread);
                       selector: @selector( documentIsClosing: )
                           name: @"ORAppTerminating"
                         object: nil];
+  
+    [ notifyCenter addObserver: self
+                      selector: @selector( orcaIsQuitting: )
+                          name: OROrcaAboutToQuitNotice
+                        object: nil];
+
+    
     
 }
+
+- (void) orcaIsQuitting:(NSNotification*)aNote
+{
+    //a quit kills the thread, so we just flag it as done here
+    running = NO;
+}
+
 
 - (void) documentIsClosing:(NSNotification*)aNote
 {
