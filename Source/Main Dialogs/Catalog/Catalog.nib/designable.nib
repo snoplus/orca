@@ -2275,6 +2275,14 @@ Gauge Controller</string>
                                                 <font key="font" metaFont="system" size="10"/>
                                             </buttonCell>
                                         </button>
+                                        <button toolTip="ORWebRakerModel" id="XXx-WH-GGb" customClass="ObjectFactory">
+                                            <rect key="frame" x="680" y="10" width="100" height="98"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="bevel" title="Web Raker" bezelStyle="regularSquare" image="WebRaker" imagePosition="above" alignment="center" state="on" inset="2" id="C0T-4s-jK8">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system" size="10"/>
+                                            </buttonCell>
+                                        </button>
                                     </subviews>
                                 </view>
                             </tabViewItem>
@@ -3481,6 +3489,7 @@ Relay</string>
         <image name="VarianTPS" width="80" height="67"/>
         <image name="Vme64CrateSmall" width="236" height="126"/>
         <image name="Vmecpu" width="16" height="128"/>
+        <image name="WebRaker" width="100" height="83"/>
         <image name="XL1Card" width="16" height="128"/>
         <image name="XL2Card" width="12" height="96"/>
         <image name="XL3Card" width="12" height="96"/>
