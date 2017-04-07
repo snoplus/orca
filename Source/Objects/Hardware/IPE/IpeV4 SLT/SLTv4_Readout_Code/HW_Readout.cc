@@ -553,7 +553,7 @@ int getSltLinuxKernelDriverVersion(void)
 	
 	while (!feof(p)){
 	    fscanf(p,"%s",buf);
-		if( cptr=strstr(buf, DRIVERNAME) ){  // dont use strncmp, it finds fzk_ipe_slt1, too, which does not exist -tb-
+		if( (cptr=strstr(buf, DRIVERNAME)) ){  // dont use strncmp, it finds fzk_ipe_slt1, too, which does not exist -tb-
 		     version = -1;
 			 if( strlen(buf) == strlen(DRIVERNAME)){ version = 0; break; }   // v0, 1st version "fzk_ipe_slt"
 			 if( strstr(buf, DRIVERNAME "_dma") ){ version = 1; break;}      // v1, 2nd version "fzk_ipe_slt_dma"
@@ -660,7 +660,7 @@ void setHostTimeToFLTsAndSLT(int32_t* args)
     //as the second change between SLT and PrPMC is not syncronized, this might be necessary even if the crate counters were set previously: the SLT may be 'before' OR 'behind' the host clock
     //TODO: keep in mind: all crate computers should be synchronized up to accuracy of 30 % to get this work properly -tb-
     if(sltsec !=secSetpoint){
-	    fprintf(stdout,"setHostTimeToFLTsAndSLT:   need to write SLT TIME!!! sltsec %u, sltsecsetpoint %u, \n", sltsec, secSetpoint);//TODO: DEBUG -tb-
+	    fprintf(stdout,"setHostTimeToFLTsAndSLT:   need to write SLT TIME!!! sltsec %lu, sltsecsetpoint %lu, \n", (unsigned long)sltsec, (unsigned long)secSetpoint);//TODO: DEBUG -tb-
 	    secSetpoint += 1;  //value will be taken after the NEXT second strobe, so we need the NEXT second
         srack->theSlt->setSecCounter->write(secSetpoint);
         //TODO: workaround until SLT takes the second counter immediately over from setSec register -tb- 2013-05-24
