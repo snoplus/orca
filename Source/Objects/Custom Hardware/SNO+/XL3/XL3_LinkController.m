@@ -325,24 +325,24 @@ static NSDictionary* xl3Ops;
 
 - (void) updateWindow
 {
-	[super updateWindow];
+    [super updateWindow];
 
-	[self xl3LockChanged:nil];
-	[self opsRunningChanged:nil];
-	//basic ops
-	[self selectedRegisterChanged:nil];
-	[self repeatCountChanged:nil];
-	[self repeatDelayChanged:nil];
-	[self autoIncrementChanged:nil];
-	[self basicOpsRunningChanged:nil];
-	[self writeValueChanged:nil];
-	//composite
-	[self compositeSlotMaskChanged:nil];
-	[self compositeXl3ModeChanged:nil];
-	[self compositeXl3ModeRunningChanged:nil];
-	[self compositeXl3PedestalMaskChanged:nil];
-	[self compositeXl3RWAddressChanged:nil];
-	[self compositeXL3RWDataChanged:nil];
+    [self xl3LockChanged:nil];
+    [self opsRunningChanged:nil];
+    //basic ops
+    [self selectedRegisterChanged:nil];
+    [self repeatCountChanged:nil];
+    [self repeatDelayChanged:nil];
+    [self autoIncrementChanged:nil];
+    [self basicOpsRunningChanged:nil];
+    [self writeValueChanged:nil];
+    //composite
+    [self compositeSlotMaskChanged:nil];
+    [self compositeXl3ModeChanged:nil];
+    [self compositeXl3ModeRunningChanged:nil];
+    [self compositeXl3PedestalMaskChanged:nil];
+    [self compositeXl3RWAddressChanged:nil];
+    [self compositeXL3RWDataChanged:nil];
     [self compositeXl3ChargeInjChanged:nil];
     //mon
     [self monPollXl3TimeChanged:nil];
@@ -362,6 +362,7 @@ static NSDictionary* xl3Ops;
     [self monVltThresholdInInitChanged:nil];
     //hv
     [self hvRelayMaskChanged:nil];
+    [self hvTriggerStatusChanged:nil];
     [self hvRelayStatusChanged:nil];
     [self hvStatusChanged:nil];
     [self hvTriggerStatusChanged:nil];
@@ -369,8 +370,8 @@ static NSDictionary* xl3Ops;
     [self hvCMOSRateLimitChanged:nil];
     [self hvCMOSRateIgnoreChanged:nil];
     [self hvChangePowerSupplyChanged:nil];
-	//ip connection
-	[self errorTimeOutChanged:nil];
+    //ip connection
+    [self errorTimeOutChanged:nil];
     [self connectStateChanged:nil];
     [self connectionAutoConnectChanged:nil];
 }
@@ -849,9 +850,11 @@ static NSDictionary* xl3Ops;
     if ([model isTriggerON]) {
         [hvATriggerStatusField setStringValue:@"ON"];
         [hvBTriggerStatusField setStringValue:@"ON"];
+        [loadNominalSettingsButton setEnabled:YES];
     } else {
         [hvATriggerStatusField setStringValue:@"OFF"];
         [hvBTriggerStatusField setStringValue:@"OFF"];
+        [loadNominalSettingsButton setEnabled:NO];
     }
 }
 
