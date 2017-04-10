@@ -120,6 +120,7 @@
     IBOutlet NSButton *hvRampDownButton;
     IBOutlet NSButton *hvStopRampButton;
     IBOutlet NSButton *loadNominalSettingsButton;
+    IBOutlet NSButton *hvTriggersButton;
     IBOutlet NSTextField *hvRelayMaskLowField;
     IBOutlet NSTextField *hvRelayMaskHighField;
     IBOutlet NSTextField *hvRelayStatusField;
@@ -307,8 +308,7 @@
 - (IBAction)hvRampDownAction:(id)sender;
 - (IBAction)hvRampPauseAction:(id)sender;
 - (IBAction)hvPanicAction:(id)sender;
-- (IBAction)hvTriggerOffAction:(id)sender;
-- (IBAction)hvTriggerOnAction:(id)sender;
+- (IBAction)hvTriggerAction:(id)sender;
 - (IBAction)loadNominalSettingsAction:(id)sender;
 
 //connection

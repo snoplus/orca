@@ -1628,14 +1628,13 @@ static NSDictionary* xl3Ops;
     [model hvPanicDown];
 }
 
-- (IBAction)hvTriggerOffAction:(id)sender
+- (IBAction)hvTriggerAction:(id)sender
 {
-    [model hvTriggersOFF];
-}
-
-- (IBAction)hvTriggerOnAction:(id)sender
-{
-    [model hvTriggersON];
+    if ([sender state]) {
+        [model hvTriggersON];
+    } else {
+        [model hvTriggersOFF];
+    }
 }
 
 - (IBAction) loadNominalSettingsAction: (id) sender

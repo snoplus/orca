@@ -86,6 +86,7 @@
                 <outlet property="hvStopRampButton" destination="4211" id="jdS-vX-rCj"/>
                 <outlet property="hvTargetValueField" destination="4495" id="4500"/>
                 <outlet property="hvTargetValueStepper" destination="4274" id="4501"/>
+                <outlet property="hvTriggersButton" destination="4420" id="72Q-Ta-x8F"/>
                 <outlet property="loadNominalSettingsButton" destination="5O1-ir-YYR" id="zmR-hC-RvR"/>
                 <outlet property="lockButton" destination="3658" id="KSH-qe-jJx"/>
                 <outlet property="monIsPollingCMOSRatesButton" destination="3962" id="4027"/>
@@ -2756,17 +2757,6 @@
                                             </buttonCell>
                                             <connections>
                                                 <action selector="hvPanicAction:" target="-2" id="4520"/>
-                                            </connections>
-                                        </button>
-                                        <button verticalHuggingPriority="750" id="4416">
-                                            <rect key="frame" x="174" y="202" width="105" height="28"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="push" title="Triggers OFF" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4417">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="hvTriggerOffAction:" target="-2" id="4535"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" id="4420">

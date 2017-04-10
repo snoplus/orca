@@ -169,17 +169,16 @@ isLoaded = isLoaded;
 	[self setImage:[NSImage imageNamed:@"XL3Card"]];
 }
 
--(void)dealloc
+- (void) dealloc
 {
-	[xl3Link release];
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
+    [xl3Link release];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     if (pollThread) [pollThread release];
     if (hvThread) [hvThread release];
     if (relayStatus) [relayStatus release];
-    if (triggerStatus) [triggerStatus release];
     [xl3DateFormatter release];
     [hvInitLock release];
-	[super dealloc];
+    [super dealloc];
 }
 
 - (void) awakeAfterDocumentLoaded
@@ -1626,12 +1625,6 @@ void SwapLongBlock(void* p, int32_t n)
     initialized = FALSE;
     stateUpdated = FALSE;
 
-    if ([self isTriggerON]) {
-        [self setTriggerStatus:@"ON"];
-    } else {
-        [self setTriggerStatus:@"OFF"];
-    }
-    
     for (i=0; i<12; i++) {
         [self setXl3VltThreshold:i withValue:[decoder decodeFloatForKey:[NSString stringWithFormat:@"ORXL3ModelVltThreshold%i", i]]];
     }
@@ -2309,9 +2302,7 @@ void SwapLongBlock(void* p, int32_t n)
 
     /* If the triggers OFF button has been pressed, turn off N100 and N20
      * triggers */
-    if ([self isTriggerON]) {
-        [self setTriggerStatus:@"ON"];
-    } else {
+    if (![self isTriggerON]) {
         for (slot = 0; slot < 16; slot++) {
             if ((slotMask & (1 << slot)) == 0) continue;
 
@@ -2320,7 +2311,6 @@ void SwapLongBlock(void* p, int32_t n)
                 mbs[slot].tr20.mask[channel] = 0;
             }
         }
-        [self setTriggerStatus:@"OFF"];
     }
 
     NSDictionary *args = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -4050,7 +4040,6 @@ err:
 
                 if (result) {
                     [self setIsTriggerON:NO];
-                    [self setTriggerStatus:@"OFF"];
                     NSLog(@"Crate %02d disabling triggers\n.", [self crateNumber]);
                     return;
                 }

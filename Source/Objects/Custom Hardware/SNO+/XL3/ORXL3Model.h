@@ -119,8 +119,6 @@ enum {
     BOOL hvBNeedsUserIntervention;
     BOOL isLoaded; //Whether the experiment is open or not (false to start, false at end)
     
-    
-    NSString* triggerStatus;
     BOOL _isTriggerON;
     
     unsigned long _hvNominalVoltageA;
@@ -213,7 +211,6 @@ enum {
 @property (nonatomic,copy) NSString* relayStatus;
 @property (nonatomic,assign) BOOL hvASwitch;
 @property (nonatomic,assign) BOOL hvBSwitch;
-@property (nonatomic,copy) NSString* triggerStatus;
 @property (nonatomic,assign) BOOL isTriggerON;
 //ADC counts (3kV 12bit)
 @property (nonatomic,assign) unsigned long hvAVoltageDACSetValue;
