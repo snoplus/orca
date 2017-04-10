@@ -845,10 +845,15 @@ static NSDictionary* xl3Ops;
 }); }
 
 - (void) hvTriggerStatusChanged:(NSNotification*)aNote
-{ dispatch_async(dispatch_get_main_queue(), ^{
-    [hvATriggerStatusField setStringValue:[model triggerStatus]];
-    [hvBTriggerStatusField setStringValue:[model triggerStatus]];
-}); }
+{
+    if ([model isTriggerON]) {
+        [hvATriggerStatusField setStringValue:@"ON"];
+        [hvBTriggerStatusField setStringValue:@"ON"];
+    } else {
+        [hvATriggerStatusField setStringValue:@"OFF"];
+        [hvBTriggerStatusField setStringValue:@"OFF"];
+    }
+}
 
 - (void) hvTargetValueChanged:(NSNotification*)aNote
 { dispatch_async(dispatch_get_main_queue(), ^{

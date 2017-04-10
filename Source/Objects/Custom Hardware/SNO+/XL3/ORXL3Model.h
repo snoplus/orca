@@ -295,6 +295,8 @@ enum {
 - (int) initAtRunStart;
 
 #pragma mark •••Accessors
+- (BOOL) isTriggerON;
+- (void) setIsTriggerON: (BOOL) isTriggerON;
 - (bool) initialized;
 - (bool) stateUpdated;
 - (NSString*) shortName;

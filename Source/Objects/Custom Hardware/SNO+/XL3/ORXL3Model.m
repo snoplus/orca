@@ -388,6 +388,23 @@ isLoaded = isLoaded;
 }
 
 #pragma mark •••Accessors
+
+- (BOOL) isTriggerON
+{
+    return _isTriggerON;
+}
+
+- (void) setIsTriggerON: (BOOL) isTriggerON
+{
+    if (isTriggerON != _isTriggerON) {
+        _isTriggerON = isTriggerON;
+
+        [self loadTriggersAndSequencers];
+
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelTriggerStatusChanged object:self];        
+    }
+}
+
 - (NSString*) shortName
 {
 	return @"XL3";
@@ -1263,22 +1280,6 @@ BOOL owlSupplyState = false;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelRelayStatusChanged object:self];        
 }
 
-- (NSString*) triggerStatus
-{
-    if (!triggerStatus) {
-        return @"ON";
-    }
-    return triggerStatus;
-}
-
-- (void) setTriggerStatus:(NSString *)aTriggerStatus
-{
-    if (triggerStatus) [triggerStatus autorelease];
-    if (aTriggerStatus) triggerStatus = [aTriggerStatus copy];
-    
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelTriggerStatusChanged object:self];        
-}
-
 - (BOOL) isXl3VltThresholdInInit
 {
     return _isXl3VltThresholdInInit;
@@ -1325,7 +1326,6 @@ BOOL owlSupplyState = false;
 {
     return changingPedMask;
 }
-
 
 #pragma mark •••DB Helpers
 
