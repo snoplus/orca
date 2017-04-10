@@ -38,6 +38,8 @@
 #import "ECARun.h"
 
 NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
+NSString* ORRunWaitFinished = @"ORRunWaitFinished";
+
 
 #define UNITS_UNDECIDED 0
 #define UNITS_RAW       1
@@ -424,7 +426,6 @@ snopGreenColor;
                      selector : @selector(fetchTellieRunFilesFinish:)
                          name : @"TellieRunFilesLoaded"
                         object: nil];
-
 }
 
 - (void) updateWindow
@@ -544,7 +545,25 @@ snopGreenColor;
 - (IBAction) stopRunAction:(id)sender
 {
     [self endEditing];
-    [model stopRun];
+
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
+    if (![objs count]) {
+        NSLogColor([NSColor redColor], @"ELLIE model not available, add an ELLIE model to your experiment\n");
+        goto err; // If error fall through and just stop the run.
+    }
+    ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
+
+    if([[theELLIEModel tellieThread] isExecuting]){
+        [theELLIEModel stopTellieRun];
+    }
+    if([[theELLIEModel smellieThread] isExecuting]){
+        [theELLIEModel stopSmellieRun];
+    }
+
+err:
+    {
+        [model stopRun];
+    }
 }
 
 - (void) runStatusChanged:(NSNotification*)aNotification
@@ -1167,16 +1186,6 @@ snopGreenColor;
     }
     ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
 
-    //////////////////////
-    // Check if the thread is still running,
-    // if not cancel the thread and let the
-    // catch statements in [ellieModel startSmellieRun]
-    // cause a goto err;
-    if(![[theELLIEModel smellieThread] isCancelled]){
-        [[theELLIEModel smellieThread] cancel];
-        return;
-    }
-
     //Call stop smellie run method to tidy up SMELLIE's hardware state
     @try{
         [theELLIEModel stopSmellieRun];
@@ -1188,9 +1197,7 @@ snopGreenColor;
     ////////////
     // Roll over into maintinance run
     if([[model lastStandardRunType] isEqualToString:@"SMELLIE"]){
-        [model setStandardRunType:@"MAINTENANCE"];
-        [self loadStandardRunFromDBAction:self];
-        [self startRunAction:self];
+        [model startStandardRun:@"MAINTENANCE" withVersion:@"DEFAULT"];
     }
 }
 
@@ -1379,16 +1386,6 @@ snopGreenColor;
     }
     ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
 
-    //////////////////////
-    // Check if the thread has been cancelled,
-    // if not cancel the thread and let the
-    // catch statements in [ellieModel startTellieRun]
-    // cause a goto err;
-    if(![[theELLIEModel tellieThread] isCancelled]){
-        [[theELLIEModel tellieThread] cancel];
-        return;
-    }
-    
     //Call stop smellie run method to tidy up TELLIE's hardware state
     @try{
         [theELLIEModel stopTellieRun];
@@ -1396,15 +1393,13 @@ snopGreenColor;
         NSLogColor([NSColor redColor], @"Problem stopping tellie run: %@\n", [e reason]);
         return;
     }
-    
+
     ////////////
     // Handle end of run sqeuencing
     if([[model lastStandardRunType] isEqualToString:@"TELLIE"]){
         // If user was running a TELLIE standard sequence, roll over into maintinance run
         if([self tellieStandardSequenceFlag]){
-            [model setStandardRunType:@"MAINTENANCE"];
-            [self loadStandardRunFromDBAction:self];
-            [self startRunAction:self];
+            [model startStandardRun:@"MAINTENANCE" withVersion:@"DEFAULT"];
         // If user is using the ellie gui simply start a new run as they'll likely need to run
         // more sequences. Reasonable as this is an 'expert' level operation. Proceedures
         // will dictate the user should start a new standard run manualy when they're finished
@@ -1412,7 +1407,7 @@ snopGreenColor;
             [self startRunAction:self];
         }
     }
-    
+
     [self setTellieFireSettings:nil];
 }
 

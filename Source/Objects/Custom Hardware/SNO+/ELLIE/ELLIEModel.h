@@ -135,6 +135,8 @@
 -(void) startTellieMultiRun:(NSArray*)fireCommandArray;
 -(void) startTellieRun:(NSDictionary*)fireCommands;
 -(void) stopTellieRun;
+-(void) waitForTellieRunToFinish;
+-(void) tellieTidyUp;
 
 // TELLIE database interactions
 -(void) pushInitialTellieRunDocument;
@@ -171,6 +173,8 @@
 -(void) startSmellieRunThread:(NSDictionary*)smellieSettings;
 -(void) startSmellieRun:(NSDictionary*)smellieSettings;
 -(void) stopSmellieRun;
+-(void) waitForSmellieRunToFinish;
+-(void) smellieTidyUp;
 -(NSNumber*)estimateSmellieRunTime:(NSDictionary*)smellieSettings;
 
 // SMELLIE database interactions
