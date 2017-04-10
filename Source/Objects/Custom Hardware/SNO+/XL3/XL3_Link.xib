@@ -3012,7 +3012,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <button verticalHuggingPriority="750" id="5O1-ir-YYR">
-                                            <rect key="frame" x="289" y="176" width="130" height="28"/>
+                                            <rect key="frame" x="165" y="202" width="130" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Triggers to Nominal" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Avj-Zn-Ov7">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
