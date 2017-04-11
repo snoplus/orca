@@ -74,9 +74,9 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (void) awakeFromNib
 {
-	controlSize			= NSMakeSize(555,670);
+	controlSize			= NSMakeSize(555,630);
     statusSize			= NSMakeSize(555,480);
-    lowLevelSize		= NSMakeSize(555,450);
+    lowLevelSize		= NSMakeSize(555,430);
     cpuManagementSize	= NSMakeSize(485,450);
     cpuTestsSize		= NSMakeSize(555,355);
 	
