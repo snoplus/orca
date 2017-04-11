@@ -38,15 +38,15 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
 {
 
          
-	uint32_t f1,f2,f3,f4,recordLength   = 4 ; 
+	uint32_t /*f1,f2,f3,f4,*/recordLength   = 4 ;
 	uint32_t fifoReadoutBuffer32[8192]; 
 	uint32_t fifoReadoutBuffer32Len=0; 
-    int i;
+    uint32_t i;
     
     //init
     uint32_t eventFifoId = GetHardwareMask()[2];
     uint32_t energyId = GetHardwareMask()[3];
-    uint32_t secondsSetSendToFLTs = GetDeviceSpecificData()[0];
+    //uint32_t secondsSetSendToFLTs = GetDeviceSpecificData()[0];
     uint32_t runFlags   = GetDeviceSpecificData()[3];//this is runFlagsMask of ORKatrinV4FLTModel.m, load_HW_Config_Structure:index:
     uint32_t sltRevision = GetDeviceSpecificData()[6];
 
@@ -58,7 +58,7 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
     //  
     //extern Pbus *pbus;              //for register access with fdhwlib
     //pbus = srack->theSlt->version;
-    uint32_t sltversion=sltRevision;
+    //uint32_t sltversion=sltRevision;
     
     
                 if(runFlags & kFirstTimeFlag){// firstTime   
@@ -150,7 +150,10 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
     
     
     if(sltRevision>=0x3010004){//we have SLT event FIFO since last revision -> read FIFO (one event = 6 words)
-        uint32_t fifoOverflow, numMissingWords=0, numToSkip=0, numMisaligned=0;
+       // uint32_t fifoOverflow;
+        //uint32_t numMissingWords=0;
+        uint32_t numToSkip=0;
+        //uint32_t numMisaligned=0;
         //DEBUG   fprintf(stdout, "sltRevision>=0x3010003\n");
         //block FIFO readout
         //has FIFO data?
@@ -177,9 +180,7 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
                 }
             }else{                          //there are more than 48 words -> use DMA
                 //fifoReadoutBuffer32Len = (fifoReadoutBuffer32Len>>3)<<3;//always read multiple of 8 word32s
-                fifoReadoutBuffer32Len = (fifoReadoutBuffer32Len/48)*48;//always read multiple of 48 word32s
-                uint32_t retval =
-                pbus->readBlock(FIFO0Addr, (unsigned long *) fifoReadoutBuffer32, fifoReadoutBuffer32Len);//read up to 4*2048 word32s
+                fifoReadoutBuffer32Len  = (fifoReadoutBuffer32Len/48)*48;//always read multiple of 48 word32s
                 #if 0
                 //DEBUG: test it, then remove it -tb- 2016
                 //DEBUG: retval is always 0 - should fix it in the fdhwlib!!!!!  -tb- 2017
@@ -190,7 +191,7 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
             
             
             
-            numMissingWords=0;
+           // numMissingWords=0;
 
 #if 0
             //check bits 29-31
@@ -301,8 +302,7 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
     gettimeofday(&t,NULL);
     currentSec = t.tv_sec;  
     currentUSec = t.tv_usec;  
-    double diffTime = (double)(currentSec  - lastSec) +
-    ((double)(currentUSec - lastUSec)) * 0.000001;
+    double diffTime = (double)(currentSec  - lastSec) + ((double)(currentUSec - lastUSec)) * 0.000001;
     
     if(diffTime >1.0){
         secCounter++;
