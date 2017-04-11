@@ -2767,7 +2767,7 @@
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="hvTriggerOnAction:" target="-2" id="4536"/>
+                                                <action selector="hvTriggerAction:" target="-2" id="k7s-iP-3py"/>
                                             </connections>
                                         </button>
                                         <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" id="4292">

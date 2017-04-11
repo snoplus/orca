@@ -1631,7 +1631,7 @@ static NSDictionary* xl3Ops;
     [model hvPanicDown];
 }
 
-- (IBAction)hvTriggerAction:(id)sender
+- (IBAction) hvTriggerAction:(id)sender
 {
     if ([sender state]) {
         [model hvTriggersON];
