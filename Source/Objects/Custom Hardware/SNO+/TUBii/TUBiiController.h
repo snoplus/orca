@@ -71,6 +71,8 @@
     IBOutlet NSTextField *PrescaleFactor;
     IBOutlet NSTextField *PrescaleTriggerMask;
     IBOutlet NSButton *sendPrescaleButton;
+    IBOutlet NSTextField *TUBiiPGTRate;
+    IBOutlet NSButton *sendTUBiiPGTButton;
     IBOutlet NSSlider *MTCAMimic_Slider;
     IBOutlet NSTextField *MTCAMimic_TextField;
     IBOutlet NSButton *sendMTCAButton;
