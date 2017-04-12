@@ -362,7 +362,6 @@ static NSDictionary* xl3Ops;
     [self monVltThresholdInInitChanged:nil];
     //hv
     [self hvRelayMaskChanged:nil];
-    [self hvTriggerStatusChanged:nil];
     [self hvRelayStatusChanged:nil];
     [self hvStatusChanged:nil];
     [self hvTriggerStatusChanged:nil];
@@ -851,10 +850,12 @@ static NSDictionary* xl3Ops;
         [hvATriggerStatusField setStringValue:@"ON"];
         [hvBTriggerStatusField setStringValue:@"ON"];
         [loadNominalSettingsButton setEnabled:YES];
+        [hvTriggersButton setState:NSOnState];
     } else {
         [hvATriggerStatusField setStringValue:@"OFF"];
         [hvBTriggerStatusField setStringValue:@"OFF"];
         [loadNominalSettingsButton setEnabled:NO];
+        [hvTriggersButton setState:NSOffState];
     }
 }
 
@@ -1638,6 +1639,10 @@ static NSDictionary* xl3Ops;
     } else {
         [model hvTriggersOFF];
     }
+    /* Need to update button because the user is sometimes given a choice to
+     * cancel turning triggers on, in which case the button will seem to be
+     * on, but in fact the triggers weren't turned on. */
+    [self hvTriggerStatusChanged:nil];
 }
 
 - (IBAction) loadNominalSettingsAction: (id) sender

@@ -398,8 +398,6 @@ isLoaded = isLoaded;
     if (isTriggerON != _isTriggerON) {
         _isTriggerON = isTriggerON;
 
-        [self loadTriggersAndSequencers];
-
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelTriggerStatusChanged object:self];        
     }
 }
@@ -4410,7 +4408,7 @@ err:
     }
 
     [self setIsTriggerON:YES];
-    [self loadHardware];
+    [self loadTriggersAndSequencers];
     NSLog(@"%@ triggers ON\n", [[self xl3Link] crateName]);
 }
 
@@ -4418,7 +4416,7 @@ err:
 {
     if ([[self xl3Link] isConnected]) {
         [self setIsTriggerON:NO];
-        [self loadHardware];
+        [self loadTriggersAndSequencers];
         NSLog(@"%@ triggers OFF\n", [[self xl3Link] crateName]);
     }
     else {
