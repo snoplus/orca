@@ -161,6 +161,7 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
 - (void) setBurstTrigger;
 - (void) setComboTrigger_EnableMask:(uint32_t) enableMask TriggerMask:(uint32_t) triggerMask;
 - (void) setPrescaleTrigger_Mask: (uint32_t) mask ByFactor:(uint32_t) factor;
+- (void) setTUBiiPGT_Rate: (float) rate;
 - (void) setSmellieRate: (float) _rate;
 - (void) setTellieRate: (float) _rate;
 - (void) setPulserRate: (float) _rate;

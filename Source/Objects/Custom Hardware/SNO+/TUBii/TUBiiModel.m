@@ -204,6 +204,10 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
     NSString* const command = [NSString stringWithFormat:@"SetPrescaleTrigger %u %u",factor,mask];
     [self sendOkCmd:command];
 }
+- (void) setTUBiiPGT_Rate:(float)rate {
+    NSString* const command = [NSString stringWithFormat:@"SetTUBiiPGT %f",rate];
+    [self sendOkCmd:command];
+}
 
 - (void) setSmellieRate:(float)_rate {
     // Specifies the frequency (in Hz) that the smellie pulser will pulse at

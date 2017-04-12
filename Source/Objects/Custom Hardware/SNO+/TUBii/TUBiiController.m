@@ -28,7 +28,7 @@
 {
     Tubii_size = NSMakeSize(450, 400);
     PulserAndDelays_size = NSMakeSize(500, 350);
-    Triggers_size = NSMakeSize(500, 680);
+    Triggers_size = NSMakeSize(600, 680);
     Analog_size = NSMakeSize(615, 445);
     GTDelays_size = NSMakeSize(500, 250);
     SpeakerCounter_size_small = NSMakeSize(575,550);
@@ -298,7 +298,6 @@
     //Makes the trigger mask GUI element match TUBii's hardware state
     NSUInteger trigMaskVal = ([model syncTrigMask] | [model asyncTrigMask]);
     NSUInteger syncMaskVal = 16777215 - [model asyncTrigMask];
-    NSLog(@"%d %d %d\n",[model syncTrigMask], [model asyncTrigMask], syncMaskVal);
     [self SendBitInfo:trigMaskVal FromBit:0 ToBit:24 ToCheckBoxes:TrigMaskSelect];
     [self SendBitInfo:syncMaskVal FromBit:24 ToBit:48 ToCheckBoxes:TrigMaskSelect];
 }
@@ -343,6 +342,15 @@
     NSUInteger mask = [PrescaleTriggerMask integerValue];
     [model setPrescaleTrigger_Mask:mask ByFactor:factor];
 }
+- (IBAction)TUBiiPGTLoad:(id)sender {
+    float rate = [TUBiiPGTRate floatValue];
+    [model setTUBiiPGT_Rate:rate];
+}
+- (IBAction)TUBiiPGTStop:(id)sender {
+    float rate = 0;
+    [model setTUBiiPGT_Rate:rate];
+}
+
 - (IBAction)CaenMatchHardware:(id)sender {
     //Makes the CAEN GUI reflect the current hardware state
     CAEN_CHANNEL_MASK ChannelMask = [model caenChannelMask];
