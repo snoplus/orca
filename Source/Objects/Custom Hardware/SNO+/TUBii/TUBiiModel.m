@@ -30,6 +30,8 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
 @implementation TUBiiModel
 #pragma mark •••Synthesized Variables
 
+@synthesize keepAliveThread = _keepAliveThread;
+
 - (void) setUpImage
 {
     NSImage* img = [NSImage imageNamed:@"tubii"];
@@ -147,14 +149,27 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
     [self ResetFifo]; //Maybe take this out eventually? I'm not sure
     [self setDataReadout:YES];
 }
+
+- (void) awakeAfterDocumentLoaded
+{
+    [self activateKeepAlive];
+}
+
 #pragma mark •••Network Communication
 - (void) sendOkCmd:(NSString* const)aCmd {
+    [self sendOkCmd:aCmd print:YES];
+}
+- (void) sendOkCmd:(NSString* const)aCmd print:(BOOL)printCheck{
     @try {
-        NSLog(@"Sending %@ to TUBii\n",aCmd);
+        if(printCheck){
+            NSLog(@"Sending %@ to TUBii\n",aCmd);
+        }
         [connection okCommand: [aCmd UTF8String]];
     }
     @catch (NSException *exception) {
-        NSLogColor([NSColor redColor],@"Command: %@ failed.  Reason: %@\n", aCmd,[exception reason]);
+        if(printCheck){
+            NSLogColor([NSColor redColor],@"Command: %@ failed.  Reason: %@\n", aCmd,[exception reason]);
+        }
     }
 }
 - (int) sendIntCmd: (NSString* const) aCmd {
@@ -737,4 +752,59 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
     aState.controlReg = [self controlReg];
     return aState;
 }
+
+//////////////////////////////////////////
+// Keep alive stuff -
+// If ORCA dies we want to force tubii from
+// sending triggers to the ellie system
+-(void)activateKeepAlive
+{
+    /*
+     Start a thread to constantly send a keep alive signal to the smellie interlock server
+     */
+    [self setKeepAliveThread:[[[NSThread alloc] initWithTarget:self selector:@selector(pulseKeepAlive:) object:nil] autorelease]];
+    [[self keepAliveThread] start];
+}
+
+-(void)pulseKeepAlive:(id)passed
+{
+    /*
+     A fuction to be run in a thread, continually sending keep alive pulses to the interlock server
+     */
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+
+    int counter = 0;
+    while (![[self keepAliveThread] isCancelled]) {
+        @try{
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                [self sendOkCmd:@"keepAlive" print:NO];
+            });
+        } @catch(NSException* e) {
+            NSLogColor([NSColor redColor], @"[TUBii]: Problem sending keep alive to TUBii server, reason: %@\n", [e reason]);
+            break;
+        }
+        [NSThread sleepForTimeInterval:0.5];
+
+        // This is a very long running thread need to relase the pool every so often
+        if(counter == 1000){
+            [pool release];
+            pool = [[NSAutoreleasePool alloc] init];
+            counter = 0;
+        }
+        counter = counter + 1;
+    }
+    NSLog(@"[TUBii]: Stopped sending keep-alive to TUBii - ELLIE pulses will be shut off\n");
+    [pool release];
+}
+
+-(void)killKeepAlive
+{
+    /*
+     Stop pulsing the keep alive and disarm the interlock
+     */
+    [[self keepAliveThread] cancel];
+    NSLog(@"[TUBii]: Killing keep alive - ELLIE pulses will be shut off\n");
+}
+
+
 @end
