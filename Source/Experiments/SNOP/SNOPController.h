@@ -160,7 +160,6 @@
     // Detector State
     IBOutlet WebView* detectorState;
 }
-
 @property (nonatomic) BOOL tellieStandardSequenceFlag;
 @property (nonatomic,retain) NSDictionary *tellieFireSettings;
 @property (nonatomic,retain) NSMutableDictionary *tellieRunFileList;
@@ -242,3 +241,4 @@
 @end
 
 extern NSString* ORSNOPRequestHVStatus;
+extern NSString* ORRunWaitFinished;

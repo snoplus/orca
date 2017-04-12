@@ -166,7 +166,7 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     [tellieGeneralTriggerDelayTf setDelegate:self];
     [tellieGeneralNoPulsesTf setDelegate:self];
     [tellieGeneralFreqTf setDelegate:self];
-    [tellieGeneralTriggerDelayTf setStringValue:@"700"];
+    [tellieGeneralTriggerDelayTf setStringValue:@"650"];
 
 
     [tellieChannelTf setDelegate:self];
@@ -178,13 +178,13 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     [tellieNoPulsesTf setDelegate:self];
     [tellieExpertNodeTf setDelegate:self];
     [telliePhotonsTf setDelegate:self];
-    [tellieTriggerDelayTf setStringValue:@"700"];
+    [tellieTriggerDelayTf setStringValue:@"650"];
 
     // Build custom run tab
     [tellieBuildPushToDB setEnabled:NO];
     [tellieBuildOpMode removeAllItems];
     [tellieBuildOpMode addItemsWithTitles:@[@"Slave", @"Master"]];
-    [tellieBuildTrigDelay setStringValue:@"700"];
+    [tellieBuildTrigDelay setStringValue:@"650"];
     for(int i=0; i<100; i++){
         if(i<92){
             [[tellieBuildNodeSelection cellWithTag:i] setEnabled:YES];
