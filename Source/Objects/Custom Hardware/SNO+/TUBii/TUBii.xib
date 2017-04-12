@@ -205,11 +205,11 @@
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <buttonCell type="radio" title="On" imagePosition="left" alignment="left" tag="1" inset="2" id="XFU-Xm-lZm">
+                                                    <buttonCell type="radio" title="On" imagePosition="left" alignment="left" state="on" tag="1" inset="2" id="XFU-Xm-lZm">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
                                                     </buttonCell>
-                                                    <buttonCell type="radio" title="Off" imagePosition="left" alignment="left" state="on" tag="2" inset="2" id="wPS-zJ-DsB">
+                                                    <buttonCell type="radio" title="Off" imagePosition="left" alignment="left" tag="2" inset="2" id="wPS-zJ-DsB">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
                                                     </buttonCell>
@@ -461,7 +461,7 @@
                                                 <action selector="PulserStop:" target="-2" id="Ybp-sv-6uI"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" fixedFrame="YES" title="Pulse Width (s)" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="iKb-XH-VuJ">
+                                        <box autoresizesSubviews="NO" fixedFrame="YES" title="Pulse Width (ns)" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="iKb-XH-VuJ">
                                             <rect key="frame" x="16" y="546" width="114" height="51"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="112" height="35"/>
@@ -480,7 +480,7 @@
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
-                                        <box autoresizesSubviews="NO" fixedFrame="YES" title="Pulse Width (s)" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="7F8-OG-Ucu">
+                                        <box autoresizesSubviews="NO" fixedFrame="YES" title="Pulse Width (ns)" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="7F8-OG-Ucu">
                                             <rect key="frame" x="14" y="394" width="117" height="51"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="115" height="35"/>
@@ -518,7 +518,7 @@
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
-                                        <box autoresizesSubviews="NO" fixedFrame="YES" title="Pulse Width (s)" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="NxO-2P-aGJ">
+                                        <box autoresizesSubviews="NO" fixedFrame="YES" title="Pulse Width (ns)" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="NxO-2P-aGJ">
                                             <rect key="frame" x="251" y="394" width="127" height="51"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="125" height="35"/>
