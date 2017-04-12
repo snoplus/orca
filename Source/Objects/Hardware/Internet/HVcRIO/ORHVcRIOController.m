@@ -351,6 +351,9 @@
 
 - (void) gainDisplayTypeChanged:(NSNotification*)aNote
 {
+    
+    return;
+    //TODO no decimal/hex selection - remove it!
 	[gainDisplayTypeMatrix selectCellWithTag : [model gainDisplayType]];
 	NSFormatter* aFormatter = nil;
 	if([model gainDisplayType] == 0){
@@ -569,17 +572,38 @@
     [self lockChanged:nil];
 }
 
+//-tb- new for HVcRIO
 - (IBAction) writeSetpointsAction:(id)sender
 {
     [model writeSetpoints];
     [self lockChanged:nil];
 }
 
+//-tb- new for HVcRIO
 - (IBAction) readBackSetpointsAction:(id)sender
 {
     [model readBackSetpoints];
     [self lockChanged:nil];
 }
+
+
+
+//-tb- new for HVcRIO
+- (IBAction) readMeasuredValuesAction:(id)sender
+{
+    [model readMeasuredValues];
+    [self lockChanged:nil];
+}
+
+//-tb- new for HVcRIO
+- (IBAction) writeTestCommandAction:(id)sender
+{
+    [model writeTestCommand];
+    [self lockChanged:nil];
+}
+
+
+
 
 - (IBAction) getGainsAction:(id)sender
 {
@@ -656,7 +680,12 @@
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
 {
     if(gainTableView == aTableView){
-        if([[aTableColumn identifier] isEqualToString:@"Item"]){
+        //if(rowIndex>15) return nil;
+        //return @"-";
+        if([[aTableColumn identifier] isEqualToString:@"Index"]){
+            return  [NSNumber numberWithInt:rowIndex];
+        }
+        else if([[aTableColumn identifier] isEqualToString:@"Item"]){
             return [model setpointItem:rowIndex];
         }
         else if([[aTableColumn identifier] isEqualToString:@"Data"]){
@@ -671,17 +700,38 @@
         //TODO remove it -tb-
         else if([[aTableColumn identifier] isEqualToString:@"Channel"]) return [NSNumber numberWithInt:rowIndex];
         else {
-            int board;
-            if([[aTableColumn identifier] isEqualToString:@"Board0"])board = 0;
-            else if([[aTableColumn identifier] isEqualToString:@"Board1"])board = 1;
-            else if([[aTableColumn identifier] isEqualToString:@"Board2"])board = 2;
-            else board = 3;
-            return [NSNumber numberWithInt:[model gain:rowIndex + board*37]];
+            //int board;
+            //if([[aTableColumn identifier] isEqualToString:@"Board0"])board = 0;
+            //else if([[aTableColumn identifier] isEqualToString:@"Board1"])board = 1;
+            //else if([[aTableColumn identifier] isEqualToString:@"Board2"])board = 2;
+            //else board = 3;
+            //return [NSNumber numberWithInt:[model gain:rowIndex + board*37]];
+            return @"--";
         }
     }
     else if(gainReadBackTableView == aTableView){
+        //return nil;
+        //return @"--";
+
+        if([[aTableColumn identifier] isEqualToString:@"Index"]){
+            return  [NSNumber numberWithInt:rowIndex];
+        }
+        //else if(1){
+        //    return @"--";
+        //}
+        else if([[aTableColumn identifier] isEqualToString:@"Item"]){
+            return [model measuredValueItem:rowIndex];
+        }
+        else if([[aTableColumn identifier] isEqualToString:@"Data"]){
+            return [model measuredValueData:rowIndex];
+        }
+        else if([[aTableColumn identifier] isEqualToString:@"Value"]){
+            return [NSNumber numberWithDouble: [model measuredValue:rowIndex]];
+        }
+        else
         if([[aTableColumn identifier] isEqualToString:@"Channel"]) return [NSNumber numberWithInt:rowIndex];
         else {
+            return @"--";
             int board;
             if([[aTableColumn identifier] isEqualToString:@"Board0"])board = 0;
             else if([[aTableColumn identifier] isEqualToString:@"Board1"])board = 1;
@@ -708,7 +758,7 @@
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView
 {
 	if(gainTableView == aTableView)return [model numSetpoints];
-	else if(gainReadBackTableView == aTableView)return 37;
+	else if(gainReadBackTableView == aTableView)return [model numMeasuredValues];
     else if(processLimitsTableView == aTableView)return 5;
 	else return 0;
 }

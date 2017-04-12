@@ -36,7 +36,7 @@ typedef struct HVcRIOSetpointNamesStruct {
 	IBOutlet NSTextField*   preAmpSelectionField;
 	IBOutlet NSTextField*   setGainsResultTextField;
 	IBOutlet NSTextField*   workingOnGainTextField;
-    IBOutlet NSMatrix*		gainDisplayTypeMatrix;
+    IBOutlet NSMatrix*		gainDisplayTypeMatrix;//remove it -tb- 2017
 	IBOutlet NSTextField*	ipAddressTextField;
 	IBOutlet NSButton*		ipConnectButton;
 
@@ -69,8 +69,8 @@ typedef struct HVcRIOSetpointNamesStruct {
 	IBOutlet NSButton*		readGainFileButton;
 	IBOutlet NSButton*		writeGainFileButton;
 
-	IBOutlet NSTableView*	gainTableView;
-	IBOutlet NSTableView*	gainReadBackTableView;
+	IBOutlet NSTableView*	gainTableView;//refactoring needed: -> setpointTableView -tb- 2017
+	IBOutlet NSTableView*	gainReadBackTableView;//refactoring needed: -> measuredValueTableView -tb- 2017
     IBOutlet NSTableView*   processLimitsTableView;
 
     IBOutlet ORValueBarGroupView*  queueValueBar;
@@ -106,8 +106,8 @@ typedef struct HVcRIOSetpointNamesStruct {
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) updateTimePlot:(NSNotification*)aNote;
 - (void) pollingStateChanged:(NSNotification*)aNote;
-- (void) gainsChanged:(NSNotification*)aNote;
-- (void) gainsReadBackChanged:(NSNotification*)aNote;
+- (void) gainsChanged:(NSNotification*)aNote;//refactoring needed: -> setpointValueTableView -tb- 2017
+- (void) gainsReadBackChanged:(NSNotification*)aNote;//refactoring needed: -> measuredValueTableView -tb- 2017
 - (void) lockChanged:(NSNotification*)aNote;
 - (void) adcChanged:(NSNotification*)aNote;
 - (void) logToFileChanged:(NSNotification*)aNote;
@@ -124,6 +124,7 @@ typedef struct HVcRIOSetpointNamesStruct {
 - (void) isConnectedChanged:(NSNotification*)aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+//unused for HVcRIO, remove it -tb-
 - (IBAction) readAdcsAction:(id)sender;
 - (IBAction) readAllAdcsAction:(id)sender;
 - (IBAction) lcmEnabledAction:(id)sender;
@@ -131,11 +132,17 @@ typedef struct HVcRIOSetpointNamesStruct {
 - (IBAction) sendPreAmpAndChannelAction:(id)sender;
 - (IBAction) channelSelectionAction:(id)sender;
 - (IBAction) preAmpSelectionAction:(id)sender;
-- (IBAction) lockAction:(id) sender;
 - (IBAction) getGainsAction:(id)sender;
 - (IBAction) setGainsAction:(id)sender;
+
+//HVcRIO
 - (IBAction) writeSetpointsAction:(id)sender;
 - (IBAction) readBackSetpointsAction:(id)sender;
+- (IBAction) readMeasuredValuesAction:(id)sender;
+- (IBAction) writeTestCommandAction:(id)sender;
+
+
+- (IBAction) lockAction:(id) sender;
 
 - (IBAction) selectFileAction:(id)sender;
 - (IBAction) setPollingAction:(id)sender;

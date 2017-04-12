@@ -68,11 +68,12 @@
     
     
         //new for HVcRIO -tb-
-        int                 numSetpoints;
-        //use dictionary for later -tb-
-        double setpoints[2000];
-        double setpointsReadback[2000];
-        double measuredValues[4000];
+    int                 numSetpoints;
+    int                 numMeasuredValues;
+    //use dictionary for later -tb-
+    double setpoints[2000];
+    double setpointsReadback[2000];
+    double measuredValues[4000];
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -87,6 +88,15 @@
 - (void) setSetpoint: (int)aIndex withValue: (double)value   ;
 - (double) setpointReadbackValue: (int) aIndex;
 - (void) setSetpointReadback: (int)aIndex withValue: (double)value   ;
+
+// MeasuredValue
+
+- (int) numMeasuredValues;
+- (void) setNumMeasuredValues: (int) aValue;
+- (NSString*) measuredValueItem: (int) aIndex;
+- (NSString*) measuredValueData: (int) aIndex;
+- (double) measuredValue: (int) aIndex;
+- (void) setMeasuredValue: (int)aIndex withValue: (double)value   ;
 
 - (BOOL) lcmEnabled;
 - (void) setLcmEnabled:(BOOL)aLcmEnabled;
@@ -155,10 +165,15 @@
 - (void) writeLogBufferToFile;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Commands
-- (void) getGains;
-- (void) setGains;
 - (void) writeSetpoints;
 - (void) readBackSetpoints;
+- (void) readMeasuredValues;
+- (void) writeTestCommand;
+
+
+//remove it
+- (void) getGains;
+- (void) setGains;
 - (void) getTemperatures;
 - (void) getCurrent;
 - (void) writeShipCmd;
