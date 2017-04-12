@@ -236,6 +236,8 @@
 		2DE91C6719DC8C2B005C1A11 /* amptek-logo.gif in Resources */ = {isa = PBXBuildFile; fileRef = 2DE91C6619DC8C2B005C1A11 /* amptek-logo.gif */; };
 		3602C15C1C4EC291006B50B3 /* anet.c in Sources */ = {isa = PBXBuildFile; fileRef = 3602C15A1C4EC291006B50B3 /* anet.c */; };
 		3602C15D1C4EC291006B50B3 /* anet.h in Headers */ = {isa = PBXBuildFile; fileRef = 3602C15B1C4EC291006B50B3 /* anet.h */; };
+		3611E9631E9DBD2A00136785 /* triggers_off.png in Resources */ = {isa = PBXBuildFile; fileRef = 3611E9611E9DBD2A00136785 /* triggers_off.png */; };
+		3611E9641E9DBD2A00136785 /* triggers_on.png in Resources */ = {isa = PBXBuildFile; fileRef = 3611E9621E9DBD2A00136785 /* triggers_on.png */; };
 		36148E3A1C6046610088C93E /* Fec32.xib in Resources */ = {isa = PBXBuildFile; fileRef = 36148E391C6046610088C93E /* Fec32.xib */; };
 		3620200E1CBD38EE0089296E /* libiconv.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3620200D1CBD38EE0089296E /* libiconv.2.dylib */; };
 		362020201CBD390A0089296E /* WPBase64Utils.h in Headers */ = {isa = PBXBuildFile; fileRef = 362020101CBD390A0089296E /* WPBase64Utils.h */; };
@@ -3993,6 +3995,8 @@
 		2DE91C6619DC8C2B005C1A11 /* amptek-logo.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "amptek-logo.gif"; sourceTree = "<group>"; };
 		3602C15A1C4EC291006B50B3 /* anet.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = anet.c; sourceTree = "<group>"; };
 		3602C15B1C4EC291006B50B3 /* anet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = anet.h; sourceTree = "<group>"; };
+		3611E9611E9DBD2A00136785 /* triggers_off.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = triggers_off.png; sourceTree = "<group>"; };
+		3611E9621E9DBD2A00136785 /* triggers_on.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = triggers_on.png; sourceTree = "<group>"; };
 		36148E391C6046610088C93E /* Fec32.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Fec32.xib; sourceTree = "<group>"; };
 		3620200D1CBD38EE0089296E /* libiconv.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libiconv.2.dylib; sourceTree = "<group>"; };
 		362020101CBD390A0089296E /* WPBase64Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WPBase64Utils.h; sourceTree = "<group>"; };
@@ -14446,6 +14450,8 @@
 		EF7722B111E813120064A1CF /* XL3 */ = {
 			isa = PBXGroup;
 			children = (
+				3611E9611E9DBD2A00136785 /* triggers_off.png */,
+				3611E9621E9DBD2A00136785 /* triggers_on.png */,
 				0F4888661C9992EE00068BC2 /* DB.h */,
 				0F4888671C9992EE00068BC2 /* PacketTypes.h */,
 				0F4888681C9992EE00068BC2 /* Registers.h */,
@@ -16377,6 +16383,7 @@
 				0F16E3371C493AD7003C9EC9 /* .gitignore in Resources */,
 				436972BE1B42DBE6008D57B5 /* CV1730.nib in Resources */,
 				8434A29B055B3287002D3102 /* Caen785.nib in Resources */,
+				3611E9641E9DBD2A00136785 /* triggers_on.png in Resources */,
 				8434A29C055B3287002D3102 /* HWWizard.nib in Resources */,
 				8434A29D055B3287002D3102 /* ORPulserDistrib.gif in Resources */,
 				8434A29E055B3287002D3102 /* PulserDistrib.nib in Resources */,
@@ -16384,6 +16391,7 @@
 				8434A2A0055B3287002D3102 /* NetConnect.gif in Resources */,
 				8434A2A1055B3287002D3102 /* ReplayData.gif in Resources */,
 				849415841B330FEB00ED42F8 /* offOnPendingBox.tif in Resources */,
+				3611E9631E9DBD2A00136785 /* triggers_off.png in Resources */,
 				8434A2A2055B3287002D3102 /* ReplayData.nib in Resources */,
 				8434A2A4055B3287002D3102 /* PlotSubview.nib in Resources */,
 				8434A2A5055B3287002D3102 /* CommandCenter.nib in Resources */,

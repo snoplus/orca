@@ -22,6 +22,7 @@
 #import "ORSNOCard.h"
 #import "PacketTypes.h"
 #import "SNOPModel.h"
+#import "ORPQResult.h"
 
 typedef struct  {
 	NSString*	regName;
@@ -118,8 +119,6 @@ enum {
     BOOL hvBNeedsUserIntervention;
     BOOL isLoaded; //Whether the experiment is open or not (false to start, false at end)
     
-    
-    NSString* triggerStatus;
     BOOL _isTriggerON;
     
     unsigned long _hvNominalVoltageA;
@@ -212,7 +211,6 @@ enum {
 @property (nonatomic,copy) NSString* relayStatus;
 @property (nonatomic,assign) BOOL hvASwitch;
 @property (nonatomic,assign) BOOL hvBSwitch;
-@property (nonatomic,copy) NSString* triggerStatus;
 @property (nonatomic,assign) BOOL isTriggerON;
 //ADC counts (3kV 12bit)
 @property (nonatomic,assign) unsigned long hvAVoltageDACSetValue;
@@ -294,6 +292,8 @@ enum {
 - (int) initAtRunStart;
 
 #pragma mark •••Accessors
+- (BOOL) isTriggerON;
+- (void) setIsTriggerON: (BOOL) isTriggerON;
 - (bool) initialized;
 - (bool) stateUpdated;
 - (NSString*) shortName;
@@ -360,6 +360,10 @@ enum {
 - (void)encodeWithCoder:(NSCoder*)encoder;
 
 #pragma mark •••Hardware Access
+- (void) nominalSettingsCallback: (ORPQResult *) result;
+- (void) loadNominalSettings;
+- (void) _loadTriggersAndSequencers;
+- (void) loadTriggersAndSequencers;
 - (void) loadTriggers;
 - (void) disableTriggers;
 - (void) loadSequencers;

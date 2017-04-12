@@ -169,17 +169,16 @@ isLoaded = isLoaded;
 	[self setImage:[NSImage imageNamed:@"XL3Card"]];
 }
 
--(void)dealloc
+- (void) dealloc
 {
-	[xl3Link release];
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
+    [xl3Link release];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     if (pollThread) [pollThread release];
     if (hvThread) [hvThread release];
     if (relayStatus) [relayStatus release];
-    if (triggerStatus) [triggerStatus release];
     [xl3DateFormatter release];
     [hvInitLock release];
-	[super dealloc];
+    [super dealloc];
 }
 
 - (void) awakeAfterDocumentLoaded
@@ -388,6 +387,21 @@ isLoaded = isLoaded;
 }
 
 #pragma mark •••Accessors
+
+- (BOOL) isTriggerON
+{
+    return _isTriggerON;
+}
+
+- (void) setIsTriggerON: (BOOL) isTriggerON
+{
+    if (isTriggerON != _isTriggerON) {
+        _isTriggerON = isTriggerON;
+
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelTriggerStatusChanged object:self];        
+    }
+}
+
 - (NSString*) shortName
 {
 	return @"XL3";
@@ -1263,22 +1277,6 @@ BOOL owlSupplyState = false;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelRelayStatusChanged object:self];        
 }
 
-- (NSString*) triggerStatus
-{
-    if (!triggerStatus) {
-        return @"ON";
-    }
-    return triggerStatus;
-}
-
-- (void) setTriggerStatus:(NSString *)aTriggerStatus
-{
-    if (triggerStatus) [triggerStatus autorelease];
-    if (aTriggerStatus) triggerStatus = [aTriggerStatus copy];
-    
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelTriggerStatusChanged object:self];        
-}
-
 - (BOOL) isXl3VltThresholdInInit
 {
     return _isXl3VltThresholdInInit;
@@ -1325,7 +1323,6 @@ BOOL owlSupplyState = false;
 {
     return changingPedMask;
 }
-
 
 #pragma mark •••DB Helpers
 
@@ -1626,12 +1623,6 @@ void SwapLongBlock(void* p, int32_t n)
     initialized = FALSE;
     stateUpdated = FALSE;
 
-    if ([self isTriggerON]) {
-        [self setTriggerStatus:@"ON"];
-    } else {
-        [self setTriggerStatus:@"OFF"];
-    }
-    
     for (i=0; i<12; i++) {
         [self setXl3VltThreshold:i withValue:[decoder decodeFloatForKey:[NSString stringWithFormat:@"ORXL3ModelVltThreshold%i", i]]];
     }
@@ -1716,6 +1707,108 @@ void SwapLongBlock(void* p, int32_t n)
 }
 
 #pragma mark •••Hardware Access
+
+- (void) nominalSettingsCallback: (ORPQResult *) result
+{
+    int i, nrows, ncols, slot, channel;
+    int n100, n20, sequencer, hv;
+    ORFec32Model *fec;
+
+    if (!result) {
+        NSLog(@"crate %02d: database request for nominal settings failed!\n", [self crateNumber]);
+        return;
+    }
+
+    nrows = [result numOfRows];
+    ncols = [result numOfFields];
+
+    if (ncols != 5) {
+        NSLog(@"crate %02d: expected 5 columns from the database, but got %i!\n", [self crateNumber], ncols);
+        return;
+    }
+
+    if (nrows != 512) {
+        NSLog(@"crate %02d: expected 512 rows from the database, but got %i!\n", [self crateNumber], nrows);
+        return;
+    }
+
+    for (i = 0; i < nrows; i++) {
+        slot = [result getInt64atRow:i column:0];
+        channel = [result getInt64atRow:i column:1];
+        n100 = [result getInt64atRow:i column:2];
+        n20 = [result getInt64atRow:i column:3];
+        sequencer = [result getInt64atRow:i column:4];
+
+        fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
+
+        if (!fec) continue;
+
+        /* Check if the relay is open. */
+        hv = ([self relayMask] >> (slot*4 + (3-channel/8))) & 0x1;
+
+        [fec setSeq:channel enabled:sequencer];
+
+        if (hv) {
+            [fec setTrigger100ns:channel enabled:n100];
+            [fec setTrigger20ns:channel enabled:n20];
+        } else {
+            [fec setTrigger100ns:channel enabled:NO];
+            [fec setTrigger20ns:channel enabled:NO];
+        }
+    }
+
+    /* Set the hardware state. */
+    [self loadTriggersAndSequencers];
+}
+
+- (void) loadNominalSettings
+{
+    /* Set the channel triggers and sequencers according to the nominal
+     * settings from the database. */
+    ORPQModel *db = [ORPQModel getCurrent];
+
+    if (!db) {
+        NSLog(@"Postgres object not found, please add it to the experiment!\n");
+        return;
+    }
+
+    [db dbQuery:[NSString stringWithFormat:@"SELECT slot, channel, n100, n20, sequencer FROM current_nominal_settings WHERE crate = %i", [self crateNumber]] object:self selector:@selector(nominalSettingsCallback:) timeout:10.0];
+}
+
+- (void) _loadTriggersAndSequencers
+{
+    /* Function to actually load the current GUI channel trigger and sequencer
+     * settings. This should be called in a separate thread since it will
+     * block. Any exceptions will be caught and logged. */
+    @try {
+        [self loadTriggers];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor], @"crate %02d: failed to set triggers. error: %@ reason: %@\n",
+                   [self crateNumber], [e name], [e reason]);
+    }
+
+    @try {
+        [self loadSequencers];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor], @"crate %02d: failed to set sequencers. error: %@ reason: %@\n",
+                   [self crateNumber], [e name], [e reason]);
+    }
+}
+
+- (void) loadTriggersAndSequencers
+{
+    /* Loads the current GUI channel trigger and sequencer settings to the
+     * hardware asynchronously. */
+    if (![[self xl3Link] isConnected]) {
+        NSLogColor([NSColor redColor], @"xl3 %02d is not connected!\n",
+                    [self crateNumber]);
+        return;
+    }
+
+    [NSThread detachNewThreadSelector:@selector(_loadTriggersAndSequencers)
+        toTarget:self
+        withObject:nil];
+}
 
 - (void) loadTriggers
 {
@@ -2207,9 +2300,7 @@ void SwapLongBlock(void* p, int32_t n)
 
     /* If the triggers OFF button has been pressed, turn off N100 and N20
      * triggers */
-    if ([self isTriggerON]) {
-        [self setTriggerStatus:@"ON"];
-    } else {
+    if (![self isTriggerON]) {
         for (slot = 0; slot < 16; slot++) {
             if ((slotMask & (1 << slot)) == 0) continue;
 
@@ -2218,7 +2309,6 @@ void SwapLongBlock(void* p, int32_t n)
                 mbs[slot].tr20.mask[channel] = 0;
             }
         }
-        [self setTriggerStatus:@"OFF"];
     }
 
     NSDictionary *args = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -3948,7 +4038,6 @@ err:
 
                 if (result) {
                     [self setIsTriggerON:NO];
-                    [self setTriggerStatus:@"OFF"];
                     NSLog(@"Crate %02d disabling triggers\n.", [self crateNumber]);
                     return;
                 }
@@ -4319,7 +4408,7 @@ err:
     }
 
     [self setIsTriggerON:YES];
-    [self loadHardware];
+    [self loadTriggersAndSequencers];
     NSLog(@"%@ triggers ON\n", [[self xl3Link] crateName]);
 }
 
@@ -4327,7 +4416,7 @@ err:
 {
     if ([[self xl3Link] isConnected]) {
         [self setIsTriggerON:NO];
-        [self loadHardware];
+        [self loadTriggersAndSequencers];
         NSLog(@"%@ triggers OFF\n", [[self xl3Link] crateName]);
     }
     else {
