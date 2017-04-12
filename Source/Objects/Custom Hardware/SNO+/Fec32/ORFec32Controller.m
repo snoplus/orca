@@ -410,6 +410,26 @@
     }
 }
 
+-(void) keyDown:(NSEvent*)event {
+    NSString* keys = [event charactersIgnoringModifiers];
+    if([keys length] == 0) {
+        return;
+    }
+    if([keys length] == 1) {
+        unichar key = [keys characterAtIndex:0];
+        // Arrow keys already taken by GroupView
+        if(key == 'h' || key == 'H') {
+            [self decCardAction:self];
+            return;
+        }
+        if(key == 'l' || key == 'L') {
+            [self incCardAction:self];
+            return;
+        }
+    }
+    [super keyDown:event];
+}
+
 - (void) dcThresholdsChanged:(NSNotification*)aNote
 {
 	int i;

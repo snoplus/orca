@@ -185,6 +185,9 @@
 #pragma mark •••Interface Management
 - (void) xl3LockChanged:(NSNotification*)aNotification;
 - (void) opsRunningChanged:(NSNotification*)aNote;
+- (void) keyDown:(NSEvent*)event;
+- (void) cancelOperation:(id)sender;
+
 //basic ops
 - (void) selectedRegisterChanged:(NSNotification*)aNote;
 - (void) repeatCountChanged:(NSNotification*)aNote;

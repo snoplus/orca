@@ -243,6 +243,30 @@
 	[boardIdField setStringValue:[model boardID]];
 }
 
+-(void) keyDown:(NSEvent*)event {
+    NSString* keys = [event charactersIgnoringModifiers];
+    if([keys length] == 0) {
+        return;
+    }
+    if([keys length] == 1) {
+        unichar key = [keys characterAtIndex:0];
+        if(key == NSLeftArrowFunctionKey || key == 'h' || key == 'H') {
+            [self decCardAction:self];
+            return;
+        }
+        else if(key == NSRightArrowFunctionKey || key == 'l' || key == 'L') {
+            [self incCardAction:self];
+            return;
+        }
+    }
+    [super keyDown:event];
+}
+
+- (void) cancelOperation:(id)sender {
+    [self endEditing];
+    [[self window] makeFirstResponder:nil];
+}
+
 - (void) showVoltsChanged:(NSNotification*)aNote
 {
 	[showVoltsCB setIntValue: [model showVolts]];

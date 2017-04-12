@@ -48,6 +48,8 @@
 - (BOOL) validateMenuItem:(NSMenuItem*)aMenuItem;
 - (void) documentLockChanged:(NSNotification*)aNote;
 - (void) setCrateLabels;
+-(void)keyDown:(NSEvent*)event;
+
 
 - (IBAction) delete:(id)sender; 
 - (IBAction) cut:(id)sender; 

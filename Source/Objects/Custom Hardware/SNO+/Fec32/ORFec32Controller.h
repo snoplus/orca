@@ -143,6 +143,7 @@
 - (void) update20nTriggerInfo:(NSNotification*)aNote;
 - (void) update100nTriggerInfo:(NSNotification*)aNote;
 - (void) updateCmosReadInfo:(NSNotification*)aNote;
+- (void) keyDown:(NSEvent *)event;
 
 #pragma mark •••Actions
 - (IBAction) readCmosRatesAction:(id)sender;

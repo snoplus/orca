@@ -333,6 +333,11 @@
     [self changeESUMThresholdDisplay:esum_units];
 }
 
+- (void) cancelOperation:(id)sender {
+    [self endEditing];
+    [[self window] makeFirstResponder:nil];
+}
+
 - (void) displayMasks
 {
 	int i;
