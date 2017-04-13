@@ -811,7 +811,7 @@ err:
     }
 
     state = RUNNING;
-    if(start == COLD_START){
+    if(start != ROLLOVER_START){
         
         [self setLastStandardRunType:[self standardRunType]];
         [self setLastStandardRunVersion:[self standardRunVersion]];

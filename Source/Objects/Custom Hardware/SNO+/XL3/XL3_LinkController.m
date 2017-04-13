@@ -471,8 +471,8 @@ static NSDictionary* xl3Ops;
 
     //HV
     [self hvStatusChanged:nil];
+    [self hvTriggerStatusChanged:nil];
     [hvTriggersButton setEnabled:!lockedOrNotRunningMaintenance];
-    [loadNominalSettingsButton setEnabled:!lockedOrNotRunningMaintenance];
 
     //Connection
     [toggleConnectButton setEnabled: !lockedOrNotRunningMaintenance];
@@ -859,10 +859,12 @@ static NSDictionary* xl3Ops;
 
 - (void) hvTriggerStatusChanged:(NSNotification*)aNote
 {
+    BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORXL3Lock];
+
     if ([model isTriggerON]) {
         [hvATriggerStatusField setStringValue:@"ON"];
         [hvBTriggerStatusField setStringValue:@"ON"];
-        [loadNominalSettingsButton setEnabled:YES];
+        [loadNominalSettingsButton setEnabled:!lockedOrNotRunningMaintenance];
         [hvTriggersButton setState:NSOnState];
     } else {
         [hvATriggerStatusField setStringValue:@"OFF"];
