@@ -8,11 +8,16 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "ORMTCModel.h"
 
 @interface NHitMonitor : NSObject {
 
 @private
     NSThread *runningthread;
+    char *buf;
+    int sock;
+    int timeout;
+    ORMTCModel *mtc;
 }
 
 - (id) init;
