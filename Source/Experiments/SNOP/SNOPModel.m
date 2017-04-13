@@ -192,7 +192,7 @@ tellieRunFiles = _tellieRunFiles;
 
     ORMTCModel* mtc;
     for (i = 0; i < [mtcs count]; i++) {
-        mtc = [mtcs objectAtIndex:0];
+        mtc = [mtcs objectAtIndex:i];
         [mtc setMTCHost:host];
     }
 
@@ -202,7 +202,7 @@ tellieRunFiles = _tellieRunFiles;
 
     SNOCaenModel* caen;
     for (i = 0; i < [caens count]; i++) {
-        caen = [caens objectAtIndex:0];
+        caen = [caens objectAtIndex:i];
         [caen setMTCHost:host];
     }
 
