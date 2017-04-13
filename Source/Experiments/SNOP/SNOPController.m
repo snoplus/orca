@@ -496,14 +496,6 @@ snopGreenColor;
 - (IBAction) startRunAction:(id)sender
 {
 
-    /* Start/Restart forces a resync */
-
-    /* A resync run does a hard stop and start without the user having to hit
-     * stop run and then start run. Doing this resets the GTID, which resyncs
-     * crate 9 after it goes out of sync :). */
-
-    [model setResync:YES];
-
     //If we are in OPERATOR mode we don't allow other version than DEFAULT
     BOOL locked = [gSecurity isLocked:ORSNOPRunsLockNotification];
     if(locked) { //Operator Mode
@@ -531,6 +523,19 @@ snopGreenColor;
 
     //Start the standard run and stop run initialization if failed
     if(![model startStandardRun:[model standardRunType] withVersion:[model standardRunVersion]]) return;
+
+}
+
+- (IBAction)resyncRunAction:(id)sender
+{
+
+    /* A resync run does a hard stop and start without the user having to hit
+     * stop run and then start run. Doing this resets the GTID, which resyncs
+     * crate 9 after it goes out of sync :). */
+
+    [model setResync:YES];
+
+    [self startRunAction:nil];
 
 }
 
@@ -566,6 +571,7 @@ err:
         [startRunButton setTitle:@"RESTART"];
         [lightBoardView setState:kGoLight];
         [runStatusField setStringValue:@"Running"];
+        [resyncRunButton setEnabled:true];
         [runNumberField setStringValue:[runControl fullRunNumberString]];
         [doggy_icon start_animation];
 	}
@@ -573,6 +579,7 @@ err:
         [startRunButton setTitle:@"START"];
         [lightBoardView setState:kStoppedLight];
         [runStatusField setStringValue:@"Stopped"];
+        [resyncRunButton setEnabled:false];
         [doggy_icon stop_animation];
 	}
 	else if([runControl runningState] == eRunStarting || [runControl runningState] == eRunStopping || [runControl runningState] == eRunBetweenSubRuns){
@@ -580,6 +587,7 @@ err:
             //The run started so update the display
             [runStatusField setStringValue:@"Starting"];
             [startRunButton setEnabled:false];
+            [resyncRunButton setEnabled:false];
             [startRunButton setTitle:@"STARTING..."];
         }
         else {
@@ -1483,7 +1491,7 @@ err:
     BOOL runInProgress				= [gOrcaGlobals runInProgress];
     BOOL locked						= [gSecurity isLocked:ORSNOPRunsLockNotification];
     BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORSNOPRunsLockNotification];
-    BOOL notRunningOrInMaintenance = [model isNotRunningOrIsInMaintenance];
+    BOOL notRunningOrInMaintenance = isNotRunningOrIsInMaintenance();
 
     //[softwareTriggerButton setEnabled: !locked && !runInProgress];
     [runsLockButton setState: locked];

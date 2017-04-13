@@ -403,17 +403,8 @@ static NSDictionary* xl3Ops;
 #pragma mark •••Interface Management
 - (void) xl3LockChanged:(NSNotification*)aNotification
 {
-    //Get SNOP Model
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* aSNOPModel = nil;
-    if ([objs count]) {
-        aSNOPModel = [objs objectAtIndex:0];
-    } else {
-        NSLogColor([NSColor redColor], @"xl3LockChanged: Couldn't find SNOP model. Please add it to the experiment and restart the run.\n");
-    }
 
-    BOOL notRunningOrInMaintenance = true; //default if no snopmodel found
-    if (aSNOPModel) notRunningOrInMaintenance = [aSNOPModel isNotRunningOrIsInMaintenance];
+    BOOL notRunningOrInMaintenance = isNotRunningOrIsInMaintenance();
     BOOL locked						= [gSecurity isLocked:ORXL3Lock];
     BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORXL3Lock];
     
@@ -706,20 +697,10 @@ static NSDictionary* xl3Ops;
 
 - (void) updateHVButtons
 {
- 
-    //Get SNOP Model
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* aSNOPModel = nil;
-    if ([objs count]) {
-        aSNOPModel = [objs objectAtIndex:0];
-    } else {
-        NSLogColor([NSColor redColor], @"xl3LockChanged: Couldn't find SNOP model. Please add it to the experiment and restart the run.\n");
-    }
 
     BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORXL3Lock];
-    BOOL notRunningOrInMaintenance = true; //default if no snopmodel found
-    if (aSNOPModel) notRunningOrInMaintenance = [aSNOPModel isNotRunningOrIsInMaintenance];
-    
+    BOOL notRunningOrInMaintenance = isNotRunningOrIsInMaintenance();
+
     if ([hvPowerSupplyMatrix selectedColumn] == 0) { //A
         bool unlock = ![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && ![model hvASwitch] && [model hvAFromDB] && !lockedOrNotRunningMaintenance;
         [hvOnButton setEnabled:unlock];

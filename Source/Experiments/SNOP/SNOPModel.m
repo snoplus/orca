@@ -68,6 +68,17 @@ NSString* ORSNOPModelSRCollectionChangedNotification = @"ORSNOPModelSRCollection
 NSString* ORSNOPModelSRChangedNotification = @"ORSNOPModelSRChangedNotification";
 NSString* ORSNOPModelSRVersionChangedNotification = @"ORSNOPModelSRVersionChangedNotification";
 
+
+BOOL isNotRunningOrIsInMaintenance()
+{
+
+    return (![gOrcaGlobals runInProgress] ||
+            (([gOrcaGlobals runType] & kMaintenanceRun) ||
+             ([gOrcaGlobals runType] & kDiagnosticRun)));
+    
+}
+
+
 @implementation SNOPModel
 
 @synthesize
@@ -847,7 +858,7 @@ err:
 
     if (![[userInfo objectForKey:@"willRestart"] boolValue] || resync) {
         state = STOPPING;
-	resync = NO;
+        resync = NO;
     }
 
     switch (state) {
@@ -2250,16 +2261,6 @@ err:
     NSLog(@"Settings loaded in Hardware \n");
 
 }
-
-- (BOOL) isNotRunningOrIsInMaintenance
-{
-    
-    return (![gOrcaGlobals runInProgress] ||
-            (([gOrcaGlobals runType] & kMaintenanceRun) ||
-            ([gOrcaGlobals runType] & kDiagnosticRun)));
-    
-}
-
 
 @end
 @implementation SNOPDecoderForRHDR

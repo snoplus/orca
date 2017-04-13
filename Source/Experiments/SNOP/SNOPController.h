@@ -50,6 +50,7 @@
 
     //Run control (the rest is in the ORExperimentController)
     IBOutlet StopLightView *lightBoardView;
+    IBOutlet NSButton *resyncRunButton;
 
     //Quick links
     

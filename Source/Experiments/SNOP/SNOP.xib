@@ -59,6 +59,7 @@
                 <outlet property="pingCratesButton" destination="drG-95-YYb" id="Aug-97-auQ"/>
                 <outlet property="rampDownCrateButton" destination="vcZ-IJ-Cct" id="noe-Li-2Q6"/>
                 <outlet property="repeatRunCB" destination="1339" id="1354"/>
+                <outlet property="resyncRunButton" destination="eox-6c-ihd" id="K4U-Io-B29"/>
                 <outlet property="runBar" destination="MBu-zu-x36" id="iTV-aT-8hr"/>
                 <outlet property="runNumberField" destination="3752" id="NlG-fq-pyu"/>
                 <outlet property="runStatusField" destination="3733" id="LhC-Ec-9HL"/>
@@ -119,8 +120,8 @@
                                     <rect key="frame" x="10" y="33" width="361" height="245"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <button toolTip="Start/restart the standard run selected on the right panel" id="1253">
-                                            <rect key="frame" x="45" y="207" width="226" height="37"/>
+                                        <button toolTip="Start/Restart the standard run selected on the menu on the right." id="1253">
+                                            <rect key="frame" x="45" y="207" width="140" height="37"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <animations/>
                                             <buttonCell key="cell" type="bevel" title="START" bezelStyle="regularSquare" alignment="center" borderStyle="border" inset="2" id="2541">
@@ -344,7 +345,7 @@
                                                 <color key="backgroundColor" red="0.25796978300000001" green="0.50936399129999999" blue="0.89733270200000004" alpha="1" colorSpace="calibratedRGB"/>
                                             </textFieldCell>
                                         </textField>
-                                        <button toolTip="Stop run" id="1258">
+                                        <button toolTip="Stop run. XSnoed and TUB will be lose, so we should only do this if extrictly required." id="1258">
                                             <rect key="frame" x="275" y="207" width="79" height="37"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <animations/>
@@ -366,6 +367,18 @@
                                             </buttonCell>
                                             <connections>
                                                 <action selector="runsLockAction:" target="-2" id="MFs-mm-seY"/>
+                                            </connections>
+                                        </button>
+                                        <button id="eox-6c-ihd">
+                                            <rect key="frame" x="182" y="207" width="95" height="37"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <string key="toolTip">Stop run and start standard run selected on the menu on the right. Induces a dead time and should only be used when things get out of sync.</string>
+                                            <buttonCell key="cell" type="bevel" title="RESYNC" bezelStyle="regularSquare" alignment="center" borderStyle="border" inset="2" id="Ter-hb-XSn">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="startRunAction:" target="-2" id="C6C-06-Atc"/>
                                             </connections>
                                         </button>
                                     </subviews>
