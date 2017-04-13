@@ -605,8 +605,9 @@ static int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 	[fpIOLVDS3Matrix setEnabled:!lockedOrRunningMaintenance]; 
 	[fpIOPatternLatchMatrix setEnabled:!lockedOrRunningMaintenance]; 
 	[fpIOTrgInMatrix setEnabled:!lockedOrRunningMaintenance]; 
-	[fpIOTrgOutMatrix setEnabled:!lockedOrRunningMaintenance]; 
-	[fpIOGetButton setEnabled:!lockedOrRunningMaintenance]; 
+    [fpIOTrgOutMatrix setEnabled:!lockedOrRunningMaintenance];
+    [fpIOTrgOutModeMatrix setEnabled:!lockedOrRunningMaintenance];
+	[fpIOGetButton setEnabled:!lockedOrRunningMaintenance];
 	[fpIOSetButton setEnabled:!lockedOrRunningMaintenance]; 
     [postTriggerSettingTextField setEnabled:!lockedOrRunningMaintenance]; 
     [triggerSourceMaskMatrix setEnabled:!lockedOrRunningMaintenance]; 
@@ -618,7 +619,7 @@ static int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     [eventSizePopUp setEnabled:!lockedOrRunningMaintenance]; 
     [loadThresholdsButton setEnabled:!lockedOrRunningMaintenance]; 
     [initButton setEnabled:!lockedOrRunningMaintenance]; 
-	
+
 	//these must NOT or can not be changed when run in progress
     [customSizeTextField setEnabled:!locked && !runInProgress && [model isCustomSize]]; 
 	[customSizeButton setEnabled:!locked && !runInProgress]; 

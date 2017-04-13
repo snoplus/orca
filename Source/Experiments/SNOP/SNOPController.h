@@ -42,11 +42,14 @@
     int displayUnitsDecider[10];
     int thresholdsFromDB[10];
 
-    IBOutlet NSMatrix* hvStatusMatrix;
-    
+    //HV Master
+    IBOutlet NSMatrix *hvStatusMatrix;
+    IBOutlet NSMatrix *triggerStatusMatrix;
+    IBOutlet NSMatrix *globalxl3Mode;
+    IBOutlet NSMatrix *rampDownCrateButton;
+
     //Run control (the rest is in the ORExperimentController)
     IBOutlet StopLightView *lightBoardView;
-    IBOutlet NSButton *resyncRunButton;
 
     //Quick links
     
@@ -61,20 +64,16 @@
     IBOutlet NSComboBox *standardRunVersionPopupMenu;
     IBOutlet NSButton *standardRunLoadButton;
     IBOutlet NSButton *standardRunSaveButton;
+    IBOutlet NSButton *standardRunLoadinHWButton;
     IBOutlet NSMatrix *standardRunThresCurrentValues;
     IBOutlet NSMatrix *standardRunThresStoredValues;
     IBOutlet NSMatrix *standardRunThreshLabels;
-
 
     //Run Types Information
     IBOutlet NSMatrix*  runTypeWordMatrix;
     IBOutlet NSMatrix *runTypeWordSRMatrix;
     IBOutlet NSTextField *inMaintenanceLabel;
 
-    //Xl3 Mode
-    IBOutlet NSMatrix * globalxl3Mode;
-    IBOutlet NSMatrix *rampDownCrateButton;
-    
     //smellie buttons ---------
     IBOutlet NSComboBox *smellieRunFileNameField;
     IBOutlet NSTextField *loadedSmellieRunNameLabel;
@@ -178,7 +177,9 @@
 - (void) updateWindow;
 
 #pragma mark ¥¥¥Interface
+- (void) XL3ModeChanged:(NSNotification*)aNote;
 - (void) hvStatusChanged:(NSNotification*)aNote;
+- (void) triggerStatusChanged:(NSNotification*)aNote;
 - (void) dbOrcaDBIPChanged:(NSNotification*)aNote;
 - (void) dbDebugDBIPChanged:(NSNotification*)aNote;
 
@@ -205,7 +206,6 @@
 
 - (IBAction) hvMasterPanicAction:(id)sender;
 - (IBAction) hvMasterTriggersOFF:(id)sender;
-- (IBAction) hvMasterStatus:(id)sender;
 
 - (IBAction) pingCratesAction:(id)sender;
 
@@ -224,9 +224,6 @@
 - (IBAction)startTellieRunAction:(id)sender;
 - (IBAction) stopTellieRunAction:(id)sender;
 - (void)startTellieRunNotification:(NSNotification *)notification;
-
-//xl3 mode status
-- (IBAction)updatexl3Mode:(id)sender;
 
 #pragma mark ¥¥¥Details Interface Management
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem;

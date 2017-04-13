@@ -92,6 +92,11 @@
     IBOutlet NSTextField*           monPollCMOSRatesMaskField; 
     IBOutlet NSTextField*           monPollPMTCurrentsMaskField; 
     IBOutlet NSTextField*           monPollFECVoltagesMaskField;
+
+    IBOutlet NSTextField *pollRunStateLabel;
+    IBOutlet NSButton *pollNowButton;
+    IBOutlet NSButton *startPollButton;
+    IBOutlet NSButton *stopPollButton;
     IBOutlet NSPopUpButton*         monPollingRatePU;
     IBOutlet NSButton*              monIsPollingVerboseButton;
     IBOutlet NSButton*              monIsPollingWithRunButton;
@@ -111,6 +116,7 @@
     IBOutlet NSButton* monVltThresholdInInitButton;
     IBOutlet NSButton* monVltThresholdSetButton;
     //hv
+    IBOutlet NSTextField *hvRunStateLabel;
     IBOutlet NSButtonCell *hvAcceptReadbackButton;
     IBOutlet NSButton *hvOnButton;
     IBOutlet NSButton *hvOffButton;

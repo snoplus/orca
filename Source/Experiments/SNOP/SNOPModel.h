@@ -204,9 +204,10 @@
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
 
 - (void) pingCrates;
+- (void) stopXL3Polling;
 
 #pragma mark ¥¥orcascript helpers
-- (BOOL) isNotRunningOrInMaintenance;
+- (BOOL) isNotRunningOrIsInMaintenance;
 - (void) zeroPedestalMasks;
 - (void) updatePedestalMasks:(unsigned int)pattern;
 - (void) hvMasterTriggersOFF;
