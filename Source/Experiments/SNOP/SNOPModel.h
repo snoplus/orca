@@ -44,6 +44,8 @@
 #define kNumOfCrates 19 //number of Crates in SNO+
 #define STANDARD_RUN_VERSION 1 //Increase if Standard Runs table structure is changed
 
+BOOL isNotRunningOrIsInMaintenance();
+
 @interface SNOPModel: ORExperimentModel <snotDbDelegate>
 {
 	int viewType;
@@ -206,7 +208,6 @@
 - (void) pingCrates;
 
 #pragma mark ¥¥orcascript helpers
-- (BOOL) isNotRunningOrInMaintenance;
 - (void) zeroPedestalMasks;
 - (void) updatePedestalMasks:(unsigned int)pattern;
 - (void) hvMasterTriggersOFF;

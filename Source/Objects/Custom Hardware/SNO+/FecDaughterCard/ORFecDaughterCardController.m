@@ -434,12 +434,16 @@
 
 - (IBAction) incCardAction:(id)sender
 {
-	[self incModelSortedBy:@selector(globalCardNumberCompare:)];
+    bool isDBLocked = [gSecurity isLocked:ORDBLock];
+    [self incModelSortedBy:@selector(globalCardNumberCompare:)];
+    [gSecurity setLock:ORDBLock to:isDBLocked];
 }
 
 - (IBAction) decCardAction:(id)sender
 {
-	[self decModelSortedBy:@selector(globalCardNumberCompare:)];
+    bool isDBLocked = [gSecurity isLocked:ORDBLock];
+    [self decModelSortedBy:@selector(globalCardNumberCompare:)];
+    [gSecurity setLock:ORDBLock to:isDBLocked];
 }
 
 - (IBAction) rp1Action:(id)sender
