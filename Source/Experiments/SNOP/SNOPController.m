@@ -521,15 +521,13 @@ snopGreenColor;
     if( !((dbruntypeword & kMaintenanceRun) || (dbruntypeword & kDiagnosticRun)) ){
         //Make sure we are not polling
         NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
-        bool xl3ispolling = false;
         for(ORXL3Model *anXL3 in xl3s){
-            if([anXL3 isPollingXl3]) xl3ispolling = true;
+            if([anXL3 isPollingXl3]) {
+                NSLog(@"Stopping XL3 polling on crate %d\n",[anXL3 crateNumber]);
+                [anXL3 setIsPollingXl3:false];
+            }
         }
-        if(xl3ispolling){
-            NSLog(@"Stopping XL3 polling \n");
-            [model stopXL3Polling];
-        }
-   }
+    }
 
     //Start the standard run and stop run initialization if failed
     if(![model startStandardRun:[model standardRunType] withVersion:[model standardRunVersion]]) return;

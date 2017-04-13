@@ -1213,14 +1213,6 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     }
 }
 
-- (void) stopXL3Polling
-{
-    NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
-    for(ORXL3Model *anXL3 in xl3s){
-        if([anXL3 isPollingXl3]) [anXL3 setIsPollingXl3:false];
-    }
-}
-
 - (void) updateRHDRSruct
 {
     //form run info
