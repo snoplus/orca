@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6254" systemVersion="13F1077" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14B25" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
         <development version="5100" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6254"/>
-        <plugIn identifier="com.apple.WebKitIBPlugin" version="6254"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
+        <plugIn identifier="com.apple.WebKitIBPlugin" version="7706"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SNOPController">
@@ -91,6 +91,7 @@
                 <outlet property="timeStartedField" destination="3770" id="rbE-Hw-cDc"/>
                 <outlet property="timedRunCB" destination="1344" id="1352"/>
                 <outlet property="triggerStatusMatrix" destination="Eyd-55-S8p" id="XRq-61-gjI"/>
+                <outlet property="triggersOFFButton" destination="266-Dd-MIl" id="Kne-La-m2D"/>
                 <outlet property="window" destination="5" id="950"/>
                 <outlet property="xl3Host" destination="AIC-b9-zSX" id="DnO-GW-xgy"/>
                 <outlet property="xl3Port" destination="hDG-wd-Xw9" id="1iH-de-4g5"/>
@@ -3845,11 +3846,11 @@
                     </textFieldCell>
                 </textField>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" id="hZV-C1-iie">
-                    <rect key="frame" x="18" y="10" width="642" height="51"/>
+                    <rect key="frame" x="18" y="27" width="642" height="34"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="justified" id="tKB-wq-DlE">
                         <font key="font" metaFont="system"/>
-                        <string key="title">- Modify Standard Run: go to Maintenance Run or stop the run. Then select the Standard Run you want to modify from the dropdown menu and click 'Load Standard Run'. Change the desired settings and click 'Overwrite Standard Run'.</string>
+                        <string key="title">- Modify Standard Run: select the Standard Run you want to modify from the dropdown menu and click 'Load Standard Run'. Change the desired settings and click 'Overwrite Standard Run'.</string>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>

@@ -1497,9 +1497,11 @@ err:
     
     //Enable or disable fields
     [standardRunThresCurrentValues setEnabled:!lockedOrNotRunningMaintenance];
-    [standardRunSaveButton setEnabled:!lockedOrNotRunningMaintenance];
-    [standardRunLoadButton setEnabled:!lockedOrNotRunningMaintenance];
+    [standardRunSaveButton setEnabled:!locked];
+    [standardRunLoadButton setEnabled:!locked];
     [standardRunLoadinHWButton setEnabled:!lockedOrNotRunningMaintenance];
+    [triggersOFFButton setEnabled:notRunningOrInMaintenance];
+
     //Do not lock detector state bits to the operator
     for(int irow=0;irow<21;irow++){
         [[runTypeWordMatrix cellAtRow:irow column:0] setEnabled:!lockedOrNotRunningMaintenance];

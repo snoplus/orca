@@ -55,6 +55,7 @@
     
     //Danger zone
     IBOutlet NSButton *panicDownButton;
+    IBOutlet NSButton *triggersOFFButton;
     IBOutlet NSTextField *detectorHVStatus;
     
     IBOutlet NSButton *pingCratesButton;

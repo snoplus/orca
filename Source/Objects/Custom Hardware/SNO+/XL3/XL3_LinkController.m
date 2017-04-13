@@ -480,7 +480,9 @@ static NSDictionary* xl3Ops;
 
     //HV
     [self hvStatusChanged:nil];
-    
+    [hvTriggersButton setEnabled:!lockedOrNotRunningMaintenance];
+    [loadNominalSettingsButton setEnabled:!lockedOrNotRunningMaintenance];
+
     //Connection
     [toggleConnectButton setEnabled: !lockedOrNotRunningMaintenance];
     [errorTimeOutPU setEnabled: !lockedOrNotRunningMaintenance];
