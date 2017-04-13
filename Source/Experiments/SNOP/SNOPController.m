@@ -1234,10 +1234,7 @@ err:
     ////////////
     // Roll over into maintenance run
     if([[model lastStandardRunType] isEqualToString:@"SMELLIE"]){
-        [model setStandardRunType:@"MAINTENANCE"];
-        [model loadStandardRun:[model standardRunType] withVersion:[model standardRunVersion]];
-        [model loadSettingsInHW];
-        [self startRunAction:self];
+        [model startStandardRun:@"MAINTENANCE" withVersion:@"DEFAULT"];
     }
 }
 
@@ -1439,10 +1436,7 @@ err:
     if([[model lastStandardRunType] isEqualToString:@"TELLIE"]){
         // If user was running a TELLIE standard sequence, roll over into maintinance run
         if([self tellieStandardSequenceFlag]){
-            [model setStandardRunType:@"MAINTENANCE"];
-            [model loadStandardRun:[model standardRunType] withVersion:[model standardRunVersion]];
-            [model loadSettingsInHW];
-            [self startRunAction:self];
+            [model startStandardRun:@"MAINTENANCE" withVersion:@"DEFAULT"];
         // If user is using the ellie gui simply start a new run as they'll likely need to run
         // more sequences. Reasonable as this is an 'expert' level operation. Proceedures
         // will dictate the user should start a new standard run manualy when they're finished
