@@ -219,7 +219,6 @@
 
 - (void) subRunStarted:(NSNotification*)aNote;
 - (void) subRunEnded:(NSNotification*)aNote;
-- (void) aboutToQuit:(NSNotification*)aNote;
 - (void) detectorStateChanged:(NSNotification*)aNote;
 
 - (void) updateEPEDStructWithCoarseDelay: (unsigned long) coarseDelay
