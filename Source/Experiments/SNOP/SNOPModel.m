@@ -956,7 +956,7 @@ err:
 
     NSArray *runObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runObjects count]){
-        NSLogColor([NSColor redColor], @"initRunNumber: couldn't find run control object!");
+        NSLogColor([NSColor redColor], @"detectorStateChanged: couldn't find run control object!");
         return;     // (should never happen)
     }
     ORRunModel* runControl = [runObjects objectAtIndex:0];
