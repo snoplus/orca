@@ -98,8 +98,6 @@ NSString* ORXL3ModelXl3VltThresholdInInitChanged = @"ORXL3ModelXl3VltThresholdIn
 NSString* ORXL3Lock = @"ORXL3Lock";
 NSString* ORXL3ModelStateChanged = @"ORXL3ModelStateChanged";
 
-extern NSString* ORSNOPRequestHVStatus;
-
 @interface ORXL3Model (private)
 - (void) doBasicOp;
 - (NSString*) stringDate;
@@ -205,11 +203,6 @@ isLoaded = isLoaded;
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     
-    [notifyCenter addObserver : self
-                     selector : @selector(readHVStatus)
-                         name : ORSNOPRequestHVStatus
-                       object : nil];
-
     [notifyCenter addObserver : self
                      selector : @selector(connectionStateChanged)
                          name : XL3_LinkConnectionChanged

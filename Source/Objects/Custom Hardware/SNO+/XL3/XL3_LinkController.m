@@ -404,6 +404,7 @@ static NSDictionary* xl3Ops;
 - (void) xl3LockChanged:(NSNotification*)aNotification
 {
 
+    BOOL notRunningOrInMaintenance = isNotRunningOrIsInMaintenance();
     BOOL locked						= [gSecurity isLocked:ORXL3Lock];
     BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORXL3Lock];
     
@@ -448,18 +449,11 @@ static NSDictionary* xl3Ops;
     [compositeChargeInjButton setEnabled: !lockedOrNotRunningMaintenance];
 
     //Monitor
-//    [monIsPollingCMOSRatesButton setEnabled: !lockedOrNotRunningMaintenance];
-//    [monIsPollingPMTCurrentsButton setEnabled: !lockedOrNotRunningMaintenance];
-//    [monIsPollingFECVoltagesButton setEnabled: !lockedOrNotRunningMaintenance];
-//    [monIsPollingXl3VoltagesButton setEnabled: !lockedOrNotRunningMaintenance];
-//    [monIsPollingHVSupplyButton setEnabled: !lockedOrNotRunningMaintenance];
-//    [monPollCMOSRatesMaskField setEnabled: !lockedOrNotRunningMaintenance];
-//    [monPollPMTCurrentsMaskField setEnabled: !lockedOrNotRunningMaintenance];
-//    [monPollFECVoltagesMaskField setEnabled: !lockedOrNotRunningMaintenance];
-//    [monPollingRatePU setEnabled: !lockedOrNotRunningMaintenance];
-//    [monIsPollingVerboseButton setEnabled: !lockedOrNotRunningMaintenance];
-//    [monIsPollingWithRunButton setEnabled: !lockedOrNotRunningMaintenance];
-//    [monPollingStatusField setEnabled: !lockedOrNotRunningMaintenance];
+    [pollNowButton setEnabled: notRunningOrInMaintenance];
+    [startPollButton setEnabled: notRunningOrInMaintenance];
+    [stopPollButton setEnabled: notRunningOrInMaintenance];
+    [pollRunStateLabel setHidden: notRunningOrInMaintenance];
+
     [monVltThresholdTextField0 setEnabled: !lockedOrNotRunningMaintenance];
     [monVltThresholdTextField1 setEnabled: !lockedOrNotRunningMaintenance];
     [monVltThresholdTextField2 setEnabled: !lockedOrNotRunningMaintenance];
@@ -477,7 +471,9 @@ static NSDictionary* xl3Ops;
 
     //HV
     [self hvStatusChanged:nil];
-    
+    [self hvTriggerStatusChanged:nil];
+    [hvTriggersButton setEnabled:!lockedOrNotRunningMaintenance];
+
     //Connection
     [toggleConnectButton setEnabled: !lockedOrNotRunningMaintenance];
     [errorTimeOutPU setEnabled: !lockedOrNotRunningMaintenance];
@@ -701,20 +697,10 @@ static NSDictionary* xl3Ops;
 
 - (void) updateHVButtons
 {
- 
-    //Get SNOP Model
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* aSNOPModel = nil;
-    if ([objs count]) {
-        aSNOPModel = [objs objectAtIndex:0];
-    } else {
-        NSLogColor([NSColor redColor], @"xl3LockChanged: Couldn't find SNOP model. Please add it to the experiment and restart the run.\n");
-    }
-    
+
     BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORXL3Lock];
-    BOOL notRunningOrInMaintenance = true; //default if no snopmodel found
-    if (aSNOPModel) notRunningOrInMaintenance = [aSNOPModel isNotRunningOrInMaintenance];
-    
+    BOOL notRunningOrInMaintenance = isNotRunningOrIsInMaintenance();
+
     if ([hvPowerSupplyMatrix selectedColumn] == 0) { //A
         bool unlock = ![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && ![model hvASwitch] && [model hvAFromDB] && !lockedOrNotRunningMaintenance;
         [hvOnButton setEnabled:unlock];
@@ -734,9 +720,11 @@ static NSDictionary* xl3Ops;
         
         unlock = ![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping] && [model hvAFromDB] && notRunningOrInMaintenance;
         [hvRampDownButton setEnabled:unlock];
-        
+
         unlock = [model hvANeedsUserIntervention] && [model hvAFromDB] && notRunningOrInMaintenance;
         [hvAcceptReadbackButton setEnabled:unlock];
+
+        [hvRunStateLabel setHidden: notRunningOrInMaintenance];
 
     } else {
         bool unlock = ![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && ![model hvBSwitch] && [model hvBFromDB] && !lockedOrNotRunningMaintenance;
@@ -757,12 +745,14 @@ static NSDictionary* xl3Ops;
         
         unlock = ![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && ![model hvBRamping] && [model hvBFromDB] && notRunningOrInMaintenance;
         [hvRampDownButton setEnabled:unlock];
-        
+
         unlock = [model hvBNeedsUserIntervention] && [model hvBFromDB] && notRunningOrInMaintenance;
         [hvAcceptReadbackButton setEnabled:unlock];
 
+        [hvRunStateLabel setHidden: notRunningOrInMaintenance];
+
     }
-    
+
 }
 
 - (void) hvRelayMaskChanged:(NSNotification*)aNote
@@ -869,10 +859,12 @@ static NSDictionary* xl3Ops;
 
 - (void) hvTriggerStatusChanged:(NSNotification*)aNote
 {
+    BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORXL3Lock];
+
     if ([model isTriggerON]) {
         [hvATriggerStatusField setStringValue:@"ON"];
         [hvBTriggerStatusField setStringValue:@"ON"];
-        [loadNominalSettingsButton setEnabled:YES];
+        [loadNominalSettingsButton setEnabled:!lockedOrNotRunningMaintenance];
         [hvTriggersButton setState:NSOnState];
     } else {
         [hvATriggerStatusField setStringValue:@"OFF"];
@@ -1120,12 +1112,16 @@ static NSDictionary* xl3Ops;
 #pragma mark •••Actions
 - (IBAction) incXL3Action:(id)sender
 {
+    bool isXL3Locked = [gSecurity isLocked:ORXL3Lock];
 	[self incModelSortedBy:@selector(XL3NumberCompare:)];
+    [gSecurity setLock:ORXL3Lock to:isXL3Locked];
 }
 
 - (IBAction) decXL3Action:(id)sender
 {
+    bool isXL3Locked = [gSecurity isLocked:ORXL3Lock];
 	[self decModelSortedBy:@selector(XL3NumberCompare:)];
+    [gSecurity setLock:ORXL3Lock to:isXL3Locked];
 }
 
 - (IBAction) lockAction:(id)sender

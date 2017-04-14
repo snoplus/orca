@@ -745,12 +745,16 @@
 
 - (IBAction) incCardAction:(id)sender
 {
-	[self incModelSortedBy:@selector(globalCardNumberCompare:)];
+    bool isFECLocked = [gSecurity isLocked:ORFecLock];
+    [self incModelSortedBy:@selector(globalCardNumberCompare:)];
+    [gSecurity setLock:ORFecLock to:isFECLocked];
 }
 
 - (IBAction) decCardAction:(id)sender
 {
-	[self decModelSortedBy:@selector(globalCardNumberCompare:)];
+    bool isFECLocked = [gSecurity isLocked:ORFecLock];
+    [self decModelSortedBy:@selector(globalCardNumberCompare:)];
+    [gSecurity setLock:ORFecLock to:isFECLocked];
 }
 
 - (IBAction) pmtStateClickAction:(id)sender
