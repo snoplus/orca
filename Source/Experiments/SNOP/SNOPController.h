@@ -147,6 +147,10 @@
 
     // Nhit Monitor settings
     IBOutlet NSButton *runNhitMonitorButton;
+    IBOutlet NSPopUpButton *nhitMonitorCrateButton;
+    IBOutlet NSTextField *nhitMonitorPulserRate;
+    IBOutlet NSTextField *nhitMonitorNumPulses;
+    IBOutlet NSTextField *nhitMonitorMaxNhit;
 
     //Custom colors
     NSColor *snopRedColor;
@@ -195,7 +199,15 @@
 
 - (void) updateSettings: (NSNotification *) aNote;
 - (void) initializeUnits;
+
 #pragma mark ¥¥¥Actions
+
+/* Nhit Monitor */
+- (IBAction) runNhitMonitorAction: (id) sender;
+- (IBAction) nhitMonitorCrateAction: (id) sender;
+- (IBAction) nhitMonitorPulserRateAction: (id) sender;
+- (IBAction) nhitMonitorNumPulsesAction: (id) sender;
+- (IBAction) nhitMonitorMaxNhitAction: (id) sender;
 
 - (IBAction) orcaDBIPAddressAction:(id)sender;
 - (IBAction) orcaDBClearHistoryAction:(id)sender;

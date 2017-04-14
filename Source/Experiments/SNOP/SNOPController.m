@@ -432,6 +432,11 @@ snopGreenColor;
                      selector : @selector(fetchTellieRunFilesFinish:)
                          name : @"TellieRunFilesLoaded"
                         object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(nhitMonitorSettingsChanged:)
+                         name : ORSNOPModelNhitMonitorChangedNotification
+                        object: nil];
 }
 
 - (void) updateWindow
@@ -456,6 +461,18 @@ snopGreenColor;
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
     [gSecurity setLock:ORSNOPRunsLockNotification to:secure];
     [runsLockButton setEnabled:secure];
+}
+
+- (void) nhitMonitorSettingsChanged: (NSNotification*) aNote
+{
+    int crate = [model nhitMonitorCrate];
+    [nhitMonitorCrateButton selectItemAtIndex:crate];
+    int pulserRate = [model nhitMonitorPulserRate];
+    [nhitMonitorPulserRate setStringValue:[NSString stringWithFormat:@"%i", pulserRate]];
+    int numPulses = [model nhitMonitorNumPulses];
+    [nhitMonitorNumPulses setStringValue:[NSString stringWithFormat:@"%i", numPulses]];
+    int maxNhit = [model nhitMonitorMaxNhit];
+    [nhitMonitorMaxNhit setStringValue:[NSString stringWithFormat:@"%i", maxNhit]];
 }
 
 -(void) SRTypeChanged:(NSNotification*)aNote
@@ -612,6 +629,26 @@ err:
 - (IBAction) runNhitMonitorAction: (id) sender
 {
     [model runNhitMonitor];
+}
+
+- (IBAction) nhitMonitorCrateAction: (id) sender
+{
+    [model setNhitMonitorCrate:[sender intValue]];
+}
+
+- (IBAction) nhitMonitorPulserRateAction: (id) sender
+{
+    [model setNhitMonitorPulserRate:[sender intValue]];
+}
+
+- (IBAction) nhitMonitorNumPulsesAction: (id) sender
+{
+    [model setNhitMonitorNumPulses:[sender intValue]];
+}
+
+- (IBAction) nhitMonitorMaxNhitAction: (id) sender
+{
+    [model setNhitMonitorMaxNhit:[sender intValue]];
 }
 
 - (void) dbOrcaDBIPChanged:(NSNotification*)aNote

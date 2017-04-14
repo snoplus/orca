@@ -67,6 +67,7 @@ NSString* ORSNOPRunsLockNotification = @"ORSNOPRunsLockNotification";
 NSString* ORSNOPModelSRCollectionChangedNotification = @"ORSNOPModelSRCollectionChangedNotification";
 NSString* ORSNOPModelSRChangedNotification = @"ORSNOPModelSRChangedNotification";
 NSString* ORSNOPModelSRVersionChangedNotification = @"ORSNOPModelSRVersionChangedNotification";
+NSString* ORSNOPModelNhitMonitorChangedNotification = @"ORSNOPModelNhitMonitorChangedNotification";
 
 
 BOOL isNotRunningOrIsInMaintenance()
@@ -138,6 +139,8 @@ tellieRunFiles = _tellieRunFiles;
 
     [self initOrcaDBConnectionHistory];
     [self initDebugDBConnectionHistory];
+
+    nhitMonitor = [[NHitMonitor alloc] init];
     [[self undoManager] enableUndoRegistration];
 
     return self;
@@ -404,6 +407,7 @@ tellieRunFiles = _tellieRunFiles;
     [dataHost release];
     [logHost release];
     [anECARun release];
+    [NHitMonitor dealloc];
     [super dealloc];
 }
 
@@ -1220,7 +1224,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 
 - (void) runNhitMonitor
 {
-    [nhitMonitor start:[self crate] pulserRate:[self pulserRate] numPulses:[self numPulses] maxNhit:[self maxNhit]];
+    [nhitMonitor start:[self nhitMonitorCrate] pulserRate:[self nhitMonitorPulserRate] numPulses:[self nhitMonitorNumPulses] maxNhit:[self nhitMonitorMaxNhit]];
 }
 
 - (void) updateRHDRSruct
@@ -1292,6 +1296,50 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 }
 
 #pragma mark ¥¥¥Accessors
+
+- (int) nhitMonitorCrate
+{
+    return nhitMonitorCrate;
+}
+
+- (void) setNhitMonitorCrate: (int) crate
+{
+    nhitMonitorCrate = crate;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelNhitMonitorChangedNotification object:self];
+}
+
+- (int) nhitMonitorPulserRate
+{
+    return nhitMonitorPulserRate;
+}
+
+- (void) setNhitMonitorPulserRate: (int) pulserRate
+{
+    nhitMonitorPulserRate = pulserRate;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelNhitMonitorChangedNotification object:self];
+}
+
+- (int) nhitMonitorNumPulses
+{
+    return nhitMonitorNumPulses;
+}
+
+- (void) setNhitMonitorNumPulses: (int) numPulses
+{
+    nhitMonitorNumPulses = numPulses;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelNhitMonitorChangedNotification object:self];
+}
+
+- (int) nhitMonitorMaxNhit
+{
+    return nhitMonitorMaxNhit;
+}
+
+- (void) setNhitMonitorMaxNhit: (int) maxNhit
+{
+    nhitMonitorMaxNhit = maxNhit;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelNhitMonitorChangedNotification object:self];
+}
 
 - (void) clearOrcaDBConnectionHistory
 {

@@ -24,6 +24,7 @@
 #import "ORVmeCardDecoder.h"
 #import "RedisClient.h"
 #import "ECARun.h"
+#import "NHitMonitor.h"
 
 @class ORDataPacket;
 @class ORDataSet;
@@ -124,6 +125,13 @@ BOOL isNotRunningOrIsInMaintenance();
 
     NSString *logHost;
     int logPort;
+
+    /* Nhit Monitor Settings. */
+    NHitMonitor *nhitMonitor;
+    int nhitMonitorCrate;
+    int nhitMonitorPulserRate;
+    int nhitMonitorNumPulses;
+    int nhitMonitorMaxNhit;
 
     RedisClient *mtc_server;
     RedisClient *xl3_server;
@@ -241,6 +249,15 @@ BOOL isNotRunningOrIsInMaintenance();
 - (void) shipRHDRRecord;
 
 #pragma mark ¥¥¥Accessors
+- (int) nhitMonitorCrate;
+- (void) setNhitMonitorCrate: (int) crate;
+- (int) nhitMonitorPulserRate;
+- (void) setNhitMonitorPulserRate: (int) pulserRate;
+- (int) nhitMonitorNumPulses;
+- (void) setNhitMonitorNumPulses: (int) numPulses;
+- (int) nhitMonitorMaxNhit;
+- (void) setNhitMonitorMaxNhit: (int) maxNhit;
+
 - (void) setViewType:(int)aViewType;
 - (int) viewType;
 - (unsigned long) runTypeWord;
@@ -325,3 +342,4 @@ extern NSString* ORSNOPRunsLockNotification;
 extern NSString* ORSNOPModelSRCollectionChangedNotification;
 extern NSString* ORSNOPModelSRChangedNotification;
 extern NSString* ORSNOPModelSRVersionChangedNotification;
+extern NSString* ORSNOPModelNhitMonitorChangedNotification;

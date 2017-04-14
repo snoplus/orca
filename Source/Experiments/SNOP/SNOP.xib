@@ -49,6 +49,9 @@
                 <outlet property="logPort" destination="DpW-Vd-aQd" id="9DN-uP-F1q"/>
                 <outlet property="mtcHost" destination="eaZ-tZ-5J9" id="rjH-OI-3ri"/>
                 <outlet property="mtcPort" destination="2aR-vd-DX1" id="sbN-pm-YYe"/>
+                <outlet property="nhitMonitorMaxNhit" destination="5fG-ST-ZPu" id="Ngu-g0-0kZ"/>
+                <outlet property="nhitMonitorNumPulses" destination="xOk-db-mDC" id="nnc-gc-Xqq"/>
+                <outlet property="nhitMonitorPulserRate" destination="o4d-ry-Qs4" id="GGn-c7-tEA"/>
                 <outlet property="orcaDBClearButton" destination="2682" id="Elw-gn-a5W"/>
                 <outlet property="orcaDBIPAddressPU" destination="2683" id="2962"/>
                 <outlet property="orcaDBName" destination="2704" id="IX3-D9-ZA1"/>
@@ -3829,13 +3832,132 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button verticalHuggingPriority="750" id="drs-Rr-CLT">
-                                            <rect key="frame" x="229" y="359" width="65" height="32"/>
+                                            <rect key="frame" x="478" y="108" width="65" height="32"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Run" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="PsX-XE-hgK">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                         </button>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="M5k-Yk-5rD">
+                                            <rect key="frame" x="252" y="342" width="38" height="17"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Crate" id="ycL-ff-hB1">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="4xR-dO-BKF">
+                                            <rect key="frame" x="224" y="298" width="74" height="17"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Pulser Rate" id="jua-db-Q5J">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="qPF-50-V6x">
+                                            <rect key="frame" x="188" y="244" width="114" height="17"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Number of Pulses" id="Wd3-3R-IaI">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="OzZ-9Y-vbh">
+                                            <rect key="frame" x="241" y="185" width="61" height="17"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Max Nhit" id="a6D-zB-83d">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <popUpButton verticalHuggingPriority="750" id="wiw-6J-IL4">
+                                            <rect key="frame" x="306" y="335" width="100" height="26"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="3gb-gX-kV3">
+                                                <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="menu"/>
+                                                <menu key="menu" id="MaV-yd-fvz">
+                                                    <items>
+                                                        <menuItem title="0" id="Bw8-pn-Yym"/>
+                                                        <menuItem title="1" id="B3L-cZ-NIX"/>
+                                                        <menuItem title="2" id="xU2-GY-2oc"/>
+                                                        <menuItem title="3" id="mva-6N-lD6"/>
+                                                        <menuItem title="4" id="JFb-0a-fhj"/>
+                                                        <menuItem title="5" id="f8n-Xk-vTC"/>
+                                                        <menuItem title="6" id="EqS-3e-ti6"/>
+                                                        <menuItem title="7" id="QaO-9E-2Ot"/>
+                                                        <menuItem title="8" id="j5n-PQ-UZr"/>
+                                                        <menuItem title="9" id="k6w-If-pnC"/>
+                                                        <menuItem title="10" id="98g-ET-qd8"/>
+                                                        <menuItem title="11" id="hdC-Av-T9I"/>
+                                                        <menuItem title="12" id="Yl2-hA-m20"/>
+                                                        <menuItem title="13" id="jUF-40-cOK"/>
+                                                        <menuItem title="14" id="53E-4G-TrR"/>
+                                                        <menuItem title="15" id="jAa-jG-Ay3"/>
+                                                        <menuItem title="16" id="2ak-V9-hM7"/>
+                                                        <menuItem title="17" id="Ecx-qg-Re9"/>
+                                                        <menuItem title="18" id="rrF-Uw-EV4"/>
+                                                        <menuItem title="19" id="4t3-92-1TO"/>
+                                                    </items>
+                                                </menu>
+                                            </popUpButtonCell>
+                                            <connections>
+                                                <action selector="nhitMonitorCrateAction:" target="-2" id="fxb-H5-9G7"/>
+                                            </connections>
+                                        </popUpButton>
+                                        <textField verticalHuggingPriority="750" id="o4d-ry-Qs4">
+                                            <rect key="frame" x="308" y="295" width="96" height="22"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="WKe-bL-1mP">
+                                                <numberFormatter key="formatter" formatterBehavior="default10_4" numberStyle="decimal" minimumIntegerDigits="1" maximumIntegerDigits="309" maximumFractionDigits="3" id="9iR-md-MNr"/>
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <connections>
+                                                <action selector="nhitMonitorPulserRateAction:" target="-2" id="EKC-zw-qUu"/>
+                                            </connections>
+                                        </textField>
+                                        <textField verticalHuggingPriority="750" id="xOk-db-mDC">
+                                            <rect key="frame" x="308" y="241" width="96" height="22"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="h4k-na-cly">
+                                                <numberFormatter key="formatter" formatterBehavior="default10_4" numberStyle="decimal" minimumIntegerDigits="1" maximumIntegerDigits="309" maximumFractionDigits="3" id="7Va-by-Uzs"/>
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <connections>
+                                                <action selector="nhitMonitorNumPulsesAction:" target="-2" id="xeZ-cw-VOP"/>
+                                            </connections>
+                                        </textField>
+                                        <textField verticalHuggingPriority="750" id="5fG-ST-ZPu">
+                                            <rect key="frame" x="308" y="182" width="96" height="22"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="Qlg-8b-wGU">
+                                                <numberFormatter key="formatter" formatterBehavior="default10_4" numberStyle="decimal" minimumIntegerDigits="1" maximumIntegerDigits="309" maximumFractionDigits="3" id="UFe-Ku-NZy"/>
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <connections>
+                                                <action selector="nhitMonitorMaxNhitAction:" target="-2" id="dYl-PW-g2S"/>
+                                            </connections>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="fXs-mb-rjf">
+                                            <rect key="frame" x="432" y="300" width="22" height="17"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Hz" id="u4P-oC-V05">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
                                     </subviews>
                                 </view>
                             </tabViewItem>
