@@ -21,6 +21,7 @@
 /* Maximum number of channels to fire on a single crate. */
 #define MAX_NHIT 512
 
+/* Default settings for running the nhit monitor. */
 #define COARSE_DELAY 250
 #define FINE_DELAY 0
 #define PEDESTAL_WIDTH 50
@@ -65,6 +66,18 @@ struct NhitRecord {
                      selector : @selector(launchECAThread:)
                          name : ORRunStartedNotification
                        object : nil];
+}
+
+- (BOOL) isRunning
+{
+    /* Returns if the nhit monitor is currently running. */
+    return [runningThread isExecuting];
+}
+
+- (void) stop
+{
+    /* Stop the nhit monitor. */
+    if ([self isRunning]) [runningThread cancel];
 }
 
 - (int) connectToDataServer
@@ -316,9 +329,13 @@ err:
 
         [xl3 setPedestals];
 
-        [mtc enablePulser];
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [mtc enablePulser];
+        });
         [self getNhitTriggerCount: i numPulses:numPulses nhitRecord:&nhitRecord];
-        [mtc disablePulser];
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [mtc disablePulser];
+        });
     }
 
     if (pedestals_enabled) {
