@@ -14,6 +14,7 @@
 #import "SNOPModel.h"
 #import "OROrderedObjManager.h"
 #import "ORPQModel.h"
+#import "ORGlobal.h"
 
 @implementation NHitMonitor
 
@@ -39,13 +40,8 @@
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
 
     [notifyCenter addObserver : self
-                     selector : @selector(setPulserRate:)
-                         name : ORRunSecondChanceForWait
-                       object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(launchECAThread:)
-                         name : ORRunStartedNotification
+                     selector : @selector(stop)
+                         name : ORRunAboutToStopNotification
                        object : nil];
 }
 
