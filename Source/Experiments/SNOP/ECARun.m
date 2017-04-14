@@ -143,7 +143,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         if ([objs count]) {
             anMTCModel = [objs objectAtIndex:0];
             [anMTCModel setPgtRate:[[self ECA_rate] floatValue]]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
-            [anMTCModel loadPulserRateToHardware];
+            [anMTCModel loadPulserRateToHardware]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
         }
     }
 

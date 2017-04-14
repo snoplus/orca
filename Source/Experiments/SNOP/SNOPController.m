@@ -87,6 +87,7 @@ snopGreenColor;
     doggy_icon = [[RunStatusIcon alloc] init];
     [self initializeUnits];
     return self;
+
 }
 - (void) dealloc
 {
@@ -223,7 +224,6 @@ snopGreenColor;
 
 }
 
-
 - (NSString*) defaultPrimaryMapFilePath
 {
     return @"~/SNOP";
@@ -258,9 +258,6 @@ snopGreenColor;
     [runControl getCurrentRunNumber]; //this should be done by the base class... but it is not
     //Sync SR with MTC
 
-    //Update XL3 state
-    [self updatexl3Mode:nil];
-
     [doggy_icon start_animation];
 
     [self initializeUnits];
@@ -268,22 +265,16 @@ snopGreenColor;
     //Update runtype word
     [self refreshRunWordLabels:nil];
     [self runTypeWordChanged:nil];
-    //Lock Standard Runs menus at init
-    if([model standardRunType] == nil){
-        [standardRunVersionPopupMenu setEnabled:false];
-    }
-    else{
-        [model refreshStandardRunsFromDB];
-    }
 
     if(!doggy_icon)
     {
         doggy_icon = [[RunStatusIcon alloc] init];
     }
-    //Pull the information from the SMELLIE DB
+
     [super awakeFromNib];
     [self performSelector:@selector(updateWindow)withObject:self afterDelay:0.1];
 }
+
 - (void) initializeUnits {
     for(int i=0;i<10;i++) {
         displayUnitsDecider[i] = UNITS_UNDECIDED;
@@ -316,7 +307,22 @@ snopGreenColor;
                      selector : @selector(hvStatusChanged:)
                          name : ORXL3ModelHVNominalVoltageChanged
                         object: nil];
-    
+
+    [notifyCenter addObserver : self
+                     selector : @selector(XL3ModeChanged:)
+                         name : ORXL3ModelStateChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(XL3ModeChanged:)
+                         name : ORXL3ModelXl3ModeChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(triggerStatusChanged:)
+                         name : ORXL3ModelTriggerStatusChanged
+                        object: nil];
+
     [notifyCenter addObserver :self
                      selector : @selector(stopSmellieRunAction:)
                          name : ORSMELLIERunFinished
@@ -431,7 +437,10 @@ snopGreenColor;
 - (void) updateWindow
 {
     [super updateWindow];
+    [model refreshStandardRunsFromDB];
     [self hvStatusChanged:nil];
+    [self triggerStatusChanged:nil];
+    [self XL3ModeChanged:nil];
     [self dbOrcaDBIPChanged:nil];
     [self dbDebugDBIPChanged:nil];
     [self runStatusChanged:nil];
@@ -454,11 +463,10 @@ snopGreenColor;
 
     NSString* standardRun = [model standardRunType];
     if([standardRunPopupMenu numberOfItems] == 0 || standardRun == nil || [standardRun isEqualToString:@""]){
-        return;
+        //Nothing
     }
-    if([standardRunPopupMenu indexOfItemWithObjectValue:standardRun] == NSNotFound){
+    else if([standardRunPopupMenu indexOfItemWithObjectValue:standardRun] == NSNotFound){
         NSLogColor([NSColor redColor],@"Standard Run \"%@\" does not exist. \n", standardRun);
-        return;
     }
     else{
         [standardRunPopupMenu selectItemWithObjectValue:standardRun];
@@ -487,60 +495,49 @@ snopGreenColor;
 
 - (IBAction) startRunAction:(id)sender
 {
-    //Load selected SR in case the user didn't click enter
-    NSString *standardRun = [[standardRunPopupMenu objectValueOfSelectedItem] copy];
-    NSString *standardRunVersion = [[standardRunVersionPopupMenu objectValueOfSelectedItem] copy];
-    
-    //Load selected version run:
-    //If we are in operator mode we ALWAYS load the DEFAULTs
-    //The expert mode has the freedom to load any test run. This is dangerous
-    //but hopefully we won't need to run in expert mode for physics data and in any
-    //case the expert will know this!
+
+    //If we are in OPERATOR mode we don't allow other version than DEFAULT
     BOOL locked = [gSecurity isLocked:ORSNOPRunsLockNotification];
     if(locked) { //Operator Mode
-        standardRunVersion = @"DEFAULT";
-    } else{ //Expert Mode
-        //Nothing
+        [model setStandardRunVersion:@"DEFAULT"];
     }
 
-    //Handle no SR cases
-    if([standardRun isEqualToString:@""] || standardRun == nil){
-        NSLogColor([NSColor redColor],@"Standard Run not set. Enter a valid name. \n");
-        [standardRun release];
-        [standardRunVersion release];
-        return;
+    /* If we are not going to maintenance we shouldn't be polling */
+    unsigned long dbruntypeword = 0;
+    NSMutableDictionary* runSettings = [[[model standardRunCollection] objectForKey:[model standardRunType]] objectForKey:[model standardRunVersion]];
+    if(runSettings != nil){
+        //Get the run type word of the next run
+        dbruntypeword = [[runSettings valueForKey:@"run_type_word"] unsignedLongValue];
     }
-    if([standardRunVersion isEqualToString:@""] || standardRunVersion == nil){
-        NSLogColor([NSColor redColor],@"Standard Run Version not set. Enter a valid name. \n");
-        [standardRun release];
-        [standardRunVersion release];
-        return;
+
+    if( !((dbruntypeword & kMaintenanceRun) || (dbruntypeword & kDiagnosticRun)) ){
+        //Make sure we are not polling
+        NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+        for(ORXL3Model *anXL3 in xl3s){
+            if([anXL3 isPollingXl3]) {
+                NSLog(@"Stopping XL3 polling on crate %d\n",[anXL3 crateNumber]);
+                [anXL3 setIsPollingXl3:false];
+            }
+        }
     }
-    
-    [model startStandardRun:standardRun withVersion:standardRunVersion];
-    [standardRun release];
-    [standardRunVersion release];
+
+    //Start the standard run and stop run initialization if failed
+    if(![model startStandardRun:[model standardRunType] withVersion:[model standardRunVersion]]) return;
+
 }
 
 - (IBAction)resyncRunAction:(id)sender
 {
+
     /* A resync run does a hard stop and start without the user having to hit
      * stop run and then start run. Doing this resets the GTID, which resyncs
      * crate 9 after it goes out of sync :). */
 
-    //Load the standard run and stop run initialization if failed
-    if(![model loadStandardRun:[model standardRunType] withVersion:[model standardRunVersion]]) return;
-
     [model setResync:YES];
 
-    if ([[model document] isDocumentEdited]) {
-        [[model document] afterSaveDo:@selector(restartRun) withTarget:runControl];
-        [[model document] saveDocument:nil];
-    } else {
-        [runControl restartRun];
-    }
-}
+    [self startRunAction:nil];
 
+}
 
 - (IBAction) stopRunAction:(id)sender
 {
@@ -575,6 +572,7 @@ err:
         [lightBoardView setState:kGoLight];
         [runStatusField setStringValue:@"Running"];
         [resyncRunButton setEnabled:true];
+        [runNumberField setStringValue:[runControl fullRunNumberString]];
         [doggy_icon start_animation];
 	}
 	else if([runControl runningState] == eRunStopped){
@@ -623,6 +621,9 @@ err:
 
 - (void) hvStatusChanged:(NSNotification*)aNote
 {
+
+    NSArray *OWLRows = [NSArray arrayWithObjects:@3,@13,@19,nil];
+
     if (!aNote) {
         //collect all instances of xl3 objects in Orca
         NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
@@ -650,11 +651,11 @@ err:
                     [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor blackColor]];
 		    hvMask &= ~(1 << [xl3 crateNumber]);
                 }
-                [[hvStatusMatrix cellAtRow:mRow column:2] setStringValue:
-                 [NSString stringWithFormat:@"%d V",(unsigned int)[xl3 hvNominalVoltageA]]];
                 [[hvStatusMatrix cellAtRow:mRow column:3] setStringValue:
-                 [NSString stringWithFormat:@"%d V",(unsigned int)[xl3 hvAVoltageReadValue]]];
+                 [NSString stringWithFormat:@"%d V",(unsigned int)[xl3 hvNominalVoltageA]]];
                 [[hvStatusMatrix cellAtRow:mRow column:4] setStringValue:
+                 [NSString stringWithFormat:@"%d V",(unsigned int)[xl3 hvAVoltageReadValue]]];
+                [[hvStatusMatrix cellAtRow:mRow column:5] setStringValue:
                  [NSString stringWithFormat:@"%3.1f mA",[xl3 hvACurrentReadValue]]];
             }
             if ([xl3 crateNumber] == 16) {//16B
@@ -672,12 +673,24 @@ err:
                         [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor blackColor]];
 			hvMask &= ~(1 << 19);
                     }
-                    [[hvStatusMatrix cellAtRow:mRow column:2] setStringValue:
-                     [NSString stringWithFormat:@"%d V",(unsigned int)[xl3 hvNominalVoltageB]]];
                     [[hvStatusMatrix cellAtRow:mRow column:3] setStringValue:
-                     [NSString stringWithFormat:@"%d V",(unsigned int)[xl3 hvBVoltageReadValue]]];
+                     [NSString stringWithFormat:@"%d V",(unsigned int)[xl3 hvNominalVoltageB]]];
                     [[hvStatusMatrix cellAtRow:mRow column:4] setStringValue:
+                     [NSString stringWithFormat:@"%d V",(unsigned int)[xl3 hvBVoltageReadValue]]];
+                    [[hvStatusMatrix cellAtRow:mRow column:5] setStringValue:
                      [NSString stringWithFormat:@"%3.1f mA",[xl3 hvBCurrentReadValue]]];
+
+                    //Update OWL HV status in crates with OWLs
+                    for (id owlRow in OWLRows) {
+                        if ([xl3 hvBSwitch]) {
+                            [[hvStatusMatrix cellAtRow:[owlRow intValue] column:2] setStringValue:@"OWLs ON"];
+                            [[hvStatusMatrix cellAtRow:[owlRow intValue] column:2] setTextColor:[NSColor redColor]];
+                        }
+                        else {
+                            [[hvStatusMatrix cellAtRow:[owlRow intValue] column:2] setStringValue:@"OWLs OFF"];
+                            [[hvStatusMatrix cellAtRow:[owlRow intValue] column:2] setTextColor:[NSColor blackColor]];
+                        }
+                    }
                 }
             }
         }
@@ -694,9 +707,10 @@ err:
                 if (found) {
                     [[hvStatusMatrix cellAtRow:mRow column:1] setStringValue:@"???"];
                     [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor blackColor]];
-                    [[hvStatusMatrix cellAtRow:mRow column:2] setStringValue:@"??? V"];
+                    [[hvStatusMatrix cellAtRow:mRow column:2] setTextColor:[NSColor blackColor]];
                     [[hvStatusMatrix cellAtRow:mRow column:3] setStringValue:@"??? V"];
-                    [[hvStatusMatrix cellAtRow:mRow column:4] setStringValue:@"??? mA"];
+                    [[hvStatusMatrix cellAtRow:mRow column:4] setStringValue:@"??? V"];
+                    [[hvStatusMatrix cellAtRow:mRow column:5] setStringValue:@"??? mA"];
                 }
             }
         }
@@ -718,11 +732,11 @@ err:
                 [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor blackColor]];
 		hvMask &= ~(1 << [[aNote object] crateNumber]);
             }
-            [[hvStatusMatrix cellAtRow:mRow column:2] setStringValue:
-             [NSString stringWithFormat:@"%d V",(unsigned int)[[aNote object] hvNominalVoltageA]]];
             [[hvStatusMatrix cellAtRow:mRow column:3] setStringValue:
-             [NSString stringWithFormat:@"%d V",(unsigned int)[[aNote object] hvAVoltageReadValue]]];
+             [NSString stringWithFormat:@"%d V",(unsigned int)[[aNote object] hvNominalVoltageA]]];
             [[hvStatusMatrix cellAtRow:mRow column:4] setStringValue:
+             [NSString stringWithFormat:@"%d V",(unsigned int)[[aNote object] hvAVoltageReadValue]]];
+            [[hvStatusMatrix cellAtRow:mRow column:5] setStringValue:
              [NSString stringWithFormat:@"%3.1f mA",[[aNote object] hvACurrentReadValue]]];
         }
         if ([[aNote object] crateNumber] == 16) {//16B
@@ -740,13 +754,26 @@ err:
                     [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor blackColor]];
 		    hvMask &= ~(1 << 19);
                 }
-                [[hvStatusMatrix cellAtRow:mRow column:2] setStringValue:
-                 [NSString stringWithFormat:@"%d V",(unsigned int)[[aNote object] hvNominalVoltageB]]];
                 [[hvStatusMatrix cellAtRow:mRow column:3] setStringValue:
-                 [NSString stringWithFormat:@"%d V",(unsigned int)[[aNote object] hvBVoltageReadValue]]];
+                 [NSString stringWithFormat:@"%d V",(unsigned int)[[aNote object] hvNominalVoltageB]]];
                 [[hvStatusMatrix cellAtRow:mRow column:4] setStringValue:
+                 [NSString stringWithFormat:@"%d V",(unsigned int)[[aNote object] hvBVoltageReadValue]]];
+                [[hvStatusMatrix cellAtRow:mRow column:5] setStringValue:
                  [NSString stringWithFormat:@"%3.1f mA",[[aNote object] hvBCurrentReadValue]]];
             }
+
+            //Update OWL HV status in crates with OWLs
+            for (id owlRow in OWLRows) {
+                if ([[aNote object] hvBSwitch]) {
+                    [[hvStatusMatrix cellAtRow:[owlRow intValue] column:2] setStringValue:@"OWLs ON"];
+                    [[hvStatusMatrix cellAtRow:[owlRow intValue] column:2] setTextColor:[NSColor redColor]];
+                }
+                else {
+                    [[hvStatusMatrix cellAtRow:[owlRow intValue] column:2] setStringValue:@"OWLs OFF"];
+                    [[hvStatusMatrix cellAtRow:[owlRow intValue] column:2] setTextColor:[NSColor blackColor]];
+                }
+            }
+
         }
     }
 
@@ -760,8 +787,55 @@ err:
         [detectorHVStatus setBackgroundColor:snopBlueColor];
         [panicDownButton setEnabled:0];
     }
+
 }
 
+- (void) triggerStatusChanged:(NSNotification*)aNote
+{
+    NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+    for (ORXL3Model* xl3 in xl3s) {
+        //Take care of crate 17 and 18
+        int row = [xl3 crateNumber];
+        if (row > 16) row++;
+        [[triggerStatusMatrix cellAtRow:row column:0] setStringValue:[xl3 isTriggerON]?@"ON":@"OFF"];
+        if( [xl3 isTriggerON] ) [[triggerStatusMatrix cellAtRow:row column:0] setTextColor:[NSColor redColor]];
+        else [[triggerStatusMatrix cellAtRow:row column:0] setTextColor:[NSColor blackColor]];
+        if (row++ == 16){
+            [[triggerStatusMatrix cellAtRow:row column:0] setStringValue:[xl3 isTriggerON]?@"ON":@"OFF"];
+            if( [xl3 isTriggerON] ) [[triggerStatusMatrix cellAtRow:row column:0] setTextColor:[NSColor redColor]];
+            else [[triggerStatusMatrix cellAtRow:row column:0] setTextColor:[NSColor blackColor]];
+        }
+    }
+}
+
+- (void) XL3ModeChanged:(NSNotification*)aNote
+{
+    int i =0;
+    NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+    for (id xl3 in xl3s) {
+        ORXL3Model * anXl3 = xl3;
+        //[xl3 xl3Mode];
+        NSString *xl3ModeDescription;
+        if([anXl3 xl3Mode] == 1)        xl3ModeDescription = [NSString stringWithFormat:@"Init"];
+        else if ([anXl3 xl3Mode] == 2)  xl3ModeDescription = [NSString stringWithFormat:@"Normal"];
+        else if ([anXl3 xl3Mode] == 3)  xl3ModeDescription = [NSString stringWithFormat:@"CGT"];
+        else                            xl3ModeDescription = [NSString stringWithFormat:@"???"];
+
+        if([anXl3 crateNumber] == 16){
+            i++;
+            [[globalxl3Mode cellAtRow:16 column:0] setStringValue:xl3ModeDescription];
+            if(i>0){
+                [[globalxl3Mode cellAtRow:17 column:0] setStringValue:xl3ModeDescription];
+            }
+        }
+        else if ([anXl3 crateNumber] > 16){
+            [[globalxl3Mode cellAtRow:([anXl3 crateNumber]+1) column:0] setStringValue:xl3ModeDescription];
+        }
+        else{
+            [[globalxl3Mode cellAtRow:[anXl3 crateNumber] column:0] setStringValue:xl3ModeDescription];
+        }
+    }
+}
 
 #pragma mark ¥¥¥Interface Management
 - (IBAction) orcaDBIPAddressAction:(id)sender
@@ -837,61 +911,28 @@ err:
     NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
     int crateNumber = [sender selectedRow];
 
-    //Handle crates 17 and 18
-    if(crateNumber > 16) crateNumber--;
-    
+    //Handle crates 16B, 17 and 18
+    NSString *HVBlabel = @"";
+    if(crateNumber > 16){
+        if(crateNumber == 17) HVBlabel = @"B";
+        crateNumber--;
+    }
+
     //Confirm
-    BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Ramp Down Crate %i?",crateNumber],@"Is this really what you want?",@"Cancel",@"Yes",nil);
+    BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Ramp Down Crate %i%@?",crateNumber,HVBlabel],@"Is this really what you want?",@"Cancel",@"Yes",nil);
     if (cancel) return;
     for (id xl3 in xl3s) {
-
         if ([xl3 crateNumber] != crateNumber) continue;
-        
         if ([xl3 isTriggerON]) {
             [xl3 hvTriggersOFF];
         }
-        [xl3 setHvANextStepValue:0];
-        [xl3 setHvBNextStepValue:0];
+        if([HVBlabel isEqualToString:@"B"]) [xl3 setHvBNextStepValue:0];
+        else [xl3 setHvANextStepValue:0];
         return;
-
     }
 
     NSLogColor([NSColor redColor],@"XL3 %i not found. Unable to Ramp Down. \n",crateNumber);
     
-}
-
-- (IBAction)updatexl3Mode:(id)sender
-{
-    int i =0;
-    NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
-    for (id xl3 in xl3s) {
-        ORXL3Model * anXl3 = xl3;
-        //[xl3 xl3Mode];
-        NSString *xl3ModeDescription;
-        if([anXl3 xl3Mode] == 1)        xl3ModeDescription = [NSString stringWithFormat:@"init"];
-        else if ([anXl3 xl3Mode] == 2)  xl3ModeDescription = [NSString stringWithFormat:@"normal"];
-        else if ([anXl3 xl3Mode] == 3)  xl3ModeDescription = [NSString stringWithFormat:@"CGT"];
-        else                            xl3ModeDescription = [NSString stringWithFormat:@"unknown"];
-        
-        if([anXl3 crateNumber] == 16){
-            i++;
-            [[globalxl3Mode cellAtRow:16 column:0] setStringValue:xl3ModeDescription];
-            if(i>0){
-                [[globalxl3Mode cellAtRow:17 column:0] setStringValue:xl3ModeDescription];
-            }
-        }
-        else if ([anXl3 crateNumber] > 16){
-            [[globalxl3Mode cellAtRow:([anXl3 crateNumber]+1) column:0] setStringValue:xl3ModeDescription];
-        }
-        else{
-            [[globalxl3Mode cellAtRow:[anXl3 crateNumber] column:0] setStringValue:xl3ModeDescription];
-        }
-        //setStringValue:[xl3 xl3Mode] stringValue]];
-        /*if([anXl3 crateNumber] >= 16); //skip for 16B
-         {
-         [[globalxl3Mode cellAtRow:[anXl3 crateNumber] column:0] setStringValue:xl3ModeDescription];
-         }*/
-    }
 }
 
 - (IBAction) reportAction:(id)sender
@@ -921,11 +962,6 @@ err:
     if(cancel) return;
 
     [model hvMasterTriggersOFF];
-}
-
-- (IBAction)hvMasterStatus:(id)sender
-{
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPRequestHVStatus object:self];
 }
 
 #pragma mark ¥¥¥Table Data Source
@@ -1195,7 +1231,7 @@ err:
     }
 
     ////////////
-    // Roll over into maintinance run
+    // Roll over into maintenance run
     if([[model lastStandardRunType] isEqualToString:@"SMELLIE"]){
         [model startStandardRun:@"MAINTENANCE" withVersion:@"DEFAULT"];
     }
@@ -1395,7 +1431,7 @@ err:
     }
 
     ////////////
-    // Handle end of run sqeuencing
+    // Handle end of run sequencing
     if([[model lastStandardRunType] isEqualToString:@"TELLIE"]){
         // If user was running a TELLIE standard sequence, roll over into maintinance run
         if([self tellieStandardSequenceFlag]){
@@ -1448,20 +1484,25 @@ err:
     BOOL runInProgress				= [gOrcaGlobals runInProgress];
     BOOL locked						= [gSecurity isLocked:ORSNOPRunsLockNotification];
     BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORSNOPRunsLockNotification];
-    BOOL notRunningOrInMaintenance = [model isNotRunningOrInMaintenance];
+    BOOL notRunningOrInMaintenance = isNotRunningOrIsInMaintenance();
 
     //[softwareTriggerButton setEnabled: !locked && !runInProgress];
     [runsLockButton setState: locked];
     
-    //Select default standard run if in operator mode
+    /* Select default standard run if in operator mode.
+     Do it only when the lock status changes */
     if(locked
        && [standardRunPopupMenu numberOfItems] != 0
-       && ![[model standardRunVersion] isEqualToString:@"DEFAULT"]) [model setStandardRunVersion:@"DEFAULT"];
+       && ![[model standardRunVersion] isEqualToString:@"DEFAULT"]
+       && [aNotification isEqualTo:ORSNOPRunsLockNotification]) [model setStandardRunVersion:@"DEFAULT"];
     
     //Enable or disable fields
     [standardRunThresCurrentValues setEnabled:!lockedOrNotRunningMaintenance];
-    [standardRunSaveButton setEnabled:!lockedOrNotRunningMaintenance];
-    [standardRunLoadButton setEnabled:!lockedOrNotRunningMaintenance];
+    [standardRunSaveButton setEnabled:!locked];
+    [standardRunLoadButton setEnabled:!locked];
+    [standardRunLoadinHWButton setEnabled:!lockedOrNotRunningMaintenance];
+    [triggersOFFButton setEnabled:notRunningOrInMaintenance];
+
     //Do not lock detector state bits to the operator
     for(int irow=0;irow<21;irow++){
         [[runTypeWordMatrix cellAtRow:irow column:0] setEnabled:!lockedOrNotRunningMaintenance];
@@ -1489,9 +1530,8 @@ err:
     [debugDBPswd setEnabled:!lockedOrNotRunningMaintenance];
     [debugDBName setEnabled:!lockedOrNotRunningMaintenance];
     [debugDBPort setEnabled:!lockedOrNotRunningMaintenance];
-    [debugDBClearButton setEnabled:!lockedOrNotRunningMaintenance];    
+    [debugDBClearButton setEnabled:!lockedOrNotRunningMaintenance];
     [rampDownCrateButton setEnabled:notRunningOrInMaintenance];
-    [[rampDownCrateButton cellAtRow:17 column:0] setEnabled:false]; //Never enable 16B button
     [inMaintenanceLabel setHidden:notRunningOrInMaintenance];
 
     //Display status
@@ -1783,6 +1823,10 @@ err:
     NSString *standardRunVer = [standardRunVersionPopupMenu objectValueOfSelectedItem];
 
     [model loadStandardRun:standardRun withVersion: standardRunVer];
+}
+
+- (IBAction)loadCurrentSettingsInHW:(id)sender
+{
     [model loadSettingsInHW];
 }
 
@@ -1939,7 +1983,7 @@ err:
     [thresholdFormatter setFormat:@"##0.0"];
     
     //If in DIAGNOSTIC run: display null threshold values
-    if([[model standardRunType] isEqualToString:@"DIAGNOSTIC"]){
+    if(dbruntypeword & kDiagnosticRun){
         for (int i=0; i<[standardRunThresStoredValues numberOfRows];i++) {
             [[standardRunThresStoredValues cellAtRow:i column:0] setStringValue:@"--"];
             [[standardRunThresStoredValues cellAtRow:i column:0] setTextColor:[self snopRedColor]];
@@ -2019,14 +2063,18 @@ err:
         [standardRunVersionPopupMenu addItemWithObjectValue:aStandardRunVersion];
     }
 
+    //If there are no versions -> Nothing
     if ([standardRunVersionPopupMenu numberOfItems] == 0 || standardRunVersion == nil || [standardRunVersion isEqualToString:@""]) {
-        return;
+        //Nothing
     }
-    if ([standardRunVersionPopupMenu indexOfItemWithObjectValue:standardRunVersion] == NSNotFound) {
-        [standardRunVersionPopupMenu selectItemWithObjectValue:standardRunVersion];
-        return;
-    } else {
+    //If previous selected version do not exist -> select DEFAULT
+    else if ([standardRunVersionPopupMenu indexOfItemWithObjectValue:standardRunVersion] == NSNotFound) {
+        [standardRunVersionPopupMenu selectItemWithObjectValue:@"DEFAULT"];
+    }
+    //else -> recover previous version
+    else {
         [standardRunVersionPopupMenu selectItemWithObjectValue:standardRunVersion];
     }
 }
+
 @end

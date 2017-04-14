@@ -68,6 +68,14 @@ NSString* ORSNOPModelSRCollectionChangedNotification = @"ORSNOPModelSRCollection
 NSString* ORSNOPModelSRChangedNotification = @"ORSNOPModelSRChangedNotification";
 NSString* ORSNOPModelSRVersionChangedNotification = @"ORSNOPModelSRVersionChangedNotification";
 
+
+BOOL isNotRunningOrIsInMaintenance()
+{
+    return (![gOrcaGlobals runInProgress] ||
+            (([gOrcaGlobals runType] & kMaintenanceRun) ||
+             ([gOrcaGlobals runType] & kDiagnosticRun)));
+}
+
 @implementation SNOPModel
 
 @synthesize
@@ -799,11 +807,13 @@ err:
     }
 
     state = RUNNING;
-    [self setLastStandardRunType:[self standardRunType]];
-    [self setLastStandardRunVersion:[self standardRunVersion]];
-    [self setLastRunTypeWord:[self runTypeWord]];
-    NSString* _lastRunTypeWord = [NSString stringWithFormat:@"0x%X",(int)[self runTypeWord]];
-    [self setLastRunTypeWordHex:_lastRunTypeWord]; //FIXME: revisit if we go over 32 bits
+    if (start != ROLLOVER_START) {
+        [self setLastStandardRunType:[self standardRunType]];
+        [self setLastStandardRunVersion:[self standardRunVersion]];
+        [self setLastRunTypeWord:[self runTypeWord]];
+        NSString* _lastRunTypeWord = [NSString stringWithFormat:@"0x%X",(int)[self runTypeWord]];
+        [self setLastRunTypeWordHex:_lastRunTypeWord]; //FIXME: revisit if we go over 32 bits
+    }
 
     [self updateRHDRSruct];
     [self shipRHDRRecord];
@@ -842,7 +852,7 @@ err:
 
     if (![[userInfo objectForKey:@"willRestart"] boolValue] || resync) {
         state = STOPPING;
-	resync = NO;
+        resync = NO;
     }
 
     switch (state) {
@@ -955,7 +965,7 @@ err:
 
     NSArray *runObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runObjects count]){
-        NSLogColor([NSColor redColor], @"initRunNumber: couldn't find run control object!");
+        NSLogColor([NSColor redColor], @"detectorStateChanged: couldn't find run control object!");
         return;     // (should never happen)
     }
     ORRunModel* runControl = [runObjects objectAtIndex:0];
@@ -1862,10 +1872,10 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     if([[standardRunCollection objectForKey:standardRunType] count] == 0){
         [self setStandardRunVersion:@""];
     }
-    //Check if previous selected run version exists
-    else if([[standardRunCollection objectForKey:standardRunType] objectForKey:standardRunVersion] == nil){
-        //If not, select first on the list
-        [self setStandardRunVersion:[[[standardRunCollection objectForKey:standardRunType] keyEnumerator] nextObject]];
+    //If EXPERT mode: check if previous selected run version exists
+    if([[standardRunCollection objectForKey:standardRunType] objectForKey:standardRunVersion] == nil){
+        //If not, select DEFAULT
+        [self setStandardRunVersion:@"DEFAULT"];
     }
     else{
         [self setStandardRunVersion:[self standardRunVersion]];
@@ -2031,16 +2041,18 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     link = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     request = [NSURLRequest requestWithURL:[NSURL URLWithString:link] cachePolicy:0 timeoutInterval:2];
     data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+    if (error != nil) {
+        NSLogColor([NSColor redColor], @"Error reading standard runs from "
+                   "database: %@\n", [error localizedDescription]);
+        goto err;
+    }
     ret = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
     NSDictionary *theStandardRuns = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
     // JSON formatting error
     if (error != nil) {
         NSLogColor([NSColor redColor], @"Error reading standard runs from "
                    "database: %@\n", [error localizedDescription]);
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelSRCollectionChangedNotification object:self];
-        [self setStandardRunType:@"DIAGNOSTIC"];
-        [self setStandardRunVersion:@"DEFAULT"];
-        return false;
+        goto err;
     }
 
     // If SR not found select diagnostic run
@@ -2083,13 +2095,21 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         /* Database is empty, so we set the standard run version to the empty string. */
         [self setStandardRunVersion:@""];
     } else if ([[standardRunCollection objectForKey:[self standardRunType]] objectForKey:[self standardRunVersion]] == nil) {
-        /* The current version is not in the standard runs anymore, so we select the first version. */
-        [self setStandardRunVersion:[[[standardRunCollection objectForKey:[self standardRunType]] keyEnumerator] nextObject]];
+        /* The current version is not in the standard runs anymore, so we select the DEFAULT version. */
+        [self setStandardRunVersion:@"DEFAULT"];
     } else {
         [self setStandardRunVersion:[self standardRunVersion]];
     }
 
     return true;
+
+err:
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelSRCollectionChangedNotification object:self];
+    [self setStandardRunType:@"DIAGNOSTIC"];
+    [self setStandardRunVersion:@"DEFAULT"];
+    return false;
+
 }
 
 // Load Detector Settings from the DB into the Models
@@ -2235,16 +2255,6 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     NSLog(@"Settings loaded in Hardware \n");
 
 }
-
-- (BOOL) isNotRunningOrInMaintenance
-{
-    
-    return (![gOrcaGlobals runInProgress] ||
-            (([gOrcaGlobals runType] & kMaintenanceRun) ||
-            ([gOrcaGlobals runType] & kDiagnosticRun)));
-    
-}
-
 
 @end
 @implementation SNOPDecoderForRHDR
