@@ -14,26 +14,6 @@
 #import "SNOPModel.h"
 #import "OROrderedObjManager.h"
 
-/* Buffer size for records from the data stream. Most records are small, but
- * the MTC records are concatenated so may be a few kilobytes. */
-#define DATASTREAM_BUFFER_SIZE 0xffffff
-
-/* Maximum number of channels to fire on a single crate. */
-#define MAX_NHIT 512
-
-/* Default settings for running the nhit monitor. */
-#define COARSE_DELAY 250
-#define FINE_DELAY 0
-#define PEDESTAL_WIDTH 50
-
-struct NhitRecord {
-    int nhit_100_lo[MAX_NHIT];
-    int nhit_100_med[MAX_NHIT];
-    int nhit_100_hi[MAX_NHIT];
-    int nhit_20[MAX_NHIT];
-    int nhit_20_lb[MAX_NHIT];
-};
-
 @implementation NHitMonitor
 
 - (id) init
@@ -80,7 +60,22 @@ struct NhitRecord {
     if ([self isRunning]) [runningThread cancel];
 }
 
-- (int) connectToDataServer
+- (void) start: (int) crate pulserRate: (int) pulserRate numPulses: (int) numPulses maxNhit: (int) maxNhit
+{
+    /* Start the nhit monitor. */
+    if ([self isRunning]) return;
+
+    NSDictionary *args = [NSDictionary dictionaryWithObjectsAndKeys:
+                            [NSNumber numberWithInt:crate], @"crate",
+                            [NSNumber numberWithInt:pulserRate], @"pulserRate",
+                            [NSNumber numberWithInt:numPulses], @"numPulses",
+                            [NSNumber numberWithInt:maxNhit], @"maxNhit",
+                             nil];
+
+    [runningThread initWithTarget:self selector:@selector(run) object:args];
+}
+
+- (int) connect
 {
     /* Connect to the data server. */
     SNOPModel *snop;
@@ -150,6 +145,9 @@ struct NhitRecord {
     start = time(NULL);
 
     while (1) {
+        /* Check to see if we should stop. */
+        if ([[NSThread currentThread] isCancelled]) goto err;
+
         if (time(NULL) > start + timeout) {
             goto err;
         }
@@ -221,8 +219,11 @@ err:
     return -1;
 }
 
-- (void) run: (int) crate pulserRate: (int) pulserRate numPulses: (int) numPulses maxNhit: (int) maxNhit
+- (void) run: (NSDictionary *) args
 {
+    /* Run the nhit monitor. This method should only be called in a separate
+     * thread. The start method should be called to actually start the nhit
+     * monitor. */
     ORXL3Model *xl3;
     ORFec32Model *fec;
     int slot, channel;
@@ -231,6 +232,13 @@ err:
     float pulser_rate;
     struct NhitRecord nhitRecord;
     int i;
+
+    int crate = [[args objectForKey:@"crate"] intValue];
+    int pulserRate = [[args objectForKey:@"pulserRate"] intValue];
+    int numPulses = [[args objectForKey:@"numPulses"] intValue];
+    int maxNhit = [[args objectForKey:@"maxNhit"] intValue];
+
+    [self connect];
 
     for (i = 0; i < MAX_NHIT; i++) {
         nhitRecord.nhit_100_lo[i] = 0;
@@ -325,6 +333,9 @@ err:
         channel = [[channels objectAtIndex:i] intValue];
         fec = [[OROrderedObjManager for:[xl3 guardian]] objectInSlot:16-slot];
 
+        /* Check to see if we should stop. */
+        if ([[NSThread currentThread] isCancelled]) goto err;
+
         [fec setPed:channel enabled:1];
 
         [xl3 setPedestals];
@@ -332,7 +343,7 @@ err:
         dispatch_sync(dispatch_get_main_queue(), ^{
             [mtc enablePulser];
         });
-        [self getNhitTriggerCount: i numPulses:numPulses nhitRecord:&nhitRecord];
+        if ([self getNhitTriggerCount: i numPulses:numPulses nhitRecord:&nhitRecord] == -1) break;
         dispatch_sync(dispatch_get_main_queue(), ^{
             [mtc disablePulser];
         });
@@ -404,5 +415,9 @@ err:
     } else {
         NSLog(@"nhit_20_lb   threshold is %.2f nhit", threshold_n20_lb);
     }
+
+    [self disconnect];
+err:
+    [self disconnect];
 }
 @end
