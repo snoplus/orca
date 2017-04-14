@@ -9,6 +9,7 @@
 
 #import <Foundation/Foundation.h>
 #import "ORMTCModel.h"
+#import <stdint.h>
 
 /* Buffer size for records from the data stream. Most records are small, but
  * the MTC records are concatenated so may be a few kilobytes. */

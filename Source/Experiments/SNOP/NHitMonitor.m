@@ -13,6 +13,7 @@
 #import "ORFec32Model.h"
 #import "SNOPModel.h"
 #import "OROrderedObjManager.h"
+#import "ORPQModel.h"
 
 @implementation NHitMonitor
 
@@ -109,7 +110,7 @@
     /* Send our name to the data server. */
     header.RecordID = htonl(kSCmd);
     header.RecordLength = htonl(strlen(name));
-    header.RecordVersion = 0x4944;
+    header.RecordVersion = htonl(kId);
 
     if (anetWrite(sock, (char *) &header, sizeof(struct GenericRecordHeader)) == -1) {
         NSLogColor([NSColor redColor], @"failed to send name to data server\n");
@@ -119,6 +120,23 @@
 
     if (anetWrite(sock, name, strlen(name)) == -1) {
         NSLogColor([NSColor redColor], @"failed to send name to data server\n");
+        [self disconnect];
+        return -1;
+    }
+
+    /* Subscribe to MTCD records from the data server. */
+    header.RecordID = htonl(kSCmd);
+    header.RecordLength = htonl(4);
+    header.RecordVersion = ntohl(kSub);
+
+    if (anetWrite(sock, (char *) &header, sizeof(struct GenericRecordHeader)) == -1) {
+        NSLogColor([NSColor redColor], @"failed to send subscription to data server\n");
+        [self disconnect];
+        return -1;
+    }
+
+    if (anetWrite(sock, "MTCD", 4) == -1) {
+        NSLogColor([NSColor redColor], @"failed to send subscription to data server\n");
         [self disconnect];
         return -1;
     }
@@ -159,14 +177,14 @@
             goto err;
         }
 
-        if (anetRead(sock, buf, ntohl(header.RecordLength)) == -1) {
+        if (anetRead(sock, (char *) buf, ntohl(header.RecordLength)) == -1) {
             goto err;
         }
 
-        nrecords = ntohl(header.RecordLength)/6;
+        nrecords = ntohl(header.RecordLength)/sizeof(struct MTCReadoutData);
 
         for (i = 0; i < nrecords; i++) {
-            struct MTCReadoutData *mtc_readout_data = (struct MTCReadoutData *) (buf + i*6*4);
+            struct MTCReadoutData *mtc_readout_data = (struct MTCReadoutData *) (buf + i*sizeof(struct MTCReadoutData));
 
             if (mtc_readout_data->BcGT < current_gtid) continue;
 
@@ -415,6 +433,47 @@ err:
     } else {
         NSLog(@"nhit_20_lb   threshold is %.2f nhit", threshold_n20_lb);
     }
+
+    NSMutableString *command = [NSMutableString stringWithFormat:@"INSERT INTO nhit_monitor (crate, num_pulses, pulser_rate, nhit_100_lo, nhit_100_med, nhit_100_hi, nhit_20, nhit_20_lb) VALUES (%i, %i, %i, ", crate, numPulses, pulserRate];
+
+    [command appendString:@"ARRAY["];
+    for (i = 0; i < maxNhit - 1; i++) {
+        [command appendFormat:@"%i, ", nhitRecord.nhit_100_lo[i]];
+    }
+    [command appendFormat:@"%i], ", nhitRecord.nhit_100_lo[i]];
+
+    [command appendString:@"ARRAY["];
+    for (i = 0; i < maxNhit - 1; i++) {
+        [command appendFormat:@"%i, ", nhitRecord.nhit_100_med[i]];
+    }
+    [command appendFormat:@"%i], ", nhitRecord.nhit_100_med[i]];
+
+    [command appendString:@"ARRAY["];
+    for (i = 0; i < maxNhit - 1; i++) {
+        [command appendFormat:@"%i, ", nhitRecord.nhit_100_hi[i]];
+    }
+    [command appendFormat:@"%i], ", nhitRecord.nhit_100_hi[i]];
+
+    [command appendString:@"ARRAY["];
+    for (i = 0; i < maxNhit - 1; i++) {
+        [command appendFormat:@"%i, ", nhitRecord.nhit_20[i]];
+    }
+    [command appendFormat:@"%i], ", nhitRecord.nhit_20[i]];
+
+    [command appendString:@"ARRAY["];
+    for (i = 0; i < maxNhit - 1; i++) {
+        [command appendFormat:@"%i, ", nhitRecord.nhit_20_lb[i]];
+    }
+    [command appendFormat:@"%i])", nhitRecord.nhit_20_lb[i]];
+
+    ORPQModel *db = [ORPQModel getCurrent];
+
+    if (!db) {
+        NSLog(@"Postgres object not found, please add it to the experiment!\n");
+        goto err;
+    }
+
+    [db dbQuery:command object:self selector:nil timeout:10.0];
 
     [self disconnect];
 err:
