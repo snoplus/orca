@@ -206,6 +206,7 @@ BOOL isNotRunningOrIsInMaintenance();
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
 
 - (void) pingCrates;
+- (void) runNhitMonitor;
 
 #pragma mark ¥¥orcascript helpers
 - (void) zeroPedestalMasks;

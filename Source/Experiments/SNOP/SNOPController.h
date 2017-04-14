@@ -32,11 +32,11 @@
     
     NSView *blankView;
     NSSize detectorSize;
-	NSSize detailsSize;
-	NSSize focalPlaneSize;
-	NSSize couchDBSize;
-	NSSize hvMasterSize;
-	NSSize runsSize;
+    NSSize detailsSize;
+    NSSize focalPlaneSize;
+    NSSize couchDBSize;
+    NSSize hvMasterSize;
+    NSSize runsSize;
     
     // Used for deciding what units to use displaying thresholds
     int displayUnitsDecider[10];
@@ -145,6 +145,9 @@
     IBOutlet NSTextField *debugDBPort;
     IBOutlet NSButton *debugDBClearButton;
 
+    // Nhit Monitor settings
+    IBOutlet NSButton *runNhitMonitorButton;
+
     //Custom colors
     NSColor *snopRedColor;
     NSColor *snopBlueColor;
@@ -210,6 +213,7 @@
 - (IBAction) hvMasterTriggersOFF:(id)sender;
 
 - (IBAction) pingCratesAction:(id)sender;
+- (IBAction) runNhitMonitorAction:(id)sender;
 
 //smellie functions -------------------
 - (IBAction) loadSmellieRunAction:(id)sender;

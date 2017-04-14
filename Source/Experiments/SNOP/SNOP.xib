@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14B25" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6751" systemVersion="13F1603" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
         <development version="5100" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
-        <plugIn identifier="com.apple.WebKitIBPlugin" version="7706"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6751"/>
+        <plugIn identifier="com.apple.WebKitIBPlugin" version="6751"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SNOPController">
@@ -61,6 +61,7 @@
                 <outlet property="repeatRunCB" destination="1339" id="1354"/>
                 <outlet property="resyncRunButton" destination="eox-6c-ihd" id="K4U-Io-B29"/>
                 <outlet property="runBar" destination="MBu-zu-x36" id="iTV-aT-8hr"/>
+                <outlet property="runNhitMonitorButton" destination="drs-Rr-CLT" id="8ay-JK-ydl"/>
                 <outlet property="runNumberField" destination="3752" id="NlG-fq-pyu"/>
                 <outlet property="runStatusField" destination="3733" id="LhC-Ec-9HL"/>
                 <outlet property="runTypeWordMatrix" destination="3935" id="GbT-ZR-J8S"/>
@@ -3820,6 +3821,22 @@
                                         </box>
                                     </subviews>
                                     <animations/>
+                                </view>
+                            </tabViewItem>
+                            <tabViewItem label="Nhit Monitor" identifier="" id="FRT-8S-HaJ">
+                                <view key="view" id="kyp-tq-6On">
+                                    <rect key="frame" x="10" y="25" width="773" height="635"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <button verticalHuggingPriority="750" id="drs-Rr-CLT">
+                                            <rect key="frame" x="229" y="359" width="65" height="32"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="push" title="Run" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="PsX-XE-hgK">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                        </button>
+                                    </subviews>
                                 </view>
                             </tabViewItem>
                         </tabViewItems>

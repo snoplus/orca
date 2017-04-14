@@ -609,6 +609,11 @@ err:
     [model pingCrates];
 }
 
+- (IBAction) runNhitMonitorAction: (id) sender
+{
+    [model runNhitMonitor];
+}
+
 - (void) dbOrcaDBIPChanged:(NSNotification*)aNote
 {
     [orcaDBIPAddressPU setStringValue:[model orcaDBIPAddress]];
