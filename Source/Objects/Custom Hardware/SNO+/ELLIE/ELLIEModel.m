@@ -884,7 +884,7 @@ err:
             ////////////
             // Set the tubii model aand ask it to fire
             @try{
-                [theTubiiModel fireTelliePulser_rate:rate pulseWidth:100e-9 NPulses:[noShots intValue]];
+                [theTubiiModel fireTelliePulser_rate:rate pulseWidth:100 NPulses:[noShots intValue]];
             } @catch(NSException* e){
                 errorString = [NSString stringWithFormat:@"[TELLIE]: Problem setting TUBii parameters: %@\n", [e reason]];
                 NSLogColor([NSColor redColor], errorString);
@@ -1855,7 +1855,7 @@ err:
                             //Set up tubii to send triggers
                             @try{
                                 //Fire trigger pulses!
-                                [theTubiiModel fireSmelliePulser_rate:[rate floatValue] pulseWidth:100e-9 NPulses:numOfPulses];
+                                [theTubiiModel fireSmelliePulser_rate:[rate floatValue] pulseWidth:100 NPulses:numOfPulses];
                             } @catch(NSException* e) {
                                 NSLogColor([NSColor redColor], @"[SMELLIE]: Problem with TUBii server request: %@\n", [e reason]);
                                 goto err;
