@@ -151,6 +151,7 @@
     IBOutlet NSTextField *nhitMonitorPulserRate;
     IBOutlet NSTextField *nhitMonitorNumPulses;
     IBOutlet NSTextField *nhitMonitorMaxNhit;
+    IBOutlet NSProgressIndicator *nhitMonitorProgress;
 
     //Custom colors
     NSColor *snopRedColor;
@@ -184,6 +185,9 @@
 #pragma mark ¥¥¥Initialization
 - (void) registerNotificationObservers;
 - (void) updateWindow;
+
+- (void) nhitMonitorSettingsChanged: (NSNotification*) aNote;
+- (void) nhitMonitorUpdate: (NSNotification*) aNote;
 
 #pragma mark ¥¥¥Interface
 - (void) XL3ModeChanged:(NSNotification*)aNote;

@@ -359,6 +359,8 @@ tellieRunFiles = _tellieRunFiles;
     /* initialize our connection to the XL3 server */
     xl3_server = [[RedisClient alloc] initWithHostName:xl3Host withPort:xl3Port];
 
+    nhitMonitor = [[NHitMonitor alloc] init];
+
     return self;
 }
 
@@ -1224,6 +1226,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 
 - (void) runNhitMonitor
 {
+    NSLog(@"running nhit monitor\n");
     [nhitMonitor start:[self nhitMonitorCrate] pulserRate:[self nhitMonitorPulserRate] numPulses:[self nhitMonitorNumPulses] maxNhit:[self nhitMonitorMaxNhit]];
 }
 

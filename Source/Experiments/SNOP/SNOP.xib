@@ -51,6 +51,7 @@
                 <outlet property="mtcPort" destination="2aR-vd-DX1" id="sbN-pm-YYe"/>
                 <outlet property="nhitMonitorMaxNhit" destination="5fG-ST-ZPu" id="Ngu-g0-0kZ"/>
                 <outlet property="nhitMonitorNumPulses" destination="xOk-db-mDC" id="nnc-gc-Xqq"/>
+                <outlet property="nhitMonitorProgress" destination="PW2-2n-hba" id="vLi-ed-h0e"/>
                 <outlet property="nhitMonitorPulserRate" destination="o4d-ry-Qs4" id="GGn-c7-tEA"/>
                 <outlet property="orcaDBClearButton" destination="2682" id="Elw-gn-a5W"/>
                 <outlet property="orcaDBIPAddressPU" destination="2683" id="2962"/>
@@ -3838,6 +3839,9 @@
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="runNhitMonitorAction:" target="-2" id="u1W-OQ-gu6"/>
+                                            </connections>
                                         </button>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="M5k-Yk-5rD">
                                             <rect key="frame" x="252" y="342" width="38" height="17"/>
@@ -3958,6 +3962,10 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
+                                        <progressIndicator maxValue="100" indeterminate="YES" style="bar" id="PW2-2n-hba">
+                                            <rect key="frame" x="500" y="417" width="96" height="20"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        </progressIndicator>
                                     </subviews>
                                 </view>
                             </tabViewItem>

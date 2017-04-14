@@ -16,6 +16,8 @@
 #import "ORPQModel.h"
 #import "ORGlobal.h"
 
+NSString* ORNhitMonitorUpdateNotification = @"ORNhitMonitorUpdateNotification";
+
 @implementation NHitMonitor
 
 - (id) init
@@ -62,6 +64,8 @@
     /* Start the nhit monitor. */
     if ([self isRunning]) return;
 
+    NSLog(@"starting nhit monitor\n");
+
     NSDictionary *args = [NSDictionary dictionaryWithObjectsAndKeys:
                             [NSNumber numberWithInt:crate], @"crate",
                             [NSNumber numberWithInt:pulserRate], @"pulserRate",
@@ -69,7 +73,8 @@
                             [NSNumber numberWithInt:maxNhit], @"maxNhit",
                              nil];
 
-    [runningThread initWithTarget:self selector:@selector(run) object:args];
+    [runningThread initWithTarget:self selector:@selector(run:) object:args];
+    [runningThread start];
 }
 
 - (int) connect
@@ -79,6 +84,8 @@
     char err[ANET_ERR_LEN];
     char* name = "nhit";
     struct GenericRecordHeader header;
+
+    NSLog(@"connecting to data server\n");
 
     [self disconnect];
 
@@ -91,6 +98,9 @@
     }
 
     snop = [snops objectAtIndex:0];
+
+    NSLog(@"host = %s\n", [[snop dataHost] UTF8String]);
+    NSLog(@"port = %i\n", [snop dataPort]);
 
     sock = anetTcpConnect(err, (char *) [[snop dataHost] UTF8String], [snop dataPort]);
 
@@ -123,7 +133,7 @@
     /* Subscribe to MTCD records from the data server. */
     header.RecordID = htonl(kSCmd);
     header.RecordLength = htonl(4);
-    header.RecordVersion = ntohl(kSub);
+    header.RecordVersion = htonl(kSub);
 
     if (anetWrite(sock, (char *) &header, sizeof(struct GenericRecordHeader)) == -1) {
         NSLogColor([NSColor redColor], @"failed to send subscription to data server\n");
@@ -163,6 +173,7 @@
         if ([[NSThread currentThread] isCancelled]) goto err;
 
         if (time(NULL) > start + timeout) {
+            NSLog(@"timeout\n");
             goto err;
         }
 
@@ -170,10 +181,12 @@
             if (errno == EAGAIN || errno == EWOULDBLOCK) {
                 continue;
             }
+            NSLog(@"anetRead: returned -1\n");
             goto err;
         }
 
         if (anetRead(sock, (char *) buf, ntohl(header.RecordLength)) == -1) {
+            NSLog(@"anetRead: returned -1\n");
             goto err;
         }
 
@@ -247,6 +260,8 @@ err:
     struct NhitRecord nhitRecord;
     int i;
 
+    NSLog(@"run\n");
+
     int crate = [[args objectForKey:@"crate"] intValue];
     int pulserRate = [[args objectForKey:@"pulserRate"] intValue];
     int numPulses = [[args objectForKey:@"numPulses"] intValue];
@@ -313,6 +328,10 @@ err:
         }
     }
 
+    NSLog(@"maxNhit = %i\n", maxNhit);
+    NSLog(@"[channels count] = %i\n", [channels count]);
+    NSLog(@"[slots count] = %i\n", [slots count]);
+
     if (maxNhit > [channels count]) {
         NSLogColor([NSColor redColor], @"crate %i only has %i channels with "
             "triggers enabled, but need at least %i", crate, [channels count],
@@ -327,32 +346,39 @@ err:
     fine_delay = [mtc fineDelay];
     pedestal_width = [mtc pedestalWidth];
 
-    [mtc disablePulser];
-    [mtc enablePedestal];
-    [mtc setPedCrateMask: (1 << crate)];
-    [mtc loadPedestalCrateMaskToHardware];
-    [mtc setPgtRate: pulserRate];
-    [mtc setCoarseDelay: COARSE_DELAY];
-    [mtc loadCoarseDelayToHardware];
-    [mtc setFineDelay: FINE_DELAY];
-    [mtc loadFineDelayToHardware];
-    [mtc setPedestalWidth: PEDESTAL_WIDTH];
-    [mtc loadPedWidthToHardware];
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        [mtc disablePulser];
+        [mtc enablePedestal];
+        [mtc setPedCrateMask: (1 << crate)];
+        [mtc loadPedestalCrateMaskToHardware];
+        [mtc setPgtRate: pulserRate];
+        [mtc setCoarseDelay: COARSE_DELAY];
+        [mtc loadCoarseDelayToHardware];
+        [mtc setFineDelay: FINE_DELAY];
+        [mtc loadFineDelayToHardware];
+        [mtc setPedestalWidth: PEDESTAL_WIDTH];
+        [mtc loadPedWidthToHardware];
+    });
 
     /* turn off all pedestals */
     [xl3 setPedestalMask:[xl3 getSlotsPresent] pattern:0];
 
-    for (i = 0; i < maxNhit + 1; i++) {
-        slot = [[slots objectAtIndex:i] intValue];
-        channel = [[channels objectAtIndex:i] intValue];
-        fec = [[OROrderedObjManager for:[xl3 guardian]] objectInSlot:16-slot];
-
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORNhitMonitorUpdateNotification object:self userInfo:@{@"nhit": @0, @"maxNhit": [NSNumber numberWithInt:maxNhit]}];
+    for (i = 0; i <= maxNhit ; i++) {
         /* Check to see if we should stop. */
         if ([[NSThread currentThread] isCancelled]) goto err;
 
-        [fec setPed:channel enabled:1];
+        if (i > 0) {
+            slot = [[slots objectAtIndex:i-1] intValue];
+            channel = [[channels objectAtIndex:i-1] intValue];
+            fec = [[OROrderedObjManager for:[xl3 guardian]] objectInSlot:16-slot];
 
-        [xl3 setPedestals];
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                [fec setPed:channel enabled:1];
+            });
+
+            [xl3 setPedestals];
+        }
 
         dispatch_sync(dispatch_get_main_queue(), ^{
             [mtc enablePulser];
@@ -361,73 +387,77 @@ err:
         dispatch_sync(dispatch_get_main_queue(), ^{
             [mtc disablePulser];
         });
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORNhitMonitorUpdateNotification object:self userInfo:@{@"nhit": [NSNumber numberWithInt:i], @"maxNhit": [NSNumber numberWithInt:maxNhit]}];
     }
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORNhitMonitorUpdateNotification object:self userInfo:@{@"nhit": [NSNumber numberWithInt:i], @"maxNhit": [NSNumber numberWithInt:maxNhit]}];
 
-    if (pedestals_enabled) {
-        [mtc enablePedestal];
-    } else {
-        [mtc disablePedestal];
-    }
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        if (pedestals_enabled) {
+            [mtc enablePedestal];
+        } else {
+            [mtc disablePedestal];
+        }
 
-    if (pulser_enabled) {
-        [mtc enablePulser];
-    } else {
-        [mtc disablePulser];
-    }
+        if (pulser_enabled) {
+            [mtc enablePulser];
+        } else {
+            [mtc disablePulser];
+        }
 
-    [mtc setPedCrateMask:pedestal_mask];
-    [mtc loadPedestalCrateMaskToHardware];
-    [mtc setCoarseDelay: coarse_delay];
-    [mtc loadCoarseDelayToHardware];
-    [mtc setFineDelay: fine_delay];
-    [mtc loadFineDelayToHardware];
-    [mtc setPedestalWidth: pedestal_width];
-    [mtc loadPedWidthToHardware];
+        [mtc setPedCrateMask:pedestal_mask];
+        [mtc loadPedestalCrateMaskToHardware];
+        [mtc setCoarseDelay: coarse_delay];
+        [mtc loadCoarseDelayToHardware];
+        [mtc setFineDelay: fine_delay];
+        [mtc loadFineDelayToHardware];
+        [mtc setPedestalWidth: pedestal_width];
+        [mtc loadPedWidthToHardware];
+    });
 
     /* print trigger thresholds */
     int threshold_n100_lo = [self getThreshold: nhitRecord.nhit_100_lo
                              numPulses: numPulses];
 
     if (threshold_n100_lo == -1) {
-        NSLog(@"nhit_100_lo  threshold is > %i nhit", maxNhit);
+        NSLog(@"nhit_100_lo  threshold is > %i nhit\n", maxNhit);
     } else {
-        NSLog(@"nhit_100_lo  threshold is %.2f nhit", threshold_n100_lo);
+        NSLog(@"nhit_100_lo  threshold is %.2f nhit\n", threshold_n100_lo);
     }
 
     int threshold_n100_med = [self getThreshold: nhitRecord.nhit_100_med
                              numPulses: numPulses];
 
     if (threshold_n100_med == -1) {
-        NSLog(@"nhit_100_med threshold is > %i nhit", maxNhit);
+        NSLog(@"nhit_100_med threshold is > %i nhit\n", maxNhit);
     } else {
-        NSLog(@"nhit_100_med threshold is %.2f nhit", threshold_n100_med);
+        NSLog(@"nhit_100_med threshold is %.2f nhit\n", threshold_n100_med);
     }
 
     int threshold_n100_hi = [self getThreshold: nhitRecord.nhit_100_hi
                              numPulses: numPulses];
 
     if (threshold_n100_hi == -1) {
-        NSLog(@"nhit_100_hi  threshold is > %i nhit", maxNhit);
+        NSLog(@"nhit_100_hi  threshold is > %i nhit\n", maxNhit);
     } else {
-        NSLog(@"nhit_100_hi  threshold is %.2f nhit", threshold_n100_hi);
+        NSLog(@"nhit_100_hi  threshold is %.2f nhit\n", threshold_n100_hi);
     }
 
     int threshold_n20 = [self getThreshold: nhitRecord.nhit_20
                              numPulses: numPulses];
 
     if (threshold_n20 == -1) {
-        NSLog(@"nhit_20      threshold is > %i nhit", maxNhit);
+        NSLog(@"nhit_20      threshold is > %i nhit\n", maxNhit);
     } else {
-        NSLog(@"nhit_20      threshold is %.2f nhit", threshold_n20);
+        NSLog(@"nhit_20      threshold is %.2f nhit\n", threshold_n20);
     }
 
     int threshold_n20_lb = [self getThreshold: nhitRecord.nhit_20_lb
                              numPulses: numPulses];
 
     if (threshold_n20_lb == -1) {
-        NSLog(@"nhit_20_lb   threshold is > %i nhit", maxNhit);
+        NSLog(@"nhit_20_lb   threshold is > %i nhit\n", maxNhit);
     } else {
-        NSLog(@"nhit_20_lb   threshold is %.2f nhit", threshold_n20_lb);
+        NSLog(@"nhit_20_lb   threshold is %.2f nhit\n", threshold_n20_lb);
     }
 
     NSMutableString *command = [NSMutableString stringWithFormat:@"INSERT INTO nhit_monitor (crate, num_pulses, pulser_rate, nhit_100_lo, nhit_100_med, nhit_100_hi, nhit_20, nhit_20_lb) VALUES (%i, %i, %i, ", crate, numPulses, pulserRate];

@@ -36,6 +36,7 @@
 #import "SNOCaenModel.h"
 #import "RunTypeWordBits.hh"
 #import "ECARun.h"
+#import "NhitMonitor.h"
 
 NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 NSString* ORRunWaitFinished = @"ORRunWaitFinished";
@@ -437,6 +438,11 @@ snopGreenColor;
                      selector : @selector(nhitMonitorSettingsChanged:)
                          name : ORSNOPModelNhitMonitorChangedNotification
                         object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(nhitMonitorUpdate:)
+                         name : ORNhitMonitorUpdateNotification
+                        object: nil];
 }
 
 - (void) updateWindow
@@ -473,6 +479,15 @@ snopGreenColor;
     [nhitMonitorNumPulses setStringValue:[NSString stringWithFormat:@"%i", numPulses]];
     int maxNhit = [model nhitMonitorMaxNhit];
     [nhitMonitorMaxNhit setStringValue:[NSString stringWithFormat:@"%i", maxNhit]];
+}
+
+- (void) nhitMonitorUpdate: (NSNotification*) aNote
+{
+    NSDictionary *userInfo = [aNote userInfo];
+
+    int nhit = [userInfo objectForKey:@"nhit"];
+    int maxNhit = [userInfo objectForKey:@"maxNhit"];
+    [nhitMonitorProgress setDoubleValue:nhit/(float) maxNhit];
 }
 
 -(void) SRTypeChanged:(NSNotification*)aNote

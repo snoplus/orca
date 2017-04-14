@@ -53,3 +53,5 @@ struct NhitRecord {
 - (int) getThreshold: (int *) counts numPulses: (int) numPulses;
 - (void) run: (NSDictionary *) args;
 @end
+
+extern NSString* ORNhitMonitorUpdateNotification;
