@@ -13,7 +13,7 @@
 @interface NHitMonitor : NSObject {
 
 @private
-    NSThread *runningthread;
+    NSThread *runningThread;
     char *buf;
     int sock;
     int timeout;

@@ -14,14 +14,14 @@ struct GenericRecordHeader {
 //   Master Trigger Card data 
 typedef struct MTCReadoutData {
   //   word 0 
-  u_int32 Bc10_1          :32;
+  uint32_t Bc10_1          :32;
   //   word 1 
-  u_int32 Bc10_2          :21;
-  u_int32 Bc50_1          :11;
+  uint32_t Bc10_2          :21;
+  uint32_t Bc50_1          :11;
   //   word 2 
-  u_int32 Bc50_2          :32;
+  uint32_t Bc50_2          :32;
   //   word 3 
-  u_int32 BcGT            :24; //   LSB 
+  uint32_t BcGT            :24; //   LSB 
   unsigned Nhit_100_Lo          :1;
   unsigned Nhit_100_Med         :1;
   unsigned Nhit_100_Hi          :1;

@@ -256,6 +256,9 @@
 		3620202D1CBD390A0089296E /* XmlrpcClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 3620201E1CBD390A0089296E /* XmlrpcClient.h */; };
 		3620202E1CBD390A0089296E /* XmlrpcClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 3620201F1CBD390A0089296E /* XmlrpcClient.m */; };
 		362F928B1681A05100F3ACB4 /* SNO.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 362F928A16819FCE00F3ACB4 /* SNO.cc */; };
+		364124E91EA04E8A0041BAA3 /* NHitMonitor.h in Headers */ = {isa = PBXBuildFile; fileRef = 364124E71EA04E8A0041BAA3 /* NHitMonitor.h */; };
+		364124EA1EA04E8A0041BAA3 /* NHitMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = 364124E81EA04E8A0041BAA3 /* NHitMonitor.m */; };
+		364124EC1EA04EB00041BAA3 /* record_info.h in Headers */ = {isa = PBXBuildFile; fileRef = 364124EB1EA04EB00041BAA3 /* record_info.h */; };
 		3672CF8C1C4EB15000870996 /* SNOCaen1720.nib in Resources */ = {isa = PBXBuildFile; fileRef = 3672CF811C4EB15000870996 /* SNOCaen1720.nib */; };
 		3672CF8D1C4EB15000870996 /* SNOCaen1720Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3672CF821C4EB15000870996 /* SNOCaen1720Card.gif */; };
 		3672CF8E1C4EB15000870996 /* SNOCaenController.h in Headers */ = {isa = PBXBuildFile; fileRef = 3672CF831C4EB15000870996 /* SNOCaenController.h */; };
@@ -4015,6 +4018,9 @@
 		3620201E1CBD390A0089296E /* XmlrpcClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XmlrpcClient.h; sourceTree = "<group>"; };
 		3620201F1CBD390A0089296E /* XmlrpcClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XmlrpcClient.m; sourceTree = "<group>"; };
 		362F928A16819FCE00F3ACB4 /* SNO.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SNO.cc; sourceTree = "<group>"; };
+		364124E71EA04E8A0041BAA3 /* NHitMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NHitMonitor.h; sourceTree = "<group>"; };
+		364124E81EA04E8A0041BAA3 /* NHitMonitor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NHitMonitor.m; sourceTree = "<group>"; };
+		364124EB1EA04EB00041BAA3 /* record_info.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = record_info.h; sourceTree = "<group>"; };
 		3672CF811C4EB15000870996 /* SNOCaen1720.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = SNOCaen1720.nib; sourceTree = "<group>"; };
 		3672CF821C4EB15000870996 /* SNOCaen1720Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = SNOCaen1720Card.gif; sourceTree = "<group>"; };
 		3672CF831C4EB15000870996 /* SNOCaenController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNOCaenController.h; sourceTree = "<group>"; };
@@ -14474,6 +14480,9 @@
 		EFB39FC5130BA1C5001220AC /* SNOP */ = {
 			isa = PBXGroup;
 			children = (
+				364124EB1EA04EB00041BAA3 /* record_info.h */,
+				364124E71EA04E8A0041BAA3 /* NHitMonitor.h */,
+				364124E81EA04E8A0041BAA3 /* NHitMonitor.m */,
 				1038D8841E23160D009FFDFB /* RunTypeWordBits.hh */,
 				6B325E071B2F4241002E2DD7 /* SNOP.xib */,
 				EFB39FC6130BA1C5001220AC /* SNOP.gif */,
@@ -15461,12 +15470,14 @@
 				844DF9050C6A836700BEB215 /* ORMaskedWaveform.h in Headers */,
 				84EA6CA10C73D11200083319 /* nTPCConstants.h in Headers */,
 				436972C21B42DBE6008D57B5 /* ORCV1730Decoder.h in Headers */,
+				364124EC1EA04EB00041BAA3 /* record_info.h in Headers */,
 				84EA6CA20C73D11200083319 /* nTPCController.h in Headers */,
 				84EA6CA40C73D11200083319 /* nTPCModel.h in Headers */,
 				84EA6CAC0C73D15B00083319 /* ORAcqirisDC440Decoders.h in Headers */,
 				9C38E5590C775F2A00255848 /* ORcPCICardDecoder.h in Headers */,
 				8493CC420C99FA0700B46CD4 /* SBC_Linking.h in Headers */,
 				8493CC430C99FA0700B46CD4 /* SBC_Link.h in Headers */,
+				364124E91EA04E8A0041BAA3 /* NHitMonitor.h in Headers */,
 				8493CC450C99FA0700B46CD4 /* SBC_LinkController.h in Headers */,
 				8480BE5B1CE116FE006A3EA3 /* ORCAEN830Shared.hh in Headers */,
 				8493CC4D0C99FA0700B46CD4 /* CircularBuffer.h in Headers */,
@@ -18088,6 +18099,7 @@
 				84DCB61B110E116E0062A95C /* ORiTransGasSensorDecoder.m in Sources */,
 				84693F741121BB4C008B5DB2 /* ORRunNotesController.m in Sources */,
 				84693F761121BB4C008B5DB2 /* ORRunNotesModel.m in Sources */,
+				364124EA1EA04E8A0041BAA3 /* NHitMonitor.m in Sources */,
 				84D29FE21843EAC800D320DB /* OROpSeqStep.m in Sources */,
 				848285B2112C5AD700BA30ED /* ORVHS4030Controller.m in Sources */,
 				848285B4112C5AD700BA30ED /* ORVHS4030Decoders.m in Sources */,

@@ -165,6 +165,7 @@
 - (void) waitForThresholds: (ORPQResult *) result;
 
 #pragma mark •••Accessors
+- (RedisClient *) mtc;
 - (BOOL) basicOpsRunning;
 - (void) setBasicOpsRunning:(BOOL)aBasicOpsRunning;
 - (BOOL) autoIncrement;

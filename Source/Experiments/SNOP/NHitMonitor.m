@@ -10,10 +10,28 @@
 #import "ORMTCModel.h"
 #import "ORXL3Model.h"
 #import "record_info.h"
+#import "ORFec32Model.h"
+#import "SNOPModel.h"
+#import "OROrderedObjManager.h"
 
 /* Buffer size for records from the data stream. Most records are small, but
  * the MTC records are concatenated so may be a few kilobytes. */
 #define DATASTREAM_BUFFER_SIZE 0xffffff
+
+/* Maximum number of channels to fire on a single crate. */
+#define MAX_NHIT 512
+
+#define COARSE_DELAY 250
+#define FINE_DELAY 0
+#define PEDESTAL_WIDTH 50
+
+struct NhitRecord {
+    int nhit_100_lo[MAX_NHIT];
+    int nhit_100_med[MAX_NHIT];
+    int nhit_100_hi[MAX_NHIT];
+    int nhit_20[MAX_NHIT];
+    int nhit_20_lb[MAX_NHIT];
+};
 
 @implementation NHitMonitor
 
@@ -36,7 +54,6 @@
 
 - (void) registerNotificationObservers
 {
-
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
 
     [notifyCenter addObserver : self
@@ -48,17 +65,14 @@
                      selector : @selector(launchECAThread:)
                          name : ORRunStartedNotification
                        object : nil];
-
 }
 
 - (int) connectToDataServer
 {
     /* Connect to the data server. */
     SNOPModel *snop;
-    char host[256];
     char err[ANET_ERR_LEN];
     char* name = "nhit";
-    int port;
     struct GenericRecordHeader header;
 
     [self disconnect];
@@ -73,8 +87,7 @@
 
     snop = [snops objectAtIndex:0];
 
-    sock = anetTcpConnect(err, [[snop dataServerHost] UTF8String],
-                          [snop dataServerPort]);
+    sock = anetTcpConnect(err, (char *) [[snop dataHost] UTF8String], [snop dataPort]);
 
     if (sock == ANET_ERR) {
         NSLogColor([NSColor redColor], @"failed to connect to data server: %s",
@@ -83,18 +96,22 @@
     }
 
     anetSendTimeout(err, sock, 1000);
-    anetRecvTimeout(err, sock, 1000);
+    anetReceiveTimeout(err, sock, 1000);
 
     /* Send our name to the data server. */
     header.RecordID = htonl(kSCmd);
     header.RecordLength = htonl(strlen(name));
     header.RecordVersion = 0x4944;
 
-    memcpy(buf, &header, sizeof(GenericRecordHeader));
-    memcpy(buf+sizeof(GenericRecordHeader), name, strlen(name));
-
-    if (anetWrite(sock, buf, sizeof(GenericRecordHeader)+strlen(name)) == -1) {
+    if (anetWrite(sock, (char *) &header, sizeof(struct GenericRecordHeader)) == -1) {
         NSLogColor([NSColor redColor], @"failed to send name to data server\n");
+        [self disconnect];
+        return -1;
+    }
+
+    if (anetWrite(sock, name, strlen(name)) == -1) {
+        NSLogColor([NSColor redColor], @"failed to send name to data server\n");
+        [self disconnect];
         return -1;
     }
 
@@ -106,14 +123,14 @@
     if (sock > 0) close(sock);
 }
 
-- (int) getNhitTriggerCount: numPulses: (int) numPulses
+- (int) getNhitTriggerCount: (int) nhit numPulses: (int) numPulses nhitRecord: (struct NhitRecord *) nhitRecord
 {
     /* Returns the number of triggers which had an NHIT trigger fire. */
     int current_gtid;
-    int data, nrecords;
-    int nhit_100_lo, nhit_100_med, nhit_100_hi, n20, n20_lb;
+    int i, nrecords;
     int count = 0;
-    int start, now;
+    int start;
+    struct GenericRecordHeader header;
 
     current_gtid = [[mtc mtc] intCommand:"get_gtid"];
 
@@ -124,7 +141,7 @@
             goto err;
         }
 
-        if (anetRead(sock, &header, sizeof(GenericRecordHeader)) == -1) {
+        if (anetRead(sock, (char *) &header, sizeof(struct GenericRecordHeader)) == -1) {
             if (errno == EAGAIN || errno == EWOULDBLOCK) {
                 continue;
             }
@@ -138,33 +155,56 @@
         nrecords = ntohl(header.RecordLength)/6;
 
         for (i = 0; i < nrecords; i++) {
-            MTCReadoutData *mtc_data = (MTCReadoutData *) (buf + i*6*4);
+            struct MTCReadoutData *mtc_readout_data = (struct MTCReadoutData *) (buf + i*6*4);
 
-            if (mtc_data->BcGT < current_gtid) continue;
+            if (mtc_readout_data->BcGT < current_gtid) continue;
 
-            if (mtc_data->Pedestal) {
-                if (mtc_readout_data.Nhit_100_Lo)
-                    nhit_100_lo += 1
-                if (mtc_readout_data.Nhit_100_Med)
-                    nhit_100_med += 1
-                if (mtc_readout_data.Nhit_100_Hi)
-                    nhit_100_hi += 1
-                if (mtc_readout_data.Nhit_20)
-                    nhit_20 += 1
-                if (mtc_readout_data.Nhit_20_LB)
-                    nhit_20_lb += 1
+            if (mtc_readout_data->Pedestal) {
+                if (mtc_readout_data->Nhit_100_Lo)
+                    nhitRecord->nhit_100_lo[nhit] += 1;
+                if (mtc_readout_data->Nhit_100_Med)
+                    nhitRecord->nhit_100_med[nhit] += 1;
+                if (mtc_readout_data->Nhit_100_Hi)
+                    nhitRecord->nhit_100_hi[nhit] += 1;
+                if (mtc_readout_data->Nhit_20)
+                    nhitRecord->nhit_20[nhit] += 1;
+                if (mtc_readout_data->Nhit_20_LB)
+                    nhitRecord->nhit_20_lb[nhit] += 1;
 
-                count += 1
+                count += 1;
 
                 if (count >= numPulses) break;
             }
 
-        if (count >= numPulses) break;
+            if (count >= numPulses) break;
+        }
     }
 
     return 0;
 err:
     NSLogColor([NSColor redColor], @"getNhitTriggerCount failed\n");
+    return -1;
+}
+
+- (int) getThreshold: (int *) counts numPulses: (int) numPulses
+{
+    /* Returns the trigger threshold for a given NHIT trigger by looking for
+     * the nhit at which the trigger rate crosses 50%.
+     *
+     * Returns -1 if no point crosses 50%. */
+    int i;
+
+    if (counts[0] > numPulses/2) {
+        /* we are already above threshold at 0 nhit */
+        return 0;
+    }
+
+    for (i = 0; i < numPulses; i++) {
+        if (counts[i] > numPulses/2) {
+            return (i-1) + (numPulses/2 - counts[i-1])/(counts[i] - counts[i-1]);
+        }
+    }
+
     return -1;
 }
 
@@ -176,6 +216,22 @@ err:
     uint32_t pedestals_enabled, pulser_enabled, pedestal_mask, coarse_delay;
     uint32_t fine_delay, pedestal_width;
     float pulser_rate;
+    struct NhitRecord nhitRecord;
+    int i;
+
+    for (i = 0; i < MAX_NHIT; i++) {
+        nhitRecord.nhit_100_lo[i] = 0;
+        nhitRecord.nhit_100_med[i] = 0;
+        nhitRecord.nhit_100_hi[i] = 0;
+        nhitRecord.nhit_20[i] = 0;
+        nhitRecord.nhit_20_lb[i] = 0;
+    }
+
+    if (maxNhit > MAX_NHIT) {
+        NSLogColor([NSColor redColor], @"maxNhit must be less than %i\n",
+                   MAX_NHIT);
+        return;
+    }
 
     NSArray* mtcs = [[(ORAppDelegate*)[NSApp delegate] document]
          collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
@@ -206,8 +262,8 @@ err:
 
     /* create a list of channels for which to enable pedestals. We only add
      * channels if both the N100 and N20 triggers are enabled. */
-    NSArray *slots = @[];
-    NSArray *channels = @[];
+    NSMutableArray *slots = [NSMutableArray array];
+    NSMutableArray *channels = [NSMutableArray array];
     for (slot = 0; slot < 16; slot++) {
         for (channel = 0; channel < 32; channel++) {
             fec = [[OROrderedObjManager for:[xl3 guardian]] objectInSlot:16-slot];
@@ -222,9 +278,9 @@ err:
         }
     }
 
-    if (maxNhit > [channels length]) {
+    if (maxNhit > [channels count]) {
         NSLogColor([NSColor redColor], @"crate %i only has %i channels with "
-            "triggers enabled, but need at least %i", crate, [channels length],
+            "triggers enabled, but need at least %i", crate, [channels count],
              maxNhit);
     }
 
@@ -232,12 +288,12 @@ err:
     pulser_enabled = [mtc pulserEnabled];
     pedestal_mask = [mtc pedCrateMask];
     pulser_rate = [mtc pgtRate];
-    coarse_delay = [mtc getCoarseDelay];
-    fine_delay = [mtc getFineDelay];
-    pedestal_width = [mtc getPedestalWidth];
+    coarse_delay = [mtc coarseDelay];
+    fine_delay = [mtc fineDelay];
+    pedestal_width = [mtc pedestalWidth];
 
     [mtc disablePulser];
-    [mtc enablePedestals];
+    [mtc enablePedestal];
     [mtc setPedCrateMask: (1 << crate)];
     [mtc loadPedestalCrateMaskToHardware];
     [mtc setPgtRate: pulserRate];
@@ -256,12 +312,12 @@ err:
         channel = [[channels objectAtIndex:i] intValue];
         fec = [[OROrderedObjManager for:[xl3 guardian]] objectInSlot:16-slot];
 
-        [fec setPed:channel state:1];
+        [fec setPed:channel enabled:1];
 
         [xl3 setPedestals];
 
         [mtc enablePulser];
-        [self getNhitTriggerCount: numPulses];
+        [self getNhitTriggerCount: i numPulses:numPulses nhitRecord:&nhitRecord];
         [mtc disablePulser];
     }
 
@@ -285,5 +341,51 @@ err:
     [mtc loadFineDelayToHardware];
     [mtc setPedestalWidth: pedestal_width];
     [mtc loadPedWidthToHardware];
+
+    /* print trigger thresholds */
+    int threshold_n100_lo = [self getThreshold: nhitRecord.nhit_100_lo
+                             numPulses: numPulses];
+
+    if (threshold_n100_lo == -1) {
+        NSLog(@"nhit_100_lo  threshold is > %i nhit", maxNhit);
+    } else {
+        NSLog(@"nhit_100_lo  threshold is %.2f nhit", threshold_n100_lo);
+    }
+
+    int threshold_n100_med = [self getThreshold: nhitRecord.nhit_100_med
+                             numPulses: numPulses];
+
+    if (threshold_n100_med == -1) {
+        NSLog(@"nhit_100_med threshold is > %i nhit", maxNhit);
+    } else {
+        NSLog(@"nhit_100_med threshold is %.2f nhit", threshold_n100_med);
+    }
+
+    int threshold_n100_hi = [self getThreshold: nhitRecord.nhit_100_hi
+                             numPulses: numPulses];
+
+    if (threshold_n100_hi == -1) {
+        NSLog(@"nhit_100_hi  threshold is > %i nhit", maxNhit);
+    } else {
+        NSLog(@"nhit_100_hi  threshold is %.2f nhit", threshold_n100_hi);
+    }
+
+    int threshold_n20 = [self getThreshold: nhitRecord.nhit_20
+                             numPulses: numPulses];
+
+    if (threshold_n20 == -1) {
+        NSLog(@"nhit_20      threshold is > %i nhit", maxNhit);
+    } else {
+        NSLog(@"nhit_20      threshold is %.2f nhit", threshold_n20);
+    }
+
+    int threshold_n20_lb = [self getThreshold: nhitRecord.nhit_20_lb
+                             numPulses: numPulses];
+
+    if (threshold_n20_lb == -1) {
+        NSLog(@"nhit_20_lb   threshold is > %i nhit", maxNhit);
+    } else {
+        NSLog(@"nhit_20_lb   threshold is %.2f nhit", threshold_n20_lb);
+    }
 }
 @end

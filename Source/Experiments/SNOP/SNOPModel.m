@@ -103,7 +103,6 @@ tellieRunFiles = _tellieRunFiles;
 
 - (id) init
 {
-    
     self = [super init];
 
     rolloverRun = NO;
@@ -121,16 +120,16 @@ tellieRunFiles = _tellieRunFiles;
 
     [self setMTCHost:@""];
     [self setXL3Host:@""];
-    [self setDataServerHost:@""];
-    [self setLogServerHost:@""];
+    [self setDataHost:@""];
+    [self setLogHost:@""];
 
     [self setMTCPort:4001];
     [self setXL3Port:4004];
-    [self setDataServerPort:4005];
-    [self setLogServerPort:4001];
+    [self setDataPort:4005];
+    [self setLogPort:4001];
 
-	[self initOrcaDBConnectionHistory];
-	[self initDebugDBConnectionHistory];
+    [self initOrcaDBConnectionHistory];
+    [self initDebugDBConnectionHistory];
     [[self undoManager] enableUndoRegistration];
 
     return self;
@@ -319,24 +318,24 @@ tellieRunFiles = _tellieRunFiles;
     [self setXL3Host:[decoder decodeObjectForKey:@"xl3Host"]];
     [self setXL3Port:[decoder decodeIntForKey:@"xl3Port"]];
 
-    [self setDataServerHost:[decoder decodeObjectForKey:@"dataHost"]];
-    [self setDataServerPort:[decoder decodeIntForKey:@"dataPort"]];
+    [self setDataHost:[decoder decodeObjectForKey:@"dataHost"]];
+    [self setDataPort:[decoder decodeIntForKey:@"dataPort"]];
 
-    [self setLogServerHost:[decoder decodeObjectForKey:@"logHost"]];
-    [self setLogServerPort:[decoder decodeIntForKey:@"logPort"]];
+    [self setLogHost:[decoder decodeObjectForKey:@"logHost"]];
+    [self setLogPort:[decoder decodeIntForKey:@"logPort"]];
     
     /* Check if we actually decoded the mtc, xl3, data, and log server
      * hostnames and ports. decodeObjectForKey() will return NULL if the
      * key doesn't exist, and decodeIntForKey() will return 0. */
     if ([self mtcHost] == NULL) [self setMTCHost:@""];
     if ([self xl3Host] == NULL) [self setXL3Host:@""];
-    if ([self dataHost] == NULL) [self setDataServerHost:@""];
-    if ([self logHost] == NULL) [self setLogServerHost:@""];
+    if ([self dataHost] == NULL) [self setDataHost:@""];
+    if ([self logHost] == NULL) [self setLogHost:@""];
 
     if ([self mtcPort] == 0) [self setMTCPort:4001];
     if ([self xl3Port] == 0) [self setXL3Port:4004];
-    if ([self dataPort] == 0) [self setDataServerPort:4005];
-    if ([self logPort] == 0) [self setLogServerPort:4001];
+    if ([self dataPort] == 0) [self setDataPort:4005];
+    if ([self logPort] == 0) [self setLogPort:4001];
 
     [[self undoManager] enableUndoRegistration];
 
