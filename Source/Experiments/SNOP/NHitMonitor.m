@@ -18,6 +18,36 @@
 
 NSString* ORNhitMonitorUpdateNotification = @"ORNhitMonitorUpdateNotification";
 
+// PH 04/23/98
+// Swap 4-byte integer/floats between native and external format
+void swap_int32(uint32_t *val_pt, int count)
+{
+	uint32_t *last = val_pt + count;
+	while (val_pt < last) {
+	    *val_pt = ((*val_pt << 24) & 0xff000000) |
+	              ((*val_pt <<  8) & 0x00ff0000) |
+	              ((*val_pt >>  8) & 0x0000ff00) |
+	              ((*val_pt >> 24) & 0x000000ff);
+	    ++val_pt;
+	}
+	return;
+}
+
+static int read_record(int sock, struct GenericRecordHeader *header, char *buf)
+{
+    /* Reads a single record from the data stream server. */
+    if (anetRead(sock, (char *) header, sizeof(struct GenericRecordHeader)) == -1) {
+        return -1;
+    }
+
+    if (anetRead(sock, buf, ntohl(header->RecordLength)) == -1) {
+        return -1;
+    }
+
+    return 0;
+}
+
+
 @implementation NHitMonitor
 
 - (id) init
@@ -130,6 +160,12 @@ NSString* ORNhitMonitorUpdateNotification = @"ORNhitMonitorUpdateNotification";
         return -1;
     }
 
+    if (read_record(sock, &header, buf) == -1) {
+        NSLogColor([NSColor redColor], @"failed to receive response from data server\n");
+        [self disconnect];
+        return -1;
+    }
+
     /* Subscribe to MTCD records from the data server. */
     header.RecordID = htonl(kSCmd);
     header.RecordLength = htonl(4);
@@ -143,6 +179,12 @@ NSString* ORNhitMonitorUpdateNotification = @"ORNhitMonitorUpdateNotification";
 
     if (anetWrite(sock, "MTCD", 4) == -1) {
         NSLogColor([NSColor redColor], @"failed to send subscription to data server\n");
+        [self disconnect];
+        return -1;
+    }
+
+    if (read_record(sock, &header, buf) == -1) {
+        NSLogColor([NSColor redColor], @"failed to receive response from data server\n");
         [self disconnect];
         return -1;
     }
@@ -190,12 +232,21 @@ NSString* ORNhitMonitorUpdateNotification = @"ORNhitMonitorUpdateNotification";
             goto err;
         }
 
+        NSLog(@"record id = 0x%x\n", ntohl(header.RecordID));
         nrecords = ntohl(header.RecordLength)/sizeof(struct MTCReadoutData);
 
         for (i = 0; i < nrecords; i++) {
             struct MTCReadoutData *mtc_readout_data = (struct MTCReadoutData *) (buf + i*sizeof(struct MTCReadoutData));
 
+            swap_int32(mtc_readout_data, 6);
+
             if (mtc_readout_data->BcGT < current_gtid) continue;
+
+            NSLog(@"gtid = %i\n", mtc_readout_data->BcGT);
+            NSLog(@"pedestal = %i\n", mtc_readout_data->Pedestal);
+            NSLog(@"pulse_gt = %i\n", mtc_readout_data->Pulse_GT);
+            NSLog(@"count = %i\n", count);
+            NSLog(@"num_pulses = %i\n", numPulses);
 
             if (mtc_readout_data->Pedestal) {
                 if (mtc_readout_data->Nhit_100_Lo)
@@ -210,12 +261,12 @@ NSString* ORNhitMonitorUpdateNotification = @"ORNhitMonitorUpdateNotification";
                     nhitRecord->nhit_20_lb[nhit] += 1;
 
                 count += 1;
-
-                if (count >= numPulses) break;
             }
 
             if (count >= numPulses) break;
         }
+
+        if (count >= numPulses) break;
     }
 
     return 0;
@@ -336,6 +387,7 @@ err:
         NSLogColor([NSColor redColor], @"crate %i only has %i channels with "
             "triggers enabled, but need at least %i", crate, [channels count],
              maxNhit);
+        return -1;
     }
 
     pedestals_enabled = [mtc isPedestalEnabledInCSR];

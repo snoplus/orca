@@ -648,7 +648,7 @@ err:
 
 - (IBAction) nhitMonitorCrateAction: (id) sender
 {
-    [model setNhitMonitorCrate:[sender intValue]];
+    [model setNhitMonitorCrate:[sender indexOfSelectedItem]];
 }
 
 - (IBAction) nhitMonitorPulserRateAction: (id) sender

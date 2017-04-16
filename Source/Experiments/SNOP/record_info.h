@@ -5,6 +5,8 @@
 
 #define RECORD_VERSION 0
 
+#pragma pack(1)
+
 struct GenericRecordHeader {
     uint32_t RecordID;
     uint32_t RecordLength;
@@ -269,5 +271,7 @@ enum SourceType {
 #define kSub  0
 /* Header version used to send ID string to data server. */
 #define kId   0x4944
+
+#pragma pack()
 
 #endif
