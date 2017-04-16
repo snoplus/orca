@@ -348,6 +348,11 @@ tellieRunFiles = _tellieRunFiles;
     if ([self dataPort] == 0) [self setDataServerPort:4005];
     if ([self logPort] == 0) [self setLogServerPort:4001];
 
+    // Nhit Monitor Settings
+    [self setNhitMonitorCrate:[decoder decodeIntForKey:@"nhitMonitorCrate"]];
+    [self setNhitMonitorPulserRate:[decoder decodeIntForKey:@"nhitMonitorPulserRate"]];
+    [self setNhitMonitorNumPulses:[decoder decodeIntForKey:@"nhitMonitorNumPulses"]];
+    [self setNhitMonitorMaxNhit:[decoder decodeIntForKey:@"nhitMonitorMaxNhit"]];
     [[self undoManager] enableUndoRegistration];
 
     //Set extra security
@@ -1650,6 +1655,11 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     [encoder encodeObject:[self logHost] forKey:@"logHost"];
     [encoder encodeInt:[self logPort] forKey:@"logPort"];
 
+    //Settings
+    [encoder encodeInt:[self nhitMonitorCrate] forKey:@"nhitMonitorCrate"];
+    [encoder encodeInt:[self nhitMonitorPulserRate] forKey:@"nhitMonitorPulserRate"];
+    [encoder encodeInt:[self nhitMonitorNumPulses] forKey:@"nhitMonitorNumPulses"];
+    [encoder encodeInt:[self nhitMonitorMaxNhit] forKey:@"nhitMonitorMaxNhit"];
 }
 
 - (NSString*) reformatSelectionString:(NSString*)aString forSet:(int)aSet

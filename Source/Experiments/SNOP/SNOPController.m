@@ -460,6 +460,7 @@ snopGreenColor;
     [self runsLockChanged:nil];
     [self runsECAChanged:nil];
     [self runTypeWordChanged:nil];
+    [self nhitMonitorSettingsChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -487,6 +488,7 @@ snopGreenColor;
 
     int nhit = [userInfo objectForKey:@"nhit"];
     int maxNhit = [userInfo objectForKey:@"maxNhit"];
+    NSLog(@"updating nhit monitor progress bar to %.2f\n", nhit/(float) maxNhit);
     [nhitMonitorProgress setDoubleValue:nhit/(float) maxNhit];
 }
 
@@ -643,6 +645,7 @@ err:
 
 - (IBAction) runNhitMonitorAction: (id) sender
 {
+    [self endEditing];
     [model runNhitMonitor];
 }
 

@@ -49,6 +49,7 @@
                 <outlet property="logPort" destination="DpW-Vd-aQd" id="9DN-uP-F1q"/>
                 <outlet property="mtcHost" destination="eaZ-tZ-5J9" id="rjH-OI-3ri"/>
                 <outlet property="mtcPort" destination="2aR-vd-DX1" id="sbN-pm-YYe"/>
+                <outlet property="nhitMonitorCrateButton" destination="wiw-6J-IL4" id="aVg-ch-1me"/>
                 <outlet property="nhitMonitorMaxNhit" destination="5fG-ST-ZPu" id="Ngu-g0-0kZ"/>
                 <outlet property="nhitMonitorNumPulses" destination="xOk-db-mDC" id="nnc-gc-Xqq"/>
                 <outlet property="nhitMonitorProgress" destination="PW2-2n-hba" id="vLi-ed-h0e"/>

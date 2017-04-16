@@ -16,6 +16,8 @@
 #import "ORPQModel.h"
 #import "ORGlobal.h"
 
+#define SWAP_INT32(a,b) swap_int32((uint32_t *)(a),(b))
+
 NSString* ORNhitMonitorUpdateNotification = @"ORNhitMonitorUpdateNotification";
 
 // PH 04/23/98
@@ -232,21 +234,21 @@ static int read_record(int sock, struct GenericRecordHeader *header, char *buf)
             goto err;
         }
 
-        NSLog(@"record id = 0x%x\n", ntohl(header.RecordID));
+        //NSLog(@"record id = 0x%x\n", ntohl(header.RecordID));
         nrecords = ntohl(header.RecordLength)/sizeof(struct MTCReadoutData);
 
         for (i = 0; i < nrecords; i++) {
             struct MTCReadoutData *mtc_readout_data = (struct MTCReadoutData *) (buf + i*sizeof(struct MTCReadoutData));
 
-            swap_int32(mtc_readout_data, 6);
+            SWAP_INT32(mtc_readout_data, 6);
 
             if (mtc_readout_data->BcGT < current_gtid) continue;
 
-            NSLog(@"gtid = %i\n", mtc_readout_data->BcGT);
-            NSLog(@"pedestal = %i\n", mtc_readout_data->Pedestal);
-            NSLog(@"pulse_gt = %i\n", mtc_readout_data->Pulse_GT);
-            NSLog(@"count = %i\n", count);
-            NSLog(@"num_pulses = %i\n", numPulses);
+            //NSLog(@"gtid = %i\n", mtc_readout_data->BcGT);
+            //NSLog(@"pedestal = %i\n", mtc_readout_data->Pedestal);
+            //NSLog(@"pulse_gt = %i\n", mtc_readout_data->Pulse_GT);
+            //NSLog(@"count = %i\n", count);
+            //NSLog(@"num_pulses = %i\n", numPulses);
 
             if (mtc_readout_data->Pedestal) {
                 if (mtc_readout_data->Nhit_100_Lo)
@@ -387,7 +389,7 @@ err:
         NSLogColor([NSColor redColor], @"crate %i only has %i channels with "
             "triggers enabled, but need at least %i", crate, [channels count],
              maxNhit);
-        return -1;
+        return;
     }
 
     pedestals_enabled = [mtc isPedestalEnabledInCSR];
