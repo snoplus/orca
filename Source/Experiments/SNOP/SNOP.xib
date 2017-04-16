@@ -3963,7 +3963,7 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <progressIndicator maxValue="100" indeterminate="YES" style="bar" id="PW2-2n-hba">
+                                        <progressIndicator maxValue="100" style="bar" id="PW2-2n-hba">
                                             <rect key="frame" x="500" y="417" width="96" height="20"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         </progressIndicator>

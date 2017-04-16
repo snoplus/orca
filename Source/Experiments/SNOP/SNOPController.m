@@ -486,10 +486,10 @@ snopGreenColor;
 {
     NSDictionary *userInfo = [aNote userInfo];
 
-    int nhit = [userInfo objectForKey:@"nhit"];
-    int maxNhit = [userInfo objectForKey:@"maxNhit"];
-    NSLog(@"updating nhit monitor progress bar to %.2f\n", nhit/(float) maxNhit);
-    [nhitMonitorProgress setDoubleValue:nhit/(float) maxNhit];
+    int nhit = [[userInfo objectForKey:@"nhit"] intValue];
+    int maxNhit = [[userInfo objectForKey:@"maxNhit"] intValue];
+    [nhitMonitorProgress setDoubleValue:nhit*100/(float) maxNhit];
+    [nhitMonitorProgress displayIfNeeded];
 }
 
 -(void) SRTypeChanged:(NSNotification*)aNote
