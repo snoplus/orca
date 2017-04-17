@@ -463,7 +463,7 @@ enum {
 
 - (Boolean) isOK
 {
-    return (mResult && PQresultStatus(mResult) == PGRES_COMMAND_OK);
+    return (mResult && (PQresultStatus(mResult) == PGRES_COMMAND_OK || PQresultStatus(mResult) == PGRES_TUPLES_OK));
 }
 
 - (void) dealloc

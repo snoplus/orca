@@ -158,17 +158,12 @@
             const char*	theCQuery = [query UTF8String];
             PGresult *  res = PQexec(mConnection, theCQuery);
             if (PQresultStatus(res) == PGRES_COMMAND_OK || PQresultStatus(res) == PGRES_TUPLES_OK) {
-                if (PQnfields(res) != 0) {
-                    theResult = [[[ORPQResult alloc] initWithResPtr:res] autorelease];
-                } else {
-                    PQclear(res);
-                }
-            }
-            else {
+                theResult = [[[ORPQResult alloc] initWithResPtr:res] autorelease];
+            } else {
                 NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Postgres error %s in %s -in ObjC : %@-\n", PQresultErrorMessage(res), theCQuery, query] forKey:@"Description"];
                 e = [NSException exceptionWithName: @"Posgres Exception"
-                                                         reason: [self getLastErrorMessage]
-                                                       userInfo: userInfo];
+                                            reason: [self getLastErrorMessage]
+                                          userInfo: userInfo];
                 PQclear(res);
                 @throw e;			
             }
