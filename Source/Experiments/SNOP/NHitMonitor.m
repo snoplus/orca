@@ -90,6 +90,73 @@ static int get_threshold(int *counts, int num_pulses)
     return -1;
 }
 
+static int get_nhit_trigger_count(char *err, RedisClient *mtc, int nhit, int num_pulses, struct NhitRecord *nhit_record, int timeout)
+{
+    /* Returns the number of triggers which had an NHIT trigger fire. */
+    int current_gtid;
+    int i, nrecords;
+    int count = 0;
+    int start;
+    struct GenericRecordHeader header;
+
+    /* get current GTID */
+    current_gtid = [mtc intCommand:"get_gtid"];
+
+    start = time(NULL);
+
+    while (1) {
+        /* Check to see if we should stop. */
+        if ([[NSThread currentThread] isCancelled]) goto err;
+
+        if (time(NULL) > start + timeout) {
+            sprintf(err, "timed out after %i seconds.\n", timeout);
+            return -1;
+        }
+
+        if (read_record(sock, &header, buf) == -1) {
+            if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                continue;
+            }
+            sprintf(err, "error reading MTCD record: %s\n", strerror(errno));
+            goto err;
+        }
+
+        nrecords = ntohl(header.RecordLength)/sizeof(struct MTCReadoutData);
+
+        for (i = 0; i < nrecords; i++) {
+            struct MTCReadoutData *mtc_readout_data = (struct MTCReadoutData *) (buf + i*sizeof(struct MTCReadoutData));
+
+            SWAP_INT32(mtc_readout_data, 6);
+
+            /* If we read out a GTID before we started, we can't be sure that
+             * it occurred after we set the XL3 pedestal mask and started the
+             * pulser, so we wait until we get a GTID aftere when we started. */
+            if (mtc_readout_data->BcGT < current_gtid) continue;
+
+            if (mtc_readout_data->Pedestal) {
+                if (mtc_readout_data->Nhit_100_Lo)
+                    nhitRecord->nhit_100_lo[nhit] += 1;
+                if (mtc_readout_data->Nhit_100_Med)
+                    nhitRecord->nhit_100_med[nhit] += 1;
+                if (mtc_readout_data->Nhit_100_Hi)
+                    nhitRecord->nhit_100_hi[nhit] += 1;
+                if (mtc_readout_data->Nhit_20)
+                    nhitRecord->nhit_20[nhit] += 1;
+                if (mtc_readout_data->Nhit_20_LB)
+                    nhitRecord->nhit_20_lb[nhit] += 1;
+
+                count += 1;
+            }
+
+            if (count >= numPulses) break;
+        }
+
+        if (count >= numPulses) break;
+    }
+
+    return 0;
+}
+
 @implementation NHitMonitor
 
 - (id) init
@@ -221,77 +288,6 @@ err:
 {
     if (sock > 0) close(sock);
     sock = -1;
-}
-
-- (int) getNhitTriggerCount: (int) nhit numPulses: (int) numPulses nhitRecord: (struct NhitRecord *) nhitRecord timeout: (int) timeout
-{
-    /* Returns the number of triggers which had an NHIT trigger fire. */
-    int current_gtid;
-    int i, nrecords;
-    int count = 0;
-    int start;
-    struct GenericRecordHeader header;
-
-    /* get current GTID */
-    current_gtid = [mtc intCommand:"get_gtid"];
-
-    start = time(NULL);
-
-    while (1) {
-        /* Check to see if we should stop. */
-        if ([[NSThread currentThread] isCancelled]) goto err;
-
-        if (time(NULL) > start + timeout) {
-            NSLog(@"nhit monitor: timed out after %i seconds.\n", timeout);
-            goto err;
-        }
-
-        if (read_record(sock, &header, buf) == -1) {
-            if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                continue;
-            }
-            NSLog(@"nhit monitor: error reading MTCD record: %s\n",
-                  strerror(errno));
-            goto err;
-        }
-
-        nrecords = ntohl(header.RecordLength)/sizeof(struct MTCReadoutData);
-
-        for (i = 0; i < nrecords; i++) {
-            struct MTCReadoutData *mtc_readout_data = (struct MTCReadoutData *) (buf + i*sizeof(struct MTCReadoutData));
-
-            SWAP_INT32(mtc_readout_data, 6);
-
-            /* If we read out a GTID before we started, we can't be sure that
-             * it occurred after we set the XL3 pedestal mask and started the
-             * pulser, so we wait until we get a GTID aftere when we started. */
-            if (mtc_readout_data->BcGT < current_gtid) continue;
-
-            if (mtc_readout_data->Pedestal) {
-                if (mtc_readout_data->Nhit_100_Lo)
-                    nhitRecord->nhit_100_lo[nhit] += 1;
-                if (mtc_readout_data->Nhit_100_Med)
-                    nhitRecord->nhit_100_med[nhit] += 1;
-                if (mtc_readout_data->Nhit_100_Hi)
-                    nhitRecord->nhit_100_hi[nhit] += 1;
-                if (mtc_readout_data->Nhit_20)
-                    nhitRecord->nhit_20[nhit] += 1;
-                if (mtc_readout_data->Nhit_20_LB)
-                    nhitRecord->nhit_20_lb[nhit] += 1;
-
-                count += 1;
-            }
-
-            if (count >= numPulses) break;
-        }
-
-        if (count >= numPulses) break;
-    }
-
-    return 0;
-err:
-    NSLogColor([NSColor redColor], @"getNhitTriggerCount failed\n");
-    return -1;
 }
 
 - (void) nhitMonitorCallback: (ORPQResult *) result
@@ -465,6 +461,7 @@ err:
     struct NhitRecord nhitRecord;
     int i;
     ORFec32Model *fec;
+    char err[256];
 
     /* Set the timeout to twice how long we expect it to take. */
     int timeout = numPulses*2/pulserRate;
@@ -499,7 +496,12 @@ err:
         }
 
         [mtc okCommand:"enable_pulser"];
-        if ([self getNhitTriggerCount: i numPulses:numPulses nhitRecord:&nhitRecord timeout:timeout] == -1) break;
+        if (get_nhit_trigger_count(err, mtc, i, numPulses, &nhitRecord,
+                                   timeout)) {
+            NSLogColor([NSColor redColor], @"nhit monitor: %s\n", err);
+            return;
+        }
+
         [mtc okCommand:"disable_pulser"];
         [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORNhitMonitorUpdateNotification object:self userInfo:@{@"nhit": [NSNumber numberWithInt:i], @"maxNhit": [NSNumber numberWithInt:maxNhit]}];
     }
