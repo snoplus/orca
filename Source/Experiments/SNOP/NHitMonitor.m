@@ -35,6 +35,22 @@ void swap_int32(uint32_t *val_pt, int count)
     return;
 }
 
+static int write_record(int sock, struct GenericRecordHeader *header, char *buf)
+{
+    /* Write a record to the data stream server. Note that header should
+     * already be byte swapped. Returns -1 on error. */
+    if (anetWrite(sock, (char *) header,
+                  sizeof(struct GenericRecordHeader)) == -1) {
+        return -1;
+    }
+
+    if (anetWrite(sock, buf, ntohl(header->RecordLength)) == -1) {
+        return -1;
+    }
+
+    return 0;
+}
+
 static int read_record(int sock, struct GenericRecordHeader *header, char *buf)
 {
     /* Reads a single record from the data stream server. Returns -1 on error. */
@@ -48,6 +64,28 @@ static int read_record(int sock, struct GenericRecordHeader *header, char *buf)
     }
 
     return 0;
+}
+
+static int get_threshold(int *counts, int num_pulses)
+{
+    /* Returns the trigger threshold for a given NHIT trigger by looking for
+     * the nhit at which the trigger rate crosses 50%.
+     *
+     * Returns -1 if no point crosses 50%. */
+    int i;
+
+    if (counts[0] > num_pulses/2) {
+        /* we are already above threshold at 0 nhit */
+        return 0;
+    }
+
+    for (i = 0; i < num_pulses; i++) {
+        if (counts[i] > num_pulses/2) {
+            return (i-1) + (num_pulses/2 - counts[i-1])/(counts[i] - counts[i-1]);
+        }
+    }
+
+    return -1;
 }
 
 @implementation NHitMonitor
@@ -146,13 +184,7 @@ static int read_record(int sock, struct GenericRecordHeader *header, char *buf)
     header.RecordLength = htonl(strlen(name));
     header.RecordVersion = htonl(kId);
 
-    if (anetWrite(sock, (char *) &header, sizeof(struct GenericRecordHeader)) == -1) {
-        NSLogColor([NSColor redColor], @"failed to send name to data server\n");
-        [self disconnect];
-        return -1;
-    }
-
-    if (anetWrite(sock, name, strlen(name)) == -1) {
+    if (write_record(sock, &header, name) == -1) {
         NSLogColor([NSColor redColor], @"failed to send name to data server\n");
         [self disconnect];
         return -1;
@@ -169,13 +201,7 @@ static int read_record(int sock, struct GenericRecordHeader *header, char *buf)
     header.RecordLength = htonl(4);
     header.RecordVersion = htonl(kSub);
 
-    if (anetWrite(sock, (char *) &header, sizeof(struct GenericRecordHeader)) == -1) {
-        NSLogColor([NSColor redColor], @"failed to send subscription to data server\n");
-        [self disconnect];
-        return -1;
-    }
-
-    if (anetWrite(sock, "MTCD", 4) == -1) {
+    if (write_record(sock, &header, "MTCD") == -1) {
         NSLogColor([NSColor redColor], @"failed to send subscription to data server\n");
         [self disconnect];
         return -1;
@@ -263,28 +289,6 @@ static int read_record(int sock, struct GenericRecordHeader *header, char *buf)
     return 0;
 err:
     NSLogColor([NSColor redColor], @"getNhitTriggerCount failed\n");
-    return -1;
-}
-
-- (int) getThreshold: (int *) counts numPulses: (int) numPulses
-{
-    /* Returns the trigger threshold for a given NHIT trigger by looking for
-     * the nhit at which the trigger rate crosses 50%.
-     *
-     * Returns -1 if no point crosses 50%. */
-    int i;
-
-    if (counts[0] > numPulses/2) {
-        /* we are already above threshold at 0 nhit */
-        return 0;
-    }
-
-    for (i = 0; i < numPulses; i++) {
-        if (counts[i] > numPulses/2) {
-            return (i-1) + (numPulses/2 - counts[i-1])/(counts[i] - counts[i-1]);
-        }
-    }
-
     return -1;
 }
 
@@ -463,8 +467,7 @@ err:
     });
 
     /* print trigger thresholds */
-    int threshold_n100_lo = [self getThreshold: nhitRecord.nhit_100_lo
-                             numPulses: numPulses];
+    int threshold_n100_lo = get_threshold(nhitRecord.nhit_100_lo, numPulses);
 
     if (threshold_n100_lo == -1) {
         NSLog(@"nhit_100_lo  threshold is > %i nhit\n", maxNhit);
@@ -472,8 +475,7 @@ err:
         NSLog(@"nhit_100_lo  threshold is %.2f nhit\n", threshold_n100_lo);
     }
 
-    int threshold_n100_med = [self getThreshold: nhitRecord.nhit_100_med
-                             numPulses: numPulses];
+    int threshold_n100_med = get_threshold(nhitRecord.nhit_100_med, numPulses);
 
     if (threshold_n100_med == -1) {
         NSLog(@"nhit_100_med threshold is > %i nhit\n", maxNhit);
@@ -481,8 +483,7 @@ err:
         NSLog(@"nhit_100_med threshold is %.2f nhit\n", threshold_n100_med);
     }
 
-    int threshold_n100_hi = [self getThreshold: nhitRecord.nhit_100_hi
-                             numPulses: numPulses];
+    int threshold_n100_hi = get_threshold(nhitRecord.nhit_100_hi, numPulses);
 
     if (threshold_n100_hi == -1) {
         NSLog(@"nhit_100_hi  threshold is > %i nhit\n", maxNhit);
@@ -490,8 +491,7 @@ err:
         NSLog(@"nhit_100_hi  threshold is %.2f nhit\n", threshold_n100_hi);
     }
 
-    int threshold_n20 = [self getThreshold: nhitRecord.nhit_20
-                             numPulses: numPulses];
+    int threshold_n20 = get_threshold(nhitRecord.nhit_20, numPulses);
 
     if (threshold_n20 == -1) {
         NSLog(@"nhit_20      threshold is > %i nhit\n", maxNhit);
@@ -499,8 +499,7 @@ err:
         NSLog(@"nhit_20      threshold is %.2f nhit\n", threshold_n20);
     }
 
-    int threshold_n20_lb = [self getThreshold: nhitRecord.nhit_20_lb
-                             numPulses: numPulses];
+    int threshold_n20_lb = get_threshold(nhitRecord.nhit_20_lb, numPulses);
 
     if (threshold_n20_lb == -1) {
         NSLog(@"nhit_20_lb   threshold is > %i nhit\n", maxNhit);
@@ -547,7 +546,6 @@ err:
         goto err;
     }
 
-    NSLog(@"command: %@\n", command);
     [db dbQuery:command object:self selector:@selector(nhitMonitorCallback:) timeout:10.0];
 
     [self disconnect];

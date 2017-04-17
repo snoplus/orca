@@ -50,7 +50,6 @@ struct NhitRecord {
 - (int) connect;
 - (void) disconnect;
 - (int) getNhitTriggerCount: (int) nhit numPulses: (int) numPulses nhitRecord: (struct NhitRecord *) nhitRecord timeout: (int) timeout;
-- (int) getThreshold: (int *) counts numPulses: (int) numPulses;
 - (void) nhitMonitorCallback: (ORPQResult *) result;
 - (void) run: (NSDictionary *) args;
 @end
