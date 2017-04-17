@@ -1234,6 +1234,11 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     [nhitMonitor start:[self nhitMonitorCrate] pulserRate:[self nhitMonitorPulserRate] numPulses:[self nhitMonitorNumPulses] maxNhit:[self nhitMonitorMaxNhit]];
 }
 
+- (void) stopNhitMonitor
+{
+    [nhitMonitor stop];
+}
+
 - (void) updateRHDRSruct
 {
     //form run info

@@ -147,6 +147,7 @@
 
     // Nhit Monitor settings
     IBOutlet NSButton *runNhitMonitorButton;
+    IBOutlet NSButton *stopNhitMonitorButton;
     IBOutlet NSPopUpButton *nhitMonitorCrateButton;
     IBOutlet NSTextField *nhitMonitorPulserRate;
     IBOutlet NSTextField *nhitMonitorNumPulses;
@@ -208,6 +209,7 @@
 
 /* Nhit Monitor */
 - (IBAction) runNhitMonitorAction: (id) sender;
+- (IBAction) stopNhitMonitorAction: (id) sender;
 - (IBAction) nhitMonitorCrateAction: (id) sender;
 - (IBAction) nhitMonitorPulserRateAction: (id) sender;
 - (IBAction) nhitMonitorNumPulsesAction: (id) sender;

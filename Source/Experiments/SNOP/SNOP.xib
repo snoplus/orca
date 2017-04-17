@@ -88,6 +88,7 @@
                 <outlet property="standardRunVersionPopupMenu" destination="0tV-8Q-LGs" id="WhV-Ow-TuV"/>
                 <outlet property="startRunButton" destination="1253" id="XdY-Mu-6m6"/>
                 <outlet property="startSingleECAButton" destination="Mzb-de-zBx" id="pka-12-igp"/>
+                <outlet property="stopNhitMonitorButton" destination="eEC-cV-Yui" id="v9K-Qp-Zvc"/>
                 <outlet property="stopRunButton" destination="1258" id="PGc-XS-Wt7"/>
                 <outlet property="tabView" destination="101" id="332"/>
                 <outlet property="tellieLoadRunFile" destination="3790" id="W7Y-AW-Cn9"/>
@@ -3967,6 +3968,17 @@
                                             <rect key="frame" x="500" y="417" width="96" height="20"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         </progressIndicator>
+                                        <button verticalHuggingPriority="750" id="eEC-cV-Yui">
+                                            <rect key="frame" x="391" y="108" width="69" height="32"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="push" title="Stop" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="NhX-84-Dkl">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="stopNhitMonitorAction:" target="-2" id="xVZ-Q3-nlT"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                 </view>
                             </tabViewItem>

@@ -649,6 +649,12 @@ err:
     [model runNhitMonitor];
 }
 
+- (IBAction) stopNhitMonitorAction: (id) sender
+{
+    [self endEditing];
+    [model stopNhitMonitor];
+}
+
 - (IBAction) nhitMonitorCrateAction: (id) sender
 {
     [model setNhitMonitorCrate:[sender indexOfSelectedItem]];

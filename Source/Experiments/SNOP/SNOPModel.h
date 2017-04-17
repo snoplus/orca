@@ -215,6 +215,7 @@ BOOL isNotRunningOrIsInMaintenance();
 
 - (void) pingCrates;
 - (void) runNhitMonitor;
+- (void) stopNhitMonitor;
 
 #pragma mark ¥¥orcascript helpers
 - (void) zeroPedestalMasks;
