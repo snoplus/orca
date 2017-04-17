@@ -141,6 +141,7 @@ tellieRunFiles = _tellieRunFiles;
     [self initDebugDBConnectionHistory];
 
     nhitMonitor = [[NHitMonitor alloc] init];
+    nhitMonitorTimer = nil;
     [[self undoManager] enableUndoRegistration];
 
     return self;
@@ -358,6 +359,7 @@ tellieRunFiles = _tellieRunFiles;
     [self setNhitMonitorCrateMask:[decoder decodeIntForKey:@"nhitMonitorCrateMask"]];
     [self setNhitMonitorTimeInterval:[decoder decodeDoubleForKey:@"nhitMonitorTimeInterval"]];
     [self setNhitMonitorMaxNhit:[decoder decodeIntForKey:@"nhitMonitorMaxNhit"]];
+    nhitMonitorTimer = nil;
     [[self undoManager] enableUndoRegistration];
 
     //Set extra security
@@ -1243,7 +1245,11 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 {
     /* Run the nhit monitor, but first check to see if we are in a specific
      * run. */
-    [nhitMonitor start:[self nhitMonitorCrate] pulserRate:[self nhitMonitorPulserRate] numPulses:[self nhitMonitorNumPulses] maxNhit:[self nhitMonitorMaxNhit]];
+    if ([gOrcaGlobals runInProgress]) {
+        if ([gOrcaGlobals runType] & nhitMonitorRunType) {
+            [nhitMonitor start:[self nhitMonitorCrate] pulserRate:[self nhitMonitorPulserRate] numPulses:[self nhitMonitorNumPulses] maxNhit:[self nhitMonitorMaxNhit]];
+        }
+    }
 }
 
 - (void) stopNhitMonitor
@@ -1375,7 +1381,10 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     nhitMonitorAutoRun = run;
 
     /* Stop any current timer. */
-    if (nhitMonitorTimer) [nhitMonitorTimer invalidate];
+    if (nhitMonitorTimer) {
+        [nhitMonitorTimer invalidate];
+        nhitMonitorTimer = nil;
+    }
 
     if (nhitMonitorAutoRun) {
         nhitMonitorTimer = [NSTimer scheduledTimerWithTimeInterval:nhitMonitorTimeInterval target:self selector:@selector(runNhitMonitorAutomatically) userInfo:nil repeats:YES];
@@ -1416,7 +1425,10 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     nhitMonitorTimeInterval = interval;
 
     /* Stop any current timer. */
-    if (nhitMonitorTimer) [nhitMonitorTimer invalidate];
+    if (nhitMonitorTimer) {
+        [nhitMonitorTimer invalidate];
+        nhitMonitorTimer = nil;
+    }
 
     if (nhitMonitorAutoRun) {
         nhitMonitorTimer = [NSTimer scheduledTimerWithTimeInterval:nhitMonitorTimeInterval target:self selector:@selector(runNhitMonitorAutomatically) userInfo:nil repeats:YES];
