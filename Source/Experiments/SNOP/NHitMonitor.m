@@ -131,9 +131,6 @@ static int read_record(int sock, struct GenericRecordHeader *header, char *buf)
 
     snop = [snops objectAtIndex:0];
 
-    NSLog(@"host = %s\n", [[snop dataHost] UTF8String]);
-    NSLog(@"port = %i\n", [snop dataPort]);
-
     sock = anetTcpConnect(err, (char *) [[snop dataHost] UTF8String], [snop dataPort]);
 
     if (sock == ANET_ERR) {
@@ -234,7 +231,6 @@ static int read_record(int sock, struct GenericRecordHeader *header, char *buf)
             goto err;
         }
 
-        //NSLog(@"record id = 0x%x\n", ntohl(header.RecordID));
         nrecords = ntohl(header.RecordLength)/sizeof(struct MTCReadoutData);
 
         for (i = 0; i < nrecords; i++) {
@@ -243,12 +239,6 @@ static int read_record(int sock, struct GenericRecordHeader *header, char *buf)
             SWAP_INT32(mtc_readout_data, 6);
 
             if (mtc_readout_data->BcGT < current_gtid) continue;
-
-            //NSLog(@"gtid = %i\n", mtc_readout_data->BcGT);
-            //NSLog(@"pedestal = %i\n", mtc_readout_data->Pedestal);
-            //NSLog(@"pulse_gt = %i\n", mtc_readout_data->Pulse_GT);
-            //NSLog(@"count = %i\n", count);
-            //NSLog(@"num_pulses = %i\n", numPulses);
 
             if (mtc_readout_data->Pedestal) {
                 if (mtc_readout_data->Nhit_100_Lo)
@@ -297,6 +287,19 @@ err:
     }
 
     return -1;
+}
+
+- (void) nhitMonitorCallback: (ORPQResult *) result
+{
+    if (!result) {
+        NSLog(@"nhit monitor: failed to upload nhit monitor results to database!\n");
+        return;
+    }
+
+    if (![result isOK]) {
+        NSLog(@"nhit monitor: failed to upload nhit monitor results to database because of a problem!\n");
+        return;
+    }
 }
 
 - (void) run: (NSDictionary *) args
@@ -380,10 +383,6 @@ err:
             }
         }
     }
-
-    NSLog(@"maxNhit = %i\n", maxNhit);
-    NSLog(@"[channels count] = %i\n", [channels count]);
-    NSLog(@"[slots count] = %i\n", [slots count]);
 
     if (maxNhit > [channels count]) {
         NSLogColor([NSColor redColor], @"crate %i only has %i channels with "
@@ -544,7 +543,7 @@ err:
     for (i = 0; i < maxNhit - 1; i++) {
         [command appendFormat:@"%i, ", nhitRecord.nhit_20_lb[i]];
     }
-    [command appendFormat:@"%i])", nhitRecord.nhit_20_lb[i]];
+    [command appendFormat:@"%i]) RETURNING key", nhitRecord.nhit_20_lb[i]];
 
     ORPQModel *db = [ORPQModel getCurrent];
 
@@ -553,9 +552,11 @@ err:
         goto err;
     }
 
-    [db dbQuery:command object:self selector:nil timeout:10.0];
+    NSLog(@"command: %@\n", command);
+    [db dbQuery:command object:self selector:@selector(nhitMonitorCallback:) timeout:10.0];
 
     [self disconnect];
+    return;
 err:
     [self disconnect];
 }

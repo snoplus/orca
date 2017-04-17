@@ -10,6 +10,7 @@
 #import <Foundation/Foundation.h>
 #import "ORMTCModel.h"
 #import <stdint.h>
+#import "ORPQModel.h"
 
 /* Buffer size for records from the data stream. Most records are small, but
  * the MTC records are concatenated so may be a few kilobytes. */
@@ -51,6 +52,7 @@ struct NhitRecord {
 - (void) disconnect;
 - (int) getNhitTriggerCount: (int) nhit numPulses: (int) numPulses nhitRecord: (struct NhitRecord *) nhitRecord;
 - (int) getThreshold: (int *) counts numPulses: (int) numPulses;
+- (void) nhitMonitorCallback: (ORPQResult *) result;
 - (void) run: (NSDictionary *) args;
 @end
 
