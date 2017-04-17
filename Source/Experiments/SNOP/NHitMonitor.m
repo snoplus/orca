@@ -311,6 +311,8 @@ err:
     uint32_t pulser_rate;
     uint32_t gt_mask;
     int i;
+    ORFec32Model *fec;
+    int slot, channel;
 
     @autoreleasepool {
         int crate = [[args objectForKey:@"crate"] intValue];
@@ -348,6 +350,34 @@ err:
 
         if (!xl3) {
             NSLogColor([NSColor redColor], @"nhit monitor: unable to find XL3 %i\n", crate);
+            return;
+        }
+
+        if (maxNhit > MAX_NHIT) {
+            NSLogColor([NSColor redColor], @"nhit monitor: max nhit must be less than %i\n", MAX_NHIT);
+            return;
+        }
+
+        /* create a list of channels for which to enable pedestals. We only add
+         * channels if both the N100 and N20 triggers are enabled. */
+        NSMutableArray *slots = [NSMutableArray array];
+        NSMutableArray *channels = [NSMutableArray array];
+        for (slot = 0; slot < 16; slot++) {
+            for (channel = 0; channel < 32; channel++) {
+                fec = [[OROrderedObjManager for:[xl3 guardian]] objectInSlot:16-slot];
+
+                if (!fec) continue;
+
+                if ([fec trigger100nsEnabled: channel] && \
+                    [fec trigger20nsEnabled: channel]) {
+                    [slots addObject:[NSNumber numberWithInt:channel]];
+                    [channels addObject:[NSNumber numberWithInt:channel]];
+                }
+            }
+        }
+
+        if (maxNhit > [channels count]) {
+            NSLogColor([NSColor redColor], @"nhit monitor: crate %i only has %i channels with triggers enabled, but max nhit is %i", crate, [channels count], maxNhit);
             return;
         }
 
@@ -393,7 +423,7 @@ err:
             /* turn off all pedestals */
             [xl3 setPedestalMask:[xl3 getSlotsPresent] pattern:0];
 
-            [self _run:args];
+            [self _run:crate pulserRate:pulserRate numPulses:numPulses maxNhit:maxNhit slots:slots channels:channels];
         } @catch (NSException *e) {
             NSLogColor([NSColor redColor], @"nhit monitor failed. error: %@ "
                        "reason: %@\n", [e name], [e reason]);
@@ -426,20 +456,15 @@ err:
     }
 }
 
-- (void) _run: (NSDictionary *) args
+- (void) _run: (int) crate pulserRate: (int) pulserRate numPulses: (int) numPulses maxNhit: (int) maxNhit slots: (NSMutableArray *) slots channels:(NSMutableArray *) channels
 {
     /* Run the nhit monitor. This method should only be called in a separate
      * thread. The start method should be called to actually start the nhit
      * monitor. */
-    ORFec32Model *fec;
     int slot, channel;
     struct NhitRecord nhitRecord;
     int i;
-
-    int crate = [[args objectForKey:@"crate"] intValue];
-    int pulserRate = [[args objectForKey:@"pulserRate"] intValue];
-    int numPulses = [[args objectForKey:@"numPulses"] intValue];
-    int maxNhit = [[args objectForKey:@"maxNhit"] intValue];
+    ORFec32Model *fec;
 
     /* Set the timeout to twice how long we expect it to take. */
     int timeout = numPulses*2/pulserRate;
@@ -454,37 +479,6 @@ err:
         nhitRecord.nhit_100_hi[i] = 0;
         nhitRecord.nhit_20[i] = 0;
         nhitRecord.nhit_20_lb[i] = 0;
-    }
-
-    if (maxNhit > MAX_NHIT) {
-        NSLogColor([NSColor redColor], @"maxNhit must be less than %i\n",
-                   MAX_NHIT);
-        return;
-    }
-
-    /* create a list of channels for which to enable pedestals. We only add
-     * channels if both the N100 and N20 triggers are enabled. */
-    NSMutableArray *slots = [NSMutableArray array];
-    NSMutableArray *channels = [NSMutableArray array];
-    for (slot = 0; slot < 16; slot++) {
-        for (channel = 0; channel < 32; channel++) {
-            fec = [[OROrderedObjManager for:[xl3 guardian]] objectInSlot:16-slot];
-
-            if (!fec) continue;
-
-            if ([fec trigger100nsEnabled: channel] && \
-                [fec trigger20nsEnabled: channel]) {
-                [slots addObject:[NSNumber numberWithInt:channel]];
-                [channels addObject:[NSNumber numberWithInt:channel]];
-            }
-        }
-    }
-
-    if (maxNhit > [channels count]) {
-        NSLogColor([NSColor redColor], @"crate %i only has %i channels with "
-            "triggers enabled, but need at least %i", crate, [channels count],
-             maxNhit);
-        return;
     }
 
     [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORNhitMonitorUpdateNotification object:self userInfo:@{@"nhit": @0, @"maxNhit": [NSNumber numberWithInt:maxNhit]}];
