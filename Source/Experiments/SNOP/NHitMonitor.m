@@ -24,21 +24,22 @@ NSString* ORNhitMonitorUpdateNotification = @"ORNhitMonitorUpdateNotification";
 // Swap 4-byte integer/floats between native and external format
 void swap_int32(uint32_t *val_pt, int count)
 {
-	uint32_t *last = val_pt + count;
-	while (val_pt < last) {
-	    *val_pt = ((*val_pt << 24) & 0xff000000) |
-	              ((*val_pt <<  8) & 0x00ff0000) |
-	              ((*val_pt >>  8) & 0x0000ff00) |
-	              ((*val_pt >> 24) & 0x000000ff);
-	    ++val_pt;
-	}
-	return;
+    uint32_t *last = val_pt + count;
+    while (val_pt < last) {
+        *val_pt = ((*val_pt << 24) & 0xff000000) |
+                  ((*val_pt <<  8) & 0x00ff0000) |
+                  ((*val_pt >>  8) & 0x0000ff00) |
+                  ((*val_pt >> 24) & 0x000000ff);
+        ++val_pt;
+    }
+    return;
 }
 
 static int read_record(int sock, struct GenericRecordHeader *header, char *buf)
 {
-    /* Reads a single record from the data stream server. */
-    if (anetRead(sock, (char *) header, sizeof(struct GenericRecordHeader)) == -1) {
+    /* Reads a single record from the data stream server. Returns -1 on error. */
+    if (anetRead(sock, (char *) header,
+                 sizeof(struct GenericRecordHeader)) == -1) {
         return -1;
     }
 
@@ -49,7 +50,6 @@ static int read_record(int sock, struct GenericRecordHeader *header, char *buf)
     return 0;
 }
 
-
 @implementation NHitMonitor
 
 - (id) init
@@ -57,7 +57,6 @@ static int read_record(int sock, struct GenericRecordHeader *header, char *buf)
     runningThread = [[NSThread alloc] init];
     buf = malloc(DATASTREAM_BUFFER_SIZE);
     sock = -1;
-    timeout = 10;
     [self registerNotificationObservers];
     return self;
 }
@@ -196,7 +195,7 @@ static int read_record(int sock, struct GenericRecordHeader *header, char *buf)
     if (sock > 0) close(sock);
 }
 
-- (int) getNhitTriggerCount: (int) nhit numPulses: (int) numPulses nhitRecord: (struct NhitRecord *) nhitRecord
+- (int) getNhitTriggerCount: (int) nhit numPulses: (int) numPulses nhitRecord: (struct NhitRecord *) nhitRecord timeout: (int) timeout
 {
     /* Returns the number of triggers which had an NHIT trigger fire. */
     int current_gtid;
@@ -295,11 +294,6 @@ err:
         NSLog(@"nhit monitor: failed to upload nhit monitor results to database!\n");
         return;
     }
-
-    if (![result isOK]) {
-        NSLog(@"nhit monitor: failed to upload nhit monitor results to database because of a problem!\n");
-        return;
-    }
 }
 
 - (void) run: (NSDictionary *) args
@@ -316,12 +310,13 @@ err:
     struct NhitRecord nhitRecord;
     int i;
 
-    NSLog(@"run\n");
-
     int crate = [[args objectForKey:@"crate"] intValue];
     int pulserRate = [[args objectForKey:@"pulserRate"] intValue];
     int numPulses = [[args objectForKey:@"numPulses"] intValue];
     int maxNhit = [[args objectForKey:@"maxNhit"] intValue];
+
+    /* Set the timeout to twice how long we expect it to take. */
+    int timeout = numPulses*2/pulserRate;
 
     [self connect];
 
@@ -436,7 +431,7 @@ err:
         dispatch_sync(dispatch_get_main_queue(), ^{
             [mtc enablePulser];
         });
-        if ([self getNhitTriggerCount: i numPulses:numPulses nhitRecord:&nhitRecord] == -1) break;
+        if ([self getNhitTriggerCount: i numPulses:numPulses nhitRecord:&nhitRecord timeout:timeout] == -1) break;
         dispatch_sync(dispatch_get_main_queue(), ^{
             [mtc disablePulser];
         });

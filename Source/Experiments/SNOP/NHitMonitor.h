@@ -38,7 +38,6 @@ struct NhitRecord {
     NSThread *runningThread;
     char *buf;
     int sock;
-    int timeout;
     ORMTCModel *mtc;
 }
 
@@ -50,7 +49,7 @@ struct NhitRecord {
 - (void) start: (int) crate pulserRate: (int) pulserRate numPulses: (int) numPulses maxNhit: (int) maxNhit;
 - (int) connect;
 - (void) disconnect;
-- (int) getNhitTriggerCount: (int) nhit numPulses: (int) numPulses nhitRecord: (struct NhitRecord *) nhitRecord;
+- (int) getNhitTriggerCount: (int) nhit numPulses: (int) numPulses nhitRecord: (struct NhitRecord *) nhitRecord timeout: (int) timeout;
 - (int) getThreshold: (int *) counts numPulses: (int) numPulses;
 - (void) nhitMonitorCallback: (ORPQResult *) result;
 - (void) run: (NSDictionary *) args;
