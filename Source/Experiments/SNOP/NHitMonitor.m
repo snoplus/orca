@@ -90,14 +90,16 @@ static int get_threshold(int *counts, int num_pulses)
     return -1;
 }
 
-static int get_nhit_trigger_count(char *err, RedisClient *mtc, int nhit, int num_pulses, struct NhitRecord *nhit_record, int timeout)
+static int get_nhit_trigger_count(char *err, RedisClient *mtc, int sock, char *buf, int nhit, int num_pulses, struct NhitRecord *nhit_record, int timeout)
 {
-    /* Returns the number of triggers which had an NHIT trigger fire. */
+    /* Get the number of triggers which had an NHIT trigger fire. Returns -1 if
+     * there was an error or the current thread was cancelled. */
     int current_gtid;
     int i, nrecords;
     int count = 0;
     int start;
     struct GenericRecordHeader header;
+    struct MTCReadoutData *mtc_readout_data;
 
     /* get current GTID */
     current_gtid = [mtc intCommand:"get_gtid"];
@@ -106,10 +108,13 @@ static int get_nhit_trigger_count(char *err, RedisClient *mtc, int nhit, int num
 
     while (1) {
         /* Check to see if we should stop. */
-        if ([[NSThread currentThread] isCancelled]) goto err;
+        if ([[NSThread currentThread] isCancelled]) {
+            sprintf(err, "current thread was cancelled");
+            return -1;
+        }
 
         if (time(NULL) > start + timeout) {
-            sprintf(err, "timed out after %i seconds.\n", timeout);
+            sprintf(err, "timed out after %i seconds", timeout);
             return -1;
         }
 
@@ -117,14 +122,14 @@ static int get_nhit_trigger_count(char *err, RedisClient *mtc, int nhit, int num
             if (errno == EAGAIN || errno == EWOULDBLOCK) {
                 continue;
             }
-            sprintf(err, "error reading MTCD record: %s\n", strerror(errno));
-            goto err;
+            sprintf(err, "error reading MTCD record: %s", strerror(errno));
+            return -1;
         }
 
         nrecords = ntohl(header.RecordLength)/sizeof(struct MTCReadoutData);
 
         for (i = 0; i < nrecords; i++) {
-            struct MTCReadoutData *mtc_readout_data = (struct MTCReadoutData *) (buf + i*sizeof(struct MTCReadoutData));
+            mtc_readout_data = (struct MTCReadoutData *) (buf + i*sizeof(struct MTCReadoutData));
 
             SWAP_INT32(mtc_readout_data, 6);
 
@@ -135,23 +140,23 @@ static int get_nhit_trigger_count(char *err, RedisClient *mtc, int nhit, int num
 
             if (mtc_readout_data->Pedestal) {
                 if (mtc_readout_data->Nhit_100_Lo)
-                    nhitRecord->nhit_100_lo[nhit] += 1;
+                    nhit_record->nhit_100_lo[nhit] += 1;
                 if (mtc_readout_data->Nhit_100_Med)
-                    nhitRecord->nhit_100_med[nhit] += 1;
+                    nhit_record->nhit_100_med[nhit] += 1;
                 if (mtc_readout_data->Nhit_100_Hi)
-                    nhitRecord->nhit_100_hi[nhit] += 1;
+                    nhit_record->nhit_100_hi[nhit] += 1;
                 if (mtc_readout_data->Nhit_20)
-                    nhitRecord->nhit_20[nhit] += 1;
+                    nhit_record->nhit_20[nhit] += 1;
                 if (mtc_readout_data->Nhit_20_LB)
-                    nhitRecord->nhit_20_lb[nhit] += 1;
+                    nhit_record->nhit_20_lb[nhit] += 1;
 
                 count += 1;
             }
 
-            if (count >= numPulses) break;
+            if (count >= num_pulses) break;
         }
 
-        if (count >= numPulses) break;
+        if (count >= num_pulses) break;
     }
 
     return 0;
@@ -496,8 +501,8 @@ err:
         }
 
         [mtc okCommand:"enable_pulser"];
-        if (get_nhit_trigger_count(err, mtc, i, numPulses, &nhitRecord,
-                                   timeout)) {
+        if (get_nhit_trigger_count(err, mtc, sock, buf, i, numPulses,
+                                   &nhitRecord, timeout)) {
             NSLogColor([NSColor redColor], @"nhit monitor: %s\n", err);
             return;
         }
@@ -584,12 +589,11 @@ err:
 
     if (!db) {
         NSLog(@"Postgres object not found, please add it to the experiment!\n");
-        goto err;
+        return;
     }
 
     [db dbQuery:command object:self selector:@selector(nhitMonitorCallback:) timeout:10.0];
 
-err:
     return;
 }
 @end
