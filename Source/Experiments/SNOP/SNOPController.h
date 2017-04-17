@@ -153,6 +153,7 @@
     IBOutlet NSTextField *nhitMonitorNumPulses;
     IBOutlet NSTextField *nhitMonitorMaxNhit;
     IBOutlet NSProgressIndicator *nhitMonitorProgress;
+    IBOutlet NSButton *runNhitMonitorAutomaticallyButton;
 
     //Custom colors
     NSColor *snopRedColor;
@@ -214,6 +215,7 @@
 - (IBAction) nhitMonitorPulserRateAction: (id) sender;
 - (IBAction) nhitMonitorNumPulsesAction: (id) sender;
 - (IBAction) nhitMonitorMaxNhitAction: (id) sender;
+- (IBAction) runNhitMonitorAutomaticallyAction: (id) sender;
 
 - (IBAction) orcaDBIPAddressAction:(id)sender;
 - (IBAction) orcaDBClearHistoryAction:(id)sender;

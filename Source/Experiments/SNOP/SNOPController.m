@@ -649,6 +649,11 @@ err:
     [model runNhitMonitor];
 }
 
+- (IBAction) runNhitMonitorAutomatically: (id) sender
+{
+    [model setRunNhitMonitorAutomatically:[sender state]];
+}
+
 - (IBAction) stopNhitMonitorAction: (id) sender
 {
     [self endEditing];

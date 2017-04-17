@@ -132,6 +132,9 @@ BOOL isNotRunningOrIsInMaintenance();
     int nhitMonitorPulserRate;
     int nhitMonitorNumPulses;
     int nhitMonitorMaxNhit;
+    BOOL nhitMonitorAutoRun;
+    NSTimer *nhitMonitorTimer;
+    NSTimeInterval nhitMonitorTimeInterval;
 
     RedisClient *mtc_server;
     RedisClient *xl3_server;
@@ -258,6 +261,10 @@ BOOL isNotRunningOrIsInMaintenance();
 - (void) setNhitMonitorNumPulses: (int) numPulses;
 - (int) nhitMonitorMaxNhit;
 - (void) setNhitMonitorMaxNhit: (int) maxNhit;
+- (int) nhitMonitorAutoRun;
+- (void) setNhitMonitorAutoRun: (BOOL) run;
+- (NSTimeInterval) nhitMonitorTimeInterval;
+- (void) setNhitMonitorTimeInterval: (NSTimeInterval) interval;
 
 - (void) setViewType:(int)aViewType;
 - (int) viewType;

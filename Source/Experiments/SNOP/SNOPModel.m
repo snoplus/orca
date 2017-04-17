@@ -1234,6 +1234,13 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     [nhitMonitor start:[self nhitMonitorCrate] pulserRate:[self nhitMonitorPulserRate] numPulses:[self nhitMonitorNumPulses] maxNhit:[self nhitMonitorMaxNhit]];
 }
 
+- (void) runNhitMonitorAutomatically
+{
+    /* Run the nhit monitor, but first check to see if we are in a specific
+     * run. */
+    [nhitMonitor start:[self nhitMonitorCrate] pulserRate:[self nhitMonitorPulserRate] numPulses:[self nhitMonitorNumPulses] maxNhit:[self nhitMonitorMaxNhit]];
+}
+
 - (void) stopNhitMonitor
 {
     [nhitMonitor stop];
@@ -1350,6 +1357,44 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 - (void) setNhitMonitorMaxNhit: (int) maxNhit
 {
     nhitMonitorMaxNhit = maxNhit;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelNhitMonitorChangedNotification object:self];
+}
+
+- (int) nhitMonitorAutoRun
+{
+    return nhitMonitorAutoRun;
+}
+
+- (void) setNhitMonitorAutoRun: (BOOL) run
+{
+    nhitMonitorAutoRun = run;
+
+    /* Stop any current timer. */
+    if (nhitMonitorTimer) [nhitMonitorTimer invalidate];
+
+    if (nhitMonitorAutoRun) {
+        nhitMonitorTimer = [NSTimer scheduledTimerWithTimeInterval:nhitMonitorTimeInterval target:self selector:@(runNhitMonitorAutomatically) userInfo:nil repeats:YES];
+    }
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelNhitMonitorChangedNotification object:self];
+}
+
+- (NSTimeInterval) nhitMonitorTimeInterval
+{
+    return nhitMonitorTimeInterval;
+}
+
+- (void) setNhitMonitorTimeInterval: (NSTimeInterval) interval
+{
+    nhitMonitorTimeInterval = interval;
+
+    /* Stop any current timer. */
+    if (nhitMonitorTimer) [nhitMonitorTimer invalidate];
+
+    if (nhitMonitorAutoRun) {
+        nhitMonitorTimer = [NSTimer scheduledTimerWithTimeInterval:nhitMonitorTimeInterval target:self selector:@(runNhitMonitorAutomatically) userInfo:nil repeats:YES];
+    }
+
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelNhitMonitorChangedNotification object:self];
 }
 

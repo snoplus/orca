@@ -3968,6 +3968,14 @@
                                             <rect key="frame" x="500" y="417" width="96" height="20"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         </progressIndicator>
+                                        <button id="Mmd-J7-CeY">
+                                            <rect key="frame" x="77" y="154" width="137" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Run Automatically" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="clj-1Q-VJ6">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                        </button>
                                         <button verticalHuggingPriority="750" id="eEC-cV-Yui">
                                             <rect key="frame" x="391" y="108" width="69" height="32"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
