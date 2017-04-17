@@ -1379,6 +1379,28 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelNhitMonitorChangedNotification object:self];
 }
 
+- (uint32_t) nhitMonitorRunType
+{
+    return nhitMonitorRunType;
+}
+
+- (void) setNhitMonitorRunType: (uint32_t) runType
+{
+    nhitMonitorRunType = runType;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelNhitMonitorChangedNotification object:self];
+}
+
+- (uint32_t) nhitMonitorCrateMask
+{
+    return nhitMonitorCrateMask;
+}
+
+- (void) setNhitMonitorCrateMask: (uint32_t) mask
+{
+    nhitMonitorCrateMask = mask;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelNhitMonitorChangedNotification object:self];
+}
+
 - (NSTimeInterval) nhitMonitorTimeInterval
 {
     return nhitMonitorTimeInterval;

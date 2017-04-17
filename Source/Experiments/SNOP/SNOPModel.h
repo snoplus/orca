@@ -132,8 +132,11 @@ BOOL isNotRunningOrIsInMaintenance();
     int nhitMonitorPulserRate;
     int nhitMonitorNumPulses;
     int nhitMonitorMaxNhit;
+    /* Settings for running the nhit monitor automatically during runs. */
     BOOL nhitMonitorAutoRun;
     NSTimer *nhitMonitorTimer;
+    uint32_t nhitMonitorRunType;
+    uint32_t nhitMonitorCrateMask;
     NSTimeInterval nhitMonitorTimeInterval;
 
     RedisClient *mtc_server;
@@ -263,6 +266,10 @@ BOOL isNotRunningOrIsInMaintenance();
 - (void) setNhitMonitorMaxNhit: (int) maxNhit;
 - (int) nhitMonitorAutoRun;
 - (void) setNhitMonitorAutoRun: (BOOL) run;
+- (uint32_t) nhitMonitorRunType;
+- (void) setNhitMonitorRunType: (uint32_t) runType;
+- (uint32_t) nhitMonitorCrateMask;
+- (void) setNhitMonitorCrateMask: (uint32_t) mask;
 - (NSTimeInterval) nhitMonitorTimeInterval;
 - (void) setNhitMonitorTimeInterval: (NSTimeInterval) interval;
 

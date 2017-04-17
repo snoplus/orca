@@ -472,6 +472,7 @@ snopGreenColor;
 
 - (void) nhitMonitorSettingsChanged: (NSNotification*) aNote
 {
+    int row, col;
     int crate = [model nhitMonitorCrate];
     [nhitMonitorCrateButton selectItemAtIndex:crate];
     int pulserRate = [model nhitMonitorPulserRate];
@@ -480,6 +481,26 @@ snopGreenColor;
     [nhitMonitorNumPulses setStringValue:[NSString stringWithFormat:@"%i", numPulses]];
     int maxNhit = [model nhitMonitorMaxNhit];
     [nhitMonitorMaxNhit setStringValue:[NSString stringWithFormat:@"%i", maxNhit]];
+    int autoRun = [model nhitMonitorAutoRun];
+    [nhitMonitorAutoRun setState:autoRun];
+    int runType = [model nhitMonitorRunType];
+    for (row = 0; row < [nhitMonitorRunTypeWord numberOfRows]; row++) {
+        if (runType & (1L << row)) {
+            [nhitMonitorRunTypeWord setState:1 atRow:row column:0];
+        } else {
+            [nhitMonitorRunTypeWord setState:0 atRow:row column:0];
+        }
+    }
+    int crateMask = [model nhitMonitorCrateMask];
+    for (row = 0; row < [nhitMonitorCrateMask numberOfRows]; row++) {
+        if (crateMask & (1L << row)) {
+            [nhitMonitorCrateMask setState:1 atRow:row column:0];
+        } else {
+            [nhitMonitorCrateMask setState:0 atRow:row column:0];
+        }
+    }
+    double timeInterval = [model nhitMonitorTimeInterval];
+    [nhitMonitorTimeInterval setStringValue:[NSString stringWithFormat:@"%.0f", timeInterval]];
 }
 
 - (void) nhitMonitorUpdate: (NSNotification*) aNote
@@ -678,6 +699,19 @@ err:
 - (IBAction) nhitMonitorMaxNhitAction: (id) sender
 {
     [model setNhitMonitorMaxNhit:[sender intValue]];
+}
+
+- (IBAction) nhitMonitorRunTypeWordAction: (id) sender
+{
+    short bit = [sender selectedRow];
+    BOOL state  = [[sender selectedCell] state];
+    unsigned long currentRunMask = [model nhitMonitorRunType];
+    if (state) {
+        currentRunMask |= (1L << bit);
+    } else {
+        currentRunMask &= ~(1L << bit);
+    }
+    [model setNhitMonitorRunType:currentRunMask];
 }
 
 - (void) dbOrcaDBIPChanged:(NSNotification*)aNote

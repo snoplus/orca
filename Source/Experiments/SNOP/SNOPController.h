@@ -145,7 +145,7 @@
     IBOutlet NSTextField *debugDBPort;
     IBOutlet NSButton *debugDBClearButton;
 
-    // Nhit Monitor settings
+    /* Nhit Monitor settings */
     IBOutlet NSButton *runNhitMonitorButton;
     IBOutlet NSButton *stopNhitMonitorButton;
     IBOutlet NSPopUpButton *nhitMonitorCrateButton;
@@ -153,7 +153,11 @@
     IBOutlet NSTextField *nhitMonitorNumPulses;
     IBOutlet NSTextField *nhitMonitorMaxNhit;
     IBOutlet NSProgressIndicator *nhitMonitorProgress;
-    IBOutlet NSButton *runNhitMonitorAutomaticallyButton;
+    /* Settings for running the nhit monitor automatically during runs. */
+    IBOutlet NSButton *nhitMonitorAutoRunButton;
+    IBOutlet NSMatrix *nhitMonitorRunTypeWordMatrix;
+    IBOutlet NSMatrix *nhitMonitorCrateMaskMatrix;
+    IBOutlet NSTextField *nhitMonitorTimeInterval;
 
     //Custom colors
     NSColor *snopRedColor;
@@ -215,7 +219,7 @@
 - (IBAction) nhitMonitorPulserRateAction: (id) sender;
 - (IBAction) nhitMonitorNumPulsesAction: (id) sender;
 - (IBAction) nhitMonitorMaxNhitAction: (id) sender;
-- (IBAction) runNhitMonitorAutomaticallyAction: (id) sender;
+- (IBAction) nhitMonitorAutoRunAction: (id) sender;
 
 - (IBAction) orcaDBIPAddressAction:(id)sender;
 - (IBAction) orcaDBClearHistoryAction:(id)sender;
