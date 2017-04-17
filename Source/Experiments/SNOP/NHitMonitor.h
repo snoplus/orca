@@ -8,9 +8,13 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ORMTCModel.h"
 #import <stdint.h>
 #import "ORPQModel.h"
+#import "RedisClient.h"
+
+/* Need to forward declare this because there is a circular dependency if we
+ * import ORXL3Model.h. */
+@class ORXL3Model;
 
 /* Buffer size for records from the data stream. Most records are small, but
  * the MTC records are concatenated so may be a few kilobytes. */
@@ -38,7 +42,8 @@ struct NhitRecord {
     NSThread *runningThread;
     char *buf;
     int sock;
-    ORMTCModel *mtc;
+    RedisClient *mtc;
+    ORXL3Model *xl3;
 }
 
 - (id) init;

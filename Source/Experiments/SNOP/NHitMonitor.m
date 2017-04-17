@@ -15,6 +15,7 @@
 #import "OROrderedObjManager.h"
 #import "ORPQModel.h"
 #import "ORGlobal.h"
+#import "RedisClient.h"
 
 #define SWAP_INT32(a,b) swap_int32((uint32_t *)(a),(b))
 
@@ -131,7 +132,10 @@ static int get_threshold(int *counts, int num_pulses)
 - (void) start: (int) crate pulserRate: (int) pulserRate numPulses: (int) numPulses maxNhit: (int) maxNhit
 {
     /* Start the nhit monitor. */
-    if ([self isRunning]) return;
+    if ([self isRunning]) {
+        NSLog(@"nhit monitor is already running!\n");
+        return;
+    }
 
     NSLog(@"starting nhit monitor\n");
 
@@ -151,10 +155,7 @@ static int get_threshold(int *counts, int num_pulses)
     /* Connect to the data server. */
     SNOPModel *snop;
     char err[ANET_ERR_LEN];
-    char* name = "nhit";
     struct GenericRecordHeader header;
-
-    NSLog(@"connecting to data server\n");
 
     [self disconnect];
 
@@ -181,19 +182,17 @@ static int get_threshold(int *counts, int num_pulses)
 
     /* Send our name to the data server. */
     header.RecordID = htonl(kSCmd);
-    header.RecordLength = htonl(strlen(name));
+    header.RecordLength = htonl(4);
     header.RecordVersion = htonl(kId);
 
-    if (write_record(sock, &header, name) == -1) {
+    if (write_record(sock, &header, "nhit") == -1) {
         NSLogColor([NSColor redColor], @"failed to send name to data server\n");
-        [self disconnect];
-        return -1;
+        goto err;
     }
 
     if (read_record(sock, &header, buf) == -1) {
         NSLogColor([NSColor redColor], @"failed to receive response from data server\n");
-        [self disconnect];
-        return -1;
+        goto err;
     }
 
     /* Subscribe to MTCD records from the data server. */
@@ -203,22 +202,24 @@ static int get_threshold(int *counts, int num_pulses)
 
     if (write_record(sock, &header, "MTCD") == -1) {
         NSLogColor([NSColor redColor], @"failed to send subscription to data server\n");
-        [self disconnect];
-        return -1;
+        goto err;
     }
 
     if (read_record(sock, &header, buf) == -1) {
         NSLogColor([NSColor redColor], @"failed to receive response from data server\n");
-        [self disconnect];
-        return -1;
+        goto err;
     }
 
     return 0;
+err:
+    [self disconnect];
+    return -1;
 }
 
 - (void) disconnect
 {
     if (sock > 0) close(sock);
+    sock = -1;
 }
 
 - (int) getNhitTriggerCount: (int) nhit numPulses: (int) numPulses nhitRecord: (struct NhitRecord *) nhitRecord timeout: (int) timeout
@@ -230,7 +231,7 @@ static int get_threshold(int *counts, int num_pulses)
     int start;
     struct GenericRecordHeader header;
 
-    current_gtid = [[mtc mtc] intCommand:"get_gtid"];
+    current_gtid = [mtc intCommand:"get_gtid"];
 
     start = time(NULL);
 
@@ -302,15 +303,127 @@ err:
 
 - (void) run: (NSDictionary *) args
 {
+    SNOPModel *snop;
+    uint32_t pedestals_enabled, pulser_enabled, pedestal_mask, coarse_delay;
+    uint32_t fine_delay, pedestal_width;
+    uint32_t control_register;
+    uint32_t pulser_rate;
+    int i;
+
+    @autoreleasepool {
+        int crate = [[args objectForKey:@"crate"] intValue];
+        int pulserRate = [[args objectForKey:@"pulserRate"] intValue];
+        int numPulses = [[args objectForKey:@"numPulses"] intValue];
+        int maxNhit = [[args objectForKey:@"maxNhit"] intValue];
+
+        NSArray* snops = [[(ORAppDelegate*)[NSApp delegate] document]
+             collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+
+        if ([snops count] == 0) {
+            NSLogColor([NSColor redColor], @"nhit monitor: unable to find SNO+ model object.\n");
+            return;
+        }
+
+        snop = [snops objectAtIndex:0];
+
+        mtc = [[RedisClient alloc] initWithHostName:[snop mtcHost] withPort:[snop mtcPort]];
+        /* Autorelease the MTC object. It will get freed when the function
+         * finishes since we are in an @autoreleasepool block. */
+        [mtc autorelease];
+
+        /* Find the correct XL3. */
+        xl3 = nil;
+
+        NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document]
+             collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+
+        for (i = 0; i < [xl3s count]; i++) {
+            if ([[xl3s objectAtIndex:i] crateNumber] == crate) {
+                xl3 = [xl3s objectAtIndex:i];
+                break;
+            }
+        }
+
+        if (!xl3) {
+            NSLogColor([NSColor redColor], @"nhit monitor: unable to find XL3 %i\n", crate);
+            return;
+        }
+
+        /* Connect to the data stream server. */
+        if ([self connect]) {
+            NSLogColor([NSColor redColor], @"nhit monitor: failed to connect to the data stream server\n");
+            return;
+        }
+
+        @try {
+            control_register = [mtc intCommand:"mtcd_read 0x0"];
+            pedestals_enabled = control_register & 0x1;
+            pulser_enabled = control_register & 0x2;
+            pedestal_mask = [mtc intCommand:"get_ped_crate_mask"];
+            pulser_rate = [mtc intCommand:"get_pulser_freq"];
+            coarse_delay = [mtc intCommand:"get_coarse_delay"];
+            fine_delay = [mtc intCommand:"get_fine_delay"];
+            pedestal_width = [mtc intCommand:"get_pedestal_width"];
+        } @catch (NSException *e) {
+            NSLogColor([NSColor redColor], @"nhit monitor failed to get mtc "
+                       "hardware state. error: %@ reason: %@\n",
+                       [e name], [e reason]);
+            [self disconnect];
+            return;
+        }
+
+        @try {
+            [mtc okCommand:"disable_pulser"];
+            [mtc okCommand:"enable_pedestals"];
+            [mtc okCommand:"set_ped_crate_mask %i", (1 << crate)];
+            [mtc okCommand:"set_pulser_freq %i", pulserRate];
+            [mtc okCommand:"set_coarse_delay %i", COARSE_DELAY];
+            [mtc okCommand:"set_fine_delay %i", FINE_DELAY];
+            [mtc okCommand:"set_pedestal_width %i", PEDESTAL_WIDTH];
+
+            /* turn off all pedestals */
+            [xl3 setPedestalMask:[xl3 getSlotsPresent] pattern:0];
+
+            [self _run:args];
+        } @catch (NSException *e) {
+            NSLogColor([NSColor redColor], @"nhit monitor failed. error: %@ "
+                       "reason: %@\n", [e name], [e reason]);
+        } @finally {
+            /* Make sure to reset all the hardware settings. */
+            if (pedestals_enabled) {
+                [mtc okCommand:"enable_pedestals"];
+            } else {
+                [mtc okCommand:"disable_pedestals"];
+            }
+
+            if (pulser_enabled) {
+                [mtc okCommand:"enable_pulser"];
+            } else {
+                [mtc okCommand:"disable_pulser"];
+            }
+
+            [mtc okCommand:"set_ped_crate_mask %i", pedestal_mask];
+            [mtc okCommand:"set_pulser_freq %i", pulser_rate];
+            [mtc okCommand:"set_coarse_delay %i", coarse_delay];
+            [mtc okCommand:"set_fine_delay %i", fine_delay];
+            [mtc okCommand:"set_pedestal_width %i", pedestal_width];
+
+            /* turn off all pedestals */
+            [xl3 setPedestalMask:[xl3 getSlotsPresent] pattern:0];
+
+            /* Disconnect from the data server. */
+            [self disconnect];
+        }
+    }
+}
+
+- (void) _run: (NSDictionary *) args
+{
     /* Run the nhit monitor. This method should only be called in a separate
      * thread. The start method should be called to actually start the nhit
      * monitor. */
-    ORXL3Model *xl3;
     ORFec32Model *fec;
     int slot, channel;
-    uint32_t pedestals_enabled, pulser_enabled, pedestal_mask, coarse_delay;
-    uint32_t fine_delay, pedestal_width;
-    float pulser_rate;
     struct NhitRecord nhitRecord;
     int i;
 
@@ -321,8 +434,6 @@ err:
 
     /* Set the timeout to twice how long we expect it to take. */
     int timeout = numPulses*2/pulserRate;
-
-    [self connect];
 
     for (i = 0; i < MAX_NHIT; i++) {
         nhitRecord.nhit_100_lo[i] = 0;
@@ -335,33 +446,6 @@ err:
     if (maxNhit > MAX_NHIT) {
         NSLogColor([NSColor redColor], @"maxNhit must be less than %i\n",
                    MAX_NHIT);
-        return;
-    }
-
-    NSArray* mtcs = [[(ORAppDelegate*)[NSApp delegate] document]
-         collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-
-    if ([mtcs count] == 0) {
-        NSLogColor([NSColor redColor], @"unable to find mtc object.\n");
-        return;
-    }
-
-    mtc = [mtcs objectAtIndex:0];
-
-    xl3 = nil;
-
-    NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document]
-         collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
-
-    for (i = 0; i < [xl3s count]; i++) {
-        if ([[xl3s objectAtIndex:i] crateNumber] == crate) {
-            xl3 = [xl3s objectAtIndex:i];
-            break;
-        }
-    }
-
-    if (!xl3) {
-        NSLogColor([NSColor redColor], @"unable to find XL3 %i\n", crate);
         return;
     }
 
@@ -390,31 +474,6 @@ err:
         return;
     }
 
-    pedestals_enabled = [mtc isPedestalEnabledInCSR];
-    pulser_enabled = [mtc pulserEnabled];
-    pedestal_mask = [mtc pedCrateMask];
-    pulser_rate = [mtc pgtRate];
-    coarse_delay = [mtc coarseDelay];
-    fine_delay = [mtc fineDelay];
-    pedestal_width = [mtc pedestalWidth];
-
-    dispatch_sync(dispatch_get_main_queue(), ^{
-        [mtc disablePulser];
-        [mtc enablePedestal];
-        [mtc setPedCrateMask: (1 << crate)];
-        [mtc loadPedestalCrateMaskToHardware];
-        [mtc setPgtRate: pulserRate];
-        [mtc setCoarseDelay: COARSE_DELAY];
-        [mtc loadCoarseDelayToHardware];
-        [mtc setFineDelay: FINE_DELAY];
-        [mtc loadFineDelayToHardware];
-        [mtc setPedestalWidth: PEDESTAL_WIDTH];
-        [mtc loadPedWidthToHardware];
-    });
-
-    /* turn off all pedestals */
-    [xl3 setPedestalMask:[xl3 getSlotsPresent] pattern:0];
-
     [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORNhitMonitorUpdateNotification object:self userInfo:@{@"nhit": @0, @"maxNhit": [NSNumber numberWithInt:maxNhit]}];
     for (i = 0; i <= maxNhit ; i++) {
         /* Check to see if we should stop. */
@@ -432,39 +491,12 @@ err:
             [xl3 setPedestals];
         }
 
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            [mtc enablePulser];
-        });
+        [mtc okCommand:"enable_pulser"];
         if ([self getNhitTriggerCount: i numPulses:numPulses nhitRecord:&nhitRecord timeout:timeout] == -1) break;
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            [mtc disablePulser];
-        });
+        [mtc okCommand:"disable_pulser"];
         [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORNhitMonitorUpdateNotification object:self userInfo:@{@"nhit": [NSNumber numberWithInt:i], @"maxNhit": [NSNumber numberWithInt:maxNhit]}];
     }
     [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORNhitMonitorUpdateNotification object:self userInfo:@{@"nhit": [NSNumber numberWithInt:i], @"maxNhit": [NSNumber numberWithInt:maxNhit]}];
-
-    dispatch_sync(dispatch_get_main_queue(), ^{
-        if (pedestals_enabled) {
-            [mtc enablePedestal];
-        } else {
-            [mtc disablePedestal];
-        }
-
-        if (pulser_enabled) {
-            [mtc enablePulser];
-        } else {
-            [mtc disablePulser];
-        }
-
-        [mtc setPedCrateMask:pedestal_mask];
-        [mtc loadPedestalCrateMaskToHardware];
-        [mtc setCoarseDelay: coarse_delay];
-        [mtc loadCoarseDelayToHardware];
-        [mtc setFineDelay: fine_delay];
-        [mtc loadFineDelayToHardware];
-        [mtc setPedestalWidth: pedestal_width];
-        [mtc loadPedWidthToHardware];
-    });
 
     /* print trigger thresholds */
     int threshold_n100_lo = get_threshold(nhitRecord.nhit_100_lo, numPulses);
@@ -548,9 +580,7 @@ err:
 
     [db dbQuery:command object:self selector:@selector(nhitMonitorCallback:) timeout:10.0];
 
-    [self disconnect];
-    return;
 err:
-    [self disconnect];
+    return;
 }
 @end
