@@ -364,6 +364,17 @@ err:
             return;
         }
 
+        /* Disable all pedestals. */
+        for (slot = 0; slot < 16; slot++) {
+            fec = [[OROrderedObjManager for:[xl3 guardian]] objectInSlot:16-slot];
+
+            if (!fec) continue;
+
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                [fec setPedEnabledMask:0];
+            });
+        }
+
         /* create a list of channels for which to enable pedestals. We only add
          * channels if both the N100 and N20 triggers are enabled. */
         NSMutableArray *slots = [NSMutableArray array];
@@ -379,10 +390,6 @@ err:
                 fec = [[OROrderedObjManager for:[xl3 guardian]] objectInSlot:16-slot];
 
                 if (!fec) continue;
-
-                dispatch_sync(dispatch_get_main_queue(), ^{
-                    [fec setPedEnabledMask:0];
-                });
 
                 if ([fec trigger100nsEnabled: channel] && \
                     [fec trigger20nsEnabled: channel]) {
@@ -430,7 +437,7 @@ err:
         @try {
             [mtc okCommand:"disable_pulser"];
             [mtc okCommand:"enable_pedestals"];
-            //[mtc okCommand:"set_ped_crate_mask %i", (1 << crate)];
+            [mtc okCommand:"set_ped_crate_mask %i", (1 << crate)];
             [mtc okCommand:"set_pulser_freq %i", pulserRate];
             [mtc okCommand:"set_coarse_delay %i", COARSE_DELAY];
             [mtc okCommand:"set_fine_delay %i", FINE_DELAY];
@@ -457,7 +464,7 @@ err:
                 [mtc okCommand:"disable_pulser"];
             }
 
-            //[mtc okCommand:"set_ped_crate_mask %i", pedestal_mask];
+            [mtc okCommand:"set_ped_crate_mask %i", pedestal_mask];
             [mtc okCommand:"set_pulser_freq %i", pulser_rate];
             [mtc okCommand:"set_coarse_delay %i", coarse_delay];
             [mtc okCommand:"set_fine_delay %i", fine_delay];
@@ -510,8 +517,6 @@ err:
             slot = [[slots objectAtIndex:i-1] intValue];
             channel = [[channels objectAtIndex:i-1] intValue];
             fec = [[OROrderedObjManager for:[xl3 guardian]] objectInSlot:16-slot];
-
-            NSLog(@"enabling pedestals for slot %i channel %i\n", slot, channel);
 
             dispatch_sync(dispatch_get_main_queue(), ^{
                 [fec setPed:channel enabled:1];
