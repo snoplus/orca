@@ -128,7 +128,7 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
                     data[dataIndex++] = pbus->read(FIFO0Addr);
                 }
             }
-            else { //more than 48 words -> use DMA
+            else { //more than 8 Events (48 words) -> use DMA
                 fifoReadoutBuffer32Len  = (fifoReadoutBuffer32Len/48)*48;//always read multiple of 48 word32s
                 /*uint32_t retval = */pbus->readBlock(FIFO0Addr, (unsigned long*)(&data[dataIndex]), fifoReadoutBuffer32Len);//read up to 4*2048 word32s
                 dataIndex += fifoReadoutBuffer32Len;
