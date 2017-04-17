@@ -16,6 +16,7 @@
 #import "ORPQModel.h"
 #import "ORGlobal.h"
 #import "RedisClient.h"
+#import "MTCRegisters.h"
 
 #define SWAP_INT32(a,b) swap_int32((uint32_t *)(a),(b))
 
@@ -308,6 +309,7 @@ err:
     uint32_t fine_delay, pedestal_width;
     uint32_t control_register;
     uint32_t pulser_rate;
+    uint32_t gt_mask;
     int i;
 
     @autoreleasepool {
@@ -364,10 +366,17 @@ err:
             coarse_delay = [mtc intCommand:"get_coarse_delay"];
             fine_delay = [mtc intCommand:"get_fine_delay"];
             pedestal_width = [mtc intCommand:"get_pedestal_width"];
+            gt_mask = [mtc intCommand:"get_gt_mask"];
         } @catch (NSException *e) {
             NSLogColor([NSColor redColor], @"nhit monitor failed to get mtc "
                        "hardware state. error: %@ reason: %@\n",
                        [e name], [e reason]);
+            [self disconnect];
+            return;
+        }
+
+        if ((gt_mask & PULSE_GT) == 0) {
+            NSLogColor([NSColor redColor], @"nhit monitor: PULSE_GT is not masked in!\n");
             [self disconnect];
             return;
         }
@@ -434,6 +443,10 @@ err:
 
     /* Set the timeout to twice how long we expect it to take. */
     int timeout = numPulses*2/pulserRate;
+
+    /* To compute the time we use time(NULL) which returns the number of
+     * seconds as an integer, so we don't want to set it too low. */
+    if (timeout < 2) timeout = 2;
 
     for (i = 0; i < MAX_NHIT; i++) {
         nhitRecord.nhit_100_lo[i] = 0;
