@@ -232,6 +232,7 @@ err:
     int start;
     struct GenericRecordHeader header;
 
+    /* get current GTID */
     current_gtid = [mtc intCommand:"get_gtid"];
 
     start = time(NULL);
@@ -241,20 +242,16 @@ err:
         if ([[NSThread currentThread] isCancelled]) goto err;
 
         if (time(NULL) > start + timeout) {
-            NSLog(@"timeout\n");
+            NSLog(@"nhit monitor: timed out after %i seconds.\n", timeout);
             goto err;
         }
 
-        if (anetRead(sock, (char *) &header, sizeof(struct GenericRecordHeader)) == -1) {
+        if (read_record(sock, &header, buf) == -1) {
             if (errno == EAGAIN || errno == EWOULDBLOCK) {
                 continue;
             }
-            NSLog(@"anetRead: returned -1\n");
-            goto err;
-        }
-
-        if (anetRead(sock, (char *) buf, ntohl(header.RecordLength)) == -1) {
-            NSLog(@"anetRead: returned -1\n");
+            NSLog(@"nhit monitor: error reading MTCD record: %s\n",
+                  strerror(errno));
             goto err;
         }
 
@@ -265,6 +262,9 @@ err:
 
             SWAP_INT32(mtc_readout_data, 6);
 
+            /* If we read out a GTID before we started, we can't be sure that
+             * it occurred after we set the XL3 pedestal mask and started the
+             * pulser, so we wait until we get a GTID aftere when we started. */
             if (mtc_readout_data->BcGT < current_gtid) continue;
 
             if (mtc_readout_data->Pedestal) {
@@ -297,7 +297,7 @@ err:
 - (void) nhitMonitorCallback: (ORPQResult *) result
 {
     if (!result) {
-        NSLog(@"nhit monitor: failed to upload nhit monitor results to database!\n");
+        NSLogColor([NSColor redColor], @"nhit monitor: failed to upload nhit monitor results to database!\n");
         return;
     }
 }
