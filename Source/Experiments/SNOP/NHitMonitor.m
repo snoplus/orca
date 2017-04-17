@@ -354,6 +354,11 @@ err:
             return;
         }
 
+        if (![xl3 isTriggerON]) {
+            NSLogColor([NSColor redColor], @"nhit monitor: crate %02d triggers are off!\n", crate);
+            return;
+        }
+
         if (maxNhit > MAX_NHIT) {
             NSLogColor([NSColor redColor], @"nhit monitor: max nhit must be less than %i\n", MAX_NHIT);
             return;
@@ -486,7 +491,10 @@ err:
     [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORNhitMonitorUpdateNotification object:self userInfo:@{@"nhit": @0, @"maxNhit": [NSNumber numberWithInt:maxNhit]}];
     for (i = 0; i <= maxNhit ; i++) {
         /* Check to see if we should stop. */
-        if ([[NSThread currentThread] isCancelled]) goto err;
+        if ([[NSThread currentThread] isCancelled]) {
+            sprintf(err, "current thread was cancelled");
+            return;
+        }
 
         if (i > 0) {
             slot = [[slots objectAtIndex:i-1] intValue];
