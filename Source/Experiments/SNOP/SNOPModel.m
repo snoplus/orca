@@ -1373,7 +1373,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     if (nhitMonitorTimer) [nhitMonitorTimer invalidate];
 
     if (nhitMonitorAutoRun) {
-        nhitMonitorTimer = [NSTimer scheduledTimerWithTimeInterval:nhitMonitorTimeInterval target:self selector:@(runNhitMonitorAutomatically) userInfo:nil repeats:YES];
+        nhitMonitorTimer = [NSTimer scheduledTimerWithTimeInterval:nhitMonitorTimeInterval target:self selector:@selector(runNhitMonitorAutomatically) userInfo:nil repeats:YES];
     }
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelNhitMonitorChangedNotification object:self];
@@ -1414,7 +1414,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     if (nhitMonitorTimer) [nhitMonitorTimer invalidate];
 
     if (nhitMonitorAutoRun) {
-        nhitMonitorTimer = [NSTimer scheduledTimerWithTimeInterval:nhitMonitorTimeInterval target:self selector:@(runNhitMonitorAutomatically) userInfo:nil repeats:YES];
+        nhitMonitorTimer = [NSTimer scheduledTimerWithTimeInterval:nhitMonitorTimeInterval target:self selector:@selector(runNhitMonitorAutomatically) userInfo:nil repeats:YES];
     }
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelNhitMonitorChangedNotification object:self];

@@ -219,7 +219,11 @@
 - (IBAction) nhitMonitorPulserRateAction: (id) sender;
 - (IBAction) nhitMonitorNumPulsesAction: (id) sender;
 - (IBAction) nhitMonitorMaxNhitAction: (id) sender;
+/* Actions for running the nhit monitor automatically during runs. */
 - (IBAction) nhitMonitorAutoRunAction: (id) sender;
+- (IBAction) nhitMonitorRunTypeAction: (id) sender;
+- (IBAction) nhitMonitorCrateMaskAction: (id) sender;
+- (IBAction) nhitMonitorTimeIntervalAction: (id) sender;
 
 - (IBAction) orcaDBIPAddressAction:(id)sender;
 - (IBAction) orcaDBClearHistoryAction:(id)sender;

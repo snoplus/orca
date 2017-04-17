@@ -4006,6 +4006,9 @@
                                                 <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
+                                            <connections>
+                                                <action selector="nhitMonitorTimeIntervalAction:" target="-2" id="r3C-GF-jB2"/>
+                                            </connections>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="fXs-mb-rjf">
                                             <rect key="frame" x="432" y="300" width="22" height="17"/>
@@ -4027,6 +4030,9 @@
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="nhitMonitorAutoRunAction:" target="-2" id="Cfl-W3-MXJ"/>
+                                            </connections>
                                         </button>
                                         <matrix toolTip="Current run type word" verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="LGZ-8t-yfV">
                                             <rect key="frame" x="632" y="418" width="119" height="176"/>
@@ -4085,6 +4091,9 @@
                                                     </buttonCell>
                                                 </column>
                                             </cells>
+                                            <connections>
+                                                <action selector="nhitMonitorRunTypeAction:" target="-2" id="2LR-2z-WIu"/>
+                                            </connections>
                                         </matrix>
                                         <matrix verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="nUb-5W-tWa">
                                             <rect key="frame" x="504" y="221" width="70" height="360"/>
@@ -4179,6 +4188,9 @@
                                                     </buttonCell>
                                                 </column>
                                             </cells>
+                                            <connections>
+                                                <action selector="nhitMonitorCrateMaskAction:" target="-2" id="yvE-wh-c3p"/>
+                                            </connections>
                                         </matrix>
                                     </subviews>
                                 </view>

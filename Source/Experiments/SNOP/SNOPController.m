@@ -472,7 +472,8 @@ snopGreenColor;
 
 - (void) nhitMonitorSettingsChanged: (NSNotification*) aNote
 {
-    int row, col;
+    int row;
+
     int crate = [model nhitMonitorCrate];
     [nhitMonitorCrateButton selectItemAtIndex:crate];
     int pulserRate = [model nhitMonitorPulserRate];
@@ -482,21 +483,21 @@ snopGreenColor;
     int maxNhit = [model nhitMonitorMaxNhit];
     [nhitMonitorMaxNhit setStringValue:[NSString stringWithFormat:@"%i", maxNhit]];
     int autoRun = [model nhitMonitorAutoRun];
-    [nhitMonitorAutoRun setState:autoRun];
+    [nhitMonitorAutoRunButton setState:autoRun];
     int runType = [model nhitMonitorRunType];
-    for (row = 0; row < [nhitMonitorRunTypeWord numberOfRows]; row++) {
+    for (row = 0; row < [nhitMonitorRunTypeWordMatrix numberOfRows]; row++) {
         if (runType & (1L << row)) {
-            [nhitMonitorRunTypeWord setState:1 atRow:row column:0];
+            [nhitMonitorRunTypeWordMatrix setState:1 atRow:row column:0];
         } else {
-            [nhitMonitorRunTypeWord setState:0 atRow:row column:0];
+            [nhitMonitorRunTypeWordMatrix setState:0 atRow:row column:0];
         }
     }
     int crateMask = [model nhitMonitorCrateMask];
-    for (row = 0; row < [nhitMonitorCrateMask numberOfRows]; row++) {
+    for (row = 0; row < [nhitMonitorCrateMaskMatrix numberOfRows]; row++) {
         if (crateMask & (1L << row)) {
-            [nhitMonitorCrateMask setState:1 atRow:row column:0];
+            [nhitMonitorCrateMaskMatrix setState:1 atRow:row column:0];
         } else {
-            [nhitMonitorCrateMask setState:0 atRow:row column:0];
+            [nhitMonitorCrateMaskMatrix setState:0 atRow:row column:0];
         }
     }
     double timeInterval = [model nhitMonitorTimeInterval];
@@ -670,11 +671,6 @@ err:
     [model runNhitMonitor];
 }
 
-- (IBAction) runNhitMonitorAutomatically: (id) sender
-{
-    [model setRunNhitMonitorAutomatically:[sender state]];
-}
-
 - (IBAction) stopNhitMonitorAction: (id) sender
 {
     [self endEditing];
@@ -701,7 +697,12 @@ err:
     [model setNhitMonitorMaxNhit:[sender intValue]];
 }
 
-- (IBAction) nhitMonitorRunTypeWordAction: (id) sender
+- (IBAction) nhitMonitorAutoRunAction: (id) sender
+{
+    [model setNhitMonitorAutoRun:[sender state]];
+}
+
+- (IBAction) nhitMonitorRunTypeAction: (id) sender
 {
     short bit = [sender selectedRow];
     BOOL state  = [[sender selectedCell] state];
@@ -712,6 +713,24 @@ err:
         currentRunMask &= ~(1L << bit);
     }
     [model setNhitMonitorRunType:currentRunMask];
+}
+
+- (IBAction) nhitMonitorCrateMaskAction: (id) sender
+{
+    short bit = [sender selectedRow];
+    BOOL state  = [[sender selectedCell] state];
+    unsigned long currentCrateMask = [model nhitMonitorCrateMask];
+    if (state) {
+        currentCrateMask |= (1L << bit);
+    } else {
+        currentCrateMask &= ~(1L << bit);
+    }
+    [model setNhitMonitorCrateMask:currentCrateMask];
+}
+    
+- (IBAction) nhitMonitorTimeIntervalAction: (id) sender
+{
+    [model setNhitMonitorTimeInterval:[sender doubleValue]];
 }
 
 - (void) dbOrcaDBIPChanged:(NSNotification*)aNote
