@@ -16,7 +16,7 @@
 #import "ORPQModel.h"
 #import "ORGlobal.h"
 #import "RedisClient.h"
-#import "ORMTC_Constants.h"
+#import "MTCRegisters.h"
 
 #define SWAP_INT32(a,b) swap_int32((uint32_t *)(a),(b))
 
@@ -484,7 +484,7 @@ err:
             goto err;
         }
 
-        if ((gt_mask & MTC_PULSE_GT_MASK) == 0) {
+        if ((gt_mask & PULSE_GT) == 0) {
             NSLogColor([NSColor redColor], @"nhit monitor: PULSE_GT is not masked in!\n");
             [self disconnect];
             goto err;

@@ -422,7 +422,7 @@ tellieRunFiles = _tellieRunFiles;
     [dataHost release];
     [logHost release];
     [anECARun release];
-    [NHitMonitor dealloc];
+    [NHitMonitor release];
     [super dealloc];
 }
 
@@ -1239,7 +1239,10 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 
 - (void) runNhitMonitor
 {
-    [nhitMonitor start:[self nhitMonitorCrate] pulserRate:[self nhitMonitorPulserRate] numPulses:[self nhitMonitorNumPulses] maxNhit:[self nhitMonitorMaxNhit]];
+    [nhitMonitor start:[self nhitMonitorCrate]
+                 pulserRate:[self nhitMonitorPulserRate]
+                 numPulses:[self nhitMonitorNumPulses]
+                 maxNhit:[self nhitMonitorMaxNhit]];
 }
 
 - (void) runNhitMonitorAutomatically
@@ -1252,7 +1255,8 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         if ([gOrcaGlobals runType] & nhitMonitorRunType) {
             /* Run the nhit monitor on the next crate in the crate mask. */
             if (last_crate == -1) {
-                /* This is the first time we've run, so just find the first crate. */
+                /* This is the first time we've run, so just find the first
+                 * crate. */
                 for (i = 0; i < 20; i++) {
                     if ([self nhitMonitorCrateMask] & (1L << i)) {
                         crate = i;
@@ -1261,7 +1265,8 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
                 }
             } else {
                 for (i = 1; i <= 20; i++) {
-                    if ([self nhitMonitorCrateMask] & (1L << ((last_crate + i) % 20))) {
+                    if ([self nhitMonitorCrateMask] & \
+                        (1L << ((last_crate + i) % 20))) {
                         crate = (last_crate + i) % 20;
                         break;
                     }
@@ -1269,10 +1274,14 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
             }
             if (crate == -1) {
                 /* Nothing is checked. */
-                NSLog(@"nhit monitor is set to run automatically, but no crates are checked.\n");
+                NSLog(@"nhit monitor is set to run automatically, "
+                      "but no crates are checked.\n");
                 return;
             }
-            [nhitMonitor start:crate pulserRate:[self nhitMonitorAutoPulserRate] numPulses:[self nhitMonitorAutoNumPulses] maxNhit:[self nhitMonitorAutoMaxNhit]];
+            [nhitMonitor start:crate
+                         pulserRate:[self nhitMonitorAutoPulserRate]
+                         numPulses:[self nhitMonitorAutoNumPulses]
+                         maxNhit:[self nhitMonitorAutoMaxNhit]];
             last_crate = crate;
         }
     }
