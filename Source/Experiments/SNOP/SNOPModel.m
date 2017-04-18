@@ -348,12 +348,15 @@ tellieRunFiles = _tellieRunFiles;
     if ([self dataPort] == 0) [self setDataServerPort:4005];
     if ([self logPort] == 0) [self setLogServerPort:4001];
 
-    // Nhit Monitor Settings
+    /* Nhit Monitor Settings */
     [self setNhitMonitorCrate:[decoder decodeIntForKey:@"nhitMonitorCrate"]];
     [self setNhitMonitorPulserRate:[decoder decodeIntForKey:@"nhitMonitorPulserRate"]];
     [self setNhitMonitorNumPulses:[decoder decodeIntForKey:@"nhitMonitorNumPulses"]];
     [self setNhitMonitorMaxNhit:[decoder decodeIntForKey:@"nhitMonitorMaxNhit"]];
     [self setNhitMonitorAutoRun:[decoder decodeBoolForKey:@"nhitMonitorAutoRun"]];
+    [self setNhitMonitorAutoPulserRate:[decoder decodeIntForKey:@"nhitMonitorAutoPulserRate"]];
+    [self setNhitMonitorAutoNumPulses:[decoder decodeIntForKey:@"nhitMonitorAutoNumPulses"]];
+    [self setNhitMonitorAutoMaxNhit:[decoder decodeIntForKey:@"nhitMonitorAutoMaxNhit"]];
     [self setNhitMonitorRunType:[decoder decodeIntForKey:@"nhitMonitorRunType"]];
     [self setNhitMonitorCrateMask:[decoder decodeIntForKey:@"nhitMonitorCrateMask"]];
     [self setNhitMonitorTimeInterval:[decoder decodeDoubleForKey:@"nhitMonitorTimeInterval"]];
@@ -1269,7 +1272,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
                 NSLog(@"nhit monitor is set to run automatically, but no crates are checked.\n");
                 return;
             }
-            [nhitMonitor start:crate pulserRate:[self nhitMonitorPulserRate] numPulses:[self nhitMonitorNumPulses] maxNhit:[self nhitMonitorMaxNhit]];
+            [nhitMonitor start:crate pulserRate:[self nhitMonitorAutoPulserRate] numPulses:[self nhitMonitorAutoNumPulses] maxNhit:[self nhitMonitorAutoMaxNhit]];
             last_crate = crate;
         }
     }
@@ -1413,6 +1416,39 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         nhitMonitorTimer = [NSTimer scheduledTimerWithTimeInterval:nhitMonitorTimeInterval target:self selector:@selector(runNhitMonitorAutomatically) userInfo:nil repeats:YES];
     }
 
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelNhitMonitorChangedNotification object:self];
+}
+
+- (int) nhitMonitorAutoPulserRate
+{
+    return nhitMonitorAutoPulserRate;
+}
+
+- (void) setNhitMonitorAutoPulserRate: (int) pulserRate
+{
+    nhitMonitorAutoPulserRate = pulserRate;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelNhitMonitorChangedNotification object:self];
+}
+
+- (int) nhitMonitorAutoNumPulses
+{
+    return nhitMonitorAutoNumPulses;
+}
+
+- (void) setNhitMonitorAutoNumPulses: (int) numPulses
+{
+    nhitMonitorAutoNumPulses = numPulses;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelNhitMonitorChangedNotification object:self];
+}
+
+- (int) nhitMonitorAutoMaxNhit
+{
+    return nhitMonitorAutoMaxNhit;
+}
+
+- (void) setNhitMonitorAutoMaxNhit: (int) maxNhit
+{
+    nhitMonitorAutoMaxNhit = maxNhit;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelNhitMonitorChangedNotification object:self];
 }
 
@@ -1766,12 +1802,15 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     [encoder encodeObject:[self logHost] forKey:@"logHost"];
     [encoder encodeInt:[self logPort] forKey:@"logPort"];
 
-    //Settings
+    /* Nhit Monitor Settings */
     [encoder encodeInt:[self nhitMonitorCrate] forKey:@"nhitMonitorCrate"];
     [encoder encodeInt:[self nhitMonitorPulserRate] forKey:@"nhitMonitorPulserRate"];
     [encoder encodeInt:[self nhitMonitorNumPulses] forKey:@"nhitMonitorNumPulses"];
     [encoder encodeInt:[self nhitMonitorMaxNhit] forKey:@"nhitMonitorMaxNhit"];
     [encoder encodeBool:[self nhitMonitorAutoRun] forKey:@"nhitMonitorAutoRun"];
+    [encoder encodeInt:[self nhitMonitorAutoPulserRate] forKey:@"nhitMonitorAutoPulserRate"];
+    [encoder encodeInt:[self nhitMonitorAutoNumPulses] forKey:@"nhitMonitorAutoNumPulses"];
+    [encoder encodeInt:[self nhitMonitorAutoMaxNhit] forKey:@"nhitMonitorAutoMaxNhit"];
     [encoder encodeInt:[self nhitMonitorRunType] forKey:@"nhitMonitorRunType"];
     [encoder encodeInt:[self nhitMonitorCrateMask] forKey:@"nhitMonitorCrateMask"];
     [encoder encodeDouble:[self nhitMonitorTimeInterval] forKey:@"nhitMonitorTimeInterval"];

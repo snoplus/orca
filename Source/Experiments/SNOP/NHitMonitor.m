@@ -528,6 +528,11 @@ err:
     ORFec32Model *fec;
     char err[256];
 
+    if (pulserRate == 0) {
+        NSLogColor([NSColor redColor], @"nhit monitor: pulser rate is zero!\n");
+        return;
+    }
+
     /* Set the timeout to twice how long we expect it to take. */
     int timeout = numPulses*2/pulserRate;
 
@@ -547,7 +552,7 @@ err:
     for (i = 0; i <= maxNhit ; i++) {
         /* Check to see if we should stop. */
         if ([[NSThread currentThread] isCancelled]) {
-            sprintf(err, "current thread was cancelled");
+            NSLogColor([NSColor redColor], @"nhit monitor: current thread was cancelled\n");
             return;
         }
 

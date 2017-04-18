@@ -156,6 +156,9 @@
     IBOutlet NSMatrix *nhitMonitorResultsMatrix;
     /* Settings for running the nhit monitor automatically during runs. */
     IBOutlet NSButton *nhitMonitorAutoRunButton;
+    IBOutlet NSTextField *nhitMonitorAutoPulserRate;
+    IBOutlet NSTextField *nhitMonitorAutoNumPulses;
+    IBOutlet NSTextField *nhitMonitorAutoMaxNhit;
     IBOutlet NSMatrix *nhitMonitorRunTypeWordMatrix;
     IBOutlet NSMatrix *nhitMonitorCrateMaskMatrix;
     IBOutlet NSTextField *nhitMonitorTimeInterval;
@@ -222,6 +225,9 @@
 - (IBAction) nhitMonitorMaxNhitAction: (id) sender;
 /* Actions for running the nhit monitor automatically during runs. */
 - (IBAction) nhitMonitorAutoRunAction: (id) sender;
+- (IBAction) nhitMonitorAutoPulserRateAction: (id) sender;
+- (IBAction) nhitMonitorAutoNumPulsesAction: (id) sender;
+- (IBAction) nhitMonitorAutoMaxNhitAction: (id) sender;
 - (IBAction) nhitMonitorRunTypeAction: (id) sender;
 - (IBAction) nhitMonitorCrateMaskAction: (id) sender;
 - (IBAction) nhitMonitorTimeIntervalAction: (id) sender;

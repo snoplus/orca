@@ -489,6 +489,12 @@ snopGreenColor;
     [nhitMonitorMaxNhit setStringValue:[NSString stringWithFormat:@"%i", maxNhit]];
     int autoRun = [model nhitMonitorAutoRun];
     [nhitMonitorAutoRunButton setState:autoRun];
+    int autoPulserRate = [model nhitMonitorAutoPulserRate];
+    [nhitMonitorAutoPulserRate setStringValue:[NSString stringWithFormat:@"%i", autoPulserRate]];
+    int autoNumPulses = [model nhitMonitorAutoNumPulses];
+    [nhitMonitorAutoNumPulses setStringValue:[NSString stringWithFormat:@"%i", autoNumPulses]];
+    int autoMaxNhit = [model nhitMonitorAutoMaxNhit];
+    [nhitMonitorAutoMaxNhit setStringValue:[NSString stringWithFormat:@"%i", autoMaxNhit]];
     int runType = [model nhitMonitorRunType];
     for (row = 0; row < [nhitMonitorRunTypeWordMatrix numberOfRows]; row++) {
         if (runType & (1L << row)) {
@@ -728,8 +734,24 @@ err:
     [model setNhitMonitorAutoRun:[sender state]];
 }
 
+- (IBAction) nhitMonitorAutoPulserRateAction: (id) sender
+{
+    [model setNhitMonitorAutoPulserRate:[sender intValue]];
+}
+
+- (IBAction) nhitMonitorAutoNumPulsesAction: (id) sender
+{
+    [model setNhitMonitorAutoNumPulses:[sender intValue]];
+}
+
+- (IBAction) nhitMonitorAutoMaxNhitAction: (id) sender
+{
+    [model setNhitMonitorAutoMaxNhit:[sender intValue]];
+}
+
 - (IBAction) nhitMonitorRunTypeAction: (id) sender
 {
+    NSLog(@"nhitMonitorRunTypeAction\n");
     short bit = [sender selectedRow];
     BOOL state  = [[sender selectedCell] state];
     unsigned long currentRunMask = [model nhitMonitorRunType];
@@ -738,6 +760,7 @@ err:
     } else {
         currentRunMask &= ~(1L << bit);
     }
+    NSLog(@"setting nhit monitor run type to 0x%x\n", currentRunMask);
     [model setNhitMonitorRunType:currentRunMask];
 }
 
