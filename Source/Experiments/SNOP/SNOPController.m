@@ -554,8 +554,16 @@ snopGreenColor;
 
 - (void) nhitMonitor: (NSNotification*) aNote
 {
-    NSLog(@"running = %s\n", [[model nhitMonitor] isRunning] ? "Yes" : "No");
-    NSLog(@"cancelled = %s\n", [[model nhitMonitor] isCancelled] ? "Yes" : "No");
+    if ([aNote userInfo]) {
+        /* The nhit monitor adds a userInfo dictionary when it is finished.
+         * It's not possible to tell if it's done by checking to see if it's
+         * still running, because when the notification is posted, the thread
+         * is still running. */
+        [runNhitMonitorButton setEnabled:YES];
+        [stopNhitMonitorButton setEnabled:NO];
+        return;
+    }
+
     if ([[model nhitMonitor] isRunning] && ![[model nhitMonitor] isCancelled]) {
         [runNhitMonitorButton setEnabled:NO];
         [stopNhitMonitorButton setEnabled:YES];

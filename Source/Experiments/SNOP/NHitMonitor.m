@@ -525,7 +525,7 @@ err:
         NSLog(@"nhit monitor done\n");
 
 err:
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORNhitMonitorNotification object:self userInfo:nil];
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORNhitMonitorNotification object:self userInfo:@{@"finished":@1}];
     }
 }
 
