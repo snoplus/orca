@@ -241,7 +241,11 @@ static int get_nhit_trigger_count(char *err, RedisClient *mtc, int sock, char *b
         return;
     }
 
-    NSLog(@"starting nhit monitor\n");
+    NSLog(@"nhit monitor starting\n");
+    NSLog(@"crate = %i\n", crate);
+    NSLog(@"pulser rate = %.2f Hz\n", pulserRate);
+    NSLog(@"num pulses = %i\n", numPulses);
+    NSLog(@"max nhit = %i\n", maxNhit);
 
     NSDictionary *args = [NSDictionary dictionaryWithObjectsAndKeys:
                             [NSNumber numberWithInt:crate], @"crate",
@@ -507,6 +511,8 @@ err:
             /* Disconnect from the data server. */
             [self disconnect];
         }
+
+        NSLog(@"nhit monitor done\n");
     }
 }
 

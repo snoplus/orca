@@ -1245,9 +1245,15 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 {
     /* Run the nhit monitor, but first check to see if we are in a specific
      * run. */
+    static int crate;
     if ([gOrcaGlobals runInProgress]) {
         if ([gOrcaGlobals runType] & nhitMonitorRunType) {
-            [nhitMonitor start:[self nhitMonitorCrate] pulserRate:[self nhitMonitorPulserRate] numPulses:[self nhitMonitorNumPulses] maxNhit:[self nhitMonitorMaxNhit]];
+            /* Run the nhit monitor on the next crate in the crate mask. */
+            crate = (crate + 1) % 20;
+            while ((crate & [self nhitMonitorCrateMask]) == 0) {
+                crate = (crate + 1) % 20;
+            }
+            [nhitMonitor start:crate pulserRate:[self nhitMonitorPulserRate] numPulses:[self nhitMonitorNumPulses] maxNhit:[self nhitMonitorMaxNhit]];
         }
     }
 }
