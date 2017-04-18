@@ -49,6 +49,8 @@ struct NhitRecord {
 - (id) init;
 - (void) dealloc;
 - (void) registerNotificationObservers;
+- (void) runAboutToStop: (NSNotification*) aNote;
+- (void) _waitForThreadToFinish;
 - (BOOL) isRunning;
 - (void) stop;
 - (void) start: (int) crate pulserRate: (int) pulserRate numPulses: (int) numPulses maxNhit: (int) maxNhit;

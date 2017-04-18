@@ -185,9 +185,40 @@ static int get_nhit_trigger_count(char *err, RedisClient *mtc, int sock, char *b
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
 
     [notifyCenter addObserver : self
-                     selector : @selector(stop)
+                     selector : @selector(runAboutToStop:)
                          name : ORRunAboutToStopNotification
                        object : nil];
+}
+
+- (void) runAboutToStop: (NSNotification*) aNote
+{
+    /* Stop the nhit monitor if it's running and post a notification telling
+     * the run control to wait. Then we wait until the thread is done. */
+    if (![self isRunning]) return;
+
+    [self stop];
+
+    NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                              @"waiting for nhit monitor", @"Reason",
+                              nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object: self userInfo: userInfo];
+
+    /* detach a thread to wait until we actually stop. */
+    [NSThread detachNewThreadSelector:@selector(_waitForThreadToFinish)
+                             toTarget:self
+                           withObject:nil];
+}
+
+- (void) _waitForThreadToFinish
+{
+    while ([self isRunning]) {
+        [NSThread sleepForTimeInterval:0.1];
+    }
+
+    /* Go ahead and end the run. */
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
+    });
 }
 
 - (BOOL) isRunning
