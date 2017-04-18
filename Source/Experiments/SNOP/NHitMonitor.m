@@ -16,7 +16,7 @@
 #import "ORPQModel.h"
 #import "ORGlobal.h"
 #import "RedisClient.h"
-#import "MTCRegisters.h"
+#import "ORMTC_Constants.h"
 
 #define SWAP_INT32(a,b) swap_int32((uint32_t *)(a),(b))
 
@@ -96,10 +96,8 @@ static int get_nhit_trigger_count(char *err, RedisClient *mtc, int sock, char *b
 {
     /* Get the number of triggers which had an NHIT trigger fire. Returns -1 if
      * there was an error or the current thread was cancelled. */
-    int current_gtid;
-    int i, nrecords;
+    int current_gtid, nrecords, start, i;
     int count = 0;
-    int start;
     struct GenericRecordHeader header;
     struct MTCReadoutData *mtc_readout_data;
 
@@ -177,6 +175,7 @@ static int get_nhit_trigger_count(char *err, RedisClient *mtc, int sock, char *b
 
 - (void) dealloc
 {
+    [self disconnect];
     free(buf);
     [runningThread release];
     [super dealloc];
@@ -213,26 +212,20 @@ static int get_nhit_trigger_count(char *err, RedisClient *mtc, int sock, char *b
 
 - (void) _waitForThreadToFinish
 {
+    /* Thread to wait until the nhit monitor is done and then post a
+     * notification telling the run control to continue. */
     while ([self isRunning]) {
         [NSThread sleepForTimeInterval:0.1];
     }
 
     /* Go ahead and end the run. */
-    dispatch_sync(dispatch_get_main_queue(), ^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
-    });
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORReleaseRunStateChangeWait object: self];
 }
 
 - (BOOL) isRunning
 {
     /* Returns if the nhit monitor is currently running. */
     return [runningThread isExecuting];
-}
-
-- (BOOL) isCancelled
-{
-    /* Returns if the nhit monitor was cancelled. */
-    return [runningThread isCancelled];
 }
 
 - (void) stop
@@ -243,18 +236,26 @@ static int get_nhit_trigger_count(char *err, RedisClient *mtc, int sock, char *b
 
 - (void) start: (int) crate pulserRate: (int) pulserRate numPulses: (int) numPulses maxNhit: (int) maxNhit
 {
-    /* Start the nhit monitor. */
+    /* Start the nhit monitor. This function will launch a thread which starts
+     * the nhit monitor and then return immediately. To check when the nhit
+     * monitor is done, you can periodically poll isRunning(). Any errors will
+     * be printed to the log and the thread will quit. If the nhit monitor
+     * succeeds, it will print the thresholds to the log, upload the results to
+     * the database, and then quit. */
     if ([self isRunning]) {
         NSLog(@"nhit monitor is already running!\n");
         return;
     }
 
+    /* Print out the settings we are going to run with. */
     NSLog(@"nhit monitor starting\n");
     NSLog(@"crate = %i\n", crate);
     NSLog(@"pulser rate = %i Hz\n", pulserRate);
     NSLog(@"num pulses = %i\n", numPulses);
     NSLog(@"max nhit = %i\n", maxNhit);
 
+    /* There is no way as far as I can tell to launch a thread with more than
+     * one argument, so we just put everything in a dictionary. */
     NSDictionary *args = [NSDictionary dictionaryWithObjectsAndKeys:
                             [NSNumber numberWithInt:crate], @"crate",
                             [NSNumber numberWithInt:pulserRate], @"pulserRate",
@@ -270,13 +271,17 @@ static int get_nhit_trigger_count(char *err, RedisClient *mtc, int sock, char *b
 
 - (int) connect
 {
-    /* Connect to the data server. */
+    /* Connect to the data server. Returns -1 on error. If successful, the
+     * instance variable sock will be a socket file descriptor connected to the
+     * data server. */
     SNOPModel *snop;
     char err[ANET_ERR_LEN];
     struct GenericRecordHeader header;
 
+    /* Make sure we are disconnected. */
     [self disconnect];
 
+    /* Get the SNO+ model object since we need to get the data server hostname. */
     NSArray* snops = [[(ORAppDelegate*)[NSApp delegate] document]
          collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
 
@@ -350,6 +355,7 @@ err:
 
 - (void) run: (NSDictionary *) args
 {
+    /* Run the nhit monitor. This method should only be called by the start method. */
     SNOPModel *snop;
     uint32_t pedestals_enabled, pulser_enabled, pedestal_mask, coarse_delay;
     uint32_t fine_delay, pedestal_width;
@@ -376,6 +382,9 @@ err:
 
         snop = [snops objectAtIndex:0];
 
+        /* Since we are running in a separate thread, it's easiest to just open
+         * up a new connection to the mtc server instead of having to dispatch
+         * all commands to the main thread. */
         mtc = [[RedisClient alloc] initWithHostName:[snop mtcHost] withPort:[snop mtcPort]];
         /* Autorelease the MTC object. It will get freed when the function
          * finishes since we are in an @autoreleasepool block. */
@@ -456,6 +465,8 @@ err:
         }
 
         @try {
+            /* Save the current MTC settings so we can set them back when the
+             * nhit monitor is done. */
             control_register = [mtc intCommand:"mtcd_read 0x0"];
             pedestals_enabled = control_register & 0x1;
             pulser_enabled = control_register & 0x2;
@@ -473,13 +484,14 @@ err:
             goto err;
         }
 
-        if ((gt_mask & PULSE_GT) == 0) {
+        if ((gt_mask & MTC_PULSE_GT_MASK) == 0) {
             NSLogColor([NSColor redColor], @"nhit monitor: PULSE_GT is not masked in!\n");
             [self disconnect];
             goto err;
         }
 
         @try {
+            /* Initialize the MTC settings for the nhit monitor. */
             [mtc okCommand:"disable_pulser"];
             [mtc okCommand:"enable_pedestals"];
             [mtc okCommand:"set_ped_crate_mask %i", (1 << crate)];
@@ -491,6 +503,9 @@ err:
             /* turn off all pedestals */
             [xl3 setPedestalMask:[xl3 getSlotsPresent] pattern:0];
 
+            /* We call another method here because we need to wrap everything
+             * in a try-catch block so that if anything fails we make sure to
+             * reset the MTC settings. */
             [self _run:crate pulserRate:pulserRate numPulses:numPulses maxNhit:maxNhit slots:slots channels:channels];
         } @catch (NSException *e) {
             NSLogColor([NSColor redColor], @"nhit monitor failed. error: %@ "
@@ -525,6 +540,13 @@ err:
         NSLog(@"nhit monitor done\n");
 
 err:
+        /* Post a notification so that the SNOPController can enable the run
+         * button. Note: ideally the SNOPController would just check to see if
+         * the nhit monitor was running and then enable/disable the buttons
+         * depending on if it's running. However, there is no easy way to post
+         * the notification *after* this thread exits, and so when the
+         * notification is posted the nhit monitor will still be running. To
+         * get around this we add a userInfo dictionary to the notification. */
         [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORNhitMonitorNotification object:self userInfo:@{@"finished":@1}];
     }
 }
@@ -552,6 +574,8 @@ err:
      * seconds as an integer, so we don't want to set it too low. */
     if (timeout < 2) timeout = 2;
 
+    /* Initialize the struct holding the number of nhit triggers which fire for
+     * each nhit. */
     for (i = 0; i < MAX_NHIT; i++) {
         nhitRecord.nhit_100_lo[i] = 0;
         nhitRecord.nhit_100_med[i] = 0;

@@ -52,7 +52,6 @@ struct NhitRecord {
 - (void) runAboutToStop: (NSNotification*) aNote;
 - (void) _waitForThreadToFinish;
 - (BOOL) isRunning;
-- (BOOL) isCancelled;
 - (void) stop;
 - (void) start: (int) crate pulserRate: (int) pulserRate numPulses: (int) numPulses maxNhit: (int) maxNhit;
 - (int) connect;

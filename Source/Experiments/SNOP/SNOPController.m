@@ -564,7 +564,7 @@ snopGreenColor;
         return;
     }
 
-    if ([[model nhitMonitor] isRunning] && ![[model nhitMonitor] isCancelled]) {
+    if ([[model nhitMonitor] isRunning]) {
         [runNhitMonitorButton setEnabled:NO];
         [stopNhitMonitorButton setEnabled:YES];
     } else {
