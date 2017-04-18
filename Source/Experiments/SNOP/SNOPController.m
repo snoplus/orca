@@ -778,7 +778,6 @@ err:
 
 - (IBAction) nhitMonitorRunTypeAction: (id) sender
 {
-    NSLog(@"nhitMonitorRunTypeAction\n");
     short bit = [sender selectedRow];
     BOOL state  = [[sender selectedCell] state];
     unsigned long currentRunMask = [model nhitMonitorRunType];
@@ -787,7 +786,6 @@ err:
     } else {
         currentRunMask &= ~(1L << bit);
     }
-    NSLog(@"setting nhit monitor run type to 0x%x\n", currentRunMask);
     [model setNhitMonitorRunType:currentRunMask];
 }
 
