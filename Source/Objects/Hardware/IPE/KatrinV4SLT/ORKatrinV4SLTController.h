@@ -20,7 +20,7 @@
 //-------------------------------------------------------------
 
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Imported Files
+#pragma mark •••Imported Files
 #import "ORKatrinV4SLTModel.h"
 #import "SBC_LinkController.h"
 
@@ -98,16 +98,16 @@
 		NSSize					cpuTestsSize;
 };
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
+#pragma mark •••Initialization
 - (id)   init;
 - (void) dealloc;
 - (void) awakeFromNib;
 
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Notifications
+#pragma mark •••Notifications
 - (void) registerNotificationObservers;
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+#pragma mark •••Interface Management
 - (void) pixelBusEnableRegChanged:(NSNotification*)aNote;
 - (void) secondsSetSendToFLTsChanged:(NSNotification*)aNote;
 - (void) secondsSetInitWithHostChanged:(NSNotification*)aNote;
@@ -145,7 +145,7 @@
 
 - (void) enableRegControls;
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+#pragma mark •••Actions
 - (IBAction) readSLTEventFifoButtonAction:(id)sender;
 - (IBAction) pixelBusEnableRegTextFieldAction:(id)sender;
 - (IBAction) pixelBusEnableRegMatrixAction:(id)sender;

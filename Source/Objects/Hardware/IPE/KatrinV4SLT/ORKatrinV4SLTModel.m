@@ -100,60 +100,60 @@ enum KatrinSLTV4Enum {
 
 
 IpeRegisterNamesStruct regKatrinSLTV4[kKatrinV4SLTNumRegs] = {
-{@"Control",			0xa80000,		1,			kIpeRegReadable | kIpeRegWriteable },
-{@"Status",				0xa80004,		1,			kIpeRegReadable | kIpeRegWriteable },
-{@"Command",			0xa80008,		1,			kIpeRegWriteable },
-{@"Interrupt Reguest",	0xA8000C,		1,			kIpeRegReadable },
-{@"Interrupt Mask",		0xA80010,		1,			kIpeRegReadable | kIpeRegWriteable },
-{@"Request Semaphore",	0xA80014,		3,			kIpeRegReadable },
-{@"HWRevision",			0xa80020,		1,			kIpeRegReadable },
-{@"Pixel Bus Error",	0xA80024,		1,			kIpeRegReadable },			
-{@"Pixel Bus Enable",	0xA80028,		1, 			kIpeRegReadable | kIpeRegWriteable },
+{@"Control",			0xa80000,		1,			kIpeRegReadable | kIpeRegWriteable  },
+{@"Status",				0xa80004,		1,			kIpeRegReadable | kIpeRegWriteable  },
+{@"Command",			0xa80008,		1,			kIpeRegWriteable                    },
+{@"Interrupt Reguest",	0xA8000C,		1,			kIpeRegReadable                     },
+{@"Interrupt Mask",		0xA80010,		1,			kIpeRegReadable | kIpeRegWriteable  },
+{@"Request Semaphore",	0xA80014,		3,			kIpeRegReadable                     },
+{@"HWRevision",			0xa80020,		1,			kIpeRegReadable                     },
+{@"Pixel Bus Error",	0xA80024,		1,			kIpeRegReadable                     },
+{@"Pixel Bus Enable",	0xA80028,		1, 			kIpeRegReadable | kIpeRegWriteable  },
 //Auger Registers Removed for Bipolar Filter Upgrade 2013 -tb-
 /*    these 3 were actually never used -tb-
-{@"Pixel Bus Test",		0xA8002C, 		1, 			kIpeRegReadable | kIpeRegWriteable },
-{@"Aux Bus Test",		0xA80030, 		1, 			kIpeRegReadable | kIpeRegWriteable },
-{@"Debug Status",		0xA80034,  		1, 			kIpeRegReadable | kIpeRegWriteable },
+{@"Pixel Bus Test",		0xA8002C, 		1, 			kIpeRegReadable | kIpeRegWriteable  },
+{@"Aux Bus Test",		0xA80030, 		1, 			kIpeRegReadable | kIpeRegWriteable  },
+{@"Debug Status",		0xA80034,  		1, 			kIpeRegReadable | kIpeRegWriteable  },
 */
-{@"Veto Counter (MSB)",	0xA80080, 		1,			kIpeRegReadable },	
-{@"Veto Counter (LSB)",	0xA80084,		1,			kIpeRegReadable },	
-{@"Dead Counter (MSB)",	0xA80088, 		1,			kIpeRegReadable },	
-{@"Dead Counter (LSB)",	0xA8008C, 		1,			kIpeRegReadable },	
-{@"Run Counter  (MSB)",	0xA80090,		1,			kIpeRegReadable },	
-{@"Run Counter  (LSB)",	0xA80094, 		1,			kIpeRegReadable },	
-{@"Second Set",			0xB00000,  		1, 			kIpeRegReadable | kIpeRegWriteable }, 
-{@"Second Counter",		0xB00004, 		1,			kIpeRegReadable },
-{@"Sub-second Counter",	0xB00008, 		1,			kIpeRegReadable }, 
+{@"Veto Counter (MSB)",	0xA80080, 		1,			kIpeRegReadable                     },
+{@"Veto Counter (LSB)",	0xA80084,		1,			kIpeRegReadable                     },
+{@"Dead Counter (MSB)",	0xA80088, 		1,			kIpeRegReadable                     },
+{@"Dead Counter (LSB)",	0xA8008C, 		1,			kIpeRegReadable                     },
+{@"Run Counter  (MSB)",	0xA80090,		1,			kIpeRegReadable                     },
+{@"Run Counter  (LSB)",	0xA80094, 		1,			kIpeRegReadable                     },
+{@"Second Set",			0xB00000,  		1, 			kIpeRegReadable | kIpeRegWriteable  },
+{@"Second Counter",		0xB00004, 		1,			kIpeRegReadable                     },
+{@"Sub-second Counter",	0xB00008, 		1,			kIpeRegReadable                     },
 //Auger Registers Removed for Bipolar Filter Upgrade 2013 -tb-
 /*      they were actually never used for KATRIN, but will result in Pbus timeouts -tb-
-{@"Page Manager",		0xB80000,  		1, 			kIpeRegReadable | kIpeRegWriteable },
-{@"Trigger Timing",		0xB80004,  		1, 			kIpeRegReadable | kIpeRegWriteable },
+{@"Page Manager",		0xB80000,  		1, 			kIpeRegReadable | kIpeRegWriteable  },
+{@"Trigger Timing",		0xB80004,  		1, 			kIpeRegReadable | kIpeRegWriteable  },
 */
-{@"Page Select",		0xB80008, 		1,			kIpeRegReadable },
+{@"Page Select",		0xB80008, 		1,			kIpeRegReadable                     },
 /*
-{@"Number of Pages",	0xB8000C, 		1,			kIpeRegReadable },
-{@"Page Numbers",		0xB81000,		64, 		kIpeRegReadable | kIpeRegWriteable },
-{@"Event Status",		0xB82000,		64,			kIpeRegReadable },
-{@"Readout CSR",		0xC00000,		1,			kIpeRegReadable | kIpeRegWriteable },
-{@"Buffer Select",		0xC00004,		1,			kIpeRegReadable | kIpeRegWriteable },
-{@"Readout Definition",	0xC10000,	  2048,			kIpeRegReadable | kIpeRegWriteable },			
+{@"Number of Pages",	0xB8000C, 		1,			kIpeRegReadable                     },
+{@"Page Numbers",		0xB81000,		64, 		kIpeRegReadable | kIpeRegWriteable  },
+{@"Event Status",		0xB82000,		64,			kIpeRegReadable                     },
+{@"Readout CSR",		0xC00000,		1,			kIpeRegReadable | kIpeRegWriteable  },
+{@"Buffer Select",		0xC00004,		1,			kIpeRegReadable | kIpeRegWriteable  },
+{@"Readout Definition",	0xC10000,	  2048,			kIpeRegReadable | kIpeRegWriteable  },
 */
-{@"TP Timing",			0xC80000,	   128,			kIpeRegReadable | kIpeRegWriteable },	
-{@"TP Shape",			0xC81000,	   512,			kIpeRegReadable | kIpeRegWriteable },	
-{@"I2C Command",		0xC00000,		1,			kIpeRegReadable },                     //was 0xD00000 (Auger)
-{@"EPC Command",		0xC00004,		1,			kIpeRegReadable | kIpeRegWriteable },  //was 0xD00004 (Auger)
-{@"Board ID (LSB)",		0xC00008,		1,			kIpeRegReadable },                     //was 0xD00008 (Auger)
-{@"Board ID (MSB)",		0xC0000C,		1,			kIpeRegReadable },                     //was 0xD0000C (Auger)
-{@"PROMs Control",		0xC00010,		1,			kIpeRegReadable | kIpeRegWriteable },  //was 0xD00010 (Auger)
-{@"PROMs Buffer",		0xC00100,		256,		kIpeRegReadable | kIpeRegWriteable },  //was 0xD00100 (Auger)
-{@"DataFIFO",		    0xD00000,	  0x10000,		kIpeRegReadable | kIpeRegWriteable },
-{@"FIFO Mode",			0xE00000,	    1,	    	kIpeRegReadable | kIpeRegWriteable },
-{@"FIFO Status",		0xE00004,	    1,	    	kIpeRegReadable | kIpeRegWriteable },
-{@"PAE Offset",		    0xE00008,	    1,	    	kIpeRegReadable | kIpeRegWriteable },
-{@"PAF Offset",		    0xE0000C,	    1,	    	kIpeRegReadable | kIpeRegWriteable },
-{@"FIFO Csr",		    0xE00010,	    1,	    	kIpeRegReadable | kIpeRegWriteable },
-{@"FIFOx Request",		0xE00014,	    1,	    	kIpeRegReadable | kIpeRegWriteable },
-{@"FIFO Mask",		    0xE00018,	    1,	    	kIpeRegReadable | kIpeRegWriteable },
+{@"TP Timing",			0xC80000,	   128,			kIpeRegReadable | kIpeRegWriteable  },
+{@"TP Shape",			0xC81000,	   512,			kIpeRegReadable | kIpeRegWriteable  },
+{@"I2C Command",		0xC00000,		1,			kIpeRegReadable                     },  //was 0xD00000 (Auger)
+{@"EPC Command",		0xC00004,		1,			kIpeRegReadable | kIpeRegWriteable  },  //was 0xD00004 (Auger)
+{@"Board ID (LSB)",		0xC00008,		1,			kIpeRegReadable                     },  //was 0xD00008 (Auger)
+{@"Board ID (MSB)",		0xC0000C,		1,			kIpeRegReadable                     },  //was 0xD0000C (Auger)
+{@"PROMs Control",		0xC00010,		1,			kIpeRegReadable | kIpeRegWriteable  },  //was 0xD00010 (Auger)
+{@"PROMs Buffer",		0xC00100,		256,		kIpeRegReadable | kIpeRegWriteable  },  //was 0xD00100 (Auger)
+{@"DataFIFO",		    0xD00000,	  0x10000,		kIpeRegReadable | kIpeRegWriteable  },
+{@"FIFO Mode",			0xE00000,	    1,	    	kIpeRegReadable | kIpeRegWriteable  },
+{@"FIFO Status",		0xE00004,	    1,	    	kIpeRegReadable | kIpeRegWriteable  },
+{@"PAE Offset",		    0xE00008,	    1,	    	kIpeRegReadable | kIpeRegWriteable  },
+{@"PAF Offset",		    0xE0000C,	    1,	    	kIpeRegReadable | kIpeRegWriteable  },
+{@"FIFO Csr",		    0xE00010,	    1,	    	kIpeRegReadable | kIpeRegWriteable  },
+{@"FIFOx Request",		0xE00014,	    1,	    	kIpeRegReadable | kIpeRegWriteable  },
+{@"FIFO Mask",		    0xE00018,	    1,	    	kIpeRegReadable | kIpeRegWriteable  },
 
 //{@"ADC Data",			0xE00000,	 0x8000,		kIpeRegReadable | kIpeRegWriteable }, //OBSOLETE (Auger)
 //{@"Data Block RW",		0xF00000 Data Block RW
@@ -281,7 +281,7 @@ NSString* ORKatrinV4SLTcpuLock							= @"ORKatrinV4SLTcpuLock";
 	[super setGuardian:aGuardian];
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Notifications
+#pragma mark •••Notifications
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -317,26 +317,10 @@ NSString* ORKatrinV4SLTcpuLock							= @"ORKatrinV4SLTcpuLock";
                     selector : @selector(runIsAboutToChangeState:)
                         name : ORRunAboutToChangeState
                       object : nil];
-
-
-
-//-tb- test -> is sent whenever a card in the crate object was added
-    [notifyCenter addObserver : self
-                     selector : @selector(viewChanged:)
-                         name : ORGroupObjectsAdded
-                       object : nil];
-    
-
 }
 
 
-- (void) viewChanged:(NSNotification*)aNotification
-{
-	//NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
-    //[super viewChanged: aNotification];
-}
-
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+#pragma mark •••Accessors
 
 - (uint32_t) pixelBusEnableReg
 {
@@ -674,13 +658,9 @@ NSString* ORKatrinV4SLTcpuLock							= @"ORKatrinV4SLTcpuLock";
 	}
 	/**/
     #endif
-
 }
 
-
-
-
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+#pragma mark •••Accessors
 
 - (NSString*) patternFilePath
 {
@@ -1317,7 +1297,6 @@ NSLog(@"  arguments: %@ \n" , arguments);
 	NSLogFont(aFont,@"IntA Enable    : %@\n", IsBitSet(data,kCtrlIntEnMask)?@"Enabled":@"Disabled");
 }
 
-
 - (void) writeControlReg
 {
 	[self writeReg:kKatrinV4SLTControlReg value:controlReg];
@@ -1329,10 +1308,6 @@ NSLog(@"  arguments: %@ \n" , arguments);
     controlRegValue &= ~kCtrlRunMask;//
 	[self writeReg:kKatrinV4SLTControlReg value:controlRegValue];
 }
-
-
-
-
 
 - (void) writePixelBusEnableReg
 {
@@ -1350,44 +1325,36 @@ NSLog(@"  arguments: %@ \n" , arguments);
 //for test purposes: read a single event from event FIFO -tb-
 - (void) readSLTEventFifoSingleEvent
 {
-    //DEBUG         
-    NSLog(@"%@::%@    \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//DEBUG -tb-
-
-
-//TODO: TEMPORARY WORKAROUND -tb-
-//TODO: TEMPORARY WORKAROUND -tb-
-//TODO: TEMPORARY WORKAROUND -tb-
-//TODO: TEMPORARY WORKAROUND -tb-
-int kKatrinV4SLTFIFOModeReg = kKatrinV4SLTFIFOCsrReg -4;
-int kKatrinV4SLTDataFIFOReg = kKatrinV4SLTFIFOCsrReg -5;
-
-
-    unsigned long mode,f1,f2,f3,f4;
-    unsigned long flt,chan,energy,sec,subsec,multiplicity,p,toplen,ediff,evID;
-    mode = [self readReg:kKatrinV4SLTFIFOModeReg];
+    unsigned long mode = [self readReg:kKatrinV4SLTFIFOModeReg];
     NSLog(@"FIFO entries: %i events (words: %i) (reg 0x%08x) \n",(mode & 0x3fffff) / 4, mode & 0x3fffff, mode);//DEBUG -tb-
     if(mode & 0x3fffff){
-    	f1 = [self readReg:kKatrinV4SLTDataFIFOReg];
-	    f2 = [self readReg:kKatrinV4SLTDataFIFOReg];
-	    f3 = [self readReg:kKatrinV4SLTDataFIFOReg];
-	    f4 = [self readReg:kKatrinV4SLTDataFIFOReg];
+    	unsigned long f1 = [self readReg:kKatrinV4SLTDataFIFOReg];
+	    unsigned long f2 = [self readReg:kKatrinV4SLTDataFIFOReg];
+	    unsigned long f3 = [self readReg:kKatrinV4SLTDataFIFOReg];
+        unsigned long f4 = [self readReg:kKatrinV4SLTDataFIFOReg];
+        unsigned long f5 = [self readReg:kKatrinV4SLTDataFIFOReg];
+        unsigned long f6 = [self readReg:kKatrinV4SLTDataFIFOReg];
     
-        NSLog(@"FIFO entry: 0x%08x, 0x%08x, 0x%08x, 0x%08x   \n",f1,f2,f3,f4 );//DEBUG -tb-
+        NSLog(@"FIFO entry: 0x%08x, 0x%08x, 0x%08x, 0x%08x   \n",f1,f2,f3,f4,f5,f6 );//DEBUG -tb-
         
-        flt   = (f1 >> 25) & 0x1f;
-        chan   = (f1 >> 20) & 0x1f;
-        energy  = f1  & 0xfffff;
-        sec = f2;
-        subsec = f3  & 0x1ffffff;
-        multiplicity  = (f3 >> 25) & 0x1f;
-        p  = (f3 >> 31) & 0x1;
-        toplen = f4  & 0x1ff;
-        ediff  = (f4 >> 9) & 0xfff;
-        evID   = (f4 >> 21) & 0x7ff;
+        unsigned long p       = (f1 >> 28) & 0x1;
+        unsigned long subsec  = f1  & 0x1ffffff;
+        unsigned long sec     = f2;
+        unsigned long flt     = (f3 >> 24) & 0x1f;
+        unsigned long chan    = (f3 >> 19) & 0x1f;
+        unsigned long multiplicity  = (f3 >> 14) & 0x1f;
+        unsigned long evID    = f3 & 0x7ff;
+        unsigned long tPeak  = f4  & 0x1ff;
+        unsigned long aPeak  = f4  & 0x1ff;
+        unsigned long tValley  = f5  & 0xfff;
+        unsigned long aValley  = f4  & 0xfff;
+
+        unsigned long energy  = f6  & 0xfffff;
         
-        NSLog(@"FIFO entry:  flt: %i,chan: %i,energy: %i,sec: %i,subsec: %i   \n",flt,chan,energy,sec,subsec );//DEBUG -tb-
-        NSLog(@"FIFO entry:  multiplicity: %i,p: %i,toplen: %i,ediff: %i,evID: %i   \n",multiplicity,p,toplen,ediff,evID );//DEBUG -tb-
-        NSLog(@"-------------------------------------------------------------\n" );//DEBUG -tb-
+        NSLog(@"FIFO entry:  flt:    %lu  chan: %lu    energy: %lu    sec: %lu    subsec: %lu\n",flt,chan,energy,sec,subsec );
+        NSLog(@"FIFO entry:  multi.: %lu   p: %lu    evID: %lu\n",multiplicity,p,evID );
+        NSLog(@"FIFO entry:  tPeak:  %lu  tValley: %lu    aPeak: %lu    aValley: %lu\n",tPeak,tValley,aPeak,aValley );
+        NSLog(@"-------------------------------------------------------------\n" );
 
     }
 
@@ -1398,13 +1365,6 @@ int kKatrinV4SLTDataFIFOReg = kKatrinV4SLTFIFOCsrReg -5;
 	val = [self readReg:kKatrinV4SLTPixelBusEnableReg];
 	[self setPixelBusEnableReg:val];	
 }
-
-
-
-
-
-
-
 
 - (void) loadSecondsReg
 {
@@ -1867,7 +1827,7 @@ return;
 	return objDictionary;
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Data Taker
+#pragma mark •••Data Taker
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
@@ -2290,7 +2250,7 @@ return;
 	//nothing to do... this just removes a run-time exception
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢SBC_Linking protocol
+#pragma mark •••SBC_Linking protocol
 - (NSString*) driverScriptName {return nil;} //no driver
 - (NSString*) driverScriptInfo {return @"";}
 
@@ -2315,7 +2275,7 @@ return;
 }
 
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢SBC Data Structure Setup
+#pragma mark •••SBC Data Structure Setup
 - (void) load_HW_Config
 {
 	int index = 0;

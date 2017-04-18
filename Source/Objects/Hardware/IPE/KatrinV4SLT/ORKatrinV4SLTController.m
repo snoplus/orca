@@ -19,7 +19,7 @@
 //-------------------------------------------------------------
 
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Imported Files
+#pragma mark •••Imported Files
 #import "ORKatrinV4SLTController.h"
 #import "ORKatrinV4SLTModel.h"
 #import "TimedWorker.h"
@@ -56,7 +56,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 @implementation ORKatrinV4SLTController
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
+#pragma mark •••Initialization
 -(id)init
 {
     self = [super initWithWindowNibName:@"KatrinV4SLT"];
@@ -64,7 +64,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
     return self;
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
+#pragma mark •••Initialization
 - (void) dealloc
 {
 	[xImage release];
@@ -88,7 +88,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[self populatePullDown];
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Notifications
+#pragma mark •••Notifications
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -222,7 +222,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+#pragma mark •••Interface Management
 
 - (void) pixelBusEnableRegChanged:(NSNotification*)aNote
 {
@@ -546,8 +546,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 {
 	[model readSLTEventFifoSingleEvent];	
 }
-
-
 
 - (void) pixelBusEnableRegTextFieldAction:(id)sender
 {
