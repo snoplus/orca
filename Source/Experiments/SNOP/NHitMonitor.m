@@ -21,6 +21,7 @@
 #define SWAP_INT32(a,b) swap_int32((uint32_t *)(a),(b))
 
 NSString* ORNhitMonitorUpdateNotification = @"ORNhitMonitorUpdateNotification";
+NSString* ORNhitMonitorResultsNotification = @"ORNhitMonitorResultsNotification";
 
 // PH 04/23/98
 // Swap 4-byte integer/floats between native and external format
@@ -68,7 +69,7 @@ static int read_record(int sock, struct GenericRecordHeader *header, char *buf)
     return 0;
 }
 
-static int get_threshold(int *counts, int num_pulses)
+static float get_threshold(int *counts, int max_nhit, int num_pulses)
 {
     /* Returns the trigger threshold for a given NHIT trigger by looking for
      * the nhit at which the trigger rate crosses 50%.
@@ -76,14 +77,14 @@ static int get_threshold(int *counts, int num_pulses)
      * Returns -1 if no point crosses 50%. */
     int i;
 
-    if (counts[0] > num_pulses/2) {
+    if (counts[0] > num_pulses/2.0) {
         /* we are already above threshold at 0 nhit */
         return 0;
     }
 
-    for (i = 0; i < num_pulses; i++) {
-        if (counts[i] > num_pulses/2) {
-            return (i-1) + (num_pulses/2 - counts[i-1])/(counts[i] - counts[i-1]);
+    for (i = 1; i < max_nhit; i++) {
+        if (counts[i] > num_pulses/2.0) {
+            return (i-1) + (num_pulses/2.0 - counts[i-1])/(counts[i] - counts[i-1]);
         }
     }
 
@@ -435,7 +436,7 @@ err:
         }
 
         if (maxNhit > [channels count]) {
-            NSLogColor([NSColor redColor], @"nhit monitor: crate %i only has %i channels with triggers enabled, but max nhit is %i", crate, [channels count], maxNhit);
+            NSLogColor([NSColor redColor], @"nhit monitor: crate %i only has %i channels with triggers enabled, but max nhit is %i\n", crate, [channels count], maxNhit);
             return;
         }
 
@@ -575,45 +576,64 @@ err:
     [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORNhitMonitorUpdateNotification object:self userInfo:@{@"nhit": [NSNumber numberWithInt:i], @"maxNhit": [NSNumber numberWithInt:maxNhit]}];
 
     /* print trigger thresholds */
-    int threshold_n100_lo = get_threshold(nhitRecord.nhit_100_lo, numPulses);
+    float threshold_n100_lo = get_threshold(nhitRecord.nhit_100_lo, maxNhit, numPulses);
 
-    if (threshold_n100_lo == -1) {
+    if (threshold_n100_lo < 0) {
         NSLog(@"nhit_100_lo  threshold is > %i nhit\n", maxNhit);
     } else {
         NSLog(@"nhit_100_lo  threshold is %.2f nhit\n", threshold_n100_lo);
     }
 
-    int threshold_n100_med = get_threshold(nhitRecord.nhit_100_med, numPulses);
+    float threshold_n100_med = get_threshold(nhitRecord.nhit_100_med, maxNhit, numPulses);
 
-    if (threshold_n100_med == -1) {
+    if (threshold_n100_med < 0) {
         NSLog(@"nhit_100_med threshold is > %i nhit\n", maxNhit);
     } else {
         NSLog(@"nhit_100_med threshold is %.2f nhit\n", threshold_n100_med);
     }
 
-    int threshold_n100_hi = get_threshold(nhitRecord.nhit_100_hi, numPulses);
+    float threshold_n100_hi = get_threshold(nhitRecord.nhit_100_hi, maxNhit, numPulses);
 
-    if (threshold_n100_hi == -1) {
+    if (threshold_n100_hi < 0) {
         NSLog(@"nhit_100_hi  threshold is > %i nhit\n", maxNhit);
     } else {
         NSLog(@"nhit_100_hi  threshold is %.2f nhit\n", threshold_n100_hi);
     }
 
-    int threshold_n20 = get_threshold(nhitRecord.nhit_20, numPulses);
+    float threshold_n20 = get_threshold(nhitRecord.nhit_20, maxNhit, numPulses);
 
-    if (threshold_n20 == -1) {
+    NSLog(@"numPulses = %i\n", numPulses);
+    for (i = 0; i < maxNhit; i++) {
+        NSLog(@"n20[%i] = %i\n", i, nhitRecord.nhit_20[i]);
+    }
+
+    if (threshold_n20 < 0) {
         NSLog(@"nhit_20      threshold is > %i nhit\n", maxNhit);
     } else {
         NSLog(@"nhit_20      threshold is %.2f nhit\n", threshold_n20);
     }
 
-    int threshold_n20_lb = get_threshold(nhitRecord.nhit_20_lb, numPulses);
+    float threshold_n20_lb = get_threshold(nhitRecord.nhit_20_lb, maxNhit, numPulses);
 
-    if (threshold_n20_lb == -1) {
+    NSLog(@"numPulses = %i\n", numPulses);
+    for (i = 0; i < maxNhit; i++) {
+        NSLog(@"n20_lb[%i] = %i\n", i, nhitRecord.nhit_20_lb[i]);
+    }
+
+    if (threshold_n20_lb < 0) {
         NSLog(@"nhit_20_lb   threshold is > %i nhit\n", maxNhit);
     } else {
         NSLog(@"nhit_20_lb   threshold is %.2f nhit\n", threshold_n20_lb);
     }
+
+    NSDictionary *userInfo = @{@"n100_lo": @(threshold_n100_lo),
+                               @"n100_med": @(threshold_n100_med),
+                               @"n100_hi": @(threshold_n100_hi),
+                               @"n20": @(threshold_n20),
+                               @"n20_lb": @(threshold_n20_lb),
+                               @"max_nhit": @(maxNhit)};
+
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORNhitMonitorResultsNotification object:self userInfo:userInfo];
 
     NSMutableString *command = [NSMutableString stringWithFormat:@"INSERT INTO nhit_monitor (crate, num_pulses, pulser_rate, nhit_100_lo, nhit_100_med, nhit_100_hi, nhit_20, nhit_20_lb) VALUES (%i, %i, %i, ", crate, numPulses, pulserRate];
 

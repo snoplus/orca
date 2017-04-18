@@ -153,6 +153,7 @@
     IBOutlet NSTextField *nhitMonitorNumPulses;
     IBOutlet NSTextField *nhitMonitorMaxNhit;
     IBOutlet NSProgressIndicator *nhitMonitorProgress;
+    IBOutlet NSMatrix *nhitMonitorResultsMatrix;
     /* Settings for running the nhit monitor automatically during runs. */
     IBOutlet NSButton *nhitMonitorAutoRunButton;
     IBOutlet NSMatrix *nhitMonitorRunTypeWordMatrix;

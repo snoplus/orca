@@ -141,7 +141,6 @@ tellieRunFiles = _tellieRunFiles;
     [self initDebugDBConnectionHistory];
 
     nhitMonitor = [[NHitMonitor alloc] init];
-    nhitMonitorTimer = nil;
     [[self undoManager] enableUndoRegistration];
 
     return self;
@@ -359,7 +358,6 @@ tellieRunFiles = _tellieRunFiles;
     [self setNhitMonitorCrateMask:[decoder decodeIntForKey:@"nhitMonitorCrateMask"]];
     [self setNhitMonitorTimeInterval:[decoder decodeDoubleForKey:@"nhitMonitorTimeInterval"]];
     [self setNhitMonitorMaxNhit:[decoder decodeIntForKey:@"nhitMonitorMaxNhit"]];
-    nhitMonitorTimer = nil;
     [[self undoManager] enableUndoRegistration];
 
     //Set extra security
@@ -1405,13 +1403,18 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 {
     nhitMonitorAutoRun = run;
 
+    NSLog(@"setnhitmonitorautorun\n");
+    NSLog(@"nhitMonitorTimer = %p\n", nhitMonitorTimer);
+
     /* Stop any current timer. */
     if (nhitMonitorTimer) {
+        NSLog(@"invalidating old timer\n");
         [nhitMonitorTimer invalidate];
         nhitMonitorTimer = nil;
     }
 
     if (nhitMonitorAutoRun) {
+        NSLog(@"setting up new timer with time %.2f sec\n", nhitMonitorTimeInterval);
         nhitMonitorTimer = [NSTimer scheduledTimerWithTimeInterval:nhitMonitorTimeInterval target:self selector:@selector(runNhitMonitorAutomatically) userInfo:nil repeats:YES];
     }
 
@@ -1449,13 +1452,18 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 {
     nhitMonitorTimeInterval = interval;
 
+    NSLog(@"setnhitmonitortimeinterval\n");
+    NSLog(@"nhitMonitorTimer = %p\n", nhitMonitorTimer);
+
     /* Stop any current timer. */
     if (nhitMonitorTimer) {
+        NSLog(@"invalidating old timer\n");
         [nhitMonitorTimer invalidate];
         nhitMonitorTimer = nil;
     }
 
     if (nhitMonitorAutoRun) {
+        NSLog(@"setting up new timer with time %.2f sec\n", nhitMonitorTimeInterval);
         nhitMonitorTimer = [NSTimer scheduledTimerWithTimeInterval:nhitMonitorTimeInterval target:self selector:@selector(runNhitMonitorAutomatically) userInfo:nil repeats:YES];
     }
 
