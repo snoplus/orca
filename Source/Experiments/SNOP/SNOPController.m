@@ -554,7 +554,9 @@ snopGreenColor;
 
 - (void) nhitMonitor: (NSNotification*) aNote
 {
-    if ([model nhitMonitorRunning]) {
+    NSLog(@"running = %s\n", [[model nhitMonitor] isRunning] ? "Yes" : "No");
+    NSLog(@"cancelled = %s\n", [[model nhitMonitor] isCancelled] ? "Yes" : "No");
+    if ([[model nhitMonitor] isRunning] && ![[model nhitMonitor] isCancelled]) {
         [runNhitMonitorButton setEnabled:NO];
         [stopNhitMonitorButton setEnabled:YES];
     } else {

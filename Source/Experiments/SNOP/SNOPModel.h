@@ -260,7 +260,7 @@ BOOL isNotRunningOrIsInMaintenance();
 - (void) shipRHDRRecord;
 
 #pragma mark ¥¥¥Accessors
-- (BOOL) nhitMonitorRunning;
+- (NHitMonitor *) nhitMonitor;
 - (int) nhitMonitorCrate;
 - (void) setNhitMonitorCrate: (int) crate;
 - (int) nhitMonitorPulserRate;

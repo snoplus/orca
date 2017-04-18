@@ -229,6 +229,12 @@ static int get_nhit_trigger_count(char *err, RedisClient *mtc, int sock, char *b
     return [runningThread isExecuting];
 }
 
+- (BOOL) isCancelled
+{
+    /* Returns if the nhit monitor was cancelled. */
+    return [runningThread isCancelled];
+}
+
 - (void) stop
 {
     /* Stop the nhit monitor. */
@@ -519,7 +525,7 @@ err:
         NSLog(@"nhit monitor done\n");
 
 err:
-        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORNhitMonitorNotification object:self userInfo:nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORNhitMonitorNotification object:self userInfo:nil];
     }
 }
 

@@ -1353,9 +1353,9 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 
 #pragma mark ¥¥¥Accessors
 
-- (BOOL) nhitMonitorRunning
+- (NHitMonitor *) nhitMonitor
 {
-    return [nhitMonitor isRunning];
+    return nhitMonitor;
 }
 
 - (int) nhitMonitorCrate
