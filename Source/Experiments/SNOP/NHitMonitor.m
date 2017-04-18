@@ -602,11 +602,6 @@ err:
 
     float threshold_n20 = get_threshold(nhitRecord.nhit_20, maxNhit, numPulses);
 
-    NSLog(@"numPulses = %i\n", numPulses);
-    for (i = 0; i < MAX_NHIT; i++) {
-        NSLog(@"n20[%i] = %i\n", i, nhitRecord.nhit_20[i]);
-    }
-
     if (threshold_n20 < 0) {
         NSLog(@"nhit_20      threshold is > %i nhit\n", maxNhit);
     } else {
@@ -614,11 +609,6 @@ err:
     }
 
     float threshold_n20_lb = get_threshold(nhitRecord.nhit_20_lb, maxNhit, numPulses);
-
-    NSLog(@"numPulses = %i\n", numPulses);
-    for (i = 0; i < MAX_NHIT; i++) {
-        NSLog(@"n20_lb[%i] = %i\n", i, nhitRecord.nhit_20_lb[i]);
-    }
 
     if (threshold_n20_lb < 0) {
         NSLog(@"nhit_20_lb   threshold is > %i nhit\n", maxNhit);
