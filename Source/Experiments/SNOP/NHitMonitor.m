@@ -22,6 +22,7 @@
 
 NSString* ORNhitMonitorUpdateNotification = @"ORNhitMonitorUpdateNotification";
 NSString* ORNhitMonitorResultsNotification = @"ORNhitMonitorResultsNotification";
+NSString* ORNhitMonitorNotification = @"ORNhitMonitorNotification";
 
 // PH 04/23/98
 // Swap 4-byte integer/floats between native and external format
@@ -257,6 +258,8 @@ static int get_nhit_trigger_count(char *err, RedisClient *mtc, int sock, char *b
 
     [runningThread initWithTarget:self selector:@selector(run:) object:args];
     [runningThread start];
+
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORNhitMonitorNotification object:self userInfo:nil];
 }
 
 - (int) connect
@@ -362,7 +365,7 @@ err:
 
         if ([snops count] == 0) {
             NSLogColor([NSColor redColor], @"nhit monitor: unable to find SNO+ model object.\n");
-            return;
+            goto err;
         }
 
         snop = [snops objectAtIndex:0];
@@ -387,17 +390,17 @@ err:
 
         if (!xl3) {
             NSLogColor([NSColor redColor], @"nhit monitor: unable to find XL3 %i\n", crate);
-            return;
+            goto err;
         }
 
         if (![xl3 isTriggerON]) {
             NSLogColor([NSColor redColor], @"nhit monitor: crate %i triggers are off!\n", crate);
-            return;
+            goto err;
         }
 
         if (maxNhit > MAX_NHIT) {
             NSLogColor([NSColor redColor], @"nhit monitor: max nhit must be less than %i\n", MAX_NHIT);
-            return;
+            goto err;
         }
 
         /* Disable all pedestals. */
@@ -437,13 +440,13 @@ err:
 
         if (maxNhit > [channels count]) {
             NSLogColor([NSColor redColor], @"nhit monitor: crate %i only has %i channels with triggers enabled, but max nhit is %i\n", crate, [channels count], maxNhit);
-            return;
+            goto err;
         }
 
         /* Connect to the data stream server. */
         if ([self connect]) {
             NSLogColor([NSColor redColor], @"nhit monitor: failed to connect to the data stream server\n");
-            return;
+            goto err;
         }
 
         @try {
@@ -461,13 +464,13 @@ err:
                        "hardware state. error: %@ reason: %@\n",
                        [e name], [e reason]);
             [self disconnect];
-            return;
+            goto err;
         }
 
         if ((gt_mask & PULSE_GT) == 0) {
             NSLogColor([NSColor redColor], @"nhit monitor: PULSE_GT is not masked in!\n");
             [self disconnect];
-            return;
+            goto err;
         }
 
         @try {
@@ -514,6 +517,9 @@ err:
         }
 
         NSLog(@"nhit monitor done\n");
+
+err:
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORNhitMonitorNotification object:self userInfo:nil];
     }
 }
 

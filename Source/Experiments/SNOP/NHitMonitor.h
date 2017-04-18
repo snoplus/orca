@@ -63,3 +63,4 @@ struct NhitRecord {
 
 extern NSString* ORNhitMonitorUpdateNotification;
 extern NSString* ORNhitMonitorResultsNotification;
+extern NSString* ORNhitMonitorNotification;

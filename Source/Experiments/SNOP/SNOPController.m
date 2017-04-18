@@ -448,6 +448,11 @@ snopGreenColor;
                      selector : @selector(nhitMonitorResults:)
                          name : ORNhitMonitorResultsNotification
                         object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(nhitMonitor:)
+                         name : ORNhitMonitorNotification
+                        object: nil];
 }
 
 - (void) updateWindow
@@ -466,6 +471,7 @@ snopGreenColor;
     [self runsECAChanged:nil];
     [self runTypeWordChanged:nil];
     [self nhitMonitorSettingsChanged:nil];
+    [self nhitMonitor:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -543,6 +549,17 @@ snopGreenColor;
                 [NSString stringWithFormat:@"%.2f",
                  [[userInfo objectForKey:names[i]] floatValue]]];
         }
+    }
+}
+
+- (void) nhitMonitor: (NSNotification*) aNote
+{
+    if ([model nhitMonitorRunning]) {
+        [runNhitMonitorButton setEnabled:NO];
+        [stopNhitMonitorButton setEnabled:YES];
+    } else {
+        [runNhitMonitorButton setEnabled:YES];
+        [stopNhitMonitorButton setEnabled:NO];
     }
 }
 
