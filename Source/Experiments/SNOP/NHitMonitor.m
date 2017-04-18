@@ -243,7 +243,7 @@ static int get_nhit_trigger_count(char *err, RedisClient *mtc, int sock, char *b
 
     NSLog(@"nhit monitor starting\n");
     NSLog(@"crate = %i\n", crate);
-    NSLog(@"pulser rate = %.2f Hz\n", pulserRate);
+    NSLog(@"pulser rate = %i Hz\n", pulserRate);
     NSLog(@"num pulses = %i\n", numPulses);
     NSLog(@"max nhit = %i\n", maxNhit);
 
@@ -390,7 +390,7 @@ err:
         }
 
         if (![xl3 isTriggerON]) {
-            NSLogColor([NSColor redColor], @"nhit monitor: crate %02d triggers are off!\n", crate);
+            NSLogColor([NSColor redColor], @"nhit monitor: crate %i triggers are off!\n", crate);
             return;
         }
 

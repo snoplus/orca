@@ -1245,15 +1245,34 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 {
     /* Run the nhit monitor, but first check to see if we are in a specific
      * run. */
-    static int crate;
+    static int last_crate = -1;
+    int i, crate = -1;
     if ([gOrcaGlobals runInProgress]) {
         if ([gOrcaGlobals runType] & nhitMonitorRunType) {
             /* Run the nhit monitor on the next crate in the crate mask. */
-            crate = (crate + 1) % 20;
-            while ((crate & [self nhitMonitorCrateMask]) == 0) {
-                crate = (crate + 1) % 20;
+            if (last_crate == -1) {
+                /* This is the first time we've run, so just find the first crate. */
+                for (i = 0; i < 20; i++) {
+                    if ([self nhitMonitorCrateMask] & (1L << i)) {
+                        crate = i;
+                        break;
+                    }
+                }
+            } else {
+                for (i = 1; i <= 20; i++) {
+                    if ([self nhitMonitorCrateMask] & (1L << ((last_crate + i) % 20))) {
+                        crate = (last_crate + i) % 20;
+                        break;
+                    }
+                }
+            }
+            if (crate == -1) {
+                /* Nothing is checked. */
+                NSLog(@"nhit monitor is set to run automatically, but no crates are checked.\n");
+                return;
             }
             [nhitMonitor start:crate pulserRate:[self nhitMonitorPulserRate] numPulses:[self nhitMonitorNumPulses] maxNhit:[self nhitMonitorMaxNhit]];
+            last_crate = crate;
         }
     }
 }
