@@ -29,6 +29,18 @@ NSMutableArray* eca_pattern_hcrates();
 #define NCRATES 19
 #define NCARDS 16
 
+NSString* getECAPatternName(int pattern){
+
+    NSArray *pattern_names = [NSArray arrayWithObjects:@"Double Beta",
+                                                       @"Solar",
+                                                       @"Crates",
+                                                       @"Penn Style",
+                                                       @"Channels",
+                                                       @"Half Crates", nil];
+    return pattern_names[pattern];
+    
+}
+
 int getECAPatternNSteps(int pattern){
 
     int nsteps[6] = {8, 32, 19, 9, 32, 38};

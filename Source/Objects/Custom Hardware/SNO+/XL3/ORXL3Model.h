@@ -365,7 +365,7 @@ enum {
 - (void) _loadTriggersAndSequencers;
 - (void) loadTriggersAndSequencers;
 - (void) loadTriggers;
-- (void) disableTriggers;
+- (void) loadTriggersWithCrateMask:(NSArray*)XL3Mask;
 - (void) loadSequencers;
 - (void) selectCards:(unsigned long) selectBits;
 - (void) deselectCards;
