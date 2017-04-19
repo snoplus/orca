@@ -1729,6 +1729,13 @@ err:
     [debugDBName setEnabled:!lockedOrNotRunningMaintenance];
     [debugDBPort setEnabled:!lockedOrNotRunningMaintenance];
     [debugDBClearButton setEnabled:!lockedOrNotRunningMaintenance];
+    [nhitMonitorAutoPulserRate setEnabled:!locked];
+    [nhitMonitorAutoNumPulses setEnabled:!locked];
+    [nhitMonitorAutoMaxNhit setEnabled:!locked];
+    [nhitMonitorRunTypeWordMatrix setEnabled:!locked];
+    [nhitMonitorCrateMaskMatrix setEnabled:!locked];
+    [nhitMonitorTimeInterval setEnabled:!locked];
+
     [rampDownCrateButton setEnabled:notRunningOrInMaintenance];
     [inMaintenanceLabel setHidden:notRunningOrInMaintenance];
 
