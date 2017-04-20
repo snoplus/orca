@@ -149,27 +149,26 @@
 
 - (ORPQResult*) queryString:(NSString *) query
 {
-    ORPQResult* theResult = nil;
-    if ([query length] == 0) return theResult;
+	ORPQResult*	theResult = nil;
+    if([query length]==0)return theResult;
     
-    NSException* e;
-    @synchronized(self) {
-        if (mConnection) {
-            const char *theCQuery = [query UTF8String];
-            PGresult *res = PQexec(mConnection, theCQuery);
+	NSException* e;
+	@synchronized(self){
+        if(mConnection){
+            const char*	theCQuery = [query UTF8String];
+            PGresult *  res = PQexec(mConnection, theCQuery);
             if (PQresultStatus(res) == PGRES_COMMAND_OK || PQresultStatus(res) == PGRES_TUPLES_OK) {
                 theResult = [[[ORPQResult alloc] initWithResPtr:res] autorelease];
-            }
-            else {
+            } else {
                 NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Postgres error %s in %s -in ObjC : %@-\n", PQresultErrorMessage(res), theCQuery, query] forKey:@"Description"];
                 e = [NSException exceptionWithName: @"Posgres Exception"
-                                                         reason: [self getLastErrorMessage]
-                                                       userInfo: userInfo];
+                                            reason: [self getLastErrorMessage]
+                                          userInfo: userInfo];
                 PQclear(res);
                 @throw e;			
             }
         }
-    }
+	}
     return theResult ;
 }
 
