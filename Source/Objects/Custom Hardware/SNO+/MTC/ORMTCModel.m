@@ -506,6 +506,11 @@ tubRegister;
 
 #pragma mark •••Accessors
 
+- (RedisClient *) mtc
+{
+    return mtc;
+}
+
 - (unsigned short) addressModifier
 {
 	return 0x29;

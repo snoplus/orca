@@ -67,6 +67,7 @@ NSString* ORSNOPRunsLockNotification = @"ORSNOPRunsLockNotification";
 NSString* ORSNOPModelSRCollectionChangedNotification = @"ORSNOPModelSRCollectionChangedNotification";
 NSString* ORSNOPModelSRChangedNotification = @"ORSNOPModelSRChangedNotification";
 NSString* ORSNOPModelSRVersionChangedNotification = @"ORSNOPModelSRVersionChangedNotification";
+NSString* ORSNOPModelNhitMonitorChangedNotification = @"ORSNOPModelNhitMonitorChangedNotification";
 
 
 BOOL isNotRunningOrIsInMaintenance()
@@ -111,7 +112,6 @@ tellieRunFiles = _tellieRunFiles;
 
 - (id) init
 {
-    
     self = [super init];
 
     rolloverRun = NO;
@@ -137,8 +137,10 @@ tellieRunFiles = _tellieRunFiles;
     [self setDataServerPort:4005];
     [self setLogServerPort:4001];
 
-	[self initOrcaDBConnectionHistory];
-	[self initDebugDBConnectionHistory];
+    [self initOrcaDBConnectionHistory];
+    [self initDebugDBConnectionHistory];
+
+    nhitMonitor = [[NHitMonitor alloc] init];
     [[self undoManager] enableUndoRegistration];
 
     return self;
@@ -200,7 +202,7 @@ tellieRunFiles = _tellieRunFiles;
 
     ORMTCModel* mtc;
     for (i = 0; i < [mtcs count]; i++) {
-        mtc = [mtcs objectAtIndex:0];
+        mtc = [mtcs objectAtIndex:i];
         [mtc setMTCHost:host];
     }
 
@@ -210,7 +212,7 @@ tellieRunFiles = _tellieRunFiles;
 
     SNOCaenModel* caen;
     for (i = 0; i < [caens count]; i++) {
-        caen = [caens objectAtIndex:0];
+        caen = [caens objectAtIndex:i];
         [caen setMTCHost:host];
     }
 
@@ -346,6 +348,19 @@ tellieRunFiles = _tellieRunFiles;
     if ([self dataPort] == 0) [self setDataServerPort:4005];
     if ([self logPort] == 0) [self setLogServerPort:4001];
 
+    /* Nhit Monitor Settings */
+    [self setNhitMonitorCrate:[decoder decodeIntForKey:@"nhitMonitorCrate"]];
+    [self setNhitMonitorPulserRate:[decoder decodeIntForKey:@"nhitMonitorPulserRate"]];
+    [self setNhitMonitorNumPulses:[decoder decodeIntForKey:@"nhitMonitorNumPulses"]];
+    [self setNhitMonitorMaxNhit:[decoder decodeIntForKey:@"nhitMonitorMaxNhit"]];
+    [self setNhitMonitorAutoRun:[decoder decodeBoolForKey:@"nhitMonitorAutoRun"]];
+    [self setNhitMonitorAutoPulserRate:[decoder decodeIntForKey:@"nhitMonitorAutoPulserRate"]];
+    [self setNhitMonitorAutoNumPulses:[decoder decodeIntForKey:@"nhitMonitorAutoNumPulses"]];
+    [self setNhitMonitorAutoMaxNhit:[decoder decodeIntForKey:@"nhitMonitorAutoMaxNhit"]];
+    [self setNhitMonitorRunType:[decoder decodeIntForKey:@"nhitMonitorRunType"]];
+    [self setNhitMonitorCrateMask:[decoder decodeIntForKey:@"nhitMonitorCrateMask"]];
+    [self setNhitMonitorTimeInterval:[decoder decodeDoubleForKey:@"nhitMonitorTimeInterval"]];
+    [self setNhitMonitorMaxNhit:[decoder decodeIntForKey:@"nhitMonitorMaxNhit"]];
     [[self undoManager] enableUndoRegistration];
 
     //Set extra security
@@ -356,6 +371,8 @@ tellieRunFiles = _tellieRunFiles;
 
     /* initialize our connection to the XL3 server */
     xl3_server = [[RedisClient alloc] initWithHostName:xl3Host withPort:xl3Port];
+
+    nhitMonitor = [[NHitMonitor alloc] init];
 
     return self;
 }
@@ -405,6 +422,7 @@ tellieRunFiles = _tellieRunFiles;
     [dataHost release];
     [logHost release];
     [anECARun release];
+    [NHitMonitor release];
     [super dealloc];
 }
 
@@ -1219,6 +1237,61 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     }
 }
 
+- (void) runNhitMonitor
+{
+    [nhitMonitor start:[self nhitMonitorCrate]
+                 pulserRate:[self nhitMonitorPulserRate]
+                 numPulses:[self nhitMonitorNumPulses]
+                 maxNhit:[self nhitMonitorMaxNhit]];
+}
+
+- (void) runNhitMonitorAutomatically
+{
+    /* Run the nhit monitor, but first check to see if we are in a specific
+     * run. */
+    static int last_crate = -1;
+    int i, crate = -1;
+    if ([gOrcaGlobals runInProgress]) {
+        if ([gOrcaGlobals runType] & nhitMonitorRunType) {
+            /* Run the nhit monitor on the next crate in the crate mask. */
+            if (last_crate == -1) {
+                /* This is the first time we've run, so just find the first
+                 * crate. */
+                for (i = 0; i < 20; i++) {
+                    if ([self nhitMonitorCrateMask] & (1L << i)) {
+                        crate = i;
+                        break;
+                    }
+                }
+            } else {
+                for (i = 1; i <= 20; i++) {
+                    if ([self nhitMonitorCrateMask] & \
+                        (1L << ((last_crate + i) % 20))) {
+                        crate = (last_crate + i) % 20;
+                        break;
+                    }
+                }
+            }
+            if (crate == -1) {
+                /* Nothing is checked. */
+                NSLog(@"nhit monitor is set to run automatically, "
+                      "but no crates are checked.\n");
+                return;
+            }
+            [nhitMonitor start:crate
+                         pulserRate:[self nhitMonitorAutoPulserRate]
+                         numPulses:[self nhitMonitorAutoNumPulses]
+                         maxNhit:[self nhitMonitorAutoMaxNhit]];
+            last_crate = crate;
+        }
+    }
+}
+
+- (void) stopNhitMonitor
+{
+    [nhitMonitor stop];
+}
+
 - (void) updateRHDRSruct
 {
     //form run info
@@ -1288,6 +1361,154 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 }
 
 #pragma mark ¥¥¥Accessors
+
+- (NHitMonitor *) nhitMonitor
+{
+    return nhitMonitor;
+}
+
+- (int) nhitMonitorCrate
+{
+    return nhitMonitorCrate;
+}
+
+- (void) setNhitMonitorCrate: (int) crate
+{
+    nhitMonitorCrate = crate;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelNhitMonitorChangedNotification object:self];
+}
+
+- (int) nhitMonitorPulserRate
+{
+    return nhitMonitorPulserRate;
+}
+
+- (void) setNhitMonitorPulserRate: (int) pulserRate
+{
+    nhitMonitorPulserRate = pulserRate;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelNhitMonitorChangedNotification object:self];
+}
+
+- (int) nhitMonitorNumPulses
+{
+    return nhitMonitorNumPulses;
+}
+
+- (void) setNhitMonitorNumPulses: (int) numPulses
+{
+    nhitMonitorNumPulses = numPulses;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelNhitMonitorChangedNotification object:self];
+}
+
+- (int) nhitMonitorMaxNhit
+{
+    return nhitMonitorMaxNhit;
+}
+
+- (void) setNhitMonitorMaxNhit: (int) maxNhit
+{
+    nhitMonitorMaxNhit = maxNhit;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelNhitMonitorChangedNotification object:self];
+}
+
+- (int) nhitMonitorAutoRun
+{
+    return nhitMonitorAutoRun;
+}
+
+- (void) setNhitMonitorAutoRun: (BOOL) run
+{
+    nhitMonitorAutoRun = run;
+
+    /* Stop any current timer. */
+    if (nhitMonitorTimer) {
+        [nhitMonitorTimer invalidate];
+        nhitMonitorTimer = nil;
+    }
+
+    if (nhitMonitorAutoRun) {
+        nhitMonitorTimer = [NSTimer scheduledTimerWithTimeInterval:nhitMonitorTimeInterval target:self selector:@selector(runNhitMonitorAutomatically) userInfo:nil repeats:YES];
+    }
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelNhitMonitorChangedNotification object:self];
+}
+
+- (int) nhitMonitorAutoPulserRate
+{
+    return nhitMonitorAutoPulserRate;
+}
+
+- (void) setNhitMonitorAutoPulserRate: (int) pulserRate
+{
+    nhitMonitorAutoPulserRate = pulserRate;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelNhitMonitorChangedNotification object:self];
+}
+
+- (int) nhitMonitorAutoNumPulses
+{
+    return nhitMonitorAutoNumPulses;
+}
+
+- (void) setNhitMonitorAutoNumPulses: (int) numPulses
+{
+    nhitMonitorAutoNumPulses = numPulses;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelNhitMonitorChangedNotification object:self];
+}
+
+- (int) nhitMonitorAutoMaxNhit
+{
+    return nhitMonitorAutoMaxNhit;
+}
+
+- (void) setNhitMonitorAutoMaxNhit: (int) maxNhit
+{
+    nhitMonitorAutoMaxNhit = maxNhit;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelNhitMonitorChangedNotification object:self];
+}
+
+- (uint32_t) nhitMonitorRunType
+{
+    return nhitMonitorRunType;
+}
+
+- (void) setNhitMonitorRunType: (uint32_t) runType
+{
+    nhitMonitorRunType = runType;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelNhitMonitorChangedNotification object:self];
+}
+
+- (uint32_t) nhitMonitorCrateMask
+{
+    return nhitMonitorCrateMask;
+}
+
+- (void) setNhitMonitorCrateMask: (uint32_t) mask
+{
+    nhitMonitorCrateMask = mask;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelNhitMonitorChangedNotification object:self];
+}
+
+- (NSTimeInterval) nhitMonitorTimeInterval
+{
+    return nhitMonitorTimeInterval;
+}
+
+- (void) setNhitMonitorTimeInterval: (NSTimeInterval) interval
+{
+    nhitMonitorTimeInterval = interval;
+
+    /* Stop any current timer. */
+    if (nhitMonitorTimer) {
+        [nhitMonitorTimer invalidate];
+        nhitMonitorTimer = nil;
+    }
+
+    if (nhitMonitorAutoRun) {
+        nhitMonitorTimer = [NSTimer scheduledTimerWithTimeInterval:nhitMonitorTimeInterval target:self selector:@selector(runNhitMonitorAutomatically) userInfo:nil repeats:YES];
+    }
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelNhitMonitorChangedNotification object:self];
+}
 
 - (void) clearOrcaDBConnectionHistory
 {
@@ -1595,6 +1816,18 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     [encoder encodeObject:[self logHost] forKey:@"logHost"];
     [encoder encodeInt:[self logPort] forKey:@"logPort"];
 
+    /* Nhit Monitor Settings */
+    [encoder encodeInt:[self nhitMonitorCrate] forKey:@"nhitMonitorCrate"];
+    [encoder encodeInt:[self nhitMonitorPulserRate] forKey:@"nhitMonitorPulserRate"];
+    [encoder encodeInt:[self nhitMonitorNumPulses] forKey:@"nhitMonitorNumPulses"];
+    [encoder encodeInt:[self nhitMonitorMaxNhit] forKey:@"nhitMonitorMaxNhit"];
+    [encoder encodeBool:[self nhitMonitorAutoRun] forKey:@"nhitMonitorAutoRun"];
+    [encoder encodeInt:[self nhitMonitorAutoPulserRate] forKey:@"nhitMonitorAutoPulserRate"];
+    [encoder encodeInt:[self nhitMonitorAutoNumPulses] forKey:@"nhitMonitorAutoNumPulses"];
+    [encoder encodeInt:[self nhitMonitorAutoMaxNhit] forKey:@"nhitMonitorAutoMaxNhit"];
+    [encoder encodeInt:[self nhitMonitorRunType] forKey:@"nhitMonitorRunType"];
+    [encoder encodeInt:[self nhitMonitorCrateMask] forKey:@"nhitMonitorCrateMask"];
+    [encoder encodeDouble:[self nhitMonitorTimeInterval] forKey:@"nhitMonitorTimeInterval"];
 }
 
 - (NSString*) reformatSelectionString:(NSString*)aString forSet:(int)aSet

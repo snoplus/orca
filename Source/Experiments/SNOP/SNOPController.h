@@ -32,11 +32,11 @@
     
     NSView *blankView;
     NSSize detectorSize;
-	NSSize detailsSize;
-	NSSize focalPlaneSize;
-	NSSize couchDBSize;
-	NSSize hvMasterSize;
-	NSSize runsSize;
+    NSSize detailsSize;
+    NSSize focalPlaneSize;
+    NSSize couchDBSize;
+    NSSize hvMasterSize;
+    NSSize runsSize;
     
     // Used for deciding what units to use displaying thresholds
     int displayUnitsDecider[10];
@@ -145,6 +145,24 @@
     IBOutlet NSTextField *debugDBPort;
     IBOutlet NSButton *debugDBClearButton;
 
+    /* Nhit Monitor settings */
+    IBOutlet NSButton *runNhitMonitorButton;
+    IBOutlet NSButton *stopNhitMonitorButton;
+    IBOutlet NSPopUpButton *nhitMonitorCrateButton;
+    IBOutlet NSTextField *nhitMonitorPulserRate;
+    IBOutlet NSTextField *nhitMonitorNumPulses;
+    IBOutlet NSTextField *nhitMonitorMaxNhit;
+    IBOutlet NSProgressIndicator *nhitMonitorProgress;
+    IBOutlet NSMatrix *nhitMonitorResultsMatrix;
+    /* Settings for running the nhit monitor automatically during runs. */
+    IBOutlet NSButton *nhitMonitorAutoRunButton;
+    IBOutlet NSTextField *nhitMonitorAutoPulserRate;
+    IBOutlet NSTextField *nhitMonitorAutoNumPulses;
+    IBOutlet NSTextField *nhitMonitorAutoMaxNhit;
+    IBOutlet NSMatrix *nhitMonitorRunTypeWordMatrix;
+    IBOutlet NSMatrix *nhitMonitorCrateMaskMatrix;
+    IBOutlet NSTextField *nhitMonitorTimeInterval;
+
     //Custom colors
     NSColor *snopRedColor;
     NSColor *snopBlueColor;
@@ -178,6 +196,9 @@
 - (void) registerNotificationObservers;
 - (void) updateWindow;
 
+- (void) nhitMonitorSettingsChanged: (NSNotification*) aNote;
+- (void) nhitMonitorUpdate: (NSNotification*) aNote;
+
 #pragma mark ¥¥¥Interface
 - (void) XL3ModeChanged:(NSNotification*)aNote;
 - (void) hvStatusChanged:(NSNotification*)aNote;
@@ -192,7 +213,24 @@
 
 - (void) updateSettings: (NSNotification *) aNote;
 - (void) initializeUnits;
+
 #pragma mark ¥¥¥Actions
+
+/* Nhit Monitor */
+- (IBAction) runNhitMonitorAction: (id) sender;
+- (IBAction) stopNhitMonitorAction: (id) sender;
+- (IBAction) nhitMonitorCrateAction: (id) sender;
+- (IBAction) nhitMonitorPulserRateAction: (id) sender;
+- (IBAction) nhitMonitorNumPulsesAction: (id) sender;
+- (IBAction) nhitMonitorMaxNhitAction: (id) sender;
+/* Actions for running the nhit monitor automatically during runs. */
+- (IBAction) nhitMonitorAutoRunAction: (id) sender;
+- (IBAction) nhitMonitorAutoPulserRateAction: (id) sender;
+- (IBAction) nhitMonitorAutoNumPulsesAction: (id) sender;
+- (IBAction) nhitMonitorAutoMaxNhitAction: (id) sender;
+- (IBAction) nhitMonitorRunTypeAction: (id) sender;
+- (IBAction) nhitMonitorCrateMaskAction: (id) sender;
+- (IBAction) nhitMonitorTimeIntervalAction: (id) sender;
 
 - (IBAction) orcaDBIPAddressAction:(id)sender;
 - (IBAction) orcaDBClearHistoryAction:(id)sender;
@@ -210,6 +248,7 @@
 - (IBAction) hvMasterTriggersOFF:(id)sender;
 
 - (IBAction) pingCratesAction:(id)sender;
+- (IBAction) runNhitMonitorAction:(id)sender;
 
 //smellie functions -------------------
 - (IBAction) loadSmellieRunAction:(id)sender;

@@ -24,6 +24,7 @@
 #import "ORVmeCardDecoder.h"
 #import "RedisClient.h"
 #import "ECARun.h"
+#import "NHitMonitor.h"
 
 @class ORDataPacket;
 @class ORDataSet;
@@ -125,6 +126,22 @@ BOOL isNotRunningOrIsInMaintenance();
     NSString *logHost;
     int logPort;
 
+    /* Nhit Monitor Settings. */
+    NHitMonitor *nhitMonitor;
+    int nhitMonitorCrate;
+    int nhitMonitorPulserRate;
+    int nhitMonitorNumPulses;
+    int nhitMonitorMaxNhit;
+    /* Settings for running the nhit monitor automatically during runs. */
+    BOOL nhitMonitorAutoRun;
+    int nhitMonitorAutoPulserRate;
+    int nhitMonitorAutoNumPulses;
+    int nhitMonitorAutoMaxNhit;
+    NSTimer *nhitMonitorTimer;
+    uint32_t nhitMonitorRunType;
+    uint32_t nhitMonitorCrateMask;
+    NSTimeInterval nhitMonitorTimeInterval;
+
     RedisClient *mtc_server;
     RedisClient *xl3_server;
 
@@ -206,6 +223,9 @@ BOOL isNotRunningOrIsInMaintenance();
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
 
 - (void) pingCrates;
+- (void) runNhitMonitorAutomatically;
+- (void) runNhitMonitor;
+- (void) stopNhitMonitor;
 
 #pragma mark ¥¥orcascript helpers
 - (void) zeroPedestalMasks;
@@ -240,6 +260,30 @@ BOOL isNotRunningOrIsInMaintenance();
 - (void) shipRHDRRecord;
 
 #pragma mark Â¥Â¥Â¥Accessors
+- (NHitMonitor *) nhitMonitor;
+- (int) nhitMonitorCrate;
+- (void) setNhitMonitorCrate: (int) crate;
+- (int) nhitMonitorPulserRate;
+- (void) setNhitMonitorPulserRate: (int) pulserRate;
+- (int) nhitMonitorNumPulses;
+- (void) setNhitMonitorNumPulses: (int) numPulses;
+- (int) nhitMonitorMaxNhit;
+- (void) setNhitMonitorMaxNhit: (int) maxNhit;
+- (int) nhitMonitorAutoRun;
+- (void) setNhitMonitorAutoRun: (BOOL) run;
+- (int) nhitMonitorAutoPulserRate;
+- (void) setNhitMonitorAutoPulserRate: (int) pulserRate;
+- (int) nhitMonitorAutoNumPulses;
+- (void) setNhitMonitorAutoNumPulses: (int) numPulses;
+- (int) nhitMonitorAutoMaxNhit;
+- (void) setNhitMonitorAutoMaxNhit: (int) maxNhit;
+- (uint32_t) nhitMonitorRunType;
+- (void) setNhitMonitorRunType: (uint32_t) runType;
+- (uint32_t) nhitMonitorCrateMask;
+- (void) setNhitMonitorCrateMask: (uint32_t) mask;
+- (NSTimeInterval) nhitMonitorTimeInterval;
+- (void) setNhitMonitorTimeInterval: (NSTimeInterval) interval;
+
 - (void) setViewType:(int)aViewType;
 - (int) viewType;
 - (unsigned long) runTypeWord;
@@ -324,3 +368,4 @@ extern NSString* ORSNOPRunsLockNotification;
 extern NSString* ORSNOPModelSRCollectionChangedNotification;
 extern NSString* ORSNOPModelSRChangedNotification;
 extern NSString* ORSNOPModelSRVersionChangedNotification;
+extern NSString* ORSNOPModelNhitMonitorChangedNotification;

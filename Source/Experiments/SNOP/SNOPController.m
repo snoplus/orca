@@ -36,6 +36,7 @@
 #import "SNOCaenModel.h"
 #import "RunTypeWordBits.hh"
 #import "ECARun.h"
+#import "NhitMonitor.h"
 
 NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 NSString* ORRunWaitFinished = @"ORRunWaitFinished";
@@ -432,6 +433,26 @@ snopGreenColor;
                      selector : @selector(fetchTellieRunFilesFinish:)
                          name : @"TellieRunFilesLoaded"
                         object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(nhitMonitorSettingsChanged:)
+                         name : ORSNOPModelNhitMonitorChangedNotification
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(nhitMonitorUpdate:)
+                         name : ORNhitMonitorUpdateNotification
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(nhitMonitorResults:)
+                         name : ORNhitMonitorResultsNotification
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(nhitMonitor:)
+                         name : ORNhitMonitorNotification
+                        object: nil];
 }
 
 - (void) updateWindow
@@ -449,6 +470,8 @@ snopGreenColor;
     [self runsLockChanged:nil];
     [self runsECAChanged:nil];
     [self runTypeWordChanged:nil];
+    [self nhitMonitorSettingsChanged:nil];
+    [self nhitMonitor:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -456,6 +479,98 @@ snopGreenColor;
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
     [gSecurity setLock:ORSNOPRunsLockNotification to:secure];
     [runsLockButton setEnabled:secure];
+}
+
+- (void) nhitMonitorSettingsChanged: (NSNotification*) aNote
+{
+    int row;
+
+    int crate = [model nhitMonitorCrate];
+    [nhitMonitorCrateButton selectItemAtIndex:crate];
+    int pulserRate = [model nhitMonitorPulserRate];
+    [nhitMonitorPulserRate setStringValue:[NSString stringWithFormat:@"%i", pulserRate]];
+    int numPulses = [model nhitMonitorNumPulses];
+    [nhitMonitorNumPulses setStringValue:[NSString stringWithFormat:@"%i", numPulses]];
+    int maxNhit = [model nhitMonitorMaxNhit];
+    [nhitMonitorMaxNhit setStringValue:[NSString stringWithFormat:@"%i", maxNhit]];
+    int autoRun = [model nhitMonitorAutoRun];
+    [nhitMonitorAutoRunButton setState:autoRun];
+    int autoPulserRate = [model nhitMonitorAutoPulserRate];
+    [nhitMonitorAutoPulserRate setStringValue:[NSString stringWithFormat:@"%i", autoPulserRate]];
+    int autoNumPulses = [model nhitMonitorAutoNumPulses];
+    [nhitMonitorAutoNumPulses setStringValue:[NSString stringWithFormat:@"%i", autoNumPulses]];
+    int autoMaxNhit = [model nhitMonitorAutoMaxNhit];
+    [nhitMonitorAutoMaxNhit setStringValue:[NSString stringWithFormat:@"%i", autoMaxNhit]];
+    int runType = [model nhitMonitorRunType];
+    for (row = 0; row < [nhitMonitorRunTypeWordMatrix numberOfRows]; row++) {
+        if (runType & (1L << row)) {
+            [nhitMonitorRunTypeWordMatrix setState:1 atRow:row column:0];
+        } else {
+            [nhitMonitorRunTypeWordMatrix setState:0 atRow:row column:0];
+        }
+    }
+    int crateMask = [model nhitMonitorCrateMask];
+    for (row = 0; row < [nhitMonitorCrateMaskMatrix numberOfRows]; row++) {
+        if (crateMask & (1L << row)) {
+            [nhitMonitorCrateMaskMatrix setState:1 atRow:row column:0];
+        } else {
+            [nhitMonitorCrateMaskMatrix setState:0 atRow:row column:0];
+        }
+    }
+    double timeInterval = [model nhitMonitorTimeInterval];
+    [nhitMonitorTimeInterval setStringValue:[NSString stringWithFormat:@"%.0f", timeInterval]];
+}
+
+- (void) nhitMonitorUpdate: (NSNotification*) aNote
+{
+    NSDictionary *userInfo = [aNote userInfo];
+
+    int nhit = [[userInfo objectForKey:@"nhit"] intValue];
+    int maxNhit = [[userInfo objectForKey:@"maxNhit"] intValue];
+    [nhitMonitorProgress setDoubleValue:nhit*100/(float) maxNhit];
+    [nhitMonitorProgress displayIfNeeded];
+}
+
+- (void) nhitMonitorResults: (NSNotification*) aNote
+{
+    int i;
+    NSDictionary *userInfo = [aNote userInfo];
+
+    NSArray *names = @[@"n100_hi", @"n100_med", @"n100_lo", @"n20",
+                       @"n20_lb"];
+
+    for (i = 0; i < [names count]; i++) {
+        if ([[userInfo objectForKey:names[i]] floatValue] < 0) {
+            [[nhitMonitorResultsMatrix cellAtRow:i column:0] setStringValue:
+                [NSString stringWithFormat:@"> %i",
+                 [[userInfo objectForKey:@"max_nhit"] intValue]]];
+        } else {
+            [[nhitMonitorResultsMatrix cellAtRow:i column:0] setStringValue:
+                [NSString stringWithFormat:@"%.2f",
+                 [[userInfo objectForKey:names[i]] floatValue]]];
+        }
+    }
+}
+
+- (void) nhitMonitor: (NSNotification*) aNote
+{
+    if ([aNote userInfo]) {
+        /* The nhit monitor adds a userInfo dictionary when it is finished.
+         * It's not possible to tell if it's done by checking to see if it's
+         * still running, because when the notification is posted, the thread
+         * is still running. */
+        [runNhitMonitorButton setEnabled:YES];
+        [stopNhitMonitorButton setEnabled:NO];
+        return;
+    }
+
+    if ([[model nhitMonitor] isRunning]) {
+        [runNhitMonitorButton setEnabled:NO];
+        [stopNhitMonitorButton setEnabled:YES];
+    } else {
+        [runNhitMonitorButton setEnabled:YES];
+        [stopNhitMonitorButton setEnabled:NO];
+    }
 }
 
 -(void) SRTypeChanged:(NSNotification*)aNote
@@ -607,6 +722,89 @@ err:
 - (IBAction) pingCratesAction: (id) sender
 {
     [model pingCrates];
+}
+
+- (IBAction) runNhitMonitorAction: (id) sender
+{
+    [self endEditing];
+    [model runNhitMonitor];
+}
+
+- (IBAction) stopNhitMonitorAction: (id) sender
+{
+    [self endEditing];
+    [model stopNhitMonitor];
+}
+
+- (IBAction) nhitMonitorCrateAction: (id) sender
+{
+    [model setNhitMonitorCrate:[sender indexOfSelectedItem]];
+}
+
+- (IBAction) nhitMonitorPulserRateAction: (id) sender
+{
+    [model setNhitMonitorPulserRate:[sender intValue]];
+}
+
+- (IBAction) nhitMonitorNumPulsesAction: (id) sender
+{
+    [model setNhitMonitorNumPulses:[sender intValue]];
+}
+
+- (IBAction) nhitMonitorMaxNhitAction: (id) sender
+{
+    [model setNhitMonitorMaxNhit:[sender intValue]];
+}
+
+- (IBAction) nhitMonitorAutoRunAction: (id) sender
+{
+    [model setNhitMonitorAutoRun:[sender state]];
+}
+
+- (IBAction) nhitMonitorAutoPulserRateAction: (id) sender
+{
+    [model setNhitMonitorAutoPulserRate:[sender intValue]];
+}
+
+- (IBAction) nhitMonitorAutoNumPulsesAction: (id) sender
+{
+    [model setNhitMonitorAutoNumPulses:[sender intValue]];
+}
+
+- (IBAction) nhitMonitorAutoMaxNhitAction: (id) sender
+{
+    [model setNhitMonitorAutoMaxNhit:[sender intValue]];
+}
+
+- (IBAction) nhitMonitorRunTypeAction: (id) sender
+{
+    short bit = [sender selectedRow];
+    BOOL state  = [[sender selectedCell] state];
+    unsigned long currentRunMask = [model nhitMonitorRunType];
+    if (state) {
+        currentRunMask |= (1L << bit);
+    } else {
+        currentRunMask &= ~(1L << bit);
+    }
+    [model setNhitMonitorRunType:currentRunMask];
+}
+
+- (IBAction) nhitMonitorCrateMaskAction: (id) sender
+{
+    short bit = [sender selectedRow];
+    BOOL state  = [[sender selectedCell] state];
+    unsigned long currentCrateMask = [model nhitMonitorCrateMask];
+    if (state) {
+        currentCrateMask |= (1L << bit);
+    } else {
+        currentCrateMask &= ~(1L << bit);
+    }
+    [model setNhitMonitorCrateMask:currentCrateMask];
+}
+    
+- (IBAction) nhitMonitorTimeIntervalAction: (id) sender
+{
+    [model setNhitMonitorTimeInterval:[sender doubleValue]];
 }
 
 - (void) dbOrcaDBIPChanged:(NSNotification*)aNote
@@ -1531,6 +1729,13 @@ err:
     [debugDBName setEnabled:!lockedOrNotRunningMaintenance];
     [debugDBPort setEnabled:!lockedOrNotRunningMaintenance];
     [debugDBClearButton setEnabled:!lockedOrNotRunningMaintenance];
+    [nhitMonitorAutoPulserRate setEnabled:!locked];
+    [nhitMonitorAutoNumPulses setEnabled:!locked];
+    [nhitMonitorAutoMaxNhit setEnabled:!locked];
+    [nhitMonitorRunTypeWordMatrix setEnabled:!locked];
+    [nhitMonitorCrateMaskMatrix setEnabled:!locked];
+    [nhitMonitorTimeInterval setEnabled:!locked];
+
     [rampDownCrateButton setEnabled:notRunningOrInMaintenance];
     [inMaintenanceLabel setHidden:notRunningOrInMaintenance];
 

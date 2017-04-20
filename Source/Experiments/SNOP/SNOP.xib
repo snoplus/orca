@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14B25" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6751" systemVersion="13F1603" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
         <development version="5100" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
-        <plugIn identifier="com.apple.WebKitIBPlugin" version="7706"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6751"/>
+        <plugIn identifier="com.apple.WebKitIBPlugin" version="6751"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SNOPController">
@@ -49,6 +49,19 @@
                 <outlet property="logPort" destination="DpW-Vd-aQd" id="9DN-uP-F1q"/>
                 <outlet property="mtcHost" destination="eaZ-tZ-5J9" id="rjH-OI-3ri"/>
                 <outlet property="mtcPort" destination="2aR-vd-DX1" id="sbN-pm-YYe"/>
+                <outlet property="nhitMonitorAutoMaxNhit" destination="MKm-qG-dcf" id="rON-w0-GtT"/>
+                <outlet property="nhitMonitorAutoNumPulses" destination="IVR-qj-PGj" id="jgp-1G-B0c"/>
+                <outlet property="nhitMonitorAutoPulserRate" destination="eQ1-1I-WTU" id="97J-UP-Xu4"/>
+                <outlet property="nhitMonitorAutoRunButton" destination="Mmd-J7-CeY" id="nIz-gJ-lhW"/>
+                <outlet property="nhitMonitorCrateButton" destination="wiw-6J-IL4" id="aVg-ch-1me"/>
+                <outlet property="nhitMonitorCrateMaskMatrix" destination="nUb-5W-tWa" id="Tmn-IY-It6"/>
+                <outlet property="nhitMonitorMaxNhit" destination="5fG-ST-ZPu" id="Ngu-g0-0kZ"/>
+                <outlet property="nhitMonitorNumPulses" destination="xOk-db-mDC" id="nnc-gc-Xqq"/>
+                <outlet property="nhitMonitorProgress" destination="PW2-2n-hba" id="vLi-ed-h0e"/>
+                <outlet property="nhitMonitorPulserRate" destination="o4d-ry-Qs4" id="GGn-c7-tEA"/>
+                <outlet property="nhitMonitorResultsMatrix" destination="mmn-NB-0n7" id="YqZ-Sg-DQz"/>
+                <outlet property="nhitMonitorRunTypeWordMatrix" destination="LGZ-8t-yfV" id="oKB-cu-BBc"/>
+                <outlet property="nhitMonitorTimeInterval" destination="PJ9-bt-8Rp" id="58l-jb-4h1"/>
                 <outlet property="orcaDBClearButton" destination="2682" id="Elw-gn-a5W"/>
                 <outlet property="orcaDBIPAddressPU" destination="2683" id="2962"/>
                 <outlet property="orcaDBName" destination="2704" id="IX3-D9-ZA1"/>
@@ -61,6 +74,7 @@
                 <outlet property="repeatRunCB" destination="1339" id="1354"/>
                 <outlet property="resyncRunButton" destination="eox-6c-ihd" id="K4U-Io-B29"/>
                 <outlet property="runBar" destination="MBu-zu-x36" id="iTV-aT-8hr"/>
+                <outlet property="runNhitMonitorButton" destination="drs-Rr-CLT" id="8ay-JK-ydl"/>
                 <outlet property="runNumberField" destination="3752" id="NlG-fq-pyu"/>
                 <outlet property="runStatusField" destination="3733" id="LhC-Ec-9HL"/>
                 <outlet property="runTypeWordMatrix" destination="3935" id="GbT-ZR-J8S"/>
@@ -82,6 +96,7 @@
                 <outlet property="standardRunVersionPopupMenu" destination="0tV-8Q-LGs" id="WhV-Ow-TuV"/>
                 <outlet property="startRunButton" destination="1253" id="XdY-Mu-6m6"/>
                 <outlet property="startSingleECAButton" destination="Mzb-de-zBx" id="pka-12-igp"/>
+                <outlet property="stopNhitMonitorButton" destination="eEC-cV-Yui" id="v9K-Qp-Zvc"/>
                 <outlet property="stopRunButton" destination="1258" id="PGc-XS-Wt7"/>
                 <outlet property="tabView" destination="101" id="332"/>
                 <outlet property="tellieLoadRunFile" destination="3790" id="W7Y-AW-Cn9"/>
@@ -3822,10 +3837,607 @@
                                     <animations/>
                                 </view>
                             </tabViewItem>
+                            <tabViewItem label="Nhit Monitor" identifier="" id="FRT-8S-HaJ">
+                                <view key="view" id="kyp-tq-6On">
+                                    <rect key="frame" x="10" y="25" width="773" height="635"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <box autoresizesSubviews="NO" title="Latest Results" borderType="line" id="osf-mb-MSE">
+                                            <rect key="frame" x="14" y="461" width="246" height="168"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView">
+                                                <rect key="frame" x="1" y="1" width="244" height="152"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="20q-3N-DX2">
+                                                        <rect key="frame" x="50" y="125" width="50" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Trigger" id="boL-7C-Lh7">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="NHE-12-WHE">
+                                                        <rect key="frame" x="124" y="125" width="104" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Threshold (nhit)" id="Cqh-Rn-iQ1">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <matrix verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" id="bQJ-P0-ZQj">
+                                                        <rect key="frame" x="18" y="14" width="86" height="103"/>
+                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        <size key="cellSize" width="86" height="19"/>
+                                                        <size key="intercellSpacing" width="0.0" height="2"/>
+                                                        <textFieldCell key="prototype" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="uka-9a-L08">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <cells>
+                                                            <column>
+                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="NHit100Hi" id="RbT-Bc-quW">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="NHit100Med" id="ZRp-Ad-CKr">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="NHit100Lo" id="9t4-gI-ZW3">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="NHit20Hi" id="st1-RT-myP">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="NHit20Lo" id="33b-D7-Ebp">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                            </column>
+                                                        </cells>
+                                                    </matrix>
+                                                    <matrix toolTip="Settings stored in the selected standard run" verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" id="mmn-NB-0n7">
+                                                        <rect key="frame" x="112" y="14" width="86" height="103"/>
+                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        <size key="cellSize" width="86" height="19"/>
+                                                        <size key="intercellSpacing" width="0.0" height="2"/>
+                                                        <textFieldCell key="prototype" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="NwR-JC-9vP">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <cells>
+                                                            <column>
+                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="--" id="u70-Rj-Cuy">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="--" id="uT9-1U-yOK">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="--" id="Ovd-Gp-tSn">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="--" id="pPd-bN-ATT">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="--" id="91n-xA-zw0">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                            </column>
+                                                        </cells>
+                                                    </matrix>
+                                                </subviews>
+                                            </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </box>
+                                        <box autoresizesSubviews="NO" title="Settings For Automatic Running" borderType="line" id="rvK-dU-5Pd">
+                                            <rect key="frame" x="402" y="172" width="357" height="457"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView">
+                                                <rect key="frame" x="1" y="1" width="355" height="441"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="USy-z7-zmA">
+                                                        <rect key="frame" x="16" y="382" width="44" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Crates" id="fYg-rq-VsG">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <matrix verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="nUb-5W-tWa">
+                                                        <rect key="frame" x="18" y="14" width="70" height="360"/>
+                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        <size key="cellSize" width="70" height="18"/>
+                                                        <buttonCell key="prototype" type="check" title="Check" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="UwU-MF-3lI">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <cells>
+                                                            <column>
+                                                                <buttonCell type="check" title="0" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="EBD-8e-f5h">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="1" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="1" inset="2" id="jqb-51-kVy">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="2" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="2" inset="2" id="UD6-6f-TZ9">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="3" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="3" inset="2" id="d6u-6H-qok">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="4" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="4" inset="2" id="8fm-rw-D7O">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="5" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="5" inset="2" id="8ja-wB-KyK">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="6" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="6" inset="2" id="DOB-rc-YgP">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="7" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="7" inset="2" id="Y1i-qI-EOH">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="8" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="8" inset="2" id="Zci-l5-eyz">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="9" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="9" inset="2" id="efO-u4-ExK">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="10" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="10" inset="2" id="yLf-0y-9XY">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="11" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="11" inset="2" id="mbi-9M-Row">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="12" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="12" inset="2" id="3M6-ew-jOW">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="13" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="13" inset="2" id="8nX-p3-PEN">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="14" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="14" inset="2" id="GN9-TF-VHC">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="15" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="15" inset="2" id="9Iq-FP-IZO">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="16" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="16" inset="2" id="Wgl-TM-3JY">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="17" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="17" inset="2" id="hT1-BQ-zu1">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="18" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="18" inset="2" id="XEl-J3-M6v">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="19" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="19" inset="2" id="7hP-l3-nod">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                            </column>
+                                                        </cells>
+                                                        <connections>
+                                                            <action selector="nhitMonitorCrateMaskAction:" target="-2" id="yvE-wh-c3p"/>
+                                                        </connections>
+                                                    </matrix>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="kfw-jB-7L1">
+                                                        <rect key="frame" x="222" y="414" width="69" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Run Types" id="bmt-xP-hzY">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <matrix toolTip="Current run type word" verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="LGZ-8t-yfV">
+                                                        <rect key="frame" x="218" y="223" width="119" height="176"/>
+                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        <size key="cellSize" width="119" height="16"/>
+                                                        <buttonCell key="prototype" type="check" title="Check" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="Shr-Ht-z7B">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <cells>
+                                                            <column>
+                                                                <buttonCell type="check" title="Maintenance" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="Cxz-ss-Gl0">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="Transition" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="1" inset="2" id="KQ3-Uk-Grd">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="Physics" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="2" inset="2" id="yVs-QG-XsP">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="Deployed Source" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="3" inset="2" id="l9r-HI-p56">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="External Source" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="4" inset="2" id="P8L-Nw-TQj">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ECA" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="5" inset="2" id="2l1-PJ-51T">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="Diagnostic" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="6" inset="2" id="lHt-IM-zNz">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="Experimental" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="7" inset="2" id="lck-Rd-NjD">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="Spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="8" inset="2" id="9vK-5u-AqL">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="Spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="9" inset="2" id="6vJ-FD-AQS">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="Spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="10" inset="2" id="41v-wv-xTd">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                            </column>
+                                                        </cells>
+                                                        <connections>
+                                                            <action selector="nhitMonitorRunTypeAction:" target="-2" id="2LR-2z-WIu"/>
+                                                        </connections>
+                                                    </matrix>
+                                                    <button id="Mmd-J7-CeY">
+                                                        <rect key="frame" x="16" y="415" width="137" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Run Automatically" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="clj-1Q-VJ6">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="nhitMonitorAutoRunAction:" target="-2" id="Cfl-W3-MXJ"/>
+                                                        </connections>
+                                                    </button>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="70N-PB-Tbt">
+                                                        <rect key="frame" x="116" y="60" width="89" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Crate Interval" id="HKO-lf-OFS">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="GkJ-2d-ser">
+                                                        <rect key="frame" x="309" y="60" width="30" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="secs" id="W9p-2V-vkT">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" id="PJ9-bt-8Rp">
+                                                        <rect key="frame" x="208" y="57" width="96" height="22"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="FD7-2E-Wnc">
+                                                            <numberFormatter key="formatter" formatterBehavior="default10_4" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="42" id="sBA-LM-QAd">
+                                                                <real key="minimum" value="60"/>
+                                                            </numberFormatter>
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <action selector="nhitMonitorTimeIntervalAction:" target="-2" id="r3C-GF-jB2"/>
+                                                        </connections>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="H4K-Gq-MwS">
+                                                        <rect key="frame" x="127" y="156" width="74" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Pulser Rate" id="AsQ-T8-5eG">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="RdU-5D-2Ze">
+                                                        <rect key="frame" x="87" y="124" width="114" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Number of Pulses" id="YRi-a6-GIb">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="l4X-YN-qoh">
+                                                        <rect key="frame" x="140" y="92" width="61" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Max Nhit" id="XTM-z1-CWc">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" id="eQ1-1I-WTU">
+                                                        <rect key="frame" x="207" y="153" width="96" height="22"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="pZy-cm-BqD">
+                                                            <numberFormatter key="formatter" formatterBehavior="default10_4" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="42" id="CEE-Id-8f9">
+                                                                <real key="minimum" value="0.0"/>
+                                                                <real key="maximum" value="1000"/>
+                                                            </numberFormatter>
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <action selector="nhitMonitorAutoPulserRateAction:" target="-2" id="m1Z-OC-qhC"/>
+                                                        </connections>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" id="IVR-qj-PGj">
+                                                        <rect key="frame" x="207" y="121" width="96" height="22"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="deW-Wx-Cao">
+                                                            <numberFormatter key="formatter" formatterBehavior="default10_4" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="42" id="ac0-aC-fke">
+                                                                <real key="minimum" value="10"/>
+                                                            </numberFormatter>
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <action selector="nhitMonitorAutoNumPulsesAction:" target="-2" id="IO3-Hg-vWA"/>
+                                                        </connections>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" id="MKm-qG-dcf">
+                                                        <rect key="frame" x="208" y="89" width="96" height="22"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="vdw-4O-40A">
+                                                            <numberFormatter key="formatter" formatterBehavior="default10_4" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="42" id="HLG-pN-Bi6">
+                                                                <real key="minimum" value="0.0"/>
+                                                                <real key="maximum" value="512"/>
+                                                            </numberFormatter>
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <action selector="nhitMonitorAutoMaxNhitAction:" target="-2" id="I5g-yk-Odf"/>
+                                                        </connections>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="WLB-rw-7vG">
+                                                        <rect key="frame" x="309" y="156" width="22" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Hz" id="KgG-aY-vyn">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                </subviews>
+                                            </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </box>
+                                        <box autoresizesSubviews="NO" title="Run Nhit Monitor Once" borderType="line" id="ImM-MN-hPP">
+                                            <rect key="frame" x="14" y="203" width="321" height="254"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView">
+                                                <rect key="frame" x="1" y="1" width="319" height="238"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <progressIndicator maxValue="100" style="bar" id="PW2-2n-hba">
+                                                        <rect key="frame" x="18" y="13" width="283" height="20"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                    </progressIndicator>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="M5k-Yk-5rD">
+                                                        <rect key="frame" x="92" y="209" width="38" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Crate" id="ycL-ff-hB1">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="4xR-dO-BKF">
+                                                        <rect key="frame" x="56" y="168" width="74" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Pulser Rate" id="jua-db-Q5J">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="qPF-50-V6x">
+                                                        <rect key="frame" x="16" y="136" width="114" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Number of Pulses" id="Wd3-3R-IaI">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="OzZ-9Y-vbh">
+                                                        <rect key="frame" x="69" y="104" width="61" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Max Nhit" id="a6D-zB-83d">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <popUpButton verticalHuggingPriority="750" id="wiw-6J-IL4">
+                                                        <rect key="frame" x="134" y="204" width="100" height="26"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="3gb-gX-kV3">
+                                                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="menu"/>
+                                                            <menu key="menu" id="MaV-yd-fvz">
+                                                                <items>
+                                                                    <menuItem title="0" id="Bw8-pn-Yym"/>
+                                                                    <menuItem title="1" id="B3L-cZ-NIX"/>
+                                                                    <menuItem title="2" id="xU2-GY-2oc"/>
+                                                                    <menuItem title="3" id="mva-6N-lD6"/>
+                                                                    <menuItem title="4" id="JFb-0a-fhj"/>
+                                                                    <menuItem title="5" id="f8n-Xk-vTC"/>
+                                                                    <menuItem title="6" id="EqS-3e-ti6"/>
+                                                                    <menuItem title="7" id="QaO-9E-2Ot"/>
+                                                                    <menuItem title="8" id="j5n-PQ-UZr"/>
+                                                                    <menuItem title="9" id="k6w-If-pnC"/>
+                                                                    <menuItem title="10" id="98g-ET-qd8"/>
+                                                                    <menuItem title="11" id="hdC-Av-T9I"/>
+                                                                    <menuItem title="12" id="Yl2-hA-m20"/>
+                                                                    <menuItem title="13" id="jUF-40-cOK"/>
+                                                                    <menuItem title="14" id="53E-4G-TrR"/>
+                                                                    <menuItem title="15" id="jAa-jG-Ay3"/>
+                                                                    <menuItem title="16" id="2ak-V9-hM7"/>
+                                                                    <menuItem title="17" id="Ecx-qg-Re9"/>
+                                                                    <menuItem title="18" id="rrF-Uw-EV4"/>
+                                                                    <menuItem title="19" id="4t3-92-1TO"/>
+                                                                </items>
+                                                            </menu>
+                                                        </popUpButtonCell>
+                                                        <connections>
+                                                            <action selector="nhitMonitorCrateAction:" target="-2" id="fxb-H5-9G7"/>
+                                                        </connections>
+                                                    </popUpButton>
+                                                    <textField verticalHuggingPriority="750" id="o4d-ry-Qs4">
+                                                        <rect key="frame" x="136" y="165" width="96" height="22"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="WKe-bL-1mP">
+                                                            <numberFormatter key="formatter" formatterBehavior="default10_4" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="42" id="W51-28-2Ox">
+                                                                <real key="minimum" value="0.0"/>
+                                                                <real key="maximum" value="1000"/>
+                                                            </numberFormatter>
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <action selector="nhitMonitorPulserRateAction:" target="-2" id="EKC-zw-qUu"/>
+                                                        </connections>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" id="xOk-db-mDC">
+                                                        <rect key="frame" x="136" y="133" width="96" height="22"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="h4k-na-cly">
+                                                            <numberFormatter key="formatter" formatterBehavior="default10_4" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="42" id="pSq-7l-7Ip">
+                                                                <real key="minimum" value="10"/>
+                                                            </numberFormatter>
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <action selector="nhitMonitorNumPulsesAction:" target="-2" id="xeZ-cw-VOP"/>
+                                                        </connections>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" id="5fG-ST-ZPu">
+                                                        <rect key="frame" x="137" y="101" width="96" height="22"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="Qlg-8b-wGU">
+                                                            <numberFormatter key="formatter" formatterBehavior="default10_4" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="42" id="Gda-Qq-5Um">
+                                                                <real key="minimum" value="0.0"/>
+                                                                <real key="maximum" value="512"/>
+                                                            </numberFormatter>
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <action selector="nhitMonitorMaxNhitAction:" target="-2" id="dYl-PW-g2S"/>
+                                                        </connections>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="fXs-mb-rjf">
+                                                        <rect key="frame" x="238" y="168" width="22" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Hz" id="u4P-oC-V05">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <button verticalHuggingPriority="750" id="drs-Rr-CLT">
+                                                        <rect key="frame" x="182" y="50" width="65" height="32"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Run" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="PsX-XE-hgK">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="runNhitMonitorAction:" target="-2" id="u1W-OQ-gu6"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" id="eEC-cV-Yui">
+                                                        <rect key="frame" x="113" y="50" width="69" height="32"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Stop" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="NhX-84-Dkl">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="stopNhitMonitorAction:" target="-2" id="xVZ-Q3-nlT"/>
+                                                        </connections>
+                                                    </button>
+                                                </subviews>
+                                            </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </box>
+                                    </subviews>
+                                </view>
+                            </tabViewItem>
                         </tabViewItems>
-                        <connections>
-                            <outlet property="delegate" destination="-2" id="347"/>
-                        </connections>
                     </tabView>
                 </subviews>
                 <animations/>
