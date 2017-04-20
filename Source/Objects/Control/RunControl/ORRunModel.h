@@ -204,6 +204,7 @@
 - (void) runAbortFromScript;
 
 - (void) startRun;
+- (void) startTimer;
 - (void) startNoScriptRun;
 - (void) restartRun;
 - (void) stopRun;
