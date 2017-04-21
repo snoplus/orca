@@ -1002,6 +1002,8 @@ err:
         [runControl setRunningState:eRunInProgress];
         if (pqRun->valid[kRun_runStartTime]) {
             [runControl setStartTime:pqRun->runStartTime];
+            [runControl setElapsedRunTime:-[pqRun->runStartTime timeIntervalSinceNow]];
+            [runControl startTimer];
         }
         state = RUNNING;
     }
