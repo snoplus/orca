@@ -422,7 +422,7 @@ tellieRunFiles = _tellieRunFiles;
     [dataHost release];
     [logHost release];
     [anECARun release];
-    [NHitMonitor release];
+    [nhitMonitor release];
     [super dealloc];
 }
 

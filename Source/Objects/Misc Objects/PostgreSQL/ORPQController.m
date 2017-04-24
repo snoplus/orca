@@ -22,8 +22,8 @@
 
 - (void) dealloc
 {
+    [[[ORPQDBQueue sharedPQDBQueue] queue] removeObserver:self forKeyPath:@"operationCount"];
     [super dealloc];
-	[[[ORPQDBQueue sharedPQDBQueue] queue] removeObserver:self forKeyPath:@"operationCount"];
 }
 
 -(void) awakeFromNib

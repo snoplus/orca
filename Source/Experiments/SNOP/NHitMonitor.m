@@ -166,6 +166,7 @@ static int get_nhit_trigger_count(char *err, RedisClient *mtc, int sock, char *b
 
 - (id) init
 {
+    self = [super init];
     runningThread = [[NSThread alloc] init];
     buf = malloc(DATASTREAM_BUFFER_SIZE);
     sock = -1;

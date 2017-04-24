@@ -28,7 +28,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 
 - (id) init
 {
-
+    self = [super init];
     ECAThread = [[NSThread alloc] init]; //Init empty
     start_eca_run = FALSE;
     isFinishing = FALSE;
