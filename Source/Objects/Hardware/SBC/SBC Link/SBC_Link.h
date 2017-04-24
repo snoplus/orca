@@ -27,7 +27,10 @@
 
 typedef  enum eSBC_CrateStates{
 	kIdle,
-	kTryToConnect,
+    kPing,
+    kWaitForPing,
+    kAfterPing,
+    kTryToConnect,
 	kTryToStartCode,
 	kWaitingForStart,
 	kReloadCode,
@@ -114,7 +117,8 @@ typedef enum eSBC_ThrottleConsts{
 
 	NSTask*			pingTask;
     BOOL            pingedSuccessfully;
-
+    BOOL            permissionDenied;
+    
 	//cbTest varibles
 	int				numTestPoints;
 	int				cbTestCount;
