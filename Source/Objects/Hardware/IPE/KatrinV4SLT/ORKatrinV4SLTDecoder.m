@@ -110,14 +110,6 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
 }
 @end
 
-
-
-
-
-
-
-
-
 @implementation ORKatrinV4SLTDecoderForEventFifo
 
 //-------------------------------------------------------------
@@ -272,16 +264,6 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
 @end
 
 
-
-
-
-
-
-
-
-
-
-
 @implementation ORKatrinV4SLTDecoderForEnergy
 
 //-------------------------------------------------------------
@@ -308,10 +290,13 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
  
  **/
 //-------------------------------------------------------------
-
+- (id) init {
+    self = [super init];
+    return self;
+}
 - (void) dealloc
 {
-	[actualFlts release];
+    [actualFlts release];
     [super dealloc];
 }
 
@@ -328,219 +313,122 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
  	NSString* crateKey		= [self getCrateKey: crate];
     
     unsigned long headerlen = 4;
-    unsigned long numEv=(length-4)/6;    //(((*ptr) & 0x3ffff)-4)/6;
+    unsigned long numEv=(length-headerlen)/6;
     
     //prepare decoding
     if(!actualFlts)actualFlts = [[NSMutableDictionary alloc] init];
 
     ptr+=headerlen;
-    
     int i;
     for(i=0;i<numEv;i++){
-        //unsigned long f1      = ptr[0];
-        //unsigned long f2      = ptr[1];
-        unsigned long f3        = ptr[2];
-        unsigned long f4        = ptr[3];
-        unsigned long f5        = ptr[4];
-        unsigned long f6        = ptr[5];
-    
+//      unsigned long f1        = ptr[0]; //word#,subseconds
+//      unsigned long f2        = ptr[1]; //seconds
+        unsigned long f3        = ptr[2]; //flt,ch,multi,eventID
+//      unsigned long f4        = ptr[3]; //aPeak, aPeak
+//      unsigned long f5        = ptr[4]; //tValley, aValley
+        unsigned long f6        = ptr[5]; //Energy
+
         unsigned char card      = (f3 >> 24) & 0x1f;
         unsigned char chan      = (f3 >> 19) & 0x1f;
-        //unsigned long multiplicity  = (f3 >> 14) & 0x1f;
-        //unsigned long evID    = f3  & 0x3fff;
-        //unsigned long toplen  = f4  & 0x1ff;
-        //unsigned long ediff   = (f4 >> 9) & 0xfff;
-        //unsigned long tpeak   = (f4 >> 16) & 0x1ff;
-        unsigned long tpeak     = (f4 >> 16) & 0x1ff;
-        unsigned long apeak     =  f4   & 0x7ff;
-        unsigned long tvalley   = (f5 >> 16) & 0x1ff;
-        unsigned long avalley   =  4096 - (f5   & 0xfff);
-    
-        unsigned long energy  = f6  & 0xfffff;
-
+//      unsigned long multiplicity  = (f3 >> 14) & 0x1f;
+//      unsigned long evID    = f3  & 0x3fff;
         
+//      unsigned long tPeak     = (f4 >> 16) & 0x1ff;
+//      unsigned long aPeak     =  f4        & 0xfff;
+        
+//      unsigned long tValley   = (f5 >> 16) & 0x1ff;
+//      unsigned long aValley   =  4096 - (f5   & 0xfff);
+//      unsigned long aValley   =  f5        & 0xfff;
+        unsigned long energy    =  f6        & 0xfffff;
+
 	    NSString* stationKey	= [self getStationKey: card];
 	    NSString* channelKey	= [self getChannelKey: chan];
-        
-		NSString* fltKey = [crateKey stringByAppendingString:stationKey];
-		//ORKatrinV4FLTModel* obj = [actualFlts objectForKey:fltKey];
-		id obj = [actualFlts objectForKey:fltKey];
-		if(!obj){
-            //NSLog(@"searching FLTs: fltKey %@ \n",fltKey);
-			NSArray* listOfFlts = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORKatrinV4FLTModel")];
-			for(ORKatrinV4FLTModel* aFlt in listOfFlts){
-                //NSLog(@"searching FLTs: stationNum %i (searching card %i)\n",[aFlt stationNumber],card);
-
-				if(/*[aFlt crateNumber] == crate &&*/ [aFlt stationNumber] == card){
-					[actualFlts setObject:aFlt forKey:fltKey];
-					obj = aFlt;
-					break;
-				}
-			}
-            if(!obj){
-                [actualFlts setObject:self forKey:fltKey];
-                obj=self;
-            }
-		}
-        int filterShapingLength = 0;
-        if(obj) filterShapingLength = [obj filterShapingLength];
-        //NSLog(@"   found FLTs(?): filterShapingLength %i \n",filterShapingLength);
-
-	    unsigned long histoLen;
-	    histoLen = 4096;//32768;//4096;//=max. ADC value for 12 bit ADC
+//        
+//		NSString* fltKey = [crateKey stringByAppendingString:stationKey];
+//		id obj = [actualFlts objectForKey:fltKey];
+//		if(!obj){
+//			NSArray* listOfFlts = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORKatrinV4FLTModel")];
+//			for(ORKatrinV4FLTModel* aFlt in listOfFlts){
+//				if([aFlt stationNumber] == card){
+//					[actualFlts setObject:aFlt forKey:fltKey];
+//					obj = aFlt;
+//					break;
+//				}
+//			}
+//            if(!obj){
+//                [actualFlts setObject:self forKey:fltKey];
+//                obj=self;
+//            }
+//		}
+//        int filterShapingLength = 0;
+//        if(obj) filterShapingLength = [obj filterShapingLength];
     
-        // count datasets
-	    [aDataSet loadGenericData:@" " sender:self withKeys:@"v4SLT",@"Energy Records",nil];
-    
-	    //channel by channel histograms 'energy'
-	    [aDataSet histogram:energy >> filterShapingLength
-				    numBins:histoLen sender:self  
+	    [aDataSet histogram:energy >> 8 /*energy >> filterShapingLength*/  //scale to 4096 bins for now
+				    numBins:4096 sender:self
 			       withKeys:@"SLT", @"FLTthruSLT", @"Energy", crateKey,stationKey,channelKey,nil];
 	
-	    //channel by channel histograms 'bipolar energy peak'
-	    [aDataSet histogram:apeak
-	    			numBins:4096 sender:self  
-	    		   withKeys:@"SLT", @"FLTthruSLT", @"PeakADC", crateKey,stationKey,channelKey,nil];
-               
-	    //channel by channel histograms 'bipolar energy valley'
-	    [aDataSet histogram:avalley
-	    			numBins:4096 sender:self  
-	    		   withKeys:@"SLT", @"FLTthruSLT", @"ValleyADC", crateKey,stationKey,channelKey,nil];
-	
-	    //channel by channel histograms 'bipolar energy peak' time
-	    [aDataSet histogram:tpeak
-	    			numBins:4096 sender:self  
-	    		   withKeys:@"SLT", @"FLTthruSLT", @"PeakPos", crateKey,stationKey,channelKey,nil];
-               
-	    //channel by channel histograms 'bipolar energy valley' time
-	    [aDataSet histogram:tvalley
-	    			numBins:4096 sender:self  
-	    		   withKeys:@"SLT", @"FLTthruSLT", @"ValleyPos", crateKey,stationKey,channelKey,nil];
-                   
+//	    [aDataSet histogram:aPeak
+//	    			numBins:4096 sender:self  
+//	    		   withKeys:@"SLT", @"FLTthruSLT", @"PeakADC", crateKey,stationKey,channelKey,nil];
+//               
+//	    [aDataSet histogram:aValley
+//	    			numBins:4096 sender:self  
+//	    		   withKeys:@"SLT", @"FLTthruSLT", @"ValleyADC", crateKey,stationKey,channelKey,nil];
+//	
+//	    [aDataSet histogram:tPeak
+//	    			numBins:4096 sender:self  
+//	    		   withKeys:@"SLT", @"FLTthruSLT", @"PeakPos", crateKey,stationKey,channelKey,nil];
+//               
+//	    [aDataSet histogram:tValley
+//	    			numBins:4096 sender:self  
+//	    		   withKeys:@"SLT", @"FLTthruSLT", @"ValleyPos", crateKey,stationKey,channelKey,nil];
+        
         ptr+=6;//next event
     }
     
-    /*
-     //for debugging/testing -tb-
-     int i=0;
-     
-     NSLog(@"EventFifoRecordLen: %i\n",length);
-     int showMax=length;
-     if(showMax>12){showMax=12;}
-     for(i=2;i<showMax; i++){
-     NSLog(@"word %i: 0x%08x\n",i,*(ptr+i));
-     }
-     */
-    
-    return length; //nothing to display at this time.. just return the length
+    return length;
 }
 
-- (NSString*) dataRecordDescription:(unsigned long*)ptr
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr
 {
+	unsigned long length	= ExtractLength(dataPtr[0]);
     
-	unsigned long length	= ExtractLength(ptr[0]);
-    
-	NSString* title= @"Katrin SLTv4 Energy Record\n\n";
-    unsigned long numCrate,numCard;
-    unsigned long numEv=(length-4)/6;    //(((*ptr) & 0x3ffff)-4)/6;
-    NSString* content=[NSString stringWithFormat:@"Num.Eevents= %lu\n",numEv];
-    
-    
-	++ptr;		//skip the first word (dataID and length)
-    numCrate=(*ptr>>21) & 0xf;
-    numCard=(*ptr>>16) & 0x1f;
-    NSString* crate = [NSString stringWithFormat:@"Crate      = %lu\n",(*ptr>>21) & 0xf];
-    NSString* card  = [NSString stringWithFormat:@"Station    = %lu\n",(*ptr>>16) & 0x1f];
-    
-    ++ptr;
-    ++ptr;
-    ++ptr;
-    
-   // unsigned long* eventPtr=ptr;
-    
-    int i;
-    if(1){
-        NSString* infoall = @"";
-        for(i=0;i<numEv;i++){
-            unsigned long f1=ptr[i*6+0];
-            unsigned long f2=ptr[i*6+1];
-            unsigned long f3=ptr[i*6+2];
-            unsigned long f4=ptr[i*6+3];
-            unsigned long f5=ptr[i*6+4];
-            unsigned long f6=ptr[i*6+5];
-            NSLog(@"Tpeak Apeak 0x%x       Tvalley Avalley 0x%x       \n",f4,f5);
-            unsigned long p  = (f1 >> 28) & 0x1;
-            unsigned long subsec = (f1  & 0x0ffffff8) >> 3;
-            unsigned long sec = (f2 & 0x1fffffff) | ((f1  & 0x7) << 29);
-            unsigned long flt   = (f3 >> 24) & 0x1f;
-            unsigned long chan   = (f3 >> 19) & 0x1f;
-            unsigned long multiplicity  = (f3 >> 14) & 0x1f;
-            unsigned long evID   = f3  & 0x3fff;
-            //unsigned long toplen = f4  & 0x1ff;
-            //unsigned long ediff  = (f4 >> 9) & 0xfff;
-            unsigned long tpeak    = (f4 >> 16) & 0x1ff;
-            unsigned long apeak    =  f4   & 0x7ff; // & 0xfff; bit 12 unused and always 1 -tb-
-            unsigned long tvalley  = (f5 >> 16) & 0x1ff;
-            //unsigned long avalley  =  f5   & 0xfff; is negative
-            unsigned long avalley  =  4096 - (f5 & 0xfff);
-            
-            unsigned long energy  = f6  & 0xfffff;
-            NSString* info1 = [NSString stringWithFormat:@"Event %i:\n"
-                               "FIFO entry:  flt: %lu,chan: %lu,energy: %lu,sec: %lu,subsec: %lu   \n",i,        flt,chan,energy,sec,subsec ];//DEBUG -tb-
-            NSString* info2 = [NSString stringWithFormat:@"FIFO entry:  multiplicity: %lu,p: %lu,Epeak: %lu,Evalley: %lu,t_peak: %lu,t_valley: %lu,evID: %lu   \n",
-                               multiplicity,p,apeak,avalley,tpeak,tvalley,evID ];//DEBUG -tb-
-            
-            infoall = [infoall stringByAppendingString: info1];
-            infoall = [infoall stringByAppendingString: info2];
-            
-        }
-        return [NSString stringWithFormat:@"%@%@%@%@%@",title,content,crate,card,
-                infoall];
-    
-    }
-    //for(i=0;i<numEv;i++){
+    unsigned long numEv = (length-4)/6;
 
-    unsigned long f1=ptr[0];
-    unsigned long f2=ptr[1];
-    unsigned long f3=ptr[2];
-    unsigned long f4=ptr[3];
-    unsigned long f5=ptr[4];
-    unsigned long f6=ptr[5];
-    
-    unsigned long p             = (f1 >> 28) & 0x1;
-    unsigned long subsec        = (f1  & 0x0ffffff8) >> 3;
-    unsigned long sec           = (f2 & 0x1fffffff) | ((f1  & 0x7) << 29);
-    unsigned long flt           = (f3 >> 24) & 0x1f;
-    unsigned long chan          = (f3 >> 19) & 0x1f;
-    unsigned long multiplicity  = (f3 >> 14) & 0x1f;
-    unsigned long evID          = f3  & 0x3fff;
-    unsigned long tpeak         = (f4 >> 16) & 0x1ff;
-    unsigned long apeak         =  f4   & 0x7ff; // & 0xfff; bit 12 unused and always 1 -tb-
-    unsigned long tvalley       = (f5 >> 16) & 0x1ff;
-    unsigned long avalley       =  4096 - (f5 & 0xfff);
-    
-    unsigned long energy  = f6  & 0xfffff;
-    
-    NSString* info1 = [NSString stringWithFormat:@"First event:\n"
-                       "FIFO entry:  flt: %lu,chan: %lu,energy: %lu,sec: %lu,subsec: %lu   \n",flt,chan,energy,sec,subsec ];//DEBUG -tb-
-    NSString* info2 = [NSString stringWithFormat:@"FIFO entry:  multiplicity: %lu,p: %lu,Epeak: %lu,Evalley: %lu,t_peak: %lu,t_valley: %lu,evID: %lu   \n",
-                       multiplicity,p,apeak,avalley,tpeak,tvalley,evID ];//DEBUG -tb-
-    
-  	return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,content,crate,card,
-            info1,info2];
+    int crateNum = (dataPtr[1]>>21) & 0xf;
+    NSString* content   = [NSString stringWithFormat:@"SLTv4 Energy Record\n\nEvents In Record: %lu\nCrate: %d\n",numEv,crateNum];
+    unsigned long* ptr = &dataPtr[4];
+    int i;
+    for(i=0;i<numEv;i++){
+        unsigned long event = i*6;
+        
+        unsigned long f1 = ptr[event + 0];
+        unsigned long f2 = ptr[event + 1];
+        unsigned long f3 = ptr[event + 2];
+        unsigned long f4 = ptr[event + 3];
+        unsigned long f5 = ptr[event + 4];
+        unsigned long f6 = ptr[event + 5];
+        
+        unsigned long subsec   = f1 & 0x0fffffff;
+        unsigned long sec      = f2;
+        unsigned long flt      = (f3 >> 24) & 0x1f;
+        unsigned long chan     = (f3 >> 19) & 0x1f;
+        unsigned long mult     = (f3 >> 14) & 0x1f;
+        unsigned long eventID  = f3  & 0x3fff;
+        unsigned long tPeak    = (f4 >> 16) & 0x1ff;
+        unsigned long aPeak    = f4 & 0x7ff; // & 0xfff; bit 12 unused and always 1 -tb-
+        unsigned long tValley  = (f5 >> 16) & 0x1ff;
+        unsigned long aValley  =  4096 - (f5 & 0xfff);
+        unsigned long energy   = f6  & 0xfffff;
+        
+        content = [content stringByAppendingFormat:@"Event: %d EventID: %lu \nSeconds: %lu.%lu\nFLT: %lu  Chan: %lu\n",i,eventID,sec,subsec,flt,chan];
+        content = [content stringByAppendingFormat:@"TPeak: %lu TValley: %lu\n",tPeak,tValley];
+        content = [content stringByAppendingFormat:@"APeak: %lu AValley: %lu\n",aPeak,aValley];
+        content = [content stringByAppendingFormat:@"Multi: %lu Energy: %lu\n",mult,energy];
+    }
+    return content;
 }
 @end
-
-
-
-
-
-
-
-
-
-
-
 
 @implementation ORKatrinV4SLTDecoderForMultiplicity
 
