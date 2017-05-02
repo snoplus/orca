@@ -4247,7 +4247,7 @@ err:
     uint32_t slots = [self getSlotsPresent];
     for (int i=0;i<16;i++) {
         if((slots & 1<<16) == 0) {
-            if(((0xF << 1*4) & relays) != 0)
+            if(((0xF << i*4) & relays) != 0)
                 bad_slots += 1<<i;
         }
     }
@@ -4303,7 +4303,6 @@ err:
                     } else {
                         NSLogColor([NSColor redColor],@"%@ HV Relays unknown\n",[[xl3 xl3Link] crateName]);
                     }
-
                 }
                 @catch (NSException *exception) {
                     NSLogColor([NSColor redColor],@"%@ error in readHVRelays\n",[[xl3 xl3Link] crateName]);
@@ -4332,7 +4331,9 @@ err:
 
         @try {
             [self readHVRelays:&relays isKnown:&relaysKnown];
-            if (!relaysKnown) NSLogColor([NSColor redColor],@"%@ HV relays unknown\n",[[self xl3Link] crateName]);
+            if (!relaysKnown){
+                NSLogColor([NSColor redColor],@"%@ HV relays unknown\n",[[self xl3Link] crateName]);
+            }
         }
         @catch (NSException *exception) {
             NSLogColor([NSColor redColor],@"%@ error in readHVRelays\n",[[self xl3Link] crateName]);
@@ -4341,7 +4342,7 @@ err:
         // Make sure the relays are open for all slots that are missing
         if(relaysKnown) {
             uint32_t badRelays = [self checkRelays:relays];
-            relaysGood = badRelays == 0;
+            relaysGood = (badRelays == 0);
             if(!relaysGood) {
                 NSLogColor([NSColor redColor], @"%@ has missing slots with closed relays!\n", [[self xl3Link] crateName]);
             }
