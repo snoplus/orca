@@ -1452,11 +1452,19 @@ static NSDictionary* xl3Ops;
     [model openHVRelays];
 }
 
-- (IBAction)hvCheckInterlockAction:(id)sender
+- (IBAction)hvCheckInterlockRelaysAction:(id)sender
 {
+    uint64_t relays;
+    BOOL known;
+
     [self endEditing];
     [model readHVInterlock];
-
+    [model readHVRelays:&relays isKnown:&known];
+    if(known) {
+        NSLog(@"Relay mask = %llu\n", (unsigned long long) relays);
+    } else {
+        NSLog(@"Relays are unknown!\n");
+    }
 }
 
 - (IBAction)hvTurnOnAction:(id)sender
