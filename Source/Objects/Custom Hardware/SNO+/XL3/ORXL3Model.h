@@ -449,6 +449,8 @@ enum {
 - (void) readHVSwitchOnForA:(BOOL*)aIsOn forB:(BOOL*)bIsOn;
 - (void) readHVSwitchOn;
 
+- (uint32_t) checkRelays:(uint64_t)relays;
+- (BOOL) isHVAdvisable:(unsigned char) sup;
 
 + (bool) requestHVParams:(ORXL3Model *)model;
 - (void) safeHvInit;

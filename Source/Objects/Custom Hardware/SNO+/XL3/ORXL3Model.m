@@ -4238,33 +4238,36 @@ err:
 
     NSLog(@"%@ switch A is %@, switch B is %@.\n",[[self xl3Link] crateName], switchAIsOn?@"ON":@"OFF", switchBIsOn?@"ON":@"OFF");
 }
+- (uint32_t) checkRelays:(uint64_t)relays {
+    // Returns if the relays are acceptable or not.
+    // Currently just checks that any missing slots also have open relays
+    // Could be expanded in the future.
 
-- (void) setHVSwitch:(BOOL)aOn forPowerSupply:(unsigned char)sup
-{
-    @synchronized(self) {
-    BOOL xl3SwitchA, xl3SwitchB;
-
-    @try {
-        [self readHVSwitchOnForA:&xl3SwitchA forB:&xl3SwitchB];
+    uint32_t bad_slots = 0;
+    uint32_t slots = [self getSlotsPresent];
+    for (int i=0;i<16;i++) {
+        if((slots & 1<<16) == 0) {
+            if(((0xF << 1*4) & relays) != 0)
+                bad_slots += 1<<i;
+        }
     }
-    @catch (NSException *exception) {
-        NSLog(@"%@ error in readHVSwitch\n", [[self xl3Link] crateName]);
-        return;
-    }
-
-    [self setHvASwitch:xl3SwitchA];
-    [self setHvBSwitch:xl3SwitchB];
-        
-        
+    return bad_slots;
+}
+- (BOOL) isHVAdvisable:(unsigned char) sup {
     BOOL interlockIsGood = false;
     BOOL relaysKnown = false;
+    BOOL relaysGood = true; // Start true b/c if relaysKnown doesn't pass this won't be checked.
+    BOOL modeGood = false;
     uint64_t relays;
     if ([self crateNumber] == 16 && sup != 0) { //16B
         //Checks interlocks for any crates with connected OWL tubes
         //Assumes that all relevant crates are represented in the open experiment
         uint32_t checkedCrates = 0;
         uint32_t goodInterlocks = 0;
+        uint32_t knownRelays = 0;
         uint32_t goodRelays = 0;
+        uint32_t goodModes = 0;
+
         NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
         for (uint32_t i = 0; i < [objs count]; i++) {
             ORXL3Model *xl3 = [objs objectAtIndex:i];
@@ -4287,20 +4290,38 @@ err:
                 @try {
                     [xl3 readHVRelays:&relays isKnown:&good];
                     if (good) {
-                        goodRelays++;
+                        knownRelays++;
+                        // If the relays are known make sure slot 15's are open if the FEC is missing
+                        uint32_t bad_relays = [xl3 checkRelays:relays];
+                        if((bad_relays & 1<<15) == 0) {
+                            goodRelays++;
+                        }
+                        else {
+                            NSLogColor([NSColor redColor], @"%@ HV relays for slot 15 are closed but FEC is missing!\n");
+                        }
+
                     } else {
                         NSLogColor([NSColor redColor],@"%@ HV Relays unknown\n",[[xl3 xl3Link] crateName]);
                     }
+
                 }
                 @catch (NSException *exception) {
                     NSLogColor([NSColor redColor],@"%@ error in readHVRelays\n",[[xl3 xl3Link] crateName]);
                 }
+
+                // Finally make sure the XL3s are reading out
+                if([xl3 xl3Mode] == NORMAL_MODE) {
+                    goodModes++;
+                }
             }
         }
+
         interlockIsGood = checkedCrates == goodInterlocks;
-        relaysKnown     = checkedCrates == goodRelays;
+        relaysKnown     = checkedCrates == knownRelays;
+        modeGood        = checkedCrates == goodModes;
+        relaysGood      = knownRelays   == goodRelays;
     } else {
-        //Checks the interlock for this crate only
+        //Checks the state for this crate only
         @try {
             [self readHVInterlockGood:&interlockIsGood];
             if (!interlockIsGood) NSLogColor([NSColor redColor],@"%@ HV interlock BAD\n",[[self xl3Link] crateName]);
@@ -4317,8 +4338,41 @@ err:
             NSLogColor([NSColor redColor],@"%@ error in readHVRelays\n",[[self xl3Link] crateName]);
         }
 
+        // Make sure the relays are open for all slots that are missing
+        if(relaysKnown) {
+            uint32_t badRelays = [self checkRelays:relays];
+            relaysGood = badRelays == 0;
+            if(!relaysGood) {
+                NSLogColor([NSColor redColor], @"%@ has missing slots with closed relays!\n", [[self xl3Link] crateName]);
+            }
+        }
+
+        // Check that the XL3 Mode is not INIT
+        modeGood = [self xl3Mode] == NORMAL_MODE;
     }
-    if (!interlockIsGood || !relaysKnown) {
+
+    return interlockIsGood && relaysKnown && modeGood && relaysGood;
+
+}
+- (void) setHVSwitch:(BOOL)aOn forPowerSupply:(unsigned char)sup
+{
+    @synchronized(self) {
+    BOOL xl3SwitchA, xl3SwitchB;
+
+    @try {
+        [self readHVSwitchOnForA:&xl3SwitchA forB:&xl3SwitchB];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"%@ error in readHVSwitch\n", [[self xl3Link] crateName]);
+        return;
+    }
+
+    [self setHvASwitch:xl3SwitchA];
+    [self setHvBSwitch:xl3SwitchB];
+
+    BOOL hv_advisable = [self isHVAdvisable:sup];
+
+    if (!hv_advisable) {
         if (aOn) {
             NSLog(@"%@ NOT turning ON the HV power supply.\n",[[self xl3Link] crateName]);
             return;
