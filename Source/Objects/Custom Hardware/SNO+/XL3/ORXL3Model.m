@@ -4114,6 +4114,31 @@ err:
     }
 }
 
+- (void) readHVRelays:(uint64_t*) _relayMask isKnown:(BOOL*)isKnown {
+    char payload[XL3_PAYLOAD_SIZE];
+    uint32_t mask1, mask2, known;
+
+    memset(payload, 0, XL3_PAYLOAD_SIZE);
+    GetHVRelaysResults* data = (GetHVRelaysResults*) payload;
+
+    @try {
+        [[self xl3Link] sendCommand:GET_HV_RELAYS_ID withPayload:payload expectResponse:YES];
+    }
+    @catch (NSException *exception) {
+        NSLogColor([NSColor redColor],@"%@ error sending GetHVRelays command.\n",[[self xl3Link] crateName]);
+        @throw exception;
+    }
+
+    if ([xl3Link needToSwap]) {
+        mask1 = swapLong(data->mask1);
+        mask2 = swapLong(data->mask2);
+        known = swapLong(data->relays_known);
+    }
+
+    *_relayMask = mask1 + ((uint64_t)mask2 << 32);
+    *isKnown = (known != 0);
+}
+
 - (void) closeHVRelays
 {
     unsigned long error;

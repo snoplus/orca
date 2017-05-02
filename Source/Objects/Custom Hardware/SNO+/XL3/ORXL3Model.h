@@ -441,6 +441,7 @@ enum {
 
 - (void) setHVRelays:(unsigned long long)relayMask error:(unsigned long*)aError;
 - (void) setHVRelays:(unsigned long long)relayMask;
+- (void) readHVRelays:(unsigned long long*) relayMask isKnown:(BOOL*)isKnown;
 - (void) closeHVRelays;
 - (void) openHVRelays;
 
