@@ -36,7 +36,7 @@
 #import "SNOCaenModel.h"
 #import "RunTypeWordBits.hh"
 #import "ECARun.h"
-#import "NhitMonitor.h"
+#import "NHitMonitor.h"
 
 NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 NSString* ORRunWaitFinished = @"ORRunWaitFinished";
