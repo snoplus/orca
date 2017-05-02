@@ -4257,18 +4257,22 @@ err:
         
         
     BOOL interlockIsGood = false;
+    BOOL relaysKnown = false;
+    uint64_t relays;
     if ([self crateNumber] == 16 && sup != 0) { //16B
         //Checks interlocks for any crates with connected OWL tubes
         //Assumes that all relevant crates are represented in the open experiment
-        uint32_t checkedInterlocks = 0;
+        uint32_t checkedCrates = 0;
         uint32_t goodInterlocks = 0;
+        uint32_t goodRelays = 0;
         NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
         for (uint32_t i = 0; i < [objs count]; i++) {
             ORXL3Model *xl3 = [objs objectAtIndex:i];
             if ([xl3 isOwlCrate]) {
-                checkedInterlocks++;
+                checkedCrates++;
+                BOOL good = false;
+                // First check the interlocks
                 @try {
-                    BOOL good = false;
                     [xl3 readHVInterlockGood:&good];
                     if (good) {
                         goodInterlocks++;
@@ -4279,9 +4283,22 @@ err:
                 @catch (NSException *exception) {
                     NSLogColor([NSColor redColor],@"%@ error in readHVInterlock\n",[[xl3 xl3Link] crateName]);
                 }
+                // Now check the relays
+                @try {
+                    [xl3 readHVRelays:&relays isKnown:&good];
+                    if (good) {
+                        goodRelays++;
+                    } else {
+                        NSLogColor([NSColor redColor],@"%@ HV Relays unknown\n",[[xl3 xl3Link] crateName]);
+                    }
+                }
+                @catch (NSException *exception) {
+                    NSLogColor([NSColor redColor],@"%@ error in readHVRelays\n",[[xl3 xl3Link] crateName]);
+                }
             }
         }
-        interlockIsGood = checkedInterlocks == goodInterlocks;
+        interlockIsGood = checkedCrates == goodInterlocks;
+        relaysKnown     = checkedCrates == goodRelays;
     } else {
         //Checks the interlock for this crate only
         @try {
@@ -4291,8 +4308,17 @@ err:
         @catch (NSException *exception) {
             NSLogColor([NSColor redColor],@"%@ error in readHVInterlock\n",[[self xl3Link] crateName]);
         }
+
+        @try {
+            [self readHVRelays:&relays isKnown:&relaysKnown];
+            if (!relaysKnown) NSLogColor([NSColor redColor],@"%@ HV relays unknown\n",[[self xl3Link] crateName]);
+        }
+        @catch (NSException *exception) {
+            NSLogColor([NSColor redColor],@"%@ error in readHVRelays\n",[[self xl3Link] crateName]);
+        }
+
     }
-    if (!interlockIsGood) {
+    if (!interlockIsGood || !relaysKnown) {
         if (aOn) {
             NSLog(@"%@ NOT turning ON the HV power supply.\n",[[self xl3Link] crateName]);
             return;
