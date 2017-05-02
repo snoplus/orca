@@ -4254,8 +4254,12 @@ err:
     uint32_t bad_slots = 0;
     uint32_t slots = [self getSlotsPresent];
     for (int i=0;i<16;i++) {
-        if((slots & 1<<16) == 0) {
-            if(((0xF << i*4) & relays) != 0)
+        // If slot is missing
+        if((slots & 1<<i) == 0) {
+            // And if the 4 relays for that slot aren't all 0 (open)
+            uint64_t mask = (uint64_t)0xF << i*4;
+            if((mask & relays) != 0)
+                //Then set a bit in bad_slots
                 bad_slots += 1<<i;
         }
     }
@@ -4360,6 +4364,9 @@ err:
 
         // Check that the XL3 Mode is not INIT
         modeGood = [self xl3Mode] == NORMAL_MODE;
+        if(!modeGood){
+            NSLogColor([NSColor redColor], @"%@ is not in NORMAL mode!\n", [[self xl3Link] crateName]);
+        }
     }
 
     return interlockIsGood && relaysKnown && modeGood && relaysGood;
