@@ -4134,9 +4134,17 @@ err:
         mask2 = swapLong(data->mask2);
         known = swapLong(data->relays_known);
     }
-
     *_relayMask = mask1 + ((uint64_t)mask2 << 32);
     *isKnown = (known != 0);
+
+    if(!known) {
+        [self setRelayStatus:@"status: UNKNOWN"];
+    }
+    else {
+        [self setRelayMask:*_relayMask];
+        [self setRelayStatus:@"status: SET"];
+
+    }
 }
 
 - (void) closeHVRelays
@@ -4253,12 +4261,14 @@ err:
     }
     return bad_slots;
 }
+
 - (BOOL) isHVAdvisable:(unsigned char) sup {
     BOOL interlockIsGood = false;
     BOOL relaysKnown = false;
     BOOL relaysGood = true; // Start true b/c if relaysKnown doesn't pass this won't be checked.
     BOOL modeGood = false;
     uint64_t relays;
+
     if ([self crateNumber] == 16 && sup != 0) { //16B
         //Checks interlocks for any crates with connected OWL tubes
         //Assumes that all relevant crates are represented in the open experiment
