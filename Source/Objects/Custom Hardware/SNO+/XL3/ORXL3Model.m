@@ -4116,18 +4116,15 @@ err:
 
 - (void) readHVRelays:(uint64_t*) _relayMask isKnown:(BOOL*)isKnown {
     char payload[XL3_PAYLOAD_SIZE];
-    uint32_t mask1, mask2, known;
 
     memset(payload, 0, XL3_PAYLOAD_SIZE);
     GetHVRelaysResults* data = (GetHVRelaysResults*) payload;
 
-    @try {
-        [[self xl3Link] sendCommand:GET_HV_RELAYS_ID withPayload:payload expectResponse:YES];
-    }
-    @catch (NSException *exception) {
-        NSLogColor([NSColor redColor],@"%@ error sending GetHVRelays command.\n",[[self xl3Link] crateName]);
-        @throw exception;
-    }
+    [[self xl3Link] sendCommand:GET_HV_RELAYS_ID withPayload:payload expectResponse:YES];
+
+    uint32_t mask1 = data->mask1;
+    uint32_t mask2 = data->mask2;
+    uint32_t known = data->relays_known;
 
     if ([xl3Link needToSwap]) {
         mask1 = swapLong(data->mask1);
@@ -4247,7 +4244,7 @@ err:
     NSLog(@"%@ switch A is %@, switch B is %@.\n",[[self xl3Link] crateName], switchAIsOn?@"ON":@"OFF", switchBIsOn?@"ON":@"OFF");
 }
 - (uint32_t) checkRelays:(uint64_t)relays {
-    // Returns if the relays are acceptable or not.
+    // Returns a bit mask of which slots have issues with their relays
     // Currently just checks that any missing slots also have open relays
     // Could be expanded in the future.
 
@@ -4260,7 +4257,7 @@ err:
             uint64_t mask = (uint64_t)0xF << i*4;
             if((mask & relays) != 0)
                 //Then set a bit in bad_slots
-                bad_slots += 1<<i;
+                bad_slots |= 1<<i;
         }
     }
     return bad_slots;
