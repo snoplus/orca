@@ -1459,11 +1459,15 @@ static NSDictionary* xl3Ops;
 
     [self endEditing];
     [model readHVInterlock];
-    [model readHVRelays:&relays isKnown:&known];
-    if(known) {
-        NSLog(@"Relay mask = %llu\n", (unsigned long long) relays);
-    } else {
-        NSLog(@"Relays are unknown!\n");
+    @try {
+        [model readHVRelays:&relays isKnown:&known];
+        if(known) {
+            NSLog(@"Relay mask = %llu\n", (unsigned long long) relays);
+        } else {
+            NSLog(@"Relays are unknown!\n");
+        }
+    }@catch (NSException *exception) {
+        NSLogColor([NSColor redColor],@"%@ error in readHVRelays. Error: %@ Reason: %@\n",[[model xl3Link] crateName], [exception name], [exception reason]);
     }
 }
 
