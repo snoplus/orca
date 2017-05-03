@@ -74,6 +74,7 @@ NSString* ORSNOPModelSRVersionChangedNotification = @"ORSNOPModelSRVersionChange
 NSString* ORSNOPModelNhitMonitorChangedNotification = @"ORSNOPModelNhitMonitorChangedNotification";
 NSString* ORSNOPStillWaitingForBuffersNotification = @"ORSNOPStillWaitingForBuffersNotification";
 NSString* ORSNOPNotWaitingForBuffersNotification = @"ORSNOPNotWaitingForBuffersNotification";
+NSString* ORRoutineChangedNotification = @"ORRoutineChangedNotification";
 
 BOOL isNotRunningOrIsInMaintenance()
 {
@@ -358,11 +359,10 @@ tellieRunFiles = _tellieRunFiles;
 
     /* Initialize ECARun object: this doesn't start the run */
     anECARun = [[ECARun alloc] init];
-
     nhitMonitor = [[NHitMonitor alloc] init];
-
     ecaLock = [[NSLock alloc] init];
-
+    /* Initialize LivePed object*/
+    livePeds = [[LivePedestals alloc] init];
     [[self undoManager] disableUndoRegistration];
     [self initOrcaDBConnectionHistory];
     [self initDebugDBConnectionHistory];
@@ -499,6 +499,7 @@ tellieRunFiles = _tellieRunFiles;
     [dataHost release];
     [logHost release];
     [anECARun release];
+    [livePeds release];
     [nhitMonitor release];
     [sessionDB release];
     [ecaLock release];
@@ -975,11 +976,21 @@ err:
          * the PDST or TSLP bits are enabled */
         [[self anECARun] launchECAThread:NULL];
     }
-    else if (run_type & kPhysicsRun) {
-        /* If this is a physics run with no ECAs, we ping each slot in the
-         * detector once at the beginning of the run to look for any trigger
-         * issues. */
+    else {
+
+        if (run_type & kPhysicsRun) {
+        /* If this is a physics run with no ECAs nor embedded pedestals, we 
+         * ping each slot in the detector once at the beginning of the run 
+         * to look for any trigger issues. */
         [self pingCratesAtRunStart];
+        }
+        
+        if(run_type & (kEmbeddedPeds)){
+            /* Launch the Live Pedestals routine if the corresponding
+             * bit is ticked in the run type word. */
+            [[self livePeds] launchLivePedsThread];
+        }
+
     }
 
     return;
@@ -2373,6 +2384,10 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 - (ECARun*) anECARun
 {
     return anECARun;
+}
+
+- (LivePedestals*) livePeds{
+    return livePeds;
 }
 
 - (BOOL) startStandardRun:(NSString*)_standardRun withVersion:(NSString*)_standardRunVersion

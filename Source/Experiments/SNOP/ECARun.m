@@ -17,7 +17,6 @@
 #import "RunTypeWordBits.hh"
 
 //Notifications
-NSString* ORECAStatusChangedNotification = @"ORECAStatusChangedNotification";
 NSString* ORECARunChangedNotification = @"ORECARunChangedNotification";
 NSString* ORECARunStartedNotification = @"ORECARunStartedNotification";
 NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
@@ -243,7 +242,7 @@ err:
     /* This is the actual ECA algorithm, which needs to be run in a separate thread */
     @autoreleasepool {
 
-        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORECAStatusChangedNotification object: self userInfo: nil];
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORRoutineChangedNotification object:self userInfo:@{@"routine":@"ECA"}];
 
         /* Get models */
         //MTC model
@@ -315,7 +314,7 @@ err:
         }
         NSLog(@"------------------------- \n");
         NSLog(@" Events per cell: %d \n", ECA_nevents);
-        NSLog(@" Pattern: %@ \n", getECAPatternName(ECA_pattern) );
+        NSLog(@" Pattern: %@ \n", ECA_pattern_string );
         NSLog(@" TSlope: %d \n", ECA_tslope_pattern);
         NSLog(@" Type: %@ \n", ECA_type);
         NSLog(@" Rate: %@ \n", ECA_rate);
@@ -376,7 +375,7 @@ err:
             isFinished = TRUE;
         });
 
-        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORECAStatusChangedNotification object: self userInfo: nil];
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORRoutineChangedNotification object:self userInfo:@{@"routine":@"ECA", @"status":@"Not running"}];
 
     }//end autoreleasepool
 
@@ -716,7 +715,7 @@ err:
 - (void)setECA_currentStep:(int)aValue
 {
     ECA_currentStep = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORECAStatusChangedNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORRoutineChangedNotification object:self userInfo:@{@"routine":@"ECA"}];
 }
 
 - (int)ECA_currentPoint
@@ -727,7 +726,7 @@ err:
 - (void)setECA_currentPoint:(int)aValue
 {
     ECA_currentPoint = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORECAStatusChangedNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORRoutineChangedNotification object:self userInfo:@{@"routine":@"ECA"}];
 }
 
 - (int)ECA_currentDelay
@@ -738,7 +737,7 @@ err:
 - (void)setECA_currentDelay:(double)aValue
 {
     ECA_currentDelay = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORECAStatusChangedNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORRoutineChangedNotification object:self userInfo:@{@"routine":@"ECA"}];
 }
 
 - (NSString*)ECA_type

@@ -52,8 +52,11 @@
     IBOutlet StopLightView *lightBoardView;
     IBOutlet NSButton *resyncRunButton;
 
+    //Routines
+    IBOutlet NSMatrix *routineStatusMatrix;
+
     //Quick links
-    
+
     //Danger zone
     IBOutlet NSButton *panicDownButton;
     IBOutlet NSButton *triggersOFFButton;
@@ -129,6 +132,10 @@
     IBOutlet NSTextField *ecaPulserRate;
     IBOutlet NSMatrix *ecaStatusMatrix;
 
+    //Live pedestals
+    IBOutlet NSTextField *livePedStatusLabel;
+    IBOutlet NSMatrix *livePedRadioButton;
+    IBOutlet NSMatrix *livePedRunTypeWordAd;
 
     //Server settings
     IBOutlet NSComboBox *orcaDBIPAddressPU;

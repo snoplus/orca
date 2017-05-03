@@ -53,6 +53,8 @@
 		0FF177C81DF7AEA000BA783B /* run_dog_frame_5.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 0FF177C11DF7AEA000BA783B /* run_dog_frame_5.tiff */; };
 		0FF177C91DF7AEA000BA783B /* run_dog_frame_6.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 0FF177C21DF7AEA000BA783B /* run_dog_frame_6.tiff */; };
 		0FF177CB1DF7AF2F00BA783B /* waiting_dog.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 0FF177CA1DF7AF2F00BA783B /* waiting_dog.tiff */; };
+		10279A731EBA4AFE00048814 /* LivePedestals.m in Sources */ = {isa = PBXBuildFile; fileRef = 10279A721EBA4AFE00048814 /* LivePedestals.m */; };
+		10279A791EBA6B5B00048814 /* ECAPatterns.m in Sources */ = {isa = PBXBuildFile; fileRef = 10279A781EBA6B5B00048814 /* ECAPatterns.m */; };
 		10E455911E283AC000FB37A5 /* ECARun.h in Headers */ = {isa = PBXBuildFile; fileRef = 10E4558F1E283AC000FB37A5 /* ECARun.h */; };
 		10E455921E283AC000FB37A5 /* ECARun.m in Sources */ = {isa = PBXBuildFile; fileRef = 10E455901E283AC000FB37A5 /* ECARun.m */; };
 		146822430FC4799C0082BD70 /* ORCircularBufferUV.h in Headers */ = {isa = PBXBuildFile; fileRef = 146822410FC4799C0082BD70 /* ORCircularBufferUV.h */; };
@@ -3835,6 +3837,9 @@
 		0FF177C11DF7AEA000BA783B /* run_dog_frame_5.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = run_dog_frame_5.tiff; sourceTree = "<group>"; };
 		0FF177C21DF7AEA000BA783B /* run_dog_frame_6.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = run_dog_frame_6.tiff; sourceTree = "<group>"; };
 		0FF177CA1DF7AF2F00BA783B /* waiting_dog.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = waiting_dog.tiff; sourceTree = "<group>"; };
+		10279A711EBA4AE900048814 /* LivePedestals.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LivePedestals.h; sourceTree = "<group>"; };
+		10279A721EBA4AFE00048814 /* LivePedestals.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LivePedestals.m; sourceTree = "<group>"; };
+		10279A781EBA6B5B00048814 /* ECAPatterns.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ECAPatterns.m; sourceTree = "<group>"; };
 		1038D8841E23160D009FFDFB /* RunTypeWordBits.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RunTypeWordBits.hh; sourceTree = "<group>"; };
 		10E4558F1E283AC000FB37A5 /* ECARun.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ECARun.h; sourceTree = "<group>"; };
 		10E455901E283AC000FB37A5 /* ECARun.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ECARun.m; sourceTree = "<group>"; };
@@ -14506,9 +14511,12 @@
 				EFB39FCC130BA1C5001220AC /* SNOPModel.h */,
 				EFB39FCD130BA1C5001220AC /* SNOPModel.m */,
 				0FF177A51DF79F5600BA783B /* run_dog_images */,
-				10E4558F1E283AC000FB37A5 /* ECARun.h */,
 				10E455931E28439B00FB37A5 /* ECAPatterns.h */,
+				10279A781EBA6B5B00048814 /* ECAPatterns.m */,
+				10E4558F1E283AC000FB37A5 /* ECARun.h */,
 				10E455901E283AC000FB37A5 /* ECARun.m */,
+				10279A711EBA4AE900048814 /* LivePedestals.h */,
+				10279A721EBA4AFE00048814 /* LivePedestals.m */,
 			);
 			path = SNOP;
 			sourceTree = "<group>";
@@ -17472,6 +17480,7 @@
 				844E49F3057538B1005F11A0 /* ORTask.m in Sources */,
 				8483E56E058652E400C28344 /* ORDataController.m in Sources */,
 				843DCF3B058E546A000C5219 /* ORDataGenModel.m in Sources */,
+				10279A731EBA4AFE00048814 /* LivePedestals.m in Sources */,
 				847CCA69058E8C75003522C8 /* ORQueue.m in Sources */,
 				5B5A40521A79385C00543633 /* ORSIS3305Decoders.m in Sources */,
 				847CCA6B058E8C75003522C8 /* ORLinkedList.m in Sources */,
@@ -18363,6 +18372,7 @@
 				84FEAD1D15939394005D798C /* ORProXR16SSRController.m in Sources */,
 				84FEAD1F15939394005D798C /* ORProXR16SSRModel.m in Sources */,
 				84D153661BD53D2A005EC269 /* OROnCallListModel.m in Sources */,
+				10279A791EBA6B5B00048814 /* ECAPatterns.m in Sources */,
 				84FEB88B15A31F42005D798C /* ORL2301Controller.m in Sources */,
 				84FEB88D15A31F42005D798C /* ORL2301Decoders.m in Sources */,
 				84D5D0661C4564DF0057C1CA /* ORSIS3316Controller.m in Sources */,
