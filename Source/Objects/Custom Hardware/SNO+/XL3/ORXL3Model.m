@@ -4308,7 +4308,7 @@ err:
                             goodRelays++;
                         }
                         else {
-                            NSLogColor([NSColor redColor], @"%@ HV relays for slot 15 are closed but FEC is missing!\n");
+                            NSLogColor([NSColor redColor], @"%@ HV relays for slot 15 are closed but FEC is missing!\n",[[self xl3Link] crateName]);
                         }
 
                     } else {
@@ -4316,7 +4316,7 @@ err:
                     }
                 }
                 @catch (NSException *exception) {
-                    NSLogColor([NSColor redColor],@"%@ error in readHVRelays\n",[[xl3 xl3Link] crateName]);
+                    NSLogColor([NSColor redColor],@"%@ error in readHVRelays. Error: %@ Reason: %@\n",[[xl3 xl3Link] crateName],[exception name], [exception reason]);
                 }
 
                 // Finally make sure the XL3s are reading out
@@ -4337,7 +4337,7 @@ err:
             if (!interlockIsGood) NSLogColor([NSColor redColor],@"%@ HV interlock BAD\n",[[self xl3Link] crateName]);
         }
         @catch (NSException *exception) {
-            NSLogColor([NSColor redColor],@"%@ error in readHVInterlock\n",[[self xl3Link] crateName]);
+            NSLogColor([NSColor redColor],@"%@ error in readHVInterlock. Error: %@ Reason %@\n",[[self xl3Link] crateName],[exception name], [exception reason]);
         }
 
         @try {
@@ -4347,7 +4347,7 @@ err:
             }
         }
         @catch (NSException *exception) {
-            NSLogColor([NSColor redColor],@"%@ error in readHVRelays\n",[[self xl3Link] crateName]);
+            NSLogColor([NSColor redColor],@"%@ error in readHVRelays. Error: %@ Reason: %@\n",[[self xl3Link] crateName],[exception name], [exception reason]);
         }
 
         // Make sure the relays are open for all slots that are missing
