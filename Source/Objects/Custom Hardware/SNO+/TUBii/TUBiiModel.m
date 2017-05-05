@@ -407,11 +407,11 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
 }
 - (NSUInteger) syncTrigMask {
     // See comment in setTrigMask for info.
-    return [connection intCommand: "GetSyncTriggerMask"];
+    return [self sendIntCmd:@"GetSyncTriggerMask"];
 }
 - (NSUInteger) asyncTrigMask {
     // See comment in setTrigMask for info.
-    return [connection intCommand: "GetAsyncTriggerMask"];
+    return [self sendIntCmd:@"GetAsyncTriggerMask"];
 }
 - (void) setSmellieDelay:(NSUInteger)_smellieDelay {
     // This specifies (in nanoseconds) how long the MicroZed should delay a pulse that
@@ -423,7 +423,7 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
 }
 - (NSUInteger) smellieDelay {
     // See comments setSmellieDelay for info
-    return [connection intCommand: "GetSmellieDelay"];
+    return [self sendIntCmd:@"GetSmellieDelay"];
 }
 - (void) setTellieDelay:(NSUInteger)_tellieDelay {
     // This specifies (in nanoseconds) how long the MicroZed should delay a pulse that
