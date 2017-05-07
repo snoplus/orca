@@ -716,7 +716,7 @@ err:
         NSLogColor([NSColor redColor], @"[TELLIE]: Error requesting asyncTrigMask from Tubii.\n");
         goto err;
     }
-    if(!([theTubiiModel asyncTrigMask] & 0x400000)){
+    if(!(asyncTrigMask & 0x400000)){
         NSLogColor([NSColor redColor], @"[TELLIE]: Triggers as not being sent to asynchronous MTC/D port\n");
         NSLogColor([NSColor redColor], @"[TELLIE]: Please amend via the TUBii GUI (triggers tab)\n");
         goto err;
