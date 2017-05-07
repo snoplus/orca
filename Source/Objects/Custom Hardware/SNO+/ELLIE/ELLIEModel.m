@@ -713,7 +713,7 @@ err:
     @try{
         asyncTrigMask = [theTubiiModel asyncTrigMask];
     } @catch(NSException* e) {
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Error requesting asyncTrigMask from Tubii.\n");
+        NSLogColor([NSColor redColor], @"[TELLIE]: Error requesting asyncTrigMask from Tubii.\n");
         goto err;
     }
     if(!([theTubiiModel asyncTrigMask] & 0x400000)){
