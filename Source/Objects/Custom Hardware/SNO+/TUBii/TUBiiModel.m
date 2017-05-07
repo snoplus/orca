@@ -156,20 +156,13 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
 }
 
 #pragma mark •••Network Communication
-- (void) sendOkCmd:(NSString* const)aCmd {
-    [self sendOkCmd:aCmd print:YES];
-}
-- (void) sendOkCmd:(NSString* const)aCmd print:(BOOL)printCheck{
+- (void) sendOkCmd:(NSString* const)aCmd{
     @try {
-        if(printCheck){
-            NSLog(@"Sending %@ to TUBii\n",aCmd);
-        }
+        NSLog(@"Sending %@ to TUBii\n",aCmd);
         [connection okCommand: [aCmd UTF8String]];
     }
     @catch (NSException *exception) {
-        if(printCheck){
-            NSLogColor([NSColor redColor],@"Command: %@ failed.  Reason: %@\n", aCmd,[exception reason]);
-        }
+        NSLogColor([NSColor redColor],@"Command: %@ failed.  Reason: %@\n", aCmd,[exception reason]);
     }
 }
 - (int) sendIntCmd: (NSString* const) aCmd {
@@ -781,7 +774,7 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
     while (![[self keepAliveThread] isCancelled]) {
         @try{
             dispatch_sync(dispatch_get_main_queue(), ^{
-                [self sendOkCmd:@"keepAlive" print:NO];
+                [connection okCommand:"keepAlive"];
             });
         } @catch(NSException* e) {
             NSLogColor([NSColor redColor], @"[TUBii]: Problem sending keep alive to TUBii server, reason: %@\n", [e reason]);
