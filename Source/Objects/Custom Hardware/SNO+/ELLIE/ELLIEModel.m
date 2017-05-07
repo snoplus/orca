@@ -709,6 +709,13 @@ err:
 
     ///////////////////////
     // Check trigger is being sent to asyncronus port of the MTC/D (EXT_A)
+    NSUInteger asyncTrigMask;
+    @try{
+        asyncTrigMask = [theTubiiModel asyncTrigMask];
+    } @catch(NSException* e) {
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Error requesting asyncTrigMask from Tubii.\n");
+        goto err;
+    }
     if(!([theTubiiModel asyncTrigMask] & 0x400000)){
         NSLogColor([NSColor redColor], @"[TELLIE]: Triggers as not being sent to asynchronous MTC/D port\n");
         NSLogColor([NSColor redColor], @"[TELLIE]: Please amend via the TUBii GUI (triggers tab)\n");
