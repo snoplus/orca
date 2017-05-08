@@ -126,7 +126,11 @@ NSString* ORWebRakerMaxValueChanged        = @"ORWebRakerMaxValueChanged";
 }
 - (NSInteger) numDataItems
 {
-    return [data count];
+    NSInteger count = 0;
+    @synchronized (self) {
+        count = [data count];
+    }
+    return count;
 }
 
 - (NSDictionary*) dataAtIndex:(int)index
@@ -200,46 +204,49 @@ NSString* ORWebRakerMaxValueChanged        = @"ORWebRakerMaxValueChanged";
                                                   encoding:NSUTF8StringEncoding] autorelease];
         s = [s stringByReplacingOccurrencesOfString:@"'" withString:@"\""];
         NSData* test = [s dataUsingEncoding:NSASCIIStringEncoding];
-        //this following can throw, so be careful here
-        [data release];
-        data = nil;
-        data = [NSJSONSerialization JSONObjectWithData:test options:0 error:&error];
-        [data retain]; //above can throw so release here
+        @synchronized(self){
+            //this following can throw, so be careful here
+            [data release];
+            data = nil;
+            data = [NSJSONSerialization JSONObjectWithData:test options:0 error:&error];
+            [data retain]; //above can throw so release here
         
-        [self setDataValid:YES];
-        [self postCouchDBRecord];
-        int i;
-        //make sure all the array sizes are the same as the data set
-        int lowLimitCountDiff = [data count] - [lowLimits count];
-        if(lowLimitCountDiff < 0)for(i=0;i<lowLimitCountDiff;i++)[lowLimits removeLastObject];
-        if(lowLimitCountDiff > 0)for(i=0;i<lowLimitCountDiff;i++)[lowLimits addObject:[NSNumber numberWithFloat:0]];
-        
-        int hiLimitCountDiff = [data count] - [hiLimits count];
-        if(hiLimitCountDiff < 0)for(i=0;i<hiLimitCountDiff;i++)[hiLimits removeLastObject];
-        if(hiLimitCountDiff > 0)for(i=0;i<hiLimitCountDiff;i++)[hiLimits addObject:[NSNumber numberWithFloat:0]];
- 
-        int minValueCountDiff = [data count] - [minValues count];
-        if(minValueCountDiff < 0)for(i=0;i<minValueCountDiff;i++)[minValues removeLastObject];
-        if(minValueCountDiff > 0)for(i=0;i<minValueCountDiff;i++)[minValues addObject:[NSNumber numberWithFloat:0]];
+            
+            [self setDataValid:YES];
+            [self postCouchDBRecord];
+            int i;
+            //make sure all the array sizes are the same as the data set
+            int lowLimitCountDiff = [data count] - [lowLimits count];
+            if(lowLimitCountDiff < 0)for(i=0;i<lowLimitCountDiff;i++)[lowLimits removeLastObject];
+            if(lowLimitCountDiff > 0)for(i=0;i<lowLimitCountDiff;i++)[lowLimits addObject:[NSNumber numberWithFloat:0]];
+            
+            int hiLimitCountDiff = [data count] - [hiLimits count];
+            if(hiLimitCountDiff < 0)for(i=0;i<hiLimitCountDiff;i++)[hiLimits removeLastObject];
+            if(hiLimitCountDiff > 0)for(i=0;i<hiLimitCountDiff;i++)[hiLimits addObject:[NSNumber numberWithFloat:0]];
+     
+            int minValueCountDiff = [data count] - [minValues count];
+            if(minValueCountDiff < 0)for(i=0;i<minValueCountDiff;i++)[minValues removeLastObject];
+            if(minValueCountDiff > 0)for(i=0;i<minValueCountDiff;i++)[minValues addObject:[NSNumber numberWithFloat:0]];
 
-        int maxValueCountDiff = [data count] - [maxValues count];
-        if(maxValueCountDiff < 0)for(i=0;i<maxValueCountDiff;i++)[maxValues removeLastObject];
-        if(maxValueCountDiff > 0)for(i=0;i<maxValueCountDiff;i++)[maxValues addObject:[NSNumber numberWithFloat:0]];
+            int maxValueCountDiff = [data count] - [maxValues count];
+            if(maxValueCountDiff < 0)for(i=0;i<maxValueCountDiff;i++)[maxValues removeLastObject];
+            if(maxValueCountDiff > 0)for(i=0;i<maxValueCountDiff;i++)[maxValues addObject:[NSNumber numberWithFloat:0]];
 
-        
-        int timeRateCountDiff = [data count] - [timeRates count];
-        if(timeRateCountDiff < 0)for(i=0;i<timeRateCountDiff;i++)[timeRates removeLastObject];
-        if(timeRateCountDiff > 0)for(i=0;i<timeRateCountDiff;i++){
-            if(!timeRates)timeRates = [[NSMutableArray alloc] init];
-            ORTimeRate* aTimeRate = [[[ORTimeRate alloc] init] autorelease];
-            [timeRates addObject:aTimeRate];
-            [aTimeRate setSampleTime: [self pollTime]];
-        }
-        
-        //update the values in the plots
-        for(i=0;i<[data count];i++){
-            float theValue = [[[data objectAtIndex:i]objectForKey:@"value"] floatValue];
-            [[timeRates objectAtIndex:i] addDataToTimeAverage:theValue];
+            
+            int timeRateCountDiff = [data count] - [timeRates count];
+            if(timeRateCountDiff < 0)for(i=0;i<timeRateCountDiff;i++)[timeRates removeLastObject];
+            if(timeRateCountDiff > 0)for(i=0;i<timeRateCountDiff;i++){
+                if(!timeRates)timeRates = [[NSMutableArray alloc] init];
+                ORTimeRate* aTimeRate = [[[ORTimeRate alloc] init] autorelease];
+                [timeRates addObject:aTimeRate];
+                [aTimeRate setSampleTime: [self pollTime]];
+            }
+            
+            //update the values in the plots
+            for(i=0;i<[data count];i++){
+                float theValue = [[[data objectAtIndex:i]objectForKey:@"value"] floatValue];
+                [[timeRates objectAtIndex:i] addDataToTimeAverage:theValue];
+            }
         }
     }
     @catch(NSException* e){
@@ -370,7 +377,7 @@ NSString* ORWebRakerMaxValueChanged        = @"ORWebRakerMaxValueChanged";
 {
 	BOOL theValue = 0;
 	@synchronized(self){
-        if(aChan>=0 && aChan<[self numDataItems]){
+        if(aChan>=0 && aChan<[data count]){
             theValue = [[[data objectAtIndex:aChan]objectForKey:@"value"] floatValue];
         }
 	}
