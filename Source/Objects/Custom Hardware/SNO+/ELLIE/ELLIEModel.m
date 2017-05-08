@@ -2027,7 +2027,12 @@ err:
         goto err;
     }
     TUBiiModel* theTubiiModel = [tubiiModels objectAtIndex:0];
-    [theTubiiModel stopSmelliePulser];
+    @try{
+        [theTubiiModel stopSmelliePulser];
+    } @catch(NSException* e){
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Problem sending stop command to the SMELLIE pulsar.\n");
+        goto err;
+    }
 
     // Tell run control it can stop waiting
     dispatch_sync(dispatch_get_main_queue(), ^{
