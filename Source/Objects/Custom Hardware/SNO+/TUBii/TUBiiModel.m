@@ -157,23 +157,12 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
 
 #pragma mark •••Network Communication
 - (void) sendOkCmd:(NSString* const)aCmd{
-    @try {
-        NSLog(@"Sending %@ to TUBii\n",aCmd);
-        [connection okCommand: [aCmd UTF8String]];
-    }
-    @catch (NSException *exception) {
-        NSLogColor([NSColor redColor],@"Command: %@ failed.  Reason: %@\n", aCmd,[exception reason]);
-    }
+    NSLog(@"Sending %@ to TUBii\n",aCmd);
+    [connection okCommand: [aCmd UTF8String]];
 }
 - (int) sendIntCmd: (NSString* const) aCmd {
-    @try {
-        NSLog(@"Sending %@ to TUBii\n",aCmd);
-        return [connection intCommand: [aCmd UTF8String]];
-    }
-    @catch (NSException *exception) {
-        NSLogColor([NSColor redColor],@"Command: %@ failed.  Reason: %@\n", aCmd,[exception reason]);
-        return nil;
-    }
+    NSLog(@"Sending %@ to TUBii\n",aCmd);
+    return [connection intCommand: [aCmd UTF8String]];
 }
 #pragma mark •••HW Access
 - (void) Initialize {
@@ -771,15 +760,20 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
     int counter = 0;
+    __block BOOL exceptionCheck = NO;
     while (![[self keepAliveThread] isCancelled]) {
-        @try{
-            dispatch_sync(dispatch_get_main_queue(), ^{
-                [connection okCommand:"keepAlive"];
-            });
-        } @catch(NSException* e) {
-            NSLogColor([NSColor redColor], @"[TUBii]: Problem sending keep alive to TUBii server, reason: %@\n", [e reason]);
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            @try{
+                [self sendOkCmd:@"keepAlive"];
+            } @catch(NSException* e) {
+                NSLogColor([NSColor redColor], @"[TUBii]: Problem sending keep alive to TUBii server, reason: %@\n", [e reason]);
+                exceptionCheck = YES;
+            }
+        });
+        if(exceptionCheck){
             break;
         }
+        
         [NSThread sleepForTimeInterval:0.5];
 
         // This is a very long running thread need to relase the pool every so often
