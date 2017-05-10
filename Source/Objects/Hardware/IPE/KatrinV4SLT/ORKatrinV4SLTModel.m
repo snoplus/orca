@@ -1326,7 +1326,7 @@ NSLog(@"  arguments: %@ \n" , arguments);
 - (void) readSLTEventFifoSingleEvent
 {
     unsigned long mode = [self readReg:kKatrinV4SLTFIFOModeReg];
-    NSLog(@"FIFO entries: %i events (words: %i) (reg 0x%08x) \n",(mode & 0x3fffff) / 4, mode & 0x3fffff, mode);//DEBUG -tb-
+    NSLog(@"FIFO entries: %i events (words: %i) (reg 0x%08x) \n",(mode & 0x3fffff) / 6, mode & 0x3fffff, mode);//DEBUG -tb-
     if(mode & 0x3fffff){
     	unsigned long f1 = [self readReg:kKatrinV4SLTDataFIFOReg];
 	    unsigned long f2 = [self readReg:kKatrinV4SLTDataFIFOReg];
@@ -1529,21 +1529,20 @@ return;
 	[self setClockTime: [self readSecondsCounter]];
 	return clockTime;
 }
-
 - (void) initBoard
 {
-	if(countersEnabled)[self writeEnCnt];
-	else [self writeDisCnt];
-	if(countersEnabled  && !(controlReg & (0x1 << kCtrlInhEnShift))  ){
-		NSLog(@"WARNING: KATRIN-DAQ SLTv4: you use 'Counters Enabled' but 'Inhibits Enabled SW' is not set!\n");//TODO: maybe popup Orca Alarm window? -tb-
-	}
-	[self loadSecondsReg];
-	[self writeControlReg];
-	[self writeInterruptMask];
-	[self clearAllStatusErrorBits];
-	[self writePixelBusEnableReg];
-	[self writeFIFOcsrReset];
+    if(countersEnabled)[self writeEnCnt];
+    else [self writeDisCnt];
     
+	if(countersEnabled  && !(controlReg & (0x1 << kCtrlInhEnShift))  ){
+		NSLogColor([NSColor redColor],@"WARNING: KATRIN-DAQ SLTv4: you used 'Counters Enabled' but 'Inhibits Enabled SW' is not set!\n");//TODO: maybe popup Orca Alarm window? -tb-
+	}
+    [self loadSecondsReg];
+    [self writeControlReg];
+    [self writeInterruptMask];
+    [self clearAllStatusErrorBits];
+    [self writePixelBusEnableReg];
+    [self writeFIFOcsrReset];
     
 	//-----------------------------------------------
 	//board doesn't appear to start without this stuff
@@ -1586,8 +1585,8 @@ return;
 	//inhibitSource = savedInhibitSource;
 	//-----------------------------------------------
 	
-	[self printStatusReg];
-	[self printControlReg];
+	//[self printStatusReg];
+	//[self printControlReg];
 }
 
 - (void) reset
@@ -1855,9 +1854,6 @@ return;
 	
 	[self writeSetInhibit];  //TODO: maybe move to readout loop to avoid dead time -tb-
     [self writeControlRegRunFlagOn:FALSE];//stop run mode -> clear event buffer -tb- 2016-05
-     
-        //DEBUG         [self dumpSltSecondCounter:@"vor initBoard"];
-        
         
 	dataTakers = [[readOutGroup allObjects] retain];		//cache of data takers.
     
@@ -1898,16 +1894,8 @@ return;
         
         
     //if cold start (not 'quick start' in RunControl) ...
-    if([[userInfo objectForKey:@"doinit"]intValue]){
-		[self initBoard];
-        // 	initBoard does:
-        //    -	enable counters (if enabled in GUI)
-        //    -	load second register (may delay 1 second ...)
-        //    -	write control register (e.g. enable SW inhibit, GPS clock, etc.)
-        //    -	write interrupt mask (in low-level-tab) (currently unused)
-        //    -	clear status error bits
-        //    - print status and control reg
-	}	
+    //BOOL fullInit = [[userInfo objectForKey:@"doinit"]boolValue];
+    [self initBoard];
 	
 
     //loop over Readout List
