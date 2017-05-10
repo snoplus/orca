@@ -143,6 +143,11 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
                      selector : @selector(runAboutToStart:)
                          name : ORRunAboutToStartNotification
                        object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(restartKeepAlive:)
+                         name : @"TUBiiKeepAliveDied"
+                       object : nil];
 }
 - (void) runAboutToStart: (NSNotification*) aNone {
     [self setDataReadout:NO];
@@ -152,6 +157,7 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
 
 - (void) awakeAfterDocumentLoaded
 {
+    [self registerNotificationObservers];
     [self activateKeepAlive];
 }
 
@@ -778,13 +784,17 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
     int counter = 0;
+    __block bool exceptionCheck = false;
     while (![[self keepAliveThread] isCancelled]) {
-        @try{
-            dispatch_sync(dispatch_get_main_queue(), ^{
-                [self sendOkCmd:@"keepAlive" print:NO];
-            });
-        } @catch(NSException* e) {
-            NSLogColor([NSColor redColor], @"[TUBii]: Problem sending keep alive to TUBii server, reason: %@\n", [e reason]);
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            @try{
+                [connection okCommand:"keepAlive"];
+            } @catch(NSException* e) {
+                NSLogColor([NSColor redColor], @"[TUBii]: Problem sending keep alive to TUBii server, reason: %@\n", [e reason]);
+                exceptionCheck = true;
+            }
+        });
+        if(exceptionCheck) {
             break;
         }
         [NSThread sleepForTimeInterval:0.5];
@@ -797,8 +807,27 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
         }
         counter = counter + 1;
     }
+    
     NSLog(@"[TUBii]: Stopped sending keep-alive to TUBii - ELLIE pulses will be shut off\n");
+
+    // This thread should always be running. If it's died, post a note to get it automatically restarted.
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"TUBiiKeepAliveDied" object:self];
+
+    // release memory
     [pool release];
+}
+
+-(void)restartKeepAlive:(NSNotification*)aNote{
+    /*
+     If the keep alive has died, as a user to re-start it.
+     */
+    BOOL restart = ORRunAlertPanel(@"The keep alive pulse to TUBii has died.",
+                                   @"Unless you restart the ELLIE systems will not be able to trigger through TUBii",
+                                   @"Restart",
+                                   @"Cancel",nil);
+    if(restart){
+        [self activateKeepAlive];
+    }
 }
 
 -(void)killKeepAlive
@@ -809,6 +838,5 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
     [[self keepAliveThread] cancel];
     NSLog(@"[TUBii]: Killing keep alive - ELLIE pulses will be shut off\n");
 }
-
 
 @end
