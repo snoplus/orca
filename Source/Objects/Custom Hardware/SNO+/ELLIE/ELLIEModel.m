@@ -461,7 +461,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
      */
     
     /*
-     Currently the predicted nPhotons does not correlate with reality so this check is defunkt.
+     Currently the predicted nPhotons does not correlate with reality so this check is defunct.
      it might be worth adding it back eventually once our understanding has improved. For now
      make do with a simple rate check (below).
     float safe_gradient = -1;
