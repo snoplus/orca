@@ -4322,6 +4322,8 @@ err:
                 // Finally make sure the XL3s are reading out
                 if([xl3 xl3Mode] == NORMAL_MODE) {
                     goodModes++;
+                } else {
+                    NSLogColor([NSColor redColor],@"%@ NOT in normal mode\n",[[xl3 xl3Link] crateName]);
                 }
             }
         }
