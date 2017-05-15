@@ -287,9 +287,11 @@ tellieRunFiles = _tellieRunFiles;
     /* Initialize ECARun object: this doesn't start the run */
     anECARun = [[ECARun alloc] init];
 
+    nhitMonitor = [[NHitMonitor alloc] init];
+
     [[self undoManager] disableUndoRegistration];
-	[self initOrcaDBConnectionHistory];
-	[self initDebugDBConnectionHistory];
+    [self initOrcaDBConnectionHistory];
+    [self initDebugDBConnectionHistory];
 
     [self setViewType:[decoder decodeIntForKey:@"viewType"]];
 
@@ -371,8 +373,6 @@ tellieRunFiles = _tellieRunFiles;
 
     /* initialize our connection to the XL3 server */
     xl3_server = [[RedisClient alloc] initWithHostName:xl3Host withPort:xl3Port];
-
-    nhitMonitor = [[NHitMonitor alloc] init];
 
     return self;
 }
