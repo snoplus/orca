@@ -140,7 +140,6 @@ tellieRunFiles = _tellieRunFiles;
     [self initOrcaDBConnectionHistory];
     [self initDebugDBConnectionHistory];
 
-    nhitMonitor = [[NHitMonitor alloc] init];
     [[self undoManager] enableUndoRegistration];
 
     return self;
