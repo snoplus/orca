@@ -90,190 +90,216 @@ NSString* ORSIS3316SettingsLock					= @"ORSIS3316SettingsLock";
 NSString* ORSIS3316SampleDone				= @"ORSIS3316SampleDone";
 NSString* ORSIS3316IDChanged				= @"ORSIS3316IDChanged";
 
+#pragma mark - Static Declerations
+typedef struct {
+    unsigned long offset;
+    NSString* name;
+    BOOL canRead;
+    BOOL canWrite;
+    BOOL hasChannels;
+    unsigned short enumId;
+} ORSIS3316RegisterInformation;
 
 //VME FPGA interface registers
-#define kControlStatusReg           0x00000000
-#define kModuleIDReg				0x00000004
-#define kInterruptConfigReg			0x00000008
-#define kInterruptControlReg        0x0000000C
-
-#define kInterfacArbCntrStatusReg   0x00000010
-#define kCBLTSetupReg               0x00000014
-#define kInternalTestReg            0x00000018
-#define kHWVersionReg               0x0000001C
+static ORSIS3316RegisterInformation vmefpgaInterface_register_information[kNumberOfVMEFPGAInterfaceRegisters] = {
+    {0x00000000,    @"Control/Status",                          YES,    YES,    NO,   kControlStatusReg},
+    {0x00000004,    @"Module ID",                               YES,    NO,     NO,   kModuleIDReg},
+    {0x00000008,    @"Interrupt Configuration",                 YES,    YES,    NO,   kInterruptConfigReg},
+    {0x0000000C,    @"Interrupt Control",                       YES,    YES,    NO,   kInterruptControlReg},
+    
+    {0x00000010,    @"Interface Access",                        YES,    YES,    NO,   kInterfacArbCntrStatusReg},
+    {0x00000014,    @"CBLT/Broadcast Setup",                    YES,    YES,    NO,   kCBLTSetupReg},
+    {0x00000018,    @"Internal Test",                           YES,    YES,    NO,   kInternalTestReg},
+    {0x0000001C,    @"Hardware Version",                        YES,    YES,    NO,   kHWVersionReg},
+};
 
 //VME FPGA registers
-#define kTemperatureReg             0x00000020
-#define k1WireEEPROMcontrolReg      0x00000024
-#define kSerialNumberReg            0x00000028
-#define kDataTransferSpdSettingReg  0x0000002C
+static ORSIS3316RegisterInformation vmefpga_register_information[kNumberOfVMEFPGARegisters] = {
+    {0x00000020,    @"Temperature",                             YES,    NO,     NO,   kTemperatureReg},
+    {0x00000024,    @"Onewire EEPROM",                          YES,    YES,    NO,   k1WireEEPROMcontrolReg},
+    {0x00000028,    @"Serial Number",                           YES,    NO,     NO,   kSerialNumberReg},
+    {0x0000002C,    @"Internal Data Transfer Speed",            YES,    YES,    NO,   kDataTransferSpdSettingReg},
+    
+    {0x00000030,    @"ADC FPGAs BOOT Controller",               YES,    YES,    NO,   kAdcFPGAsBootControllerReg},
+    {0x00000034,    @"SPI FLASH CONTROL/Status",                YES,    YES,    NO,   kSpiFlashControlStatusReg},
+    {0x00000038,    @"SPI Flash Data",                          YES,    YES,    NO,   kSpiFlashData},
+    {0x0000003C,    @"External Veto/Gate Delay",                YES,    YES,    NO,   kReservedforPROMReg},
+    
+    {0x00000040,    @"ADC Clock",                               YES,    YES,    NO,   kAdcClockI2CReg},
+    {0x00000044,    @"MGT1 Clock",                              YES,    YES,    NO,   kMgt1ClockI2CReg},
+    {0x00000048,    @" MGT2 CLock",                             YES,    YES,    NO,   kMgt2ClockI2CReg},
+    {0x0000004C,    @"DDR3 Clock",                              YES,    YES,    NO,   kDDR3ClockI2CReg},
+    
+    {0x00000050,    @"ADC Sample CLock distribution control",   YES,    YES,    NO,   kAdcSampleClockDistReg},
+    {0x00000054,    @"External NIM Clock Multiplier",           YES,    YES,    NO,   kExtNIMClockMulSpiReg},
+    {0x00000058,    @"FP-Bus control ",                         YES,    YES,    NO,   kFPBusControlReg},
+    {0x0000005C,    @"NIM-IN Control/status",                   YES,    YES,    NO,   kNimInControlReg},
+    
+    {0x00000060,    @"Acquisition control/status",              YES,    YES,    NO,   kAcqControlStatusReg},
+    {0x00000064,    @"TCLT Control",                            YES,    YES,    NO,   kTrigCoinLUTControlReg},
+    {0x00000068,    @"TCLT Address",                            YES,    YES,    NO,   kTrigCoinLUTAddReg},
+    {0x0000006C,    @"TCLT Data",                               YES,    YES,    NO,   kTrigCoinLUTDataReg},
+    
+    {0x00000070,    @"LEMO Out CO",                             YES,    YES,    NO,   kLemoOutCOSelectReg},
+    {0x00000074,    @"LMEO Out TO",                             YES,    YES,    NO,   kLemoOutTOSelectReg},
+    {0x00000078,    @"LEMO Out UO",                             YES,    YES,    NO,   kLemoOutUOSelectReg},
+    {0x0000007C,    @"Internal Trigger Feedback Select",        YES,    YES,    NO,   kIntTrigFeedBackSelReg},
+    
+    {0x00000080,    @"ADC ch1-ch4 Data Transfer Control",       YES,    YES,    YES,  kAdcCh1_Ch4DataCntrReg},
+    {0x00000084,    @"ADC ch5-ch8 Data Transfer Control",       YES,    YES,    YES,  kAdcCh5_Ch8DataCntrReg},
+    {0x00000088,    @"ADC ch9-ch12 Data Transfer Control",      YES,    YES,    YES,  kAdcCh9_Ch12DataCntrReg},
+    {0x0000008C,    @"ADC ch13-ch16 Data Transfer Control",     YES,    YES,    YES,  kAdcCh13_Ch16DataCntrReg},
+    
+    {0x00000090,    @"ADC ch1-ch4 Data Transfer STatus",        YES,    NO,     YES,  kAdcCh1_Ch4DataStatusReg},
+    {0x00000094,    @"ADC ch5-ch8 Data Transfer STatus",        YES,    NO,     YES,  kAdcCh5_Ch8DataStatusReg},
+    {0x00000098,    @"ADC ch9-ch12 Data Transfer STatus",       YES,    NO,     YES,  kAdcCh9_Ch12DataStatusReg},
+    {0x0000009C,    @"ADC ch13-ch16 Data Transfer STatus",      YES,    NO,     YES,  kAdcCh13_Ch16DataStatusReg},
+    
+    {0x000000A0,    @"ADC Data Link Status",                    YES,    YES,    NO,   kAdcDataLinkStatusReg},
+    {0x000000A4,    @"ADC SPI Busy Status",                     YES,    YES,    NO,   kAdcSpiBusyStatusReg},
+    {0x000000B8,    @"Prescaler output pulse divider",          YES,    YES,    NO,   kPrescalerOutDivReg},
+    {0x000000BC,    @"Prescaler output pulse length",           YES,    YES,    NO,   kPrescalerOutLenReg},
+    
+    {0x000000C0,    @"Channel 1 Internal Trigger Counter",      YES,    NO,     YES,    kChan1TrigCounterReg},
+    {0x000000C4,    @"Channel 2 Internal Trigger Counter",      YES,    NO,     YES,    kChan2TrigCounterReg},
+    {0x000000C8,    @"Channel 3 Internal Trigger Counter",      YES,    NO,     YES,    kChan3TrigCounterReg},
+    {0x000000CC,    @"Channel 4 Internal Trigger Counter",      YES,    NO,     YES,    kChan4TrigCounterReg},
+    
+    {0x000000D0,    @"Channel 5 Internal Trigger Counter",      YES,    NO,     YES,    kChan5TrigCounterReg},
+    {0x000000D4,    @"Channel 6 Internal Trigger Counter",      YES,    NO,     YES,    kChan6TrigCounterReg},
+    {0x000000D8,    @"Channel 7 Internal Trigger Counter",      YES,    NO,     YES,    kChan7TrigCounterReg},
+    {0x000000DC,    @"Channel 8 Internal Trigger Counter",      YES,    NO,     YES,    kChan8TrigCounterReg},
+    
+    {0x000000E0,    @"Channel 9 Internal Trigger Counter",      YES,    NO,     YES,    kChan9TrigCounterReg},
+    {0x000000E4,    @"Channel 10 Internal Trigger Counter",     YES,    NO,     YES,    kChan10TrigCounterReg},
+    {0x000000E8,    @"Channel 11 Internal Trigger Counter",     YES,    NO,     YES,    kChan11TrigCounterReg},
+    {0x000000EC,    @"Channel 12 Internal Trigger Counter",     YES,    NO,     YES,    kChan12TrigCounterReg},
 
-#define kAdcFPGAsBootControllerReg  0x00000030
-#define kSpiFlashControlStatusReg   0x00000034
-#define kSpiFlashData               0x00000038
-#define kReservedforPROMReg         0x0000003C
+    {0x000000F0,    @"Channel 13 Internal Trigger Counter",     YES,    NO,     YES,    kChan13TrigCounterReg},
+    {0x000000F4,    @"Channel 14 Internal Trigger Counter",     YES,    NO,     YES,    kChan14TrigCounterReg},
+    {0x000000F8,    @"Channel 15 Internal Trigger Counter",     YES,    NO,     YES,    kChan15TrigCounterReg},
+    {0x000000FC,    @"Channel 16 Internal Trigger Counter",     YES,    NO,     YES,    kChan16TrigCounterReg},
 
-#define kAdcClockI2CReg             0x00000040
-#define kMgt2ClockI2CReg            0x00000044
-
-#define kAdcSampleClockDistReg      0x00000050
-#define kExtNIMClockMulSpiReg       0x00000054
-#define kFPBusControlReg            0x00000058
-#define kNimInControlReg            0x0000005C
-
-#define kAcqControlStatusReg        0x00000060
-#define kTrigCoinLUTControlReg      0x00000064
-#define kTrigCoinLUTAddReg          0x00000068
-#define kTrigCoinLUTDataReg         0x0000006C
-
-#define kLemoOutCOSelectReg         0x00000070
-#define kLemoOutTOSelectReg         0x00000074
-#define kLemoOutUOSelectReg         0x00000078
-#define kIntTrigFeedBackSelReg      0x0000007C
-
-#define kAdcCh1_Ch4DataCntrReg      0x00000080
-#define kAdcCh5_Ch8DataCntrReg      0x00000084
-#define kAdcCh9_Ch12DataCntrReg     0x00000088
-#define kAdcCh13_Ch16DataCntrReg    0x0000008C
-
-#define kAdcCh1_Ch4DataStatusReg    0x00000090
-#define kAdcCh5_Ch8DataStatusReg    0x00000094
-#define kAdcCh9_Ch12DataStatusReg   0x00000098
-#define kAdcCh13_Ch16DataStatusReg  0x0000009C
-
-#define kAdcDataLinkStatusReg       0x000000A0
-#define kAdcSpiBusyStatusReg        0x000000A4
-#define kPrescalerOutDivReg         0x000000B8
-#define kPrescalerOutLenReg         0x000000BC
-
-#define kChan1TrigCounterReg        0x000000C0
-#define kChan2TrigCounterReg        0x000000C4
-#define kChan3TrigCounterReg        0x000000C8
-#define kChan4TrigCounterReg        0x000000CC
-
-#define kChan5TrigCounterReg        0x000000D0
-#define kChan6TrigCounterReg        0x000000D4
-#define kChan7TrigCounterReg        0x000000D8
-#define kChan8TrigCounterReg        0x000000DC
-
-#define kChan9TrigCounterReg        0x000000E0
-#define kChan10TrigCounterReg       0x000000E4
-#define kChan11TrigCounterReg       0x000000E8
-#define kChan12TrigCounterReg       0x000000EC
-
-#define kChan13TrigCounterReg       0x000000F0
-#define kChan14TrigCounterReg       0x000000F4
-#define kChan15TrigCounterReg       0x000000F8
-#define kChan16TrigCounterReg       0x000000FC
+   
+};
 
 //Key address registers
-#define kKeyResetReg                0x00000400
-#define kKeyUserFuncReg             0x00000404
 
-#define kKeyArmSampleLogicReg       0x00000410
-#define kKeyDisarmSampleLogicReg    0x00000414
-#define kKeyTriggerReg              0x00000418
-#define kKeyTimeStampClrReg         0x0000041C
+static ORSIS3316RegisterInformation key_address_register_information[kKeyAddressRegisters] = {
+    
+    {0x00000400,    @"Key Register Reset",                      NO,    YES,     NO,     kKeyResetReg},
+    {0x00000404,    @"Key User Function",                       NO,    YES,     NO,     kKeyUserFuncReg},
+    
+    {0x00000410,    @"Key Arm Sample Logic",                    NO,    YES,     NO,     kKeyArmSampleLogicReg},
+    {0x00000414,    @"Key Disarm Sample Logic",                 NO,    YES,     NO,     kKeyDisarmSampleLogicReg},
+    {0x00000418,    @"Key Trigger",                             NO,    YES,     NO,     kKeyTriggerReg},
+    {0x0000041C,    @"Key Timestamp Clear",                     NO,    YES,     NO,     kKeyTimeStampClrReg},
+    
+    {0x00000420,    @"Key Dusarm Bankx and Arm Bank1",          NO,    YES,     NO,     kKeyDisarmXArmBank1Reg},
+    {0x00000424,    @"Key Dusarm Bankx and Arm Bank2",          NO,    YES,     NO,     kKeyDisarmXArmBank2Reg},
+    {0x00000428,    @"Key Enable Bank Swap",                    NO,    YES,     NO,     kKeyEnableBankSwapNimReg},
+    {0x0000042C,    @"Key Disable Prescaler Logic",             NO,    YES,     NO,     kKeyDisablePrescalerLogReg},
+    
+    {0x00000430,    @"Key PPS latch bit clear",                 NO,    YES,     NO,     kKeyPPSLatchBitClrReg},
+    {0x00000434,    @"Key Reset ADC-FPGA-Logic",                NO,    YES,     NO,     kKeyResetAdcLogicReg},
+    {0x00000438,    @"Key ADC Clock DCM/PLL Reset",             NO,    YES,     NO,     kKeyAdcClockPllResetReg},
+};
+    
 
-#define kKeyDisarmXArmBank1Reg      0x00000420
-#define kKeyDisarmXArmBank2Reg      0x00000424
-#define kKeyEnableBankSwapNimReg    0x00000428
-#define kKeyDisablePrescalerLogReg  0x0000042C
+//ADC Group registers Add 0x1000 for each group
 
-#define kKeyPPSLatchBitClrReg       0x00000430
-#define kKeyResetAdcLogicReg        0x00000434
-#define kKeyAdcClockPllResetReg     0x00000438
+static ORSIS3316RegisterInformation group_register_information[kADCGroupRegisters] = {
+  
+    {0x00001000,    @"ADC Input Tap Delay",                     YES,    YES,    YES,   kAdcInputTapDelayReg},
+    {0x00001004,    @"ADC Gain/Termination Control",            YES,    YES,    YES,   kAdcGainTermCntrlReg},
+    {0x00001008,    @"ADC Offset Control",                      YES,    YES,    YES,   kAdcOffsetDacCntrlReg},
+    {0x0000100C,    @"ADC SPI Control",                         YES,    YES,    YES,   kAdcSpiControlReg},
+    
+    {0x00001010,    @"Event Configureation",                    YES,    YES,    YES,   kEventConfigReg},
+    {0x00001014,    @"Channel Header ID",                       YES,    YES,    YES,   kChanHeaderIdReg},
+    {0x00001018,    @"End Address Threshold",                   YES,    YES,    YES,   kEndAddressThresholdReg},
+    {0x0000101C,    @"Active Trigger Gate WIndow Length",       YES,    YES,    YES,   kActTriggerGateWindowLenReg},
+    
+    {0x00001020,    @"Raw Data Buffer COnfiguration",           YES,    YES,    YES,   kRawDataBufferConfigReg},
+    {0x00001024,    @"Pileup Configuration",                    YES,    YES,    YES,   kPileupConfigReg},
+    {0x00001028,    @"Pre Trigger Delay",                       YES,    YES,    YES,   kPreTriggerDelayReg},
+    {0x0000102C,    @"Average Configuration",                   YES,    YES,    YES,   kAveConfigReg},
+    
+    {0x00001030,    @"Data Format Configuration",               YES,    YES,    YES,   kDataFormatConfigReg},
+    {0x00001034,    @"MAW Test Buffer Configuration",           YES,    YES,    YES,   kMawTestBufferConfigReg},
+    {0x00001038,    @"Internal Trigger Delay Configuration",    YES,    YES,    YES,   kInternalTrigDelayConfigReg},
+    {0x0000103C,    @"Internal Gate Length Configuration",      YES,    YES,    YES,   kInternalGateLenConfigReg},
+    
+    {0x00001040,    @"FIR Trigger Setup Ch1",                   YES,    YES,    YES,   kFirTrigSetupCh1Reg},
+    {0x00001044,    @"Trigger Threshold Ch1",                   YES,    YES,    YES,   kTrigThresholdCh1Reg},
+    {0x00001048,    @"High Energy Trigger Threshold Ch1",       YES,    YES,    YES,   kHiEnergyTrigThresCh1Reg},
 
-//ADC Group1 registers Add 0x1000 for each group
-#define kAdcInputTapDelayReg        0x00001000
-#define kAdcGainTermCntrlReg        0x00001004
-#define kAdcOffsetDacCntrlReg       0x00001008
-#define kAdcSpiControlReg           0x0000100C
+    {0x00001050,    @"FIR Trigger Setup Ch2",                   YES,    YES,    YES,   kFirTrigSetupCh2Reg},
+    {0x00001054,    @"Trigger Threshold Ch2",                   YES,    YES,    YES,   kTrigThresholdCh2Reg},
+    {0x00001058,    @"High Energy Trigger Threshold Ch2",       YES,    YES,    YES,   kHiEnergyTrigThresCh2Reg},
+    
+    {0x00001060,    @"FIR Trigger Setup Ch3",                   YES,    YES,    YES,   kFirTrigSetupCh3Reg},
+    {0x00001064,    @"Trigger Threshold Ch3",                   YES,    YES,    YES,   kTrigThresholdCh3Reg},
+    {0x00001068,    @"High Energy Trigger Threshold Ch3",       YES,    YES,    YES,   kHiEnergyTrigThresCh3Reg},
+    
+    {0x00001070,    @"FIR Trigger Setup Ch4",                   YES,    YES,    YES,   kFirTrigSetupCh4Reg},
+    {0x00001074,    @"Trigger Threshold Ch4",                   YES,    YES,    YES,   kTrigThresholdCh4Reg},
+    {0x00001078,    @"High Energy Trigger Threshold Ch4",       YES,    YES,    YES,   kHiEnergyTrigThresCh4Reg},
+    
+    {0x00001080,    @"FIR Trigger Setup Sum",                   YES,    YES,    YES,   kFirTrigSetupSumCh1Ch4Reg},
+    {0x00001084,    @"Trigger Threshold Sum",                   YES,    YES,    YES,   kTrigThreholdSumCh1Ch4Reg},
+    {0x00001088,    @"High Energy Trigger Threshold Sum",       YES,    YES,    YES,   kHiETrigThresSumCh1Ch4Reg},
+    
+    {0x00001090,    @"Trigger Statistic Counter Mode",          YES,    YES,    YES,   kTrigStatCounterModeCh1Ch4Reg},
+    {0x00001094,    @"Peak/Charge Configuration",               YES,    YES,    YES,   kPeakChargeConfigReg},
+    {0x00001098,    @"Extended Raw Data Buffer Configuration",  YES,    YES,    YES,   kExtRawDataBufConfigReg},
+    {0x0000109C,    @"Extended Event Configuration",            YES,    YES,    YES,   kExtEventConfigCh1Ch4Reg},
+    
+    {0x000010A0,    @"Accumulator Gate 1 Configuration",        YES,    YES,    YES,   kAccGate1ConfigReg},
+    {0x000010A4,    @"Accumulator Gate 2 Configuration",        YES,    YES,    YES,   kAccGate2ConfigReg},
+    {0x000010A8,    @"Accumulator Gate 3 Configuration",        YES,    YES,    YES,   kAccGate3ConfigReg},
+    {0x000010AC,    @"Accumulator Gate 4 Configuration",        YES,    YES,    YES,   kAccGate4ConfigReg},
+    
+    {0x000010B0,    @"Accumulator Gate 5 Configuration",        YES,    YES,    YES,   kAccGate5ConfigReg},
+    {0x000010B4,    @"Accumulator Gate 6 Configuration",        YES,    YES,    YES,   kAccGate6ConfigReg},
+    {0x000010B8,    @"Accumulator Gate 7 Configuration",        YES,    YES,    YES,   kAccGate7ConfigReg},
+    {0x000010BC,    @"Accumulator Gate 8 Configuration",        YES,    YES,    YES,   kAccGate8ConfigReg},
+    
+    {0x000010C0,    @"FIR Energy Setup Ch1",                    YES,    YES,    YES,   kFirEnergySetupCh1Reg},
+    {0x000010C4,    @"FIR Energy Setup Ch2",                    YES,    YES,    YES,   kFirEnergySetupCh2Reg},
+    {0x000010C8,    @"FIR Energy Setup Ch3",                    YES,    YES,    YES,   kFirEnergySetupCh3Reg},
+    {0x000010CC,    @"FIR Energy Setup Ch4",                    YES,    YES,    YES,   kFirEnergySetupCh4Reg},
 
-#define kEventConfigReg             0x00001010
-#define kChanHeaderIdReg            0x00001014
-#define kEndAddressThresholdReg     0x00001018
-#define kActTriggerGateWindowLenReg 0x0000101C
+    {0x000010D0,    @"Energy Histogram COnfiguration Ch1",      YES,    YES,    YES,   kEnergyHistoConfigCh1Reg},
+    {0x000010D4,    @"Energy Histogram COnfiguration Ch2",      YES,    YES,    YES,   kEnergyHistoConfigCh2Reg},
+    {0x000010D8,    @"Energy Histogram COnfiguration Ch3",      YES,    YES,    YES,   kEnergyHistoConfigCh3Reg},
+    {0x000010DC,    @"Energy Histogram COnfiguration Ch4",      YES,    YES,    YES,   kEnergyHistoConfigCh4Reg},
 
-#define kRawDataBufferConfigReg     0x00001020
-#define kPileupConfigReg            0x00001024
-#define kPreTriggerDelayReg         0x00001028
-#define kAveConfigReg               0x0000102C
+    {0x000010E0,    @"MAW Start Index and Energy Pickup Config Ch1",    YES,    YES,    YES,   kMawStartIndexConfigCh1Reg},
+    {0x000010E4,    @"MAW Start Index and Energy Pickup Config Ch2",    YES,    YES,    YES,   kMawStartIndexConfigCh2Reg},
+    {0x000010E8,    @"MAW Start Index and Energy Pickup Config Ch3",    YES,    YES,    YES,   kMawStartIndexConfigCh3Reg},
+    {0x000010EC,    @"MAW Start Index and Energy Pickup Config Ch4",    YES,    YES,    YES,   kMawStartIndexConfigCh4Reg},
 
-#define kDataFormatConfigReg        0x00001030
-#define kMawTestBufferConfigReg     0x00001034
-#define kInternalTrigDelayConfigReg 0x00001038
-#define kInternalGateLenConfigReg   0x0000103C
+    {0x00001100,    @"ADC FPGA Version",                        YES,    NO,    YES,   kAdcVersionReg},
+    {0x00001104,    @"ADC FPGA Status",                         YES,    NO,    YES,   kAdcVStatusReg},
+    {0x00001108,    @"ADC Offset (DAC) readback",               YES,    NO,    YES,   kAdcOffsetReadbackReg},
+    {0x0000110C,    @"ADC SPI readback",                        YES,    NO,    YES,   kAdcSpiReadbackReg},
 
-#define kFirTrigSetupCh1Reg         0x00001040
-#define kTrigThresholdCh1Reg        0x00001044
-#define kHiEnergyTrigThresCh1Reg    0x00001048
+    {0x00001110,    @"Actual sample address Ch1",               YES,    NO,    YES,   kActualSampleCh1Reg},
+    {0x00001114,    @"Actual sample address Ch2",               YES,    NO,    YES,   kActualSampleCh2Reg},
+    {0x00001118,    @"Actual sample address Ch3",               YES,    NO,    YES,   kActualSampleCh3Reg},
+    {0x0000111C,    @"Actual sample address Ch4",               YES,    NO,    YES,   kActualSampleCh4Reg},
 
-#define kFirTrigSetupCh2Reg         0x00001050
-#define kTrigThresholdCh2Reg        0x00001054
-#define kHiEnergyTrigThresCh2Reg    0x00001058
+    {0x00001120,    @"Previous Bank Sample Address Register Ch1",       YES,    NO,    YES,   kPreviousBankSampleCh1Reg},
+    {0x00001124,    @"Previous Bank Sample Address Register Ch2",       YES,    NO,    YES,   kPreviousBankSampleCh2Reg},
+    {0x00001128,    @"Previous Bank Sample Address Register Ch3",       YES,    NO,    YES,   kPreviousBankSampleCh3Reg},
+    {0x0000112C,    @"Previous Bank Sample Address Register Ch4",       YES,    NO,    YES,   kPreviousBankSampleCh4Reg},
 
-#define kFirTrigSetupCh3Reg         0x00001060
-#define kTrigThresholdCh3Reg        0x00001064
-#define kHiEnergyTrigThresCh3Reg    0x00001068
-
-#define kFirTrigSetupCh4Reg         0x00001070
-#define kTrigThresholdCh4Reg        0x00001074
-#define kHiEnergyTrigThresCh4Reg    0x00001078
-
-#define kFirTrigSetupSumCh1Ch4Reg   0x00001080
-#define kTrigThreholdSumCh1Ch4Reg   0x00001084
-#define kHiETrigThresSumCh1Ch4Reg   0x00001088
-
-#define kTrigStatCounterModeCh1Ch4Reg 0x00001090
-#define kPeakChargeConfigReg        0x00001094
-#define kExtRawDataBufConfigReg     0x00001098
-#define kExtEventConfigCh1Ch4Reg    0x0000109C
-
-#define kAccGate1ConfigReg          0x000010A0
-#define kAccGate2ConfigReg          0x000010A4
-#define kAccGate3ConfigReg          0x000010A8
-#define kAccGate4ConfigReg          0x000010AC
-#define kAccGate5ConfigReg          0x000010B0
-#define kAccGate6ConfigReg          0x000010B4
-#define kAccGate7ConfigReg          0x000010B8
-#define kAccGate8ConfigReg          0x000010BC
-
-#define kFirEnergySetupCh1Reg       0x000010C0
-#define kFirEnergySetupCh2Reg       0x000010C4
-#define kFirEnergySetupCh3Reg       0x000010C8
-#define kFirEnergySetupCh4Reg       0x000010CC
-
-#define kEnergyHistoConfigCh1Reg    0x000010D0
-#define kEnergyHistoConfigCh2Reg    0x000010D4
-#define kEnergyHistoConfigCh3Reg    0x000010D8
-#define kEnergyHistoConfigCh4Reg    0x000010DC
-
-
-#define kMawStartIndexConfigCh1Reg  0x000010E0
-#define kMawStartIndexConfigCh2Reg  0x000010E4
-#define kMawStartIndexConfigCh3Reg  0x000010E8
-#define kMawStartIndexConfigCh4Reg  0x000010EC
-
-#define kAdcVersionReg              0x00001100
-#define kAdcVStatusReg              0x00001104
-#define kAdcOffsetReadbackReg       0x00001108
-#define kAdcSpiReadbackReg          0x0000110C
-
-#define kActualSampleCh1Reg         0x00001110
-#define kActualSampleCh2Reg         0x00001114
-#define kActualSampleCh3Reg         0x00001118
-#define kActualSampleCh4Reg         0x0000111C
-
-#define kPreviousBankSampleCh1Reg   0x00001120
-#define kPreviousBankSampleCh2Reg   0x00001124
-#define kPreviousBankSampleCh3Reg   0x00001128
-#define kPreviousBankSampleCh4Reg   0x0000112C
-
-#define kPPSTimeStampHiReg          0x00001130
-#define kPPSTimeStampLoReg          0x00001134
-#define kTestReadback01018Reg       0x00001138
-#define kTestReadback0101CReg       0x0000113C
+    {0x00001130,    @"PPS Timestamp (bits 47-32)",              YES,    NO,    YES,   kPPSTimeStampHiReg},
+    {0x00001134,    @"PPS TImestamp (bits 31-0)",               YES,    NO,    YES,   kPPSTimeStampLoReg},
+    {0x00001138,    @"Test:readback  0x01018",                  YES,    NO,    YES,   kTestReadback01018Reg},
+    {0x0000113C,    @"Test: readback 0x0101C",                  YES,    NO,    YES,   kTestReadback0101CReg},
+};
 
 #define I2C_ACK             8
 #define I2C_START			9
@@ -481,6 +507,40 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 - (NSRange)	memoryFootprint
 {
 	return NSMakeRange(baseAddress,0x00780000+0x80000);
+}
+- (BOOL) checkRegList
+{
+    int i;
+    for(i=0;i<kNumberOfVMEFPGARegisters;i++){
+        if(vmefpga_register_information[i].enumId != i){
+            NSLog(@"programmer bug\n");
+            NSLog(@"check line: %d\n",i);
+            return NO;
+        }
+    }
+    for(i=0;i<kADCGroupRegisters;i++){
+        if(group_register_information[i].enumId != i){
+            NSLog(@"programmer bug\n");
+            NSLog(@"check line: %d\n",i);
+            return NO;
+        }
+    }
+    for(i=0;i<kKeyAddressRegisters;i++){
+        if(key_address_register_information[i].enumId != i) {
+            NSLog(@"programmer bug\n");
+            NSLog(@"check line: %d\n",i);
+            return NO;
+        }
+    }
+    for(i=0;i<kNumberOfVMEFPGAInterfaceRegisters;i++){
+        if(vmefpgaInterface_register_information[i].enumId != i){
+            NSLog(@"programmer bug\n");
+            NSLog(@"check line: %d\n",i);
+            return NO;
+        }
+    }
+    NSLog(@"List OK\n");
+    return YES;
 }
 
 #pragma mark ***Accessors
@@ -1469,10 +1529,29 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 
 
 #pragma mark •••Hardware Access
+//Register Array
+- (unsigned long) interfaceRegister: (unsigned long)aRegisterIndex
+{
+    return [self baseAddress] + vmefpgaInterface_register_information[aRegisterIndex].offset;
+}
+- (unsigned long) vmeRegister:(unsigned long)aRegisterIndex
+{
+    return [self baseAddress] + vmefpga_register_information[aRegisterIndex].offset;
+}
+-(unsigned long) keyRegister:(unsigned long)aRegisterIndex
+{
+    return [self baseAddress] + key_address_register_information[aRegisterIndex].offset;
+}
+
+- (unsigned long) groupRegister:(unsigned long)aRegisterIndex group:(int)aGroup
+{
+    return [self baseAddress] + group_register_information[aRegisterIndex].offset + 0x1000*aGroup;
+}
+
 - (void) writeControlStatusReg:(unsigned long)aValue
 {
     [[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + kControlStatusReg
+                         atAddress:[self interfaceRegister:kControlStatusReg]
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -1482,7 +1561,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
     unsigned long aValue = 0;
     [[self adapter] readLongBlock:&aValue
-                         atAddress:[self baseAddress] + kControlStatusReg
+                         atAddress:[self interfaceRegister:kControlStatusReg]
                         numToRead:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -1493,7 +1572,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
     unsigned long result = 0;
     [[self adapter] readLongBlock:&result
-                        atAddress:[self baseAddress] + kModuleIDReg
+                        atAddress:[self interfaceRegister:kModuleIDReg]
                         numToRead:1
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
@@ -1509,7 +1588,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
     unsigned long result = 0;
     [[self adapter] readLongBlock:&result
-                        atAddress:[self baseAddress] + kHWVersionReg
+                        atAddress:[self interfaceRegister:kHWVersionReg]
                         numToRead:1
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
@@ -1520,7 +1599,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
     unsigned long result = 0;
     [[self adapter] readLongBlock:&result
-                        atAddress:[self baseAddress] + kTemperatureReg
+                        atAddress:[self vmeRegister:kTemperatureReg]
                         numToRead:1
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
@@ -1531,7 +1610,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
     unsigned long result = 0;
     [[self adapter] readLongBlock:&result
-                        atAddress:[self baseAddress] + kSerialNumberReg
+                        atAddress:[self vmeRegister:kSerialNumberReg ]
                         numToRead:1
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
@@ -1543,7 +1622,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
     unsigned long value = clockSource;
     [[self adapter] writeLongBlock:&value
-                         atAddress:[self baseAddress] + kAdcSampleClockDistReg
+                         atAddress:[self vmeRegister:kAdcSampleClockDistReg]
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -1598,7 +1677,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
     unsigned long aValue = state ? 0x1:(0x1<<16);
 	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + kControlStatusReg
+                         atAddress:[self interfaceRegister:kControlStatusReg]
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -1658,7 +1737,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
     unsigned long aValue = 1;
     [[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + kKeyTimeStampClrReg
+                         atAddress:[self keyRegister:kKeyTimeStampClrReg]
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -1670,7 +1749,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
     unsigned long aValue = 1;
     [[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + kKeyTriggerReg
+                         atAddress:[self keyRegister:kKeyTriggerReg]
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -1680,7 +1759,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
     unsigned long aValue = 1;
     [[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + kKeyAdcClockPllResetReg
+                         atAddress:[self keyRegister:kKeyAdcClockPllResetReg]
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -1726,7 +1805,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     for(group=0;group<4;group++){
         unsigned long aValue = 0xf00;
         [[self adapter] writeLongBlock:&aValue
-                             atAddress:[self baseAddress] + kAdcInputTapDelayReg + (0x1000*group)
+                             atAddress:[self groupRegister:kAdcInputTapDelayReg group:group]
                             numToWrite:1
                             withAddMod:[self addressModifier]
                          usingAddSpace:0x01];
@@ -1735,7 +1814,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     for(group=0;group<4;group++){
         unsigned long aValue = 0x300 + iob_delay_value;
         [[self adapter] writeLongBlock:&aValue
-                             atAddress:[self baseAddress] + kAdcInputTapDelayReg + (0x1000*group)
+                             atAddress:[self groupRegister:kAdcInputTapDelayReg group:group]
                             numToWrite:1
                             withAddMod:[self addressModifier]
                          usingAddSpace:0x01];
@@ -1793,7 +1872,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
     unsigned long aValue = 1;
     [[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + kKeyDisarmSampleLogicReg
+                         atAddress:[self keyRegister:kKeyDisarmSampleLogicReg]
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -1804,7 +1883,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
     unsigned long aValue = 1;
     [[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + kKeyDisarmXArmBank1Reg
+                         atAddress:[self keyRegister:kKeyDisarmXArmBank1Reg]
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -1816,7 +1895,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
     unsigned long aValue = 1;
     [[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + kKeyDisarmXArmBank2Reg
+                         atAddress:[self keyRegister:kKeyDisarmXArmBank2Reg]
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -1829,7 +1908,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
     unsigned long aValue=0;
     [[self adapter] readLongBlock:&aValue
-                        atAddress:[self baseAddress] + kAcqControlStatusReg
+                        atAddress:[self vmeRegister:kAcqControlStatusReg]
                         numToRead:1
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
@@ -1840,7 +1919,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
 	unsigned long aValue=0;
 	[[self adapter] readLongBlock:&aValue
-						atAddress:[self baseAddress] + kAcqControlStatusReg
+						atAddress:[self vmeRegister:kAcqControlStatusReg]
                         numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
@@ -1854,7 +1933,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
         unsigned long valueToWrite =  (([self tauFactor:i] & 0x3f)<<12) | (([self gapTime:i] & 0xffff)<<12) | ([self peakingTime:i] & 0xffff);
         
         [[self adapter] writeLongBlock:&valueToWrite
-                             atAddress:[self baseAddress] + kFirEnergySetupCh1Reg + (0x10*i)
+                             atAddress:[self groupRegister:kFirEnergySetupCh1Reg group:i]
                             numToWrite:1
                             withAddMod:[self addressModifier]
                          usingAddSpace:0x01];
@@ -1868,7 +1947,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
         unsigned long valueToWrite =  (([self gapTime:i] & 0xffff)<<12) | ([self peakingTime:i] & 0xffff);
         
         [[self adapter] writeLongBlock:&valueToWrite
-                             atAddress:[self baseAddress] + kFirTrigSetupCh1Reg + (0x10*i)
+                             atAddress:[self groupRegister:kFirTrigSetupCh1Reg group:i]
                             numToWrite:1
                             withAddMod:[self addressModifier]
                          usingAddSpace:0x01];
@@ -1945,7 +2024,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
         unsigned long valueToWrite = [self activeTrigGateWindowLen:i];
         
         [[self adapter] writeLongBlock:&valueToWrite
-                             atAddress:[self baseAddress] + kActTriggerGateWindowLenReg + (0x1000 * i)
+                             atAddress:[self groupRegister:kActTriggerGateWindowLenReg group:i]
                             numToWrite:1
                             withAddMod:[self addressModifier]
                          usingAddSpace:0x01];
@@ -1960,7 +2039,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
         unsigned long valueToWrite = [self preTriggerDelay:i];
         
         [[self adapter] writeLongBlock:&valueToWrite
-                             atAddress:[self baseAddress] + kPreTriggerDelayReg + (0x1000 * i)
+                             atAddress:[self groupRegister:kPreTriggerDelayReg group:i]
                             numToWrite:1
                             withAddMod:[self addressModifier]
                          usingAddSpace:0x01];
@@ -1975,7 +2054,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     for(i = 0; i < kNumSIS3316Groups; i++) {
         unsigned long valueToWrite = ([self rawDataBufferLen:i]<<16) | ([self rawDataBufferStart:i]);
         [[self adapter] writeLongBlock:&valueToWrite
-                             atAddress:[self baseAddress] + kRawDataBufferConfigReg + (0x1000 * i)
+                             atAddress:[self groupRegister:kRawDataBufferConfigReg group:i]
                             numToWrite:1
                             withAddMod:[self addressModifier]
                          usingAddSpace:0x01];
@@ -2016,56 +2095,56 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     for(i = 0; i < kNumSIS3316Groups; i++) {
         valueToWrite =  ([self accGate1Len:i] << 16) | [self accGate1Start:i];
         [[self adapter] writeLongBlock:&valueToWrite
-                             atAddress:[self baseAddress] + kAccGate1ConfigReg + (0x1000 * i)
+                             atAddress:[self groupRegister:kAccGate1ConfigReg group:i]
                             numToWrite:1
                             withAddMod:[self addressModifier]
                          usingAddSpace:0x01];
         
         valueToWrite =  ([self accGate2Len:i] << 16) | [self accGate2Start:i];
         [[self adapter] writeLongBlock:&valueToWrite
-                             atAddress:[self baseAddress] + kAccGate2ConfigReg + (0x1000 * i)
+                             atAddress:[self groupRegister:kAccGate2ConfigReg group:i]
                             numToWrite:1
                             withAddMod:[self addressModifier]
                          usingAddSpace:0x01];
 
         valueToWrite =  ([self accGate3Len:i] << 16) | [self accGate3Start:i];
         [[self adapter] writeLongBlock:&valueToWrite
-                             atAddress:[self baseAddress] + kAccGate3ConfigReg + (0x1000 * i)
+                             atAddress:[self groupRegister:kAccGate3ConfigReg group:i]
                             numToWrite:1
                             withAddMod:[self addressModifier]
                          usingAddSpace:0x01];
 
         valueToWrite =  ([self accGate4Len:i] << 16) | [self accGate4Start:i];
         [[self adapter] writeLongBlock:&valueToWrite
-                             atAddress:[self baseAddress] + kAccGate4ConfigReg + (0x1000 * i)
+                             atAddress:[self groupRegister:kAccGate4ConfigReg group:i]
                             numToWrite:1
                             withAddMod:[self addressModifier]
                          usingAddSpace:0x01];
 
         valueToWrite =  ([self accGate5Len:i] << 16) | [self accGate5Start:i];
         [[self adapter] writeLongBlock:&valueToWrite
-                             atAddress:[self baseAddress] + kAccGate5ConfigReg + (0x1000 * i)
+                             atAddress:[self groupRegister:kAccGate5ConfigReg group:i]
                             numToWrite:1
                             withAddMod:[self addressModifier]
                          usingAddSpace:0x01];
 
         valueToWrite =  ([self accGate6Len:i] << 16) | [self accGate6Start:i];
         [[self adapter] writeLongBlock:&valueToWrite
-                             atAddress:[self baseAddress] + kAccGate6ConfigReg + (0x1000 * i)
+                             atAddress:[self groupRegister:kAccGate6ConfigReg group:i]
                             numToWrite:1
                             withAddMod:[self addressModifier]
                          usingAddSpace:0x01];
 
         valueToWrite =  ([self accGate7Len:i] << 16) | [self accGate7Start:i];
         [[self adapter] writeLongBlock:&valueToWrite
-                             atAddress:[self baseAddress] + kAccGate7ConfigReg + (0x1000 * i)
+                             atAddress:[self groupRegister:kAccGate7ConfigReg group:i]
                             numToWrite:1
                             withAddMod:[self addressModifier]
                          usingAddSpace:0x01];
 
         valueToWrite =  ([self accGate8Len:i] << 16) | [self accGate8Start:i];
         [[self adapter] writeLongBlock:&valueToWrite
-                             atAddress:[self baseAddress] + kAccGate8ConfigReg + (0x1000 * i)
+                             atAddress:[self groupRegister:kAccGate8ConfigReg group:i]
                             numToWrite:1
                             withAddMod:[self addressModifier]
                          usingAddSpace:0x01];
@@ -2098,7 +2177,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     for(i=0;i<kNumSIS3316Groups;i++){
         unsigned long aValue = 0x05050505;//<<<<<<<---------hard coded for now---------------
         [[self adapter] writeLongBlock: &aValue
-                             atAddress: [self baseAddress] + kDataFormatConfigReg * (0x1000*i)
+                             atAddress: [self groupRegister:kDataFormatConfigReg group:i]
                             numToWrite: 1
                             withAddMod: [self addressModifier]
                          usingAddSpace: 0x01];
@@ -2110,7 +2189,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     for(i=0;i<kNumSIS3316Groups;i++){
         unsigned long aValue = 0x4;//<<<<<<<---------hard coded for now (Internal Trigger)---------------
         [[self adapter] writeLongBlock: &aValue
-                             atAddress: [self baseAddress] + kEventConfigReg * (0x1000*i)
+                             atAddress: [self groupRegister:kEventConfigReg group:i]
                             numToWrite: 1
                             withAddMod: [self addressModifier]
                          usingAddSpace: 0x01];
@@ -2123,7 +2202,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     for(i=0;i<kNumSIS3316Groups;i++){
         unsigned long aValue = 0x1024;//<<<<<<<---------hard coded for now ---------------
         [[self adapter] writeLongBlock: &aValue
-                             atAddress: [self baseAddress] + kEndAddressThresholdReg * (0x1000*i)
+                             atAddress: [self groupRegister:kEndAddressThresholdReg group:i]
                             numToWrite: 1
                             withAddMod: [self addressModifier]
                          usingAddSpace: 0x01];
@@ -2133,7 +2212,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
 unsigned long aValue=0; //<<<<<<<---------hard coded for now ---------------
 [[self adapter] readLongBlock:&aValue
-                    atAddress:[self baseAddress] + kAcqControlStatusReg
+                    atAddress:[self vmeRegister:kAcqControlStatusReg]
                     numToRead:1
                    withAddMod:[self addressModifier]
                 usingAddSpace:0x01];
@@ -2241,7 +2320,7 @@ unsigned long aValue=0; //<<<<<<<---------hard coded for now ---------------
             adata = adata | (tdata<<(ic*8));
         }
         [[self adapter] writeLongBlock: &adata
-                             atAddress: [self baseAddress] + 0x1000*iadc + kAdcGainTermCntrlReg
+                             atAddress: [self groupRegister:kAdcGainTermCntrlReg group:iadc]
                             numToWrite: 1
                             withAddMod: [self addressModifier]
                          usingAddSpace: 0x01];
@@ -2252,7 +2331,7 @@ unsigned long aValue=0; //<<<<<<<---------hard coded for now ---------------
     for (int iadc=0;iadc<kNumSIS3316Groups;iadc++) {
         unsigned long aValue = 0x81001404; // SPI (OE)  set binary
         [[self adapter] writeLongBlock: &aValue
-                             atAddress: [self baseAddress] + 0x1000*iadc + kAdcSpiControlReg
+                             atAddress: [self groupRegister:kAdcSpiControlReg group:iadc]
                             numToWrite: 1
                             withAddMod: [self addressModifier]
                          usingAddSpace: 0x01];
@@ -2260,7 +2339,7 @@ unsigned long aValue=0; //<<<<<<<---------hard coded for now ---------------
         usleep(1);
         aValue = 0x81401404; // SPI (OE)  set binary
         [[self adapter] writeLongBlock: &aValue
-                             atAddress: [self baseAddress] + 0x1000*iadc + kAdcSpiControlReg
+                             atAddress: [self groupRegister:kAdcSpiControlReg group:iadc]
                             numToWrite: 1
                             withAddMod: [self addressModifier]
                          usingAddSpace: 0x01];
@@ -2268,7 +2347,7 @@ unsigned long aValue=0; //<<<<<<<---------hard coded for now ---------------
         usleep(1);
         aValue = 0x8100ff01; // SPI (OE)  update
         [[self adapter] writeLongBlock: &aValue
-                             atAddress: [self baseAddress] + 0x1000*iadc + kAdcSpiControlReg
+                             atAddress: [self groupRegister:kAdcSpiControlReg group:iadc]
                             numToWrite: 1
                             withAddMod: [self addressModifier]
                          usingAddSpace: 0x01];
@@ -2276,7 +2355,7 @@ unsigned long aValue=0; //<<<<<<<---------hard coded for now ---------------
         usleep(1);
         aValue = 0x8140ff01; // SPI (OE)  update
         [[self adapter] writeLongBlock: &aValue
-                             atAddress: [self baseAddress] + 0x1000*iadc + kAdcSpiControlReg
+                             atAddress: [self groupRegister:kAdcSpiControlReg group:iadc]
                             numToWrite: 1
                             withAddMod: [self addressModifier]
                          usingAddSpace: 0x01];
@@ -2289,14 +2368,14 @@ unsigned long aValue=0; //<<<<<<<---------hard coded for now ---------------
     for (iadc=0;iadc<kNumSIS3316Groups;iadc++) {
         unsigned long aValue = 0x80000000 + 0x08000000 +  0x00f00000 + 0x1; // set internal Reference
         [[self adapter] writeLongBlock: &aValue
-                             atAddress: [self baseAddress] + 0x1000*iadc + kAdcOffsetDacCntrlReg
+                             atAddress: [self groupRegister:kAdcOffsetDacCntrlReg group:iadc]
                             numToWrite: 1
                             withAddMod: [self addressModifier]
                          usingAddSpace: 0x01];
         usleep(1);
         aValue = 0x80000000 + 0x02000000 +  0x00f00000 + ((dacOffset & 0xffff) << 4);  // clear error Latch bits
         [[self adapter] writeLongBlock: &aValue
-                             atAddress: [self baseAddress] + 0x1000*iadc + kAdcOffsetDacCntrlReg
+                             atAddress: [self groupRegister:kAdcOffsetDacCntrlReg group:iadc]
                             numToWrite: 1
                             withAddMod: [self addressModifier]
                          usingAddSpace: 0x01];
@@ -2304,7 +2383,7 @@ unsigned long aValue=0; //<<<<<<<---------hard coded for now ---------------
         usleep(1);
         aValue = 0xC0000000;  // clear error Latch bits
         [[self adapter] writeLongBlock: &aValue
-                             atAddress: [self baseAddress] + 0x1000*iadc + kAdcOffsetDacCntrlReg
+                             atAddress: [self groupRegister:kAdcOffsetDacCntrlReg group:iadc]
                             numToWrite: 1
                             withAddMod: [self addressModifier]
                          usingAddSpace: 0x01];
@@ -2620,7 +2699,7 @@ unsigned long aValue=0; //<<<<<<<---------hard coded for now ---------------
 {
  	unsigned long aValue = 0; //value doesn't matter 
 	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + kKeyResetReg
+                         atAddress:[self keyRegister:kKeyResetReg]
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -3193,7 +3272,7 @@ unsigned long aValue=0; //<<<<<<<---------hard coded for now ---------------
     // start
     unsigned long aValue = 1<<I2C_START;
     [[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + kAdcClockI2CReg +  (4 * osc)
+                         atAddress:[self vmeRegister:kAdcClockI2CReg] +  (4 * osc)
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -3204,7 +3283,7 @@ unsigned long aValue=0; //<<<<<<<---------hard coded for now ---------------
     do{
         // poll i2c fsm busy
         [[self adapter] readLongBlock:&aValue
-                            atAddress:[self baseAddress] + kAdcClockI2CReg +  (4 * osc)
+                            atAddress:[self vmeRegister:kAdcClockI2CReg] + (4 * osc)
                             numToRead:1
                            withAddMod:[self addressModifier]
                         usingAddSpace:0x01];
@@ -3230,7 +3309,7 @@ unsigned long aValue=0; //<<<<<<<---------hard coded for now ---------------
     usleep(20000);
     unsigned long aValue = 1<<I2C_STOP;
     [[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + kAdcClockI2CReg +  (4 * osc)
+                         atAddress:[self vmeRegister:kAdcClockI2CReg] +  (4 * osc)
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -3241,7 +3320,7 @@ unsigned long aValue=0; //<<<<<<<---------hard coded for now ---------------
         // poll i2c fsm busy
         usleep(20000);
         [[self adapter] readLongBlock:&aValue
-                            atAddress:[self baseAddress] + kAdcClockI2CReg +  (4 * osc)
+                            atAddress:[self vmeRegister:kAdcClockI2CReg] +  (4 * osc)
                             numToRead:1
                            withAddMod:[self addressModifier]
                         usingAddSpace:0x01];
@@ -3262,7 +3341,7 @@ unsigned long aValue=0; //<<<<<<<---------hard coded for now ---------------
     // write byte, receive ack
     unsigned long aValue = 1<<I2C_WRITE ^ data;
     [[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + kAdcClockI2CReg +  (4 * osc)
+                         atAddress:[self vmeRegister:kAdcClockI2CReg] +  (4 * osc)
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -3272,7 +3351,7 @@ unsigned long aValue=0; //<<<<<<<---------hard coded for now ---------------
     do{
         // poll i2c fsm busy
         [[self adapter] readLongBlock:&tmp
-                            atAddress:[self baseAddress] + kAdcClockI2CReg +  (4 * osc)
+                            atAddress:[self vmeRegister:kAdcClockI2CReg]+  (4 * osc)
                             numToRead:1
                            withAddMod:[self addressModifier]
                         usingAddSpace:0x01];
@@ -3303,7 +3382,7 @@ unsigned long aValue=0; //<<<<<<<---------hard coded for now ---------------
     usleep(20000);
     
     [[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + kAdcClockI2CReg +  (4 * osc)
+                         atAddress:[self vmeRegister:kAdcClockI2CReg] +  (4 * osc)
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -3314,7 +3393,7 @@ unsigned long aValue=0; //<<<<<<<---------hard coded for now ---------------
         // poll i2c fsm busy
         usleep(20000);
         [[self adapter] readLongBlock:&aValue
-                            atAddress:[self baseAddress] + kAdcClockI2CReg +  (4 * osc)
+                            atAddress:[self vmeRegister:kAdcClockI2CReg] +  (4 * osc)
                             numToRead:1
                            withAddMod:[self addressModifier]
                         usingAddSpace:0x01];
