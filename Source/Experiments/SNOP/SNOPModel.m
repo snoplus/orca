@@ -354,14 +354,19 @@ tellieRunFiles = _tellieRunFiles;
     [self setNhitMonitorPulserRate:[decoder decodeIntForKey:@"nhitMonitorPulserRate"]];
     [self setNhitMonitorNumPulses:[decoder decodeIntForKey:@"nhitMonitorNumPulses"]];
     [self setNhitMonitorMaxNhit:[decoder decodeIntForKey:@"nhitMonitorMaxNhit"]];
-    [self setNhitMonitorAutoRun:[decoder decodeBoolForKey:@"nhitMonitorAutoRun"]];
     [self setNhitMonitorAutoPulserRate:[decoder decodeIntForKey:@"nhitMonitorAutoPulserRate"]];
     [self setNhitMonitorAutoNumPulses:[decoder decodeIntForKey:@"nhitMonitorAutoNumPulses"]];
     [self setNhitMonitorAutoMaxNhit:[decoder decodeIntForKey:@"nhitMonitorAutoMaxNhit"]];
     [self setNhitMonitorRunType:[decoder decodeIntForKey:@"nhitMonitorRunType"]];
     [self setNhitMonitorCrateMask:[decoder decodeIntForKey:@"nhitMonitorCrateMask"]];
+    /* Don't automatically run the nhit monitor until we load all the settings.
+     * Initially the time interval and auto run variables will be uninitialized
+     * in this method and if we set the time interval here and
+     * nhitMonitorAutoRun is set to YES, it will start the automatic timer
+     * before the settings are loaded. */
+    nhitMonitorAutoRun = NO;
     [self setNhitMonitorTimeInterval:[decoder decodeDoubleForKey:@"nhitMonitorTimeInterval"]];
-    [self setNhitMonitorMaxNhit:[decoder decodeIntForKey:@"nhitMonitorMaxNhit"]];
+    [self setNhitMonitorAutoRun:[decoder decodeBoolForKey:@"nhitMonitorAutoRun"]];
     [[self undoManager] enableUndoRegistration];
 
     //Set extra security
