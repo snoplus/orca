@@ -83,6 +83,7 @@ BOOL isNotRunningOrIsInMaintenance()
 orcaDBUserName = _orcaDBUserName,
 smellieRunNameLabel = _smellieRunNameLabel,
 tellieRunNameLabel = _tellieRunNameLabel,
+amellieRunNameLabel = _amellieRunNameLabel,
 orcaDBPassword = _orcaDBPassword,
 orcaDBName = _orcaDBName,
 orcaDBPort = _orcaDBPort,
@@ -106,6 +107,7 @@ logHost,
 logPort,
 resync,
 smellieRunFiles = _smellieRunFiles,
+amellieRunFiles = _amellieRunFiles,
 tellieRunFiles = _tellieRunFiles;
 
 #pragma mark ¥¥¥Initialization
@@ -1666,6 +1668,10 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
             {
                 [self parseTellieRunFileDocs:aResult];
             }
+            else if ([aTag isEqualToString:@"kAmellieRunHeaderRetrieved"])
+            {
+                [self parseAmellieRunFileDocs:aResult];
+            }
             else if ([aTag isEqualToString:@"Message"]) {
                 [aResult prettyPrint:@"CouchDB Message:"];
             } else if ([aTag isEqualToString:@"kStandardRunPosted"]) {
@@ -2054,6 +2060,45 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     [runFiles release];
 
     [[NSNotificationCenter defaultCenter] postNotificationName: @"TellieRunFilesLoaded" object:nil];
+}
+
+- (void) getAmellieRunFiles
+{
+    //Set TellieRunFiles to nil
+    [self setAmellieRunFiles:nil];
+    
+    // Check there is an ELLIE model in the current configuration
+    NSArray*  ellieModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
+    if(![ellieModels count]){
+        NSLogColor([NSColor redColor], @"Must have an ELLIE object in the configuration\n");
+        return;
+    }
+    
+    ELLIEModel* anELLIEModel = [ellieModels objectAtIndex:0];
+    NSString *requestString = [NSString stringWithFormat:@"_design/runs/_view/run_plans"];
+    
+    // This line calls [self couchDBresult], which in turn calls [self parseSmellieRunFileDocs] where the
+    // [self smellieRunFiles] property variable gets set.
+    [[anELLIEModel couchDBRef:self withDB:@"amellie"]  getDocumentId:requestString tag:@"kAmellieRunHeaderRetrieved"];
+}
+
+-(void) parseAmellieRunFileDocs:(id)aResult
+{
+    // Use the result returned from the tellie database query to fill a dictionary with all the available
+    // run file documents.
+    unsigned int nFiles = [[aResult objectForKey:@"rows"] count];
+    NSMutableDictionary *runFiles = [[NSMutableDictionary alloc] init];
+    
+    for(int i=0;i<nFiles;i++){
+        NSMutableDictionary* amellieRunFileIterator = [[[aResult objectForKey:@"rows"] objectAtIndex:i] objectForKey:@"value"];
+        NSString *keyForAmellieDocs = [NSString stringWithFormat:@"%u",i];
+        [runFiles setObject:amellieRunFileIterator forKey:keyForAmellieDocs];
+    }
+    
+    [self setAmellieRunFiles:runFiles];
+    [runFiles release];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"AmellieRunFilesLoaded" object:nil];
 }
 
 - (unsigned long) runTypeWord

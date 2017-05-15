@@ -12,11 +12,10 @@
 #import "ELLIEController.h"
 #import "ELLIEModel.h"
 #import "SNOPModel.h"
+#import "TUBiiModel.h"
 #import "SNOP_Run_Constants.h"
 #import "ORRunModel.h"
 #import "ORCouchDB.h"
-
-NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 
 @implementation ELLIEController
 
@@ -45,7 +44,7 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 -(void) awakeFromNib
 {
     [super awakeFromNib];
-    [super updateWindow];
+    [self updateWindow];
     [self updateServerSettings:nil];
     [self fetchConfigurationFile:nil];
     [self initialiseTellie];
@@ -110,6 +109,11 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
                      selector : @selector(killInterlock:)
                          name : @"SMELLIEEmergencyStop"
                         object: nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(tubiiDied:)
+                         name : @"TUBiiKeepAliveDied"
+                       object : nil];
 }
 
 -(void)fetchConfigurationFile:(NSNotification *)aNote{
@@ -141,22 +145,28 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     [tellieExpertOperationModePb addItemsWithTitles:@[@"Slave", @"Master"]];
     [tellieExpertOperationModePb selectItemAtIndex:0];
     
+    [amellieOperationModePb removeAllItems];
+    [amellieOperationModePb addItemsWithTitles:@[@"Slave", @"Master"]];
+    [amellieOperationModePb selectItemAtIndex:0];
+
+    [amellieFibreSelectPb removeAllItems];
+    [amellieFibreSelectPb addItemsWithTitles:@[@"FA008", @"FA108", @"FA050", @"FA150", @"FA092", @"FA173", @"FA089", @"FA189"]];
+    [amellieFibreSelectPb selectItemAtIndex:0];
+    
     //Grey out fibre until node is given
     [tellieGeneralFibreSelectPb setTarget:self];
     [tellieGeneralFibreSelectPb setEnabled:NO];
     
     [tellieExpertFibreSelectPb setTarget:self];
     [tellieExpertFibreSelectPb setEnabled:NO];
-
-    //Set pulse height to full as default
-    //**Might be sensible to remove this field completely, needs discussion.
-    [telliePulseHeightTf setStringValue:@"16383"];
     
     //Disable Fire / stop buttons
     [tellieExpertFireButton setEnabled:NO];
     [tellieExpertStopButton setEnabled:NO];
     [tellieGeneralFireButton setEnabled:NO];
     [tellieGeneralStopButton setEnabled:NO];
+    [amellieFireButton setEnabled:NO];
+    [amellieStopButton setEnabled:NO];
     
     //Set this object as delegate for textFields
     //This means we get notified when someone's edited
@@ -168,7 +178,6 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     [tellieGeneralFreqTf setDelegate:self];
     [tellieGeneralTriggerDelayTf setStringValue:@"650"];
 
-
     [tellieChannelTf setDelegate:self];
     [telliePulseWidthTf setDelegate:self];
     [telliePulseFreqTf setDelegate:self];
@@ -179,6 +188,16 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     [tellieExpertNodeTf setDelegate:self];
     [telliePhotonsTf setDelegate:self];
     [tellieTriggerDelayTf setStringValue:@"650"];
+    [telliePulseHeightTf setStringValue:@"16383"];
+
+    [amelliePulseWidthTf setDelegate:self];
+    [amelliePulseFreqTf setDelegate:self];
+    [amelliePulseHeightTf setDelegate:self];
+    [amellieFibreDelayTf setDelegate:self];
+    [amellieTriggerDelayTf setDelegate:self];
+    [amellieNoPulsesTf setDelegate:self];
+    [amellieTriggerDelayTf setStringValue:@"650"];
+    [amelliePulseHeightTf setStringValue:@"16383"];
 
     // Build custom run tab
     [tellieBuildPushToDB setEnabled:NO];
@@ -209,7 +228,6 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     [tellieGeneralStopButton setEnabled:YES];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunStart object:nil userInfo:[self guiFireSettings]];
     [tellieGeneralValidationStatusTf setStringValue:@""];
-
 }
 
 -(IBAction)tellieExpertFireAction:(id)sender
@@ -424,6 +442,28 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     [tellieBuildPushToDB setEnabled:NO];
     [document release];
 }
+
+//////////////////////////
+// AMELLIE actions
+//////////////////////////
+- (IBAction)amellieFireButton:(id)sender {
+    ////////////
+    // Check a run isn't ongoing
+    if([model ellieFireFlag]){
+        NSLogColor([NSColor redColor], @"[AMELLIE]: Fire button will not work while an ELLIE run is underway\n");
+        return;
+    }
+        
+    [amellieFireButton setEnabled:NO];
+    [amellieStopButton setEnabled:YES];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAMELLIERunStart object:nil userInfo:[self guiFireSettings]];
+    [amellieValidationStatusTf setStringValue:@""];
+}
+
+- (IBAction)amellieStopButton:(id)sender {
+
+}
+
 
 ////////////////////////////////////////////////////////
 //
@@ -741,6 +781,115 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     NSLog(@"---------------------------------------------------------------------------------------------\n");
 }
 
+-(IBAction)amellieValidateSettingsAction:(id)sender
+{
+    [self setGuiFireSettings:nil];
+    [amellieTriggerDelayTf.window makeFirstResponder:nil];
+    [amellieFibreDelayTf.window makeFirstResponder:nil];
+    [amelliePulseWidthTf.window makeFirstResponder:nil];
+    [amelliePulseHeightTf.window makeFirstResponder:nil];
+    [amelliePulseFreqTf.window makeFirstResponder:nil];
+    [amellieNoPulsesTf.window makeFirstResponder:nil];
+    [amellieFibreSelectPb.window makeFirstResponder:nil];
+    [amellieOperationModePb.window makeFirstResponder:nil];
+    
+    //Check if fibre mapping has been loaded from the amellieDB
+    /*
+    if(![model amellieNodeMapping]){
+        [model loadAMELLIEStaticsFromDB];
+    }
+    //If still can't get reference, return
+    if(![model amellieNodeMapping]){
+        NSLogColor([NSColor redColor], @"[TELLIE]: Cannot connect to couchdb database\n");
+        return;
+    }
+    */
+    
+    NSString* msg = nil;
+    NSMutableArray* msgs = [NSMutableArray arrayWithCapacity:7];
+    NSLog(@"---------------------------- Amellie Validation messages ----------------------------\n");
+    msg = [self validateTellieTriggerDelay:[amellieTriggerDelayTf stringValue]];
+    if(msg){
+        [msgs insertObject:msg atIndex:0];
+    } else {
+        [msgs insertObject:[NSNull null] atIndex:0];
+    }
+    
+    msg = [self validateTellieFibreDelay:[amellieFibreDelayTf stringValue]];
+    if(msg){
+        [msgs insertObject:msg atIndex:1];
+    } else {
+        [msgs insertObject:[NSNull null] atIndex:1];
+    }
+    
+    msg = [self validateTelliePulseWidth:[amelliePulseWidthTf stringValue]];
+    if(msg){
+        [msgs insertObject:msg atIndex:2];
+    } else {
+        [msgs insertObject:[NSNull null] atIndex:2];
+    }
+    
+    msg = [self validateTelliePulseHeight:[amelliePulseHeightTf stringValue]];
+    if(msg){
+        [msgs insertObject:msg atIndex:3];
+    } else {
+        [msgs insertObject:[NSNull null] atIndex:3];
+    }
+    
+    msg = [self validateTelliePulseFreq:[amelliePulseFreqTf stringValue]];
+    if(msg){
+        [msgs insertObject:msg atIndex:4];
+    } else {
+        [msgs insertObject:[NSNull null] atIndex:4];
+    }
+    
+    
+    msg = [self validateTellieNoPulses:[amellieNoPulsesTf stringValue]];
+    if(msg){
+        [msgs insertObject:msg atIndex:5];
+    } else {
+        [msgs insertObject:[NSNull null] atIndex:5];
+    }
+    
+    // Remove any null objects
+    for(int i = 0; i < [msgs count]; i++){
+        if([msgs objectAtIndex:i] == [NSNull null]){
+            [msgs removeObject:[msgs objectAtIndex:i]];
+        }
+    }
+    
+    // Check if validation passed
+    if([msgs count] == 0){
+        NSLog(@"[AMELLIE]: fire settings are valid\n");
+        //Set backgrounds back to white
+        [amelliePulseWidthTf setBackgroundColor:[NSColor whiteColor]];
+        [amelliePulseFreqTf setBackgroundColor:[NSColor whiteColor]];
+        [amelliePulseHeightTf setBackgroundColor:[NSColor whiteColor]];
+        [amellieFibreDelayTf setBackgroundColor:[NSColor whiteColor]];
+        [amellieTriggerDelayTf setBackgroundColor:[NSColor whiteColor]];
+        [amellieNoPulsesTf setBackgroundColor:[NSColor whiteColor]];
+        // Make settings dict to pass to fire method
+        float pulseSeparation = 1000.*(1./[amelliePulseFreqTf floatValue]); // TELLIE accepts pulse rate in ms
+        NSMutableDictionary* settingsDict = [NSMutableDictionary dictionaryWithCapacity:100];
+        [settingsDict setValue:[amellieFibreSelectPb titleOfSelectedItem] forKey:@"fibre"];
+        [settingsDict setValue:[NSNumber numberWithInteger:[model fibreToChannel:[amellieFibreSelectPb titleOfSelectedItem]]] forKey:@"channel"];
+        [settingsDict setValue:[amellieOperationModePb titleOfSelectedItem] forKey:@"run_mode"];
+        [settingsDict setValue:[NSNumber numberWithInteger:[amelliePulseWidthTf integerValue]] forKey:@"pulse_width"];
+        [settingsDict setValue:[NSNumber numberWithFloat:pulseSeparation] forKey:@"pulse_separation"];
+        [settingsDict setValue:[NSNumber numberWithInteger:[amellieNoPulsesTf integerValue]] forKey:@"number_of_shots"];
+        [settingsDict setValue:[NSNumber numberWithInteger:[amellieTriggerDelayTf integerValue]] forKey:@"trigger_delay"];
+        [settingsDict setValue:[NSNumber numberWithFloat:[amellieFibreDelayTf floatValue]] forKey:@"fibre_delay"];
+        [settingsDict setValue:[NSNumber numberWithInteger:[amelliePulseHeightTf integerValue]] forKey:@"pulse_height"];
+        [self setGuiFireSettings:settingsDict];
+        [amellieFireButton setEnabled:YES];
+        [amellieValidationStatusTf setStringValue:@"Settings are valid. Fire away!"];
+    } else {
+        [amellieValidationStatusTf setStringValue:@"Validation issues found. See orca log for full description.\n"];
+    }
+    NSLog(@"---------------------------------------------------------------------------------------------\n");
+}
+
+
 ////////////////////////////////////////////
 // Delagate funcs waiting to observe edits
 ////////////////////////////////////////////
@@ -797,6 +946,8 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     NSString* expertMsg = nil;
     NSString* generalMsg = nil;
     NSString* buildMsg = nil;
+    NSString* amellieMsg = nil;
+    
     BOOL gotInside = NO;
     
     //Make sure background gets drawn
@@ -937,6 +1088,46 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
         return;
     } else if(expertMsg == nil && gotInside == YES){
         [tellieBuildPushToDB setEnabled:NO];
+        [editedField setBackgroundColor:[NSColor whiteColor]];
+        [editedField setNeedsDisplay:YES];
+        return;
+    }
+    
+    ///////////////////////////
+    // check if this notification originated from the AMELLIE tab
+    
+    //Re-set got inside.
+    gotInside = NO;
+    
+    if([note object] == amellieTriggerDelayTf){
+        amellieMsg = [self validateTellieTriggerDelay:currentString];
+        gotInside = YES;
+    } else if ([note object] == amellieFibreDelayTf){
+        amellieMsg = [self validateTellieFibreDelay:currentString];
+        gotInside = YES;
+    } else if ([note object] == amelliePulseFreqTf){
+        amellieMsg = [self validateTelliePulseFreq:currentString];
+        gotInside = YES;
+    } else if ([note object] == amelliePulseHeightTf){
+        amellieMsg = [self validateTelliePulseHeight:currentString];
+        gotInside = YES;
+    } else if ([note object] == amelliePulseWidthTf){
+        amellieMsg = [self validateTelliePulseWidth:currentString];
+        gotInside = YES;
+    } else if ([note object] == amellieNoPulsesTf){
+        amellieMsg = [self validateTellieNoPulses:currentString];
+        gotInside = YES;
+    }
+    
+    if(amellieMsg){
+        [amellieFireButton setEnabled:NO];
+        [amellieValidationStatusTf setStringValue:expertMsg];
+        [editedField setBackgroundColor:[NSColor orangeColor]];
+        [editedField setNeedsDisplay:YES];
+        return;
+    } else if(amellieMsg == nil && gotInside == YES){
+        [amellieFireButton setEnabled:NO];
+        [amellieValidationStatusTf setStringValue:@""];
         [editedField setBackgroundColor:[NSColor whiteColor]];
         [editedField setNeedsDisplay:YES];
         return;
@@ -1083,7 +1274,7 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     int minimumChannelNumber = 1;
     int maxmiumChannelNumber = 95;
     
-    NSString* msg = [NSString stringWithFormat:@"[TELLIE_VALIDATION]: Valid channel numbers are 1-95\n"];
+    NSString* msg = [NSString stringWithFormat:@"[ELLIE_VALIDATION]: Valid channel numbers are 1-95\n"];
     if(currentChannelNumber  > maxmiumChannelNumber){
         NSLog(msg);
         return msg;
@@ -1105,7 +1296,7 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     int minimumValue = 0;
     int maxmiumValue = 16383;
     
-    NSString* msg = @"[TELLIE_VALIDATION]: Valid pulse width settings: 0-16383 in integer steps\n";
+    NSString* msg = @"[ELLIE_VALIDATION]: Valid pulse width settings: 0-16383 in integer steps\n";
     if(currentValue  > maxmiumValue){
         NSLog(msg);
         return msg;
@@ -1127,7 +1318,7 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     int minimumValue = 0;
     int maxmiumValue = 16383;
     
-    NSString* msg = @"[TELLIE_VALIDATION]: Valid pulse width settings: 0-16383 in integer steps\n";
+    NSString* msg = @"[ELLIE_VALIDATION]: Valid pulse width settings: 0-16383 in integer steps\n";
     if(currentValue  > maxmiumValue){
         NSLog(msg);
         return msg;
@@ -1149,7 +1340,7 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     float frequency = [currentText floatValue];
     float maxFreq = 1e4;
 
-    NSString* msg = @"[TELLIE_VALIDATION]: Valid frequency settings: 0-10kHz\n";
+    NSString* msg = @"[ELLIE_VALIDATION]: Valid frequency settings: 0-10kHz\n";
     if (![scanner scanFloat:nil]){
         NSLog(msg);
         return msg;
@@ -1173,7 +1364,7 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     float maxmiumFibreDelay = 63.75;                //in ns
     int fibreDelayRemainder = (int)(fibreDelayNumber*100)  % (int)(minimumNumberFibreDelaySteps*100);
     
-    NSString* msg = @"[TELLIE_VALIDATION]: Valid fibre delay settings: 0-63.75ns in steps of 0.25ns.\n";
+    NSString* msg = @"[ELLIE_VALIDATION]: Valid fibre delay settings: 0-63.75ns in steps of 0.25ns.\n";
     if (![scanner scanFloat:nil]){
         NSLog(msg);
         return msg;
@@ -1201,7 +1392,7 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     int maxmiumTriggerDelay = 1275;             //in ns
     int triggerDelayRemainder = (triggerDelayNumber  % minimumNumberTriggerDelaySteps);
     
-    NSString* msg = @"[TELLIE_VALIDATION]: Valid trigger delay settings: 0-1275ns in steps of 5ns.\n";
+    NSString* msg = @"[ELLIE_VALIDATION]: Valid trigger delay settings: 0-1275ns in steps of 5ns.\n";
     if (![scanner scanInt:nil]){
         NSLog(msg);
         return msg;
@@ -1223,7 +1414,7 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     NSScanner* scanner = [NSScanner scannerWithString:currentText];
     int noPulses = [currentText intValue];
 
-    NSString* msg = @"[TELLIE_VALIDATION]: Number of pulses has to be a positive integer\n";
+    NSString* msg = @"[ELLIE_VALIDATION]: Number of pulses has to be a positive integer\n";
     if (![scanner scanInt:nil]){
         NSLog(msg);
         return msg;
@@ -1240,11 +1431,11 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 /////////////////////////////////////////////
 - (IBAction)telliePing:(id)sender {
     if([model pingTellie]){
-        NSString* response = [NSString stringWithFormat:@"Connected to tellie at:\n\n%@:%@", [model tellieHost], [model telliePort]];
+        NSString* response = [NSString stringWithFormat:@"Connected to tellie at: \%@:%@", [model tellieHost], [model telliePort]];
         [tellieServerResponseTf setStringValue:response];
         [tellieServerResponseTf setBackgroundColor:[NSColor greenColor]];
     } else {
-        NSString* response = [NSString stringWithFormat:@"Could not connect to tellie at:\n\n%@:%@", [model tellieHost], [model telliePort]];
+        NSString* response = [NSString stringWithFormat:@"Could not connect to tellie at: %@:%@", [model tellieHost], [model telliePort]];
         [tellieServerResponseTf setStringValue:response];
         [tellieServerResponseTf setBackgroundColor:[NSColor redColor]];
     }
@@ -1253,11 +1444,11 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 
 - (IBAction)smelliePing:(id)sender {
     if([model pingSmellie]){
-        NSString* response = [NSString stringWithFormat:@"Connected to smellie at:\n\n%@:%@", [model smellieHost], [model smelliePort]];
+        NSString* response = [NSString stringWithFormat:@"Connected to smellie at: %@:%@", [model smellieHost], [model smelliePort]];
         [smellieServerResponseTf setStringValue:response];
         [smellieServerResponseTf setBackgroundColor:[NSColor greenColor]];
     } else {
-        NSString* response = [NSString stringWithFormat:@"Could not connect to smellie at:\n\n%@:%@", [model smellieHost], [model smelliePort]];
+        NSString* response = [NSString stringWithFormat:@"Could not connect to smellie at: %@:%@", [model smellieHost], [model smelliePort]];
         [smellieServerResponseTf setStringValue:response];
         [smellieServerResponseTf setBackgroundColor:[NSColor redColor]];
     }
@@ -1266,11 +1457,11 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 
 - (IBAction)interlockPing:(id)sender {
     if([model pingInterlock]){
-        NSString* response = [NSString stringWithFormat:@"Connected to interlock at:\n\n%@:%@", [model interlockHost], [model interlockPort]];
+        NSString* response = [NSString stringWithFormat:@"Connected to interlock at: %@:%@", [model interlockHost], [model interlockPort]];
         [interlockServerResponseTf setStringValue:response];
         [interlockServerResponseTf setBackgroundColor:[NSColor greenColor]];
     } else {
-        NSString* response = [NSString stringWithFormat:@"Could not connect to interlock at:\n\n%@:%@", [model interlockHost], [model interlockPort]];
+        NSString* response = [NSString stringWithFormat:@"Could not connect to interlock at: %@:%@", [model interlockHost], [model interlockPort]];
         [interlockServerResponseTf setStringValue:response];
         [interlockServerResponseTf setBackgroundColor:[NSColor redColor]];
     }
@@ -1281,4 +1472,57 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 {
     [model killKeepAlive];
 }
+
+- (IBAction)tubiiRestart:(id)sender {
+    //////////////
+    //Get a Tubii object
+    NSArray*  tubiiModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
+    if(![tubiiModels count]){
+        NSLogColor([NSColor redColor], @"[ELLIE]: Couldn't find Tubii model in current experiment.\n");
+        return;
+    }
+    TUBiiModel* theTubiiModel = [tubiiModels objectAtIndex:0];
+    if([[theTubiiModel keepAliveThread] isExecuting]){
+        NSString* response = @"TUBii keep alive thread is already active, restarting.\n";
+        [tubiiThreadResponseTf setStringValue:response];
+        // This method will cancel the thread, causing a break statement to
+        // be called, ending a while loop. Once outside the loop the memory
+        // is tidied up and the user is promped (via a pop-up box) to
+        // re-activate the thread.
+        [theTubiiModel killKeepAlive];
+    } else {
+        NSString* response = @"TUBii keep alive thread is getting a cold start.\n";
+        [tubiiThreadResponseTf setStringValue:response];
+        [theTubiiModel activateKeepAlive];
+    }
+    [self tubiiPing:self];
+}
+
+- (IBAction)tubiiPing:(id)sender {
+    //////////////
+    //Get a Tubii object
+    NSArray*  tubiiModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
+    if(![tubiiModels count]){
+        NSLogColor([NSColor redColor], @"[ELLIE]: Couldn't find Tubii model in current experiment.\n");
+        return;
+    }
+    TUBiiModel* theTubiiModel = [tubiiModels objectAtIndex:0];
+    
+    // If ping was requested by note, wait to see if keep alive inits OK.
+    if([[theTubiiModel keepAliveThread] isExecuting]){
+        NSString* response = @"TUBii keep alive thread is active.\n";
+        [tubiiThreadResponseTf setStringValue:response];
+        [tubiiThreadResponseTf setBackgroundColor:[NSColor greenColor]];
+    } else {
+        [self tubiiDied:nil];
+    }
+}
+
+-(void)tubiiDied:(NSNotification*)note{
+    NSString* response = @"TUBii keep alive thread is not executing. Please try a restart";
+    [tubiiThreadResponseTf setStringValue:response];
+    [tubiiThreadResponseTf setBackgroundColor:[NSColor redColor]];
+}
+
+
 @end

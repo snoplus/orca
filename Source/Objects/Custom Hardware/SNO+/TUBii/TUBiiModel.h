@@ -200,7 +200,7 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
 -(void)activateKeepAlive;
 -(void)pulseKeepAlive:(id)passed;
 -(void)restartKeepAlive:(NSNotification*)aNote;
--(void)killKeepAlive;
+-(void)killKeepAlive:(NSNotification*)aNote;
 @end
 
 extern NSString* ORTubiiLock;

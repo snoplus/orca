@@ -80,6 +80,23 @@
     IBOutlet NSButton *tellieBuildValidate;
     IBOutlet NSButton *tellieBuildPushToDB;
 
+    //AMELLIE interface ------------------------------------------
+    IBOutlet NSTextField *amelliePulseWidthTf;
+    IBOutlet NSTextField *amelliePulseFreqTf;
+    IBOutlet NSTextField *amelliePulseHeightTf;
+    IBOutlet NSTextField *amellieFibreDelayTf;
+    IBOutlet NSTextField *amellieTriggerDelayTf;
+    IBOutlet NSTextField *amellieNoPulsesTf;
+    
+    IBOutlet NSPopUpButton *amellieFibreSelectPb;
+    IBOutlet NSPopUpButton *amellieOperationModePb; //Operation mode (master or slave)
+    
+    IBOutlet NSTextField *amellieValidationStatusTf;
+    
+    IBOutlet NSButton *amellieFireButton;
+    IBOutlet NSButton *amellieStopButton;
+    IBOutlet NSButton *amellieValidateSettingsButton;
+    
     //Server interface ------------------------------------------
 
     IBOutlet NSTextField *tellieHostTf;
@@ -94,6 +111,8 @@
     IBOutlet NSTextField *smellieServerResponseTf;
     IBOutlet NSTextField *interlockServerResponseTf;
 
+    IBOutlet NSTextField *tubiiThreadResponseTf;
+    
     // Instance variables
     NSThread *tellieThread;
     NSButton *tellieExpertConvertAction;
@@ -102,6 +121,7 @@
     NSThread* _tellieThread;
     NSThread* _smellieThread;
     NSButton *interlockPing;
+    NSButton *tubiiRestart;
 }
 
 // Properties
@@ -128,7 +148,6 @@
 -(IBAction)tellieNodeMapAction:(id)sender;
 -(IBAction)tellieGeneralFibreNameAction:(NSPopUpButton *)sender;
 -(IBAction)tellieGeneralModeAction:(NSPopUpButton *)sender;
-
 
 //Expert tab
 -(IBAction)tellieExpertFireAction:(id)sender;
@@ -161,17 +180,25 @@
 -(IBAction)tellieBuildValidateAction:(id)sender;
 -(IBAction)tellieBuildPushToDBAction:(id)sender;
 
+//Amellie tab functions -----------------------------
+- (IBAction)amellieValidateSettingsAction:(id)sender;
+- (IBAction)amellieFireButton:(id)sender;
+- (IBAction)amellieStopButton:(id)sender;
 
 //Server tab functions -----------------------------
 - (IBAction)telliePing:(id)sender;
 - (IBAction)smelliePing:(id)sender;
 - (IBAction)interlockPing:(id)sender;
-- (IBAction) serverSettingsChanged:(id)sender;
+- (IBAction)tubiiPing:(id)sender;
+- (IBAction)tubiiRestart:(id)sender;
+- (IBAction)serverSettingsChanged:(id)sender;
 -(void)killInterlock:(NSNotification *)aNote;
 
 @end
 
 extern NSString* ORTELLIERunStart;
+extern NSString* ORAMELLIERunStart;
 extern NSString* ORSMELLIERunFinished;
 extern NSString* ORTELLIERunFinished;
+extern NSString* ORAMELLIERunFinished;
 
