@@ -303,7 +303,7 @@
 - (IBAction)hvRelayMaskMatrixAction:(id)sender;
 - (IBAction)hvRelaySetAction:(id)sender;
 - (IBAction)hvRelayOpenAllAction:(id)sender;
-- (IBAction)hvCheckInterlockAction:(id)sender;
+- (IBAction)hvCheckInterlockRelaysAction:(id)sender;
 - (IBAction)hvTurnOnAction:(id)sender;
 - (IBAction)hvTurnOffAction:(id)sender;
 - (IBAction)hvAcceptReadback:(id)sender;
