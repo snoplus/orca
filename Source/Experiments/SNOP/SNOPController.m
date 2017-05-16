@@ -1583,7 +1583,7 @@ err:
     if(slaveValue == 1){
         inSlave = YES;
     }
-    NSMutableArray* settingsArray = [[NSMutableArray alloc] init];
+    NSMutableArray* settingsArray = [NSMutableArray arrayWithCapacity:[nodes count]];
     for(NSNumber* node in nodes){
         NSString* fibre = [theELLIEModel calcTellieFibreForNode:[node integerValue]];
         NSMutableDictionary* settings = [theELLIEModel returnTellieFireCommands:fibre

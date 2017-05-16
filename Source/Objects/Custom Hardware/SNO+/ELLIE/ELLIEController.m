@@ -692,12 +692,6 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
         [msgs insertObject:[NSNull null] atIndex:3];
     }
 
-    // Calculate settings and check any issues in
-    BOOL inSlave = YES;
-    if([[tellieBuildOpMode titleOfSelectedItem] isEqualToString:@"Master"]){
-        inSlave = NO;
-    }
-
     BOOL safety_check = [model photonIntensityCheck:[tellieBuildPhotons integerValue] atFrequency:[tellieBuildRate integerValue]];
     if(safety_check == NO){
         msg = @"Requested photon output is not detector safe at requested frequncy\n";
