@@ -459,6 +459,11 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
      to avoid pushing too much current through individual channels / trigger sums. Use a
      loglog curve to define what counts as detector safe.
      */
+    
+    /*
+     Currently the predicted nPhotons does not correlate with reality so this check is defunct.
+     it might be worth adding it back eventually once our understanding has improved. For now
+     make do with a simple rate check (below).
     float safe_gradient = -1;
     float safe_intercept = 1.05e6;
     float max_photons = safe_intercept*pow(frequency, safe_gradient);
@@ -467,6 +472,10 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     } else {
         return YES;
     }
+     */
+    if(frequency > 1.01e3)
+        return NO;
+    return YES;
 }
 
 -(NSString*)calcTellieFibreForNode:(NSUInteger)node{
