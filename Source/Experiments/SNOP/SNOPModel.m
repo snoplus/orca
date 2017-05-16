@@ -2248,15 +2248,12 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     [standardRunCollection removeAllObjects];
 
     // First add Off-line standard runs
-    NSMutableDictionary* runSettings = [[NSMutableDictionary alloc] init];
-    NSMutableDictionary* versionCollection = [[NSMutableDictionary alloc] init];
-    NSNumber* diagRunType = [[NSNumber alloc] initWithInt:kDiagnosticRun];
+    NSMutableDictionary* runSettings = [NSMutableDictionary dictionary];
+    NSMutableDictionary* versionCollection = [NSMutableDictionary dictionary];
+    NSNumber* diagRunType = [NSNumber numberWithInt:kDiagnosticRun];
     [runSettings setObject:diagRunType forKey:@"run_type_word"];
-    [versionCollection setObject:[runSettings copy] forKey:@"DEFAULT"];
-    [standardRunCollection setObject:[versionCollection copy] forKey:@"DIAGNOSTIC"];
-    [versionCollection release];
-    [runSettings release];
-    [diagRunType release];
+    [versionCollection setObject:runSettings forKey:@"DEFAULT"];
+    [standardRunCollection setObject:versionCollection forKey:@"DIAGNOSTIC"];
 
     // Now query DB and fetch the SRs
     NSString *urlString, *link, *ret;
@@ -2306,7 +2303,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         NSDictionary *runsettings = [aStandardRun valueForKey:@"doc"];
         if ([runtype isEqualToString:@"DIAGNOSTIC"]) continue; // Diagnostic is a protected name
         if ([standardRunCollection objectForKey:runtype] == nil) {
-            [standardRunCollection setObject:[[NSMutableDictionary alloc] init] forKey:runtype];
+            [standardRunCollection setObject:[NSMutableDictionary dictionary] forKey:runtype];
         }
         [[standardRunCollection objectForKey:runtype] setObject:runsettings forKey:runversion];
     }
