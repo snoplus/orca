@@ -140,7 +140,6 @@ tellieRunFiles = _tellieRunFiles;
     [self initOrcaDBConnectionHistory];
     [self initDebugDBConnectionHistory];
 
-    nhitMonitor = [[NHitMonitor alloc] init];
     [[self undoManager] enableUndoRegistration];
 
     return self;
@@ -287,9 +286,11 @@ tellieRunFiles = _tellieRunFiles;
     /* Initialize ECARun object: this doesn't start the run */
     anECARun = [[ECARun alloc] init];
 
+    nhitMonitor = [[NHitMonitor alloc] init];
+
     [[self undoManager] disableUndoRegistration];
-	[self initOrcaDBConnectionHistory];
-	[self initDebugDBConnectionHistory];
+    [self initOrcaDBConnectionHistory];
+    [self initDebugDBConnectionHistory];
 
     [self setViewType:[decoder decodeIntForKey:@"viewType"]];
 
@@ -353,14 +354,19 @@ tellieRunFiles = _tellieRunFiles;
     [self setNhitMonitorPulserRate:[decoder decodeIntForKey:@"nhitMonitorPulserRate"]];
     [self setNhitMonitorNumPulses:[decoder decodeIntForKey:@"nhitMonitorNumPulses"]];
     [self setNhitMonitorMaxNhit:[decoder decodeIntForKey:@"nhitMonitorMaxNhit"]];
-    [self setNhitMonitorAutoRun:[decoder decodeBoolForKey:@"nhitMonitorAutoRun"]];
     [self setNhitMonitorAutoPulserRate:[decoder decodeIntForKey:@"nhitMonitorAutoPulserRate"]];
     [self setNhitMonitorAutoNumPulses:[decoder decodeIntForKey:@"nhitMonitorAutoNumPulses"]];
     [self setNhitMonitorAutoMaxNhit:[decoder decodeIntForKey:@"nhitMonitorAutoMaxNhit"]];
     [self setNhitMonitorRunType:[decoder decodeIntForKey:@"nhitMonitorRunType"]];
     [self setNhitMonitorCrateMask:[decoder decodeIntForKey:@"nhitMonitorCrateMask"]];
+    /* Don't automatically run the nhit monitor until we load all the settings.
+     * Initially the time interval and auto run variables will be uninitialized
+     * in this method and if we set the time interval here and
+     * nhitMonitorAutoRun is set to YES, it will start the automatic timer
+     * before the settings are loaded. */
+    nhitMonitorAutoRun = NO;
     [self setNhitMonitorTimeInterval:[decoder decodeDoubleForKey:@"nhitMonitorTimeInterval"]];
-    [self setNhitMonitorMaxNhit:[decoder decodeIntForKey:@"nhitMonitorMaxNhit"]];
+    [self setNhitMonitorAutoRun:[decoder decodeBoolForKey:@"nhitMonitorAutoRun"]];
     [[self undoManager] enableUndoRegistration];
 
     //Set extra security
@@ -371,8 +377,6 @@ tellieRunFiles = _tellieRunFiles;
 
     /* initialize our connection to the XL3 server */
     xl3_server = [[RedisClient alloc] initWithHostName:xl3Host withPort:xl3Port];
-
-    nhitMonitor = [[NHitMonitor alloc] init];
 
     return self;
 }
