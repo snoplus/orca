@@ -91,6 +91,7 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
     return self;
 }
 - (void) dealloc {
+    [_keepAliveThread release];
     [connection release];
     [super dealloc];
 

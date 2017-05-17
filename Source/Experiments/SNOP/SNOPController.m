@@ -92,14 +92,19 @@ snopGreenColor;
 }
 - (void) dealloc
 {
-    [smellieRunFile release];
     [snopBlueColor release];
     [snopGreenColor release];
     [snopOrangeColor release];
     [snopRedColor release];
+    [snopBlackColor release];
+    [snopGrayColor release];
     [doggy_icon stop_animation];
     [doggy_icon release];
-    
+    [smellieRunFile release];
+    [tellieRunFile release];
+    [_smellieRunFileList release];
+    [_tellieRunFileList release];
+    [tellieFireSettings release];
     [super dealloc];
 }
 

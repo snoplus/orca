@@ -427,6 +427,9 @@ tellieRunFiles = _tellieRunFiles;
     [logHost release];
     [anECARun release];
     [nhitMonitor release];
+    [_smellieRunFiles release];
+    [_tellieRunFiles release];
+    [_tellieRunNameLabel release];
     [super dealloc];
 }
 
