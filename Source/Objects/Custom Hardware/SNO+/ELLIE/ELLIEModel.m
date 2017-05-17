@@ -1095,6 +1095,7 @@ err:
      variables and push up to the telliedb. Additionally, the run doc dictionary set as
      the tellieRunDoc propery, to be updated later in the run.
      */
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:10];
     
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
@@ -1119,12 +1120,7 @@ err:
     [self setTellieRunDoc:runDocDict];
 
     [[self couchDBRef:self withDB:@"telliedb"] addDocument:runDocDict tag:kTellieRunDocumentAdded];
-
-    //wait for main thread to receive acknowledgement from couchdb
-    NSDate* timeout = [NSDate dateWithTimeIntervalSinceNow:2.0];
-    while ([timeout timeIntervalSinceNow] > 0 && ![[self tellieRunDoc] objectForKey:@"_id"]) {
-        [NSThread sleepForTimeInterval:0.1];
-    }
+    [pool release];
 }
 
 - (void) updateTellieRunDocument:(NSDictionary*)subRunDoc
@@ -1135,7 +1131,7 @@ err:
      Arguments:
      NSDictionary* subRunDoc:  Subrun information to be added to the current [self tellieRunDoc].
      */
-    
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     // Get run control
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
@@ -1163,9 +1159,7 @@ err:
          documentId:[runDocDict objectForKey:@"_id"]
          tag:kTellieRunDocumentUpdated];
     }
-    [subRunInfo release];
-    [runDocDict release];
-    [subRunDocDict release];
+    [pool release];
 }
 
 -(void) loadTELLIEStaticsFromDB
@@ -1176,7 +1170,8 @@ err:
      fibreMapping and nodeMapping documents. The data is then saved to the member variables
      tellieFireParameters, tellieFibreMapping and tellieNodeMapping.
      */
-    
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+
     //Set all to be nil
     [self setTellieFireParameters:nil];
     [self setTellieFibreMapping:nil];
@@ -1191,6 +1186,7 @@ err:
     [[self couchDBRef:self withDB:@"telliedb"] getDocumentId:mapString tag:kTellieMapRetrieved];
     [[self couchDBRef:self withDB:@"telliedb"] getDocumentId:nodeString tag:kTellieNodeRetrieved];
     [self loadTELLIERunPlansFromDB];
+    [pool release];
 }
 
 -(void) loadTELLIERunPlansFromDB
@@ -2060,6 +2056,7 @@ err:
      variables and push up to the smelliedb. Additionally, the run doc dictionary set as
      the tellieRunDoc propery, to be updated later in the run.
      */
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:10];
 
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
@@ -2093,12 +2090,7 @@ err:
     [self setSmellieRunDoc:runDocDict];
 
     [[self couchDBRef:self withDB:@"smellie"] addDocument:runDocDict tag:kSmellieRunDocumentAdded];
-
-    //wait for main thread to receive acknowledgement from couchdb
-    NSDate* timeout = [NSDate dateWithTimeIntervalSinceNow:5.0];
-    while ([timeout timeIntervalSinceNow] > 0 && ![runDocDict objectForKey:@"_id"]) {
-        [NSThread sleepForTimeInterval:0.1];
-    }
+    [pool release];
 }
 
 - (void) updateSmellieRunDocument:(NSDictionary*)subRunDoc
@@ -2109,6 +2101,7 @@ err:
      Arguments:
      NSDictionary* subRunDoc:  Subrun information to be added to the current [self tellieRunDoc].
      */
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
         NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find ORRunModel. Please add it to the experiment and restart the run.\n");
@@ -2129,9 +2122,7 @@ err:
 
     //check to see if run is offline or not
     [[self couchDBRef:self withDB:@"smellie"] updateDocument:runDocDict documentId:[runDocDict objectForKey:@"_id"] tag:kTellieRunDocumentUpdated];
-    [subRunInfo release];
-    [runDocDict release];
-    [subRunDocDict release];
+    [pool release];
 }
 
 -(void) fetchCurrentSmellieConfig
