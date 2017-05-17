@@ -234,6 +234,19 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     [_smellieLaserToInputFibreMapping release];
     [_smellieFibreSwitchToFibreMapping release];
     [_smellieConfigVersionNo release];
+    
+    [_tellieRunNames release];
+    [_interlockPort release];
+    [_tellieHost release];
+    [_tellieThread release];
+    [_telliePort release];
+    [_interlockClient release];
+    [_smellieHost release];
+    [_smellieThread release];
+    [_tellieNodeMapping release];
+    [_smelliePort release];
+    [_interlockHost release];
+    
     [super dealloc];
 }
 

@@ -56,6 +56,10 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 
 - (void)dealloc
 {
+    [_nodeMapWC release];
+    [_smellieThread release];
+    [_guiFireSettings release];
+    [_tellieThread release];
     [super dealloc];
 }
 
