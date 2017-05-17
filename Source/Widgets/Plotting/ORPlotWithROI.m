@@ -27,6 +27,7 @@
 #pragma mark ***Initialization 
 - (void) dealloc
 {
+    [roi setDataSource:nil];
 	[roi release];
 	[super dealloc];
 }
