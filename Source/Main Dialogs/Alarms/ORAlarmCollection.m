@@ -22,8 +22,6 @@
 #pragma mark •••Imported Files
 #import "ORAlarmCollection.h"
 #import "ORAlarmController.h"
-#define __CARBONSOUND__ 
-#import <Carbon/Carbon.h>
 #import "SynthesizeSingleton.h"
 #import "ORMailer.h"
 
@@ -133,6 +131,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmCollection);
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    [notifyCenter removeObserver:self];
+    
     [notifyCenter addObserver : self
                      selector : @selector(alarmWasPosted:)
                          name : ORAlarmWasPostedNotification
@@ -157,35 +157,46 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmCollection);
 
 - (void) alarmWasPosted:(NSNotification*)aNotification
 {
-	ORAlarm* anAlarm = [aNotification object];
-    [self addAlarm:anAlarm];
-    [self setBeepTimer:[NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(beep:) userInfo:nil repeats:YES]];
-    [self beep:nil];
-    [anAlarm setIsPosted:YES];
-    [[[ORAlarmController sharedAlarmController] window]orderFront:self];
-	[self drawBadge];
+    if ([NSThread isMainThread]) {
+        ORAlarm* anAlarm = [aNotification object];
+        [self addAlarm:anAlarm];
+        [self setBeepTimer:[NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(beep:) userInfo:nil repeats:YES]];
+        [self beep:nil];
+        [anAlarm setIsPosted:YES];
+        [[[ORAlarmController sharedAlarmController] window]orderFront:self];
+        [self drawBadge];
+    }
+    else {
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThread:aNotification];
+    }
 }
 
 - (void) alarmWasCleared:(NSNotification*)aNotification
 {
-	ORAlarm* anAlarm = [[aNotification object] retain];
-    [anAlarm setIsPosted:NO];
-    [self removeAlarm:anAlarm];
-    if([alarms count] == 0){
-        [self setBeepTimer:nil];
-		RestoreApplicationDockTileImage();
-		[[[ORAlarmController sharedAlarmController] window]orderOut:self];
+    if ([NSThread isMainThread]) {
+        ORAlarm* anAlarm = [[aNotification object] retain];
+        [anAlarm setIsPosted:NO];
+        [self removeAlarm:anAlarm];
+        if([alarms count] == 0){
+            [self setBeepTimer:nil];
+            //RestoreApplicationDockTileImage();
+            [[[ORAlarmController sharedAlarmController] window]orderOut:self];
+        }
+        [self drawBadge];
+        [anAlarm release];
     }
-	else [self drawBadge];
-	[anAlarm release];
+    else {
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThread:aNotification];
+    }
 }
 
 - (void) drawBadge
 {
-	return; 
-//  crashes sometimes..... Don't know why... just remove it for now
-//  if([alarms count]) [[NSApp dockTile] setBadgeLabel: [NSString stringWithFormat:@"%d",[alarms count]]];
-//	else			   [[NSApp dockTile] setBadgeLabel: nil];
+//  crashes sometimes..... Don't know why... try ensuring it's only executed on main thread
+    if ([NSThread isMainThread]) {
+        if([alarms count]) [[NSApp dockTile] setBadgeLabel: [NSString stringWithFormat:@"%d",[alarms count]]];
+        else			   [[NSApp dockTile] setBadgeLabel: nil];
+    }
 }
 
 - (void) alarmWasAcknowledged:(NSNotification*)aNotification

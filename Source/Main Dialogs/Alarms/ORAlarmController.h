@@ -27,9 +27,8 @@
 	IBOutlet NSButton* 		acknowledgeButton;
 	IBOutlet NSButton* 		helpButton;
 	IBOutlet NSTextView* 	helpTextView;
-	IBOutlet NSTableView* 	tableView;
+    IBOutlet NSTableView* 	tableView;
 	IBOutlet NSDrawer* 		helpDrawer;
-
 	IBOutlet NSMatrix*      severityMatrix;
 	IBOutlet NSTableView*	addressList;
 	IBOutlet NSTextField*	addressField;
