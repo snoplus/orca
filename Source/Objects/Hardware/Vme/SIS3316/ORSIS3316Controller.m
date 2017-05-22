@@ -86,8 +86,8 @@
         [[tauFactorMatrix           cellAtRow:i column:0] setTag:i];
         [[gapTimeMatrix             cellAtRow:i column:0] setTag:i];
         [[peakingTimeMatrix         cellAtRow:i column:0] setTag:i];
-	}
-    for(i=0;i<kNumSIS3316Channels/4;i++){
+	}  
+    for(i=0;i<kNumSIS3316Groups;i++){
         [[activeTrigGateWindowLenMatrix cellAtRow:i column:0] setFormatter:numberFormatter];
         [[activeTrigGateWindowLenMatrix cellAtRow:i column:0] setTag:i];
         [[preTriggerDelayMatrix cellAtRow:i column:0] setFormatter:numberFormatter];
@@ -568,7 +568,6 @@
 	[[acqMatrix cellWithTag:4] setIntValue:[model lemoStartStop]];
 	[[acqMatrix cellWithTag:5] setIntValue:[model p2StartStop]];
 	[[acqMatrix cellWithTag:6] setIntValue:[model gateMode]];
-	[startDelayEnabledButton setIntValue: [model startDelayEnabled]];
 	[stopDelayEnabledButton setIntValue: [model stopDelayEnabled]];
 }
 
@@ -577,6 +576,11 @@
 	unsigned short moduleID = [model moduleID];
 	if(moduleID) [moduleIDField setStringValue:[NSString stringWithFormat:@"%x",moduleID]];
 	else		 [moduleIDField setStringValue:@"---"];
+    
+    NSString* revision = [model revision];
+    if(revision) [revisionField setStringValue:revision];
+    else		 [revisionField setStringValue:@"---"];
+
 }
 
 - (void) eventConfigChanged:(NSNotification*)aNote
@@ -666,7 +670,6 @@
 	[eventConfigMatrix		setEnabled:!locked && !runInProgress];
 	[stopTriggerButton		setEnabled:!lockedOrRunningMaintenance];
 	[randomClockButton		setEnabled:!lockedOrRunningMaintenance];
-	[startDelayEnabledButton setEnabled:!lockedOrRunningMaintenance];
 	[stopDelayEnabledButton setEnabled:!lockedOrRunningMaintenance];
 	[startDelayField		setEnabled:!lockedOrRunningMaintenance];
 	[clockSourcePU			setEnabled:!lockedOrRunningMaintenance];
@@ -977,8 +980,7 @@
 		case 4: [model setLemoStartStop:state];		break; 
 		case 5: [model setP2StartStop:state];		break; 
 		case 6: [model setGateMode:state];			break; 
-		case 7: [model setStartDelayEnabled:state];			break; 
-		case 8: [model setStopDelayEnabled:state];			break; 
+		case 8: [model setStopDelayEnabled:state];			break;
 		default: break;
 	}
 }
@@ -1027,10 +1029,6 @@
 	[model setRandomClock:[sender intValue]];	
 }
 
-- (IBAction) startDelayEnabledAction:(id)sender
-{
-	[model setStartDelayEnabled:[sender intValue]];	
-}
 
 - (IBAction) stopDelayEnabledAction:(id)sender
 {

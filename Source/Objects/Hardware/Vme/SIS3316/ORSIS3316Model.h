@@ -233,6 +233,11 @@ enum{
     kADCGroupRegisters
 };
 
+//section 6-
+
+
+
+
 @interface ORSIS3316Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping,AutoTesting>
 {
   @private
@@ -310,7 +315,6 @@ enum{
 
 	//clocks and delays (Acquistion control reg)
     BOOL stopDelayEnabled;
-    BOOL startDelayEnabled;
     BOOL randomClock;
     
     int	 startDelay;
@@ -327,6 +331,7 @@ enum{
 	long count;
     BOOL firstTime;
     BOOL waitingForSomeChannels;
+    NSString* revision;
 }
 
 - (id) init;
@@ -337,6 +342,8 @@ enum{
 #pragma mark ***Accessors
 - (void) setDefaults;
 - (unsigned short) moduleID;
+- (NSString*) revision;
+- (void) setRevision:(NSString*)aString;
 
 - (long) enabledMask;
 - (void) setEnabledMask:(long)aMask;
@@ -499,12 +506,13 @@ enum{
 - (void) setGateMode:(BOOL)aGateMode;
 
 //clocks and delays (Acquistion control reg)
-- (BOOL) startDelayEnabled;
-- (void) setStartDelayEnabled:(BOOL)aStartDelayEnabled;
 - (BOOL) stopDelayEnabled;
 - (void) setStopDelayEnabled:(BOOL)aStopDelayEnabled;
 - (BOOL) randomClock;
 - (void) setRandomClock:(BOOL)aRandomClock;
+
+
+
 - (int) clockSource;
 - (void) setClockSource:(int)aClockSource;
 
@@ -540,27 +548,27 @@ enum{
 - (unsigned long) vmeRegister:(unsigned long)aRegisterIndex;
 -(unsigned long) keyRegister:(unsigned long)aRegisterIndex;
 - (unsigned long) groupRegister:(unsigned long)aRegisterIndex  group:(int)aGroup;
-- (void) initBoard;
-- (void) writeThresholds;
-- (void) readThresholds:(BOOL)verbose;
-- (void) writeFirTriggerSetup;
-- (void) writeHeTrigThresholds;
-- (void) readHeTrigThresholds:(BOOL)verbose;
-- (void) writeActiveTrigeGateWindowLens;
-- (void) writePreTriggerDelays;
-- (void) writeRawDataBufferConfig;
-- (void) writeAccumulatorGates;
-- (unsigned long)readControlStatusReg;
-- (void) readModuleID:(BOOL)verbose;
-- (void) readHWVersion:(BOOL)verbose;
-- (void) readTemperature:(BOOL)verbose;
-- (void) readSerialNumber:(BOOL)verbose;
-- (void) writeClockSource;
-- (void) writeHistogramConfiguration;
-- (void) writeDataFormat;
-- (void) configureAnalogRegisters;
-- (void) writeAcquistionRegister;
-- (unsigned long) eventNumberGroup:(int)group bank:(int) bank;
+- (void) initBoard;                             //**NOT IN MANUAL**//
+- (void) writeThresholds;                       //6.26 (section 2)  (pg 119 and on)
+- (void) readThresholds:(BOOL)verbose;          //6.26 (section 2)
+- (void) writeFirTriggerSetup;                  //6.25 (section 2)
+- (void) writeHeTrigThresholds;                 //6.27 (section 2)
+- (void) readHeTrigThresholds:(BOOL)verbose;    //6.27 (section 2)
+- (void) writeActiveTrigeGateWindowLens;        //6.24 (section 2)
+- (void) writePreTriggerDelays;                 //6.19 (section 2)
+- (void) writeRawDataBufferConfig;              //6.17 (section 2)
+- (void) writeAccumulatorGates;                 //6.31 (section 2)
+- (unsigned long)readControlStatusReg;          //6.1
+- (void) readModuleID:(BOOL)verbose;            //6.2
+- (void) readHWVersion:(BOOL)verbose;           //6.7   (p. 94)
+- (void) readTemperature:(BOOL)verbose;         //6.8 Needs to be converted to Celsius (pg95)
+- (void) readSerialNumber:(BOOL)verbose;        //6.10
+- (void) writeClockSource;                      //6.16
+- (void) writeHistogramConfiguration;           //6.33 (section 2)
+- (void) writeDataFormat;                       //6.21 (section 2)
+- (void) configureAnalogRegisters;              //*** NOT IN MANUEAL ***//
+- (void) writeAcquistionRegister;               //6.21
+- (unsigned long) eventNumberGroup:(int)group bank:(int) bank;  //6.12 or 6.13 (S2) ????
 - (unsigned long) eventTriggerGroup:(int)group bank:(int) bank;
 - (unsigned long) readTriggerTime:(int)bank index:(int)index;
 
@@ -575,11 +583,11 @@ enum{
 - (void) setClockChoice:(int) clck_choice;
 - (int) setFrequency:(int) osc values:(unsigned char*)values;
 
-- (BOOL) sampleLogicIsBusy;
+- (BOOL) sampleLogicIsBusy; //6.2????
 
 //some test functions
 - (unsigned long) readTriggerEventBank:(int)bank index:(int)index;
-- (void) readAddressCounts;
+- (void) readAddressCounts; //6.15????
 
 //- (int) dataWord:(int)chan index:(int)index;
 

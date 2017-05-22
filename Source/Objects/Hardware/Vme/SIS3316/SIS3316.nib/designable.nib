@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14E46" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1050" identifier="macosx"/>
         <development version="5100" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10116"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ORSIS3316Controller">
@@ -56,6 +56,7 @@
                 <outlet property="rawDataBufferLenMatrix" destination="ZRg-oF-htU" id="new-BW-c7J"/>
                 <outlet property="rawDataBufferStartMatrix" destination="fU0-6m-tcJ" id="9jk-E8-hT8"/>
                 <outlet property="readThresholdButton" destination="2190" id="2192"/>
+                <outlet property="revisionField" destination="job-xX-mKu" id="75K-dd-ewz"/>
                 <outlet property="settingLockButton" destination="1224" id="1305"/>
                 <outlet property="slotField" destination="1221" id="1301"/>
                 <outlet property="startDelayEnabledButton" destination="1941" id="1982"/>
@@ -83,11 +84,11 @@
         <window title="SIS3316" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="21" userLabel="Window">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="86" y="125" width="977" height="1191"/>
+            <rect key="contentRect" x="86" y="125" width="1024" height="1191"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>
             <value key="minSize" type="size" width="213" height="107"/>
             <view key="contentView" id="2">
-                <rect key="frame" x="0.0" y="0.0" width="977" height="1191"/>
+                <rect key="frame" x="0.0" y="0.0" width="1024" height="1191"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <tabView controlSize="small" id="1336">
@@ -517,7 +518,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" id="2838">
-                                            <rect key="frame" x="103" y="1044" width="75" height="17"/>
+                                            <rect key="frame" x="111" y="1040" width="75" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="--- " id="2896">
                                                 <font key="font" metaFont="label"/>
@@ -4062,13 +4063,31 @@
                                                 </tabViewItem>
                                             </tabViewItems>
                                         </tabView>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="j2D-0d-BkD">
+                                            <rect key="frame" x="31" y="1011" width="101" height="20"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Module Revision:" id="c8q-Zc-2Zp">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="job-xX-mKu">
+                                            <rect key="frame" x="33" y="1001" width="45" height="14"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="---" id="Cs6-tX-AVi">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
                                     </subviews>
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Rates" identifier="" id="1338">
                                 <view key="view" id="1340">
                                     <rect key="frame" x="10" y="25" width="936" height="1130"/>
-                                    <autoresizingMask key="autoresizingMask"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box title="Integration Time (s)" boxType="secondary" borderType="bezel" titlePosition="noTitle" id="1341">
                                             <rect key="frame" x="658" y="955" width="94" height="34"/>
@@ -4433,7 +4452,7 @@
             <connections>
                 <outlet property="delegate" destination="-2" id="308"/>
             </connections>
-            <point key="canvasLocation" x="173.5" y="748.5"/>
+            <point key="canvasLocation" x="197" y="748.5"/>
         </window>
         <customObject id="387" userLabel="OHexFormatter" customClass="OHexFormatter"/>
         <window title="Panel" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="1483" userLabel="Panel" customClass="NSPanel">

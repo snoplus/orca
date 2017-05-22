@@ -28,6 +28,7 @@
 {
     IBOutlet NSTabView* 	tabView;
     IBOutlet NSTextField*   moduleIDField;
+    IBOutlet NSTextField*   revisionField;
 	
 	//base address
     IBOutlet NSTextField*   slotField;
@@ -86,7 +87,6 @@
 	
 	IBOutlet NSButton*		stopTriggerButton;
 	IBOutlet NSButton*		randomClockButton;
-	IBOutlet NSButton*		startDelayEnabledButton;
 	IBOutlet NSButton*		stopDelayEnabledButton;
 	IBOutlet NSButton*		writeThresholdButton;
 	IBOutlet NSButton*		readThresholdButton;
@@ -237,7 +237,6 @@
 
 - (IBAction) stopTriggerAction:(id)sender;
 - (IBAction) randomClockAction:(id)sender;
-- (IBAction) startDelayEnabledAction:(id)sender;
 - (IBAction) stopDelayEnabledAction:(id)sender;
 - (IBAction) stopDelayAction:(id)sender;
 - (IBAction) startDelayAction:(id)sender;
