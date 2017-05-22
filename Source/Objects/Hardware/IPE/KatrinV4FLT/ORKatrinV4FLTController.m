@@ -76,14 +76,14 @@
 	ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
 	[timeRatePlot addPlot: aPlot];
 	[(ORTimeAxis*)[timeRatePlot xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
-    [[timeRatePlot yAxis] setRngLimitsLow:0 withHigh:24*200000 withMinRng:5];
+    [[timeRatePlot yAxis] setRngLimitsLow:0 withHigh:24*1000000 withMinRng:5];
 
 	[aPlot release];
 
 	[rate0 setNumber:24 height:10 spacing:6];
-    [[rate0 xAxis] setRngLimitsLow:0 withHigh:200000 withMinRng:5];
+    [[rate0 xAxis] setRngLimitsLow:0 withHigh:1000000 withMinRng:5];
     
-    [[totalRate xAxis] setRngLimitsLow:0 withHigh:24*200000 withMinRng:5];
+    [[totalRate xAxis] setRngLimitsLow:0 withHigh:24*1000000 withMinRng:5];
 
 	int i;
 	for(i=0;i<kNumV4FLTChannels;i++){
@@ -579,7 +579,6 @@
 
 - (void) filterShapingLengthChanged:(NSNotification*)aNote
 {
-	//[filterLengthPU selectItemAtIndex:[model filterLength]];
 	[filterShapingLengthPU selectItemWithTag:[model filterShapingLength]];
 	[self recommendedPZCChanged:nil];
 	#if 1
@@ -1288,7 +1287,6 @@
 
 - (IBAction) filterShapingLengthAction:(id)sender
 {
-	//[model setFilterLength:[sender indexOfSelectedItem]];
 	[model setFilterShapingLength:[[sender selectedCell] tag]];
 }
 
@@ -1299,10 +1297,8 @@
 
 - (void) boxcarLengthPUAction:(id)sender
 {
-	//[model setBoxcarLength:[sender intValue]];	
 	[model setBoxcarLength:[[sender selectedCell] tag]];
 }
-
 
 - (IBAction) histNofMeasAction:(id)sender
 {
@@ -1469,9 +1465,7 @@
 		[model printVersions];
 		[model printStatusReg];
 		[model printPStatusRegs];
-		//[model printPixelRegs];
 		[model printValueTable];
-		//[model printStatistics];
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT (%d) status\n",[model stationNumber]);
@@ -1680,7 +1674,6 @@
 	}
 }
 
-
 - (IBAction) devTest1ButtonAction: (id) sender
 {
     NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
@@ -1693,7 +1686,6 @@
     NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
 	[model devTest2ButtonAction];
 }
-
 
 - (IBAction) testButtonLowLevelAction: (id) sender
 {
@@ -1712,10 +1704,7 @@
         NSLog(@"   resetTPButton: Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
 	    [model testButtonLowLevelResetTP];
 	}
-
 }
-
-
 
 #pragma mark •••Plot DataSource
 - (int) numberPointsInPlot:(id)aPlotter

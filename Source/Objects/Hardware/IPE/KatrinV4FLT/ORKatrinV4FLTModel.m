@@ -32,72 +32,71 @@
 #import "ORCommandList.h"
 
 
-NSString* ORKatrinV4FLTModelEnergyOffsetChanged = @"ORKatrinV4FLTModelEnergyOffsetChanged";
-NSString* ORKatrinV4FLTModelForceFLTReadoutChanged = @"ORKatrinV4FLTModelForceFLTReadoutChanged";
-NSString* ORKatrinV4FLTModelSkipFltEventReadoutChanged = @"ORKatrinV4FLTModelSkipFltEventReadoutChanged";
-NSString* ORKatrinV4FLTModelBipolarEnergyThreshTestChanged = @"ORKatrinV4FLTModelBipolarEnergyThreshTestChanged";
-NSString* ORKatrinV4FLTModelUseBipolarEnergyChanged = @"ORKatrinV4FLTModelUseBipolarEnergyChanged";
-NSString* ORKatrinV4FLTModelUseSLTtimeChanged = @"ORKatrinV4FLTModelUseSLTtimeChanged";
-NSString* ORKatrinV4FLTModelBoxcarLengthChanged = @"ORKatrinV4FLTModelBoxcarLengthChanged";
-NSString* ORKatrinV4FLTModelUseDmaBlockReadChanged = @"ORKatrinV4FLTModelUseDmaBlockReadChanged";
-NSString* ORKatrinV4FLTModelSyncWithRunControlChanged = @"ORKatrinV4FLTModelSyncWithRunControlChanged";
-NSString* ORKatrinV4FLTModelDecayTimeChanged = @"ORKatrinV4FLTModelDecayTimeChanged";
-NSString* ORKatrinV4FLTModelPoleZeroCorrectionChanged = @"ORKatrinV4FLTModelPoleZeroCorrectionChanged";
-NSString* ORKatrinV4FLTModelCustomVariableChanged = @"ORKatrinV4FLTModelCustomVariableChanged";
-NSString* ORKatrinV4FLTModelReceivedHistoCounterChanged = @"ORKatrinV4FLTModelReceivedHistoCounterChanged";
-NSString* ORKatrinV4FLTModelReceivedHistoChanMapChanged = @"ORKatrinV4FLTModelReceivedHistoChanMapChanged";
-NSString* ORKatrinV4FLTModelFifoLengthChanged = @"ORKatrinV4FLTModelFifoLengthChanged";
-NSString* ORKatrinV4FLTModelNfoldCoincidenceChanged = @"ORKatrinV4FLTModelNfoldCoincidenceChanged";
-NSString* ORKatrinV4FLTModelVetoOverlapTimeChanged = @"ORKatrinV4FLTModelVetoOverlapTimeChanged";
-NSString* ORKatrinV4FLTModelShipSumHistogramChanged = @"ORKatrinV4FLTModelShipSumHistogramChanged";
-NSString* ORKatrinV4FLTModelTargetRateChanged			= @"ORKatrinV4FLTModelTargetRateChanged";
-NSString* ORKatrinV4FLTModelHistMaxEnergyChanged       = @"ORKatrinV4FLTModelHistMaxEnergyChanged";
-NSString* ORKatrinV4FLTModelHistPageABChanged          = @"ORKatrinV4FLTModelHistPageABChanged";
-NSString* ORKatrinV4FLTModelHistLastEntryChanged       = @"ORKatrinV4FLTModelHistLastEntryChanged";
-NSString* ORKatrinV4FLTModelHistFirstEntryChanged      = @"ORKatrinV4FLTModelHistFirstEntryChanged";
-NSString* ORKatrinV4FLTModelHistClrModeChanged			= @"ORKatrinV4FLTModelHistClrModeChanged";
-NSString* ORKatrinV4FLTModelHistModeChanged			= @"ORKatrinV4FLTModelHistModeChanged";
-NSString* ORKatrinV4FLTModelHistEBinChanged			= @"ORKatrinV4FLTModelHistEBinChanged";
-NSString* ORKatrinV4FLTModelHistEMinChanged			= @"ORKatrinV4FLTModelHistEMinChanged";
-NSString* ORKatrinV4FLTModelRunModeChanged				= @"ORKatrinV4FLTModelRunModeChanged";
-NSString* ORKatrinV4FLTModelStoreDataInRamChanged		= @"ORKatrinV4FLTModelStoreDataInRamChanged";
-//NSString* ORKatrinV4FLTModelFilterLengthChanged		= @"ORKatrinV4FLTModelFilterLengthChanged";
+NSString* ORKatrinV4FLTModelEnergyOffsetChanged             = @"ORKatrinV4FLTModelEnergyOffsetChanged";
+NSString* ORKatrinV4FLTModelForceFLTReadoutChanged          = @"ORKatrinV4FLTModelForceFLTReadoutChanged";
+NSString* ORKatrinV4FLTModelSkipFltEventReadoutChanged      = @"ORKatrinV4FLTModelSkipFltEventReadoutChanged";
+NSString* ORKatrinV4FLTModelBipolarEnergyThreshTestChanged  = @"ORKatrinV4FLTModelBipolarEnergyThreshTestChanged";
+NSString* ORKatrinV4FLTModelUseBipolarEnergyChanged         = @"ORKatrinV4FLTModelUseBipolarEnergyChanged";
+NSString* ORKatrinV4FLTModelUseSLTtimeChanged               = @"ORKatrinV4FLTModelUseSLTtimeChanged";
+NSString* ORKatrinV4FLTModelBoxcarLengthChanged             = @"ORKatrinV4FLTModelBoxcarLengthChanged";
+NSString* ORKatrinV4FLTModelUseDmaBlockReadChanged          = @"ORKatrinV4FLTModelUseDmaBlockReadChanged";
+NSString* ORKatrinV4FLTModelSyncWithRunControlChanged       = @"ORKatrinV4FLTModelSyncWithRunControlChanged";
+NSString* ORKatrinV4FLTModelDecayTimeChanged                = @"ORKatrinV4FLTModelDecayTimeChanged";
+NSString* ORKatrinV4FLTModelPoleZeroCorrectionChanged       = @"ORKatrinV4FLTModelPoleZeroCorrectionChanged";
+NSString* ORKatrinV4FLTModelCustomVariableChanged           = @"ORKatrinV4FLTModelCustomVariableChanged";
+NSString* ORKatrinV4FLTModelReceivedHistoCounterChanged     = @"ORKatrinV4FLTModelReceivedHistoCounterChanged";
+NSString* ORKatrinV4FLTModelReceivedHistoChanMapChanged     = @"ORKatrinV4FLTModelReceivedHistoChanMapChanged";
+NSString* ORKatrinV4FLTModelFifoLengthChanged               = @"ORKatrinV4FLTModelFifoLengthChanged";
+NSString* ORKatrinV4FLTModelNfoldCoincidenceChanged         = @"ORKatrinV4FLTModelNfoldCoincidenceChanged";
+NSString* ORKatrinV4FLTModelVetoOverlapTimeChanged          = @"ORKatrinV4FLTModelVetoOverlapTimeChanged";
+NSString* ORKatrinV4FLTModelShipSumHistogramChanged         = @"ORKatrinV4FLTModelShipSumHistogramChanged";
+NSString* ORKatrinV4FLTModelTargetRateChanged               = @"ORKatrinV4FLTModelTargetRateChanged";
+NSString* ORKatrinV4FLTModelHistMaxEnergyChanged            = @"ORKatrinV4FLTModelHistMaxEnergyChanged";
+NSString* ORKatrinV4FLTModelHistPageABChanged               = @"ORKatrinV4FLTModelHistPageABChanged";
+NSString* ORKatrinV4FLTModelHistLastEntryChanged            = @"ORKatrinV4FLTModelHistLastEntryChanged";
+NSString* ORKatrinV4FLTModelHistFirstEntryChanged           = @"ORKatrinV4FLTModelHistFirstEntryChanged";
+NSString* ORKatrinV4FLTModelHistClrModeChanged              = @"ORKatrinV4FLTModelHistClrModeChanged";
+NSString* ORKatrinV4FLTModelHistModeChanged                 = @"ORKatrinV4FLTModelHistModeChanged";
+NSString* ORKatrinV4FLTModelHistEBinChanged                 = @"ORKatrinV4FLTModelHistEBinChanged";
+NSString* ORKatrinV4FLTModelHistEMinChanged                 = @"ORKatrinV4FLTModelHistEMinChanged";
+NSString* ORKatrinV4FLTModelRunModeChanged                  = @"ORKatrinV4FLTModelRunModeChanged";
+NSString* ORKatrinV4FLTModelStoreDataInRamChanged           = @"ORKatrinV4FLTModelStoreDataInRamChanged";
 NSString* ORKatrinV4FLTModelFilterShapingLengthChanged		= @"ORKatrinV4FLTModelFilterShapingLengthChanged";
-NSString* ORKatrinV4FLTModelGapLengthChanged			= @"ORKatrinV4FLTModelGapLengthChanged";
-NSString* ORKatrinV4FLTModelHistNofMeasChanged			= @"ORKatrinV4FLTModelHistNofMeasChanged";
-NSString* ORKatrinV4FLTModelHistMeasTimeChanged		= @"ORKatrinV4FLTModelHistMeasTimeChanged";
-NSString* ORKatrinV4FLTModelHistRecTimeChanged			= @"ORKatrinV4FLTModelHistRecTimeChanged";
-NSString* ORKatrinV4FLTModelPostTriggerTimeChanged		= @"ORKatrinV4FLTModelPostTriggerTimeChanged";
-NSString* ORKatrinV4FLTModelFifoBehaviourChanged		= @"ORKatrinV4FLTModelFifoBehaviourChanged";
-NSString* ORKatrinV4FLTModelAnalogOffsetChanged		= @"ORKatrinV4FLTModelAnalogOffsetChanged";
-NSString* ORKatrinV4FLTModelLedOffChanged				= @"ORKatrinV4FLTModelLedOffChanged";
-NSString* ORKatrinV4FLTModelInterruptMaskChanged		= @"ORKatrinV4FLTModelInterruptMaskChanged";
-NSString* ORKatrinV4FLTModelTModeChanged				= @"ORKatrinV4FLTModelTModeChanged";
-NSString* ORKatrinV4FLTModelHitRateLengthChanged		= @"ORKatrinV4FLTModelHitRateLengthChanged";
-NSString* ORKatrinV4FLTModelTriggersEnabledChanged		= @"ORKatrinV4FLTModelTriggersEnabledChanged";
-NSString* ORKatrinV4FLTModelGainsChanged				= @"ORKatrinV4FLTModelGainsChanged";
-NSString* ORKatrinV4FLTModelThresholdsChanged			= @"ORKatrinV4FLTModelThresholdsChanged";
-NSString* ORKatrinV4FLTModelModeChanged				= @"ORKatrinV4FLTModelModeChanged";
-NSString* ORKatrinV4FLTSettingsLock					= @"ORKatrinV4FLTSettingsLock";
-NSString* ORKatrinV4FLTChan							= @"ORKatrinV4FLTChan";
-NSString* ORKatrinV4FLTModelTestPatternsChanged		= @"ORKatrinV4FLTModelTestPatternsChanged";
-NSString* ORKatrinV4FLTModelGainChanged				= @"ORKatrinV4FLTModelGainChanged";
-NSString* ORKatrinV4FLTModelThresholdChanged			= @"ORKatrinV4FLTModelThresholdChanged";
-NSString* ORKatrinV4FLTModelTriggerEnabledMaskChanged	= @"ORKatrinV4FLTModelTriggerEnabledMaskChanged";
-NSString* ORKatrinV4FLTModelHitRateEnabledMaskChanged	= @"ORKatrinV4FLTModelHitRateEnabledMaskChanged";
-NSString* ORKatrinV4FLTModelHitRateChanged				= @"ORKatrinV4FLTModelHitRateChanged";
-NSString* ORKatrinV4FLTModelTestsRunningChanged		= @"ORKatrinV4FLTModelTestsRunningChanged";
-NSString* ORKatrinV4FLTModelTestEnabledArrayChanged	= @"ORKatrinV4FLTModelTestEnabledChanged";
-NSString* ORKatrinV4FLTModelTestStatusArrayChanged		= @"ORKatrinV4FLTModelTestStatusChanged";
-NSString* ORKatrinV4FLTModelEventMaskChanged			= @"ORKatrinV4FLTModelEventMaskChanged";
+NSString* ORKatrinV4FLTModelGapLengthChanged                = @"ORKatrinV4FLTModelGapLengthChanged";
+NSString* ORKatrinV4FLTModelHistNofMeasChanged              = @"ORKatrinV4FLTModelHistNofMeasChanged";
+NSString* ORKatrinV4FLTModelHistMeasTimeChanged             = @"ORKatrinV4FLTModelHistMeasTimeChanged";
+NSString* ORKatrinV4FLTModelHistRecTimeChanged              = @"ORKatrinV4FLTModelHistRecTimeChanged";
+NSString* ORKatrinV4FLTModelPostTriggerTimeChanged          = @"ORKatrinV4FLTModelPostTriggerTimeChanged";
+NSString* ORKatrinV4FLTModelFifoBehaviourChanged            = @"ORKatrinV4FLTModelFifoBehaviourChanged";
+NSString* ORKatrinV4FLTModelAnalogOffsetChanged             = @"ORKatrinV4FLTModelAnalogOffsetChanged";
+NSString* ORKatrinV4FLTModelLedOffChanged                   = @"ORKatrinV4FLTModelLedOffChanged";
+NSString* ORKatrinV4FLTModelInterruptMaskChanged            = @"ORKatrinV4FLTModelInterruptMaskChanged";
+NSString* ORKatrinV4FLTModelTModeChanged                    = @"ORKatrinV4FLTModelTModeChanged";
+NSString* ORKatrinV4FLTModelHitRateLengthChanged            = @"ORKatrinV4FLTModelHitRateLengthChanged";
+NSString* ORKatrinV4FLTModelTriggersEnabledChanged          = @"ORKatrinV4FLTModelTriggersEnabledChanged";
+NSString* ORKatrinV4FLTModelGainsChanged                    = @"ORKatrinV4FLTModelGainsChanged";
+NSString* ORKatrinV4FLTModelThresholdsChanged               = @"ORKatrinV4FLTModelThresholdsChanged";
+NSString* ORKatrinV4FLTModelModeChanged                     = @"ORKatrinV4FLTModelModeChanged";
+NSString* ORKatrinV4FLTSettingsLock                         = @"ORKatrinV4FLTSettingsLock";
+NSString* ORKatrinV4FLTChan                                 = @"ORKatrinV4FLTChan";
+NSString* ORKatrinV4FLTModelTestPatternsChanged             = @"ORKatrinV4FLTModelTestPatternsChanged";
+NSString* ORKatrinV4FLTModelGainChanged                     = @"ORKatrinV4FLTModelGainChanged";
+NSString* ORKatrinV4FLTModelThresholdChanged                = @"ORKatrinV4FLTModelThresholdChanged";
+NSString* ORKatrinV4FLTModelTriggerEnabledMaskChanged       = @"ORKatrinV4FLTModelTriggerEnabledMaskChanged";
+NSString* ORKatrinV4FLTModelHitRateEnabledMaskChanged       = @"ORKatrinV4FLTModelHitRateEnabledMaskChanged";
+NSString* ORKatrinV4FLTModelHitRateChanged                  = @"ORKatrinV4FLTModelHitRateChanged";
+NSString* ORKatrinV4FLTModelTestsRunningChanged             = @"ORKatrinV4FLTModelTestsRunningChanged";
+NSString* ORKatrinV4FLTModelTestEnabledArrayChanged         = @"ORKatrinV4FLTModelTestEnabledChanged";
+NSString* ORKatrinV4FLTModelTestStatusArrayChanged          = @"ORKatrinV4FLTModelTestStatusChanged";
+NSString* ORKatrinV4FLTModelEventMaskChanged                = @"ORKatrinV4FLTModelEventMaskChanged";
 
-NSString* ORKatrinV4FLTSelectedRegIndexChanged			= @"ORKatrinV4FLTSelectedRegIndexChanged";
-NSString* ORKatrinV4FLTWriteValueChanged				= @"ORKatrinV4FLTWriteValueChanged";
-NSString* ORKatrinV4FLTSelectedChannelValueChanged		= @"ORKatrinV4FLTSelectedChannelValueChanged";
-NSString* ORKatrinV4FLTNoiseFloorChanged				= @"ORKatrinV4FLTNoiseFloorChanged";
-NSString* ORKatrinV4FLTNoiseFloorOffsetChanged			= @"ORKatrinV4FLTNoiseFloorOffsetChanged";
+NSString* ORKatrinV4FLTSelectedRegIndexChanged              = @"ORKatrinV4FLTSelectedRegIndexChanged";
+NSString* ORKatrinV4FLTWriteValueChanged                    = @"ORKatrinV4FLTWriteValueChanged";
+NSString* ORKatrinV4FLTSelectedChannelValueChanged          = @"ORKatrinV4FLTSelectedChannelValueChanged";
+NSString* ORKatrinV4FLTNoiseFloorChanged                    = @"ORKatrinV4FLTNoiseFloorChanged";
+NSString* ORKatrinV4FLTNoiseFloorOffsetChanged              = @"ORKatrinV4FLTNoiseFloorOffsetChanged";
 NSString* ORKatrinV4FLTModelActivateDebuggingDisplaysChanged = @"ORKatrinV4FLTModelActivateDebuggingDisplaysChanged";
-NSString* ORKatrinV4FLTModeFifoFlagsChanged				= @"ORKatrinV4FLTModeFifoFlagsChanged";
+NSString* ORKatrinV4FLTModeFifoFlagsChanged                 = @"ORKatrinV4FLTModeFifoFlagsChanged";
 
 static NSString* fltTestName[kNumKatrinV4FLTTests]= {
 	@"Run Mode",
@@ -108,7 +107,7 @@ static NSString* fltTestName[kNumKatrinV4FLTTests]= {
 };
 
 // data for low-level page (IPE V4 electronic definitions)
-enum IpeFLTV4Enum{
+typedef enum eKatrinFLTV4RegEnum {
 	kFLTV4StatusReg,
 	kFLTV4ControlReg,
 	kFLTV4CommandReg,
@@ -146,47 +145,55 @@ enum IpeFLTV4Enum{
 	kFLTV4TestPatternReg,
 	kFLTV4EnergyOffsetReg,
 	kFLTV4NumRegs //must be last
+}eKatrinFLTV4RegEnum;
+
+typedef struct katrinv4FLTRegNamesStruct {
+    NSString*       regName;
+    unsigned long 	addressOffset;
+    short			accessType;
+    eKatrinFLTV4RegEnum enumCheckValue;
+} katrinv4FLTRegNamesStruct;
+
+static katrinv4FLTRegNamesStruct regV4[kFLTV4NumRegs] = {
+	//2nd column is PCI register address shifted 2 bits to right (the two rightmost bits are always zero) -tb-
+	{@"Status",				0x000000>>2, 	kIpeRegReadable,                                            kFLTV4StatusReg          },
+	{@"Control",			0x000004>>2, 	kIpeRegReadable | kIpeRegWriteable,                         kFLTV4ControlReg         },
+	{@"Command",			0x000008>>2, 	kIpeRegReadable | kIpeRegWriteable,                         kFLTV4CommandReg         },
+	{@"CFPGAVersion",		0x00000c>>2, 	kIpeRegReadable,                                            kFLTV4VersionReg         },
+	{@"FPGA8Version",		0x000010>>2, 	kIpeRegReadable,                                            kFLTV4pVersionReg        },
+	{@"BoardIDLSB",         0x000014>>2, 	kIpeRegReadable,                                            kFLTV4BoardIDLsbReg      },
+	{@"BoardIDMSB",         0x000018>>2, 	kIpeRegReadable,                                            kFLTV4BoardIDMsbReg      },
+	{@"InterruptMask",      0x00001C>>2, 	kIpeRegReadable | kIpeRegWriteable,                         kFLTV4InterruptMaskReg   },
+	{@"HrMeasEnable",       0x000024>>2, 	kIpeRegReadable | kIpeRegWriteable,                         kFLTV4HrMeasEnableReg    },
+	{@"EventFifoStatus",    0x00002C>>2, 	kIpeRegReadable,                                            kFLTV4EventFifoStatusReg },
+	{@"PixelSettings1",     0x000030>>2,    kIpeRegReadable | kIpeRegWriteable,                         kFLTV4PixelSettings1Reg  },
+	{@"PixelSettings2",     0x000034>>2, 	kIpeRegReadable | kIpeRegWriteable,                         kFLTV4PixelSettings2Reg  },
+	{@"RunControl",         0x000038>>2, 	kIpeRegReadable | kIpeRegWriteable,                         kFLTV4RunControlReg      },
+	{@"HistgrSettings",     0x00003c>>2, 	kIpeRegReadable | kIpeRegWriteable,                         kFLTV4HistgrSettingsReg  },
+	{@"AccessTest",         0x000040>>2, 	kIpeRegReadable | kIpeRegWriteable,                         kFLTV4AccessTestReg      },
+	{@"SecondCounter",      0x000044>>2, 	kIpeRegReadable | kIpeRegWriteable,                         kFLTV4SecondCounterReg   },
+	{@"HrControl",          0x000048>>2, 	kIpeRegReadable | kIpeRegWriteable,                         kFLTV4HrControlReg       },
+	{@"HistMeasTime",       0x00004C>>2, 	kIpeRegReadable | kIpeRegWriteable,                         kFLTV4HistMeasTimeReg    },
+	{@"HistRecTime",        0x000050>>2, 	kIpeRegReadable,                                            kFLTV4HistRecTimeReg     },
+	{@"HistNumMeas",        0x000054>>2, 	kIpeRegReadable,                                            kFLTV4HistNumMeasReg     },
+	{@"PostTrigger",		0x000058>>2, 	kIpeRegReadable | kIpeRegWriteable,                         kFLTV4PostTrigger        },
+	{@"Threshold",          0x002080>>2, 	kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel,   kFLTV4ThresholdReg       },
+	{@"pStatusA",           0x002000>>2, 	kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel,   kFLTV4pStatusA           },
+	{@"pStatusB",           0x006000>>2, 	kIpeRegReadable,                                            kFLTV4pStatusB           },
+	{@"pStatusC",           0x026000>>2, 	kIpeRegReadable,                                            kFLTV4pStatusC           },
+	{@"Analog Offset",		0x001000>>2, 	kIpeRegReadable,                                            kFLTV4AnalogOffset       },
+	{@"Gain",				0x001004>>2, 	kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel,   kFLTV4GainReg            },
+	{@"Hit Rate",			0x001100>>2, 	kIpeRegReadable | kIpeRegNeedsChannel,                      kFLTV4HitRateReg         },
+	{@"Event FIFO1",		0x001800>>2, 	kIpeRegReadable,                                            kFLTV4EventFifo1Reg      },
+	{@"Event FIFO2",		0x001804>>2, 	kIpeRegReadable,                                            kFLTV4EventFifo2Reg      },
+	{@"Event FIFO3",		0x001808>>2, 	kIpeRegReadable | kIpeRegNeedsChannel,                      kFLTV4EventFifo3Reg      },
+	{@"Event FIFO4",		0x00180C>>2, 	kIpeRegReadable | kIpeRegNeedsChannel,                      kFLTV4EventFifo4Reg      },
+	{@"HistPageN",			0x00200C>>2, 	kIpeRegReadable,                                            kFLTV4HistPageNReg       },
+	{@"HistLastFirst",		0x002044>>2, 	kIpeRegReadable,                                            kFLTV4HistLastFirstReg   },
+	{@"TestPattern",		0x001400>>2, 	kIpeRegReadable | kIpeRegWriteable,                         kFLTV4TestPatternReg     },
+	{@"EnergyOffset",		0x00005C>>2, 	kIpeRegReadable | kIpeRegWriteable,                         kFLTV4EnergyOffsetReg    },
 };
 
-static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
-	//2nd column is PCI register address shifted 2 bits to right (the two rightmost bits are always zero) -tb-
-	{@"Status",				0x000000>>2,		-1,				kIpeRegReadable},
-	{@"Control",			0x000004>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-	{@"Command",			0x000008>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-	{@"CFPGAVersion",		0x00000c>>2,		-1,				kIpeRegReadable},
-	{@"FPGA8Version",		0x000010>>2,		-1,				kIpeRegReadable},
-	{@"BoardIDLSB",         0x000014>>2,		-1,				kIpeRegReadable},
-	{@"BoardIDMSB",         0x000018>>2,		-1,				kIpeRegReadable},
-	{@"InterruptMask",      0x00001C>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-	{@"HrMeasEnable",       0x000024>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-	{@"EventFifoStatus",    0x00002C>>2,		-1,				kIpeRegReadable},
-	{@"PixelSettings1",     0x000030>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-	{@"PixelSettings2",     0x000034>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-	{@"RunControl",         0x000038>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-	{@"HistgrSettings",     0x00003c>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-	{@"AccessTest",         0x000040>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-	{@"SecondCounter",      0x000044>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-	{@"HrControl",          0x000048>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-	{@"HistMeasTime",       0x00004C>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-	{@"HistRecTime",        0x000050>>2,		-1,				kIpeRegReadable},
-	{@"HistNumMeas",         0x000054>>2,		-1,				kIpeRegReadable},
-	{@"PostTrigger",		0x000058>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-	{@"Threshold",          0x002080>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
-	{@"pStatusA",           0x002000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
-	{@"pStatusB",           0x006000>>2,		-1,				kIpeRegReadable},
-	{@"pStatusC",           0x026000>>2,		-1,				kIpeRegReadable},
-	{@"Analog Offset",		0x001000>>2,		-1,				kIpeRegReadable},
-	{@"Gain",				0x001004>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
-	{@"Hit Rate",			0x001100>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
-	{@"Event FIFO1",		0x001800>>2,		-1,				kIpeRegReadable},
-	{@"Event FIFO2",		0x001804>>2,		-1,				kIpeRegReadable},
-	{@"Event FIFO3",		0x001808>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
-	{@"Event FIFO4",		0x00180C>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
-	{@"HistPageN",			0x00200C>>2,		-1,				kIpeRegReadable},
-	{@"HistLastFirst",		0x002044>>2,		-1,				kIpeRegReadable},
-	{@"TestPattern",		0x001400>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-	{@"EnergyOffset",		0x00005C>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-};
 
 @interface ORKatrinV4FLTModel (private)
 - (NSAttributedString*) test:(int)testName result:(NSString*)string color:(NSColor*)aColor;
@@ -207,17 +214,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 }
 
 - (void) dealloc
-{	
-#if 0
-	[NSObject cancelPreviousPerformRequestsWithTarget:self];
-    [testEnabledArray release];
-    [testStatusArray release];
-	[testSuit release];
-	[thresholds release];
-	[gains release];
-	[totalRate release];
-#endif
-    
+{
     [fltV4useDmaBlockReadAlarm clearAlarm];
     [fltV4useDmaBlockReadAlarm release];
     
@@ -266,24 +263,25 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (ORTimeRate*) totalRate   { return totalRate; }
 - (short) getNumberRegisters{ return kFLTV4NumRegs; }
 
+- (BOOL) checkRegisterStruct
+{
+    //used to double-check the register structure against the enum list
+    int i;
+    for(i=0;i<kFLTV4NumRegs;i++){
+        if(regV4[i].enumCheckValue != i){
+            NSLog(@"Programmer error in ORKatrinv4FLTModel: enum mismatch at index %d\n",i);
+            return  NO;
+        }
+    }
+    return YES;
+}
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers
 {
-    //NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
-	
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
  	[notifyCenter removeObserver:self]; //guard against a double register
    
-    //[super registerNotificationObservers]; ORIpeV4FLTModel does not implement it ... -tb-
-    
-	#if 0
-    [notifyCenter addObserver : self
-                     selector : @selector(XXXXsettingsLockChanged:)
-                         name : ORRunStatusChangedNotification
-                       object : nil];
-	#endif
-					   
     [notifyCenter addObserver : self
                      selector : @selector(runIsAboutToChangeState:)
                          name : ORRunAboutToChangeState
@@ -293,21 +291,11 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
                      selector : @selector(runIsAboutToStop:)
                          name : ORRunAboutToStopNotification
                        object : nil];
-					   
-					   
 }
 
-
-//#define SHOW_RUN_NOTIFICATIONS_AND_CALLS 1
 - (void) runIsAboutToStop:(NSNotification*)aNote
 {
-    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
-        //DEBUG
-                 NSLog(@"%@::%@   --- FLT #%i<---------N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber]);//DEBUG -tb-
-    #endif
-    //NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
-    //reset the 'sync with subruns' facility (should not be necessary without 'sending  eRunStarting twice' bug)
-	runControlState = eRunStopping;
+	runControlState               = eRunStopping;
 	syncWithRunControlCounterFlag = 0;
 }
 
@@ -315,23 +303,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {
     int state = [[[aNote userInfo] objectForKey:@"State"] intValue];
 
-    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
-         //DEBUG
-                 NSLog(@"%@::%@ Called runIsAboutToChangeState --- FLT #%i [self isPartOfRun] %i<-------------------------N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber],[self isPartOfRun]);//DEBUG -tb-
-    #endif
-                
-    
     //is FLT  in data taker list of data task manager?
     if(![self isPartOfRun]) return;
     
-    //handle shipping final hitrate events
-    //if(run is going to stop) set a 'wait'; release it after shipping the hitrate record; use a watchdog? -tb-
-    if(state==eRunStopping){
-        //DEBUG
-        //NSLog(@"%@::%@ FLT#%i: need to place a 'wait for hitrate record' (hr mask: 0x%08x)\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber],hitRateEnabledMask);//DEBUG -tb-
-	    //TODO: [self addRunWaitWithReason:@"FLTv4: wait for next hitrate event."];
-    }
-
     //from here: histogram mode sync option handling
     if(!syncWithRunControl) return;//nothing to care about ... Sync with run control not enabled in dialog ...
     if(syncWithRunControl && (runMode != kIpeFltV4Katrin_Histo_Mode)) return;//nothing to care about ... Sync with run control not enabled in dialog ...
@@ -383,7 +357,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	    // case 1.
 		//NSLog(@"   Case 1: do nothing\n");//DEBUG -tb-
 		return;
-	}else{
+	}
+    else {
 	    //catch errors
 	    if(runControlState==eRunStarting && lastState==eRunStarting){//should not happen! bug? -tb-
 		    NSLog(@" %@::%@   Case 2: ERROR - runControlState==eRunStarting && lastState==eRunStarting\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
@@ -405,7 +380,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) syncWithRunControlStart:(int)numHistograms
 {
-    //NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
 	[self clearReceivedHistoCounter];
 	syncWithRunControlCounterFlag = numHistograms; //we set syncWithRunControlCounterFlag to the number of histograms we yet need to receive
 	[self addRunWaitWithReason:@"FLTv4: wait for next histogram."];
@@ -413,11 +387,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) syncWithRunControlCheckStopCondition
 {
-    //DEBUG    NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
     if(syncWithRunControlCounterFlag >= receivedHistoCounter){//the notification 'runAboutToChangeState' seems to be called every second, if a wait is active, so we need to check for >= (not ==) -tb-
         //this is the sum histogram facility - see - (BOOL) setFromDecodeStageReceivedHistoForChan:(short)aChan
-            //DEBUG              NSLog(@"%@::%@ subrun-histo-summing: SHIP NOW <--------------\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));
-            [self shipSumHistograms];
+        [self shipSumHistograms];
         //clear waits for run control
 	    [self releaseRunWait]; 
 	    syncWithRunControlCounterFlag=0;
@@ -439,13 +411,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelEnergyOffsetChanged object:self];
 }
 
-
-
-
-
-
-
-
 - (BOOL) forceFLTReadout
 {
     return forceFLTReadout;
@@ -454,9 +419,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) setForceFLTReadout:(BOOL)aForceFLTReadout
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setForceFLTReadout:forceFLTReadout];
-    
     forceFLTReadout = aForceFLTReadout;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelForceFLTReadoutChanged object:self];
 }
 
@@ -482,9 +445,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) setBipolarEnergyThreshTest:(unsigned long)aBipolarEnergyThreshTest
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setBipolarEnergyThreshTest:bipolarEnergyThreshTest];
-    
     bipolarEnergyThreshTest = aBipolarEnergyThreshTest;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelBipolarEnergyThreshTestChanged object:self];
 }
 
@@ -507,8 +468,10 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     // return value: NO=0; YES=1; undef (no SLT present) = 2
 	id slt = [[self crate] adapter];
 	if(slt != nil){
-	    if([slt  secondsSetSendToFLTs]) return 1; else return 0;
-	}else return 2;
+	    if([slt  secondsSetSendToFLTs]) return 1;
+        else return 0;
+	}
+    else return 2;
 
 }
 
@@ -516,22 +479,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelUseSLTtimeChanged object:self];
 }
-
-#if 0
-- (void) setUseSLTtime:(int)aUseSLTtime //updates just the interface
-{
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelUseSLTtimeChanged object:self];
-    if(aUseSLTtime == useSLTtime) return;
-	
-    [[[self undoManager] prepareWithInvocationTarget:self] setUseSLTtime:useSLTtime];
-    
-    useSLTtime = aUseSLTtime;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelUseSLTtimeChanged object:self];
-	
-	//if([[self crate] adapter])  [[[self crate] adapter] setSecondsSetSendToFLTs: useSLTtime];
-}
-#endif
 
 - (int) boxcarLength
 {
@@ -550,13 +497,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelBoxcarLengthChanged object:self];
 }
 
-/** Used to open the alarm view only once if there are the same alarms from several FLTs.
-  */  //-tb-
-- (ORAlarm*) fltV4useDmaBlockReadAlarm
-{
-    return fltV4useDmaBlockReadAlarm;
-}
-
 - (int) useDmaBlockRead
 {
     return useDmaBlockRead;
@@ -564,8 +504,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) setUseDmaBlockRead:(int)aUseDmaBlockRead
 {
-    //NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
-
     if((!useDmaBlockRead) && aUseDmaBlockRead){//at change from "no" to "yes" post alarm -tb-
             //
             if(!fltV4useDmaBlockReadAlarm){
@@ -589,7 +527,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) setSyncWithRunControl:(int)aSyncWithRunControl
 {
-    //NSLog(@"Called %@::%@ - value %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd), aSyncWithRunControl);//DEBUG -tb-
     [[[self undoManager] prepareWithInvocationTarget:self] setSyncWithRunControl:syncWithRunControl];
     syncWithRunControl = aSyncWithRunControl;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelSyncWithRunControlChanged object:self];
@@ -1043,8 +980,8 @@ static double table[32]={
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelStoreDataInRamChanged object:self];
 }
 
-- (int) filterShapingLength { return filterShapingLength; }//was filterLength -tb-
-- (void) setFilterShapingLength:(int)aFilterShapingLength//was setFilterShapingLength -tb-
+- (int) filterShapingLength { return filterShapingLength; }
+- (void) setFilterShapingLength:(int)aFilterShapingLength
 {
 	if(aFilterShapingLength == 8 && gapLength>0){
 		[self setGapLength:0];
@@ -1052,9 +989,6 @@ static double table[32]={
 	}
     [[[self undoManager] prepareWithInvocationTarget:self] setFilterShapingLength:filterShapingLength];
     filterShapingLength = [self restrictIntValue:aFilterShapingLength min:0 max:8];
-	filterLength = filterShapingLength - 2;//TODO: this line should be removed mid 2011, filterLength is obsolete; filterLength is int, may become -1! -tb-
-	//DEBUG -tb- 
-	//TODO: DEBUG-REMOVE - NSLog(@"%@::%@  filterLength: %i filterShapingLength:%i  filterLength: 0x%x filterShapingLength: 0x%x\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),filterLength,filterShapingLength, filterLength,filterShapingLength);
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelFilterShapingLengthChanged object:self];
 }
 
@@ -1187,10 +1121,7 @@ static double table[32]={
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
     [userInfo setObject:[NSNumber numberWithInt:aChan] forKey: ORKatrinV4FLTChan];
 	
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORKatrinV4FLTModelThresholdChanged
-	 object:self
-	 userInfo: userInfo];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelThresholdChanged object:self userInfo: userInfo];
 	
 	//ORAdcInfoProviding protocol requirement
 	[self postAdcInfoProvidingValueChanged];
@@ -1206,18 +1137,16 @@ static double table[32]={
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
     [userInfo setObject:[NSNumber numberWithInt:aChan] forKey: ORKatrinV4FLTChan];
 	
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORKatrinV4FLTModelGainChanged
-	 object:self
-	 userInfo: userInfo];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelGainChanged object:self userInfo: userInfo];
 	
-	//ORAdcInfoProviding protocol requirement
 	[self postAdcInfoProvidingValueChanged];
 }
+
 - (unsigned long) thresholdForDisplay:(unsigned short) aChan
 {
 	return [self threshold:aChan];
 }
+
 - (unsigned short) gainForDisplay:(unsigned short) aChan
 {
 	return [self gain:aChan];
@@ -1289,10 +1218,8 @@ static double table[32]={
 
 - (float) hitRate:(unsigned short)aChan
 {
-	if(aChan<kNumV4FLTChannels){
-		return hitRate[aChan];
-	}
-	else return 0.0;
+	if(aChan<kNumV4FLTChannels) return hitRate[aChan];
+	else                        return 0.0;
 }
 
 
@@ -1351,7 +1278,6 @@ static double table[32]={
 		[self setGain:i withValue:0];
 	}
 	[self setGapLength:0];
-	//[self setFilterLength:5];
 	[self setFilterShapingLength:7];
 	[self setFifoBehaviour:kFifoEnableOverFlow];// kFifoEnableOverFlow or kFifoStopOnFull
 	[self setPostTriggerTime:1024]; // max. filter length should fit into the range -tb-
@@ -1359,7 +1285,6 @@ static double table[32]={
 	[self setHistMeasTime:	5];
 	
 	[self setPoleZeroCorrection:0];
-	
 }
 
 
@@ -1374,73 +1299,46 @@ static double table[32]={
 	[self releaseRunWait]; 
 }
 
-
 //Testpulser tests -tb-
-    //SLT registers
-	static const uint32_t SLTTPTimingRam     = 0xc80000 >> 2;
-	static const uint32_t SLTTPShapeRam      = 0xc81000 >> 2;
-	static const uint32_t SLTControlReg      = 0xa80000 >> 2;
-	static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
+//SLT registers
+static const uint32_t SLTTPTimingRam     = 0xc80000 >> 2;
+static const uint32_t SLTTPShapeRam      = 0xc81000 >> 2;
+static const uint32_t SLTControlReg      = 0xa80000 >> 2;
+static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 - (void) testButtonLowLevelConfigTP
 {
-        NSLog(@"n   configTPButton: Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+    NSLog(@"n   configTPButton: Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
 	//[self releaseRunWait]; 
 	
 	//write TP shape ram (if constant step height: set only the first AND TPShape bit=0)
 	int i=0;
-	static uint32_t shape =0x210;
-	//shape +=0x10;
+	static uint32_t shape = 0x210;
 	NSLog(@"shape is: 0x%x  (%i) ",shape,shape);
-	//[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x80]; i++;
-	//[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x440]; i++;
 	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: shape]; i++;
 	
 	//write TP timing ram
 	i=0;
-	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0x164]; i++;   // das gehoert zum FLT pattern mit index 1 (?)
-	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0x0]; i++; //0x64 = 100 (* 50/100 nanosec) //10 u sec; das ist die erste Luecke
-	//[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0x64]; i++; //0x64 = 100 (* 50/100 nanosec) //10 u sec
-	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0x50]; i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0x0]; i++;
-	//ein oder zwei Pulse: hier konfigurieren (0x0 frueher oder spaeter ...), fltpattern unten immer gleich lassen: 0x0, fltpattern, ... immer abwechselnd
-	
-	
-	//[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0x1a]; i++;
-	//[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0x1a]; i++;
-	//[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0xa]; i++;
-	//[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0x0]; i++;
-	
+	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0x164];  i++; // das gehoert zum FLT pattern mit index 1 (?)
+	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0x0];    i++; //0x64 = 100 (* 50/100 nanosec) //10 u sec;
+	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0x50];   i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0x0];    i++;
+		
 	//reset FLT TP pointer kFLTV4CommandReg
-#if 1
-    {
-	// 
-	uint32_t fltaddress = [self regAddress: kFLTV4CommandReg];
-	uint32_t rstTp = 0x10; //bit 4 
-	NSLog(@"flt kFLTV4CommandReg reg: 0x%x   ",fltaddress);
-	[[[self crate] adapter] rawWriteReg: fltaddress value: rstTp];
-	NSLog(@"  - wrote: flt command reg: 0x%x  \n",rstTp);
-	} 
-#endif
+	uint32_t anAddress = [self regAddress: kFLTV4CommandReg];
+	uint32_t rstTp     = 0x10; //bit 4
+	[[[self crate] adapter] rawWriteReg: anAddress value: rstTp];
+	NSLog(@"Wrote: flt command reg (0x%x): 0x%x  \n",anAddress,rstTp);
+    
 	//write FLT test pattern ram
-	uint32_t address = [self regAddress: kFLTV4TestPatternReg];
-	uint32_t fltpattern = 0xffffff;  //0x111112;// 0xffffff = all
+	anAddress = [self regAddress: kFLTV4TestPatternReg];
+	uint32_t fltpattern = 0xffffff;
 	
-	[[[self crate] adapter] rawWriteReg: address   value: 0x0];  
-	[[[self crate] adapter] rawWriteReg: address+1 value: fltpattern];
-	[[[self crate] adapter] rawWriteReg: address+2 value: 0x2000000];
-	//[[[self crate] adapter] rawWriteReg: address+2 value: 0x0];
-	[[[self crate] adapter] rawWriteReg: address+3 value: fltpattern];
-	//[[[self crate] adapter] rawWriteReg: address+3 value: 0x0];
-	[[[self crate] adapter] rawWriteReg: address+4 value: 0x0];
-	#if 0
-	[[[self crate] adapter] rawWriteReg: address+5 value: 0x0];
-	[[[self crate] adapter] rawWriteReg: address+6 value: fltpattern];
-	[[[self crate] adapter] rawWriteReg: address+7 value: fltpattern];
-	[[[self crate] adapter] rawWriteReg: address+8 value: 0x0];
-	[[[self crate] adapter] rawWriteReg: address+9 value: 0x0];
-	[[[self crate] adapter] rawWriteReg: address+10 value: fltpattern];
-	#endif
+	[[[self crate] adapter] rawWriteReg: anAddress   value: 0x0];
+	[[[self crate] adapter] rawWriteReg: anAddress+1 value: fltpattern];
+	[[[self crate] adapter] rawWriteReg: anAddress+2 value: 0x2000000];
+	[[[self crate] adapter] rawWriteReg: anAddress+3 value: fltpattern];
+	[[[self crate] adapter] rawWriteReg: anAddress+4 value: 0x0];
 	
 	//set SLT control register
 	uint32_t control=	[[[self crate] adapter] rawReadReg: SLTControlReg ];
@@ -1453,144 +1351,12 @@ static double table[32]={
 	NSLog(@"  -  after write: control reg: 0x%x  \n",control);
 	
 	//set FLT control register flag
-	uint32_t fltaddress = [self regAddress: kFLTV4ControlReg];
-	uint32_t fltcontrol=	[[[self crate] adapter] rawReadReg: fltaddress ];
+	anAddress = [self regAddress: kFLTV4ControlReg];
+	uint32_t fltcontrol=	[[[self crate] adapter] rawReadReg: anAddress ];
 	NSLog(@"flt control reg: 0x%x   ",fltcontrol);
 	fltcontrol = fltcontrol | (0x10);//bit 4
-	[[[self crate] adapter] rawWriteReg: fltaddress value: fltcontrol];
+	[[[self crate] adapter] rawWriteReg: anAddress value: fltcontrol];
 	NSLog(@"  -  after write: flt control reg: 0x%x  \n",fltcontrol);
-	
-	
-
-
-#if 0
-	//OLD VERSION (zu kompliziert)
-	//write TP shape ram (if constant step height: set only the first AND TPShape bit=0)
-	int i=0;
-	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x80];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x00];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x3ff];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x00];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x2ff];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x00];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x2ff];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x2ff];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x2ff];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x2ff];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x00];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x00];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x00];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x00];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x2ff];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x2ff];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x2ff];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x00];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x2ff];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x00];
-	i++;
-
-	
-	//write TP timing ram
-	i=0;
-	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
-	uint32_t time      = 0x50; 
-	i=0;
-	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
-	i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0];
-	i++;
-
-	
-	
-	//set SLT control register
-	uint32_t control=	[[[self crate] adapter] rawReadReg: SLTControlReg ];
-	NSLog(@"control reg: 0x%x   ",control);
-	control = control & ~(0x7<<11);
-	NSLog(@"  -  after reset: control reg: 0x%x  \n",control);
-	control = (control | (0x01<<11)); //0x1 oder 0x5
-	// 0bXYZ is: TPShape X=0: constant DC level; X=1 shaped DC level; YZ= TP Enable: 00=no; 01=SW; 10=global(Lemo?); 11=FrontPanel
-	[[[self crate] adapter] rawWriteReg: SLTControlReg value: control];
-	NSLog(@"  -  after write: control reg: 0x%x  \n",control);
-	
-	//write FLT test pattern ram
-	uint32_t address = [self regAddress: kFLTV4TestPatternReg];
-	uint32_t fltpattern = 0xffffff;  //0x111112;// 0xffffff = all
-	
-	[[[self crate] adapter] rawWriteReg: address   value: fltpattern];
-	[[[self crate] adapter] rawWriteReg: address+1 value: 0x0];
-	[[[self crate] adapter] rawWriteReg: address+2 value: fltpattern];
-	[[[self crate] adapter] rawWriteReg: address+3 value: fltpattern];
-	[[[self crate] adapter] rawWriteReg: address+4 value: 0x0];
-	[[[self crate] adapter] rawWriteReg: address+5 value: 0x0];
-	[[[self crate] adapter] rawWriteReg: address+6 value: fltpattern];
-	[[[self crate] adapter] rawWriteReg: address+7 value: fltpattern];
-	[[[self crate] adapter] rawWriteReg: address+8 value: 0x0];
-	[[[self crate] adapter] rawWriteReg: address+9 value: 0x0];
-	[[[self crate] adapter] rawWriteReg: address+10 value: fltpattern];
-	[[[self crate] adapter] rawWriteReg: address+11 value: fltpattern];
-	[[[self crate] adapter] rawWriteReg: address+12 value: fltpattern];
-	[[[self crate] adapter] rawWriteReg: address+13 value: 0x0];
-	[[[self crate] adapter] rawWriteReg: address+14 value: 0x0];
-	[[[self crate] adapter] rawWriteReg: address+15 value: 0x0];
-	[[[self crate] adapter] rawWriteReg: address+16 value: fltpattern];
-	[[[self crate] adapter] rawWriteReg: address+17 value: fltpattern];
-	[[[self crate] adapter] rawWriteReg: address+18 value: fltpattern];
-	[[[self crate] adapter] rawWriteReg: address+18 value: 0x1ffffff];
-	
-	//set FLT control register flag
-	uint32_t fltaddress = [self regAddress: kFLTV4ControlReg];
-	uint32_t fltcontrol=	[[[self crate] adapter] rawReadReg: fltaddress ];
-	NSLog(@"flt control reg: 0x%x   ",fltcontrol);
-	fltcontrol = fltcontrol | (0x10);//bit 4
-	[[[self crate] adapter] rawWriteReg: fltaddress value: fltcontrol];
-	NSLog(@"  -  after write: flt control reg: 0x%x  \n",fltcontrol);
-#endif
-	
 }
 
 - (void) testButtonLowLevelFireTP
@@ -1598,14 +1364,11 @@ static double table[32]={
         NSLog(@"   fireTPButton: Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
 		
 	//reset FLT TP pointer kFLTV4CommandReg
-#if 1
-	// 
 	uint32_t fltaddress = [self regAddress: kFLTV4CommandReg];
 	uint32_t rstTp = 0x10; //bit 4 
 	NSLog(@"flt kFLTV4CommandReg reg: 0x%x   ",fltaddress);
 	[[[self crate] adapter] rawWriteReg: fltaddress value: rstTp];
 	NSLog(@"  - wrote: flt command reg: 0x%x  \n",rstTp);
-#endif
 	
 	//fire TP SLT command
 	//[self releaseRunWait]; 
@@ -1616,7 +1379,7 @@ static double table[32]={
 
 - (void) testButtonLowLevelResetTP
 {
-        NSLog(@"   resetTPButton: Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+    NSLog(@"   resetTPButton: Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
 	//[self releaseRunWait]; 
 	uint32_t control=	[[[self crate] adapter] rawReadReg: SLTControlReg ];
 	NSLog(@"control reg: 0x%x   ",control);
@@ -1624,7 +1387,6 @@ static double table[32]={
 	NSLog(@"  -  after reset: control reg: 0x%x  \n",control);
 	[[[self crate] adapter] rawWriteReg: SLTControlReg value: control];
 
-#if 1
 	//reset FLT control register flag
 	uint32_t fltaddress = [self regAddress: kFLTV4ControlReg];
 	uint32_t fltcontrol=	[[[self crate] adapter] rawReadReg: fltaddress ];
@@ -1632,10 +1394,7 @@ static double table[32]={
 	fltcontrol = fltcontrol & ~(0x10);//bit 4 to 0
 	[[[self crate] adapter] rawWriteReg: fltaddress value: fltcontrol];
 	NSLog(@"  -  after write: flt control reg: 0x%x  \n",fltcontrol);
-#endif
 }
-
-
 
 #pragma mark •••HW Access
 - (unsigned long) readBoardIDLow
@@ -1697,10 +1456,8 @@ static double table[32]={
 		else									thres = [self threshold:i];
         //DEBUG: FOR TESTING!!! 2013-11-21 added for polar energy
 		unsigned long threshPolar;
-        threshPolar= bipolarEnergyThreshTest & 0xfff;
-        //threshPolar= (thres>>filterShapingLength) & 0xfff;
-        //threshPolar=   0xfff;//switch polar trigger off
-        thres=thres & 0xFFFFF;
+        threshPolar = bipolarEnergyThreshTest & 0xfff;
+        thres = thres & 0xFFFFF;
 		[aList addCommand: [self writeRegCmd:kFLTV4ThresholdReg channel:i value: ((threshPolar<<20) | thres)]];
 		[aList addCommand: [self writeRegCmd:kFLTV4GainReg channel:i value:[self gain:i] & 0xFFF]];
 	}
@@ -1726,65 +1483,6 @@ static double table[32]={
 	else					  return aValue;
 }
 
-- (void) enableStatistics  //TODO: remove it -tb-
-{
-#if (0)
-    unsigned long aValue;
-	bool enabled = true;
-	unsigned long adc_guess = 150;			// This are parameter that work with the standard Auger-type boards
-	unsigned long n = 65000;				// There is not really a need to make them variable. ak 7.10.07
-	
-    aValue =     (  ( (unsigned long) (enabled  &   0x1) ) << 31)
-	| (  ( (unsigned long) (adc_guess   & 0x3ff) ) << 16)
-	|    ( (unsigned long) ( (n-1)  & 0xffff) ) ; // 16 bit !
-	
-	// Broadcast to all channel	(pseudo channel 0x1f)     
-	[self writeReg:kFLTStaticSetReg channel:0x1f value:aValue]; 
-	
-	// Save parameter for calculation of mean and variance
-	statisticOffset = adc_guess;
-	statisticN = n;
-#endif
-}
-
-
-- (void) getStatistics:(int)aChannel mean:(double *)aMean  var:(double *)aVar   //TODO: remove it -tb-
-{
-#if (0)
-    unsigned long data;
-	signed long sum;
-    unsigned long sumSq;
-	
-    // Read Statistic parameter
-    data = [self  readReg:kFLTStaticSetReg channel:aChannel];
-	statisticOffset = (data  >> 16) & 0x3ff;
-	statisticN = (data & 0xffff) +1;
-	
-	
-    // Read statistics
-	// The sum is a 25bit signed number.
-	sum = [self readReg:kFLTSumXReg channel:aChannel];
-	// Move the sign
-	sum = (sum & 0x01000000) ? (sum | 0xFE000000) : (sum & 0x00FFFFFF);
-	
-    // Read the sum of squares	
-	sumSq = [self readReg:kFLTSumX2Reg channel:aChannel];
-	
-	//NSLog(@"data = %x Offset = %d, n = %d, sum = %08x, sum2 = %08x\n", data, statisticOffset, statisticN, sum, sumSq);
-	
-	// Calculate mean and variance
-	if (statisticN > 0){
-		*aMean = (double) sum / statisticN + statisticOffset;
-		*aVar = (double) sumSq / statisticN 
-		- (double) sum / statisticN * sum / statisticN;
-    } else {
-		*aMean = -1; 
-		*aVar = -1;
-	}
-#endif
-}
-
-
 - (void) initBoard
 {
 	//[self writeControl]; //removed setting runmode from here -tb-
@@ -1795,7 +1493,6 @@ static double table[32]={
 	[self writeReg:kFLTV4AnalogOffset  value:analogOffset];
 	[self writeTriggerControl];			//TODO:   (for v4 this needs to be implemented by DENIS)-tb- //set trigger mask
 	[self writeHitRateMask];			//set hitRage control mask
-	//[self enableStatistics];			//TODO: OBSOLETE -tb- enable hardware ADC statistics, ak 7.1.07
 	
 	if(fltRunMode == kIpeFltV4Katrin_Histo_Mode){
 		[self writeHistogramControl];
@@ -1858,12 +1555,11 @@ static double table[32]={
   */
 - (void) writeControlWithFltRunMode:(int)aMode
 {
-	
 	//TODO: add fifo length -tb- <---------------------------------------------
-	unsigned long aValue =  ((aMode & 0xf)<<16) | 
-	((fifoLength & 0x1)<<25) |
-	((fifoBehaviour & 0x1)<<24) |
-	((ledOff & 0x1)<<1 );
+	unsigned long aValue =  ((aMode         & 0xf)<<16)         |
+                            ((fifoLength    & 0x1)<<25)    |
+                            ((fifoBehaviour & 0x1)<<24) |
+                            ((ledOff        & 0x1)<<1 );
 	[self writeReg: kFLTV4ControlReg value:aValue];
 }
 
@@ -1876,7 +1572,10 @@ static double table[32]={
 - (void) writeHistogramControl
 {
 	[self writeReg:kFLTV4HistMeasTimeReg value:histMeasTime];
-	unsigned long aValue = ((histClrMode & 0x1)<<29) | ((histMode & 0x1)<<28) | ((histEBin & 0xf)<<20) | histEMin;
+	unsigned long aValue =  ((histClrMode & 0x1)<<29) |
+                            ((histMode    & 0x1)<<28) |
+                            ((histEBin    & 0xf)<<20) |
+                            histEMin;
 	[self writeReg:kFLTV4HistgrSettingsReg value:aValue];
 }
 
@@ -1902,16 +1601,7 @@ static double table[32]={
 
 - (unsigned long) readReg:(int)aReg
 {
-#if 0
-	NSLog(@"%@::%@:  0x%x\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aReg);//-tb-NSLog-tb-
-//TODO: DEBUG output for crashed SLT 2010-08 -tb-
-    NSLog(@"debug-output: read reg addr is %i (0x%x)\n", [self regAddress:aReg], [self regAddress:aReg]);  //TODO: DEBUG-OUTPUT -tb-
-	unsigned long tmp = [self read: [self regAddress:aReg]];
-NSLog(@"debug-output: read value was (0x%x)\n", tmp);
-	return tmp;
-#else
-	return [self read: [self regAddress:aReg]];
-#endif
+    return [self read: [self regAddress:aReg]];
 }
 
 - (unsigned long) readReg:(int)aReg channel:(int)aChannel
@@ -1921,11 +1611,6 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 
 - (void) writeReg:(int)aReg value:(unsigned long)aValue
 {
-#if 0
-	NSLog(@"%@::%@:  val %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aValue);//-tb-NSLog-tb-
-    NSLog(@"debug-output: read reg addr is %i (0x%x)\n", [self regAddress:aReg], [self regAddress:aReg]);  //TODO: DEBUG-OUTPUT -tb-
-#endif
-
 	[self write:[self regAddress:aReg] value:aValue];
 }
 
@@ -1958,23 +1643,12 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 
 - (void) writeTestPattern:(unsigned long*)mask length:(int)len
 {
-	[self rewindTestPattern];
 	[self writeNextPattern:0];
 	int i;
 	for(i=0;i<len;i++){
 		[self writeNextPattern:mask[i]];
 		NSLog(@"%d: %@\n",i,mask[i]?@".":@"-");
 	}
-	[self rewindTestPattern];
-}
-
-- (void) rewindTestPattern
-{
-#if (0)
-    //TODO: obsolete (v3) -tb-
-	[self writeReg:kFLTTestPulsMemReg value: kIpeFlt_TP_Control | kIpeFlt_TestPattern_Reset];
-	
-#endif
 }
 
 - (void) writeNextPattern:(unsigned long)aValue
@@ -2106,7 +1780,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 		unsigned long data[5 + kNumV4FLTChannels + kNumV4FLTChannels];//2013-04-24 changed to ship full 32 bit counter; data format changed! see decoder -tb-
 		
 		//combine all the hitrate read commands into one command packet
-		ORCommandList* aList = [ORCommandList commandList];
+		ORCommandList* aList = [[ORCommandList commandList] retain];
 		for(chan=0;chan<kNumV4FLTChannels;chan++){
 			if(hitRateEnabledMask & (1L<<chan)){
 				[aList addCommand: [self readRegCmd:kFLTV4HitRateReg channel:chan]];
@@ -2197,6 +1871,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 		if(oneChanged){
 		    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelHitRateChanged object:self];
 		}
+        [aList release];
 	}
 	@catch(NSException* localException) {
             //DEBUG
@@ -2316,18 +1991,10 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     }
     
 	if([decoder containsValueForKey:@"filterShapingLength"]){
-		//TODO: DEBUG-REMOVE - int tmpval=[decoder decodeIntForKey:@"filterShapingLength"];
 		[self setFilterShapingLength:[decoder decodeIntForKey:@"filterShapingLength"]];
-		//TODO: DEBUG-REMOVE - NSLog(@" ------------> filterShapingLength found: %i (%i)!!!\n",filterShapingLength,tmpval);
-	}else{
-		NSLog(@" ------------> filterShapingLength not found!!!\n");
-		if([decoder containsValueForKey:@"filterLength"]){
-			[self setFilterShapingLength:[decoder decodeIntForKey:@"filterLength"]];
-		    //TODO: DEBUG-REMOVE - NSLog(@" -----------------------------> filterLength found:%i!!!\n",filterShapingLength);
-		}else{
-			[self setFilterShapingLength:7];//use the default
-		    //TODO: DEBUG-REMOVE - NSLog(@"Could not load filterShapingLength! Using default!\n");
-		}
+	}
+    else {
+        [self setFilterShapingLength:7];//use the default
 	}
 	
 	//TODO: many fields are  still in super class ORIpeV4FLTModel, some should move here (see ORIpeV4FLTModel::initWithCoder, see my comments in 2011-04-07-ORKatrinV4FLTModel.m) -tb-
@@ -2486,7 +2153,6 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     [objDictionary setObject:[NSNumber numberWithLong:analogOffset]			forKey:@"analogOffset"];
     [objDictionary setObject:[NSNumber numberWithLong:hitRateLength]		forKey:@"hitRateLength"];
     [objDictionary setObject:[NSNumber numberWithLong:gapLength]			forKey:@"gapLength"];
-    //[objDictionary setObject:[NSNumber numberWithLong:filterLength+2]		forKey:@"filterLength"];//this is the fpga register value -tb-
     [objDictionary setObject:[NSNumber numberWithLong:filterShapingLength]		forKey:@"filterShapingLength"];//this is the fpga register value -tb-
     [objDictionary setObject:[NSNumber numberWithInt:vetoOverlapTime]		forKey:@"vetoOverlapTime"];
     [objDictionary setObject:[NSNumber numberWithInt:nfoldCoincidence]		forKey:@"nfoldCoincidence"];
@@ -2718,12 +2384,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 }
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{	
-    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
-        //DEBUG
-                 NSLog(@"%@::%@ Called runTaskStarted --- FLT #%i<-------------------------\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber]);//DEBUG -tb-
-    #endif
-
+{
     [self setIsPartOfRun: YES];
 
     //NOTE: during this function the whole crate is set to 'INHIBIT' by the SLT -tb-
@@ -2809,28 +2470,21 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 
 
 //**************************************************************************************
-// Function:	
-
-// Description: Read data from a card
+// Function:
+// Description: Read data from a card. Should never call this method since the FLT
+//
 //***************************************************************************************
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {	
 	if(firstTime){
-    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
-        //DEBUG
-                 NSLog(@"%@::%@   FLT #%i<---------\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber]);//DEBUG -tb-
-    #endif
 		firstTime = NO;
-		NSLogColor([NSColor redColor],@"Readout List Error: FLT %d must be a child of an SLT in the readout list\n",[self stationNumber]);
+        NSLogColor([NSColor redColor],@"Readout List Error: FLT %d is NOT child of an SLT in the readout list\n",[self stationNumber]);
+        NSLogColor([NSColor redColor],@"It will be ignored in this run\n");
 	}
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
-        //DEBUG
-                 NSLog(@"%@::%@   FLT #%i<-------------stopped\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber]);//DEBUG -tb-
-    #endif
 	//[self writeRunControl:NO];// let it run, see runTaskStarted ... -tb-
 	//changed 2013-04-29 -tb- SLT will set inhibit anyway! for quick start we want to leave the current mode active (histogr. FLTs are restarted at runTaskStarted) [self writeControlWithStandbyMode];
 	//[self setLedOff:YES];
@@ -2843,14 +2497,6 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	[self setHitRateTotal:0];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelHitRateChanged object:self];
-
-    
-#if 0
-    //TODO:temporary test - remove it!!!!!!!!!!!!!!!!!!! -tb-
-	if(runMode == kIpeFltV4_Histogram_DaqMode){//FLTs in histogram mode always need to be set to standby mode (to restart the histogramming facility) -tb-
-    	[self writeControlWithStandbyMode];
-	}
-#endif
 
     [self setIsPartOfRun: NO];
 
@@ -2890,8 +2536,6 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	configStruct->card_info[index].deviceSpecificData[4] = triggerEnabledMask;	
     //the daq mode (should replace the flt mode)
     configStruct->card_info[index].deviceSpecificData[5] = runMode;			//the daqRunMode
-	//configStruct->card_info[index].deviceSpecificData[6] = [self filterLength];		//packed into the records for normalization (MAH/May5,2010) --//TODO: this two lines should be removed mid 2011, filterLength is obsolete -tb-
-																					//to avoid any conflicts I use deviceSpecificData[9] for the filterShapingLength -tb- 2011-04
 	//for handling of different firmware versions
     uint32_t versionCFPGA = [self readVersion];
     uint32_t versionFPGA8 = [self readpVersion];
@@ -2917,9 +2561,6 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 
 	configStruct->card_info[index].num_Trigger_Indexes = 0;					//we can't have children
 	configStruct->card_info[index].next_Card_Index 	= index+1;	
-
-	//TODO: DEBUG-REMOVE - NSLog(@"%@::%@  i: %i l:%i  i: 0x%x l: 0x%x\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),
-	//TODO: DEBUG-REMOVE - [self filterLength],[self filterShapingLength], [self filterLength],[self filterShapingLength]);
 	
 	return index+1;
 }
@@ -3308,22 +2949,6 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 		NSLogFont(aFont,@"%4d | %@ | %4d | %4d \n",i,(aHitRateMask>>i)&0x1 ? @" Enabled":@"Disabled",[aList longValueForCmd:i*2],[aList longValueForCmd:1+i*2]);
 	}
 	NSLogFont(aFont,   @"---------------------------------\n");
-}
-
-- (void) printStatistics
-{
-	//TODO:  replace by V4 code -tb-
-	NSLog(@"FLTv4: printStatistics not implemented \n");//TODO: needs implementation -tb-
-	return;
-    int j;
-	double mean;
-	double var;
-	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
-    NSLogFont(aFont,@"Statistics      :\n");
-	for (j=0;j<kNumV4FLTChannels;j++){
-		[self getStatistics:j mean:&mean var:&var];
-		NSLogFont(aFont,@"  %2d -- %10.2f +/-  %10.2f\n", j, mean, var);
-	}
 }
 
 - (void) findNoiseFloors

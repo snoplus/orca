@@ -22,7 +22,6 @@
 #pragma mark •••Imported Files
 #import "ORIpeCard.h"
 #import "ORIpeV4FLTModel.h"
-//#import "ORIpeV4SLTModel.h"
 #import "SLTv4_HW_Definitions.h"
 #import "ORHWWizard.h"
 #import "ORDataTaker.h"
@@ -92,9 +91,7 @@
     int vetoOverlapTime;
     int nfoldCoincidence;
     int fifoLength;
-    int filterShapingLength;  //for ORKatrinV4FLTModel we use filterShapingLength from 2011-04/Orca:svnrev5000 on (old: filterLength) -tb- 
-	                          //filterShapingLength is the register value and the popup item tag; 
-							  //Denis enabled filterShapingLengthReg 1, so filterLength would become -1 (negative), so I invented filterShapingLenght as new variable -tb-
+    int filterShapingLength;  
 	BOOL activateDebuggingDisplays;
 	unsigned char fifoFlags[kNumV4FLTChannels];
     int receivedHistoChanMap;
@@ -108,7 +105,6 @@
 	ORAlarm* fltV4useDmaBlockReadAlarm;
     int useDmaBlockRead;
     int boxcarLength;
-    //int useSLTtime; // unused - use SLT value -tb-
     unsigned long   oldTriggerEnabledMask; //!< mask to temporarially store the enabled mask for later reuse.
     
     //buffer for summed histograms
@@ -127,6 +123,7 @@
 - (void) setUpImage;
 - (void) makeMainController;
 - (short) getNumberRegisters;
+- (BOOL) checkRegisterStruct;
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
@@ -151,7 +148,6 @@
 //- (void) setUseSLTtime:(int)aUseSLTtime;
 - (int) boxcarLength;
 - (void) setBoxcarLength:(int)aBoxcarLength;
-- (ORAlarm*) fltV4useDmaBlockReadAlarm;
 - (int) useDmaBlockRead;
 - (void) setUseDmaBlockRead:(int)aUseDmaBlockRead;
 - (int) syncWithRunControl;
@@ -335,7 +331,6 @@
 - (void) readHitRates;
 - (void) readHistogrammingStatus;
 - (void) writeTestPattern:(unsigned long*)mask length:(int)len;
-- (void) rewindTestPattern;
 - (void) writeNextPattern:(unsigned long)aValue;
 - (unsigned long) readStatus;
 - (unsigned long) readControl;
@@ -350,8 +345,6 @@
 - (void) printEventFIFOs;
 - (void) writeHistogramControl;
 
-/** Print result of hardware statistics for all channels */
-- (void) printStatistics; // ak, 7.10.07
 - (void) writeThreshold:(int)i value:(unsigned int)aValue;
 - (unsigned int) readThreshold:(int)i;
 - (void) writeGain:(int)i value:(unsigned short)aValue;
@@ -366,13 +359,6 @@
 - (unsigned char) fifoFlags:(short)aChan;
 - (void) setFifoFlags:(short)aChan withValue:(unsigned char)aChan;
 - (NSString*) fifoFlagString:(short)aChan;
-
-/** Enable the statistic evaluation of sum and sum square of the 
- * ADC signals in all channels.  */
-- (void) enableStatistics; // ak, 7.10.07
-
-/** Get statistics of a single channel */
-- (void) getStatistics:(int)aChannel mean:(double *)aMean  var:(double *)aVar; // ak, 7.10.07
 
 - (unsigned long) readMemoryChan:(int)chan page:(int)aPage;
 - (void) readMemoryChan:(int)aChan page:(int)aPage pageBuffer:(unsigned short*)aPageBuffer;
