@@ -61,16 +61,16 @@
 	<string>Orca 11, Copyright ©2014 Mark Howe Physics Dept, University of North Carolina</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>10.6</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>ReportBugsTo</key>
 	<string>mhowe@physics.unc.edu</string>
-	<key>NSAppTransportSecurity</key>
-    		<dict>
-           		<key>NSAllowsArbitraryLoads</key>
-          		<true/>
-   		</dict>
 </dict>
 </plist>
