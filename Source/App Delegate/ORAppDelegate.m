@@ -362,12 +362,6 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 	//nothing to do... everything is in the submenu and handled by the doc controller
 }
 
-- (IBAction) performClose:(id)sender
-{
-	[[self undoManager] removeAllActions];
-    [[NSDocumentController sharedDocumentController] performClose:sender];
-}
-
 - (IBAction) terminate:(id)sender
 {
     BOOL cancel = NO;

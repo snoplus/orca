@@ -69,7 +69,6 @@
 - (IBAction) showStatusLog:(id)sender;
 - (IBAction) newDocument:(id)sender;
 - (IBAction) openDocument:(id)sender;
-- (IBAction) performClose:(id)sender;
 - (IBAction) terminate:(id)sender;
 - (IBAction) showCommandCenter:(id)sender;
 - (IBAction) showCatalog:(id)sender;
