@@ -1803,6 +1803,21 @@ void SwapLongBlock(void* p, int32_t n)
         withObject:nil];
 }
 
+- (void) disableTriggers
+{
+    /* Disable channel triggers. This
+     * function will block and so should only be called on a separate thread.
+     * This function will raise an exception if any error occurs. */
+
+    NSMutableArray* trigger_crate_mask = [NSMutableArray array];
+    for(int islot=0;islot<16;islot++){
+        [trigger_crate_mask insertObject:@0x0 atIndex:islot];
+    }
+
+    [self loadTriggersWithCrateMask:trigger_crate_mask];
+    
+}
+
 - (void) loadTriggers
 {
     /* Loads the current GUI channel trigger settings to the hardware. This

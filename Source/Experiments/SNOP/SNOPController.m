@@ -1817,8 +1817,6 @@ err:
 - (void) ECAStatusChanged:(NSNotification*)aNotification
 {
 
-dispatch_async(dispatch_get_main_queue(), ^{
-
     ECARun *theECARun = [model anECARun];
 
     //Status
@@ -1852,8 +1850,6 @@ dispatch_async(dispatch_get_main_queue(), ^{
     [[ecaStatusMatrix cellAtRow:7 column:0] setStringValue:ecaPointLabel];
     //Delay
     [[ecaStatusMatrix cellAtRow:8 column:0] setDoubleValue:[theECARun ECA_currentDelay]];
-
-});
 
 }
 
