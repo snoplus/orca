@@ -222,6 +222,7 @@ BOOL isNotRunningOrIsInMaintenance();
 - (void) taskFinished:(NSTask*)aTask;
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
 
+- (void) pingCratesAtRunStart;
 - (void) pingCrates;
 - (void) runNhitMonitorAutomatically;
 - (void) runNhitMonitor;
