@@ -2129,8 +2129,8 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 			
 		}
         
-		[aList addCommand: [[[self crate] adapter] readHardwareRegisterCmd:sltSubSecAddr]];
-		[aList addCommand: [[[self crate] adapter] readHardwareRegisterCmd:sltSecAddr]];
+//DEBUG		[aList addCommand: [[[self crate] adapter] readHardwareRegisterCmd:sltSubSecAddr]];
+//DEBUG		[aList addCommand: [[[self crate] adapter] readHardwareRegisterCmd:sltSecAddr]];
         
         //HW access
 		[self executeCommandList:aList];
@@ -2167,9 +2167,9 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 			}
 		}
         
-        sltSubSecReg =  [aList longValueForCmd:dataIndex];		
+//DEBUG        sltSubSecReg =  [aList longValueForCmd:dataIndex];
         sltSubSec   = ((sltSubSecReg>>11)&0x3fff)*2000   +  (sltSubSecReg & 0x7ff);
-        sltSec    =  [aList longValueForCmd:dataIndex+1];		
+//DEBUG        sltSec    =  [aList longValueForCmd:dataIndex+1];		
         //DEBUGGING         NSLog(@"FLT %i: readHitRates: sltSec: %08x (%i)  sltSubSec %08x (%i, %f)\n",[self stationNumber],sltSec,sltSec,sltSubSec,sltSubSec, (0.00000005*sltSubSec));	
         
         if(	dataIndex != countHREnabledChans){

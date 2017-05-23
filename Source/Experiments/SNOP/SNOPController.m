@@ -36,7 +36,7 @@
 #import "SNOCaenModel.h"
 #import "RunTypeWordBits.hh"
 #import "ECARun.h"
-#import "NhitMonitor.h"
+#import "NHitMonitor.h"
 
 NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 NSString* ORRunWaitFinished = @"ORRunWaitFinished";
@@ -92,14 +92,19 @@ snopGreenColor;
 }
 - (void) dealloc
 {
-    [smellieRunFile release];
     [snopBlueColor release];
     [snopGreenColor release];
     [snopOrangeColor release];
     [snopRedColor release];
+    [snopBlackColor release];
+    [snopGrayColor release];
     [doggy_icon stop_animation];
     [doggy_icon release];
-    
+    [smellieRunFile release];
+    [tellieRunFile release];
+    [_smellieRunFileList release];
+    [_tellieRunFileList release];
+    [tellieFireSettings release];
     [super dealloc];
 }
 
@@ -1592,7 +1597,7 @@ err:
     if(slaveValue == 1){
         inSlave = YES;
     }
-    NSMutableArray* settingsArray = [[NSMutableArray alloc] init];
+    NSMutableArray* settingsArray = [NSMutableArray arrayWithCapacity:[nodes count]];
     for(NSNumber* node in nodes){
         NSString* fibre = [theELLIEModel calcTellieFibreForNode:[node integerValue]];
         NSMutableDictionary* settings = [theELLIEModel returnTellieFireCommands:fibre

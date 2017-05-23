@@ -327,6 +327,11 @@
 	#endif
 //TODO: no offset -tb-
 startIndex=traceStart16;
+    //startIndex=0;
+    
+    //NSLog(@" traceStart16 %i\n",traceStart16);//
+	//NSLog(@" %@::%@   traceStart16 %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),traceStart16 );//TODO: DEBUG -tb-
+    
 	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
 					offset: 9*sizeof(long)					// Offset in bytes (past header words)
 				  unitSize: sizeof(short)					// unit size in bytes

@@ -187,6 +187,7 @@ enum eHaloStatus {
 - (void) startTimer; //SV
 - (void) stopTimer; //SV
 - (void) waitForEndOfRun:(NSTimer*)aTimer; //SV
+- (void) setNextToggleTime:(NSString*)aString;//MAH
 - (NSString*) nextToggleTime; //SV
 - (NSMutableArray*) sentryLog; //SV
 

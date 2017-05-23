@@ -56,6 +56,10 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 
 - (void)dealloc
 {
+    [_nodeMapWC release];
+    [_smellieThread release];
+    [_guiFireSettings release];
+    [_tellieThread release];
     [super dealloc];
 }
 
@@ -690,12 +694,6 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
         [msgs insertObject:msg atIndex:3];
     } else {
         [msgs insertObject:[NSNull null] atIndex:3];
-    }
-
-    // Calculate settings and check any issues in
-    BOOL inSlave = YES;
-    if([[tellieBuildOpMode titleOfSelectedItem] isEqualToString:@"Master"]){
-        inSlave = NO;
     }
 
     BOOL safety_check = [model photonIntensityCheck:[tellieBuildPhotons integerValue] atFrequency:[tellieBuildRate integerValue]];

@@ -18906,8 +18906,6 @@
 				OTHER_CFLAGS = "";
 				OTHER_CPLUSPLUSFLAGS = "";
 				OTHER_LDFLAGS = (
-					"-lcrypto",
-					"-lssl",
 					"-lz",
 					"-lnetsnmp",
 				);
@@ -18985,8 +18983,6 @@
 				OTHER_CPLUSPLUSFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-lnetsnmp",
-					"-lcrypto",
-					"-lssl",
 					"-lz",
 				);
 				PRODUCT_NAME = Orca;
@@ -19059,8 +19055,6 @@
 				OTHER_CFLAGS = "";
 				OTHER_CPLUSPLUSFLAGS = "";
 				OTHER_LDFLAGS = (
-					"-lcrypto",
-					"-lssl",
 					"-lz",
 					"-Wl,-stack_size,1000000",
 				);

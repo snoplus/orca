@@ -121,7 +121,10 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 	NSString* noKill				 = [standardDefaults stringForKey:@"startup"];
 	if(![noKill isEqualToString:@"NoKill"]){
         NSString* bundleID = [[NSRunningApplication currentApplication] bundleIdentifier];
-		NSArray* launchedApps = [NSRunningApplication runningApplicationsWithBundleIdentifier:bundleID];
+        NSArray* launchedApps = nil;
+        if(bundleID){
+             launchedApps = [NSRunningApplication runningApplicationsWithBundleIdentifier:bundleID];
+        }
         if([launchedApps count]>1)[NSApp terminate:self];
 
 	}

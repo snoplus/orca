@@ -31,6 +31,208 @@
 #define kNumSIS3316Groups			4
 #define kNumSIS3316ChansPerGroup	4
 
+enum {
+    kControlStatusReg,
+    kModuleIDReg,
+    kInterruptConfigReg ,
+    kInterruptControlReg,
+    kInterfacArbCntrStatusReg,
+    kCBLTSetupReg,
+    kInternalTestReg,
+    kHWVersionReg,
+    
+    kNumberOfVMEFPGAInterfaceRegisters //must be last
+};
+enum {
+    kTemperatureReg,
+    k1WireEEPROMcontrolReg,
+    kSerialNumberReg,
+    kDataTransferSpdSettingReg,
+    
+    kAdcFPGAsBootControllerReg,
+    kSpiFlashControlStatusReg,
+    kSpiFlashData,
+    kReservedforPROMReg,
+    
+    kAdcClockI2CReg,
+    kMgt1ClockI2CReg,
+    kMgt2ClockI2CReg,
+    kDDR3ClockI2CReg,
+    
+    kAdcSampleClockDistReg,
+    kExtNIMClockMulSpiReg,
+    kFPBusControlReg,
+    kNimInControlReg,
+    
+    kAcqControlStatusReg,
+    kTrigCoinLUTControlReg,
+    kTrigCoinLUTAddReg,
+    kTrigCoinLUTDataReg,
+    
+    kLemoOutCOSelectReg,
+    kLemoOutTOSelectReg,
+    kLemoOutUOSelectReg,
+    kIntTrigFeedBackSelReg,
+    
+    kAdcCh1_Ch4DataCntrReg,
+    kAdcCh5_Ch8DataCntrReg,
+    kAdcCh9_Ch12DataCntrReg,
+    kAdcCh13_Ch16DataCntrReg,
+    
+    kAdcCh1_Ch4DataStatusReg,
+    kAdcCh5_Ch8DataStatusReg,
+    kAdcCh9_Ch12DataStatusReg,
+    kAdcCh13_Ch16DataStatusReg,
+    
+    kAdcDataLinkStatusReg,
+    kAdcSpiBusyStatusReg,
+    kPrescalerOutDivReg,
+    kPrescalerOutLenReg,
+    
+    kChan1TrigCounterReg,
+    kChan2TrigCounterReg,
+    kChan3TrigCounterReg,
+    kChan4TrigCounterReg,
+    
+    kChan5TrigCounterReg,
+    kChan6TrigCounterReg,
+    kChan7TrigCounterReg,
+    kChan8TrigCounterReg,
+    
+    kChan9TrigCounterReg,
+    kChan10TrigCounterReg,
+    kChan11TrigCounterReg,
+    kChan12TrigCounterReg,
+    
+    kChan13TrigCounterReg,
+    kChan14TrigCounterReg,
+    kChan15TrigCounterReg,
+    kChan16TrigCounterReg,
+    
+    kNumberOfVMEFPGARegisters
+};
+
+enum{
+    
+    kKeyResetReg,
+    kKeyUserFuncReg,
+    
+    kKeyArmSampleLogicReg,
+    kKeyDisarmSampleLogicReg,
+    kKeyTriggerReg,
+    kKeyTimeStampClrReg,
+    
+    kKeyDisarmXArmBank1Reg,
+    kKeyDisarmXArmBank2Reg,
+    kKeyEnableBankSwapNimReg,
+    kKeyDisablePrescalerLogReg,
+    
+    kKeyPPSLatchBitClrReg,
+    kKeyResetAdcLogicReg,
+    kKeyAdcClockPllResetReg,
+    
+    kKeyAddressRegisters
+};
+
+enum{
+    
+    kAdcInputTapDelayReg,
+    kAdcGainTermCntrlReg,
+    kAdcOffsetDacCntrlReg,
+    kAdcSpiControlReg,
+    
+    kEventConfigReg,
+    kChanHeaderIdReg,
+    kEndAddressThresholdReg,
+    kActTriggerGateWindowLenReg,
+    
+    kRawDataBufferConfigReg,
+    kPileupConfigReg,
+    kPreTriggerDelayReg,
+    kAveConfigReg,
+    
+    kDataFormatConfigReg,
+    kMawTestBufferConfigReg,
+    kInternalTrigDelayConfigReg,
+    kInternalGateLenConfigReg,
+    
+    kFirTrigSetupCh1Reg,
+    kTrigThresholdCh1Reg,
+    kHiEnergyTrigThresCh1Reg,
+    
+    
+    kFirTrigSetupCh2Reg,
+    kTrigThresholdCh2Reg,
+    kHiEnergyTrigThresCh2Reg,
+    
+    
+    kFirTrigSetupCh3Reg,
+    kTrigThresholdCh3Reg,
+    kHiEnergyTrigThresCh3Reg,
+    
+    
+    kFirTrigSetupCh4Reg,
+    kTrigThresholdCh4Reg,
+    kHiEnergyTrigThresCh4Reg,
+    
+    kFirTrigSetupSumCh1Ch4Reg,
+    kTrigThreholdSumCh1Ch4Reg,
+    kHiETrigThresSumCh1Ch4Reg,
+    
+    kTrigStatCounterModeCh1Ch4Reg,
+    kPeakChargeConfigReg,
+    kExtRawDataBufConfigReg,
+    kExtEventConfigCh1Ch4Reg,
+    
+    kAccGate1ConfigReg,
+    kAccGate2ConfigReg,
+    kAccGate3ConfigReg,
+    kAccGate4ConfigReg,
+    
+    kAccGate5ConfigReg,
+    kAccGate6ConfigReg,
+    kAccGate7ConfigReg,
+    kAccGate8ConfigReg,
+    
+    kFirEnergySetupCh1Reg,
+    kFirEnergySetupCh2Reg,
+    kFirEnergySetupCh3Reg,
+    kFirEnergySetupCh4Reg,
+    
+    kEnergyHistoConfigCh1Reg,
+    kEnergyHistoConfigCh2Reg,
+    kEnergyHistoConfigCh3Reg,
+    kEnergyHistoConfigCh4Reg,
+    
+    kMawStartIndexConfigCh1Reg,
+    kMawStartIndexConfigCh2Reg,
+    kMawStartIndexConfigCh3Reg,
+    kMawStartIndexConfigCh4Reg,
+    
+    kAdcVersionReg,
+    kAdcVStatusReg,
+    kAdcOffsetReadbackReg,
+    kAdcSpiReadbackReg,
+    
+    kActualSampleCh1Reg,
+    kActualSampleCh2Reg,
+    kActualSampleCh3Reg,
+    kActualSampleCh4Reg,
+    
+    kPreviousBankSampleCh1Reg,
+    kPreviousBankSampleCh2Reg,
+    kPreviousBankSampleCh3Reg,
+    kPreviousBankSampleCh4Reg,
+    
+    kPPSTimeStampHiReg,
+    kPPSTimeStampLoReg,
+    kTestReadback01018Reg,
+    kTestReadback0101CReg,
+    
+    
+    kADCGroupRegisters
+};
+
 @interface ORSIS3316Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping,AutoTesting>
 {
   @private
@@ -331,8 +533,13 @@
 - (BOOL)			bumpRateFromDecodeStage:(short)channel;
 
 - (int) numberOfSamples;
+- (BOOL) checkRegList;
 
 #pragma mark •••Hardware Access
+- (unsigned long) interfaceRegister:(unsigned long)aRegisterIndex;
+- (unsigned long) vmeRegister:(unsigned long)aRegisterIndex;
+-(unsigned long) keyRegister:(unsigned long)aRegisterIndex;
+- (unsigned long) groupRegister:(unsigned long)aRegisterIndex  group:(int)aGroup;
 - (void) initBoard;
 - (void) writeThresholds;
 - (void) readThresholds:(BOOL)verbose;

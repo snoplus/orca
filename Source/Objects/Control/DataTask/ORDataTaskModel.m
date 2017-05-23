@@ -484,8 +484,8 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
     while([transferQueue count]){
 		[ORTimer delay:1];
 		totalTime += 1;
-		if(totalTime > 2){
-			NSLogColor([NSColor redColor], @"Continuing after data que didn't flush after 2 seconds.\n");
+		if(totalTime > 8){
+			NSLogColor([NSColor redColor], @"Continuing after data que didn't flush after 8 seconds.\n");
 			break;
 		}
 	}	
@@ -527,8 +527,8 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
     while([transferQueue count]){
 		[ORTimer delay:.1];
 		totalTime += .1;
-		if(totalTime > 4){
-			NSLogColor([NSColor redColor], @"Continuing after data que didn't flush after 2 seconds.\n");
+		if(totalTime > 8){
+			NSLogColor([NSColor redColor], @"Continuing after data que didn't flush after 8 seconds.\n");
 			break;
 		}
 	}	
@@ -545,7 +545,7 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 		timeToStopProcessThread = YES;
 		[ORTimer delay:.1];
 		totalTime += .1;
-		if(totalTime > 2){
+		if(totalTime > 4){
 			NSLogColor([NSColor redColor], @"Transfer Thread Failed to stop.....You should stop and restart ORCA!\n");
 			break;
 		}
