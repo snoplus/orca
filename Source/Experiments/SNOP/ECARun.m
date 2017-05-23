@@ -136,7 +136,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
             [previousSR_campaign release];
             [previousSRVersion_campaign release];
             eca_campaign_running = FALSE;
-            [[NSNotificationCenter defaultCenter] postNotificationName:ORECAStatusChangedNotification object: self userInfo: nil];
+            [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORECAStatusChangedNotification object: self userInfo: nil];
             return;
         }
 
@@ -159,7 +159,9 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
             [previousSR_campaign release];
             [previousSRVersion_campaign release];
             eca_campaign_running = FALSE;
-            [[NSNotificationCenter defaultCenter] postNotificationName:ORECAStatusChangedNotification object: self userInfo: nil];
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                [[NSNotificationCenter defaultCenter] postNotificationName:ORECAStatusChangedNotification object: self userInfo: nil];
+            });
             return;
         }
 
@@ -176,7 +178,9 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         [previousSRVersion_campaign release];
         eca_campaign_running = FALSE;
 
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORECAStatusChangedNotification object: self userInfo: nil];
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORECAStatusChangedNotification object: self userInfo: nil];
+        });
 
     }
 
@@ -259,7 +263,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
     NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
                               @"waiting for ECA run to finish", @"Reason",
                               nil];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object: self userInfo: userInfo];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORAddRunStateChangeWait object: self userInfo: userInfo];
 
     /*Set Thread to be cancelled. Only the thread itself can exit.
      This is done by checking the 'cancel' condition within the
@@ -330,6 +334,10 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
             else if ([ECA_type isEqualTo:@"TSLP"]) {
                 runTypeWord |= kECATSlopeRun;
             }
+            else {
+                //You should never get here
+                NSLogColor([NSColor redColor], @"ECA: Unknown ECA run type. The current run won't be flag as ECA run!");
+            }
             [aSNOPModel setRunTypeWord:runTypeWord];
         }
 
@@ -349,7 +357,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         [ECAThread release];
         ECAThread = [[NSThread alloc] initWithTarget:self selector:@selector(doECAs) object:nil];
         [ECAThread start];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORECARunStartedNotification object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORECARunStartedNotification object:self];
 
     }
 
@@ -359,7 +367,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 {
     @autoreleasepool {
 
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORECAStatusChangedNotification object: self userInfo: nil];
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORECAStatusChangedNotification object: self userInfo: nil];
 
         /* Get models */
         //MTC model
@@ -517,7 +525,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
             });
         }
 
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORECAStatusChangedNotification object: self userInfo: nil];
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORECAStatusChangedNotification object: self userInfo: nil];
 
     }//end autoreleasepool
 
@@ -841,7 +849,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 - (void) setECA_pattern:(int)aValue
 {
     ECA_pattern = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORECARunChangedNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORECARunChangedNotification object:self];
 }
 
 - (int)ECA_nsteps
@@ -857,7 +865,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 - (void)setECA_currentStep:(int)aValue
 {
     ECA_currentStep = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORECAStatusChangedNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORECAStatusChangedNotification object:self];
 }
 
 - (int)ECA_currentPoint
@@ -868,7 +876,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 - (void)setECA_currentPoint:(int)aValue
 {
     ECA_currentPoint = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORECAStatusChangedNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORECAStatusChangedNotification object:self];
 }
 
 - (int)ECA_currentDelay
@@ -879,7 +887,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 - (void)setECA_currentDelay:(double)aValue
 {
     ECA_currentDelay = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORECAStatusChangedNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORECAStatusChangedNotification object:self];
 }
 
 - (NSString*)ECA_type
@@ -894,7 +902,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         NSString* temp = ECA_type;
         ECA_type = [aValue retain];
         [temp release];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORECARunChangedNotification object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORECARunChangedNotification object:self];
     }
 }
 
@@ -906,7 +914,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 - (void) setECA_tslope_pattern:(int)aValue
 {
     ECA_tslope_pattern = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORECARunChangedNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORECARunChangedNotification object:self];
 }
 
 - (int)ECA_nevents
@@ -918,7 +926,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 {
     if(aValue <= 0) aValue = 1;
     ECA_nevents = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORECARunChangedNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORECARunChangedNotification object:self];
 }
 
 - (NSNumber*)ECA_rate
@@ -947,7 +955,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         ECA_rate = [[NSNumber alloc] initWithDouble:new_ECA_rate];
         [ECA_rate_limit release];
         [temp release];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORECARunChangedNotification object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORECARunChangedNotification object:self];
     }
 }
 
@@ -977,7 +985,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 -(void) setECA_mode:(int)aValue
 {
     ECA_mode = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORECARunChangedNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORECARunChangedNotification object:self];
 }
 
 
