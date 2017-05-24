@@ -1226,7 +1226,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     /* Reset the pedestal width. */
     [mtc setPedestalWidth:50];
     @try {
-        [mtc loadPedestalWidthToHardware];
+        [mtc loadPedWidthToHardware];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
                    @"error setting the MTCD pedestal width. error: "
@@ -1330,7 +1330,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     /* Reset the pedestal width. */
     [mtc setPedestalWidth:pedestal_width];
     @try {
-        [mtc loadPedestalWidthToHardware];
+        [mtc loadPedWidthToHardware];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
                    @"error setting the MTCD pedestal width. error: "
