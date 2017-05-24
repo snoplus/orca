@@ -1273,7 +1273,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
                                       fineDelay: [mtc fineDelay]
                                  chargePulseAmp: 0
                                   pedestalWidth: [mtc pedestalWidth]
-                                        calType: 0
+                                        calType: 5
                                      stepNumber: ((i << 4) | j)];
 
             @try {
