@@ -69,7 +69,6 @@ NSString* ORSNOPModelSRChangedNotification = @"ORSNOPModelSRChangedNotification"
 NSString* ORSNOPModelSRVersionChangedNotification = @"ORSNOPModelSRVersionChangedNotification";
 NSString* ORSNOPModelNhitMonitorChangedNotification = @"ORSNOPModelNhitMonitorChangedNotification";
 
-
 BOOL isNotRunningOrIsInMaintenance()
 {
     return (![gOrcaGlobals runInProgress] ||
@@ -96,8 +95,6 @@ debugDBPort = _debugDBPort,
 debugDBConnectionHistory = _debugDBConnectionHistory,
 debugDBIPNumberIndex = _debugDBIPNumberIndex,
 debugDBPingTask = _debugDBPingTask,
-epedDataId = _epedDataId,
-rhdrDataId = _rhdrDataId,
 smellieDBReadInProgress = _smellieDBReadInProgress,
 smellieDocUploaded = _smellieDocUploaded,
 dataHost,
@@ -176,7 +173,6 @@ tellieRunFiles = _tellieRunFiles;
     }
 
     [[NSNotificationCenter defaultCenter] postNotificationName:@"SNOPSettingsChanged" object:self];
-    
 }
 
 - (int) mtcPort
@@ -216,7 +212,6 @@ tellieRunFiles = _tellieRunFiles;
     }
 
     [[NSNotificationCenter defaultCenter] postNotificationName:@"SNOPSettingsChanged" object:self];
-
 }
 
 - (NSString *) mtcHost
@@ -234,7 +229,6 @@ tellieRunFiles = _tellieRunFiles;
     [xl3_server setPort:port];
 
     [[NSNotificationCenter defaultCenter] postNotificationName:@"SNOPSettingsChanged" object:self];
-    
 }
 
 - (int) xl3Port
@@ -266,7 +260,6 @@ tellieRunFiles = _tellieRunFiles;
     }
 
     [[NSNotificationCenter defaultCenter] postNotificationName:@"SNOPSettingsChanged" object:self];
-
 }
 
 - (NSString *) xl3Host
@@ -291,8 +284,6 @@ tellieRunFiles = _tellieRunFiles;
     [[self undoManager] disableUndoRegistration];
     [self initOrcaDBConnectionHistory];
     [self initDebugDBConnectionHistory];
-
-    [self setViewType:[decoder decodeIntForKey:@"viewType"]];
 
     //CouchDB
     self.orcaDBUserName = [decoder decodeObjectForKey:@"ORSNOPModelOrcaDBUserName"];
@@ -444,11 +435,6 @@ tellieRunFiles = _tellieRunFiles;
     [self refreshStandardRunsFromDB];
     [self enableGlobalSecurity];
     [[ORGlobal sharedGlobal] setCanQuitDuringRun:YES];
-}
-
--(void) initRunMaskHistory
-{
-    
 }
 
 - (void) initOrcaDBConnectionHistory
@@ -841,9 +827,6 @@ err:
         [self setLastRunTypeWordHex:_lastRunTypeWord]; //FIXME: revisit if we go over 32 bits
     }
 
-    [self updateRHDRSruct];
-    [self shipRHDRRecord];
-
     return;
 
 err:
@@ -942,9 +925,7 @@ err:
         [xl3 release];
 
         /* Go ahead and end the run. */
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
-        });
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORReleaseRunStateChangeWait object: self];
     }
 }
 
@@ -1018,10 +999,8 @@ err:
 
 - (void) enableGlobalSecurity
 {
-
     [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:YES] forKey:OROrcaSecurityEnabled];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGlobalSecurityStateChanged object:self userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES] forKey:OROrcaSecurityEnabled]];
-
 }
 
 // orca script helper (will come from DB)
@@ -1041,7 +1020,6 @@ err:
 - (void) updateEPEDStructWithStepNumber: (unsigned long) stepNumber
 {
     _epedStruct.stepNumber = stepNumber;
-    
 }
 
 - (void) updateEPEDStructWithNSlopePoint: (unsigned long) nTSlopePoints
@@ -1299,74 +1277,6 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 - (void) stopNhitMonitor
 {
     [nhitMonitor stop];
-}
-
-- (void) updateRHDRSruct
-{
-    //form run info
-    NSArray* runObjects = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-	if([runObjects count]){
-		ORRunModel* rc = [runObjects objectAtIndex:0];
-        _rhdrStruct.runNumber = [rc runNumber];
-        NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian] autorelease];
-        NSDateComponents *cmpStartTime = [gregorian components:
-                                                 (NSCalendarUnitYear | NSCalendarUnitMonth |  NSCalendarUnitDay |
-                                                  NSCalendarUnitHour | NSCalendarUnitMinute |NSCalendarUnitSecond)
-                                                      fromDate:[NSDate date]];
-        _rhdrStruct.date = [cmpStartTime day] + [cmpStartTime month] * 100 + [cmpStartTime year] * 10000;
-        _rhdrStruct.time = [cmpStartTime second] * 100 + [cmpStartTime minute] * 10000 + [cmpStartTime hour] * 1000000;
-	}
-
-    //svn revision
-    if (_rhdrStruct.daqCodeVersion == 0) {
-        NSFileManager* fm = [NSFileManager defaultManager];
-		NSString* svnVersionPath = [[NSBundle mainBundle] pathForResource:@"svnversion"ofType:nil];
-		NSMutableString* svnVersion = [NSMutableString stringWithString:@""];
-		if([fm fileExistsAtPath:svnVersionPath])svnVersion = [NSMutableString stringWithContentsOfFile:svnVersionPath encoding:NSASCIIStringEncoding error:nil];
-		if([svnVersion hasSuffix:@"\n"]){
-			[svnVersion replaceCharactersInRange:NSMakeRange([svnVersion length]-1, 1) withString:@""];
-		}
-        NSLog(svnVersion);
-        NSLog(svnVersionPath);
-        _rhdrStruct.daqCodeVersion = [svnVersion integerValue]; //8045:8046M -> 8045 which is desired
-    }
-    
-    _rhdrStruct.calibrationTrialNumber = 0;
-    _rhdrStruct.sourceMask = 0; // from run type document
-    _rhdrStruct.runMask = 0; // from run type document
-    _rhdrStruct.gtCrateMask = 0; // from run type document
-}
-
-- (void) shipRHDRRecord
-{
-    const unsigned char rhdr_rec_length = 20;
-    unsigned long data[rhdr_rec_length];
-    data[0] = [self rhdrDataId] | rhdr_rec_length;
-    data[1] = 0;
-    
-    data[2] = _rhdrStruct.date;
-    data[3] = _rhdrStruct.time;
-    data[4] = _rhdrStruct.daqCodeVersion;
-    data[5] = _rhdrStruct.runNumber;
-    data[6] = _rhdrStruct.calibrationTrialNumber;
-    data[7] = _rhdrStruct.sourceMask;
-    data[8] = _rhdrStruct.runMask & 0xffffffffULL;
-    data[9] = _rhdrStruct.gtCrateMask;
-    data[10] = 0;
-    data[11] = 0;
-    data[12] = _rhdrStruct.runMask >> 32;
-    data[13] = 0;
-    data[14] = 0;
-    data[15] = 0;
-    data[16] = 0;
-    data[17] = 0;
-    data[18] = 0;
-    data[19] = 0;
-    
-    NSData* pdata = [[NSData alloc] initWithBytes:data length:sizeof(long)*(rhdr_rec_length)];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:pdata];
-    [pdata release];
-    pdata = nil;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -1695,55 +1605,8 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 	} // synchronized
 }
 
-#pragma mark ¥¥¥Segment Group Methods
-- (void) makeSegmentGroups
-{
-    ORSegmentGroup* group = [[ORSegmentGroup alloc] initWithName:@"SNO+ Detector" numSegments:kNumTubes mapEntries:[self setupMapEntries:0]];
-	[self addGroup:group];
-	[group release];
-}
-
-- (int)  maxNumSegments
-{
-	return kNumTubes;
-}
-
-- (void) showDataSetForSet:(int)aSet segment:(int)index
-{ 
-	if(aSet>=0 && aSet < [segmentGroups count]){
-		ORSegmentGroup* aGroup = [segmentGroups objectAtIndex:aSet];
-		NSString* cardName = [aGroup segment:index objectForKey:@"kCardSlot"];
-		NSString* chanName = [aGroup segment:index objectForKey:@"kChannel"];
-		if(cardName && chanName && ![cardName hasPrefix:@"-"] && ![chanName hasPrefix:@"-"]){
-			ORDataSet* aDataSet = nil;
-			[[[self document] collectObjectsOfClass:NSClassFromString(@"OrcaObject")] makeObjectsPerformSelector:@selector(clearLoopChecked)];
-			NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-			if([objs count]){
-				NSArray* arrayOfHistos = [[objs objectAtIndex:0] collectConnectedObjectsOfClass:NSClassFromString(@"ORHistoModel")];
-				if([arrayOfHistos count]){
-					id histoObj = [arrayOfHistos objectAtIndex:0];
-					aDataSet = [histoObj objectForKeyArray:[NSMutableArray arrayWithObjects:@"SIS3302", @"Crate  0",
-															[NSString stringWithFormat:@"Card %2d",[cardName intValue]], 
-															[NSString stringWithFormat:@"Channel %2d",[chanName intValue]],
-															nil]];
-					
-					[aDataSet doDoubleClick:nil];
-				}
-			}
-		}
-	}
-}
-- (NSString*) dataSetNameGroup:(int)aGroup segment:(int)index
-{
-	ORSegmentGroup* theGroup = [segmentGroups objectAtIndex:aGroup];
-	
-	NSString* crateName = [theGroup segment:index objectForKey:@"kCrate"];
-	NSString* cardName  = [theGroup segment:index objectForKey:@"kCardSlot"];
-	NSString* chanName  = [theGroup segment:index objectForKey:@"kChannel"];
-	
-	return [NSString stringWithFormat:@"SIS3302,Energy,Crate %2d,Card %2d,Channel %2d",[crateName intValue],[cardName intValue],[chanName intValue]];
-}
 #pragma mark ¥¥¥Specific Dialog Lock Methods
+
 - (NSString*) experimentMapLock
 {
 	return @"SNOPMapLock";
@@ -1754,37 +1617,14 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 	return @"SNOPDetectorLock";
 }
 
-- (id) sbcLink
-{
-    NSArray* theSBCs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORVmecpuModel")];
-    //NSLog(@"Found %d SBCs.\n", theSBCs.count);
-    for(id anSBC in theSBCs)
-    {
-        return [anSBC sbcLink];
-    }
-    return nil;
-}
-
 - (NSString*) experimentDetailsLock
 {
 	return @"SNOPDetailsLock";
 }
 
-- (void) setViewType:(int)aViewType
-{
-	[[[self undoManager] prepareWithInvocationTarget:self] setViewType:aViewType];
-	viewType = aViewType;
-}
-
-- (int) viewType
-{
-	return viewType;
-}
-
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:viewType forKey:@"viewType"];
 
     //CouchDB
     [encoder encodeObject:self.orcaDBUserName forKey:@"ORSNOPModelOrcaDBUserName"];
@@ -1839,71 +1679,6 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     [encoder encodeDouble:[self nhitMonitorTimeInterval] forKey:@"nhitMonitorTimeInterval"];
 }
 
-- (NSString*) reformatSelectionString:(NSString*)aString forSet:(int)aSet
-{
-	if([aString length] == 0)return @"Not Mapped";
-	
-	NSString* finalString = @"";
-	NSArray* parts = [aString componentsSeparatedByString:@"\n"];
-	finalString = [finalString stringByAppendingString:@"\n-----------------------\n"];
-	finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Detector" parts:parts]];
-	finalString = [finalString stringByAppendingString:@"-----------------------\n"];
-	finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" CardSlot" parts:parts]];
-	finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Channel" parts:parts]];
-	finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Threshold" parts:parts]];
-	finalString = [finalString stringByAppendingString:@"-----------------------\n"];
-	return finalString;
-}
-
-- (NSString*) getPartStartingWith:(NSString*)aLabel parts:(NSArray*)parts
-{
-	for(id aLine in parts){
-		if([aLine rangeOfString:aLabel].location != NSNotFound) return aLine;
-	}
-	return @"";
-}
-
-#pragma mark ¥¥¥DataTaker
-- (void) setDataIds:(id)assigner
-{
-    [self setRhdrDataId:[assigner assignDataIds:kLongForm]];
-    [self setEpedDataId:[assigner assignDataIds:kLongForm]];
-}
-
-- (void) syncDataIdsWith:(id)anotherObj
-{
-	[self setRhdrDataId:[anotherObj rhdrDataId]];
-	[self setEpedDataId:[anotherObj epedDataId]];
-}
-
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"SNOPModel"];
-}
-
-- (NSDictionary*) dataRecordDescription
-{
-	NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
-	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 @"SNOPDecoderForRHDR", @"decoder",
-                                 [NSNumber numberWithLong:[self rhdrDataId]], @"dataId",
-                                 [NSNumber numberWithBool:NO],	@"variable",
-                                 [NSNumber numberWithLong:20], @"length",
-                                 nil];
-	[dataDictionary setObject:aDictionary forKey:@"snopRhdrBundle"];
-    
-	NSDictionary* bDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 @"SNOPDecoderForEPED", @"decoder",
-                                 [NSNumber numberWithLong:[self epedDataId]], @"dataId",
-                                 [NSNumber numberWithBool:NO], @"variable",
-                                 [NSNumber numberWithLong:11], @"length",
-                                 nil];
-	[dataDictionary setObject:bDictionary forKey:@"snopEpedBundle"];
-    
-	return dataDictionary;
-}
-
-
 #pragma mark ¥¥¥SnotDbDelegate
 
 - (ORCouchDB*) orcaDbRef:(id)aCouchDelegate
@@ -1922,8 +1697,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 }
 
 - (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
- {
-
+{
      ORCouchDB* result = [ORCouchDB couchHost:self.orcaDBIPAddress
                                          port:self.orcaDBPort
                                      username:self.orcaDBUserName
@@ -1952,9 +1726,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     return [[result retain] autorelease];
 }
 
-
 #pragma mark ¥¥¥OrcaScript helpers
-
 
 - (void) zeroPedestalMasks
 {
@@ -1962,17 +1734,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
      makeObjectsPerformSelector:@selector(zeroPedestalMasks)];
 }
 
-- (void) updatePedestalMasks:(unsigned int)pattern
-{
-    
-    unsigned int** pt_step = (unsigned int**) pattern;
-    NSLog(@"aaa 0x%08x\n", pt_step);
-    
-    //unsigned int* pt_step_crate = pt_step[0];
-    
-}
-
-- (void)hvMasterTriggersOFF
+- (void) hvMasterTriggersOFF
 {
     [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(setIsPollingXl3:) withObject:NO];
 
@@ -2152,7 +1914,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     lastStandardRunType = [aValue copy];
 }
 
-- (NSString*)lastStandardRunVersion
+- (NSString*) lastStandardRunVersion
 {
     return lastStandardRunVersion;
 }
@@ -2163,7 +1925,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     lastStandardRunVersion = [aValue copy];
 }
 
-- (NSNumber*)standardRunTableVersion
+- (NSNumber*) standardRunTableVersion
 {
     return standardRunTableVersion;
 }
@@ -2174,20 +1936,18 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     standardRunTableVersion = [aValue copy];
 }
 
-- (ECARun*) anECARun{
+- (ECARun*) anECARun
+{
     return anECARun;
 }
 
 - (void) startECARunInParallel
 {
-
     [anECARun start];
-
 }
 
--(BOOL) startStandardRun:(NSString*)_standardRun withVersion:(NSString*)_standardRunVersion
+- (BOOL) startStandardRun:(NSString*)_standardRun withVersion:(NSString*)_standardRunVersion
 {
-
     /* Get RC model */
     ORRunModel *aRunModel = nil;
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
@@ -2228,13 +1988,10 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     }
 
     return true;
-
 }
 
-
--(void) stopRun
+- (void) stopRun
 {
-
     ORRunModel *aRunModel = nil;
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if ([objs count]) {
@@ -2246,10 +2003,9 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 
     [aRunModel quitSelectedRunScript];
     [aRunModel performSelector:@selector(haltRun)withObject:nil afterDelay:.1];
-
 }
 
--(BOOL) refreshStandardRunsFromDB
+- (BOOL) refreshStandardRunsFromDB
 {
     // Prune the Standard Runs collection
     [standardRunCollection removeAllObjects];
@@ -2353,7 +2109,7 @@ err:
 }
 
 // Load Detector Settings from the DB into the Models
--(BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion
+- (BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion
 {
     NSMutableDictionary* runSettings = [[[self standardRunCollection] objectForKey:runTypeName] objectForKey:runVersion];
     if(runSettings == nil){
@@ -2407,7 +2163,7 @@ err:
 }
 
 //Save MTC settings in a Standard Run table in CouchDB for later use by the Run Scripts or the user
--(BOOL) saveStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion
+- (BOOL) saveStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion
 {
     // Check that runTypeName is properly set:
     if (runTypeName == nil || runVersion == nil) {
@@ -2469,9 +2225,8 @@ err:
 }
 
 //Ship GUI settings to hardware
--(void) loadSettingsInHW
+- (void) loadSettingsInHW
 {
-
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     ORMTCModel* mtc;
     if ([objs count]) {
@@ -2493,56 +2248,6 @@ err:
     }
     
     NSLog(@"Settings loaded in Hardware \n");
-
 }
 
-@end
-@implementation SNOPDecoderForRHDR
-
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
-{
-	unsigned long* ptr = (unsigned long*)someData;
-	unsigned long length = ExtractLength(*ptr);
-	return length; //must return number of bytes processed.
-}
-
-- (NSString*) dataRecordDescription:(unsigned long*)dataPtr
-{
-    NSMutableString* dsc = [NSMutableString stringWithFormat: @"RHDR record\n\n"];
-    
-    [dsc appendFormat:@"date: %ld\n", dataPtr[2]];
-    [dsc appendFormat:@"time: %ld\n", dataPtr[3]];
-    [dsc appendFormat:@"daq ver: %ld\n", dataPtr[4]];
-    [dsc appendFormat:@"run num: %ld\n", dataPtr[5]];
-    [dsc appendFormat:@"calib trial: %ld\n", dataPtr[6]];
-    [dsc appendFormat:@"src msk: 0x%08lx\n", dataPtr[7]];
-    [dsc appendFormat:@"run msk: 0x%016llx\n", (unsigned long long)(dataPtr[8] | (((unsigned long long)dataPtr[12]) << 32))];
-    [dsc appendFormat:@"crate mask: 0x%08lx\n", dataPtr[9]];
-    
-    return [[dsc retain] autorelease];
-}
-@end
-
-@implementation SNOPDecoderForEPED
-
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
-{
-	unsigned long* ptr = (unsigned long*)someData;
-	unsigned long length = ExtractLength(*ptr);
-	return length; //must return number of bytes processed.
-}
-
-- (NSString*) dataRecordDescription:(unsigned long*)dataPtr
-{
-    NSMutableString* dsc = [NSMutableString stringWithFormat: @"EPED record\n\n"];
-
-    [dsc appendFormat:@"coarse delay: %ld nsec\n", dataPtr[3]];
-    [dsc appendFormat:@"fine delay: %ld clicks\n", dataPtr[4]];
-    [dsc appendFormat:@"charge amp: %ld clicks\n", dataPtr[5]];
-    [dsc appendFormat:@"ped width: %ld nsec\n", dataPtr[2]];
-    [dsc appendFormat:@"cal type: 0x%08lx\n", dataPtr[7]];
-    [dsc appendFormat:@"step num: %ld\n", dataPtr[6]];
-    
-    return [[dsc retain] autorelease];
-}
 @end
