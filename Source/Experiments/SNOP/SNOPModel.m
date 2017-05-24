@@ -1092,6 +1092,32 @@ err:
         }
     }
 }
+
+- (void) shipEPEDStructWithCoarseDelay: (unsigned long) coarseDelay
+                             fineDelay: (unsigned long) fineDelay
+                        chargePulseAmp: (unsigned long) chargePulseAmp
+                         pedestalWidth: (unsigned long) pedestalWidth
+                               calType: (unsigned long) calType
+                            stepNumber: (unsigned long) stepNumber
+{
+    if ([[ORGlobal sharedGlobal] runInProgress]) {
+        @try {
+            [mtc_server okCommand:"send_eped_record %d %d %d %d %d %d %d",
+                pedestalWidth,
+                coarseDelay,
+                fineDelay,
+                chargePulseAmp, /* qinj_dacsetting */
+                stepNumber, /* half crate id? */
+                calType,
+                0 /* flags */
+            ];
+        } @catch (NSException *e) {
+            NSLogColor([NSColor redColor], @"failed to send EPED record: %@ \n",
+                       [e reason]);
+        }
+    }
+}
+
 - (void) shipEPEDRecord
 {
     /* Sends a command to the MTC server to ship an EPED record to the data
@@ -1175,100 +1201,88 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 
     pulser_rate = [mtc pgtRate];
 
-    dispatch_sync(dispatch_get_main_queue(), ^{
-        /* Set the coarse delay. */
-        [mtc setCoarseDelay:250];
-        @try {
-            [mtc loadCoarseDelayToHardware];
-        } @catch (NSException *e) {
-            NSLogColor([NSColor redColor],
-                       @"error setting the MTCD coarse delay. error: "
-                        "%@ reason: %@\n", [e name], [e reason]);
-            return;
-        }
+    /* Set the coarse delay. */
+    [mtc setCoarseDelay:250];
+    @try {
+        [mtc loadCoarseDelayToHardware];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"error setting the MTCD coarse delay. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+        return;
+    }
 
-        /* Set the fine delay. */
-        [mtc setFineDelay:0];
-        @try {
-            [mtc loadFineDelayToHardware];
-        } @catch (NSException *e) {
-            NSLogColor([NSColor redColor],
-                       @"error setting the MTCD fine delay. error: "
-                        "%@ reason: %@\n", [e name], [e reason]);
-            return;
-        }
+    /* Set the fine delay. */
+    [mtc setFineDelay:0];
+    @try {
+        [mtc loadFineDelayToHardware];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"error setting the MTCD fine delay. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+        return;
+    }
 
-        /* Reset the pedestal width. */
-        [mtc setPedestalWidth:50];
-        @try {
-            [mtc loadPedestalWidthToHardware];
-        } @catch (NSException *e) {
-            NSLogColor([NSColor redColor],
-                       @"error setting the MTCD pedestal width. error: "
-                        "%@ reason: %@\n", [e name], [e reason]);
-            return;
-        }
-    });
-
-    dispatch_sync(dispatch_get_main_queue(), ^{
-        [self updateEPEDStructWithCoarseDelay: [mtc coarseDelay]
-                                    fineDelay: [mtc fineDelay]
-                               chargePulseAmp: 0
-                                pedestalWidth: [mtc pedestalWidth]
-                                      calType: 0];
-    });
+    /* Reset the pedestal width. */
+    [mtc setPedestalWidth:50];
+    @try {
+        [mtc loadPedestalWidthToHardware];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"error setting the MTCD pedestal width. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+        return;
+    }
 
     /* Enable all pedestals for each crate, and then fire a single pedestal
      * pulse. */
     for (i = 0; i < [xl3s count]; i++) {
         xl3 = [xl3s objectAtIndex:i];
 
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            /* Enable all crates in the MTCD pedestal mask. */
-            [mtc setPedCrateMask:1 << [xl3 crateNumber]];
+        /* Enable all crates in the MTCD pedestal mask. */
+        [mtc setPedCrateMask:1 << [xl3 crateNumber]];
 
-            @try {
-                [mtc loadPedestalCrateMaskToHardware];
-            } @catch (NSException *e) {
-                NSLogColor([NSColor redColor],
-                           @"error setting the MTCD crate pedestal mask. error: "
-                            "%@ reason: %@\n", [e name], [e reason]);
-                continue;
-            }
-        });
+        @try {
+            [mtc loadPedestalCrateMaskToHardware];
+        } @catch (NSException *e) {
+            NSLogColor([NSColor redColor],
+                       @"error setting the MTCD crate pedestal mask. error: "
+                        "%@ reason: %@\n", [e name], [e reason]);
+            continue;
+        }
 
         if (![[xl3 xl3Link] isConnected]) continue;
 
         for (j = 0; j < 16; j++) {
             if (!([xl3 getSlotsPresent] & (1 << j))) continue;
 
-            dispatch_sync(dispatch_get_main_queue(), ^{
-                if ([xl3 setPedestalMask:(1 << j) pattern:0xffffffff]) {
-                    NSLogColor([NSColor redColor],
-                               @"failed to set pedestal mask for crate %02d slot %02d\n", i, j);
-                    continue;
-                }
+            if ([xl3 setPedestalMask:(1 << j) pattern:0xffffffff]) {
+                NSLogColor([NSColor redColor],
+                           @"failed to set pedestal mask for crate %02d slot %02d\n", i, j);
+                continue;
+            }
 
-                /* The crate and slot are encoded in the step number or
-                 * half_crate_id field. For example, to unpack the crate and
-                 * slot:
-                 *
-                 *     crate = (eped_record.half_crate_id >> 4) & 0xff;
-                 *     slot = eped_record.half_crate_id & 0xf;
-                 */
-                [self updateEPEDStructWithStepNumber: (i << 4) | j];
+            /* The crate and slot are encoded in the step number or
+             * half_crate_id field. For example, to unpack the crate and
+             * slot:
+             *
+             *     crate = (eped_record.half_crate_id >> 4) & 0xff;
+             *     slot = eped_record.half_crate_id & 0xf;
+             */
+            [self shipEPEDStructWithCoarseDelay: [mtc coarseDelay]
+                                      fineDelay: [mtc fineDelay]
+                                 chargePulseAmp: 0
+                                  pedestalWidth: [mtc pedestalWidth]
+                                        calType: 0
+                                     stepNumber: ((i << 4) | j)];
 
-                /* Tell the MTC server to send the EPED record. */
-                [self shipEPEDRecord];
-
-                @try {
-                    [mtc firePedestals:1 withRate:1];
-                } @catch (NSException *e) {
-                    NSLogColor([NSColor redColor],
-                               @"failed to fire pedestal. error: %@ reason: %@\n",
-                               [e name], [e reason]);
-                }
-            });
+            @try {
+                [mtc firePedestals:1 withRate:1];
+            } @catch (NSException *e) {
+                NSLogColor([NSColor redColor],
+                           @"failed to fire pedestal. error: %@ reason: %@\n",
+                           [e name], [e reason]);
+            }
         }
 
         NSLog(@"PING crate %02d\n", i);
@@ -1279,64 +1293,60 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         xl3 = [xl3s objectAtIndex:i];
 
         if ([[xl3 xl3Link] isConnected]) {
-            dispatch_sync(dispatch_get_main_queue(), ^{
-                [xl3 setPedestals];
-            });
+            [xl3 setPedestals];
         }
     }
 
-    dispatch_sync(dispatch_get_main_queue(), ^{
-        /* Reset the crate pedestal all crates in the MTCD pedestal mask. */
-        [mtc setPedCrateMask:crate_pedestal_mask];
-        @try {
-            [mtc loadPedestalCrateMaskToHardware];
-        } @catch (NSException *e) {
-            NSLogColor([NSColor redColor],
-                       @"error setting the MTCD crate pedestal mask. error: "
-                        "%@ reason: %@\n", [e name], [e reason]);
-        }
+    /* Reset the crate pedestal all crates in the MTCD pedestal mask. */
+    [mtc setPedCrateMask:crate_pedestal_mask];
+    @try {
+        [mtc loadPedestalCrateMaskToHardware];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"error setting the MTCD crate pedestal mask. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+    }
 
-        /* Reset the coarse delay. */
-        [mtc setCoarseDelay:coarse_delay];
-        @try {
-            [mtc loadCoarseDelayToHardware];
-        } @catch (NSException *e) {
-            NSLogColor([NSColor redColor],
-                       @"error setting the MTCD coarse delay. error: "
-                        "%@ reason: %@\n", [e name], [e reason]);
-        }
+    /* Reset the coarse delay. */
+    [mtc setCoarseDelay:coarse_delay];
+    @try {
+        [mtc loadCoarseDelayToHardware];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"error setting the MTCD coarse delay. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+    }
 
-        /* Reset the fine delay. */
-        [mtc setFineDelay:fine_delay];
-        @try {
-            [mtc loadFineDelayToHardware];
-        } @catch (NSException *e) {
-            NSLogColor([NSColor redColor],
-                       @"error setting the MTCD fine delay. error: "
-                        "%@ reason: %@\n", [e name], [e reason]);
-        }
+    /* Reset the fine delay. */
+    [mtc setFineDelay:fine_delay];
+    @try {
+        [mtc loadFineDelayToHardware];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"error setting the MTCD fine delay. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+    }
 
-        /* Reset the pedestal width. */
-        [mtc setPedestalWidth:pedestal_width];
-        @try {
-            [mtc loadPedestalWidthToHardware];
-        } @catch (NSException *e) {
-            NSLogColor([NSColor redColor],
-                       @"error setting the MTCD pedestal width. error: "
-                        "%@ reason: %@\n", [e name], [e reason]);
-        }
+    /* Reset the pedestal width. */
+    [mtc setPedestalWidth:pedestal_width];
+    @try {
+        [mtc loadPedestalWidthToHardware];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"error setting the MTCD pedestal width. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+    }
 
-        /* Reset the pulser rate since the firePedestals function sets the pulser
-         * rate to 0. */
-        @try {
-            [mtc setPgtRate:pulser_rate];
-            [mtc loadPulserRateToHardware];
-        } @catch (NSException *e) {
-            NSLogColor([NSColor redColor],
-                       @"error setting the pulser rate. error: "
-                        "%@ reason: %@\n", [e name], [e reason]);
-        }
-    });
+    /* Reset the pulser rate since the firePedestals function sets the pulser
+     * rate to 0. */
+    @try {
+        [mtc setPgtRate:pulser_rate];
+        [mtc loadPulserRateToHardware];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"error setting the pulser rate. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+    }
 }
 
 - (void) pingCrates
