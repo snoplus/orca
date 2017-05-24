@@ -70,6 +70,7 @@ typedef NS_OPTIONS(uint32_t, TRIG_MASK)
     Smellie = 1<<23,
     GT = 1<<24
 };
+
 struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of TUBii's state at once.
     float smellieRate;
     float tellieRate;
@@ -94,6 +95,32 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
     CONTROL_REG_MASK controlReg;
     BOOL CounterMode;
 };
+
+NSString *TubiiStateKeys[] = { //Needs to be in order wrt the TUBiiState struct above
+    @"smellieRate",
+    @"tellieRate",
+    @"pulserRate",
+    @"smelliePulseWidth",
+    @"telliePulseWidth",
+    @"pulserPulseWidth",
+    @"smellieNPulses",
+    @"tellieNPulses",
+    @"pulserNPulses",
+    @"tellieDelay",
+    @"smellieDelay",
+    @"genericDelay",
+    @"CaenChannelMask",
+    @"CaenGainMask",
+    @"DGT_Bits",
+    @"LO_Bits",
+    @"speakerMask",
+    @"counterMask",
+    @"syncTrigMask",
+    @"asyncTrigMask",
+    @"controlReg",
+    @"CounterMode"
+};
+
 @interface TUBiiModel : OrcaObject{
     float smellieRate;
     float tellieRate;

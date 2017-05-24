@@ -726,6 +726,7 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
     [self setCounterMode: aState.CounterMode];
     [self setControlReg: aState.controlReg];
 }
+
 - (struct TUBiiState) CurrentState {
     // Returns a struct that that is a static representation of
     // TUBii's static.
@@ -756,6 +757,15 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
     aState.CounterMode = [self CounterMode];
     aState.controlReg = [self controlReg];
     return aState;
+}
+
+- (NSDictionary*) CurrentStateToDict {
+
+    //Manually add struct elements to dictionary. Iterating over elements of different
+    //type seems a pain, so do it this way.
+    NSDictionary* TubiiStateDict = [NSDictionary dictionary];
+    [TubiiStateDict setObject:[self CurrentState].smellieRate forKey:TubiiStateKeys[0]];
+
 }
 
 //////////////////////////////////////////
