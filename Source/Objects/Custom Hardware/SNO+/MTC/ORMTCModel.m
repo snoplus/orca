@@ -673,8 +673,12 @@ tubRegister;
 
 - (void) setGtMask:(uint32_t)_mask
 {
-    gtMask = _mask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCGTMaskChanged object:self];
+    @synchronized(self) {
+        if (gtMask != _mask) {
+            gtMask = _mask;
+            [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORMTCGTMaskChanged object:self];
+        }
+    }
 }
 
 - (uint32_t) gtMask
@@ -684,8 +688,12 @@ tubRegister;
 
 - (void) setPgtRate:(float)rate
 {
-    pgtRate = rate;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCPulserRateChanged object:self];
+    @synchronized(self) {
+        if (pgtRate != rate) {
+            pgtRate = rate;
+            [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORMTCPulserRateChanged object:self];
+        }
+    }
 }
 
 - (float) pgtRate
@@ -700,9 +708,11 @@ tubRegister;
 
 - (void) setCoarseDelay:(int) delay
 {
-    if (coarseDelay != delay) {
-        coarseDelay = delay;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCSettingsChanged object:self];
+    @synchronized(self) {
+        if (coarseDelay != delay) {
+            coarseDelay = delay;
+            [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORMTCSettingsChanged object:self];
+        }
     }
 }
 
@@ -713,16 +723,22 @@ tubRegister;
 
 - (void) setFineDelay:(int)delay
 {
-    if (fineDelay != delay) {
-        fineDelay = delay;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCSettingsChanged object:self];
+    @synchronized(self) {
+        if (fineDelay != delay) {
+            fineDelay = delay;
+            [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORMTCSettingsChanged object:self];
+        }
     }
 }
 
 - (void) setPrescaleValue:(uint16_t)newVal
 {
-    prescaleValue = newVal;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCSettingsChanged object:self];
+    @synchronized(self) {
+        if (prescaleValue != newVal) {
+            prescaleValue = newVal;
+            [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORMTCSettingsChanged object:self];
+        }
+    }
 }
 
 - (uint16_t) prescaleValue
@@ -844,9 +860,11 @@ tubRegister;
 
 - (void) setLockoutWidth:(uint16_t)width
 {
-    if (lockoutWidth != width) {
-        lockoutWidth = width;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCSettingsChanged object:self];
+    @synchronized(self) {
+        if (lockoutWidth != width) {
+            lockoutWidth = width;
+            [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORMTCSettingsChanged object:self];
+        }
     }
 }
 
@@ -857,9 +875,11 @@ tubRegister;
 
 - (void) setPedestalWidth:(uint16_t) width
 {
-    if (pedestalWidth != width) {
-        pedestalWidth = width;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCSettingsChanged object:self];
+    @synchronized(self) {
+        if (pedestalWidth != width) {
+            pedestalWidth = width;
+            [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORMTCSettingsChanged object:self];
+        }
     }
 }
 
@@ -870,9 +890,11 @@ tubRegister;
 
 - (void) setGTCrateMask:(uint32_t)mask
 {
-    if (GTCrateMask != mask) {
-        GTCrateMask = mask;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCSettingsChanged object:self];
+    @synchronized(self) {
+        if (GTCrateMask != mask) {
+            GTCrateMask = mask;
+            [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORMTCSettingsChanged object:self];
+        }
     }
 }
 
@@ -883,9 +905,11 @@ tubRegister;
 
 - (void) setPedCrateMask:(uint32_t)mask
 {
-    if (pedCrateMask != mask) {
-        pedCrateMask = mask;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCSettingsChanged object:self];
+    @synchronized(self) {
+        if (pedCrateMask != mask) {
+            pedCrateMask = mask;
+            [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORMTCSettingsChanged object:self];
+        }
     }
 }
 
