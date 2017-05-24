@@ -68,7 +68,8 @@ NSString* ORSNOPModelSRCollectionChangedNotification = @"ORSNOPModelSRCollection
 NSString* ORSNOPModelSRChangedNotification = @"ORSNOPModelSRChangedNotification";
 NSString* ORSNOPModelSRVersionChangedNotification = @"ORSNOPModelSRVersionChangedNotification";
 NSString* ORSNOPModelNhitMonitorChangedNotification = @"ORSNOPModelNhitMonitorChangedNotification";
-
+NSString* ORStillWaitingForBuffersNotification = @"ORStillWaitingForBuffersNotification";
+NSString* ORNotWaitingForBuffersNotification = @"ORNotWaitingForBuffersNotification";
 
 BOOL isNotRunningOrIsInMaintenance()
 {
@@ -904,10 +905,13 @@ err:
                                   nil];
         [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object: self userInfo: userInfo];
 
+        waitingFlag = true;
         /* detach a thread to monitor XL3/CAEN/MTC buffers */
         [NSThread detachNewThreadSelector:@selector(_waitForBuffers)
                                  toTarget:self
                                withObject:nil];
+        // post a modal dialog after 1 sec if the buffers haven't cleared yet
+        [self performSelector:@selector(stillWaitingForBuffers) withObject:nil afterDelay:1];
         break;
     default:
         break;
@@ -917,6 +921,13 @@ err:
 
 err:
     state = RUNNING;
+}
+
+- (void) stillWaitingForBuffers
+{
+    if (waitingFlag) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORStillWaitingForBuffersNotification object:self];
+    }
 }
 
 - (void) _waitForBuffers
@@ -940,6 +951,8 @@ err:
 
         [mtc release];
         [xl3 release];
+        waitingFlag = false;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORNotWaitingForBuffersNotification object:self];
 
         /* Go ahead and end the run. */
         dispatch_sync(dispatch_get_main_queue(), ^{

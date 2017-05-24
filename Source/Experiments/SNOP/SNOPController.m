@@ -79,6 +79,8 @@ snopBlackColor,
 snopGrayColor,
 snopGreenColor;
 
+static NSAlert *sWaitingForBuffersAlert = nil;
+
 #pragma mark ¥¥¥Initialization
 -(id)init
 {
@@ -458,6 +460,11 @@ snopGreenColor;
                      selector : @selector(nhitMonitor:)
                          name : ORNhitMonitorNotification
                         object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(stillWaitingForBuffers:)
+                         name : ORStillWaitingForBuffersNotification
+                        object: nil];
 }
 
 - (void) updateWindow
@@ -820,6 +827,29 @@ err:
 - (void) dbDebugDBIPChanged:(NSNotification*)aNote
 {
     [debugDBIPAddressPU setStringValue:[model debugDBIPAddress]];
+}
+
+- (void) stillWaitingForBuffers:(NSNotification*)aNote
+{
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSString* s = [NSString stringWithFormat:@"Waiting for buffers to empty..."];
+    sWaitingForBuffersAlert = [[[NSAlert alloc] init] autorelease];
+    [sWaitingForBuffersAlert setMessageText:s];
+    [sWaitingForBuffersAlert addButtonWithTitle:@"Cancel"];
+    [sWaitingForBuffersAlert setAlertStyle:NSInformationalAlertStyle];
+    [sWaitingForBuffersAlert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn) {
+            // cancel waiting for buffers to clear and force run to end
+            [runControl abortRunFromWait];
+            sWaitingForBuffersAlert = nil;
+        }
+    }];
+#endif
+}
+
+- (void) notWaitingForBuffers:(NSNotification*)aNote
+{
+    sWaitingForBuffersAlert = nil;
 }
 
 - (void) hvStatusChanged:(NSNotification*)aNote

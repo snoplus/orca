@@ -148,6 +148,7 @@ BOOL isNotRunningOrIsInMaintenance();
     int state;
     int start;
     bool resync;
+    bool waitingFlag;   // flag indicates we are waiting for our buffers to empty
 
     @private
         //Run type word
@@ -258,6 +259,7 @@ BOOL isNotRunningOrIsInMaintenance();
 - (void) shipEPEDRecord;
 - (void) updateRHDRSruct;
 - (void) shipRHDRRecord;
+- (void) stillWaitingForBuffers;
 
 #pragma mark ¥¥¥Accessors
 - (NHitMonitor *) nhitMonitor;
@@ -369,3 +371,5 @@ extern NSString* ORSNOPModelSRCollectionChangedNotification;
 extern NSString* ORSNOPModelSRChangedNotification;
 extern NSString* ORSNOPModelSRVersionChangedNotification;
 extern NSString* ORSNOPModelNhitMonitorChangedNotification;
+extern NSString* ORStillWaitingForBuffersNotification;
+extern NSString* ORNotWaitingForBuffersNotification;
