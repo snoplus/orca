@@ -465,6 +465,7 @@ static IpeRegisterNamesStruct regKatrinSLTV4[kKatrinV4SLTNumRegs] = {
 //- (void)		loadPulserValues;
 //- (void)		swTrigger;
 - (void)		initBoard;
+- (void)		initBoard:(BOOL)quickStart;
 - (void)		autoCalibrate;
 - (long)		getSBCCodeVersion;
 - (long)		getFdhwlibVersion;

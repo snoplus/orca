@@ -234,6 +234,19 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     [_smellieLaserToInputFibreMapping release];
     [_smellieFibreSwitchToFibreMapping release];
     [_smellieConfigVersionNo release];
+    
+    [_tellieRunNames release];
+    [_interlockPort release];
+    [_tellieHost release];
+    [_tellieThread release];
+    [_telliePort release];
+    [_interlockClient release];
+    [_smellieHost release];
+    [_smellieThread release];
+    [_tellieNodeMapping release];
+    [_smelliePort release];
+    [_interlockHost release];
+    
     [super dealloc];
 }
 
@@ -459,6 +472,11 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
      to avoid pushing too much current through individual channels / trigger sums. Use a
      loglog curve to define what counts as detector safe.
      */
+    
+    /*
+     Currently the predicted nPhotons does not correlate with reality so this check is defunct.
+     it might be worth adding it back eventually once our understanding has improved. For now
+     make do with a simple rate check (below).
     float safe_gradient = -1;
     float safe_intercept = 1.05e6;
     float max_photons = safe_intercept*pow(frequency, safe_gradient);
@@ -467,6 +485,10 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     } else {
         return YES;
     }
+     */
+    if(frequency > 1.01e3)
+        return NO;
+    return YES;
 }
 
 -(NSString*)calcTellieFibreForNode:(NSUInteger)node{
@@ -1093,6 +1115,7 @@ err:
      variables and push up to the telliedb. Additionally, the run doc dictionary set as
      the tellieRunDoc propery, to be updated later in the run.
      */
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:10];
     
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
@@ -1117,12 +1140,7 @@ err:
     [self setTellieRunDoc:runDocDict];
 
     [[self couchDBRef:self withDB:@"telliedb"] addDocument:runDocDict tag:kTellieRunDocumentAdded];
-
-    //wait for main thread to receive acknowledgement from couchdb
-    NSDate* timeout = [NSDate dateWithTimeIntervalSinceNow:2.0];
-    while ([timeout timeIntervalSinceNow] > 0 && ![[self tellieRunDoc] objectForKey:@"_id"]) {
-        [NSThread sleepForTimeInterval:0.1];
-    }
+    [pool release];
 }
 
 - (void) updateTellieRunDocument:(NSDictionary*)subRunDoc
@@ -1133,7 +1151,7 @@ err:
      Arguments:
      NSDictionary* subRunDoc:  Subrun information to be added to the current [self tellieRunDoc].
      */
-    
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     // Get run control
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
@@ -1161,9 +1179,7 @@ err:
          documentId:[runDocDict objectForKey:@"_id"]
          tag:kTellieRunDocumentUpdated];
     }
-    [subRunInfo release];
-    [runDocDict release];
-    [subRunDocDict release];
+    [pool release];
 }
 
 -(void) loadTELLIEStaticsFromDB
@@ -1174,7 +1190,8 @@ err:
      fibreMapping and nodeMapping documents. The data is then saved to the member variables
      tellieFireParameters, tellieFibreMapping and tellieNodeMapping.
      */
-    
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+
     //Set all to be nil
     [self setTellieFireParameters:nil];
     [self setTellieFibreMapping:nil];
@@ -1189,6 +1206,7 @@ err:
     [[self couchDBRef:self withDB:@"telliedb"] getDocumentId:mapString tag:kTellieMapRetrieved];
     [[self couchDBRef:self withDB:@"telliedb"] getDocumentId:nodeString tag:kTellieNodeRetrieved];
     [self loadTELLIERunPlansFromDB];
+    [pool release];
 }
 
 -(void) loadTELLIERunPlansFromDB
@@ -2063,6 +2081,7 @@ err:
      variables and push up to the smelliedb. Additionally, the run doc dictionary set as
      the tellieRunDoc propery, to be updated later in the run.
      */
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:10];
 
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
@@ -2096,12 +2115,7 @@ err:
     [self setSmellieRunDoc:runDocDict];
 
     [[self couchDBRef:self withDB:@"smellie"] addDocument:runDocDict tag:kSmellieRunDocumentAdded];
-
-    //wait for main thread to receive acknowledgement from couchdb
-    NSDate* timeout = [NSDate dateWithTimeIntervalSinceNow:5.0];
-    while ([timeout timeIntervalSinceNow] > 0 && ![runDocDict objectForKey:@"_id"]) {
-        [NSThread sleepForTimeInterval:0.1];
-    }
+    [pool release];
 }
 
 - (void) updateSmellieRunDocument:(NSDictionary*)subRunDoc
@@ -2112,6 +2126,7 @@ err:
      Arguments:
      NSDictionary* subRunDoc:  Subrun information to be added to the current [self tellieRunDoc].
      */
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
         NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find ORRunModel. Please add it to the experiment and restart the run.\n");
@@ -2132,9 +2147,7 @@ err:
 
     //check to see if run is offline or not
     [[self couchDBRef:self withDB:@"smellie"] updateDocument:runDocDict documentId:[runDocDict objectForKey:@"_id"] tag:kTellieRunDocumentUpdated];
-    [subRunInfo release];
-    [runDocDict release];
-    [subRunDocDict release];
+    [pool release];
 }
 
 -(void) fetchCurrentSmellieConfig

@@ -1002,9 +1002,13 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 		NSString* aCrateName = [self crateName];
 		NSLog(@"%@  %d: reload processing done\n",aCrateName,[delegate crateNumber]);
 		[self setReloading:NO];
-        if ([sender sawErrors]) {
+        if(permissionDenied){
+            NSLogColor([NSColor redColor], @"Could not log in\n");
+        }
+        else if ([sender sawErrors]) {
             NSLogColor([NSColor redColor], @"%@: %d Errors were seen during tasks\n",aCrateName,[delegate crateNumber]);
-		} else if(compilerErrors == 0 && compilerWarnings == 0){
+		}
+        else if(compilerErrors == 0 && compilerWarnings == 0){
 			NSLog(@"%@: %d loaded and compiled without errors\n",aCrateName,[delegate crateNumber]);
 		}
 		else if(compilerErrors){
@@ -1240,11 +1244,14 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 
 - (void) taskData:(NSString*)text
 {
-    NSLog(@"%@\n",text);
+    //NSLog(@"%@\n",text);
 	if([text rangeOfString:@"error:"].location!=NSNotFound){
 		[self setCompilerErrors:compilerErrors+1];
 		NSLogColor([NSColor redColor], @"%@\n",text);
 	}
+    else if([text rangeOfString:@"Permission denied"].location!= NSNotFound){
+        permissionDenied = YES;
+    }
 	else if([text rangeOfString:@"warning"].location!=NSNotFound){
 		[self setCompilerWarnings:compilerWarnings+1];
 		NSLogColor([NSColor redColor], @"%@\n",text);
@@ -1298,12 +1305,13 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 	}
 	else {
 		[self setTryingToStartCrate:YES];
-		if(forceReload){
-			startCrateState = kReloadCode;
-		}
-		else {
-			startCrateState = kTryToConnect;
-		}
+//		if(forceReload){
+//			startCrateState = kReloadCode;
+//		}
+//		else {
+            permissionDenied = NO;
+			startCrateState = kPing;
+//		}
 		[self performSelector:@selector(startCrateProcess) withObject:self afterDelay:0];
 	}
 }
@@ -1312,7 +1320,8 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 {
 	if(!tryingTostartCrate){		
 		[self setTryingToStartCrate:YES];
-		startCrateState = kTryToConnect;
+        permissionDenied = NO;
+		startCrateState = kPing;
 		[self performSelector:@selector(startCrateProcess) withObject:self afterDelay:0];
 	}
 }
@@ -2125,7 +2134,10 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 {
 	switch(startCrateState){
 		case kIdle:				return @"";
-		case kTryToConnect:		return @"Trying to connect";
+        case kPing:             return @"Pinging";
+        case kWaitForPing:      return @"Wait for Ping";
+        case kAfterPing:        return @"Ping OK";
+        case kTryToConnect:		return @"Trying to connect";
 		case kTryToStartCode:	return @"Trying to start";
 		case kWaitingForStart:	return @"Waiting for start";
 		case kReloadCode:		return @"Reloading/Compiling";
@@ -2340,9 +2352,48 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 
 - (void) startCrateProcess
 {
+    
+    if (permissionDenied) {
+        NSLog(@"Check log-in credentials\n");
+        startCrateState = kDone;
+    }
+
 	int oldState = startCrateState;
 	switch(startCrateState){
-		case kTryToConnect:
+        case kPing:
+            NSLog(@"Trying to ping SBC\n");
+            [self pingVerbose:YES];
+            startCrateState = kWaitForPing;
+            waitCount = 0;
+            break;
+            
+        case kWaitForPing:
+            if(pingedSuccessfully){
+                NSLog(@"SBC returned ping\n");
+                startCrateState = kAfterPing;
+            }
+            else if(!pingTask){
+                NSLog(@"No communication to SBC (ping failed)\n");
+                [self setReloading:NO];
+                startCrateState = kDone;
+            }
+            else {
+                waitCount++;
+                if(waitCount > 20){
+                    waitCount = 0;
+                    NSLog(@"No communication to SBC (ping failed)\n");
+                    [self setReloading:NO];
+                    startCrateState = kDone;
+               }
+            }
+           break;
+            
+        case kAfterPing:
+            if(forceReload) startCrateState = kReloadCode;
+            else            startCrateState = kTryToConnect;
+            break;
+            
+        case kTryToConnect:
 			@try {
 				NSLog(@"Trying to connect to SBC\n");
 				[self connect]; //will throw if can't connect
@@ -2370,8 +2421,8 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 			break;
 			
 		case kWaitingForStart:
-			if(isConnected)startCrateState = kDone;
-			else if (goScriptFailed) startCrateState = kDone;
+			if(isConnected)            startCrateState = kDone;
+ 			else if (goScriptFailed)   startCrateState = kReloadCode;
 			else {
 				@try {
 					[self connect];
@@ -2389,9 +2440,9 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 			
 		case kReloadCode:
 			[self reloadClient];
-			NSLog(@"Waiting for SBC code reload\n");
-			startCrateState = kWaitingForReload;
-			waitCount = 0;
+			NSLog(@"Waiting for SBC code reload \n");
+            startCrateState = kWaitingForReload;
+            waitCount = 0;
 			break;
 			
 		case kWaitingForReload:
@@ -2401,7 +2452,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 			}
 			else {
 				waitCount++;
-				if(waitCount > 300){
+				if(waitCount > 600){
 					waitCount = 0;
 					startCrateState = kDone;
 					//failed......
@@ -2424,7 +2475,8 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 					waitCount = 0;
 					startCrateState = kDone;
 					//failed......
-					NSLog(@"Failed to connect after reload\n");
+                    if(reloading)NSLog(@"Failed to connect after reload\n");
+                    NSLog(@"Check log-in credentials\n");
 					[self setReloading:NO];
 				}
 			}

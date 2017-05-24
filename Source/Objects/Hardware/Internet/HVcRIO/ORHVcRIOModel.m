@@ -1383,7 +1383,6 @@ return;//TODO -tb-
                 NSLog(@"Received 'command:' with arguments:  \n");
                 aLine = [aLine substringFromIndex:8];
                 NSArray* theParts = [aLine componentsSeparatedByString:@","];
-                int i=0;
                 for(id aValue in theParts){
                     NSLog(@"    argument: %@\n",aValue);
 
