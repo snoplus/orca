@@ -945,4 +945,10 @@
         }
     }
 }
+
+-(void)log_error:(NSException *)e
+{
+    // Log an exception
+    NSLogColor([NSColor redColor], @"[TUBii]: RedisClient exception from TUBii server: %@\n", [e reason]);
+}
 @end

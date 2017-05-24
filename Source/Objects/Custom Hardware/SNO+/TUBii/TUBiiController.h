@@ -181,6 +181,6 @@
 - (IBAction)MTCAMimicLoadValue:(id)sender;
 - (IBAction)LoadClockSource:(id)sender;
 - (IBAction)ClockSourceMatchHardware:(id)sender;
-
+- (void)log_error:(NSException*)e;
 
 @end
