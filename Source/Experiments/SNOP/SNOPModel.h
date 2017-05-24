@@ -49,8 +49,6 @@ BOOL isNotRunningOrIsInMaintenance();
 
 @interface SNOPModel: ORExperimentModel <snotDbDelegate>
 {
-	int viewType;
-
     NSString* _orcaDBUserName;
     NSString* _orcaDBPassword;
     NSString* _orcaDBName;
@@ -229,7 +227,6 @@ BOOL isNotRunningOrIsInMaintenance();
 
 #pragma mark ⅴorcascript helpers
 - (void) zeroPedestalMasks;
-- (void) updatePedestalMasks:(unsigned int)pattern;
 - (void) hvMasterTriggersOFF;
 
 #pragma mark 짜짜짜Notifications
@@ -256,8 +253,6 @@ BOOL isNotRunningOrIsInMaintenance();
 - (void) updateEPEDStructWithStepNumber: (unsigned long) stepNumber;
 - (void) shipSubRunRecord;
 - (void) shipEPEDRecord;
-- (void) updateRHDRSruct;
-- (void) shipRHDRRecord;
 
 #pragma mark 짜짜짜Accessors
 - (NHitMonitor *) nhitMonitor;
@@ -284,8 +279,6 @@ BOOL isNotRunningOrIsInMaintenance();
 - (NSTimeInterval) nhitMonitorTimeInterval;
 - (void) setNhitMonitorTimeInterval: (NSTimeInterval) interval;
 
-- (void) setViewType:(int)aViewType;
-- (int) viewType;
 - (unsigned long) runTypeWord;
 - (void) setRunTypeWord:(unsigned long)aMask;
 - (unsigned long) lastRunTypeWord;
@@ -307,19 +300,10 @@ BOOL isNotRunningOrIsInMaintenance();
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
 
-#pragma mark 짜짜짜Segment Group Methods
-- (void) makeSegmentGroups;
-
 #pragma mark 짜짜짜Specific Dialog Lock Methods
 - (NSString*) experimentMapLock;
 - (NSString*) experimentDetectorLock;
 - (NSString*) experimentDetailsLock;
-
-#pragma mark 짜짜짜DataTaker
-- (void) setDataIds:(id)assigner;
-- (void) syncDataIdsWith:(id)anotherObj;
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (NSDictionary*) dataRecordDescription;
 
 #pragma mark 짜짜짜SnotDbDelegate
 - (ORCouchDB*) orcaDbRef:(id)aCouchDelegate;
@@ -346,18 +330,6 @@ BOOL isNotRunningOrIsInMaintenance();
 -(void) loadSettingsInHW;
 -(void) stopRun;
 
-@end
-
-@interface SNOPDecoderForRHDR : ORVmeCardDecoder {
-}
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
-- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
-@end
-
-@interface SNOPDecoderForEPED : ORVmeCardDecoder {
-}
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
-- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 @end
 
 extern NSString* ORSNOPModelOrcaDBIPAddressChanged;
