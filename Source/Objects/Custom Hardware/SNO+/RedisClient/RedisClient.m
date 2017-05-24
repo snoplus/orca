@@ -15,20 +15,24 @@
 
 - (void) setTimeout: (long) _timeout
 {
-    timeout = _timeout;
-    if (context) {
-        struct timeval tv;
-        tv.tv_sec = timeout/1000;
-        tv.tv_usec = (timeout % 1000)*1000;
-        redisSetTimeout(context, tv);
+    @synchronized(self) {
+        timeout = _timeout;
+        if (context) {
+            struct timeval tv;
+            tv.tv_sec = timeout/1000;
+            tv.tv_usec = (timeout % 1000)*1000;
+            redisSetTimeout(context, tv);
+        }
     }
 }
+
 - (void) dealloc
 {
     [self disconnect];
     [host release];
     [super dealloc];
 }
+
 - (long) timeout
 {
     return timeout;
@@ -55,77 +59,85 @@
 
 - (void) connect
 {
-    /* timeout for connect is 1 second */
-    struct timeval tv = {1, 0};
+    @synchronized(self) {
+        /* timeout for connect is 1 second */
+        struct timeval tv = {1, 0};
 
-    context = redisConnectWithTimeout([host UTF8String], port, tv);
+        context = redisConnectWithTimeout([host UTF8String], port, tv);
 
-    if (context == NULL) {
-        NSException *excep = [NSException exceptionWithName:@"RedisClient"
-                              reason:@"Connection failed" 
-                              userInfo: nil];
-        [excep raise];
-    } else if (context->err) {
-        NSString *err = [NSString stringWithUTF8String:context->errstr]; 
-        [self disconnect];
-        NSException *excep = [NSException exceptionWithName:@"RedisClient"
-                              reason:err
-                              userInfo: nil];
-        [excep raise];
+        if (context == NULL) {
+            NSException *excep = [NSException exceptionWithName:@"RedisClient"
+                                  reason:@"Connection failed"
+                                  userInfo: nil];
+            [excep raise];
+        } else if (context->err) {
+            NSString *err = [NSString stringWithUTF8String:context->errstr];
+            [self disconnect];
+            NSException *excep = [NSException exceptionWithName:@"RedisClient"
+                                  reason:err
+                                  userInfo: nil];
+            [excep raise];
+        }
+
+        /* successfully connected */
+        /* set the timeout on the socket */
+        tv.tv_sec = timeout/1000;
+        tv.tv_usec = (timeout % 1000)*1000;
+        redisSetTimeout(context, tv);
     }
-
-    /* successfully connected */
-    /* set the timeout on the socket */
-    tv.tv_sec = timeout/1000;
-    tv.tv_usec = (timeout % 1000)*1000;
-    redisSetTimeout(context, tv);
 }
 
 - (void) disconnect
 {
-    if(context) {
-        redisFree(context);
-        context = NULL;
+    @synchronized(self) {
+        if(context) {
+            redisFree(context);
+            context = NULL;
+        }
     }
 }
 
 - (void) reconnect
 {
-    [self disconnect];
-    [self connect];
+    @synchronized(self) {
+        [self disconnect];
+        [self connect];
+    }
 }
 
 - (redisReply*) vcommand:(const char *)fmt args:(va_list)ap
 {
-    if (context == NULL) [self connect];
+    @synchronized(self) {
+        if (context == NULL) [self connect];
 
-    redisReply *r = redisvCommand(context,fmt,ap);
-
-    if (r == NULL) {
-        /* Try the command again in case the server was just restarted. */
-        [self reconnect];
-
-        r = redisvCommand(context,fmt,ap);
+        redisReply *r = redisvCommand(context,fmt,ap);
 
         if (r == NULL) {
-            NSString *err = [NSString stringWithUTF8String:context->errstr];
-            [self disconnect];
+            /* Try the command again in case the server was just restarted. */
+            [self reconnect];
+
+            r = redisvCommand(context,fmt,ap);
+
+            if (r == NULL) {
+                NSString *err = [NSString stringWithUTF8String:context->errstr];
+                [self disconnect];
+                NSException *excep = [NSException exceptionWithName:@"RedisClient"
+                                      reason:err
+                                      userInfo:nil];
+                [excep raise];
+            }
+        }
+
+        if(r->type == REDIS_REPLY_ERROR) {
+            NSString *err = [NSString stringWithUTF8String:r->str];
+            freeReplyObject(r);
             NSException *excep = [NSException exceptionWithName:@"RedisClient"
                                   reason:err
                                   userInfo:nil];
             [excep raise];
         }
+        return r;
     }
-    
-    if(r->type == REDIS_REPLY_ERROR) {
-        NSString *err = [NSString stringWithUTF8String:r->str];
-        freeReplyObject(r);
-        NSException *excep = [NSException exceptionWithName:@"RedisClient"
-                              reason:err
-                              userInfo:nil];
-        [excep raise];
-    }
-    return r;
 }
 
 - (redisReply*) command: (const char *) fmt, ... 
