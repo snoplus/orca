@@ -95,8 +95,6 @@ debugDBPort = _debugDBPort,
 debugDBConnectionHistory = _debugDBConnectionHistory,
 debugDBIPNumberIndex = _debugDBIPNumberIndex,
 debugDBPingTask = _debugDBPingTask,
-epedDataId = _epedDataId,
-rhdrDataId = _rhdrDataId,
 smellieDBReadInProgress = _smellieDBReadInProgress,
 smellieDocUploaded = _smellieDocUploaded,
 dataHost,
@@ -1699,8 +1697,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 }
 
 - (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
- {
-
+{
      ORCouchDB* result = [ORCouchDB couchHost:self.orcaDBIPAddress
                                          port:self.orcaDBPort
                                      username:self.orcaDBUserName

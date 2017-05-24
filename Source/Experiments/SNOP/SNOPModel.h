@@ -26,8 +26,6 @@
 #import "ECARun.h"
 #import "NHitMonitor.h"
 
-@class ORDataPacket;
-@class ORDataSet;
 @class ORCouchDB;
 @class ORRunModel;
 
@@ -69,9 +67,6 @@ BOOL isNotRunningOrIsInMaintenance();
     NSUInteger _debugDBIPNumberIndex;
     NSTask*	_debugDBPingTask;
     
-    unsigned long	_epedDataId;
-    unsigned long	_rhdrDataId;
-    
     struct {
         unsigned long coarseDelay;
         unsigned long fineDelay;
@@ -82,18 +77,6 @@ BOOL isNotRunningOrIsInMaintenance();
         unsigned long nTSlopePoints;
     } _epedStruct;
     
-    struct {
-        unsigned long date;
-        unsigned long time;
-        unsigned long daqCodeVersion;
-        unsigned long runNumber;
-        unsigned long calibrationTrialNumber;
-        unsigned long sourceMask;
-        unsigned long long runMask;
-        unsigned long gtCrateMask;
-    } _rhdrStruct;
-    
-
     NSDictionary* _runDocument;
     NSDictionary* _configDocument;
     NSDictionary* _mtcConfigDoc;
@@ -153,7 +136,6 @@ BOOL isNotRunningOrIsInMaintenance();
         unsigned long lastRunTypeWord;
         NSString* lastRunTypeWordHex;
         ECARun* anECARun;
-    
 }
 
 @property (nonatomic,retain) NSMutableDictionary* smellieRunFiles;
@@ -178,9 +160,6 @@ BOOL isNotRunningOrIsInMaintenance();
 @property (nonatomic,retain) NSMutableArray* debugDBConnectionHistory;
 @property (nonatomic,assign) NSUInteger debugDBIPNumberIndex;
 @property (nonatomic,retain) NSTask* debugDBPingTask;
-
-@property (nonatomic,assign) unsigned long epedDataId;
-@property (nonatomic,assign) unsigned long rhdrDataId;
 
 @property (nonatomic,assign) bool smellieDBReadInProgress;
 @property (nonatomic,assign) bool smellieDocUploaded;
@@ -310,19 +289,18 @@ BOOL isNotRunningOrIsInMaintenance();
 - (ORCouchDB*) debugDBRef:(id)aCouchDelegate;
 - (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
 
-//smellie functions -------
+// smellie functions -------
 -(void) getSmellieRunFiles;
 
-//tellie functions -------
+// tellie functions -------
 -(void) getTellieRunFiles;
 
-
-//ECA
+// ECA
 -(ECARun*) anECARun;
 
 -(void) startECARunInParallel;
 
-//Standard runs functions
+// Standard runs functions
 -(BOOL) refreshStandardRunsFromDB;
 -(BOOL) startStandardRun:(NSString*)_standardRun withVersion:(NSString*)_standardRunVersion;
 -(BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
