@@ -2286,15 +2286,25 @@ err:
         return;
     }
 
+    NSNumberFormatter *dacFormat = [[NSNumberFormatter alloc] init];
+    [dacFormat setFormat:@"##.##"];
     [[aMatrix cellAtRow:0 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"CAEN_enabledMask"] unsignedIntValue]]];
     [[aMatrix cellAtRow:1 column:0] setFloatValue:[caenModel convertDacToVolts:[[settingsDict valueForKey:@"CAEN_dac_0"] unsignedShortValue]]];
+    [[aMatrix cellAtRow:1 column:0] setFormatter:dacFormat];
     [[aMatrix cellAtRow:2 column:0] setFloatValue:[caenModel convertDacToVolts:[[settingsDict valueForKey:@"CAEN_dac_1"] unsignedShortValue]]];
+    [[aMatrix cellAtRow:2 column:0] setFormatter:dacFormat];
     [[aMatrix cellAtRow:3 column:0] setFloatValue:[caenModel convertDacToVolts:[[settingsDict valueForKey:@"CAEN_dac_2"] unsignedShortValue]]];
+    [[aMatrix cellAtRow:3 column:0] setFormatter:dacFormat];
     [[aMatrix cellAtRow:4 column:0] setFloatValue:[caenModel convertDacToVolts:[[settingsDict valueForKey:@"CAEN_dac_3"] unsignedShortValue]]];
+    [[aMatrix cellAtRow:4 column:0] setFormatter:dacFormat];
     [[aMatrix cellAtRow:5 column:0] setFloatValue:[caenModel convertDacToVolts:[[settingsDict valueForKey:@"CAEN_dac_4"] unsignedShortValue]]];
+    [[aMatrix cellAtRow:5 column:0] setFormatter:dacFormat];
     [[aMatrix cellAtRow:6 column:0] setFloatValue:[caenModel convertDacToVolts:[[settingsDict valueForKey:@"CAEN_dac_5"] unsignedShortValue]]];
+    [[aMatrix cellAtRow:6 column:0] setFormatter:dacFormat];
     [[aMatrix cellAtRow:7 column:0] setFloatValue:[caenModel convertDacToVolts:[[settingsDict valueForKey:@"CAEN_dac_6"] unsignedShortValue]]];
+    [[aMatrix cellAtRow:7 column:0] setFormatter:dacFormat];
     [[aMatrix cellAtRow:8 column:0] setFloatValue:[caenModel convertDacToVolts:[[settingsDict valueForKey:@"CAEN_dac_7"] unsignedShortValue]]];
+    [[aMatrix cellAtRow:8 column:0] setFormatter:dacFormat];
     [[aMatrix cellAtRow:9 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"CAEN_triggerSourceMask"] unsignedIntValue]]];
     [[aMatrix cellAtRow:10 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"CAEN_triggerOutMask"] unsignedIntValue]]];
     [[aMatrix cellAtRow:11 column:0] setObjectValue:[settingsDict valueForKey:@"CAEN_coincidenceLevel"]];
@@ -2306,6 +2316,8 @@ err:
     [[aMatrix cellAtRow:17 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"CAEN_channelConfigMask"] unsignedShortValue]]];
     [[aMatrix cellAtRow:18 column:0] setObjectValue:[settingsDict valueForKey:@"CAEN_acquisitionMode"]];
     [[aMatrix cellAtRow:19 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"CAEN_frontPanelControlMask"] unsignedIntValue]]];
+
+    [dacFormat release];
 }
 
 
