@@ -550,6 +550,7 @@ tellieRunFiles = _tellieRunFiles;
     ORMTCModel *mtc;
     SNOCaenModel *caen;
     ORXL3Model *xl3;
+
     int i;
     objs = [[(ORAppDelegate*)[NSApp delegate] document]
          collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
@@ -762,6 +763,7 @@ err:
 {
     NSArray* objs;
     ORMTCModel *mtc;
+
     objs = [[(ORAppDelegate*)[NSApp delegate] document]
          collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
 
