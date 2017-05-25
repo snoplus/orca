@@ -833,7 +833,7 @@ err:
     [debugDBIPAddressPU setStringValue:[model debugDBIPAddress]];
 }
 
-- (void) openWaitingAlert
+- (void) stillWaitingForBuffers:(NSNotification*)aNote
 {
 #if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
     NSString* s = [NSString stringWithFormat:@"Waiting for buffers to empty..."];
@@ -850,19 +850,9 @@ err:
 #endif
 }
 
-- (void) closeWaitingAlert
-{
-    waitingForBuffersAlert = nil;
-}
-
-- (void) stillWaitingForBuffers:(NSNotification*)aNote
-{
-    [self performSelectorOnMainThread:@selector(openWaitingAlert) withObject:nil waitUntilDone:NO];
-}
-
 - (void) notWaitingForBuffers:(NSNotification*)aNote
 {
-    [self performSelectorOnMainThread:@selector(closeWaitingAlert) withObject:nil waitUntilDone:NO];
+    waitingForBuffersAlert = nil;
 }
 
 - (void) hvStatusChanged:(NSNotification*)aNote

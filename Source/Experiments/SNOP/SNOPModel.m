@@ -924,7 +924,7 @@ err:
 - (void) stillWaitingForBuffers
 {
     if (waitingForBuffers) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORStillWaitingForBuffersNotification object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORStillWaitingForBuffersNotification object:self];
     }
 }
 
@@ -955,7 +955,7 @@ err:
         [mtc release];
         [xl3 release];
         waitingForBuffers = false;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORNotWaitingForBuffersNotification object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORNotWaitingForBuffersNotification object:self];
 
         /* Go ahead and end the run. */
         dispatch_sync(dispatch_get_main_queue(), ^{
