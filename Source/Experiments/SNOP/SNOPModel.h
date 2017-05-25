@@ -372,5 +372,5 @@ extern NSString* ORSNOPModelSRCollectionChangedNotification;
 extern NSString* ORSNOPModelSRChangedNotification;
 extern NSString* ORSNOPModelSRVersionChangedNotification;
 extern NSString* ORSNOPModelNhitMonitorChangedNotification;
-extern NSString* ORStillWaitingForBuffersNotification;
-extern NSString* ORNotWaitingForBuffersNotification;
+extern NSString* ORSNOPStillWaitingForBuffersNotification;
+extern NSString* ORSNOPNotWaitingForBuffersNotification;

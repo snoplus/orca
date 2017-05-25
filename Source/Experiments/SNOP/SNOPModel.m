@@ -68,8 +68,8 @@ NSString* ORSNOPModelSRCollectionChangedNotification = @"ORSNOPModelSRCollection
 NSString* ORSNOPModelSRChangedNotification = @"ORSNOPModelSRChangedNotification";
 NSString* ORSNOPModelSRVersionChangedNotification = @"ORSNOPModelSRVersionChangedNotification";
 NSString* ORSNOPModelNhitMonitorChangedNotification = @"ORSNOPModelNhitMonitorChangedNotification";
-NSString* ORStillWaitingForBuffersNotification = @"ORStillWaitingForBuffersNotification";
-NSString* ORNotWaitingForBuffersNotification = @"ORNotWaitingForBuffersNotification";
+NSString* ORSNOPStillWaitingForBuffersNotification = @"ORSNOPStillWaitingForBuffersNotification";
+NSString* ORSNOPNotWaitingForBuffersNotification = @"ORSNOPNotWaitingForBuffersNotification";
 
 BOOL isNotRunningOrIsInMaintenance()
 {
@@ -928,7 +928,7 @@ err:
     /* We're stopping a run but our buffers are taking a while to clear, so
      * send a notification to allow our controller to throw up a "force stop" dialog */
     if (waitingForBuffers) {
-        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORStillWaitingForBuffersNotification object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORSNOPStillWaitingForBuffersNotification object:self];
     }
 }
 
@@ -960,7 +960,7 @@ err:
         [mtc release];
         [xl3 release];
         waitingForBuffers = false;
-        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORNotWaitingForBuffersNotification object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORSNOPNotWaitingForBuffersNotification object:self];
 
         /* Go ahead and end the run. */
         dispatch_sync(dispatch_get_main_queue(), ^{

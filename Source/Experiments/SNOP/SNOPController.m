@@ -462,12 +462,12 @@ snopGreenColor;
 
     [notifyCenter addObserver : self
                      selector : @selector(stillWaitingForBuffers:)
-                         name : ORStillWaitingForBuffersNotification
+                         name : ORSNOPStillWaitingForBuffersNotification
                         object: nil];
 
     [notifyCenter addObserver : self
                      selector : @selector(notWaitingForBuffers:)
-                         name : ORNotWaitingForBuffersNotification
+                         name : ORSNOPNotWaitingForBuffersNotification
                         object: nil];
 }
 
