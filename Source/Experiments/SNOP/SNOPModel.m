@@ -908,8 +908,8 @@ err:
         [NSThread detachNewThreadSelector:@selector(_waitForBuffers)
                                  toTarget:self
                                withObject:nil];
-        // post a modal dialog after 1 sec if the buffers haven't cleared yet
-        [self performSelector:@selector(stillWaitingForBuffers) withObject:nil afterDelay:1];
+        // post a modal dialog after 3 secs if the buffers haven't cleared yet
+        [self performSelector:@selector(stillWaitingForBuffers) withObject:nil afterDelay:3];
         break;
     default:
         break;
