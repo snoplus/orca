@@ -843,7 +843,7 @@ err:
     NSString* s = [NSString stringWithFormat:@"Waiting for buffers to empty..."];
     waitingForBuffersAlert = [[[NSAlert alloc] init] autorelease];
     [waitingForBuffersAlert setMessageText:s];
-    [waitingForBuffersAlert addButtonWithTitle:@"Force stop and LOSE DATA!"];
+    [waitingForBuffersAlert addButtonWithTitle:@"Force Stop and LOSE DATA!"];
     [waitingForBuffersAlert setAlertStyle:NSInformationalAlertStyle];
     [waitingForBuffersAlert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn) {
