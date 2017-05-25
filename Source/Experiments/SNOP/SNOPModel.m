@@ -923,6 +923,8 @@ err:
 
 - (void) stillWaitingForBuffers
 {
+    /* We're stopping a run but our buffers are taking a while to clear, so
+     * send a notification to allow our controller to throw up a "force stop" dialog */
     if (waitingForBuffers) {
         [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORStillWaitingForBuffersNotification object:self];
     }
@@ -930,6 +932,7 @@ err:
 
 - (void) abortWaitingForBuffers
 {
+    /* Give up on waiting for our buffers to clear at the end of a run */
     waitingForBuffers = false;
 }
 

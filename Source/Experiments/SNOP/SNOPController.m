@@ -835,6 +835,10 @@ err:
 
 - (void) stillWaitingForBuffers:(NSNotification*)aNote
 {
+    /* Throw up a window-modal dialog to give the user an option
+     * to avoid waiting for the hardware buffers to clear at the end
+     * of a run (only for OS X 10.10 or later).  Must be called
+     * only from the main thread. */
 #if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
     NSString* s = [NSString stringWithFormat:@"Waiting for buffers to empty..."];
     waitingForBuffersAlert = [[[NSAlert alloc] init] autorelease];
@@ -852,6 +856,8 @@ err:
 
 - (void) notWaitingForBuffers:(NSNotification*)aNote
 {
+    /* Close our "Waiting for buffers" dialog if it was open.
+     * Must be called only from the main thread. */
     waitingForBuffersAlert = nil;
 }
 
