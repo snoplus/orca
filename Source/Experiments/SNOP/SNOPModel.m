@@ -551,7 +551,6 @@ tellieRunFiles = _tellieRunFiles;
     SNOCaenModel *caen;
     ORXL3Model *xl3;
     int i;
-
     objs = [[(ORAppDelegate*)[NSApp delegate] document]
          collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
 
@@ -763,7 +762,6 @@ err:
 {
     NSArray* objs;
     ORMTCModel *mtc;
-
     objs = [[(ORAppDelegate*)[NSApp delegate] document]
          collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
 
@@ -905,7 +903,7 @@ err:
                                   nil];
         [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object: self userInfo: userInfo];
 
-        waitingFlag = true;
+        waitingForBuffers = true;
         /* detach a thread to monitor XL3/CAEN/MTC buffers */
         [NSThread detachNewThreadSelector:@selector(_waitForBuffers)
                                  toTarget:self
@@ -925,9 +923,14 @@ err:
 
 - (void) stillWaitingForBuffers
 {
-    if (waitingFlag) {
+    if (waitingForBuffers) {
         [[NSNotificationCenter defaultCenter] postNotificationName:ORStillWaitingForBuffersNotification object:self];
     }
+}
+
+- (void) abortWaitingForBuffers
+{
+    waitingForBuffers = false;
 }
 
 - (void) _waitForBuffers
@@ -938,7 +941,7 @@ err:
         RedisClient *mtc = [[RedisClient alloc] initWithHostName:mtcHost withPort:mtcPort];
         RedisClient *xl3 = [[RedisClient alloc] initWithHostName:xl3Host withPort:xl3Port];
 
-        while (1) {
+        while (waitingForBuffers) {
             @try {
                 if (([mtc intCommand:"data_available"] == 0) &&
                     ([xl3 intCommand:"data_available"] == 0))
@@ -951,7 +954,7 @@ err:
 
         [mtc release];
         [xl3 release];
-        waitingFlag = false;
+        waitingForBuffers = false;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORNotWaitingForBuffersNotification object:self];
 
         /* Go ahead and end the run. */

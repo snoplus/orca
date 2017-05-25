@@ -79,8 +79,6 @@ snopBlackColor,
 snopGrayColor,
 snopGreenColor;
 
-static NSAlert *sWaitingForBuffersAlert = nil;
-
 #pragma mark ¥¥¥Initialization
 -(id)init
 {
@@ -107,6 +105,7 @@ static NSAlert *sWaitingForBuffersAlert = nil;
     [_smellieRunFileList release];
     [_tellieRunFileList release];
     [tellieFireSettings release];
+    waitingForBuffersAlert = nil;
     [super dealloc];
 }
 
@@ -464,6 +463,11 @@ static NSAlert *sWaitingForBuffersAlert = nil;
     [notifyCenter addObserver : self
                      selector : @selector(stillWaitingForBuffers:)
                          name : ORStillWaitingForBuffersNotification
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(notWaitingForBuffers:)
+                         name : ORNotWaitingForBuffersNotification
                         object: nil];
 }
 
@@ -829,27 +833,36 @@ err:
     [debugDBIPAddressPU setStringValue:[model debugDBIPAddress]];
 }
 
-- (void) stillWaitingForBuffers:(NSNotification*)aNote
+- (void) openWaitingAlert
 {
 #if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
     NSString* s = [NSString stringWithFormat:@"Waiting for buffers to empty..."];
-    sWaitingForBuffersAlert = [[[NSAlert alloc] init] autorelease];
-    [sWaitingForBuffersAlert setMessageText:s];
-    [sWaitingForBuffersAlert addButtonWithTitle:@"Cancel"];
-    [sWaitingForBuffersAlert setAlertStyle:NSInformationalAlertStyle];
-    [sWaitingForBuffersAlert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+    waitingForBuffersAlert = [[[NSAlert alloc] init] autorelease];
+    [waitingForBuffersAlert setMessageText:s];
+    [waitingForBuffersAlert addButtonWithTitle:@"Force stop and LOSE DATA!"];
+    [waitingForBuffersAlert setAlertStyle:NSInformationalAlertStyle];
+    [waitingForBuffersAlert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn) {
-            // cancel waiting for buffers to clear and force run to end
-            [runControl abortRunFromWait];
-            sWaitingForBuffersAlert = nil;
+            [model abortWaitingForBuffers]; // don't wait for buffers to clear
+            waitingForBuffersAlert = nil;
         }
     }];
 #endif
 }
 
+- (void) closeWaitingAlert
+{
+    waitingForBuffersAlert = nil;
+}
+
+- (void) stillWaitingForBuffers:(NSNotification*)aNote
+{
+    [self performSelectorOnMainThread:@selector(openWaitingAlert) withObject:nil waitUntilDone:NO];
+}
+
 - (void) notWaitingForBuffers:(NSNotification*)aNote
 {
-    sWaitingForBuffersAlert = nil;
+    [self performSelectorOnMainThread:@selector(closeWaitingAlert) withObject:nil waitUntilDone:NO];
 }
 
 - (void) hvStatusChanged:(NSNotification*)aNote

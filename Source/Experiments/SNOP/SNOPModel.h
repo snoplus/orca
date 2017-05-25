@@ -148,7 +148,7 @@ BOOL isNotRunningOrIsInMaintenance();
     int state;
     int start;
     bool resync;
-    bool waitingFlag;   // flag indicates we are waiting for our buffers to empty
+    bool waitingForBuffers;     // flag indicates we are waiting for our buffers to empty
 
     @private
         //Run type word
@@ -260,6 +260,7 @@ BOOL isNotRunningOrIsInMaintenance();
 - (void) updateRHDRSruct;
 - (void) shipRHDRRecord;
 - (void) stillWaitingForBuffers;
+- (void) abortWaitingForBuffers;
 
 #pragma mark ¥¥¥Accessors
 - (NHitMonitor *) nhitMonitor;

@@ -175,6 +175,7 @@
     uint32_t hvMask;
 
     RunStatusIcon* doggy_icon;
+    NSAlert*       waitingForBuffersAlert;
 
     // Detector State
     IBOutlet WebView* detectorState;
@@ -206,6 +207,10 @@
 - (void) dbOrcaDBIPChanged:(NSNotification*)aNote;
 - (void) dbDebugDBIPChanged:(NSNotification*)aNote;
 - (void) stillWaitingForBuffers:(NSNotification *) aNote;
+- (void) notWaitingForBuffers:(NSNotification *) aNote;
+
+- (void) openWaitingAlert;
+- (void) closeWaitingAlert;
 
 - (IBAction) testMTCServer:(id)sender;
 - (IBAction) testXL3Server:(id)sender;
