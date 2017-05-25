@@ -71,6 +71,8 @@ typedef NS_OPTIONS(uint32_t, TRIG_MASK)
     GT = 1<<24
 };
 
+#define TUBIISTATE_NUMBEROFKEYS 22; // Number of elements in the TUBiiState struct
+
 struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of TUBii's state at once.
     float smellieRate;
     float tellieRate;
@@ -94,31 +96,6 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
     uint32_t asyncTrigMask;
     CONTROL_REG_MASK controlReg;
     BOOL CounterMode;
-};
-
-NSString *TubiiStateKeys[] = { //Needs to be in order wrt the TUBiiState struct above
-    @"smellieRate",
-    @"tellieRate",
-    @"pulserRate",
-    @"smelliePulseWidth",
-    @"telliePulseWidth",
-    @"pulserPulseWidth",
-    @"smellieNPulses",
-    @"tellieNPulses",
-    @"pulserNPulses",
-    @"tellieDelay",
-    @"smellieDelay",
-    @"genericDelay",
-    @"CaenChannelMask",
-    @"CaenGainMask",
-    @"DGT_Bits",
-    @"LO_Bits",
-    @"speakerMask",
-    @"counterMask",
-    @"syncTrigMask",
-    @"asyncTrigMask",
-    @"controlReg",
-    @"CounterMode"
 };
 
 @interface TUBiiModel : OrcaObject{
@@ -184,6 +161,8 @@ NSString *TubiiStateKeys[] = { //Needs to be in order wrt the TUBiiState struct 
 - (float) MTCAMimic_BitsToVolts: (NSUInteger) BitValue;
 - (void) Initialize;
 - (void) Ping;
+- (NSMutableDictionary*) CurrentStateToDict;
+- (void) setCurrentStateFromDict:(NSMutableDictionary*)settingsDict;
 - (void) setTrigMask:(NSUInteger)trigMask setAsyncMask:(NSUInteger)asyncMask;
 - (void) setBurstTrigger;
 - (void) setComboTrigger_EnableMask:(uint32_t) enableMask TriggerMask:(uint32_t) triggerMask;

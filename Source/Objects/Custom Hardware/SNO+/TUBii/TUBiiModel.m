@@ -727,6 +727,21 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
     [self setControlReg: aState.controlReg];
 }
 
+- (void) setCurrentStateFromDict:(NSMutableDictionary*)settingsDict {
+
+    //Convert from dict to TubiiState
+    @try{
+        struct TUBiiState tubiiStateSettings = [self CurrentState];
+        tubiiStateSettings.tellieDelay = [[settingsDict objectForKey:[self getStandardRunKeyForField:@"tellieDelay"]] floatValue];
+        tubiiStateSettings.smellieDelay = [[settingsDict objectForKey:[self getStandardRunKeyForField:@"smellieDelay"]] floatValue];
+        tubiiStateSettings.genericDelay = [[settingsDict objectForKey:[self getStandardRunKeyForField:@"genericDelay"]] floatValue];
+        [self setCurrentState:tubiiStateSettings];
+    } @catch(...){
+        NSLogColor([NSColor redColor], @"TUBii: settings couldn't not be loaded \n");
+    }
+
+}
+
 - (struct TUBiiState) CurrentState {
     // Returns a struct that that is a static representation of
     // TUBii's static.
@@ -759,13 +774,27 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
     return aState;
 }
 
-- (NSDictionary*) CurrentStateToDict {
+- (NSDictionary*) CurrentStateToDict
+{
 
-    //Manually add struct elements to dictionary. Iterating over elements of different
-    //type seems a pain, so do it this way.
-    NSDictionary* TubiiStateDict = [NSDictionary dictionary];
-    [TubiiStateDict setObject:[self CurrentState].smellieRate forKey:TubiiStateKeys[0]];
+    //Manually cherry-pick struct elements and store it into dictionary.
+    NSMutableDictionary* TubiiStateDict = [NSMutableDictionary dictionaryWithCapacity:3]; //CHANGE TO TubiiStateNumberOfKeys!!!
+    @try{
+        [TubiiStateDict setObject:[NSNumber numberWithUnsignedLong:[self CurrentState].tellieDelay] forKey:[self getStandardRunKeyForField:@"tellieDelay" ]];
+        [TubiiStateDict setObject:[NSNumber numberWithUnsignedLong:[self CurrentState].smellieDelay] forKey:[self getStandardRunKeyForField:@"smellieDelay"]];
+        [TubiiStateDict setObject:[NSNumber numberWithUnsignedLong:[self CurrentState].genericDelay] forKey:[self getStandardRunKeyForField:@"genericDelay"]];
+    } @catch(...){
+        NSLogColor([NSColor redColor], @"TUBii: settings couldn't not be saved \n");
+    }
 
+    return TubiiStateDict;
+
+}
+
+- (NSString*) getStandardRunKeyForField:(NSString*)aField
+{
+    aField = [NSString stringWithFormat:@"TUBii_%@",aField];
+    return aField;
 }
 
 //////////////////////////////////////////

@@ -268,6 +268,7 @@ snopGreenColor;
 
     [self initializeUnits];
     [self mtcDataBaseChanged:nil];
+    [self CAENSettingsChanged:nil];
     //Update runtype word
     [self refreshRunWordLabels:nil];
     [self runTypeWordChanged:nil];
@@ -424,6 +425,12 @@ snopGreenColor;
                      selector : @selector(mtcDataBaseChanged:)
                          name : ORMTCGTMaskChanged
                         object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenSettingsChanged
+                        object: nil];
+
     [notifyCenter addObserver : self
                      selector : @selector(updateSettings:)
                          name : @"SNOPSettingsChanged"
@@ -2027,6 +2034,23 @@ err:
     
 }
 
+- (void) CAENSettingsChanged:(NSNotification*)aNotification
+{
+
+    NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOCaenModel")];
+    SNOCaenModel* caenModel;
+    if ([objs count]) {
+        caenModel = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find CAEN model. Please add it to the experiment and restart the run.\n");
+        return;
+    }
+
+    //CAEN
+    [self displayCAENSettings:[caenModel CurrentStateToDict] inMatrix:standardRunCAENCurrentMatrix];
+
+}
+
 - (IBAction)loadStandardRunFromDBAction:(id)sender
 {
     NSString *standardRun = [standardRunPopupMenu objectValueOfSelectedItem];
@@ -2206,6 +2230,8 @@ err:
         }
     //If in non-DIAGNOSTIC run: display DB threshold values
     } else {
+
+        //MTC
         float mVolts;
         int gtmask = [[runSettings valueForKey:GTMaskSerializationString] intValue];
         
@@ -2233,6 +2259,10 @@ err:
         } else{
             [[standardRunThresStoredValues cellAtRow:11 column:0] setTextColor:[self snopRedColor]];
         }
+
+        //CAEN
+        [self displayCAENSettings:runSettings inMatrix:standardRunCAENDBMatrix];
+
     }
     
     //Display runtype word
@@ -2244,6 +2274,40 @@ err:
         }
     }
 }
+
+- (void) displayCAENSettings:(NSMutableDictionary*) settingsDict inMatrix:(NSMatrix*)aMatrix
+{
+    NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOCaenModel")];
+    SNOCaenModel* caenModel;
+    if ([objs count]) {
+        caenModel = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find CAEN model. Please add it to the experiment and restart the run.\n");
+        return;
+    }
+
+    [[aMatrix cellAtRow:0 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"CAEN_enabledMask"] unsignedIntValue]]];
+    [[aMatrix cellAtRow:1 column:0] setFloatValue:[caenModel convertDacToVolts:[[settingsDict valueForKey:@"CAEN_dac_0"] unsignedShortValue]]];
+    [[aMatrix cellAtRow:2 column:0] setFloatValue:[caenModel convertDacToVolts:[[settingsDict valueForKey:@"CAEN_dac_1"] unsignedShortValue]]];
+    [[aMatrix cellAtRow:3 column:0] setFloatValue:[caenModel convertDacToVolts:[[settingsDict valueForKey:@"CAEN_dac_2"] unsignedShortValue]]];
+    [[aMatrix cellAtRow:4 column:0] setFloatValue:[caenModel convertDacToVolts:[[settingsDict valueForKey:@"CAEN_dac_3"] unsignedShortValue]]];
+    [[aMatrix cellAtRow:5 column:0] setFloatValue:[caenModel convertDacToVolts:[[settingsDict valueForKey:@"CAEN_dac_4"] unsignedShortValue]]];
+    [[aMatrix cellAtRow:6 column:0] setFloatValue:[caenModel convertDacToVolts:[[settingsDict valueForKey:@"CAEN_dac_5"] unsignedShortValue]]];
+    [[aMatrix cellAtRow:7 column:0] setFloatValue:[caenModel convertDacToVolts:[[settingsDict valueForKey:@"CAEN_dac_6"] unsignedShortValue]]];
+    [[aMatrix cellAtRow:8 column:0] setFloatValue:[caenModel convertDacToVolts:[[settingsDict valueForKey:@"CAEN_dac_7"] unsignedShortValue]]];
+    [[aMatrix cellAtRow:9 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"CAEN_triggerSourceMask"] unsignedIntValue]]];
+    [[aMatrix cellAtRow:10 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"CAEN_triggerOutMask"] unsignedIntValue]]];
+    [[aMatrix cellAtRow:11 column:0] setObjectValue:[settingsDict valueForKey:@"CAEN_coincidenceLevel"]];
+    [[aMatrix cellAtRow:12 column:0] setObjectValue:[NSString stringWithFormat:@"%@",[[settingsDict valueForKey:@"CAEN_countAllTriggers"] boolValue]? @"YES":@"NO"]];
+    [[aMatrix cellAtRow:13 column:0] setObjectValue:[NSString stringWithFormat:@"%@",[[settingsDict valueForKey:@"CAEN_isCustomSize"] boolValue]? @"YES":@"NO"]];
+    [[aMatrix cellAtRow:14 column:0] setObjectValue:[settingsDict valueForKey:@"CAEN_eventSize"]];
+    [[aMatrix cellAtRow:15 column:0] setIntValue:[[settingsDict valueForKey:@"CAEN_customSize"] unsignedIntValue]*4];
+    [[aMatrix cellAtRow:16 column:0] setIntValue:[[settingsDict valueForKey:@"CAEN_postTriggerSetting"] unsignedIntValue]*4];
+    [[aMatrix cellAtRow:17 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"CAEN_channelConfigMask"] unsignedShortValue]]];
+    [[aMatrix cellAtRow:18 column:0] setObjectValue:[settingsDict valueForKey:@"CAEN_acquisitionMode"]];
+    [[aMatrix cellAtRow:19 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"CAEN_frontPanelControlMask"] unsignedIntValue]]];
+}
+
 
 - (IBAction) refreshStandardRunsAction:(id)sender
 {
