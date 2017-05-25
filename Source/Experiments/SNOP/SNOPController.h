@@ -206,8 +206,8 @@
 - (void) triggerStatusChanged:(NSNotification*)aNote;
 - (void) dbOrcaDBIPChanged:(NSNotification*)aNote;
 - (void) dbDebugDBIPChanged:(NSNotification*)aNote;
-- (void) stillWaitingForBuffers:(NSNotification *) aNote;
-- (void) notWaitingForBuffers:(NSNotification *) aNote;
+- (void) stillWaitingForBuffers:(NSNotification *)aNote;
+- (void) notWaitingForBuffers:(NSNotification *)aNote;
 
 - (IBAction) testMTCServer:(id)sender;
 - (IBAction) testXL3Server:(id)sender;
