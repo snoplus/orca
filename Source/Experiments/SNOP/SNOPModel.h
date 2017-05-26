@@ -142,6 +142,8 @@ BOOL isNotRunningOrIsInMaintenance();
     uint32_t nhitMonitorCrateMask;
     NSTimeInterval nhitMonitorTimeInterval;
 
+    NSLock *ecaLock;
+
     RedisClient *mtc_server;
     RedisClient *xl3_server;
 
@@ -223,6 +225,7 @@ BOOL isNotRunningOrIsInMaintenance();
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
 
 - (void) pingCratesAtRunStart;
+- (NSLock *) ecaLock;
 - (void) pingCrates;
 - (void) runNhitMonitorAutomatically;
 - (void) runNhitMonitor;
