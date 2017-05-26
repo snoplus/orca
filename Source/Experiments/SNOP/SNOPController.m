@@ -34,6 +34,7 @@
 #import "ORMTCModel.h"
 #import "SNOP_Run_Constants.h"
 #import "SNOCaenModel.h"
+#import "TUBiiModel.h"
 #import "RunTypeWordBits.hh"
 #import "ECARun.h"
 #import "NHitMonitor.h"
@@ -269,6 +270,7 @@ snopGreenColor;
     [self initializeUnits];
     [self mtcDataBaseChanged:nil];
     [self CAENSettingsChanged:nil];
+    [self TUBiiSettingsChanged:nil];
     //Update runtype word
     [self refreshRunWordLabels:nil];
     [self runTypeWordChanged:nil];
@@ -429,6 +431,11 @@ snopGreenColor;
     [notifyCenter addObserver : self
                      selector : @selector(CAENSettingsChanged:)
                          name : SNOCaenSettingsChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(TUBiiSettingsChanged:)
+                         name : ORTubiiSettingsChangedNotification
                         object: nil];
 
     [notifyCenter addObserver : self
@@ -2046,9 +2053,24 @@ err:
         return;
     }
 
-    //CAEN
     [self displayCAENSettings:[caenModel CurrentStateToDict] inMatrix:standardRunCAENCurrentMatrix];
+    
+}
 
+- (void) TUBiiSettingsChanged:(NSNotification*)aNotification
+{
+
+    NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
+    TUBiiModel* tubiiModel;
+    if ([objs count]) {
+        tubiiModel = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find TUBii model. Please add it to the experiment and restart the run.\n");
+        return;
+    }
+
+    [self displayTUBiiSettings:[tubiiModel CurrentStateToDict] inMatrix:standardRunTUBiiCurrentMatrix];
+    
 }
 
 - (IBAction)loadStandardRunFromDBAction:(id)sender
@@ -2263,6 +2285,9 @@ err:
         //CAEN
         [self displayCAENSettings:runSettings inMatrix:standardRunCAENDBMatrix];
 
+        //TUBii
+        [self displayTUBiiSettings:runSettings inMatrix:standardRunTUBiiDBMatrix];
+
     }
     
     //Display runtype word
@@ -2320,6 +2345,32 @@ err:
     [dacFormat release];
 }
 
+
+- (void) displayTUBiiSettings:(NSMutableDictionary*) settingsDict inMatrix:(NSMatrix*)aMatrix
+{
+
+    NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
+    TUBiiModel* tubiiModel;
+    if ([objs count]) {
+        tubiiModel = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find TUBii model. Please add it to the experiment and restart the run.\n");
+        return;
+    }
+
+    [[aMatrix cellAtRow:0 column:0] setIntValue:[[settingsDict valueForKey:@"TUBii_TUBiiPGT_Rate"] intValue]]; //for formatting purposes
+    [[aMatrix cellAtRow:1 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"TUBii_syncTrigMask"] unsignedIntValue]]];
+    [[aMatrix cellAtRow:2 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"TUBii_asyncTrigMask"] unsignedIntValue]]];
+    [[aMatrix cellAtRow:3 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"TUBii_CaenChannelMask"] unsignedIntValue]]];
+    [[aMatrix cellAtRow:4 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"TUBii_CaenGainMask"] unsignedIntValue]]];
+    [[aMatrix cellAtRow:5 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"TUBii_counterMask"] unsignedIntValue]]];
+    [[aMatrix cellAtRow:6 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"TUBii_speakerMask"] unsignedIntValue]]];
+    [[aMatrix cellAtRow:7 column:0] setFloatValue:[tubiiModel MTCAMimic_BitsToVolts:[[settingsDict valueForKey:@"TUBii_MTCAMimic1_ThresholdInBits"] integerValue]]];
+    [[aMatrix cellAtRow:8 column:0] setIntegerValue:[tubiiModel DGT_BitsToNanoSeconds:[[settingsDict valueForKey:@"TUBii_DGT_Bits"] integerValue]]];
+    [[aMatrix cellAtRow:9 column:0] setIntegerValue:[tubiiModel LODelay_BitsToNanoSeconds:[[settingsDict valueForKey:@"TUBii_LO_Bits"] integerValue]]];
+    [[aMatrix cellAtRow:10 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"TUBii_controlReg"] unsignedIntValue]]];
+
+}
 
 - (IBAction) refreshStandardRunsAction:(id)sender
 {

@@ -65,7 +65,7 @@
     
     [notifyCenter addObserver : self
                      selector : @selector(tubiiLockChanged:)
-                         name : ORTubiiLock
+                         name : ORTubiiLockNotification
                        object : nil];
     
 }
@@ -73,7 +73,7 @@
 - (void) checkGlobalSecurity
 {
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
-    [gSecurity setLock:ORTubiiLock to:secure];
+    [gSecurity setLock:ORTubiiLockNotification to:secure];
     [tubiiLockButton setEnabled:secure];
 }
 
@@ -81,8 +81,8 @@
 {
     
     //Basic ops
-    BOOL locked						= [gSecurity isLocked:ORTubiiLock];
-    BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORTubiiLock];
+    BOOL locked						= [gSecurity isLocked:ORTubiiLockNotification];
+    BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORTubiiLockNotification];
     
     //Tubii
     [tubiiLockButton setState: locked];
@@ -230,7 +230,7 @@
 
 #pragma mark •••Actions
 - (IBAction)tubiiLockAction:(id)sender {
-    [gSecurity tryToSetLock:ORTubiiLock to:[sender intValue] forWindow:[self window]];
+    [gSecurity tryToSetLock:ORTubiiLockNotification to:[sender intValue] forWindow:[self window]];
 }
 - (IBAction)InitializeClicked:(id)sender {
     [model Initialize];
