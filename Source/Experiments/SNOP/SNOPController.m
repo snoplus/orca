@@ -858,7 +858,10 @@ err:
 {
     /* Close our "Waiting for buffers" dialog if it was open.
      * Must be called only from the main thread. */
-    waitingForBuffersAlert = nil;
+    if (waitingForBuffersAlert) {
+        [[self window] endSheet:[[self window] attachedSheet] returnCode:NSAlertSecondButtonReturn];
+        waitingForBuffersAlert = nil;
+    }
 }
 
 - (void) hvStatusChanged:(NSNotification*)aNote
