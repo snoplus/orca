@@ -99,7 +99,8 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
 };
 
 @interface TUBiiModel : OrcaObject{
-    struct TUBiiState CurrentState;
+@private
+    struct TUBiiState currentState;
     float smellieRate;
     float tellieRate;
     float pulserRate;
@@ -140,7 +141,6 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
 @property (nonatomic) BOOL TUBiiIsDefaultClock;
 @property (nonatomic) BOOL TUBiiIsLOSrc;
 @property (nonatomic) BOOL CounterMode;
-//@property (nonatomic) struct TUBiiState CurrentState; //Get/Sets a struct that fully specifies TUBii's Current state
 @property (nonatomic,retain) NSThread* keepAliveThread;
 
 #pragma mark •••Initialization
@@ -163,7 +163,9 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
 - (float) MTCAMimic_BitsToVolts: (NSUInteger) BitValue;
 - (void) Initialize;
 - (void) Ping;
+- (struct TUBiiState) currentState;
 - (NSMutableDictionary*) CurrentStateToDict;
+- (void) sendCurrentStateToHW;
 - (void) setCurrentStateFromDict:(NSMutableDictionary*)settingsDict;
 - (void) setTrigMask:(NSUInteger)trigMask setAsyncMask:(NSUInteger)asyncMask;
 - (void) setBurstTrigger;

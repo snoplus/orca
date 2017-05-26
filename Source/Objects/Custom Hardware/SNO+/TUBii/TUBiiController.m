@@ -7,7 +7,9 @@
 //
 
 #import "TUBiiController.h"
+#pragma pack(push)
 #import "TUBiiModel.h"
+#pragma pack(pop)
 //Defs to map between tab number and tab name
 #define TUBII_GUI_TUBII_TAB_NUM 0
 #define TUBII_GUI_PULSER_TAB_NUM 1
@@ -67,7 +69,12 @@
                      selector : @selector(tubiiLockChanged:)
                          name : ORTubiiLockNotification
                        object : nil];
-    
+
+    [notifyCenter addObserver : self
+                     selector : @selector(tubiiCurrentStateChanged:)
+                         name : ORTubiiSettingsChangedNotification
+                       object : nil];
+
 }
 
 - (void) checkGlobalSecurity
@@ -184,6 +191,71 @@
     [matchClockButton setEnabled: !lockedOrNotRunningMaintenance];
     [resetClockButton setEnabled: !lockedOrNotRunningMaintenance];
     
+}
+
+- (void) tubiiCurrentStateChanged:(NSNotification *)aNote
+{
+    /* Change GUI to match the current state of the model */
+    // TrigMasks
+    struct TUBiiState theTUBiiState = [model currentState];
+    NSUInteger trigMaskVal = (theTUBiiState.syncTrigMask | theTUBiiState. asyncTrigMask);
+    NSUInteger syncMaskVal = 16777215 - theTUBiiState.asyncTrigMask;
+    [self SendBitInfo:trigMaskVal FromBit:0 ToBit:24 ToCheckBoxes:TrigMaskSelect];
+    [self SendBitInfo:syncMaskVal FromBit:24 ToBit:48 ToCheckBoxes:TrigMaskSelect];
+    //CAEN
+    CAEN_CHANNEL_MASK ChannelMask = theTUBiiState.CaenChannelMask;
+    CAEN_GAIN_MASK GainMask = theTUBiiState.CaenGainMask;
+    BOOL err = YES;
+    err &= [caenChannelSelect_0 selectCellWithTag:(ChannelMask & channelSel_0)>0];
+    err &= [caenChannelSelect_1 selectCellWithTag:(ChannelMask & channelSel_1)>0];
+    err &= [caenChannelSelect_2 selectCellWithTag:(ChannelMask & channelSel_2)>0];
+    err &= [caenChannelSelect_3 selectCellWithTag:(ChannelMask & channelSel_3)>0];
+    err &= [caenGainSelect_0 selectCellWithTag:(GainMask & gainSel_0)>0];
+    err &= [caenGainSelect_1 selectCellWithTag:(GainMask & gainSel_1)>0];
+    err &= [caenGainSelect_2 selectCellWithTag:(GainMask & gainSel_2)>0];
+    err &= [caenGainSelect_3 selectCellWithTag:(GainMask & gainSel_3)>0];
+    err &= [caenGainSelect_4 selectCellWithTag:(GainMask & gainSel_4)>0];
+    err &= [caenGainSelect_5 selectCellWithTag:(GainMask & gainSel_5)>0];
+    err &= [caenGainSelect_6 selectCellWithTag:(GainMask & gainSel_6)>0];
+    err &= [caenGainSelect_7 selectCellWithTag:(GainMask & gainSel_7)>0];
+    //Speaker
+    [SpeakerMaskField setStringValue:[NSString stringWithFormat:@"%@",@(theTUBiiState.speakerMask)]];
+    [self SendBitInfo:theTUBiiState.speakerMask FromBit:0 ToBit:16 ToCheckBoxes:SpeakerMaskSelect_1];
+    [self SendBitInfo:theTUBiiState.speakerMask FromBit:16 ToBit:32 ToCheckBoxes:SpeakerMaskSelect_2];
+    //Counter
+    [CounterMaskField setStringValue:[NSString stringWithFormat:@"%@",@(theTUBiiState.counterMask)]];
+    [self SendBitInfo:theTUBiiState.counterMask FromBit:0 ToBit:16 ToCheckBoxes:CounterMaskSelect_1];
+    [self SendBitInfo:theTUBiiState.counterMask FromBit:16 ToBit:32 ToCheckBoxes:CounterMaskSelect_2];
+    //GTDelay
+    float LO_Delay = [model LODelay_BitsToNanoSeconds:theTUBiiState.LO_Bits];
+    [LO_Slider setIntValue:LO_Delay];
+    [LO_Field setIntegerValue:LO_Delay];
+    float DGT_Delay = [model DGT_BitsToNanoSeconds:theTUBiiState.DGT_Bits];
+    [DGT_Slider setIntValue:DGT_Delay];
+    [DGT_Field setIntValue:DGT_Delay];
+    if ((theTUBiiState.controlReg & lockoutSel_Bit)>0){
+        [LO_SrcSelect selectCellWithTag:1];
+    }
+    else {
+        [LO_SrcSelect selectCellWithTag:2];
+    }
+    [self LOSrcSelectChanged:self];
+    //MTCA mimic
+    float ThresholdValue = [model MTCAMimic_BitsToVolts:theTUBiiState.MTCAMimic1_ThresholdInBits];
+    [MTCAMimic_Slider setFloatValue:ThresholdValue];
+    [MTCAMimic_TextField setFloatValue:ThresholdValue];
+    //Clock Source
+    CONTROL_REG_MASK cntrl_reg = theTUBiiState.controlReg;
+    if(cntrl_reg & clkSel_Bit) {
+        [DefaultClockSelect selectCellWithTag:1]; //TUBii Clk is tag 1
+    }
+    else {
+        [DefaultClockSelect selectCellWithTag:2];//TUB Clk is tag 2
+    }
+    //TUBiiPGT
+    float rate = theTUBiiState.TUBiiPGT_Rate;
+    [TUBiiPGTRate setFloatValue:rate];
+
 }
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item

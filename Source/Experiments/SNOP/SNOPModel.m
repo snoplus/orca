@@ -2416,11 +2416,11 @@ err:
         //Load MTC settings
         [mtcModel loadFromSearialization:runSettings];
 
-        //Load TUBii settings
-        [tubiiModel setCurrentStateFromDict:runSettings];
-
         //Load CAEN settings
         [caenModel setCurrentStateFromDict:runSettings];
+
+        //Load TUBii settings
+        [tubiiModel setCurrentStateFromDict:runSettings];
 
         NSLog(@"Standard run %@ (%@) settings loaded. \n",runTypeName,runVersion);
         return true;
@@ -2538,11 +2538,36 @@ err:
         return;
     }
 
+    objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOCaenModel")];
+    SNOCaenModel* caen;
+    if ([objs count]) {
+        caen = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find CAEN model. Please add it to the experiment and restart the run.\n");
+        return;
+    }
+
+    objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
+    TUBiiModel* tubii;
+    if ([objs count]) {
+        tubii = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find TUBii model. Please add it to the experiment and restart the run.\n");
+        return;
+    }
+
     @try{
+        //Load TUBii settings
+        [tubii sendCurrentStateToHW];
+
+        //Load CAEN settings
+        [caen initBoard];
+
         //Load MTC settings
         [mtc loadTheMTCADacs];
         [mtc setGlobalTriggerWordMask];
         [mtc loadPulserRateToHardware];
+
     }
     @catch(NSException *e){
         NSLogColor([NSColor redColor], @"Problem loading settings into Hardware: %@\n",[e reason]);

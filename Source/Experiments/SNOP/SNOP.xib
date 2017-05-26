@@ -69,6 +69,7 @@
                 <outlet property="standardRunPopupMenu" destination="9N0-mK-BSA" id="wPo-8V-poZ"/>
                 <outlet property="standardRunSaveButton" destination="hzP-U1-4kA" id="OhX-9u-5Ys"/>
                 <outlet property="standardRunTUBiiCurrentMatrix" destination="S8T-VR-eUc" id="qwt-7P-gtG"/>
+                <outlet property="standardRunTUBiiDBMatrix" destination="5Il-K8-9ZY" id="iBv-Ut-m16"/>
                 <outlet property="standardRunThresCurrentValues" destination="jf7-EJ-hAP" id="cve-nw-GUr"/>
                 <outlet property="standardRunThresStoredValues" destination="gE1-m4-m8q" id="0GX-gd-u9h"/>
                 <outlet property="standardRunThreshLabels" destination="002-Sr-nUh" id="UPB-Ij-RiI"/>

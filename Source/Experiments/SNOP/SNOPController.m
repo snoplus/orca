@@ -2346,7 +2346,7 @@ err:
 }
 
 
-- (void) displayTUBiiSettings:(NSMutableDictionary*) settingsDict inMatrix:(NSMatrix*)aMatrix
+- (void) displayTUBiiSettings:(NSMutableDictionary*)settingsDict inMatrix:(NSMatrix*)aMatrix
 {
 
     NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
@@ -2358,6 +2358,8 @@ err:
         return;
     }
 
+    NSNumberFormatter *format = [[NSNumberFormatter alloc] init];
+    [format setFormat:@"#.###"];
     [[aMatrix cellAtRow:0 column:0] setIntValue:[[settingsDict valueForKey:@"TUBii_TUBiiPGT_Rate"] intValue]]; //for formatting purposes
     [[aMatrix cellAtRow:1 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"TUBii_syncTrigMask"] unsignedIntValue]]];
     [[aMatrix cellAtRow:2 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"TUBii_asyncTrigMask"] unsignedIntValue]]];
@@ -2366,6 +2368,7 @@ err:
     [[aMatrix cellAtRow:5 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"TUBii_counterMask"] unsignedIntValue]]];
     [[aMatrix cellAtRow:6 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"TUBii_speakerMask"] unsignedIntValue]]];
     [[aMatrix cellAtRow:7 column:0] setFloatValue:[tubiiModel MTCAMimic_BitsToVolts:[[settingsDict valueForKey:@"TUBii_MTCAMimic1_ThresholdInBits"] integerValue]]];
+    [[aMatrix cellAtRow:7 column:0] setFormatter:format];
     [[aMatrix cellAtRow:8 column:0] setIntegerValue:[tubiiModel DGT_BitsToNanoSeconds:[[settingsDict valueForKey:@"TUBii_DGT_Bits"] integerValue]]];
     [[aMatrix cellAtRow:9 column:0] setIntegerValue:[tubiiModel LODelay_BitsToNanoSeconds:[[settingsDict valueForKey:@"TUBii_LO_Bits"] integerValue]]];
     [[aMatrix cellAtRow:10 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"TUBii_controlReg"] unsignedIntValue]]];

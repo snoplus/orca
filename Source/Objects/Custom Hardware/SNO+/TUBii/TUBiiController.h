@@ -140,6 +140,7 @@
 - (void) SendBitInfo:(NSUInteger) maskVal FromBit:(int)low ToBit:(int) high ToCheckBoxes: (NSMatrix*) aMatrix;
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item;
 - (void) tubiiLockChanged:(NSNotification*)aNote;
+- (void) tubiiCurrentStateChanged:(NSNotification*)aNote;
 
 - (IBAction)InitializeClicked:(id)sender;
 - (IBAction)SendPing:(id)sender;
