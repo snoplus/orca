@@ -58,7 +58,8 @@ struct NhitRecord {
 - (void) disconnect;
 - (void) nhitMonitorCallback: (ORPQResult *) result;
 - (void) run: (NSDictionary *) args;
-- (void) _run: (int) crate pulserRate: (int) pulserRate numPulses: (int) numPulses maxNhit: (int) maxNhit slots: (NSMutableArray *) slots channels:(NSMutableArray *) channels;
+- (void) _run: (NSDictionary *) args;
+- (void) __run: (int) crate pulserRate: (int) pulserRate numPulses: (int) numPulses maxNhit: (int) maxNhit slots: (NSMutableArray *) slots channels:(NSMutableArray *) channels;
 @end
 
 extern NSString* ORNhitMonitorUpdateNotification;
