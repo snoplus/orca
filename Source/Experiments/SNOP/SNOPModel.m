@@ -1197,9 +1197,10 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
      * the start of physics runs. A nearline job will eventually look at these
      * events to determine if any slots are not firing triggers correctly.
      * This function should only be called in a separate thread. */
-    int i, j;
+    int i, j, k;
     uint32_t crate_pedestal_mask, coarse_delay, fine_delay, pedestal_width;
     float pulser_rate;
+    uint32_t channelMasks[16];
 
     NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document]
          collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
@@ -1280,7 +1281,19 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         for (j = 0; j < 16; j++) {
             if (!([xl3 getSlotsPresent] & (1 << j))) continue;
 
-            if ([xl3 setPedestalMask:(1 << j) pattern:0xffffffff]) {
+            for (k = 0; k < 16; k++) {
+                if (k == j) {
+                    /* For the slot we are testing, set the pedestal mask to
+                     * 0xffffffff. */
+                    channelMasks[k] = 0xffffffff;
+                } else {
+                    /* For all other slots, pedestal channels 17 and 18 to make
+                     * sure we don't get any pedestal pickup. */
+                    channelMasks[k] = 0x60000;
+                }
+            }
+
+            if ([xl3 multiSetPedestalMask:0xffff patterns:channelMasks]) {
                 NSLogColor([NSColor redColor],
                            @"failed to set pedestal mask for crate %02d slot %02d\n", i, j);
                 continue;

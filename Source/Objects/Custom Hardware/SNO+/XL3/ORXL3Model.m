@@ -2966,6 +2966,40 @@ err:
     return 0;
 }
 
+- (int) multiSetPedestalMask: (uint32_t) slotMask patterns: (uint32_t[16]) patterns
+{
+    /* Similar to setPedestalMask except any slots not in the slot mask will
+     * not have their pedestal mask changed. */
+    char payload[XL3_PAYLOAD_SIZE];
+    MultiSetCratePedestalsArgs *args;
+    MultiSetCratePedestalsResults *results;
+
+    memset(&payload, 0, XL3_PAYLOAD_SIZE);
+
+    args = (MultiSetCratePedestalsArgs *) payload;
+
+    args->slotMask = htonl(slotMask);
+
+    for (i = 0; i < 16; i++) {
+        args->pattern[i] = htonl(patterns[i]);
+    }
+
+    @try {
+        [[self xl3Link] sendCommand:MULTI_SET_CRATE_PEDESTALS_ID withPayload:payload
+                        expectResponse:YES];
+    } @catch (NSException *e) {
+        return -1;
+    }
+
+    results = (MultiSetCratePedestalsResults *) payload;
+
+    if (ntohl(results->errorMask)) {
+        return -1;
+    }
+
+    return 0;
+}
+
 - (int) setPedestalMask: (uint32_t) slotMask pattern: (uint32_t) pattern
 {
     /* Set the pedestal mask for a given slot mask. Any slots not in the mask
