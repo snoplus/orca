@@ -1134,7 +1134,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     unsigned long aValue;
     [self read:kVMEControl returnValue:&aValue];
 
-	if (enable) {
+    if (enable) {
         aValue |= 0x100;
     } else {
         aValue &= 0xffffffeff;
