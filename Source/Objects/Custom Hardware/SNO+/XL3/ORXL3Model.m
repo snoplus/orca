@@ -2970,6 +2970,7 @@ err:
 {
     /* Similar to setPedestalMask except any slots not in the slot mask will
      * not have their pedestal mask changed. */
+    int i;
     char payload[XL3_PAYLOAD_SIZE];
     MultiSetCratePedsArgs *args;
     MultiSetCratePedsResults *results;
