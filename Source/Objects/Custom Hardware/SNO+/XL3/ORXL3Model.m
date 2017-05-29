@@ -2982,7 +2982,7 @@ err:
     args->slotMask = htonl(slotMask);
 
     for (i = 0; i < 16; i++) {
-        args->pattern[i] = htonl(patterns[i]);
+        args->channelMasks[i] = htonl(patterns[i]);
     }
 
     @try {
