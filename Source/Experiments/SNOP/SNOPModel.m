@@ -288,6 +288,8 @@ tellieRunFiles = _tellieRunFiles;
 
     nhitMonitor = [[NHitMonitor alloc] init];
 
+    ecaLock = [[NSLock alloc] init];
+
     [[self undoManager] disableUndoRegistration];
     [self initOrcaDBConnectionHistory];
     [self initDebugDBConnectionHistory];
@@ -427,6 +429,7 @@ tellieRunFiles = _tellieRunFiles;
     [logHost release];
     [anECARun release];
     [nhitMonitor release];
+    [ecaLock release];
     [_smellieRunFiles release];
     [_tellieRunFiles release];
     [_tellieRunNameLabel release];
@@ -1293,7 +1296,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
                 }
             }
 
-            if ([xl3 multiSetPedestalMask:0xffff patterns:channelMasks]) {
+            if ([xl3 multiSetPedestalMask:[xl3 getSlotsPresent] patterns:channelMasks]) {
                 NSLogColor([NSColor redColor],
                            @"failed to set pedestal mask for crate %02d slot %02d\n", i, j);
                 continue;
