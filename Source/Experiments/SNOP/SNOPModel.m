@@ -1216,7 +1216,8 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     ORXL3Model* xl3;
 
     if ([mtcs count] == 0) {
-        NSLogColor([NSColor redColor], @"pingCrates: couldn't find MTC object.\n");
+        NSLogColor([NSColor redColor],
+                   @"pingCrates: couldn't find MTC object.\n");
         return;
     }
 
@@ -1296,9 +1297,10 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
                 }
             }
 
-            if ([xl3 multiSetPedestalMask:[xl3 getSlotsPresent] patterns:channelMasks]) {
-                NSLogColor([NSColor redColor],
-                           @"failed to set pedestal mask for crate %02d slot %02d\n", i, j);
+            if ([xl3 multiSetPedestalMask:[xl3 getSlotsPresent]
+                     patterns:channelMasks]) {
+                NSLogColor([NSColor redColor], @"failed to set pedestal mask "
+                            "for crate %02d slot %02d\n", i, j);
                 continue;
             }
 
