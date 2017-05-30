@@ -3452,8 +3452,6 @@
 		EFB39FCE130BA1C5001220AC /* SNOP.gif in Resources */ = {isa = PBXBuildFile; fileRef = EFB39FC6130BA1C5001220AC /* SNOP.gif */; };
 		EFB39FD0130BA1C5001220AC /* SNOPController.h in Headers */ = {isa = PBXBuildFile; fileRef = EFB39FC8130BA1C5001220AC /* SNOPController.h */; };
 		EFB39FD1130BA1C5001220AC /* SNOPController.m in Sources */ = {isa = PBXBuildFile; fileRef = EFB39FC9130BA1C5001220AC /* SNOPController.m */; };
-		EFB39FD2130BA1C5001220AC /* SNOPDetectorView.h in Headers */ = {isa = PBXBuildFile; fileRef = EFB39FCA130BA1C5001220AC /* SNOPDetectorView.h */; };
-		EFB39FD3130BA1C5001220AC /* SNOPDetectorView.m in Sources */ = {isa = PBXBuildFile; fileRef = EFB39FCB130BA1C5001220AC /* SNOPDetectorView.m */; };
 		EFB39FD4130BA1C5001220AC /* SNOPModel.h in Headers */ = {isa = PBXBuildFile; fileRef = EFB39FCC130BA1C5001220AC /* SNOPModel.h */; };
 		EFB39FD5130BA1C5001220AC /* SNOPModel.m in Sources */ = {isa = PBXBuildFile; fileRef = EFB39FCD130BA1C5001220AC /* SNOPModel.m */; };
 		EFCC4546117FD45E008DC12C /* ORSNOCrateDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = EFCC4544117FD45E008DC12C /* ORSNOCrateDecoders.h */; };
@@ -7101,8 +7099,6 @@
 		EFB39FC6130BA1C5001220AC /* SNOP.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = SNOP.gif; sourceTree = "<group>"; };
 		EFB39FC8130BA1C5001220AC /* SNOPController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNOPController.h; sourceTree = "<group>"; };
 		EFB39FC9130BA1C5001220AC /* SNOPController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SNOPController.m; sourceTree = "<group>"; };
-		EFB39FCA130BA1C5001220AC /* SNOPDetectorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNOPDetectorView.h; sourceTree = "<group>"; };
-		EFB39FCB130BA1C5001220AC /* SNOPDetectorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SNOPDetectorView.m; sourceTree = "<group>"; };
 		EFB39FCC130BA1C5001220AC /* SNOPModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNOPModel.h; sourceTree = "<group>"; };
 		EFB39FCD130BA1C5001220AC /* SNOPModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SNOPModel.m; sourceTree = "<group>"; };
 		EFCC4544117FD45E008DC12C /* ORSNOCrateDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSNOCrateDecoders.h; sourceTree = "<group>"; };
@@ -14490,8 +14486,6 @@
 				0FF177B51DF7A09900BA783B /* RunStatusIcon.m */,
 				EFB39FC8130BA1C5001220AC /* SNOPController.h */,
 				EFB39FC9130BA1C5001220AC /* SNOPController.m */,
-				EFB39FCA130BA1C5001220AC /* SNOPDetectorView.h */,
-				EFB39FCB130BA1C5001220AC /* SNOPDetectorView.m */,
 				EFB39FCC130BA1C5001220AC /* SNOPModel.h */,
 				EFB39FCD130BA1C5001220AC /* SNOPModel.m */,
 				0FF177A51DF79F5600BA783B /* run_dog_images */,
@@ -15956,7 +15950,6 @@
 				8457D25512F9986E00D3E3B4 /* ORiSegHVCardController.h in Headers */,
 				8457D37712F9AB8A00D3E3B4 /* ORiSegHVCardDecoders.h in Headers */,
 				EFB39FD0130BA1C5001220AC /* SNOPController.h in Headers */,
-				EFB39FD2130BA1C5001220AC /* SNOPDetectorView.h in Headers */,
 				EFB39FD4130BA1C5001220AC /* SNOPModel.h in Headers */,
 				84052A2E13106B65007607A4 /* ORCouchDBController.h in Headers */,
 				84052A3013106B65007607A4 /* ORCouchDBModel.h in Headers */,
@@ -18219,7 +18212,6 @@
 				8457D25612F9986E00D3E3B4 /* ORiSegHVCardController.m in Sources */,
 				8457D37812F9AB8A00D3E3B4 /* ORiSegHVCardDecoders.m in Sources */,
 				EFB39FD1130BA1C5001220AC /* SNOPController.m in Sources */,
-				EFB39FD3130BA1C5001220AC /* SNOPDetectorView.m in Sources */,
 				EFB39FD5130BA1C5001220AC /* SNOPModel.m in Sources */,
 				84052A2F13106B65007607A4 /* ORCouchDBController.m in Sources */,
 				842FCCB2197849C700B89723 /* OREHS8260pController.m in Sources */,

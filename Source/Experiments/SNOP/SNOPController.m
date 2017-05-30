@@ -105,6 +105,7 @@ snopGreenColor;
     [_smellieRunFileList release];
     [_tellieRunFileList release];
     [tellieFireSettings release];
+    waitingForBuffersAlert = nil;
     [super dealloc];
 }
 
@@ -466,6 +467,16 @@ snopGreenColor;
     [notifyCenter addObserver : self
                      selector : @selector(nhitMonitor:)
                          name : ORNhitMonitorNotification
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(stillWaitingForBuffers:)
+                         name : ORSNOPStillWaitingForBuffersNotification
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(notWaitingForBuffers:)
+                         name : ORSNOPNotWaitingForBuffersNotification
                         object: nil];
 }
 
@@ -829,6 +840,37 @@ err:
 - (void) dbDebugDBIPChanged:(NSNotification*)aNote
 {
     [debugDBIPAddressPU setStringValue:[model debugDBIPAddress]];
+}
+
+- (void) stillWaitingForBuffers:(NSNotification*)aNote
+{
+    /* Throw up a window-modal dialog to give the user an option
+     * to avoid waiting for the hardware buffers to clear at the end
+     * of a run (only for OS X 10.10 or later).  Must be called
+     * only from the main thread. */
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSString* s = [NSString stringWithFormat:@"Waiting for buffers to empty..."];
+    waitingForBuffersAlert = [[[NSAlert alloc] init] autorelease];
+    [waitingForBuffersAlert setMessageText:s];
+    [waitingForBuffersAlert addButtonWithTitle:@"Force Stop and LOSE DATA!"];
+    [waitingForBuffersAlert setAlertStyle:NSInformationalAlertStyle];
+    [waitingForBuffersAlert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn) {
+            [model abortWaitingForBuffers]; // don't wait for buffers to clear
+            waitingForBuffersAlert = nil;
+        }
+    }];
+#endif
+}
+
+- (void) notWaitingForBuffers:(NSNotification*)aNote
+{
+    /* Close our "Waiting for buffers" dialog if it was open.
+     * Must be called only from the main thread. */
+    if (waitingForBuffersAlert) {
+        [[self window] endSheet:[[self window] attachedSheet] returnCode:NSAlertSecondButtonReturn];
+        waitingForBuffersAlert = nil;
+    }
 }
 
 - (void) hvStatusChanged:(NSNotification*)aNote

@@ -486,6 +486,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 - (void) dealloc 
 {
     [waveFormRateGroup release];
+    [revision release];
     [super dealloc];
 }
 
@@ -554,10 +555,10 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 	[self setEnableInternalRouting:YES];
 	[self setPageWrap:YES];
 	[self setPageSize:1];
+    
 	[self setStopDelay:15000];
 	[self setStartDelay:15000];
 	[self setStopDelayEnabled:YES];
-	[self setStartDelayEnabled:YES];
 }
 
 - (unsigned short) moduleID;
@@ -567,6 +568,19 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 
 //---------------------------------------------------------------------------
 //-----------------------Threshold Register Accessors------------------------
+
+//6.1
+- (void) writeControlStatusRegister: (unsigned short)aValue{
+    //if (writeControlStatusRegister)>0xffff return 0xffff;
+    if (aValue<0)aValue = 0;
+    if (aValue>1)aValue = 1;
+}
+    
+
+
+
+
+///------------------------------------------------------------
 - (long) enabledMask                        { return enabledMask;                                       }
 - (BOOL) enabled:(short)chan                { return enabledMask & (1<<chan);                           }
 - (long) heSuppressTriggerMask              { return heSuppressTriggerMask;                             }
@@ -875,7 +889,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     if(aGroup<0 || aGroup>kNumSIS3316Groups)return;
     if(aValue != [self activeTrigGateWindowLen:aGroup]){
         [[[self undoManager] prepareWithInvocationTarget:self] setActiveTrigGateWindowLen:aGroup withValue:[self activeTrigGateWindowLen:aGroup]];
-        activeTrigGateWindowLen[aGroup] = aValue;
+        activeTrigGateWindowLen[aGroup] = aValue & 0xffff;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316ActiveTrigGateWindowLenChanged object:self];
     }
 }
@@ -1353,17 +1367,6 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AcqRegChanged object:self];
 }
 
-- (BOOL) startDelayEnabled
-{
-    return startDelayEnabled;
-}
-
-- (void) setStartDelayEnabled:(BOOL)aStartDelayEnabled
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setStartDelayEnabled:startDelayEnabled];
-    startDelayEnabled = aStartDelayEnabled;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AcqRegChanged object:self];
-}
 
 - (BOOL) stopDelayEnabled
 {
@@ -1486,6 +1489,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
     return waveFormRateGroup;
 }
+
 - (void) setWaveFormRateGroup:(ORRateGroup*)newRateGroup
 {
     [newRateGroup retain];
@@ -1530,26 +1534,27 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 
 #pragma mark •••Hardware Access
 //Register Array
-- (unsigned long) interfaceRegister: (unsigned long)aRegisterIndex
-{
+
+//------------------------------------------------------------
+//four types of registers
+- (unsigned long) interfaceRegister: (unsigned long)aRegisterIndex{
     return [self baseAddress] + vmefpgaInterface_register_information[aRegisterIndex].offset;
 }
-- (unsigned long) vmeRegister:(unsigned long)aRegisterIndex
-{
+- (unsigned long) vmeRegister:(unsigned long)aRegisterIndex{
     return [self baseAddress] + vmefpga_register_information[aRegisterIndex].offset;
 }
--(unsigned long) keyRegister:(unsigned long)aRegisterIndex
-{
+-(unsigned long) keyRegister:(unsigned long)aRegisterIndex{
     return [self baseAddress] + key_address_register_information[aRegisterIndex].offset;
 }
 
-- (unsigned long) groupRegister:(unsigned long)aRegisterIndex group:(int)aGroup
-{
+- (unsigned long) groupRegister:(unsigned long)aRegisterIndex group:(int)aGroup{
     return [self baseAddress] + group_register_information[aRegisterIndex].offset + 0x1000*aGroup;
 }
 
-- (void) writeControlStatusReg:(unsigned long)aValue
-{
+//--------------------------------------------------------------
+
+//6.1 Control/Status Register(0x0, write/read)
+- (void) writeControlStatusReg:(unsigned long)aValue{
     [[self adapter] writeLongBlock:&aValue
                          atAddress:[self interfaceRegister:kControlStatusReg]
                         numToWrite:1
@@ -1557,8 +1562,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
                      usingAddSpace:0x01];
 }
 
-- (unsigned long) readControlStatusReg
-{
+- (unsigned long) readControlStatusReg{
     unsigned long aValue = 0;
     [[self adapter] readLongBlock:&aValue
                          atAddress:[self interfaceRegister:kControlStatusReg]
@@ -1567,9 +1571,8 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
                      usingAddSpace:0x01];
     return aValue;
 }
-
-- (void) readModuleID:(BOOL)verbose
-{
+//6.2 Module Id. and Firmware Revision Register
+- (void) readModuleID:(BOOL)verbose{
     unsigned long result = 0;
     [[self adapter] readLongBlock:&result
                         atAddress:[self interfaceRegister:kModuleIDReg]
@@ -1579,22 +1582,47 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     moduleID = result >> 16;
     unsigned short majorRev = (result >> 8) & 0xff;
     unsigned short minorRev = result & 0xff;
-    if(verbose)NSLog(@"SIS3316 ID: %x  Firmware:%x.%x\n",moduleID,majorRev,minorRev);
+    [self setRevision:[NSString stringWithFormat:@"%x.%x",majorRev,minorRev]];
+    
+    if(verbose)NSLog(@"SIS3316 ID: %x  Firmware:%x@\n",moduleID,revision);
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316IDChanged object:self];
-}
+}//note: 0x20 uses n/Gamma //
 
-- (void) readHWVersion:(BOOL)verbose
-{
+//6.3 Intterupt Configureation register (0x8)
+
+//6.4 Interrupt control register (0xC)
+
+//6.5 Interface Access Arbitration Control Register
+
+//6.6 Broadcast setup register
+
+//6.7 Hardware Version Register
+- (void) readHWVersion:(BOOL)verbose{
     unsigned long result = 0;
     [[self adapter] readLongBlock:&result
                         atAddress:[self interfaceRegister:kHWVersionReg]
                         numToRead:1
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
+    result &= 0xf;
+    
     if(verbose)NSLog(@"%@ HW Version: %d\n",[self fullID],result);
 }
 
+
+- (NSString*) revision{
+    if(revision)return revision;
+    else        return nil;
+}
+
+- (void) setRevision:(NSString*)aString;
+{
+    [revision autorelease];
+    revision = [aString copy];
+}
+
+//6.8 Temperature Register
 - (void) readTemperature:(BOOL)verbose
 {
     unsigned long result = 0;
@@ -1604,20 +1632,44 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
     if(verbose)NSLog(@"%@ HW Version: 0x`%0x\n",[self fullID],result);
+    //maxes at bit 9
+    //may need binary to Celsius conversion
 }
 
-- (void) readSerialNumber:(BOOL)verbose
-{
+//6.9 Onewire EEPROM Control register
+
+//6.10 Serial Number register
+- (void) readSerialNumber:(BOOL)verbose{
     unsigned long result = 0;
     [[self adapter] readLongBlock:&result
                         atAddress:[self vmeRegister:kSerialNumberReg ]
                         numToRead:1
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
-    unsigned short serialNumber = result & 0xFF;
-    if(verbose)NSLog(@"%@ Serial Number: 0x%0x\n",[self fullID],serialNumber);
+    BOOL isSerialNumberValid    = (result >> 16) & 0x1;
+    unsigned short serialNumber = result & 0xFFFF;  //gives serial number
+   // unsigned short dhcpOption   = (result >> 24) & 0xFF;
+    //unsigned short megaByteMemoryFlag512    =   (result >> 23);
+    
+    if(verbose){
+        if(isSerialNumberValid)NSLog(@"%@ Serial Number: 0x%0x\n",[self fullID],serialNumber);
+        else NSLog(@"Serial Number is not valid\n");
+       // if (megaByteMemoryFlag512)NSLog(@"512 MByte Memory Flag\n");
+        
+    }
 }
 
+//6.11 Internal Transfer Speed register(not often needed)
+
+//6.12 ADC FPGA Boot control register
+
+//6.13 SPI Flash Control/Status register
+
+//6.14 6.14 SPI Flash Data register
+
+//6.15 External Veto/Gate Delay register
+
+//6.16 Programmable Clock I2C registers (needs four channels)
 - (void) writeClockSource
 {
     unsigned long value = clockSource;
@@ -1628,6 +1680,9 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
                      usingAddSpace:0x01];
 }
 
+//6.17 ADC Sample Clock distribution control register (0x50)
+
+//6.18 External NIM Clock Multiplier SPI register
 
 
 //- (void) writeAcquistionRegister
@@ -1637,8 +1692,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 //	if(bankSwitchMode)			aMask |= kSISBankSwitch;
 //	if(autoStart)				aMask |= kSISAutostart;
 //	if(multiEventMode)			aMask |= kSISMultiEvent;
-//	if(startDelayEnabled)		aMask |= kSISEnableStartDelay;			
-//	if(stopDelayEnabled)		aMask |= kSISEnableStopDelay;			
+//	if(stopDelayEnabled)		aMask |= kSISEnableStopDelay;
 //	if(lemoStartStop)			aMask |= kSISEnableLemoStartStop;			
 //	if(p2StartStop)				aMask |= kSISEnableP2StartStop;			
 //	if(gateMode)				aMask |= kSISEnableGateMode;
@@ -1672,6 +1726,355 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 //                     usingAddSpace:0x01];
 //}
 //
+
+
+//6.19 FP-Bus control register
+
+//6.20 NIM Input Control/Status register
+
+//6.21 Acquisition control/status register (0x60, read/write)
+- (void) writeAcquistionRegister
+{
+    unsigned long aValue=0; //<<<<<<<---------hard coded for now ---------------
+    [[self adapter] readLongBlock:&aValue
+                        atAddress:[self vmeRegister:kAcqControlStatusReg]
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+}
+
+//6.22 Trigger Coincidence Lookup Table Control register
+
+//6.23 Trigger Coincidence Lookup Table Address register
+
+//6.24 Trigger Coincidence Lookup Table Data register
+
+//6.25 LEMO Out “CO” Select register
+
+//6.26 LEMO Out “TO” Select register
+
+//6.27 LEMO Out “UO” Select register
+
+//6.28 Internal Trigger Feedback Select register
+
+//6.29 ADC FPGA Data Transfer Control registers
+
+//6.30 ADC FPGA Data Transfer Status registers
+
+//6.1 VME FPGA – ADC FPGA Data Link Status register (page 119 and on)
+
+//6.2 ADC FPGA SPI BUSY Status register
+
+//6.3 Prescaler Output Pulse Divider register
+
+//6.4 Prescaler Output Pulse Length register
+
+//6.5 Channel 1 to 16 Internal Trigger Counters
+
+//6.6 ADC Input tap delay registers
+
+//6.7 ADC Gain and Termination Control register
+
+//6.8 ADC Offset (DAC) Control registers
+
+//6.9 ADC Offset (DAC) Readback registers
+
+//6.10 ADC SPI Control register
+
+//6.11 ADC SPI Readback registers
+
+//6.12 Event configuration registers
+
+//6.13 Extended Event configuration registers
+
+//6.14 Channel Header ID registers
+
+//6.15 End Address Threshold register
+
+//6.16 Active Trigger Gate Window Length registers
+
+//6.17 Raw Data Buffer Configuration registers
+- (void) writeRawDataBufferConfig
+{
+    int i;
+    
+    for(i = 0; i < kNumSIS3316Groups; i++) {
+        unsigned long valueToWrite = ([self rawDataBufferLen:i]<<16) | ([self rawDataBufferStart:i]);
+        [[self adapter] writeLongBlock:&valueToWrite
+                             atAddress:[self groupRegister:kRawDataBufferConfigReg group:i]
+                            numToWrite:1
+                            withAddMod:[self addressModifier]
+                         usingAddSpace:0x01];
+    }
+    
+}
+
+
+//6.18 Pileup Configuration registers
+
+//6.19 Pre Trigger Delay registers
+- (void) writePreTriggerDelays
+{
+    int i;
+    for(i = 0; i < kNumSIS3316Groups; i++) {
+        unsigned long valueToWrite = [self preTriggerDelay:i];
+
+        [[self adapter] writeLongBlock:&valueToWrite
+                             atAddress:[self groupRegister:kPreTriggerDelayReg group:i]
+                            numToWrite:1
+                            withAddMod:[self addressModifier]
+                         usingAddSpace:0x01];
+    }
+
+}
+
+//6.20 Average Configuration registers
+
+//6.21 Data Format Configuration registers
+- (void) writeDataFormat
+{
+    int i;
+    for(i=0;i<kNumSIS3316Groups;i++){
+        unsigned long aValue = 0x05050505;//<<<<<<<---------hard coded for now---------------
+        [[self adapter] writeLongBlock: &aValue
+                             atAddress: [self groupRegister:kDataFormatConfigReg group:i]
+                            numToWrite: 1
+                            withAddMod: [self addressModifier]
+                         usingAddSpace: 0x01];
+    }
+}
+
+//6.22 MAW Test Buffer Configuration registers
+
+//6.23 Internal Trigger Delay Configuration registers
+
+//6.24 Internal Gate Length Configuration registers
+- (void) writeActiveTrigeGateWindowLens
+{
+    int i;
+    for(i = 0; i < kNumSIS3316Groups; i++) {
+        unsigned long valueToWrite = [self activeTrigGateWindowLen:i] & 0xffff;
+        
+        [[self adapter] writeLongBlock:&valueToWrite
+                             atAddress:[self groupRegister:kActTriggerGateWindowLenReg group:i]
+                            numToWrite:1
+                            withAddMod:[self addressModifier]
+                         usingAddSpace:0x01];
+    }
+    
+}
+
+//6.25 FIR Trigger Setup registers
+- (void) writeFirTriggerSetup
+{
+    int i;
+    for(i = 0; i < kNumSIS3316Channels; i++) {
+        unsigned long valueToWrite =  (([self gapTime:i] & 0xffff)<<12) | ([self peakingTime:i] & 0xffff);
+        
+        [[self adapter] writeLongBlock:&valueToWrite
+                             atAddress:[self groupRegister:kFirTrigSetupCh1Reg group:i]
+                            numToWrite:1
+                            withAddMod:[self addressModifier]
+                         usingAddSpace:0x01];
+    }
+}
+
+//6.26 Trigger Threshold registers
+- (void) writeThresholds
+{
+    int i;
+    if(!moduleID)[self readModuleID:NO];
+    for(i = 0; i < kNumSIS3316Channels; i++) {
+        unsigned long valueToWrite =  (((enabledMask>>i)           & 0x1) << 31)  |
+        (((heSuppressTriggerMask>>i) & 0x1) << 30)  |
+        ((cfdControlBits[i]+1  & 0x3) <<28)   |
+        (threshold[i]          & 0xffffffff);
+        
+        [[self adapter] writeLongBlock:&valueToWrite
+                             atAddress:[self baseAddress] + thresholdRegs[i]
+                            numToWrite:1
+                            withAddMod:[self addressModifier]
+                         usingAddSpace:0x01];
+    }
+}
+
+- (void) readThresholds:(BOOL)verbose
+{
+    int i;
+    if(verbose){
+        NSLog(@"Reading Thresholds:\n");
+        NSLog(@"Chan Enabled HESupp CFD Threshold \n");
+    }
+    for(i =0; i < kNumSIS3316Channels; i++) {
+        
+        unsigned long aValue;
+        [[self adapter] readLongBlock: &aValue
+                            atAddress: [self baseAddress] + thresholdRegs[i]
+                            numToRead: 1
+                           withAddMod: [self addressModifier]
+                        usingAddSpace: 0x01];
+        
+        if(verbose){
+            unsigned short thres  = (aValue & 0x0FFFFFFF);
+            unsigned short cfdCnt = ((aValue>>28) & 0x3);
+            unsigned short heSup  = ((aValue>>30) & 0x1);
+            unsigned short enabl  = ((aValue>>31) & 0x1);
+            NSLog(@"%2d: %@ %@ %@ 0x%08x\n",i, enabl?@"YES":@" NO",heSup?@"YES":@" NO",cfdCntrlString[cfdCnt],thres);
+        }
+    }
+}
+
+
+//6.27 High Energy Trigger Threshold registers
+- (void) writeHeTrigThresholds
+{
+    int i;
+    for(i = 0; i < kNumSIS3316Channels; i++) {
+        unsigned long valueToWrite =    (((trigBothEdgesMask>>i)        & 0x1) << 31)  |
+        (((intHeTrigOutPulseMask>>i)    & 0x1) << 30)  |
+        (([self intTrigOutPulseBit:i]  & 0x3) <<28)   |
+        ([self heTrigThreshold:i]       & 0xffffffff);
+        
+        [[self adapter] writeLongBlock:&valueToWrite
+                             atAddress:[self baseAddress] + heThresholdRegs[i]
+                            numToWrite:1
+                            withAddMod:[self addressModifier]
+                         usingAddSpace:0x01];
+    }
+    
+}
+
+- (void) readHeTrigThresholds:(BOOL)verbose
+{
+    int i;
+    if(verbose){
+        NSLog(@"Reading High Energty Thresholds:\n");
+        NSLog(@"Chan BothEdges IntHETrigOut IntTrigOut HEThreshold \n");
+    }
+    for(i =0; i < kNumSIS3316Channels; i++) {
+        
+        unsigned long aValue;
+        [[self adapter] readLongBlock: &aValue
+                            atAddress: [self baseAddress] + heThresholdRegs[i]
+                            numToRead: 1
+                           withAddMod: [self addressModifier]
+                        usingAddSpace: 0x01];
+        
+        if(verbose){
+            unsigned short heThres  = (aValue & 0x0FFFFFFF);
+            unsigned short intTrigOut = ((aValue>>28) & 0x3);
+            unsigned short intHETrigOut  = ((aValue>>30) & 0x1);
+            unsigned short both  = ((aValue>>31) & 0x1);
+            NSLog(@"%2d: %@ %@ %@ 0x%08x\n",i, both?@"YES":@" NO",intHETrigOut?@"YES":@" NO",intTrigOutPulseString[intTrigOut],heThres);
+        }
+    }
+}
+
+//6.28 Trigger Statistic Counter Mode register
+
+//6.29 Peak/Charge Configuration registers
+
+//6.30 Extended Raw Data Buffer Configuration registers
+
+//6.31 Accumulator Gate X Configuration registers
+- (void) writeAccumulatorGates
+{
+    int i;
+    unsigned long valueToWrite;
+    for(i = 0; i < kNumSIS3316Groups; i++) {
+        valueToWrite =  ([self accGate1Len:i] << 16) | [self accGate1Start:i];
+        [[self adapter] writeLongBlock:&valueToWrite
+                             atAddress:[self groupRegister:kAccGate1ConfigReg group:i]
+                            numToWrite:1
+                            withAddMod:[self addressModifier]
+                         usingAddSpace:0x01];
+        
+        valueToWrite =  ([self accGate2Len:i] << 16) | [self accGate2Start:i];
+        [[self adapter] writeLongBlock:&valueToWrite
+                             atAddress:[self groupRegister:kAccGate2ConfigReg group:i]
+                            numToWrite:1
+                            withAddMod:[self addressModifier]
+                         usingAddSpace:0x01];
+        
+        valueToWrite =  ([self accGate3Len:i] << 16) | [self accGate3Start:i];
+        [[self adapter] writeLongBlock:&valueToWrite
+                             atAddress:[self groupRegister:kAccGate3ConfigReg group:i]
+                            numToWrite:1
+                            withAddMod:[self addressModifier]
+                         usingAddSpace:0x01];
+        
+        valueToWrite =  ([self accGate4Len:i] << 16) | [self accGate4Start:i];
+        [[self adapter] writeLongBlock:&valueToWrite
+                             atAddress:[self groupRegister:kAccGate4ConfigReg group:i]
+                            numToWrite:1
+                            withAddMod:[self addressModifier]
+                         usingAddSpace:0x01];
+        
+        valueToWrite =  ([self accGate5Len:i] << 16) | [self accGate5Start:i];
+        [[self adapter] writeLongBlock:&valueToWrite
+                             atAddress:[self groupRegister:kAccGate5ConfigReg group:i]
+                            numToWrite:1
+                            withAddMod:[self addressModifier]
+                         usingAddSpace:0x01];
+        
+        valueToWrite =  ([self accGate6Len:i] << 16) | [self accGate6Start:i];
+        [[self adapter] writeLongBlock:&valueToWrite
+                             atAddress:[self groupRegister:kAccGate6ConfigReg group:i]
+                            numToWrite:1
+                            withAddMod:[self addressModifier]
+                         usingAddSpace:0x01];
+        
+        valueToWrite =  ([self accGate7Len:i] << 16) | [self accGate7Start:i];
+        [[self adapter] writeLongBlock:&valueToWrite
+                             atAddress:[self groupRegister:kAccGate7ConfigReg group:i]
+                            numToWrite:1
+                            withAddMod:[self addressModifier]
+                         usingAddSpace:0x01];
+        
+        valueToWrite =  ([self accGate8Len:i] << 16) | [self accGate8Start:i];
+        [[self adapter] writeLongBlock:&valueToWrite
+                             atAddress:[self groupRegister:kAccGate8ConfigReg group:i]
+                            numToWrite:1
+                            withAddMod:[self addressModifier]
+                         usingAddSpace:0x01];
+    }
+}
+//6.32 FIR Energy Setup registers
+
+//6.33 Energy Histogram Configuration registers
+- (void) writeHistogramConfiguration
+{
+    int i;
+    for(i=0;i<16;i++){
+        unsigned long aValue = 0x0;
+        if([self histogramsEnabled:i])      aValue |= 0x1<<0;
+        if([self pileupEnabled:i])          aValue |= 0x1<<1;
+        if([self clrHistogramsWithTS:i])    aValue |= 0x1<<30;
+        if([self writeHitsToEventMemory:i]) aValue |= 0x1<<31;
+        
+        aValue |= ([self energyDivider:i]&0xfff)  << 16;
+        aValue |= ([self energySubtractor:i]&0xfff)<< 8;
+        
+        [[self adapter] writeLongBlock: &aValue
+                             atAddress: [self baseAddress] + energyHistogramConfigRegs[i]
+                            numToWrite: 1
+                            withAddMod: [self addressModifier]
+                         usingAddSpace: 0x01];
+    }
+}
+
+//6.34 MAW Start Index and Energy Pickup Configuration registers
+
+//6.35 ADC FPGA Firmware Version Register
+
+//6.36 ADC FPGA Status register
+
+//6.37 Actual Sample address registers
+
+//6.38 Previous Bank Sample address registers
+
+//6.39 Key addresses (0x400 – 0x43C write only)
+
 
 - (void) setLed:(BOOL)state
 {
@@ -1940,249 +2343,6 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     }
 }
 
-- (void) writeFirTriggerSetup
-{
-    int i;
-    for(i = 0; i < kNumSIS3316Channels; i++) {
-        unsigned long valueToWrite =  (([self gapTime:i] & 0xffff)<<12) | ([self peakingTime:i] & 0xffff);
-        
-        [[self adapter] writeLongBlock:&valueToWrite
-                             atAddress:[self groupRegister:kFirTrigSetupCh1Reg group:i]
-                            numToWrite:1
-                            withAddMod:[self addressModifier]
-                         usingAddSpace:0x01];
-    }
-}
-
-- (void) writeThresholds
-{   
-	int i;
-	if(!moduleID)[self readModuleID:NO];
-	for(i = 0; i < kNumSIS3316Channels; i++) {
-		unsigned long valueToWrite =  (((enabledMask>>i)           & 0x1) << 31)  |
-                                      (((heSuppressTriggerMask>>i) & 0x1) << 30)  |
-                                      ((cfdControlBits[i]+1  & 0x3) <<28)   |
-                                      (threshold[i]          & 0xffffffff);
-							
-		[[self adapter] writeLongBlock:&valueToWrite
-							 atAddress:[self baseAddress] + thresholdRegs[i]
-							numToWrite:1
-							withAddMod:[self addressModifier]
-						 usingAddSpace:0x01];
-	}
-}
-
-- (void) readThresholds:(BOOL)verbose
-{   
-	int i;
-    if(verbose){
-        NSLog(@"Reading Thresholds:\n");
-        NSLog(@"Chan Enabled HESupp CFD Threshold \n");
-    }
-    for(i =0; i < kNumSIS3316Channels; i++) {
-		
-		unsigned long aValue;
-		[[self adapter] readLongBlock: &aValue
-							atAddress: [self baseAddress] + thresholdRegs[i]
-							numToRead: 1
-						   withAddMod: [self addressModifier]
-						usingAddSpace: 0x01];
-		
-		if(verbose){
-            unsigned short thres  = (aValue & 0x0FFFFFFF);
-            unsigned short cfdCnt = ((aValue>>28) & 0x3);
-            unsigned short heSup  = ((aValue>>30) & 0x1);
-            unsigned short enabl  = ((aValue>>31) & 0x1);
-			NSLog(@"%2d: %@ %@ %@ 0x%08x\n",i, enabl?@"YES":@" NO",heSup?@"YES":@" NO",cfdCntrlString[cfdCnt],thres);
-		}
-	}
-}
-
-
-- (void) writeHeTrigThresholds
-{
-    int i;
-    for(i = 0; i < kNumSIS3316Channels; i++) {
-        unsigned long valueToWrite =    (((trigBothEdgesMask>>i)        & 0x1) << 31)  |
-                                        (((intHeTrigOutPulseMask>>i)    & 0x1) << 30)  |
-                                        (([self intTrigOutPulseBit:i]  & 0x3) <<28)   |
-                                        ([self heTrigThreshold:i]       & 0xffffffff);
-        
-        [[self adapter] writeLongBlock:&valueToWrite
-                             atAddress:[self baseAddress] + heThresholdRegs[i]
-                            numToWrite:1
-                            withAddMod:[self addressModifier]
-                         usingAddSpace:0x01];
-    }
-  
-}
-
-- (void) writeActiveTrigeGateWindowLens
-{
-    int i;
-    for(i = 0; i < kNumSIS3316Groups; i++) {
-        unsigned long valueToWrite = [self activeTrigGateWindowLen:i];
-        
-        [[self adapter] writeLongBlock:&valueToWrite
-                             atAddress:[self groupRegister:kActTriggerGateWindowLenReg group:i]
-                            numToWrite:1
-                            withAddMod:[self addressModifier]
-                         usingAddSpace:0x01];
-    }
-    
-}
-
-- (void) writePreTriggerDelays
-{
-    int i;
-    for(i = 0; i < kNumSIS3316Groups; i++) {
-        unsigned long valueToWrite = [self preTriggerDelay:i];
-        
-        [[self adapter] writeLongBlock:&valueToWrite
-                             atAddress:[self groupRegister:kPreTriggerDelayReg group:i]
-                            numToWrite:1
-                            withAddMod:[self addressModifier]
-                         usingAddSpace:0x01];
-    }
-    
-}
-
-- (void) writeRawDataBufferConfig
-{
-    int i;
-    
-    for(i = 0; i < kNumSIS3316Groups; i++) {
-        unsigned long valueToWrite = ([self rawDataBufferLen:i]<<16) | ([self rawDataBufferStart:i]);
-        [[self adapter] writeLongBlock:&valueToWrite
-                             atAddress:[self groupRegister:kRawDataBufferConfigReg group:i]
-                            numToWrite:1
-                            withAddMod:[self addressModifier]
-                         usingAddSpace:0x01];
-    }
-    
-}
-
-
-- (void) readHeTrigThresholds:(BOOL)verbose
-{
-    int i;
-    if(verbose){
-        NSLog(@"Reading High Energty Thresholds:\n");
-        NSLog(@"Chan BothEdges IntHETrigOut IntTrigOut HEThreshold \n");
-    }
-    for(i =0; i < kNumSIS3316Channels; i++) {
-        
-        unsigned long aValue;
-        [[self adapter] readLongBlock: &aValue
-                            atAddress: [self baseAddress] + heThresholdRegs[i]
-                            numToRead: 1
-                           withAddMod: [self addressModifier]
-                        usingAddSpace: 0x01];
-        
-        if(verbose){
-            unsigned short heThres  = (aValue & 0x0FFFFFFF);
-            unsigned short intTrigOut = ((aValue>>28) & 0x3);
-            unsigned short intHETrigOut  = ((aValue>>30) & 0x1);
-            unsigned short both  = ((aValue>>31) & 0x1);
-            NSLog(@"%2d: %@ %@ %@ 0x%08x\n",i, both?@"YES":@" NO",intHETrigOut?@"YES":@" NO",intTrigOutPulseString[intTrigOut],heThres);
-        }
-    }
-}
-- (void) writeAccumulatorGates
-{
-    int i;
-    unsigned long valueToWrite;
-    for(i = 0; i < kNumSIS3316Groups; i++) {
-        valueToWrite =  ([self accGate1Len:i] << 16) | [self accGate1Start:i];
-        [[self adapter] writeLongBlock:&valueToWrite
-                             atAddress:[self groupRegister:kAccGate1ConfigReg group:i]
-                            numToWrite:1
-                            withAddMod:[self addressModifier]
-                         usingAddSpace:0x01];
-        
-        valueToWrite =  ([self accGate2Len:i] << 16) | [self accGate2Start:i];
-        [[self adapter] writeLongBlock:&valueToWrite
-                             atAddress:[self groupRegister:kAccGate2ConfigReg group:i]
-                            numToWrite:1
-                            withAddMod:[self addressModifier]
-                         usingAddSpace:0x01];
-
-        valueToWrite =  ([self accGate3Len:i] << 16) | [self accGate3Start:i];
-        [[self adapter] writeLongBlock:&valueToWrite
-                             atAddress:[self groupRegister:kAccGate3ConfigReg group:i]
-                            numToWrite:1
-                            withAddMod:[self addressModifier]
-                         usingAddSpace:0x01];
-
-        valueToWrite =  ([self accGate4Len:i] << 16) | [self accGate4Start:i];
-        [[self adapter] writeLongBlock:&valueToWrite
-                             atAddress:[self groupRegister:kAccGate4ConfigReg group:i]
-                            numToWrite:1
-                            withAddMod:[self addressModifier]
-                         usingAddSpace:0x01];
-
-        valueToWrite =  ([self accGate5Len:i] << 16) | [self accGate5Start:i];
-        [[self adapter] writeLongBlock:&valueToWrite
-                             atAddress:[self groupRegister:kAccGate5ConfigReg group:i]
-                            numToWrite:1
-                            withAddMod:[self addressModifier]
-                         usingAddSpace:0x01];
-
-        valueToWrite =  ([self accGate6Len:i] << 16) | [self accGate6Start:i];
-        [[self adapter] writeLongBlock:&valueToWrite
-                             atAddress:[self groupRegister:kAccGate6ConfigReg group:i]
-                            numToWrite:1
-                            withAddMod:[self addressModifier]
-                         usingAddSpace:0x01];
-
-        valueToWrite =  ([self accGate7Len:i] << 16) | [self accGate7Start:i];
-        [[self adapter] writeLongBlock:&valueToWrite
-                             atAddress:[self groupRegister:kAccGate7ConfigReg group:i]
-                            numToWrite:1
-                            withAddMod:[self addressModifier]
-                         usingAddSpace:0x01];
-
-        valueToWrite =  ([self accGate8Len:i] << 16) | [self accGate8Start:i];
-        [[self adapter] writeLongBlock:&valueToWrite
-                             atAddress:[self groupRegister:kAccGate8ConfigReg group:i]
-                            numToWrite:1
-                            withAddMod:[self addressModifier]
-                         usingAddSpace:0x01];
-    }
-}
-
-- (void) writeHistogramConfiguration
-{
-    int i;
-    for(i=0;i<16;i++){
-        unsigned long aValue = 0x0;
-        if([self histogramsEnabled:i])      aValue |= 0x1<<0;
-        if([self pileupEnabled:i])          aValue |= 0x1<<1;
-        if([self clrHistogramsWithTS:i])    aValue |= 0x1<<30;
-        if([self writeHitsToEventMemory:i]) aValue |= 0x1<<31;
-        
-        aValue |= ([self energyDivider:i]&0xfff)  << 16;
-        aValue |= ([self energySubtractor:i]&0xfff)<< 8;
-
-        [[self adapter] writeLongBlock: &aValue
-                            atAddress: [self baseAddress] + energyHistogramConfigRegs[i]
-                            numToWrite: 1
-                           withAddMod: [self addressModifier]
-                        usingAddSpace: 0x01];
-    }
-}
-- (void) writeDataFormat
-{
-    int i;
-    for(i=0;i<kNumSIS3316Groups;i++){
-        unsigned long aValue = 0x05050505;//<<<<<<<---------hard coded for now---------------
-        [[self adapter] writeLongBlock: &aValue
-                             atAddress: [self groupRegister:kDataFormatConfigReg group:i]
-                            numToWrite: 1
-                            withAddMod: [self addressModifier]
-                         usingAddSpace: 0x01];
-    }
-}
 - (void) writeConfigurationReg
 {
     int i;
@@ -2207,15 +2367,6 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
                             withAddMod: [self addressModifier]
                          usingAddSpace: 0x01];
     }
-}
-- (void) writeAcquistionRegister
-{
-unsigned long aValue=0; //<<<<<<<---------hard coded for now ---------------
-[[self adapter] readLongBlock:&aValue
-                    atAddress:[self vmeRegister:kAcqControlStatusReg]
-                    numToRead:1
-                   withAddMod:[self addressModifier]
-                usingAddSpace:0x01];
 }
 - (unsigned long) readTriggerTime:(int)bank index:(int)index
 {   		
@@ -2496,7 +2647,6 @@ unsigned long aValue=0; //<<<<<<<---------hard coded for now ---------------
     [a addObject:[ORHWWizParam boolParamWithName:@"LemoStartStop" setter:@selector(setLemoStartStop:) getter:@selector(lemoStartStop)]];
     [a addObject:[ORHWWizParam boolParamWithName:@"RandomClock" setter:@selector(setRandomClock:) getter:@selector(randomClock)]];
     [a addObject:[ORHWWizParam boolParamWithName:@"GateMode" setter:@selector(setGateMode:) getter:@selector(gateMode)]];
-    [a addObject:[ORHWWizParam boolParamWithName:@"StartDelayEnabled" setter:@selector(setStartDelayEnabled:) getter:@selector(startDelayEnabled)]];
     [a addObject:[ORHWWizParam boolParamWithName:@"StopDelayEnabled" setter:@selector(setStopDelayEnabled:) getter:@selector(stopDelayEnabled)]];
     [a addObject:[ORHWWizParam boolParamWithName:@"MultiEvent" setter:@selector(setMultiEventMode:) getter:@selector(multiEventMode)]];
     [a addObject:[ORHWWizParam boolParamWithName:@"AutoStart" setter:@selector(setAutoStart:) getter:@selector(autoStart)]];
@@ -2543,7 +2693,6 @@ unsigned long aValue=0; //<<<<<<<---------hard coded for now ---------------
     else if([param isEqualToString:@"RandomClock"]) return [cardDictionary objectForKey:@"randomClock"];
     else if([param isEqualToString:@"GateMode"]) return [cardDictionary objectForKey:@"gateMode"];
     else if([param isEqualToString:@"MultiEvent"]) return [cardDictionary objectForKey:@"multiEventMode"];
-    else if([param isEqualToString:@"StartDelayEnabled"]) return [cardDictionary objectForKey:@"sartDelayEnabled"];
     else if([param isEqualToString:@"StopDelayEnabled"]) return [cardDictionary objectForKey:@"stopDelayEnabled"];
     else return nil;
 }
@@ -2805,7 +2954,6 @@ unsigned long aValue=0; //<<<<<<<---------hard coded for now ---------------
 	
 	//clocks
     [self setRandomClock:			[decoder decodeBoolForKey:@"randomClock"]];
-    [self setStartDelayEnabled:		[decoder decodeBoolForKey:@"startDelayEnabled"]];
     [self setStopDelayEnabled:		[decoder decodeBoolForKey:@"stopDelayEnabled"]];
     [self setStopDelay:				[decoder decodeIntForKey:@"stopDelay"]];
     [self setStartDelay:			[decoder decodeIntForKey:@"startDelay"]];
@@ -2929,7 +3077,6 @@ unsigned long aValue=0; //<<<<<<<---------hard coded for now ---------------
 	
  	//clocks
     [encoder encodeBool:randomClock				forKey:@"randomClock"];
-    [encoder encodeBool:startDelayEnabled		forKey:@"startDelayEnabled"];
     [encoder encodeBool:stopDelayEnabled		forKey:@"stopDelayEnabled"];
     [encoder encodeInt:stopDelay				forKey:@"stopDelay"];
     [encoder encodeInt:startDelay				forKey:@"startDelay"];
@@ -3014,7 +3161,6 @@ unsigned long aValue=0; //<<<<<<<---------hard coded for now ---------------
 	[objDictionary setObject: [NSNumber numberWithInt:clockSource]			forKey:@"clockSource"];
 	[objDictionary setObject: [NSNumber numberWithInt:stopDelay]			forKey:@"stopDelay"];
 	[objDictionary setObject: [NSNumber numberWithInt:startDelay]			forKey:@"startDelay"];
-	[objDictionary setObject: [NSNumber numberWithBool:startDelayEnabled]	forKey:@"startDelayEnabled"];
 	[objDictionary setObject: [NSNumber numberWithBool:stopDelayEnabled]	forKey:@"stopDelayEnabled"];
 
 	[objDictionary setObject: [NSNumber numberWithInt:pageSize]				forKey:@"pageSize"];
