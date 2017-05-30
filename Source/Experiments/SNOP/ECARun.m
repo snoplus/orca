@@ -168,7 +168,6 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         //Rollover to previous run, if any.
         if(start_new_run_campaign){
             dispatch_sync(dispatch_get_main_queue(), ^{
-                [aSNOPModel setResync:YES];
                 [aSNOPModel startStandardRun:previousSR_campaign withVersion:previousSRVersion_campaign];
             });
         }
@@ -225,15 +224,12 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         BOOL runstarted = FALSE;
         switch (ECA_mode){
             case ECAMODE_DEDICATED:
-                [aSNOPModel setResync:YES];
                 runstarted = [aSNOPModel startStandardRun:@"ECA" withVersion:@"DEFAULT"];
                 break;
             case ECAMODE_SUPERNOVA:
-                [aSNOPModel setResync:YES];
                 runstarted = [aSNOPModel startStandardRun:@"SUPERNOVA" withVersion:@"DEFAULT"];
                 break;
             case ECAMODE_PHYSICS:
-                [aSNOPModel setResync:YES];
                 runstarted = [aSNOPModel startStandardRun:@"PHYSICS" withVersion:@"DEFAULT"];
                 break;
         }
@@ -505,7 +501,6 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         if(start_new_run){
             dispatch_sync(dispatch_get_main_queue(), ^{
                 [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object:self];
-                [aSNOPModel setResync:YES];
                 [aSNOPModel startStandardRun:previousSR withVersion:previousSRVersion];
                 //Don't leak memory
                 [previousSR release];
