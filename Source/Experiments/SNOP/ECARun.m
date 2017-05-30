@@ -7,6 +7,7 @@
 //
 
 #import "ECARun.h"
+#import "ORRunModel.h"
 #import "SNOPModel.h"
 #import "ORMTCModel.h"
 #import "ORXL3Model.h"
@@ -319,10 +320,10 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 #endif
 
         /* Set the required ECA bits in the run type word */
-        objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+        objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
         if ([objs count]) {
-            aSNOPModel = [objs objectAtIndex:0];
-            unsigned long runTypeWord = [aSNOPModel runTypeWord];
+            ORRunModel *aRunModel = [objs objectAtIndex:0];
+            unsigned long runTypeWord = [aRunModel runType];
             runTypeWord &= ~(kECAPedestalRun & kECATSlopeRun); //Unset ECA bits
             if ([ECA_type isEqualTo:@"PDST"]) {
                 runTypeWord |= kECAPedestalRun;
@@ -334,7 +335,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
                 //You should never get here
                 NSLogColor([NSColor redColor], @"ECA: Unknown ECA run type. The current run won't be flag as ECA run!");
             }
-            [aSNOPModel setRunTypeWord:runTypeWord];
+            [aRunModel setRunType:runTypeWord];
         }
 
     }
