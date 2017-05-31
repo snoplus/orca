@@ -36,6 +36,7 @@
 #import <ifaddrs.h>
 #import <arpa/inet.h>
 
+NSString* ORCouchDBModelSkipDataSetsChanged       = @"ORCouchDBModelSkipDataSetsChanged";
 NSString* ORCouchDBModelAlertTypeChanged          = @"ORCouchDBModelAlertTypeChanged";
 NSString* ORCouchDBModelAlertMessageChanged       = @"ORCouchDBModelAlertMessageChanged";
 NSString* ORCouchDBModelReplicationRunningChanged = @"ORCouchDBModelReplicationRunningChanged";
@@ -125,7 +126,6 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
         [self createDatabases];
         [self _startAllPeriodicOperations];
         [self registerNotificationObservers];
-
     }
     [super wakeUp];
 }
@@ -135,7 +135,6 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 {
     [self _cancelAllPeriodicOperations];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-	//[self deleteDatabases];
 	[super sleep];
 }
 
@@ -279,6 +278,20 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 #pragma mark ***Accessors
 
+- (BOOL) skipDataSets
+{
+    return skipDataSets;
+}
+
+- (void) setSkipDataSets:(BOOL)aSkipDataSets
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSkipDataSets:skipDataSets];
+    
+    skipDataSets = aSkipDataSets;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBModelSkipDataSetsChanged object:self];
+}
+
 - (int) alertType
 {
     return alertType;
@@ -359,11 +372,9 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     if(stealthMode){
         if([ORCouchDBQueue operationCount]) [ORCouchDBQueue cancelAllOperations];
         [self _cancelAllPeriodicOperations];
-        //[self deleteDatabases];
     }
     else {
         [self createDatabases];
-       // [self _startAllPeriodicOperations];
     }
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBModelStealthModeChanged object:self];
 }
@@ -1459,7 +1470,7 @@ nil];
 
 - (void) updateDataSets
 {
-	if(!stealthMode){
+	if(!stealthMode && !skipDataSets){
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDataSets) object:nil];
         if([[ORCouchDBQueue sharedCouchDBQueue]lowPriorityOperationCount]<10){
             NSMutableArray* dataSetNames = [NSMutableArray array];
@@ -1552,14 +1563,15 @@ nil];
 {    
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
-    [self setAlertType:[decoder decodeIntForKey:@"alertType"]];
-    [self setAlertMessage:[decoder decodeObjectForKey:@"alertMessage"]];
-    [self setKeepHistory:[decoder decodeBoolForKey:@"keepHistory"]];
-    [self setPassword:[decoder decodeObjectForKey:@"Password"]];
-    [self setLocalHostName:[decoder decodeObjectForKey:@"LocalHostName"]];
-    [self setUserName:[decoder decodeObjectForKey:@"UserName"]];
-    [self setRemoteHostName:[decoder decodeObjectForKey:@"RemoteHostName"]];
-    [self setPortNumber:[decoder decodeIntegerForKey:@"PortNumber"]];
+    [self setSkipDataSets:  [decoder decodeBoolForKey:   @"skipDataSets"]];
+    [self setAlertType:     [decoder decodeIntForKey:    @"alertType"]];
+    [self setAlertMessage:  [decoder decodeObjectForKey: @"alertMessage"]];
+    [self setKeepHistory:   [decoder decodeBoolForKey:   @"keepHistory"]];
+    [self setPassword:      [decoder decodeObjectForKey: @"Password"]];
+    [self setLocalHostName: [decoder decodeObjectForKey: @"LocalHostName"]];
+    [self setUserName:      [decoder decodeObjectForKey: @"UserName"]];
+    [self setRemoteHostName:[decoder decodeObjectForKey: @"RemoteHostName"]];
+    [self setPortNumber:    [decoder decodeIntegerForKey:@"PortNumber"]];
     
     customDataBases = [[decoder decodeObjectForKey:@"customDataBases"] retain];
     
@@ -1578,17 +1590,18 @@ nil];
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:alertType forKey:@"alertType"];
-    [encoder encodeObject:alertMessage forKey:@"alertMessage"];
-    [encoder encodeBool:keepHistory forKey:@"keepHistory"];
-    [encoder encodeBool:stealthMode forKey:@"stealthMode"];
-    [encoder encodeObject:password forKey:@"Password"];
-    [encoder encodeInteger:portNumber forKey:@"PortNumber"];
-    [encoder encodeObject:userName forKey:@"UserName"];
-    [encoder encodeObject:localHostName forKey:@"LocalHostName"];
-    [encoder encodeObject:remoteHostName forKey:@"RemoteHostName"];
-    [encoder encodeBool:wasReplicationRunning forKey:@"wasReplicationRunning"];
-    [encoder encodeObject:customDataBases forKey:@"customDataBases"];
+    [encoder encodeBool:skipDataSets            forKey:@"skipDataSets"];
+    [encoder encodeInt:alertType                forKey:@"alertType"];
+    [encoder encodeObject:alertMessage          forKey:@"alertMessage"];
+    [encoder encodeBool:keepHistory             forKey:@"keepHistory"];
+    [encoder encodeBool:stealthMode             forKey:@"stealthMode"];
+    [encoder encodeObject:password              forKey:@"Password"];
+    [encoder encodeInteger:portNumber           forKey:@"PortNumber"];
+    [encoder encodeObject:userName              forKey:@"UserName"];
+    [encoder encodeObject:localHostName         forKey:@"LocalHostName"];
+    [encoder encodeObject:remoteHostName        forKey:@"RemoteHostName"];
+    [encoder encodeBool:wasReplicationRunning   forKey:@"wasReplicationRunning"];
+    [encoder encodeObject:customDataBases       forKey:@"customDataBases"];
 
 }
 @end
