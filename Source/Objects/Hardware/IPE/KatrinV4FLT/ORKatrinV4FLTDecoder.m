@@ -94,12 +94,6 @@
 	if(filterShapingLength==0){
 		filterDiv = boxcarLen + 1;
 	}
-	#if 0  //obsolete  since filterIndex is obsolete, changed 2012-11
-	if(filterShapingLength==0){
-		if(filterIndex==0)	{			histoLen = 16*1024;			filterDiv = 64;		}
-		else {			histoLen = 4096;			filterDiv = 1L << (filterIndex+2);		}
-	}
-	#endif
 	
 	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* stationKey	= [self getStationKey: card];	
@@ -145,32 +139,7 @@
 				getFifoFlagsFromDecodeStage = [obj setFromDecodeStage:chan fifoFlags:fifoFlags];
 				fifoFlags = oldFifoFlags[chan];
 			}
-			#if 0
-			//TESTING TIMESTAMPS --------------
-				int32_t diff, seconds, subseconds, evID;
-				seconds		=     ptr[2];
-				subseconds		=     ptr[3];
-				evID = ptr[5] & 0x3ff;
-				static int32_t lastseconds		=  -1, lastsubseconds =0;
-				if(lastseconds==-1){
-				    NSLog(@"Sec is %i\n",seconds);
-					lastseconds=0;
-				}
-				diff = (seconds-lastseconds)*20000000 + subseconds-lastsubseconds;
-			//NSLog(@"WARNING: Sec is %i, lastsec %i\n",seconds,lastseconds);
-			//NSLog(@"WARNING: evID %i, Sec is %i, subsec %i,  lastsec %i, lastsubsec %i,   diff %i, \n",evID,seconds,subseconds,lastseconds,lastsubseconds,diff);
-			//NSLog(@"WARNING: diff %i, Sec is %i, subsec %i,  lastsec %i, lastsubsec %i\n",diff,seconds,subseconds,lastseconds,lastsubseconds);
-
-				//if( diff<=0 || subseconds>19900000){
-				if( diff<=0 || diff>19900000){
-				    //NSLog(@"WARNING: diff %i, Sec is %i, subsec %i,  lastsec %i, lastsubsec %i\n",diff,seconds,subseconds,lastseconds,lastsubseconds);
-					NSLog(@"WARNING: evID %i, Sec is %i, subsec %i,  lastsec %i, lastsubsec %i,   diff %i, \n",evID,seconds,subseconds,lastseconds,lastsubseconds,diff);
-				}
-
-				lastseconds = seconds;
-				lastsubseconds = subseconds;
-            #endif
-	    }	
+	    }
     }
 	
     return length; //must return number of longs processed.
@@ -307,24 +276,6 @@
 	
 	// Set up the waveform
 	NSData* waveFormdata = [NSData dataWithBytes:someData length:length*sizeof(long)];
-	#if 0
-	//-----------------------------------------------
-	//temp.. to lock the waveform to the highest value
-	int n = [waveFormdata length]/sizeof(short) - 20;
-	unsigned long maxValue = 0;
-	startIndex = 0;
-	unsigned long i;
-	unsigned short* p = (unsigned short*)[waveFormdata bytes];
-	for(i=20;i<n;i++){
-		unsigned short theValue = p[i] & 0xfff;
-		if(theValue>maxValue){
-			maxValue = theValue;
-			startIndex = i;
-		}	
-	}
-	startIndex = (startIndex+2000)%n;
-	//-----------------------------------------------
-	#endif
 //TODO: no offset -tb-
 startIndex=traceStart16;
     //startIndex=0;
@@ -519,7 +470,6 @@ Variable section: exists if trace length !=0
     uint32_t eventFlags     = ptr[7];
     uint32_t traceStart16 = ShiftAndExtract(eventFlags,8,0x7ff);//start of trace in short array
 	
-//TODO: DEBUG -tb- NSLog(@"energy on chan %i is %i (%i), subsec %i , page# %i, traceStart16 %i\n", chan, ptr[6] ,energy, subsec, ShiftAndExtract(eventID,10,0x3f),traceStart16);//TODO: DEBUG -tb-
 
 	//channel by channel histograms  NSScanner
 	[aDataSet histogram:energy 
@@ -539,26 +489,8 @@ Variable section: exists if trace length !=0
 	
 	// Set up the waveform
 	NSData* waveFormdata = [NSData dataWithBytes:someData length:length*sizeof(long)];
-	#if 0
-	//-----------------------------------------------
-	//temp.. to lock the waveform to the highest value
-	int n = [waveFormdata length]/sizeof(short) - 20;
-	unsigned long maxValue = 0;
-	startIndex = 0;
-	unsigned long i;
-	unsigned short* p = (unsigned short*)[waveFormdata bytes];
-	for(i=20;i<n;i++){
-		unsigned short theValue = p[i] & 0xfff;
-		if(theValue>maxValue){
-			maxValue = theValue;
-			startIndex = i;
-		}	
-	}
-	startIndex = (startIndex+2000)%n;
-	//-----------------------------------------------
-	#endif
-//TODO: no offset -tb-
-startIndex=traceStart16;
+    //TODO: no offset -tb-
+    startIndex=traceStart16;
 	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
 					offset: 9*sizeof(long)					// Offset in bytes (past header words)
 				  unitSize: sizeof(short)					// unit size in bytes
@@ -736,7 +668,7 @@ startIndex=traceStart16;
 
     uint32_t version                = ShiftAndExtract(ptr[1],0,0x1);    //bit 1 = version
     uint32_t countHREnabledChans    = ShiftAndExtract(ptr[1],8,0x1f);   //NOC in record
-if(version==1) title= @"Katrin FLT Hit Rate Record v1\n\n";
+    if(version==1) title= @"Katrin FLT Hit Rate Record v1\n\n";
 
 	int i;
     
@@ -834,9 +766,6 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
-    //debug output -tb-
-    //NSLog(@"  ORKatrinFLTDecoderForHistogram::decodeData:\n");
-    
     unsigned long* ptr = (unsigned long*)someData;
 	unsigned long length	= ExtractLength(*ptr);	 //get length from first word
 
@@ -850,57 +779,14 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
 		
 	++ptr;		//point to event struct
 	
-	
 	katrinV4HistogramDataStruct* ePtr = (katrinV4HistogramDataStruct*) ptr;
-    #if 0 //debug output -tb-
-	NSLog(@"Keys:%@ %@ %@ %@ %@ \n", @"FLT",@"HitrateTimeSerie",crateKey,stationKey,channelKey);
-	NSLog(@"  readoutSec = %d \n", ePtr->readoutSec);
-	//NSLog(@"  recordingTimeSec = %d \n", ePtr->recordingTimeSec);
-	NSLog(@"  refreshTimeSec = %d \n", ePtr->recordingTimeSec);
-	NSLog(@"  firstBin = %d \n", ePtr->firstBin);
-	NSLog(@"  lastBin = %d \n", ePtr->lastBin);
-	NSLog(@"  histogramLength = %d \n", ePtr->histogramLength);
-	NSLog(@"  maxHistogramLength = %d \n", ePtr->maxHistogramLength);
-	NSLog(@"  binSize = %d \n", ePtr->binSize);
-	NSLog(@"  offsetEMin = %d \n", ePtr->offsetEMin);
-    #endif
 
     ptr = ptr + (sizeof(katrinV4HistogramDataStruct)/sizeof(long));// points now to the histogram data -tb-
     
-    #if 0
-    {
-        // this is really brute force, but probably we want the second version (see below) ... -tb-
-        // this counts every single event in the histogram as one event in data monitor -tb-
-        int i;
-        unsigned long aValue;
-        unsigned long aBin;
-        for(i=0; i< ePtr->histogramLength;i++){
-            aValue=*(ptr+i);
-            aBin = i+ (ePtr->firstBin);
-            //if(aValue) NSLog(@"  Bin %i = %d \n", aBin,aValue);
-            #if 1
-            int j;
-            for(j=0;j<aValue;j++){
-                //NSLog(@"  Fill Bin %i = %d times \n", aBin,aValue);
-                [aDataSet histogram:aBin 
-                            numBins:2048 
-                             sender:self  
-                           withKeys: @"FLT",
-                 @"Histogram (all counts)", // use better name -tb-
-                 crateKey,stationKey,channelKey,nil];
-            }
-            #endif
-        }
-    }
-    #endif
-    
-
-    #if 1
 	int isSumHistogram = ePtr->histogramInfo & 0x2; //the bit1 marks the Sum Histograms
     // this counts one histogram as one event in data monitor -tb-
     //if(ePtr->histogramLength){ //uncommented -  I want to see empty histograms
-	if(!isSumHistogram)
-    {
+	if(!isSumHistogram) {
         int numBins = 2048; //TODO: this has changed for V4 to 2048!!!! -tb-512;
 		if(ePtr->maxHistogramLength>numBins) numBins=ePtr->maxHistogramLength;
         unsigned long data[numBins];// v3: histogram length is 512 -tb-
@@ -921,8 +807,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
                          numBins:  numBins  // is fixed in the current FPGA version -tb- 2008-03-13 
                     withKeyArray:  keyArray];
     }
-	else
-    {
+    else {
         int numBins = 2048; //TODO: this has changed for V4 to 2048!!!! -tb-512;
 		if(ePtr->maxHistogramLength>numBins) numBins=ePtr->maxHistogramLength;
         unsigned long data[numBins];// v3: histogram length is 512 -tb-
@@ -944,62 +829,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
                          numBins:  numBins  // is fixed in the current FPGA version -tb- 2008-03-13 
                     withKeyArray:  keyArray];
     }
-    #endif
     
-    
-    
-    #if 0
-    // test - ok  -tb-
-    {        
-        NSMutableArray*  keyArray = [NSMutableArray arrayWithCapacity:5];
-        [keyArray insertObject:@"FLT" atIndex:0];
-        [keyArray insertObject:@"Histogram (loadHistogram test)" atIndex:1];
-        [keyArray insertObject:crateKey atIndex:2];
-        [keyArray insertObject:stationKey atIndex:3];
-        [keyArray insertObject:channelKey atIndex:4];
-        
-        [aDataSet loadHistogram:  ptr 
-                        numBins:        ePtr->histogramLength 
-                   withKeyArray:   keyArray];
-    }
-    #endif
-    
-    
-    
-    
-
-    
-    
-    #if 0
-    {
-        // this is very similar to the first version (with speed up improvement 2008-08-05),
-        // but probably it is usefull as it is in 'energy mode' units ... -tb-
-        int i;
-        //first compute the sum of events:
-        unsigned int sumEvents=0;
-        for(i=0; i< ePtr->histogramLength;i++){
-            sumEvents += *(ptr+i);
-        }
-        unsigned long energy;
-        //energy= ( ((ePtr->firstBin) << (ePtr->binSize))/2 )   + ePtr->offsetEMin;
-        //energy= ( ((ePtr->firstBin) << (ePtr->binSize))/4 )   + ePtr->offsetEMin;// since 2009 May: /4 instead of /2, see getHistoEnergyOfBin of ORKatrinFLTDecoder.m
-        energy= ( ((ePtr->firstBin) << (ePtr->binSize-2)) )   + ePtr->offsetEMin;// since 2009 May: /4 instead of /2, see getHistoEnergyOfBin of ORKatrinFLTDecoder.m
-                       // maybe I should use getHistoEnergyOfBin here (then need to include header) ... -tb-
-        int stepSize;
-        stepSize = 1 << (ePtr->binSize -2);// again: see  getHistoEnergyOfBin of ORKatrinFLTDecoder.m
-
-        [aDataSet mergeEnergyHistogram: ptr
-                          numBins: ePtr->histogramLength  
-                          maxBins: 65536  //32768
-                         firstBin: energy   
-                         stepSize: stepSize
-                           counts: sumEvents
-                         withKeys: @"FLT",
-                                   @"Energy Histogram (HW, energy mode units)", // use better name -tb-
-                                   crateKey,stationKey,channelKey,nil];
-        
-    }
-    #endif
 
 	//get the actual object
 	if(getHistoReceivedNoteFromDecodeStage){
@@ -1041,21 +871,9 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
 
 	int isSumHistogram = ePtr->histogramInfo & 0x2; //the bit1 marks the Sum Histograms
 	if(!isSumHistogram) title= @"Katrin V4 FLT Histogram Record\n\n";
-	else title= @"Katrin V4 FLT Summed Histogram Record\n\n";
-
-    #if 0
-    //debug output
-	NSLog(@" readoutSec = %d \n", ePtr->readoutSec);
-	//NSLog(@" recordingTimeSec = %d \n", ePtr->recordingTimeSec);
-	NSLog(@" refreshTimeSec = %d \n", ePtr->refreshTimeSec);
-	NSLog(@" firstBin = %d \n", ePtr->firstBin);
-	NSLog(@" lastBin = %d \n", ePtr->lastBin);
-	NSLog(@" histogramLength = %d \n", ePtr->histogramLength);
-    #endif
+	else                title= @"Katrin V4 FLT Summed Histogram Record\n\n";
 	
 	NSString* readoutSec	= [NSString stringWithFormat:@"ReadoutSec = %d\n",ePtr->readoutSec];
-	//NSString* recordingTimeSec	= [NSString stringWithFormat:@"recordingTimeSec = %d\n",ePtr->recordingTimeSec];
-	//NSString* refreshTimeSec	= [NSString stringWithFormat:@"refreshTimeSec = %d\n",ePtr->refreshTimeSec];
 	NSString* refreshTimeSec	= [NSString stringWithFormat:@"recordingTimeSec = %d\n",ePtr->refreshTimeSec];
 	NSString* firstBin	= [NSString stringWithFormat:@"firstBin = %d\n",ePtr->firstBin];
 	NSString* lastBin	= [NSString stringWithFormat:@"lastBin  = %d\n",ePtr->lastBin];
@@ -1070,8 +888,6 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
 	                       readoutSec,refreshTimeSec,firstBin,lastBin,histogramLength,
                            maxHistogramLength,binSize,offsetEMin,histIDInfo]; 
 }
-
-
 
 @end
 

@@ -124,18 +124,18 @@
                         <tabViewItems>
                             <tabViewItem label="Control" identifier="" id="2718">
                                 <view key="view" id="2719">
-                                    <rect key="frame" x="10" y="29" width="487" height="550"/>
+                                    <rect key="frame" x="10" y="25" width="487" height="554"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <box title="Hw Version" id="2725">
-                                            <rect key="frame" x="263" y="477" width="214" height="61"/>
+                                        <box misplaced="YES" title="Hw Version" id="2725">
+                                            <rect key="frame" x="263" y="486" width="214" height="56"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="6f7-cA-GcV">
-                                                <rect key="frame" x="2" y="2" width="210" height="44"/>
+                                                <rect key="frame" x="2" y="2" width="210" height="39"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <button verticalHuggingPriority="750" id="2726">
-                                                        <rect key="frame" x="-1" y="10" width="96" height="28"/>
+                                                    <button verticalHuggingPriority="750" misplaced="YES" id="2726">
+                                                        <rect key="frame" x="3" y="6" width="96" height="28"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <buttonCell key="cell" type="push" title="Read Version" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5556">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -145,19 +145,10 @@
                                                             <action selector="hwVersionAction:" target="-2" id="5070"/>
                                                         </connections>
                                                     </button>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="2729">
-                                                        <rect key="frame" x="112" y="4" width="97" height="28"/>
+                                                    <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="2729">
+                                                        <rect key="frame" x="104" y="12" width="101" height="16"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="1,0x212,0x8002" id="5557">
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="2730">
-                                                        <rect key="frame" x="86" y="18" width="30" height="14"/>
-                                                        <autoresizingMask key="autoresizingMask"/>
-                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Ver." id="5558">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -167,7 +158,7 @@
                                             </view>
                                         </box>
                                         <box title="Control Register" id="2724">
-                                            <rect key="frame" x="14" y="321" width="240" height="217"/>
+                                            <rect key="frame" x="14" y="325" width="240" height="217"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="VEK-6Z-wbd">
                                                 <rect key="frame" x="2" y="2" width="236" height="200"/>
@@ -181,25 +172,25 @@
                                                         <size key="intercellSpacing" width="3" height="1"/>
                                                         <buttonCell key="prototype" type="check" title="Veto/DeadTime Counters" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="-1" inset="2" id="5589">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="miniSystem"/>
+                                                            <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
                                                         <cells>
                                                             <column>
                                                                 <buttonCell type="check" title="SW" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="2759">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="Pages Full" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="1" inset="2" id="2761">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="Global" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="2" inset="2" id="2760">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="Lemo In" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="3" inset="2" id="4856">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                             </column>
                                                         </cells>
@@ -215,35 +206,35 @@
                                                         <size key="intercellSpacing" width="0.0" height="4"/>
                                                         <buttonCell key="prototype" type="check" title="Veto/DeadTime Counters" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="-1" inset="2" id="5590">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="miniSystem"/>
+                                                            <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
                                                         <cells>
                                                             <column>
                                                                 <buttonCell type="check" title="SW" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="2752">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="Right" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="1" inset="2" id="2754">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="Left" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="2" inset="2" id="2756">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                             </column>
                                                             <column>
                                                                 <buttonCell type="check" title="Camera" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="3" inset="2" id="2753">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="Global" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="4" inset="2" id="2755">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="Lemo In" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="5" inset="2" id="2757">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                             </column>
                                                         </cells>
@@ -251,43 +242,43 @@
                                                             <action selector="triggerEnableAction:" target="-2" id="4851"/>
                                                         </connections>
                                                     </matrix>
-                                                    <matrix verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="5060">
-                                                        <rect key="frame" x="11" y="21" width="116" height="56"/>
+                                                    <matrix verticalHuggingPriority="750" misplaced="YES" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="5060">
+                                                        <rect key="frame" x="6" y="21" width="126" height="56"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        <size key="cellSize" width="58" height="16"/>
+                                                        <size key="cellSize" width="63" height="16"/>
                                                         <size key="intercellSpacing" width="0.0" height="4"/>
                                                         <buttonCell key="prototype" type="check" title="Veto/DeadTime Counters" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="-1" inset="2" id="5592">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="miniSystem"/>
+                                                            <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
                                                         <cells>
                                                             <column>
                                                                 <buttonCell type="check" title="PPS" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="5061">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="Shape" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="1" inset="2" id="5063">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="Run" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="2" inset="2" id="5065">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                             </column>
                                                             <column>
                                                                 <buttonCell type="check" title="TstSlt" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="3" inset="2" id="5062">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="IntEn" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="4" inset="2" id="5064">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="Led Off" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="5" inset="2" id="5066">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                             </column>
                                                         </cells>
@@ -347,8 +338,8 @@
                                                         <rect key="frame" x="13" y="80" width="201" height="5"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                     </box>
-                                                    <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" id="4879">
-                                                        <rect key="frame" x="156" y="5" width="67" height="72"/>
+                                                    <matrix verticalHuggingPriority="750" misplaced="YES" allowsEmptySelection="NO" id="4879">
+                                                        <rect key="frame" x="148" y="5" width="67" height="72"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         <size key="cellSize" width="67" height="18"/>
@@ -385,7 +376,7 @@
                                             </view>
                                         </box>
                                         <box misplaced="YES" title="Command Register" id="5097">
-                                            <rect key="frame" x="14" y="201" width="240" height="116"/>
+                                            <rect key="frame" x="14" y="205" width="240" height="116"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="vfK-Tt-YFP">
                                                 <rect key="frame" x="2" y="2" width="236" height="99"/>
@@ -458,14 +449,14 @@
                                             </view>
                                         </box>
                                         <box misplaced="YES" title="Trigger Timing" id="2723">
-                                            <rect key="frame" x="262" y="58" width="208" height="259"/>
+                                            <rect key="frame" x="262" y="62" width="217" height="259"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="MVO-li-ffF">
-                                                <rect key="frame" x="2" y="2" width="204" height="242"/>
+                                                <rect key="frame" x="2" y="2" width="213" height="242"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="2784">
-                                                        <rect key="frame" x="117" y="205" width="32" height="19"/>
+                                                        <rect key="frame" x="127" y="211" width="32" height="19"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="255" drawsBackground="YES" id="5535">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -474,12 +465,12 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" id="2785">
-                                                        <rect key="frame" x="150" y="203" width="15" height="22"/>
+                                                        <rect key="frame" x="160" y="209" width="15" height="22"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="127" valueWraps="YES" id="5536"/>
                                                     </stepper>
                                                     <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="2787">
-                                                        <rect key="frame" x="36" y="203" width="76" height="17"/>
+                                                        <rect key="frame" x="46" y="209" width="76" height="17"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Trigger Window:" id="5537">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -488,7 +479,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <slider verticalHuggingPriority="750" misplaced="YES" id="2788">
-                                                        <rect key="frame" x="11" y="128" width="172" height="17"/>
+                                                        <rect key="frame" x="11" y="128" width="182" height="17"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="100" tickMarkPosition="below" numberOfTickMarks="10" sliderType="linear" id="5538">
                                                             <font key="font" size="12" name="Helvetica"/>
@@ -498,7 +489,7 @@
                                                         </connections>
                                                     </slider>
                                                     <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="2789">
-                                                        <rect key="frame" x="170" y="112" width="13" height="13"/>
+                                                        <rect key="frame" x="182" y="112" width="13" height="13"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="0" id="5539">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -518,7 +509,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="2791">
-                                                        <rect key="frame" x="165" y="209" width="20" height="11"/>
+                                                        <rect key="frame" x="175" y="215" width="20" height="11"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="µS" id="5541">
                                                             <font key="font" metaFont="miniSystem"/>
@@ -536,10 +527,10 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" autosizesCells="NO" id="2795">
-                                                        <rect key="frame" x="8" y="61" width="150" height="18"/>
+                                                        <rect key="frame" x="8" y="61" width="184" height="18"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        <size key="cellSize" width="73" height="18"/>
+                                                        <size key="cellSize" width="90" height="18"/>
                                                         <size key="intercellSpacing" width="4" height="2"/>
                                                         <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" inset="2" id="5588">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -570,7 +561,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="2797">
-                                                        <rect key="frame" x="117" y="170" width="32" height="19"/>
+                                                        <rect key="frame" x="127" y="177" width="32" height="19"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="100" drawsBackground="YES" id="5546">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -582,7 +573,7 @@
                                                         </connections>
                                                     </textField>
                                                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" id="2798">
-                                                        <rect key="frame" x="150" y="168" width="15" height="22"/>
+                                                        <rect key="frame" x="160" y="175" width="15" height="22"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="127" valueWraps="YES" id="5547"/>
                                                         <connections>
@@ -590,7 +581,7 @@
                                                         </connections>
                                                     </stepper>
                                                     <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="2799">
-                                                        <rect key="frame" x="29" y="168" width="83" height="17"/>
+                                                        <rect key="frame" x="39" y="175" width="83" height="17"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="End Page Delay:" id="5548">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -599,7 +590,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="2800">
-                                                        <rect key="frame" x="165" y="174" width="20" height="11"/>
+                                                        <rect key="frame" x="175" y="181" width="20" height="11"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="µS" id="5549">
                                                             <font key="font" metaFont="miniSystem"/>
@@ -610,7 +601,7 @@
                                                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="2801">
                                                         <rect key="frame" x="10" y="33" width="67" height="13"/>
                                                         <autoresizingMask key="autoresizingMask"/>
-                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Display:" id="5550">
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Display:" id="5550">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -667,7 +658,7 @@
                                             </view>
                                         </box>
                                         <button verticalHuggingPriority="750" misplaced="YES" id="2722">
-                                            <rect key="frame" x="52" y="-3" width="63" height="28"/>
+                                            <rect key="frame" x="52" y="1" width="63" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Report" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5534">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -678,7 +669,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" misplaced="YES" id="2721">
-                                            <rect key="frame" x="149" y="-3" width="87" height="28"/>
+                                            <rect key="frame" x="149" y="1" width="87" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Init Board" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5533">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -688,8 +679,8 @@
                                                 <action selector="initBoardAction:" target="-2" id="3606"/>
                                             </connections>
                                         </button>
-                                        <box borderType="line" title="Counters" id="5092">
-                                            <rect key="frame" x="262" y="416" width="215" height="57"/>
+                                        <box misplaced="YES" borderType="line" title="Counters" id="5092">
+                                            <rect key="frame" x="262" y="426" width="215" height="57"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="jeV-5h-6CK">
                                                 <rect key="frame" x="1" y="1" width="213" height="41"/>
@@ -738,7 +729,7 @@
                                             </view>
                                         </box>
                                         <button hidden="YES" verticalHuggingPriority="750" misplaced="YES" id="5148">
-                                            <rect key="frame" x="262" y="-4" width="97" height="28"/>
+                                            <rect key="frame" x="369" y="27" width="97" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Pattern File..." bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5566">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -746,32 +737,23 @@
                                             </buttonCell>
                                         </button>
                                         <button hidden="YES" verticalHuggingPriority="750" misplaced="YES" id="5149">
-                                            <rect key="frame" x="262" y="23" width="97" height="28"/>
+                                            <rect key="frame" x="262" y="27" width="97" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Load Pattern" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5567">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
                                         </button>
-                                        <textField hidden="YES" verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="5150">
-                                            <rect key="frame" x="365" y="4" width="146" height="14"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Small System Font Text" id="5568">
-                                                <font key="font" metaFont="smallSystem"/>
-                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <box borderType="line" title="Seconds" id="5408">
-                                            <rect key="frame" x="263" y="321" width="216" height="91"/>
+                                        <box misplaced="YES" borderType="line" title="Seconds" id="5408">
+                                            <rect key="frame" x="263" y="325" width="216" height="97"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="rsy-SM-YnW">
-                                                <rect key="frame" x="1" y="1" width="214" height="75"/>
+                                                <rect key="frame" x="1" y="1" width="214" height="81"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="5086">
-                                                        <rect key="frame" x="103" y="53" width="78" height="19"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                    <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="5086">
+                                                        <rect key="frame" x="91" y="50" width="113" height="19"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="4000000000" drawsBackground="YES" id="5569">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -781,27 +763,40 @@
                                                             <action selector="secondsSetAction:" target="-2" id="5095"/>
                                                         </connections>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="5406">
-                                                        <rect key="frame" x="151" y="45" width="25" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask"/>
-                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" id="5571">
+                                                    <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="5090">
+                                                        <rect key="frame" x="10" y="53" width="74" height="14"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="right" title="Initialize To:" id="5570">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="5090">
-                                                        <rect key="frame" x="3" y="52" width="89" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask"/>
-                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Initialize To:" id="5570">
+                                                    <button misplaced="YES" id="5703">
+                                                        <rect key="frame" x="15" y="10" width="99" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Use for FLTs" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="5704">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
-                                                    <button id="5651">
-                                                        <rect key="frame" x="101" y="35" width="77" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="secondsSetSendToFLTsCBAction:" target="-2" id="5706"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" misplaced="YES" id="5708">
+                                                        <rect key="frame" x="131" y="4" width="78" height="28"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Set now" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5709">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="secondsSetSetNowButtonAction:" target="-2" id="5711"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button misplaced="YES" id="5651">
+                                                        <rect key="frame" x="129" y="33" width="77" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Host Time" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="5652">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
@@ -810,40 +805,18 @@
                                                             <action selector="secondsSetInitWithHostButtonAction:" target="-2" id="5653"/>
                                                         </connections>
                                                     </button>
-                                                    <button id="5703">
-                                                        <rect key="frame" x="15" y="12" width="148" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Use for FLT cards" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="5704">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="secondsSetSendToFLTsCBAction:" target="-2" id="5706"/>
-                                                        </connections>
-                                                    </button>
-                                                    <button verticalHuggingPriority="750" id="5708">
-                                                        <rect key="frame" x="149" y="7" width="58" height="16"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="push" title="Set now" bezelStyle="rounded" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="5709">
-                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="miniSystem"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="secondsSetSetNowButtonAction:" target="-2" id="5711"/>
-                                                        </connections>
-                                                    </button>
                                                 </subviews>
                                             </view>
                                         </box>
                                         <box misplaced="YES" title="Pixelbus Enable Register" id="5719">
-                                            <rect key="frame" x="14" y="58" width="240" height="139"/>
+                                            <rect key="frame" x="14" y="38" width="240" height="163"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="p14-Gf-dge">
-                                                <rect key="frame" x="2" y="2" width="236" height="122"/>
+                                                <rect key="frame" x="2" y="2" width="236" height="146"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <matrix verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="5720">
-                                                        <rect key="frame" x="10" y="51" width="214" height="54"/>
+                                                    <matrix verticalHuggingPriority="750" misplaced="YES" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="5720">
+                                                        <rect key="frame" x="12" y="64" width="214" height="54"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         <size key="cellSize" width="25" height="25"/>
@@ -958,8 +931,8 @@
                                                             <action selector="pixelBusEnableRegMatrixAction:" target="-2" id="tiA-2B-GCL"/>
                                                         </connections>
                                                     </matrix>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="5725">
-                                                        <rect key="frame" x="7" y="106" width="114" height="14"/>
+                                                    <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="5725">
+                                                        <rect key="frame" x="9" y="119" width="114" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="left" title="Enable FLT #" id="5726">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -968,16 +941,16 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="5724">
-                                                        <rect key="frame" x="3" y="29" width="78" height="17"/>
+                                                        <rect key="frame" x="37" y="42" width="116" height="17"/>
                                                         <autoresizingMask key="autoresizingMask"/>
-                                                        <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="right" title="PixBusEnable" id="5727">
+                                                        <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="right" title="PixBusEnable Mask " id="5727">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="5723">
-                                                        <rect key="frame" x="88" y="31" width="136" height="16"/>
+                                                        <rect key="frame" x="157" y="44" width="62" height="16"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="mini" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="5728">
                                                             <font key="font" metaFont="miniSystem"/>
@@ -989,19 +962,8 @@
                                                             <outlet property="formatter" destination="318" id="bzc-mb-3Wh"/>
                                                         </connections>
                                                     </textField>
-                                                    <button verticalHuggingPriority="750" misplaced="YES" id="5722">
-                                                        <rect key="frame" x="174" y="3" width="54" height="28"/>
-                                                        <autoresizingMask key="autoresizingMask"/>
-                                                        <buttonCell key="cell" type="push" title="Write" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5729">
-                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="writePixelBusEnableRegButtonAction:" target="-2" id="5XU-Pq-qvG"/>
-                                                        </connections>
-                                                    </button>
                                                     <button verticalHuggingPriority="750" misplaced="YES" id="5721">
-                                                        <rect key="frame" x="83" y="3" width="54" height="28"/>
+                                                        <rect key="frame" x="16" y="8" width="54" height="28"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <buttonCell key="cell" type="push" title="Read" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5730">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1011,9 +973,29 @@
                                                             <action selector="readPixelBusEnableRegButtonAction:" target="-2" id="8EI-WM-E8n"/>
                                                         </connections>
                                                     </button>
+                                                    <button verticalHuggingPriority="750" misplaced="YES" id="5722">
+                                                        <rect key="frame" x="170" y="10" width="54" height="28"/>
+                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <buttonCell key="cell" type="push" title="Write" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5729">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="writePixelBusEnableRegButtonAction:" target="-2" id="5XU-Pq-qvG"/>
+                                                        </connections>
+                                                    </button>
                                                 </subviews>
                                             </view>
                                         </box>
+                                        <textField hidden="YES" verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="5150">
+                                            <rect key="frame" x="265" y="7" width="198" height="14"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="Small System Font Text" id="5568">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
                                     </subviews>
                                 </view>
                             </tabViewItem>
@@ -1746,85 +1728,85 @@
                                                         <size key="intercellSpacing" width="0.0" height="2"/>
                                                         <buttonCell key="prototype" type="check" title="Switch" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="-1" inset="2" id="5581">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="miniSystem"/>
+                                                            <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
                                                         <cells>
                                                             <column>
                                                                 <buttonCell type="check" title="Flt Rq" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" toolTip="All Pages Full" inset="2" id="3023">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="WDog" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" toolTip="Second Strobe Error" tag="1" inset="2" id="3024">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="Pixel Err" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="2" inset="2" id="3022">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="PPS Err" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="3" inset="2" id="5415">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="Clk 0 Err" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="4" inset="2" id="5423">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="Clk 1 Err" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="5" inset="2" id="5425">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                             </column>
                                                             <column>
                                                                 <buttonCell type="check" title="Clk 2 Err" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="6" inset="2" id="3019">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="Clk 3 Err" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" tag="7" inset="2" id="3017">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="GPS Err" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="8" inset="2" id="3025">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="VTT Err" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="9" inset="2" id="5414">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="Fan Err" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="10" inset="2" id="5422">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="Sw Rq" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="11" inset="2" id="5424">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                             </column>
                                                             <column>
                                                                 <buttonCell type="check" title="Event Ready" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="12" inset="2" id="3021">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="Page Ready" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="13" inset="2" id="3020">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="Page Full" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="14" inset="2" id="3018">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="Flt Time out" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="15" inset="2" id="5416">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="Switch" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="-1" transparent="YES" inset="2" id="5421">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="Switch" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="-1" transparent="YES" inset="2" id="5426">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="miniSystem"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
                                                             </column>
                                                         </cells>
@@ -2358,6 +2340,7 @@
             <connections>
                 <outlet property="delegate" destination="-2" id="3816"/>
             </connections>
+            <point key="canvasLocation" x="-256.5" y="156.5"/>
         </window>
         <customObject id="318" userLabel="OHexFormatter" customClass="OHexFormatter"/>
         <window title="Orca Security" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="4474" userLabel="PasswordPanel" customClass="NSPanel">

@@ -1379,6 +1379,7 @@ return;
 	//[self writeReg:kSltSwSltTrigger value:0];
 	//[self writeReg:kSltSwSetInhibit value:0];				
 }
+
 /*
 - (void) loadPulseAmp
 {
@@ -1398,7 +1399,6 @@ return;
 	int i; //load the rest of the pulser memory with 0's
 	for (i=2;i<256;i++) [self write:SLT_REG_ADDRESS(kSltTestpulsTiming)+i value:theConvertedDelay];
 }
-
 
 - (void) loadPulserValues
 {
@@ -1590,7 +1590,6 @@ return;
 }
 
 #pragma mark •••Data Taker
-
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     [self setIsPartOfRun: YES];
@@ -1711,31 +1710,26 @@ return;
 
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	if(!first){
-		//event readout controlled by the SLT cpu now. ORCA reads out 
-		//the resulting data from a generic circular buffer in the pmc code.
-		[pmcLink takeData:aDataPacket userInfo:userInfo];
-	}
-	else {// the first time
+	if(first){
 		//TODO: -tb- [self writePageManagerReset];
 		//TODO: -tb- [self writeClrCnt];
-        
-        //DEBUG         [self dumpSltSecondCounter:@"SLT-takeData-vor RelInhibit:"];
         
 		unsigned long long runcount = [self readRunTime];
 		[self shipSltEvent:kRunCounterType withType:kStartRunType eventCt:0 high: (runcount>>32)&0xffffffff low:(runcount)&0xffffffff ];
 		[self writeClrInhibit]; //TODO: maybe move to readout loop to avoid dead time -tb-
 
-        //DEBUG         [self dumpSltSecondCounter:@"SLT-takeData-nach RelInhibit:"];
-
 		[self shipSltSecondCounter: kStartRunType];
 		first = NO;
 	}
+    else {
+        //event readout controlled by the SLT cpu now. ORCA reads out
+        //the resulting data from a generic circular buffer in the pmc code.
+        [pmcLink takeData:aDataPacket userInfo:userInfo];
+    }
 }
 
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-
     for(id obj in dataTakers){
         [obj runIsStopping:aDataPacket userInfo:userInfo];
     }
@@ -1765,17 +1759,14 @@ return;
 	dataTakers = nil;
 
     [self setIsPartOfRun: NO];
-
 }
 
 - (void) dumpSltSecondCounter:(NSString*)text
 {
 	unsigned long subseconds = [self readSubSecondsCounter];
 	unsigned long seconds = [self readSecondsCounter];
-    if(text)
-        NSLog(@"%@::%@   %@   sec:%i  subsec:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),text,seconds,subseconds);//DEBUG -tb-
-    else
-        NSLog(@"%@::%@    sec:%i  subsec:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),seconds,subseconds);//DEBUG -tb-
+    if(text) NSLog(@"%@::%@   %@   sec:%i  subsec:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),text,seconds,subseconds);//DEBUG -tb-
+    else     NSLog(@"%@::%@    sec:%i  subsec:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),seconds,subseconds);//DEBUG -tb-
 }
 
 /** For the V4 SLT (Auger/KATRIN)the subseconds count 100 nsec tics! (Despite the fact that the ADC sampling has a 50 nsec base.)
@@ -1818,7 +1809,6 @@ return;
 	//temp----
 	int i, j, k;
 	int sltSize = pageSize * 20;	
-	
 	
 	// Dislay the matrix of triggered pixel and timing
 	// The xy-Projection is needed to readout only the triggered pixel!!!

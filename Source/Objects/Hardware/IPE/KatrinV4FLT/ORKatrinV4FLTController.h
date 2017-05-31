@@ -32,7 +32,7 @@
 	    IBOutlet NSTextField*   energyOffsetTextField;
 	    IBOutlet NSButton*      forceFLTReadoutCB;
 	    IBOutlet NSButton*      skipFltEventReadoutCB;
-	IBOutlet   NSTextField* bipolarEnergyThreshTestTextField;
+        IBOutlet NSTextField*   bipolarEnergyThreshTestTextField;
 	    IBOutlet NSButton*      useBipolarEnergyCB;
 	    IBOutlet NSPopUpButton* useSLTtimePU;
 	    IBOutlet NSPopUpButton* useDmaBlockReadPU;
