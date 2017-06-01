@@ -1353,6 +1353,10 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 {
     if(!isValid)return;//don't post if not valid
     NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
+                            [self fullID],   @"name",
+                            @"LN State",     @"title",
+
+                            
                             [NSArray arrayWithObjects:
                              [NSNumber numberWithFloat:level[0]],
                              [NSNumber numberWithFloat:level[1]],
@@ -1415,6 +1419,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
                             
                             nil];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddHistoryAdcRecord" object:self userInfo:values];
 }
 
 
