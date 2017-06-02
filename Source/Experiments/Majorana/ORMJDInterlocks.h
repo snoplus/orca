@@ -66,6 +66,7 @@ typedef struct {
     BOOL                sentCmds;
     BOOL                vacuumSpike;
     BOOL                fillingLN;
+    int                 pollingTimeForLN;
     int                 breakDownPass;
     NSString*           breakDownResult;
     BOOL                scheduledToSendVacReport;
@@ -92,6 +93,7 @@ typedef struct {
 - (NSString*)   moduleName;
 - (BOOL)        vacuumSpike;
 - (BOOL)        fillingLN;
+- (int)         pollingTimeForLN;
 - (void)        errorReport;
 
 @property (assign) MajoranaModel*             delegate;

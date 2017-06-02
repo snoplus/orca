@@ -89,8 +89,10 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         [mjdSource[i] setDelegate:nil];
         [mjdSource[i] release];
         
-        [savedSpikeInfo[i] release];
     }
+    
+    for(i=0;i<3;i++)[scheduledToSendRateReport[i] release];
+    
     [highRateChecker release];
     [anObjForCouchID release];
     [stringMap release];
@@ -326,13 +328,11 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     }
 }
 
-- (void) logBreakdowns:(int)aCrate
+- (void) updateBreakdownDictionary:(NSDictionary*)dic
 {
-    if((aCrate == 2) &&  ignoreBreakdownCheckOnA)return;
-    if((aCrate == 1) &&  ignoreBreakdownCheckOnB)return;
+    if(!dic)return; //shouldn't happen, but if it does then no sense in continuing
     
-    if([self fillingLN:aCrate-1])return;
-
+    int aCrate = [[dic objectForKey:@"crate"]intValue];
     //the two Spike dicationaries come from notifications from the digitizers and the preamps.
     //They hold location info and a dictionary with the spike info. If they exist, there was an excursion in the running average
     if(baselineSpikes || rateSpikes){
@@ -349,7 +349,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                 
                 if([detIndexString length]==0 || [detIndexString rangeOfString:@"-"].location!=NSNotFound)continue;
                 
-                int detIndex = [detIndexString intValue];
+                int detIndex = [detIndexString intValue]*2; //x2 because the stringMap hi/low gains get expanded into a bigger table
                 
                 NSString* detectorName = [aGroup segment:detIndex objectForKey:@"kDetectorName"];
                 if([detectorName length]==0 || [detectorName rangeOfString:@"-"].location!=NSNotFound)continue;
@@ -383,13 +383,13 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                         detectorEntry = [detectorEntries objectForKey:detectorName];
                     }
                     
-                    if(rateEntry     && ![detectorEntry objectForKey:@"rateInfo"]){
+                    if(rateEntry && ![detectorEntry objectForKey:@"rateInfo"]){
                         if(![self calibrationRun:aCrate]){
                             [detectorEntry setObject:rateEntry forKey:@"rateInfo"];
                             [breakDownDictionary setObject:@"YES" forKey:@"changed"];
-                            if(!scheduledToSendRateReport){
-                                scheduledToSendRateReport = YES;
-                                [self performSelector:@selector(sendRateSpikeReport) withObject:nil afterDelay:15];
+                            if(!scheduledToSendRateReport[aCrate]){
+                                scheduledToSendRateReport[aCrate] = [[NSDate date] retain];
+                                //the actual send will happen when the constraint check is finished
                             }
                         }
                     }
@@ -444,38 +444,72 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     if(pollTime){
         if(!scheduledToRunCheckBreakdown){
             scheduledToRunCheckBreakdown = YES;
-            [self performSelector:@selector(forceConstraintCheck) withObject:nil afterDelay:7];
+            [self performSelector:@selector(forceConstraintCheck) withObject:nil afterDelay:15];
         }
     }
 }
 
-- (void) sendRateSpikeReport
+- (void) sendRateSpikeReportForCrate:(int)aCrate
 {
-    scheduledToSendRateReport = NO;
-    //send out text to experts
-    OROnCallListModel* onCallObj = [[(ORAppDelegate*)[NSApp delegate] document] findObjectWithFullID:@"OROnCallListModel,1"];
+    if(aCrate!=1 && aCrate!=2) return;
+
+    if(!scheduledToSendRateReport[aCrate])return; //not scheduled at all
+    
+    //have to ensure that the AMI has had enough time to have polled the valve states
+    NSTimeInterval dt = [[NSDate date] timeIntervalSinceDate:scheduledToSendRateReport[aCrate]];
+    int lnPollingTime = [self pollingTimeForLN:aCrate-1];
+    if(dt < lnPollingTime)return; //not enough time, it's OK since we'll be called again later
+    
+    [scheduledToSendRateReport[aCrate] release];
+    scheduledToSendRateReport[aCrate] = nil;
+    
+    if(![self fillingLN:aCrate-1]){
+
+        //send out text to experts
+        OROnCallListModel* onCallObj = [[(ORAppDelegate*)[NSApp delegate] document] findObjectWithFullID:@"OROnCallListModel,1"];
+        NSMutableDictionary* detectorEntries = [breakDownDictionary objectForKey:@"detectorEntries"];
+        NSMutableString* report = [NSMutableString stringWithString:@""];
+        for(id aKey in detectorEntries){
+            NSMutableDictionary* anEntry = [detectorEntries objectForKey:aKey];
+            ORRunningAveSpike* rateInfo  = [anEntry objectForKey:@"rateInfo"];
+            if(rateInfo){
+                int crateKey = [[anEntry objectForKey:@"crate"] intValue];
+                if(crateKey != aCrate)                      continue;
+                
+                if(crateKey == 1 && ignoreBreakdownCheckOnB)continue;
+                if(crateKey == 1 && [self fillingLN:0])     continue;
+                
+                if(crateKey == 2 && ignoreBreakdownCheckOnA)continue;
+                if(crateKey == 2 && [self fillingLN:1])     continue;
+                
+                //ok, append this detector
+                [report appendFormat:@"Detector: %@ (%@,%@,%@)\n",[anEntry objectForKey:@"detectorName"],[anEntry objectForKey:@"crate"],[anEntry objectForKey:@"card"],[anEntry objectForKey:@"chan"]];
+                [report appendFormat:@"Ave: %.1f  Spiked: %.1f (%@ MT)\n",[rateInfo ave],[rateInfo spikeValue],[[rateInfo spikeStart] stdDescription]];
+            }
+        }
+        //make sure there is something to send
+        if([report length]>0){
+            NSString* s1 = [NSString stringWithFormat:@"Rate Spikes Reported\n%@",report];
+            [onCallObj broadcastMessage:s1];
+        }
+    }
+    //don't care anymore
     NSMutableDictionary* detectorEntries = [breakDownDictionary objectForKey:@"detectorEntries"];
-    NSMutableString* report = [NSMutableString stringWithString:@""];
-    for(id aKey in detectorEntries){
+    for(id aKey in [detectorEntries allKeys]){
         NSMutableDictionary* anEntry = [detectorEntries objectForKey:aKey];
         ORRunningAveSpike* rateInfo  = [anEntry objectForKey:@"rateInfo"];
         if(rateInfo){
-            if([[anEntry objectForKey:@"crate"] intValue] == 1 && ignoreBreakdownCheckOnB)continue;
-            if([[anEntry objectForKey:@"crate"] intValue] == 2 && ignoreBreakdownCheckOnA)continue;
-            
-            if([[anEntry objectForKey:@"crate"] intValue] == 1 && [self fillingLN:0]) continue;
-            if([[anEntry objectForKey:@"crate"] intValue] == 2 && [self fillingLN:1]) continue;
-            
-            //ok, append this detector
-            [report appendFormat:@"Detector: %@ (%@,%@,%@)\n",[anEntry objectForKey:@"detectorName"],[anEntry objectForKey:@"crate"],[anEntry objectForKey:@"card"],[anEntry objectForKey:@"chan"]];
-            [report appendFormat:@"Ave: %.1f  Spiked: %.1f (%@ MT)\n",[rateInfo ave],[rateInfo spikeValue],[[rateInfo spikeStart] stdDescription]];
+            int crateKey = [[anEntry objectForKey:@"crate"] intValue];
+            if(crateKey != aCrate)                      continue;
+            [anEntry removeObjectForKey:@"rateInfo"];
+            if([anEntry allKeys] == 0){
+                //no baseline entry either, so remove the entry all together
+                [detectorEntries removeObjectForKey:aKey];
+            }
         }
     }
-    //make sure there is something to send
-    if([report length]>0){
-        NSString* s1 = [NSString stringWithFormat:@"Rate Spikes Reported\n%@",report];
-        [onCallObj broadcastMessage:s1];
-    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORMajoranaModelUpdateSpikeDisplay" object:self];
+
 }
 
 - (void) sendRateBaselineReport
@@ -501,9 +535,21 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         NSString* s1 = [NSString stringWithFormat:@"Baseline Excursions Reported\n%@",report];
         [onCallObj broadcastMessage:s1];
     }
+    
+    //don't care anymore
+    for(id aKey in [detectorEntries allKeys]){
+        NSMutableDictionary* anEntry = [detectorEntries objectForKey:aKey];
+        ORRunningAveSpike* rateInfo  = [anEntry objectForKey:@"baselineInfo"];
+        if(rateInfo){
+            [anEntry removeObjectForKey:@"baselineInfo"];
+            if([anEntry allKeys] == 0){
+                //no rate spike entry either, so remove the entry all together
+                [detectorEntries removeObjectForKey:aKey];
+            }
+        }
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORMajoranaModelUpdateSpikeDisplay" object:self];
 }
-
-
 
 - (BOOL) calibrationRun:(int)aCrate
 {
@@ -513,10 +559,9 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
 - (void) forceConstraintCheck
 {
-    //temp fix?? until I can understand why things don't work
-    //[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(forceConstraintCheck) object:nil];
-    //scheduledToRunCheckBreakdown = NO;
-    //[self checkConstraints];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(forceConstraintCheck) object:nil];
+    scheduledToRunCheckBreakdown = NO;
+    [self checkConstraints];
 }
 
 - (NSString*) checkForBreakdown:(int)aCrate vacSystem:(int)aVacSystem
@@ -653,12 +698,20 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     if(i>=0 && i<2)return[[self mjdInterlocks:i] vacuumSpike];
     else return NO;
 }
+
+
 - (BOOL) fillingLN:(int)i
 {
     if(i>=0 && i<2)return[[self mjdInterlocks:i] fillingLN];
     else return NO;
 }
-
+                          
+- (int) pollingTimeForLN:(int)i
+{
+    if(i>=0 && i<2)return[[self mjdInterlocks:i] pollingTimeForLN];
+    else return 0;
+}
+                          
 - (BOOL) breakdownConditionsMet:(id)aDetectorKey
 {
     NSDictionary* detectorEntries   = [breakDownDictionary objectForKey:@"detectorEntries"];
@@ -730,22 +783,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
 - (void) rateSpike:(NSNotification*) aNote
 {
-    //save the dic for posting after constraints checked... only care if NO LN2 fill is going on.
     NSDictionary* dic = [aNote userInfo];
-    int index =  [[dic objectForKey:@"crate"] intValue] - 1;
-    if(index>=0 && index<=1){
-        [savedSpikeInfo[index] release];
-        savedSpikeInfo[index] = [dic retain];
-    }
-}
-
-- (void) processSavedSpikeInfo:(int)index
-{
-    if(index<0 || index>1)return;
-    
-    NSDictionary* dic = savedSpikeInfo[index];
-    if(!dic)return;
-    
+   
     //either a spike happened or a spike cleared
     ORRunningAveSpike* spikeInfo = [dic objectForKey:@"spikeInfo"];
     NSString* aKey = [NSString stringWithFormat:@"%@,%@,%@",
@@ -753,7 +792,6 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                       [dic objectForKey:@"card"],
                       [dic objectForKey:@"channel"]];
     BOOL spiked = [spikeInfo spiked];
-    BOOL sendPost = NO;
     if(spiked){
         int aCrate = [[dic objectForKey:@"crate"]intValue];
         if((aCrate == 2) &&  ignoreBreakdownCheckOnA)return;
@@ -763,7 +801,6 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
             //not noticed before, so store it
             if(!rateSpikes)rateSpikes = [[NSMutableDictionary dictionary] retain];
             [rateSpikes setObject:dic forKey:aKey]; //<<<--note, dictionary stored has spike and crate,card, chan info
-            sendPost = YES;
         }
     }
     else {
@@ -802,13 +839,10 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                 [rateSpikes release];
                 rateSpikes = nil;
             }
-            sendPost = YES;
         }
     }
-    if(sendPost){
-        [self logBreakdowns:[[dic objectForKey:@"crate"]intValue]];
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"ORMajoranaModelUpdateSpikeDisplay" object:self];
-    }
+    [self updateBreakdownDictionary:dic];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORMajoranaModelUpdateSpikeDisplay" object:self];
 }
 
 - (void) baselineSpike:(NSNotification*) aNote
@@ -822,7 +856,6 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                       [dic objectForKey:@"channel"]];
     BOOL spiked = [spikeInfo spiked];
     if(!spikeInfo.spikeStart)return;
-    BOOL sendPost = NO;
     if(spiked){
         int aCrate = [[dic objectForKey:@"crate"]intValue];
         if((aCrate == 2) &&  ignoreBreakdownCheckOnA)return;
@@ -831,7 +864,6 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         if(![baselineSpikes objectForKey:aKey]){
             if(!baselineSpikes)baselineSpikes = [[NSMutableDictionary dictionary] retain];
             [baselineSpikes setObject:dic forKey:aKey];
-            sendPost = YES;
         }
     }
     else {
@@ -867,20 +899,16 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                 [baselineSpikes release];
                 baselineSpikes = nil;
             }
-            sendPost = YES;
         }
     }
-    if(sendPost){
-        [self logBreakdowns:[[dic objectForKey:@"crate"]intValue]];
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"ORMajoranaModelUpdateSpikeDisplay" object:self];
-    }
+    [self updateBreakdownDictionary:dic];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORMajoranaModelUpdateSpikeDisplay" object:self];
 }
 
 - (NSDictionary*) rateSpikes
 {
     return rateSpikes;
 }
-
 
 - (NSDictionary*) baselineSpikes
 {
@@ -1442,7 +1470,6 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     for(i=0;i<2;i++){
         mjdInterlocks[i] = [[ORMJDInterlocks alloc] initWithDelegate:self slot:i];
         mjdSource[i] = [[ORMJDSource alloc] initWithDelegate:self slot:i];
-        savedSpikeInfo[i] = nil;
     }
     pollTime   = [decoder  decodeIntForKey:	@"pollTime"];
     stringMap  = [[decoder decodeObjectForKey:@"stringMap"] retain];
@@ -1842,6 +1869,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         NSLogColor([NSColor redColor],@"%@ Digitizers init failed\n",[self className]);
     }
 }
+
 - (void) initVeto
 {
     @try {
@@ -1853,16 +1881,9 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     }
 }
 
-- (void) constraintCheckFinished:(int)module
+- (void) constraintCheckFinished:(int)aCrate
 {
-    int index = module - 1;
-    if(index>=0 && index<=1){
-        if(![self fillingLN:index]){
-            [self processSavedSpikeInfo:index];
-        }
-        [savedSpikeInfo[index] release];
-        savedSpikeInfo[index] = nil;
-    }
+    [self sendRateSpikeReportForCrate:aCrate];
 }
 
 @end
