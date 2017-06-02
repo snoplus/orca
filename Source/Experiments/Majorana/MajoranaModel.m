@@ -458,6 +458,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     //have to ensure that the AMI has had enough time to have polled the valve states
     NSTimeInterval dt = [[NSDate date] timeIntervalSinceDate:scheduledToSendRateReport[aCrate]];
     int lnPollingTime = [self pollingTimeForLN:aCrate-1];
+    if(lnPollingTime==0)lnPollingTime = 45; //default
     if(dt < lnPollingTime)return; //not enough time, it's OK since we'll be called again later
     
     [scheduledToSendRateReport[aCrate] release];
