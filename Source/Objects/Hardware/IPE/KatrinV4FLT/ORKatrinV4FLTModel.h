@@ -123,7 +123,6 @@
 - (void) setUpImage;
 - (void) makeMainController;
 - (short) getNumberRegisters;
-- (BOOL) checkRegisterStruct;
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
@@ -271,10 +270,6 @@
 - (ORTimeRate*) totalRate;
 - (void) setTotalRate:(ORTimeRate*)newTimeRate;
 
-- (NSString*) getRegisterName: (short) anIndex;
-- (unsigned long) getAddressOffset: (short) anIndex;
-- (short) getAccessType: (short) anIndex;
-
 - (unsigned short) selectedRegIndex;
 - (void) setSelectedRegIndex:(unsigned short) anIndex;
 - (unsigned long) writeValue;
@@ -296,6 +291,7 @@
 
 #pragma mark •••HW Access
 //all can raise exceptions
+- (int) accessTypeOfReg:(int)aReg;
 - (unsigned long) regAddress:(int)aReg channel:(int)aChannel;
 - (unsigned long) regAddress:(int)aReg;
 - (unsigned long) adcMemoryChannel:(int)aChannel page:(int)aPage;

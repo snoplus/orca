@@ -208,7 +208,7 @@
 	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* stationKey	= [self getStationKey: card];	
 	NSString* channelKey	= [self getChannelKey: chan];	
-	unsigned long startIndex= ShiftAndExtract(ptr[7],8,0x7ff);
+    unsigned long startIndex;
 
 	//channel by channel histograms
 	unsigned long energy = ptr[6];

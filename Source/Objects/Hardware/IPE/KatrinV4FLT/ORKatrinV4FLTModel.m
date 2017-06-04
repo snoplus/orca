@@ -30,7 +30,7 @@
 #import "SBC_Config.h"
 #import "SLTv4_HW_Definitions.h"
 #import "ORCommandList.h"
-
+#import "ORKatrinV4Registers.h"
 
 NSString* ORKatrinV4FLTModelEnergyOffsetChanged             = @"ORKatrinV4FLTModelEnergyOffsetChanged";
 NSString* ORKatrinV4FLTModelForceFLTReadoutChanged          = @"ORKatrinV4FLTModelForceFLTReadoutChanged";
@@ -106,93 +106,6 @@ static NSString* fltTestName[kNumKatrinV4FLTTests]= {
 	@"Event",
 };
 
-// data for low-level page (IPE V4 electronic definitions)
-typedef enum eKatrinFLTV4RegEnum {
-	kFLTV4StatusReg,
-	kFLTV4ControlReg,
-	kFLTV4CommandReg,
-	kFLTV4VersionReg,
-	kFLTV4pVersionReg,
-	kFLTV4BoardIDLsbReg,
-	kFLTV4BoardIDMsbReg,
-	kFLTV4InterruptMaskReg,
-	kFLTV4HrMeasEnableReg,
-	kFLTV4EventFifoStatusReg,
-	kFLTV4PixelSettings1Reg,
-	kFLTV4PixelSettings2Reg,
-	kFLTV4RunControlReg,
-	kFLTV4HistgrSettingsReg,
-	kFLTV4AccessTestReg,
-	kFLTV4SecondCounterReg,
-	kFLTV4HrControlReg,
-	kFLTV4HistMeasTimeReg,
-	kFLTV4HistRecTimeReg,
-	kFLTV4HistNumMeasReg,
-	kFLTV4PostTrigger,
-	kFLTV4ThresholdReg,
-	kFLTV4pStatusA,
-	kFLTV4pStatusB,
-	kFLTV4pStatusC,
-	kFLTV4AnalogOffset,
-	kFLTV4GainReg,
-	kFLTV4HitRateReg,
-	kFLTV4EventFifo1Reg,
-	kFLTV4EventFifo2Reg,
-	kFLTV4EventFifo3Reg,
-	kFLTV4EventFifo4Reg,
-	kFLTV4HistPageNReg,
-	kFLTV4HistLastFirstReg,
-	kFLTV4TestPatternReg,
-	kFLTV4EnergyOffsetReg,
-	kFLTV4NumRegs //must be last
-}eKatrinFLTV4RegEnum;
-
-typedef struct katrinv4FLTRegNamesStruct {
-    NSString*       regName;
-    unsigned long 	addressOffset;
-    short			accessType;
-    eKatrinFLTV4RegEnum enumCheckValue;
-} katrinv4FLTRegNamesStruct;
-
-static katrinv4FLTRegNamesStruct regV4[kFLTV4NumRegs] = {
-	//2nd column is PCI register address shifted 2 bits to right (the two rightmost bits are always zero) -tb-
-	{@"Status",				0x000000>>2, 	kIpeRegReadable,                                            kFLTV4StatusReg          },
-	{@"Control",			0x000004>>2, 	kIpeRegReadable | kIpeRegWriteable,                         kFLTV4ControlReg         },
-	{@"Command",			0x000008>>2, 	kIpeRegReadable | kIpeRegWriteable,                         kFLTV4CommandReg         },
-	{@"CFPGAVersion",		0x00000c>>2, 	kIpeRegReadable,                                            kFLTV4VersionReg         },
-	{@"FPGA8Version",		0x000010>>2, 	kIpeRegReadable,                                            kFLTV4pVersionReg        },
-	{@"BoardIDLSB",         0x000014>>2, 	kIpeRegReadable,                                            kFLTV4BoardIDLsbReg      },
-	{@"BoardIDMSB",         0x000018>>2, 	kIpeRegReadable,                                            kFLTV4BoardIDMsbReg      },
-	{@"InterruptMask",      0x00001C>>2, 	kIpeRegReadable | kIpeRegWriteable,                         kFLTV4InterruptMaskReg   },
-	{@"HrMeasEnable",       0x000024>>2, 	kIpeRegReadable | kIpeRegWriteable,                         kFLTV4HrMeasEnableReg    },
-	{@"EventFifoStatus",    0x00002C>>2, 	kIpeRegReadable,                                            kFLTV4EventFifoStatusReg },
-	{@"PixelSettings1",     0x000030>>2,    kIpeRegReadable | kIpeRegWriteable,                         kFLTV4PixelSettings1Reg  },
-	{@"PixelSettings2",     0x000034>>2, 	kIpeRegReadable | kIpeRegWriteable,                         kFLTV4PixelSettings2Reg  },
-	{@"RunControl",         0x000038>>2, 	kIpeRegReadable | kIpeRegWriteable,                         kFLTV4RunControlReg      },
-	{@"HistgrSettings",     0x00003c>>2, 	kIpeRegReadable | kIpeRegWriteable,                         kFLTV4HistgrSettingsReg  },
-	{@"AccessTest",         0x000040>>2, 	kIpeRegReadable | kIpeRegWriteable,                         kFLTV4AccessTestReg      },
-	{@"SecondCounter",      0x000044>>2, 	kIpeRegReadable | kIpeRegWriteable,                         kFLTV4SecondCounterReg   },
-	{@"HrControl",          0x000048>>2, 	kIpeRegReadable | kIpeRegWriteable,                         kFLTV4HrControlReg       },
-	{@"HistMeasTime",       0x00004C>>2, 	kIpeRegReadable | kIpeRegWriteable,                         kFLTV4HistMeasTimeReg    },
-	{@"HistRecTime",        0x000050>>2, 	kIpeRegReadable,                                            kFLTV4HistRecTimeReg     },
-	{@"HistNumMeas",        0x000054>>2, 	kIpeRegReadable,                                            kFLTV4HistNumMeasReg     },
-	{@"PostTrigger",		0x000058>>2, 	kIpeRegReadable | kIpeRegWriteable,                         kFLTV4PostTrigger        },
-	{@"Threshold",          0x002080>>2, 	kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel,   kFLTV4ThresholdReg       },
-	{@"pStatusA",           0x002000>>2, 	kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel,   kFLTV4pStatusA           },
-	{@"pStatusB",           0x006000>>2, 	kIpeRegReadable,                                            kFLTV4pStatusB           },
-	{@"pStatusC",           0x026000>>2, 	kIpeRegReadable,                                            kFLTV4pStatusC           },
-	{@"Analog Offset",		0x001000>>2, 	kIpeRegReadable,                                            kFLTV4AnalogOffset       },
-	{@"Gain",				0x001004>>2, 	kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel,   kFLTV4GainReg            },
-	{@"Hit Rate",			0x001100>>2, 	kIpeRegReadable | kIpeRegNeedsChannel,                      kFLTV4HitRateReg         },
-	{@"Event FIFO1",		0x001800>>2, 	kIpeRegReadable,                                            kFLTV4EventFifo1Reg      },
-	{@"Event FIFO2",		0x001804>>2, 	kIpeRegReadable,                                            kFLTV4EventFifo2Reg      },
-	{@"Event FIFO3",		0x001808>>2, 	kIpeRegReadable | kIpeRegNeedsChannel,                      kFLTV4EventFifo3Reg      },
-	{@"Event FIFO4",		0x00180C>>2, 	kIpeRegReadable | kIpeRegNeedsChannel,                      kFLTV4EventFifo4Reg      },
-	{@"HistPageN",			0x00200C>>2, 	kIpeRegReadable,                                            kFLTV4HistPageNReg       },
-	{@"HistLastFirst",		0x002044>>2, 	kIpeRegReadable,                                            kFLTV4HistLastFirstReg   },
-	{@"TestPattern",		0x001400>>2, 	kIpeRegReadable | kIpeRegWriteable,                         kFLTV4TestPatternReg     },
-	{@"EnergyOffset",		0x00005C>>2, 	kIpeRegReadable | kIpeRegWriteable,                         kFLTV4EnergyOffsetReg    },
-};
 
 
 @interface ORKatrinV4FLTModel (private)
@@ -261,20 +174,8 @@ static katrinv4FLTRegNamesStruct regV4[kFLTV4NumRegs] = {
 }
 
 - (ORTimeRate*) totalRate   { return totalRate; }
-- (short) getNumberRegisters{ return kFLTV4NumRegs; }
+- (short) getNumberRegisters{ return [katrinV4Registers numRegisters]; }
 
-- (BOOL) checkRegisterStruct
-{
-    //used to double-check the register structure against the enum list
-    int i;
-    for(i=0;i<kFLTV4NumRegs;i++){
-        if(regV4[i].enumCheckValue != i){
-            NSLog(@"Programmer error in ORKatrinv4FLTModel: enum mismatch at index %d\n",i);
-            return  NO;
-        }
-    }
-    return YES;
-}
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers
@@ -813,7 +714,7 @@ static double table[32]={
 	
 	readWaveforms = NO;
 	
-	int fifoLengthSetting = kFifoLength512;
+	//int fifoLengthSetting = kFifoLength512;
 	
 	switch (runMode) {
 		case kIpeFltV4_EnergyDaqMode:
@@ -865,7 +766,7 @@ static double table[32]={
 				//-tb- 2013-05 //TODO: remember the state and restore it after a run -tb-
 			}
 			readWaveforms = YES;
-			fifoLengthSetting = kFifoLength64;
+			//fifoLengthSetting = kFifoLength64;
 			break;
 			
 		default:
@@ -1255,20 +1156,6 @@ static double table[32]={
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTWriteValueChanged object:self];
 }
 
-- (NSString*) getRegisterName: (short) anIndex
-{
-    return regV4[anIndex].regName;
-}
-
-- (unsigned long) getAddressOffset: (short) anIndex
-{
-    return( regV4[anIndex].addressOffset );
-}
-
-- (short) getAccessType: (short) anIndex
-{
-	return regV4[anIndex].accessType;
-}
 
 - (void) setToDefaults
 {
@@ -1581,13 +1468,12 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 - (unsigned long) regAddress:(int)aReg channel:(int)aChannel
 {
-	return ([self stationNumber] << 17) | (aChannel << 12)   | regV4[aReg].addressOffset; //TODO: the channel ... -tb-   | ((aChannel&0x01f)<<kIpeFlt_ChannelAddress)
+    return [katrinV4Registers addressForStation:[self stationNumber] registerIndex:aReg chan:aChannel];
 }
 
 - (unsigned long) regAddress:(int)aReg
 {
-	
-	return ([self stationNumber] << 17) |  regV4[aReg].addressOffset; //TODO: NEED <<17 !!! -tb-
+    return [katrinV4Registers addressForStation:[self stationNumber] registerIndex:aReg ];
 }
 
 - (unsigned long) adcMemoryChannel:(int)aChannel page:(int)aPage
@@ -1597,6 +1483,10 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	return 0;
     //TODO: obsolete (v3) -tb-
 	return ([self slot] << 24) | (0x2 << kIpeFlt_AddressSpace) | (aChannel << kIpeFlt_ChannelAddress)	| (aPage << kIpeFlt_PageNumber);
+}
+- (int) accessTypeOfReg:(int)aReg
+{
+    return [katrinV4Registers accessType:aReg];
 }
 
 - (unsigned long) readReg:(int)aReg
@@ -1920,7 +1810,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 - (id) writeRegCmd:(unsigned long) aRegister value:(unsigned long)aValue
 {
-	return [[[self crate] adapter] writeHardwareRegisterCmd:[self regAddress:aRegister] value:aValue];		
+	return [[[self crate] adapter] writeHardwareRegisterCmd:[self regAddress:aRegister] value:aValue];
 }
 
 //------------------
@@ -1943,14 +1833,10 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	[self performSelector:@selector(readHistogrammingStatus) withObject:nil afterDelay:histoUpdateRate];
 }
 
-
-
 - (NSString*) rateNotification
 {
 	return ORKatrinV4FLTModelHitRateChanged;
 }
-
-
 
 #pragma mark •••archival
 - (id)initWithCoder:(NSCoder*)decoder
@@ -2871,20 +2757,20 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 - (void) printVersions
 {
 	unsigned long data;
-    uint32_t versionCFPGA;
-    uint32_t versionFPGA8;
+    //uint32_t versionCFPGA;
+    //uint32_t versionFPGA8;
 	data = [self readVersion];
 	if(0x1f000000 == data){
 		NSLogColor([NSColor redColor],@"FLTv4: Could not access hardware, no version register read!\n");
 		return;
 	}
-	versionCFPGA=data;
+	//versionCFPGA=data;
 	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
 	NSLogFont(aFont,@"%@ versions:\n",[self fullID]);
 	NSLogFont(aFont,@"CFPGA Version %u.%u.%u.%u\n",((data>>28)&0xf),((data>>16)&0xfff),((data>>8)&0xff),((data>>0)&0xff));
 	data = [self readpVersion];
 	NSLogFont(aFont,@"FPGA8 Version %u.%u.%u.%u\n",((data>>28)&0xf),((data>>16)&0xfff),((data>>8)&0xff),((data>>0)&0xff));
-	versionFPGA8=data;
+	//versionFPGA8=data;
 
 
 	switch ( ((data>>28)&0xf) ) {

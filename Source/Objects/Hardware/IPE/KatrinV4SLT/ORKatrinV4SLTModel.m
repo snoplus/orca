@@ -1624,7 +1624,7 @@ return;
             if(runMode == kIpeFltV4_Histogram_DaqMode) countHistoMode++; else countNonHistoMode++;
         }
         if([obj respondsToSelector:@selector(useBipolarEnergy)]){
-            runMode=[obj useBipolarEnergy];
+            //runMode=[obj useBipolarEnergy];
             if([obj useBipolarEnergy]) countBipolarEnergyMode++;
         }
         

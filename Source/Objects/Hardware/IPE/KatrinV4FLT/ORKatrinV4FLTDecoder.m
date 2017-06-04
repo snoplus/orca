@@ -84,7 +84,7 @@
 	unsigned char crate		= ShiftAndExtract(ptr[1],21,0xf);
 	unsigned char card		= ShiftAndExtract(ptr[1],16,0x1f);
 	unsigned char chan		= ShiftAndExtract(ptr[1],8,0xff);
-	unsigned char fifoFlags = ShiftAndExtract(ptr[5],20,0xf);
+	//unsigned char fifoFlags = ShiftAndExtract(ptr[5],20,0xf);
 	int boxcarLen = ShiftAndExtract(ptr[1],4,0x3);
 	int filterShapingLength = ShiftAndExtract(ptr[1],0,0xf);
 	unsigned short filterDiv;
@@ -134,12 +134,12 @@
 			}
 		}
 		if(getRatesFromDecodeStage)    getRatesFromDecodeStage     = [obj bumpRateFromDecodeStage:chan];
-		if(getFifoFlagsFromDecodeStage)  {
-			if(fifoFlags != oldFifoFlags[chan]){
-				getFifoFlagsFromDecodeStage = [obj setFromDecodeStage:chan fifoFlags:fifoFlags];
-				fifoFlags = oldFifoFlags[chan];
-			}
-	    }
+//		if(getFifoFlagsFromDecodeStage)  {
+//			if(fifoFlags != oldFifoFlags[chan]){
+//				getFifoFlagsFromDecodeStage = [obj setFromDecodeStage:chan fifoFlags:fifoFlags];
+//				fifoFlags = oldFifoFlags[chan];
+//			}
+//	    }
     }
 	
     return length; //must return number of longs processed.
@@ -227,7 +227,7 @@
 	unsigned char crate		= ShiftAndExtract(ptr[1],21,0xf);
 	unsigned char card		= ShiftAndExtract(ptr[1],16,0x1f);
 	unsigned char chan		= ShiftAndExtract(ptr[1],8,0xff);
-	unsigned char fifoFlags = ShiftAndExtract(ptr[5],20,0xf);
+	//unsigned char fifoFlags = ShiftAndExtract(ptr[5],20,0xf);
 	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* stationKey	= [self getStationKey: card];	
 	NSString* channelKey	= [self getChannelKey: chan];	
@@ -243,7 +243,7 @@
 	}
 	
 	
-	unsigned long startIndex= ShiftAndExtract(ptr[7],8,0x7ff);
+    unsigned long startIndex;
 
 	//channel by channel histograms
 	//note the ptr[6] shares the eventID and the energy
@@ -309,12 +309,12 @@ startIndex=traceStart16;
 			}
 		}
 		if(getRatesFromDecodeStage)    getRatesFromDecodeStage     = [obj bumpRateFromDecodeStage:chan];
-		if(getFifoFlagsFromDecodeStage){
-			if(fifoFlags != oldFifoFlags[chan]){
-				getFifoFlagsFromDecodeStage = [obj setFromDecodeStage:chan fifoFlags:fifoFlags];
-				fifoFlags = oldFifoFlags[chan];
-			}
-		}
+//		if(getFifoFlagsFromDecodeStage){
+//			if(fifoFlags != oldFifoFlags[chan]){
+//				getFifoFlagsFromDecodeStage = [obj setFromDecodeStage:chan fifoFlags:fifoFlags];
+//				fifoFlags = oldFifoFlags[chan];
+//			}
+//		}
 	}
 	
 										
@@ -460,7 +460,7 @@ Variable section: exists if trace length !=0
 	filterDiv = 1L << filterShapingLength;
 	
 	
-	unsigned long startIndex= ShiftAndExtract(ptr[7],8,0x7ff);
+    unsigned long startIndex;//= ShiftAndExtract(ptr[7],8,0x7ff);
 
 	//channel by channel histograms
 	unsigned long energy = (ptr[6] & 0xfffff)/filterDiv;
