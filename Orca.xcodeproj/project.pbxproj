@@ -1364,6 +1364,7 @@
 		843DCF35058E546A000C5219 /* DataGen.gif in Resources */ = {isa = PBXBuildFile; fileRef = 843DCF2E058E546A000C5219 /* DataGen.gif */; };
 		843DCF3A058E546A000C5219 /* ORDataGenModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 843DCF33058E546A000C5219 /* ORDataGenModel.h */; };
 		843DCF3B058E546A000C5219 /* ORDataGenModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 843DCF34058E546A000C5219 /* ORDataGenModel.m */; };
+		844035B61EE452EB00E2A162 /* ORKatrinv4Registers.m in Sources */ = {isa = PBXBuildFile; fileRef = 844035B51EE452EB00E2A162 /* ORKatrinv4Registers.m */; };
 		844048AE08350BEE000D03DB /* MemoryWatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = 844048AC08350BEE000D03DB /* MemoryWatcher.h */; };
 		844048AF08350BEE000D03DB /* MemoryWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = 844048AD08350BEE000D03DB /* MemoryWatcher.m */; };
 		844049C308353B65000D03DB /* MemoryWatcherController.h in Headers */ = {isa = PBXBuildFile; fileRef = 844049C108353B65000D03DB /* MemoryWatcherController.h */; };
@@ -4857,6 +4858,8 @@
 		843DCF33058E546A000C5219 /* ORDataGenModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORDataGenModel.h; sourceTree = "<group>"; };
 		843DCF34058E546A000C5219 /* ORDataGenModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORDataGenModel.m; sourceTree = "<group>"; };
 		843F28F811ECFEED0077E55B /* ORDataGenReadout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORDataGenReadout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORDataGenReadout.hh; sourceTree = SOURCE_ROOT; };
+		844035B51EE452EB00E2A162 /* ORKatrinv4Registers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORKatrinv4Registers.m; sourceTree = "<group>"; };
+		844035B81EE4533100E2A162 /* ORKatrinV4Registers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ORKatrinV4Registers.h; sourceTree = "<group>"; };
 		844048AC08350BEE000D03DB /* MemoryWatcher.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MemoryWatcher.h; path = "Source/Objects/Misc Objects/MemoryWatcher/MemoryWatcher.h"; sourceTree = SOURCE_ROOT; };
 		844048AD08350BEE000D03DB /* MemoryWatcher.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = MemoryWatcher.m; path = "Source/Objects/Misc Objects/MemoryWatcher/MemoryWatcher.m"; sourceTree = SOURCE_ROOT; };
 		844049C108353B65000D03DB /* MemoryWatcherController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MemoryWatcherController.h; sourceTree = "<group>"; };
@@ -7584,6 +7587,8 @@
 				2D158EB211359F5800EA1552 /* ORKatrinV4FLTDefs.h */,
 				2D158EB311359F5800EA1552 /* ORKatrinV4FLTModel.h */,
 				2D158EB411359F5800EA1552 /* ORKatrinV4FLTModel.m */,
+				844035B51EE452EB00E2A162 /* ORKatrinv4Registers.m */,
+				844035B81EE4533100E2A162 /* ORKatrinV4Registers.h */,
 			);
 			path = KatrinV4FLT;
 			sourceTree = "<group>";
@@ -17589,6 +17594,7 @@
 				84539C520807247B00615B6D /* ORRemoteRunController.m in Sources */,
 				84539C540807247B00615B6D /* ORRemoteRunModel.m in Sources */,
 				84A9816E18E1D7A400BD3FB3 /* NSFileManager+Extensions.m in Sources */,
+				844035B61EE452EB00E2A162 /* ORKatrinv4Registers.m in Sources */,
 				84539EA4080ADAF500615B6D /* ORListenerModel.m in Sources */,
 				84539EA5080ADAF500615B6D /* ORListenerController.m in Sources */,
 				840AF86E0819924D005B750D /* SourceMask.m in Sources */,
