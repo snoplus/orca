@@ -28,7 +28,10 @@
 {
     IBOutlet NSTabView* 	tabView;
     IBOutlet NSTextField*   moduleIDField;
+    IBOutlet NSTextField*   hwVersionField;
+    IBOutlet NSTextField*   gammaRevisionField;
     IBOutlet NSTextField*   revisionField;
+    IBOutlet NSTextField*   serialNumberField;
 	
 	//base address
     IBOutlet NSTextField*   slotField;
@@ -114,7 +117,8 @@
     IBOutlet NSButton*				  totalRateLogCB;
     IBOutlet ORCompositeTimeLineView* timeRatePlot;
     IBOutlet NSButton*				  timeRateLogCB;
-	
+    IBOutlet NSTextField*   temperatureField;
+    //IBOutlet NSColorWell*   colorField;
     NSView* blankView;
     NSSize  settingSize;
     NSSize  rateSize;
@@ -181,6 +185,11 @@
 - (void) totalRateChanged:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) moduleIDChanged:(NSNotification*)aNote;
+- (void) hwVersionChanged:(NSNotification*)aNote;
+
+- (void) temperatureChanged:(NSNotification*)aNotification;
+- (void) serialNumberChanged:(NSNotification*)aNotification;
+
 
 - (void) scaleAction:(NSNotification*)aNote;
 - (void) integrationChanged:(NSNotification*)aNote;

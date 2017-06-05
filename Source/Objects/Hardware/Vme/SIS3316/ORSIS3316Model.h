@@ -307,13 +307,13 @@ enum{
 	//Acquisition control reg
 	BOOL bankSwitchMode;
     BOOL autoStart;
-    BOOL multiEventMode;
+    BOOL multiEventMode;    //this is all with the commented out code
 	BOOL lemoStartStop;
     BOOL p2StartStop;
     BOOL gateMode;
     BOOL multiplexerMode;
 
-	//clocks and delays (Acquistion control reg)
+	//clocks and delays (Acquisition control reg)
     BOOL stopDelayEnabled;
     BOOL randomClock;
     
@@ -332,6 +332,13 @@ enum{
     BOOL firstTime;
     BOOL waitingForSomeChannels;
     NSString* revision;
+    unsigned short majorRev;        //6.2
+    unsigned short minorRev;        //6.2
+    unsigned short hwVersion;       //6.7
+    float temperature;              //6.8
+    unsigned short serialNumber;     //6.10  
+    //
+    
 }
 
 - (id) init;
@@ -342,6 +349,8 @@ enum{
 #pragma mark ***Accessors
 - (void) setDefaults;
 - (unsigned short) moduleID;
+- (unsigned short) hwVersion;
+- (float) temperature;
 - (NSString*) revision;
 - (void) setRevision:(NSString*)aString;
 
@@ -505,7 +514,7 @@ enum{
 - (BOOL) gateMode;
 - (void) setGateMode:(BOOL)aGateMode;
 
-//clocks and delays (Acquistion control reg)
+//clocks and delays (Acquisition control reg)
 - (BOOL) stopDelayEnabled;
 - (void) setStopDelayEnabled:(BOOL)aStopDelayEnabled;
 - (BOOL) randomClock;
@@ -544,35 +553,45 @@ enum{
 - (BOOL) checkRegList;
 
 #pragma mark •••Hardware Access
+//Comments denote section of the manual (or parts of that section ie. 6.1')
 - (unsigned long) interfaceRegister:(unsigned long)aRegisterIndex;
 - (unsigned long) vmeRegister:(unsigned long)aRegisterIndex;
 -(unsigned long) keyRegister:(unsigned long)aRegisterIndex;
 - (unsigned long) groupRegister:(unsigned long)aRegisterIndex  group:(int)aGroup;
-- (void) initBoard;                             //**NOT IN MANUAL**//
-- (void) writeThresholds;                       //6.26 (section 2)  (pg 119 and on)
-- (void) readThresholds:(BOOL)verbose;          //6.26 (section 2)
+
+- (unsigned long)readControlStatusReg;          //6.1               (complete) -not connected  
+- (unsigned long)writeControlStatusReg;         //6.1               (complete)
+- (void) setLed:(BOOL)state;                    //6.1'              (complete)
+- (void) readModuleID:(BOOL)verbose;            //6.2               (complete)
+- (void) readHWVersion:(BOOL)verbose;           //6.7               (complete)
+- (unsigned short) hwVersion;                   //6.7'              (complete)
+- (void) readTemperature:(BOOL)verbose;         //6.8               (complete)
+- (int)  temp;
+- (void) readSerialNumber:(BOOL)verbose;        //6.10              (complete)
+- (void) writeClockSource;                      //6.17              (complete)
+- (void) writeAcquisitionRegister;              //6.21              (incomplete. No read)
+- (BOOL) sampleLogicIsBusy;                     //6.21      none of 21 is connected to the nib
+//pg 119 and on
+- (void) writeRawDataBufferConfig;              //6.17 (section 2)
+- (void) writePreTriggerDelays;                 //6.19 (section 2)  (Missing read and caps at 4 bits (I think))
+- (void) writeDataFormat;                       //6.21 (section 2)  (complete)
+- (void) writeActiveTrigeGateWindowLens;        //6.24 (section 2)
 - (void) writeFirTriggerSetup;                  //6.25 (section 2)
+- (void) initBoard;
+- (void) writeThresholds;                       //6.26 (section 2)  
+- (void) readThresholds:(BOOL)verbose;          //6.26 (section 2)
 - (void) writeHeTrigThresholds;                 //6.27 (section 2)
 - (void) readHeTrigThresholds:(BOOL)verbose;    //6.27 (section 2)
-- (void) writeActiveTrigeGateWindowLens;        //6.24 (section 2)
-- (void) writePreTriggerDelays;                 //6.19 (section 2)
-- (void) writeRawDataBufferConfig;              //6.17 (section 2)
 - (void) writeAccumulatorGates;                 //6.31 (section 2)
-- (unsigned long)readControlStatusReg;          //6.1
-- (void) readModuleID:(BOOL)verbose;            //6.2
-- (void) readHWVersion:(BOOL)verbose;           //6.7   (p. 94)
-- (void) readTemperature:(BOOL)verbose;         //6.8 Needs to be converted to Celsius (pg95)
-- (void) readSerialNumber:(BOOL)verbose;        //6.10
-- (void) writeClockSource;                      //6.16
+
 - (void) writeHistogramConfiguration;           //6.33 (section 2)
-- (void) writeDataFormat;                       //6.21 (section 2)
-- (void) configureAnalogRegisters;              //*** NOT IN MANUEAL ***//
-- (void) writeAcquistionRegister;               //6.21
+- (void) configureAnalogRegisters;
+
 - (unsigned long) eventNumberGroup:(int)group bank:(int) bank;  //6.12 or 6.13 (S2) ????
-- (unsigned long) eventTriggerGroup:(int)group bank:(int) bank;
+- (unsigned long) eventTriggerGroup:(int)group bank:(int) bank; //6.12 or 6.13 (S2) ????
 - (unsigned long) readTriggerTime:(int)bank index:(int)index;
 
-- (void) setLed:(BOOL)state;
+
 - (void) clearTimeStamp;
 - (void) trigger;
 - (void) disarmSampleLogic;
@@ -583,11 +602,9 @@ enum{
 - (void) setClockChoice:(int) clck_choice;
 - (int) setFrequency:(int) osc values:(unsigned char*)values;
 
-- (BOOL) sampleLogicIsBusy; //6.2????
-
 //some test functions
 - (unsigned long) readTriggerEventBank:(int)bank index:(int)index;
-- (void) readAddressCounts; //6.15????
+- (void) readAddressCounts;
 
 //- (int) dataWord:(int)chan index:(int)index;
 
@@ -668,6 +685,7 @@ extern NSString* ORSIS3316AccGate7LenChanged;
 extern NSString* ORSIS3316AccGate7StartChanged;
 extern NSString* ORSIS3316AccGate8LenChanged;
 extern NSString* ORSIS3316AccGate8StartChanged;
+extern NSString* ORSIS3316TemperatureChanged;
 
 //CSR
 extern NSString* ORSIS3316CSRRegChanged;
@@ -685,3 +703,6 @@ extern NSString* ORSIS3316SettingsLock;
 extern NSString* ORSIS3316RateGroupChangedNotification;
 extern NSString* ORSIS3316SampleDone;
 extern NSString* ORSIS3316IDChanged;
+extern NSString* ORSIS3316HWVersionChanged;
+extern NSString* ORSIS3316SerialNumberChanged;
+

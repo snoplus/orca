@@ -140,7 +140,7 @@
     
     [notifyCenter addObserver : self
                      selector : @selector(settingsLockChanged:)
-                         name : ORRunStatusChangedNotification
+                         name : ORRunStatusChangedNotification  //kControlStatusReg? 6.1?
                        object : nil];
     
     [notifyCenter addObserver : self
@@ -413,6 +413,23 @@
                      selector : @selector(moduleIDChanged:)
                          name : ORSIS3316IDChanged
 						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(hwVersionChanged:)
+                         name : ORSIS3316HWVersionChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(temperatureChanged:)
+                         name : ORSIS3316TemperatureChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(serialNumberChanged:)
+                         name : ORSIS3316SerialNumberChanged
+                        object: model];
+    
+    
 }
 
 - (void) registerRates
@@ -500,6 +517,8 @@
 	[self csrChanged:nil];
 	[self acqChanged:nil];
 	[self moduleIDChanged:nil];
+    [self hwVersionChanged:nil];
+    [self serialNumberChanged:nil];
     
     [self setUpdatedOnce]; //<<--Must be last to ensure all fields are updated on first load
 }
@@ -580,7 +599,23 @@
     NSString* revision = [model revision];
     if(revision) [revisionField setStringValue:revision];
     else		 [revisionField setStringValue:@"---"];
+    
+    if( [model majorRevision] == 0x20)   [gammaRevisionField setStringValue:@"Gamma Revision"];
+    else                            [gammaRevisionField setStringValue:@""];
 
+}
+
+- (void) hwVersionChanged: (NSNotification*)aNote
+{
+    unsigned short readHWVersion = [model hwVersion];
+    if(readHWVersion) [hwVersionField setStringValue: [NSString stringWithFormat:@"%x",readHWVersion]];
+}
+
+- (void) serialNumberChanged: (NSNotification*)aNote
+{
+    unsigned short readSerialNumber = [model serialNumber];
+    if(readSerialNumber) [serialNumberField setStringValue:[NSString stringWithFormat:@"%x",readSerialNumber]];
+    else [serialNumberField setStringValue:@""];
 }
 
 - (void) eventConfigChanged:(NSNotification*)aNote
@@ -704,6 +739,12 @@
     }
 }
 
+- (void) temperatureChanged:(NSNotification*)aNotification
+{
+    [temperatureField setFloatValue: [model temperature]];
+    if ([model temperature] >= 51 ) [temperatureField setTextColor: [NSColor redColor] ];
+    else                            [temperatureField setTextColor: [NSColor blackColor] ];
+}
 
 - (void) scaleAction:(NSNotification*)aNotification
 {
@@ -1013,6 +1054,7 @@
         [model readModuleID:YES];
         [model readHWVersion:YES];
         [model readSerialNumber:YES];
+        [model readTemperature:YES];
 	}
 	@catch (NSException* localException) {
 		NSLog(@"Probe of SIS 3300 board ID failed\n");
