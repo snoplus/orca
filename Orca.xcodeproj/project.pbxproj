@@ -377,12 +377,6 @@
 		4547F56D1CECB9B1006CA8E3 /* ORRunningAverageGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 4547F56B1CECB9B1006CA8E3 /* ORRunningAverageGroup.m */; };
 		4AB9E5271DE5D820007C75E0 /* libpq-fe.h in Headers */ = {isa = PBXBuildFile; fileRef = 4AB9E5181DE5D820007C75E0 /* libpq-fe.h */; };
 		4AB9E5281DE5D820007C75E0 /* libpq-fs.h in Headers */ = {isa = PBXBuildFile; fileRef = 4AB9E5191DE5D820007C75E0 /* libpq-fs.h */; };
-		4AB9E5291DE5D820007C75E0 /* NKDPostgreSQLConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = 4AB9E51A1DE5D820007C75E0 /* NKDPostgreSQLConnection.h */; };
-		4AB9E52A1DE5D820007C75E0 /* NKDPostgreSQLConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AB9E51B1DE5D820007C75E0 /* NKDPostgreSQLConnection.m */; };
-		4AB9E52B1DE5D820007C75E0 /* NKDPostgreSQLResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 4AB9E51C1DE5D820007C75E0 /* NKDPostgreSQLResult.h */; };
-		4AB9E52C1DE5D820007C75E0 /* NKDPostgreSQLResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AB9E51D1DE5D820007C75E0 /* NKDPostgreSQLResult.m */; };
-		4AB9E52D1DE5D820007C75E0 /* NKDPostgreSQLResultset.h in Headers */ = {isa = PBXBuildFile; fileRef = 4AB9E51E1DE5D820007C75E0 /* NKDPostgreSQLResultset.h */; };
-		4AB9E52E1DE5D820007C75E0 /* NKDPostgreSQLResultset.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AB9E51F1DE5D820007C75E0 /* NKDPostgreSQLResultset.m */; };
 		4AB9E52F1DE5D820007C75E0 /* ORPQController.h in Headers */ = {isa = PBXBuildFile; fileRef = 4AB9E5201DE5D820007C75E0 /* ORPQController.h */; };
 		4AB9E5301DE5D820007C75E0 /* ORPQController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AB9E5211DE5D820007C75E0 /* ORPQController.m */; };
 		4AB9E5311DE5D820007C75E0 /* ORPQModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 4AB9E5221DE5D820007C75E0 /* ORPQModel.h */; };
@@ -2290,6 +2284,8 @@
 		8499FFE40DC9102700E82DB4 /* ORXL2Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8499FFE10DC9102700E82DB4 /* ORXL2Model.h */; };
 		8499FFE50DC9102700E82DB4 /* ORXL2Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8499FFE20DC9102700E82DB4 /* ORXL2Model.m */; };
 		8499FFE60DC9102700E82DB4 /* XL2Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8499FFE30DC9102700E82DB4 /* XL2Card.gif */; };
+		849A471B1ECDE8DD00876389 /* offToggleSwitch.tif in Resources */ = {isa = PBXBuildFile; fileRef = 849A47171ECDE8DD00876389 /* offToggleSwitch.tif */; };
+		849A471C1ECDE8DD00876389 /* onToggleSwitch.tif in Resources */ = {isa = PBXBuildFile; fileRef = 849A47191ECDE8DD00876389 /* onToggleSwitch.tif */; };
 		849B25EC0B2F34F90007484F /* Prespectrometer.nib in Resources */ = {isa = PBXBuildFile; fileRef = 849B25E40B2F34F90007484F /* Prespectrometer.nib */; };
 		849B25ED0B2F34FA0007484F /* prespectrometer.tif in Resources */ = {isa = PBXBuildFile; fileRef = 849B25E50B2F34F90007484F /* prespectrometer.tif */; };
 		849B25EE0B2F34FA0007484F /* PrespectrometerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 849B25E60B2F34F90007484F /* PrespectrometerController.h */; };
@@ -3965,17 +3961,17 @@
 		2DC1EE7F0F33724E00E93C75 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		2DD0C4A0192E45EF009112B2 /* OpSequence.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = OpSequence.nib; sourceTree = "<group>"; };
 		2DD0C89E193FBAE3009112B2 /* goScript */ = {isa = PBXFileReference; explicitFileType = file; fileEncoding = 4; path = goScript; sourceTree = "<group>"; };
-		2DD0C89F193FBAE3009112B2 /* HW_Readout.cc */ = {isa = PBXFileReference; explicitFileType = file; fileEncoding = 4; path = HW_Readout.cc; sourceTree = "<group>"; };
-		2DD0C8A0193FBAE3009112B2 /* HW_Readout.h */ = {isa = PBXFileReference; explicitFileType = file; fileEncoding = 4; path = HW_Readout.h; sourceTree = "<group>"; };
-		2DD0C8A1193FBAE3009112B2 /* HW_Specific.icc */ = {isa = PBXFileReference; explicitFileType = file; fileEncoding = 4; path = HW_Specific.icc; sourceTree = "<group>"; };
-		2DD0C8A2193FBAE3009112B2 /* HWMakefile.mk */ = {isa = PBXFileReference; explicitFileType = file; fileEncoding = 4; path = HWMakefile.mk; sourceTree = "<group>"; };
-		2DD0C8A3193FBAE3009112B2 /* KatrinV4SLTScript */ = {isa = PBXFileReference; explicitFileType = file; fileEncoding = 4; path = KatrinV4SLTScript; sourceTree = "<group>"; };
-		2DD0C8A4193FBAE3009112B2 /* ORFLTv4Readout.cc */ = {isa = PBXFileReference; explicitFileType = file; fileEncoding = 4; path = ORFLTv4Readout.cc; sourceTree = "<group>"; };
-		2DD0C8A5193FBAE3009112B2 /* ORFLTv4Readout.hh */ = {isa = PBXFileReference; explicitFileType = file; fileEncoding = 4; path = ORFLTv4Readout.hh; sourceTree = "<group>"; };
-		2DD0C8A6193FBAE3009112B2 /* ORSLTv4Readout.cc */ = {isa = PBXFileReference; explicitFileType = file; fileEncoding = 4; path = ORSLTv4Readout.cc; sourceTree = "<group>"; };
-		2DD0C8A7193FBAE3009112B2 /* ORSLTv4Readout.hh */ = {isa = PBXFileReference; explicitFileType = file; fileEncoding = 4; path = ORSLTv4Readout.hh; sourceTree = "<group>"; };
-		2DD0C8A8193FBAE3009112B2 /* SLTv4_HW_Definitions.h */ = {isa = PBXFileReference; explicitFileType = file; fileEncoding = 4; path = SLTv4_HW_Definitions.h; sourceTree = "<group>"; };
-		2DD0C8A9193FBAE3009112B2 /* SLTv4GeneralOperations.h */ = {isa = PBXFileReference; explicitFileType = file; fileEncoding = 4; path = SLTv4GeneralOperations.h; sourceTree = "<group>"; };
+		2DD0C89F193FBAE3009112B2 /* HW_Readout.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; path = HW_Readout.cc; sourceTree = "<group>"; };
+		2DD0C8A0193FBAE3009112B2 /* HW_Readout.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = HW_Readout.h; sourceTree = "<group>"; };
+		2DD0C8A1193FBAE3009112B2 /* HW_Specific.icc */ = {isa = PBXFileReference; explicitFileType = sourcecode.c; fileEncoding = 4; path = HW_Specific.icc; sourceTree = "<group>"; };
+		2DD0C8A2193FBAE3009112B2 /* HWMakefile.mk */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 4; path = HWMakefile.mk; sourceTree = "<group>"; };
+		2DD0C8A3193FBAE3009112B2 /* KatrinV4SLTScript */ = {isa = PBXFileReference; explicitFileType = text.script.sh; fileEncoding = 4; path = KatrinV4SLTScript; sourceTree = "<group>"; };
+		2DD0C8A4193FBAE3009112B2 /* ORFLTv4Readout.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; path = ORFLTv4Readout.cc; sourceTree = "<group>"; };
+		2DD0C8A5193FBAE3009112B2 /* ORFLTv4Readout.hh */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = ORFLTv4Readout.hh; sourceTree = "<group>"; };
+		2DD0C8A6193FBAE3009112B2 /* ORSLTv4Readout.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; path = ORSLTv4Readout.cc; sourceTree = "<group>"; };
+		2DD0C8A7193FBAE3009112B2 /* ORSLTv4Readout.hh */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = ORSLTv4Readout.hh; sourceTree = "<group>"; };
+		2DD0C8A8193FBAE3009112B2 /* SLTv4_HW_Definitions.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; path = SLTv4_HW_Definitions.h; sourceTree = "<group>"; };
+		2DD0C8A9193FBAE3009112B2 /* SLTv4GeneralOperations.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; path = SLTv4GeneralOperations.h; sourceTree = "<group>"; };
 		2DD0C8AA193FBAE3009112B2 /* KatrinV4SLT.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = KatrinV4SLT.nib; sourceTree = "<group>"; };
 		2DD0C8AB193FBAE3009112B2 /* KatrinV4SLTCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = KatrinV4SLTCard.gif; sourceTree = "<group>"; };
 		2DD0C8AC193FBAE3009112B2 /* ORKatrinV4SLTController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORKatrinV4SLTController.h; sourceTree = "<group>"; };
@@ -4117,12 +4113,6 @@
 		4547F56B1CECB9B1006CA8E3 /* ORRunningAverageGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORRunningAverageGroup.m; sourceTree = "<group>"; };
 		4AB9E5181DE5D820007C75E0 /* libpq-fe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "libpq-fe.h"; sourceTree = "<group>"; };
 		4AB9E5191DE5D820007C75E0 /* libpq-fs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "libpq-fs.h"; sourceTree = "<group>"; };
-		4AB9E51A1DE5D820007C75E0 /* NKDPostgreSQLConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NKDPostgreSQLConnection.h; sourceTree = "<group>"; };
-		4AB9E51B1DE5D820007C75E0 /* NKDPostgreSQLConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NKDPostgreSQLConnection.m; sourceTree = "<group>"; };
-		4AB9E51C1DE5D820007C75E0 /* NKDPostgreSQLResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NKDPostgreSQLResult.h; sourceTree = "<group>"; };
-		4AB9E51D1DE5D820007C75E0 /* NKDPostgreSQLResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NKDPostgreSQLResult.m; sourceTree = "<group>"; };
-		4AB9E51E1DE5D820007C75E0 /* NKDPostgreSQLResultset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NKDPostgreSQLResultset.h; sourceTree = "<group>"; };
-		4AB9E51F1DE5D820007C75E0 /* NKDPostgreSQLResultset.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NKDPostgreSQLResultset.m; sourceTree = "<group>"; };
 		4AB9E5201DE5D820007C75E0 /* ORPQController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORPQController.h; sourceTree = "<group>"; };
 		4AB9E5211DE5D820007C75E0 /* ORPQController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORPQController.m; sourceTree = "<group>"; };
 		4AB9E5221DE5D820007C75E0 /* ORPQModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORPQModel.h; sourceTree = "<group>"; };
@@ -5823,6 +5813,8 @@
 		8499FFE10DC9102700E82DB4 /* ORXL2Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORXL2Model.h; path = "Source/Objects/Custom Hardware/SNO+/XL2/ORXL2Model.h"; sourceTree = SOURCE_ROOT; };
 		8499FFE20DC9102700E82DB4 /* ORXL2Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORXL2Model.m; path = "Source/Objects/Custom Hardware/SNO+/XL2/ORXL2Model.m"; sourceTree = SOURCE_ROOT; };
 		8499FFE30DC9102700E82DB4 /* XL2Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = XL2Card.gif; path = "Source/Objects/Custom Hardware/SNO+/XL2/XL2Card.gif"; sourceTree = SOURCE_ROOT; };
+		849A47181ECDE8DD00876389 /* English */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = English; path = English.lproj/offToggleSwitch.tif; sourceTree = "<group>"; };
+		849A471A1ECDE8DD00876389 /* English */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = English; path = English.lproj/onToggleSwitch.tif; sourceTree = "<group>"; };
 		849B25E40B2F34F90007484F /* Prespectrometer.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Prespectrometer.nib; path = Source/Experiments/Prespectrometer/Prespectrometer.nib; sourceTree = SOURCE_ROOT; };
 		849B25E50B2F34F90007484F /* prespectrometer.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = prespectrometer.tif; path = Source/Experiments/Prespectrometer/prespectrometer.tif; sourceTree = SOURCE_ROOT; };
 		849B25E60B2F34F90007484F /* PrespectrometerController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrespectrometerController.h; path = Source/Experiments/Prespectrometer/PrespectrometerController.h; sourceTree = SOURCE_ROOT; };
@@ -7429,6 +7421,8 @@
 				843CA9BD053E011B005F64B1 /* notice.gif */,
 				84D0592C08FF367A00A99A83 /* goBack.tif */,
 				84D0593D08FF39EA00A99A83 /* goBackPressed.tif */,
+				849A47171ECDE8DD00876389 /* offToggleSwitch.tif */,
+				849A47191ECDE8DD00876389 /* onToggleSwitch.tif */,
 				84764CC005055A32005F64B1 /* UnderConstruction.gif */,
 				2A37F4B9FDCFA73011CA2CEA /* Credits.rtf */,
 				089C165FFE840EACC02AAC07 /* InfoPlist.strings */,
@@ -7814,12 +7808,6 @@
 			children = (
 				4AB9E5181DE5D820007C75E0 /* libpq-fe.h */,
 				4AB9E5191DE5D820007C75E0 /* libpq-fs.h */,
-				4AB9E51A1DE5D820007C75E0 /* NKDPostgreSQLConnection.h */,
-				4AB9E51B1DE5D820007C75E0 /* NKDPostgreSQLConnection.m */,
-				4AB9E51C1DE5D820007C75E0 /* NKDPostgreSQLResult.h */,
-				4AB9E51D1DE5D820007C75E0 /* NKDPostgreSQLResult.m */,
-				4AB9E51E1DE5D820007C75E0 /* NKDPostgreSQLResultset.h */,
-				4AB9E51F1DE5D820007C75E0 /* NKDPostgreSQLResultset.m */,
 				4AB9E5201DE5D820007C75E0 /* ORPQController.h */,
 				4AB9E5211DE5D820007C75E0 /* ORPQController.m */,
 				4AB9E5221DE5D820007C75E0 /* ORPQModel.h */,
@@ -15265,7 +15253,6 @@
 				2A943A6808A8194B00D04541 /* ORSerialPortList.h in Headers */,
 				4AB9E5281DE5D820007C75E0 /* libpq-fs.h in Headers */,
 				84EB2DE31E32990D00C273AA /* ORLabJackU6Decoders.h in Headers */,
-				4AB9E5291DE5D820007C75E0 /* NKDPostgreSQLConnection.h in Headers */,
 				2A4553E308BCE9A3004BB15E /* ORTDC3377Controller.h in Headers */,
 				2A4553E508BCE9A3004BB15E /* ORTDC3377Decoders.h in Headers */,
 				2A4553E708BCE9A3004BB15E /* ORTDC3377Model.h in Headers */,
@@ -15720,7 +15707,6 @@
 				84EBC2140F530E4A00F57BDD /* ORCaen419Decoders.h in Headers */,
 				84BA5DE50F6E8C8900CF92D6 /* ORHVRampItem.h in Headers */,
 				84BA5DE80F6E8C8900CF92D6 /* ORHVRampItemController.h in Headers */,
-				4AB9E52D1DE5D820007C75E0 /* NKDPostgreSQLResultset.h in Headers */,
 				84BA5F2B0F70388D00CF92D6 /* ORZupController.h in Headers */,
 				84BA5F2D0F70388D00CF92D6 /* ORZupModel.h in Headers */,
 				840973600F81136F00036BE8 /* ORManualPlotController.h in Headers */,
@@ -15736,7 +15722,6 @@
 				84BC88E00F9CDB5600336DF1 /* ORSerialPortController.h in Headers */,
 				84BC88EE0F9CDD5B00336DF1 /* ORSerialPortModel.h in Headers */,
 				840823CC0F9F83DC007E6061 /* ORFlippedView.h in Headers */,
-				4AB9E52B1DE5D820007C75E0 /* NKDPostgreSQLResult.h in Headers */,
 				84D2586C0FA7340B00626276 /* ORMotionNodeController.h in Headers */,
 				84D2586E0FA7340B00626276 /* ORMotionNodeModel.h in Headers */,
 				84CC16D00FAF157000CEE642 /* ORMCA927Controller.h in Headers */,
@@ -16670,6 +16655,7 @@
 				844BF9E90B1E2FC20047C9BF /* smalldottopmask.tif in Resources */,
 				844BF9EA0B1E2FC20047C9BF /* smalldotcolormask.tif in Resources */,
 				844BF9EB0B1E2FC20047C9BF /* smalldotshadow.tif in Resources */,
+				849A471B1ECDE8DD00876389 /* offToggleSwitch.tif in Resources */,
 				849B25EC0B2F34F90007484F /* Prespectrometer.nib in Resources */,
 				849B25ED0B2F34FA0007484F /* prespectrometer.tif in Resources */,
 				84760D350B3728DF00512F67 /* KatrinConstants.h in Resources */,
@@ -17245,6 +17231,7 @@
 				846F313C17E8819000A5F1DA /* ApcUps.nib in Resources */,
 				846F313D17E8819000A5F1DA /* ApcUpsIcon.tif in Resources */,
 				84BAC04617F4A72100695DA8 /* C977.gif in Resources */,
+				849A471C1ECDE8DD00876389 /* onToggleSwitch.tif in Resources */,
 				84BAC04717F4A72100695DA8 /* CV977.nib in Resources */,
 				847D308B17FF0B3000D2D8BC /* NMon5085.nib in Resources */,
 				847D308C17FF0B3000D2D8BC /* NMon5085.tif in Resources */,
@@ -17573,7 +17560,6 @@
 				8446CE2507B847B8006CD9C4 /* ORAD413AModel.m in Sources */,
 				843A54DB07BBE7A500534C27 /* OR4ChanTriggerController.m in Sources */,
 				843A54DD07BBE7A500534C27 /* OR4ChanTriggerDecoders.m in Sources */,
-				4AB9E52E1DE5D820007C75E0 /* NKDPostgreSQLResultset.m in Sources */,
 				843A54DF07BBE7A500534C27 /* OR4ChanTriggerModel.m in Sources */,
 				84DDEBA607BD3E080060D0B4 /* ORMultiPlot.m in Sources */,
 				84DDEBA807BD3E080060D0B4 /* ORMultiPlotController.m in Sources */,
@@ -17762,7 +17748,6 @@
 				84E6FB220B2DDC6000CAA7C5 /* ObjectFactory.m in Sources */,
 				845313D81B98A45200FCEEE5 /* ORMJDSource.m in Sources */,
 				849B25EF0B2F34FA0007484F /* PrespectrometerController.m in Sources */,
-				4AB9E52A1DE5D820007C75E0 /* NKDPostgreSQLConnection.m in Sources */,
 				849B25F10B2F34FA0007484F /* PrespectrometerView.m in Sources */,
 				849B25F30B2F34FA0007484F /* PrespectrometerModel.m in Sources */,
 				84F69CF80B331BBA000BE0CA /* ORSegmentGroup.m in Sources */,
@@ -18407,7 +18392,6 @@
 				B3808A8F1700F84B0019C27D /* ORCouchDBListenerController.m in Sources */,
 				B3808A911700F84B0019C27D /* ORCouchDBListenerModel.m in Sources */,
 				841DACF2175E2CB5002542BD /* OR3DScanPlatformView.m in Sources */,
-				4AB9E52C1DE5D820007C75E0 /* NKDPostgreSQLResult.m in Sources */,
 				43D7CB8A177C84AC00ED4736 /* OROpenGLObject.m in Sources */,
 				43D7CB8E177CBDF600ED4736 /* ORVertex.m in Sources */,
 				846F313F17E8819000A5F1DA /* ORApcUpsController.m in Sources */,
@@ -18536,6 +18520,22 @@
 			);
 			name = OrcaFilterScript.icns;
 			sourceTree = SOURCE_ROOT;
+		};
+		849A47171ECDE8DD00876389 /* offToggleSwitch.tif */ = {
+			isa = PBXVariantGroup;
+			children = (
+				849A47181ECDE8DD00876389 /* English */,
+			);
+			name = offToggleSwitch.tif;
+			sourceTree = "<group>";
+		};
+		849A47191ECDE8DD00876389 /* onToggleSwitch.tif */ = {
+			isa = PBXVariantGroup;
+			children = (
+				849A471A1ECDE8DD00876389 /* English */,
+			);
+			name = onToggleSwitch.tif;
+			sourceTree = "<group>";
 		};
 		84C533280652BA6B00E4731F /* MainMenu.nib */ = {
 			isa = PBXVariantGroup;
