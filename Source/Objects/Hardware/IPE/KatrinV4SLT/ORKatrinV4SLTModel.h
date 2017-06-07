@@ -24,7 +24,7 @@
 #import "ORIpeCard.h"
 #import "SBC_Linking.h"
 #import "SBC_Config.h"
-
+#import "ORKatrinV4SLTRegisters.h"
 
 
 #import "ORIpeV4SLTModel.h"   //for kKatrinV4SLTNumRegs declaration - maybe not necessary in the future any more -tb- 2014
@@ -139,59 +139,6 @@
 #define kTrgTimingTrgWindow		(0x00000007 <<  16) //R/W
 #define kTrgEndPageDelay		(0x000007FF <<   0) //R/W
 
-//IPE V4 register definitions
-typedef enum KatrinSLTV4Enum {
-	kKatrinV4SLTControlReg,
-	kKatrinV4SLTStatusReg,
-	kKatrinV4SLTCommandReg,
-	kKatrinV4SLTInterruptReguestReg,
-	kKatrinV4SLTInterruptMaskReg,
-	kKatrinV4SLTRequestSemaphoreReg,
-	kKatrinV4SLTHWRevisionReg,
-	kKatrinV4SLTPixelBusErrorReg,
-	kKatrinV4SLTPixelBusEnableReg,
- 	kKatrinV4SLTVetoCounterHiReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-	kKatrinV4SLTVetoCounterLoReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-	kKatrinV4SLTDeadTimeCounterHiReg,	//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-	kKatrinV4SLTDeadTimeCounterLoReg,	//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-								//TODO: and dead time and veto time counter are confused, too -tb-
-	kKatrinV4SLTRunCounterHiReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-	kKatrinV4SLTRunCounterLoReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-    kKatrinV4SLTLostEventsCountReg, //new v10
-	kKatrinV4SLTSecondSetReg,
-	kKatrinV4SLTSecondCounterReg,
-	kKatrinV4SLTSubSecondCounterReg,
- 	kKatrinV4SLTPageSelectReg,
-	kKatrinV4SLTTPTimingReg,
-	kKatrinV4SLTTPShapeReg,
-	kKatrinV4SLTi2cCommandReg,
-	kKatrinV4SLTepcsCommandReg,
-	kKatrinV4SLTBoardIDLoReg,
-	kKatrinV4SLTBoardIDHiReg,
-	kKatrinV4SLTPROMsControlReg,
-	kKatrinV4SLTPROMsBufferReg,
-	kKatrinV4SLTDataFIFOReg,
-	kKatrinV4SLTFIFOModeReg,
-	kKatrinV4SLTFIFOStatusReg,
-	kKatrinV4SLTPAEOffsetReg,
-	kKatrinV4SLTPAFOffsetReg,
-	kKatrinV4SLTFIFOCsrReg,
-	kKatrinV4SLTFIFOxRequestReg,
-	kKatrinV4SLTFIFOMaskReg,
-	kKatrinV4SLTNumRegs //must be last
-} KatrinSLTV4Enum;
-
-typedef struct KatrinV4SLTRegisterNamesStruct {
-    NSString*       regName;
-    unsigned long 	addressOffset;
-    int				length;
-    short			accessType;
-    KatrinSLTV4Enum enumCheckValue;
-} KatrinV4SLTRegisterNamesStruct;
-
-
-extern KatrinV4SLTRegisterNamesStruct regKatrinSLTV4[kKatrinV4SLTNumRegs];
-
 
 @interface ORKatrinV4SLTModel : ORIpeCard <ORDataTaker,SBC_Linking>
 {
@@ -246,7 +193,6 @@ extern KatrinV4SLTRegisterNamesStruct regKatrinSLTV4[kKatrinV4SLTNumRegs];
 - (void) setUpImage;
 - (void) makeMainController;
 - (void) setGuardian:(id)aGuardian;
-- (BOOL) checkRegisterStruct;
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;

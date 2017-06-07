@@ -36,44 +36,6 @@
 #import "ORTaskSequence.h"
 #import "ORFileMover.h"
 
-KatrinV4SLTRegisterNamesStruct regKatrinSLTV4[kKatrinV4SLTNumRegs] = {
-{@"Control",			0xa80000,	1,		kIpeRegReadable | kIpeRegWriteable, kKatrinV4SLTControlReg          },
-{@"Status",				0xa80004,	1,		kIpeRegReadable | kIpeRegWriteable, kKatrinV4SLTStatusReg           },
-{@"Command",			0xa80008,	1,		kIpeRegWriteable,                   kKatrinV4SLTCommandReg          },
-{@"Interrupt Reguest",	0xA8000C,	1,		kIpeRegReadable,                    kKatrinV4SLTInterruptReguestReg },
-{@"Interrupt Mask",		0xA80010,	1,		kIpeRegReadable | kIpeRegWriteable, kKatrinV4SLTInterruptMaskReg    },
-{@"Request Semaphore",	0xA80014,	3,		kIpeRegReadable,                    kKatrinV4SLTRequestSemaphoreReg },
-{@"HWRevision",			0xa80020,	1,		kIpeRegReadable,                    kKatrinV4SLTHWRevisionReg       },
-{@"Pixel Bus Error",	0xA80024,	1,		kIpeRegReadable,                    kKatrinV4SLTPixelBusErrorReg    },
-{@"Pixel Bus Enable",	0xA80028,	1, 		kIpeRegReadable | kIpeRegWriteable, kKatrinV4SLTPixelBusEnableReg   },
-{@"Veto Counter (MSB)",	0xA80080, 	1,		kIpeRegReadable,                    kKatrinV4SLTVetoCounterHiReg    },
-{@"Veto Counter (LSB)",	0xA80084,	1,		kIpeRegReadable,                    kKatrinV4SLTVetoCounterLoReg    },
-{@"Dead Counter (MSB)",	0xA80088, 	1,		kIpeRegReadable,                    kKatrinV4SLTDeadTimeCounterHiReg},
-{@"Dead Counter (LSB)",	0xA8008C, 	1,		kIpeRegReadable,                    kKatrinV4SLTDeadTimeCounterLoReg},
-{@"Run Counter  (MSB)",	0xA80090,	1,		kIpeRegReadable,                    kKatrinV4SLTRunCounterHiReg     },
-{@"Run Counter  (LSB)",	0xA80094, 	1,		kIpeRegReadable,                    kKatrinV4SLTRunCounterLoReg     },
-{@"Lost Events",        0xa80098,   1,      kIpeRegReadable,                    kKatrinV4SLTLostEventsCountReg  },
-{@"Second Set",			0xB00000,  	1, 		kIpeRegReadable | kIpeRegWriteable, kKatrinV4SLTSecondSetReg        },
-{@"Second Counter",		0xB00004, 	1,		kIpeRegReadable,                    kKatrinV4SLTSecondCounterReg    },
-{@"Sub-second Counter",	0xB00008, 	1,		kIpeRegReadable,                    kKatrinV4SLTSubSecondCounterReg },
-{@"Page Select",		0xB80008, 	1,		kIpeRegReadable,                    kKatrinV4SLTPageSelectReg       },
-{@"TP Timing",			0xC80000,   128,	kIpeRegReadable | kIpeRegWriteable, kKatrinV4SLTTPTimingReg         },
-{@"TP Shape",			0xC81000,   512,	kIpeRegReadable | kIpeRegWriteable, kKatrinV4SLTTPShapeReg          },
-{@"I2C Command",		0xC00000,	1,		kIpeRegReadable,                    kKatrinV4SLTi2cCommandReg       },
-{@"EPC Command",		0xC00004,	1,		kIpeRegReadable | kIpeRegWriteable, kKatrinV4SLTepcsCommandReg      },
-{@"Board ID (LSB)",		0xC00008,	1,		kIpeRegReadable,                    kKatrinV4SLTBoardIDLoReg        },
-{@"Board ID (MSB)",		0xC0000C,	1,		kIpeRegReadable,                    kKatrinV4SLTBoardIDHiReg        },
-{@"PROMs Control",		0xC00010,	1,		kIpeRegReadable | kIpeRegWriteable, kKatrinV4SLTPROMsControlReg     },
-{@"PROMs Buffer",		0xC00100,	256,	kIpeRegReadable | kIpeRegWriteable, kKatrinV4SLTPROMsBufferReg      },
-{@"DataFIFO",		    0xD00000,   0x10000,kIpeRegReadable | kIpeRegWriteable, kKatrinV4SLTDataFIFOReg         },
-{@"FIFO Mode",			0xE00000,   1,	    kIpeRegReadable | kIpeRegWriteable, kKatrinV4SLTFIFOModeReg         },
-{@"FIFO Status",		0xE00004,   1,	    kIpeRegReadable | kIpeRegWriteable, kKatrinV4SLTFIFOStatusReg       },
-{@"PAE Offset",		    0xE00008,   1,	    kIpeRegReadable | kIpeRegWriteable, kKatrinV4SLTPAEOffsetReg        },
-{@"PAF Offset",		    0xE0000C,   1,	    kIpeRegReadable | kIpeRegWriteable, kKatrinV4SLTPAFOffsetReg        },
-{@"FIFO Csr",		    0xE00010,   1,	    kIpeRegReadable | kIpeRegWriteable, kKatrinV4SLTFIFOCsrReg          },
-{@"FIFOx Request",		0xE00014,   1,	    kIpeRegReadable | kIpeRegWriteable, kKatrinV4SLTFIFOxRequestReg     },
-{@"FIFO Mask",		    0xE00018,   1,	    kIpeRegReadable | kIpeRegWriteable, kKatrinV4SLTFIFOMaskReg         },
-};
 
 #pragma mark ***Notification Strings
 NSString* ORKatrinV4SLTModelPixelBusEnableRegChanged        = @"ORKatrinV4SLTModelPixelBusEnableRegChanged";
@@ -175,19 +137,6 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 	}
 	@catch(NSException* localException) {
 	}
-}
-
-- (BOOL) checkRegisterStruct
-{
-    //used to double-check the register structure against the enum list
-    int i;
-    BOOL structOK = YES;
-    for(i=0;i<kKatrinV4SLTNumRegs;i++){
-        if(regKatrinSLTV4[i].enumCheckValue != i){
-            structOK = NO;
-        }
-    }
-    return structOK;
 }
 
 - (void) setUpImage			{ [self setImage:[NSImage imageNamed:@"KatrinV4SLTCard"]];  }
@@ -578,17 +527,17 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 
 - (NSString*) getRegisterName: (short) anIndex
 {
-    return regKatrinSLTV4[anIndex].regName;
+    return [katrinV4SLTRegisters registerName:anIndex];
 }
 
 - (unsigned long) getAddress: (short) anIndex
 {
-    return( regKatrinSLTV4[anIndex].addressOffset>>2);
+    return [katrinV4SLTRegisters address:anIndex];
 }
 
 - (short) getAccessType: (short) anIndex
 {
-	return regKatrinSLTV4[anIndex].accessType;
+	return [katrinV4SLTRegisters accessType:anIndex];
 }
 
 - (unsigned short) selectedRegIndex
@@ -727,6 +676,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     [driverScriptFileMover doNotMoveFilesToSentFolder];
     [driverScriptFileMover setTransferType:eUseSCP];
     [aSequence addTaskObj:driverScriptFileMover];
+    [driverScriptFileMover release];
     
     //NSString* scriptRunPath = [NSString stringWithFormat:@"/home/%@/%@",[pmcLink userName],scriptName];
     NSString* scriptRunPath = [NSString stringWithFormat:@"~/%@",scriptName];
