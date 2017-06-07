@@ -16,21 +16,20 @@
 //express or implied, or assume any liability or responsibility
 //for the use of this software.
 //-------------------------------------------------------------
-#define kFLTRead    0x1
-#define kFLTWrite   0x2
-#define kFLTChanReg 0x4
-#define kFLTReadOnly  kFLTRead
-#define kFLTWriteOnly kFLTWrite
-#define kFLTReadWrite kFLTRead|kFLTWrite
+#define kRead    0x1
+#define kWrite   0x2
+#define kChanReg 0x4
+#define kReadOnly  kRead
+#define kWriteOnly kWrite
+#define kReadWrite kRead|kWrite
 
-@class ORKatrinV4Registers;
+@class ORKatrinV4FLTRegisters;
 
-#define katrinV4Registers [ORKatrinV4Registers sharedRegSet]
+#define katrinV4FLTRegisters [ORKatrinV4FLTRegisters sharedRegSet]
 
+static ORKatrinV4FLTRegisters* sharedKatrinV4FLTRegisters;
 
-static ORKatrinV4Registers* sharedKatrinV4Registers;
-
-typedef enum eKatrinFLTV4RegEnum {
+typedef enum eKatrinV4FLTRegEnum {
     kFLTV4StatusReg,
     kFLTV4ControlReg,
     kFLTV4CommandReg,
@@ -68,14 +67,14 @@ typedef enum eKatrinFLTV4RegEnum {
     kFLTV4TestPatternReg,
     kFLTV4EnergyOffsetReg,
     kFLTV4NumRegs //must be last
-} eKatrinFLTV4RegEnum;
+} eKatrinV4FLTRegEnum;
 
-@interface ORKatrinV4Registers : NSObject
+@interface ORKatrinV4FLTRegisters : NSObject
 {
     BOOL printedOnce;
 }
 
-+ (ORKatrinV4Registers*) sharedRegSet;
++ (ORKatrinV4FLTRegisters*) sharedRegSet;
 - (id) init;
 - (void) dealloc;
 - (BOOL) checkRegisterTable;

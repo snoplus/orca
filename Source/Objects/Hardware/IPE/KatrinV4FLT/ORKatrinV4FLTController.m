@@ -30,7 +30,7 @@
 #import "ORTimeAxis.h"
 #import "ORTimeRate.h"
 #import "ORTimeLinePlot.h"
-#import "ORKatrinV4Registers.h"
+#import "ORKatrinV4FLTRegisters.h"
 
 @implementation ORKatrinV4FLTController
 
@@ -644,8 +644,8 @@
     [registerPopUp removeAllItems];
     
 	// Populate the register popup
-    for (i = 0; i < [katrinV4Registers numRegisters]; i++) {
-        [registerPopUp insertItemWithTitle:[katrinV4Registers registerName:i] atIndex:i];
+    for (i = 0; i < [katrinV4FLTRegisters numRegisters]; i++) {
+        [registerPopUp insertItemWithTitle:[katrinV4FLTRegisters registerName:i] atIndex:i];
     }
     
     
@@ -816,9 +816,9 @@
 {
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORKatrinV4FLTSettingsLock];
 	short index = [model selectedRegIndex];
-	BOOL readAllowed = !lockedOrRunningMaintenance  && ([model accessTypeOfReg:index] & kFLTRead);
-	BOOL writeAllowed = !lockedOrRunningMaintenance && ([model accessTypeOfReg:index] & kFLTWrite);
-	BOOL needsChannel = !lockedOrRunningMaintenance && ([model accessTypeOfReg:index] & kFLTChanReg);
+	BOOL readAllowed = !lockedOrRunningMaintenance  && ([model accessTypeOfReg:index] & kRead);
+	BOOL writeAllowed = !lockedOrRunningMaintenance && ([model accessTypeOfReg:index] & kWrite);
+	BOOL needsChannel = !lockedOrRunningMaintenance && ([model accessTypeOfReg:index] & kChanReg);
 	
 	[regWriteButton setEnabled:writeAllowed];
 	[regReadButton setEnabled:readAllowed];
@@ -1623,7 +1623,7 @@
 	int index = [model selectedRegIndex]; 
 	@try {
 		unsigned long value;
-        if(([model accessTypeOfReg:index] & kFLTChanReg)){
+        if(([model accessTypeOfReg:index] & kChanReg)){
             int chan = [model selectedChannelValue];
 		    value = [model readReg:index channel: chan ];
 		    NSLog(@"FLTv4 reg: %@ for channel %i has value: 0x%x (%i)\n",[model getRegisterName:index], chan, value, value);
@@ -1646,7 +1646,7 @@
 	int index = [registerPopUp indexOfSelectedItem];
 	@try {
 		unsigned long val = [model writeValue];
-        if(([model accessTypeOfReg:index] & kFLTChanReg)){
+        if(([model accessTypeOfReg:index] & kChanReg)){
             int chan = [model selectedChannelValue];
      		[model writeReg:index  channel: chan value: val];//TODO: allow hex values, e.g. 0x23 -tb-
     		NSLog(@"wrote 0x%x (%i) to FLTv4 reg: %@ channel %i\n", val, val, [model getRegisterName:index], chan);

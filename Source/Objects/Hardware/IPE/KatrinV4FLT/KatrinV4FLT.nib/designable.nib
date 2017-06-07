@@ -172,11 +172,11 @@
                         <tabViewItems>
                             <tabViewItem label="Settings" identifier="" id="1185">
                                 <view key="view" id="1187">
-                                    <rect key="frame" x="10" y="25" width="613" height="665"/>
+                                    <rect key="frame" x="10" y="29" width="613" height="661"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box misplaced="YES" title="Control Register" id="595">
-                                            <rect key="frame" x="-1" y="549" width="280" height="112"/>
+                                            <rect key="frame" x="-1" y="545" width="280" height="112"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="iWR-qe-1Lq">
                                                 <rect key="frame" x="2" y="2" width="276" height="95"/>
@@ -285,7 +285,7 @@
                                             </view>
                                         </box>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Misc HW Settings" id="2907">
-                                            <rect key="frame" x="452" y="80" width="147" height="157"/>
+                                            <rect key="frame" x="452" y="76" width="147" height="157"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="KKy-KN-lvH">
                                                 <rect key="frame" x="1" y="1" width="145" height="141"/>
@@ -389,7 +389,7 @@
                                             </view>
                                         </box>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Misc Requests" id="2988">
-                                            <rect key="frame" x="452" y="502" width="147" height="159"/>
+                                            <rect key="frame" x="452" y="498" width="147" height="159"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="FPb-hv-qb4">
                                                 <rect key="frame" x="1" y="1" width="145" height="143"/>
@@ -454,7 +454,7 @@
                                             </view>
                                         </box>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Thresold Finder" id="3255">
-                                            <rect key="frame" x="452" y="298" width="147" height="82"/>
+                                            <rect key="frame" x="452" y="294" width="147" height="82"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="Ykk-NE-LQe">
                                                 <rect key="frame" x="1" y="1" width="145" height="66"/>
@@ -484,7 +484,7 @@
                                             </view>
                                         </box>
                                         <tabView drawsBackground="NO" controlSize="small" type="noTabsNoBorder" id="3343">
-                                            <rect key="frame" x="-4" y="-3" width="458" height="553"/>
+                                            <rect key="frame" x="-4" y="-7" width="458" height="553"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <tabViewItems>
                                                 <tabViewItem label="Tab" identifier="1" id="3344">
@@ -2912,7 +2912,7 @@ Enable</string>
                                             </view>
                                         </box>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Filter Parameters" id="3006">
-                                            <rect key="frame" x="279" y="549" width="164" height="112"/>
+                                            <rect key="frame" x="279" y="545" width="164" height="112"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="enX-Fg-qYe">
                                                 <rect key="frame" x="1" y="1" width="162" height="96"/>
@@ -3019,7 +3019,7 @@ Enable</string>
                                             </view>
                                         </box>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Hit Rate" id="3035">
-                                            <rect key="frame" x="449" y="241" width="150" height="53"/>
+                                            <rect key="frame" x="449" y="237" width="150" height="53"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="XBP-b6-1Ty">
                                                 <rect key="frame" x="1" y="1" width="148" height="37"/>
@@ -3913,8 +3913,8 @@ Enable</string>
                             </tabViewItem>
                             <tabViewItem label="Low-Level" identifier="Item 3" id="2328">
                                 <view key="view" id="2329">
-                                    <rect key="frame" x="10" y="25" width="588" height="665"/>
-                                    <autoresizingMask key="autoresizingMask"/>
+                                    <rect key="frame" x="10" y="25" width="613" height="665"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box title="Register Access" id="2330">
                                             <rect key="frame" x="14" y="550" width="212" height="109"/>
@@ -3924,11 +3924,11 @@ Enable</string>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <popUpButton verticalHuggingPriority="750" imageHugsTitle="YES" id="2335">
-                                                        <rect key="frame" x="15" y="67" width="178" height="15"/>
+                                                        <rect key="frame" x="13" y="64" width="181" height="22"/>
                                                         <autoresizingMask key="autoresizingMask"/>
-                                                        <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" alignment="left" controlSize="mini" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2338" id="2891">
+                                                        <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2338" id="2891">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="miniSystem"/>
+                                                            <font key="font" metaFont="smallSystem"/>
                                                             <menu key="menu" title="OtherViews" id="2337">
                                                                 <items>
                                                                     <menuItem title="Item1" state="on" id="2338"/>
@@ -3983,14 +3983,14 @@ Enable</string>
                                                         </connections>
                                                     </stepper>
                                                     <popUpButton verticalHuggingPriority="750" imageHugsTitle="YES" id="2499">
-                                                        <rect key="frame" x="14" y="46" width="48" height="15"/>
+                                                        <rect key="frame" x="12" y="43" width="51" height="22"/>
                                                         <autoresizingMask key="autoresizingMask"/>
-                                                        <popUpButtonCell key="cell" type="push" title="Chan" bezelStyle="rounded" alignment="left" controlSize="mini" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2502" id="2892">
+                                                        <popUpButtonCell key="cell" type="push" title="0" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2502" id="2892">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="miniSystem"/>
+                                                            <font key="font" metaFont="smallSystem"/>
                                                             <menu key="menu" title="OtherViews" id="2501">
                                                                 <items>
-                                                                    <menuItem title="Chan" state="on" id="2502"/>
+                                                                    <menuItem title="0" id="2502"/>
                                                                 </items>
                                                             </menu>
                                                         </popUpButtonCell>

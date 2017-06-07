@@ -30,7 +30,8 @@
 #import "SBC_Config.h"
 #import "SLTv4_HW_Definitions.h"
 #import "ORCommandList.h"
-#import "ORKatrinV4Registers.h"
+#import "ORKatrinV4FLTRegisters.h"
+#import "ORKatrinV4SLTRegisters.h"
 
 NSString* ORKatrinV4FLTModelEnergyOffsetChanged             = @"ORKatrinV4FLTModelEnergyOffsetChanged";
 NSString* ORKatrinV4FLTModelForceFLTReadoutChanged          = @"ORKatrinV4FLTModelForceFLTReadoutChanged";
@@ -174,7 +175,7 @@ static NSString* fltTestName[kNumKatrinV4FLTTests]= {
 }
 
 - (ORTimeRate*) totalRate   { return totalRate; }
-- (short) getNumberRegisters{ return [katrinV4Registers numRegisters]; }
+- (short) getNumberRegisters{ return [katrinV4FLTRegisters numRegisters]; }
 
 
 #pragma mark •••Notifications
@@ -1468,12 +1469,12 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 - (unsigned long) regAddress:(int)aReg channel:(int)aChannel
 {
-    return [katrinV4Registers addressForStation:[self stationNumber] registerIndex:aReg chan:aChannel];
+    return [katrinV4FLTRegisters addressForStation:[self stationNumber] registerIndex:aReg chan:aChannel];
 }
 
 - (unsigned long) regAddress:(int)aReg
 {
-    return [katrinV4Registers addressForStation:[self stationNumber] registerIndex:aReg ];
+    return [katrinV4FLTRegisters addressForStation:[self stationNumber] registerIndex:aReg ];
 }
 
 - (unsigned long) adcMemoryChannel:(int)aChannel page:(int)aPage
@@ -1486,7 +1487,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 }
 - (int) accessTypeOfReg:(int)aReg
 {
-    return [katrinV4Registers accessType:aReg];
+    return [katrinV4FLTRegisters accessType:aReg];
 }
 
 - (unsigned long) readReg:(int)aReg
