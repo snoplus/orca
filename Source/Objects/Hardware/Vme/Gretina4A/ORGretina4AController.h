@@ -70,13 +70,6 @@
     IBOutlet ORValueBarGroupView*       rate0;
     IBOutlet ORValueBarGroupView*       totalRate;
 
-    //noise floor
-    IBOutlet NSButton*              noiseFloorButton;
-    IBOutlet NSPanel*				noiseFloorPanel;
-    IBOutlet NSTextField*			noiseFloorOffsetField;
-    IBOutlet NSTextField*			noiseFloorIntegrationField;
-    IBOutlet NSButton*				startNoiseFloorButton;
-    IBOutlet NSProgressIndicator*	noiseFloorProgress;
     
     //SerDes and Clock Distribution
     IBOutlet NSTextField*	initSerDesStateField;
@@ -93,25 +86,37 @@
     //hardware setup
     IBOutlet NSButton*		forceFullCardInitCB;
     IBOutlet NSMatrix*		forceFullInitMatrix;
-    IBOutlet NSMatrix*		enabledMatrix;
-    IBOutlet NSMatrix*      ledThresholdMatrix;
-    IBOutlet NSMatrix*      cFDFractionMatrix;
-    IBOutlet NSPopUpButton* decimationFactorPU;
     
-    IBOutlet NSMatrix*      pileupModeMatrix;
-    IBOutlet NSMatrix*      premapResetDelayEnMatrix;
-    IBOutlet NSMatrix*      premapResetDelayMatrix;
-    IBOutlet NSMatrix*      droppedEventCountModeMatrix;
-    IBOutlet NSMatrix*      eventCountModeMatrix;
-    IBOutlet NSMatrix*      triggerPolarityMatrix;
-    IBOutlet NSMatrix*      aHitCountModeMatrix;
-    IBOutlet NSMatrix*      discCountModeMatrix;
-    IBOutlet NSMatrix*      eventExtensionModeMatrix;
-    IBOutlet NSMatrix*      pileupExtensionModeMatrix;
-    IBOutlet NSMatrix*      counterResetMatrix;
-    IBOutlet NSMatrix*      pileupWaveformOnlyModeMatrix;
+    IBOutlet NSMatrix*      extDiscrSrcMatrix;
+    IBOutlet NSTextField*   userPackageDataField;
     IBOutlet NSTextField*   windowCompMinField;
     IBOutlet NSTextField*   windowCompMaxField;
+   
+    IBOutlet NSMatrix*      pileupWaveformOnlyModeMatrix;
+    IBOutlet NSMatrix*      pileupExtensionModeMatrix;
+    IBOutlet NSMatrix*      eventExtensionModeMatrix;
+    IBOutlet NSMatrix*      discCountModeMatrix;
+    IBOutlet NSMatrix*      aHitCountModeMatrix;
+    IBOutlet NSMatrix*      eventCountModeMatrix;
+    IBOutlet NSMatrix*      droppedEventCountModeMatrix;
+//    IBOutlet NSButton*      writeFlagCB;
+    IBOutlet NSMatrix*      decimationFactorMatrix;
+    IBOutlet NSMatrix*      triggerPolarityMatrix;
+    IBOutlet NSMatrix*      premapResetDelayEnMatrix;
+    IBOutlet NSMatrix*      pileupModeMatrix;
+    IBOutlet NSMatrix*		enabledMatrix;
+
+    
+    
+    IBOutlet NSMatrix*      ledThresholdMatrix;
+    
+    IBOutlet NSTextField*   holdoffTimeField;
+    IBOutlet NSButton*		autoModeCB;
+    IBOutlet NSTextField*   vetoGateWidthField;
+
+    
+    
+    IBOutlet NSMatrix*      premapResetDelayMatrix;
     IBOutlet NSTextField*   rawDataLengthField; //bad name in docs. really raw_data_offset
     IBOutlet NSTextField*   rawDataWindowField; //bad name in docs. really max length of event packet
     IBOutlet NSTextField*   dWindowField;
@@ -125,7 +130,6 @@
     IBOutlet NSTextField*   p2WindowField;
     IBOutlet NSTextField*   peakSensitivityField;
     IBOutlet NSPopUpButton*      triggerConfigPU;
-    IBOutlet NSButton*      writeFlagCB;
 
     
     NSView *blankView;
@@ -176,11 +180,6 @@
 - (void) totalRateChanged:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 
-#pragma mark - noise floor
-- (void) noiseFloorIntegrationChanged:(NSNotification*)aNote;
-- (void) noiseFloorOffsetChanged:(NSNotification*)aNote;
-- (void) noiseFloorChanged:(NSNotification*)aNote;
-
 #pragma mark - SerDes and Clock Distribution
 - (void) updateClockLocked;
 - (void) initSerDesStateChanged:(NSNotification*) aNote;
@@ -189,7 +188,13 @@
 - (void) enabledChanged:(NSNotification*)aNote;
 - (void) forceFullCardInitChanged:(NSNotification*)aNote;
 - (void) forceFullInitChanged:(NSNotification*)aNote;
-- (void) firmwareVersionChanged:(NSNotification*)aNote;
+- (void) extDiscrSrcChanged:(NSNotification*)aNote;
+- (void) userPackageDataChanged:(NSNotification*)aNote;
+- (void) holdoffTimeChanged:(NSNotification*)aNote;
+- (void) autoModeChanged:(NSNotification*)aNote;
+- (void) vetoGateWidthChanged:(NSNotification*)aNote;
+
+
 - (void) acqDcmCtrlStatusChanged:(NSNotification*)aNote;
 - (void) acqDcmLockChanged:(NSNotification*)aNote;
 - (void) acqDcmResetChanged:(NSNotification*)aNote;
@@ -200,28 +205,21 @@
 - (void) adcDcmResetChanged:(NSNotification*)aNote;
 - (void) adcPhShiftOverflowChanged:(NSNotification*)aNote;
 - (void) adcDcmClockStoppedChanged:(NSNotification*)aNote;
-- (void) userPackageDataChanged:(NSNotification*)aNote;
-- (void) routerVetoEnChanged:(NSNotification*)aNote;
 - (void) preampResetDelayEnChanged:(NSNotification*)aNote;
 - (void) decimationFactorChanged:(NSNotification*)aNote;
-- (void) writeFlagChanged:(NSNotification*)aNote;
+//- (void) writeFlagChanged:(NSNotification*)aNote;
 - (void) pileupModeChanged:(NSNotification*)aNote;
 - (void) droppedEventCountModeChanged:(NSNotification*)aNote;
 - (void) eventCountModeChanged:(NSNotification*)aNote;
 - (void) ledThresholdChanged:(NSNotification*)aNote;
-- (void) cfdFractionChanged:(NSNotification*)aNote;
 - (void) preampResetDelayChanged:(NSNotification*)aNote;
 - (void) triggerPolarityChanged:(NSNotification*)aNote;
 - (void) aHitCountModeChanged:(NSNotification*)aNote;
 - (void) discCountModeChanged:(NSNotification*)aNote;
 - (void) eventExtensionModeChanged:(NSNotification*)aNote;
 - (void) pileupExtensionModeChanged:(NSNotification*)aNote;
-- (void) counterResetChanged:(NSNotification*)aNote;
 - (void) pileupWaveformOnlyModeChanged:(NSNotification*)aNote;
 - (void) triggerConfigChanged:(NSNotification*)aNote;
-
-
-
 - (void) rawDataLengthChanged:(NSNotification*)aNote;
 - (void) rawDataWindowChanged:(NSNotification*)aNote;
 - (void) dWindowChanged:(NSNotification*)aNote;
@@ -236,32 +234,14 @@
 - (void) p2WindowChanged:(NSNotification*)aNote;
 - (void) dacChannelSelectChanged:(NSNotification*)aNote;
 - (void) dacAttenuationChanged:(NSNotification*)aNote;
-- (void) phaseHuntChanged:(NSNotification*)aNote;
-- (void) loadbaselineChanged:(NSNotification*)aNote;
-- (void) phaseHuntDebugChanged:(NSNotification*)aNote;
-- (void) phaseHuntProceedChanged:(NSNotification*)aNote;
-- (void) phaseDecChanged:(NSNotification*)aNote;
-- (void) phaseIncChanged:(NSNotification*)aNote;
-- (void) serdesPhaseIncChanged:(NSNotification*)aNote;
-- (void) serdesPhaseDecChanged:(NSNotification*)aNote;
 - (void) peakSensitivityChanged:(NSNotification*)aNote;
 - (void) diagInputChanged:(NSNotification*)aNote;
 - (void) rj45SpareIoMuxSelChanged:(NSNotification*)aNote;
 - (void) rj45SpareIoDirChanged:(NSNotification*)aNote;
-- (void) liveTimestampLsbChanged:(NSNotification*)aNote;
-- (void) liveTimestampMsbChanged:(NSNotification*)aNote;
 - (void) diagIsyncChanged:(NSNotification*)aNote;
 - (void) serdesSmLostLockChanged:(NSNotification*)aNote;
 - (void) overflowFlagChanChanged:(NSNotification*)aNote;
-- (void) phaseStatusChanged:(NSNotification*)aNote;
-- (void) phaseChanged:(NSNotification*)aNote;
-- (void) phase1Changed:(NSNotification*)aNote;
-- (void) phase2Changed:(NSNotification*)aNote;
-- (void) phase3Changed:(NSNotification*)aNote;
-- (void) pcbRevisionChanged:(NSNotification*)aNote;
-- (void) fwTypeChanged:(NSNotification*)aNote;
-- (void) mjrCodeRevisionChanged:(NSNotification*)aNote;
-- (void) minCodeRevisionChanged:(NSNotification*)aNote;
+- (void) codeRevisionChanged:(NSNotification*)aNote;
 - (void) codeDateChanged:(NSNotification*)aNote;
 - (void) droppedEventCountChanged:(NSNotification*)aNote;
 - (void) acceptedEventCountChanged:(NSNotification*)aNote;
@@ -274,7 +254,7 @@
 - (void) sdSmLostLockFlagChanged:(NSNotification*)aNote;
 - (void) adcConfigChanged:(NSNotification*)aNote;
 - (void) configMainFpgaChanged:(NSNotification*)aNote;
-- (void) powerOkChanged:(NSNotification*)aNote;
+- (void) vmeStatusChanged:(NSNotification*)aNote;
 - (void) overVoltStatChanged:(NSNotification*)aNote;
 - (void) underVoltStatChanged:(NSNotification*)aNote;
 - (void) temp0SensorChanged:(NSNotification*)aNote;
@@ -286,11 +266,8 @@
 - (void) serialNumChanged:(NSNotification*)aNote;
 - (void) boardRevNumChanged:(NSNotification*)aNote;
 - (void) vhdlVerNumChanged:(NSNotification*)aNote;
-- (void) fifoAccessChanged:(NSNotification*)aNote;
 
-#pragma mark - Actions
 - (IBAction) decimationFactorAction:(id)sender;
-- (IBAction) writeFlagAction:(id)sender;
 
 #pragma mark - Security
 - (IBAction) settingLockAction:(id) sender;
@@ -300,18 +277,15 @@
 - (IBAction) downloadMainFPGAAction:(id)sender;
 - (IBAction) stopLoadingMainFPGAAction:(id)sender;
 
-#pragma mark - Noise floor
-- (IBAction) findNoiseFloors:(id)sender;
-- (IBAction) noiseFloorOffsetAction:(id)sender;
-- (IBAction) openNoiseFloorPanel:(id)sender;
-- (IBAction) closeNoiseFloorPanel:(id)sender;
-- (IBAction) noiseFloorIntegrationAction:(id)sender;
 
 #pragma mark - Register Actions
 - (IBAction) enabledAction:(id)sender;
-- (IBAction) cdfFractionAction:(id)sender;
+- (IBAction) extDiscrSrcAction:(id)sender;
+- (IBAction) userPackageDataAction:(id)sender;
+
+
 - (IBAction) ledThresholdAction:(id)sender;
-- (IBAction) writeFlagAction:(id)sender;
+//- (IBAction) writeFlagAction:(id)sender;
 - (IBAction) pileupModeAction:(id)sender;
 - (IBAction) preampResetDelayEnAction:(id)sender;
 - (IBAction) preampResetDelayAction:(id)sender;
@@ -322,7 +296,6 @@
 - (IBAction) discCountModeAction:(id)sender;
 - (IBAction) eventExtensionModeAction:(id)sender;
 - (IBAction) pileupExtensionModeAction:(id)sender;
-- (IBAction) counterResetAction:(id)sender;
 - (IBAction) pileupWaveformOnlyModeAction:(id)sender;
 - (IBAction) rawDataLengthAction:(id)sender;
 - (IBAction) rawDataWindowAction:(id)sender;
@@ -338,6 +311,10 @@
 - (IBAction) triggerConfigAction:(id)sender;
 - (IBAction) windowCompMinAction:(id)sender;
 - (IBAction) windowCompMaxAction:(id)sender;
+- (IBAction) holdoffTimeAction:(id)sender;
+- (IBAction) autoModeAction:(id)sender;
+- (IBAction) vetoGateWidthAction:(id)sender;
+- (IBAction) loadDelaysAction:(id)sender;
 
 #pragma mark - Low-level registers and diagnostics
 - (IBAction) selectedChannelAction:(id)sender;
@@ -364,6 +341,9 @@
 - (IBAction) clearFIFO:(id)sender;
 - (IBAction) forceFullInitAction:(id)sender;
 - (IBAction) forceFullCardInitAction:(id)sender;
+- (IBAction) readTimeStamp:(id)sender;
+- (IBAction) readFPGAVersions:(id)sender;
+- (IBAction) readVmeAuxStatus:(id)sender;
 
 #pragma mark - Data Source
 - (void)    tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
