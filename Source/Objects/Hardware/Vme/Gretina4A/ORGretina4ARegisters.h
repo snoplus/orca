@@ -108,6 +108,54 @@ enum {
     kVMEFPGASandbox4,			//0x093C VME Sandbox4
     kNumberOfFPGARegisters
 };
+#define kGretina4AFIFOEmpty			0x100000
+#define kGretina4AFIFOAlmostEmpty	0x400000
+#define kGretina4AFIFOAlmostFull	0x800000
+#define kGretina4AFIFOAllFull		0x1000000
+
+#define kGretina4APacketSeparator    0xAAAAAAAA
+
+#define kGretina4ANumberWordsMask	0x7FF0000
+
+#define kGretina4AFlashMaxWordCount	0xF
+#define kGretina4AFlashBlockSize		( 128 * 1024 )
+#define kGretina4AFlashBlocks		128
+#define kGretina4AUsedFlashBlocks	32
+#define kGretina4AFlashBufferBytes	32
+#define kGretina4ATotalFlashBytes	( kGretina4AFlashBlocks * kGretina4AFlashBlockSize)
+#define kFlashBusy                  0x80
+#define kGretina4AFlashEnableWrite	0x10
+#define kGretina4AFlashDisableWrite	0x0
+#define kGretina4AFlashConfirmCmd	0xD0
+#define kGretina4AFlashWriteCmd		0xE8
+#define kGretina4AFlashBlockEraseCmd	0x20
+#define kGretina4AFlashReadArrayCmd	0xFF
+#define kGretina4AFlashStatusRegCmd	0x70
+#define kGretina4AFlashClearSRCmd	0x50
+
+#define kGretina4AResetMainFPGACmd	0x30
+#define kGretina4AReloadMainFPGACmd	0x3
+#define kGretina4AMainFPGAIsLoaded	0x41
+
+
+#define kSPIData	    0x2
+#define kSPIClock	    0x4
+#define kSPIChipSelect	0x8
+#define kSPIRead        0x10
+#define kSDLockBit      (0x1<<17)
+#define kSDLostLockBit  (0x1<<24)
+
+enum {
+    kSerDesIdle,
+    kSerDesSetup,
+    kSetDigitizerClkSrc,
+    kFlushFifo,
+    kReleaseClkManager,
+    kPowerUpRTPower,
+    kSetMasterLogic,
+    kSetSDSyncBit,
+    kSerDesError,
+};
 
 
 @interface ORGretina4ARegisters : NSObject
