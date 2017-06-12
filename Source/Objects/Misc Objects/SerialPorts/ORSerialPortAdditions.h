@@ -3,7 +3,7 @@
 //  ORCA
 //
 //  Created by Mark Howe on Mon Feb 10 2003.
-//  Copyright © 2002 CENPA, University of Washington. All rights reserved.
+//  Copyright ï¿½ 2002 CENPA, University of Washington. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 

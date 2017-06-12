@@ -78,7 +78,7 @@
     int totalNeedToWrite = theLength;
     int i;
     for(i=0;i<totalNeedToWrite;i++){
-        int numWritten =  write(fileDescriptor, ptr, theLength);
+        int numWritten =  write(fileDescriptor, ptr, theLength-totalWritten);
         ptr          += numWritten;
         totalWritten += numWritten;
         if(totalWritten >= totalNeedToWrite)break;
