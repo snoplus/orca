@@ -101,7 +101,7 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
     self.delegate    = nil;
     self.stateStatus = nil;
     self.order       = nil;
-    self.speed       = 175; //default
+    self.speed       = 250; //default -- used to be 175
     [interlockFailureAlarm clearAlarm];
     [interlockFailureAlarm release];
     [super dealloc];
