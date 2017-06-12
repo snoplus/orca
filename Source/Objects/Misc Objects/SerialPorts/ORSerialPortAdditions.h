@@ -47,6 +47,7 @@
 
 // write string to the serial port
 - (int)writeString:(NSString *)string;
+- (int) writeCharArray:(const char *)charArray length:(int)theLength;
 
 
 - (void)readDataInBackground;

@@ -72,6 +72,22 @@
     return totalWritten;
 }
 
+- (int) writeCharArray:(const char *)ptr length:(int)theLength
+{
+    int totalWritten     = 0;
+    int totalNeedToWrite = theLength;
+    int i;
+    for(i=0;i<totalNeedToWrite;i++){
+        int numWritten =  write(fileDescriptor, ptr, theLength);
+        ptr          += numWritten;
+        totalWritten += numWritten;
+        if(totalWritten >= totalNeedToWrite)break;
+    }
+    
+    return totalWritten;
+}
+
+
 - (int) checkRead
 {
     FD_ZERO(readfds);
