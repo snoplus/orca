@@ -1295,12 +1295,15 @@ err:
    // When we get a noticication that the database read has finished, set local variables
     NSMutableDictionary *runFileDict = [[NSMutableDictionary alloc] initWithDictionary:[model smellieRunFiles]];
     
-    //Fill lthe combo box with information
+    NSMutableArray* runNames = [NSMutableArray array];
     for(id key in runFileDict){
         id loopValue = [runFileDict objectForKey:key];
-        [smellieRunFileNameField addItemWithObjectValue:[NSString stringWithFormat:@"%@",[loopValue objectForKey:@"run_name"]]];
+        [runNames addObject:[NSString stringWithFormat:@"%@",[loopValue objectForKey:@"run_name"]]];
     }
-    
+
+    //Fill lthe combo box with alphabetically sorted information
+    [smellieRunFileNameField addItemsWithObjectValues:[runNames sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)]];
+
     [smellieRunFileNameField setEnabled:YES];
     [smellieLoadRunFile setEnabled:YES];
     
@@ -1331,12 +1334,15 @@ err:
     // When we get a noticication that the database read has finished, set local variables
     NSMutableDictionary *runFileDict = [[NSMutableDictionary alloc] initWithDictionary:[model tellieRunFiles]];
 
-    //Fill lthe combo box with information
+    NSMutableArray* runNames = [NSMutableArray array];
     for(id key in runFileDict){
         id loopValue = [runFileDict objectForKey:key];
-        [tellieRunFileNameField addItemWithObjectValue:[NSString stringWithFormat:@"%@",[loopValue objectForKey:@"name"]]];
+        [runNames addObject:[NSString stringWithFormat:@"%@",[loopValue objectForKey:@"name"]]];
     }
-
+    
+    //Fill lthe combo box with alphabetically sorted information
+    [tellieRunFileNameField addItemsWithObjectValues:[runNames sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)]];
+    
     [tellieRunFileNameField setEnabled:YES];
     [tellieLoadRunFile setEnabled:YES];
 
