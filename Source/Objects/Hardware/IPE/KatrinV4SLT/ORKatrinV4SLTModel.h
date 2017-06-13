@@ -24,7 +24,7 @@
 #import "ORIpeCard.h"
 #import "SBC_Linking.h"
 #import "SBC_Config.h"
-
+#import "ORKatrinV4SLTRegisters.h"
 
 
 #import "ORIpeV4SLTModel.h"   //for kKatrinV4SLTNumRegs declaration - maybe not necessary in the future any more -tb- 2014
@@ -140,123 +140,6 @@
 #define kTrgEndPageDelay		(0x000007FF <<   0) //R/W
 
 
-
-
-
-#if 1
-//IPE V4 register definitions
-enum KatrinSLTV4Enum {
-	kKatrinV4SLTControlReg,
-	kKatrinV4SLTStatusReg,
-	kKatrinV4SLTCommandReg,
-	kKatrinV4SLTInterruptReguestReg,
-	kKatrinV4SLTInterruptMaskReg,
-	kKatrinV4SLTRequestSemaphoreReg,
-	kKatrinV4SLTHWRevisionReg,
-	kKatrinV4SLTPixelBusErrorReg,
-	kKatrinV4SLTPixelBusEnableReg,
-    //Auger Registers Removed for Bipolar Filter Upgrade 2013 -tb-
-    /*       these 3 were actually never used -tb-
-	kKatrinV4SLTPixelBusTestReg,
-	kKatrinV4SLTAuxBusTestReg,
-	kKatrinV4SLTDebugStatusReg,
-    */
-	kKatrinV4SLTVetoCounterHiReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-	kKatrinV4SLTVetoCounterLoReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-	kKatrinV4SLTDeadTimeCounterHiReg,	//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-	kKatrinV4SLTDeadTimeCounterLoReg,	//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-								//TODO: and dead time and veto time counter are confused, too -tb-
-	kKatrinV4SLTRunCounterHiReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-	kKatrinV4SLTRunCounterLoReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-	kKatrinV4SLTSecondSetReg,
-	kKatrinV4SLTSecondCounterReg,
-	kKatrinV4SLTSubSecondCounterReg,
-    //Auger Registers Removed for Bipolar Filter Upgrade 2013 -tb-
-    /*      only kKatrinV4SLTPageSelectReg, kKatrinV4SLTPageManagerReg, kKatrinV4SLTEventStatusReg were actually never used -tb-
-	kKatrinV4SLTPageManagerReg,
-	kKatrinV4SLTTriggerTimingReg,
-    */
-	kKatrinV4SLTPageSelectReg,
-    /*
-	kKatrinV4SLTNumberPagesReg,
-	kKatrinV4SLTPageNumbersReg,
-	kKatrinV4SLTEventStatusReg,
-	kKatrinV4SLTReadoutCSRReg,
-	kKatrinV4SLTBufferSelectReg,
-	kKatrinV4SLTReadoutDefinitionReg,
-    */
-	kKatrinV4SLTTPTimingReg,
-	kKatrinV4SLTTPShapeReg,
-	kKatrinV4SLTi2cCommandReg,
-	kKatrinV4SLTepcsCommandReg,
-	kKatrinV4SLTBoardIDLoReg,
-	kKatrinV4SLTBoardIDHiReg,
-	kKatrinV4SLTPROMsControlReg,
-	kKatrinV4SLTPROMsBufferReg,
-	kKatrinV4SLTDataFIFOReg,
-	kKatrinV4SLTFIFOModeReg,
-	kKatrinV4SLTFIFOStatusReg,
-	kKatrinV4SLTPAEOffsetReg,
-	kKatrinV4SLTPAFOffsetReg,
-	kKatrinV4SLTFIFOCsrReg,
-	kKatrinV4SLTFIFOxRequestReg,
-	kKatrinV4SLTFIFOMaskReg,
-	kKatrinV4SLTNumRegs //must be last
-};
-#endif
-
-extern IpeRegisterNamesStruct regKatrinSLTV4[kKatrinV4SLTNumRegs];
-
-#if 0
-//this is in .m file
-static IpeRegisterNamesStruct regKatrinSLTV4[kKatrinV4SLTNumRegs] = {
-{@"Control",			0xa80000,		1,			kIpeRegReadable | kIpeRegWriteable  },
-{@"Status",				0xa80004,		1,			kIpeRegReadable                     },
-{@"Command",			0xa80008,		1,			kIpeRegWriteable                    },
-{@"Interrupt Reguest",	0xA8000C,		1,			kIpeRegReadable                     },
-{@"Interrupt Mask",		0xA80010,		1,			kIpeRegReadable | kIpeRegWriteable  },
-{@"Request Semaphore",	0xA80014,		3,			kIpeRegReadable                     },
-{@"HWRevision",			0xa80020,		1,			kIpeRegReadable                     },
-{@"Pixel Bus Error",	0xA80024,		1,			kIpeRegReadable                     },
-{@"Pixel Bus Enable",	0xA80028,		1, 			kIpeRegReadable | kIpeRegWriteable  },
-{@"Pixel Bus Test",		0xA8002C, 		1, 			kIpeRegReadable | kIpeRegWriteable  },
-{@"Aux Bus Test",		0xA80030, 		1, 			kIpeRegReadable | kIpeRegWriteable  },
-{@"Debug Status",		0xA80034,  		1, 			kIpeRegReadable | kIpeRegWriteable  },
-{@"Veto Counter (MSB)",	0xA80080, 		1,			kIpeRegReadable                     },
-{@"Veto Counter (LSB)",	0xA80084,		1,			kIpeRegReadable                     },
-{@"Dead Counter (MSB)",	0xA80088, 		1,			kIpeRegReadable                     },
-{@"Dead Counter (LSB)",	0xA8008C, 		1,			kIpeRegReadable                     },
-{@"Run Counter  (MSB)",	0xA80090,		1,			kIpeRegReadable                     },
-{@"Run Counter  (LSB)",	0xA80094, 		1,			kIpeRegReadable                     },
-{@"Second Set",			0xB00000,  		1, 			kIpeRegReadable | kIpeRegWriteable  },
-{@"Second Counter",		0xB00004, 		1,			kIpeRegReadable                     },
-{@"Sub-second Counter",	0xB00008, 		1,			kIpeRegReadable                     },
-{@"Page Manager",		0xB80000,  		1, 			kIpeRegReadable | kIpeRegWriteable  },
-{@"Trigger Timing",		0xB80004,  		1, 			kIpeRegReadable | kIpeRegWriteable  },
-{@"Page Select",		0xB80008, 		1,			kIpeRegReadable                     },
-{@"Number of Pages",	0xB8000C, 		1,			kIpeRegReadable                     },
-{@"Page Numbers",		0xB81000,		64, 		kIpeRegReadable | kIpeRegWriteable  },
-{@"Event Status",		0xB82000,		64,			kIpeRegReadable                     },
-{@"Readout CSR",		0xC00000,		1,			kIpeRegReadable | kIpeRegWriteable  },
-{@"Buffer Select",		0xC00004,		1,			kIpeRegReadable | kIpeRegWriteable  },
-{@"Readout Definition",	0xC10000,	  2048,			kIpeRegReadable | kIpeRegWriteable  },
-{@"TP Timing",			0xC80000,	   128,			kIpeRegReadable | kIpeRegWriteable  },
-{@"TP Shape",			0xC81000,	   512,			kIpeRegReadable | kIpeRegWriteable  },
-{@"I2C Command",		0xD00000,		1,			kIpeRegReadable                     },
-{@"EPC Command",		0xD00004,		1,			kIpeRegReadable | kIpeRegWriteable  },
-{@"Board ID (LSB)",		0xD00008,		1,			kIpeRegReadable                     },
-{@"Board ID (MSB)",		0xD0000C,		1,			kIpeRegReadable                     },
-{@"PROMs Control",		0xD00010,		1,			kIpeRegReadable | kIpeRegWriteable  },
-{@"PROMs Buffer",		0xD00100,		256,		kIpeRegReadable | kIpeRegWriteable  },
-{@"Trigger Data",		0xD80000,	  14000,		kIpeRegReadable | kIpeRegWriteable  },
-{@"ADC Data",			0xE00000,	 0x8000,		kIpeRegReadable | kIpeRegWriteable  },
-//{@"Data Block RW",		0xF00000 Data Block RW
-//{@"Data Block Length",	0xF00004 Data Block Length 
-//{@"Data Block Address",	0xF00008 Data Block Address
-};
-#endif
-
-
 @interface ORKatrinV4SLTModel : ORIpeCard <ORDataTaker,SBC_Linking>
 {
 	@private
@@ -279,7 +162,6 @@ static IpeRegisterNamesStruct regKatrinSLTV4[kKatrinV4SLTNumRegs] = {
 		ORReadOutList*	readOutGroup;
 		NSArray*		dataTakers;			//cache of data takers.
 		BOOL			first;
-		// ak, 9.12.07
 		BOOL            displayTrigger;    //< Display pixel and timing view of trigger data
 		BOOL            displayEventLoop;  //< Display the event loop parameter
 		unsigned long   lastDisplaySec;
@@ -314,12 +196,8 @@ static IpeRegisterNamesStruct regKatrinSLTV4[kKatrinV4SLTNumRegs] = {
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
-- (void) runIsAboutToStart:(NSNotification*)aNote;
-- (void) runStarted:(NSNotification*)aNote;
-- (void) runIsStopped:(NSNotification*)aNote;
 - (void) runIsBetweenSubRuns:(NSNotification*)aNote;
 - (void) runIsStartingSubRun:(NSNotification*)aNote;
-- (void) runIsAboutToChangeState:(NSNotification*)aNote;
 
 #pragma mark •••Accessors
 - (uint32_t) pixelBusEnableReg;
@@ -465,7 +343,6 @@ static IpeRegisterNamesStruct regKatrinSLTV4[kKatrinV4SLTNumRegs] = {
 //- (void)		loadPulserValues;
 //- (void)		swTrigger;
 - (void)		initBoard;
-- (void)		initBoard:(BOOL)quickStart;
 - (void)		autoCalibrate;
 - (long)		getSBCCodeVersion;
 - (long)		getFdhwlibVersion;

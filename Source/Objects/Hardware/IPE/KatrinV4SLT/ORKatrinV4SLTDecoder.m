@@ -265,6 +265,30 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
 
 
 @implementation ORKatrinV4SLTDecoderForEnergy
+static NSString* kSLTCrate[4] = {
+    //pre-make some keys for speed.
+    @"SLT0.FLT.Energy", @"SLT0.FLT.Energy", @"SLT0.FLT.Energy", @"SLT0.FLT.Energy",
+ };
+static NSString* kSLTStation[32] = {
+    //pre-make some keys for speed.
+    @"Station  0", @"Station  1", @"Station  2", @"Station  3",
+    @"Station  4", @"Station  5", @"Station  6", @"Station  7",
+    @"Station  8", @"Station  9", @"Station 10", @"Station 11",
+    @"Station 12", @"Station 13", @"Station 14", @"Station 15",
+    @"Station 16", @"Station 17", @"Station 18", @"Station 19",
+    @"Station 20", @"Station 21", @"Station 22", @"Station 23",
+    @"Station 24", @"Station 25", @"Station 26", @"Station 27",
+    @"Station 28", @"Station 29", @"Station 30", @"Station 31"
+};
+static NSString* kFLTChanKey[24] = {
+    //pre-make some keys for speed.
+    @"Channel  0", @"Channel  1", @"Channel  2", @"Channel  3",
+    @"Channel  4", @"Channel  5", @"Channel  6", @"Channel  7",
+    @"Channel  8", @"Channel  9", @"Channel 10", @"Channel 11",
+    @"Channel 12", @"Channel 13", @"Channel 14", @"Channel 15",
+    @"Channel 16", @"Channel 17", @"Channel 18", @"Channel 19",
+    @"Channel 20", @"Channel 21", @"Channel 22", @"Channel 23"
+};
 
 //-------------------------------------------------------------
 /** Data format for event:
@@ -310,7 +334,8 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
 	unsigned long length	= ExtractLength(*ptr);	 //get length from first word
 	unsigned char crate		= ShiftAndExtract(ptr[1],21,0xf);
     
- 	NSString* crateKey		= [self getCrateKey: crate];
+ 	NSString* crateKey = @"??";
+    if(crate<4)crateKey= kSLTCrate[crate];
     
     unsigned long headerlen = 4;
     unsigned long numEv=(length-headerlen)/6;
@@ -322,7 +347,7 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
     int i;
     for(i=0;i<numEv;i++){
 //      unsigned long f1        = ptr[0]; //word#,subseconds
-//      unsigned long f2        = ptr[1]; //seconds
+      //unsigned long f2        = ptr[1]; //seconds
         unsigned long f3        = ptr[2]; //flt,ch,multi,eventID
 //      unsigned long f4        = ptr[3]; //aPeak, aPeak
 //      unsigned long f5        = ptr[4]; //tValley, aValley
@@ -340,9 +365,14 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
 //      unsigned long aValley   =  4096 - (f5   & 0xfff);
 //      unsigned long aValley   =  f5        & 0xfff;
         unsigned long energy    =  f6        & 0xfffff;
-
-	    NSString* stationKey	= [self getStationKey: card];
-	    NSString* channelKey	= [self getChannelKey: chan];
+        //unsigned long lostEvents    =  (f6>>20)&0x1ff;;
+        
+        //get the keys faster than the usual way
+        NSString* stationKey = @"??";
+	    if(card<32)stationKey  = kSLTStation[card];
+        
+        NSString* channelKey  = @"??";
+	    if(chan<24)channelKey = kFLTChanKey[chan];
 //        
 //		NSString* fltKey = [crateKey stringByAppendingString:stationKey];
 //		id obj = [actualFlts objectForKey:fltKey];
@@ -363,10 +393,10 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
 //        int filterShapingLength = 0;
 //        if(obj) filterShapingLength = [obj filterShapingLength];
     
-	    [aDataSet histogram:energy >> 8 /*energy >> filterShapingLength*/  //scale to 4096 bins for now
-				    numBins:4096 sender:self
-			       withKeys:@"SLT", @"FLTthruSLT", @"Energy", crateKey,stationKey,channelKey,nil];
-	
+        [aDataSet histogram:energy >> 8 /*energy >> filterShapingLength*/  //scale to 4096 bins for now
+                    numBins:4096 sender:self
+                   withKeys: crateKey,stationKey,channelKey,nil];
+        
 //	    [aDataSet histogram:aPeak
 //	    			numBins:4096 sender:self  
 //	    		   withKeys:@"SLT", @"FLTthruSLT", @"PeakADC", crateKey,stationKey,channelKey,nil];

@@ -281,6 +281,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
         
         //send the HV Bias state to the Vac system
         case kMJDInterlocks_UpdateVacSystem:
+
             if(remoteOpStatus){
                 if([[remoteOpStatus objectForKey:@"connected"] boolValue]==YES){
                     //it worked. move on.
@@ -518,11 +519,15 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             }
             
             else if(remoteOpStatus){
-                if([[remoteOpStatus objectForKey:@"connected"] boolValue]==YES && [remoteOpStatus objectForKey:@"fillingLN"]){
+                if([[remoteOpStatus objectForKey:@"connected"] boolValue]==YES &&
+                   [remoteOpStatus objectForKey:@"fillingLN"] &&
+                   [remoteOpStatus objectForKey:@"pollTime"]
+                   ){
                     //it worked. move on.
                     retryCount = 0;
                     [self clearInterlockFailureAlarm];
-                    int theStatus = [[remoteOpStatus objectForKey:@"fillingLN"] intValue];
+                    int theStatus    = [[remoteOpStatus objectForKey:@"fillingLN"] intValue];
+                    pollingTimeForLN = [[remoteOpStatus objectForKey:@"pollTime"] intValue];
                     NSString* fillString;
                     NSColor* fillColor;
                     if(theStatus == 1 || theStatus == 3){
@@ -556,15 +561,19 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                         [self setCurrentState:kMJDInterlocks_Idle];
                     }
                 }
-                breakDownPass= 0;
-                sentCmds = NO;
-                self.remoteOpStatus=nil;
+                breakDownPass       = 0;
+                sentCmds            = NO;
+                self.remoteOpStatus = nil;
             }
             else {
                 if(!sentCmds){
                     self.remoteOpStatus=nil;
-                    NSString* cmd = [NSString stringWithFormat:@"fillingLN = [ORAmi286Model,2 fillStatus:%d];",slot];
-                    [self sendCommand:cmd remoteSocket:[delegate remoteSocket:kScmSlot]];
+                    NSMutableArray* cmds = [NSMutableArray arrayWithObjects:
+                                            [NSString stringWithFormat:@"fillingLN = [ORAmi286Model,2 fillStatus:%d];",slot],
+                                            @"pollTime = [ORAmi286Model,2 pollTime];",
+                                            nil];
+
+                    [self sendCommands:cmds remoteSocket:[delegate remoteSocket:kScmSlot]];
                     [self setState:kMJDInterlocks_CheckLNFill status:@"Sending..." color:normalColor];
                     sentCmds = YES;
                 }
@@ -589,6 +598,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
         case kMJDInterlocks_FinalState:
             if([finalReport count])[self errorReport];
             [delegate constraintCheckFinished:[self module]];
+            [self setCurrentState:kMJDInterlocks_Idle];
             break;
     }
     if(currentState != kMJDInterlocks_Idle){
@@ -644,6 +654,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
 
 - (BOOL)        vacuumSpike {return vacuumSpike;   }
 - (BOOL)        fillingLN   {return fillingLN;}
+- (int)         pollingTimeForLN {return pollingTimeForLN;}
 
 
 

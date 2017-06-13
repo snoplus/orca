@@ -128,6 +128,7 @@
 -(NSNumber*) calcTellieChannelPulseSettings:(NSUInteger)channel withNPhotons:(NSUInteger)photons withFireFrequency:(NSUInteger)frequency inSlave:(BOOL)mode;
 -(NSNumber*) calcTellieChannelForFibre:(NSString*)fibre;
 -(NSString*) calcTellieFibreForNode:(NSUInteger)node;
+-(NSString*) calcTellieFibreForChannel:(NSUInteger)channel;
 -(NSNumber*)calcPhotonsForIPW:(NSUInteger)ipw forChannel:(NSUInteger)channel inSlave:(BOOL)inSlave;
 -(NSString*)selectPriorityFibre:(NSArray*)fibres forNode:(NSUInteger)node;
 -(void) startTellieRunThread:(NSDictionary*)fireCommands;

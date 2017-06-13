@@ -30,6 +30,7 @@
 #import "ORTimeAxis.h"
 #import "ORTimeRate.h"
 #import "ORTimeLinePlot.h"
+#import "ORKatrinV4FLTRegisters.h"
 
 @implementation ORKatrinV4FLTController
 
@@ -76,14 +77,14 @@
 	ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
 	[timeRatePlot addPlot: aPlot];
 	[(ORTimeAxis*)[timeRatePlot xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
-    [[timeRatePlot yAxis] setRngLimitsLow:0 withHigh:24*200000 withMinRng:5];
+    [[timeRatePlot yAxis] setRngLimitsLow:0 withHigh:24*1000000 withMinRng:5];
 
 	[aPlot release];
 
 	[rate0 setNumber:24 height:10 spacing:6];
-    [[rate0 xAxis] setRngLimitsLow:0 withHigh:200000 withMinRng:5];
+    [[rate0 xAxis] setRngLimitsLow:0 withHigh:1000000 withMinRng:5];
     
-    [[totalRate xAxis] setRngLimitsLow:0 withHigh:24*200000 withMinRng:5];
+    [[totalRate xAxis] setRngLimitsLow:0 withHigh:24*1000000 withMinRng:5];
 
 	int i;
 	for(i=0;i<kNumV4FLTChannels;i++){
@@ -579,7 +580,6 @@
 
 - (void) filterShapingLengthChanged:(NSNotification*)aNote
 {
-	//[filterLengthPU selectItemAtIndex:[model filterLength]];
 	[filterShapingLengthPU selectItemWithTag:[model filterShapingLength]];
 	[self recommendedPZCChanged:nil];
 	#if 1
@@ -644,8 +644,8 @@
     [registerPopUp removeAllItems];
     
 	// Populate the register popup
-    for (i = 0; i < [model getNumberRegisters]; i++) {
-        [registerPopUp insertItemWithTitle:[model getRegisterName:i] atIndex:i];
+    for (i = 0; i < [katrinV4FLTRegisters numRegisters]; i++) {
+        [registerPopUp insertItemWithTitle:[katrinV4FLTRegisters registerName:i] atIndex:i];
     }
     
     
@@ -816,9 +816,9 @@
 {
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORKatrinV4FLTSettingsLock];
 	short index = [model selectedRegIndex];
-	BOOL readAllowed = !lockedOrRunningMaintenance && ([model getAccessType:index] & kIpeRegReadable)>0;
-	BOOL writeAllowed = !lockedOrRunningMaintenance && ([model getAccessType:index] & kIpeRegWriteable)>0;
-	BOOL needsChannel = !lockedOrRunningMaintenance && ([model getAccessType:index] & kIpeRegNeedsChannel)>0;
+	BOOL readAllowed = !lockedOrRunningMaintenance  && ([model accessTypeOfReg:index] & kRead);
+	BOOL writeAllowed = !lockedOrRunningMaintenance && ([model accessTypeOfReg:index] & kWrite);
+	BOOL needsChannel = !lockedOrRunningMaintenance && ([model accessTypeOfReg:index] & kChanReg);
 	
 	[regWriteButton setEnabled:writeAllowed];
 	[regReadButton setEnabled:readAllowed];
@@ -1288,7 +1288,6 @@
 
 - (IBAction) filterShapingLengthAction:(id)sender
 {
-	//[model setFilterLength:[sender indexOfSelectedItem]];
 	[model setFilterShapingLength:[[sender selectedCell] tag]];
 }
 
@@ -1299,10 +1298,8 @@
 
 - (void) boxcarLengthPUAction:(id)sender
 {
-	//[model setBoxcarLength:[sender intValue]];	
 	[model setBoxcarLength:[[sender selectedCell] tag]];
 }
-
 
 - (IBAction) histNofMeasAction:(id)sender
 {
@@ -1469,9 +1466,7 @@
 		[model printVersions];
 		[model printStatusReg];
 		[model printPStatusRegs];
-		//[model printPixelRegs];
 		[model printValueTable];
-		//[model printStatistics];
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT (%d) status\n",[model stationNumber]);
@@ -1628,7 +1623,7 @@
 	int index = [model selectedRegIndex]; 
 	@try {
 		unsigned long value;
-        if(([model getAccessType:index] & kIpeRegNeedsChannel)){
+        if(([model accessTypeOfReg:index] & kChanReg)){
             int chan = [model selectedChannelValue];
 		    value = [model readReg:index channel: chan ];
 		    NSLog(@"FLTv4 reg: %@ for channel %i has value: 0x%x (%i)\n",[model getRegisterName:index], chan, value, value);
@@ -1651,7 +1646,7 @@
 	int index = [registerPopUp indexOfSelectedItem];
 	@try {
 		unsigned long val = [model writeValue];
-        if(([model getAccessType:index] & kIpeRegNeedsChannel)){
+        if(([model accessTypeOfReg:index] & kChanReg)){
             int chan = [model selectedChannelValue];
      		[model writeReg:index  channel: chan value: val];//TODO: allow hex values, e.g. 0x23 -tb-
     		NSLog(@"wrote 0x%x (%i) to FLTv4 reg: %@ channel %i\n", val, val, [model getRegisterName:index], chan);
@@ -1680,7 +1675,6 @@
 	}
 }
 
-
 - (IBAction) devTest1ButtonAction: (id) sender
 {
     NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
@@ -1693,7 +1687,6 @@
     NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
 	[model devTest2ButtonAction];
 }
-
 
 - (IBAction) testButtonLowLevelAction: (id) sender
 {
@@ -1712,10 +1705,7 @@
         NSLog(@"   resetTPButton: Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
 	    [model testButtonLowLevelResetTP];
 	}
-
 }
-
-
 
 #pragma mark •••Plot DataSource
 - (int) numberPointsInPlot:(id)aPlotter

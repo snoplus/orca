@@ -2,7 +2,7 @@
 // NKDPostgreSQLConnection.m
 // -----------------------------------------------------------------------------------
 //  Created by Jeff LaMarche on Sat Jul 13 2002.
-//  ©2002 Naked Software. All rights reserved.
+//  ï¿½2002 Naked Software. All rights reserved.
 // -----------------------------------------------------------------------------------
 // THIS	SOURCE CODE IS PROVIDED AS-IS WITH NO WARRANTY OF ANY KIND
 // -----------------------------------------------------------------------------------
@@ -45,7 +45,7 @@
         [connInfo appendString:[NSString stringWithFormat:@"password='%@'", inPassword]];
 
 
-    [sConn _setConn: PQconnectdb([connInfo cString])];
+    [sConn _setConn: PQconnectdb([connInfo cStringUsingEncoding:NSUTF8StringEncoding])];
     return [sConn autorelease];
 
 }
@@ -107,31 +107,31 @@
 -(NSString *)host
 // -----------------------------------------------------------------------------------
 {
-    return [NSString stringWithCString: PQhost(conn)];
+    return [NSString stringWithCString: PQhost(conn) encoding:NSASCIIStringEncoding];
 }
 // -----------------------------------------------------------------------------------
 -(NSString *)port
 // -----------------------------------------------------------------------------------
 {
-    return [NSString stringWithCString: PQport(conn)];
+    return [NSString stringWithCString: PQport(conn) encoding:NSASCIIStringEncoding];
 }
 // -----------------------------------------------------------------------------------
 -(NSString *)databaseName
 // -----------------------------------------------------------------------------------
 {
-    return [NSString stringWithCString: PQdb(conn)]; 
+    return [NSString stringWithCString: PQdb(conn) encoding:NSASCIIStringEncoding];
 }
 // -----------------------------------------------------------------------------------
 -(NSString *)user
 // -----------------------------------------------------------------------------------
 {
-    return [NSString stringWithCString: PQuser(conn)];
+    return [NSString stringWithCString: PQuser(conn) encoding:NSASCIIStringEncoding];
 }
 // -----------------------------------------------------------------------------------
 -(NSString *)password
 // -----------------------------------------------------------------------------------
 {
-    return [NSString stringWithCString: PQpass(conn)];
+    return [NSString stringWithCString: PQpass(conn) encoding:NSASCIIStringEncoding];
 }
 // -----------------------------------------------------------------------------------
 -(BOOL)isConnected
@@ -149,13 +149,13 @@
 -(NSString *)errorMessage
 // -----------------------------------------------------------------------------------
 {
-    return [NSString stringWithCString: PQerrorMessage(conn)];
+    return [NSString stringWithCString: PQerrorMessage(conn) encoding:NSASCIIStringEncoding];
 }
 // -----------------------------------------------------------------------------------
 -(NKDPostgreSQLResult *)executeQuery: (NSString *)query
 // -----------------------------------------------------------------------------------
 {
-    PGresult *result = PQexec(conn, [query cString]);
+    PGresult *result = PQexec(conn, [query cStringUsingEncoding:NSUTF8StringEncoding]);
     ExecStatusType status = PQresultStatus(result);
     NKDPostgreSQLResult *ret = nil;
     
@@ -164,7 +164,7 @@
      else
 		 [[NSException exceptionWithName:@"PostgreSQL TUPLES Error Exception"
 				 reason:@"Database gave error"
-			       userInfo:[NSString stringWithCString:PQresultErrorMessage(result)]] raise];
+                                userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithCString:PQresultErrorMessage(result) encoding:NSASCIIStringEncoding] forKey:@"Error"]] raise];
     
     return ret;
 }
@@ -172,7 +172,7 @@
 -(void)executeUpdate: (NSString *)query
 // -----------------------------------------------------------------------------------
 {
-    PGresult *result = PQexec(conn, [query cString]);
+    PGresult *result = PQexec(conn, [query cStringUsingEncoding:NSUTF8StringEncoding]);
     ExecStatusType status = PQresultStatus(result);
 
     switch (status)
@@ -180,17 +180,17 @@
 	case PGRES_FATAL_ERROR:
 	    [[NSException exceptionWithName:@"PostgreSQL Fatal Error Exception"
 				     reason:@"Database system gave fatal error"
-				   userInfo:[NSString stringWithCString:PQresultErrorMessage(result)]] raise];
+				   userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithCString:PQresultErrorMessage(result) encoding:NSASCIIStringEncoding] forKey:@"Error"]] raise];
 	    break;
 	case PGRES_BAD_RESPONSE:
 	    [[NSException exceptionWithName:@"PostgreSQL Bad Response Exception"
 				     reason:@"Database system gave bad response"
-				   userInfo:[NSString stringWithCString:PQresultErrorMessage(result)]] raise];
+				   userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithCString:PQresultErrorMessage(result) encoding:NSASCIIStringEncoding] forKey:@"Error"]] raise];
 	    break;
 	case PGRES_NONFATAL_ERROR:
 	    [[NSException exceptionWithName:@"PostgreSQL Non-Fatal Error Exception"
 				     reason:@"Database system gave non-fatal error"
-				   userInfo:[NSString stringWithCString:PQresultErrorMessage(result)]] raise];
+				   userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithCString:PQresultErrorMessage(result) encoding:NSASCIIStringEncoding] forKey:@"Error"]] raise];
 	    break;
 	default:
 	    // nothing

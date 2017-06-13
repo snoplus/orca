@@ -557,6 +557,20 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     return channel;
 }
 
+-(NSString*) calcTellieFibreForChannel:(NSUInteger)channel
+{
+    /*
+     Use patch pannel map loaded from the telliedb to map a given fibre to the correct tellie channel.
+     */
+    if([self tellieFibreMapping] == nil){
+        NSLogColor([NSColor redColor], @"[TELLIE]: fibre map has not been loaded from couchdb - you need to call loadTellieStaticsFromDB\n");
+        return nil;
+    }
+    NSUInteger channelIndex = [[[self tellieFibreMapping] objectForKey:@"channels"] indexOfObject:channel];
+    NSString* fibre = [[[self tellieFibreMapping] objectForKey:@"fibres"] objectAtIndex:channelIndex];
+    return fibre;
+}
+
 -(NSString*)selectPriorityFibre:(NSArray*)fibres forNode:(NSUInteger)node{
     /*
      Select appropriate fibre based on naming convensions for the node at

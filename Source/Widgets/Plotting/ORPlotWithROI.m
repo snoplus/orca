@@ -29,6 +29,7 @@
 {
     [roi setDataSource:nil];
 	[roi release];
+    roi = nil; //because the super class accesses the roi indirectly later in the dealloc process
 	[super dealloc];
 }
 

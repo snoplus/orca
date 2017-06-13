@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14F27" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1050" identifier="macosx"/>
         <development version="5100" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10116"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ORSIS3316Controller">
@@ -35,10 +35,12 @@
                 <outlet property="energyDividerMatrix" destination="dkH-Um-HaU" id="6fz-Xe-ghf"/>
                 <outlet property="energySubtractorMatrix" destination="8dd-eu-iUG" id="wPo-Om-oZF"/>
                 <outlet property="eventConfigMatrix" destination="2391" id="2401"/>
+                <outlet property="gammaRevisionField" destination="eaf-CK-xge" id="LwE-Mw-ghB"/>
                 <outlet property="gapTimeMatrix" destination="F4d-FY-07r" id="nrd-cD-B20"/>
                 <outlet property="heSuppressTrigModeMatrix" destination="1971" id="spH-qA-aCL"/>
                 <outlet property="heTrigThresholdMatrix" destination="ZIG-r5-1fr" id="cQV-ic-IGD"/>
                 <outlet property="histogramsEnabledMatrix" destination="zd8-0L-3ZZ" id="yMb-M5-xeh"/>
+                <outlet property="hwVersionField" destination="SrF-hQ-tct" id="y90-Fk-HSp"/>
                 <outlet property="initButton" destination="1217" id="1326"/>
                 <outlet property="intHeTrigOutPulseMatrix" destination="iZ7-cg-eZS" id="CTd-o4-z8S"/>
                 <outlet property="intTrigOutPulseBitsMatrix" destination="nJ6-T8-0iB" id="LOa-I6-Grl"/>
@@ -56,6 +58,8 @@
                 <outlet property="rawDataBufferLenMatrix" destination="ZRg-oF-htU" id="new-BW-c7J"/>
                 <outlet property="rawDataBufferStartMatrix" destination="fU0-6m-tcJ" id="9jk-E8-hT8"/>
                 <outlet property="readThresholdButton" destination="2190" id="2192"/>
+                <outlet property="revisionField" destination="job-xX-mKu" id="75K-dd-ewz"/>
+                <outlet property="serialNumberField" destination="CrN-pW-VP5" id="Vgm-WU-NbO"/>
                 <outlet property="settingLockButton" destination="1224" id="1305"/>
                 <outlet property="slotField" destination="1221" id="1301"/>
                 <outlet property="startDelayEnabledButton" destination="1941" id="1982"/>
@@ -65,6 +69,7 @@
                 <outlet property="stopDelayField" destination="1936" id="1985"/>
                 <outlet property="tabView" destination="1336" id="1779"/>
                 <outlet property="tauFactorMatrix" destination="PFO-94-JU4" id="OTm-8d-1Qa"/>
+                <outlet property="temperatureField" destination="SDY-xe-J49" id="Xat-M2-P3U"/>
                 <outlet property="testMemoryButton" destination="1323" id="2750"/>
                 <outlet property="thresholdMatrix" destination="1649" id="1993"/>
                 <outlet property="timeRateLogCB" destination="1406" id="1466"/>
@@ -83,15 +88,15 @@
         <window title="SIS3316" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="21" userLabel="Window">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="86" y="125" width="977" height="1191"/>
+            <rect key="contentRect" x="86" y="125" width="1024" height="1191"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>
             <value key="minSize" type="size" width="213" height="107"/>
             <view key="contentView" id="2">
-                <rect key="frame" x="0.0" y="0.0" width="977" height="1191"/>
+                <rect key="frame" x="0.0" y="0.0" width="1024" height="1191"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <tabView controlSize="small" id="1336">
-                        <rect key="frame" x="-7" y="18" width="956" height="1168"/>
+                        <rect key="frame" x="13" y="-24" width="956" height="1168"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <tabViewItems>
                             <tabViewItem label="Basic Ops" identifier="" id="1337">
@@ -508,7 +513,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <textField verticalHuggingPriority="750" id="2836">
-                                            <rect key="frame" x="31" y="1044" width="76" height="17"/>
+                                            <rect key="frame" x="29" y="1044" width="76" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Module Type:" id="2895">
                                                 <font key="font" metaFont="label"/>
@@ -517,7 +522,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" id="2838">
-                                            <rect key="frame" x="103" y="1044" width="75" height="17"/>
+                                            <rect key="frame" x="111" y="1044" width="75" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="--- " id="2896">
                                                 <font key="font" metaFont="label"/>
@@ -4062,13 +4067,103 @@
                                                 </tabViewItem>
                                             </tabViewItems>
                                         </tabView>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="job-xX-mKu">
+                                            <rect key="frame" x="33" y="1010" width="45" height="14"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="---" id="Cs6-tX-AVi">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="j2D-0d-BkD">
+                                            <rect key="frame" x="31" y="1018" width="101" height="20"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Module Revision:" id="c8q-Zc-2Zp">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="MwE-XN-hmD">
+                                            <rect key="frame" x="31" y="963" width="74" height="17"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Temperature:" id="euG-yb-bwe">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="SDY-xe-J49">
+                                            <rect key="frame" x="100" y="966" width="38" height="14"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="--" id="JIQ-M0-mqq">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="jn4-M1-wMN">
+                                            <rect key="frame" x="142" y="966" width="13" height="14"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="C" id="gkr-uQ-6x8">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="eaf-CK-xge">
+                                            <rect key="frame" x="66" y="1010" width="106" height="14"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="---" id="MMA-eS-nSK">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="xbr-Wl-NfI">
+                                            <rect key="frame" x="31" y="1037" width="101" height="14"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Hardware Version:" id="Mea-Mw-RcQ">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="SrF-hQ-tct">
+                                            <rect key="frame" x="132" y="1037" width="46" height="14"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="---" id="pjC-X1-kAE">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="XkZ-Ih-GrO">
+                                            <rect key="frame" x="31" y="992" width="83" height="14"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Serial Number:" id="0md-el-DFm">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="CrN-pW-VP5">
+                                            <rect key="frame" x="111" y="992" width="61" height="14"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="---" id="EaW-Jc-xv7">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
                                     </subviews>
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Rates" identifier="" id="1338">
                                 <view key="view" id="1340">
                                     <rect key="frame" x="10" y="25" width="936" height="1130"/>
-                                    <autoresizingMask key="autoresizingMask"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box title="Integration Time (s)" boxType="secondary" borderType="bezel" titlePosition="noTitle" id="1341">
                                             <rect key="frame" x="658" y="955" width="94" height="34"/>
@@ -4433,7 +4528,7 @@
             <connections>
                 <outlet property="delegate" destination="-2" id="308"/>
             </connections>
-            <point key="canvasLocation" x="173.5" y="748.5"/>
+            <point key="canvasLocation" x="197" y="748.5"/>
         </window>
         <customObject id="387" userLabel="OHexFormatter" customClass="OHexFormatter"/>
         <window title="Panel" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="1483" userLabel="Panel" customClass="NSPanel">
@@ -4520,6 +4615,7 @@
                     </textField>
                 </subviews>
             </view>
+            <point key="canvasLocation" x="711" y="467.5"/>
         </window>
     </objects>
     <resources>

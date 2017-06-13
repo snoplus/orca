@@ -2,7 +2,7 @@
 // NKDPostgreSQLResultset.m
 // -----------------------------------------------------------------------------------
 //  Created by Jeff LaMarche on Sat Jul 13 2002.
-//  ©2002 Naked Software. All rights reserved.
+//  ï¿½2002 Naked Software. All rights reserved.
 // -----------------------------------------------------------------------------------
 // THIS	SOURCE CODE IS PROVIDED AS-IS WITH NO WARRANTY OF ANY KIND
 // -----------------------------------------------------------------------------------
@@ -28,16 +28,16 @@
     for (field=0; field <numFields; field++)
     {
         NSMutableArray    *array = [NSMutableArray arrayWithCapacity:numRows];
-        [fields setObject:[NSString stringWithCString: PQfname(inRes, field)] forKey: [NSNumber numberWithInt:field]];
+        [fields setObject:[NSString stringWithCString: PQfname(inRes, field) encoding:NSASCIIStringEncoding] forKey: [NSNumber numberWithInt:field]];
 
         for (row=0;row < numRows; row++)
 	    if (! PQgetisnull(inRes, row, field))
-		[array addObject:[NSString stringWithCString:PQgetvalue(inRes, row, field)]];
+		[array addObject:[NSString stringWithCString:PQgetvalue(inRes, row, field) encoding:NSASCIIStringEncoding]];
 	    else
 		[array addObject:[NSNull null]];
 	
 
-        [columns setObject:array forKey:[NSString stringWithCString: PQfname(inRes, field)]];
+        [columns setObject:array forKey:[NSString stringWithCString: PQfname(inRes, field) encoding:NSASCIIStringEncoding]];
     }
 
     [rset _setResults:columns];

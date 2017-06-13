@@ -86,8 +86,8 @@
         [[tauFactorMatrix           cellAtRow:i column:0] setTag:i];
         [[gapTimeMatrix             cellAtRow:i column:0] setTag:i];
         [[peakingTimeMatrix         cellAtRow:i column:0] setTag:i];
-	}
-    for(i=0;i<kNumSIS3316Channels/4;i++){
+	}  
+    for(i=0;i<kNumSIS3316Groups;i++){
         [[activeTrigGateWindowLenMatrix cellAtRow:i column:0] setFormatter:numberFormatter];
         [[activeTrigGateWindowLenMatrix cellAtRow:i column:0] setTag:i];
         [[preTriggerDelayMatrix cellAtRow:i column:0] setFormatter:numberFormatter];
@@ -140,7 +140,7 @@
     
     [notifyCenter addObserver : self
                      selector : @selector(settingsLockChanged:)
-                         name : ORRunStatusChangedNotification
+                         name : ORRunStatusChangedNotification  //kControlStatusReg? 6.1?
                        object : nil];
     
     [notifyCenter addObserver : self
@@ -413,6 +413,23 @@
                      selector : @selector(moduleIDChanged:)
                          name : ORSIS3316IDChanged
 						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(hwVersionChanged:)
+                         name : ORSIS3316HWVersionChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(temperatureChanged:)
+                         name : ORSIS3316TemperatureChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(serialNumberChanged:)
+                         name : ORSIS3316SerialNumberChanged
+                        object: model];
+    
+    
 }
 
 - (void) registerRates
@@ -500,6 +517,8 @@
 	[self csrChanged:nil];
 	[self acqChanged:nil];
 	[self moduleIDChanged:nil];
+    [self hwVersionChanged:nil];
+    [self serialNumberChanged:nil];
     
     [self setUpdatedOnce]; //<<--Must be last to ensure all fields are updated on first load
 }
@@ -568,7 +587,6 @@
 	[[acqMatrix cellWithTag:4] setIntValue:[model lemoStartStop]];
 	[[acqMatrix cellWithTag:5] setIntValue:[model p2StartStop]];
 	[[acqMatrix cellWithTag:6] setIntValue:[model gateMode]];
-	[startDelayEnabledButton setIntValue: [model startDelayEnabled]];
 	[stopDelayEnabledButton setIntValue: [model stopDelayEnabled]];
 }
 
@@ -577,6 +595,27 @@
 	unsigned short moduleID = [model moduleID];
 	if(moduleID) [moduleIDField setStringValue:[NSString stringWithFormat:@"%x",moduleID]];
 	else		 [moduleIDField setStringValue:@"---"];
+    
+    NSString* revision = [model revision];
+    if(revision) [revisionField setStringValue:revision];
+    else		 [revisionField setStringValue:@"---"];
+    
+    if( [model majorRevision] == 0x20)   [gammaRevisionField setStringValue:@"Gamma Revision"];
+    else                            [gammaRevisionField setStringValue:@""];
+
+}
+
+- (void) hwVersionChanged: (NSNotification*)aNote
+{
+    unsigned short readHWVersion = [model hwVersion];
+    if(readHWVersion) [hwVersionField setStringValue: [NSString stringWithFormat:@"%x",readHWVersion]];
+}
+
+- (void) serialNumberChanged: (NSNotification*)aNote
+{
+    unsigned short readSerialNumber = [model serialNumber];
+    if(readSerialNumber) [serialNumberField setStringValue:[NSString stringWithFormat:@"%x",readSerialNumber]];
+    else [serialNumberField setStringValue:@""];
 }
 
 - (void) eventConfigChanged:(NSNotification*)aNote
@@ -666,7 +705,6 @@
 	[eventConfigMatrix		setEnabled:!locked && !runInProgress];
 	[stopTriggerButton		setEnabled:!lockedOrRunningMaintenance];
 	[randomClockButton		setEnabled:!lockedOrRunningMaintenance];
-	[startDelayEnabledButton setEnabled:!lockedOrRunningMaintenance];
 	[stopDelayEnabledButton setEnabled:!lockedOrRunningMaintenance];
 	[startDelayField		setEnabled:!lockedOrRunningMaintenance];
 	[clockSourcePU			setEnabled:!lockedOrRunningMaintenance];
@@ -701,6 +739,12 @@
     }
 }
 
+- (void) temperatureChanged:(NSNotification*)aNotification
+{
+    [temperatureField setFloatValue: [model temperature]];
+    if ([model temperature] >= 51 ) [temperatureField setTextColor: [NSColor redColor] ];
+    else                            [temperatureField setTextColor: [NSColor blackColor] ];
+}
 
 - (void) scaleAction:(NSNotification*)aNotification
 {
@@ -977,8 +1021,7 @@
 		case 4: [model setLemoStartStop:state];		break; 
 		case 5: [model setP2StartStop:state];		break; 
 		case 6: [model setGateMode:state];			break; 
-		case 7: [model setStartDelayEnabled:state];			break; 
-		case 8: [model setStopDelayEnabled:state];			break; 
+		case 8: [model setStopDelayEnabled:state];			break;
 		default: break;
 	}
 }
@@ -1011,6 +1054,7 @@
         [model readModuleID:YES];
         [model readHWVersion:YES];
         [model readSerialNumber:YES];
+        [model readTemperature:YES];
 	}
 	@catch (NSException* localException) {
 		NSLog(@"Probe of SIS 3300 board ID failed\n");
@@ -1027,10 +1071,6 @@
 	[model setRandomClock:[sender intValue]];	
 }
 
-- (IBAction) startDelayEnabledAction:(id)sender
-{
-	[model setStartDelayEnabled:[sender intValue]];	
-}
 
 - (IBAction) stopDelayEnabledAction:(id)sender
 {

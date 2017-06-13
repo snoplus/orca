@@ -22,8 +22,6 @@
 #import "ORGlobal.h"
 #import "ORCrate.h"
 #import "ORKatrinV4SLTModel.h"
-//#import "ORIpeFLTModel.h"
-//#import "ORIpeCrateModel.h"
 #import "ORIpeV4CrateModel.h"
 #import "ORKatrinV4SLTDefs.h"
 #import "ORKatrinV4FLTModel.h"
@@ -32,173 +30,50 @@
 #import "TimedWorker.h"
 #import "ORDataTypeAssigner.h"
 #import "PMC_Link.h"
-//#import "../SLTv4_Readout_Code/SLTv4_HW_Definitions.h"  //TODO: use own file name 2014 -tb-
-#import "SLTv4_HW_Definitions.h"  //TODO: use own file name 2014 -tb-
+#import "SLTv4_HW_Definitions.h"
 #import "ORPMCReadWriteCommand.h"
 #import "SLTv4GeneralOperations.h"
-
 #import "ORTaskSequence.h"
 #import "ORFileMover.h"
 
-#if 0
-//IPE V4 register definitions
-//MOVED TO .h FILE !!!!!!!!!!!!!!!!     <---------------- NOTE!
-enum KatrinSLTV4Enum {
-	kKatrinV4SLTControlReg,
-	kKatrinV4SLTStatusReg,
-	kKatrinV4SLTCommandReg,
-	kKatrinV4SLTInterruptReguestReg,
-	kKatrinV4SLTInterruptMaskReg,
-	kKatrinV4SLTRequestSemaphoreReg,
-	kKatrinV4SLTHWRevisionReg,
-	kKatrinV4SLTPixelBusErrorReg,
-	kKatrinV4SLTPixelBusEnableReg,
-    //Auger Registers Removed for Bipolar Filter Upgrade 2013 -tb-
-    /*       these 3 were actually never used -tb-
-	kKatrinV4SLTPixelBusTestReg,
-	kKatrinV4SLTAuxBusTestReg,
-	kKatrinV4SLTDebugStatusReg,
-    */
-	kKatrinV4SLTVetoCounterHiReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-	kKatrinV4SLTVetoCounterLoReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-	kKatrinV4SLTDeadTimeCounterHiReg,	//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-	kKatrinV4SLTDeadTimeCounterLoReg,	//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-								//TODO: and dead time and veto time counter are confused, too -tb-
-	kKatrinV4SLTRunCounterHiReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-	kKatrinV4SLTRunCounterLoReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-	kKatrinV4SLTSecondSetReg,
-	kKatrinV4SLTSecondCounterReg,
-	kKatrinV4SLTSubSecondCounterReg,
-	kKatrinV4SLTPageManagerReg,
-	kKatrinV4SLTTriggerTimingReg,
-	kKatrinV4SLTPageSelectReg,
-	kKatrinV4SLTNumberPagesReg,
-	kKatrinV4SLTPageNumbersReg,
-	kKatrinV4SLTEventStatusReg,
-	kKatrinV4SLTReadoutCSRReg,
-	kKatrinV4SLTBufferSelectReg,
-	kKatrinV4SLTReadoutDefinitionReg,
-	kKatrinV4SLTTPTimingReg,
-	kKatrinV4SLTTPShapeReg,
-	kKatrinV4SLTi2cCommandReg,
-	kKatrinV4SLTepcsCommandReg,
-	kKatrinV4SLTBoardIDLoReg,
-	kKatrinV4SLTBoardIDHiReg,
-	kKatrinV4SLTPROMsControlReg,
-	kKatrinV4SLTPROMsBufferReg,
-	kKatrinV4SLTDataFIFOReg,
-	kKatrinV4SLTFIFOModeReg,           //    <-------------- //TODO: new for SLT bipolar -tb-
-	kKatrinV4SLTFIFOStatusReg,
-	kKatrinV4SLTPAEOffsetReg,
-	kKatrinV4SLTPAFOffsetReg,
-	kKatrinV4SLTFIFOCsrReg,
-	kKatrinV4SLTFIFOxRequestReg,
-	kKatrinV4SLTFIFOMaskReg,
-	kKatrinV4SLTNumRegs //must be last
-};
-#endif
 
+#pragma mark ***Notification Strings
+NSString* ORKatrinV4SLTModelPixelBusEnableRegChanged        = @"ORKatrinV4SLTModelPixelBusEnableRegChanged";
+NSString* ORKatrinV4SLTModelSecondsSetSendToFLTsChanged     = @"ORKatrinV4SLTModelSecondsSetSendToFLTsChanged";
+NSString* ORKatrinV4SLTModelSecondsSetInitWithHostChanged   = @"ORKatrinV4SLTModelSecondsSetInitWithHostChanged";
+NSString* ORKatrinV4SLTModelSltScriptArgumentsChanged       = @"ORKatrinV4SLTModelSltScriptArgumentsChanged";
+NSString* ORKatrinV4SLTModelCountersEnabledChanged          = @"ORKatrinV4SLTModelCorntersEnabledChanged";
+NSString* ORKatrinV4SLTModelClockTimeChanged                = @"ORKatrinV4SLTModelClockTimeChanged";
+NSString* ORKatrinV4SLTModelRunTimeChanged                  = @"ORKatrinV4SLTModelRunTimeChanged";
+NSString* ORKatrinV4SLTModelVetoTimeChanged                 = @"ORKatrinV4SLTModelVetoTimeChanged";
+NSString* ORKatrinV4SLTModelDeadTimeChanged                 = @"ORKatrinV4SLTModelDeadTimeChanged";
+NSString* ORKatrinV4SLTModelSecondsSetChanged               = @"ORKatrinV4SLTModelSecondsSetChanged";
+NSString* ORKatrinV4SLTModelStatusRegChanged                = @"ORKatrinV4SLTModelStatusRegChanged";
+NSString* ORKatrinV4SLTModelControlRegChanged               = @"ORKatrinV4SLTModelControlRegChanged";
+NSString* ORKatrinV4SLTModelFanErrorChanged                 = @"ORKatrinV4SLTModelFanErrorChanged";
+NSString* ORKatrinV4SLTModelVttErrorChanged                 = @"ORKatrinV4SLTModelVttErrorChanged";
+NSString* ORKatrinV4SLTModelGpsErrorChanged                 = @"ORKatrinV4SLTModelGpsErrorChanged";
+NSString* ORKatrinV4SLTModelClockErrorChanged               = @"ORKatrinV4SLTModelClockErrorChanged";
+NSString* ORKatrinV4SLTModelPpsErrorChanged                 = @"ORKatrinV4SLTModelPpsErrorChanged";
+NSString* ORKatrinV4SLTModelPixelBusErrorChanged            = @"ORKatrinV4SLTModelPixelBusErrorChanged";
+NSString* ORKatrinV4SLTModelHwVersionChanged                = @"ORKatrinV4SLTModelHwVersionChanged";
 
-IpeRegisterNamesStruct regKatrinSLTV4[kKatrinV4SLTNumRegs] = {
-{@"Control",			0xa80000,		1,			kIpeRegReadable | kIpeRegWriteable  },
-{@"Status",				0xa80004,		1,			kIpeRegReadable | kIpeRegWriteable  },
-{@"Command",			0xa80008,		1,			kIpeRegWriteable                    },
-{@"Interrupt Reguest",	0xA8000C,		1,			kIpeRegReadable                     },
-{@"Interrupt Mask",		0xA80010,		1,			kIpeRegReadable | kIpeRegWriteable  },
-{@"Request Semaphore",	0xA80014,		3,			kIpeRegReadable                     },
-{@"HWRevision",			0xa80020,		1,			kIpeRegReadable                     },
-{@"Pixel Bus Error",	0xA80024,		1,			kIpeRegReadable                     },
-{@"Pixel Bus Enable",	0xA80028,		1, 			kIpeRegReadable | kIpeRegWriteable  },
-//Auger Registers Removed for Bipolar Filter Upgrade 2013 -tb-
-/*    these 3 were actually never used -tb-
-{@"Pixel Bus Test",		0xA8002C, 		1, 			kIpeRegReadable | kIpeRegWriteable  },
-{@"Aux Bus Test",		0xA80030, 		1, 			kIpeRegReadable | kIpeRegWriteable  },
-{@"Debug Status",		0xA80034,  		1, 			kIpeRegReadable | kIpeRegWriteable  },
-*/
-{@"Veto Counter (MSB)",	0xA80080, 		1,			kIpeRegReadable                     },
-{@"Veto Counter (LSB)",	0xA80084,		1,			kIpeRegReadable                     },
-{@"Dead Counter (MSB)",	0xA80088, 		1,			kIpeRegReadable                     },
-{@"Dead Counter (LSB)",	0xA8008C, 		1,			kIpeRegReadable                     },
-{@"Run Counter  (MSB)",	0xA80090,		1,			kIpeRegReadable                     },
-{@"Run Counter  (LSB)",	0xA80094, 		1,			kIpeRegReadable                     },
-{@"Second Set",			0xB00000,  		1, 			kIpeRegReadable | kIpeRegWriteable  },
-{@"Second Counter",		0xB00004, 		1,			kIpeRegReadable                     },
-{@"Sub-second Counter",	0xB00008, 		1,			kIpeRegReadable                     },
-//Auger Registers Removed for Bipolar Filter Upgrade 2013 -tb-
-/*      they were actually never used for KATRIN, but will result in Pbus timeouts -tb-
-{@"Page Manager",		0xB80000,  		1, 			kIpeRegReadable | kIpeRegWriteable  },
-{@"Trigger Timing",		0xB80004,  		1, 			kIpeRegReadable | kIpeRegWriteable  },
-*/
-{@"Page Select",		0xB80008, 		1,			kIpeRegReadable                     },
-/*
-{@"Number of Pages",	0xB8000C, 		1,			kIpeRegReadable                     },
-{@"Page Numbers",		0xB81000,		64, 		kIpeRegReadable | kIpeRegWriteable  },
-{@"Event Status",		0xB82000,		64,			kIpeRegReadable                     },
-{@"Readout CSR",		0xC00000,		1,			kIpeRegReadable | kIpeRegWriteable  },
-{@"Buffer Select",		0xC00004,		1,			kIpeRegReadable | kIpeRegWriteable  },
-{@"Readout Definition",	0xC10000,	  2048,			kIpeRegReadable | kIpeRegWriteable  },
-*/
-{@"TP Timing",			0xC80000,	   128,			kIpeRegReadable | kIpeRegWriteable  },
-{@"TP Shape",			0xC81000,	   512,			kIpeRegReadable | kIpeRegWriteable  },
-{@"I2C Command",		0xC00000,		1,			kIpeRegReadable                     },  //was 0xD00000 (Auger)
-{@"EPC Command",		0xC00004,		1,			kIpeRegReadable | kIpeRegWriteable  },  //was 0xD00004 (Auger)
-{@"Board ID (LSB)",		0xC00008,		1,			kIpeRegReadable                     },  //was 0xD00008 (Auger)
-{@"Board ID (MSB)",		0xC0000C,		1,			kIpeRegReadable                     },  //was 0xD0000C (Auger)
-{@"PROMs Control",		0xC00010,		1,			kIpeRegReadable | kIpeRegWriteable  },  //was 0xD00010 (Auger)
-{@"PROMs Buffer",		0xC00100,		256,		kIpeRegReadable | kIpeRegWriteable  },  //was 0xD00100 (Auger)
-{@"DataFIFO",		    0xD00000,	  0x10000,		kIpeRegReadable | kIpeRegWriteable  },
-{@"FIFO Mode",			0xE00000,	    1,	    	kIpeRegReadable | kIpeRegWriteable  },
-{@"FIFO Status",		0xE00004,	    1,	    	kIpeRegReadable | kIpeRegWriteable  },
-{@"PAE Offset",		    0xE00008,	    1,	    	kIpeRegReadable | kIpeRegWriteable  },
-{@"PAF Offset",		    0xE0000C,	    1,	    	kIpeRegReadable | kIpeRegWriteable  },
-{@"FIFO Csr",		    0xE00010,	    1,	    	kIpeRegReadable | kIpeRegWriteable  },
-{@"FIFOx Request",		0xE00014,	    1,	    	kIpeRegReadable | kIpeRegWriteable  },
-{@"FIFO Mask",		    0xE00018,	    1,	    	kIpeRegReadable | kIpeRegWriteable  },
+NSString* ORKatrinV4SLTModelPatternFilePathChanged          = @"ORKatrinV4SLTModelPatternFilePathChanged";
+NSString* ORKatrinV4SLTModelInterruptMaskChanged            = @"ORKatrinV4SLTModelInterruptMaskChanged";
+NSString* ORKatrinV4SLTPulserDelayChanged                   = @"ORKatrinV4SLTPulserDelayChanged";
+NSString* ORKatrinV4SLTPulserAmpChanged                     = @"ORKatrinV4SLTPulserAmpChanged";
+NSString* ORKatrinV4SLTSettingsLock                         = @"ORKatrinV4SLTSettingsLock";
+NSString* ORKatrinV4SLTStatusRegChanged                     = @"ORKatrinV4SLTStatusRegChanged";
+NSString* ORKatrinV4SLTControlRegChanged                    = @"ORKatrinV4SLTControlRegChanged";
+NSString* ORKatrinV4SLTSelectedRegIndexChanged              = @"ORKatrinV4SLTSelectedRegIndexChanged";
+NSString* ORKatrinV4SLTWriteValueChanged                    = @"ORKatrinV4SLTWriteValueChanged";
+NSString* ORKatrinV4SLTModelNextPageDelayChanged            = @"ORKatrinV4SLTModelNextPageDelayChanged";
+NSString* ORKatrinV4SLTModelPollRateChanged                 = @"ORKatrinV4SLTModelPollRateChanged";
 
-//{@"ADC Data",			0xE00000,	 0x8000,		kIpeRegReadable | kIpeRegWriteable }, //OBSOLETE (Auger)
-//{@"Data Block RW",		0xF00000 Data Block RW
-//{@"Data Block Length",	0xF00004 Data Block Length 
-//{@"Data Block Address",	0xF00008 Data Block Address
-};
-
-#pragma mark ***External Strings
-
-NSString* ORKatrinV4SLTModelPixelBusEnableRegChanged = @"ORKatrinV4SLTModelPixelBusEnableRegChanged";
-NSString* ORKatrinV4SLTModelSecondsSetSendToFLTsChanged = @"ORKatrinV4SLTModelSecondsSetSendToFLTsChanged";
-NSString* ORKatrinV4SLTModelSecondsSetInitWithHostChanged = @"ORKatrinV4SLTModelSecondsSetInitWithHostChanged";
-NSString* ORKatrinV4SLTModelSltScriptArgumentsChanged = @"ORKatrinV4SLTModelSltScriptArgumentsChanged";
-NSString* ORKatrinV4SLTModelCountersEnabledChanged = @"ORKatrinV4SLTModelCorntersEnabledChanged";
-NSString* ORKatrinV4SLTModelClockTimeChanged = @"ORKatrinV4SLTModelClockTimeChanged";
-NSString* ORKatrinV4SLTModelRunTimeChanged = @"ORKatrinV4SLTModelRunTimeChanged";
-NSString* ORKatrinV4SLTModelVetoTimeChanged = @"ORKatrinV4SLTModelVetoTimeChanged";
-NSString* ORKatrinV4SLTModelDeadTimeChanged = @"ORKatrinV4SLTModelDeadTimeChanged";
-NSString* ORKatrinV4SLTModelSecondsSetChanged		= @"ORKatrinV4SLTModelSecondsSetChanged";
-NSString* ORKatrinV4SLTModelStatusRegChanged		= @"ORKatrinV4SLTModelStatusRegChanged";
-NSString* ORKatrinV4SLTModelControlRegChanged		= @"ORKatrinV4SLTModelControlRegChanged";
-NSString* ORKatrinV4SLTModelFanErrorChanged		= @"ORKatrinV4SLTModelFanErrorChanged";
-NSString* ORKatrinV4SLTModelVttErrorChanged		= @"ORKatrinV4SLTModelVttErrorChanged";
-NSString* ORKatrinV4SLTModelGpsErrorChanged		= @"ORKatrinV4SLTModelGpsErrorChanged";
-NSString* ORKatrinV4SLTModelClockErrorChanged		= @"ORKatrinV4SLTModelClockErrorChanged";
-NSString* ORKatrinV4SLTModelPpsErrorChanged		= @"ORKatrinV4SLTModelPpsErrorChanged";
-NSString* ORKatrinV4SLTModelPixelBusErrorChanged	= @"ORKatrinV4SLTModelPixelBusErrorChanged";
-NSString* ORKatrinV4SLTModelHwVersionChanged		= @"ORKatrinV4SLTModelHwVersionChanged";
-
-NSString* ORKatrinV4SLTModelPatternFilePathChanged		= @"ORKatrinV4SLTModelPatternFilePathChanged";
-NSString* ORKatrinV4SLTModelInterruptMaskChanged		= @"ORKatrinV4SLTModelInterruptMaskChanged";
-NSString* ORKatrinV4SLTPulserDelayChanged				= @"ORKatrinV4SLTPulserDelayChanged";
-NSString* ORKatrinV4SLTPulserAmpChanged				= @"ORKatrinV4SLTPulserAmpChanged";
-NSString* ORKatrinV4SLTSettingsLock					= @"ORKatrinV4SLTSettingsLock";
-NSString* ORKatrinV4SLTStatusRegChanged				= @"ORKatrinV4SLTStatusRegChanged";
-NSString* ORKatrinV4SLTControlRegChanged				= @"ORKatrinV4SLTControlRegChanged";
-NSString* ORKatrinV4SLTSelectedRegIndexChanged			= @"ORKatrinV4SLTSelectedRegIndexChanged";
-NSString* ORKatrinV4SLTWriteValueChanged				= @"ORKatrinV4SLTWriteValueChanged";
-NSString* ORKatrinV4SLTModelNextPageDelayChanged		= @"ORKatrinV4SLTModelNextPageDelayChanged";
-NSString* ORKatrinV4SLTModelPollRateChanged			= @"ORKatrinV4SLTModelPollRateChanged";
-
-NSString* ORKatrinV4SLTModelPageSizeChanged			= @"ORKatrinV4SLTModelPageSizeChanged";
-NSString* ORKatrinV4SLTModelDisplayTriggerChanged		= @"ORKatrinV4SLTModelDisplayTrigerChanged";
-NSString* ORKatrinV4SLTModelDisplayEventLoopChanged	= @"ORKatrinV4SLTModelDisplayEventLoopChanged";
-NSString* ORKatrinV4SLTcpuLock							= @"ORKatrinV4SLTcpuLock";
+NSString* ORKatrinV4SLTModelPageSizeChanged                 = @"ORKatrinV4SLTModelPageSizeChanged";
+NSString* ORKatrinV4SLTModelDisplayTriggerChanged           = @"ORKatrinV4SLTModelDisplayTrigerChanged";
+NSString* ORKatrinV4SLTModelDisplayEventLoopChanged         = @"ORKatrinV4SLTModelDisplayEventLoopChanged";
+NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpuLock";
 
 @interface ORKatrinV4SLTModel (private)
 - (unsigned long) read:(unsigned long) address;
@@ -264,9 +139,9 @@ NSString* ORKatrinV4SLTcpuLock							= @"ORKatrinV4SLTcpuLock";
 	}
 }
 
-- (void) setUpImage			{ [self setImage:[NSImage imageNamed:@"KatrinV4SLTCard"]]; }
+- (void) setUpImage			{ [self setImage:[NSImage imageNamed:@"KatrinV4SLTCard"]];  }
 - (void) makeMainController	{ [self linkToController:@"ORKatrinV4SLTController"];		}
-- (Class) guardianClass		{ return NSClassFromString(@"ORIpeV4CrateModel");		}
+- (Class) guardianClass		{ return NSClassFromString(@"ORIpeV4CrateModel");           }
 
 - (void) setGuardian:(id)aGuardian //-tb-
 {
@@ -286,22 +161,7 @@ NSString* ORKatrinV4SLTcpuLock							= @"ORKatrinV4SLTcpuLock";
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
 	[notifyCenter removeObserver:self];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(runIsAboutToStart:)
-                         name : ORRunAboutToStartNotification
-                       object : nil];
 	
-    [notifyCenter addObserver : self
-                     selector : @selector(runStarted:)
-                         name : ORRunStartedNotification
-                       object : nil];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(runIsStopped:)
-                         name : ORRunStoppedNotification
-                       object : nil];
-
     [notifyCenter addObserver : self
                      selector : @selector(runIsBetweenSubRuns:)
                          name : ORRunBetweenSubRunsNotification
@@ -311,12 +171,6 @@ NSString* ORKatrinV4SLTcpuLock							= @"ORKatrinV4SLTcpuLock";
                      selector : @selector(runIsStartingSubRun:)
                          name : ORRunStartSubRunNotification
                        object : nil];
-
-   //TODO: testing the sequence of notifications -tb- 2013-05-15
-   [notifyCenter addObserver : self
-                    selector : @selector(runIsAboutToChangeState:)
-                        name : ORRunAboutToChangeState
-                      object : nil];
 }
 
 
@@ -554,110 +408,18 @@ NSString* ORKatrinV4SLTcpuLock							= @"ORKatrinV4SLTcpuLock";
     [self setPoller:[TimedWorker TimeWorkerWithInterval:anInterval]];
 }
 
-
-
-//#define SHOW_RUN_NOTIFICATIONS_AND_CALLS 1
-- (void) runIsAboutToStart:(NSNotification*)aNote
-{
-    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
-        //DEBUG
-                 NSLog(@"%@::%@  <-----------------N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
-    #endif
-	//TODO: reset of timers probably should be done here -tb-2011-01
-	#if 0 
-		NSLog(@"%@::%@  called!  <---N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: debug -tb-
-	#endif
-}
-
-- (void) runStarted:(NSNotification*)aNote
-{
-    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
-        //DEBUG
-                 NSLog(@"%@::%@  <-----------------N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
-    #endif
-	#if 0
-		NSLog(@"%@::%@  called!  <----N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: debug -tb-
-	#endif
-}
-
-- (void) runIsStopped:(NSNotification*)aNote
-{	
-    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
-        //DEBUG
-                 NSLog(@"%@::%@  <-----------------N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
-    #endif
-	//NSLog(@"%@::%@  [readOutGroup count] is %i!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[readOutGroup count]);//TODO: debug -tb-
-
-	//writing the SLT time counters is done in runTaskStopped:userInfo:   -tb-
-	//see SBC_Link.m, runIsStopping:userInfo:: if(runInfo.amountInBuffer > 0)... this is data sent out during 'Stop()...' of readout code, e.g.
-	//the histogram (2060 int32_t's per histogram and one extra word) -tb-
-
-	// Stop all activities by software inhibit
-	//if([readOutGroup count] == 0){//TODO: I don't understand this - remove it? -tb-
-	//	[self writeSetInhibit];
-	//}
-	
-}
-
 - (void) runIsBetweenSubRuns:(NSNotification*)aNote
 {
-    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
-        //DEBUG
-                 NSLog(@"%@::%@  <-----------------N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
-    #endif
-	//NSLog(@"%@::%@  called!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: debug -tb-
 	[self shipSltSecondCounter: kStopSubRunType];
-	[self shipSltRunCounter: kStopSubRunType];
+	[self shipSltRunCounter:    kStopSubRunType];
 	//TODO: I could set inhibit to measure the 'netto' run time precisely -tb-
 }
 
 
 - (void) runIsStartingSubRun:(NSNotification*)aNote
 {
-    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
-        //DEBUG
-                 NSLog(@"%@::%@  <-----------------N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
-    #endif
-	//NSLog(@"%@::%@  called!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));
 	[self shipSltSecondCounter: kStartSubRunType];
-	[self shipSltRunCounter: kStartSubRunType];
-}
-
-
-- (void) runIsAboutToChangeState:(NSNotification*)aNote
-{
-    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
-        //DEBUG
-                 NSLog(@"%@::%@ Called runIsAboutToChangeState --- SLT <-------------------------N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
-    #endif
-                 
-    //int state = [[[aNote userInfo] objectForKey:@"State"] intValue];
-    
-    //NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
-    //NSLog(@"Called %@::%@   aNote:>>>%@<<<\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aNote);//DEBUG -tb-
-	//aNote: >>>NSConcreteNotification 0x5a552d0 {name = ORRunAboutToChangeState; object = (ORRunModel,1) Decoders: ORRunDecoderForRun
-    // Connectors: "Run Control Connector"  ; userInfo = {State = 4;}}<<<
-	// states: 2,3,4: 2=starting, 3=stopping, 4=between subruns (0 = eRunStopped, 1 = eRunInProgress); see ORGlobal.h, enum 'eRunState'
-
-    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
-	/**/
-	id rc =  [aNote object];
-    NSLog(@"%@::%@ Calling object %@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),NSStringFromClass([rc class]));//DEBUG -tb-
-	switch (state) {
-		case eRunStarting://=2
-            NSLog(@"   Notification: go to  %@\n",@"eRunStarting");//DEBUG -tb-
-			break;
-		case eRunBetweenSubRuns://=4
-            NSLog(@"   Notification: go to  %@\n",@"eRunBetweenSubRuns");//DEBUG -tb-
-			break;
-		case eRunStopping://=3
-            NSLog(@"   Notification: go to  %@\n",@"eRunStopping");//DEBUG -tb-
-			break;
-		default:
-			break;
-	}
-	/**/
-    #endif
+	[self shipSltRunCounter:    kStartSubRunType];
 }
 
 #pragma mark •••Accessors
@@ -765,17 +527,17 @@ NSString* ORKatrinV4SLTcpuLock							= @"ORKatrinV4SLTcpuLock";
 
 - (NSString*) getRegisterName: (short) anIndex
 {
-    return regKatrinSLTV4[anIndex].regName;
+    return [katrinV4SLTRegisters registerName:anIndex];
 }
 
 - (unsigned long) getAddress: (short) anIndex
 {
-    return( regKatrinSLTV4[anIndex].addressOffset>>2);
+    return [katrinV4SLTRegisters address:anIndex];
 }
 
 - (short) getAccessType: (short) anIndex
 {
-	return regKatrinSLTV4[anIndex].accessType;
+	return [katrinV4SLTRegisters accessType:anIndex];
 }
 
 - (unsigned short) selectedRegIndex
@@ -846,14 +608,12 @@ NSString* ORKatrinV4SLTcpuLock							= @"ORKatrinV4SLTcpuLock";
 
 - (void) setPageSize: (unsigned long) aPageSize
 {
-	
 	[[[self undoManager] prepareWithInvocationTarget:self] setPageSize:pageSize];
 	
     if (aPageSize > 100) pageSize = 100;
 	else pageSize = aPageSize;
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4SLTModelPageSizeChanged object:self];
-	
 }  
 
 /*! Send a script to the PrPMC which will configure the PrPMC.
@@ -861,67 +621,19 @@ NSString* ORKatrinV4SLTcpuLock							= @"ORKatrinV4SLTcpuLock";
  */
 - (void) sendSimulationConfigScriptON
 {
-	NSLog(@"%@::%@: invoked.\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));
-	//example code to send a script:  SBC_Link.m: - (void) installDriver:(NSString*)rootPwd 
-	
-	//[self sendPMCCommandScript: @"SimulationConfigScriptON"];
-	[self sendPMCCommandScript: [NSString stringWithFormat:@"%@ %i",@"SimulationConfigScriptON",[pmcLink portNumber]]];//send the port number, too
-
-	#if 0
-	NSString *scriptName = @"KatrinV4SLTScript";
-		ORTaskSequence* aSequence;	
-		aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
-		NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
-		
-		NSString* driverCodePath; //[pmcLink ]
-		if([pmcLink loadMode])driverCodePath = [[pmcLink filePath] stringByAppendingPathComponent:[self sbcLocalCodePath]];
-		else driverCodePath = [resourcePath stringByAppendingPathComponent:[self codeResourcePath]];
-		//driverCodePath = [driverCodePath stringByAppendingPathComponent:[delegate driverScriptName]];
-		driverCodePath = [driverCodePath stringByAppendingPathComponent: scriptName];
-		ORFileMover* driverScriptFileMover = [[ORFileMover alloc] init];//TODO: keep it as object in the class variables -tb-
-		[driverScriptFileMover setDelegate:aSequence];
-NSLog(@"loadMode: %i driverCodePath: %@ \n",[pmcLink loadMode], driverCodePath);		
-		[driverScriptFileMover setMoveParams:[driverCodePath stringByExpandingTildeInPath]
-										to:@"" 
-								remoteHost:[pmcLink IPNumber] 
-								  userName:[pmcLink userName] 
-								  passWord:[pmcLink passWord]];
-		[driverScriptFileMover setVerbose:YES];
-		[driverScriptFileMover doNotMoveFilesToSentFolder];
-		[driverScriptFileMover setTransferType:eUseSCP];
-		[aSequence addTaskObj:driverScriptFileMover];
-		
-		//NSString* scriptRunPath = [NSString stringWithFormat:@"/home/%@/%@",[pmcLink userName],scriptName];
-		NSString* scriptRunPath = [NSString stringWithFormat:@"~/%@",scriptName];
-NSLog(@"  scriptRunPath: %@ \n" , scriptRunPath);		
-		[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
-				 arguments:[NSArray arrayWithObjects:[pmcLink userName],[pmcLink passWord],[pmcLink IPNumber],scriptRunPath,
-				 //@"arg1",@"arg2",nil]];
-				 //@"shellcommand",@"ls",@"&&",@"date",@"&&",@"ps",nil]];
-				 //@"shellcommand",@"ls",@"-laF",nil]];
-				 @"shellcommand",@"ls",@"-l",@"-a",@"-F",nil]];  //limited to 6 arguments (see loginScript)
-				 //TODO: use sltScriptArguments -tb-
-		
-		[aSequence launch];
-		#endif
-
+	[self sendPMCCommandScript: [NSString stringWithFormat:@"%@ %i",@"SimulationConfigScriptON",[pmcLink portNumber]]];
 }
 
 /*! Send a script to the PrPMC which will configure the PrPMC.
  */
 - (void) sendSimulationConfigScriptOFF
 {
-	//NSLog(@"%@::%@: invoked.\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));
-	//example code to send a script:  SBC_Link.m: - (void) installDriver:(NSString*)rootPwd 
-	
 	[self sendPMCCommandScript: @"SimulationConfigScriptOFF"];
 }
 
 - (void) sendLinkWithDmaLibConfigScriptON
 {
-	NSLog(@"%@::%@: invoked.\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));
-	//example code to send a script:  SBC_Link.m: - (void) installDriver:(NSString*)rootPwd 
-	
+	NSLog(@"%@::%@: invoked.\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));	
 	[self sendPMCCommandScript: @"LinkWithDMALibConfigScriptON"];
 }
 
@@ -938,50 +650,50 @@ NSLog(@"  scriptRunPath: %@ \n" , scriptRunPath);
 	NSLog(@"%@::%@: invoked.\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));
 	//example code to send a script:  SBC_Link.m: - (void) installDriver:(NSString*)rootPwd 
 
-
 	NSArray *scriptcommands = nil;//limited to 6 arguments (see loginScript)
 	if(aString) scriptcommands = [aString componentsSeparatedByCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
 	if([scriptcommands count] >6) NSLog(@"WARNING: too much arguments in sendPMCConfigScript:\n");
 	
 	NSString *scriptName = @"KatrinV4SLTScript";
-		ORTaskSequence* aSequence;	
-		aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
-		NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
-		
-		NSString* driverCodePath; //[pmcLink ]
-		if([pmcLink loadMode])driverCodePath = [[pmcLink filePath] stringByAppendingPathComponent:[self sbcLocalCodePath]];
-		else driverCodePath = [resourcePath stringByAppendingPathComponent:[self codeResourcePath]];
-		//driverCodePath = [driverCodePath stringByAppendingPathComponent:[delegate driverScriptName]];
-		driverCodePath = [driverCodePath stringByAppendingPathComponent: scriptName];
-		ORFileMover* driverScriptFileMover = [[ORFileMover alloc] init];//TODO: keep it as object in the class variables -tb-
-		[driverScriptFileMover setDelegate:aSequence];
-NSLog(@"loadMode: %i driverCodePath: %@ \n",[pmcLink loadMode], driverCodePath);		
-		[driverScriptFileMover setMoveParams:[driverCodePath stringByExpandingTildeInPath]
-										to:@"" 
-								remoteHost:[pmcLink IPNumber] 
-								  userName:[pmcLink userName] 
-								  passWord:[pmcLink passWord]];
-		[driverScriptFileMover setVerbose:YES];
-		[driverScriptFileMover doNotMoveFilesToSentFolder];
-		[driverScriptFileMover setTransferType:eUseSCP];
-		[aSequence addTaskObj:driverScriptFileMover];
-		
-		//NSString* scriptRunPath = [NSString stringWithFormat:@"/home/%@/%@",[pmcLink userName],scriptName];
-		NSString* scriptRunPath = [NSString stringWithFormat:@"~/%@",scriptName];
-NSLog(@"  scriptRunPath: %@ \n" , scriptRunPath);	
+    ORTaskSequence* aSequence;
+    aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
+    NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
+    
+    NSString* driverCodePath; //[pmcLink ]
+    if([pmcLink loadMode])driverCodePath = [[pmcLink filePath] stringByAppendingPathComponent:[self sbcLocalCodePath]];
+    else driverCodePath = [resourcePath stringByAppendingPathComponent:[self codeResourcePath]];
+    //driverCodePath = [driverCodePath stringByAppendingPathComponent:[delegate driverScriptName]];
+    driverCodePath = [driverCodePath stringByAppendingPathComponent: scriptName];
+    ORFileMover* driverScriptFileMover = [[ORFileMover alloc] init];//TODO: keep it as object in the class variables -tb-
+    [driverScriptFileMover setDelegate:aSequence];
+    NSLog(@"loadMode: %i driverCodePath: %@ \n",[pmcLink loadMode], driverCodePath);
+    [driverScriptFileMover setMoveParams:[driverCodePath stringByExpandingTildeInPath]
+                                    to:@"" 
+                            remoteHost:[pmcLink IPNumber] 
+                              userName:[pmcLink userName] 
+                              passWord:[pmcLink passWord]];
+    [driverScriptFileMover setVerbose:YES];
+    [driverScriptFileMover doNotMoveFilesToSentFolder];
+    [driverScriptFileMover setTransferType:eUseSCP];
+    [aSequence addTaskObj:driverScriptFileMover];
+    [driverScriptFileMover release];
+    
+    //NSString* scriptRunPath = [NSString stringWithFormat:@"/home/%@/%@",[pmcLink userName],scriptName];
+    NSString* scriptRunPath = [NSString stringWithFormat:@"~/%@",scriptName];
+    NSLog(@"  scriptRunPath: %@ \n" , scriptRunPath);
 
-	    //prepare script commands/arguments
-		NSMutableArray *arguments = nil;
-		arguments = [NSMutableArray arrayWithObjects:[pmcLink userName],[pmcLink passWord],[pmcLink IPNumber],scriptRunPath,nil];
-		[arguments addObjectsFromArray:	scriptcommands];
-NSLog(@"  arguments: %@ \n" , arguments);	
-	
-		//add task
-		[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
-				 arguments: arguments];  //limited to 6 arguments (see loginScript)
+    //prepare script commands/arguments
+    NSMutableArray *arguments = nil;
+    arguments = [NSMutableArray arrayWithObjects:[pmcLink userName],[pmcLink passWord],[pmcLink IPNumber],scriptRunPath,nil];
+    [arguments addObjectsFromArray:	scriptcommands];
+    NSLog(@"  arguments: %@ \n" , arguments);
 
-		
-		[aSequence launch];
+    //add task
+    [aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
+             arguments: arguments];  //limited to 6 arguments (see loginScript)
+
+    
+    [aSequence launch];
 
 }
 
@@ -1529,6 +1241,7 @@ return;
 	[self setClockTime: [self readSecondsCounter]];
 	return clockTime;
 }
+
 - (void) initBoard
 {
     if(countersEnabled)[self writeEnCnt];
@@ -1616,6 +1329,7 @@ return;
 	//[self writeReg:kSltSwSltTrigger value:0];
 	//[self writeReg:kSltSwSetInhibit value:0];				
 }
+
 /*
 - (void) loadPulseAmp
 {
@@ -1635,7 +1349,6 @@ return;
 	int i; //load the rest of the pulser memory with 0's
 	for (i=2;i<256;i++) [self write:SLT_REG_ADDRESS(kSltTestpulsTiming)+i value:theConvertedDelay];
 }
-
 
 - (void) loadPulserValues
 {
@@ -1827,14 +1540,8 @@ return;
 }
 
 #pragma mark •••Data Taker
-
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
-        //DEBUG
-                 NSLog(@"%@::%@ Called runTaskStarted --- SLT <-------------------------\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
-    #endif
-    
     [self setIsPartOfRun: YES];
 
     [self clearExceptionCount];
@@ -1867,7 +1574,7 @@ return;
             if(runMode == kIpeFltV4_Histogram_DaqMode) countHistoMode++; else countNonHistoMode++;
         }
         if([obj respondsToSelector:@selector(useBipolarEnergy)]){
-            runMode=[obj useBipolarEnergy];
+            //runMode=[obj useBipolarEnergy];
             if([obj useBipolarEnergy]) countBipolarEnergyMode++;
         }
         
@@ -1936,13 +1643,13 @@ return;
 	if(countersEnabled)[self writeClrCnt];//If enabled run counter will be reset to 0 at run start -tb-
 	
 	[self readStatusReg];
-	actualPageIndex = 0;
-	eventCounter    = 0;
-	first = YES;
-	lastDisplaySec = 0;
-	lastDisplayCounter = 0;
-	lastDisplayRate = 0;
-	lastSimSec = 0;
+	actualPageIndex     = 0;
+	eventCounter        = 0;
+	first               = YES;
+	lastDisplaySec      = 0;
+	lastDisplayCounter  = 0;
+	lastDisplayRate     = 0;
+	lastSimSec          = 0;
 	
 	//load all the data needed for the eCPU to do the HW read-out.
 	[self load_HW_Config];
@@ -1953,40 +1660,26 @@ return;
 
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	if(!first){
-		//event readout controlled by the SLT cpu now. ORCA reads out 
-		//the resulting data from a generic circular buffer in the pmc code.
-		[pmcLink takeData:aDataPacket userInfo:userInfo];
-	}
-	else {// the first time
-    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
-        //DEBUG
-                 NSLog(@"%@::%@   <------- \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
-    #endif
+	if(first){
 		//TODO: -tb- [self writePageManagerReset];
 		//TODO: -tb- [self writeClrCnt];
-        
-        //DEBUG         [self dumpSltSecondCounter:@"SLT-takeData-vor RelInhibit:"];
         
 		unsigned long long runcount = [self readRunTime];
 		[self shipSltEvent:kRunCounterType withType:kStartRunType eventCt:0 high: (runcount>>32)&0xffffffff low:(runcount)&0xffffffff ];
 		[self writeClrInhibit]; //TODO: maybe move to readout loop to avoid dead time -tb-
 
-        //DEBUG         [self dumpSltSecondCounter:@"SLT-takeData-nach RelInhibit:"];
-
 		[self shipSltSecondCounter: kStartRunType];
 		first = NO;
 	}
+    else {
+        //event readout controlled by the SLT cpu now. ORCA reads out
+        //the resulting data from a generic circular buffer in the pmc code.
+        [pmcLink takeData:aDataPacket userInfo:userInfo];
+    }
 }
 
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
-        //DEBUG NSLog(@"%@::%@   <------- \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
-        //DEBUG
-                 NSLog(@"%@::%@ Called runIsStopping --- SLT <-------------------------\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
-    #endif
-
     for(id obj in dataTakers){
         [obj runIsStopping:aDataPacket userInfo:userInfo];
     }
@@ -1995,19 +1688,12 @@ return;
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
-        //DEBUG
-                 NSLog(@"%@::%@ Called runTaskStopped --- SLT <-------------------------\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
-    #endif
-
-
 	[self writeSetInhibit]; //TODO: maybe move to readout loop to avoid dead time -tb-
 	[self shipSltSecondCounter: kStopRunType];
 	unsigned long long runcount = [self readRunTime];
 	[self shipSltEvent:kRunCounterType withType:kStopRunType eventCt:0 high: (runcount>>32)&0xffffffff low:(runcount)&0xffffffff ];
 	
     //TODO: set a run control 'wait', if we record the hitrate counter -> wait for final hitrate event (... in change state notification callback ...) -tb-
-    
     
     for(id obj in dataTakers){
 		[obj runTaskStopped:aDataPacket userInfo:userInfo];
@@ -2023,17 +1709,14 @@ return;
 	dataTakers = nil;
 
     [self setIsPartOfRun: NO];
-
 }
 
 - (void) dumpSltSecondCounter:(NSString*)text
 {
 	unsigned long subseconds = [self readSubSecondsCounter];
 	unsigned long seconds = [self readSecondsCounter];
-    if(text)
-        NSLog(@"%@::%@   %@   sec:%i  subsec:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),text,seconds,subseconds);//DEBUG -tb-
-    else
-        NSLog(@"%@::%@    sec:%i  subsec:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),seconds,subseconds);//DEBUG -tb-
+    if(text) NSLog(@"%@::%@   %@   sec:%i  subsec:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),text,seconds,subseconds);//DEBUG -tb-
+    else     NSLog(@"%@::%@    sec:%i  subsec:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),seconds,subseconds);//DEBUG -tb-
 }
 
 /** For the V4 SLT (Auger/KATRIN)the subseconds count 100 nsec tics! (Despite the fact that the ADC sampling has a 50 nsec base.)
@@ -2044,19 +1727,7 @@ return;
 	unsigned long subseconds = [self readSubSecondsCounter];
 	unsigned long seconds = [self readSecondsCounter];
 	
-
 	[self shipSltEvent:kSecondsCounterType withType:aType eventCt:0 high:seconds low:subseconds ];
-	#if 0
-	unsigned long location = (([self crateNumber]&0xf)<<21) | ([self stationNumber]& 0x0000001f)<<16;
-	unsigned long data[5];
-			data[0] = eventDataId | 5; 
-			data[1] = location | (aType & 0xf);
-			data[2] = 0;	
-			data[3] = seconds;	
-			data[4] = subseconds;
-			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-																object:[NSData dataWithBytes:data length:sizeof(long)*(5)]];
-	#endif
 }
 
 - (void) shipSltRunCounter:(unsigned char)aType
@@ -2078,7 +1749,6 @@ return;
 																object:[NSData dataWithBytes:data length:sizeof(long)*(5)]];
 }
 
-
 - (BOOL) doneTakingData
 {
 	return [pmcLink doneTakingData];
@@ -2089,7 +1759,6 @@ return;
 	//temp----
 	int i, j, k;
 	int sltSize = pageSize * 20;	
-	
 	
 	// Dislay the matrix of triggered pixel and timing
 	// The xy-Projection is needed to readout only the triggered pixel!!!
@@ -2214,11 +1883,10 @@ return;
 	}
 	
 	
-	NSLogFont(aFont,@"\n");			
-	
-	
+	NSLogFont(aFont,@"\n");
 }
 */
+
 - (void) autoCalibrate
 {
 	NSArray* allFLTs = [[self crate] orcaObjects];
@@ -2233,9 +1901,7 @@ return;
 
 - (void) tasksCompleted: (NSNotification*)aNote
 {
-        //DEBUG
-                 NSLog(@"%@::%@ Called tasksCompleted --- SLT <-------------------------\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
-	//nothing to do... this just removes a run-time exception
+	//nothing to do... this is to satisfy protocol
 }
 
 #pragma mark •••SBC_Linking protocol
@@ -2262,7 +1928,6 @@ return;
 	return [[self sbcLocalCodePath] lastPathComponent];
 }
 
-
 #pragma mark •••SBC Data Structure Setup
 - (void) load_HW_Config
 {
@@ -2285,23 +1950,14 @@ return;
 	configStruct->card_info[index].crate		= [self crateNumber];
 	configStruct->card_info[index].add_mod		= 0;		//not needed for this HW
     
-    //SLT specific settings BEGIN
     //"first time" flag (needed for histogram mode)
-	unsigned long runFlagsMask = 0;
-	runFlagsMask |= kFirstTimeFlag;          //bit 16 = "first time" flag
-    if(secondsSetSendToFLTs)
-        runFlagsMask |= kSecondsSetSendToFLTsFlag;//bit ...
-	configStruct->card_info[index].deviceSpecificData[3] = runFlagsMask;	
+	unsigned long            runFlagsMask = kFirstTimeFlag;
+    if(secondsSetSendToFLTs) runFlagsMask |= kSecondsSetSendToFLTsFlag;
+	configStruct->card_info[index].deviceSpecificData[3] = runFlagsMask;
+	configStruct->card_info[index].deviceSpecificData[6] = [self readReg: kKatrinV4SLTHWRevisionReg];
     
-	//for handling of different firmware versions
-    uint32_t sltRevision = [self readReg: kKatrinV4SLTHWRevisionReg];
-	configStruct->card_info[index].deviceSpecificData[6] = sltRevision;	
-    //SLT specific settings END
-    
-
-
-	
-	configStruct->card_info[index].num_Trigger_Indexes = 1;	//Just 1 group of objects controlled by SLT
+    //children
+	configStruct->card_info[index].num_Trigger_Indexes = 1;
     int nextIndex = index+1;
     
 	configStruct->card_info[index].next_Trigger_Index[0] = -1;
@@ -2320,6 +1976,7 @@ return;
 	configStruct->card_info[index].next_Card_Index 	= nextIndex;	
 	return index+1;
 }
+
 @end
 
 @implementation ORKatrinV4SLTModel (private)

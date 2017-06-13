@@ -65,11 +65,12 @@
     NSMutableDictionary* baselineSpikes;
     NSMutableDictionary* breakDownDictionary;
     BOOL scheduledToRunCheckBreakdown;
-    BOOL scheduledToSendRateReport;
+    NSDate* scheduledToSendRateReport[3]; //crate 1 & 2.. no '0' so no conversion
     BOOL scheduledToSendBaselineReport;
     float maxNonCalibrationRate;
     ORHighRateChecker*    highRateChecker;
-    NSDictionary*  savedSpikeInfo[2];
+    
+    BOOL testfillingLN[2];
 }
 
 #pragma mark ¥¥¥Accessors
@@ -88,7 +89,7 @@
 - (void) setIgnoreBreakdownCheckOnB:(BOOL)aIgnorePanicOnB;
 - (BOOL) ignoreBreakdownCheckOnA;
 - (void) setIgnoreBreakdownCheckOnA:(BOOL)aIgnorePanicOnA;
-- (void) sendRateSpikeReport;
+- (void) sendRateSpikeReportForCrate:(int)aCrate;
 - (void) sendRateBaselineReport;
 
 - (void) getRunType:(ORRunModel*)rc;
@@ -121,7 +122,7 @@
 - (void) setMaxNonCalibrationRate:(float)aValue;
 
 //in the case of being asked to checkBreakdown, it should event rate and baseline, leave the vacuum to the MJD interlock
-- (void) logBreakdowns:(int)aCrate;
+- (void) updateBreakdownDictionary:(NSDictionary*)dic;
 - (void) rateSpike:(NSNotification*) aNote;
 - (void) baselineSpike:(NSNotification*) aNote;
 - (BOOL) breakdownConditionsMet:(id)aDetector;
@@ -129,8 +130,9 @@
 - (void) forceConstraintCheck;
 - (BOOL) vacuumSpike:(int)i;
 - (BOOL) fillingLN:(int)i;
+- (int) pollingTimeForLN:(int)i;
 - (void) printBreakdownReport;
-- (void) constraintCheckFinished:(int)module;
+- (void) constraintCheckFinished:(int)crate;
 
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups;
