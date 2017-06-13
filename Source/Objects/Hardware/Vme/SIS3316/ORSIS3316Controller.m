@@ -525,7 +525,14 @@
 
 #pragma mark •••Interface Management
 
-- (void) enabledChanged:(NSNotification*)aNote                  { [self updateBOOLMatrix:enabledMatrix                  getter:@selector(enabled:)]; }
+- (void) enabledChanged:(NSNotification*)aNote  //bools and possibly more changed like this
+{
+    short i;
+    for(i=0;i<kNumSIS3316Channels;i++){
+        [[enabledMatrix cellWithTag:i] setState:[model enabled:i]];
+    }
+}
+
 - (void) histogramsEnabledChanged:(NSNotification*)aNote        { [self updateBOOLMatrix:histogramsEnabledMatrix        getter:@selector(histogramsEnabled:)]; }
 - (void) pileupEnabledChanged:(NSNotification*)aNote            { [self updateBOOLMatrix:pileupEnabledMatrix            getter:@selector(pileupEnabled:)]; }
 - (void) clrHistogramWithTSChanged:(NSNotification*)aNote       { [self updateBOOLMatrix:clrHistogramWithTSMatrix       getter:@selector(clrHistogramsWithTS:)]; }
@@ -697,19 +704,19 @@
 	[heSuppressTrigModeMatrix   setEnabled:!lockedOrRunningMaintenance];
 	[thresholdMatrix            setEnabled:!lockedOrRunningMaintenance];
     
-	[checkEventButton	    setEnabled:!locked && !runInProgress];
-	[testMemoryButton	    setEnabled:!locked && !runInProgress];
+	[checkEventButton           setEnabled:!locked && !runInProgress];
+	[testMemoryButton           setEnabled:!locked && !runInProgress];
 	
-	[csrMatrix				setEnabled:!locked && !runInProgress];
-	[acqMatrix				setEnabled:!locked && !runInProgress];
-	[eventConfigMatrix		setEnabled:!locked && !runInProgress];
-	[stopTriggerButton		setEnabled:!lockedOrRunningMaintenance];
-	[randomClockButton		setEnabled:!lockedOrRunningMaintenance];
-	[stopDelayEnabledButton setEnabled:!lockedOrRunningMaintenance];
-	[startDelayField		setEnabled:!lockedOrRunningMaintenance];
-	[clockSourcePU			setEnabled:!lockedOrRunningMaintenance];
-	[stopDelayField			setEnabled:!lockedOrRunningMaintenance];
-	[pageSizePU				setEnabled:!locked && !runInProgress];
+	[csrMatrix                  setEnabled:!locked && !runInProgress];
+	[acqMatrix                  setEnabled:!locked && !runInProgress];
+	[eventConfigMatrix          setEnabled:!locked && !runInProgress];
+	[stopTriggerButton          setEnabled:!lockedOrRunningMaintenance];
+	[randomClockButton          setEnabled:!lockedOrRunningMaintenance];
+	[stopDelayEnabledButton     setEnabled:!lockedOrRunningMaintenance];
+	[startDelayField            setEnabled:!lockedOrRunningMaintenance];
+	[clockSourcePU              setEnabled:!lockedOrRunningMaintenance];
+	[stopDelayField             setEnabled:!lockedOrRunningMaintenance];
+	[pageSizePU                 setEnabled:!locked && !runInProgress];
 }
 
 - (void) setModel:(id)aModel
@@ -742,7 +749,7 @@
 - (void) temperatureChanged:(NSNotification*)aNotification
 {
     [temperatureField setFloatValue: [model temperature]];
-    if ([model temperature] >= 51 ) [temperatureField setTextColor: [NSColor redColor] ];
+    if ([model temperature] > 50 ) [temperatureField setTextColor: [NSColor redColor] ];
     else                            [temperatureField setTextColor: [NSColor blackColor] ];
 }
 
@@ -841,7 +848,9 @@
 
 - (IBAction) enabledAction:(id)sender
 {
-    [model setEnabledBit:[[sender selectedCell] tag] withValue:[sender intValue]];
+    int tag =[[sender selectedCell] tag];
+    int aValue = [sender intValue];
+    [model setEnabledBit:tag withValue:aValue];
 }
 
 - (IBAction) heSuppressTrigModeAction:(id)sender

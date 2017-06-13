@@ -88,11 +88,11 @@ NSString* ORSIS3316RateGroupChangedNotification	= @"ORSIS3316RateGroupChangedNot
 NSString* ORSIS3316SettingsLock					= @"ORSIS3316SettingsLock";
 
 NSString* ORSIS3316SampleDone				= @"ORSIS3316SampleDone";
-NSString* ORSIS3316IDChanged				= @"ORSIS3316IDChanged";
-
-NSString* ORSIS3316TemperatureChanged       =@"ORSIS3316TemperatureChanged";
-NSString* ORSIS3316HWVersionChanged         =@"ORSIS3316HWVersionChanged";
 NSString* ORSIS3316SerialNumberChanged      =@"ORSIS3316SerialNumberChanged";
+//-=**NSString* ORSIS3316IDChanged				= @"ORSIS3316IDChanged";
+//-=**NSString* ORSIS3316TemperatureChanged       =@"ORSIS3316TemperatureChanged";
+//-=**NSString* ORSIS3316HWVersionChanged         =@"ORSIS3316HWVersionChanged";
+//-=**NSString* ORSIS3316SerialNumberChanged      =@"ORSIS3316SerialNumberChanged";
 
 #pragma mark - Static Declerations
 typedef struct {
@@ -429,10 +429,10 @@ unsigned char freqPreset250MHz[6]  = {0x20,0xC2,0xBC,0x33,0xE4,0xF2};
 - (int) si570Divider:(int) osc values:(unsigned char*)data;
 - (int) si570UnfreezeDCO:(int)osc;
 - (int) si570NewFreq:(int) osc;
-- (int) i2cStop:(int) osc;
-- (int) i2cStart:(int) osc;
-- (int) i2cWriteByte:(int)osc data:(unsigned char) data ack:(char*)ack;
-- (int) i2cReadByte:(int) osc data:(unsigned char*) data ack:(char)ack;
+//- (int) i2cStop:(int) osc;
+//- (int) i2cStart:(int) osc;
+//- (int) i2cWriteByte:(int)osc data:(unsigned char) data ack:(char*)ack;
+//- (int) i2cReadByte:(int) osc data:(unsigned char*) data ack:(char)ack;
 - (void) addCurrentState:(NSMutableDictionary*)dictionary unsignedLongArray:(unsigned long*)anArray   size:(long)numItems forKey:(NSString*)aKey;
 - (void) addCurrentState:(NSMutableDictionary*)dictionary unsignedShortArray:(unsigned short*)anArray size:(long)numItems forKey:(NSString*)aKey;
 - (void) addCurrentState:(NSMutableDictionary*)dictionary boolArray:(BOOL*)anArray                    size:(long)numItems forKey:(NSString*)aKey;
@@ -552,7 +552,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
 	int i;
 	for(i=0;i<kNumSIS3316Channels;i++){
-		[self setThreshold:i withValue:0xFFFFFFF];
+		[self setThreshold:i withValue:0xFFFFFFF];  //7 F's? (max int value)
 	}
     
 	[self setEnableInternalRouting:YES];
@@ -564,48 +564,34 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 	[self setStopDelayEnabled:YES];
 }
 
-- (unsigned short) moduleID
-{
-	return moduleID;
-}
-- (float) temperature
-{
-    return temperature;
-}
+//-=**- (unsigned short) moduleID
+//-=**{
+//-=**	return moduleID;
+//-=**}
+//-=**- (float) temperature
+//-=**{
+//-=**    return temperature;
+//-=**}
 
 //---------------------------------------------------------------------------
-//-----------------------Threshold Register Accessors------------------------
-
-//6.1
-- (void) writeControlStatusRegister: (unsigned short)aValue{
-    //if (writeControlStatusRegister)>0xffff return 0xffff;
-    if (aValue<0)aValue = 0;
-    if (aValue>1)aValue = 1;
-}
-    
-
-//---^^^^ can probably be deleted
-
-
-///------------------------------------------------------------
-- (long) enabledMask                        { return enabledMask;                                       }
-- (BOOL) enabled:(short)chan                { return enabledMask & (1<<chan);                           }
-- (long) heSuppressTriggerMask              { return heSuppressTriggerMask;                             }
-- (BOOL) heSuppressTriggerMask:(short)chan  { return heSuppressTriggerMask & (1<<chan);                 }
+- (long) enabledMask                        { return enabledMask;                              }
+- (BOOL) enabled:(short)chan                { return (enabledMask & (1<<chan)) != 0;           }
+- (long) heSuppressTriggerMask              { return heSuppressTriggerMask;                    }
+- (BOOL) heSuppressTriggerMask:(short)chan  { return (heSuppressTriggerMask & (1<<chan)) != 0; }
 - (short) cfdControlBits:(short)aChan       { if(aChan<kNumSIS3316Channels)return cfdControlBits[aChan]; else return 0; }
-- (long) threshold:(short)aChan             { if(aChan<kNumSIS3316Channels)return threshold[aChan];     else return 0;}
+- (long) threshold:(short)aChan             { if(aChan<kNumSIS3316Channels)return thresholdRegs[aChan];     else return 0;}
 
 - (void) setEnabledMask:(long)aMask
 {
-    if(enabledMask==aMask)return;
     [[[self undoManager] prepareWithInvocationTarget:self] setEnabledMask:enabledMask];
+    NSLog(@"0x%08x   0x%08x\n",enabledMask,aMask);
     enabledMask = aMask;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316EnabledChanged object:self];
 }
 
 - (void) setEnabledBit:(short)chan withValue:(BOOL)aValue
 {
-    unsigned char   aMask = enabledMask;
+    long  aMask = enabledMask;
     if(aValue)      aMask |= (1<<chan);
     else            aMask &= ~(1<<chan);
     [self setEnabledMask:aMask];
@@ -632,8 +618,8 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     if(aValue<0)aValue = 0;
     if(aValue>0xFFFFFFF)aValue = 0xFFFFFFF;
     if(aValue != [self threshold:aChan]){
-        [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:aChan withValue:threshold[aChan]];
-        threshold[aChan] = aValue;
+        [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:aChan withValue:thresholdRegs[aChan]];
+        thresholdRegs[aChan] = aValue;
         
         [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316ThresholdChanged object:self];
     }
@@ -821,7 +807,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 - (long) trigBothEdgesMask                       { return trigBothEdgesMask;                }
 - (BOOL) trigBothEdgesMask:(short)chan           { return trigBothEdgesMask & (1<<chan);    }
 - (long) intHeTrigOutPulseMask                   { return intHeTrigOutPulseMask;            }
-- (BOOL) intHeTrigOutPulseMask:(short)chan       { return intHeTrigOutPulseMask & (1<<chan);}
+- (BOOL) intHeTrigOutPulseMask:(short)chan       { return (intHeTrigOutPulseMask & (1<<chan)) != 0;}
 - (unsigned short) intTrigOutPulseBit:(short)aChan         { return intTrigOutPulseBit[aChan];        }
 
 
@@ -1611,11 +1597,40 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
 }
-
-
+//------------------------------------------------------------
 
 //6.2 Module Id. and Firmware Revision Register
-- (void) readModuleID:(BOOL)verbose
+NSString* ORSIS3316IDChanged    = @"ORSIS3316IDChanged"; //pointer for ID
+
+- (unsigned short) moduleID
+{
+    return moduleID;
+}
+
+- (NSString*) revision
+{
+    if(revision)return revision;
+    else        return nil;
+}
+
+- (void) setRevision:(NSString*)aString;
+
+{
+    [revision autorelease];
+    revision = [aString copy];
+}
+
+- (unsigned short) majorRevision;
+{
+    return majorRev;
+}
+
+- (unsigned short) minorRevision;
+{
+    return minorRev;
+}
+
+- (void) readModuleID:(BOOL)verbose //*** readModuleID method ***//
 {
     unsigned long result = 0;
     [[self adapter] readLongBlock:&result
@@ -1634,26 +1649,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316IDChanged object:self]; //changes name if BOOL = true
 }
-//-----------------------------------       this section may need to be above ^^
-- (NSString*) revision
-{
-    if(revision)return revision;
-    else        return nil;
-}
-
-- (void) setRevision:(NSString*)aString;
-{
-    [revision autorelease];
-    revision = [aString copy];
-}
-- (unsigned short) majorRevision;
-{
-    return majorRev;
-}
-
-//-----------------------------------
-
-
+//----------------------------------------------------------
 
 //6.3 Intterupt Configureation register (0x8)
 
@@ -1664,6 +1660,8 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 //6.6 Broadcast setup register
 
 //6.7 Hardware Version Register
+NSString* ORSIS3316HWVersionChanged =@"ORSIS3316HWVersionChanged";
+
 - (void) readHWVersion:(BOOL)verbose
 {
     unsigned long result = 0;   
@@ -1683,12 +1681,16 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
     return hwVersion;
 }
-
-
-
-
+//-----------------------------------------------------
 
 //6.8 Temperature Register
+NSString* ORSIS3316TemperatureChanged       =@"ORSIS3316TemperatureChanged";
+
+- (float) temperature
+{
+    return temperature;
+}
+
 - (void) readTemperature:(BOOL)verbose
 {
     
@@ -1718,6 +1720,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 //6.9 Onewire EEPROM Control register
 
 //6.10 Serial Number register  (ethernet mac address)
+
 - (void) readSerialNumber:(BOOL)verbose{
     unsigned long result = 0;
     [[self adapter] readLongBlock:&result
@@ -2300,15 +2303,15 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     }
 }
 
-//6.26 Trigger Threshold registers
+//6.26 Trigger Threshold registers      //sum not yet coded
 - (void) writeThresholds
 {
     int i;
-    if(!moduleID)[self readModuleID:NO];
+    if(!moduleID)[self readModuleID:NO]; //why would this line be here?
     for(i = 0; i < kNumSIS3316Channels; i++) {
         unsigned long valueToWrite =  (((enabledMask>>i)           & 0x1) << 31)  |
         (((heSuppressTriggerMask>>i) & 0x1) << 30)  |
-        ((cfdControlBits[i]+1  & 0x3) <<28)   |
+        ((cfdControlBits[i]+1  & 0x3) <<28)   |  
         (threshold[i]          & 0xffffffff);
         
         [[self adapter] writeLongBlock:&valueToWrite
@@ -2346,14 +2349,14 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 }
 
 
-//6.27 High Energy Trigger Threshold registers
+//6.27 High Energy Trigger Threshold registers  (This and the one above may need to be switched)
 - (void) writeHeTrigThresholds
 {
     int i;
     for(i = 0; i < kNumSIS3316Channels; i++) {
         unsigned long valueToWrite =    (((trigBothEdgesMask>>i)        & 0x1) << 31)  |
         (((intHeTrigOutPulseMask>>i)    & 0x1) << 30)  |
-        (([self intTrigOutPulseBit:i]  & 0x3) <<28)   |
+        (([self intTrigOutPulseBit:i]  & 0x3) << 28)   |
         ([self heTrigThreshold:i]       & 0xffffffff);
         
         [[self adapter] writeLongBlock:&valueToWrite
@@ -2786,7 +2789,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 	for(i=0;i<1024;i++){
 		unsigned long aValue = i;
 		[[self adapter] writeLongBlock: &aValue
-							atAddress: [self baseAddress] + 0x00400000+i*4
+							atAddress: [self baseAddress] + 0x00400000+(i*4)
 							numToWrite: 1
 						   withAddMod: [self addressModifier]
 						usingAddSpace: 0x01];
@@ -2795,7 +2798,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 	for(i=0;i<1024;i++){
 		unsigned long aValue;
 		[[self adapter] readLongBlock: &aValue
-							atAddress: [self baseAddress] + 0x00400000+i*4
+							atAddress: [self baseAddress] + 0x00400000+(i*4)
 							numToRead: 1
 						   withAddMod: [self addressModifier]
 						usingAddSpace: 0x01];

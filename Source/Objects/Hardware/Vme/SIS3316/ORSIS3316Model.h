@@ -353,6 +353,7 @@ enum{
 - (float) temperature;
 - (NSString*) revision;
 - (void) setRevision:(NSString*)aString;
+- (unsigned short) majorRevision;
 
 - (long) enabledMask;
 - (void) setEnabledMask:(long)aMask;
@@ -551,6 +552,7 @@ enum{
 
 - (int) numberOfSamples;
 - (BOOL) checkRegList;
+- (unsigned short) serialNumber;
 
 #pragma mark •••Hardware Access
 //Comments denote section of the manual (or parts of that section ie. 6.1')
@@ -560,13 +562,13 @@ enum{
 - (unsigned long) groupRegister:(unsigned long)aRegisterIndex  group:(int)aGroup;
 
 - (unsigned long)readControlStatusReg;          //6.1               (complete) -not connected  
-- (unsigned long)writeControlStatusReg;         //6.1               (complete)
+- (void) writeControlStatusReg:(unsigned long)aValue;
+        //6.1               (complete)
 - (void) setLed:(BOOL)state;                    //6.1'              (complete)
 - (void) readModuleID:(BOOL)verbose;            //6.2               (complete)
 - (void) readHWVersion:(BOOL)verbose;           //6.7               (complete)
 - (unsigned short) hwVersion;                   //6.7'              (complete)
 - (void) readTemperature:(BOOL)verbose;         //6.8               (complete)
-- (int)  temp;
 - (void) readSerialNumber:(BOOL)verbose;        //6.10              (complete)
 - (void) writeClockSource;                      //6.17              (complete)
 - (void) writeAcquisitionRegister;              //6.21              (incomplete. No read)
