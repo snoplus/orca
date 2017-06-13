@@ -532,6 +532,20 @@
         [[enabledMatrix cellWithTag:i] setState:[model enabled:i]];
     }
 }
+- (void) cfdControlBitsChanged:(NSNotification*)aNote
+{
+    
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Channels;i++){
+            [[cfdControlMatrix cellAtRow:i column:0] selectItemAtIndex:[model cfdControlBits:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[cfdControlMatrix cellAtRow:chan column:0] selectItemAtIndex:[model cfdControlBits:chan]];
+    }
+}
 
 - (void) histogramsEnabledChanged:(NSNotification*)aNote        { [self updateBOOLMatrix:histogramsEnabledMatrix        getter:@selector(histogramsEnabled:)]; }
 - (void) pileupEnabledChanged:(NSNotification*)aNote            { [self updateBOOLMatrix:pileupEnabledMatrix            getter:@selector(pileupEnabled:)]; }
@@ -540,7 +554,6 @@
 
 - (void) heSuppressTrigModeChanged:(NSNotification*)aNote { [self updateBOOLMatrix:heSuppressTrigModeMatrix getter:@selector(heSuppressTriggerMask:)]; }
 - (void) thresholdChanged:(NSNotification*)aNote          { [self updateValueMatrix:thresholdMatrix         getter:@selector(threshold:)]; }
-- (void) cfdControlBitsChanged:(NSNotification*)aNote     { [self updatePUMatrix:cfdControlMatrix           getter:@selector(cfdControlBits:)]; }
 
 - (void) energyDividerChanged:(NSNotification*)aNote      { [self updateValueMatrix:energyDividerMatrix     getter:@selector(energyDivider:)]; }
 - (void) energySubtractorChanged:(NSNotification*)aNote   { [self updateValueMatrix:energySubtractorMatrix  getter:@selector(energySubtractor:)]; }

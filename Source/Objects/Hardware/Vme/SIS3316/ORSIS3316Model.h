@@ -560,6 +560,7 @@ enum{
 - (unsigned long) vmeRegister:(unsigned long)aRegisterIndex;
 -(unsigned long) keyRegister:(unsigned long)aRegisterIndex;
 - (unsigned long) groupRegister:(unsigned long)aRegisterIndex  group:(int)aGroup;
+- (unsigned long) channelRegister:(unsigned long)aRegisterIndex channel:(int)aChannel;
 
 - (unsigned long)readControlStatusReg;          //6.1               (complete) -not connected  
 - (void) writeControlStatusReg:(unsigned long)aValue;

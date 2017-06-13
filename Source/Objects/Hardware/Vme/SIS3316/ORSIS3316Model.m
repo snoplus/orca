@@ -89,10 +89,10 @@ NSString* ORSIS3316SettingsLock					= @"ORSIS3316SettingsLock";
 
 NSString* ORSIS3316SampleDone				= @"ORSIS3316SampleDone";
 NSString* ORSIS3316SerialNumberChanged      =@"ORSIS3316SerialNumberChanged";
-//-=**NSString* ORSIS3316IDChanged				= @"ORSIS3316IDChanged";
-//-=**NSString* ORSIS3316TemperatureChanged       =@"ORSIS3316TemperatureChanged";
-//-=**NSString* ORSIS3316HWVersionChanged         =@"ORSIS3316HWVersionChanged";
-//-=**NSString* ORSIS3316SerialNumberChanged      =@"ORSIS3316SerialNumberChanged";
+NSString* ORSIS3316IDChanged				= @"ORSIS3316IDChanged";
+NSString* ORSIS3316TemperatureChanged       =@"ORSIS3316TemperatureChanged";
+NSString* ORSIS3316HWVersionChanged         =@"ORSIS3316HWVersionChanged";
+
 
 #pragma mark - Static Declerations
 typedef struct {
@@ -184,7 +184,6 @@ static ORSIS3316RegisterInformation vmefpga_register_information[kNumberOfVMEFPG
     {0x000000F8,    @"Channel 15 Internal Trigger Counter",     YES,    NO,     YES,    kChan15TrigCounterReg},
     {0x000000FC,    @"Channel 16 Internal Trigger Counter",     YES,    NO,     YES,    kChan16TrigCounterReg},
 
-   
 };
 
 //Key address registers
@@ -313,86 +312,11 @@ static ORSIS3316RegisterInformation group_register_information[kADCGroupRegister
 #define I2C_BUSY			31
 #define OSC_ADR             0x55
 
-unsigned long prevBankSampleRegs[kNumSIS3316Channels] ={
-    kPreviousBankSampleCh1Reg,
-    kPreviousBankSampleCh2Reg,
-    kPreviousBankSampleCh3Reg,
-    kPreviousBankSampleCh4Reg,
-    kPreviousBankSampleCh1Reg + 0x1000,
-    kPreviousBankSampleCh2Reg + 0x1000,
-    kPreviousBankSampleCh3Reg + 0x1000,
-    kPreviousBankSampleCh4Reg + 0x1000,
-    kPreviousBankSampleCh1Reg + 0x2000,
-    kPreviousBankSampleCh2Reg + 0x2000,
-    kPreviousBankSampleCh3Reg + 0x2000,
-    kPreviousBankSampleCh4Reg + 0x2000,
-    kPreviousBankSampleCh1Reg + 0x3000,
-    kPreviousBankSampleCh2Reg + 0x3000,
-    kPreviousBankSampleCh3Reg + 0x3000,
-    kPreviousBankSampleCh4Reg + 0x3000
-};
-
-
-unsigned long thresholdRegs[kNumSIS3316Channels] = {
-    kTrigThresholdCh1Reg,
-    kTrigThresholdCh2Reg,
-    kTrigThresholdCh3Reg,
-    kTrigThresholdCh4Reg,
-    kTrigThresholdCh1Reg + 0x1000,
-    kTrigThresholdCh2Reg + 0x1000,
-    kTrigThresholdCh3Reg + 0x1000,
-    kTrigThresholdCh4Reg + 0x1000,
-    kTrigThresholdCh1Reg + 0x2000,
-    kTrigThresholdCh2Reg + 0x2000,
-    kTrigThresholdCh3Reg + 0x2000,
-    kTrigThresholdCh4Reg + 0x2000,
-    kTrigThresholdCh1Reg + 0x3000,
-    kTrigThresholdCh2Reg + 0x3000,
-    kTrigThresholdCh3Reg + 0x3000,
-    kTrigThresholdCh4Reg + 0x3000,
-};
-
-unsigned long energyHistogramConfigRegs[kNumSIS3316Channels] = {
-    kEnergyHistoConfigCh1Reg,
-    kEnergyHistoConfigCh2Reg,
-    kEnergyHistoConfigCh3Reg,
-    kEnergyHistoConfigCh4Reg,
-    kEnergyHistoConfigCh1Reg + 0x1000,
-    kEnergyHistoConfigCh2Reg + 0x1000,
-    kEnergyHistoConfigCh3Reg + 0x1000,
-    kEnergyHistoConfigCh4Reg + 0x1000,
-    kEnergyHistoConfigCh1Reg + 0x2000,
-    kEnergyHistoConfigCh2Reg + 0x2000,
-    kEnergyHistoConfigCh3Reg + 0x2000,
-    kEnergyHistoConfigCh4Reg + 0x2000,
-    kEnergyHistoConfigCh1Reg + 0x3000,
-    kEnergyHistoConfigCh2Reg + 0x3000,
-    kEnergyHistoConfigCh3Reg + 0x3000,
-    kEnergyHistoConfigCh4Reg + 0x3000,
-};
 NSString* cfdCntrlString[4] = {
     @"Disabled     ",
     @"Disabled     ",
     @"Zero Crossing",
     @"50%          "
-};
-unsigned long heThresholdRegs[kNumSIS3316Channels] = {
-    kHiEnergyTrigThresCh1Reg,
-    kHiEnergyTrigThresCh2Reg,
-    kHiEnergyTrigThresCh3Reg,
-    kHiEnergyTrigThresCh4Reg + 0x1000,
-    kHiEnergyTrigThresCh1Reg + 0x1000,
-    kHiEnergyTrigThresCh2Reg + 0x1000,
-    kHiEnergyTrigThresCh3Reg + 0x1000,
-    kHiEnergyTrigThresCh4Reg + 0x2000,
-    kHiEnergyTrigThresCh1Reg + 0x2000,
-    kHiEnergyTrigThresCh2Reg + 0x2000,
-    kHiEnergyTrigThresCh3Reg + 0x2000,
-    kHiEnergyTrigThresCh4Reg + 0x3000,
-    kHiEnergyTrigThresCh1Reg + 0x3000,
-    kHiEnergyTrigThresCh2Reg + 0x3000,
-    kHiEnergyTrigThresCh3Reg + 0x3000,
-    kHiEnergyTrigThresCh4Reg + 0x3000
 };
 NSString* intTrigOutPulseString[3] = {
     @"Internal    ",
@@ -407,21 +331,21 @@ unsigned char freqPreset250MHz[6]  = {0x20,0xC2,0xBC,0x33,0xE4,0xF2};
 
 //----------------------------------------------
 //Control Status Register Bits
-//-=**# define kLedUOnBit				(0x1<<0)
-//-=** #define kLed1OnBit              (0x1<<1)
-//-=** #define kLed2OnBit              (0x1<<2)
-//-=** #define kLedUAppModeBit         (0x1<<4)
-//-=** #define kLed1AppModeBit         (0x1<<5)
-//-=** #define kLed2AppModeBitBit      (0x1<<6)
-//-=** #define kRebootFPGA             (0x1<<15)
+#define kLedUOnBit				(0x1<<0)
+#define kLed1OnBit              (0x1<<1)
+#define kLed2OnBit              (0x1<<2)
+#define kLedUAppModeBit         (0x1<<4)
+#define kLed1AppModeBit         (0x1<<5)
+#define kLed2AppModeBitBit      (0x1<<6)
+#define kRebootFPGA             (0x1<<15)
 
-//-=**#define kLedUOffBit				(0x1<<0)
-//-=**#define kLed1OffBit             (0x1<<1)
-//-=**#define kLed2OffBit             (0x1<<2)
-//-=**#define kLedUAppModeClrBit      (0x1<<4)
-//-=**#define kLed1AppModeClrBit      (0x1<<5)
-//-=**#define kLed2AppModeVlrBit      (0x1<<6)
-//-=**#define kRebootFPGAClrBit       (0x1<<15)
+#define kLedUOffBit				(0x1<<0)
+#define kLed1OffBit             (0x1<<1)
+#define kLed2OffBit             (0x1<<2)
+#define kLedUAppModeClrBit      (0x1<<4)
+#define kLed1AppModeClrBit      (0x1<<5)
+#define kLed2AppModeVlrBit      (0x1<<6)
+#define kRebootFPGAClrBit       (0x1<<15)
 
 @interface ORSIS3316Model (private)
 //low level stuff that should never be called by scripts or other objects
@@ -564,27 +488,26 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 	[self setStopDelayEnabled:YES];
 }
 
-//-=**- (unsigned short) moduleID
-//-=**{
-//-=**	return moduleID;
-//-=**}
-//-=**- (float) temperature
-//-=**{
-//-=**    return temperature;
-//-=**}
+- (unsigned short) moduleID
+{
+	return moduleID;
+}
+- (float) temperature
+{
+    return temperature;
+}
 
 //---------------------------------------------------------------------------
 - (long) enabledMask                        { return enabledMask;                              }
 - (BOOL) enabled:(short)chan                { return (enabledMask & (1<<chan)) != 0;           }
 - (long) heSuppressTriggerMask              { return heSuppressTriggerMask;                    }
 - (BOOL) heSuppressTriggerMask:(short)chan  { return (heSuppressTriggerMask & (1<<chan)) != 0; }
-- (short) cfdControlBits:(short)aChan       { if(aChan<kNumSIS3316Channels)return cfdControlBits[aChan]; else return 0; }
-- (long) threshold:(short)aChan             { if(aChan<kNumSIS3316Channels)return thresholdRegs[aChan];     else return 0;}
+- (short) cfdControlBits:(short)aChan       { if(aChan>=0 & aChan<kNumSIS3316Channels)return cfdControlBits[aChan]; else return 0; }
+- (long) threshold:(short)aChan             { if(aChan>=0 & aChan<kNumSIS3316Channels)return threshold[aChan];     else return 0;}
 
 - (void) setEnabledMask:(long)aMask
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setEnabledMask:enabledMask];
-    NSLog(@"0x%08x   0x%08x\n",enabledMask,aMask);
     enabledMask = aMask;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316EnabledChanged object:self];
 }
@@ -618,8 +541,8 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     if(aValue<0)aValue = 0;
     if(aValue>0xFFFFFFF)aValue = 0xFFFFFFF;
     if(aValue != [self threshold:aChan]){
-        [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:aChan withValue:thresholdRegs[aChan]];
-        thresholdRegs[aChan] = aValue;
+        [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:aChan withValue:threshold[aChan]];
+        threshold[aChan] = aValue;
         
         [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316ThresholdChanged object:self];
     }
@@ -628,11 +551,12 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 - (void) setCfdControlBits:(short)aChan withValue:(short)aValue
 {
     if(aValue<0)aValue = 0;
-    if(aValue>0x3)aValue = 0x3;
+    if(aValue>0x2)aValue = 0x2;
     if([self cfdControlBits:aChan] == aValue)return;
     [[[self undoManager] prepareWithInvocationTarget:self] setCfdControlBits:aChan withValue:[self cfdControlBits:aChan]];
     cfdControlBits[aChan] = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316CfdControlBitsChanged object:self];
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316CfdControlBitsChanged object:self userInfo:userInfo];
 }
 
 //---------------------------------------------------------------------------
@@ -1549,24 +1473,15 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     return [self baseAddress] + group_register_information[aRegisterIndex].offset + 0x1000*aGroup;
 }
 
+- (unsigned long) channelRegister:(unsigned long)aRegisterIndex channel:(int)aChannel
+{
+    return [self baseAddress] + group_register_information[aRegisterIndex].offset + (0x10*(aChannel%4)) + (0x1000*(aChannel/4));
+}
+
+
 //--------------------------------------------------------------
 
 //6.1 Control/Status Register(0x0, write/read)
-#define kLedUOnBit				(0x1<<0)
-#define kLed1OnBit              (0x1<<1)
-#define kLed2OnBit              (0x1<<2)
-#define kLedUAppModeBit         (0x1<<4)
-#define kLed1AppModeBit         (0x1<<5)
-#define kLed2AppModeBitBit      (0x1<<6)
-#define kRebootFPGA             (0x1<<15)
-
-#define kLedUOffBit				(0x1<<0)
-#define kLed1OffBit             (0x1<<1)
-#define kLed2OffBit             (0x1<<2)
-#define kLedUAppModeClrBit      (0x1<<4)
-#define kLed1AppModeClrBit      (0x1<<5)
-#define kLed2AppModeVlrBit      (0x1<<6)
-#define kRebootFPGAClrBit       (0x1<<15)
 
 - (void) writeControlStatusReg:(unsigned long)aValue
 {
@@ -1600,12 +1515,6 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 //------------------------------------------------------------
 
 //6.2 Module Id. and Firmware Revision Register
-NSString* ORSIS3316IDChanged    = @"ORSIS3316IDChanged"; //pointer for ID
-
-- (unsigned short) moduleID
-{
-    return moduleID;
-}
 
 - (NSString*) revision
 {
@@ -1660,8 +1569,6 @@ NSString* ORSIS3316IDChanged    = @"ORSIS3316IDChanged"; //pointer for ID
 //6.6 Broadcast setup register
 
 //6.7 Hardware Version Register
-NSString* ORSIS3316HWVersionChanged =@"ORSIS3316HWVersionChanged";
-
 - (void) readHWVersion:(BOOL)verbose
 {
     unsigned long result = 0;   
@@ -1684,12 +1591,6 @@ NSString* ORSIS3316HWVersionChanged =@"ORSIS3316HWVersionChanged";
 //-----------------------------------------------------
 
 //6.8 Temperature Register
-NSString* ORSIS3316TemperatureChanged       =@"ORSIS3316TemperatureChanged";
-
-- (float) temperature
-{
-    return temperature;
-}
 
 - (void) readTemperature:(BOOL)verbose
 {
@@ -2296,7 +2197,7 @@ NSString* ORSIS3316TemperatureChanged       =@"ORSIS3316TemperatureChanged";
         unsigned long valueToWrite =  (([self gapTime:i] & 0xffff)<<12) | ([self peakingTime:i] & 0xffff);
         
         [[self adapter] writeLongBlock:&valueToWrite
-                             atAddress:[self groupRegister:kFirTrigSetupCh1Reg group:i]
+                             atAddress:[self channelRegister:kFirTrigSetupCh1Reg channel:i]
                             numToWrite:1
                             withAddMod:[self addressModifier]
                          usingAddSpace:0x01];
@@ -2307,15 +2208,15 @@ NSString* ORSIS3316TemperatureChanged       =@"ORSIS3316TemperatureChanged";
 - (void) writeThresholds
 {
     int i;
-    if(!moduleID)[self readModuleID:NO]; //why would this line be here?
+//if(!moduleID)[self readModuleID:NO]; //why would this line be here?
     for(i = 0; i < kNumSIS3316Channels; i++) {
-        unsigned long valueToWrite =  (((enabledMask>>i)           & 0x1) << 31)  |
-        (((heSuppressTriggerMask>>i) & 0x1) << 30)  |
-        ((cfdControlBits[i]+1  & 0x3) <<28)   |  
-        (threshold[i]          & 0xffffffff);
+        unsigned long valueToWrite =    (((enabledMask>>i)           & 0x1) << 31)  |
+                                        (((heSuppressTriggerMask>>i) & 0x1) << 30)  |
+                                        ((cfdControlBits[i]+1        & 0x3) << 28)  |
+                                        (threshold[i]                & 0xfffffff);
         
         [[self adapter] writeLongBlock:&valueToWrite
-                             atAddress:[self baseAddress] + thresholdRegs[i]
+                             atAddress:[self channelRegister:kTrigThresholdCh1Reg channel:i]
                             numToWrite:1
                             withAddMod:[self addressModifier]
                          usingAddSpace:0x01];
@@ -2333,16 +2234,16 @@ NSString* ORSIS3316TemperatureChanged       =@"ORSIS3316TemperatureChanged";
         
         unsigned long aValue;
         [[self adapter] readLongBlock: &aValue
-                            atAddress: [self baseAddress] + thresholdRegs[i]
+                            atAddress:[self channelRegister:kTrigThresholdCh1Reg channel:i]
                             numToRead: 1
                            withAddMod: [self addressModifier]
                         usingAddSpace: 0x01];
         
         if(verbose){
-            unsigned short thres  = (aValue & 0x0FFFFFFF);
-            unsigned short cfdCnt = ((aValue>>28) & 0x3);
-            unsigned short heSup  = ((aValue>>30) & 0x1);
-            unsigned short enabl  = ((aValue>>31) & 0x1);
+            unsigned long thres  = (aValue & 0x0FFFFFFF);
+            unsigned long cfdCnt = ((aValue>>28) & 0x3);
+            unsigned long heSup  = ((aValue>>30) & 0x1);
+            unsigned long enabl  = ((aValue>>31) & 0x1);
             NSLog(@"%2d: %@ %@ %@ 0x%08x\n",i, enabl?@"YES":@" NO",heSup?@"YES":@" NO",cfdCntrlString[cfdCnt],thres);
         }
     }
@@ -2360,8 +2261,8 @@ NSString* ORSIS3316TemperatureChanged       =@"ORSIS3316TemperatureChanged";
         ([self heTrigThreshold:i]       & 0xffffffff);
         
         [[self adapter] writeLongBlock:&valueToWrite
-                             atAddress:[self baseAddress] + heThresholdRegs[i]
-                            numToWrite:1
+                             atAddress:[self channelRegister:kHiEnergyTrigThresCh1Reg channel:i]
+                                     numToWrite:1
                             withAddMod:[self addressModifier]
                          usingAddSpace:0x01];
     }
@@ -2379,7 +2280,7 @@ NSString* ORSIS3316TemperatureChanged       =@"ORSIS3316TemperatureChanged";
         
         unsigned long aValue;
         [[self adapter] readLongBlock: &aValue
-                            atAddress: [self baseAddress] + heThresholdRegs[i]
+                            atAddress:[self channelRegister:kHiEnergyTrigThresCh1Reg channel:i]
                             numToRead: 1
                            withAddMod: [self addressModifier]
                         usingAddSpace: 0x01];
@@ -2471,7 +2372,7 @@ NSString* ORSIS3316TemperatureChanged       =@"ORSIS3316TemperatureChanged";
         unsigned long valueToWrite =  (([self tauFactor:i] & 0x3f)<<12) | (([self gapTime:i] & 0xffff)<<12) | ([self peakingTime:i] & 0xffff);
         
         [[self adapter] writeLongBlock:&valueToWrite
-                             atAddress:[self groupRegister:kFirEnergySetupCh1Reg group:i]
+                             atAddress:[self channelRegister:kFirEnergySetupCh1Reg channel:i]
                             numToWrite:1
                             withAddMod:[self addressModifier]
                          usingAddSpace:0x01];
@@ -2493,7 +2394,8 @@ NSString* ORSIS3316TemperatureChanged       =@"ORSIS3316TemperatureChanged";
         aValue |= ([self energySubtractor:i]&0xfff)<< 8;
         
         [[self adapter] writeLongBlock: &aValue
-                             atAddress: [self baseAddress] + energyHistogramConfigRegs[i]
+         
+                             atAddress: [self channelRegister:kEnergyHistoConfigCh1Reg channel:i]
                             numToWrite: 1
                             withAddMod: [self addressModifier]
                          usingAddSpace: 0x01];
@@ -2983,8 +2885,7 @@ NSString* ORSIS3316TemperatureChanged       =@"ORSIS3316TemperatureChanged";
             BOOL timeout = NO;
             do {
                 [[self adapter] readLongBlock: &prevBankEndingAddress
-                                    atAddress: [self baseAddress] + prevBankSampleRegs[chan]
-                                    numToRead: 1
+                                    atAddress: [self channelRegister:kPreviousBankSampleCh1Reg channel:chan]                                      numToRead: 1
                                     withAddMod: [self addressModifier]
                                 usingAddSpace: 0x01];
 
