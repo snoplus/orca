@@ -765,7 +765,7 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
     while (![[self keepAliveThread] isCancelled]) {
         dispatch_sync(dispatch_get_main_queue(), ^{
             @try{
-                [self sendOkCmd:@"keepAlive"];
+                [connection okCommand:"keepAlive"];
             } @catch(NSException* e) {
                 NSLogColor([NSColor redColor], @"[TUBii]: Problem sending keep alive to TUBii server, reason: %@\n", [e reason]);
                 exceptionCheck = YES;
