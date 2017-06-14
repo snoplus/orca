@@ -275,6 +275,10 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
     NSString* command = [NSString stringWithFormat:@"SetTelliePulser %f %f %d", tellieRate,telliePulseWidth,tellieNPulses];
     [self sendOkCmd:command];
 }
+- (void) setTellieMode:(BOOL) _tellieMode{
+    NSString* command = [NSString stringWithFormat:@"SetTellieMode %d",_tellieMode];
+    [self sendOkCmd:command];
+}
 - (void) stopTelliePulser {
     // Stops the Tellie pulser by setting the number of pulses to be fired to zero.
     [self setTellieNPulses:0];
