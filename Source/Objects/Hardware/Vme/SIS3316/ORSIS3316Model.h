@@ -356,133 +356,133 @@ enum{
 - (unsigned short) majorRevision;
 
 - (long) enabledMask;
-- (void) setEnabledMask:(long)aMask;
-- (BOOL) enabled:(short)chan;
-- (void) setEnabledBit:(short)chan withValue:(BOOL)aValue;
+- (void) setEnabledMask:(unsigned long)aMask;
+- (BOOL) enabled:(unsigned short)chan;
+- (void) setEnabledBit:(unsigned short)chan withValue:(BOOL)aValue;
 
 //////
 - (long) histogramsEnabledMask;
-- (void) setHistogramsEnabledMask:(long)aMask;
-- (BOOL) histogramsEnabled:(short)chan;
-- (void) setHistogramsEnabled:(short)chan withValue:(BOOL)aValue;
+- (void) setHistogramsEnabledMask:(unsigned long)aMask;
+- (BOOL) histogramsEnabled:(unsigned short)chan;
+- (void) setHistogramsEnabled:(unsigned short)chan withValue:(BOOL)aValue;
 
 - (long) pileupEnabledMask;
-- (void) setPileupEnabledMask:(long)aMask;
-- (BOOL) pileupEnabled:(short)chan;
-- (void) setPileupEnabled:(short)chan withValue:(BOOL)aValue;
+- (void) setPileupEnabledMask:(unsigned long)aMask;
+- (BOOL) pileupEnabled:(unsigned short)chan;
+- (void) setPileupEnabled:(unsigned short)chan withValue:(BOOL)aValue;
 
 - (long) clrHistogramsWithTSMask;
-- (void) setClrHistogramsWithTSMask:(long)aMask;
-- (BOOL) clrHistogramsWithTS:(short)chan;
-- (void) setClrHistogramsWithTS:(short)chan withValue:(BOOL)aValue;
+- (void) setClrHistogramsWithTSMask:(unsigned long)aMask;
+- (BOOL) clrHistogramsWithTS:(unsigned short)chan;
+- (void) setClrHistogramsWithTS:(unsigned short)chan withValue:(BOOL)aValue;
 
 - (long) writeHitsToEventMemoryMask;
-- (void) setWriteHitsToEventMemoryMask:(long)aMask;
-- (BOOL) writeHitsToEventMemory:(short)chan;
-- (void) setWriteHitsToEventMemory:(short)chan withValue:(BOOL)aValue;
+- (void) setWriteHitsToEventMemoryMask:(unsigned long)aMask;
+- (BOOL) writeHitsToEventMemory:(unsigned short)chan;
+- (void) setWriteHitsToEventMemory:(unsigned short)chan withValue:(BOOL)aValue;
 ///////
 
 - (long) heSuppressTriggerMask;
-- (BOOL) heSuppressTriggerMask:(short)chan;
-- (void) setHeSuppressTriggerMask:(long)aMask;
-- (void) setHeSuppressTriggerBit:(short)chan withValue:(BOOL)aValue;
+- (BOOL) heSuppressTriggerMask:(unsigned short)chan;
+- (void) setHeSuppressTriggerMask:(unsigned long)aMask;
+- (void) setHeSuppressTriggerBit:(unsigned short)chan withValue:(BOOL)aValue;
 
-- (void) setThreshold:(short)chan withValue:(long)aValue;
-- (long) threshold:(short)chan;
+- (void) setThreshold:(unsigned short)chan withValue:(long)aValue;
+- (long) threshold:(unsigned short)chan;
 
-- (short)cfdControlBits:(short)aChan;
-- (void) setCfdControlBits:(short)aChan withValue:(short)aValue;
+- (long)cfdControlBits:(unsigned short)aChan;
+- (void) setCfdControlBits:(unsigned short)aChan withValue:(long)aValue;
 
-- (unsigned short) energyDivider:(short) aChan;
-- (void) setEnergyDivider:(short)aChan withValue:(unsigned short)aValue;
+- (unsigned short) energyDivider:(unsigned short)aChan;
+- (void) setEnergyDivider:(unsigned short)aChan withValue:(unsigned short)aValue;
 
-- (unsigned short) energySubtractor:(short) aChan;
-- (void) setEnergySubtractor:(short)aChan withValue:(unsigned short)aValue;
+- (unsigned short) energySubtractor:(unsigned short)aChan;
+- (void) setEnergySubtractor:(unsigned short)aChan withValue:(unsigned short)aValue;
 
-- (void) setTauFactor:(short)chan withValue:(unsigned short)aValue;
-- (unsigned short) tauFactor:(short)chan;
+- (void) setTauFactor:(unsigned short)chan withValue:(unsigned short)aValue;
+- (unsigned short) tauFactor:(unsigned short)chan;
 
-- (void) setGapTime:(short)chan withValue:(unsigned short)aValue;
-- (unsigned short) gapTime:(short)chan;
+- (void) setGapTime:(unsigned short)chan withValue:(unsigned short)aValue;
+- (unsigned short) gapTime:(unsigned short)chan;
 
-- (void) setPeakingTime:(short)chan withValue:(unsigned short)aValue;
-- (unsigned short) peakingTime:(short)chan;
+- (void) setPeakingTime:(unsigned short)chan withValue:(unsigned short)aValue;
+- (unsigned short) peakingTime:(unsigned short)chan;
 
-- (void) setHeTrigThreshold:(short)chan withValue:(unsigned long)aValue;
-- (unsigned long) heTrigThreshold:(short)chan;
+- (void) setHeTrigThreshold:(unsigned short)chan withValue:(unsigned long)aValue;
+- (unsigned long) heTrigThreshold:(unsigned short)chan;
 
 - (long) trigBothEdgesMask;
-- (BOOL) trigBothEdgesMask:(short)chan;
-- (void) setTrigBothEdgesMask:(long)aMask;
-- (void) setTrigBothEdgesBit:(short)chan withValue:(BOOL)aValue;
+- (BOOL) trigBothEdgesMask:(unsigned short)chan;
+- (void) setTrigBothEdgesMask:(unsigned long)aMask;
+- (void) setTrigBothEdgesBit:(unsigned short)chan withValue:(BOOL)aValue;
 
 - (long) intHeTrigOutPulseMask;
-- (BOOL) intHeTrigOutPulseMask:(short)chan;
-- (void) setIntHeTrigOutPulseMask:(long)aMask;
-- (void) setIntHeTrigOutPulseBit:(short)chan withValue:(BOOL)aValue;
+- (BOOL) intHeTrigOutPulseMask:(unsigned short)chan;
+- (void) setIntHeTrigOutPulseMask:(unsigned long)aMask;
+- (void) setIntHeTrigOutPulseBit:(unsigned short)chan withValue:(BOOL)aValue;
 
-- (unsigned short) intTrigOutPulseBit:(short)aChan;
-- (void) setIntTrigOutPulseBit:(short)aChan withValue:(unsigned short)aValue;
+- (unsigned short) intTrigOutPulseBit:(unsigned short)aChan;
+- (void)           setIntTrigOutPulseBit:(unsigned short)aChan withValue:(unsigned short)aValue;
 
-- (unsigned short) activeTrigGateWindowLen:(short)aGroup;
-- (void) setActiveTrigGateWindowLen:(short)aGroup withValue:(unsigned short)aValue;
+- (unsigned short) activeTrigGateWindowLen:(unsigned short)group;
+- (void)           setActiveTrigGateWindowLen:(unsigned short)group withValue:(unsigned short)aValue;
 
-- (unsigned short)  preTriggerDelay:(short)aGroup;
-- (void)            setPreTriggerDelay:(short)aGroup withValue:(unsigned short)aValue;
+- (unsigned short)  preTriggerDelay:(unsigned short)group;
+- (void)            setPreTriggerDelay:(unsigned short)group withValue:(unsigned short)aValue;
 
-- (unsigned long)  rawDataBufferLen:(short) aGroup;
-- (void)            setRawDataBufferLen:(short)aGroup withValue:(unsigned long)aValue;
+- (unsigned long)  rawDataBufferLen:(unsigned short)aGroup;
+- (void)            setRawDataBufferLen:(unsigned short)group withValue:(unsigned long)aValue;
 
-- (unsigned long)  rawDataBufferStart:(short) aGroup;
-- (void)           setRawDataBufferStart:(short)aGroup withValue:(unsigned long)aValue;
+- (unsigned long)  rawDataBufferStart:(unsigned short)aGroup;
+- (void)           setRawDataBufferStart:(unsigned short)group withValue:(unsigned long)aValue;
 
-- (unsigned short)  accGate1Start:(short) aGroup;
-- (void)            setAccGate1Start:(short)aGroup withValue:(unsigned short)aValue;
+- (unsigned short)  accGate1Start:(unsigned short)aGroup;
+- (void)            setAccGate1Start:(unsigned short)group withValue:(unsigned short)aValue;
 
-- (unsigned short)  accGate1Len:(short) aGroup;
-- (void)            setAccGate1Len:(short)aGroup withValue:(unsigned short)aValue;
+- (unsigned short)  accGate1Len:(unsigned short)aGroup;
+- (void)            setAccGate1Len:(unsigned short)group withValue:(unsigned short)aValue;
 
-- (unsigned short)  accGate2Start:(short) aGroup;
-- (void)            setAccGate2Start:(short)aGroup withValue:(unsigned short)aValue;
+- (unsigned short)  accGate2Start:(unsigned short)aGroup;
+- (void)            setAccGate2Start:(unsigned short)group withValue:(unsigned short)aValue;
 
-- (unsigned short)  accGate2Len:(short) aGroup;
-- (void)            setAccGate2Len:(short)aGroup withValue:(unsigned short)aValue;
+- (unsigned short)  accGate2Len:(unsigned short)aGroup;
+- (void)            setAccGate2Len:(unsigned short)group withValue:(unsigned short)aValue;
 
-- (unsigned short)  accGate3Start:(short) aGroup;
-- (void)            setAccGate3Start:(short)aGroup withValue:(unsigned short)aValue;
+- (unsigned short)  accGate3Start:(unsigned short)aGroup;
+- (void)            setAccGate3Start:(unsigned short)group withValue:(unsigned short)aValue;
 
-- (unsigned short)  accGate3Len:(short) aGroup;
-- (void)            setAccGate3Len:(short)aGroup withValue:(unsigned short)aValue;
+- (unsigned short)  accGate3Len:(unsigned short)aGroup;
+- (void)            setAccGate3Len:(unsigned short)group withValue:(unsigned short)aValue;
 
-- (unsigned short)  accGate4Start:(short) aGroup;
-- (void)            setAccGate4Start:(short)aGroup withValue:(unsigned short)aValue;
+- (unsigned short)  accGate4Start:(unsigned short)aGroup;
+- (void)            setAccGate4Start:(unsigned short)group withValue:(unsigned short)aValue;
 
-- (unsigned short)  accGate4Len:(short) aGroup;
-- (void)            setAccGate4Len:(short)aGroup withValue:(unsigned short)aValue;
+- (unsigned short)  accGate4Len:(unsigned short)aGroup;
+- (void)            setAccGate4Len:(unsigned short)group withValue:(unsigned short)aValue;
 
-- (unsigned short)  accGate5Start:(short) aGroup;
-- (void)            setAccGate5Start:(short)aGroup withValue:(unsigned short)aValue;
+- (unsigned short)  accGate5Start:(unsigned short)aGroup;
+- (void)            setAccGate5Start:(unsigned short)group withValue:(unsigned short)aValue;
 
-- (unsigned short)  accGate5Len:(short) aGroup;
-- (void)            setAccGate5Len:(short)aGroup withValue:(unsigned short)aValue;
+- (unsigned short)  accGate5Len:(unsigned short)aGroup;
+- (void)            setAccGate5Len:(unsigned short)group withValue:(unsigned short)aValue;
 
-- (unsigned short)  accGate6Start:(short) aGroup;
-- (void)            setAccGate6Start:(short)aGroup withValue:(unsigned short)aValue;
+- (unsigned short)  accGate6Start:(unsigned short)aGroup;
+- (void)            setAccGate6Start:(unsigned short)group withValue:(unsigned short)aValue;
 
-- (unsigned short)  accGate6Len:(short) aGroup;
-- (void)            setAccGate6Len:(short)aGroup withValue:(unsigned short)aValue;
+- (unsigned short)  accGate6Len:(unsigned short)aGroup;
+- (void)            setAccGate6Len:(unsigned short)group withValue:(unsigned short)aValue;
 
-- (unsigned short)  accGate7Start:(short) aGroup;
-- (void)            setAccGate7Start:(short)aGroup withValue:(unsigned short)aValue;
+- (unsigned short)  accGate7Start:(unsigned short)aGroup;
+- (void)            setAccGate7Start:(unsigned short)group withValue:(unsigned short)aValue;
 
-- (unsigned short)  accGate7Len:(short) aGroup;
-- (void)            setAccGate7Len:(short)aGroup withValue:(unsigned short)aValue;
+- (unsigned short)  accGate7Len:(unsigned short)aGroup;
+- (void)            setAccGate7Len:(unsigned short)group withValue:(unsigned short)aValue;
 
-- (unsigned short)  accGate8Start:(short) aGroup;
-- (void)            setAccGate8Start:(short)aGroup withValue:(unsigned short)aValue;
+- (unsigned short)  accGate8Start:(unsigned short)aGroup;
+- (void)            setAccGate8Start:(unsigned short)group withValue:(unsigned short)aValue;
 
-- (unsigned short)  accGate8Len:(short) aGroup;
-- (void)            setAccGate8Len:(short)aGroup withValue:(unsigned short)aValue;
+- (unsigned short)  accGate8Len:(unsigned short)aGroup;
+- (void)            setAccGate8Len:(unsigned short)group withValue:(unsigned short)aValue;
 
 - (BOOL) bankFullTo3;
 - (void) setBankFullTo3:(BOOL)aBankFullTo3;
@@ -548,7 +548,7 @@ enum{
 - (void)			setWaveFormRateGroup:(ORRateGroup*)newRateGroup;
 - (id)              rateObject:(int)channel;
 - (void)            setRateIntegrationTime:(double)newIntegrationTime;
-- (BOOL)			bumpRateFromDecodeStage:(short)channel;
+- (BOOL)			bumpRateFromDecodeStage:(unsigned short)channel;
 
 - (int) numberOfSamples;
 - (BOOL) checkRegList;

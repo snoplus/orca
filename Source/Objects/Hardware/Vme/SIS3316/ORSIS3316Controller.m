@@ -48,8 +48,8 @@
 
 - (void) awakeFromNib
 {
-    settingSize     = NSMakeSize(865,860);
-    rateSize		= NSMakeSize(790,300);
+    settingSize     = NSMakeSize(900,900);
+    rateSize		= NSMakeSize(790,460);
     
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
@@ -59,18 +59,9 @@
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
-			
-	OHexFormatter *numberFormatter = [[[OHexFormatter alloc] init] autorelease];
-	
-	NSNumberFormatter *rateFormatter = [[[NSNumberFormatter alloc] init] autorelease];
-	[rateFormatter setFormat:@"##0.0;0;-##0.0"];
-	
+				
 	int i;
 	for(i=0;i<kNumSIS3316Channels;i++){
-        [[thresholdMatrix           cellAtRow:i column:0] setFormatter:numberFormatter];
-        [[heTrigThresholdMatrix     cellAtRow:i column:0] setFormatter:numberFormatter];
-		[[rateTextFields            cellAtRow:i column:0] setFormatter:rateFormatter];
-        
         [[enabledMatrix             cellAtRow:i column:0] setTag:i];
         [[histogramsEnabledMatrix   cellAtRow:i column:0] setTag:i];
         [[pileupEnabledMatrix       cellAtRow:i column:0] setTag:i];
@@ -78,19 +69,18 @@
         [[writeHitsIntoEventMemoryMatrix   cellAtRow:i column:0] setTag:i];
         [[thresholdMatrix           cellAtRow:i column:0] setTag:i];
         [[heSuppressTrigModeMatrix  cellAtRow:i column:0] setTag:i];
-        [[cfdControlMatrix          cellAtRow:i column:0] setTag:i];
         [[heTrigThresholdMatrix     cellAtRow:i column:0] setTag:i];
-        [[intTrigOutPulseBitsMatrix cellAtRow:i column:0] setTag:i];
         [[energyDividerMatrix       cellAtRow:i column:0] setTag:i];
         [[energySubtractorMatrix    cellAtRow:i column:0] setTag:i];
         [[tauFactorMatrix           cellAtRow:i column:0] setTag:i];
         [[gapTimeMatrix             cellAtRow:i column:0] setTag:i];
         [[peakingTimeMatrix         cellAtRow:i column:0] setTag:i];
-	}  
+        [[trigBothEdgesMatrix       cellAtRow:i column:0] setTag:i];
+        [[intHeTrigOutPulseMatrix   cellAtRow:i column:0] setTag:i];
+        
+	}
     for(i=0;i<kNumSIS3316Groups;i++){
-        [[activeTrigGateWindowLenMatrix cellAtRow:i column:0] setFormatter:numberFormatter];
         [[activeTrigGateWindowLenMatrix cellAtRow:i column:0] setTag:i];
-        [[preTriggerDelayMatrix cellAtRow:i column:0] setFormatter:numberFormatter];
         [[preTriggerDelayMatrix cellAtRow:i column:0] setTag:i];
         [[accGate1LenMatrix     cellAtRow:i column:0] setTag:i];
         [[accGate1StartMatrix   cellAtRow:i column:0] setTag:i];
@@ -117,7 +107,7 @@
 	[(ORTimeAxis*)[timeRatePlot xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 	[aPlot1 release];
 	
-	[rate0 setNumber:8 height:10 spacing:5];
+	[rate0 setNumber:16 height:10 spacing:5];
 	
 	[super awakeFromNib];
 }
@@ -140,7 +130,7 @@
     
     [notifyCenter addObserver : self
                      selector : @selector(settingsLockChanged:)
-                         name : ORRunStatusChangedNotification  //kControlStatusReg? 6.1?
+                         name : ORRunStatusChangedNotification
                        object : nil];
     
     [notifyCenter addObserver : self
@@ -173,7 +163,6 @@
                          name : ORSIS3316ThresholdChanged
                        object : model];
 
-  
     [notifyCenter addObserver : self
                      selector : @selector(cfdControlBitsChanged:)
                          name : ORSIS3316CfdControlBitsChanged
@@ -360,14 +349,11 @@
                          name : ORRateAverageChangedNotification
                        object : [[model waveFormRateGroup]timeRate]];
     
-	
- 	
     [notifyCenter addObserver : self
                      selector : @selector(pageSizeChanged:)
                          name : ORSIS3316PageSizeChanged
 						object: model];
 	
-    [self registerRates];
     [notifyCenter addObserver : self
                      selector : @selector(stopDelayChanged:)
                          name : ORSIS3316StopDelayChanged
@@ -429,7 +415,8 @@
                          name : ORSIS3316SerialNumberChanged
                         object: model];
     
-    
+    [self registerRates];
+
 }
 
 - (void) registerRates
@@ -534,7 +521,6 @@
 }
 - (void) cfdControlBitsChanged:(NSNotification*)aNote
 {
-    
     if(aNote == nil){
         short i;
         for(i=0;i<kNumSIS3316Channels;i++){
@@ -547,45 +533,453 @@
     }
 }
 
-- (void) histogramsEnabledChanged:(NSNotification*)aNote        { [self updateBOOLMatrix:histogramsEnabledMatrix        getter:@selector(histogramsEnabled:)]; }
-- (void) pileupEnabledChanged:(NSNotification*)aNote            { [self updateBOOLMatrix:pileupEnabledMatrix            getter:@selector(pileupEnabled:)]; }
-- (void) clrHistogramWithTSChanged:(NSNotification*)aNote       { [self updateBOOLMatrix:clrHistogramWithTSMatrix       getter:@selector(clrHistogramsWithTS:)]; }
-- (void) writeHitsIntoEventMemoryChanged:(NSNotification*)aNote { [self updateBOOLMatrix:writeHitsIntoEventMemoryMatrix getter:@selector(writeHitsToEventMemory:)]; }
+- (void) histogramsEnabledChanged:(NSNotification*)aNote
+{
+    short i;
+    for(i=0;i<kNumSIS3316Channels;i++){
+        [[histogramsEnabledMatrix cellWithTag:i] setState:[model histogramsEnabled:i]];
+    }
+}
 
-- (void) heSuppressTrigModeChanged:(NSNotification*)aNote { [self updateBOOLMatrix:heSuppressTrigModeMatrix getter:@selector(heSuppressTriggerMask:)]; }
-- (void) thresholdChanged:(NSNotification*)aNote          { [self updateValueMatrix:thresholdMatrix         getter:@selector(threshold:)]; }
+- (void) pileupEnabledChanged:(NSNotification*)aNote
+{
+    short i;
+    for(i=0;i<kNumSIS3316Channels;i++){
+        [[pileupEnabledMatrix cellWithTag:i] setState:[model pileupEnabled:i]];
+    }
+}
 
-- (void) energyDividerChanged:(NSNotification*)aNote      { [self updateValueMatrix:energyDividerMatrix     getter:@selector(energyDivider:)]; }
-- (void) energySubtractorChanged:(NSNotification*)aNote   { [self updateValueMatrix:energySubtractorMatrix  getter:@selector(energySubtractor:)]; }
+- (void) clrHistogramWithTSChanged:(NSNotification*)aNote
+{
+    short i;
+    for(i=0;i<kNumSIS3316Channels;i++){
+        [[clrHistogramWithTSMatrix cellWithTag:i] setState:[model clrHistogramsWithTS:i]];
+    }
+}
+- (void) writeHitsIntoEventMemoryChanged:(NSNotification*)aNote
+{
+    short i;
+    for(i=0;i<kNumSIS3316Channels;i++){
+        [[writeHitsIntoEventMemoryMatrix cellWithTag:i] setState:[model writeHitsToEventMemory:i]];
+    }
+}
 
-- (void) tauFactorChanged:(NSNotification*)aNote          { [self updateValueMatrix:tauFactorMatrix         getter:@selector(tauFactor:)]; }
-- (void) gapTimeChanged:(NSNotification*)aNote            { [self updateValueMatrix:gapTimeMatrix           getter:@selector(gapTime:)]; }
-- (void) peakingTimeChanged:(NSNotification*)aNote        { [self updateValueMatrix:peakingTimeMatrix       getter:@selector(peakingTime:)]; }
-- (void) heTrigThresholdChanged:(NSNotification*)aNote    { [self updateValueMatrix:heTrigThresholdMatrix   getter:@selector(heTrigThreshold:)]; }
-- (void) trigBothEdgesChanged:(NSNotification*)aNote      { [self updateBOOLMatrix:trigBothEdgesMatrix      getter:@selector(trigBothEdgesMask:)]; }
-- (void) intHeTrigOutPulseChanged:(NSNotification*)aNote  { [self updateBOOLMatrix:intHeTrigOutPulseMatrix  getter:@selector(intHeTrigOutPulseMask:)]; }
-- (void) intTrigOutPulseBitsChanged:(NSNotification*)aNote{ [self updatePUMatrix:intTrigOutPulseBitsMatrix  getter:@selector(intTrigOutPulseBit:)]; }
-- (void) activeTrigGateWindowLenChanged:(NSNotification*)aNote  {[self updateValueMatrix:activeTrigGateWindowLenMatrix getter:@selector(activeTrigGateWindowLen:)];}
-- (void) preTriggerDelayChanged:(NSNotification*)aNote    { [self updateValueMatrix:preTriggerDelayMatrix   getter:@selector(preTriggerDelay:)];}
+- (void) heSuppressTrigModeChanged:(NSNotification*)aNote
+{
+    short i;
+    for(i=0;i<kNumSIS3316Channels;i++){
+        [[heSuppressTrigModeMatrix cellWithTag:i] setState:[model heSuppressTriggerMask:i]];
+    }
+}
 
-- (void) accGate1LenChanged:  (NSNotification*)aNote      { [self updateValueMatrix:accGate1LenMatrix        getter:@selector(accGate1Len:)];}
-- (void) accGate1StartChanged:(NSNotification*)aNote      { [self updateValueMatrix:accGate1StartMatrix      getter:@selector(accGate1Start:)];}
-- (void) accGate2LenChanged:  (NSNotification*)aNote      { [self updateValueMatrix:accGate2LenMatrix        getter:@selector(accGate2Len:)];}
-- (void) accGate2StartChanged:(NSNotification*)aNote      { [self updateValueMatrix:accGate2StartMatrix      getter:@selector(accGate2Start:)];}
-- (void) accGate3LenChanged:  (NSNotification*)aNote      { [self updateValueMatrix:accGate3LenMatrix        getter:@selector(accGate3Len:)];}
-- (void) accGate3StartChanged:(NSNotification*)aNote      { [self updateValueMatrix:accGate3StartMatrix      getter:@selector(accGate3Start:)];}
-- (void) accGate4LenChanged:  (NSNotification*)aNote      { [self updateValueMatrix:accGate4LenMatrix        getter:@selector(accGate4Len:)];}
-- (void) accGate4StartChanged:(NSNotification*)aNote      { [self updateValueMatrix:accGate4StartMatrix      getter:@selector(accGate4Start:)];}
-- (void) accGate5LenChanged:  (NSNotification*)aNote      { [self updateValueMatrix:accGate5LenMatrix        getter:@selector(accGate5Len:)];}
-- (void) accGate5StartChanged:(NSNotification*)aNote      { [self updateValueMatrix:accGate5StartMatrix      getter:@selector(accGate5Start:)];}
-- (void) accGate6LenChanged:  (NSNotification*)aNote      { [self updateValueMatrix:accGate6LenMatrix        getter:@selector(accGate6Len:)];}
-- (void) accGate6StartChanged:(NSNotification*)aNote      { [self updateValueMatrix:accGate6StartMatrix      getter:@selector(accGate6Start:)];}
-- (void) accGate7LenChanged:  (NSNotification*)aNote      { [self updateValueMatrix:accGate7LenMatrix        getter:@selector(accGate7Len:)];}
-- (void) accGate7StartChanged:(NSNotification*)aNote      { [self updateValueMatrix:accGate7StartMatrix      getter:@selector(accGate7Start:)];}
-- (void) accGate8LenChanged:  (NSNotification*)aNote      { [self updateValueMatrix:accGate8LenMatrix        getter:@selector(accGate8Len:)];}
-- (void) accGate8StartChanged:(NSNotification*)aNote      { [self updateValueMatrix:accGate8StartMatrix      getter:@selector(accGate8Start:)];}
-- (void) rawDataBufferLenChanged:  (NSNotification*)aNote { [self updateValueMatrix:rawDataBufferLenMatrix   getter:@selector(rawDataBufferLen:)];}
-- (void) rawDataBufferStartChanged:(NSNotification*)aNote { [self updateValueMatrix:rawDataBufferStartMatrix getter:@selector(rawDataBufferStart:)];}
+- (void) trigBothEdgesChanged:(NSNotification*)aNote
+{
+    short i;
+    for(i=0;i<kNumSIS3316Channels;i++){
+        [[trigBothEdgesMatrix cellWithTag:i] setState:[model trigBothEdgesMask:i]];
+    }
+}
+- (void) intHeTrigOutPulseChanged:(NSNotification*)aNote
+{
+    short i;
+    for(i=0;i<kNumSIS3316Channels;i++){
+        [[intHeTrigOutPulseMatrix cellWithTag:i] setState:[model intHeTrigOutPulseMask:i]];
+    }
+}
+
+
+- (void) thresholdChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Channels;i++){
+            [[thresholdMatrix cellWithTag:i] setIntValue:[model threshold:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[thresholdMatrix cellWithTag:i] setIntValue:[model threshold:i]];
+    }
+}
+
+- (void) energyDividerChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Channels;i++){
+            [[energyDividerMatrix cellWithTag:i] setIntValue:[model energyDivider:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[energyDividerMatrix cellWithTag:i] setIntValue:[model energyDivider:i]];
+    }
+}
+
+- (void) energySubtractorChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Channels;i++){
+            [[energySubtractorMatrix cellWithTag:i] setIntValue:[model energySubtractor:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[energySubtractorMatrix cellWithTag:i] setIntValue:[model energySubtractor:i]];
+    }
+}
+
+
+- (void) tauFactorChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Channels;i++){
+            [[tauFactorMatrix cellWithTag:i] setIntValue:[model tauFactor:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[tauFactorMatrix cellWithTag:i] setIntValue:[model tauFactor:i]];
+    }
+}
+
+- (void) gapTimeChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Channels;i++){
+            [[gapTimeMatrix cellWithTag:i] setIntValue:[model gapTime:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[gapTimeMatrix cellWithTag:i] setIntValue:[model gapTime:i]];
+    }
+}
+
+- (void) peakingTimeChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Channels;i++){
+            [[peakingTimeMatrix cellWithTag:i] setIntValue:[model peakingTime:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[peakingTimeMatrix cellWithTag:i] setIntValue:[model peakingTime:i]];
+    }
+}
+
+- (void) heTrigThresholdChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Channels;i++){
+            [[heTrigThresholdMatrix cellWithTag:i] setIntValue:[model heTrigThreshold:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[heTrigThresholdMatrix cellWithTag:i] setIntValue:[model heTrigThreshold:i]];
+    }
+}
+
+- (void) intTrigOutPulseBitsChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Channels;i++){
+            [[intTrigOutPulseBitsMatrix cellAtRow:i column:0] selectItemAtIndex:[model intTrigOutPulseBit:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[intTrigOutPulseBitsMatrix cellAtRow:i column:0] selectItemAtIndex:[model intTrigOutPulseBit:i]];
+    }
+}
+
+- (void) activeTrigGateWindowLenChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Groups;i++){
+            [[activeTrigGateWindowLenMatrix cellWithTag:i] setIntValue:[model activeTrigGateWindowLen:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
+        [[activeTrigGateWindowLenMatrix cellWithTag:i] setIntValue:[model activeTrigGateWindowLen:i]];
+    }
+}
+
+- (void) preTriggerDelayChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Groups;i++){
+            [[preTriggerDelayMatrix cellWithTag:i] setIntValue:[model preTriggerDelay:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
+        [[preTriggerDelayMatrix cellWithTag:i] setIntValue:[model preTriggerDelay:i]];
+    }
+}
+
+- (void) accGate1LenChanged:  (NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Groups;i++){
+            [[accGate1LenMatrix cellWithTag:i] setIntValue:[model accGate1Len:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
+        [[accGate1LenMatrix cellWithTag:i] setIntValue:[model accGate1Len:i]];
+    }
+}
+
+- (void) accGate1StartChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Groups;i++){
+            [[accGate1StartMatrix cellWithTag:i] setIntValue:[model accGate1Start:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
+        [[accGate1StartMatrix cellWithTag:i] setIntValue:[model accGate1Start:i]];
+    }
+}
+
+- (void) accGate2LenChanged:  (NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Groups;i++){
+            [[accGate2LenMatrix cellWithTag:i] setIntValue:[model accGate2Len:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
+        [[accGate2LenMatrix cellWithTag:i] setIntValue:[model accGate2Len:i]];
+    }
+}
+
+- (void) accGate2StartChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Groups;i++){
+            [[accGate2StartMatrix cellWithTag:i] setIntValue:[model accGate2Start:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
+        [[accGate2StartMatrix cellWithTag:i] setIntValue:[model accGate2Start:i]];
+    }
+}
+
+- (void) accGate3LenChanged:  (NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Groups;i++){
+            [[accGate3LenMatrix cellWithTag:i] setIntValue:[model accGate3Len:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
+        [[accGate3LenMatrix cellWithTag:i] setIntValue:[model accGate3Len:i]];
+    }
+}
+
+- (void) accGate3StartChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Groups;i++){
+            [[accGate3StartMatrix cellWithTag:i] setIntValue:[model accGate3Start:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
+        [[accGate3StartMatrix cellWithTag:i] setIntValue:[model accGate3Start:i]];
+    }
+}
+
+- (void) accGate4LenChanged:  (NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Groups;i++){
+            [[accGate4LenMatrix cellWithTag:i] setIntValue:[model accGate4Len:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
+        [[accGate4LenMatrix cellWithTag:i] setIntValue:[model accGate4Len:i]];
+    }
+}
+
+- (void) accGate4StartChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Groups;i++){
+            [[accGate4StartMatrix cellWithTag:i] setIntValue:[model accGate4Start:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
+        [[accGate4StartMatrix cellWithTag:i] setIntValue:[model accGate4Start:i]];
+    }
+}
+
+- (void) accGate5LenChanged:  (NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Groups;i++){
+            [[accGate5LenMatrix cellWithTag:i] setIntValue:[model accGate5Len:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
+        [[accGate5LenMatrix cellWithTag:i] setIntValue:[model accGate5Len:i]];
+    }
+}
+
+- (void) accGate5StartChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Groups;i++){
+            [[accGate5StartMatrix cellWithTag:i] setIntValue:[model accGate5Start:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
+        [[accGate5StartMatrix cellWithTag:i] setIntValue:[model accGate5Start:i]];
+    }
+}
+
+- (void) accGate6LenChanged:  (NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Groups;i++){
+            [[accGate6LenMatrix cellWithTag:i] setIntValue:[model accGate6Len:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
+        [[accGate6LenMatrix cellWithTag:i] setIntValue:[model accGate6Len:i]];
+    }
+}
+
+- (void) accGate6StartChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Groups;i++){
+            [[accGate6StartMatrix cellWithTag:i] setIntValue:[model accGate6Start:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
+        [[accGate6StartMatrix cellWithTag:i] setIntValue:[model accGate6Start:i]];
+    }
+}
+
+- (void) accGate7LenChanged:  (NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Groups;i++){
+            [[accGate7LenMatrix cellWithTag:i] setIntValue:[model accGate7Len:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
+        [[accGate7LenMatrix cellWithTag:i] setIntValue:[model accGate7Len:i]];
+    }
+}
+
+- (void) accGate7StartChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Groups;i++){
+            [[accGate7StartMatrix cellWithTag:i] setIntValue:[model accGate7Start:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
+        [[accGate7StartMatrix cellWithTag:i] setIntValue:[model accGate7Start:i]];
+    }
+}
+
+- (void) accGate8LenChanged:  (NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Groups;i++){
+            [[accGate8LenMatrix cellWithTag:i] setIntValue:[model accGate8Len:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
+        [[accGate8LenMatrix cellWithTag:i] setIntValue:[model accGate8Len:i]];
+    }
+}
+
+- (void) accGate8StartChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Groups;i++){
+            [[accGate8StartMatrix cellWithTag:i] setIntValue:[model accGate8Start:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
+        [[accGate8StartMatrix cellWithTag:i] setIntValue:[model accGate8Start:i]];
+    }
+}
+
+- (void) rawDataBufferLenChanged:  (NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Groups;i++){
+            [[rawDataBufferLenMatrix cellWithTag:i] setIntValue:[model rawDataBufferLen:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
+        [[rawDataBufferLenMatrix cellWithTag:i] setIntValue:[model rawDataBufferLen:i]];
+    }
+}
+
+- (void) rawDataBufferStartChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Groups;i++){
+            [[rawDataBufferStartMatrix cellWithTag:i] setIntValue:[model rawDataBufferStart:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
+        [[rawDataBufferStartMatrix cellWithTag:i] setIntValue:[model rawDataBufferStart:i]];
+    }
+}
 
 - (void) csrChanged:(NSNotification*)aNote
 {
@@ -620,8 +1014,8 @@
     if(revision) [revisionField setStringValue:revision];
     else		 [revisionField setStringValue:@"---"];
     
-    if( [model majorRevision] == 0x20)   [gammaRevisionField setStringValue:@"Gamma Revision"];
-    else                            [gammaRevisionField setStringValue:@""];
+    if( [model majorRevision] == 0x20)  [gammaRevisionField setStringValue:@"Gamma"];
+    else                                [gammaRevisionField setStringValue:@"Std"];
 
 }
 
