@@ -56,6 +56,7 @@
 - (void)updateSlider:(NSSlider *)control setting:(int)inValue;
 - (void)updateStepper:(NSStepper *)control setting:(int)inValue;
 - (void)updateIntText:(NSTextField *)control setting:(int)inValue;
+- (void) updateValueMatrix:(NSMatrix*)aMatrix getter:(SEL)aGetter;
 - (void) incModelSortedBy:(SEL)aSelector;
 - (void) decModelSortedBy:(SEL)aSelector;
 
@@ -74,9 +75,6 @@
 - (IBAction) printDocument:(id)sender;
 
 - (IBAction) copy:(id)sender;
-- (void) updateValueMatrix:(NSMatrix*)aMatrix getter:(SEL)aGetter;
-- (void) updateBOOLMatrix:(NSMatrix*)aMatrix getter:(SEL)aGetter;
-- (void) updatePUMatrix:(NSMatrix*)aMatrix getter:(SEL)aGetter;
 
 @end
 
