@@ -172,6 +172,7 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
 - (void) setNPulses: (int) _NPulses;
 - (void) fireSmelliePulser;
 - (void) fireTelliePulser;
+- (void) setTellieMode: (BOOL) _tellieMode;
 - (void) firePulser;
 - (void) stopSmelliePulser;
 - (void) stopTelliePulser;
@@ -181,7 +182,7 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
 - (void) firePulser_rate: (float)rate pulseWidth:(double)_pulseWidth NPulses:(int)_NPulses;
 - (void) setDataReadout: (BOOL) val;
 - (void) ResetFifo;
--(void) setCaenMasks: (CAEN_CHANNEL_MASK)aChannelMask
+- (void) setCaenMasks: (CAEN_CHANNEL_MASK)aChannelMask
             GainMask:(CAEN_GAIN_MASK) aGainMask;
 - (void) ResetClock;
 - (void) setGTDelaysBits:(NSUInteger)aDGTMask LOBits:(NSUInteger)aLOMask;
