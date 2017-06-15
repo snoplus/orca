@@ -402,7 +402,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                             if(!scheduledToSendRateReport[aCrate]){
                                 scheduledToSendRateReport[aCrate] = [[NSDate date] retain];
                                 if(verboseDiagnostics) {
-                                    NSLog(@"Scheduled to send rate breakdown report for crate: %d\n",aCrate+1);
+                                    NSLog(@"Scheduled to send rate breakdown report for crate: %d\n",aCrate);
                                 }
                                 //the actual send will happen when the constraint check is finished
                             }
@@ -912,15 +912,32 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
             [record setObject:endTime                       forKey:@"endTime"];
             [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddHistoryAdcRecord" object:self userInfo:record];
             //-------------------------
-
+            
+            //spike ended. remove it and take it out of the breakdown dic
             [rateSpikes removeObjectForKey:aKey];
             if([[rateSpikes allKeys] count] == 0){
                 [rateSpikes release];
                 rateSpikes = nil;
             }
+            
+            [breakDownDictionary removeObjectForKey:@"changed"];
+            NSMutableDictionary* detectorEntries = [breakDownDictionary objectForKey:@"detectorEntries"];
+            for(id aKey in [detectorEntries allKeys]){
+                NSMutableDictionary* anEntry = [detectorEntries objectForKey:aKey];
+                ORRunningAveSpike* rateInfo  = [anEntry objectForKey:@"rateInfo"];
+                if(rateInfo){
+                    [anEntry removeObjectForKey:@"rateInfo"];
+                    if(![anEntry objectForKey:@"baselineInfo"]){
+                        //no baseline entry either, so remove the entry all together
+                        [detectorEntries removeObjectForKey:aKey];
+                    }
+                }
+            }
+            
             if(verboseDiagnostics){
                 NSLog(@"Rate spike dictionary: %@\n",rateSpikes?rateSpikes:@"Empty");
-            }
+                NSLog(@"Breakdown dictionary spike ended: %@\n",breakDownDictionary);
+           }
 
         }
     }
@@ -994,8 +1011,25 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                 [baselineSpikes release];
                 baselineSpikes = nil;
             }
+            
+            [breakDownDictionary removeObjectForKey:@"changed"];
+            NSMutableDictionary* detectorEntries = [breakDownDictionary objectForKey:@"detectorEntries"];
+            for(id aKey in [detectorEntries allKeys]){
+                NSMutableDictionary* anEntry = [detectorEntries objectForKey:aKey];
+                ORRunningAveSpike* rateInfo  = [anEntry objectForKey:@"baselineInfo"];
+                if(rateInfo){
+                    [anEntry removeObjectForKey:@"baselineInfo"];
+                    if(![anEntry objectForKey:@"rateInfo"]){
+                        //no baseline spike entry either, so remove the entry all together
+                        [detectorEntries removeObjectForKey:aKey];
+                    }
+                }
+            }
+
+            
             if(verboseDiagnostics){
                 NSLog(@"Baseline excursion dictionary: %@\n",baselineSpikes?baselineSpikes:@"Empty");
+                NSLog(@"Breakdown dictionary baseline excursion ended: %@\n",breakDownDictionary);
             }
 
         }
