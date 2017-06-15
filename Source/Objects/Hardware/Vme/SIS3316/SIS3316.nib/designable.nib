@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
-        <deployment version="1070" identifier="macosx"/>
+        <deployment version="1060" identifier="macosx"/>
         <development version="7000" identifier="xcode"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
         <capability name="box content view" minToolsVersion="7.0"/>
@@ -249,11 +249,11 @@
                                             <tabViewItems>
                                                 <tabViewItem label="Settings" identifier="1" id="WwZ-ff-Haf">
                                                     <view key="view" id="4mL-Ym-aOJ">
-                                                        <rect key="frame" x="10" y="25" width="839" height="479"/>
+                                                        <rect key="frame" x="10" y="29" width="839" height="475"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <box misplaced="YES" title="Channel Parameters" id="1703">
-                                                                <rect key="frame" x="6" y="13" width="828" height="466"/>
+                                                                <rect key="frame" x="6" y="9" width="828" height="466"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                                                 <view key="contentView" id="Rn2-gj-iQW">
                                                                     <rect key="frame" x="2" y="2" width="824" height="450"/>
