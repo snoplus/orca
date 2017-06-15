@@ -151,7 +151,6 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
 - (NSUInteger) ConvertValueToBits: (float) value NBits: (int) nBits MinVal: (float) minVal MaxVal: (float) maxVal;
 
 - (void) sendOkCmd:(NSString* const)aCmd;
-- (void) sendOkCmd:(NSString* const)aCmd print:(BOOL)printCheck;
 - (int) sendIntCmd:(NSString* const)aCmd;
 - (NSUInteger) MTCAMimic_VoltsToBits: (float) VoltageValue;
 - (float) MTCAMimic_BitsToVolts: (NSUInteger) BitValue;
