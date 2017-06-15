@@ -113,6 +113,7 @@
     IBOutlet NSTextField*   gateValveStateField1;
     IBOutlet NSTextField*   sourceIsInField1;
 
+    IBOutlet NSButton*      verboseDiagnosticsCB;
     IBOutlet NSButton*      calibrationLockButton;
     
 	NSView *blankView;
@@ -127,6 +128,7 @@
 #pragma mark ¥¥¥Initialization
 - (void) registerNotificationObservers;
 - (void) updateWindow;
+- (void) verboseDiagnosticsChanged:(NSNotification*)aNote;
 - (void) updateLastConstraintCheck:(NSNotification*)aNote;
 - (void) secondaryColorAxisAttributesChanged:(NSNotification*)aNote;
 - (void) secondaryAdcClassNameChanged:(NSNotification*)aNote;
@@ -199,6 +201,7 @@
 - (void)     confirmCloseGateValve:(int)index;
 - (IBAction) printBreakdownReport:(id)sender;
 - (IBAction) maxNonCalibrationRateAction:(id)sender;
+- (IBAction) verboseDiagnosticsAction:(id)sender;
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem;
 

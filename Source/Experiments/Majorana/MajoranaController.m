@@ -61,7 +61,7 @@
 {
 	detectorSize		 = NSMakeSize(770,740);
 	detailsSize			 = NSMakeSize(560,600);
-	subComponentViewSize = NSMakeSize(590,630);
+	subComponentViewSize = NSMakeSize(590,645);
 	detectorMapViewSize	 = NSMakeSize(900,760);
     vetoMapViewSize		 = NSMakeSize(580,565);
     calibrationViewSize	 = NSMakeSize(580,320);
@@ -264,6 +264,12 @@
                      selector : @selector(maxNonCalibrationRateChanged:)
                          name : ORMajoranaModelMaxNonCalibrationRate
                        object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(verboseDiagnosticsChanged:)
+                         name : ORMajoranaModelVerboseDiagnosticsChanged
+                       object : nil];
+
 }
 
 
@@ -299,6 +305,7 @@
     [self updateLastConstraintCheck:nil];
     [self breakdownDetectedChanged:nil];
     [self sourceStateChanged:nil];
+    [self verboseDiagnosticsChanged:nil];
     
     //Source
     [self calibrationLockChanged:nil];
@@ -308,6 +315,11 @@
     [self sourcePatternChanged:nil];
     [self sourceGatevalveChanged:nil];
     [self sourceIsInChanged:nil];
+}
+
+- (void) verboseDiagnosticsChanged:(NSNotification*)aNote
+{
+    [verboseDiagnosticsCB setState:[model verboseDiagnostics]];
 }
 
 - (void) sourceIsInChanged:(NSNotification*)aNote
@@ -939,6 +951,12 @@
 
 
 #endif
+
+- (IBAction) verboseDiagnosticsAction:(id)sender;
+{
+    [model setVerboseDiagnostics:[sender intValue]];
+}
+
 - (IBAction) initDigitizerAction:(id)sender
 {
     [model initDigitizers];

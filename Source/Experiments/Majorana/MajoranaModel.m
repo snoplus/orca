@@ -53,6 +53,7 @@ NSString* ORMJDAuxTablesChanged                         = @"ORMJDAuxTablesChange
 NSString* ORMajoranaModelLastConstraintCheckChanged     = @"ORMajoranaModelLastConstraintCheckChanged";
 NSString* ORMajoranaModelUpdateSpikeDisplay             = @"ORMajoranaModelUpdateSpikeDisplay";
 NSString* ORMajoranaModelMaxNonCalibrationRate          = @"ORMajoranaModelMaxNonCalibrationRate";
+NSString* ORMajoranaModelVerboseDiagnosticsChanged      = @"ORMajoranaModelVerboseDiagnosticsChanged";
 
 static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
@@ -289,6 +290,17 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         }
     }
 }
+- (BOOL) verboseDiagnostics
+{
+    return verboseDiagnostics;
+}
+
+- (void) setVerboseDiagnostics:(BOOL)aState
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setVerboseDiagnostics:verboseDiagnostics];
+    verboseDiagnostics = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORMajoranaModelVerboseDiagnosticsChanged" object:self];
+}
 
 - (void) hvInfoRequest:(NSNotification*)aNote
 {
@@ -389,6 +401,9 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                             [breakDownDictionary setObject:@"YES" forKey:@"changed"];
                             if(!scheduledToSendRateReport[aCrate]){
                                 scheduledToSendRateReport[aCrate] = [[NSDate date] retain];
+                                if(verboseDiagnostics) {
+                                    NSLog(@"Scheduled to send rate breakdown report for crate: %d\n",aCrate+1);
+                                }
                                 //the actual send will happen when the constraint check is finished
                             }
                         }
@@ -400,6 +415,10 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                         if(!scheduledToSendBaselineReport){
                             scheduledToSendBaselineReport = YES;
                             [self performSelector:@selector(sendRateBaselineReport) withObject:nil afterDelay:15];
+                            if(verboseDiagnostics) {
+                                NSLog(@"Scheduled to send baseline excursion report in 15 seconds\n");
+                            }
+
                         }
                    }
                     
@@ -419,22 +438,39 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
             }
         }
     }
-    
+    if(verboseDiagnostics){
+        NSLog(@"Breakdown Dictionary After Update: %@\n",breakDownDictionary?breakDownDictionary:@"Empty");
+    }
+
     if(!rateSpikes){
+        if(verboseDiagnostics){
+            NSLog(@"Checking Breakdown Dictionary for Rate Spikes to remove\n");
+        }
         //no ratespikes exist.. remove spikes from all detectors
         NSMutableDictionary* detectorEntries = [breakDownDictionary objectForKey:@"detectorEntries"];
         for(id aKey in detectorEntries){
             NSMutableDictionary* anEntry = [detectorEntries objectForKey:aKey];
             [anEntry removeObjectForKey:@"rateInfo"];
         }
+        if(verboseDiagnostics){
+            NSLog(@"No Rate Spikes. New Breakdown Dictionary: %@\n",[[[breakDownDictionary objectForKey:@"detectorEntries"]allKeys]count]?breakDownDictionary:@"Empty");
+        }
+
     }
     if(!baselineSpikes){
+        if(verboseDiagnostics){
+            NSLog(@"Checking Breakdown Dictionary for Baseline Excursions to remove\n");
+        }
         //no baselineSpikes exist.. remove spikes from all detectors
         NSMutableDictionary* detectorEntries = [breakDownDictionary objectForKey:@"detectorEntries"];
         for(id aKey in detectorEntries){
             NSMutableDictionary* anEntry = [detectorEntries objectForKey:aKey];
             [anEntry removeObjectForKey:@"baselineInfo"];
        }
+        if(verboseDiagnostics){
+            NSLog(@"No Baseline Excursions. New Breakdown Dictionary: %@\n",[[[breakDownDictionary objectForKey:@"detectorEntries"]allKeys]count]?breakDownDictionary:@"Empty");
+        }
+
     }
     if(!rateSpikes && !baselineSpikes){
         [breakDownDictionary release];
@@ -454,17 +490,27 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     if(aCrate!=1 && aCrate!=2) return;
 
     if(!scheduledToSendRateReport[aCrate])return; //not scheduled at all
-    
     //have to ensure that the AMI has had enough time to have polled the valve states
     NSTimeInterval dt = [[NSDate date] timeIntervalSinceDate:scheduledToSendRateReport[aCrate]];
     int lnPollingTime = [self pollingTimeForLN:aCrate-1];
     if(lnPollingTime==0)lnPollingTime = 45; //default
+    
+    if(verboseDiagnostics){
+        NSLog(@"lnPollingtime: %d\n",lnPollingTime);
+        NSLog(@"time since report was scheduled: %.0f\n",dt);
+    }
+
     if(dt < lnPollingTime)return; //not enough time, it's OK since we'll be called again later
     
     [scheduledToSendRateReport[aCrate] release];
     scheduledToSendRateReport[aCrate] = nil;
-    
+    if(verboseDiagnostics){
+        NSLog(@"Time To Send Report. Will check for LN fill first\n");
+    }
     if(![self fillingLN:aCrate-1]){
+        if(verboseDiagnostics){
+            NSLog(@"Time To Send Report. NO LN fill so will send report.\n");
+        }
 
         //send out text to experts
         OROnCallListModel* onCallObj = [[(ORAppDelegate*)[NSApp delegate] document] findObjectWithFullID:@"OROnCallListModel,1"];
@@ -494,7 +540,17 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
             [onCallObj broadcastMessage:s1];
         }
     }
+    else {
+        if(verboseDiagnostics){
+            NSLog(@"Time To Send Report, but LN is fill so will NOT send report.\n");
+        }
+    }
     //don't care anymore
+    if(verboseDiagnostics){
+        NSLog(@"Clean out breakdown dictionary of rate spikes.\n");
+    }
+    [breakDownDictionary removeObjectForKey:@"changed"];
+
     NSMutableDictionary* detectorEntries = [breakDownDictionary objectForKey:@"detectorEntries"];
     for(id aKey in [detectorEntries allKeys]){
         NSMutableDictionary* anEntry = [detectorEntries objectForKey:aKey];
@@ -503,12 +559,16 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
             int crateKey = [[anEntry objectForKey:@"crate"] intValue];
             if(crateKey != aCrate)                      continue;
             [anEntry removeObjectForKey:@"rateInfo"];
-            if([anEntry allKeys] == 0){
+            if(![anEntry objectForKey:@"baselineInfo"]){
                 //no baseline entry either, so remove the entry all together
                 [detectorEntries removeObjectForKey:aKey];
             }
         }
     }
+    if(verboseDiagnostics){
+        NSLog(@"Breakdown dictionary after cleaning rate spikes: %@\n",breakDownDictionary);
+    }
+
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORMajoranaModelUpdateSpikeDisplay" object:self];
 
 }
@@ -536,19 +596,27 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         NSString* s1 = [NSString stringWithFormat:@"Baseline Excursions Reported\n%@",report];
         [onCallObj broadcastMessage:s1];
     }
-    
+    if(verboseDiagnostics){
+        NSLog(@"Clean out breakdown dictionary of baseline excursions.\n");
+    }
+    [breakDownDictionary removeObjectForKey:@"changed"];
+
     //don't care anymore
     for(id aKey in [detectorEntries allKeys]){
         NSMutableDictionary* anEntry = [detectorEntries objectForKey:aKey];
         ORRunningAveSpike* rateInfo  = [anEntry objectForKey:@"baselineInfo"];
         if(rateInfo){
             [anEntry removeObjectForKey:@"baselineInfo"];
-            if([anEntry allKeys] == 0){
+            if(![anEntry objectForKey:@"rateInfo"]){
                 //no rate spike entry either, so remove the entry all together
                 [detectorEntries removeObjectForKey:aKey];
             }
         }
     }
+    if(verboseDiagnostics){
+        NSLog(@"Breakdown dictionary after cleaning baseline excursions: %@\n",breakDownDictionary);
+    }
+
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORMajoranaModelUpdateSpikeDisplay" object:self];
 }
 
@@ -798,14 +866,24 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         if((aCrate == 2) &&  ignoreBreakdownCheckOnA)return;
         if((aCrate == 1) &&  ignoreBreakdownCheckOnB)return;
         //a spike happened..
+        if(verboseDiagnostics){
+            NSLog(@"Rate spike started: %@\n",[aNote userInfo]);
+        }
         if(![rateSpikes objectForKey:aKey]){
             //not noticed before, so store it
             if(!rateSpikes)rateSpikes = [[NSMutableDictionary dictionary] retain];
             [rateSpikes setObject:dic forKey:aKey]; //<<<--note, dictionary stored has spike and crate,card, chan info
         }
+        if(verboseDiagnostics){
+            NSLog(@"Rate spike dictionary: %@\n",rateSpikes);
+        }
+
     }
     else {
         //the spike has ended
+        if(verboseDiagnostics){
+            NSLog(@"Rate spike cleared: %@\n",[aNote userInfo]);
+        }
         NSDictionary* spikeDic = [rateSpikes objectForKey:aKey];
         if(spikeDic){
             ORRunningAveSpike* oldSpikeInfo = [spikeDic objectForKey:@"spikeInfo"];
@@ -840,6 +918,10 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                 [rateSpikes release];
                 rateSpikes = nil;
             }
+            if(verboseDiagnostics){
+                NSLog(@"Rate spike dictionary: %@\n",rateSpikes?rateSpikes:@"Empty");
+            }
+
         }
     }
     [self updateBreakdownDictionary:dic];
@@ -848,6 +930,10 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
 - (void) baselineSpike:(NSNotification*) aNote
 {
+    if(verboseDiagnostics){
+        NSLog(@"Baseline excursion started: %@\n",[aNote userInfo]);
+    }
+
     //either a spike happened or a spike cleared
     NSDictionary* dic = [aNote userInfo];
     ORRunningAveSpike* spikeInfo = [dic objectForKey:@"spikeInfo"];
@@ -866,8 +952,16 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
             if(!baselineSpikes)baselineSpikes = [[NSMutableDictionary dictionary] retain];
             [baselineSpikes setObject:dic forKey:aKey];
         }
+        if(verboseDiagnostics){
+            NSLog(@"Baseline excursion dictionary: %@\n",baselineSpikes);
+        }
+
     }
     else {
+        if(verboseDiagnostics){
+            NSLog(@"Baseline excursion ended: %@\n",[aNote userInfo]);
+        }
+
         if([baselineSpikes objectForKey:aKey]){
             
             //-------------------------
@@ -900,6 +994,10 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                 [baselineSpikes release];
                 baselineSpikes = nil;
             }
+            if(verboseDiagnostics){
+                NSLog(@"Baseline excursion dictionary: %@\n",baselineSpikes?baselineSpikes:@"Empty");
+            }
+
         }
     }
     [self updateBreakdownDictionary:dic];
@@ -1467,6 +1565,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     [self setIgnoreBreakdownPanicOnB:[decoder decodeBoolForKey:@"ignoreBreakdownPanicOnB"]];
     [self setIgnoreBreakdownPanicOnA:[decoder decodeBoolForKey:@"ignoreBreakdownPanicOnA"]];
     [self setViewType:[decoder decodeIntForKey:@"viewType"]];
+    [self setVerboseDiagnostics:[decoder decodeBoolForKey:@"verboseDiagnostics"]];
+    
     int i;
     for(i=0;i<2;i++){
         mjdInterlocks[i] = [[ORMJDInterlocks alloc] initWithDelegate:self slot:i];
@@ -1491,6 +1591,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:verboseDiagnostics forKey:@"verboseDiagnostics"];
     [encoder encodeBool:ignorePanicOnB forKey:@"ignorePanicOnB"];
     [encoder encodeBool:ignorePanicOnA forKey:@"ignorePanicOnA"];
     [encoder encodeBool:ignoreBreakdownCheckOnB forKey:@"ignoreBreakdownCheckOnB"];

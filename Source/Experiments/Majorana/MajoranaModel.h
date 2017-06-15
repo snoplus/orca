@@ -71,9 +71,12 @@
     ORHighRateChecker*    highRateChecker;
     
     BOOL testfillingLN[2];
+    BOOL verboseDiagnostics;
 }
 
 #pragma mark ¥¥¥Accessors
+- (BOOL) verboseDiagnostics;
+- (void) setVerboseDiagnostics:(BOOL)aState;
 - (NSDate*) lastConstraintCheck;
 - (void) setLastConstraintCheck:(NSDate*)aDate;
 - (BOOL) ignorePanicOnB;
@@ -192,6 +195,7 @@ extern NSString* ORMJDAuxTablesChanged;
 extern NSString* ORMajoranaModelLastConstraintCheckChanged;
 extern NSString* ORMajoranaModelUpdateSpikeDisplay;
 extern NSString* ORMajoranaModelMaxNonCalibrationRate;
+extern NSString* ORMajoranaModelVerboseDiagnosticsChanged;
 
 @interface ORMJDHeaderRecordID : NSObject
 - (NSString*) fullID;

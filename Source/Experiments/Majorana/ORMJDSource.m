@@ -92,7 +92,8 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
     self            = [super init];
     self.slot       = aSlot;
     self.delegate   = aDelegate;
-    return self;
+    self.speed      = 250; //default -- used to be 175
+   return self;
 }
 
 - (void) dealloc
@@ -101,7 +102,6 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
     self.delegate    = nil;
     self.stateStatus = nil;
     self.order       = nil;
-    self.speed       = 250; //default -- used to be 175
     [interlockFailureAlarm clearAlarm];
     [interlockFailureAlarm release];
     [super dealloc];
