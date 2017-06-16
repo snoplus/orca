@@ -1784,7 +1784,7 @@ void SwapLongBlock(void* p, int32_t n)
          "current_nominal_settings.crate   = current_channel_status.crate   AND "
          "current_nominal_settings.slot    = current_channel_status.slot    AND "
          "current_nominal_settings.channel = current_channel_status.channel AND "
-         "current_nominal_status.crate = %i",
+         "current_nominal_settings.crate = %i",
          [self crateNumber]];
 
     [db dbQuery:query object:self selector:@selector(nominalSettingsCallback:) timeout:10.0];
