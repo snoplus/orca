@@ -627,12 +627,6 @@ snopGreenColor;
 - (IBAction) startRunAction:(id)sender
 {
 
-    //If we are in OPERATOR mode we don't allow other version than DEFAULT
-    BOOL locked = [gSecurity isLocked:ORSNOPRunsLockNotification];
-    if(locked) { //Operator Mode
-        [model setStandardRunVersion:@"DEFAULT"];
-    }
-
     /* If we are not going to maintenance we shouldn't be polling */
     unsigned long dbruntypeword = 0;
     NSMutableDictionary* runSettings = [[[model standardRunCollection] objectForKey:[model standardRunType]] objectForKey:[model standardRunVersion]];
@@ -1739,14 +1733,7 @@ err:
 
     //[softwareTriggerButton setEnabled: !locked && !runInProgress];
     [runsLockButton setState: locked];
-    
-    /* Select default standard run if in operator mode.
-     Do it only when the lock status changes */
-    if(locked
-       && [standardRunPopupMenu numberOfItems] != 0
-       && ![[model standardRunVersion] isEqualToString:@"DEFAULT"]
-       && [aNotification isEqualTo:ORSNOPRunsLockNotification]) [model setStandardRunVersion:@"DEFAULT"];
-    
+
     //Enable or disable fields
     [standardRunThresCurrentValues setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunSaveButton setEnabled:!locked];
@@ -1758,7 +1745,6 @@ err:
     for(int irow=0;irow<21;irow++){
         [[runTypeWordMatrix cellAtRow:irow column:0] setEnabled:!lockedOrNotRunningMaintenance];
     }
-    [standardRunVersionPopupMenu setEnabled:!locked && [standardRunVersionPopupMenu numberOfItems]>0]; //allow to change version when in expert mode
     [timedRunCB setEnabled:!runInProgress];
     [timeLimitField setEnabled:!lockedOrNotRunningMaintenance];
     [repeatRunCB setEnabled:!lockedOrNotRunningMaintenance];

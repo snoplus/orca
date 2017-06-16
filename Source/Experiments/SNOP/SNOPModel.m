@@ -1899,7 +1899,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     if([[standardRunCollection objectForKey:standardRunType] count] == 0){
         [self setStandardRunVersion:@""];
     }
-    //If EXPERT mode: check if previous selected run version exists
+    //Check if previous selected run version exists
     if([[standardRunCollection objectForKey:standardRunType] objectForKey:standardRunVersion] == nil){
         //If not, select DEFAULT
         [self setStandardRunVersion:@"DEFAULT"];
