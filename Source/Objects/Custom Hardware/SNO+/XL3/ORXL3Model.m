@@ -1704,24 +1704,24 @@ void SwapLongBlock(void* p, int32_t n)
 - (void) nominalSettingsCallback: (ORPQResult *) result
 {
     int i, nrows, ncols, slot, channel;
-    int n100, n20, sequencer, hv;
+    int n100, n20, sequencer, hv, resistor_pulled;
     ORFec32Model *fec;
 
     if (!result) {
-        NSLog(@"crate %02d: database request for nominal settings failed!\n", [self crateNumber]);
+        NSLogColor([NSColor redColor], @"crate %02d: database request for nominal settings failed!\n", [self crateNumber]);
         return;
     }
 
     nrows = [result numOfRows];
     ncols = [result numOfFields];
 
-    if (ncols != 5) {
-        NSLog(@"crate %02d: expected 5 columns from the database, but got %i!\n", [self crateNumber], ncols);
+    if (ncols != 6) {
+        NSLogColor([NSColor redColor], @"crate %02d: expected 5 columns from the database, but got %i!\n", [self crateNumber], ncols);
         return;
     }
 
     if (nrows != 512) {
-        NSLog(@"crate %02d: expected 512 rows from the database, but got %i!\n", [self crateNumber], nrows);
+        NSLogColor([NSColor redColor], @"crate %02d: expected 512 rows from the database, but got %i!\n", [self crateNumber], nrows);
         return;
     }
 
@@ -1731,22 +1731,30 @@ void SwapLongBlock(void* p, int32_t n)
         n100 = [result getInt64atRow:i column:2];
         n20 = [result getInt64atRow:i column:3];
         sequencer = [result getInt64atRow:i column:4];
+        resistor_pulled = [result getInt64atRow:i column:5];
 
         fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
 
         if (!fec) continue;
 
         /* Check if the relay is open. */
-        hv = ([self relayMask] >> (slot*4 + (3-channel/8))) & 0x1;
-
-        [fec setSeq:channel enabled:sequencer];
+        hv = !resistor_pulled && (([self relayMask] >> (slot*4 + (3-channel/8))) & 0x1);
 
         if (hv) {
             [fec setTrigger100ns:channel enabled:n100];
             [fec setTrigger20ns:channel enabled:n20];
+            if (!sequencer) {
+                NSLogColor([NSColor redColor], @"%02d/%02d/%02d HV is on, "
+                    "turning sequencer on even though nominal state is off!\n",
+                    [self crateNumber], slot, channel);
+            }
+            /* Turn sequencer on regardless of the nominal state if this
+             * channel has HV on. */
+            [fec setSeq:channel enabled:1];
         } else {
             [fec setTrigger100ns:channel enabled:NO];
             [fec setTrigger20ns:channel enabled:NO];
+            [fec setSeq:channel enabled:sequencer];
         }
     }
 
@@ -1765,7 +1773,21 @@ void SwapLongBlock(void* p, int32_t n)
         return;
     }
 
-    [db dbQuery:[NSString stringWithFormat:@"SELECT slot, channel, n100, n20, sequencer FROM current_nominal_settings WHERE crate = %i", [self crateNumber]] object:self selector:@selector(nominalSettingsCallback:) timeout:10.0];
+    NSString *query = [NSString stringWithFormat:
+        @"SELECT current_nominal_settings.slot, "
+         "current_nominal_settings.channel, "
+         "current_nominal_settings.n100, "
+         "current_nominal_settings.n20, "
+         "current_nominal_settings.sequencer, "
+         "current_channel_status.resistor_pulled FROM "
+         "current_nominal_settings, current_channel_status WHERE "
+         "current_nominal_settings.crate   = current_channel_status.crate   AND "
+         "current_nominal_settings.slot    = current_channel_status.slot    AND "
+         "current_nominal_settings.channel = current_channel_status.channel AND "
+         "current_nominal_status.crate = %i",
+         [self crateNumber]]
+
+    [db dbQuery:query object:self selector:@selector(nominalSettingsCallback:) timeout:10.0];
 }
 
 - (void) _loadTriggersAndSequencers
