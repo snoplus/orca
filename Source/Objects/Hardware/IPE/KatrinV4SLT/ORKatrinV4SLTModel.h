@@ -26,19 +26,13 @@
 #import "SBC_Config.h"
 #import "ORKatrinV4SLTRegisters.h"
 
-
-#import "ORIpeV4SLTModel.h"   //for kKatrinV4SLTNumRegs declaration - maybe not necessary in the future any more -tb- 2014
-
-
-
 @class ORReadOutList;
 @class ORDataPacket;
 @class TimedWorker;
-@class ORIpeFLTModel;
 @class PMC_Link;
 @class SBC_Link;
 
-#define IsBitSet(A,B) (((A) & (B)) == (B))
+#define IsBitSet(A,B)       (((A) & (B)) == (B))
 #define ExtractValue(A,B,C) (((A) & (B)) >> (C))
 
 //control reg bit masks
@@ -47,15 +41,15 @@
 #define kCtrlPPSShift		10
 #define kCtrlTpEnEnShift	11
 
-#define kCtrlLedOffmask	(0x00000001 << 17) //RW
-#define kCtrlIntEnMask	(0x00000001 << 16) //RW
-#define kCtrlTstSltMask	(0x00000001 << 15) //RW
-#define kCtrlRunMask	(0x00000001 << 14) //RW
-#define kCtrlShapeMask	(0x00000001 << 13) //RW
-#define kCtrlTpEnMask	(0x00000003 << kCtrlTpEnEnShift)	//RW
-#define kCtrlPPSMask	(0x00000001 << kCtrlPPSShift)		//RW
-#define kCtrlInhEnMask	(0x0000000F <<  kCtrlInhEnShift)	//RW
-#define kCtrlTrgEnMask	(0x0000003F <<  kCtrlTrgEnShift)	//RW
+#define kCtrlLedOffmask	(0x00000001 << 17)               //RW
+#define kCtrlIntEnMask	(0x00000001 << 16)               //RW
+#define kCtrlTstSltMask	(0x00000001 << 15)               //RW
+#define kCtrlRunMask	(0x00000001 << 14)               //RW
+#define kCtrlShapeMask	(0x00000001 << 13)               //RW
+#define kCtrlTpEnMask	(0x00000003 << kCtrlTpEnEnShift) //RW
+#define kCtrlPPSMask	(0x00000001 << kCtrlPPSShift)    //RW
+#define kCtrlInhEnMask	(0x0000000F << kCtrlInhEnShift)	 //RW
+#define kCtrlTrgEnMask	(0x0000003F << kCtrlTrgEnShift)	 //RW
 
 //status reg bit masks
 #define kStatusIrq			(0x00000001 << 31) //R
@@ -122,10 +116,10 @@
 #define kPageMngResetShift			22
 #define kPageMngNumFreePagesShift	15
 #define kPageMngPgFullShift			14
-#define kPageMngNextPageShift		8
-#define kPageMngReadyShift			7
-#define kPageMngOldestPageShift	1
-#define kPageMngReleaseShift		0
+#define kPageMngNextPageShift		 8
+#define kPageMngReadyShift			 7
+#define kPageMngOldestPageShift      1
+#define kPageMngReleaseShift		 0
 
 #define kPageMngReset			(0x00000001 << kPageMngResetShift)			//W - self cleared
 #define kPageMngNumFreePages	(0x0000007F << kPageMngNumFreePagesShift)	//R
@@ -184,7 +178,7 @@
         NSString*   sltScriptArguments;
         BOOL        secondsSetInitWithHost;
         bool        secondsSetSendToFLTs;
-        uint32_t    pixelBusEnableReg;
+        unsigned long    pixelBusEnableReg;
 }
 
 #pragma mark •••Initialization
@@ -200,8 +194,8 @@
 - (void) runIsStartingSubRun:(NSNotification*)aNote;
 
 #pragma mark •••Accessors
-- (uint32_t) pixelBusEnableReg;
-- (void) setPixelBusEnableReg:(uint32_t)aPixelBusEnableReg;
+- (unsigned long) pixelBusEnableReg;
+- (void) setPixelBusEnableReg:(unsigned long)aPixelBusEnableReg;
 - (bool) secondsSetSendToFLTs;
 - (void) setSecondsSetSendToFLTs:(bool)aSecondsSetSendToFLTs;
 - (BOOL) secondsSetInitWithHost;
@@ -311,7 +305,6 @@
 - (void)		writeFIFOcsrReset;
 
 - (unsigned long long) readBoardID;
-- (void) readEventStatus:(unsigned long*)eventStatusBuffer;
 
 - (void)		  writePageSelect:(unsigned long)aPageNum;
 - (void)		  writeInterruptMask;

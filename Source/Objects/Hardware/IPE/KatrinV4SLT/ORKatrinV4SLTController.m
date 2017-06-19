@@ -787,21 +787,20 @@
 }
 
 //most of these are not currently connected to anything.. used during testing..
-- (IBAction) enableCountersAction:(id)sender	{ [self do:@selector(writeEnCnt) name:@"Enable Counters"]; }
-- (IBAction) disableCountersAction:(id)sender	{ [self do:@selector(writeDisCnt) name:@"Disable Counters"]; }
-- (IBAction) clearCountersAction:(id)sender		{ [self do:@selector(writeClrCnt) name:@"Clear Counters"]; }
-- (IBAction) activateSWRequestAction:(id)sender	{ [self do:@selector(writeSwRq) name:@"Active SW Request Interrupt"]; }
-- (IBAction) configureFPGAsAction:(id)sender	{ [self do:@selector(writeFwCfg) name:@"Config FPGAs"]; }
-- (IBAction) tpStartAction:(id)sender			{ [self do:@selector(writeTpStart) name:@"Test Pattern Start"]; }
-- (IBAction) resetFLTAction:(id)sender			{ [self do:@selector(writeFltReset) name:@"FLT Reset"]; }
-- (IBAction) resetSLTAction:(id)sender			{ [self do:@selector(writeSltReset) name:@"SLT Reset"]; }
-- (IBAction) writeSWTrigAction:(id)sender		{ [self do:@selector(writeSwTrigger) name:@"SW Trigger"]; }
-- (IBAction) writeClrInhibitAction:(id)sender	{ [self do:@selector(writeClrInhibit) name:@"Clr Inhibit"]; }
-- (IBAction) writeSetInhibitAction:(id)sender	{ [self do:@selector(writeSetInhibit) name:@"Set Inhibit"]; }
-- (IBAction) resetPageManagerAction:(id)sender	{ [self do:@selector(writePageManagerReset) name:@"Reset Page Manager"]; }
-- (IBAction) releaseAllPagesAction:(id)sender	{ [self do:@selector(writeReleasePage) name:@"Release Pages"]; }
-
-- (IBAction) clearAllStatusErrorBitsAction:(id)sender		{ [self do:@selector(clearAllStatusErrorBits) name:@"Clear All Status Error+Flag Bits"]; }
+- (IBAction) enableCountersAction:(id)sender          { [self do:@selector(writeEnCnt)              name:@"Enable Counters"];                  }
+- (IBAction) disableCountersAction:(id)sender         { [self do:@selector(writeDisCnt)             name:@"Disable Counters"];                 }
+- (IBAction) clearCountersAction:(id)sender           { [self do:@selector(writeClrCnt)             name:@"Clear Counters"];                   }
+- (IBAction) activateSWRequestAction:(id)sender       { [self do:@selector(writeSwRq)               name:@"Active SW Request Interrupt"];      }
+- (IBAction) configureFPGAsAction:(id)sender          { [self do:@selector(writeFwCfg)              name:@"Config FPGAs"];                     }
+- (IBAction) tpStartAction:(id)sender                 { [self do:@selector(writeTpStart)            name:@"Test Pattern Start"];               }
+- (IBAction) resetFLTAction:(id)sender                { [self do:@selector(writeFltReset)           name:@"FLT Reset"];                        }
+- (IBAction) resetSLTAction:(id)sender                { [self do:@selector(writeSltReset)           name:@"SLT Reset"];                        }
+- (IBAction) writeSWTrigAction:(id)sender             { [self do:@selector(writeSwTrigger)          name:@"SW Trigger"];                       }
+- (IBAction) writeClrInhibitAction:(id)sender         { [self do:@selector(writeClrInhibit)         name:@"Clr Inhibit"];                      }
+- (IBAction) writeSetInhibitAction:(id)sender         { [self do:@selector(writeSetInhibit)         name:@"Set Inhibit"];                      }
+- (IBAction) resetPageManagerAction:(id)sender        { [self do:@selector(writePageManagerReset)   name:@"Reset Page Manager"];               }
+- (IBAction) releaseAllPagesAction:(id)sender         { [self do:@selector(writeReleasePage)        name:@"Release Pages"];                    }
+- (IBAction) clearAllStatusErrorBitsAction:(id)sender { [self do:@selector(clearAllStatusErrorBits) name:@"Clear All Status Error+Flag Bits"]; }
 
 - (IBAction) sendCommandScript:(id)sender
 {
@@ -1019,11 +1018,11 @@
 - (IBAction) calibrateAction:(id)sender
 {
 #if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
-    [alert setMessageText:@"Threshold Calibration"];
-    [alert setInformativeText:@"Really run threshold calibration for ALL FLTs?\n This will change ALL thresholds on ALL cards."];
-    [alert addButtonWithTitle:@"Yes/Do Calibrate"];
-    [alert addButtonWithTitle:@"Cancel"];
+    NSAlert* alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:      @"Threshold Calibration"];
+    [alert setInformativeText:  @"Really run threshold calibration for ALL FLTs?\n This will change ALL thresholds on ALL cards."];
+    [alert addButtonWithTitle:  @"Yes/Do Calibrate"];
+    [alert addButtonWithTitle:  @"Cancel"];
     [alert setAlertStyle:NSWarningAlertStyle];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
@@ -1059,6 +1058,7 @@
     }    
 }
 #endif
+    
 - (void) do:(SEL)aSelector name:(NSString*)aName
 {
 	@try { 
