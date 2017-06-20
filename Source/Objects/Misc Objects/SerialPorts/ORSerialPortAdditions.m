@@ -72,7 +72,7 @@
     return totalWritten;
 }
 
-- (int) writeCharArray:(const char *)ptr length:(int)theLength
+- (int) writeCharArray:(const unsigned char *)ptr length:(int)theLength
 {
     int totalWritten     = 0;
     int totalNeedToWrite = theLength;
@@ -86,6 +86,13 @@
     
     return totalWritten;
 }
+
+- (int) readCharArray:(unsigned char *)ptr length:(int)theLength
+{
+    int len = read(fileDescriptor, (void*)ptr, theLength);
+    return len;
+}
+
 
 
 - (int) checkRead
