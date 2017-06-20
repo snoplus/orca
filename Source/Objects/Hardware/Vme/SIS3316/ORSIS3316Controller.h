@@ -42,6 +42,7 @@
     IBOutlet NSMatrix*		heSuppressTrigModeMatrix;
     IBOutlet NSMatrix*		cfdControlMatrix;
     IBOutlet NSMatrix*		thresholdMatrix;
+    IBOutlet NSMatrix*      thresholdSumMatrix;
     IBOutlet NSMatrix*		energyDividerMatrix;
     IBOutlet NSMatrix*		energySubtractorMatrix;
     IBOutlet NSMatrix*		tauFactorMatrix;
@@ -49,6 +50,7 @@
     IBOutlet NSMatrix*		peakingTimeMatrix;
     
     IBOutlet NSMatrix*		heTrigThresholdMatrix;
+    IBOutlet NSMatrix*      heTrigThresholdSumMatrix;
     IBOutlet NSMatrix*		trigBothEdgesMatrix;
     IBOutlet NSMatrix*		intHeTrigOutPulseMatrix;
     IBOutlet NSMatrix*		intTrigOutPulseBitsMatrix;
@@ -131,6 +133,7 @@
 #pragma mark •••Interface Management
 - (void) enabledChanged:(NSNotification*)aNote;
 - (void) thresholdChanged:(NSNotification*)aNote;
+- (void) thresholdSumChanged: (NSNotification*)aNote;
 - (void) energyDividerChanged:(NSNotification*)aNote;
 - (void) energySubtractorChanged:(NSNotification*)aNote;
 - (void) histogramsEnabledChanged:(NSNotification*)aNote;
@@ -142,6 +145,7 @@
 - (void) gapTimeChanged:(NSNotification*)aNote;
 - (void) peakingTimeChanged:(NSNotification*)aNote;
 - (void) heTrigThresholdChanged:(NSNotification*)aNote;
+- (void) heTrigThresholdSumChanged: (NSNotification*)aNote;
 - (void) trigBothEdgesChanged:(NSNotification*)aNote;
 - (void) intHeTrigOutPulseChanged:(NSNotification*)aNote;
 - (void) intTrigOutPulseBitsChanged:(NSNotification*)aNote;
@@ -204,12 +208,14 @@
 - (IBAction) heSuppressTrigModeAction:(id)sender;
 - (IBAction) cfdControlAction:(id)sender;
 - (IBAction) thresholdAction:(id)sender;
+- (IBAction) thresholdSumAction:(id)sender;
 - (IBAction) energyDividerAction:(id)sender;
 - (IBAction) energySubtractorAction:(id)sender;
 - (IBAction) tauFactorAction:(id)sender;
 - (IBAction) gapTimeAction:(id)sender;
 - (IBAction) peakingTimeAction:(id)sender;
 - (IBAction) heTrigThresholdAction:(id)sender;
+- (IBAction) heTrigThresholdSumAction:(id)sender;
 - (IBAction) trigBothEdgesAction:(id)sender;
 - (IBAction) intHeTrigOutPulseAction:(id)sender;
 - (IBAction) intTrigOutPulseBitsAction:(id)sender;
@@ -236,8 +242,6 @@
 
 - (IBAction) writeThresholdsAction:(id)sender;
 - (IBAction) readThresholdsAction:(id)sender;
-- (IBAction) writeHeTrigThresholdsAction:(id)sender;
-- (IBAction) readHeTrigThresholdsAction:(id)sender;
 
 - (IBAction) csrAction:(id)sender;
 - (IBAction) acqAction:(id)sender;

@@ -36,6 +36,7 @@ NSString* ORSIS3316ClrHistogramWithTSChanged       = @"ORSIS3316ClrHistogramWith
 NSString* ORSIS3316WriteHitsIntoEventMemoryChanged = @"ORSIS3316WriteHitsIntoEventMemoryChanged";
 
 NSString* ORSIS3316ThresholdChanged          = @"ORSIS3316ThresholdChanged";
+NSString* ORSIS3316ThresholdSumChanged          = @"ORSIS3316ThresholdSumChanged";
 NSString* ORSIS3316HeSuppressTrigModeChanged = @"ORSIS3316HeSuppressTrigModeChanged";
 NSString* ORSIS3316CfdControlBitsChanged     = @"ORSIS3316CfdControlBitsChanged";
 
@@ -45,6 +46,7 @@ NSString* ORSIS3316TauFactorChanged          = @"ORSIS3316TauFactorChanged";
 NSString* ORSIS3316PeakingTimeChanged        = @"ORSIS3316PeakingTimeChanged";
 NSString* ORSIS3316GapTimeChanged            = @"ORSIS3316GapTimeChanged";
 NSString* ORSIS3316HeTrigThresholdChanged    = @"ORSIS3316HeTrigThresholdChanged";
+NSString* ORSIS3316HeTrigThresholdSumChanged = @"ORSIS3316HeTrigThresholdSumChanged";
 NSString* ORSIS3316TrigBothEdgesChanged      = @"ORSIS3316TrigBothEdgesChanged";
 NSString* ORSIS3316IntHeTrigOutPulseChanged  = @"ORSIS3316IntHeTrigOutPulseChanged";
 NSString* ORSIS3316IntTrigOutPulseBitsChanged= @"ORSIS3316IntTrigOutPulseBitsChanged";
@@ -312,18 +314,6 @@ static ORSIS3316RegisterInformation group_register_information[kADCGroupRegister
 #define I2C_BUSY			31
 #define OSC_ADR             0x55
 
-NSString* cfdCntrlString[4] = {
-    @"Disabled     ",
-    @"Disabled     ",
-    @"Zero Crossing",
-    @"50%          "
-};
-NSString* intTrigOutPulseString[3] = {
-    @"Internal    ",
-    @"High Energy ",
-    @"Pileup Pulse"
-};
-
 // frequency presets setup
 unsigned char freqPreset62_5MHz[6] = {0x23,0xC2,0xBC,0x33,0xE4,0xF2};
 unsigned char freqPreset125MHz[6]  = {0x21,0xC2,0xBC,0x33,0xE4,0xF2};
@@ -476,8 +466,13 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
 	int i;
 	for(i=0;i<kNumSIS3316Channels;i++){
-		[self setThreshold:i withValue:0xFFFFFFF];  //7 F's? (max int value)
+		[self setThreshold:i withValue:0xFFFFFFF];
+        [self setHeTrigThreshold:i withValue:0xFFFFFFF];
 	}
+    for(i=0;i<kNumSIS3316Groups;i++){
+        [self setThresholdSum:i withValue:0xFFFFFFFF];
+        [self setHeTrigThresholdSum:i withValue:0xFFFFFFFF];
+    }
     
 	[self setEnableInternalRouting:YES];
 	[self setPageWrap:YES];
@@ -497,67 +492,6 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     return temperature;
 }
 
-//---------------------------------------------------------------------------
-- (long) enabledMask                                { return enabledMask;                              }
-- (BOOL) enabled:(unsigned short)chan               { return (enabledMask & (1<<chan)) != 0;           }
-- (long) heSuppressTriggerMask                      { return heSuppressTriggerMask;                    }
-- (BOOL) heSuppressTriggerMask:(unsigned short)chan { return (heSuppressTriggerMask & (1<<chan)) != 0; }
-- (long) cfdControlBits:(unsigned short)aChan       { if(aChan<kNumSIS3316Channels)return cfdControlBits[aChan]; else return 0; }
-- (long) threshold:(unsigned short)aChan            { if(aChan<kNumSIS3316Channels)return threshold[aChan];      else return 0;}
-
-- (void) setEnabledMask:(unsigned long)aMask
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setEnabledMask:enabledMask];
-    enabledMask = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316EnabledChanged object:self];
-}
-
-- (void) setEnabledBit:(unsigned short)chan withValue:(BOOL)aValue
-{
-    long  aMask = enabledMask;
-    if(aValue)      aMask |= (1<<chan);
-    else            aMask &= ~(1<<chan);
-    [self setEnabledMask:aMask];
-}
-
-- (void) setHeSuppressTriggerMask:(unsigned long)aMask
-{
-    if(heSuppressTriggerMask==aMask)return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setHeSuppressTriggerMask:heSuppressTriggerMask];
-    heSuppressTriggerMask = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316HeSuppressTrigModeChanged object:self];
-}
-
-- (void) setHeSuppressTriggerBit:(unsigned short)chan withValue:(BOOL)aValue
-{
-    unsigned short aMask = heSuppressTriggerMask;
-    if(aValue)aMask |= (1<<chan);
-    else aMask &= ~(1<<chan);
-    [self setHeSuppressTriggerMask:aMask];
-}
-
-- (void) setThreshold:(unsigned short)aChan withValue:(long)aValue
-{
-    if(aValue<0)aValue = 0;
-    if(aValue>0xFFFFFFF)aValue = 0xFFFFFFF;
-    if(aValue != [self threshold:aChan]){
-        [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:aChan withValue:threshold[aChan]];
-        threshold[aChan] = aValue;
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316ThresholdChanged object:self userInfo:userInfo];
-    }
-}
-
-- (void) setCfdControlBits:(unsigned short)aChan withValue:(long)aValue
-{
-    if(aValue<0)aValue = 0;
-    if(aValue>0x2)aValue = 0x2;
-    if([self cfdControlBits:aChan] == aValue)return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setCfdControlBits:aChan withValue:[self cfdControlBits:aChan]];
-    cfdControlBits[aChan] = aValue;
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316CfdControlBitsChanged object:self userInfo:userInfo];
-}
 
 //---------------------------------------------------------------------------
 //Energy Histogram Configuration
@@ -722,79 +656,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316GapTimeChanged object:self userInfo:userInfo];
 }
-
-//-------------High Energy Trigger Threshold Reg Access----------------------
 //---------------------------------------------------------------------------
-- (unsigned long) heTrigThreshold:(unsigned short)aChan      { return heTrigThreshold[aChan];                    }
-- (long) trigBothEdgesMask                                   { return trigBothEdgesMask;                         }
-- (BOOL) trigBothEdgesMask:(unsigned short)chan              { return (trigBothEdgesMask     & (1<<chan)) != 0;  }
-- (long) intHeTrigOutPulseMask                               { return intHeTrigOutPulseMask;                     }
-- (BOOL) intHeTrigOutPulseMask:(unsigned short)chan          { return (intHeTrigOutPulseMask & (1<<chan)) != 0;  }
-
-- (unsigned short) intTrigOutPulseBit:(unsigned short)aChan  { return intTrigOutPulseBit[aChan];                 }
-
-
-- (void) setHeTrigThreshold:(unsigned short)aChan withValue:(unsigned long)aValue
-{
-    if(aChan>kNumSIS3316Channels)return;
-    if(aValue>0xFFFFFFF)aValue = 0xFFFFFFF;
-    if([self heTrigThreshold:aChan] == aValue)return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setHeTrigThreshold:aChan withValue:[self heTrigThreshold:aChan]];
-    heTrigThreshold[aChan] =aValue;
-    
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316HeTrigThresholdChanged object:self userInfo:userInfo];
-}
-
-- (void) setTrigBothEdgesMask:(unsigned long)aMask
-{
-    if(trigBothEdgesMask == aMask)return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setTrigBothEdgesMask:trigBothEdgesMask];
-    trigBothEdgesMask = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316TrigBothEdgesChanged object:self];
-}
-
-- (void) setTrigBothEdgesBit:(unsigned short)aChan withValue:(BOOL)aValue
-{
-    if(aChan>kNumSIS3316Channels)return;
-    unsigned short  aMask  = trigBothEdgesMask;
-    if(aValue)      aMask |= (1<<aChan);
-    else            aMask &= ~(1<<aChan);
-    [self setTrigBothEdgesMask:aMask];
-}
-
-- (void) setIntHeTrigOutPulseMask:(unsigned long)aMask
-{
-    if(intHeTrigOutPulseMask == aMask)return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setIntHeTrigOutPulseMask:intHeTrigOutPulseMask];
-    intHeTrigOutPulseMask = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316IntHeTrigOutPulseChanged object:self];
-}
-
-- (void) setIntHeTrigOutPulseBit:(unsigned short)aChan withValue:(BOOL)aValue
-{
-    if(aChan>kNumSIS3316Channels)return;
-    unsigned short   aMask  = intHeTrigOutPulseMask;
-    if(aValue)      aMask |= (1<<aChan);
-    else            aMask &= ~(1<<aChan);
-    [self setIntHeTrigOutPulseMask:aMask];
-}
-
-- (void) setIntTrigOutPulseBit:(unsigned short)aChan withValue:(unsigned short)aValue
-{
-    if(aChan>kNumSIS3316Channels)return;
-
-    if(aValue>0x3)aValue = 0x3;
-    if(intTrigOutPulseBit[aChan] == aValue)return;
-    
-    [[[self undoManager] prepareWithInvocationTarget:self] setIntTrigOutPulseBit:aChan withValue:[self intTrigOutPulseBit:aChan]];
-    intTrigOutPulseBit[aChan] = aValue;
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316IntTrigOutPulseBitsChanged object:self userInfo:userInfo];
-}
-//---------------------------------------------------------------------------
-
-
 - (unsigned short) activeTrigGateWindowLen:(unsigned short)aGroup
 {
     if(aGroup>kNumSIS3316Groups)return 0;
@@ -2224,7 +2086,90 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     }
 }
 
-//6.26 Trigger Threshold registers      //sum not yet coded
+//6.26 Trigger Threshold registers
+
+NSString* cfdCntrlString[4] = {
+    @"Disabled     ",
+    @"Disabled     ",
+    @"Zero Crossing",
+    @"50%          "
+};
+
+- (long) enabledMask                                { return enabledMask;                              }
+- (BOOL) enabled:(unsigned short)chan               { return (enabledMask & (1<<chan)) != 0;           }
+- (long) heSuppressTriggerMask                      { return heSuppressTriggerMask;                    }
+- (BOOL) heSuppressTriggerMask:(unsigned short)chan { return (heSuppressTriggerMask & (1<<chan)) != 0; }
+- (long) cfdControlBits:(unsigned short)aChan       { if(aChan<kNumSIS3316Channels)return cfdControlBits[aChan]; else return 0; }
+- (long) threshold:(unsigned short)aChan            { if(aChan<kNumSIS3316Channels)return threshold[aChan];      else return 0;}
+- (unsigned long) thresholdSum:(unsigned short)aGroup {if(aGroup<kNumSIS3316Groups)return thresholdSum[aGroup]; else return 0;}
+
+- (void) setEnabledMask:(unsigned long)aMask
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setEnabledMask:enabledMask];
+    enabledMask = aMask;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316EnabledChanged object:self];
+}
+
+- (void) setEnabledBit:(unsigned short)chan withValue:(BOOL)aValue
+{
+    long  aMask = enabledMask;
+    if(aValue)      aMask |= (1<<chan);
+    else            aMask &= ~(1<<chan);
+    [self setEnabledMask:aMask];
+}
+
+- (void) setHeSuppressTriggerMask:(unsigned long)aMask
+{
+    if(heSuppressTriggerMask==aMask)return;
+    [[[self undoManager] prepareWithInvocationTarget:self] setHeSuppressTriggerMask:heSuppressTriggerMask];
+    heSuppressTriggerMask = aMask;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316HeSuppressTrigModeChanged object:self];
+}
+
+- (void) setHeSuppressTriggerBit:(unsigned short)chan withValue:(BOOL)aValue
+{
+    unsigned short aMask = heSuppressTriggerMask;
+    if(aValue)aMask |= (1<<chan);
+    else aMask &= ~(1<<chan);
+    [self setHeSuppressTriggerMask:aMask];
+}
+
+- (void) setThreshold:(unsigned short)aChan withValue:(long)aValue
+{
+    if(aValue<0)aValue = 0;
+    if(aValue>0xFFFFFFF)aValue = 0xFFFFFFF;
+    if(aValue != [self threshold:aChan]){
+        [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:aChan withValue:threshold[aChan]];
+        threshold[aChan] = aValue;
+        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316ThresholdChanged object:self userInfo:userInfo];
+    }
+}
+
+- (void) setThresholdSum:(unsigned short)aGroup withValue:(unsigned long)aValue
+{
+    if(aValue>0xFFFFFFFF)aValue = 0xFFFFFFFF;
+    if(aValue != [self thresholdSum:aGroup]){
+        [[[self undoManager] prepareWithInvocationTarget:self] setThresholdSum:aGroup withValue:thresholdSum[aGroup]];
+        thresholdSum[aGroup] = aValue;
+        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
+        [[NSNotificationCenter defaultCenter] postNotificationName: ORSIS3316ThresholdSumChanged object:self userInfo:userInfo];
+
+    }
+}
+
+- (void) setCfdControlBits:(unsigned short)aChan withValue:(long)aValue
+{
+    if(aValue<0)aValue = 0;
+    if(aValue>0x2)aValue = 0x2;
+    if([self cfdControlBits:aChan] == aValue)return;
+    [[[self undoManager] prepareWithInvocationTarget:self] setCfdControlBits:aChan withValue:[self cfdControlBits:aChan]];
+    cfdControlBits[aChan] = aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316CfdControlBitsChanged object:self userInfo:userInfo];
+}
+
+
 - (void) writeThresholds
 {
     int i;
@@ -2237,6 +2182,20 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
         
         [[self adapter] writeLongBlock:&valueToWrite
                              atAddress:[self channelRegister:kTrigThresholdCh1Reg channel:i]
+                            numToWrite:1
+                            withAddMod:[self addressModifier]
+                         usingAddSpace:0x01];
+    }
+}
+
+- (void) writeThresholdSum
+{
+    int i;
+    for(i = 0; i <kNumSIS3316Groups; i++){
+        unsigned long valueToWrite = (thresholdSum[i] & 0xFFFFFFFF);
+        
+        [[self adapter] writeLongBlock:&valueToWrite
+                             atAddress:[self groupRegister:kTrigThreholdSumCh1Ch4Reg group:i]
                             numToWrite:1
                             withAddMod:[self addressModifier]
                          usingAddSpace:0x01];
@@ -2268,9 +2227,116 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
         }
     }
 }
+- (void) readThresholdSum:(BOOL)verbose
+{
+    int i;
+    if(verbose){
+        NSLog(@"Reading Threshold Sum:\n");
+    }
+    for(i = 0; i < kNumSIS3316Groups; i++){
+        unsigned long aValue;
+        [[self adapter] readLongBlock: &aValue
+                            atAddress:[self groupRegister:kTrigThreholdSumCh1Ch4Reg group:i]
+                            numToRead: 1
+                           withAddMod: [self addressModifier]
+                        usingAddSpace: 0x01];
 
+    if(verbose){
+        unsigned long threshSum = (aValue & 0xFFFFFFFF);
+        NSLog(@"%2d: 0x%08x\n", i, threshSum);
+        }
+    }
+}
 
-//6.27 High Energy Trigger Threshold registers  (This and the one above may need to be switched)
+//6.27 High Energy Trigger Threshold registers
+NSString* intTrigOutPulseString[3] = {
+    @"Internal    ",
+    @"High Energy ",
+    @"Pileup Pulse"
+};
+
+- (unsigned long) heTrigThreshold:(unsigned short)aChan      { return heTrigThreshold[aChan];                    }
+- (unsigned long) heTrigThresholdSum:(unsigned short)aGroup  {if(aGroup<kNumSIS3316Groups)return heTrigThresholdSum[aGroup]; else return 0;}
+- (long) trigBothEdgesMask                                   { return trigBothEdgesMask;                         }
+- (BOOL) trigBothEdgesMask:(unsigned short)chan              { return (trigBothEdgesMask     & (1<<chan)) != 0;  }
+- (long) intHeTrigOutPulseMask                               { return intHeTrigOutPulseMask;                     }
+- (BOOL) intHeTrigOutPulseMask:(unsigned short)chan          { return (intHeTrigOutPulseMask & (1<<chan)) != 0;  }
+
+- (unsigned short) intTrigOutPulseBit:(unsigned short)aChan  { return intTrigOutPulseBit[aChan];                 }
+
+- (void) setHeTrigThreshold:(unsigned short)aChan withValue:(unsigned long)aValue
+{
+    if(aChan>kNumSIS3316Channels)return;
+    if(aValue>0xFFFFFFF)aValue = 0xFFFFFFF;
+    if([self heTrigThreshold:aChan] == aValue)return;
+    [[[self undoManager] prepareWithInvocationTarget:self] setHeTrigThreshold:aChan withValue:[self heTrigThreshold:aChan]];
+    heTrigThreshold[aChan] =aValue;
+    
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316HeTrigThresholdChanged object:self userInfo:userInfo];
+}
+
+- (void) setHeTrigThresholdSum:(unsigned short)aGroup withValue:(unsigned long)aValue
+{
+    if(aGroup>kNumSIS3316Groups)return;
+    if(aValue>0xFFFFFFFF)aValue = 0xFFFFFFFF;
+    if([self heTrigThresholdSum:aGroup] ==aValue)return;
+    [[[self undoManager] prepareWithInvocationTarget:self] setHeTrigThresholdSum:aGroup withValue:[self heTrigThresholdSum:aGroup]];
+    heTrigThresholdSum[aGroup] = aValue;
+    
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject: [NSNumber numberWithInt:aGroup] forKey:@"Group"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316HeTrigThresholdSumChanged object:self userInfo:userInfo];
+}
+
+- (void) setTrigBothEdgesMask:(unsigned long)aMask
+{
+    if(trigBothEdgesMask == aMask)return;
+    [[[self undoManager] prepareWithInvocationTarget:self] setTrigBothEdgesMask:trigBothEdgesMask];
+    trigBothEdgesMask = aMask;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316TrigBothEdgesChanged object:self];
+    
+}
+
+- (void) setTrigBothEdgesBit:(unsigned short)aChan withValue:(BOOL)aValue
+{
+    if(aChan>kNumSIS3316Channels)return;
+    unsigned short  aMask  = trigBothEdgesMask;
+    if(aValue)      aMask |= (1<<aChan);
+    else            aMask &= ~(1<<aChan);
+    [self setTrigBothEdgesMask:aMask];
+}
+
+- (void) setIntHeTrigOutPulseMask:(unsigned long)aMask
+{
+    if(intHeTrigOutPulseMask == aMask)return;
+    if(aMask > 2)aMask = 2;
+    [[[self undoManager] prepareWithInvocationTarget:self] setIntHeTrigOutPulseMask:intHeTrigOutPulseMask];
+    intHeTrigOutPulseMask = aMask;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316IntHeTrigOutPulseChanged object:self];
+}
+
+- (void) setIntHeTrigOutPulseBit:(unsigned short)aChan withValue:(BOOL)aValue
+{
+    if(aChan>kNumSIS3316Channels)return;
+    unsigned short   aMask  = intHeTrigOutPulseMask;
+    if(aValue)      aMask |= (1<<aChan);
+    else            aMask &= ~(1<<aChan);
+    [self setIntHeTrigOutPulseMask:aMask];
+}
+
+- (void) setIntTrigOutPulseBit:(unsigned short)aChan withValue:(unsigned short)aValue
+{
+    if(aChan>kNumSIS3316Channels)return;
+    
+    if(aValue>0x3)aValue = 0x3;
+    if(intTrigOutPulseBit[aChan] == aValue)return;
+    
+    [[[self undoManager] prepareWithInvocationTarget:self] setIntTrigOutPulseBit:aChan withValue:[self intTrigOutPulseBit:aChan]];
+    intTrigOutPulseBit[aChan] = aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316IntTrigOutPulseBitsChanged object:self userInfo:userInfo];
+}
+
 - (void) writeHeTrigThresholds
 {
     int i;
@@ -2289,11 +2355,26 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     
 }
 
+- (void) writeHeTrigThresholdSum
+{
+    int i;
+    for( i = 0; i<kNumSIS3316Groups; i++){
+        unsigned long valueToWrite = ([self heTrigThresholdSum:i] & 0xFFFFFFFF);
+        
+        [[self adapter] writeLongBlock:&valueToWrite
+                             atAddress:[self groupRegister:kHiETrigThresSumCh1Ch4Reg group:i]
+                            numToWrite:1
+                            withAddMod:[self addressModifier]
+                         usingAddSpace:0x01];
+
+    }
+}
+
 - (void) readHeTrigThresholds:(BOOL)verbose
 {
     int i;
     if(verbose){
-        NSLog(@"Reading High Energty Thresholds:\n");
+        NSLog(@"Reading High Energy Thresholds:\n");
         NSLog(@"Chan BothEdges IntHETrigOut IntTrigOut HEThreshold \n");
     }
     for(i =0; i < kNumSIS3316Channels; i++) {
@@ -2306,11 +2387,32 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
                         usingAddSpace: 0x01];
         
         if(verbose){
-            unsigned short heThres  = (aValue & 0x0FFFFFFF);
+            unsigned long heThres  = (aValue & 0x0FFFFFFF);
             unsigned short intTrigOut = ((aValue>>28) & 0x3);
             unsigned short intHETrigOut  = ((aValue>>30) & 0x1);
             unsigned short both  = ((aValue>>31) & 0x1);
-            NSLog(@"%2d: %@ %@ %@ 0x%08x\n",i, both?@"YES":@" NO",intHETrigOut?@"YES":@" NO",intTrigOutPulseString[intTrigOut],heThres);
+            if(intTrigOut>2)NSLog(@"%2d: %@ %@ %@ 0x%08x\n",i, both?@"YES":@" NO",intHETrigOut?@"YES":@" NO",@"reserved",heThres);
+            else NSLog(@"%2d: %@ %@ %@ 0x%08x\n",i, both?@"YES":@" NO",intHETrigOut?@"YES":@" NO",intTrigOutPulseString[intTrigOut],heThres);
+        }
+    }
+}
+
+- (void) readHeTrigThresholdSum:(BOOL)verbose
+{
+    int i;
+    if(verbose){
+        NSLog(@"Reading High Energy Threshold Sum:\n");
+    }
+    for(i = 0; i < kNumSIS3316Groups; i++){
+        unsigned long aValue;
+        [[self adapter] readLongBlock: &aValue
+                            atAddress:[self groupRegister:kHiETrigThresSumCh1Ch4Reg group:i]
+                            numToRead: 1
+                           withAddMod: [self addressModifier]
+                        usingAddSpace: 0x01];
+        if(verbose){
+            unsigned short heTrigThreshSum = (aValue & 0xFFFFFFFF);
+            NSLog(@"%2d:  0x%08x\n",i, heTrigThreshSum);
         }
     }
 }
@@ -2664,7 +2766,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 //    
 //}
 
-
+//-=**
 - (void) initBoard
 {
     [self reset];
@@ -2701,7 +2803,9 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     [self writeFirTriggerSetup];
     [self writeFirEnergySetup];
     
-//    [self writeHeTrigThresholds];
+    [self writeHeTrigThresholds];
+    [self writeHeTrigThresholdSum];
+    [self writeThresholdSum];
 //    [self writeHistogramConfiguration];
     
 	
@@ -2773,56 +2877,45 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     return kNumSIS3316Channels;
 }
 
-- (NSArray*) wizardParameters
+- (NSArray*) wizardParameters   //*****IN ALPHABETICAL ORDER*****//
 {
     NSMutableArray* a = [NSMutableArray array];
     ORHWWizParam* p;
+
+    [a addObject:[ORHWWizParam boolParamWithName:@"AutoStart"        setter:@selector(setAutoStart:)        getter:@selector(autoStart)]];
+    //-=**
+    //[a addObject:[ORHWWizParam boolParamWithName:@"trigBothEdgesMask"        setter:@selector(setTrigBothEdgesBit:)        getter:@selector(setTrigBothEdgesBit)]];
+    //p = [[[ORHWWizParam alloc] init] autorelease];
+    //[p setName:@"CFD Control Bits"];
+    //[p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@""];
+    //[p setSetMethod:@selector(setTrigBothEdgesMask:) getMethod:@selector(trigBothEdgesMask:)];
+    //[p setCanBeRamped:YES];
+    //[a addObject:p];
     
+    //-=**
     p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Page Size"];
-    [p setFormat:@"##0" upperLimit:7 lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setPageSize:) getMethod:@selector(pageSize)];
-    [p setActionMask:kAction_Set_Mask];
+    [p setName:@"CFD Control Bits"];
+    [p setFormat:@"##0" upperLimit:2 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setCfdControlBits:withValue:) getMethod:@selector(cfdControlBits:)];
+    [p setCanBeRamped:YES];
     [a addObject:p];
-	
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Start Delay"];
-    [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setStartDelay:) getMethod:@selector(startDelay)];
-    [p setActionMask:kAction_Set_Mask];
-    [a addObject:p];
-	
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Stop Delay"];
-    [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setStopDelay:) getMethod:@selector(stopDelay)];
-    [p setActionMask:kAction_Set_Mask];
-    [a addObject:p];
-	
+    
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Clock Source"];
     [p setFormat:@"##0" upperLimit:3 lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setClockSource:) getMethod:@selector(clockSource)];
     [p setActionMask:kAction_Set_Mask];
     [a addObject:p];
-	
-    [a addObject:[ORHWWizParam boolParamWithName:@"PageWrap"         setter:@selector(setPageWrap:)         getter:@selector(pageWrap)]];
-    [a addObject:[ORHWWizParam boolParamWithName:@"StopTrigger"      setter:@selector(setStopTrigger:)      getter:@selector(stopTrigger)]];
-    [a addObject:[ORHWWizParam boolParamWithName:@"P2StartStop"      setter:@selector(setP2StartStop:)      getter:@selector(p2StartStop)]];
-    [a addObject:[ORHWWizParam boolParamWithName:@"LemoStartStop"    setter:@selector(setLemoStartStop:)    getter:@selector(lemoStartStop)]];
-    [a addObject:[ORHWWizParam boolParamWithName:@"RandomClock"      setter:@selector(setRandomClock:)      getter:@selector(randomClock)]];
-    [a addObject:[ORHWWizParam boolParamWithName:@"GateMode"         setter:@selector(setGateMode:)         getter:@selector(gateMode)]];
-    [a addObject:[ORHWWizParam boolParamWithName:@"StopDelayEnabled" setter:@selector(setStopDelayEnabled:) getter:@selector(stopDelayEnabled)]];
-    [a addObject:[ORHWWizParam boolParamWithName:@"MultiEvent"       setter:@selector(setMultiEventMode:)   getter:@selector(multiEventMode)]];
-    [a addObject:[ORHWWizParam boolParamWithName:@"AutoStart"        setter:@selector(setAutoStart:)        getter:@selector(autoStart)]];
-	
+    
     p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Threshold"];
-    [p setFormat:@"##0" upperLimit:0xfffffff lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setThreshold:withValue:) getMethod:@selector(threshold:)];
+    [p setName:@"Gap Time"];
+    [p setFormat:@"##0" upperLimit:0x3f lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setGapTime:withValue:) getMethod:@selector(gapTime:)];
     [p setCanBeRamped:YES];
     [a addObject:p];
     
+    [a addObject:[ORHWWizParam boolParamWithName:@"GateMode"         setter:@selector(setGateMode:)         getter:@selector(gateMode)]];
+
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"HE Trig Threshold"];
     [p setFormat:@"##0" upperLimit:0xfffffff lowerLimit:0 stepSize:1 units:@""];
@@ -2831,18 +2924,66 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     [a addObject:p];
     
     p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"CFD Control Bits"];
-    [p setFormat:@"##0" upperLimit:2 lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setCfdControlBits:withValue:) getMethod:@selector(cfdControlBits:)];
+    [p setName:@"HE Trig Threshold"];
+    [p setFormat:@"##0" upperLimit:0x3FFFFFFC lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setHeTrigThresholdSum:withValue:) getMethod:@selector(heTrigThresholdSum:)];
     [p setCanBeRamped:YES];
     [a addObject:p];
-
+    
     p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Int Trig Out PUlse"];
+    [p setUseValue:NO];
+    [p setName:@"Init"];
+    [p setSetMethodSelector:@selector(initBoard)];
+    [a addObject:p];
+    
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Int Trig Out Pulse"];
     [p setFormat:@"##0" upperLimit:2 lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setIntTrigOutPulseBit:withValue:) getMethod:@selector(intTrigOutPulseBit:)];
     [p setCanBeRamped:YES];
     [a addObject:p];
+    
+    [a addObject:[ORHWWizParam boolParamWithName:@"LemoStartStop"    setter:@selector(setLemoStartStop:)    getter:@selector(lemoStartStop)]];
+    
+    [a addObject:[ORHWWizParam boolParamWithName:@"MultiEvent"       setter:@selector(setMultiEventMode:)   getter:@selector(multiEventMode)]];
+
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Page Size"];
+    [p setFormat:@"##0" upperLimit:7 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setPageSize:) getMethod:@selector(pageSize)];
+    [p setActionMask:kAction_Set_Mask];
+    [a addObject:p];
+
+    [a addObject:[ORHWWizParam boolParamWithName:@"PageWrap"         setter:@selector(setPageWrap:)         getter:@selector(pageWrap)]];
+    
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Peaking Time"];
+    [p setFormat:@"##0" upperLimit:0x3f lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setPeakingTime:withValue:) getMethod:@selector(peakingTime:)];
+    [p setCanBeRamped:YES];
+    [a addObject:p];
+    
+    [a addObject:[ORHWWizParam boolParamWithName:@"P2StartStop"      setter:@selector(setP2StartStop:)      getter:@selector(p2StartStop)]];
+    
+    [a addObject:[ORHWWizParam boolParamWithName:@"RandomClock"      setter:@selector(setRandomClock:)      getter:@selector(randomClock)]];
+    
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Start Delay"];
+    [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setStartDelay:) getMethod:@selector(startDelay)];
+    [p setActionMask:kAction_Set_Mask];
+    [a addObject:p];
+    
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Stop Delay"];
+    [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setStopDelay:) getMethod:@selector(stopDelay)];
+    [p setActionMask:kAction_Set_Mask];
+    [a addObject:p];
+
+    [a addObject:[ORHWWizParam boolParamWithName:@"StopDelayEnabled" setter:@selector(setStopDelayEnabled:) getter:@selector(stopDelayEnabled)]];
+
+    [a addObject:[ORHWWizParam boolParamWithName:@"StopTrigger"      setter:@selector(setStopTrigger:)      getter:@selector(stopTrigger)]];
     
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Tau Factor"];
@@ -2850,27 +2991,22 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     [p setSetMethod:@selector(setTauFactor:withValue:) getMethod:@selector(tauFactor:)];
     [p setCanBeRamped:YES];
     [a addObject:p];
-
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Gap Time"];
-    [p setFormat:@"##0" upperLimit:0x3f lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setGapTime:withValue:) getMethod:@selector(gapTime:)];
-    [p setCanBeRamped:YES];
-    [a addObject:p];
-
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Peaking Time"];
-    [p setFormat:@"##0" upperLimit:0x3f lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setPeakingTime:withValue:) getMethod:@selector(peakingTime:)];
-    [p setCanBeRamped:YES];
-    [a addObject:p];
-
     
     p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setUseValue:NO];
-    [p setName:@"Init"];
-    [p setSetMethodSelector:@selector(initBoard)];
+    [p setName:@"Threshold"];
+    [p setFormat:@"##0" upperLimit:0xfffffff lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setThreshold:withValue:) getMethod:@selector(threshold:)];
+    [p setCanBeRamped:YES];
     [a addObject:p];
+   
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Threshold Sum"];
+    [p setFormat:@"##0" upperLimit:0x3FFFFFFC lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setThresholdSum:withValue:) getMethod:@selector(thresholdSum:)];
+    [p setCanBeRamped:YES];
+    [a addObject:p];
+
+
     
     return a;
 }
@@ -3092,6 +3228,9 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     int i;
     for(i=0;i<kNumSIS3316Channels;i++){
         [self setCfdControlBits:i   withValue:[decoder decodeInt32ForKey:[NSString stringWithFormat:@"cfdControlBits%d",i]]];
+        //=-**
+        //[self setTrigBothEdgesMask:i   withValue:[decoder decodeInt32ForKey:[NSString stringWithFormat:@"trigBothEdgesMask%d",i]]];
+        //=-**
         [self setThreshold:i        withValue:[decoder decodeInt32ForKey:[NSString stringWithFormat:@"threshold%d",i]]];
         [self setPeakingTime:i      withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"peakingTime%d",i]]];
         [self setGapTime:i          withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"gapTime%d",i]]];
@@ -3103,6 +3242,8 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     }
     
     for(i=0;i<kNumSIS3316Groups;i++){
+        [self setThresholdSum:i        withValue:[decoder decodeInt32ForKey:[NSString stringWithFormat:@"thresholdSum%d",i]]];
+        [self setHeTrigThresholdSum:i  withValue:[decoder decodeInt32ForKey:[NSString stringWithFormat:@"heTrigThresholdSum%d",i]]];
         [self setActiveTrigGateWindowLen:i  withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"activeTrigGateWindowLen%d",i]]];
         [self setPreTriggerDelay:i      withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"preTriggerDelay%d",i]]];
         [self setRawDataBufferLen:i     withValue:[decoder decodeInt32ForKey:[NSString stringWithFormat:@"rawDataBufferLen%d",i]]];
@@ -3227,6 +3368,8 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     }
     
     for(i=0;i<kNumSIS3316Groups;i++){
+        [encoder encodeInt32:thresholdSum[i]           forKey:[NSString stringWithFormat:@"thresholdSum%d",i]];
+        [encoder encodeInt:heTrigThresholdSum[i]       forKey:[NSString stringWithFormat:@"heTrigThresholdSum%d",i]];
         [encoder encodeInt:activeTrigGateWindowLen[i]     forKey:[NSString stringWithFormat:@"activeTrigGateWindowLen%d",i]];
         [encoder encodeInt:preTriggerDelay[i]             forKey:[NSString stringWithFormat:@"preTriggerDelay%d",i]];
         [encoder encodeInt:rawDataBufferLen[i]            forKey:[NSString stringWithFormat:@"rawDataBufferLen%d",i]];
@@ -3301,20 +3444,24 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     [objDictionary setObject: [NSNumber numberWithLong:intHeTrigOutPulseMask]       forKey:@"intHeTrigOutPulseMask"];
     
 
-    [self addCurrentState:objDictionary unsignedLongArray:cfdControlBits  size:kNumSIS3316Channels  forKey:@"cfdControlBits"];
-    [self addCurrentState:objDictionary unsignedLongArray:threshold       size:kNumSIS3316Channels forKey:@"threshold"];
-    [self addCurrentState:objDictionary unsignedShortArray:peakingTime    size:kNumSIS3316Channels forKey:@"peakingTime"];
-    [self addCurrentState:objDictionary unsignedShortArray:gapTime        size:kNumSIS3316Channels  forKey:@"gapTime"];
-    [self addCurrentState:objDictionary unsignedShortArray:tauFactor      size:kNumSIS3316Channels  forKey:@"tauFactor"];
-    [self addCurrentState:objDictionary unsignedShortArray:intTrigOutPulseBit      size:kNumSIS3316Channels  forKey:@"intTrigOutPulseBit"];
-    [self addCurrentState:objDictionary unsignedLongArray:heTrigThreshold size:kNumSIS3316Channels forKey:@"heTrigThreshold"];
-    [self addCurrentState:objDictionary unsignedShortArray:energyDivider size:kNumSIS3316Channels forKey:@"energyDivider"];
-    [self addCurrentState:objDictionary unsignedShortArray:energySubtractor size:kNumSIS3316Channels forKey:@"energySubtractor"];
+    [self addCurrentState:objDictionary unsignedLongArray:cfdControlBits            size:kNumSIS3316Channels forKey:@"cfdControlBits"];
+    [self addCurrentState:objDictionary unsignedLongArray:threshold                 size:kNumSIS3316Channels forKey:@"threshold"];
+    [self addCurrentState:objDictionary unsignedShortArray:peakingTime              size:kNumSIS3316Channels forKey:@"peakingTime"];
+    [self addCurrentState:objDictionary unsignedShortArray:gapTime                  size:kNumSIS3316Channels forKey:@"gapTime"];
+    [self addCurrentState:objDictionary unsignedShortArray:tauFactor                size:kNumSIS3316Channels forKey:@"tauFactor"];
+    [self addCurrentState:objDictionary unsignedShortArray:intTrigOutPulseBit       size:kNumSIS3316Channels forKey:@"intTrigOutPulseBit"];
+    [self addCurrentState:objDictionary unsignedLongArray:heTrigThreshold           size:kNumSIS3316Channels forKey:@"heTrigThreshold"];
+    [self addCurrentState:objDictionary unsignedShortArray:energyDivider            size:kNumSIS3316Channels forKey:@"energyDivider"];
+    [self addCurrentState:objDictionary unsignedShortArray:energySubtractor         size:kNumSIS3316Channels forKey:@"energySubtractor"];
 
-    [self addCurrentState:objDictionary unsignedShortArray:activeTrigGateWindowLen  size:kNumSIS3316Groups forKey:@"activeTrigGateWindowLen" ];
-    [self addCurrentState:objDictionary unsignedShortArray:preTriggerDelay          size:kNumSIS3316Groups forKey:@"preTriggerDelay"];
-    [self addCurrentState:objDictionary unsignedLongArray:rawDataBufferLen          size:kNumSIS3316Groups forKey:@"rawDataBufferLen"];
-    [self addCurrentState:objDictionary unsignedLongArray:rawDataBufferStart        size:kNumSIS3316Groups forKey:@"rawDataBufferStart"];
+    [self addCurrentState:objDictionary unsignedShortArray:activeTrigGateWindowLen  size:kNumSIS3316Groups   forKey:@"activeTrigGateWindowLen" ];
+    [self addCurrentState:objDictionary unsignedShortArray:preTriggerDelay          size:kNumSIS3316Groups   forKey:@"preTriggerDelay"];
+    [self addCurrentState:objDictionary unsignedLongArray:rawDataBufferLen          size:kNumSIS3316Groups   forKey:@"rawDataBufferLen"];
+    [self addCurrentState:objDictionary unsignedLongArray:rawDataBufferStart        size:kNumSIS3316Groups   forKey:@"rawDataBufferStart"];
+    
+    [self addCurrentState:objDictionary unsignedLongArray:heTrigThresholdSum        size:kNumSIS3316Groups   forKey:@"heTrigThresholdSum"];
+    
+    [self addCurrentState:objDictionary unsignedLongArray:thresholdSum              size:kNumSIS3316Groups   forKey:@"ThresholdSum"];
 
     [self addCurrentState:objDictionary unsignedShortArray:accGate1Start            size:kNumSIS3316Groups forKey:@"accGate1Start"];
     [self addCurrentState:objDictionary unsignedShortArray:accGate2Start            size:kNumSIS3316Groups forKey:@"accGate2Start"];

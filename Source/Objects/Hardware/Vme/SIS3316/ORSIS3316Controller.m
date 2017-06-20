@@ -48,7 +48,7 @@
 
 - (void) awakeFromNib
 {
-    settingSize     = NSMakeSize(900,900);
+    settingSize     = NSMakeSize(950,890);
     rateSize		= NSMakeSize(790,460);
     
     blankView = [[NSView alloc] init];
@@ -81,6 +81,8 @@
 	}
     for(i=0;i<kNumSIS3316Groups;i++){
         [[activeTrigGateWindowLenMatrix cellAtRow:i column:0] setTag:i];
+        [[thresholdSumMatrix    cellAtRow:i column:0] setTag:i];
+        [[heTrigThresholdSumMatrix cellAtRow:i column: 0] setTag:i];
         [[preTriggerDelayMatrix cellAtRow:i column:0] setTag:i];
         [[accGate1LenMatrix     cellAtRow:i column:0] setTag:i];
         [[accGate1StartMatrix   cellAtRow:i column:0] setTag:i];
@@ -164,6 +166,11 @@
                        object : model];
 
     [notifyCenter addObserver : self
+                     selector : @selector(thresholdSumChanged:)
+                         name : ORSIS3316ThresholdSumChanged
+                       object : model];
+    
+    [notifyCenter addObserver : self
                      selector : @selector(cfdControlBitsChanged:)
                          name : ORSIS3316CfdControlBitsChanged
                        object : model];
@@ -217,6 +224,11 @@
     [notifyCenter addObserver : self
                      selector : @selector(heTrigThresholdChanged:)
                          name : ORSIS3316HeTrigThresholdChanged
+                       object : model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(heTrigThresholdSumChanged:)
+                         name : ORSIS3316HeTrigThresholdSumChanged
                        object : model];
 
     [notifyCenter addObserver : self
@@ -448,6 +460,7 @@
     [self enabledChanged:nil];
     [self heSuppressTrigModeChanged:nil];
 	[self thresholdChanged:nil];
+    [self thresholdSumChanged:nil];
     [self cfdControlBitsChanged:nil];
  
     [self histogramsEnabledChanged:nil];
@@ -461,6 +474,7 @@
     [self gapTimeChanged:nil];
     [self peakingTimeChanged:nil];
     [self heTrigThresholdChanged:nil];
+    [self heTrigThresholdSumChanged:nil];
     [self trigBothEdgesChanged:nil];
     [self intHeTrigOutPulseChanged:nil];
     [self intTrigOutPulseBitsChanged:nil];
@@ -602,6 +616,20 @@
     }
 }
 
+- (void) thresholdSumChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Groups; i++){
+            [[thresholdSumMatrix cellWithTag:i] setIntValue:[model thresholdSum:i]];
+        }
+    }
+    else{
+        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
+        [[thresholdSumMatrix cellWithTag:i] setIntValue:[model thresholdSum:i]];
+    }
+}
+
 - (void) energyDividerChanged:(NSNotification*)aNote
 {
     if(aNote == nil){
@@ -684,6 +712,20 @@
     else {
         int i = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
         [[heTrigThresholdMatrix cellWithTag:i] setIntValue:[model heTrigThreshold:i]];
+    }
+}
+
+- (void) heTrigThresholdSumChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Groups;i++){
+            [[heTrigThresholdSumMatrix cellWithTag:i] setIntValue:[model heTrigThresholdSum:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
+        [[heTrigThresholdSumMatrix cellWithTag:i] setIntValue:[model heTrigThresholdSum:i]];
     }
 }
 
@@ -1110,6 +1152,9 @@
 	[enabledMatrix              setEnabled:!lockedOrRunningMaintenance];
 	[heSuppressTrigModeMatrix   setEnabled:!lockedOrRunningMaintenance];
 	[thresholdMatrix            setEnabled:!lockedOrRunningMaintenance];
+    [thresholdSumMatrix         setEnabled:!lockedOrRunningMaintenance];
+    [heTrigThresholdMatrix      setEnabled:!lockedOrRunningMaintenance];
+    [heTrigThresholdSumMatrix   setEnabled:!lockedOrRunningMaintenance];
     
 	[checkEventButton           setEnabled:!locked && !runInProgress];
 	[testMemoryButton           setEnabled:!locked && !runInProgress];
@@ -1270,6 +1315,11 @@
     [model setThreshold:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
+- (IBAction) thresholdSumAction:(id)sender
+{
+    [model setThresholdSum:[[sender selectedCell] tag] withValue:[sender intValue]];
+}
+
 - (IBAction) cfdControlAction:(id)sender
 {
     [model setCfdControlBits:[sender selectedRow] withValue:[[sender selectedCell] indexOfSelectedItem]];
@@ -1303,6 +1353,11 @@
 - (IBAction) heTrigThresholdAction:(id)sender
 {
     [model setHeTrigThreshold:[[sender selectedCell] tag] withValue:[sender intValue]];
+}
+
+- (IBAction) heTrigThresholdSumAction:(id)sender
+{
+    [model setHeTrigThresholdSum:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
 - (IBAction) trigBothEdgesAction:(id)sender
@@ -1567,7 +1622,9 @@
     @try {
         [self endEditing];
         [model writeThresholds];
+        [model writeThresholdSum];
         [model writeHeTrigThresholds];
+        [model writeHeTrigThresholdSum];
         [model writeFirTriggerSetup];
     }
 	@catch(NSException* localException) {
@@ -1582,7 +1639,9 @@
     @try {
         [self endEditing];
         [model readThresholds:YES];
+        [model readThresholdSum:YES];
         [model readHeTrigThresholds:YES];
+        [model readHeTrigThresholdSum:YES];
     }
 	@catch(NSException* localException) {
         NSLog(@"SIS3316 Thresholds read FAILED.\n");
@@ -1590,45 +1649,6 @@
                         localException);
     }
 }
-- (IBAction) writeFirTrigSetupsAction:(id)sender
-{
-    @try {
-        [self endEditing];
-        [model writeFirTriggerSetup];
-    }
-    @catch(NSException* localException) {
-        NSLog(@"SIS3316 FirTrigSetups write FAILED.\n");
-        ORRunAlertPanel([localException name], @"%@\nSIS3316 Write FAILED", @"OK", nil, nil,
-                        localException);
-    }
-}
-
-- (IBAction) writeHeTrigThresholdsAction:(id)sender
-{
-    @try {
-        [self endEditing];
-        [model writeHeTrigThresholds];
-    }
-    @catch(NSException* localException) {
-        NSLog(@"SIS3316 HeTrigThresholds write FAILED.\n");
-        ORRunAlertPanel([localException name], @"%@\nSIS3316 Write FAILED", @"OK", nil, nil,
-                        localException);
-    }
-}
-
-- (IBAction) readHeTrigThresholdsAction:(id)sender
-{
-    @try {
-        [self endEditing];
-        [model readThresholds:YES];
-    }
-    @catch(NSException* localException) {
-        NSLog(@"SIS3316 HeTrigThresholds read FAILED.\n");
-        ORRunAlertPanel([localException name], @"%@\nSIS3316 Read FAILED", @"OK", nil, nil,
-                        localException);
-    }
-}
-
 
 - (IBAction) checkEvent:(id)sender
 {

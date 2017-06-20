@@ -233,11 +233,6 @@ enum{
     kADCGroupRegisters
 };
 
-//section 6-
-
-
-
-
 @interface ORSIS3316Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping,AutoTesting>
 {
   @private
@@ -250,10 +245,12 @@ enum{
     long			heSuppressTriggerMask;
     unsigned long  cfdControlBits[kNumSIS3316Channels];
     unsigned long  threshold[kNumSIS3316Channels];
+    unsigned long thresholdSum[kNumSIS3316Groups];
     unsigned short peakingTime[kNumSIS3316Channels];
     unsigned short gapTime[kNumSIS3316Channels];
     unsigned short tauFactor[kNumSIS3316Channels];
     unsigned long  heTrigThreshold[kNumSIS3316Channels];
+    unsigned long heTrigThresholdSum[kNumSIS3316Groups];
     unsigned short intTrigOutPulseBit[kNumSIS3316Channels];
     long            trigBothEdgesMask;
     long            intHeTrigOutPulseMask;
@@ -388,7 +385,9 @@ enum{
 - (void) setHeSuppressTriggerBit:(unsigned short)chan withValue:(BOOL)aValue;
 
 - (void) setThreshold:(unsigned short)chan withValue:(long)aValue;
+- (void) setThresholdSum:(unsigned short)aGroup withValue: (unsigned long)aValue;
 - (long) threshold:(unsigned short)chan;
+- (unsigned long) thresholdSum: (unsigned short)aGroup;
 
 - (long)cfdControlBits:(unsigned short)aChan;
 - (void) setCfdControlBits:(unsigned short)aChan withValue:(long)aValue;
@@ -409,8 +408,9 @@ enum{
 - (unsigned short) peakingTime:(unsigned short)chan;
 
 - (void) setHeTrigThreshold:(unsigned short)chan withValue:(unsigned long)aValue;
+- (void) setHeTrigThresholdSum:(unsigned short)aGroup withValue:(unsigned long)aValue;
 - (unsigned long) heTrigThreshold:(unsigned short)chan;
-
+- (unsigned long) heTrigThresholdSum:(unsigned short)aGroup;
 - (long) trigBothEdgesMask;
 - (BOOL) trigBothEdgesMask:(unsigned short)chan;
 - (void) setTrigBothEdgesMask:(unsigned long)aMask;
@@ -581,10 +581,14 @@ enum{
 - (void) writeActiveTrigeGateWindowLens;        //6.24 (section 2)
 - (void) writeFirTriggerSetup;                  //6.25 (section 2)
 - (void) initBoard;
-- (void) writeThresholds;                       //6.26 (section 2)  
+- (void) writeThresholds;                       //6.26 (section 2)
+- (void) writeThresholdSum;
 - (void) readThresholds:(BOOL)verbose;          //6.26 (section 2)
+- (void) readThresholdSum: (BOOL)verbose;
 - (void) writeHeTrigThresholds;                 //6.27 (section 2)
+- (void) writeHeTrigThresholdSum;
 - (void) readHeTrigThresholds:(BOOL)verbose;    //6.27 (section 2)
+- (void) readHeTrigThresholdSum:(BOOL)verbose;
 - (void) writeAccumulatorGates;                 //6.31 (section 2)
 
 - (void) writeHistogramConfiguration;           //6.33 (section 2)
@@ -657,6 +661,7 @@ extern NSString* ORSIS3316ClrHistogramWithTSChanged;
 extern NSString* ORSIS3316WriteHitsIntoEventMemoryChanged;
 
 extern NSString* ORSIS3316ThresholdChanged;
+extern NSString* ORSIS3316ThresholdSumChanged;
 extern NSString* ORSIS3316HeSuppressTrigModeChanged;
 extern NSString* ORSIS3316CfdControlBitsChanged;
 extern NSString* ORSIS3316EnergyDividerChanged ;
@@ -665,6 +670,7 @@ extern NSString* ORSIS3316TauFactorChanged;
 extern NSString* ORSIS3316GapTimeChanged;
 extern NSString* ORSIS3316PeakingTimeChanged;
 extern NSString* ORSIS3316HeTrigThresholdChanged;
+extern NSString* ORSIS3316HeTrigThresholdSumChanged;
 extern NSString* ORSIS3316TrigBothEdgesChanged;
 extern NSString* ORSIS3316IntHeTrigOutPulseChanged;
 extern NSString* ORSIS3316IntTrigOutPulseBitsChanged;
