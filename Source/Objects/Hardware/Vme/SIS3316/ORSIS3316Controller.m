@@ -48,7 +48,7 @@
 
 - (void) awakeFromNib
 {
-    settingSize     = NSMakeSize(950,890);
+    settingSize     = NSMakeSize(950,900);
     rateSize		= NSMakeSize(790,460);
     
     blankView = [[NSView alloc] init];
@@ -1626,6 +1626,7 @@
         [model writeHeTrigThresholds];
         [model writeHeTrigThresholdSum];
         [model writeFirTriggerSetup];
+        [model writeActiveTrigGateWindowLen];
     }
 	@catch(NSException* localException) {
         NSLog(@"SIS3316 Thresholds write FAILED.\n");
@@ -1642,6 +1643,7 @@
         [model readThresholdSum:YES];
         [model readHeTrigThresholds:YES];
         [model readHeTrigThresholdSum:YES];
+        [model readActiveTrigGateWindowLen:YES];
     }
 	@catch(NSException* localException) {
         NSLog(@"SIS3316 Thresholds read FAILED.\n");

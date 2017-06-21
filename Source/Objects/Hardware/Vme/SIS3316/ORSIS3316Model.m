@@ -28,72 +28,72 @@
 #import "VME_HW_Definitions.h"
 #import "ORVmeTests.h"
 
-NSString* ORSIS3316EnabledChanged			 = @"ORSIS3316EnabledChanged";
-NSString* ORSIS3316HistogramsEnabledChanged  = @"ORSIS3316HistogramsEnabledChanged";
+NSString* ORSIS3316EnabledChanged                   = @"ORSIS3316EnabledChanged";
+NSString* ORSIS3316HistogramsEnabledChanged         = @"ORSIS3316HistogramsEnabledChanged";
 
 NSString* ORSIS3316PileUpEnabledChanged            = @"ORSIS3316PileUpEnabledChanged";
 NSString* ORSIS3316ClrHistogramWithTSChanged       = @"ORSIS3316ClrHistogramWithTSChanged";
 NSString* ORSIS3316WriteHitsIntoEventMemoryChanged = @"ORSIS3316WriteHitsIntoEventMemoryChanged";
 
-NSString* ORSIS3316ThresholdChanged          = @"ORSIS3316ThresholdChanged";
-NSString* ORSIS3316ThresholdSumChanged          = @"ORSIS3316ThresholdSumChanged";
-NSString* ORSIS3316HeSuppressTrigModeChanged = @"ORSIS3316HeSuppressTrigModeChanged";
-NSString* ORSIS3316CfdControlBitsChanged     = @"ORSIS3316CfdControlBitsChanged";
+NSString* ORSIS3316ThresholdChanged                 = @"ORSIS3316ThresholdChanged";
+NSString* ORSIS3316ThresholdSumChanged              = @"ORSIS3316ThresholdSumChanged";
+NSString* ORSIS3316HeSuppressTrigModeChanged        = @"ORSIS3316HeSuppressTrigModeChanged";
+NSString* ORSIS3316CfdControlBitsChanged            = @"ORSIS3316CfdControlBitsChanged";
 
-NSString* ORSIS3316EnergyDividerChanged      = @"ORSIS3316EnergyDividerChanged";
-NSString* ORSIS3316EnergySubtractorChanged   = @"ORSIS3316EnergySubtractorChanged";
-NSString* ORSIS3316TauFactorChanged          = @"ORSIS3316TauFactorChanged";
-NSString* ORSIS3316PeakingTimeChanged        = @"ORSIS3316PeakingTimeChanged";
-NSString* ORSIS3316GapTimeChanged            = @"ORSIS3316GapTimeChanged";
-NSString* ORSIS3316HeTrigThresholdChanged    = @"ORSIS3316HeTrigThresholdChanged";
-NSString* ORSIS3316HeTrigThresholdSumChanged = @"ORSIS3316HeTrigThresholdSumChanged";
-NSString* ORSIS3316TrigBothEdgesChanged      = @"ORSIS3316TrigBothEdgesChanged";
-NSString* ORSIS3316IntHeTrigOutPulseChanged  = @"ORSIS3316IntHeTrigOutPulseChanged";
-NSString* ORSIS3316IntTrigOutPulseBitsChanged= @"ORSIS3316IntTrigOutPulseBitsChanged";
+NSString* ORSIS3316EnergyDividerChanged             = @"ORSIS3316EnergyDividerChanged";
+NSString* ORSIS3316EnergySubtractorChanged          = @"ORSIS3316EnergySubtractorChanged";
+NSString* ORSIS3316TauFactorChanged                 = @"ORSIS3316TauFactorChanged";
+NSString* ORSIS3316PeakingTimeChanged               = @"ORSIS3316PeakingTimeChanged";
+NSString* ORSIS3316GapTimeChanged                   = @"ORSIS3316GapTimeChanged";
+NSString* ORSIS3316HeTrigThresholdChanged           = @"ORSIS3316HeTrigThresholdChanged";
+NSString* ORSIS3316HeTrigThresholdSumChanged        = @"ORSIS3316HeTrigThresholdSumChanged";
+NSString* ORSIS3316TrigBothEdgesChanged             = @"ORSIS3316TrigBothEdgesChanged";
+NSString* ORSIS3316IntHeTrigOutPulseChanged         = @"ORSIS3316IntHeTrigOutPulseChanged";
+NSString* ORSIS3316IntTrigOutPulseBitsChanged       = @"ORSIS3316IntTrigOutPulseBitsChanged";
 
-NSString* ORSIS3316ActiveTrigGateWindowLenChanged = @"ORSIS3316ActiveTrigGateWindowLenChanged";
-NSString* ORSIS3316PreTriggerDelayChanged    = @"ORSIS3316PreTriggerDelayChanged";
-NSString* ORSIS3316RawDataBufferLenChanged   = @"ORSIS3316RawDataBufferLenChanged";
-NSString* ORSIS3316RawDataBufferStartChanged = @"ORSIS3316RawDataBufferStartChanged";
+NSString* ORSIS3316ActiveTrigGateWindowLenChanged   = @"ORSIS3316ActiveTrigGateWindowLenChanged";
+NSString* ORSIS3316PreTriggerDelayChanged           = @"ORSIS3316PreTriggerDelayChanged";
+NSString* ORSIS3316RawDataBufferLenChanged          = @"ORSIS3316RawDataBufferLenChanged";
+NSString* ORSIS3316RawDataBufferStartChanged        = @"ORSIS3316RawDataBufferStartChanged";
 
-NSString* ORSIS3316AccGate1LenChanged     = @"ORSIS3316AccGate1LenChanged";
-NSString* ORSIS3316AccGate1StartChanged   = @"ORSIS3316AccGate1StartChanged";
-NSString* ORSIS3316AccGate2LenChanged     = @"ORSIS3316AccGate2LenChanged";
-NSString* ORSIS3316AccGate2StartChanged   = @"ORSIS3316AccGate2StartChanged";
-NSString* ORSIS3316AccGate3LenChanged     = @"ORSIS3316AccGate3LenChanged";
-NSString* ORSIS3316AccGate3StartChanged   = @"ORSIS3316AccGate3StartChanged";
-NSString* ORSIS3316AccGate4LenChanged     = @"ORSIS3316AccGate4LenChanged";
-NSString* ORSIS3316AccGate4StartChanged   = @"ORSIS3316AccGate4StartChanged";
-NSString* ORSIS3316AccGate5LenChanged     = @"ORSIS3316AccGate5LenChanged";
-NSString* ORSIS3316AccGate5StartChanged   = @"ORSIS3316AccGate5StartChanged";
-NSString* ORSIS3316AccGate6LenChanged     = @"ORSIS3316AccGate6LenChanged";
-NSString* ORSIS3316AccGate6StartChanged   = @"ORSIS3316AccGate6StartChanged";
-NSString* ORSIS3316AccGate7LenChanged     = @"ORSIS3316AccGate7LenChanged";
-NSString* ORSIS3316AccGate7StartChanged   = @"ORSIS3316AccGate7StartChanged";
-NSString* ORSIS3316AccGate8LenChanged     = @"ORSIS3316AccGate8LenChanged";
-NSString* ORSIS3316AccGate8StartChanged   = @"ORSIS3316AccGate8StartChanged";
+NSString* ORSIS3316AccGate1LenChanged               = @"ORSIS3316AccGate1LenChanged";
+NSString* ORSIS3316AccGate1StartChanged             = @"ORSIS3316AccGate1StartChanged";
+NSString* ORSIS3316AccGate2LenChanged               = @"ORSIS3316AccGate2LenChanged";
+NSString* ORSIS3316AccGate2StartChanged             = @"ORSIS3316AccGate2StartChanged";
+NSString* ORSIS3316AccGate3LenChanged               = @"ORSIS3316AccGate3LenChanged";
+NSString* ORSIS3316AccGate3StartChanged             = @"ORSIS3316AccGate3StartChanged";
+NSString* ORSIS3316AccGate4LenChanged               = @"ORSIS3316AccGate4LenChanged";
+NSString* ORSIS3316AccGate4StartChanged             = @"ORSIS3316AccGate4StartChanged";
+NSString* ORSIS3316AccGate5LenChanged               = @"ORSIS3316AccGate5LenChanged";
+NSString* ORSIS3316AccGate5StartChanged             = @"ORSIS3316AccGate5StartChanged";
+NSString* ORSIS3316AccGate6LenChanged               = @"ORSIS3316AccGate6LenChanged";
+NSString* ORSIS3316AccGate6StartChanged             = @"ORSIS3316AccGate6StartChanged";
+NSString* ORSIS3316AccGate7LenChanged               = @"ORSIS3316AccGate7LenChanged";
+NSString* ORSIS3316AccGate7StartChanged             = @"ORSIS3316AccGate7StartChanged";
+NSString* ORSIS3316AccGate8LenChanged               = @"ORSIS3316AccGate8LenChanged";
+NSString* ORSIS3316AccGate8StartChanged             = @"ORSIS3316AccGate8StartChanged";
 
 
 
-NSString* ORSIS3316CSRRegChanged			= @"ORSIS3316CSRRegChanged";
-NSString* ORSIS3316AcqRegChanged			= @"ORSIS3316AcqRegChanged";
-NSString* ORSIS3316EventConfigChanged		= @"ORSIS3316EventConfigChanged";
-NSString* ORSIS3316PageSizeChanged			= @"ORSIS3316PageSizeChanged";
+NSString* ORSIS3316CSRRegChanged                    = @"ORSIS3316CSRRegChanged";
+NSString* ORSIS3316AcqRegChanged                    = @"ORSIS3316AcqRegChanged";
+NSString* ORSIS3316EventConfigChanged               = @"ORSIS3316EventConfigChanged";
+NSString* ORSIS3316PageSizeChanged                  = @"ORSIS3316PageSizeChanged";
 
-NSString* ORSIS3316ClockSourceChanged		= @"ORSIS3316ClockSourceChanged";
-NSString* ORSIS3316StopDelayChanged         = @"ORSIS3316StopDelayChanged";
-NSString* ORSIS3316StartDelayChanged		= @"ORSIS3316StartDelayChanged";
-NSString* ORSIS3316RandomClockChanged		= @"ORSIS3316RandomClockChanged";
+NSString* ORSIS3316ClockSourceChanged               = @"ORSIS3316ClockSourceChanged";
+NSString* ORSIS3316StopDelayChanged                 = @"ORSIS3316StopDelayChanged";
+NSString* ORSIS3316StartDelayChanged                = @"ORSIS3316StartDelayChanged";
+NSString* ORSIS3316RandomClockChanged               = @"ORSIS3316RandomClockChanged";
 
-NSString* ORSIS3316StopTriggerChanged           = @"ORSIS3316StopTriggerChanged";
-NSString* ORSIS3316RateGroupChangedNotification	= @"ORSIS3316RateGroupChangedNotification";
-NSString* ORSIS3316SettingsLock					= @"ORSIS3316SettingsLock";
+NSString* ORSIS3316StopTriggerChanged               = @"ORSIS3316StopTriggerChanged";
+NSString* ORSIS3316RateGroupChangedNotification     = @"ORSIS3316RateGroupChangedNotification";
+NSString* ORSIS3316SettingsLock                     = @"ORSIS3316SettingsLock";
 
-NSString* ORSIS3316SampleDone				= @"ORSIS3316SampleDone";
-NSString* ORSIS3316SerialNumberChanged      =@"ORSIS3316SerialNumberChanged";
-NSString* ORSIS3316IDChanged				= @"ORSIS3316IDChanged";
-NSString* ORSIS3316TemperatureChanged       =@"ORSIS3316TemperatureChanged";
-NSString* ORSIS3316HWVersionChanged         =@"ORSIS3316HWVersionChanged";
+NSString* ORSIS3316SampleDone                       = @"ORSIS3316SampleDone";
+NSString* ORSIS3316SerialNumberChanged              =@"ORSIS3316SerialNumberChanged";
+NSString* ORSIS3316IDChanged                        = @"ORSIS3316IDChanged";
+NSString* ORSIS3316TemperatureChanged               =@"ORSIS3316TemperatureChanged";
+NSString* ORSIS3316HWVersionChanged                 =@"ORSIS3316HWVersionChanged";
 
 
 #pragma mark - Static Declerations
@@ -657,22 +657,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316GapTimeChanged object:self userInfo:userInfo];
 }
 //---------------------------------------------------------------------------
-- (unsigned short) activeTrigGateWindowLen:(unsigned short)aGroup
-{
-    if(aGroup>kNumSIS3316Groups)return 0;
-    else return activeTrigGateWindowLen[aGroup];
-}
 
-- (void) setActiveTrigGateWindowLen:(unsigned short)aGroup withValue:(unsigned short)aValue
-{
-    if(aGroup>kNumSIS3316Groups)return;
-    if(aValue != [self activeTrigGateWindowLen:aGroup]){
-        [[[self undoManager] prepareWithInvocationTarget:self] setActiveTrigGateWindowLen:aGroup withValue:[self activeTrigGateWindowLen:aGroup]];
-        activeTrigGateWindowLen[aGroup] = aValue & 0xffff;
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316ActiveTrigGateWindowLenChanged object:self userInfo:userInfo];
-    }
-}
 
 // **** bit 14 and 16-31 are reserved ****  //
 // **** valid values are 0,2,4,6 to 2042/16.378 ****  //
@@ -1997,11 +1982,29 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 }
 
 //6.16 Active Trigger Gate Window Length registers
-- (void) writeActiveTrigeGateWindowLens
+//-=**- (long) gateLengthdMask                                { return gateLengthMask;                              }
+
+
+- (unsigned short) activeTrigGateWindowLen:(unsigned short)aGroup {if(aGroup<kNumSIS3316Groups)return activeTrigGateWindowLen[aGroup]; else return 0;}
+
+- (void) setActiveTrigGateWindowLen:(unsigned short)aGroup withValue:(unsigned short)aValue
+{
+    if(aGroup>kNumSIS3316Groups)return;
+    if(aValue > 0xFFFF)aValue = 0;
+    if(aValue <1)aValue=1;
+    if(aValue != [self activeTrigGateWindowLen:aGroup]){
+        [[[self undoManager] prepareWithInvocationTarget:self] setActiveTrigGateWindowLen:aGroup withValue:[self activeTrigGateWindowLen:aGroup]];
+        activeTrigGateWindowLen[aGroup] = aValue & 0xffff;
+        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316ActiveTrigGateWindowLenChanged object:self userInfo:userInfo];
+    }
+}
+
+- (void) writeActiveTrigGateWindowLen
 {
     int i;
     for(i = 0; i < kNumSIS3316Groups; i++) {
-        unsigned long valueToWrite = [self activeTrigGateWindowLen:i] & 0xffff;
+        unsigned long valueToWrite = (activeTrigGateWindowLen[i] & 0xffff)<<2;
         
         [[self adapter] writeLongBlock:&valueToWrite
                              atAddress:[self groupRegister:kActTriggerGateWindowLenReg group:i]
@@ -2010,6 +2013,27 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
                          usingAddSpace:0x01];
     }
     
+}
+
+- (void) readActiveTrigGateWindowLen:(BOOL)verbose
+{
+    int i;
+    if(verbose){
+        NSLog(@"Reading Active Trigger Gate Window Length:\n");
+        NSLog(@"(bit 0 not used)\n");
+    }
+    for(i=0; i < kNumSIS3316Groups; i++){
+        unsigned long aValue;
+        [[self adapter] readLongBlock: &aValue
+                                     atAddress:[self channelRegister:kTrigThresholdCh1Reg channel:i]
+                                     numToRead: 1
+                                    withAddMod: [self addressModifier]
+                                 usingAddSpace: 0x01];
+        if(verbose){
+            unsigned long gateLength = ((aValue) & 0xFFFF);
+            NSLog(@"%2d: 0x%08x\n", i, gateLength);
+        }
+    }
 }
 
 //6.17 Raw Data Buffer Configuration registers
@@ -2261,7 +2285,6 @@ NSString* intTrigOutPulseString[3] = {
 - (BOOL) trigBothEdgesMask:(unsigned short)chan              { return (trigBothEdgesMask     & (1<<chan)) != 0;  }
 - (long) intHeTrigOutPulseMask                               { return intHeTrigOutPulseMask;                     }
 - (BOOL) intHeTrigOutPulseMask:(unsigned short)chan          { return (intHeTrigOutPulseMask & (1<<chan)) != 0;  }
-
 - (unsigned short) intTrigOutPulseBit:(unsigned short)aChan  { return intTrigOutPulseBit[aChan];                 }
 
 - (void) setHeTrigThreshold:(unsigned short)aChan withValue:(unsigned long)aValue
@@ -2309,7 +2332,6 @@ NSString* intTrigOutPulseString[3] = {
 - (void) setIntHeTrigOutPulseMask:(unsigned long)aMask
 {
     if(intHeTrigOutPulseMask == aMask)return;
-    if(aMask > 2)aMask = 2;
     [[[self undoManager] prepareWithInvocationTarget:self] setIntHeTrigOutPulseMask:intHeTrigOutPulseMask];
     intHeTrigOutPulseMask = aMask;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316IntHeTrigOutPulseChanged object:self];
@@ -2766,7 +2788,6 @@ NSString* intTrigOutPulseString[3] = {
 //    
 //}
 
-//-=**
 - (void) initBoard
 {
     [self reset];
@@ -2791,7 +2812,7 @@ NSString* intTrigOutPulseString[3] = {
 //    vslot->addressthreshold[iadc]=0x100;
     [self configureAnalogRegisters];
     
-    [self writeActiveTrigeGateWindowLens];
+    [self writeActiveTrigGateWindowLen];
     [self writePreTriggerDelays];
     [self writeRawDataBufferConfig];
     [self writeDataFormat];
@@ -2883,16 +2904,14 @@ NSString* intTrigOutPulseString[3] = {
     ORHWWizParam* p;
 
     [a addObject:[ORHWWizParam boolParamWithName:@"AutoStart"        setter:@selector(setAutoStart:)        getter:@selector(autoStart)]];
-    //-=**
-    //[a addObject:[ORHWWizParam boolParamWithName:@"trigBothEdgesMask"        setter:@selector(setTrigBothEdgesBit:)        getter:@selector(setTrigBothEdgesBit)]];
-    //p = [[[ORHWWizParam alloc] init] autorelease];
-    //[p setName:@"CFD Control Bits"];
-    //[p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@""];
-    //[p setSetMethod:@selector(setTrigBothEdgesMask:) getMethod:@selector(trigBothEdgesMask:)];
-    //[p setCanBeRamped:YES];
-    //[a addObject:p];
     
-    //-=**
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Both Edges"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setTrigBothEdgesBit:withValue:) getMethod:@selector(trigBothEdgesMask:)];
+    [p setCanBeRamped:YES];
+    [a addObject:p];
+    
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"CFD Control Bits"];
     [p setFormat:@"##0" upperLimit:2 lowerLimit:0 stepSize:1 units:@""];
@@ -2906,6 +2925,28 @@ NSString* intTrigOutPulseString[3] = {
     [p setSetMethod:@selector(setClockSource:) getMethod:@selector(clockSource)];
     [p setActionMask:kAction_Set_Mask];
     [a addObject:p];
+  //-=**
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Enable"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setEnabledBit:withValue:) getMethod:@selector(enabled:)];
+    [p setCanBeRamped:YES];
+    [a addObject:p];
+    
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"HE"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setHeSuppressTriggerBit:withValue:) getMethod:@selector(heSuppressTriggerMask:)];
+    [p setCanBeRamped:YES];
+    [a addObject:p];
+    
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"HE Trig Out"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setIntHeTrigOutPulseBit:withValue:) getMethod:@selector(intHeTrigOutPulseMask:)];
+    [p setCanBeRamped:YES];
+    [a addObject:p];
+
     
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Gap Time"];
@@ -2923,18 +2964,12 @@ NSString* intTrigOutPulseString[3] = {
     [p setCanBeRamped:YES];
     [a addObject:p];
     
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"HE Trig Threshold"];
-    [p setFormat:@"##0" upperLimit:0x3FFFFFFC lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setHeTrigThresholdSum:withValue:) getMethod:@selector(heTrigThresholdSum:)];
-    [p setCanBeRamped:YES];
-    [a addObject:p];
-    
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setUseValue:NO];
-    [p setName:@"Init"];
-    [p setSetMethodSelector:@selector(initBoard)];
-    [a addObject:p];
+//    p = [[[ORHWWizParam alloc] init] autorelease];
+//    [p setName:@"HE Trig Threshold Sum"];
+//    [p setFormat:@"##0" upperLimit:0xFFFFFFFF lowerLimit:0 stepSize:1 units:@""];
+//    [p setSetMethod:@selector(setHeTrigThresholdSum:withValue:) getMethod:@selector(heTrigThresholdSum:)];
+//    [p setCanBeRamped:YES];
+//    [a addObject:p];
     
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Int Trig Out Pulse"];
@@ -2960,7 +2995,6 @@ NSString* intTrigOutPulseString[3] = {
     [p setName:@"Peaking Time"];
     [p setFormat:@"##0" upperLimit:0x3f lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setPeakingTime:withValue:) getMethod:@selector(peakingTime:)];
-    [p setCanBeRamped:YES];
     [a addObject:p];
     
     [a addObject:[ORHWWizParam boolParamWithName:@"P2StartStop"      setter:@selector(setP2StartStop:)      getter:@selector(p2StartStop)]];
@@ -2989,7 +3023,6 @@ NSString* intTrigOutPulseString[3] = {
     [p setName:@"Tau Factor"];
     [p setFormat:@"##0" upperLimit:0x3f lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setTauFactor:withValue:) getMethod:@selector(tauFactor:)];
-    [p setCanBeRamped:YES];
     [a addObject:p];
     
     p = [[[ORHWWizParam alloc] init] autorelease];
@@ -2999,13 +3032,18 @@ NSString* intTrigOutPulseString[3] = {
     [p setCanBeRamped:YES];
     [a addObject:p];
    
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Threshold Sum"];
-    [p setFormat:@"##0" upperLimit:0x3FFFFFFC lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setThresholdSum:withValue:) getMethod:@selector(thresholdSum:)];
-    [p setCanBeRamped:YES];
-    [a addObject:p];
+//    p = [[[ORHWWizParam alloc] init] autorelease];
+//    [p setName:@"Threshold Sum"];
+//    [p setFormat:@"##0" upperLimit:0xFFFFFFFF lowerLimit:0 stepSize:1 units:@""];
+//    [p setSetMethod:@selector(setThresholdSum:withValue:) getMethod:@selector(thresholdSum:)];
+//    [a addObject:p];
 
+    p = [[[ORHWWizParam alloc] init] autorelease]; //MUST BE LAST
+    [p setUseValue:NO];
+    [p setName:@"Init"];
+    [p setSetMethodSelector:@selector(initBoard)];
+    [a addObject:p];
+    
 
     
     return a;
@@ -3242,6 +3280,7 @@ NSString* intTrigOutPulseString[3] = {
     }
     
     for(i=0;i<kNumSIS3316Groups;i++){
+        [self setActiveTrigGateWindowLen:i withValue:[decoder decodeInt32ForKey:[NSString stringWithFormat:@"gateLength%d",i]]];
         [self setThresholdSum:i        withValue:[decoder decodeInt32ForKey:[NSString stringWithFormat:@"thresholdSum%d",i]]];
         [self setHeTrigThresholdSum:i  withValue:[decoder decodeInt32ForKey:[NSString stringWithFormat:@"heTrigThresholdSum%d",i]]];
         [self setActiveTrigGateWindowLen:i  withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"activeTrigGateWindowLen%d",i]]];
@@ -3368,6 +3407,7 @@ NSString* intTrigOutPulseString[3] = {
     }
     
     for(i=0;i<kNumSIS3316Groups;i++){
+        [encoder encodeInt32:thresholdSum[i]           forKey:[NSString stringWithFormat:@"thresholdSum%d",i]];
         [encoder encodeInt32:thresholdSum[i]           forKey:[NSString stringWithFormat:@"thresholdSum%d",i]];
         [encoder encodeInt:heTrigThresholdSum[i]       forKey:[NSString stringWithFormat:@"heTrigThresholdSum%d",i]];
         [encoder encodeInt:activeTrigGateWindowLen[i]     forKey:[NSString stringWithFormat:@"activeTrigGateWindowLen%d",i]];

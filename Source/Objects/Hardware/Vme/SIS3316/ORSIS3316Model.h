@@ -236,6 +236,7 @@ enum{
 @interface ORSIS3316Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping,AutoTesting>
 {
   @private
+//-=**    short           gateLengthMask;
     unsigned long   dataId;
     long			enabledMask;
     long            histogramsEnabledMask;
@@ -254,6 +255,7 @@ enum{
     unsigned short intTrigOutPulseBit[kNumSIS3316Channels];
     long            trigBothEdgesMask;
     long            intHeTrigOutPulseMask;
+    long            heTrigOutputMask;
     
     unsigned short  activeTrigGateWindowLen[kNumSIS3316Groups];
     unsigned short  preTriggerDelay[kNumSIS3316Groups];
@@ -353,6 +355,7 @@ enum{
 - (unsigned short) majorRevision;
 
 - (long) enabledMask;
+//-=** (BOOL) enabledMask:(unsigned short)chan;
 - (void) setEnabledMask:(unsigned long)aMask;
 - (BOOL) enabled:(unsigned short)chan;
 - (void) setEnabledBit:(unsigned short)chan withValue:(BOOL)aValue;
@@ -411,6 +414,7 @@ enum{
 - (void) setHeTrigThresholdSum:(unsigned short)aGroup withValue:(unsigned long)aValue;
 - (unsigned long) heTrigThreshold:(unsigned short)chan;
 - (unsigned long) heTrigThresholdSum:(unsigned short)aGroup;
+
 - (long) trigBothEdgesMask;
 - (BOOL) trigBothEdgesMask:(unsigned short)chan;
 - (void) setTrigBothEdgesMask:(unsigned long)aMask;
@@ -575,10 +579,12 @@ enum{
 - (void) writeAcquisitionRegister;              //6.21              (incomplete. No read)
 - (BOOL) sampleLogicIsBusy;                     //6.21      none of 21 is connected to the nib
 //pg 119 and on
+- (void) writeActiveTrigGateWindowLen;        //6.16 (section 2)
+- (void) readActiveTrigGateWindowLen:(BOOL)verbose;
 - (void) writeRawDataBufferConfig;              //6.17 (section 2)
 - (void) writePreTriggerDelays;                 //6.19 (section 2)  (Missing read and caps at 4 bits (I think))
 - (void) writeDataFormat;                       //6.21 (section 2)  (complete)
-- (void) writeActiveTrigeGateWindowLens;        //6.24 (section 2)
+
 - (void) writeFirTriggerSetup;                  //6.25 (section 2)
 - (void) initBoard;
 - (void) writeThresholds;                       //6.26 (section 2)
