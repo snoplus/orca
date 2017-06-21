@@ -25,6 +25,7 @@
 #define kRARecovered         2
 
 @class ORRunningAveSpike;
+@class ORRunningAverageGroup;
 
 @interface ORRunningAverage : NSObject
 {
@@ -35,9 +36,8 @@
     NSMutableArray*	inComingData;
     int             tag;
     int             groupTag;
-    BOOL            didSpike;
-    BOOL            lastDidSpike;
-    NSDate*         spikeStartDate;
+    BOOL            spikeState;
+    BOOL            lastSpikeState;
 }
 - (id)      initWithTag:(short)aTag andLength:(short)wl;
 - (void)    dealloc;
@@ -52,9 +52,12 @@
 - (void)    setTag:(int)newTag;
 - (int)     groupTag;
 - (void)    setGroupTag:(int)newGroupTag;
-- (ORRunningAveSpike*) calculateAverage:(float)rate minSamples:(int)minSamples triggerValue:(float)triggerValue spikeType:(BOOL)triggerType;
+- (void) calculateAverage:(float)dataPoint minSamples:(int)minSamples triggerValue:(float)triggerValue spikeType:(BOOL)triggerType group:(ORRunningAverageGroup*)aGroup;
 - (ORRunningAveSpike*) spikedInfo:(BOOL)spiked;
 @end
+
+
+
 
 @interface NSObject (ORRunningAverage_Catagory)
 - (unsigned long) getRate:(int)tag forGroup:(int)aGroupTag;
@@ -63,18 +66,14 @@
 @interface ORRunningAveSpike : NSObject
 {
     BOOL    spiked;
-    NSDate* spikeStart;
-    NSTimeInterval  duration;   //only valid is !spiked
     int     tag;
     float   ave;
     float   spikeValue;
 }
 @property (assign) BOOL     spiked;
-@property (retain) NSDate*  spikeStart;
 @property (assign) int      tag;
 @property (assign) float    ave;
 @property (assign) float    spikeValue;
-@property (assign) NSTimeInterval   duration;
 
 @end
 

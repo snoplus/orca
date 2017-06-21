@@ -65,9 +65,8 @@
 - (void)        setPollTime:(int)aValue;
 @end
 
-extern NSString* ORRunningAverageSpikeNotification;
 extern NSString* ORRunningAverageChangedNotification;
-
+extern NSString* ORSpikeStateChangedNotification;
 
 @interface NSObject (ORRunningAverageGroup_Catagory)
 - (float) getRate:(int)aChannel;

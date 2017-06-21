@@ -20,6 +20,8 @@
 //-------------------------------------------------------------
 
 #import "ORRunningAverage.h"
+#import "ORRunningAverageGroup.h"
+
 @implementation ORRunningAverage
 
 - (id) initWithTag: (short)aTag
@@ -29,13 +31,11 @@
     [self setTag: aTag];
     inComingData = [[NSMutableArray alloc] init];
     [self setWindowLength:wl];
-    spikeStartDate = nil;
     return self;
 }
 
 - (void) dealloc
 {
-    [spikeStartDate release];
     [inComingData release];
     [super dealloc];
 }
@@ -93,7 +93,7 @@
     return spikeValue;
 }
 
-- (ORRunningAveSpike*) calculateAverage:(float)dataPoint minSamples:(int)minSamples triggerValue:(float)triggerValue spikeType:(BOOL)triggerType
+- (void) calculateAverage:(float)dataPoint minSamples:(int)minSamples triggerValue:(float)triggerValue spikeType:(BOOL)triggerType group:(ORRunningAverageGroup*)aGroup
 {
     lastRateValue = dataPoint;
     [inComingData addObject:[NSNumber numberWithFloat:dataPoint]];
@@ -101,65 +101,49 @@
     
     unsigned long n = [inComingData count];
     if(n<=5){
-        didSpike = NO;
-        lastDidSpike = NO;
+        spikeState       = NO;
+        lastSpikeState   = NO;
         runningAverage = dataPoint;
-        runningAverage = runningAverage + (dataPoint - runningAverage)/(float)n;
-        return nil;
+        runningAverage = ((n-1)*runningAverage + dataPoint)/(float)n;
+        return;
     }
-    runningAverage = runningAverage + (dataPoint - runningAverage)/(float)n;
+    runningAverage = ((n-1)*runningAverage + dataPoint)/(float)n;
     
     spikeValue = 0;
     switch(triggerType){
         case kRASpikeOnRatio: //trigger on the ratio of the rate over the average
             if(runningAverage != 0) {
                 spikeValue = dataPoint/runningAverage;
-                didSpike   = (fabs(spikeValue) >= triggerValue);
+                spikeState = (fabs(spikeValue) >= triggerValue);
+                NSLog(@"%d: %.1f %.1f %.1f %@\n",tag,spikeValue,dataPoint,runningAverage,spikeState?@"Spike":@"");
             }
             break;
             
         case kRASpikeOnThreshold:
             spikeValue = dataPoint-runningAverage;
-            didSpike   = (fabs(spikeValue) > triggerValue);
+            spikeState   = (fabs(spikeValue) > triggerValue);
             break;
             
         default:
             break;
     }
     
-    if(lastDidSpike != didSpike){
-        lastDidSpike = didSpike;
-        return [self spikedInfo:didSpike];
+    if(lastSpikeState != spikeState){
+        lastSpikeState = spikeState;
+        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[self spikedInfo:spikeState]forKey:@"SpikeObject"];
+        [[NSNotificationCenter defaultCenter] postNotificationName: ORSpikeStateChangedNotification
+                                                                object: aGroup
+                                                              userInfo: userInfo];
     }
-    return nil;
 }
 
 - (ORRunningAveSpike*) spikedInfo:(BOOL)spiked
 {
-    NSTimeInterval duration;
-    if(spiked){
-        [spikeStartDate release];
-        spikeStartDate = [[NSDate date]retain];
-        duration = -1;
-    }
-    else {
-        duration = [[NSDate date] timeIntervalSinceDate:spikeStartDate];
-        [spikeStartDate release];
-        spikeStartDate = nil;
-    }
-    
     ORRunningAveSpike* aSpikeObj = [[ORRunningAveSpike alloc] init];
-    aSpikeObj.spikeStart    = spikeStartDate;
-    aSpikeObj.duration      = duration; //only valid at end of spike, else -1
     aSpikeObj.spiked        = spiked;
     aSpikeObj.tag           = tag;
     aSpikeObj.ave           = runningAverage;
     aSpikeObj.spikeValue    = spikeValue;
-    
-    if(!spiked){
-        [spikeStartDate release];
-        spikeStartDate = nil;
-    }
     
     return [aSpikeObj autorelease];
 }
@@ -175,20 +159,11 @@
 @end
 
 @implementation ORRunningAveSpike
-@synthesize tag,spiked,spikeStart,ave,spikeValue,duration;
-
-- (void) dealloc
-{
-    //dealloc properties like this
-    self.spikeStart = nil;
-    
-    [super dealloc];
-}
+@synthesize tag,spiked,ave,spikeValue;
 
 - (NSString*) description
 {
-    NSString* s = [NSString stringWithFormat:@"\ntime:%@\nspiked:%@\ntag:%d\nave:%.3f\nspikeValue:%.3f",
-                   self.spikeStart,
+    NSString* s = [NSString stringWithFormat:@"\nspiked:%@\ntag:%d\nave:%.3f\nspikeValue:%.3f",
                    self.spiked?@"YES":@"NO",
                    self.tag,
                    self.ave,
