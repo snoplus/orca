@@ -101,6 +101,7 @@
 - (ORTimeRate*)leakageCurrentHistory:(int)index;
 
 //running averages
+- (void) fakeASpike:(int) channel started:(BOOL)start;
 - (void) baselineSpikeChanged:(NSNotification*)aNote;
 - (void)  setBaselineRunningAverages:(ORRunningAverageGroup*)newRunningAverageGroup;
 
