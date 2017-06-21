@@ -91,6 +91,8 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
         }
     }
     @catch(NSException* e){
+        NSLog(@"Exception thrown trying to open [%@]\n",[[url path] stringByAbbreviatingWithTildeInPath]);
+        [(ORAppDelegate*)[NSApp delegate] setDocument:nil];
     }
     return nil;
 }
@@ -108,6 +110,8 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
         }
     }
     @catch(NSException* e){
+        NSLog(@"Exception thrown trying to open [%@]\n",[[url path] stringByAbbreviatingWithTildeInPath]);
+        [(ORAppDelegate*)[NSApp delegate] setDocument:nil];
     }
     return nil;
 }
