@@ -273,9 +273,11 @@ NSString* OROnCallListModelEdited           = @"OROnCallListMessageChanged";
 
 - (void) broadcastMessage:(NSString*)aMessage
 {
-    [[self primaryPerson]   sendMessage:aMessage];
-    [[self secondaryPerson] sendMessage:aMessage];
-    [[self tertiaryPerson]  sendMessage:aMessage];
+    if([aMessage length]){
+        [[self primaryPerson]   sendMessage:aMessage];
+        [[self secondaryPerson] sendMessage:aMessage];
+        [[self tertiaryPerson]  sendMessage:aMessage];
+    }
 }
 
 - (OROnCallPerson*) primaryPerson
