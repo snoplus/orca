@@ -930,15 +930,13 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) fakeASpike:(int) channel started:(BOOL)start
 {
     ORRunningAveSpike* aSpike = [[[ORRunningAveSpike alloc] init] autorelease];
-    aSpike.spiked = start;
-    aSpike.spikeStart = [NSDate date];
-    aSpike.duration = start?1:-1;
-    aSpike.tag = channel;
-    aSpike.ave = 2;
-    aSpike.spikeValue = 10;
+    aSpike.spiked       = start;
+    aSpike.tag          = channel;
+    aSpike.ave          = 2;
+    aSpike.spikeValue   = 10;
     
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:aSpike forKey:@"SpikeObject"];
-    NSNotification* aNote  = [NSNotification notificationWithName:ORRunningAverageSpikeNotification object:self userInfo:userInfo];
+    NSNotification* aNote  = [NSNotification notificationWithName:ORSpikeStateChangedNotification object:self userInfo:userInfo];
     [self rateSpikeChanged:aNote];
 
 }
@@ -949,9 +947,9 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     ORRunningAveSpike* spikeObj = [[aNote userInfo] objectForKey:@"SpikeObject"];
     NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
                               spikeObj,@"spikeInfo",
-                              [NSNumber numberWithInt:[self crateNumber]],@"crate",
-                              [NSNumber numberWithInt:[self slot]],@"card",
-                              [NSNumber numberWithInt:[spikeObj tag]],@"channel",
+                              [NSNumber numberWithInt:[self crateNumber]],  @"crate",
+                              [NSNumber numberWithInt:[self slot]],         @"card",
+                              [NSNumber numberWithInt:[spikeObj tag]],      @"channel",
                               nil];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MModelRateSpiked object:self userInfo:userInfo];
  
@@ -969,7 +967,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     
         [notifyCenter addObserver : self
                          selector : @selector(rateSpikeChanged:)
-                             name : ORRunningAverageSpikeNotification
+                             name : ORSpikeStateChangedNotification
                            object : run_ave];
     }
 }
@@ -1046,13 +1044,13 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	}
 	return 0;
 }
+
 - (float) getRate:(short)channel
 {
-    
     if(channel>=0 && channel<kNumGretina4MChannels){
         return [[self rateObject:channel] rate]; //the rate
     }
-return 0;
+    return 0;
 }
 
 #pragma mark •••specific accessors
