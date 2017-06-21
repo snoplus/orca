@@ -128,6 +128,9 @@
     [PrescaleFactor setEnabled: !lockedOrNotRunningMaintenance];
     [PrescaleTriggerMask setEnabled: !lockedOrNotRunningMaintenance];
     [sendPrescaleButton setEnabled: !lockedOrNotRunningMaintenance];
+    [TUBiiPGTRate setEnabled: !lockedOrNotRunningMaintenance];
+    [sendTUBiiPGTStart setEnabled: !lockedOrNotRunningMaintenance];
+    [sendTUBiiPGTStop setEnabled: !lockedOrNotRunningMaintenance];
     [MTCAMimic_Slider setEnabled: !lockedOrNotRunningMaintenance];
     [MTCAMimic_TextField setEnabled: !lockedOrNotRunningMaintenance];
     [sendMTCAButton setEnabled: !lockedOrNotRunningMaintenance];
