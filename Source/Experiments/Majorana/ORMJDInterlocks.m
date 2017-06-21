@@ -652,11 +652,11 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
     }
 }
 
-- (BOOL)        vacuumSpike {return vacuumSpike;   }
-- (BOOL)        fillingLN   {return fillingLN;}
-- (int)         pollingTimeForLN {return pollingTimeForLN;}
+- (BOOL) vacuumSpike {return vacuumSpike;   }
+- (BOOL) fillingLN   {return fillingLN;}
 
-
+- (int)  pollingTimeForLN {if(pollingTimeForLN==0)return 45; else return pollingTimeForLN;}
+- (void) setFillingLN:(BOOL)aState {fillingLN = aState;} //---for testing only
 
 - (void) addToReport:(NSString*)aString
 {

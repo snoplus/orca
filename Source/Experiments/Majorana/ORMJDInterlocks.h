@@ -95,6 +95,7 @@ typedef struct {
 - (BOOL)        fillingLN;
 - (int)         pollingTimeForLN;
 - (void)        errorReport;
+- (void)        setFillingLN:(BOOL)aState;
 
 @property (assign) MajoranaModel*             delegate;
 @property (assign,nonatomic) BOOL             isRunning;

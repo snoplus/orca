@@ -196,10 +196,10 @@
 - (IBAction) stopSourceAction1:(id)sender;
 - (IBAction) checkSourceGateValve1:(id)sender;
 - (IBAction) closeGateValve1:(id)sender;
+- (IBAction) printBreakDownReport:(id)sender;
 
 - (IBAction) calibrationLockAction:(id)sender;
 - (void)     confirmCloseGateValve:(int)index;
-- (IBAction) printBreakdownReport:(id)sender;
 - (IBAction) maxNonCalibrationRateAction:(id)sender;
 - (IBAction) verboseDiagnosticsAction:(id)sender;
 
