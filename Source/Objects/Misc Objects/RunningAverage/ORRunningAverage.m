@@ -115,7 +115,6 @@
             if(runningAverage != 0) {
                 spikeValue = dataPoint/runningAverage;
                 spikeState = (fabs(spikeValue) >= triggerValue);
-                NSLog(@"%d: %.1f %.1f %.1f %@\n",tag,spikeValue,dataPoint,runningAverage,spikeState?@"Spike":@"");
             }
             break;
             
