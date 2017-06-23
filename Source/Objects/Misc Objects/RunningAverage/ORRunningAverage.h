@@ -30,29 +30,29 @@
 @interface ORRunningAverage : NSObject
 {
     float           runningAverage;
+    unsigned long   dataCount;
     float           spikeValue;
-    float           lastRateValue;
+    float           averageAtTimeOfSpike;
     int             windowLength;
-    NSMutableArray*	inComingData;
     int             tag;
     int             groupTag;
     BOOL            spikeState;
     BOOL            lastSpikeState;
 }
 - (id)      initWithTag:(short)aTag andLength:(short)wl;
-- (void)    dealloc;
 - (void)    setWindowLength:(int) wl;
 - (void)    resetCounter:(float) rate;
 - (void)    reset;
 - (float)   runningAverage;
 - (float)   spikeValue;
-- (float)   lastRateValue;
-- (void)    dump;
 - (int)     tag;
 - (void)    setTag:(int)newTag;
 - (int)     groupTag;
 - (void)    setGroupTag:(int)newGroupTag;
 - (void) calculateAverage:(float)dataPoint minSamples:(int)minSamples triggerValue:(float)triggerValue spikeType:(BOOL)triggerType group:(ORRunningAverageGroup*)aGroup;
+- (BOOL) spiked;
+- (float) averageAtTimeOfSpike;
+
 - (ORRunningAveSpike*) spikedInfo:(BOOL)spiked;
 @end
 

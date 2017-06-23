@@ -29,15 +29,8 @@
 {
     self = [super init];
     [self setTag: aTag];
-    inComingData = [[NSMutableArray alloc] init];
     [self setWindowLength:wl];
     return self;
-}
-
-- (void) dealloc
-{
-    [inComingData release];
-    [super dealloc];
 }
 
 - (int) tag
@@ -62,32 +55,27 @@
 
 - (void) setWindowLength:(int) wl
 {
-    [inComingData removeAllObjects];
-    
     windowLength = wl;
     [self reset];
-    //NSLog(@"my running average window initially = %d\n",inComingData.count);
-    runningAverage = 0.;
 }
 
 - (void) resetCounter:(float) rate
 {
-    [inComingData removeAllObjects];
-}
-- (void) reset
-{
-    [inComingData removeAllObjects];
+    [self reset];
+    runningAverage = rate;
 }
 
-- (float) lastRateValue
+- (void) reset
 {
-    return lastRateValue;
+    dataCount       = 0;
+    runningAverage  = 0.;
 }
 
 - (float) runningAverage
 {
     return runningAverage;
 }
+
 - (float)   spikeValue
 {
     return spikeValue;
@@ -95,36 +83,52 @@
 
 - (void) calculateAverage:(float)dataPoint minSamples:(int)minSamples triggerValue:(float)triggerValue spikeType:(BOOL)triggerType group:(ORRunningAverageGroup*)aGroup
 {
-    lastRateValue = dataPoint;
-    [inComingData addObject:[NSNumber numberWithFloat:dataPoint]];
-    if([inComingData count] > minSamples)[inComingData removeObjectAtIndex:0];
     
-    unsigned long n = [inComingData count];
-    if(n<=5){
-        spikeState       = NO;
-        lastSpikeState   = NO;
+    dataCount = dataCount+1;
+    if(dataCount>windowLength)dataCount = windowLength;
+    
+    if(dataCount<=5){
+        spikeState     = NO;
+        lastSpikeState = NO;
         runningAverage = dataPoint;
-        runningAverage = ((n-1)*runningAverage + dataPoint)/(float)n;
+        runningAverage = ((dataCount-1)*runningAverage + dataPoint)/(float)dataCount;
         return;
     }
-    runningAverage = ((n-1)*runningAverage + dataPoint)/(float)n;
     
     spikeValue = 0;
     switch(triggerType){
         case kRASpikeOnRatio: //trigger on the ratio of the rate over the average
             if(runningAverage != 0) {
-                spikeValue = dataPoint/runningAverage;
-                spikeState = (fabs(spikeValue) >= triggerValue);
-            }
-            break;
+                if(fabs(dataPoint/runningAverage) >= triggerValue){
+                    spikeValue           = dataPoint;
+                    averageAtTimeOfSpike = runningAverage;
+                    spikeState           = YES;
+                }
+                else {
+                    //don't reset state unless the new value is lower than the ave that triggered spike
+                    if(fabs(dataPoint/averageAtTimeOfSpike)<triggerValue) spikeState = NO;
+                }
+            }            
+        break;
             
         case kRASpikeOnThreshold:
-            spikeValue = dataPoint-runningAverage;
-            spikeState   = (fabs(spikeValue) > triggerValue);
-            break;
+            if(fabs(dataPoint-runningAverage) > triggerValue){
+                spikeValue           = dataPoint;
+                averageAtTimeOfSpike = runningAverage;
+                spikeState           = YES;
+            }
+            else {
+                //don't reset state unless the new value is lower than the ave that triggered spike
+                if(fabs(dataPoint-averageAtTimeOfSpike) < triggerValue) spikeState = NO;
+            }
+        break;
             
         default:
-            break;
+        break;
+    }
+    
+    if(spikeState == NO){
+        runningAverage = ((dataCount-1)*runningAverage + dataPoint)/(float)dataCount;
     }
     
     if(lastSpikeState != spikeState){
@@ -134,6 +138,16 @@
                                                                 object: aGroup
                                                               userInfo: userInfo];
     }
+}
+
+- (BOOL) spiked
+{
+    return spikeState;
+}
+
+- (float) averageAtTimeOfSpike
+{
+    return averageAtTimeOfSpike;
 }
 
 - (ORRunningAveSpike*) spikedInfo:(BOOL)spiked
@@ -146,15 +160,6 @@
     
     return [aSpikeObj autorelease];
 }
-
-- (void) dump
-{
-    int idx;
-    for(idx=0; idx<[inComingData count];idx++){
-        NSLog(@"number at index %d = %f\n",idx, [[inComingData objectAtIndex:idx] floatValue]);
-    }
-}
-
 @end
 
 @implementation ORRunningAveSpike
