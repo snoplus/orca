@@ -536,6 +536,19 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         else {
             NSTimeInterval dt           = [self timeSinceRateSpike:index];
             NSTimeInterval lnPolltime   = [self pollingTimeForLN:index];
+            if(verboseDiagnostics){
+                if(dt < lnPolltime){
+                    NSLog(@"Rate is spiking but less than %d (pollTime: %d) seconds have passed\n",(int)dt,(int)lnPolltime);
+                }
+                else {
+                    if([self fillingLN:index]){
+                        NSLog(@"Spikes exist and NOT filling\n");
+                    }
+                    else {
+                        NSLog(@"Spikes ignored because LN fill in progress\n");
+                    }
+                }
+            }
             return (dt > lnPolltime) && ![self fillingLN:index];
         }
     }

@@ -61,7 +61,7 @@
 {
 	detectorSize		 = NSMakeSize(770,740);
 	detailsSize			 = NSMakeSize(560,600);
-	subComponentViewSize = NSMakeSize(590,645);
+	subComponentViewSize = NSMakeSize(590,665);
 	detectorMapViewSize	 = NSMakeSize(900,760);
     vetoMapViewSize		 = NSMakeSize(580,565);
     calibrationViewSize	 = NSMakeSize(580,320);
