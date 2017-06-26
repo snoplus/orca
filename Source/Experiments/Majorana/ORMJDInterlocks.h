@@ -26,6 +26,7 @@
 //do NOT change this list without changing the StateInfo array in the .m file
 enum {
     kMJDInterlocks_Idle,
+    kMJDInterlocks_ExecuteLNPoll,
     kMJDInterlocks_Ping,
     kMJDInterlocks_PingWait,
     kMJDInterlocks_CheckHVisOn,

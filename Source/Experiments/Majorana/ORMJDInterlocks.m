@@ -28,6 +28,7 @@
 //do NOT change this list without changing the enum states in the .h filef
 static MJDInterlocksStateInfo state_info [kMJDInterlocks_NumStates] = {
     { kMJDInterlocks_Idle,               @"State Machine"},
+    { kMJDInterlocks_ExecuteLNPoll,      @"Start SCM LN Request"},
     { kMJDInterlocks_Ping,               @"Ping Vac System"},
     { kMJDInterlocks_PingWait,           @"Ping Response"},
     { kMJDInterlocks_CheckHVisOn,        @"HV Status"},
@@ -121,7 +122,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
 {
     if(retryCount == 0){
         [self setupStateArray]; //info for display in dialog
-        [self setCurrentState:kMJDInterlocks_Ping]; //first state
+        [self setCurrentState:kMJDInterlocks_ExecuteLNPoll]; //first state
     }
     else {
         [self setCurrentState:retryState]; //there was an error so doing a restart
@@ -213,6 +214,19 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             [self setState:kMJDInterlocks_Idle status:@"Waiting" color:normalColor];
             break;
             
+        case kMJDInterlocks_ExecuteLNPoll:
+            if(!hvIsOn){
+                [self setState:kMJDInterlocks_ExecuteLNPoll           status:@"Skipped" color:normalColor];
+            }
+           else {
+                self.remoteOpStatus=nil;
+                [self sendCommand:@"[ORAmi286Model,2 pollLevels];" remoteSocket:[delegate remoteSocket:kScmSlot]];
+                [self setState:kMJDInterlocks_ExecuteLNPoll           status:@"Sent" color:normalColor];
+            }
+            [self setCurrentState:kMJDInterlocks_Ping];
+
+            break;
+
         case kMJDInterlocks_Ping:
             [self setState:kMJDInterlocks_Idle status:@"Running" color:normalColor];
             if(!retryCount)[self setState:kMJDInterlocks_Ping status:@"Pinging..." color:normalColor];

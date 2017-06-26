@@ -480,7 +480,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     if(pollTime){
         if(!scheduledToRunCheckBreakdown){
             scheduledToRunCheckBreakdown = YES;
-            [self performSelector:@selector(forceConstraintCheck) withObject:nil afterDelay:[self pollingTimeForLN:0]*2 + 5];
+            [self performSelector:@selector(forceConstraintCheck) withObject:nil afterDelay:[self pollingTimeForLN:0] + 10];
         }
     }
 }
@@ -532,11 +532,11 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 {
     if(index<2){
         if([self calibrationRun:index])           return NO;
-        else if([rateSpikes[index] count] == 0)        return NO;
+        else if([rateSpikes[index] count] == 0)   return NO;
         else {
             NSTimeInterval dt           = [self timeSinceRateSpike:index];
             NSTimeInterval lnPolltime   = [self pollingTimeForLN:index];
-            return (dt > lnPolltime*2) && ![self fillingLN:index];
+            return (dt > lnPolltime) && ![self fillingLN:index];
         }
     }
     else return NO;
