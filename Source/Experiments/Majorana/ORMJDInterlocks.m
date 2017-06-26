@@ -215,14 +215,9 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             break;
             
         case kMJDInterlocks_ExecuteLNPoll:
-            if(!hvIsOn){
-                [self setState:kMJDInterlocks_ExecuteLNPoll           status:@"Skipped" color:normalColor];
-            }
-           else {
-                self.remoteOpStatus=nil;
-                [self sendCommand:@"[ORAmi286Model,2 pollLevels];" remoteSocket:[delegate remoteSocket:kScmSlot]];
-                [self setState:kMJDInterlocks_ExecuteLNPoll           status:@"Sent" color:normalColor];
-            }
+            self.remoteOpStatus=nil;
+            [self sendCommand:@"[ORAmi286Model,2 pollLevels];" remoteSocket:[delegate remoteSocket:kScmSlot]];
+            [self setState:kMJDInterlocks_ExecuteLNPoll           status:@"Sent" color:normalColor];
             [self setCurrentState:kMJDInterlocks_Ping];
 
             break;
