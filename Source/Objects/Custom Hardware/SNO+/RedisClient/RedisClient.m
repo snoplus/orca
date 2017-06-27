@@ -176,7 +176,7 @@
     freeReplyObject(r);
 }
 
-- (int) intCommand: (const char *) fmt, ... 
+- (long long) intCommand: (const char *) fmt, ... 
 {
     va_list ap;
     va_start(ap,fmt);
@@ -190,7 +190,7 @@
         [excep raise];
     }
 
-    int responseVal = r->integer;
+    long long responseVal = r->integer;
     freeReplyObject(r);
     return responseVal;
 }
