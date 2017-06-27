@@ -48,7 +48,7 @@
 #import "ORPQModel.h"
 #import "ORPQResult.h"
 #import "RunTypeWordBits.hh"
-#import "TUBiiModel.hh"
+#import "TUBiiModel.h"
 
 #define RUNNING 0
 #define STARTING 1
@@ -1297,13 +1297,13 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         return;
     }
 
-    if (sync_mask != 0 || async_mask != 0) {
+    if (sync_trigger_mask != 0 || async_trigger_mask != 0) {
         NSLogColor([NSColor redColor],
                    @"pingCratesAtRunStart: tubii already has triggers enabled.\n");
     }
 
     @try {
-        [tubii setTriggerMask:0x10000 setAsyncMask:0];
+        [tubii setTrigMask:0x10000 setAsyncMask:0];
         [tubii setMTCAMimic1_ThresholdInBits:0];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
@@ -1399,7 +1399,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 
     /* Reset tubii's trigger masks and DAC value. */
     @try {
-        [tubii setTriggerMask:0 setAsyncMask:0];
+        [tubii setTrigMask:0 setAsyncMask:0];
         [tubii setMTCAMimic1_ThresholdInBits:tubii_dac];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
