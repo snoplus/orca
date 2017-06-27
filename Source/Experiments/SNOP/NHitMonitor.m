@@ -18,6 +18,7 @@
 #import "RedisClient.h"
 #import "ORMTC_Constants.h"
 #import "TUBiiModel.h"
+#import "AppDelegate.h"
 
 #define SWAP_INT32(a,b) swap_int32((uint32_t *)(a),(b))
 
