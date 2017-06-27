@@ -290,6 +290,7 @@ enum {
 - (void) documentClosed;
 - (void) detectorStateChanged:(NSNotification*)aNote;
 - (int) initAtRunStart;
+- (void) zeroPedestalMasksAtRunStart;
 
 #pragma mark •••Accessors
 - (BOOL) isTriggerON;

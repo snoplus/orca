@@ -370,7 +370,7 @@ isLoaded = isLoaded;
      *
      * See this shift report for more details:
      * http://snopl.us/shift/view/9e1ff17e58704756a99f947ec2509f39. */
-    int slot, i, hv;
+    int slot;
     ORFec32Model *fec;
 
     /* First, set the pedestal mask in the GUI to zero. */
