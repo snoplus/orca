@@ -1374,8 +1374,6 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
                            @"pingCratesAtRunStart: failed to fire pedestal. error: %@ reason: %@\n",
                            [e name], [e reason]);
             }
-
-            NSLog(@"PING crate %02d, slot %02d\n", i, j);
         }
     }
 
