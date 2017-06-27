@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12120" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1050" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12120"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
         <capability name="box content view" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -232,13 +232,12 @@
                                                             <menu key="menu" id="yXd-zW-1XY">
                                                                 <items>
                                                                     <menuItem title="Energy" state="on" id="Po3-f0-sda"/>
-                                                                    <menuItem title="Energy + Trace (sync)-obsolete" id="V6N-vz-QJv"/>
-                                                                    <menuItem title="Energy + Trace" id="zR3-Ni-5w7"/>
-                                                                    <menuItem title="Histogram" id="6sP-hl-rjC"/>
-                                                                    <menuItem title="Veto (Energy)" id="yAy-YJ-9Hs"/>
-                                                                    <menuItem title="Veto (Energy + Trace)" id="QNB-os-vCy"/>
-                                                                    <menuItem title="Bipolar Energy" id="JR4-LT-mtn"/>
-                                                                    <menuItem title="Bipolar Energy + Trace (Debug)" id="ybL-B0-tfo"/>
+                                                                    <menuItem title="Energy + Trace" tag="1" id="zR3-Ni-5w7"/>
+                                                                    <menuItem title="Histogram" tag="2" id="6sP-hl-rjC"/>
+                                                                    <menuItem title="Veto (Energy)" tag="3" id="yAy-YJ-9Hs"/>
+                                                                    <menuItem title="Veto (Energy + Trace)" tag="4" id="QNB-os-vCy"/>
+                                                                    <menuItem title="Bipolar Energy" tag="8" id="JR4-LT-mtn"/>
+                                                                    <menuItem title="Bipolar Energy + Trace (Debug)" tag="9" id="ybL-B0-tfo"/>
                                                                 </items>
                                                             </menu>
                                                         </popUpButtonCell>
@@ -3985,12 +3984,12 @@ Enable</string>
                                                     <popUpButton verticalHuggingPriority="750" imageHugsTitle="YES" id="2499">
                                                         <rect key="frame" x="12" y="43" width="51" height="22"/>
                                                         <autoresizingMask key="autoresizingMask"/>
-                                                        <popUpButtonCell key="cell" type="push" title="0" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2502" id="2892">
+                                                        <popUpButtonCell key="cell" type="push" title="0" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2502" id="2892">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <menu key="menu" title="OtherViews" id="2501">
                                                                 <items>
-                                                                    <menuItem title="0" id="2502"/>
+                                                                    <menuItem title="0" state="on" id="2502"/>
                                                                 </items>
                                                             </menu>
                                                         </popUpButtonCell>

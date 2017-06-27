@@ -703,12 +703,6 @@ static double table[32]={
 - (int) runMode { return runMode; }
 - (void) setRunMode:(int)aRunMode
 {
-	if(aRunMode <0 || aRunMode >= kIpeFltV4_NumberOfDaqModes){
-		NSLog(@"ORKatrinV4FLTModel message: unknown DAQ run mode %i, switched to fallback mode!\n", aRunMode);//TODO: fix it -tb-
-		aRunMode = 0;
-	}
-	//NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//debug output -tb-
-	//NSLog(@"Called %@::%@ Num DaqModes is %i, set daq mode to %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd), kIpeFltV4_NumberOfDaqModes,aRunMode);//debug output -tb-
 
     [[[self undoManager] prepareWithInvocationTarget:self] setRunMode:runMode];
     runMode = aRunMode;
@@ -758,17 +752,17 @@ static double table[32]={
 			
 		// new modes after mode redesign 2011-01 -tb-
 		//    -> removed automatic settings of FIFO length (64) and FIFO behaviour (stop on full) 2013-05 -tb-
-		case kIpeFltV4_EnergyTraceSyncDaqMode:
-			[self setFltRunMode:kIpeFltV4Katrin_Run_Mode];
-			if(fifoBehaviour == kFifoEnableOverFlow){
-				NSLog(@"ORKatrinV4FLTModel #%i WARNING: FIFO behaviour is kFifoEnableOverFlow (recommended is  kFifoStopOnFull for sync'd energy+trace mode)\n", [self stationNumber]);//TODO: fix it -tb-
-				//-tb- 2013-05 NSLog(@"ORKatrinV4FLTModel message: switched FIFO behaviour to kFifoStopOnFull (required for sync'd energy+trace mode)\n");//TODO: fix it -tb-
-				//-tb- 2013-05 [self setFifoBehaviour: kFifoStopOnFull];
-				//-tb- 2013-05 //TODO: remember the state and restore it after a run -tb-
-			}
-			readWaveforms = YES;
-			//fifoLengthSetting = kFifoLength64;
-			break;
+//		case kIpeFltV4_EnergyTraceSyncDaqMode:
+//			[self setFltRunMode:kIpeFltV4Katrin_Run_Mode];
+//			if(fifoBehaviour == kFifoEnableOverFlow){
+//				NSLog(@"ORKatrinV4FLTModel #%i WARNING: FIFO behaviour is kFifoEnableOverFlow (recommended is  kFifoStopOnFull for sync'd energy+trace mode)\n", [self stationNumber]);//TODO: fix it -tb-
+//				//-tb- 2013-05 NSLog(@"ORKatrinV4FLTModel message: switched FIFO behaviour to kFifoStopOnFull (required for sync'd energy+trace mode)\n");//TODO: fix it -tb-
+//				//-tb- 2013-05 [self setFifoBehaviour: kFifoStopOnFull];
+//				//-tb- 2013-05 //TODO: remember the state and restore it after a run -tb-
+//			}
+//			readWaveforms = YES;
+//			//fifoLengthSetting = kFifoLength64;
+//			break;
 			
 		default:
 			NSLog(@"ORKatrinV4FLTModel WARNING: setRunMode: received a unknown DAQ run mode (%i)!\n",aRunMode);
@@ -1648,26 +1642,23 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 - (void) readHitRates
 {
-    //DEBUG            NSLog(@"%@::%@\n  ",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
-
-    unsigned long sltSubSecReg =  0;		
-    unsigned long sltSubSec =  0;		
-    unsigned long sltSec    =  0;		
-    int hadException    =  0;
+    unsigned long sltSubSecReg  =  0;
+    unsigned long sltSubSec     =  0;
+    unsigned long sltSec        =  0;
+    int hadException            =  0;
 
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
 	
 	@try {
 
-		BOOL oneChanged = NO;
-		float newTotal = 0;
-		int chan;
-		int countHREnabledChans=0;//2013-04-24 -tb-
-        int hitRateLengthSec = 1<<hitRateLength;
-		float freq = 1.0/((double)hitRateLengthSec);
+		BOOL    oneChanged = NO;
+		float   newTotal = 0;
+		int     chan;
+		int     countHREnabledChans = 0;
+        int     hitRateLengthSec    = 1<<hitRateLength;
+		float   freq                = 1.0/((double)hitRateLengthSec);
 				
 		unsigned long location = (([self crateNumber]&0xf)<<21) | ([self stationNumber]& 0x0000001f)<<16;
-		//unsigned long data[5 + kNumV4FLTChannels];
 		unsigned long data[5 + kNumV4FLTChannels + kNumV4FLTChannels];//2013-04-24 changed to ship full 32 bit counter; data format changed! see decoder -tb-
 		
 		//combine all the hitrate read commands into one command packet
@@ -1680,24 +1671,19 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 		}
 		
         //read SLT second counters after readout of the hitrates
-        //  need to consider two types of SLT cards -tb- 2016-05
-        //DEBUG        NSLog(@"%@::%@   slt is of class %@\n  ",NSStringFromClass([self class]),NSStringFromSelector(_cmd),NSStringFromClass([[[self crate] adapter] class]));//DEBUG -tb-
-        id slt = [[self crate] adapter];
+        //need to consider two types of SLT cards -tb- 2016-05
+        id slt                      = [[self crate] adapter];
         unsigned long sltSubSecAddr =  0;
         unsigned long sltSecAddr    =  0;
-        if( [slt isKindOfClass: [ORKatrinV4SLTModel class]]){
+        if([slt isKindOfClass: [ORKatrinV4SLTModel class]]){
             sltSubSecAddr =  [slt getAddress: kKatrinV4SLTSubSecondCounterReg];
             sltSecAddr    =  [slt getAddress: kKatrinV4SLTSecondCounterReg];
-        }else{
+        }
+        else {
             sltSubSecAddr =  [slt getAddress: kSltV4SubSecondCounterReg];
             sltSecAddr    =  [slt getAddress: kSltV4SecondCounterReg];
-			
 		}
         
-//DEBUG		[aList addCommand: [[[self crate] adapter] readHardwareRegisterCmd:sltSubSecAddr]];
-//DEBUG		[aList addCommand: [[[self crate] adapter] readHardwareRegisterCmd:sltSecAddr]];
-        
-        //HW access
 		[self executeCommandList:aList];
 		
 		//put the synchronized around this code to test if access to the hitrates is thread safe
@@ -1735,12 +1721,10 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 //DEBUG        sltSubSecReg =  [aList longValueForCmd:dataIndex];
         sltSubSec   = ((sltSubSecReg>>11)&0x3fff)*2000   +  (sltSubSecReg & 0x7ff);
 //DEBUG        sltSec    =  [aList longValueForCmd:dataIndex+1];		
-        //DEBUGGING         NSLog(@"FLT %i: readHitRates: sltSec: %08x (%i)  sltSubSec %08x (%i, %f)\n",[self stationNumber],sltSec,sltSec,sltSubSec,sltSubSec, (0.00000005*sltSubSec));	
         
         if(	dataIndex != countHREnabledChans){
             NSLog(@"ERROR:  Shipping hitrates: FLT #%i:	dataIndex %i,  countHREnabledChans %i are not the same!!!\n",[self stationNumber],dataIndex , countHREnabledChans);	
         }	
-            //DEBUGGING     NSLog(@"Shipping hitrates: FLT %i:	dataIndex %i,  countHREnabledChans %i\n",[self stationNumber],dataIndex , countHREnabledChans);	
         
 		if(dataIndex>0){
 			time_t	ut_time;
@@ -1748,13 +1732,11 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 			data[0] = hitRateId | (dataIndex + countHREnabledChans + 5); 
 			data[1] = location  | ((countHREnabledChans & 0x1f)<<8) | 0x1; //2013-04-24 version of record type: 0x1: shipping  32 bit hitrate registers  -tb-
-			//data[2] = ut_time;	
 			data[2] = sltSec;	//2013-04-24 changed to ship slt second counter -tb-
 			data[3] = hitRateLengthSec;	
 			data[4] = newTotal;
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
 																object:[NSData dataWithBytes:data length:sizeof(long)*(dataIndex + 5 + countHREnabledChans)]];
-			
 		}
 		
 		[self setHitRateTotal:newTotal];
@@ -1768,19 +1750,17 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
             //DEBUG
             NSLog(@"%@::%@\n EXCEPTION  sltSec %i",NSStringFromClass([self class]),NSStringFromSelector(_cmd),sltSec);//DEBUG -tb-
             hadException=1;
-            
 	}
 	
     //try to read always between two second strobes -> sec = fullSec+0.4
-    double delay=1<<[self hitRateLength];
-    double deltadelay=0.4 - 0.00000005*sltSubSec;
+    double delay      = 1<<[self hitRateLength];
+    double deltadelay = 0.4 - 0.00000005*sltSubSec;
     delay += deltadelay;
-            //DEBUG            NSLog(@"%@::%@\n delay for call of @selector(readHitRates):delay %f",NSStringFromClass([self class]),NSStringFromSelector(_cmd),delay);//DEBUG -tb-
 
-	//[self performSelector:@selector(readHitRates) withObject:nil afterDelay:(delay)];
 	if(!hadException){
         [self performSelector:@selector(readHitRates) withObject:nil afterDelay:(delay)];
-    }else{
+    }
+    else {
         NSLog(@"Exception! Skip 'readHitRates'!\n");
     }
 }
@@ -1843,22 +1823,13 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
-	
-    
-    if(runMode==kIpeFltV4_EnergyTraceSyncDaqMode){
-	    NSLog(@"%@::%@ WARNING: RunMode 'Energy+Trace (sync)' is obsolete - use 'Energy+Trace' instead (optionally with 'Stop on Full')!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//debug output -tb-
-        //TODO: in the future (maybe from 2014 on?) automatically switch to 'Energy+Trace' -tb-
-        //	[self setRunMode:			kIpeFltV4_EnergyTraceDaqMode];
 
-    }
     
     [[self undoManager] disableUndoRegistration];
 	
     [self setEnergyOffset:[decoder decodeIntForKey:@"energyOffset"]];
     [self setSkipFltEventReadout:[decoder decodeIntForKey:@"skipFltEventReadout"]];
     [self setBipolarEnergyThreshTest:[decoder decodeInt32ForKey:@"bipolarEnergyThreshTest"]];
-    //[self setUseBipolarEnergy:[decoder decodeIntForKey:@"useBipolarEnergy"]];
-    //[self setUseSLTtime:[decoder decodeIntForKey:@"useSLTtime"]];
     [self setBoxcarLength:[decoder decodeIntForKey:@"boxcarLength"]];
     [self setUseDmaBlockRead:[decoder decodeIntForKey:@"useDmaBlockRead"]];
     [self setSyncWithRunControl:[decoder decodeIntForKey:@"syncWithRunControl"]];
@@ -1873,7 +1844,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 	if([decoder containsValueForKey:@"forceFLTReadout"]){
         [self setForceFLTReadout:[decoder decodeBoolForKey:@"forceFLTReadout"]];
-    }else{
+    }
+    else {
         [self setForceFLTReadout:true];//old file loaded with new Orca version -> before, we always had FLT readout, so use it now, too -tb- 2016-07
     }
     
@@ -1976,30 +1948,27 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
 	
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								 @"ORKatrinV4FLTDecoderForEnergy",			@"decoder",
+								 @"ORKatrinV4FLTDecoderForEnergy",		@"decoder",
 								 [NSNumber numberWithLong:dataId],		@"dataId",
 								 [NSNumber numberWithBool:NO],			@"variable",
 								 [NSNumber numberWithLong:7],			@"length",
 								 nil];
-	
     [dataDictionary setObject:aDictionary forKey:@"KatrinV4FLTEnergy"];
     
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-				   @"ORKatrinV4FLTDecoderForWaveForm",			@"decoder",
+				   @"ORKatrinV4FLTDecoderForWaveForm",		@"decoder",
 				   [NSNumber numberWithLong:waveFormId],	@"dataId",
 				   [NSNumber numberWithBool:YES],			@"variable",
 				   [NSNumber numberWithLong:-1],			@"length",
 				   nil];
-	
     [dataDictionary setObject:aDictionary forKey:@"KatrinV4FLTWaveForm"];
 	
 	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-				   @"ORKatrinV4FLTDecoderForHitRate",			@"decoder",
+				   @"ORKatrinV4FLTDecoderForHitRate",		@"decoder",
 				   [NSNumber numberWithLong:hitRateId],		@"dataId",
 				   [NSNumber numberWithBool:YES],			@"variable",
 				   [NSNumber numberWithLong:-1],			@"length",
 				   nil];
-	
     [dataDictionary setObject:aDictionary forKey:@"KatrinV4FLTHitRate"];
 	
 	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -2008,7 +1977,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 				   [NSNumber numberWithBool:YES],			@"variable",
 				   [NSNumber numberWithLong:-1],			@"length",
 				   nil];
-	
     [dataDictionary setObject:aDictionary forKey:@"KatrinV4FLTHistogram"];
 	
 	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -2017,7 +1985,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 				   [NSNumber numberWithBool:YES],			@"variable",
 				   [NSNumber numberWithLong:-1],			@"length",
 				   nil];
-	
     [dataDictionary setObject:aDictionary forKey:@"KatrinV4FLTEnergyTrace"];
 	
     return dataDictionary;
@@ -2323,15 +2290,15 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	
 	//removed 2013-04-29 (TIMING) is already in cold start part ...  [self writeRunControl:YES];//TODO: still necessary?? -tb- 2013-04 would restart the katrin filter ... -tb-
     
-	if(runMode == kIpeFltV4_EnergyTraceSyncDaqMode){
-		if((fifoLength != kFifoLength64) || (fifoBehaviour != kFifoStopOnFull)){
-            //-tb- 2013-05 -> removed automatic setting of kFifoStopOnFull, kFifoLength64
-			//-tb- 2013-05 [self setRunMode: runMode];// this sets all necessary settings
-			//-tb- 2013-05 [self setFifoBehaviour: kFifoStopOnFull];
-			//-tb- 2013-05 [self setFifoLength: kFifoLength64];
-			NSLog(@"ORKatrinV4FLTModel  #%i WARNING: recommended FIFO settings for this mode are: kFifoStopOnFull and kFifoLength64 \n", [self stationNumber]);
-		}
-	}
+//	if(runMode == kIpeFltV4_EnergyTraceSyncDaqMode){
+//		if((fifoLength != kFifoLength64) || (fifoBehaviour != kFifoStopOnFull)){
+//            //-tb- 2013-05 -> removed automatic setting of kFifoStopOnFull, kFifoLength64
+//			//-tb- 2013-05 [self setRunMode: runMode];// this sets all necessary settings
+//			//-tb- 2013-05 [self setFifoBehaviour: kFifoStopOnFull];
+//			//-tb- 2013-05 [self setFifoLength: kFifoLength64];
+//			NSLog(@"ORKatrinV4FLTModel  #%i WARNING: recommended FIFO settings for this mode are: kFifoStopOnFull and kFifoLength64 \n", [self stationNumber]);
+//		}
+//	}
     
 	//moved 2013-04-29 to cold start section for non-histogram mode FLTs - see above  -tb- [self writeControl];
 
