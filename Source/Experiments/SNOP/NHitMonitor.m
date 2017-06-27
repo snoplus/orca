@@ -381,6 +381,7 @@ err:
         } else {
             NSLogColor([NSColor redColor],
                        @"nhit monitor: unable to acquire eca lock!\n");
+            [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORNhitMonitorNotification object:self userInfo:@{@"finished":@1}];
         }
     }
 }
