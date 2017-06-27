@@ -220,6 +220,10 @@ tubRegister;
 
         [self loadCoarseDelayToHardware];
         [self loadFineDelayToHardware];
+        /* Temporary hack to make sure we don't run with a lockout width of
+         * 5100 after a power cycle. Eventually, the lockout width should be in
+         * the standard run definition. */
+        [self setLockoutWidth:420];
         [self loadLockOutWidthToHardware];
         [self loadPedWidthToHardware];
         [self loadPulserRateToHardware];
