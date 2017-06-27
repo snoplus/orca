@@ -50,6 +50,7 @@ struct NhitRecord {
 - (void) dealloc;
 - (void) registerNotificationObservers;
 - (void) runAboutToStop: (NSNotification*) aNote;
+- (void) orcaAboutToQuit: (NSNotification*) aNote;
 - (void) _waitForThreadToFinish;
 - (BOOL) isRunning;
 - (void) stop;

@@ -191,6 +191,11 @@ static int get_nhit_trigger_count(char *err, RedisClient *mtc, int sock, char *b
                      selector : @selector(runAboutToStop:)
                          name : ORRunAboutToStopNotification
                        object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(orcaAboutToQuit:)
+                         name : OROrcaAboutToQuitNotification
+                       object : nil];
 }
 
 - (void) runAboutToStop: (NSNotification*) aNote
@@ -210,6 +215,17 @@ static int get_nhit_trigger_count(char *err, RedisClient *mtc, int sock, char *b
     [NSThread detachNewThreadSelector:@selector(_waitForThreadToFinish)
                              toTarget:self
                            withObject:nil];
+}
+
+- (void) orcaAboutToQuit: (NSNotification*) aNote
+{
+    /* Stop the nhit monitor if it's running and delay the termination. */
+    if (![self isRunning]) return;
+
+    [self stop];
+
+    /* Tell Orca to wait five seconds before quitting. */
+    [(ORAppDelegate *)[NSApp delegate] delayTermination];
 }
 
 - (void) _waitForThreadToFinish
