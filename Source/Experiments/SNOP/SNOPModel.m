@@ -1330,6 +1330,15 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         }
     }
 
+    /* Send an EPED record with the stepNumber set to 0xffffffff to let the
+     * nearline job know that we are done. */
+    [self shipEPEDStructWithCoarseDelay: [mtc coarseDelay]
+                              fineDelay: [mtc fineDelay]
+                         chargePulseAmp: 0
+                          pedestalWidth: [mtc pedestalWidth]
+                                calType: 50
+                             stepNumber: 0xffffffff];
+
     /* Set the pedestal mask for each crate back. */
     for (i = 0; i < [xl3s count]; i++) {
         xl3 = [xl3s objectAtIndex:i];
