@@ -604,6 +604,24 @@ tellieRunFiles = _tellieRunFiles;
             NSLogColor([NSColor redColor], @"error initializing MTC.\n");
             goto err;
         }
+
+        /* Load the XL3 hardware. */
+        objs = [[(ORAppDelegate*)[NSApp delegate] document]
+             collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+
+        for (i = 0; i < [objs count]; i++) {
+            xl3 = [objs objectAtIndex:i];
+
+            if ([gOrcaGlobals runType] & kPhysicsRun) {
+                /* If we're in a physics run, we zero the pedestal masks before
+                 * the run starts. This is because it was noticed that the
+                 * number of channels in the pedestal mask seems to affect the
+                 * noise on the trigger signals. See
+                 * http://snopl.us/shift/view/9e1ff17e58704756a99f947ec2509f39?index_start=15. */
+                [xl3 zeroPedestalMasksAtRunStart];
+            }
+        }
+
         break;
     default:
         /* Turn off triggers */
@@ -643,10 +661,20 @@ tellieRunFiles = _tellieRunFiles;
             xl3 = [objs objectAtIndex:i];
 
             if ([xl3 initAtRunStart]) {
-                NSLogColor([NSColor redColor], @"error initializing XL3.\n");
+                NSLogColor([NSColor redColor], @"error initializing XL3 %i.\n", [xl3 crateNumber]);
                 goto err;
             }
+
+            if ([gOrcaGlobals runType] & kPhysicsRun) {
+                /* If we're in a physics run, we zero the pedestal masks before
+                 * the run starts. This is because it was noticed that the
+                 * number of channels in the pedestal mask seems to affect the
+                 * noise on the trigger signals. See
+                 * http://snopl.us/shift/view/9e1ff17e58704756a99f947ec2509f39?index_start=15. */
+                [xl3 zeroPedestalMasksAtRunStart];
+            }
         }
+
         break;
     }
 
