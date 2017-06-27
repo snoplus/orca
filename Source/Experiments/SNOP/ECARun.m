@@ -188,6 +188,14 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 
 - (void) start
 {
+
+    /* Method called when an user request a single ECA run by
+     clicking the corresponding button. Start a new ECA run and 
+     set a flag to enable running of 'launchECAThread'. This will 
+     be called when the run is about to start. This is done in this 
+     way since we need to ensure that the ECAThread is launched AFTER 
+     run stop, to not cancel the Thread. */
+
     if([ECAThread isExecuting]){
         //Do nothing
         NSLogColor([NSColor redColor], @"ECA Run already ongoing!\n");
@@ -241,10 +249,6 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
             [previousSRVersion release];
         }
 
-        /* Enable the action of method 'launchECAThread' which
-         is called when the run is about to start. This is done
-         in this way since we need to ensure that the ECAThread
-         is launched AFTER run stop, to not cancel the Thread. */
         start_eca_run = TRUE;
         isFinished = FALSE;
 
@@ -354,6 +358,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         [ECAThread release];
         ECAThread = [[NSThread alloc] initWithTarget:self selector:@selector(doECAs) object:nil];
         [ECAThread start];
+        //[ECAThread autorelease];
         [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORECARunStartedNotification object:self];
 
     }
