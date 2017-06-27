@@ -407,6 +407,7 @@ enum {
 - (void) compositeXl3RW;
 - (void) compositeQuit;
 - (int) setPedestals;
+- (int) multiSetPedestalMask: (uint32_t) slotMask patterns: (uint32_t[16]) patterns;
 - (int) setPedestalMask: (uint32_t) slotMask pattern: (uint32_t) pattern;
 - (void) compositeSetPedestal;
 - (void) setPedestalInParallel;
