@@ -62,7 +62,8 @@ ifeq ($(PMC_LINK_WITH_DMA_LIB),0)
   defflags2='-DPMC_LINK_WITH_DMA_LIB=0'
 endif
 
-UCFLAGS =  -g -Wall  -DNeedHwMutex -I ~/src/v4/fdhwlib/src  $(defflags)  $(defflags2) $(sltdrvversion)
+UCFLAGS =  -g -Wall   -I ~/src/v4/fdhwlib/src  $(defflags)  $(defflags2) $(sltdrvversion)
+//UCFLAGS =  -g -Wall  -DNeedHwMutex -I ~/src/v4/fdhwlib/src  $(defflags)  $(defflags2) $(sltdrvversion)
 #2013-03: removed  -gstabs+: UCFLAGS =  -g -Wall  -gstabs+ -I ~/src/v4/fdhwlib/src  $(defflags)  $(defflags2)
 #Note: -Wno-sign-compare supresses 'comparison int with unsigned int' compiler warning -tb-
 #LFLAGS  = -fexceptions -lpbusaccess -lPbus1394 -lakutil -lpthread -lstdc++ \

@@ -32,7 +32,7 @@
 	    IBOutlet NSTextField*   energyOffsetTextField;
 	    IBOutlet NSButton*      forceFLTReadoutCB;
 	    IBOutlet NSButton*      skipFltEventReadoutCB;
-	IBOutlet   NSTextField* bipolarEnergyThreshTestTextField;
+        IBOutlet NSTextField*   bipolarEnergyThreshTestTextField;
 	    IBOutlet NSButton*      useBipolarEnergyCB;
 	    IBOutlet NSPopUpButton* useSLTtimePU;
 	    IBOutlet NSPopUpButton* useDmaBlockReadPU;
@@ -64,9 +64,8 @@
 	    IBOutlet NSButton*      syncWithRunControlButton;
 		IBOutlet NSTextField*	histEMinTextField;
 		IBOutlet NSButton*		storeDataInRamCB;
-		IBOutlet NSPopUpButton*	filterLengthPU;
-		IBOutlet NSPopUpButton*	filterShapingLengthPU;//for ORKatrinV4FLTModel we use filterShapingLength from 2011-04/Orca:svnrev5000 on -tb-
-		IBOutlet NSPopUpButton*	gapLengthPU;
+		IBOutlet NSPopUpButton*	filterShapingLengthPU;
+        IBOutlet NSPopUpButton*	gapLengthPU;
 	    IBOutlet NSPopUpButton* boxcarLengthPU;
 	    IBOutlet NSTextField*   boxcarLengthLabel;
 		IBOutlet NSTextField*	histNofMeasField;

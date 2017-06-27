@@ -216,6 +216,7 @@ enum {
 - (void)			writePostTriggerSetting;
 - (void)			writeChannelEnabledMask;
 - (void)            writeNumberBLTEvents:(BOOL)enable;
+- (void)            writeEnableExtendedReadoutBuffer:(BOOL)enable;
 - (void)            writeEnableBerr:(BOOL)enable;
 - (void)			writeOverUnderThresholds;
 

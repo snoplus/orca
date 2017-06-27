@@ -557,6 +557,20 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     return channel;
 }
 
+-(NSString*) calcTellieFibreForChannel:(NSUInteger)channel
+{
+    /*
+     Use patch pannel map loaded from the telliedb to map a given fibre to the correct tellie channel.
+     */
+    if([self tellieFibreMapping] == nil){
+        NSLogColor([NSColor redColor], @"[TELLIE]: fibre map has not been loaded from couchdb - you need to call loadTellieStaticsFromDB\n");
+        return nil;
+    }
+    NSUInteger channelIndex = [[[self tellieFibreMapping] objectForKey:@"channels"] indexOfObject:channel];
+    NSString* fibre = [[[self tellieFibreMapping] objectForKey:@"fibres"] objectAtIndex:channelIndex];
+    return fibre;
+}
+
 -(NSString*)selectPriorityFibre:(NSArray*)fibres forNode:(NSUInteger)node{
     /*
      Select appropriate fibre based on naming convensions for the node at
@@ -731,7 +745,14 @@ err:
 
     ///////////////////////
     // Check trigger is being sent to asyncronus port of the MTC/D (EXT_A)
-    if(!([theTubiiModel asyncTrigMask] & 0x400000)){
+    NSUInteger asyncTrigMask;
+    @try{
+        asyncTrigMask = [theTubiiModel asyncTrigMask];
+    } @catch(NSException* e) {
+        NSLogColor([NSColor redColor], @"[TELLIE]: Error requesting asyncTrigMask from Tubii.\n");
+        goto err;
+    }
+    if(!(asyncTrigMask & 0x400000)){
         NSLogColor([NSColor redColor], @"[TELLIE]: Triggers as not being sent to asynchronous MTC/D port\n");
         NSLogColor([NSColor redColor], @"[TELLIE]: Please amend via the TUBii GUI (triggers tab)\n");
         goto err;
@@ -2038,7 +2059,12 @@ err:
         goto err;
     }
     TUBiiModel* theTubiiModel = [tubiiModels objectAtIndex:0];
-    [theTubiiModel stopSmelliePulser];
+    @try{
+        [theTubiiModel stopSmelliePulser];
+    } @catch(NSException* e){
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Problem sending stop command to the SMELLIE pulsar.\n");
+        goto err;
+    }
 
     // Tell run control it can stop waiting
     dispatch_sync(dispatch_get_main_queue(), ^{

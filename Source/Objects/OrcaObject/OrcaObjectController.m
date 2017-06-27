@@ -540,51 +540,6 @@ static NSString *OROrcaObjectControllerNibName	= @"OROrcaObjectControllerNibName
         
     }
 }
-- (void) updatePUMatrix:(NSMatrix*)aMatrix getter:(SEL)aGetter
-{
-    NSInteger numItems = [aMatrix numberOfRows];
-    NSInteger i;
-    for(i=0;i<numItems;i++){
-        
-        NSMethodSignature* signature = [[model class] instanceMethodSignatureForSelector:aGetter];
-        NSInvocation* invocation     = [NSInvocation invocationWithMethodSignature: signature];
-        [invocation setTarget:   model];
-        [invocation setSelector: aGetter];
-        [invocation setArgument: &i atIndex: 2];
-        [invocation invoke];
-        NSPopUpButtonCell* aCell  = [aMatrix cellAtRow:i column:0];
-        
-        const char* returnType = [signature methodReturnType];
-        switch(*returnType){
-            case 's':
-            {
-                short aValue;
-                [invocation getReturnValue:&aValue];
-                if(!updatedOnce || ([aCell indexOfSelectedItem] != aValue))[aCell selectItemAtIndex:aValue];
-            }
-            break;
-         }
-    }
-}
-- (void) updateBOOLMatrix:(NSMatrix*)aMatrix getter:(SEL)aGetter
-{
-    NSInteger numItems = [aMatrix numberOfRows];
-    NSInteger i;
-    for(i=0;i<numItems;i++){
-        
-        NSMethodSignature* signature = [[model class] instanceMethodSignatureForSelector:aGetter];
-        NSInvocation* invocation     = [NSInvocation invocationWithMethodSignature: signature];
-        [invocation setTarget:   model];
-        [invocation setSelector: aGetter];
-        [invocation setArgument: &i atIndex: 2];
-        [invocation invoke];
-        NSCell* aCell   = [aMatrix cellWithTag:i];
-        
-        BOOL aValue;
-        [invocation getReturnValue:&aValue];
-        if(!updatedOnce || ([aCell intValue] != aValue))[aCell setState:aValue];
-    }
-}
 
 @end
 

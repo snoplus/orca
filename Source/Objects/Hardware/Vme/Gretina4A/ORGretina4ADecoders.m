@@ -43,7 +43,8 @@
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
-#define koffset -8180
+//#define koffset -8180
+#define koffset -8100
 	if(![self cacheSetUp]){
 		[self cacheCardLevelObject:kIntegrateTimeKey fromHeader:[aDecoder fileHeader]];
 		[self cacheCardLevelObject:kHistEMultiplierKey fromHeader:[aDecoder fileHeader]];
@@ -52,63 +53,45 @@
     unsigned long* ptr = (unsigned long*)someData;
 	unsigned long length = ExtractLength(ptr[0]);
     //point to ORCA location info
-    ptr++;
-    int crate           = (*ptr&0x01e00000)>>21;
-    int card            = (*ptr&0x001f0000)>>16;
+    int crate           = (ptr[1]&0x01e00000)>>21;
+    int card            = (ptr[1]&0x001f0000)>>16;
     NSString* crateKey	= [self getCrateKey: crate];
     NSString* cardKey	= [self getCardKey: card];
-    
-    unsigned long amountProcessed = 0;
+    ptr = &ptr[2]; //move the pointer up to the data header
+    unsigned long amountProcessed = 2;
     do {
-        ptr++; //should be the separator
-        if(*ptr == 0xAAAAAAAA){
-            ptr++; //Geo Addr ...
-            int channel      = *ptr & 0xF;
-            int packetLength = (*ptr >> 16) & 0x7ff;
-            NSString* channelKey = [self getChannelKey: channel];
-           
-            ptr++; //timestamp of descrimiator
-            ptr++; //header Length ...
-            int headerLength = (*ptr >> 26) & 0x3f;
-            int dataLength = packetLength - headerLength/2;
-
-            ptr++; //Timestamp of previous descriminator ...
-            ptr++; //CFD sample 0
-            ptr++; //Sample baseline bits 23:0
-            ptr++; //CFD sample 2
-            ptr++; //post-rise sum (7:0) ...
-            unsigned long sumWord1 = *ptr;
-            ptr++; //Timestamp of peak detect bits 15:0 ..
-            unsigned long sumWord2 = *ptr;
-            ptr++; //Timestamp of peak detect bits 47:16..
-            ptr++; //Post-rise end samle ...
-            ptr++; //Pre-rise end sample ...
-            ptr++; //Base sample ...
-            unsigned long scaleFactor = 1000;
-            unsigned long postRiseSum = ((sumWord2 & 0xFFFF)<< 8) | ((sumWord1 >> 24) & 0xff);
-            unsigned long preRiseSum  = sumWord1 & 0xFFFFFF;
-            long energy      = (postRiseSum - preRiseSum)/scaleFactor;
+        if(ptr[0] == 0xAAAAAAAA){
+            int             channel         = ptr[1] & 0xF;
+            int             packetLength    = (ptr[1] >> 16) & 0x7ff;
+            NSString*       channelKey      = [self getChannelKey: channel];
+            int             headerLength    = (ptr[3] >> 26) & 0x3f;
+            int             dataLength      = packetLength - headerLength/2;
+            unsigned long   sumWord1        = ptr[8];
+            unsigned long   sumWord2        = ptr[9];
+            unsigned long   scaleFactor     = 1000;
+            unsigned long   postRiseSum     = ((sumWord2 & 0xFFFF)<< 8) | ((sumWord1 >> 24) & 0xff);
+            unsigned long   preRiseSum      = sumWord1 & 0xFFFFFF;
+            long            energy          = (postRiseSum - preRiseSum)/scaleFactor;
             if(energy >= 0){
                 [aDataSet histogram:energy numBins:0xFFFFFF/scaleFactor  sender:self  withKeys:@"Gretina4A", @"Energy",crateKey,cardKey,channelKey,nil];
             }
             
-            if(headerLength!=0){
-                ptr++; //point to data
+            // NSLog(@"type: %d packetLen: %d  headerLen: %d  dataLen:%d\n",headerType,packetLength,headerLength,dataLength);
+
+            
+            if(dataLength>0){
+                NSData* waveformData = [NSData dataWithBytes:&ptr[14] length:dataLength*sizeof(long)];
                 
-                if(dataLength>0){
-                    NSData* waveformData = [NSData dataWithBytes:ptr length:dataLength*sizeof(long)];
-                    
-                    [aDataSet loadWaveform: waveformData            //pass in the whole data set
-                                    offset: 0                       // Offset in bytes (past header words)
-                                  unitSize: sizeof(short)			// unit size in bytes
-                                startIndex:	0                       // first Point Index (past the header offset!!!)
-                               scaleOffset: koffset                 // offset the value by this
-                                      mask:	0x3FFF					// when displayed all values will be masked with this value
-                               specialBits: 0x4000
-                                  bitNames: [NSArray arrayWithObjects:@"Trig",nil]
-                                    sender: self 
-                                  withKeys: @"Gretina4A", @"Waveforms",crateKey,cardKey,channelKey,nil];
-                }
+                [aDataSet loadWaveform: waveformData            //pass in the whole data set
+                                offset: 0                       // Offset in bytes (past header words)
+                              unitSize: sizeof(short)			// unit size in bytes
+                            startIndex:	0                       // first Point Index (past the header offset!!!)
+                           scaleOffset: koffset                 // offset the value by this
+                                  mask:	0x3FFF					// when displayed all values will be masked with this value
+                           specialBits: 0xC000
+                              bitNames: [NSArray arrayWithObjects:@"M",@"O",nil]
+                                sender: self 
+                              withKeys: @"Gretina4A", @"Waveforms",crateKey,cardKey,channelKey,nil];
             }
             //get the actual object
             NSString* aKey = [crateKey stringByAppendingString:cardKey];
@@ -127,9 +110,9 @@
                 }
             }
             [obj bumpRateFromDecodeStage:channel];
-            ptr += dataLength;
+            ptr = &ptr[dataLength];
 
-            amountProcessed += packetLength;
+            amountProcessed += packetLength; //packetLength is # of shorts
         }
         else break;
         

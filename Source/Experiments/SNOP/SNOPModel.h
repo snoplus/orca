@@ -26,8 +26,6 @@
 #import "ECARun.h"
 #import "NHitMonitor.h"
 
-@class ORDataPacket;
-@class ORDataSet;
 @class ORCouchDB;
 @class ORRunModel;
 
@@ -49,8 +47,6 @@ BOOL isNotRunningOrIsInMaintenance();
 
 @interface SNOPModel: ORExperimentModel <snotDbDelegate>
 {
-	int viewType;
-
     NSString* _orcaDBUserName;
     NSString* _orcaDBPassword;
     NSString* _orcaDBName;
@@ -71,9 +67,6 @@ BOOL isNotRunningOrIsInMaintenance();
     NSUInteger _debugDBIPNumberIndex;
     NSTask*	_debugDBPingTask;
     
-    unsigned long	_epedDataId;
-    unsigned long	_rhdrDataId;
-    
     struct {
         unsigned long coarseDelay;
         unsigned long fineDelay;
@@ -84,18 +77,6 @@ BOOL isNotRunningOrIsInMaintenance();
         unsigned long nTSlopePoints;
     } _epedStruct;
     
-    struct {
-        unsigned long date;
-        unsigned long time;
-        unsigned long daqCodeVersion;
-        unsigned long runNumber;
-        unsigned long calibrationTrialNumber;
-        unsigned long sourceMask;
-        unsigned long long runMask;
-        unsigned long gtCrateMask;
-    } _rhdrStruct;
-    
-
     NSDictionary* _runDocument;
     NSDictionary* _configDocument;
     NSDictionary* _mtcConfigDoc;
@@ -148,6 +129,7 @@ BOOL isNotRunningOrIsInMaintenance();
     int state;
     int start;
     bool resync;
+    bool waitingForBuffers;     // flag indicates we are waiting for our buffers to empty
 
     @private
         //Run type word
@@ -155,7 +137,6 @@ BOOL isNotRunningOrIsInMaintenance();
         unsigned long lastRunTypeWord;
         NSString* lastRunTypeWordHex;
         ECARun* anECARun;
-    
 }
 
 @property (nonatomic,retain) NSMutableDictionary* smellieRunFiles;
@@ -180,9 +161,6 @@ BOOL isNotRunningOrIsInMaintenance();
 @property (nonatomic,retain) NSMutableArray* debugDBConnectionHistory;
 @property (nonatomic,assign) NSUInteger debugDBIPNumberIndex;
 @property (nonatomic,retain) NSTask* debugDBPingTask;
-
-@property (nonatomic,assign) unsigned long epedDataId;
-@property (nonatomic,assign) unsigned long rhdrDataId;
 
 @property (nonatomic,assign) bool smellieDBReadInProgress;
 @property (nonatomic,assign) bool smellieDocUploaded;
@@ -229,7 +207,6 @@ BOOL isNotRunningOrIsInMaintenance();
 
 #pragma mark ⅴorcascript helpers
 - (void) zeroPedestalMasks;
-- (void) updatePedestalMasks:(unsigned int)pattern;
 - (void) hvMasterTriggersOFF;
 
 #pragma mark 짜짜짜Notifications
@@ -256,8 +233,8 @@ BOOL isNotRunningOrIsInMaintenance();
 - (void) updateEPEDStructWithStepNumber: (unsigned long) stepNumber;
 - (void) shipSubRunRecord;
 - (void) shipEPEDRecord;
-- (void) updateRHDRSruct;
-- (void) shipRHDRRecord;
+- (void) stillWaitingForBuffers;
+- (void) abortWaitingForBuffers;
 
 #pragma mark 짜짜짜Accessors
 - (NHitMonitor *) nhitMonitor;
@@ -284,8 +261,6 @@ BOOL isNotRunningOrIsInMaintenance();
 - (NSTimeInterval) nhitMonitorTimeInterval;
 - (void) setNhitMonitorTimeInterval: (NSTimeInterval) interval;
 
-- (void) setViewType:(int)aViewType;
-- (int) viewType;
 - (unsigned long) runTypeWord;
 - (void) setRunTypeWord:(unsigned long)aMask;
 - (unsigned long) lastRunTypeWord;
@@ -307,38 +282,28 @@ BOOL isNotRunningOrIsInMaintenance();
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
 
-#pragma mark 짜짜짜Segment Group Methods
-- (void) makeSegmentGroups;
-
 #pragma mark 짜짜짜Specific Dialog Lock Methods
 - (NSString*) experimentMapLock;
 - (NSString*) experimentDetectorLock;
 - (NSString*) experimentDetailsLock;
-
-#pragma mark 짜짜짜DataTaker
-- (void) setDataIds:(id)assigner;
-- (void) syncDataIdsWith:(id)anotherObj;
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (NSDictionary*) dataRecordDescription;
 
 #pragma mark 짜짜짜SnotDbDelegate
 - (ORCouchDB*) orcaDbRef:(id)aCouchDelegate;
 - (ORCouchDB*) debugDBRef:(id)aCouchDelegate;
 - (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
 
-//smellie functions -------
+// smellie functions -------
 -(void) getSmellieRunFiles;
 
-//tellie functions -------
+// tellie functions -------
 -(void) getTellieRunFiles;
 
-
-//ECA
+// ECA
 -(ECARun*) anECARun;
 
 -(void) startECARunInParallel;
 
-//Standard runs functions
+// Standard runs functions
 -(BOOL) refreshStandardRunsFromDB;
 -(BOOL) startStandardRun:(NSString*)_standardRun withVersion:(NSString*)_standardRunVersion;
 -(BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
@@ -346,18 +311,6 @@ BOOL isNotRunningOrIsInMaintenance();
 -(void) loadSettingsInHW;
 -(void) stopRun;
 
-@end
-
-@interface SNOPDecoderForRHDR : ORVmeCardDecoder {
-}
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
-- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
-@end
-
-@interface SNOPDecoderForEPED : ORVmeCardDecoder {
-}
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
-- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 @end
 
 extern NSString* ORSNOPModelOrcaDBIPAddressChanged;
@@ -369,3 +322,5 @@ extern NSString* ORSNOPModelSRCollectionChangedNotification;
 extern NSString* ORSNOPModelSRChangedNotification;
 extern NSString* ORSNOPModelSRVersionChangedNotification;
 extern NSString* ORSNOPModelNhitMonitorChangedNotification;
+extern NSString* ORSNOPStillWaitingForBuffersNotification;
+extern NSString* ORSNOPNotWaitingForBuffersNotification;

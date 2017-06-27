@@ -26,6 +26,11 @@ static const uint32_t FIFO0Addr         = 0xd00000 >> 2;
 static const uint32_t FIFO0ModeReg      = 0xe00000 >> 2;//obsolete 2012-10
 static const uint32_t FIFO0StatusReg    = 0xe00004 >> 2;//obsolete 2012-10
 
+bool ORSLTv4Readout::Start() {
+    firstTime = true;
+    return true;
+}   
+
 bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
 {
     uint32_t i;
@@ -33,7 +38,7 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
     //init
     uint32_t eventFifoId = GetHardwareMask()[2];
     uint32_t energyId    = GetHardwareMask()[3];
-    uint32_t runFlags    = GetDeviceSpecificData()[3];
+    //uint32_t runFlags    = GetDeviceSpecificData()[3];
     uint32_t sltRevision = GetDeviceSpecificData()[6];
 
     uint32_t col        = GetSlot() - 1; //(1-24)
@@ -46,15 +51,10 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
     //pbus = srack->theSlt->version;
     //uint32_t sltversion=sltRevision;
     
-    
-    if(runFlags & kFirstTimeFlag){// firstTime
-        //fprintf(stdout, "KatrinSLTv4Readout called ... fast event readout using SLT buffer ... tbtb\n");
-        GetDeviceSpecificData()[3]=GetDeviceSpecificData()[3] & ~(kFirstTimeFlag);// runFlags is GetDeviceSpecificData()[3], so this clears the 'first time' flag -tb-
-        GetDeviceSpecificData()[3]=0;//TODO: for testing -tb-
-
-        //TODO: better use a local static variable and init it the first time, as changing GetDeviceSpecificData()[3] could be dangerous -tb-
-        //debug: fprintf(stdout,"FLT %i: first cycle\n",col+1);fflush(stdout);
-        //debug: //sleep(1);
+    if(firstTime){
+        //not sure what Till had in mind for the firstTime flag... it wasn't used in his code
+        //I kept it for now, but moved it to a private variable
+        firstTime = false;
     }
     
     if(sltRevision==0x3010003){//we have SLT event FIFO since this revision -> read FIFO (one event = 4 words)
@@ -131,9 +131,6 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
 #else //of #if !PMC_COMPILE_IN_SIMULATION_MODE
 // (here follow the 'simulation' versions of all functions -tb-)
 //----------------------------------------------------------------
-
-// 'simulation' of hitrate is done in HW_Readout.cc in doReadBlock -tb-
-
 bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
 {
     static int currentSec   = 0;

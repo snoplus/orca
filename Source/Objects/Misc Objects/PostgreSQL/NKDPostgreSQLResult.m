@@ -2,7 +2,7 @@
 // NKDPostgreSQLResult.m
 // -----------------------------------------------------------------------------------
 //  Created by Jeff LaMarche on Sat Jul 13 2002.
-//  ©2002 Naked Software. All rights reserved.
+//  ï¿½2002 Naked Software. All rights reserved.
 // -----------------------------------------------------------------------------------
 // THIS	SOURCE CODE IS PROVIDED AS-IS WITH NO WARRANTY OF ANY KIND
 // -----------------------------------------------------------------------------------
@@ -77,7 +77,7 @@
 -(NSString *)errorMessage
 // -----------------------------------------------------------------------------------
 {
-    return [NSString stringWithCString: PQresultErrorMessage(res)];
+    return [NSString stringWithCString: PQresultErrorMessage(res) encoding:NSASCIIStringEncoding];
 }
 // -----------------------------------------------------------------------------------
 -(void)dealloc

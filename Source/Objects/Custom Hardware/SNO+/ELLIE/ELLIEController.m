@@ -528,8 +528,9 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
         [tellieNoPulsesTf setBackgroundColor:[NSColor whiteColor]];
         // Make settings dict to pass to fire method
         float pulseSeparation = 1000.*(1./[telliePulseFreqTf floatValue]); // TELLIE accepts pulse rate in ms
+        NSString* fibre = [model calcTellieFibreForChannel:[tellieChannelTf integerValue]];
         NSMutableDictionary* settingsDict = [NSMutableDictionary dictionaryWithCapacity:100];
-        [settingsDict setValue:[tellieExpertFibreSelectPb titleOfSelectedItem] forKey:@"fibre"];
+        [settingsDict setValue:fibre forKey:@"fibre"];
         [settingsDict setValue:[NSNumber numberWithInteger:[tellieChannelTf integerValue]]  forKey:@"channel"];
         [settingsDict setValue:[tellieExpertOperationModePb titleOfSelectedItem] forKey:@"run_mode"];
         //[settingsDict setValue:[NSNumber numberWithInteger:[telliePhotonsTf integerValue]] forKey:@"photons"];

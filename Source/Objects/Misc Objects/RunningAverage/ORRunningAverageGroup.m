@@ -19,8 +19,8 @@
 
 
 #import "ORRunningAverageGroup.h"
-NSString* ORRunningAverageSpikeNotification  = @"ORRunningAverageSpikeNotification";
-NSString* ORRunningAverageChangedNotification = @"ORRunningAverageChangedNotification";
+NSString* ORRunningAverageChangedNotification   = @"ORRunningAverageChangedNotification";
+NSString* ORSpikeStateChangedNotification       = @"ORSpikeStateChangedNotification";
 
 @implementation ORRunningAverageGroup
 
@@ -163,9 +163,6 @@ NSString* ORRunningAverageChangedNotification = @"ORRunningAverageChangedNotific
     for(idx=0; idx<[runningAverages count];idx++){
         ORRunningAverage* ra = [runningAverages objectAtIndex:idx];
         [ra reset];
-        //ORRunningAveSpike* aSpikeObj = [ra spikedInfo:NO];
-       // NSDictionary* userInfo = [NSDictionary dictionaryWithObject:aSpikeObj forKey:@"SpikeObject"];
-       // [[NSNotificationCenter defaultCenter] postNotificationName:ORRunningAverageSpikeNotification object:self userInfo:userInfo];
     }
 }
 - (int) tag
@@ -188,12 +185,13 @@ NSString* ORRunningAverageChangedNotification = @"ORRunningAverageChangedNotific
 
 - (void) addNewValue:(float)aValue toIndex:(int)i
 {
-    ORRunningAverage* ra         = [runningAverages objectAtIndex:i];
-    ORRunningAveSpike* aSpikeObj = [ra calculateAverage:aValue minSamples:windowLength triggerValue:triggerValue spikeType:triggerType];
-    if(aSpikeObj){
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:aSpikeObj forKey:@"SpikeObject"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORRunningAverageSpikeNotification object:self userInfo:userInfo];
-    }
+    ORRunningAverage* ra = [runningAverages objectAtIndex:i];
+    [ra calculateAverage: aValue
+              minSamples: windowLength
+            triggerValue: triggerValue
+               spikeType: triggerType
+                   group: self];
+
 }
 
 - (void) addValuesUsingTimer

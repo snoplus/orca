@@ -26,6 +26,7 @@
 //do NOT change this list without changing the StateInfo array in the .m file
 enum {
     kMJDInterlocks_Idle,
+    kMJDInterlocks_ExecuteLNPoll,
     kMJDInterlocks_Ping,
     kMJDInterlocks_PingWait,
     kMJDInterlocks_CheckHVisOn,
@@ -66,6 +67,7 @@ typedef struct {
     BOOL                sentCmds;
     BOOL                vacuumSpike;
     BOOL                fillingLN;
+    int                 pollingTimeForLN;
     int                 breakDownPass;
     NSString*           breakDownResult;
     BOOL                scheduledToSendVacReport;
@@ -92,7 +94,9 @@ typedef struct {
 - (NSString*)   moduleName;
 - (BOOL)        vacuumSpike;
 - (BOOL)        fillingLN;
+- (int)         pollingTimeForLN;
 - (void)        errorReport;
+- (void)        setFillingLN:(BOOL)aState;
 
 @property (assign) MajoranaModel*             delegate;
 @property (assign,nonatomic) BOOL             isRunning;

@@ -203,7 +203,8 @@ struct {
     return kMJDPreAmpAdcChannels;
 }
 
-- (ORRunningAverageGroup*) baselineRunningAverages{
+- (ORRunningAverageGroup*) baselineRunningAverages
+{
     return baselineRunningAverages;
 }
 
@@ -213,15 +214,32 @@ struct {
     [baselineRunningAverages release];
     baselineRunningAverages = newRunningAverageGroup;
 }
+//-----------------------------------------------------
+//----for testing some of the rate spike logic
+- (void) fakeASpike:(int) channel started:(BOOL)start
+{
+    ORRunningAveSpike* aSpike = [[[ORRunningAveSpike alloc] init] autorelease];
+    aSpike.spiked       = start;
+    aSpike.tag          = channel;
+    aSpike.ave          = 2;
+    aSpike.spikeValue   = 10;
+    
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:aSpike forKey:@"SpikeObject"];
+    NSNotification* aNote  = [NSNotification notificationWithName:ORSpikeStateChangedNotification object:self userInfo:userInfo];
+    [self baselineSpikeChanged:aNote];
+    
+}
+//-----------------------------------------------------
 
 - (void) baselineSpikeChanged:(NSNotification*)aNote
 {
+    //spike
     ORRunningAveSpike* spikeObj = [[aNote userInfo] objectForKey:@"SpikeObject"];
     NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
                               spikeObj,@"spikeInfo",
                               [NSNumber numberWithInt:[self connectedGretinaCrate]],@"crate",
-                              [NSNumber numberWithInt:[self connectedGretinaSlot]],@"card",
-                              [NSNumber numberWithInt:[spikeObj tag]],@"channel",
+                              [NSNumber numberWithInt:[self connectedGretinaSlot]], @"card",
+                              [NSNumber numberWithInt:[spikeObj tag]],              @"adcChannel",
                               nil];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelRateSpiked object:self userInfo:userInfo];
 }
@@ -321,7 +339,7 @@ struct {
 
     [notifyCenter addObserver : self
                          selector : @selector(baselineSpikeChanged:)
-                             name : ORRunningAverageSpikeNotification
+                             name : ORSpikeStateChangedNotification
                            object : baselineRunningAverages];
 }
 

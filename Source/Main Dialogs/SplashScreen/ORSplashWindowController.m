@@ -85,10 +85,22 @@
 
 
 @implementation ORSplashWindow
+//use a #if to get rid of compiler warning about NSWindowStyleMask
+#if defined(MAC_OS_X_VERSION_10_12)
+
+- (id) initWithContentRect: (NSRect) contentRect
+                 styleMask: (NSWindowStyleMask) aStyle
+                   backing: (NSBackingStoreType) bufferingType
+                     defer: (BOOL) flag
+
+#else
+
 - (id) initWithContentRect: (NSRect) contentRect
                  styleMask: (unsigned int) aStyle
                    backing: (NSBackingStoreType) bufferingType
                      defer: (BOOL) flag
+#endif
+
 {
     if (self = [super initWithContentRect: contentRect
                                 styleMask: NSBorderlessWindowMask

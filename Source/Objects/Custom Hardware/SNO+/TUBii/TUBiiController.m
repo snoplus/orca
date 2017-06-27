@@ -135,6 +135,9 @@
     [PrescaleFactor setEnabled: !lockedOrNotRunningMaintenance];
     [PrescaleTriggerMask setEnabled: !lockedOrNotRunningMaintenance];
     [sendPrescaleButton setEnabled: !lockedOrNotRunningMaintenance];
+    [TUBiiPGTRate setEnabled: !lockedOrNotRunningMaintenance];
+    [sendTUBiiPGTStart setEnabled: !lockedOrNotRunningMaintenance];
+    [sendTUBiiPGTStop setEnabled: !lockedOrNotRunningMaintenance];
     [MTCAMimic_Slider setEnabled: !lockedOrNotRunningMaintenance];
     [MTCAMimic_TextField setEnabled: !lockedOrNotRunningMaintenance];
     [sendMTCAButton setEnabled: !lockedOrNotRunningMaintenance];
@@ -305,17 +308,37 @@
     [gSecurity tryToSetLock:ORTubiiLockNotification to:[sender intValue] forWindow:[self window]];
 }
 - (IBAction)InitializeClicked:(id)sender {
-    [model Initialize];
+    @try{
+        [model Initialize];
+    } @catch (NSException *exception) {
+        [self log_error:exception];
+        return;
+    }
 }
 - (IBAction)SendPing:(id)sender {
-    [model Ping];
+    @try{
+        [model Ping];
+    } @catch (NSException *exception) {
+        [self log_error:exception];
+        return;
+    }
 }
 - (IBAction)DataReadoutChanged:(id)sender {
     if ([[sender selectedCell] tag] == 1) { //Data Readout On is selected
-        [model setDataReadout:YES];
+        @try{
+            [model setDataReadout:YES];
+        } @catch (NSException *exception) {
+            [self log_error:exception];
+            return;
+        }
     }
     else { //Data Readout Off is selected
-        [model setDataReadout:NO];
+        @try{
+            [model setDataReadout:NO];
+        } @catch (NSException *exception) {
+            [self log_error:exception];
+            return;
+        }
     }
     return;
 }
@@ -324,28 +347,58 @@
     //rather then just sending them all at once.
     if ([sender tag] == 1){
         //Smellie Pulser is being fired
-        [model fireSmelliePulser_rate:[SmellieRate_TextField floatValue] pulseWidth:[SmellieWidth_TextField doubleValue] NPulses:[SmellieNPulses_TextField intValue]];
+        @try{
+            [model fireSmelliePulser_rate:[SmellieRate_TextField floatValue] pulseWidth:[SmellieWidth_TextField doubleValue] NPulses:[SmellieNPulses_TextField intValue]];
+        } @catch (NSException *exception) {
+            [self log_error:exception];
+            return;
+        }
     }
     else if([sender tag] == 2){
         //Tellie Pulser is being fired
-        [model fireTelliePulser_rate:[TellieRate_TextField floatValue] pulseWidth:[TellieWidth_TextField doubleValue] NPulses:[TellieNPulses_TextField intValue]];
+        @try{
+            [model fireTelliePulser_rate:[TellieRate_TextField floatValue] pulseWidth:[TellieWidth_TextField doubleValue] NPulses:[TellieNPulses_TextField intValue]];
+        } @catch (NSException *exception) {
+            [self log_error:exception];
+            return;
+        }
     }
     else if([sender tag] == 3){
         //Generic Pulser is being fired
-        [model firePulser_rate:[ GenericRate_TextField floatValue] pulseWidth:[GenericWidth_TextField doubleValue] NPulses:[GenericNPulses_TextField intValue]];
+        @try{
+            [model firePulser_rate:[ GenericRate_TextField floatValue] pulseWidth:[GenericWidth_TextField doubleValue] NPulses:[GenericNPulses_TextField intValue]];
+        } @catch (NSException *exception) {
+            [self log_error:exception];
+            return;
+        }
     }
     return;
 }
 - (IBAction)PulserStop:(id)sender {
     //Stops the pulser from sending anymore pulses
     if([sender tag] == 1){
-        [model stopSmelliePulser];
+        @try{
+            [model stopSmelliePulser];
+        } @catch (NSException *exception) {
+            [self log_error:exception];
+            return;
+        }
     }
     else if([sender tag] == 2){
-        [model stopTelliePulser];
+        @try{
+            [model stopTelliePulser];
+        } @catch (NSException *exception) {
+            [self log_error:exception];
+            return;
+        }
     }
     else if([sender tag] == 3){
-        [model stopPulser];
+        @try{
+            [model stopPulser];
+        } @catch (NSException *exception) {
+            [self log_error:exception];
+            return;
+        }
     }
     return;
 }
@@ -354,22 +407,51 @@
     int delay =0;
     if([sender tag] == 1){
         delay = [SmellieDelay_TextField integerValue];
-        [model setSmellieDelay:delay];
+        @try{
+            [model setSmellieDelay:delay];
+        } @catch (NSException *exception) {
+            [self log_error:exception];
+            return;
+        }
     }
     else if([sender tag] == 2){
         delay = [TellieDelay_TextField integerValue];
-        [model setTellieDelay:delay];
+        @try{
+            [model setTellieDelay:delay];
+        } @catch (NSException *exception) {
+            [self log_error:exception];
+            return;
+        }
     }
     else if([sender tag] == 3){
         delay = [GenericDelay_TextField integerValue];
-        [model setGenericDelay:delay];
+        @try{
+            [model setGenericDelay:delay];
+        } @catch (NSException *exception) {
+            [self log_error:exception];
+            return;
+        }
     }
     return;
 }
 - (IBAction)TrigMaskMatchHardware:(id)sender {
     //Makes the trigger mask GUI element match TUBii's hardware state
-    NSUInteger trigMaskVal = ([model syncTrigMask] | [model asyncTrigMask]);
-    NSUInteger syncMaskVal = 16777215 - [model asyncTrigMask];
+    NSUInteger syncMask;
+    NSUInteger asyncMask;
+    @try {
+        syncMask = [model syncTrigMask];
+    } @catch(NSException *exception) {
+        [self log_error:exception];
+        return;
+    }
+    @try {
+        asyncMask = [model asyncTrigMask];
+    } @catch(NSException *exception) {
+        [self log_error:exception];
+        return;
+    }
+    NSUInteger trigMaskVal = (syncMask | asyncMask);
+    NSUInteger syncMaskVal = 16777215 - asyncMask;
     [self SendBitInfo:trigMaskVal FromBit:0 ToBit:24 ToCheckBoxes:TrigMaskSelect];
     [self SendBitInfo:syncMaskVal FromBit:24 ToBit:48 ToCheckBoxes:TrigMaskSelect];
 }
@@ -399,7 +481,12 @@
         }
     }
     
-    [model setTrigMask:syncMask setAsyncMask:asyncMask];
+    @try{
+        [model setTrigMask:syncMask setAsyncMask:asyncMask];
+    } @catch(NSException *exception) {
+        [self log_error:exception];
+        return;
+    }
 }
 - (IBAction)BurstTriggerLoad:(id)sender {
     NSLog(@"Not yet implemented. :(");
@@ -407,26 +494,58 @@
 - (IBAction)ComboTriggerLoad:(id)sender {
     NSUInteger enableMask = [ComboEnableMask integerValue];
     NSUInteger triggerMask = [ComboTriggerMask integerValue];
-    [model setComboTrigger_EnableMask:enableMask TriggerMask:triggerMask];
+    @try{
+        [model setComboTrigger_EnableMask:enableMask TriggerMask:triggerMask];
+    } @catch(NSException *exception) {
+        [self log_error:exception];
+        return;
+    }
 }
 - (IBAction)PrescaleTriggerLoad:(id)sender {
     float factor = [PrescaleFactor floatValue];
     NSUInteger mask = [PrescaleTriggerMask integerValue];
-    [model setPrescaleTrigger_Mask:mask ByFactor:factor];
+    @try{
+        [model setPrescaleTrigger_Mask:mask ByFactor:factor];
+    } @catch(NSException *exception) {
+        [self log_error:exception];
+        return;
+    }
 }
 - (IBAction)TUBiiPGTLoad:(id)sender {
     float rate = [TUBiiPGTRate floatValue];
-    [model setTUBiiPGT_Rate:rate];
+    @try{
+        [model setTUBiiPGT_Rate:rate];
+    } @catch(NSException *exception) {
+        [self log_error:exception];
+        return;
+    }
 }
 - (IBAction)TUBiiPGTStop:(id)sender {
     float rate = 0;
-    [model setTUBiiPGT_Rate:rate];
+    @try{
+        [model setTUBiiPGT_Rate:rate];
+    } @catch(NSException *exception) {
+        [self log_error:exception];
+        return;
+    }
 }
 
 - (IBAction)CaenMatchHardware:(id)sender {
     //Makes the CAEN GUI reflect the current hardware state
-    CAEN_CHANNEL_MASK ChannelMask = [model caenChannelMask];
-    CAEN_GAIN_MASK GainMask = [model caenGainMask];
+    CAEN_CHANNEL_MASK ChannelMask;
+    CAEN_GAIN_MASK GainMask;
+    @try {
+        ChannelMask = [model caenChannelMask];
+    } @catch(NSException *exception) {
+        [self log_error:exception];
+        return;
+    }
+    @try {
+        GainMask = [model caenGainMask];
+    } @catch(NSException *exception) {
+        [self log_error:exception];
+        return;
+    }
 
     BOOL err = YES;
     err &= [caenChannelSelect_0 selectCellWithTag:(ChannelMask & channelSel_0)>0];
@@ -461,7 +580,13 @@
     GainMask |= [[caenGainSelect_5 selectedCell] tag ]*gainSel_5;
     GainMask |= [[caenGainSelect_6 selectedCell] tag ]*gainSel_6;
     GainMask |= [[caenGainSelect_7 selectedCell] tag ]*gainSel_7;
-    [model setCaenMasks:ChannelMask GainMask:GainMask];
+    @try{
+        [model setCaenMasks:ChannelMask GainMask:GainMask];
+    } @catch(NSException *exception) {
+        [self log_error:exception];
+        return;
+    }
+
 }
 
 - (IBAction)SpeakerMatchHardware:(id)sender {
@@ -473,14 +598,24 @@
 
     if ([sender tag] ==1)
     {
-        maskVal = [model speakerMask];
+        @try {
+            maskVal = [model speakerMask];
+        } @catch(NSException *exception) {
+            [self log_error:exception];
+            return;
+        }
         maskSelect_1 = SpeakerMaskSelect_1;
         maskSelect_2 = SpeakerMaskSelect_2;
         textField = SpeakerMaskField;
     }
     else if ([sender tag]==2)
     {
-        maskVal = [model counterMask];
+        @try {
+            maskVal = [model speakerMask];
+        } @catch(NSException *exception) {
+            [self log_error:exception];
+            return;
+        }
         maskSelect_1 = CounterMaskSelect_1;
         maskSelect_2 = CounterMaskSelect_2;
         textField = CounterMaskField;
@@ -491,12 +626,26 @@
 }
 - (IBAction)CounterMatchHardware:(id)sender {
     [self SpeakerMatchHardware:sender]; //Bit of a hack. I should probably rename the function
-    CONTROL_REG_MASK ControlRegVal = [model controlReg];
-
+    CONTROL_REG_MASK ControlRegVal;
+    BOOL counter_mode;
+    @try {
+        ControlRegVal = [model controlReg];
+    } @catch(NSException *exception) {
+        [self log_error:exception];
+        return;
+    }
+    
     [CounterLZBSelect setState: (ControlRegVal & scalerLZB_Bit) > 0 ? NSOnState : NSOffState ];
     [CounterTestModeSelect setState: (ControlRegVal & scalerT_Bit) > 0 ? NSOffState : NSOnState ]; //Unchecked = bit high
     [CounterInhibitSelect setState: (ControlRegVal & scalerI_Bit) > 0 ? NSOffState : NSOnState ]; //Unchecked = bit high
-    if ([model CounterMode]) {
+    @try {
+        counter_mode = [model CounterMode];
+    } @catch (NSException *exception) {
+        [self log_error:exception];
+        return;
+    }
+    
+    if (counter_mode) {
         [CounterModeSelect selectCellWithTag:1];
     }
     else {
@@ -520,30 +669,61 @@
     maskVal |= [self GetBitInfoFromCheckBoxes:maskSelect_2 FromBit:16 ToBit:32];
 
     if ([sender tag] ==1) {
-        [model setSpeakerMask:maskVal];
+        @try{
+            [model setSpeakerMask:maskVal];
+        } @catch (NSException *exception) {
+            [self log_error:exception];
+            return;
+        }
     }
     else if ([sender tag] ==2)
     {
-        [model setCounterMask:maskVal];
+        @try{
+            [model setCounterMask:maskVal];
+        } @catch (NSException *exception) {
+            [self log_error:exception];
+            return;
+        }
     }
 
 }
 - (IBAction)CounterLoadMask:(id)sender {
     [self SpeakerLoadMask:sender];
-    CONTROL_REG_MASK newControlReg = [model controlReg];
+    CONTROL_REG_MASK newControlReg;
+    @try {
+        newControlReg = [model controlReg];
+    } @catch (NSException *exception) {
+        [self log_error:exception];
+        return;
+    }
     newControlReg |=  [CounterLZBSelect intValue] ==1 ? scalerLZB_Bit : 0;
     newControlReg |=  [CounterTestModeSelect intValue] ==1 ? 0 : scalerT_Bit;
     newControlReg |=  [CounterInhibitSelect intValue] ==1 ? 0 : scalerI_Bit;
-    [model setControlReg:newControlReg];
+    @try{
+        [model setControlReg:newControlReg];
+    } @catch (NSException *exception) {
+        [self log_error:exception];
+        return;
+    }
     if ([[CounterModeSelect selectedCell] tag] ==1) {
         //Rate Mode is selected
-        [model setCounterMode:YES];
+        @try {
+            [model setCounterMode:YES];
+        } @catch (NSException *exception) {
+            [self log_error:exception];
+            return;
+        }
     }
     else { //Totalizer Mode is selected
-        [model setCounterMode:NO];
+        @try {
+            [model setCounterMode:NO];
+        } @catch (NSException* exception) {
+            [self log_error:exception];
+            return;
+        }
+        
     }
-
-    }
+}
 - (IBAction)SpeakerCheckBoxChanged:(id)sender {
     NSUInteger maskVal = [self GetBitInfoFromCheckBoxes:SpeakerMaskSelect_1 FromBit:0 ToBit:16];
     maskVal |= [self GetBitInfoFromCheckBoxes:SpeakerMaskSelect_2 FromBit:16 ToBit:32]<<16;
@@ -633,25 +813,59 @@
 - (IBAction)GTDelaysLoadMask:(id)sender {
     float LO_Delay = [LO_Field floatValue];
     float DGT_Delay = [DGT_Field floatValue];
-    [model setGTDelaysInNS:DGT_Delay LOValue:LO_Delay];
+    @try{
+        [model setGTDelaysInNS:DGT_Delay LOValue:LO_Delay];
+    } @catch (NSException* exception) {
+        [self log_error:exception];
+        return;
+    }
 
     if([[LO_SrcSelect selectedCell] tag] ==1){
         //MTCD is LO Src is selected
-        [model setTUBiiIsLOSrc:NO];
+        @try{
+            [model setTUBiiIsLOSrc:NO];
+        } @catch (NSException* exception) {
+            [self log_error:exception];
+            return;
+        }
     }
     else {
         //TUBii is LO Src is selected
-        [model setTUBiiIsLOSrc:YES];
+        @try{
+            [model setTUBiiIsLOSrc:YES];
+        } @catch (NSException* exception) {
+            [self log_error:exception];
+            return;
+        }
     }
 }
 - (IBAction)GTDelaysMatchHardware:(id)sender {
-    float LO_Delay = [model LODelayInNS];
-    [LO_Slider setIntValue:LO_Delay];
-    [LO_Field setIntegerValue:LO_Delay];
-    float DGT_Delay = [model DGTInNS];
+    float LO_Delay;
+    float DGT_Delay;
+    CONTROL_REG_MASK controlReg;
+    @try {
+        DGT_Delay = [model DGTInNS];
+    } @catch(NSException *exception) {
+        [self log_error:exception];
+        return;
+    }
     [DGT_Slider setIntValue:DGT_Delay];
     [DGT_Field setIntValue:DGT_Delay];
-    if (([model controlReg] & lockoutSel_Bit)>0){
+    @try {
+        LO_Delay = [model LODelayInNS];
+    } @catch(NSException *exception) {
+        [self log_error:exception];
+        return;
+    }
+    [LO_Slider setIntValue:LO_Delay];
+    [LO_Field setIntegerValue:LO_Delay];
+    @try {
+        controlReg = [model controlReg];
+    } @catch(NSException *exception) {
+        [self log_error:exception];
+        return;
+    }
+    if ((controlReg & lockoutSel_Bit)>0){
         [LO_SrcSelect selectCellWithTag:1];
     }
     else {
@@ -699,14 +913,29 @@
 }
 
 - (IBAction)ResetClock:(id)sender {
-    [model ResetClock];
+    @try{
+        [model ResetClock];
+    } @catch(NSException *exception) {
+        [self log_error:exception];
+        return;
+    }
 }
 - (IBAction)ECAEnableChanged:(id)sender {
     if([[ECA_EnableButton selectedCell] tag]==1){ //ECA mode On is selected
-        [model setECALMode: YES];
+        @try{
+            [model setECALMode: YES];
+        } @catch(NSException *exception) {
+            [self log_error:exception];
+            return;
+        }
     }
     else { //ECA mode Off is selected
-        [model setECALMode: NO];
+        @try{
+            [model setECALMode: NO];
+        } @catch(NSException *exception) {
+            [self log_error:exception];
+            return;
+        }
     }
 }
 
@@ -719,27 +948,44 @@
     [MTCAMimic_TextField setStringValue:[NSString stringWithFormat:@"%.3f",[MTCAMimic_Slider floatValue]]];
 }
 - (IBAction)MTCAMimicMatchHardware:(id)sender {
-    NSUInteger ThresholdValue= [model MTCAMimic1_ThresholdInVolts];
-    //Bit value of the DAC
+    NSUInteger ThresholdValue;
+    @try {
+        ThresholdValue= [model MTCAMimic1_ThresholdInVolts];
+    } @catch(NSException *exception) {
+        [self log_error:exception];
+        return;
+    }    //Bit value of the DAC
 
     [MTCAMimic_Slider setFloatValue:ThresholdValue];
     [MTCAMimic_TextField setFloatValue:ThresholdValue];
 }
 - (IBAction)MTCAMimicLoadValue:(id)sender {
     double value = [MTCAMimic_TextField floatValue];
-    [model setMTCAMimic1_ThresholdInVolts:value];
+    @try {
+        [model setMTCAMimic1_ThresholdInVolts:value];
+    } @catch(NSException *exception) {
+        [self log_error:exception];
+        return;
+    }
 }
 
 - (IBAction)LoadClockSource:(id)sender {
-    if([[DefaultClockSelect selectedCell] tag]==1){
-        [model setTUBiiIsDefaultClock: YES];
-    }
-    else {
-        [model setTUBiiIsDefaultClock: NO];
+    BOOL tubii_is_default = ([[DefaultClockSelect selectedCell] tag] == 1);
+    @try {
+        [model setTUBiiIsDefaultClock: tubii_is_default];
+    } @catch(NSException *exception) {
+        [self log_error:exception];
+        return;
     }
 }
 - (IBAction)ClockSourceMatchHardware:(id)sender {
-    CONTROL_REG_MASK cntrl_reg = [model controlReg];
+    CONTROL_REG_MASK cntrl_reg;
+    @try {
+        cntrl_reg = [model controlReg];
+    } @catch(NSException *exception) {
+        [self log_error:exception];
+        return;
+    }
     if(cntrl_reg & clkSel_Bit) {
         [DefaultClockSelect selectCellWithTag:1]; //TUBii Clk is tag 1
     }
@@ -773,5 +1019,11 @@
             [[aMatrix cellWithTag:i] setState:0];
         }
     }
+}
+
+-(void)log_error:(NSException *)e
+{
+    // Log an exception
+    NSLogColor([NSColor redColor], @"[TUBii]: RedisClient exception from TUBii server: %@\n", [e reason]);
 }
 @end

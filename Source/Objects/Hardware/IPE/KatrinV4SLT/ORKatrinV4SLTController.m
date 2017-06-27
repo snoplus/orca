@@ -26,27 +26,6 @@
 #import "SBC_Link.h"
 
 
-#if 0
-#define kFltNumberTriggerSources 5
-
-NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
-{
-	@"Software",
-	@"Right",
-	@"Left",
-	@"Mirror",
-	@"External",
-},
-{
-	@"Software",
-	@"N/A",
-	@"N/A",
-	@"Multiplicity",
-	@"External",
-}
-};
-#endif
-
 @interface ORKatrinV4SLTController (private)
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) calibrationSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
@@ -60,7 +39,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 -(id)init
 {
     self = [super initWithWindowNibName:@"KatrinV4SLT"];
-    
     return self;
 }
 
@@ -136,12 +114,12 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 						object: model];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(pageSizeChanged:)
+                     selector : @selector(displayEventLoopChanged:)
                          name : ORKatrinV4SLTModelDisplayEventLoopChanged
 						object: model];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(pageSizeChanged:)
+                     selector : @selector(displayTriggerChanged:)
                          name : ORKatrinV4SLTModelDisplayTriggerChanged
 						object: model];
 	
@@ -226,7 +204,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (void) pixelBusEnableRegChanged:(NSNotification*)aNote
 {
-	//[pixelBusEnableRegTextField setIntValue: [model pixelBusEnableReg]];
 	[pixelBusEnableRegTextField setIntValue: [model pixelBusEnableReg]];
 	int i;
 	for(i=0;i<19;i++){
@@ -237,7 +214,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (void) secondsSetSendToFLTsChanged:(NSNotification*)aNote
 {
-    //NSLog(@"Called %@::%@\n  secondsSetSendToFLTs is %i",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model secondsSetSendToFLTs]);//DEBUG -tb-
 	[secondsSetSendToFLTsCB setState: [model secondsSetSendToFLTs]];
 }
 
@@ -264,27 +240,20 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (void) runTimeChanged:(NSNotification*)aNote
 {
-	//[[countersMatrix cellWithTag:2] setStringValue: [NSString stringWithFormat:@"%llu",(unsigned long long)[model runTime]]];
 	unsigned long long t=[model runTime];
 	[[countersMatrix cellWithTag:2] setStringValue: [NSString stringWithFormat:@"%llu",t]];
-	//[[countersMatrix cellWithTag:2] setStringValue: [NSString stringWithFormat:@"%llu.%llu", (t>>32) & 0xffffffff, t & 0xffffffff]];
-	//[[countersMatrix cellWithTag:2] setIntValue:  [model runTime]];
 }
 
 - (void) vetoTimeChanged:(NSNotification*)aNote
 {
 	unsigned long long t=[model vetoTime];
 	[[countersMatrix cellWithTag:1] setStringValue: [NSString stringWithFormat:@"%llu",t]];
-	//[[countersMatrix cellWithTag:1] setStringValue: [NSString stringWithFormat:@"%llu.%llu", (t>>32) & 0xffffffff, t & 0xffffffff]];
-	//[[countersMatrix cellWithTag:1] setIntValue:[model vetoTime]];
 }
 
 - (void) deadTimeChanged:(NSNotification*)aNote
 {
 	unsigned long long t=[model deadTime];
 	[[countersMatrix cellWithTag:0] setStringValue: [NSString stringWithFormat:@"%llu",t]];
-	//[[countersMatrix cellWithTag:0] setStringValue: [NSString stringWithFormat:@"%llu.%llu", (t>>32) & 0xffffffff, t & 0xffffffff]];
-	//[[countersMatrix cellWithTag:0] setIntValue:[model deadTime]];
 }
 
 - (void) secondsSetChanged:(NSNotification*)aNote
@@ -395,7 +364,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[self pixelBusEnableRegChanged:nil];
 }
 
-
 - (void) checkGlobalSecurity
 {
     [super checkGlobalSecurity]; 
@@ -487,7 +455,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[displayTriggerButton setState:[model displayTrigger]];
 }
 
-
 - (void) selectedRegIndexChanged:(NSNotification*) aNote
 {
 	short index = [model selectedRegIndex];
@@ -521,11 +488,8 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (void) populatePullDown
 {
     short	i;
-	
-	// Clear all the popup items.
     [registerPopUp removeAllItems];
     
-	// Populate the register popup
     for (i = 0; i < [model getNumberRegisters]; i++) {
         [registerPopUp insertItemWithTitle:[model getRegisterName:i] atIndex:i];
     }
@@ -555,10 +519,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (void) pixelBusEnableRegMatrixAction:(id)sender
 {
-	//[model setPixelBusEnableReg:[sender intValue]];	
-    //debug
-	NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
-//	[model setPixelBusEnableReg:[sender intValue]];	
 	int i, val=0;
 	for(i=0;i<20;i++){
 		if([[sender cellWithTag:i] intValue]) val |= (0x1<<i);
@@ -576,8 +536,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 {
 	[model readPixelBusEnableReg];	
 }
-
-
 
 - (IBAction) secondsSetSetNowButtonAction:(id)sender
 {
@@ -658,8 +616,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 //----------------------------------
 
-
-
 - (IBAction) dumpPageStatus:(id)sender
 {
 	if([[NSApp currentEvent] clickCount] >=2){
@@ -711,12 +667,10 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[model setDisplayTrigger:[sender intValue]];	
 }
 
-
 - (IBAction) displayEventLoopAction:(id)sender
 {
 	[model setDisplayEventLoop:[sender intValue]];	
 }
-
 
 - (IBAction) initBoardAction:(id)sender
 {
@@ -775,7 +729,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (IBAction) selectRegisterAction:(id) aSender
 {
-    // Make sure that value has changed.
     if ([aSender indexOfSelectedItem] != [model selectedRegIndex]){
 	    [[model undoManager] setActionName:@"Select Register"]; // Set undo name
 	    [model setSelectedRegIndex:[aSender indexOfSelectedItem]]; // set new value
@@ -786,7 +739,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (IBAction) writeValueAction:(id) aSender
 {
 	[self endEditing];
-    // Make sure that value has changed.
     if ([aSender intValue] != [model writeValue]){
 		[[model undoManager] setActionName:@"Set Write Value"]; // Set undo name.
 		[model setWriteValue:[aSender intValue]]; // Set new value
@@ -825,17 +777,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 {
 	@try {
 		[model readHwVersion];
-		//NSLog(@"%@ Project:%d Doc:%d Implementation:%d\n",[model fullID], [model projectVersion], [model documentVersion], [model implementation]);
 		NSLog(@"%@ Project:%d Doc:0x%x Implementation:0x%x\n",[model fullID], [model projectVersion], [model documentVersion], [model implementation]);
-		long fdhwlibVersion = [model getFdhwlibVersion];
-		int ver=(fdhwlibVersion>>16) & 0xff,maj =(fdhwlibVersion>>8) & 0xff,min = fdhwlibVersion & 0xff;
-	    NSLog(@"%@: SBC PrPMC running with fdhwlib version: %i.%i.%i (0x%08x)\n",[model fullID],ver,maj,min, fdhwlibVersion);
-		long SltPciDriverVersion = [model getSltPciDriverVersion];
-		//NSLog(@"%@: SLT PCI driver version: %i\n",[model fullID],SltPciDriverVersion);
-	    if(SltPciDriverVersion<0) NSLog(@"%@: unknown SLT PCI driver version: %i\n",[model fullID],SltPciDriverVersion);
-        else if(SltPciDriverVersion==0) NSLog(@"%@: SBC running with SLT PCI driver version: %i (fzk_ipe_slt)\n",[model fullID],SltPciDriverVersion);
-        else if(SltPciDriverVersion==1) NSLog(@"%@: SBC running with SLT PCI driver version: %i (fzk_ipe_slt_dma)\n",[model fullID],SltPciDriverVersion);
-        else NSLog(@"%@: SBC running with SLT PCI driver version: %i (fzk_ipe_slt%i)\n",[model fullID],SltPciDriverVersion,SltPciDriverVersion);
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading SLT HW Model Version\n");
@@ -845,21 +787,20 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 }
 
 //most of these are not currently connected to anything.. used during testing..
-- (IBAction) enableCountersAction:(id)sender	{ [self do:@selector(writeEnCnt) name:@"Enable Counters"]; }
-- (IBAction) disableCountersAction:(id)sender	{ [self do:@selector(writeDisCnt) name:@"Disable Counters"]; }
-- (IBAction) clearCountersAction:(id)sender		{ [self do:@selector(writeClrCnt) name:@"Clear Counters"]; }
-- (IBAction) activateSWRequestAction:(id)sender	{ [self do:@selector(writeSwRq) name:@"Active SW Request Interrupt"]; }
-- (IBAction) configureFPGAsAction:(id)sender	{ [self do:@selector(writeFwCfg) name:@"Config FPGAs"]; }
-- (IBAction) tpStartAction:(id)sender			{ [self do:@selector(writeTpStart) name:@"Test Pattern Start"]; }
-- (IBAction) resetFLTAction:(id)sender			{ [self do:@selector(writeFltReset) name:@"FLT Reset"]; }
-- (IBAction) resetSLTAction:(id)sender			{ [self do:@selector(writeSltReset) name:@"SLT Reset"]; }
-- (IBAction) writeSWTrigAction:(id)sender		{ [self do:@selector(writeSwTrigger) name:@"SW Trigger"]; }
-- (IBAction) writeClrInhibitAction:(id)sender	{ [self do:@selector(writeClrInhibit) name:@"Clr Inhibit"]; }
-- (IBAction) writeSetInhibitAction:(id)sender	{ [self do:@selector(writeSetInhibit) name:@"Set Inhibit"]; }
-- (IBAction) resetPageManagerAction:(id)sender	{ [self do:@selector(writePageManagerReset) name:@"Reset Page Manager"]; }
-- (IBAction) releaseAllPagesAction:(id)sender	{ [self do:@selector(writeReleasePage) name:@"Release Pages"]; }
-
-- (IBAction) clearAllStatusErrorBitsAction:(id)sender		{ [self do:@selector(clearAllStatusErrorBits) name:@"Clear All Status Error+Flag Bits"]; }
+- (IBAction) enableCountersAction:(id)sender          { [self do:@selector(writeEnCnt)              name:@"Enable Counters"];                  }
+- (IBAction) disableCountersAction:(id)sender         { [self do:@selector(writeDisCnt)             name:@"Disable Counters"];                 }
+- (IBAction) clearCountersAction:(id)sender           { [self do:@selector(writeClrCnt)             name:@"Clear Counters"];                   }
+- (IBAction) activateSWRequestAction:(id)sender       { [self do:@selector(writeSwRq)               name:@"Active SW Request Interrupt"];      }
+- (IBAction) configureFPGAsAction:(id)sender          { [self do:@selector(writeFwCfg)              name:@"Config FPGAs"];                     }
+- (IBAction) tpStartAction:(id)sender                 { [self do:@selector(writeTpStart)            name:@"Test Pattern Start"];               }
+- (IBAction) resetFLTAction:(id)sender                { [self do:@selector(writeFltReset)           name:@"FLT Reset"];                        }
+- (IBAction) resetSLTAction:(id)sender                { [self do:@selector(writeSltReset)           name:@"SLT Reset"];                        }
+- (IBAction) writeSWTrigAction:(id)sender             { [self do:@selector(writeSwTrigger)          name:@"SW Trigger"];                       }
+- (IBAction) writeClrInhibitAction:(id)sender         { [self do:@selector(writeClrInhibit)         name:@"Clr Inhibit"];                      }
+- (IBAction) writeSetInhibitAction:(id)sender         { [self do:@selector(writeSetInhibit)         name:@"Set Inhibit"];                      }
+- (IBAction) resetPageManagerAction:(id)sender        { [self do:@selector(writePageManagerReset)   name:@"Reset Page Manager"];               }
+- (IBAction) releaseAllPagesAction:(id)sender         { [self do:@selector(writeReleasePage)        name:@"Release Pages"];                    }
+- (IBAction) clearAllStatusErrorBitsAction:(id)sender { [self do:@selector(clearAllStatusErrorBits) name:@"Clear All Status Error+Flag Bits"]; }
 
 - (IBAction) sendCommandScript:(id)sender
 {
@@ -884,16 +825,10 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
             BOOL rememberState = [[model sbcLink] forceReload];
             if(rememberState) [[model sbcLink] setForceReload: NO];
             [model sendSimulationConfigScriptON];
-            //[self connectionAction: nil];
-            //[self toggleCrateAction: nil];
-            //[[model sbcLink] startCrate]; //If "Force reload" is checked the readout code will be loaded again and overwrite the simulation mode! -tb-
-            //   [[model sbcLink] startCrateProcess]; //If "Force reload" is checked the readout code will be loaded again and overwrite the simulation mode! -tb-
-            //[[model sbcLink] startCrate];
             if(rememberState !=[[model sbcLink] forceReload]) [[model sbcLink] setForceReload: rememberState];
         }
     }];
 #else
-    //[self killCrateAction: nil];//TODO: this seems not to be modal ??? -tb- 2010-04-27
     NSBeginAlertSheet(@"This will KILL the crate process before compiling and starting simulation mode. \nThere may be other ORCAs connected to the crate. You need to do a 'Force reload' before.",
                       @"Cancel",
                       @"Yes, Kill Crate",
@@ -908,18 +843,11 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _SLTv4killCrateAndStartSimDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
-//NSLog(@"This is my _killCrateDidEnd: -tb-\n");
-	//called
-	if(returnCode == NSAlertAlternateReturn){		
+	if(returnCode == NSAlertAlternateReturn){
 		[[model sbcLink] killCrate]; //XCode says "No '-killCrate' method found!" but it is found during runtime!! -tb- How to get rid of this warning?
 		BOOL rememberState = [[model sbcLink] forceReload];
 		if(rememberState) [[model sbcLink] setForceReload: NO];
 		[model sendSimulationConfigScriptON];  
-		//[self connectionAction: nil];
-		//[self toggleCrateAction: nil];
-		//[[model sbcLink] startCrate]; //If "Force reload" is checked the readout code will be loaded again and overwrite the simulation mode! -tb-
-		//   [[model sbcLink] startCrateProcess]; //If "Force reload" is checked the readout code will be loaded again and overwrite the simulation mode! -tb-
-		//[[model sbcLink] startCrate];
 		if(rememberState !=[[model sbcLink] forceReload]) [[model sbcLink] setForceReload: rememberState];
 	}
 }
@@ -930,8 +858,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[model sendSimulationConfigScriptOFF];  
 	NSLog(@"Sending simulation-mode-off script is still under development. If it fails just stop and force-reload-start the crate.\n");
 }
-
-
 
 - (IBAction) sendLinkWithDmaLibConfigScriptON:(id)sender
 {
@@ -948,15 +874,8 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
             [[model sbcLink] killCrate]; //XCode says "No '-killCrate' method found!" but it is found during runtime!! -tb- How to get rid of this warning?
             BOOL rememberState = [[model sbcLink] forceReload];
             if(rememberState) [[model sbcLink] setForceReload: NO];
-            //if(rememberState) [[model sbcLink] reloadClient];
-            //sleep(2);
             [model sendLinkWithDmaLibConfigScriptON];  //this is not blocking but the script will run for several seconds so all subsequent commands shouldn't rely on the script! -tb-
-            //[self connectionAction: nil];
-            //[self toggleCrateAction: nil];
-            //[[model sbcLink] startCrate]; //If "Force reload" is checked the readout code will be loaded again and overwrite the simulation mode! -tb-
-            //   [[model sbcLink] startCrateProcess]; //If "Force reload" is checked the readout code will be loaded again and overwrite the simulation mode! -tb-
-            //[[model sbcLink] startCrate];
-            if(rememberState !=[[model sbcLink] forceReload]) [[model sbcLink] setForceReload: rememberState];
+             if(rememberState !=[[model sbcLink] forceReload]) [[model sbcLink] setForceReload: rememberState];
         }
     }];
 #else
@@ -985,14 +904,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 		[[model sbcLink] killCrate]; //XCode says "No '-killCrate' method found!" but it is found during runtime!! -tb- How to get rid of this warning?
 		BOOL rememberState = [[model sbcLink] forceReload];
 		if(rememberState) [[model sbcLink] setForceReload: NO];
-		//if(rememberState) [[model sbcLink] reloadClient];
-		//sleep(2);
 		[model sendLinkWithDmaLibConfigScriptON];  //this is not blocking but the script will run for several seconds so all subsequent commands shouldn't rely on the script! -tb-
-		//[self connectionAction: nil];
-		//[self toggleCrateAction: nil];
-		//[[model sbcLink] startCrate]; //If "Force reload" is checked the readout code will be loaded again and overwrite the simulation mode! -tb-
-		//   [[model sbcLink] startCrateProcess]; //If "Force reload" is checked the readout code will be loaded again and overwrite the simulation mode! -tb-
-		//[[model sbcLink] startCrate];
 		if(rememberState !=[[model sbcLink] forceReload]) [[model sbcLink] setForceReload: rememberState];
 	}
 }
@@ -1000,11 +912,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (IBAction) sendLinkWithDmaLibConfigScriptOFF:(id)sender
 {
-#if 0
-  //TODO: in fact I would like to run the script and recompile the code without reload; but I did not mane it up to now -tb-
-	[model sendLinkWithDmaLibConfigScriptOFF];  
-	NSLog(@"Sending link-with-dma-lib script is still under development. If it fails just stop and force-reload-start the crate.\n");
-#else
+
 #if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
     NSAlert *alert = [[[NSAlert alloc] init] autorelease];
     [alert setMessageText:@"This will KILL the crate process before compiling and starting using DMA mode. \nThere may be other ORCAs connected to the crate. You need to do a 'Force reload' before."];
@@ -1039,13 +947,10 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                       nil,
                       nil,@"Is this really what you want?");
 #endif
-#endif
 }
 
 - (void) _SLTv4killCrateAndStartLinkWithoutDMADidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
-//NSLog(@"This is my _killCrateDidEnd: -tb-\n");
-	//called
 #if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 	if(returnCode == NSAlertFirstButtonReturn){
 #else
@@ -1055,18 +960,9 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 		BOOL rememberState = [[model sbcLink] forceReload];
 		if(rememberState) [[model sbcLink] setForceReload: NO];
 	    [model sendLinkWithDmaLibConfigScriptOFF];  
-		//[self connectionAction: nil];
-		//[self toggleCrateAction: nil];
-		//[[model sbcLink] startCrate]; //If "Force reload" is checked the readout code will be loaded again and overwrite the simulation mode! -tb-
-		//   [[model sbcLink] startCrateProcess]; //If "Force reload" is checked the readout code will be loaded again and overwrite the simulation mode! -tb-
-		//[[model sbcLink] startCrate];
 		if(rememberState !=[[model sbcLink] forceReload]) [[model sbcLink] setForceReload: rememberState];
 	}
 }
-
-
-
-
 
 - (IBAction) pulserAmpAction: (id) sender
 {
@@ -1122,11 +1018,11 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (IBAction) calibrateAction:(id)sender
 {
 #if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
-    [alert setMessageText:@"Threshold Calibration"];
-    [alert setInformativeText:@"Really run threshold calibration for ALL FLTs?\n This will change ALL thresholds on ALL cards."];
-    [alert addButtonWithTitle:@"Yes/Do Calibrate"];
-    [alert addButtonWithTitle:@"Cancel"];
+    NSAlert* alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:      @"Threshold Calibration"];
+    [alert setInformativeText:  @"Really run threshold calibration for ALL FLTs?\n This will change ALL thresholds on ALL cards."];
+    [alert addButtonWithTitle:  @"Yes/Do Calibrate"];
+    [alert addButtonWithTitle:  @"Cancel"];
     [alert setAlertStyle:NSWarningAlertStyle];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
@@ -1162,6 +1058,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
     }    
 }
 #endif
+    
 - (void) do:(SEL)aSelector name:(NSString*)aName
 {
 	@try { 

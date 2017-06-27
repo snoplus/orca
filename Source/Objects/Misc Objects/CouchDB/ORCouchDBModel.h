@@ -49,6 +49,7 @@
     int             alertType;
     NSString*       thisHostAdress;
     BOOL            scheduledForRunInfoUpdate;
+    BOOL            skipDataSets;
 }
 
 #pragma mark ***Initialization
@@ -74,6 +75,8 @@
 - (void) postOrPutCustomRecord:(NSDictionary*)aRecord dataBaseRef:(ORCouchDB*)aDataBaseRef;
 
 #pragma mark ***Accessors
+- (BOOL) skipDataSets;
+- (void) setSkipDataSets:(BOOL)aSkipDataSets;
 - (int) alertType;
 - (void) setAlertType:(int)aAlertType;
 - (NSString*) alertMessage;
@@ -147,6 +150,7 @@
 - (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
+extern NSString* ORCouchDBModelSkipDataSetsChanged;
 extern NSString* ORCouchDBModelAlertTypeChanged;
 extern NSString* ORCouchDBModelAlertMessageChanged;
 extern NSString* ORCouchDBModelReplicationRunningChanged;

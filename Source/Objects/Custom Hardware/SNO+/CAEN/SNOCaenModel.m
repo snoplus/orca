@@ -215,6 +215,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
         [self initBoard];
         [self writeNumberBLTEvents:0];
         [self writeEnableBerr:0];
+        [self writeEnableExtendedReadoutBuffer:1];
         [self writeAcquisitionControl:YES];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor], @"error loading CAEN hardware: %@\n",
@@ -1144,6 +1145,24 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     unsigned long aValue = (enable) ? 1 : 0;
 
     [self write:kBLTEventNum sendValue:aValue];
+}
+
+- (void) writeEnableExtendedReadoutBuffer:(BOOL)enable
+{
+    /* Enable/disable the extended readout buffer. The normal readout buffer is
+     * mapped to 4kB of address space, however there is an undocumented bit in
+     * the vme control register which, if enabled, extends this space to ~16MB.
+     * */
+    unsigned long aValue;
+    [self read:kVMEControl returnValue:&aValue];
+
+    if (enable) {
+        aValue |= 0x100;
+    } else {
+        aValue &= 0xffffffeff;
+    }
+
+    [self write:kVMEControl sendValue:aValue];
 }
 
 - (void) writeEnableBerr:(BOOL)enable
