@@ -1250,7 +1250,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         [mtc loadCoarseDelayToHardware];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
-                   @"error setting the MTCD coarse delay. error: "
+                   @"pingCratesAtRunStart: error setting the MTCD coarse delay. error: "
                     "%@ reason: %@\n", [e name], [e reason]);
         return;
     }
@@ -1261,7 +1261,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         [mtc loadFineDelayToHardware];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
-                   @"error setting the MTCD fine delay. error: "
+                   @"pingCratesAtRunStart: error setting the MTCD fine delay. error: "
                     "%@ reason: %@\n", [e name], [e reason]);
         return;
     }
@@ -1272,7 +1272,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         [mtc loadPedWidthToHardware];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
-                   @"error setting the MTCD pedestal width. error: "
+                   @"pingCratesAtRunStart: error setting the MTCD pedestal width. error: "
                     "%@ reason: %@\n", [e name], [e reason]);
         return;
     }
@@ -1292,7 +1292,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         tubii_dac = [tubii MTCAMimic1_ThresholdInBits];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
-                   @"error getting TUBii trigger masks or dac value. error: "
+                   @"pingCratesAtRunStart: error getting TUBii trigger masks or dac value. error: "
                     "%@ reason: %@\n", [e name], [e reason]);
         return;
     }
@@ -1307,7 +1307,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         [tubii setMTCAMimic1_ThresholdInBits:0];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
-                   @"error setting TUBii trigger masks or dac value. error: "
+                   @"pingCratesAtRunStart: error setting TUBii trigger masks or dac value. error: "
                     "%@ reason: %@\n", [e name], [e reason]);
         return;
     }
@@ -1324,7 +1324,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
             [mtc loadPedestalCrateMaskToHardware];
         } @catch (NSException *e) {
             NSLogColor([NSColor redColor],
-                       @"error setting the MTCD crate pedestal mask. error: "
+                       @"pingCratesAtRunStart: error setting the MTCD crate pedestal mask. error: "
                         "%@ reason: %@\n", [e name], [e reason]);
             continue;
         }
@@ -1348,7 +1348,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 
             if ([xl3 multiSetPedestalMask:[xl3 getSlotsPresent]
                      patterns:channelMasks]) {
-                NSLogColor([NSColor redColor], @"failed to set pedestal mask "
+                NSLogColor([NSColor redColor], @"pingCratesAtRunStart: failed to set pedestal mask "
                             "for crate %02d slot %02d\n", i, j);
                 continue;
             }
@@ -1371,7 +1371,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
                 [mtc firePedestals:1 withRate:1];
             } @catch (NSException *e) {
                 NSLogColor([NSColor redColor],
-                           @"failed to fire pedestal. error: %@ reason: %@\n",
+                           @"pingCratesAtRunStart: failed to fire pedestal. error: %@ reason: %@\n",
                            [e name], [e reason]);
             }
 
@@ -1403,7 +1403,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         [tubii setMTCAMimic1_ThresholdInBits:tubii_dac];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
-                   @"error setting TUBii trigger masks or dac value. error: "
+                   @"pingCratesAtRunStart: error setting TUBii trigger masks or dac value. error: "
                     "%@ reason: %@\n", [e name], [e reason]);
     }
 
@@ -1413,7 +1413,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         [mtc loadPedestalCrateMaskToHardware];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
-                   @"error setting the MTCD crate pedestal mask. error: "
+                   @"pingCratesAtRunStart: error setting the MTCD crate pedestal mask. error: "
                     "%@ reason: %@\n", [e name], [e reason]);
     }
 
@@ -1423,7 +1423,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         [mtc loadCoarseDelayToHardware];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
-                   @"error setting the MTCD coarse delay. error: "
+                   @"pingCratesAtRunStart: error setting the MTCD coarse delay. error: "
                     "%@ reason: %@\n", [e name], [e reason]);
     }
 
@@ -1433,7 +1433,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         [mtc loadFineDelayToHardware];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
-                   @"error setting the MTCD fine delay. error: "
+                   @"pingCratesAtRunStart: error setting the MTCD fine delay. error: "
                     "%@ reason: %@\n", [e name], [e reason]);
     }
 
@@ -1443,7 +1443,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         [mtc loadPedWidthToHardware];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
-                   @"error setting the MTCD pedestal width. error: "
+                   @"pingCratesAtRunStart: error setting the MTCD pedestal width. error: "
                     "%@ reason: %@\n", [e name], [e reason]);
     }
 
@@ -1454,7 +1454,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         [mtc loadPulserRateToHardware];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
-                   @"error setting the pulser rate. error: "
+                   @"pingCratesAtRunStart: error setting the pulser rate. error: "
                     "%@ reason: %@\n", [e name], [e reason]);
     }
 }
@@ -1496,7 +1496,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         [mtc loadPedestalCrateMaskToHardware];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
-                   @"error setting the MTCD crate pedestal mask. error: "
+                   @"pingCrates: error setting the MTCD crate pedestal mask. error: "
                     "%@ reason: %@\n", [e name], [e reason]);
         return;
     }
@@ -1508,7 +1508,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         if ([[xl3 xl3Link] isConnected]) {
             if ([xl3 setPedestalMask:[xl3 getSlotsPresent] pattern:0]) {
                 NSLogColor([NSColor redColor],
-                           @"failed to set pedestal mask for crate %02d\n", i);
+                           @"pingCrates: failed to set pedestal mask for crate %02d\n", i);
                 continue;
             }
         }
@@ -1523,7 +1523,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
             if ([xl3 setPedestalMask:[xl3 getSlotsPresent]
                  pattern:0xffffffff]) {
                 NSLogColor([NSColor redColor],
-                           @"failed to set pedestal mask for crate %02d\n", i);
+                           @"pingCrates: failed to set pedestal mask for crate %02d\n", i);
                 continue;
             }
 
@@ -1531,14 +1531,14 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
                 [mtc firePedestals:1 withRate:1];
             } @catch (NSException *e) {
                 NSLogColor([NSColor redColor],
-                           @"failed to fire pedestal. error: %@ reason: %@\n",
+                           @"pingCrates: failed to fire pedestal. error: %@ reason: %@\n",
                            [e name], [e reason]);
             }
 
             /* Set pedestal mask back to 0. */
             if ([xl3 setPedestalMask:[xl3 getSlotsPresent] pattern:0]) {
                 NSLogColor([NSColor redColor],
-                           @"failed to set pedestal mask for crate %02d\n", i);
+                           @"pingCrates: failed to set pedestal mask for crate %02d\n", i);
                 continue;
             }
 
@@ -1561,7 +1561,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         [mtc loadPedestalCrateMaskToHardware];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
-                   @"error setting the MTCD crate pedestal mask. error: "
+                   @"pingCrates: error setting the MTCD crate pedestal mask. error: "
                     "%@ reason: %@\n", [e name], [e reason]);
     }
 
@@ -1572,7 +1572,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         [mtc loadPulserRateToHardware];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
-                   @"error setting the pulser rate. error: "
+                   @"pingCrates: error setting the pulser rate. error: "
                     "%@ reason: %@\n", [e name], [e reason]);
     }
 }

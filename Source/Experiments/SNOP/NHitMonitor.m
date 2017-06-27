@@ -17,6 +17,7 @@
 #import "ORGlobal.h"
 #import "RedisClient.h"
 #import "ORMTC_Constants.h"
+#import "TUBiiModel.h"
 
 #define SWAP_INT32(a,b) swap_int32((uint32_t *)(a),(b))
 
@@ -398,6 +399,8 @@ err:
     int i;
     ORFec32Model *fec;
     int slot, channel;
+    uint32_t sync_trigger_mask, async_trigger_mask, tubii_dac;
+    TUBiiModel* tubii;
 
     int crate = [[args objectForKey:@"crate"] intValue];
     int pulserRate = [[args objectForKey:@"pulserRate"] intValue];
@@ -413,6 +416,17 @@ err:
     }
 
     snop = [snops objectAtIndex:0];
+
+    NSArray* tubiis = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
+
+    if ([tubiis count] == 0) {
+        NSLogColor([NSColor redColor],
+                   @"nhit monitor: couldn't find TUBii object.\n");
+        return;
+    }
+
+    tubii = [tubiis objectAtIndex:0];
 
     /* Since we are running in a separate thread, it's easiest to just open
      * up a new connection to the mtc server instead of having to dispatch
@@ -522,6 +536,31 @@ err:
         goto err;
     }
 
+    if (gt_mask & MTC_EXT_2_MASK) {
+        NSLogColor([NSColor redColor], @"nhit monitor: EXT2 is masked in, so can't run nhit monitor.\n");
+        [self disconnect];
+        goto err;
+    }
+
+    @try {
+        sync_trigger_mask = [tubii syncTrigMask];
+        async_trigger_mask = [tubii asyncTrigMask];
+        tubii_dac = [tubii MTCAMimic1_ThresholdInBits];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"nhit monitor: error getting TUBii trigger masks or dac value. "
+                    "error: %@ reason: %@\n", [e name], [e reason]);
+        [self disconnect];
+        goto err;
+    }
+
+    if (sync_trigger_mask != 0 || async_trigger_mask != 0) {
+        NSLogColor([NSColor redColor],
+                   @"nhit monitor: tubii already has triggers enabled.\n");
+        [self disconnect];
+        goto err;
+    }
+
     @try {
         /* Initialize the MTC settings for the nhit monitor. */
         [mtc okCommand:"disable_pulser"];
@@ -531,6 +570,13 @@ err:
         [mtc okCommand:"set_coarse_delay %i", COARSE_DELAY];
         [mtc okCommand:"set_fine_delay %i", FINE_DELAY];
         [mtc okCommand:"set_pedestal_width %i", PEDESTAL_WIDTH];
+
+        /* Set the EXT2 trigger signal high so that it gets latched in every
+         * event while we run the nhit monitor. This is to mark these events so
+         * that if we find out that changing the pedestal mask while running
+         * causes noise or other problems we can throw these events out. */
+        [tubii setTrigMask:0x10000 setAsyncMask:0];
+        [tubii setMTCAMimic1_ThresholdInBits:0];
 
         /* turn off all pedestals */
         [xl3 setPedestalMask:[xl3 getSlotsPresent] pattern:0];
@@ -564,6 +610,16 @@ err:
 
         /* turn off all pedestals */
         [xl3 setPedestalMask:[xl3 getSlotsPresent] pattern:0];
+
+        /* Reset tubii's trigger masks and DAC value. */
+        @try {
+            [tubii setTrigMask:0 setAsyncMask:0];
+            [tubii setMTCAMimic1_ThresholdInBits:tubii_dac];
+        } @catch (NSException *e) {
+            NSLogColor([NSColor redColor],
+                       @"error setting TUBii trigger masks or dac value. error: "
+                        "%@ reason: %@\n", [e name], [e reason]);
+        }
 
         /* Disconnect from the data server. */
         [self disconnect];
