@@ -195,7 +195,7 @@ static int get_nhit_trigger_count(char *err, RedisClient *mtc, int sock, char *b
 
     [notifyCenter addObserver : self
                      selector : @selector(orcaAboutToQuit:)
-                         name : OROrcaAboutToQuitNotification
+                         name : OROrcaAboutToQuitNotice
                        object : nil];
 }
 
