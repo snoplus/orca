@@ -370,7 +370,7 @@ err:
         snop = [snops objectAtIndex:0];
 
         /* Try to acquire the lock for 10 seconds. If we can't get it then we
-         * just skip the ping crates. */
+         * just skip running the nhit monitor. */
         if ([[snop ecaLock] lockBeforeDate:[NSDate dateWithTimeIntervalSinceNow:10.0]]) {
             @try {
                 [self _run:args];
