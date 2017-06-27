@@ -867,6 +867,12 @@ err:
         [self pingCratesAtRunStart];
     }
 
+    if ([gOrcaGlobals runType] & kPhysicsRun) {
+        /* If this is a physics run, we ping each slot in the detector once at
+         * the beginning of the run to look for any trigger issues. */
+        [self pingCratesAtRunStart];
+    }
+
     return;
 
 err:
