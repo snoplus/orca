@@ -30,7 +30,7 @@ static katrinv4FLTRegNamesStruct regV4FLT[kFLTV4NumRegs] = {
     {@"Status",			 0x0000, kReadOnly,               kFLTV4StatusReg          },
     {@"Control",		 0x0004, kReadWrite,              kFLTV4ControlReg         },
     {@"Command",		 0x0008, kReadWrite,              kFLTV4CommandReg         },
-    {@"CFPGAVersion",	 0x000c, kReadOnly,               kFLTV4VersionReg         },
+    {@"CFPGAVersion",	 0x000C, kReadOnly,               kFLTV4VersionReg         },
     {@"FPGA8Version",	 0x0010, kReadOnly,               kFLTV4pVersionReg        },
     {@"BoardIDLSB",      0x0014, kReadOnly,               kFLTV4BoardIDLsbReg      },
     {@"BoardIDMSB",      0x0018, kReadOnly,               kFLTV4BoardIDMsbReg      },
@@ -48,10 +48,11 @@ static katrinv4FLTRegNamesStruct regV4FLT[kFLTV4NumRegs] = {
     {@"HistRecTime",     0x0050, kReadOnly,               kFLTV4HistRecTimeReg     },
     {@"HistNumMeas",     0x0054, kReadOnly,               kFLTV4HistNumMeasReg     },
     {@"PostTrigger",     0x0058, kReadWrite,              kFLTV4PostTrigger        },
+    {@"EnergyOffset",	 0x005C, kReadWrite,              kFLTV4EnergyOffsetReg    },
     {@"Threshold",       0x2080, kReadWrite | kChanReg,   kFLTV4ThresholdReg       },
     {@"pStatusA",        0x2000, kReadWrite | kChanReg,   kFLTV4pStatusA           },
-    {@"pStatusB",        0x6000, kReadOnly,               kFLTV4pStatusB           },
-    {@"pStatusC",        0x26000,kReadOnly,               kFLTV4pStatusC           },
+    {@"pStatusB",        0x12000,kReadOnly,               kFLTV4pStatusB           },
+    {@"pStatusC",        0x52000,kReadOnly,               kFLTV4pStatusC           },
     {@"Analog Offset",   0x1000, kReadOnly,               kFLTV4AnalogOffset       },
     {@"Gain",			 0x1004, kReadWrite | kChanReg,   kFLTV4GainReg            },
     {@"Hit Rate",		 0x1100, kReadOnly  | kChanReg,   kFLTV4HitRateReg         },
@@ -62,7 +63,6 @@ static katrinv4FLTRegNamesStruct regV4FLT[kFLTV4NumRegs] = {
     {@"HistPageN",		 0x200C, kReadOnly,               kFLTV4HistPageNReg       },
     {@"HistLastFirst",	 0x2044, kReadOnly,               kFLTV4HistLastFirstReg   },
     {@"TestPattern",	 0x1400, kReadWrite,              kFLTV4TestPatternReg     },
-    {@"EnergyOffset",	 0x005C, kReadWrite,              kFLTV4EnergyOffsetReg    },
 };
 
 @implementation ORKatrinV4FLTRegisters
