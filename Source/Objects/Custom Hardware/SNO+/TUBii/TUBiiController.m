@@ -70,10 +70,10 @@
                          name : ORTubiiLockNotification
                        object : nil];
 
-//    [notifyCenter addObserver : self
-//                     selector : @selector(tubiiCurrentStateChanged:)
-//                         name : ORTubiiSettingsChangedNotification
-//                       object : nil];
+    [notifyCenter addObserver : self
+                     selector : @selector(tubiiCurrentStateChanged:)
+                         name : ORTubiiSettingsChangedNotification
+                       object : nil];
 
 }
 
@@ -201,6 +201,8 @@
     /* Change GUI to match the current state of the model */
     // TrigMasks
     struct TUBiiState theTUBiiState = [model currentState];
+
+    NSLogColor([NSColor redColor], @"tubiiCurrentStateChanged: 0x%X\n",theTUBiiState.counterMask);
     NSUInteger trigMaskVal = (theTUBiiState.syncTrigMask | theTUBiiState. asyncTrigMask);
     NSUInteger syncMaskVal = 16777215 - theTUBiiState.asyncTrigMask;
     [self SendBitInfo:trigMaskVal FromBit:0 ToBit:24 ToCheckBoxes:TrigMaskSelect];
@@ -242,7 +244,14 @@
     else {
         [LO_SrcSelect selectCellWithTag:2];
     }
-    [self LOSrcSelectChanged:self];
+    if([[LO_SrcSelect selectedCell] tag]==1){ //MTCD is selected
+        [LO_Field setEnabled:NO];
+        [LO_Slider setEnabled:NO];
+    }
+    else { //TUBii is selected
+        [LO_Field setEnabled:YES];
+        [LO_Slider setEnabled:YES];
+    }
     //MTCA mimic
     float ThresholdValue = [model MTCAMimic_BitsToVolts:theTUBiiState.MTCAMimic1_ThresholdInBits];
     [MTCAMimic_Slider setFloatValue:ThresholdValue];
@@ -668,14 +677,8 @@
     [self SendBitInfo:maskVal FromBit:0 ToBit:16 ToCheckBoxes:SpeakerMaskSelect_1];
     [self SendBitInfo:maskVal FromBit:16 ToBit:32 ToCheckBoxes:SpeakerMaskSelect_2];
 }
-- (IBAction)CounterCheckBoxChanged:(id)sender {
-    NSUInteger maskVal = [self GetBitInfoFromCheckBoxes:CounterMaskSelect_1 FromBit:0 ToBit:16];
-    maskVal |= [self GetBitInfoFromCheckBoxes:CounterMaskSelect_2 FromBit:16 ToBit:32]<<16;
-    [CounterMaskField setStringValue:[NSString stringWithFormat:@"%@",@(maskVal)]];
-}
 - (IBAction)CounterFieldChanged:(id)sender {
     NSUInteger maskVal =[CounterMaskField integerValue];
-
     [self SendBitInfo:maskVal FromBit:0 ToBit:16 ToCheckBoxes:CounterMaskSelect_1];
     [self SendBitInfo:maskVal FromBit:16 ToBit:32 ToCheckBoxes:CounterMaskSelect_2];
 }
@@ -821,42 +824,15 @@
     [self LOSrcSelectChanged:self];
 }
 
-- (IBAction)LOSrcSelectChanged:(id)sender {
-    if([[LO_SrcSelect selectedCell] tag]==1){ //MTCD is selected
-        [LO_Field setEnabled:NO];
-        [LO_Slider setEnabled:NO];
-    }
-    else { //TUBii is selected
-        [LO_Field setEnabled:YES];
-        [LO_Slider setEnabled:YES];
-    }
-}
-- (IBAction)LODelayLengthTextFieldChagned:(id)sender {
-    NSTextField *field = nil;
-    NSSlider *slider = nil;
-    if ([sender tag]==1){
-        field = LO_Field;
-        slider = LO_Slider;
+- (IBAction)LOSrcSelectAction:(id)sender {
+    if([[LO_SrcSelect selectedCell] tag] ==1){
+        //MTCD is LO Src is selected
+        [model setTUBiiIsLOSrcInState:NO];
     }
     else {
-        field = DGT_Field;
-        slider = DGT_Slider;
+        //TUBii is LO Src is selected
+        [model setTUBiiIsLOSrcInState:YES];
     }
-    float val = [field floatValue];
-    [slider setFloatValue:val];
-}
-- (IBAction)LODelayLengthSliderChagned:(id)sender {
-    NSTextField *field = nil;
-    NSSlider *slider = nil;
-    if ([sender tag]==1){
-        field = LO_Field;
-        slider = LO_Slider;
-    }
-    else {
-        field = DGT_Field;
-        slider = DGT_Slider;
-    }
-    [field setIntegerValue:[slider integerValue]];
 }
 
 - (IBAction)ResetClock:(id)sender {
@@ -886,14 +862,6 @@
     }
 }
 
-- (IBAction)MTCAMimicTextFieldChanged:(id)sender {
-    //Used to keep the MTCA Mimic slider and text field in sync
-    [MTCAMimic_Slider setFloatValue:[MTCAMimic_TextField floatValue]];
-}
-- (IBAction)MTCAMimicSliderChanged:(id)sender {
-    //Used to keep the MTCA Mimic slider and text field in sync
-    [MTCAMimic_TextField setStringValue:[NSString stringWithFormat:@"%.3f",[MTCAMimic_Slider floatValue]]];
-}
 - (IBAction)MTCAMimicMatchHardware:(id)sender {
     NSUInteger ThresholdValue;
     @try {
@@ -998,37 +966,27 @@
 
 }
 
-- (IBAction)SpeakerMaskAction:(id)sender {
+- (IBAction)SpeakerCounterMaskAction:(id)sender {
 
-    NSUInteger maskVal = [self GetBitInfoFromCheckBoxes:SpeakerMaskSelect_1 FromBit:0 ToBit:16];
-    maskVal |= [self GetBitInfoFromCheckBoxes:SpeakerMaskSelect_2 FromBit:16 ToBit:32]<<16;
-    [SpeakerMaskField setStringValue:[NSString stringWithFormat:@"%@",@(maskVal)]];
-
-    maskVal=0;
-    NSMatrix *maskSelect_1 =nil;
-    NSMatrix *maskSelect_2 =nil;
+    NSUInteger maskVal=0;
     if ([sender tag] ==1){
-        maskSelect_1 = SpeakerMaskSelect_1;
-        maskSelect_2 = SpeakerMaskSelect_2;
+        maskVal = [self GetBitInfoFromCheckBoxes:SpeakerMaskSelect_1 FromBit:0 ToBit:16];
+        maskVal |= [self GetBitInfoFromCheckBoxes:SpeakerMaskSelect_2 FromBit:16 ToBit:32]<<16;
+        [SpeakerMaskField setStringValue:[NSString stringWithFormat:@"%@",@(maskVal)]];
+        [model setSpeakerMaskInState:maskVal];
     }
     else if ([sender tag]==2){
-        maskSelect_1 = CounterMaskSelect_1;
-        maskSelect_2 = CounterMaskSelect_2;
-    }
+        maskVal = [self GetBitInfoFromCheckBoxes:CounterMaskSelect_1 FromBit:0 ToBit:16];
+        maskVal |= ([self GetBitInfoFromCheckBoxes:CounterMaskSelect_2 FromBit:16 ToBit:32]<<16);
+        [CounterMaskField setStringValue:[NSString stringWithFormat:@"%@",@(maskVal)]];
 
-    maskVal = [self GetBitInfoFromCheckBoxes:maskSelect_1 FromBit:0 ToBit:16];
-    maskVal |= [self GetBitInfoFromCheckBoxes:maskSelect_2 FromBit:16 ToBit:32];
-
-    if ([sender tag] ==1) {
-        [model setSpeakerMaskInState:maskVal];
-    } else if ([sender tag] ==2){
+        NSLogColor([NSColor redColor], @"SpeakerCounterMaskAction: 0x%X\n",maskVal);
         [model setCounterMaskInState:maskVal];
     }
+
 }
 
 - (IBAction)CounterMaskAction:(id)sender {
-
-    [self SpeakerMaskAction:sender];
 
     CONTROL_REG_MASK newControlReg;
     newControlReg = [model currentState].controlReg;
@@ -1038,14 +996,18 @@
 
     [model setControlRegInState:newControlReg];
 
-    if ([[CounterModeSelect selectedCell] tag] ==1) {
+}
+
+- (IBAction)CounterModeAction:(id)sender {
+
+    if ([CounterModeSelect selectedColumn] == 0) {
         //Rate Mode is selected
         [model setCounterModeInState:YES];
     }
     else { //Totalizer Mode is selected
         [model setCounterModeInState:NO];
     }
-
+    
 }
 
 - (IBAction)MTCAMimicAction:(id)sender {
@@ -1063,14 +1025,6 @@
     }
     [model setGTDelaysBitsInState:[model DGT_NanoSecondsToBits:DGT_Delay] LOBits:[model LODelay_NanoSecondsToBits:LO_Delay]];
 
-    if([[LO_SrcSelect selectedCell] tag] ==1){
-        //MTCD is LO Src is selected
-        [model setTUBiiIsLOSrcInState:NO];
-    }
-    else {
-        //TUBii is LO Src is selected
-        [model setTUBiiIsLOSrcInState:YES];
-    }
 }
 
 - (IBAction)ClockSourceAction:(id)sender {
@@ -1095,7 +1049,7 @@
     //Helper function to send a bit value to a bunch of check boxes
     for (int i=low;i<high;i++)
     {
-        if((maskVal & 1<<(i-low)) >0)
+        if( (maskVal & 1<<i)>0 )
         {
             [[aMatrix cellWithTag:i] setState:1];
         }

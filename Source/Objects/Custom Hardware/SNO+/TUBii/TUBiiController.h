@@ -160,25 +160,19 @@
 - (IBAction)CounterMatchHardware:(id)sender;
 - (IBAction)SpeakerLoadMask:(id)sender;
 - (IBAction)CounterLoadMask:(id)sender;
-- (IBAction)SpeakerCheckBoxChanged:(id)sender;
 - (IBAction)SpeakerFieldChanged:(id)sender;
 - (IBAction)SpeakerCounterCheckAll:(id)sender;
 - (IBAction)SpeakerCounterUnCheckAll:(id)sender;
 
-- (IBAction)CounterCheckBoxChanged:(id)sender;
 - (IBAction)CounterFieldChanged:(id)sender;
 - (IBAction)AdvancedOptionsButtonChanged:(id)sender;
 
 - (IBAction)GTDelaysMatchHardware:(id)sender;
 - (IBAction)GTDelaysLoadMask:(id)sender;
 - (IBAction)LOSrcSelectChanged:(id)sender;
-- (IBAction)LODelayLengthTextFieldChagned:(id)sender;
-- (IBAction)LODelayLengthSliderChagned:(id)sender;
 - (IBAction)ResetClock:(id)sender;
 
 - (IBAction)ECAEnableChanged:(id)sender;
-- (IBAction)MTCAMimicTextFieldChanged:(id)sender;
-- (IBAction)MTCAMimicSliderChanged:(id)sender;
 - (IBAction)MTCAMimicMatchHardware:(id)sender;
 - (IBAction)MTCAMimicLoadValue:(id)sender;
 - (IBAction)LoadClockSource:(id)sender;
