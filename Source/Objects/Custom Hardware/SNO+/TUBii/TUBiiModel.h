@@ -100,7 +100,6 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
 
 @interface TUBiiModel : OrcaObject{
 @private
-    struct TUBiiState currentState;
     float smellieRate;
     float tellieRate;
     float pulserRate;
@@ -116,6 +115,8 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
     int portNumber;
     NSString* strHostName;//"192.168.80.25";
     NSThread* _keepAliveThread;
+@public
+    struct TUBiiState currentState;
 }
 @property (readonly) BOOL solitaryObject; //Prevents there from being two TUBiis
 @property (nonatomic) int portNumber;
@@ -167,10 +168,12 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
 - (void) sendCurrentStateToHW;
 - (void) setCurrentStateFromDict:(NSMutableDictionary*)settingsDict;
 - (void) setTrigMask:(NSUInteger)trigMask setAsyncMask:(NSUInteger)asyncMask;
+- (void) setTrigMaskInState:(NSUInteger)trigMask setAsyncMask:(NSUInteger)asyncMask;
 - (void) setBurstTrigger;
 - (void) setComboTrigger_EnableMask:(uint32_t) enableMask TriggerMask:(uint32_t) triggerMask;
 - (void) setPrescaleTrigger_Mask: (uint32_t) mask ByFactor:(uint32_t) factor;
 - (void) setTUBiiPGT_Rate: (float) rate;
+- (void) setTUBiiPGT_RateInState: (float) rate;
 - (void) setSmellieRate: (float) _rate;
 - (void) setTellieRate: (float) _rate;
 - (void) setPulserRate: (float) _rate;
@@ -193,7 +196,19 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
 - (void) setDataReadout: (BOOL) val;
 - (void) ResetFifo;
 - (void) setCaenMasks: (CAEN_CHANNEL_MASK)aChannelMask
-            GainMask:(CAEN_GAIN_MASK) aGainMask;
+             GainMask:(CAEN_GAIN_MASK) aGainMask;
+- (void) setCaenMasksInState: (CAEN_CHANNEL_MASK)aChannelMask
+             GainMask:(CAEN_GAIN_MASK) aGainMask;
+- (void) setSpeakerMask:(NSUInteger)_counterMask;
+- (void) setSpeakerMaskInState:(NSUInteger)_counterMask;
+- (void) setCounterMask:(NSUInteger)_counterMask;
+- (void) setCounterMaskInState:(NSUInteger)_counterMask;
+- (void) setControlRegInState:(CONTROL_REG_MASK)_controlReg;
+- (void) setCounterModeInState:(BOOL)mode;
+- (void) setMTCAMimic1_ThresholdInBitsInState:(NSUInteger)_MTCAMimic1_ThresholdInBits;
+- (void) setGTDelaysBitsInState:(NSUInteger)aDGTMask LOBits:(NSUInteger)aLOMask;
+- (void) setTUBiiIsLOSrcInState:(BOOL)isSrc;
+- (void) setTUBiiIsDefaultClockInState: (BOOL) IsDefault;
 - (void) ResetClock;
 - (void) setGTDelaysBits:(NSUInteger)aDGTMask LOBits:(NSUInteger)aLOMask;
 - (void) setGTDelaysInNS:(int)DGT LOValue:(int)LO;
