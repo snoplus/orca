@@ -1457,7 +1457,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
 	// 2013-11-14 bipolar energy update - changes in SLT registers (for versionCFPGA  >= 0x20010300  &&  versionFPGA8 >= 0x20010300) -tb-
 	//===================================================================================================================
         if(srack->theFlt[col]->isPresent()  && (forceFltReadoutFlag==kForceFltReadoutFlag)){
-            
+
             //static uint32_t currFlt = col;// only for better readability (started using it since EnergyTraceSync mode for HW data buffering)  -tb-
             
             
@@ -1467,6 +1467,8 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
             
             // --- ENERGY MODE ------------------------------
             if((daqRunMode == kIpeFltV4_EnergyDaqMode) || (daqRunMode == kIpeFltV4_VetoEnergyDaqMode) || (daqRunMode == kIpeFltV4_BipolarEnergyDaqMode)  ){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
+                
+
                 //uint32_t status         = srack->theFlt[col]->status->read();
                 //uint32_t fifoStatus;// = (status >> 24) & 0xf;
                 uint32_t fifoFlags;// =   FF, AF, AE, EF
@@ -1476,9 +1478,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                 uint32_t eventN;
                 for(eventN=0;eventN<10;eventN++){
                     hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = (hw4::FltKatrinEventFIFOStatus*)srack->theFlt[col]->eventFIFOStatus;//TODO: typing error in fdhwlib - remove cast after correction -tb-
-                    //fifoStatus = srack->theFlt[col]->eventFIFOStatus->read();//reads to cache
-                    //fifoStatus = eventFIFOStatus->read();//reads to cache
-                    //uint32_t fifoEmptyFlag = (fifoStatus>>28)&1;//srack->theFlt[col]->eventFIFOStatus->emptyFlag->getCache();
+                    eventFIFOStatus->read();//reads to cache
                     uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
                     //not needed for now - uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();//TODO: then we should read more than 10 events? -tb-
                     //not needed for now - uint32_t fifoFullFlag = eventFIFOStatus->fullFlag->getCache();//TODO: then we should clear the fifo and leave? -tb-
@@ -1494,8 +1494,6 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                     (eventFIFOStatus->almostFullFlag->getCache()	<< 2) |
                                     (eventFIFOStatus->almostEmptyFlag->getCache()	<< 1) |
                                     (eventFIFOStatus->emptyFlag->getCache());
-                                    
-                        //depending on 'diff' the loop should start here -tb-
                         
                         if(diff>0){
                             hw4::FltKatrinEventFIFO1 *eventFIFO1 = srack->theFlt[col]->eventFIFO1;
