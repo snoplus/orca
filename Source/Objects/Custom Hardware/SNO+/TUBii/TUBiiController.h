@@ -169,7 +169,6 @@
 
 - (IBAction)GTDelaysMatchHardware:(id)sender;
 - (IBAction)GTDelaysLoadMask:(id)sender;
-- (IBAction)LOSrcSelectChanged:(id)sender;
 - (IBAction)ResetClock:(id)sender;
 
 - (IBAction)ECAEnableChanged:(id)sender;

@@ -827,7 +827,6 @@
     else {
         [LO_SrcSelect selectCellWithTag:2];
     }
-    [self LOSrcSelectChanged:self];
 }
 
 - (IBAction)LOSrcSelectAction:(id)sender {
