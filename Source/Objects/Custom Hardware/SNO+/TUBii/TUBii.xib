@@ -86,7 +86,6 @@
                 <outlet property="sendMTCAButton" destination="MX5-Zj-gla" id="qp2-F6-ilg"/>
                 <outlet property="sendPrescaleButton" destination="WRT-qx-g2F" id="Lvc-2t-czu"/>
                 <outlet property="sendSpeakerButton" destination="6qo-Db-OUU" id="Ua3-yl-jZe"/>
-                <outlet property="sendTUBiiPGTButton" destination="ztc-pC-en0" id="KPE-6Q-7my"/>
                 <outlet property="sendTUBiiPGTStart" destination="ztc-pC-en0" id="v5J-MF-e5B"/>
                 <outlet property="sendTUBiiPGTStop" destination="9OO-c8-TZX" id="iMW-A7-H2E"/>
                 <outlet property="sendTriggerMaskButton" destination="oLy-3Y-DUA" id="utH-yL-T2h"/>
