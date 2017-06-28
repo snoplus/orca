@@ -62,6 +62,7 @@ NSString* ORMTCModelMTCAMaskChanged             = @"ORMTCModelMTCAMaskChanged";
 NSString* ORMTCModelIsPedestalEnabledInCSR      = @"ORMTCModelIsPedestalEnabledInCSR";
 NSString* ORMTCPulserRateChanged                = @"ORMTCPulserRateChanged";
 NSString* ORMTCGTMaskChanged                    = @"ORMTCGTMaskChanged";
+NSString* ORMTCLockOutWidth                    = @"ORMTCLockOutWidth";
 
 
 #define kMTCRegAddressBase		0x00007000
@@ -1256,6 +1257,7 @@ tubRegister;
     [self setPulserEnabled:[[self objectFromSerialization:serial withKey:PulserEnabledSerializationString] boolValue]];
     [self setPrescaleValue:[[self objectFromSerialization:serial withKey:PrescaleValueSerializationString] intValue]];
     [self setGtMask:[[self objectFromSerialization:serial withKey:GTMaskSerializationString] unsignedIntValue]];
+    [self setLockoutWidth:[[self objectFromSerialization:serial withKey:ORMTCLockOutWidth] unsignedIntValue]];
 }
 
 - (NSMutableDictionary*) serializeToDictionary
@@ -1278,6 +1280,7 @@ tubRegister;
     [serial setObject:[NSNumber numberWithBool:[self pulserEnabled] ] forKey:PulserEnabledSerializationString];
     [serial setObject:[NSNumber numberWithUnsignedShort:[self prescaleValue]] forKey:PrescaleValueSerializationString];
     [serial setObject:[NSNumber numberWithUnsignedInt: [self gtMask]] forKey:GTMaskSerializationString];
+    [serial setObject:[NSNumber numberWithUnsignedInt: [self lockoutWidth]] forKey:ORMTCLockOutWidth];
     return serial;
 }
 
