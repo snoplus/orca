@@ -647,6 +647,7 @@
 
 - (IBAction)CounterLoadMask:(id)sender {
     [self SpeakerLoadMask:sender];
+
     CONTROL_REG_MASK newControlReg = [model currentState].controlReg;
     @try{
         [model setControlReg:newControlReg];
@@ -654,23 +655,11 @@
         [self log_error:exception];
         return;
     }
-    if ([[CounterModeSelect selectedCell] tag] ==1) {
-        //Rate Mode is selected
-        @try {
-            [model setCounterMode:YES];
-        } @catch (NSException *exception) {
-            [self log_error:exception];
-            return;
-        }
-    }
-    else { //Totalizer Mode is selected
-        @try {
-            [model setCounterMode:NO];
-        } @catch (NSException* exception) {
-            [self log_error:exception];
-            return;
-        }
-        
+    @try {
+        [model setCounterMode:[model currentState].CounterMode];
+    } @catch (NSException *exception) {
+        [self log_error:exception];
+        return;
     }
 }
 
@@ -717,6 +706,12 @@
     maskVal |= [self GetBitInfoFromCheckBoxes:maskSelect_2 FromBit:16 ToBit:32]<<16;
     [maskField setStringValue:[NSString stringWithFormat:@"%@",@(maskVal)]];
 
+    if ([sender tag] ==1) {
+        [model setSpeakerMaskInState:maskVal];
+    } else if ([sender tag] ==2){
+        [model setCounterMaskInState:maskVal];
+    }
+
 }
 - (IBAction)SpeakerCounterUnCheckAll:(id)sender {
     NSMatrix *maskSelect_1 =nil;
@@ -741,6 +736,13 @@
     [maskSelect_2 deselectAllCells];
 
     [maskField setStringValue:[NSString stringWithFormat:@"%i",0]];
+
+    if ([sender tag] ==1) {
+        [model setSpeakerMaskInState:0];
+    } else if ([sender tag] ==2){
+        [model setCounterMaskInState:0];
+    }
+
 }
 - (IBAction)AdvancedOptionsButtonChanged:(id)sender{
     if([sender state] == NSOffState){
@@ -1017,8 +1019,6 @@
     maskVal = [self GetBitInfoFromCheckBoxes:maskSelect_1 FromBit:0 ToBit:16];
     maskVal |= [self GetBitInfoFromCheckBoxes:maskSelect_2 FromBit:16 ToBit:32];
 
-    NSLogColor([NSColor redColor], @"SpeakerMaskAction: 0x%X \n",maskVal);
-
     if ([sender tag] ==1) {
         [model setSpeakerMaskInState:maskVal];
     } else if ([sender tag] ==2){
@@ -1029,6 +1029,14 @@
 - (IBAction)CounterMaskAction:(id)sender {
 
     [self SpeakerMaskAction:sender];
+
+    CONTROL_REG_MASK newControlReg;
+    newControlReg = [model currentState].controlReg;
+    newControlReg |=  [CounterLZBSelect intValue] ==1 ? scalerLZB_Bit : 0;
+    newControlReg |=  [CounterTestModeSelect intValue] ==1 ? 0 : scalerT_Bit;
+    newControlReg |=  [CounterInhibitSelect intValue] ==1 ? 0 : scalerI_Bit;
+
+    [model setControlRegInState:newControlReg];
 
     if ([[CounterModeSelect selectedCell] tag] ==1) {
         //Rate Mode is selected
