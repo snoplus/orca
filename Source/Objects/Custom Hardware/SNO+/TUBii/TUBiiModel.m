@@ -918,7 +918,6 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
 
 - (NSDictionary*) CurrentStateToDict
 {
-
     //Manually cherry-pick struct elements and store it into dictionary.
     NSMutableDictionary* TubiiStateDict = [NSMutableDictionary dictionaryWithCapacity:8];
     @try{
@@ -933,12 +932,11 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
         [TubiiStateDict setObject:[NSNumber numberWithUnsignedInt:currentState.DGT_Bits] forKey:[self getStandardRunKeyForField:@"DGT_Bits"]];
         [TubiiStateDict setObject:[NSNumber numberWithUnsignedInt:currentState.LO_Bits] forKey:[self getStandardRunKeyForField:@"LO_Bits"]];
         [TubiiStateDict setObject:[NSNumber numberWithUnsignedInt:currentState.controlReg] forKey:[self getStandardRunKeyForField:@"controlReg"]];
+        return TubiiStateDict;
     } @catch(...){
         NSLogColor([NSColor redColor], @"TUBii: settings couldn't not be saved \n");
+        return NULL;
     }
-
-    return TubiiStateDict;
-
 }
 
 - (NSString*) getStandardRunKeyForField:(NSString*)aField

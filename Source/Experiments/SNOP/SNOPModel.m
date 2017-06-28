@@ -2282,19 +2282,16 @@ err:
     [detectorSettings setObject:[NSNumber numberWithUnsignedLong:currentRunTypeWord] forKey:@"run_type_word"];
 
     // Save MTC/D parameters, trigger masks and MTC/A+ thresholds
-    NSMutableDictionary* mtc_serial = [[mtc serializeToDictionary] retain];
+    NSMutableDictionary* mtc_serial = [mtc serializeToDictionary];
     [detectorSettings addEntriesFromDictionary:mtc_serial];
-    [mtc_serial release];
 
     // Save TUBii settings
-    NSMutableDictionary* tubii_serial = [[tubiiModel CurrentStateToDict] retain];
-    [detectorSettings addEntriesFromDictionary:tubii_serial];
-    [tubii_serial release];
+    NSMutableDictionary* tubii_serial = [tubiiModel CurrentStateToDict];
+    if(tubii_serial != NULL) [detectorSettings addEntriesFromDictionary:tubii_serial];
 
     // Save CAEN settings
-    NSMutableDictionary* caen_serial = [[caenModel CurrentStateToDict] retain];
-    [detectorSettings addEntriesFromDictionary:caen_serial];
-    [caen_serial release];
+    NSMutableDictionary* caen_serial = [caenModel CurrentStateToDict];
+    if(caen_serial != NULL) [detectorSettings addEntriesFromDictionary:caen_serial];
 
     NSLog(@"Saving settings for Standard Run %@ - Version %@: \n %@ \n",runTypeName,runVersion,detectorSettings);
 

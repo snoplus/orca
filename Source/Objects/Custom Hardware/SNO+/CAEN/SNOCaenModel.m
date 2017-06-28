@@ -1314,12 +1314,14 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
         for (int idac=0; idac<kNumCaenChannelDacs; ++idac) {
             [CAENStateDict setObject:[NSNumber numberWithUnsignedShort:[self dac:idac]] forKey:[NSString stringWithFormat:@"%@_%i",[self getStandardRunKeyForField:@"dac"],idac]];
         }
+
+        return CAENStateDict;
+
     } @catch(...){
         NSLogColor([NSColor redColor], @"CAEN: settings couldn't not be saved \n");
+        return NULL;
     }
 
-    return CAENStateDict;
-    
 }
 
 - (void) setCurrentStateFromDict:(NSMutableDictionary*)settingsDict {

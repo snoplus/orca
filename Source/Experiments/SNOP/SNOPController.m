@@ -2077,34 +2077,14 @@ err:
 
 - (void) CAENSettingsChanged:(NSNotification*)aNotification
 {
-
-    NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOCaenModel")];
-    SNOCaenModel* caenModel;
-    if ([objs count]) {
-        caenModel = [objs objectAtIndex:0];
-    } else {
-        NSLogColor([NSColor redColor], @"couldn't find CAEN model. Please add it to the experiment and restart the run.\n");
-        return;
-    }
-
+    SNOCaenModel *caenModel = [aNotification object];
     [self displayCAENSettings:[caenModel CurrentStateToDict] inMatrix:standardRunCAENCurrentMatrix];
-    
 }
 
 - (void) TUBiiSettingsChanged:(NSNotification*)aNotification
 {
-
-    NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
-    TUBiiModel* tubiiModel;
-    if ([objs count]) {
-        tubiiModel = [objs objectAtIndex:0];
-    } else {
-        NSLogColor([NSColor redColor], @"couldn't find TUBii model. Please add it to the experiment and restart the run.\n");
-        return;
-    }
-
+    TUBiiModel *tubiiModel = [aNotification object];
     [self displayTUBiiSettings:[tubiiModel CurrentStateToDict] inMatrix:standardRunTUBiiCurrentMatrix];
-    
 }
 
 - (IBAction)loadStandardRunFromDBAction:(id)sender
