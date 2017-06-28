@@ -1943,35 +1943,35 @@
                                                         </buttonCell>
                                                         <cells>
                                                             <column>
-                                                                <buttonCell type="check" title="Burst" bezelStyle="regularSquare" imagePosition="left" tag="1" inset="2" id="BnZ-kV-lQ6">
+                                                                <buttonCell type="check" title="Burst" bezelStyle="regularSquare" imagePosition="left" tag="16" inset="2" id="BnZ-kV-lQ6">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Combo" bezelStyle="regularSquare" imagePosition="left" tag="1" inset="2" id="VZ2-NL-xbD">
+                                                                <buttonCell type="check" title="Combo" bezelStyle="regularSquare" imagePosition="left" tag="17" inset="2" id="VZ2-NL-xbD">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Prescale" bezelStyle="regularSquare" imagePosition="left" tag="1" inset="2" id="BJx-Q4-CYp">
+                                                                <buttonCell type="check" title="Prescale" bezelStyle="regularSquare" imagePosition="left" tag="18" inset="2" id="BJx-Q4-CYp">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="MTCA MIMIC 1" bezelStyle="regularSquare" imagePosition="left" tag="1" inset="2" id="Pzp-L6-Y3o">
+                                                                <buttonCell type="check" title="MTCA MIMIC 1" bezelStyle="regularSquare" imagePosition="left" tag="19" inset="2" id="Pzp-L6-Y3o">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="MTCA MIMIC 2" bezelStyle="regularSquare" imagePosition="left" tag="1" inset="2" id="oo3-Lm-jJe">
+                                                                <buttonCell type="check" title="MTCA MIMIC 2" bezelStyle="regularSquare" imagePosition="left" tag="20" inset="2" id="oo3-Lm-jJe">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="TELLIE" bezelStyle="regularSquare" imagePosition="left" tag="1" inset="2" id="R6K-Sh-1aI">
+                                                                <buttonCell type="check" title="TELLIE" bezelStyle="regularSquare" imagePosition="left" tag="211" inset="2" id="R6K-Sh-1aI">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="SMELLIE" bezelStyle="regularSquare" imagePosition="left" tag="1" inset="2" id="yLK-8H-OZO">
+                                                                <buttonCell type="check" title="SMELLIE" bezelStyle="regularSquare" imagePosition="left" tag="22" inset="2" id="yLK-8H-OZO">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="GT" bezelStyle="regularSquare" imagePosition="left" state="on" tag="1" inset="2" id="rEm-w3-T4y">
+                                                                <buttonCell type="check" title="GT" bezelStyle="regularSquare" imagePosition="left" state="on" tag="23" inset="2" id="rEm-w3-T4y">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
@@ -2042,7 +2042,7 @@
                                                         </buttonCell>
                                                         <cells>
                                                             <column>
-                                                                <buttonCell type="check" title="ExtTrig 0" bezelStyle="regularSquare" imagePosition="left" tag="1" inset="2" id="QkR-1k-63e">
+                                                                <buttonCell type="check" title="ExtTrig 0" bezelStyle="regularSquare" imagePosition="left" inset="2" id="QkR-1k-63e">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
@@ -2050,61 +2050,61 @@
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="ExtTrig 2" bezelStyle="regularSquare" imagePosition="left" tag="1" inset="2" id="0OO-qj-MzT">
+                                                                <buttonCell type="check" title="ExtTrig 2" bezelStyle="regularSquare" imagePosition="left" tag="2" inset="2" id="0OO-qj-MzT">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="ExtTrig 3" bezelStyle="regularSquare" imagePosition="left" tag="1" inset="2" id="q5m-UG-Fp8">
+                                                                <buttonCell type="check" title="ExtTrig 3" bezelStyle="regularSquare" imagePosition="left" tag="3" inset="2" id="q5m-UG-Fp8">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="ExtTrig 4" bezelStyle="regularSquare" imagePosition="left" tag="1" inset="2" id="qSi-5E-Rep">
+                                                                <buttonCell type="check" title="ExtTrig 4" bezelStyle="regularSquare" imagePosition="left" tag="4" inset="2" id="qSi-5E-Rep">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="ExtTrig 5" bezelStyle="regularSquare" imagePosition="left" tag="1" inset="2" id="qW0-at-0BA">
+                                                                <buttonCell type="check" title="ExtTrig 5" bezelStyle="regularSquare" imagePosition="left" tag="5" inset="2" id="qW0-at-0BA">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="ExtTrig 6" bezelStyle="regularSquare" imagePosition="left" tag="1" inset="2" id="72c-ma-Els">
+                                                                <buttonCell type="check" title="ExtTrig 6" bezelStyle="regularSquare" imagePosition="left" tag="6" inset="2" id="72c-ma-Els">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="ExtTrig 7" bezelStyle="regularSquare" imagePosition="left" state="on" tag="1" inset="2" id="fW9-HK-BiZ">
+                                                                <buttonCell type="check" title="ExtTrig 7" bezelStyle="regularSquare" imagePosition="left" state="on" tag="7" inset="2" id="fW9-HK-BiZ">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
                                                             </column>
                                                             <column>
-                                                                <buttonCell type="check" title="ExtTrig 8" bezelStyle="regularSquare" imagePosition="left" state="on" tag="1" inset="2" id="X1r-tO-jjM">
+                                                                <buttonCell type="check" title="ExtTrig 8" bezelStyle="regularSquare" imagePosition="left" state="on" tag="8" inset="2" id="X1r-tO-jjM">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="ExtTrig 9" bezelStyle="regularSquare" imagePosition="left" state="on" tag="1" inset="2" id="p89-x5-V0F">
+                                                                <buttonCell type="check" title="ExtTrig 9" bezelStyle="regularSquare" imagePosition="left" state="on" tag="9" inset="2" id="p89-x5-V0F">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="ExtTrig 10" bezelStyle="regularSquare" imagePosition="left" state="on" tag="1" inset="2" id="L1r-Cl-cyM">
+                                                                <buttonCell type="check" title="ExtTrig 10" bezelStyle="regularSquare" imagePosition="left" state="on" tag="10" inset="2" id="L1r-Cl-cyM">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="ExtTrig 11" bezelStyle="regularSquare" imagePosition="left" state="on" tag="1" inset="2" id="LeU-Em-go3">
+                                                                <buttonCell type="check" title="ExtTrig 11" bezelStyle="regularSquare" imagePosition="left" state="on" tag="11" inset="2" id="LeU-Em-go3">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="ExtTrig 12" bezelStyle="regularSquare" imagePosition="left" state="on" tag="1" inset="2" id="Izq-wK-aZs">
+                                                                <buttonCell type="check" title="ExtTrig 12" bezelStyle="regularSquare" imagePosition="left" state="on" tag="12" inset="2" id="Izq-wK-aZs">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="ExtTrig 13" bezelStyle="regularSquare" imagePosition="left" state="on" tag="1" inset="2" id="vLg-1d-Ldb">
+                                                                <buttonCell type="check" title="ExtTrig 13" bezelStyle="regularSquare" imagePosition="left" state="on" tag="13" inset="2" id="vLg-1d-Ldb">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="ExtTrig 14" bezelStyle="regularSquare" imagePosition="left" state="on" tag="1" inset="2" id="stA-sW-mBH">
+                                                                <buttonCell type="check" title="ExtTrig 14" bezelStyle="regularSquare" imagePosition="left" state="on" tag="14" inset="2" id="stA-sW-mBH">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="ExtTrig 15" bezelStyle="regularSquare" imagePosition="left" state="on" tag="1" inset="2" id="6Rd-Ci-WJ9">
+                                                                <buttonCell type="check" title="ExtTrig 15" bezelStyle="regularSquare" imagePosition="left" state="on" tag="15" inset="2" id="6Rd-Ci-WJ9">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
