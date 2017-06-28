@@ -202,9 +202,15 @@
     // TrigMasks
     struct TUBiiState theTUBiiState = [model currentState];
 
-    NSLogColor([NSColor redColor], @"tubiiCurrentStateChanged: 0x%X\n",theTUBiiState.counterMask);
-    NSUInteger trigMaskVal = (theTUBiiState.syncTrigMask | theTUBiiState. asyncTrigMask);
-    NSUInteger syncMaskVal = 16777215 - theTUBiiState.asyncTrigMask;
+    NSLogColor([NSColor redColor], @"tubiiCurrentStateChanged syncTrigMask: 0x%X\n",theTUBiiState.syncTrigMask);
+    NSLogColor([NSColor redColor], @"tubiiCurrentStateChanged asyncTrigMask: 0x%X\n",theTUBiiState. asyncTrigMask);
+
+    NSUInteger trigMaskVal = (theTUBiiState.syncTrigMask | theTUBiiState.asyncTrigMask);
+    NSUInteger syncMaskVal = 0xFFFFFF - theTUBiiState.asyncTrigMask;
+
+    NSLogColor([NSColor redColor], @"tubiiCurrentStateChanged trigMaskVal: 0x%X\n",trigMaskVal);
+    NSLogColor([NSColor redColor], @"tubiiCurrentStateChanged syncMaskVal: 0x%X\n",syncMaskVal);
+
     [self SendBitInfo:trigMaskVal FromBit:0 ToBit:24 ToCheckBoxes:TrigMaskSelect];
     [self SendBitInfo:syncMaskVal FromBit:24 ToBit:48 ToCheckBoxes:TrigMaskSelect];
     //CAEN
@@ -913,6 +919,9 @@
     NSUInteger trigMaskVal = [self GetBitInfoFromCheckBoxes:sender FromBit:0 ToBit:24];
     NSUInteger syncMaskVal = [self GetBitInfoFromCheckBoxes:sender FromBit:24 ToBit:48];
 
+    NSLogColor([NSColor redColor], @"trigMaskAction trigMaskVal: 0x%X\n",trigMaskVal);
+    NSLogColor([NSColor redColor], @"trigMaskAction syncMaskVal: 0x%X\n",syncMaskVal);
+
     NSUInteger syncMask=0, asyncMask=0;
     for(int i=0; i<24; i++)
     {
@@ -933,6 +942,9 @@
             syncMask &= ~(1<<i);
         }
     }
+
+    NSLogColor([NSColor redColor], @"trigMaskAction syncMask: 0x%X\n",syncMask);
+    NSLogColor([NSColor redColor], @"trigMaskAction asyncMask: 0x%X\n",asyncMask);
 
     [model setTrigMaskInState:syncMask setAsyncMask:asyncMask];
 
@@ -979,8 +991,6 @@
         maskVal = [self GetBitInfoFromCheckBoxes:CounterMaskSelect_1 FromBit:0 ToBit:16];
         maskVal |= ([self GetBitInfoFromCheckBoxes:CounterMaskSelect_2 FromBit:16 ToBit:32]<<16);
         [CounterMaskField setStringValue:[NSString stringWithFormat:@"%@",@(maskVal)]];
-
-        NSLogColor([NSColor redColor], @"SpeakerCounterMaskAction: 0x%X\n",maskVal);
         [model setCounterMaskInState:maskVal];
     }
 
