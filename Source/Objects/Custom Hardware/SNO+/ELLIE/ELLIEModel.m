@@ -788,7 +788,7 @@ err:
         @try{
             [theTubiiModel setTellieMode:mode];
         } @catch(NSException* e){
-            NSLogColor([NSColor redColor], @"[TELLIE]: Problem setting correct slave mode behaviour at TUBii");
+            NSLogColor([NSColor redColor], @"[TELLIE]: Problem setting correct slave mode behaviour at TUBii: %@\n", [e reason]);
             goto err;
         }
     }
