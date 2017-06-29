@@ -202,14 +202,8 @@
     // TrigMasks
     struct TUBiiState theTUBiiState = [model currentState];
 
-    NSLogColor([NSColor redColor], @"tubiiCurrentStateChanged syncTrigMask: 0x%X\n",theTUBiiState.syncTrigMask);
-    NSLogColor([NSColor redColor], @"tubiiCurrentStateChanged asyncTrigMask: 0x%X\n",theTUBiiState. asyncTrigMask);
-
     NSUInteger trigMaskVal = (theTUBiiState.syncTrigMask | theTUBiiState.asyncTrigMask);
     NSUInteger syncMaskVal = 0xFFFFFF - theTUBiiState.asyncTrigMask;
-
-    NSLogColor([NSColor redColor], @"tubiiCurrentStateChanged trigMaskVal: 0x%X\n",trigMaskVal);
-    NSLogColor([NSColor redColor], @"tubiiCurrentStateChanged syncMaskVal: 0x%X\n",syncMaskVal);
 
     [self SendBitInfo:trigMaskVal FromBit:0 ToBit:24 ToCheckBoxes:TrigMaskSelect];
     [self SendBitInfo:syncMaskVal FromBit:24 ToBit:48 ToCheckBoxes:TrigMaskSelect];
