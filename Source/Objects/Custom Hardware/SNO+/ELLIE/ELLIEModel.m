@@ -783,7 +783,7 @@ err:
     if(isSlave){
         BOOL mode = YES;
         if([fireCommands objectForKey:@"TUBii_slave_setting"]){
-            mode = (BOOL)[fireCommands objectForKey:@"TUBii_slave_setting"];
+            mode = [[fireCommands objectForKey:@"TUBii_slave_setting"] boolValue];
         }
         @try{
             [theTubiiModel setTellieMode:mode];
