@@ -1430,7 +1430,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 }
 
 /** Possible values are (see SLTv4_HW_Definitions.h):
-    kIpeFltV4Katrin_StandBy_Mode, 
+    kIpeFltV4Katrin_StandBy_Mode,
 	kIpeFltV4Katrin_Run_Mode,
 	kIpeFltV4Katrin_Histo_Mode,
 	kIpeFltV4Katrin_Veto_Mode
