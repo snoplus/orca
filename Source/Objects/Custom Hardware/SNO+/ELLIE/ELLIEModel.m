@@ -766,7 +766,7 @@ err:
     }
     
     //////////////
-    // TUBii has two possible slave mode condigurations.
+    // TUBii has two possible slave mode configurations.
     // 0 [@NO]:  Trigger path = TUBii->TELLIE->TUBii->MTC/D
     // 1 [@YES]: Trigger path = TUBii->TELLIE
     //                          TUBii->MTC/D
@@ -789,6 +789,7 @@ err:
             [theTubiiModel setTellieMode:mode];
         } @catch(NSException* e){
             NSLogColor([NSColor redColor], @"[TELLIE]: Problem setting correct slave mode behaviour at TUBii");
+            goto err;
         }
     }
     
