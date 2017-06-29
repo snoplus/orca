@@ -33,10 +33,7 @@
 #define kIpeFltV4Katrin_Histo_Mode			2
 #define kIpeFltV4Katrin_Veto_Mode			3
 #define kIpeFltV4Katrin_Bipolar_Mode		5
-//#define kIpeFltV4Katrin_Test_Mode			3   //TODO: see fpga8_package.vhd -tb-
 
-// I switched to enums to always have a guilty kIpeFltV4_NumberOfDaqModes; older Orca versions may get newer Orca files with daq modes
-// still unknown to the older Orca; with kIpeFltV4_NumberOfDaqModes we can check this -tb-
 enum daqMode { 
 	kIpeFltV4_EnergyDaqMode			= 0,
 	kIpeFltV4_EnergyTraceDaqMode	= 1,
