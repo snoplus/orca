@@ -269,7 +269,7 @@ snopGreenColor;
     [doggy_icon start_animation];
 
     [self initializeUnits];
-    [self mtcDataBaseChanged:nil];
+    [self MTCSettingsChanged:nil];
     [self CAENSettingsChanged:nil];
     [self TUBiiSettingsChanged:nil];
     //Update runtype word
@@ -405,28 +405,32 @@ snopGreenColor;
                         object: nil];
 
     [notifyCenter addObserver : self
-                     selector : @selector(mtcDataBaseChanged:)
+                     selector : @selector(MTCSettingsChanged:)
                          name : ORMTCAThresholdChanged
                         object: nil];
     [notifyCenter addObserver : self
-                     selector : @selector(mtcDataBaseChanged:)
+                     selector : @selector(MTCSettingsChanged:)
                          name : ORMTCAConversionChanged
                         object: nil];
     [notifyCenter addObserver : self
-                     selector : @selector(mtcDataBaseChanged:)
+                     selector : @selector(MTCSettingsChanged:)
                          name : ORMTCABaselineChanged
                         object: nil];
     [notifyCenter addObserver : self
-                     selector : @selector(mtcDataBaseChanged:)
+                     selector : @selector(MTCSettingsChanged:)
                          name : ORMTCPulserRateChanged
                         object: nil];
     [notifyCenter addObserver : self
-                     selector : @selector(mtcDataBaseChanged:)
+                     selector : @selector(MTCSettingsChanged:)
                          name : ORMTCSettingsChanged
                         object: nil];
     [notifyCenter addObserver : self
-                     selector : @selector(mtcDataBaseChanged:)
+                     selector : @selector(MTCSettingsChanged:)
                          name : ORMTCGTMaskChanged
+                        object: nil];
+    [notifyCenter addObserver : self
+                     selector : @selector(MTCSettingsChanged:)
+                         name : ORMTCModelIsPedestalEnabledInCSR
                         object: nil];
 
     [notifyCenter addObserver : self
@@ -2020,7 +2024,7 @@ err:
     }
 }
 
-- (void) mtcDataBaseChanged:(NSNotification*)aNotification
+- (void) MTCSettingsChanged:(NSNotification*)aNotification
 {
     if(aNotification && [[aNotification name] isEqualToString:ORMTCAConversionChanged])
     {
@@ -2072,7 +2076,16 @@ err:
     {
         [self redisplayThresholdValuesUsingModel:mtcModel];
     }
-    
+
+    //LO width
+    [[standardRunMTCCurrentValues cellAtRow:0 column:0] setIntValue:[mtcModel lockoutWidth]];
+    //Pulser ON
+    [[standardRunMTCCurrentValues cellAtRow:1 column:0] setStringValue:([mtcModel pulserEnabled]?@"ON":@"OFF")];
+    //Pulser mode (PGT/PED)
+    [[standardRunMTCCurrentValues cellAtRow:2 column:0] setStringValue:([mtcModel isPedestalEnabledInCSR]?@"PED":@"PGT")];
+
+    [self highlightDifferencesBetween:standardRunMTCCurrentValues And:standardRunMTCStoredValues];
+
 }
 
 - (void) CAENSettingsChanged:(NSNotification*)aNotification
@@ -2220,15 +2233,6 @@ err:
 //and display the values in the GUI.
 -(void) displayThresholdsFromDB
 {
-    /* Get models */
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    ORMTCModel* mtcModel;
-    if ([objs count]) {
-        mtcModel = [objs objectAtIndex:0];
-    } else {
-        NSLogColor([NSColor redColor], @"couldn't find MTC model. Please add it to the experiment and restart the run.\n");
-        return;
-    }
 
     NSMutableDictionary* runSettings = [[[model standardRunCollection] objectForKey:[model standardRunType]] objectForKey:[model standardRunVersion]];
     if(runSettings == nil){
@@ -2248,10 +2252,6 @@ err:
     //Get run type word first
     unsigned long dbruntypeword = [[runSettings valueForKey:@"run_type_word"] unsignedLongValue];
 
-    //Setup format
-    NSNumberFormatter *thresholdFormatter = [[[NSNumberFormatter alloc] init] autorelease];;
-    [thresholdFormatter setFormat:@"##0.0"];
-    
     //If in DIAGNOSTIC run: display null threshold values
     if(dbruntypeword & kDiagnosticRun){
         for (int i=0; i<[standardRunThresStoredValues numberOfRows];i++) {
@@ -2266,42 +2266,12 @@ err:
         }
     //If in non-DIAGNOSTIC run: display DB threshold values
     } else {
-
         //MTC
-        float mVolts;
-        int gtmask = [[runSettings valueForKey:GTMaskSerializationString] intValue];
-        
-        for(int i=0;i<10;i++) {
-            float raw = [[runSettings valueForKey:[mtcModel stringForThreshold:view_model_map[i]]] floatValue];
-            BOOL inMask = ((1<< view_mask_map[i]) & gtmask) != 0;
-            [self updateSingleDBThresholdDisplayForRow:i inMask:inMask withModel:mtcModel withFormatter:thresholdFormatter toValue:raw];
-        }
-
-        //Prescale
-        mVolts = [[runSettings valueForKey:PrescaleValueSerializationString] floatValue];
-        [[standardRunThresStoredValues cellAtRow:10 column:0] setFloatValue:mVolts];
-        [[standardRunThresStoredValues cellAtRow:10 column:0] setFormatter:thresholdFormatter];
-        if((gtmask >> 11) & 1){
-            [[standardRunThresStoredValues cellAtRow:10 column:0] setTextColor:[self snopBlueColor]];
-        } else{
-            [[standardRunThresStoredValues cellAtRow:10 column:0] setTextColor:[self snopRedColor]];
-        }
-        //Pulser
-        mVolts = [[runSettings valueForKey:PulserRateSerializationString] floatValue];
-        [[standardRunThresStoredValues cellAtRow:11 column:0] setFloatValue:mVolts];
-        [[standardRunThresStoredValues cellAtRow:11 column:0] setFormatter:thresholdFormatter];
-        if((gtmask >> 10) & 1){
-            [[standardRunThresStoredValues cellAtRow:11 column:0] setTextColor:[self snopBlueColor]];
-        } else{
-            [[standardRunThresStoredValues cellAtRow:11 column:0] setTextColor:[self snopRedColor]];
-        }
-
+        [self displayMTCSettings:runSettings];
         //CAEN
         [self displayCAENSettings:runSettings inMatrix:standardRunCAENDBMatrix];
-
         //TUBii
         [self displayTUBiiSettings:runSettings inMatrix:standardRunTUBiiDBMatrix];
-
     }
     
     //Display runtype word
@@ -2313,6 +2283,61 @@ err:
         }
     }
 }
+
+- (void) displayMTCSettings:(NSMutableDictionary*)settingsDict
+{
+    /* Get models */
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    ORMTCModel* mtcModel;
+    if ([objs count]) {
+        mtcModel = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find MTC model. Please add it to the experiment and restart the run.\n");
+        return;
+    }
+
+    //Setup format
+    NSNumberFormatter *thresholdFormatter = [[[NSNumberFormatter alloc] init] autorelease];;
+    [thresholdFormatter setFormat:@"##0.0"];
+
+    float mVolts;
+    int gtmask = [[settingsDict valueForKey:GTMaskSerializationString] intValue];
+
+    for(int i=0;i<10;i++) {
+        float raw = [[settingsDict valueForKey:[mtcModel stringForThreshold:view_model_map[i]]] floatValue];
+        BOOL inMask = ((1<< view_mask_map[i]) & gtmask) != 0;
+        [self updateSingleDBThresholdDisplayForRow:i inMask:inMask withModel:mtcModel withFormatter:thresholdFormatter toValue:raw];
+    }
+
+    //Prescale
+    mVolts = [[settingsDict valueForKey:PrescaleValueSerializationString] floatValue];
+    [[standardRunThresStoredValues cellAtRow:10 column:0] setFloatValue:mVolts];
+    [[standardRunThresStoredValues cellAtRow:10 column:0] setFormatter:thresholdFormatter];
+    if((gtmask >> 11) & 1){
+        [[standardRunThresStoredValues cellAtRow:10 column:0] setTextColor:[self snopBlueColor]];
+    } else{
+        [[standardRunThresStoredValues cellAtRow:10 column:0] setTextColor:[self snopRedColor]];
+    }
+    //Pulser
+    mVolts = [[settingsDict valueForKey:PulserRateSerializationString] floatValue];
+    [[standardRunThresStoredValues cellAtRow:11 column:0] setFloatValue:mVolts];
+    [[standardRunThresStoredValues cellAtRow:11 column:0] setFormatter:thresholdFormatter];
+    if((gtmask >> 10) & 1){
+        [[standardRunThresStoredValues cellAtRow:11 column:0] setTextColor:[self snopBlueColor]];
+    } else{
+        [[standardRunThresStoredValues cellAtRow:11 column:0] setTextColor:[self snopRedColor]];
+    }
+    //LO width
+    [[standardRunMTCStoredValues cellAtRow:0 column:0] setIntValue:[[settingsDict valueForKey:LockOutWidthSerializationString] intValue]];
+    //Pulser ON
+    [[standardRunMTCStoredValues cellAtRow:1 column:0] setStringValue:[[settingsDict valueForKey:PulserEnabledSerializationString] boolValue]?@"ON":@"OFF"];
+    //Pulser mode (PGT/PED)
+    [[standardRunMTCStoredValues cellAtRow:2 column:0] setStringValue:[[settingsDict valueForKey:PGT_PED_Mode_SerializationString] boolValue]?@"PED":@"PGT"];
+
+    [self highlightDifferencesBetween:standardRunMTCCurrentValues And:standardRunMTCStoredValues];
+
+}
+
 
 - (void) displayCAENSettings:(NSMutableDictionary*) settingsDict inMatrix:(NSMatrix*)aMatrix
 {
@@ -2357,6 +2382,9 @@ err:
     [[aMatrix cellAtRow:19 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"CAEN_frontPanelControlMask"] unsignedIntValue]]];
 
     [dacFormat release];
+
+    [self highlightDifferencesBetween:standardRunCAENCurrentMatrix And:standardRunCAENDBMatrix];
+
 }
 
 
@@ -2387,6 +2415,22 @@ err:
     [[aMatrix cellAtRow:9 column:0] setIntegerValue:[tubiiModel LODelay_BitsToNanoSeconds:[[settingsDict valueForKey:@"TUBii_LO_Bits"] integerValue]]];
     [[aMatrix cellAtRow:10 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"TUBii_controlReg"] unsignedIntValue]]];
 
+    [self highlightDifferencesBetween:standardRunTUBiiCurrentMatrix And:standardRunTUBiiDBMatrix];
+
+}
+
+- (void) highlightDifferencesBetween:(NSMatrix*)aMatrix And:(NSMatrix*)bMatrix
+{
+    NSInteger aNEntries = [aMatrix numberOfRows];
+    NSInteger bNEntries = [bMatrix numberOfRows];
+    if(aNEntries != bNEntries) NSLogColor([NSColor redColor], @"Problem highlighting differences for matrices! Different number of rows. \n");
+
+    for(int irow=0; irow<aNEntries; irow++){
+        if( [[[aMatrix cellAtRow:irow column:0] stringValue] isEqualToString:[[bMatrix cellAtRow:irow column:0] stringValue]] )
+            [[aMatrix cellAtRow:irow column:0] setTextColor:snopBlackColor];
+        else
+            [[aMatrix cellAtRow:irow column:0] setTextColor:snopRedColor];
+    }
 }
 
 - (IBAction) refreshStandardRunsAction:(id)sender

@@ -66,6 +66,8 @@
                 <outlet property="standardRunCAENDBMatrix" destination="i9Q-u5-4Yq" id="An8-fS-ch6"/>
                 <outlet property="standardRunLoadButton" destination="by7-du-Yh5" id="z7c-Du-u3I"/>
                 <outlet property="standardRunLoadinHWButton" destination="cYq-Gf-T75" id="juo-xj-3jX"/>
+                <outlet property="standardRunMTCCurrentValues" destination="ff7-zt-N1n" id="oFc-CX-m9V"/>
+                <outlet property="standardRunMTCStoredValues" destination="afS-uQ-qPu" id="466-ov-Lrg"/>
                 <outlet property="standardRunPopupMenu" destination="9N0-mK-BSA" id="wPo-8V-poZ"/>
                 <outlet property="standardRunSaveButton" destination="hzP-U1-4kA" id="OhX-9u-5Ys"/>
                 <outlet property="standardRunTUBiiCurrentMatrix" destination="S8T-VR-eUc" id="qwt-7P-gtG"/>
@@ -505,14 +507,14 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" title="Run Type Word" borderType="line" id="3963">
-                                            <rect key="frame" x="622" y="3" width="147" height="626"/>
+                                            <rect key="frame" x="622" y="-7" width="147" height="636"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView">
-                                                <rect key="frame" x="1" y="1" width="145" height="610"/>
+                                                <rect key="frame" x="1" y="1" width="145" height="620"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <box verticalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="ZAc-Zq-koX">
-                                                        <rect key="frame" x="7" y="406" width="133" height="5"/>
+                                                        <rect key="frame" x="7" y="416" width="133" height="5"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
@@ -520,7 +522,7 @@
                                                         <font key="titleFont" metaFont="system"/>
                                                     </box>
                                                     <box verticalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="qca-QN-PXH">
-                                                        <rect key="frame" x="7" y="246" width="135" height="5"/>
+                                                        <rect key="frame" x="7" y="256" width="135" height="5"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
@@ -528,7 +530,7 @@
                                                         <font key="titleFont" metaFont="system"/>
                                                     </box>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="V3X-8h-WXg">
-                                                        <rect key="frame" x="4" y="591" width="44" height="14"/>
+                                                        <rect key="frame" x="4" y="601" width="44" height="14"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Current" id="eGr-e3-IhI">
@@ -538,7 +540,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="aDt-ix-V7f">
-                                                        <rect key="frame" x="121" y="591" width="21" height="14"/>
+                                                        <rect key="frame" x="121" y="601" width="21" height="14"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="DB" id="Xf4-cz-YQv">
@@ -548,7 +550,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <matrix toolTip="Run type word of the selected standard run" verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="zuQ-GY-eWY">
-                                                        <rect key="frame" x="122" y="72" width="20" height="512"/>
+                                                        <rect key="frame" x="122" y="82" width="20" height="512"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <animations/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -694,7 +696,7 @@
                                                         </connections>
                                                     </matrix>
                                                     <matrix toolTip="Current run type word" verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="3935">
-                                                        <rect key="frame" x="8" y="72" width="119" height="512"/>
+                                                        <rect key="frame" x="8" y="82" width="119" height="512"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <animations/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -856,14 +858,14 @@
                                             </textFieldCell>
                                         </textField>
                                         <box autoresizesSubviews="NO" title="CAEN settings" borderType="line" id="o4g-Ms-Wnk">
-                                            <rect key="frame" x="1" y="3" width="324" height="307"/>
+                                            <rect key="frame" x="1" y="-7" width="324" height="355"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView">
-                                                <rect key="frame" x="1" y="1" width="322" height="291"/>
+                                                <rect key="frame" x="1" y="1" width="322" height="339"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="8ym-mS-PgO">
-                                                        <rect key="frame" x="234" y="274" width="52" height="14"/>
+                                                        <rect key="frame" x="234" y="319" width="52" height="14"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="DB value" id="FDg-uQ-rYp">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -872,7 +874,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="uH7-vU-qvZ">
-                                                        <rect key="frame" x="124" y="274" width="75" height="14"/>
+                                                        <rect key="frame" x="124" y="319" width="75" height="14"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Current value" id="0tG-tj-EIP">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -881,7 +883,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <matrix toolTip="Settings stored in the selected standard run" verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" id="i9Q-u5-4Yq">
-                                                        <rect key="frame" x="218" y="9" width="86" height="258"/>
+                                                        <rect key="frame" x="218" y="54" width="86" height="258"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         <size key="cellSize" width="86" height="11"/>
@@ -997,7 +999,7 @@
                                                         </cells>
                                                     </matrix>
                                                     <matrix toolTip="Settings stored in the selected standard run" verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" id="Xdt-S9-5q7">
-                                                        <rect key="frame" x="118" y="9" width="86" height="258"/>
+                                                        <rect key="frame" x="118" y="54" width="86" height="258"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         <size key="cellSize" width="86" height="11"/>
@@ -1113,7 +1115,7 @@
                                                         </cells>
                                                     </matrix>
                                                     <matrix toolTip="Settings stored in the selected standard run" verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" id="z9b-Gs-x5K">
-                                                        <rect key="frame" x="0.0" y="9" width="105" height="258"/>
+                                                        <rect key="frame" x="0.0" y="54" width="105" height="258"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         <size key="cellSize" width="105" height="11"/>
@@ -1228,20 +1230,47 @@
                                                             </column>
                                                         </cells>
                                                     </matrix>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Nry-4G-8Bn">
+                                                        <rect key="frame" x="58" y="14" width="96" height="14"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Different from DB" id="HkM-yT-rbZ">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="GZZ-Jn-EgJ">
+                                                        <rect key="frame" x="153" y="14" width="68" height="14"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Equal to DB" id="oSJ-se-7DC">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="ps4-pp-WVg">
+                                                        <rect key="frame" x="9" y="14" width="47" height="14"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Legend:" id="vlD-9F-tDT">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" title="TUBii settings" borderType="line" id="Whm-Y3-09L">
-                                            <rect key="frame" x="327" y="112" width="293" height="198"/>
+                                            <rect key="frame" x="327" y="-5" width="293" height="209"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView">
-                                                <rect key="frame" x="1" y="1" width="291" height="182"/>
+                                                <rect key="frame" x="1" y="1" width="291" height="193"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Tdh-wI-4WV">
-                                                        <rect key="frame" x="223" y="164" width="52" height="14"/>
+                                                        <rect key="frame" x="223" y="179" width="52" height="14"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="DB value" id="RqR-TB-6gd">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1250,7 +1279,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="W7F-uP-f6c">
-                                                        <rect key="frame" x="124" y="164" width="75" height="14"/>
+                                                        <rect key="frame" x="124" y="179" width="75" height="14"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Current value" id="3QW-Xk-fSd">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1259,7 +1288,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <matrix toolTip="Settings stored in the selected standard run" verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" id="fuk-W6-4rg">
-                                                        <rect key="frame" x="5" y="13" width="105" height="141"/>
+                                                        <rect key="frame" x="5" y="37" width="105" height="141"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         <size key="cellSize" width="105" height="11"/>
@@ -1330,7 +1359,7 @@
                                                         </cells>
                                                     </matrix>
                                                     <matrix toolTip="Settings stored in the selected standard run" verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" id="S8T-VR-eUc">
-                                                        <rect key="frame" x="119" y="13" width="86" height="141"/>
+                                                        <rect key="frame" x="119" y="37" width="86" height="141"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         <size key="cellSize" width="86" height="11"/>
@@ -1401,7 +1430,7 @@
                                                         </cells>
                                                     </matrix>
                                                     <matrix toolTip="Settings stored in the selected standard run" verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" id="5Il-K8-9ZY">
-                                                        <rect key="frame" x="205" y="13" width="86" height="141"/>
+                                                        <rect key="frame" x="205" y="37" width="86" height="141"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         <size key="cellSize" width="86" height="11"/>
@@ -1471,13 +1500,40 @@
                                                             </column>
                                                         </cells>
                                                     </matrix>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="MSe-yb-oaE">
+                                                        <rect key="frame" x="55" y="14" width="96" height="14"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Different from DB" id="dV4-af-knu">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="5nc-sv-37g">
+                                                        <rect key="frame" x="150" y="14" width="68" height="14"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Equal to DB" id="f3t-S5-CJH">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="LCe-5O-JgE">
+                                                        <rect key="frame" x="6" y="14" width="47" height="14"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Legend:" id="290-Dw-pdK">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" title="Standard Run control" borderType="line" id="Oik-pb-QQv">
-                                            <rect key="frame" x="1" y="384" width="226" height="245"/>
+                                            <rect key="frame" x="1" y="381" width="226" height="245"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="224" height="229"/>
@@ -1586,14 +1642,14 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" title="MTC trigger settings" borderType="line" id="H5p-mY-U4E">
-                                            <rect key="frame" x="266" y="314" width="354" height="315"/>
+                                            <rect key="frame" x="327" y="208" width="293" height="421"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView">
-                                                <rect key="frame" x="1" y="1" width="352" height="299"/>
+                                                <rect key="frame" x="1" y="1" width="291" height="405"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <matrix toolTip="Current settings. This does NOT necessarily reflects the current state of the hardware" verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" id="jf7-EJ-hAP">
-                                                        <rect key="frame" x="95" y="21" width="67" height="250"/>
+                                                        <rect key="frame" x="87" y="112" width="67" height="250"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         <size key="cellSize" width="67" height="19"/>
@@ -1672,7 +1728,7 @@
                                                         </connections>
                                                     </matrix>
                                                     <matrix verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" id="Ctq-mS-5Bm">
-                                                        <rect key="frame" x="1" y="19" width="86" height="250"/>
+                                                        <rect key="frame" x="-7" y="110" width="86" height="250"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         <size key="cellSize" width="86" height="19"/>
@@ -1748,10 +1804,10 @@
                                                         </cells>
                                                     </matrix>
                                                     <matrix verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" id="002-Sr-nUh">
-                                                        <rect key="frame" x="247" y="19" width="131" height="250"/>
+                                                        <rect key="frame" x="242" y="110" width="49" height="250"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        <size key="cellSize" width="131" height="19"/>
+                                                        <size key="cellSize" width="49" height="19"/>
                                                         <size key="intercellSpacing" width="0.0" height="2"/>
                                                         <textFieldCell key="prototype" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="JgL-9j-EN1">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1824,7 +1880,7 @@
                                                         </cells>
                                                     </matrix>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="xMk-QH-pcf">
-                                                        <rect key="frame" x="91" y="280" width="75" height="14"/>
+                                                        <rect key="frame" x="83" y="371" width="75" height="14"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Current value" id="j6W-2R-zyg">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1833,7 +1889,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="8ay-pM-1io">
-                                                        <rect key="frame" x="182" y="280" width="52" height="14"/>
+                                                        <rect key="frame" x="174" y="371" width="52" height="14"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="DB value" id="1ux-Lc-iTf">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -1842,7 +1898,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <matrix toolTip="Settings stored in the selected standard run" verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" id="gE1-m4-m8q">
-                                                        <rect key="frame" x="161" y="19" width="86" height="250"/>
+                                                        <rect key="frame" x="153" y="110" width="86" height="250"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         <size key="cellSize" width="86" height="19"/>
@@ -1917,6 +1973,191 @@
                                                             </column>
                                                         </cells>
                                                     </matrix>
+                                                    <matrix toolTip="Settings stored in the selected standard run" verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" id="Pv0-Oq-yjY">
+                                                        <rect key="frame" x="12" y="36" width="67" height="57"/>
+                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        <size key="cellSize" width="67" height="15"/>
+                                                        <size key="intercellSpacing" width="0.0" height="6"/>
+                                                        <textFieldCell key="prototype" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="dIZ-HS-UQB">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <cells>
+                                                            <column>
+                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="LO Width" id="XCA-pB-yJk">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Pulser" id="j8c-lB-xfI">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="PGT/PED" id="FeR-BT-J1Z">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                            </column>
+                                                        </cells>
+                                                    </matrix>
+                                                    <matrix toolTip="Settings stored in the selected standard run" verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" id="ff7-zt-N1n">
+                                                        <rect key="frame" x="87" y="37" width="67" height="57"/>
+                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        <size key="cellSize" width="67" height="15"/>
+                                                        <size key="intercellSpacing" width="0.0" height="6"/>
+                                                        <textFieldCell key="prototype" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="kmz-ZO-YcR">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <cells>
+                                                            <column>
+                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="--" id="AhK-0S-1x5">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="--" id="Xx4-xf-CFk">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="--" id="2Ou-fO-VJr">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                            </column>
+                                                        </cells>
+                                                    </matrix>
+                                                    <matrix toolTip="Settings stored in the selected standard run" verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" id="afS-uQ-qPu">
+                                                        <rect key="frame" x="163" y="37" width="67" height="57"/>
+                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        <size key="cellSize" width="67" height="15"/>
+                                                        <size key="intercellSpacing" width="0.0" height="6"/>
+                                                        <textFieldCell key="prototype" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="582-0l-fSS">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <cells>
+                                                            <column>
+                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="--" id="Pgw-Qo-otA">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="--" id="XLd-vp-16Z">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="--" id="y1n-0x-fqY">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                            </column>
+                                                        </cells>
+                                                    </matrix>
+                                                    <matrix toolTip="Settings stored in the selected standard run" verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" id="H4z-Sn-WOX">
+                                                        <rect key="frame" x="218" y="37" width="67" height="57"/>
+                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        <size key="cellSize" width="67" height="15"/>
+                                                        <size key="intercellSpacing" width="0.0" height="6"/>
+                                                        <textFieldCell key="prototype" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="1NY-9B-x3j">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <cells>
+                                                            <column>
+                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="ns" id="qc7-IF-xGu">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" id="Ayp-ae-7OQ">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                                <textFieldCell controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" id="5P2-lx-Mbh">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                            </column>
+                                                        </cells>
+                                                    </matrix>
+                                                    <box verticalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="JXC-1u-fHk">
+                                                        <rect key="frame" x="31" y="99" width="237" height="5"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                        <font key="titleFont" metaFont="system"/>
+                                                    </box>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Xpv-6z-rBO">
+                                                        <rect key="frame" x="186" y="390" width="55" height="14"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Enabled" id="6Lb-Ls-jc2">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" red="0.0" green="0.31524979440789475" blue="0.74105674342105265" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="ocp-Kz-aF6">
+                                                        <rect key="frame" x="236" y="390" width="55" height="14"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Disabled" id="Zhg-3K-gV3">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="UxE-oF-FYx">
+                                                        <rect key="frame" x="57" y="7" width="96" height="14"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Different from DB" id="0Ex-IA-F5g">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="JjI-zY-3TQ">
+                                                        <rect key="frame" x="8" y="7" width="47" height="14"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Legend:" id="HVV-lT-4MO">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="HKe-7a-pkr">
+                                                        <rect key="frame" x="157" y="8" width="68" height="14"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Equal to DB" id="NUX-l9-xZU">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="k5T-xZ-Dzc">
+                                                        <rect key="frame" x="136" y="390" width="47" height="14"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Legend:" id="wpi-Y8-W3T">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>

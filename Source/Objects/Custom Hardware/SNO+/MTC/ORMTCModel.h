@@ -310,4 +310,4 @@ extern NSString* ORMTCModelMTCAMaskChanged;
 extern NSString* ORMTCModelIsPedestalEnabledInCSR;
 extern NSString* ORMTCPulserRateChanged;
 extern NSString* ORMTCGTMaskChanged;
-extern NSString* ORMTCLockOutWidth;
+extern NSString* LockOutWidthSerializationString;
