@@ -1955,23 +1955,23 @@
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="MTCA MIMIC 1" bezelStyle="regularSquare" imagePosition="left" tag="21" inset="2" id="Pzp-L6-Y3o">
+                                                                <buttonCell type="check" title="MTCA MIMIC 1" bezelStyle="regularSquare" imagePosition="left" tag="16" inset="2" id="Pzp-L6-Y3o">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="MTCA MIMIC 2" bezelStyle="regularSquare" imagePosition="left" tag="22" inset="2" id="oo3-Lm-jJe">
+                                                                <buttonCell type="check" title="MTCA MIMIC 2" bezelStyle="regularSquare" imagePosition="left" tag="17" inset="2" id="oo3-Lm-jJe">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="TELLIE" bezelStyle="regularSquare" imagePosition="left" tag="23" inset="2" id="R6K-Sh-1aI">
+                                                                <buttonCell type="check" title="TELLIE" bezelStyle="regularSquare" imagePosition="left" tag="22" inset="2" id="R6K-Sh-1aI">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="SMELLIE" bezelStyle="regularSquare" imagePosition="left" tag="24" inset="2" id="yLK-8H-OZO">
+                                                                <buttonCell type="check" title="SMELLIE" bezelStyle="regularSquare" imagePosition="left" tag="23" inset="2" id="yLK-8H-OZO">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="GT" bezelStyle="regularSquare" imagePosition="left" state="on" tag="25" inset="2" id="rEm-w3-T4y">
+                                                                <buttonCell type="check" title="GT" bezelStyle="regularSquare" imagePosition="left" state="on" tag="24" inset="2" id="rEm-w3-T4y">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
@@ -2308,23 +2308,23 @@
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="MTCA MIMIC 1" bezelStyle="regularSquare" imagePosition="left" tag="21" inset="2" id="3Ze-C0-0cX">
+                                                                <buttonCell type="check" title="MTCA MIMIC 1" bezelStyle="regularSquare" imagePosition="left" tag="16" inset="2" id="3Ze-C0-0cX">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="MTCA MIMIC 2" bezelStyle="regularSquare" imagePosition="left" tag="22" inset="2" id="nnG-Po-gLa">
+                                                                <buttonCell type="check" title="MTCA MIMIC 2" bezelStyle="regularSquare" imagePosition="left" tag="17" inset="2" id="nnG-Po-gLa">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="TELLIE" bezelStyle="regularSquare" imagePosition="left" tag="23" inset="2" id="Igl-Ld-Sa7">
+                                                                <buttonCell type="check" title="TELLIE" bezelStyle="regularSquare" imagePosition="left" tag="22" inset="2" id="Igl-Ld-Sa7">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="SMELLIE" bezelStyle="regularSquare" imagePosition="left" tag="24" inset="2" id="rAu-od-OoG">
+                                                                <buttonCell type="check" title="SMELLIE" bezelStyle="regularSquare" imagePosition="left" tag="23" inset="2" id="rAu-od-OoG">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="GT" bezelStyle="regularSquare" imagePosition="left" state="on" tag="25" inset="2" id="qs8-Do-7HB">
+                                                                <buttonCell type="check" title="GT" bezelStyle="regularSquare" imagePosition="left" state="on" tag="24" inset="2" id="qs8-Do-7HB">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
