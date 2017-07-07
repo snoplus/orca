@@ -361,6 +361,51 @@ isLoaded = isLoaded;
     return 0;
 }
 
+- (void) zeroPedestalMasksAtRunStart
+{
+    /* Zero the pedestal masks at the start of a run. Normally, this will only
+     * be called at the beginning of a physics run. The reason for doing this
+     * is that it was noticed that the noise on the trigger signal seemed to
+     * depend on how many channels had their pedestal enabled.
+     *
+     * See this shift report for more details:
+     * http://snopl.us/shift/view/9e1ff17e58704756a99f947ec2509f39. */
+    int slot;
+    ORFec32Model *fec;
+
+    /* First, set the pedestal mask in the GUI to zero. */
+    for (slot = 0; slot < 16; slot++) {
+        fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
+
+        if (!fec) continue;
+
+        [fec setPedEnabledMask:0];
+    }
+
+    /* Post a notification telling ORCA not to start the run until we've
+     * finished setting the pedestal masks. */
+    if ([[self xl3Link] isConnected]) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object:self];
+        /* Actually zero the pedestal masks in a separate thread so that they
+         * can be done in parallel at the start of a run. */
+        [NSThread detachNewThreadSelector:@selector(_zeroPedestalMasksAtRunStart)
+                                 toTarget:self
+                               withObject:nil];
+    }
+}
+
+- (void) _zeroPedestalMasksAtRunStart
+{
+    /* This function sets the pedestal mask at the start of the run, and then
+     * posts a notification telling the run model that the run can start. */
+    @autoreleasepool {
+        [self setPedestals];
+
+        /* Tell ORCA that we have finished setting the pedestal masks. */
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORReleaseRunStateChangeWait object:self];
+    }
+}
+
 - (void) runStartDone: (CrateInitResults *) results
 {
     if (results == NULL) {
@@ -2970,6 +3015,41 @@ err:
 
     for (i = 0; i < 16; i++) {
         args->channelMasks[i] = htonl(args->channelMasks[i]);
+    }
+
+    @try {
+        [[self xl3Link] sendCommand:MULTI_SET_CRATE_PEDS_ID withPayload:payload
+                        expectResponse:YES];
+    } @catch (NSException *e) {
+        return -1;
+    }
+
+    results = (MultiSetCratePedsResults *) payload;
+
+    if (ntohl(results->errorMask)) {
+        return -1;
+    }
+
+    return 0;
+}
+
+- (int) multiSetPedestalMask: (uint32_t) slotMask patterns: (uint32_t[16]) patterns
+{
+    /* Similar to setPedestalMask except any slots not in the slot mask will
+     * not have their pedestal mask changed. */
+    int i;
+    char payload[XL3_PAYLOAD_SIZE];
+    MultiSetCratePedsArgs *args;
+    MultiSetCratePedsResults *results;
+
+    memset(&payload, 0, XL3_PAYLOAD_SIZE);
+
+    args = (MultiSetCratePedsArgs *) payload;
+
+    args->slotMask = htonl(slotMask);
+
+    for (i = 0; i < 16; i++) {
+        args->channelMasks[i] = htonl(patterns[i]);
     }
 
     @try {

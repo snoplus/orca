@@ -23,7 +23,6 @@
 #import "ORKatrinV4FLTModel.h"
 #import "ORKatrinV4FLTDefs.h"
 #import "SLTv4_HW_Definitions.h"
-#import "ORFireWireInterface.h"
 #import "ORPlotView.h"
 #import "ORValueBarGroupView.h"
 #import "ORCompositePlotView.h"

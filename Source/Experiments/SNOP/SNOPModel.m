@@ -284,6 +284,8 @@ tellieRunFiles = _tellieRunFiles;
 
     nhitMonitor = [[NHitMonitor alloc] init];
 
+    ecaLock = [[NSLock alloc] init];
+
     [[self undoManager] disableUndoRegistration];
     [self initOrcaDBConnectionHistory];
     [self initDebugDBConnectionHistory];
@@ -421,6 +423,7 @@ tellieRunFiles = _tellieRunFiles;
     [logHost release];
     [anECARun release];
     [nhitMonitor release];
+    [ecaLock release];
     [_smellieRunFiles release];
     [_tellieRunFiles release];
     [_tellieRunNameLabel release];
@@ -601,6 +604,24 @@ tellieRunFiles = _tellieRunFiles;
             NSLogColor([NSColor redColor], @"error initializing MTC.\n");
             goto err;
         }
+
+        /* Load the XL3 hardware. */
+        objs = [[(ORAppDelegate*)[NSApp delegate] document]
+             collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+
+        for (i = 0; i < [objs count]; i++) {
+            xl3 = [objs objectAtIndex:i];
+
+            if ([gOrcaGlobals runType] & kPhysicsRun) {
+                /* If we're in a physics run, we zero the pedestal masks before
+                 * the run starts. This is because it was noticed that the
+                 * number of channels in the pedestal mask seems to affect the
+                 * noise on the trigger signals. See
+                 * http://snopl.us/shift/view/9e1ff17e58704756a99f947ec2509f39?index_start=15. */
+                [xl3 zeroPedestalMasksAtRunStart];
+            }
+        }
+
         break;
     default:
         /* Turn off triggers */
@@ -640,10 +661,20 @@ tellieRunFiles = _tellieRunFiles;
             xl3 = [objs objectAtIndex:i];
 
             if ([xl3 initAtRunStart]) {
-                NSLogColor([NSColor redColor], @"error initializing XL3.\n");
+                NSLogColor([NSColor redColor], @"error initializing XL3 %i.\n", [xl3 crateNumber]);
                 goto err;
             }
+
+            if ([gOrcaGlobals runType] & kPhysicsRun) {
+                /* If we're in a physics run, we zero the pedestal masks before
+                 * the run starts. This is because it was noticed that the
+                 * number of channels in the pedestal mask seems to affect the
+                 * noise on the trigger signals. See
+                 * http://snopl.us/shift/view/9e1ff17e58704756a99f947ec2509f39?index_start=15. */
+                [xl3 zeroPedestalMasksAtRunStart];
+            }
         }
+
         break;
     }
 
@@ -828,6 +859,12 @@ err:
         [self setLastRunTypeWord:[self runTypeWord]];
         NSString* _lastRunTypeWord = [NSString stringWithFormat:@"0x%X",(int)[self runTypeWord]];
         [self setLastRunTypeWordHex:_lastRunTypeWord]; //FIXME: revisit if we go over 32 bits
+    }
+
+    if ([gOrcaGlobals runType] & kPhysicsRun) {
+        /* If this is a physics run, we ping each slot in the detector once at
+         * the beginning of the run to look for any trigger issues. */
+        [self pingCratesAtRunStart];
     }
 
     return;
@@ -1087,6 +1124,32 @@ err:
         }
     }
 }
+
+- (void) shipEPEDStructWithCoarseDelay: (unsigned long) coarseDelay
+                             fineDelay: (unsigned long) fineDelay
+                        chargePulseAmp: (unsigned long) chargePulseAmp
+                         pedestalWidth: (unsigned long) pedestalWidth
+                               calType: (unsigned long) calType
+                            stepNumber: (unsigned long) stepNumber
+{
+    if ([[ORGlobal sharedGlobal] runInProgress]) {
+        @try {
+            [mtc_server okCommand:"send_eped_record %d %d %d %d %d %d %d",
+                pedestalWidth,
+                coarseDelay,
+                fineDelay,
+                chargePulseAmp, /* qinj_dacsetting */
+                stepNumber, /* half crate id? */
+                calType,
+                0 /* flags */
+            ];
+        } @catch (NSException *e) {
+            NSLogColor([NSColor redColor], @"failed to send EPED record: %@ \n",
+                       [e reason]);
+        }
+    }
+}
+
 - (void) shipEPEDRecord
 {
     /* Sends a command to the MTC server to ship an EPED record to the data
@@ -1129,6 +1192,299 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     }
 }
 
+- (NSLock *) ecaLock
+{
+    return ecaLock;
+}
+
+- (void) pingCratesAtRunStart
+{
+    [NSThread detachNewThreadSelector:@selector(_pingCratesAtRunStart)
+                             toTarget:self
+                           withObject:nil];
+}
+
+- (void) _pingCratesAtRunStart
+{
+    @autoreleasepool {
+        /* Try to acquire the lock for 10 seconds. If we can't get it then we
+         * just skip the ping crates. */
+        if ([ecaLock lockBeforeDate:[NSDate dateWithTimeIntervalSinceNow:10.0]]) {
+            @try {
+                [self __pingCratesAtRunStart];
+            } @finally {
+                /* Make sure to unlock the lock when we're done. */
+                [ecaLock unlock];
+            }
+        } else {
+            NSLogColor([NSColor redColor],
+                       @"pingCratesAtRunStart: unable to acquire eca lock!\n");
+        }
+    }
+}
+
+- (void) __pingCratesAtRunStart
+{
+    /* Fire pedestals on each slot in the detector. This function is called at
+     * the start of physics runs. A nearline job will eventually look at these
+     * events to determine if any slots are not firing triggers correctly.
+     * This function should only be called in a separate thread. */
+    int i, j, k;
+    uint32_t crate_pedestal_mask, coarse_delay, fine_delay, pedestal_width, gt_mask;
+    float pulser_rate;
+    uint32_t channelMasks[16];
+    uint32_t sync_trigger_mask, async_trigger_mask, tubii_dac;
+
+    NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+    NSArray* mtcs = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    NSArray* tubiis = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
+
+    xl3s = [xl3s sortedArrayUsingFunction:compareXL3s context:nil];
+
+    ORMTCModel* mtc;
+    ORXL3Model* xl3;
+    TUBiiModel* tubii;
+
+    if ([mtcs count] == 0) {
+        NSLogColor([NSColor redColor],
+                   @"pingCratesAtRunStart: couldn't find MTC object.\n");
+        return;
+    }
+
+    mtc = [mtcs objectAtIndex:0];
+
+    if ([tubiis count] == 0) {
+        NSLogColor([NSColor redColor],
+                   @"pingCratesAtRunStart: couldn't find TUBii object.\n");
+        return;
+    }
+
+    tubii = [tubiis objectAtIndex:0];
+
+    crate_pedestal_mask = [mtc pedCrateMask];
+    coarse_delay = [mtc coarseDelay];
+    fine_delay = [mtc fineDelay];
+    pedestal_width = [mtc pedestalWidth];
+    gt_mask = [mtc gtMask];
+
+    pulser_rate = [mtc pgtRate];
+
+    /* Set the coarse delay. */
+    [mtc setCoarseDelay:250];
+    @try {
+        [mtc loadCoarseDelayToHardware];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"pingCratesAtRunStart: error setting the MTCD coarse delay. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+        return;
+    }
+
+    /* Set the fine delay. */
+    [mtc setFineDelay:0];
+    @try {
+        [mtc loadFineDelayToHardware];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"pingCratesAtRunStart: error setting the MTCD fine delay. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+        return;
+    }
+
+    /* Reset the pedestal width. */
+    [mtc setPedestalWidth:50];
+    @try {
+        [mtc loadPedWidthToHardware];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"pingCratesAtRunStart: error setting the MTCD pedestal width. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+        return;
+    }
+
+    if (gt_mask & MTC_EXT_2_MASK) {
+        NSLogColor([NSColor redColor], @"pingCratesAtRunStart: EXT2 is masked in, so can't run ping crates.\n");
+        return;
+    }
+
+    /* Set the EXT2 trigger signal high so that it gets latched in every event
+     * while we ping the crates. This is to mark these events so that if we
+     * find out that changing the pedestal mask while running causes noise or
+     * other problems we can throw these events out. */
+    @try {
+        sync_trigger_mask = [tubii syncTrigMask];
+        async_trigger_mask = [tubii asyncTrigMask];
+        tubii_dac = [tubii MTCAMimic1_ThresholdInBits];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"pingCratesAtRunStart: error getting TUBii trigger masks or dac value. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+        return;
+    }
+
+    if (sync_trigger_mask != 0 || async_trigger_mask != 0) {
+        NSLogColor([NSColor redColor],
+                   @"pingCratesAtRunStart: tubii already has triggers enabled.\n");
+    }
+
+    @try {
+        [tubii setTrigMask:0x10000 setAsyncMask:0];
+        [tubii setMTCAMimic1_ThresholdInBits:0];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"pingCratesAtRunStart: error setting TUBii trigger masks or dac value. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+        return;
+    }
+
+    /* Enable all pedestals for each crate, and then fire a single pedestal
+     * pulse. */
+    for (i = 0; i < [xl3s count]; i++) {
+        xl3 = [xl3s objectAtIndex:i];
+
+        /* Enable all crates in the MTCD pedestal mask. */
+        [mtc setPedCrateMask:1 << [xl3 crateNumber]];
+
+        @try {
+            [mtc loadPedestalCrateMaskToHardware];
+        } @catch (NSException *e) {
+            NSLogColor([NSColor redColor],
+                       @"pingCratesAtRunStart: error setting the MTCD crate pedestal mask. error: "
+                        "%@ reason: %@\n", [e name], [e reason]);
+            continue;
+        }
+
+        if (![[xl3 xl3Link] isConnected]) continue;
+
+        for (j = 0; j < 16; j++) {
+            if (!([xl3 getSlotsPresent] & (1 << j))) continue;
+
+            for (k = 0; k < 16; k++) {
+                if (k == j) {
+                    /* For the slot we are testing, set the pedestal mask to
+                     * 0xffffffff. */
+                    channelMasks[k] = 0xffffffff;
+                } else {
+                    /* For all other slots, pedestal channels 17 and 18 to make
+                     * sure we don't get any pedestal pickup. */
+                    channelMasks[k] = 0x60000;
+                }
+            }
+
+            if ([xl3 multiSetPedestalMask:[xl3 getSlotsPresent]
+                     patterns:channelMasks]) {
+                NSLogColor([NSColor redColor], @"pingCratesAtRunStart: failed to set pedestal mask "
+                            "for crate %02d slot %02d\n", i, j);
+                continue;
+            }
+
+            /* The crate and slot are encoded in the step number or
+             * half_crate_id field. For example, to unpack the crate and
+             * slot:
+             *
+             *     crate = (eped_record.half_crate_id >> 4) & 0xff;
+             *     slot = eped_record.half_crate_id & 0xf;
+             */
+            [self shipEPEDStructWithCoarseDelay: [mtc coarseDelay]
+                                      fineDelay: [mtc fineDelay]
+                                 chargePulseAmp: 0
+                                  pedestalWidth: [mtc pedestalWidth]
+                                        calType: 50
+                                     stepNumber: ((i << 4) | j)];
+
+            @try {
+                [mtc firePedestals:1 withRate:1];
+            } @catch (NSException *e) {
+                NSLogColor([NSColor redColor],
+                           @"pingCratesAtRunStart: failed to fire pedestal. error: %@ reason: %@\n",
+                           [e name], [e reason]);
+            }
+        }
+    }
+
+    /* Send an EPED record with calType set to zero to let the nearline job
+     * know that we are done. */
+    [self shipEPEDStructWithCoarseDelay: [mtc coarseDelay]
+                              fineDelay: [mtc fineDelay]
+                         chargePulseAmp: 0
+                          pedestalWidth: [mtc pedestalWidth]
+                                calType: 0
+                             stepNumber: 0xffffffff];
+
+    /* Set the pedestal mask for each crate back. */
+    for (i = 0; i < [xl3s count]; i++) {
+        xl3 = [xl3s objectAtIndex:i];
+
+        if ([[xl3 xl3Link] isConnected]) {
+            [xl3 setPedestals];
+        }
+    }
+
+    /* Reset tubii's trigger masks and DAC value. */
+    @try {
+        [tubii setTrigMask:0 setAsyncMask:0];
+        [tubii setMTCAMimic1_ThresholdInBits:tubii_dac];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"pingCratesAtRunStart: error setting TUBii trigger masks or dac value. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+    }
+
+    /* Reset the crate pedestal all crates in the MTCD pedestal mask. */
+    [mtc setPedCrateMask:crate_pedestal_mask];
+    @try {
+        [mtc loadPedestalCrateMaskToHardware];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"pingCratesAtRunStart: error setting the MTCD crate pedestal mask. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+    }
+
+    /* Reset the coarse delay. */
+    [mtc setCoarseDelay:coarse_delay];
+    @try {
+        [mtc loadCoarseDelayToHardware];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"pingCratesAtRunStart: error setting the MTCD coarse delay. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+    }
+
+    /* Reset the fine delay. */
+    [mtc setFineDelay:fine_delay];
+    @try {
+        [mtc loadFineDelayToHardware];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"pingCratesAtRunStart: error setting the MTCD fine delay. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+    }
+
+    /* Reset the pedestal width. */
+    [mtc setPedestalWidth:pedestal_width];
+    @try {
+        [mtc loadPedWidthToHardware];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"pingCratesAtRunStart: error setting the MTCD pedestal width. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+    }
+
+    /* Reset the pulser rate since the firePedestals function sets the pulser
+     * rate to 0. */
+    @try {
+        [mtc setPgtRate:pulser_rate];
+        [mtc loadPulserRateToHardware];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"pingCratesAtRunStart: error setting the pulser rate. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+    }
+}
+
 - (void) pingCrates
 {
     /* Enables pedestals for all channels in each crate one at a time and sends
@@ -1166,7 +1522,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         [mtc loadPedestalCrateMaskToHardware];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
-                   @"error setting the MTCD crate pedestal mask. error: "
+                   @"pingCrates: error setting the MTCD crate pedestal mask. error: "
                     "%@ reason: %@\n", [e name], [e reason]);
         return;
     }
@@ -1178,7 +1534,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         if ([[xl3 xl3Link] isConnected]) {
             if ([xl3 setPedestalMask:[xl3 getSlotsPresent] pattern:0]) {
                 NSLogColor([NSColor redColor],
-                           @"failed to set pedestal mask for crate %02d\n", i);
+                           @"pingCrates: failed to set pedestal mask for crate %02d\n", i);
                 continue;
             }
         }
@@ -1193,7 +1549,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
             if ([xl3 setPedestalMask:[xl3 getSlotsPresent]
                  pattern:0xffffffff]) {
                 NSLogColor([NSColor redColor],
-                           @"failed to set pedestal mask for crate %02d\n", i);
+                           @"pingCrates: failed to set pedestal mask for crate %02d\n", i);
                 continue;
             }
 
@@ -1201,14 +1557,14 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
                 [mtc firePedestals:1 withRate:1];
             } @catch (NSException *e) {
                 NSLogColor([NSColor redColor],
-                           @"failed to fire pedestal. error: %@ reason: %@\n",
+                           @"pingCrates: failed to fire pedestal. error: %@ reason: %@\n",
                            [e name], [e reason]);
             }
 
             /* Set pedestal mask back to 0. */
             if ([xl3 setPedestalMask:[xl3 getSlotsPresent] pattern:0]) {
                 NSLogColor([NSColor redColor],
-                           @"failed to set pedestal mask for crate %02d\n", i);
+                           @"pingCrates: failed to set pedestal mask for crate %02d\n", i);
                 continue;
             }
 
@@ -1231,7 +1587,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         [mtc loadPedestalCrateMaskToHardware];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
-                   @"error setting the MTCD crate pedestal mask. error: "
+                   @"pingCrates: error setting the MTCD crate pedestal mask. error: "
                     "%@ reason: %@\n", [e name], [e reason]);
     }
 
@@ -1242,7 +1598,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         [mtc loadPulserRateToHardware];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
-                   @"error setting the pulser rate. error: "
+                   @"pingCrates: error setting the pulser rate. error: "
                     "%@ reason: %@\n", [e name], [e reason]);
     }
 }
@@ -1759,8 +2115,6 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 
 - (void) hvMasterTriggersOFF
 {
-    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(setIsPollingXl3:) withObject:NO];
-
     [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersOFF)];
 }
 

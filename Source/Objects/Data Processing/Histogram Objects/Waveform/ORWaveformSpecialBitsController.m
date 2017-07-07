@@ -67,7 +67,7 @@
 	}
 }
 
-#if 0
+//#if 0
 //2017-02-15 -tb- commented out to force using the 'slow' plotting methods (required to take the offset index into account
 
 - (NSUInteger) plotter:(id)aPlot indexRange:(NSRange)aRange stride:(NSUInteger)stride x:(NSMutableData*)x y:(NSMutableData*)y
@@ -96,6 +96,6 @@
     }
     return length;
 }
-#endif
+//#endif
 
 @end

@@ -17,6 +17,8 @@
 #import "ORGlobal.h"
 #import "RedisClient.h"
 #import "ORMTC_Constants.h"
+#import "TUBiiModel.h"
+#import "ORAppDelegate.h"
 
 #define SWAP_INT32(a,b) swap_int32((uint32_t *)(a),(b))
 
@@ -190,6 +192,11 @@ static int get_nhit_trigger_count(char *err, RedisClient *mtc, int sock, char *b
                      selector : @selector(runAboutToStop:)
                          name : ORRunAboutToStopNotification
                        object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(orcaAboutToQuit:)
+                         name : OROrcaAboutToQuitNotice
+                       object : nil];
 }
 
 - (void) runAboutToStop: (NSNotification*) aNote
@@ -209,6 +216,17 @@ static int get_nhit_trigger_count(char *err, RedisClient *mtc, int sock, char *b
     [NSThread detachNewThreadSelector:@selector(_waitForThreadToFinish)
                              toTarget:self
                            withObject:nil];
+}
+
+- (void) orcaAboutToQuit: (NSNotification*) aNote
+{
+    /* Stop the nhit monitor if it's running and delay the termination. */
+    if (![self isRunning]) return;
+
+    [self stop];
+
+    /* Tell Orca to wait five seconds before quitting. */
+    [(ORAppDelegate *)[NSApp delegate] delayTermination];
 }
 
 - (void) _waitForThreadToFinish
@@ -356,6 +374,38 @@ err:
 
 - (void) run: (NSDictionary *) args
 {
+    SNOPModel *snop;
+
+    @autoreleasepool {
+        NSArray* snops = [[(ORAppDelegate*)[NSApp delegate] document]
+             collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+
+        if ([snops count] == 0) {
+            NSLogColor([NSColor redColor], @"nhit monitor: unable to find SNO+ model object.\n");
+            return;
+        }
+
+        snop = [snops objectAtIndex:0];
+
+        /* Try to acquire the lock for 10 seconds. If we can't get it then we
+         * just skip running the nhit monitor. */
+        if ([[snop ecaLock] lockBeforeDate:[NSDate dateWithTimeIntervalSinceNow:10.0]]) {
+            @try {
+                [self _run:args];
+            } @finally {
+                /* Make sure to unlock the lock when we're done. */
+                [[snop ecaLock] unlock];
+            }
+        } else {
+            NSLogColor([NSColor redColor],
+                       @"nhit monitor: unable to acquire eca lock!\n");
+            [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORNhitMonitorNotification object:self userInfo:@{@"finished":@1}];
+        }
+    }
+}
+
+- (void) _run: (NSDictionary *) args
+{
     /* Run the nhit monitor. This method should only be called by the start method. */
     SNOPModel *snop;
     uint32_t pedestals_enabled, pulser_enabled, pedestal_mask, coarse_delay;
@@ -366,193 +416,246 @@ err:
     int i;
     ORFec32Model *fec;
     int slot, channel;
+    uint32_t sync_trigger_mask, async_trigger_mask, tubii_dac;
+    TUBiiModel* tubii;
 
-    @autoreleasepool {
-        int crate = [[args objectForKey:@"crate"] intValue];
-        int pulserRate = [[args objectForKey:@"pulserRate"] intValue];
-        int numPulses = [[args objectForKey:@"numPulses"] intValue];
-        int maxNhit = [[args objectForKey:@"maxNhit"] intValue];
+    int crate = [[args objectForKey:@"crate"] intValue];
+    int pulserRate = [[args objectForKey:@"pulserRate"] intValue];
+    int numPulses = [[args objectForKey:@"numPulses"] intValue];
+    int maxNhit = [[args objectForKey:@"maxNhit"] intValue];
 
-        NSArray* snops = [[(ORAppDelegate*)[NSApp delegate] document]
-             collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    NSArray* snops = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
 
-        if ([snops count] == 0) {
-            NSLogColor([NSColor redColor], @"nhit monitor: unable to find SNO+ model object.\n");
-            goto err;
+    if ([snops count] == 0) {
+        NSLogColor([NSColor redColor], @"nhit monitor: unable to find SNO+ model object.\n");
+        goto err;
+    }
+
+    snop = [snops objectAtIndex:0];
+
+    NSArray* tubiis = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
+
+    if ([tubiis count] == 0) {
+        NSLogColor([NSColor redColor],
+                   @"nhit monitor: couldn't find TUBii object.\n");
+        return;
+    }
+
+    tubii = [tubiis objectAtIndex:0];
+
+    /* Since we are running in a separate thread, it's easiest to just open
+     * up a new connection to the mtc server instead of having to dispatch
+     * all commands to the main thread. */
+    mtc = [[RedisClient alloc] initWithHostName:[snop mtcHost] withPort:[snop mtcPort]];
+    /* Autorelease the MTC object. It will get freed when the function
+     * finishes since we are in an @autoreleasepool block. */
+    [mtc autorelease];
+
+    /* Find the correct XL3. */
+    xl3 = nil;
+
+    NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+
+    for (i = 0; i < [xl3s count]; i++) {
+        if ([[xl3s objectAtIndex:i] crateNumber] == crate) {
+            xl3 = [xl3s objectAtIndex:i];
+            break;
         }
+    }
 
-        snop = [snops objectAtIndex:0];
+    if (!xl3) {
+        NSLogColor([NSColor redColor], @"nhit monitor: unable to find XL3 %i\n", crate);
+        goto err;
+    }
 
-        /* Since we are running in a separate thread, it's easiest to just open
-         * up a new connection to the mtc server instead of having to dispatch
-         * all commands to the main thread. */
-        mtc = [[RedisClient alloc] initWithHostName:[snop mtcHost] withPort:[snop mtcPort]];
-        /* Autorelease the MTC object. It will get freed when the function
-         * finishes since we are in an @autoreleasepool block. */
-        [mtc autorelease];
+    if (![xl3 isTriggerON]) {
+        NSLogColor([NSColor redColor], @"nhit monitor: crate %i triggers are off!\n", crate);
+        goto err;
+    }
 
-        /* Find the correct XL3. */
-        xl3 = nil;
+    if (maxNhit > MAX_NHIT) {
+        NSLogColor([NSColor redColor], @"nhit monitor: max nhit must be less than %i\n", MAX_NHIT);
+        goto err;
+    }
 
-        NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document]
-             collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+    /* Disable all pedestals. */
+    for (slot = 0; slot < 16; slot++) {
+        fec = [[OROrderedObjManager for:[xl3 guardian]] objectInSlot:16-slot];
 
-        for (i = 0; i < [xl3s count]; i++) {
-            if ([[xl3s objectAtIndex:i] crateNumber] == crate) {
-                xl3 = [xl3s objectAtIndex:i];
-                break;
-            }
-        }
+        if (!fec) continue;
 
-        if (!xl3) {
-            NSLogColor([NSColor redColor], @"nhit monitor: unable to find XL3 %i\n", crate);
-            goto err;
-        }
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [fec setPedEnabledMask:0];
+        });
+    }
 
-        if (![xl3 isTriggerON]) {
-            NSLogColor([NSColor redColor], @"nhit monitor: crate %i triggers are off!\n", crate);
-            goto err;
-        }
-
-        if (maxNhit > MAX_NHIT) {
-            NSLogColor([NSColor redColor], @"nhit monitor: max nhit must be less than %i\n", MAX_NHIT);
-            goto err;
-        }
-
-        /* Disable all pedestals. */
+    /* create a list of channels for which to enable pedestals. We only add
+     * channels if both the N100 and N20 triggers are enabled. */
+    NSMutableArray *slots = [NSMutableArray array];
+    NSMutableArray *channels = [NSMutableArray array];
+    /* Loop over channels 17 and 18 first, since they are the most likely
+     * to have pickup. Then, we loop over the channels in order starting
+     * from 0, except we skip the channels at the edge of each daughter
+     * board since those tend to cause pickup on the next set of channels. */
+    int channel_order[32] = {17,18,0,1,2,3,4,5,8,9,10,11,12,13,14,19,20,21,22,25,26,27,28,29,30,31,6,7,15,16,23,24};
+    for (i = 0; i < 32; i++) {
+        channel = channel_order[i];
         for (slot = 0; slot < 16; slot++) {
             fec = [[OROrderedObjManager for:[xl3 guardian]] objectInSlot:16-slot];
 
             if (!fec) continue;
 
-            dispatch_sync(dispatch_get_main_queue(), ^{
-                [fec setPedEnabledMask:0];
-            });
-        }
-
-        /* create a list of channels for which to enable pedestals. We only add
-         * channels if both the N100 and N20 triggers are enabled. */
-        NSMutableArray *slots = [NSMutableArray array];
-        NSMutableArray *channels = [NSMutableArray array];
-        /* Loop over channels 17 and 18 first, since they are the most likely
-         * to have pickup. Then, we loop over the channels in order starting
-         * from 0, except we skip the channels at the edge of each daughter
-         * board since those tend to cause pickup on the next set of channels. */
-        int channel_order[32] = {17,18,0,1,2,3,4,5,8,9,10,11,12,13,14,19,20,21,22,25,26,27,28,29,30,31,6,7,15,16,23,24};
-        for (i = 0; i < 32; i++) {
-            channel = channel_order[i];
-            for (slot = 0; slot < 16; slot++) {
-                fec = [[OROrderedObjManager for:[xl3 guardian]] objectInSlot:16-slot];
-
-                if (!fec) continue;
-
-                if ([fec trigger100nsEnabled: channel] && \
-                    [fec trigger20nsEnabled: channel]) {
-                    [slots addObject:[NSNumber numberWithInt:slot]];
-                    [channels addObject:[NSNumber numberWithInt:channel]];
-                }
+            if ([fec trigger100nsEnabled: channel] && \
+                [fec trigger20nsEnabled: channel]) {
+                [slots addObject:[NSNumber numberWithInt:slot]];
+                [channels addObject:[NSNumber numberWithInt:channel]];
             }
         }
+    }
 
-        if (maxNhit > [channels count]) {
-            NSLogColor([NSColor redColor], @"nhit monitor: crate %i only has %i channels with triggers enabled, but max nhit is %i\n", crate, [channels count], maxNhit);
-            goto err;
-        }
+    if (maxNhit > [channels count]) {
+        NSLogColor([NSColor redColor], @"nhit monitor: crate %i only has %i channels with triggers enabled, but max nhit is %i\n", crate, [channels count], maxNhit);
+        goto err;
+    }
 
-        /* Connect to the data stream server. */
-        if ([self connect]) {
-            NSLogColor([NSColor redColor], @"nhit monitor: failed to connect to the data stream server\n");
-            goto err;
-        }
+    /* Connect to the data stream server. */
+    if ([self connect]) {
+        NSLogColor([NSColor redColor], @"nhit monitor: failed to connect to the data stream server\n");
+        goto err;
+    }
 
-        @try {
-            /* Save the current MTC settings so we can set them back when the
-             * nhit monitor is done. */
-            control_register = [mtc intCommand:"mtcd_read 0x0"];
-            pedestals_enabled = control_register & 0x1;
-            pulser_enabled = control_register & 0x2;
-            pedestal_mask = [mtc intCommand:"get_ped_crate_mask"];
-            pulser_rate = [mtc intCommand:"get_pulser_freq"];
-            coarse_delay = [mtc intCommand:"get_coarse_delay"];
-            fine_delay = [mtc intCommand:"get_fine_delay"];
-            pedestal_width = [mtc intCommand:"get_pedestal_width"];
-            gt_mask = [mtc intCommand:"get_gt_mask"];
-        } @catch (NSException *e) {
-            NSLogColor([NSColor redColor], @"nhit monitor failed to get mtc "
-                       "hardware state. error: %@ reason: %@\n",
-                       [e name], [e reason]);
-            [self disconnect];
-            goto err;
-        }
+    @try {
+        /* Save the current MTC settings so we can set them back when the
+         * nhit monitor is done. */
+        control_register = [mtc intCommand:"mtcd_read 0x0"];
+        pedestals_enabled = control_register & 0x1;
+        pulser_enabled = control_register & 0x2;
+        pedestal_mask = [mtc intCommand:"get_ped_crate_mask"];
+        pulser_rate = [mtc intCommand:"get_pulser_freq"];
+        coarse_delay = [mtc intCommand:"get_coarse_delay"];
+        fine_delay = [mtc intCommand:"get_fine_delay"];
+        pedestal_width = [mtc intCommand:"get_pedestal_width"];
+        gt_mask = [mtc intCommand:"get_gt_mask"];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor], @"nhit monitor failed to get mtc "
+                   "hardware state. error: %@ reason: %@\n",
+                   [e name], [e reason]);
+        [self disconnect];
+        goto err;
+    }
 
-        if ((gt_mask & MTC_PULSE_GT_MASK) == 0) {
-            NSLogColor([NSColor redColor], @"nhit monitor: PULSE_GT is not masked in!\n");
-            [self disconnect];
-            goto err;
-        }
+    if ((gt_mask & MTC_PULSE_GT_MASK) == 0) {
+        NSLogColor([NSColor redColor], @"nhit monitor: PULSE_GT is not masked in!\n");
+        [self disconnect];
+        goto err;
+    }
 
-        @try {
-            /* Initialize the MTC settings for the nhit monitor. */
-            [mtc okCommand:"disable_pulser"];
+    if (gt_mask & MTC_EXT_2_MASK) {
+        NSLogColor([NSColor redColor], @"nhit monitor: EXT2 is masked in, so can't run nhit monitor.\n");
+        [self disconnect];
+        goto err;
+    }
+
+    @try {
+        sync_trigger_mask = [tubii syncTrigMask];
+        async_trigger_mask = [tubii asyncTrigMask];
+        tubii_dac = [tubii MTCAMimic1_ThresholdInBits];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"nhit monitor: error getting TUBii trigger masks or dac value. "
+                    "error: %@ reason: %@\n", [e name], [e reason]);
+        [self disconnect];
+        goto err;
+    }
+
+    if (sync_trigger_mask != 0 || async_trigger_mask != 0) {
+        NSLogColor([NSColor redColor],
+                   @"nhit monitor: tubii already has triggers enabled.\n");
+        [self disconnect];
+        goto err;
+    }
+
+    @try {
+        /* Initialize the MTC settings for the nhit monitor. */
+        [mtc okCommand:"disable_pulser"];
+        [mtc okCommand:"enable_pedestals"];
+        [mtc okCommand:"set_ped_crate_mask %i", (1 << crate)];
+        [mtc okCommand:"set_pulser_freq %i", pulserRate];
+        [mtc okCommand:"set_coarse_delay %i", COARSE_DELAY];
+        [mtc okCommand:"set_fine_delay %i", FINE_DELAY];
+        [mtc okCommand:"set_pedestal_width %i", PEDESTAL_WIDTH];
+
+        /* Set the EXT2 trigger signal high so that it gets latched in every
+         * event while we run the nhit monitor. This is to mark these events so
+         * that if we find out that changing the pedestal mask while running
+         * causes noise or other problems we can throw these events out. */
+        [tubii setTrigMask:0x10000 setAsyncMask:0];
+        [tubii setMTCAMimic1_ThresholdInBits:0];
+
+        /* turn off all pedestals */
+        [xl3 setPedestalMask:[xl3 getSlotsPresent] pattern:0];
+
+        /* We call another method here because we need to wrap everything
+         * in a try-catch block so that if anything fails we make sure to
+         * reset the MTC settings. */
+        [self __run:crate pulserRate:pulserRate numPulses:numPulses maxNhit:maxNhit slots:slots channels:channels];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor], @"nhit monitor failed. error: %@ "
+                   "reason: %@\n", [e name], [e reason]);
+    } @finally {
+        /* Make sure to reset all the hardware settings. */
+        if (pedestals_enabled) {
             [mtc okCommand:"enable_pedestals"];
-            [mtc okCommand:"set_ped_crate_mask %i", (1 << crate)];
-            [mtc okCommand:"set_pulser_freq %i", pulserRate];
-            [mtc okCommand:"set_coarse_delay %i", COARSE_DELAY];
-            [mtc okCommand:"set_fine_delay %i", FINE_DELAY];
-            [mtc okCommand:"set_pedestal_width %i", PEDESTAL_WIDTH];
-
-            /* turn off all pedestals */
-            [xl3 setPedestalMask:[xl3 getSlotsPresent] pattern:0];
-
-            /* We call another method here because we need to wrap everything
-             * in a try-catch block so that if anything fails we make sure to
-             * reset the MTC settings. */
-            [self _run:crate pulserRate:pulserRate numPulses:numPulses maxNhit:maxNhit slots:slots channels:channels];
-        } @catch (NSException *e) {
-            NSLogColor([NSColor redColor], @"nhit monitor failed. error: %@ "
-                       "reason: %@\n", [e name], [e reason]);
-        } @finally {
-            /* Make sure to reset all the hardware settings. */
-            if (pedestals_enabled) {
-                [mtc okCommand:"enable_pedestals"];
-            } else {
-                [mtc okCommand:"disable_pedestals"];
-            }
-
-            if (pulser_enabled) {
-                [mtc okCommand:"enable_pulser"];
-            } else {
-                [mtc okCommand:"disable_pulser"];
-            }
-
-            [mtc okCommand:"set_ped_crate_mask %i", pedestal_mask];
-            [mtc okCommand:"set_pulser_freq %i", pulser_rate];
-            [mtc okCommand:"set_coarse_delay %i", coarse_delay];
-            [mtc okCommand:"set_fine_delay %i", fine_delay];
-            [mtc okCommand:"set_pedestal_width %i", pedestal_width];
-
-            /* turn off all pedestals */
-            [xl3 setPedestalMask:[xl3 getSlotsPresent] pattern:0];
-
-            /* Disconnect from the data server. */
-            [self disconnect];
+        } else {
+            [mtc okCommand:"disable_pedestals"];
         }
 
-        NSLog(@"nhit monitor done\n");
+        if (pulser_enabled) {
+            [mtc okCommand:"enable_pulser"];
+        } else {
+            [mtc okCommand:"disable_pulser"];
+        }
+
+        [mtc okCommand:"set_ped_crate_mask %i", pedestal_mask];
+        [mtc okCommand:"set_pulser_freq %i", pulser_rate];
+        [mtc okCommand:"set_coarse_delay %i", coarse_delay];
+        [mtc okCommand:"set_fine_delay %i", fine_delay];
+        [mtc okCommand:"set_pedestal_width %i", pedestal_width];
+
+        /* turn off all pedestals */
+        [xl3 setPedestalMask:[xl3 getSlotsPresent] pattern:0];
+
+        /* Reset tubii's trigger masks and DAC value. */
+        @try {
+            [tubii setTrigMask:0 setAsyncMask:0];
+            [tubii setMTCAMimic1_ThresholdInBits:tubii_dac];
+        } @catch (NSException *e) {
+            NSLogColor([NSColor redColor],
+                       @"error setting TUBii trigger masks or dac value. error: "
+                        "%@ reason: %@\n", [e name], [e reason]);
+        }
+
+        /* Disconnect from the data server. */
+        [self disconnect];
+    }
+
+    NSLog(@"nhit monitor done\n");
 
 err:
-        /* Post a notification so that the SNOPController can enable the run
-         * button. Note: ideally the SNOPController would just check to see if
-         * the nhit monitor was running and then enable/disable the buttons
-         * depending on if it's running. However, there is no easy way to post
-         * the notification *after* this thread exits, and so when the
-         * notification is posted the nhit monitor will still be running. To
-         * get around this we add a userInfo dictionary to the notification. */
-        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORNhitMonitorNotification object:self userInfo:@{@"finished":@1}];
-    }
+    /* Post a notification so that the SNOPController can enable the run
+     * button. Note: ideally the SNOPController would just check to see if
+     * the nhit monitor was running and then enable/disable the buttons
+     * depending on if it's running. However, there is no easy way to post
+     * the notification *after* this thread exits, and so when the
+     * notification is posted the nhit monitor will still be running. To
+     * get around this we add a userInfo dictionary to the notification. */
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORNhitMonitorNotification object:self userInfo:@{@"finished":@1}];
 }
 
-- (void) _run: (int) crate pulserRate: (int) pulserRate numPulses: (int) numPulses maxNhit: (int) maxNhit slots: (NSMutableArray *) slots channels:(NSMutableArray *) channels
+- (void) __run: (int) crate pulserRate: (int) pulserRate numPulses: (int) numPulses maxNhit: (int) maxNhit slots: (NSMutableArray *) slots channels:(NSMutableArray *) channels
 {
     /* Run the nhit monitor. This method should only be called in a separate
      * thread. The start method should be called to actually start the nhit
