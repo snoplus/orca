@@ -9,6 +9,9 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SNOPController">
             <connections>
+                <outlet property="ECApatternPopUpButton" destination="dBJ-eI-bEw" id="Bsm-ET-LDq"/>
+                <outlet property="ECAtypePopUpButton" destination="V5O-ay-jfT" id="6wG-wM-xlf"/>
+                <outlet property="TSlopePatternTextField" destination="u1v-fA-9yA" id="Q46-aw-qcG"/>
                 <outlet property="dataHost" destination="UWf-rc-B5V" id="XsF-fQ-J4g"/>
                 <outlet property="dataPort" destination="iRb-mE-Azg" id="q3z-dm-lJm"/>
                 <outlet property="debugDBClearButton" destination="2731" id="1EM-Mi-IT6"/>
@@ -20,11 +23,27 @@
                 <outlet property="detectorHVStatus" destination="fHi-qS-g5A" id="oT8-lw-7La"/>
                 <outlet property="detectorLockButton" destination="368" id="370"/>
                 <outlet property="detectorState" destination="rCO-DX-2zv" id="Rep-KK-iKb"/>
+                <outlet property="ecaNEventsTextField" destination="Fze-hD-1jb" id="bwp-QM-cS5"/>
+                <outlet property="ecaPulserRate" destination="Unf-wm-WPb" id="8ED-iU-RaC"/>
                 <outlet property="elapsedTimeField" destination="3771" id="ZCv-hI-YYv"/>
                 <outlet property="globalxl3Mode" destination="4194" id="4216"/>
                 <outlet property="hvStatusMatrix" destination="2830" id="2912"/>
                 <outlet property="inMaintenanceLabel" destination="ZIv-V5-16l" id="aaL-TT-0jx"/>
                 <outlet property="lightBoardView" destination="URf-Um-n84" id="fpR-9q-LuL"/>
+                <outlet property="loadedSmellieApproxTimeLabel" destination="dU9-zi-x8w" id="AEc-H4-7zL"/>
+                <outlet property="loadedSmellieFibresLabel" destination="cS3-ex-tXv" id="FLM-QI-rdR"/>
+                <outlet property="loadedSmellieLasersLabel" destination="s5i-jb-6co" id="xeO-dI-eDo"/>
+                <outlet property="loadedSmellieOperationModeLabel" destination="C9d-li-hQO" id="WNw-Dz-lfk"/>
+                <outlet property="loadedSmellieRunNameLabel" destination="IIC-vS-5qH" id="vDW-Vx-2ps"/>
+                <outlet property="loadedSmellieSuperKwavelengths" destination="yLg-GR-Ce7" id="ZBI-x5-Yy8"/>
+                <outlet property="loadedSmellieTriggerFrequencyLabel" destination="J01-jv-n2K" id="hxE-qg-8YX"/>
+                <outlet property="loadedTellieFireRateLabel" destination="xK4-U6-Ycb" id="kZm-nx-6Iu"/>
+                <outlet property="loadedTellieIntensityLabel" destination="IpF-Yg-6Ug" id="vlh-ic-6kJ"/>
+                <outlet property="loadedTellieNoPulsesLabel" destination="391-bz-WPw" id="upB-9w-DF7"/>
+                <outlet property="loadedTellieNodesLabel" destination="vKf-HJ-Sm0" id="6ur-pi-FuR"/>
+                <outlet property="loadedTellieOperationLabel" destination="syb-lx-DpA" id="xtf-30-SAG"/>
+                <outlet property="loadedTellieRunNameLabel" destination="FCg-q6-iyf" id="ukT-F4-he3"/>
+                <outlet property="loadedTellieRunTimeLabel" destination="lqW-Ew-72m" id="809-bM-1kF"/>
                 <outlet property="lockStatusTextField" destination="Np3-DI-Iif" id="5ty-0b-EY4"/>
                 <outlet property="logHost" destination="KzD-He-2lG" id="LXs-Sy-EvF"/>
                 <outlet property="logPort" destination="DpW-Vd-aQd" id="9DN-uP-F1q"/>
@@ -61,6 +80,11 @@
                 <outlet property="runTypeWordMatrix" destination="3935" id="GbT-ZR-J8S"/>
                 <outlet property="runTypeWordSRMatrix" destination="zuQ-GY-eWY" id="e1l-GQ-cUd"/>
                 <outlet property="runsLockButton" destination="URx-nh-GMP" id="E2u-gI-0d3"/>
+                <outlet property="smellieEmergencyStop" destination="uhs-DN-ePI" id="MPy-Ac-3Gi"/>
+                <outlet property="smellieLoadRunFile" destination="wQo-rL-aDD" id="7t3-LC-Ad3"/>
+                <outlet property="smellieRunFileNameField" destination="3cW-2R-0PG" id="deA-fT-6xF"/>
+                <outlet property="smellieStartRunButton" destination="J8i-g9-LzC" id="NqN-IT-2nr"/>
+                <outlet property="smellieStopRunButton" destination="Cgv-06-MFb" id="Sdx-C4-GXB"/>
                 <outlet property="snopView" destination="6" id="Vn9-RA-Mde"/>
                 <outlet property="standardRunCAENCurrentMatrix" destination="Xdt-S9-5q7" id="4sp-ez-vw0"/>
                 <outlet property="standardRunCAENDBMatrix" destination="i9Q-u5-4Yq" id="An8-fS-ch6"/>
@@ -77,9 +101,14 @@
                 <outlet property="standardRunThreshLabels" destination="002-Sr-nUh" id="UPB-Ij-RiI"/>
                 <outlet property="standardRunVersionPopupMenu" destination="6EN-vd-XcM" id="Rqc-CS-eNT"/>
                 <outlet property="startRunButton" destination="1253" id="XdY-Mu-6m6"/>
+                <outlet property="startSingleECAButton" destination="HH6-Ln-TL1" id="ugo-Qh-JRM"/>
                 <outlet property="stopNhitMonitorButton" destination="eEC-cV-Yui" id="v9K-Qp-Zvc"/>
                 <outlet property="stopRunButton" destination="1258" id="PGc-XS-Wt7"/>
                 <outlet property="tabView" destination="101" id="332"/>
+                <outlet property="tellieLoadRunFile" destination="NfS-XO-jlw" id="4hJ-6y-t4a"/>
+                <outlet property="tellieRunFileNameField" destination="rE3-OT-BzQ" id="K4a-Rh-jUB"/>
+                <outlet property="tellieStartRunButton" destination="d9A-XG-q1a" id="jv9-bD-hwx"/>
+                <outlet property="tellieStopRunButton" destination="F6Z-1L-94D" id="Rqt-6k-gcm"/>
                 <outlet property="timeLimitField" destination="1342" id="1353"/>
                 <outlet property="timeStartedField" destination="3770" id="rbE-Hw-cDc"/>
                 <outlet property="timedRunCB" destination="1344" id="1352"/>
@@ -3235,6 +3264,17 @@
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
                                                             </button>
+                                                            <button id="HH6-Ln-TL1">
+                                                                <rect key="frame" x="54" y="3" width="174" height="38"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <buttonCell key="cell" type="bevel" title="Start Single ECA Run" bezelStyle="regularSquare" imagePosition="overlaps" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="GKp-tL-RiI">
+                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <connections>
+                                                                    <action selector="startECASingleRunAction:" target="-2" id="dlT-KO-XLf"/>
+                                                                </connections>
+                                                            </button>
                                                             <box autoresizesSubviews="NO" title="ECA run status" borderType="line" id="OD6-Xe-TQT">
                                                                 <rect key="frame" x="18" y="284" width="246" height="209"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -3443,7 +3483,7 @@
                                                                 <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                             </box>
                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Tbe-27-6Si">
-                                                                <rect key="frame" x="80" y="145" width="49" height="17"/>
+                                                                <rect key="frame" x="80" y="150" width="49" height="17"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Pattern" id="MPu-pQ-1Xq">
                                                                     <font key="font" metaFont="system"/>
@@ -3452,7 +3492,7 @@
                                                                 </textFieldCell>
                                                             </textField>
                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="akO-sD-Vdf">
-                                                                <rect key="frame" x="24" y="120" width="105" height="17"/>
+                                                                <rect key="frame" x="24" y="125" width="105" height="17"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Calibration type" id="MXc-Jt-Rqa">
                                                                     <font key="font" metaFont="system"/>
@@ -3461,7 +3501,7 @@
                                                                 </textFieldCell>
                                                             </textField>
                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="NcN-o1-TaW">
-                                                                <rect key="frame" x="17" y="95" width="112" height="17"/>
+                                                                <rect key="frame" x="17" y="100" width="112" height="17"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Number of points" id="LZl-g7-aEl">
                                                                     <font key="font" metaFont="system"/>
@@ -3470,7 +3510,7 @@
                                                                 </textFieldCell>
                                                             </textField>
                                                             <textField verticalHuggingPriority="750" id="Fze-hD-1jb">
-                                                                <rect key="frame" x="133" y="67" width="96" height="22"/>
+                                                                <rect key="frame" x="133" y="72" width="96" height="22"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="center" title="200" drawsBackground="YES" id="peA-v0-vb1">
                                                                     <font key="font" metaFont="system"/>
@@ -3482,7 +3522,7 @@
                                                                 </connections>
                                                             </textField>
                                                             <textField verticalHuggingPriority="750" id="Unf-wm-WPb">
-                                                                <rect key="frame" x="133" y="42" width="96" height="22"/>
+                                                                <rect key="frame" x="133" y="47" width="96" height="22"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="center" title="10" placeholderString="rate" drawsBackground="YES" id="EjV-KE-y6o">
                                                                     <font key="font" metaFont="system"/>
@@ -3494,7 +3534,7 @@
                                                                 </connections>
                                                             </textField>
                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="zoV-Cr-HaI">
-                                                                <rect key="frame" x="13" y="70" width="116" height="17"/>
+                                                                <rect key="frame" x="13" y="75" width="116" height="17"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Number of events" id="D5S-Pu-CgN">
                                                                     <font key="font" metaFont="system"/>
@@ -3502,37 +3542,8 @@
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                 </textFieldCell>
                                                             </textField>
-                                                            <popUpButton verticalHuggingPriority="750" id="dBJ-eI-bEw">
-                                                                <rect key="frame" x="133" y="140" width="143" height="26"/>
-                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <popUpButtonCell key="cell" type="push" title="SNO style" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" inset="2" selectedItem="C35-6s-QyJ" id="TcK-ue-FCD">
-                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                                    <font key="font" metaFont="menu"/>
-                                                                    <menu key="menu" id="gLz-DH-c6d">
-                                                                        <items>
-                                                                            <menuItem title="Double Beta" id="fWn-lF-Tbo"/>
-                                                                            <menuItem title="Solar" id="NaG-J5-Of4">
-                                                                                <modifierMask key="keyEquivalentModifierMask"/>
-                                                                            </menuItem>
-                                                                            <menuItem title="Crate by crate" id="wrr-qn-dud">
-                                                                                <modifierMask key="keyEquivalentModifierMask"/>
-                                                                            </menuItem>
-                                                                            <menuItem title="Penn style" id="u8l-Ac-biA">
-                                                                                <modifierMask key="keyEquivalentModifierMask"/>
-                                                                            </menuItem>
-                                                                            <menuItem title="Channel by channel" id="l14-7t-yvf">
-                                                                                <modifierMask key="keyEquivalentModifierMask"/>
-                                                                            </menuItem>
-                                                                            <menuItem title="SNO style" state="on" id="C35-6s-QyJ"/>
-                                                                        </items>
-                                                                    </menu>
-                                                                </popUpButtonCell>
-                                                                <connections>
-                                                                    <action selector="ecaPatternChangedAction:" target="-2" id="FqQ-u2-fhJ"/>
-                                                                </connections>
-                                                            </popUpButton>
                                                             <popUpButton verticalHuggingPriority="750" id="V5O-ay-jfT">
-                                                                <rect key="frame" x="132" y="115" width="100" height="26"/>
+                                                                <rect key="frame" x="132" y="120" width="100" height="26"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <popUpButtonCell key="cell" type="push" title="PDST" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="gFF-EJ-tqR" id="42x-As-8Mn">
                                                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -3549,7 +3560,7 @@
                                                                 </connections>
                                                             </popUpButton>
                                                             <textField verticalHuggingPriority="750" id="u1v-fA-9yA">
-                                                                <rect key="frame" x="133" y="92" width="96" height="22"/>
+                                                                <rect key="frame" x="133" y="97" width="96" height="22"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" enabled="NO" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="center" title="50" drawsBackground="YES" id="GJu-5I-rtz">
                                                                     <font key="font" metaFont="system"/>
@@ -3561,7 +3572,7 @@
                                                                 </connections>
                                                             </textField>
                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="tAZ-wL-7yS">
-                                                                <rect key="frame" x="232" y="45" width="57" height="17"/>
+                                                                <rect key="frame" x="232" y="50" width="57" height="17"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Hz" id="JP6-KP-sku">
                                                                     <font key="font" metaFont="system"/>
@@ -3570,7 +3581,7 @@
                                                                 </textFieldCell>
                                                             </textField>
                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="kQN-k1-hnW">
-                                                                <rect key="frame" x="7" y="45" width="122" height="17"/>
+                                                                <rect key="frame" x="7" y="50" width="122" height="17"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Pulser rate for ECA" id="kD3-tX-LcF">
                                                                     <font key="font" metaFont="system"/>
@@ -3617,6 +3628,35 @@
                                                                 <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                                                 <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                             </box>
+                                                            <popUpButton verticalHuggingPriority="750" id="dBJ-eI-bEw">
+                                                                <rect key="frame" x="133" y="145" width="143" height="26"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <popUpButtonCell key="cell" type="push" title="SNO style" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" inset="2" selectedItem="C35-6s-QyJ" id="TcK-ue-FCD">
+                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                    <font key="font" metaFont="menu"/>
+                                                                    <menu key="menu" id="gLz-DH-c6d">
+                                                                        <items>
+                                                                            <menuItem title="Double Beta" id="fWn-lF-Tbo"/>
+                                                                            <menuItem title="Solar" id="NaG-J5-Of4">
+                                                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                                            </menuItem>
+                                                                            <menuItem title="Crate by crate" id="wrr-qn-dud">
+                                                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                                            </menuItem>
+                                                                            <menuItem title="Penn style" id="u8l-Ac-biA">
+                                                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                                            </menuItem>
+                                                                            <menuItem title="Channel by channel" id="l14-7t-yvf">
+                                                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                                            </menuItem>
+                                                                            <menuItem title="SNO style" state="on" id="C35-6s-QyJ"/>
+                                                                        </items>
+                                                                    </menu>
+                                                                </popUpButtonCell>
+                                                                <connections>
+                                                                    <action selector="ecaPatternChangedAction:" target="-2" id="FqQ-u2-fhJ"/>
+                                                                </connections>
+                                                            </popUpButton>
                                                         </subviews>
                                                     </view>
                                                 </tabViewItem>

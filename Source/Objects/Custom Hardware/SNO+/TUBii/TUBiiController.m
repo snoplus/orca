@@ -41,7 +41,7 @@
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
     
     [super awakeFromNib];
-    
+    [self tubiiCurrentStateChanged:nil];
     [tabView setDelegate:self];
 
     [CounterAdvancedOptionsBox setHidden:YES];
@@ -142,6 +142,11 @@
     [MTCAMimic_TextField setEnabled: !lockedOrNotRunningMaintenance];
     [sendMTCAButton setEnabled: !lockedOrNotRunningMaintenance];
     [matchMTCAButton setEnabled: !lockedOrNotRunningMaintenance];
+    //Make sure the sync/async mask are properly disabled
+    if(!lockedOrNotRunningMaintenance){
+        NSUInteger trigMaskVal = ([model currentState].syncTrigMask | [model currentState].asyncTrigMask);
+        [self disableMask:trigMaskVal ForCheckBoxes:TrigMaskSelect FromBit:24 ToBit:48];
+    }
 
     //Analog
     [caenChannelSelect_0 setEnabled: !lockedOrNotRunningMaintenance];
@@ -199,7 +204,6 @@
 - (void) tubiiCurrentStateChanged:(NSNotification *)aNote
 {
 
-    NSLogColor([NSColor redColor], @"tubiiCurrentStateChanged\n");
     /* Change GUI to match the current state of the model */
     struct TUBiiState theTUBiiState = [model currentState];
     // TrigMasks

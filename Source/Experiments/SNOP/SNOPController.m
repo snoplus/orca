@@ -2105,6 +2105,7 @@ err:
 
 - (void) TUBiiSettingsChanged:(NSNotification*)aNotification
 {
+
     TUBiiModel *tubiiModel = [aNotification object];
     if(tubiiModel==NULL){
         NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];

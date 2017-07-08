@@ -546,8 +546,6 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
 }
 - (void) setCounterMaskInState:(NSUInteger)_counterMask {
 
-    NSLogColor([NSColor redColor], @"setCounterMaskInState: 0x%X\n",_counterMask);
-
     currentState.counterMask = _counterMask;
     [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName: ORTubiiSettingsChangedNotification object:self];
 }
