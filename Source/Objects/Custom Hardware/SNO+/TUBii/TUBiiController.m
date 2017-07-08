@@ -589,7 +589,7 @@
     else if ([sender tag]==2)
     {
         @try {
-            maskVal = [model speakerMask];
+            maskVal = [model counterMask];
         } @catch(NSException *exception) {
             [self log_error:exception];
             return;
@@ -600,7 +600,7 @@
     }
     [textField setStringValue:[NSString stringWithFormat:@"%@",@(maskVal)]];
     [self SendBitInfo:maskVal FromBit:0 ToBit:16 ToCheckBoxes:maskSelect_1];
-    [self SendBitInfo:maskVal FromBit:16 ToBit:32 ToCheckBoxes:maskSelect_2];
+    [self SendBitInfo:(maskVal>>16) FromBit:16 ToBit:32 ToCheckBoxes:maskSelect_2];
 }
 - (IBAction)CounterMatchHardware:(id)sender {
     [self SpeakerMatchHardware:sender]; //Bit of a hack. I should probably rename the function
@@ -676,12 +676,12 @@
 - (IBAction)SpeakerFieldChanged:(id)sender {
     NSUInteger maskVal =[SpeakerMaskField integerValue];
     [self SendBitInfo:maskVal FromBit:0 ToBit:16 ToCheckBoxes:SpeakerMaskSelect_1];
-    [self SendBitInfo:maskVal FromBit:16 ToBit:32 ToCheckBoxes:SpeakerMaskSelect_2];
+    [self SendBitInfo:(maskVal>>16) FromBit:16 ToBit:32 ToCheckBoxes:SpeakerMaskSelect_2];
 }
 - (IBAction)CounterFieldChanged:(id)sender {
     NSUInteger maskVal =[CounterMaskField integerValue];
     [self SendBitInfo:maskVal FromBit:0 ToBit:16 ToCheckBoxes:CounterMaskSelect_1];
-    [self SendBitInfo:maskVal FromBit:16 ToBit:32 ToCheckBoxes:CounterMaskSelect_2];
+    [self SendBitInfo:(maskVal>>16) FromBit:16 ToBit:32 ToCheckBoxes:CounterMaskSelect_2];
 }
 
 - (IBAction)SpeakerCounterCheckAll:(id)sender {
