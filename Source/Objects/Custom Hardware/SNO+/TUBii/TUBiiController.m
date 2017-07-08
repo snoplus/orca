@@ -198,13 +198,14 @@
 
 - (void) tubiiCurrentStateChanged:(NSNotification *)aNote
 {
-    /* Change GUI to match the current state of the model */
-    // TrigMasks
-    struct TUBiiState theTUBiiState = [model currentState];
 
+    NSLogColor([NSColor redColor], @"tubiiCurrentStateChanged\n");
+    /* Change GUI to match the current state of the model */
+    struct TUBiiState theTUBiiState = [model currentState];
+    // TrigMasks
     NSUInteger trigMaskVal = (theTUBiiState.syncTrigMask | theTUBiiState.asyncTrigMask);
     NSUInteger syncMaskVal = 0xFFFFFF - theTUBiiState.asyncTrigMask;
-
+    [self disableMask:trigMaskVal ForCheckBoxes:TrigMaskSelect FromBit:24 ToBit:48];
     [self SendBitInfo:trigMaskVal FromBit:0 ToBit:24 ToCheckBoxes:TrigMaskSelect];
     [self SendBitInfo:syncMaskVal FromBit:24 ToBit:48 ToCheckBoxes:TrigMaskSelect];
     //CAEN
@@ -226,11 +227,11 @@
     //Speaker
     [SpeakerMaskField setStringValue:[NSString stringWithFormat:@"%@",@(theTUBiiState.speakerMask)]];
     [self SendBitInfo:theTUBiiState.speakerMask FromBit:0 ToBit:16 ToCheckBoxes:SpeakerMaskSelect_1];
-    [self SendBitInfo:theTUBiiState.speakerMask FromBit:16 ToBit:32 ToCheckBoxes:SpeakerMaskSelect_2];
+    [self SendBitInfo:(theTUBiiState.speakerMask>>16) FromBit:16 ToBit:32 ToCheckBoxes:SpeakerMaskSelect_2];
     //Counter
     [CounterMaskField setStringValue:[NSString stringWithFormat:@"%@",@(theTUBiiState.counterMask)]];
     [self SendBitInfo:theTUBiiState.counterMask FromBit:0 ToBit:16 ToCheckBoxes:CounterMaskSelect_1];
-    [self SendBitInfo:theTUBiiState.counterMask FromBit:16 ToBit:32 ToCheckBoxes:CounterMaskSelect_2];
+    [self SendBitInfo:(theTUBiiState.counterMask>>16) FromBit:16 ToBit:32 ToCheckBoxes:CounterMaskSelect_2];
     //GTDelay
     float LO_Delay = [model LODelay_BitsToNanoSeconds:theTUBiiState.LO_Bits];
     [LO_Slider setIntValue:LO_Delay];
@@ -911,10 +912,6 @@
 - (IBAction)trigMaskAction:(id)sender {
     NSUInteger trigMaskVal = [self GetBitInfoFromCheckBoxes:sender FromBit:0 ToBit:24];
     NSUInteger syncMaskVal = [self GetBitInfoFromCheckBoxes:sender FromBit:24 ToBit:48];
-
-    NSLogColor([NSColor redColor], @"trigMaskAction trigMaskVal: 0x%X\n",trigMaskVal);
-    NSLogColor([NSColor redColor], @"trigMaskAction syncMaskVal: 0x%X\n",syncMaskVal);
-
     NSUInteger syncMask=0, asyncMask=0;
     for(int i=0; i<24; i++)
     {
@@ -935,9 +932,6 @@
             syncMask &= ~(1<<i);
         }
     }
-
-    NSLogColor([NSColor redColor], @"trigMaskAction syncMask: 0x%X\n",syncMask);
-    NSLogColor([NSColor redColor], @"trigMaskAction asyncMask: 0x%X\n",asyncMask);
 
     [model setTrigMaskInState:syncMask setAsyncMask:asyncMask];
 
@@ -1052,13 +1046,28 @@
     //Helper function to send a bit value to a bunch of check boxes
     for (int i=low;i<high;i++)
     {
-        if( (maskVal & 1<<i)>0 )
+        if( (maskVal & 1<<(i-low))>0 )
         {
             [[aMatrix cellWithTag:i] setState:1];
         }
         else
         {
             [[aMatrix cellWithTag:i] setState:0];
+        }
+    }
+}
+
+- (void) disableMask:(NSUInteger)maskVal ForCheckBoxes:(NSMatrix*) aMatrix FromBit:(int)low ToBit:(int) high {
+    //Helper function to enable/disable check boxes
+    for (int i=low;i<high;i++)
+    {
+        if( (maskVal & 1<<(i-low))>0 )
+        {
+            [[aMatrix cellWithTag:i] setEnabled:1];
+        }
+        else
+        {
+            [[aMatrix cellWithTag:i] setEnabled:0];
         }
     }
 }
