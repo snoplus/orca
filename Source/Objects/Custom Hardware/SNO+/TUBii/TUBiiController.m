@@ -215,19 +215,18 @@
     //CAEN
     CAEN_CHANNEL_MASK ChannelMask = theTUBiiState.CaenChannelMask;
     CAEN_GAIN_MASK GainMask = theTUBiiState.CaenGainMask;
-    BOOL err = YES;
-    err &= [caenChannelSelect_0 selectCellWithTag:(ChannelMask & channelSel_0)>0];
-    err &= [caenChannelSelect_1 selectCellWithTag:(ChannelMask & channelSel_1)>0];
-    err &= [caenChannelSelect_2 selectCellWithTag:(ChannelMask & channelSel_2)>0];
-    err &= [caenChannelSelect_3 selectCellWithTag:(ChannelMask & channelSel_3)>0];
-    err &= [caenGainSelect_0 selectCellWithTag:(GainMask & gainSel_0)>0];
-    err &= [caenGainSelect_1 selectCellWithTag:(GainMask & gainSel_1)>0];
-    err &= [caenGainSelect_2 selectCellWithTag:(GainMask & gainSel_2)>0];
-    err &= [caenGainSelect_3 selectCellWithTag:(GainMask & gainSel_3)>0];
-    err &= [caenGainSelect_4 selectCellWithTag:(GainMask & gainSel_4)>0];
-    err &= [caenGainSelect_5 selectCellWithTag:(GainMask & gainSel_5)>0];
-    err &= [caenGainSelect_6 selectCellWithTag:(GainMask & gainSel_6)>0];
-    err &= [caenGainSelect_7 selectCellWithTag:(GainMask & gainSel_7)>0];
+    [caenChannelSelect_0 selectCellWithTag:(ChannelMask & channelSel_0)>0];
+    [caenChannelSelect_1 selectCellWithTag:(ChannelMask & channelSel_1)>0];
+    [caenChannelSelect_2 selectCellWithTag:(ChannelMask & channelSel_2)>0];
+    [caenChannelSelect_3 selectCellWithTag:(ChannelMask & channelSel_3)>0];
+    [caenGainSelect_0 selectCellWithTag:(GainMask & gainSel_0)>0];
+    [caenGainSelect_1 selectCellWithTag:(GainMask & gainSel_1)>0];
+    [caenGainSelect_2 selectCellWithTag:(GainMask & gainSel_2)>0];
+    [caenGainSelect_3 selectCellWithTag:(GainMask & gainSel_3)>0];
+    [caenGainSelect_4 selectCellWithTag:(GainMask & gainSel_4)>0];
+    [caenGainSelect_5 selectCellWithTag:(GainMask & gainSel_5)>0];
+    [caenGainSelect_6 selectCellWithTag:(GainMask & gainSel_6)>0];
+    [caenGainSelect_7 selectCellWithTag:(GainMask & gainSel_7)>0];
     //Speaker
     [SpeakerMaskField setStringValue:[NSString stringWithFormat:@"%@",@(theTUBiiState.speakerMask)]];
     [self SendBitInfo:theTUBiiState.speakerMask FromBit:0 ToBit:16 ToCheckBoxes:SpeakerMaskSelect_1];
@@ -464,10 +463,7 @@
         [self log_error:exception];
         return;
     }
-    NSUInteger trigMaskVal = (syncMask | asyncMask);
-    NSUInteger syncMaskVal = 16777215 - asyncMask;
-    [self SendBitInfo:trigMaskVal FromBit:0 ToBit:24 ToCheckBoxes:TrigMaskSelect];
-    [self SendBitInfo:syncMaskVal FromBit:24 ToBit:48 ToCheckBoxes:TrigMaskSelect];
+    [model setTrigMaskInState:syncMask setAsyncMask:asyncMask];
 }
 
 - (IBAction)TrigMaskLoad:(id)sender {
@@ -540,23 +536,7 @@
         [self log_error:exception];
         return;
     }
-
-    BOOL err = YES;
-    err &= [caenChannelSelect_0 selectCellWithTag:(ChannelMask & channelSel_0)>0];
-    err &= [caenChannelSelect_1 selectCellWithTag:(ChannelMask & channelSel_1)>0];
-    err &= [caenChannelSelect_2 selectCellWithTag:(ChannelMask & channelSel_2)>0];
-    err &= [caenChannelSelect_3 selectCellWithTag:(ChannelMask & channelSel_3)>0];
-    err &= [caenGainSelect_0 selectCellWithTag:(GainMask & gainSel_0)>0];
-    err &= [caenGainSelect_1 selectCellWithTag:(GainMask & gainSel_1)>0];
-    err &= [caenGainSelect_2 selectCellWithTag:(GainMask & gainSel_2)>0];
-    err &= [caenGainSelect_3 selectCellWithTag:(GainMask & gainSel_3)>0];
-    err &= [caenGainSelect_4 selectCellWithTag:(GainMask & gainSel_4)>0];
-    err &= [caenGainSelect_5 selectCellWithTag:(GainMask & gainSel_5)>0];
-    err &= [caenGainSelect_6 selectCellWithTag:(GainMask & gainSel_6)>0];
-    err &= [caenGainSelect_7 selectCellWithTag:(GainMask & gainSel_7)>0];
-    if (err==NO) {
-        NSLogColor([NSColor redColor],@"Error in CaenMatchHardware");
-    }
+    [model setCaenMasksInState:ChannelMask GainMask:GainMask];
 }
 - (IBAction)CaenLoadMask:(id)sender {
     //Sends the CAEN GUI values to TUBii
@@ -574,37 +554,26 @@
 - (IBAction)SpeakerMatchHardware:(id)sender {
     //Makes the Speaker/Counter GUI elements match the hardware
     NSUInteger maskVal =0;
-    NSMatrix *maskSelect_1 =nil;
-    NSMatrix *maskSelect_2 =nil;
-    NSTextField *textField = nil;
-
     if ([sender tag] ==1)
     {
         @try {
             maskVal = [model speakerMask];
+            [model setSpeakerMaskInState:maskVal];
         } @catch(NSException *exception) {
             [self log_error:exception];
             return;
         }
-        maskSelect_1 = SpeakerMaskSelect_1;
-        maskSelect_2 = SpeakerMaskSelect_2;
-        textField = SpeakerMaskField;
     }
     else if ([sender tag]==2)
     {
         @try {
             maskVal = [model counterMask];
+            [model setCounterMaskInState:maskVal];
         } @catch(NSException *exception) {
             [self log_error:exception];
             return;
         }
-        maskSelect_1 = CounterMaskSelect_1;
-        maskSelect_2 = CounterMaskSelect_2;
-        textField = CounterMaskField;
     }
-    [textField setStringValue:[NSString stringWithFormat:@"%@",@(maskVal)]];
-    [self SendBitInfo:maskVal FromBit:0 ToBit:16 ToCheckBoxes:maskSelect_1];
-    [self SendBitInfo:(maskVal>>16) FromBit:16 ToBit:32 ToCheckBoxes:maskSelect_2];
 }
 - (IBAction)CounterMatchHardware:(id)sender {
     [self SpeakerMatchHardware:sender]; //Bit of a hack. I should probably rename the function
@@ -622,6 +591,7 @@
     [CounterInhibitSelect setState: (ControlRegVal & scalerI_Bit) > 0 ? NSOffState : NSOnState ]; //Unchecked = bit high
     @try {
         counter_mode = [model CounterMode];
+        [model setCounterModeInState:counter_mode];
     } @catch (NSException *exception) {
         [self log_error:exception];
         return;
@@ -804,28 +774,21 @@
         [self log_error:exception];
         return;
     }
-    [DGT_Slider setIntValue:DGT_Delay];
-    [DGT_Field setIntValue:DGT_Delay];
     @try {
         LO_Delay = [model LODelayInNS];
     } @catch(NSException *exception) {
         [self log_error:exception];
         return;
     }
-    [LO_Slider setIntValue:LO_Delay];
-    [LO_Field setIntegerValue:LO_Delay];
+    [model setGTDelaysBitsInState:DGT_Delay LOBits:LO_Delay];
     @try {
         controlReg = [model controlReg];
     } @catch(NSException *exception) {
         [self log_error:exception];
         return;
     }
-    if ((controlReg & lockoutSel_Bit)>0){
-        [LO_SrcSelect selectCellWithTag:1];
-    }
-    else {
-        [LO_SrcSelect selectCellWithTag:2];
-    }
+    [model setControlRegInState:controlReg];
+
 }
 
 - (IBAction)LOSrcSelectAction:(id)sender {
@@ -874,9 +837,7 @@
         [self log_error:exception];
         return;
     }    //Bit value of the DAC
-
-    [MTCAMimic_Slider setFloatValue:ThresholdValue];
-    [MTCAMimic_TextField setFloatValue:ThresholdValue];
+    [model setMTCAMimic1_ThresholdInBitsInState:ThresholdValue];
 }
 - (IBAction)MTCAMimicLoadValue:(id)sender {
     float ThresholdValue = [model MTCAMimic_BitsToVolts:[model currentState].MTCAMimic1_ThresholdInBits];
@@ -905,12 +866,7 @@
         [self log_error:exception];
         return;
     }
-    if(cntrl_reg & clkSel_Bit) {
-        [DefaultClockSelect selectCellWithTag:1]; //TUBii Clk is tag 1
-    }
-    else {
-        [DefaultClockSelect selectCellWithTag:2];//TUB Clk is tag 2
-    }
+    [model setControlRegInState:cntrl_reg];
 }
 
 - (IBAction)trigMaskAction:(id)sender {
