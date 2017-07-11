@@ -565,6 +565,15 @@ tellieRunFiles = _tellieRunFiles;
         goto err;
     }
 
+    objs = [[(ORAppDelegate*)[NSApp delegate] document]
+            collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
+    if ([objs count]) {
+        tubii = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find TUBii model. Please add it to the experiment and restart the run.\n");
+        return;
+    }
+
     switch (state) {
     case STOPPED:
         start = COLD_START;
