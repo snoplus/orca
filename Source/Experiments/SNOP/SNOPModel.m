@@ -44,6 +44,7 @@
 #import "RedisClient.h"
 #include <stdint.h>
 #import "SNOCaenModel.h"
+#import "TUBiiModel.h"
 #import "XL3_Link.h"
 #import "ORPQModel.h"
 #import "ORPQResult.h"
@@ -541,6 +542,7 @@ tellieRunFiles = _tellieRunFiles;
     ORMTCModel *mtc;
     SNOCaenModel *caen;
     ORXL3Model *xl3;
+    TUBiiModel *tubii;
     int i;
 
     objs = [[(ORAppDelegate*)[NSApp delegate] document]
@@ -647,6 +649,12 @@ tellieRunFiles = _tellieRunFiles;
             goto err;
         }
 
+        /* Load the TUBii settings to hardware. */
+        if ([tubii sendCurrentStateToHW]) {
+            NSLogColor([NSColor redColor], @"error initializing TUBii.\n");
+            goto err;
+        }
+            
         /* Load the MTC hardware. */
         if ([mtc initAtRunStart:0]) {
             NSLogColor([NSColor redColor], @"error initializing MTC.\n");
@@ -2695,7 +2703,6 @@ err:
         [mtc loadTheMTCADacs];
         [mtc setGlobalTriggerWordMask];
         [mtc loadPulserRateToHardware];
-
     }
     @catch(NSException *e){
         NSLogColor([NSColor redColor], @"Problem loading settings into Hardware: %@\n",[e reason]);

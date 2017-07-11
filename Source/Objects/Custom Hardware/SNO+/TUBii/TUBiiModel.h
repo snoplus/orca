@@ -165,7 +165,7 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
 - (void) Ping;
 - (struct TUBiiState) currentState;
 - (NSMutableDictionary*) CurrentStateToDict;
-- (void) sendCurrentStateToHW;
+- (bool) sendCurrentStateToHW;
 - (void) setCurrentStateFromDict:(NSMutableDictionary*)settingsDict;
 - (void) setTrigMask:(NSUInteger)trigMask setAsyncMask:(NSUInteger)asyncMask;
 - (void) setTrigMaskInState:(NSUInteger)trigMask setAsyncMask:(NSUInteger)asyncMask;

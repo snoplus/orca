@@ -836,58 +836,25 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
 }
 
 /* Send the current state of the model (which is in sync with the GUI) to HW. */
-- (void) sendCurrentStateToHW {
-    [self setSmellieRate: currentState.smellieRate];
-    [self setTellieRate: currentState.tellieRate];
-    [self setPulserRate: currentState.pulserRate];
-    [self setTUBiiPGT_Rate: currentState.TUBiiPGT_Rate];
-    [self setSmelliePulseWidth: currentState.smelliePulseWidth];
-    [self setTelliePulseWidth: currentState.telliePulseWidth];
-    [self setPulseWidth: currentState.pulserPulseWidth];
-    [self setSmellieNPulses: currentState.smellieNPulses];
-    [self setTellieNPulses: currentState.tellieNPulses];
-    [self setNPulses: currentState.pulserNPulses];
-    [self setTellieDelay: currentState.tellieDelay];
-    [self setSmellieDelay: currentState.smellieDelay];
-    [self setGenericDelay: currentState.genericDelay];
-    [self setCaenMasks:currentState.CaenChannelMask GainMask:currentState.CaenGainMask];
-    [self setGTDelaysBits:currentState.DGT_Bits LOBits:currentState.LO_Bits];
-    [self setSpeakerMask: currentState.speakerMask];
-    [self setCounterMask: currentState.counterMask];
-    [self setTrigMask: currentState.syncTrigMask setAsyncMask:currentState.asyncTrigMask];
-    [self setCounterMode: currentState.CounterMode];
-    [self setMTCAMimic1_ThresholdInBits: currentState.MTCAMimic1_ThresholdInBits];
-    [self setControlReg: currentState.controlReg];
-}
-
-/* Send a give state to HW. So, this function actually changes the HW.
- * Not to be confused with the one below that doesn't!
- */
-- (void) setCurrentState:(struct TUBiiState)aState {
+/* Only set Standard Run settings */
+- (bool) sendCurrentStateToHW {
     // Set every relevant variable state variable of TUBii
     // aState must have every variable filled in with a value
     // to have good behavior from this function
-    [self setSmellieRate: aState.smellieRate];
-    [self setTellieRate: aState.tellieRate];
-    [self setPulserRate: aState.pulserRate];
-    [self setTUBiiPGT_Rate: aState.TUBiiPGT_Rate];
-    [self setSmelliePulseWidth: aState.smelliePulseWidth];
-    [self setTelliePulseWidth: aState.telliePulseWidth];
-    [self setPulseWidth: aState.pulserPulseWidth];
-    [self setSmellieNPulses: aState.smellieNPulses];
-    [self setTellieNPulses: aState.tellieNPulses];
-    [self setNPulses: aState.pulserNPulses];
-    [self setTellieDelay: aState.tellieDelay];
-    [self setSmellieDelay: aState.smellieDelay];
-    [self setGenericDelay: aState.genericDelay];
-    [self setCaenMasks:aState.CaenChannelMask GainMask:aState.CaenGainMask];
-    [self setGTDelaysBits:aState.DGT_Bits LOBits:aState.LO_Bits];
-    [self setSpeakerMask: aState.speakerMask];
-    [self setCounterMask: aState.counterMask];
-    [self setTrigMask: aState.syncTrigMask setAsyncMask:aState.asyncTrigMask];
-    [self setCounterMode: aState.CounterMode];
-    [self setMTCAMimic1_ThresholdInBits: aState.MTCAMimic1_ThresholdInBits];
-    [self setControlReg: aState.controlReg];
+    @try{
+        [self setTUBiiPGT_Rate: currentState.TUBiiPGT_Rate];
+        [self setTrigMask: currentState.syncTrigMask setAsyncMask:currentState.asyncTrigMask];
+        [self setCaenMasks:currentState.CaenChannelMask GainMask:currentState.CaenGainMask];
+        [self setSpeakerMask: currentState.speakerMask];
+        [self setCounterMask: currentState.counterMask];
+        [self setMTCAMimic1_ThresholdInBits: currentState.MTCAMimic1_ThresholdInBits];
+        [self setGTDelaysBits:currentState.DGT_Bits LOBits:currentState.LO_Bits];
+        [self setControlReg: currentState.controlReg];
+    }
+    @catch(...){
+        return 0;
+    }
+    return 1;
 }
 
 /* Set the state of the GUI. Don't send it to HW.
