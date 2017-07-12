@@ -95,7 +95,6 @@ static Caen1720RegisterNamesStruct reg[kNumRegisters] = {
 
 #define kEventReadyMask 0x8
 
-NSString* SNOCaenSettingsChanged                         = @"SNOCaenSettingsChanged";
 NSString* SNOCaenModelEnabledMaskChanged                 = @"SNOCaenModelEnabledMaskChanged";
 NSString* SNOCaenModelPostTriggerSettingChanged          = @"SNOCaenModelPostTriggerSettingChanged";
 NSString* SNOCaenModelTriggerSourceMaskChanged           = @"SNOCaenModelTriggerSourceMaskChanged";
@@ -299,7 +298,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     
     eventSize = aEventSize;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelEventSizeChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenModelEventSizeChanged object:self];
 }
 
 - (int)	bufferState
@@ -416,8 +415,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     
     enabledMask = aEnabledMask;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelEnabledMaskChanged object:self];
-    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenSettingsChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenModelEnabledMaskChanged object:self];
 }
 
 - (unsigned long) postTriggerSetting
@@ -431,8 +429,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     
     postTriggerSetting = aPostTriggerSetting;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelPostTriggerSettingChanged object:self];
-    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenSettingsChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenModelPostTriggerSettingChanged object:self];
 }
 
 - (unsigned long) triggerSourceMask
@@ -446,8 +443,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     
     triggerSourceMask = aTriggerSourceMask;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelTriggerSourceMaskChanged object:self];
-    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenSettingsChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenModelTriggerSourceMaskChanged object:self];
 }
 
 - (unsigned long) triggerOutMask
@@ -462,8 +458,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 	//do not step into the reserved area
 	triggerOutMask = aTriggerOutMask & 0xc00000ff;
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelTriggerOutMaskChanged object:self];
-    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenSettingsChanged object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenModelTriggerOutMaskChanged object:self];
 }
 
 - (unsigned long) frontPanelControlMask
@@ -477,8 +472,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 	
 	frontPanelControlMask = aFrontPanelControlMask;
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelFrontPanelControlMaskChanged object:self];
-    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenSettingsChanged object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenModelFrontPanelControlMaskChanged object:self];
 }
 
 - (unsigned short) coincidenceLevel
@@ -492,8 +486,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     
     coincidenceLevel = aCoincidenceLevel;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelCoincidenceLevelChanged object:self];
-    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenSettingsChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenModelCoincidenceLevelChanged object:self];
 }
 
 - (unsigned short) acquisitionMode
@@ -507,8 +500,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     
     acquisitionMode = aMode;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelAcquisitionModeChanged object:self];
-    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenSettingsChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenModelAcquisitionModeChanged object:self];
 }
 
 - (BOOL) countAllTriggers
@@ -522,8 +514,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     
     countAllTriggers = aCountAllTriggers;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelCountAllTriggersChanged object:self];
-    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenSettingsChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenModelCountAllTriggersChanged object:self];
 }
 
 - (unsigned long) customSize
@@ -537,8 +528,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     
     customSize = aCustomSize;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelCustomSizeChanged object:self];
-    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenSettingsChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenModelCustomSizeChanged object:self];
 }
 
 - (BOOL) isCustomSize
@@ -552,8 +542,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 	
 	isCustomSize = aIsCustomSize;
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelIsCustomSizeChanged object:self];
-    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenSettingsChanged object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenModelIsCustomSizeChanged object:self];
 }
 
 - (BOOL) isFixedSize
@@ -567,8 +556,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 	
 	isFixedSize = aIsFixedSize;
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelIsFixedSizeChanged object:self];
-    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenSettingsChanged object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenModelIsFixedSizeChanged object:self];
 }
 
 - (unsigned short) channelConfigMask
@@ -588,8 +576,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 	//we do the sequential memory access only
 	channelConfigMask |= (1L<<4);
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelChannelConfigMaskChanged object:self];
-    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenSettingsChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenModelChannelConfigMaskChanged object:self];
 }
 
 - (unsigned long) numberBLTEventsToReadout
@@ -603,8 +590,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     
     numberBLTEventsToReadout = numBLTEvents;
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelNumberBLTEventsToReadoutChanged object:self];
-    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenSettingsChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenModelNumberBLTEventsToReadoutChanged object:self];
 }
 
 - (void) setUpImage
@@ -628,8 +614,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     
     continuousMode = aContinuousMode;
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelContinuousModeChanged object:self];    
-    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenSettingsChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenModelContinuousModeChanged object:self];
 }
 
 #pragma mark ***Register - General routines
@@ -690,12 +675,8 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     [userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:SNOCaenChnl];
     
     // Send out notification that the value has changed.
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:SNOCaenChnlDacChanged
-	 object:self
-	 userInfo:userInfo];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenChnlDacChanged object:self userInfo:userInfo];
 
-    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenSettingsChanged object:self];
 }
 
 - (unsigned short) overUnderThreshold:(unsigned short) aChnl
@@ -717,12 +698,8 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     [userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:SNOCaenChnl];
     
     // Send out notification that the value has changed.
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:SNOCaenOverUnderThresholdChanged
-	 object:self
-	 userInfo:userInfo];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenOverUnderThresholdChanged object:self userInfo:userInfo];
 
-    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenSettingsChanged object:self];
 }
 
 - (void) readChan:(unsigned short)chan reg:(unsigned short) pReg returnValue:(unsigned long*) pValue
@@ -782,12 +759,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     [userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:SNOCaenChnl];
     
     // Send out notification that the value has changed.
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:SNOCaenChnlThresholdChanged
-	 object:self
-	 userInfo:userInfo];
-
-    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenSettingsChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenChnlThresholdChanged object:self userInfo:userInfo];
 
 }
 
@@ -1293,10 +1265,11 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     }
 }
 
-- (NSDictionary*) CurrentStateToDict
+- (NSDictionary*) serializeToDictionary
 {
 
-    //Dump CAEN settings in dictionary
+    // Dump current CAEN settings into dictionary.
+    // Returns NULL if there was any error.
     NSMutableDictionary* CAENStateDict = [NSMutableDictionary dictionaryWithCapacity:1];
     @try{
         [CAENStateDict setObject:[NSNumber numberWithUnsignedShort:[self channelConfigMask]] forKey:[self getStandardRunKeyForField:@"channelConfigMask" ]];
@@ -1317,14 +1290,14 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 
         return CAENStateDict;
 
-    } @catch(...){
-        NSLogColor([NSColor redColor], @"CAEN: settings couldn't not be saved \n");
+    } @catch(NSException *err){
+        NSLogColor([NSColor redColor], @"CAEN: settings couldn't be saved. error: %@ reason: %@ \n", [err name], [err reason]);
         return NULL;
     }
 
 }
 
-- (void) setCurrentStateFromDict:(NSMutableDictionary*)settingsDict {
+- (void) loadFromSerialization:(NSMutableDictionary*)settingsDict {
 
     @try{
         [self setChannelConfigMask:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"channelConfigMask"]] unsignedShortValue]];
@@ -1342,8 +1315,8 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
         for (int idac=0; idac<kNumCaenChannelDacs; ++idac) {
             [self setDac:idac withValue:[[settingsDict objectForKey:[NSString stringWithFormat:@"%@_%i",[self getStandardRunKeyForField:@"dac"],idac]] unsignedShortValue]];
         }
-    } @catch(...){
-        NSLogColor([NSColor redColor], @"CAEN: settings couldn't not be loaded \n");
+    } @catch(NSException *err){
+        NSLogColor([NSColor redColor], @"CAEN: settings couldn't not be loaded. error: %@ reason: %@ \n", [err name], [err reason]);
     }
 
 }

@@ -851,7 +851,8 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
         [self setGTDelaysBits:currentState.DGT_Bits LOBits:currentState.LO_Bits];
         [self setControlReg: currentState.controlReg];
     }
-    @catch(...){
+    @catch(NSException *err){
+        NSLogColor([NSColor redColor], @"TUBii: settings couldn't be send to HW. error: %@ reason: %@ \n", [err name], [err reason]);
         return 0;
     }
     return 1;
@@ -862,7 +863,7 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
  * the others ORCA objects behave and it'll be a
  * pain to handle this differently for the standard
  * runs */
-- (void) setCurrentStateFromDict:(NSMutableDictionary*)settingsDict {
+- (void) loadFromSerialization:(NSMutableDictionary*)settingsDict {
     @try{
         currentState.TUBiiPGT_Rate = [[settingsDict objectForKey:[self getStandardRunKeyForField:@"TUBiiPGT_Rate"]] floatValue];
         currentState.syncTrigMask = [[settingsDict objectForKey:[self getStandardRunKeyForField:@"syncTrigMask"]] floatValue];
@@ -881,9 +882,10 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
     [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName: ORTubiiSettingsChangedNotification object:self];
 }
 
-- (NSDictionary*) CurrentStateToDict
+- (NSDictionary*) serializeToDictionary
 {
-    //Manually cherry-pick struct elements and store it into dictionary.
+    // Cherry-pick struct elements and store it into dictionary.
+    // Returns NULL if there was any error.
     NSMutableDictionary* TubiiStateDict = [NSMutableDictionary dictionaryWithCapacity:8];
     @try{
         [TubiiStateDict setObject:[NSNumber numberWithFloat:currentState.TUBiiPGT_Rate] forKey:[self getStandardRunKeyForField:@"TUBiiPGT_Rate"]];
@@ -898,8 +900,8 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
         [TubiiStateDict setObject:[NSNumber numberWithUnsignedInt:currentState.LO_Bits] forKey:[self getStandardRunKeyForField:@"LO_Bits"]];
         [TubiiStateDict setObject:[NSNumber numberWithUnsignedInt:currentState.controlReg] forKey:[self getStandardRunKeyForField:@"controlReg"]];
         return TubiiStateDict;
-    } @catch(...){
-        NSLogColor([NSColor redColor], @"TUBii: settings couldn't not be saved \n");
+    } @catch(NSException *err){
+        NSLogColor([NSColor redColor], @"TUBii: settings couldn't be saved. error: %@ reason: %@ \n", [err name], [err reason]);
         return NULL;
     }
 }

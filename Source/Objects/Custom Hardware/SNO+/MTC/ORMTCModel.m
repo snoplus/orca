@@ -1265,7 +1265,7 @@ tubRegister;
     return obj;
 }
 
-- (void) loadFromSearialization:(NSMutableDictionary*) serial
+- (void) loadFromSerialization:(NSMutableDictionary*) serial
 {
     //This function will let any exceptions from below bubble up
 

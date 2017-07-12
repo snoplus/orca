@@ -433,10 +433,89 @@ snopGreenColor;
                          name : ORMTCModelIsPedestalEnabledInCSR
                         object: nil];
 
+
+
     [notifyCenter addObserver : self
                      selector : @selector(CAENSettingsChanged:)
-                         name : SNOCaenSettingsChanged
+                         name : SNOCaenModelEventSizeChanged
                         object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenModelEnabledMaskChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenModelPostTriggerSettingChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenModelTriggerSourceMaskChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenModelTriggerOutMaskChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenModelFrontPanelControlMaskChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenModelCoincidenceLevelChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenModelAcquisitionModeChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenModelCountAllTriggersChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenModelCustomSizeChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenModelIsCustomSizeChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenModelIsFixedSizeChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenModelChannelConfigMaskChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenChnlDacChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenOverUnderThresholdChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenChnlThresholdChanged
+                        object: nil];
+
+
 
     [notifyCenter addObserver : self
                      selector : @selector(TUBiiSettingsChanged:)
@@ -2100,7 +2179,7 @@ err:
             return;
         }
     }
-    [self displayCAENSettings:[caenModel CurrentStateToDict] inMatrix:standardRunCAENCurrentMatrix];
+    [self displayCAENSettings:[caenModel serializeToDictionary] inMatrix:standardRunCAENCurrentMatrix];
 }
 
 - (void) TUBiiSettingsChanged:(NSNotification*)aNotification
@@ -2116,7 +2195,7 @@ err:
             return;
         }
     }
-    [self displayTUBiiSettings:[tubiiModel CurrentStateToDict] inMatrix:standardRunTUBiiCurrentMatrix];
+    [self displayTUBiiSettings:[tubiiModel serializeToDictionary] inMatrix:standardRunTUBiiCurrentMatrix];
 }
 
 - (IBAction)loadStandardRunFromDBAction:(id)sender
@@ -2129,7 +2208,10 @@ err:
 
 - (IBAction)loadCurrentSettingsInHW:(id)sender
 {
-    [model loadSettingsInHW];
+    BOOL cancel = ORRunAlertPanel(@"Loading current Standard Run settings into Hardware",@"Is this really what you want?",@"Cancel",@"Yes, reload hardware",nil);
+    if (!cancel) {
+        [model loadSettingsInHW];
+    }
 }
 
 - (IBAction)saveStandardRunToDBAction:(id)sender
@@ -2137,7 +2219,9 @@ err:
     NSString *standardRun = [standardRunPopupMenu objectValueOfSelectedItem];
     NSString *standardRunVer = [standardRunVersionPopupMenu objectValueOfSelectedItem];
     
-    [model saveStandardRun:standardRun withVersion:standardRunVer];
+    if([model saveStandardRun:standardRun withVersion:standardRunVer]){
+        NSLogColor([NSColor redColor], @"Couldn't save standard run due to a problem. \n");
+    }
 }
 
 // Create a new SR item if doesn't exist, set the runType string value and query the DB to display the trigger configuration

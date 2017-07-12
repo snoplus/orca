@@ -2563,13 +2563,13 @@ err:
         if(nextruntypeword & kDiagnosticRun) return true;
 
         //Load MTC settings
-        [mtcModel loadFromSearialization:runSettings];
+        [mtcModel loadFromSerialization:runSettings];
 
         //Load CAEN settings
-        [caenModel setCurrentStateFromDict:runSettings];
+        [caenModel loadFromSerialization:runSettings];
 
         //Load TUBii settings
-        [tubiiModel setCurrentStateFromDict:runSettings];
+        [tubiiModel loadFromSerialization:runSettings];
 
         NSLog(@"Standard run %@ (%@) settings loaded. \n",runTypeName,runVersion);
         return true;
@@ -2657,12 +2657,14 @@ err:
     [detectorSettings addEntriesFromDictionary:mtc_serial];
 
     // Save TUBii settings
-    NSMutableDictionary* tubii_serial = [tubiiModel CurrentStateToDict];
+    NSMutableDictionary* tubii_serial = [tubiiModel serializeToDictionary];
     if(tubii_serial != NULL) [detectorSettings addEntriesFromDictionary:tubii_serial];
+    else return false;
 
     // Save CAEN settings
-    NSMutableDictionary* caen_serial = [caenModel CurrentStateToDict];
+    NSMutableDictionary* caen_serial = [caenModel serializeToDictionary];
     if(caen_serial != NULL) [detectorSettings addEntriesFromDictionary:caen_serial];
+    else return false;
 
     NSLog(@"Saving settings for Standard Run %@ - Version %@: \n %@ \n",runTypeName,runVersion,detectorSettings);
 

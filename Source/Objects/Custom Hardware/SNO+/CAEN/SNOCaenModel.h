@@ -245,12 +245,11 @@ enum {
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
-- (NSMutableDictionary*) CurrentStateToDict;
-- (void) setCurrentStateFromDict:(NSMutableDictionary*)settingsDict;
+- (NSMutableDictionary*) serializeToDictionary;
+- (void) loadFromSerialization:(NSMutableDictionary*)settingsDict;
 
 @end
 
-extern NSString* SNOCaenSettingsChanged;
 extern NSString* SNOCaenModelEventSizeChanged;
 extern NSString* SNOCaenSelectedRegIndexChanged;
 extern NSString* SNOCaenSelectedChannelChanged;
