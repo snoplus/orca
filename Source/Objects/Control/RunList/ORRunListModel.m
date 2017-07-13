@@ -279,12 +279,13 @@ static NSString* ORRunListDataOut1	= @"ORRunListDataOut1";
 {
 	NSString* s = @"#Script Parameters:RunLength:SubRun\n";
 	for(id anItem in items){ 
-        if(![[anItem objectForKey:@"ScriptParameters"]length] && ![[anItem objectForKey:@"RunLength"]length] && ![[anItem objectForKey:@"SubRun"]length])continue;
-        id isSubRun = [anItem objectForKey:@"SubRun"];
-        if(!isSubRun)isSubRun = [NSNumber numberWithBool:NO];
-		s = [s stringByAppendingFormat:@"%@:%@:%@\n",
-			 [anItem objectForKey:@"ScriptParameters"],
-			 [anItem objectForKey:@"RunLength"],isSubRun];
+        id isSubRun             = [anItem objectForKey:@"SubRun"];
+        if(!isSubRun)isSubRun   = [NSNumber numberWithBool:NO];
+		s = [s stringByAppendingFormat:@"%@:%@:%@:%@\n",
+             [[anItem objectForKey:@"ScriptParameters"]length]   > 0 ? [anItem objectForKey:@"ScriptParameters"]:@"",
+             [[anItem objectForKey:@"EndScriptParameters"]length]> 0 ? [anItem objectForKey:@"EndScriptParameters"]:@"",
+			 [[anItem objectForKey:@"RunLength"]length]          > 0 ? [anItem objectForKey:@"RunLength"]:@"0",
+             isSubRun];
 	}
 	[s writeToFile:aPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
 }
@@ -301,17 +302,32 @@ static NSString* ORRunListDataOut1	= @"ORRunListDataOut1";
 		aLine = [aLine trimSpacesFromEnds];
 		if(![aLine hasPrefix:@"#"]){
 			NSArray* parts = [aLine componentsSeparatedByString:@":"];
-			if([parts count] == 3){
+			if([parts count] == 4){
                 NSString* args = [[parts objectAtIndex:0] trimSpacesFromEnds];
                 if([args isEqualToString:@"(null)"])args = @"";
+                NSString* endArgs = [[parts objectAtIndex:1] trimSpacesFromEnds];
+                if([endArgs isEqualToString:@"(null)"])endArgs = @"";
 				NSMutableDictionary* anItem = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-										args,@"ScriptParameters",
-										[NSNumber numberWithFloat:[[[parts objectAtIndex:1] trimSpacesFromEnds]floatValue]],@"RunLength",
-										[NSNumber numberWithInt:[[[parts objectAtIndex:2] trimSpacesFromEnds]intValue]],@"SubRun",
+										args,@"ScriptParameters",endArgs,@"EndScriptParameters",
+										[NSNumber numberWithFloat:[[[parts objectAtIndex:2] trimSpacesFromEnds]floatValue]],@"RunLength",
+										[NSNumber numberWithInt:[[[parts objectAtIndex:3] trimSpacesFromEnds]intValue]],@"SubRun",
 										@"",@"RunState",
 										nil];
 				[items addObject:anItem];
 			}
+            
+            else if([parts count] == 3){ //old version
+                NSString* args = [[parts objectAtIndex:0] trimSpacesFromEnds];
+                if([args isEqualToString:@"(null)"])args = @"";
+                NSMutableDictionary* anItem = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                               args,@"ScriptParameters",@"",@"EndScriptParameters",
+                                               [NSNumber numberWithFloat:[[[parts objectAtIndex:1] trimSpacesFromEnds]floatValue]],@"RunLength",
+                                               [NSNumber numberWithInt:[[[parts objectAtIndex:2] trimSpacesFromEnds]intValue]],@"SubRun",
+                                               @"",@"RunState",
+                                               nil];
+                [items addObject:anItem];
+            }
+
 		}
 	}
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunListModelReloadTable object:self];    
