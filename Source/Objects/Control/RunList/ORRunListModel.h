@@ -34,6 +34,8 @@ enum eRunListStates {
 	kStartScript,
 	kWaitForScript,
 	kWaitForRunTime,
+    kStartEndScript,
+    kWaitForEndScript,
 	kRunFinished,
 	kCheckForRepeat,
 	kFinishUp,
@@ -41,23 +43,24 @@ enum eRunListStates {
 
 @interface ORRunListModel : OrcaObject  {
 	NSMutableArray* items;
-	TimedWorker* timedWorker;
-	float totalExpectedTime;
-	float accumulatedTime;
-    int workingItemIndex;
-	ORRunModel* runModel;
-	ORScriptIDEModel* scriptModel;
-	BOOL oldTimedRun;
-	BOOL oldRepeatRun;
-	int oldRepeatTime;
-	int runListState;
-    int nextState; //used by some states to dynamically set the next state
-	float runLength;
+	TimedWorker*    timedWorker;
+	float           totalExpectedTime;
+	float           accumulatedTime;
+    int             workingItemIndex;
+	ORRunModel*     runModel;
+	BOOL            oldTimedRun;
+	BOOL            oldRepeatRun;
+	int             oldRepeatTime;
+	int             runListState;
+    int             nextState; //used by some states to dynamically set the next state
+	float           runLength;
 	NSMutableArray* orderArray;
-    BOOL randomize;
-	NSString* lastFile;
-    int timesToRepeat;
-    int executionCount;
+    BOOL            randomize;
+	NSString*       lastFile;
+    int             timesToRepeat;
+    int             executionCount;
+    ORScriptIDEModel* scriptAtStartModel;
+    ORScriptIDEModel* scriptAtEndModel;
 }
 
 - (void) registerNotificationObservers;
