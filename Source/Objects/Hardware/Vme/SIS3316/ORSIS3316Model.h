@@ -246,10 +246,13 @@ enum{
     long			heSuppressTriggerMask;
     unsigned long  cfdControlBits[kNumSIS3316Channels];
     unsigned long  threshold[kNumSIS3316Channels];
-    unsigned long thresholdSum[kNumSIS3316Groups];
-    unsigned short peakingTime[kNumSIS3316Channels];
-    unsigned short gapTime[kNumSIS3316Channels];
-    unsigned short tauFactor[kNumSIS3316Channels];
+    unsigned long  thresholdSum[kNumSIS3316Groups];
+    unsigned long  peakingTime[kNumSIS3316Channels];
+    unsigned long  gapTime[kNumSIS3316Channels];
+    unsigned long  tauFactor[kNumSIS3316Channels];
+    unsigned long  extraFilterBits[kNumSIS3316Channels];
+    unsigned long  tauTableBits[kNumSIS3316Channels];
+    
     unsigned long  heTrigThreshold[kNumSIS3316Channels];
     unsigned long heTrigThresholdSum[kNumSIS3316Groups];
     unsigned short intTrigOutPulseBit[kNumSIS3316Channels];
@@ -265,6 +268,8 @@ enum{
     unsigned short energyDivider[kNumSIS3316Channels];
     unsigned short energySubtractor[kNumSIS3316Channels];
 
+    unsigned short accumulatorGateStart[kNumSIS3316Groups];
+    unsigned short accumulatorGateLength[kNumSIS3316Groups];
     unsigned short accGate1Len[kNumSIS3316Groups];
     unsigned short accGate1Start[kNumSIS3316Groups];
     unsigned short accGate2Len[kNumSIS3316Groups];
@@ -395,6 +400,12 @@ enum{
 - (long)cfdControlBits:(unsigned short)aChan;
 - (void) setCfdControlBits:(unsigned short)aChan withValue:(long)aValue;
 
+- (long)extraFilterBits:(unsigned short)aChan;
+- (void) setExtraFilterBits:(unsigned short)aChan withValue:(long)aValue;
+
+- (long)tauTableBits:(unsigned short)aChan;
+- (void) setTauTableBits:(unsigned short)aChan withValue:(long)aValue;
+
 - (unsigned short) energyDivider:(unsigned short)aChan;
 - (void) setEnergyDivider:(unsigned short)aChan withValue:(unsigned short)aValue;
 
@@ -439,6 +450,12 @@ enum{
 
 - (unsigned long)  rawDataBufferStart:(unsigned short)aGroup;
 - (void)           setRawDataBufferStart:(unsigned short)group withValue:(unsigned long)aValue;
+
+- (unsigned short)  accumulatorGateStart:(unsigned short)aGroup;
+- (void)            setAccumulatorGateStart:(unsigned short)aGroup withValue:(unsigned short)aValue;
+
+- (unsigned short)  accumulatorGateLength:(unsigned short)aGroup;
+- (void)            setAccumulatorGateLength:(unsigned short)aGroup withValue:(unsigned short)aValue;
 
 - (unsigned short)  accGate1Start:(unsigned short)aGroup;
 - (void)            setAccGate1Start:(unsigned short)group withValue:(unsigned short)aValue;
@@ -565,7 +582,8 @@ enum{
 -(unsigned long) keyRegister:(unsigned long)aRegisterIndex;
 - (unsigned long) groupRegister:(unsigned long)aRegisterIndex  group:(int)aGroup;
 - (unsigned long) channelRegister:(unsigned long)aRegisterIndex channel:(int)aChannel;
-
+- (unsigned long) channelRegisterVersionTwo:(unsigned long)aRegisterIndex channel:(int)aChannel;
+- (unsigned long) accumulatorRegisters:(unsigned long)aRegisterIndex channel:(int)aChannel;
 - (unsigned long)readControlStatusReg;          //6.1               (complete) -not connected  
 - (void) writeControlStatusReg:(unsigned long)aValue;
         //6.1               (complete)
@@ -596,12 +614,15 @@ enum{
 - (void) readHeTrigThresholds:(BOOL)verbose;    //6.27 (section 2)
 - (void) readHeTrigThresholdSum:(BOOL)verbose;
 - (void) writeAccumulatorGates;                 //6.31 (section 2)
-
+- (void) readAccumulatorGates:(BOOL)verbose;
+- (void) writeFirEnergySetup;                   //6.32 (section 2)
+- (void) readFirEnergySetup:(BOOL)verbose;
 - (void) writeHistogramConfiguration;           //6.33 (section 2)
+- (void) readHistogramConfiguration:(BOOL)verbose;
 - (void) configureAnalogRegisters;
 
-- (unsigned long) eventNumberGroup:(int)group bank:(int) bank;  //6.12 or 6.13 (S2) ????
-- (unsigned long) eventTriggerGroup:(int)group bank:(int) bank; //6.12 or 6.13 (S2) ????
+- (unsigned long) eventNumberGroup:(int)group bank:(int) bank;
+- (unsigned long) eventTriggerGroup:(int)group bank:(int) bank; 
 - (unsigned long) readTriggerTime:(int)bank index:(int)index;
 
 
@@ -670,6 +691,8 @@ extern NSString* ORSIS3316ThresholdChanged;
 extern NSString* ORSIS3316ThresholdSumChanged;
 extern NSString* ORSIS3316HeSuppressTrigModeChanged;
 extern NSString* ORSIS3316CfdControlBitsChanged;
+extern NSString* ORSIS3316ExtraFilterBitsChanged;
+extern NSString* ORSIS3316TauTableBitsChanged;
 extern NSString* ORSIS3316EnergyDividerChanged ;
 extern NSString* ORSIS3316EnergySubtractorChanged;
 extern NSString* ORSIS3316TauFactorChanged;
@@ -684,6 +707,8 @@ extern NSString* ORSIS3316ActiveTrigGateWindowLenChanged;
 extern NSString* ORSIS3316PreTriggerDelayChanged;
 extern NSString* ORSIS3316RawDataBufferLenChanged;
 extern NSString* ORSIS3316RawDataBufferStartChanged;
+extern NSString* ORSIS3316AccumulatorGateStartChanged;
+extern NSString* ORSIS3316AccumulatorGateLengthChanged;
 extern NSString* ORSIS3316AccGate1LenChanged;
 extern NSString* ORSIS3316AccGate1StartChanged;
 extern NSString* ORSIS3316AccGate2LenChanged;

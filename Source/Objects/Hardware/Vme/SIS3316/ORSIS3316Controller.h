@@ -48,6 +48,8 @@
     IBOutlet NSMatrix*		tauFactorMatrix;
     IBOutlet NSMatrix*		gapTimeMatrix;
     IBOutlet NSMatrix*		peakingTimeMatrix;
+    IBOutlet NSMatrix*      extraFilterMatrix;
+    IBOutlet NSMatrix*      tauTableMatrix;
     
     IBOutlet NSMatrix*		heTrigThresholdMatrix;
     IBOutlet NSMatrix*      heTrigThresholdSumMatrix;
@@ -95,6 +97,8 @@
 	IBOutlet NSButton*		stopDelayEnabledButton;
 	IBOutlet NSButton*		writeThresholdButton;
 	IBOutlet NSButton*		readThresholdButton;
+    IBOutlet NSButton*      writeHistogramConfigurationButton;
+    IBOutlet NSButton*      readHistogramConfigurationButton;
 	IBOutlet NSTextField*	startDelayField;
 	IBOutlet NSPopUpButton* clockSourcePU;
 	IBOutlet NSTextField*	stopDelayField;
@@ -152,6 +156,10 @@
 - (void) activeTrigGateWindowLenChanged:(NSNotification*)aNote;
 - (void) rawDataBufferLenChanged:(NSNotification*)aNote;
 - (void) rawDataBufferStartChanged:(NSNotification*)aNote;
+
+- (void) accumulatorGateStartChanged:(NSNotification*)aNote;
+- (void) accumulatorGateLengthChanged:(NSNotification*)aNote;
+
 - (void) accGate1LenChanged:(NSNotification*)aNote;
 - (void) accGate1StartChanged:(NSNotification*)aNote;
 - (void) accGate2LenChanged:(NSNotification*)aNote;
@@ -214,6 +222,8 @@
 - (IBAction) tauFactorAction:(id)sender;
 - (IBAction) gapTimeAction:(id)sender;
 - (IBAction) peakingTimeAction:(id)sender;
+- (IBAction) extraFilterAction:(id)sender;
+- (IBAction) tauTableAction:(id)sender;
 - (IBAction) heTrigThresholdAction:(id)sender;
 - (IBAction) heTrigThresholdSumAction:(id)sender;
 - (IBAction) trigBothEdgesAction:(id)sender;
@@ -239,6 +249,9 @@
 - (IBAction) accGate7StartAction:(id)sender;
 - (IBAction) accGate8LenAction:(id)sender;
 - (IBAction) accGate8StartAction:(id)sender;
+
+- (IBAction) writeAccumulatorGateAction:(id)sender;
+- (IBAction) readAccumulatorGateAction:(id)sender;
 
 - (IBAction) writeThresholdsAction:(id)sender;
 - (IBAction) readThresholdsAction:(id)sender;

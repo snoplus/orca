@@ -43,6 +43,8 @@ NSString* ORSIS3316CfdControlBitsChanged            = @"ORSIS3316CfdControlBitsC
 NSString* ORSIS3316EnergyDividerChanged             = @"ORSIS3316EnergyDividerChanged";
 NSString* ORSIS3316EnergySubtractorChanged          = @"ORSIS3316EnergySubtractorChanged";
 NSString* ORSIS3316TauFactorChanged                 = @"ORSIS3316TauFactorChanged";
+NSString* ORSIS3316ExtraFilterBitsChanged           = @"ORSIS3316ExtraFilterBitsChanged";
+NSString* ORSIS3316TauTableBitsChanged              = @"ORSIS3316TauTableBitsChanged";
 NSString* ORSIS3316PeakingTimeChanged               = @"ORSIS3316PeakingTimeChanged";
 NSString* ORSIS3316GapTimeChanged                   = @"ORSIS3316GapTimeChanged";
 NSString* ORSIS3316HeTrigThresholdChanged           = @"ORSIS3316HeTrigThresholdChanged";
@@ -55,6 +57,10 @@ NSString* ORSIS3316ActiveTrigGateWindowLenChanged   = @"ORSIS3316ActiveTrigGateW
 NSString* ORSIS3316PreTriggerDelayChanged           = @"ORSIS3316PreTriggerDelayChanged";
 NSString* ORSIS3316RawDataBufferLenChanged          = @"ORSIS3316RawDataBufferLenChanged";
 NSString* ORSIS3316RawDataBufferStartChanged        = @"ORSIS3316RawDataBufferStartChanged";
+
+NSString* ORSIS3316AccumulatorGateStartChanged      = @"ORSIS3316AccumulatorGateStartChanged";
+NSString* ORSIS3316AccumulatorGateLengthChanged     = @"ORSIS3316AccumulatorGateLengthChanged";
+
 
 NSString* ORSIS3316AccGate1LenChanged               = @"ORSIS3316AccGate1LenChanged";
 NSString* ORSIS3316AccGate1StartChanged             = @"ORSIS3316AccGate1StartChanged";
@@ -274,10 +280,10 @@ static ORSIS3316RegisterInformation group_register_information[kADCGroupRegister
     {0x000010C8,    @"FIR Energy Setup Ch3",                    YES,    YES,    YES,   kFirEnergySetupCh3Reg},
     {0x000010CC,    @"FIR Energy Setup Ch4",                    YES,    YES,    YES,   kFirEnergySetupCh4Reg},
 
-    {0x000010D0,    @"Energy Histogram COnfiguration Ch1",      YES,    YES,    YES,   kEnergyHistoConfigCh1Reg},
-    {0x000010D4,    @"Energy Histogram COnfiguration Ch2",      YES,    YES,    YES,   kEnergyHistoConfigCh2Reg},
-    {0x000010D8,    @"Energy Histogram COnfiguration Ch3",      YES,    YES,    YES,   kEnergyHistoConfigCh3Reg},
-    {0x000010DC,    @"Energy Histogram COnfiguration Ch4",      YES,    YES,    YES,   kEnergyHistoConfigCh4Reg},
+    {0x000010D0,    @"Energy Histogram Configuration Ch1",      YES,    YES,    YES,   kEnergyHistoConfigCh1Reg},
+    {0x000010D4,    @"Energy Histogram Configuration Ch2",      YES,    YES,    YES,   kEnergyHistoConfigCh2Reg},
+    {0x000010D8,    @"Energy Histogram Configuration Ch3",      YES,    YES,    YES,   kEnergyHistoConfigCh3Reg},
+    {0x000010DC,    @"Energy Histogram Configuration Ch4",      YES,    YES,    YES,   kEnergyHistoConfigCh4Reg},
 
     {0x000010E0,    @"MAW Start Index/Energy Pickup Config Ch1",YES,    YES,    YES,   kMawStartIndexConfigCh1Reg},
     {0x000010E4,    @"MAW Start Index/Energy Pickup Config Ch2",YES,    YES,    YES,   kMawStartIndexConfigCh2Reg},
@@ -496,166 +502,9 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 //---------------------------------------------------------------------------
 //Energy Histogram Configuration
 
-- (long) histogramsEnabledMask                        { return histogramsEnabledMask;                                       }
-- (BOOL) histogramsEnabled:(unsigned short)chan       { return histogramsEnabledMask & (1<<chan);                           }
-- (void) setHistogramsEnabledMask:(unsigned long)aMask
-{
-    if(histogramsEnabledMask==aMask)return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setHistogramsEnabledMask:histogramsEnabledMask];
-    histogramsEnabledMask = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316HistogramsEnabledChanged object:self];
-}
-
-- (void) setHistogramsEnabled:(unsigned short)chan withValue:(BOOL)aValue
-{
-    unsigned short   aMask = histogramsEnabledMask;
-    if(aValue)      aMask |= (1<<chan);
-    else            aMask &= ~(1<<chan);
-    [self setHistogramsEnabledMask:aMask];
-}
-
-- (long) pileupEnabledMask                        { return pileupEnabledMask;                                       }
-- (BOOL) pileupEnabled:(unsigned short)chan       { return pileupEnabledMask & (1<<chan);                           }
-- (void) setPileupEnabledMask:(unsigned long)aMask
-{
-    if(pileupEnabledMask==aMask)return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setPileupEnabledMask:pileupEnabledMask];
-    pileupEnabledMask = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316PileUpEnabledChanged object:self];
-}
-
-- (void) setPileupEnabled:(unsigned short)chan withValue:(BOOL)aValue
-{
-    unsigned short   aMask = pileupEnabledMask;
-    if(aValue)      aMask |= (1<<chan);
-    else            aMask &= ~(1<<chan);
-    [self setPileupEnabledMask:aMask];
-}
-
-- (long) clrHistogramsWithTSMask                    { return clrHistogramsWithTSMask;}
-- (BOOL) clrHistogramsWithTS:(unsigned short)chan   { return clrHistogramsWithTSMask & (1<<chan); }
-- (void) setClrHistogramsWithTSMask:(unsigned long)aMask
-{
-    if(clrHistogramsWithTSMask==aMask)return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setClrHistogramsWithTSMask:clrHistogramsWithTSMask];
-    clrHistogramsWithTSMask = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316ClrHistogramWithTSChanged object:self];
-}
-
-- (void) setClrHistogramsWithTS:(unsigned short)chan withValue:(BOOL)aValue
-{
-    unsigned short   aMask = clrHistogramsWithTSMask;
-    if(aValue)      aMask |= (1<<chan);
-    else            aMask &= ~(1<<chan);
-    [self setClrHistogramsWithTSMask:aMask];
-}
-
-- (long) writeHitsToEventMemoryMask                 { return writeHitsToEventMemoryMask;}
-- (BOOL) writeHitsToEventMemory:(unsigned short)chan         { return writeHitsToEventMemoryMask & (1<<chan); }
-- (void) setWriteHitsToEventMemoryMask:(unsigned long)aMask
-{
-    if(writeHitsToEventMemoryMask==aMask)return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setWriteHitsToEventMemoryMask:writeHitsToEventMemoryMask];
-    writeHitsToEventMemoryMask = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316WriteHitsIntoEventMemoryChanged object:self];
-}
-
-- (void) setWriteHitsToEventMemory:(unsigned short)chan withValue:(BOOL)aValue
-{
-    unsigned short   aMask = writeHitsToEventMemoryMask;
-    if(aValue)      aMask |= (1<<chan);
-    else            aMask &= ~(1<<chan);
-    [self setWriteHitsToEventMemoryMask:aMask];
-}
-
-- (unsigned short) energyDivider:(unsigned short)aChan
-{
-    if(aChan>kNumSIS3316Channels)return 0;
-    else return energyDivider[aChan];
-}
-
-- (void) setEnergyDivider:(unsigned short)aChan withValue:(unsigned short)aValue
-{
-    if(aChan>kNumSIS3316Channels)return;
-    if(aValue<1)aValue = 1;
-    if(aValue>0x3f)aValue = 0xfff;
-    if([self energyDivider:aChan] == aValue) return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setEnergyDivider:aChan withValue:[self energyDivider:aChan]];
-    energyDivider[aChan]=aValue;
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316EnergyDividerChanged object:self userInfo:userInfo];
-}
-
-- (unsigned short) energySubtractor:(unsigned short)aChan
-{
-    if(aChan>kNumSIS3316Channels)return 0;
-    else return energySubtractor[aChan];
-}
-
-- (void) setEnergySubtractor:(unsigned short)aChan withValue:(unsigned short)aValue
-{
-    if(aChan>kNumSIS3316Channels)return;
-    if(aValue>0x3f)aValue = 0xff;
-    if([self energySubtractor:aChan] == aValue) return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setEnergySubtractor:aChan withValue:[self energySubtractor:aChan]];
-    energySubtractor[aChan]=aValue;
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316EnergySubtractorChanged object:self userInfo:userInfo];
-}
 
 //---------------------------------------------------------------------------
 
-- (unsigned short) tauFactor:(unsigned short)aChan
-{
-    if(aChan>kNumSIS3316Channels)return 0;
-    else return tauFactor [aChan];
-}
-
-- (void) setTauFactor:(unsigned short)aChan withValue:(unsigned short)aValue
-{
-    if(aChan>kNumSIS3316Channels)return;
-    if(aValue>0x3f)aValue = 0x3f;
-    if([self tauFactor:aChan] == aValue) return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setTauFactor:aChan withValue:[self tauFactor:aChan]];
-    tauFactor[aChan] = aValue;
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316TauFactorChanged object:self userInfo:userInfo];
-}
-
-
-- (unsigned short) peakingTime:(unsigned short)aChan
-{
-    if(aChan>kNumSIS3316Channels)return 0;
-    else return peakingTime[aChan];
-}
-
-- (void) setPeakingTime:(unsigned short)aChan withValue:(unsigned short)aValue
-{
-    if(aChan>kNumSIS3316Channels)return;
-    if([self peakingTime:aChan] == aValue) return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setPeakingTime:aChan withValue:peakingTime[aChan]];
-    peakingTime[aChan] = aValue;
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316PeakingTimeChanged object:self userInfo:userInfo];
-}
-
-
-- (unsigned short) gapTime:(unsigned short)aChan
-{
-    if(aChan>kNumSIS3316Channels)return 0;
-    else return gapTime[aChan];
-}
-
-- (void) setGapTime:(unsigned short)aChan withValue:(unsigned short)aValue
-{
-    if(aChan>kNumSIS3316Channels)return;
-    //aValue &= ~0xFFFE; //bit zero is always zero
-    if([self gapTime:aChan] == aValue) return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setGapTime:aChan withValue:[self gapTime:aChan]];
-    gapTime[aChan] = aValue;
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316GapTimeChanged object:self userInfo:userInfo];
-}
 //---------------------------------------------------------------------------
 
 
@@ -710,264 +559,6 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316RawDataBufferStartChanged object:self userInfo:userInfo];
-}
-//-----------------
-//----Accumlator gate1
-
-- (unsigned short) accGate1Start:(unsigned short)aGroup
-{
-    if(aGroup>kNumSIS3316Groups)return 0;
-    else return accGate1Start[aGroup];
-}
-
-- (void) setAccGate1Start:(unsigned short)aGroup withValue:(unsigned short)aValue
-{
-    if(aGroup>kNumSIS3316Groups)return;
-    if([self accGate1Start:aGroup] == aValue)   return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate1Start:aGroup withValue:[self accGate1Start:aGroup]];
-    accGate1Start[aGroup]=aValue;
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate1StartChanged object:self userInfo:userInfo];
-}
-
-
-- (unsigned short) accGate1Len:(unsigned short)aGroup
-{
-    if(aGroup>kNumSIS3316Groups)return 0;
-    else return accGate1Len[aGroup];
-}
-
-- (void) setAccGate1Len:(unsigned short)aGroup withValue:(unsigned short)aValue
-{
-    if(aGroup>kNumSIS3316Groups)return;
-    if([self accGate1Len:aGroup] == aValue)    return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate1Len:aGroup withValue:[self accGate1Len:aGroup]];
-    accGate1Len[aGroup]=aValue;
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate1LenChanged object:self userInfo:userInfo];
-}
-//----Accumlator gate2
-- (unsigned short) accGate2Start:(unsigned short)aGroup
-{
-    if(aGroup>kNumSIS3316Groups)return 0;
-    else return accGate2Start[aGroup];
-}
-
-- (void) setAccGate2Start:(unsigned short)aGroup withValue:(unsigned short)aValue
-{
-    if(aGroup>kNumSIS3316Groups)return;
-    if([self accGate2Start:aGroup] == aValue)   return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate2Start:aGroup withValue:[self accGate2Start:aGroup]];
-    accGate2Start[aGroup]=aValue;
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate2StartChanged object:self userInfo:userInfo];
-}
-
-- (unsigned short) accGate2Len:(unsigned short)aGroup
-{
-    if(aGroup>kNumSIS3316Groups)return 0;
-    else return accGate2Len[aGroup];
-}
-
-- (void) setAccGate2Len:(unsigned short)aGroup withValue:(unsigned short)aValue
-{
-    if(aGroup>kNumSIS3316Groups)return;
-    if([self accGate2Len:aGroup] == aValue)     return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate2Len:aGroup withValue:[self accGate2Len:aGroup]];
-    accGate2Len[aGroup]=aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate2LenChanged object:self];
-}
-//----Accumlator gate3
-- (unsigned short) accGate3Start:(unsigned short)aGroup
-{
-    if(aGroup>kNumSIS3316Groups)return 0;
-    else return accGate3Start[aGroup];
-}
-
-- (void) setAccGate3Start:(unsigned short)aGroup withValue:(unsigned short)aValue
-{
-    if(aGroup>kNumSIS3316Groups)return;
-    if([self accGate3Start:aGroup] == aValue)   return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate3Start:aGroup withValue:[self accGate3Start:aGroup]];
-    accGate3Start[aGroup]=aValue;
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate3StartChanged object:self userInfo:userInfo];
-}
-
-- (unsigned short) accGate3Len:(unsigned short)aGroup
-{
-    if(aGroup>kNumSIS3316Groups)return 0;
-    else return accGate3Len[aGroup];
-}
-
-- (void) setAccGate3Len:(unsigned short)aGroup withValue:(unsigned short)aValue
-{
-    if(aGroup>kNumSIS3316Groups)return;
-    if([self accGate3Len:aGroup] == aValue)   return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate3Len:aGroup withValue:[self accGate3Len:aGroup]];
-    accGate3Len[aGroup]=aValue;
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate3LenChanged object:self userInfo:userInfo];
-}
-//----Accumlator gate4
-- (unsigned short) accGate4Start:(unsigned short)aGroup
-{
-    if(aGroup>kNumSIS3316Groups)return 0;
-    else return accGate4Start[aGroup];
-}
-
-- (void) setAccGate4Start:(unsigned short)aGroup withValue:(unsigned short)aValue
-{
-    if(aGroup>kNumSIS3316Groups)return;
-    if([self accGate4Start:aGroup] == aValue)   return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate4Start:aGroup withValue:[self accGate4Start:aGroup]];
-    accGate4Start[aGroup]=aValue;
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate4StartChanged object:self userInfo:userInfo];
-}
-
-- (unsigned short) accGate4Len:(unsigned short)aGroup
-{
-    if(aGroup>kNumSIS3316Groups)return 0;
-    else return accGate4Len[aGroup];
-}
-
-- (void) setAccGate4Len:(unsigned short)aGroup withValue:(unsigned short)aValue
-{
-    if(aGroup>kNumSIS3316Groups)return;
-    if([self accGate4Len:aGroup] == aValue)     return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate4Len:aGroup withValue:[self accGate4Len:aGroup]];
-    accGate4Len[aGroup]=aValue;
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate4LenChanged object:self userInfo:userInfo];
-}
-//----Accumlator gate5
-- (unsigned short) accGate5Start:(unsigned short)aGroup
-{
-    if(aGroup>kNumSIS3316Groups)return 0;
-    else return accGate5Start[aGroup];
-}
-
-- (void) setAccGate5Start:(unsigned short)aGroup withValue:(unsigned short)aValue
-{
-    if(aGroup>kNumSIS3316Groups)return;
-    if([self accGate5Start:aGroup] == aValue)   return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate5Start:aGroup withValue:[self accGate5Start:aGroup]];
-    accGate5Start[aGroup]=aValue;
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate5StartChanged object:self userInfo:userInfo];
-}
-
-- (unsigned short) accGate5Len:(unsigned short)aGroup
-{
-    if(aGroup>kNumSIS3316Groups)return 0;
-    else return accGate5Len[aGroup];
-}
-
-- (void) setAccGate5Len:(unsigned short)aGroup withValue:(unsigned short)aValue
-{
-    if(aGroup>kNumSIS3316Groups)return;
-    if([self accGate5Len:aGroup] == aValue)   return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate5Len:aGroup withValue:[self accGate5Len:aGroup]];
-    accGate5Len[aGroup]=aValue;
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate5LenChanged object:self userInfo:userInfo];
-}
-//----Accumlator gate6
-- (unsigned short) accGate6Start:(unsigned short)aGroup
-{
-    if(aGroup>kNumSIS3316Groups)return 0;
-    else return accGate6Start[aGroup];
-}
-
-- (void) setAccGate6Start:(unsigned short)aGroup withValue:(unsigned short)aValue
-{
-    if(aGroup>kNumSIS3316Groups)return;
-    if([self accGate6Start:aGroup] == aValue)   return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate6Start:aGroup withValue:[self accGate6Start:aGroup]];
-    accGate6Start[aGroup]=aValue;
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate6StartChanged object:self userInfo:userInfo];
-}
-
-- (unsigned short) accGate6Len:(unsigned short)aGroup
-{
-    if(aGroup>kNumSIS3316Groups)return 0;
-    else return accGate6Len[aGroup];
-}
-
-- (void) setAccGate6Len:(unsigned short)aGroup withValue:(unsigned short)aValue
-{
-    if(aGroup>kNumSIS3316Groups)return;
-    if([self accGate6Len:aGroup] == aValue)   return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate6Len:aGroup withValue:[self accGate6Len:aGroup]];
-    accGate6Len[aGroup]=aValue;
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate6LenChanged object:self userInfo:userInfo];
-}
-//----Accumlator gate7
-- (unsigned short) accGate7Start:(unsigned short)aGroup
-{
-    if(aGroup>kNumSIS3316Groups)return 0;
-    else return accGate7Start[aGroup];
-}
-
-- (void) setAccGate7Start:(unsigned short)aGroup withValue:(unsigned short)aValue
-{
-    if(aGroup>kNumSIS3316Groups)return;
-    if([self accGate7Start:aGroup] == aValue)   return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate7Start:aGroup withValue:[self accGate7Start:aGroup]];
-    accGate7Start[aGroup]=aValue;
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate7StartChanged object:self userInfo:userInfo];
-}
-
-- (unsigned short) accGate7Len:(unsigned short)aGroup
-{
-    if(aGroup>kNumSIS3316Groups)return 0;
-    else return accGate7Len[aGroup];
-}
-
-- (void) setAccGate7Len:(unsigned short)aGroup withValue:(unsigned short)aValue
-{
-    if(aGroup>kNumSIS3316Groups)return;
-    if([self accGate7Len:aGroup] == aValue)   return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate7Len:aGroup withValue:[self accGate7Len:aGroup]];
-    accGate7Len[aGroup]=aValue;
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate7LenChanged object:self userInfo:userInfo];
-}
-//----Accumlator gate8
-- (unsigned short) accGate8Start:(unsigned short)aGroup
-{
-    if(aGroup>kNumSIS3316Groups)return 0;
-    else return accGate8Start[aGroup];
-}
-
-- (void) setAccGate8Start:(unsigned short)aGroup withValue:(unsigned short)aValue
-{
-    if(aGroup>kNumSIS3316Groups)return;
-    if([self accGate8Start:aGroup] == aValue)   return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate8Start:aGroup withValue:[self accGate8Start:aGroup]];
-    accGate8Start[aGroup]=aValue;
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate8StartChanged object:self userInfo:userInfo];
-}
-
-- (unsigned short) accGate8Len:(unsigned short)aGroup
-{
-    if(aGroup>kNumSIS3316Groups)return 0;
-    else return accGate8Len[aGroup];
-}
-
-- (void) setAccGate8Len:(unsigned short)aGroup withValue:(unsigned short)aValue
-{
-    if(aGroup>kNumSIS3316Groups)return;
-    if([self accGate8Len:aGroup] == aValue)   return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate8Len:aGroup withValue:[self accGate8Len:aGroup]];
-    accGate8Len[aGroup]=aValue;
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate8LenChanged object:self userInfo:userInfo];
 }
 
 //-----------------
@@ -1342,6 +933,16 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 - (unsigned long) channelRegister:(unsigned long)aRegisterIndex channel:(int)aChannel
 {
     return [self baseAddress] + group_register_information[aRegisterIndex].offset + (0x10*(aChannel%4)) + (0x1000*(aChannel/4));
+}
+
+- (unsigned long) channelRegisterVersionTwo:(unsigned long)aRegisterIndex channel:(int)aChannel
+{
+    return [self baseAddress] + group_register_information[aRegisterIndex].offset + (0x4*(aChannel%4)) + (0x1000*(aChannel/4));
+}
+
+- (unsigned long) accumulatorRegisters:(unsigned long)aRegisterIndex channel:(int)aChannel
+{
+    return [self baseAddress] + group_register_information[aRegisterIndex].offset + (0x4*(aChannel%2)) + (0x1000*(aChannel/8));
 }
 
 
@@ -2025,7 +1626,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     for(i=0; i < kNumSIS3316Groups; i++){
         unsigned long aValue;
         [[self adapter] readLongBlock: &aValue
-                                     atAddress:[self channelRegister:kTrigThresholdCh1Reg channel:i]
+                                     atAddress:[self groupRegister:kActTriggerGateWindowLenReg group:i]
                                      numToRead: 1
                                     withAddMod: [self addressModifier]
                                  usingAddSpace: 0x01];
@@ -2099,8 +1700,9 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
     int i;
     for(i = 0; i < kNumSIS3316Channels; i++) {
-        unsigned long valueToWrite =  (([self gapTime:i]     & 0xfffe) << 12) |
-                                       ([self peakingTime:i] & 0xffff);
+        unsigned long valueToWrite =  (([self gapTime:i]     & 0x1FE) << 12) |
+                                       ([self peakingTime:i] & 0x7FC);
+        
         
         [[self adapter] writeLongBlock:&valueToWrite
                              atAddress:[self channelRegister:kFirTrigSetupCh1Reg channel:i]
@@ -2112,7 +1714,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 
 //6.26 Trigger Threshold registers
 
-NSString* cfdCntrlString[4] = {
+NSString* cfdCntrlString[4] = {//asdf //-=**
     @"Disabled     ",
     @"Disabled     ",
     @"Zero Crossing",
@@ -2446,76 +2048,681 @@ NSString* intTrigOutPulseString[3] = {
 //6.30 Extended Raw Data Buffer Configuration registers
 
 //6.31 Accumulator Gate X Configuration registers
-- (void) writeAccumulatorGates
+
+//----Accumlator gate1
+
+- (unsigned short) accGate1Start:(unsigned short)aGroup
+{
+    if(aGroup>kNumSIS3316Groups)return 0;
+    else return accGate1Start[aGroup];
+}
+
+- (void) setAccGate1Start:(unsigned short)aGroup withValue:(unsigned short)aValue
+{
+    if(aGroup>kNumSIS3316Groups)return;
+    if(aValue<1)aValue = 1;
+    if(aValue>0x200)aValue = 0x200;
+    if([self accGate1Start:aGroup] == aValue)   return;
+    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate1Start:aGroup withValue:[self accGate1Start:aGroup]];
+    accGate1Start[aGroup]=aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate1StartChanged object:self userInfo:userInfo];
+}
+
+
+- (unsigned short) accGate1Len:(unsigned short)aGroup
+{
+    if(aGroup>kNumSIS3316Groups)return 0;
+    else return accGate1Len[aGroup];
+}
+
+- (void) setAccGate1Len:(unsigned short)aGroup withValue:(unsigned short)aValue
+{
+    if(aGroup>kNumSIS3316Groups)return;
+    if([self accGate1Len:aGroup] == aValue)    return;
+    if(aValue<0)aValue = 0;
+    if(aValue>0x1FF)aValue = 0x1FF;
+    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate1Len:aGroup withValue:[self accGate1Len:aGroup]];
+    accGate1Len[aGroup]=aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate1LenChanged object:self userInfo:userInfo];
+}
+//----Accumlator gate2
+- (unsigned short) accGate2Start:(unsigned short)aGroup
+{
+    if(aGroup>kNumSIS3316Groups)return 0;
+    else return accGate2Start[aGroup];
+}
+
+- (void) setAccGate2Start:(unsigned short)aGroup withValue:(unsigned short)aValue
+{
+    if(aGroup>kNumSIS3316Groups)return;
+    if([self accGate2Start:aGroup] == aValue)   return;
+    if(aValue<1)aValue = 1;
+    if(aValue>0x200)aValue = 0x200;
+    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate2Start:aGroup withValue:[self accGate2Start:aGroup]];
+    accGate2Start[aGroup]=aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate2StartChanged object:self userInfo:userInfo];
+}
+
+- (unsigned short) accGate2Len:(unsigned short)aGroup
+{
+    if(aGroup>kNumSIS3316Groups)return 0;
+    else return accGate2Len[aGroup];
+}
+
+- (void) setAccGate2Len:(unsigned short)aGroup withValue:(unsigned short)aValue
+{
+    if(aGroup>kNumSIS3316Groups)return;
+    if([self accGate2Len:aGroup] == aValue)     return;
+    if(aValue<0)aValue = 0;
+    if(aValue>0x1FF)aValue = 0x1FF;
+    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate2Len:aGroup withValue:[self accGate2Len:aGroup]];
+    accGate2Len[aGroup]=aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate2LenChanged object:self];
+}
+//----Accumlator gate3
+- (unsigned short) accGate3Start:(unsigned short)aGroup
+{
+    if(aGroup>kNumSIS3316Groups)return 0;
+    else return accGate3Start[aGroup];
+}
+
+- (void) setAccGate3Start:(unsigned short)aGroup withValue:(unsigned short)aValue
+{
+    if(aGroup>kNumSIS3316Groups)return;
+    if([self accGate3Start:aGroup] == aValue)   return;
+    if(aValue<1)aValue = 1;
+    if(aValue>0x200)aValue = 0x200;
+    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate3Start:aGroup withValue:[self accGate3Start:aGroup]];
+    accGate3Start[aGroup]=aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate3StartChanged object:self userInfo:userInfo];
+}
+
+- (unsigned short) accGate3Len:(unsigned short)aGroup
+{
+    if(aGroup>kNumSIS3316Groups)return 0;
+    else return accGate3Len[aGroup];
+}
+
+- (void) setAccGate3Len:(unsigned short)aGroup withValue:(unsigned short)aValue
+{
+    if(aGroup>kNumSIS3316Groups)return;
+    if([self accGate3Len:aGroup] == aValue)   return;
+    if(aValue<0)aValue = 0;
+    if(aValue>0x1FF)aValue = 0x1FF;
+    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate3Len:aGroup withValue:[self accGate3Len:aGroup]];
+    accGate3Len[aGroup]=aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate3LenChanged object:self userInfo:userInfo];
+}
+//----Accumlator gate4
+- (unsigned short) accGate4Start:(unsigned short)aGroup
+{
+    if(aGroup>kNumSIS3316Groups)return 0;
+    else return accGate4Start[aGroup];
+}
+
+- (void) setAccGate4Start:(unsigned short)aGroup withValue:(unsigned short)aValue
+{
+    if(aGroup>kNumSIS3316Groups)return;
+    if([self accGate4Start:aGroup] == aValue)   return;
+    if(aValue<1)aValue = 1;
+    if(aValue>0x200)aValue = 0x200;
+    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate4Start:aGroup withValue:[self accGate4Start:aGroup]];
+    accGate4Start[aGroup]=aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate4StartChanged object:self userInfo:userInfo];
+}
+
+- (unsigned short) accGate4Len:(unsigned short)aGroup
+{
+    if(aGroup>kNumSIS3316Groups)return 0;
+    else return accGate4Len[aGroup];
+}
+
+- (void) setAccGate4Len:(unsigned short)aGroup withValue:(unsigned short)aValue
+{
+    if(aGroup>kNumSIS3316Groups)return;
+    if([self accGate4Len:aGroup] == aValue)     return;
+    if(aValue<0)aValue = 0;
+    if(aValue>0x1FF)aValue = 0x1FF;
+    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate4Len:aGroup withValue:[self accGate4Len:aGroup]];
+    accGate4Len[aGroup]=aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate4LenChanged object:self userInfo:userInfo];
+}
+//----Accumlator gate5
+- (unsigned short) accGate5Start:(unsigned short)aGroup
+{
+    if(aGroup>kNumSIS3316Groups)return 0;
+    else return accGate5Start[aGroup];
+}
+
+- (void) setAccGate5Start:(unsigned short)aGroup withValue:(unsigned short)aValue
+{
+    if(aGroup>kNumSIS3316Groups)return;
+    if([self accGate5Start:aGroup] == aValue)   return;
+    if(aValue<1)aValue = 1;
+    if(aValue>0x200)aValue = 0x200;
+    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate5Start:aGroup withValue:[self accGate5Start:aGroup]];
+    accGate5Start[aGroup]=aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate5StartChanged object:self userInfo:userInfo];
+}
+
+- (unsigned short) accGate5Len:(unsigned short)aGroup
+{
+    if(aGroup>kNumSIS3316Groups)return 0;
+    else return accGate5Len[aGroup];
+}
+
+- (void) setAccGate5Len:(unsigned short)aGroup withValue:(unsigned short)aValue
+{
+    if(aGroup>kNumSIS3316Groups)return;
+    if([self accGate5Len:aGroup] == aValue)   return;
+    if(aValue<0)aValue = 0;
+    if(aValue>0x1FF)aValue = 0x1FF;
+    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate5Len:aGroup withValue:[self accGate5Len:aGroup]];
+    accGate5Len[aGroup]=aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate5LenChanged object:self userInfo:userInfo];
+}
+//----Accumlator gate6
+- (unsigned short) accGate6Start:(unsigned short)aGroup
+{
+    if(aGroup>kNumSIS3316Groups)return 0;
+    else return accGate6Start[aGroup];
+}
+
+- (void) setAccGate6Start:(unsigned short)aGroup withValue:(unsigned short)aValue
+{
+    if(aGroup>kNumSIS3316Groups)return;
+    if([self accGate6Start:aGroup] == aValue)   return;
+    if(aValue<1)aValue = 1;
+    if(aValue>0x200)aValue = 0x200;
+    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate6Start:aGroup withValue:[self accGate6Start:aGroup]];
+    accGate6Start[aGroup]=aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate6StartChanged object:self userInfo:userInfo];
+}
+
+- (unsigned short) accGate6Len:(unsigned short)aGroup
+{
+    if(aGroup>kNumSIS3316Groups)return 0;
+    else return accGate6Len[aGroup];
+}
+
+- (void) setAccGate6Len:(unsigned short)aGroup withValue:(unsigned short)aValue
+{
+    if(aGroup>kNumSIS3316Groups)return;
+    if([self accGate6Len:aGroup] == aValue)   return;
+    if(aValue<0)aValue = 0;
+    if(aValue>0x1FF)aValue = 0x1FF;
+    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate6Len:aGroup withValue:[self accGate6Len:aGroup]];
+    accGate6Len[aGroup]=aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate6LenChanged object:self userInfo:userInfo];
+}
+//----Accumlator gate7
+- (unsigned short) accGate7Start:(unsigned short)aGroup
+{
+    if(aGroup>kNumSIS3316Groups)return 0;
+    else return accGate7Start[aGroup];
+}
+
+- (void) setAccGate7Start:(unsigned short)aGroup withValue:(unsigned short)aValue
+{
+    if(aGroup>kNumSIS3316Groups)return;
+    if([self accGate7Start:aGroup] == aValue)   return;
+    if(aValue<1)aValue = 1;
+    if(aValue>0x200)aValue = 0x200;
+    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate7Start:aGroup withValue:[self accGate7Start:aGroup]];
+    accGate7Start[aGroup]=aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate7StartChanged object:self userInfo:userInfo];
+}
+
+- (unsigned short) accGate7Len:(unsigned short)aGroup
+{
+    if(aGroup>kNumSIS3316Groups)return 0;
+    else return accGate7Len[aGroup];
+}
+
+- (void) setAccGate7Len:(unsigned short)aGroup withValue:(unsigned short)aValue
+{
+    if(aGroup>kNumSIS3316Groups)return;
+    if([self accGate7Len:aGroup] == aValue)   return;
+    if(aValue<0)aValue = 0;
+    if(aValue>0x1FF)aValue = 0x1FF;
+    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate7Len:aGroup withValue:[self accGate7Len:aGroup]];
+    accGate7Len[aGroup]=aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate7LenChanged object:self userInfo:userInfo];
+}
+//----Accumlator gate8
+- (unsigned short) accGate8Start:(unsigned short)aGroup
+{
+    if(aGroup>kNumSIS3316Groups)return 0;
+    else return accGate8Start[aGroup];
+}
+
+- (void) setAccGate8Start:(unsigned short)aGroup withValue:(unsigned short)aValue
+{
+    if(aGroup>kNumSIS3316Groups)return;
+    if([self accGate8Start:aGroup] == aValue)   return;
+    if(aValue<1)aValue = 1;
+    if(aValue>0x200)aValue = 0x200;
+    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate8Start:aGroup withValue:[self accGate8Start:aGroup]];
+    accGate8Start[aGroup]=aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate8StartChanged object:self userInfo:userInfo];
+}
+
+- (unsigned short) accGate8Len:(unsigned short)aGroup
+{
+    if(aGroup>kNumSIS3316Groups)return 0;
+    else return accGate8Len[aGroup];
+}
+
+- (void) setAccGate8Len:(unsigned short)aGroup withValue:(unsigned short)aValue
+{
+    if(aGroup>kNumSIS3316Groups)return;
+    if([self accGate8Len:aGroup] == aValue)   return;
+    if(aValue<0)aValue = 0;
+    if(aValue>0x1FF)aValue = 0x1FF;
+    [[[self undoManager] prepareWithInvocationTarget:self] setAccGate8Len:aGroup withValue:[self accGate8Len:aGroup]];
+    accGate8Len[aGroup]=aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccGate8LenChanged object:self userInfo:userInfo];
+}
+
+//--------------------------------------------------------------
+- (unsigned short) accumulatorGateStart:(unsigned short)aGroup
+{
+    if(aGroup>kNumSIS3316Groups)return 0;
+    else return accumulatorGateStart[aGroup];
+}
+
+- (void) setAccumulatorGateStart:(unsigned short)aGroup withValue:(unsigned short)aValue
+{
+    if(aGroup>kNumSIS3316Groups)return;
+    if([self accumulatorGateStart:aGroup] == aValue)   return;
+    if(aValue<1)aValue = 1;
+    if(aValue>0x200)aValue = 0x200;
+    [[[self undoManager] prepareWithInvocationTarget:self] setAccumulatorGateStart:aGroup withValue:[self accumulatorGateStart:aGroup]];
+    accumulatorGateStart[aGroup]=aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccumulatorGateStartChanged object:self userInfo:userInfo];
+}
+
+
+- (unsigned short) accumulatorGateLength:(unsigned short)aGroup
+{
+    if(aGroup>kNumSIS3316Groups)return 0;
+    else return accumulatorGateLength[aGroup];
+}
+
+- (void) setAccumulatorGateLength:(unsigned short)aGroup withValue:(unsigned short)aValue
+{
+    if(aGroup>kNumSIS3316Groups)return;
+    if(aValue<0)aValue = 0;
+    if(aValue>0x1FF)aValue = 0x1FF;
+    if([self accumulatorGateLength:aGroup] == aValue)    return;
+    [[[self undoManager] prepareWithInvocationTarget:self] setAccumulatorGateLength:aGroup withValue:[self accumulatorGateLength:aGroup]];
+    accumulatorGateLength[aGroup]=aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aGroup] forKey:@"Group"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316AccumulatorGateLengthChanged object:self userInfo:userInfo];
+}
+
+
+
+- (void) writeAccumulatorGates    //accGate8Len
 {
     int i;
-    unsigned long valueToWrite;
+    
     for(i = 0; i < kNumSIS3316Groups; i++) {
-        valueToWrite =  ([self accGate1Len:i] << 16) | [self accGate1Start:i];
-        [[self adapter] writeLongBlock:&valueToWrite
+        unsigned long valueToWrite1 =
+                                        (([self accGate1Len:i]     & 0x1FF) << 16 )     |
+                                        (([self accGate1Start:i]   & 0x200) << 0  )     ;
+        
+        [[self adapter] writeLongBlock:&valueToWrite1
                              atAddress:[self groupRegister:kAccGate1ConfigReg group:i]
                             numToWrite:1
                             withAddMod:[self addressModifier]
                          usingAddSpace:0x01];
         
-        valueToWrite =  ([self accGate2Len:i] << 16) | [self accGate2Start:i];
-        [[self adapter] writeLongBlock:&valueToWrite
+        unsigned long valueToWrite2 =
+                                        (([self accGate2Len:i]     & 0x1FF) << 16 )     |
+                                        (([self accGate2Start:i]   & 0x200) << 0  )     ;
+        
+        [[self adapter] writeLongBlock:&valueToWrite2
                              atAddress:[self groupRegister:kAccGate2ConfigReg group:i]
                             numToWrite:1
                             withAddMod:[self addressModifier]
                          usingAddSpace:0x01];
+       
+        unsigned long valueToWrite3 =
+                                        (([self accGate3Len:i]     & 0x1FF) << 16 )     |
+                                        (([self accGate3Start:i]   & 0x200) << 0  )     ;
         
-        valueToWrite =  ([self accGate3Len:i] << 16) | [self accGate3Start:i];
-        [[self adapter] writeLongBlock:&valueToWrite
+        [[self adapter] writeLongBlock:&valueToWrite3
                              atAddress:[self groupRegister:kAccGate3ConfigReg group:i]
                             numToWrite:1
                             withAddMod:[self addressModifier]
                          usingAddSpace:0x01];
+       
+        unsigned long valueToWrite4 =
+                                        (([self accGate4Len:i]     & 0x1FF) << 16 )     |
+                                        (([self accGate4Start:i]   & 0x200) << 0  )     ;
         
-        valueToWrite =  ([self accGate4Len:i] << 16) | [self accGate4Start:i];
-        [[self adapter] writeLongBlock:&valueToWrite
+        [[self adapter] writeLongBlock:&valueToWrite4
                              atAddress:[self groupRegister:kAccGate4ConfigReg group:i]
                             numToWrite:1
                             withAddMod:[self addressModifier]
                          usingAddSpace:0x01];
         
-        valueToWrite =  ([self accGate5Len:i] << 16) | [self accGate5Start:i];
-        [[self adapter] writeLongBlock:&valueToWrite
+        unsigned long valueToWrite5 =
+                                        (([self accGate5Len:i]     & 0x1FF) << 16 )     |
+                                        (([self accGate5Start:i]   & 0x200) << 0  )     ;
+        
+        [[self adapter] writeLongBlock:&valueToWrite5
                              atAddress:[self groupRegister:kAccGate5ConfigReg group:i]
                             numToWrite:1
                             withAddMod:[self addressModifier]
                          usingAddSpace:0x01];
         
-        valueToWrite =  ([self accGate6Len:i] << 16) | [self accGate6Start:i];
-        [[self adapter] writeLongBlock:&valueToWrite
+        unsigned long valueToWrite6 =
+                                        (([self accGate6Len:i]     & 0x1FF) << 16 )     |
+                                        (([self accGate6Start:i]   & 0x200) << 0  )     ;
+        
+        [[self adapter] writeLongBlock:&valueToWrite6
                              atAddress:[self groupRegister:kAccGate6ConfigReg group:i]
                             numToWrite:1
                             withAddMod:[self addressModifier]
                          usingAddSpace:0x01];
         
-        valueToWrite =  ([self accGate7Len:i] << 16) | [self accGate7Start:i];
-        [[self adapter] writeLongBlock:&valueToWrite
+        unsigned long valueToWrite7 =
+                                        (([self accGate7Len:i]     & 0x1FF) << 16 )     |
+                                        (([self accGate7Start:i]   & 0x200) << 0  )     ;
+        
+        [[self adapter] writeLongBlock:&valueToWrite7
                              atAddress:[self groupRegister:kAccGate7ConfigReg group:i]
                             numToWrite:1
                             withAddMod:[self addressModifier]
                          usingAddSpace:0x01];
+       
+        unsigned long valueToWrite8 =
+                                    (([self accGate8Len:i]     & 0x1FF) << 16 )     |
+                                    (([self accGate8Start:i]   & 0x200) << 0  )     ;
         
-        valueToWrite =  ([self accGate8Len:i] << 16) | [self accGate8Start:i];
-        [[self adapter] writeLongBlock:&valueToWrite
+        [[self adapter] writeLongBlock:&valueToWrite8
                              atAddress:[self groupRegister:kAccGate8ConfigReg group:i]
                             numToWrite:1
                             withAddMod:[self addressModifier]
                          usingAddSpace:0x01];
-    }
+        
+                                        //(([self accumulatorGateStart:i]     & 0x200) << 0 ) |
+                                        //(([self accumulatorGateLength:i]    & 0x1FF) << 16) ;
+           }
 }
+
+- (void) readAccumulatorGates:(BOOL)verbose
+{
+    int i;
+    if(verbose){
+        NSLog(@"Reading Accumulator Gates Configuration:\n");
+        NSLog(@"gate1Len gate1Start");
+    }
+    for(i =0; i < kNumSIS3316Groups; i++) {
+        
+        unsigned long aValue;
+        [[self adapter] readLongBlock: &aValue
+                            atAddress:[self groupRegister:kAccGate1ConfigReg group:i]
+                            numToRead: 1
+                           withAddMod: [self addressModifier]
+                        usingAddSpace: 0x01];
+        
+        if(verbose){
+            unsigned long gate1Len      = ((aValue >> 16) & 0x1FF)  ;
+            unsigned long gate1Start    = ((aValue >> 0 ) & 0x200)  ;
+           
+            NSLog(@"%2d: 0x%03x 0x%03x \n ",i, gate1Len, gate1Start)  ;
+        }}
+//---------------------------------------------------------------------
+        NSLog(@"gate2Len gate2Start");
+        for(i =0; i < kNumSIS3316Groups; i++) {
+            
+        unsigned long aValue;
+        [[self adapter] readLongBlock: &aValue
+                            atAddress:[self groupRegister:kAccGate2ConfigReg group:i]
+                            numToRead: 1
+                            withAddMod: [self addressModifier]
+                        usingAddSpace: 0x01];
+            
+        if(verbose){
+            unsigned long gate2Len      = ((aValue >> 16) & 0x1FF)  ;
+            unsigned long gate2Start    = ((aValue >> 0 ) & 0x200)  ;
+                
+            NSLog(@"%2d: 0x%03x 0x%03x \n ",i, gate2Len, gate2Start)  ;
+        }}
+//---------------------------------------------------------------------
+        NSLog(@"gate3Len gate3Start");
+        for(i =0; i < kNumSIS3316Groups; i++) {
+                
+        unsigned long aValue;
+        [[self adapter] readLongBlock: &aValue
+                            atAddress:[self groupRegister:kAccGate3ConfigReg group:i]
+                            numToRead: 1
+                           withAddMod: [self addressModifier]
+                        usingAddSpace: 0x01];
+                
+        if(verbose){
+            unsigned long gate3Len      = ((aValue >> 16) & 0x1FF)  ;
+            unsigned long gate3Start    = ((aValue >> 0 ) & 0x200)  ;
+            
+            NSLog(@"%2d: 0x%03x 0x%03x \n ",i, gate3Len, gate3Start)  ;
+        }}
+//--------------------------------------------------------------------
+        NSLog(@"gate4Len gate4Start");
+        for(i =0; i < kNumSIS3316Groups; i++) {
+    
+        unsigned long aValue;
+        [[self adapter] readLongBlock: &aValue
+                            atAddress:[self groupRegister:kAccGate4ConfigReg group:i]
+                            numToRead: 1
+                           withAddMod: [self addressModifier]
+                        usingAddSpace: 0x01];
+                
+        if(verbose){
+            unsigned long gate4Len      = ((aValue >> 16) & 0x1FF)  ;
+            unsigned long gate4Start    = ((aValue >> 0 ) & 0x200)  ;
+                    
+            NSLog(@"%2d: 0x%03x 0x%03x \n ",i, gate4Len, gate4Start)  ;
+        }}
+//---------------------------------------------------------------------
+        NSLog(@"gate5Len gate5Start");
+        for(i =0; i < kNumSIS3316Groups; i++) {
+                    
+            unsigned long aValue;
+            [[self adapter] readLongBlock: &aValue
+                                atAddress:[self groupRegister:kAccGate5ConfigReg group:i]
+                                 numToRead: 1
+                                withAddMod: [self addressModifier]
+                             usingAddSpace: 0x01];
+                    
+             if(verbose){
+                 unsigned long gate5Len      = ((aValue >> 16) & 0x1FF)  ;
+                 unsigned long gate5Start    = ((aValue >> 0 ) & 0x200)  ;
+                        
+                 NSLog(@"%2d: 0x%03x 0x%03x \n ",i, gate5Len, gate5Start)  ;
+             }}
+//--------------------------------------------------------------------
+        NSLog(@"gate6Len gate6Start");
+        for(i =0; i < kNumSIS3316Groups; i++) {
+                
+            unsigned long aValue;
+            [[self adapter] readLongBlock: &aValue
+                                atAddress:[self groupRegister:kAccGate6ConfigReg group:i]
+                                numToRead: 1
+                               withAddMod: [self addressModifier]
+                            usingAddSpace: 0x01];
+                
+            if(verbose){
+                unsigned long gate6Len      = ((aValue >> 16) & 0x1FF)  ;
+                unsigned long gate6Start    = ((aValue >> 0 ) & 0x200)  ;
+                    
+                NSLog(@"%2d: 0x%03x 0x%03x \n ",i, gate6Len, gate6Start)  ;
+            }}
+//--------------------------------------------------------------------
+        NSLog(@"gate7Len gate7Start");
+        for(i =0; i < kNumSIS3316Groups; i++) {
+                    
+            unsigned long aValue;
+            [[self adapter] readLongBlock: &aValue
+                                atAddress:[self groupRegister:kAccGate7ConfigReg group:i]
+                                numToRead: 1
+                               withAddMod: [self addressModifier]
+                            usingAddSpace: 0x01];
+                    
+            if(verbose){
+                unsigned long gate7Len      = ((aValue >> 16) & 0x1FF)  ;
+                unsigned long gate7Start    = ((aValue >> 0 ) & 0x200)  ;
+                
+                NSLog(@"%2d: 0x%03x 0x%03x \n ",i, gate7Len, gate7Start)  ;
+            }}
+//---------------------------------------------------------------------
+        NSLog(@"gate8Len gate8Start");
+        for(i =0; i < kNumSIS3316Groups; i++) {
+                        
+            unsigned long aValue;
+            [[self adapter] readLongBlock: &aValue
+                               atAddress:[self groupRegister:kAccGate8ConfigReg group:i]
+                               numToRead: 1
+                              withAddMod: [self addressModifier]
+                           usingAddSpace: 0x01];
+                        
+           if(verbose){
+               unsigned long gate8Len      = ((aValue >> 16) & 0x1FF)  ;
+               unsigned long gate8Start    = ((aValue >> 0 ) & 0x200)  ;
+                            
+               NSLog(@"%2d: 0x%03x 0x%03x \n ",i, gate8Len, gate8Start)  ;
+           }}
+//--------------------------------------------------------------------
+        }
+
+
 //6.32 FIR Energy Setup registers
+NSString* extraFilter[4] = {
+    @"None          ",
+    @"Average of 4  ",
+    @"Average of 8  ",
+    @"Average of 16 "
+};
+
+NSString* tauTable[4] ={
+    @"0",
+    @"1",
+    @"2",
+    @"3",
+};
+
+- (long) extraFilterBits:(unsigned short)aChan       { if(aChan<kNumSIS3316Channels)return extraFilterBits[aChan]; else return 0; }
+
+- (long) tauTableBits:(unsigned short)aChan       { if(aChan<kNumSIS3316Channels)return tauTableBits[aChan]; else return 0; };
+
+- (void) setExtraFilterBits:(unsigned short)aChan withValue:(long)aValue
+{
+    if(aValue<0)aValue = 0;
+    if(aValue>0x3)aValue = 0x3;
+    if([self extraFilterBits:aChan] == aValue)return;
+    [[[self undoManager] prepareWithInvocationTarget:self] setExtraFilterBits:aChan withValue:[self extraFilterBits:aChan]];
+    extraFilterBits[aChan] = aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316ExtraFilterBitsChanged object:self userInfo:userInfo];
+}
+
+- (void) setTauTableBits:(unsigned short)aChan withValue:(long)aValue
+{
+    if(aValue<0)aValue = 0;
+    if(aValue>0x3)aValue = 0x3;
+    if([self tauTableBits:aChan] == aValue)return;
+    [[[self undoManager] prepareWithInvocationTarget:self] setTauTableBits:aChan withValue:[self tauTableBits:aChan]];
+    tauTableBits[aChan] = aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316TauTableBitsChanged object:self userInfo:userInfo];
+}
+
+
+- (unsigned short) tauFactor:(unsigned short)aChan
+{
+    if(aChan>kNumSIS3316Channels)return 0;
+    else return tauFactor [aChan];
+}
+
+- (void) setTauFactor:(unsigned short)aChan withValue:(unsigned short)aValue
+{
+    if(aChan>kNumSIS3316Channels)return;
+    if(aValue>0x3f)aValue = 0x3f;
+    if([self tauFactor:aChan] == aValue) return;
+    [[[self undoManager] prepareWithInvocationTarget:self] setTauFactor:aChan withValue:[self tauFactor:aChan]];
+    tauFactor[aChan] = aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316TauFactorChanged object:self userInfo:userInfo];
+}
+
+
+- (unsigned short) peakingTime:(unsigned short)aChan
+{
+    if(aChan>kNumSIS3316Channels)return 0;
+    else return peakingTime[aChan];
+}
+
+- (void) setPeakingTime:(unsigned short)aChan withValue:(unsigned short)aValue
+{
+    if(aChan>kNumSIS3316Channels)return;
+    if(aValue>0x3f)aValue = 0x7FC;
+    if(aValue<4)aValue = 4;
+    aValue &= ~0x0003;
+    [[[self undoManager] prepareWithInvocationTarget:self] setPeakingTime:aChan withValue:peakingTime[aChan]];
+    peakingTime[aChan] = aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316PeakingTimeChanged object:self userInfo:userInfo];
+}
+
+
+- (unsigned short) gapTime:(unsigned short)aChan
+{
+    if(aChan>kNumSIS3316Channels)return 0;
+    else return gapTime[aChan];
+}
+
+- (void) setGapTime:(unsigned short)aChan withValue:(unsigned short)aValue
+{
+    if(aChan>kNumSIS3316Channels)return;
+    if(aValue>0x3f)aValue = 0x1FE;
+    if(aValue<2)aValue = 2;
+    aValue &= ~0x0001; //bit zero is always zero
+    
+    [[[self undoManager] prepareWithInvocationTarget:self] setGapTime:aChan withValue:[self gapTime:aChan]];
+    gapTime[aChan] = aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316GapTimeChanged object:self userInfo:userInfo];
+}
+
+
 - (void) writeFirEnergySetup
 {
     int i;
     for(i = 0; i < kNumSIS3316Channels; i++) {
-        unsigned long valueToWrite =    (([self tauFactor:i]  & 0x3f)<<12)   |
-                                        (([self gapTime:i]    & 0xfffe)<<12) |
-                                        ([self peakingTime:i] & 0xffff);
+        unsigned long valueToWrite =    (([self tauFactor:i]        & 0x3f)<<24)        |
+                                        (([self gapTime:i]          & 0x1FE)<<12)       |
+                                        ([self peakingTime:i]       & 0x7FC)            |
+                                        (([self tauTableBits:i]     & 0x3) << 30)       |
+                                        (([self extraFilterBits:i]  & 0x3) << 22)       ;
+
         
         [[self adapter] writeLongBlock:&valueToWrite
                              atAddress:[self channelRegister:kFirEnergySetupCh1Reg channel:i]
@@ -2524,29 +2731,191 @@ NSString* intTrigOutPulseString[3] = {
                          usingAddSpace:0x01];
     }
 }
+- (void) readFirEnergySetup:(BOOL)verbose
+{
+    int i;
+    if(verbose){
+        NSLog(@"Reading FIR Energy Setup:\n");
+        NSLog(@"TauTable TauFactor GapTime PeakingTime ExtraFilter \n");
+    }
+    for(i =0; i < kNumSIS3316Channels; i++) {
+        
+        unsigned long aValue;
+        [[self adapter] readLongBlock: &aValue
+                            atAddress:[self channelRegister:kFirEnergySetupCh1Reg channel:i]
+                            numToRead: 1
+                           withAddMod: [self addressModifier]
+                        usingAddSpace: 0x01];
+        
+        if(verbose){
+            unsigned long theTauFactor   = ((aValue >> 24) & 0x3F)  ;
+            unsigned long theTauTable    = ((aValue >> 30) & 0x3)   ;
+            unsigned long theExtraFilter = ((aValue >> 22) & 0x3)   ;
+            unsigned long theGapTime     = ((aValue >> 12) & 0x1FE) ;
+            unsigned long thePeakTime    = ((aValue >> 0) & 0x7FC)  ;
+            NSLog(@"%2d: %@ 0x%08x 0x%08x 0x%08x %@\n",i, tauTable[theTauTable], theTauFactor , theGapTime, thePeakTime, extraFilter[theExtraFilter]);
+        }
+    }
+}
 
 //6.33 Energy Histogram Configuration registers
+//asf
+- (long) histogramsEnabledMask                      { return histogramsEnabledMask;                             }
+- (BOOL) histogramsEnabled:(unsigned short)chan     { return (histogramsEnabledMask     & (0x1<<chan)) != 0;    }
+- (long) pileupEnabledMask                          { return pileupEnabledMask;                                 }
+- (BOOL) pileupEnabled:(unsigned short)chan         { return (pileupEnabledMask         & (0x1<<chan)) != 0;    }
+- (long) clrHistogramsWithTSMask                    { return clrHistogramsWithTSMask;                           }
+- (BOOL) clrHistogramsWithTS:(unsigned short)chan   { return (clrHistogramsWithTSMask   & (0x1<<chan)) != 0;    }
+- (long) writeHitsToEventMemoryMask                 { return writeHitsToEventMemoryMask;                        }
+- (BOOL) writeHitsToEventMemory:(unsigned short)chan{ return (writeHitsToEventMemoryMask& (0x1<<chan)) != 0;    }
+
+- (void) setHistogramsEnabledMask:(unsigned long)aMask
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHistogramsEnabledMask:histogramsEnabledMask];
+    histogramsEnabledMask = aMask;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316HistogramsEnabledChanged object:self];
+}
+
+- (void) setHistogramsEnabled:(unsigned short)chan withValue:(BOOL)aValue
+{
+    long            aMask  = histogramsEnabledMask;
+    if(aValue)      aMask |= (0x1<<chan);
+    else            aMask &= ~(0x1<<chan);
+    [self setHistogramsEnabledMask:aMask];
+}
+
+- (void) setPileupEnabledMask:(unsigned long)aMask
+{
+    if(pileupEnabledMask==aMask)return;
+    [[[self undoManager] prepareWithInvocationTarget:self] setPileupEnabledMask:pileupEnabledMask];
+    pileupEnabledMask = aMask;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316PileUpEnabledChanged object:self];
+}
+
+- (void) setPileupEnabled:(unsigned short)chan withValue:(BOOL)aValue
+{
+    long            aMask  = pileupEnabledMask;
+    if(aValue)      aMask |= (1<<chan);
+    else            aMask &= ~(1<<chan);
+    [self setPileupEnabledMask:aMask];
+}
+
+- (void) setClrHistogramsWithTSMask:(unsigned long)aMask
+{
+    if(clrHistogramsWithTSMask==aMask)return;
+    [[[self undoManager] prepareWithInvocationTarget:self] setClrHistogramsWithTSMask:clrHistogramsWithTSMask];
+    clrHistogramsWithTSMask = aMask;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316ClrHistogramWithTSChanged object:self];
+}
+
+- (void) setClrHistogramsWithTS:(unsigned short)chan withValue:(BOOL)aValue
+{
+    long            aMask = clrHistogramsWithTSMask;
+    if(aValue)      aMask |= (1<<chan);
+    else            aMask &= ~(1<<chan);
+    [self setClrHistogramsWithTSMask:aMask];
+}
+
+- (void) setWriteHitsToEventMemoryMask:(unsigned long)aMask
+{
+    if(writeHitsToEventMemoryMask==aMask)return;
+    [[[self undoManager] prepareWithInvocationTarget:self] setWriteHitsToEventMemoryMask:writeHitsToEventMemoryMask];
+    writeHitsToEventMemoryMask = aMask;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316WriteHitsIntoEventMemoryChanged object:self];
+}
+
+- (void) setWriteHitsToEventMemory:(unsigned short)chan withValue:(BOOL)aValue
+{
+    long            aMask = writeHitsToEventMemoryMask;
+    if(aValue)      aMask |= (1<<chan);
+    else            aMask &= ~(1<<chan);
+    [self setWriteHitsToEventMemoryMask:aMask];
+}
+
+- (unsigned short) energyDivider:(unsigned short)aChan
+{
+    if(aChan>kNumSIS3316Channels)return 0;
+    else return energyDivider[aChan];
+}
+
+- (void) setEnergyDivider:(unsigned short)aChan withValue:(unsigned short)aValue
+{
+    if(aChan>kNumSIS3316Channels)return;
+    if(aValue<1)aValue = 1;
+    if(aValue>0x3f)aValue = 0xfff;
+    if([self energyDivider:aChan] == aValue) return;
+    [[[self undoManager] prepareWithInvocationTarget:self] setEnergyDivider:aChan withValue:[self energyDivider:aChan]];
+    energyDivider[aChan]=aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316EnergyDividerChanged object:self userInfo:userInfo];
+}
+
+- (unsigned short) energySubtractor:(unsigned short)aChan
+{
+    if(aChan>kNumSIS3316Channels)return 0;
+    else return energySubtractor[aChan];
+}
+
+- (void) setEnergySubtractor:(unsigned short)aChan withValue:(unsigned short)aValue
+{
+    if(aChan>kNumSIS3316Channels)return;
+    if(aValue>0x3f)aValue = 0xff;
+    if([self energySubtractor:aChan] == aValue) return;
+    [[[self undoManager] prepareWithInvocationTarget:self] setEnergySubtractor:aChan withValue:[self energySubtractor:aChan]];
+    energySubtractor[aChan]=aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316EnergySubtractorChanged object:self userInfo:userInfo];
+}
+
 - (void) writeHistogramConfiguration
 {
     int i;
-    for(i=0;i<16;i++){
-        unsigned long aValue = 0x0;
-        if([self histogramsEnabled:i])      aValue |= 0x1<<0;
-        if([self pileupEnabled:i])          aValue |= 0x1<<1;
-        if([self clrHistogramsWithTS:i])    aValue |= 0x1<<30;
-        if([self writeHitsToEventMemory:i]) aValue |= 0x1<<31;
+    for(i = 0; i < kNumSIS3316Channels; i++) {
+        unsigned long valueToWrite =
+        (((histogramsEnabledMask>>i)     & 0x1)     << 0 )  |
+        (((pileupEnabledMask>>i)         & 0x1)     << 1 )  |
+        (((clrHistogramsWithTSMask>>i)   & 0x1)     << 30)  |
+        ((writeHitsToEventMemoryMask>>i  & 0x1)     << 31)  |
+        ((energyDivider[i]               & 0xFFF)  << 16)  |
+        ((energySubtractor[i]            & 0xFF)  << 8 )  ;
         
-        aValue |= ([self energyDivider:i]&0xfff)  << 16;
-        aValue |= ([self energySubtractor:i]&0xfff)<< 8;
-        
-        [[self adapter] writeLongBlock: &aValue
-         
-                             atAddress: [self channelRegister:kEnergyHistoConfigCh1Reg channel:i]
-                            numToWrite: 1
-                            withAddMod: [self addressModifier]
-                         usingAddSpace: 0x01];
+        [[self adapter] writeLongBlock:&valueToWrite
+                             atAddress:[self channelRegisterVersionTwo:kEnergyHistoConfigCh1Reg channel:i]
+                            numToWrite:1
+                            withAddMod:[self addressModifier]
+                         usingAddSpace:0x01];
     }
 }
+
+- (void) readHistogramConfiguration:(BOOL)verbose
+{
+    int i;
+    if(verbose){
+        NSLog(@"Reading Histogram Configuration:\n");
+        NSLog(@"Enabled PU ClrW/TS Hits division subtraction \n");
+    }
+    for(i =0; i < kNumSIS3316Channels; i++) {
+        
+        unsigned long aValue;
+        [[self adapter] readLongBlock: &aValue
+                            atAddress:[self channelRegisterVersionTwo:kEnergyHistoConfigCh1Reg channel:i]
+                            numToRead: 1
+                           withAddMod: [self addressModifier]
+                        usingAddSpace: 0x01];
+        
+        if(verbose){
+            BOOL theHistogramsEnabled      = ((aValue >> 0) & 0x1)      ;
+            BOOL thePileupEnabled          = ((aValue >> 1) & 0x1)      ;
+            BOOL theClrHistogramsWithTS    = ((aValue >> 30) & 0x1)     ;
+            BOOL theWriteHitsToEventMemory = ((aValue >> 31) & 0x1)     ;
+            unsigned short theEnergyDivider          = ((aValue >> 16) & 0xFFF)  ;
+            unsigned short theEnergySubtractor       = ((aValue >> 8 ) & 0xFF)  ;
+            NSLog(@"%2d: %@ %@ %@ %@  0x%08x 0x%08x\n",i, theHistogramsEnabled?@"YES":@" NO ", thePileupEnabled?@"YES":@" NO ", theClrHistogramsWithTS?@"YES":@" NO ", theWriteHitsToEventMemory?@"YES":@" NO ", theEnergyDivider,theEnergySubtractor);
+        }
+    }
+}
+
+
 
 //6.34 MAW Start Index and Energy Pickup Configuration registers
 
@@ -2819,7 +3188,7 @@ NSString* intTrigOutPulseString[3] = {
     [self writeAccumulatorGates];
     [self writeConfigurationReg];
     [self writeEndThresholds];
-    [self writeAcquisitionRegister];			//set up the Acquisition Register
+    [self writeAcquisitionRegister];			//set up the Acquisition Register //-=**
 
     [self writeFirTriggerSetup];
     [self writeFirEnergySetup];
@@ -2827,6 +3196,7 @@ NSString* intTrigOutPulseString[3] = {
     [self writeHeTrigThresholds];
     [self writeHeTrigThresholdSum];
     [self writeThresholdSum];
+    [self writeFirEnergySetup];
 //    [self writeHistogramConfiguration];
     
 	
@@ -2934,6 +3304,14 @@ NSString* intTrigOutPulseString[3] = {
     [a addObject:p];
     
     p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Extra Filter"];
+    [p setFormat:@"##0" upperLimit:3 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setExtraFilterBits:withValue:) getMethod:@selector(extraFilterBits:)];
+    [p setCanBeRamped:YES];
+    [a addObject:p];
+
+    
+    p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"HE"];
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setHeSuppressTriggerBit:withValue:) getMethod:@selector(heSuppressTriggerMask:)];
@@ -3026,6 +3404,13 @@ NSString* intTrigOutPulseString[3] = {
     [a addObject:p];
     
     p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Tau Table"];
+    [p setFormat:@"##0" upperLimit:3 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setTauTableBits:withValue:) getMethod:@selector(tauTableBits:)];
+    [p setCanBeRamped:YES];
+    [a addObject:p];
+    
+    p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Threshold"];
     [p setFormat:@"##0" upperLimit:0xfffffff lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setThreshold:withValue:) getMethod:@selector(threshold:)];
@@ -3062,20 +3447,21 @@ NSString* intTrigOutPulseString[3] = {
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel
 {
 	NSDictionary* cardDictionary = [self findCardDictionaryInHeader:fileHeader];
-	if([param isEqualToString:      @"Threshold"])       return [[cardDictionary objectForKey:@"thresholds"] objectAtIndex:aChannel];
-    else if([param isEqualToString: @"Enabled"])         return [cardDictionary objectForKey: @"enabledMask"];
-    else if([param isEqualToString: @"Page Size"])       return [cardDictionary objectForKey: @"pageSize"];
-    else if([param isEqualToString: @"Start Delay"])     return [cardDictionary objectForKey: @"startDelay"];
-    else if([param isEqualToString: @"Stop Delay"])      return [cardDictionary objectForKey: @"stopDelay"];
-    else if([param isEqualToString: @"Clock Source"])    return [cardDictionary objectForKey: @"clockSource"];
-    else if([param isEqualToString: @"PageWrap"])        return [cardDictionary objectForKey: @"pageWrap"];
-    else if([param isEqualToString: @"StopTrigger"])     return [cardDictionary objectForKey: @"stopTrigger"];
-    else if([param isEqualToString: @"P2StartStop"])     return [cardDictionary objectForKey: @"p2StartStop"];
-    else if([param isEqualToString: @"LemoStartStop"])   return [cardDictionary objectForKey: @"lemoStartStop"];
-    else if([param isEqualToString: @"RandomClock"])     return [cardDictionary objectForKey: @"randomClock"];
-    else if([param isEqualToString: @"GateMode"])        return [cardDictionary objectForKey: @"gateMode"];
-    else if([param isEqualToString: @"MultiEvent"])      return [cardDictionary objectForKey: @"multiEventMode"];
-    else if([param isEqualToString: @"StopDelayEnabled"])return [cardDictionary objectForKey: @"stopDelayEnabled"];
+	if([param isEqualToString:      @"Threshold"])          return [[cardDictionary objectForKey:@"thresholds"] objectAtIndex:aChannel];
+    else if([param isEqualToString: @"Enabled"])            return [cardDictionary objectForKey: @"enabledMask"];
+    else if([param isEqualToString: @"Histogram Enabled"])  return [cardDictionary objectForKey: @"histogramsEnabledMask"];
+    else if([param isEqualToString: @"Page Size"])          return [cardDictionary objectForKey: @"pageSize"];
+    else if([param isEqualToString: @"Start Delay"])        return [cardDictionary objectForKey: @"startDelay"];
+    else if([param isEqualToString: @"Stop Delay"])         return [cardDictionary objectForKey: @"stopDelay"];
+    else if([param isEqualToString: @"Clock Source"])       return [cardDictionary objectForKey: @"clockSource"];
+    else if([param isEqualToString: @"PageWrap"])           return [cardDictionary objectForKey: @"pageWrap"];
+    else if([param isEqualToString: @"StopTrigger"])        return [cardDictionary objectForKey: @"stopTrigger"];
+    else if([param isEqualToString: @"P2StartStop"])        return [cardDictionary objectForKey: @"p2StartStop"];
+    else if([param isEqualToString: @"LemoStartStop"])      return [cardDictionary objectForKey: @"lemoStartStop"];
+    else if([param isEqualToString: @"RandomClock"])        return [cardDictionary objectForKey: @"randomClock"];
+    else if([param isEqualToString: @"GateMode"])           return [cardDictionary objectForKey: @"gateMode"];
+    else if([param isEqualToString: @"MultiEvent"])         return [cardDictionary objectForKey: @"multiEventMode"];
+    else if([param isEqualToString: @"StopDelayEnabled"])   return [cardDictionary objectForKey: @"stopDelayEnabled"];
     else return nil;
 }
 
@@ -3273,6 +3659,8 @@ NSString* intTrigOutPulseString[3] = {
         [self setPeakingTime:i      withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"peakingTime%d",i]]];
         [self setGapTime:i          withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"gapTime%d",i]]];
         [self setTauFactor:i        withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"tauFactor%d",i]]];
+        [self setExtraFilterBits:i  withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"extraFilterBits%d",i]]];
+        [self setTauTableBits:i  withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"tauTableBits%d",i]]];
         [self setIntTrigOutPulseBit:i  withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"intTrigOutPulseBit%d",i]]];
         [self setHeTrigThreshold:i  withValue:[decoder decodeInt32ForKey:[NSString stringWithFormat:@"heTrigThreshold%d",i]]];
         [self setEnergySubtractor:i  withValue:[decoder decodeInt32ForKey:[NSString stringWithFormat:@"energySubtractors%d",i]]];
@@ -3287,6 +3675,10 @@ NSString* intTrigOutPulseString[3] = {
         [self setPreTriggerDelay:i      withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"preTriggerDelay%d",i]]];
         [self setRawDataBufferLen:i     withValue:[decoder decodeInt32ForKey:[NSString stringWithFormat:@"rawDataBufferLen%d",i]]];
         [self setRawDataBufferStart:i   withValue:[decoder decodeInt32ForKey:[NSString stringWithFormat:@"rawDataBufferStart%d",i]]];
+        
+        [self setAccumulatorGateStart:i        withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"setAccumulatorGateStart%d",i]]];
+        [self setAccumulatorGateLength:i          withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"setAccumulatorGateLength%d",i]]];
+
         [self setAccGate1Start:i        withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"accGate1Start%d",i]]];
         [self setAccGate2Start:i        withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"accGate2Start%d",i]]];
         [self setAccGate3Start:i        withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"accGate3Start%d",i]]];
@@ -3397,6 +3789,8 @@ NSString* intTrigOutPulseString[3] = {
     int i;
     for(i=0;i<kNumSIS3316Channels;i++){
         [encoder encodeInt32:cfdControlBits         forKey:[NSString stringWithFormat:@"cfdControlBits%d",i]];
+        [encoder encodeInt32:extraFilterBits        forKey:[NSString stringWithFormat:@"extraFilterBits%d",i]];
+        [encoder encodeInt32:tauTableBits           forKey:[NSString stringWithFormat:@"tauTableBits%d",i]];
         [encoder encodeInt32:threshold[i]           forKey:[NSString stringWithFormat:@"threshold%d",i]];
         [encoder encodeInt:peakingTime[i]           forKey:[NSString stringWithFormat:@"peakingTime%d",i]];
         [encoder encodeInt:gapTime[i]               forKey:[NSString stringWithFormat:@"gapTime%d",i]];
@@ -3414,6 +3808,10 @@ NSString* intTrigOutPulseString[3] = {
         [encoder encodeInt:preTriggerDelay[i]             forKey:[NSString stringWithFormat:@"preTriggerDelay%d",i]];
         [encoder encodeInt:rawDataBufferLen[i]            forKey:[NSString stringWithFormat:@"rawDataBufferLen%d",i]];
         [encoder encodeInt:rawDataBufferStart[i]          forKey:[NSString stringWithFormat:@"rawDataBufferStart%d",i]];
+        
+        [encoder encodeInt:accumulatorGateLength[i]                 forKey:[NSString stringWithFormat:@"accumulatorGateLength%d",i]];
+        [encoder encodeInt:accumulatorGateStart[i]                 forKey:[NSString stringWithFormat:@"accumulatorGateStart%d",i]];
+
         [encoder encodeInt:accGate1Len[i]                 forKey:[NSString stringWithFormat:@"accGate1Len%d",i]];
         [encoder encodeInt:accGate2Len[i]                 forKey:[NSString stringWithFormat:@"accGate2Len%d",i]];
         [encoder encodeInt:accGate3Len[i]                 forKey:[NSString stringWithFormat:@"accGate3Len%d",i]];
@@ -3485,10 +3883,12 @@ NSString* intTrigOutPulseString[3] = {
     
 
     [self addCurrentState:objDictionary unsignedLongArray:cfdControlBits            size:kNumSIS3316Channels forKey:@"cfdControlBits"];
+    [self addCurrentState:objDictionary unsignedLongArray:extraFilterBits           size:kNumSIS3316Channels forKey:@"extraFilterBits"];
+    [self addCurrentState:objDictionary unsignedLongArray:tauTableBits              size:kNumSIS3316Channels forKey:@"tauTableBits"];
     [self addCurrentState:objDictionary unsignedLongArray:threshold                 size:kNumSIS3316Channels forKey:@"threshold"];
-    [self addCurrentState:objDictionary unsignedShortArray:peakingTime              size:kNumSIS3316Channels forKey:@"peakingTime"];
-    [self addCurrentState:objDictionary unsignedShortArray:gapTime                  size:kNumSIS3316Channels forKey:@"gapTime"];
-    [self addCurrentState:objDictionary unsignedShortArray:tauFactor                size:kNumSIS3316Channels forKey:@"tauFactor"];
+    [self addCurrentState:objDictionary unsignedLongArray:peakingTime               size:kNumSIS3316Channels forKey:@"peakingTime"];
+    [self addCurrentState:objDictionary unsignedLongArray:gapTime                   size:kNumSIS3316Channels forKey:@"gapTime"];
+    [self addCurrentState:objDictionary unsignedLongArray:tauFactor                 size:kNumSIS3316Channels forKey:@"tauFactor"];
     [self addCurrentState:objDictionary unsignedShortArray:intTrigOutPulseBit       size:kNumSIS3316Channels forKey:@"intTrigOutPulseBit"];
     [self addCurrentState:objDictionary unsignedLongArray:heTrigThreshold           size:kNumSIS3316Channels forKey:@"heTrigThreshold"];
     [self addCurrentState:objDictionary unsignedShortArray:energyDivider            size:kNumSIS3316Channels forKey:@"energyDivider"];
@@ -3503,6 +3903,10 @@ NSString* intTrigOutPulseString[3] = {
     
     [self addCurrentState:objDictionary unsignedLongArray:thresholdSum              size:kNumSIS3316Groups   forKey:@"ThresholdSum"];
 
+    [self addCurrentState:objDictionary unsignedShortArray:accumulatorGateStart     size:kNumSIS3316Groups forKey:@"accumulatorGateStart"];
+    [self addCurrentState:objDictionary unsignedShortArray:accumulatorGateLength    size:kNumSIS3316Groups forKey:@"accumulatorGateLength"];
+    
+    
     [self addCurrentState:objDictionary unsignedShortArray:accGate1Start            size:kNumSIS3316Groups forKey:@"accGate1Start"];
     [self addCurrentState:objDictionary unsignedShortArray:accGate2Start            size:kNumSIS3316Groups forKey:@"accGate2Start"];
     [self addCurrentState:objDictionary unsignedShortArray:accGate3Start            size:kNumSIS3316Groups forKey:@"accGate3Start"];

@@ -48,7 +48,7 @@
 
 - (void) awakeFromNib
 {
-    settingSize     = NSMakeSize(950,900);
+    settingSize     = NSMakeSize(1150,900);
     rateSize		= NSMakeSize(790,460);
     
     blankView = [[NSView alloc] init];
@@ -174,7 +174,17 @@
                      selector : @selector(cfdControlBitsChanged:)
                          name : ORSIS3316CfdControlBitsChanged
                        object : model];
-
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(extraFilterBitsChanged:)
+                         name : ORSIS3316ExtraFilterBitsChanged
+                       object : model];
+  
+    [notifyCenter addObserver : self
+                     selector : @selector(tauTableBitsChanged:)
+                         name : ORSIS3316TauTableBitsChanged
+                       object : model];
+    
     [notifyCenter addObserver : self
                      selector : @selector(peakingTimeChanged:)
                          name : ORSIS3316PeakingTimeChanged
@@ -264,6 +274,16 @@
                      selector : @selector(rawDataBufferStartChanged:)
                          name : ORSIS3316RawDataBufferStartChanged
                         object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(accumulatorGateLengthChanged:)
+                         name : ORSIS3316AccumulatorGateLengthChanged
+                       object : model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(accumulatorGateStartChanged:)
+                         name : ORSIS3316AccumulatorGateStartChanged
+                       object : model];
     
     [notifyCenter addObserver : self
                      selector : @selector(accGate1LenChanged:)
@@ -462,6 +482,8 @@
 	[self thresholdChanged:nil];
     [self thresholdSumChanged:nil];
     [self cfdControlBitsChanged:nil];
+    [self extraFilterBitsChanged:nil];
+    [self tauTableBitsChanged:nil];
  
     [self histogramsEnabledChanged:nil];
     [self pileupEnabledChanged:nil];
@@ -482,6 +504,9 @@
     [self preTriggerDelayChanged:nil];
     [self rawDataBufferLenChanged:nil];
     [self rawDataBufferStartChanged:nil];
+    
+    [self accumulatorGateStartChanged:nil];
+    [self accumulatorGateLengthChanged:nil];
 
     [self accGate1LenChanged:nil];
     [self accGate1StartChanged:nil];
@@ -544,6 +569,34 @@
     else {
         int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
         [[cfdControlMatrix cellAtRow:chan column:0] selectItemAtIndex:[model cfdControlBits:chan]];
+    }
+}
+
+- (void) extraFilterBitsChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Channels;i++){
+            [[extraFilterMatrix cellAtRow:i column:0] selectItemAtIndex:[model extraFilterBits:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[extraFilterMatrix cellAtRow:chan column:0] selectItemAtIndex:[model extraFilterBits:chan]];
+    }
+}
+
+- (void) tauTableBitsChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Channels;i++){
+            [[tauTableMatrix cellAtRow:i column:0] selectItemAtIndex:[model tauTableBits:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[tauTableMatrix cellAtRow:chan column:0] selectItemAtIndex:[model tauTableBits:chan]];
     }
 }
 
@@ -770,7 +823,63 @@
         [[preTriggerDelayMatrix cellWithTag:i] setIntValue:[model preTriggerDelay:i]];
     }
 }
+//----------------------------------------------------------------
+- (void) accumulatorGateLengthChanged:  (NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Groups;i++){ //-=** might be 32
+            [[accGate1LenMatrix cellWithTag:i] setIntValue:[model accumulatorGateLength:i]];
+            [[accGate2LenMatrix cellWithTag:i] setIntValue:[model accumulatorGateLength:i]];
+            [[accGate3LenMatrix cellWithTag:i] setIntValue:[model accumulatorGateLength:i]];
+            [[accGate4LenMatrix cellWithTag:i] setIntValue:[model accumulatorGateLength:i]];
+            [[accGate5LenMatrix cellWithTag:i] setIntValue:[model accumulatorGateLength:i]];
+            [[accGate6LenMatrix cellWithTag:i] setIntValue:[model accumulatorGateLength:i]];
+            [[accGate7LenMatrix cellWithTag:i] setIntValue:[model accumulatorGateLength:i]];
+            [[accGate8LenMatrix cellWithTag:i] setIntValue:[model accumulatorGateLength:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
+        [[accGate1LenMatrix cellWithTag:i] setIntValue:[model accumulatorGateLength:i]];
+        [[accGate2LenMatrix cellWithTag:i] setIntValue:[model accumulatorGateLength:i]];
+        [[accGate3LenMatrix cellWithTag:i] setIntValue:[model accumulatorGateLength:i]];
+        [[accGate4LenMatrix cellWithTag:i] setIntValue:[model accumulatorGateLength:i]];
+        [[accGate5LenMatrix cellWithTag:i] setIntValue:[model accumulatorGateLength:i]];
+        [[accGate6LenMatrix cellWithTag:i] setIntValue:[model accumulatorGateLength:i]];
+        [[accGate7LenMatrix cellWithTag:i] setIntValue:[model accumulatorGateLength:i]];
+        [[accGate8LenMatrix cellWithTag:i] setIntValue:[model accumulatorGateLength:i]];
+    }
+}
 
+- (void) accumulatorGateStartChanged:  (NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Groups;i++){
+            [[accGate1StartMatrix cellWithTag:i] setIntValue:[model accumulatorGateStart:i]];
+            [[accGate2StartMatrix cellWithTag:i] setIntValue:[model accumulatorGateStart:i]];
+            [[accGate3StartMatrix cellWithTag:i] setIntValue:[model accumulatorGateStart:i]];
+            [[accGate4StartMatrix cellWithTag:i] setIntValue:[model accumulatorGateStart:i]];
+            [[accGate5StartMatrix cellWithTag:i] setIntValue:[model accumulatorGateStart:i]];
+            [[accGate6StartMatrix cellWithTag:i] setIntValue:[model accumulatorGateStart:i]];
+            [[accGate7StartMatrix cellWithTag:i] setIntValue:[model accumulatorGateStart:i]];
+            [[accGate8StartMatrix cellWithTag:i] setIntValue:[model accumulatorGateStart:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
+        [[accGate1StartMatrix cellWithTag:i] setIntValue:[model accumulatorGateStart:i]];
+        [[accGate2StartMatrix cellWithTag:i] setIntValue:[model accumulatorGateStart:i]];
+        [[accGate3StartMatrix cellWithTag:i] setIntValue:[model accumulatorGateStart:i]];
+        [[accGate4StartMatrix cellWithTag:i] setIntValue:[model accumulatorGateStart:i]];
+        [[accGate5StartMatrix cellWithTag:i] setIntValue:[model accumulatorGateStart:i]];
+        [[accGate6StartMatrix cellWithTag:i] setIntValue:[model accumulatorGateStart:i]];
+        [[accGate7StartMatrix cellWithTag:i] setIntValue:[model accumulatorGateStart:i]];
+        [[accGate8StartMatrix cellWithTag:i] setIntValue:[model accumulatorGateStart:i]];
+    }
+}
+//-------------------------------------------------------------------------
 - (void) accGate1LenChanged:  (NSNotification*)aNote
 {
     if(aNote == nil){
@@ -1150,8 +1259,11 @@
     [addressText                setEnabled:!locked && !runInProgress];
     [initButton                 setEnabled:!lockedOrRunningMaintenance];
 	[enabledMatrix              setEnabled:!lockedOrRunningMaintenance];
+    [histogramsEnabledMatrix    setEnabled:!lockedOrRunningMaintenance];
 	[heSuppressTrigModeMatrix   setEnabled:!lockedOrRunningMaintenance];
 	[thresholdMatrix            setEnabled:!lockedOrRunningMaintenance];
+    [tauFactorMatrix            setEnabled:!lockedOrRunningMaintenance];
+
     [thresholdSumMatrix         setEnabled:!lockedOrRunningMaintenance];
     [heTrigThresholdMatrix      setEnabled:!lockedOrRunningMaintenance];
     [heTrigThresholdSumMatrix   setEnabled:!lockedOrRunningMaintenance];
@@ -1283,8 +1395,11 @@
 
 - (IBAction) histogramsEnabledAction:(id)sender
 {
-    [model setHistogramsEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
+    int tag =[[sender selectedCell] tag];
+    int aValue = [sender intValue];
+    [model setHistogramsEnabled:tag withValue:aValue]; 
 }
+
 - (IBAction) pileupEnabledAction:(id)sender
 {
     [model setPileupEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
@@ -1298,7 +1413,7 @@
     [model setWriteHitsToEventMemory:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
-- (IBAction) enabledAction:(id)sender
+- (IBAction) enabledAction:(id)sender //-=**
 {
     int tag =[[sender selectedCell] tag];
     int aValue = [sender intValue];
@@ -1323,6 +1438,16 @@
 - (IBAction) cfdControlAction:(id)sender
 {
     [model setCfdControlBits:[sender selectedRow] withValue:[[sender selectedCell] indexOfSelectedItem]];
+}
+
+- (IBAction) extraFilterAction:(id)sender
+{
+    [model setExtraFilterBits:[sender selectedRow] withValue:[[sender selectedCell] indexOfSelectedItem]];
+}
+
+- (IBAction) tauTableAction:(id)sender
+{
+    [model setTauTableBits:[sender selectedRow] withValue:[[sender selectedCell] indexOfSelectedItem]];
 }
 
 - (IBAction) peakingTimeAction:(id)sender
@@ -1625,8 +1750,9 @@
         [model writeThresholdSum];
         [model writeHeTrigThresholds];
         [model writeHeTrigThresholdSum];
-        [model writeFirTriggerSetup];
+        //[model writeFirTriggerSetup];
         [model writeActiveTrigGateWindowLen];
+        [model writeFirEnergySetup];
     }
 	@catch(NSException* localException) {
         NSLog(@"SIS3316 Thresholds write FAILED.\n");
@@ -1644,12 +1770,69 @@
         [model readHeTrigThresholds:YES];
         [model readHeTrigThresholdSum:YES];
         [model readActiveTrigGateWindowLen:YES];
+        [model readFirEnergySetup:YES];
     }
 	@catch(NSException* localException) {
         NSLog(@"SIS3316 Thresholds read FAILED.\n");
         ORRunAlertPanel([localException name], @"%@\nSIS3316 Read FAILED", @"OK", nil, nil,
                         localException);
     }
+}
+
+- (IBAction) writeAccumulatorGateAction:(id)sender
+{
+    @try {
+        [self endEditing];
+        [model writeAccumulatorGates];
+        
+    }
+    @catch(NSException* localException) {
+        NSLog(@"SIS3316 Accumulator Gate write FAILED.\n");
+        ORRunAlertPanel([localException name], @"%@\nSIS3316 Write FAILED", @"OK", nil, nil,
+                        localException);
+    }
+
+}
+
+- (IBAction) readAccumulatorGateAction:(id)sender
+{
+    @try {
+        [self endEditing];
+        [model readAccumulatorGates:YES];
+    }
+    @catch(NSException* localException) {
+        NSLog(@"SIS3316 Accumulator Gate read FAILED.\n");
+        ORRunAlertPanel([localException name], @"%@\nSIS3316 Read FAILED", @"OK", nil, nil,
+                        localException);
+    }
+ 
+}
+
+- (IBAction) writeHistogramConfigurationAction:(id)sender
+{
+    @try {
+        [self endEditing];
+        [model writeHistogramConfiguration];
+    }
+    @catch(NSException* localException) {
+        NSLog(@"SIS3316 Histogram Configuration Write FAILED.\n");
+        ORRunAlertPanel([localException name], @"%@\nSIS3316 Write FAILED", @"OK", nil, nil,
+                        localException);
+    }
+}
+
+- (IBAction) readHistogramConfigurationAction:(id)sender
+{
+    @try {
+        [self endEditing];
+        [model readHistogramConfiguration:YES];
+    }
+    @catch(NSException* localException) {
+        NSLog(@"SIS3316 Histogram Configuration read FAILED.\n");
+        ORRunAlertPanel([localException name], @"%@\nSIS3316 Read FAILED", @"OK", nil, nil,
+                        localException);
+    }
+
 }
 
 - (IBAction) checkEvent:(id)sender
