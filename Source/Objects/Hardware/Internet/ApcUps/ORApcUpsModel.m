@@ -297,9 +297,9 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
         float bat  = [self batteryCapacity];
         if((Vin1<KMinVoltage) || (Vin2<KMinVoltage) || (Vin3<KMinVoltage)){
             if(!powerOutAlarm){
-                NSLog(@"The Main Davis UPS is reporting a power failure. Battery capacity is now %.0f%%\n",bat);
-                powerOutAlarm = [[ORAlarm alloc] initWithName:@"Davis Power Failure" severity:kEmergencyAlarm];
-                [powerOutAlarm setHelpString:@"The Davis UPS is reporting that the input voltage is less then 110V on one or more of the three phases. This Alarm can be silenced by acknowledging it, but it will not be cleared until power is restored."];
+                NSLog(@"The UPS (%@) is reporting a power failure. Battery capacity is now %.0f%%\n",[self fullID],bat);
+                powerOutAlarm = [[ORAlarm alloc] initWithName:@"Power Failure" severity:kEmergencyAlarm];
+                [powerOutAlarm setHelpString:@"The UPS is reporting that the input voltage is less then 110V on one or more of the three phases. This Alarm can be silenced by acknowledging it, but it will not be cleared until power is restored."];
                 [powerOutAlarm setSticky:YES];
                 [powerOutAlarm postAlarm];
                 [powerOutAlarm acknowledge]; //use the voice instead of beep
@@ -326,7 +326,7 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
                 [powerOutAlarm release];
                 powerOutAlarm = nil;
                 lastBatteryValue = 0;
-                NSLog(@"The Main Davis UPS is restored. Battery capacity is now %.0f%%\n",bat);
+                NSLog(@"The UPS (%@) is restored. Battery capacity is now %.0f%%\n",[self fullID],bat);
             }
         }
     }
@@ -968,9 +968,9 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
             if([value rangeOfString:@"INTERNAL FAULT BYPASS"].location != NSNotFound ||
                [value rangeOfString:@"BATTERY CHARGER FAILURE"].location != NSNotFound ){
                 if(!badStatusAlarm){
-                    NSLog(@"The Main Davis UPS is reporting serious alarms. %@\n",value);
-                    badStatusAlarm = [[ORAlarm alloc] initWithName:@"Davis UPS Faults" severity:kEmergencyAlarm];
-                    [badStatusAlarm setHelpString:@"The Davis UPS is reporting that it has serioius fault conditions. This Alarm can be silenced by acknowledging it, but it will not be cleared until power is restored."];
+                    NSLog(@"The UPS (%@) is reporting serious alarms. %@\n",[self fullID],value);
+                    badStatusAlarm = [[ORAlarm alloc] initWithName:@"UPS Faults" severity:kEmergencyAlarm];
+                    [badStatusAlarm setHelpString:[NSString stringWithFormat:@"The %@ UPS is reporting that it has serioius fault conditions. This Alarm can be silenced by acknowledging it, but it will not be cleared until power is restored.",[self fullID]]];
                     [badStatusAlarm setSticky:YES];
                     [badStatusAlarm postAlarm];
                 }
@@ -980,7 +980,7 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
                     [badStatusAlarm clearAlarm];
                     [badStatusAlarm release];
                     badStatusAlarm = nil;
-                    NSLog(@"The Main Davis UPS faults cleared.\n");
+                    NSLog(@"The UPS faults cleared.\n");
                 }
             }
         }
