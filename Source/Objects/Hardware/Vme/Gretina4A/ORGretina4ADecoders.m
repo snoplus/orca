@@ -65,7 +65,7 @@
             int             packetLength    = (ptr[1] >> 16) & 0x7ff;
             NSString*       channelKey      = [self getChannelKey: channel];
             int             headerLength    = (ptr[3] >> 26) & 0x3f;
-            int             dataLength      = packetLength - headerLength/2;
+            int             dataLength      = (packetLength - headerLength)/2;
             unsigned long   sumWord1        = ptr[8];
             unsigned long   sumWord2        = ptr[9];
             unsigned long   scaleFactor     = 1000;
@@ -80,18 +80,20 @@
 
             
             if(dataLength>0){
-                NSData* waveformData = [NSData dataWithBytes:&ptr[14] length:dataLength*sizeof(long)];
-                
+                NSData* waveformData = [NSData dataWithBytes:&ptr[0] length:(length-4)*sizeof(long)];
                 [aDataSet loadWaveform: waveformData            //pass in the whole data set
-                                offset: 0                       // Offset in bytes (past header words)
+                                offset: headerLength*2                       // Offset in bytes (past header words)
                               unitSize: sizeof(short)			// unit size in bytes
                             startIndex:	0                       // first Point Index (past the header offset!!!)
-                           scaleOffset: koffset                 // offset the value by this
+                           scaleOffset: 0                       // offset the value by this
                                   mask:	0x3FFF					// when displayed all values will be masked with this value
                            specialBits: 0xC000
                               bitNames: [NSArray arrayWithObjects:@"M",@"O",nil]
                                 sender: self 
                               withKeys: @"Gretina4A", @"Waveforms",crateKey,cardKey,channelKey,nil];
+                
+ 
+                
             }
             //get the actual object
             NSString* aKey = [crateKey stringByAppendingString:cardKey];

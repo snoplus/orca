@@ -46,7 +46,7 @@
 
 - (void) awakeFromNib
 {
-    settingSize     = NSMakeSize(1070,480);
+    settingSize     = NSMakeSize(1570,480);
     rateSize		= NSMakeSize(790,340);
     registerTabSize	= NSMakeSize(400,490);
 	firmwareTabSize = NSMakeSize(340,187);
@@ -87,7 +87,14 @@
         [[premapResetDelayEnMatrix      cellAtRow:i column:0] setTag:i];
         [[pileupModeMatrix              cellAtRow:i column:0] setTag:i];
         [[ledThresholdMatrix            cellAtRow:i column:0] setTag:i];
+        [[p1WindowMatrix                cellAtRow:i column:0] setTag:i];
+        [[mWindowMatrix                 cellAtRow:i column:0] setTag:i];
+        [[kWindowMatrix                 cellAtRow:i column:0] setTag:i];
+        [[d3WindowMatrix                cellAtRow:i column:0] setTag:i];
+        [[dWindowMatrix                 cellAtRow:i column:0] setTag:i];
+        [[discWidthMatrix               cellAtRow:i column:0] setTag:i];
         [[premapResetDelayMatrix        cellAtRow:i column:0] setTag:i];
+        [[baselineStartMatrix          cellAtRow:i column:0] setTag:i];
    }
     
     NSString* key = [NSString stringWithFormat: @"orca.Gretina4A%d.selectedtab",[model slot]];
@@ -389,6 +396,11 @@
                         object: model];
     
     [notifyCenter addObserver : self
+                     selector : @selector(trackingSpeedChanged:)
+                         name : ORGretina4ATrackingSpeedChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
                      selector : @selector(p1WindowChanged:)
                          name : ORGretina4AP1WindowChanged
                         object: model];
@@ -651,6 +663,7 @@
     
     [self baselineStartChanged:nil];
     [self baselineDelayChanged:nil];
+    [self trackingSpeedChanged:nil];
     [self p1WindowChanged:nil];
     [self p2WindowChanged:nil];
     [self dacChannelSelectChanged:nil];
@@ -932,17 +945,77 @@
     //if([model clockSource] == 1) [clockLockedField setStringValue:@""];
     //else [clockLockedField setStringValue:[model locked]?@"":@"NOT Locked"];
 }
+//single values
+- (void) forceFullCardInitChanged:  (NSNotification*)aNote  { [forceFullCardInitCB setIntValue:[model forceFullCardInit]];  }
+- (void) initSerDesStateChanged:    (NSNotification*)aNote  { [initSerDesStateField setStringValue:[model serDesStateName]];}
+- (void) userPackageDataChanged:    (NSNotification*)aNote  { [userPackageDataField setIntValue:[model userPackageData]];   }
+- (void) windowCompMinChanged:      (NSNotification*)aNote  { [windowCompMinField   setIntValue:[model windowCompMin]];     }
+- (void) windowCompMaxChanged:      (NSNotification*)aNote  { [windowCompMaxField   setIntValue:[model windowCompMax]];     }
+- (void) rawDataLengthChanged:      (NSNotification*)aNote  { [rawDataLengthField   setIntValue:[model rawDataLength]];     }
+- (void) rawDataWindowChanged:      (NSNotification*)aNote  { [rawDataWindowField   setIntValue:[model rawDataWindow]];     }
+- (void) baselineDelayChanged:      (NSNotification*)aNote  { [baselineDelayField   setIntValue:[model baselineDelay]];     }
+- (void) trackingSpeedChanged:      (NSNotification*)aNote  { [trackingSpeedField   setIntValue:[model trackingSpeed]];     }
+- (void) p2WindowChanged:           (NSNotification*)aNote  { [p2WindowField        setIntValue:[model p2Window]];           }
+- (void) peakSensitivityChanged:    (NSNotification*)aNote  { [peakSensitivityField setIntValue:[model peakSensitivity]];   }
+- (void) holdoffTimeChanged:        (NSNotification*)aNote  { [holdoffTimeField     setIntValue:[model holdoffTime]];       }
+- (void) autoModeChanged:           (NSNotification*)aNote  { [autoModeCB           setIntValue:[model autoMode]];          }
+- (void) vetoGateWidthChanged:      (NSNotification*)aNote  { [vetoGateWidthField   setIntValue:[model vetoGateWidth]];     }
+- (void) triggerConfigChanged:      (NSNotification*)aNote  { [triggerConfigPU selectItemAtIndex:[model triggerConfig]];    }
+//following are non-implemented values
+- (void) acqDcmCtrlStatusChanged:   (NSNotification*)aNote  {}
+- (void) acqDcmLockChanged:         (NSNotification*)aNote  {}
+- (void) acqDcmResetChanged:        (NSNotification*)aNote  {}
+- (void) acqPhShiftOverflowChanged: (NSNotification*)aNote  {}
+- (void) acqDcmClockStoppedChanged: (NSNotification*)aNote  {}
+- (void) adcDcmCtrlStatusChanged:   (NSNotification*)aNote  {}
+- (void) adcDcmLockChanged:         (NSNotification*)aNote  {}
+- (void) adcDcmResetChanged:        (NSNotification*)aNote  {}
+- (void) adcPhShiftOverflowChanged: (NSNotification*)aNote  {}
+- (void) adcDcmClockStoppedChanged: (NSNotification*)aNote  {}
+- (void) dacChannelSelectChanged:   (NSNotification*)aNote  {}
+- (void) dacAttenuationChanged:     (NSNotification*)aNote  {}
+- (void) ilaConfigChanged:          (NSNotification*)aNote  {}
+- (void) diagMuxControlChanged:     (NSNotification*)aNote  {}
+- (void) diagInputChanged:          (NSNotification*)aNote  {}
+- (void) diagChannelEventSelChanged:(NSNotification*)aNote  {}
+- (void) rj45SpareIoMuxSelChanged:  (NSNotification*)aNote  {}
+- (void) rj45SpareIoDirChanged:     (NSNotification*)aNote  {}
+- (void) ledStatusChanged:          (NSNotification*)aNote  {}
+- (void) diagIsyncChanged:          (NSNotification*)aNote  {}
+- (void) serdesSmLostLockChanged:   (NSNotification*)aNote  {}
+- (void) overflowFlagChanChanged:   (NSNotification*)aNote  {}
+- (void) codeRevisionChanged:       (NSNotification*)aNote  {}
+- (void) codeDateChanged:           (NSNotification*)aNote  {}
+- (void) phaseErrorCountChanged:    (NSNotification*)aNote  {}
+- (void) serdesPhaseValueChanged:   (NSNotification*)aNote  {}
+- (void) tSErrCntCtrlChanged:       (NSNotification*)aNote  {}
+- (void) tSErrorCountChanged:       (NSNotification*)aNote  {}
+- (void) droppedEventCountChanged:  (NSNotification*)aNote  {}
+- (void) acceptedEventCountChanged: (NSNotification*)aNote  {}
+- (void) ahitCountChanged:          (NSNotification*)aNote  {}
+- (void) discCountChanged:          (NSNotification*)aNote  {}
+- (void) auxIoReadChanged:          (NSNotification*)aNote  {}
+- (void) auxIoWriteChanged:         (NSNotification*)aNote  {}
+- (void) auxIoConfigChanged:        (NSNotification*)aNote  {}
+- (void) sdPemChanged:              (NSNotification*)aNote  {}
+- (void) sdSmLostLockFlagChanged:   (NSNotification*)aNote  {}
+- (void) adcConfigChanged:          (NSNotification*)aNote  {}
+- (void) configMainFpgaChanged:     (NSNotification*)aNote  {}
+- (void) vmeStatusChanged:          (NSNotification*)aNote  {}
+- (void) overVoltStatChanged:       (NSNotification*)aNote  {}
+- (void) underVoltStatChanged:      (NSNotification*)aNote  {}
+- (void) temp0SensorChanged:        (NSNotification*)aNote  {}
+- (void) temp1SensorChanged:        (NSNotification*)aNote  {}
+- (void) temp2SensorChanged:        (NSNotification*)aNote  {}
+- (void) clkSelectChanged:          (NSNotification*)aNote  {}
+- (void) clkSelect1Changed:         (NSNotification*)aNote  {}
+- (void) flashModeChanged:          (NSNotification*)aNote  {}
+- (void) serialNumChanged:          (NSNotification*)aNote  {}
+- (void) boardRevNumChanged:        (NSNotification*)aNote  {}
+- (void) vhdlVerNumChanged:         (NSNotification*)aNote  {}
+- (void) fifoAccessChanged:         (NSNotification*)aNote  {}
 
-- (void) initSerDesStateChanged:(NSNotification*) aNote
-{
-    [initSerDesStateField setStringValue:[model serDesStateName]];
-}
-
-- (void) forceFullCardInitChanged:(NSNotification*)aNote
-{
-    [forceFullCardInitCB setIntValue:[model forceFullCardInit]];
-}
-
+//channel related values
 - (void) forceFullInitChanged:(NSNotification*)aNote
 {
     short chan;
@@ -958,10 +1031,6 @@
         [[extDiscrSrcMatrix cellAtRow:chan column:0] selectItemAtIndex:([model extDiscriminatorSrc]>>(chan*3)) & 0x7];
     }
 }
-
-- (void) userPackageDataChanged:(NSNotification*)aNote { [userPackageDataField setIntValue:[model userPackageData]]; }
-- (void) windowCompMinChanged:  (NSNotification*)aNote { [windowCompMinField   setIntValue:[model windowCompMin]];   }
-- (void) windowCompMaxChanged:  (NSNotification*)aNote { [windowCompMaxField   setIntValue:[model windowCompMax]];   }
 
 - (void) pileupWaveformOnlyModeChanged:(NSNotification*)aNote
 {
@@ -1080,254 +1149,60 @@
     }
 }
 
-- (void) rawDataLengthChanged:(NSNotification*)aNote
+- (void) p1WindowChanged:(NSNotification*)aNote
 {
-    [rawDataLengthField setIntValue:[model rawDataLength]];
-}
-
-- (void) rawDataWindowChanged:(NSNotification*)aNote
-{
-    [rawDataWindowField setIntValue:[model rawDataWindow]];
-}
+    unsigned short chan;
+    for(chan=0;chan<kNumGretina4AChannels;chan++){
+        [[p1WindowMatrix cellWithTag:chan] setIntValue:[model p1Window:chan]];
+    }
+ }
 
 - (void) dWindowChanged:(NSNotification*)aNote
 {
-    [dWindowField setIntValue:[model dWindow:0]];
+    short chan;
+    for(chan=0;chan<kNumGretina4AChannels;chan++){
+        [[dWindowMatrix cellWithTag:chan] setIntValue:[model dWindow:chan]];
+    }
 }
 
 - (void) kWindowChanged:(NSNotification*)aNote
 {
-    [kWindowField setIntValue:[model kWindow:0]];
+    short chan;
+    for(chan=0;chan<kNumGretina4AChannels;chan++){
+        [[kWindowMatrix cellWithTag:chan] setIntValue:[model kWindow:chan]];
+    }
 }
 
 - (void) mWindowChanged:(NSNotification*)aNote
 {
-    [mWindowField setIntValue:[model mWindow:0]];
+    short chan;
+    for(chan=0;chan<kNumGretina4AChannels;chan++){
+        [[mWindowMatrix cellWithTag:chan] setIntValue:[model mWindow:chan]];
+    }
 }
-
 
 - (void) d3WindowChanged:(NSNotification*)aNote
 {
-    [d3WindowField setIntValue:[model d3Window:0]];
+    short chan;
+    for(chan=0;chan<kNumGretina4AChannels;chan++){
+        [[d3WindowMatrix cellWithTag:chan] setIntValue:[model d3Window:chan]];
+    }
 }
 
 - (void) discWidthChanged:(NSNotification*)aNote
 {
-    [discWidthField setIntValue:[model discWidth:0]];
+    short chan;
+    for(chan=0;chan<kNumGretina4AChannels;chan++){
+        [[discWidthMatrix cellWithTag:chan] setIntValue:[model discWidth:chan]];
+    }
 }
 
 - (void) baselineStartChanged:(NSNotification*)aNote
 {
-    [baselineStartField setIntValue:[model baselineStart:0]];
-}
-
-- (void) baselineDelayChanged:(NSNotification*)aNote
-{
-    [baselineDelayField setIntValue:[model baselineDelay]];
-}
-
-- (void) p1WindowChanged:(NSNotification*)aNote
-{
-    [p1WindowField setIntValue:[model p1Window:0]];
-}
-
-- (void) p2WindowChanged:(NSNotification*)aNote
-{
-    [p2WindowField setIntValue:[model p2Window]];
-}
-
-- (void) peakSensitivityChanged:(NSNotification*)aNote
-{
-    [peakSensitivityField setIntValue:[model peakSensitivity]];
-}
-
-- (void) holdoffTimeChanged:(NSNotification*)aNote
-{
-    [holdoffTimeField setIntValue:[model holdoffTime]];
-}
-
-- (void) autoModeChanged:(NSNotification*)aNote
-{
-    [autoModeCB setIntValue:[model autoMode]];
-}
-
-- (void) vetoGateWidthChanged:(NSNotification*)aNote
-{
-    [vetoGateWidthField setIntValue:[model vetoGateWidth]];
-}
-
-- (void) acqDcmCtrlStatusChanged:(NSNotification*)aNote
-{
-}
-- (void) acqDcmLockChanged:(NSNotification*)aNote
-{
-}
-- (void) acqDcmResetChanged:(NSNotification*)aNote
-{
-}
-- (void) acqPhShiftOverflowChanged:(NSNotification*)aNote
-{
-}
-- (void) acqDcmClockStoppedChanged:(NSNotification*)aNote
-{
-}
-- (void) adcDcmCtrlStatusChanged:(NSNotification*)aNote
-{
-}
-- (void) adcDcmLockChanged:(NSNotification*)aNote
-{
-}
-- (void) adcDcmResetChanged:(NSNotification*)aNote
-{
-}
-- (void) adcPhShiftOverflowChanged:(NSNotification*)aNote
-{
-}
-- (void) adcDcmClockStoppedChanged:(NSNotification*)aNote
-{
-}
-
-
-
-
-
-
-
-
-
-- (void) dacChannelSelectChanged:(NSNotification*)aNote
-{
-}
-- (void) dacAttenuationChanged:(NSNotification*)aNote
-{
-}
-- (void) ilaConfigChanged:(NSNotification*)aNote
-{
-}
-
-- (void) diagMuxControlChanged:(NSNotification*)aNote
-{
-}
-- (void) diagInputChanged:(NSNotification*)aNote
-{
-}
-- (void) diagChannelEventSelChanged:(NSNotification*)aNote
-{
-}
-- (void) rj45SpareIoMuxSelChanged:(NSNotification*)aNote
-{
-}
-- (void) rj45SpareIoDirChanged:(NSNotification*)aNote
-{
-}
-- (void) ledStatusChanged:(NSNotification*)aNote
-{
-}
-
-- (void) diagIsyncChanged:(NSNotification*)aNote
-{
-}
-- (void) serdesSmLostLockChanged:(NSNotification*)aNote
-{
-}
-- (void) overflowFlagChanChanged:(NSNotification*)aNote
-{
-}
-- (void) codeRevisionChanged:(NSNotification*)aNote
-{
-}
-- (void) codeDateChanged:(NSNotification*)aNote
-{
-}
-- (void) triggerConfigChanged:(NSNotification*)aNote
-{
-    [triggerConfigPU selectItemAtIndex:[model triggerConfig]];
-}
-
-- (void) phaseErrorCountChanged:(NSNotification*)aNote
-{
-}
-
-- (void) serdesPhaseValueChanged:(NSNotification*)aNote
-{
-}
-- (void) tSErrCntCtrlChanged:(NSNotification*)aNote
-{
-}
-- (void) tSErrorCountChanged:(NSNotification*)aNote
-{
-}
-- (void) droppedEventCountChanged:(NSNotification*)aNote
-{
-}
-- (void) acceptedEventCountChanged:(NSNotification*)aNote
-{
-}
-- (void) ahitCountChanged:(NSNotification*)aNote
-{
-}
-- (void) discCountChanged:(NSNotification*)aNote
-{
-}
-- (void) auxIoReadChanged:(NSNotification*)aNote
-{
-}
-- (void) auxIoWriteChanged:(NSNotification*)aNote
-{
-}
-- (void) auxIoConfigChanged:(NSNotification*)aNote
-{
-}
-- (void) sdPemChanged:(NSNotification*)aNote
-{
-}
-- (void) sdSmLostLockFlagChanged:(NSNotification*)aNote
-{
-}
-- (void) adcConfigChanged:(NSNotification*)aNote
-{
-}
-- (void) configMainFpgaChanged:(NSNotification*)aNote
-{
-}
-- (void) vmeStatusChanged:(NSNotification*)aNote
-{
-}
-- (void) overVoltStatChanged:(NSNotification*)aNote
-{
-}
-- (void) underVoltStatChanged:(NSNotification*)aNote
-{
-}
-- (void) temp0SensorChanged:(NSNotification*)aNote
-{
-}
-- (void) temp1SensorChanged:(NSNotification*)aNote
-{
-}
-- (void) temp2SensorChanged:(NSNotification*)aNote
-{
-}
-- (void) clkSelectChanged:(NSNotification*)aNote
-{
-}
-- (void) clkSelect1Changed:(NSNotification*)aNote
-{
-}
-- (void) flashModeChanged:(NSNotification*)aNote
-{
-}
-- (void) serialNumChanged:(NSNotification*)aNote
-{
-}
-- (void) boardRevNumChanged:(NSNotification*)aNote
-{
-}
-- (void) vhdlVerNumChanged:(NSNotification*)aNote
-{
-}
-- (void) fifoAccessChanged:(NSNotification*)aNote
-{
+    short chan;
+    for(chan=0;chan<kNumGretina4AChannels;chan++){
+        [[baselineStartMatrix cellWithTag:chan] setIntValue:[model baselineStart:chan]];
+    }
 }
 
 #pragma mark •••Actions
@@ -1441,34 +1316,9 @@
     [model setRawDataWindow:[sender intValue]];
 }
 
-- (IBAction) dWindowAction:(id)sender
-{
-    [model setDWindow:0 withValue:[sender intValue]];
-}
-
-- (IBAction) kWindowAction:(id)sender
-{
-    [model setKWindow:0 withValue:[sender intValue]];
-}
-
-- (IBAction) mWindowAction:(id)sender
-{
-    [model setMWindow:0 withValue:[sender intValue]];
-}
-
-- (IBAction) d3WindowAction:(id)sender
-{
-    [model setD3Window:0 withValue:[sender intValue]];
-}
-
 - (IBAction) discWidthAction:(id)sender
 {
-    [model setDiscWidth:0 withValue:[sender intValue]];
-}
-
-- (IBAction) baselineStartAction:(id)sender
-{
-    [model setBaselineStart:0 withValue:[sender intValue]];
+    [model setDiscWidth:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
 - (IBAction) baselineDelayAction:(id)sender
@@ -1476,14 +1326,43 @@
     [model setBaselineDelay:[sender intValue]];
 }
 
+- (IBAction) trackingSpeedAction:(id)sender
+{
+    [model setTrackingSpeed:[sender intValue]];
+}
+
 - (IBAction) p1WindowAction:(id)sender
 {
-    [model setP1Window:0 withValue:[sender intValue]];
+    [model setP1Window:[[sender selectedCell] tag] withValue:[sender intValue]];
+}
+- (IBAction) dWindowAction:(id)sender
+{
+    [model setDWindow:[[sender selectedCell] tag] withValue:[sender intValue]];
+}
+
+- (IBAction) kWindowAction:(id)sender
+{
+    [model setKWindow:[[sender selectedCell] tag] withValue:[sender intValue]];
+}
+
+- (IBAction) mWindowAction:(id)sender
+{
+    [model setMWindow:[[sender selectedCell] tag] withValue:[sender intValue]];
+}
+
+- (IBAction) d3WindowAction:(id)sender
+{
+    [model setD3Window:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
 - (IBAction) p2WindowAction:(id)sender
 {
-    [model setP2Window:[sender intValue]];
+   [model setP2Window:[sender intValue]];
+}
+
+- (IBAction) baselineStartAction:(id)sender
+{
+    [model setBaselineStart:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
 - (IBAction) peakSensitivityAction:(id)sender;
@@ -1498,7 +1377,7 @@
 
 - (IBAction) autoModeAction:(id)sender;
 {
-    [model setAutoMode:[sender intValue]];
+    [model setAutoMode:[sender boolValue]];
 }
 
 - (IBAction) vetoGateWidthAction:(id)sender
@@ -1559,10 +1438,16 @@
 	unsigned int index = [model registerIndex];
 	if (index < kNumberOfGretina4ARegisters) {
         unsigned long address   = [Gretina4ARegisters offsetForRegisterIndex:index];
-        if([Gretina4ARegisters hasChannels:index])address += [model selectedChannel]*0x04;
+        NSString* chanString;
+        if([Gretina4ARegisters hasChannels:index]){
+            int chan = [model selectedChannel];
+            address += chan*0x04;
+            chanString = [NSString stringWithFormat:@"%d",chan];
+        }
+        else chanString = @"*";
         aValue = [model readFromAddress:address];
 
-        NSLog(@"Gretina4A(%d,%d) %@: %u (0x%08x)\n",[model crateNumber],[model slot], [Gretina4ARegisters registerName:index],aValue,aValue);
+        NSLog(@"Gretina4A(%d,%d,%@) %@: %u (0x%08x)\n",[model crateNumber],[model slot], [Gretina4ARegisters registerName:index],aValue,aValue);
 	} 
 	else {
 		index -= kNumberOfGretina4ARegisters;
@@ -1579,9 +1464,15 @@
     
 	if (index < kNumberOfGretina4ARegisters) {
         unsigned long address   = [Gretina4ARegisters offsetForRegisterIndex:index];
-        if([Gretina4ARegisters hasChannels:index])address += [model selectedChannel]*0x04;
+        NSString* chanString;
+        if([Gretina4ARegisters hasChannels:index]){
+            int chan = [model selectedChannel];
+            address += chan*0x04;
+            chanString = [NSString stringWithFormat:@"%d",chan];
+        }
+        else chanString = @"*";
         [model writeToAddress:address aValue:aValue];
-        NSLog(@"Wrote to Gretina4A(%d,%d) %@: %u (0x%08x)\n",[model crateNumber],[model slot], [Gretina4ARegisters registerName:index],aValue,aValue);
+        NSLog(@"Wrote to Gretina4A(%d,%d,%@) %@: %u (0x%08x)\n",[model crateNumber],[model slot],chanString, [Gretina4ARegisters registerName:index],aValue,aValue);
 	}
 	else {
 		index -= kNumberOfGretina4ARegisters;
@@ -1641,7 +1532,7 @@
 {
     @try {
         [self endEditing];
-        [model initBoard];		//initialize and load hardware, but don't enable channels
+        [model initBoard];
         NSLog(@"Initialized Gretina4A (Slot %d <%p>)\n",[model slot],[model baseAddress]);
         
     }
@@ -1657,7 +1548,7 @@
     @try {
         [self endEditing];
         [model clearOldUserValues];
-        [model initBoard];		//initialize and load hardware, but don't enable channels
+        [model initBoard];
         NSLog(@"Initialized Gretina4A (Slot %d <%p>)\n",[model slot],[model baseAddress]);
         
     }
@@ -1668,12 +1559,20 @@
     }
 }
 
-- (IBAction) readTimeStamp:(id)sender
+- (IBAction) readLiveTimeStamp:(id)sender
 {
-    unsigned long long ts = [model readTimeStamp];
-    NSLog(@"Gretina4A (Slot %d <%p>) Timestamp: 0x%llx\n",[model slot],[model baseAddress],ts);
+    unsigned long long ts = [model readLiveTimeStamp];
+    NSLog(@"Gretina4A (Slot %d <%p>) Live Timestamp: 0x%llx\n",[model slot],[model baseAddress],ts);
 
 }
+
+- (IBAction) readLatTimeStamp:(id)sender
+{
+    unsigned long long ts = [model readLatTimeStamp];
+    NSLog(@"Gretina4A (Slot %d <%p>) Lat Timestamp: 0x%llx\n",[model slot],[model baseAddress],ts);
+    
+}
+
 
 - (IBAction) clearFIFO:(id)sender
 {
