@@ -75,7 +75,9 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
     [sortedEventLog release];
     [dataInValidAlarm   clearAlarm];
     [powerOutAlarm      clearAlarm];
+    [badStatusAlarm      clearAlarm];
     
+    [badStatusAlarm   release];
     [dataInValidAlarm   release];
     [powerOutAlarm      release];
     [inputBuffer        release];
@@ -942,6 +944,7 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 
     [self cancelTimeout];
 }
+//STATUS OF UPS: INTERNAL FAULT BYPASS, BATTERY CHARGER FAILURE, OTHER ALARMS PRESENT,
 
 - (void) parseLine:(NSString*)aLine
 {
@@ -959,6 +962,26 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
             NSArray* tempParts = [value componentsSeparatedByString:@","];
             if([tempParts count] > 1){
                 value = [tempParts objectAtIndex:0];
+            }
+        }
+        else if([varName hasPrefix:@"STATUS OF UPS"]){
+            if([value rangeOfString:@"INTERNAL FAULT BYPASS"].location != NSNotFound ||
+               [value rangeOfString:@"BATTERY CHARGER FAILURE"].location != NSNotFound ){
+                if(!badStatusAlarm){
+                    NSLog(@"The Main Davis UPS is reporting serious alarms. %@\n",value);
+                    badStatusAlarm = [[ORAlarm alloc] initWithName:@"Davis UPS Faults" severity:kEmergencyAlarm];
+                    [badStatusAlarm setHelpString:@"The Davis UPS is reporting that it has serioius fault conditions. This Alarm can be silenced by acknowledging it, but it will not be cleared until power is restored."];
+                    [badStatusAlarm setSticky:YES];
+                    [badStatusAlarm postAlarm];
+                }
+            }
+            else {
+                if([badStatusAlarm isPosted]){
+                    [badStatusAlarm clearAlarm];
+                    [badStatusAlarm release];
+                    badStatusAlarm = nil;
+                    NSLog(@"The Main Davis UPS faults cleared.\n");
+                }
             }
         }
         
