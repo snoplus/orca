@@ -571,10 +571,10 @@
                                                                             </textFieldCell>
                                                                         </textField>
                                                                         <matrix verticalHuggingPriority="750" mode="track" allowsEmptySelection="NO" autosizesCells="NO" id="662">
-                                                                            <rect key="frame" x="142" y="20" width="43" height="478"/>
+                                                                            <rect key="frame" x="142" y="20" width="50" height="478"/>
                                                                             <autoresizingMask key="autoresizingMask"/>
                                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                            <size key="cellSize" width="43" height="18"/>
+                                                                            <size key="cellSize" width="50" height="18"/>
                                                                             <size key="intercellSpacing" width="0.0" height="2"/>
                                                                             <textFieldCell key="prototype" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" tag="-1" drawsBackground="YES" id="2897">
                                                                                 <font key="font" metaFont="label"/>
@@ -1169,10 +1169,6 @@
                                                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                             </textFieldCell>
                                                                         </textField>
-                                                                        <box horizontalHuggingPriority="750" boxType="separator" id="968">
-                                                                            <rect key="frame" x="194" y="13" width="5" height="488"/>
-                                                                            <autoresizingMask key="autoresizingMask"/>
-                                                                        </box>
                                                                         <box verticalHuggingPriority="750" boxType="separator" id="1059">
                                                                             <rect key="frame" x="10" y="11" width="252" height="5"/>
                                                                             <autoresizingMask key="autoresizingMask"/>
@@ -1471,6 +1467,10 @@ Enable</string>
                                                                                 </column>
                                                                             </cells>
                                                                         </matrix>
+                                                                        <box horizontalHuggingPriority="750" misplaced="YES" boxType="separator" id="968">
+                                                                            <rect key="frame" x="198" y="15" width="5" height="488"/>
+                                                                            <autoresizingMask key="autoresizingMask"/>
+                                                                        </box>
                                                                     </subviews>
                                                                 </view>
                                                             </box>
@@ -4382,7 +4382,7 @@ Enable</string>
             <connections>
                 <outlet property="delegate" destination="-2" id="308"/>
             </connections>
-            <point key="canvasLocation" x="498.5" y="255.5"/>
+            <point key="canvasLocation" x="-68.5" y="159.5"/>
         </window>
         <customObject id="318" userLabel="OHexFormatter" customClass="OHexFormatter"/>
         <window title="Panel" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="3174" userLabel="ThresholdFinder" customClass="NSPanel">
