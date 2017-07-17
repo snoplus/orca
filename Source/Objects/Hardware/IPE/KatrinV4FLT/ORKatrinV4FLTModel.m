@@ -1438,8 +1438,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	[self writeReg:kFLTV4HistMeasTimeReg value:histMeasTime];
 	unsigned long aValue =  ((histClrMode & 0x1)<<29) |
                             ((histMode    & 0x1)<<28) |
-                            ((histEBin    & 0xf)<<20) |
-                            histEMin;
+                            ((histEBin    & 0xF)<<20) |
+                            histEMin & 0xFFFFF;
 	[self writeReg:kFLTV4HistgrSettingsReg value:aValue];
 }
 
@@ -2207,7 +2207,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     
     //if cold start (not 'quick start' in RunControl) ...
     if([[userInfo objectForKey:@"doinit"]intValue]){
-	    if(runMode != kKatrinV4Flt_Histogram_DaqMode){//FLTs NOT in histogram mode may stay in their previous mode - this will remove the delay (until next 1PPs) the FLT needs to start the filter -tb-
+	    if(runMode == kKatrinV4Flt_Histogram_DaqMode){//FLTs NOT in histogram mode may stay in their previous mode - this will remove the delay (until next 1PPs) the FLT needs to start the filter -tb-
     	    [self writeControlWithStandbyMode];
 	    }
         //TODO: I could check the current mode and set it only if not yet set
