@@ -2032,23 +2032,17 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     
     unsigned long* ptr = (unsigned long*)someData;
 
-	++ptr;											//crate, card,channel from second word
-	unsigned char chan		= (*ptr>>8) & 0xff;
+	unsigned char chan = (ptr[1]>>8) & 0xff;
     
-		
-	//++ptr;		//point to event struct	
-	katrinV4FltFullHistogramDataStruct* ePtr = (katrinV4FltFullHistogramDataStruct*) someData;
+	katrinV4FltFullHistogramDataStruct* ePtr = (katrinV4FltFullHistogramDataStruct*) &ptr[2];
     
     uint32_t* histoData = ePtr->h;
     //ptr + (sizeof(katrinV4FltHistogramDataStruct)/sizeof(long));// points now to the histogram data -tb-
    	int isSumHistogram = ePtr->histogramInfo & 0x2; //the bit1 marks the Sum Histograms
 
-    if(isSumHistogram){//avoid adding the already shipped histograms
+    if(isSumHistogram){ //avoid adding the already shipped histograms
         return;
     }
-    
-    
-    //DEBUG      NSLog(@"%@::%@   FLT #%i<------------- aChan: %i  isSumHistogram:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),card,chan,isSumHistogram);//DEBUG -tb-
     
     int i, firstBin = ePtr->firstBin;//first bin should always be 0 ... -tb-
     for(i=0; i<ePtr->histogramLength;i++){ 
@@ -2056,9 +2050,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     }
     histoBuf[chan].refreshTimeSec += ePtr->refreshTimeSec;
     histoBuf[chan].readoutSec      =  ePtr->readoutSec;
-              //histoBuf[aChan].refreshTimeSec += histMeasTime;
-		      //DEBUG   NSLog(@"    -------adding: Received histogram for chan:%i  (trigger mask: %i) current refreshTime: %i  readoutSec:%i\n",chan,triggerEnabledMask,histoBuf[chan].refreshTimeSec,histoBuf[chan].readoutSec);//DEBUG
-
 }
 
 
@@ -2069,12 +2060,9 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
         int chan;
         for(chan=0; chan<kNumV4FLTChannels; chan++){
             if(triggerEnabledMask & (0x1<<chan)){//if this channel is active, ship histogram, then clear
-               //DEBUG  NSLog(@"%@::%@     FLT #%i  sizeof(katrinV4FullHistogramDataStruct): %i    -----> shipping chan %i  \n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber], sizeof(katrinV4FullHistogramDataStruct),chan);//DEBUG -tb-
                 //set the 'between subrun' flag
-                if(isBetweenSubruns)
-                    histoBuf[chan].histogramInfo  |=  0x04; //set bit 2
-                else
-                    histoBuf[chan].histogramInfo  &=  0xfffffffb; //set bit 2 so 0
+                if(isBetweenSubruns) histoBuf[chan].histogramInfo  |=  0x04; //set bit 2
+                else                 histoBuf[chan].histogramInfo  &=  0xfffffffb; //set bit 2 so 0
                 //ship
                 [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
 																object:[NSData dataWithBytes:(void*)&(histoBuf[chan]) length:sizeof(katrinV4FltFullHistogramDataStruct)]];
