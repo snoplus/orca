@@ -46,8 +46,8 @@
             NSArray *parts = [aHostName componentsSeparatedByString:@":"];
             NSString *conninfo;
             if ([parts count] > 1) {
-                conninfo = 0;//-tb- compile error: [NSString stringWithFormat:@"host='%@' port='%@' user='%@' password='%@' dbname='%@'",
-                    //        (NSString*)parts[0], (NSString *)parts[1], aUserName, aPassWord, aDataBase];
+                conninfo = [NSString stringWithFormat:@"host='%@' port='%@' user='%@' password='%@' dbname='%@'",
+                            (NSString*)parts[0], (NSString *)parts[1], aUserName, aPassWord, aDataBase];
             } else {
                 conninfo = [NSString stringWithFormat:@"host='%@' user='%@' password='%@' dbname='%@'",
                                   aHostName, aUserName, aPassWord, aDataBase];

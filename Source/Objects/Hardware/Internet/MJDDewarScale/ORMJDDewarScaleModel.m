@@ -173,7 +173,7 @@ NSString* ORMJDDewarScaleValueChanged           = @"ORMJDDewarScaleValueChanged"
 {
     if([ipAddress length]!=0){
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
-        NSExpression *session = [NSExpression sharedSession];
+        NSURLSession *session = [NSURLSession sharedSession];
         [[session dataTaskWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@",ipAddress]]
                 completionHandler:^(NSData* data,
                                     NSURLResponse* response,

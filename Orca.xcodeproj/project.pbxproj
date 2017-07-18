@@ -418,6 +418,7 @@
 		5B5A40551A79385C00543633 /* ORSISRegisterDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B5A404C1A79385C00543633 /* ORSISRegisterDefs.h */; };
 		5B5A40561A79385C00543633 /* SIS3305.nib in Resources */ = {isa = PBXBuildFile; fileRef = 5B5A404D1A79385C00543633 /* SIS3305.nib */; };
 		5B5A40571A79385C00543633 /* SIS3305Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 5B5A404E1A79385C00543633 /* SIS3305Card.gif */; };
+		6B325E081B2F4241002E2DD7 /* SNOP.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B325E071B2F4241002E2DD7 /* SNOP.xib */; };
 		6B325E0A1B2F42C8002E2DD7 /* SNOCrate.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B325E091B2F42C8002E2DD7 /* SNOCrate.xib */; };
 		6B325E0C1B2F42D8002E2DD7 /* SNORack.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B325E0B1B2F42D8002E2DD7 /* SNORack.xib */; };
 		6B325E0E1B2F4306002E2DD7 /* XL1.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B325E0D1B2F4306002E2DD7 /* XL1.xib */; };
@@ -3436,6 +3437,7 @@
 		DB704A1018EBA4D100839B42 /* ELLIEController.m in Sources */ = {isa = PBXBuildFile; fileRef = DB704A0E18EBA4D100839B42 /* ELLIEController.m */; };
 		DB704A1318EBA4E100839B42 /* ELLIEModel.h in Headers */ = {isa = PBXBuildFile; fileRef = DB704A1118EBA4E100839B42 /* ELLIEModel.h */; };
 		DB704A1418EBA4E100839B42 /* ELLIEModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DB704A1218EBA4E100839B42 /* ELLIEModel.m */; };
+		DB704A1618EBA61E00839B42 /* ellie.xib in Resources */ = {isa = PBXBuildFile; fileRef = DB704A1518EBA61E00839B42 /* ellie.xib */; };
 		DBEC755518EB9E9B0077D493 /* ellie.gif in Resources */ = {isa = PBXBuildFile; fileRef = DBEC755418EB9E9B0077D493 /* ellie.gif */; };
 		EF37879212DFFF81003C814E /* YAJL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF37879112DFFF81003C814E /* YAJL.framework */; };
 		EF3787A012DFFF90003C814E /* YAJL.framework in Frameworks_Copy */ = {isa = PBXBuildFile; fileRef = EF37879112DFFF81003C814E /* YAJL.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
@@ -4170,6 +4172,7 @@
 		5B5A404C1A79385C00543633 /* ORSISRegisterDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSISRegisterDefs.h; sourceTree = "<group>"; };
 		5B5A404D1A79385C00543633 /* SIS3305.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = SIS3305.nib; sourceTree = "<group>"; };
 		5B5A404E1A79385C00543633 /* SIS3305Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = SIS3305Card.gif; sourceTree = "<group>"; };
+		6B325E071B2F4241002E2DD7 /* SNOP.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SNOP.xib; sourceTree = "<group>"; };
 		6B325E091B2F42C8002E2DD7 /* SNOCrate.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SNOCrate.xib; sourceTree = "<group>"; };
 		6B325E0B1B2F42D8002E2DD7 /* SNORack.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SNORack.xib; sourceTree = "<group>"; };
 		6B325E0D1B2F4306002E2DD7 /* XL1.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = XL1.xib; sourceTree = "<group>"; };
@@ -7087,6 +7090,7 @@
 		DB704A0E18EBA4D100839B42 /* ELLIEController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ELLIEController.m; sourceTree = "<group>"; };
 		DB704A1118EBA4E100839B42 /* ELLIEModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ELLIEModel.h; sourceTree = "<group>"; };
 		DB704A1218EBA4E100839B42 /* ELLIEModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ELLIEModel.m; sourceTree = "<group>"; };
+		DB704A1518EBA61E00839B42 /* ellie.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ellie.xib; sourceTree = "<group>"; };
 		DBEC755418EB9E9B0077D493 /* ellie.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = ellie.gif; sourceTree = "<group>"; };
 		EF37879112DFFF81003C814E /* YAJL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = YAJL.framework; path = Frameworks/YAJL.framework; sourceTree = "<group>"; };
 		EF69C430116E5DC3008ABADC /* ORSNOCrateReadout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORSNOCrateReadout.cc; sourceTree = "<group>"; };
@@ -14429,6 +14433,7 @@
 				DB704A1218EBA4E100839B42 /* ELLIEModel.m */,
 				3AFC9E201D2AACFB00190989 /* NodeMap.xib */,
 				3AFC9E221D2AAD4600190989 /* NodePanelMap.png */,
+				DB704A1518EBA61E00839B42 /* ellie.xib */,
 			);
 			path = ELLIE;
 			sourceTree = "<group>";
@@ -14464,6 +14469,7 @@
 				364124E71EA04E8A0041BAA3 /* NHitMonitor.h */,
 				364124E81EA04E8A0041BAA3 /* NHitMonitor.m */,
 				1038D8841E23160D009FFDFB /* RunTypeWordBits.hh */,
+				6B325E071B2F4241002E2DD7 /* SNOP.xib */,
 				EFB39FC6130BA1C5001220AC /* SNOP.gif */,
 				0FF177B41DF7A09900BA783B /* RunStatusIcon.h */,
 				0FF177B51DF7A09900BA783B /* RunStatusIcon.m */,
@@ -17199,6 +17205,7 @@
 				84CED3941732FB9E000A84C2 /* LakeShore336.tif in Resources */,
 				849978741746C7C100BFEE3E /* PollingTimeStamp.gif in Resources */,
 				84D29FDE1843EAC800D320DB /* check.png in Resources */,
+				6B325E081B2F4241002E2DD7 /* SNOP.xib in Resources */,
 				8499788B174BA11400BFEE3E /* EHS130n.nib in Resources */,
 				8499788C174BA11400BFEE3E /* EHS130n.tif in Resources */,
 				3AFC9E211D2AACFB00190989 /* NodeMap.xib in Resources */,
@@ -17233,6 +17240,7 @@
 				844CBDD01866010F0012AA3B /* RaidMonitor.nib in Resources */,
 				844CBDD11866010F0012AA3B /* scpExpectGetScript in Resources */,
 				DBEC755518EB9E9B0077D493 /* ellie.gif in Resources */,
+				DB704A1618EBA61E00839B42 /* ellie.xib in Resources */,
 				2DD0C4CE192E4F9E009112B2 /* OpSequence.nib in Resources */,
 				2DD0C8BC193FBAE4009112B2 /* KatrinV4SLTScript in Resources */,
 				2DD0C8C3193FBAE4009112B2 /* KatrinV4SLT.nib in Resources */,

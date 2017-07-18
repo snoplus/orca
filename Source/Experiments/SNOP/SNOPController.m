@@ -549,23 +549,23 @@ snopGreenColor;
 
 - (void) nhitMonitorResults: (NSNotification*) aNote
 {
-//    int i;
-//    NSDictionary *userInfo = [aNote userInfo];
-//
-//    NSArray *names = @[@"n100_hi", @"n100_med", @"n100_lo", @"n20",
-//                       @"n20_lb"];
-//
-//    for (i = 0; i < [names count]; i++) {
-//        if ([[userInfo objectForKey:names[i]] floatValue] < 0) {
-//            [[nhitMonitorResultsMatrix cellAtRow:i column:0] setStringValue:
-//                [NSString stringWithFormat:@"> %i",
-//                 [[userInfo objectForKey:@"max_nhit"] intValue]]];
-//        } else {
-//            [[nhitMonitorResultsMatrix cellAtRow:i column:0] setStringValue:
-//                [NSString stringWithFormat:@"%.2f",
-//                 [[userInfo objectForKey:names[i]] floatValue]]];
-//        }
-//    }
+    int i;
+    NSDictionary *userInfo = [aNote userInfo];
+
+    NSArray *names = @[@"n100_hi", @"n100_med", @"n100_lo", @"n20",
+                       @"n20_lb"];
+
+    for (i = 0; i < [names count]; i++) {
+        if ([[userInfo objectForKey:names[i]] floatValue] < 0) {
+            [[nhitMonitorResultsMatrix cellAtRow:i column:0] setStringValue:
+                [NSString stringWithFormat:@"> %i",
+                 [[userInfo objectForKey:@"max_nhit"] intValue]]];
+        } else {
+            [[nhitMonitorResultsMatrix cellAtRow:i column:0] setStringValue:
+                [NSString stringWithFormat:@"%.2f",
+                 [[userInfo objectForKey:names[i]] floatValue]]];
+        }
+    }
 }
 
 - (void) nhitMonitor: (NSNotification*) aNote
