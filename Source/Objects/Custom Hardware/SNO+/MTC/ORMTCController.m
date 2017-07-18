@@ -560,7 +560,8 @@
                             [model mtcaOELOMask]};
     for (int matrix_index = 0; matrix_index < [matrices count]; matrix_index++) {
         uint32_t maskValue = masks[matrix_index];
-        NSMatrix* thisMatrix = matrices[matrix_index];
+        //NSMatrix* thisMatrix = matrices[matrix_index];
+        NSMatrix* thisMatrix = 0;//tb XCode 5 compiler error fix DO NOT commit
         for (int i = 0; i < [thisMatrix numberOfRows]; i++) {
             NSCell* thisCell = [thisMatrix cellAtRow:i column:0];
             int bitPos = [thisCell tag];
