@@ -2055,7 +2055,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 - (void) shipSumHistograms
 {
-    if(!shipSumHistogram) return;
+    if(shipSumHistogram){
     
         int chan;
         for(chan=0; chan<kNumV4FLTChannels; chan++){
@@ -2084,6 +2084,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                 */
             }
         }
+    }
 }
 
 
