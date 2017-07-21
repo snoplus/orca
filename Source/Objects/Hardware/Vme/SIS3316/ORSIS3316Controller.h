@@ -89,7 +89,7 @@
     //------------------------------
 	//CSR
 	IBOutlet NSMatrix*		csrMatrix;
-	IBOutlet NSMatrix*		acqMatrix;
+	IBOutlet NSMatrix*		acquisitionControlMatrix;
 	IBOutlet NSMatrix*		eventConfigMatrix;
 	
 	IBOutlet NSButton*		stopTriggerButton;
@@ -97,6 +97,8 @@
 	IBOutlet NSButton*		stopDelayEnabledButton;
 	IBOutlet NSButton*		writeThresholdButton;
 	IBOutlet NSButton*		readThresholdButton;
+    IBOutlet NSButton*      writeAcquisitionControlButton;
+    IBOutlet NSButton*      readAcquisitionControlButton;
     IBOutlet NSButton*      writeHistogramConfigurationButton;
     IBOutlet NSButton*      readHistogramConfigurationButton;
 	IBOutlet NSTextField*	startDelayField;
@@ -144,6 +146,7 @@
 - (void) pileupEnabledChanged:(NSNotification*)aNote;
 - (void) clrHistogramWithTSChanged:(NSNotification*)aNote;
 - (void) writeHitsIntoEventMemoryChanged:(NSNotification*)aNote;
+- (void) acquisitionControlChanged: (NSNotification*)aNote;
 
 - (void) tauFactorChanged:(NSNotification*)aNote;
 - (void) gapTimeChanged:(NSNotification*)aNote;
@@ -178,7 +181,7 @@
 - (void) accGate8StartChanged:(NSNotification*)aNote;
 
 - (void) csrChanged:(NSNotification*)aNote;
-- (void) acqChanged:(NSNotification*)aNote;
+//- (void) acqChanged:(NSNotification*)aNote;
 - (void) eventConfigChanged:(NSNotification*)aNote;
 
 - (void) stopTriggerChanged:(NSNotification*)aNote;
@@ -249,12 +252,16 @@
 - (IBAction) accGate7StartAction:(id)sender;
 - (IBAction) accGate8LenAction:(id)sender;
 - (IBAction) accGate8StartAction:(id)sender;
+- (IBAction) acquisitionControlAction:(id)sender;
 
 - (IBAction) writeAccumulatorGateAction:(id)sender;
 - (IBAction) readAccumulatorGateAction:(id)sender;
 
 - (IBAction) writeThresholdsAction:(id)sender;
 - (IBAction) readThresholdsAction:(id)sender;
+
+- (IBAction) writeAcquisitionControlAction:(id)sender;
+- (IBAction) readAcquisitionControlAction:(id)sender;
 
 - (IBAction) csrAction:(id)sender;
 - (IBAction) acqAction:(id)sender;

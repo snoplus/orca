@@ -77,6 +77,7 @@
         [[peakingTimeMatrix         cellAtRow:i column:0] setTag:i];
         [[trigBothEdgesMatrix       cellAtRow:i column:0] setTag:i];
         [[intHeTrigOutPulseMatrix   cellAtRow:i column:0] setTag:i];
+        [[acquisitionControlMatrix  cellAtRow:i column:0] setTag:i]; //-=**
         
 	}
     for(i=0;i<kNumSIS3316Groups;i++){
@@ -158,6 +159,11 @@
     [notifyCenter addObserver : self
                      selector : @selector(heSuppressTrigModeChanged:)
                          name : ORSIS3316HeSuppressTrigModeChanged
+                       object : model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(acquisitionControlChanged:)
+                         name : ORSIS3316AcquisitionControlChanged
                        object : model];
     
     [notifyCenter addObserver : self
@@ -484,6 +490,7 @@
     [self cfdControlBitsChanged:nil];
     [self extraFilterBitsChanged:nil];
     [self tauTableBitsChanged:nil];
+    [self acquisitionControlChanged:nil];
  
     [self histogramsEnabledChanged:nil];
     [self pileupEnabledChanged:nil];
@@ -1132,6 +1139,21 @@
     }
 }
 
+- (void) acquisitionControlChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<12;i++){
+            [[acquisitionControlMatrix cellWithTag:i] setIntValue:[model acquisitionControl:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Channel"] intValue]; ///here //-=**
+        [[acquisitionControlMatrix cellWithTag:i] setIntValue:[model acquisitionControl:i]];
+    }
+}
+
+
 - (void) csrChanged:(NSNotification*)aNote
 {
 	[[csrMatrix cellWithTag:0] setIntValue:[model enableTriggerOutput]];
@@ -1145,14 +1167,14 @@
 
 - (void) acqChanged:(NSNotification*)aNote
 {
-	[[acqMatrix cellWithTag:0] setIntValue:[model bankSwitchMode]];
-	[[acqMatrix cellWithTag:1] setIntValue:[model autoStart]];
-	[[acqMatrix cellWithTag:2] setIntValue:[model multiEventMode]];
-	[[acqMatrix cellWithTag:3] setIntValue:[model multiplexerMode]];
-	[[acqMatrix cellWithTag:4] setIntValue:[model lemoStartStop]];
-	[[acqMatrix cellWithTag:5] setIntValue:[model p2StartStop]];
-	[[acqMatrix cellWithTag:6] setIntValue:[model gateMode]];
-	[stopDelayEnabledButton setIntValue: [model stopDelayEnabled]];
+//	[[acqMatrix cellWithTag:0] setIntValue:[model bankSwitchMode]];
+//	[[acqMatrix cellWithTag:1] setIntValue:[model autoStart]];
+//	[[acqMatrix cellWithTag:2] setIntValue:[model multiEventMode]];
+//	[[acqMatrix cellWithTag:3] setIntValue:[model multiplexerMode]];
+//	[[acqMatrix cellWithTag:4] setIntValue:[model lemoStartStop]];
+//	[[acqMatrix cellWithTag:5] setIntValue:[model p2StartStop]];
+//	[[acqMatrix cellWithTag:6] setIntValue:[model gateMode]];
+//	[stopDelayEnabledButton setIntValue: [model stopDelayEnabled]];
 }
 
 - (void) moduleIDChanged:(NSNotification*)aNote
@@ -1267,12 +1289,13 @@
     [thresholdSumMatrix         setEnabled:!lockedOrRunningMaintenance];
     [heTrigThresholdMatrix      setEnabled:!lockedOrRunningMaintenance];
     [heTrigThresholdSumMatrix   setEnabled:!lockedOrRunningMaintenance];
+    [acquisitionControlMatrix   setEnabled:!lockedOrRunningMaintenance];
     
 	[checkEventButton           setEnabled:!locked && !runInProgress];
 	[testMemoryButton           setEnabled:!locked && !runInProgress];
 	
 	[csrMatrix                  setEnabled:!locked && !runInProgress];
-	[acqMatrix                  setEnabled:!locked && !runInProgress];
+//	[acqMatrix                  setEnabled:!locked && !runInProgress];
 	[eventConfigMatrix          setEnabled:!locked && !runInProgress];
 	[stopTriggerButton          setEnabled:!lockedOrRunningMaintenance];
 	[randomClockButton          setEnabled:!lockedOrRunningMaintenance];
@@ -1424,6 +1447,12 @@
 {
     [model setHeSuppressTriggerBit:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
+
+- (IBAction) acquisitionControlAction:(id)sender
+{
+    int tag =[[sender selectedCell] tag];
+    int aValue = [sender intValue];
+    [model setAcquisitionControlBit:tag withValue:aValue];}
 
 - (IBAction) thresholdAction:(id)sender
 {
@@ -1608,16 +1637,16 @@
 - (IBAction) acqAction:(id)sender
 {
 	//tags are defined in IB, they have to match here or there will be trouble
-	BOOL state = [[sender selectedCell] intValue];
+//	BOOL state = [[sender selectedCell] intValue];
 	switch ([[sender selectedCell] tag]) {
-		case 0: [model setBankSwitchMode:state];	break; 
-		case 1: [model setAutoStart:state];			break; 
-		case 2: [model setMultiEventMode:state];	break; 
-		case 3: [model setMultiplexerMode:state];	break; 
-		case 4: [model setLemoStartStop:state];		break; 
-		case 5: [model setP2StartStop:state];		break; 
-		case 6: [model setGateMode:state];			break; 
-		case 8: [model setStopDelayEnabled:state];			break;
+//		case 0: [model setBankSwitchMode:state];	break; 
+//		case 1: [model setAutoStart:state];			break; 
+//		case 2: [model setMultiEventMode:state];	break; 
+//		case 3: [model setMultiplexerMode:state];	break; 
+//		case 4: [model setLemoStartStop:state];		break; 
+//		case 5: [model setP2StartStop:state];		break; 
+//		case 6: [model setGateMode:state];			break; 
+//		case 8: [model setStopDelayEnabled:state];			break;
 		default: break;
 	}
 }
@@ -1779,11 +1808,40 @@
     }
 }
 
+- (IBAction) writeAcquisitionControlAction:(id)sender
+{
+    @try {
+        [self endEditing];
+        [model writeAcquisitionRegister];
+    }
+    @catch(NSException* localException) {
+        NSLog(@"SIS3316 Acquisition Control write FAILED.\n");
+        ORRunAlertPanel([localException name], @"%@\nSIS3316 Write FAILED", @"OK", nil, nil,
+                        localException);
+    }
+}
+
+- (IBAction) readAcquisitionControlAction:(id)sender
+{
+    @try {
+        [self endEditing];
+        [model readAcquisitionRegister:YES];
+    }
+    @catch(NSException* localException) {
+        NSLog(@"SIS3316 Accumulator Gate read FAILED.\n");
+        ORRunAlertPanel([localException name], @"%@\nSIS3316 Read FAILED", @"OK", nil, nil,
+                        localException);
+    }
+    
+}
+
+
 - (IBAction) writeAccumulatorGateAction:(id)sender
 {
     @try {
         [self endEditing];
         [model writeAccumulatorGates];
+        [model writeRawDataBufferConfig];
         
     }
     @catch(NSException* localException) {
@@ -1799,6 +1857,7 @@
     @try {
         [self endEditing];
         [model readAccumulatorGates:YES];
+        [model readRawDataBufferConfig:YES];
     }
     @catch(NSException* localException) {
         NSLog(@"SIS3316 Accumulator Gate read FAILED.\n");

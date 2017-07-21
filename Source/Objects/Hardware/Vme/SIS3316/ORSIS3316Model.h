@@ -241,6 +241,7 @@ enum{
     long			enabledMask;
     long            histogramsEnabledMask;
     long			pileupEnabledMask;
+    long            acquisitionControlMask;
     long            clrHistogramsWithTSMask;
     long            writeHitsToEventMemoryMask;
     long			heSuppressTriggerMask;
@@ -364,6 +365,11 @@ enum{
 - (void) setEnabledMask:(unsigned long)aMask;
 - (BOOL) enabled:(unsigned short)chan;
 - (void) setEnabledBit:(unsigned short)chan withValue:(BOOL)aValue;
+///////
+- (long) acquisitionControlMask;
+- (void) setAcquisitionControlMask:(unsigned long)aMask;
+- (BOOL) acquisitionControl:(unsigned long)chan;
+- (void) setAcquisitionControlBit:(unsigned long)aChan withValue:(BOOL)aValue;
 
 //////
 - (long) histogramsEnabledMask;
@@ -521,20 +527,20 @@ enum{
 - (void) setEnableTriggerOutput:(BOOL)aEnableTriggerOutput;
 
 //Acquisition control reg
-- (BOOL) bankSwitchMode;
-- (void) setBankSwitchMode:(BOOL)aBankSwitchMode;
-- (BOOL) autoStart;
-- (void) setAutoStart:(BOOL)aAutoStart;
-- (BOOL) multiEventMode;
-- (void) setMultiEventMode:(BOOL)aMultiEventMode;
-- (BOOL) multiplexerMode;
-- (void) setMultiplexerMode:(BOOL)aMultiplexerMode;
-- (BOOL) lemoStartStop;
-- (void) setLemoStartStop:(BOOL)aLemoStartStop;
-- (BOOL) p2StartStop;
-- (void) setP2StartStop:(BOOL)aP2StartStop;
-- (BOOL) gateMode;
-- (void) setGateMode:(BOOL)aGateMode;
+//- (BOOL) bankSwitchMode;
+//- (void) setBankSwitchMode:(BOOL)aBankSwitchMode;
+//- (BOOL) autoStart;
+//- (void) setAutoStart:(BOOL)aAutoStart;
+//- (BOOL) multiEventMode;
+//- (void) setMultiEventMode:(BOOL)aMultiEventMode;
+//- (BOOL) multiplexerMode;
+//- (void) setMultiplexerMode:(BOOL)aMultiplexerMode;
+//- (BOOL) lemoStartStop;
+//- (void) setLemoStartStop:(BOOL)aLemoStartStop;
+//- (BOOL) p2StartStop;
+//- (void) setP2StartStop:(BOOL)aP2StartStop;
+//- (BOOL) gateMode;
+//- (void) setGateMode:(BOOL)aGateMode;
 
 //clocks and delays (Acquisition control reg)
 - (BOOL) stopDelayEnabled;
@@ -587,19 +593,20 @@ enum{
 - (unsigned long)readControlStatusReg;          //6.1               (complete) -not connected  
 - (void) writeControlStatusReg:(unsigned long)aValue;
         //6.1               (complete)
-- (void) setLed:(BOOL)state;                    //6.1'              (complete)
-- (void) readModuleID:(BOOL)verbose;            //6.2               (complete)
-- (void) readHWVersion:(BOOL)verbose;           //6.7               (complete)
-- (unsigned short) hwVersion;                   //6.7'              (complete)
-- (void) readTemperature:(BOOL)verbose;         //6.8               (complete)
-- (void) readSerialNumber:(BOOL)verbose;        //6.10              (complete)
-- (void) writeClockSource;                      //6.17              (complete)
-- (void) writeAcquisitionRegister;              //6.21              (incomplete. No read)
-- (BOOL) sampleLogicIsBusy;                     //6.21      none of 21 is connected to the nib
-//pg 119 and on
-- (void) writeActiveTrigGateWindowLen;        //6.16 (section 2)
+- (void) setLed:(BOOL)state;                    //6.1'
+- (void) readModuleID:(BOOL)verbose;            //6.2
+- (void) readHWVersion:(BOOL)verbose;           //6.7
+- (unsigned short) hwVersion;                   //6.7'
+- (void) readTemperature:(BOOL)verbose;         //6.8
+- (void) readSerialNumber:(BOOL)verbose;        //6.10
+- (void) writeClockSource;                      //6.17
+- (void) writeAcquisitionRegister;              //6.21
+- (void) readAcquisitionRegister:(BOOL)verbose;
+- (BOOL) sampleLogicIsBusy;                     //6.21      //pg 119 and on
+- (void) writeActiveTrigGateWindowLen;          //6.16 (section 2)
 - (void) readActiveTrigGateWindowLen:(BOOL)verbose;
 - (void) writeRawDataBufferConfig;              //6.17 (section 2)
+- (void) readRawDataBufferConfig:(BOOL)verbose;
 - (void) writePreTriggerDelays;                 //6.19 (section 2)  (Missing read and caps at 4 bits (I think))
 - (void) writeDataFormat;                       //6.21 (section 2)  (complete)
 
@@ -682,6 +689,7 @@ enum{
 @end
 
 extern NSString* ORSIS3316EnabledChanged;
+extern NSString* ORSIS3316AcquisitionControlChanged;
 extern NSString* ORSIS3316HistogramsEnabledChanged;
 extern NSString* ORSIS3316PileUpEnabledChanged;
 extern NSString* ORSIS3316ClrHistogramWithTSChanged;
