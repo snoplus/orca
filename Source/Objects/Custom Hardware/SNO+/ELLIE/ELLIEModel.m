@@ -1193,6 +1193,10 @@ err:
          documentId:[runDocDict objectForKey:@"_id"]
          tag:kTellieRunDocumentUpdated];
     }
+
+    [runDocDict release];
+    [subRunDocDict release];
+    [subRunInfo release];
     [pool release];
 }
 
@@ -2135,7 +2139,7 @@ err:
 - (void) updateSmellieRunDocument:(NSDictionary*)subRunDoc
 {
     /*
-     Update [self tellieRunDoc] with subrun information.
+     Update [self smellieRunDoc] with subrun information.
      
      Arguments:
      NSDictionary* subRunDoc:  Subrun information to be added to the current [self tellieRunDoc].
@@ -2160,7 +2164,11 @@ err:
     [self setSmellieRunDoc:runDocDict];
 
     //check to see if run is offline or not
-    [[self couchDBRef:self withDB:@"smellie"] updateDocument:runDocDict documentId:[runDocDict objectForKey:@"_id"] tag:kTellieRunDocumentUpdated];
+    [[self couchDBRef:self withDB:@"smellie"] updateDocument:runDocDict documentId:[runDocDict objectForKey:@"_id"] tag:kSmellieRunDocumentUpdated];
+
+    [runDocDict release];
+    [subRunDocDict release];
+    [subRunInfo release];
     [pool release];
 }
 
