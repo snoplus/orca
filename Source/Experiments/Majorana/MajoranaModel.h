@@ -123,7 +123,7 @@
 - (BOOL) fillingLN:(unsigned short)index;
 - (NSTimeInterval) pollingTimeForLN:(unsigned short)index;
 - (void) constraintCheckFinished:(int)index;
-- (NSString*) checkForBreakdown:(unsigned short)index vacSystem:(unsigned short)aVacSystem;
+- (NSString*) checkForBreakdown:(unsigned short)module vacSystem:(unsigned short)aVacSystem;
 - (NSDictionary*) baselineExcursions:(unsigned short)index;
 - (BOOL) breakdownAlarmPosted:(unsigned short)alarmIndex;
 - (void) clearBreakdownAlarm:(unsigned short)index;

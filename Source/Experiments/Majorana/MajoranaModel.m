@@ -576,15 +576,14 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     else return nil;
 }
 
-- (NSString*) checkForBreakdown:(unsigned short)index vacSystem:(unsigned short)aVacSystem
+- (NSString*) checkForBreakdown:(unsigned short)module vacSystem:(unsigned short)aVacSystem
 {
+    int index = module - 1;
+
     //M1 = Crate1 = index0 // vacSystemB ==vacIndex1
     //M2 = Crate2 = index1 // vacSystemA ==vacIndex0
-    
     if(index      > 1) return @"Index??";
     if(aVacSystem > 1) return @"Index??";
-    
-    int module = index + 1;
     
     //first send out reports as needed
     if([self rateSpikesValid:index] && !rateReportSent[index]){
