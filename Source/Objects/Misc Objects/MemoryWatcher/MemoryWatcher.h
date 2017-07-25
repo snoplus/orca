@@ -33,6 +33,8 @@
     NSTimeInterval       taskInterval;
     NSDate*              launchTime;
     NSTimeInterval       upTime;
+    NSOperationQueue*   opQueue;
+
 }
 
 #pragma mark ***Initialization
@@ -50,6 +52,7 @@
 - (float) convertValue:(float)aValue withMultiplier:(NSString*)aMultiplier;
 - (unsigned) timeRateCount:(int)rateIndex;
 - (float) timeRate:(int)rateIndex value:(int)valueIndex;
+- (void) setUpQueue;
 
 - (void) launchTop;
 @end
