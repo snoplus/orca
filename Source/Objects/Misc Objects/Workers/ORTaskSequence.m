@@ -109,23 +109,25 @@
 
 - (void) taskDataAvailable:(NSNotification*)aNotification
 {
-	NSData* incomingData   = [[aNotification userInfo] valueForKey:NSFileHandleNotificationDataItem];
-    if ([incomingData length]) {
-		NSString* incomingText = [[[NSString alloc] initWithData:incomingData encoding:NSASCIIStringEncoding] autorelease];
-		incomingText = [incomingText removeNLandCRs];
-		if(verbose){
+    NSData* incomingData   = [[aNotification userInfo] valueForKey:NSFileHandleNotificationDataItem];
+    if (incomingData && [incomingData length]) {
+        NSString *incomingText = [[[NSString alloc] initWithData:incomingData encoding:NSASCIIStringEncoding] autorelease];
+        incomingText = [incomingText removeNLandCRs];
+        if(verbose){
             ANSIEscapeHelper* helper = [[[ANSIEscapeHelper alloc] init] autorelease];
             [helper setFont:[NSFont fontWithName:@"Courier New" size:12]];
             NSAttributedString* str = [helper attributedStringWithANSIEscapedString:
                                        [NSString stringWithFormat:@"%@\n",incomingText]];
             NSLogAttr(str);
         }
-		if(textToDelegate && incomingText){
-			if([delegate respondsToSelector:@selector(taskData:)]){
-				[delegate taskData:incomingText];
-			}
-		}
-	}
+        if(textToDelegate && incomingText){
+            if([delegate respondsToSelector:@selector(taskData:)]){
+                [delegate taskData:incomingText];
+            }
+        }
+    }
+    [[aNotification object] readInBackgroundAndNotify];  // go back for more.
+
 }
 @end
 
@@ -133,40 +135,40 @@
 @implementation ORTaskSequence (private)
 - (void) _launch
 {
-	if([tasks count]){
-		NSTask* theTask = [tasks objectAtIndex:0];
-		NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
+    if([tasks count]){
+        NSTask* theTask = [tasks objectAtIndex:0];
+        NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
+        
+        if(![theTask respondsToSelector:@selector(taskDataAvailable:)]){
+            NSPipe *newPipe = [NSPipe pipe];
+            NSFileHandle *readHandle = [newPipe fileHandleForReading];
+            
+            
+            [nc addObserver:self
+                   selector:@selector(taskDataAvailable:)
+                       name:NSFileHandleReadCompletionNotification
+                     object:readHandle];
+            
+            
+            [readHandle readInBackgroundAndNotify];
+            
+            [theTask setStandardOutput:newPipe];
+            [theTask setStandardError:newPipe];
+        }
         [nc addObserver : self
                selector : @selector(taskCompleted:)
                    name : NSTaskDidTerminateNotification
                  object : theTask];
-
-		if(![theTask respondsToSelector:@selector(taskDataAvailable:)]){
-            
-			NSPipe*       newPipe    = [NSPipe pipe];
-			NSFileHandle* readHandle = [newPipe fileHandleForReading];
-
-            [nc addObserver:self
-                   selector:@selector(taskDataAvailable:)
-                       name:NSFileHandleReadToEndOfFileCompletionNotification
-                     object:readHandle];
-
-			[readHandle readToEndOfFileInBackgroundAndNotify];
-
-			[theTask setStandardOutput:newPipe];
-			[theTask setStandardError:newPipe];
-		}
         
-
-		
-		[theTask launch];
-	}
-	else {
-		[delegate tasksCompleted:self];
-		[delegate release];
-		delegate = nil;
-		[self autorelease];
-	}
+        //if(verbose)NSLog(@"launching: %@\n",theTask);
+        [theTask launch];
+    }
+    else {
+        [delegate tasksCompleted:self];
+        [delegate release];
+        delegate = nil;
+        [self autorelease];
+    }
 }
 @end
 

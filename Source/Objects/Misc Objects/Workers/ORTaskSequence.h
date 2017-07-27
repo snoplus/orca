@@ -67,7 +67,6 @@
 + (id) pingTaskWithDelegate:(id)aDelegate;
 - (id) initWithDelegate:(id)aDelegate;
 - (void) ping;
-- (void)terminate;
 
 @property (assign) BOOL verbose;
 @property (assign) BOOL textToDelegate;
