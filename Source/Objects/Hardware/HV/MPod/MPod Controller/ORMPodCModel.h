@@ -21,13 +21,14 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORMPodCard.h"
 #import "ORMPodProtocol.h"
+@class ORPingTask;
 
 @interface ORMPodCModel :  ORMPodCard <ORMPodProtocol>
 {
 	NSMutableArray*	connectionHistory;
 	unsigned		ipNumberIndex;
 	NSString*		IPNumber;
-	NSTask*			pingTask;
+	ORPingTask*		pingTask;
 	BOOL			oldPower;
 	double			queueCount;
     BOOL			verbose;
@@ -57,6 +58,7 @@
 - (NSDictionary*) parameterDictionary;
 - (void) setParameterDictionary:(NSDictionary*)aParameterDictionary;
 - (void) decodeWalk:(NSString*)theWalk;
+- (void) taskFinished:(ORPingTask*)aTask;
 
 #pragma mark ¥¥¥Hardware Access
 - (void) ping;

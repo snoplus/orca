@@ -24,6 +24,7 @@
 #import "ORGroup.h"
 
 @class ORCommandList;
+@class ORPingTask;
 
 typedef  enum eSBC_CrateStates{
 	kIdle,
@@ -115,7 +116,7 @@ typedef enum eSBC_ThrottleConsts{
 	ORSafeQueue*    lamsToAck;
 	BOOL			stopWatchingIRQ;
 
-	NSTask*			pingTask;
+	ORPingTask*			pingTask;
     BOOL            pingedSuccessfully;
     BOOL            permissionDenied;
     
@@ -253,7 +254,7 @@ typedef enum eSBC_ThrottleConsts{
 - (void) reloadClient;
 - (void) killCrate;
 - (void) taskData:(NSString*)text;
-- (void) taskFinished:(NSTask*)aTask;
+- (void) taskFinished:(ORPingTask*)aTask;
 - (void) toggleCrate;
 - (void) startCrate;
 - (void) stopCrate;

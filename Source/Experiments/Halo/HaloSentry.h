@@ -21,7 +21,7 @@
 
 @class NetSocket;
 @class ORRunModel;
-
+@class ORPingTask;
 
 enum  eHaloSentryState {
     eIdle,
@@ -90,7 +90,7 @@ enum eHaloStatus {
     BOOL        triedBooting;
     BOOL        wasLocalRun;
     
-	NSTask*     pingTask;
+	ORPingTask*     pingTask;
     NetSocket*  socket;
     BOOL        isConnected;
     int         sbcSocketDropCount;
@@ -203,7 +203,7 @@ enum eHaloStatus {
 - (void) collectObjects;
 - (void) ping;
 - (BOOL) pingTaskRunning;
-- (void) tasksCompleted:(id)sender;
+- (void) taskFinished:(ORPingTask*)aTask;
 - (void) updateRemoteMachine;
 - (void) toggleSystems;
 - (void) startHeartbeatTimeout;

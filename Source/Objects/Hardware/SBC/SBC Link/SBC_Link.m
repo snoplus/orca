@@ -1233,7 +1233,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 }
 
 
-- (void) taskFinished:(NSTask*)aTask
+- (void) taskFinished:(ORPingTask*)aTask
 {
 	if(aTask == pingTask){
 		[pingTask release];
@@ -2171,18 +2171,17 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 {
 	if(!pingTask){
         pingedSuccessfully = NO;
-		ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
-		pingTask = [[NSTask alloc] init];
-		
-		[pingTask setLaunchPath:@"/sbin/ping"];
+        
+        pingTask = [[ORPingTask pingTaskWithDelegate:self] retain];
+        
+        pingTask.launchPath= @"/sbin/ping";
+        pingTask.arguments = [NSArray arrayWithObjects:@"-c",@"1",@"-t",@"1",@"-q",IPNumber,nil];
+        
+        pingTask.verbose = aFlag;
+        pingTask.textToDelegate = YES;
+        [pingTask ping];
 
-		[pingTask setArguments: [NSArray arrayWithObjects:@"-c",@"1",@"-t",@"1",@"-q",IPNumber,nil]];
-		
-		[aSequence addTaskObj:pingTask];
-		[aSequence setVerbose:aFlag];
-		[aSequence setTextToDelegate:YES];
-		[aSequence launch];
-		[[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkPingTask object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkPingTask object:self];
 	}
 }
 

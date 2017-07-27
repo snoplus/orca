@@ -340,7 +340,7 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 }
 
 #pragma mark ¥¥¥Tasks
-- (void) taskFinished:(NSTask*)aTask
+- (void) taskFinished:(ORPingTask*)aTask
 {
 	if(aTask == pingTask){
 		[pingTask release];
@@ -352,30 +352,23 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 - (void) ping
 {
 	if(!pingTask){
-		ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
-		pingTask = [[NSTask alloc] init];
-		
-		[pingTask setLaunchPath:@"/sbin/ping"];
-		[pingTask setArguments: [NSArray arrayWithObjects:@"-c",@"5",@"-t",@"10",@"-q",IPNumber,nil]];
-		
-		[aSequence addTaskObj:pingTask];
-		[aSequence setVerbose:YES];
-		[aSequence setTextToDelegate:YES];
-		[aSequence launch];
+        
+        pingTask = [[ORPingTask pingTaskWithDelegate:self] retain];
+        
+        pingTask.launchPath= @"/sbin/ping";
+        pingTask.arguments = [NSArray arrayWithObjects:@"-c",@"5",@"-t",@"10",@"-q",IPNumber,nil];
+        
+        pingTask.verbose = YES;
+        pingTask.textToDelegate = YES;
+        [pingTask ping];
+        
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORMPodCPingTask object:self];
-	}
-	else {
-		[pingTask terminate];
 	}
 }
 
 - (BOOL) pingTaskRunning
 {
 	return pingTask != nil;
-}
-
-- (void) tasksCompleted:(id)sender
-{
 }
 
 - (void) taskData:(NSString*)text

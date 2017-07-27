@@ -50,3 +50,29 @@
 - (void) tasksCompleted:(id)sender;
 - (void) taskData:(NSString*)text;
 @end
+
+//---------------------------------------------
+// Special task for pinging HW. Using the ORTaskSequence
+//fails sometimes because of a race condition.
+//This object runs out of a separate thread.
+//---------------------------------------------
+@interface ORPingTask : NSObject
+{
+    BOOL verbose;
+    BOOL textToDelegate;
+    id delegate;
+    NSString* launchPath;
+    NSArray* arguments;
+}
++ (id) pingTaskWithDelegate:(id)aDelegate;
+- (id) initWithDelegate:(id)aDelegate;
+- (void) ping;
+- (void)terminate;
+
+@property (assign) BOOL verbose;
+@property (assign) BOOL textToDelegate;
+@property (retain) id delegate;
+@property (retain) NSString* launchPath;
+@property (retain) NSArray* arguments;
+
+@end

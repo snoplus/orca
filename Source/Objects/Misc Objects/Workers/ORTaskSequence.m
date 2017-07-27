@@ -110,8 +110,8 @@
 - (void) taskDataAvailable:(NSNotification*)aNotification
 {
 	NSData* incomingData   = [[aNotification userInfo] valueForKey:NSFileHandleNotificationDataItem];
-    if (incomingData && [incomingData length]) {
-		NSString *incomingText = [[[NSString alloc] initWithData:incomingData encoding:NSASCIIStringEncoding] autorelease];
+    if ([incomingData length]) {
+		NSString* incomingText = [[[NSString alloc] initWithData:incomingData encoding:NSASCIIStringEncoding] autorelease];
 		incomingText = [incomingText removeNLandCRs];
 		if(verbose){
             ANSIEscapeHelper* helper = [[[ANSIEscapeHelper alloc] init] autorelease];
@@ -125,7 +125,6 @@
 				[delegate taskData:incomingText];
 			}
 		}
-		[[aNotification object] readInBackgroundAndNotify];  // go back for more.
 	}
 }
 @end
@@ -137,29 +136,29 @@
 	if([tasks count]){
 		NSTask* theTask = [tasks objectAtIndex:0];
 		NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
+        [nc addObserver : self
+               selector : @selector(taskCompleted:)
+                   name : NSTaskDidTerminateNotification
+                 object : theTask];
 
 		if(![theTask respondsToSelector:@selector(taskDataAvailable:)]){
-			NSPipe *newPipe = [NSPipe pipe];
-			NSFileHandle *readHandle = [newPipe fileHandleForReading];
+            
+			NSPipe*       newPipe    = [NSPipe pipe];
+			NSFileHandle* readHandle = [newPipe fileHandleForReading];
 
+            [nc addObserver:self
+                   selector:@selector(taskDataAvailable:)
+                       name:NSFileHandleReadToEndOfFileCompletionNotification
+                     object:readHandle];
 
-			[nc addObserver:self 
-				   selector:@selector(taskDataAvailable:) 
-					   name:NSFileHandleReadCompletionNotification 
-					 object:readHandle];
-
-
-			[readHandle readInBackgroundAndNotify];
+			[readHandle readToEndOfFileInBackgroundAndNotify];
 
 			[theTask setStandardOutput:newPipe];
 			[theTask setStandardError:newPipe];
 		}
-		[nc addObserver : self
-			   selector : @selector(taskCompleted:)
-				   name : NSTaskDidTerminateNotification
-				 object : theTask];
+        
+
 		
-		//if(verbose)NSLog(@"launching: %@\n",theTask);
 		[theTask launch];
 	}
 	else {
@@ -169,4 +168,78 @@
 		[self autorelease];
 	}
 }
+@end
+
+
+
+//--------------------------------
+@implementation ORPingTask
+
+@synthesize verbose,textToDelegate,delegate,launchPath,arguments;
+
++ (id) pingTaskWithDelegate:(id)aDelegate
+{
+    return [[[ORPingTask alloc] initWithDelegate:aDelegate] autorelease];
+}
+
+- (id) initWithDelegate:(id)aDelegate
+{
+    self = [super init];
+    self.verbose = YES;
+    self.textToDelegate = NO;
+    //normally we would not retain our delegate, but in this case we have to make sure that the delegate
+    //doesn't go away before we are done.
+    self.delegate = aDelegate;
+    return self;
+}
+
+- (void) dealloc
+{
+    self.delegate = nil;
+    self.launchPath = nil;
+    self.arguments = nil;
+    [super dealloc];
+}
+
+- (void) ping
+{
+    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+    [queue addOperationWithBlock:^(void) {
+        NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+        NSTask* task = [[NSTask alloc] init];
+        NSPipe* pipe = [[NSPipe alloc] init];
+        NSFileHandle* fh = [pipe fileHandleForReading];
+
+        [task setLaunchPath:self.launchPath];
+        [task setArguments: self.arguments];
+        [task setStandardOutput:pipe];
+        [task launch];
+        [task waitUntilExit];
+        NSData* incomingData = [fh readDataToEndOfFile];
+        NSString* incomingText = [[[NSString alloc] initWithData:incomingData encoding:NSASCIIStringEncoding] autorelease];
+        incomingText = [incomingText removeNLandCRs];
+        if(verbose){
+            ANSIEscapeHelper* helper = [[[ANSIEscapeHelper alloc] init] autorelease];
+            [helper setFont:[NSFont fontWithName:@"Courier New" size:12]];
+            NSAttributedString* str = [helper attributedStringWithANSIEscapedString:
+                                       [NSString stringWithFormat:@"%@\n",incomingText]];
+            NSLogAttr(str);
+        }
+        if(textToDelegate && incomingText){
+            if([delegate respondsToSelector:@selector(taskData:)]){
+                [delegate performSelectorOnMainThread:@selector(taskData:) withObject:incomingText waitUntilDone:NO];
+            }
+        }
+        if([delegate respondsToSelector:@selector(taskFinished:)]){
+            [delegate performSelectorOnMainThread:@selector(taskFinished:) withObject:self waitUntilDone:YES];
+        }
+
+        [task release];
+        [pipe release];
+        [fh closeFile];
+        [pool release];
+    }];
+    [queue autorelease];
+}
+
 @end
