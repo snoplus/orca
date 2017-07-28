@@ -50,6 +50,7 @@
     IBOutlet NSMatrix*		peakingTimeMatrix;
     IBOutlet NSMatrix*      extraFilterMatrix;
     IBOutlet NSMatrix*      tauTableMatrix;
+    IBOutlet NSMatrix*      triggerDelayMatrix;
     
     IBOutlet NSMatrix*		heTrigThresholdMatrix;
     IBOutlet NSMatrix*      heTrigThresholdSumMatrix;
@@ -101,10 +102,12 @@
     IBOutlet NSButton*      readAcquisitionControlButton;
     IBOutlet NSButton*      writeHistogramConfigurationButton;
     IBOutlet NSButton*      readHistogramConfigurationButton;
-	IBOutlet NSTextField*	startDelayField;
+	//IBOutlet NSTextField*	startDelayField;
 	IBOutlet NSPopUpButton* clockSourcePU;
 	IBOutlet NSTextField*	stopDelayField;
 	IBOutlet NSPopUpButton* pageSizePU;
+    IBOutlet NSButton*      writeClockSourceButton;
+    IBOutlet NSButton*      readClockSourceButton;
 
 
     IBOutlet NSButton*      settingLockButton;
@@ -147,6 +150,7 @@
 - (void) clrHistogramWithTSChanged:(NSNotification*)aNote;
 - (void) writeHitsIntoEventMemoryChanged:(NSNotification*)aNote;
 - (void) acquisitionControlChanged: (NSNotification*)aNote;
+- (void) triggerDelayChanged: (NSNotification*)aNote;
 
 - (void) tauFactorChanged:(NSNotification*)aNote;
 - (void) gapTimeChanged:(NSNotification*)aNote;
@@ -187,7 +191,7 @@
 - (void) stopTriggerChanged:(NSNotification*)aNote;
 - (void) randomClockChanged:(NSNotification*)aNote;
 - (void) stopDelayChanged:(NSNotification*)aNote;
-- (void) startDelayChanged:(NSNotification*)aNote;
+//- (void) startDelayChanged:(NSNotification*)aNote;
 - (void) clockSourceChanged:(NSNotification*)aNote;
 - (void) stopDelayChanged:(NSNotification*)aNote;
 - (void) pageSizeChanged:(NSNotification*)aNote;
@@ -220,6 +224,7 @@
 - (IBAction) cfdControlAction:(id)sender;
 - (IBAction) thresholdAction:(id)sender;
 - (IBAction) thresholdSumAction:(id)sender;
+- (IBAction) triggerDelayAction:(id)sender;
 - (IBAction) energyDividerAction:(id)sender;
 - (IBAction) energySubtractorAction:(id)sender;
 - (IBAction) tauFactorAction:(id)sender;
@@ -272,13 +277,15 @@
 - (IBAction) randomClockAction:(id)sender;
 - (IBAction) stopDelayEnabledAction:(id)sender;
 - (IBAction) stopDelayAction:(id)sender;
-- (IBAction) startDelayAction:(id)sender;
+//- (IBAction) startDelayAction:(id)sender;
 - (IBAction) clockSourceAction:(id)sender;
 - (IBAction) baseAddressAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
 - (IBAction) initBoard:(id)sender;
 - (IBAction) integrationAction:(id)sender;
 - (IBAction) probeBoardAction:(id)sender;
+- (IBAction) writeClockSourceAction:(id)sender;
+- (IBAction) readClockSourceAction:(id)sender;
 
 - (IBAction) testMemoryBankAction:(id)sender;
 - (IBAction) checkEvent:(id)sender;

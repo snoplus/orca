@@ -77,9 +77,24 @@
         [[peakingTimeMatrix         cellAtRow:i column:0] setTag:i];
         [[trigBothEdgesMatrix       cellAtRow:i column:0] setTag:i];
         [[intHeTrigOutPulseMatrix   cellAtRow:i column:0] setTag:i];
-        [[acquisitionControlMatrix  cellAtRow:i column:0] setTag:i]; //-=**
-        
-	}
+    }
+    int tag = 0;
+    int row,col;
+    for(col=0;col<4;col++){
+        for(row=0;row<4;row++){
+            [[triggerDelayMatrix cellAtRow:row column:col] setTag:tag];
+            tag++;
+        }
+    }
+    tag=0;
+    for(col=0;col<2;col++){
+        for(row=0;row<6;row++){
+            [[acquisitionControlMatrix cellAtRow:row column:col] setTag:tag];
+            tag++;
+        }
+    }
+
+
     for(i=0;i<kNumSIS3316Groups;i++){
         [[activeTrigGateWindowLenMatrix cellAtRow:i column:0] setTag:i];
         [[thresholdSumMatrix    cellAtRow:i column:0] setTag:i];
@@ -174,6 +189,11 @@
     [notifyCenter addObserver : self
                      selector : @selector(thresholdSumChanged:)
                          name : ORSIS3316ThresholdSumChanged
+                       object : model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(triggerDelayChanged:)
+                         name : ORSIS3316TriggerDelayChanged
                        object : model];
     
     [notifyCenter addObserver : self
@@ -402,10 +422,10 @@
                          name : ORSIS3316ClockSourceChanged
 						object: model];
 	
-    [notifyCenter addObserver : self
-                     selector : @selector(startDelayChanged:)
-                         name : ORSIS3316StartDelayChanged
-						object: model];
+   // [notifyCenter addObserver : self
+   //                  selector : @selector(startDelayChanged:)
+   //                      name : ORSIS3316StartDelayChanged
+   //  					object: model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(stopDelayChanged:)
@@ -487,6 +507,7 @@
     [self heSuppressTrigModeChanged:nil];
 	[self thresholdChanged:nil];
     [self thresholdSumChanged:nil];
+    [self triggerDelayChanged:nil];
     [self cfdControlBitsChanged:nil];
     [self extraFilterBitsChanged:nil];
     [self tauTableBitsChanged:nil];
@@ -541,7 +562,7 @@
 	[self pageSizeChanged:nil];
 	[self stopDelayChanged:nil];
 	[self clockSourceChanged:nil];
-	[self startDelayChanged:nil];
+	//[self startDelayChanged:nil];
 	[self stopDelayChanged:nil];
 	[self randomClockChanged:nil];
 	[self stopTriggerChanged:nil];
@@ -687,6 +708,20 @@
     else{
         int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
         [[thresholdSumMatrix cellWithTag:i] setIntValue:[model thresholdSum:i]];
+    }
+}
+
+- (void) triggerDelayChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Groups; i++){
+            [[triggerDelayMatrix cellWithTag:i] setIntValue:[model triggerDelay:i]];
+        }
+    }
+    else{
+        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
+        [[triggerDelayMatrix cellWithTag:i] setIntValue:[model triggerDelay:i]];
     }
 }
 
@@ -1139,19 +1174,28 @@
     }
 }
 
-- (void) acquisitionControlChanged:(NSNotification*)aNote
+//- (void) acquisitionControlChanged:(NSNotification*)aNote
+//{
+//    if(aNote == nil){
+//        short i;
+//        for(i=0;i<12;i++){
+//            [[acquisitionControlMatrix cellWithTag:i] setIntValue:[model acquisitionControl:i]];
+//        }
+//    }
+//    else {
+//        int i = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+//        [[acquisitionControlMatrix cellWithTag:i] setIntValue:[model acquisitionControl:i]];
+//    }
+//}
+
+- (void) acquisitionControlChanged:(NSNotification*)aNote  //bools and possibly more changed like this
 {
-    if(aNote == nil){
-        short i;
-        for(i=0;i<12;i++){
-            [[acquisitionControlMatrix cellWithTag:i] setIntValue:[model acquisitionControl:i]];
-        }
-    }
-    else {
-        int i = [[[aNote userInfo] objectForKey:@"Channel"] intValue]; ///here //-=**
-        [[acquisitionControlMatrix cellWithTag:i] setIntValue:[model acquisitionControl:i]];
+    short i;
+    for(i=0;i<12;i++){
+        [[acquisitionControlMatrix cellWithTag:i] setState:[model acquisitionControl:i]];
     }
 }
+
 
 
 - (void) csrChanged:(NSNotification*)aNote
@@ -1226,10 +1270,10 @@
 	[clockSourcePU selectItemAtIndex: [model clockSource]];
 }
 
-- (void) startDelayChanged:(NSNotification*)aNote
-{
-	[startDelayField setIntValue: [model startDelay]];
-}
+//- (void) startDelayChanged:(NSNotification*)aNote
+//{
+//	[startDelayField setIntValue: [model startDelay]];
+//}
 
 - (void) stopDelayChanged:(NSNotification*)aNote
 {
@@ -1287,6 +1331,7 @@
     [tauFactorMatrix            setEnabled:!lockedOrRunningMaintenance];
 
     [thresholdSumMatrix         setEnabled:!lockedOrRunningMaintenance];
+    [triggerDelayMatrix         setEnabled:!lockedOrRunningMaintenance];
     [heTrigThresholdMatrix      setEnabled:!lockedOrRunningMaintenance];
     [heTrigThresholdSumMatrix   setEnabled:!lockedOrRunningMaintenance];
     [acquisitionControlMatrix   setEnabled:!lockedOrRunningMaintenance];
@@ -1300,7 +1345,7 @@
 	[stopTriggerButton          setEnabled:!lockedOrRunningMaintenance];
 	[randomClockButton          setEnabled:!lockedOrRunningMaintenance];
 	[stopDelayEnabledButton     setEnabled:!lockedOrRunningMaintenance];
-	[startDelayField            setEnabled:!lockedOrRunningMaintenance];
+    //	[startDelayField            setEnabled:!lockedOrRunningMaintenance];
 	[clockSourcePU              setEnabled:!lockedOrRunningMaintenance];
 	[stopDelayField             setEnabled:!lockedOrRunningMaintenance];
 	[pageSizePU                 setEnabled:!locked && !runInProgress];
@@ -1462,6 +1507,11 @@
 - (IBAction) thresholdSumAction:(id)sender
 {
     [model setThresholdSum:[[sender selectedCell] tag] withValue:[sender intValue]];
+}
+
+- (IBAction) triggerDelayAction:(id)sender
+{
+    [model setTriggerDelay:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
 - (IBAction) cfdControlAction:(id)sender
@@ -1673,6 +1723,7 @@
 		NSLog(@"Test of SIS 3300 Memory Bank failed\n");
 	}
 }
+
 - (IBAction) probeBoardAction:(id)sender;
 {
 	@try {
@@ -1702,19 +1753,19 @@
 	[model setStopDelayEnabled:[sender intValue]];	
 }
 
-- (IBAction) startDelayAction:(id)sender
-{
-	[model setStartDelay:[sender intValue]];	
-}
+//- (IBAction) startDelayAction:(id)sender
+//{
+//	[model setStartDelay:[sender intValue]];
+//}
 
 - (IBAction) clockSourceAction:(id)sender
 {
-	[model setClockSource:[sender indexOfSelectedItem]];	
+	[model setClockSource:[sender indexOfSelectedItem]];
 }
 
 - (IBAction) stopDelayAction:(id)sender
 {
-	[model setStopDelay:[sender intValue]];	
+	[model setStopDelay:[sender intValue]];
 }
 
 - (IBAction) pageSizeAction:(id)sender
@@ -1782,6 +1833,7 @@
         //[model writeFirTriggerSetup];
         [model writeActiveTrigGateWindowLen];
         [model writeFirEnergySetup];
+        [model writePreTriggerDelays];
     }
 	@catch(NSException* localException) {
         NSLog(@"SIS3316 Thresholds write FAILED.\n");
@@ -1799,6 +1851,7 @@
         [model readHeTrigThresholds:YES];
         [model readHeTrigThresholdSum:YES];
         [model readActiveTrigGateWindowLen:YES];
+        [model readPreTriggerDelays:YES];
         [model readFirEnergySetup:YES];
     }
 	@catch(NSException* localException) {
@@ -1835,6 +1888,33 @@
     
 }
 
+- (IBAction) writeClockSourceAction:(id)sender
+{
+    @try {
+        [self endEditing];
+        [model writeClockSource];
+        [model writeTriggerDelay];
+    }
+    @catch(NSException* localException) {
+        NSLog(@"SIS3316 Clock Source write FAILED. \n");
+        ORRunAlertPanel([localException name], @"%@\nSIS3316 Write FAILED", @"OK", nil, nil, localException);
+    }
+}
+
+- (IBAction)readClockSourceAction:(id)sender
+{
+    @try {
+        [self endEditing];
+        [model readClockSource:YES];
+        [model readTriggerDelay:YES];
+    }
+    @catch(NSException* localException) {
+        NSLog(@"SIS3316 Accumulator Gate read FAILED.\n");
+        ORRunAlertPanel([localException name], @"%@\nSIS3316 Read FAILED", @"OK", nil, nil,
+                        localException);
+    }
+ 
+}
 
 - (IBAction) writeAccumulatorGateAction:(id)sender
 {
@@ -1864,7 +1944,6 @@
         ORRunAlertPanel([localException name], @"%@\nSIS3316 Read FAILED", @"OK", nil, nil,
                         localException);
     }
- 
 }
 
 - (IBAction) writeHistogramConfigurationAction:(id)sender

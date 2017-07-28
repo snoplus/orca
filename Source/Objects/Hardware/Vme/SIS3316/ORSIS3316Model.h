@@ -245,17 +245,15 @@ enum{
     long            clrHistogramsWithTSMask;
     long            writeHitsToEventMemoryMask;
     long			heSuppressTriggerMask;
-    unsigned long  cfdControlBits[kNumSIS3316Channels];
-    unsigned long  threshold[kNumSIS3316Channels];
-    unsigned long  thresholdSum[kNumSIS3316Groups];
-    unsigned long  peakingTime[kNumSIS3316Channels];
-    unsigned long  gapTime[kNumSIS3316Channels];
-    unsigned long  tauFactor[kNumSIS3316Channels];
-    unsigned long  extraFilterBits[kNumSIS3316Channels];
-    unsigned long  tauTableBits[kNumSIS3316Channels];
-    
-    unsigned long  heTrigThreshold[kNumSIS3316Channels];
-    unsigned long heTrigThresholdSum[kNumSIS3316Groups];
+    unsigned long   cfdControlBits[kNumSIS3316Channels];
+    unsigned long   threshold[kNumSIS3316Channels];
+    unsigned long   peakingTime[kNumSIS3316Channels];
+    unsigned long   gapTime[kNumSIS3316Channels];
+    unsigned long   tauFactor[kNumSIS3316Channels];
+    unsigned long   extraFilterBits[kNumSIS3316Channels];
+    unsigned long   tauTableBits[kNumSIS3316Channels];
+    unsigned long   heTrigThreshold[kNumSIS3316Channels];
+    unsigned long   heTrigThresholdSum[kNumSIS3316Groups];
     unsigned short intTrigOutPulseBit[kNumSIS3316Channels];
     long            trigBothEdgesMask;
     long            intHeTrigOutPulseMask;
@@ -269,24 +267,27 @@ enum{
     unsigned short energyDivider[kNumSIS3316Channels];
     unsigned short energySubtractor[kNumSIS3316Channels];
 
-    unsigned short accumulatorGateStart[kNumSIS3316Groups];
-    unsigned short accumulatorGateLength[kNumSIS3316Groups];
-    unsigned short accGate1Len[kNumSIS3316Groups];
-    unsigned short accGate1Start[kNumSIS3316Groups];
-    unsigned short accGate2Len[kNumSIS3316Groups];
-    unsigned short accGate2Start[kNumSIS3316Groups];
-    unsigned short accGate3Len[kNumSIS3316Groups];
-    unsigned short accGate3Start[kNumSIS3316Groups];
-    unsigned short accGate4Len[kNumSIS3316Groups];
-    unsigned short accGate4Start[kNumSIS3316Groups];
-    unsigned short accGate5Len[kNumSIS3316Groups];
-    unsigned short accGate5Start[kNumSIS3316Groups];
-    unsigned short accGate6Len[kNumSIS3316Groups];
-    unsigned short accGate6Start[kNumSIS3316Groups];
-    unsigned short accGate7Len[kNumSIS3316Groups];
-    unsigned short accGate7Start[kNumSIS3316Groups];
-    unsigned short accGate8Len[kNumSIS3316Groups];
-    unsigned short accGate8Start[kNumSIS3316Groups];
+    unsigned short  accumulatorGateStart[kNumSIS3316Groups];
+    unsigned short  accumulatorGateLength[kNumSIS3316Groups];
+    unsigned short  accGate1Len[kNumSIS3316Groups];
+    unsigned short  accGate1Start[kNumSIS3316Groups];
+    unsigned short  accGate2Len[kNumSIS3316Groups];
+    unsigned short  accGate2Start[kNumSIS3316Groups];
+    unsigned short  accGate3Len[kNumSIS3316Groups];
+    unsigned short  accGate3Start[kNumSIS3316Groups];
+    unsigned short  accGate4Len[kNumSIS3316Groups];
+    unsigned short  accGate4Start[kNumSIS3316Groups];
+    unsigned short  accGate5Len[kNumSIS3316Groups];
+    unsigned short  accGate5Start[kNumSIS3316Groups];
+    unsigned short  accGate6Len[kNumSIS3316Groups];
+    unsigned short  accGate6Start[kNumSIS3316Groups];
+    unsigned short  accGate7Len[kNumSIS3316Groups];
+    unsigned short  accGate7Start[kNumSIS3316Groups];
+    unsigned short  accGate8Len[kNumSIS3316Groups];
+    unsigned short  accGate8Start[kNumSIS3316Groups];
+    unsigned long   thresholdSum[kNumSIS3316Groups]; //should be a short but then it has to be changed throughout the code
+    unsigned short  triggerDelay[kNumSIS3316Groups];
+
     
 
     
@@ -322,7 +323,7 @@ enum{
     BOOL stopDelayEnabled;
     BOOL randomClock;
     
-    int	 startDelay;
+    //int	 startDelay;
     int	 stopDelay;
 	
 	
@@ -356,6 +357,7 @@ enum{
 - (unsigned short) moduleID;
 - (unsigned short) hwVersion;
 - (float) temperature;
+//- (float) clockSource;
 - (NSString*) revision;
 - (void) setRevision:(NSString*)aString;
 - (unsigned short) majorRevision;
@@ -392,6 +394,8 @@ enum{
 - (BOOL) writeHitsToEventMemory:(unsigned short)chan;
 - (void) setWriteHitsToEventMemory:(unsigned short)chan withValue:(BOOL)aValue;
 ///////
+- (void) setTriggerDelay:(unsigned short)aGroup withValue: (unsigned short)aValue;
+- (unsigned short) triggerDelay: (unsigned short)aGroup;
 
 - (long) heSuppressTriggerMask;
 - (BOOL) heSuppressTriggerMask:(unsigned short)chan;
@@ -405,6 +409,9 @@ enum{
 
 - (long)cfdControlBits:(unsigned short)aChan;
 - (void) setCfdControlBits:(unsigned short)aChan withValue:(long)aValue;
+
+//- (long)clockSource:(unsigned short)aChan;
+- (void) setClockSource:(unsigned short)aChan withValue:(long)aValue;
 
 - (long)extraFilterBits:(unsigned short)aChan;
 - (void) setExtraFilterBits:(unsigned short)aChan withValue:(long)aValue;
@@ -550,8 +557,8 @@ enum{
 
 
 
-- (int) clockSource;
-- (void) setClockSource:(int)aClockSource;
+//-=**- (int) clockSource;
+//-=**- (void) setClockSource:(int)aClockSource;
 
 //event configuration
 - (BOOL) pageWrap;
@@ -564,8 +571,8 @@ enum{
 - (void) setStopTrigger:(BOOL)aStopTrigger;
 - (int) stopDelay;
 - (void) setStopDelay:(int)aStopDelay;
-- (int) startDelay;
-- (void) setStartDelay:(int)aStartDelay;
+//- (int) startDelay;
+//- (void) setStartDelay:(int)aStartDelay;
 - (int) pageSize;
 - (void) setPageSize:(int)aPageSize;
 
@@ -582,7 +589,7 @@ enum{
 - (unsigned short) serialNumber;
 
 #pragma mark •••Hardware Access
-//Comments denote section of the manual (or parts of that section ie. 6.1')
+//Comments denote section of the manual 
 - (unsigned long) interfaceRegister:(unsigned long)aRegisterIndex;
 - (unsigned long) vmeRegister:(unsigned long)aRegisterIndex;
 -(unsigned long) keyRegister:(unsigned long)aRegisterIndex;
@@ -600,6 +607,7 @@ enum{
 - (void) readTemperature:(BOOL)verbose;         //6.8
 - (void) readSerialNumber:(BOOL)verbose;        //6.10
 - (void) writeClockSource;                      //6.17
+- (void) readClockSource:(BOOL)verbose;
 - (void) writeAcquisitionRegister;              //6.21
 - (void) readAcquisitionRegister:(BOOL)verbose;
 - (BOOL) sampleLogicIsBusy;                     //6.21      //pg 119 and on
@@ -607,9 +615,11 @@ enum{
 - (void) readActiveTrigGateWindowLen:(BOOL)verbose;
 - (void) writeRawDataBufferConfig;              //6.17 (section 2)
 - (void) readRawDataBufferConfig:(BOOL)verbose;
-- (void) writePreTriggerDelays;                 //6.19 (section 2)  (Missing read and caps at 4 bits (I think))
-- (void) writeDataFormat;                       //6.21 (section 2)  (complete)
-
+- (void) writePreTriggerDelays;                 //6.19 (section 2)
+- (void) readPreTriggerDelays:(BOOL)verbose;
+- (void) writeDataFormat;                       //6.21 (section 2)
+- (void) writeTriggerDelay;                     //6.23 (section 2)
+- (void) readTriggerDelay:(BOOL)verbose;
 - (void) writeFirTriggerSetup;                  //6.25 (section 2)
 - (void) initBoard;
 - (void) writeThresholds;                       //6.26 (section 2)
@@ -697,6 +707,7 @@ extern NSString* ORSIS3316WriteHitsIntoEventMemoryChanged;
 
 extern NSString* ORSIS3316ThresholdChanged;
 extern NSString* ORSIS3316ThresholdSumChanged;
+extern NSString* ORSIS3316TriggerDelayChanged;
 extern NSString* ORSIS3316HeSuppressTrigModeChanged;
 extern NSString* ORSIS3316CfdControlBitsChanged;
 extern NSString* ORSIS3316ExtraFilterBitsChanged;
@@ -743,7 +754,7 @@ extern NSString* ORSIS3316EventConfigChanged;
 extern NSString* ORSIS3316StopTriggerChanged;
 extern NSString* ORSIS3316RandomClockChanged;
 extern NSString* ORSIS3316StopDelayChanged;
-extern NSString* ORSIS3316StartDelayChanged;
+//extern NSString* ORSIS3316StartDelayChanged;
 extern NSString* ORSIS3316ClockSourceChanged;
 extern NSString* ORSIS3316PageSizeChanged;
 
