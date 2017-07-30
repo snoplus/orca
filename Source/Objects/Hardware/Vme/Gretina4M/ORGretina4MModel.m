@@ -925,17 +925,34 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
      postNotificationName:ORGretina4MModelRAGChanged
      object:self];
 }
+//-----------------------------------------------------
+//----for testing some of the rate spike logic
+- (void) fakeASpike:(int) channel started:(BOOL)start
+{
+    ORRunningAveSpike* aSpike = [[[ORRunningAveSpike alloc] init] autorelease];
+    aSpike.spiked       = start;
+    aSpike.tag          = channel;
+    aSpike.ave          = 2;
+    aSpike.spikeValue   = 10;
+    
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:aSpike forKey:@"SpikeObject"];
+    NSNotification* aNote  = [NSNotification notificationWithName:ORSpikeStateChangedNotification object:self userInfo:userInfo];
+    [self rateSpikeChanged:aNote];
+
+}
+//-----------------------------------------------------
 
 - (void) rateSpikeChanged:(NSNotification*)aNote
 {
     ORRunningAveSpike* spikeObj = [[aNote userInfo] objectForKey:@"SpikeObject"];
     NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
                               spikeObj,@"spikeInfo",
-                              [NSNumber numberWithInt:[self crateNumber]],@"crate",
-                              [NSNumber numberWithInt:[self slot]],@"card",
-                              [NSNumber numberWithInt:[spikeObj tag]],@"channel",
+                              [NSNumber numberWithInt:[self crateNumber]],  @"crate",
+                              [NSNumber numberWithInt:[self slot]],         @"card",
+                              [NSNumber numberWithInt:[spikeObj tag]],      @"channel",
                               nil];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MModelRateSpiked object:self userInfo:userInfo];
+ 
     
 }
 
@@ -950,25 +967,9 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     
         [notifyCenter addObserver : self
                          selector : @selector(rateSpikeChanged:)
-                             name : ORRunningAverageSpikeNotification
+                             name : ORSpikeStateChangedNotification
                            object : run_ave];
     }
-}
-
-- (BOOL)channelSpike:(int)idx
-{
-    if(idx<kNumGretina4MChannels){
-        return channelSpikes[idx];
-    }
-    else return 0;
-} 
-
-- (float)rateSpike:(int)idx
-{
-    if(idx<kNumGretina4MChannels){
-        return rateSpikes[idx];
-    }
-    else return 0;
 }
 
 - (id) rateObject:(short)channel{
@@ -1010,8 +1011,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 		tpol[i]             = 0x3;//spec default: 0
 		presumEnabled[i]    = 0x0;
 		trapThreshold[i]	= 0x10;
-        channelSpikes[i]    = false; //condition of running average
-        rateSpikes[i]       = 0;
 	}
     
     clockPhase      = 0x0;
@@ -1045,13 +1044,13 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	}
 	return 0;
 }
+
 - (float) getRate:(short)channel
 {
-    
     if(channel>=0 && channel<kNumGretina4MChannels){
         return [[self rateObject:channel] rate]; //the rate
     }
-return 0;
+    return 0;
 }
 
 #pragma mark •••specific accessors
@@ -3151,15 +3150,10 @@ return 0;
     }
     [rateRunningAverages setTriggerType:kRASpikeOnRatio];
     [rateRunningAverages setTriggerValue:5]; //this is ratio...  rate threshold could be changed
-
-	int i;
-    for(i=0;i<kNumGretina4MChannels;i++){ //for running average
-        channelSpikes[i]=false;
-        rateSpikes[i]= 0; //be absolutely sure
-    }
-        
-        
+    
+    int i;
 	for(i=0;i<kNumGretina4MChannels;i++){
+        
         [self setForceFullInit:i withValue:[decoder decodeIntForKey:[@"forceFullInit"	    stringByAppendingFormat:@"%d",i]]];
         [self setEnabled:i		withValue:[decoder decodeIntForKey:[@"enabled"	    stringByAppendingFormat:@"%d",i]]];
 		[self setTrapEnabled:i	withValue:[decoder decodeIntForKey:[@"trapEnabled"	stringByAppendingFormat:@"%d",i]]];

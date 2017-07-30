@@ -159,17 +159,21 @@
                          name : ORCouchDBModelAlertMessageChanged
                         object: model];
 
-    
     [notifyCenter addObserver : self
                      selector : @selector(alertTypeChanged:)
                          name : ORCouchDBModelAlertTypeChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(skipDataSetsChanged:)
+                         name : ORCouchDBModelSkipDataSetsChanged
                         object: model];
 
 }
 
 - (void) updateWindow
 {
-	[super updateWindow];
+    [super updateWindow];
     [self alertMessageChanged:nil];
     [self alertTypeChanged:nil];
     [self remoteHostNameChanged:nil];
@@ -182,8 +186,15 @@
 	[self stealthModeChanged:nil];
 	[self keepHistoryChanged:nil];
 	[self replicationRunningChanged:nil];
-	[self usingUpdateHandlerChanged:nil];
+    [self usingUpdateHandlerChanged:nil];
+    [self skipDataSetsChanged:nil];
 }
+
+- (void) skipDataSetsChanged:(NSNotification*)aNote
+{
+    [skipDataSetsCB setIntValue:[model skipDataSets]];
+}
+
 
 - (void) alertMessageChanged:(NSNotification*)aNote
 {
@@ -253,15 +264,16 @@
 - (void) couchDBLockChanged:(NSNotification*)aNote
 {
     BOOL locked = [gSecurity isLocked:ORCouchDBLock];
-    [couchDBLockButton setState: locked];
+    [couchDBLockButton   setState: locked];
     
     [remoteHostNameField setEnabled:!locked];
-    [localHostNameField setEnabled:!locked];
-    [userNameField setEnabled:!locked];
-    [passwordField setEnabled:!locked];
-    [portField setEnabled:!locked];
-    [keepHistoryCB setEnabled:!locked];
-    [stealthModeButton setEnabled:!locked];
+    [localHostNameField  setEnabled:!locked];
+    [userNameField       setEnabled:!locked];
+    [passwordField       setEnabled:!locked];
+    [portField           setEnabled:!locked];
+    [keepHistoryCB       setEnabled:!locked];
+    [stealthModeButton   setEnabled:!locked];
+    [skipDataSetsCB      setEnabled:!locked];
 }
 
 - (void) checkGlobalSecurity
@@ -290,6 +302,10 @@
 }
 
 #pragma mark •••Actions
+- (IBAction) skipDataSetsAction:(id)sender
+{
+    [model setSkipDataSets:[sender intValue]];
+}
 
 - (IBAction) startReplicationAction:(id)sender
 {
@@ -303,7 +319,6 @@
 
 - (IBAction) keepHistoryAction:(id)sender
 {
-	
     if([model keepHistory]){
         NSString* s = [NSString stringWithFormat:@"Really DOs NOT keep a history: %@?\n",[model databaseName]];
 #if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific

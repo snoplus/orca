@@ -55,6 +55,10 @@
 
 - (void)dealloc
 {
+    [_nodeMapWC release];
+    [_smellieThread release];
+    [_guiFireSettings release];
+    [_tellieThread release];
     [super dealloc];
 }
 
@@ -564,8 +568,9 @@
         [tellieNoPulsesTf setBackgroundColor:[NSColor whiteColor]];
         // Make settings dict to pass to fire method
         float pulseSeparation = 1000.*(1./[telliePulseFreqTf floatValue]); // TELLIE accepts pulse rate in ms
+        NSString* fibre = [model calcTellieFibreForChannel:[tellieChannelTf integerValue]];
         NSMutableDictionary* settingsDict = [NSMutableDictionary dictionaryWithCapacity:100];
-        [settingsDict setValue:[tellieExpertFibreSelectPb titleOfSelectedItem] forKey:@"fibre"];
+        [settingsDict setValue:fibre forKey:@"fibre"];
         [settingsDict setValue:[NSNumber numberWithInteger:[tellieChannelTf integerValue]]  forKey:@"channel"];
         [settingsDict setValue:[tellieExpertOperationModePb titleOfSelectedItem] forKey:@"run_mode"];
         //[settingsDict setValue:[NSNumber numberWithInteger:[telliePhotonsTf integerValue]] forKey:@"photons"];
@@ -730,12 +735,6 @@
         [msgs insertObject:msg atIndex:3];
     } else {
         [msgs insertObject:[NSNull null] atIndex:3];
-    }
-
-    // Calculate settings and check any issues in
-    BOOL inSlave = YES;
-    if([[tellieBuildOpMode titleOfSelectedItem] isEqualToString:@"Master"]){
-        inSlave = NO;
     }
 
     BOOL safety_check = [model photonIntensityCheck:[tellieBuildPhotons integerValue] atFrequency:[tellieBuildRate integerValue]];

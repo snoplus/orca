@@ -48,6 +48,7 @@
 #import "ORPQModel.h"
 #import "ORPQResult.h"
 #import "RunTypeWordBits.hh"
+#import "TUBiiModel.h"
 
 #define RUNNING 0
 #define STARTING 1
@@ -68,7 +69,8 @@ NSString* ORSNOPModelSRCollectionChangedNotification = @"ORSNOPModelSRCollection
 NSString* ORSNOPModelSRChangedNotification = @"ORSNOPModelSRChangedNotification";
 NSString* ORSNOPModelSRVersionChangedNotification = @"ORSNOPModelSRVersionChangedNotification";
 NSString* ORSNOPModelNhitMonitorChangedNotification = @"ORSNOPModelNhitMonitorChangedNotification";
-
+NSString* ORSNOPStillWaitingForBuffersNotification = @"ORSNOPStillWaitingForBuffersNotification";
+NSString* ORSNOPNotWaitingForBuffersNotification = @"ORSNOPNotWaitingForBuffersNotification";
 
 BOOL isNotRunningOrIsInMaintenance()
 {
@@ -97,8 +99,6 @@ debugDBPort = _debugDBPort,
 debugDBConnectionHistory = _debugDBConnectionHistory,
 debugDBIPNumberIndex = _debugDBIPNumberIndex,
 debugDBPingTask = _debugDBPingTask,
-epedDataId = _epedDataId,
-rhdrDataId = _rhdrDataId,
 smellieDBReadInProgress = _smellieDBReadInProgress,
 smellieDocUploaded = _smellieDocUploaded,
 dataHost,
@@ -142,7 +142,6 @@ tellieRunFiles = _tellieRunFiles;
     [self initOrcaDBConnectionHistory];
     [self initDebugDBConnectionHistory];
 
-    nhitMonitor = [[NHitMonitor alloc] init];
     [[self undoManager] enableUndoRegistration];
 
     return self;
@@ -179,7 +178,6 @@ tellieRunFiles = _tellieRunFiles;
     }
 
     [[NSNotificationCenter defaultCenter] postNotificationName:@"SNOPSettingsChanged" object:self];
-    
 }
 
 - (int) mtcPort
@@ -219,7 +217,6 @@ tellieRunFiles = _tellieRunFiles;
     }
 
     [[NSNotificationCenter defaultCenter] postNotificationName:@"SNOPSettingsChanged" object:self];
-
 }
 
 - (NSString *) mtcHost
@@ -237,7 +234,6 @@ tellieRunFiles = _tellieRunFiles;
     [xl3_server setPort:port];
 
     [[NSNotificationCenter defaultCenter] postNotificationName:@"SNOPSettingsChanged" object:self];
-    
 }
 
 - (int) xl3Port
@@ -269,7 +265,6 @@ tellieRunFiles = _tellieRunFiles;
     }
 
     [[NSNotificationCenter defaultCenter] postNotificationName:@"SNOPSettingsChanged" object:self];
-
 }
 
 - (NSString *) xl3Host
@@ -289,11 +284,13 @@ tellieRunFiles = _tellieRunFiles;
     /* Initialize ECARun object: this doesn't start the run */
     anECARun = [[ECARun alloc] init];
 
-    [[self undoManager] disableUndoRegistration];
-	[self initOrcaDBConnectionHistory];
-	[self initDebugDBConnectionHistory];
+    nhitMonitor = [[NHitMonitor alloc] init];
 
-    [self setViewType:[decoder decodeIntForKey:@"viewType"]];
+    ecaLock = [[NSLock alloc] init];
+
+    [[self undoManager] disableUndoRegistration];
+    [self initOrcaDBConnectionHistory];
+    [self initDebugDBConnectionHistory];
 
     //CouchDB
     self.orcaDBUserName = [decoder decodeObjectForKey:@"ORSNOPModelOrcaDBUserName"];
@@ -355,14 +352,19 @@ tellieRunFiles = _tellieRunFiles;
     [self setNhitMonitorPulserRate:[decoder decodeIntForKey:@"nhitMonitorPulserRate"]];
     [self setNhitMonitorNumPulses:[decoder decodeIntForKey:@"nhitMonitorNumPulses"]];
     [self setNhitMonitorMaxNhit:[decoder decodeIntForKey:@"nhitMonitorMaxNhit"]];
-    [self setNhitMonitorAutoRun:[decoder decodeBoolForKey:@"nhitMonitorAutoRun"]];
     [self setNhitMonitorAutoPulserRate:[decoder decodeIntForKey:@"nhitMonitorAutoPulserRate"]];
     [self setNhitMonitorAutoNumPulses:[decoder decodeIntForKey:@"nhitMonitorAutoNumPulses"]];
     [self setNhitMonitorAutoMaxNhit:[decoder decodeIntForKey:@"nhitMonitorAutoMaxNhit"]];
     [self setNhitMonitorRunType:[decoder decodeIntForKey:@"nhitMonitorRunType"]];
     [self setNhitMonitorCrateMask:[decoder decodeIntForKey:@"nhitMonitorCrateMask"]];
+    /* Don't automatically run the nhit monitor until we load all the settings.
+     * Initially the time interval and auto run variables will be uninitialized
+     * in this method and if we set the time interval here and
+     * nhitMonitorAutoRun is set to YES, it will start the automatic timer
+     * before the settings are loaded. */
+    nhitMonitorAutoRun = NO;
     [self setNhitMonitorTimeInterval:[decoder decodeDoubleForKey:@"nhitMonitorTimeInterval"]];
-    [self setNhitMonitorMaxNhit:[decoder decodeIntForKey:@"nhitMonitorMaxNhit"]];
+    [self setNhitMonitorAutoRun:[decoder decodeBoolForKey:@"nhitMonitorAutoRun"]];
     [[self undoManager] enableUndoRegistration];
 
     //Set extra security
@@ -373,8 +375,6 @@ tellieRunFiles = _tellieRunFiles;
 
     /* initialize our connection to the XL3 server */
     xl3_server = [[RedisClient alloc] initWithHostName:xl3Host withPort:xl3Port];
-
-    nhitMonitor = [[NHitMonitor alloc] init];
 
     return self;
 }
@@ -425,6 +425,10 @@ tellieRunFiles = _tellieRunFiles;
     [logHost release];
     [anECARun release];
     [nhitMonitor release];
+    [ecaLock release];
+    [_smellieRunFiles release];
+    [_tellieRunFiles release];
+    [_tellieRunNameLabel release];
     [super dealloc];
 }
 
@@ -439,11 +443,6 @@ tellieRunFiles = _tellieRunFiles;
     [self refreshStandardRunsFromDB];
     [self enableGlobalSecurity];
     [[ORGlobal sharedGlobal] setCanQuitDuringRun:YES];
-}
-
--(void) initRunMaskHistory
-{
-    
 }
 
 - (void) initOrcaDBConnectionHistory
@@ -607,6 +606,24 @@ tellieRunFiles = _tellieRunFiles;
             NSLogColor([NSColor redColor], @"error initializing MTC.\n");
             goto err;
         }
+
+        /* Load the XL3 hardware. */
+        objs = [[(ORAppDelegate*)[NSApp delegate] document]
+             collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+
+        for (i = 0; i < [objs count]; i++) {
+            xl3 = [objs objectAtIndex:i];
+
+            if ([gOrcaGlobals runType] & kPhysicsRun) {
+                /* If we're in a physics run, we zero the pedestal masks before
+                 * the run starts. This is because it was noticed that the
+                 * number of channels in the pedestal mask seems to affect the
+                 * noise on the trigger signals. See
+                 * http://snopl.us/shift/view/9e1ff17e58704756a99f947ec2509f39?index_start=15. */
+                [xl3 zeroPedestalMasksAtRunStart];
+            }
+        }
+
         break;
     default:
         /* Turn off triggers */
@@ -646,10 +663,20 @@ tellieRunFiles = _tellieRunFiles;
             xl3 = [objs objectAtIndex:i];
 
             if ([xl3 initAtRunStart]) {
-                NSLogColor([NSColor redColor], @"error initializing XL3.\n");
+                NSLogColor([NSColor redColor], @"error initializing XL3 %i.\n", [xl3 crateNumber]);
                 goto err;
             }
+
+            if ([gOrcaGlobals runType] & kPhysicsRun) {
+                /* If we're in a physics run, we zero the pedestal masks before
+                 * the run starts. This is because it was noticed that the
+                 * number of channels in the pedestal mask seems to affect the
+                 * noise on the trigger signals. See
+                 * http://snopl.us/shift/view/9e1ff17e58704756a99f947ec2509f39?index_start=15. */
+                [xl3 zeroPedestalMasksAtRunStart];
+            }
         }
+
         break;
     }
 
@@ -836,8 +863,11 @@ err:
         [self setLastRunTypeWordHex:_lastRunTypeWord]; //FIXME: revisit if we go over 32 bits
     }
 
-    [self updateRHDRSruct];
-    [self shipRHDRRecord];
+    if ([gOrcaGlobals runType] & kPhysicsRun) {
+        /* If this is a physics run, we ping each slot in the detector once at
+         * the beginning of the run to look for any trigger issues. */
+        [self pingCratesAtRunStart];
+    }
 
     return;
 
@@ -899,10 +929,13 @@ err:
                                   nil];
         [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object: self userInfo: userInfo];
 
+        waitingForBuffers = true;
         /* detach a thread to monitor XL3/CAEN/MTC buffers */
         [NSThread detachNewThreadSelector:@selector(_waitForBuffers)
                                  toTarget:self
                                withObject:nil];
+        // post a modal dialog after 10 secs if the buffers haven't cleared yet
+        [self performSelector:@selector(stillWaitingForBuffers) withObject:nil afterDelay:10];
         break;
     default:
         break;
@@ -914,6 +947,21 @@ err:
     state = RUNNING;
 }
 
+- (void) stillWaitingForBuffers
+{
+    /* We're stopping a run but our buffers are taking a while to clear, so
+     * send a notification to allow our controller to throw up a "force stop" dialog */
+    if (waitingForBuffers) {
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORSNOPStillWaitingForBuffersNotification object:self];
+    }
+}
+
+- (void) abortWaitingForBuffers
+{
+    /* Give up on waiting for our buffers to clear at the end of a run */
+    waitingForBuffers = false;
+}
+
 - (void) _waitForBuffers
 {
     /* Since we are running in a separate thread, we just open a new
@@ -922,7 +970,7 @@ err:
         RedisClient *mtc = [[RedisClient alloc] initWithHostName:mtcHost withPort:mtcPort];
         RedisClient *xl3 = [[RedisClient alloc] initWithHostName:xl3Host withPort:xl3Port];
 
-        while (1) {
+        while (waitingForBuffers) {
             @try {
                 if (([mtc intCommand:"data_available"] == 0) &&
                     ([xl3 intCommand:"data_available"] == 0))
@@ -935,11 +983,11 @@ err:
 
         [mtc release];
         [xl3 release];
+        waitingForBuffers = false;
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORSNOPNotWaitingForBuffersNotification object:self];
 
         /* Go ahead and end the run. */
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
-        });
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORReleaseRunStateChangeWait object: self];
     }
 }
 
@@ -1013,10 +1061,8 @@ err:
 
 - (void) enableGlobalSecurity
 {
-
     [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:YES] forKey:OROrcaSecurityEnabled];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGlobalSecurityStateChanged object:self userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES] forKey:OROrcaSecurityEnabled]];
-
 }
 
 // orca script helper (will come from DB)
@@ -1036,7 +1082,6 @@ err:
 - (void) updateEPEDStructWithStepNumber: (unsigned long) stepNumber
 {
     _epedStruct.stepNumber = stepNumber;
-    
 }
 
 - (void) updateEPEDStructWithNSlopePoint: (unsigned long) nTSlopePoints
@@ -1081,6 +1126,32 @@ err:
         }
     }
 }
+
+- (void) shipEPEDStructWithCoarseDelay: (unsigned long) coarseDelay
+                             fineDelay: (unsigned long) fineDelay
+                        chargePulseAmp: (unsigned long) chargePulseAmp
+                         pedestalWidth: (unsigned long) pedestalWidth
+                               calType: (unsigned long) calType
+                            stepNumber: (unsigned long) stepNumber
+{
+    if ([[ORGlobal sharedGlobal] runInProgress]) {
+        @try {
+            [mtc_server okCommand:"send_eped_record %d %d %d %d %d %d %d",
+                pedestalWidth,
+                coarseDelay,
+                fineDelay,
+                chargePulseAmp, /* qinj_dacsetting */
+                stepNumber, /* half crate id? */
+                calType,
+                0 /* flags */
+            ];
+        } @catch (NSException *e) {
+            NSLogColor([NSColor redColor], @"failed to send EPED record: %@ \n",
+                       [e reason]);
+        }
+    }
+}
+
 - (void) shipEPEDRecord
 {
     /* Sends a command to the MTC server to ship an EPED record to the data
@@ -1123,6 +1194,299 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     }
 }
 
+- (NSLock *) ecaLock
+{
+    return ecaLock;
+}
+
+- (void) pingCratesAtRunStart
+{
+    [NSThread detachNewThreadSelector:@selector(_pingCratesAtRunStart)
+                             toTarget:self
+                           withObject:nil];
+}
+
+- (void) _pingCratesAtRunStart
+{
+    @autoreleasepool {
+        /* Try to acquire the lock for 10 seconds. If we can't get it then we
+         * just skip the ping crates. */
+        if ([ecaLock lockBeforeDate:[NSDate dateWithTimeIntervalSinceNow:10.0]]) {
+            @try {
+                [self __pingCratesAtRunStart];
+            } @finally {
+                /* Make sure to unlock the lock when we're done. */
+                [ecaLock unlock];
+            }
+        } else {
+            NSLogColor([NSColor redColor],
+                       @"pingCratesAtRunStart: unable to acquire eca lock!\n");
+        }
+    }
+}
+
+- (void) __pingCratesAtRunStart
+{
+    /* Fire pedestals on each slot in the detector. This function is called at
+     * the start of physics runs. A nearline job will eventually look at these
+     * events to determine if any slots are not firing triggers correctly.
+     * This function should only be called in a separate thread. */
+    int i, j, k;
+    uint32_t crate_pedestal_mask, coarse_delay, fine_delay, pedestal_width, gt_mask;
+    float pulser_rate;
+    uint32_t channelMasks[16];
+    uint32_t sync_trigger_mask, async_trigger_mask, tubii_dac;
+
+    NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+    NSArray* mtcs = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    NSArray* tubiis = [[(ORAppDelegate*)[NSApp delegate] document]
+         collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
+
+    xl3s = [xl3s sortedArrayUsingFunction:compareXL3s context:nil];
+
+    ORMTCModel* mtc;
+    ORXL3Model* xl3;
+    TUBiiModel* tubii;
+
+    if ([mtcs count] == 0) {
+        NSLogColor([NSColor redColor],
+                   @"pingCratesAtRunStart: couldn't find MTC object.\n");
+        return;
+    }
+
+    mtc = [mtcs objectAtIndex:0];
+
+    if ([tubiis count] == 0) {
+        NSLogColor([NSColor redColor],
+                   @"pingCratesAtRunStart: couldn't find TUBii object.\n");
+        return;
+    }
+
+    tubii = [tubiis objectAtIndex:0];
+
+    crate_pedestal_mask = [mtc pedCrateMask];
+    coarse_delay = [mtc coarseDelay];
+    fine_delay = [mtc fineDelay];
+    pedestal_width = [mtc pedestalWidth];
+    gt_mask = [mtc gtMask];
+
+    pulser_rate = [mtc pgtRate];
+
+    /* Set the coarse delay. */
+    [mtc setCoarseDelay:250];
+    @try {
+        [mtc loadCoarseDelayToHardware];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"pingCratesAtRunStart: error setting the MTCD coarse delay. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+        return;
+    }
+
+    /* Set the fine delay. */
+    [mtc setFineDelay:0];
+    @try {
+        [mtc loadFineDelayToHardware];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"pingCratesAtRunStart: error setting the MTCD fine delay. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+        return;
+    }
+
+    /* Reset the pedestal width. */
+    [mtc setPedestalWidth:50];
+    @try {
+        [mtc loadPedWidthToHardware];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"pingCratesAtRunStart: error setting the MTCD pedestal width. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+        return;
+    }
+
+    if (gt_mask & MTC_EXT_2_MASK) {
+        NSLogColor([NSColor redColor], @"pingCratesAtRunStart: EXT2 is masked in, so can't run ping crates.\n");
+        return;
+    }
+
+    /* Set the EXT2 trigger signal high so that it gets latched in every event
+     * while we ping the crates. This is to mark these events so that if we
+     * find out that changing the pedestal mask while running causes noise or
+     * other problems we can throw these events out. */
+    @try {
+        sync_trigger_mask = [tubii syncTrigMask];
+        async_trigger_mask = [tubii asyncTrigMask];
+        tubii_dac = [tubii MTCAMimic1_ThresholdInBits];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"pingCratesAtRunStart: error getting TUBii trigger masks or dac value. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+        return;
+    }
+
+    if (sync_trigger_mask != 0 || async_trigger_mask != 0) {
+        NSLogColor([NSColor redColor],
+                   @"pingCratesAtRunStart: tubii already has triggers enabled.\n");
+    }
+
+    @try {
+        [tubii setTrigMask:0x10000 setAsyncMask:0];
+        [tubii setMTCAMimic1_ThresholdInBits:0];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"pingCratesAtRunStart: error setting TUBii trigger masks or dac value. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+        return;
+    }
+
+    /* Enable all pedestals for each crate, and then fire a single pedestal
+     * pulse. */
+    for (i = 0; i < [xl3s count]; i++) {
+        xl3 = [xl3s objectAtIndex:i];
+
+        /* Enable all crates in the MTCD pedestal mask. */
+        [mtc setPedCrateMask:1 << [xl3 crateNumber]];
+
+        @try {
+            [mtc loadPedestalCrateMaskToHardware];
+        } @catch (NSException *e) {
+            NSLogColor([NSColor redColor],
+                       @"pingCratesAtRunStart: error setting the MTCD crate pedestal mask. error: "
+                        "%@ reason: %@\n", [e name], [e reason]);
+            continue;
+        }
+
+        if (![[xl3 xl3Link] isConnected]) continue;
+
+        for (j = 0; j < 16; j++) {
+            if (!([xl3 getSlotsPresent] & (1 << j))) continue;
+
+            for (k = 0; k < 16; k++) {
+                if (k == j) {
+                    /* For the slot we are testing, set the pedestal mask to
+                     * 0xffffffff. */
+                    channelMasks[k] = 0xffffffff;
+                } else {
+                    /* For all other slots, pedestal channels 17 and 18 to make
+                     * sure we don't get any pedestal pickup. */
+                    channelMasks[k] = 0x60000;
+                }
+            }
+
+            if ([xl3 multiSetPedestalMask:[xl3 getSlotsPresent]
+                     patterns:channelMasks]) {
+                NSLogColor([NSColor redColor], @"pingCratesAtRunStart: failed to set pedestal mask "
+                            "for crate %02d slot %02d\n", i, j);
+                continue;
+            }
+
+            /* The crate and slot are encoded in the step number or
+             * half_crate_id field. For example, to unpack the crate and
+             * slot:
+             *
+             *     crate = (eped_record.half_crate_id >> 4) & 0xff;
+             *     slot = eped_record.half_crate_id & 0xf;
+             */
+            [self shipEPEDStructWithCoarseDelay: [mtc coarseDelay]
+                                      fineDelay: [mtc fineDelay]
+                                 chargePulseAmp: 0
+                                  pedestalWidth: [mtc pedestalWidth]
+                                        calType: 50
+                                     stepNumber: ((i << 4) | j)];
+
+            @try {
+                [mtc firePedestals:1 withRate:1];
+            } @catch (NSException *e) {
+                NSLogColor([NSColor redColor],
+                           @"pingCratesAtRunStart: failed to fire pedestal. error: %@ reason: %@\n",
+                           [e name], [e reason]);
+            }
+        }
+    }
+
+    /* Send an EPED record with calType set to zero to let the nearline job
+     * know that we are done. */
+    [self shipEPEDStructWithCoarseDelay: [mtc coarseDelay]
+                              fineDelay: [mtc fineDelay]
+                         chargePulseAmp: 0
+                          pedestalWidth: [mtc pedestalWidth]
+                                calType: 0
+                             stepNumber: 0xffffffff];
+
+    /* Set the pedestal mask for each crate back. */
+    for (i = 0; i < [xl3s count]; i++) {
+        xl3 = [xl3s objectAtIndex:i];
+
+        if ([[xl3 xl3Link] isConnected]) {
+            [xl3 setPedestals];
+        }
+    }
+
+    /* Reset tubii's trigger masks and DAC value. */
+    @try {
+        [tubii setTrigMask:0 setAsyncMask:0];
+        [tubii setMTCAMimic1_ThresholdInBits:tubii_dac];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"pingCratesAtRunStart: error setting TUBii trigger masks or dac value. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+    }
+
+    /* Reset the crate pedestal all crates in the MTCD pedestal mask. */
+    [mtc setPedCrateMask:crate_pedestal_mask];
+    @try {
+        [mtc loadPedestalCrateMaskToHardware];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"pingCratesAtRunStart: error setting the MTCD crate pedestal mask. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+    }
+
+    /* Reset the coarse delay. */
+    [mtc setCoarseDelay:coarse_delay];
+    @try {
+        [mtc loadCoarseDelayToHardware];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"pingCratesAtRunStart: error setting the MTCD coarse delay. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+    }
+
+    /* Reset the fine delay. */
+    [mtc setFineDelay:fine_delay];
+    @try {
+        [mtc loadFineDelayToHardware];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"pingCratesAtRunStart: error setting the MTCD fine delay. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+    }
+
+    /* Reset the pedestal width. */
+    [mtc setPedestalWidth:pedestal_width];
+    @try {
+        [mtc loadPedWidthToHardware];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"pingCratesAtRunStart: error setting the MTCD pedestal width. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+    }
+
+    /* Reset the pulser rate since the firePedestals function sets the pulser
+     * rate to 0. */
+    @try {
+        [mtc setPgtRate:pulser_rate];
+        [mtc loadPulserRateToHardware];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],
+                   @"pingCratesAtRunStart: error setting the pulser rate. error: "
+                    "%@ reason: %@\n", [e name], [e reason]);
+    }
+}
+
 - (void) pingCrates
 {
     /* Enables pedestals for all channels in each crate one at a time and sends
@@ -1160,7 +1524,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         [mtc loadPedestalCrateMaskToHardware];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
-                   @"error setting the MTCD crate pedestal mask. error: "
+                   @"pingCrates: error setting the MTCD crate pedestal mask. error: "
                     "%@ reason: %@\n", [e name], [e reason]);
         return;
     }
@@ -1172,7 +1536,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         if ([[xl3 xl3Link] isConnected]) {
             if ([xl3 setPedestalMask:[xl3 getSlotsPresent] pattern:0]) {
                 NSLogColor([NSColor redColor],
-                           @"failed to set pedestal mask for crate %02d\n", i);
+                           @"pingCrates: failed to set pedestal mask for crate %02d\n", i);
                 continue;
             }
         }
@@ -1187,7 +1551,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
             if ([xl3 setPedestalMask:[xl3 getSlotsPresent]
                  pattern:0xffffffff]) {
                 NSLogColor([NSColor redColor],
-                           @"failed to set pedestal mask for crate %02d\n", i);
+                           @"pingCrates: failed to set pedestal mask for crate %02d\n", i);
                 continue;
             }
 
@@ -1195,14 +1559,14 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
                 [mtc firePedestals:1 withRate:1];
             } @catch (NSException *e) {
                 NSLogColor([NSColor redColor],
-                           @"failed to fire pedestal. error: %@ reason: %@\n",
+                           @"pingCrates: failed to fire pedestal. error: %@ reason: %@\n",
                            [e name], [e reason]);
             }
 
             /* Set pedestal mask back to 0. */
             if ([xl3 setPedestalMask:[xl3 getSlotsPresent] pattern:0]) {
                 NSLogColor([NSColor redColor],
-                           @"failed to set pedestal mask for crate %02d\n", i);
+                           @"pingCrates: failed to set pedestal mask for crate %02d\n", i);
                 continue;
             }
 
@@ -1225,7 +1589,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         [mtc loadPedestalCrateMaskToHardware];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
-                   @"error setting the MTCD crate pedestal mask. error: "
+                   @"pingCrates: error setting the MTCD crate pedestal mask. error: "
                     "%@ reason: %@\n", [e name], [e reason]);
     }
 
@@ -1236,7 +1600,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         [mtc loadPulserRateToHardware];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
-                   @"error setting the pulser rate. error: "
+                   @"pingCrates: error setting the pulser rate. error: "
                     "%@ reason: %@\n", [e name], [e reason]);
     }
 }
@@ -1294,74 +1658,6 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 - (void) stopNhitMonitor
 {
     [nhitMonitor stop];
-}
-
-- (void) updateRHDRSruct
-{
-    //form run info
-    NSArray* runObjects = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-	if([runObjects count]){
-		ORRunModel* rc = [runObjects objectAtIndex:0];
-        _rhdrStruct.runNumber = [rc runNumber];
-        NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian] autorelease];
-        NSDateComponents *cmpStartTime = [gregorian components:
-                                                 (NSCalendarUnitYear | NSCalendarUnitMonth |  NSCalendarUnitDay |
-                                                  NSCalendarUnitHour | NSCalendarUnitMinute |NSCalendarUnitSecond)
-                                                      fromDate:[NSDate date]];
-        _rhdrStruct.date = [cmpStartTime day] + [cmpStartTime month] * 100 + [cmpStartTime year] * 10000;
-        _rhdrStruct.time = [cmpStartTime second] * 100 + [cmpStartTime minute] * 10000 + [cmpStartTime hour] * 1000000;
-	}
-
-    //svn revision
-    if (_rhdrStruct.daqCodeVersion == 0) {
-        NSFileManager* fm = [NSFileManager defaultManager];
-		NSString* svnVersionPath = [[NSBundle mainBundle] pathForResource:@"svnversion"ofType:nil];
-		NSMutableString* svnVersion = [NSMutableString stringWithString:@""];
-		if([fm fileExistsAtPath:svnVersionPath])svnVersion = [NSMutableString stringWithContentsOfFile:svnVersionPath encoding:NSASCIIStringEncoding error:nil];
-		if([svnVersion hasSuffix:@"\n"]){
-			[svnVersion replaceCharactersInRange:NSMakeRange([svnVersion length]-1, 1) withString:@""];
-		}
-        NSLog(svnVersion);
-        NSLog(svnVersionPath);
-        _rhdrStruct.daqCodeVersion = [svnVersion integerValue]; //8045:8046M -> 8045 which is desired
-    }
-    
-    _rhdrStruct.calibrationTrialNumber = 0;
-    _rhdrStruct.sourceMask = 0; // from run type document
-    _rhdrStruct.runMask = 0; // from run type document
-    _rhdrStruct.gtCrateMask = 0; // from run type document
-}
-
-- (void) shipRHDRRecord
-{
-    const unsigned char rhdr_rec_length = 20;
-    unsigned long data[rhdr_rec_length];
-    data[0] = [self rhdrDataId] | rhdr_rec_length;
-    data[1] = 0;
-    
-    data[2] = _rhdrStruct.date;
-    data[3] = _rhdrStruct.time;
-    data[4] = _rhdrStruct.daqCodeVersion;
-    data[5] = _rhdrStruct.runNumber;
-    data[6] = _rhdrStruct.calibrationTrialNumber;
-    data[7] = _rhdrStruct.sourceMask;
-    data[8] = _rhdrStruct.runMask & 0xffffffffULL;
-    data[9] = _rhdrStruct.gtCrateMask;
-    data[10] = 0;
-    data[11] = 0;
-    data[12] = _rhdrStruct.runMask >> 32;
-    data[13] = 0;
-    data[14] = 0;
-    data[15] = 0;
-    data[16] = 0;
-    data[17] = 0;
-    data[18] = 0;
-    data[19] = 0;
-    
-    NSData* pdata = [[NSData alloc] initWithBytes:data length:sizeof(long)*(rhdr_rec_length)];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:pdata];
-    [pdata release];
-    pdata = nil;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -1608,42 +1904,32 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 - (void) orcaDBPing
 {
     if(!self.orcaDBPingTask){
-		ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
-		self.orcaDBPingTask = [[[NSTask alloc] init] autorelease];
-		
-		[self.orcaDBPingTask setLaunchPath:@"/sbin/ping"];
-		[self.orcaDBPingTask setArguments: [NSArray arrayWithObjects:@"-c",@"2",@"-t",@"5",@"-q",self.orcaDBIPAddress,nil]];
-		
-		[aSequence addTaskObj:self.orcaDBPingTask];
-		[aSequence setVerbose:YES];
-		[aSequence setTextToDelegate:YES];
-		[aSequence launch];
-	}
-	else {
-		[self.orcaDBPingTask terminate];
+        self.orcaDBPingTask = [ORPingTask pingTaskWithDelegate:self];
+        
+        self.orcaDBPingTask.launchPath      = @"/sbin/ping";
+        self.orcaDBPingTask.arguments       = [NSArray arrayWithObjects:@"-c",@"2",@"-t",@"5",@"-q",self.orcaDBIPAddress,nil];
+        
+        self.orcaDBPingTask.verbose         = YES;
+        self.orcaDBPingTask.textToDelegate  = YES;
+        [self.orcaDBPingTask ping];
 	}
 }
 
 - (void) debugDBPing
 {
     if(!self.debugDBPingTask){
-		ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
-		self.debugDBPingTask = [[[NSTask alloc] init] autorelease];
-		
-		[self.debugDBPingTask setLaunchPath:@"/sbin/ping"];
-		[self.debugDBPingTask setArguments: [NSArray arrayWithObjects:@"-c",@"2",@"-t",@"5",@"-q",self.debugDBIPAddress,nil]];
-		
-		[aSequence addTaskObj:self.debugDBPingTask];
-		[aSequence setVerbose:YES];
-		[aSequence setTextToDelegate:YES];
-		[aSequence launch];
-	}
-	else {
-		[self.debugDBPingTask terminate];
+        self.debugDBPingTask = [ORPingTask pingTaskWithDelegate:self];
+        
+        self.debugDBPingTask.launchPath     = @"/sbin/ping";
+        self.debugDBPingTask.arguments      = [NSArray arrayWithObjects:@"-c",@"2",@"-t",@"5",@"-q",self.debugDBIPAddress,nil];
+        
+        self.debugDBPingTask.verbose        = YES;
+        self.debugDBPingTask.textToDelegate = YES;
+        [self.debugDBPingTask ping];
 	}
 }
 
-- (void) taskFinished:(NSTask*)aTask
+- (void) taskFinished:(ORPingTask*)aTask
 {
 	if(aTask == self.orcaDBPingTask){
 		self.orcaDBPingTask = nil;
@@ -1694,55 +1980,8 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 	} // synchronized
 }
 
-#pragma mark ¥¥¥Segment Group Methods
-- (void) makeSegmentGroups
-{
-    ORSegmentGroup* group = [[ORSegmentGroup alloc] initWithName:@"SNO+ Detector" numSegments:kNumTubes mapEntries:[self setupMapEntries:0]];
-	[self addGroup:group];
-	[group release];
-}
-
-- (int)  maxNumSegments
-{
-	return kNumTubes;
-}
-
-- (void) showDataSetForSet:(int)aSet segment:(int)index
-{ 
-	if(aSet>=0 && aSet < [segmentGroups count]){
-		ORSegmentGroup* aGroup = [segmentGroups objectAtIndex:aSet];
-		NSString* cardName = [aGroup segment:index objectForKey:@"kCardSlot"];
-		NSString* chanName = [aGroup segment:index objectForKey:@"kChannel"];
-		if(cardName && chanName && ![cardName hasPrefix:@"-"] && ![chanName hasPrefix:@"-"]){
-			ORDataSet* aDataSet = nil;
-			[[[self document] collectObjectsOfClass:NSClassFromString(@"OrcaObject")] makeObjectsPerformSelector:@selector(clearLoopChecked)];
-			NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-			if([objs count]){
-				NSArray* arrayOfHistos = [[objs objectAtIndex:0] collectConnectedObjectsOfClass:NSClassFromString(@"ORHistoModel")];
-				if([arrayOfHistos count]){
-					id histoObj = [arrayOfHistos objectAtIndex:0];
-					aDataSet = [histoObj objectForKeyArray:[NSMutableArray arrayWithObjects:@"SIS3302", @"Crate  0",
-															[NSString stringWithFormat:@"Card %2d",[cardName intValue]], 
-															[NSString stringWithFormat:@"Channel %2d",[chanName intValue]],
-															nil]];
-					
-					[aDataSet doDoubleClick:nil];
-				}
-			}
-		}
-	}
-}
-- (NSString*) dataSetNameGroup:(int)aGroup segment:(int)index
-{
-	ORSegmentGroup* theGroup = [segmentGroups objectAtIndex:aGroup];
-	
-	NSString* crateName = [theGroup segment:index objectForKey:@"kCrate"];
-	NSString* cardName  = [theGroup segment:index objectForKey:@"kCardSlot"];
-	NSString* chanName  = [theGroup segment:index objectForKey:@"kChannel"];
-	
-	return [NSString stringWithFormat:@"SIS3302,Energy,Crate %2d,Card %2d,Channel %2d",[crateName intValue],[cardName intValue],[chanName intValue]];
-}
 #pragma mark ¥¥¥Specific Dialog Lock Methods
+
 - (NSString*) experimentMapLock
 {
 	return @"SNOPMapLock";
@@ -1753,37 +1992,14 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 	return @"SNOPDetectorLock";
 }
 
-- (id) sbcLink
-{
-    NSArray* theSBCs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORVmecpuModel")];
-    //NSLog(@"Found %d SBCs.\n", theSBCs.count);
-    for(id anSBC in theSBCs)
-    {
-        return [anSBC sbcLink];
-    }
-    return nil;
-}
-
 - (NSString*) experimentDetailsLock
 {
 	return @"SNOPDetailsLock";
 }
 
-- (void) setViewType:(int)aViewType
-{
-	[[[self undoManager] prepareWithInvocationTarget:self] setViewType:aViewType];
-	viewType = aViewType;
-}
-
-- (int) viewType
-{
-	return viewType;
-}
-
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:viewType forKey:@"viewType"];
 
     //CouchDB
     [encoder encodeObject:self.orcaDBUserName forKey:@"ORSNOPModelOrcaDBUserName"];
@@ -1838,71 +2054,6 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     [encoder encodeDouble:[self nhitMonitorTimeInterval] forKey:@"nhitMonitorTimeInterval"];
 }
 
-- (NSString*) reformatSelectionString:(NSString*)aString forSet:(int)aSet
-{
-	if([aString length] == 0)return @"Not Mapped";
-	
-	NSString* finalString = @"";
-	NSArray* parts = [aString componentsSeparatedByString:@"\n"];
-	finalString = [finalString stringByAppendingString:@"\n-----------------------\n"];
-	finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Detector" parts:parts]];
-	finalString = [finalString stringByAppendingString:@"-----------------------\n"];
-	finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" CardSlot" parts:parts]];
-	finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Channel" parts:parts]];
-	finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Threshold" parts:parts]];
-	finalString = [finalString stringByAppendingString:@"-----------------------\n"];
-	return finalString;
-}
-
-- (NSString*) getPartStartingWith:(NSString*)aLabel parts:(NSArray*)parts
-{
-	for(id aLine in parts){
-		if([aLine rangeOfString:aLabel].location != NSNotFound) return aLine;
-	}
-	return @"";
-}
-
-#pragma mark ¥¥¥DataTaker
-- (void) setDataIds:(id)assigner
-{
-    [self setRhdrDataId:[assigner assignDataIds:kLongForm]];
-    [self setEpedDataId:[assigner assignDataIds:kLongForm]];
-}
-
-- (void) syncDataIdsWith:(id)anotherObj
-{
-	[self setRhdrDataId:[anotherObj rhdrDataId]];
-	[self setEpedDataId:[anotherObj epedDataId]];
-}
-
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"SNOPModel"];
-}
-
-- (NSDictionary*) dataRecordDescription
-{
-	NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
-	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 @"SNOPDecoderForRHDR", @"decoder",
-                                 [NSNumber numberWithLong:[self rhdrDataId]], @"dataId",
-                                 [NSNumber numberWithBool:NO],	@"variable",
-                                 [NSNumber numberWithLong:20], @"length",
-                                 nil];
-	[dataDictionary setObject:aDictionary forKey:@"snopRhdrBundle"];
-    
-	NSDictionary* bDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 @"SNOPDecoderForEPED", @"decoder",
-                                 [NSNumber numberWithLong:[self epedDataId]], @"dataId",
-                                 [NSNumber numberWithBool:NO], @"variable",
-                                 [NSNumber numberWithLong:11], @"length",
-                                 nil];
-	[dataDictionary setObject:bDictionary forKey:@"snopEpedBundle"];
-    
-	return dataDictionary;
-}
-
-
 #pragma mark ¥¥¥SnotDbDelegate
 
 - (ORCouchDB*) orcaDbRef:(id)aCouchDelegate
@@ -1921,8 +2072,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 }
 
 - (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
- {
-
+{
      ORCouchDB* result = [ORCouchDB couchHost:self.orcaDBIPAddress
                                          port:self.orcaDBPort
                                      username:self.orcaDBUserName
@@ -1951,9 +2101,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     return [[result retain] autorelease];
 }
 
-
 #pragma mark ¥¥¥OrcaScript helpers
-
 
 - (void) zeroPedestalMasks
 {
@@ -1961,20 +2109,8 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
      makeObjectsPerformSelector:@selector(zeroPedestalMasks)];
 }
 
-- (void) updatePedestalMasks:(unsigned int)pattern
+- (void) hvMasterTriggersOFF
 {
-    
-    unsigned int** pt_step = (unsigned int**) pattern;
-    NSLog(@"aaa 0x%08x\n", pt_step);
-    
-    //unsigned int* pt_step_crate = pt_step[0];
-    
-}
-
-- (void)hvMasterTriggersOFF
-{
-    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(setIsPollingXl3:) withObject:NO];
-
     [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersOFF)];
 }
 
@@ -2153,7 +2289,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     if([[standardRunCollection objectForKey:standardRunType] count] == 0){
         [self setStandardRunVersion:@""];
     }
-    //If EXPERT mode: check if previous selected run version exists
+    //Check if previous selected run version exists
     if([[standardRunCollection objectForKey:standardRunType] objectForKey:standardRunVersion] == nil){
         //If not, select DEFAULT
         [self setStandardRunVersion:@"DEFAULT"];
@@ -2190,7 +2326,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     lastStandardRunType = [aValue copy];
 }
 
-- (NSString*)lastStandardRunVersion
+- (NSString*) lastStandardRunVersion
 {
     return lastStandardRunVersion;
 }
@@ -2201,7 +2337,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     lastStandardRunVersion = [aValue copy];
 }
 
-- (NSNumber*)standardRunTableVersion
+- (NSNumber*) standardRunTableVersion
 {
     return standardRunTableVersion;
 }
@@ -2212,20 +2348,18 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     standardRunTableVersion = [aValue copy];
 }
 
-- (ECARun*) anECARun{
+- (ECARun*) anECARun
+{
     return anECARun;
 }
 
 - (void) startECARunInParallel
 {
-
     [anECARun start];
-
 }
 
--(BOOL) startStandardRun:(NSString*)_standardRun withVersion:(NSString*)_standardRunVersion
+- (BOOL) startStandardRun:(NSString*)_standardRun withVersion:(NSString*)_standardRunVersion
 {
-
     /* Get RC model */
     ORRunModel *aRunModel = nil;
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
@@ -2266,13 +2400,10 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     }
 
     return true;
-
 }
 
-
--(void) stopRun
+- (void) stopRun
 {
-
     ORRunModel *aRunModel = nil;
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if ([objs count]) {
@@ -2284,24 +2415,20 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 
     [aRunModel quitSelectedRunScript];
     [aRunModel performSelector:@selector(haltRun)withObject:nil afterDelay:.1];
-
 }
 
--(BOOL) refreshStandardRunsFromDB
+- (BOOL) refreshStandardRunsFromDB
 {
     // Prune the Standard Runs collection
     [standardRunCollection removeAllObjects];
 
     // First add Off-line standard runs
-    NSMutableDictionary* runSettings = [[NSMutableDictionary alloc] init];
-    NSMutableDictionary* versionCollection = [[NSMutableDictionary alloc] init];
-    NSNumber* diagRunType = [[NSNumber alloc] initWithInt:kDiagnosticRun];
+    NSMutableDictionary* runSettings = [NSMutableDictionary dictionary];
+    NSMutableDictionary* versionCollection = [NSMutableDictionary dictionary];
+    NSNumber* diagRunType = [NSNumber numberWithInt:kDiagnosticRun];
     [runSettings setObject:diagRunType forKey:@"run_type_word"];
-    [versionCollection setObject:[runSettings copy] forKey:@"DEFAULT"];
-    [standardRunCollection setObject:[versionCollection copy] forKey:@"DIAGNOSTIC"];
-    [versionCollection release];
-    [runSettings release];
-    [diagRunType release];
+    [versionCollection setObject:runSettings forKey:@"DEFAULT"];
+    [standardRunCollection setObject:versionCollection forKey:@"DIAGNOSTIC"];
 
     // Now query DB and fetch the SRs
     NSString *urlString, *link, *ret;
@@ -2351,7 +2478,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         NSDictionary *runsettings = [aStandardRun valueForKey:@"doc"];
         if ([runtype isEqualToString:@"DIAGNOSTIC"]) continue; // Diagnostic is a protected name
         if ([standardRunCollection objectForKey:runtype] == nil) {
-            [standardRunCollection setObject:[[NSMutableDictionary alloc] init] forKey:runtype];
+            [standardRunCollection setObject:[NSMutableDictionary dictionary] forKey:runtype];
         }
         [[standardRunCollection objectForKey:runtype] setObject:runsettings forKey:runversion];
     }
@@ -2394,7 +2521,7 @@ err:
 }
 
 // Load Detector Settings from the DB into the Models
--(BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion
+- (BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion
 {
     NSMutableDictionary* runSettings = [[[self standardRunCollection] objectForKey:runTypeName] objectForKey:runVersion];
     if(runSettings == nil){
@@ -2448,7 +2575,7 @@ err:
 }
 
 //Save MTC settings in a Standard Run table in CouchDB for later use by the Run Scripts or the user
--(BOOL) saveStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion
+- (BOOL) saveStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion
 {
     // Check that runTypeName is properly set:
     if (runTypeName == nil || runVersion == nil) {
@@ -2510,9 +2637,8 @@ err:
 }
 
 //Ship GUI settings to hardware
--(void) loadSettingsInHW
+- (void) loadSettingsInHW
 {
-
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     ORMTCModel* mtc;
     if ([objs count]) {
@@ -2534,56 +2660,6 @@ err:
     }
     
     NSLog(@"Settings loaded in Hardware \n");
-
 }
 
-@end
-@implementation SNOPDecoderForRHDR
-
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
-{
-	unsigned long* ptr = (unsigned long*)someData;
-	unsigned long length = ExtractLength(*ptr);
-	return length; //must return number of bytes processed.
-}
-
-- (NSString*) dataRecordDescription:(unsigned long*)dataPtr
-{
-    NSMutableString* dsc = [NSMutableString stringWithFormat: @"RHDR record\n\n"];
-    
-    [dsc appendFormat:@"date: %ld\n", dataPtr[2]];
-    [dsc appendFormat:@"time: %ld\n", dataPtr[3]];
-    [dsc appendFormat:@"daq ver: %ld\n", dataPtr[4]];
-    [dsc appendFormat:@"run num: %ld\n", dataPtr[5]];
-    [dsc appendFormat:@"calib trial: %ld\n", dataPtr[6]];
-    [dsc appendFormat:@"src msk: 0x%08lx\n", dataPtr[7]];
-    [dsc appendFormat:@"run msk: 0x%016llx\n", (unsigned long long)(dataPtr[8] | (((unsigned long long)dataPtr[12]) << 32))];
-    [dsc appendFormat:@"crate mask: 0x%08lx\n", dataPtr[9]];
-    
-    return [[dsc retain] autorelease];
-}
-@end
-
-@implementation SNOPDecoderForEPED
-
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
-{
-	unsigned long* ptr = (unsigned long*)someData;
-	unsigned long length = ExtractLength(*ptr);
-	return length; //must return number of bytes processed.
-}
-
-- (NSString*) dataRecordDescription:(unsigned long*)dataPtr
-{
-    NSMutableString* dsc = [NSMutableString stringWithFormat: @"EPED record\n\n"];
-
-    [dsc appendFormat:@"coarse delay: %ld nsec\n", dataPtr[3]];
-    [dsc appendFormat:@"fine delay: %ld clicks\n", dataPtr[4]];
-    [dsc appendFormat:@"charge amp: %ld clicks\n", dataPtr[5]];
-    [dsc appendFormat:@"ped width: %ld nsec\n", dataPtr[2]];
-    [dsc appendFormat:@"cal type: 0x%08lx\n", dataPtr[7]];
-    [dsc appendFormat:@"step num: %ld\n", dataPtr[6]];
-    
-    return [[dsc retain] autorelease];
-}
 @end

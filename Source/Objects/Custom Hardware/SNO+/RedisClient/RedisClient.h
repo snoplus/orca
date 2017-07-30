@@ -29,5 +29,5 @@
 - (redisReply*) vcommand: (const char*) fmt args:(va_list) args;
 - (redisReply*) command: (const char *) fmt, ...;
 - (void) okCommand: (const char *) fmt, ...;
-- (int) intCommand: (const char *) fmt, ...;
+- (long long) intCommand: (const char *) fmt, ...;
 @end

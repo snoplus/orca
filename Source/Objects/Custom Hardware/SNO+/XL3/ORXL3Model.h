@@ -290,6 +290,7 @@ enum {
 - (void) documentClosed;
 - (void) detectorStateChanged:(NSNotification*)aNote;
 - (int) initAtRunStart;
+- (void) zeroPedestalMasksAtRunStart;
 
 #pragma mark •••Accessors
 - (BOOL) isTriggerON;
@@ -407,6 +408,7 @@ enum {
 - (void) compositeXl3RW;
 - (void) compositeQuit;
 - (int) setPedestals;
+- (int) multiSetPedestalMask: (uint32_t) slotMask patterns: (uint32_t[16]) patterns;
 - (int) setPedestalMask: (uint32_t) slotMask pattern: (uint32_t) pattern;
 - (void) compositeSetPedestal;
 - (void) setPedestalInParallel;
@@ -441,6 +443,7 @@ enum {
 
 - (void) setHVRelays:(unsigned long long)relayMask error:(unsigned long*)aError;
 - (void) setHVRelays:(unsigned long long)relayMask;
+- (void) readHVRelays:(uint64_t*) relayMask isKnown:(BOOL*)isKnown;
 - (void) closeHVRelays;
 - (void) openHVRelays;
 
@@ -448,6 +451,8 @@ enum {
 - (void) readHVSwitchOnForA:(BOOL*)aIsOn forB:(BOOL*)bIsOn;
 - (void) readHVSwitchOn;
 
+- (uint32_t) checkRelays:(uint64_t)relays;
+- (BOOL) isHVAdvisable:(unsigned char) sup;
 
 + (bool) requestHVParams:(ORXL3Model *)model;
 - (void) safeHvInit;

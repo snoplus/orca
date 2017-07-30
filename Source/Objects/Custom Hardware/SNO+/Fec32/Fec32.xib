@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14B25" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9531" systemVersion="15C50" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
-        <development version="5100" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
+        <development version="6300" identifier="xcode"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9531"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ORFec32Controller">
@@ -81,7 +81,7 @@
                         <tabViewItems>
                             <tabViewItem label="Config/Rates" identifier="1" id="182">
                                 <view key="view" id="183">
-                                    <rect key="frame" x="10" y="25" width="449" height="504"/>
+                                    <rect key="frame" x="10" y="29" width="449" height="500"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <matrix verticalHuggingPriority="750" mode="track" allowsEmptySelection="NO" autosizesCells="NO" id="878">
@@ -149,7 +149,7 @@
                                             </connections>
                                         </matrix>
                                         <matrix verticalHuggingPriority="750" mode="track" allowsEmptySelection="NO" autosizesCells="NO" id="890">
-                                            <rect key="frame" x="150" y="430" width="286" height="20"/>
+                                            <rect key="frame" x="150" y="426" width="286" height="20"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             <size key="cellSize" width="20" height="20"/>
@@ -344,7 +344,7 @@
                                             </connections>
                                         </customView>
                                         <matrix verticalHuggingPriority="750" mode="track" allowsEmptySelection="NO" autosizesCells="NO" id="934">
-                                            <rect key="frame" x="150" y="449" width="286" height="20"/>
+                                            <rect key="frame" x="150" y="445" width="286" height="20"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             <size key="cellSize" width="20" height="20"/>
@@ -1242,8 +1242,6 @@
                                                     </matrix>
                                                 </subviews>
                                             </view>
-                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <textField verticalHuggingPriority="750" id="276">
                                             <rect key="frame" x="27" y="212" width="315" height="51"/>
@@ -2615,19 +2613,13 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <box verticalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="M3g-QX-IQP">
+                                        <box verticalHuggingPriority="750" boxType="separator" id="M3g-QX-IQP">
                                             <rect key="frame" x="157" y="446" width="191" height="5"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <font key="titleFont" metaFont="system"/>
                                         </box>
-                                        <box horizontalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="gPS-Kv-Ci9">
+                                        <box horizontalHuggingPriority="750" boxType="separator" id="gPS-Kv-Ci9">
                                             <rect key="frame" x="155" y="62" width="5" height="387"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <font key="titleFont" metaFont="system"/>
                                         </box>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="2xZ-k3-Fb2">
                                             <rect key="frame" x="163" y="33" width="271" height="14"/>
@@ -2638,12 +2630,9 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <box horizontalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="6Ph-Bv-0BG">
+                                        <box horizontalHuggingPriority="750" boxType="separator" id="6Ph-Bv-0BG">
                                             <rect key="frame" x="144" y="28" width="5" height="34"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <font key="titleFont" metaFont="system"/>
                                         </box>
                                         <textField verticalHuggingPriority="750" id="mXa-Kq-KKi">
                                             <rect key="frame" x="36" y="6" width="205" height="19"/>
@@ -2737,8 +2726,6 @@
                                 </textField>
                             </subviews>
                         </view>
-                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     </box>
                     <popUpButton verticalHuggingPriority="750" id="1381">
                         <rect key="frame" x="495" y="552" width="183" height="22"/>
@@ -2769,7 +2756,7 @@
                         <tabViewItems>
                             <tabViewItem label="Voltages" identifier="1" id="1388">
                                 <view key="view" id="1389">
-                                    <rect key="frame" x="10" y="33" width="171" height="330"/>
+                                    <rect key="frame" x="10" y="7" width="165" height="346"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" autosizesCells="NO" id="1241">
@@ -3118,7 +3105,7 @@
                                             </cells>
                                         </matrix>
                                         <button verticalHuggingPriority="750" id="1142">
-                                            <rect key="frame" x="8" y="24" width="120" height="32"/>
+                                            <rect key="frame" x="8" y="40" width="120" height="32"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Read Voltages" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1918">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>

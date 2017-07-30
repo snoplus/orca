@@ -91,6 +91,7 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
     return self;
 }
 - (void) dealloc {
+    [_keepAliveThread release];
     [connection release];
     [super dealloc];
 
@@ -167,31 +168,13 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
 }
 
 #pragma mark •••Network Communication
-- (void) sendOkCmd:(NSString* const)aCmd {
-    [self sendOkCmd:aCmd print:YES];
-}
-- (void) sendOkCmd:(NSString* const)aCmd print:(BOOL)printCheck{
-    @try {
-        if(printCheck){
-            NSLog(@"Sending %@ to TUBii\n",aCmd);
-        }
-        [connection okCommand: [aCmd UTF8String]];
-    }
-    @catch (NSException *exception) {
-        if(printCheck){
-            NSLogColor([NSColor redColor],@"Command: %@ failed.  Reason: %@\n", aCmd,[exception reason]);
-        }
-    }
+- (void) sendOkCmd:(NSString* const)aCmd{
+    NSLog(@"Sending %@ to TUBii\n",aCmd);
+    [connection okCommand: [aCmd UTF8String]];
 }
 - (int) sendIntCmd: (NSString* const) aCmd {
-    @try {
-        NSLog(@"Sending %@ to TUBii\n",aCmd);
-        return [connection intCommand: [aCmd UTF8String]];
-    }
-    @catch (NSException *exception) {
-        NSLogColor([NSColor redColor],@"Command: %@ failed.  Reason: %@\n", aCmd,[exception reason]);
-        return nil;
-    }
+    NSLog(@"Sending %@ to TUBii\n",aCmd);
+    return [connection intCommand: [aCmd UTF8String]];
 }
 #pragma mark •••HW Access
 - (void) Initialize {
@@ -283,6 +266,10 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
     // specified by it's internal variables which can be set with
     // setTellieRate setTelliePulseWidth setTellieNPulses
     NSString* command = [NSString stringWithFormat:@"SetTelliePulser %f %f %d", tellieRate,telliePulseWidth,tellieNPulses];
+    [self sendOkCmd:command];
+}
+- (void) setTellieMode:(BOOL) _tellieMode{
+    NSString* command = [NSString stringWithFormat:@"SetTellieMode %d",_tellieMode];
     [self sendOkCmd:command];
 }
 - (void) stopTelliePulser {
@@ -418,11 +405,11 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
 }
 - (NSUInteger) syncTrigMask {
     // See comment in setTrigMask for info.
-    return [connection intCommand: "GetSyncTriggerMask"];
+    return [self sendIntCmd:@"GetSyncTriggerMask"];
 }
 - (NSUInteger) asyncTrigMask {
     // See comment in setTrigMask for info.
-    return [connection intCommand: "GetAsyncTriggerMask"];
+    return [self sendIntCmd:@"GetAsyncTriggerMask"];
 }
 - (void) setSmellieDelay:(NSUInteger)_smellieDelay {
     // This specifies (in nanoseconds) how long the MicroZed should delay a pulse that
@@ -434,7 +421,7 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
 }
 - (NSUInteger) smellieDelay {
     // See comments setSmellieDelay for info
-    return [connection intCommand: "GetSmellieDelay"];
+    return [self sendIntCmd:@"GetSmellieDelay"];
 }
 - (void) setTellieDelay:(NSUInteger)_tellieDelay {
     // This specifies (in nanoseconds) how long the MicroZed should delay a pulse that
@@ -789,19 +776,20 @@ NSString* ORTubiiLock				= @"ORTubiiLock";
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
     int counter = 0;
-    __block bool exceptionCheck = false;
+    __block BOOL exceptionCheck = NO;
     while (![[self keepAliveThread] isCancelled]) {
         dispatch_sync(dispatch_get_main_queue(), ^{
             @try{
                 [connection okCommand:"keepAlive"];
             } @catch(NSException* e) {
                 NSLogColor([NSColor redColor], @"[TUBii]: Problem sending keep alive to TUBii server, reason: %@\n", [e reason]);
-                exceptionCheck = true;
+                exceptionCheck = YES;
             }
         });
-        if(exceptionCheck) {
+        if(exceptionCheck){
             break;
         }
+        
         [NSThread sleepForTimeInterval:0.5];
 
         // This is a very long running thread need to relase the pool every so often

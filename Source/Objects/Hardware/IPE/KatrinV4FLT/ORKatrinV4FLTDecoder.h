@@ -41,13 +41,6 @@
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 @end
 
-@interface ORKatrinV4FLTDecoderForEnergyTrace : ORKatrinV4FLTDecoderForEnergy {
-}
-// Documentation in m-file
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
-- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
-@end
-
 @interface ORKatrinV4FLTDecoderForHitRate : ORIpeCardDecoder {
 }
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;

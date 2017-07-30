@@ -23,7 +23,7 @@
 #define kIpeFlt_Cntl_InterruptMask_Mask		0xff
 
 #define kIpeFlt_Cntl_LedOff_Shift			17
-#define kIpeFlt_Cntl_LedOff_Mask				0x1
+#define kIpeFlt_Cntl_LedOff_Mask			0x1
 
 #define kIpeFlt_Cntl_HitRateLength_Shift	18   
 #define kIpeFlt_Cntl_HitRateLength_Mask		0x7 

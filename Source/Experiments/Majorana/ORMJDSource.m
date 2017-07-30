@@ -76,7 +76,7 @@ static MJDSourceStateInfo state_info [kMJDSource_NumStates] = {
 
 @implementation ORMJDSource
 
-@synthesize delegate,slot,isDeploying,isRetracting,currentState;
+@synthesize delegate,speed,slot,isDeploying,isRetracting,currentState;
 @synthesize sourceIsIn,stateStatus,firstTime,order,runningTime,gateValveIsOpen;
 
 NSString* ORMJDSourceModeChanged            = @"ORMJDSourceModeChanged";
@@ -92,7 +92,8 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
     self            = [super init];
     self.slot       = aSlot;
     self.delegate   = aDelegate;
-    return self;
+    self.speed      = 250; //default -- used to be 175
+   return self;
 }
 
 - (void) dealloc
@@ -844,9 +845,8 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
 
 - (void) sendDeploymentCommand
 {
-    NSLog(@"Module %d Starting source deployment\n",slot+1);
-
-    NSString* motionCmd = @"PM-1,C,SA1M175,LM0,I1M-45000,L0,R";
+    NSLog(@"Module %d Starting source deployment at %d steps/sec\n",slot+1,self.speed);
+    NSString* motionCmd = [NSString stringWithFormat:@"PM-1,C,SA1M%d,LM0,I1M-45000,L0,R",self.speed];
     NSMutableArray* cmds = [NSMutableArray arrayWithObjects:
                             @"[ORVXMModel,1 enableMotor:0];",
                             @"[ORVXMModel,1 setUseCmdQueue:0];",
@@ -858,8 +858,8 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
 
 - (void) sendRetractionCommand
 {
-    NSLog(@"Module %d Starting source retraction\n",slot+1);
-    NSString* motionCmd = @"PM-1,C,SA1M175,LM0,I1M45000,L0,R";
+    NSLog(@"Module %d Starting source retraction at %d steps/sec\n",slot+1,self.speed);
+    NSString* motionCmd = [NSString stringWithFormat:@"PM-1,C,SA1M%d,LM0,I1M45000,L0,R",self.speed];
     NSMutableArray* cmds = [NSMutableArray arrayWithObjects:
                             @"[ORVXMModel,1 enableMotor:0];",
                             @"[ORVXMModel,1 setUseCmdQueue:0];",

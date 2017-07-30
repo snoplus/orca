@@ -61,7 +61,7 @@
 {
 	detectorSize		 = NSMakeSize(770,740);
 	detailsSize			 = NSMakeSize(560,600);
-	subComponentViewSize = NSMakeSize(590,630);
+	subComponentViewSize = NSMakeSize(590,665);
 	detectorMapViewSize	 = NSMakeSize(900,760);
     vetoMapViewSize		 = NSMakeSize(580,565);
     calibrationViewSize	 = NSMakeSize(580,320);
@@ -264,6 +264,12 @@
                      selector : @selector(maxNonCalibrationRateChanged:)
                          name : ORMajoranaModelMaxNonCalibrationRate
                        object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(verboseDiagnosticsChanged:)
+                         name : ORMajoranaModelVerboseDiagnosticsChanged
+                       object : nil];
+
 }
 
 
@@ -299,6 +305,7 @@
     [self updateLastConstraintCheck:nil];
     [self breakdownDetectedChanged:nil];
     [self sourceStateChanged:nil];
+    [self verboseDiagnosticsChanged:nil];
     
     //Source
     [self calibrationLockChanged:nil];
@@ -308,6 +315,11 @@
     [self sourcePatternChanged:nil];
     [self sourceGatevalveChanged:nil];
     [self sourceIsInChanged:nil];
+}
+
+- (void) verboseDiagnosticsChanged:(NSNotification*)aNote
+{
+    [verboseDiagnosticsCB setState:[model verboseDiagnostics]];
 }
 
 - (void) sourceIsInChanged:(NSNotification*)aNote
@@ -452,47 +464,20 @@
 - (void) breakdownDetectedChanged:(NSNotification*)aNote
 {
 #define kIgnore 2
-    NSDictionary* rateSpikes     = [model rateSpikes];
-    if([rateSpikes count]==0){
-        [rate1BiState setState:[model ignoreBreakdownCheckOnB]?kIgnore:1];
-        [rate2BiState setState:[model ignoreBreakdownCheckOnA]?kIgnore:1];
-    }
-    else {
-        for(id aKey in [rateSpikes allKeys]){
-            int crate = [aKey intValue]; //pick off the crate value
-            if(crate==1)      [rate1BiState setState:[model ignoreBreakdownCheckOnB ]?kIgnore:0];
-            else if(crate==2) [rate2BiState setState:[model ignoreBreakdownCheckOnA ]?kIgnore:0];
-        }
-    }
-    
-    NSDictionary* baselineSpikes = [model baselineSpikes];
-    if([baselineSpikes count]==0){
-        [baseline1BiState setState:[model ignoreBreakdownCheckOnB]?kIgnore:1];
-        [baseline2BiState setState:[model ignoreBreakdownCheckOnA]?kIgnore:1];
-    }
-    else {
-        for(id aKey in [baselineSpikes allKeys]){
-           int crate = [aKey intValue]; //pick off the crate value
-            if(crate==1)      [baseline1BiState setState:[model ignoreBreakdownCheckOnB]?kIgnore:0];
-           else if(crate==2) [baseline2BiState setState: [model ignoreBreakdownCheckOnA ]?kIgnore:0];
-        }
-    }
-    
-    
-    if([model vacuumSpike:0])   [vac1BiState setState:[model ignoreBreakdownCheckOnB]?kIgnore:0];
-    else                        [vac1BiState setState:[model ignoreBreakdownCheckOnB]?kIgnore:1];
-  
-    
-    if([model vacuumSpike:1])   [vac2BiState setState:[model ignoreBreakdownCheckOnA]?kIgnore:0];
-    else                        [vac2BiState setState:[model ignoreBreakdownCheckOnA]?kIgnore:1];
+    [rate1BiState     setState:[model ignoreBreakdownCheckOnB]?kIgnore:![model rateSpikes:0]];
+    [rate2BiState     setState:[model ignoreBreakdownCheckOnA]?kIgnore:![model rateSpikes:1]];
+    [baseline1BiState setState:[model ignoreBreakdownCheckOnB]?kIgnore:![model baselineExcursions:0]];
+    [baseline2BiState setState:[model ignoreBreakdownCheckOnA]?kIgnore:![model baselineExcursions:1]];
+    [vac1BiState      setState:[model ignoreBreakdownCheckOnB]?kIgnore:![model vacuumSpike:0]];
+    [vac2BiState      setState:[model ignoreBreakdownCheckOnA]?kIgnore:![model vacuumSpike:1]];
     
     if([model ignoreBreakdownCheckOnB]){
         [breakdown1Field setStringValue:@"Skipped"];
         [filling1Field   setStringValue:@"Skipped"];
     }
     else {
-        if([model fillingLN:0])     [filling1Field setStringValue:@"YES"];
-        else                        [filling1Field setStringValue:@"NO"];
+        if([model fillingLN:0])             [filling1Field setStringValue:@"YES"];
+        else                                [filling1Field setStringValue:@"NO"];
         if([model breakdownAlarmPosted:0])  [breakdown1Field setStringValue:@"YES"];
         else                                [breakdown1Field setStringValue:@"NO"];
     }
@@ -939,6 +924,12 @@
 
 
 #endif
+
+- (IBAction) verboseDiagnosticsAction:(id)sender;
+{
+    [model setVerboseDiagnostics:[sender intValue]];
+}
+
 - (IBAction) initDigitizerAction:(id)sender
 {
     [model initDigitizers];
@@ -959,6 +950,7 @@
     [[model mjdInterlocks:1] reset:YES];
     [model setPollTime:[model pollTime]];
 }
+- (IBAction) printBreakDownReport:(id)sender    {[model printBreakDownReport];}
 
 - (IBAction) checkSourceGateValve0:(id)sender   {[model checkSourceGateValve:0];}
 - (IBAction) deploySourceAction0:(id)sender     {[model deploySource:0];}
@@ -1091,11 +1083,6 @@
             [[model segmentGroup:1] saveMapFileAs:[[savePanel URL]path]];
         }
     }];
-}
-
-- (IBAction) printBreakdownReport:(id)sender
-{
-    [model printBreakdownReport];
 }
 
 #pragma mark ¥¥¥Table Data Source

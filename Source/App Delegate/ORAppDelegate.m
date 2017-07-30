@@ -121,7 +121,10 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 	NSString* noKill				 = [standardDefaults stringForKey:@"startup"];
 	if(![noKill isEqualToString:@"NoKill"]){
         NSString* bundleID = [[NSRunningApplication currentApplication] bundleIdentifier];
-		NSArray* launchedApps = [NSRunningApplication runningApplicationsWithBundleIdentifier:bundleID];
+        NSArray* launchedApps = nil;
+        if(bundleID){
+             launchedApps = [NSRunningApplication runningApplicationsWithBundleIdentifier:bundleID];
+        }
         if([launchedApps count]>1)[NSApp terminate:self];
 
 	}
@@ -357,12 +360,6 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 {
     //we implement this method ONLY so we can do the validation of the menu item
 	//nothing to do... everything is in the submenu and handled by the doc controller
-}
-
-- (IBAction) performClose:(id)sender
-{
-	[[self undoManager] removeAllActions];
-    [[NSDocumentController sharedDocumentController] performClose:sender];
 }
 
 - (IBAction) terminate:(id)sender

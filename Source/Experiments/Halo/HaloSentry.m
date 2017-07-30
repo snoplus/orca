@@ -73,6 +73,7 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
     [sentryLog release];
     [toggleTimer invalidate];
     [toggleTimer release];
+    [nextToggleTime release];
     
     [self clearAllAlarms];
     
@@ -552,6 +553,16 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 }
 
 //SV
+//MAH -- added setter because that's the way to do things
+- (void) setNextToggleTime:(NSString*)aString
+{
+    
+    [nextToggleTime autorelease];
+    nextToggleTime = [aString copy];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryToggleIntervalChanged object:self];
+}
+
 - (NSString*) nextToggleTime
 {
     if(!nextToggleTime) nextToggleTime = @"None scheduled"; //MAH -- can never have nil string
@@ -568,29 +579,25 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
     
     toggleInterval = seconds;
     [self appendToSentryLog:[NSString stringWithFormat:@"Toggle interval set to %i day(s)", toggleInterval/86400]];
-    if(toggleTimer==0){ nextToggleTime = @"None scheduled"; }
+    if(toggleTimer==0) [self setNextToggleTime:@"None scheduled"];
     
     //If timer was already running, restart with new setup/toggle interval
-    if([toggleTimer isValid])
-    {
+    if([toggleTimer isValid]) {
         [self appendToSentryLog:@"Resetting timer"];
         [self stopTimer];
         [self startTimer];
     }
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryToggleIntervalChanged object:self];
 }
 
 //SV
 - (void) startTimer
 {
-    if (toggleInterval > 0 && sentryIsRunning)
-    {
+    if (toggleInterval > 0 && sentryIsRunning){
         [self appendToSentryLog:@"Starting sentry timer"];
         if ([toggleTimer isValid]){ [toggleTimer release]; }
         toggleTimer = [[NSTimer scheduledTimerWithTimeInterval:toggleInterval target:self selector:@selector(waitForEndOfRun:) userInfo:nil repeats:NO] retain];
-        nextToggleTime = [NSString stringWithFormat:@"%@", [[[NSDate date] dateByAddingTimeInterval:toggleInterval] stdDescription]];
-        [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryToggleIntervalChanged object:self];
+        [self setNextToggleTime:[NSString stringWithFormat:@"%@", [[[NSDate date] dateByAddingTimeInterval:toggleInterval] stdDescription]]];
     }
 }
 
@@ -605,8 +612,7 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
         toggleTimer = nil;
     }
     
-    nextToggleTime = @"None scheduled";
-    [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryToggleIntervalChanged object:self];
+    [self setNextToggleTime : @"None scheduled"];
 }
 
 //SV
@@ -632,12 +638,12 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
         [self appendToSentryLog:@"Waiting for local run to end"];
         scheduledToggleTime = TRUE;
         [runControl setIgnoreRepeat:TRUE];
-        nextToggleTime = @"Waiting for end of run";
+        [self setNextToggleTime : @"Waiting for end of run"];
     }
     
     else{
         [self appendToSentryLog:@"Timer was stopped"];
-        nextToggleTime = @"None scheduled";
+        [self setNextToggleTime : @"None scheduled"];
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryToggleIntervalChanged object:self];
 }
@@ -1385,20 +1391,15 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
             [self setRemoteMachineReachable:eYES];
         }
         else {
-            ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
-            pingTask = [[NSTask alloc] init];
+            pingTask = [[ORPingTask pingTaskWithDelegate:self] retain];
             
-            [pingTask setLaunchPath:@"/sbin/ping"];
-            [pingTask setArguments: [NSArray arrayWithObjects:@"-c",@"1",@"-t",@"10",@"-q",otherSystemIP,nil]];
+            pingTask.launchPath= @"/sbin/ping";
+            pingTask.arguments = [NSArray arrayWithObjects:@"-c",@"1",@"-t",@"10",@"-q",otherSystemIP,nil];
             
-            [aSequence addTaskObj:pingTask];
-            [aSequence setVerbose:NO];
-            [aSequence setTextToDelegate:YES];
-            [aSequence launch];
+            pingTask.verbose = NO;
+            pingTask.textToDelegate = YES;
+            [pingTask ping];
         }
-    }
-    else {
-        [pingTask terminate];
     }
 }
 
@@ -1408,13 +1409,13 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 	return pingTask != nil;
 }
 
-- (void) tasksCompleted:(id)sender
+- (void) taskFinished:(ORPingTask*)aTask
 {
-    [pingTask release];
-    pingTask = nil;
-
+    if(aTask == pingTask){
+        [pingTask release];
+        pingTask = nil;
+    }
 }
-
 - (void) taskData:(NSString*)text
 {
     if([text rangeOfString:@"100.0% packet loss"].location != NSNotFound){

@@ -28,6 +28,10 @@
 {
     IBOutlet NSTabView* 	tabView;
     IBOutlet NSTextField*   moduleIDField;
+    IBOutlet NSTextField*   hwVersionField;
+    IBOutlet NSTextField*   gammaRevisionField;
+    IBOutlet NSTextField*   revisionField;
+    IBOutlet NSTextField*   serialNumberField;
 	
 	//base address
     IBOutlet NSTextField*   slotField;
@@ -38,13 +42,17 @@
     IBOutlet NSMatrix*		heSuppressTrigModeMatrix;
     IBOutlet NSMatrix*		cfdControlMatrix;
     IBOutlet NSMatrix*		thresholdMatrix;
+    IBOutlet NSMatrix*      thresholdSumMatrix;
     IBOutlet NSMatrix*		energyDividerMatrix;
     IBOutlet NSMatrix*		energySubtractorMatrix;
     IBOutlet NSMatrix*		tauFactorMatrix;
     IBOutlet NSMatrix*		gapTimeMatrix;
     IBOutlet NSMatrix*		peakingTimeMatrix;
+    IBOutlet NSMatrix*      extraFilterMatrix;
+    IBOutlet NSMatrix*      tauTableMatrix;
     
     IBOutlet NSMatrix*		heTrigThresholdMatrix;
+    IBOutlet NSMatrix*      heTrigThresholdSumMatrix;
     IBOutlet NSMatrix*		trigBothEdgesMatrix;
     IBOutlet NSMatrix*		intHeTrigOutPulseMatrix;
     IBOutlet NSMatrix*		intTrigOutPulseBitsMatrix;
@@ -81,15 +89,18 @@
     //------------------------------
 	//CSR
 	IBOutlet NSMatrix*		csrMatrix;
-	IBOutlet NSMatrix*		acqMatrix;
+	IBOutlet NSMatrix*		acquisitionControlMatrix;
 	IBOutlet NSMatrix*		eventConfigMatrix;
 	
 	IBOutlet NSButton*		stopTriggerButton;
 	IBOutlet NSButton*		randomClockButton;
-	IBOutlet NSButton*		startDelayEnabledButton;
 	IBOutlet NSButton*		stopDelayEnabledButton;
 	IBOutlet NSButton*		writeThresholdButton;
 	IBOutlet NSButton*		readThresholdButton;
+    IBOutlet NSButton*      writeAcquisitionControlButton;
+    IBOutlet NSButton*      readAcquisitionControlButton;
+    IBOutlet NSButton*      writeHistogramConfigurationButton;
+    IBOutlet NSButton*      readHistogramConfigurationButton;
 	IBOutlet NSTextField*	startDelayField;
 	IBOutlet NSPopUpButton* clockSourcePU;
 	IBOutlet NSTextField*	stopDelayField;
@@ -114,7 +125,8 @@
     IBOutlet NSButton*				  totalRateLogCB;
     IBOutlet ORCompositeTimeLineView* timeRatePlot;
     IBOutlet NSButton*				  timeRateLogCB;
-	
+    IBOutlet NSTextField*   temperatureField;
+    //IBOutlet NSColorWell*   colorField;
     NSView* blankView;
     NSSize  settingSize;
     NSSize  rateSize;
@@ -127,23 +139,30 @@
 #pragma mark •••Interface Management
 - (void) enabledChanged:(NSNotification*)aNote;
 - (void) thresholdChanged:(NSNotification*)aNote;
+- (void) thresholdSumChanged: (NSNotification*)aNote;
 - (void) energyDividerChanged:(NSNotification*)aNote;
 - (void) energySubtractorChanged:(NSNotification*)aNote;
 - (void) histogramsEnabledChanged:(NSNotification*)aNote;
 - (void) pileupEnabledChanged:(NSNotification*)aNote;
 - (void) clrHistogramWithTSChanged:(NSNotification*)aNote;
 - (void) writeHitsIntoEventMemoryChanged:(NSNotification*)aNote;
+- (void) acquisitionControlChanged: (NSNotification*)aNote;
 
 - (void) tauFactorChanged:(NSNotification*)aNote;
 - (void) gapTimeChanged:(NSNotification*)aNote;
 - (void) peakingTimeChanged:(NSNotification*)aNote;
 - (void) heTrigThresholdChanged:(NSNotification*)aNote;
+- (void) heTrigThresholdSumChanged: (NSNotification*)aNote;
 - (void) trigBothEdgesChanged:(NSNotification*)aNote;
 - (void) intHeTrigOutPulseChanged:(NSNotification*)aNote;
 - (void) intTrigOutPulseBitsChanged:(NSNotification*)aNote;
 - (void) activeTrigGateWindowLenChanged:(NSNotification*)aNote;
 - (void) rawDataBufferLenChanged:(NSNotification*)aNote;
 - (void) rawDataBufferStartChanged:(NSNotification*)aNote;
+
+- (void) accumulatorGateStartChanged:(NSNotification*)aNote;
+- (void) accumulatorGateLengthChanged:(NSNotification*)aNote;
+
 - (void) accGate1LenChanged:(NSNotification*)aNote;
 - (void) accGate1StartChanged:(NSNotification*)aNote;
 - (void) accGate2LenChanged:(NSNotification*)aNote;
@@ -162,7 +181,7 @@
 - (void) accGate8StartChanged:(NSNotification*)aNote;
 
 - (void) csrChanged:(NSNotification*)aNote;
-- (void) acqChanged:(NSNotification*)aNote;
+//- (void) acqChanged:(NSNotification*)aNote;
 - (void) eventConfigChanged:(NSNotification*)aNote;
 
 - (void) stopTriggerChanged:(NSNotification*)aNote;
@@ -181,6 +200,11 @@
 - (void) totalRateChanged:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) moduleIDChanged:(NSNotification*)aNote;
+- (void) hwVersionChanged:(NSNotification*)aNote;
+
+- (void) temperatureChanged:(NSNotification*)aNotification;
+- (void) serialNumberChanged:(NSNotification*)aNotification;
+
 
 - (void) scaleAction:(NSNotification*)aNote;
 - (void) integrationChanged:(NSNotification*)aNote;
@@ -195,12 +219,16 @@
 - (IBAction) heSuppressTrigModeAction:(id)sender;
 - (IBAction) cfdControlAction:(id)sender;
 - (IBAction) thresholdAction:(id)sender;
+- (IBAction) thresholdSumAction:(id)sender;
 - (IBAction) energyDividerAction:(id)sender;
 - (IBAction) energySubtractorAction:(id)sender;
 - (IBAction) tauFactorAction:(id)sender;
 - (IBAction) gapTimeAction:(id)sender;
 - (IBAction) peakingTimeAction:(id)sender;
+- (IBAction) extraFilterAction:(id)sender;
+- (IBAction) tauTableAction:(id)sender;
 - (IBAction) heTrigThresholdAction:(id)sender;
+- (IBAction) heTrigThresholdSumAction:(id)sender;
 - (IBAction) trigBothEdgesAction:(id)sender;
 - (IBAction) intHeTrigOutPulseAction:(id)sender;
 - (IBAction) intTrigOutPulseBitsAction:(id)sender;
@@ -224,11 +252,16 @@
 - (IBAction) accGate7StartAction:(id)sender;
 - (IBAction) accGate8LenAction:(id)sender;
 - (IBAction) accGate8StartAction:(id)sender;
+- (IBAction) acquisitionControlAction:(id)sender;
+
+- (IBAction) writeAccumulatorGateAction:(id)sender;
+- (IBAction) readAccumulatorGateAction:(id)sender;
 
 - (IBAction) writeThresholdsAction:(id)sender;
 - (IBAction) readThresholdsAction:(id)sender;
-- (IBAction) writeHeTrigThresholdsAction:(id)sender;
-- (IBAction) readHeTrigThresholdsAction:(id)sender;
+
+- (IBAction) writeAcquisitionControlAction:(id)sender;
+- (IBAction) readAcquisitionControlAction:(id)sender;
 
 - (IBAction) csrAction:(id)sender;
 - (IBAction) acqAction:(id)sender;
@@ -237,7 +270,6 @@
 
 - (IBAction) stopTriggerAction:(id)sender;
 - (IBAction) randomClockAction:(id)sender;
-- (IBAction) startDelayEnabledAction:(id)sender;
 - (IBAction) stopDelayEnabledAction:(id)sender;
 - (IBAction) stopDelayAction:(id)sender;
 - (IBAction) startDelayAction:(id)sender;

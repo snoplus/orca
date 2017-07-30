@@ -361,6 +361,51 @@ isLoaded = isLoaded;
     return 0;
 }
 
+- (void) zeroPedestalMasksAtRunStart
+{
+    /* Zero the pedestal masks at the start of a run. Normally, this will only
+     * be called at the beginning of a physics run. The reason for doing this
+     * is that it was noticed that the noise on the trigger signal seemed to
+     * depend on how many channels had their pedestal enabled.
+     *
+     * See this shift report for more details:
+     * http://snopl.us/shift/view/9e1ff17e58704756a99f947ec2509f39. */
+    int slot;
+    ORFec32Model *fec;
+
+    /* First, set the pedestal mask in the GUI to zero. */
+    for (slot = 0; slot < 16; slot++) {
+        fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
+
+        if (!fec) continue;
+
+        [fec setPedEnabledMask:0];
+    }
+
+    /* Post a notification telling ORCA not to start the run until we've
+     * finished setting the pedestal masks. */
+    if ([[self xl3Link] isConnected]) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object:self];
+        /* Actually zero the pedestal masks in a separate thread so that they
+         * can be done in parallel at the start of a run. */
+        [NSThread detachNewThreadSelector:@selector(_zeroPedestalMasksAtRunStart)
+                                 toTarget:self
+                               withObject:nil];
+    }
+}
+
+- (void) _zeroPedestalMasksAtRunStart
+{
+    /* This function sets the pedestal mask at the start of the run, and then
+     * posts a notification telling the run model that the run can start. */
+    @autoreleasepool {
+        [self setPedestals];
+
+        /* Tell ORCA that we have finished setting the pedestal masks. */
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORReleaseRunStateChangeWait object:self];
+    }
+}
+
 - (void) runStartDone: (CrateInitResults *) results
 {
     if (results == NULL) {
@@ -1704,24 +1749,24 @@ void SwapLongBlock(void* p, int32_t n)
 - (void) nominalSettingsCallback: (ORPQResult *) result
 {
     int i, nrows, ncols, slot, channel;
-    int n100, n20, sequencer, hv;
+    int n100, n20, sequencer, hv, resistor_pulled;
     ORFec32Model *fec;
 
     if (!result) {
-        NSLog(@"crate %02d: database request for nominal settings failed!\n", [self crateNumber]);
+        NSLogColor([NSColor redColor], @"crate %02d: database request for nominal settings failed!\n", [self crateNumber]);
         return;
     }
 
     nrows = [result numOfRows];
     ncols = [result numOfFields];
 
-    if (ncols != 5) {
-        NSLog(@"crate %02d: expected 5 columns from the database, but got %i!\n", [self crateNumber], ncols);
+    if (ncols != 6) {
+        NSLogColor([NSColor redColor], @"crate %02d: expected 5 columns from the database, but got %i!\n", [self crateNumber], ncols);
         return;
     }
 
     if (nrows != 512) {
-        NSLog(@"crate %02d: expected 512 rows from the database, but got %i!\n", [self crateNumber], nrows);
+        NSLogColor([NSColor redColor], @"crate %02d: expected 512 rows from the database, but got %i!\n", [self crateNumber], nrows);
         return;
     }
 
@@ -1731,22 +1776,30 @@ void SwapLongBlock(void* p, int32_t n)
         n100 = [result getInt64atRow:i column:2];
         n20 = [result getInt64atRow:i column:3];
         sequencer = [result getInt64atRow:i column:4];
+        resistor_pulled = [result getInt64atRow:i column:5];
 
         fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
 
         if (!fec) continue;
 
         /* Check if the relay is open. */
-        hv = ([self relayMask] >> (slot*4 + (3-channel/8))) & 0x1;
-
-        [fec setSeq:channel enabled:sequencer];
+        hv = !resistor_pulled && (([self relayMask] >> (slot*4 + (3-channel/8))) & 0x1);
 
         if (hv) {
             [fec setTrigger100ns:channel enabled:n100];
             [fec setTrigger20ns:channel enabled:n20];
+            if (!sequencer) {
+                NSLogColor([NSColor redColor], @"%02d/%02d/%02d HV is on, "
+                    "turning sequencer on even though nominal state is off!\n",
+                    [self crateNumber], slot, channel);
+            }
+            /* Turn sequencer on regardless of the nominal state if this
+             * channel has HV on. */
+            [fec setSeq:channel enabled:1];
         } else {
             [fec setTrigger100ns:channel enabled:NO];
             [fec setTrigger20ns:channel enabled:NO];
+            [fec setSeq:channel enabled:sequencer];
         }
     }
 
@@ -1765,7 +1818,21 @@ void SwapLongBlock(void* p, int32_t n)
         return;
     }
 
-    [db dbQuery:[NSString stringWithFormat:@"SELECT slot, channel, n100, n20, sequencer FROM current_nominal_settings WHERE crate = %i", [self crateNumber]] object:self selector:@selector(nominalSettingsCallback:) timeout:10.0];
+    NSString *query = [NSString stringWithFormat:
+        @"SELECT current_nominal_settings.slot, "
+         "current_nominal_settings.channel, "
+         "current_nominal_settings.n100, "
+         "current_nominal_settings.n20, "
+         "current_nominal_settings.sequencer, "
+         "current_channel_status.resistor_pulled FROM "
+         "current_nominal_settings, current_channel_status WHERE "
+         "current_nominal_settings.crate   = current_channel_status.crate   AND "
+         "current_nominal_settings.slot    = current_channel_status.slot    AND "
+         "current_nominal_settings.channel = current_channel_status.channel AND "
+         "current_nominal_settings.crate = %i",
+         [self crateNumber]];
+
+    [db dbQuery:query object:self selector:@selector(nominalSettingsCallback:) timeout:10.0];
 }
 
 - (void) _loadTriggersAndSequencers
@@ -2966,6 +3033,41 @@ err:
     return 0;
 }
 
+- (int) multiSetPedestalMask: (uint32_t) slotMask patterns: (uint32_t[16]) patterns
+{
+    /* Similar to setPedestalMask except any slots not in the slot mask will
+     * not have their pedestal mask changed. */
+    int i;
+    char payload[XL3_PAYLOAD_SIZE];
+    MultiSetCratePedsArgs *args;
+    MultiSetCratePedsResults *results;
+
+    memset(&payload, 0, XL3_PAYLOAD_SIZE);
+
+    args = (MultiSetCratePedsArgs *) payload;
+
+    args->slotMask = htonl(slotMask);
+
+    for (i = 0; i < 16; i++) {
+        args->channelMasks[i] = htonl(patterns[i]);
+    }
+
+    @try {
+        [[self xl3Link] sendCommand:MULTI_SET_CRATE_PEDS_ID withPayload:payload
+                        expectResponse:YES];
+    } @catch (NSException *e) {
+        return -1;
+    }
+
+    results = (MultiSetCratePedsResults *) payload;
+
+    if (ntohl(results->errorMask)) {
+        return -1;
+    }
+
+    return 0;
+}
+
 - (int) setPedestalMask: (uint32_t) slotMask pattern: (uint32_t) pattern
 {
     /* Set the pedestal mask for a given slot mask. Any slots not in the mask
@@ -4114,6 +4216,36 @@ err:
     }
 }
 
+- (void) readHVRelays:(uint64_t*) _relayMask isKnown:(BOOL*)isKnown {
+    char payload[XL3_PAYLOAD_SIZE];
+
+    memset(payload, 0, XL3_PAYLOAD_SIZE);
+    GetHVRelaysResults* data = (GetHVRelaysResults*) payload;
+
+    [[self xl3Link] sendCommand:GET_HV_RELAYS_ID withPayload:payload expectResponse:YES];
+
+    uint32_t mask1 = data->mask1;
+    uint32_t mask2 = data->mask2;
+    uint32_t known = data->relays_known;
+
+    if ([xl3Link needToSwap]) {
+        mask1 = swapLong(data->mask1);
+        mask2 = swapLong(data->mask2);
+        known = swapLong(data->relays_known);
+    }
+    *_relayMask = mask1 + ((uint64_t)mask2 << 32);
+    *isKnown = (known != 0);
+
+    if(!known) {
+        [self setRelayStatus:@"status: UNKNOWN"];
+    }
+    else {
+        [self setRelayMask:*_relayMask];
+        [self setRelayStatus:@"status: SET"];
+
+    }
+}
+
 - (void) closeHVRelays
 {
     unsigned long error;
@@ -4213,7 +4345,134 @@ err:
 
     NSLog(@"%@ switch A is %@, switch B is %@.\n",[[self xl3Link] crateName], switchAIsOn?@"ON":@"OFF", switchBIsOn?@"ON":@"OFF");
 }
+- (uint32_t) checkRelays:(uint64_t)relays {
+    // Returns a bit mask of which slots have issues with their relays
+    // Currently just checks that any missing slots also have open relays
+    // Could be expanded in the future.
 
+    uint32_t bad_slots = 0;
+    uint32_t slots = [self getSlotsPresent];
+    for (int i=0;i<16;i++) {
+        // If slot is missing
+        if((slots & 1<<i) == 0) {
+            // And if the 4 relays for that slot aren't all 0 (open)
+            uint64_t mask = (uint64_t)0xF << i*4;
+            if((mask & relays) != 0)
+                //Then set a bit in bad_slots
+                bad_slots |= 1<<i;
+        }
+    }
+    return bad_slots;
+}
+
+- (BOOL) isHVAdvisable:(unsigned char) sup {
+    BOOL interlockIsGood = false;
+    BOOL relaysKnown = false;
+    BOOL relaysGood = true; // Start true b/c if relaysKnown doesn't pass this won't be checked.
+    BOOL modeGood = false;
+    uint64_t relays;
+
+    if ([self crateNumber] == 16 && sup != 0) { //16B
+        //Checks interlocks for any crates with connected OWL tubes
+        //Assumes that all relevant crates are represented in the open experiment
+        uint32_t checkedCrates = 0;
+        uint32_t goodInterlocks = 0;
+        uint32_t knownRelays = 0;
+        uint32_t goodRelays = 0;
+        uint32_t goodModes = 0;
+
+        NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+        for (uint32_t i = 0; i < [objs count]; i++) {
+            ORXL3Model *xl3 = [objs objectAtIndex:i];
+            if ([xl3 isOwlCrate]) {
+                checkedCrates++;
+                BOOL good = false;
+                // First check the interlocks
+                @try {
+                    [xl3 readHVInterlockGood:&good];
+                    if (good) {
+                        goodInterlocks++;
+                    } else {
+                        NSLogColor([NSColor redColor],@"%@ HV interlock BAD\n",[[xl3 xl3Link] crateName]);
+                    }
+                }
+                @catch (NSException *exception) {
+                    NSLogColor([NSColor redColor],@"%@ error in readHVInterlock\n",[[xl3 xl3Link] crateName]);
+                }
+                // Now check the relays
+                @try {
+                    [xl3 readHVRelays:&relays isKnown:&good];
+                    if (good) {
+                        knownRelays++;
+                        // If the relays are known make sure slot 15's are open if the FEC is missing
+                        uint32_t bad_relays = [xl3 checkRelays:relays];
+                        if((bad_relays & 1<<15) == 0) {
+                            goodRelays++;
+                        }
+                        else {
+                            NSLogColor([NSColor redColor], @"%@ HV relays for slot 15 are closed but FEC is missing!\n",[[self xl3Link] crateName]);
+                        }
+
+                    } else {
+                        NSLogColor([NSColor redColor],@"%@ HV Relays unknown\n",[[xl3 xl3Link] crateName]);
+                    }
+                }
+                @catch (NSException *exception) {
+                    NSLogColor([NSColor redColor],@"%@ error in readHVRelays. Error: %@ Reason: %@\n",[[xl3 xl3Link] crateName],[exception name], [exception reason]);
+                }
+
+                // Finally make sure the XL3s are reading out
+                if([xl3 xl3Mode] == NORMAL_MODE) {
+                    goodModes++;
+                } else {
+                    NSLogColor([NSColor redColor],@"%@ NOT in normal mode\n",[[xl3 xl3Link] crateName]);
+                }
+            }
+        }
+
+        interlockIsGood = checkedCrates == goodInterlocks;
+        relaysKnown     = checkedCrates == knownRelays;
+        modeGood        = checkedCrates == goodModes;
+        relaysGood      = knownRelays   == goodRelays;
+    } else {
+        //Checks the state for this crate only
+        @try {
+            [self readHVInterlockGood:&interlockIsGood];
+            if (!interlockIsGood) NSLogColor([NSColor redColor],@"%@ HV interlock BAD\n",[[self xl3Link] crateName]);
+        }
+        @catch (NSException *exception) {
+            NSLogColor([NSColor redColor],@"%@ error in readHVInterlock. Error: %@ Reason %@\n",[[self xl3Link] crateName],[exception name], [exception reason]);
+        }
+
+        @try {
+            [self readHVRelays:&relays isKnown:&relaysKnown];
+            if (!relaysKnown){
+                NSLogColor([NSColor redColor],@"%@ HV relays unknown\n",[[self xl3Link] crateName]);
+            }
+        }
+        @catch (NSException *exception) {
+            NSLogColor([NSColor redColor],@"%@ error in readHVRelays. Error: %@ Reason: %@\n",[[self xl3Link] crateName],[exception name], [exception reason]);
+        }
+
+        // Make sure the relays are open for all slots that are missing
+        if(relaysKnown) {
+            uint32_t badRelays = [self checkRelays:relays];
+            relaysGood = (badRelays == 0);
+            if(!relaysGood) {
+                NSLogColor([NSColor redColor], @"%@ has missing slots with closed relays!\n", [[self xl3Link] crateName]);
+            }
+        }
+
+        // Check that the XL3 Mode is not INIT
+        modeGood = [self xl3Mode] == NORMAL_MODE;
+        if(!modeGood){
+            NSLogColor([NSColor redColor], @"%@ is not in NORMAL mode!\n", [[self xl3Link] crateName]);
+        }
+    }
+
+    return interlockIsGood && relaysKnown && modeGood && relaysGood;
+
+}
 - (void) setHVSwitch:(BOOL)aOn forPowerSupply:(unsigned char)sup
 {
     @synchronized(self) {
@@ -4229,45 +4488,10 @@ err:
 
     [self setHvASwitch:xl3SwitchA];
     [self setHvBSwitch:xl3SwitchB];
-        
-        
-    BOOL interlockIsGood = false;
-    if ([self crateNumber] == 16 && sup != 0) { //16B
-        //Checks interlocks for any crates with connected OWL tubes
-        //Assumes that all relevant crates are represented in the open experiment
-        uint32_t checkedInterlocks = 0;
-        uint32_t goodInterlocks = 0;
-        NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
-        for (uint32_t i = 0; i < [objs count]; i++) {
-            ORXL3Model *xl3 = [objs objectAtIndex:i];
-            if ([xl3 isOwlCrate]) {
-                checkedInterlocks++;
-                @try {
-                    BOOL good = false;
-                    [xl3 readHVInterlockGood:&good];
-                    if (good) {
-                        goodInterlocks++;
-                    } else {
-                        NSLogColor([NSColor redColor],@"%@ HV interlock BAD\n",[[xl3 xl3Link] crateName]);
-                    }
-                }
-                @catch (NSException *exception) {
-                    NSLogColor([NSColor redColor],@"%@ error in readHVInterlock\n",[[xl3 xl3Link] crateName]);
-                }
-            }
-        }
-        interlockIsGood = checkedInterlocks == goodInterlocks;
-    } else {
-        //Checks the interlock for this crate only
-        @try {
-            [self readHVInterlockGood:&interlockIsGood];
-            if (!interlockIsGood) NSLogColor([NSColor redColor],@"%@ HV interlock BAD\n",[[self xl3Link] crateName]);
-        }
-        @catch (NSException *exception) {
-            NSLogColor([NSColor redColor],@"%@ error in readHVInterlock\n",[[self xl3Link] crateName]);
-        }
-    }
-    if (!interlockIsGood) {
+
+    BOOL hv_advisable = [self isHVAdvisable:sup];
+
+    if (!hv_advisable) {
         if (aOn) {
             NSLog(@"%@ NOT turning ON the HV power supply.\n",[[self xl3Link] crateName]);
             return;

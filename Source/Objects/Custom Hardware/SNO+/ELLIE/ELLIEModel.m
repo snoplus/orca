@@ -242,6 +242,19 @@ NSString* ORAMELLIERunFinished = @"ORAMELLIERunFinished";
     [_smellieLaserToInputFibreMapping release];
     [_smellieFibreSwitchToFibreMapping release];
     [_smellieConfigVersionNo release];
+    
+    [_tellieRunNames release];
+    [_interlockPort release];
+    [_tellieHost release];
+    [_tellieThread release];
+    [_telliePort release];
+    [_interlockClient release];
+    [_smellieHost release];
+    [_smellieThread release];
+    [_tellieNodeMapping release];
+    [_smelliePort release];
+    [_interlockHost release];
+    
     [super dealloc];
 }
 
@@ -467,6 +480,11 @@ NSString* ORAMELLIERunFinished = @"ORAMELLIERunFinished";
      to avoid pushing too much current through individual channels / trigger sums. Use a
      loglog curve to define what counts as detector safe.
      */
+    
+    /*
+     Currently the predicted nPhotons does not correlate with reality so this check is defunct.
+     it might be worth adding it back eventually once our understanding has improved. For now
+     make do with a simple rate check (below).
     float safe_gradient = -1;
     float safe_intercept = 1.05e6;
     float max_photons = safe_intercept*pow(frequency, safe_gradient);
@@ -475,6 +493,10 @@ NSString* ORAMELLIERunFinished = @"ORAMELLIERunFinished";
     } else {
         return YES;
     }
+     */
+    if(frequency > 1.01e3)
+        return NO;
+    return YES;
 }
 
 -(NSString*)calcTellieFibreForNode:(NSUInteger)node{
@@ -541,6 +563,20 @@ NSString* ORAMELLIERunFinished = @"ORAMELLIERunFinished";
     NSUInteger channelInt = [[[[self tellieFibreMapping] objectForKey:@"channels"] objectAtIndex:fibreIndex] integerValue];
     NSNumber* channel = [NSNumber numberWithInt:channelInt];
     return channel;
+}
+
+-(NSString*) calcTellieFibreForChannel:(NSUInteger)channel
+{
+    /*
+     Use patch pannel map loaded from the telliedb to map a given fibre to the correct tellie channel.
+     */
+    if([self tellieFibreMapping] == nil){
+        NSLogColor([NSColor redColor], @"[TELLIE]: fibre map has not been loaded from couchdb - you need to call loadTellieStaticsFromDB\n");
+        return nil;
+    }
+    NSUInteger channelIndex = [[[self tellieFibreMapping] objectForKey:@"channels"] indexOfObject:channel];
+    NSString* fibre = [[[self tellieFibreMapping] objectForKey:@"fibres"] objectAtIndex:channelIndex];
+    return fibre;
 }
 
 -(NSString*)selectPriorityFibre:(NSArray*)fibres forNode:(NSUInteger)node{
@@ -787,7 +823,6 @@ err:
 
     ///////////////////////
     // Check TELLIE run type is masked in
-/*
     if(!([snopModel lastRunTypeWord] & kTELLIERun)){
         NSLogColor([NSColor redColor], @"[TELLIE]: TELLIE bit is not masked into the run type word.\n");
         NSLogColor([NSColor redColor], @"[TELLIE]: Please load the TELLIE standard run type.\n");
@@ -796,16 +831,17 @@ err:
 
     ///////////////////////
     // Check trigger is being sent to asyncronus port of the MTC/D (EXT_A)
-
     if([[theTubiiModel keepAliveThread] isCancelled]){
         [theTubiiModel restartKeepAlive:nil];
     }
-    if(!([theTubiiModel asyncTrigMask] & 0x400000)){
-        NSLogColor([NSColor redColor], @"[TELLIE]: Triggers as not being sent to asynchronous MTC/D port\n");
-        NSLogColor([NSColor redColor], @"[TELLIE]: Please amend via the TUBii GUI (triggers tab)\n");
+    NSUInteger asyncTrigMask;
+    @try{
+        asyncTrigMask = [theTubiiModel asyncTrigMask];
+    } @catch(NSException* e) {
+        NSLogColor([NSColor redColor], @"[TELLIE]: Error requesting asyncTrigMask from Tubii.\n");
         goto err;
     }
-*/
+
     //////////////
     // Get run mode boolean
     BOOL isSlave = YES;
@@ -1185,6 +1221,7 @@ err:
      variables and push up to the telliedb. Additionally, the run doc dictionary set as
      the tellieRunDoc propery, to be updated later in the run.
      */
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:10];
     
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
@@ -1209,6 +1246,7 @@ err:
 
     [self setTellieRunDoc:runDocDict];
     [[self couchDBRef:self withDB:@"telliedb"] addDocument:runDocDict tag:kTellieRunDocumentAdded];
+    [pool release];
 }
 
 - (void) updateTellieRunDocument:(NSDictionary*)subRunDoc
@@ -1219,7 +1257,7 @@ err:
      Arguments:
      NSDictionary* subRunDoc:  Subrun information to be added to the current [self tellieRunDoc].
      */
-    
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     // Get run control
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
@@ -1247,9 +1285,11 @@ err:
          documentId:[runDocDict objectForKey:@"_id"]
          tag:kTellieRunDocumentUpdated];
     }
-    [subRunInfo release];
+
     [runDocDict release];
     [subRunDocDict release];
+    [subRunInfo release];
+    [pool release];
 }
 
 -(void) loadTELLIEStaticsFromDB
@@ -1260,7 +1300,8 @@ err:
      fibreMapping and nodeMapping documents. The data is then saved to the member variables
      tellieFireParameters, tellieFibreMapping and tellieNodeMapping.
      */
-    
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+
     //Set all to be nil
     [self setTellieFireParameters:nil];
     [self setTellieFibreMapping:nil];
@@ -1275,6 +1316,7 @@ err:
     [[self couchDBRef:self withDB:@"telliedb"] getDocumentId:mapString tag:kTellieMapRetrieved];
     [[self couchDBRef:self withDB:@"telliedb"] getDocumentId:nodeString tag:kTellieNodeRetrieved];
     [self loadTELLIERunPlansFromDB];
+    [pool release];
 }
 
 -(void) loadTELLIERunPlansFromDB
@@ -2225,7 +2267,12 @@ err:
         goto err;
     }
     TUBiiModel* theTubiiModel = [tubiiModels objectAtIndex:0];
-    [theTubiiModel stopSmelliePulser];
+    @try{
+        [theTubiiModel stopSmelliePulser];
+    } @catch(NSException* e){
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Problem sending stop command to the SMELLIE pulsar.\n");
+        goto err;
+    }
 
     // Tell run control it can stop waiting
     dispatch_sync(dispatch_get_main_queue(), ^{
@@ -2256,6 +2303,7 @@ err:
      variables and push up to the smelliedb. Additionally, the run doc dictionary set as
      the tellieRunDoc propery, to be updated later in the run.
      */
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:10];
 
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
@@ -2289,22 +2337,18 @@ err:
     [self setSmellieRunDoc:runDocDict];
 
     [[self couchDBRef:self withDB:@"smellie"] addDocument:runDocDict tag:kSmellieRunDocumentAdded];
-
-    //wait for main thread to receive acknowledgement from couchdb
-    NSDate* timeout = [NSDate dateWithTimeIntervalSinceNow:5.0];
-    while ([timeout timeIntervalSinceNow] > 0 && ![runDocDict objectForKey:@"_id"]) {
-        [NSThread sleepForTimeInterval:0.1];
-    }
+    [pool release];
 }
 
 - (void) updateSmellieRunDocument:(NSDictionary*)subRunDoc
 {
     /*
-     Update [self tellieRunDoc] with subrun information.
+     Update [self smellieRunDoc] with subrun information.
      
      Arguments:
      NSDictionary* subRunDoc:  Subrun information to be added to the current [self tellieRunDoc].
      */
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
         NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find ORRunModel. Please add it to the experiment and restart the run.\n");
@@ -2324,10 +2368,12 @@ err:
     [self setSmellieRunDoc:runDocDict];
 
     //check to see if run is offline or not
-    [[self couchDBRef:self withDB:@"smellie"] updateDocument:runDocDict documentId:[runDocDict objectForKey:@"_id"] tag:kTellieRunDocumentUpdated];
-    [subRunInfo release];
+    [[self couchDBRef:self withDB:@"smellie"] updateDocument:runDocDict documentId:[runDocDict objectForKey:@"_id"] tag:kSmellieRunDocumentUpdated];
+
     [runDocDict release];
     [subRunDocDict release];
+    [subRunInfo release];
+    [pool release];
 }
 
 -(void) fetchCurrentSmellieConfig

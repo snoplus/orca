@@ -6,7 +6,8 @@
 /// \author Javier Caravaca <jcaravaca@berkeley.edu>
 ///
 /// REVISION HISTORY:\n
-///     07 Jan 2017 : Javier Caravaca --- First version.\n
+///     07 Jan  2017 : Javier Caravaca --- First version.\n
+///     27 July 2017 : Tony LaTorre    --- added AV Recirculation bit.\n
 ///
 /// \details  Reference for the run type word bits positions
 ///           and names. This piece is shared with the ORCA
@@ -44,10 +45,10 @@ static char *RunTypeWordBitNames[32] = {
     "Comp. Coils OFF",
     "PMTs OFF",
     "Bubblers ON",
-    "Recirculation",
+    "Cavity Recirculation ON",
     "SLAssay",
     "Unusual Activity",
-    "Spare",
+    "AV Recirculation ON",
     "Spare",
     "Spare",
     "Spare"

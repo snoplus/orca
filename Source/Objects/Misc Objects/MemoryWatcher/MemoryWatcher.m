@@ -56,14 +56,22 @@ enum {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:nil object:nil];
  
-    
+    [opQueue cancelAllOperations];
+    [opQueue release];
+
     int i;
     for(i=0;i<kNumWatchedValues;i++){
         [timeRate[i] release];
     }
     [super dealloc];
 }
-
+- (void) setUpQueue
+{
+    if(!opQueue){
+        opQueue = [[NSOperationQueue alloc] init];
+        [opQueue setMaxConcurrentOperationCount:10];
+    }
+}
 #pragma mark ***Accessors
 - (NSTimeInterval) accurateUptime
 {
@@ -124,14 +132,15 @@ enum {
 
 - (void) launchTop
 {
-    
+    [self setUpQueue];
+    [opQueue cancelAllOperations];
     int i;
     for(i=0;i<kNumWatchedValues;i++){
         if(!timeRate[i])timeRate[i] = [[ORTimeRate alloc] init];
     }
     
     ORTopShellOp* anOp = [[ORTopShellOp alloc] initWithDelegate:self];
-    [[NSOperationQueue mainQueue] addOperation:anOp];
+    [opQueue addOperation:anOp];
     [anOp release];
     
     [self setUpTime:[[NSDate date] timeIntervalSinceDate:launchTime]];

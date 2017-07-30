@@ -61,9 +61,12 @@ typedef struct {
 
 typedef struct
 {
-	MB mb[16]; //!< all 16 fec database values
-    uint16_t pmticID[16]; //!< All 16 PMTIC IDs. Not in MB for compatibility
-	uint32_t ctcDelay; //!< ctc based trigger delay
+  MB mb[16]; //!< all 16 fec database values
+  uint16_t pmticID[16]; //!< All 16 PMTIC IDs. Not stored in MB for compatibility
+  uint32_t ctcDelay; //!< ctc based trigger delay
+  uint32_t relays_known; //!< stores if the relays have been set successfully
+  uint32_t hv_relay1; //!< stores the (lower) relays
+  uint32_t hv_relay2; //!< stores the (upper) relays
 } Crate; //!< all database values for the crate
 
 Crate crate; //!< Current configuration

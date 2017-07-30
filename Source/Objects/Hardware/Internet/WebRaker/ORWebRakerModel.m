@@ -126,15 +126,22 @@ NSString* ORWebRakerMaxValueChanged        = @"ORWebRakerMaxValueChanged";
 }
 - (NSInteger) numDataItems
 {
-    return [data count];
+    NSInteger count = 0;
+    @synchronized (self) {
+        count = [data count];
+    }
+    return count;
 }
 
 - (NSDictionary*) dataAtIndex:(int)index
 {
-    if(index>=0 && index < [self numDataItems]){
-        return [data objectAtIndex:index];
+    NSDictionary* theData = nil;
+    @synchronized (self) {
+        if(index>=0 && index < [self numDataItems]){
+            theData = [[[data objectAtIndex:index]copy] autorelease];
+        }
     }
-    else return nil;
+    return theData;;
 }
 
 
@@ -174,19 +181,24 @@ NSString* ORWebRakerMaxValueChanged        = @"ORWebRakerMaxValueChanged";
 - (void) pollHardware
 {
     if([ipAddress length]!=0){
-        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
-        NSURLSession *session = [NSURLSession sharedSession];
-        [[session dataTaskWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@",ipAddress]]
+        @synchronized (self) {
+            [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
+            NSURLSessionDataTask* downloadTask =[[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@",ipAddress]]
                 completionHandler:^(NSData* theData,
                                     NSURLResponse* response,
                                     NSError* error) {
-                        [self performSelectorOnMainThread:@selector(processData:) withObject:theData waitUntilDone:YES];
-
-                }] resume];
-        
-        [self performSelector:@selector(pollHardware) withObject:nil afterDelay:[self pollTime]];
-        [self setNextPollScheduled:[NSDate dateWithTimeIntervalSinceNow:[self pollTime]]];
-        [self setLastTimePolled:[NSDate date]];
+                    if(error == nil){
+                        dispatch_async(dispatch_get_main_queue(), ^{[self processData:theData];});
+                    }
+                    else {
+                        dispatch_async(dispatch_get_main_queue(), ^{[self processData:nil];});
+                    }
+                }];
+            [downloadTask resume];
+            [self performSelector:@selector(pollHardware) withObject:nil afterDelay:[self pollTime]];
+            [self setNextPollScheduled:[NSDate dateWithTimeIntervalSinceNow:[self pollTime]]];
+            [self setLastTimePolled:[NSDate date]];
+       }
     }
     else {
         [self setDataValid:NO];
@@ -195,51 +207,58 @@ NSString* ORWebRakerMaxValueChanged        = @"ORWebRakerMaxValueChanged";
 - (void) processData:(NSData*)theData
 {
     @try {
-        NSError* error = nil;
-        NSString* s= [[[NSString alloc] initWithData:theData
+        @synchronized (self) {
+            
+            NSError* error = nil;
+            NSString* s= [[[NSString alloc] initWithData:theData
                                                   encoding:NSUTF8StringEncoding] autorelease];
-        s = [s stringByReplacingOccurrencesOfString:@"'" withString:@"\""];
-        NSData* test = [s dataUsingEncoding:NSASCIIStringEncoding];
-        //this following can throw, so be careful here
-        [data release];
-        data = nil;
-        data = [NSJSONSerialization JSONObjectWithData:test options:0 error:&error];
-        [data retain]; //above can throw so release here
+            s = [s stringByReplacingOccurrencesOfString:@"'" withString:@"\""];
+            NSData* test = [s dataUsingEncoding:NSASCIIStringEncoding];
         
-        [self setDataValid:YES];
-        [self postCouchDBRecord];
-        int i;
-        //make sure all the array sizes are the same as the data set
-        int lowLimitCountDiff = [data count] - [lowLimits count];
-        if(lowLimitCountDiff < 0)for(i=0;i<lowLimitCountDiff;i++)[lowLimits removeLastObject];
-        if(lowLimitCountDiff > 0)for(i=0;i<lowLimitCountDiff;i++)[lowLimits addObject:[NSNumber numberWithFloat:0]];
+            NSArray* theNewData = [[NSJSONSerialization JSONObjectWithData:test options:0 error:&error]retain];
         
-        int hiLimitCountDiff = [data count] - [hiLimits count];
-        if(hiLimitCountDiff < 0)for(i=0;i<hiLimitCountDiff;i++)[hiLimits removeLastObject];
-        if(hiLimitCountDiff > 0)for(i=0;i<hiLimitCountDiff;i++)[hiLimits addObject:[NSNumber numberWithFloat:0]];
- 
-        int minValueCountDiff = [data count] - [minValues count];
-        if(minValueCountDiff < 0)for(i=0;i<minValueCountDiff;i++)[minValues removeLastObject];
-        if(minValueCountDiff > 0)for(i=0;i<minValueCountDiff;i++)[minValues addObject:[NSNumber numberWithFloat:0]];
+            if(theNewData){
+                
+                [data autorelease];
+                data = [theNewData retain];
+                
+                int i;
+                //make sure all the array sizes are the same as the data set
+                int lowLimitCountDiff = [data count] - [lowLimits count];
+                if(lowLimitCountDiff < 0)for(i=0;i<lowLimitCountDiff;i++)[lowLimits removeLastObject];
+                if(lowLimitCountDiff > 0)for(i=0;i<lowLimitCountDiff;i++)[lowLimits addObject:[NSNumber numberWithFloat:0]];
+                
+                int hiLimitCountDiff = [data count] - [hiLimits count];
+                if(hiLimitCountDiff < 0)for(i=0;i<hiLimitCountDiff;i++)[hiLimits removeLastObject];
+                if(hiLimitCountDiff > 0)for(i=0;i<hiLimitCountDiff;i++)[hiLimits addObject:[NSNumber numberWithFloat:0]];
+         
+                int minValueCountDiff = [data count] - [minValues count];
+                if(minValueCountDiff < 0)for(i=0;i<minValueCountDiff;i++)[minValues removeLastObject];
+                if(minValueCountDiff > 0)for(i=0;i<minValueCountDiff;i++)[minValues addObject:[NSNumber numberWithFloat:0]];
 
-        int maxValueCountDiff = [data count] - [maxValues count];
-        if(maxValueCountDiff < 0)for(i=0;i<maxValueCountDiff;i++)[maxValues removeLastObject];
-        if(maxValueCountDiff > 0)for(i=0;i<maxValueCountDiff;i++)[maxValues addObject:[NSNumber numberWithFloat:0]];
+                int maxValueCountDiff = [data count] - [maxValues count];
+                if(maxValueCountDiff < 0)for(i=0;i<maxValueCountDiff;i++)[maxValues removeLastObject];
+                if(maxValueCountDiff > 0)for(i=0;i<maxValueCountDiff;i++)[maxValues addObject:[NSNumber numberWithFloat:0]];
 
-        
-        int timeRateCountDiff = [data count] - [timeRates count];
-        if(timeRateCountDiff < 0)for(i=0;i<timeRateCountDiff;i++)[timeRates removeLastObject];
-        if(timeRateCountDiff > 0)for(i=0;i<timeRateCountDiff;i++){
-            if(!timeRates)timeRates = [[NSMutableArray alloc] init];
-            ORTimeRate* aTimeRate = [[[ORTimeRate alloc] init] autorelease];
-            [timeRates addObject:aTimeRate];
-            [aTimeRate setSampleTime: [self pollTime]];
-        }
-        
-        //update the values in the plots
-        for(i=0;i<[data count];i++){
-            float theValue = [[[data objectAtIndex:i]objectForKey:@"value"] floatValue];
-            [[timeRates objectAtIndex:i] addDataToTimeAverage:theValue];
+                
+                int timeRateCountDiff = [data count] - [timeRates count];
+                if(timeRateCountDiff < 0)for(i=0;i<timeRateCountDiff;i++)[timeRates removeLastObject];
+                if(timeRateCountDiff > 0)for(i=0;i<timeRateCountDiff;i++){
+                    if(!timeRates)timeRates = [[NSMutableArray alloc] init];
+                    ORTimeRate* aTimeRate = [[[ORTimeRate alloc] init] autorelease];
+                    [timeRates addObject:aTimeRate];
+                    [aTimeRate setSampleTime: [self pollTime]];
+                }
+                
+                //update the values in the plots
+                for(i=0;i<[data count];i++){
+                    float theValue = [[[data objectAtIndex:i]objectForKey:@"value"] floatValue];
+                    [[timeRates objectAtIndex:i] addDataToTimeAverage:theValue];
+                }
+                [self setDataValid:YES];
+                [self postCouchDBRecord];
+            }
+            else [self setDataValid:NO];
         }
     }
     @catch(NSException* e){
@@ -336,7 +355,6 @@ NSString* ORWebRakerMaxValueChanged        = @"ORWebRakerMaxValueChanged";
         [userInfo setObject:[NSNumber numberWithInt:i] forKey: @"Channel"];
         
         [[NSNotificationCenter defaultCenter] postNotificationName:ORWebRakerMaxValueChanged object:self userInfo:userInfo];
-        
     }
 }
 
@@ -370,7 +388,7 @@ NSString* ORWebRakerMaxValueChanged        = @"ORWebRakerMaxValueChanged";
 {
 	BOOL theValue = 0;
 	@synchronized(self){
-        if(aChan>=0 && aChan<[self numDataItems]){
+        if(aChan>=0 && aChan<[data count]){
             theValue = [[[data objectAtIndex:aChan]objectForKey:@"value"] floatValue];
         }
 	}
@@ -452,13 +470,14 @@ NSString* ORWebRakerMaxValueChanged        = @"ORWebRakerMaxValueChanged";
 @implementation ORWebRakerModel (private)
 - (void) postCouchDBRecord
 {
+   	@synchronized(self){
+        NSMutableDictionary* couchRecord = [NSMutableDictionary dictionary];
+        [couchRecord setObject:[NSNumber numberWithInt:pollTime] forKey:@"pollTime"];
+        [couchRecord setObject:data forKey:@"data"];
+        [couchRecord setObject:[NSNumber numberWithBool:dataValid] forKey:@"dataValid"];
     
-    NSMutableDictionary* couchRecord = [NSMutableDictionary dictionary];
-    [couchRecord setObject:[NSNumber numberWithInt:pollTime] forKey:@"pollTime"];
-    [couchRecord setObject:data forKey:@"data"];
-    [couchRecord setObject:[NSNumber numberWithBool:dataValid] forKey:@"dataValid"];
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:couchRecord];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:couchRecord];
+    }
 }
 @end
 

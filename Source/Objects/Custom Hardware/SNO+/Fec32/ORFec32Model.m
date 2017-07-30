@@ -281,7 +281,6 @@ static int              sChannelsNotChangedCount = 0;
 - (void) setPedEnabledMask:(unsigned long) aMask
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setPedEnabledMask:pedEnabledMask];
-    //NSLog(@"FEC (%d,%d), mask 0x%08x\n", [self crateNumber], [self stationNumber], aMask);
     pedEnabledMask = aMask;
     [self postNotificationName:ORFecPedEnabledMaskChanged];
 }

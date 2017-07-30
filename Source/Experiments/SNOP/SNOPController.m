@@ -36,7 +36,7 @@
 #import "SNOCaenModel.h"
 #import "RunTypeWordBits.hh"
 #import "ECARun.h"
-#import "NhitMonitor.h"
+#import "NHitMonitor.h"
 
 NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 NSString* ORRunWaitFinished = @"ORRunWaitFinished";
@@ -96,14 +96,20 @@ snopGreenColor;
 }
 - (void) dealloc
 {
-    [smellieRunFile release];
     [snopBlueColor release];
     [snopGreenColor release];
     [snopOrangeColor release];
     [snopRedColor release];
+    [snopBlackColor release];
+    [snopGrayColor release];
     [doggy_icon stop_animation];
     [doggy_icon release];
-    
+    [smellieRunFile release];
+    [tellieRunFile release];
+    [_smellieRunFileList release];
+    [_tellieRunFileList release];
+    [tellieFireSettings release];
+    waitingForBuffersAlert = nil;
     [super dealloc];
 }
 
@@ -478,6 +484,16 @@ snopGreenColor;
                      selector : @selector(nhitMonitor:)
                          name : ORNhitMonitorNotification
                         object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(stillWaitingForBuffers:)
+                         name : ORSNOPStillWaitingForBuffersNotification
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(notWaitingForBuffers:)
+                         name : ORSNOPNotWaitingForBuffersNotification
+                        object: nil];
 }
 
 - (void) updateWindow
@@ -635,12 +651,6 @@ snopGreenColor;
 
 - (IBAction) startRunAction:(id)sender
 {
-
-    //If we are in OPERATOR mode we don't allow other version than DEFAULT
-    BOOL locked = [gSecurity isLocked:ORSNOPRunsLockNotification];
-    if(locked) { //Operator Mode
-        [model setStandardRunVersion:@"DEFAULT"];
-    }
 
     /* If we are not going to maintenance we shouldn't be polling */
     unsigned long dbruntypeword = 0;
@@ -840,6 +850,37 @@ err:
 - (void) dbDebugDBIPChanged:(NSNotification*)aNote
 {
     [debugDBIPAddressPU setStringValue:[model debugDBIPAddress]];
+}
+
+- (void) stillWaitingForBuffers:(NSNotification*)aNote
+{
+    /* Throw up a window-modal dialog to give the user an option
+     * to avoid waiting for the hardware buffers to clear at the end
+     * of a run (only for OS X 10.10 or later).  Must be called
+     * only from the main thread. */
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSString* s = [NSString stringWithFormat:@"Waiting for buffers to empty..."];
+    waitingForBuffersAlert = [[[NSAlert alloc] init] autorelease];
+    [waitingForBuffersAlert setMessageText:s];
+    [waitingForBuffersAlert addButtonWithTitle:@"Force Stop and LOSE DATA!"];
+    [waitingForBuffersAlert setAlertStyle:NSInformationalAlertStyle];
+    [waitingForBuffersAlert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn) {
+            [model abortWaitingForBuffers]; // don't wait for buffers to clear
+            waitingForBuffersAlert = nil;
+        }
+    }];
+#endif
+}
+
+- (void) notWaitingForBuffers:(NSNotification*)aNote
+{
+    /* Close our "Waiting for buffers" dialog if it was open.
+     * Must be called only from the main thread. */
+    if (waitingForBuffersAlert) {
+        [[self window] endSheet:[[self window] attachedSheet] returnCode:NSAlertSecondButtonReturn];
+        waitingForBuffersAlert = nil;
+    }
 }
 
 - (void) hvStatusChanged:(NSNotification*)aNote
@@ -1270,15 +1311,18 @@ err:
 
 -(void) fetchSmellieRunFilesFinish:(NSNotification *)aNote
 {
-   // When we get a noticication that the database read has finished, set local variables
+    // When we get a noticication that the database read has finished, set local variables
     NSMutableDictionary *runFileDict = [[NSMutableDictionary alloc] initWithDictionary:[model smellieRunFiles]];
     
-    //Fill lthe combo box with information
+    NSMutableArray* runNames = [NSMutableArray array];
     for(id key in runFileDict){
         id loopValue = [runFileDict objectForKey:key];
-        [smellieRunFileNameField addItemWithObjectValue:[NSString stringWithFormat:@"%@",[loopValue objectForKey:@"run_name"]]];
+        [runNames addObject:[NSString stringWithFormat:@"%@",[loopValue objectForKey:@"run_name"]]];
     }
-    
+
+    // Fill the combo box with alphabetically sorted information
+    [smellieRunFileNameField addItemsWithObjectValues:[runNames sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)]];
+
     [smellieRunFileNameField setEnabled:YES];
     [smellieLoadRunFile setEnabled:YES];
     
@@ -1309,12 +1353,15 @@ err:
     // When we get a noticication that the database read has finished, set local variables
     NSMutableDictionary *runFileDict = [[NSMutableDictionary alloc] initWithDictionary:[model tellieRunFiles]];
 
-    //Fill lthe combo box with information
+    NSMutableArray* runNames = [NSMutableArray array];
     for(id key in runFileDict){
         id loopValue = [runFileDict objectForKey:key];
-        [tellieRunFileNameField addItemWithObjectValue:[NSString stringWithFormat:@"%@",[loopValue objectForKey:@"name"]]];
+        [runNames addObject:[NSString stringWithFormat:@"%@",[loopValue objectForKey:@"name"]]];
     }
-
+    
+    // Fill the combo box with alphabetically sorted information
+    [tellieRunFileNameField addItemsWithObjectValues:[runNames sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)]];
+    
     [tellieRunFileNameField setEnabled:YES];
     [tellieLoadRunFile setEnabled:YES];
 
@@ -1641,7 +1688,7 @@ err:
     if(slaveValue == 1){
         inSlave = YES;
     }
-    NSMutableArray* settingsArray = [[NSMutableArray alloc] init];
+    NSMutableArray* settingsArray = [NSMutableArray arrayWithCapacity:[nodes count]];
     for(NSNumber* node in nodes){
         NSString* fibre = [theELLIEModel calcTellieFibreForNode:[node integerValue]];
         NSMutableDictionary* settings = [theELLIEModel returnTellieFireCommands:fibre
@@ -1936,14 +1983,7 @@ err:
 
     //[softwareTriggerButton setEnabled: !locked && !runInProgress];
     [runsLockButton setState: locked];
-    
-    /* Select default standard run if in operator mode.
-     Do it only when the lock status changes */
-    if(locked
-       && [standardRunPopupMenu numberOfItems] != 0
-       && ![[model standardRunVersion] isEqualToString:@"DEFAULT"]
-       && [aNotification isEqualTo:ORSNOPRunsLockNotification]) [model setStandardRunVersion:@"DEFAULT"];
-    
+
     //Enable or disable fields
     [standardRunThresCurrentValues setEnabled:!lockedOrNotRunningMaintenance];
     [standardRunSaveButton setEnabled:!locked];
@@ -1955,7 +1995,6 @@ err:
     for(int irow=0;irow<21;irow++){
         [[runTypeWordMatrix cellAtRow:irow column:0] setEnabled:!lockedOrNotRunningMaintenance];
     }
-    [standardRunVersionPopupMenu setEnabled:!locked && [standardRunVersionPopupMenu numberOfItems]>0]; //allow to change version when in expert mode
     [timedRunCB setEnabled:!runInProgress];
     [timeLimitField setEnabled:!lockedOrNotRunningMaintenance];
     [repeatRunCB setEnabled:!lockedOrNotRunningMaintenance];

@@ -113,6 +113,7 @@ typedef struct {
     NSMutableString*    order;
     BOOL                oneTimeGVVerbose;
     float               elapsedTime;
+    int                 speed;
 }
 
 - (id)          initWithDelegate:(MajoranaModel*)aDelegate slot:(int)aSlot;
@@ -171,6 +172,7 @@ typedef struct {
 @property (assign,nonatomic) int              slot;
 @property (assign,nonatomic) int              currentState;
 @property (assign,nonatomic) float            runningTime;
+@property (assign,nonatomic) int              speed;
 @property (retain,nonatomic) NSMutableString* order;
 @property (retain,nonatomic) NSMutableArray*  stateStatus;
 

@@ -41,6 +41,8 @@
     IBOutlet NSTextField* usingUpdateHandlerField;
     IBOutlet NSTextField* alertMessageField;
     IBOutlet NSPopUpButton* alertTypePU;
+    IBOutlet NSButton*	  skipDataSetsCB;
+
 }
 
 #pragma mark ***Interface Management
@@ -59,6 +61,7 @@
 - (void) setQueCount:(NSNumber*)n;
 - (void) dataBaseInfoChanged:(NSNotification*)aNote;
 - (void) usingUpdateHandlerChanged:(NSNotification*)aNote;
+- (void) skipDataSetsChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) startReplicationAction:(id)sender;
@@ -80,6 +83,5 @@
 - (IBAction) alertMessageAction:(id)sender;
 - (IBAction) alertTypeAction:(id)sender;
 - (IBAction) postAlertAction:(id)sender;
-
-
+- (IBAction) skipDataSetsAction:(id)sender;
 @end
