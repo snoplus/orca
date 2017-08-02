@@ -402,9 +402,9 @@
 
 #pragma mark - Hardware Access
 - (void)            writeLong:          (unsigned long)aValue toReg:(int)aReg;
+- (void)            writeLong:          (unsigned long)aValue toReg:(int)aReg channel:(int)aChan;
 - (unsigned long)   readLongFromReg:    (int)aReg;
-- (void)            writeLong:          (unsigned long)aValue toOffset:(int)anOffset;
-- (unsigned long)   readLongFromOffset: (int)anOffset;
+- (unsigned long)   readLongFromReg:    (int)aReg channel:(int)aChan;
 - (short)           readBoardIDReg;
 - (BOOL)            checkFirmwareVersion;
 - (BOOL)            checkFirmwareVersion:(BOOL)verbose;
@@ -444,8 +444,6 @@
 - (void)            writeP1Window:       (unsigned short)channel;
 - (unsigned long)   readP2Window:        (unsigned short)channel;
 - (void)            writeP2Window;
-- (unsigned long)   readChannelPulsedControl:(unsigned short)channel;
-- (void)            writeChannelPulsedControl;
 - (void)            loadWindowDelays;
 - (unsigned long)   readBaselineDelay;
 - (void)            writeBaselineDelay;

@@ -46,7 +46,7 @@
 
 - (void) awakeFromNib
 {
-    settingSize     = NSMakeSize(1570,480);
+    settingSize     = NSMakeSize(1130,460);
     rateSize		= NSMakeSize(790,340);
     registerTabSize	= NSMakeSize(400,490);
 	firmwareTabSize = NSMakeSize(340,187);
@@ -56,17 +56,17 @@
 	
 
 	// Setup register popup buttons
-	[registerIndexPU removeAllItems];
+    [registerIndexPU removeAllItems];
 	[registerIndexPU setAutoenablesItems:NO];
 	int i;
 	for (i=0;i<kNumberOfGretina4ARegisters;i++) {
-        NSString* s = [NSString stringWithFormat:@"(0x%04lx) %@",[Gretina4ARegisters offsetForRegisterIndex:i], [Gretina4ARegisters registerName:i]];
+        NSString* s = [NSString stringWithFormat:@"(0x%04lx) %@",[Gretina4ARegisters offsetforReg:i], [Gretina4ARegisters registerName:i]];
 		[registerIndexPU insertItemWithTitle:s	atIndex:i];
 		[[registerIndexPU itemAtIndex:i] setEnabled:YES];
 	}
 	// And now the FPGA registers
     for (i=0;i<kNumberOfFPGARegisters;i++) {
-        NSString* s = [NSString stringWithFormat:@"(0x%04lx) %@",[Gretina4AFPGARegisters offsetForRegisterIndex:i], [Gretina4AFPGARegisters registerName:i]];
+        NSString* s = [NSString stringWithFormat:@"(0x%04lx) %@",[Gretina4AFPGARegisters offsetforReg:i], [Gretina4AFPGARegisters registerName:i]];
 
 		[registerIndexPU insertItemWithTitle:s	atIndex:(i+kNumberOfGretina4ARegisters)];
 	}
@@ -94,7 +94,7 @@
         [[dWindowMatrix                 cellAtRow:i column:0] setTag:i];
         [[discWidthMatrix               cellAtRow:i column:0] setTag:i];
         [[premapResetDelayMatrix        cellAtRow:i column:0] setTag:i];
-        [[baselineStartMatrix          cellAtRow:i column:0] setTag:i];
+        [[baselineStartMatrix           cellAtRow:i column:0] setTag:i];
    }
     
     NSString* key = [NSString stringWithFormat: @"orca.Gretina4A%d.selectedtab",[model slot]];
@@ -1437,17 +1437,17 @@
 	unsigned long aValue = 0;
 	unsigned int index = [model registerIndex];
 	if (index < kNumberOfGretina4ARegisters) {
-        unsigned long address   = [Gretina4ARegisters offsetForRegisterIndex:index];
+        unsigned long address   = [Gretina4ARegisters offsetforReg:index];
         NSString* chanString;
         if([Gretina4ARegisters hasChannels:index]){
             int chan = [model selectedChannel];
             address += chan*0x04;
-            chanString = [NSString stringWithFormat:@"%d",chan];
+            chanString = [NSString stringWithFormat:@",%d",chan];
         }
-        else chanString = @"*";
+        else chanString = @"";
         aValue = [model readFromAddress:address];
 
-        NSLog(@"Gretina4A(%d,%d,%@) %@: %u (0x%08x)\n",[model crateNumber],[model slot], [Gretina4ARegisters registerName:index],aValue,aValue);
+        NSLog(@"Gretina4A(%d,%d%@) %@: %u (0x%08x)\n",[model crateNumber],[model slot], chanString, [Gretina4ARegisters registerName:index],aValue,aValue);
 	} 
 	else {
 		index -= kNumberOfGretina4ARegisters;
@@ -1463,7 +1463,7 @@
 	unsigned int index      = [model registerIndex];
     
 	if (index < kNumberOfGretina4ARegisters) {
-        unsigned long address   = [Gretina4ARegisters offsetForRegisterIndex:index];
+        unsigned long address   = [Gretina4ARegisters offsetforReg:index];
         NSString* chanString;
         if([Gretina4ARegisters hasChannels:index]){
             int chan = [model selectedChannel];

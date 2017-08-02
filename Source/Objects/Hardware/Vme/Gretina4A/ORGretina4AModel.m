@@ -396,7 +396,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     if (index >= kNumberOfGretina4ARegisters) return -1;
     if (![Gretina4ARegisters regIsReadable:index]) return -1;
     unsigned long theValue = 0;
-    unsigned long theAddress = [Gretina4ARegisters address:[self baseAddress] forRegisterIndex:index];
+    unsigned long theAddress = [Gretina4ARegisters address:[self baseAddress] forReg:index];
     if([Gretina4ARegisters hasChannels:index]){
         theAddress += aChannel*0x04;
     }
@@ -415,7 +415,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     if (![Gretina4ARegisters regIsReadable:index]) return -1;
     unsigned long theValue = 0;
     [[self adapter] readLongBlock:&theValue
-                        atAddress:[Gretina4ARegisters address:[self baseAddress] forRegisterIndex:index]
+                        atAddress:[Gretina4ARegisters address:[self baseAddress] forReg:index]
                         numToRead:1
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
@@ -427,7 +427,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     if (index >= kNumberOfGretina4ARegisters) return;
     if (![Gretina4ARegisters regIsWriteable:index]) return;
     [[self adapter] writeLongBlock:&value
-                         atAddress:[Gretina4ARegisters address:[self baseAddress] forRegisterIndex:index]
+                         atAddress:[Gretina4ARegisters address:[self baseAddress] forReg:index]
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -460,7 +460,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     if (![Gretina4AFPGARegisters regIsReadable:index]) return -1;
     unsigned long theValue = 0;
     [[self adapter] readLongBlock:&theValue
-                        atAddress:[Gretina4AFPGARegisters address:[self baseAddress] forRegisterIndex:index]
+                        atAddress:[Gretina4AFPGARegisters address:[self baseAddress] forReg:index]
                         numToRead:1
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
@@ -472,7 +472,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     if (index >= kNumberOfFPGARegisters) return;
     if (![Gretina4AFPGARegisters regIsWriteable:index]) return;
     [[self adapter] writeLongBlock:&value
-                         atAddress:[Gretina4AFPGARegisters address:[self baseAddress] forRegisterIndex:index]
+                         atAddress:[Gretina4AFPGARegisters address:[self baseAddress] forReg:index]
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -502,7 +502,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     for(i=0;i<kNumberOfGretina4ARegisters;i++){
         unsigned long theValue = [self readRegister:i  channel:[self selectedChannel]];
         if(snapShot[i] != theValue){
-            NSLogFont([NSFont fontWithName:@"Monaco" size:10.0],@"0x%04x 0x%08x != 0x%08x %@\n",[Gretina4ARegisters offsetForRegisterIndex:i],snapShot[i],theValue,[Gretina4ARegisters registerName:i]);
+            NSLogFont([NSFont fontWithName:@"Monaco" size:10.0],@"0x%04x 0x%08x != 0x%08x %@\n",[Gretina4ARegisters offsetforReg:i],snapShot[i],theValue,[Gretina4ARegisters registerName:i]);
             
         }
     }
@@ -510,7 +510,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     for(i=0;i<kNumberOfFPGARegisters;i++){
         unsigned long theValue = [self readFPGARegister:i];
         if(fpgaSnapShot[i] != theValue){
-            NSLogFont([NSFont fontWithName:@"Monaco" size:10.0],@"0x%04x 0x%08x != 0x%08x %@\n",[Gretina4AFPGARegisters offsetForRegisterIndex:i],fpgaSnapShot[i],theValue,[Gretina4AFPGARegisters registerName:i]);
+            NSLogFont([NSFont fontWithName:@"Monaco" size:10.0],@"0x%04x 0x%08x != 0x%08x %@\n",[Gretina4AFPGARegisters offsetforReg:i],fpgaSnapShot[i],theValue,[Gretina4AFPGARegisters registerName:i]);
             
         }
     }
@@ -525,7 +525,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     int i;
     for(i=0;i<kNumberOfGretina4ARegisters;i++){
         unsigned long theValue = [self readRegister:i channel:[self selectedChannel]];
-        NSLogFont([NSFont fontWithName:@"Monaco" size:10.0],@"0x%04x 0x%08x %10d %@\n",[Gretina4ARegisters offsetForRegisterIndex:i],theValue,theValue,[Gretina4ARegisters registerName:i]);
+        NSLogFont([NSFont fontWithName:@"Monaco" size:10.0],@"0x%04x 0x%08x %10d %@\n",[Gretina4ARegisters offsetforReg:i],theValue,theValue,[Gretina4ARegisters registerName:i]);
         snapShot[i] = theValue;
         
     }
@@ -533,7 +533,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     
     for(i=0;i<kNumberOfFPGARegisters;i++){
         unsigned long theValue = [self readFPGARegister:i];
-        NSLogFont([NSFont fontWithName:@"Monaco" size:10.0],@"0x%04x 0x%08x %@\n",[Gretina4AFPGARegisters offsetForRegisterIndex:i],theValue,[Gretina4AFPGARegisters registerName:i]);
+        NSLogFont([NSFont fontWithName:@"Monaco" size:10.0],@"0x%04x 0x%08x %@\n",[Gretina4AFPGARegisters offsetforReg:i],theValue,[Gretina4AFPGARegisters registerName:i]);
         
         fpgaSnapShot[i] = theValue;
     }
@@ -1060,7 +1060,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 - (void) setRawDataLength:(unsigned short)aValue
 {
     //same value for all channels
-    if(aValue>0x3FF)aValue = 0x3FF;
+    if(aValue>0x7FF)aValue = 0x7FF;
     [[[self undoManager] prepareWithInvocationTarget:self] setRawDataLength:rawDataLength];
     rawDataLength = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ARawDataLengthChanged object:self];
@@ -1257,7 +1257,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 - (unsigned short) holdoffTime { return holdoffTime; }
 - (void) setHoldoffTime:(unsigned short)aValue
 {
-    if(aValue>0x1FF)aValue = 0x1FF;
+    if(aValue>0x3FF)aValue = 0x3FF;
     [[[self undoManager] prepareWithInvocationTarget:self] setHoldoffTime:holdoffTime];
     holdoffTime = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AHoldoffTimeChanged object:self];
@@ -1681,7 +1681,16 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 - (void) writeLong:(unsigned long)aValue toReg:(int)aReg
 {
     [[self adapter] writeLongBlock:&aValue
-                         atAddress: [Gretina4ARegisters address:[self baseAddress] forRegisterIndex:aReg]
+                         atAddress: [Gretina4ARegisters address:[self baseAddress] forReg:aReg]
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+}
+
+- (void) writeLong:(unsigned long)aValue toReg:(int)aReg channel:(int)aChan
+{
+    [[self adapter] writeLongBlock:&aValue
+                         atAddress:[Gretina4ARegisters address:[self baseAddress] forReg:aReg chan:aChan]
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -1691,27 +1700,18 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 {
     unsigned long aValue = 0;
     [[self adapter] readLongBlock:&aValue
-                        atAddress:[Gretina4ARegisters address:[self baseAddress] forRegisterIndex:aReg]
+                        atAddress:[Gretina4ARegisters address:[self baseAddress] forReg:aReg]
                         numToRead:1
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
     return aValue;
 }
 
-- (void) writeLong:(unsigned long)aValue toOffset:(int)anOffset
-{
-    [[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + anOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-}
-
-- (unsigned long) readLongFromOffset:(int)anOffset
+- (unsigned long) readLongFromReg:(int)aReg channel:(int)aChan
 {
     unsigned long aValue = 0;
     [[self adapter] readLongBlock:&aValue
-                        atAddress:[self baseAddress] + anOffset
+                        atAddress:[Gretina4ARegisters address:[self baseAddress] forReg:aReg chan:aChan]
                         numToRead:1
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
@@ -1762,7 +1762,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 {
     unsigned long theValue = (extDiscriminatorSrc & 0x1fffffff);
     [self writeAndCheckLong:theValue
-              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kExternalDiscSrc]
+              addressOffset:[Gretina4ARegisters offsetforReg:kExternalDiscSrc]
                        mask:0x0000ffff
                   reportKey:@"ExternalDiscSrc"
               forceFullInit:forceFullCardInit];
@@ -1780,7 +1780,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 - (void) writeUserPackageData
 {
     [self writeAndCheckLong:(userPackageData & 0xFFFF)
-              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kUserPackageData]
+              addressOffset:[Gretina4ARegisters offsetforReg:kUserPackageData]
                        mask:0xFFFF
                   reportKey:@"UserPackageData"
               forceFullInit:forceFullCardInit];
@@ -1791,7 +1791,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 - (void) writeWindowCompMin
 {
     [self writeAndCheckLong:(windowCompMin & 0xFFFF)
-              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kWindowCompMin]
+              addressOffset:[Gretina4ARegisters offsetforReg:kWindowCompMin]
                        mask:0xFFFF
                   reportKey:@"WindowCompMin"
               forceFullInit:forceFullCardInit];
@@ -1802,7 +1802,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 - (void) writeWindowCompMax
 {
     [self writeAndCheckLong:(windowCompMax & 0xFFFF)
-              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kWindowCompMax]
+              addressOffset:[Gretina4ARegisters offsetforReg:kWindowCompMax]
                        mask:0xFFFF
                   reportKey:@"WindowCompMax"
               forceFullInit:forceFullCardInit];
@@ -1818,7 +1818,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
      * to the model state.                                                                 */
     
     BOOL startStop;
-    if(forceEnable)	startStop= enabled[chan];
+    if(forceEnable)	startStop = enabled[chan];
     else			startStop = NO;
 
     BOOL writeFlag = NO;
@@ -1827,7 +1827,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     (startStop                        << 0)  |
     (pileupMode[chan]                 << 2)  |
     (preampResetDelay[chan]           << 3)  |
-    ((triggerPolarity[chan] & 0x3)    << 10) |
+    ((triggerPolarity[chan]  & 0x3)   << 10) |
     ((decimationFactor[chan] & 0x7)   << 12) |
     (writeFlag                        << 15) | //default to data with flags
     (droppedEventCountMode[chan]      << 20) |
@@ -1836,13 +1836,13 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     (discCountMode[chan]              << 23) |
     ((eventExtensionMode[chan] & 0x3) << 24) |
     (pileupExtensionMode[chan]        << 26) |
+    (!startStop                       << 27) | //counters reset at run stop
     (pileupWaveformOnlyMode[chan]     << 30);
-    
-    
+
     if(chan==1)    NSLog(@"%d:0x%08x\n",chan,theValue);
 
     [self writeAndCheckLong:theValue
-              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kChannelControl chan:chan]
+              addressOffset:[Gretina4ARegisters offsetforReg:kChannelControl chan:chan]
                        mask:0x4FF0FC0D //mask off the reserved bits
                   reportKey:[NSString stringWithFormat:@"ControlStatus_%d",chan]
               forceFullInit:forceFullInit[chan]];
@@ -1852,12 +1852,12 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 {
     int chan;
     for(chan=0;chan<kNumGretina4AChannels;chan++){
-        unsigned long old = [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kChannelControl chan:chan]];
+        unsigned long old = [self readLongFromReg:kChannelControl channel:chan];
         //toggle the reset bit
         old ^= (0x1<<27);
-        [self writeLong:old toOffset:[Gretina4ARegisters offsetForRegisterIndex:kChannelControl chan:chan]];
+        [self writeLong:old toReg:kChannelControl channel:chan];
         old ^= (0x1<<27);
-        [self writeLong:old toOffset:[Gretina4ARegisters offsetForRegisterIndex:kChannelControl chan:chan]];
+        [self writeLong:old toReg:kChannelControl channel:chan];
     }
 }
 
@@ -1865,216 +1865,196 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 - (unsigned long) readLedThreshold:(unsigned short)channel
 {
     if(channel<kNumGretina4AChannels){
-        return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kLedThreshold chan:channel]];
+        return [self readLongFromReg:kLedThreshold channel:channel];
     }
     else return 0;
 }
 
-- (void) writeLedThreshold:(unsigned short)channel
+- (void) writeLedThreshold:(unsigned short)aChan
 {
-    unsigned long theValue = ((preampResetDelay[channel] & 0x000000ff)<<16) | (ledThreshold[channel] & 0x00003fff);
+    unsigned long theValue = ((preampResetDelay[aChan] & 0x000000ff)<<16) | (ledThreshold[aChan] & 0x00003fff);
     [self writeAndCheckLong:theValue
-              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kLedThreshold chan:channel]
+              addressOffset:[Gretina4ARegisters offsetforReg:kLedThreshold chan:aChan]
                        mask:0x00ffffff
-                  reportKey:[NSString stringWithFormat:@"LedThreshold_%d",channel]
-              forceFullInit:forceFullInit[channel]];
+                  reportKey:[NSString stringWithFormat:@"LedThreshold_%d",aChan]
+              forceFullInit:forceFullInit[aChan]];
     
 }
 
 //-------------------------kRawDataLength Reg----------------------------------------
-- (unsigned long) readRawDataLength:(unsigned short)channel
+- (unsigned long) readRawDataLength:(unsigned short)aChan
 {
-    return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kRawDataLength chan:channel]];
+    return [self readLongFromReg:kRawDataLength channel:aChan];
 }
 
 - (void) writeRawDataLength:(unsigned short)channel
 {
     //***NOTE that we only write same value to all channels
-    unsigned long theValue = (rawDataLength & 0x000003ff);
+    unsigned long theValue = (rawDataLength & 0x000007ff);
     [self writeAndCheckLong:theValue
-              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kRawDataLength chan:channel]
-                       mask:0x000003ff
+              addressOffset:[Gretina4ARegisters offsetforReg:kRawDataLength chan:channel]
+                       mask:0x000007ff
                   reportKey:[NSString stringWithFormat:@"RawDataLength_%d",channel]
               forceFullInit:forceFullInit[channel]];
     
 }
 
 //-------------------------kRawDataWindow Reg----------------------------------------
-- (unsigned long) readRawDataWindow:(unsigned short)channel
+- (unsigned long) readRawDataWindow:(unsigned short)aChan
 {
-    return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kRawDataWindow chan:channel]];
+    return [self readLongFromReg:kRawDataWindow channel:aChan];
 }
 
-- (void) writeRawDataWindow:(unsigned short)channel
+- (void) writeRawDataWindow:(unsigned short)aChan
 {
     //***NOTE that we write same value to all
     unsigned long theValue = (rawDataWindow & 0x000003ff);
     [self writeAndCheckLong:theValue
-              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kRawDataWindow chan:channel]
+              addressOffset:[Gretina4ARegisters offsetforReg:kRawDataWindow chan:aChan]
                        mask:0x000003ff
-                  reportKey:[NSString stringWithFormat:@"RawDataWindow_%d",channel]
-              forceFullInit:forceFullInit[channel]];
+                  reportKey:[NSString stringWithFormat:@"RawDataWindow_%d",aChan]
+              forceFullInit:forceFullInit[aChan]];
 
 }
 
 
 //-------------------------kDWindow Reg----------------------------------------
-- (unsigned long) readDWindow:(unsigned short)channel
+- (unsigned long) readDWindow:(unsigned short)aChan
 {
-    return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kDWindow chan:channel]];
+    return [self readLongFromReg:kDWindow channel:aChan];
  }
 
-- (void) writeDWindow:(unsigned short)channel
+- (void) writeDWindow:(unsigned short)aChan
 {
-    unsigned long theValue = (dWindow[channel] & 0x0000007F);
+    unsigned long theValue = (dWindow[aChan] & 0x0000007F);
     [self writeAndCheckLong:theValue
-              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kDWindow chan:channel]
+              addressOffset:[Gretina4ARegisters offsetforReg:kDWindow chan:aChan]
                        mask:0x0000007F
-                  reportKey:[NSString stringWithFormat:@"DWindow_%d",channel]
-              forceFullInit:forceFullInit[channel]];
+                  reportKey:[NSString stringWithFormat:@"DWindow_%d",aChan]
+              forceFullInit:forceFullInit[aChan]];
 }
 
 //-------------------------kKWindow Reg----------------------------------------
-- (unsigned long) readKWindow:(unsigned short)channel
+- (unsigned long) readKWindow:(unsigned short)aChan
 {
-    return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kKWindow chan:channel]];
+    return [self readLongFromReg:kKWindow channel:aChan];
 }
 
-- (void) writeKWindow:(unsigned short)channel
+- (void) writeKWindow:(unsigned short)aChan
 {
-    unsigned long theValue = (kWindow[channel] & 0x0000007F);
+    unsigned long theValue = (kWindow[aChan] & 0x0000007F);
     [self writeAndCheckLong:theValue
-              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kKWindow chan:channel]
+              addressOffset:[Gretina4ARegisters offsetforReg:kKWindow chan:aChan]
                        mask:0x0000007F
-                  reportKey:[NSString stringWithFormat:@"KWindow_%d",channel]
-              forceFullInit:forceFullInit[channel]];
+                  reportKey:[NSString stringWithFormat:@"KWindow_%d",aChan]
+              forceFullInit:forceFullInit[aChan]];
 
 }
 //-------------------------kMWindow Reg----------------------------------------
-- (unsigned long) readMWindow:(unsigned short)channel
+- (unsigned long) readMWindow:(unsigned short)aChan
 {
-    if(channel < kNumGretina4AChannels){
-        return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kMWindow chan:channel]];
+    if(aChan < kNumGretina4AChannels){
+        return [self readLongFromReg:kMWindow channel:aChan];
     }
     else return 0;
 }
 
-- (void) writeMWindow:(unsigned short)channel
+- (void) writeMWindow:(unsigned short)aChan
 {
-    unsigned long theValue = (mWindow[channel] & 0x0000007F);
+    unsigned long theValue = (mWindow[aChan] & 0x0000007F);
     [self writeAndCheckLong:theValue
-              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kMWindow chan:channel]
+              addressOffset:[Gretina4ARegisters offsetforReg:kMWindow chan:aChan]
                        mask:0x0000007F
-                  reportKey:[NSString stringWithFormat:@"MWindow_%d",channel]
-              forceFullInit:forceFullInit[channel]];
+                  reportKey:[NSString stringWithFormat:@"MWindow_%d",aChan]
+              forceFullInit:forceFullInit[aChan]];
     
 }
 
 
 //-------------------------kD3Window Reg----------------------------------------
-- (unsigned long)readD3Window:(unsigned short)channel
+- (unsigned long)readD3Window:(unsigned short)aChan
 {
-    return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kD3Window chan:channel]];
+    return [self readLongFromReg:kD3Window channel:aChan];
 }
 
-- (void) writeD3Window:(unsigned short)channel
+- (void) writeD3Window:(unsigned short)aChan
 {
-        unsigned long theValue = (d3Window[channel] & 0x0000007F);
+        unsigned long theValue = (d3Window[aChan] & 0x0000007F);
     [self writeAndCheckLong:theValue
-              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kD3Window chan:channel]
+              addressOffset:[Gretina4ARegisters offsetforReg:kD3Window chan:aChan]
                        mask:0x0000007F
-                  reportKey:[NSString stringWithFormat:@"D3Window_%d",channel]
-              forceFullInit:forceFullInit[channel]];
+                  reportKey:[NSString stringWithFormat:@"D3Window_%d",aChan]
+              forceFullInit:forceFullInit[aChan]];
 }
 
 //-------------------------kDiscWidth Reg----------------------------------------
-- (unsigned long) readDiscWidth:(unsigned short)channel
+- (unsigned long) readDiscWidth:(unsigned short)aChan
 {
-    return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kDiscWidth chan:channel]];
+    return [self readLongFromReg:kDiscWidth channel:aChan];
 }
-- (void) writeDiscWidth:(unsigned short)channel
+- (void) writeDiscWidth:(unsigned short)aChan
 {
-    unsigned long theValue = (discWidth[channel] & 0x0000003F);
+    unsigned long theValue = (discWidth[aChan] & 0x0000003F);
     [self writeAndCheckLong:theValue
-              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kDiscWidth chan:channel]
+              addressOffset:[Gretina4ARegisters offsetforReg:kDiscWidth chan:aChan]
                        mask:0x0000003F
-                  reportKey:[NSString stringWithFormat:@"DiscWidth%d",channel]
-              forceFullInit:forceFullInit[channel]];
-}
-//-------------------------kBaselineStart Reg----------------------------------------
-- (unsigned long) readBaselineStart:(unsigned short)channel
-{
-    return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kBaselineStart chan:channel]];
+                  reportKey:[NSString stringWithFormat:@"DiscWidth%d",aChan]
+              forceFullInit:forceFullInit[aChan]];
 }
 
-- (void) writeBaselineStart:(unsigned short)channel
+//-------------------------kBaselineStart Reg----------------------------------------
+- (unsigned long) readBaselineStart:(unsigned short)aChan
 {
-    unsigned long theValue = (baselineStart[0] & 0x00003FFF);
+    return [self readLongFromReg:kBaselineStart channel:aChan];
+}
+
+- (void) writeBaselineStart:(unsigned short)aChan
+{
+    unsigned long theValue = (baselineStart[aChan] & 0x00003FFF);
     [self writeAndCheckLong:theValue
-              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kBaselineStart chan:channel]
+              addressOffset:[Gretina4ARegisters offsetforReg:kBaselineStart chan:aChan]
                        mask:0x00003FFF
-                  reportKey:[NSString stringWithFormat:@"BaselineStart%d",channel]
-              forceFullInit:forceFullInit[channel]];
+                  reportKey:[NSString stringWithFormat:@"BaselineStart%d",aChan]
+              forceFullInit:forceFullInit[aChan]];
 }
 
 //-------------------------kP1Window Reg----------------------------------------
-- (unsigned long) readP1Window:(unsigned short)channel
+- (unsigned long) readP1Window:(unsigned short)aChan
 {
-    return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kP1Window chan:channel]];
- }
+    return [self readLongFromReg:kP1Window channel:aChan];
+}
 
-- (void) writeP1Window:(unsigned short)channel
+- (void) writeP1Window:(unsigned short)aChan
 {
-    unsigned long theValue = (p1Window[channel] & 0x0000000F);
+    unsigned long theValue = (p1Window[aChan] & 0x0000000F);
     [self writeAndCheckLong:theValue
-              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kP1Window chan:channel]
+              addressOffset:[Gretina4ARegisters offsetforReg:kP1Window chan:aChan]
                        mask:0x0000000F
-                  reportKey:[NSString stringWithFormat:@"P1Window_%d",channel]
-              forceFullInit:forceFullInit[channel]];
+                  reportKey:[NSString stringWithFormat:@"P1Window_%d",aChan]
+              forceFullInit:forceFullInit[aChan]];
 }
 
 //-------------------------kP2Window Reg----------------------------------------
-- (unsigned long) readP2Window:(unsigned short)channel
+- (unsigned long) readP2Window:(unsigned short)aChan
 {
-    return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kP2Window chan:channel]];
+    return [self readLongFromReg:kP2Window channel:aChan];
 }
 
 - (void) writeP2Window
 {
     unsigned long theValue = (p2Window & 0x0000003ff);
     [self writeAndCheckLong:theValue
-              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kP2Window]
+              addressOffset:[Gretina4ARegisters offsetforReg:kP2Window]
                        mask:0x0000003ff
                   reportKey:@"P2Window"
               forceFullInit:forceFullCardInit];
 }
 
 //-------------------------kChannelPulsedControl Reg----------------------------------------
-- (unsigned long) readChannelPulsedControl:(unsigned short)channel
-{
-    return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kChannelPulsedControl chan:channel]];
-}
-
-- (void) writeChannelPulsedControl
-{
-    [self writeAndCheckLong:channelPulsedControl
-              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kChannelPulsedControl]
-                       mask:0x000037F7
-                  reportKey:@"ChannelPulsedControl"
-              forceFullInit:forceFullCardInit];
-}
-
 - (void) loadWindowDelays
 {
-    unsigned long theValue = [self readLongFromOffset:kChannelPulsedControl];
-    theValue = theValue | 0x5;
-    [self writeLong:theValue toOffset:kChannelPulsedControl];
-    theValue = theValue & ~(0x5);
-    [self writeAndCheckLong:theValue & 0x5
-              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kChannelPulsedControl]
-                       mask:0x5
-                  reportKey:@"PulsedControl"
-              forceFullInit:forceFullCardInit];
+    unsigned long theValue = 0x261;
+    [self writeLong:theValue toReg:kChannelPulsedControl];
 }
 
 //-------------------------kBaselineDelay Reg----------------------------------------
@@ -2087,7 +2067,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 {
     unsigned long theValue = (baselineStart[0] & 0x00003fff);
     [self writeAndCheckLong:theValue
-              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kBaselineDelay]
+              addressOffset:[Gretina4ARegisters offsetforReg:kBaselineDelay]
                        mask:0x00003fff
                   reportKey:@"BaselineDelay"
               forceFullInit:forceFullCardInit];
@@ -2105,7 +2085,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
                              ((peakSensitivity & 0x07) << 9)  |
                              ((autoMode        & 0x01) << 12);
     [self writeAndCheckLong:theValue
-              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kHoldoffControl]
+              addressOffset:[Gretina4ARegisters offsetforReg:kHoldoffControl]
                        mask:0x00001FFF
                   reportKey:@"holdoffControl"
               forceFullInit:forceFullCardInit];
@@ -2135,7 +2115,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 - (void) writeVetoGateWidth
 {
     [self writeAndCheckLong:(vetoGateWidth & 0x00003fff)
-              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kVetoGateWidth]
+              addressOffset:[Gretina4ARegisters offsetforReg:kVetoGateWidth]
                        mask:0x00003fff
                   reportKey:@"VetoGateWidth"
               forceFullInit:forceFullCardInit];
@@ -2144,9 +2124,12 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 //-------------------------kMasterLogicStatus Reg----------------------------------------
 - (void) writeMasterLogic:(BOOL)enable
 {
-    unsigned long oldValue = [self readLongFromOffset:kMasterLogicStatus];
-    [self writeAndCheckLong:oldValue | enable
-              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kMasterLogicStatus]
+    unsigned long oldValue = [self readLongFromReg:kMasterLogicStatus];
+    unsigned long newValue;
+    if(enable) newValue = oldValue |  0x1;
+    else       newValue = oldValue & ~0x1;
+    [self writeAndCheckLong:newValue
+              addressOffset:[Gretina4ARegisters offsetforReg:kMasterLogicStatus]
                        mask:0x00000001 //mask off the reserved bits
                   reportKey:@"masterLogic"
               forceFullInit:YES];
@@ -2162,7 +2145,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 {
     unsigned long theValue = (triggerConfig & 0x00000003);
     [self writeAndCheckLong:theValue
-              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kTriggerConfig]
+              addressOffset:[Gretina4ARegisters offsetforReg:kTriggerConfig]
                        mask:0x00000003
                   reportKey:@"TriggerConfig"
               forceFullInit:forceFullCardInit];
@@ -2182,7 +2165,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 - (unsigned long) readDroppedEventCount:(unsigned short) aChan
 {
     if(aChan<kNumGretina4AChannels){
-        return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kDroppedEventCount chan:aChan]];
+        return [self readLongFromReg:[Gretina4ARegisters address:[self baseAddress] forReg:kDroppedEventCount chan:aChan]];
     }
     else return 0;
 }
@@ -2191,7 +2174,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 - (unsigned long) readAcceptedEventCount:(unsigned short) aChan
 {
     if(aChan<kNumGretina4AChannels){
-        return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kAcceptedEventCount chan:aChan]];
+        return [self readLongFromReg:[Gretina4ARegisters address:[self baseAddress] forReg:kAcceptedEventCount chan:aChan]];
     }
     else return 0;
 }
@@ -2199,7 +2182,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 - (unsigned long) readAHitCount:(unsigned short) aChan
 {
     if(aChan<kNumGretina4AChannels){
-        return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kAhitCount chan:aChan]];
+        return [self readLongFromReg:[Gretina4ARegisters address:[self baseAddress] forReg:kAhitCount chan:aChan]];
     }
     else return 0;
 }
@@ -2207,7 +2190,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 - (unsigned long) readDiscCount:(unsigned short) aChan
 {
     if(aChan<kNumGretina4AChannels){
-        return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kDiscCount chan:aChan]];
+        return [self readLongFromReg:[Gretina4ARegisters address:[self baseAddress] forReg:kDiscCount chan:aChan]];
     }
     else return 0;
 }
@@ -2253,7 +2236,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 {
     unsigned long theValue = 0x10;
     [[self adapter] writeLongBlock:&theValue
-                         atAddress: [Gretina4AFPGARegisters address:[self baseAddress] forRegisterIndex:kMainFPGAControl]
+                         atAddress: [Gretina4AFPGARegisters address:[self baseAddress] forReg:kMainFPGAControl]
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -2262,7 +2245,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     
     theValue = 0x00;
     [[self adapter] writeLongBlock:&theValue
-                         atAddress:[Gretina4AFPGARegisters address:[self baseAddress] forRegisterIndex:kMainFPGAControl]
+                         atAddress:[Gretina4AFPGARegisters address:[self baseAddress] forReg:kMainFPGAControl]
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -2273,13 +2256,11 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 //initialization
 - (void) initBoard
 {
-    [self clearCounters];
     [self writeMasterLogic:NO]; //disable
     int i;
     for(i=0;i<kNumGretina4AChannels;i++) {
         [self writeControlReg:i enabled:NO];
     }
-    [self resetFIFO];
     //write the channel level params
     for(i=0;i<kNumGretina4AChannels;i++) {
         [self writeP1Window:i];
@@ -2291,28 +2272,30 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
         
         [self writeRawDataLength:i];    //only [0] is used
         [self writeRawDataWindow:i];    //only [0] is used
-        [self writeDiscWidth:i];        //only [0] is used
+        [self writeDiscWidth:i];
         [self writeBaselineStart:i];
     }
     
     //write the card level params
+    [self writeP2Window];
     [self writeHoldoffControl];
     [self writeTriggerConfig];
-    [self writeP2Window];
     [self writeBaselineDelay];
     [self writeWindowCompMin];
     [self writeWindowCompMax];
     [self writeVetoGateWidth];
-    
+    [self writeExtDiscriminatorSrc];
     [self loadWindowDelays];
+    [self clearCounters];
     
-    [self writeMasterLogic:YES];
-   
+ 
     //enable channels
     for(i=0;i<kNumGretina4AChannels;i++) {
         [self writeControlReg:i enabled:[self enabled:i]];
     }
-    
+    [self writeMasterLogic:YES];
+    [self resetFIFO];
+
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ACardInited object:self];
 }
 
@@ -2608,7 +2591,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     if(serialNumber==0){
         @try {
             [[self adapter] readLongBlock:&serialNumber
-                                atAddress:[Gretina4AFPGARegisters address:[self baseAddress] forRegisterIndex:kVMEFPGAVersionStatus]
+                                atAddress:[Gretina4AFPGARegisters address:[self baseAddress] forReg:kVMEFPGAVersionStatus]
                                 numToRead:1
                                withAddMod:[self addressModifier]
                             usingAddSpace:0x01];
@@ -2624,7 +2607,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     location        = (([self crateNumber]&0x0000000f)<<21) | (([self slot]& 0x0000001f)<<16) | serialNumber;
     theController   = [self adapter];
     fifoAddress     = [self baseAddress] + 0x1000;
-    fifoStateAddress= [self baseAddress] + [Gretina4ARegisters offsetForRegisterIndex:kProgrammingDone];
+    fifoStateAddress= [self baseAddress] + [Gretina4ARegisters address:[self baseAddress] forReg:kProgrammingDone];
     
     fifoResetCount = 0;
     [self startRates];
@@ -2796,7 +2779,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     configStruct->card_info[index].crate					= [self crateNumber];
     configStruct->card_info[index].add_mod					= [self addressModifier];
     configStruct->card_info[index].base_add					= [self baseAddress];
-    configStruct->card_info[index].deviceSpecificData[0]	= [self baseAddress] + [Gretina4ARegisters offsetForRegisterIndex:kProgrammingDone]; //fifoStateAddress
+    configStruct->card_info[index].deviceSpecificData[0]	= [self baseAddress] + [Gretina4ARegisters offsetforReg:kProgrammingDone]; //fifoStateAddress
     configStruct->card_info[index].deviceSpecificData[1]	= [self baseAddress] + 0x1000; // fifoAddress
     configStruct->card_info[index].deviceSpecificData[2]	= 0x0B; // fifoAM
     configStruct->card_info[index].deviceSpecificData[3]	= [self baseAddress] + 0x04; // fifoReset Address

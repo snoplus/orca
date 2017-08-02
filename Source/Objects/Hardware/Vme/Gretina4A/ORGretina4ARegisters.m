@@ -44,7 +44,7 @@ static gretina4ARegNamesStruct reg4A[kNumberOfGretina4ARegisters] = {
     { 0x0200,	@"M Window",                kReadWrite | kChanReg,	kMWindow             },
     { 0x0240,	@"D3 Window",               kReadWrite | kChanReg,	kD3Window            },
     { 0x0280,	@"Disc Width",              kReadWrite | kChanReg,	kDiscWidth           },
-    { 0x02C0,	@"Baseline Start",          kReadWrite,             kBaselineStart       },
+    { 0x02C0,	@"Baseline Start",          kReadWrite | kChanReg,  kBaselineStart       },
     { 0x0300,	@"P1 Delay",                kReadWrite | kChanReg,  kP1Window            },
     { 0x0400,	@"Dac",                     kReadWrite,             kDac                 },
     { 0x0404,	@"P2 Delay",                kReadWrite,             kP2Window            },
@@ -160,30 +160,30 @@ static gretina4ARegNamesStruct reg4A[kNumberOfGretina4ARegisters] = {
     return reg4A[anIndex].accessType;
 }
 
-- (unsigned long) offsetForRegisterIndex:(unsigned short)anIndex chan:(unsigned short)aChannel
+- (unsigned long) offsetforReg:(unsigned short)anIndex chan:(unsigned short)aChannel
 {
     [self checkIndex:  anIndex]; //will throw if out of bounds
     [self checkChannel:aChannel]; //will throw if out of bounds
-    return reg4A[anIndex].offset + 4 * aChannel;
+    return reg4A[anIndex].offset + (4 * aChannel);
 }
 
-- (unsigned long) offsetForRegisterIndex:(unsigned short)anIndex
+- (unsigned long) offsetforReg:(unsigned short)anIndex
 {
     [self checkIndex:anIndex]; //will throw if out of bounds
     return reg4A[anIndex].offset;
 }
 
-- (unsigned long) address:(unsigned long)baseAddress forRegisterIndex:(unsigned short)anIndex
+- (unsigned long) address:(unsigned long)baseAddress forReg:(unsigned short)anIndex
 {
     [self checkIndex:anIndex]; //will throw if out of bounds
     return baseAddress+ reg4A[anIndex].offset;
 }
 
-- (unsigned long) address:(unsigned long)baseAddress forRegisterIndex:(unsigned short)anIndex chan:(unsigned short)aChannel
+- (unsigned long) address:(unsigned long)baseAddress forReg:(unsigned short)anIndex chan:(unsigned short)aChannel
 {
     [self checkIndex:  anIndex]; //will throw if out of bounds
     [self checkChannel:aChannel]; //will throw if out of bounds
-    return baseAddress+ reg4A[anIndex].offset + 4*aChannel;
+    return baseAddress+ reg4A[anIndex].offset + (4*aChannel);
 }
 
 - (void) checkIndex:(unsigned short)anIndex
@@ -284,13 +284,13 @@ static gretina4ARegNamesStruct fpga_reg4A[kNumberOfFPGARegisters] = {
     return fpga_reg4A[anIndex].accessType;
 }
 
-- (unsigned long) offsetForRegisterIndex:(unsigned short)anIndex
+- (unsigned long) offsetforReg:(unsigned short)anIndex
 {
     [self checkIndex:anIndex]; //will throw if out of bounds
     return fpga_reg4A[anIndex].offset;
 }
 
-- (unsigned long) address:(unsigned long)baseAddress forRegisterIndex:(unsigned short)anIndex
+- (unsigned long) address:(unsigned long)baseAddress forReg:(unsigned short)anIndex
 {
     [self checkIndex:anIndex]; //will throw if out of bounds
     return baseAddress+ fpga_reg4A[anIndex].offset;
