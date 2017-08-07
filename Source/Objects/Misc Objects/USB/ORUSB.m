@@ -153,7 +153,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 
 - (void) claimInterfaceWithSerialNumber:(NSString*)serialNumber for:(id)obj
 {
-	NSArray* someInterfaces = [self interfacesForVender:[obj vendorID] product:[obj productID]];
+    NSArray* someInterfaces;
+    if([obj respondsToSelector:@selector(vendorIDs)] && [obj respondsToSelector:@selector(productIDs)]){
+        someInterfaces = [self interfacesForVenders:[obj vendorIDs] products:[obj productIDs]];
+    }
+	else someInterfaces = [self interfacesForVender:[obj vendorID] product:[obj productID]];
 	NSEnumerator* e = [someInterfaces objectEnumerator];
 	id anInterface;
 	while(anInterface = [e nextObject]){
@@ -171,7 +175,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 - (void) claimInterfaceWithVendor:(unsigned long)aVendorID product:(unsigned long)aProductID for:(id)obj
 {
 	//just grab the first one....someday this will probably have to be fixed
-	NSArray* someInterfaces = [self interfacesForVender:[obj vendorID] product:[obj productID]];
+    NSArray* someInterfaces;
+    if([obj respondsToSelector:@selector(vendorIDs)] && [obj respondsToSelector:@selector(productIDs)]){
+        someInterfaces = [self interfacesForVenders:[obj vendorIDs] products:[obj productIDs]];
+    }
+    else someInterfaces = [self interfacesForVender:[obj vendorID] product:[obj productID]];
 	id anInterface = [someInterfaces objectAtIndex:0];
 	id oldObj = [anInterface registeredObject];
 	[oldObj setUsbInterface:nil];
@@ -182,7 +190,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 
 - (void) releaseInterfaceFor:(id)obj
 {
-	NSArray* someInterfaces = [self interfacesForVender:[obj vendorID] product:[obj productID]];
+    NSArray* someInterfaces;
+    if([obj respondsToSelector:@selector(vendorIDs)] && [obj respondsToSelector:@selector(productIDs)]){
+        someInterfaces = [self interfacesForVenders:[obj vendorIDs] products:[obj productIDs]];
+    }
+    else someInterfaces = [self interfacesForVender:[obj vendorID] product:[obj productID]];
 	NSEnumerator* e = [someInterfaces objectEnumerator];
 	id anInterface;
 	while(anInterface = [e nextObject]){
@@ -678,15 +690,34 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 
 - (NSArray*) interfacesForVender:(unsigned long)aVenderID product:(unsigned long)aProductID
 {
-	NSMutableArray* matchingInterfaces = [NSMutableArray array];
-	NSEnumerator* e = [interfaces objectEnumerator];
-	ORUSBInterface* anInterface;
-	while(anInterface = [e nextObject]){
-		if([anInterface vendor] == aVenderID && [anInterface product] == aProductID){
-			[matchingInterfaces addObject:anInterface];
-		}
-	}
-	return matchingInterfaces;
+    NSMutableArray* matchingInterfaces = [NSMutableArray array];
+    NSEnumerator* e = [interfaces objectEnumerator];
+    ORUSBInterface* anInterface;
+    while(anInterface = [e nextObject]){
+        if([anInterface vendor] == aVenderID && [anInterface product] == aProductID){
+            [matchingInterfaces addObject:anInterface];
+        }
+    }
+    return matchingInterfaces;
+}
+
+- (NSArray*) interfacesForVenders:(NSArray*)someVendorIDs products:(NSArray*)someProductIDs
+{
+    NSMutableArray* matchingInterfaces = [NSMutableArray array];
+
+    if([someVendorIDs count] == [someProductIDs count]){
+        int i;
+        for(i=0;i<[someVendorIDs count];i++){
+            unsigned long aVendorID  = [[someVendorIDs objectAtIndex:i] unsignedLongValue];
+            unsigned long aProductID = [[someProductIDs objectAtIndex:i] unsignedLongValue];
+            [matchingInterfaces addObjectsFromArray:[self interfacesForVender:aVendorID product:aProductID]];
+        }
+       return  matchingInterfaces;
+    }
+    else {
+        NSLog(@"Programmer error: VenderID and ProductID lists have different number of entries\n");
+        return nil;
+    }
 }
 
 - (ORUSBInterface*) getUSBInterfaceWithSerialNumber:(NSString*)aSerialNumber
