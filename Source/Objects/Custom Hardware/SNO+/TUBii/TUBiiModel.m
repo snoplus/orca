@@ -45,6 +45,7 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
 - (void) setPortNumber:(int)_portNumber {
     if( _portNumber != portNumber)
     {
+        portNumber = _portNumber;
         [connection setPort:_portNumber];
         [connection disconnect];
     }
@@ -54,6 +55,7 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
 }
 - (void) setStrHostName:(NSString *)_strHostName {
     if(_strHostName != strHostName) {
+        strHostName = _strHostName;
         [connection setHost:_strHostName];
         [connection disconnect];
     }
@@ -85,7 +87,7 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
         tellieNPulses=0;
         pulserNPulses=0;
         connection = [[RedisClient alloc] init]; // Connection must be allocated before port and host name are set
-        portNumber =TUBII_DEFAULT_PORT;
+        portNumber = TUBII_DEFAULT_PORT;
         strHostName = [[NSString alloc]initWithUTF8String:TUBII_DEFAULT_IP];
     }
     return self;
@@ -134,17 +136,11 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
         pulserRate =      [ aCoder decodeFloatForKey:@"TUBiiModelPulserRate"];
         pulserPulseWidth =[ aCoder decodeFloatForKey:@"TUBiiModelPulseWidth"];
         pulserNPulses =   [ aCoder decodeIntForKey:@"TUBiiModelNPulses"];
-        portNumber =      [ aCoder decodeIntForKey:@"TUBiiModelPortNumber"];
-        
+        [self setStrHostName:[ aCoder decodeObjectForKey:@"TUBiiModelStrHostName"]];
+        [self setPortNumber:[ aCoder decodeIntForKey:@"TUBiiModelPortNumber"]];
+
         //Connection must be made before port and host name are set.
         connection = [[RedisClient alloc] initWithHostName:strHostName withPort:portNumber];
-        [self setStrHostName:[ aCoder decodeObjectForKey:@"TUBiiModelStrHostName"]];
-        if (!strHostName) {
-            [self setStrHostName: @TUBII_DEFAULT_IP];
-        }
-        if (![self portNumber]) {
-            [self setPortNumber:TUBII_DEFAULT_PORT];
-        }
     }
     return self;
 }
@@ -157,8 +153,8 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
     [aCoder encodeFloat:telliePulseWidth    forKey:@"TUBiiModelTelliePulseWidth"];
     [aCoder encodeInt:tellieNPulses         forKey:@"TUBiiModelTellieNPulses"];
     [aCoder encodeFloat:pulserRate          forKey:@"TUBiiModelPulserRate"];
-    [aCoder encodeFloat:pulserPulseWidth          forKey:@"TUBiiModelPulseWidth"];
-    [aCoder encodeInt:pulserNPulses               forKey:@"TUBiiModelNPulses"];
+    [aCoder encodeFloat:pulserPulseWidth    forKey:@"TUBiiModelPulseWidth"];
+    [aCoder encodeInt:pulserNPulses         forKey:@"TUBiiModelNPulses"];
     [aCoder encodeInt:portNumber            forKey:@"TUBiiModelPortNumber"];
     [aCoder encodeObject:strHostName        forKey:@"TUBiiModelStrHostName"];
 }
