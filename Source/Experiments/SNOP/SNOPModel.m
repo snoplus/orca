@@ -659,7 +659,7 @@ tellieRunFiles = _tellieRunFiles;
         }
 
         /* Load the TUBii settings to hardware. */
-        if ([tubii sendCurrentStateToHW]) {
+        if ([tubii sendCurrentModelStateToHW]) {
             NSLogColor([NSColor redColor], @"error initializing TUBii.\n");
             goto err;
         }
@@ -2696,7 +2696,7 @@ err:
 
     @try{
         //Load TUBii settings
-        [tubii sendCurrentStateToHW];
+        [tubii sendCurrentModelStateToHW];
 
         //Load CAEN settings
         [caen initBoard];

@@ -116,7 +116,7 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
     NSString* strHostName;//"192.168.80.25";
     NSThread* _keepAliveThread;
 @public
-    struct TUBiiState currentState;
+    struct TUBiiState currentModelState;
 }
 @property (readonly) BOOL solitaryObject; //Prevents there from being two TUBiis
 @property (nonatomic) int portNumber;
@@ -163,9 +163,9 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
 - (float) MTCAMimic_BitsToVolts: (NSUInteger) BitValue;
 - (void) Initialize;
 - (void) Ping;
-- (struct TUBiiState) currentState;
+- (struct TUBiiState) currentModelState;
 - (NSMutableDictionary*) serializeToDictionary;
-- (bool) sendCurrentStateToHW;
+- (bool) sendCurrentModelStateToHW;
 - (void) loadFromSerialization:(NSMutableDictionary*)settingsDict;
 - (void) setTrigMask:(NSUInteger)trigMask setAsyncMask:(NSUInteger)asyncMask;
 - (void) setTrigMaskInState:(NSUInteger)trigMask setAsyncMask:(NSUInteger)asyncMask;

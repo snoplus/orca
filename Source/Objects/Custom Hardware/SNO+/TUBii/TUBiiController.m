@@ -41,7 +41,7 @@
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
     
     [super awakeFromNib];
-    [self tubiiCurrentStateChanged:nil];
+    [self tubiiCurrentModelStateChanged:nil];
     [tabView setDelegate:self];
 
     [CounterAdvancedOptionsBox setHidden:YES];
@@ -71,7 +71,7 @@
                        object : nil];
 
     [notifyCenter addObserver : self
-                     selector : @selector(tubiiCurrentStateChanged:)
+                     selector : @selector(tubiiCurrentModelStateChanged:)
                          name : ORTubiiSettingsChangedNotification
                        object : nil];
 
@@ -144,7 +144,7 @@
     [matchMTCAButton setEnabled: !lockedOrNotRunningMaintenance];
     //Make sure the sync/async mask are properly disabled
     if(!lockedOrNotRunningMaintenance){
-        NSUInteger trigMaskVal = ([model currentState].syncTrigMask | [model currentState].asyncTrigMask);
+        NSUInteger trigMaskVal = ([model currentModelState].syncTrigMask | [model currentModelState].asyncTrigMask);
         [self disableMask:trigMaskVal ForCheckBoxes:TrigMaskSelect FromBit:24 ToBit:48];
     }
 
@@ -201,11 +201,11 @@
     
 }
 
-- (void) tubiiCurrentStateChanged:(NSNotification *)aNote
+- (void) tubiiCurrentModelStateChanged:(NSNotification *)aNote
 {
 
     /* Change GUI to match the current state of the model */
-    struct TUBiiState theTUBiiState = [model currentState];
+    struct TUBiiState theTUBiiState = [model currentModelState];
     // TrigMasks
     NSUInteger trigMaskVal = (theTUBiiState.syncTrigMask | theTUBiiState.asyncTrigMask);
     NSUInteger syncMaskVal = 0xFFFFFF - theTUBiiState.asyncTrigMask;
@@ -467,8 +467,8 @@
 }
 
 - (IBAction)TrigMaskLoad:(id)sender {
-    NSUInteger syncMask = [model currentState].syncTrigMask;
-    NSUInteger asyncMask = [model currentState].asyncTrigMask;
+    NSUInteger syncMask = [model currentModelState].syncTrigMask;
+    NSUInteger asyncMask = [model currentModelState].asyncTrigMask;
     @try{
         [model setTrigMask:syncMask setAsyncMask:asyncMask];
     } @catch(NSException *exception) {
@@ -502,7 +502,7 @@
     }
 }
 - (IBAction)TUBiiPGTLoad:(id)sender {
-    float rate = [model currentState].TUBiiPGT_Rate;
+    float rate = [model currentModelState].TUBiiPGT_Rate;
     @try{
         [model setTUBiiPGT_Rate:rate];
     } @catch(NSException *exception) {
@@ -540,8 +540,8 @@
 }
 - (IBAction)CaenLoadMask:(id)sender {
     //Sends the CAEN GUI values to TUBii
-    CAEN_CHANNEL_MASK ChannelMask = [model currentState].CaenChannelMask;
-    CAEN_GAIN_MASK GainMask=[model currentState].CaenGainMask;
+    CAEN_CHANNEL_MASK ChannelMask = [model currentModelState].CaenChannelMask;
+    CAEN_GAIN_MASK GainMask=[model currentModelState].CaenGainMask;
     @try{
         [model setCaenMasks:ChannelMask GainMask:GainMask];
     } @catch(NSException *exception) {
@@ -608,7 +608,7 @@
 - (IBAction)SpeakerLoadMask:(id)sender {
 
     if ([sender tag] ==1) {
-        NSUInteger maskVal= [model currentState].speakerMask;
+        NSUInteger maskVal= [model currentModelState].speakerMask;
         @try{
             [model setSpeakerMask:maskVal];
         } @catch (NSException *exception) {
@@ -618,7 +618,7 @@
     }
     else if ([sender tag] ==2)
     {
-        NSUInteger maskVal= [model currentState].counterMask;
+        NSUInteger maskVal= [model currentModelState].counterMask;
         @try{
             [model setCounterMask:maskVal];
         } @catch (NSException *exception) {
@@ -632,7 +632,7 @@
 - (IBAction)CounterLoadMask:(id)sender {
     [self SpeakerLoadMask:sender];
 
-    CONTROL_REG_MASK newControlReg = [model currentState].controlReg;
+    CONTROL_REG_MASK newControlReg = [model currentModelState].controlReg;
     @try{
         [model setControlReg:newControlReg];
     } @catch (NSException *exception) {
@@ -640,7 +640,7 @@
         return;
     }
     @try {
-        [model setCounterMode:[model currentState].CounterMode];
+        [model setCounterMode:[model currentModelState].CounterMode];
     } @catch (NSException *exception) {
         [self log_error:exception];
         return;
@@ -736,8 +736,8 @@
 }
 
 - (IBAction)GTDelaysLoadMask:(id)sender {
-    float LO_Delay = [model LODelay_BitsToNanoSeconds:[model currentState].LO_Bits];
-    float DGT_Delay = [model DGT_BitsToNanoSeconds:[model currentState].DGT_Bits];
+    float LO_Delay = [model LODelay_BitsToNanoSeconds:[model currentModelState].LO_Bits];
+    float DGT_Delay = [model DGT_BitsToNanoSeconds:[model currentModelState].DGT_Bits];
     @try{
         [model setGTDelaysInNS:DGT_Delay LOValue:LO_Delay];
     } @catch (NSException* exception) {
@@ -840,7 +840,7 @@
     [model setMTCAMimic1_ThresholdInBitsInState:ThresholdValue];
 }
 - (IBAction)MTCAMimicLoadValue:(id)sender {
-    float ThresholdValue = [model MTCAMimic_BitsToVolts:[model currentState].MTCAMimic1_ThresholdInBits];
+    float ThresholdValue = [model MTCAMimic_BitsToVolts:[model currentModelState].MTCAMimic1_ThresholdInBits];
     @try {
         [model setMTCAMimic1_ThresholdInVolts:ThresholdValue];
     } @catch(NSException *exception) {
@@ -946,7 +946,7 @@
 - (IBAction)CounterMaskAction:(id)sender {
 
     CONTROL_REG_MASK newControlReg;
-    newControlReg = [model currentState].controlReg;
+    newControlReg = [model currentModelState].controlReg;
     newControlReg |=  [CounterLZBSelect intValue] ==1 ? scalerLZB_Bit : 0;
     newControlReg |=  [CounterTestModeSelect intValue] ==1 ? 0 : scalerT_Bit;
     newControlReg |=  [CounterInhibitSelect intValue] ==1 ? 0 : scalerI_Bit;
