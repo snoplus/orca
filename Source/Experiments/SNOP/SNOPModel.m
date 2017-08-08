@@ -2571,6 +2571,7 @@ err:
 }
 
 //Save MTC settings in a Standard Run table in CouchDB for later use by the Run Scripts or the user
+//Return True on success and False on failure
 - (BOOL) saveStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion
 {
     // Check that runTypeName is properly set:
@@ -2594,7 +2595,7 @@ err:
         runControlModel = [objs objectAtIndex:0];
     } else {
         NSLogColor([NSColor redColor], @"couldn't find RC model. Please add it to the experiment and restart the run.\n");
-        return 0;
+        return false;
     }
 
     // Get MTC model
@@ -2604,7 +2605,7 @@ err:
         mtc = [objs objectAtIndex:0];
     } else {
         NSLogColor([NSColor redColor], @"couldn't find MTC model. Please add it to the experiment and restart the run.\n");
-        return 0;
+        return false;
     }
 
     // Get TUBii model
@@ -2614,7 +2615,7 @@ err:
         tubiiModel = [objs objectAtIndex:0];
     } else {
         NSLogColor([NSColor redColor], @"couldn't find TUBii model. Please add it to the experiment and restart the run.\n");
-        return 0;
+        return false;
     }
 
     // Get CAEN model

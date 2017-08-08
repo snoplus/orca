@@ -841,6 +841,7 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
     // Set every relevant variable state variable of TUBii
     // aState must have every variable filled in with a value
     // to have good behavior from this function
+    // Returns 0 on success and 1 on failure
     @try{
         [self setTUBiiPGT_Rate: currentState.TUBiiPGT_Rate];
         [self setTrigMask: currentState.syncTrigMask setAsyncMask:currentState.asyncTrigMask];
@@ -853,9 +854,9 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
     }
     @catch(NSException *err){
         NSLogColor([NSColor redColor], @"TUBii: settings couldn't be send to HW. error: %@ reason: %@ \n", [err name], [err reason]);
-        return 0;
+        return 1;
     }
-    return 1;
+    return 0;
 }
 
 /* Set the state of the GUI. Don't send it to HW.
