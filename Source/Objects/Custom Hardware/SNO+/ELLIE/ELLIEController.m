@@ -1488,7 +1488,7 @@
         // be called, ending a while loop. Once outside the loop the memory
         // is tidied up and the user is promped (via a pop-up box) to
         // re-activate the thread.
-        [theTubiiModel killKeepAlive];
+        [theTubiiModel killKeepAlive:nil];
     } else {
         NSString* response = @"TUBii keep alive thread is getting a cold start.\n";
         [tubiiThreadResponseTf setStringValue:response];

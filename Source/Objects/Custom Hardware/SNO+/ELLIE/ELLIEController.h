@@ -87,6 +87,7 @@
     IBOutlet NSTextField *amellieFibreDelayTf;
     IBOutlet NSTextField *amellieTriggerDelayTf;
     IBOutlet NSTextField *amellieNoPulsesTf;
+    IBOutlet NSTextField *amellieChannelTf;
     
     IBOutlet NSPopUpButton *amellieFibreSelectPb;
     IBOutlet NSPopUpButton *amellieOperationModePb; //Operation mode (master or slave)
