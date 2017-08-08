@@ -57,7 +57,7 @@
 	//[[filterShapingLengthPU itemAtIndex:0] setHidden: YES];//TODO: remove this line to enable 100 nsec filter shaping length setting -tb-
 	//[[filterShapingLengthPU itemAtIndex:0] setEnabled: NO];//TODO: remove this line to enable 100 nsec filter shaping length setting -tb-
 	
-    settingSize			= NSMakeSize(670,720);
+    settingSize			= NSMakeSize(690,720);
     rateSize			= NSMakeSize(500,690);
     testSize			= NSMakeSize(610,510);
     lowlevelSize		= NSMakeSize(610,510);
@@ -1033,8 +1033,6 @@
 
 - (void) modeChanged:(NSNotification*)aNote
 {
-	//[modeButton selectItemAtIndex:[model runMode]];
-	// index is not the daq mode number any more -tb-
 	[modeButton selectItemWithTag:[model runMode]];
 	[self updateButtons];
 }
@@ -1494,8 +1492,6 @@
 
 - (IBAction) modeAction: (id) sender
 {
-	//[model setRunMode:[modeButton indexOfSelectedItem]];
-	// index is not equal to daq mode any more, use tag instead -tb-
 	[model setRunMode:[[modeButton selectedItem] tag]];
 }
 

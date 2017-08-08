@@ -65,12 +65,12 @@ NSString* ORGretina4AMWindowChanged                     = @"ORGretina4AMWindowCh
 NSString* ORGretina4AD3WindowChanged                    = @"ORGretina4AD3WindowChanged";
 NSString* ORGretina4ADiscWidthChanged                   = @"ORGretina4ADiscWidthChanged";
 NSString* ORGretina4ABaselineStartChanged               = @"ORGretina4ABaselineStart0Changed";
-NSString* ORGretina4AP1WindowChanged                    = @"ORGretina4AP1WindowChanged";
+NSString* ORGretina4AP1WindowChanged                     = @"ORGretina4AP1WindowChanged";
+NSString* ORGretina4AP2WindowChanged                     = @"ORGretina4AP2WindowChanged";
 //---DAC Config---
 NSString* ORGretina4ADacChannelSelectChanged            = @"ORGretina4ADacChannelSelectChanged";
 NSString* ORGretina4ADacAttenuationChanged              = @"ORGretina4ADacAttenuationChanged";
 //------
-NSString* ORGretina4AP2WindowChanged                    = @"ORGretina4AP2WindowChanged";
 NSString* ORGretina4AChannelPulseControlChanged         = @"ORGretina4AChannelPulseControlChanged";
 NSString* ORGretina4ADiagMuxControlChanged              = @"ORGretina4ADiagMuxControlChanged";
 NSString* ORGretina4AHoldoffTimeChanged                 = @"ORGretina4AHoldoffTimeChanged";
@@ -79,7 +79,8 @@ NSString* ORGretina4AAutoModeChanged                    = @"ORGretina4AAutoModeC
 //---Baseline Delay---
 NSString* ORGretina4ABaselineDelayChanged               = @"ORGretina4ABaselineDelayChanged";
 NSString* ORGretina4ATrackingSpeedChanged               = @"ORGretina4ATrackingSpeedChanged";
-//------
+NSString* ORGretina4ABaselineStatusChanged              = @"ORGretina4ABaselineStatusChanged";
+//---ORGretina4ABaselineStatusChanged//------
 NSString* ORGretina4ADiagInputChanged                   = @"ORGretina4ADiagInputChanged";
 NSString* ORGretina4ADiagChannelEventSelChanged         = @"ORGretina4ADiagChannelEventSelChanged";
 NSString* ORGretina4AExtDiscriminatorModeChanged        = @"ORGretina4AExtDiscriminatorModeChanged";
@@ -390,6 +391,24 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ASelectedChannelChanged object:self];
 }
 
+- (unsigned long) readRegister:(unsigned int)index channel:(int)aChannel
+{
+    if (index >= kNumberOfGretina4ARegisters) return -1;
+    if (![Gretina4ARegisters regIsReadable:index]) return -1;
+    unsigned long theValue = 0;
+    unsigned long theAddress = [Gretina4ARegisters address:[self baseAddress] forRegisterIndex:index];
+    if([Gretina4ARegisters hasChannels:index]){
+        theAddress += aChannel*0x04;
+    }
+
+    [[self adapter] readLongBlock:&theValue
+                        atAddress:theAddress
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    return theValue;
+}
+
 - (unsigned long) readRegister:(unsigned int)index
 {
     if (index >= kNumberOfGretina4ARegisters) return -1;
@@ -461,9 +480,11 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 
 - (void) snapShotRegisters
 {
+    NSLog(@"Did Snapshot for %@ channel: %d\n",[self fullID],[self selectedChannel]);
+
     int i;
     for(i=0;i<kNumberOfGretina4ARegisters;i++){
-        snapShot[i] = [self readRegister:i];
+        snapShot[i] = [self readRegister:i channel:[self selectedChannel]];
     }
     
     for(i=0;i<kNumberOfFPGARegisters;i++){
@@ -473,12 +494,13 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 
 - (void) compareToSnapShot
 {
-    NSLog(@"------------------------------------------------\n");
+    NSLog(@"-------------Snapshot comparison----------------\n");
+    NSLog(@"%@ channel: %d\n",[self fullID],[self selectedChannel]);
     NSLogFont([NSFont fontWithName:@"Monaco" size:10.0],@"offset   snapshot        newest\n");
     
     int i;
     for(i=0;i<kNumberOfGretina4ARegisters;i++){
-        unsigned long theValue = [self readRegister:i];
+        unsigned long theValue = [self readRegister:i  channel:[self selectedChannel]];
         if(snapShot[i] != theValue){
             NSLogFont([NSFont fontWithName:@"Monaco" size:10.0],@"0x%04x 0x%08x != 0x%08x %@\n",[Gretina4ARegisters offsetForRegisterIndex:i],snapShot[i],theValue,[Gretina4ARegisters registerName:i]);
             
@@ -499,10 +521,10 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 - (void) dumpAllRegisters
 {
     NSLog(@"------------------------------------------------\n");
-    NSLog(@"Register Values for Channel #1\n");
+    NSLog(@"Register Values for Channel #%d\n",[self selectedChannel]);
     int i;
     for(i=0;i<kNumberOfGretina4ARegisters;i++){
-        unsigned long theValue = [self readRegister:i];
+        unsigned long theValue = [self readRegister:i channel:[self selectedChannel]];
         NSLogFont([NSFont fontWithName:@"Monaco" size:10.0],@"0x%04x 0x%08x %10d %@\n",[Gretina4ARegisters offsetForRegisterIndex:i],theValue,theValue,[Gretina4ARegisters registerName:i]);
         snapShot[i] = theValue;
         
@@ -640,7 +662,6 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
             [self checkFirmwareVersion:YES];
         }
     }
-    
 }
 
 - (void) stopDownLoadingMainFPGA
@@ -669,7 +690,6 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
                 NSLog(@"kSBC_KillJob command failed. %@\n",localException);
                 [NSException raise:@"kSBC_KillJob command failed" format:@"%@",localException];
             }
-            
         }
     }
 }
@@ -745,7 +765,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 - (unsigned long) hardwareStatus { return hardwareStatus; }
 - (void)          setHardwareStatus:(unsigned long)aValue
 {
-    hardwareStatus = aValue;
+    hardwareStatus = aValue & 0xfff;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AHardwareStatusChanged object:self];
 }
 
@@ -754,11 +774,9 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 - (void) setUserPackageData:(unsigned long)aValue
 {
     if(aValue>0xFFF)aValue = 0xFFF;
-    if(userPackageData != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setUserPackageData:userPackageData];
-        userPackageData = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AUserPackageDataChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setUserPackageData:userPackageData];
+    userPackageData = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AUserPackageDataChanged object:self];
 }
 
 //------------------- Address = 0x0028  Bit Field = 15..0 ---------------
@@ -766,11 +784,9 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 - (void)           setWindowCompMin:(unsigned short)aValue
 {
     if(aValue>0xFFFF)aValue = 0xFFFF;
-    if(windowCompMin != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setWindowCompMin:windowCompMin];
-        windowCompMin = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AWindowCompMinChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setWindowCompMin:windowCompMin];
+    windowCompMin = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AWindowCompMinChanged object:self];
 }
 
 //------------------- Address = 0x002C  Bit Field = 15..0 ---------------
@@ -778,11 +794,9 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 - (void)           setWindowCompMax:(unsigned short)aValue
 {
     if(aValue>0xFFFF)aValue = 0xFFFF;
-    if(windowCompMax != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setWindowCompMax:windowCompMax];
-        windowCompMax = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AWindowCompMaxChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setWindowCompMax:windowCompMax];
+    windowCompMax = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AWindowCompMaxChanged object:self];
 }
 
 //------------------- Address = 0x0040  Bit Field = 15..0 ---------------
@@ -794,7 +808,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 }
 - (void) setEnabled:(unsigned short)chan withValue:(BOOL)aValue
 {
-    if((chan<kNumGretina4AChannels) && (aValue!=enabled[chan])){
+    if((chan<kNumGretina4AChannels)){
         [[[self undoManager] prepareWithInvocationTarget:self] setEnabled:chan withValue:enabled[chan]];
         enabled[chan] = aValue;
         [self setUpImage];
@@ -811,7 +825,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 
 - (void) setPileupMode:(unsigned short)chan withValue:(BOOL)aValue
 {
-    if((chan < kNumGretina4AChannels) && (aValue!=pileupMode[chan])){
+    if((chan < kNumGretina4AChannels)){
         [[[self undoManager] prepareWithInvocationTarget:self] setPileupMode:chan withValue:pileupMode[chan]];
         pileupMode[chan] = aValue;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APileupModeChanged object:self];
@@ -827,7 +841,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 
 - (void) setPreampResetDelayEn:(unsigned short)chan withValue:(BOOL)aValue
 {
-    if((chan < kNumGretina4AChannels) && (aValue!=preampResetDelayEn[chan])){
+    if((chan < kNumGretina4AChannels)){
         [[[self undoManager] prepareWithInvocationTarget:self] setPreampResetDelayEn:chan withValue:preampResetDelayEn[chan]];
         preampResetDelayEn[chan] = aValue;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APreampResetDelayEnChanged object:self];
@@ -845,7 +859,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 - (void) setTriggerPolarity:(unsigned short)chan withValue:(unsigned short)aValue
 {
     if(aValue > 0x3)aValue = 0x3;
-    if((chan < kNumGretina4AChannels) && (aValue!=triggerPolarity[chan])){
+    if((chan < kNumGretina4AChannels)){
         [[[self undoManager] prepareWithInvocationTarget:self] setTriggerPolarity:chan withValue:triggerPolarity[chan]];
         triggerPolarity[chan] = aValue;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ATriggerPolarityChanged object:self];
@@ -862,7 +876,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 - (void) setDecimationFactor:(unsigned short)chan withValue:(unsigned short)aValue
 {
     if(aValue>0x7)aValue = 0x7;
-    if((chan < kNumGretina4AChannels) && (aValue!=decimationFactor[chan])){
+    if((chan < kNumGretina4AChannels)){
         [[[self undoManager] prepareWithInvocationTarget:self] setDecimationFactor:chan withValue:decimationFactor[chan]];
         decimationFactor[chan] = aValue;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADecimationFactorChanged object:self];
@@ -874,11 +888,9 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 //- (BOOL) writeFlag { return writeFlag; }
 //- (void) setWriteFlag:(BOOL)aValue
 //{
-//    if(writeFlag != aValue){
 //        [[[self undoManager] prepareWithInvocationTarget:self] setWriteFlag:writeFlag];
 //        writeFlag = aValue;
 //        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AWriteFlagChanged object:self];
-//    }
 //}
 
 //------------------- kChannelControl  Bit Field = 20 ---------------
@@ -890,7 +902,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 
 - (void) setDroppedEventCountMode:(unsigned short)chan withValue:(BOOL)aValue
 {
-    if((chan < kNumGretina4AChannels) && (droppedEventCountMode[chan] != aValue)) {
+    if((chan < kNumGretina4AChannels)) {
         [[[self undoManager] prepareWithInvocationTarget:self] setDroppedEventCountMode:chan withValue:droppedEventCountMode[chan]];
         droppedEventCountMode[chan] = aValue;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADroppedEventCountModeChanged object:self];
@@ -906,7 +918,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 
 - (void) setEventCountMode:(unsigned short)chan withValue:(BOOL)aValue
 {
-    if((chan < kNumGretina4AChannels) && (eventCountMode[chan] != aValue)){
+    if((chan < kNumGretina4AChannels)){
         [[[self undoManager] prepareWithInvocationTarget:self] setEventCountMode:chan withValue:eventCountMode[chan]];
         eventCountMode[chan] = aValue;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AEventCountModeChanged object:self];
@@ -922,7 +934,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 
 - (void)  setAHitCountMode:(unsigned short)chan withValue:(BOOL)aValue
 {
-    if((chan < kNumGretina4AChannels) && (aHitCountMode[chan] != aValue)){
+    if((chan < kNumGretina4AChannels)){
         [[[self undoManager] prepareWithInvocationTarget:self] setAHitCountMode:chan withValue:aHitCountMode[chan]];
         aHitCountMode[chan] = aValue;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAHitCountModeChanged object:self];
@@ -938,7 +950,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 }
 - (void)  setDiscCountMode:(unsigned short)chan withValue:(BOOL)aValue
 {
-    if((chan < kNumGretina4AChannels) && (discCountMode[chan] != aValue)){
+    if((chan < kNumGretina4AChannels)){
         [[[self undoManager] prepareWithInvocationTarget:self] setDiscCountMode:chan withValue:discCountMode[chan]];
         discCountMode[chan] = aValue;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADiscCountModeChanged object:self];
@@ -948,14 +960,14 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 //------------------- kChannelControl  Bit Field = 24..25 ---------------
 - (short) eventExtensionMode:(unsigned short)chan
 {
-    if(chan < kNumGretina4AChannels )return eventExtensionMode[chan];
-    else return 0;
+    if(chan < kNumGretina4AChannels ) return eventExtensionMode[chan];
+    else                              return 0;
 }
 
 - (void) setEventExtensionMode:(unsigned short)chan withValue:(unsigned short)aValue
 {
     if(aValue>0x3)aValue = 0x3;
-    if((chan < kNumGretina4AChannels) && (eventExtensionMode[chan] != aValue)){
+    if((chan < kNumGretina4AChannels)){
         [[[self undoManager] prepareWithInvocationTarget:self] setEventExtensionMode:chan withValue:eventExtensionMode[chan]];
         eventExtensionMode[chan] = aValue;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AEventExtensionModeChanged object:self];
@@ -971,12 +983,14 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 
 - (void) setPileupExtensionMode:(unsigned short)chan withValue:(BOOL)aValue
 {
-    if((chan < kNumGretina4AChannels) && (pileupExtensionMode[chan] != aValue)){
+    if((chan < kNumGretina4AChannels)){
         [[[self undoManager] prepareWithInvocationTarget:self] setPileupExtensionMode:chan withValue:pileupExtensionMode[chan]];
         pileupExtensionMode[chan] = aValue;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APileupExtensionModeChanged object:self];
     }
 }
+//------------------- count_Reset  Bit Field = 27    ---------------
+//------------------- Reserved  Bit Field    = 28-29 ---------------
 
 //------------------- kChannelControl  Bit Field = 30 ---------------
 - (BOOL) pileupWaveformOnlyMode:(unsigned short)chan
@@ -986,7 +1000,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 }
 - (void) setPileupWaveformOnlyMode:(unsigned short)chan withValue:(BOOL)aValue
 {
-    if((chan < kNumGretina4AChannels) && (pileupWaveformOnlyMode[chan] != aValue)){
+    if((chan < kNumGretina4AChannels)){
         [[[self undoManager] prepareWithInvocationTarget:self] setPileupWaveformOnlyMode:chan withValue:pileupWaveformOnlyMode[chan]];
         pileupWaveformOnlyMode[chan] = aValue;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APileupWaveformOnlyModeChanged object:self];
@@ -1008,7 +1022,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 - (void) setLedThreshold:(unsigned short)chan withValue:(unsigned short)aValue
 {
     if(aValue>0x3FFF)aValue = 0x3FFF;
-    if((chan < kNumGretina4AChannels) && (ledThreshold[chan] != aValue)){
+    if((chan < kNumGretina4AChannels)){
         [[[self undoManager] prepareWithInvocationTarget:self] setLedThreshold:chan withValue:ledThreshold[chan]];
         ledThreshold[chan] = aValue;
         
@@ -1025,8 +1039,8 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 
 - (void) setPreampResetDelay:(unsigned short)chan withValue:(unsigned short)aValue
 {
-    if(aValue>0x3FF)aValue = 0x3FF;
-    if((chan < kNumGretina4AChannels) && (preampResetDelay[chan] != aValue)){
+    if(aValue>0xFF)aValue = 0xFF;
+    if((chan < kNumGretina4AChannels)){
         [[[self undoManager] prepareWithInvocationTarget:self] setPreampResetDelay:chan withValue:preampResetDelay[chan]];
         preampResetDelay[chan] = aValue;
         NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
@@ -1047,11 +1061,9 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 {
     //same value for all channels
     if(aValue>0x3FF)aValue = 0x3FF;
-    if((rawDataLength != aValue)){
-        [[[self undoManager] prepareWithInvocationTarget:self] setRawDataLength:rawDataLength];
-        rawDataLength = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ARawDataLengthChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setRawDataLength:rawDataLength];
+    rawDataLength = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ARawDataLengthChanged object:self];
 }
 
 //Waveform offset value. (10 ns per count)
@@ -1065,28 +1077,24 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 {
     //same value for all channels
     if(aValue>0x3FF)aValue = 0x3FF;
-    if(rawDataWindow != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setRawDataWindow:rawDataWindow];
-        rawDataWindow = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ARawDataWindowChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setRawDataWindow:rawDataWindow];
+    rawDataWindow = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ARawDataWindowChanged object:self];
 }
 
 //------------------- Address = 0x0180  Bit Field = 6..0 ---------------
 - (short) dWindow:(unsigned short)chan
 {
-    //use only the first value for all channels. Keep the array for future expansion
-    if(chan == 0)return dWindow[0];
+    if(chan < kNumGretina4AChannels)return dWindow[chan];
     else return 0;
 }
 
 - (void) setDWindow:(unsigned short)chan withValue:(unsigned short)aValue
 {
-    //use only the first value for all channels. Keep the array for future expansion
     if(aValue>0x7F)aValue = 0x7F;
-    if((chan == 0) && (dWindow[0] != aValue)){
-        [[[self undoManager] prepareWithInvocationTarget:self] setDWindow:0 withValue:dWindow[0]];
-        dWindow[0] = aValue;
+    if((chan < kNumGretina4AChannels)){
+        [[[self undoManager] prepareWithInvocationTarget:self] setDWindow:chan withValue:dWindow[chan]];
+        dWindow[chan] = aValue;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADWindowChanged object:self];
     }
 }
@@ -1094,16 +1102,14 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 //------------------- Address = 0x01C0  Bit Field = 6..0 ---------------
 - (short) kWindow:(unsigned short)chan
 {
-    //use only the first value for all channels. Keep the array for future expansion
-    if(chan == 0)return kWindow[chan];
+    if(chan < kNumGretina4AChannels)return kWindow[chan];
     else return 0;
 }
 
 - (void) setKWindow:(unsigned short)chan withValue:(unsigned short)aValue
 {
-    //use only the first value for all channels. Keep the array for future expansion
     if(aValue>0x7F)aValue = 0x7F;
-    if((chan == 0) && (kWindow[chan] != aValue)){
+    if((chan < kNumGretina4AChannels)){
         [[[self undoManager] prepareWithInvocationTarget:self] setKWindow:chan withValue:kWindow[chan]];
         kWindow[chan] = aValue;
         
@@ -1114,16 +1120,14 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 //------------------- Address = 0x0200  Bit Field = 6..0 ---------------
 - (short) mWindow:(unsigned short)chan
 {
-    //use only the first value for all channels. Keep the array for future expansion
-    if(chan == 0)return mWindow[chan];
+    if(chan < kNumGretina4AChannels)return mWindow[chan];
     else return 0;
 }
 
 - (void) setMWindow:(unsigned short)chan withValue:(unsigned short)aValue
 {
-    //use only the first value for all channels. Keep the array for future expansion
-    if(aValue>0x7F)aValue = 0x7F;
-    if((chan == 0) && (mWindow[chan] != aValue)){
+    if(aValue>0x3FF)aValue = 0x3FF;
+    if((chan < kNumGretina4AChannels)){
         [[[self undoManager] prepareWithInvocationTarget:self] setMWindow:chan withValue:mWindow[chan]];
         mWindow[chan] = aValue;
         
@@ -1135,18 +1139,16 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 //------------------- Address = 0x0240  Bit Field = 6..0 ---------------
 - (short) d3Window:(unsigned short)chan
 {
-    //use only the first value for all channels. Keep the array for future expansion
-    if(chan == 0)return d3Window[0];
+    if(chan < kNumGretina4AChannels)return d3Window[chan];
     else return 0;
 }
 
 - (void) setD3Window:(unsigned short)chan withValue:(unsigned short)aValue
 {
-    //use only the first value for all channels. Keep the array for future expansion
     if(aValue>0x7F)aValue = 0x7F;
-    if((chan == 0) && (d3Window[0] != aValue)){
-        [[[self undoManager] prepareWithInvocationTarget:self] setD3Window:0 withValue:d3Window[0]];
-        d3Window[0] = aValue;
+    if((chan < kNumGretina4AChannels)){
+        [[[self undoManager] prepareWithInvocationTarget:self] setD3Window:chan withValue:d3Window[chan]];
+        d3Window[chan] = aValue;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AD3WindowChanged object:self];
     }
 }
@@ -1154,17 +1156,16 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 //------------------- Address = 0x0280  Bit Field = N/A ---------------
 - (short) discWidth:(unsigned short)chan
 {
-    //use only the first value for all channels. Keep the array for future expansion
-    if(chan == 0)return discWidth[0];
+    if(chan < kNumGretina4AChannels)return discWidth[chan];
     else  return 0;
 }
 
 - (void) setDiscWidth:(unsigned short)chan withValue:(unsigned short)aValue
 {
-    //use only the first value for all channels. Keep the array for future expansion
-    if((chan == 0) && (discWidth[0] != aValue)){
-        [[[self undoManager] prepareWithInvocationTarget:self] setDiscWidth:0 withValue:discWidth[0]];
-        discWidth[0] = aValue;
+    if(aValue>0x3F)aValue = 0x3F;
+    if((chan <kNumGretina4AChannels)){
+        [[[self undoManager] prepareWithInvocationTarget:self] setDiscWidth:chan withValue:discWidth[0]];
+        discWidth[chan] = aValue;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADiscWidthChanged object:self];
     }
 }
@@ -1172,18 +1173,16 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 //------------------- Address = 0x02C0  Bit Field = 13..0 ---------------
 - (short) baselineStart:(unsigned short)chan
 {
-    //use only the first value for all channels. Keep the array for future expansion
-    if(chan == 0)return baselineStart[0];
+    if(chan <kNumGretina4AChannels)return baselineStart[chan];
     else return 0;
 }
 
 - (void) setBaselineStart:(unsigned short)chan withValue:(unsigned short)aValue
 {
-    //use only the first value for all channels. Keep the array for future expansion
     if(aValue>0x3FFF)aValue = 0x3FFF;
-    if((chan == 0) && (baselineStart[0] != aValue)){
-        [[[self undoManager] prepareWithInvocationTarget:self] setBaselineStart:chan withValue:baselineStart[0]];
-        baselineStart[0] = aValue;
+    if((chan <kNumGretina4AChannels)){
+        [[[self undoManager] prepareWithInvocationTarget:self] setBaselineStart:chan withValue:baselineStart[chan]];
+        baselineStart[chan] = aValue;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ABaselineStartChanged object:self];
     }
 }
@@ -1191,31 +1190,18 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 //------------------- Address = 0x0300  Bit Field = 3 .. 0 ---------------
 - (short) p1Window:(unsigned short)chan
 {
-    //use only the first value for all channels. Keep the array for future expansion
-    if(chan == 0)return p1Window[chan];
-    else return 0;
+    if(chan < 10) return p1Window[chan];
+    else          return 0;
 }
 
 - (void) setP1Window:(unsigned short)chan withValue:(unsigned short)aValue
 {
-    //use only the first value for all channels. Keep the array for future expansion
-    if(aValue>0x7F)aValue = 0x7F;
-    if((chan == 0) && (p1Window[0] != aValue)){
-        [[[self undoManager] prepareWithInvocationTarget:self] setP1Window:chan withValue:p1Window[0]];
-        p1Window[0] = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AP1WindowChanged object:self];
-    }
-}
-
-//------------------- Address = 0x0404  Bit Field = N/A ---------------
-- (long) p2Window { return p2Window; }
-- (void) setP2Window:(long)aValue
-{
-    if(aValue>0x1FF)aValue = 0x1FF;
-    if(p2Window != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setP2Window:p2Window];
-        p2Window = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AP2WindowChanged object:self];
+    if(aValue>0xF)aValue = 0xF;
+    if((chan < kNumGretina4AChannels)){
+        [[[self undoManager] prepareWithInvocationTarget:self] setP1Window:chan withValue:p1Window[chan]];
+        p1Window[chan] = aValue;
+        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AP1WindowChanged object:self userInfo:userInfo];
     }
 }
 
@@ -1239,6 +1225,16 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADacAttenuationChanged object:self];
 }
 
+//------------------- Address = 0x0404  Bit Field = N/A ---------------
+- (short) p2Window { return p2Window; }
+- (void) setP2Window:(short)aValue
+{
+    if(aValue>0x2FF)aValue = 0x3FF;
+    [[[self undoManager] prepareWithInvocationTarget:self] setP2Window:p2Window];
+    p2Window = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AP2WindowChanged object:self];
+}
+
 //------------------- Address = 0x040C  ---------------
 - (unsigned long) channelPulsedControl { return channelPulsedControl; }
 - (void) setChannelPulsedControl:(unsigned long)aValue
@@ -1257,7 +1253,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADiagMuxControlChanged object:self];
 }
 
-//------------------- Address = 0x0414  Bit Field = 9..0 ---------------
+//------------------- Address = 0x0414  Bit Field = 8..0 ---------------
 - (unsigned short) holdoffTime { return holdoffTime; }
 - (void) setHoldoffTime:(unsigned short)aValue
 {
@@ -1267,7 +1263,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AHoldoffTimeChanged object:self];
 }
 
-//------------------- Address = 0x0414  Bit Field = 9..0 ---------------
+//------------------- Address = 0x0414  Bit Field = 9..11 ---------------
 - (unsigned short) peakSensitivity { return peakSensitivity; }
 - (void) setPeakSensitivity:(unsigned short)aValue
 {
@@ -1277,11 +1273,10 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APeakSensitivityChanged object:self];
 }
 
-//------------------- Address = 0x0414  Bit Field = 9..0 ---------------
-- (unsigned short) autoMode { return autoMode; }
-- (void) setAutoMode:(unsigned short)aValue
+//------------------- Address = 0x0414  Bit Field = bit 12 ---------------
+- (BOOL) autoMode { return autoMode; }
+- (void) setAutoMode:(BOOL)aValue
 {
-    if(aValue>0xFF)aValue = 0xFF;
     [[[self undoManager] prepareWithInvocationTarget:self] setAutoMode:autoMode];
     autoMode = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAutoModeChanged object:self];
@@ -1291,11 +1286,39 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 - (unsigned short) baselineDelay { return baselineDelay; }
 - (void) setBaselineDelay:(unsigned short)aValue
 {
-    if(aValue > 0x3FFF)aValue = 0x3FFF;
-    
+    if(aValue > 0x1FF)aValue = 0x1FF;
     [[[self undoManager] prepareWithInvocationTarget:self] setBaselineDelay:baselineDelay];
     baselineDelay = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ABaselineDelayChanged object:self];
+}
+
+//------------------- Address = 0x0418  Bit Field = 10..8 ---------------
+- (unsigned short) trackingSpeed { return trackingSpeed; }
+- (void) setTrackingSpeed:(unsigned short)aValue
+{
+    if(aValue > 0x7)aValue = 0x7;
+    [[[self undoManager] prepareWithInvocationTarget:self] setTrackingSpeed:trackingSpeed];
+    trackingSpeed = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ATrackingSpeedChanged object:self];
+}
+
+//------------------- Address = 0x0418  Bit Field = 16..23 Display only---------------
+- (unsigned short) baselineStatus { return trackingSpeed; }
+- (void) setBaselineStatus:(unsigned short)aValue
+{
+    if(aValue > 0xff)aValue = 0xff;
+    baselineStatus = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ABaselineStatusChanged object:self];
+}
+
+//------------------- Address = 0x041C  Bit Field = 13..0 ---------------
+- (unsigned short) diagInput { return diagInput; }
+- (void) setDiagInput:(unsigned short)aValue
+{
+    if(aValue>0x3FFF)aValue = 0x3FFF;
+    [[[self undoManager] prepareWithInvocationTarget:self] setDiagInput:diagInput];
+    diagInput = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADiagInputChanged object:self];
 }
 
 //------------------- Address = 0x0420 ---------------
@@ -1307,46 +1330,11 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AExtDiscriminatorModeChanged object:self];
 }
 
-
-//------------------- Address = 0x0418  Bit Field = 13..0 ---------------
-- (unsigned short) trackingSpeed { return trackingSpeed; }
-- (void) setTrackingSpeed:(unsigned short)aValue
+//------------------- Address = 0x0420  Bit Field Bit Field = 29..27 ---------------
+- (unsigned short) diagChannelEventSel { return diagChannelEventSel; }
+- (void) setDiagChannelEventSel:(unsigned short)aValue
 {
-    if(aValue > 0x7)aValue = 0x7;
-    
-    [[[self undoManager] prepareWithInvocationTarget:self] setTrackingSpeed:trackingSpeed];
-    trackingSpeed = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ATrackingSpeedChanged object:self];
-}
-
-//------------------- Address = 0x041C  Bit Field = 13..0 ---------------
-- (unsigned long) diagInput { return diagInput; }
-- (void) setDiagInput:(unsigned long)aValue
-{
-    if(aValue>0x3FFF)aValue = 0x3FFF;
-    if(diagInput != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setDiagInput:diagInput];
-        diagInput = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADiagInputChanged object:self];
-    }
-}
-
-//------------------- Address = 0x0420  Bit Field = 15..0 ---------------
-- (unsigned short) vetoGateWidth { return vetoGateWidth; }
-- (void) setVetoGateWidth:(unsigned short)aValue
-{
-    if(aValue > 0x3FFF)aValue = 0x3FFF;
-    if(vetoGateWidth != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setVetoGateWidth:vetoGateWidth];
-        vetoGateWidth = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AVetoGateWidthChanged object:self];
-    }
-}
-
-//------------------- Address = 0x0420  Bit Field = N/A ---------------
-- (unsigned long) diagChannelEventSel { return diagChannelEventSel; }
-- (void) setDiagChannelEventSel:(unsigned long)aValue
-{
+    if(aValue>0x7)aValue = 0x7;
     [[[self undoManager] prepareWithInvocationTarget:self] setDiagChannelEventSel:diagChannelEventSel];
     diagChannelEventSel = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADiagChannelEventSelChanged object:self];
@@ -1382,7 +1370,16 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 
 //------------------- Address = 0x048C  Bit Field = 31..0 ---------------
 //------------------- Address = 0x0490  Bit Field = 15..0 ---------------
+//------------------- Address = 0x0494  Bit Field = 15..0 ---------------
 
+- (unsigned short) vetoGateWidth { return vetoGateWidth; }
+- (void) setVetoGateWidth:(unsigned short)aValue
+{
+    if(aValue > 0xFF)aValue = 0xFF;
+    [[[self undoManager] prepareWithInvocationTarget:self] setVetoGateWidth:vetoGateWidth];
+    vetoGateWidth = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AVetoGateWidthChanged object:self];
+}
 
 //------------------- Address = 0x0500  Bit Field = 1 ---------------
 - (BOOL) diagIsync { return diagIsync; }
@@ -1432,7 +1429,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 - (void) setPhaseErrorCount:(unsigned long)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setPhaseErrorCount:phaseErrorCount];
-    phaseErrorCount = aValue;
+    phaseErrorCount = aValue & 0xffff;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhaseErrorCountChanged object:self];
 }
 
@@ -1516,7 +1513,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 
 - (void) setAcceptedEventCount:(unsigned short)chan withValue:(unsigned long)aValue
 {
-    if((chan < kNumGretina4AChannels) && (acceptedEventCount[chan] != aValue)){
+    if((chan < kNumGretina4AChannels)){
         [[[self undoManager] prepareWithInvocationTarget:self] setAcceptedEventCount:chan withValue:acceptedEventCount[chan]];
         acceptedEventCount[chan] = aValue;
         NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
@@ -1672,11 +1669,9 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 - (void) setVhdlVerNum:(unsigned long)aValue
 {
     if(aValue > 0xFF)aValue = 0xFF;
-    if(vhdlVerNum != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setVhdlVerNum:vhdlVerNum];
-        vhdlVerNum = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AVhdlVerNumChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setVhdlVerNum:vhdlVerNum];
+    vhdlVerNum = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AVhdlVerNumChanged object:self];
 }
 
 
@@ -1825,6 +1820,8 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     BOOL startStop;
     if(forceEnable)	startStop= enabled[chan];
     else			startStop = NO;
+
+    BOOL writeFlag = NO;
     
     unsigned long theValue =
     (startStop                        << 0)  |
@@ -1832,7 +1829,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     (preampResetDelay[chan]           << 3)  |
     ((triggerPolarity[chan] & 0x3)    << 10) |
     ((decimationFactor[chan] & 0x7)   << 12) |
-//    (writeFlag                        << 15) |
+    (writeFlag                        << 15) | //default to data with flags
     (droppedEventCountMode[chan]      << 20) |
     (eventCountMode[chan]             << 21) |
     (aHitCountMode[chan]              << 22) |
@@ -1841,6 +1838,9 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     (pileupExtensionMode[chan]        << 26) |
     (pileupWaveformOnlyMode[chan]     << 30);
     
+    
+    if(chan==1)    NSLog(@"%d:0x%08x\n",chan,theValue);
+
     [self writeAndCheckLong:theValue
               addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kChannelControl chan:chan]
                        mask:0x4FF0FC0D //mask off the reserved bits
@@ -1872,103 +1872,83 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 
 - (void) writeLedThreshold:(unsigned short)channel
 {
-    if(channel < kNumGretina4AChannels){
-        unsigned long theValue = ((preampResetDelay[channel] & 0x000000ff)<<16) | (ledThreshold[channel] & 0x00003fff);
-        [self writeAndCheckLong:theValue
-                  addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kLedThreshold chan:channel]
-                           mask:0x00ffffff
-                      reportKey:[NSString stringWithFormat:@"LedThreshold_%d",channel]
-                  forceFullInit:forceFullInit[channel]];
-    }
+    unsigned long theValue = ((preampResetDelay[channel] & 0x000000ff)<<16) | (ledThreshold[channel] & 0x00003fff);
+    [self writeAndCheckLong:theValue
+              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kLedThreshold chan:channel]
+                       mask:0x00ffffff
+                  reportKey:[NSString stringWithFormat:@"LedThreshold_%d",channel]
+              forceFullInit:forceFullInit[channel]];
+    
 }
 
 //-------------------------kRawDataLength Reg----------------------------------------
 - (unsigned long) readRawDataLength:(unsigned short)channel
 {
-    if(channel<kNumGretina4AChannels){
-        return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kRawDataLength chan:channel]];
-    }
-    else return 0;
+    return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kRawDataLength chan:channel]];
 }
 
 - (void) writeRawDataLength:(unsigned short)channel
 {
-    //***NOTE that we only write the first value of the array to all channels
-    if(channel < kNumGretina4AChannels){
-        unsigned long theValue = (rawDataLength & 0x000003ff);
-        [self writeAndCheckLong:theValue
-                  addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kRawDataLength chan:channel]
-                           mask:0x000003ff
-                      reportKey:[NSString stringWithFormat:@"RawDataLength_%d",channel]
-                  forceFullInit:forceFullInit[channel]];
-    }
+    //***NOTE that we only write same value to all channels
+    unsigned long theValue = (rawDataLength & 0x000003ff);
+    [self writeAndCheckLong:theValue
+              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kRawDataLength chan:channel]
+                       mask:0x000003ff
+                  reportKey:[NSString stringWithFormat:@"RawDataLength_%d",channel]
+              forceFullInit:forceFullInit[channel]];
+    
 }
 
 //-------------------------kRawDataWindow Reg----------------------------------------
 - (unsigned long) readRawDataWindow:(unsigned short)channel
 {
-    if(channel<kNumGretina4AChannels){
-        return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kRawDataWindow chan:channel]];
-    }
-    else return 0;
+    return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kRawDataWindow chan:channel]];
 }
 
 - (void) writeRawDataWindow:(unsigned short)channel
 {
-    //***NOTE that we only write the first value of the array to all channels
-    if(channel < kNumGretina4AChannels){
-        unsigned long theValue = (rawDataWindow & 0x000003ff);
-        [self writeAndCheckLong:theValue
-                  addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kRawDataWindow chan:channel]
-                           mask:0x000003ff
-                      reportKey:[NSString stringWithFormat:@"RawDataWindow_%d",channel]
-                  forceFullInit:forceFullInit[channel]];
-    }
+    //***NOTE that we write same value to all
+    unsigned long theValue = (rawDataWindow & 0x000003ff);
+    [self writeAndCheckLong:theValue
+              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kRawDataWindow chan:channel]
+                       mask:0x000003ff
+                  reportKey:[NSString stringWithFormat:@"RawDataWindow_%d",channel]
+              forceFullInit:forceFullInit[channel]];
+
 }
 
 
 //-------------------------kDWindow Reg----------------------------------------
 - (unsigned long) readDWindow:(unsigned short)channel
 {
-    if(channel<kNumGretina4AChannels){
-        return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kDWindow chan:channel]];
-    }
-    else return 0;
-}
+    return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kDWindow chan:channel]];
+ }
 
 - (void) writeDWindow:(unsigned short)channel
 {
-    //***NOTE that we only write the first value of the array to all channels
-    if(channel < kNumGretina4AChannels){
-        unsigned long theValue = (dWindow[0] & 0x0000007F);
-        [self writeAndCheckLong:theValue
-                  addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kDWindow chan:channel]
-                           mask:0x0000007F
-                      reportKey:[NSString stringWithFormat:@"DWindow_%d",channel]
-                  forceFullInit:forceFullInit[channel]];
-    }
+    unsigned long theValue = (dWindow[channel] & 0x0000007F);
+    [self writeAndCheckLong:theValue
+              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kDWindow chan:channel]
+                       mask:0x0000007F
+                  reportKey:[NSString stringWithFormat:@"DWindow_%d",channel]
+              forceFullInit:forceFullInit[channel]];
 }
 
 //-------------------------kKWindow Reg----------------------------------------
 - (unsigned long) readKWindow:(unsigned short)channel
 {
-    if(channel < kNumGretina4AChannels){
-        return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kKWindow chan:channel]];
-    }
-    else return 0;
+    return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kKWindow chan:channel]];
 }
 
 - (void) writeKWindow:(unsigned short)channel
 {
-    //***NOTE that we only write the first value of the array to all channels
-    if(channel < kNumGretina4AChannels){
-        unsigned long theValue = (kWindow[0] & 0x0000007F);
-        [self writeAndCheckLong:theValue
-                  addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kKWindow chan:channel]
-                           mask:0x0000007F
-                      reportKey:[NSString stringWithFormat:@"KWindow_%d",channel]
-                  forceFullInit:forceFullInit[channel]];
-    }
+    unsigned long theValue = (kWindow[channel] & 0x0000007F);
+    [self writeAndCheckLong:theValue
+              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kKWindow chan:channel]
+                       mask:0x0000007F
+                  reportKey:[NSString stringWithFormat:@"KWindow_%d",channel]
+              forceFullInit:forceFullInit[channel]];
+
 }
 //-------------------------kMWindow Reg----------------------------------------
 - (unsigned long) readMWindow:(unsigned short)channel
@@ -1981,112 +1961,82 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 
 - (void) writeMWindow:(unsigned short)channel
 {
-    //***NOTE that we only write the first value of the array to all channels
-    if(channel < kNumGretina4AChannels){
-        unsigned long theValue = (mWindow[0] & 0x0000007F);
-        [self writeAndCheckLong:theValue
-                  addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kMWindow chan:channel]
-                           mask:0x0000007F
-                      reportKey:[NSString stringWithFormat:@"MWindow_%d",channel]
-                  forceFullInit:forceFullInit[channel]];
-    }
+    unsigned long theValue = (mWindow[channel] & 0x0000007F);
+    [self writeAndCheckLong:theValue
+              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kMWindow chan:channel]
+                       mask:0x0000007F
+                  reportKey:[NSString stringWithFormat:@"MWindow_%d",channel]
+              forceFullInit:forceFullInit[channel]];
+    
 }
 
 
 //-------------------------kD3Window Reg----------------------------------------
 - (unsigned long)readD3Window:(unsigned short)channel
 {
-    if(channel<kNumGretina4AChannels){
-        return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kD3Window chan:channel]];
-    }
-    else return 0;
+    return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kD3Window chan:channel]];
 }
 
 - (void) writeD3Window:(unsigned short)channel
 {
-    //***NOTE that we only write the first value of the array to all channels
-    if(channel < kNumGretina4AChannels){
-        unsigned long theValue = (d3Window[0] & 0x0000007F);
-        [self writeAndCheckLong:theValue
-                  addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kD3Window chan:channel]
-                           mask:0x0000007F
-                      reportKey:[NSString stringWithFormat:@"D3Window_%d",channel]
-                  forceFullInit:forceFullInit[channel]];
-    }
+        unsigned long theValue = (d3Window[channel] & 0x0000007F);
+    [self writeAndCheckLong:theValue
+              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kD3Window chan:channel]
+                       mask:0x0000007F
+                  reportKey:[NSString stringWithFormat:@"D3Window_%d",channel]
+              forceFullInit:forceFullInit[channel]];
 }
 
 //-------------------------kDiscWidth Reg----------------------------------------
 - (unsigned long) readDiscWidth:(unsigned short)channel
 {
-    if(channel<kNumGretina4AChannels){
-        return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kDiscWidth chan:channel]];
-    }
-    else return 0;
+    return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kDiscWidth chan:channel]];
 }
 - (void) writeDiscWidth:(unsigned short)channel
 {
-    //***NOTE that we only write the first value of the array to all channels
-    if(channel < kNumGretina4AChannels){
-        unsigned long theValue = (discWidth[0] & 0x0000003F);
-        [self writeAndCheckLong:theValue
-                  addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kDiscWidth chan:channel]
-                           mask:0x0000003F
-                      reportKey:[NSString stringWithFormat:@"DiscWidth%d",channel]
-                  forceFullInit:forceFullInit[channel]];
-    }
+    unsigned long theValue = (discWidth[channel] & 0x0000003F);
+    [self writeAndCheckLong:theValue
+              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kDiscWidth chan:channel]
+                       mask:0x0000003F
+                  reportKey:[NSString stringWithFormat:@"DiscWidth%d",channel]
+              forceFullInit:forceFullInit[channel]];
 }
 //-------------------------kBaselineStart Reg----------------------------------------
 - (unsigned long) readBaselineStart:(unsigned short)channel
 {
-    if(channel<kNumGretina4AChannels){
-        return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kBaselineStart chan:channel]];
-    }
-    else return 0;
+    return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kBaselineStart chan:channel]];
 }
 
 - (void) writeBaselineStart:(unsigned short)channel
 {
-    //***NOTE that we only write the first value of the array to all channels
-    if(channel < kNumGretina4AChannels){
-        unsigned long theValue = (baselineStart[0] & 0x00003FFF);
-        [self writeAndCheckLong:theValue
-                  addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kBaselineStart chan:channel]
-                           mask:0x00003FFF
-                      reportKey:[NSString stringWithFormat:@"BaselineStart%d",channel]
-                  forceFullInit:forceFullInit[channel]];
-    }
+    unsigned long theValue = (baselineStart[0] & 0x00003FFF);
+    [self writeAndCheckLong:theValue
+              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kBaselineStart chan:channel]
+                       mask:0x00003FFF
+                  reportKey:[NSString stringWithFormat:@"BaselineStart%d",channel]
+              forceFullInit:forceFullInit[channel]];
 }
 
-//-------------------------kBaselineStart Reg----------------------------------------
+//-------------------------kP1Window Reg----------------------------------------
 - (unsigned long) readP1Window:(unsigned short)channel
 {
-    if(channel<kNumGretina4AChannels){
-        return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kP1Window chan:channel]];
-    }
-    else return 0;
-}
+    return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kP1Window chan:channel]];
+ }
 
 - (void) writeP1Window:(unsigned short)channel
 {
-    //***NOTE that we only write the first value of the array to all channels
-    if(channel < kNumGretina4AChannels){
-        unsigned long theValue = (p1Window[0] & 0x0000000F);
-        [self writeAndCheckLong:theValue
-                  addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kP1Window chan:channel]
-                           mask:0x0000000F
-                      reportKey:[NSString stringWithFormat:@"P1Window_%d",channel]
-                  forceFullInit:forceFullInit[channel]];
-    }
-    
+    unsigned long theValue = (p1Window[channel] & 0x0000000F);
+    [self writeAndCheckLong:theValue
+              addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kP1Window chan:channel]
+                       mask:0x0000000F
+                  reportKey:[NSString stringWithFormat:@"P1Window_%d",channel]
+              forceFullInit:forceFullInit[channel]];
 }
 
 //-------------------------kP2Window Reg----------------------------------------
 - (unsigned long) readP2Window:(unsigned short)channel
 {
-    if(channel<kNumGretina4AChannels){
-        return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kP2Window chan:channel]];
-    }
-    else return 0;
+    return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kP2Window chan:channel]];
 }
 
 - (void) writeP2Window
@@ -2102,10 +2052,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 //-------------------------kChannelPulsedControl Reg----------------------------------------
 - (unsigned long) readChannelPulsedControl:(unsigned short)channel
 {
-    if(channel<kNumGretina4AChannels){
-        return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kChannelPulsedControl chan:channel]];
-    }
-    else return 0;
+    return [self readLongFromOffset:[Gretina4ARegisters offsetForRegisterIndex:kChannelPulsedControl chan:channel]];
 }
 
 - (void) writeChannelPulsedControl
@@ -2155,8 +2102,8 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 - (void) writeHoldoffControl
 {
     unsigned long theValue = ((holdoffTime     & 0x1FF) << 0) |
-    ((peakSensitivity & 0x07) << 9) |
-    ((autoMode        & 0x01) << 12);
+                             ((peakSensitivity & 0x07) << 9)  |
+                             ((autoMode        & 0x01) << 12);
     [self writeAndCheckLong:theValue
               addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kHoldoffControl]
                        mask:0x00001FFF
@@ -2165,7 +2112,14 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 }
 
 //-------------------------Timestamp Regs----------------------------------------
-- (unsigned long long) readTimeStamp
+- (unsigned long long) readLatTimeStamp
+{
+    unsigned long      ts1 =  [self readLongFromReg:kLatTimestampLsb];
+    unsigned long long ts2 =  [self readLongFromReg:kLatTimestampMsb];
+    return (ts2<<32) | ts1;
+}
+
+- (unsigned long long) readLiveTimeStamp
 {
     unsigned long      ts1 =  [self readLongFromReg:kLiveTimestampLsb];
     unsigned long long ts2 =  [self readLongFromReg:kLiveTimestampMsb];
@@ -2183,7 +2137,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     [self writeAndCheckLong:(vetoGateWidth & 0x00003fff)
               addressOffset:[Gretina4ARegisters offsetForRegisterIndex:kVetoGateWidth]
                        mask:0x00003fff
-                  reportKey:@"BaselineDelay"
+                  reportKey:@"VetoGateWidth"
               forceFullInit:forceFullCardInit];
 }
 
@@ -2328,17 +2282,17 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     [self resetFIFO];
     //write the channel level params
     for(i=0;i<kNumGretina4AChannels;i++) {
-        [self writeKWindow:i];          //only [0] is used
-        [self writeMWindow:i];          //only [0] is used
-        [self writeDWindow:i];          //only [0] is used
-        [self writeD3Window:i];         //only [0] is used
+        [self writeP1Window:i];
+        [self writeKWindow:i];
+        [self writeMWindow:i];
+        [self writeDWindow:i];
+        [self writeD3Window:i];
         [self writeLedThreshold:i];
         
         [self writeRawDataLength:i];    //only [0] is used
         [self writeRawDataWindow:i];    //only [0] is used
-        [self writeP1Window:i];         //only [0] is used
         [self writeDiscWidth:i];        //only [0] is used
-        [self writeBaselineStart:i];    //only [0] is used
+        [self writeBaselineStart:i];
     }
     
     //write the card level params
@@ -2356,7 +2310,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
    
     //enable channels
     for(i=0;i<kNumGretina4AChannels;i++) {
-        [self writeControlReg:i enabled:YES];
+        [self writeControlReg:i enabled:[self enabled:i]];
     }
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ACardInited object:self];
@@ -2562,7 +2516,52 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     [p setSetMethod:@selector(setLedThreshold:withValue:) getMethod:@selector(ledThreshold:)];
     [p setCanBeRamped:YES];
     [a addObject:p];
+ 
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"P1 Window"];
+    [p setFormat:@"##0" upperLimit:15 lowerLimit:0 stepSize:1 units:@"x10ns"];
+    [p setSetMethod:@selector(setP1Window:withValue:) getMethod:@selector(p1Window:)];
+    [a addObject:p];
+
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"K Window"];
+    [p setFormat:@"##0" upperLimit:127 lowerLimit:0 stepSize:1 units:@"x10ns"];
+    [p setSetMethod:@selector(setKWindow:withValue:) getMethod:@selector(kWindow:)];
+    [a addObject:p];
     
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"D Window"];
+    [p setFormat:@"##0" upperLimit:127 lowerLimit:0 stepSize:1 units:@"x10ns"];
+    [p setSetMethod:@selector(setDWindow:withValue:) getMethod:@selector(dWindow:)];
+    [a addObject:p];
+    
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"D3 Window"];
+    [p setFormat:@"##0" upperLimit:127 lowerLimit:0 stepSize:1 units:@"x10ns"];
+    [p setSetMethod:@selector(setD3Window:withValue:) getMethod:@selector(d3Window:)];
+    [a addObject:p];
+    
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"M Window"];
+    [p setFormat:@"##0" upperLimit:0x3fffff lowerLimit:0 stepSize:1 units:@"x10ns"];
+    [p setSetMethod:@selector(setMWindow:withValue:) getMethod:@selector(mWindow:)];
+    [p setCanBeRamped:YES];
+    [a addObject:p];
+  
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Descrim Width"];
+    [p setFormat:@"##0" upperLimit:0x3F lowerLimit:0 stepSize:1 units:@"x20ns"];
+    [p setSetMethod:@selector(setDiscWidth:withValue:) getMethod:@selector(discWidth:)];
+    [a addObject:p];
+    
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Baseline Start"];
+    [p setFormat:@"##0" upperLimit:0x3fff lowerLimit:0 stepSize:1 units:@"x10ns"];
+    [p setSetMethod:@selector(setBaselineStart:withValue:) getMethod:@selector(baselineStart:)];
+    [p setCanBeRamped:YES];
+    [a addObject:p];
+    
+
     
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Force Full Init"];
@@ -2649,29 +2648,28 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     NSString* errorLocation = @"";
     @try {
         if(![self fifoIsEmpty]){
-            short orcaHeaderLen      = 2;
-            short extraLenghtOfData  = 2;
-            unsigned long dataLength = [self rawDataWindow]/2;
-            dataBuffer[0] = dataId | (dataLength + extraLenghtOfData + orcaHeaderLen); //length + 2 longs + orca header
+            short orcaHeaderLen = 2;
+            unsigned long dataLength = [self rawDataWindow]/2 +1;
+            dataBuffer[0] = dataId | (orcaHeaderLen + dataLength); //length + 2 longs + orca header
             dataBuffer[1] = location;
             
             [theController readLong:&dataBuffer[2]
                           atAddress:fifoAddress
-                        timesToRead:dataLength+extraLenghtOfData //actual length is 4 shorts longer then the register
+                        timesToRead:dataLength //actual length is 4 shorts longer then the register
                          withAddMod:[self addressModifier]
                       usingAddSpace:0x01];
-            
+//            int n = (orcaHeaderLen + dataLength);
+//            for(int i=0;i<n;i++){
+//                NSLog(@"%3d: 0x%08x\n",i,dataBuffer[i]);
+//            }
+ 
           //  NSLog(@"dropped: %lu  accepted: %lu  ahit: %lu  disc: %lu\n",[self readDroppedEventCount:0],[self readAcceptedEventCount:0],[self readAHitCount:0],[self readDiscCount:0]);
             //the first word of the actual data record had better be the packet separator
             if(dataBuffer[2]==kGretina4APacketSeparator){
                 short chan = dataBuffer[3] & 0xf;
                 if(chan < 10){
                     ++waveFormCount[dataBuffer[3] & 0x7];  //grab the channel and inc the count
-                    [aDataPacket addLongsToFrameBuffer:dataBuffer length:dataLength + extraLenghtOfData + orcaHeaderLen];
-//                    int n = (dataLength + extraLenghtOfData + orcaHeaderLen);
-//                    for(int i=0;i<n;i++){
-//                        NSLog(@"%3d: 0x%08x\n",i,dataBuffer[i]);
-//                    }
+                    [aDataPacket addLongsToFrameBuffer:dataBuffer length:orcaHeaderLen + dataLength];
                 }
                 else {
                     NSLogError(@"",@"Bad header--record discarded",@"GRETINA4M",[NSString stringWithFormat:@"slot %d",[self slot]], [NSString stringWithFormat:@"chan %d",1],nil);
@@ -2786,9 +2784,9 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     /* The current hardware specific data is:               *
      *                                                      *
      * 0: FIFO state address                                *
-     * 1: FIFO empty state mask                             *
-     * 2: FIFO address                                      *
-     * 3: FIFO address AM                                   *
+     * 1: FIFO address                                      *
+     * 2: FIFO address AM                                   *
+     * 3: FIFO reset Address                                *
      * 4: FIFO size                                         */
     
     configStruct->total_cards++;
@@ -2815,7 +2813,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 {
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
-    [self setForceFullCardInit:         [decoder decodeBoolForKey:   @"forceFullCardInit"]];
+    [self setForceFullCardInit:         [decoder decodeBoolForKey:  @"forceFullCardInit"]];
     [self setSpiConnector:              [decoder decodeObjectForKey:@"spiConnector"]];
     [self setLinkConnector:             [decoder decodeObjectForKey:@"linkConnector"]];
     [self setRegisterIndex:				[decoder decodeIntForKey:   @"registerIndex"]];
@@ -2823,22 +2821,21 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     [self setRegisterWriteValue:		[decoder decodeInt32ForKey: @"registerWriteValue"]];
     [self setSPIWriteValue:     		[decoder decodeInt32ForKey: @"spiWriteValue"]];
     [self setFpgaFilePath:				[decoder decodeObjectForKey:@"fpgaFilePath"]];
-//    [self setWriteFlag:                 [decoder decodeBoolForKey:  @"writeFlag"]];
     [self setExtDiscriminatorSrc:       [decoder decodeInt32ForKey: @"extDiscriminatorSrc"]];
     [self setUserPackageData:           [decoder decodeInt32ForKey: @"userPackageData"]];
     [self setWindowCompMin:             [decoder decodeIntForKey:   @"windowCompMin"]];
     [self setWindowCompMax:             [decoder decodeIntForKey:   @"windowCompMax"]];
-    [self setP2Window:                  [decoder decodeInt32ForKey: @"p2Window"]];
+    [self setP2Window:                  [decoder decodeIntForKey:   @"p2Window"]];
     [self setDacChannelSelect:          [decoder decodeIntForKey:   @"dacChannelSelect"]];
     [self setDacAttenuation:            [decoder decodeIntForKey:   @"dacAttenuation"]];
     [self setChannelPulsedControl:      [decoder decodeInt32ForKey: @"channelPulsedControl"]];
     [self setDiagMuxControl:            [decoder decodeInt32ForKey: @"diagMuxControl"]];
     [self setHoldoffTime:               [decoder decodeIntForKey:   @"holdoffTime"]];
     [self setPeakSensitivity:           [decoder decodeIntForKey:   @"peakSensitivity"]];
-    [self setAutoMode:                  [decoder decodeIntForKey:   @"autoMode"]];
+    [self setAutoMode:                  [decoder decodeBoolForKey:  @"autoMode"]];
     [self setTrackingSpeed:             [decoder decodeIntForKey:   @"trackingSpeed"]];
     [self setBaselineDelay:             [decoder decodeIntForKey:   @"baselineDelay"]];
-    [self setDiagInput:                 [decoder decodeInt32ForKey: @"diagInput"]];
+    [self setDiagInput:                 [decoder decodeIntForKey:   @"diagInput"]];
     [self setDiagChannelEventSel:       [decoder decodeInt32ForKey: @"diagChannelEventSel"]];
     [self setRj45SpareIoDir:            [decoder decodeBoolForKey:  @"rj45SpareIoDir"]];
     [self setRj45SpareIoMuxSel:         [decoder decodeInt32ForKey: @"rj45SpareIoMuxSel"]];
@@ -2908,21 +2905,20 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
     [encoder encodeInt32:spiWriteValue			    forKey:@"spiWriteValue"];
     [encoder encodeObject:fpgaFilePath				forKey:@"fpgaFilePath"];
     [encoder encodeInt32:extDiscriminatorSrc        forKey:@"extDiscriminatorSrc"];
-//    [encoder encodeBool:writeFlag                   forKey:@"writeFlag"];
     [encoder encodeInt32:userPackageData            forKey:@"userPackageData"];
     [encoder encodeInt32:windowCompMin              forKey:@"windowCompMin"];
     [encoder encodeInt32:windowCompMax              forKey:@"windowCompMax"];
-    [encoder encodeInt32:p2Window                   forKey:@"p2Window"];
+    [encoder encodeInt:p2Window                     forKey:@"p2Window"];
     [encoder encodeInt:dacChannelSelect             forKey:@"dacChannelSelect"];
     [encoder encodeInt:dacAttenuation               forKey:@"dacAttenuation"];
     [encoder encodeInt32:channelPulsedControl       forKey:@"channelPulsedControl"];
     [encoder encodeInt32:diagMuxControl             forKey:@"diagMuxControl"];
     [encoder encodeInt:holdoffTime                  forKey:@"holdoffTime"];
     [encoder encodeInt:peakSensitivity              forKey:@"peakSensitivity"];
-    [encoder encodeInt:autoMode                     forKey:@"autoMode"];
+    [encoder encodeBool:autoMode                    forKey:@"autoMode"];
     [encoder encodeInt:trackingSpeed                forKey:@"trackingSpeed"];
     [encoder encodeInt:baselineDelay                forKey:@"baselineDelay"];
-    [encoder encodeInt32:diagInput                  forKey:@"diagInput"];
+    [encoder encodeInt:diagInput                    forKey:@"diagInput"];
     [encoder encodeInt32:diagChannelEventSel        forKey:@"diagChannelEventSel"];
     [encoder encodeInt32:rj45SpareIoMuxSel          forKey:@"rj45SpareIoMuxSel"];
     [encoder encodeBool:rj45SpareIoDir              forKey:@"rj45SpareIoDir"];
@@ -2960,7 +2956,7 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
         [encoder encodeInt:discWidth[i]               forKey:[@"discWidth"             stringByAppendingFormat:@"%d",i]];
         [encoder encodeInt:d3Window[i]                forKey:[@"d3Window"              stringByAppendingFormat:@"%d",i]];
         [encoder encodeInt:baselineStart[i]           forKey:[@"baselineStart"         stringByAppendingFormat:@"%d",i]];
-        [encoder encodeInt:p1Window[i]                forKey:[@"p1Window"              stringByAppendingFormat:@"%d",i]];
+        [encoder encodeInt:p1Window[i]                forKey:[@"p1Window"               stringByAppendingFormat:@"%d",i]];
     }
     
     [encoder encodeObject:waveFormRateGroup			forKey:@"waveFormRateGroup"];
@@ -2970,26 +2966,23 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 {
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     [objDictionary setObject:[NSNumber numberWithBool:forceFullCardInit]             forKey:@"forceFullCardInit"];
-    [objDictionary setObject:[NSNumber numberWithInt:p2Window]                      forKey:@"p2Window"];
     
     [objDictionary setObject:[NSNumber numberWithUnsignedLong:extDiscriminatorSrc]  forKey:@"extDiscriminatorSrc"];
 //    [objDictionary setObject:[NSNumber numberWithBool:writeFlag]                    forKey:@"writeFlag"];
-    [objDictionary setObject:[NSNumber numberWithInt:p2Window]                      forKey:@"p2Window"];
-    [objDictionary setObject:[NSNumber numberWithInt:p2Window]                      forKey:@"p2Window"];
     [objDictionary setObject:[NSNumber numberWithInt:userPackageData]               forKey:@"userPackageData"];
     [objDictionary setObject:[NSNumber numberWithUnsignedLong:windowCompMin]        forKey:@"windowCompMin"];
     [objDictionary setObject:[NSNumber numberWithUnsignedLong:windowCompMax]        forKey:@"windowCompMax"];
-    [objDictionary setObject:[NSNumber numberWithUnsignedLong:p2Window]             forKey:@"p2Window"];
+    [objDictionary setObject:[NSNumber numberWithInt:p2Window]                      forKey:@"p2Window"];
     [objDictionary setObject:[NSNumber numberWithInt:dacChannelSelect]              forKey:@"dacChannelSelect"];
     [objDictionary setObject:[NSNumber numberWithInt:dacAttenuation]                forKey:@"dacAttenuation"];
     [objDictionary setObject:[NSNumber numberWithUnsignedLong:channelPulsedControl] forKey:@"channelPulsedControl"];
     [objDictionary setObject:[NSNumber numberWithUnsignedLong:diagMuxControl]       forKey:@"diagMuxControl"];
     [objDictionary setObject:[NSNumber numberWithInt:holdoffTime]                   forKey:@"holdoffTime"];
     [objDictionary setObject:[NSNumber numberWithInt:peakSensitivity]               forKey:@"peakSensitivity"];
-    [objDictionary setObject:[NSNumber numberWithInt:autoMode]                      forKey:@"autoMode"];
+    [objDictionary setObject:[NSNumber numberWithBool:autoMode]                     forKey:@"autoMode"];
     [objDictionary setObject:[NSNumber numberWithInt:trackingSpeed]                 forKey:@"trackingSpeed"];
     [objDictionary setObject:[NSNumber numberWithInt:baselineDelay]                 forKey:@"baselineDelay"];
-    [objDictionary setObject:[NSNumber numberWithUnsignedLong:diagInput]            forKey:@"diagInput"];
+    [objDictionary setObject:[NSNumber numberWithInt:diagInput]                     forKey:@"diagInput"];
     [objDictionary setObject:[NSNumber numberWithUnsignedLong:diagChannelEventSel]  forKey:@"diagChannelEventSel"];
     [objDictionary setObject:[NSNumber numberWithUnsignedLong:rj45SpareIoMuxSel]    forKey:@"rj45SpareIoMuxSel"];
     [objDictionary setObject:[NSNumber numberWithBool:rj45SpareIoDir]               forKey:@"rj45SpareIoDir"];

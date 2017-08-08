@@ -22,7 +22,7 @@
 #pragma mark •••Imported Files
 #import "ORIpeCard.h"
 #import "ORIpeV4FLTModel.h"
-#import "SLTv4_HW_Definitions.h"
+#import "KatrinV4_HW_Definitions.h"
 #import "ORHWWizard.h"
 #import "ORDataTaker.h"
 #import "ORKatrinV4FLTDefs.h"
@@ -85,8 +85,6 @@
 @interface ORKatrinV4FLTModel : ORIpeV4FLTModel <ORDataTaker,ORHWWizard,ORHWRamping,ORAdcInfoProviding>
 {
     // Hardware configuration
-	unsigned long	energyTraceId;		//!< Id used to identify energy+trace data set (general data set - for sync, skipped trace readout etc. - FLT rev. xxxx,2121)
-
     int shipSumHistogram;
     int vetoOverlapTime;
     int nfoldCoincidence;
@@ -108,7 +106,7 @@
     unsigned long   oldTriggerEnabledMask; //!< mask to temporarially store the enabled mask for later reuse.
     
     //buffer for summed histograms
-    katrinV4FullHistogramDataStruct histoBuf[24];
+    katrinV4FltFullHistogramDataStruct histoBuf[24];
     int32_t isBetweenSubruns;//temp variable used for shipping sum histograms -tb-
     int useBipolarEnergy;
     unsigned long bipolarEnergyThreshTest;
@@ -442,7 +440,6 @@ extern NSString* ORKatrinV4FLTModelHistClrModeChanged;
 extern NSString* ORKatrinV4FLTModelHistModeChanged;
 extern NSString* ORKatrinV4FLTModelHistEBinChanged;
 extern NSString* ORKatrinV4FLTModelHistEMinChanged;
-extern NSString* ORKatrinV4FLTModelRunModeChanged;
 extern NSString* ORKatrinV4FLTModelStoreDataInRamChanged;
 extern NSString* ORKatrinV4FLTModelFilterShapingLengthChanged;
 extern NSString* ORKatrinV4FLTModelGapLengthChanged;

@@ -46,6 +46,7 @@
     ORTimeRate*          timeRate[8];
     BOOL                 dataValid;
     ORAlarm*             dataInValidAlarm;
+    ORAlarm*             badStatusAlarm;
     ORAlarm*             powerOutAlarm;
     NSOperationQueue*    fileQueue;
     NSMutableSet*        eventLog;

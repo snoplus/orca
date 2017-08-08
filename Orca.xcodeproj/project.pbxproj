@@ -216,7 +216,7 @@
 		2DD0C8BC193FBAE4009112B2 /* KatrinV4SLTScript in Resources */ = {isa = PBXBuildFile; fileRef = 2DD0C8A3193FBAE3009112B2 /* KatrinV4SLTScript */; };
 		2DD0C8BE193FBAE4009112B2 /* ORFLTv4Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 2DD0C8A5193FBAE3009112B2 /* ORFLTv4Readout.hh */; };
 		2DD0C8C0193FBAE4009112B2 /* ORSLTv4Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 2DD0C8A7193FBAE3009112B2 /* ORSLTv4Readout.hh */; };
-		2DD0C8C1193FBAE4009112B2 /* SLTv4_HW_Definitions.h in Headers */ = {isa = PBXBuildFile; fileRef = 2DD0C8A8193FBAE3009112B2 /* SLTv4_HW_Definitions.h */; };
+		2DD0C8C1193FBAE4009112B2 /* KatrinV4_HW_Definitions.h in Headers */ = {isa = PBXBuildFile; fileRef = 2DD0C8A8193FBAE3009112B2 /* KatrinV4_HW_Definitions.h */; };
 		2DD0C8C2193FBAE4009112B2 /* SLTv4GeneralOperations.h in Headers */ = {isa = PBXBuildFile; fileRef = 2DD0C8A9193FBAE3009112B2 /* SLTv4GeneralOperations.h */; };
 		2DD0C8C3193FBAE4009112B2 /* KatrinV4SLT.nib in Resources */ = {isa = PBXBuildFile; fileRef = 2DD0C8AA193FBAE3009112B2 /* KatrinV4SLT.nib */; };
 		2DD0C8C4193FBAE4009112B2 /* KatrinV4SLTCard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 2DD0C8AB193FBAE3009112B2 /* KatrinV4SLTCard.gif */; };
@@ -823,6 +823,18 @@
 		8421064C1085A28E00C3AA81 /* ORAdeiLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = 8421064A1085A28E00C3AA81 /* ORAdeiLoader.m */; };
 		8421064D1085A28E00C3AA81 /* ORAdeiLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = 8421064B1085A28E00C3AA81 /* ORAdeiLoader.h */; };
 		84211E371074E5CD00CCB0C0 /* IpeV4SLT.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84211E361074E5CD00CCB0C0 /* IpeV4SLT.nib */; };
+		84213E341F05917E004F7635 /* goScript in KatrinSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2DD0C89E193FBAE3009112B2 /* goScript */; };
+		84213E351F05917E004F7635 /* HW_Readout.cc in KatrinSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2DD0C89F193FBAE3009112B2 /* HW_Readout.cc */; };
+		84213E361F05917E004F7635 /* HW_Readout.h in KatrinSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2DD0C8A0193FBAE3009112B2 /* HW_Readout.h */; };
+		84213E371F05917E004F7635 /* HW_Specific.icc in KatrinSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2DD0C8A1193FBAE3009112B2 /* HW_Specific.icc */; };
+		84213E381F05917E004F7635 /* HWMakefile.mk in KatrinSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2DD0C8A2193FBAE3009112B2 /* HWMakefile.mk */; };
+		84213E391F05917E004F7635 /* KatrinV4SLTScript in KatrinSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2DD0C8A3193FBAE3009112B2 /* KatrinV4SLTScript */; };
+		84213E3A1F05917E004F7635 /* ORFLTv4Readout.cc in KatrinSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2DD0C8A4193FBAE3009112B2 /* ORFLTv4Readout.cc */; };
+		84213E3B1F05917E004F7635 /* ORFLTv4Readout.hh in KatrinSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2DD0C8A5193FBAE3009112B2 /* ORFLTv4Readout.hh */; };
+		84213E3C1F05917E004F7635 /* ORSLTv4Readout.cc in KatrinSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2DD0C8A6193FBAE3009112B2 /* ORSLTv4Readout.cc */; };
+		84213E3D1F05917E004F7635 /* ORSLTv4Readout.hh in KatrinSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2DD0C8A7193FBAE3009112B2 /* ORSLTv4Readout.hh */; };
+		84213E3E1F05917E004F7635 /* KatrinV4_HW_Definitions.h in KatrinSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2DD0C8A8193FBAE3009112B2 /* KatrinV4_HW_Definitions.h */; };
+		84213E3F1F05917E004F7635 /* SLTv4GeneralOperations.h in KatrinSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2DD0C8A9193FBAE3009112B2 /* SLTv4GeneralOperations.h */; };
 		84216070094F7F9E002E68B7 /* ORAdcModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8421606E094F7F9E002E68B7 /* ORAdcModel.h */; };
 		84216071094F7F9E002E68B7 /* ORAdcModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8421606F094F7F9E002E68B7 /* ORAdcModel.m */; };
 		8421607B094F861E002E68B7 /* adc.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8421607A094F861E002E68B7 /* adc.tif */; };
@@ -3553,6 +3565,18 @@
 			dstPath = KatrinSLTv4_Readout_Code;
 			dstSubfolderSpec = 7;
 			files = (
+				84213E341F05917E004F7635 /* goScript in KatrinSLTv4_Copy */,
+				84213E351F05917E004F7635 /* HW_Readout.cc in KatrinSLTv4_Copy */,
+				84213E361F05917E004F7635 /* HW_Readout.h in KatrinSLTv4_Copy */,
+				84213E371F05917E004F7635 /* HW_Specific.icc in KatrinSLTv4_Copy */,
+				84213E381F05917E004F7635 /* HWMakefile.mk in KatrinSLTv4_Copy */,
+				84213E391F05917E004F7635 /* KatrinV4SLTScript in KatrinSLTv4_Copy */,
+				84213E3A1F05917E004F7635 /* ORFLTv4Readout.cc in KatrinSLTv4_Copy */,
+				84213E3B1F05917E004F7635 /* ORFLTv4Readout.hh in KatrinSLTv4_Copy */,
+				84213E3C1F05917E004F7635 /* ORSLTv4Readout.cc in KatrinSLTv4_Copy */,
+				84213E3D1F05917E004F7635 /* ORSLTv4Readout.hh in KatrinSLTv4_Copy */,
+				84213E3E1F05917E004F7635 /* KatrinV4_HW_Definitions.h in KatrinSLTv4_Copy */,
+				84213E3F1F05917E004F7635 /* SLTv4GeneralOperations.h in KatrinSLTv4_Copy */,
 			);
 			name = KatrinSLTv4_Copy;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3963,7 +3987,7 @@
 		2DD0C8A5193FBAE3009112B2 /* ORFLTv4Readout.hh */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = ORFLTv4Readout.hh; sourceTree = "<group>"; };
 		2DD0C8A6193FBAE3009112B2 /* ORSLTv4Readout.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; path = ORSLTv4Readout.cc; sourceTree = "<group>"; };
 		2DD0C8A7193FBAE3009112B2 /* ORSLTv4Readout.hh */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = ORSLTv4Readout.hh; sourceTree = "<group>"; };
-		2DD0C8A8193FBAE3009112B2 /* SLTv4_HW_Definitions.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; path = SLTv4_HW_Definitions.h; sourceTree = "<group>"; };
+		2DD0C8A8193FBAE3009112B2 /* KatrinV4_HW_Definitions.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; path = KatrinV4_HW_Definitions.h; sourceTree = "<group>"; };
 		2DD0C8A9193FBAE3009112B2 /* SLTv4GeneralOperations.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; path = SLTv4GeneralOperations.h; sourceTree = "<group>"; };
 		2DD0C8AA193FBAE3009112B2 /* KatrinV4SLT.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = KatrinV4SLT.nib; sourceTree = "<group>"; };
 		2DD0C8AB193FBAE3009112B2 /* KatrinV4SLTCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = KatrinV4SLTCard.gif; sourceTree = "<group>"; };
@@ -7693,7 +7717,7 @@
 				2DD0C8A5193FBAE3009112B2 /* ORFLTv4Readout.hh */,
 				2DD0C8A6193FBAE3009112B2 /* ORSLTv4Readout.cc */,
 				2DD0C8A7193FBAE3009112B2 /* ORSLTv4Readout.hh */,
-				2DD0C8A8193FBAE3009112B2 /* SLTv4_HW_Definitions.h */,
+				2DD0C8A8193FBAE3009112B2 /* KatrinV4_HW_Definitions.h */,
 				2DD0C8A9193FBAE3009112B2 /* SLTv4GeneralOperations.h */,
 			);
 			path = KatrinSLTv4_Readout_Code;
@@ -16154,7 +16178,7 @@
 				2DD0C8B9193FBAE4009112B2 /* HW_Readout.h in Headers */,
 				2DD0C8BE193FBAE4009112B2 /* ORFLTv4Readout.hh in Headers */,
 				2DD0C8C0193FBAE4009112B2 /* ORSLTv4Readout.hh in Headers */,
-				2DD0C8C1193FBAE4009112B2 /* SLTv4_HW_Definitions.h in Headers */,
+				2DD0C8C1193FBAE4009112B2 /* KatrinV4_HW_Definitions.h in Headers */,
 				2DD0C8C2193FBAE4009112B2 /* SLTv4GeneralOperations.h in Headers */,
 				2DD0C8C5193FBAE4009112B2 /* ORKatrinV4SLTController.h in Headers */,
 				2DD0C8C7193FBAE4009112B2 /* ORKatrinV4SLTDecoder.h in Headers */,

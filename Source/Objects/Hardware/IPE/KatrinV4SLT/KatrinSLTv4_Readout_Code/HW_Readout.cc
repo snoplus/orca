@@ -70,7 +70,7 @@ extern "C" {
 #include "SBC_Config.h"
 #include "SBC_Readout.h"
 #include "CircularBuffer.h"
-#include "SLTv4_HW_Definitions.h"
+#include "KatrinV4_HW_Definitions.h"
 #include "SLTv4GeneralOperations.h"
 #ifdef __cplusplus
 }

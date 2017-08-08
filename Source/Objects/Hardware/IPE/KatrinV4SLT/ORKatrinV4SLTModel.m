@@ -30,7 +30,7 @@
 #import "TimedWorker.h"
 #import "ORDataTypeAssigner.h"
 #import "PMC_Link.h"
-#import "SLTv4_HW_Definitions.h"
+#import "KatrinV4_HW_Definitions.h"
 #import "ORPMCReadWriteCommand.h"
 #import "SLTv4GeneralOperations.h"
 #import "ORTaskSequence.h"
@@ -1536,7 +1536,7 @@ return;
 	for(id obj in dataTakers){
         if([obj respondsToSelector:@selector(runMode)]){
             runMode=[obj runMode];
-            if(runMode == kIpeFltV4_Histogram_DaqMode) countHistoMode++; else countNonHistoMode++;
+            if(runMode == kKatrinV4Flt_Histogram_DaqMode) countHistoMode++; else countNonHistoMode++;
         }
         if([obj respondsToSelector:@selector(useBipolarEnergy)]){
             //runMode=[obj useBipolarEnergy];
@@ -1558,7 +1558,7 @@ return;
             if([[obj class] isSubclassOfClass: NSClassFromString(@"ORKatrinV4FLTModel")]){//or ORIpeV4FLTModel
             //if([obj respondsToSelector:@selector(runMode)]){
                 runMode=[obj runMode];
-                if(runMode == kIpeFltV4_Histogram_DaqMode) [obj writeControlWithStandbyMode];// -> set the run mode
+                if(runMode == kKatrinV4Flt_Histogram_DaqMode) [obj writeControlWithStandbyMode];// -> set the run mode
             }
         }
         usleep(1000000);
@@ -1599,7 +1599,7 @@ return;
             if([[obj class] isSubclassOfClass: NSClassFromString(@"ORKatrinV4FLTModel")]){//or ORIpeV4FLTModel
             //if([obj respondsToSelector:@selector(runMode)]){
                 runMode=[obj runMode];
-                if(runMode == kIpeFltV4_Histogram_DaqMode) [obj writeControl];// -> set the run mode
+                if(runMode == kKatrinV4Flt_Histogram_DaqMode) [obj writeControl];// -> set the run mode
             }
         }
 	}	
@@ -1915,7 +1915,7 @@ return;
 	configStruct->card_info[index].add_mod		= 0;		//not needed for this HW
     
     //"first time" flag (needed for histogram mode)
-	unsigned long            runFlagsMask = kFirstTimeFlag;
+    unsigned long            runFlagsMask = 0;
     if(secondsSetSendToFLTs) runFlagsMask |= kSecondsSetSendToFLTsFlag;
 	configStruct->card_info[index].deviceSpecificData[3] = runFlagsMask;
 	configStruct->card_info[index].deviceSpecificData[6] = [self readReg: kKatrinV4SLTHWRevisionReg];

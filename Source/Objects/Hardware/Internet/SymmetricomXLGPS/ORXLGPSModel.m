@@ -539,24 +539,21 @@ NSString* ORXLGPSModelPpoRepeatsChanged		= @"ORXLGPSModelPpoRepeatsChanged";
 {
 	if(!pingTask){
 		[self setGpsOpsRunning:YES forKey:@"telnetPing"];
-		ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
-		pingTask = [[NSTask alloc] init];
-		
-		[pingTask setLaunchPath:@"/sbin/ping"];
-		[pingTask setArguments: [NSArray arrayWithObjects:@"-c",@"5",@"-t",@"10",@"-q",IPNumber,nil]];
-		
-		[aSequence addTaskObj:pingTask];
-		[aSequence setVerbose:YES];
-		[aSequence setTextToDelegate:YES];
-		[aSequence launch];
-	}
-	else {
-		[pingTask terminate];
-		[self setGpsOpsRunning:NO forKey:@"telnetPing"];
-	}
+
+        
+        pingTask = [[ORPingTask pingTaskWithDelegate:self] retain];
+        
+        pingTask.launchPath= @"/sbin/ping";
+        pingTask.arguments = [NSArray arrayWithObjects:@"-c",@"5",@"-t",@"10",@"-q",IPNumber,nil];
+        
+        pingTask.verbose = YES;
+        pingTask.textToDelegate = YES;
+        [pingTask ping];
+
+ 	}
 }
 
-- (void) taskFinished:(NSTask*)aTask
+- (void) taskFinished:(ORPingTask*)aTask
 {
 	if(aTask == pingTask){
 		[pingTask release];

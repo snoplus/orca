@@ -22,9 +22,10 @@
 @class ORFileGetterOp;
 
 @interface ORPulseCheckModel : OrcaObject  {
-    NSMutableArray* machines;
-    NSString*       lastFile;
-    NSTimer*        notificationTimer;
+    NSMutableArray*     machines;
+    NSString*           lastFile;
+    NSTimer*            notificationTimer;
+    NSOperationQueue*   fileQueue;
 }
 
 #pragma mark •••Accessors
@@ -33,6 +34,7 @@
 - (ORMachineToCheck*) machineAtIndex:(int)anIndex;
 - (NSInteger) machineCount;
 - (void) checkMachines:(NSTimer*)aTimer;
+- (void) setUpQueue;
 
 #pragma mark •••Save/Restore
 - (void) saveToFile:        (NSString*)aPath;
@@ -51,9 +53,9 @@ extern NSString* ORPulseCheckModelReloadTable;
 extern NSString* ORPulseCheckListLock;
 
 @interface ORMachineToCheck : NSObject <NSCopying> {
-    NSMutableDictionary* data;
-    ORAlarm* noHeartbeatAlarm;
-    ORFileGetterOp* mover;
+    NSMutableDictionary*    data;
+    ORAlarm*                noHeartbeatAlarm;
+    ORFileGetterOp*         mover;
 }
 + (id) machineToCheck;
 - (id) copyWithZone:(NSZone *)zone;
@@ -68,11 +70,12 @@ extern NSString* ORPulseCheckListLock;
 - (void)      setStatus:(NSString*)aString;
 - (void)      setLastChecked:(NSString*)aDate;
 - (NSString*) status;
-- (void) doCheck;
+- (void) doCheck:(NSOperationQueue*)fileQueue;
 - (void) fileGetterIsDone;
 - (NSString*)localPath;
 - (void) postHeartbeatAlarm;
 - (void) clearHeartbeatAlarm;
+- (void) resetStatus;
 
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;

@@ -106,30 +106,27 @@
     IBOutlet NSMatrix*      pileupModeMatrix;
     IBOutlet NSMatrix*		enabledMatrix;
 
-    
-    
     IBOutlet NSMatrix*      ledThresholdMatrix;
-    
+    IBOutlet NSMatrix*      p1WindowMatrix;
+    IBOutlet NSMatrix*      dWindowMatrix;
+    IBOutlet NSMatrix*      kWindowMatrix;
+    IBOutlet NSMatrix*      mWindowMatrix;
+    IBOutlet NSMatrix*      d3WindowMatrix;
+    IBOutlet NSTextField*   p2WindowField;
+    IBOutlet NSMatrix*      discWidthMatrix;
+
     IBOutlet NSTextField*   holdoffTimeField;
     IBOutlet NSButton*		autoModeCB;
     IBOutlet NSTextField*   vetoGateWidthField;
 
-    
-    
     IBOutlet NSMatrix*      premapResetDelayMatrix;
     IBOutlet NSTextField*   rawDataLengthField; //bad name in docs. really raw_data_offset
     IBOutlet NSTextField*   rawDataWindowField; //bad name in docs. really max length of event packet
-    IBOutlet NSTextField*   dWindowField;
-    IBOutlet NSTextField*   kWindowField;
-    IBOutlet NSTextField*   mWindowField;
-    IBOutlet NSTextField*   d3WindowField;
-    IBOutlet NSTextField*   discWidthField;
-    IBOutlet NSTextField*   baselineStartField;
+    IBOutlet NSMatrix*      baselineStartMatrix;
     IBOutlet NSTextField*   baselineDelayField;
-    IBOutlet NSTextField*   p1WindowField;
-    IBOutlet NSTextField*   p2WindowField;
+    IBOutlet NSTextField*   trackingSpeedField;
     IBOutlet NSTextField*   peakSensitivityField;
-    IBOutlet NSPopUpButton*      triggerConfigPU;
+    IBOutlet NSPopUpButton* triggerConfigPU;
 
     
     NSView *blankView;
@@ -228,6 +225,7 @@
 - (void) d3WindowChanged:(NSNotification*)aNote;
 - (void) baselineStartChanged:(NSNotification*)aNote;
 - (void) baselineDelayChanged:(NSNotification*)aNote;
+- (void) trackingSpeedChanged:(NSNotification*)aNote;
 - (void) windowCompMinChanged:(NSNotification*)aNote;
 - (void) windowCompMaxChanged:(NSNotification*)aNote;
 - (void) p1WindowChanged:(NSNotification*)aNote;
@@ -284,8 +282,8 @@
 - (IBAction) userPackageDataAction:(id)sender;
 
 
-- (IBAction) ledThresholdAction:(id)sender;
-//- (IBAction) writeFlagAction:(id)sender;
+- (IBAction) ledThresholdAction:    (id)sender;
+//- (IBAction) writeFlagAction: (id)sender;
 - (IBAction) pileupModeAction:(id)sender;
 - (IBAction) preampResetDelayEnAction:(id)sender;
 - (IBAction) preampResetDelayAction:(id)sender;
@@ -306,6 +304,7 @@
 - (IBAction) discWidthAction:(id)sender;
 - (IBAction) baselineStartAction:(id)sender;
 - (IBAction) baselineDelayAction:(id)sender;
+- (IBAction) trackingSpeedAction:(id)sender;
 - (IBAction) p1WindowAction:(id)sender;
 - (IBAction) p2WindowAction:(id)sender;
 - (IBAction) triggerConfigAction:(id)sender;
@@ -341,7 +340,8 @@
 - (IBAction) clearFIFO:(id)sender;
 - (IBAction) forceFullInitAction:(id)sender;
 - (IBAction) forceFullCardInitAction:(id)sender;
-- (IBAction) readTimeStamp:(id)sender;
+- (IBAction) readLiveTimeStamp:(id)sender;
+- (IBAction) readLatTimeStamp:(id)sender;
 - (IBAction) readFPGAVersions:(id)sender;
 - (IBAction) readVmeAuxStatus:(id)sender;
 

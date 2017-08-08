@@ -22,6 +22,7 @@
 @class MajoranaModel;
 @class ORRemoteSocketModel;
 @class ORAlarm;
+@class ORPingTask;
 
 //do NOT change this list without changing the StateInfo array in the .m file
 enum {
@@ -55,7 +56,7 @@ typedef struct {
     int                 retryState;
     NSMutableArray*     stateStatus;
     NSMutableArray*     finalReport;
-    NSTask*             pingTask;
+    ORPingTask*         pingTask;
     int                 retryCount;
     BOOL                printedErrorReport;
     BOOL                pingedSuccessfully;
@@ -113,7 +114,7 @@ typedef struct {
 - (BOOL) pingTaskRunning;
 - (BOOL) pingedSuccessfully;
 - (void) tasksCompleted:(id)sender;
-- (void) taskFinished:(NSTask*)aTask;
+- (void) taskFinished:(ORPingTask*)aTask;
 @end
 
 extern NSString* ORMJDInterlocksIsRunningChanged;

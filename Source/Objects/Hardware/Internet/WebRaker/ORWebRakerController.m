@@ -276,7 +276,7 @@
     }
     else {
         [dataValidField setTextColor:[NSColor redColor]];
-        [dataValidField setStringValue: @"Data Invalid"];
+        [dataValidField setStringValue: @"Waiting"];
     }
 }
 

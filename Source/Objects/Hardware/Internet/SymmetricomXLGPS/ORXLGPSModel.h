@@ -20,6 +20,7 @@
 
 #pragma mark •••Imported Files
 @class NetSocket;
+@class ORPingTask;
 
 @interface ORXLGPSModel : OrcaObject
 {
@@ -29,7 +30,7 @@
 	NSString*		userName;
 	NSString*		password;
 	NSUInteger		timeOut;
-	NSTask*			pingTask;
+	ORPingTask*		pingTask;
 	NetSocket*		socket;
 	NSMutableString*	gpsInBuffer;
 	BOOL			isConnected;
@@ -100,7 +101,7 @@
 - (void) disconnect;
 - (void) test;
 - (void) ping;
-- (void) taskFinished:(NSTask*)aTask;
+- (void) taskFinished:(ORPingTask*)aTask;
 - (void) send;
 - (void) send:(NSString*)aCommand; //ORCAScript helper
 - (NSDate*) time;

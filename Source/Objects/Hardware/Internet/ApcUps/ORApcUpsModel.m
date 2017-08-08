@@ -75,7 +75,9 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
     [sortedEventLog release];
     [dataInValidAlarm   clearAlarm];
     [powerOutAlarm      clearAlarm];
+    [badStatusAlarm      clearAlarm];
     
+    [badStatusAlarm   release];
     [dataInValidAlarm   release];
     [powerOutAlarm      release];
     [inputBuffer        release];
@@ -295,9 +297,9 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
         float bat  = [self batteryCapacity];
         if((Vin1<KMinVoltage) || (Vin2<KMinVoltage) || (Vin3<KMinVoltage)){
             if(!powerOutAlarm){
-                NSLog(@"The Main Davis UPS is reporting a power failure. Battery capacity is now %.0f%%\n",bat);
-                powerOutAlarm = [[ORAlarm alloc] initWithName:@"Davis Power Failure" severity:kEmergencyAlarm];
-                [powerOutAlarm setHelpString:@"The Davis UPS is reporting that the input voltage is less then 110V on one or more of the three phases. This Alarm can be silenced by acknowledging it, but it will not be cleared until power is restored."];
+                NSLog(@"The UPS (%@) is reporting a power failure. Battery capacity is now %.0f%%\n",[self fullID],bat);
+                powerOutAlarm = [[ORAlarm alloc] initWithName:@"Power Failure" severity:kEmergencyAlarm];
+                [powerOutAlarm setHelpString:@"The UPS is reporting that the input voltage is less then 110V on one or more of the three phases. This Alarm can be silenced by acknowledging it, but it will not be cleared until power is restored."];
                 [powerOutAlarm setSticky:YES];
                 [powerOutAlarm postAlarm];
                 [powerOutAlarm acknowledge]; //use the voice instead of beep
@@ -324,7 +326,7 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
                 [powerOutAlarm release];
                 powerOutAlarm = nil;
                 lastBatteryValue = 0;
-                NSLog(@"The Main Davis UPS is restored. Battery capacity is now %.0f%%\n",bat);
+                NSLog(@"The UPS (%@) is restored. Battery capacity is now %.0f%%\n",[self fullID],bat);
             }
         }
     }
@@ -942,6 +944,7 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 
     [self cancelTimeout];
 }
+//STATUS OF UPS: INTERNAL FAULT BYPASS, BATTERY CHARGER FAILURE, OTHER ALARMS PRESENT,
 
 - (void) parseLine:(NSString*)aLine
 {
@@ -959,6 +962,26 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
             NSArray* tempParts = [value componentsSeparatedByString:@","];
             if([tempParts count] > 1){
                 value = [tempParts objectAtIndex:0];
+            }
+        }
+        else if([varName hasPrefix:@"STATUS OF UPS"]){
+            if([value rangeOfString:@"INTERNAL FAULT BYPASS"].location != NSNotFound ||
+               [value rangeOfString:@"BATTERY CHARGER FAILURE"].location != NSNotFound ){
+                if(!badStatusAlarm){
+                    NSLog(@"The UPS (%@) is reporting serious alarms. %@\n",[self fullID],value);
+                    badStatusAlarm = [[ORAlarm alloc] initWithName:@"UPS Faults" severity:kEmergencyAlarm];
+                    [badStatusAlarm setHelpString:[NSString stringWithFormat:@"The %@ UPS is reporting that it has serioius fault conditions. This Alarm can be silenced by acknowledging it, but it will not be cleared until power is restored.",[self fullID]]];
+                    [badStatusAlarm setSticky:YES];
+                    [badStatusAlarm postAlarm];
+                }
+            }
+            else {
+                if([badStatusAlarm isPosted]){
+                    [badStatusAlarm clearAlarm];
+                    [badStatusAlarm release];
+                    badStatusAlarm = nil;
+                    NSLog(@"The UPS faults cleared.\n");
+                }
             }
         }
         

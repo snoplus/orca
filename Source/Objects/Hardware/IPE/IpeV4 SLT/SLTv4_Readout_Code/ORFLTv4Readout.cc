@@ -170,7 +170,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
             for(eventN=0;eventN<10;eventN++){
                 hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = (hw4::FltKatrinEventFIFOStatus*)srack->theFlt[col]->eventFIFOStatus;//TODO: typing error in fdhwlib - remove cast after correction -tb-
                 //fifoStatus = srack->theFlt[col]->eventFIFOStatus->read();//reads to cache
-                //fifoStatus = eventFIFOStatus->read();//reads to cache
+                eventFIFOStatus->read();//reads to cache
                 //uint32_t fifoEmptyFlag = (fifoStatus>>28)&1;//srack->theFlt[col]->eventFIFOStatus->emptyFlag->getCache();
                 uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
                 //not needed for now - uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();//TODO: then we should read more than 10 events? -tb-
@@ -238,7 +238,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
             for(eventN=0;eventN<10;eventN++){
                 hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = (hw4::FltKatrinEventFIFOStatus*)srack->theFlt[col]->eventFIFOStatus;//TODO: typing error in fdhwlib - remove cast after correction -tb-
                 //fifoStatus = srack->theFlt[col]->eventFIFOStatus->read();//reads to cache
-                //fifoStatus = eventFIFOStatus->read();//reads to cache
+                eventFIFOStatus->read();//reads to cache
                 //uint32_t fifoEmptyFlag = (fifoStatus>>28)&1;//srack->theFlt[col]->eventFIFOStatus->emptyFlag->getCache();
                 uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
                 //uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();
@@ -586,7 +586,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
             for(eventN=0;eventN<10;eventN++){
                 hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = (hw4::FltKatrinEventFIFOStatus*)srack->theFlt[col]->eventFIFOStatus;//TODO: typing error in fdhwlib - remove cast after correction -tb-
                 //fifoStatus = srack->theFlt[col]->eventFIFOStatus->read();//reads to cache
-                //fifoStatus = eventFIFOStatus->read();//reads to cache
+                eventFIFOStatus->read();//reads to cache
                 //uint32_t fifoEmptyFlag = (fifoStatus>>28)&1;//srack->theFlt[col]->eventFIFOStatus->emptyFlag->getCache();
                 uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
                 //not needed for now - uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();//TODO: then we should read more than 10 events? -tb-
@@ -662,7 +662,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
             for(eventN=0;eventN<10;eventN++){
                 hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = (hw4::FltKatrinEventFIFOStatus*)srack->theFlt[col]->eventFIFOStatus;//TODO: typing error in fdhwlib - remove cast after correction -tb-
                 //fifoStatus = srack->theFlt[col]->eventFIFOStatus->read();//reads to cache
-                //fifoStatus = eventFIFOStatus->read();//reads to cache
+                eventFIFOStatus->read();//reads to cache
                 //uint32_t fifoEmptyFlag = (fifoStatus>>28)&1;//srack->theFlt[col]->eventFIFOStatus->emptyFlag->getCache();
                 uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
                 //uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();
@@ -877,7 +877,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
             for(eventN=0;eventN<10;eventN++){
                 hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = (hw4::FltKatrinEventFIFOStatus*)srack->theFlt[col]->eventFIFOStatus;//TODO: typing error in fdhwlib - remove cast after correction -tb-
                 //fifoStatus = srack->theFlt[col]->eventFIFOStatus->read();//reads to cache
-                //fifoStatus = eventFIFOStatus->read();//reads to cache
+                eventFIFOStatus->read();//reads to cache
                 //uint32_t fifoEmptyFlag = (fifoStatus>>28)&1;//srack->theFlt[col]->eventFIFOStatus->emptyFlag->getCache();
                 uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
                 //uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();
@@ -1104,7 +1104,7 @@ fprintf(stdout,"4x - readpr:%i, writeptr:%i\n",readptrx,writeptrx);fflush(stdout
             for(eventN=0;eventN<10;eventN++){
                 hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = (hw4::FltKatrinEventFIFOStatus*)srack->theFlt[col]->eventFIFOStatus;//TODO: typing error in fdhwlib - remove cast after correction -tb-
                 //fifoStatus = srack->theFlt[col]->eventFIFOStatus->read();//reads to cache
-                fifoStatus = eventFIFOStatus->read();//reads to cache
+                eventFIFOStatus->read();//reads to cache
                 //uint32_t fifoEmptyFlag = (fifoStatus>>28)&1;//srack->theFlt[col]->eventFIFOStatus->emptyFlag->getCache();
                 uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
                 uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();
@@ -1475,7 +1475,7 @@ fprintf(stdout,"4x - readpr:%i, writeptr:%i\n",readptrx,writeptrx);fflush(stdout
             for(eventN=0;eventN<10;eventN++){
                 hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = (hw4::FltKatrinEventFIFOStatus*)srack->theFlt[col]->eventFIFOStatus;//TODO: typing error in fdhwlib - remove cast after correction -tb-
                 //fifoStatus = srack->theFlt[col]->eventFIFOStatus->read();//reads to cache
-                //fifoStatus = eventFIFOStatus->read();//reads to cache
+                eventFIFOStatus->read();//reads to cache
                 //uint32_t fifoEmptyFlag = (fifoStatus>>28)&1;//srack->theFlt[col]->eventFIFOStatus->emptyFlag->getCache();
                 uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
                 //not needed for now - uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();//TODO: then we should read more than 10 events? -tb-
@@ -1551,7 +1551,7 @@ fprintf(stdout,"4x - readpr:%i, writeptr:%i\n",readptrx,writeptrx);fflush(stdout
             for(eventN=0;eventN<10;eventN++){
                 hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = (hw4::FltKatrinEventFIFOStatus*)srack->theFlt[col]->eventFIFOStatus;//TODO: typing error in fdhwlib - remove cast after correction -tb-
                 //fifoStatus = srack->theFlt[col]->eventFIFOStatus->read();//reads to cache
-                //fifoStatus = eventFIFOStatus->read();//reads to cache
+                eventFIFOStatus->read();//reads to cache
                 //uint32_t fifoEmptyFlag = (fifoStatus>>28)&1;//srack->theFlt[col]->eventFIFOStatus->emptyFlag->getCache();
                 uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
                 //uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();
@@ -1769,7 +1769,7 @@ TODO                            */
             for(eventN=0;eventN<10;eventN++){
                 hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = (hw4::FltKatrinEventFIFOStatus*)srack->theFlt[col]->eventFIFOStatus;//TODO: typing error in fdhwlib - remove cast after correction -tb-
                 //fifoStatus = srack->theFlt[col]->eventFIFOStatus->read();//reads to cache
-                //uint32_t fifoStatus = eventFIFOStatus->read();//reads to cache
+                eventFIFOStatus->read();//reads to cache
                 //uint32_t fifoEmptyFlag = (fifoStatus>>28)&1;//srack->theFlt[col]->eventFIFOStatus->emptyFlag->getCache();
                 uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
                 //uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();
@@ -1998,7 +1998,7 @@ fprintf(stdout,"4x - readpr:%i, writeptr:%i\n",readptrx,writeptrx);fflush(stdout
             for(eventN=0;eventN<10;eventN++){
                 hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = (hw4::FltKatrinEventFIFOStatus*)srack->theFlt[col]->eventFIFOStatus;//TODO: typing error in fdhwlib - remove cast after correction -tb-
                 //fifoStatus = srack->theFlt[col]->eventFIFOStatus->read();//reads to cache
-                //fifoStatus = eventFIFOStatus->read();//reads to cache
+                eventFIFOStatus->read();//reads to cache
                 //uint32_t fifoEmptyFlag = (fifoStatus>>28)&1;//srack->theFlt[col]->eventFIFOStatus->emptyFlag->getCache();
                 uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
                 uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();

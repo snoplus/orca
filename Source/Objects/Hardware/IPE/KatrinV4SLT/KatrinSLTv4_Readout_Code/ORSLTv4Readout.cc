@@ -1,5 +1,5 @@
 #include "ORSLTv4Readout.hh"
-#include "SLTv4_HW_Definitions.h"
+#include "KatrinV4_HW_Definitions.h"
 #include "readout_code.h"
 
 
@@ -24,12 +24,7 @@ extern Pbus* pbus;
 
 static const uint32_t FIFO0Addr         = 0xd00000 >> 2;
 static const uint32_t FIFO0ModeReg      = 0xe00000 >> 2;//obsolete 2012-10
-static const uint32_t FIFO0StatusReg    = 0xe00004 >> 2;//obsolete 2012-10
-
-bool ORSLTv4Readout::Start() {
-    firstTime = true;
-    return true;
-}   
+static const uint32_t FIFO0StatusReg    = 0xe00004 >> 2;//obsolete 2012-10  
 
 bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
 {
@@ -51,11 +46,6 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
     //pbus = srack->theSlt->version;
     //uint32_t sltversion=sltRevision;
     
-    if(firstTime){
-        //not sure what Till had in mind for the firstTime flag... it wasn't used in his code
-        //I kept it for now, but moved it to a private variable
-        firstTime = false;
-    }
     
     if(sltRevision==0x3010003){//we have SLT event FIFO since this revision -> read FIFO (one event = 4 words)
         uint32_t headerLen  = 4;

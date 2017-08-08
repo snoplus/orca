@@ -1391,20 +1391,15 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
             [self setRemoteMachineReachable:eYES];
         }
         else {
-            ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
-            pingTask = [[NSTask alloc] init];
+            pingTask = [[ORPingTask pingTaskWithDelegate:self] retain];
             
-            [pingTask setLaunchPath:@"/sbin/ping"];
-            [pingTask setArguments: [NSArray arrayWithObjects:@"-c",@"1",@"-t",@"10",@"-q",otherSystemIP,nil]];
+            pingTask.launchPath= @"/sbin/ping";
+            pingTask.arguments = [NSArray arrayWithObjects:@"-c",@"1",@"-t",@"10",@"-q",otherSystemIP,nil];
             
-            [aSequence addTaskObj:pingTask];
-            [aSequence setVerbose:NO];
-            [aSequence setTextToDelegate:YES];
-            [aSequence launch];
+            pingTask.verbose = NO;
+            pingTask.textToDelegate = YES;
+            [pingTask ping];
         }
-    }
-    else {
-        [pingTask terminate];
     }
 }
 
@@ -1414,13 +1409,13 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
 	return pingTask != nil;
 }
 
-- (void) tasksCompleted:(id)sender
+- (void) taskFinished:(ORPingTask*)aTask
 {
-    [pingTask release];
-    pingTask = nil;
-
+    if(aTask == pingTask){
+        [pingTask release];
+        pingTask = nil;
+    }
 }
-
 - (void) taskData:(NSString*)text
 {
     if([text rangeOfString:@"100.0% packet loss"].location != NSNotFound){

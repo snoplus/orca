@@ -241,15 +241,19 @@ enum{
     long			enabledMask;
     long            histogramsEnabledMask;
     long			pileupEnabledMask;
+    long            acquisitionControlMask;
     long            clrHistogramsWithTSMask;
     long            writeHitsToEventMemoryMask;
     long			heSuppressTriggerMask;
     unsigned long  cfdControlBits[kNumSIS3316Channels];
     unsigned long  threshold[kNumSIS3316Channels];
-    unsigned long thresholdSum[kNumSIS3316Groups];
-    unsigned short peakingTime[kNumSIS3316Channels];
-    unsigned short gapTime[kNumSIS3316Channels];
-    unsigned short tauFactor[kNumSIS3316Channels];
+    unsigned long  thresholdSum[kNumSIS3316Groups];
+    unsigned long  peakingTime[kNumSIS3316Channels];
+    unsigned long  gapTime[kNumSIS3316Channels];
+    unsigned long  tauFactor[kNumSIS3316Channels];
+    unsigned long  extraFilterBits[kNumSIS3316Channels];
+    unsigned long  tauTableBits[kNumSIS3316Channels];
+    
     unsigned long  heTrigThreshold[kNumSIS3316Channels];
     unsigned long heTrigThresholdSum[kNumSIS3316Groups];
     unsigned short intTrigOutPulseBit[kNumSIS3316Channels];
@@ -265,6 +269,8 @@ enum{
     unsigned short energyDivider[kNumSIS3316Channels];
     unsigned short energySubtractor[kNumSIS3316Channels];
 
+    unsigned short accumulatorGateStart[kNumSIS3316Groups];
+    unsigned short accumulatorGateLength[kNumSIS3316Groups];
     unsigned short accGate1Len[kNumSIS3316Groups];
     unsigned short accGate1Start[kNumSIS3316Groups];
     unsigned short accGate2Len[kNumSIS3316Groups];
@@ -359,6 +365,11 @@ enum{
 - (void) setEnabledMask:(unsigned long)aMask;
 - (BOOL) enabled:(unsigned short)chan;
 - (void) setEnabledBit:(unsigned short)chan withValue:(BOOL)aValue;
+///////
+- (long) acquisitionControlMask;
+- (void) setAcquisitionControlMask:(unsigned long)aMask;
+- (BOOL) acquisitionControl:(unsigned long)chan;
+- (void) setAcquisitionControlBit:(unsigned long)aChan withValue:(BOOL)aValue;
 
 //////
 - (long) histogramsEnabledMask;
@@ -394,6 +405,12 @@ enum{
 
 - (long)cfdControlBits:(unsigned short)aChan;
 - (void) setCfdControlBits:(unsigned short)aChan withValue:(long)aValue;
+
+- (long)extraFilterBits:(unsigned short)aChan;
+- (void) setExtraFilterBits:(unsigned short)aChan withValue:(long)aValue;
+
+- (long)tauTableBits:(unsigned short)aChan;
+- (void) setTauTableBits:(unsigned short)aChan withValue:(long)aValue;
 
 - (unsigned short) energyDivider:(unsigned short)aChan;
 - (void) setEnergyDivider:(unsigned short)aChan withValue:(unsigned short)aValue;
@@ -439,6 +456,12 @@ enum{
 
 - (unsigned long)  rawDataBufferStart:(unsigned short)aGroup;
 - (void)           setRawDataBufferStart:(unsigned short)group withValue:(unsigned long)aValue;
+
+- (unsigned short)  accumulatorGateStart:(unsigned short)aGroup;
+- (void)            setAccumulatorGateStart:(unsigned short)aGroup withValue:(unsigned short)aValue;
+
+- (unsigned short)  accumulatorGateLength:(unsigned short)aGroup;
+- (void)            setAccumulatorGateLength:(unsigned short)aGroup withValue:(unsigned short)aValue;
 
 - (unsigned short)  accGate1Start:(unsigned short)aGroup;
 - (void)            setAccGate1Start:(unsigned short)group withValue:(unsigned short)aValue;
@@ -504,20 +527,20 @@ enum{
 - (void) setEnableTriggerOutput:(BOOL)aEnableTriggerOutput;
 
 //Acquisition control reg
-- (BOOL) bankSwitchMode;
-- (void) setBankSwitchMode:(BOOL)aBankSwitchMode;
-- (BOOL) autoStart;
-- (void) setAutoStart:(BOOL)aAutoStart;
-- (BOOL) multiEventMode;
-- (void) setMultiEventMode:(BOOL)aMultiEventMode;
-- (BOOL) multiplexerMode;
-- (void) setMultiplexerMode:(BOOL)aMultiplexerMode;
-- (BOOL) lemoStartStop;
-- (void) setLemoStartStop:(BOOL)aLemoStartStop;
-- (BOOL) p2StartStop;
-- (void) setP2StartStop:(BOOL)aP2StartStop;
-- (BOOL) gateMode;
-- (void) setGateMode:(BOOL)aGateMode;
+//- (BOOL) bankSwitchMode;
+//- (void) setBankSwitchMode:(BOOL)aBankSwitchMode;
+//- (BOOL) autoStart;
+//- (void) setAutoStart:(BOOL)aAutoStart;
+//- (BOOL) multiEventMode;
+//- (void) setMultiEventMode:(BOOL)aMultiEventMode;
+//- (BOOL) multiplexerMode;
+//- (void) setMultiplexerMode:(BOOL)aMultiplexerMode;
+//- (BOOL) lemoStartStop;
+//- (void) setLemoStartStop:(BOOL)aLemoStartStop;
+//- (BOOL) p2StartStop;
+//- (void) setP2StartStop:(BOOL)aP2StartStop;
+//- (BOOL) gateMode;
+//- (void) setGateMode:(BOOL)aGateMode;
 
 //clocks and delays (Acquisition control reg)
 - (BOOL) stopDelayEnabled;
@@ -565,23 +588,25 @@ enum{
 -(unsigned long) keyRegister:(unsigned long)aRegisterIndex;
 - (unsigned long) groupRegister:(unsigned long)aRegisterIndex  group:(int)aGroup;
 - (unsigned long) channelRegister:(unsigned long)aRegisterIndex channel:(int)aChannel;
-
+- (unsigned long) channelRegisterVersionTwo:(unsigned long)aRegisterIndex channel:(int)aChannel;
+- (unsigned long) accumulatorRegisters:(unsigned long)aRegisterIndex channel:(int)aChannel;
 - (unsigned long)readControlStatusReg;          //6.1               (complete) -not connected  
 - (void) writeControlStatusReg:(unsigned long)aValue;
         //6.1               (complete)
-- (void) setLed:(BOOL)state;                    //6.1'              (complete)
-- (void) readModuleID:(BOOL)verbose;            //6.2               (complete)
-- (void) readHWVersion:(BOOL)verbose;           //6.7               (complete)
-- (unsigned short) hwVersion;                   //6.7'              (complete)
-- (void) readTemperature:(BOOL)verbose;         //6.8               (complete)
-- (void) readSerialNumber:(BOOL)verbose;        //6.10              (complete)
-- (void) writeClockSource;                      //6.17              (complete)
-- (void) writeAcquisitionRegister;              //6.21              (incomplete. No read)
-- (BOOL) sampleLogicIsBusy;                     //6.21      none of 21 is connected to the nib
-//pg 119 and on
-- (void) writeActiveTrigGateWindowLen;        //6.16 (section 2)
+- (void) setLed:(BOOL)state;                    //6.1'
+- (void) readModuleID:(BOOL)verbose;            //6.2
+- (void) readHWVersion:(BOOL)verbose;           //6.7
+- (unsigned short) hwVersion;                   //6.7'
+- (void) readTemperature:(BOOL)verbose;         //6.8
+- (void) readSerialNumber:(BOOL)verbose;        //6.10
+- (void) writeClockSource;                      //6.17
+- (void) writeAcquisitionRegister;              //6.21
+- (void) readAcquisitionRegister:(BOOL)verbose;
+- (BOOL) sampleLogicIsBusy;                     //6.21      //pg 119 and on
+- (void) writeActiveTrigGateWindowLen;          //6.16 (section 2)
 - (void) readActiveTrigGateWindowLen:(BOOL)verbose;
 - (void) writeRawDataBufferConfig;              //6.17 (section 2)
+- (void) readRawDataBufferConfig:(BOOL)verbose;
 - (void) writePreTriggerDelays;                 //6.19 (section 2)  (Missing read and caps at 4 bits (I think))
 - (void) writeDataFormat;                       //6.21 (section 2)  (complete)
 
@@ -596,12 +621,15 @@ enum{
 - (void) readHeTrigThresholds:(BOOL)verbose;    //6.27 (section 2)
 - (void) readHeTrigThresholdSum:(BOOL)verbose;
 - (void) writeAccumulatorGates;                 //6.31 (section 2)
-
+- (void) readAccumulatorGates:(BOOL)verbose;
+- (void) writeFirEnergySetup;                   //6.32 (section 2)
+- (void) readFirEnergySetup:(BOOL)verbose;
 - (void) writeHistogramConfiguration;           //6.33 (section 2)
+- (void) readHistogramConfiguration:(BOOL)verbose;
 - (void) configureAnalogRegisters;
 
-- (unsigned long) eventNumberGroup:(int)group bank:(int) bank;  //6.12 or 6.13 (S2) ????
-- (unsigned long) eventTriggerGroup:(int)group bank:(int) bank; //6.12 or 6.13 (S2) ????
+- (unsigned long) eventNumberGroup:(int)group bank:(int) bank;
+- (unsigned long) eventTriggerGroup:(int)group bank:(int) bank; 
 - (unsigned long) readTriggerTime:(int)bank index:(int)index;
 
 
@@ -661,6 +689,7 @@ enum{
 @end
 
 extern NSString* ORSIS3316EnabledChanged;
+extern NSString* ORSIS3316AcquisitionControlChanged;
 extern NSString* ORSIS3316HistogramsEnabledChanged;
 extern NSString* ORSIS3316PileUpEnabledChanged;
 extern NSString* ORSIS3316ClrHistogramWithTSChanged;
@@ -670,6 +699,8 @@ extern NSString* ORSIS3316ThresholdChanged;
 extern NSString* ORSIS3316ThresholdSumChanged;
 extern NSString* ORSIS3316HeSuppressTrigModeChanged;
 extern NSString* ORSIS3316CfdControlBitsChanged;
+extern NSString* ORSIS3316ExtraFilterBitsChanged;
+extern NSString* ORSIS3316TauTableBitsChanged;
 extern NSString* ORSIS3316EnergyDividerChanged ;
 extern NSString* ORSIS3316EnergySubtractorChanged;
 extern NSString* ORSIS3316TauFactorChanged;
@@ -684,6 +715,8 @@ extern NSString* ORSIS3316ActiveTrigGateWindowLenChanged;
 extern NSString* ORSIS3316PreTriggerDelayChanged;
 extern NSString* ORSIS3316RawDataBufferLenChanged;
 extern NSString* ORSIS3316RawDataBufferStartChanged;
+extern NSString* ORSIS3316AccumulatorGateStartChanged;
+extern NSString* ORSIS3316AccumulatorGateLengthChanged;
 extern NSString* ORSIS3316AccGate1LenChanged;
 extern NSString* ORSIS3316AccGate1StartChanged;
 extern NSString* ORSIS3316AccGate2LenChanged;

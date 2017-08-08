@@ -28,6 +28,7 @@
 
 @class ORCouchDB;
 @class ORRunModel;
+@class ORPingTask;
 
 @protocol snotDbDelegate <NSObject>
 @required
@@ -54,7 +55,7 @@ BOOL isNotRunningOrIsInMaintenance();
     NSString* _orcaDBIPAddress;
     NSMutableArray* _orcaDBConnectionHistory;
     NSUInteger _orcaDBIPNumberIndex;
-    NSTask*	_orcaDBPingTask;
+    ORPingTask*	_orcaDBPingTask;
     
     NSString* _debugDBUserName;
     NSString* _debugDBPassword;
@@ -65,7 +66,7 @@ BOOL isNotRunningOrIsInMaintenance();
     NSString* _debugDBIPAddress;
     NSMutableArray* _debugDBConnectionHistory;
     NSUInteger _debugDBIPNumberIndex;
-    NSTask*	_debugDBPingTask;
+    ORPingTask*	_debugDBPingTask;
     
     struct {
         unsigned long coarseDelay;
@@ -151,7 +152,7 @@ BOOL isNotRunningOrIsInMaintenance();
 @property (nonatomic,copy) NSString* orcaDBIPAddress;
 @property (nonatomic,retain) NSMutableArray* orcaDBConnectionHistory;
 @property (nonatomic,assign) NSUInteger orcaDBIPNumberIndex;
-@property (nonatomic,retain) NSTask* orcaDBPingTask;
+@property (nonatomic,retain) ORPingTask* orcaDBPingTask;
 
 @property (nonatomic,copy) NSString* debugDBUserName;
 @property (nonatomic,copy) NSString* debugDBPassword;
@@ -162,7 +163,7 @@ BOOL isNotRunningOrIsInMaintenance();
 @property (nonatomic,copy) NSString* debugDBIPAddress;
 @property (nonatomic,retain) NSMutableArray* debugDBConnectionHistory;
 @property (nonatomic,assign) NSUInteger debugDBIPNumberIndex;
-@property (nonatomic,retain) NSTask* debugDBPingTask;
+@property (nonatomic,retain) ORPingTask* debugDBPingTask;
 
 @property (nonatomic,assign) bool smellieDBReadInProgress;
 @property (nonatomic,assign) bool smellieDocUploaded;
@@ -199,7 +200,7 @@ BOOL isNotRunningOrIsInMaintenance();
 - (id) debugDBConnectionHistoryItem:(unsigned int)index;
 - (void) debugDBPing;
 
-- (void) taskFinished:(NSTask*)aTask;
+- (void) taskFinished:(ORPingTask*)aTask;
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
 
 - (void) pingCratesAtRunStart;

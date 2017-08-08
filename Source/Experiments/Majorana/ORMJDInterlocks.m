@@ -734,24 +734,21 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
         NSString*               ip  = [remObj remoteHost];
         [remObj setRemoteHost:ip];
         
-        ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
-        pingTask = [[NSTask alloc] init];
+        pingTask = [[ORPingTask pingTaskWithDelegate:self] retain];
         
-        [pingTask setLaunchPath:@"/sbin/ping"];
+        pingTask.launchPath= @"/sbin/ping";
+        pingTask.arguments = [NSArray arrayWithObjects:@"-c",@"3",@"-t",@"10",@"-q",ip,nil];
         
-        [pingTask setArguments: [NSArray arrayWithObjects:@"-c",@"3",@"-t",@"10",@"-q",ip,nil]];
-        
-        [aSequence addTaskObj:pingTask];
-        [aSequence setVerbose:NO];
-        [aSequence setTextToDelegate:YES];
-        [aSequence launch];
+        pingTask.verbose = NO;
+        pingTask.textToDelegate = YES;
+        [pingTask ping];
     }
 }
 
 - (BOOL) pingTaskRunning            { return pingTask != nil;}
 - (BOOL) pingedSuccessfully         { return pingedSuccessfully; }
 - (void) tasksCompleted:(id)sender  { }
-- (void) taskFinished:(NSTask*)aTask
+- (void) taskFinished:(ORPingTask*)aTask
 {
     if(aTask == pingTask){
         [pingTask release];

@@ -1919,42 +1919,32 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 - (void) orcaDBPing
 {
     if(!self.orcaDBPingTask){
-		ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
-		self.orcaDBPingTask = [[[NSTask alloc] init] autorelease];
-		
-		[self.orcaDBPingTask setLaunchPath:@"/sbin/ping"];
-		[self.orcaDBPingTask setArguments: [NSArray arrayWithObjects:@"-c",@"2",@"-t",@"5",@"-q",self.orcaDBIPAddress,nil]];
-		
-		[aSequence addTaskObj:self.orcaDBPingTask];
-		[aSequence setVerbose:YES];
-		[aSequence setTextToDelegate:YES];
-		[aSequence launch];
-	}
-	else {
-		[self.orcaDBPingTask terminate];
+        self.orcaDBPingTask = [ORPingTask pingTaskWithDelegate:self];
+        
+        self.orcaDBPingTask.launchPath      = @"/sbin/ping";
+        self.orcaDBPingTask.arguments       = [NSArray arrayWithObjects:@"-c",@"2",@"-t",@"5",@"-q",self.orcaDBIPAddress,nil];
+        
+        self.orcaDBPingTask.verbose         = YES;
+        self.orcaDBPingTask.textToDelegate  = YES;
+        [self.orcaDBPingTask ping];
 	}
 }
 
 - (void) debugDBPing
 {
     if(!self.debugDBPingTask){
-		ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
-		self.debugDBPingTask = [[[NSTask alloc] init] autorelease];
-		
-		[self.debugDBPingTask setLaunchPath:@"/sbin/ping"];
-		[self.debugDBPingTask setArguments: [NSArray arrayWithObjects:@"-c",@"2",@"-t",@"5",@"-q",self.debugDBIPAddress,nil]];
-		
-		[aSequence addTaskObj:self.debugDBPingTask];
-		[aSequence setVerbose:YES];
-		[aSequence setTextToDelegate:YES];
-		[aSequence launch];
-	}
-	else {
-		[self.debugDBPingTask terminate];
+        self.debugDBPingTask = [ORPingTask pingTaskWithDelegate:self];
+        
+        self.debugDBPingTask.launchPath     = @"/sbin/ping";
+        self.debugDBPingTask.arguments      = [NSArray arrayWithObjects:@"-c",@"2",@"-t",@"5",@"-q",self.debugDBIPAddress,nil];
+        
+        self.debugDBPingTask.verbose        = YES;
+        self.debugDBPingTask.textToDelegate = YES;
+        [self.debugDBPingTask ping];
 	}
 }
 
-- (void) taskFinished:(NSTask*)aTask
+- (void) taskFinished:(ORPingTask*)aTask
 {
 	if(aTask == self.orcaDBPingTask){
 		self.orcaDBPingTask = nil;

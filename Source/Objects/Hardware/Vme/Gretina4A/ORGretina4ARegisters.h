@@ -16,6 +16,9 @@
 //express or implied, or assume any liability or responsibility
 //for the use of this software.
 //-------------------------------------------------------------
+
+#define kNumGretina4AChannels		10
+
 #define kNoAccess  0x0
 #define kRead      0x1
 #define kWrite     0x2
@@ -53,9 +56,9 @@ enum {
     kD3Window,              //0x0240	d2_window0
     kDiscWidth,             //0x0280	disc_width0
     kBaselineStart,         //0x02C0	baseline_start0
-    kP1Window,              //0x0300    p1_Window
+    kP1Window,              //0x0300    p1_2indow
     kDac,                   //0x0400	dac
-    kP2Window,              //0x0404    p2_Window
+    kP2Window,              //0x0404    p2_2indow
     kIlaConfig,             //0x0408	ila_config
     kChannelPulsedControl,	//0x040C	channel_pulsed_control
     kDiagMuxControl,        //0x0410	diag_mux_control
@@ -169,16 +172,17 @@ enum {
 - (BOOL) checkRegisterTable;
 
 - (int)           numRegisters;
-- (BOOL)          regIsReadable: (short) anIndex;
-- (BOOL)          hasChannels:    (short) anIndex;
-- (BOOL)          regIsWriteable: (short) anIndex;
-- (NSString*)     registerName:   (short) anIndex;
-- (short)         accessType:     (short) anIndex;
-- (unsigned long) address:(unsigned long)baseAddress forRegisterIndex:(int)anIndex;
-- (unsigned long) address:(unsigned long)baseAddress forRegisterIndex:(int)anIndex chan:(int)aChannel;
-- (unsigned long) offsetForRegisterIndex:(int)anIndex;
-- (unsigned long) offsetForRegisterIndex:(int)anIndex chan:(int)aChannel;
-- (BOOL)          indexInRange:(short)anIndex;
+- (BOOL)          regIsReadable:  (unsigned short) anIndex;
+- (BOOL)          hasChannels:    (unsigned short) anIndex;
+- (BOOL)          regIsWriteable: (unsigned short) anIndex;
+- (NSString*)     registerName:   (unsigned short) anIndex;
+- (short)         accessType:     (unsigned short) anIndex;
+- (unsigned long) address:(unsigned long)baseAddress forRegisterIndex:(unsigned short)anIndex;
+- (unsigned long) address:(unsigned long)baseAddress forRegisterIndex:(unsigned short)anIndex chan:(unsigned short)aChannel;
+- (unsigned long) offsetForRegisterIndex:(unsigned short)anIndex;
+- (unsigned long) offsetForRegisterIndex:(unsigned short)anIndex chan:(unsigned short)aChannel;
+- (void)          checkChannel:(unsigned short)aChannel;
+- (void)          checkIndex:(unsigned short)anIndex;
 @end
 
 
@@ -193,12 +197,12 @@ enum {
 - (BOOL) checkRegisterTable;
 
 - (int)           numRegisters;
-- (BOOL)          regIsReadable: (short) anIndex;
-- (BOOL)          regIsWriteable: (short) anIndex;
-- (NSString*)     registerName:   (short) anIndex;
-- (short)         accessType:     (short) anIndex;
-- (unsigned long) offsetForRegisterIndex:(int)anIndex;
-- (unsigned long) address:(unsigned long)baseAddress forRegisterIndex:(int)anIndex;
-- (BOOL)          indexInRange:(short)anIndex;
+- (BOOL)          regIsReadable:  (unsigned short) anIndex;
+- (BOOL)          regIsWriteable: (unsigned short) anIndex;
+- (NSString*)     registerName:   (unsigned short) anIndex;
+- (short)         accessType:     (unsigned short) anIndex;
+- (unsigned long) offsetForRegisterIndex:(unsigned short)anIndex;
+- (unsigned long) address:(unsigned long)baseAddress forRegisterIndex:(unsigned short)anIndex;
+- (void)          checkIndex:(unsigned short)anIndex;
 
 @end

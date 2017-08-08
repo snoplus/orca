@@ -45,9 +45,9 @@ static gretina4ARegNamesStruct reg4A[kNumberOfGretina4ARegisters] = {
     { 0x0240,	@"D3 Window",               kReadWrite | kChanReg,	kD3Window            },
     { 0x0280,	@"Disc Width",              kReadWrite | kChanReg,	kDiscWidth           },
     { 0x02C0,	@"Baseline Start",          kReadWrite,             kBaselineStart       },
-    { 0x0300,	@"P1 Window",               kReadWrite | kChanReg,  kP1Window            },
+    { 0x0300,	@"P1 Delay",                kReadWrite | kChanReg,  kP1Window            },
     { 0x0400,	@"Dac",                     kReadWrite,             kDac                 },
-    { 0x0404,	@"P2 Window",               kReadWrite,             kP2Window            },
+    { 0x0404,	@"P2 Delay",                kReadWrite,             kP2Window            },
     { 0x0408,	@"Ila Config",              kReadWrite,             kIlaConfig           },
     { 0x040C,	@"Channel Pulsed Control",	kReadWrite,             kChannelPulsedControl},
     { 0x0410,	@"Diag Mux Control",        kReadWrite,             kDiagMuxControl      },
@@ -130,60 +130,78 @@ static gretina4ARegNamesStruct reg4A[kNumberOfGretina4ARegisters] = {
     return kNumberOfGretina4ARegisters;
 }
 
-- (BOOL) hasChannels:(short) anIndex
+- (BOOL) hasChannels:(unsigned short) anIndex
 {
-    if ([self indexInRange:anIndex]) return reg4A[anIndex].accessType & kChanReg;
-    else                             return NO;
+    [self checkIndex:anIndex]; //will throw if out of bounds
+    return reg4A[anIndex].accessType & kChanReg;
 }
 
-- (BOOL) regIsReadable:(short) anIndex
+- (BOOL) regIsReadable:(unsigned short) anIndex
 {
-    if ([self indexInRange:anIndex]) return reg4A[anIndex].accessType & kRead;
-    else                             return NO;
+    [self checkIndex:anIndex]; //will throw if out of bounds
+    return reg4A[anIndex].accessType & kRead;
 }
 
-- (BOOL) regIsWriteable:(short) anIndex
+- (BOOL) regIsWriteable:(unsigned short) anIndex
 {
-    if ([self indexInRange:anIndex]) return reg4A[anIndex].accessType & kWrite;
-    else                             return NO;
+    [self checkIndex:anIndex]; //will throw if out of bounds
+    return reg4A[anIndex].accessType & kWrite;
 }
 
-- (NSString*) registerName: (short) anIndex
+- (NSString*) registerName: (unsigned short) anIndex
 {
-    if ([self indexInRange:anIndex]) return reg4A[anIndex].regName;
-    else                             return @"Illegal";
-}
-- (short) accessType: (short) anIndex
-{
-    if ([self indexInRange:anIndex]) return reg4A[anIndex].accessType;
-    else                             return kNoAccess;
+    [self checkIndex:anIndex]; //will throw if out of bounds
+    return reg4A[anIndex].regName;
 }
 
-- (unsigned long) offsetForRegisterIndex:(int)anIndex chan:(int)aChannel
+- (short) accessType: (unsigned short) anIndex
 {
-    if ([self indexInRange:anIndex]) return reg4A[anIndex].offset + 4 * aChannel;
-    else                             return 0x0;
+    [self checkIndex:anIndex]; //will throw if out of bounds
+    return reg4A[anIndex].accessType;
 }
 
-- (unsigned long) offsetForRegisterIndex:(int)anIndex
+- (unsigned long) offsetForRegisterIndex:(unsigned short)anIndex chan:(unsigned short)aChannel
 {
-    if ([self indexInRange:anIndex]) return reg4A[anIndex].offset;
-    else                             return 0x0;
+    [self checkIndex:  anIndex]; //will throw if out of bounds
+    [self checkChannel:aChannel]; //will throw if out of bounds
+    return reg4A[anIndex].offset + 4 * aChannel;
 }
-- (unsigned long) address:(unsigned long)baseAddress forRegisterIndex:(int)anIndex
+
+- (unsigned long) offsetForRegisterIndex:(unsigned short)anIndex
 {
-    if ([self indexInRange:anIndex]) return baseAddress+ reg4A[anIndex].offset;
-    else                             return 0x0;
+    [self checkIndex:anIndex]; //will throw if out of bounds
+    return reg4A[anIndex].offset;
 }
-- (unsigned long) address:(unsigned long)baseAddress forRegisterIndex:(int)anIndex chan:(int)aChannel
+
+- (unsigned long) address:(unsigned long)baseAddress forRegisterIndex:(unsigned short)anIndex
 {
-    if ([self indexInRange:anIndex]) return baseAddress+ reg4A[anIndex].offset + 4*aChannel;
-    else                             return 0x0;
+    [self checkIndex:anIndex]; //will throw if out of bounds
+    return baseAddress+ reg4A[anIndex].offset;
 }
-- (BOOL) indexInRange:(short)anIndex
+
+- (unsigned long) address:(unsigned long)baseAddress forRegisterIndex:(unsigned short)anIndex chan:(unsigned short)aChannel
 {
-    return anIndex>=0 && anIndex<kNumberOfGretina4ARegisters;
+    [self checkIndex:  anIndex]; //will throw if out of bounds
+    [self checkChannel:aChannel]; //will throw if out of bounds
+    return baseAddress+ reg4A[anIndex].offset + 4*aChannel;
 }
+
+- (void) checkIndex:(unsigned short)anIndex
+{
+    if(anIndex >= kNumberOfGretina4ARegisters){
+        NSString* reason = [NSString stringWithFormat:@"Index out of bounds: %d. Valid Range: 0 - %d",anIndex,kNumberOfGretina4ARegisters-1];
+        @throw([NSException exceptionWithName:@"Index Out of Bounds" reason:reason userInfo:nil]);
+    };
+}
+
+- (void) checkChannel:(unsigned short)aChannel
+{
+    if(aChannel >= kNumGretina4AChannels){
+        NSString* reason = [NSString stringWithFormat:@"Channel out of bounds: %d. Valid Range: 0 - 9",aChannel];
+        @throw([NSException exceptionWithName:@"Channel Out of Bounds" reason:reason userInfo:nil]);
+    };
+}
+
 @end
 
 
@@ -240,48 +258,50 @@ static gretina4ARegNamesStruct fpga_reg4A[kNumberOfFPGARegisters] = {
     [super dealloc];
 }
 
-- (int)       numRegisters { return kNumberOfFPGARegisters; }
+- (int)       numRegisters                  { return kNumberOfFPGARegisters; }
 
-- (BOOL) regIsReadable:(short) anIndex
+- (BOOL) regIsReadable:(unsigned short) anIndex
 {
-    if ([self indexInRange:anIndex]) return fpga_reg4A[anIndex].accessType & kRead;
-    else                             return NO;
+    [self checkIndex:anIndex]; //will throw if out of bounds
+    return fpga_reg4A[anIndex].accessType & kRead;
 }
 
-- (BOOL) regIsWriteable:(short) anIndex
+- (BOOL) regIsWriteable:(unsigned short) anIndex
 {
-    if ([self indexInRange:anIndex]) return fpga_reg4A[anIndex].accessType & kWrite;
-    else                             return NO;
+    [self checkIndex:anIndex]; //will throw if out of bounds
+    return fpga_reg4A[anIndex].accessType & kWrite;
 }
 
-- (NSString*) registerName: (short) anIndex
+- (NSString*) registerName: (unsigned short) anIndex
 {
-    if ([self indexInRange:anIndex]) return fpga_reg4A[anIndex].regName;
-    else                             return @"Illegal";
+    [self checkIndex:anIndex]; //will throw if out of bounds
+    return fpga_reg4A[anIndex].regName;
 }
 
-- (short) accessType: (short) anIndex
+- (short) accessType: (unsigned short) anIndex
 {
-    if ([self indexInRange:anIndex]) return fpga_reg4A[anIndex].accessType;
-    else                             return kNoAccess;
+    [self checkIndex:anIndex]; //will throw if out of bounds
+    return fpga_reg4A[anIndex].accessType;
 }
 
-- (unsigned long) offsetForRegisterIndex:(int)anIndex
+- (unsigned long) offsetForRegisterIndex:(unsigned short)anIndex
 {
-    if ([self indexInRange:anIndex]) return fpga_reg4A[anIndex].offset;
-    else                             return 0x0;
+    [self checkIndex:anIndex]; //will throw if out of bounds
+    return fpga_reg4A[anIndex].offset;
 }
 
-- (unsigned long) address:(unsigned long)baseAddress forRegisterIndex:(int)anIndex
+- (unsigned long) address:(unsigned long)baseAddress forRegisterIndex:(unsigned short)anIndex
 {
-    if ([self indexInRange:anIndex]) return baseAddress+ fpga_reg4A[anIndex].offset;
-    else                             return 0x0;
+    [self checkIndex:anIndex]; //will throw if out of bounds
+    return baseAddress+ fpga_reg4A[anIndex].offset;
 }
 
-- (BOOL) indexInRange:(short)anIndex
+- (void) checkIndex:(unsigned short)anIndex
 {
-    return anIndex>=0 && anIndex<kNumberOfFPGARegisters;
+    if(anIndex > kNumberOfFPGARegisters){
+        NSString* reason = [NSString stringWithFormat:@"Index: %d. Valid Range: 0 - %d",anIndex,kNumberOfFPGARegisters-1];
+        @throw([NSException exceptionWithName:@"Index Out of Bounds" reason:reason userInfo:nil]);
+    };
 }
-
 @end
 
