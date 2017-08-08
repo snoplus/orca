@@ -769,13 +769,13 @@
     float DGT_Delay;
     CONTROL_REG_MASK controlReg;
     @try {
-        DGT_Delay = [model DGTInNS];
+        DGT_Delay = [model DGTBits];
     } @catch(NSException *exception) {
         [self log_error:exception];
         return;
     }
     @try {
-        LO_Delay = [model LODelayInNS];
+        LO_Delay = [model LODelayBits];
     } @catch(NSException *exception) {
         [self log_error:exception];
         return;
@@ -832,7 +832,7 @@
 - (IBAction)MTCAMimicMatchHardware:(id)sender {
     NSUInteger ThresholdValue;
     @try {
-        ThresholdValue= [model MTCAMimic1_ThresholdInVolts];
+        ThresholdValue = [model MTCAMimic1_ThresholdInBits];
     } @catch(NSException *exception) {
         [self log_error:exception];
         return;
