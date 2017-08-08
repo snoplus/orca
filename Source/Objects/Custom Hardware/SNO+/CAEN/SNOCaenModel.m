@@ -1025,6 +1025,8 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     [self writeOverUnderThresholds];
     [self writeDacs];
     [self writePostTriggerSetting];
+    NSLog(@"Caen 1720 Card %d inited\n",[self slot]);
+
 }
 
 - (float) convertDacToVolts:(unsigned short)aDacValue 
