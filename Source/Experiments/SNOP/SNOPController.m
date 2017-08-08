@@ -2219,7 +2219,7 @@ err:
     NSString *standardRun = [standardRunPopupMenu objectValueOfSelectedItem];
     NSString *standardRunVer = [standardRunVersionPopupMenu objectValueOfSelectedItem];
     
-    if([model saveStandardRun:standardRun withVersion:standardRunVer]){
+    if(![model saveStandardRun:standardRun withVersion:standardRunVer]){
         NSLogColor([NSColor redColor], @"Couldn't save standard run due to a problem. \n");
     }
 }
