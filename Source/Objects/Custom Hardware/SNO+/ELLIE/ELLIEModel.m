@@ -566,7 +566,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
         NSLogColor([NSColor redColor], @"[TELLIE]: fibre map has not been loaded from couchdb - you need to call loadTellieStaticsFromDB\n");
         return nil;
     }
-    NSUInteger channelIndex = [[[self tellieFibreMapping] objectForKey:@"channels"] indexOfObject:channel];
+    NSUInteger channelIndex = [[[self tellieFibreMapping] objectForKey:@"channels"] indexOfObject:[NSString stringWithFormat:@"%d",channel]];
     NSString* fibre = [[[self tellieFibreMapping] objectForKey:@"fibres"] objectAtIndex:channelIndex];
     return fibre;
 }
