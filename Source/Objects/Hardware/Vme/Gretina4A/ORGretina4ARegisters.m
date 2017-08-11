@@ -212,6 +212,7 @@ static gretina4ARegNamesStruct fpga_reg4A[kNumberOfFPGARegisters] = {
     {0x910,	@"VME General Purpose Control", kReadWrite,    kVMEGPControl        },
     {0x914,	@"VME Timeout Value Register",  kReadWrite,    kVMETimeoutValue     },
     {0x920,	@"VME Version/Status",          kReadOnly,     kVMEFPGAVersionStatus},
+    {0x928,	@"VME FPGA Date    ",           kReadOnly,     kVMEFPGADate         },
     {0x930,	@"VME Sandbox Register1",       kReadWrite,    kVMEFPGASandbox1     },
     {0x934,	@"VME Sandbox Register2",       kReadWrite,    kVMEFPGASandbox2     },
     {0x938,	@"VME Sandbox Register3",       kReadWrite,    kVMEFPGASandbox3     },

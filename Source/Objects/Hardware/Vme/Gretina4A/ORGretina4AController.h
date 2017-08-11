@@ -49,6 +49,7 @@
     IBOutlet NSButton*		dumpAllRegistersButton;
     IBOutlet NSButton*		snapShotRegistersButton;
     IBOutlet NSButton*		compareRegistersButton;
+    IBOutlet NSButton*      doHwCheckButton;
 
 	//Firmware loading
 	IBOutlet NSTextField*			fpgaFilePathField;
@@ -86,7 +87,8 @@
     //hardware setup
     IBOutlet NSButton*		forceFullCardInitCB;
     IBOutlet NSMatrix*		forceFullInitMatrix;
-    
+    IBOutlet NSMatrix*      channelStatusMatrix;
+
     IBOutlet NSMatrix*      extDiscrSrcMatrix;
     IBOutlet NSTextField*   userPackageDataField;
     IBOutlet NSTextField*   windowCompMinField;
@@ -264,6 +266,7 @@
 - (void) serialNumChanged:(NSNotification*)aNote;
 - (void) boardRevNumChanged:(NSNotification*)aNote;
 - (void) vhdlVerNumChanged:(NSNotification*)aNote;
+- (void) doHwCheckChanged:(NSNotification*)aNote;
 
 - (IBAction) decimationFactorAction:(id)sender;
 
@@ -344,6 +347,10 @@
 - (IBAction) readLatTimeStamp:(id)sender;
 - (IBAction) readFPGAVersions:(id)sender;
 - (IBAction) readVmeAuxStatus:(id)sender;
+- (IBAction) dumpCounters:(id)sender;
+- (IBAction) doHwCheckButtonAction:(id)sender;
+- (IBAction) compareHwNowAction:(id)sender;
+- (IBAction) openPreampDialog:(id)sender;
 
 #pragma mark - Data Source
 - (void)    tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;

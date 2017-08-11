@@ -56,9 +56,9 @@ enum {
     kD3Window,              //0x0240	d2_window0
     kDiscWidth,             //0x0280	disc_width0
     kBaselineStart,         //0x02C0	baseline_start0
-    kP1Window,              //0x0300    p1_2indow
+    kP1Window,              //0x0300    p1_window
     kDac,                   //0x0400	dac
-    kP2Window,              //0x0404    p2_2indow
+    kP2Window,              //0x0404    p2_window
     kIlaConfig,             //0x0408	ila_config
     kChannelPulsedControl,	//0x040C	channel_pulsed_control
     kDiagMuxControl,        //0x0410	diag_mux_control
@@ -105,6 +105,7 @@ enum {
     kVMEGPControl,				//0x0910 General Purpose VME Control Settings
     kVMETimeoutValue,			//0x0914 VME Timeout Value Register
     kVMEFPGAVersionStatus,		//0x0920 VME Version/Status
+    kVMEFPGADate,
     kVMEFPGASandbox1,			//0x0930 VME Sandbox1
     kVMEFPGASandbox2,			//0x0934 VME Sandbox2
     kVMEFPGASandbox3,			//0x0938 VME Sandbox3

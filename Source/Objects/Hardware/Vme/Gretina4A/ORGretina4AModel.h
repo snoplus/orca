@@ -31,6 +31,8 @@
 @class ORRateGroup;
 @class ORConnector;
 @class ORFileMoverOp;
+@class ORRunningAverageGroup;
+@class ORConnector;
 
 #define kG4MDataPacketSize 2048+2  //waveforms have max size, ORCA header is 2
 
@@ -87,11 +89,12 @@
     unsigned long       fpgaSnapShot[kNumberOfFPGARegisters];
     
     //rates
-    ORRateGroup*        waveFormRateGroup;
-    unsigned long       waveFormCount[kNumGretina4AChannels];
+    ORRateGroup*    waveFormRateGroup;
+    unsigned long   waveFormCount[kNumGretina4AChannels];
+    ORRunningAverageGroup* rateRunningAverages; //initialized in initWithCoder, start by runstart
 
     //clock sync
-    int                 initializationState;
+    int             initializationState;
     
     //data taker
     unsigned long   dataId;
@@ -110,19 +113,20 @@
     BOOL			forceFullInit[kNumGretina4AChannels];
     BOOL            forceFullCardInit;
     
-    BOOL pileupExtensionMode[kNumGretina4AChannels];
-    short rawDataLength;
-    short rawDataWindow;
-    short dWindow[kNumGretina4AChannels];
-    short kWindow[kNumGretina4AChannels];
-    short mWindow[kNumGretina4AChannels];
-    short d3Window[kNumGretina4AChannels];
-    short discWidth[kNumGretina4AChannels];
-    short baselineStart[kNumGretina4AChannels];
-    short p1Window[kNumGretina4AChannels];
-    unsigned long p2Window;
-    short dacChannelSelect;
-    short dacAttenuation;
+    BOOL            pileupExtensionMode[kNumGretina4AChannels];
+    short           rawDataLength;
+    short           rawDataWindow;
+    short           dWindow[kNumGretina4AChannels];
+    short           kWindow[kNumGretina4AChannels];
+    short           mWindow[kNumGretina4AChannels];
+    short           d3Window[kNumGretina4AChannels];
+    short           discWidth[kNumGretina4AChannels];
+    short           baselineStart[kNumGretina4AChannels];
+    short           p1Window[kNumGretina4AChannels];
+    BOOL            channelStatus[kNumGretina4AChannels];
+    unsigned long   p2Window;
+    short           dacChannelSelect;
+    short           dacAttenuation;
     
     unsigned short baselineDelay;
     unsigned long  extDiscriminatorMode;
@@ -132,56 +136,59 @@
     unsigned long  diagMuxControl;
     
 
-    unsigned short holdoffTime;
-    unsigned short peakSensitivity;
-    BOOL autoMode;
-    unsigned short diagInput;
-    unsigned short diagChannelEventSel;
-    unsigned short vetoGateWidth;
+    unsigned short  holdoffTime;
+    unsigned short  peakSensitivity;
+    BOOL            autoMode;
+    unsigned short  diagInput;
+    unsigned short  diagChannelEventSel;
+    unsigned short  vetoGateWidth;
     
-    unsigned long rj45SpareIoMuxSel;
-    BOOL rj45SpareIoDir;
-    unsigned long ledStatus;
-    unsigned long liveTimestampLsb;
-    unsigned long liveTimestampMsb;
-    BOOL diagIsync;
-    BOOL serdesSmLostLock;
-    BOOL overflowFlagChan[kNumGretina4AChannels];
-    unsigned short triggerConfig;
-    unsigned long phaseErrorCount;
-    unsigned long phaseStatus;
-    unsigned long serdesPhaseValue;
-    unsigned long codeRevision;
-    unsigned long codeDate;
-    unsigned long tSErrCntCtrl;
-    unsigned long tSErrorCount;
-    unsigned long droppedEventCount[kNumGretina4AChannels];
-    unsigned long acceptedEventCount[kNumGretina4AChannels];
-    unsigned long ahitCount[kNumGretina4AChannels];
-    unsigned long discCount[kNumGretina4AChannels];
-    unsigned long auxIoRead;
-    unsigned long auxIoWrite;
-    unsigned long auxIoConfig;
-    unsigned long sdPem;
-    BOOL sdSmLostLockFlag;
-    BOOL configMainFpga;
-    unsigned long vmeStatus;
-     BOOL clkSelect0;
-    BOOL clkSelect1;
-    BOOL flashMode;
-    unsigned long serialNum;
-    unsigned long boardRevNum;
-    unsigned long vhdlVerNum;
+    unsigned long   rj45SpareIoMuxSel;
+    BOOL            rj45SpareIoDir;
+    unsigned long   ledStatus;
+    unsigned long   liveTimestampLsb;
+    unsigned long   liveTimestampMsb;
+    BOOL            diagIsync;
+    BOOL            serdesSmLostLock;
+    BOOL            overflowFlagChan[kNumGretina4AChannels];
+    unsigned short  triggerConfig;
+    unsigned long   phaseErrorCount;
+    unsigned long   phaseStatus;
+    unsigned long   serdesPhaseValue;
+    unsigned long   codeRevision;
+    unsigned long   codeDate;
+    unsigned long   tSErrCntCtrl;
+    unsigned long   tSErrorCount;
+    unsigned long   droppedEventCount[kNumGretina4AChannels];
+    unsigned long   acceptedEventCount[kNumGretina4AChannels];
+    unsigned long   ahitCount[kNumGretina4AChannels];
+    unsigned long   discCount[kNumGretina4AChannels];
+    unsigned long   auxIoRead;
+    unsigned long   auxIoWrite;
+    unsigned long   auxIoConfig;
+    unsigned long   sdPem;
+    BOOL            sdSmLostLockFlag;
+    BOOL            configMainFpga;
+    unsigned long   vmeStatus;
+    BOOL            clkSelect0;
+    BOOL            clkSelect1;
+    BOOL            flashMode;
+    unsigned long   serialNum;
+    unsigned long   boardRevNum;
+    unsigned long   vhdlVerNum;
+    BOOL            firstTime;
+    BOOL            doHwCheck;
+
 }
 
 #pragma mark - Boilerplate
-- (id) init;
-- (void) dealloc;
-- (void) setUpImage;
-- (void) makeMainController;
-- (NSString*) helpURL;
-- (Class) guardianClass;
-- (NSRange)	memoryFootprint;
+- (id)          init;
+- (void)        dealloc;
+- (void)        setUpImage;
+- (void)        makeMainController;
+- (NSString*)   helpURL;
+- (Class)       guardianClass;
+- (NSRange)     memoryFootprint;
 
 
 - (void) makeConnectors;
@@ -197,6 +204,7 @@
 - (void)            setLinkConnector:(ORConnector*)aConnector;
 - (ORConnector*)    spiConnector;
 - (void)            setSpiConnector:(ORConnector*)aConnector;
+- (void)            openPreampDialog;
 
 #pragma mark ***Access Methods for Low-Level Access
 - (unsigned long)   spiWriteValue;
@@ -246,8 +254,13 @@
 - (void) setForceFullCardInit:  (BOOL)aValue;
 - (BOOL) forceFullInit:         (short)chan;
 - (void) setForceFullInit:      (short)chan withValue:(BOOL)aValue;
+- (BOOL) channelStatus:         (unsigned short)chan;
+- (BOOL) doHwCheck;
+- (void) setDoHwCheck:          (BOOL)aFlag;
 
 #pragma mark - Persistant Register Values
+- (void)            loadCardDefaults;
+- (void)            loadChannelDefaults:(unsigned short) aChan;
 - (unsigned long)   extDiscriminatorSrc;
 - (void)            setExtDiscriminatorSrc:(unsigned long)aValue;
 - (unsigned long)   hardwareStatus;
@@ -444,7 +457,8 @@
 - (void)            writeP1Window:       (unsigned short)channel;
 - (unsigned long)   readP2Window:        (unsigned short)channel;
 - (void)            writeP2Window;
-- (void)            loadWindowDelays;
+- (void)            loadBaselines;
+- (void)            loadDelays;
 - (unsigned long)   readBaselineDelay;
 - (void)            writeBaselineDelay;
 - (unsigned long)   readHoldoffControl;
@@ -454,6 +468,7 @@
 - (unsigned long)   readVetoGateWidth;
 - (void)            writeVetoGateWidth;
 - (void)            writeMasterLogic:(BOOL)enable;
+- (void)            readMasterLogic;
 - (unsigned long)   readTriggerConfig;
 - (void)            writeTriggerConfig;
 - (void)            readFPGAVersions;
@@ -467,6 +482,18 @@
 - (void)            resetBoard;
 - (void)            resetMainFPGA;
 - (void)            initBoard;
+- (void)            initBoard:(BOOL)doChannelEnable;
+- (void)            dumpCounters;
+- (void)            dumpBoardIdDetails:         (unsigned long)aValue;
+- (void)            dumpProgrammingDoneDetails: (unsigned long)aValue;
+- (void)            dumpHardwareStatusDetails:  (unsigned long)aValue;
+- (void)            dumpExternalDiscSrcDetails: (unsigned long)aValue;
+- (void)            dumpChannelControlDetails:  (unsigned long)aValue;
+- (void)            dumpLedThresholdDetails:    (unsigned long)aValue;
+- (void)            dumpHoldoffControlDetails:  (unsigned long)aValue;
+- (void)            dumpBaselineDelayDetails:   (unsigned long)aValue;
+- (void)            dumpExtDiscSelDetails:      (unsigned long)aValue;
+- (void)            dumpMasterStatusDetails:    (unsigned long)aValue;
 
 #pragma mark - Clock Sync
 - (short)           initState;
@@ -502,6 +529,9 @@
 - (void) clearWaveFormCounts;
 - (BOOL) bumpRateFromDecodeStage:(short)channel;
 - (int)  load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
+- (id) rateObject:(short)channel;
+- (void) setRateIntegrationTime:(double)newIntegrationTime;
+- (ORRunningAverageGroup*) rateRunningAverages;
 
 #pragma mark - Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -512,6 +542,25 @@
 
 #pragma mark - AutoTesting
 - (NSArray*) autoTests;
+- (void) checkBoard:(BOOL)verbose;
+- (BOOL) checkExtDiscriminatorSrc:  (BOOL)verbose;
+- (BOOL) checkWindowCompMin:        (BOOL)verbose;
+- (BOOL) checkWindowCompMax:        (BOOL)verbose;
+- (BOOL) checkP2Window:             (BOOL)verbose;
+- (BOOL) checkHoldoffControl:       (BOOL)verbose;
+- (BOOL) checkBaselineDelay:        (BOOL)verbose;
+- (BOOL) checkVetoGateWidth:        (BOOL)verbose;
+- (BOOL) checkTriggerConfig:        (BOOL)verbose;
+- (BOOL) checkDiscWidth:    (int)aChan verbose:(BOOL)verbose;
+- (BOOL) checkP1Window:     (int)aChan verbose:(BOOL)verbose;
+- (BOOL) checkDWindow:      (int)aChan verbose:(BOOL)verbose;
+- (BOOL) checkKWindow:      (int)aChan verbose:(BOOL)verbose;
+- (BOOL) checkMWindow:      (int)aChan verbose:(BOOL)verbose;
+- (BOOL) checkD3Window:     (int)aChan verbose:(BOOL)verbose;
+- (BOOL) checkLedThreshold: (int)aChan verbose:(BOOL)verbose;
+- (BOOL) checkRawDataWindow:(int)aChan verbose:(BOOL)verbose;
+- (BOOL) checkRawDataLength:(int)aChan verbose:(BOOL)verbose;
+- (BOOL) checkBaselineStart:(int)aChan verbose:(BOOL)verbose;
 
 #pragma mark - SPI Interface
 - (unsigned long) writeAuxIOSPI:(unsigned long)spiData;
@@ -525,6 +574,11 @@
 - (unsigned short)  gainForDisplay:(unsigned short) aChan;
 - (void)            clearEventCounts;
 - (void)            postAdcInfoProvidingValueChanged;
+
+- (void)            rateSpikeChanged:(NSNotification*)aNote;
+- (float)           getRate:(short)channel;
+
+
 @end
 
 @interface NSObject (Gretina4A)
@@ -642,6 +696,7 @@ extern NSString* ORGretina4AMainFPGADownLoadStateChanged;
 extern NSString* ORGretina4AFpgaFilePathChanged;
 extern NSString* ORGretina4AModelFirmwareStatusStringChanged;
 extern NSString* ORGretina4AMainFPGADownLoadInProgressChanged;
+extern NSString* ORGretina4AChannelStatusChanged;
 
 //====General
 extern NSString* ORGretina4ARateGroupChangedNotification;
@@ -650,7 +705,9 @@ extern NSString* ORGretina4AModelInitStateChanged;
 extern NSString* ORGretina4ACardInited;
 extern NSString* ORGretina4AForceFullCardInitChanged;
 extern NSString* ORGretina4AForceFullInitChanged;
-
+extern NSString* ORGretina4ADoHwCheckChanged;
 extern NSString* ORGretina4ASettingsLock;
 extern NSString* ORGretina4ARegisterLock;
 extern NSString* ORGretina4ALockChanged;
+extern NSString* ORGretina4AModelRateSpiked;
+extern NSString* ORGretina4AModelRAGChanged;

@@ -48,7 +48,7 @@
 {
     settingSize     = NSMakeSize(1130,460);
     rateSize		= NSMakeSize(790,340);
-    registerTabSize	= NSMakeSize(400,490);
+    registerTabSize	= NSMakeSize(400,520);
 	firmwareTabSize = NSMakeSize(340,187);
     blankView = [[NSView alloc] init];
     
@@ -71,7 +71,7 @@
 		[registerIndexPU insertItemWithTitle:s	atIndex:(i+kNumberOfGretina4ARegisters)];
 	}
 
-    for (i=0;i<kNumberOfGretina4ARegisters;i++) {
+    for (i=0;i<kNumGretina4AChannels;i++) {
         [[enabledMatrix                 cellAtRow:i column:0] setTag:i];
         [[enabled2Matrix                cellAtRow:i column:0] setTag:i];
         [[extDiscrSrcMatrix             cellAtRow:i column:0] setTag:i];
@@ -95,7 +95,9 @@
         [[discWidthMatrix               cellAtRow:i column:0] setTag:i];
         [[premapResetDelayMatrix        cellAtRow:i column:0] setTag:i];
         [[baselineStartMatrix           cellAtRow:i column:0] setTag:i];
-   }
+        [[channelStatusMatrix           cellAtRow:i column:0] setTag:i];
+
+    }
     
     NSString* key = [NSString stringWithFormat: @"orca.Gretina4A%d.selectedtab",[model slot]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
@@ -556,6 +558,18 @@
                      selector : @selector(vhdlVerNumChanged:)
                          name : ORGretina4AVhdlVerNumChanged
                         object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(channelStatusChanged:)
+                         name : ORGretina4AChannelStatusChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(doHwCheckChanged:)
+                         name : ORGretina4ADoHwCheckChanged
+                        object: model];
+    
+
  
 }
 
@@ -708,6 +722,9 @@
     [self serialNumChanged:nil];
     [self boardRevNumChanged:nil];
     [self vhdlVerNumChanged:nil];
+    [self channelStatusChanged:nil];
+    [self doHwCheckChanged:nil];
+
 }
 
 #pragma mark •••Interface Management
@@ -745,7 +762,7 @@
     [resetButton            setEnabled:!lockedOrRunningMaintenance && !downloading];
     [loadMainFPGAButton     setEnabled:!locked && !downloading];
     [stopFPGALoadButton     setEnabled:!locked && downloading];
-    [dumpAllRegistersButton setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [dumpAllRegistersButton setEnabled:!downloading];
     [snapShotRegistersButton setEnabled:!lockedOrRunningMaintenance && !downloading];
     [compareRegistersButton setEnabled:!lockedOrRunningMaintenance && !downloading];
     
@@ -788,6 +805,7 @@
     }
     else {
         index -= kNumberOfGretina4ARegisters;
+        [selectedChannelField setEnabled:   NO];
         [writeRegisterButton setEnabled:    [Gretina4AFPGARegisters regIsWriteable:index]];
         [registerWriteValueField setEnabled:[Gretina4AFPGARegisters regIsWriteable:index]];
         [readRegisterButton setEnabled:     [Gretina4AFPGARegisters regIsReadable:index]];
@@ -815,6 +833,14 @@
     [diagnosticsEnabledCB setIntValue: [model diagnosticsEnabled]];
 }
 
+- (void) channelStatusChanged:(NSNotification*)aNote
+{
+    int chan;
+    for(chan=0;chan<kNumGretina4AChannels;chan++){
+        [[channelStatusMatrix cellWithTag:chan] setStringValue:[model channelStatus:chan]?@"X":@""];
+    }
+}
+
 #pragma mark •••firmware loading
 - (void) fpgaDownInProgressChanged:(NSNotification*)aNote
 {
@@ -836,6 +862,7 @@
 {
     [fpgaFilePathField setStringValue: [[model fpgaFilePath] stringByAbbreviatingWithTildeInPath]];
 }
+
 
 #pragma mark •••rates
 - (void) integrationChanged:(NSNotification*)aNotification
@@ -1023,7 +1050,10 @@
         [[forceFullInitMatrix cellWithTag:chan] setState:[model forceFullInit:chan]];
     }
 }
-
+- (void) doHwCheckChanged:(NSNotification*)aNote
+{
+   	[doHwCheckButton setIntValue: [model doHwCheck]];
+}
 - (void) extDiscrSrcChanged:(NSNotification*)aNote
 {
     int chan;
@@ -1206,6 +1236,15 @@
 }
 
 #pragma mark •••Actions
+- (IBAction) doHwCheckButtonAction:(id)sender;
+{
+    [model setDoHwCheck:[sender intValue]];
+}
+- (IBAction) compareHwNowAction:(id)sender
+{
+    [model checkBoard:YES];
+}
+
 - (IBAction) extDiscrSrcAction:(id)sender
 {
     unsigned long regValue = [model extDiscriminatorSrc];
@@ -1388,9 +1427,8 @@
 - (IBAction) loadDelaysAction:(id)sender;
 {
     [self endEditing];
-    [model loadWindowDelays];
+    [model loadDelays];
 }
-//???
 
 - (IBAction) diagnosticsClearAction:(id)sender
 {
@@ -1661,13 +1699,23 @@
 - (IBAction) readVmeAuxStatus:(id)sender
 {
     unsigned long status = [model readVmeAuxStatus];
-    NSLog(@"Gretina4A %d Aux VME Status:\n",[model slot]);
-    NSLog(@"Power: %@\n",       (status>>0)&01?@"FAULT":@"OK");
-    NSLog(@"Over Volt: %@\n",   (status>>1)&01?@"FAULT":@"OK");
-    NSLog(@"Under Volt: %@\n",  (status>>2)&01?@"FAULT":@"OK");
-    NSLog(@"Temp0: %@\n",       (status>>3)&01?@"FAULT":@"OK");
-    NSLog(@"Temp1: %@\n",       (status>>4)&01?@"FAULT":@"OK");
-    NSLog(@"Temp2: %@\n",       (status>>5)&01?@"FAULT":@"OK");
+    NSLog(@"Gretina4A %d Aux VME Status: 0x%08x\n",[model slot],status);
+    NSLog(@"Power: %@\n",       ((status>>0)&01)?@"FAULT":@"OK");
+    NSLog(@"Over Volt: %@\n",   ((status>>1)&01)?@"FAULT":@"OK");
+    NSLog(@"Under Volt: %@\n",  ((status>>2)&01)?@"FAULT":@"OK");
+    NSLog(@"Temp0: %@\n",       ((status>>3)&01)?@"FAULT":@"OK");
+    NSLog(@"Temp1: %@\n",       ((status>>4)&01)?@"FAULT":@"OK");
+    NSLog(@"Temp2: %@\n",       ((status>>5)&01)?@"FAULT":@"OK");
+}
+
+- (IBAction) dumpCounters:(id)sender
+{
+    [model dumpCounters];
+}
+
+- (IBAction) openPreampDialog:(id)sender
+{
+    [model openPreampDialog];
 }
 
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem

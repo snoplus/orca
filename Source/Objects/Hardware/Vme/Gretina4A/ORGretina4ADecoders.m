@@ -43,8 +43,7 @@
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
-//#define koffset -8180
-#define koffset -8100
+#define koffset -8192
 	if(![self cacheSetUp]){
 		[self cacheCardLevelObject:kIntegrateTimeKey fromHeader:[aDecoder fileHeader]];
 		[self cacheCardLevelObject:kHistEMultiplierKey fromHeader:[aDecoder fileHeader]];
@@ -68,10 +67,10 @@
             int             dataLength      = (packetLength - headerLength)/2;
             unsigned long   sumWord1        = ptr[8];
             unsigned long   sumWord2        = ptr[9];
-            unsigned long   scaleFactor     = 1000;
+            unsigned long   scaleFactor     = 0xfff;
             unsigned long   postRiseSum     = ((sumWord2 & 0xFFFF)<< 8) | ((sumWord1 >> 24) & 0xff);
             unsigned long   preRiseSum      = sumWord1 & 0xFFFFFF;
-            long            energy          = (postRiseSum - preRiseSum)/scaleFactor;
+            long            energy          = (postRiseSum - preRiseSum)/0xfff;
             if(energy >= 0){
                 [aDataSet histogram:energy numBins:0xFFFFFF/scaleFactor  sender:self  withKeys:@"Gretina4A", @"Energy",crateKey,cardKey,channelKey,nil];
             }
@@ -85,7 +84,7 @@
                                 offset: headerLength*2                       // Offset in bytes (past header words)
                               unitSize: sizeof(short)			// unit size in bytes
                             startIndex:	0                       // first Point Index (past the header offset!!!)
-                           scaleOffset: 0                       // offset the value by this
+                           scaleOffset: koffset                   // offset the value by this
                                   mask:	0x3FFF					// when displayed all values will be masked with this value
                            specialBits: 0xC000
                               bitNames: [NSArray arrayWithObjects:@"M",@"O",nil]
