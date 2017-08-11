@@ -153,11 +153,13 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 
 - (void) claimInterfaceWithSerialNumber:(NSString*)serialNumber for:(id)obj
 {
-    NSArray* someInterfaces;
+    NSArray* someInterfaces = nil;
     if([obj respondsToSelector:@selector(vendorIDs)] && [obj respondsToSelector:@selector(productIDs)]){
         someInterfaces = [self interfacesForVenders:[obj vendorIDs] products:[obj productIDs]];
     }
-	else someInterfaces = [self interfacesForVender:[obj vendorID] product:[obj productID]];
+    else if([obj respondsToSelector:@selector(vendorID)] && [obj respondsToSelector:@selector(productID)]){
+        someInterfaces = [self interfacesForVender:[obj vendorID] product:[obj productID]];
+    }
 	NSEnumerator* e = [someInterfaces objectEnumerator];
 	id anInterface;
 	while(anInterface = [e nextObject]){

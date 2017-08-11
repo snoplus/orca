@@ -95,16 +95,18 @@ extern NSString* ORUSBInterfaceRemoved;
 extern NSString* ORUSBInterfaceAdded;
 extern NSString* ORUSBInterfacesChanged;
 
+@interface NSObject (multipleIDs)
+- (NSArray*) vendorIDs;
+- (NSArray*) productIDs;
+- (unsigned long) vendorID;
+- (unsigned long) productID;
+@end
 
 @protocol USBDevice
 - (id) getUSBController;
 - (void) setUsbInterface:(ORUSBInterface*)anInterface;
 - (NSString*) usbInterfaceDescription;
 - (void) registerWithUSB:(id)usb;
-- (unsigned long) vendorID;
-- (unsigned long) productID;
-- (NSArray*) vendorIDs;
-- (NSArray*) productIDs;
 - (void) interfaceAdded:(NSNotification*)aNote;
 - (void) interfaceRemoved:(NSNotification*)aNote;
 @end
