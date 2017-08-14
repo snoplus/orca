@@ -43,6 +43,8 @@
     IBOutlet NSMatrix*		cfdControlMatrix;
     IBOutlet NSMatrix*		thresholdMatrix;
     IBOutlet NSMatrix*      thresholdSumMatrix;
+    IBOutlet NSMatrix*      endAddressMatrix;
+
     IBOutlet NSMatrix*		energyDividerMatrix;
     IBOutlet NSMatrix*		energySubtractorMatrix;
     IBOutlet NSMatrix*		tauFactorMatrix;
@@ -51,6 +53,12 @@
     IBOutlet NSMatrix*      extraFilterMatrix;
     IBOutlet NSMatrix*      tauTableMatrix;
     IBOutlet NSMatrix*      triggerDelayMatrix;
+    IBOutlet NSMatrix*      triggerDelayTwoMatrix;
+    IBOutlet NSMatrix*      triggerDelay3Matrix;
+    IBOutlet NSMatrix*      triggerDelay4Matrix;
+    IBOutlet NSMatrix*      eventConfigMatrix;
+    IBOutlet NSMatrix*      extendedEventConfigMatrix;
+//    IBOutlet NSMatrix*      endAddressFinalMatrix;
     
     IBOutlet NSMatrix*		heTrigThresholdMatrix;
     IBOutlet NSMatrix*      heTrigThresholdSumMatrix;
@@ -89,17 +97,19 @@
     //----------------------^^^^^^^^
     //------------------------------
 	//CSR
-	IBOutlet NSMatrix*		csrMatrix;
+//	IBOutlet NSMatrix*		csrMatrix;
 	IBOutlet NSMatrix*		acquisitionControlMatrix;
-	IBOutlet NSMatrix*		eventConfigMatrix;
+    IBOutlet NSMatrix*      nimControlStatusMatrix;
 	
 	IBOutlet NSButton*		stopTriggerButton;
 	IBOutlet NSButton*		randomClockButton;
-	IBOutlet NSButton*		stopDelayEnabledButton;
+//	IBOutlet NSButton*		stopDelayEnabledButton;
 	IBOutlet NSButton*		writeThresholdButton;
 	IBOutlet NSButton*		readThresholdButton;
     IBOutlet NSButton*      writeAcquisitionControlButton;
     IBOutlet NSButton*      readAcquisitionControlButton;
+    IBOutlet NSButton*      writeNIMControlStatusButton;
+    IBOutlet NSButton*      readNIMControlStatusButton;
     IBOutlet NSButton*      writeHistogramConfigurationButton;
     IBOutlet NSButton*      readHistogramConfigurationButton;
 	//IBOutlet NSTextField*	startDelayField;
@@ -108,7 +118,8 @@
 	IBOutlet NSPopUpButton* pageSizePU;
     IBOutlet NSButton*      writeClockSourceButton;
     IBOutlet NSButton*      readClockSourceButton;
-
+    IBOutlet NSButton*      writeEventConfigButton;
+    IBOutlet NSButton*      readEventConfigButton;
 
     IBOutlet NSButton*      settingLockButton;
     IBOutlet NSButton*      initButton;
@@ -143,6 +154,8 @@
 - (void) enabledChanged:(NSNotification*)aNote;
 - (void) thresholdChanged:(NSNotification*)aNote;
 - (void) thresholdSumChanged: (NSNotification*)aNote;
+- (void) endAddressChanged: (NSNotification*)aNote;
+
 - (void) energyDividerChanged:(NSNotification*)aNote;
 - (void) energySubtractorChanged:(NSNotification*)aNote;
 - (void) histogramsEnabledChanged:(NSNotification*)aNote;
@@ -150,7 +163,12 @@
 - (void) clrHistogramWithTSChanged:(NSNotification*)aNote;
 - (void) writeHitsIntoEventMemoryChanged:(NSNotification*)aNote;
 - (void) acquisitionControlChanged: (NSNotification*)aNote;
+- (void) nimControlStatusChanged: (NSNotification*)aNote;
 - (void) triggerDelayChanged: (NSNotification*)aNote;
+- (void) triggerDelayTwoChanged: (NSNotification*)aNote;
+- (void) triggerDelay3Changed: (NSNotification*)aNote;
+- (void) triggerDelay4Changed: (NSNotification*)aNote;
+
 
 - (void) tauFactorChanged:(NSNotification*)aNote;
 - (void) gapTimeChanged:(NSNotification*)aNote;
@@ -183,17 +201,15 @@
 - (void) accGate7StartChanged:(NSNotification*)aNote;
 - (void) accGate8LenChanged:(NSNotification*)aNote;
 - (void) accGate8StartChanged:(NSNotification*)aNote;
-
-- (void) csrChanged:(NSNotification*)aNote;
-//- (void) acqChanged:(NSNotification*)aNote;
 - (void) eventConfigChanged:(NSNotification*)aNote;
+- (void) extendedEventConfigChanged:(NSNotification*)aNote;
+//- (void) endAddressFinalChanged:(NSNotification*)aNote;
 
 - (void) stopTriggerChanged:(NSNotification*)aNote;
 - (void) randomClockChanged:(NSNotification*)aNote;
-- (void) stopDelayChanged:(NSNotification*)aNote;
+//- (void) stopDelayChanged:(NSNotification*)aNote;
 //- (void) startDelayChanged:(NSNotification*)aNote;
 - (void) clockSourceChanged:(NSNotification*)aNote;
-- (void) stopDelayChanged:(NSNotification*)aNote;
 - (void) pageSizeChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
 - (void) baseAddressChanged:(NSNotification*)aNote;
@@ -222,9 +238,18 @@
 - (IBAction) enabledAction:(id)sender;
 - (IBAction) heSuppressTrigModeAction:(id)sender;
 - (IBAction) cfdControlAction:(id)sender;
+- (IBAction) eventConfigAction:(id)sender;
+- (IBAction) extendedEventConfigAction:(id)sender;
+//- (IBAction) endAddressFinalAction:(id)sender;
+
 - (IBAction) thresholdAction:(id)sender;
 - (IBAction) thresholdSumAction:(id)sender;
+- (IBAction) endAddressAction:(id)sender;
+
 - (IBAction) triggerDelayAction:(id)sender;
+- (IBAction) triggerDelayTwoAction:(id)sender;
+- (IBAction) triggerDelay3Action:(id)sender;
+- (IBAction) triggerDelay4Action:(id)sender;
 - (IBAction) energyDividerAction:(id)sender;
 - (IBAction) energySubtractorAction:(id)sender;
 - (IBAction) tauFactorAction:(id)sender;
@@ -258,9 +283,10 @@
 - (IBAction) accGate8LenAction:(id)sender;
 - (IBAction) accGate8StartAction:(id)sender;
 - (IBAction) acquisitionControlAction:(id)sender;
-
+- (IBAction) nimControlStatusAction:(id)sender;
 - (IBAction) writeAccumulatorGateAction:(id)sender;
 - (IBAction) readAccumulatorGateAction:(id)sender;
+- (IBAction) trigger:(id)sender;
 
 - (IBAction) writeThresholdsAction:(id)sender;
 - (IBAction) readThresholdsAction:(id)sender;
@@ -268,15 +294,17 @@
 - (IBAction) writeAcquisitionControlAction:(id)sender;
 - (IBAction) readAcquisitionControlAction:(id)sender;
 
-- (IBAction) csrAction:(id)sender;
+- (IBAction) writeNIMControlStatusAction:(id)sender;
+- (IBAction) readNIMControlStatusAction:(id)sender;
+
+//- (IBAction) csrAction:(id)sender;
 - (IBAction) acqAction:(id)sender;
-- (IBAction) eventConfigAction:(id)sender;
 - (IBAction) pageSizeAction:(id)sender;
 
 - (IBAction) stopTriggerAction:(id)sender;
 - (IBAction) randomClockAction:(id)sender;
-- (IBAction) stopDelayEnabledAction:(id)sender;
-- (IBAction) stopDelayAction:(id)sender;
+//- (IBAction) stopDelayEnabledAction:(id)sender;
+//- (IBAction) stopDelayAction:(id)sender;
 //- (IBAction) startDelayAction:(id)sender;
 - (IBAction) clockSourceAction:(id)sender;
 - (IBAction) baseAddressAction:(id)sender;

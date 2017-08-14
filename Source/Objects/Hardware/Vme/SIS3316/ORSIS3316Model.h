@@ -242,6 +242,7 @@ enum{
     long            histogramsEnabledMask;
     long			pileupEnabledMask;
     long            acquisitionControlMask;
+    long            nimControlStatusMask;
     long            clrHistogramsWithTSMask;
     long            writeHitsToEventMemoryMask;
     long			heSuppressTriggerMask;
@@ -254,18 +255,23 @@ enum{
     unsigned long   tauTableBits[kNumSIS3316Channels];
     unsigned long   heTrigThreshold[kNumSIS3316Channels];
     unsigned long   heTrigThresholdSum[kNumSIS3316Groups];
-    unsigned short intTrigOutPulseBit[kNumSIS3316Channels];
+    unsigned long   endAddress[kNumSIS3316Groups];
+    unsigned short  intTrigOutPulseBit[kNumSIS3316Channels];
     long            trigBothEdgesMask;
     long            intHeTrigOutPulseMask;
     long            heTrigOutputMask;
     
+    
+    unsigned long   eventConfigMask;
+    unsigned long   extendedEventConfigMask;
+//    unsigned long   endAddressFinalMask;
     unsigned short  activeTrigGateWindowLen[kNumSIS3316Groups];
     unsigned short  preTriggerDelay[kNumSIS3316Groups];
     
-    unsigned long  rawDataBufferLen[kNumSIS3316Groups];
-    unsigned long  rawDataBufferStart[kNumSIS3316Groups];
-    unsigned short energyDivider[kNumSIS3316Channels];
-    unsigned short energySubtractor[kNumSIS3316Channels];
+    unsigned long   rawDataBufferLen[kNumSIS3316Groups];
+    unsigned long   rawDataBufferStart[kNumSIS3316Groups];
+    unsigned short  energyDivider[kNumSIS3316Channels];
+    unsigned short  energySubtractor[kNumSIS3316Channels];
 
     unsigned short  accumulatorGateStart[kNumSIS3316Groups];
     unsigned short  accumulatorGateLength[kNumSIS3316Groups];
@@ -285,8 +291,11 @@ enum{
     unsigned short  accGate7Start[kNumSIS3316Groups];
     unsigned short  accGate8Len[kNumSIS3316Groups];
     unsigned short  accGate8Start[kNumSIS3316Groups];
-    unsigned long   thresholdSum[kNumSIS3316Groups]; //should be a short but then it has to be changed throughout the code
+    unsigned long   thresholdSum[kNumSIS3316Groups];
     unsigned short  triggerDelay[kNumSIS3316Groups];
+    unsigned short  triggerDelayTwo[kNumSIS3316Groups];
+    unsigned short  triggerDelay3[kNumSIS3316Groups];
+    unsigned short  triggerDelay4[kNumSIS3316Groups];
 
     
 
@@ -302,13 +311,7 @@ enum{
     unsigned long   clockSource;
 	
 	//control status reg
-    BOOL enableTriggerOutput;
-    BOOL invertTrigger;
-    BOOL activateTriggerOnArmed;
-    BOOL enableInternalRouting;
-    BOOL bankFullTo1;
-    BOOL bankFullTo2;
-    BOOL bankFullTo3;	
+ 
 	
 	//Acquisition control reg
 	BOOL bankSwitchMode;
@@ -363,6 +366,22 @@ enum{
 - (unsigned short) majorRevision;
 
 - (long) enabledMask;
+- (unsigned long) eventConfigMask;
+- (unsigned long) extendedEventConfigMask;
+//- (unsigned long) endAddressFinalMask;
+
+- (void) setEventConfigMask:(unsigned long)aMask;
+- (BOOL) eventConfig:(unsigned short)aGroup;
+- (void) setEventConfigBit:(unsigned short)aGroup withValue:(BOOL)aValue;
+
+- (void) setExtendedEventConfigMask:(unsigned long)aMask;
+- (BOOL) extendedEventConfig:(unsigned short)aGroup;
+- (void) setExtendedEventConfigBit:(unsigned short)aGroup withValue:(BOOL)aValue;
+
+//- (void) setEndAddressFinalMask:(unsigned long)aMask;
+//- (BOOL) endAddressFinal:(unsigned short)aGroup;
+//- (void) setEndAddressFinalBit:(unsigned short)aGroup withValue:(BOOL)aValue;
+
 //-=** (BOOL) enabledMask:(unsigned short)chan;
 - (void) setEnabledMask:(unsigned long)aMask;
 - (BOOL) enabled:(unsigned short)chan;
@@ -372,7 +391,11 @@ enum{
 - (void) setAcquisitionControlMask:(unsigned long)aMask;
 - (BOOL) acquisitionControl:(unsigned long)chan;
 - (void) setAcquisitionControlBit:(unsigned long)aChan withValue:(BOOL)aValue;
-
+//////
+- (long) nimControlStatusMask;
+- (void) setNIMControlStatusMask:(unsigned long)aMask;
+- (BOOL) nimControlStatus:(unsigned long)chan;
+- (void) setNIMControlStatusBit:(unsigned long)aChan withValue:(BOOL)aValue;
 //////
 - (long) histogramsEnabledMask;
 - (void) setHistogramsEnabledMask:(unsigned long)aMask;
@@ -397,10 +420,22 @@ enum{
 - (void) setTriggerDelay:(unsigned short)aGroup withValue: (unsigned short)aValue;
 - (unsigned short) triggerDelay: (unsigned short)aGroup;
 
+- (void) setTriggerDelayTwo:(unsigned short)aGroup withValue: (unsigned short)aValue;
+- (unsigned short) triggerDelayTwo: (unsigned short)aGroup;
+
+- (void) setTriggerDelay3:(unsigned short)aGroup withValue: (unsigned short)aValue;
+- (unsigned short) triggerDelay3: (unsigned short)aGroup;
+
+- (void) setTriggerDelay4:(unsigned short)aGroup withValue: (unsigned short)aValue;
+- (unsigned short) triggerDelay4: (unsigned short)aGroup;
+
 - (long) heSuppressTriggerMask;
 - (BOOL) heSuppressTriggerMask:(unsigned short)chan;
 - (void) setHeSuppressTriggerMask:(unsigned long)aMask;
 - (void) setHeSuppressTriggerBit:(unsigned short)chan withValue:(BOOL)aValue;
+
+- (void) setEndAddress:(unsigned short)aGroup withValue: (unsigned long)aValue;
+- (unsigned long) endAddress: (unsigned short)aGroup;
 
 - (void) setThreshold:(unsigned short)chan withValue:(long)aValue;
 - (void) setThresholdSum:(unsigned short)aGroup withValue: (unsigned long)aValue;
@@ -453,7 +488,7 @@ enum{
 - (void)           setIntTrigOutPulseBit:(unsigned short)aChan withValue:(unsigned short)aValue;
 
 - (unsigned short) activeTrigGateWindowLen:(unsigned short)group;
-- (void)           setActiveTrigGateWindowLen:(unsigned short)group withValue:(unsigned short)aValue;
+- (void)           setActiveTrigGateWindowLen:(unsigned short)group withValue:(unsigned long)aValue;
 
 - (unsigned short)  preTriggerDelay:(unsigned short)group;
 - (void)            setPreTriggerDelay:(unsigned short)group withValue:(unsigned short)aValue;
@@ -518,20 +553,7 @@ enum{
 - (unsigned short)  accGate8Len:(unsigned short)aGroup;
 - (void)            setAccGate8Len:(unsigned short)group withValue:(unsigned short)aValue;
 
-- (BOOL) bankFullTo3;
-- (void) setBankFullTo3:(BOOL)aBankFullTo3;
-- (BOOL) bankFullTo2;
-- (void) setBankFullTo2:(BOOL)aBankFullTo2;
-- (BOOL) bankFullTo1;
-- (void) setBankFullTo1:(BOOL)aBankFullTo1;
-- (BOOL) enableInternalRouting;
-- (void) setEnableInternalRouting:(BOOL)aEnableInternalRouting;
-- (BOOL) activateTriggerOnArmed;
-- (void) setActivateTriggerOnArmed:(BOOL)aActivateTriggerOnArmed;
-- (BOOL) invertTrigger;
-- (void) setInvertTrigger:(BOOL)aInvertTrigger;
-- (BOOL) enableTriggerOutput;
-- (void) setEnableTriggerOutput:(BOOL)aEnableTriggerOutput;
+
 
 //Acquisition control reg
 //- (BOOL) bankSwitchMode;
@@ -550,8 +572,8 @@ enum{
 //- (void) setGateMode:(BOOL)aGateMode;
 
 //clocks and delays (Acquisition control reg)
-- (BOOL) stopDelayEnabled;
-- (void) setStopDelayEnabled:(BOOL)aStopDelayEnabled;
+//- (BOOL) stopDelayEnabled;
+//- (void) setStopDelayEnabled:(BOOL)aStopDelayEnabled;
 - (BOOL) randomClock;
 - (void) setRandomClock:(BOOL)aRandomClock;
 
@@ -561,8 +583,6 @@ enum{
 //-=**- (void) setClockSource:(int)aClockSource;
 
 //event configuration
-- (BOOL) pageWrap;
-- (void) setPageWrap:(BOOL)aPageWrap;
 - (BOOL) gateChaining;
 - (void) setGateChaining:(BOOL)aState;
 
@@ -570,7 +590,7 @@ enum{
 - (BOOL) stopTrigger;
 - (void) setStopTrigger:(BOOL)aStopTrigger;
 - (int) stopDelay;
-- (void) setStopDelay:(int)aStopDelay;
+//- (void) setStopDelay:(int)aStopDelay;
 //- (int) startDelay;
 //- (void) setStartDelay:(int)aStartDelay;
 - (int) pageSize;
@@ -608,9 +628,17 @@ enum{
 - (void) readSerialNumber:(BOOL)verbose;        //6.10
 - (void) writeClockSource;                      //6.17
 - (void) readClockSource:(BOOL)verbose;
+- (void) writeNIMControlStatus;                 //6.20
+- (void) readNIMControlStatus:(BOOL)verbose;
 - (void) writeAcquisitionRegister;              //6.21
 - (void) readAcquisitionRegister:(BOOL)verbose;
 - (BOOL) sampleLogicIsBusy;                     //6.21      //pg 119 and on
+- (void) writeEventConfig;                      //6.12 (section 2)
+- (void) readEventConfig:(BOOL)verbose;
+- (void) writeExtendedEventConfig;              //6.13 (section 2)
+- (void) readExtendedEventConfig:(BOOL)verbose;
+- (void) writeEndAddress;                       //6.15 (section 2)
+- (void) readEndAddress:(BOOL)verbose;
 - (void) writeActiveTrigGateWindowLen;          //6.16 (section 2)
 - (void) readActiveTrigGateWindowLen:(BOOL)verbose;
 - (void) writeRawDataBufferConfig;              //6.17 (section 2)
@@ -699,7 +727,11 @@ enum{
 @end
 
 extern NSString* ORSIS3316EnabledChanged;
+extern NSString* ORSIS3316EventConfigChanged;
+extern NSString* ORSIS3316ExtendedEventConfigChanged;
+//extern NSString* ORSIS3316EndAddressFinalChanged;
 extern NSString* ORSIS3316AcquisitionControlChanged;
+extern NSString* ORSIS3316NIMControlStatusChanged;
 extern NSString* ORSIS3316HistogramsEnabledChanged;
 extern NSString* ORSIS3316PileUpEnabledChanged;
 extern NSString* ORSIS3316ClrHistogramWithTSChanged;
@@ -707,7 +739,11 @@ extern NSString* ORSIS3316WriteHitsIntoEventMemoryChanged;
 
 extern NSString* ORSIS3316ThresholdChanged;
 extern NSString* ORSIS3316ThresholdSumChanged;
+extern NSString* ORSIS3316EndAddressChanged;
 extern NSString* ORSIS3316TriggerDelayChanged;
+extern NSString* ORSIS3316TriggerDelayTwoChanged;
+extern NSString* ORSIS3316TriggerDelay3Changed;
+extern NSString* ORSIS3316TriggerDelay4Changed;
 extern NSString* ORSIS3316HeSuppressTrigModeChanged;
 extern NSString* ORSIS3316CfdControlBitsChanged;
 extern NSString* ORSIS3316ExtraFilterBitsChanged;
@@ -749,11 +785,10 @@ extern NSString* ORSIS3316TemperatureChanged;
 //CSR
 extern NSString* ORSIS3316CSRRegChanged;
 extern NSString* ORSIS3316AcqRegChanged;
-extern NSString* ORSIS3316EventConfigChanged;
 
 extern NSString* ORSIS3316StopTriggerChanged;
 extern NSString* ORSIS3316RandomClockChanged;
-extern NSString* ORSIS3316StopDelayChanged;
+//extern NSString* ORSIS3316StopDelayChanged;
 //extern NSString* ORSIS3316StartDelayChanged;
 extern NSString* ORSIS3316ClockSourceChanged;
 extern NSString* ORSIS3316PageSizeChanged;
