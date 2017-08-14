@@ -53,7 +53,6 @@ enum katrinDaqMode {
 #define kShipSumHistogramFlag		0x040000
 #define kSecondsSetInitWithHostFlag	0x080000
 #define kSecondsSetSendToFLTsFlag	0x100000
-//#define kSkipFltEventReadoutFlag	0x200000
 #define kForceFltReadoutFlag	    0x200000
 
 //not used in the newer firmware readout code -MAH- 7/3/2017

@@ -1196,7 +1196,6 @@ return;
 	unsigned long long low  = [self readReg:kKatrinV4SLTRunCounterLoReg];
 	unsigned long long high = [self readReg:kKatrinV4SLTRunCounterHiReg];
 	unsigned long long theTime = ((unsigned long long)high << 32) | low;
-	//NSLog(@"runtime lo %llx high %llx   ---   time %llx  %llu\n",low,high, theTime, theTime);
 	[self setRunTime:theTime];
 	return theTime;
 }
@@ -1530,23 +1529,14 @@ return;
 	dataTakers = [[readOutGroup allObjects] retain];		//cache of data takers.
     
     //check: are there FLTs in histogram mode?
-	int runMode=0, countHistoMode=0, countNonHistoMode=0, countBipolarEnergyMode=0;
-    //DEBUG         [self dumpSltSecondCounter:@"FLT-runTaskStarted:"];
-    //loop over Readout List
+	int runMode=0, countHistoMode=0, countNonHistoMode=0;
 	for(id obj in dataTakers){
         if([obj respondsToSelector:@selector(runMode)]){
             runMode=[obj runMode];
-            if(runMode == kKatrinV4Flt_Histogram_DaqMode) countHistoMode++; else countNonHistoMode++;
+            if(runMode == kKatrinV4Flt_Histogram_DaqMode)   countHistoMode++;
+            else                                            countNonHistoMode++;
         }
-        if([obj respondsToSelector:@selector(useBipolarEnergy)]){
-            //runMode=[obj useBipolarEnergy];
-            if([obj useBipolarEnergy]) countBipolarEnergyMode++;
-        }
-        
     }
-    //DEBUG         NSLog(@"%@::%@  countHistoMode:%i  countNonHistoMode:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),countHistoMode,countNonHistoMode);//DEBUG -tb-
-    //DEBUG         [self dumpSltSecondCounter:nil];
-        
         
     //THIS IS A WORKAROUND FOR THE start-histo FLT BUG
     //   (start-histo FLT BUG is: the FIRST histogram already starts recording BEFORE the next second strobe/1PPS, if the 'set standby mode' command was within this second)
@@ -1588,7 +1578,7 @@ return;
             usleep(1000);
         }				
         //DEBUG
-                 NSLog(@"%@::%@ waiting for second strobe: i:%i  subsec:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),i,subsec1);//DEBUG -tb-
+        //NSLog(@"%@::%@ waiting for second strobe: i:%i  subsec:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),i,subsec1);//DEBUG -tb-
 	}	
     
         //DEBUG         [self dumpSltSecondCounter:@"histoFLT-writeControl:"];
@@ -1619,8 +1609,6 @@ return;
 	//load all the data needed for the eCPU to do the HW read-out.
 	[self load_HW_Config];
 	[pmcLink runTaskStarted:aDataPacket userInfo:userInfo];//method of SBC_Link.m: init alarm handling; send kSBC_StartRun to SBC/PrPMC -tb-
-	
-    //next  takeData:userInfo: will be called, which will release inhibit in the first cycle -tb-
 }
 
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo

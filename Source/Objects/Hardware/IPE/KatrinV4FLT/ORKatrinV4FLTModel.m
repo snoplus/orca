@@ -862,7 +862,10 @@ static double table[32]={
 - (int) filterShapingLength { return filterShapingLength; }
 - (void) setFilterShapingLength:(int)aFilterShapingLength
 {
-	if(aFilterShapingLength == 8 && gapLength>0){
+    if(aFilterShapingLength>0x3f)aFilterShapingLength = 0x3F;
+    if(aFilterShapingLength<2)   aFilterShapingLength = 2;
+    
+	if(aFilterShapingLength == 0x3f && gapLength>0){
 		[self setGapLength:0];
 		NSLog(@"Warning: setFilterShapingLength: FLTv4: maximum filter length allows only gap length of 0. Gap length reset to 0!\n");
 	}
@@ -874,7 +877,9 @@ static double table[32]={
 - (int) gapLength { return gapLength; }
 - (void) setGapLength:(int)aGapLength
 {
-	if(filterShapingLength == 8 && aGapLength>0){
+    if(aGapLength>0x7)aGapLength = 0x7;
+    if(aGapLength<0)  aGapLength = 0;
+    if(filterShapingLength == 0x3f && gapLength>0){
 		aGapLength=0;
 		NSLog(@"Warning: setGapLength: FLTv4: maximum filter length allows only gap length of 0. Gap length reset to 0!\n");
 	}
@@ -2397,7 +2402,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Filter Shaping Length"];
-    [p setFormat:@"##0" upperLimit:8 lowerLimit:1 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:0x3F lowerLimit:2 stepSize:1 units:@""];
     [p setSetMethod:@selector(setFilterShapingLength:) getMethod:@selector(filterShapingLength)];
     [a addObject:p];			
 

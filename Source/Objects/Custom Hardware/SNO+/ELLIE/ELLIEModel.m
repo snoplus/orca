@@ -566,7 +566,13 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
         NSLogColor([NSColor redColor], @"[TELLIE]: fibre map has not been loaded from couchdb - you need to call loadTellieStaticsFromDB\n");
         return nil;
     }
-    NSUInteger channelIndex = [[[self tellieFibreMapping] objectForKey:@"channels"] indexOfObject:[NSString stringWithFormat:@"%d",channel]];
+
+    NSUInteger channelIndex;
+    @try{
+        channelIndex = [[[self tellieFibreMapping] objectForKey:@"channels"] indexOfObject:[NSString stringWithFormat:@"%d",channel]];
+    }@catch(NSException* e) {
+        channelIndex = [[[self tellieFibreMapping] objectForKey:@"channels"] indexOfObject:channel];
+    }
     NSString* fibre = [[[self tellieFibreMapping] objectForKey:@"fibres"] objectAtIndex:channelIndex];
     return fibre;
 }
@@ -763,6 +769,34 @@ err:
     BOOL isSlave = YES;
     if([[fireCommands objectForKey:@"run_mode"] isEqualToString:@"Master"]){
         isSlave = NO;
+    }
+    
+    //////////////
+    // TUBii has two possible slave mode configurations.
+    // 0 [@NO]:  Trigger path = TUBii->TELLIE->TUBii->MTC/D
+    // 1 [@YES]: Trigger path = TUBii->TELLIE
+    //                          TUBii->MTC/D
+    //
+    // In the first case a single signal propagates in sequence through the entire chain of hardware. This
+    // has a disadvantage that significant attenuation can be picked up on the long paths between TUBii
+    // and tellie (approx 20m each).
+    // In the second case TUBii first sends a trigger to TELLIE, then independently, after some delay, sends
+    // a trigger onto the MTC/D in anticipation that the TELLIE trigger would have been properly received.
+    // This has the advantage that the trigger paths are much better controlled.
+    //
+    // The second case was added as the trigger efficiency of the first arrangement proved to be extremely
+    // poor (<50%). Hence we want to force this method to be used by default.
+    if(isSlave){
+        BOOL mode = YES;
+        if([fireCommands objectForKey:@"TUBii_slave_setting"]){
+            mode = [[fireCommands objectForKey:@"TUBii_slave_setting"] boolValue];
+        }
+        @try{
+            [theTubiiModel setTellieMode:mode];
+        } @catch(NSException* e){
+            NSLogColor([NSColor redColor], @"[TELLIE]: Problem setting correct slave mode behaviour at TUBii, reason: %@\n", [e reason]);
+            goto err;
+        }
     }
     
     /////////////
