@@ -1878,7 +1878,6 @@ void SwapLongBlock(void* p, int32_t n)
     int slot, dbNum, channel;
     char payload[XL3_PAYLOAD_SIZE];
     ORFec32Model *fec;
-    ORFecDaughterCardModel *db;
 
     memset(&payload, 0, sizeof(payload));
 
@@ -1901,8 +1900,6 @@ void SwapLongBlock(void* p, int32_t n)
         if ([self isTriggerON]) {
             for (dbNum = 0; dbNum < 4; dbNum++) {
                 if (![fec dcPresent:dbNum]) continue;
-
-                db = [fec dc:dbNum];
 
                 for (channel = 0; channel < 8; channel++) {
                     if ([fec trigger100nsEnabled: (dbNum*8 + channel)]) {
