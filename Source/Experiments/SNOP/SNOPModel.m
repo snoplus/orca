@@ -856,8 +856,8 @@ err:
     if (start != ROLLOVER_START) {
         [self setLastStandardRunType:[self standardRunType]];
         [self setLastStandardRunVersion:[self standardRunVersion]];
-        [self setLastRunTypeWord:[self runTypeWord]];
-        NSString* _lastRunTypeWord = [NSString stringWithFormat:@"0x%X",(int)[self runTypeWord]];
+        [self setLastRunTypeWord:run_type];
+        NSString* _lastRunTypeWord = [NSString stringWithFormat:@"0x%X",(int)run_type];
         [self setLastRunTypeWordHex:_lastRunTypeWord]; //FIXME: revisit if we go over 32 bits
     }
 
@@ -2311,6 +2311,11 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 - (void) startECARunInParallel
 {
     [anECARun start];
+}
+
+- (void) startECACampaign
+{
+    [anECARun startCampaign];
 }
 
 - (BOOL) startStandardRun:(NSString*)_standardRun withVersion:(NSString*)_standardRunVersion
