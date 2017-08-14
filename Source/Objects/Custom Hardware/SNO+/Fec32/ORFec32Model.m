@@ -910,17 +910,15 @@ static int              sChannelsNotChangedCount = 0;
 {
 	return ((kHVRefMax-kHVRefMin)/255.0)*hVRef+kHVRefMin;
 }
-//readVoltages
-//read the voltage and temp adcs for a crate and card
-//assumes that bus access has already been granted.
--(void) readVoltages
-{	
-    bool statusChanged = false;
 
-    statusChanged = [self readVoltagesUsingXL3];
+- (void) readVoltages
+{
+    /* Read the voltage and temp adcs for a crate and card. Assumes that bus
+     * access has already been granted. */
+    [self readVoltagesUsingXL3];
 }
 
--(void) parseVoltages:(VMonResults*)result;
+- (void) parseVoltages:(VMonResults*)result;
 {
     [self parseVoltagesUsingXL3:result];
 }
