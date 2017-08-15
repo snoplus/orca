@@ -1833,7 +1833,7 @@ err:
     [runsLockButton setState: locked];
 
     //Enable or disable fields
-    [standardRunThresCurrentValues setEnabled:!lockedOrNotRunningMaintenance];
+    [standardRunThresCurrentValues setEnabled:!locked];
     [standardRunSaveButton setEnabled:!locked];
     [standardRunLoadButton setEnabled:!locked];
     [standardRunLoadinHWButton setEnabled:!lockedOrNotRunningMaintenance];
@@ -1841,7 +1841,7 @@ err:
 
     //Do not lock detector state bits to the operator
     for(int irow=0;irow<21;irow++){
-        [[runTypeWordMatrix cellAtRow:irow column:0] setEnabled:!lockedOrNotRunningMaintenance];
+        [[runTypeWordMatrix cellAtRow:irow column:0] setEnabled:!locked];
     }
     [timedRunCB setEnabled:!runInProgress];
     [timeLimitField setEnabled:!locked];

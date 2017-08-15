@@ -608,7 +608,7 @@ static int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     [fpIOTrgOutMatrix setEnabled:!locked];
     [fpIOTrgOutModeMatrix setEnabled:!locked];
 	[fpIOGetButton setEnabled:!locked];
-	[fpIOSetButton setEnabled:!locked];
+	[fpIOSetButton setEnabled:!lockedOrRunningMaintenance];
     [postTriggerSettingTextField setEnabled:!locked];
     [triggerSourceMaskMatrix setEnabled:!locked];
     [coincidenceLevelTextField setEnabled:!locked];
@@ -629,7 +629,7 @@ static int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
-		if(runInProgress && ![gSecurity isLocked:SNOCaenSettingsLock])s = @"Not in Maintenance Run.";
+		if(runInProgress && ![gSecurity isLocked:SNOCaenSettingsLock])s = @"Not in Maintenance";
     }
     [settingsLockDocField setStringValue:s];
 	

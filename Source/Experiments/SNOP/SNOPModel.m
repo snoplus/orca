@@ -597,6 +597,13 @@ tellieRunFiles = _tellieRunFiles;
         /* We don't queue the run start here for rollover runs. Since we don't
          * send a queue_run_start command to the mtc server, the first gtid and
          * the valid gtid fields in the run header will be the same. */
+
+        //Load last run type word if rolling over to allow the user change the
+        //run word mask during running
+        if (start == ROLLOVER_START) {
+            ORRunModel *run = [aNote object];
+            [run setRunType:[self lastRunTypeWord]];
+        }
         break;
     case CONTINUOUS_START:
         @try {
@@ -876,15 +883,15 @@ err:
     }
 
     state = RUNNING;
+    [self setLastRunTypeWord:run_type];
+    NSString* _lastRunTypeWord = [NSString stringWithFormat:@"0x%X",run_type];
+    [self setLastRunTypeWordHex:_lastRunTypeWord]; //FIXME: revisit if we go over 32 bits
     if (start != ROLLOVER_START) {
         [self setLastStandardRunType:[self standardRunType]];
         [self setLastStandardRunVersion:[self standardRunVersion]];
-        [self setLastRunTypeWord:[self runTypeWord]];
-        NSString* _lastRunTypeWord = [NSString stringWithFormat:@"0x%X",(int)[self runTypeWord]];
-        [self setLastRunTypeWordHex:_lastRunTypeWord]; //FIXME: revisit if we go over 32 bits
     }
 
-    if ([gOrcaGlobals runType] & kPhysicsRun) {
+    if (run_type & kPhysicsRun) {
         /* If this is a physics run, we ping each slot in the detector once at
          * the beginning of the run to look for any trigger issues. */
         [self pingCratesAtRunStart];
