@@ -204,7 +204,7 @@
 
 - (NSString*) stringForThreshold:(int) threshold_index;
 - (id) objectFromSerialization: (NSMutableDictionary*) serial withKey:(NSString*)str;
-- (void) loadFromSearialization:(NSMutableDictionary*) serial;
+- (void) loadFromSerialization:(NSMutableDictionary*) serial;
 - (NSMutableDictionary*) serializeToDictionary;
 
 - (BOOL) thresholdIndexIsValid:(int) index;
@@ -310,3 +310,4 @@ extern NSString* ORMTCModelMTCAMaskChanged;
 extern NSString* ORMTCModelIsPedestalEnabledInCSR;
 extern NSString* ORMTCPulserRateChanged;
 extern NSString* ORMTCGTMaskChanged;
+extern NSString* LockOutWidthSerializationString;

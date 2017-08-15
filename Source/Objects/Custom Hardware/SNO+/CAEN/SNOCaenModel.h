@@ -245,6 +245,8 @@ enum {
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
+- (NSMutableDictionary*) serializeToDictionary;
+- (void) loadFromSerialization:(NSMutableDictionary*)settingsDict;
 
 @end
 

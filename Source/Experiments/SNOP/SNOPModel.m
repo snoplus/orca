@@ -44,6 +44,7 @@
 #import "RedisClient.h"
 #include <stdint.h>
 #import "SNOCaenModel.h"
+#import "TUBiiModel.h"
 #import "XL3_Link.h"
 #import "ORPQModel.h"
 #import "ORPQResult.h"
@@ -541,6 +542,7 @@ tellieRunFiles = _tellieRunFiles;
     ORMTCModel *mtc;
     SNOCaenModel *caen;
     ORXL3Model *xl3;
+    TUBiiModel *tubii;
     int i;
 
     objs = [[(ORAppDelegate*)[NSApp delegate] document]
@@ -561,6 +563,15 @@ tellieRunFiles = _tellieRunFiles;
     } else {
         NSLogColor([NSColor redColor], @"couldn't find SNO CAEN model. Please add it to the experiment and restart the run.\n");
         goto err;
+    }
+
+    objs = [[(ORAppDelegate*)[NSApp delegate] document]
+            collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
+    if ([objs count]) {
+        tubii = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find TUBii model. Please add it to the experiment and restart the run.\n");
+        return;
     }
 
     switch (state) {
@@ -647,6 +658,12 @@ tellieRunFiles = _tellieRunFiles;
             goto err;
         }
 
+        /* Load the TUBii settings to hardware. */
+        if ([tubii sendCurrentModelStateToHW]) {
+            NSLogColor([NSColor redColor], @"error initializing TUBii.\n");
+            goto err;
+        }
+            
         /* Load the MTC hardware. */
         if ([mtc initAtRunStart:0]) {
             NSLogColor([NSColor redColor], @"error initializing MTC.\n");
@@ -2503,6 +2520,24 @@ err:
         return false;
     }
 
+    objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
+    TUBiiModel* tubiiModel;
+    if ([objs count]) {
+        tubiiModel = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find TUBii model. Please add it to the experiment and restart the run.\n");
+        return false;
+    }
+
+    objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOCaenModel")];
+    SNOCaenModel* caenModel;
+    if ([objs count]) {
+        caenModel = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find CAEN model. Please add it to the experiment and restart the run.\n");
+        return false;
+    }
+
 
     //Load values
     @try{
@@ -2517,9 +2552,13 @@ err:
         //Do not load thresholds if in Diagnostic run
         if(nextruntypeword & kDiagnosticRun) return true;
 
-        //Load MTC thresholds
-        [mtcModel loadFromSearialization:runSettings];
-        
+        //Load MTC settings
+        [mtcModel loadFromSerialization:runSettings];
+        //Load CAEN settings
+        [caenModel loadFromSerialization:runSettings];
+        //Load TUBii settings
+        [tubiiModel loadFromSerialization:runSettings];
+
         NSLog(@"Standard run %@ (%@) settings loaded. \n",runTypeName,runVersion);
         return true;
     }
@@ -2530,6 +2569,7 @@ err:
 }
 
 //Save MTC settings in a Standard Run table in CouchDB for later use by the Run Scripts or the user
+//Return True on success and False on failure
 - (BOOL) saveStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion
 {
     // Check that runTypeName is properly set:
@@ -2553,7 +2593,7 @@ err:
         runControlModel = [objs objectAtIndex:0];
     } else {
         NSLogColor([NSColor redColor], @"couldn't find RC model. Please add it to the experiment and restart the run.\n");
-        return 0;
+        return false;
     }
 
     // Get MTC model
@@ -2563,8 +2603,29 @@ err:
         mtc = [objs objectAtIndex:0];
     } else {
         NSLogColor([NSColor redColor], @"couldn't find MTC model. Please add it to the experiment and restart the run.\n");
-        return 0;
+        return false;
     }
+
+    // Get TUBii model
+    objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
+    TUBiiModel* tubiiModel;
+    if ([objs count]) {
+        tubiiModel = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find TUBii model. Please add it to the experiment and restart the run.\n");
+        return false;
+    }
+
+    // Get CAEN model
+    objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOCaenModel")];
+    SNOCaenModel* caenModel;
+    if ([objs count]) {
+        caenModel = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find CAEN model. Please add it to the experiment and restart the run.\n");
+        return false;
+    }
+
 
     // Build run table
     NSMutableDictionary *detectorSettings = [NSMutableDictionary dictionaryWithCapacity:200];
@@ -2581,9 +2642,19 @@ err:
     [detectorSettings setObject:[NSNumber numberWithUnsignedLong:currentRunTypeWord] forKey:@"run_type_word"];
 
     // Save MTC/D parameters, trigger masks and MTC/A+ thresholds
-    NSMutableDictionary* mtc_serial = [[mtc serializeToDictionary] retain];
+    NSMutableDictionary* mtc_serial = [mtc serializeToDictionary];
     [detectorSettings addEntriesFromDictionary:mtc_serial];
-    [mtc_serial release];
+
+    // Save TUBii settings
+    NSMutableDictionary* tubii_serial = [tubiiModel serializeToDictionary];
+    if(tubii_serial != NULL) [detectorSettings addEntriesFromDictionary:tubii_serial];
+    else return false;
+
+    // Save CAEN settings
+    NSMutableDictionary* caen_serial = [caenModel serializeToDictionary];
+    if(caen_serial != NULL) [detectorSettings addEntriesFromDictionary:caen_serial];
+    else return false;
+
     NSLog(@"Saving settings for Standard Run %@ - Version %@: \n %@ \n",runTypeName,runVersion,detectorSettings);
 
     [[self orcaDbRefWithEntryDB:self withDB:[self orcaDBName]] addDocument:detectorSettings tag:@"kStandardRunPosted"];
@@ -2603,7 +2674,31 @@ err:
         return;
     }
 
+    objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOCaenModel")];
+    SNOCaenModel* caen;
+    if ([objs count]) {
+        caen = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find CAEN model. Please add it to the experiment and restart the run.\n");
+        return;
+    }
+
+    objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
+    TUBiiModel* tubii;
+    if ([objs count]) {
+        tubii = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find TUBii model. Please add it to the experiment and restart the run.\n");
+        return;
+    }
+
     @try{
+        //Load TUBii settings
+        [tubii sendCurrentModelStateToHW];
+
+        //Load CAEN settings
+        [caen initBoard];
+
         //Load MTC settings
         [mtc loadTheMTCADacs];
         [mtc setGlobalTriggerWordMask];

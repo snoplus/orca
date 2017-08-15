@@ -38,6 +38,7 @@ NSString* PrescaleValueSerializationString      = @"MTC_PrescaleValue";
 NSString* PulserRateSerializationString         = @"MTC_PulserRate";
 NSString* PGT_PED_Mode_SerializationString      = @"MTC_PulserMode";
 NSString* PulserEnabledSerializationString      = @"MTC_PulserEnabled";
+NSString* LockOutWidthSerializationString       = @"MTC_LockoutWidth";
 NSString* ORMTCSettingsChanged                  = @"ORMTCSettingsChanged";
 NSString* ORMTCModelBasicOpsRunningChanged      = @"ORMTCModelBasicOpsRunningChanged";
 NSString* ORMTCABaselineChanged                 = @"ORMTCABaselineChanged";
@@ -1221,34 +1222,34 @@ tubRegister;
     
     switch (threshold_index) {
         case MTC_N100_HI_THRESHOLD_INDEX:
-            ret = @"N100H_Threshold";
+            ret = @"MTC_N100H_Threshold";
             break;
         case MTC_N100_MED_THRESHOLD_INDEX:
-            ret = @"N100M_Threshold";
+            ret = @"MTC_N100M_Threshold";
             break;
         case MTC_N100_LO_THRESHOLD_INDEX:
-            ret = @"N100L_Threshold";
+            ret = @"MTC_N100L_Threshold";
             break;
         case MTC_N20_THRESHOLD_INDEX:
-            ret = @"N20_Threshold";
+            ret = @"MTC_N20_Threshold";
             break;
         case MTC_N20LB_THRESHOLD_INDEX:
-            ret = @"N20LB_Threshold";
+            ret = @"MTC_N20LB_Threshold";
             break;
         case MTC_ESUMH_THRESHOLD_INDEX:
-            ret = @"ESUMH_Threshold";
+            ret = @"MTC_ESUMH_Threshold";
             break;
         case MTC_ESUML_THRESHOLD_INDEX:
-            ret = @"ESUML_Threshold";
+            ret = @"MTC_ESUML_Threshold";
             break;
         case MTC_OWLN_THRESHOLD_INDEX:
-            ret = @"OWLN_Threshold";
+            ret = @"MTC_OWLN_Threshold";
             break;
         case MTC_OWLEHI_THRESHOLD_INDEX:
-            ret = @"OWLEH_Threshold";
+            ret = @"MTC_OWLEH_Threshold";
             break;
         case MTC_OWLELO_THRESHOLD_INDEX:
-            ret = @"OWLEL_Threshold";
+            ret = @"MTC_OWLEL_Threshold";
             break;
         default:
             ret =@"";
@@ -1264,7 +1265,7 @@ tubRegister;
     return obj;
 }
 
-- (void) loadFromSearialization:(NSMutableDictionary*) serial
+- (void) loadFromSerialization:(NSMutableDictionary*) serial
 {
     //This function will let any exceptions from below bubble up
 
@@ -1284,6 +1285,7 @@ tubRegister;
     [self setPulserEnabled:[[self objectFromSerialization:serial withKey:PulserEnabledSerializationString] boolValue]];
     [self setPrescaleValue:[[self objectFromSerialization:serial withKey:PrescaleValueSerializationString] intValue]];
     [self setGtMask:[[self objectFromSerialization:serial withKey:GTMaskSerializationString] unsignedIntValue]];
+    [self setLockoutWidth:[[self objectFromSerialization:serial withKey:LockOutWidthSerializationString] unsignedIntValue]];
 }
 
 - (NSMutableDictionary*) serializeToDictionary
@@ -1306,6 +1308,7 @@ tubRegister;
     [serial setObject:[NSNumber numberWithBool:[self pulserEnabled] ] forKey:PulserEnabledSerializationString];
     [serial setObject:[NSNumber numberWithUnsignedShort:[self prescaleValue]] forKey:PrescaleValueSerializationString];
     [serial setObject:[NSNumber numberWithUnsignedInt: [self gtMask]] forKey:GTMaskSerializationString];
+    [serial setObject:[NSNumber numberWithUnsignedInt: [self lockoutWidth]] forKey:LockOutWidthSerializationString];
     return serial;
 }
 
