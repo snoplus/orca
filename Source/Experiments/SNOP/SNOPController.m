@@ -2520,6 +2520,7 @@ err:
 
     [self highlightDifferencesBetween:standardRunTUBiiCurrentMatrix And:standardRunTUBiiDBMatrix];
 
+    [format release];
 }
 
 - (void) highlightDifferencesBetween:(NSMatrix*)aMatrix And:(NSMatrix*)bMatrix

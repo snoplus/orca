@@ -2554,10 +2554,8 @@ err:
 
         //Load MTC settings
         [mtcModel loadFromSerialization:runSettings];
-
         //Load CAEN settings
         [caenModel loadFromSerialization:runSettings];
-
         //Load TUBii settings
         [tubiiModel loadFromSerialization:runSettings];
 

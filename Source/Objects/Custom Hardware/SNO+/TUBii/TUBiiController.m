@@ -7,9 +7,7 @@
 //
 
 #import "TUBiiController.h"
-#pragma pack(push)
 #import "TUBiiModel.h"
-#pragma pack(pop)
 //Defs to map between tab number and tab name
 #define TUBII_GUI_TUBII_TAB_NUM 0
 #define TUBII_GUI_PULSER_TAB_NUM 1

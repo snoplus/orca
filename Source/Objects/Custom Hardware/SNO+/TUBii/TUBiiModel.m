@@ -861,21 +861,17 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
  * pain to handle this differently for the standard
  * runs */
 - (void) loadFromSerialization:(NSMutableDictionary*)settingsDict {
-    @try{
-        currentModelState.TUBiiPGT_Rate = [[settingsDict objectForKey:[self getStandardRunKeyForField:@"TUBiiPGT_Rate"]] floatValue];
-        currentModelState.syncTrigMask = [[settingsDict objectForKey:[self getStandardRunKeyForField:@"syncTrigMask"]] floatValue];
-        currentModelState.asyncTrigMask = [[settingsDict objectForKey:[self getStandardRunKeyForField:@"asyncTrigMask"]] floatValue];
-        currentModelState.CaenChannelMask = [[settingsDict objectForKey:[self getStandardRunKeyForField:@"CaenChannelMask"]] floatValue];
-        currentModelState.CaenGainMask = [[settingsDict objectForKey:[self getStandardRunKeyForField:@"CaenGainMask"]] floatValue];
-        currentModelState.counterMask = [[settingsDict objectForKey:[self getStandardRunKeyForField:@"counterMask"]] unsignedIntValue];
-        currentModelState.speakerMask = [[settingsDict objectForKey:[self getStandardRunKeyForField:@"speakerMask"]] unsignedIntValue];
-        currentModelState.MTCAMimic1_ThresholdInBits = [[settingsDict objectForKey:[self getStandardRunKeyForField:@"MTCAMimic1_ThresholdInBits"]] floatValue];
-        currentModelState.DGT_Bits = [[settingsDict objectForKey:[self getStandardRunKeyForField:@"DGT_Bits"]] floatValue];
-        currentModelState.LO_Bits = [[settingsDict objectForKey:[self getStandardRunKeyForField:@"LO_Bits"]] floatValue];
-        currentModelState.controlReg = [[settingsDict objectForKey:[self getStandardRunKeyForField:@"controlReg"]] floatValue];
-    } @catch(...){
-        NSLogColor([NSColor redColor], @"TUBii: settings couldn't not be loaded \n");
-    }
+    currentModelState.TUBiiPGT_Rate = [[settingsDict objectForKey:[self getStandardRunKeyForField:@"TUBiiPGT_Rate"]] floatValue];
+    currentModelState.syncTrigMask = [[settingsDict objectForKey:[self getStandardRunKeyForField:@"syncTrigMask"]] floatValue];
+    currentModelState.asyncTrigMask = [[settingsDict objectForKey:[self getStandardRunKeyForField:@"asyncTrigMask"]] floatValue];
+    currentModelState.CaenChannelMask = [[settingsDict objectForKey:[self getStandardRunKeyForField:@"CaenChannelMask"]] floatValue];
+    currentModelState.CaenGainMask = [[settingsDict objectForKey:[self getStandardRunKeyForField:@"CaenGainMask"]] floatValue];
+    currentModelState.counterMask = [[settingsDict objectForKey:[self getStandardRunKeyForField:@"counterMask"]] unsignedIntValue];
+    currentModelState.speakerMask = [[settingsDict objectForKey:[self getStandardRunKeyForField:@"speakerMask"]] unsignedIntValue];
+    currentModelState.MTCAMimic1_ThresholdInBits = [[settingsDict objectForKey:[self getStandardRunKeyForField:@"MTCAMimic1_ThresholdInBits"]] floatValue];
+    currentModelState.DGT_Bits = [[settingsDict objectForKey:[self getStandardRunKeyForField:@"DGT_Bits"]] floatValue];
+    currentModelState.LO_Bits = [[settingsDict objectForKey:[self getStandardRunKeyForField:@"LO_Bits"]] floatValue];
+    currentModelState.controlReg = [[settingsDict objectForKey:[self getStandardRunKeyForField:@"controlReg"]] floatValue];
     [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName: ORTubiiSettingsChangedNotification object:self];
 }
 

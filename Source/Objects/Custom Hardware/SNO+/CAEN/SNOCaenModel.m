@@ -1301,24 +1301,20 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 
 - (void) loadFromSerialization:(NSMutableDictionary*)settingsDict {
 
-    @try{
-        [self setChannelConfigMask:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"channelConfigMask"]] unsignedShortValue]];
-        [self setEventSize:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"eventSize"]] intValue]];
-        [self setCustomSize:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"customSize"]] unsignedLongValue]];
-        [self setIsCustomSize:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"isCustomSize"]] boolValue]];
-        [self setAcquisitionMode:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"acquisitionMode"]] unsignedShortValue]];
-        [self setCountAllTriggers:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"countAllTriggers"]] boolValue]];
-        [self setTriggerSourceMask:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"triggerSourceMask"]] unsignedLongValue]];
-        [self setCoincidenceLevel:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"coincidenceLevel"]] unsignedShortValue]];
-        [self setTriggerOutMask:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"triggerOutMask"]] unsignedLongValue]];
-        [self setPostTriggerSetting:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"postTriggerSetting"]] unsignedLongValue]];
-        [self setFrontPanelControlMask:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"frontPanelControlMask"]] unsignedLongValue]];
-        [self setEnabledMask:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"enabledMask"]] unsignedShortValue]];
-        for (int idac=0; idac<kNumCaenChannelDacs; ++idac) {
-            [self setDac:idac withValue:[[settingsDict objectForKey:[NSString stringWithFormat:@"%@_%i",[self getStandardRunKeyForField:@"dac"],idac]] unsignedShortValue]];
-        }
-    } @catch(NSException *err){
-        NSLogColor([NSColor redColor], @"CAEN: settings couldn't not be loaded. error: %@ reason: %@ \n", [err name], [err reason]);
+    [self setChannelConfigMask:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"channelConfigMask"]] unsignedShortValue]];
+    [self setEventSize:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"eventSize"]] intValue]];
+    [self setCustomSize:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"customSize"]] unsignedLongValue]];
+    [self setIsCustomSize:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"isCustomSize"]] boolValue]];
+    [self setAcquisitionMode:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"acquisitionMode"]] unsignedShortValue]];
+    [self setCountAllTriggers:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"countAllTriggers"]] boolValue]];
+    [self setTriggerSourceMask:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"triggerSourceMask"]] unsignedLongValue]];
+    [self setCoincidenceLevel:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"coincidenceLevel"]] unsignedShortValue]];
+    [self setTriggerOutMask:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"triggerOutMask"]] unsignedLongValue]];
+    [self setPostTriggerSetting:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"postTriggerSetting"]] unsignedLongValue]];
+    [self setFrontPanelControlMask:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"frontPanelControlMask"]] unsignedLongValue]];
+    [self setEnabledMask:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"enabledMask"]] unsignedShortValue]];
+    for (int idac=0; idac<kNumCaenChannelDacs; ++idac) {
+        [self setDac:idac withValue:[[settingsDict objectForKey:[NSString stringWithFormat:@"%@_%i",[self getStandardRunKeyForField:@"dac"],idac]] unsignedShortValue]];
     }
 
 }
