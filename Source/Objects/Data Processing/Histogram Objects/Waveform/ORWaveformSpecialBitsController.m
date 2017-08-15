@@ -48,17 +48,18 @@
 #pragma mark ¥¥¥Data Source
 - (void) plotter:(id)aPlot index:(int)index x:(double*)x y:(double*)y
 {
-	if([aPlot tag] == 0){
+    int thePlotTag = [aPlot tag];
+	if(thePlotTag == 0){
 		unsigned long aMask =  [(ORMaskedIndexedWaveformWithSpecialBits*)model mask];
 		*y =  ([model value:index] & aMask) + [model scaleOffset];
 		*x = index;
 	}
 	else {
 		int bit;
+        unsigned long aMask =  [model firstBitMask];
 		for(bit=0;bit<[model numBits];bit++){
-			if([aPlot tag] == bit+1){
-				unsigned long aMask =  [model firstBitMask];
-				unsigned long aValue = [model value:index];
+			if(thePlotTag == bit+1){
+ 				unsigned long aValue = [model value:index];
 				*y =  ((aValue & (aMask << bit)))!=0;
 				*x = index;
 				break;
