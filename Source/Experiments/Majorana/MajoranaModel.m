@@ -34,7 +34,6 @@
 #import "ORVME64CrateModel.h"
 #import "ORMJDSource.h"
 #import "ORDataProcessing.h"
-#import "ORGretina4MModel.h"
 #import "ORMJDPreAmpModel.h"
 #import "ORRunningAverage.h"
 #import "OROnCallListModel.h"
@@ -182,9 +181,14 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     
     [notifyCenter addObserver : self
                      selector : @selector(rateSpike:)
-                         name : ORGretina4MModelRateSpiked
+                         name : @"ORGretina4MModelRateSpiked" //string so we don't have to import the .h file
                        object : nil];
     
+    [notifyCenter addObserver : self
+                     selector : @selector(rateSpike:)
+                         name : @"ORGretina4AModelRateSpiked" //string so we don't have to import the .h file
+                       object : nil];
+  
     [notifyCenter addObserver : self
                      selector : @selector(baselineSpike:)
                          name : ORMJDPreAmpModelRateSpiked
