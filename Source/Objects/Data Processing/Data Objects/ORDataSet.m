@@ -1397,31 +1397,37 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 		} while((s = va_arg(myArgs, NSString *)));
 		
 		ORMaskedIndexedWaveformWithSpecialBits* waveform = [nextLevel data];
-		if(!waveform){
-			waveform = [[ORMaskedIndexedWaveformWithSpecialBits alloc] init];
-			[waveform setDataSet:self];
-            [waveform setMask:aMask];
-            [waveform setScaleOffset:aScaleOffset];
-			[waveform setSpecialBitMask:aSpecialMask];
-			[waveform setBitNames:bitNames];
-			[waveform setStartIndex:aStartIndex];
-			[waveform setDataOffset:anOffset];
-			[waveform setKey:[nextLevel key]];
-			[waveform setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
-			[waveform setUnitSize:aUnitSize];
-			[nextLevel setData:waveform];
-			[waveform setWaveform:aWaveForm];       
-			[waveform release];
-            [[NSNotificationCenter defaultCenter]  postNotificationOnMainThreadWithName:ORDataSetAdded object:self];
-		}
-		
-		else {
-			[waveform setMask:aMask];
-			[waveform setSpecialBitMask:aSpecialMask];
-			[waveform setBitNames:bitNames];
-			[waveform setStartIndex:aStartIndex];
-			[waveform setWaveform:aWaveForm];
-		}
+        if(aWaveForm){
+            if(!waveform){
+                waveform = [[ORMaskedIndexedWaveformWithSpecialBits alloc] init];
+                [waveform setDataSet:self];
+                [waveform setMask:aMask];
+                [waveform setScaleOffset:aScaleOffset];
+                [waveform setSpecialBitMask:aSpecialMask];
+                [waveform setBitNames:bitNames];
+                [waveform setStartIndex:aStartIndex];
+                [waveform setDataOffset:anOffset];
+                [waveform setKey:[nextLevel key]];
+                [waveform setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
+                [waveform setUnitSize:aUnitSize];
+                [nextLevel setData:waveform];
+                [waveform setWaveform:aWaveForm];       
+                [waveform release];
+                [[NSNotificationCenter defaultCenter]  postNotificationOnMainThreadWithName:ORDataSetAdded object:self];
+            }
+            
+            else {
+                [waveform setMask:aMask];
+                [waveform setSpecialBitMask:aSpecialMask];
+                [waveform setBitNames:bitNames];
+                [waveform setStartIndex:aStartIndex];
+                [waveform setWaveform:aWaveForm];
+            }
+        }
+        else {
+            [waveform incrementTotalCounts]; //count only
+        }
+
 		va_end(myArgs);
 	}
 }
