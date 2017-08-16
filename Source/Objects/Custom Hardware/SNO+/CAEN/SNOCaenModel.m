@@ -1302,8 +1302,16 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     /* Checks if the current model state is the same as the settings in the
      * dictionary. Returns FALSE if the settings are the same, TRUE otherwise.
      *
-     * This is used to check if we need to reload the caen settings. If so, we
-     * need to resync instead of restarting. */
+     * This is used to check if we need to reload the caen settings at the
+     * start of a run. According to the documentation, the following registers
+     * can't be changed while the acquisition is running:
+     *
+     *   - buffer organization
+     *   - custom size
+     *   - channel enable mask
+     *
+     * But to make life easier, we just check if any setting needs to be
+     * changed and if so, resync the run. */
     if ([self channelConfigMask]     != [[dict objectForKey:@"CAEN_channelConfigMask"] unsignedShortValue]) return TRUE;
     if ([self eventSize]             != [[dict objectForKey:@"CAEN_eventSize"] intValue]) return TRUE;
     if ([self customSize]            != [[dict objectForKey:@"CAEN_customSize"] unsignedLongValue]) return TRUE;
