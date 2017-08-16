@@ -5609,15 +5609,8 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
 }
 
 // This is the historical HV control and monitoring thread. It effectively ramps
-// towards set points (hv*NextStepValue) which are elsewhere set from GUI
-// elements or scripts.
-//
-// Historically this code did not allow values to be set above the
-// hv*VoltageTargetValue which are confusingly named as they are not the actual
-// target values of the ramp but the value stored in the target field of the
-// GUI that would be ramped to if one pressed the 'ramp up' button. This would
-// copy the target value into the nextstep value and this thread executes the
-// ramp.
+// up or down towards set points (hv*NextStepValue) which are elsewhere set from 
+// GUI elements or scripts.
 //
 // Note this will abort a ramp up and freeze the voltage if the readback differs
 // by 100 volts from the last set value. Ramp down will not stop under any
@@ -5682,8 +5675,8 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
             if ([self hvANextStepValue] < [self hvAVoltageDACSetValue] - [self hvramp_b_down] / 3000. * 4096) {
                 aValueToSet = [self hvAVoltageDACSetValue] - [self hvramp_b_down] / 3000. * 4096;
             }
-            if (aValueToSet > [self hvAVoltageTargetValue]) { //never go above target (?)
-                aValueToSet = [self hvAVoltageTargetValue];
+            if (aValueToSet > [self hvNominalVoltageA]*4096/3000) { //never go above nominal
+                aValueToSet = [self hvNominalVoltageA]*4096/3000;
             }
             aUp = aValueToSet > [self hvAVoltageDACSetValue];
             @try {
@@ -5706,8 +5699,8 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
             if ([self hvBNextStepValue] < [self hvBVoltageDACSetValue] - [self hvramp_b_down] / 3000. * 4096) {
                 aValueToSet = [self hvBVoltageDACSetValue] - [self hvramp_b_down] / 3000. * 4096;
             }
-            if (aValueToSet > [self hvBVoltageTargetValue]) { // never go above target (?)
-                aValueToSet = [self hvBVoltageTargetValue];
+            if (aValueToSet > [self hvNominalVoltageB]*4096/3000) { // never go above target (?)
+                aValueToSet = [self hvNominalVoltageB]*4096/3000;
             }
             bUp = aValueToSet > [self hvBVoltageDACSetValue];
             @try {

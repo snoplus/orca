@@ -711,7 +711,7 @@ static NSDictionary* xl3Ops;
         unlock = ![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping] && [model hvAFromDB] && !lockedOrNotRunningMaintenance;
         [hvStepUpButton setEnabled:unlock];
         [hvStepDownButton setEnabled:unlock];
-        [hvRampUpButton setEnabled:unlock];
+        [hvRampToTargetButton setEnabled:unlock];
         [hvTargetValueStepper setEnabled:unlock];
         [hvTargetValueField setEnabled:unlock];
         
@@ -736,7 +736,7 @@ static NSDictionary* xl3Ops;
         unlock = ![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && ![model hvBRamping] && [model hvBFromDB] && !lockedOrNotRunningMaintenance;
         [hvStepUpButton setEnabled:unlock];
         [hvStepDownButton setEnabled:unlock];
-        [hvRampUpButton setEnabled:unlock];
+        [hvRampToTargetButton setEnabled:unlock];
         [hvTargetValueStepper setEnabled:unlock];
         [hvTargetValueField setEnabled:unlock];
 
@@ -1502,7 +1502,6 @@ static NSDictionary* xl3Ops;
     [model hvUserIntervention:([hvPowerSupplyMatrix selectedColumn] ? false : true)];
 }
 
-//FIXME: redo the logic
 - (IBAction)hvTargetValueAction:(id)sender
 {
     [[sender window] makeFirstResponder:tabView];
@@ -1514,7 +1513,7 @@ static NSDictionary* xl3Ops;
         if (sup == 0 && nextTargetValue > [model hvNominalVoltageA] / 3000. * 4096) {//A
             nextTargetValue = [model hvNominalVoltageA] * 4096 / 3000;
         }
-        else if (sup == 1 && nextTargetValue > [model hvNominalVoltageB] / 3000. * 4096) {//A
+        else if (sup == 1 && nextTargetValue > [model hvNominalVoltageB] / 3000. * 4096) {//B
             nextTargetValue = [model hvNominalVoltageB] * 4096 / 3000;
         }
     }
@@ -1524,16 +1523,11 @@ static NSDictionary* xl3Ops;
         if (sup == 0 && nextTargetValue > [model hvNominalVoltageA] / 3000. * 4096) {//A
             nextTargetValue = [model hvNominalVoltageA] * 4096 / 3000;
         }
-        else if (sup == 1 && nextTargetValue > [model hvNominalVoltageB] / 3000. * 4096) {//A
+        else if (sup == 1 && nextTargetValue > [model hvNominalVoltageB] / 3000. * 4096) {//B
             nextTargetValue = [model hvNominalVoltageB] * 4096 / 3000;
         }
     }
     else {
-        return;
-    }
-    if ((sup == 0 && nextTargetValue + 20 < [model hvAVoltageDACSetValue]) || (sup == 1 && nextTargetValue + 20 < [model hvBVoltageDACSetValue])) {
-        [self hvTargetValueChanged:nil];
-        ORRunAlertPanel (@"HV target NOT changed.",@"Can not set target value lower than the current HV. Ramp down first.",@"OK",nil,nil);
         return;
     }
     if (sup == 0) {
@@ -1622,7 +1616,7 @@ static NSDictionary* xl3Ops;
     }    
 }
 
-- (IBAction)hvRampUpAction:(id)sender
+- (IBAction)hvRampToTargetAction:(id)sender
 {
     [[sender window] makeFirstResponder:tabView];
     if ([hvPowerSupplyMatrix selectedColumn] == 0) {

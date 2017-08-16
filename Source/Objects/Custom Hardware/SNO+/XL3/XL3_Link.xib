@@ -74,7 +74,7 @@
                 <outlet property="hvOnButton" destination="4209" id="7aH-JM-VfW"/>
                 <outlet property="hvPowerSupplyMatrix" destination="4292" id="4485"/>
                 <outlet property="hvRampDownButton" destination="4212" id="Mjb-sm-WIw"/>
-                <outlet property="hvRampUpButton" destination="4213" id="crz-jF-SlV"/>
+                <outlet property="hvRampToTargetButton" destination="4213" id="crz-jF-SlV"/>
                 <outlet property="hvRelayCloseButton" destination="4060" id="4521"/>
                 <outlet property="hvRelayMaskHighField" destination="4196" id="4328"/>
                 <outlet property="hvRelayMaskLowField" destination="4056" id="4327"/>
@@ -1942,12 +1942,12 @@
                                                     <button verticalHuggingPriority="750" id="4213">
                                                         <rect key="frame" x="10" y="79" width="105" height="28"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="push" title="Ramp UP" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4214">
+                                                        <buttonCell key="cell" type="push" title="Ramp to Target" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4214">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
                                                         <connections>
-                                                            <action selector="hvRampUpAction:" target="-2" id="4517"/>
+                                                            <action selector="hvRampToTargetAction:" target="-2" id="4517"/>
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" id="4225">
