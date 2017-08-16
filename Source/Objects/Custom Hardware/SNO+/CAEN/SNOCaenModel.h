@@ -246,6 +246,7 @@ enum {
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 - (NSMutableDictionary*) serializeToDictionary;
+- (BOOL) checkFromSerialization:(NSMutableDictionary*) dict;
 - (void) loadFromSerialization:(NSMutableDictionary*)settingsDict;
 
 @end

@@ -42,7 +42,6 @@
 NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 NSString* ORRunWaitFinished = @"ORRunWaitFinished";
 
-
 #define UNITS_UNDECIDED 0
 #define UNITS_RAW       1
 #define UNITS_CONVERTED 2
@@ -723,34 +722,37 @@ snopGreenColor;
 
 - (IBAction) startRunAction:(id)sender
 {
+    /* Action when the user clicks on the Start or Restart Button. */
+    unsigned long dbruntypeword = 0;
 
     /* If we are not going to maintenance we shouldn't be polling */
-    unsigned long dbruntypeword = 0;
     NSMutableDictionary* runSettings = [[[model standardRunCollection] objectForKey:[model standardRunType]] objectForKey:[model standardRunVersion]];
-    if(runSettings != nil){
-        //Get the run type word of the next run
-        dbruntypeword = [[runSettings valueForKey:@"run_type_word"] unsignedLongValue];
+
+    if (runSettings == nil) {
+        NSLogColor([NSColor redColor], @"Standard run %@(%@) does NOT exists in DB. \n", [model standardRunType], [model standardRunVersion]);
+        return;
     }
 
-    if( !((dbruntypeword & kMaintenanceRun) || (dbruntypeword & kDiagnosticRun)) ){
-        //Make sure we are not polling
-        NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
-        for(ORXL3Model *anXL3 in xl3s){
-            if([anXL3 isPollingXl3]) {
+    // Get the run type word of the next run
+    dbruntypeword = [[runSettings valueForKey:@"run_type_word"] unsignedLongValue];
+
+    if (!((dbruntypeword & kMaintenanceRun) || (dbruntypeword & kDiagnosticRun))) {
+        // Make sure we are not polling
+        NSArray *xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+        for (ORXL3Model *anXL3 in xl3s) {
+            if ([anXL3 isPollingXl3]) {
                 NSLog(@"Stopping XL3 polling on crate %d\n",[anXL3 crateNumber]);
                 [anXL3 setIsPollingXl3:false];
             }
         }
     }
 
-    //Start the standard run and stop run initialization if failed
-    if(![model startStandardRun:[model standardRunType] withVersion:[model standardRunVersion]]) return;
-
+    // Start the standard run
+    [model startStandardRun:[model standardRunType] withVersion:[model standardRunVersion]];
 }
 
-- (IBAction)resyncRunAction:(id)sender
+- (IBAction) resyncRunAction:(id)sender
 {
-
     /* A resync run does a hard stop and start without the user having to hit
      * stop run and then start run. Doing this resets the GTID, which resyncs
      * crate 9 after it goes out of sync :). */
@@ -758,7 +760,6 @@ snopGreenColor;
     [model setResync:YES];
 
     [self startRunAction:nil];
-
 }
 
 - (IBAction) stopRunAction:(id)sender
