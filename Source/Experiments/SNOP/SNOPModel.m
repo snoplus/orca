@@ -906,11 +906,11 @@ err:
      * will fire a SOFT_GT and turn triggers off. Then we need to wait
      * until the MTC/CAEN/XL3s have read out all the data. */
 
-    //Stop the ECA thread
-    /* This will send a cancel signal to the ECAThread which will exit
-     at the end of the current ECA step. This makes the run wait until
-     the ECAThread is stopped */
-    if([anECARun isExecuting] && ![anECARun isFinishing]){
+    // Stop the ECA thread
+    /* This will send a cancel signal to the ECAThread which will exit at the
+     * end of the current ECA step. This makes the run wait until the ECAThread
+     * is stopped */
+    if ([anECARun isExecuting] && ![anECARun isFinishing]) {
         [anECARun stop];
     }
 
