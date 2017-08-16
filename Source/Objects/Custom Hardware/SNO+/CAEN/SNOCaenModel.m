@@ -1300,7 +1300,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 - (BOOL) checkFromSerialization:(NSMutableDictionary*) dict
 {
     /* Checks if the current model state is the same as the settings in the
-     * dictionary. Returns FALSE if the settings are the same, TRUE otherwise.
+     * dictionary. Returns NO if the settings are the same, YES otherwise.
      *
      * This is used to check if we need to reload the caen settings at the
      * start of a run. According to the documentation, the following registers
@@ -1312,23 +1312,23 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
      *
      * But to make life easier, we just check if any setting needs to be
      * changed and if so, resync the run. */
-    if ([self channelConfigMask]     != [[dict objectForKey:@"CAEN_channelConfigMask"] unsignedShortValue]) return TRUE;
-    if ([self eventSize]             != [[dict objectForKey:@"CAEN_eventSize"] intValue]) return TRUE;
-    if ([self customSize]            != [[dict objectForKey:@"CAEN_customSize"] unsignedLongValue]) return TRUE;
-    if ([self isCustomSize]          != [[dict objectForKey:@"CAEN_isCustomSize"] boolValue]) return TRUE;
-    if ([self acquisitionMode]       != [[dict objectForKey:@"CAEN_acquisitionMode"] unsignedShortValue]) return TRUE;
-    if ([self countAllTriggers]      != [[dict objectForKey:@"CAEN_countAllTriggers"] boolValue]) return TRUE;
-    if ([self triggerSourceMask]     != [[dict objectForKey:@"CAEN_triggerSourceMask"] unsignedLongValue]) return TRUE;
-    if ([self coincidenceLevel]      != [[dict objectForKey:@"CAEN_coincidenceLevel"] unsignedShortValue]) return TRUE;
-    if ([self triggerOutMask]        != [[dict objectForKey:@"CAEN_triggerOutMask"] unsignedLongValue]) return TRUE;
-    if ([self postTriggerSetting]    != [[dict objectForKey:@"CAEN_postTriggerSetting"] unsignedLongValue]) return TRUE;
-    if ([self frontPanelControlMask] != [[dict objectForKey:@"CAEN_frontPanelControlMask"] unsignedLongValue]) return TRUE;
-    if ([self enabledMask]           != [[dict objectForKey:@"CAEN_enabledMask"] unsignedShortValue]) return TRUE;
+    if ([self channelConfigMask]     != [[dict objectForKey:@"CAEN_channelConfigMask"] unsignedShortValue]) return YES;
+    if ([self eventSize]             != [[dict objectForKey:@"CAEN_eventSize"] intValue]) return YES;
+    if ([self customSize]            != [[dict objectForKey:@"CAEN_customSize"] unsignedLongValue]) return YES;
+    if ([self isCustomSize]          != [[dict objectForKey:@"CAEN_isCustomSize"] boolValue]) return YES;
+    if ([self acquisitionMode]       != [[dict objectForKey:@"CAEN_acquisitionMode"] unsignedShortValue]) return YES;
+    if ([self countAllTriggers]      != [[dict objectForKey:@"CAEN_countAllTriggers"] boolValue]) return YES;
+    if ([self triggerSourceMask]     != [[dict objectForKey:@"CAEN_triggerSourceMask"] unsignedLongValue]) return YES;
+    if ([self coincidenceLevel]      != [[dict objectForKey:@"CAEN_coincidenceLevel"] unsignedShortValue]) return YES;
+    if ([self triggerOutMask]        != [[dict objectForKey:@"CAEN_triggerOutMask"] unsignedLongValue]) return YES;
+    if ([self postTriggerSetting]    != [[dict objectForKey:@"CAEN_postTriggerSetting"] unsignedLongValue]) return YES;
+    if ([self frontPanelControlMask] != [[dict objectForKey:@"CAEN_frontPanelControlMask"] unsignedLongValue]) return YES;
+    if ([self enabledMask]           != [[dict objectForKey:@"CAEN_enabledMask"] unsignedShortValue]) return YES;
     for (int i = 0; i < kNumCaenChannelDacs; i++) {
-        if ([self dac:i] != [[dict objectForKey:[NSString stringWithFormat:@"%@_%i",@"CAEN_dac",i]] unsignedShortValue]) return TRUE;
+        if ([self dac:i] != [[dict objectForKey:[NSString stringWithFormat:@"%@_%i",@"CAEN_dac",i]] unsignedShortValue]) return YES;
     }
 
-    return FALSE;
+    return NO;
 }
 
 - (void) loadFromSerialization:(NSMutableDictionary*)settingsDict

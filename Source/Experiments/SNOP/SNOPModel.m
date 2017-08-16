@@ -2332,6 +2332,8 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 
 - (BOOL) startStandardRun:(NSString*)_standardRun withVersion:(NSString*)_standardRunVersion
 {
+    SNOCaenModel* caen;
+
     /* Get RC model */
     ORRunModel *aRunModel = nil;
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
@@ -2339,7 +2341,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         aRunModel = [objs objectAtIndex:0];
     } else {
         NSLogColor([NSColor redColor], @"SNOPModel: couldn't find Run Model. \n");
-        return 0;
+        return NO;
     }
 
     //Make sure we are not running any RunScripts
@@ -2348,8 +2350,36 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     [self setStandardRunType:_standardRun];
     [self setStandardRunVersion:_standardRunVersion];
 
+    /* If we are not going to maintenance we shouldn't be polling */
+    NSMutableDictionary* runSettings = [[[self standardRunCollection] objectForKey:[self standardRunType]] objectForKey:[self standardRunVersion]];
+
+    if (runSettings == nil) {
+        NSLogColor([NSColor redColor], @"Standard run %@(%@) does NOT exists in DB. \n", [self standardRunType], [self standardRunVersion]);
+        return NO;
+    }
+
+    if ([aRunModel runningState] == eRunInProgress) {
+        NSArray *objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOCaenModel")];
+        if ([objs count]) {
+            caen = [objs objectAtIndex:0];
+
+            /* Check to see if the CAEN settings need to be reloaded. */
+            @try {
+                if ([caen checkFromSerialization:runSettings]) {
+                    /* Need to resync. */
+                    NSLog(@"CAEN settings are different in this standard run. Resyncing...\n");
+                    [self setResync:YES];
+                }
+            } @catch (NSException *e) {
+                NSLogColor([NSColor redColor], @"unable to validate CAEN settings because of exception. name: %@ reason: %@. Assuming settings haven't changed...\n", [e name], [e reason]);
+            }
+        } else {
+            NSLogColor([NSColor redColor], @"couldn't find CAEN model. Assuming settings haven't changed.\n");
+        }
+    }
+
     //Load the standard run and stop run initialization if failed
-    if(![self loadStandardRun:_standardRun withVersion:_standardRunVersion]) return false;
+    if(![self loadStandardRun:_standardRun withVersion:_standardRunVersion]) return NO;
 
     //Start or restart the run
     if ([aRunModel isRunning]) {
@@ -2371,7 +2401,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         }
     }
 
-    return true;
+    return YES;
 }
 
 - (void) stopRun

@@ -723,7 +723,6 @@ snopGreenColor;
 - (IBAction) startRunAction:(id)sender
 {
     /* Action when the user clicks on the Start or Restart Button. */
-    SNOCaenModel* caen;
     unsigned long dbruntypeword = 0;
 
     /* If we are not going to maintenance we shouldn't be polling */
@@ -736,26 +735,6 @@ snopGreenColor;
 
     // Get the run type word of the next run
     dbruntypeword = [[runSettings valueForKey:@"run_type_word"] unsignedLongValue];
-
-    if ([runControl runningState] == eRunInProgress) {
-        NSArray *objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOCaenModel")];
-        if ([objs count]) {
-            caen = [objs objectAtIndex:0];
-
-            /* Check to see if the CAEN settings need to be reloaded. */
-            @try {
-                if ([caen checkFromSerialization:runSettings]) {
-                    /* Need to resync. */
-                    NSLog(@"CAEN settings are different in this standard run. Resyncing...\n");
-                    [model setResync:YES];
-                }
-            } @catch (NSException *e) {
-                NSLogColor([NSColor redColor], @"unable to validate CAEN settings because of exception. name: %@ reason: %@. Assuming settings haven't changed...\n", [e name], [e reason]);
-            }
-        } else {
-            NSLogColor([NSColor redColor], @"couldn't find CAEN model. Assuming settings haven't changed.\n");
-        }
-    }
 
     if (!((dbruntypeword & kMaintenanceRun) || (dbruntypeword & kDiagnosticRun))) {
         // Make sure we are not polling
