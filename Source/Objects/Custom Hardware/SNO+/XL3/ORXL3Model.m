@@ -5675,8 +5675,8 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
             if ([self hvANextStepValue] < [self hvAVoltageDACSetValue] - [self hvramp_b_down] / 3000. * 4096) {
                 aValueToSet = [self hvAVoltageDACSetValue] - [self hvramp_b_down] / 3000. * 4096;
             }
-            if (aValueToSet > [self hvAVoltageNominalValue]) { //never go above nominal
-                aValueToSet = [self hvAVoltageNominalValue];
+            if (aValueToSet > [self hvNominalVoltageA]*4096/3000) { //never go above nominal
+                aValueToSet = [self hvNominalVoltageA]*4096/3000;
             }
             aUp = aValueToSet > [self hvAVoltageDACSetValue];
             @try {
@@ -5699,8 +5699,8 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
             if ([self hvBNextStepValue] < [self hvBVoltageDACSetValue] - [self hvramp_b_down] / 3000. * 4096) {
                 aValueToSet = [self hvBVoltageDACSetValue] - [self hvramp_b_down] / 3000. * 4096;
             }
-            if (aValueToSet > [self hvBVoltageNominalValue]) { // never go above target (?)
-                aValueToSet = [self hvBVoltageNominalValue];
+            if (aValueToSet > [self hvNominalVoltageB]*4096/3000) { // never go above target (?)
+                aValueToSet = [self hvNominalVoltageB]*4096/3000;
             }
             bUp = aValueToSet > [self hvBVoltageDACSetValue];
             @try {
