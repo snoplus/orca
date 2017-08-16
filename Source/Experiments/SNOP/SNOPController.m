@@ -744,13 +744,11 @@ snopGreenColor;
 
             /* Check to see if the CAEN settings need to be reloaded. */
             @try {
-                NSLog(@"checking caen settings\n");
                 if ([caen checkFromSerialization:runSettings]) {
                     /* Need to resync. */
                     NSLog(@"CAEN settings are different in this standard run. Resyncing...\n");
                     [model setResync:YES];
                 }
-                NSLog(@"caen settings don't need to be changed\n");
             } @catch (NSException *e) {
                 NSLogColor([NSColor redColor], @"unable to validate CAEN settings because of exception. name: %@ reason: %@. Assuming settings haven't changed...\n", [e name], [e reason]);
             }
