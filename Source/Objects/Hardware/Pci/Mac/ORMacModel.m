@@ -169,6 +169,11 @@ void registryChanged(
 
 
 #pragma mark ¥¥¥Accessors
+- (void) turnOnAllOutputBuffer:(BOOL)state
+{
+    useAllOutputBuffer = state;
+    [self clearAllOutput];
+}
 
 - (NSString*) lastStringReceived
 {
@@ -178,7 +183,35 @@ void registryChanged(
 - (void) setLastStringReceived:(NSString*)aLastStringReceived
 {
     [lastStringReceived autorelease];
-    lastStringReceived = [aLastStringReceived copy];    
+    lastStringReceived = [aLastStringReceived copy];
+    @synchronized (self) {
+        if(useAllOutputBuffer){
+            if(!allOutput) allOutput = [[NSMutableString string]retain];
+            [allOutput appendString:aLastStringReceived];
+        }
+    }
+}
+
+- (NSString*) allOutput
+{
+    NSString* s;
+    @synchronized (self) {
+        s = [allOutput stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+    }
+    return s;
+}
+
+- (void) clearAllOutput
+{
+    @synchronized (self) {
+        [allOutput release];
+        allOutput = nil;
+    }
+}
+
+- (BOOL) allOutputHasSubstring:(NSString*)s
+{
+    return [allOutput rangeOfString:s].location != NSNotFound;
 }
 
 - (NSString*) commandByAppendingEOL:(NSString*) aCmd

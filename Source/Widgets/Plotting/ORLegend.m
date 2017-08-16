@@ -19,7 +19,7 @@
 
 #import "ORLegend.h"
 #import "ORPlotView.h"
-#import "ORPLot.h"
+#import "ORPlot.h"
 
 @implementation ORLegend
 

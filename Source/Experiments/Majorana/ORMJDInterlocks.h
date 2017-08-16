@@ -22,10 +22,12 @@
 @class MajoranaModel;
 @class ORRemoteSocketModel;
 @class ORAlarm;
+@class ORPingTask;
 
 //do NOT change this list without changing the StateInfo array in the .m file
 enum {
     kMJDInterlocks_Idle,
+    kMJDInterlocks_ExecuteLNPoll,
     kMJDInterlocks_Ping,
     kMJDInterlocks_PingWait,
     kMJDInterlocks_CheckHVisOn,
@@ -54,7 +56,7 @@ typedef struct {
     int                 retryState;
     NSMutableArray*     stateStatus;
     NSMutableArray*     finalReport;
-    NSTask*             pingTask;
+    ORPingTask*         pingTask;
     int                 retryCount;
     BOOL                printedErrorReport;
     BOOL                pingedSuccessfully;
@@ -66,6 +68,7 @@ typedef struct {
     BOOL                sentCmds;
     BOOL                vacuumSpike;
     BOOL                fillingLN;
+    int                 pollingTimeForLN;
     int                 breakDownPass;
     NSString*           breakDownResult;
     BOOL                scheduledToSendVacReport;
@@ -92,7 +95,9 @@ typedef struct {
 - (NSString*)   moduleName;
 - (BOOL)        vacuumSpike;
 - (BOOL)        fillingLN;
+- (int)         pollingTimeForLN;
 - (void)        errorReport;
+- (void)        setFillingLN:(BOOL)aState;
 
 @property (assign) MajoranaModel*             delegate;
 @property (assign,nonatomic) BOOL             isRunning;
@@ -109,7 +114,7 @@ typedef struct {
 - (BOOL) pingTaskRunning;
 - (BOOL) pingedSuccessfully;
 - (void) tasksCompleted:(id)sender;
-- (void) taskFinished:(NSTask*)aTask;
+- (void) taskFinished:(ORPingTask*)aTask;
 @end
 
 extern NSString* ORMJDInterlocksIsRunningChanged;

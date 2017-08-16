@@ -80,7 +80,16 @@
     [groupView setGroup:(ORGroup*)aModel];
 }
 
+- (NSTabView*) tabView
+{
+    return tabView;
+}
 
+- (void) selectPortAtIndex:(int)index
+{
+    [serialPortView selectRowIndexes:[NSIndexSet indexSetWithIndex:index] byExtendingSelection:NO];
+
+}
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers
 {

@@ -71,6 +71,9 @@
     IBOutlet NSTextField *PrescaleFactor;
     IBOutlet NSTextField *PrescaleTriggerMask;
     IBOutlet NSButton *sendPrescaleButton;
+    IBOutlet NSTextField *TUBiiPGTRate;
+    IBOutlet NSButton *sendTUBiiPGTStart;
+    IBOutlet NSButton *sendTUBiiPGTStop;
     IBOutlet NSSlider *MTCAMimic_Slider;
     IBOutlet NSTextField *MTCAMimic_TextField;
     IBOutlet NSButton *sendMTCAButton;
@@ -138,6 +141,7 @@
 - (void) SendBitInfo:(NSUInteger) maskVal FromBit:(int)low ToBit:(int) high ToCheckBoxes: (NSMatrix*) aMatrix;
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item;
 - (void) tubiiLockChanged:(NSNotification*)aNote;
+- (void) tubiiCurrentModelStateChanged:(NSNotification*)aNote;
 
 - (IBAction)InitializeClicked:(id)sender;
 - (IBAction)SendPing:(id)sender;
@@ -156,29 +160,22 @@
 - (IBAction)CounterMatchHardware:(id)sender;
 - (IBAction)SpeakerLoadMask:(id)sender;
 - (IBAction)CounterLoadMask:(id)sender;
-- (IBAction)SpeakerCheckBoxChanged:(id)sender;
 - (IBAction)SpeakerFieldChanged:(id)sender;
 - (IBAction)SpeakerCounterCheckAll:(id)sender;
 - (IBAction)SpeakerCounterUnCheckAll:(id)sender;
 
-- (IBAction)CounterCheckBoxChanged:(id)sender;
 - (IBAction)CounterFieldChanged:(id)sender;
 - (IBAction)AdvancedOptionsButtonChanged:(id)sender;
 
 - (IBAction)GTDelaysMatchHardware:(id)sender;
 - (IBAction)GTDelaysLoadMask:(id)sender;
-- (IBAction)LOSrcSelectChanged:(id)sender;
-- (IBAction)LODelayLengthTextFieldChagned:(id)sender;
-- (IBAction)LODelayLengthSliderChagned:(id)sender;
 - (IBAction)ResetClock:(id)sender;
 
 - (IBAction)ECAEnableChanged:(id)sender;
-- (IBAction)MTCAMimicTextFieldChanged:(id)sender;
-- (IBAction)MTCAMimicSliderChanged:(id)sender;
 - (IBAction)MTCAMimicMatchHardware:(id)sender;
 - (IBAction)MTCAMimicLoadValue:(id)sender;
 - (IBAction)LoadClockSource:(id)sender;
 - (IBAction)ClockSourceMatchHardware:(id)sender;
-
+- (void)log_error:(NSException*)e;
 
 @end

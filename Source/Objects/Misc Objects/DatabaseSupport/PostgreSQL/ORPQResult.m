@@ -13,7 +13,7 @@
 //  but that header doesn't compile, so define them here instead - PH)
 enum {
     kPQTypeBool     = 16,   // 8 bit boolean
-    kPQTypeString   = 17,   // variable-length string
+    kPQTypeByte     = 17,   // variable-length string with binary characters escaped
     kPQTypeChar     = 18,   // single 8 bit character
     kPQTypeName     = 19,   // 63-byte name
     kPQTypeInt64    = 20,   // 8-byte integer
@@ -22,13 +22,12 @@ enum {
     kPQTypeInt32    = 23,   // 4-byte integer
     kPQTypeFloat4   = 700,  // 4-byte single precision float
     kPQTypeFloat8   = 701,  // 8-byte double precision float
+    kPQTypeString   = 25,   // variable-length string
     kPQTypeArrayChar= 1002, // array of 8-bit characters
     kPQTypeArray16  = 1005, // array of 2-byte integers
     kPQTypeArray32  = 1007, // array of 4-byte integers
     kPQTypeArray64  = 1016, // array of 8-byte integers
 };
-
-NSDate* MCPYear0000;
 
 @implementation ORPQResult
 
@@ -111,6 +110,7 @@ NSDate* MCPYear0000;
                         theCurrentObj = [NSNumber numberWithInt:1];
                     }
                     break;
+                case kPQTypeByte:
                 case kPQTypeString:
                     theCurrentObj = [NSString stringWithCString:pt encoding:NSISOLatin1StringEncoding];
                     break;
@@ -217,7 +217,7 @@ NSDate* MCPYear0000;
 }
 
 // (returns 0 if there is no value at those coordinates)
-- (int64_t) getInt64atRow:(int)aRow column:(int)aColumn;
+- (int64_t) getInt64atRow:(int)aRow column:(int)aColumn
 {
     int64_t val = kPQBadValue;
     if (mResult && aRow<mNumOfRows && aColumn<mNumOfFields) {
@@ -248,7 +248,7 @@ NSDate* MCPYear0000;
     return val;
 }
 
-- (NSMutableData *) getInt64arrayAtRow:(int)aRow column:(int)aColumn;
+- (NSMutableData *) getInt64arrayAtRow:(int)aRow column:(int)aColumn
 {
     NSMutableData *theData = nil;
     int64_t val;
@@ -305,6 +305,31 @@ NSDate* MCPYear0000;
     return theData;
 }
 
+// get date from database assuming time is a local sudbury time
+// (returns nil if there is no valid date at those coordinates)
+- (NSDate *) getDateAtRow:(int)aRow column:(int)aColumn
+{
+    NSDate *date = nil;
+    if (mResult && aRow<mNumOfRows && aColumn<mNumOfFields) {
+        char *pt = PQgetvalue(mResult,aRow,aColumn);
+        NSString *val = [NSString stringWithCString:pt encoding:NSASCIIStringEncoding];
+        NSTimeZone *localZone = [NSTimeZone timeZoneWithName:@"America/Toronto"];
+        NSDateFormatter *formatter = [[[NSDateFormatter alloc] init] autorelease];
+        [formatter setTimeZone:localZone];
+        [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss.SSSSSS"];
+        date = [formatter dateFromString:val];
+    }
+    return date;
+}
+
+- (BOOL) isNullAtRow:(int)aRow column:(int)aColumn
+{
+    if (mResult && aRow<mNumOfRows && aColumn<mNumOfFields) {
+        return PQgetisnull(mResult,aRow,aColumn);
+    }
+    return YES;
+}
+
 - (id) fetchTypesAsType:(MCPReturnType) aType
 {
     int				i;
@@ -335,6 +360,7 @@ NSDate* MCPYear0000;
             case kPQTypeBool:
                 theType = @"bool";
                 break;
+            case kPQTypeByte:
             case kPQTypeString:
                 theType = @"byte";
                 break;
@@ -437,7 +463,7 @@ NSDate* MCPYear0000;
 
 - (Boolean) isOK
 {
-    return (mResult && PQresultStatus(mResult) == PGRES_COMMAND_OK);
+    return (mResult && (PQresultStatus(mResult) == PGRES_COMMAND_OK || PQresultStatus(mResult) == PGRES_TUPLES_OK));
 }
 
 - (void) dealloc

@@ -55,7 +55,7 @@
                                         <textField verticalHuggingPriority="750" id="22">
                                             <rect key="frame" x="108" y="165" width="65" height="14"/>
                                             <autoresizingMask key="autoresizingMask"/>
-                                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="DB Host:" id="48">
+                                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Host(:port):" id="48">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -88,7 +88,7 @@
                                         <textField verticalHuggingPriority="750" id="26">
                                             <rect key="frame" x="103" y="111" width="70" height="14"/>
                                             <autoresizingMask key="autoresizingMask"/>
-                                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Pass Word:" id="52">
+                                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Password" id="52">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>

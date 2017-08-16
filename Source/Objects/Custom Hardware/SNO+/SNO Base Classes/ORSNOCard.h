@@ -38,6 +38,9 @@
 - (void) positionConnector:(ORConnector*)aConnector;
 - (NSString*) boardID;
 - (void) setBoardID:(NSString*)anId;
+- (void) postNotificationName: (NSString*)name;
++ (void) disableNotifications;
++ (void) enableNotifications;
 
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder;

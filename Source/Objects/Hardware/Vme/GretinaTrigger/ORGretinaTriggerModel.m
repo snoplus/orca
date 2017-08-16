@@ -592,21 +592,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
                     [routerObj readTimeStamps];
                 }
             }
-            
-            if(![self locked] && [gOrcaGlobals runInProgress]){
-                [self shipDataRecord];
-                
-                NSArray*  runModelObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-                ORRunModel* aRunModel = [runModelObjects objectAtIndex:0];
-                
-                NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:@"Clock Lock Lost",@"Reason",@"Master Trigger card reported lost lock",@"Details",nil];
-                if([aRunModel quickStart])doLockRecoveryInQuckStart = YES;
-                [[NSNotificationCenter defaultCenter] postNotificationName:ORRequestRunRestart
-                                                                        object:self
-                                                                      userInfo:userInfo];
-                [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollLock) object:nil];
-
-            }
+            [self checkForLostLinkCondition];
             [self performSelector:@selector(pollLock) withObject:nil afterDelay:10];
         }
     }
@@ -1151,20 +1137,24 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
 
 - (BOOL) checkSystemLock
 {
-    BOOL lockState = [self isLocked];
+    BOOL lockState = NO; //assume the worst
     
     int i;
     if([self isMaster]){
+        
         routerCount         = 0;
         digitizerCount      = 0;
         digitizerLockCount  = 0;
+        
+        lockState = [self isLocked]; //the master lock state
+        
         //we are the master, so loop over the routers and get their state
         for(i=0;i<8;i++){
             ORConnector* otherConnector = [linkConnector[i] connector];
             if([otherConnector identifer] == 'L'){
                 ORGretinaTriggerModel* routerObj = [otherConnector objectLink];
                 if(routerObj)routerCount++;
-                lockState &= [routerObj isRouterLocked];
+                lockState &= [routerObj isRouterLocked]; //all must be locked to have system lock
                 digitizerCount      += [routerObj digitizerCount];
                 digitizerLockCount  += [routerObj digitizerLockCount];
             }
@@ -1172,7 +1162,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     }
     else {
         NSLogColor([NSColor redColor],@"Illegal call. Do not call %@ on a Router card.\n",NSStringFromSelector(_cmd));
-        return NO;
+        return lockState;
     }
     [self setLocked:lockState];
     [self postCouchDBRecord];
@@ -1284,25 +1274,51 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     return locked;
 }
 
-- (void) setLocked:(BOOL)aCurrentState
+- (void) setLocked:(BOOL)aNewState
 {
-    if(locked!=aCurrentState){
-        if(locked && !aCurrentState){
-            linkWasLost = YES;
-        }
+    if(locked!=aNewState){
         
-        locked = aCurrentState;
+        locked = aNewState;
         
-        if([self isMaster] && linkWasLost){
-            [self postLinkLostAlarm];
-            NSLogColor([NSColor redColor],@"%@: Trigger card was locked but lock was lost.\n",[self fullID]);
-            [self printMasterDiagnosticReport];
-        }
-        [self shipDataRecord]; //ship a record to show the new state
-
-        if(locked)linkWasLost = NO;
+        [self shipDataRecord];
 
         [[NSNotificationCenter defaultCenter] postNotificationName:ORGretinaTriggerLockChanged object: self];
+    }
+}
+
+- (void) checkForLostLinkCondition
+{
+    if([self isMaster]){
+        //current link state
+        if(locked){
+            wasLocked     = YES;
+            linkLostCount = 0;
+            return;
+        }
+        else {
+            //not locked now, was it locked before?
+            if(wasLocked)linkLostCount++;
+        }
+    
+        if(linkLostCount == 2){ //we just want to do the following once....
+            wasLocked = NO;
+            [self postLinkLostAlarm];
+            NSLogColor([NSColor redColor],@"%@: Trigger card was locked but lock was lost for TWO check cycles.\n",[self fullID]);
+            [self printMasterDiagnosticReport];
+            
+            if([gOrcaGlobals runInProgress]){
+                [self shipDataRecord];
+                
+                NSArray*  runModelObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+                ORRunModel* aRunModel = [runModelObjects objectAtIndex:0];
+                
+                NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:@"Clock Lock Lost",@"Reason",@"Master Trigger card reported lost lock",@"Details",nil];
+                if([aRunModel quickStart])doLockRecoveryInQuckStart = YES;
+                [[NSNotificationCenter defaultCenter] postNotificationName:ORRequestRunRestart
+                                                                    object:self
+                                                                  userInfo:userInfo];
+            }
+        }
     }
 }
 

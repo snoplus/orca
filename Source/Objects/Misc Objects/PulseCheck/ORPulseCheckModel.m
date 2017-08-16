@@ -53,6 +53,9 @@ NSString* ORPulseCheckModelReloadTable      = @"ORPulseCheckModelReloadTable";
     self.lastFile   = nil;
     self.machines   = nil;
     
+    [fileQueue cancelAllOperations];
+    [fileQueue release];
+
     [super dealloc];
 }
 
@@ -111,7 +114,7 @@ NSString* ORPulseCheckModelReloadTable      = @"ORPulseCheckModelReloadTable";
     [[self undoManager] disableUndoRegistration];
     [self setLastFile:  [decoder decodeObjectForKey:@"lastFile"]];
     self.machines =     [decoder decodeObjectForKey:@"machines"];
-    
+    [machines makeObjectsPerformSelector:@selector(resetStatus)];
     if([lastFile length] == 0)self.lastFile = @"";
     
     [[self undoManager] enableUndoRegistration];
@@ -145,10 +148,25 @@ NSString* ORPulseCheckModelReloadTable      = @"ORPulseCheckModelReloadTable";
 
 - (void) checkMachines:(NSTimer*)aTimer
 {
-    for(ORMachineToCheck* aMachine in machines){
-        [aMachine doCheck];
+    [self setUpQueue];
+    if([fileQueue operationCount] == 0) {
+
+        for(ORMachineToCheck* aMachine in machines){
+            [aMachine doCheck:fileQueue];
+        }
     }
 }
+
+- (void) setUpQueue
+{
+    if(!fileQueue){
+        fileQueue = [[NSOperationQueue alloc] init];
+        [fileQueue setMaxConcurrentOperationCount:10];
+    }
+}
+
+
+
 @end
 
 //--------------------------------------------------------------------------------------
@@ -229,23 +247,27 @@ NSString* ORPulseCheckModelReloadTable      = @"ORPulseCheckModelReloadTable";
     return copy;
 }
 
-- (void) doCheck
+- (void) doCheck:(NSOperationQueue*)fileQueue
 {
     [[NSFileManager defaultManager] removeItemAtPath:[self localPath] error:nil];
-    if(mover)[mover cancel];
-    else {
-        mover = [[ORFileGetterOp alloc] init];
-        mover.delegate     = self;
-        
-        [mover setParams: [self heartbeatPath]
-               localPath: [self localPath]
-               ipAddress: [self ipNumber]
-                userName: [self username]
-                passWord: [self password]];
-        
-        [mover setDoneSelectorName:@"fileGetterIsDone"];
-        [[NSOperationQueue mainQueue] addOperation:mover];
+    if(mover){
+        [mover cancel];
+        [mover release];
+        mover = nil;
     }
+    
+    mover = [[ORFileGetterOp alloc] init];
+    mover.delegate     = self;
+    
+    [mover setParams: [self heartbeatPath]
+           localPath: [self localPath]
+           ipAddress: [self ipNumber]
+            userName: [self username]
+            passWord: [self password]];
+    
+    [mover setDoneSelectorName:@"fileGetterIsDone"];
+    [fileQueue addOperation:mover];
+    
 }
 
 - (NSString*)localPath
@@ -256,44 +278,46 @@ NSString* ORPulseCheckModelReloadTable      = @"ORPulseCheckModelReloadTable";
 
 - (void) fileGetterIsDone
 {
-    [mover release];
-    mover = nil;
-    [self setLastChecked:[[NSDate date]stdDescription]];
-    NSString* contents = [NSString stringWithContentsOfFile:[self localPath] encoding:NSASCIIStringEncoding error:nil];
-    if([contents length] == 0){
-        [self setStatus:@"No Pulse"];
-        [self postHeartbeatAlarm];
+    @synchronized (self) {
+        [mover release];
+        mover = nil;
+        [self setLastChecked:[[NSDate date]stdDescription]];
+        NSString* contents = [NSString stringWithContentsOfFile:[self localPath] encoding:NSASCIIStringEncoding error:nil];
+        if([contents length] == 0){
+            [self setStatus:@"No File"];
+            //[self postHeartbeatAlarm];
+        }
+        else {
+            NSArray* lines = [contents componentsSeparatedByString:@"\n"];
+            if([lines count]==1){
+                if([[lines objectAtIndex:0] rangeOfString:@"Quit:"].location != NSNotFound){
+                    [self setStatus:@"Quit"];
+                    [self clearHeartbeatAlarm];
+                }
+                else  {
+                    [self setStatus:@"Bad File"];
+                    [self postHeartbeatAlarm];
+                }
+            }
+            else if([lines count]>=2){
+                time_t postTime = [[[lines objectAtIndex:0] substringFromIndex:5] unsignedLongValue];
+                time_t nextTime = [[[lines objectAtIndex:1] substringFromIndex:5] unsignedLongValue];
+                time_t delta  = abs(nextTime - postTime);
+                time_t overDue  = nextTime + 6*delta;
+                //if the postTime is older than the delta, then something is wrong
+                time_t	now;
+                time(&now);
+                if(now < overDue){
+                    [self setStatus:@"OK"];
+                    [self clearHeartbeatAlarm];
+                }
+                else {
+                    [self setStatus:@"No Pulse"];
+                    [self postHeartbeatAlarm];
+                }
+            }
+         }
     }
-    else {
-        NSArray* lines = [contents componentsSeparatedByString:@"\n"];
-        if([lines count]==1){
-            if([[lines objectAtIndex:0] rangeOfString:@"Quit:"].location != NSNotFound){
-                [self setStatus:@"Quit"];
-                [self clearHeartbeatAlarm];
-            }
-            else  {
-                [self setStatus:@"Bad File"];
-                [self postHeartbeatAlarm];
-            }
-        }
-        else if([lines count]>=2){
-            time_t postTime = [[[lines objectAtIndex:0] substringFromIndex:5] unsignedLongValue];
-            time_t nextTime = [[[lines objectAtIndex:1] substringFromIndex:5] unsignedLongValue];
-            time_t maxDelta    = nextTime - postTime;
-            //if the postTime is older than the delta, then something is wrong
-            time_t	now;
-            time(&now);
-            time_t deltaFromNow = now-postTime;
-            if(deltaFromNow > 3*maxDelta){
-                [self setStatus:@"No Pulse"];
-                [self postHeartbeatAlarm];
-            }
-            else {
-                [self setStatus:@"OK"];
-                [self clearHeartbeatAlarm];
-            }
-        }
-     }
 }
 
 - (void) postHeartbeatAlarm
@@ -314,5 +338,8 @@ NSString* ORPulseCheckModelReloadTable      = @"ORPulseCheckModelReloadTable";
         noHeartbeatAlarm = nil;
     }
 }
-
+- (void) resetStatus
+{
+    [self setStatus:@"?"];
+}
 @end

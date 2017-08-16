@@ -263,8 +263,6 @@ enum Gretina4MFIFOStates {
 	int noiseFloorTestValue;
 	int noiseFloorOffset;
     float noiseFloorIntegrationTime;
-    float rateSpikes[kNumGretina4MChannels];
-    BOOL  channelSpikes[kNumGretina4MChannels];
 	
     NSString* mainFPGADownLoadState;
     NSString* fpgaFilePath;
@@ -381,6 +379,7 @@ enum Gretina4MFIFOStates {
 - (void) writeToAddress:(unsigned long)anAddress aValue:(unsigned long)aValue;
 - (unsigned long) readFromAddress:(unsigned long)anAddress;
 - (void) printThresholds;
+- (void) fakeASpike:(int) channel started:(BOOL)start;
 
 - (void) registerNotificationObservers;
 - (ORRateGroup*)    waveFormRateGroup;
@@ -568,10 +567,8 @@ enum Gretina4MFIFOStates {
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
 - (BOOL) bumpRateFromDecodeStage:(int)channel;
 
-- (float) rateSpike:(int)idx;
 - (float) getRate:(short)channel;
 
-- (BOOL)channelSpike:(int)idx;
 #pragma mark •••HW Wizard
 - (int) numberOfChannels;
 - (NSArray*) wizardParameters;

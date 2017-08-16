@@ -98,8 +98,6 @@ NSString* ORXL3ModelXl3VltThresholdInInitChanged = @"ORXL3ModelXl3VltThresholdIn
 NSString* ORXL3Lock = @"ORXL3Lock";
 NSString* ORXL3ModelStateChanged = @"ORXL3ModelStateChanged";
 
-extern NSString* ORSNOPRequestHVStatus;
-
 @interface ORXL3Model (private)
 - (void) doBasicOp;
 - (NSString*) stringDate;
@@ -169,17 +167,16 @@ isLoaded = isLoaded;
 	[self setImage:[NSImage imageNamed:@"XL3Card"]];
 }
 
--(void)dealloc
+- (void) dealloc
 {
-	[xl3Link release];
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
+    [xl3Link release];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     if (pollThread) [pollThread release];
     if (hvThread) [hvThread release];
     if (relayStatus) [relayStatus release];
-    if (triggerStatus) [triggerStatus release];
     [xl3DateFormatter release];
     [hvInitLock release];
-	[super dealloc];
+    [super dealloc];
 }
 
 - (void) awakeAfterDocumentLoaded
@@ -207,11 +204,6 @@ isLoaded = isLoaded;
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     
     [notifyCenter addObserver : self
-                     selector : @selector(readHVStatus)
-                         name : ORSNOPRequestHVStatus
-                       object : nil];
-
-    [notifyCenter addObserver : self
                      selector : @selector(connectionStateChanged)
                          name : XL3_LinkConnectionChanged
                        object : xl3Link];
@@ -224,6 +216,11 @@ isLoaded = isLoaded;
     [notifyCenter addObserver : self
                      selector : @selector(documentClosed)
                          name : ORDocumentClosedNotification
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(detectorStateChanged:)
+                         name : ORPQDetectorStateChanged
                        object : nil];
 }
 
@@ -241,7 +238,6 @@ isLoaded = isLoaded;
             sleep(1);
         }
     }
-    
 }
 
 - (void) connectionStateChanged
@@ -253,6 +249,54 @@ isLoaded = isLoaded;
         /* If we disconnected, assume we don't know the state any more. */
         initialized = FALSE;
         stateUpdated = FALSE;
+    }
+}
+
+- (void) detectorStateChanged:(NSNotification*)aNote
+{
+    ORPQDetectorDB *detDB = [aNote object];
+
+    if (!detDB) return;
+
+    PQ_Crate *pqCrate = (PQ_Crate *)[detDB getCrate:[self crateNumber] ];
+
+    if (!pqCrate || !pqCrate->valid[kCrate_exists]) return; // nothing to do if crate doesn't exist in the current state
+
+    @try {
+        [[self undoManager] disableUndoRegistration];
+        
+        if (pqCrate->valid[kCrate_ctcDelay]) {
+            // currently this is always 0, but write this if we ever add it to the GUI
+        }
+        if (pqCrate->valid[kCrate_hvRelayMask1] && pqCrate->valid[kCrate_hvRelayMask2]) {
+            unsigned long long mask = ((unsigned long long)pqCrate->hvRelayMask2 << 32) | pqCrate->hvRelayMask1;
+            [self setRelayMask:mask];
+            [self setRelayStatus:@"status: set"];
+        }
+        if (pqCrate->valid[kCrate_hvAOn]) {
+            // don't set this
+        }
+        if (pqCrate->valid[kCrate_hvBOn]) {
+            // don't set this
+        }
+        if (pqCrate->valid[kCrate_hvDacA]) {
+            // don't set this [self setHvAVoltageDACSetValue:pqCrate->hvDacA];
+        }
+        if (pqCrate->valid[kCrate_hvDacB]) {
+            // don't set this [self setHvBVoltageDACSetValue:pqCrate->hvDacB];
+        }
+        if (pqCrate->valid[kCrate_xl3ReadoutMask]) {
+            [self setSlotMask:pqCrate->xl3ReadoutMask]; // note that this affects all GUI slot operations, not only readout
+        }
+        if (pqCrate->valid[kCrate_xl3Mode]) {
+            [self setXl3Mode:pqCrate->xl3Mode];
+        }
+        // (voltage alarm thresholds aren't currently used)
+        // (don't change HV setpoints)
+        // (pedestal mask is set in the FEC32)
+    }
+    @finally {
+        [[self undoManager] enableUndoRegistration];
     }
 }
 
@@ -317,6 +361,51 @@ isLoaded = isLoaded;
     return 0;
 }
 
+- (void) zeroPedestalMasksAtRunStart
+{
+    /* Zero the pedestal masks at the start of a run. Normally, this will only
+     * be called at the beginning of a physics run. The reason for doing this
+     * is that it was noticed that the noise on the trigger signal seemed to
+     * depend on how many channels had their pedestal enabled.
+     *
+     * See this shift report for more details:
+     * http://snopl.us/shift/view/9e1ff17e58704756a99f947ec2509f39. */
+    int slot;
+    ORFec32Model *fec;
+
+    /* First, set the pedestal mask in the GUI to zero. */
+    for (slot = 0; slot < 16; slot++) {
+        fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
+
+        if (!fec) continue;
+
+        [fec setPedEnabledMask:0];
+    }
+
+    /* Post a notification telling ORCA not to start the run until we've
+     * finished setting the pedestal masks. */
+    if ([[self xl3Link] isConnected]) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object:self];
+        /* Actually zero the pedestal masks in a separate thread so that they
+         * can be done in parallel at the start of a run. */
+        [NSThread detachNewThreadSelector:@selector(_zeroPedestalMasksAtRunStart)
+                                 toTarget:self
+                               withObject:nil];
+    }
+}
+
+- (void) _zeroPedestalMasksAtRunStart
+{
+    /* This function sets the pedestal mask at the start of the run, and then
+     * posts a notification telling the run model that the run can start. */
+    @autoreleasepool {
+        [self setPedestals];
+
+        /* Tell ORCA that we have finished setting the pedestal masks. */
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORReleaseRunStateChangeWait object:self];
+    }
+}
+
 - (void) runStartDone: (CrateInitResults *) results
 {
     if (results == NULL) {
@@ -336,6 +425,21 @@ isLoaded = isLoaded;
 }
 
 #pragma mark •••Accessors
+
+- (BOOL) isTriggerON
+{
+    return _isTriggerON;
+}
+
+- (void) setIsTriggerON: (BOOL) isTriggerON
+{
+    if (isTriggerON != _isTriggerON) {
+        _isTriggerON = isTriggerON;
+
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelTriggerStatusChanged object:self];        
+    }
+}
+
 - (NSString*) shortName
 {
 	return @"XL3";
@@ -405,9 +509,7 @@ isLoaded = isLoaded;
     [[[self undoManager] prepareWithInvocationTarget:self] setSlot:[self slot]];
     [self setTag:aSlot];
     
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORSNOCardSlotChanged
-	 object: self];
+    [self postNotificationName:ORSNOCardSlotChanged];
 }
 
 - (short) getNumberRegisters
@@ -1213,22 +1315,6 @@ BOOL owlSupplyState = false;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelRelayStatusChanged object:self];        
 }
 
-- (NSString*) triggerStatus
-{
-    if (!triggerStatus) {
-        return @"ON";
-    }
-    return triggerStatus;
-}
-
-- (void) setTriggerStatus:(NSString *)aTriggerStatus
-{
-    if (triggerStatus) [triggerStatus autorelease];
-    if (aTriggerStatus) triggerStatus = [aTriggerStatus copy];
-    
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelTriggerStatusChanged object:self];        
-}
-
 - (BOOL) isXl3VltThresholdInInit
 {
     return _isXl3VltThresholdInInit;
@@ -1269,6 +1355,11 @@ BOOL owlSupplyState = false;
 - (NSComparisonResult) XL3NumberCompare:(id)aCard
 {
     return [self crateNumber] - [aCard crateNumber];
+}
+
+- (BOOL) changingPedMask
+{
+    return changingPedMask;
 }
 
 #pragma mark •••DB Helpers
@@ -1458,7 +1549,7 @@ void SwapLongBlock(void* p, int32_t n)
         if (![fec dcPresent:dbNum]) continue;
 
         db = [fec dc:dbNum];
-            
+
         for (channel = 0; channel < 8; channel++) {
             mb->vThr[dbNum*8+channel] = [db vt:channel];
             mb->tCmos.tacShift[dbNum*8+channel] = [db tac0trim:channel];
@@ -1570,12 +1661,6 @@ void SwapLongBlock(void* p, int32_t n)
     initialized = FALSE;
     stateUpdated = FALSE;
 
-    if ([self isTriggerON]) {
-        [self setTriggerStatus:@"ON"];
-    } else {
-        [self setTriggerStatus:@"OFF"];
-    }
-    
     for (i=0; i<12; i++) {
         [self setXl3VltThreshold:i withValue:[decoder decodeFloatForKey:[NSString stringWithFormat:@"ORXL3ModelVltThreshold%i", i]]];
     }
@@ -1660,6 +1745,285 @@ void SwapLongBlock(void* p, int32_t n)
 }
 
 #pragma mark •••Hardware Access
+
+- (void) nominalSettingsCallback: (ORPQResult *) result
+{
+    int i, nrows, ncols, slot, channel;
+    int n100, n20, sequencer, hv, resistor_pulled;
+    ORFec32Model *fec;
+
+    if (!result) {
+        NSLogColor([NSColor redColor], @"crate %02d: database request for nominal settings failed!\n", [self crateNumber]);
+        return;
+    }
+
+    nrows = [result numOfRows];
+    ncols = [result numOfFields];
+
+    if (ncols != 6) {
+        NSLogColor([NSColor redColor], @"crate %02d: expected 5 columns from the database, but got %i!\n", [self crateNumber], ncols);
+        return;
+    }
+
+    if (nrows != 512) {
+        NSLogColor([NSColor redColor], @"crate %02d: expected 512 rows from the database, but got %i!\n", [self crateNumber], nrows);
+        return;
+    }
+
+    for (i = 0; i < nrows; i++) {
+        slot = [result getInt64atRow:i column:0];
+        channel = [result getInt64atRow:i column:1];
+        n100 = [result getInt64atRow:i column:2];
+        n20 = [result getInt64atRow:i column:3];
+        sequencer = [result getInt64atRow:i column:4];
+        resistor_pulled = [result getInt64atRow:i column:5];
+
+        fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
+
+        if (!fec) continue;
+
+        /* Check if the relay is open. */
+        hv = !resistor_pulled && (([self relayMask] >> (slot*4 + (3-channel/8))) & 0x1);
+
+        if (hv) {
+            [fec setTrigger100ns:channel enabled:n100];
+            [fec setTrigger20ns:channel enabled:n20];
+            if (!sequencer) {
+                NSLogColor([NSColor redColor], @"%02d/%02d/%02d HV is on, "
+                    "turning sequencer on even though nominal state is off!\n",
+                    [self crateNumber], slot, channel);
+            }
+            /* Turn sequencer on regardless of the nominal state if this
+             * channel has HV on. */
+            [fec setSeq:channel enabled:1];
+        } else {
+            [fec setTrigger100ns:channel enabled:NO];
+            [fec setTrigger20ns:channel enabled:NO];
+            [fec setSeq:channel enabled:sequencer];
+        }
+    }
+
+    /* Set the hardware state. */
+    [self loadTriggersAndSequencers];
+}
+
+- (void) loadNominalSettings
+{
+    /* Set the channel triggers and sequencers according to the nominal
+     * settings from the database. */
+    ORPQModel *db = [ORPQModel getCurrent];
+
+    if (!db) {
+        NSLog(@"Postgres object not found, please add it to the experiment!\n");
+        return;
+    }
+
+    NSString *query = [NSString stringWithFormat:
+        @"SELECT current_nominal_settings.slot, "
+         "current_nominal_settings.channel, "
+         "current_nominal_settings.n100, "
+         "current_nominal_settings.n20, "
+         "current_nominal_settings.sequencer, "
+         "current_channel_status.resistor_pulled FROM "
+         "current_nominal_settings, current_channel_status WHERE "
+         "current_nominal_settings.crate   = current_channel_status.crate   AND "
+         "current_nominal_settings.slot    = current_channel_status.slot    AND "
+         "current_nominal_settings.channel = current_channel_status.channel AND "
+         "current_nominal_settings.crate = %i",
+         [self crateNumber]];
+
+    [db dbQuery:query object:self selector:@selector(nominalSettingsCallback:) timeout:10.0];
+}
+
+- (void) _loadTriggersAndSequencers
+{
+    /* Function to actually load the current GUI channel trigger and sequencer
+     * settings. This should be called in a separate thread since it will
+     * block. Any exceptions will be caught and logged. */
+    @try {
+        [self loadTriggers];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor], @"crate %02d: failed to set triggers. error: %@ reason: %@\n",
+                   [self crateNumber], [e name], [e reason]);
+    }
+
+    @try {
+        [self loadSequencers];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor], @"crate %02d: failed to set sequencers. error: %@ reason: %@\n",
+                   [self crateNumber], [e name], [e reason]);
+    }
+}
+
+- (void) loadTriggersAndSequencers
+{
+    /* Loads the current GUI channel trigger and sequencer settings to the
+     * hardware asynchronously. */
+    if (![[self xl3Link] isConnected]) {
+        NSLogColor([NSColor redColor], @"xl3 %02d is not connected!\n",
+                    [self crateNumber]);
+        return;
+    }
+
+    [NSThread detachNewThreadSelector:@selector(_loadTriggersAndSequencers)
+        toTarget:self
+        withObject:nil];
+}
+
+- (void) loadTriggers
+{
+    /* Loads the current GUI channel trigger settings to the hardware. This
+     * function will block and so should only be called on a separate thread.
+     * This function will raise an exception if any error occurs. */
+    int slot, dbNum, channel;
+    char payload[XL3_PAYLOAD_SIZE];
+    ORFec32Model *fec;
+
+    memset(&payload, 0, sizeof(payload));
+
+    MultiSetCrateTriggersArgs *args = (MultiSetCrateTriggersArgs *) payload;
+
+    args->slotMask = 0;
+
+    for (slot = 0; slot < 16; slot++) {
+        args->tr100Masks[slot] = 0;
+        args->tr20Masks[slot] = 0;
+    }
+
+    for (slot = 0; slot < 16; slot++) {
+        fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
+
+        if (!fec) continue;
+
+        args->slotMask |= 1 << slot;
+
+        if ([self isTriggerON]) {
+            for (dbNum = 0; dbNum < 4; dbNum++) {
+                if (![fec dcPresent:dbNum]) continue;
+
+                for (channel = 0; channel < 8; channel++) {
+                    if ([fec trigger100nsEnabled: (dbNum*8 + channel)]) {
+                        args->tr100Masks[slot] |= 1 << (dbNum*8+channel);
+                    }
+
+                    if ([fec trigger20nsEnabled: (dbNum*8 + channel)]) {
+                        args->tr20Masks[slot] |= 1 << (dbNum*8+channel);
+                    }
+                }
+            }
+        }
+    }
+
+    /* Convert args to network byte order. */
+    args->slotMask = htonl(args->slotMask);
+
+    for (slot = 0; slot < 16; slot++) {
+        args->tr100Masks[slot] = htonl(args->tr100Masks[slot]);
+        args->tr20Masks[slot] = htonl(args->tr20Masks[slot]);
+    }
+
+    [[self xl3Link] sendCommand:MULTI_SET_CRATE_TRIGGERS_ID withPayload:payload expectResponse:YES];
+
+    MultiSetCrateTriggersResults *results = (MultiSetCrateTriggersResults *) payload;
+
+    if (ntohl(results->errorMask)) {
+        NSException *e = [NSException exceptionWithName:@"loadTriggersError"
+                          reason:@"failed to load channel triggers"
+                          userInfo:nil];
+        [e raise];
+    }
+}
+
+- (void) disableTriggers
+{
+    /* Turns off all channel level triggers. This function does *not* update
+     * the GUI so once this function is called, the GUI will most likely be in
+     * an inconsistent state. This can be useful in certain situations like ECA
+     * runs where you want to disable channel triggers but then load them back
+     * at the end of the run. This function will block until the operation
+     * completes. This function will raise an exception if any error occurs. */
+    int slot;
+    char payload[XL3_PAYLOAD_SIZE];
+
+    memset(&payload, 0, sizeof(payload));
+
+    MultiSetCrateTriggersArgs *args = (MultiSetCrateTriggersArgs *) payload;
+
+    args->slotMask = [self getSlotsPresent];
+
+    for (slot = 0; slot < 16; slot++) {
+        args->tr100Masks[slot] = 0;
+        args->tr20Masks[slot] = 0;
+    }
+
+    /* Convert args to network byte order. */
+    args->slotMask = htonl(args->slotMask);
+
+    for (slot = 0; slot < 16; slot++) {
+        args->tr100Masks[slot] = htonl(args->tr100Masks[slot]);
+        args->tr20Masks[slot] = htonl(args->tr20Masks[slot]);
+    }
+
+    [[self xl3Link] sendCommand:MULTI_SET_CRATE_TRIGGERS_ID withPayload:payload expectResponse:YES];
+
+    MultiSetCrateTriggersResults *results = (MultiSetCrateTriggersResults *) payload;
+
+    if (ntohl(results->errorMask)) {
+        NSException *e = [NSException exceptionWithName:@"loadTriggersError"
+                          reason:@"failed to load channel triggers"
+                          userInfo:nil];
+        [e raise];
+    }
+}
+
+- (void) loadSequencers
+{
+    /* Loads the current GUI channel sequencer settings to the hardware. This
+     * function will block and so should only be called on a separate thread.
+     * This function will raise an exception if any error occurs. */
+    int slot;
+    char payload[XL3_PAYLOAD_SIZE];
+    ORFec32Model *fec;
+
+    memset(&payload, 0, sizeof(payload));
+
+    MultiSetCrateSequencersArgs *args = (MultiSetCrateSequencersArgs *) payload;
+
+    args->slotMask = 0;
+
+    for (slot = 0; slot < 16; slot++) {
+        args->channelMasks[slot] = 0;
+    }
+
+    for (slot = 0; slot < 16; slot++) {
+        fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
+
+        if (!fec) continue;
+
+        args->slotMask |= 1 << slot;
+
+        args->channelMasks[slot] = ~[fec seqDisabledMask];
+    }
+
+    /* Convert args to network byte order. */
+    args->slotMask = htonl(args->slotMask);
+
+    for (slot = 0; slot < 16; slot++) {
+        args->channelMasks[slot] = htonl(args->channelMasks[slot]);
+    }
+
+    [[self xl3Link] sendCommand:MULTI_SET_CRATE_SEQUENCERS_ID withPayload:payload expectResponse:YES];
+
+    MultiSetCrateSequencersResults *results = (MultiSetCrateSequencersResults *) payload;
+
+    if (ntohl(results->errorMask)) {
+        NSException *e = [NSException exceptionWithName:@"loadSequencersError"
+                          reason:@"failed to load channel sequencers"
+                          userInfo:nil];
+        [e raise];
+    }
+}
+
 - (void) deselectCards
 {
 	[[self xl3Link] sendCommand:DESELECT_FECS_ID expectResponse:YES];
@@ -1993,9 +2357,7 @@ void SwapLongBlock(void* p, int32_t n)
 
     /* If the triggers OFF button has been pressed, turn off N100 and N20
      * triggers */
-    if ([self isTriggerON]) {
-        [self setTriggerStatus:@"ON"];
-    } else {
+    if (![self isTriggerON]) {
         for (slot = 0; slot < 16; slot++) {
             if ((slotMask & (1 << slot)) == 0) continue;
 
@@ -2004,7 +2366,6 @@ void SwapLongBlock(void* p, int32_t n)
                 mbs[slot].tr20.mask[channel] = 0;
             }
         }
-        [self setTriggerStatus:@"OFF"];
     }
 
     NSDictionary *args = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -2623,6 +2984,85 @@ err:
 		NSLog(@"Send XL3 Quit failed; error: %@ reason: %@\n", [e name], [e reason]);
 	}
 	[self setXl3OpsRunning:NO forKey:@"compositeQuit"];
+}
+
+- (int) setPedestals
+{
+    /* Set the pedestal mask. Returns 0 on success, -1 on error. */
+    int i;
+    char payload[XL3_PAYLOAD_SIZE];
+    MultiSetCratePedsArgs *args;
+    MultiSetCratePedsResults *results;
+
+    memset(&payload, 0, XL3_PAYLOAD_SIZE);
+
+    args = (MultiSetCratePedsArgs *) payload;
+
+    NSArray* fecs = [[self guardian]
+                     collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
+
+    args->slotMask = 0;
+
+    for (id aFec in fecs) {
+        args->slotMask |= 1 << [aFec stationNumber];
+        args->channelMasks[[aFec stationNumber]] = [aFec pedEnabledMask];
+    }
+
+    args->slotMask = htonl(args->slotMask);
+
+    for (i = 0; i < 16; i++) {
+        args->channelMasks[i] = htonl(args->channelMasks[i]);
+    }
+
+    @try {
+        [[self xl3Link] sendCommand:MULTI_SET_CRATE_PEDS_ID withPayload:payload
+                        expectResponse:YES];
+    } @catch (NSException *e) {
+        return -1;
+    }
+
+    results = (MultiSetCratePedsResults *) payload;
+
+    if (ntohl(results->errorMask)) {
+        return -1;
+    }
+
+    return 0;
+}
+
+- (int) multiSetPedestalMask: (uint32_t) slotMask patterns: (uint32_t[16]) patterns
+{
+    /* Similar to setPedestalMask except any slots not in the slot mask will
+     * not have their pedestal mask changed. */
+    int i;
+    char payload[XL3_PAYLOAD_SIZE];
+    MultiSetCratePedsArgs *args;
+    MultiSetCratePedsResults *results;
+
+    memset(&payload, 0, XL3_PAYLOAD_SIZE);
+
+    args = (MultiSetCratePedsArgs *) payload;
+
+    args->slotMask = htonl(slotMask);
+
+    for (i = 0; i < 16; i++) {
+        args->channelMasks[i] = htonl(patterns[i]);
+    }
+
+    @try {
+        [[self xl3Link] sendCommand:MULTI_SET_CRATE_PEDS_ID withPayload:payload
+                        expectResponse:YES];
+    } @catch (NSException *e) {
+        return -1;
+    }
+
+    results = (MultiSetCratePedsResults *) payload;
+
+    if (ntohl(results->errorMask)) {
+        return -1;
+    }
+
+    return 0;
 }
 
 - (int) setPedestalMask: (uint32_t) slotMask pattern: (uint32_t) pattern
@@ -3652,7 +4092,6 @@ err:
         SwapLongBlock(payload, sizeof(HVReadbackResults)/4);
     }
     memcpy(status, payload, sizeof(HVReadbackResults));
-    [self setHvEverUpdated:YES];
 }
 
 - (void) readHVStatus
@@ -3679,6 +4118,25 @@ err:
         [self setHvBVoltageReadValue:status.voltageB * 300. * self.hvReadbackCorrB];
         [self setHvACurrentReadValue:status.currentA * 10.];
         [self setHvBCurrentReadValue:status.currentB * 10.];
+
+        if (![self hvEverUpdated] &&
+            ([self hvAVoltageReadValue] < ([self hvNominalVoltageA] - 100)) &&
+            [self isTriggerON]) {
+            /* If this is the first time we've read back HV, the crate is not
+             * at nominal voltage, and the triggers are enabled, we prompt the
+             * user to disable triggers. */
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                BOOL result = ORRunAlertPanel([NSString stringWithFormat:@"Crate %i HV is not at nominal voltage, but triggers are currently enabled.", [self crateNumber]], @"Would you like to disable triggers?", @"Yes", @"No", nil);
+
+                if (result) {
+                    [self setIsTriggerON:NO];
+                    NSLog(@"Crate %02d disabling triggers\n.", [self crateNumber]);
+                    return;
+                }
+            });
+        }
+
+        [self setHvEverUpdated:YES];
 
         dispatch_async(dispatch_get_main_queue(), ^{
             [[NSNotificationCenter defaultCenter]
@@ -3752,6 +4210,36 @@ err:
         NSLogColor([NSColor redColor],@"%@ error in setHVRelays relays were NOT set.\n",[[self xl3Link] crateName]);
     } else {
         NSLog(@"%@ HV relays set.\n",[[self xl3Link] crateName]);
+    }
+}
+
+- (void) readHVRelays:(uint64_t*) _relayMask isKnown:(BOOL*)isKnown {
+    char payload[XL3_PAYLOAD_SIZE];
+
+    memset(payload, 0, XL3_PAYLOAD_SIZE);
+    GetHVRelaysResults* data = (GetHVRelaysResults*) payload;
+
+    [[self xl3Link] sendCommand:GET_HV_RELAYS_ID withPayload:payload expectResponse:YES];
+
+    uint32_t mask1 = data->mask1;
+    uint32_t mask2 = data->mask2;
+    uint32_t known = data->relays_known;
+
+    if ([xl3Link needToSwap]) {
+        mask1 = swapLong(data->mask1);
+        mask2 = swapLong(data->mask2);
+        known = swapLong(data->relays_known);
+    }
+    *_relayMask = mask1 + ((uint64_t)mask2 << 32);
+    *isKnown = (known != 0);
+
+    if(!known) {
+        [self setRelayStatus:@"status: UNKNOWN"];
+    }
+    else {
+        [self setRelayMask:*_relayMask];
+        [self setRelayStatus:@"status: SET"];
+
     }
 }
 
@@ -3854,7 +4342,134 @@ err:
 
     NSLog(@"%@ switch A is %@, switch B is %@.\n",[[self xl3Link] crateName], switchAIsOn?@"ON":@"OFF", switchBIsOn?@"ON":@"OFF");
 }
+- (uint32_t) checkRelays:(uint64_t)relays {
+    // Returns a bit mask of which slots have issues with their relays
+    // Currently just checks that any missing slots also have open relays
+    // Could be expanded in the future.
 
+    uint32_t bad_slots = 0;
+    uint32_t slots = [self getSlotsPresent];
+    for (int i=0;i<16;i++) {
+        // If slot is missing
+        if((slots & 1<<i) == 0) {
+            // And if the 4 relays for that slot aren't all 0 (open)
+            uint64_t mask = (uint64_t)0xF << i*4;
+            if((mask & relays) != 0)
+                //Then set a bit in bad_slots
+                bad_slots |= 1<<i;
+        }
+    }
+    return bad_slots;
+}
+
+- (BOOL) isHVAdvisable:(unsigned char) sup {
+    BOOL interlockIsGood = false;
+    BOOL relaysKnown = false;
+    BOOL relaysGood = true; // Start true b/c if relaysKnown doesn't pass this won't be checked.
+    BOOL modeGood = false;
+    uint64_t relays;
+
+    if ([self crateNumber] == 16 && sup != 0) { //16B
+        //Checks interlocks for any crates with connected OWL tubes
+        //Assumes that all relevant crates are represented in the open experiment
+        uint32_t checkedCrates = 0;
+        uint32_t goodInterlocks = 0;
+        uint32_t knownRelays = 0;
+        uint32_t goodRelays = 0;
+        uint32_t goodModes = 0;
+
+        NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+        for (uint32_t i = 0; i < [objs count]; i++) {
+            ORXL3Model *xl3 = [objs objectAtIndex:i];
+            if ([xl3 isOwlCrate]) {
+                checkedCrates++;
+                BOOL good = false;
+                // First check the interlocks
+                @try {
+                    [xl3 readHVInterlockGood:&good];
+                    if (good) {
+                        goodInterlocks++;
+                    } else {
+                        NSLogColor([NSColor redColor],@"%@ HV interlock BAD\n",[[xl3 xl3Link] crateName]);
+                    }
+                }
+                @catch (NSException *exception) {
+                    NSLogColor([NSColor redColor],@"%@ error in readHVInterlock\n",[[xl3 xl3Link] crateName]);
+                }
+                // Now check the relays
+                @try {
+                    [xl3 readHVRelays:&relays isKnown:&good];
+                    if (good) {
+                        knownRelays++;
+                        // If the relays are known make sure slot 15's are open if the FEC is missing
+                        uint32_t bad_relays = [xl3 checkRelays:relays];
+                        if((bad_relays & 1<<15) == 0) {
+                            goodRelays++;
+                        }
+                        else {
+                            NSLogColor([NSColor redColor], @"%@ HV relays for slot 15 are closed but FEC is missing!\n",[[self xl3Link] crateName]);
+                        }
+
+                    } else {
+                        NSLogColor([NSColor redColor],@"%@ HV Relays unknown\n",[[xl3 xl3Link] crateName]);
+                    }
+                }
+                @catch (NSException *exception) {
+                    NSLogColor([NSColor redColor],@"%@ error in readHVRelays. Error: %@ Reason: %@\n",[[xl3 xl3Link] crateName],[exception name], [exception reason]);
+                }
+
+                // Finally make sure the XL3s are reading out
+                if([xl3 xl3Mode] == NORMAL_MODE) {
+                    goodModes++;
+                } else {
+                    NSLogColor([NSColor redColor],@"%@ NOT in normal mode\n",[[xl3 xl3Link] crateName]);
+                }
+            }
+        }
+
+        interlockIsGood = checkedCrates == goodInterlocks;
+        relaysKnown     = checkedCrates == knownRelays;
+        modeGood        = checkedCrates == goodModes;
+        relaysGood      = knownRelays   == goodRelays;
+    } else {
+        //Checks the state for this crate only
+        @try {
+            [self readHVInterlockGood:&interlockIsGood];
+            if (!interlockIsGood) NSLogColor([NSColor redColor],@"%@ HV interlock BAD\n",[[self xl3Link] crateName]);
+        }
+        @catch (NSException *exception) {
+            NSLogColor([NSColor redColor],@"%@ error in readHVInterlock. Error: %@ Reason %@\n",[[self xl3Link] crateName],[exception name], [exception reason]);
+        }
+
+        @try {
+            [self readHVRelays:&relays isKnown:&relaysKnown];
+            if (!relaysKnown){
+                NSLogColor([NSColor redColor],@"%@ HV relays unknown\n",[[self xl3Link] crateName]);
+            }
+        }
+        @catch (NSException *exception) {
+            NSLogColor([NSColor redColor],@"%@ error in readHVRelays. Error: %@ Reason: %@\n",[[self xl3Link] crateName],[exception name], [exception reason]);
+        }
+
+        // Make sure the relays are open for all slots that are missing
+        if(relaysKnown) {
+            uint32_t badRelays = [self checkRelays:relays];
+            relaysGood = (badRelays == 0);
+            if(!relaysGood) {
+                NSLogColor([NSColor redColor], @"%@ has missing slots with closed relays!\n", [[self xl3Link] crateName]);
+            }
+        }
+
+        // Check that the XL3 Mode is not INIT
+        modeGood = [self xl3Mode] == NORMAL_MODE;
+        if(!modeGood){
+            NSLogColor([NSColor redColor], @"%@ is not in NORMAL mode!\n", [[self xl3Link] crateName]);
+        }
+    }
+
+    return interlockIsGood && relaysKnown && modeGood && relaysGood;
+
+}
 - (void) setHVSwitch:(BOOL)aOn forPowerSupply:(unsigned char)sup
 {
     @synchronized(self) {
@@ -3870,45 +4485,10 @@ err:
 
     [self setHvASwitch:xl3SwitchA];
     [self setHvBSwitch:xl3SwitchB];
-        
-        
-    BOOL interlockIsGood = false;
-    if ([self crateNumber] == 16 && sup != 0) { //16B
-        //Checks interlocks for any crates with connected OWL tubes
-        //Assumes that all relevant crates are represented in the open experiment
-        uint32_t checkedInterlocks = 0;
-        uint32_t goodInterlocks = 0;
-        NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
-        for (uint32_t i = 0; i < [objs count]; i++) {
-            ORXL3Model *xl3 = [objs objectAtIndex:i];
-            if ([xl3 isOwlCrate]) {
-                checkedInterlocks++;
-                @try {
-                    BOOL good = false;
-                    [xl3 readHVInterlockGood:&good];
-                    if (good) {
-                        goodInterlocks++;
-                    } else {
-                        NSLogColor([NSColor redColor],@"%@ HV interlock BAD\n",[[xl3 xl3Link] crateName]);
-                    }
-                }
-                @catch (NSException *exception) {
-                    NSLogColor([NSColor redColor],@"%@ error in readHVInterlock\n",[[xl3 xl3Link] crateName]);
-                }
-            }
-        }
-        interlockIsGood = checkedInterlocks == goodInterlocks;
-    } else {
-        //Checks the interlock for this crate only
-        @try {
-            [self readHVInterlockGood:&interlockIsGood];
-            if (!interlockIsGood) NSLogColor([NSColor redColor],@"%@ HV interlock BAD\n",[[self xl3Link] crateName]);
-        }
-        @catch (NSException *exception) {
-            NSLogColor([NSColor redColor],@"%@ error in readHVInterlock\n",[[self xl3Link] crateName]);
-        }
-    }
-    if (!interlockIsGood) {
+
+    BOOL hv_advisable = [self isHVAdvisable:sup];
+
+    if (!hv_advisable) {
         if (aOn) {
             NSLog(@"%@ NOT turning ON the HV power supply.\n",[[self xl3Link] crateName]);
             return;
@@ -3969,42 +4549,53 @@ err:
     }//synchronized
 }
 
-- (void) hvPanicDown
+- (void) _hvPanicDown
 {
-    [self setIsPollingXl3:NO];
-    //triggers turned off in DoPanicDown command
-
+    /* Panic down method which is called in a separate thread. */
     XL3Packet packet;
     memset(packet.payload, 0, XL3_PAYLOAD_SIZE);
 
-    DoPanicDownResults* result = (DoPanicDownResults*)packet.payload;
+    DoPanicDownResults* result = (DoPanicDownResults*) packet.payload;
 
     @try {
         [[self xl3Link] sendCommand:DO_PANIC_DOWN withPayload:packet.payload expectResponse:YES];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor],@"crate %02d: error while performing panic down; error: %@ reason: %@\n",
+                   [self crateNumber], [e name], [e reason]);
+        goto err;
     }
-    @catch (NSException *e) {
-        NSLogColor([NSColor redColor],@"%@ error while performing panic down; error: %@ reason: %@\n",
-              [[self xl3Link] crateName], [e name], [e reason]);
+
+    result->errorFlags = ntohl(result->errorFlags);
+
+    if (result->errorFlags) {
+        NSLogColor([NSColor redColor], @"crate %02d: There was a problem performing panic down. Try again or ramp crate manually",
+                   [self crateNumber]);
+        goto err;
+    }
+
+    /* Restart the HV thread. Need to post on the main thread. */
+    dispatch_async(dispatch_get_main_queue(), ^{
         [self safeHvInit];
-        return;
-    }
-    if ([xl3Link needToSwap]) {
-        result->errorFlags = swapLong(result->errorFlags);
-    }
-    if(result->errorFlags)
-    {
-        NSLogColor([NSColor redColor],@"There was a problem performing panic down. Try again or ramp crate manually");
+    });
+
+    NSLog(@"crate %02d: panic down completed.\n", [self crateNumber]);
+
+    return;
+
+err:
+    /* Restart the HV thread. Need to post on the main thread. */
+    dispatch_async(dispatch_get_main_queue(), ^{
         [self safeHvInit];
-        return;
-    }
-    [self safeHvInit];
-    NSLog(@"%@ panic down completed.\n", [[self xl3Link] crateName]);
+    });
 }
 
-//not used, we collect the objects from the controller now
-- (void) hvMasterPanicDown
+- (void) hvPanicDown
 {
-    [[[self document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
+    /* Asynchronously send a panic down command to the XL3. The panic down
+     * command will turn triggers off and then ramp down the HV. */
+    [self setIsPollingXl3:NO];
+
+    [NSThread detachNewThreadSelector:@selector(_hvPanicDown) toTarget:self withObject:nil];
 }
 
 - (void) hvTriggersON
@@ -4031,7 +4622,7 @@ err:
     }
 
     [self setIsTriggerON:YES];
-    [self loadHardware];
+    [self loadTriggersAndSequencers];
     NSLog(@"%@ triggers ON\n", [[self xl3Link] crateName]);
 }
 
@@ -4039,7 +4630,7 @@ err:
 {
     if ([[self xl3Link] isConnected]) {
         [self setIsTriggerON:NO];
-        [self loadHardware];
+        [self loadTriggersAndSequencers];
         NSLog(@"%@ triggers OFF\n", [[self xl3Link] crateName]);
     }
     else {
@@ -5155,7 +5746,7 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
                 [self setHvANextStepValue:[self hvAVoltageDACSetValue]];
             }
             if ([self crateNumber] == 16 && [self hvBSwitch] && bUp && fabs([self hvBVoltageReadValue] - [self hvBVoltageDACSetValue]/4096.*3000.) > 100) {
-                [self _trigger_edge_alarm:80100+[self crateNumber]*2+0];
+                [self _trigger_edge_alarm:80100+[self crateNumber]*2+1];
                 NSLogColor([NSColor redColor],@"%@ HV B read value differs from the setpoint. stopping!\nPress Ramp UP to continue.\n", [[self xl3Link] crateName]);
                 [self setHvBNextStepValue:[self hvBVoltageDACSetValue]];
             }
@@ -5179,6 +5770,22 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
                     self.hvANeedsUserIntervention = true;
                     supplyASetpointDiscrepancy = true;
                     NSLogColor([NSColor redColor],@"%@ HV A read value differs from the setpoint! Suspending HV monitoring and control. Press 'Accept Readback' to resume.\n", [[self xl3Link] crateName]);
+
+                    if ([self isTriggerON]) {
+                        /* If the triggers are enabled, prompt the user to
+                         * disable them.
+                         *
+                         * Note: dispatch this asynchronously so that the HV
+                         * thread continues. */
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            BOOL result = ORRunAlertPanel([NSString stringWithFormat:@"Crate %i HV readback differs from the setpoint. This might indicate a tripped HV power supply. Triggers are currently enabled, which is not safe for the hardware unless the crate is at HV.", [self crateNumber]], @"Would you like to disable triggers?", @"Yes", @"No", nil);
+
+                            if (result) {
+                                [self hvTriggersOFF];
+                                NSLog(@"Crate %02d disabling triggers\n.", [self crateNumber]);
+                            }
+                        });
+                    }
                 }
             }
             if (!loopCounter || supplyASetpointDiscrepancy != lastSupplyASetpointDiscrepancy) {
@@ -5228,7 +5835,7 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
         }
         
         if ([self crateNumber] == 16) {
-            bool supplyBCurrentDropout = [self hvBVoltageReadValue] > [self ilowalarm_b_vmin] && [self hvBCurrentReadValue] < [self ilowalarm_a_imin];
+            bool supplyBCurrentDropout = [self hvBVoltageReadValue] > [self ilowalarm_b_vmin] && [self hvBCurrentReadValue] < [self ilowalarm_b_imin];
             bool supplyBOverVoltage = [self hvBVoltageReadValue] > [self vhighalarm_b_vmax];
             bool supplyBOverCurrent = [self hvBCurrentReadValue] > [self ihighalarm_b_imax];
             int boffset = 2*[self crateNumber] + 1;
@@ -5261,56 +5868,65 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
 
 - (void) _setPedestalInParallelWorker
 {
-    char payload[XL3_PAYLOAD_SIZE];
-    MultiSetCratePedsArgs *args;
-    MultiSetCratePedsResults *results;
-    int i;
 
-    memset(&payload, 0, XL3_PAYLOAD_SIZE);
+    @synchronized(self) {
+        //Keep track of how many XL3s are changing ped mask
+        changingPedMask = TRUE;
 
-    args = (MultiSetCratePedsArgs *) payload;
+        char payload[XL3_PAYLOAD_SIZE];
+        MultiSetCratePedsArgs *args;
+        MultiSetCratePedsResults *results;
+        int i;
 
-    NSAutoreleasePool* pedPool = [[NSAutoreleasePool alloc] init];
+        memset(&payload, 0, XL3_PAYLOAD_SIZE);
 
-    if (![[self xl3Link] isConnected]) {
+        args = (MultiSetCratePedsArgs *) payload;
+
+        NSAutoreleasePool* pedPool = [[NSAutoreleasePool alloc] init];
+
+        if (![[self xl3Link] isConnected]) {
+            [pedPool release];
+            changingPedMask = FALSE;
+            return;
+        }
+
+        NSArray* fecs = [[self guardian]
+                         collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
+
+        args->slotMask = 0;
+
+        for (id aFec in fecs) {
+            args->slotMask |= 1 << [aFec stationNumber];
+            args->channelMasks[[aFec stationNumber]] = [aFec pedEnabledMask];
+        }
+
+        args->slotMask = htonl(args->slotMask);
+
+        for (i = 0; i < 16; i++) {
+            args->channelMasks[i] = htonl(args->channelMasks[i]);
+        }
+
+        @try {
+            [[self xl3Link] sendCommand:MULTI_SET_CRATE_PEDS_ID
+                            withPayload:payload expectResponse:YES];
+        } @catch (NSException* e) {
+            NSLog(@"%@ error setting pedestal masks. error: %@ reason: %@.\n",
+                  [[self xl3Link] crateName], [e name], [e reason]);
+            goto err;
+        }
+
+        results = (MultiSetCratePedsResults *) payload;
+
+        if (results->errorMask) {
+            NSLog(@"%@ error setting pedestal masks.\n",
+                  [[self xl3Link] crateName]);
+        }
+
+    err:
         [pedPool release];
-        return;
+        changingPedMask = FALSE;
     }
 
-    NSArray* fecs = [[self guardian]
-        collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
-
-    args->slotMask = 0;
-
-    for (id aFec in fecs) {
-        args->slotMask |= 1 << [aFec stationNumber];
-        args->channelMasks[[aFec stationNumber]] = [aFec pedEnabledMask];
-    }
-
-    args->slotMask = htonl(args->slotMask);
-
-    for (i = 0; i < 16; i++) {
-        args->channelMasks[i] = htonl(args->channelMasks[i]);
-    }
-
-    @try {
-        [[self xl3Link] sendCommand:MULTI_SET_CRATE_PEDS_ID
-             withPayload:payload expectResponse:YES];
-    } @catch (NSException* e) {
-        NSLog(@"%@ error setting pedestal masks. error: %@ reason: %@.\n",
-              [[self xl3Link] crateName], [e name], [e reason]);
-        goto err;
-    }
-
-    results = (MultiSetCratePedsResults *) payload;
-
-    if (results->errorMask) {
-        NSLog(@"%@ error setting pedestal masks.\n",
-              [[self xl3Link] crateName]);
-    }
-    
-err:
-    [pedPool release];
 }
 
 @end

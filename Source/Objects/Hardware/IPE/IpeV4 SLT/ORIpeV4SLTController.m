@@ -71,11 +71,11 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (void) awakeFromNib
 {
-	controlSize			= NSMakeSize(555,670);
+	controlSize			= NSMakeSize(555,640);
     statusSize			= NSMakeSize(555,480);
-    lowLevelSize		= NSMakeSize(555,400);
+    lowLevelSize		= NSMakeSize(555,430);
     cpuManagementSize	= NSMakeSize(475,450);
-    cpuTestsSize		= NSMakeSize(555,355);
+    cpuTestsSize		= NSMakeSize(555,335);
 	
 	[[self window] setTitle:@"IPE-DAQ-V4 SLT"];	
 	

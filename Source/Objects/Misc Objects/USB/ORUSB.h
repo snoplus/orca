@@ -72,6 +72,7 @@ typedef  struct  {
 
 - (ORUSBInterface*) getUSBInterface:(unsigned long)aVendorID productID:(unsigned long)aProductID;
 - (NSArray*) interfacesForVender:(unsigned long)aVenderID product:(unsigned long)aProductID;
+- (NSArray*) interfacesForVenders:(NSArray*)someVendorIDs products:(NSArray*)someProductIDs;
 - (unsigned) deviceCount;
 - (unsigned) interfaceCount;
 - (NSArray*) interfaces;
@@ -94,14 +95,18 @@ extern NSString* ORUSBInterfaceRemoved;
 extern NSString* ORUSBInterfaceAdded;
 extern NSString* ORUSBInterfacesChanged;
 
+@interface NSObject (multipleIDs)
+- (NSArray*) vendorIDs;
+- (NSArray*) productIDs;
+- (unsigned long) vendorID;
+- (unsigned long) productID;
+@end
 
 @protocol USBDevice
 - (id) getUSBController;
 - (void) setUsbInterface:(ORUSBInterface*)anInterface;
 - (NSString*) usbInterfaceDescription;
 - (void) registerWithUSB:(id)usb;
-- (unsigned long) vendorID;
-- (unsigned long) productID;
 - (void) interfaceAdded:(NSNotification*)aNote;
 - (void) interfaceRemoved:(NSNotification*)aNote;
 @end

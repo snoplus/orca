@@ -294,7 +294,7 @@ NSString* ORMJDVacuumModelSpikeTriggerValueChanged      = @"ORMJDVacuumModelSpik
     
     [notifyCenter addObserver : self
                      selector : @selector(vacuumSpikeChanged:)
-                         name : ORRunningAverageSpikeNotification
+                         name : ORSpikeStateChangedNotification
                        object : vacuumRunningAverages];
     
 }

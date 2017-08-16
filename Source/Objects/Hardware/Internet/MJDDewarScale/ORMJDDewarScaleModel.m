@@ -151,7 +151,7 @@ NSString* ORMJDDewarScaleValueChanged           = @"ORMJDDewarScaleValueChanged"
             [dataInValidAlarm clearAlarm];
             [dataInValidAlarm release];
             dataInValidAlarm = nil;
-        }
+        } 
     }
     else {
         if([ipAddress length]!=0){

@@ -38,14 +38,15 @@
 	NetSocket*      serverSocket;
 	NSMutableArray*	clients;
 	NSMutableDictionary*         currentHeader;
-    BOOL        checkAllowed;
-    BOOL        checkRefused;
-	BOOL		_ignoreMode;
-	BOOL		scheduledForUpdate;
-    NSArray* allowedList;
-    NSArray* refusedList;
-	BOOL     runInProgress;
-	int		runMode;
+    BOOL            checkAllowed;
+    BOOL            checkRefused;
+	BOOL            _ignoreMode;
+	BOOL            scheduledForUpdate;
+    NSArray*        allowedList;
+    NSArray*        refusedList;
+	BOOL            runInProgress;
+	int             runMode;
+    BOOL            ignoreBlock;
 }
 
 - (void)serve;
@@ -74,6 +75,10 @@
 - (void) scheduleUpdateOnMainThread;
 - (void) postUpdateOnMainThread;
 - (void) postUpdate;
+
+#pragma mark ¥¥¥Notifications
+- (void) registerNotificationObservers;
+- (void) runAboutToStop:(NSNotification*) aNote;
 
 #pragma mark ¥¥¥Data Handling
 - (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;

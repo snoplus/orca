@@ -20,6 +20,8 @@ class ORSLTv4Readout : public ORVCard
     ORSLTv4Readout(SBC_card_info* ci) : ORVCard(ci) {} 
     virtual ~ORSLTv4Readout() {} 
     virtual bool Readout(SBC_LAM_Data*);
+   private:
+    bool firstTime;
 };
 
 #endif /* _ORSLTv4Readout_hh_*/

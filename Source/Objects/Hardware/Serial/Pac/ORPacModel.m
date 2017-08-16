@@ -370,7 +370,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 
 - (void) setGainValue:(int)aGainValue
 {
-	if(aGainValue>256)aGainValue=255;
+	if(aGainValue>255)aGainValue=255;
     [[[self undoManager] prepareWithInvocationTarget:self] setGainValue:gainValue];
     gainValue = aGainValue;
 	
@@ -384,7 +384,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 
 - (float) adcVoltage:(int)index
 {
-	if(index<0 && index>=8)return 0.0;
+	if(index<0 || index>=8)return 0.0;
 	else return 5.0 * adc[index]/65535.0;
 }
 
@@ -405,7 +405,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 {
 	float theValue = kBadPacValue; //a 'bad' value as default
 	@synchronized (self){
-		if(index<0 && index>8)return 0.0;
+		if(index<0 || index>8)return 0.0;
         
 		float temperatureConstants[8][2] = {
 			{100.0	,	-50.0},

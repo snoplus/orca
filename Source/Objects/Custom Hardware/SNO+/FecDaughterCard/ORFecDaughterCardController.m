@@ -159,12 +159,16 @@
                      selector : @selector(commentsChanged:)
                          name : ORDCModelCommentsChanged
 						object: model];
-	
+
+    [notifyCenter addObserver : self
+                     selector : @selector(everythingChanged:)
+                         name : ORDCModelEverythingChanged
+                        object: model];
+
     [notifyCenter addObserver : self
                      selector : @selector(boardIdChanged:)
                          name : ORSNOCardBoardIDChanged
-						object: model];
-	
+                        object: model];
 }
 
 #pragma mark •••Interface Management
@@ -192,6 +196,13 @@
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
     [gSecurity setLock:ORDBLock to:secure];
     [lockButton setEnabled:secure];
+}
+
+- (void) everythingChanged:(NSNotification*)aNote
+{
+    if (model == [aNote object]) {
+        [self updateWindow];
+    }
 }
 
 - (void) lockChanged:(NSNotification*)aNotification
@@ -230,6 +241,30 @@
 - (void) boardIdChanged:(NSNotification*)aNote
 {
 	[boardIdField setStringValue:[model boardID]];
+}
+
+-(void) keyDown:(NSEvent*)event {
+    NSString* keys = [event charactersIgnoringModifiers];
+    if([keys length] == 0) {
+        return;
+    }
+    if([keys length] == 1) {
+        unichar key = [keys characterAtIndex:0];
+        if(key == NSLeftArrowFunctionKey || key == 'h' || key == 'H') {
+            [self decCardAction:self];
+            return;
+        }
+        else if(key == NSRightArrowFunctionKey || key == 'l' || key == 'L') {
+            [self incCardAction:self];
+            return;
+        }
+    }
+    [super keyDown:event];
+}
+
+- (void) cancelOperation:(id)sender {
+    [self endEditing];
+    [[self window] makeFirstResponder:nil];
 }
 
 - (void) showVoltsChanged:(NSNotification*)aNote
@@ -399,12 +434,16 @@
 
 - (IBAction) incCardAction:(id)sender
 {
-	[self incModelSortedBy:@selector(globalCardNumberCompare:)];
+    bool isDBLocked = [gSecurity isLocked:ORDBLock];
+    [self incModelSortedBy:@selector(globalCardNumberCompare:)];
+    [gSecurity setLock:ORDBLock to:isDBLocked];
 }
 
 - (IBAction) decCardAction:(id)sender
 {
-	[self decModelSortedBy:@selector(globalCardNumberCompare:)];
+    bool isDBLocked = [gSecurity isLocked:ORDBLock];
+    [self decModelSortedBy:@selector(globalCardNumberCompare:)];
+    [gSecurity setLock:ORDBLock to:isDBLocked];
 }
 
 - (IBAction) rp1Action:(id)sender

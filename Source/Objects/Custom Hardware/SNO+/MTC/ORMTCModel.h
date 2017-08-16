@@ -24,45 +24,74 @@
 
 #import "ORVmeIOCard.h"
 #import "RedisClient.h"
+#import "ORPQResult.h"
 #include <stdint.h>
 
 @class ORMTC_DB;
 @class ORReadOutList;
 
 #define MTCLockOutWidth @"MTCLockOutWidth"
+#define FIRST_MTC_THRESHOLD_INDEX 0
+#define MTC_N100_LO_THRESHOLD_INDEX  0
+#define MTC_N100_MED_THRESHOLD_INDEX 1
+#define MTC_N100_HI_THRESHOLD_INDEX  2
+#define MTC_N20_THRESHOLD_INDEX      3
+#define MTC_N20LB_THRESHOLD_INDEX    4
+#define MTC_ESUML_THRESHOLD_INDEX    5
+#define MTC_ESUMH_THRESHOLD_INDEX    6
+#define MTC_OWLN_THRESHOLD_INDEX     7
+#define MTC_OWLELO_THRESHOLD_INDEX   8
+#define MTC_OWLEHI_THRESHOLD_INDEX   9
+#define LAST_MTC_THRESHOLD_INDEX 9
+#define MTC_NUM_THRESHOLDS 14  // The number of thresholds that exist
+#define MTC_NUM_USED_THRESHOLDS 10 // The number of thresholds that are actually used
+
+#define MTC_RAW_UNITS 1
+#define MTC_mV_UNITS 2
+#define MTC_NHIT_UNITS 3
+
+//This defines the order at which the MTC server and database expects MTCA thresholds
+#define SERVER_N100L_INDEX 0
+#define SERVER_N100M_INDEX 1
+#define SERVER_N100H_INDEX 2
+#define SERVER_N20_INDEX   3
+#define SERVER_N20LB_INDEX 4
+#define SERVER_ESUML_INDEX 5
+#define SERVER_ESUMH_INDEX 6
+#define SERVER_OWLN_INDEX  7
+#define SERVER_OWLEL_INDEX 8
+#define SERVER_OWLEH_INDEX 9
+
 
 @interface ORMTCModel :  ORVmeIOCard
 {
-    @private
-		unsigned long			_dataId;
-        unsigned long			_mtcStatusDataId;
-		NSMutableDictionary*	mtcDataBase;
-		
-		//basic ops
-		int						selectedRegister;
-		unsigned long			memoryOffset;
-		unsigned long			writeValue;
-		short					repeatOpCount;
-		unsigned short			repeatDelay;
-		int						useMemory;
-		unsigned long			workingCount;
-		BOOL				doReadOp;
-		BOOL				autoIncrement;
-		BOOL				basicOpsRunning;
-		BOOL				isPulserFixedRate;
-		unsigned long			fixedPulserRateCount;
-		float				fixedPulserRateDelay;
-    BOOL _isPedestalEnabledInCSR;
+@private
+    uint16_t                lockoutWidth;
+    uint16_t                pedestalWidth;
+    float                   pgtRate;
+    uint32_t                gtMask;
+    uint32_t                GTCrateMask;
+    uint32_t                pedCrateMask;
+    uint16_t                prescaleValue;
+    int                     fineDelay;
+    int                     coarseDelay;
 
+    //basic ops
+    int                     selectedRegister;
+    unsigned long			memoryOffset;
+    unsigned long			writeValue;
+    short					repeatOpCount;
+    unsigned short			repeatDelay;
+    int						useMemory;
+    unsigned long			workingCount;
+    BOOL				doReadOp;
+    BOOL				autoIncrement;
+    BOOL				basicOpsRunning;
+    BOOL				isPulserFixedRate;
+    unsigned long			fixedPulserRateCount;
+    float				fixedPulserRateDelay;
+    BOOL _isPedestalEnabledInCSR;
     BOOL _pulserEnabled;
-		
-		//settings
-		NSString*				lastFileLoaded;
-		NSString*				lastFile;
-		NSString*				defaultFile;
-		
-		int						nHitViewType;
-		int						eSumViewType;
     
     //MTCA+ crate masks
     unsigned long _mtcaN100Mask;
@@ -73,22 +102,30 @@
     unsigned long _mtcaOEHIMask;
     unsigned long _mtcaOWLNMask;
 
-    unsigned long _mtcStatusGTID;
-    double _mtcStatusGTIDRate;
-    unsigned long long _mtcStatusCnt10MHz;
-    NSString* _mtcStatusTime10Mhz;
-    unsigned long _mtcStatusReadPtr;
-    unsigned long _mtcStatusWritePtr;
-    BOOL _mtcStatusDataAvailable;
-    unsigned long _mtcStatusNumEventsInMem;
-    BOOL _resetFifoOnStart;
+    int tubRegister;
 
+    uint16_t mtca_thresholds[MTC_NUM_THRESHOLDS];
+    uint16_t mtca_baselines[MTC_NUM_THRESHOLDS];
+    float mtca_dac_per_nhit[MTC_NUM_THRESHOLDS]; //Let the ESUMs have a conversion in case we ever need it
+    float mtca_dac_per_mV[MTC_NUM_THRESHOLDS];
+    BOOL mtca_conversion_is_valid[MTC_NUM_THRESHOLDS];
     RedisClient *mtc;
 }
+
+@property (nonatomic,assign) uint16_t lockoutWidth;
+@property (nonatomic,assign) uint16_t pedestalWidth;
+@property (nonatomic,assign) float    pgtRate;
+@property (nonatomic,assign) int      fineDelay;
+@property (nonatomic,assign) int      coarseDelay;
+@property (nonatomic,assign) uint32_t gtMask;
+@property (nonatomic,assign) uint16_t prescaleValue;
+@property (nonatomic,assign) uint32_t GTCrateMask;
+@property (nonatomic,assign) uint32_t pedCrateMask;
 
 @property (nonatomic,assign) BOOL isPulserFixedRate;
 @property (nonatomic,assign) unsigned long fixedPulserRateCount;
 @property (nonatomic,assign) float fixedPulserRateDelay;
+
 @property (nonatomic,assign) unsigned long mtcaN100Mask;
 @property (nonatomic,assign) unsigned long mtcaN20Mask;
 @property (nonatomic,assign) unsigned long mtcaEHIMask;
@@ -96,19 +133,12 @@
 @property (nonatomic,assign) unsigned long mtcaOELOMask;
 @property (nonatomic,assign) unsigned long mtcaOEHIMask;
 @property (nonatomic,assign) unsigned long mtcaOWLNMask;
-@property (nonatomic,assign) unsigned long dataId;
-@property (nonatomic,assign) unsigned long mtcStatusDataId;
-@property (nonatomic,assign) unsigned long mtcStatusGTID;
-@property (nonatomic,assign) double mtcStatusGTIDRate;
-@property (nonatomic,assign) unsigned long long mtcStatusCnt10MHz;
-@property (nonatomic,copy) NSString* mtcStatusTime10Mhz;
-@property (nonatomic,assign) unsigned long mtcStatusReadPtr;
-@property (nonatomic,assign) unsigned long mtcStatusWritePtr;
-@property (nonatomic,assign) BOOL mtcStatusDataAvailable;
-@property (nonatomic,assign) unsigned long mtcStatusNumEventsInMem;
 @property (nonatomic,assign) BOOL isPedestalEnabledInCSR;
-@property (nonatomic,assign) BOOL resetFifoOnStart;
 @property (nonatomic,assign) BOOL pulserEnabled;
+
+// The TUB register is no longer used in SNO+
+// but maybe someday it will be. So I'll leave it in here.
+@property (nonatomic,assign) int tubRegister;
 
 #pragma mark •••Initialization
 - (id) init;
@@ -124,20 +154,18 @@
 
 - (void) registerNotificationObservers;
 - (int) initAtRunStart: (int) loadTriggers;
+- (void) detectorStateChanged:(NSNotification*)aNote;
+
+// DB Access
+- (void) getLatestTriggerScans;
+- (void) updateTriggerThresholds;
+
+- (int) triggerScanNameToIndex:(NSString*) name;
+- (void) waitForTriggerScan: (ORPQResult *) result;
+- (void) waitForThresholds: (ORPQResult *) result;
 
 #pragma mark •••Accessors
-- (int) eSumViewType;
-- (void) setESumViewType:(int)aESumViewType;
-- (int) nHitViewType;
-- (void) setNHitViewType:(int)aNHitViewType;
-- (NSString*) xilinxFilePath;
-- (void) setXilinxFilePath:(NSString*)aDefaultFile;
-- (NSString*) defaultFile;
-- (void) setDefaultFile:(NSString*)aDefaultFile;
-- (NSString*) lastFile;
-- (void) setLastFile:(NSString*)aLastFile;
-- (NSString*) lastFileLoaded;
-- (void) setLastFileLoaded:(NSString*)aLastFile;
+- (RedisClient *) mtc;
 - (BOOL) basicOpsRunning;
 - (void) setBasicOpsRunning:(BOOL)aBasicOpsRunning;
 - (BOOL) autoIncrement;
@@ -154,38 +182,42 @@
 - (void) setMemoryOffset:(unsigned long)aMemoryOffset;
 - (int) selectedRegister;
 - (void) setSelectedRegister:(int)aSelectedRegister;
-- (NSMutableDictionary*) mtcDataBase;
-- (id) dbObjectByName:(NSString*)aKey;
-- (void) setMtcDataBase:(NSMutableDictionary*)aNestedDictionary;
 - (unsigned long) memBaseAddress;
 - (unsigned long) memAddressModifier;
 - (unsigned long) baseAddress;
 
-- (short) dbLookTableSize;
-- (NSString*) getDBKeyByIndex:(short) anIndex;
-- (NSString*) getDBDefaultByIndex:(short) anIndex;
-- (id) dbObjectByIndex:(int)anIndex;
-- (void) setDbLong:(long) aValue forIndex:(int)anIndex;
-- (void) setDbFloat:(float) aValue forIndex:(int)anIndex;
-- (void) setDbObject:(id) anObject forIndex:(int)anIndex;
-- (float) dbFloatByIndex:(int)anIndex;
-- (int) dbIntByIndex:(int)anIndex;
-- (int) dacValueByIndex:(short)anIndex;
+- (float) getThresholdOfType:(int) type inUnits:(int) units;
+- (void) setThresholdOfType:(int) type fromUnits: (int) units toValue:(float) aThreshold;
+
+- (uint16_t) getBaselineOfType:(int) type;
+- (void) setBaselineOfType:(int) type toValue:(uint16_t) _val;
+
+- (float) dacPerNHit:(int) type;
+- (void) setDacPerNHit:(int) type toValue:(float) _val;
+
+- (float) DacPerMilliVoltOfType:(int) type;
+- (void) setDacPerMilliVoltOfType:(int) type toValue:(float) _val;
+
+- (BOOL) ConversionIsValidForThreshold:(int) type;
+- (void) setConversionIsValidForThreshold:(int) type isValid:(BOOL) _val;
+
+
+- (NSString*) stringForThreshold:(int) threshold_index;
+- (id) objectFromSerialization: (NSMutableDictionary*) serial withKey:(NSString*)str;
+- (void) loadFromSerialization:(NSMutableDictionary*) serial;
+- (NSMutableDictionary*) serializeToDictionary;
+
+- (BOOL) thresholdIndexIsValid:(int) index;
+- (BOOL) thresholdIsNHit:(int) index;
 
 #pragma mark •••Converters
-- (unsigned long) mVoltsToRaw:(float) mVolts;
-- (float) rawTomVolts:(long) aRawValue;
-- (float) mVoltsToNHits:(float) mVolts dcOffset:(float)dcOffset mVperNHit:(float)mVperNHit;
-- (float) NHitsTomVolts:(float) NHits dcOffset:(float)dcOffset mVperNHit:(float)mVperNHit;
-- (long) NHitsToRaw:(float) NHits dcOffset:(float)dcOffset mVperNHit:(float)mVperNHit;
-- (float) mVoltsTopC:(float) mVolts dcOffset:(float)dcOffset mVperpC:(float)mVperp;
-- (float) pCTomVolts:(float) pC dcOffset:(float)dcOffset mVperpC:(float)mVperp;
-- (long) pCToRaw:(float) pC dcOffset:(float)dcOffset mVperpC:(float)mVperp;
+- (float) convertThreshold:(float)aThreshold OfType:(int) type fromUnits:(int)in_units toUnits:(int) out_units;
+- (int) server_index_to_model_index:(int) server_index;
+- (int) model_index_to_server_index:(int) model_index;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
-- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 
 #pragma mark •••HW Access
 - (BOOL) adapterIsSBC;
@@ -195,45 +227,32 @@
 - (void) write:(int)aReg value:(uint32_t)aValue;
 - (void) setBits:(int)aReg mask:(uint32_t)aMask;
 - (void) clrBits:(int)aReg mask:(uint32_t)aMask;
-- (unsigned long) getMTC_CSR;
-- (unsigned long) getMTC_GTID;
-- (unsigned long) getMTC_PedWidth;
-- (unsigned long) getMTC_CoarseDelay;
-- (unsigned long) getMTC_FineDelay;
 - (void) sendMTC_SoftGt;
 - (void) sendMTC_SoftGt:(BOOL) setGTMask;
-- (void) initializeMtc:(BOOL) loadTheMTCXilinxFile load10MHzClock:(BOOL) loadThe10MHzClock;
+- (void) initializeMtc;
 - (void) initializeMtcDone;
+- (void) server_init;
 - (void) clearGlobalTriggerWordMask;
 - (void) setGlobalTriggerWordMask;
-- (unsigned long) getMTC_GTWordMask;
+- (uint32_t) getGTMaskFromHardware;
 - (void) setSingleGTWordMask:(unsigned long) gtWordMask;
 - (void) clearSingleGTWordMask:(unsigned long) gtWordMask;
 - (void) clearPedestalCrateMask;
-- (long) getPedestalCrateMask;
-- (void) setPedestalCrateMask;
 - (void) clearGTCrateMask;
-- (void) setGTCrateMask;
-- (unsigned long) getGTCrateMask;
+- (uint32_t) getGTCrateMaskFromHardware;
+- (void) loadPedestalCrateMaskToHardware;
+- (void) loadGTCrateMaskToHardware;
 - (void) clearTheControlRegister;
 - (void) resetTheMemory;
 - (void) setTheGTCounter:(unsigned long) theGTCounterValue;
 - (void) zeroTheGTCounter;
-- (void) setMtcTime;
-- (double) get10MHzSeconds;
-- (unsigned long) getMtcTime;
-- (void) setThe10MHzCounterLow:(unsigned long) lowerValue high:(unsigned long) upperValue;
-- (void) getThe10MHzCounterLow:(unsigned long*) lowerValue high:(unsigned long*) upperValue;
-- (void) setTheLockoutWidth:(unsigned short) theLockoutWidthValue;
-- (void) setThePedestalWidth:(unsigned short) thePedestalWidthValue;
-- (void) setThePrescaleValue;
-- (void) setupPulseGTDelaysCoarse:(unsigned short) theCoarseDelay fine:(unsigned short) theAddelValue;
-- (void) setupGTCorseDelay:(unsigned short) theCoarseDelay;
-- (void) setupGTCorseDelay;
-- (void) setupGTFineDelay:(unsigned short) theAddelValue;
-- (void) setupGTFineDelay;
-- (float) getThePulserRate;
-- (void) setThePulserRate:(float) pulserRate;
+- (void) setThe10MHzCounter:(uint64_t) newValue;
+- (void) loadPrescaleValueToHardware;
+- (void) loadCoarseDelayToHardware;
+- (void) loadFineDelayToHardware;
+- (void) loadPulserRateToHardware;
+- (void) loadLockOutWidthToHardware;
+- (void) loadPedWidthToHardware;
 - (void) enablePulser;
 - (void) disablePulser;
 - (void) enablePedestal;
@@ -246,10 +265,10 @@
 - (void) stopMTCPedestalsFixedTime;
 - (void) firePedestals:(unsigned long) count withRate:(float) rate;
 - (void) basicMTCReset;
+- (void) validateMTCADAC:(uint16_t) dac_value;
 - (void) loadTheMTCADacs;
 - (void) loadMTCXilinx;
-- (void) setTubRegister;
-- (void) load10MHzClock;
+- (void) loadTubRegister;
 
 - (void) mtcatResetMtcat:(unsigned char) mtcat;
 - (void) mtcatResetAll;
@@ -261,24 +280,17 @@
 - (void) readBasicOps;
 - (void) writeBasicOps;
 - (void) stopBasicOps;
-- (void) reportStatus;
-
-//Extra getter functions
--(NSMutableDictionary*) get_MTCDataBase;
-
-#pragma mark •••Settings
-- (void) saveSet:(NSString*)filePath;
-- (void) loadSet:(NSString*)filePath;
 @end
-
-
-
-extern NSString* ORMTCModelESumViewTypeChanged;
-extern NSString* ORMTCModelNHitViewTypeChanged;
-extern NSString* ORMTCModelDefaultFileChanged;
-extern NSString* ORMTCModelLastFileChanged;
-extern NSString* ORMTCModelLastFileLoadedChanged;
+extern NSString* GTMaskSerializationString;
+extern NSString* PulserRateSerializationString;
+extern NSString* PGT_PED_Mode_SerializationString;
+extern NSString* PulserEnabledSerializationString;
+extern NSString* PrescaleValueSerializationString;
+extern NSString* ORMTCSettingsChanged;
 extern NSString* ORMTCModelBasicOpsRunningChanged;
+extern NSString* ORMTCABaselineChanged;
+extern NSString* ORMTCAThresholdChanged;
+extern NSString* ORMTCAConversionChanged;
 extern NSString* ORMTCModelAutoIncrementChanged;
 extern NSString* ORMTCModelUseMemoryChanged;
 extern NSString* ORMTCModelRepeatDelayChanged;
@@ -286,8 +298,6 @@ extern NSString* ORMTCModelRepeatCountChanged;
 extern NSString* ORMTCModelWriteValueChanged;
 extern NSString* ORMTCModelMemoryOffsetChanged;
 extern NSString* ORMTCModelSelectedRegisterChanged;
-extern NSString* ORMTCModelXlinixPathChanged;
-extern NSString* ORMTCModelMtcDataBaseChanged;
 extern NSString* ORMTCModelIsPulserFixedRateChanged;
 extern NSString* ORMTCModelFixedPulserRateCountChanged;
 extern NSString* ORMTCModelFixedPulserRateDelayChanged;
@@ -298,3 +308,6 @@ extern NSString* ORMTCSettingsLock;
 extern NSString* ORMTCTriggersLock;
 extern NSString* ORMTCModelMTCAMaskChanged;
 extern NSString* ORMTCModelIsPedestalEnabledInCSR;
+extern NSString* ORMTCPulserRateChanged;
+extern NSString* ORMTCGTMaskChanged;
+extern NSString* LockOutWidthSerializationString;

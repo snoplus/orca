@@ -92,6 +92,11 @@
     IBOutlet NSTextField*           monPollCMOSRatesMaskField; 
     IBOutlet NSTextField*           monPollPMTCurrentsMaskField; 
     IBOutlet NSTextField*           monPollFECVoltagesMaskField;
+
+    IBOutlet NSTextField *pollRunStateLabel;
+    IBOutlet NSButton *pollNowButton;
+    IBOutlet NSButton *startPollButton;
+    IBOutlet NSButton *stopPollButton;
     IBOutlet NSPopUpButton*         monPollingRatePU;
     IBOutlet NSButton*              monIsPollingVerboseButton;
     IBOutlet NSButton*              monIsPollingWithRunButton;
@@ -111,6 +116,7 @@
     IBOutlet NSButton* monVltThresholdInInitButton;
     IBOutlet NSButton* monVltThresholdSetButton;
     //hv
+    IBOutlet NSTextField *hvRunStateLabel;
     IBOutlet NSButtonCell *hvAcceptReadbackButton;
     IBOutlet NSButton *hvOnButton;
     IBOutlet NSButton *hvOffButton;
@@ -119,6 +125,8 @@
     IBOutlet NSButton *hvRampToTargetButton;
     IBOutlet NSButton *hvRampDownButton;
     IBOutlet NSButton *hvStopRampButton;
+    IBOutlet NSButton *loadNominalSettingsButton;
+    IBOutlet NSButton *hvTriggersButton;
     IBOutlet NSTextField *hvRelayMaskLowField;
     IBOutlet NSTextField *hvRelayMaskHighField;
     IBOutlet NSTextField *hvRelayStatusField;
@@ -183,6 +191,9 @@
 #pragma mark •••Interface Management
 - (void) xl3LockChanged:(NSNotification*)aNotification;
 - (void) opsRunningChanged:(NSNotification*)aNote;
+- (void) keyDown:(NSEvent*)event;
+- (void) cancelOperation:(id)sender;
+
 //basic ops
 - (void) selectedRegisterChanged:(NSNotification*)aNote;
 - (void) repeatCountChanged:(NSNotification*)aNote;
@@ -292,7 +303,7 @@
 - (IBAction)hvRelayMaskMatrixAction:(id)sender;
 - (IBAction)hvRelaySetAction:(id)sender;
 - (IBAction)hvRelayOpenAllAction:(id)sender;
-- (IBAction)hvCheckInterlockAction:(id)sender;
+- (IBAction)hvCheckInterlockRelaysAction:(id)sender;
 - (IBAction)hvTurnOnAction:(id)sender;
 - (IBAction)hvTurnOffAction:(id)sender;
 - (IBAction)hvAcceptReadback:(id)sender;
@@ -306,8 +317,8 @@
 - (IBAction)hvRampDownAction:(id)sender;
 - (IBAction)hvRampPauseAction:(id)sender;
 - (IBAction)hvPanicAction:(id)sender;
-- (IBAction)hvTriggerOffAction:(id)sender;
-- (IBAction)hvTriggerOnAction:(id)sender;
+- (IBAction)hvTriggerAction:(id)sender;
+- (IBAction)loadNominalSettingsAction:(id)sender;
 
 //connection
 - (IBAction) toggleConnectAction:(id)sender;

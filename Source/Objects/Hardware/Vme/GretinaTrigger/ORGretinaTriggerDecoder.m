@@ -18,7 +18,7 @@
 //-------------------------------------------------------------
 
 
-#import "ORGretinaTriggerDecoder.h"
+#import "ORGretinatriggerDecoder.h"
 #import "ORDataPacket.h"
 #import "ORDataSet.h"
 

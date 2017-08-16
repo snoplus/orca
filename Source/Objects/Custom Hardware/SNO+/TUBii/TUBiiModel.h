@@ -70,10 +70,12 @@ typedef NS_OPTIONS(uint32_t, TRIG_MASK)
     Smellie = 1<<23,
     GT = 1<<24
 };
+
 struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of TUBii's state at once.
     float smellieRate;
     float tellieRate;
     float pulserRate;
+    float TUBiiPGT_Rate;
     float smelliePulseWidth;
     float telliePulseWidth;
     float pulserPulseWidth;
@@ -92,9 +94,12 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
     uint32_t syncTrigMask;
     uint32_t asyncTrigMask;
     CONTROL_REG_MASK controlReg;
+    NSUInteger MTCAMimic1_ThresholdInBits;
     BOOL CounterMode;
 };
+
 @interface TUBiiModel : OrcaObject{
+@private
     float smellieRate;
     float tellieRate;
     float pulserRate;
@@ -109,12 +114,16 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
     RedisClient *connection;
     int portNumber;
     NSString* strHostName;//"192.168.80.25";
+    NSThread* _keepAliveThread;
+@public
+    struct TUBiiState currentModelState;
 }
 @property (readonly) BOOL solitaryObject; //Prevents there from being two TUBiis
 @property (nonatomic) int portNumber;
 @property (nonatomic,retain) NSString* strHostName;
 @property (nonatomic) NSUInteger smellieDelay;
 @property (nonatomic) NSUInteger tellieDelay;
+@property (nonatomic) float TUBiiPGT_Rate;
 @property (nonatomic) NSUInteger genericDelay;
 @property (nonatomic) NSUInteger MTCAMimic1_ThresholdInBits;
 @property (nonatomic) float MTCAMimic1_ThresholdInVolts;
@@ -133,7 +142,7 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
 @property (nonatomic) BOOL TUBiiIsDefaultClock;
 @property (nonatomic) BOOL TUBiiIsLOSrc;
 @property (nonatomic) BOOL CounterMode;
-@property (nonatomic) struct TUBiiState CurrentState; //Get/Sets a struct that fully specifies TUBii's Current state
+@property (nonatomic,retain) NSThread* keepAliveThread;
 
 #pragma mark •••Initialization
 - (id) init;
@@ -142,6 +151,7 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
 - (void) makeMainController;
 - (void) encodeWithCoder:(NSCoder *)aCoder;
 - (void) dealloc;
+- (void) awakeAfterDocumentLoaded;
 - (BOOL) solitaryObject;
 
 - (float) ConvertBitsToValue:(NSUInteger)bits NBits: (int) nBits MinVal: (float) minVal MaxVal: (float) maxVal;
@@ -153,10 +163,17 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
 - (float) MTCAMimic_BitsToVolts: (NSUInteger) BitValue;
 - (void) Initialize;
 - (void) Ping;
+- (struct TUBiiState) currentModelState;
+- (NSMutableDictionary*) serializeToDictionary;
+- (bool) sendCurrentModelStateToHW;
+- (void) loadFromSerialization:(NSMutableDictionary*)settingsDict;
 - (void) setTrigMask:(NSUInteger)trigMask setAsyncMask:(NSUInteger)asyncMask;
+- (void) setTrigMaskInState:(NSUInteger)trigMask setAsyncMask:(NSUInteger)asyncMask;
 - (void) setBurstTrigger;
 - (void) setComboTrigger_EnableMask:(uint32_t) enableMask TriggerMask:(uint32_t) triggerMask;
 - (void) setPrescaleTrigger_Mask: (uint32_t) mask ByFactor:(uint32_t) factor;
+- (void) setTUBiiPGT_Rate: (float) rate;
+- (void) setTUBiiPGT_RateInState: (float) rate;
 - (void) setSmellieRate: (float) _rate;
 - (void) setTellieRate: (float) _rate;
 - (void) setPulserRate: (float) _rate;
@@ -168,6 +185,7 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
 - (void) setNPulses: (int) _NPulses;
 - (void) fireSmelliePulser;
 - (void) fireTelliePulser;
+- (void) setTellieMode: (BOOL) _tellieMode;
 - (void) firePulser;
 - (void) stopSmelliePulser;
 - (void) stopTelliePulser;
@@ -177,8 +195,20 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
 - (void) firePulser_rate: (float)rate pulseWidth:(double)_pulseWidth NPulses:(int)_NPulses;
 - (void) setDataReadout: (BOOL) val;
 - (void) ResetFifo;
--(void) setCaenMasks: (CAEN_CHANNEL_MASK)aChannelMask
-            GainMask:(CAEN_GAIN_MASK) aGainMask;
+- (void) setCaenMasks: (CAEN_CHANNEL_MASK)aChannelMask
+             GainMask:(CAEN_GAIN_MASK) aGainMask;
+- (void) setCaenMasksInState: (CAEN_CHANNEL_MASK)aChannelMask
+             GainMask:(CAEN_GAIN_MASK) aGainMask;
+- (void) setSpeakerMask:(NSUInteger)_counterMask;
+- (void) setSpeakerMaskInState:(NSUInteger)_counterMask;
+- (void) setCounterMask:(NSUInteger)_counterMask;
+- (void) setCounterMaskInState:(NSUInteger)_counterMask;
+- (void) setControlRegInState:(CONTROL_REG_MASK)_controlReg;
+- (void) setCounterModeInState:(BOOL)mode;
+- (void) setMTCAMimic1_ThresholdInBitsInState:(NSUInteger)_MTCAMimic1_ThresholdInBits;
+- (void) setGTDelaysBitsInState:(NSUInteger)aDGTMask LOBits:(NSUInteger)aLOMask;
+- (void) setTUBiiIsLOSrcInState:(BOOL)isSrc;
+- (void) setTUBiiIsDefaultClockInState: (BOOL) IsDefault;
 - (void) ResetClock;
 - (void) setGTDelaysBits:(NSUInteger)aDGTMask LOBits:(NSUInteger)aLOMask;
 - (void) setGTDelaysInNS:(int)DGT LOValue:(int)LO;
@@ -192,6 +222,10 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
                                    CounterLZBOn: (bool) LZB
                                   CounterTestOn: (bool) TestMode
                                CounterInhibitOn: (bool) Inhibit;
+-(void)activateKeepAlive;
+-(void)pulseKeepAlive:(id)passed;
+-(void)killKeepAlive;
 @end
 
-extern NSString* ORTubiiLock;
+extern NSString* ORTubiiLockNotification;
+extern NSString* ORTubiiSettingsChangedNotification;

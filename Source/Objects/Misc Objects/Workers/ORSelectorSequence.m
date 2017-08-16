@@ -148,7 +148,6 @@ NSString* ORSequenceStopped  = @"ORSequenceStopped";
 	@catch(NSException* localException) {
 		NSLog(@"Task sequence aborted because of exception: %@\n",localException);
 		[self stopSequence];
-		[localException raise];
 	}
 }
 @end

@@ -26,7 +26,7 @@
 @class OR1dFitController;
 @class ORFFTController;
 
-@interface ORWaveformController : ORDataController<ORFastPlotDataSourceMethods> {
+@interface ORWaveformController : ORDataController<ORFastPlotDataSourceMethods> { //-tb- 2016-11-10 removed <ORFastPlotDataSourceMethods> as it broke KATRIN waveform plots (they need startIndex!) -tb- 
 	IBOutlet NSView*		roiView;
 	IBOutlet NSView*		fitView;
 	IBOutlet NSView*		fftView;
@@ -57,3 +57,56 @@
 - (NSUInteger) plotter:(id)aPlot indexRange:(NSRange)aRange stride:(NSUInteger)stride x:(NSMutableData*)x y:(NSMutableData*)y;
 - (NSMutableArray*) roiArrayForPlotter:(id)aPlot;
 @end
+
+
+
+
+
+
+
+
+
+//------------------------------------------------------------------------------------------------------------------------------------
+//2017-02-15 -tb- added ORBasicWaveformController to force using the 'slow' plotting methods for KATRIN waveforms (required to take the offset index into account)
+// added here for testing, will be moved to own source file after testing -tb-
+
+
+
+
+
+
+
+@interface ORBasicWaveformController : ORDataController { //<ORFastPlotDataSourceMethods> -tb- 2016-11-10 removed <ORFastPlotDataSourceMethods> as it broke KATRIN waveform plots (they need startIndex!) -tb- 
+	IBOutlet NSView*		roiView;
+	IBOutlet NSView*		fitView;
+	IBOutlet NSView*		fftView;
+	IBOutlet NSButton*		useUnsignedValuesButton;
+	id						calibrationPanel;				
+    OR1dRoiController*		roiController;
+	OR1dFitController*		fitController;
+	ORFFTController*		fftController;
+}
+
+#pragma mark ¥¥¥Initialzation
+- (id)init;
+- (void) awakeFromNib;
+
+#pragma mark ¥¥¥Notifications
+- (void) useUnsignedValuesChanged:(NSNotification*)aNote;
+
+#pragma mark ¥¥¥Actions
+- (IBAction) useUnsignedValuesAction:(id)sender;
+- (IBAction) calibrate:(id)sender;
+
+#pragma mark ¥¥¥Data Source
+- (BOOL) useUnsignedValues;
+- (void) plotOrderDidChange:(id)aPlotView;
+- (BOOL) plotterShouldShowRoi:(id)aPlot;
+- (int) numberPointsInPlot:(id)aPlot;
+- (void) plotter:(id)aPlot index:(int)index x:(double*)x y:(double*)y;
+//- (NSUInteger) plotter:(id)aPlot indexRange:(NSRange)aRange stride:(NSUInteger)stride x:(NSMutableData*)x y:(NSMutableData*)y;
+- (NSMutableArray*) roiArrayForPlotter:(id)aPlot;
+@end
+
+
+

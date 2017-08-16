@@ -22,6 +22,7 @@
 #import "ORSNOCard.h"
 #import "PacketTypes.h"
 #import "SNOPModel.h"
+#import "ORPQResult.h"
 
 typedef struct  {
 	NSString*	regName;
@@ -118,8 +119,6 @@ enum {
     BOOL hvBNeedsUserIntervention;
     BOOL isLoaded; //Whether the experiment is open or not (false to start, false at end)
     
-    
-    NSString* triggerStatus;
     BOOL _isTriggerON;
     
     unsigned long _hvNominalVoltageA;
@@ -178,6 +177,8 @@ enum {
 
     bool initialized;
     bool stateUpdated;
+
+    BOOL changingPedMask;
 }
 
 @property (nonatomic,assign) unsigned long xl3MegaBundleDataId;
@@ -210,7 +211,6 @@ enum {
 @property (nonatomic,copy) NSString* relayStatus;
 @property (nonatomic,assign) BOOL hvASwitch;
 @property (nonatomic,assign) BOOL hvBSwitch;
-@property (nonatomic,copy) NSString* triggerStatus;
 @property (nonatomic,assign) BOOL isTriggerON;
 //ADC counts (3kV 12bit)
 @property (nonatomic,assign) unsigned long hvAVoltageDACSetValue;
@@ -288,9 +288,13 @@ enum {
 - (void) connectionStateChanged;
 - (void) documentLoaded;
 - (void) documentClosed;
+- (void) detectorStateChanged:(NSNotification*)aNote;
 - (int) initAtRunStart;
+- (void) zeroPedestalMasksAtRunStart;
 
 #pragma mark •••Accessors
+- (BOOL) isTriggerON;
+- (void) setIsTriggerON: (BOOL) isTriggerON;
 - (bool) initialized;
 - (bool) stateUpdated;
 - (NSString*) shortName;
@@ -335,10 +339,10 @@ enum {
 - (void) setSelectedRegister:(int)aSelectedRegister;
 - (NSString*) xl3LockName;
 - (NSComparisonResult) XL3NumberCompare:(id)aCard;
-
 + (void) setOwlSupplyOn:(BOOL)isOn;
 + (BOOL) owlSupplyOn;
 - (BOOL) isOwlCrate;
+- (BOOL) changingPedMask;
 
 #pragma mark •••DB Helpers
 - (void) synthesizeDefaultsIntoBundle:(MB*)aBundle forSlot:(unsigned short)aSlot;
@@ -357,6 +361,13 @@ enum {
 - (void)encodeWithCoder:(NSCoder*)encoder;
 
 #pragma mark •••Hardware Access
+- (void) nominalSettingsCallback: (ORPQResult *) result;
+- (void) loadNominalSettings;
+- (void) _loadTriggersAndSequencers;
+- (void) loadTriggersAndSequencers;
+- (void) loadTriggers;
+- (void) disableTriggers;
+- (void) loadSequencers;
 - (void) selectCards:(unsigned long) selectBits;
 - (void) deselectCards;
 - (void) select:(ORSNOCard*) aCard;
@@ -396,6 +407,8 @@ enum {
 - (void) writeXl3Mode: (uint32_t) mode withSlotMask: (uint32_t) slotMask;
 - (void) compositeXl3RW;
 - (void) compositeQuit;
+- (int) setPedestals;
+- (int) multiSetPedestalMask: (uint32_t) slotMask patterns: (uint32_t[16]) patterns;
 - (int) setPedestalMask: (uint32_t) slotMask pattern: (uint32_t) pattern;
 - (void) compositeSetPedestal;
 - (void) setPedestalInParallel;
@@ -430,6 +443,7 @@ enum {
 
 - (void) setHVRelays:(unsigned long long)relayMask error:(unsigned long*)aError;
 - (void) setHVRelays:(unsigned long long)relayMask;
+- (void) readHVRelays:(uint64_t*) relayMask isKnown:(BOOL*)isKnown;
 - (void) closeHVRelays;
 - (void) openHVRelays;
 
@@ -437,12 +451,14 @@ enum {
 - (void) readHVSwitchOnForA:(BOOL*)aIsOn forB:(BOOL*)bIsOn;
 - (void) readHVSwitchOn;
 
+- (uint32_t) checkRelays:(uint64_t)relays;
+- (BOOL) isHVAdvisable:(unsigned char) sup;
 
 + (bool) requestHVParams:(ORXL3Model *)model;
 - (void) safeHvInit;
 - (void) setHVSwitch:(BOOL)aOn forPowerSupply:(unsigned char)sup;
+- (void) _hvPanicDown;
 - (void) hvPanicDown;
-- (void) hvMasterPanicDown;
 - (void) hvTriggersON;
 - (void) hvTriggersOFF;
 - (void) readHVInterlockGood:(BOOL*)isGood;

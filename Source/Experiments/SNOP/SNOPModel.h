@@ -23,11 +23,12 @@
 #import "ORExperimentModel.h"
 #import "ORVmeCardDecoder.h"
 #import "RedisClient.h"
+#import "ECARun.h"
+#import "NHitMonitor.h"
 
-@class ORDataPacket;
-@class ORDataSet;
 @class ORCouchDB;
 @class ORRunModel;
+@class ORPingTask;
 
 @protocol snotDbDelegate <NSObject>
 @required
@@ -41,11 +42,12 @@
 #define kUsePSUPView	2
 #define kNumTubes	20 //XL3s
 #define kNumOfCrates 19 //number of Crates in SNO+
+#define STANDARD_RUN_VERSION 2 //Increase if Standard Runs table structure is changed
+
+BOOL isNotRunningOrIsInMaintenance();
 
 @interface SNOPModel: ORExperimentModel <snotDbDelegate>
 {
-	int viewType;
-
     NSString* _orcaDBUserName;
     NSString* _orcaDBPassword;
     NSString* _orcaDBName;
@@ -53,20 +55,18 @@
     NSString* _orcaDBIPAddress;
     NSMutableArray* _orcaDBConnectionHistory;
     NSUInteger _orcaDBIPNumberIndex;
-    NSTask*	_orcaDBPingTask;
+    ORPingTask*	_orcaDBPingTask;
     
     NSString* _debugDBUserName;
     NSString* _debugDBPassword;
     NSString* _debugDBName;
     NSString* _smellieRunNameLabel;
+    NSString* _tellieRunNameLabel;
     unsigned int _debugDBPort;
     NSString* _debugDBIPAddress;
     NSMutableArray* _debugDBConnectionHistory;
     NSUInteger _debugDBIPNumberIndex;
-    NSTask*	_debugDBPingTask;
-    
-    unsigned long	_epedDataId;
-    unsigned long	_rhdrDataId;
+    ORPingTask*	_debugDBPingTask;
     
     struct {
         unsigned long coarseDelay;
@@ -78,31 +78,22 @@
         unsigned long nTSlopePoints;
     } _epedStruct;
     
-    struct {
-        unsigned long date;
-        unsigned long time;
-        unsigned long daqCodeVersion;
-        unsigned long runNumber;
-        unsigned long calibrationTrialNumber;
-        unsigned long sourceMask;
-        unsigned long long runMask;
-        unsigned long gtCrateMask;
-    } _rhdrStruct;
-    
-
     NSDictionary* _runDocument;
     NSDictionary* _configDocument;
     NSDictionary* _mtcConfigDoc;
     NSMutableDictionary* _runTypeDocumentPhysics;
-    NSMutableDictionary* smellieRunFiles;
+    NSMutableDictionary* _smellieRunFiles;
+    NSMutableDictionary* _tellieRunFiles;
     
     bool _smellieDBReadInProgress;
     bool _smellieDocUploaded;
-    NSString * standardRunType;
-    NSString * standardRunVersion;
-    NSString * lastStandardRunType;
-    NSString * lastStandardRunVersion;
-    
+    NSMutableDictionary* standardRunCollection;
+    NSString* standardRunType;
+    NSString* standardRunVersion;
+    NSString* lastStandardRunType;
+    NSString* lastStandardRunVersion;
+    NSNumber* standardRunTableVersion;
+
     bool rolloverRun;
 
     NSString *mtcHost;
@@ -117,28 +108,42 @@
     NSString *logHost;
     int logPort;
 
+    /* Nhit Monitor Settings. */
+    NHitMonitor *nhitMonitor;
+    int nhitMonitorCrate;
+    int nhitMonitorPulserRate;
+    int nhitMonitorNumPulses;
+    int nhitMonitorMaxNhit;
+    /* Settings for running the nhit monitor automatically during runs. */
+    BOOL nhitMonitorAutoRun;
+    int nhitMonitorAutoPulserRate;
+    int nhitMonitorAutoNumPulses;
+    int nhitMonitorAutoMaxNhit;
+    NSTimer *nhitMonitorTimer;
+    uint32_t nhitMonitorRunType;
+    uint32_t nhitMonitorCrateMask;
+    NSTimeInterval nhitMonitorTimeInterval;
+
+    NSLock *ecaLock;
+
     RedisClient *mtc_server;
     RedisClient *xl3_server;
 
     int state;
     int start;
     bool resync;
+    bool waitingForBuffers;     // flag indicates we are waiting for our buffers to empty
 
     @private
         //Run type word
         unsigned long runTypeWord;
         unsigned long lastRunTypeWord;
         NSString* lastRunTypeWordHex;
-        //ECA stuff
-        int ECA_pattern;
-        NSString* ECA_type;
-        int ECA_tslope_pattern;
-        int ECA_nevents;
-        NSNumber* ECA_rate;
-    
+        ECARun* anECARun;
 }
 
 @property (nonatomic,retain) NSMutableDictionary* smellieRunFiles;
+@property (nonatomic,retain) NSMutableDictionary* tellieRunFiles;
 
 @property (nonatomic,copy) NSString* orcaDBUserName;
 @property (nonatomic,copy) NSString* orcaDBPassword;
@@ -147,20 +152,18 @@
 @property (nonatomic,copy) NSString* orcaDBIPAddress;
 @property (nonatomic,retain) NSMutableArray* orcaDBConnectionHistory;
 @property (nonatomic,assign) NSUInteger orcaDBIPNumberIndex;
-@property (nonatomic,retain) NSTask* orcaDBPingTask;
+@property (nonatomic,retain) ORPingTask* orcaDBPingTask;
 
 @property (nonatomic,copy) NSString* debugDBUserName;
 @property (nonatomic,copy) NSString* debugDBPassword;
 @property (nonatomic,copy) NSString* debugDBName;
 @property (nonatomic,copy) NSString* smellieRunNameLabel;
+@property (nonatomic,copy) NSString* tellieRunNameLabel;
 @property (nonatomic,assign) unsigned int debugDBPort;
 @property (nonatomic,copy) NSString* debugDBIPAddress;
 @property (nonatomic,retain) NSMutableArray* debugDBConnectionHistory;
 @property (nonatomic,assign) NSUInteger debugDBIPNumberIndex;
-@property (nonatomic,retain) NSTask* debugDBPingTask;
-
-@property (nonatomic,assign) unsigned long epedDataId;
-@property (nonatomic,assign) unsigned long rhdrDataId;
+@property (nonatomic,retain) ORPingTask* debugDBPingTask;
 
 @property (nonatomic,assign) bool smellieDBReadInProgress;
 @property (nonatomic,assign) bool smellieDocUploaded;
@@ -173,6 +176,7 @@
 @property (nonatomic,assign) bool resync;
 
 - (id) init;
+- (void) awakeAfterDocumentLoaded;
 
 - (void) setMTCPort: (int) port;
 - (int) mtcPort;
@@ -196,15 +200,18 @@
 - (id) debugDBConnectionHistoryItem:(unsigned int)index;
 - (void) debugDBPing;
 
-- (void) taskFinished:(NSTask*)aTask;
+- (void) taskFinished:(ORPingTask*)aTask;
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
 
+- (void) pingCratesAtRunStart;
+- (NSLock *) ecaLock;
 - (void) pingCrates;
+- (void) runNhitMonitorAutomatically;
+- (void) runNhitMonitor;
+- (void) stopNhitMonitor;
 
 #pragma mark ��orcascript helpers
-- (BOOL) isNotRunningOrInMaintenance;
 - (void) zeroPedestalMasks;
-- (void) updatePedestalMasks:(unsigned int)pattern;
 - (void) hvMasterTriggersOFF;
 
 #pragma mark ¥¥¥Notifications
@@ -220,6 +227,8 @@
 
 - (void) subRunStarted:(NSNotification*)aNote;
 - (void) subRunEnded:(NSNotification*)aNote;
+- (void) detectorStateChanged:(NSNotification*)aNote;
+- (void) enableGlobalSecurity;
 
 - (void) updateEPEDStructWithCoarseDelay: (unsigned long) coarseDelay
                                fineDelay: (unsigned long) fineDelay
@@ -229,18 +238,41 @@
 - (void) updateEPEDStructWithStepNumber: (unsigned long) stepNumber;
 - (void) shipSubRunRecord;
 - (void) shipEPEDRecord;
-- (void) updateRHDRSruct;
-- (void) shipRHDRRecord;
+- (void) stillWaitingForBuffers;
+- (void) abortWaitingForBuffers;
 
 #pragma mark ¥¥¥Accessors
-- (void) setViewType:(int)aViewType;
-- (int) viewType;
+- (NHitMonitor *) nhitMonitor;
+- (int) nhitMonitorCrate;
+- (void) setNhitMonitorCrate: (int) crate;
+- (int) nhitMonitorPulserRate;
+- (void) setNhitMonitorPulserRate: (int) pulserRate;
+- (int) nhitMonitorNumPulses;
+- (void) setNhitMonitorNumPulses: (int) numPulses;
+- (int) nhitMonitorMaxNhit;
+- (void) setNhitMonitorMaxNhit: (int) maxNhit;
+- (int) nhitMonitorAutoRun;
+- (void) setNhitMonitorAutoRun: (BOOL) run;
+- (int) nhitMonitorAutoPulserRate;
+- (void) setNhitMonitorAutoPulserRate: (int) pulserRate;
+- (int) nhitMonitorAutoNumPulses;
+- (void) setNhitMonitorAutoNumPulses: (int) numPulses;
+- (int) nhitMonitorAutoMaxNhit;
+- (void) setNhitMonitorAutoMaxNhit: (int) maxNhit;
+- (uint32_t) nhitMonitorRunType;
+- (void) setNhitMonitorRunType: (uint32_t) runType;
+- (uint32_t) nhitMonitorCrateMask;
+- (void) setNhitMonitorCrateMask: (uint32_t) mask;
+- (NSTimeInterval) nhitMonitorTimeInterval;
+- (void) setNhitMonitorTimeInterval: (NSTimeInterval) interval;
+
 - (unsigned long) runTypeWord;
 - (void) setRunTypeWord:(unsigned long)aMask;
 - (unsigned long) lastRunTypeWord;
 - (void) setLastRunTypeWord:(unsigned long)aMask;
 - (NSString*) lastRunTypeWordHex;
 - (void) setLastRunTypeWordHex:(NSString*)aValue;
+- (NSMutableDictionary*) standardRunCollection;
 - (NSString*) standardRunType;
 - (void) setStandardRunType:(NSString*)aValue;
 - (NSString*) standardRunVersion;
@@ -249,60 +281,41 @@
 - (void) setLastStandardRunType:(NSString*)aValue;
 - (NSString*) lastStandardRunVersion;
 - (void) setLastStandardRunVersion:(NSString*)aValue;
-- (int) ECA_pattern;
-- (NSString*) ECA_type;
-- (int) ECA_tslope_pattern;
-- (int) ECA_nevents;
-- (NSNumber*) ECA_rate;
-- (void) setECA_pattern:(int)aValue;
-- (void) setECA_type:(NSString*)aValue;
-- (void) setECA_tslope_pattern:(int)aValue;
-- (void) setECA_nevents:(int)aValue;
-- (void) setECA_rate:(NSNumber*)aValue;
+- (NSNumber*) standardRunTableVersion;
 
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
-
-#pragma mark ¥¥¥Segment Group Methods
-- (void) makeSegmentGroups;
 
 #pragma mark ¥¥¥Specific Dialog Lock Methods
 - (NSString*) experimentMapLock;
 - (NSString*) experimentDetectorLock;
 - (NSString*) experimentDetailsLock;
 
-#pragma mark ¥¥¥DataTaker
-- (void) setDataIds:(id)assigner;
-- (void) syncDataIdsWith:(id)anotherObj;
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (NSDictionary*) dataRecordDescription;
-
 #pragma mark ¥¥¥SnotDbDelegate
 - (ORCouchDB*) orcaDbRef:(id)aCouchDelegate;
 - (ORCouchDB*) debugDBRef:(id)aCouchDelegate;
 - (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
 
-//smellie functions -------
+// smellie functions -------
 -(void) getSmellieRunFiles;
 
-//Standard runs functions
+// tellie functions -------
+-(void) getTellieRunFiles;
+
+// ECA
+-(ECARun*) anECARun;
+
+-(void) startECARunInParallel;
+
+// Standard runs functions
+-(BOOL) refreshStandardRunsFromDB;
+-(BOOL) startStandardRun:(NSString*)_standardRun withVersion:(NSString*)_standardRunVersion;
 -(BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
 -(BOOL) saveStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
 -(void) loadSettingsInHW;
+-(void) stopRun;
 
-@end
-
-@interface SNOPDecoderForRHDR : ORVmeCardDecoder {
-}
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
-- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
-@end
-
-@interface SNOPDecoderForEPED : ORVmeCardDecoder {
-}
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
-- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 @end
 
 extern NSString* ORSNOPModelOrcaDBIPAddressChanged;
@@ -310,6 +323,9 @@ extern NSString* ORSNOPModelDebugDBIPAddressChanged;
 extern NSString* ORSNOPRunTypeWordChangedNotification;
 extern NSString* SNOPRunTypeChangedNotification;
 extern NSString* ORSNOPRunsLockNotification;
-extern NSString* ORSNOPModelRunsECAChangedNotification;
+extern NSString* ORSNOPModelSRCollectionChangedNotification;
 extern NSString* ORSNOPModelSRChangedNotification;
 extern NSString* ORSNOPModelSRVersionChangedNotification;
+extern NSString* ORSNOPModelNhitMonitorChangedNotification;
+extern NSString* ORSNOPStillWaitingForBuffersNotification;
+extern NSString* ORSNOPNotWaitingForBuffersNotification;

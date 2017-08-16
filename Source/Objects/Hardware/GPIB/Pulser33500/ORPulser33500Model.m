@@ -182,7 +182,7 @@ NSString* ORPulser33500Lock							= @"ORPulser33500Lock";
 	else {
 		[self setCanChangeConnectionProtocol:YES];
 	}
-	NSArray* interfaces = [[self getUSBController] interfacesForVender:[self vendorID] product:[self productID]];
+	NSArray* interfaces = [[self getUSBController] interfacesForVenders:[self vendorIDs] products:[self productIDs]];
 	NSString* sn = serialNumber;
 	if([interfaces count] == 1 && ![sn length]){
 		sn = [[interfaces objectAtIndex:0] serialNumber];
@@ -248,14 +248,14 @@ NSString* ORPulser33500Lock							= @"ORPulser33500Lock";
 	return [NSString stringWithFormat:@"33500 Pulser (%d)",[self tag]];
 }
 
-- (unsigned long) vendorID
+- (NSArray*) vendorIDs
 {
-	return 0x0957;
+    return @[@0x0957,@0x0957];
 }
 
-- (unsigned long) productID
+- (NSArray*) productIDs
 {
-	return 0x2307;
+    return @[@0x2307,@0x2c07];
 }
 
 - (id) getUSBController
@@ -529,7 +529,7 @@ NSString* ORPulser33500Lock							= @"ORPulser33500Lock";
 
 - (NSArray*) usbInterfaces
 {
-	return [[self getUSBController]  interfacesForVender:[self vendorID] product:[self productID]];
+	return [[self getUSBController]  interfacesForVenders:[self vendorIDs] products:[self productIDs]];
 }
 
 - (NSString*) usbInterfaceDescription

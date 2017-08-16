@@ -251,11 +251,16 @@
                         object: nil];
 
 
-	[notifyCenter addObserver : self
+    [notifyCenter addObserver : self
                      selector : @selector(cmosRatesChanged:)
                          name : ORFec32ModelCmosRateChanged
-						object: nil];
-	
+                        object: nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(everythingChanged:)
+                         name : ORFec32ModelEverythingChanged
+                        object: nil];
+    
 }
 
 - (void) updateWindow
@@ -313,6 +318,13 @@
 }
 
 #pragma mark •••Interface Management
+- (void) everythingChanged:(NSNotification*)aNote
+{
+    if (model == [aNote object]) {
+        [self updateWindow];
+    }
+}
+
 - (void) updatePMTInfo:(NSNotification*)aNote
 {
 	int crate = [model crateNumber];
@@ -398,6 +410,26 @@
     }
 }
 
+-(void) keyDown:(NSEvent*)event {
+    NSString* keys = [event charactersIgnoringModifiers];
+    if([keys length] == 0) {
+        return;
+    }
+    if([keys length] == 1) {
+        unichar key = [keys characterAtIndex:0];
+        // Arrow keys already taken by GroupView
+        if(key == 'h' || key == 'H') {
+            [self decCardAction:self];
+            return;
+        }
+        if(key == 'l' || key == 'L') {
+            [self incCardAction:self];
+            return;
+        }
+    }
+    [super keyDown:event];
+}
+
 - (void) dcThresholdsChanged:(NSNotification*)aNote
 {
 	int i;
@@ -428,7 +460,6 @@
 		if(displayRow>15)displayRow=0;
 	}
 }
-
 
 - (void) dcVBsChanged:(NSNotification*)aNote
 {
@@ -714,12 +745,16 @@
 
 - (IBAction) incCardAction:(id)sender
 {
-	[self incModelSortedBy:@selector(globalCardNumberCompare:)];
+    bool isFECLocked = [gSecurity isLocked:ORFecLock];
+    [self incModelSortedBy:@selector(globalCardNumberCompare:)];
+    [gSecurity setLock:ORFecLock to:isFECLocked];
 }
 
 - (IBAction) decCardAction:(id)sender
 {
-	[self decModelSortedBy:@selector(globalCardNumberCompare:)];
+    bool isFECLocked = [gSecurity isLocked:ORFecLock];
+    [self decModelSortedBy:@selector(globalCardNumberCompare:)];
+    [gSecurity setLock:ORFecLock to:isFECLocked];
 }
 
 - (IBAction) pmtStateClickAction:(id)sender

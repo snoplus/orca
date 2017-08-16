@@ -23,8 +23,8 @@ extern hw4::SubrackKatrin* srack;
 bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
 {
     //init
-    uint32_t secondsSetSendToFLTs = GetDeviceSpecificData()[0];
-    uint32_t runFlags   = GetDeviceSpecificData()[3];//this is runFlagsMask of ORKatrinV4FLTModel.m, load_HW_Config_Structure:index:
+    //uint32_t secondsSetSendToFLTs = GetDeviceSpecificData()[0];
+    //uint32_t runFlags   = GetDeviceSpecificData()[3];//this is runFlagsMask of ORKatrinV4FLTModel.m, load_HW_Config_Structure:index:
 
 
     //SLT read out

@@ -1296,6 +1296,13 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     }
 }
 
+- (void) startTimer
+{
+    [timer invalidate];
+    [timer release];
+    timer = [[NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(incrementTime:)userInfo:nil repeats:YES] retain];
+}
+
 - (void) startRunStage3:(NSNumber*)doInitBool
 {
 	if(startScript){
@@ -1324,15 +1331,11 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		[readoutThread start];
 		 
         [self setStartTime:[NSDate date]];
-		[self setSubRunStartTime:[NSDate date]];
-		[self setElapsedRunTime:0];
+	[self setSubRunStartTime:[NSDate date]];
+	[self setElapsedRunTime:0];
         [self setElapsedSubRunTime:0];
-        
-        [timer invalidate];
-        [timer release];
-        timer = [[NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(incrementTime:)userInfo:nil repeats:YES] retain];
-        
-        
+
+        [self startTimer];
         
         [[ORGlobal sharedGlobal] checkRunMode];
         

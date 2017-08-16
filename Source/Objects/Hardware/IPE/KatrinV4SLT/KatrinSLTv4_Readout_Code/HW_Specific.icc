@@ -1,4 +1,4 @@
-#include "SLTv4_HW_Definitions.h"
+#include "KatrinV4_HW_Definitions.h"
 #include "ORVCard.hh"
 #include "ORSLTv4Readout.hh"
 #include "ORFLTv4Readout.hh"

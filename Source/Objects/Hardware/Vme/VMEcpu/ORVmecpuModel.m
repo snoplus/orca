@@ -23,7 +23,7 @@
 #import "ORVmeCrateModel.h"
 #import "ORReadOutList.h"
 #import "SBC_Link.h"
-#import "SBC_config.h"
+#import "SBC_Config.h"
 #import "ORCommandList.h"
 #import "VmeSBCGeneralOperations.h"
 

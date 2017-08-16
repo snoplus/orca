@@ -66,57 +66,45 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
 {
 
 	NSString* title= @"Ipe SLTv4 Event Record\n\n";
-	++ptr;		//skip the first word (dataID and length)
-    
-    NSString* crate = [NSString stringWithFormat:@"Crate      = %lu\n",(*ptr>>21) & 0xf];
-    NSString* card  = [NSString stringWithFormat:@"Station    = %lu\n",(*ptr>>16) & 0x1f];
-	int recordType = (*ptr) & 0xf;
-	int counterType = ((*ptr)>>4) & 0xf;
-	
-	++ptr;		//point to event counter
-	
+    NSString* crate = [NSString stringWithFormat:@"Crate      = %lu\n",(ptr[1]>>21) & 0xf];
+    NSString* card  = [NSString stringWithFormat:@"Station    = %lu\n",(ptr[1]>>16) & 0x1f];
+	int recordType  =  (ptr[1])     & 0xf;
+	int counterType = ((ptr[1])>>4) & 0xf;
+		
 	if (recordType == 0) {
-		NSString* eventCounter    = [NSString stringWithFormat:@"Event     = %lu\n",*ptr++];
-		NSString* timeStampHi     = [NSString stringWithFormat:@"Time Hi   = %lu\n",*ptr++];
-		NSString* timeStampLo     = [NSString stringWithFormat:@"Time Lo   = %lu\n",*ptr];
+		NSString* eventCounter    = [NSString stringWithFormat:@"Event     = %lu\n",ptr[2]];
+		NSString* timeStampHi     = [NSString stringWithFormat:@"Time Hi   = %lu\n",ptr[3]];
+		NSString* timeStampLo     = [NSString stringWithFormat:@"Time Lo   = %lu\n",ptr[4]];
 
 		return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,crate,card,
 							eventCounter,timeStampHi,timeStampLo];               
 	}
-	
-	++ptr;		//skip event counter
-	//timestamp events
-	NSString* counterString;
-	switch (counterType) {
-		case kSecondsCounterType:	counterString    = [NSString stringWithFormat:@"Seconds Counter\n"]; break;
-		case kVetoCounterType:		counterString    = [NSString stringWithFormat:@"Veto Counter\n"]; break;
-		case kDeadCounterType:		counterString    = [NSString stringWithFormat:@"Deadtime Counter\n"]; break;
-		case kRunCounterType:		counterString    = [NSString stringWithFormat:@"Run  Counter\n"]; break;
-		default:					counterString    = [NSString stringWithFormat:@"Unknown Counter\n"]; break;
-	}
-	NSString* typeString;
-	switch (recordType) {
-		case kStartRunType:		typeString    = [NSString stringWithFormat:@"Start Run Timestamp\n"]; break;
-		case kStopRunType:		typeString    = [NSString stringWithFormat:@"Stop Run Timestamp\n"]; break;
-		case kStartSubRunType:	typeString    = [NSString stringWithFormat:@"Start SubRun Timestamp\n"]; break;
-		case kStopSubRunType:	typeString    = [NSString stringWithFormat:@"Stop SubRun Timestamp\n"]; break;
-		default:				typeString    = [NSString stringWithFormat:@"Unknown Timestamp Type\n"]; break;
-	}
-	NSString* timeStampHi     = [NSString stringWithFormat:@"Time Hi   = %lu\n",*ptr++];
-	NSString* timeStampLo     = [NSString stringWithFormat:@"Time Lo   = %lu\n",*ptr];		
+    else {
+        //timestamp events
+        NSString* counterString;
+        switch (counterType) {
+            case kSecondsCounterType:	counterString    = [NSString stringWithFormat:@"Seconds Counter\n"]; break;
+            case kVetoCounterType:		counterString    = [NSString stringWithFormat:@"Veto Counter\n"]; break;
+            case kDeadCounterType:		counterString    = [NSString stringWithFormat:@"Deadtime Counter\n"]; break;
+            case kRunCounterType:		counterString    = [NSString stringWithFormat:@"Run  Counter\n"]; break;
+            default:					counterString    = [NSString stringWithFormat:@"Unknown Counter\n"]; break;
+        }
+        NSString* typeString;
+        switch (recordType) {
+            case kStartRunType:		typeString    = [NSString stringWithFormat:@"Start Run Timestamp\n"]; break;
+            case kStopRunType:		typeString    = [NSString stringWithFormat:@"Stop Run Timestamp\n"]; break;
+            case kStartSubRunType:	typeString    = [NSString stringWithFormat:@"Start SubRun Timestamp\n"]; break;
+            case kStopSubRunType:	typeString    = [NSString stringWithFormat:@"Stop SubRun Timestamp\n"]; break;
+            default:				typeString    = [NSString stringWithFormat:@"Unknown Timestamp Type\n"]; break;
+        }
+        NSString* timeStampHi     = [NSString stringWithFormat:@"Time Hi   = %lu\n",ptr[3]];
+        NSString* timeStampLo     = [NSString stringWithFormat:@"Time Lo   = %lu\n",ptr[4]];
 
-	return [NSString stringWithFormat:@"%@%@%@%@%@%@%@",title,crate,card,
-						counterString,typeString,timeStampHi,timeStampLo];               
+        return [NSString stringWithFormat:@"%@%@%@%@%@%@%@",title,crate,card,
+                            counterString,typeString,timeStampHi,timeStampLo];
+    }
 }
 @end
-
-
-
-
-
-
-
-
 
 @implementation ORKatrinV4SLTDecoderForEventFifo
 
@@ -124,13 +112,13 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
 /** Data format for event:
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
  ^^^^ ^^^^ ^^^^ ^^-----------------------data id
- ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
+                  ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
  
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
  ^^^^ ^^^--------------------------------spare
- ^ ^^^---------------------------crate
- ^ ^^^^---------------------card
- ^^^^ ^^^^-----------spare
+         ^ ^^^---------------------------crate
+              ^ ^^^^---------------------card
+                     ^^^^ ^^^^-----------spare
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx Spare 1
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx Spare 2
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx EventFifo 1
@@ -148,20 +136,6 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
     unsigned long* ptr = (unsigned long*)someData;
 	unsigned long length	= ExtractLength(*ptr);	 //get length from first word
 	[aDataSet loadGenericData:@" " sender:self withKeys:@"v4SLT",@"Event Fifo Records",nil];
-    
-    /*
-     //for debugging/testing -tb-
-     int i=0;
-     
-     NSLog(@"EventFifoRecordLen: %i\n",length);
-     int showMax=length;
-     if(showMax>12){showMax=12;}
-     for(i=2;i<showMax; i++){
-     NSLog(@"word %i: 0x%08x\n",i,*(ptr+i));
-     }
-     */
-    
-    
     return length; //nothing to display at this time.. just return the length
 }
 
@@ -169,134 +143,60 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
 {
     
 	NSString* title= @"Ipe SLTv4 Event FIFO Record\n\n";
-    unsigned long numEv,numCrate,numCard;
-    numEv=((*ptr) & 0x3ffff)/4-1;
-    NSString* content=[NSString stringWithFormat:@"Num.Eevents= %lu\n",((*ptr) & 0x3ffff)/4-1];
+    NSString* content=[NSString stringWithFormat:@"Num.Events= %lu\n",((ptr[0]) & 0x3ffff)/4-1];
+    NSString* crate = [NSString stringWithFormat:@"Crate      = %lu\n",(ptr[1]>>21) & 0xf];
+    NSString* card  = [NSString stringWithFormat:@"Station    = %lu\n",(ptr[1]>>16) & 0x1f];
     
+    unsigned long f1            = ptr[4];
+    unsigned long f2            = ptr[5];
+    unsigned long f3            = ptr[6];
+    unsigned long f4            = ptr[7];
+    unsigned long flt           = (f1 >> 25) & 0x1f;
+    unsigned long chan          = (f1 >> 20) & 0x1f;
+    unsigned long energy        = f1  & 0xfffff;
+    unsigned long sec           = f2;
+    unsigned long subsec        = f3  & 0x1ffffff;
+    unsigned long multiplicity  = (f3 >> 25) & 0x1f;
+    unsigned long p             = (f3 >> 31) & 0x1;
+    unsigned long toplen        = f4  & 0x1ff;
+    unsigned long ediff         = (f4 >> 9) & 0xfff;
+    unsigned long evID          = (f4 >> 21) & 0x7ff;
     
-	++ptr;		//skip the first word (dataID and length)
-    numCrate=(*ptr>>21) & 0xf;
-    numCard=(*ptr>>16) & 0x1f;
-    NSString* crate = [NSString stringWithFormat:@"Crate      = %lu\n",(*ptr>>21) & 0xf];
-    NSString* card  = [NSString stringWithFormat:@"Station    = %lu\n",(*ptr>>16) & 0x1f];
-    
-    ++ptr;
-    ++ptr;
-    ++ptr;
-    unsigned long* eventPtr=ptr;
-    unsigned long f1,f2,f3,f4;
-    f1=ptr[0];
-    f2=ptr[1];
-    f3=ptr[2];
-    f4=ptr[3];
-    unsigned long flt,chan,energy,sec,subsec,multiplicity,p,toplen,ediff,evID;
-    flt   = (f1 >> 25) & 0x1f;
-    chan   = (f1 >> 20) & 0x1f;
-    energy  = f1  & 0xfffff;
-    sec = f2;
-    subsec = f3  & 0x1ffffff;
-    multiplicity  = (f3 >> 25) & 0x1f;
-    p  = (f3 >> 31) & 0x1;
-    toplen = f4  & 0x1ff;
-    ediff  = (f4 >> 9) & 0xfff;
-    evID   = (f4 >> 21) & 0x7ff;
-    
-#if 0
-    NSString* info1 = @"";
-    NSString* info2 = @"";
-#else
     NSString* info1 = [NSString stringWithFormat:@"First event:\n"
                        "FIFO entry:  flt: %lu,chan: %lu,energy: %lu,sec: %lu,subsec: %lu   \n",flt,chan,energy,sec,subsec ];//DEBUG -tb-
     NSString* info2 = [NSString stringWithFormat:@"FIFO entry:  multiplicity: %lu,p: %lu,toplen: %lu,ediff: %lu,evID: %lu   \n",
                        multiplicity,p,toplen,ediff,evID ];//DEBUG -tb-
-#endif
-    
-    
-#if 1
-    //draw full content on debugger console - for DEBUGGING -tb-
-    fprintf(stdout,"Event Record for crate %li, card/FLT %li contains %li events:\n",numCrate,numCard,numEv);
-    int i;
-    for(i=0;i<numEv;i++){
-        unsigned long f1,f2,f3,f4;
-        f1=eventPtr[0];
-        f2=eventPtr[1];
-        f3=eventPtr[2];
-        f4=eventPtr[3];
-        unsigned long flt,chan,energy,sec,subsec,multiplicity,p,toplen,ediff,evID;
-        flt   = (f1 >> 25) & 0x1f;
-        chan   = (f1 >> 20) & 0x1f;
-        energy  = f1  & 0xfffff;
-        sec = f2;
-        subsec = f3  & 0x1ffffff;
-        multiplicity  = (f3 >> 25) & 0x1f;
-        p  = (f3 >> 31) & 0x1;
-        toplen = f4  & 0x1ff;
-        ediff  = (f4 >> 9) & 0xfff;
-        evID   = (f4 >> 21) & 0x7ff;
-        
-        fprintf(stdout,"FIFO entry:  flt: %li,chan: %li,energy: %li,sec: %li,subsec: %li   \n",flt,chan,energy,sec,subsec);
-        fprintf(stdout,"FIFO entry:  multiplicity: %li,p: %li,toplen: %li,ediff: %li,evID: %li   \n",  multiplicity,p,toplen,ediff,evID);
-        
-        //go to next event block
-        eventPtr+=4;
-        
-    }
-    fprintf(stdout,"END of event Record.\n");
-    
-#endif
-    
-    /*
-     int recordType = (*ptr) & 0xf;
-     int counterType = ((*ptr)>>4) & 0xf;
-     
-     ++ptr;		//point to event counter
-     if (recordType == 0) {
-     NSString* eventCounter    = [NSString stringWithFormat:@"Event     = %lu\n",*ptr++];
-     NSString* timeStampHi     = [NSString stringWithFormat:@"Time Hi   = %lu\n",*ptr++];
-     NSString* timeStampLo     = [NSString stringWithFormat:@"Time Lo   = %lu\n",*ptr];
-     
-     return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,crate,card,
-     eventCounter,timeStampHi,timeStampLo];
-     }
-     
-     ++ptr;		//skip event counter
-     //timestamp events
-     NSString* counterString;
-     switch (counterType) {
-     case kSecondsCounterType:	counterString    = [NSString stringWithFormat:@"Seconds Counter\n"]; break;
-     case kVetoCounterType:		counterString    = [NSString stringWithFormat:@"Veto Counter\n"]; break;
-     case kDeadCounterType:		counterString    = [NSString stringWithFormat:@"Deadtime Counter\n"]; break;
-     case kRunCounterType:		counterString    = [NSString stringWithFormat:@"Run  Counter\n"]; break;
-     default:					counterString    = [NSString stringWithFormat:@"Unknown Counter\n"]; break;
-     }
-     NSString* typeString;
-     switch (recordType) {
-     case kStartRunType:		typeString    = [NSString stringWithFormat:@"Start Run Timestamp\n"]; break;
-     case kStopRunType:		typeString    = [NSString stringWithFormat:@"Stop Run Timestamp\n"]; break;
-     case kStartSubRunType:	typeString    = [NSString stringWithFormat:@"Start SubRun Timestamp\n"]; break;
-     case kStopSubRunType:	typeString    = [NSString stringWithFormat:@"Stop SubRun Timestamp\n"]; break;
-     default:				typeString    = [NSString stringWithFormat:@"Unknown Timestamp Type\n"]; break;
-     }
-     NSString* timeStampHi     = [NSString stringWithFormat:@"Time Hi   = %lu\n",*ptr++];
-     NSString* timeStampLo     = [NSString stringWithFormat:@"Time Lo   = %lu\n",*ptr];
-     */
 	return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,content,crate,card,
             info1,info2];
 }
 @end
 
 
-
-
-
-
-
-
-
-
-
-
 @implementation ORKatrinV4SLTDecoderForEnergy
+static NSString* kSLTCrate[4] = {
+    //pre-make some keys for speed.
+    @"SLT0.FLT.Energy", @"SLT0.FLT.Energy", @"SLT0.FLT.Energy", @"SLT0.FLT.Energy",
+ };
+static NSString* kSLTStation[32] = {
+    //pre-make some keys for speed.
+    @"Station  0", @"Station  1", @"Station  2", @"Station  3",
+    @"Station  4", @"Station  5", @"Station  6", @"Station  7",
+    @"Station  8", @"Station  9", @"Station 10", @"Station 11",
+    @"Station 12", @"Station 13", @"Station 14", @"Station 15",
+    @"Station 16", @"Station 17", @"Station 18", @"Station 19",
+    @"Station 20", @"Station 21", @"Station 22", @"Station 23",
+    @"Station 24", @"Station 25", @"Station 26", @"Station 27",
+    @"Station 28", @"Station 29", @"Station 30", @"Station 31"
+};
+static NSString* kFLTChanKey[24] = {
+    //pre-make some keys for speed.
+    @"Channel  0", @"Channel  1", @"Channel  2", @"Channel  3",
+    @"Channel  4", @"Channel  5", @"Channel  6", @"Channel  7",
+    @"Channel  8", @"Channel  9", @"Channel 10", @"Channel 11",
+    @"Channel 12", @"Channel 13", @"Channel 14", @"Channel 15",
+    @"Channel 16", @"Channel 17", @"Channel 18", @"Channel 19",
+    @"Channel 20", @"Channel 21", @"Channel 22", @"Channel 23"
+};
 
 //-------------------------------------------------------------
 /** Data format for event:
@@ -322,309 +222,104 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
  
  **/
 //-------------------------------------------------------------
-
+- (id) init {
+    self = [super init];
+    return self;
+}
 - (void) dealloc
 {
-	[actualFlts release];
+    [actualFlts release];
     [super dealloc];
 }
 
-- (int) filterShapingLength //this is to  return a dummy value, if the FLT card cannot be found (see below) -tb-
-{return 8;}//I return the maximum value
+//this is to  return a dummy value, if the FLT card cannot be found (see below) -tb-
+- (int) filterShapingLength {return 8;}//return the maximum value as default
 
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr = (unsigned long*)someData;
-	unsigned long length	= ExtractLength(*ptr);	 //get length from first word
+	unsigned long length	= ExtractLength(ptr[0]);	 //get length from first word
 	unsigned char crate		= ShiftAndExtract(ptr[1],21,0xf);
-	unsigned char card		= 0;//ShiftAndExtract(ptr[1],16,0x1f);
-	unsigned char chan		= 0;//ShiftAndExtract(ptr[1],8,0xff);
     
- 	NSString* crateKey		= [self getCrateKey: crate];
-	NSString* stationKey	= @"";	
-	NSString* channelKey	= @"";	
+ 	NSString* crateKey = @"??";
+    if(crate<4)crateKey= kSLTCrate[crate];
     
-    unsigned long f1,f2,f3,f4,f5,f6;
-    unsigned long energy,/*sec,subsec,multiplicity,p,toplen,ediff,evID,*/ tpeak, tvalley, apeak, avalley;
     unsigned long headerlen = 4;
-    unsigned long numEv=(length-4)/6;    //(((*ptr) & 0x3ffff)-4)/6;
+    unsigned long numEv=(length-headerlen)/6;
     
     //prepare decoding
     if(!actualFlts)actualFlts = [[NSMutableDictionary alloc] init];
 
-    
-    
-    
-    
-    
-    
     ptr+=headerlen;
-    
     int i;
     for(i=0;i<numEv;i++){
-        f1=ptr[0];
-        f2=ptr[1];
-        f3=ptr[2];
-        f4=ptr[3];
-        f5=ptr[4];
-        f6=ptr[5];
-    
-        card   = (f3 >> 24) & 0x1f;
-        chan   = (f3 >> 19) & 0x1f;
-        //multiplicity  = (f3 >> 14) & 0x1f;
-        //evID   = f3  & 0x3fff;
-        //toplen = f4  & 0x1ff;
-        //ediff  = (f4 >> 9) & 0xfff;
-        //tpeak    = (f4 >> 16) & 0x1ff;
-        tpeak    = (f4 >> 16) & 0x1ff;
-        apeak    =  f4   & 0x7ff;
-        //tvalley  = (f5 >> 16) & 0x1ff;
-        tvalley  = (f5 >> 16) & 0x1ff;
-        avalley  =  4096 - (f5   & 0xfff);
-    
-        energy  = f6  & 0xfffff;
+        //only decode some things in ORCA for speed
+        unsigned long f3        = ptr[2]; //flt,ch,multi,eventID
+        unsigned long f6        = ptr[5]; //Energy
 
+        unsigned char card      = (f3 >> 24) & 0x1f;
+        unsigned char chan      = (f3 >> 19) & 0x1f;
+        unsigned long energy    =  f6        & 0xfffff;
+        //unsigned long lostEvents    =  (f6>>20)&0x1ff;;
         
-	    stationKey	= [self getStationKey: card];	
-	    channelKey	= [self getChannelKey: chan];	
+        NSString* stationKey = @"??";
+	    if(card<32)stationKey  = kSLTStation[card];
         
-		NSString* fltKey = [crateKey stringByAppendingString:stationKey];
-		//ORKatrinV4FLTModel* obj = [actualFlts objectForKey:fltKey];
-		id obj = [actualFlts objectForKey:fltKey];
-		if(!obj){
-            //NSLog(@"searching FLTs: fltKey %@ \n",fltKey);
-			NSArray* listOfFlts = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORKatrinV4FLTModel")];
-			for(ORKatrinV4FLTModel* aFlt in listOfFlts){
-                //NSLog(@"searching FLTs: stationNum %i (searching card %i)\n",[aFlt stationNumber],card);
+        NSString* channelKey  = @"??";
+	    if(chan<24)channelKey = kFLTChanKey[chan];
 
-				if(/*[aFlt crateNumber] == crate &&*/ [aFlt stationNumber] == card){
-					[actualFlts setObject:aFlt forKey:fltKey];
-					obj = aFlt;
-					break;
-				}
-			}
-            if(!obj){
-                [actualFlts setObject:self forKey:fltKey];
-                obj=self;
-            }
-		}
-        int filterShapingLength = 0;
-        if(obj) filterShapingLength = [obj filterShapingLength];
-        //NSLog(@"   found FLTs(?): filterShapingLength %i \n",filterShapingLength);
-
-	    unsigned long histoLen;
-	    histoLen = 4096;//32768;//4096;//=max. ADC value for 12 bit ADC
     
-        // count datasets
-	    [aDataSet loadGenericData:@" " sender:self withKeys:@"v4SLT",@"Energy Records",nil];
-    
-	    //channel by channel histograms 'energy'
-	    [aDataSet histogram:energy >> filterShapingLength
-				    numBins:histoLen sender:self  
-			       withKeys:@"SLT", @"FLTthruSLT", @"Energy", crateKey,stationKey,channelKey,nil];
-	
-	    //channel by channel histograms 'bipolar energy peak'
-	    [aDataSet histogram:apeak
-	    			numBins:4096 sender:self  
-	    		   withKeys:@"SLT", @"FLTthruSLT", @"PeakADC", crateKey,stationKey,channelKey,nil];
-               
-	    //channel by channel histograms 'bipolar energy valley'
-	    [aDataSet histogram:avalley
-	    			numBins:4096 sender:self  
-	    		   withKeys:@"SLT", @"FLTthruSLT", @"ValleyADC", crateKey,stationKey,channelKey,nil];
-	
-	    //channel by channel histograms 'bipolar energy peak' time
-	    [aDataSet histogram:tpeak
-	    			numBins:4096 sender:self  
-	    		   withKeys:@"SLT", @"FLTthruSLT", @"PeakPos", crateKey,stationKey,channelKey,nil];
-               
-	    //channel by channel histograms 'bipolar energy valley' time
-	    [aDataSet histogram:tvalley
-	    			numBins:4096 sender:self  
-	    		   withKeys:@"SLT", @"FLTthruSLT", @"ValleyPos", crateKey,stationKey,channelKey,nil];
-                   
+        [aDataSet histogram:energy >> 8 /*energy >> filterShapingLength*/  //scale to 4096 bins for now
+                    numBins:4096 sender:self
+                   withKeys: crateKey,stationKey,channelKey,nil];
+        
         ptr+=6;//next event
-	
-
     }
     
-        
-                
-    /*
-     //for debugging/testing -tb-
-     int i=0;
-     
-     NSLog(@"EventFifoRecordLen: %i\n",length);
-     int showMax=length;
-     if(showMax>12){showMax=12;}
-     for(i=2;i<showMax; i++){
-     NSLog(@"word %i: 0x%08x\n",i,*(ptr+i));
-     }
-     */
-    
-    
-    return length; //nothing to display at this time.. just return the length
+    return length;
 }
 
-- (NSString*) dataRecordDescription:(unsigned long*)ptr
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr
 {
+	unsigned long length	= ExtractLength(dataPtr[0]);
     
-	unsigned long length	= ExtractLength(ptr[0]);
-    
-	NSString* title= @"Katrin SLTv4 Energy Record\n\n";
-    unsigned long numCrate,numCard;
-    unsigned long numEv=(length-4)/6;    //(((*ptr) & 0x3ffff)-4)/6;
-    NSString* content=[NSString stringWithFormat:@"Num.Eevents= %lu\n",numEv];
-    
-    
-	++ptr;		//skip the first word (dataID and length)
-    numCrate=(*ptr>>21) & 0xf;
-    numCard=(*ptr>>16) & 0x1f;
-    NSString* crate = [NSString stringWithFormat:@"Crate      = %lu\n",(*ptr>>21) & 0xf];
-    NSString* card  = [NSString stringWithFormat:@"Station    = %lu\n",(*ptr>>16) & 0x1f];
-    
-    ++ptr;
-    ++ptr;
-    ++ptr;
-    
-    
-    
-    //unsigned long* eventPtr=ptr;
-    unsigned long f1,f2,f3,f4,f5,f6;
-    
-    //for(i=0;i<numEv;i++){
+    unsigned long numEv = (length-4)/6;
 
-    f1=ptr[0];
-    f2=ptr[1];
-    f3=ptr[2];
-    f4=ptr[3];
-    f5=ptr[4];
-    f6=ptr[5];
-    
-#if 0
-    //quickfix
-    f1=ptr[1];
-    f2=ptr[0];
-    f3=ptr[3];
-    f4=ptr[2];
-    f5=ptr[5];
-    f6=ptr[4];
-    //quickfix
-#endif
-    
-    unsigned long flt,chan,energy,sec,subsec,multiplicity,p,/*toplen,ediff,*/evID, tpeak, tvalley, apeak, avalley;
-    p  = (f1 >> 28) & 0x1;
-    subsec = (f1  & 0x0ffffff8) >> 3;
-    sec = (f2 & 0x1fffffff) | ((f1  & 0x7) << 29);
-    flt   = (f3 >> 24) & 0x1f;
-    chan   = (f3 >> 19) & 0x1f;
-    multiplicity  = (f3 >> 14) & 0x1f;
-    evID   = f3  & 0x3fff;
-    //toplen = f4  & 0x1ff;
-    //ediff  = (f4 >> 9) & 0xfff;
-    tpeak    = (f4 >> 16) & 0x1ff;
-    apeak    =  f4   & 0x7ff; // & 0xfff; bit 12 unused and always 1 -tb-
-    tvalley  = (f5 >> 16) & 0x1ff;
-    //avalley  =  f5   & 0xfff; is negative
-    avalley  =  4096 - (f5 & 0xfff);
-    
-    energy  = f6  & 0xfffff;
-    
-#if 0
-    NSString* info1 = @"";
-    NSString* info2 = @"";
-#else
-    NSString* info1 = [NSString stringWithFormat:@"First event:\n"
-                       "FIFO entry:  flt: %lu,chan: %lu,energy: %lu,sec: %lu,subsec: %lu   \n",flt,chan,energy,sec,subsec ];//DEBUG -tb-
-    NSString* info2 = [NSString stringWithFormat:@"FIFO entry:  multiplicity: %lu,p: %lu,Epeak: %lu,Evalley: %lu,t_peak: %lu,t_valley: %lu,evID: %lu   \n",
-                       multiplicity,p,apeak,avalley,tpeak,tvalley,evID ];//DEBUG -tb-
-#endif
-    
-    
-#if 0
-    //draw full content on debugger console - for DEBUGGING -tb-
-    fprintf(stdout,"Event Record for crate %li, card/FLT %li contains %li events:\n",numCrate,numCard,numEv);
+    int crateNum = (dataPtr[1]>>21) & 0xf;
+    NSString* content   = [NSString stringWithFormat:@"SLTv4 Energy Record\n\nEvents In Record: %lu\nCrate: %d\n",numEv,crateNum];
+    unsigned long* ptr = &dataPtr[4];
     int i;
     for(i=0;i<numEv;i++){
-        unsigned long f1,f2,f3,f4;
-        f1=eventPtr[0];
-        f2=eventPtr[1];
-        f3=eventPtr[2];
-        f4=eventPtr[3];
-        unsigned long flt,chan,energy,sec,subsec,multiplicity,p,toplen,ediff,evID;
-        flt   = (f1 >> 25) & 0x1f;
-        chan   = (f1 >> 20) & 0x1f;
-        energy  = f1  & 0xfffff;
-        sec = f2;
-        subsec = f3  & 0x1ffffff;
-        multiplicity  = (f3 >> 25) & 0x1f;
-        p  = (f3 >> 31) & 0x1;
-        toplen = f4  & 0x1ff;
-        ediff  = (f4 >> 9) & 0xfff;
-        evID   = (f4 >> 21) & 0x7ff;
+        unsigned long event = i*6;
         
-        fprintf(stdout,"FIFO entry:  flt: %li,chan: %li,energy: %li,sec: %li,subsec: %li   \n",flt,chan,energy,sec,subsec);
-        fprintf(stdout,"FIFO entry:  multiplicity: %li,p: %li,toplen: %li,ediff: %li,evID: %li   \n",  multiplicity,p,toplen,ediff,evID);
+        unsigned long f1 = ptr[event + 0];
+        unsigned long f2 = ptr[event + 1];
+        unsigned long f3 = ptr[event + 2];
+        unsigned long f4 = ptr[event + 3];
+        unsigned long f5 = ptr[event + 4];
+        unsigned long f6 = ptr[event + 5];
         
-        //go to next event block
-        eventPtr+=4;
+        unsigned long subsec   = f1 & 0x0fffffff;
+        unsigned long sec      = f2;
+        unsigned long flt      = (f3 >> 24) & 0x001f;
+        unsigned long chan     = (f3 >> 19) & 0x001f;
+        unsigned long mult     = (f3 >> 14) & 0x001f;
+        unsigned long eventID  =  f3        & 0x3fff;
+        unsigned long tPeak    = (f4 >> 16) & 0x01ff;
+        unsigned long aPeak    =  f4 & 0x7ff; // & 0xfff; bit 12 unused and always 1 -tb-
+        unsigned long tValley  = (f5 >> 16) & 0x1ff;
+        unsigned long aValley  =  4096 - (f5 & 0xfff);
+        unsigned long energy   =  f6 & 0xfffff;
         
+        content = [content stringByAppendingFormat:@"Event: %d EventID: %lu \nSeconds: %lu.%lu\nFLT: %lu  Chan: %lu\n",i,eventID,sec,subsec,flt,chan];
+        content = [content stringByAppendingFormat:@"TPeak: %lu TValley: %lu\n",tPeak,tValley];
+        content = [content stringByAppendingFormat:@"APeak: %lu AValley: %lu\n",aPeak,aValley];
+        content = [content stringByAppendingFormat:@"Multi: %lu Energy: %lu\n",mult,energy];
     }
-    fprintf(stdout,"END of event Record.\n");
-    
-#endif
-    
-    /*
-     int recordType = (*ptr) & 0xf;
-     int counterType = ((*ptr)>>4) & 0xf;
-     
-     ++ptr;		//point to event counter
-     if (recordType == 0) {
-     NSString* eventCounter    = [NSString stringWithFormat:@"Event     = %lu\n",*ptr++];
-     NSString* timeStampHi     = [NSString stringWithFormat:@"Time Hi   = %lu\n",*ptr++];
-     NSString* timeStampLo     = [NSString stringWithFormat:@"Time Lo   = %lu\n",*ptr];
-     
-     return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,crate,card,
-     eventCounter,timeStampHi,timeStampLo];
-     }
-     
-     ++ptr;		//skip event counter
-     //timestamp events
-     NSString* counterString;
-     switch (counterType) {
-     case kSecondsCounterType:	counterString    = [NSString stringWithFormat:@"Seconds Counter\n"]; break;
-     case kVetoCounterType:		counterString    = [NSString stringWithFormat:@"Veto Counter\n"]; break;
-     case kDeadCounterType:		counterString    = [NSString stringWithFormat:@"Deadtime Counter\n"]; break;
-     case kRunCounterType:		counterString    = [NSString stringWithFormat:@"Run  Counter\n"]; break;
-     default:					counterString    = [NSString stringWithFormat:@"Unknown Counter\n"]; break;
-     }
-     NSString* typeString;
-     switch (recordType) {
-     case kStartRunType:		typeString    = [NSString stringWithFormat:@"Start Run Timestamp\n"]; break;
-     case kStopRunType:		typeString    = [NSString stringWithFormat:@"Stop Run Timestamp\n"]; break;
-     case kStartSubRunType:	typeString    = [NSString stringWithFormat:@"Start SubRun Timestamp\n"]; break;
-     case kStopSubRunType:	typeString    = [NSString stringWithFormat:@"Stop SubRun Timestamp\n"]; break;
-     default:				typeString    = [NSString stringWithFormat:@"Unknown Timestamp Type\n"]; break;
-     }
-     NSString* timeStampHi     = [NSString stringWithFormat:@"Time Hi   = %lu\n",*ptr++];
-     NSString* timeStampLo     = [NSString stringWithFormat:@"Time Lo   = %lu\n",*ptr];
-     */
-	return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,content,crate,card,
-            info1,info2];
+    return content;
 }
 @end
-
-
-
-
-
-
-
-
-
-
-
 
 @implementation ORKatrinV4SLTDecoderForMultiplicity
 

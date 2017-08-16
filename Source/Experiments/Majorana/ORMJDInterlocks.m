@@ -28,6 +28,7 @@
 //do NOT change this list without changing the enum states in the .h filef
 static MJDInterlocksStateInfo state_info [kMJDInterlocks_NumStates] = {
     { kMJDInterlocks_Idle,               @"State Machine"},
+    { kMJDInterlocks_ExecuteLNPoll,      @"Start SCM LN Request"},
     { kMJDInterlocks_Ping,               @"Ping Vac System"},
     { kMJDInterlocks_PingWait,           @"Ping Response"},
     { kMJDInterlocks_CheckHVisOn,        @"HV Status"},
@@ -121,7 +122,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
 {
     if(retryCount == 0){
         [self setupStateArray]; //info for display in dialog
-        [self setCurrentState:kMJDInterlocks_Ping]; //first state
+        [self setCurrentState:kMJDInterlocks_ExecuteLNPoll]; //first state
     }
     else {
         [self setCurrentState:retryState]; //there was an error so doing a restart
@@ -213,6 +214,14 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             [self setState:kMJDInterlocks_Idle status:@"Waiting" color:normalColor];
             break;
             
+        case kMJDInterlocks_ExecuteLNPoll:
+            self.remoteOpStatus=nil;
+            [self sendCommand:@"[ORAmi286Model,2 pollLevels];" remoteSocket:[delegate remoteSocket:kScmSlot]];
+            [self setState:kMJDInterlocks_ExecuteLNPoll           status:@"Sent" color:normalColor];
+            [self setCurrentState:kMJDInterlocks_Ping];
+
+            break;
+
         case kMJDInterlocks_Ping:
             [self setState:kMJDInterlocks_Idle status:@"Running" color:normalColor];
             if(!retryCount)[self setState:kMJDInterlocks_Ping status:@"Pinging..." color:normalColor];
@@ -257,7 +266,9 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             [self setState:kMJDInterlocks_CheckHVisOn status:[NSString stringWithFormat:@"HV is %@",hvIsOn?@"ON":@"OFF"] color:normalColor];
             if(pingedSuccessfully){
                 [self setCurrentState:kMJDInterlocks_UpdateVacSystem];
-            }
+                sentCmds = NO;
+                self.remoteOpStatus=nil;
+           }
             else {
                 //couldn't reach the Vac system. no point int trying to get the status
                 [self setState:kMJDInterlocks_UpdateVacSystem     status:@"Skipped" color:normalColor];
@@ -274,10 +285,12 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                     [self setCurrentState:kMJDInterlocks_HandleHVDialog];
                 }
             }
+
             break;
         
         //send the HV Bias state to the Vac system
         case kMJDInterlocks_UpdateVacSystem:
+
             if(remoteOpStatus){
                 if([[remoteOpStatus objectForKey:@"connected"] boolValue]==YES){
                     //it worked. move on.
@@ -502,6 +515,9 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             else {
                 [self setCurrentState:kMJDInterlocks_CheckLNFill];
             }
+            sentCmds = NO;
+            self.remoteOpStatus=nil;
+
             break;
 
         case kMJDInterlocks_CheckLNFill:
@@ -512,11 +528,15 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             }
             
             else if(remoteOpStatus){
-                if([[remoteOpStatus objectForKey:@"connected"] boolValue]==YES && [remoteOpStatus objectForKey:@"fillingLN"]){
+                if([[remoteOpStatus objectForKey:@"connected"] boolValue]==YES &&
+                   [remoteOpStatus objectForKey:@"fillingLN"] &&
+                   [remoteOpStatus objectForKey:@"pollTime"]
+                   ){
                     //it worked. move on.
                     retryCount = 0;
                     [self clearInterlockFailureAlarm];
-                    int theStatus = [[remoteOpStatus objectForKey:@"fillingLN"] intValue];
+                    int theStatus    = [[remoteOpStatus objectForKey:@"fillingLN"] intValue];
+                    pollingTimeForLN = [[remoteOpStatus objectForKey:@"pollTime"] intValue];
                     NSString* fillString;
                     NSColor* fillColor;
                     if(theStatus == 1 || theStatus == 3){
@@ -545,20 +565,24 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                         //no connection
                         retryCount++;
                         [self postInterlockFailureAlarm:[NSString stringWithFormat:@"SCM unreachable %d/%d",retryCount,kAllowedConnectionRetry] hvInDanger:NO finalWarning:NO];
-                        [self setState:kMJDInterlocks_UpdateVacSystem status:[NSString stringWithFormat:@"Failed: %d/%d",retryCount,kAllowedConnectionRetry] color:badColor];
+                        [self setState:kMJDInterlocks_CheckLNFill status:[NSString stringWithFormat:@"Failed: %d/%d",retryCount,kAllowedConnectionRetry] color:badColor];
                         retryState = kMJDInterlocks_CheckLNFill;  //force a retry of this state next time around
                         [self setCurrentState:kMJDInterlocks_Idle];
                     }
                 }
-                breakDownPass= 0;
-                sentCmds = NO;
-                self.remoteOpStatus=nil;
+                breakDownPass       = 0;
+                sentCmds            = NO;
+                self.remoteOpStatus = nil;
             }
             else {
                 if(!sentCmds){
                     self.remoteOpStatus=nil;
-                    NSString* cmd = [NSString stringWithFormat:@"fillingLN = [ORAmi286Model,2 fillStatus:%d];",slot];
-                    [self sendCommand:cmd remoteSocket:[delegate remoteSocket:kScmSlot]];
+                    NSMutableArray* cmds = [NSMutableArray arrayWithObjects:
+                                            [NSString stringWithFormat:@"fillingLN = [ORAmi286Model,2 fillStatus:%d];",slot],
+                                            @"pollTime = [ORAmi286Model,2 pollTime];",
+                                            nil];
+
+                    [self sendCommands:cmds remoteSocket:[delegate remoteSocket:kScmSlot]];
                     [self setState:kMJDInterlocks_CheckLNFill status:@"Sending..." color:normalColor];
                     sentCmds = YES;
                 }
@@ -582,6 +606,8 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             
         case kMJDInterlocks_FinalState:
             if([finalReport count])[self errorReport];
+            [delegate constraintCheckFinished:[self module]];
+            [self setCurrentState:kMJDInterlocks_Idle];
             break;
     }
     if(currentState != kMJDInterlocks_Idle){
@@ -635,10 +661,11 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
     }
 }
 
-- (BOOL)        vacuumSpike {return vacuumSpike;   }
-- (BOOL)        fillingLN   {return fillingLN;}
+- (BOOL) vacuumSpike {return vacuumSpike;   }
+- (BOOL) fillingLN   {return fillingLN;}
 
-
+- (int)  pollingTimeForLN {if(pollingTimeForLN==0)return 45; else return pollingTimeForLN;}
+- (void) setFillingLN:(BOOL)aState {fillingLN = aState;} //---for testing only
 
 - (void) addToReport:(NSString*)aString
 {
@@ -707,24 +734,21 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
         NSString*               ip  = [remObj remoteHost];
         [remObj setRemoteHost:ip];
         
-        ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
-        pingTask = [[NSTask alloc] init];
+        pingTask = [[ORPingTask pingTaskWithDelegate:self] retain];
         
-        [pingTask setLaunchPath:@"/sbin/ping"];
+        pingTask.launchPath= @"/sbin/ping";
+        pingTask.arguments = [NSArray arrayWithObjects:@"-c",@"3",@"-t",@"10",@"-q",ip,nil];
         
-        [pingTask setArguments: [NSArray arrayWithObjects:@"-c",@"3",@"-t",@"10",@"-q",ip,nil]];
-        
-        [aSequence addTaskObj:pingTask];
-        [aSequence setVerbose:NO];
-        [aSequence setTextToDelegate:YES];
-        [aSequence launch];
+        pingTask.verbose = NO;
+        pingTask.textToDelegate = YES;
+        [pingTask ping];
     }
 }
 
 - (BOOL) pingTaskRunning            { return pingTask != nil;}
 - (BOOL) pingedSuccessfully         { return pingedSuccessfully; }
 - (void) tasksCompleted:(id)sender  { }
-- (void) taskFinished:(NSTask*)aTask
+- (void) taskFinished:(ORPingTask*)aTask
 {
     if(aTask == pingTask){
         [pingTask release];

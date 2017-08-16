@@ -26,6 +26,7 @@
 #import "ORCard.h"
 #import "ORCB37Model.h"
 #import "ORSafeQueue.h"
+#import "ORAlarm.h"
 
 NSString* ORLabJackUE9CmdLocalIDChanged = @"ORLabJackUE9CmdLocalIDChanged";
 NSString* ORLabJackUE9CmdClockDivisorChanged = @"ORLabJackUE9CmdClockDivisorChanged";
@@ -144,6 +145,8 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
     [serialNumber release];
 	[cmdQueue release];
 	[lastRequest release];
+    [socketClosedAlarm clearAlarm];
+    [socketClosedAlarm release];
 	[super dealloc];
 }
 
@@ -376,9 +379,9 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
 
 	}
 	else {
-		[self setSocket:nil];	
+        wasConnected = NO;
+		[self setSocket:nil];
         [self setIsConnected:[socket isConnected]];
-		wasConnected = NO;
 	}
 }
 
@@ -389,6 +392,13 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
 - (void) netsocketConnected:(NetSocket*)inNetSocket
 {
     if(inNetSocket == socket){
+        
+        if(socketClosedAlarm){
+            [socketClosedAlarm clearAlarm];
+            [socketClosedAlarm release];
+            socketClosedAlarm = nil;
+        }
+        
         [self setIsConnected:[socket isConnected]];
 		[self getCalibrationInfo:0];
 		[self getCalibrationInfo:1];
@@ -445,7 +455,17 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
 - (void) netsocketDisconnected:(NetSocket*)inNetSocket
 {
     if(inNetSocket == socket){
-		
+        if(wasConnected){
+            if(!socketClosedAlarm){
+                NSString* aName = [NSString stringWithFormat:@"%@ socket dropped",[self fullID]];
+                socketClosedAlarm = [[ORAlarm alloc] initWithName:aName severity:kHardwareAlarm];
+                [socketClosedAlarm setSticky:NO];
+            }
+            if(![socketClosedAlarm isPosted]){
+                [socketClosedAlarm postAlarm];
+                [socketClosedAlarm setMailDelay:k30SecDelay];
+            }
+        }
 		[self setIsConnected:NO];
 		[socket autorelease];
 		socket = nil;

@@ -28,6 +28,7 @@
 #import "ORRateGroup.h"
 #import "VME_HW_Definitions.h"
 #import "ORRunModel.h"
+#import "ORPQModel.h"
 #import "SNOPModel.h"
 
 // Address information for this unit.
@@ -196,6 +197,12 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 
 - (void) registerNotificationObservers
 {
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(detectorStateChanged:)
+                         name : ORPQDetectorStateChanged
+                       object : nil];
 }
 
 - (int) initAtRunStart
@@ -207,7 +214,8 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
         [self initBoard];
         [self writeNumberBLTEvents:0];
         [self writeEnableBerr:0];
-        [self writeAcquistionControl:YES];
+        [self writeEnableExtendedReadoutBuffer:1];
+        [self writeAcquisitionControl:YES];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor], @"error loading CAEN hardware: %@\n",
                    [e reason]);
@@ -215,6 +223,64 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     }
 
     return 0;
+}
+
+- (void) detectorStateChanged:(NSNotification*)aNote
+{
+    ORPQDetectorDB *detDB = [aNote object];
+
+    if (!detDB) return;
+
+    PQ_CAEN *pqCAEN = (PQ_CAEN *)[detDB getCAEN];
+
+    if (!pqCAEN) return; // nothing to do if CAEN doesn't exist in the current state
+
+    @try{
+        [[self undoManager] disableUndoRegistration];
+
+        if (pqCAEN->valid[kCAEN_channelConfiguration]) {
+            [self setChannelConfigMask:pqCAEN->channelConfiguration];
+        }
+        if (pqCAEN->valid[kCAEN_bufferOrganization]) {
+            [self setEventSize:pqCAEN->bufferOrganization];
+        }
+        if (pqCAEN->valid[kCAEN_customSize]) {
+            [self setCustomSize:pqCAEN->customSize];
+            [self setIsCustomSize:(pqCAEN->customSize ? YES : NO)];
+            // (setIsFixedSize is not used)
+        }
+        if (pqCAEN->valid[kCAEN_acquisitionControl]) {
+            [self setAcquisitionMode:pqCAEN->acquisitionControl & 0x03];
+            [self setCountAllTriggers:(pqCAEN->acquisitionControl >> 3) & 0x01];
+        }
+        if (pqCAEN->valid[kCAEN_triggerMask]) {
+            [self setTriggerSourceMask:(pqCAEN->triggerMask & 0xffffffff)]; // for bits 0-7 and 30-31
+            [self setCoincidenceLevel:((pqCAEN->triggerMask >> 24) & 0x7)]; // for bits 24-26
+        }
+        if (pqCAEN->valid[kCAEN_triggerOutMask]) {
+            [self setTriggerOutMask:pqCAEN->triggerOutMask];
+        }
+        if (pqCAEN->valid[kCAEN_postTrigger]) {
+            [self setPostTriggerSetting:pqCAEN->postTrigger];
+        }
+        if (pqCAEN->valid[kCAEN_frontPanelIoControl]) {
+            [self setFrontPanelControlMask:pqCAEN->frontPanelIoControl];
+        }
+        if (pqCAEN->valid[kCAEN_channelMask]) {
+            [self setEnabledMask:pqCAEN->channelMask];
+        }
+        for (int i=0; i<kNumCaenChannelDacs; ++i) {
+            if (pqCAEN->valid[kCAEN_channelDacs] & (1 << i)) {
+                [self setDac:i withValue:pqCAEN->channelDacs[i]];
+                // (we don't currently use the thresholds because we use an external trigger,
+                //  so don't yet call setThreshold and setOverUnderThreshold)
+            }
+        }
+        // setNumberBLTEventsToReadout (not used)
+    }
+    @finally {
+        [[self undoManager] enableUndoRegistration];
+    }
 }
 
 #pragma mark ***Accessors
@@ -232,7 +298,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     
     eventSize = aEventSize;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelEventSizeChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenModelEventSizeChanged object:self];
 }
 
 - (int)	bufferState
@@ -349,7 +415,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     
     enabledMask = aEnabledMask;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelEnabledMaskChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenModelEnabledMaskChanged object:self];
 }
 
 - (unsigned long) postTriggerSetting
@@ -363,7 +429,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     
     postTriggerSetting = aPostTriggerSetting;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelPostTriggerSettingChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenModelPostTriggerSettingChanged object:self];
 }
 
 - (unsigned long) triggerSourceMask
@@ -377,7 +443,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     
     triggerSourceMask = aTriggerSourceMask;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelTriggerSourceMaskChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenModelTriggerSourceMaskChanged object:self];
 }
 
 - (unsigned long) triggerOutMask
@@ -392,7 +458,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 	//do not step into the reserved area
 	triggerOutMask = aTriggerOutMask & 0xc00000ff;
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelTriggerOutMaskChanged object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenModelTriggerOutMaskChanged object:self];
 }
 
 - (unsigned long) frontPanelControlMask
@@ -406,7 +472,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 	
 	frontPanelControlMask = aFrontPanelControlMask;
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelFrontPanelControlMaskChanged object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenModelFrontPanelControlMaskChanged object:self];
 }
 
 - (unsigned short) coincidenceLevel
@@ -420,7 +486,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     
     coincidenceLevel = aCoincidenceLevel;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelCoincidenceLevelChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenModelCoincidenceLevelChanged object:self];
 }
 
 - (unsigned short) acquisitionMode
@@ -434,7 +500,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     
     acquisitionMode = aMode;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelAcquisitionModeChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenModelAcquisitionModeChanged object:self];
 }
 
 - (BOOL) countAllTriggers
@@ -448,7 +514,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     
     countAllTriggers = aCountAllTriggers;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelCountAllTriggersChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenModelCountAllTriggersChanged object:self];
 }
 
 - (unsigned long) customSize
@@ -462,7 +528,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     
     customSize = aCustomSize;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelCustomSizeChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenModelCustomSizeChanged object:self];
 }
 
 - (BOOL) isCustomSize
@@ -476,7 +542,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 	
 	isCustomSize = aIsCustomSize;
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelIsCustomSizeChanged object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenModelIsCustomSizeChanged object:self];
 }
 
 - (BOOL) isFixedSize
@@ -490,7 +556,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 	
 	isFixedSize = aIsFixedSize;
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelIsFixedSizeChanged object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenModelIsFixedSizeChanged object:self];
 }
 
 - (unsigned short) channelConfigMask
@@ -510,7 +576,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 	//we do the sequential memory access only
 	channelConfigMask |= (1L<<4);
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelChannelConfigMaskChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenModelChannelConfigMaskChanged object:self];
 }
 
 - (unsigned long) numberBLTEventsToReadout
@@ -524,7 +590,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     
     numberBLTEventsToReadout = numBLTEvents;
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelNumberBLTEventsToReadoutChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenModelNumberBLTEventsToReadoutChanged object:self];
 }
 
 - (void) setUpImage
@@ -548,7 +614,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     
     continuousMode = aContinuousMode;
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:SNOCaenModelContinuousModeChanged object:self];    
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenModelContinuousModeChanged object:self];
 }
 
 #pragma mark ***Register - General routines
@@ -609,10 +675,8 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     [userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:SNOCaenChnl];
     
     // Send out notification that the value has changed.
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:SNOCaenChnlDacChanged
-	 object:self
-	 userInfo:userInfo];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenChnlDacChanged object:self userInfo:userInfo];
+
 }
 
 - (unsigned short) overUnderThreshold:(unsigned short) aChnl
@@ -634,10 +698,8 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     [userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:SNOCaenChnl];
     
     // Send out notification that the value has changed.
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:SNOCaenOverUnderThresholdChanged
-	 object:self
-	 userInfo:userInfo];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenOverUnderThresholdChanged object:self userInfo:userInfo];
+
 }
 
 - (void) readChan:(unsigned short)chan reg:(unsigned short) pReg returnValue:(unsigned long*) pValue
@@ -697,10 +759,8 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     [userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:SNOCaenChnl];
     
     // Send out notification that the value has changed.
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:SNOCaenChnlThresholdChanged
-	 object:self
-	 userInfo:userInfo];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SNOCaenChnlThresholdChanged object:self userInfo:userInfo];
+
 }
 
 - (void) read
@@ -952,20 +1012,21 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
 
 - (void) initBoard
 {
-    [self writeAcquistionControl:NO]; // Make sure it's off.
-	[self clearAllMemory];
-	[self softwareReset];
-	[self writeThresholds];
-	[self writeChannelConfiguration];
-	[self writeCustomSize];
-	[self writeTriggerSource];
-	[self writeTriggerOut];
-	[self writeFrontPanelControl];
-	[self writeChannelEnabledMask];
-	[self writeBufferOrganization];
-	[self writeOverUnderThresholds];
-	[self writeDacs];
-	[self writePostTriggerSetting];
+    [self softwareReset];
+    [self writeAcquisitionControl:NO]; // Make sure it's off.
+    [self writeThresholds];
+    [self writeChannelConfiguration];
+    [self writeCustomSize];
+    [self writeTriggerSource];
+    [self writeTriggerOut];
+    [self writeFrontPanelControl];
+    [self writeChannelEnabledMask];
+    [self writeBufferOrganization];
+    [self writeOverUnderThresholds];
+    [self writeDacs];
+    [self writePostTriggerSetting];
+    NSLog(@"Caen 1720 Card %d inited\n",[self slot]);
+
 }
 
 - (float) convertDacToVolts:(unsigned short)aDacValue 
@@ -1045,7 +1106,7 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     [self write:kPostTrigSetting sendValue:postTriggerSetting];
 }
 
-- (void) writeAcquistionControl:(BOOL)start
+- (void) writeAcquisitionControl:(BOOL)start
 {
 	unsigned long aValue = (countAllTriggers<<3) | (start<<2) | (acquisitionMode&0x3);
     [self write:kAcqControl sendValue:aValue];
@@ -1058,6 +1119,24 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
     unsigned long aValue = (enable) ? 1 : 0;
 
     [self write:kBLTEventNum sendValue:aValue];
+}
+
+- (void) writeEnableExtendedReadoutBuffer:(BOOL)enable
+{
+    /* Enable/disable the extended readout buffer. The normal readout buffer is
+     * mapped to 4kB of address space, however there is an undocumented bit in
+     * the vme control register which, if enabled, extends this space to ~16MB.
+     * */
+    unsigned long aValue;
+    [self read:kVMEControl returnValue:&aValue];
+
+    if (enable) {
+        aValue |= 0x100;
+    } else {
+        aValue &= 0xffffffeff;
+    }
+
+    [self write:kVMEControl sendValue:aValue];
 }
 
 - (void) writeEnableBerr:(BOOL)enable
@@ -1186,6 +1265,64 @@ NSString* SNOCaenModelContinuousModeChanged              = @"SNOCaenModelContinu
         [anEncoder encodeInt32:thresholds[i] forKey:[NSString stringWithFormat:@"CAENThresChnl%d", i]];
         [anEncoder encodeInt:overUnderThreshold[i] forKey:[NSString stringWithFormat:@"CAENOverUnderChnl%d", i]];
     }
+}
+
+- (NSDictionary*) serializeToDictionary
+{
+
+    // Dump current CAEN settings into dictionary.
+    // Returns NULL if there was any error.
+    NSMutableDictionary* CAENStateDict = [NSMutableDictionary dictionaryWithCapacity:1];
+    @try{
+        [CAENStateDict setObject:[NSNumber numberWithUnsignedShort:[self channelConfigMask]] forKey:[self getStandardRunKeyForField:@"channelConfigMask" ]];
+        [CAENStateDict setObject:[NSNumber numberWithInt:[self eventSize]] forKey:[self getStandardRunKeyForField:@"eventSize" ]];
+        [CAENStateDict setObject:[NSNumber numberWithUnsignedLong:[self customSize]] forKey:[self getStandardRunKeyForField:@"customSize" ]];
+        [CAENStateDict setObject:[NSNumber numberWithBool:[self isCustomSize]] forKey:[self getStandardRunKeyForField:@"isCustomSize" ]];
+        [CAENStateDict setObject:[NSNumber numberWithUnsignedShort:[self acquisitionMode]] forKey:[self getStandardRunKeyForField:@"acquisitionMode" ]];
+        [CAENStateDict setObject:[NSNumber numberWithBool:[self countAllTriggers]] forKey:[self getStandardRunKeyForField:@"countAllTriggers" ]];
+        [CAENStateDict setObject:[NSNumber numberWithUnsignedLong:[self triggerSourceMask]] forKey:[self getStandardRunKeyForField:@"triggerSourceMask" ]];
+        [CAENStateDict setObject:[NSNumber numberWithUnsignedShort:[self coincidenceLevel]] forKey:[self getStandardRunKeyForField:@"coincidenceLevel" ]];
+        [CAENStateDict setObject:[NSNumber numberWithUnsignedLong:[self triggerOutMask]] forKey:[self getStandardRunKeyForField:@"triggerOutMask" ]];
+        [CAENStateDict setObject:[NSNumber numberWithUnsignedLong:[self postTriggerSetting]] forKey:[self getStandardRunKeyForField:@"postTriggerSetting" ]];
+        [CAENStateDict setObject:[NSNumber numberWithUnsignedLong:[self frontPanelControlMask]] forKey:[self getStandardRunKeyForField:@"frontPanelControlMask" ]];
+        [CAENStateDict setObject:[NSNumber numberWithUnsignedShort:[self enabledMask]] forKey:[self getStandardRunKeyForField:@"enabledMask" ]];
+        for (int idac=0; idac<kNumCaenChannelDacs; ++idac) {
+            [CAENStateDict setObject:[NSNumber numberWithUnsignedShort:[self dac:idac]] forKey:[NSString stringWithFormat:@"%@_%i",[self getStandardRunKeyForField:@"dac"],idac]];
+        }
+
+        return CAENStateDict;
+
+    } @catch(NSException *err){
+        NSLogColor([NSColor redColor], @"CAEN: settings couldn't be saved. error: %@ reason: %@ \n", [err name], [err reason]);
+        return NULL;
+    }
+
+}
+
+- (void) loadFromSerialization:(NSMutableDictionary*)settingsDict {
+
+    [self setChannelConfigMask:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"channelConfigMask"]] unsignedShortValue]];
+    [self setEventSize:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"eventSize"]] intValue]];
+    [self setCustomSize:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"customSize"]] unsignedLongValue]];
+    [self setIsCustomSize:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"isCustomSize"]] boolValue]];
+    [self setAcquisitionMode:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"acquisitionMode"]] unsignedShortValue]];
+    [self setCountAllTriggers:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"countAllTriggers"]] boolValue]];
+    [self setTriggerSourceMask:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"triggerSourceMask"]] unsignedLongValue]];
+    [self setCoincidenceLevel:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"coincidenceLevel"]] unsignedShortValue]];
+    [self setTriggerOutMask:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"triggerOutMask"]] unsignedLongValue]];
+    [self setPostTriggerSetting:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"postTriggerSetting"]] unsignedLongValue]];
+    [self setFrontPanelControlMask:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"frontPanelControlMask"]] unsignedLongValue]];
+    [self setEnabledMask:[[settingsDict objectForKey:[self getStandardRunKeyForField:@"enabledMask"]] unsignedShortValue]];
+    for (int idac=0; idac<kNumCaenChannelDacs; ++idac) {
+        [self setDac:idac withValue:[[settingsDict objectForKey:[NSString stringWithFormat:@"%@_%i",[self getStandardRunKeyForField:@"dac"],idac]] unsignedShortValue]];
+    }
+
+}
+
+- (NSString*) getStandardRunKeyForField:(NSString*)aField
+{
+    aField = [NSString stringWithFormat:@"CAEN_%@",aField];
+    return aField;
 }
 
 #pragma mark •••HW Wizard

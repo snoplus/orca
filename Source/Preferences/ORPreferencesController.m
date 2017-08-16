@@ -114,10 +114,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(PreferencesController);
     if(colorAsData != nil)color = colorForData(colorAsData);
     [scriptConstantsColorWell setColor:color];
 
-
     [bugReportEMailField setDelegate:self];
-    
     [nextTimeTextField setStringValue:@" "];
+    [self _setPassWordButtonText];
 
     tag = [[defaults objectForKey: ORHelpFilesUseDefault] intValue];
     [helpFileLocationMatrix selectCellWithTag: tag ];
@@ -128,8 +127,20 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(PreferencesController);
 	[heartbeatPathField setStringValue:[[defaults objectForKey: ORPrefHeartBeatPath] stringByAbbreviatingWithTildeInPath]];
 	[activateHeartbeatCB setIntValue:[[defaults objectForKey: ORPrefHeartBeatEnabled] intValue]];
 
+    //-----mail preferences --------
+    tag = [[defaults objectForKey: ORMailSelectionPreference] intValue];
+    [mailSelectionMatrix selectCellWithTag: tag ];
+    NSString* ser = [defaults objectForKey: ORMailServer];
+    if(ser)[mailServerField setStringValue: ser];
+    NSString* add = [defaults objectForKey: ORMailAddress];
+    if(add)[mailAddressField setStringValue: add];
+    NSString* pw = [defaults objectForKey: ORMailPassword];
+    if(pw)[mailPasswordField setStringValue:pw];
 
-    [self _setPassWordButtonText];
+    [mailServerField   setEnabled: tag == 1];
+    [mailAddressField  setEnabled: tag == 1];
+    [mailPasswordField setEnabled: tag == 1];
+    
 }
 
 #pragma mark ¥¥¥Accessors
@@ -391,6 +402,36 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(PreferencesController);
             [[NSNotificationCenter defaultCenter]postNotificationName:ORPrefHeartBeatPathChanged object:nil];
         }
     }];
+}
+
+- (IBAction) mailSelectionAction:(id)sender
+{
+    int tag = [[mailSelectionMatrix selectedCell] tag];
+    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:tag] forKey:ORMailSelectionPreference];
+    
+    [mailServerField   setEnabled: tag == 1];
+    [mailAddressField  setEnabled: tag == 1];
+    [mailPasswordField setEnabled: tag == 1];
+    
+}
+
+- (IBAction) mailServerAction:(id)sender
+{
+    [mailServerField setStringValue:[sender stringValue]];
+    [[NSUserDefaults standardUserDefaults] setObject:[sender stringValue] forKey:ORMailServer];
+}
+
+
+- (IBAction) mailAddressAction:(id)sender
+{
+    [mailAddressField setStringValue:[sender stringValue]];
+    [[NSUserDefaults standardUserDefaults] setObject:[sender stringValue] forKey:ORMailAddress];
+}
+
+- (IBAction) mailPasswordAction:(id)sender;
+{
+    [mailPasswordField setStringValue:[sender stringValue]];
+    [[NSUserDefaults standardUserDefaults] setObject:[sender stringValue] forKey:ORMailPassword];
 }
 
 @end

@@ -90,8 +90,8 @@
 - (BOOL) waitForAsyncDownloadDone;
 - (void) setWaitForAsyncDownloadDone:(BOOL)aState;
 
-- (unsigned long) vendorID;
-- (unsigned long) productID;
+- (NSArray*) vendorIDs;
+- (NSArray*) productIDs;
 - (NSString*) usbInterfaceDescription;
 - (void) logSystemResponse;
 

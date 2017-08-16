@@ -20,7 +20,7 @@
 //-------------------------------------------------------------
 
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Imported Files
+#pragma mark •••Imported Files
 #import "ORKatrinV4SLTModel.h"
 #import "SBC_LinkController.h"
 
@@ -85,11 +85,11 @@
 		IBOutlet NSTextField*	pulserDelayField;
 
 
-        IBOutlet NSPopUpButton*	pollRatePopup;
+        IBOutlet NSPopUpButton*         pollRatePopup;
         IBOutlet NSProgressIndicator*	pollRunningIndicator;
 				
-		NSImage* xImage;
-		NSImage* yImage;
+		NSImage*                xImage;
+		NSImage*                yImage;
 
 		NSSize					controlSize;
 		NSSize					statusSize;
@@ -98,16 +98,16 @@
 		NSSize					cpuTestsSize;
 };
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
+#pragma mark •••Initialization
 - (id)   init;
 - (void) dealloc;
 - (void) awakeFromNib;
 
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Notifications
+#pragma mark •••Notifications
 - (void) registerNotificationObservers;
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+#pragma mark •••Interface Management
 - (void) pixelBusEnableRegChanged:(NSNotification*)aNote;
 - (void) secondsSetSendToFLTsChanged:(NSNotification*)aNote;
 - (void) secondsSetInitWithHostChanged:(NSNotification*)aNote;
@@ -121,7 +121,8 @@
 - (void) statusRegChanged:(NSNotification*)aNote;
 - (void) controlRegChanged:(NSNotification*)aNote;
 - (void) hwVersionChanged:(NSNotification*) aNote;
-
+- (void) displayEventLoopChanged:(NSNotification*) aNote;
+- (void) displayTriggerChanged:(NSNotification*) aNote;
 - (void) patternFilePathChanged:(NSNotification*)aNote;
 - (void) interruptMaskChanged:(NSNotification*)aNote;
 - (void) nextPageDelayChanged:(NSNotification*)aNote;
@@ -145,7 +146,7 @@
 
 - (void) enableRegControls;
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+#pragma mark •••Actions
 - (IBAction) readSLTEventFifoButtonAction:(id)sender;
 - (IBAction) pixelBusEnableRegTextFieldAction:(id)sender;
 - (IBAction) pixelBusEnableRegMatrixAction:(id)sender;
@@ -165,7 +166,6 @@
 - (IBAction) writeSWTrigAction:(id)sender;
 - (IBAction) resetPageManagerAction:(id)sender;
 - (IBAction) clearAllStatusErrorBitsAction:(id)sender;
-
 - (IBAction) dumpPageStatus:(id)sender;
 - (IBAction) pollRateAction:(id)sender;
 - (IBAction) pollNowAction:(id)sender;
@@ -188,8 +188,6 @@
 - (IBAction) definePatternFileAction:(id)sender;
 - (IBAction) loadPatternFile:(id)sender;
 - (IBAction) calibrateAction:(id)sender;
-
-
 - (IBAction) enableCountersAction:(id)sender;
 - (IBAction) disableCountersAction:(id)sender;
 - (IBAction) clearCountersAction:(id)sender;
@@ -203,16 +201,19 @@
 - (IBAction) writeSetInhibitAction:(id)sender;
 - (IBAction) resetPageManagerAction:(id)sender;
 - (IBAction) resetPageManagerAction:(id)sender;
-
 - (IBAction) sendCommandScript:(id)sender;
+
 - (IBAction) sendSimulationConfigScriptON:(id)sender;
 - (IBAction) sendSimulationConfigScriptOFF:(id)sender;
+- (IBAction) sendLinkWithDmaLibConfigScriptON:(id)sender;
+- (IBAction) sendLinkWithDmaLibConfigScriptOFF:(id)sender;
+
+- (void) _SLTv4killCrateAndStartLinkWithDMADidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _SLTv4killCrateAndStartLinkWithoutDMADidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _SLTv4killCrateAndStartSimDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 #endif
-- (IBAction) sendLinkWithDmaLibConfigScriptON:(id)sender;
-- (void) _SLTv4killCrateAndStartLinkWithDMADidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (void) _SLTv4killCrateAndStartLinkWithoutDMADidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (IBAction) sendLinkWithDmaLibConfigScriptOFF:(id)sender;
+
 
 @end

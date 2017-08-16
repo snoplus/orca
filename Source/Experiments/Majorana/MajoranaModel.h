@@ -61,17 +61,20 @@
     ORMJDInterlocks*    mjdInterlocks[2];
     ORMJDSource*        mjdSource[2];
     ORMJDHeaderRecordID* anObjForCouchID;
-    NSMutableDictionary* rateSpikes;
-    NSMutableDictionary* baselineSpikes;
-    NSMutableDictionary* breakDownDictionary;
-    BOOL scheduledToRunCheckBreakdown;
-    BOOL scheduledToSendRateReport;
-    BOOL scheduledToSendBaselineReport;
+    NSMutableDictionary* rateSpikes[2];
+    NSDate*              rateSpikeTime[2];
+    BOOL                 rateReportSent[2];
+    NSMutableDictionary* baselineExcursions[2];
     float maxNonCalibrationRate;
     ORHighRateChecker*    highRateChecker;
+    BOOL scheduledToRunCheckBreakdown;
+    BOOL testfillingLN[2];
+    BOOL verboseDiagnostics;
 }
 
 #pragma mark ¥¥¥Accessors
+- (BOOL) verboseDiagnostics;
+- (void) setVerboseDiagnostics:(BOOL)aState;
 - (NSDate*) lastConstraintCheck;
 - (void) setLastConstraintCheck:(NSDate*)aDate;
 - (BOOL) ignorePanicOnB;
@@ -87,11 +90,8 @@
 - (void) setIgnoreBreakdownCheckOnB:(BOOL)aIgnorePanicOnB;
 - (BOOL) ignoreBreakdownCheckOnA;
 - (void) setIgnoreBreakdownCheckOnA:(BOOL)aIgnorePanicOnA;
-- (void) sendRateSpikeReport;
-- (void) sendRateBaselineReport;
 
 - (void) getRunType:(ORRunModel*)rc;
-- (BOOL) calibrationRun:(int)aCrate;
 - (int)  pollTime;
 - (void) setPollTime:(int)aPollTime;
 - (void) setViewType:(int)aViewType;
@@ -99,14 +99,6 @@
 - (ORRemoteSocketModel*) remoteSocket:(int)aVMECrate;
 - (BOOL) anyHvOnVMECrate:(int)aVMECrate;
 - (void) setVmeCrateHVConstraint:(int)aCrate state:(BOOL)aState;
-- (void) rampDownHV:(int)aCrate vac:(int)aVacSystem;
-- (NSString*) checkForBreakdown:(int)aCrate vacSystem:(int)aVacSystem;
-- (void) setupBreakDownDictionary;
-- (NSDictionary*)breakDownDictionary;
-- (NSDictionary*) rateSpikes;
-- (NSDictionary*) baselineSpikes;
-- (BOOL) breakdownAlarmPosted:(int)alarmIndex;
-- (NSString*) breakdownReportFor:(NSDictionary*)detectorEntry;
 
 - (id) mjdInterlocks:(int)index;
 - (void) runTypeChanged:(NSNotification*) aNote;
@@ -119,16 +111,31 @@
 - (float) maxNonCalibrationRate;
 - (void) setMaxNonCalibrationRate:(float)aValue;
 
-//in the case of being asked to checkBreakdown, it should event rate and baseline, leave the vacuum to the MJD interlock
-- (void) logBreakdowns:(int)aCrate;
+#pragma mark ¥¥¥Breakdown Methods
+- (BOOL) matchingRateAndBaselineIssues:(unsigned short)index;
 - (void) rateSpike:(NSNotification*) aNote;
+- (NSDictionary*) rateSpikes:(unsigned short)index;
 - (void) baselineSpike:(NSNotification*) aNote;
-- (BOOL) breakdownConditionsMet:(id)aDetector;
+- (void) setRateSpikeTime:(unsigned short) index time:(NSDate*)aDate;
+- (BOOL) breakdownConditionsMet:(unsigned short)index;
 - (void) rampDownChannelsWithBreakdown:(int)module vac:(int)aVacSystem;
+- (BOOL) vacuumSpike:(unsigned short)index;
+- (BOOL) fillingLN:(unsigned short)index;
+- (NSTimeInterval) pollingTimeForLN:(unsigned short)index;
+- (void) constraintCheckFinished:(int)index;
+- (NSString*) checkForBreakdown:(unsigned short)module vacSystem:(unsigned short)aVacSystem;
+- (NSDictionary*) baselineExcursions:(unsigned short)index;
+- (BOOL) breakdownAlarmPosted:(unsigned short)alarmIndex;
+- (void) clearBreakdownAlarm:(unsigned short)index;
+- (BOOL) calibrationRun:(unsigned short)index;
+- (BOOL) rateSpikesValid:(unsigned short)index;
+- (NSString*) rateSpikeReport:(unsigned short)index;
+- (NSString*) baselineExcursionReport:(unsigned short)index;
+- (void) rampDownHV:(int)aCrate vac:(int)aVacSystem;
+- (void) printBreakDownReport;
+- (NSString*) fullBreakDownReport:(unsigned short)index;
+- (void) scheduleConstraintCheck;
 - (void) forceConstraintCheck;
-- (BOOL) vacuumSpike:(int)i;
-- (BOOL) fillingLN:(int)i;
-- (void) printBreakdownReport;
 
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups;
@@ -188,6 +195,7 @@ extern NSString* ORMJDAuxTablesChanged;
 extern NSString* ORMajoranaModelLastConstraintCheckChanged;
 extern NSString* ORMajoranaModelUpdateSpikeDisplay;
 extern NSString* ORMajoranaModelMaxNonCalibrationRate;
+extern NSString* ORMajoranaModelVerboseDiagnosticsChanged;
 
 @interface ORMJDHeaderRecordID : NSObject
 - (NSString*) fullID;

@@ -60,6 +60,11 @@
 	IBOutlet NSTextField*	heartbeatPathField;
     IBOutlet NSButton*      activateHeartbeatCB;
     IBOutlet NSButton*      activatePostLogCB;
+    
+    IBOutlet NSMatrix*		mailSelectionMatrix;
+    IBOutlet NSTextField*   mailAddressField;
+    IBOutlet NSTextField*   mailServerField;
+    IBOutlet NSSecureTextField* mailPasswordField;
 
     BOOL disallowStateChange;
 }
@@ -103,5 +108,11 @@
 - (IBAction) activateHeatbeatAction:(id)sender;
 - (IBAction) activatePostLogAction:(id)sender;
 - (IBAction) selectHeartbeatPathAction:(id)sender;
+
+
+- (IBAction) mailSelectionAction:(id)sender;
+- (IBAction) mailServerAction:(id)sender;
+- (IBAction) mailAddressAction:(id)sender;
+- (IBAction) mailPasswordAction:(id)sender;
 
 @end

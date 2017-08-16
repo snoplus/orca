@@ -27,17 +27,33 @@
 #import "ORTimeRate.h"
 #import "ORMTC_Constants.h"
 #import "ORSelectorSequence.h"
+#import "ORPQModel.h"
+
+
+#define VIEW_RAW_UNITS_TAG 0
+#define VIEW_mV_UNITS_TAG 1
+#define VIEW_NHIT_UNITS_TAG 2
+
+#define FIRST_NHIT_TAG 1
+#define VIEW_N100H_TAG 1
+#define VIEW_N100M_TAG 2
+#define VIEW_N100L_TAG 3
+#define VIEW_N20_TAG 4
+#define VIEW_N20LB_TAG 5
+#define VIEW_OWLN_TAG 6
+#define LAST_NHIT_TAG 6
+
+#define FIRST_ESUM_TAG 7
+#define VIEW_ESUML_TAG 7
+#define VIEW_ESUMH_TAG 8
+#define VIEW_OWLEL_TAG 9
+#define VIEW_OWLEH_TAG 10
+#define LAST_ESUM_TAG 10
+
 
 #pragma mark •••PrivateInterface
 @interface ORMTCController (private)
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 //pre 10.6-specific
-- (void) setXilinxFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void) setDefaultFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void) saveDefaultSetDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void) selectAndLoadDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void) loadDBFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-#endif
-- (void) selectAndLoadDBFile:(NSString*)aStartPath;
+
 - (void) setupNHitFormats;
 - (void) setupESumFormats;
 - (void) storeUserNHitValue:(float)value index:(int) thresholdIndex;
@@ -55,28 +71,21 @@
     return self;
 }
 
-//This pulls any names from the Nib
-- (NSMutableDictionary*) getMatriciesFromNib;
-{
-    NSMutableDictionary* returnDictionary= [NSMutableDictionary dictionaryWithCapacity:100];
-    [returnDictionary setObject:globalTriggerMaskMatrix forKey:@"globalTriggerMaskMatrix"];
-    [returnDictionary setObject:globalTriggerCrateMaskMatrix forKey:@"globalTriggerCrateMaskMatrix"];
-    [returnDictionary setObject:pedCrateMaskMatrix forKey:@"pedCrateMaskMatrix"];
-    return returnDictionary;
-}
-
 - (void) awakeFromNib
 {
-    basicOpsSize    = NSMakeSize(400,350);
-    standardOpsSize	= NSMakeSize(560,530);
-    settingsSize	= NSMakeSize(810,600);
-    triggerSize		= NSMakeSize(800,640);
+    standardOpsSizeSmall = NSMakeSize(590,300);
+    standardOpsSizeLarge = NSMakeSize(590,620);
+    settingsSizeSmall	 = NSMakeSize(580,400);
+    settingsSizeLarge	 = NSMakeSize(580,520);
+    triggerSize          = NSMakeSize(800,655);
     blankView = [[NSView alloc] init];
     [tabView setFocusRingType:NSFocusRingTypeNone];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
 
 	[initProgressField setHidden:YES];
-	
+    [settingsAdvancedOptionsBox setHidden:YES];
+    [opAdvancedOptionsBox setHidden:YES];
+
     [super awakeFromNib];
 	
     NSString* key = [NSString stringWithFormat: @"orca.ORMTC%d.selectedtab",[model slot]];
@@ -86,7 +95,6 @@
     [tabView selectTabViewItemAtIndex: index];
     [self populatePullDown];
     [self updateWindow];
-
 }
 
 #pragma mark •••Notifications
@@ -153,47 +161,32 @@
                      selector : @selector(basicOpsRunningChanged:)
                          name : ORMTCModelBasicOpsRunningChanged
 						object: model];
-						
-    [notifyCenter addObserver : self
-                     selector : @selector(defaultFileChanged:)
-                         name : ORMTCModelDefaultFileChanged
-						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(mtcDataBaseChanged:)
-                         name : ORMTCModelMtcDataBaseChanged
+                     selector : @selector(mtcPulserRateChanged:)
+                         name : ORMTCPulserRateChanged
 						object: model];
-						
+
     [notifyCenter addObserver : self
-                     selector : @selector(lastFileLoadedChanged:)
-                         name : ORMTCModelLastFileLoadedChanged
-						object: model];
-						
-   [notifyCenter addObserver : self
-                     selector : @selector(nHitViewTypeChanged:)
-                         name : ORMTCModelNHitViewTypeChanged
-						object: model];
+                     selector : @selector(mtcGTMaskChanged:)
+                         name : ORMTCGTMaskChanged
+                        object: model];
 
-	[notifyCenter addObserver : self
-                     selector : @selector(eSumViewTypeChanged:)
-                         name : ORMTCModelESumViewTypeChanged
-						object: model];
+    [notifyCenter addObserver : self
+                     selector : @selector(isPulserFixedRateChanged:)
+                         name : ORMTCModelIsPulserFixedRateChanged
+                        object: model];
 
-	[notifyCenter addObserver : self
-			 selector : @selector(isPulserFixedRateChanged:)
-			     name : ORMTCModelIsPulserFixedRateChanged
-			    object: model];
+    [notifyCenter addObserver : self
+                     selector : @selector(fixedPulserRateCountChanged:)
+                         name : ORMTCModelFixedPulserRateCountChanged
+                        object: model];
 
-	[notifyCenter addObserver : self
-			 selector : @selector(fixedPulserRateCountChanged:)
-			     name : ORMTCModelFixedPulserRateCountChanged
-			    object: model];
+    [notifyCenter addObserver : self
+                     selector : @selector(fixedPulserRateDelayChanged:)
+                         name : ORMTCModelFixedPulserRateDelayChanged
+                        object: model];
 
-	[notifyCenter addObserver : self
-			 selector : @selector(fixedPulserRateDelayChanged:)
-			     name : ORMTCModelFixedPulserRateDelayChanged
-			    object: model];
-	
     [notifyCenter addObserver : self
                      selector : @selector(sequenceRunning:)
                          name : ORSequenceRunning
@@ -212,18 +205,42 @@
     [notifyCenter addObserver : self
                      selector : @selector(triggerMTCAMaskChanged:)
                          name : ORMTCModelMTCAMaskChanged
-                       object : nil];
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(updateThresholdsDisplay:)
+                         name : ORMTCAThresholdChanged
+                       object : model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(updateThresholdsDisplay:)
+                         name : ORMTCABaselineChanged
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(updateThresholdsDisplay:)
+                         name : ORMTCAConversionChanged
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(triggerMTCAMaskChanged:)
+                         name : ORMTCAThresholdChanged
+                       object : model];
 
     [notifyCenter addObserver : self
                      selector : @selector(isPedestalEnabledInCSRChanged:)
                          name : ORMTCModelIsPedestalEnabledInCSR
-                       object : nil];
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(mtcSettingsChanged:)
+                         name : ORMTCSettingsChanged
+                       object : model];
 }
 
 - (void) updateWindow
 {
     [super updateWindow];
- 	[self nHitViewTypeChanged:nil];
     [self regBaseAddressChanged:nil];
     [self memBaseAddressChanged:nil];
     [self slotChanged:nil];
@@ -236,15 +253,17 @@
 	[self useMemoryChanged:nil];
 	[self autoIncrementChanged:nil];
 	[self basicOpsRunningChanged:nil];
-	[self defaultFileChanged:nil];
-	[self mtcDataBaseChanged:nil];
-	[self lastFileLoadedChanged:nil];
-	[self eSumViewTypeChanged:nil];
+    [self mtcGTMaskChanged:nil];
+    [self updateThresholdsDisplay:nil];
+    [self mtcPulserRateChanged:nil];
 	[self isPulserFixedRateChanged:nil];
 	[self fixedPulserRateCountChanged:nil];
 	[self fixedPulserRateDelayChanged:nil];
     [self triggerMTCAMaskChanged:nil];
     [self isPedestalEnabledInCSRChanged:nil];
+    [self mtcSettingsChanged:nil];
+    [lockOutWidthField setIntValue:[model lockoutWidth]];
+    [pedestalWidthField setIntValue:[model pedestalWidth]];
 }
 
 - (void) checkGlobalSecurity
@@ -284,127 +303,56 @@
 	[initProgressField setFloatValue:progress/100.];
 }
 
-- (void) eSumViewTypeChanged:(NSNotification*)aNote
+- (void) mtcPulserRateChanged:(NSNotification *)aNote
 {
-	[eSumViewTypeMatrix selectCellWithTag: [model eSumViewType]];
-	[self setupESumFormats];
-	[self mtcDataBaseChanged:nil];
+    int rate = [model pgtRate];
+    [pulserPeriodField setIntValue:rate];
 }
 
-- (void) nHitViewTypeChanged:(NSNotification*)aNote
+- (void) mtcGTMaskChanged:(NSNotification *) aNote
 {
-	[nHitViewTypeMatrix selectCellWithTag: [model nHitViewType]];
-	[self setupNHitFormats];
-	[self mtcDataBaseChanged:nil];
+    int maskValue = [model gtMask];
+    for(int i=0;i<26;i++){
+        [[globalTriggerMaskMatrix cellWithTag:i]  setIntValue: maskValue & (1<<i)];
+    }
 }
 
-
-- (void) mtcDataBaseChanged:(NSNotification*)aNote
+- (void) updateThresholdsDisplay:(NSNotification *)aNote
 {
-	[lockOutWidthField		setFloatValue:	[model dbFloatByIndex: kLockOutWidth]];
-	[pedestalWidthField		setFloatValue:	[model dbFloatByIndex: kPedestalWidth]];
-	[nhit100LoPrescaleField setFloatValue:	[model dbFloatByIndex: kNhit100LoPrescale]];
-	[pulserPeriodField		setFloatValue:	[model dbFloatByIndex: kPulserPeriod]];
-    [extraPulserPeriodField	setFloatValue:	[model dbFloatByIndex: kPulserPeriod]];
-    [fineSlopeField			setFloatValue:	[model dbFloatByIndex: kFineSlope]];
-	[minDelayOffsetField	setFloatValue:	[model dbFloatByIndex: kMinDelayOffset]];
-	[coarseDelayField		setFloatValue:	[model dbFloatByIndex: kCoarseDelay]];
-	[fineDelayField			setFloatValue:	[model dbFloatByIndex: kFineDelay]];
-	
-	[self displayMasks];
+    int nhit_units,esum_units;
+    int nhit_view_unit_index = [[nHitViewTypeMatrix selectedCell] tag];
+    int esum_view_unit_index = [[eSumViewTypeMatrix selectedCell] tag];
+    @try {
+        nhit_units = [self convert_view_unit_index_to_model_index: nhit_view_unit_index];
+        esum_units = [self convert_view_unit_index_to_model_index: esum_view_unit_index];
+    } @catch (NSException *exception) {
+        NSLogColor([NSColor redColor], @"Error displaying updated threshold information. Reason: %@\n",[exception reason]);
+        return;
+    }
+    [self changeNhitThresholdsDisplay:nhit_units];
+    [self changeESUMThresholdDisplay:esum_units];
+}
 
-	//load the nhit values
-	int col,row;
-	float displayValue=0;
-	for(col=0;col<4;col++){
-		for(row=0;row<6;row++){
-			int index = kNHit100HiThreshold + row + (col * 6);
-			if(col == 0){
-				int type = [model nHitViewType];
-				if(type == kNHitsViewRaw) {
-					displayValue = [model dbFloatByIndex: index];
-				}	
-				else if(type == kNHitsViewmVolts) { 
-					float rawValue = [model dbFloatByIndex: index];
-					displayValue = [model rawTomVolts:rawValue];
-				}
-				else if(type == kNHitsViewNHits) {
-					int rawValue    = [model dbFloatByIndex: index];
-					float mVolts    = [model rawTomVolts:rawValue];
-					float dcOffset  = [model dbFloatByIndex:index + kNHitDcOffset_Offset];
-					float mVperNHit = [model dbFloatByIndex:index + kmVoltPerNHit_Offset];
-					displayValue    = [model mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];			
-				}
-			}
-			else displayValue = [model dbFloatByIndex: index];
-			[[nhitMatrix cellAtRow:row column:col] setFloatValue:displayValue];
-		}
-	}
-	
-	//now the esum values
-	for(col=0;col<4;col++){
-		for(row=0;row<4;row++){
-			int index = kESumLowThreshold + row + (col * 4);
-			if(col == 0){
-				int type = [model eSumViewType];
-				if(type == kESumViewRaw) {
-					displayValue = [model dbFloatByIndex: index];
-				}	
-				else if(type == kESumViewmVolts) { 
-					float rawValue = [model dbFloatByIndex: index];
-					displayValue = [model rawTomVolts:rawValue];
-				}
-				else if(type == kESumVieweSumRel) {					
-					float dcOffset = [model dbFloatByIndex:index + kESumDcOffset_Offset];
-					displayValue = dcOffset - [model dbFloatByIndex: index];
-				}
-				else if(type == kESumViewpC) {
-					int rawValue   = [model dbFloatByIndex: index];
-					float mVolts   = [model rawTomVolts:rawValue];
-					float dcOffset = [model dbFloatByIndex:index + kESumDcOffset_Offset];
-					float mVperpC  = [model dbFloatByIndex:index + kmVoltPerpC_Offset];
-					displayValue   = [model mVoltsTopC:mVolts dcOffset:dcOffset mVperpC:mVperpC];			
-				}
-			}
-			else displayValue = [model dbFloatByIndex: index];
-			[[esumMatrix cellAtRow:row column:col] setFloatValue:displayValue];
-		}
-	}
-	
-	NSString* ss = [model dbObjectByIndex: kDBComments];
-	if(!ss) ss = @"---";
-	[commentsField setStringValue: ss];
-	
-	NSString* xilinxFile = [model dbObjectByIndex: kXilinxFile];
-	if(!xilinxFile) xilinxFile = @"---";
-	[xilinxFilePathField setStringValue: [xilinxFile stringByAbbreviatingWithTildeInPath]];
+- (void) cancelOperation:(id)sender {
+    [self endEditing];
+    [[self window] makeFirstResponder:nil];
 }
 
 - (void) displayMasks
 {
 	int i;
-	int maskValue = [model dbIntByIndex: kGtMask];
+	int maskValue = [model gtMask];
 	for(i=0;i<26;i++){
 		[[globalTriggerMaskMatrix cellWithTag:i]  setIntValue: maskValue & (1<<i)];
 	}
-	maskValue = [model dbIntByIndex: kGtCrateMask];
+	maskValue = [model GTCrateMask];
 	for(i=0;i<25;i++){
 		[[globalTriggerCrateMaskMatrix cellWithTag:i]  setIntValue: maskValue & (1<<i)];
 	}
-	maskValue = [model dbIntByIndex: kPEDCrateMask];
+	maskValue = [model pedCrateMask];
 	for(i=0;i<25;i++){
 		[[pedCrateMaskMatrix cellWithTag:i]  setIntValue: maskValue & (1<<i)];
 	}
-}
-
-- (void) lastFileLoadedChanged:(NSNotification*)aNote
-{
-	[lastFileLoadedField setStringValue: [[[model lastFileLoaded] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]];
-}
-
-- (void) defaultFileChanged:(NSNotification*)aNote
-{
-	[defaultFileField setStringValue: [[[model defaultFile] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]];
 }
 
 - (void) basicOpsRunningChanged:(NSNotification*)aNote
@@ -450,11 +398,6 @@
 	[selectedRegisterPU selectItemAtIndex: [model selectedRegister]];
 }
 
-- (void) loadXilinxPathChanged:(NSNotification*)aNote
-{
-	[xilinxFilePathField setStringValue: [[model xilinxFilePath] stringByAbbreviatingWithTildeInPath]];
-}
-
 - (void) isPulserFixedRateChanged:(NSNotification*)aNote
 {
 	[[isPulserFixedRateMatrix cellWithTag:1] setIntValue:[model isPulserFixedRate]];
@@ -474,8 +417,7 @@
 
 - (void) basicLockChanged:(NSNotification*)aNotification
 {
-
-    BOOL locked						= [gSecurity isLocked:ORMTCBasicLock];
+    BOOL locked                        = [gSecurity isLocked:ORMTCBasicLock];
     BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORMTCBasicLock];
 
     //Basic ops
@@ -495,16 +437,12 @@
     [readButton setEnabled: !lockedOrNotRunningMaintenance];
     [writteButton setEnabled: !lockedOrNotRunningMaintenance];
     [stopButton setEnabled: !lockedOrNotRunningMaintenance];
-    [statusButton setEnabled: !lockedOrNotRunningMaintenance];
     
     //Standards ops
     lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORMTCBasicLock] | sequenceRunning;
     
     [initMtcButton				setEnabled: !lockedOrNotRunningMaintenance];
-    [initNoXilinxButton			setEnabled: !lockedOrNotRunningMaintenance];
-    [initNo10MHzButton			setEnabled: !lockedOrNotRunningMaintenance];
-    [initNoXilinxNo100MHzButton setEnabled: !lockedOrNotRunningMaintenance];
-    [pulserFeedsMatrix          setEnabled: !lockedOrNotRunningMaintenance];
+    [includePedestalsCheckBox   setEnabled: !lockedOrNotRunningMaintenance];
     
     [firePedestalsButton		setEnabled: !lockedOrNotRunningMaintenance && [model isPulserFixedRate]];
     [stopPedestalsButton		setEnabled: !lockedOrNotRunningMaintenance && [model isPulserFixedRate]];
@@ -514,29 +452,16 @@
     [fixedTimePedestalsCountField	setEnabled: !lockedOrNotRunningMaintenance && ![model isPulserFixedRate]];
     [fixedTimePedestalsDelayField	setEnabled: !lockedOrNotRunningMaintenance && ![model isPulserFixedRate]];
     
-    [triggerZeroMatrix			setEnabled: !lockedOrNotRunningMaintenance];
-    [findTriggerZerosButton		setEnabled: !lockedOrNotRunningMaintenance];
-    [continuousButton			setEnabled: !lockedOrNotRunningMaintenance];
-    [stopTriggerZeroButton		setEnabled: !lockedOrNotRunningMaintenance];
-
     //Settings
-    [load10MhzCounterButton		    setEnabled: !lockedOrNotRunningMaintenance];
-    [setCoarseDelayButton           setEnabled: !lockedOrNotRunningMaintenance];
-    [setFineDelayButton				setEnabled: !lockedOrNotRunningMaintenance];
+    [setAdvancedOptionsButton           setEnabled: !lockedOrNotRunningMaintenance];
     [loadMTCADacsButton				setEnabled: !lockedOrNotRunningMaintenance];
     [nhitMatrix                     setEnabled: !lockedOrNotRunningMaintenance];
     [esumMatrix                     setEnabled: !lockedOrNotRunningMaintenance];
     [lockOutWidthField              setEnabled: !lockedOrNotRunningMaintenance];
     [pedestalWidthField             setEnabled: !lockedOrNotRunningMaintenance];
-    [low10MhzClockField             setEnabled: !lockedOrNotRunningMaintenance];
-    [high10MhzClockField            setEnabled: !lockedOrNotRunningMaintenance];
     [nhit100LoPrescaleField         setEnabled: !lockedOrNotRunningMaintenance];
-    [pulserPeriodField              setEnabled: !lockedOrNotRunningMaintenance];
-    [extraPulserPeriodField         setEnabled: !lockedOrNotRunningMaintenance];
-    [fineSlopeField                 setEnabled: !lockedOrNotRunningMaintenance];
-    [minDelayOffsetField            setEnabled: !lockedOrNotRunningMaintenance];
-    [fineDelayField                 setEnabled: !lockedOrNotRunningMaintenance];
-    [coarseDelayField               setEnabled: !lockedOrNotRunningMaintenance];
+    [pulserPeriodField         setEnabled: !lockedOrNotRunningMaintenance];
+    [coarseDelayField                 setEnabled: !lockedOrNotRunningMaintenance];
 
     //Triggers
     [globalTriggerCrateMaskMatrix setEnabled: !lockedOrNotRunningMaintenance];
@@ -554,53 +479,54 @@
     [loadMTCACrateMaskButton setEnabled: !lockedOrNotRunningMaintenance];
     [loadPEDCrateMaskButton setEnabled: !lockedOrNotRunningMaintenance];
     [loadTriggerMaskButton setEnabled: !lockedOrNotRunningMaintenance];
-    [clearGTCratesButton setEnabled: !lockedOrNotRunningMaintenance];
-    [clearMTCAMaskButton setEnabled: !lockedOrNotRunningMaintenance];
-    [clearPEDCratesButton setEnabled: !lockedOrNotRunningMaintenance];
-    [clearTriggersButton setEnabled: !lockedOrNotRunningMaintenance];
-    
 }
 
 - (void) isPedestalEnabledInCSRChanged:(NSNotification*)aNotification
 {
-    if ([model isPedestalEnabledInCSR]) {
-        [[pulserFeedsMatrix cellWithTag:0] setIntegerValue:0];
-        [[pulserFeedsMatrix cellWithTag:1] setIntegerValue:1];
-    }
-    else {
-        [[pulserFeedsMatrix cellWithTag:0] setIntegerValue:1];
-        [[pulserFeedsMatrix cellWithTag:1] setIntegerValue:0];
-    }
+    [includePedestalsCheckBox setState:[model isPedestalEnabledInCSR]];
+}
+
+- (void) mtcSettingsChanged:(NSNotification*)aNotification
+{
+    [coarseDelayField setFloatValue:[model coarseDelay]];
+    [fineDelayField setFloatValue:[model fineDelay]/1000.0];
+    [lockOutWidthField setIntValue:[model lockoutWidth]];
+    [pedestalWidthField setIntValue:[model pedestalWidth]];
+    [nhit100LoPrescaleField setIntValue:[model prescaleValue]];
+    [self displayMasks];
 }
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
 {
-    if([tabView indexOfTabViewItem:item] == 0){
+    if ([tabView indexOfTabViewItem:item] == 0) {
+        NSSize* newSize =nil;
+        if ([opAdvancedOptionsBox isHidden]) {
+            newSize = &standardOpsSizeSmall;
+        } else {
+            newSize = &standardOpsSizeLarge;
+        }
 		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:basicOpsSize];
+		[self resizeWindowToSize:*newSize];
 		[[self window] setContentView:mtcView];
-    }
-    else if([tabView indexOfTabViewItem:item] == 1){
+    } else if ([tabView indexOfTabViewItem:item] == 1) {
+        NSSize* newSize = nil;
+        if ([settingsAdvancedOptionsBox isHidden]) {
+            newSize = &settingsSizeSmall;
+        } else {
+            newSize = &settingsSizeLarge;
+        }
 		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:standardOpsSize];
+		[self resizeWindowToSize:*newSize];
 		[[self window] setContentView:mtcView];
-    }
-    else if([tabView indexOfTabViewItem:item] == 2){
-		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:settingsSize];
-		[[self window] setContentView:mtcView];
-    }
-    else if([tabView indexOfTabViewItem:item] == 3){
+    } else if ([tabView indexOfTabViewItem:item] == 2) {
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:triggerSize];
 		[[self window] setContentView:mtcView];
     }
 
-
     NSString* key = [NSString stringWithFormat: @"orca.ORMTC%d.selectedtab",[model slot]];
     int index = [tabView indexOfTabViewItem:item];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
-	
 }
 
 - (void) slotChanged:(NSNotification*)aNotification
@@ -627,37 +553,18 @@
 
 - (void) triggerMTCAMaskChanged:(NSNotification*)aNotification
 {
-    unsigned long maskValue = [model mtcaN100Mask];
-    unsigned short i;
-	for(i=0;i<20;i++) [[mtcaN100Matrix cellWithTag:i] setIntValue: maskValue & (1<<i)];
-
-    maskValue = [model mtcaN20Mask];
-	for(i=0;i<20;i++) [[mtcaN20Matrix cellWithTag:i] setIntValue: maskValue & (1<<i)];
-
-    maskValue = [model mtcaEHIMask];
-	for(i=0;i<20;i++) [[mtcaEHIMatrix cellWithTag:i] setIntValue: maskValue & (1<<i)];
-
-    maskValue = [model mtcaELOMask];
-	for(i=0;i<20;i++) [[mtcaELOMatrix cellWithTag:i] setIntValue: maskValue & (1<<i)];
-    
-    maskValue = [model mtcaOELOMask];
-	for(i=0;i<20;i++) {
-        if ([mtcaOELOMatrix cellWithTag:i]) {
-            [[mtcaOELOMatrix cellWithTag:i]  setIntValue: maskValue & (1<<i)];
-        }
-    }
-
-    maskValue = [model mtcaOEHIMask];
-	for(i=0;i<20;i++) {
-        if ([mtcaOEHIMatrix cellWithTag:i]) {
-            [[mtcaOEHIMatrix cellWithTag:i]  setIntValue: maskValue & (1<<i)];
-        }
-    }
-
-    maskValue = [model mtcaOWLNMask];
-	for(i=0;i<20;i++) {
-        if ([mtcaOWLNMatrix cellWithTag:i]) {
-            [[mtcaOWLNMatrix cellWithTag:i]  setIntValue: maskValue & (1<<i)];
+    NSArray* matrices = @[mtcaN100Matrix, mtcaN20Matrix, mtcaEHIMatrix, mtcaELOMatrix,
+                          mtcaOWLNMatrix,mtcaOEHIMatrix,mtcaOELOMatrix];
+    uint32_t masks[7] = {[model mtcaN100Mask],[model mtcaN20Mask],[model mtcaEHIMask],
+                            [model mtcaELOMask],[model mtcaOWLNMask],[model mtcaOEHIMask],
+                            [model mtcaOELOMask]};
+    for (int matrix_index = 0; matrix_index < [matrices count]; matrix_index++) {
+        uint32_t maskValue = masks[matrix_index];
+        NSMatrix* thisMatrix = matrices[matrix_index];
+        for (int i = 0; i < [thisMatrix numberOfRows]; i++) {
+            NSCell* thisCell = [thisMatrix cellAtRow:i column:0];
+            int bitPos = [thisCell tag];
+            [thisCell setIntValue:(maskValue & (1<<bitPos))];
         }
     }
 }
@@ -707,7 +614,7 @@
 
 - (void) populatePullDown
 {
-    short	i;
+    short i;
         
     [selectedRegisterPU removeAllItems];
     
@@ -716,13 +623,6 @@
     }
      
     [self selectedRegisterChanged:nil];
-
-}
-
-- (void) buttonPushed:(id) sender 
-{
-	NSLog(@"Input received from %@\n", [sender title] );	//This is the only real method.  The other button push methods just call this one.
-	NSLogColor([NSColor redColor], @"implementation needed\n");
 }
 
 //basic ops Actions
@@ -736,11 +636,6 @@
 	[model writeBasicOps];
 }
 
-- (IBAction) basicStatusAction:(id) sender
-{
-	[model reportStatus];
-}
-
 - (IBAction) basicStopAction:(id) sender
 {
 	[model stopBasicOps];
@@ -749,47 +644,30 @@
 //MTC Init Ops buttons.
 - (IBAction) standardInitMTC:(id) sender 
 {
-	[model initializeMtc:YES load10MHzClock:YES]; 
+    [model initializeMtc];
 }
 
-- (IBAction) standardInitMTCnoXilinx:(id) sender 
-{
-	[model initializeMtc:NO load10MHzClock:YES]; 
-}
-
-- (IBAction) standardInitMTCno10MHz:(id) sender 
-{
-	[model initializeMtc:YES load10MHzClock:NO]; 
-}
-
-- (IBAction) standardInitMTCnoXilinxno10MHz:(id) sender 
-{
-	[model initializeMtc:NO load10MHzClock:NO]; 
-}
-
-- (IBAction) standardLoad10MHzCounter:(id) sender 
-{
-	[model load10MHzClock];
-}
-
-- (IBAction) standardLoadOnlineGTMasks:(id) sender 
-{
-	[model setGlobalTriggerWordMask];
-}
-	
 - (IBAction) standardLoadMTCADacs:(id) sender 
 {
-	[model loadTheMTCADacs];
+    @try {
+	    [model loadTheMTCADacs];
+    } @catch(NSException *excep) {
+        NSLogColor([NSColor redColor], @"Error loading the MTCA DACs. Reason: %@\n.",[excep reason]);
+    }
 }
 
-- (IBAction) standardSetCoarseDelay:(id) sender 
+- (IBAction) setAdvancedOptions:(id)sender
 {
-	[model setupGTCorseDelay];
-}
-
-- (IBAction) standardSetFineDelay:(id) sender
-{
-    [model setupGTFineDelay];
+    @try {
+        [model loadCoarseDelayToHardware];
+        [model loadFineDelayToHardware];
+        [model loadPrescaleValueToHardware];
+        [model loadLockOutWidthToHardware];
+        [model loadPedWidthToHardware];
+    } @catch (NSException *excep) {
+        // Do nothing
+        // The above will all catch and warn about any error already
+    }
 }
 
 - (IBAction) standardIsPulserFixedRate:(id) sender
@@ -820,7 +698,11 @@
 
 - (IBAction) standardStopPedestalsFixedTime:(id) sender
 {
-	[model stopMTCPedestalsFixedTime];
+    @try {
+        [model stopMTCPedestalsFixedTime];
+    } @catch (NSException* excep) {
+        NSLog(@"Failed to stop pulser: %@\n",[excep reason]);
+    }
 }
 
 - (IBAction) standardSetPedestalsCount:(id) sender
@@ -839,561 +721,440 @@
 	[model setFixedPulserRateDelay:aValue];
 }
 
-- (IBAction) standardFindTriggerZeroes:(id) sender 
-{
-	[self buttonPushed:sender];
-}
-
-- (IBAction) standardStopFindTriggerZeroes:(id) sender 
-{
-	[self buttonPushed:sender];
-}
-
 - (IBAction) standardPulserFeeds:(id)sender
 {
-    [model setIsPedestalEnabledInCSR:[[sender selectedCell] tag]];
+    [model setIsPedestalEnabledInCSR:[includePedestalsCheckBox state]];
+    [self endEditing];
 }
 
 //Settings buttons.
 - (IBAction) eSumViewTypeAction:(id)sender
 {
-	[self endEditing];
-	[model setESumViewType:[[sender selectedCell] tag]];	
+    int unit_index;
+    int view_index = [[sender selectedCell] tag];
+    @try {
+        unit_index = [self convert_view_unit_index_to_model_index:view_index];
+    } @catch (NSException *exception) {
+        NSLogColor([NSColor redColor], @"Could not change views. Reason:%@\n",[exception reason]);
+        return;
+    }
+    [self changeESUMThresholdDisplay:unit_index];
 }
 
 - (IBAction) nHitViewTypeAction:(id)sender
 {
-	[self endEditing];
-	[model setNHitViewType:[[sender selectedCell] tag]];
+    int unit_index;
+    int view_index = [[sender selectedCell] tag];
+    @try {
+        unit_index = [self convert_view_unit_index_to_model_index:view_index];
+        [self changeNhitThresholdsDisplay: unit_index];
+    } @catch (NSException *exception) {
+        NSLogColor([NSColor redColor], @"Could not change views. Reason:%@\n",[exception reason]);
+    }
 }
 
-- (IBAction) settingsLoadDBFile:(id) sender 
+- (IBAction)opsAdvancedOptionsTriangeChanged:(id)sender
 {
-	[self selectAndLoadDBFile:[model lastFileLoaded]];
+    [self showHideOptions:sender Box:opAdvancedOptionsBox resizeSmall:standardOpsSizeSmall resizeLarge:standardOpsSizeLarge];
 }
 
-- (IBAction) settingsXilinxFile:(id) sender 
+- (IBAction)settingsAdvancedOptionsTriangeChanged:(id)sender
 {
-	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
-    [openPanel setCanChooseDirectories:NO];
-    [openPanel setCanChooseFiles:YES];
-    [openPanel setAllowsMultipleSelection:NO];
-    [openPanel setPrompt:@"Choose"];
-    NSString* startingDir;
-	
-	NSString* fullPath = [[model xilinxFilePath] stringByExpandingTildeInPath];
-    if(fullPath)	startingDir = [[model xilinxFilePath] stringByDeletingLastPathComponent];
-    else			startingDir = NSHomeDirectory();
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
-    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
-        if (result == NSFileHandlingPanelOKButton){
-            [model setXilinxFilePath:[[openPanel URL]path]];
-            NSLog(@"MTC Xilinx default file set to: %@\n",[[[[[openPanel URLs] objectAtIndex:0]path] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
+    [self showHideOptions:sender Box:settingsAdvancedOptionsBox resizeSmall:settingsSizeSmall resizeLarge:settingsSizeLarge];
+}
+
+- (void) showHideOptions:(id) sender Box:(id)box resizeSmall:(NSSize) smallSize resizeLarge:(NSSize) largeSize
+{
+    if ([sender state] == NSOffState) {
+        [box setHidden:YES];
+        [self resizeWindowToSize:smallSize];
+    } else {
+        [box setHidden:NO];
+        // Don't resize if the window is already large enough
+        if(self.window.frame.size.height <  largeSize.height || self.window.frame.size.width < largeSize.width) {
+            [self resizeWindowToSize:largeSize];
         }
-    }];
-    
-#else 		
-    [openPanel beginSheetForDirectory:startingDir
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(setXilinxFileDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
+    }
 }
 
-- (IBAction) settingsMTCDAction:(id) sender 
+- (IBAction) settingsLockoutWidthFieldChanged:(id)sender
 {
-	[model setDbObject:[sender stringValue] forIndex:[sender tag]];
+    int lockout_width = [lockOutWidthField intValue];
+    [model setLockoutWidth:lockout_width];
+}
+
+- (IBAction) settingsPedWidthFieldChanged:(id)sender
+{
+    int ped_width = [pedestalWidthField intValue];
+    [model setPedestalWidth:ped_width];
+}
+
+- (IBAction) settingsPrescaleFieldChanged:(id)sender
+{
+    int prescale_value = [nhit100LoPrescaleField intValue];
+    [model setPrescaleValue:prescale_value];
+}
+
+- (IBAction) settingsPedDelayFieldChanged:(id)sender
+{
+    int coarse_delay = [coarseDelayField intValue];
+    float fine_delay = [fineDelayField floatValue];
+    int fine_delay_ps = fine_delay*1000.0;
+
+    [model setCoarseDelay:coarse_delay];
+    [model setFineDelay:fine_delay_ps];
+}
+
+- (IBAction) standardPulserRateFieldChanged:(id)sender
+{
+    float pulser_rate = [pulserPeriodField floatValue];
+    [model setPgtRate:pulser_rate];
+}
+
+- (void) changeNhitThresholdsDisplay: (int) units
+{
+    int threshold_index;
+    float value;
+    for(int i=FIRST_NHIT_TAG;i<=LAST_NHIT_TAG;i++) {
+        @try {
+            threshold_index = [self convert_view_threshold_index_to_model_index:i];
+            if(![model ConversionIsValidForThreshold:threshold_index] && units!=MTC_RAW_UNITS) {
+                [[nhitMatrix cellWithTag:i] setEnabled:NO];
+                [[nhitMatrix cellWithTag:i] setStringValue:@"--"];
+                continue;
+            }
+            [[nhitMatrix cellWithTag:i] setEnabled:YES];
+            value = [model getThresholdOfType: threshold_index inUnits:units];
+        } @catch (NSException *exception) {
+            NSLogColor([NSColor redColor], @"Failed to interpret field with tag %i, Reason: %@\n. Aborting after %i changes already made\n", i,[exception reason],i-FIRST_NHIT_TAG);
+            [self basicLockChanged:nil];
+            return;
+        }
+        [[nhitMatrix cellWithTag:i] setFloatValue: value];
+    }
+    [self basicLockChanged:nil];
+}
+
+- (void) changeESUMThresholdDisplay: (int) units
+{
+    int threshold_index;
+    float value;
+    for (int i = FIRST_ESUM_TAG; i <= LAST_ESUM_TAG; i++) {
+        @try {
+            threshold_index = [self convert_view_threshold_index_to_model_index:i];
+            if (![model ConversionIsValidForThreshold:threshold_index] && units!=MTC_RAW_UNITS) {
+                [[esumMatrix cellWithTag:i] setEnabled:NO];
+                [[esumMatrix cellWithTag:i] setStringValue:@"--"];
+                continue;
+            }
+            [[esumMatrix cellWithTag:i] setEnabled:YES];
+            value = [model getThresholdOfType: threshold_index inUnits:units];
+        } @catch (NSException *exception) {
+            NSLogColor([NSColor redColor], @"Failed to interpret field with tag %i, Reason: %@\n. Aborting after %i changes already made\n", i,[exception reason],i-FIRST_ESUM_TAG);
+            [self basicLockChanged:nil];
+            return;
+        }
+        [[esumMatrix cellWithTag:i] setFloatValue: value];
+    }
+    [self basicLockChanged:nil];
+}
+
+- (int) convert_view_threshold_index_to_model_index: (int) view_index
+{
+    switch (view_index) {
+        case VIEW_N100H_TAG:
+            return MTC_N100_HI_THRESHOLD_INDEX;
+            break;
+        case VIEW_N100M_TAG:
+            return MTC_N100_MED_THRESHOLD_INDEX;
+            break;
+        case VIEW_N100L_TAG:
+            return MTC_N100_LO_THRESHOLD_INDEX;
+            break;
+        case VIEW_N20_TAG:
+            return MTC_N20_THRESHOLD_INDEX;
+            break;
+        case VIEW_N20LB_TAG:
+            return MTC_N20LB_THRESHOLD_INDEX;
+            break;
+        case VIEW_ESUMH_TAG:
+            return MTC_ESUMH_THRESHOLD_INDEX;
+            break;
+        case VIEW_ESUML_TAG:
+            return MTC_ESUML_THRESHOLD_INDEX;
+            break;
+        case VIEW_OWLEH_TAG:
+            return MTC_OWLEHI_THRESHOLD_INDEX;
+            break;
+        case VIEW_OWLEL_TAG:
+            return MTC_OWLELO_THRESHOLD_INDEX;
+            break;
+        case VIEW_OWLN_TAG:
+            return MTC_OWLN_THRESHOLD_INDEX;
+            break;
+        default:
+            [NSException raise:@"MTCController" format:@"Cannot convert threshold index %i to model index",view_index];
+            break;
+    }
+    return -1; // Will never reach here
+}
+
+- (int) convert_model_threshold_index_to_view_index: (int) model_index
+{
+    switch (model_index) {
+        case MTC_N100_HI_THRESHOLD_INDEX:
+            return VIEW_N100H_TAG;
+            break;
+        case MTC_N100_MED_THRESHOLD_INDEX:
+            return VIEW_N100M_TAG;
+            break;
+        case MTC_N100_LO_THRESHOLD_INDEX:
+            return VIEW_N100L_TAG;
+            break;
+        case MTC_N20_THRESHOLD_INDEX:
+            return VIEW_N20_TAG;
+            break;
+        case MTC_N20LB_THRESHOLD_INDEX:
+            return VIEW_N20LB_TAG;
+            break;
+        case MTC_ESUMH_THRESHOLD_INDEX:
+            return VIEW_ESUMH_TAG;
+            break;
+        case MTC_ESUML_THRESHOLD_INDEX:
+            return VIEW_ESUML_TAG;
+            break;
+        case MTC_OWLEHI_THRESHOLD_INDEX:
+            return VIEW_OWLEH_TAG;
+            break;
+        case MTC_OWLELO_THRESHOLD_INDEX:
+            return VIEW_OWLEL_TAG;
+            break;
+        case MTC_OWLN_THRESHOLD_INDEX:
+            return VIEW_OWLN_TAG;
+            break;
+        default:
+            [NSException raise:@"MTCController" format:@"Cannot convert threshold  index %i to view index",model_index];
+        break;
+    }
+    return -1;
+}
+
+- (int) convert_view_unit_index_to_model_index: (int) view_index
+{
+    switch (view_index) {
+        case VIEW_RAW_UNITS_TAG:
+            return MTC_RAW_UNITS;
+            break;
+        case VIEW_mV_UNITS_TAG:
+            return MTC_mV_UNITS;
+            break;
+        case VIEW_NHIT_UNITS_TAG:
+            return MTC_NHIT_UNITS;
+            break;
+        default:
+            [NSException raise:@"MTCController" format:@"Cannot convert units index %i to model index",view_index];
+            break;
+    }
+    return -1;
+}
+
+- (int) convert_model_unit_index_to_view_index: (int) model_index
+{
+    switch (model_index) {
+        case MTC_RAW_UNITS:
+            return VIEW_RAW_UNITS_TAG;
+            break;
+        case MTC_mV_UNITS:
+            return VIEW_NHIT_UNITS_TAG;
+            break;
+        case MTC_NHIT_UNITS:
+            return VIEW_NHIT_UNITS_TAG;
+            break;
+        default:
+            [NSException raise:@"MTCController" format:@"Cannot convert units index %i to view index",model_index];
+            break;
+    }
+    return -1;
 }
 
 - (IBAction) settingsNHitAction:(id) sender 
 {
-	int row = [sender selectedRow];
-	int col = [sender selectedColumn];
-	int index = kNHit100HiThreshold + row + (col * 6);
-	
-	//get the value the user entered
-	float theValue = [[sender cellAtRow:row column:col] floatValue];
-	if((index >= kNHit100HimVperNHit) && (index <= kOWLNdcOffset)) {
-		[model setDbFloat:theValue forIndex:index];
-		[self calcNHitValueForRow:row];
-	}
-	else if((index >= kNHit100HiThreshold) && (index <= kOWLNThreshold)){
-		[self storeUserNHitValue:theValue index:index];
-	}
-	else {
-		[model setDbFloat:theValue forIndex:index];	
-	}
-    [[sender window] makeFirstResponder:tabView];
+    int threshold_index, unit_index;
+    @try {
+        threshold_index = [self convert_view_threshold_index_to_model_index:[[sender selectedCell] tag]];
+        unit_index = [self convert_view_unit_index_to_model_index:[[nHitViewTypeMatrix selectedCell] tag]];
+        float threshold = [[sender selectedCell] floatValue];
+        [model setThresholdOfType:threshold_index fromUnits:unit_index toValue:threshold];
+    } @catch (NSException *exception) {
+        NSLogColor([NSColor redColor], @"Error when setting threshold. Reason: %@\n Aborting\n",[exception reason]);
+    }
 }
-
 
 - (IBAction) settingsESumAction:(id) sender 
 {
-	int row = [sender selectedRow];
-	int col = [sender selectedColumn];
-	int index = kESumLowThreshold + row + (col * 4);
-	//get the value the user entered
-	float theValue = [[sender cellAtRow:row column:col] floatValue];
-	if((index >= kESumLowmVperpC) && (index <= kOWLEHidcOffset)) {
-		[model setDbFloat:theValue forIndex:index];
-		[self calcESumValueForRow:row];
-	}
-	else if((index >= kESumLowThreshold) && (index <= kOWLEHiThreshold)){
-		[self storeUserESumValue:theValue index:index];
-	}
-	else {
-		[model setDbFloat:theValue forIndex:index];	
-	}
-    [[sender window] makeFirstResponder:tabView];
+    int threshold_index, unit_index;
+    @try {
+        threshold_index = [self convert_view_threshold_index_to_model_index:[[sender selectedCell]tag]];
+        unit_index = [self convert_view_unit_index_to_model_index:[[eSumViewTypeMatrix selectedCell] tag]];
+        float threshold = [[sender selectedCell] floatValue];
+        [model setThresholdOfType:threshold_index fromUnits:unit_index toValue:threshold];
+    } @catch (NSException *excep) {
+        NSLogColor([NSColor redColor], @"Error when setting threshold. Reason: %@\n Aborting\n",[excep reason]);
+    }
 }
 
-- (IBAction) settingsGTMaskAction:(id) sender 
+- (IBAction) updateConversionSettingsAction:(id)sender
 {
-	unsigned long mask = 0;
-	int i;
-	for(i=0;i<26;i++){
-		if([[sender cellWithTag:i] intValue]){	
-			mask |= (1L << i);
-		}
-	}
-	[model setDbLong:mask forIndex:kGtMask];
+    [model getLatestTriggerScans];
+}
+
+- (IBAction) grab_current_thresholds:(id)sender
+{
+    [model updateTriggerThresholds];
+}
+
+- (uint32_t) gatherMaskFromCheckBoxes:(NSMatrix *) boxes
+{
+    uint32_t mask = 0;
+    for (int i = 0; i < [boxes numberOfRows]; i++){
+        if([[boxes cellAtRow:i column:0] intValue]) {
+            int position = [[boxes cellAtRow:i column:0] tag];
+            mask |= (1L << position);
+        }
+    }
+    return mask;
+}
+
+- (IBAction) settingsGTMaskAction:(id) sender
+{
+    uint32_t mask = 0;
+    [self CheckBoxMatrixCellClicked:sender newState:![[sender selectedCell] nextState]];
+    mask = [self gatherMaskFromCheckBoxes:sender];
+	[model setGtMask:mask];
 }
 
 - (IBAction) settingsGTCrateMaskAction:(id) sender 
 {
-	unsigned long mask = 0;
-	int i;
-	for(i=0;i<25;i++){
-		if([[sender cellWithTag:i] intValue]){	
-			mask |= (1L << i);
-		}
-	}
-	[model setDbLong:mask forIndex:kGtCrateMask];
+    uint32_t mask;
+    [self CheckBoxMatrixCellClicked:sender newState:![[sender selectedCell] nextState]];
+    mask = [self gatherMaskFromCheckBoxes:sender];
+	[model setGTCrateMask:mask];
 }
 
-- (IBAction) settingsPEDCrateMaskAction:(id) sender 
+- (IBAction) settingsPEDCrateMaskAction:(id) sender
 {
-	unsigned long mask = 0;
-	int i;
-	for(i=0;i<25;i++){
-		if([[sender cellWithTag:i] intValue]){	
-			mask |= (1L << i);
-		}
-	}
-	[model setDbLong:mask forIndex:kPEDCrateMask];
+    uint32_t mask;
+    [self CheckBoxMatrixCellClicked:sender newState:![[sender selectedCell] nextState]];
+    mask = [self gatherMaskFromCheckBoxes:sender];
+    [model setPedCrateMask:mask];
 }
 
-- (IBAction) settingsDefValFile:(id) sender 
-{
-    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
-    [openPanel setCanChooseDirectories:NO];
-    [openPanel setCanChooseFiles:YES];
-    [openPanel setAllowsMultipleSelection:NO];
-    [openPanel setPrompt:@"Choose"];
-    NSString* startingDir;
-	
-	NSString* fullPath = [[model defaultFile] stringByExpandingTildeInPath];
-    if(fullPath)	startingDir = [[model defaultFile] stringByDeletingLastPathComponent];
-    else			startingDir = NSHomeDirectory();
-	
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
-    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
-        if (result == NSFileHandlingPanelOKButton){
-            [model setDefaultFile:[[openPanel URL]path]];
-            NSLog(@"MTC DataBase default file set to: %@\n",[[[[[openPanel URLs] objectAtIndex:0]path]stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
-        }
-    }];
-    
-#else 	
-	[openPanel setRequiredFileType:@"mtcdb"];
-    [openPanel beginSheetForDirectory:startingDir
-                                 file:nil
-                                types:[NSArray arrayWithObject:@"mtcdb"]
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(setDefaultFileDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
-}
-
-
-
-
-- (IBAction) settingsDefaultSaveSet:(id) sender 
-{
-    NSSavePanel *savePanel = [NSSavePanel savePanel];
-    [savePanel setPrompt:@"Save As"];
-    [savePanel setCanCreateDirectories:YES];
-   
-    NSString* startingDir;
-    NSString* defaultFile;
-	defaultFile = nil; //to make both 10.5 and 10.8 compilers happy
-    
-	NSString* fullPath = [[model lastFile] stringByExpandingTildeInPath];
-    if(fullPath){
-        startingDir = [fullPath stringByDeletingLastPathComponent];
-        //defaultFile = [fullPath lastPathComponent];
-    }
-    else {
-        startingDir = NSHomeDirectory();
-        //defaultFile = @"MtcDataBase";
-    }
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-  	[savePanel setAllowedFileTypes:[NSArray arrayWithObject:@"mtcdb"]];
-    [savePanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
-    [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
-        if (result == NSFileHandlingPanelOKButton){
-            [model saveSet:[[savePanel URL] path]];
-            NSLog(@"MTC DataBase saved into: %@\n",[[[[savePanel URL] path] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
-        }
-    }];
-    
-#else 	
-
- 	[savePanel setRequiredFileType:@"mtcdb"];
-    [savePanel beginSheetForDirectory:startingDir
-                                 file:[defaultFile stringByExpandingTildeInPath]
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(saveDefaultSetDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif	
-}
 
 - (IBAction) triggerMTCAN100:(id) sender
 {
-    unsigned long mask = 0;
-	int i;
-	for(i=0;i<20;i++){
-		if([[sender cellWithTag:i] intValue]){
-			mask |= (1L << i);
-		}
-	}
+    uint32_t mask;
+    [self CheckBoxMatrixCellClicked:sender newState:![[sender selectedCell] nextState]];
+    mask = [self gatherMaskFromCheckBoxes:sender];
     [model setMtcaN100Mask:mask];
 }
 
 - (IBAction) triggerMTCAN20:(id) sender
 {
-    unsigned long mask = 0;
-	int i;
-	for(i=0;i<20;i++){
-		if([[sender cellWithTag:i] intValue]){
-			mask |= (1L << i);
-		}
-	}
+    uint32_t mask;
+    [self CheckBoxMatrixCellClicked:sender newState:![[sender selectedCell] nextState]];
+    mask = [self gatherMaskFromCheckBoxes:sender];
     [model setMtcaN20Mask:mask];
 }
 
 - (IBAction) triggerMTCAEHI:(id) sender
 {
-    unsigned long mask = 0;
-	int i;
-	for(i=0;i<20;i++){
-		if([[sender cellWithTag:i] intValue]){
-			mask |= (1L << i);
-		}
-	}
+    uint32_t mask;
+    [self CheckBoxMatrixCellClicked:sender newState:![[sender selectedCell] nextState]];
+    mask = [self gatherMaskFromCheckBoxes:sender];
     [model setMtcaEHIMask:mask];
 }
 
 - (IBAction) triggerMTCAELO:(id) sender
 {
-    unsigned long mask = 0;
-	int i;
-	for(i=0;i<20;i++){
-		if([[sender cellWithTag:i] intValue]){
-			mask |= (1L << i);
-		}
-	}
+    uint32_t mask;
+    [self CheckBoxMatrixCellClicked:sender newState:![[sender selectedCell] nextState]];
+    mask = [self gatherMaskFromCheckBoxes:sender];
+
     [model setMtcaELOMask:mask];
 }
 
 - (IBAction) triggerMTCAOELO:(id) sender
 {
-    unsigned long mask = 0;
-	int i;
-	for(i=0;i<20;i++){
-		if([sender cellWithTag:i] && [[sender cellWithTag:i] intValue]){
-			mask |= (1L << i);
-		}
-	}
+    uint32_t mask = 0;
+    [self CheckBoxMatrixCellClicked:sender newState:![[sender selectedCell] nextState]];
+    mask = [self gatherMaskFromCheckBoxes:sender];
     [model setMtcaOELOMask:mask];
 }
 
 - (IBAction) triggerMTCAOEHI:(id) sender
 {
-    unsigned long mask = 0;
-	int i;
-	for(i=0;i<20;i++){
-		if([sender cellWithTag:i] && [[sender cellWithTag:i] intValue]){
-			mask |= (1L << i);
-		}
-	}
+    uint32_t mask;
+    [self CheckBoxMatrixCellClicked:sender newState:![[sender selectedCell] nextState]];
+    mask = [self gatherMaskFromCheckBoxes:sender];
     [model setMtcaOEHIMask:mask];
 }
 
 - (IBAction) triggerMTCAOWLN:(id) sender
 {
-    unsigned long mask = 0;
-	int i;
-	for(i=0;i<20;i++){
-		if([sender cellWithTag:i] && [[sender cellWithTag:i] intValue]){
-			mask |= (1L << i);
-		}
-	}
+    uint32_t mask;
+    [self CheckBoxMatrixCellClicked:sender newState:![[sender selectedCell] nextState]];
+    mask = [self gatherMaskFromCheckBoxes:sender];
     [model setMtcaOWLNMask:mask];
 }
 
 - (IBAction) triggersLoadTriggerMask:(id) sender
 {
-    [model setGlobalTriggerWordMask];
+    @try {
+        [model setGlobalTriggerWordMask];
+    } @catch (NSException* excep) {
+        //pass, the model already warns
+    }
 }
 
 - (IBAction) triggersLoadGTCrateMask:(id) sender
 {
-    [model setGTCrateMask];
+    @try {
+        [model loadGTCrateMaskToHardware];
+    } @catch (NSException* excep) {
+        // pass, the model already warns
+    }
 }
 
 - (IBAction) triggersLoadPEDCrateMask:(id) sender
 {
-    [model setPedestalCrateMask];
+    @try {
+        [model loadPedestalCrateMaskToHardware];
+    } @catch (NSException* excep) {
+        // pass, the model already warns
+    }
 }
 
 - (IBAction) triggersLoadMTCACrateMask:(id) sender
 {
-    [model mtcatLoadCrateMasks];
-}
-
-- (IBAction) triggersClearTriggerMask:(id) sender
-{
-    [model clearGlobalTriggerWordMask];
-}
-
-- (IBAction) triggersClearGTCrateMask:(id) sender
-{
-    [model clearGTCrateMask];
-}
-
-- (IBAction) triggersClearPEDCrateMask:(id) sender
-{
-    [model clearPedestalCrateMask];
-}
-
-- (IBAction) triggersClearMTCACrateMask:(id) sender
-{
-    [model mtcatClearCrateMasks];
-}
-
-@end
-
-#pragma mark •••PrivateInterface
-@implementation ORMTCController (private)
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 //pre 10.6-specific
-- (void) setXilinxFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [model setXilinxFilePath:[[sheet filenames] objectAtIndex:0]];
-		NSLog(@"MTC Xilinx default file set to: %@\n",[[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
-    }
-}
-- (void) setDefaultFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [model setDefaultFile:[[sheet filenames] objectAtIndex:0]];
-		NSLog(@"MTC DataBase default file set to: %@\n",[[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
+    @try {
+        [model mtcatLoadCrateMasks];
+    } @catch (NSException* excep) {
+        //pass, the model already warns
     }
 }
 
-- (void) saveDefaultSetDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+- (IBAction) helpButtonClicked:(id)sender
 {
-    if(returnCode){
-        [model saveSet:[[sheet filenames] objectAtIndex:0]];
-		NSLog(@"MTC DataBase saved into: %@\n",[[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
-    }
+    [helpText setHidden:![helpText isHidden]];
 }
 
-- (void) selectAndLoadDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+- (void)CheckBoxMatrixCellClicked:(NSMatrix*) checkBoxes newState:(int)state
 {
-    if(returnCode){
-        [model loadSet:[[sheet filenames] objectAtIndex:0]];
-		NSLog(@"MTC DataBase loaded from: %@\n",[[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
-    }
-}
-
-- (void) loadDBFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [model loadSet:[[sheet filenames] objectAtIndex:0]];
-		NSLog(@"MTC DataBase loaded from: %@\n",[[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
-    }
-}
-#endif
-
-- (void) selectAndLoadDBFile:(NSString*)aStartPath
-{
-    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
-    [openPanel setCanChooseDirectories:NO];
-    [openPanel setCanChooseFiles:YES];
-    [openPanel setAllowsMultipleSelection:NO];
-    [openPanel setPrompt:@"Choose"];
-	NSString* startingDir;
-	
-	NSString* fullPath = [aStartPath stringByExpandingTildeInPath];
-    if(fullPath)	startingDir = [fullPath stringByDeletingLastPathComponent];
-    else			startingDir = NSHomeDirectory();
-    
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
- 	[openPanel setAllowedFileTypes:[NSArray arrayWithObject:@"mtcdb"]];
-    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
-    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
-        if (result == NSFileHandlingPanelOKButton){
-            [model loadSet:[[openPanel URL]path]];
-            NSLog(@"MTC DataBase loaded from: %@\n",[[[[[openPanel URLs] objectAtIndex:0] path]stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
+    BOOL cmdKeyDown = ([[NSApp currentEvent] modifierFlags] & NSCommandKeyMask) != 0;
+    if (cmdKeyDown) {
+        for (int i = 0; i < [checkBoxes numberOfRows]; i++) {
+            [[checkBoxes cellAtRow:i column:0] setState: state];
         }
-    }];
-    
-#else 	
- 	[openPanel setRequiredFileType:@"mtcdb"];
-    [openPanel beginSheetForDirectory:startingDir
-                                 file:nil
-                                types:[NSArray arrayWithObject:@"mtcdb"]
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(selectAndLoadDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
+    }
 }
-
-- (void) setupNHitFormats
-{
-	NSNumberFormatter *thresholdFormatter = [[[NSNumberFormatter alloc] init] autorelease];;
-	
-	if([model nHitViewType] == kNHitsViewRaw) [thresholdFormatter setFormat:@"##0"];
-	else [thresholdFormatter setFormat:@"##0.0"];
-	
-	NSNumberFormatter *numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
-	[numberFormatter setFormat:@"##0.0;0;-##0.0"];
-	
-	int row,col;
-	for(col=0;col<4;col++){
-		for(row=0;row<6;row++){
-			NSCell* theCell = [nhitMatrix cellAtRow:row column:col];
-			if(col==0)	[theCell setFormatter:thresholdFormatter];
-			else		[theCell setFormatter:numberFormatter];
-		}
-	}
-	[nhitMatrix setNeedsDisplay:YES];
-}
-
-- (void) setupESumFormats
-{
-	NSNumberFormatter *thresholdFormatter = [[[NSNumberFormatter alloc] init] autorelease];;
-	
-	if([model eSumViewType] == kESumViewRaw) [thresholdFormatter setFormat:@"##0"];
-	else [thresholdFormatter setFormat:@"##0.0"];
-	
-	NSNumberFormatter *numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
-	[numberFormatter setFormat:@"##0.0;0;-##0.0"];
-	
-	int row,col;
-	for(col=0;col<4;col++){
-		for(row=0;row<4;row++){
-			NSCell* theCell = [esumMatrix cellAtRow:row column:col];
-			if(col==0)	[theCell setFormatter:thresholdFormatter];
-			else		[theCell setFormatter:numberFormatter];
-		}
-	}
-	[esumMatrix setNeedsDisplay:YES];
-}
-
-- (void) storeUserNHitValue:(float)userValue index:(int) thresholdIndex
-{
-	//user changed the NHit threshold -- convert from the displayed value to the raw value and store
-	float numberToStore=0;
-	int viewType = [model nHitViewType];
-	if((thresholdIndex >= kNHit100HiThreshold) && (thresholdIndex <= kOWLNThreshold)){
-		if(viewType == kNHitsViewRaw) {
-			numberToStore = userValue;
-		}
-		else if(viewType == kNHitsViewmVolts) {
-			numberToStore = [model mVoltsToRaw:userValue];
-		}
-		else if(viewType == kNHitsViewNHits) {
-			float dcOffset  = [model dbFloatByIndex:thresholdIndex + kNHitDcOffset_Offset];
-			float mVperNHit = [model dbFloatByIndex:thresholdIndex + kmVoltPerNHit_Offset];
-			numberToStore = [model NHitsToRaw:userValue dcOffset:dcOffset mVperNHit:mVperNHit];
-		}
-        if (numberToStore < 0) numberToStore = 0;
-        if (numberToStore > 4095) numberToStore = 4095;
-		[model setDbFloat:numberToStore forIndex:thresholdIndex];
-	}
-}
-
-- (void) calcNHitValueForRow:(int) aRow
-{
-	float numberToStore;
-	int index = kNHit100HiThreshold + aRow;
-	if((index >= kNHit100HiThreshold) && (index <= kOWLNThreshold)){
-		float mVolts    = [model rawTomVolts:[model dbFloatByIndex:index]];
-		float dcOffset  = [model dbFloatByIndex:index + kNHitDcOffset_Offset];
-		float mVperNHit = [model dbFloatByIndex:index + kmVoltPerNHit_Offset];
-		float newNHits  = [model mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
-		float newMilliVolts = [model NHitsTomVolts:newNHits dcOffset:dcOffset mVperNHit:mVperNHit];
-		numberToStore = [model mVoltsToRaw:newMilliVolts];
-
-        if (numberToStore < 0) numberToStore = 0;
-        if (numberToStore > 4095) numberToStore = 4095;
-		[model setDbFloat:numberToStore forIndex:index];
-	}
-}
-
-- (void) storeUserESumValue:(float)userValue index:(int) thresholdIndex
-{
-	//user changed the ESum threshold -- convert from the displayed value to the raw value and store
-	float numberToStore=0;
-	int viewType = [model eSumViewType];
-	if((thresholdIndex >= kESumLowThreshold) && (thresholdIndex <= kOWLEHiThreshold)){
-		if(viewType == kESumViewRaw) {
-			numberToStore = userValue;
-		}
-		else if(viewType == kESumViewmVolts) {
-			numberToStore = [model mVoltsToRaw:userValue];
-		}
-		else if(viewType == kESumVieweSumRel) {
-			float dcOffset  = [model dbFloatByIndex:thresholdIndex + kESumDcOffset_Offset];
-			numberToStore = [model mVoltsToRaw:dcOffset - userValue];
-		}
-		else if(viewType == kESumViewpC) {
-			float dcOffset  = [model dbFloatByIndex:thresholdIndex + kESumDcOffset_Offset];
-			float mVperpC	= [model dbFloatByIndex:thresholdIndex + kmVoltPerpC_Offset];
-			numberToStore   = [model pCToRaw:userValue dcOffset:dcOffset mVperpC:mVperpC];
-		}
-		[model setDbFloat:numberToStore forIndex:thresholdIndex];	
-	}
-	
-}
-
-- (void) calcESumValueForRow:(int) aRow
-{
-	float numberToStore;
-	int index = kESumLowThreshold + aRow;
-	if((index >= kESumLowThreshold) && (index <= kOWLEHiThreshold)){
-		float mVolts    = [model rawTomVolts:[model dbFloatByIndex:index]];
-		float dcOffset  = [model dbFloatByIndex:index + kESumDcOffset_Offset];
-		float mVperpC   = [model dbFloatByIndex:index + kmVoltPerpC_Offset];
-		
-		float newpC		= [model mVoltsTopC:mVolts dcOffset:dcOffset mVperpC:mVperpC];
-		float newMilliVolts = [model pCTomVolts:newpC dcOffset:dcOffset mVperpC:mVperpC];
-		numberToStore = [model mVoltsToRaw:newMilliVolts];
-		
-		[model setDbFloat:numberToStore forIndex:index];	
-	}
-}
-
 @end
-

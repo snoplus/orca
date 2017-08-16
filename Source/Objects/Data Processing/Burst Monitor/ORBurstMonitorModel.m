@@ -514,7 +514,7 @@ double facto(unsigned long long num)
                         //}
                         if(cardNum<=15){ //was break here, now just skip section to include release
                             
-                            quietSec=0;
+                            //was quietsec reset here, wrong
                             
                             
                             //make array of data to be buffered
@@ -525,6 +525,7 @@ double facto(unsigned long long num)
                             [mics insertObject:[NSNumber numberWithLong:microseconds] atIndex:0];
                             [words insertObject:[NSNumber numberWithLong:firstword] atIndex:0];
                             if((energy >= minimumEnergyAllowed && energy <= 1400 && cardNum <= 15) || burstForce ==1){  //Filter
+                                quietSec=0;
                                 //make a key for looking up the correct queue for this record
                                 NSString* aShaperKey = [NSString stringWithFormat:@"%d,%d,%d",crateNum,cardNum,chanNum];
                                 
@@ -1316,8 +1317,8 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     if(burstState == 1){
         quietSec++;
         //loudSec = 1; //temp
-        loudSec=[[secs objectAtIndex:1] longValue] - [[secs objectAtIndex:(secs.count-1)] longValue];  //CB crash source??? use Bsecs?  can't, not writen yet
-        if(quietSec > 30){
+        loudSec=[[Nsecs objectAtIndex:1] longValue] - [[Nsecs objectAtIndex:(Nsecs.count-1)] longValue];  //CB crash source??? use Bsecs?  can't, not writen yet
+        if(quietSec > 10){
             burstForce=1;
             [theBurstMonitoredObject processData:[NSArray arrayWithObject:header] decoder:theDecoder];
         }

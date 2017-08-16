@@ -56,8 +56,13 @@
  * would first run RESET_CRATE_ID and then you would do a CRATE_INIT without
  * Xilinx to load the non-default values into the FEC. */
 #define RESET_CRATE_ID            (0x34) 
+/* Set the sequencer mask for multiple slots at a time. */
+#define MULTI_SET_CRATE_SEQUENCERS_ID (0x35)
+/* Set the trigger mask for multiple slots at a time. */
+#define MULTI_SET_CRATE_TRIGGERS_ID   (0x36)
 // HV Tasks
 #define SET_HV_RELAYS_ID          (0x40) //!< turns on/off hv relays
+#define GET_HV_RELAYS_ID          (0x41) //!< returns the stored relay values
 #define HV_READBACK_ID			      (0x42) //!< reads voltage and current	
 #define READ_PMT_CURRENT_ID	      (0x43) //!< reads pmt current from FEC hv csr	
 #define SETUP_CHARGE_INJ_ID		    (0x44) //!< setup charge injection in FEC hv csr
@@ -346,6 +351,12 @@ typedef struct{
 } SetHVRelaysResults;
 
 typedef struct{
+  uint32_t mask1;
+  uint32_t mask2;
+  uint32_t relays_known;
+} GetHVRelaysResults;
+
+typedef struct{
   float voltageA;
   float voltageB;
   float currentA;
@@ -438,6 +449,25 @@ typedef struct {
   uint32_t fecPresent; // each bit is 1 if that slot as a FEC, 0 if not
   FECConfiguration hwareVals[16];
 } ResetCrateResults;
+
+typedef struct {
+  uint32_t slotMask;
+  uint32_t channelMasks[16];
+} MultiSetCrateSequencersArgs;
+
+typedef struct {
+  uint32_t errorMask;
+} MultiSetCrateSequencersResults;
+
+typedef struct {
+  uint32_t slotMask;
+  uint32_t tr100Masks[16];
+  uint32_t tr20Masks[16];
+} MultiSetCrateTriggersArgs;
+
+typedef struct {
+  uint32_t errorMask;
+} MultiSetCrateTriggersResults;
 
 typedef struct{
     uint32_t slot;

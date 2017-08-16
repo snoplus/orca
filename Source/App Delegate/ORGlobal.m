@@ -245,9 +245,19 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
     [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORInProductionModeChanged object:nil userInfo:nil waitUntilDone:NO];
 }
 
+- (void) setCanQuitDuringRun:(BOOL)canQuit
+{
+    canQuitDuringRun = canQuit;
+}
+
 - (BOOL) inProductionMode
 {
     return inProductionMode;
+}
+
+- (BOOL) canQuitDuringRun
+{
+    return canQuitDuringRun;
 }
 
 - (BOOL) forcedHalt

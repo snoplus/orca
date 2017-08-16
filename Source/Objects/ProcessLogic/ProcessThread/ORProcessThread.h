@@ -48,6 +48,7 @@
 - (void) dealloc;
 - (void) registerNotificationObservers;
 - (void) documentIsClosing:(NSNotification*)aNote;
+- (void) orcaIsQuitting:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Accessors
 - (BOOL) isRunning;

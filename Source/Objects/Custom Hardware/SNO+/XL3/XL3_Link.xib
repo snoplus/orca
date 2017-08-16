@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14F1605" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1050" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6254"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="XL3_LinkController">
@@ -81,11 +81,14 @@
                 <outlet property="hvRelayMaskMatrix" destination="4342" id="4408"/>
                 <outlet property="hvRelayOpenButton" destination="4065" id="4522"/>
                 <outlet property="hvRelayStatusField" destination="4322" id="4326"/>
+                <outlet property="hvRunStateLabel" destination="nYF-wV-RLu" id="vpI-jc-Xb0"/>
                 <outlet property="hvStepDownButton" destination="4225" id="u0j-OG-kSP"/>
                 <outlet property="hvStepUpButton" destination="4226" id="3CC-g8-yx2"/>
                 <outlet property="hvStopRampButton" destination="4211" id="jdS-vX-rCj"/>
                 <outlet property="hvTargetValueField" destination="4495" id="4500"/>
                 <outlet property="hvTargetValueStepper" destination="4274" id="4501"/>
+                <outlet property="hvTriggersButton" destination="4420" id="72Q-Ta-x8F"/>
+                <outlet property="loadNominalSettingsButton" destination="5O1-ir-YYR" id="zmR-hC-RvR"/>
                 <outlet property="lockButton" destination="3658" id="KSH-qe-jJx"/>
                 <outlet property="monIsPollingCMOSRatesButton" destination="3962" id="4027"/>
                 <outlet property="monIsPollingFECVoltagesButton" destination="3968" id="4028"/>
@@ -116,6 +119,8 @@
                 <outlet property="overCurentStatus" destination="nDX-Ck-6ls" id="uoq-t2-vqI"/>
                 <outlet property="overVoltageStatus" destination="mAt-JU-fI7" id="ytT-co-c9m"/>
                 <outlet property="owlStatus" destination="9RR-r0-pTH" id="9Ms-wD-UZ9"/>
+                <outlet property="pollNowButton" destination="3995" id="Dan-9c-Vpb"/>
+                <outlet property="pollRunStateLabel" destination="88l-T7-32r" id="Erz-GK-bN0"/>
                 <outlet property="rampDownStatus" destination="YN6-hm-7Mx" id="uKv-V0-GAy"/>
                 <outlet property="rampUpStatus" destination="jvJ-o1-vqb" id="SCs-u9-Sxl"/>
                 <outlet property="repeatCountField" destination="3406" id="3489"/>
@@ -126,6 +131,8 @@
                 <outlet property="selectSlotMaskButton" destination="3642" id="18J-W7-qNC"/>
                 <outlet property="selectedRegisterPU" destination="3426" id="3454"/>
                 <outlet property="setpointTolStatus" destination="Cy4-zc-HLm" id="xKF-KN-euS"/>
+                <outlet property="startPollButton" destination="3998" id="8ae-r0-moT"/>
+                <outlet property="stopPollButton" destination="4001" id="KMx-Oc-AoV"/>
                 <outlet property="tabView" destination="841" id="3668"/>
                 <outlet property="toggleConnectButton" destination="3925" id="3959"/>
                 <outlet property="window" destination="839" id="923"/>
@@ -1435,6 +1442,15 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
+                                                    <textField hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="88l-T7-32r">
+                                                        <rect key="frame" x="120" y="94" width="127" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Not in Maintenance" id="dFd-OL-yyd">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
@@ -2126,14 +2142,14 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" id="4068">
-                                                        <rect key="frame" x="170" y="2" width="109" height="28"/>
+                                                        <rect key="frame" x="154" y="2" width="142" height="28"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="push" title="Check Interlock" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4069">
+                                                        <buttonCell key="cell" type="push" title="Check Interlock/Relays" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4069">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
                                                         <connections>
-                                                            <action selector="hvCheckInterlockAction:" target="-2" id="4334"/>
+                                                            <action selector="hvCheckInterlockRelaysAction:" target="-2" id="HxJ-qz-hGn"/>
                                                         </connections>
                                                     </button>
                                                     <textField verticalHuggingPriority="750" id="4063">
@@ -2757,26 +2773,15 @@
                                                 <action selector="hvPanicAction:" target="-2" id="4520"/>
                                             </connections>
                                         </button>
-                                        <button verticalHuggingPriority="750" id="4416">
-                                            <rect key="frame" x="174" y="202" width="105" height="28"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="push" title="triggers OFF" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4417">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="hvTriggerOffAction:" target="-2" id="4535"/>
-                                            </connections>
-                                        </button>
                                         <button verticalHuggingPriority="750" id="4420">
                                             <rect key="frame" x="18" y="202" width="105" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="push" title="triggers ON" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4421">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
+                                            <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="triggers_off" imagePosition="overlaps" alignment="center" alternateImage="triggers_on" imageScaling="proportionallyDown" inset="2" id="4421">
+                                                <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="hvTriggerOnAction:" target="-2" id="4536"/>
+                                                <action selector="hvTriggerAction:" target="-2" id="k7s-iP-3py"/>
                                             </connections>
                                         </button>
                                         <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" id="4292">
@@ -3020,6 +3025,26 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
+                                        <button verticalHuggingPriority="750" id="5O1-ir-YYR">
+                                            <rect key="frame" x="165" y="202" width="130" height="28"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="push" title="Triggers to Nominal" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Avj-Zn-Ov7">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="smallSystem"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="loadNominalSettingsAction:" target="-2" id="Yty-Zs-nKZ"/>
+                                            </connections>
+                                        </button>
+                                        <textField hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="nYF-wV-RLu">
+                                            <rect key="frame" x="320" y="183" width="127" height="17"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Not in Maintenance" id="zq8-pe-HAA">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
                                     </subviews>
                                 </view>
                             </tabViewItem>
@@ -3185,5 +3210,7 @@
         <image name="Unlocked" width="33" height="36"/>
         <image name="dec" width="18" height="18"/>
         <image name="inc" width="18" height="18"/>
+        <image name="triggers_off" width="448" height="165.60000610351562"/>
+        <image name="triggers_on" width="448" height="166.39999389648438"/>
     </resources>
 </document>

@@ -14,14 +14,11 @@
 #import "SNOPModel.h"
 #import "SNOP_Run_Constants.h"
 #import "ORRunModel.h"
+#import "ORCouchDB.h"
 
 NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 
 @implementation ELLIEController
-    NSMutableDictionary *configForSmellie;
-    BOOL *laserHeadSelected;
-    BOOL *fibreSwitchOutputSelected;
-//smellie maxiumum trigger frequency
 
 @synthesize nodeMapWC = _nodeMapWC;
 @synthesize guiFireSettings = _guiFireSettings;
@@ -32,72 +29,16 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 -(id)init
 {
     self = [super initWithWindowNibName:@"ellie"];
-    //[smellieConfigAttenutationFactor setKeyboardType:UIKeyboardTypeNumberPad]
-    
-    laserHeadSelected = NO;
-    fibreSwitchOutputSelected = NO;
-    
     @try{
-
-        // Check there is an ELLIE model in the current configuration
-        NSArray*  ellieModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
-        if(![ellieModels count]){
-            NSLogColor([NSColor redColor], @"Must have an ELLIE object in the configuration\n");
-            return nil;
-        }
-        ELLIEModel* anELLIEModel = [ellieModels objectAtIndex:0];
-     
-        NSNumber *currentConfigurationVersion = [[NSNumber alloc] initWithInt:0];
-
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            //fetch the data associated with the current configuration
-            configForSmellie = [[anELLIEModel fetchConfigurationFile:
-                                    [anELLIEModel fetchRecentConfigVersion]] mutableCopy];
-        });
-    
-        //increment the current version of the incrementation
-        currentConfigurationVersion = [NSNumber numberWithInt:[currentConfigurationVersion intValue] + 1];
-
-        [configForSmellie setObject:currentConfigurationVersion forKey:@"configuration_version"];
-    
-        //SMELLIE Configuration file
-        //Make sure these buttons are working on start up for Smellie
-        [smellieNumIntensitySteps setEnabled:YES];
-        [smellieMaxIntensity setEnabled:YES];
-        [smellieMinIntensity setEnabled:YES];
-        [smellieNumTriggersPerLoop setEnabled:YES];
-        [smellieOperationMode setEnabled:YES];
-        [smellieOperatorName setEnabled:YES];
-        [smellieTriggerFrequency setEnabled:YES];
-        [smellieRunName setEnabled:YES];
-        [smellie405nmLaserButton setEnabled:YES];
-        [smellie375nmLaserButton setEnabled:YES];
-        [smellie440nmLaserButton setEnabled:YES];
-        [smellie500nmLaserButton setEnabled:YES];
-        [smellieFibreButtonFS007 setEnabled:YES];
-        [smellieFibreButtonFS107 setEnabled:YES];
-        [smellieFibreButtonFS207 setEnabled:YES];
-        [smellieFibreButtonFS025 setEnabled:YES];
-        [smellieFibreButtonFS125 setEnabled:YES];
-        [smellieFibreButtonFS225 setEnabled:YES];
-        [smellieFibreButtonFS037 setEnabled:YES];
-        [smellieFibreButtonFS137 setEnabled:YES];
-        [smellieFibreButtonFS237 setEnabled:YES];
-        [smellieFibreButtonFS055 setEnabled:YES];
-        [smellieFibreButtonFS155 setEnabled:YES];
-        [smellieFibreButtonFS255 setEnabled:YES];
-        [smellieAllFibresButton setEnabled:YES];
-        [smellieAllLasersButton setEnabled:YES];
-        [smellieMakeNewRunButton setEnabled:NO];
-    }
-    @catch (NSException *e) {
+        [self fetchConfigurationFile:nil];
+        [self initialiseTellie];
+    } @catch (NSException *e) {
         NSLog(@"CouchDB for ELLIE isn't connected properly. Please reload the ELLIE Gui and check the database connections\n");
         NSLog(@"Reason for error %@ \n",e);
     }
-
-    /*Setting up TELLIE GUI */
-    [self initialiseTellie];
-    
+    [tellieServerResponseTf setEditable:NO];
+    [smellieServerResponseTf setEditable:NO];
+    [interlockServerResponseTf setEditable:NO];
     return self;
 }
 
@@ -105,11 +46,20 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 {
     [super awakeFromNib];
     [super updateWindow];
+    [self updateServerSettings:nil];
+    [self fetchConfigurationFile:nil];
     [self initialiseTellie];
+    [tellieServerResponseTf setEditable:NO];
+    [smellieServerResponseTf setEditable:NO];
+    [interlockServerResponseTf setEditable:NO];
 }
 
 - (void)dealloc
 {
+    [_nodeMapWC release];
+    [_smellieThread release];
+    [_guiFireSettings release];
+    [_tellieThread release];
     [super dealloc];
 }
 
@@ -118,39 +68,59 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 	[super updateWindow];
 }
 
+- (void) updateServerSettings: (NSNotification *) aNote
+{
+    [tellieHostTf setStringValue:[model tellieHost]];
+    [telliePortTf setStringValue:[model telliePort]];
+
+    [smellieHostTf setStringValue:[model smellieHost]];
+    [smelliePortTf setStringValue:[model smelliePort]];
+
+    [interlockHostTf setStringValue:[model interlockHost]];
+    [interlockPortTf setStringValue:[model interlockPort]];
+}
+
+- (IBAction) serverSettingsChanged:(id)sender {
+    /* Settings tab changed. Set the model variables in ELLIEModel. */
+    [model setTelliePort:[telliePortTf stringValue]];
+    [model setTellieHost:[tellieHostTf stringValue]];
+
+    [model setSmelliePort:[smelliePortTf stringValue]];
+    [model setSmellieHost:[smellieHostTf stringValue]];
+
+    [model setInterlockPort:[interlockPortTf stringValue]];
+    [model setInterlockHost:[interlockHostTf stringValue]];
+}
+
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    
+
 	[super registerNotificationObservers];
-    
+
 	[notifyCenter removeObserver:self name:NSWindowDidResignKeyNotification object:nil];
-    
-    [notifyCenter addObserver : self
-					 selector : @selector(setAllLasersAction:)
-						 name : ELLIEAllLasersChanged
-					   object : model];
-    
-    [notifyCenter addObserver : self
-					 selector : @selector(setAllFibresAction:)
-						 name : ELLIEAllFibresChanged
-					   object : model];
-    
-    [notifyCenter addObserver:self
-                     selector:@selector(loadCurrentInformationForLaserHead)
-                         name:NSComboBoxSelectionDidChangeNotification
-                       object:smellieConfigLaserHeadField];
 
     [notifyCenter addObserver : self
                      selector : @selector(tellieRunFinished:)
                          name : ORTELLIERunFinished
                         object: nil];
-    
+
     [notifyCenter addObserver : self
-                     selector : @selector(tellieRunStarted:)
-                         name : ORTELLIERunStart
+                     selector : @selector(updateServerSettings:)
+                         name : @"ELLIEServerSettingsChanged"
                         object: nil];
-    
+
+    [notifyCenter addObserver : self
+                     selector : @selector(killInterlock:)
+                         name : @"SMELLIEEmergencyStop"
+                        object: nil];
+}
+
+-(void)fetchConfigurationFile:(NSNotification *)aNote{
+    /*
+     When the run files are loaded we re-load the smellie config file, just incase
+    */
+    [model fetchCurrentSmellieConfig];
 }
 
 ///////////////////////////////////////////
@@ -159,11 +129,8 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 -(void)initialiseTellie
 {
     // Load static (calibration and mapping) parameters from DB.
-    // May take a while so try to run asyncronously
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [model loadTELLIEStaticsFromDB];
-    });
-    
+    [model loadTELLIEStaticsFromDB];
+
     //Make sure sensible tabs are selected to begin with
     [ellieTabView selectTabViewItem:tellieTViewItem];
     [tellieTabView selectTabViewItem:tellieFireFibreTViewItem];
@@ -203,7 +170,7 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     [tellieGeneralTriggerDelayTf setDelegate:self];
     [tellieGeneralNoPulsesTf setDelegate:self];
     [tellieGeneralFreqTf setDelegate:self];
-    [tellieGeneralTriggerDelayTf setStringValue:@"700"];
+    [tellieGeneralTriggerDelayTf setStringValue:@"650"];
 
 
     [tellieChannelTf setDelegate:self];
@@ -215,7 +182,22 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     [tellieNoPulsesTf setDelegate:self];
     [tellieExpertNodeTf setDelegate:self];
     [telliePhotonsTf setDelegate:self];
-    [tellieTriggerDelayTf setStringValue:@"700"];
+    [tellieTriggerDelayTf setStringValue:@"650"];
+
+    // Build custom run tab
+    [tellieBuildPushToDB setEnabled:NO];
+    [tellieBuildOpMode removeAllItems];
+    [tellieBuildOpMode addItemsWithTitles:@[@"Slave", @"Master"]];
+    [tellieBuildTrigDelay setStringValue:@"650"];
+    for(int i=0; i<100; i++){
+        if(i<92){
+            [[tellieBuildNodeSelection cellWithTag:i] setEnabled:YES];
+            [[tellieBuildNodeSelection cellWithTag:i] setState:1];
+        } else {
+            [[tellieBuildNodeSelection cellWithTag:i] setEnabled:NO];
+            [[tellieBuildNodeSelection cellWithTag:i] setState:0];
+        }
+    }
 }
 
 -(IBAction)tellieGeneralFireAction:(id)sender
@@ -263,15 +245,6 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 {
     [tellieGeneralStopButton setEnabled:NO];
     [tellieExpertStopButton setEnabled:NO];
-    [tellieExpertRunStatusTf setStringValue:@"No light"];
-    [tellieGeneralRunStatusTf setStringValue:@"No light"];
-}
-
--(void)tellieRunStarted:(NSNotification *)aNote
-{
-    [tellieExpertRunStatusTf setStringValue:@"Firing!"];
-    [tellieGeneralRunStatusTf setStringValue:@"Firing!"];
-
 }
 
 - (BOOL) isNumeric:(NSString *)s{
@@ -291,7 +264,6 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     NSWindowController* tmpWc = [[NSWindowController alloc] initWithWindowNibName:@"NodeMap"];
     
     if([self nodeMapWC] != nil){
-        //[[self nodeMapWC] release];
         [self setNodeMapWC:nil];
         [self setNodeMapWC:tmpWc];
         [[self nodeMapWC] showWindow:self];
@@ -350,13 +322,6 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     
     //Check if inputs are valid
     NSString* msg = nil;
-    /*
-    msg = [self validateExpertTellieNode:[tellieExpertNodeTf stringValue]];
-    if ([msg isNotEqualTo:nil]){
-        [tellieExpertValidationStatusTf setStringValue:msg];
-        return;
-    }
-    */
     msg = [self validateGeneralTelliePhotons:[telliePhotonsTf stringValue]];
     if ([msg isNotEqualTo:nil]){
         [tellieExpertValidationStatusTf setStringValue:msg];
@@ -415,6 +380,55 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     [tellieTriggerDelayTf setBackgroundColor:[NSColor whiteColor]];
     [tellieNoPulsesTf setBackgroundColor:[NSColor whiteColor]];
 }
+
+- (IBAction)tellieBuildPushToDBAction:(id)sender {
+    /*
+     Format a dictionary into a TELLIE_RUN_PLAN document. All database
+     interactions are then handled from within the models
+     */
+
+    // Make a dictionary to act as the document
+    NSMutableDictionary* document = [[NSMutableDictionary alloc] init];
+
+    // Loop over cells in matrix and find which were selected.
+    NSMutableArray* nodes = [NSMutableArray arrayWithCapacity:92];
+    for(int i=0; i<92; i++){
+        if([[tellieBuildNodeSelection cellWithTag:i] intValue] > 0){
+            [nodes addObject:[NSNumber numberWithInt:([[NSNumber numberWithInt:i] intValue] + 1)]];
+        }
+    }
+
+    // Get other parameters
+    NSNumber* photons = [NSNumber numberWithInteger:[tellieBuildPhotons integerValue]];
+    NSNumber* noPulses = [NSNumber numberWithInteger:[tellieBuildNoPulses integerValue]];
+    NSNumber* triggerDelay = [NSNumber numberWithFloat:[tellieTriggerDelayTf floatValue]];
+    NSNumber* pulseRate = [NSNumber numberWithInteger:[tellieBuildRate integerValue]];
+    NSString* name = [tellieBuildRunName stringValue];
+    BOOL slave = YES;
+    if([[tellieBuildOpMode titleOfSelectedItem] isEqualToString:@"Master"]){
+        slave = NO;
+    }
+
+    [document setObject:@"TELLIE_RUN_PLAN" forKey:@"type"];
+    [document setObject:@"" forKey:@"index"];
+    [document setObject:@"" forKey:@"comment"];
+    [document setObject:[model stringDateFromDate:nil] forKey:@"timestamp"];
+    [document setObject:[NSNumber numberWithInt:0] forKey:@"version"];
+    [document setObject:[NSNumber numberWithInt:0] forKey:@"pass"];
+    [document setObject:photons forKey:@"photons_per_pulse"];
+    [document setObject:noPulses forKey:@"trigger_per_node"];
+    [document setObject:triggerDelay forKey:@"trigger_delay"];
+    [document setObject:pulseRate forKey:@"trigger_rate"];
+    [document setObject:nodes forKey:@"nodes"];
+    [document setObject:[NSNumber numberWithBool:slave] forKey:@"slave_mode"];
+    [document setObject:name forKey:@"name"];
+
+    [[model couchDBRef:model withDB:@"telliedb"] addDocument:document tag:@"kTellieRunPlanAdded"];
+
+    [tellieBuildPushToDB setEnabled:NO];
+    [document release];
+}
+
 ////////////////////////////////////////////////////////
 //
 // TELLIE Validation button functions
@@ -441,8 +455,7 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
         NSLogColor([NSColor redColor], @"[TELLIE]: Cannot connect to couchdb database\n");
         return;
     }
-    
-    
+
     NSString* msg = nil;
     NSMutableArray* msgs = [NSMutableArray arrayWithCapacity:7];
     NSLog(@"---------------------------- Tellie Validation messages ----------------------------\n");
@@ -515,8 +528,9 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
         [tellieNoPulsesTf setBackgroundColor:[NSColor whiteColor]];
         // Make settings dict to pass to fire method
         float pulseSeparation = 1000.*(1./[telliePulseFreqTf floatValue]); // TELLIE accepts pulse rate in ms
+        NSString* fibre = [model calcTellieFibreForChannel:[tellieChannelTf integerValue]];
         NSMutableDictionary* settingsDict = [NSMutableDictionary dictionaryWithCapacity:100];
-        [settingsDict setValue:[tellieExpertFibreSelectPb titleOfSelectedItem] forKey:@"fibre"];
+        [settingsDict setValue:fibre forKey:@"fibre"];
         [settingsDict setValue:[NSNumber numberWithInteger:[tellieChannelTf integerValue]]  forKey:@"channel"];
         [settingsDict setValue:[tellieExpertOperationModePb titleOfSelectedItem] forKey:@"run_mode"];
         //[settingsDict setValue:[NSNumber numberWithInteger:[telliePhotonsTf integerValue]] forKey:@"photons"];
@@ -629,7 +643,104 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     NSLog(@"---------------------------------------------------------------------------------------------\n");
 }
 
-///////////////////////////////////////////
+-(void) tellieBuildValidateAction:(id)sender
+{
+    [model loadTELLIERunPlansFromDB];
+    [tellieBuildNoPulses.window makeFirstResponder:nil];
+    [tellieBuildPhotons.window makeFirstResponder:nil];
+    [tellieBuildRate.window makeFirstResponder:nil];
+    [tellieBuildTrigDelay.window makeFirstResponder:nil];
+
+    //Check if fibre mapping has been loaded from the tellieDB
+    if(![model tellieNodeMapping]){
+        [model loadTELLIEStaticsFromDB];
+    }
+    //If still can't get reference, return
+    if(![model tellieNodeMapping]){
+        NSLogColor([NSColor redColor], @"[TELLIE]: Cannot connect to couchdb database\n");
+        return;
+    }
+    [NSThread sleepForTimeInterval:1.0f];
+
+    NSString* msg = nil;
+    NSMutableArray* msgs = [NSMutableArray arrayWithCapacity:6];
+
+    ///////////////
+    // Run checks
+    NSLog(@"---------------------------- Tellie Validation messages ----------------------------\n");
+
+    msg = [self validateGeneralTellieNoPulses:[tellieBuildNoPulses stringValue]];
+    if(msg){
+        [msgs insertObject:msg atIndex:0];
+    } else {
+        [msgs insertObject:[NSNull null] atIndex:0];
+    }
+
+    msg = [self validateGeneralTelliePhotons:[tellieBuildPhotons stringValue]];
+    if(msg){
+        [msgs insertObject:msg atIndex:1];
+    } else {
+        [msgs insertObject:[NSNull null] atIndex:1];
+    }
+
+    msg = [self validateGeneralTelliePulseFreq:[tellieBuildRate stringValue]];
+    if(msg){
+        [msgs insertObject:msg atIndex:2];
+    } else {
+        [msgs insertObject:[NSNull null] atIndex:2];
+    }
+
+    msg = [self validateGeneralTellieTriggerDelay:[tellieBuildTrigDelay stringValue]];
+    if(msg){
+        [msgs insertObject:msg atIndex:3];
+    } else {
+        [msgs insertObject:[NSNull null] atIndex:3];
+    }
+
+    BOOL safety_check = [model photonIntensityCheck:[tellieBuildPhotons integerValue] atFrequency:[tellieBuildRate integerValue]];
+    if(safety_check == NO){
+        msg = @"Requested photon output is not detector safe at requested frequncy\n";
+        NSLog(@"%@",msg);
+        [msgs insertObject:msg atIndex:4];
+    } else {
+        [msgs insertObject:[NSNull null] atIndex:4];
+    }
+
+    ///////////////////////////////////
+    // Check file name against database
+    msg = nil;
+    for(NSString* name in [model tellieRunNames]){
+        if([name isEqualToString:[tellieBuildRunName stringValue]]){
+            msg = @"[TELLIE]: Run plan name already exists on database\n";
+            NSLog(msg);
+        }
+    }
+    if(msg){
+        [msgs insertObject:msg atIndex:5];
+    } else {
+        [msgs insertObject:[NSNull null] atIndex:5];
+    }
+
+    //////////////////////////
+    // Remove any null objects
+    for(int i = 0; i < [msgs count]; i++){
+        if([msgs objectAtIndex:i] == [NSNull null]){
+            [msgs removeObject:[msgs objectAtIndex:i]];
+        }
+    }
+
+    // Check validations passed
+    if([msgs count] == 0){
+        NSLog(@"[TELLIE]: Build custom sequence - settings are valid\n");
+        [tellieBuildPushToDB setEnabled:YES];
+    } else {
+        [tellieBuildPushToDB setEnabled:NO];
+        NSLog(@"[TELLIE]: Build custom sequence - settings invalid please resolve issues.\n");
+    }
+    NSLog(@"---------------------------------------------------------------------------------------------\n");
+}
+
+////////////////////////////////////////////
 // Delagate funcs waiting to observe edits
 ////////////////////////////////////////////
 -(void)controlTextDidBeginEditing:(NSNotification *)note {
@@ -656,6 +767,7 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     [tellieGeneralFireButton setEnabled:NO];
     [tellieExpertValidationStatusTf setStringValue:@""];
 
+    [tellieBuildPushToDB setEnabled:NO];
 }
 
 -(void)controlTextDidEndEditing:(NSNotification *)note {
@@ -671,6 +783,7 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     if(![model tellieNodeMapping]){
         [model loadTELLIEStaticsFromDB];
     }
+
     //If still can't get reference, return
     if(![model tellieNodeMapping]){
         NSLogColor([NSColor redColor], @"[TELLIE]: Cannot connect to couchdb database\n");
@@ -682,12 +795,11 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     
     NSString* expertMsg = nil;
     NSString* generalMsg = nil;
+    NSString* buildMsg = nil;
     BOOL gotInside = NO;
     
     //Make sure background gets drawn
     [editedField setDrawsBackground:YES];
-    //[tellieExpertStopButton setEnabled:NO];
-    //[tellieGeneralStopButton setEnabled:NO];
 
     //check if this notification originated from the expert tab
     if([note object] == tellieExpertNodeTf){
@@ -792,6 +904,38 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     } else if(generalMsg == nil && gotInside == YES){
         [tellieGeneralFireButton setEnabled:NO];
         [tellieGeneralValidationStatusTf setStringValue:@""];
+        [editedField setBackgroundColor:[NSColor whiteColor]];
+        [editedField setNeedsDisplay:YES];
+        return;
+    }
+
+    ///////////////////////////
+    // check if this notification originated from tellie run plan tab
+
+    //Re-set got inside.
+    gotInside = NO;
+
+    if([note object] == tellieBuildPhotons){
+        buildMsg = [self validateGeneralTelliePhotons:currentString];
+        gotInside = YES;
+    } else if ([note object] == tellieBuildNoPulses){
+        buildMsg = [self validateGeneralTellieNoPulses:currentString];
+        gotInside = YES;
+    } else if ([note object] == tellieBuildRate) {
+        buildMsg = [self validateGeneralTelliePulseFreq:currentString];
+        gotInside = YES;
+    } else if ([note object] == tellieBuildTrigDelay){
+        buildMsg = [self validateGeneralTellieTriggerDelay:currentString];
+        gotInside = YES;
+    }
+
+    if(buildMsg){
+        [tellieBuildPushToDB setEnabled:NO];
+        [editedField setBackgroundColor:[NSColor orangeColor]];
+        [editedField setNeedsDisplay:YES];
+        return;
+    } else if(expertMsg == nil && gotInside == YES){
+        [tellieBuildPushToDB setEnabled:NO];
         [editedField setBackgroundColor:[NSColor whiteColor]];
         [editedField setNeedsDisplay:YES];
         return;
@@ -1089,722 +1233,51 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     return nil;
 }
 
-//SMELLIE functions -------------------------
 
-
--(void) loadCurrentInformationForLaserHead
-{
-    //load information from a configArray
-    [smellieConfigAttenuatorField selectItemWithObjectValue:nil];
-    [smellieConfigFsInputCh selectItemWithObjectValue:nil];
-    [smellieConfigFsOutputCh selectItemWithObjectValue:nil];
-    [smellieConfigDetectorFibreRef selectItemWithObjectValue:nil];
+/////////////////////////////////////////////
+// Server tab functions
+/////////////////////////////////////////////
+- (IBAction)telliePing:(id)sender {
+    if([model pingTellie]){
+        NSString* response = [NSString stringWithFormat:@"Connected to tellie at:\n\n%@:%@", [model tellieHost], [model telliePort]];
+        [tellieServerResponseTf setStringValue:response];
+        [tellieServerResponseTf setBackgroundColor:[NSColor greenColor]];
+    } else {
+        NSString* response = [NSString stringWithFormat:@"Could not connect to tellie at:\n\n%@:%@", [model tellieHost], [model telliePort]];
+        [tellieServerResponseTf setStringValue:response];
+        [tellieServerResponseTf setBackgroundColor:[NSColor redColor]];
+    }
+    return;
 }
 
-//enables all lasers if the "all lasers" box is enabled 
--(IBAction)setAllLasersAction:(id)sender;
-{
-    if([smellieAllLasersButton state] == 1){
-        //Set the state of all Lasers to 1
-        [smellieSuperkLaserButton setState:1];
-        [smellie375nmLaserButton setState:1];
-        [smellie405nmLaserButton setState:1];
-        [smellie440nmLaserButton setState:1];
-        [smellie500nmLaserButton setState:1];
+- (IBAction)smelliePing:(id)sender {
+    if([model pingSmellie]){
+        NSString* response = [NSString stringWithFormat:@"Connected to smellie at:\n\n%@:%@", [model smellieHost], [model smelliePort]];
+        [smellieServerResponseTf setStringValue:response];
+        [smellieServerResponseTf setBackgroundColor:[NSColor greenColor]];
+    } else {
+        NSString* response = [NSString stringWithFormat:@"Could not connect to smellie at:\n\n%@:%@", [model smellieHost], [model smelliePort]];
+        [smellieServerResponseTf setStringValue:response];
+        [smellieServerResponseTf setBackgroundColor:[NSColor redColor]];
     }
+    return;
 }
 
-//enables all fibres if the "all fibres" box is enabled 
--(IBAction)setAllFibresAction:(id)sender;
-{
-    if([smellieAllFibresButton state] == 1){
-        [smellieFibreButtonFS007 setState:1];
-        [smellieFibreButtonFS107 setState:1];
-        [smellieFibreButtonFS207 setState:1];
-        [smellieFibreButtonFS025 setState:1];
-        [smellieFibreButtonFS125 setState:1];
-        [smellieFibreButtonFS225 setState:1];
-        [smellieFibreButtonFS037 setState:1];
-        [smellieFibreButtonFS137 setState:1];
-        [smellieFibreButtonFS237 setState:1];
-        [smellieFibreButtonFS055 setState:1];
-        [smellieFibreButtonFS155 setState:1];
-        [smellieFibreButtonFS255 setState:1];
+- (IBAction)interlockPing:(id)sender {
+    if([model pingInterlock]){
+        NSString* response = [NSString stringWithFormat:@"Connected to interlock at:\n\n%@:%@", [model interlockHost], [model interlockPort]];
+        [interlockServerResponseTf setStringValue:response];
+        [interlockServerResponseTf setBackgroundColor:[NSColor greenColor]];
+    } else {
+        NSString* response = [NSString stringWithFormat:@"Could not connect to interlock at:\n\n%@:%@", [model interlockHost], [model interlockPort]];
+        [interlockServerResponseTf setStringValue:response];
+        [interlockServerResponseTf setBackgroundColor:[NSColor redColor]];
     }
+    return;
 }
 
-//removes the tick in case for "all lasers" if any of the lasers and not pressed
--(IBAction)allLaserValidator:(id)sender
+-(void)killInterlock:(NSNotification *)aNote
 {
-    if( ([smellie375nmLaserButton state] != 1) || ([smellie405nmLaserButton state] != 1) || ([smellie440nmLaserButton state] != 1) || ([smellie500nmLaserButton state] != 1))
-    {
-        [smellieAllLasersButton setState:0];
-    }
-    
+    [model killKeepAlive];
 }
-
-//removes the tick in case for "all fibres" if any of the lasers and not pressed
--(IBAction)allFibreValidator:(id)sender
-{
-    if( ([smellieFibreButtonFS007 state] != 1) || ([smellieFibreButtonFS107 state] != 1) || ([smellieFibreButtonFS025 state] != 1) || ([smellieFibreButtonFS125 state] != 1) || ([smellieFibreButtonFS225 state] != 1) || ([smellieFibreButtonFS037 state] != 1) || ([smellieFibreButtonFS137 state] != 1) || ([smellieFibreButtonFS237 state] != 1) || ([smellieFibreButtonFS055 state] != 1) || ([smellieFibreButtonFS155 state] != 1) || ([smellieFibreButtonFS255 state] != 1))
-    {
-        [smellieAllFibresButton setState:0];
-    }
-    
-}
-
-//Force the string value to be less than 100 and a valid value
--(IBAction)validateLaserMaxIntensity:(id)sender;
-{
-    NSString* maxLaserIntString = [smellieMaxIntensity stringValue];
-    int maxLaserIntensity;
-    
-    @try{
-        maxLaserIntensity  = [maxLaserIntString intValue];
-    }
-    @catch (NSException *e) {
-        maxLaserIntensity = 100;
-        [smellieMaxIntensity setIntValue:maxLaserIntensity];
-        NSLog(@"SMELLIE_RUN_BUILDER: Maximum Laser intensity is invalid. Setting to 100%% by Default\n");
-    }
-    
-    if((maxLaserIntensity < 0) ||(maxLaserIntensity > 100))
-    {
-        maxLaserIntensity = 100;
-        [smellieMaxIntensity setIntValue:maxLaserIntensity];
-        NSLog(@"SMELLIE_RUN_BUILDER: Maximum Laser intensity is too high (or too low). Setting to 100%% by Default\n");
-    }
-}
-
--(IBAction)validateLaserMinIntensity:(id)sender;
-{
-    NSString* minLaserIntString = [smellieMinIntensity stringValue];
-    int minLaserIntensity;
-    
-    @try{
-        minLaserIntensity  = [minLaserIntString intValue];
-    }
-    @catch (NSException *e) {
-        minLaserIntensity = 20;
-        [smellieMinIntensity setIntValue:minLaserIntensity];
-        NSLog(@"SMELLIE_RUN_BUILDER: Minimum Laser intensity is invalid. Setting to 20%% by Default\n");
-    }
-    
-    if((minLaserIntensity < 0) || (minLaserIntensity > 100))
-    {
-        minLaserIntensity = 0;
-        [smellieMinIntensity setIntValue:minLaserIntensity];
-        NSLog(@"SMELLIE_RUN_BUILDER: Minimum Laser intensity is too low or high. Setting to 0%% by Default\n");
-    }
-}
-
-//The number of intensity steps cannot be more than the maximum intensity less minimum intensity 
--(IBAction)validateIntensitySteps:(id)sender;
-{
-    int numberOfIntensitySteps;
-    int maxNumberOfSteps;
-    
-    @try{
-        numberOfIntensitySteps = [smellieNumIntensitySteps intValue];
-        maxNumberOfSteps = [smellieMaxIntensity intValue] - [smellieMinIntensity intValue];
-    }
-    @catch(NSException *e){
-        NSLog(@"SMELLIE_RUN_BUILDER: Number of Intensity steps is invalid. Setting the number of steps to 1\n");
-        numberOfIntensitySteps = 1;
-        [smellieNumIntensitySteps setIntValue:numberOfIntensitySteps];
-    }
-    
-    if( (numberOfIntensitySteps > maxNumberOfSteps)|| (numberOfIntensitySteps < 1) || (remainderf((1.0*maxNumberOfSteps),(1.0*numberOfIntensitySteps)) != 0)){
-        numberOfIntensitySteps = 1;
-        [smellieNumIntensitySteps setIntValue:numberOfIntensitySteps];
-        NSLog(@"SMELLIE_RUN_BUILDER: Number of Intensity steps is invalid. Setting the the maximum correct value\n");
-    }
-    
-}
-
-//checks to make sure the trigger frequency isn't too high
--(IBAction)validateSmellieTriggerFrequency:(id)sender;
-{
-    int triggerFrequency;
-    //maxmium allowed trigger frequency in the GUI
-    int maxmiumTriggerFrequency = 1000;
-    
-    @try{
-        triggerFrequency = [smellieTriggerFrequency intValue];
-    }
-    @catch(NSException *e){
-        NSLog(@"SMELLIE_RUN_BUILDER: Trigger Frequency is invalid. Setting the frequency to 10 Hz\n");
-        triggerFrequency = 10;
-        [smellieTriggerFrequency setIntValue:triggerFrequency];
-    }
-    
-    if( (triggerFrequency > maxmiumTriggerFrequency) || (triggerFrequency < 0)){
-        [smellieTriggerFrequency setIntValue:10];
-        NSLog(@"SMELLIE_RUN_BUILDER: Trigger Frequency is invalid. Setting the frequency to 10 Hz\n");
-    }
-}
-
--(IBAction)validateNumTriggersPerStep:(id)sender;
-{
-    int numberTriggersPerStep;
-    //maxmium allowed number of triggers per loop
-    int maximumNumberTriggersPerStep = 100000;
-    
-    @try{
-        numberTriggersPerStep = [smellieNumTriggersPerLoop intValue];
-    }
-    @catch(NSException *e){
-        NSLog(@"SMELLIE_RUN_BUILDER: Triggers per loop is invalid. Setting to 100\n");
-        [smellieNumTriggersPerLoop setIntValue:100];
-    }
-    
-    if( (numberTriggersPerStep > maximumNumberTriggersPerStep) || (numberTriggersPerStep < 0)){
-        NSLog(@"SMELLIE_RUN_BUILDER: Triggers per loop is invalid. Setting to 100\n");
-        [smellieNumTriggersPerLoop setIntValue:100];
-    }
-}
-
--(IBAction)validationSmellieRunAction:(id)sender;
-{
-    //NSLog(@" output: %@",[model callPythonScript:@"/Users/jonesc/testScript.py" withCmdLineArgs:nil]);
-    [smellieMakeNewRunButton setEnabled:NO];
-    
-    //Error messages
-    NSString* smellieRunErrorString = [[NSString alloc] initWithString:@"Unable to Validate. Check all fields are entered and see Status and Error Log" ];
-    
-    NSNumber* validationErrorFlag = [NSNumber numberWithInt:1];
-    //validationErrorFlag = [NSNumber numberWithInt:1];
-    
-    //check the Operator has entered their name 
-    if([[smellieOperatorName stringValue] length] == 0){
-        NSLog(@"SMELLIE_RUN_BUILDER:Please enter a Operator Name \n");
-    }
-
-    //TODO:Check there are no files with the same name (although each will have a unique id)
-    //check the Operator has a valid run name 
-    else if([[smellieRunName stringValue] length] == 0){
-        NSLog(@"SMELLIE_RUN_BUILDER:Please enter a Run Name\n");
-    }
-    
-    //check that an operation mode has been given 
-    else if([[smellieOperationMode stringValue] length] == 0){
-        NSLog(@"SMELLIE_RUN_BUILDER:Please enter an Operation Mode \n");
-    }
-    
-    //check the maximum laser intensity is given
-    else if([[smellieMaxIntensity stringValue] length] == 0){
-        NSLog(@"SMELLIE_RUN_BUILDER:Please enter an Maxmium Laser Intensity\n");
-    }
-    
-    //check the minimum laser intensity is given
-    else if([[smellieMinIntensity stringValue] length] == 0){
-        NSLog(@"SMELLIE_RUN_BUILDER:Please enter an Minimum Laser Intensity\n");
-    }
-    
-    //check the intensity step is given 
-    else if([[smellieNumIntensitySteps stringValue] length] == 0){
-        NSLog(@"SMELLIE_RUN_BUILDER:Please enter a number of intensity steps\n");
-    }
-    
-    //check the trigger frequency is given 
-    else if([[smellieTriggerFrequency stringValue] length] == 0){
-        NSLog(@"SMELLIE_RUN_BUILDER:Please enter a trigger frequency\n");
-    }
-    
-    //check the trigger frequency is given
-    else if([[smellieNumTriggersPerLoop stringValue] length] == 0){
-        NSLog(@"SMELLIE_RUN_BUILDER:Please enter a number of triggers per loop\n");
-    }
-    
-    else{
-        validationErrorFlag = [NSNumber numberWithInt:2];
-    }
-    
-    //If any errors has been detected in the validation 
-    if([validationErrorFlag intValue] == 1){
-        [smellieRunErrorTextField setStringValue:smellieRunErrorString];
-        [smellieMakeNewRunButton setEnabled:NO]; //Disable the user from this button
-    }
-    else if ([validationErrorFlag intValue] == 2){
-        [smellieRunErrorTextField setStringValue:@"No Error"];
-        [smellieMakeNewRunButton setEnabled:YES]; //Enable the user from this button
-
-        //We need to block out all the textFields until the run has been submitted!
-        [smellieNumIntensitySteps setEnabled:NO];
-        [smellieMaxIntensity setEnabled:NO];
-        [smellieMinIntensity setEnabled:NO];
-        [smellieNumTriggersPerLoop setEnabled:NO];
-        [smellieOperationMode setEnabled:NO];
-        [smellieOperatorName setEnabled:NO];
-        [smellieTriggerFrequency setEnabled:NO];
-        [smellieRunName setEnabled:NO];
-        [smellie405nmLaserButton setEnabled:NO];
-        [smellie375nmLaserButton setEnabled:NO];
-        [smellie440nmLaserButton setEnabled:NO];
-        [smellie500nmLaserButton setEnabled:NO];
-        [smellieFibreButtonFS007 setEnabled:NO];
-        [smellieFibreButtonFS107 setEnabled:NO];
-        [smellieFibreButtonFS207 setEnabled:NO];
-        [smellieFibreButtonFS025 setEnabled:NO];
-        [smellieFibreButtonFS125 setEnabled:NO];
-        [smellieFibreButtonFS225 setEnabled:NO];
-        [smellieFibreButtonFS037 setEnabled:NO];
-        [smellieFibreButtonFS137 setEnabled:NO];
-        [smellieFibreButtonFS237 setEnabled:NO];
-        [smellieFibreButtonFS055 setEnabled:NO];
-        [smellieFibreButtonFS155 setEnabled:NO];
-        [smellieFibreButtonFS255 setEnabled:NO];
-        [smellieAllFibresButton setEnabled:NO];
-        [smellieAllLasersButton setEnabled:NO];
-        
-    }
-    else{
-        NSLog(@"SMELLIE_BUILD_RUN: Unknown invalid Entry or no entries sent\n");
-    }
-    
-    [smellieRunErrorString release];
-    
-    //Example functions of how this values can be pulled 
-    //state 1 is ON, state 0 is OFF for these buttons
-    //NSLog(@"375 laser setting %i \n",[smellie375nmLaserButton state]);
-    //NSLog(@"Entry into the Operator Field %@ \n",[smellieOperationMode stringValue]);
-    
-    //[model validationSmellieSettings];
-}
-
--(IBAction)makeNewSmellieRun:(id)sender
-{
-    NSAutoreleasePool* smellieSettingsPool = [[NSAutoreleasePool alloc] init];
-    
-    NSMutableDictionary * smellieRunSettingsFromGUI = [NSMutableDictionary dictionaryWithCapacity:100];
-    
-    //Build Objects to store values
-    NSString * smellieOperatorNameString = [NSString stringWithString:[smellieOperatorName stringValue]];
-    NSString * smellieRunNameString = [NSString stringWithString:[smellieRunName stringValue]];
-    NSString * smellieOperatorModeString = [NSString stringWithString:[smellieOperationMode stringValue]];
-    
-    NSNumber * smellieMaxIntensityNum = [NSNumber numberWithInt:[smellieMaxIntensity intValue]];
-    NSNumber * smellieMinIntensityNum = [NSNumber numberWithInt:[smellieMinIntensity intValue]];
-    NSNumber * smellieNumIntensityStepsNum = [NSNumber numberWithInt:[smellieNumIntensitySteps intValue]];
-    NSNumber * smellieTriggerFrequencyNum = [NSNumber numberWithInt:[smellieTriggerFrequency intValue]];
-    NSNumber * smellieNumTriggersPerLoopNum = [NSNumber numberWithInt:[smellieNumTriggersPerLoop intValue]];
-    
-    NSNumber * smellie405nmLaserButtonNum = [NSNumber numberWithInteger:[smellie405nmLaserButton state]];
-    NSNumber * smellie375nmLaserButtonNum = [NSNumber numberWithInteger:[smellie375nmLaserButton state]];
-    NSNumber * smellie440nmLaserButtonNum = [NSNumber numberWithInteger:[smellie440nmLaserButton state]];
-    NSNumber * smellie500nmLaserButtonNum = [NSNumber numberWithInteger:[smellie500nmLaserButton state]];
-    
-    NSNumber * smellieFibreButtonFS007Num = [NSNumber numberWithInteger:[smellieFibreButtonFS007 state]];
-    NSNumber * smellieFibreButtonFS107Num = [NSNumber numberWithInteger:[smellieFibreButtonFS107 state]];
-    NSNumber * smellieFibreButtonFS207Num = [NSNumber numberWithInteger:[smellieFibreButtonFS207 state]];
-    NSNumber * smellieFibreButtonFS025Num = [NSNumber numberWithInteger:[smellieFibreButtonFS025 state]];
-    NSNumber * smellieFibreButtonFS125Num = [NSNumber numberWithInteger:[smellieFibreButtonFS125 state]];
-    NSNumber * smellieFibreButtonFS225Num = [NSNumber numberWithInteger:[smellieFibreButtonFS225 state]];
-    NSNumber * smellieFibreButtonFS037Num = [NSNumber numberWithInteger:[smellieFibreButtonFS037 state]];
-    NSNumber * smellieFibreButtonFS137Num = [NSNumber numberWithInteger:[smellieFibreButtonFS137 state]];
-    NSNumber * smellieFibreButtonFS237Num = [NSNumber numberWithInteger:[smellieFibreButtonFS237 state]];
-    NSNumber * smellieFibreButtonFS055Num = [NSNumber numberWithInteger:[smellieFibreButtonFS055 state]];
-    NSNumber * smellieFibreButtonFS155Num = [NSNumber numberWithInteger:[smellieFibreButtonFS155 state]];
-    NSNumber * smellieFibreButtonFS255Num = [NSNumber numberWithInteger:[smellieFibreButtonFS255 state]];
-    
-    
-    [smellieRunSettingsFromGUI setObject:smellieOperatorNameString forKey:@"operator_name"];
-    [smellieRunSettingsFromGUI setObject:smellieRunNameString forKey:@"run_name"];
-    [smellieRunSettingsFromGUI setObject:smellieOperatorModeString forKey:@"operation_mode"];
-    [smellieRunSettingsFromGUI setObject:smellieMaxIntensityNum forKey:@"max_laser_intensity"];
-    [smellieRunSettingsFromGUI setObject:smellieMinIntensityNum forKey:@"min_laser_intensity"];
-    [smellieRunSettingsFromGUI setObject:smellieNumIntensityStepsNum forKey:@"num_intensity_steps"];
-    [smellieRunSettingsFromGUI setObject:smellieTriggerFrequencyNum forKey:@"trigger_frequency"];
-    [smellieRunSettingsFromGUI setObject:smellieNumTriggersPerLoopNum forKey:@"triggers_per_loop"];
-    [smellieRunSettingsFromGUI setObject:smellie375nmLaserButtonNum forKey:@"375nm_laser_on"];
-    [smellieRunSettingsFromGUI setObject:smellie405nmLaserButtonNum forKey:@"405nm_laser_on"];
-    [smellieRunSettingsFromGUI setObject:smellie440nmLaserButtonNum forKey:@"440nm_laser_on"];
-    [smellieRunSettingsFromGUI setObject:smellie500nmLaserButtonNum forKey:@"500nm_laser_on"];
-    
-    //Fill the SMELLIE Fibre Array information
-    [smellieRunSettingsFromGUI setObject:smellieFibreButtonFS007Num forKey:@"FS007"];
-    [smellieRunSettingsFromGUI setObject:smellieFibreButtonFS107Num forKey:@"FS107"];
-    [smellieRunSettingsFromGUI setObject:smellieFibreButtonFS207Num forKey:@"FS207"];
-    [smellieRunSettingsFromGUI setObject:smellieFibreButtonFS025Num forKey:@"FS025"];
-    [smellieRunSettingsFromGUI setObject:smellieFibreButtonFS125Num forKey:@"FS125"];
-    [smellieRunSettingsFromGUI setObject:smellieFibreButtonFS225Num forKey:@"FS225"];
-    [smellieRunSettingsFromGUI setObject:smellieFibreButtonFS037Num forKey:@"FS037"];
-    [smellieRunSettingsFromGUI setObject:smellieFibreButtonFS137Num forKey:@"FS137"];
-    [smellieRunSettingsFromGUI setObject:smellieFibreButtonFS237Num forKey:@"FS237"];
-    [smellieRunSettingsFromGUI setObject:smellieFibreButtonFS055Num forKey:@"FS055"];
-    [smellieRunSettingsFromGUI setObject:smellieFibreButtonFS155Num forKey:@"FS155"];
-    [smellieRunSettingsFromGUI setObject:smellieFibreButtonFS255Num forKey:@"FS255"];
-    
-    NSLog(@" operator_name (string) %@\n",[smellieRunSettingsFromGUI objectForKey:@"operator_name"]);
-    NSLog(@" max intensity (string) %@\n",[smellieRunSettingsFromGUI objectForKey:@"max_laser_intensity"]);
-    NSLog(@" laser state (string) %@\n",[smellieRunSettingsFromGUI objectForKey:@"405nm_laser_on"]);
-    
-    [model smellieDBpush:smellieRunSettingsFromGUI];
-    
-    //Re-enable these buttons for editing
-    [smellieNumIntensitySteps setEnabled:YES];
-    [smellieMaxIntensity setEnabled:YES];
-    [smellieMinIntensity setEnabled:YES];
-    [smellieNumTriggersPerLoop setEnabled:YES];
-    [smellieOperationMode setEnabled:YES];
-    [smellieOperatorName setEnabled:YES];
-    [smellieTriggerFrequency setEnabled:YES];
-    [smellieRunName setEnabled:YES];
-    [smellie405nmLaserButton setEnabled:YES];
-    [smellie375nmLaserButton setEnabled:YES];
-    [smellie440nmLaserButton setEnabled:YES];
-    [smellie500nmLaserButton setEnabled:YES];
-    [smellieFibreButtonFS007 setEnabled:YES];
-    [smellieFibreButtonFS107 setEnabled:YES];
-    [smellieFibreButtonFS207 setEnabled:YES];
-    [smellieFibreButtonFS025 setEnabled:YES];
-    [smellieFibreButtonFS125 setEnabled:YES];
-    [smellieFibreButtonFS225 setEnabled:YES];
-    [smellieFibreButtonFS037 setEnabled:YES];
-    [smellieFibreButtonFS137 setEnabled:YES];
-    [smellieFibreButtonFS237 setEnabled:YES];
-    [smellieFibreButtonFS055 setEnabled:YES];
-    [smellieFibreButtonFS155 setEnabled:YES];
-    [smellieFibreButtonFS255 setEnabled:YES];
-    [smellieAllFibresButton setEnabled:YES];
-    [smellieAllLasersButton setEnabled:YES];
-    [smellieMakeNewRunButton setEnabled:NO];
-    
-    [smellieSettingsPool drain];
-    
-}
-
-//Submit Smellie configuration file to the Database
--(IBAction)onSelectOfSepiaInput:(id)sender
-{
-    
-    //TODO: Read in current information about that Sepia Input and to the detector
-    //[self fetchRecentVersion];
-    //Download the most recent smellie configuration - this is implemented by run number
-    //NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
-    //ELLIEModel* anELLIEModel = [objs objectAtIndex:0];
-    //[anELLIEModel fetchSmellieConfigurationInformation];
-    
-    //print down the current self-test pmt values
-    [smellieConfigSelfTestNoOfPulses setStringValue:[configForSmellie objectForKey:@"selfTestNumOfPulses"]];
-    [smellieConfigSelfTestLaserTriggerFreq setStringValue:[configForSmellie objectForKey:@"selfTestLaserTrigFrequency"]];
-    [smellieConfigSelfTestPmtSampleRate setStringValue:[configForSmellie objectForKey:@"selfTestPmtSamplerRate"]];
-    [smellieConfigSelfTestNoOfPulsesPerLaser setStringValue:[configForSmellie objectForKey:@"selfTestNumOfPulsesPerLaser"]];
-    [smellieConfigSelfTestNiTriggerOutputPin setStringValue:[configForSmellie objectForKey:@"selfTestNiTriggerOutputPin"]];
-    [smellieConfigSelfTestNiTriggerInputPin setStringValue:[configForSmellie objectForKey:@"selfTestNiTriggerInputPin"]];
-    
-    
-    int laserHeadIndex = [sender indexOfSelectedItem];
-    
-    for (id specificConfigValue in configForSmellie){
-        if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput%i",laserHeadIndex]]){
-            
-            //Get the values of the configuration
-            NSString *laserHeadConnected = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"laserHeadConnected"]];
-            NSString *attentuatorConnected = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"splitterTypeConnected"]];
-            NSString *fibreSwitchInputConnected = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"fibreSwitchInputConnected"]];
-            NSString *attenutationFactor = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"attenuationFactor"]];
-            NSString *gainControlFactor = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"gainControlFactor"]];
-            
-            @try{
-                //try and select the correct index of the combo boxes to make this work 
-                [smellieConfigLaserHeadField selectItemAtIndex:[smellieConfigLaserHeadField indexOfItemWithObjectValue:laserHeadConnected]];
-                [smellieConfigAttenuatorField selectItemAtIndex:[smellieConfigAttenuatorField indexOfItemWithObjectValue:attentuatorConnected]];
-                [smellieConfigFsInputCh selectItemAtIndex:[smellieConfigFsInputCh indexOfItemWithObjectValue:fibreSwitchInputConnected]];
-                [smellieConfigAttenutationFactor setStringValue:attenutationFactor];
-                [smellieConfigGainControl setStringValue:gainControlFactor];
-                laserHeadSelected = YES;
-            }
-            @catch (NSException * error) {
-                NSLog(@"Error Parsing Configuration File: %@",error);
-            }
-            
-        }
-    }
-}
-
--(IBAction)onClickLaserHead:(id)sender
-{
-    if(laserHeadSelected){
-        //update the correct value which is selected
-        NSString *currentSepiaInputChannel = [NSString stringWithFormat:@"laserInput%@",[smellieConfigSepiaInputChannel objectValueOfSelectedItem]];
-        
-        //copy the current object into an array
-        NSMutableDictionary *currentSmellieConfigForSepiaInput = [[[configForSmellie objectForKey:currentSepiaInputChannel] mutableCopy] autorelease];
-        
-        //update with new value
-        [currentSmellieConfigForSepiaInput setObject:[smellieConfigLaserHeadField objectValueOfSelectedItem] forKey:@"laserHeadConnected"];
-        [configForSmellie setObject:currentSmellieConfigForSepiaInput forKey:currentSepiaInputChannel];
-
-    }
-}
-
-
-- (IBAction)onClickAttenuator:(id)sender
-{
-    if(laserHeadSelected){
-        //update the correct value which is selected
-        NSString *currentSepiaInputChannel = [NSString stringWithFormat:@"laserInput%@",[smellieConfigSepiaInputChannel objectValueOfSelectedItem]];
-        
-        //copy the current object into an array
-        NSMutableDictionary *currentSmellieConfigForSepiaInput = [[[configForSmellie objectForKey:currentSepiaInputChannel] mutableCopy] autorelease];
-        
-        //update with new value
-        [currentSmellieConfigForSepiaInput setObject:[smellieConfigAttenuatorField objectValueOfSelectedItem] forKey:@"splitterTypeConnected"];
-        [configForSmellie setObject:currentSmellieConfigForSepiaInput forKey:currentSepiaInputChannel];
-    
-    }
-}
-
-- (IBAction)onClickFibreSwithInput:(id)sender
-{
-    if(laserHeadSelected){
-        //update the correct value which is selected
-        NSString *currentSepiaInputChannel = [NSString stringWithFormat:@"laserInput%@",[smellieConfigSepiaInputChannel objectValueOfSelectedItem]];
-        
-        //copy the current object into an array
-        NSMutableDictionary *currentSmellieConfigForSepiaInput = [[[configForSmellie objectForKey:currentSepiaInputChannel] mutableCopy] autorelease];
-        
-        //update with new value
-        [currentSmellieConfigForSepiaInput setObject:[smellieConfigFsInputCh objectValueOfSelectedItem] forKey:@"fibreSwitchInputConnected"];
-        [configForSmellie setObject:currentSmellieConfigForSepiaInput forKey:currentSepiaInputChannel];
-        
-    }
-}
-- (IBAction)onClickFibeSwitchOutput:(id)sender
-{
-    //TODO: Read in current information about that Sepia Input and to the detector
-    for (id specificConfigValue in configForSmellie){
-        if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"%@",[sender objectValueOfSelectedItem]]]){
-            
-            //Get the values of the configuration
-            NSString *detectorFibreReference = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"detectorFibreReference"]];
-            
-            
-            @try{
-                //try and select the correct index of the combo boxes to make this work
-                [smellieConfigDetectorFibreRef selectItemAtIndex:[smellieConfigDetectorFibreRef indexOfItemWithObjectValue:detectorFibreReference]];
-                fibreSwitchOutputSelected = YES;
-            }
-            @catch (NSException * error) {
-                NSLog(@"Error Parsing Configuration File: %@",error);
-            }
-            
-        }
-    }
-}
-
-- (IBAction)onClickDetectorFibreReference:(id)sender
-{
-    if(fibreSwitchOutputSelected){
-        //update the correct value which is selected
-        NSString *currentSepiaInputChannel = [NSString stringWithFormat:@"%@",[smellieConfigFsOutputCh objectValueOfSelectedItem]];
-        
-        //copy the current object into an array
-        NSMutableDictionary *currentSmellieConfigForSepiaInput = [[[configForSmellie objectForKey:currentSepiaInputChannel] mutableCopy] autorelease];
-        
-        //update with new value
-        [currentSmellieConfigForSepiaInput setObject:[smellieConfigDetectorFibreRef objectValueOfSelectedItem] forKey:@"detectorFibreReference"];
-        [configForSmellie setObject:currentSmellieConfigForSepiaInput forKey:currentSepiaInputChannel];
-    }
-}
-
-
-BOOL isNumeric(NSString *s)
-{
-    NSScanner *sc = [NSScanner scannerWithString: s];
-    if ( [sc scanFloat:NULL] )
-    {
-        return [sc isAtEnd];
-    }
-    return NO;
-}
-
-
-- (IBAction)onChangeAttenuationFactor:(id)sender
-{
-    if(laserHeadSelected){
-        
-        float attenutationFactor = [smellieConfigAttenutationFactor floatValue];
-        
-        BOOL isAttenutationFactorNumeric = isNumeric([smellieConfigAttenutationFactor stringValue]);
-        
-        if(isAttenutationFactorNumeric == YES){
-            
-            //check the attenuation factor makes sense
-            if((attenutationFactor < 0.0) || (attenutationFactor > 100.0)){
-                NSLog(@"SMELLIE_CONFIGURATION_BUILDER: Please enter an attentuation factor between 0.0 and 100.0\n");
-                [smellieConfigAttenutationFactor setFloatValue:0.0];
-            }
-            else{
-                NSString *currentSepiaInputChannel = [NSString stringWithFormat:@"laserInput%@",[smellieConfigSepiaInputChannel objectValueOfSelectedItem]];
-                //copy the current object into an array
-                NSMutableDictionary *currentSmellieConfigForSepiaInput = [[[configForSmellie objectForKey:currentSepiaInputChannel] mutableCopy] autorelease];
-                [currentSmellieConfigForSepiaInput
-                    setObject:[NSString stringWithString:[smellieConfigAttenutationFactor stringValue]]
-                    forKey:@"attenuationFactor"];
-        
-        
-                [configForSmellie setObject:currentSmellieConfigForSepiaInput forKey:currentSepiaInputChannel];
-            }
-        }
-        else{
-            NSLog(@"SMELLIE_CONFIGURATION_BUILDER: Please enter a numerical value for the attenutation Factor\n");
-            [smellieConfigAttenutationFactor setFloatValue:0.0];
-        }
-    }
-}
-
--(IBAction)onChangeGainControlVoltage:(id)sender
-{
-    if(laserHeadSelected){
-        float gainVoltageFactor = [smellieConfigGainControl floatValue];
-        BOOL isGainVoltageFactorNumeric = isNumeric([smellieConfigAttenutationFactor stringValue]);
-        if(isGainVoltageFactorNumeric == YES){
-            //check the gain control factor makes sense
-            if((gainVoltageFactor < 0.0) || (gainVoltageFactor > 0.5)){
-                NSLog(@"SMELLIE_CONFIGURATION_BUILDER: Please enter an attentuation factor between 0.0 and 0.5\n");
-                [smellieConfigAttenutationFactor setFloatValue:0.0];
-            }
-            else{
-                NSString *currentSepiaInputChannel = [NSString stringWithFormat:@"laserInput%@",[smellieConfigSepiaInputChannel objectValueOfSelectedItem]];
-                //copy the current object into an array
-                NSMutableDictionary *currentSmellieConfigForSepiaInput = [[[configForSmellie objectForKey:currentSepiaInputChannel] mutableCopy] autorelease];
-                [currentSmellieConfigForSepiaInput
-                 setObject:[NSString stringWithString:[smellieConfigGainControl stringValue]]
-                 forKey:@"gainControlFactor"];
-                
-                [configForSmellie setObject:currentSmellieConfigForSepiaInput forKey:currentSepiaInputChannel];
-            }
-        }
-        else{
-            NSLog(@"SMELLIE_CONFIGURATION_BUILDER: Please enter a numerical value for the gain Control Factor\n");
-            [smellieConfigGainControl setFloatValue:0.0];
-        }
-    }
-}
-
-- (IBAction)onClickNumOfPulses:(id)sender
-{
-    //copy the current object into an array
-    NSMutableDictionary *currentSmellieConfig = [[configForSmellie mutableCopy] autorelease];
-    
-    BOOL isNumOfPulsesNumeric = isNumeric([smellieConfigSelfTestNoOfPulses stringValue]);
-    
-    if(isNumOfPulsesNumeric == YES){
-        [currentSmellieConfig setObject:[NSString stringWithString:[smellieConfigSelfTestNoOfPulses stringValue]]
-                                 forKey:@"selfTestNumOfPulses"];
-        configForSmellie = [currentSmellieConfig mutableCopy];
-    }
-    else{
-        NSLog(@"SMELLIE_CONFIGURATION_BUILDER: Please enter a numerical value for the number of pulses\n");
-        [smellieConfigSelfTestNoOfPulses setFloatValue:10.0];
-    }
-}
-
-- (IBAction)onClickSelfTestLasertTrigFreq:(id)sender
-{
-    //copy the current object into an array
-    NSMutableDictionary *currentSmellieConfig = [[configForSmellie mutableCopy] autorelease];
-    
-    BOOL isLaserFreqNumeric = isNumeric([smellieConfigSelfTestLaserTriggerFreq stringValue]);
-    
-    if(isLaserFreqNumeric == YES){
-    
-        float selfTestlaserFreq = [smellieConfigSelfTestLaserTriggerFreq floatValue];
-        
-        //PMT monitoring system cannot deal with a frequency that is greater than 17Khz.
-        //Also it is dangerous to try and trigger the laser at high rates
-        if((selfTestlaserFreq < 0.0) || (selfTestlaserFreq > 17000.0)){
-            NSLog(@"SMELLIE_CONFIGURATION_BUILDER: Laser self test frequency has to be between 0.0 and 17000 Hz\n");
-            [smellieConfigSelfTestNoOfPulses setFloatValue:10.0];
-        }
-        else{
-            [currentSmellieConfig setObject:[NSString stringWithString:[smellieConfigSelfTestLaserTriggerFreq stringValue]]
-                                     forKey:@"selfTestLaserTrigFrequency"];
-            configForSmellie = [currentSmellieConfig mutableCopy];
-        }
-    }
-    else{
-        NSLog(@"SMELLIE_CONFIGURATION_BUILDER: Please enter a numerical value for the Self test laser frequency\n");
-    }
-}
-
-- (IBAction)onClickSelfTestPmtSampleRate:(id)sender
-{
-    //copy the current object into an array
-    NSMutableDictionary *currentSmellieConfig = [[configForSmellie mutableCopy] autorelease];
-    
-    BOOL isSelfTestPmtSampleRateNumeric = isNumeric([smellieConfigSelfTestPmtSampleRate stringValue]);
-    
-    if(isSelfTestPmtSampleRateNumeric == YES){
-    
-        [currentSmellieConfig setObject:[NSString stringWithString:[smellieConfigSelfTestPmtSampleRate stringValue]]
-                                 forKey:@"selfTestPmtSamplerRate"];
-    
-        configForSmellie = [currentSmellieConfig mutableCopy];
-    }
-    else{
-        NSLog(@"SMELLIE_CONFIGURATION_BUILDER: Please enter a numerical value for the Self test Pmt sample rate\n");
-    }
-}
-
-//PMT samples to take per Laser
-- (IBAction)onClickNumOfPulsesPerLaser:(id)sender
-{
-    NSMutableDictionary *currentSmellieConfig = [[configForSmellie mutableCopy] autorelease];
-    
-    BOOL isNumberOfPulsesPerLaserNumeric = isNumeric([smellieConfigSelfTestNoOfPulsesPerLaser stringValue]);
-    
-    if(isNumberOfPulsesPerLaserNumeric == YES){
-    
-        [currentSmellieConfig setObject:[NSString stringWithString:[smellieConfigSelfTestNoOfPulsesPerLaser stringValue]]
-                                 forKey:@"selfTestNumOfPulsesPerLaser"];
-    
-        configForSmellie = [currentSmellieConfig mutableCopy];
-    }
-    else{
-        NSLog(@"SMELLIE_CONFIGURATION_BUILDER: Please enter a numerical value for the Self test Pmt samples per laser\n");
-    }
-}
-
-- (IBAction)onClickNiTriggerOutputPin:(id)sender
-{
-    NSMutableDictionary *currentSmellieConfig = [[configForSmellie mutableCopy] autorelease];
-    
-    [currentSmellieConfig setObject:[NSString stringWithString:[smellieConfigSelfTestNiTriggerOutputPin stringValue]]
-                             forKey:@"selfTestNiTriggerOutputPin"];
-    
-    configForSmellie = [currentSmellieConfig mutableCopy];
-}
-- (IBAction)onClickNiTriggerInputPin:(id)sender
-{
-    NSMutableDictionary *currentSmellieConfig = [[configForSmellie mutableCopy] autorelease];
-    
-    [currentSmellieConfig setObject:[NSString stringWithString:[smellieConfigSelfTestNiTriggerInputPin stringValue]]
-                             forKey:@"selfTestNiTriggerInputPin"];
-    
-    configForSmellie = [currentSmellieConfig mutableCopy];
-}
-
--(IBAction)onClickValidateSmellieConfig:(id)sender
-{
-    //TODO: Check the file is correct and send a message to the user
-    
-    [smellieConfigSubmitButton setEnabled:YES];
-}
-
-- (IBAction)onClickSubmitButton:(id)sender
-{
-    
-    //add a version number to the smellie configuration also add a run number 
-    
-    //post to the database
-    [model smellieConfigurationDBpush:configForSmellie];
-    [self close];
-}
-
-//TELLIE functions -------------------------
-
-
 @end

@@ -25,6 +25,7 @@
 #import "ORXL3Model.h"
 
 
+NSString* ORDCModelEverythingChanged        = @"ORDCModelEverythingChanged";
 NSString* ORDCModelCommentsChanged			= @"ORDCModelCommentsChanged";
 NSString* ORDCModelShowVoltsChanged			= @"ORDCModelShowVoltsChanged";
 NSString* ORDCModelSetAllCmosChanged		= @"ORDCModelSetAllCmosChanged";
@@ -109,7 +110,7 @@ NSString* ORDBLock = @"ORDBLock";
     [comments autorelease];
     comments = [aComments copy];    
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelCommentsChanged object:self];
+    [self postNotificationName:ORDCModelCommentsChanged];
 }
 
 - (void) setSlot:(int)aSlot
@@ -127,7 +128,7 @@ NSString* ORDBLock = @"ORDBLock";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setShowVolts:showVolts];
     showVolts = aShowVolts;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelShowVoltsChanged object:self];
+    [self postNotificationName:ORDCModelShowVoltsChanged];
 }
 
 - (BOOL) setAllCmos
@@ -139,7 +140,7 @@ NSString* ORDBLock = @"ORDBLock";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setSetAllCmos:setAllCmos];
     setAllCmos = aSetAllCmos;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelSetAllCmosChanged object:self];
+    [self postNotificationName:ORDCModelSetAllCmosChanged];
 }
 
 - (short) cmosRegShown
@@ -154,7 +155,7 @@ NSString* ORDBLock = @"ORDBLock";
 	
     [[[self undoManager] prepareWithInvocationTarget:self] setCmosRegShown:cmosRegShown];
     cmosRegShown = aCmosRegShown;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelCmosRegShownChanged object:self];
+    [self postNotificationName:ORDCModelCmosRegShownChanged];
 }
 
 - (unsigned char) rp1:(short)anIndex
@@ -166,7 +167,7 @@ NSString* ORDBLock = @"ORDBLock";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setRp1:anIndex withValue:rp1[anIndex]];
     rp1[anIndex] = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelRp1Changed object:self];
+    [self postNotificationName:ORDCModelRp1Changed];
 }
 
 - (unsigned char) rp2:(short)anIndex
@@ -178,7 +179,7 @@ NSString* ORDBLock = @"ORDBLock";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setRp2:anIndex withValue:rp2[anIndex]];
     rp2[anIndex] = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelRp2Changed object:self];
+    [self postNotificationName:ORDCModelRp2Changed];
 }
 
 - (unsigned char) vli:(short)anIndex
@@ -190,7 +191,7 @@ NSString* ORDBLock = @"ORDBLock";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setVli:anIndex withValue:vli[anIndex]];
     vli[anIndex] = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelVliChanged object:self];
+    [self postNotificationName:ORDCModelVliChanged];
 }
 
 - (unsigned char) vsi:(short)anIndex
@@ -202,7 +203,7 @@ NSString* ORDBLock = @"ORDBLock";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setVsi:anIndex withValue:vsi[anIndex]];
     vsi[anIndex] = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelVsiChanged object:self];
+    [self postNotificationName:ORDCModelVsiChanged];
 }
 
 - (unsigned char) vt:(short)anIndex
@@ -214,7 +215,7 @@ NSString* ORDBLock = @"ORDBLock";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setVt:anIndex withValue:vt[anIndex]];
     vt[anIndex] = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelVtChanged object:self];
+    [self postNotificationName:ORDCModelVtChanged];
 }
 
 - (unsigned char) vt_ecal:(short)anIndex
@@ -227,7 +228,7 @@ NSString* ORDBLock = @"ORDBLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setVt_ecal:anIndex withValue:[self vt_ecal:anIndex]];
     _vt_ecal[anIndex] = aValue;
     [self silentUpdateVt:anIndex];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelVtChanged object:self];
+    [self postNotificationName:ORDCModelVtChanged];
 }
 
 - (unsigned char) vt_zero:(short)anIndex
@@ -240,7 +241,7 @@ NSString* ORDBLock = @"ORDBLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setVt_zero:anIndex withValue:[self vt_zero:anIndex]];
     _vt_zero[anIndex] = aValue;
     [self silentUpdateVt:anIndex];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelVtChanged object:self];
+    [self postNotificationName:ORDCModelVtChanged];
 }
 
 - (short) vt_corr:(short)anIndex
@@ -253,7 +254,7 @@ NSString* ORDBLock = @"ORDBLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setVt_corr:anIndex withValue:[self vt_corr:anIndex]];
     _vt_corr[anIndex] = aValue;
     [self silentUpdateVt:anIndex];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelVtChanged object:self];
+    [self postNotificationName:ORDCModelVtChanged];
 }
 
 - (unsigned char) vt_safety
@@ -269,7 +270,7 @@ NSString* ORDBLock = @"ORDBLock";
     for (ch=0; ch<8; ch++) {
         [self silentUpdateVt:ch];
     }
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelVtChanged object:self];
+    [self postNotificationName:ORDCModelVtChanged];
 }
 
 - (unsigned char) vb:(short)anIndex
@@ -286,7 +287,7 @@ NSString* ORDBLock = @"ORDBLock";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setVb:anIndex withValue:vb[anIndex]];
     vb[anIndex] = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelVbChanged object:self];
+    [self postNotificationName:ORDCModelVbChanged];
 }
 
 - (unsigned char) ns100width:(short)anIndex
@@ -298,7 +299,7 @@ NSString* ORDBLock = @"ORDBLock";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setNs100width:anIndex withValue:ns100width[anIndex]];
     ns100width[anIndex] = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelNs100widthChanged object:self];
+    [self postNotificationName:ORDCModelNs100widthChanged];
 }
 
 - (unsigned char) ns20width:(short)anIndex
@@ -310,7 +311,7 @@ NSString* ORDBLock = @"ORDBLock";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setNs20width:anIndex withValue:ns20width[anIndex]];
     ns20width[anIndex] = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelNs20widthChanged object:self];
+    [self postNotificationName:ORDCModelNs20widthChanged];
 }
 
 - (unsigned char) ns20delay:(short)anIndex
@@ -321,7 +322,7 @@ NSString* ORDBLock = @"ORDBLock";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setNs20delay:anIndex withValue:ns20delay[anIndex]];
     ns20delay[anIndex] = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelNs20delayChanged object:self];
+    [self postNotificationName:ORDCModelNs20delayChanged];
 }
 
 - (unsigned char) tac0trim:(short)anIndex
@@ -333,7 +334,7 @@ NSString* ORDBLock = @"ORDBLock";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setTac0trim:anIndex withValue:tac0trim[anIndex]];
     tac0trim[anIndex] = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelTac0trimChanged object:self];
+    [self postNotificationName:ORDCModelTac0trimChanged];
 }
 
 - (unsigned char) tac1trim:(short)anIndex
@@ -344,7 +345,7 @@ NSString* ORDBLock = @"ORDBLock";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setTac1trim:anIndex withValue:tac1trim[anIndex]];
     tac1trim[anIndex] = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelTac1trimChanged object:self];
+    [self postNotificationName:ORDCModelTac1trimChanged];
 }
 
 #pragma mark ====Converter Methods

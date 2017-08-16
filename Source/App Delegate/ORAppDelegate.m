@@ -99,6 +99,8 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 		[initialUserDefaults setObject:[NSNumber numberWithInt:1] forKey:ORPrefPostLogEnabled];
 		[initialUserDefaults setObject:@"" forKey:ORPrefHeartBeatPath];
 
+        //default to using Apple Mail
+        [initialUserDefaults setObject:[NSNumber numberWithBool:0] forKey:ORMailSelectionPreference];
 		
         [defaults registerDefaults:initialUserDefaults];
         initialized = YES;
@@ -119,7 +121,10 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 	NSString* noKill				 = [standardDefaults stringForKey:@"startup"];
 	if(![noKill isEqualToString:@"NoKill"]){
         NSString* bundleID = [[NSRunningApplication currentApplication] bundleIdentifier];
-		NSArray* launchedApps = [NSRunningApplication runningApplicationsWithBundleIdentifier:bundleID];
+        NSArray* launchedApps = nil;
+        if(bundleID){
+             launchedApps = [NSRunningApplication runningApplicationsWithBundleIdentifier:bundleID];
+        }
         if([launchedApps count]>1)[NSApp terminate:self];
 
 	}
@@ -357,12 +362,6 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 	//nothing to do... everything is in the submenu and handled by the doc controller
 }
 
-- (IBAction) performClose:(id)sender
-{
-	[[self undoManager] removeAllActions];
-    [[NSDocumentController sharedDocumentController] performClose:sender];
-}
-
 - (IBAction) terminate:(id)sender
 {
     BOOL cancel = NO;
@@ -405,7 +404,7 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
 {
-	return ![[ORGlobal sharedGlobal] runInProgress];
+	return [[ORGlobal sharedGlobal] canQuitDuringRun] || ![[ORGlobal sharedGlobal] runInProgress];
 }
 
 #pragma mark ¥¥¥Accessors
@@ -585,10 +584,10 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
     BOOL documentIsOpen = [[NSApp orderedDocuments] count]>0;
     SEL theAction = [menuItem action];
     if(theAction == @selector(terminate:)){
-        return ![[ORGlobal sharedGlobal] runInProgress];
+        return [[ORGlobal sharedGlobal] canQuitDuringRun] || ![[ORGlobal sharedGlobal] runInProgress];
     }
     if(theAction == @selector(performClose:)){
-        return ![[ORGlobal sharedGlobal] runInProgress];
+        return [[ORGlobal sharedGlobal] canQuitDuringRun] || ![[ORGlobal sharedGlobal] runInProgress];
     }
     if(theAction == @selector(newDocument:)){
         return documentIsOpen ? NO : YES;

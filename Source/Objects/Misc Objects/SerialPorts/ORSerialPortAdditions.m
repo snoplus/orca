@@ -72,6 +72,29 @@
     return totalWritten;
 }
 
+- (int) writeCharArray:(const unsigned char *)ptr length:(int)theLength
+{
+    int totalWritten     = 0;
+    int totalNeedToWrite = theLength;
+    int i;
+    for(i=0;i<totalNeedToWrite;i++){
+        int numWritten =  write(fileDescriptor, ptr, theLength-totalWritten);
+        ptr          += numWritten;
+        totalWritten += numWritten;
+        if(totalWritten >= totalNeedToWrite)break;
+    }
+    
+    return totalWritten;
+}
+
+- (int) readCharArray:(unsigned char *)ptr length:(int)theLength
+{
+    int len = read(fileDescriptor, (void*)ptr, theLength);
+    return len;
+}
+
+
+
 - (int) checkRead
 {
     FD_ZERO(readfds);

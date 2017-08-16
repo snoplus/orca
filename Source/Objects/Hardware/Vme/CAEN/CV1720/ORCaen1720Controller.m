@@ -311,9 +311,11 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 
 - (void) eventSizeChanged:(NSNotification*)aNote
 {
-	[eventSizePopUp selectItemAtIndex:	[model eventSize]];
-	[eventSizeTextField setIntValue:	1024*1024./powf(2.,(float)[model eventSize]) / 2]; //in Samples
-	
+    [eventSizePopUp selectItemAtIndex: [model eventSize]];
+    /* Set the text field in samples. For the conversion between the buffer
+     * organization register and the number of samples see Section 4.15 in the
+     * user manual. */
+    [eventSizeTextField setIntValue: (1 << (20-[model eventSize]))];
 }
 
 - (void) checkGlobalSecurity

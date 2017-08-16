@@ -15,7 +15,7 @@
 //outside your organization.  The DOE and the University of 
 //Washington reserve all rights in the program. Neither the authors,
 //University of Washington, or U.S. Government make any warranty, 
-//express or implied, or assume any liability or responsibility 
+//express or implied, or assume any liability or responsibility
 //for the use of this software.
 //-------------------------------------------------------------
 
@@ -140,6 +140,7 @@ enum {
 
 - (void) registerNotificationObservers;
 - (int) initAtRunStart;
+- (void) detectorStateChanged:(NSNotification*)aNote;
 
 - (void) awakeAfterDocumentLoaded;
 
@@ -207,7 +208,7 @@ enum {
 - (void)			initBoard;
 - (void)			writeChannelConfiguration;
 - (void)			writeCustomSize;
-- (void)			writeAcquistionControl:(BOOL)start;
+- (void)			writeAcquisitionControl:(BOOL)start;
 - (void)			writeTriggerSource;
 - (void)			writeTriggerOut;
 - (void)			writeFrontPanelControl;
@@ -215,6 +216,7 @@ enum {
 - (void)			writePostTriggerSetting;
 - (void)			writeChannelEnabledMask;
 - (void)            writeNumberBLTEvents:(BOOL)enable;
+- (void)            writeEnableExtendedReadoutBuffer:(BOOL)enable;
 - (void)            writeEnableBerr:(BOOL)enable;
 - (void)			writeOverUnderThresholds;
 
@@ -243,6 +245,8 @@ enum {
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
+- (NSMutableDictionary*) serializeToDictionary;
+- (void) loadFromSerialization:(NSMutableDictionary*)settingsDict;
 
 @end
 

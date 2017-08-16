@@ -33,11 +33,18 @@
 	ORUSB*			usb;
     int				eolType;
     NSString* lastStringReceived;
+    BOOL   useAllOutputBuffer;
+    NSMutableString*  allOutput;
 }
 
 #pragma mark ¥¥¥Accessors
 - (NSString*) lastStringReceived;
 - (void) setLastStringReceived:(NSString*)aLastStringReceived;
+- (NSString*) allOutput;
+- (void) clearAllOutput;
+- (BOOL) allOutputHasSubstring:(NSString*)s;
+- (void) turnOnAllOutputBuffer:(BOOL)state;
+
 - (NSString*) commandByAppendingEOL:(NSString*) aCmd;
 - (int) eolType;
 - (void) setEolType:(int)aEolType;

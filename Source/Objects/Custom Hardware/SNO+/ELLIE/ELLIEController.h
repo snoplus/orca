@@ -19,84 +19,13 @@
     IBOutlet NSTabView *tellieOperatorTabView;
     //TabViewItems
     IBOutlet NSTabViewItem *tellieTViewItem;
-    IBOutlet NSTabViewItem *smellieTViewItem;
     IBOutlet NSTabViewItem *amellieTViewItem;
+    IBOutlet NSTabViewItem *serversTViewItem;
     //TabViewItems
     IBOutlet NSTabViewItem *tellieFireFibreTViewItem;
     IBOutlet NSTabViewItem *tellieBuildConfigTViewItem;
     IBOutlet NSTabViewItem *tellieGeneralOpTViewItem;
     IBOutlet NSTabViewItem *tellieExpertOpTViewItem;
-    
-    //SMELLIE interface --------------------------------------
-    //Storage of run information
-    //NSMutableDictionary* smellieRunSettingsFromGUI;
-    
-    //check box buttons for lasers
-    IBOutlet NSButton* smellieSuperkLaserButton;   //check box for superK
-    IBOutlet NSButton* smellie375nmLaserButton;    //check box for 375nm Laser
-    IBOutlet NSButton* smellie405nmLaserButton;    //check box for 405nm Laser
-    IBOutlet NSButton* smellie440nmLaserButton;    //check box for 440nm Laser
-    IBOutlet NSButton* smellie500nmLaserButton;    //check box for 500nm Laser
-    IBOutlet NSButton* smellieAllLasersButton;     //check box for all Lasers set
-    
-    //check box buttons for fibres (fibre id is in variable name)
-    IBOutlet NSButton* smellieFibreButtonFS007;
-    IBOutlet NSButton* smellieFibreButtonFS107;
-    IBOutlet NSButton* smellieFibreButtonFS207;
-    IBOutlet NSButton* smellieFibreButtonFS025;
-    IBOutlet NSButton* smellieFibreButtonFS125;
-    IBOutlet NSButton* smellieFibreButtonFS225;
-    IBOutlet NSButton* smellieFibreButtonFS037;
-    IBOutlet NSButton* smellieFibreButtonFS137;
-    IBOutlet NSButton* smellieFibreButtonFS237;
-    IBOutlet NSButton* smellieFibreButtonFS055;
-    IBOutlet NSButton* smellieFibreButtonFS155;
-    IBOutlet NSButton* smellieFibreButtonFS255;
-    IBOutlet NSButton* smellieAllFibresButton;    
-    
-    // Run settings
-    IBOutlet NSTextField* smellieOperatorName;          //Operator Name Field
-    IBOutlet NSTextField* smellieRunName;               //Run Name Field
-    IBOutlet NSComboBox* smellieOperationMode;          //Operation mode (master or slave)
-    IBOutlet NSTextField* smellieMaxIntensity;          //maximum intensity of lasers in run
-    IBOutlet NSTextField* smellieMinIntensity;          //minimum intensity of lasers in run
-    IBOutlet NSTextField* smellieNumIntensitySteps;     //number of intensities to step through
-    IBOutlet NSTextField* smellieMinWavelength;         //Bottom edge of the shortest wavelength window
-    IBOutlet NSTextField* smellieNumWavelengthSteps;    //Number of steps from shortest wavelength window
-    IBOutlet NSTextField* smellieWavelengthStepSize;    //Step size from bottom edge of one window to the bottom edge of the next
-    IBOutlet NSTextField* smellieWavelengthWinWidth;    //Width of a wavelength window (top_edge - bottom_edge)
-    IBOutlet NSTextField* smellieNumTriggersPerLoop;
-    IBOutlet NSTextField* smellieTriggerFrequency;      //trigger frequency of SMELLIE in Hz
-    // Not sure about these...
-    IBOutlet NSTextField *smellieDirectArg1;
-    IBOutlet NSButton *smellieDirectExecuteCmd;
-    IBOutlet NSTextFieldCell *smellieDirectArg2;
-    IBOutlet NSTextField *smellieDirectCmd;
-    IBOutlet NSComboBox *executeCmdBox;
-    //Control Button
-    IBOutlet NSButton* smellieMakeNewRunButton;         //make a new smellie run
-
-    //Error Fields
-    IBOutlet NSTextField* smellieRunErrorTextField; //new run error text field
-    
-    //SMELLIE Configuration Fields
-    IBOutlet NSComboBox *smellieConfigSepiaInputChannel;
-    IBOutlet NSComboBox* smellieConfigLaserHeadField;
-    IBOutlet NSComboBox* smellieConfigAttenuatorField;
-    IBOutlet NSComboBox* smellieConfigFsInputCh;
-    IBOutlet NSComboBox* smellieConfigFsOutputCh;
-    IBOutlet NSComboBox* smellieConfigDetectorFibreRef;
-    IBOutlet NSTextField* smellieConfigSelfTestNoOfPulses;
-    IBOutlet NSTextField* smellieConfigSelfTestNoOfPulsesPerLaser;
-    IBOutlet NSTextField* smellieConfigSelfTestNiTriggerOutputPin;
-    IBOutlet NSTextField* smellieConfigSelfTestNiTriggerInputPin;
-    IBOutlet NSTextField* smellieConfigSelfTestLaserTriggerFreq;
-    IBOutlet NSTextField* smellieConfigSelfTestPmtSampleRate;
-    IBOutlet NSTextField *smellieConfigAttenutationFactor;
-    
-    IBOutlet NSButton *smellieConfigSubmitButton;
-    IBOutlet NSTextField *smellieConfigGainControl;
-    
     
     //TELLIE interface ------------------------------------------
     
@@ -116,7 +45,6 @@
     IBOutlet NSButton *tellieGeneralValidateSettingsButton;
     
     IBOutlet NSTextField *tellieGeneralValidationStatusTf;
-    IBOutlet NSTextField *tellieGeneralRunStatusTf;
     
     ////////////////////
     //Expert interface
@@ -134,12 +62,38 @@
     IBOutlet NSPopUpButton *tellieExpertOperationModePb; //Operation mode (master or slave)
     
     IBOutlet NSTextField *tellieExpertValidationStatusTf;
-    IBOutlet NSTextField *tellieExpertRunStatusTf;
     
     IBOutlet NSButton *tellieExpertFireButton;
     IBOutlet NSButton *tellieExpertStopButton;
     IBOutlet NSButton *tellieExpertValidateSettingsButton;
    
+    ////////////////////
+    //Custom sequence
+    IBOutlet NSMatrix *tellieBuildNodeSelection;
+    IBOutlet NSTextField *tellieBuildPhotons;
+    IBOutlet NSTextField *tellieBuildTrigDelay;
+
+    IBOutlet NSTextField *tellieBuildNoPulses;
+    IBOutlet NSTextField *tellieBuildRate;
+    IBOutlet NSTextField *tellieBuildRunName;
+    IBOutlet NSPopUpButton *tellieBuildOpMode;
+    IBOutlet NSButton *tellieBuildValidate;
+    IBOutlet NSButton *tellieBuildPushToDB;
+
+    //Server interface ------------------------------------------
+
+    IBOutlet NSTextField *tellieHostTf;
+    IBOutlet NSTextField *smellieHostTf;
+    IBOutlet NSTextField *interlockHostTf;
+
+    IBOutlet NSTextField *telliePortTf;
+    IBOutlet NSTextField *smelliePortTf;
+    IBOutlet NSTextField *interlockPortTf;
+
+    IBOutlet NSTextField *tellieServerResponseTf;
+    IBOutlet NSTextField *smellieServerResponseTf;
+    IBOutlet NSTextField *interlockServerResponseTf;
+
     // Instance variables
     NSThread *tellieThread;
     NSButton *tellieExpertConvertAction;
@@ -147,6 +101,7 @@
     NSMutableDictionary* _guiFireSettings;
     NSThread* _tellieThread;
     NSThread* _smellieThread;
+    NSButton *interlockPing;
 }
 
 // Properties
@@ -160,21 +115,9 @@
 -(void)updateWindow;
 -(void)registerNotificationObservers;
 -(void)awakeFromNib;
+-(void)updateServerSettings:(NSNotification *)aNote;
 -(BOOL)isNumeric:(NSString *)s;
-
-//SMELLIE functions ----------------------------
-
-//Button clicked to validate the new run type settings for smellie 
--(IBAction)setAllLasersAction:(id)sender;
--(IBAction)setAllFibresAction:(id)sender;
--(IBAction)validateLaserMaxIntensity:(id)sender;
--(IBAction)validateLaserMinIntensity:(id)sender;
--(IBAction)validateIntensitySteps:(id)sender;
--(IBAction)validateSmellieTriggerFrequency:(id)sender;
--(IBAction)validateNumTriggersPerStep:(id)sender;
--(IBAction)validationSmellieRunAction:(id)sender;
--(IBAction)allLaserValidator:(id)sender;
--(IBAction)makeNewSmellieRun:(id)sender;
+-(void)fetchConfigurationFile:(NSNotification *)aNote;
 
 //TELLIE functions -----------------------------
 
@@ -201,6 +144,7 @@
 -(NSString*)validateGeneralTellieTriggerDelay:(NSString *)currentText;
 -(NSString*)validateGeneralTellieNoPulses:(NSString *)currentText;
 -(NSString*)validateGeneralTelliePulseFreq:(NSString *)currentText;
+
 //Expert gui
 -(NSString*)validateTellieChannel:(NSString *)currentText;
 -(NSString*)validateTelliePulseWidth:(NSString *)currentText;
@@ -210,11 +154,20 @@
 -(NSString*)validateTellieTriggerDelay:(NSString *)currentText;
 -(NSString*)validateTellieNoPulses:(NSString *)currentText;
 
-//-(void)validateTellieGeneralSettings:(NSNotification *)note;
-//-(void)validateTellieExpertSettings:(NSNotification *)note;
--(void)tellieRunStarted:(NSNotification *)aNote;
 -(void)tellieRunFinished:(NSNotification *)aNote;
 -(void)initialiseTellie;
+
+//Build Custom sequence
+-(IBAction)tellieBuildValidateAction:(id)sender;
+-(IBAction)tellieBuildPushToDBAction:(id)sender;
+
+
+//Server tab functions -----------------------------
+- (IBAction)telliePing:(id)sender;
+- (IBAction)smelliePing:(id)sender;
+- (IBAction)interlockPing:(id)sender;
+- (IBAction) serverSettingsChanged:(id)sender;
+-(void)killInterlock:(NSNotification *)aNote;
 
 @end
 

@@ -37,8 +37,8 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
 	static uint32_t FIFO2[kNumV4FLTs];
 	static uint32_t FIFO3[kNumV4FLTs][kNumV4FLTChannels];
 	static uint32_t FIFO4[kNumV4FLTs];
-	static uint32_t FltStatusReg[kNumV4FLTs];
-	static uint32_t debugbuffer[kNumV4FLTs][kNumV4FLTChannels];//used for debugging -tb-
+	//static uint32_t FltStatusReg[kNumV4FLTs];
+	//static uint32_t debugbuffer[kNumV4FLTs][kNumV4FLTChannels];//used for debugging -tb-
 
 
     //this data must be constant during a run
@@ -50,12 +50,12 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
     uint32_t dataId     = GetHardwareMask()[0];//this is energy record
     uint32_t waveformId = GetHardwareMask()[1];
     uint32_t histogramId = GetHardwareMask()[2];
-    uint32_t energyTraceId = GetHardwareMask()[3];
+    //uint32_t energyTraceId = GetHardwareMask()[3];
     uint32_t col        = GetSlot() - 1; //GetSlot() is in fact stationNumber, which goes from 1 to 24 (slots go from 0-9, 11-20)
     uint32_t crate      = GetCrate();
     
     uint32_t postTriggerTime = GetDeviceSpecificData()[0];
-    uint32_t eventType  = GetDeviceSpecificData()[1];
+    //uint32_t eventType  = GetDeviceSpecificData()[1];
     uint32_t fltRunMode = GetDeviceSpecificData()[2];
     uint32_t runFlags   = GetDeviceSpecificData()[3];//this is runFlagsMask of ORKatrinV4FLTModel.m, load_HW_Config_Structure:index:
     uint32_t triggerEnabledMask = GetDeviceSpecificData()[4];
@@ -162,7 +162,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
         // --- ENERGY MODE ------------------------------
         if((daqRunMode == kIpeFltV4_EnergyDaqMode) || (daqRunMode == kIpeFltV4_VetoEnergyDaqMode)){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
             //uint32_t status         = srack->theFlt[col]->status->read();
-            uint32_t fifoStatus;// = (status >> 24) & 0xf;
+            //uint32_t fifoStatus;// = (status >> 24) & 0xf;
             uint32_t fifoFlags;// =   FF, AF, AE, EF
             
             //TO DO... the number of events to read could (should) be made variable <-- depending on the readptr/witeptr -tb-
@@ -170,7 +170,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
             for(eventN=0;eventN<10;eventN++){
                 hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = (hw4::FltKatrinEventFIFOStatus*)srack->theFlt[col]->eventFIFOStatus;//TODO: typing error in fdhwlib - remove cast after correction -tb-
                 //fifoStatus = srack->theFlt[col]->eventFIFOStatus->read();//reads to cache
-                fifoStatus = eventFIFOStatus->read();//reads to cache
+                eventFIFOStatus->read();//reads to cache
                 //uint32_t fifoEmptyFlag = (fifoStatus>>28)&1;//srack->theFlt[col]->eventFIFOStatus->emptyFlag->getCache();
                 uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
                 //not needed for now - uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();//TODO: then we should read more than 10 events? -tb-
@@ -230,7 +230,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
         // --- ENERGY+TRACE MODE ------------------------------
         else if((daqRunMode == kIpeFltV4_EnergyTraceDaqMode) || (daqRunMode == kIpeFltV4_VetoEnergyTraceDaqMode)){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
             //uint32_t status         = srack->theFlt[col]->status->read();
-            uint32_t fifoStatus;// = (status >> 24) & 0xf;
+            //uint32_t fifoStatus;// = (status >> 24) & 0xf;
             uint32_t fifoFlags;// =   FF, AF, AE, EF
             
             //TO DO... the number of events to read could (should) be made variable <-- depending on the readptr/witeptr -tb-
@@ -238,10 +238,10 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
             for(eventN=0;eventN<10;eventN++){
                 hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = (hw4::FltKatrinEventFIFOStatus*)srack->theFlt[col]->eventFIFOStatus;//TODO: typing error in fdhwlib - remove cast after correction -tb-
                 //fifoStatus = srack->theFlt[col]->eventFIFOStatus->read();//reads to cache
-                fifoStatus = eventFIFOStatus->read();//reads to cache
+                eventFIFOStatus->read();//reads to cache
                 //uint32_t fifoEmptyFlag = (fifoStatus>>28)&1;//srack->theFlt[col]->eventFIFOStatus->emptyFlag->getCache();
                 uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
-                uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();
+                //uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();
                 if(!fifoEmptyFlag){
                     
                     //should be something in the fifo, check the read/write pointers and read and package up to 10 events.
@@ -269,9 +269,9 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                         uint32_t adcoffset  = evsubsec & 0x7ff; // cut 11 ls bits (equal to % 2048)                                //evsubsec   = srack->theSlt->subSecCounter->read();
                                 //evsec      = srack->theSlt->secCounter->read();
                         uint32_t precision  = eventFIFO2->timePrecision->getCache();
-                        uint32_t sltsubsec;
-                        uint32_t sltsec;
-                        int32_t timediff2slt;
+                        //uint32_t sltsubsec;
+                        //uint32_t sltsec;
+                        //int32_t timediff2slt;
                         uint32_t eventchan, eventchanmask;
                         for(eventchan=0;eventchan<kNumChan;eventchan++){
                             eventchanmask = (0x1L << eventchan);
@@ -300,7 +300,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 uint32_t waveformLength = 2048; 
                                 static uint32_t waveformBuffer32[64*1024];
                                 static uint32_t shipWaveformBuffer32[64*1024];
-                                static uint16_t *waveformBuffer16 = (uint16_t *)(waveformBuffer32);
+                                //static uint16_t *waveformBuffer16 = (uint16_t *)(waveformBuffer32);
                                 static uint16_t *shipWaveformBuffer16 = (uint16_t *)(shipWaveformBuffer32);
                                 uint32_t searchTrig,triggerPos = 0xffffffff;
                                 int32_t appendFlagPos = -1;
@@ -567,7 +567,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
     if((versionCFPGA>=0x20010104 && versionCFPGA<0x20010300) || (versionFPGA8>=0x20010104  && versionFPGA8<0x20010300) ){
     if(srack->theFlt[col]->isPresent()){
 		
-		static uint32_t currFlt = col;// only for better readability (started using it since EnergyTraceSync mode for HW data buffering)  -tb-
+		//static uint32_t currFlt = col;// only for better readability (started using it since EnergyTraceSync mode for HW data buffering)  -tb-
 		
         
         //READOUT MODES (energy, energy+trace, histogram)
@@ -577,7 +577,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
         // --- ENERGY MODE ------------------------------
         if((daqRunMode == kIpeFltV4_EnergyDaqMode) || (daqRunMode == kIpeFltV4_VetoEnergyDaqMode)){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
             //uint32_t status         = srack->theFlt[col]->status->read();
-            uint32_t fifoStatus;// = (status >> 24) & 0xf;
+            //uint32_t fifoStatus;// = (status >> 24) & 0xf;
             uint32_t fifoFlags;// =   FF, AF, AE, EF
             uint32_t f1, f2;
             
@@ -586,7 +586,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
             for(eventN=0;eventN<10;eventN++){
                 hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = (hw4::FltKatrinEventFIFOStatus*)srack->theFlt[col]->eventFIFOStatus;//TODO: typing error in fdhwlib - remove cast after correction -tb-
                 //fifoStatus = srack->theFlt[col]->eventFIFOStatus->read();//reads to cache
-                fifoStatus = eventFIFOStatus->read();//reads to cache
+                eventFIFOStatus->read();//reads to cache
                 //uint32_t fifoEmptyFlag = (fifoStatus>>28)&1;//srack->theFlt[col]->eventFIFOStatus->emptyFlag->getCache();
                 uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
                 //not needed for now - uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();//TODO: then we should read more than 10 events? -tb-
@@ -653,7 +653,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
         //TODO: else if((daqRunMode == kIpeFltV4_EnergyTraceSyncDaqMode) || (daqRunMode == kIpeFltV4_VetoEnergyTraceSyncDaqMode)){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
 			
             //uint32_t status         = srack->theFlt[col]->status->read();
-            uint32_t fifoStatus;// = (status >> 24) & 0xf;
+            //uint32_t fifoStatus;// = (status >> 24) & 0xf;
             uint32_t fifoFlags;// =   FF, AF, AE, EF
             uint32_t f1, f2;
             
@@ -662,10 +662,10 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
             for(eventN=0;eventN<10;eventN++){
                 hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = (hw4::FltKatrinEventFIFOStatus*)srack->theFlt[col]->eventFIFOStatus;//TODO: typing error in fdhwlib - remove cast after correction -tb-
                 //fifoStatus = srack->theFlt[col]->eventFIFOStatus->read();//reads to cache
-                fifoStatus = eventFIFOStatus->read();//reads to cache
+                eventFIFOStatus->read();//reads to cache
                 //uint32_t fifoEmptyFlag = (fifoStatus>>28)&1;//srack->theFlt[col]->eventFIFOStatus->emptyFlag->getCache();
                 uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
-                uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();
+                //uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();
                 if(!fifoEmptyFlag){
 
                     
@@ -717,7 +717,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
 //							fprintf(stderr,"---  diffsubsec is %i\n",diffsubsec);
 //							fprintf(stderr,"---  diffsubsec is %i, post trigg: %i  (  ((0x%08x=%i))  sltsubsec %i, evsubsec %i)\n",diffsubsec,postTriggerTime,sltsubseccount,sltsubseccount,sltsubsec,evsubsec);
 //							if(diffsubsec<postTriggerTime) fprintf(stderr,"---=============break\n");
-							if(diffsubsec<postTriggerTime) break; //FLT still recording ADC trace -> leave for later for(eventN ...)-loop cycle ... -tb-
+							if(diffsubsec<(int32_t)postTriggerTime) break; //FLT still recording ADC trace -> leave for later for(eventN ...)-loop cycle ... -tb-
 						}
 						#endif
 						
@@ -745,14 +745,15 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 uint32_t f3            = srack->theFlt[col]->eventFIFO3->read(eventchan);
 								FIFO3[col][eventchan] = f3;
                                 uint32_t pagenr        = (f3 >> 24) & 0x3f;
-                                uint32_t energy        = f3 & 0xfffff;
+                                //uint32_t energy        = f3 & 0xfffff;
 				
                                 //static uint32_t waveformBuffer32[64*1024];
                                 //static uint32_t shipWaveformBuffer32[64*1024];
                                 //static uint16_t *waveformBuffer16 = (uint16_t *)(waveformBuffer32);
                                 //static uint16_t *shipWaveformBuffer16 = (uint16_t *)(shipWaveformBuffer32);
-                                uint32_t searchTrig,triggerPos = 0xffffffff;
-                                int32_t appendFlagPos = -1;
+                                //uint32_t searchTrig;
+                                //uint32_t triggerPos = 0xffffffff;
+                                //int32_t appendFlagPos = -1;
                                 
                                 srack->theSlt->pageSelect->write(0x100 | pagenr);
                                 
@@ -867,7 +868,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
 			#endif
 			
             //uint32_t status         = srack->theFlt[col]->status->read();
-            uint32_t fifoStatus;// = (status >> 24) & 0xf;
+            //uint32_t fifoStatus;// = (status >> 24) & 0xf;
             uint32_t fifoFlags;// =   FF, AF, AE, EF
             uint32_t f1, f2;
             
@@ -876,10 +877,10 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
             for(eventN=0;eventN<10;eventN++){
                 hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = (hw4::FltKatrinEventFIFOStatus*)srack->theFlt[col]->eventFIFOStatus;//TODO: typing error in fdhwlib - remove cast after correction -tb-
                 //fifoStatus = srack->theFlt[col]->eventFIFOStatus->read();//reads to cache
-                fifoStatus = eventFIFOStatus->read();//reads to cache
+                eventFIFOStatus->read();//reads to cache
                 //uint32_t fifoEmptyFlag = (fifoStatus>>28)&1;//srack->theFlt[col]->eventFIFOStatus->emptyFlag->getCache();
                 uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
-                uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();
+                //uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();
                 if(!fifoEmptyFlag){
 
                     
@@ -931,7 +932,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
 //							fprintf(stderr,"---  diffsubsec is %i\n",diffsubsec);
 //							fprintf(stderr,"---  diffsubsec is %i, post trigg: %i  (  ((0x%08x=%i))  sltsubsec %i, evsubsec %i)\n",diffsubsec,postTriggerTime,sltsubseccount,sltsubseccount,sltsubsec,evsubsec);
 //							if(diffsubsec<postTriggerTime) fprintf(stderr,"---=============break\n");
-							if(diffsubsec<postTriggerTime) break; //FLT still recording ADC trace -> leave for later for(eventN ...)-loop cycle ... -tb-
+							if(diffsubsec<(int32_t)postTriggerTime) break; //FLT still recording ADC trace -> leave for later for(eventN ...)-loop cycle ... -tb-
 						}
 						#endif
 						
@@ -964,7 +965,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
 								//DEBUG:
 								FIFO3[col][eventchan] = f3;
                                 uint32_t pagenr        = (f3 >> 24) & 0x3f;
-                                uint32_t energy        = f3 & 0xfffff;
+                                //uint32_t energy        = f3 & 0xfffff;
 //fprintf(stdout,"col:%i, rp: %i wp: %i , chmap: %i pagenr:%i energy: %i \n\r",col+1,readptr,writeptr, chmap,pagenr, energy); fflush(stdout);
 //fprintf(stdout,"-----------------------------                                  \n\r"); fflush(stdout);
 				
@@ -972,8 +973,9 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 //static uint32_t shipWaveformBuffer32[64*1024];
                                 //static uint16_t *waveformBuffer16 = (uint16_t *)(waveformBuffer32);
                                 //static uint16_t *shipWaveformBuffer16 = (uint16_t *)(shipWaveformBuffer32);
-                                uint32_t searchTrig,triggerPos = 0xffffffff;
-                                int32_t appendFlagPos = -1;
+                                //uint32_t searchTrig;
+                                //uint32_t triggerPos = 0xffffffff;
+                                //int32_t appendFlagPos = -1;
                                 
                                 srack->theSlt->pageSelect->write(0x100 | pagenr);
                                 
@@ -1102,7 +1104,7 @@ fprintf(stdout,"4x - readpr:%i, writeptr:%i\n",readptrx,writeptrx);fflush(stdout
             for(eventN=0;eventN<10;eventN++){
                 hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = (hw4::FltKatrinEventFIFOStatus*)srack->theFlt[col]->eventFIFOStatus;//TODO: typing error in fdhwlib - remove cast after correction -tb-
                 //fifoStatus = srack->theFlt[col]->eventFIFOStatus->read();//reads to cache
-                fifoStatus = eventFIFOStatus->read();//reads to cache
+                eventFIFOStatus->read();//reads to cache
                 //uint32_t fifoEmptyFlag = (fifoStatus>>28)&1;//srack->theFlt[col]->eventFIFOStatus->emptyFlag->getCache();
                 uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
                 uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();
@@ -1454,7 +1456,7 @@ fprintf(stdout,"4x - readpr:%i, writeptr:%i\n",readptrx,writeptrx);fflush(stdout
 	//===================================================================================================================
     if(srack->theFlt[col]->isPresent()){
 		
-		static uint32_t currFlt = col;// only for better readability (started using it since EnergyTraceSync mode for HW data buffering)  -tb-
+		//static uint32_t currFlt = col;// only for better readability (started using it since EnergyTraceSync mode for HW data buffering)  -tb-
 		
         
         //READOUT MODES (energy, energy+trace, histogram)
@@ -1464,7 +1466,7 @@ fprintf(stdout,"4x - readpr:%i, writeptr:%i\n",readptrx,writeptrx);fflush(stdout
         // --- ENERGY MODE ------------------------------
         if((daqRunMode == kIpeFltV4_EnergyDaqMode) || (daqRunMode == kIpeFltV4_VetoEnergyDaqMode)){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
             //uint32_t status         = srack->theFlt[col]->status->read();
-            uint32_t fifoStatus;// = (status >> 24) & 0xf;
+            //uint32_t fifoStatus;// = (status >> 24) & 0xf;
             uint32_t fifoFlags;// =   FF, AF, AE, EF
             uint32_t f1, f2;
             
@@ -1473,7 +1475,7 @@ fprintf(stdout,"4x - readpr:%i, writeptr:%i\n",readptrx,writeptrx);fflush(stdout
             for(eventN=0;eventN<10;eventN++){
                 hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = (hw4::FltKatrinEventFIFOStatus*)srack->theFlt[col]->eventFIFOStatus;//TODO: typing error in fdhwlib - remove cast after correction -tb-
                 //fifoStatus = srack->theFlt[col]->eventFIFOStatus->read();//reads to cache
-                fifoStatus = eventFIFOStatus->read();//reads to cache
+                eventFIFOStatus->read();//reads to cache
                 //uint32_t fifoEmptyFlag = (fifoStatus>>28)&1;//srack->theFlt[col]->eventFIFOStatus->emptyFlag->getCache();
                 uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
                 //not needed for now - uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();//TODO: then we should read more than 10 events? -tb-
@@ -1540,7 +1542,7 @@ fprintf(stdout,"4x - readpr:%i, writeptr:%i\n",readptrx,writeptrx);fflush(stdout
         //TODO: else if((daqRunMode == kIpeFltV4_EnergyTraceSyncDaqMode) || (daqRunMode == kIpeFltV4_VetoEnergyTraceSyncDaqMode)){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
 			
             //uint32_t status         = srack->theFlt[col]->status->read();
-            uint32_t fifoStatus;// = (status >> 24) & 0xf;
+            //uint32_t fifoStatus;// = (status >> 24) & 0xf;
             uint32_t fifoFlags;// =   FF, AF, AE, EF
             uint32_t f1, f2;
             
@@ -1549,10 +1551,10 @@ fprintf(stdout,"4x - readpr:%i, writeptr:%i\n",readptrx,writeptrx);fflush(stdout
             for(eventN=0;eventN<10;eventN++){
                 hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = (hw4::FltKatrinEventFIFOStatus*)srack->theFlt[col]->eventFIFOStatus;//TODO: typing error in fdhwlib - remove cast after correction -tb-
                 //fifoStatus = srack->theFlt[col]->eventFIFOStatus->read();//reads to cache
-                fifoStatus = eventFIFOStatus->read();//reads to cache
+                eventFIFOStatus->read();//reads to cache
                 //uint32_t fifoEmptyFlag = (fifoStatus>>28)&1;//srack->theFlt[col]->eventFIFOStatus->emptyFlag->getCache();
                 uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
-                uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();
+                //uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();
                 if(!fifoEmptyFlag){
 
                     
@@ -1604,7 +1606,7 @@ fprintf(stdout,"4x - readpr:%i, writeptr:%i\n",readptrx,writeptrx);fflush(stdout
 //							fprintf(stderr,"---  diffsubsec is %i\n",diffsubsec);
 //							fprintf(stderr,"---  diffsubsec is %i, post trigg: %i  (  ((0x%08x=%i))  sltsubsec %i, evsubsec %i)\n",diffsubsec,postTriggerTime,sltsubseccount,sltsubseccount,sltsubsec,evsubsec);
 //							if(diffsubsec<postTriggerTime) fprintf(stderr,"---=============break\n");
-							if(diffsubsec<postTriggerTime) break; //FLT still recording ADC trace -> leave for later for(eventN ...)-loop cycle ... -tb-
+							if(diffsubsec<(int32_t)postTriggerTime) break; //FLT still recording ADC trace -> leave for later for(eventN ...)-loop cycle ... -tb-
 						}
 						#endif
 						
@@ -1632,14 +1634,15 @@ fprintf(stdout,"4x - readpr:%i, writeptr:%i\n",readptrx,writeptrx);fflush(stdout
                                 uint32_t f3            = srack->theFlt[col]->eventFIFO3->read(eventchan);
 								FIFO3[col][eventchan] = f3;
                                 uint32_t pagenr        = (f3 >> 24) & 0x3f;
-                                uint32_t energy        = f3 & 0xfffff;
+                                //uint32_t energy        = f3 & 0xfffff;
 				
                                 //static uint32_t waveformBuffer32[64*1024];
                                 //static uint32_t shipWaveformBuffer32[64*1024];
                                 //static uint16_t *waveformBuffer16 = (uint16_t *)(waveformBuffer32);
                                 //static uint16_t *shipWaveformBuffer16 = (uint16_t *)(shipWaveformBuffer32);
-                                uint32_t searchTrig,triggerPos = 0xffffffff;
-                                int32_t appendFlagPos = -1;
+                                //uint32_t searchTrig;
+                                //uint32_t triggerPos = 0xffffffff;
+                                //int32_t appendFlagPos = -1;
                                 
                                 //Auger Registers Removed for Bipolar Filter Upgrade 2013 -tb-
                                 /*      they were actually never used for KATRIN, but will result in Pbus timeouts -tb-
@@ -1757,7 +1760,7 @@ TODO                            */
 			#endif
 			
             //uint32_t status         = srack->theFlt[col]->status->read();
-            uint32_t fifoStatus;// = (status >> 24) & 0xf;
+            //uint32_t fifoStatus;// = (status >> 24) & 0xf;
             uint32_t fifoFlags;// =   FF, AF, AE, EF
             uint32_t f1, f2;
             
@@ -1766,10 +1769,10 @@ TODO                            */
             for(eventN=0;eventN<10;eventN++){
                 hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = (hw4::FltKatrinEventFIFOStatus*)srack->theFlt[col]->eventFIFOStatus;//TODO: typing error in fdhwlib - remove cast after correction -tb-
                 //fifoStatus = srack->theFlt[col]->eventFIFOStatus->read();//reads to cache
-                fifoStatus = eventFIFOStatus->read();//reads to cache
+                eventFIFOStatus->read();//reads to cache
                 //uint32_t fifoEmptyFlag = (fifoStatus>>28)&1;//srack->theFlt[col]->eventFIFOStatus->emptyFlag->getCache();
                 uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
-                uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();
+                //uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();
                 if(!fifoEmptyFlag){
 
                     
@@ -1821,7 +1824,7 @@ TODO                            */
 //							fprintf(stderr,"---  diffsubsec is %i\n",diffsubsec);
 //							fprintf(stderr,"---  diffsubsec is %i, post trigg: %i  (  ((0x%08x=%i))  sltsubsec %i, evsubsec %i)\n",diffsubsec,postTriggerTime,sltsubseccount,sltsubseccount,sltsubsec,evsubsec);
 //							if(diffsubsec<postTriggerTime) fprintf(stderr,"---=============break\n");
-							if(diffsubsec<postTriggerTime) break; //FLT still recording ADC trace -> leave for later for(eventN ...)-loop cycle ... -tb-
+							if(diffsubsec<(int32_t)postTriggerTime) break; //FLT still recording ADC trace -> leave for later for(eventN ...)-loop cycle ... -tb-
 						}
 						#endif
 						
@@ -1854,7 +1857,7 @@ TODO                            */
 								//DEBUG:
 								FIFO3[col][eventchan] = f3;
                                 uint32_t pagenr        = (f3 >> 24) & 0x3f;
-                                uint32_t energy        = f3 & 0xfffff;
+                                //uint32_t energy        = f3 & 0xfffff;
 //fprintf(stdout,"col:%i, rp: %i wp: %i , chmap: %i pagenr:%i energy: %i \n\r",col+1,readptr,writeptr, chmap,pagenr, energy); fflush(stdout);
 //fprintf(stdout,"-----------------------------                                  \n\r"); fflush(stdout);
 				
@@ -1862,8 +1865,8 @@ TODO                            */
                                 //static uint32_t shipWaveformBuffer32[64*1024];
                                 //static uint16_t *waveformBuffer16 = (uint16_t *)(waveformBuffer32);
                                 //static uint16_t *shipWaveformBuffer16 = (uint16_t *)(shipWaveformBuffer32);
-                                uint32_t searchTrig,triggerPos = 0xffffffff;
-                                int32_t appendFlagPos = -1;
+                                //uint32_t searchTrig,triggerPos = 0xffffffff;
+                                //int32_t appendFlagPos = -1;
                                 
                                 //Auger Registers Removed for Bipolar Filter Upgrade 2013 -tb-
                                 /*      they were actually never used for KATRIN, but will result in Pbus timeouts -tb-
@@ -1986,7 +1989,7 @@ fprintf(stdout,"4x - readpr:%i, writeptr:%i\n",readptrx,writeptrx);fflush(stdout
         // --- ENERGY+TRACE MODE ------------------------------
         else if((daqRunMode == kIpeFltV4_EnergyTraceDaqMode) || (daqRunMode == kIpeFltV4_VetoEnergyTraceDaqMode)){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
             //uint32_t status         = srack->theFlt[col]->status->read();
-            uint32_t fifoStatus;// = (status >> 24) & 0xf;
+            //uint32_t fifoStatus;// = (status >> 24) & 0xf;
             uint32_t fifoFlags;// =   FF, AF, AE, EF
             uint32_t f1, f2;
             
@@ -1995,7 +1998,7 @@ fprintf(stdout,"4x - readpr:%i, writeptr:%i\n",readptrx,writeptrx);fflush(stdout
             for(eventN=0;eventN<10;eventN++){
                 hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = (hw4::FltKatrinEventFIFOStatus*)srack->theFlt[col]->eventFIFOStatus;//TODO: typing error in fdhwlib - remove cast after correction -tb-
                 //fifoStatus = srack->theFlt[col]->eventFIFOStatus->read();//reads to cache
-                fifoStatus = eventFIFOStatus->read();//reads to cache
+                eventFIFOStatus->read();//reads to cache
                 //uint32_t fifoEmptyFlag = (fifoStatus>>28)&1;//srack->theFlt[col]->eventFIFOStatus->emptyFlag->getCache();
                 uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
                 uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();
@@ -2369,13 +2372,13 @@ bool ORFLTv4Readout::Stop()
 		uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16);
 		uint32_t fltRunMode = GetDeviceSpecificData()[2];
 		uint32_t triggerEnabledMask = GetDeviceSpecificData()[4];
-		uint32_t daqRunMode = GetDeviceSpecificData()[5];
+		//uint32_t daqRunMode = GetDeviceSpecificData()[5];
 		//data to ship
 		uint32_t chan=0;
 		uint32_t readoutSec;
 		unsigned long totalLength=kMaxHistoLength;
-		uint32_t last=kMaxHistoLength-1,first=0;
-		uint32_t fpgaHistogramID;
+		//uint32_t last=kMaxHistoLength-1,first=0;
+		//uint32_t fpgaHistogramID;
 		uint32_t histoBinWidth = 0;
 		uint32_t histoEnergyOffset = 0;
 		if(fltRunMode == kIpeFltV4Katrin_Histo_Mode ) {//only in histogram mode ...

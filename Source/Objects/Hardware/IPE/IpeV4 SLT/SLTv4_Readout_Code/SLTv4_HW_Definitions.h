@@ -35,28 +35,7 @@
 #define kIpeFltV4Katrin_Bipolar_Mode		5
 //#define kIpeFltV4Katrin_Test_Mode			3   //TODO: see fpga8_package.vhd -tb-
 
-
-#if 0
-//daq run modes set by user in popup -> for daqRunMode -tb-
-//old names: kIpeFlt_EnergyMode, kIpeFlt_EnergyTrace, kIpeFlt_Histogram_Mode
-#define kIpeFltV4_EnergyDaqMode					0
-#define kIpeFltV4_EnergyTraceDaqMode			1
-#define kIpeFltV4_Histogram_DaqMode				2
-#define kIpeFltV4_VetoEnergyDaqMode				3
-#define kIpeFltV4_VetoEnergyTraceDaqMode		4
-#define kIpeFltV4_VetoEnergyAutoDaqMode			5
-#define kIpeFltV4_VetoEnergyTraceSyncDaqMode	6
-// new modes after mode redesign 2011-01 -tb-
-#define kIpeFltV4_EnergyTraceSyncDaqMode		7
-// new modes after mode redesign 2013-05 -tb-
-#define kIpeFltV4_BipolarEnergyDaqMode		    8
-#define kIpeFltV4_NumberOfDaqModes				9
-// kIpeFltV4_NumberOfDaqModes MUST be the number of daq modes; no gaps allowed! TODO: using a enum would be better -tb- <------NOTE!
-
-#else
-// I switched to enums to always have a guilty kIpeFltV4_NumberOfDaqModes; older Orca versions may get newer Orca files with daq modes
-// still unknown to the older Orca; with kIpeFltV4_NumberOfDaqModes we can check this -tb-
-enum daqMode { 
+enum daqMode {
 	kIpeFltV4_EnergyDaqMode			= 0,
 	kIpeFltV4_EnergyTraceDaqMode	= 1,
 	kIpeFltV4_Histogram_DaqMode		= 2,
@@ -69,15 +48,14 @@ enum daqMode {
 	kIpeFltV4_BipolarEnergyTraceDaqMode  = 9,
 	kIpeFltV4_NumberOfDaqModes // do not assign a value, the compiler will do it
 };
-#endif
-	
+
 //flags in the runFlagsMask, sent to PrPMC by ORIpeV4FLTModel::load_HW_Config_Structure
 #define kFirstTimeFlag              0x010000
 #define kSyncFltWithSltTimerFlag    0x020000
 #define kShipSumHistogramFlag		0x040000
 #define kSecondsSetInitWithHostFlag	0x080000
 #define kSecondsSetSendToFLTsFlag	0x100000
-#define kSkipFltEventReadoutFlag	0x200000
+#define kSkipFltEventReadoutFlag	0x200000  //unused, thus the same as kForceFltReadoutFlag
 #define kForceFltReadoutFlag	    0x200000
 
 typedef struct { // -tb- 2008-02-27
@@ -92,7 +70,6 @@ typedef struct { // -tb- 2008-02-27
     uint32_t histogramID;
     uint32_t histogramInfo;
 } katrinV4HistogramDataStruct;
-
 
 typedef struct { // -tb- 2013-05-27 struct for histogram buffer (for summing up histograms)
 	uint32_t orcaHeader;

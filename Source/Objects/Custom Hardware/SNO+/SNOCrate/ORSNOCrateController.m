@@ -119,6 +119,25 @@
 	[crateNumberField setIntValue:[model crateNumber]];
 }
 
+- (void) keyDown:(NSEvent*)event {
+    NSString* keys = [event charactersIgnoringModifiers];
+    if([keys length] == 0) {
+        return;
+    }
+    if([keys length] == 1) {
+        unichar key = [keys characterAtIndex:0];
+        //Arrow keys already taken by GroupView
+        if(key == 'l' || key == 'L') {
+            [self incCrateAction:self];
+            return;
+        }
+        if(key == 'h' || key == 'H') {
+            [self decCrateAction:self];
+            return;
+        }
+    }
+    [super keyDown:event];
+}
 #pragma mark •••Actions
 - (IBAction) incCrateAction:(id)sender
 {

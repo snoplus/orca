@@ -325,24 +325,24 @@ static NSDictionary* xl3Ops;
 
 - (void) updateWindow
 {
-	[super updateWindow];
+    [super updateWindow];
 
-	[self xl3LockChanged:nil];
-	[self opsRunningChanged:nil];
-	//basic ops
-	[self selectedRegisterChanged:nil];
-	[self repeatCountChanged:nil];
-	[self repeatDelayChanged:nil];
-	[self autoIncrementChanged:nil];
-	[self basicOpsRunningChanged:nil];
-	[self writeValueChanged:nil];
-	//composite
-	[self compositeSlotMaskChanged:nil];
-	[self compositeXl3ModeChanged:nil];
-	[self compositeXl3ModeRunningChanged:nil];
-	[self compositeXl3PedestalMaskChanged:nil];
-	[self compositeXl3RWAddressChanged:nil];
-	[self compositeXL3RWDataChanged:nil];
+    [self xl3LockChanged:nil];
+    [self opsRunningChanged:nil];
+    //basic ops
+    [self selectedRegisterChanged:nil];
+    [self repeatCountChanged:nil];
+    [self repeatDelayChanged:nil];
+    [self autoIncrementChanged:nil];
+    [self basicOpsRunningChanged:nil];
+    [self writeValueChanged:nil];
+    //composite
+    [self compositeSlotMaskChanged:nil];
+    [self compositeXl3ModeChanged:nil];
+    [self compositeXl3ModeRunningChanged:nil];
+    [self compositeXl3PedestalMaskChanged:nil];
+    [self compositeXl3RWAddressChanged:nil];
+    [self compositeXL3RWDataChanged:nil];
     [self compositeXl3ChargeInjChanged:nil];
     //mon
     [self monPollXl3TimeChanged:nil];
@@ -369,8 +369,8 @@ static NSDictionary* xl3Ops;
     [self hvCMOSRateLimitChanged:nil];
     [self hvCMOSRateIgnoreChanged:nil];
     [self hvChangePowerSupplyChanged:nil];
-	//ip connection
-	[self errorTimeOutChanged:nil];
+    //ip connection
+    [self errorTimeOutChanged:nil];
     [self connectStateChanged:nil];
     [self connectionAutoConnectChanged:nil];
 }
@@ -404,6 +404,7 @@ static NSDictionary* xl3Ops;
 - (void) xl3LockChanged:(NSNotification*)aNotification
 {
 
+    BOOL notRunningOrInMaintenance = isNotRunningOrIsInMaintenance();
     BOOL locked						= [gSecurity isLocked:ORXL3Lock];
     BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORXL3Lock];
     
@@ -448,18 +449,11 @@ static NSDictionary* xl3Ops;
     [compositeChargeInjButton setEnabled: !lockedOrNotRunningMaintenance];
 
     //Monitor
-//    [monIsPollingCMOSRatesButton setEnabled: !lockedOrNotRunningMaintenance];
-//    [monIsPollingPMTCurrentsButton setEnabled: !lockedOrNotRunningMaintenance];
-//    [monIsPollingFECVoltagesButton setEnabled: !lockedOrNotRunningMaintenance];
-//    [monIsPollingXl3VoltagesButton setEnabled: !lockedOrNotRunningMaintenance];
-//    [monIsPollingHVSupplyButton setEnabled: !lockedOrNotRunningMaintenance];
-//    [monPollCMOSRatesMaskField setEnabled: !lockedOrNotRunningMaintenance];
-//    [monPollPMTCurrentsMaskField setEnabled: !lockedOrNotRunningMaintenance];
-//    [monPollFECVoltagesMaskField setEnabled: !lockedOrNotRunningMaintenance];
-//    [monPollingRatePU setEnabled: !lockedOrNotRunningMaintenance];
-//    [monIsPollingVerboseButton setEnabled: !lockedOrNotRunningMaintenance];
-//    [monIsPollingWithRunButton setEnabled: !lockedOrNotRunningMaintenance];
-//    [monPollingStatusField setEnabled: !lockedOrNotRunningMaintenance];
+    [pollNowButton setEnabled: notRunningOrInMaintenance];
+    [startPollButton setEnabled: notRunningOrInMaintenance];
+    [stopPollButton setEnabled: notRunningOrInMaintenance];
+    [pollRunStateLabel setHidden: notRunningOrInMaintenance];
+
     [monVltThresholdTextField0 setEnabled: !lockedOrNotRunningMaintenance];
     [monVltThresholdTextField1 setEnabled: !lockedOrNotRunningMaintenance];
     [monVltThresholdTextField2 setEnabled: !lockedOrNotRunningMaintenance];
@@ -477,7 +471,9 @@ static NSDictionary* xl3Ops;
 
     //HV
     [self hvStatusChanged:nil];
-    
+    [self hvTriggerStatusChanged:nil];
+    [hvTriggersButton setEnabled:!lockedOrNotRunningMaintenance];
+
     //Connection
     [toggleConnectButton setEnabled: !lockedOrNotRunningMaintenance];
     [errorTimeOutPU setEnabled: !lockedOrNotRunningMaintenance];
@@ -501,6 +497,29 @@ static NSDictionary* xl3Ops;
 	}
 }); }
 
+-(void) keyDown:(NSEvent*)event {
+    NSString* keys = [event charactersIgnoringModifiers];
+    if([keys length] == 0) {
+        return;
+    }
+    if([keys length] == 1) {
+        unichar key = [keys characterAtIndex:0];
+        if(key == NSLeftArrowFunctionKey || key == 'h' || key == 'H') {
+            [self decXL3Action:self];
+            return;
+        }
+        if(key == NSRightArrowFunctionKey || key == 'l' || key == 'L') {
+            [self incXL3Action:self];
+            return;
+        }
+    }
+    [super keyDown:event];
+}
+
+- (void) cancelOperation:(id)sender {
+    [self endEditing];
+    [[self window] makeFirstResponder:nil];
+}
 
 #pragma mark •basic ops
 - (void) repeatCountChanged:(NSNotification*)aNote
@@ -678,25 +697,15 @@ static NSDictionary* xl3Ops;
 
 - (void) updateHVButtons
 {
- 
-    //Get SNOP Model
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* aSNOPModel = nil;
-    if ([objs count]) {
-        aSNOPModel = [objs objectAtIndex:0];
-    } else {
-        NSLogColor([NSColor redColor], @"xl3LockChanged: Couldn't find SNOP model. Please add it to the experiment and restart the run.\n");
-    }
-    
+
     BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORXL3Lock];
-    BOOL notRunningOrInMaintenance = true; //default if no snopmodel found
-    if (aSNOPModel) notRunningOrInMaintenance = [aSNOPModel isNotRunningOrInMaintenance];
-    
+    BOOL notRunningOrInMaintenance = isNotRunningOrIsInMaintenance();
+
     if ([hvPowerSupplyMatrix selectedColumn] == 0) { //A
         bool unlock = ![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && ![model hvASwitch] && [model hvAFromDB] && !lockedOrNotRunningMaintenance;
         [hvOnButton setEnabled:unlock];
 
-        unlock = ![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && [model hvAFromDB] && !lockedOrNotRunningMaintenance;
+        unlock = ![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && [model hvAFromDB] && notRunningOrInMaintenance;
         [hvOffButton setEnabled:unlock];
 
         unlock = ![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping] && [model hvAFromDB] && !lockedOrNotRunningMaintenance;
@@ -711,15 +720,17 @@ static NSDictionary* xl3Ops;
         
         unlock = ![model hvANeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping] && [model hvAFromDB] && notRunningOrInMaintenance;
         [hvRampDownButton setEnabled:unlock];
-        
+
         unlock = [model hvANeedsUserIntervention] && [model hvAFromDB] && notRunningOrInMaintenance;
         [hvAcceptReadbackButton setEnabled:unlock];
+
+        [hvRunStateLabel setHidden: notRunningOrInMaintenance];
 
     } else {
         bool unlock = ![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && ![model hvBSwitch] && [model hvBFromDB] && !lockedOrNotRunningMaintenance;
         [hvOnButton setEnabled:unlock];
         
-        unlock = ![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && [model hvBFromDB] && !lockedOrNotRunningMaintenance;
+        unlock = ![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && [model hvBFromDB] && notRunningOrInMaintenance;
         [hvOffButton setEnabled:unlock];
         
         unlock = ![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && ![model hvBRamping] && [model hvBFromDB] && !lockedOrNotRunningMaintenance;
@@ -734,12 +745,14 @@ static NSDictionary* xl3Ops;
         
         unlock = ![model hvBNeedsUserIntervention] && [model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && ![model hvBRamping] && [model hvBFromDB] && notRunningOrInMaintenance;
         [hvRampDownButton setEnabled:unlock];
-        
+
         unlock = [model hvBNeedsUserIntervention] && [model hvBFromDB] && notRunningOrInMaintenance;
         [hvAcceptReadbackButton setEnabled:unlock];
 
+        [hvRunStateLabel setHidden: notRunningOrInMaintenance];
+
     }
-    
+
 }
 
 - (void) hvRelayMaskChanged:(NSNotification*)aNote
@@ -845,10 +858,21 @@ static NSDictionary* xl3Ops;
 }); }
 
 - (void) hvTriggerStatusChanged:(NSNotification*)aNote
-{ dispatch_async(dispatch_get_main_queue(), ^{
-    [hvATriggerStatusField setStringValue:[model triggerStatus]];
-    [hvBTriggerStatusField setStringValue:[model triggerStatus]];
-}); }
+{
+    BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORXL3Lock];
+
+    if ([model isTriggerON]) {
+        [hvATriggerStatusField setStringValue:@"ON"];
+        [hvBTriggerStatusField setStringValue:@"ON"];
+        [loadNominalSettingsButton setEnabled:!lockedOrNotRunningMaintenance];
+        [hvTriggersButton setState:NSOnState];
+    } else {
+        [hvATriggerStatusField setStringValue:@"OFF"];
+        [hvBTriggerStatusField setStringValue:@"OFF"];
+        [loadNominalSettingsButton setEnabled:NO];
+        [hvTriggersButton setState:NSOffState];
+    }
+}
 
 - (void) hvTargetValueChanged:(NSNotification*)aNote
 { dispatch_async(dispatch_get_main_queue(), ^{
@@ -1088,12 +1112,16 @@ static NSDictionary* xl3Ops;
 #pragma mark •••Actions
 - (IBAction) incXL3Action:(id)sender
 {
+    bool isXL3Locked = [gSecurity isLocked:ORXL3Lock];
 	[self incModelSortedBy:@selector(XL3NumberCompare:)];
+    [gSecurity setLock:ORXL3Lock to:isXL3Locked];
 }
 
 - (IBAction) decXL3Action:(id)sender
 {
+    bool isXL3Locked = [gSecurity isLocked:ORXL3Lock];
 	[self decModelSortedBy:@selector(XL3NumberCompare:)];
+    [gSecurity setLock:ORXL3Lock to:isXL3Locked];
 }
 
 - (IBAction) lockAction:(id)sender
@@ -1424,11 +1452,23 @@ static NSDictionary* xl3Ops;
     [model openHVRelays];
 }
 
-- (IBAction)hvCheckInterlockAction:(id)sender
+- (IBAction)hvCheckInterlockRelaysAction:(id)sender
 {
+    uint64_t relays;
+    BOOL known;
+
     [self endEditing];
     [model readHVInterlock];
-
+    @try {
+        [model readHVRelays:&relays isKnown:&known];
+        if(known) {
+            NSLog(@"Relay mask = %llu\n", (unsigned long long) relays);
+        } else {
+            NSLog(@"Relays are unknown!\n");
+        }
+    }@catch (NSException *exception) {
+        NSLogColor([NSColor redColor],@"%@ error in readHVRelays. Error: %@ Reason: %@\n",[[model xl3Link] crateName], [exception name], [exception reason]);
+    }
 }
 
 - (IBAction)hvTurnOnAction:(id)sender
@@ -1590,13 +1630,13 @@ static NSDictionary* xl3Ops;
 - (IBAction)hvRampDownAction:(id)sender
 {
     [[sender window] makeFirstResponder:tabView];
-    if ([model isTriggerON]) {
-        [model hvTriggersOFF];
-    }
     if ([hvPowerSupplyMatrix selectedColumn] == 0) {
+        if ([model isTriggerON]) {
+            [model hvTriggersOFF];
+        }
         [model setHvANextStepValue:0];
-    }
-    else {
+    } else {
+        //FIXME: do we handle triggers for supply B?
         [model setHvBNextStepValue:0];
     }
 }
@@ -1617,14 +1657,22 @@ static NSDictionary* xl3Ops;
     [model hvPanicDown];
 }
 
-- (IBAction)hvTriggerOffAction:(id)sender
+- (IBAction) hvTriggerAction:(id)sender
 {
-    [model hvTriggersOFF];
+    if ([sender state]) {
+        [model hvTriggersON];
+    } else {
+        [model hvTriggersOFF];
+    }
+    /* Need to update button because the user is sometimes given a choice to
+     * cancel turning triggers on, in which case the button will seem to be
+     * on, but in fact the triggers weren't turned on. */
+    [self hvTriggerStatusChanged:nil];
 }
 
-- (IBAction)hvTriggerOnAction:(id)sender
+- (IBAction) loadNominalSettingsAction: (id) sender
 {
-    [model hvTriggersON];
+    [model loadNominalSettings];
 }
 
 //connection

@@ -118,6 +118,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management
+- (void) everythingChanged:(NSNotification*)aNote;
 - (void) updatePMTInfo:(NSNotification*)aNote;
 - (void) dcVBsChanged:(NSNotification*)aNote;
 - (void) dcThresholdsChanged:(NSNotification*)aNote;
@@ -142,6 +143,7 @@
 - (void) update20nTriggerInfo:(NSNotification*)aNote;
 - (void) update100nTriggerInfo:(NSNotification*)aNote;
 - (void) updateCmosReadInfo:(NSNotification*)aNote;
+- (void) keyDown:(NSEvent *)event;
 
 #pragma mark •••Actions
 - (IBAction) readCmosRatesAction:(id)sender;
