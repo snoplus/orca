@@ -43,7 +43,7 @@
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
-#define koffset -8192
+#define koffset -8170
 	if(![self cacheSetUp]){
 		[self cacheCardLevelObject:kIntegrateTimeKey fromHeader:[aDecoder fileHeader]];
 		[self cacheCardLevelObject:kHistEMultiplierKey fromHeader:[aDecoder fileHeader]];
@@ -70,39 +70,58 @@
             unsigned long   scaleFactor     = 0xfff;
             unsigned long   postRiseSum     = ((sumWord2 & 0xFFFF)<< 8) | ((sumWord1 >> 24) & 0xff);
             unsigned long   preRiseSum      = sumWord1 & 0xFFFFFF;
-            long            energy          = (postRiseSum - preRiseSum)/0xfff;
+            long            energy          = (postRiseSum - preRiseSum)/scaleFactor;
             if(energy >= 0){
-                [aDataSet histogram:energy numBins:0xFFFFFF/scaleFactor  sender:self  withKeys:@"Gretina4A", @"Energy",crateKey,cardKey,channelKey,nil];
+                [aDataSet histogram:energy numBins:0xFFFFFF/scaleFactor  sender:self  withKeys:@"Gretina4 Energy",crateKey,cardKey,channelKey,nil];
+            }
+        
+            BOOL fullDecode = NO;
+            
+            struct timeval tv;
+            gettimeofday(&tv, NULL);
+            
+            unsigned long long now =
+            (unsigned long long)(tv.tv_sec) * 1000 +
+            (unsigned long long)(tv.tv_usec) / 1000;
+            
+            if(!decoderOptions){
+                decoderOptions = [[NSMutableDictionary dictionary]retain];
             }
             
-            // NSLog(@"type: %d packetLen: %d  headerLen: %d  dataLen:%d\n",headerType,packetLength,headerLength,dataLength);
-
+            NSString* lastTimeKey = [NSString stringWithFormat:@"%@,%@,%@,LastTime",crateKey,cardKey,channelKey];
             
-            if(dataLength>0){
-                NSData* waveformData = [NSData dataWithBytes:&ptr[0] length:(length-4)*sizeof(long)];
-                [aDataSet loadWaveform: waveformData            //pass in the whole data set
-                                offset: headerLength*2                       // Offset in bytes (past header words)
-                              unitSize: sizeof(short)			// unit size in bytes
-                            startIndex:	0                       // first Point Index (past the header offset!!!)
-                           scaleOffset: koffset                   // offset the value by this
-                                  mask:	0x3FFF					// when displayed all values will be masked with this value
-                           specialBits: 0xC000
-                              bitNames: [NSArray arrayWithObjects:@"M",@"O",nil]
-                                sender: self 
-                              withKeys: @"Gretina4A", @"Waveforms",crateKey,cardKey,channelKey,nil];
-                
- 
-                
+            unsigned long long lastTime = [[decoderOptions objectForKey:lastTimeKey] unsignedLongLongValue];
+            
+            if(now - lastTime >= 100){
+                fullDecode = YES;
+                [decoderOptions setObject:[NSNumber numberWithUnsignedLongLong:now] forKey:lastTimeKey];
             }
+            BOOL someoneWatching = NO;
+            if([aDataSet isSomeoneLooking:[NSString stringWithFormat:@"Gretina4Waveforms,%d,%d,%d",crate,card,channel]]){
+                someoneWatching = YES;
+            }
+            NSMutableData* waveformData = nil;
+            if(fullDecode && someoneWatching){
+                waveformData = [NSMutableData dataWithBytes:&ptr[0] length:(length-4)*sizeof(long)];
+            }
+            [aDataSet loadWaveform: waveformData     //pass in the whole data set
+                            offset: headerLength*2   // Offset in bytes (past header words)
+                          unitSize: sizeof(short)    // unit size in bytes
+                        startIndex:	0                // first Point Index
+                       scaleOffset: koffset          // offset the value by this
+                              mask:	0x3FFF           // display mask for all values
+                       specialBits: 0xC000
+                          bitNames: [NSArray arrayWithObjects:@"M",@"O",nil]
+                            sender: self 
+                          withKeys: @"Gretina4 Waveforms",crateKey,cardKey,channelKey,nil];
+    
             //get the actual object
             NSString* aKey = [crateKey stringByAppendingString:cardKey];
             if(!actualGretinaCards)actualGretinaCards = [[NSMutableDictionary alloc] init];
             ORGretina4AModel* obj = [actualGretinaCards objectForKey:aKey];
             if(!obj){
                 NSArray* listOfCards = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORGretina4AModel")];
-                NSEnumerator* e = [listOfCards objectEnumerator];
-                ORGretina4AModel* aCard;
-                while(aCard = [e nextObject]){
+                for(ORGretina4AModel* aCard in listOfCards){
                     if([aCard slot] == card){
                         [actualGretinaCards setObject:aCard forKey:aKey];
                         obj = aCard;

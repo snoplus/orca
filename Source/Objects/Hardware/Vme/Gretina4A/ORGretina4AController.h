@@ -87,7 +87,6 @@
     //hardware setup
     IBOutlet NSButton*		forceFullCardInitCB;
     IBOutlet NSMatrix*		forceFullInitMatrix;
-    IBOutlet NSMatrix*      channelStatusMatrix;
 
     IBOutlet NSMatrix*      extDiscrSrcMatrix;
     IBOutlet NSTextField*   userPackageDataField;
@@ -96,15 +95,13 @@
    
     IBOutlet NSMatrix*      pileupWaveformOnlyModeMatrix;
     IBOutlet NSMatrix*      pileupExtensionModeMatrix;
-    IBOutlet NSMatrix*      eventExtensionModeMatrix;
     IBOutlet NSMatrix*      discCountModeMatrix;
     IBOutlet NSMatrix*      aHitCountModeMatrix;
     IBOutlet NSMatrix*      eventCountModeMatrix;
     IBOutlet NSMatrix*      droppedEventCountModeMatrix;
-//    IBOutlet NSButton*      writeFlagCB;
+
     IBOutlet NSMatrix*      decimationFactorMatrix;
     IBOutlet NSMatrix*      triggerPolarityMatrix;
-    IBOutlet NSMatrix*      premapResetDelayEnMatrix;
     IBOutlet NSMatrix*      pileupModeMatrix;
     IBOutlet NSMatrix*		enabledMatrix;
 
@@ -117,11 +114,11 @@
     IBOutlet NSTextField*   p2WindowField;
     IBOutlet NSMatrix*      discWidthMatrix;
 
-    IBOutlet NSTextField*   holdoffTimeField;
+    IBOutlet NSTextField*   downSampleHoldOffTimeField;
+    IBOutlet NSTextField*   holdOffTimeField;
     IBOutlet NSButton*		autoModeCB;
     IBOutlet NSTextField*   vetoGateWidthField;
 
-    IBOutlet NSMatrix*      premapResetDelayMatrix;
     IBOutlet NSTextField*   rawDataLengthField; //bad name in docs. really raw_data_offset
     IBOutlet NSTextField*   rawDataWindowField; //bad name in docs. really max length of event packet
     IBOutlet NSMatrix*      baselineStartMatrix;
@@ -129,6 +126,8 @@
     IBOutlet NSTextField*   trackingSpeedField;
     IBOutlet NSTextField*   peakSensitivityField;
     IBOutlet NSPopUpButton* triggerConfigPU;
+    IBOutlet NSPopUpButton* clockSourcePU;
+    IBOutlet NSTextField*   clockLockedField;
 
     
     NSView *blankView;
@@ -189,9 +188,11 @@
 - (void) forceFullInitChanged:(NSNotification*)aNote;
 - (void) extDiscrSrcChanged:(NSNotification*)aNote;
 - (void) userPackageDataChanged:(NSNotification*)aNote;
-- (void) holdoffTimeChanged:(NSNotification*)aNote;
+- (void) downSampleHoldOffTimeChanged:(NSNotification*)aNote;
+- (void) holdOffTimeChanged:(NSNotification*)aNote;
 - (void) autoModeChanged:(NSNotification*)aNote;
 - (void) vetoGateWidthChanged:(NSNotification*)aNote;
+- (void) clockSourceChanged:(NSNotification*)aNote;
 
 
 - (void) acqDcmCtrlStatusChanged:(NSNotification*)aNote;
@@ -204,18 +205,15 @@
 - (void) adcDcmResetChanged:(NSNotification*)aNote;
 - (void) adcPhShiftOverflowChanged:(NSNotification*)aNote;
 - (void) adcDcmClockStoppedChanged:(NSNotification*)aNote;
-- (void) preampResetDelayEnChanged:(NSNotification*)aNote;
 - (void) decimationFactorChanged:(NSNotification*)aNote;
 //- (void) writeFlagChanged:(NSNotification*)aNote;
 - (void) pileupModeChanged:(NSNotification*)aNote;
 - (void) droppedEventCountModeChanged:(NSNotification*)aNote;
 - (void) eventCountModeChanged:(NSNotification*)aNote;
 - (void) ledThresholdChanged:(NSNotification*)aNote;
-- (void) preampResetDelayChanged:(NSNotification*)aNote;
 - (void) triggerPolarityChanged:(NSNotification*)aNote;
 - (void) aHitCountModeChanged:(NSNotification*)aNote;
 - (void) discCountModeChanged:(NSNotification*)aNote;
-- (void) eventExtensionModeChanged:(NSNotification*)aNote;
 - (void) pileupExtensionModeChanged:(NSNotification*)aNote;
 - (void) pileupWaveformOnlyModeChanged:(NSNotification*)aNote;
 - (void) triggerConfigChanged:(NSNotification*)aNote;
@@ -288,14 +286,11 @@
 - (IBAction) ledThresholdAction:    (id)sender;
 //- (IBAction) writeFlagAction: (id)sender;
 - (IBAction) pileupModeAction:(id)sender;
-- (IBAction) preampResetDelayEnAction:(id)sender;
-- (IBAction) preampResetDelayAction:(id)sender;
 - (IBAction) droppedEventCountModeAction:(id)sender;
 - (IBAction) eventCountModeAction:(id)sender;
 - (IBAction) triggerPolarityAction:(id)sender;
 - (IBAction) aHitCountModeAction:(id)sender;
 - (IBAction) discCountModeAction:(id)sender;
-- (IBAction) eventExtensionModeAction:(id)sender;
 - (IBAction) pileupExtensionModeAction:(id)sender;
 - (IBAction) pileupWaveformOnlyModeAction:(id)sender;
 - (IBAction) rawDataLengthAction:(id)sender;
@@ -313,7 +308,8 @@
 - (IBAction) triggerConfigAction:(id)sender;
 - (IBAction) windowCompMinAction:(id)sender;
 - (IBAction) windowCompMaxAction:(id)sender;
-- (IBAction) holdoffTimeAction:(id)sender;
+- (IBAction) downSampleHoldOffTimeAction:(id)sender;
+- (IBAction) holdOffTimeAction:(id)sender;
 - (IBAction) autoModeAction:(id)sender;
 - (IBAction) vetoGateWidthAction:(id)sender;
 - (IBAction) loadDelaysAction:(id)sender;
@@ -351,6 +347,7 @@
 - (IBAction) doHwCheckButtonAction:(id)sender;
 - (IBAction) compareHwNowAction:(id)sender;
 - (IBAction) openPreampDialog:(id)sender;
+- (IBAction) clockSourceAction:(id)sender;
 
 #pragma mark - Data Source
 - (void)    tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;

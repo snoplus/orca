@@ -45,7 +45,6 @@ NSString* ORGretina4AWindowCompMaxChanged               = @"ORGretina4AWindowCom
 //---channel control parts---
 NSString* ORGretina4APileupWaveformOnlyModeChanged      = @"ORGretina4APileupWaveformOnlyModeChanged";
 NSString* ORGretina4APileupExtensionModeChanged         = @"ORGretina4APileupExtensionModeChanged";
-NSString* ORGretina4AEventExtensionModeChanged          = @"ORGretina4AEventExtensionModeChanged";
 NSString* ORGretina4ADiscCountModeChanged               = @"ORGretina4ADiscCountModeChanged";
 NSString* ORGretina4AAHitCountModeChanged               = @"ORGretina4AAHitCountModeChanged";
 NSString* ORGretina4AEventCountModeChanged              = @"ORGretina4AEventCountModeChanged";
@@ -53,12 +52,10 @@ NSString* ORGretina4ADroppedEventCountModeChanged       = @"ORGretina4ADroppedEv
 //NSString* ORGretina4AWriteFlagChanged                   = @"ORGretina4AWriteFlagChanged";
 NSString* ORGretina4ADecimationFactorChanged            = @"ORGretina4ADecimationFactorChanged";
 NSString* ORGretina4ATriggerPolarityChanged             = @"ORGretina4ATriggerPolarityChanged";
-NSString* ORGretina4APreampResetDelayEnChanged          = @"ORGretina4APreampResetDelayEnChanged";
 NSString* ORGretina4APileupModeChanged                  = @"ORGretina4APileupModeChanged";
 NSString* ORGretina4AEnabledChanged                     = @"ORGretina4AEnabledChanged";
 //---------
 NSString* ORGretina4ALedThreshold0Changed               = @"ORGretina4ALedThreshold0Changed";
-NSString* ORGretina4APreampResetDelay0Changed           = @"ORGretina4APreampResetDelay0Changed";
 NSString* ORGretina4ARawDataLengthChanged               = @"ORGretina4ARawDataLengthChanged";
 NSString* ORGretina4ARawDataWindowChanged               = @"ORGretina4ARawDataWindowChanged";
 NSString* ORGretina4ADWindowChanged                     = @"ORGretina4ADWindowChanged";
@@ -75,7 +72,8 @@ NSString* ORGretina4ADacAttenuationChanged              = @"ORGretina4ADacAttenu
 //------
 NSString* ORGretina4AChannelPulseControlChanged         = @"ORGretina4AChannelPulseControlChanged";
 NSString* ORGretina4ADiagMuxControlChanged              = @"ORGretina4ADiagMuxControlChanged";
-NSString* ORGretina4AHoldoffTimeChanged                 = @"ORGretina4AHoldoffTimeChanged";
+NSString* ORGretina4ADownSampleHoldOffTimeChanged       = @"ORGretina4ADownSampleHoldOffTimeChanged";
+NSString* ORGretina4AHoldOffTimeChanged                 = @"ORGretina4AHoldOffTimeChanged";
 NSString* ORGretina4APeakSensitivityChanged             = @"ORGretina4APeakSensitivityChanged";
 NSString* ORGretina4AAutoModeChanged                    = @"ORGretina4AAutoModeChanged";
 //---Baseline Delay---
@@ -147,10 +145,10 @@ NSString* ORGretina4AForceFullInitChanged               = @"ORGretina4AForceFull
 NSString* ORGretina4ALockChanged                        = @"ORGretina4ALockChanged";
 NSString* ORGretina4ASettingsLock                       = @"ORGretina4ASettingsLock";
 NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterLock";
-NSString* ORGretina4AChannelStatusChanged               = @"ORGretina4AChannelStatusChanged";
 NSString* ORGretina4ADoHwCheckChanged                   = @"ORGretina4ADoHwCheckChanged";
 NSString* ORGretina4AModelRateSpiked                    = @"ORGretina4AModelRateSpiked";
 NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGChanged";
+NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSourceChanged";
 
 @interface ORGretina4AModel (private)
 //firmware loading
@@ -248,7 +246,7 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
 
 - (NSString*) helpURL
 {
-    return @"VME/Gretina.html";
+    return @"VME/Gretina4A.html";
 }
 
 - (Class) guardianClass
@@ -649,16 +647,9 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
         @"Falling Edge",
         @"Both"
     };
-    NSString* eventExt[4] = {
-        @"Disabled",
-        @"Offset",
-        @"Offset Trunc",
-        @"Headers"
-    };
 
     NSLogFont(aFont,@"     Channel Enabled     : %@\n", ((aValue>>0)&0x1)?@"Enabled" : @"Disabled");
     NSLogFont(aFont,@"     Pileup Mode         : %@\n", ((aValue>>2)&0x1)?@"Accept"  : @"Reject");
-    NSLogFont(aFont,@"     Preamp Reset Delay  : %@\n", ((aValue>>3)&0x1)?@"Enabled" : @"Disabled");
     NSLogFont(aFont,@"     Trigger Polarity    : %@\n", trigPolarity[(aValue>>10)&0x3]);
     NSLogFont(aFont,@"     Decimation          : x%d\n", (int)pow(2.,(double)((aValue>>12)&0x7)));
     NSLogFont(aFont,@"     Write Flag          : %@\n", (aValue>>15)&0x1 ? @"Shift Data":@"Normal");
@@ -666,7 +657,6 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
     NSLogFont(aFont,@"     Event Count Mode    : %@\n", ((aValue>>21)&0x1)?@"Count" : @"Rate");
     NSLogFont(aFont,@"     aHit Count Mode     : %@\n", ((aValue>>22)&0x1)?@"Count" : @"Rate");
     NSLogFont(aFont,@"     Disc Count Mode     : %@\n", ((aValue>>23)&0x1)?@"Count" : @"Rate");
-    NSLogFont(aFont,@"     Event Extension     : %@\n", eventExt[(aValue>>24)&0x3]);
     NSLogFont(aFont,@"     Pileup Ext Mode     : %@\n", ((aValue>>26)&0x1)?@"Enabled" : @"Disabled");
     NSLogFont(aFont,@"     Counter Reset       : %@\n", ((aValue>>27)&0x1)?@"Reset"  : @"Run");
     NSLogFont(aFont,@"     Pileup Waveform Only: %@\n", ((aValue>>30)&0x1)?@"Enabled": @"Disabled");
@@ -676,7 +666,6 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
 {
     NSFont* aFont = [NSFont fontWithName:@"Monaco" size:10.0];
     NSLogFont(aFont,@"     LED Threshold     : %d\n", (aValue>> 0)&0x3fff);
-    NSLogFont(aFont,@"     Preamp Reset Delay: %d\n", (aValue>>16)&0xff);
 }
 
 - (void) dumpHoldoffControlDetails:(unsigned long)aValue
@@ -743,8 +732,8 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
     windowCompMax   = 32000;
     rawDataLength   = 500;
     rawDataWindow   = 2000;
-    p2Window        = 2;
-    holdoffTime     = 160;
+    p2Window        = 0;
+    holdOffTime     = 160;
     baselineDelay   = 511;
     trackingSpeed   = 5;
     peakSensitivity = 7;
@@ -757,14 +746,13 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
     pileupMode[aChan]             = NO;
     triggerPolarity[aChan]        = 1;
     decimationFactor[aChan]       = 0;
-    eventExtensionMode[aChan]     = 0;
     pileupExtensionMode[aChan]    = NO;
     pileupWaveformOnlyMode[aChan] = NO;
-    ledThreshold[aChan]           = 200;
+    ledThreshold[aChan]           = 300;
     dWindow[aChan]                = 16;
     kWindow[aChan]                = 100;
     mWindow[aChan]                = 200;
-    p1Window[aChan]               = 1;
+    p1Window[aChan]               = 0;
     discWidth[aChan]              = 10;
     baselineStart[aChan]          = 100;
 
@@ -1033,6 +1021,19 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
 }
 
 #pragma mark - Persistant Register Values
+
+- (short) clockSource
+{
+    return clockSource;
+}
+
+- (void) setClockSource:(short)aClockSource
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setClockSource:clockSource];
+    clockSource = aClockSource;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AClockSourceChanged object:self];
+}
+
 //------------------- Address = 0x0008  Bit Field = 32..0 ---------------
 - (unsigned long) extDiscriminatorSrc { return extDiscriminatorSrc ;}
 - (void)  setExtDiscriminatorSrc:(unsigned long)aValue
@@ -1110,22 +1111,6 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
         [[[self undoManager] prepareWithInvocationTarget:self] setPileupMode:chan withValue:pileupMode[chan]];
         pileupMode[chan] = aValue;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APileupModeChanged object:self];
-    }
-}
-
-//------------------- kChannelControl  Bit Field = 3 ---------------
-- (BOOL) preampResetDelayEn:(unsigned short)chan
-{
-    if(chan<kNumGretina4AChannels)  return preampResetDelayEn[chan];
-    else                            return NO;
-}
-
-- (void) setPreampResetDelayEn:(unsigned short)chan withValue:(BOOL)aValue
-{
-    if((chan < kNumGretina4AChannels)){
-        [[[self undoManager] prepareWithInvocationTarget:self] setPreampResetDelayEn:chan withValue:preampResetDelayEn[chan]];
-        preampResetDelayEn[chan] = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APreampResetDelayEnChanged object:self];
     }
 }
 
@@ -1238,22 +1223,6 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
     }
 }
 
-//------------------- kChannelControl  Bit Field = 24..25 ---------------
-- (short) eventExtensionMode:(unsigned short)chan
-{
-    if(chan < kNumGretina4AChannels ) return eventExtensionMode[chan];
-    else                              return 0;
-}
-
-- (void) setEventExtensionMode:(unsigned short)chan withValue:(unsigned short)aValue
-{
-    if(aValue>0x3)aValue = 0x3;
-    if((chan < kNumGretina4AChannels)){
-        [[[self undoManager] prepareWithInvocationTarget:self] setEventExtensionMode:chan withValue:eventExtensionMode[chan]];
-        eventExtensionMode[chan] = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AEventExtensionModeChanged object:self];
-    }
-}
 
 //------------------- kChannelControl  Bit Field = 26 ---------------
 - (BOOL)  pileupExtensionMode:(unsigned short)chan
@@ -1312,22 +1281,6 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
     }
 }
 
-- (short) preampResetDelay:(unsigned short)chan
-{
-    if(chan<kNumGretina4AChannels )return preampResetDelay[chan];
-    else return 0;
-}
-
-- (void) setPreampResetDelay:(unsigned short)chan withValue:(unsigned short)aValue
-{
-    if(aValue>0xFF)aValue = 0xFF;
-    if((chan < kNumGretina4AChannels)){
-        [[[self undoManager] prepareWithInvocationTarget:self] setPreampResetDelay:chan withValue:preampResetDelay[chan]];
-        preampResetDelay[chan] = aValue;
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APreampResetDelay0Changed object:self userInfo:userInfo];
-    }
-}
 
 
 //------------------- Address = 0x0100 ---------------
@@ -1535,13 +1488,13 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
 }
 
 //------------------- Address = 0x0414  Bit Field = 8..0 ---------------
-- (unsigned short) holdoffTime { return holdoffTime; }
-- (void) setHoldoffTime:(unsigned short)aValue
+- (unsigned short) holdOffTime { return holdOffTime; }
+- (void) setHoldOffTime:(unsigned short)aValue
 {
     if(aValue>0x3FF)aValue = 0x3FF;
-    [[[self undoManager] prepareWithInvocationTarget:self] setHoldoffTime:holdoffTime];
-    holdoffTime = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AHoldoffTimeChanged object:self];
+    [[[self undoManager] prepareWithInvocationTarget:self] setHoldOffTime:holdOffTime];
+    holdOffTime = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AHoldOffTimeChanged object:self];
 }
 
 //------------------- Address = 0x0414  Bit Field = 9..11 ---------------
@@ -1648,7 +1601,15 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
     ledStatus = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ALedStatusChanged object:self];
 }
-
+//------------------- Address = 0x0434 ---------------
+- (unsigned short) downSampleHoldOffTime { return downSampleHoldOffTime; }
+- (void) setDownSampleHoldOffTime:(unsigned short)aValue
+{
+    if(aValue>0x3FF)aValue = 0x3FF;
+    [[[self undoManager] prepareWithInvocationTarget:self] setDownSampleHoldOffTime:downSampleHoldOffTime];
+    downSampleHoldOffTime = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADownSampleHoldOffTimeChanged object:self];
+}
 //------------------- Address = 0x048C  Bit Field = 31..0 ---------------
 //------------------- Address = 0x0490  Bit Field = 15..0 ---------------
 //------------------- Address = 0x0494  Bit Field = 15..0 ---------------
@@ -2025,6 +1986,11 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
 }
 
 //------------------------- kProgrammingDone Reg ------------------------------------
+- (void) resetSingleFIFO
+{
+    [self resetFIFO];
+}
+
 - (void) resetFIFO
 {
 
@@ -2107,7 +2073,6 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
     unsigned long theValue =
     (startStop                        << 0)  |
     (pileupMode[chan]                 << 2)  |
-    (preampResetDelay[chan]           << 3)  |
     ((triggerPolarity[chan]  & 0x3)   << 10) |
     ((decimationFactor[chan] & 0x7)   << 12) |
     (writeFlag                        << 15) | //default to data with flags
@@ -2115,7 +2080,6 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
     (eventCountMode[chan]             << 21) |
     (aHitCountMode[chan]              << 22) |
     (discCountMode[chan]              << 23) |
-    ((eventExtensionMode[chan] & 0x3) << 24) |
     (pileupExtensionMode[chan]        << 26) |
     (!startStop                       << 27) | //counters reset at run stop
     (pileupWaveformOnlyMode[chan]     << 30);
@@ -2151,7 +2115,7 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
 
 - (void) writeLedThreshold:(unsigned short)aChan
 {
-    unsigned long theValue = ((preampResetDelay[aChan] & 0xff)<<16) | (ledThreshold[aChan] & 0x3fff);
+    unsigned long theValue =  ledThreshold[aChan] & 0x3fff;
     [self writeAndCheckLong:theValue
               addressOffset:[Gretina4ARegisters offsetforReg:kLedThreshold chan:aChan]
                        mask:0xff03ff
@@ -2314,9 +2278,9 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
 }
 
 //-------------------------kP2Window Reg----------------------------------------
-- (unsigned long) readP2Window:(unsigned short)aChan
+- (unsigned long) readP2Window
 {
-    return [self readLongFromReg:kP2Window channel:aChan];
+    return [self readLongFromReg:kP2Window];
 }
 
 - (void) writeP2Window
@@ -2379,11 +2343,26 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
 
 - (void) writeHoldoffControl
 {
-    unsigned long theValue = ((holdoffTime     & 0x1FF) << 0) |
+    unsigned long theValue = ((holdOffTime     & 0x1FF) << 0) |
                              ((peakSensitivity & 0x007) << 9)  |
                              ((autoMode        & 0x001) << 12);
     [self writeAndCheckLong:theValue
               addressOffset:[Gretina4ARegisters offsetforReg:kHoldoffControl]
+                       mask:0x00001FFF
+                  reportKey:@"holdoffControl"
+              forceFullInit:forceFullCardInit];
+}
+//-------------------------kDownSampleHoldoff Reg----------------------------------------
+- (unsigned long) readDownSampleHoldOffTime
+{
+    return [self readLongFromReg:kDownSampleHoldOffTime];
+}
+
+- (void) writeDownSampleHoldOffTime
+{
+    unsigned long theValue = downSampleHoldOffTime;
+    [self writeAndCheckLong:theValue
+              addressOffset:[Gretina4ARegisters offsetforReg:kDownSampleHoldOffTime]
                        mask:0x00001FFF
                   reportKey:@"holdoffControl"
               forceFullInit:forceFullCardInit];
@@ -2433,30 +2412,6 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
               forceFullInit:YES];
 }
 
-- (void) readMasterLogic
-{
-    unsigned long aValue = [self readLongFromReg:kMasterLogicStatus];
-    BOOL changed = NO;
-    int chan;
-    for(chan=0;chan<kNumGretina4AChannels;chan++){
-        BOOL state = ((aValue >> (22+chan)) & 0x1) == 0x1;
-        if(state!=channelStatus[chan] || firstTime){
-            channelStatus[chan] = state;
-            changed = YES;
-        }
-    }
-    firstTime = NO;
-    if(changed){
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AChannelStatusChanged object:self];
-    }
-}
-- (BOOL) channelStatus:(unsigned short)chan
-{
-    if(chan<kNumGretina4AChannels){
-        return channelStatus[chan];
-    }
-    else return NO;
-}
 //-------------------------kTriggerConfig Reg----------------------------------------
 - (unsigned long) readTriggerConfig
 {
@@ -2533,7 +2488,20 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
 {
     return [self readFPGARegister:kVMEGPControl] & 0x3;
 }
+- (void) writeClockSource: (unsigned long) clocksource
+{
+    if(clocksource == 0)return; ////temp..... Clock source might be set by the Trigger Card init code.
+    [self writeAndCheckLong:clocksource
+              addressOffset:[Gretina4AFPGARegisters address:[self baseAddress] forReg:kVMEGPControl]
+                       mask:0x3
+                  reportKey:@"ClockSource"
+              forceFullInit:forceFullInit];
+}
 
+- (void) writeClockSource
+{
+    [self writeClockSource:clockSource];
+}
 //-------------------------kAuxStatus Reg----------------------------------------
 - (unsigned long) readVmeAuxStatus
 {
@@ -2594,12 +2562,12 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
         [self writeWindowCompMax];
         [self writeP2Window];
         [self writeHoldoffControl];
+        [self writeDownSampleHoldOffTime];
         [self writeBaselineDelay];
         [self loadBaselines];
         [self writeVetoGateWidth];
         [self writeTriggerConfig];
         [self clearCounters];
-
         
         //write the channel level params
         for(i=0;i<kNumGretina4AChannels;i++) {
@@ -2632,11 +2600,12 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
 
 - (void) checkBoard:(BOOL)verbose
 {
-    BOOL extDiscriminatorSrcResult = [self checkExtDiscriminatorSrc:verbose];
-    BOOL windowCompMinResult       = [self checkWindowCompMin:verbose];
-    BOOL windowCompMaxResult       = [self checkWindowCompMax:verbose];
-    BOOL p2WindowResult            = [self checkP2Window:verbose];
-    BOOL holdoffControlResult      = [self checkHoldoffControl:verbose];
+    BOOL extDiscriminatorSrcResult   = [self checkExtDiscriminatorSrc:verbose];
+    BOOL windowCompMinResult         = [self checkWindowCompMin:verbose];
+    BOOL windowCompMaxResult         = [self checkWindowCompMax:verbose];
+    BOOL p2WindowResult              = [self checkP2Window:verbose];
+    BOOL holdoffControlResult        = [self checkHoldoffControl:verbose];
+    BOOL downSampleHoldOffTimeResult = [self checkDownSampleHoldOffTime:verbose];
     
     
     unsigned short ledThresholdResultMask   = 0xFFFF; //assume all OK
@@ -2680,7 +2649,8 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
             mWindowResultMask           &&
             d3WindowResultMask          &&
             discWidthResultMask         &&
-            p1WindowResultMask){
+            p1WindowResultMask          &&
+            downSampleHoldOffTimeResult ){
            
             NSLog(@"%@ HW registers match dialog values\n",[self fullID]);
         }
@@ -2727,14 +2697,24 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
     }
 }
 
+- (BOOL) checkDownSampleHoldOffTime:(BOOL)verbose
+{
+    unsigned long aValue = [self readRegister:kDownSampleHoldOffTime] & 0x3ff;
+    if(aValue == downSampleHoldOffTime)return YES;
+    else {
+        if(verbose)NSLog(@"down sample holdoff time mismatch: 0x%x != 0x%x\n",aValue,downSampleHoldOffTime);
+        return NO;
+    }
+}
+
 - (BOOL) checkHoldoffControl:(BOOL)verbose
 {
     unsigned long aValue = [self readRegister:kHoldoffControl];
-    unsigned long theValue = ((holdoffTime     & 0x1FF) << 0) |
+    unsigned long theValue = ((holdOffTime     & 0x1FF) << 0) |
                              ((peakSensitivity & 0x007) << 9)  |
                              ((autoMode        & 0x001) << 12);
 
-    if( ( (aValue       & 0x1FF) == holdoffTime)     &&
+    if( ( (aValue       & 0x1FF) == holdOffTime)     &&
         (((aValue >> 9) & 0x007) == peakSensitivity) &&
         (((aValue >>12) & 0x001) == autoMode)) return YES;
     else {
@@ -2919,7 +2899,7 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
             
         case kSetDigitizerClkSrc:
             [[self undoManager] disableUndoRegistration];
-            //[self setClockSource:0];                                //set to external clock (gui only!!!)
+            [self setClockSource:0];                                //set to external clock (gui only!!!)
             [[self undoManager] enableUndoRegistration];
             [self writeFPGARegister:kVMEGPControl   withValue:0x00 ]; //set to external clock (in HW)
             [self setInitState:kFlushFifo];
@@ -3072,12 +3052,6 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
     [a addObject:p];
     
     p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"PreampResetDelay Enabled"];
-    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
-    [p setSetMethod:@selector(setPreampResetDelayEn:withValue:) getMethod:@selector(preampResetDelayEn:)];
-    [a addObject:p];
-    
-    p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Dropped Event Count Mode"];
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
     [p setSetMethod:@selector(setDroppedEventCountMode:withValue:) getMethod:@selector(droppedEventCountMode:)];
@@ -3140,6 +3114,12 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
     [p setCanBeRamped:YES];
     [a addObject:p];
     
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Clock Source"];
+    [p setFormat:@"##0" upperLimit:0x2 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setClockSource:) getMethod:@selector(clockSource)];
+    [p setActionMask:kAction_Set_Mask];
+    [a addObject:p];
 
     
     p = [[[ORHWWizParam alloc] init] autorelease];
@@ -3214,9 +3194,7 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
     BOOL doChannelEnable = [[userInfo objectForKey:@"doinit"]boolValue]==1;
     [self initBoard:doChannelEnable];
     if(!doChannelEnable) NSLog(@" %@ Quick Start Enabled. Channels NOT disabled/enabled.\n",[self fullID]);
-    
-    //[self readMasterLogic];
-    
+        
     if([self diagnosticsEnabled])[self briefDiagnosticsReport];
     
     [self performSelector:@selector(checkFifoAlarm) withObject:nil afterDelay:1];
@@ -3402,7 +3380,8 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
     [self setDacAttenuation:            [decoder decodeIntForKey:   @"dacAttenuation"]];
     [self setChannelPulsedControl:      [decoder decodeInt32ForKey: @"channelPulsedControl"]];
     [self setDiagMuxControl:            [decoder decodeInt32ForKey: @"diagMuxControl"]];
-    [self setHoldoffTime:               [decoder decodeIntForKey:   @"holdoffTime"]];
+    [self setHoldOffTime:               [decoder decodeIntForKey:   @"holdOffTime"]];
+    [self setDownSampleHoldOffTime:     [decoder decodeIntForKey:   @"downSampleHoldOffTime"]];
     [self setPeakSensitivity:           [decoder decodeIntForKey:   @"peakSensitivity"]];
     [self setAutoMode:                  [decoder decodeBoolForKey:  @"autoMode"]];
     [self setTrackingSpeed:             [decoder decodeIntForKey:   @"trackingSpeed"]];
@@ -3421,20 +3400,19 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
     [self setAuxIoConfig:               [decoder decodeInt32ForKey: @"auxIoConfig"]];
     [self setRawDataLength:             [decoder decodeIntForKey:   @"rawDataLength"]];
     [self setRawDataWindow:             [decoder decodeIntForKey:   @"rawDataWindow"]];
-    
+    [self setClockSource:               [decoder decodeIntForKey:   @"clockSource"]];
+
     int i;
     for(i=0;i<kNumGretina4AChannels;i++){
         [self setForceFullInit:i           withValue: [decoder decodeIntForKey:   [@"forceFullInit"          stringByAppendingFormat:@"%d",i]]];
         [self setPileupWaveformOnlyMode:i  withValue: [decoder decodeBoolForKey:  [@"pileupWaveformOnlyMode" stringByAppendingFormat:@"%d",i]]];
         [self setPileupExtensionMode:i     withValue: [decoder decodeBoolForKey:  [@"pileExtensionMode"      stringByAppendingFormat:@"%d",i]]];
-        [self setEventExtensionMode:i      withValue: [decoder decodeIntForKey:   [@"eventExtensionMode"     stringByAppendingFormat:@"%d",i]]];
         [self setAHitCountMode:i           withValue: [decoder decodeBoolForKey:  [@"aHitCountMode"          stringByAppendingFormat:@"%d",i]]];
         [self setDiscCountMode:i           withValue: [decoder decodeBoolForKey:  [@"discCountMode"          stringByAppendingFormat:@"%d",i]]];
         [self setEventCountMode:i          withValue: [decoder decodeBoolForKey:  [@"eventCountMode"         stringByAppendingFormat:@"%d",i]]];
         [self setDroppedEventCountMode:i   withValue: [decoder decodeBoolForKey:  [@"droppedEventCountMode"  stringByAppendingFormat:@"%d",i]]];
         [self setDecimationFactor:i        withValue: [decoder decodeIntForKey:   [@"decimationFactor"       stringByAppendingFormat:@"%d",i]]];
         [self setTriggerPolarity:i         withValue: [decoder decodeInt32ForKey: [@"triggerPolarity"        stringByAppendingFormat:@"%d",i]]];
-        [self setPreampResetDelayEn:i      withValue: [decoder decodeBoolForKey:  [@"preampResetDelayEn"     stringByAppendingFormat:@"%d",i]]];
         [self setPileupMode:i              withValue: [decoder decodeBoolForKey:  [@"pileupMode"             stringByAppendingFormat:@"%d",i]]];
         [self setEnabled:i                 withValue: [decoder decodeBoolForKey:  [@"enabled"                stringByAppendingFormat:@"%d",i]]];
         [self setDWindow:i                 withValue: [decoder decodeIntForKey:   [@"dWindow"                stringByAppendingFormat:@"%d",i]]];
@@ -3445,7 +3423,6 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
         [self setBaselineStart:i           withValue: [decoder decodeIntForKey:   [@"baselineStart"          stringByAppendingFormat:@"%d",i]]];
         [self setP1Window:i                withValue: [decoder decodeIntForKey:   [@"p1Window"               stringByAppendingFormat:@"%d",i]]];
         [self setLedThreshold:i            withValue: [decoder decodeIntForKey:   [@"ledThreshold"           stringByAppendingFormat:@"%d",i]]];
-        [self setPreampResetDelay:i        withValue: [decoder decodeIntForKey:   [@"preampResetDelay"       stringByAppendingFormat:@"%d",i]]];
         [self setOverflowFlagChan:i        withValue: [decoder decodeBoolForKey:  [@"overflowFlagChan"       stringByAppendingFormat:@"%d",i]]];
     }
     
@@ -3493,7 +3470,8 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
     [encoder encodeInt:dacAttenuation               forKey:@"dacAttenuation"];
     [encoder encodeInt32:channelPulsedControl       forKey:@"channelPulsedControl"];
     [encoder encodeInt32:diagMuxControl             forKey:@"diagMuxControl"];
-    [encoder encodeInt:holdoffTime                  forKey:@"holdoffTime"];
+    [encoder encodeInt:holdOffTime                  forKey:@"holdOffTime"];
+    [encoder encodeInt:downSampleHoldOffTime        forKey:@"downSampleHoldOffTime"];
     [encoder encodeInt:peakSensitivity              forKey:@"peakSensitivity"];
     [encoder encodeBool:autoMode                    forKey:@"autoMode"];
     [encoder encodeInt:trackingSpeed                forKey:@"trackingSpeed"];
@@ -3512,21 +3490,19 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
     [encoder encodeInt32:auxIoConfig                forKey:@"auxIoConfig"];
     [encoder encodeInt:rawDataLength                forKey:@"rawDataLength"];
     [encoder encodeInt:rawDataWindow                forKey:@"rawDataWindow"];
-    
+    [encoder encodeInt:clockSource                  forKey:@"clockSource"];
+
     int i;
     for(i=0;i<kNumGretina4AChannels;i++){
         [encoder encodeInt:forceFullInit[i]           forKey:[@"forceFullInit"         stringByAppendingFormat:@"%d",i]];
         [encoder encodeBool:enabled[i]                forKey:[@"enabled"               stringByAppendingFormat:@"%d",i]];
         [encoder encodeBool:pileupMode[i]             forKey:[@"pileupMode"            stringByAppendingFormat:@"%d",i]];
-        [encoder encodeBool:preampResetDelayEn[i]     forKey:[@"preampResetDelayEn"    stringByAppendingFormat:@"%d",i]];
-        [encoder encodeInt:preampResetDelay[i]        forKey:[@"preampResetDelay"      stringByAppendingFormat:@"%d",i]];
         [encoder encodeInt:triggerPolarity[i]         forKey:[@"triggerPolarity"       stringByAppendingFormat:@"%d",i]];
         [encoder encodeInt:decimationFactor[i]        forKey:[@"decimationFactor"      stringByAppendingFormat:@"%d",i]];
         [encoder encodeBool:droppedEventCountMode[i]  forKey:[@"droppedEventCountMode" stringByAppendingFormat:@"%d",i]];
         [encoder encodeBool:eventCountMode[i]         forKey:[@"eventCountMode"        stringByAppendingFormat:@"%d",i]];
         [encoder encodeBool:aHitCountMode[i]          forKey:[@"aHitCountMode"         stringByAppendingFormat:@"%d",i]];
         [encoder encodeBool:discCountMode[i]          forKey:[@"discCountMode"         stringByAppendingFormat:@"%d",i]];
-        [encoder encodeInt:eventExtensionMode[i]      forKey:[@"eventExtensionMode"    stringByAppendingFormat:@"%d",i]];
         [encoder encodeBool:pileupExtensionMode[i]    forKey:[@"pileExtensionMode"     stringByAppendingFormat:@"%d",i]];
         [encoder encodeBool:pileupWaveformOnlyMode[i] forKey:[@"pileupWaveformOnlyMode"stringByAppendingFormat:@"%d",i]];
         [encoder encodeInt:ledThreshold[i]            forKey:[@"ledThreshold"          stringByAppendingFormat:@"%d",i]];
@@ -3557,7 +3533,8 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
     [objDictionary setObject:[NSNumber numberWithInt:dacAttenuation]                forKey:@"dacAttenuation"];
     [objDictionary setObject:[NSNumber numberWithUnsignedLong:channelPulsedControl] forKey:@"channelPulsedControl"];
     [objDictionary setObject:[NSNumber numberWithUnsignedLong:diagMuxControl]       forKey:@"diagMuxControl"];
-    [objDictionary setObject:[NSNumber numberWithInt:holdoffTime]                   forKey:@"holdoffTime"];
+    [objDictionary setObject:[NSNumber numberWithInt:downSampleHoldOffTime]         forKey:@"downSampleHoldOffTime"];
+    [objDictionary setObject:[NSNumber numberWithInt:holdOffTime]                   forKey:@"holdOffTime"];
     [objDictionary setObject:[NSNumber numberWithInt:peakSensitivity]               forKey:@"peakSensitivity"];
     [objDictionary setObject:[NSNumber numberWithBool:autoMode]                     forKey:@"autoMode"];
     [objDictionary setObject:[NSNumber numberWithInt:trackingSpeed]                 forKey:@"trackingSpeed"];
@@ -3576,19 +3553,17 @@ NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGC
     [objDictionary setObject:[NSNumber numberWithUnsignedLong:auxIoConfig]          forKey:@"auxIoConfig"];
     [objDictionary setObject:[NSNumber numberWithInt:rawDataLength]                 forKey:@"rawDataLength"];
     [objDictionary setObject:[NSNumber numberWithInt:rawDataWindow]                 forKey:@"rawDataWindow"];
+    [objDictionary setObject:[NSNumber numberWithInt:clockSource]                   forKey:@"Clock Source"];
     
     [self addCurrentState:objDictionary boolArray:(BOOL*)forceFullInit              forKey:@"forceFullInit"];
     [self addCurrentState:objDictionary boolArray:(BOOL*)enabled                    forKey:@"enabled"];
     [self addCurrentState:objDictionary boolArray:(BOOL*)pileupMode                 forKey:@"pileupMode"];
-    [self addCurrentState:objDictionary shortArray:(short*)preampResetDelayEn       forKey:@"preampResetDelayEn"];
-    [self addCurrentState:objDictionary shortArray:(short*)preampResetDelay         forKey:@"preampResetDelay"];
     [self addCurrentState:objDictionary shortArray:(short*)triggerPolarity          forKey:@"pileupMode"];
     [self addCurrentState:objDictionary shortArray:(short*)decimationFactor         forKey:@"decimationFactor"];
     [self addCurrentState:objDictionary boolArray:(BOOL*)droppedEventCountMode      forKey:@"droppedEventCountMode"];
     [self addCurrentState:objDictionary boolArray:(BOOL*)eventCountMode             forKey:@"eventCountMode"];
     [self addCurrentState:objDictionary boolArray:(BOOL*)aHitCountMode              forKey:@"aHitCountMode"];
     [self addCurrentState:objDictionary boolArray:(BOOL*)discCountMode              forKey:@"discCountMode"];
-    [self addCurrentState:objDictionary shortArray:(short*)eventExtensionMode       forKey:@"eventExtensionMode"];
     [self addCurrentState:objDictionary boolArray:(BOOL*)pileupExtensionMode        forKey:@"pileExtensionMode"];
     [self addCurrentState:objDictionary boolArray:(BOOL*)pileupWaveformOnlyMode     forKey:@"pileupWaveformOnlyMode"];
     [self addCurrentState:objDictionary shortArray:(short*)ledThreshold             forKey:@"ledThreshold"];

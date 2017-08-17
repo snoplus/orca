@@ -48,7 +48,7 @@ enum {
     kChannelControl,        //0x0040	channel_control0
     kLedThreshold,          //0x0080	led_threshold0
     kCFDFraction,           //0x00C0	CFD_fraction0
-    kRawDataLength,         //0x0100	raw_data_length0
+    kRawDataLength,         //0x0100	raw_data_length0 (waveform offset)
     kRawDataWindow,         //0x0140	raw_data_window0
     kDWindow,               //0x0180	d_window0
     kKWindow,               //0x01C0	k_window0
@@ -68,6 +68,7 @@ enum {
     kExtDiscSel,            //0x0420	ext_desc_sel
     kRj45SpareDoutControl,	//0x0424	rj45_spare_dout_control
     kLedStatus,             //0x0428	led_status
+    kDownSampleHoldOffTime, //0x0434    downsample holdoff
     kLatTimestampLsb,       //0x0480	lat_timestamp_lsb
     kLatTimestampMsb,       //0x0488	lat_timestamp_msb
     kLiveTimestampLsb,      //0x048C	live_timestamp_lsb
@@ -149,17 +150,6 @@ enum {
 #define kSDLockBit      (0x1<<17)
 #define kSDLostLockBit  (0x1<<24)
 
-enum {
-    kSerDesIdle,
-    kSerDesSetup,
-    kSetDigitizerClkSrc,
-    kFlushFifo,
-    kReleaseClkManager,
-    kPowerUpRTPower,
-    kSetMasterLogic,
-    kSetSDSyncBit,
-    kSerDesError,
-};
 
 
 @interface ORGretina4ARegisters : NSObject
