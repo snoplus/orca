@@ -27,6 +27,7 @@
 #import "AutoTesting.h"
 #import "ORAdcInfoProviding.h"
 #import "SBC_Link.h"
+#import "ORGretinaTriggerProtocol.h"
 
 
 @class ORRateGroup;
@@ -75,17 +76,6 @@
 #define kSDLockBit      (0x1<<17)
 #define kSDLostLockBit  (0x1<<24)
 
-enum {
-    kSerDesIdle,
-    kSerDesSetup,
-    kSetDigitizerClkSrc,
-    kFlushFifo,
-    kReleaseClkManager,
-    kPowerUpRTPower,
-    kSetMasterLogic,
-    kSetSDSyncBit,
-    kSerDesError,
-};
 
 #pragma mark •••Register Definitions
 enum {
@@ -197,7 +187,7 @@ enum Gretina4MFIFOStates {
 #define kFtAdjust    4
 #define kHeaderSize  29
 
-@interface ORGretina4MModel : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping,AutoTesting,ORAdcInfoProviding>
+@interface ORGretina4MModel : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping,AutoTesting,ORAdcInfoProviding,ORGretinaTriggerProtocol>
 {
   @private
 	NSThread*		fpgaProgrammingThread;
