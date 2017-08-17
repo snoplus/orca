@@ -229,7 +229,7 @@
 
 #pragma mark •••Actions
 - (IBAction) forceFullInitCardAction:(id)sender;
-- (IBAction) clockSourceAction:(id)sender;              // is this repeated?
+- (IBAction) clockSourceAction:(id)sender;
 - (IBAction) clockPhaseAction:(id)sender;
 - (IBAction) diagnosticsClearAction:(id)sender;
 - (IBAction) diagnosticsReportAction:(id)sender;
@@ -241,7 +241,6 @@
 - (IBAction) extTrigLengthFieldAction:(id)sender;
 - (IBAction) pileUpWindowFieldAction:(id)sender;
 - (IBAction) externalWindowFieldAction:(id)sender;
-- (IBAction) clockSourceAction:(id)sender;              // is this repeated?
 - (IBAction) downSampleAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
 - (IBAction) probeBoard:(id)sender;
