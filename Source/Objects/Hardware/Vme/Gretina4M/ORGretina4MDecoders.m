@@ -111,7 +111,7 @@
             int integrateTime = [[self objectForNestedKey:crateKey,cardKey,kIntegrateTimeKey,nil] intValue];
             if(integrateTime) energy /= integrateTime; 
             
-            [aDataSet histogram:energy numBins:0x1fff sender:self  withKeys:@"Gretina4M", @"Energy",crateKey,cardKey,channelKey,nil];
+            [aDataSet histogram:energy numBins:0x1fff sender:self  withKeys:@"Gretina4 Energy",crateKey,cardKey,channelKey,nil];
             
             
             BOOL fullDecode = NO;
@@ -136,7 +136,7 @@
                 [decoderOptions setObject:[NSNumber numberWithUnsignedLongLong:now] forKey:lastTimeKey];
             }
             BOOL someoneWatching = NO;
-            if([aDataSet isSomeoneLooking:[NSString stringWithFormat:@"Gretina4M,Waveforms,%d,%d,%d",crate,card,channel]]){
+            if([aDataSet isSomeoneLooking:[NSString stringWithFormat:@"Gretina4,Waveforms,%d,%d,%d",crate,card,channel]]){
                 someoneWatching = YES;
             }
             
@@ -163,7 +163,7 @@
                             offset:0 //bytes!
                           unitSize:2 //unit size in bytes!
                             sender:self
-                          withKeys:@"Gretina4M", @"Waveforms",crateKey,cardKey,channelKey,nil];
+                          withKeys:@"Gretina4 Waveforms",crateKey,cardKey,channelKey,nil];
   
             //get the actual object
             NSString* aKey = [crateKey stringByAppendingString:cardKey];
