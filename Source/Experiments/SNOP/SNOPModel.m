@@ -616,6 +616,12 @@ tellieRunFiles = _tellieRunFiles;
             goto err;
         }
 
+        /* Load the TUBii settings to hardware. */
+        if ([tubii sendCurrentModelStateToHW]) {
+            NSLogColor([NSColor redColor], @"error initializing TUBii.\n");
+            goto err;
+        }
+
         /* Load the XL3 hardware. */
         objs = [[(ORAppDelegate*)[NSApp delegate] document]
              collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
@@ -663,7 +669,7 @@ tellieRunFiles = _tellieRunFiles;
             NSLogColor([NSColor redColor], @"error initializing TUBii.\n");
             goto err;
         }
-            
+
         /* Load the MTC hardware. */
         if ([mtc initAtRunStart:0]) {
             NSLogColor([NSColor redColor], @"error initializing MTC.\n");
