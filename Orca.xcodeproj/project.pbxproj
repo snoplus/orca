@@ -4076,7 +4076,7 @@
 		43ADFE3D10B6DAF90044617C /* readout_code.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = readout_code.cc; path = Source/Objects/Hardware/SBC/SBC_Code/readout_code.cc; sourceTree = SOURCE_ROOT; };
 		43ADFE3E10B6DAF90044617C /* ORVCard.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ORVCard.cc; path = Source/Objects/Hardware/SBC/SBC_Code/ORVCard.cc; sourceTree = SOURCE_ROOT; };
 		43ADFE4310B6DB060044617C /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = Source/Objects/Hardware/SBC/SBC_Code/Makefile; sourceTree = SOURCE_ROOT; };
-		43ADFE5610B6DBCF0044617C /* HW_Specific.icc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = HW_Specific.icc; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/HW_Specific.icc; sourceTree = SOURCE_ROOT; };
+		43ADFE5610B6DBCF0044617C /* HW_Specific.icc */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = HW_Specific.icc; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/HW_Specific.icc; sourceTree = SOURCE_ROOT; };
 		43ADFE5710B6DBCF0044617C /* HWMakefile.mk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = HWMakefile.mk; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/HWMakefile.mk; sourceTree = SOURCE_ROOT; };
 		43ADFE5810B6DBCF0044617C /* ORCAEN419Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ORCAEN419Readout.cc; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN419Readout.cc; sourceTree = SOURCE_ROOT; };
 		43ADFE5910B6DBCF0044617C /* ORCAEN419Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORCAEN419Readout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN419Readout.hh; sourceTree = SOURCE_ROOT; };
@@ -6207,6 +6207,7 @@
 		84B51979191D285A003A580B /* ORBurstMonitorController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORBurstMonitorController.m; sourceTree = "<group>"; };
 		84B5197A191D285A003A580B /* ORBurstMonitorModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORBurstMonitorModel.h; sourceTree = "<group>"; };
 		84B5197B191D285A003A580B /* ORBurstMonitorModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORBurstMonitorModel.m; sourceTree = "<group>"; };
+		84B59B361F45C13200B46C9E /* ORGretinaTriggerProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ORGretinaTriggerProtocol.h; sourceTree = "<group>"; };
 		84B60907043134E8005F64B1 /* OReCPU147Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OReCPU147Model.h; sourceTree = "<group>"; };
 		84B60908043134E8005F64B1 /* OReCPU147Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OReCPU147Model.m; sourceTree = "<group>"; };
 		84B6090B04313907005F64B1 /* OReCPU147Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OReCPU147Controller.h; path = Source/Objects/Hardware/Vme/eCPU/eCPU147/OReCPU147Controller.h; sourceTree = SOURCE_ROOT; };
@@ -7986,6 +7987,7 @@
 				43135801195C5D89007B1F15 /* ORGretinaTriggerModel.m */,
 				4338654319AB6D330052796C /* ORGretinatriggerDecoder.h */,
 				4338654419AB6D330052796C /* ORGretinaTriggerDecoder.m */,
+				84B59B361F45C13200B46C9E /* ORGretinaTriggerProtocol.h */,
 			);
 			path = GretinaTrigger;
 			sourceTree = "<group>";
