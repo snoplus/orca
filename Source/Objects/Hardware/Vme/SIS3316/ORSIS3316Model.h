@@ -445,8 +445,8 @@ enum{
 - (long)cfdControlBits:(unsigned short)aChan;
 - (void) setCfdControlBits:(unsigned short)aChan withValue:(long)aValue;
 
-//- (long)clockSource:(unsigned short)aChan;
-- (void) setClockSource:(unsigned short)aChan withValue:(long)aValue;
+- (long)clockSource;
+- (void) setClockSource:(long)aValue;
 
 - (long)extraFilterBits:(unsigned short)aChan;
 - (void) setExtraFilterBits:(unsigned short)aChan withValue:(long)aValue;
@@ -583,13 +583,13 @@ enum{
 //-=**- (void) setClockSource:(int)aClockSource;
 
 //event configuration
-- (BOOL) gateChaining;
-- (void) setGateChaining:(BOOL)aState;
+//- (BOOL) gateChaining;
+//- (void) setGateChaining:(BOOL)aState;
 
 
 - (BOOL) stopTrigger;
 - (void) setStopTrigger:(BOOL)aStopTrigger;
-- (int) stopDelay;
+//- (int) stopDelay;
 //- (void) setStopDelay:(int)aStopDelay;
 //- (int) startDelay;
 //- (void) setStartDelay:(int)aStartDelay;

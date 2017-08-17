@@ -414,6 +414,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     [[self undoManager] disableUndoRegistration];
     [self setAddressModifier:0x09];
     [self setBaseAddress:0x01000000];
+    [self setDefaults];
     [[self undoManager] enableUndoRegistration];
     return self;
 }
@@ -492,7 +493,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
         [self setHeTrigThresholdSum:i withValue:0xFFFFFFFF];
     }
     
-	[self setEnableInternalRouting:YES];
+//	[self setEnableInternalRouting:YES];
 	[self setPageSize:1];
     
 	//[self setStopDelay:15000];
@@ -1037,12 +1038,12 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 
 //6.17 ADC Sample Clock distribution control register (0x50)
 
-- (int) clockSource
+- (long) clockSource
 {
     return clockSource;
 }
 
-- (void) setClockSource:(int)aClockSource
+- (void) setClockSource:(long)aClockSource
 {
     if(aClockSource<0)aClockSource = 0;
     if(aClockSource>0x3)aClockSource = 0x3;
@@ -3447,7 +3448,7 @@ NSString* tauTable[4] ={
     [self writeRawDataBufferConfig];
     [self writeDataFormat];
     [self writeAccumulatorGates];
-    [self writeEndThresholds];
+//    [self writeEndThresholds];
     [self writeAcquisitionRegister];
     [self writeFirTriggerSetup];
     [self writeHeTrigThresholds];
