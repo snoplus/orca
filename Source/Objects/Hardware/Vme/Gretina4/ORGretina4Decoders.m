@@ -99,7 +99,7 @@
 	int integrationTime = [[self objectForNestedKey:crateKey,cardKey,kIntegrationTimeKey,nil] intValue];
 	if(integrationTime) energy /= integrationTime; 
 	
-    [aDataSet histogram:energy numBins:0x1fff*histEMultiplier sender:self  withKeys:@"Gretina4", @"Energy",crateKey,cardKey,channelKey,nil];
+    [aDataSet histogram:energy numBins:0x1fff*histEMultiplier sender:self  withKeys:@"Gretina4 Energy",crateKey,cardKey,channelKey,nil];
 	
 	
 	if (packetLength > 0) {
@@ -124,7 +124,7 @@
 						offset:0 //bytes!
 					  unitSize:2 //unit size in bytes!
 						sender:self  
-					  withKeys:@"Gretina4", @"Waveforms",crateKey,cardKey,channelKey,nil];
+					  withKeys:@"Gretina4 Waveforms",crateKey,cardKey,channelKey,nil];
 	}
 	if(getRatesFromDecodeStage && !skipRateCounts){
 		//get the actual object
