@@ -24,9 +24,11 @@
 #import "ORVmeCrateModel.h"
 #import "ORFileMoverOp.h"
 #import "MJDCmds.h"
-#import "ORGretina4MModel.h"
 #import "ORRunModel.h"
 #import "ORAlarm.h"
+#import "ORGretinaTriggerProtocol.h"
+#import "ORDataPacket.h"
+
 
 NSString* ORGretinaTriggerModelNumTimesToRetryChanged   = @"ORGretinaTriggerModelNumTimesToRetryChanged";
 NSString* ORGretinaTriggerModelDoNotLockChanged         = @"ORGretinaTriggerModelDoNotLockChanged";
@@ -612,7 +614,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     if(!doNotLock){
         if([self isMaster]){
             @try {
-                [self readRegister:kBoardID];
+                [self readRegister:kLEDRegister]; //throws if can't reach board
                // [self pulseNIMOutput];
                 if(![(ORRunModel*)[aNote object] quickStart] || doLockRecoveryInQuckStart){
                     [self initClockDistribution];
@@ -1054,7 +1056,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
         if(!initializationRunning && isMaster){
             [self setupStateArray];
             //a check to make sure we can reach the card
-            [self readRegister:kBoardID];
+            [self readRegister:kLEDRegister]; //throws if can't reach board
             [self addRunWaitWithReason:@"Wait for Trigger Card Clock Distribution Init"];
             [self setInitState:kMasterSetup];
             connectedRouterMask = 0;
@@ -1123,7 +1125,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     else {
         for(i=0;i<8;i++){
             if([linkConnector[i]  identifer] != 'L'){
-                ORGretina4MModel* digitizerObj   = [[linkConnector[i] connector] objectLink];
+                id<ORGretinaTriggerProtocol> digitizerObj   = [[linkConnector[i] connector] objectLink];
                 if(digitizerObj){
                     [[self undoManager] disableUndoRegistration];
                     [digitizerObj setClockSource:1];
@@ -1179,7 +1181,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
         digitizerLockCount  = 0;
         for(i=0;i<8;i++){
             if([linkConnector[i]  identifer] != 'L'){
-                ORGretina4MModel* digitizerObj   = [[linkConnector[i] connector] objectLink];
+                id<ORGretinaTriggerProtocol> digitizerObj   = [[linkConnector[i] connector] objectLink];
                 if(digitizerObj){
                     digitizerCount++;
                     BOOL localLocked = [digitizerObj isLocked];
@@ -1207,7 +1209,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
         for(i=0;i<8;i++){
             if([linkConnector[i]  identifer] != 'L'){
                 ORConnector* otherConnector = [linkConnector[i] connector];
-                ORGretina4MModel* digitizerObj = [otherConnector objectLink];
+                id<ORGretinaTriggerProtocol> digitizerObj = [otherConnector objectLink];
                 if(digitizerObj){
                     if(verbose)NSLog(@"Flush Fifo on %@\n",[digitizerObj fullID]);
                     [digitizerObj resetSingleFIFO];
@@ -1242,7 +1244,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
         int i;
         for(i=0;i<8;i++){
             if([linkConnector[i]  identifer] != 'L'){
-                ORGretina4MModel* digitizerObj   = [[linkConnector[i] connector] objectLink];
+                id<ORGretinaTriggerProtocol> digitizerObj   = [[linkConnector[i] connector] objectLink];
                 if(digitizerObj){
                     if(![digitizerObj isLocked]){
                         NSLogColor([NSColor redColor],@"%@: NOT Locked.\n",[digitizerObj fullID]);
@@ -1686,7 +1688,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             for(i=0;i<8;i++){
                 if([linkConnector[i]  identifer] != 'L'){
                     ORConnector* otherConnector = [linkConnector[i] connector];
-                    ORGretina4MModel* digitizerObj = [otherConnector objectLink];
+                    id<ORGretinaTriggerProtocol> digitizerObj = [otherConnector objectLink];
                     if(digitizerObj){
                         if(verbose)NSLog(@"Init Gretina SerDes VMEGP Reg %@\n",[digitizerObj fullID]);
                         [digitizerObj setInitState:kSerDesSetup];
@@ -1775,7 +1777,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             for(i=0;i<8;i++){
                 if([linkConnector[i]  identifer] != 'L'){
                     ORConnector* otherConnector = [linkConnector[i] connector];
-                    ORGretina4MModel* digitizerObj = [otherConnector objectLink];
+                    id<ORGretinaTriggerProtocol> digitizerObj = [otherConnector objectLink];
                     if(digitizerObj){
                         if(verbose)NSLog(@"Set up Gretina SerDes %@\n",[digitizerObj fullID]);
                         [digitizerObj setInitState:kSetDigitizerClkSrc];
@@ -1814,7 +1816,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     for(i=0;i<8;i++){
         if([linkConnector[i]  identifer] != 'L'){
             ORConnector* otherConnector = [linkConnector[i] connector];
-            ORGretina4MModel* digitizerObj = [otherConnector objectLink];
+            id<ORGretinaTriggerProtocol> digitizerObj = [otherConnector objectLink];
             if(digitizerObj){
                 if([digitizerObj initState] != kSerDesIdle)return NO;
             }
@@ -1851,7 +1853,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     NSLog(@"--------------------------------------\n");
     NSLog(@"Gretina Trigger Card FPGA registers (%@)\n",[self isMaster]?@"Master":@"Router");
     int i;
-    for(i=0;i<kNumberOfFPGARegisters;i++){
+    for(i=0;i<kTriggerNumberOfFPGARegisters;i++){
         unsigned short theValue;
         [[self adapter] readWordBlock:&theValue
                             atAddress:[self baseAddress] + fpga_register_information[i].offset
