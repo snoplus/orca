@@ -111,7 +111,7 @@
             int integrateTime = [[self objectForNestedKey:crateKey,cardKey,kIntegrateTimeKey,nil] intValue];
             if(integrateTime) energy /= integrateTime; 
             
-            [aDataSet histogram:energy numBins:0x1fff sender:self  withKeys:@"Gretina4 Energy",crateKey,cardKey,channelKey,nil];
+            [aDataSet histogram:energy numBins:0x1fff sender:self  withKeys:@"Gretina4",@"Energy",crateKey,cardKey,channelKey,nil];
             
             
             BOOL fullDecode = NO;
@@ -141,7 +141,7 @@
             }
             
             NSMutableData* tmpData = nil;
-            if(fullDecode && someoneWatching){
+            if(lastTime==0 || (fullDecode && someoneWatching)){
             
                 dataPtr += 11; //point to the data
 
@@ -163,7 +163,7 @@
                             offset:0 //bytes!
                           unitSize:2 //unit size in bytes!
                             sender:self
-                          withKeys:@"Gretina4 Waveforms",crateKey,cardKey,channelKey,nil];
+                          withKeys:@"Gretina4",@"Waveforms",crateKey,cardKey,channelKey,nil];
   
             //get the actual object
             NSString* aKey = [crateKey stringByAppendingString:cardKey];
