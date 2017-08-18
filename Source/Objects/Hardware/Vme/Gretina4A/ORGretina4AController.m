@@ -1381,10 +1381,10 @@
     [model setVetoGateWidth:[sender intValue]];
 }
 
-- (IBAction) loadDelaysAction:(id)sender;
+- (IBAction) loadThresholdsAction:(id)sender;
 {
     [self endEditing];
-    [model loadDelays];
+    [model writeThresholds];
 }
 
 - (IBAction) diagnosticsClearAction:(id)sender

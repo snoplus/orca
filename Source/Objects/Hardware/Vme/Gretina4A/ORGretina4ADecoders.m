@@ -48,7 +48,6 @@
 		[self cacheCardLevelObject:kIntegrateTimeKey fromHeader:[aDecoder fileHeader]];
 		[self cacheCardLevelObject:kHistEMultiplierKey fromHeader:[aDecoder fileHeader]];
 	}
-	
     unsigned long* ptr = (unsigned long*)someData;
 	unsigned long length = ExtractLength(ptr[0]);
     //point to ORCA location info
@@ -57,86 +56,80 @@
     NSString* crateKey	= [self getCrateKey: crate];
     NSString* cardKey	= [self getCardKey: card];
     ptr = &ptr[2]; //move the pointer up to the data header
-    unsigned long amountProcessed = 2;
-    do {
-        if(ptr[0] == 0xAAAAAAAA){
-            int             channel         = ptr[1] & 0xF;
-            int             packetLength    = (ptr[1] >> 16) & 0x7ff;
-            NSString*       channelKey      = [self getChannelKey: channel];
-            int             headerLength    = (ptr[3] >> 26) & 0x3f;
-            int             dataLength      = (packetLength - headerLength)/2;
-            unsigned long   sumWord1        = ptr[8];
-            unsigned long   sumWord2        = ptr[9];
-            unsigned long   scaleFactor     = 0xfff;
-            unsigned long   postRiseSum     = ((sumWord2 & 0xFFFF)<< 8) | ((sumWord1 >> 24) & 0xff);
-            unsigned long   preRiseSum      = sumWord1 & 0xFFFFFF;
-            long            energy          = (postRiseSum - preRiseSum)/scaleFactor;
-            if(energy >= 0){
-                [aDataSet histogram:energy numBins:0xFFFFFF/scaleFactor  sender:self  withKeys:@"Gretina4 Energy",crateKey,cardKey,channelKey,nil];
-            }
-        
-            BOOL fullDecode = NO;
-            
-            struct timeval tv;
-            gettimeofday(&tv, NULL);
-            
-            unsigned long long now =
-            (unsigned long long)(tv.tv_sec) * 1000 +
-            (unsigned long long)(tv.tv_usec) / 1000;
-            
-            if(!decoderOptions){
-                decoderOptions = [[NSMutableDictionary dictionary]retain];
-            }
-            
-            NSString* lastTimeKey = [NSString stringWithFormat:@"%@,%@,%@,LastTime",crateKey,cardKey,channelKey];
-            
-            unsigned long long lastTime = [[decoderOptions objectForKey:lastTimeKey] unsignedLongLongValue];
-            
-            if(now - lastTime >= 100){
-                fullDecode = YES;
-                [decoderOptions setObject:[NSNumber numberWithUnsignedLongLong:now] forKey:lastTimeKey];
-            }
-            BOOL someoneWatching = NO;
-            if([aDataSet isSomeoneLooking:[NSString stringWithFormat:@"Gretina4Waveforms,%d,%d,%d",crate,card,channel]]){
-                someoneWatching = YES;
-            }
-            NSMutableData* waveformData = nil;
-            if(fullDecode && someoneWatching){
-                waveformData = [NSMutableData dataWithBytes:&ptr[0] length:(length-4)*sizeof(long)];
-            }
-            [aDataSet loadWaveform: waveformData     //pass in the whole data set
-                            offset: headerLength*2   // Offset in bytes (past header words)
-                          unitSize: sizeof(short)    // unit size in bytes
-                        startIndex:	0                // first Point Index
-                       scaleOffset: koffset          // offset the value by this
-                              mask:	0x3FFF           // display mask for all values
-                       specialBits: 0xC000
-                          bitNames: [NSArray arrayWithObjects:@"M",@"O",nil]
-                            sender: self 
-                          withKeys: @"Gretina4 Waveforms",crateKey,cardKey,channelKey,nil];
+    if(ptr[0] == 0xAAAAAAAA){
+        int             channel         = ptr[1] & 0xF;
+        NSString*       channelKey      = [self getChannelKey: channel];
+        int             headerLength    = (ptr[3] >> 26) & 0x3f;
+//      int             packetLength    = (ptr[1] >> 16) & 0x7ff;
+//      int             dataLength      = (packetLength - headerLength)/2;
+        unsigned long   sumWord1        = ptr[8];
+        unsigned long   sumWord2        = ptr[9];
+        unsigned long   scaleFactor     = 0xfff;
+        unsigned long   postRiseSum     = ((sumWord2 & 0xFFFF)<< 8) | ((sumWord1 >> 24) & 0xff);
+        unsigned long   preRiseSum      = sumWord1 & 0xFFFFFF;
+        long            energy          = (postRiseSum - preRiseSum)/scaleFactor;
+        if(energy >= 0){
+            [aDataSet histogram:energy numBins:0xFFFFFF/scaleFactor  sender:self  withKeys:@"Gretina4",@"Energy",crateKey,cardKey,channelKey,nil];
+        }
     
-            //get the actual object
-            NSString* aKey = [crateKey stringByAppendingString:cardKey];
-            if(!actualGretinaCards)actualGretinaCards = [[NSMutableDictionary alloc] init];
-            ORGretina4AModel* obj = [actualGretinaCards objectForKey:aKey];
-            if(!obj){
-                NSArray* listOfCards = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORGretina4AModel")];
-                for(ORGretina4AModel* aCard in listOfCards){
-                    if([aCard slot] == card){
-                        [actualGretinaCards setObject:aCard forKey:aKey];
-                        obj = aCard;
-                        break;
-                    }
+        struct timeval tv;
+        gettimeofday(&tv, NULL);
+        
+        unsigned long long now =
+                (unsigned long long)(tv.tv_sec) * 1000 +
+                (unsigned long long)(tv.tv_usec) / 1000;
+        
+        if(!decoderOptions){
+            decoderOptions = [[NSMutableDictionary dictionary]retain];
+        }
+        
+        NSString* lastTimeKey = [NSString stringWithFormat:@"%@,%@,%@,LastTime",crateKey,cardKey,channelKey];
+        
+        unsigned long long lastTime = [[decoderOptions objectForKey:lastTimeKey] unsignedLongLongValue];
+        
+        BOOL fullDecode = NO;
+        if(now - lastTime >= 100){
+            fullDecode = YES;
+            [decoderOptions setObject:[NSNumber numberWithUnsignedLongLong:now] forKey:lastTimeKey];
+        }
+        
+        BOOL someoneWatching = NO;
+        if([aDataSet isSomeoneLooking:[NSString stringWithFormat:@"Gretina4,Waveforms,%d,%d,%d",crate,card,channel]]){
+            someoneWatching = YES;
+        }
+        
+        NSMutableData* waveformData = nil;
+        if(lastTime==0 || (fullDecode && someoneWatching)){
+            waveformData = [NSMutableData dataWithBytes:&ptr[0] length:(length-4)*sizeof(long)];
+        }
+        
+        [aDataSet loadWaveform: waveformData     //pass in the whole data set, if nil it will be counted only
+                        offset: headerLength*2   // Offset in bytes (past header words)
+                      unitSize: sizeof(short)    // unit size in bytes
+                    startIndex:	0                // first Point Index
+                   scaleOffset: koffset          // offset the value by this
+                          mask:	0x3FFF           // display mask for all values
+                   specialBits: 0xC000
+                      bitNames: [NSArray arrayWithObjects:@"M",@"O",nil]
+                        sender: self 
+                      withKeys: @"Gretina4",@"Waveforms",crateKey,cardKey,channelKey,nil];
+
+        //get the actual object
+        NSString* aKey = [crateKey stringByAppendingString:cardKey];
+        if(!actualGretinaCards)actualGretinaCards = [[NSMutableDictionary alloc] init];
+        ORGretina4AModel* obj = [actualGretinaCards objectForKey:aKey];
+        if(!obj){
+            NSArray* listOfCards = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORGretina4AModel")];
+            for(ORGretina4AModel* aCard in listOfCards){
+                if([aCard slot] == card){
+                    [actualGretinaCards setObject:aCard forKey:aKey];
+                    obj = aCard;
+                    break;
                 }
             }
-            [obj bumpRateFromDecodeStage:channel];
-            ptr = &ptr[dataLength];
-
-            amountProcessed += packetLength; //packetLength is # of shorts
         }
-        else break;
-        
-    }while (amountProcessed < length);
+        [obj bumpRateFromDecodeStage:channel];
+    }
 	 
     return length; //must return number of longs
 }

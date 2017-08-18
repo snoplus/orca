@@ -110,16 +110,16 @@
                         <tabViewItems>
                             <tabViewItem label="Basic Ops" identifier="" id="1337">
                                 <view key="view" id="1339">
-                                    <rect key="frame" x="10" y="29" width="1346" height="464"/>
+                                    <rect key="frame" x="10" y="25" width="1346" height="468"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <imageView id="1307">
-                                            <rect key="frame" x="6" y="395" width="21" height="70"/>
+                                            <rect key="frame" x="6" y="399" width="21" height="70"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Gretina4Card" id="2283"/>
                                         </imageView>
                                         <box misplaced="YES" title="Channel Parameters" id="1703">
-                                            <rect key="frame" x="3" y="113" width="946" height="274"/>
+                                            <rect key="frame" x="3" y="117" width="946" height="274"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <view key="contentView" id="3oH-mn-VzN">
                                                 <rect key="frame" x="2" y="2" width="942" height="258"/>
@@ -2026,7 +2026,7 @@
                                             <font key="titleFont" metaFont="label"/>
                                         </box>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="1710">
-                                            <rect key="frame" x="4" y="102" width="388" height="14"/>
+                                            <rect key="frame" x="4" y="106" width="388" height="14"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="PU = Pileup Mode     PUW = Pileup Waveform Only PUE = Pileup Ext " id="2319">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -2035,7 +2035,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="ZnJ-tw-JhJ">
-                                            <rect key="frame" x="4" y="86" width="478" height="14"/>
+                                            <rect key="frame" x="4" y="90" width="478" height="14"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="DE = Dropped Event Mode EC = Event Cnt Mode AH = aHit Mode DC = Discr Count Mode     " id="B4u-8K-Wj9">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -2044,7 +2044,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Waveform Length and Trigger" id="aGB-P6-jSN">
-                                            <rect key="frame" x="448" y="375" width="236" height="86"/>
+                                            <rect key="frame" x="448" y="379" width="236" height="86"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="li0-MR-EdE">
                                                 <rect key="frame" x="1" y="1" width="234" height="70"/>
@@ -2133,7 +2133,7 @@
                                             </view>
                                         </box>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="bmt-iu-qn6">
-                                            <rect key="frame" x="315" y="444" width="38" height="19"/>
+                                            <rect key="frame" x="315" y="448" width="38" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="5" drawsBackground="YES" id="cOf-X3-BEd">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -2145,7 +2145,7 @@
                                             </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="dkh-k5-MHh">
-                                            <rect key="frame" x="211" y="444" width="101" height="16"/>
+                                            <rect key="frame" x="211" y="448" width="101" height="16"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Peak Sensitivity" id="gaV-gp-2Bu">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -2154,7 +2154,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="6GA-Xd-ylH">
-                                            <rect key="frame" x="165" y="444" width="46" height="19"/>
+                                            <rect key="frame" x="165" y="448" width="46" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="5" drawsBackground="YES" id="1v3-8U-xIp">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -2166,7 +2166,7 @@
                                             </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="10r-b3-K9x">
-                                            <rect key="frame" x="40" y="444" width="120" height="16"/>
+                                            <rect key="frame" x="40" y="448" width="120" height="16"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Window Comp Min" id="FhS-ng-xeh">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -2175,7 +2175,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="Djw-HY-Fp5">
-                                            <rect key="frame" x="165" y="418" width="46" height="19"/>
+                                            <rect key="frame" x="165" y="422" width="46" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="32000" drawsBackground="YES" id="qQf-zp-iQw">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -2187,7 +2187,7 @@
                                             </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="5la-gQ-0BB">
-                                            <rect key="frame" x="40" y="417" width="120" height="16"/>
+                                            <rect key="frame" x="40" y="421" width="120" height="16"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Window Comp Max" id="Bwm-JA-yZb">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -2196,7 +2196,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="YHN-s4-smG">
-                                            <rect key="frame" x="33" y="392" width="127" height="16"/>
+                                            <rect key="frame" x="33" y="396" width="127" height="16"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Down Sample Holdoff" id="KQf-Sl-GH8">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -2205,7 +2205,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="ccd-4N-hIh">
-                                            <rect key="frame" x="315" y="418" width="38" height="19"/>
+                                            <rect key="frame" x="315" y="422" width="38" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="5" drawsBackground="YES" id="PPe-3v-zrd">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -2217,7 +2217,7 @@
                                             </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="Dft-Xe-A59">
-                                            <rect key="frame" x="211" y="417" width="101" height="16"/>
+                                            <rect key="frame" x="211" y="421" width="101" height="16"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Holdoff Time " id="mO0-Oy-5Td">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -2226,7 +2226,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="BNP-Hx-nQ5">
-                                            <rect key="frame" x="315" y="392" width="38" height="19"/>
+                                            <rect key="frame" x="315" y="396" width="38" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="5" drawsBackground="YES" id="VjO-c8-VHM">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -2238,7 +2238,7 @@
                                             </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="djg-I4-hVt">
-                                            <rect key="frame" x="211" y="392" width="101" height="16"/>
+                                            <rect key="frame" x="211" y="396" width="101" height="16"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Veto Gate Width:" id="RG0-Dr-xQD">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -2247,7 +2247,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="3wb-3N-Q0B">
-                                            <rect key="frame" x="355" y="391" width="37" height="19"/>
+                                            <rect key="frame" x="355" y="395" width="37" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="µS" id="I8E-zT-drV">
                                                 <font key="font" size="11" name=".SFNSText"/>
@@ -2256,7 +2256,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Inter-Detector Delay (P2)" id="IQe-Fm-GPD">
-                                            <rect key="frame" x="686" y="413" width="146" height="47"/>
+                                            <rect key="frame" x="686" y="417" width="146" height="47"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="cqS-B7-sUW">
                                                 <rect key="frame" x="1" y="1" width="144" height="31"/>
@@ -2287,7 +2287,7 @@
                                             </view>
                                         </box>
                                         <box misplaced="YES" boxType="secondary" borderType="bezel" title="Board Ops" titlePosition="noTitle" id="1214">
-                                            <rect key="frame" x="51" y="46" width="898" height="33"/>
+                                            <rect key="frame" x="51" y="50" width="898" height="33"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <view key="contentView" id="BGk-Db-GRC">
                                                 <rect key="frame" x="3" y="3" width="892" height="27"/>
@@ -2327,18 +2327,18 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" misplaced="YES" id="LVD-17-uEM">
-                                                        <rect key="frame" x="296" y="-1" width="90" height="28"/>
+                                                        <rect key="frame" x="294" y="-1" width="114" height="28"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="push" title="Load Delays" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Wc7-ZB-yYW">
+                                                        <buttonCell key="cell" type="push" title="Load Thresholds" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Wc7-ZB-yYW">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
                                                         <connections>
-                                                            <action selector="loadDelaysAction:" target="-2" id="ZE4-1b-Akw"/>
+                                                            <action selector="loadThresholdsAction:" target="-2" id="ERv-vL-xAc"/>
                                                         </connections>
                                                     </button>
                                                     <button toolTip="Load only changed values or init forced channels" verticalHuggingPriority="750" misplaced="YES" id="1217">
-                                                        <rect key="frame" x="526" y="-1" width="217" height="28"/>
+                                                        <rect key="frame" x="551" y="-1" width="217" height="28"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <buttonCell key="cell" type="push" title="Init Changed and Forced Init Chans " bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="2266">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2349,7 +2349,7 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" misplaced="YES" id="KPB-jk-SWI">
-                                                        <rect key="frame" x="392" y="-1" width="136" height="28"/>
+                                                        <rect key="frame" x="415" y="-1" width="136" height="28"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Show PreAmp Dialog" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="QRb-ov-djN">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2375,7 +2375,7 @@
                                             <font key="titleFont" metaFont="label"/>
                                         </box>
                                         <button misplaced="YES" id="1224">
-                                            <rect key="frame" x="6" y="50" width="33" height="36"/>
+                                            <rect key="frame" x="6" y="54" width="33" height="36"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="Unlocked" imagePosition="only" alignment="center" alternateImage="Locked" state="on" inset="2" id="2271">
                                                 <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -2386,7 +2386,7 @@
                                             </connections>
                                         </button>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Baseline" id="9WK-fu-s18">
-                                            <rect key="frame" x="834" y="377" width="115" height="84"/>
+                                            <rect key="frame" x="834" y="381" width="115" height="84"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="rkC-0A-lY8">
                                                 <rect key="frame" x="1" y="1" width="113" height="68"/>
@@ -2438,7 +2438,7 @@
                                             </view>
                                         </box>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="V3c-Gt-sZw">
-                                            <rect key="frame" x="165" y="392" width="46" height="19"/>
+                                            <rect key="frame" x="165" y="396" width="46" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="5" drawsBackground="YES" id="N3o-uF-P4k">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -2450,7 +2450,7 @@
                                             </connections>
                                         </textField>
                                         <button misplaced="YES" id="byF-sn-0kR">
-                                            <rect key="frame" x="358" y="410" width="86" height="28"/>
+                                            <rect key="frame" x="358" y="414" width="86" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Auto Mode" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="UvM-3x-Hqy">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2461,7 +2461,7 @@
                                             </connections>
                                         </button>
                                         <button misplaced="YES" id="ab9-IF-aWA">
-                                            <rect key="frame" x="830" y="84" width="108" height="28"/>
+                                            <rect key="frame" x="830" y="88" width="108" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Forced Card Init" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="MYf-K2-CPc">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2472,7 +2472,7 @@
                                             </connections>
                                         </button>
                                         <popUpButton verticalHuggingPriority="750" misplaced="YES" id="dNc-s7-BaJ">
-                                            <rect key="frame" x="742" y="381" width="77" height="22"/>
+                                            <rect key="frame" x="742" y="385" width="77" height="22"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="push" title="External" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="HIi-YM-gSE">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -2489,8 +2489,8 @@
                                             </connections>
                                         </popUpButton>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="zwB-kL-860">
-                                            <rect key="frame" x="694" y="385" width="52" height="15"/>
-                                            <autoresizingMask key="autoresizingMask"/>
+                                            <rect key="frame" x="694" y="389" width="52" height="15"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Clock" id="nhA-YB-lxf">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -2499,7 +2499,7 @@
                                         </textField>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="lDs-Nx-3PK">
                                             <rect key="frame" x="737" y="405" width="87" height="11"/>
-                                            <autoresizingMask key="autoresizingMask"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title=" " id="Lpm-ie-uTA">
                                                 <font key="font" metaFont="miniSystem"/>
                                                 <color key="textColor" red="0.54891304350000003" green="0.054213633919999997" blue="0.054213633919999997" alpha="1" colorSpace="calibratedRGB"/>

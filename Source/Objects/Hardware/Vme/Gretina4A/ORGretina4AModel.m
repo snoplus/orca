@@ -731,7 +731,7 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
     windowCompMin   = 256;
     windowCompMax   = 32000;
     rawDataLength   = 500;
-    rawDataWindow   = 2000;
+    rawDataWindow   = 0x7fc;
     p2Window        = 0;
     holdOffTime     = 160;
     baselineDelay   = 511;
@@ -1004,6 +1004,24 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
 }
 
 #pragma mark - Initialization
+//---functions to allow the MJD threshold fineder script to work
+- (void) setForceFullInitCard:(BOOL)aValue { [self setForceFullCardInit:aValue]; }
+- (void) setTrapThreshold:(unsigned short)chan withValue:(unsigned short)aValue
+{
+    [self setLedThreshold:chan withValue:aValue];
+}
+- (short) trapThreshold:(unsigned short)chan
+{
+    return [self ledThreshold:chan];
+}
+
+- (void) writeTrapThreshold:(unsigned short)aChan
+{
+    [self writeLedThreshold:aChan];
+}
+- (BOOL) trapEnabled:(int)aChan { return YES; }
+//----------------------------------------------------------------
+
 - (BOOL) forceFullCardInit		{ return forceFullCardInit; }
 - (void) setForceFullCardInit:(BOOL)aValue
 {
@@ -1310,7 +1328,8 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
 - (void) setRawDataWindow:(unsigned short)aValue
 {
     //same value for all channels
-    if(aValue>0x7FF)aValue = 0x7FF;
+    if(aValue>0x7FC)aValue = 0x7FC;
+    aValue = (aValue/2)*2; //make it even
     [[[self undoManager] prepareWithInvocationTarget:self] setRawDataWindow:rawDataWindow];
     rawDataWindow = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ARawDataWindowChanged object:self];
@@ -2068,14 +2087,12 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
     if(forceEnable)	startStop = enabled[chan];
     else			startStop = NO;
 
-    BOOL writeFlag = NO;
     
     unsigned long theValue =
     (startStop                        << 0)  |
     (pileupMode[chan]                 << 2)  |
     ((triggerPolarity[chan]  & 0x3)   << 10) |
     ((decimationFactor[chan] & 0x7)   << 12) |
-    (writeFlag                        << 15) | //default to data with flags
     (droppedEventCountMode[chan]      << 20) |
     (eventCountMode[chan]             << 21) |
     (aHitCountMode[chan]              << 22) |
@@ -2118,7 +2135,7 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
     unsigned long theValue =  ledThreshold[aChan] & 0x3fff;
     [self writeAndCheckLong:theValue
               addressOffset:[Gretina4ARegisters offsetforReg:kLedThreshold chan:aChan]
-                       mask:0xff03ff
+                       mask:0x03fff
                   reportKey:[NSString stringWithFormat:@"LedThreshold_%d",aChan]
               forceFullInit:forceFullInit[aChan]];
     
@@ -2151,10 +2168,10 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
 - (void) writeRawDataWindow:(unsigned short)aChan
 {
     //***NOTE that we write same value to all
-    unsigned long theValue = (rawDataWindow & 0x000007ff);
+    unsigned long theValue = (rawDataWindow & 0x000007fc);
     [self writeAndCheckLong:theValue
               addressOffset:[Gretina4ARegisters offsetforReg:kRawDataWindow chan:aChan]
-                       mask:0x000007ff
+                       mask:0x000007fc
                   reportKey:[NSString stringWithFormat:@"RawDataWindow_%d",aChan]
               forceFullInit:forceFullInit[aChan]];
 
@@ -2597,7 +2614,13 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ACardInited object:self];
 }
-
+- (void) writeThresholds
+{
+    int i;
+    for(i=0;i<kNumGretina4AChannels;i++) {
+        [self writeLedThreshold:i];
+    }
+}
 - (void) checkBoard:(BOOL)verbose
 {
     BOOL extDiscriminatorSrcResult   = [self checkExtDiscriminatorSrc:verbose];
@@ -2802,7 +2825,7 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
 
 - (BOOL) checkRawDataWindow:(int)aChan verbose:(BOOL)verbose
 {
-    unsigned long aValue = [self readRegister:kRawDataWindow channel:aChan] & 0x7ff;
+    unsigned long aValue = [self readRegister:kRawDataWindow channel:aChan] & 0x7fc;
     
     if(aValue == rawDataWindow)return YES;
     else {
@@ -2813,7 +2836,7 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
 
 - (BOOL) checkRawDataLength:(int)aChan verbose:(BOOL)verbose
 {
-    unsigned long aValue = [self readRegister:kRawDataLength channel:aChan] & 0x3ff;
+    unsigned long aValue = [self readRegister:kRawDataLength channel:aChan] & 0x3fe;
     
     if(aValue == rawDataLength)return YES;
     else {
@@ -3349,7 +3372,7 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
     configStruct->card_info[index].deviceSpecificData[0]	= [Gretina4ARegisters offsetforReg:kProgrammingDone];  //fifoStateAddress
     configStruct->card_info[index].deviceSpecificData[1]	= [Gretina4ARegisters offsetforReg:kFifo]; // fifoAddress
     configStruct->card_info[index].deviceSpecificData[2]	= [Gretina4ARegisters offsetforReg:kProgrammingDone];   // fifoReset Address
-    configStruct->card_info[index].deviceSpecificData[3]	= [self rawDataWindow];
+    configStruct->card_info[index].deviceSpecificData[3]	= [self rawDataWindow]/2 + 1; //longs
     configStruct->card_info[index].num_Trigger_Indexes		= 0;
     
     configStruct->card_info[index].next_Card_Index 	= index+1;

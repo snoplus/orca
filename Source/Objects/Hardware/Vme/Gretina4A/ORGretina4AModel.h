@@ -420,6 +420,7 @@
 - (BOOL)            fifoIsEmpty;
 - (void)            resetSingleFIFO;
 - (void)            resetFIFO;
+- (void)            writeThresholds;
 - (unsigned long)   readExtDiscriminatorSrc;
 - (void)            writeExtDiscriminatorSrc;
 - (unsigned long)   readHardwareStatus;
@@ -494,6 +495,12 @@
 - (void)            dumpBaselineDelayDetails:   (unsigned long)aValue;
 - (void)            dumpExtDiscSelDetails:      (unsigned long)aValue;
 - (void)            dumpMasterStatusDetails:    (unsigned long)aValue;
+
+
+- (void) setForceFullInitCard:(BOOL)aValue;
+- (void) setLEDThreshold:(unsigned short)chan withValue:(unsigned short)aValue;
+- (void) writeLEDThreshold:(unsigned short)aChan;
+- (BOOL) trapEnabled:(int)aChan;
 
 #pragma mark - Clock Sync
 - (short)           initState;

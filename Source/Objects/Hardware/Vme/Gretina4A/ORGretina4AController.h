@@ -312,7 +312,7 @@
 - (IBAction) holdOffTimeAction:(id)sender;
 - (IBAction) autoModeAction:(id)sender;
 - (IBAction) vetoGateWidthAction:(id)sender;
-- (IBAction) loadDelaysAction:(id)sender;
+- (IBAction) loadThresholdsAction:(id)sender;
 
 #pragma mark - Low-level registers and diagnostics
 - (IBAction) selectedChannelAction:(id)sender;
