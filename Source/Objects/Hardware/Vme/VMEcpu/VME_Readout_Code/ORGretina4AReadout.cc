@@ -13,7 +13,7 @@ bool ORGretina4AReadout::Readout(SBC_LAM_Data* /*lamData*/)
     uint32_t fifoStateAddress = baseAddress + GetDeviceSpecificData()[0];
     uint32_t fifoAddress      = baseAddress + GetDeviceSpecificData()[1];
     uint32_t fifoResetAddress = baseAddress + GetDeviceSpecificData()[2];
-    uint32_t dataLength       = GetDeviceSpecificData()[3]/2 + 1; //longs!!
+    uint32_t dataLength       = GetDeviceSpecificData()[3]; //longs!!
     uint32_t dataId           = GetHardwareMask()[0];
     uint32_t slot             = GetSlot(); 
     uint32_t crate            = GetCrate(); 
@@ -55,7 +55,7 @@ bool ORGretina4AReadout::Readout(SBC_LAM_Data* /*lamData*/)
         }
         
         if(data[eventStartIndex] != kGretinaPacketSeparator){
-            LogBusErrorForCard(GetSlot(),"Packet Err: Gretina4A 0x%04x %s",baseAddress,strerror(errno));
+            LogBusErrorForCard(GetSlot(),"No Packet Separator: Gretina4A 0x%x ",baseAddress);
             dataIndex = savedIndex; //DUMP the data by reseting the data Index back to where it was when we got it.
             clearFifo(fifoResetAddress);
         }
