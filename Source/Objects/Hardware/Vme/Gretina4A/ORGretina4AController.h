@@ -71,6 +71,12 @@
     IBOutlet ORValueBarGroupView*       rate0;
     IBOutlet ORValueBarGroupView*       totalRate;
 
+    //counters
+    IBOutlet NSMatrix*                  aHitCountMatrix;
+    IBOutlet NSMatrix*                  acceptedEventCountMatrix;
+    IBOutlet NSMatrix*                  droppedEventCountMatrix;
+    IBOutlet NSMatrix*                  discriminatorCountMatrix;
+
     
     //SerDes and Clock Distribution
     IBOutlet NSTextField*	initSerDesStateField;
@@ -115,6 +121,7 @@
     IBOutlet NSMatrix*      discWidthMatrix;
 
     IBOutlet NSTextField*   downSampleHoldOffTimeField;
+    IBOutlet NSButton*      downSamplePauseEnableCB;
     IBOutlet NSTextField*   holdOffTimeField;
     IBOutlet NSButton*		autoModeCB;
     IBOutlet NSTextField*   vetoGateWidthField;
@@ -206,7 +213,6 @@
 - (void) adcPhShiftOverflowChanged:(NSNotification*)aNote;
 - (void) adcDcmClockStoppedChanged:(NSNotification*)aNote;
 - (void) decimationFactorChanged:(NSNotification*)aNote;
-//- (void) writeFlagChanged:(NSNotification*)aNote;
 - (void) pileupModeChanged:(NSNotification*)aNote;
 - (void) droppedEventCountModeChanged:(NSNotification*)aNote;
 - (void) eventCountModeChanged:(NSNotification*)aNote;
@@ -265,6 +271,10 @@
 - (void) boardRevNumChanged:(NSNotification*)aNote;
 - (void) vhdlVerNumChanged:(NSNotification*)aNote;
 - (void) doHwCheckChanged:(NSNotification*)aNote;
+- (void) aHitCountChanged:(NSNotification*)aNote;
+- (void) droppedEventCountChanged:(NSNotification*)aNote;
+- (void) discCountChanged:(NSNotification*)aNote;
+- (void) acceptedEventCountChanged:(NSNotification*)aNote;
 
 - (IBAction) decimationFactorAction:(id)sender;
 
@@ -308,6 +318,7 @@
 - (IBAction) triggerConfigAction:(id)sender;
 - (IBAction) windowCompMinAction:(id)sender;
 - (IBAction) windowCompMaxAction:(id)sender;
+- (IBAction) downSampleHoldOffPauseEnableAction:(id)sender;
 - (IBAction) downSampleHoldOffTimeAction:(id)sender;
 - (IBAction) holdOffTimeAction:(id)sender;
 - (IBAction) autoModeAction:(id)sender;
@@ -348,6 +359,8 @@
 - (IBAction) compareHwNowAction:(id)sender;
 - (IBAction) openPreampDialog:(id)sender;
 - (IBAction) clockSourceAction:(id)sender;
+- (IBAction) readCounters:(id)sender;
+- (IBAction) clearCounters:(id)sender;
 
 #pragma mark - Data Source
 - (void)    tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;

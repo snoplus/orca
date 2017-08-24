@@ -48,7 +48,7 @@
 {
     settingSize     = NSMakeSize(965,460);
     rateSize		= NSMakeSize(790,340);
-    registerTabSize	= NSMakeSize(400,520);
+    registerTabSize	= NSMakeSize(800,520);
 	firmwareTabSize = NSMakeSize(340,187);
     blankView = [[NSView alloc] init];
     
@@ -92,6 +92,11 @@
         [[dWindowMatrix                 cellAtRow:i column:0] setTag:i];
         [[discWidthMatrix               cellAtRow:i column:0] setTag:i];
         [[baselineStartMatrix           cellAtRow:i column:0] setTag:i];
+        
+        [[aHitCountMatrix               cellAtRow:i column:0] setTag:i];
+        [[acceptedEventCountMatrix      cellAtRow:i column:0] setTag:i];
+        [[droppedEventCountMatrix       cellAtRow:i column:0] setTag:i];
+        [[discriminatorCountMatrix      cellAtRow:i column:0] setTag:i];
 
     }
     
@@ -232,9 +237,6 @@
                      selector : @selector(spiWriteValueChanged:)
                          name : ORGretina4ASPIWriteValueChanged
 						object: model];
-	
-   	[self registerRates];
-    
     
     [notifyCenter addObserver : self
                      selector : @selector(forceFullInitChanged:)
@@ -297,11 +299,6 @@
                          name : ORGretina4ADroppedEventCountModeChanged
                         object: model];
 
-//    [notifyCenter addObserver : self
-//                     selector : @selector(writeFlagChanged:)
-//                         name : ORGretina4AWriteFlagChanged
-//                        object: model];
-   
     [notifyCenter addObserver : self
                      selector : @selector(decimationFactorChanged:)
                          name : ORGretina4ADecimationFactorChanged
@@ -424,11 +421,6 @@
                          name : ORGretina4AClockSourceChanged
                         object: model];
 
-    
-    
- 
-   
-   
     [notifyCenter addObserver : self
                      selector : @selector(dacChannelSelectChanged:)
                          name : ORGretina4ADacChannelSelectChanged
@@ -553,9 +545,34 @@
                      selector : @selector(doHwCheckChanged:)
                          name : ORGretina4ADoHwCheckChanged
                         object: model];
-    
 
- 
+    [notifyCenter addObserver : self
+                     selector : @selector(downSamplePauseEnableChanged:)
+                         name : ORGretina4ADownSamplePauseEnableChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(aHitCountChanged:)
+                         name : ORGretina4AAHitCountChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(droppedEventCountChanged:)
+                         name : ORGretina4ADroppedEventCountChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(discCountChanged:)
+                         name : ORGretina4ADiscCountChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(acceptedEventCountChanged:)
+                         name : ORGretina4AAcceptedEventCountChanged
+                        object: model];
+
+    [self registerRates];
+
 }
 
 - (void) registerRates
@@ -681,13 +698,7 @@
     
     [self triggerConfigChanged:nil];
     [self phaseErrorCountChanged:nil];
-    [self tSErrCntCtrlChanged:nil];
-    [self tSErrorCountChanged:nil];
-    [self droppedEventCountChanged:nil];
-    [self acceptedEventCountChanged:nil];
-    [self ahitCountChanged:nil];
-    [self discCountChanged:nil];
-    [self auxIoReadChanged:nil];
+     [self auxIoReadChanged:nil];
     [self auxIoWriteChanged:nil];
     [self auxIoConfigChanged:nil];
     [self sdPemChanged:nil];
@@ -707,6 +718,14 @@
     [self boardRevNumChanged:nil];
     [self vhdlVerNumChanged:nil];
     [self doHwCheckChanged:nil];
+    [self downSamplePauseEnableChanged:nil];
+
+    [self tSErrCntCtrlChanged:nil];
+    [self tSErrorCountChanged:nil];
+    [self aHitCountChanged:nil];
+    [self droppedEventCountChanged:nil];
+    [self discCountChanged:nil];
+    [self acceptedEventCountChanged:nil];
 
 }
 
@@ -745,9 +764,10 @@
     [resetButton            setEnabled:!lockedOrRunningMaintenance && !downloading];
     [loadMainFPGAButton     setEnabled:!locked && !downloading];
     [stopFPGALoadButton     setEnabled:!locked && downloading];
-    [dumpAllRegistersButton setEnabled:!downloading];
-    [snapShotRegistersButton setEnabled:!lockedOrRunningMaintenance && !downloading];
-    [compareRegistersButton setEnabled:!lockedOrRunningMaintenance && !downloading];
+    
+    [downSampleHoldOffTimeField setEnabled:!locked && !runInProgress && !downloading && [model downSamplePauseEnable]];
+    [downSamplePauseEnableCB setEnabled:!locked && !runInProgress && !downloading];
+
     
     [diagnosticsReportButton setEnabled:[model diagnosticsEnabled]];
     [diagnosticsClearButton  setEnabled:[model diagnosticsEnabled]];
@@ -769,6 +789,10 @@
     [writeRegisterButton setEnabled:!lockedOrRunningMaintenance && !downloading];
     [spiWriteValueField setEnabled:!lockedOrRunningMaintenance && !downloading];
     [writeSPIButton setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [dumpAllRegistersButton setEnabled:!downloading];
+    [snapShotRegistersButton setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [compareRegistersButton setEnabled:!lockedOrRunningMaintenance && !downloading];
+
 }
 
 #pragma mark •••Low-level registers and diagnostics
@@ -817,6 +841,37 @@
     [diagnosticsEnabledCB setIntValue: [model diagnosticsEnabled]];
 }
 
+- (void) aHitCountChanged:(NSNotification*)aNote
+{
+    int i;
+    for(i=0;i<kNumGretina4AChannels;i++){
+         [[aHitCountMatrix cellWithTag:i] setIntValue:[model aHitCount:i]];
+    }
+}
+
+- (void) droppedEventCountChanged:(NSNotification*)aNote
+{
+    int i;
+    for(i=0;i<kNumGretina4AChannels;i++){
+        [[droppedEventCountMatrix cellWithTag:i] setIntValue:[model droppedEventCount:i]];
+    }
+}
+
+- (void) discCountChanged:(NSNotification*)aNote
+{
+    int i;
+    for(i=0;i<kNumGretina4AChannels;i++){
+        [[discriminatorCountMatrix cellWithTag:i] setIntValue:[model discCount:i]];
+    }
+}
+
+- (void) acceptedEventCountChanged:(NSNotification*)aNote
+{
+    int i;
+    for(i=0;i<kNumGretina4AChannels;i++){
+        [[acceptedEventCountMatrix cellWithTag:i] setIntValue:[model acceptedEventCount:i]];
+    }
+}
 
 #pragma mark •••firmware loading
 - (void) fpgaDownInProgressChanged:(NSNotification*)aNote
@@ -961,11 +1016,17 @@
 - (void) trackingSpeedChanged:      (NSNotification*)aNote  { [trackingSpeedField   setIntValue:[model trackingSpeed]];         }
 - (void) p2WindowChanged:           (NSNotification*)aNote  { [p2WindowField        setIntValue:[model p2Window]];              }
 - (void) peakSensitivityChanged:    (NSNotification*)aNote  { [peakSensitivityField setIntValue:[model peakSensitivity]];       }
-- (void) downSampleHoldOffTimeChanged:(NSNotification*)aNote { [downSampleHoldOffTimeField     setIntValue:[model downSampleHoldOffTime]];       }
+- (void) downSampleHoldOffTimeChanged:(NSNotification*)aNote{ [downSampleHoldOffTimeField setIntValue:[model downSampleHoldOffTime]];  }
 - (void) holdOffTimeChanged:        (NSNotification*)aNote  { [holdOffTimeField     setIntValue:[model holdOffTime]];           }
 - (void) autoModeChanged:           (NSNotification*)aNote  { [autoModeCB           setIntValue:[model autoMode]];              }
 - (void) vetoGateWidthChanged:      (NSNotification*)aNote  { [vetoGateWidthField   setIntValue:[model vetoGateWidth]];         }
 - (void) triggerConfigChanged:      (NSNotification*)aNote  { [triggerConfigPU selectItemAtIndex:[model triggerConfig]];        }
+- (void) downSamplePauseEnableChanged:(NSNotification*)aNote
+{
+    [downSamplePauseEnableCB    setState:   [model downSamplePauseEnable]];
+    [self settingsLockChanged:nil];
+}
+
 - (void) clockSourceChanged:(NSNotification*)aNote
 {
     [clockSourcePU selectItemAtIndex: [model clockSource]];
@@ -1000,10 +1061,7 @@
 - (void) serdesPhaseValueChanged:   (NSNotification*)aNote  {}
 - (void) tSErrCntCtrlChanged:       (NSNotification*)aNote  {}
 - (void) tSErrorCountChanged:       (NSNotification*)aNote  {}
-- (void) droppedEventCountChanged:  (NSNotification*)aNote  {}
-- (void) acceptedEventCountChanged: (NSNotification*)aNote  {}
 - (void) ahitCountChanged:          (NSNotification*)aNote  {}
-- (void) discCountChanged:          (NSNotification*)aNote  {}
 - (void) auxIoReadChanged:          (NSNotification*)aNote  {}
 - (void) auxIoWriteChanged:         (NSNotification*)aNote  {}
 - (void) auxIoConfigChanged:        (NSNotification*)aNote  {}
@@ -1033,6 +1091,7 @@
         [[forceFullInitMatrix cellWithTag:chan] setState:[model forceFullInit:chan]];
     }
 }
+
 - (void) doHwCheckChanged:(NSNotification*)aNote
 {
    	[doHwCheckButton setIntValue: [model doHwCheck]];
@@ -1262,11 +1321,6 @@
     [model setDroppedEventCountMode:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
-//- (IBAction) writeFlagAction:(id)sender
-//{
-//    [model setWriteFlag:[sender intValue]];
-//}
-
 - (IBAction) decimationFactorAction:(id)sender
 {
     [model setDecimationFactor:[sender selectedRow] withValue:[[sender selectedCell] indexOfSelectedItem]];
@@ -1361,6 +1415,11 @@
     [model setDownSampleHoldOffTime:[sender intValue]];
 }
 
+- (IBAction) downSampleHoldOffPauseEnableAction:(id)sender
+{
+    [model setDownSamplePauseEnable:[sender intValue]];
+}
+
 - (IBAction) clockSourceAction:(id)sender
 {
     [model setClockSource:[sender indexOfSelectedItem]];
@@ -1424,6 +1483,18 @@
     if([sender intValue] != [model forceFullInit:[[sender selectedCell] tag]]){
         [model setForceFullInit:[[sender selectedCell] tag] withValue:[sender intValue]];
     }
+}
+
+- (IBAction) readCounters:(id)sender;
+{
+    [model readaHitCounts];
+    [model readAcceptedEventCounts];
+    [model readDroppedEventCounts];
+    [model readDiscriminatorCounts];
+}
+- (IBAction) clearCounters:(id)sender
+{
+    [model clearCounters];
 }
 
 - (IBAction) readRegisterAction:(id)sender
