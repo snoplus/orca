@@ -8,8 +8,12 @@ bool ORGretina4AReadout::Readout(SBC_LAM_Data* /*lamData*/)
 {
 
 #define kGretinaPacketSeparator ((int32_t)(0xAAAAAAAA))
-    
-    uint32_t baseAddress      = GetBaseAddress();  
+#define kGretina4AFIFOEmpty			0x00100000
+#define kGretina4AFIFO16KFull       0x00800000
+#define kGretina4AFIFO30KFull		0x01000000
+#define kGretina4AFIFOFull          0x02000000
+
+    uint32_t baseAddress      = GetBaseAddress();
     uint32_t fifoStateAddress = baseAddress + GetDeviceSpecificData()[0];
     uint32_t fifoAddress      = baseAddress + GetDeviceSpecificData()[1];
     uint32_t fifoResetAddress = baseAddress + GetDeviceSpecificData()[2];
@@ -19,7 +23,7 @@ bool ORGretina4AReadout::Readout(SBC_LAM_Data* /*lamData*/)
     uint32_t crate            = GetCrate(); 
     uint32_t location         = ((crate&0x0000000f)<<21) | ((slot& 0x0000001f)<<16);
     uint32_t fifoState        = 0;
-    
+
     
     int32_t result            = VMERead(fifoStateAddress,
                                         GetAddressModifier(),
@@ -33,11 +37,20 @@ bool ORGretina4AReadout::Readout(SBC_LAM_Data* /*lamData*/)
 
     if(((fifoState>>20) & 0x3)!=0x3) { //both bits are high if FIFO is empty
 
+        if(fifoState & kGretina4AFIFO30KFull){
+            numEventsToRead = 256;
+            fifoFlag = 0x80000000;
+        }
+        else if(fifoState & kGretina4AFIFO16KFull){
+            numEventsToRead = 128;
+            fifoFlag = 0x40000000;
+        }
+
         ensureDataCanHold(dataLength+2); //orca header + datalength
  
         int32_t savedIndex      = dataIndex;
         data[dataIndex++]       = dataId | (dataLength+2); //longs!!
-        data[dataIndex++]       = location;
+        data[dataIndex++]       = location | fifoState;
         int32_t eventStartIndex = dataIndex;
 
         result = DMARead(fifoAddress,
