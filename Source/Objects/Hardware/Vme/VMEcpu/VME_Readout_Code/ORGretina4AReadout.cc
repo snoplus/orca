@@ -36,13 +36,11 @@ bool ORGretina4AReadout::Readout(SBC_LAM_Data* /*lamData*/)
     }
 
     if(((fifoState>>20) & 0x3)!=0x3) { //both bits are high if FIFO is empty
-
+        uint32_t fifoFlag;
         if(fifoState & kGretina4AFIFO30KFull){
-            numEventsToRead = 256;
             fifoFlag = 0x80000000;
         }
         else if(fifoState & kGretina4AFIFO16KFull){
-            numEventsToRead = 128;
             fifoFlag = 0x40000000;
         }
 
@@ -50,7 +48,7 @@ bool ORGretina4AReadout::Readout(SBC_LAM_Data* /*lamData*/)
  
         int32_t savedIndex      = dataIndex;
         data[dataIndex++]       = dataId | (dataLength+2); //longs!!
-        data[dataIndex++]       = location | fifoState;
+        data[dataIndex++]       = location | fifoFlag;
         int32_t eventStartIndex = dataIndex;
 
         result = DMARead(fifoAddress,
