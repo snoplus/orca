@@ -275,7 +275,7 @@
 - (IBAction) stopTellieRunAction:(id)sender;
 - (void)startTellieRunNotification:(NSNotification *)notification;
 
--(void)checkAndTidyELLIEThreads;
+-(void)checkAndTidyELLIEThreads:(NSNotification *)aNote;
 
 #pragma mark ¥¥¥Details Interface Management
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem;

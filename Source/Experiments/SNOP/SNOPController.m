@@ -565,6 +565,11 @@ snopGreenColor;
                      selector : @selector(notWaitingForBuffers:)
                          name : ORSNOPNotWaitingForBuffersNotification
                         object: nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(checkAndTidyELLIEThreads:)
+                         name : ORRunAboutToStopNotification
+                       object : nil];
 }
 
 - (void) updateWindow
@@ -723,8 +728,6 @@ snopGreenColor;
 - (IBAction) startRunAction:(id)sender
 {
     /* Action when the user clicks on the Start or Restart Button. */
-    [self checkAndTidyELLIEThreads];
-    
     unsigned long dbruntypeword = 0;
 
     /* If we are not going to maintenance we shouldn't be polling */
@@ -766,7 +769,6 @@ snopGreenColor;
 - (IBAction) stopRunAction:(id)sender
 {
     [self endEditing];
-    [self checkAndTidyELLIEThreads];
     [model stopRun];
 }
 
@@ -1495,7 +1497,7 @@ snopGreenColor;
     }
 }
 
--(void)checkAndTidyELLIEThreads
+-(void)checkAndTidyELLIEThreads:(NSNotification *)aNote
 {
     /*
      Check to see if an ELLIE fire sequence has been running. If so, the stop*ellieRun methods of
