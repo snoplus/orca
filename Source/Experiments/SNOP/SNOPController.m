@@ -723,6 +723,8 @@ snopGreenColor;
 - (IBAction) startRunAction:(id)sender
 {
     /* Action when the user clicks on the Start or Restart Button. */
+    [self checkAndTidyELLIEThreads];
+    
     unsigned long dbruntypeword = 0;
 
     /* If we are not going to maintenance we shouldn't be polling */
@@ -750,7 +752,6 @@ snopGreenColor;
     // Start the standard run
     [model startStandardRun:[model standardRunType] withVersion:[model standardRunVersion]];
 }
-
 - (IBAction) resyncRunAction:(id)sender
 {
     /* A resync run does a hard stop and start without the user having to hit
@@ -765,25 +766,8 @@ snopGreenColor;
 - (IBAction) stopRunAction:(id)sender
 {
     [self endEditing];
-
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
-    if (![objs count]) {
-        NSLogColor([NSColor redColor], @"ELLIE model not available, add an ELLIE model to your experiment\n");
-        goto err; // If error fall through and just stop the run.
-    }
-    ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
-
-    if([[theELLIEModel tellieThread] isExecuting]){
-        [theELLIEModel stopTellieRun];
-    }
-    if([[theELLIEModel smellieThread] isExecuting]){
-        [theELLIEModel stopSmellieRun];
-    }
-
-err:
-    {
-        [model stopRun];
-    }
+    [self checkAndTidyELLIEThreads];
+    [model stopRun];
 }
 
 - (void) runStatusChanged:(NSNotification*)aNotification
@@ -1511,6 +1495,29 @@ err:
     }
 }
 
+-(void)checkAndTidyELLIEThreads
+{
+    /*
+     Check to see if an ELLIE fire sequence has been running. If so, the stop*ellieRun methods of
+     the ellieModel will post the run wait notification and launch a thread that waits for the smellieThread
+     to stop executing before tidying up and, finally, releasing the run wait.
+    */
+    
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
+    if (![objs count]) {
+        NSLogColor([NSColor redColor], @"ELLIE model not available, add an ELLIE model to your experiment\n");
+        return;
+    }
+    ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
+
+    if([[theELLIEModel tellieThread] isExecuting]){
+        [theELLIEModel stopTellieRun];
+    }
+    if([[theELLIEModel smellieThread] isExecuting]){
+        [theELLIEModel stopSmellieRun];
+    }
+}
+
 - (IBAction) startSmellieRunAction:(id)sender
 {
     /////////////////////
@@ -1645,6 +1652,8 @@ err:
         NSLog(@"Main SNO+ Control: Please choose a Tellie Run File from selection\n");
     }
 }
+
+
 
 -(void)startTellieRunNotification:(NSNotification *)note;
 {
