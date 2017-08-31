@@ -1627,8 +1627,6 @@ snopGreenColor;
     }
 }
 
-
-
 -(void)startTellieRunNotification:(NSNotification *)note;
 {
     [self setTellieFireSettings:[note userInfo]];

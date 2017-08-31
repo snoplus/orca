@@ -1730,7 +1730,7 @@ err:
         NSLogColor([NSColor redColor], @"[SMELLIE]: Please load the SMELLIE standard run type.\n");
         goto err;
     }
-/*
+
     ///////////////////////
     // Check trigger is being sent to asyncronus port (EXT_A)
     NSUInteger asyncTrigMask;
@@ -1745,7 +1745,7 @@ err:
         NSLogColor([NSColor redColor], @"[SMELLIE]: Please amend via the TUBii GUI (triggers tab)\n");
         goto err;
     }
-*/
+
     ////////////////////////
     // SET MASTER / SLAVE MODE
     NSString *operationMode = [NSString stringWithFormat:@"%@",[smellieSettings objectForKey:@"operation_mode"]];
