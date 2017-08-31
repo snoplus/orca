@@ -10,6 +10,7 @@
 
 #import <Foundation/Foundation.h>
 #import "ELLIEController.h"
+#import "OrcaObject.h"
 #import "XmlrpcClient.h"
 
 @class ORCouchDB;
@@ -169,7 +170,7 @@
 -(NSMutableArray*)getSmellieLowEdgeWavelengthArray:(NSDictionary*)smellieSettings;
 -(void) startSmellieRunInBackground:(NSDictionary*)smellieSettings;
 -(void) activateKeepAlive:(NSNumber *)runNumber;
--(void) killKeepAlive;
+-(void) killKeepAlive:(NSNotification*)aNote;
 -(void) pulseKeepAlive:(id)passed;
 -(void) startSmellieRunThread:(NSDictionary*)smellieSettings;
 -(void) startSmellieRun:(NSDictionary*)smellieSettings;

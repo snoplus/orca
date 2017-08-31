@@ -131,6 +131,8 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
 {
     self = [super initWithCoder:decoder];
     if (self){
+        [self registerNotificationObservers];
+        
         //Settings
         [self setTellieHost:[decoder decodeObjectForKey:@"tellieHost"]];
         [self setTelliePort:[decoder decodeObjectForKey:@"telliePort"]];
@@ -250,6 +252,35 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     [super dealloc];
 }
 
+- (void) registerNotificationObservers
+{
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(checkAndTidyELLIEThreads:)
+                         name : ORRunAboutToStopNotification
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(killKeepAlive:)
+                         name : @"SMELLIEEmergencyStop"
+                        object: nil];
+}
+
+-(void)checkAndTidyELLIEThreads:(NSNotification *)aNote
+{
+    /*
+     Check to see if an ELLIE fire sequence has been running. If so, the stop*ellieRun methods of
+     the ellieModel will post the run wait notification and launch a thread that waits for the smellieThread
+     to stop executing before tidying up and, finally, releasing the run wait.
+     */
+    if([[self tellieThread] isExecuting]){
+        [self stopTellieRun];
+    }
+    if([[self smellieThread] isExecuting]){
+        [self stopSmellieRun];
+    }
+}
 
 /*********************************************************/
 /*                    TELLIE Functions                   */
@@ -1423,7 +1454,7 @@ err:
     [pool release];
 }
 
--(void)killKeepAlive
+-(void)killKeepAlive:(NSNotification*)aNote
 {
     /*
      Stop pulsing the keep alive and disarm the interlock
@@ -1699,7 +1730,7 @@ err:
         NSLogColor([NSColor redColor], @"[SMELLIE]: Please load the SMELLIE standard run type.\n");
         goto err;
     }
-    
+/*
     ///////////////////////
     // Check trigger is being sent to asyncronus port (EXT_A)
     NSUInteger asyncTrigMask;
@@ -1714,7 +1745,7 @@ err:
         NSLogColor([NSColor redColor], @"[SMELLIE]: Please amend via the TUBii GUI (triggers tab)\n");
         goto err;
     }
-
+*/
     ////////////////////////
     // SET MASTER / SLAVE MODE
     NSString *operationMode = [NSString stringWithFormat:@"%@",[smellieSettings objectForKey:@"operation_mode"]];
@@ -2089,7 +2120,7 @@ err:
     }
 
     // Kill the keepalive
-    [self killKeepAlive];
+    [self killKeepAlive:nil];
 
     // Get a Tubii object
     NSArray*  tubiiModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];

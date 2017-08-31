@@ -29,6 +29,7 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 -(id)init
 {
     self = [super initWithWindowNibName:@"ellie"];
+    [super registerNotificationObservers];
     @try{
         [self fetchConfigurationFile:nil];
         [self initialiseTellie];
@@ -110,16 +111,6 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
                      selector : @selector(updateServerSettings:)
                          name : @"ELLIEServerSettingsChanged"
                         object: nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(killInterlock:)
-                         name : @"SMELLIEEmergencyStop"
-                        object: nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(checkAndTidyELLIEThreads:)
-                         name : ORRunAboutToStopNotification
-                       object : nil];
 }
 
 -(void)fetchConfigurationFile:(NSNotification *)aNote{
@@ -127,21 +118,6 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
      When the run files are loaded we re-load the smellie config file, just incase
     */
     [model fetchCurrentSmellieConfig];
-}
-
--(void)checkAndTidyELLIEThreads:(NSNotification *)aNote
-{
-    /*
-     Check to see if an ELLIE fire sequence has been running. If so, the stop*ellieRun methods of
-     the ellieModel will post the run wait notification and launch a thread that waits for the smellieThread
-     to stop executing before tidying up and, finally, releasing the run wait.
-     */
-    if([[model tellieThread] isExecuting]){
-        [model stopTellieRun];
-    }
-    if([[model smellieThread] isExecuting]){
-        [model stopSmellieRun];
-    }
 }
 
 ///////////////////////////////////////////
@@ -1297,8 +1273,4 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     return;
 }
 
--(void)killInterlock:(NSNotification *)aNote
-{
-    [model killKeepAlive];
-}
 @end
