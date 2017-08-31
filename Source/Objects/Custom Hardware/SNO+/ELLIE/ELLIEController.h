@@ -118,6 +118,7 @@
 -(void)updateServerSettings:(NSNotification *)aNote;
 -(BOOL)isNumeric:(NSString *)s;
 -(void)fetchConfigurationFile:(NSNotification *)aNote;
+-(void)checkAndTidyELLIEThreads:(NSNotification *)aNote;
 
 //TELLIE functions -----------------------------
 

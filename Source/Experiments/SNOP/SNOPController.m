@@ -565,11 +565,6 @@ snopGreenColor;
                      selector : @selector(notWaitingForBuffers:)
                          name : ORSNOPNotWaitingForBuffersNotification
                         object: nil];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(checkAndTidyELLIEThreads:)
-                         name : ORRunAboutToStopNotification
-                       object : nil];
 }
 
 - (void) updateWindow
@@ -1494,29 +1489,6 @@ snopGreenColor;
         [loadedSmellieSuperKwavelengths setStringValue:@""];
         [loadedSmellieOperationModeLabel setStringValue:@""];
         NSLog(@"Main SNO+ Control: Please choose a Smellie Run File from selection\n");
-    }
-}
-
--(void)checkAndTidyELLIEThreads:(NSNotification *)aNote
-{
-    /*
-     Check to see if an ELLIE fire sequence has been running. If so, the stop*ellieRun methods of
-     the ellieModel will post the run wait notification and launch a thread that waits for the smellieThread
-     to stop executing before tidying up and, finally, releasing the run wait.
-    */
-    
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
-    if (![objs count]) {
-        NSLogColor([NSColor redColor], @"ELLIE model not available, add an ELLIE model to your experiment\n");
-        return;
-    }
-    ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
-
-    if([[theELLIEModel tellieThread] isExecuting]){
-        [theELLIEModel stopTellieRun];
-    }
-    if([[theELLIEModel smellieThread] isExecuting]){
-        [theELLIEModel stopSmellieRun];
     }
 }
 
