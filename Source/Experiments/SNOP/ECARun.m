@@ -170,7 +170,6 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         //Load hardcoded values if requested
         if([[aSNOPModel standardRunVersion] isEqualToString:@"ECA_PDST_STANDARD"]){
             //Pedestal run
-            [self setECA_mode:ECAMODE_SUPERNOVA];
             [self setECA_type:ECA_PDST_TYPE];
             [self setECA_rate:[NSNumber numberWithInt:ECA_PDST_RATE]];
             [self setECA_pattern:ECA_PDST_PATTERN];
@@ -178,7 +177,6 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         }
         else if([[aSNOPModel standardRunVersion] isEqualToString:@"ECA_TSLP_STANDARD"]){
             //Time Slope run
-            [self setECA_mode:ECAMODE_SUPERNOVA];
             [self setECA_type:ECA_TSLP_TYPE];
             [self setECA_rate:[NSNumber numberWithInt:ECA_TSLP_RATE]];
             [self setECA_pattern:ECA_TSLP_PATTERN];
