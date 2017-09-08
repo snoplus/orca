@@ -262,6 +262,11 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
                        object : nil];
     
     [notifyCenter addObserver : self
+                     selector : @selector(checkAndTidyELLIEThreads:)
+                         name : OROrcaAboutToQuitNotice
+                       object : nil];
+    
+    [notifyCenter addObserver : self
                      selector : @selector(killKeepAlive:)
                          name : @"SMELLIEEmergencyStop"
                         object: nil];
@@ -1450,6 +1455,7 @@ err:
         return;
     }
     interlockThread = [[NSThread alloc] initWithTarget:self selector:@selector(pulseKeepAlive:) object:nil];
+    //interlockThread = [NSThread detachNewThreadSelector:@selector(pulseKeepAlive:) toTarget:self withObject:nil];
     [interlockThread start];
     [pool release];
 }
