@@ -1529,6 +1529,8 @@ snopGreenColor;
     //////////////////////
     // Start smellie thread
     [theELLIEModel startSmellieRunThread:smellieRunFile];
+    [theELLIEModel startInterlockThread];
+
 }
 
 - (IBAction) stopSmellieRunAction:(id)sender

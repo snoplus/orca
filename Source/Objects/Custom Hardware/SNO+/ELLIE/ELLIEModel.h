@@ -169,6 +169,7 @@
 -(NSMutableArray*)getSmellieRunGainArray:(NSDictionary*)smellieSettings forLaser:(NSString*)laser;
 -(NSMutableArray*)getSmellieLowEdgeWavelengthArray:(NSDictionary*)smellieSettings;
 -(void) startSmellieRunInBackground:(NSDictionary*)smellieSettings;
+-(void) startInterlockThread;
 -(void) activateKeepAlive:(NSNumber *)runNumber;
 -(void) killKeepAlive:(NSNotification*)aNote;
 -(void) pulseKeepAlive:(id)passed;

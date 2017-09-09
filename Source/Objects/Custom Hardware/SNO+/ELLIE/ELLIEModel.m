@@ -1437,13 +1437,23 @@ err:
     }
 }
 
--(void)activateKeepAlive:(NSNumber *)runNumber
+-(void) startInterlockThread;
 {
     /*
-     Start a thread to constantly send a keep alive signal to the smellie interlock server
+     Launch a thread to host the keep alive pulsing.
      */
+
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    NSArray* args = @[runNumber];
+    //////////////
+    //Get the run controller
+    NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    if(![runModels count]){
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find ORRunModel. Please add it to the experiment and restart the run.\n");
+        return;
+    }
+    ORRunModel* runControl = [runModels objectAtIndex:0];
+    
+    NSArray* args = @[[NSNumber numberWithInteger:[runControl runNumber]]];
     @try {
         [[self interlockClient] command:@"new_run" withArgs:args];
         [[self interlockClient] command:@"set_arm"];
@@ -1454,11 +1464,14 @@ err:
         [pool release];
         return;
     }
+    
+    //////////////////////
+    // Start interlock thread
     interlockThread = [[NSThread alloc] initWithTarget:self selector:@selector(pulseKeepAlive:) object:nil];
-    //interlockThread = [NSThread detachNewThreadSelector:@selector(pulseKeepAlive:) toTarget:self withObject:nil];
     [interlockThread start];
     [pool release];
 }
+
 
 -(void)killKeepAlive:(NSNotification*)aNote
 {
@@ -1718,7 +1731,7 @@ err:
     }
     TUBiiModel* theTubiiModel = [tubiiModels objectAtIndex:0];
 
-    ///////////////
+    //////////////
     //Get the run controller
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
@@ -1791,12 +1804,6 @@ err:
     [self setEllieFireFlag:YES];
 
     if([runControl isRunning]){
-        @try{
-            [self activateKeepAlive:[NSNumber numberWithUnsignedLong:[runControl runNumber]]];
-        } @catch(NSException* e) {
-            NSLogColor([NSColor redColor], @"[SMELLIE]: Problem activating interlock server: %@\n", [e reason]);
-            goto err;
-        }
         @try{
             [self setSmellieNewRun:[NSNumber numberWithUnsignedLong:[runControl runNumber]]];
         } @catch(NSException* e) {
@@ -1996,14 +2003,14 @@ err:
                                     goto err;
                                 }
                             } else {
-
+/*
                                 @try{
                                     [theTubiiModel setSmellieDelay:[[smellieSettings objectForKey:@"delay_fixed_wavelength"] intValue]];
                                 } @catch(NSException* e) {
                                     NSLogColor([NSColor redColor], @"[SMELLIE]: Problem setting trigger delay at TUBii: %@\n", [e reason]);
                                     goto err;
                                 }
-
+*/
                                 @try{
                                     [self setSmellieLaserHeadMasterMode:laserSwitchChannel withIntensity:intensity withRepRate:rate withFibreInput:fibreInputSwitchChannel withFibreOutput:fibreOutputSwitchChannel withNPulses:numOfPulses withGainVoltage:gain];
                                 } @catch(NSException* e){
