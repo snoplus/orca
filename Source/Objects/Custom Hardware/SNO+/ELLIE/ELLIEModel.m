@@ -2035,14 +2035,13 @@ err:
                                     goto err;
                                 }
                             } else {
-/*
+
                                 @try{
                                     [theTubiiModel setSmellieDelay:[[smellieSettings objectForKey:@"delay_fixed_wavelength"] intValue]];
                                 } @catch(NSException* e) {
                                     NSLogColor([NSColor redColor], @"[SMELLIE]: Problem setting trigger delay at TUBii: %@\n", [e reason]);
                                     goto err;
                                 }
-*/
                                 @try{
                                     [self setSmellieLaserHeadMasterMode:laserSwitchChannel withIntensity:intensity withRepRate:rate withFibreInput:fibreInputSwitchChannel withFibreOutput:fibreOutputSwitchChannel withNPulses:numOfPulses withGainVoltage:gain];
                                 } @catch(NSException* e){
@@ -2127,13 +2126,21 @@ err:
      Here we post the run wait notification and launch a thread that waits for the smellieThread
      to stop executing before tidying up and, finally, releasing the run wait.
      */
-
-    [[self smellieThread] cancel];
-
+    
     // Post a notification telling the run control to wait until the thread finishes
     NSDictionary* userInfo  = [NSDictionary dictionaryWithObjectsAndKeys:@"waiting for smellie run to finish", @"Reason", nil];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object:self userInfo:userInfo];
 
+    // Cancel the smellie thread
+    [[self smellieThread] cancel];
+    
+    // Tell SMELLIE hardware to stop generating triggers
+    @try{
+        [self CancelSmellieTriggers];
+    } @catch(NSException *e) {
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Problem telling smellie to stop sending triggers, reason: %@\n", [e reason]);
+    }
+    
     // Detatch thread to monitor smellie run thread
     [NSThread detachNewThreadSelector:@selector(waitForSmellieRunToFinish) toTarget:self withObject:nil];
 }
