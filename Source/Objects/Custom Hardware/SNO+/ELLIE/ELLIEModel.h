@@ -45,6 +45,7 @@
 
     XmlrpcClient* _tellieClient;
     XmlrpcClient* _smellieClient;
+    XmlrpcClient* _smellieFlaggingClient;
     XmlrpcClient* _interlockClient;
 
     //tellie settings
@@ -97,6 +98,7 @@
 @property (nonatomic,retain) NSString* interlockPort;
 @property (nonatomic,retain) XmlrpcClient* tellieClient;
 @property (nonatomic,retain) XmlrpcClient* smellieClient;
+@property (nonatomic,retain) XmlrpcClient* smellieFlaggingClient;
 @property (nonatomic,retain) XmlrpcClient* interlockClient;
 @property (nonatomic,retain) NSThread* tellieThread;
 @property (nonatomic,retain) NSThread* smellieThread;
@@ -156,7 +158,7 @@
 //SMELLIE Control Functions
 -(void) setSmellieNewRun:(NSNumber *)runNumber;
 -(void) deactivateSmellie;
-
+-(void) CancelSmellieTriggers;
 -(void) setSmellieLaserHeadMasterMode:(NSNumber*)laserSwitchChan withIntensity:(NSNumber*)intensity withRepRate:(NSNumber*)rate withFibreInput:(NSNumber*)fibreInChan withFibreOutput:(NSNumber*)fibreOutChan withNPulses:(NSNumber*)noPulses withGainVoltage:(NSNumber*)gain;
 
 -(void) setSmellieLaserHeadSlaveMode:(NSNumber*)laserSwitchChan withIntensity:(NSNumber*)intensity withFibreInput:(NSNumber*)fibreInChan withFibreOutput:(NSNumber*)fibreOutChan withTime:(NSNumber*)time withGainVoltage:(NSNumber*)gain;
@@ -170,7 +172,6 @@
 -(NSMutableArray*)getSmellieLowEdgeWavelengthArray:(NSDictionary*)smellieSettings;
 -(void) startSmellieRunInBackground:(NSDictionary*)smellieSettings;
 -(void) startInterlockThread;
--(void) activateKeepAlive:(NSNumber *)runNumber;
 -(void) killKeepAlive:(NSNotification*)aNote;
 -(void) pulseKeepAlive:(id)passed;
 -(void) startSmellieRunThread:(NSDictionary*)smellieSettings;

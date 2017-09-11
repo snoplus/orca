@@ -1528,8 +1528,8 @@ snopGreenColor;
 
     //////////////////////
     // Start smellie thread
-    [theELLIEModel startSmellieRunThread:smellieRunFile];
     [theELLIEModel startInterlockThread];
+    [theELLIEModel startSmellieRunThread:smellieRunFile];
 
 }
 

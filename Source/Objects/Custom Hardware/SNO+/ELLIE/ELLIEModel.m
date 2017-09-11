@@ -107,6 +107,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
 
 @synthesize tellieClient = _tellieClient;
 @synthesize smellieClient = _smellieClient;
+@synthesize smellieFlaggingClient = _smellieFlaggingClient;
 @synthesize interlockClient = _interlockClient;
 
 @synthesize ellieFireFlag = _ellieFireFlag;
@@ -156,13 +157,17 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
 
         XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:[self tellieHost] withPort:[self telliePort]];
         XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:[self smellieHost] withPort:[self smelliePort]];
+        XmlrpcClient* smellieFlaggingCli = [[XmlrpcClient alloc] initWithHostName:[self smellieHost] withPort:[self smelliePort]];
         XmlrpcClient* interlockCli = [[XmlrpcClient alloc] initWithHostName:[self interlockHost] withPort:[self interlockPort]];
 
         [self setTellieClient:tellieCli];
         [self setSmellieClient:smellieCli];
+        [self setSmellieFlaggingClient:smellieFlaggingCli];
         [self setInterlockClient:interlockCli];
-        [[self tellieClient] setTimeout:100];
-        [[self smellieClient] setTimeout:360];
+        
+        [[self tellieClient] setTimeout:100]; // Sometimes TELLIE calls can take longer than expected due to network speeds on the logging calls.
+        [[self smellieClient] setTimeout:1200]; // Smellie server calls are flagging. This sets the max time of single a flash sequence to 20 mins
+        [[self smellieFlaggingClient] setTimeout:60]; // Use this client for getting run flags and calling deactivate functions
         [[self interlockClient] setTimeout:10];
 
         [tellieCli release];
@@ -1354,7 +1359,19 @@ err:
 
 -(void) deactivateSmellie
 {
-    id result = [[self smellieClient] command:@"deactivate"];
+    id result = [[self smellieFlaggingClient] command:@"deactivate"];
+    if([result isKindOfClass:[NSString class]]){
+        NSException* e = [NSException
+                          exceptionWithName:@"SMELLIE EXCEPTION"
+                          reason:result
+                          userInfo:nil];
+        [e raise];
+    }
+}
+
+-(void) CancelSmellieTriggers
+{
+    id result = [[self smellieFlaggingClient] command:@"set_run_flag_false"];
     if([result isKindOfClass:[NSString class]]){
         NSException* e = [NSException
                           exceptionWithName:@"SMELLIE EXCEPTION"
@@ -1478,15 +1495,30 @@ err:
     /*
      Stop pulsing the keep alive and disarm the interlock
     */
+
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    
+    // Cancel the thread hosting the keep alive pulse
     [interlockThread cancel];
+
+    // Tell SMELLIE to stop generating triggers
+    @try{
+        [self CancelSmellieTriggers];
+    } @catch(NSException *e) {
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Problem telling smellie to stop sending triggers, reason: %@\n", [e reason]);
+    }
+
+    // Additionally send an explicit disarm command to the interlock.
     @try {
         [[self interlockClient] command:@"set_disarm"];
     }
     @catch (NSException *e) {
         NSLogColor([NSColor redColor], @"[SMELLIE]: Problem disarming interlock server, reason: %@\n", [e reason]);
     }
+    
+    // Set the local fire flag to no to jump out of the loop in [self startSmellieRun]
     [self setEllieFireFlag:NO];
+
     NSLog(@"[SMELLIE]: Smellie laser interlock server disarmed\n");
     [pool release];
 }
