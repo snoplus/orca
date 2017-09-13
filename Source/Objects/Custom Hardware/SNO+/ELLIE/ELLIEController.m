@@ -29,7 +29,6 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 -(id)init
 {
     self = [super initWithWindowNibName:@"ellie"];
-    [super registerNotificationObservers];
     @try{
         [self fetchConfigurationFile:nil];
         [self initialiseTellie];

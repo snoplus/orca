@@ -118,7 +118,6 @@
 -(void)updateServerSettings:(NSNotification *)aNote;
 -(BOOL)isNumeric:(NSString *)s;
 -(void)fetchConfigurationFile:(NSNotification *)aNote;
--(void)checkAndTidyELLIEThreads:(NSNotification *)aNote;
 
 //TELLIE functions -----------------------------
 
@@ -168,7 +167,6 @@
 - (IBAction)smelliePing:(id)sender;
 - (IBAction)interlockPing:(id)sender;
 - (IBAction) serverSettingsChanged:(id)sender;
--(void)killInterlock:(NSNotification *)aNote;
 
 @end
 
