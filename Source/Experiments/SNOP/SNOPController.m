@@ -1565,12 +1565,6 @@ snopGreenColor;
         NSLogColor([NSColor redColor], @"Problem stopping smellie run: %@\n", [e reason]);
         return;
     }
-
-    ////////////
-    // Roll over into maintenance run
-    if([[model lastStandardRunType] isEqualToString:@"SMELLIE"]){
-        [model startStandardRun:@"MAINTENANCE" withVersion:@"DEFAULT"];
-    }
 }
 
 - (IBAction) emergencySmellieStopAction:(id)sender

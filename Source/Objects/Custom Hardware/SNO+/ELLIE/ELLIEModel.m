@@ -2214,8 +2214,11 @@ err:
     
     ////////////
     // Roll over into maintenance run
+    NSLog(@"[SMELLIE]: Moving into a Maintenance run.\n");
     if([[snopModel lastStandardRunType] isEqualToString:@"SMELLIE"]){
-        [snopModel startStandardRun:@"MAINTENANCE" withVersion:@"DEFAULT"];
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [snopModel startStandardRun:@"MAINTENANCE" withVersion:@"DEFAULT"];
+        });
     }
     [pool release];
     return;
