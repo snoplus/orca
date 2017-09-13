@@ -1498,10 +1498,12 @@ err:
 
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     
-    // Cancel the thread hosting the keep alive pulse
+    // Cancel the SMELLIE run threads - If we've killed the interlock, we will never want to keep running
     [interlockThread cancel];
-
-    // Tell SMELLIE to stop generating triggers
+    [[self smellieThread] cancel];
+    [self setEllieFireFlag:NO];
+    
+    // Tell SMELLIE to stop generating triggers. This sets a flag in the server functions to tell them to jump out early
     @try{
         [self CancelSmellieTriggers];
     } @catch(NSException *e) {
@@ -1516,9 +1518,6 @@ err:
         NSLogColor([NSColor redColor], @"[SMELLIE]: Problem disarming interlock server, reason: %@\n", [e reason]);
     }
     
-    // Set the local fire flag to no to jump out of the loop in [self startSmellieRun]
-    [self setEllieFireFlag:NO];
-
     NSLog(@"[SMELLIE]: Smellie laser interlock server disarmed\n");
     [pool release];
 }
@@ -1810,7 +1809,7 @@ err:
         NSLogColor([NSColor redColor], @"[SMELLIE]: Slave / master mode could not be read in run plan file.\n");
         goto err;
     }
-    
+
     /////////////////////
     // GET SMELLIE LASERS AND FIBRES TO LOOP OVER
     // Wavelengths, intensities and gains variables
@@ -2042,6 +2041,7 @@ err:
                                     NSLogColor([NSColor redColor], @"[SMELLIE]: Problem setting trigger delay at TUBii: %@\n", [e reason]);
                                     goto err;
                                 }
+
                                 @try{
                                     [self setSmellieLaserHeadMasterMode:laserSwitchChannel withIntensity:intensity withRepRate:rate withFibreInput:fibreInputSwitchChannel withFibreOutput:fibreOutputSwitchChannel withNPulses:numOfPulses withGainVoltage:gain];
                                 } @catch(NSException* e){
@@ -2073,7 +2073,7 @@ err:
                         //////////////////
                         // RUN CONTROL
                         //Prepare new subrun - will produce a subrun boundrary in the zdab.
-                        if([runControl isRunning]){
+                        if([runControl isRunning] && ![[NSThread currentThread] isCancelled]){
                             [runControl performSelectorOnMainThread:@selector(prepareForNewSubRun) withObject:nil waitUntilDone:YES];
                             [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
                         }
@@ -2132,17 +2132,24 @@ err:
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object:self userInfo:userInfo];
 
     // Cancel the smellie thread
-    [[self smellieThread] cancel];
+    if([[self smellieThread] isExecuting]){
+        [[self smellieThread] cancel];
     
-    // Tell SMELLIE hardware to stop generating triggers
-    @try{
-        [self CancelSmellieTriggers];
-    } @catch(NSException *e) {
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Problem telling smellie to stop sending triggers, reason: %@\n", [e reason]);
+        // Tell SMELLIE hardware to stop generating triggers
+        @try{
+            [self CancelSmellieTriggers];
+        } @catch(NSException *e) {
+            NSLogColor([NSColor redColor], @"[SMELLIE]: Problem telling smellie to stop sending triggers, reason: %@\n", [e reason]);
+        }
+        // Detatch thread to monitor smellie run thread
+        NSLog(@"[SMELLIE]: Waiting for SMELLIE server to release blocking trigger function...\n");
+        [NSThread detachNewThreadSelector:@selector(waitForSmellieRunToFinish) toTarget:self withObject:nil];
+    } else {
+        // Tell run control it can stop waiting
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object:self];
+        });
     }
-    
-    // Detatch thread to monitor smellie run thread
-    [NSThread detachNewThreadSelector:@selector(waitForSmellieRunToFinish) toTarget:self withObject:nil];
 }
 
 -(void)waitForSmellieRunToFinish
@@ -2166,9 +2173,10 @@ err:
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
     @try{
+        NSLog(@"[SMELLIE]: Waiting for lasers to deactivate....\n");
         [self deactivateSmellie];
     } @catch(NSException* e) {
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Deactivate command could not be sent to the SMELLIE server, reason: %@\n", [e reason]);
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Deactivate command failed, reason: %@\n", [e reason]);
     }
 
     // Kill the keepalive

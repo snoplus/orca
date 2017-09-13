@@ -1535,6 +1535,16 @@ snopGreenColor;
 
 - (IBAction) stopSmellieRunAction:(id)sender
 {
+    if(![sender isKindOfClass:[NSNotification class]]){
+        NSLog(@"#############################################\n");
+        NSLog(@"[SMELLIE]\n");
+        NSLog(@"\t\tRun stop button recongnised.\n");
+        NSLog(@"\t\tEXTA triggers will stop within the next 5s.\n");
+        NSLog(@"\t\tPutting the lasers to safe state may take\n");
+        NSLog(@"\t\tupto 2 minutes.\n");
+        NSLog(@"#############################################\n");
+    }
+    
     [smellieLoadRunFile setEnabled:YES];
     [smellieRunFileNameField setEnabled:YES];
     [smellieStopRunButton setEnabled:NO];
@@ -1547,7 +1557,7 @@ snopGreenColor;
         return;
     }
     ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
-
+ 
     //Call stop smellie run method to tidy up SMELLIE's hardware state
     @try{
         [theELLIEModel stopSmellieRun];
@@ -1565,11 +1575,16 @@ snopGreenColor;
 
 - (IBAction) emergencySmellieStopAction:(id)sender
 {
+    NSLog(@"#############################################\n");
+    NSLog(@"[SMELLIE]\n");
+    NSLog(@"\t\tEmergency run stop button recongnised.\n");
+    NSLog(@"\t\tEXTA triggers will stop within the next [5s].\n");
+    NSLog(@"\t\tPutting the lasers to safe state may take\n");
+    NSLog(@"\t\tupto [2 minutes].\n");
+    NSLog(@"#############################################\n");
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:@"SMELLIEEmergencyStop" object:self];
-    [smellieLoadRunFile setEnabled:NO];
-    [smellieRunFileNameField setEnabled:NO];
     [smellieStartRunButton setEnabled:NO];
-    [smellieStopRunButton setEnabled:YES];
 }
 
 -(IBAction)loadTellieRunAction:(id)sender
