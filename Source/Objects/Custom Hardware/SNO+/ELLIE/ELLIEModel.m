@@ -2202,6 +2202,21 @@ err:
     });
 
     NSLog(@"[SMELLIE]: Run sequence stopped.\n");
+    
+    ///////////////
+    //ROLL OVER INTO A MAINTENANCE RUN
+    NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    if(![snopModels count]){
+        NSLogColor([NSColor redColor], @"[TELLIE]: Couldn't find SNOPModel\n");
+        goto err;
+    }
+    SNOPModel* snopModel = [snopModels objectAtIndex:0];
+    
+    ////////////
+    // Roll over into maintenance run
+    if([[snopModel lastStandardRunType] isEqualToString:@"SMELLIE"]){
+        [snopModel startStandardRun:@"MAINTENANCE" withVersion:@"DEFAULT"];
+    }
     [pool release];
     return;
 
