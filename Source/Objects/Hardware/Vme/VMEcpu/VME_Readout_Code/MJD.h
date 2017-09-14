@@ -54,6 +54,10 @@ void readPreAmpAdcs(SBC_Packet* inputPacket);
 void singleAuxIO(SBC_Packet* aPacket);
 uint32_t writeAuxIOSPI(uint32_t baseAddress,uint32_t spiData);
 
+void readANLPreAmpAdcs(SBC_Packet* aPacket);
+void singleANLAuxIO(SBC_Packet* aPacket);
+uint32_t writeANLAuxIOSPI(uint32_t baseAddress,uint32_t spiData);
+
 void flashGretinaFPGA(SBC_Packet* aPacket);
 void setJobStatus(const char* message,uint32_t progress);
 

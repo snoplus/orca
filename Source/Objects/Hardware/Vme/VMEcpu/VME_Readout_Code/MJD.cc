@@ -57,18 +57,156 @@ void processMJDCommand(SBC_Packet* aPacket)
 		case kMJDReadPreamps:       readPreAmpAdcs(aPacket);             break;
         case kMJDSingleAuxIO:       singleAuxIO(aPacket);                break;
         case kMJDFlashGretinaFPGA:  startJob(&flashGretinaFPGA,aPacket); break;
+        case kMJDReadPreampsANL:    readANLPreAmpAdcs(aPacket);          break;
+        case kMJDSingleAuxIOANL:    singleANLAuxIO(aPacket);             break;
 	}
 }
 
+
+//------------------ANL Aux I/O ------------------------------
+void singleANLAuxIO(SBC_Packet* aPacket)
+{
+    //create the packet that will be returned
+    GRETINA4_SingleAuxIOStruct* p    = (GRETINA4_SingleAuxIOStruct*)aPacket->payload;
+    if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+    
+    uint32_t baseAddress = p->baseAddress;
+    p->spiData = writeANLAuxIOSPI(baseAddress,p->spiData);
+    
+    if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+    if (writeBuffer(aPacket) < 0) {
+        LogError("SingleAuxIO Error: %s", strerror(errno));
+    }
+}
+
+//read preAmps from the ANL Gretina card
+void readANLPreAmpAdcs(SBC_Packet* aPacket)
+{
+    //create the packet that will be returned
+    GRETINA4_PreAmpReadStruct* p    = (GRETINA4_PreAmpReadStruct*)aPacket->payload;
+    if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+    
+    uint32_t baseAddress = p->baseAddress;
+    uint32_t chip        = p->chip;
+    uint32_t enabledMask = p->readEnabledMask>>(chip*8); //mask comes for all channels. shift to get the part we care about.
+    uint32_t i;
+    for(i=0;i<8;i++){
+        uint32_t rawValue = 0;
+        if(enabledMask & (0x1<<i)){
+            //don't like it, but have to do multiple reads because of latencies
+             if( i==0 ){
+                // one latency here
+                rawValue = writeANLAuxIOSPI(baseAddress,p->adc[i]);
+                rawValue = writeANLAuxIOSPI(baseAddress,p->adc[i]);
+                rawValue = writeANLAuxIOSPI(baseAddress,p->adc[i+1]);
+            }
+            if( (i>0) && (i<5) ){
+                rawValue = writeANLAuxIOSPI(baseAddress,p->adc[i]);
+                rawValue = writeANLAuxIOSPI(baseAddress,p->adc[i+1]);
+            }
+            if( i==5 ){
+                // one latency here
+                rawValue = writeANLAuxIOSPI(baseAddress,p->adc[i]);
+                rawValue = writeANLAuxIOSPI(baseAddress,p->adc[i+1]);
+                rawValue = writeANLAuxIOSPI(baseAddress,p->adc[i+1]);
+            }
+            if( i==6 ){
+                // one write here
+                rawValue = writeANLAuxIOSPI(baseAddress,p->adc[i]);
+            }
+            if( i==7 ){
+                // catch up with previous writes here
+                rawValue = writeANLAuxIOSPI(baseAddress,p->adc[i]);
+                rawValue = writeANLAuxIOSPI(baseAddress,p->adc[i]);
+                rawValue = writeANLAuxIOSPI(baseAddress,p->adc[i]);
+            }
+        }
+        else rawValue=0;
+        p->adc[i] = rawValue;
+    }
+    if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+    if (writeBuffer(aPacket) < 0) {
+        LogError("PreAmp Error: %s", strerror(errno));
+    }
+}
+
+uint32_t writeANLAuxIOSPI(uint32_t baseAddress,uint32_t spiData)
+{
+//--------------------------------------------------------------------------------------------------
+//Bits 20:19 control whether the Aux I/O pins are inputs or outputs.
+//value of "00" sets bits 9:8 and bits 3:0 as enabled outputs, other pins are inputs.
+//In this mode the value written to bits 30:21 of this same register (address 0x424) are mapped to the AUX I/O pins:
+//Register bit  =>  30   29   28   27   26   25   24   23   22   21
+//Aux I/O  bit  =>   9    8    7    6    5    4    3    2    1    0
+//When you have bits 20:19 of register 0x424 set to "00", other bits in that register allow you to drive data out of bits
+//9:8 and 3:0 of the AUX I/O connector, but the assumption is that bits 7:4 of the connector are inputs.  To read the
+//state of the input pins, you read the register at address 0x020.  Bits 7:4 of that register read back the state of
+//bits 7:4 of the AUX I/O connector.
+//--------------------------------------------------------------------------------------------------
+
+#define kANLSPIData         (0x1 << 22)   //bit 22 of the control/mode/data register
+#define kANLSPIClock        (0x1 << 23)   //bit 23 of the control/mode/data register
+#define kANLSPIChipSelect   (0x1 << 24)   //bit 24 of the control/mode/data register
+#define kANLSPIRead         (0x1 <<  4)   //bit  4 of status register is the SPIRead pin
+    
+#define kSPIMode00          (0x00 << 19)  //9:8 and 3:0 outputs, others are inputs
+#define kSPIMode01          (0x01 << 19)  //all bits are outputs, driving pulses when channels have hits
+#define kSPIMode10          (0x10 << 19)  //all bits are outputs, driving all zeros
+#define kSPIMode11          (0x11 << 19)  //same as mode 00 but ALL are outputs
+    
+    TUVMEDevice* device = get_new_device(baseAddress, 0x09, 4, 0x0);
+    uint32_t readBack   = 0;
+    if(device!=0){
+        uint32_t auxIORead   =  0x020;   //status register
+        uint32_t auxIOWrite  =  0x424;   //aux io control/data/mode register
+        uint32_t auxIOConfig =  0x424;   //aux io control/data/mode register
+        
+        uint32_t valueToWrite = (kSPIMode11 | kANLSPIChipSelect | kANLSPIClock);    //set mode, chip select high, clock high
+        write_device(device, (char*)(&valueToWrite), 4, auxIOConfig);
+        
+        //signify that we are starting
+        valueToWrite = kANLSPIChipSelect | kANLSPIClock | kANLSPIData;
+        write_device(device, (char*)(&valueToWrite), 4, auxIOWrite);
+        
+        uint32_t i;
+        for(i=0; i<32; i++) {
+            bool bitHigh = (spiData & (0x80000000>>i)) != 0; //get bit state starting with MSB
+            
+            //write data with clock low
+            if(bitHigh) valueToWrite = kANLSPIChipSelect | kANLSPIData;
+            else        valueToWrite = kANLSPIChipSelect;
+            write_device(device, (char*)(&valueToWrite), 4, auxIOWrite);
+            
+            //repeat with clock high
+            if(bitHigh) valueToWrite = kANLSPIChipSelect | kANLSPIClock | kANLSPIData;
+            else        valueToWrite = kANLSPIChipSelect | kANLSPIClock;
+            write_device(device, (char*)(&valueToWrite), 4, auxIOWrite);
+            
+            //get the readBack value
+            uint32_t valueRead;
+            read_device(device,(char*)(&valueRead),4,auxIORead);
+            readBack |= ((valueRead & kANLSPIRead) > 0) << (31-i);
+        }
+        
+        //unset kSPIChipSelect to signify that we are done
+        valueToWrite = kANLSPIClock | kANLSPIData;
+        write_device(device, (char*)(&valueToWrite), 4, auxIOWrite);
+        close_device(device);
+    }
+    return readBack;
+}
+
+
+//------------------LBL Aux I/O ------------------------------
 void singleAuxIO(SBC_Packet* aPacket)
 {
-    //create the packet that will be returned    
-	GRETINA4_SingleAuxIOStruct* p    = (GRETINA4_SingleAuxIOStruct*)aPacket->payload;
+    //create the packet that will be returned
+    GRETINA4_SingleAuxIOStruct* p    = (GRETINA4_SingleAuxIOStruct*)aPacket->payload;
     if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
-
+    
     uint32_t baseAddress = p->baseAddress;
     p->spiData = writeAuxIOSPI(baseAddress,p->spiData);
-
+    
     if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
     if (writeBuffer(aPacket) < 0) {
         LogError("SingleAuxIO Error: %s", strerror(errno));
@@ -76,6 +214,7 @@ void singleAuxIO(SBC_Packet* aPacket)
 }
 
 
+//read preAmps from the LBL Gretina card
 void readPreAmpAdcs(SBC_Packet* aPacket)
 {
     //create the packet that will be returned
@@ -95,7 +234,6 @@ void readPreAmpAdcs(SBC_Packet* aPacket)
 			//rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
 			//rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
             if( i==0 ){
-               
                 // one latency here
                 rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
                 rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
