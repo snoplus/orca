@@ -26,7 +26,6 @@
         IBOutlet NSPopUpButton* firmwareRevPU;
 		IBOutlet NSButton*		settingsLockButton;
         IBOutlet NSPopUpButton* boardRevPU;
-        IBOutlet NSButton*      useSBCCB;
 		IBOutlet NSMatrix*		adcEnabledMaskMatrix;
 		IBOutlet NSButton*		shipValuesCB;
 		IBOutlet NSPopUpButton* pollTimePU;
@@ -74,7 +73,6 @@
 - (void) firmwareRevChanged:(NSNotification*)aNote;
 - (void) doNotUseHWMapChanged:(NSNotification*)aNote;
 - (void) boardRevChanged:(NSNotification*)aNote;
-- (void) useSBCChanged:(NSNotification*)aNote;
 - (void) updateTimePlot:(NSNotification*)aNotification;
 - (void) scaleAction:(NSNotification*)aNotification;
 - (void) adcEnabledMaskChanged:(NSNotification*)aNote;
@@ -116,7 +114,6 @@
 - (IBAction) doNotUseHWMapAction:(id)sender;
 - (IBAction) boardRevAction:(id)sender;
 - (IBAction) clearSupplyErrorsAction:(id)sender;
-- (IBAction) useSBCAction:(id)sender;
 - (IBAction) detectorNameAction:(id)sender;
 - (IBAction) adcEnabledMaskAction:(id)sender;
 - (IBAction) pollNowAction:(id)sender;

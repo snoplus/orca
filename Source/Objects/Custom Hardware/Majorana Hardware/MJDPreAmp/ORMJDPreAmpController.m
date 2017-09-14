@@ -359,11 +359,6 @@
 					   object : nil];
 
     [notifyCenter addObserver : self
-                     selector : @selector(useSBCChanged:)
-                         name : ORMJDPreAmpModelUseSBCChanged
-						object: model];
-
-    [notifyCenter addObserver : self
                      selector : @selector(boardRevChanged:)
                          name : ORMJDPreAmpModelBoardRevChanged
 						object: model];
@@ -415,7 +410,6 @@
 	[self feedbackResistorChanged:nil];
 	[self detectorNameChanged:nil];
     [self doNotUseHWMapChanged:nil];
-	[self useSBCChanged:nil];
 	[self boardRevChanged:nil];
     [self adcChanged:nil];
     [self firmwareRevChanged:nil];
@@ -453,11 +447,6 @@
 {
 	[boardRevPU selectItemAtIndex: [model boardRev]];
     [self setWindowTitle];
-}
-
-- (void) useSBCChanged:(NSNotification*)aNote
-{
-	[useSBCCB setIntValue: [model useSBC]];
 }
 
 - (void) scaleAction:(NSNotification*)aNotification
@@ -817,10 +806,6 @@
 	[model setBoardRev:[sender indexOfSelectedItem]];
 }
 
-- (IBAction) useSBCAction:(id)sender
-{
-	[model setUseSBC:[sender intValue]];
-}
 - (IBAction) adcEnabledMaskAction:(id)sender
 {
 	unsigned short mask = 0;
