@@ -36,9 +36,9 @@
 @class ORCommandList;
 @class ORRateGroup;
 
-#define kNumKatrinV4FLTTests 5
-#define kKatrinV4FLTBufferSizeLongs 1024
-#define kKatrinV4FLTBufferSizeShorts 1024/2
+#define kNumKatrinV4FLTTests            5
+#define kKatrinV4FLTBufferSizeLongs     1024
+#define kKatrinV4FLTBufferSizeShorts    1024/2
 
 /** Access to the first level trigger board of the IPE-DAQ V4 electronics.
  * The board contains ADCs for 24 channels and digital logic (FPGA) 
@@ -103,8 +103,9 @@
 	ORAlarm* fltV4useDmaBlockReadAlarm;
     int useDmaBlockRead;
     int boxcarLength;
+    int hitRateMode;
     unsigned long   oldTriggerEnabledMask; //!< mask to temporarially store the enabled mask for later reuse.
-    
+    unsigned short lastHitRateLength;
     //buffer for summed histograms
     katrinV4FltFullHistogramDataStruct histoBuf[24];
     int32_t isBetweenSubruns;//temp variable used for shipping sum histograms -tb-
@@ -232,6 +233,11 @@
 - (void) setHitRateId: (unsigned long)aHitRateId;
 - (unsigned long) histogramId;
 - (void) setHistogramId: (unsigned long)aHistogramId;
+- (int) hitRateMode;
+- (void) setHitRateMode:(int)aMode;
+- (void) stopReadingHitRates;
+- (void) startReadingHitRates;
+- (void) clearHitRates;
 
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherCard;
@@ -469,6 +475,7 @@ extern NSString* ORKatrinV4FLTModelEventMaskChanged;
 extern NSString* ORKatrinV4FLTNoiseFloorChanged;
 extern NSString* ORKatrinV4FLTNoiseFloorOffsetChanged;
 extern NSString* ORKatrinV4FLTModelActivateDebuggingDisplaysChanged;
+extern NSString* ORKatrinV4FLTModelHitRateModeChanged;
 
 extern NSString* ORIpeSLTModelName;
 

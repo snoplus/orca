@@ -418,10 +418,21 @@
                      selector : @selector(energyOffsetChanged:)
                          name : ORKatrinV4FLTModelEnergyOffsetChanged
 						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(hitRateModeChanged:)
+                         name : ORKatrinV4FLTModelHitRateModeChanged
+                        object: model];
 
+    
 }
 
 #pragma mark •••Interface Management
+
+- (void) hitRateModeChanged:(NSNotification*)aNote
+{
+    [hitRateModePU selectItemAtIndex:[model hitRateMode]];
+}
 
 - (void) energyOffsetChanged:(NSNotification*)aNote
 {
@@ -723,6 +734,7 @@
 	[self skipFltEventReadoutChanged:nil];
 	[self forceFLTReadoutChanged:nil];
 	[self energyOffsetChanged:nil];
+    [self hitRateModeChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -1144,32 +1156,37 @@
 	[model updateUseSLTtime];	
 }
 
+- (IBAction) hitRateModeAction:(id)sender
+{
+    [model setHitRateMode:[sender indexOfSelectedItem]];
+}
+
 - (IBAction) useDmaBlockReadPUAction:(id)sender
 {
 	[model setUseDmaBlockRead:[[useDmaBlockReadPU selectedItem] tag]];	
 }
 
-- (void) useDmaBlockReadButtonAction:(id)sender
+- (IBAction) useDmaBlockReadButtonAction:(id)sender
 {
 	[model setUseDmaBlockRead:[sender intValue]];	
 }
 
-- (void) syncWithRunControlButtonAction:(id)sender
+- (IBAction) syncWithRunControlButtonAction:(id)sender
 {
 	[model setSyncWithRunControl:[sender intValue]];	
 }
 
-- (void) decayTimeTextFieldAction:(id)sender
+- (IBAction) decayTimeTextFieldAction:(id)sender
 {
 	[model setDecayTime:[sender doubleValue]];	
 }
 
-- (void) poleZeroCorrectionPUAction:(id)sender
+- (IBAction) poleZeroCorrectionPUAction:(id)sender
 {
 	[model setPoleZeroCorrection:[poleZeroCorrectionPU indexOfSelectedItem]];	
 }
 
-- (void) customVariableTextFieldAction:(id)sender
+- (IBAction) customVariableTextFieldAction:(id)sender
 {
 	[model setCustomVariable:[sender intValue]];	
 }
