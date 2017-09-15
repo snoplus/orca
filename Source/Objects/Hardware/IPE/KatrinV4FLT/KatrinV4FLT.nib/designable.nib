@@ -3061,12 +3061,12 @@ Enable</string>
                                                     <popUpButton verticalHuggingPriority="750" misplaced="YES" imageHugsTitle="YES" id="9Lg-ce-QCB">
                                                         <rect key="frame" x="50" y="32" width="88" height="22"/>
                                                         <autoresizingMask key="autoresizingMask"/>
-                                                        <popUpButtonCell key="cell" type="push" title="With Run" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="Les-sL-xzU" id="0gg-UO-DMj">
+                                                        <popUpButtonCell key="cell" type="push" title="With Run" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="Les-sL-xzU" id="0gg-UO-DMj">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <menu key="menu" title="OtherViews" id="OXZ-nd-aUM">
                                                                 <items>
-                                                                    <menuItem title="With Run" id="Les-sL-xzU">
+                                                                    <menuItem title="With Run" state="on" id="Les-sL-xzU">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
                                                                     <menuItem title="Always" tag="1" id="KJ3-g8-26F">
@@ -3626,8 +3626,8 @@ Enable</string>
                             </tabViewItem>
                             <tabViewItem label="Testing" identifier="" id="2908">
                                 <view key="view" id="2909">
-                                    <rect key="frame" x="10" y="25" width="588" height="665"/>
-                                    <autoresizingMask key="autoresizingMask"/>
+                                    <rect key="frame" x="10" y="25" width="613" height="665"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box boxType="oldStyle" borderType="none" title="Title" titlePosition="noTitle" id="2910">
                                             <rect key="frame" x="-3" y="402" width="308" height="230"/>
