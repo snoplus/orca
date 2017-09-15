@@ -1807,7 +1807,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     double delay      = 1<<[self hitRateLength];
     double deltadelay = 0.4 - 0.00000005*sltSubSec;
     delay += deltadelay;
-    NSLog(@"delay: %.1f\n",delay);
     [self performSelector:@selector(readHitRates) withObject:nil afterDelay:(delay)];
 }
 
