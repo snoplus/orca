@@ -329,6 +329,7 @@
 - (IBAction)SendPing:(id)sender {
     @try{
         [model Ping];
+        NSLog(@"TUBii ping successful.\n");
     } @catch (NSException *exception) {
         [self log_error:exception];
         return;
