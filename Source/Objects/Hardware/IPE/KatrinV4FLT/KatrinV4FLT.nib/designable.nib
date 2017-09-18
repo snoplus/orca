@@ -173,11 +173,11 @@
                         <tabViewItems>
                             <tabViewItem label="Settings" identifier="" id="1185">
                                 <view key="view" id="1187">
-                                    <rect key="frame" x="10" y="29" width="613" height="661"/>
+                                    <rect key="frame" x="10" y="25" width="613" height="665"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box misplaced="YES" title="Control Register" id="595">
-                                            <rect key="frame" x="-1" y="545" width="280" height="112"/>
+                                            <rect key="frame" x="-1" y="549" width="280" height="112"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="iWR-qe-1Lq">
                                                 <rect key="frame" x="2" y="2" width="276" height="95"/>
@@ -285,7 +285,7 @@
                                             </view>
                                         </box>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Misc HW Settings" id="2907">
-                                            <rect key="frame" x="452" y="76" width="147" height="144"/>
+                                            <rect key="frame" x="452" y="80" width="147" height="144"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="KKy-KN-lvH">
                                                 <rect key="frame" x="1" y="1" width="145" height="128"/>
@@ -389,7 +389,7 @@
                                             </view>
                                         </box>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Misc Requests" id="2988">
-                                            <rect key="frame" x="452" y="509" width="147" height="148"/>
+                                            <rect key="frame" x="452" y="513" width="147" height="148"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="FPb-hv-qb4">
                                                 <rect key="frame" x="1" y="1" width="145" height="132"/>
@@ -454,7 +454,7 @@
                                             </view>
                                         </box>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Thresold Finder" id="3255">
-                                            <rect key="frame" x="452" y="306" width="147" height="82"/>
+                                            <rect key="frame" x="452" y="310" width="147" height="82"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="Ykk-NE-LQe">
                                                 <rect key="frame" x="1" y="1" width="145" height="66"/>
@@ -484,7 +484,7 @@
                                             </view>
                                         </box>
                                         <tabView drawsBackground="NO" controlSize="small" type="noTabsNoBorder" id="3343">
-                                            <rect key="frame" x="-4" y="-7" width="458" height="553"/>
+                                            <rect key="frame" x="-4" y="-3" width="458" height="553"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <tabViewItems>
                                                 <tabViewItem label="Tab" identifier="1" id="3344">
@@ -2912,7 +2912,7 @@ Enable</string>
                                             </view>
                                         </box>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Filter Parameters" id="3006">
-                                            <rect key="frame" x="279" y="545" width="164" height="112"/>
+                                            <rect key="frame" x="279" y="549" width="164" height="112"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="enX-Fg-qYe">
                                                 <rect key="frame" x="1" y="1" width="162" height="96"/>
@@ -3018,8 +3018,8 @@ Enable</string>
                                                 </subviews>
                                             </view>
                                         </box>
-                                        <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Hit Rate" id="3035">
-                                            <rect key="frame" x="449" y="224" width="150" height="78"/>
+                                        <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Hit Rate Polling" id="3035">
+                                            <rect key="frame" x="449" y="228" width="150" height="78"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="XBP-b6-1Ty">
                                                 <rect key="frame" x="1" y="1" width="148" height="62"/>
@@ -3059,14 +3059,14 @@ Enable</string>
                                                         </connections>
                                                     </popUpButton>
                                                     <popUpButton verticalHuggingPriority="750" misplaced="YES" imageHugsTitle="YES" id="9Lg-ce-QCB">
-                                                        <rect key="frame" x="50" y="32" width="88" height="22"/>
+                                                        <rect key="frame" x="3" y="32" width="135" height="22"/>
                                                         <autoresizingMask key="autoresizingMask"/>
-                                                        <popUpButtonCell key="cell" type="push" title="With Run" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="Les-sL-xzU" id="0gg-UO-DMj">
+                                                        <popUpButtonCell key="cell" type="push" title="During Run Only" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="Les-sL-xzU" id="0gg-UO-DMj">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <menu key="menu" title="OtherViews" id="OXZ-nd-aUM">
                                                                 <items>
-                                                                    <menuItem title="With Run" state="on" id="Les-sL-xzU">
+                                                                    <menuItem title="During Run Only" id="Les-sL-xzU">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
                                                                     <menuItem title="Always" tag="1" id="KJ3-g8-26F">
@@ -3083,15 +3083,6 @@ Enable</string>
                                                         <rect key="frame" x="4" y="8" width="42" height="17"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="right" title="Length" id="2843">
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
-                                                    <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="gDy-a8-Qk5">
-                                                        <rect key="frame" x="5" y="34" width="42" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask"/>
-                                                        <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="right" title="Run" id="JET-sK-CyG">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
