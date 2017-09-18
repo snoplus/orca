@@ -41,6 +41,7 @@
     IBOutlet NSMatrix*			negativePulseMatrix;
     IBOutlet NSTextField*		voltageDisplay;
     IBOutlet NSTextField*		burstRateDisplay;
+    IBOutlet NSTextField*		freqLabel;
     IBOutlet ORCompositePlotView*	plotter;
     NSArray*                    topLevelObjects;
 }
@@ -57,6 +58,7 @@
 - (void) downloadWaveform;
 
 #pragma mark ***Interface Management
+- (void) updateFreqLabels;
 - (void) loadConstantsChanged:(NSNotification*)aNote;
 - (void) voltageChanged:(NSNotification*)aNote;
 - (void) voltageOffsetChanged:(NSNotification*)aNote;

@@ -41,7 +41,7 @@
     IBOutlet NSButton* 		testButton;	
     IBOutlet NSButton* 		resetButton;	
     IBOutlet NSButton* 		clearMemoryButton;	
-	
+    IBOutlet NSButton*      showInKHzCB;
     IBOutlet NSButton*		initHardwareButton;
 
     IBOutlet NSTextField*   lockDocField;
@@ -74,6 +74,7 @@
 - (IBAction) lockAction:(id)sender;
 - (IBAction) testAction:(id)sender;
 - (IBAction) initHardware:(id)sender;
+- (IBAction) showInKHzAction:(id)sender;
 
 - (void) populateInterfacePopup;
 - (void) validateInterfacePopup;
