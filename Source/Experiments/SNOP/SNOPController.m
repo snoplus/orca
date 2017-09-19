@@ -1839,10 +1839,6 @@ err:
     [standardRunLoadinHWButton setEnabled:!lockedOrNotRunningMaintenance];
     [triggersOFFButton setEnabled:notRunningOrInMaintenance];
 
-    //Do not lock detector state bits to the operator
-    for(int irow=0;irow<21;irow++){
-        [[runTypeWordMatrix cellAtRow:irow column:0] setEnabled:!locked];
-    }
     [timedRunCB setEnabled:!runInProgress];
     [timeLimitField setEnabled:!locked];
     [repeatRunCB setEnabled:!locked];
@@ -1873,6 +1869,10 @@ err:
     [nhitMonitorCrateMaskMatrix setEnabled:!locked];
     [nhitMonitorTimeInterval setEnabled:!locked];
 
+    //Do not lock detector state bits to the operator
+    for(int irow=0;irow<21;irow++){
+        [[runTypeWordMatrix cellAtRow:irow column:0] setEnabled:!lockedOrNotRunningMaintenance];
+    }
     [rampDownCrateButton setEnabled:notRunningOrInMaintenance];
     [inMaintenanceLabel setHidden:notRunningOrInMaintenance];
 

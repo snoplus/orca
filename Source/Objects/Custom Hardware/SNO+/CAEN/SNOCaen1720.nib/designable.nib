@@ -276,7 +276,6 @@
 																<int key="NSvFlags">256</int>
 																<string key="NSFrame">{{11, 8}, {91, 17}}</string>
 																<reference key="NSSuperview" ref="595780569"/>
-																<reference key="NSNextKeyView" ref="488279668"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="236120928">
 																	<int key="NSCellFlags">67108864</int>
@@ -4004,7 +4003,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																<string key="NSFrame">{{597, 21}, {62, 28}}</string>
 																<reference key="NSSuperview" ref="210438904"/>
 																<reference key="NSWindow"/>
-																<reference key="NSNextKeyView" ref="488279668"/>
+																<reference key="NSNextKeyView"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSButtonCell" key="NSCell" id="739016606">
 																	<int key="NSCellFlags">67108864</int>
@@ -5069,7 +5068,7 @@ OAA</bytes>
 															<object class="NSTextField" id="405477671">
 																<reference key="NSNextResponder" ref="95966892"/>
 																<int key="NSvFlags">268</int>
-																<string key="NSFrame">{{10, 70}, {106, 14}}</string>
+																<string key="NSFrame">{{5, 70}, {116, 14}}</string>
 																<reference key="NSSuperview" ref="95966892"/>
 																<reference key="NSWindow"/>
 																<reference key="NSNextKeyView" ref="417706686"/>
@@ -8409,7 +8408,7 @@ xcjGRsbDx0HHv8g9yLzJOsm5yjjKt8s2y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="488279668"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1280, 777}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1057}}</string>
 				<string key="NSMinSize">{270, 226}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
@@ -12919,7 +12918,7 @@ xcjGRsbDx0HHv8g9yLzJOsm5yjjKt8s2y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ
 							<string key="candidateClassName">id</string>
 						</object>
 					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="1055915234">
+					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="276011974">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">../Source/Widgets/CompositeObjects/ORCompositePlotView.h</string>
 					</object>
@@ -13028,7 +13027,7 @@ xcjGRsbDx0HHv8g9yLzJOsm5yjjKt8s2y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ
 				<object class="IBPartialClassDescription">
 					<string key="className">ORCompositeTimeLineView</string>
 					<string key="superclassName">ORCompositePlotView</string>
-					<reference key="sourceIdentifier" ref="1055915234"/>
+					<reference key="sourceIdentifier" ref="276011974"/>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">ORTimedTextField</string>
