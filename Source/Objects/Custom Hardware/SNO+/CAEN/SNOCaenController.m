@@ -561,7 +561,6 @@ static int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     BOOL locked						= [gSecurity isLocked:SNOCaenBasicLock];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:SNOCaenBasicLock];
 	
-	//[softwareTriggerButton setEnabled: !locked && !runInProgress]; 
     [basicLockButton setState: locked];
     
     [addressStepper setEnabled:!locked && !runInProgress];
@@ -592,8 +591,6 @@ static int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 	[self setBufferStateLabel];
     [thresholdMatrix setEnabled:!locked];
     [overUnderMatrix setEnabled:!locked];
-    //[softwareTriggerButton setEnabled:!lockedOrRunningMaintenance]; 
-	[softwareTriggerButton setEnabled:YES]; 
     [otherTriggerMatrix setEnabled:!locked];
     [chanTriggerMatrix setEnabled:!locked];
 	[otherTriggerOutMatrix setEnabled:!locked];
@@ -626,6 +623,7 @@ static int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 	//these must NOT or can not be changed when run in progress
     [loadThresholdsButton setEnabled:!lockedOrRunningMaintenance];
     [initButton setEnabled:!lockedOrRunningMaintenance];
+    [softwareTriggerButton setEnabled:!lockedOrRunningMaintenance];
 
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
