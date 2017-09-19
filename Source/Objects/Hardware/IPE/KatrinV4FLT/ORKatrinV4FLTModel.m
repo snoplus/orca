@@ -1774,7 +1774,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                 sltSec      =  [slt getSeconds];
                 sltSubSec   =  [slt readSubSecondsCounter];
 
-                if(dataIndex>0){
+                if(dataIndex>0 && [gOrcaGlobals runInProgress]){
                     time_t	ut_time;
                     time(&ut_time);
 
@@ -1783,7 +1783,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                     data[2] = sltSec;
                     data[3] = hitRateLengthSec;	
                     data[4] = newTotal;
-                    [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+
+                    [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification
                                                                         object:[NSData dataWithBytes:data length:sizeof(long)*(dataIndex + 5 + countHREnabledChans)]];
                 }
                 
@@ -2343,7 +2344,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	//changed 2013-04-29 -tb- SLT will set inhibit anyway! for quick start we want to leave the current mode active (histogr. FLTs are restarted at runTaskStarted) [self writeControlWithStandbyMode];
 	//[self setLedOff:YES];
     if(hitRateMode == kKatrinV4HitRunRateWithRun){
-        if(![gOrcaGlobals runInProgress])[self stopReadingHitRates];
+        [self stopReadingHitRates];
     }
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHistogrammingStatus) object:nil];
 
