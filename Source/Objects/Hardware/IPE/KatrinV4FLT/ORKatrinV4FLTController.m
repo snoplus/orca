@@ -592,11 +592,9 @@
 {
 	[filterShapingLengthPU selectItemWithTag:[model filterShapingLength]];
 	[self recommendedPZCChanged:nil];
-	#if 1
 	bool useBoxcar=([model filterShapingLength]==0);
-	[boxcarLengthPU setEnabled: useBoxcar];
-	[boxcarLengthLabel setEnabled: useBoxcar];
-	#endif
+	[boxcarLengthPU     setEnabled: useBoxcar];
+	[boxcarLengthLabel  setEnabled: useBoxcar];
 }
 
 - (void) gapLengthChanged:(NSNotification*)aNote
@@ -756,14 +754,16 @@
     BOOL locked           = [gSecurity isLocked:ORKatrinV4FLTSettingsLock];
 	BOOL testsAreRunning  = [model testsRunning];
 	BOOL testingOrRunning = testsAreRunning | runInProgress;
-    
+    bool useBoxcar        = ([(ORKatrinV4FLTModel*)model runMode] == 3) || ([(ORKatrinV4FLTModel*)model runMode] == 4);
+
     //MAH. put in casts below to clear warning from XCode 5
 	if([(ORKatrinV4FLTModel*)model runMode] < 3 || [(ORKatrinV4FLTModel*)model runMode] > 6)	[modeTabView selectTabViewItemAtIndex:0];
 	else											[modeTabView selectTabViewItemAtIndex:1];
+    
+
 	
 	[gapLengthPU setEnabled:!lockedOrRunningMaintenance && (([(ORKatrinV4FLTModel*)model runMode]<3) || ([(ORKatrinV4FLTModel*)model runMode]>6))];
 	[filterShapingLengthPU setEnabled:!lockedOrRunningMaintenance];
-	bool useBoxcar=([model filterShapingLength]==0);
 	[boxcarLengthPU setEnabled:!lockedOrRunningMaintenance && useBoxcar];
 	[boxcarLengthLabel setEnabled:!lockedOrRunningMaintenance && useBoxcar];
 	

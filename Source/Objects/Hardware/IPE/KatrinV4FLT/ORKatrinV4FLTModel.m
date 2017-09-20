@@ -771,9 +771,7 @@ static double table[32]={
 
     [[[self undoManager] prepareWithInvocationTarget:self] setRunMode:runMode];
     runMode = aRunMode;
-	
-	//int fifoLengthSetting = kFifoLength512;
-	
+		
 	switch (runMode) {
 		case kKatrinV4Flt_EnergyDaqMode:
 			[self setFltRunMode:kKatrinV4FLT_Run_Mode];
@@ -929,29 +927,35 @@ static double table[32]={
 - (int) filterShapingLength { return filterShapingLength; }
 - (void) setFilterShapingLength:(int)aFilterShapingLength
 {
-    if(aFilterShapingLength>0x3f)aFilterShapingLength = 0x3F;
-    if(aFilterShapingLength<2)   aFilterShapingLength = 2;
-    
-	if(aFilterShapingLength == 0x3f && gapLength>0){
+    [[[self undoManager] prepareWithInvocationTarget:self] setFilterShapingLength:filterShapingLength];
+    int newValue = [self restrictIntValue:aFilterShapingLength min:2 max:8];
+    if(filterShapingLength!=0 && newValue!=filterShapingLength){
+        float old = 1<<filterShapingLength;
+        float new = 1<<newValue;
+        float ratio = new/old;
+        int chan;
+        for(chan=0;chan<kNumV4FLTChannels;chan++){
+            unsigned long currentThreshold = [self threshold:chan];
+            [self setThreshold:chan withValue:currentThreshold*ratio];
+        }
+    }
+    filterShapingLength = newValue;
+	if(filterShapingLength == 8 && gapLength>0){
 		[self setGapLength:0];
 		NSLog(@"Warning: setFilterShapingLength: FLTv4: maximum filter length allows only gap length of 0. Gap length reset to 0!\n");
 	}
-    [[[self undoManager] prepareWithInvocationTarget:self] setFilterShapingLength:filterShapingLength];
-    filterShapingLength = [self restrictIntValue:aFilterShapingLength min:0 max:8];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelFilterShapingLengthChanged object:self];
 }
 
 - (int) gapLength { return gapLength; }
 - (void) setGapLength:(int)aGapLength
 {
-    if(aGapLength>0x7)aGapLength = 0x7;
-    if(aGapLength<0)  aGapLength = 0;
-    if(filterShapingLength == 0x3f && gapLength>0){
-		aGapLength=0;
-		NSLog(@"Warning: setGapLength: FLTv4: maximum filter length allows only gap length of 0. Gap length reset to 0!\n");
-	}
     [[[self undoManager] prepareWithInvocationTarget:self] setGapLength:gapLength];
     gapLength = [self restrictIntValue:aGapLength min:0 max:7];
+    if(filterShapingLength == 8 && gapLength>0){
+		gapLength=0;
+		NSLog(@"Warning: setGapLength: FLTv4: maximum filter length allows only gap length of 0. Gap length reset to 0!\n");
+	}
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelGapLengthChanged object:self];
 }
 
@@ -1421,7 +1425,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 - (void) initBoard
 {
-	//[self writeControl]; //removed setting runmode from here -tb-
+    [self writeControlWithStandbyMode];     //standby mode so the HW is stable for the following writes
 	[self writeReg: kFLTV4HrControlReg     value:hitRateLength];
 	[self writeReg: kFLTV4PostTrigger      value:postTriggerTime];
 	[self writeReg: kFLTV4EnergyOffsetReg  value:energyOffset];//new 2016-07 - is it OK for old firmware? -tb-
@@ -1433,6 +1437,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	if(fltRunMode == kKatrinV4FLT_Histo_Mode){
 		[self writeHistogramControl];
 	}
+    [self writeRunControl:YES];
+    [self writeControl];                //come out of standby mode
 }
 
 - (unsigned long) readStatus
@@ -1445,23 +1451,21 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	return [self readReg: kFLTV4ControlReg];
 }
 
-
 //TODO: better use the STANDBY flag of the FLT -tb- 2010-01-xx     !!!!!!!!!!!!!!!!!
 - (void) writeRunControl:(BOOL)startSampling
 {
 	unsigned long aValue = 
-	(((boxcarLength)        & 0x7)<<28)	|		//boxcarLength is the register value and the popup item tag -tb- extended to 3 bits in 2016, needed to be shifted to bit 28 ...
+	(((boxcarLength)        & 0x7)<<28)	|		//boxcarLength is the register value and the popup item tag. extended to 3 bits in 2016, needed to be shifted to bit 28
     (((poleZeroCorrection)  & 0xf)<<24) |		//poleZeroCorrection is stored as the popup index -- NEW since 2011-06-09 -tb-
 	(((nfoldCoincidence)    & 0xf)<<20) |		//nfoldCoincidence is stored as the popup index -- NEW since 2010-11-09 -tb-
 	(((vetoOverlapTime)     & 0xf)<<16)	|		//vetoOverlapTime is stored as the popup index -- NEW since 2010-08-04 -tb-
 	(((boxcarLength)        & 0x3)<<14)	|		//boxcarLength is the register value and the popup item tag -tb-
 	(((filterShapingLength) & 0xf)<<8)	|		//filterShapingLength is the register value and the popup item tag -tb-
-	((gapLength & 0xf)<<4)			| 
-	// -tb- ((runBoxCarFilter & 0x1)<<2)	|
-	((startSampling & 0x1)<<3)		|		// run trigger unit
-	((startSampling & 0x1)<<2)		|		// run filter unit
-	((startSampling & 0x1)<<1)      |		// start ADC sampling
-	 (startSampling & 0x1);					// store data in QDRII RAM
+	((gapLength & 0xf)<<4)              |
+	((startSampling & 0x1)<<3)          |		// run trigger unit
+	((startSampling & 0x1)<<2)          |		// run filter unit
+	((startSampling & 0x1)<<1)          |		// start ADC sampling
+	 (startSampling & 0x1);                     // store data in QDRII RAM
 	
 	[self writeReg:kFLTV4RunControlReg value:aValue];					
 }
@@ -1933,11 +1937,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     [encoder encodeInt:shipSumHistogram             forKey:@"shipSumHistogram"];
     [encoder encodeBool:activateDebuggingDisplays   forKey:@"activateDebuggingDisplays"];
     [encoder encodeInt:hitRateMode                  forKey:@"hitRateMode"];
-
-    [encoder encodeInt:filterShapingLength forKey:@"filterShapingLength"];
-	if(filterShapingLength == 1) NSLog(@"filterShapingLength is 1. After saving ORCA configuration use ORCA 9.2.1, rev.5243 or higher to open again!\n");
-	
-	//see above: many fields are  still in super class ORIpeV4FLTModel, some should move here (see ORIpeV4FLTModel::encodeWithCoder, see my comments in 2011-04-07-ORKatrinV4FLTModel.m) -tb-
+    [encoder encodeInt:filterShapingLength          forKey:@"filterShapingLength"];
 }
 
 #pragma mark Data Taking
@@ -2040,7 +2040,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     [objDictionary setObject:[NSNumber numberWithLong:analogOffset]			forKey:@"analogOffset"];
     [objDictionary setObject:[NSNumber numberWithLong:hitRateLength]		forKey:@"hitRateLength"];
     [objDictionary setObject:[NSNumber numberWithLong:gapLength]			forKey:@"gapLength"];
-    [objDictionary setObject:[NSNumber numberWithLong:filterShapingLength]		forKey:@"filterShapingLength"];//this is the fpga register value -tb-
+    [objDictionary setObject:[NSNumber numberWithLong:filterShapingLength]  forKey:@"filterShapingLength"];//this is the fpga register value -tb-
     [objDictionary setObject:[NSNumber numberWithInt:vetoOverlapTime]		forKey:@"vetoOverlapTime"];
     [objDictionary setObject:[NSNumber numberWithInt:nfoldCoincidence]		forKey:@"nfoldCoincidence"];
 	
@@ -2284,21 +2284,9 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	//}
     
     //if cold start (not 'quick start' in RunControl) ...
+    [self setLedOff:NO];
     if([[userInfo objectForKey:@"doinit"]intValue]){
-	    if(runMode == kKatrinV4Flt_Histogram_DaqMode){//FLTs NOT in histogram mode may stay in their previous mode - this will remove the delay (until next 1PPs) the FLT needs to start the filter -tb-
-    	    [self writeControlWithStandbyMode];
-	    }
-        //TODO: I could check the current mode and set it only if not yet set
-	    [self setLedOff:NO];
-	    [self writeRunControl:YES]; // writes to run control register (was NO, but this causes the first few noise events -tb-)
 	    [self initBoard];           // writes control reg + hr control reg + PostTrigg + thresh+gains + offset + triggControl + hr mask + enab.statistics
-
-        //I start non-histogramming FLTS early - the filter shall run and 1st PPS should be over when SLT releases inhibit -tb-
-        //histogramming FLTs will be started by SLTS late (after next 1PPS)
-	    if(runMode != kKatrinV4Flt_Histogram_DaqMode){//FLTs NOT in histogram mode may stay in their previous mode - this will remove the delay (until next 1PPs) the FLT needs to start the filter -tb-
-    	    [self writeControl];
-            
-	    }
 	}
 	
     [self reset];               // Write 1 to all reset/clear flags of the FLTv4 command register. (-> will 'clear' the event FIFO pointers)
@@ -2342,7 +2330,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 {
 	//[self writeRunControl:NO];// let it run, see runTaskStarted ... -tb-
 	//changed 2013-04-29 -tb- SLT will set inhibit anyway! for quick start we want to leave the current mode active (histogr. FLTs are restarted at runTaskStarted) [self writeControlWithStandbyMode];
-	//[self setLedOff:YES];
+	[self setLedOff:YES];
     if(hitRateMode == kKatrinV4HitRunRateWithRun){
         [self stopReadingHitRates];
     }
@@ -2480,7 +2468,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Filter Shaping Length"];
-    [p setFormat:@"##0" upperLimit:0x3F lowerLimit:2 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:8 lowerLimit:2 stepSize:1 units:@""];
     [p setSetMethod:@selector(setFilterShapingLength:) getMethod:@selector(filterShapingLength)];
     [a addObject:p];			
 
