@@ -51,8 +51,8 @@
     unsigned long* ptr = (unsigned long*)someData;
 	unsigned long length = ExtractLength(ptr[0]);
     //point to ORCA location info
-    int crate           = (ptr[1]&0x01e00000)>>21;
-    int card            = (ptr[1]&0x001f0000)>>16;
+    int crate           = (ptr[1]>>21)&0xf;
+    int card            = (ptr[1]>>16)&0x1f;
     NSString* crateKey	= [self getCrateKey: crate];
     NSString* cardKey	= [self getCardKey: card];
     ptr = &ptr[2]; //move the pointer up to the data header

@@ -57,6 +57,7 @@
 	IBOutlet NSButton*				stopFPGALoadButton;
     IBOutlet NSProgressIndicator*	loadFPGAProgress;
 	IBOutlet NSTextField*			mainFPGADownLoadStateField;
+    IBOutlet NSTextField*           firmwareStatusStringField;
 
     //rates
     IBOutlet NSMatrix*                  rateTextFields;
@@ -175,6 +176,7 @@
 - (void) fpgaDownProgressChanged:(NSNotification*)aNote;
 - (void) mainFPGADownLoadStateChanged:(NSNotification*)aNote;
 - (void) fpgaFilePathChanged:(NSNotification*)aNote;
+- (void) firmwareStatusStringChanged:(NSNotification*)aNote;
 
 #pragma mark - rates
 - (void) scaleAction:(NSNotification*)aNote;

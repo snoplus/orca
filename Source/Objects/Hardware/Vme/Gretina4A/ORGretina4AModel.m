@@ -561,7 +561,6 @@ NSString* ORGretina4AAcceptedEventCountChanged          = @"ORGretina4AAcceptedE
         if(i == kHardwareStatus)   [self dumpHardwareStatusDetails:theValue];
         if(i == kExternalDiscSrc)  [self dumpExternalDiscSrcDetails:theValue];
         if(i == kChannelControl)   [self dumpChannelControlDetails:theValue];
-        if(i == kLedThreshold)     [self dumpLedThresholdDetails:theValue];
         if(i == kHoldoffControl)   [self dumpHoldoffControlDetails:theValue];
         if(i == kBaselineDelay)    [self dumpBaselineDelayDetails:theValue];
         if(i == kExtDiscSel)       [self dumpExtDiscSelDetails:theValue];
@@ -669,11 +668,6 @@ NSString* ORGretina4AAcceptedEventCountChanged          = @"ORGretina4AAcceptedE
     NSLogFont(aFont,@"     Pileup Waveform Only: %@\n", ((aValue>>30)&0x1)?@"Enabled": @"Disabled");
 }
 
-- (void) dumpLedThresholdDetails:(unsigned long)aValue
-{
-    NSFont* aFont = [NSFont fontWithName:@"Monaco" size:10.0];
-    NSLogFont(aFont,@"     LED Threshold     : %d\n", (aValue>> 0)&0x3fff);
-}
 
 - (void) dumpHoldoffControlDetails:(unsigned long)aValue
 {
@@ -724,7 +718,6 @@ NSString* ORGretina4AAcceptedEventCountChanged          = @"ORGretina4AAcceptedE
     NSLogFont(aFont,@"     Master Counter Reset : %@\n", (aValue>>5)&0x1?@"Reset":@"Run");
     NSLogFont(aFont,@"     BGO discbit sel      : %@\n", (aValue>>7)&0x1?@"All":@"Accepted Only");
     NSLogFont(aFont,@"     Veto enable          : %@\n", (aValue>>8)&0x1?@"Enabled":@"Disabled");
-    NSLogFont(aFont,@"     CFD Mode             : %@\n", (aValue>>15)&0x1?@"CFD":@"LED");
     NSLogFont(aFont,@"     PU Time Err          : %@\n", (aValue>>16)&0x1?@"Error":@"OK");
     NSLogFont(aFont,@"     Serdes lock          : %@\n", (aValue>>17)&0x1?@"Lock":@"Unlock");
     NSLogFont(aFont,@"     Serdes sm locked     : %@\n", (aValue>>18)&0x1?@"Lock":@"Unlock");
@@ -1201,7 +1194,7 @@ NSString* ORGretina4AAcceptedEventCountChanged          = @"ORGretina4AAcceptedE
 //------------------- kChannelControl  Bit Field = 10..11 ---------------
 - (short) triggerPolarity:(unsigned short)chan
 {
-    if(chan < kNumGretina4AChannels ) return triggerPolarity[chan];
+    if(chan < kNumGretina4AChannels ) return triggerPolarity[chan] & 0x3;
     else                            return 0;
 }
 
@@ -1218,7 +1211,7 @@ NSString* ORGretina4AAcceptedEventCountChanged          = @"ORGretina4AAcceptedE
 //------------------- kChannelControl  Bit Field = 12..14 ---------------
 - (short) decimationFactor:(unsigned short)chan
 {
-    if(chan < kNumGretina4AChannels) return decimationFactor[chan];
+    if(chan < kNumGretina4AChannels) return decimationFactor[chan] & 0x7;
     else                             return 0;
 }
 
@@ -2114,7 +2107,6 @@ NSString* ORGretina4AAcceptedEventCountChanged          = @"ORGretina4AAcceptedE
     if(forceEnable)	startStop = enabled[chan];
     else			startStop = NO;
 
-    
     unsigned long theValue =
     (startStop                        << 0)  |
     (!pileupMode[chan]                << 2)  |
@@ -2128,10 +2120,10 @@ NSString* ORGretina4AAcceptedEventCountChanged          = @"ORGretina4AAcceptedE
     (pileupExtensionMode[chan]        << 26) |
     //(0x1L                             << 27) | //start counters
     (pileupWaveformOnlyMode[chan]     << 30);
-
+    
     [self writeAndCheckLong:theValue
               addressOffset:[Gretina4ARegisters offsetforReg:kChannelControl chan:chan]
-                       mask:0x4cF11405 //mask off the reserved bits
+                       mask:0x4ff1fc0d //mask off the reserved bits
                   reportKey:[NSString stringWithFormat:@"ControlStatus_%d",chan]
               forceFullInit:forceFullInit[chan]];
 }
@@ -2397,7 +2389,7 @@ NSString* ORGretina4AAcceptedEventCountChanged          = @"ORGretina4AAcceptedE
     unsigned long theValue = downSampleHoldOffTime;
     [self writeAndCheckLong:theValue
               addressOffset:[Gretina4ARegisters offsetforReg:kDownSampleHoldOffTime]
-                       mask:0x00001FFF
+                       mask:0x00003FF
                   reportKey:@"holdoffControl"
               forceFullInit:forceFullCardInit];
 }
@@ -2588,12 +2580,11 @@ NSString* ORGretina4AAcceptedEventCountChanged          = @"ORGretina4AAcceptedE
         for(i=0;i<kNumGretina4AChannels;i++) {
             [self writeControlReg:i enabled:[self enabled:i]];
         }
+        [self clearCounters];
 
         [self writeLong:(0x1<<27) toReg:kProgrammingDone]; //reset
         [self writeLong:0   toReg:kProgrammingDone];
         [self writeMasterLogic:YES];
-        [self clearCounters];
-
     }
 
     if(doHwCheck)[self checkBoard:YES];
@@ -3931,8 +3922,10 @@ NSString* ORGretina4AAcceptedEventCountChanged          = @"ORGretina4AAcceptedE
 - (void) reloadMainFPGAFromFlash
 {
     
-    [self writeToAddress:0x900 aValue:kGretina4AResetMainFPGACmd];
-    [self writeToAddress:0x900 aValue:kGretina4AReloadMainFPGACmd];
+//    [self writeToAddress:0x900 aValue:kGretina4AResetMainFPGACmd];
+//    [self writeToAddress:0x900 aValue:kGretina4AReloadMainFPGACmd];
+    [self writeToAddress:0x900 aValue:0x10];
+    [self writeToAddress:0x900 aValue:0x20];
     
     unsigned long statusRegValue=[self readFromAddress:0x904];
     
@@ -4022,7 +4015,7 @@ NSString* ORGretina4AAcceptedEventCountChanged          = @"ORGretina4AAcceptedE
         //if an SBC is available we pass the request to flash the fpga. this assumes the .bin file is already there
         SBC_Packet aPacket;
         aPacket.cmdHeader.destination           = kMJD;
-        aPacket.cmdHeader.cmdID                 = kMJDFlashGretinaFPGA;
+        aPacket.cmdHeader.cmdID                 = kMJDFlashGretinaAFPGA;
         aPacket.cmdHeader.numberBytesinPayload	= sizeof(MJDFlashGretinaFPGAStruct);
         
         MJDFlashGretinaFPGAStruct* p = (MJDFlashGretinaFPGAStruct*) aPacket.payload;
