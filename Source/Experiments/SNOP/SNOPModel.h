@@ -48,6 +48,15 @@ BOOL isNotRunningOrIsInMaintenance();
 
 @interface SNOPModel: ORExperimentModel <snotDbDelegate>
 {
+    ORPQConnection* dbLockConnection;
+    BOOL ignoreDBLock;
+    NSString* _lockDBUserName;
+    NSString* _lockDBPassword;
+    NSString* _lockDBName;
+    NSString* _lockDBIPAddress;
+    unsigned int _lockDBPort;
+    unsigned int _lockDBLockID;
+
     NSString* _orcaDBUserName;
     NSString* _orcaDBPassword;
     NSString* _orcaDBName;
@@ -145,6 +154,13 @@ BOOL isNotRunningOrIsInMaintenance();
 @property (nonatomic,retain) NSMutableDictionary* smellieRunFiles;
 @property (nonatomic,retain) NSMutableDictionary* tellieRunFiles;
 
+@property (nonatomic,copy) NSString* lockDBUserName;
+@property (nonatomic,copy) NSString* lockDBPassword;
+@property (nonatomic,copy) NSString* lockDBName;
+@property (nonatomic,copy) NSString* lockDBIPAddress;
+@property (nonatomic,assign) unsigned int lockDBPort;
+@property (nonatomic,assign) unsigned int lockDBLockID;
+
 @property (nonatomic,copy) NSString* orcaDBUserName;
 @property (nonatomic,copy) NSString* orcaDBPassword;
 @property (nonatomic,copy) NSString* orcaDBName;
@@ -177,6 +193,10 @@ BOOL isNotRunningOrIsInMaintenance();
 
 - (id) init;
 - (void) awakeAfterDocumentLoaded;
+
+- (bool) acquireDatabaseLock;
+- (void) checkDatabaseLock;
+- (void) timerCheckDatabaseLock: (NSTimer*) timer;
 
 - (void) setMTCPort: (int) port;
 - (int) mtcPort;

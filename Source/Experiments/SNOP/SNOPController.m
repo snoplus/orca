@@ -1856,6 +1856,12 @@ err:
     [dataHost setEnabled:!lockedOrNotRunningMaintenance];
     [logPort setEnabled:!lockedOrNotRunningMaintenance];
     [logHost setEnabled:!lockedOrNotRunningMaintenance];
+    [lockDBUser setEnabled:!lockedOrNotRunningMaintenance];
+    [lockDBPswd setEnabled:!lockedOrNotRunningMaintenance];
+    [lockDBName setEnabled:!lockedOrNotRunningMaintenance];
+    [lockDBIPAddress setEnabled:!lockedOrNotRunningMaintenance];
+    [lockDBPort setEnabled:!lockedOrNotRunningMaintenance];
+    [lockDBID setEnabled:!lockedOrNotRunningMaintenance];
     [orcaDBUser setEnabled:!lockedOrNotRunningMaintenance];
     [orcaDBPswd setEnabled:!lockedOrNotRunningMaintenance];
     [orcaDBName setEnabled:!lockedOrNotRunningMaintenance];

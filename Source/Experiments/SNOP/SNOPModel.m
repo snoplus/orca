@@ -37,6 +37,8 @@
 #import "ORFec32Model.h"
 #import "OROrderedObjManager.h"
 #import "ORSNOConstants.h"
+#import "ORPQConnection.h"
+#import "ORPQResult.h"
 #import "ELLIEModel.h"
 #import "SNOP_Run_Constants.h"
 #import "SBC_Link.h"
@@ -83,6 +85,12 @@ BOOL isNotRunningOrIsInMaintenance()
 @implementation SNOPModel
 
 @synthesize
+lockDBUserName = _lockDBUserName,
+lockDBPassword = _lockDBPassword,
+lockDBName = _lockDBName,
+lockDBIPAddress = _lockDBIPAddress,
+lockDBPort = _lockDBPort,
+lockDBLockID = _lockDBLockID,
 orcaDBUserName = _orcaDBUserName,
 smellieRunNameLabel = _smellieRunNameLabel,
 tellieRunNameLabel = _tellieRunNameLabel,
@@ -120,6 +128,9 @@ tellieRunFiles = _tellieRunFiles;
     start = COLD_START;
     resync = NO;
 
+    /* Check that not other Orca is controlling the detector, using a database lock. This will either block or quit. */
+    [self checkDatabaseLock];
+
     /* initialize our connection to the MTC server */
     mtc_server = [[RedisClient alloc] init];
 
@@ -144,6 +155,102 @@ tellieRunFiles = _tellieRunFiles;
     [[self undoManager] enableUndoRegistration];
 
     return self;
+}
+
+- (bool) acquireDatabaseLock
+{
+    NSNumber* gotLock = [NSNumber numberWithBool:false];
+
+    if (ignoreDBLock) {
+        return true;
+    }
+
+    if (![self dbLockConnection]) {
+        dbLockConnection = [[ORPQConnection alloc] init];
+    }
+
+    if (![[self dbLockConnection] isConnected]) {
+        NSString* host = [NSString stringWithFormat:@"%@:%u", _lockDBIPAddress, _lockDBPort];
+        [dbLockConnection connectToHost:host
+                               userName:_lockDBUserName
+                               passWord:_lockDBPassword
+                               dataBase:_lockDBName];
+    }
+
+    /* Try to get an advisory lock, returns t if we get it or already own it, else f. */
+    if ([[self dbLockConnection] isConnected]) {
+        ORPQResult* result = [dbLockConnection queryString:[NSString stringWithFormat:@"select pg_try_advisory_lock(%i);", _lockDBLockID]];
+        gotLock = [[result fetchRowAsType:MCPTypeDictionary row:0] valueForKey:@"pg_try_advisory_lock"];
+        NSLog(@"Obtaining lock for %@ on %@:%u/%@ ID %u. Result: %@\n",
+              _lockDBUserName, _lockDBIPAddress, _lockDBPort, _lockDBName, _lockDBLockID, gotLock);
+    }
+
+    return [gotLock boolValue];
+}
+
+- (void) checkDatabaseLock
+{
+    /* If the lock database is not set up, disable locking. */
+    if (!self.lockDBIPAddress || [self.lockDBIPAddress isEqualToString:@""]) {
+        NSLog(@"Lock database address not set, disabling locking.\n");
+        ignoreDBLock = YES;
+    }
+
+    /* Try to acquire the lock. If we get it, proceed with initialization. */
+    if (ignoreDBLock || [self acquireDatabaseLock]) {
+        return;
+    }
+
+    /* We don't have the lock. Open a modal dialog asking whether to quit Orca or ignore the lock (hostile takeover). */
+    NSAlert *alert = [[NSAlert alloc] init];
+    [alert addButtonWithTitle:@"Quit"];
+    [alert addButtonWithTitle:@"Hostile Takeover"];
+    [alert setInformativeText:@"Cannot start Orca when another copy is already running.\n\nWaiting to acquire lock..."];
+    [alert setAlertStyle:NSWarningAlertStyle];
+
+    /* A timer to check the lock every 5 seconds, and close the window/proceed if we can obtain it. */
+    NSTimer* dbModalTimer = [NSTimer scheduledTimerWithTimeInterval:5
+                                                             target:self
+                                                           selector:@selector(timerCheckDatabaseLock:)
+                                                           userInfo:nil
+                                                            repeats:true];
+
+    [[NSRunLoop currentRunLoop] addTimer:dbModalTimer forMode:NSModalPanelRunLoopMode];
+
+    /* Launch the modal. */
+    [[NSRunningApplication currentApplication] activateWithOptions:NSApplicationActivateIgnoringOtherApps];
+    int modalAction = [alert runModal];
+
+    /* Respond to a press of the modal buttons. */
+    if (modalAction == NSAlertFirstButtonReturn) {
+        ORAppDelegate* delegate = [NSApp delegate];
+        [delegate terminate:self];
+    }
+    else if (modalAction == NSAlertSecondButtonReturn) {
+        ignoreDBLock = YES;
+    }
+
+    /* Clean up and proceed with loading the SNOPModel. */
+    [alert release];
+    [dbModalTimer invalidate];
+    [dbModalTimer release];
+}
+
+- (void) timerCheckDatabaseLock: (NSTimer*) timer
+{
+    /* Try again to acquire the database lock. If we get it, close the modal and loading can proceed. */
+    if ([self acquireDatabaseLock]) {
+        [NSApp abortModal];
+    }
+}
+
+- (void) setDBLockConnection: (ORPQConnection *) conn
+{
+    dbLockConnection = conn;
+}
+
+- (ORPQConnection*) dbLockConnection {
+    return dbLockConnection;
 }
 
 - (void) setMTCPort: (int) port
@@ -279,6 +386,17 @@ tellieRunFiles = _tellieRunFiles;
     state = STOPPED;
     start = COLD_START;
     resync = NO;
+
+    // Database lock
+    self.lockDBUserName = [decoder decodeObjectForKey:@"ORSNOPModelLockDBUserName"];
+    self.lockDBPassword = [decoder decodeObjectForKey:@"ORSNOPModelLockDBPassword"];
+    self.lockDBName = [decoder decodeObjectForKey:@"ORSNOPModelLockDBName"];
+    self.lockDBIPAddress = [decoder decodeObjectForKey:@"ORSNOPModelLockDBIPAddress"];
+    self.lockDBPort = [decoder decodeInt32ForKey:@"ORSNOPModelLockDBPort"];
+    self.lockDBLockID = [decoder decodeInt32ForKey:@"ORSNOPModelLockDBLockID"];
+
+    /* Check that not other Orca is controlling the detector, using a database lock. This will either block or quit. */
+    [self checkDatabaseLock];
 
     /* Initialize ECARun object: this doesn't start the run */
     anECARun = [[ECARun alloc] init];
@@ -438,6 +556,9 @@ tellieRunFiles = _tellieRunFiles;
 
 - (void) awakeAfterDocumentLoaded
 {
+    /* Check that not other Orca is controlling the detector, using a database lock. This will either block or quit. */
+    [self checkDatabaseLock];
+
     /* Get the standard runs from the database. */
     [self refreshStandardRunsFromDB];
     [self enableGlobalSecurity];
@@ -2017,6 +2138,14 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+
+    // Lock Database
+    [encoder encodeObject:self.lockDBUserName forKey:@"ORSNOPModelLockDBUserName"];
+    [encoder encodeObject:self.lockDBPassword forKey:@"ORSNOPModelLockDBPassword"];
+    [encoder encodeObject:self.lockDBName forKey:@"ORSNOPModelLockDBName"];
+    [encoder encodeObject:self.lockDBIPAddress forKey:@"ORSNOPModelLockDBIPAddress"];
+    [encoder encodeInt32:self.lockDBPort forKey:@"ORSNOPModelLockDBPort"];
+    [encoder encodeInt32:self.lockDBLockID forKey:@"ORSNOPModelLockDBLockID"];
 
     //CouchDB
     [encoder encodeObject:self.orcaDBUserName forKey:@"ORSNOPModelOrcaDBUserName"];
