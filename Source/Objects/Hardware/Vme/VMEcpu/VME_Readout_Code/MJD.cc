@@ -49,14 +49,15 @@ extern pthread_mutex_t  jobInfoMutex;
 extern SBC_JOB          sbc_job;
 
 TUVMEDevice* fpgaDevice = NULL;
-
+bool flashANLVersion = 0;
 
 void processMJDCommand(SBC_Packet* aPacket)
 {
 	switch(aPacket->cmdHeader.cmdID){
 		case kMJDReadPreamps:       readPreAmpAdcs(aPacket);             break;
         case kMJDSingleAuxIO:       singleAuxIO(aPacket);                break;
-        case kMJDFlashGretinaFPGA:  startJob(&flashGretinaFPGA,aPacket); break;
+        case kMJDFlashGretinaFPGA:  flashANLVersion=false; startJob(&flashGretinaFPGA,aPacket); break;
+        case kMJDFlashGretinaAFPGA: flashANLVersion=true; startJob(&flashGretinaFPGA,aPacket); break;
         case kMJDReadPreampsANL:    readANLPreAmpAdcs(aPacket);          break;
         case kMJDSingleAuxIOANL:    singleANLAuxIO(aPacket);             break;
 	}
@@ -144,7 +145,8 @@ uint32_t writeANLAuxIOSPI(uint32_t baseAddress,uint32_t spiData)
 //bits 7:4 of the AUX I/O connector.
 //--------------------------------------------------------------------------------------------------
 
-#define kANLSPIData         (0x1 << 22)   //bit 22 of the control/mode/data register
+#define kANLSPIDataHi       (0x1 << 22)   //bit 22 of the control/mode/data register
+#define kANLSPIDataLo       0x0           //just to have a clean definition for the bit when lo
 #define kANLSPIClock        (0x1 << 23)   //bit 23 of the control/mode/data register
 #define kANLSPIChipSelect   (0x1 << 24)   //bit 24 of the control/mode/data register
 #define kANLSPIRead         (0x1 <<  4)   //bit  4 of status register is the SPIRead pin
@@ -161,35 +163,37 @@ uint32_t writeANLAuxIOSPI(uint32_t baseAddress,uint32_t spiData)
         uint32_t auxIOWrite  =  0x424;   //aux io control/data/mode register
         uint32_t auxIOConfig =  0x424;   //aux io control/data/mode register
         
-        uint32_t valueToWrite = (kSPIMode11 | kANLSPIChipSelect | kANLSPIClock);    //set mode, chip select high, clock high
+        uint32_t valueToWrite = (kSPIMode00 | kANLSPIChipSelect | kANLSPIClock);    //set mode, chip select high, clock high
         write_device(device, (char*)(&valueToWrite), 4, auxIOConfig);
-        
         //signify that we are starting
-        valueToWrite = kANLSPIChipSelect | kANLSPIClock | kANLSPIData;
+        valueToWrite = kANLSPIChipSelect | kANLSPIClock | kANLSPIDataHi;
         write_device(device, (char*)(&valueToWrite), 4, auxIOWrite);
-        
-        uint32_t i;
-        for(i=0; i<32; i++) {
-            bool bitHigh = (spiData & (0x80000000>>i)) != 0; //get bit state starting with MSB
+
+        uint32_t dataBit;
+        uint32_t bit;
+        for(bit=0x80000000; bit; bit >>= 1) {
+            
+            dataBit = (spiData & bit)?kANLSPIDataLo:kANLSPIDataHi;
             
             //write data with clock low
-            if(bitHigh) valueToWrite = kANLSPIChipSelect | kANLSPIData;
-            else        valueToWrite = kANLSPIChipSelect;
+            valueToWrite = kSPIMode00 | kANLSPIChipSelect | dataBit  | kANLSPIClock;
             write_device(device, (char*)(&valueToWrite), 4, auxIOWrite);
-            
+
             //repeat with clock high
-            if(bitHigh) valueToWrite = kANLSPIChipSelect | kANLSPIClock | kANLSPIData;
-            else        valueToWrite = kANLSPIChipSelect | kANLSPIClock;
+            valueToWrite = kSPIMode00 | kANLSPIChipSelect  | dataBit;
             write_device(device, (char*)(&valueToWrite), 4, auxIOWrite);
-            
+
             //get the readBack value
             uint32_t valueRead;
             read_device(device,(char*)(&valueRead),4,auxIORead);
-            readBack |= ((valueRead & kANLSPIRead) > 0) << (31-i);
+            
+            if(valueRead & kANLSPIRead){
+                readBack |= bit;
+            }
         }
         
         //unset kSPIChipSelect to signify that we are done
-        valueToWrite = kANLSPIClock | kANLSPIData;
+        valueToWrite = kANLSPIClock | kANLSPIDataHi;
         write_device(device, (char*)(&valueToWrite), 4, auxIOWrite);
         close_device(device);
     }
@@ -313,8 +317,8 @@ uint32_t writeAuxIOSPI(uint32_t baseAddress,uint32_t spiData)
             if( (spiData & 0x80000000) != 0) rawValueToWrite &= (~kSPIData);
             //toggle the kSPIClock bit
             valueToWrite = rawValueToWrite | kSPIClock;
-            write_device(device, (char*)(&valueToWrite),    4, auxIOWrite);
-            write_device(device, (char*)(&rawValueToWrite), 4, auxIOWrite);
+            write_device(device, (char*)(&valueToWrite),    4, auxIOWrite);//clock hi
+            write_device(device, (char*)(&rawValueToWrite), 4, auxIOWrite);//clock lo
             
             read_device(device,(char*)(&valueRead),4,auxIORead);
            
@@ -373,7 +377,8 @@ void flashGretinaFPGA(SBC_Packet* aPacket)
                 programFlashBuffer(map,sb.st_size);
                 if(verifyFlashBuffer(map,sb.st_size)&& !sbc_job.killJobNow){
                     strcpy(errorMessage,"Done$No Errors Reported");
-                    reloadMainFpgaFromFlash();
+                    if(flashANLVersion==false)  reloadMainFpgaFromFlash();
+                    else                        reloadMainFpgaFromFlash_ANL();
                     finalStatus = 1;
                 }
                 else {
@@ -563,18 +568,52 @@ uint8_t verifyFlashBuffer(uint8_t* theData, uint32_t totalSize)
         return 0;
     }
 }
-void reloadMainFpgaFromFlash(void)
+
+void reloadMainFpgaFromFlash()
 {
+    //LBL version
     writeDevice(kMainFPGAControlReg,kResetMainFPGACmd);
     writeDevice(kMainFPGAControlReg,kReloadMainFPGACmd);
-    setJobStatus("Finishing$Flash Memory-->FPGA", 0);
-    //wait until done
+    setJobStatus("FinishingLBL$Flash Memory-->FPGA", 0);
+    //wait until done or timeout
+    time_t start = time(NULL);
     uint32_t statusRegValue;
     readDevice(kMainFPGAStatusReg,&statusRegValue);
     while(!(statusRegValue & kMainFPGAIsLoaded)) {
         if(sbc_job.killJobNow)return;
         readDevice(kMainFPGAStatusReg,&statusRegValue);
+        if(time(NULL) > start+10){
+            setJobStatus("Timeout$Flash Memory", 0);
+            break;
+        }
     }
+}
+
+void reloadMainFpgaFromFlash_ANL()
+{
+//ANL version
+    time_t start = time(NULL);
+    uint32_t statusRegValue;
+    readDevice(kMainFPGAStatusReg,&statusRegValue);
+    setJobStatus("FinishingLBL$Flash Memory-->FPGA", 0);
+
+    writeDevice(kANLMainFPGAControlReg,0x2); //acknowledge power-up is complete
+    writeDevice(kANLMainFPGAControlReg,0x0); //remove acknowledge
+    writeDevice(kANLMainFPGAControlReg,0x1); //ask for  reconfiguration
+
+    readDevice(kMainFPGAStatusReg,&statusRegValue);
+
+    while(!(statusRegValue & 0x01)) {
+        if(sbc_job.killJobNow)return;
+        readDevice(kMainFPGAStatusReg,&statusRegValue);
+       if(time(NULL) > start+10){
+           setJobStatus("Timeout$Flash Memory", 0);
+           break;
+        }
+    }
+    printf("got here 2: 0x%08x\n",statusRegValue);
+
+    writeDevice(kANLMainFPGAControlReg,0x0); //remove request
 }
 
 void setJobStatus(const char* message,uint32_t progress)
