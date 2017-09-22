@@ -418,10 +418,21 @@
                      selector : @selector(energyOffsetChanged:)
                          name : ORKatrinV4FLTModelEnergyOffsetChanged
 						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(hitRateModeChanged:)
+                         name : ORKatrinV4FLTModelHitRateModeChanged
+                        object: model];
 
+    
 }
 
 #pragma mark •••Interface Management
+
+- (void) hitRateModeChanged:(NSNotification*)aNote
+{
+    [hitRateModePU selectItemAtIndex:[model hitRateMode]];
+}
 
 - (void) energyOffsetChanged:(NSNotification*)aNote
 {
@@ -581,11 +592,9 @@
 {
 	[filterShapingLengthPU selectItemWithTag:[model filterShapingLength]];
 	[self recommendedPZCChanged:nil];
-	#if 1
 	bool useBoxcar=([model filterShapingLength]==0);
-	[boxcarLengthPU setEnabled: useBoxcar];
-	[boxcarLengthLabel setEnabled: useBoxcar];
-	#endif
+	[boxcarLengthPU     setEnabled: useBoxcar];
+	[boxcarLengthLabel  setEnabled: useBoxcar];
 }
 
 - (void) gapLengthChanged:(NSNotification*)aNote
@@ -723,6 +732,7 @@
 	[self skipFltEventReadoutChanged:nil];
 	[self forceFLTReadoutChanged:nil];
 	[self energyOffsetChanged:nil];
+    [self hitRateModeChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -744,14 +754,16 @@
     BOOL locked           = [gSecurity isLocked:ORKatrinV4FLTSettingsLock];
 	BOOL testsAreRunning  = [model testsRunning];
 	BOOL testingOrRunning = testsAreRunning | runInProgress;
-    
+    bool useBoxcar        = ([(ORKatrinV4FLTModel*)model runMode] == 3) || ([(ORKatrinV4FLTModel*)model runMode] == 4);
+
     //MAH. put in casts below to clear warning from XCode 5
 	if([(ORKatrinV4FLTModel*)model runMode] < 3 || [(ORKatrinV4FLTModel*)model runMode] > 6)	[modeTabView selectTabViewItemAtIndex:0];
 	else											[modeTabView selectTabViewItemAtIndex:1];
+    
+
 	
 	[gapLengthPU setEnabled:!lockedOrRunningMaintenance && (([(ORKatrinV4FLTModel*)model runMode]<3) || ([(ORKatrinV4FLTModel*)model runMode]>6))];
 	[filterShapingLengthPU setEnabled:!lockedOrRunningMaintenance];
-	bool useBoxcar=([model filterShapingLength]==0);
 	[boxcarLengthPU setEnabled:!lockedOrRunningMaintenance && useBoxcar];
 	[boxcarLengthLabel setEnabled:!lockedOrRunningMaintenance && useBoxcar];
 	
@@ -1144,32 +1156,37 @@
 	[model updateUseSLTtime];	
 }
 
+- (IBAction) hitRateModeAction:(id)sender
+{
+    [model setHitRateMode:[sender indexOfSelectedItem]];
+}
+
 - (IBAction) useDmaBlockReadPUAction:(id)sender
 {
 	[model setUseDmaBlockRead:[[useDmaBlockReadPU selectedItem] tag]];	
 }
 
-- (void) useDmaBlockReadButtonAction:(id)sender
+- (IBAction) useDmaBlockReadButtonAction:(id)sender
 {
 	[model setUseDmaBlockRead:[sender intValue]];	
 }
 
-- (void) syncWithRunControlButtonAction:(id)sender
+- (IBAction) syncWithRunControlButtonAction:(id)sender
 {
 	[model setSyncWithRunControl:[sender intValue]];	
 }
 
-- (void) decayTimeTextFieldAction:(id)sender
+- (IBAction) decayTimeTextFieldAction:(id)sender
 {
 	[model setDecayTime:[sender doubleValue]];	
 }
 
-- (void) poleZeroCorrectionPUAction:(id)sender
+- (IBAction) poleZeroCorrectionPUAction:(id)sender
 {
 	[model setPoleZeroCorrection:[poleZeroCorrectionPU indexOfSelectedItem]];	
 }
 
-- (void) customVariableTextFieldAction:(id)sender
+- (IBAction) customVariableTextFieldAction:(id)sender
 {
 	[model setCustomVariable:[sender intValue]];	
 }

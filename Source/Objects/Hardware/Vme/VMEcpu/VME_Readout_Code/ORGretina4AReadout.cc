@@ -36,7 +36,7 @@ bool ORGretina4AReadout::Readout(SBC_LAM_Data* /*lamData*/)
     }
 
     if(((fifoState>>20) & 0x3)!=0x3) { //both bits are high if FIFO is empty
-        uint32_t fifoFlag;
+        uint32_t fifoFlag = 0x0;
         if(fifoState & kGretina4AFIFO30KFull){
             fifoFlag = 0x80000000;
         }

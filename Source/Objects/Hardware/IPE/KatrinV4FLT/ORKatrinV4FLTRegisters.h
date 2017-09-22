@@ -27,6 +27,9 @@
 
 #define katrinV4FLTRegisters [ORKatrinV4FLTRegisters sharedRegSet]
 
+#define kKatrinV4HitRunRateAlways    1
+#define kKatrinV4HitRunRateWithRun   0
+
 static ORKatrinV4FLTRegisters* sharedKatrinV4FLTRegisters;
 
 typedef enum eKatrinV4FLTRegEnum {

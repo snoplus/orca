@@ -79,7 +79,7 @@
 	unsigned char chan		= ShiftAndExtract(ptr[1], 8,0xff);
 	int boxcarLen           = ShiftAndExtract(ptr[1], 4,0x03);
 	int filterShapingLength = ShiftAndExtract(ptr[1], 0,0x0f);
-	unsigned long histoLen  = 4096;//=max. ADC value for 12 bit ADC
+	unsigned long histoLen  = 4*4096;
 	unsigned long filterDiv = 1L << filterShapingLength;
 	if(filterShapingLength==0){
 		filterDiv = boxcarLen + 1;
@@ -91,8 +91,8 @@
 
 	//note the ptr[6] shares the eventID and the energy
 	//the eventID must be masked off
-    //unsigned long energy = (ptr[6] & 0xfffff)/filterDiv; //keep this
-    unsigned long energy = (ptr[6] & 0xfffff)>>8; //scale to 4096
+    unsigned long energy = (ptr[6] & 0xfffff)/filterDiv; //keep this
+    //unsigned long energy = (ptr[6] & 0xfffff)>>8; //scale to 4096
 		
 	//channel by channel histograms
 	[aDataSet histogram:energy

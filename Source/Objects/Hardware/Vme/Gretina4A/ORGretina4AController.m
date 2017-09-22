@@ -49,7 +49,7 @@
     settingSize     = NSMakeSize(965,460);
     rateSize		= NSMakeSize(790,340);
     registerTabSize	= NSMakeSize(800,520);
-	firmwareTabSize = NSMakeSize(340,187);
+	firmwareTabSize = NSMakeSize(480,187);
     blankView = [[NSView alloc] init];
     
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
@@ -571,6 +571,12 @@
                          name : ORGretina4AAcceptedEventCountChanged
                         object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(firmwareStatusStringChanged:)
+                         name : ORGretina4AModelFirmwareStatusStringChanged
+                        object: model];
+
+    
     [self registerRates];
 
 }
@@ -726,6 +732,7 @@
     [self droppedEventCountChanged:nil];
     [self discCountChanged:nil];
     [self acceptedEventCountChanged:nil];
+    [self firmwareStatusStringChanged:nil];
 
 }
 
@@ -1254,6 +1261,10 @@
     for(chan=0;chan<kNumGretina4AChannels;chan++){
         [[baselineStartMatrix cellWithTag:chan] setIntValue:[model baselineStart:chan]];
     }
+}
+- (void) firmwareStatusStringChanged:(NSNotification*)aNote
+{
+    [firmwareStatusStringField setStringValue: [model firmwareStatusString]];
 }
 
 #pragma mark •••Actions
