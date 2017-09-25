@@ -1833,39 +1833,35 @@ err:
     [runsLockButton setState: locked];
 
     //Enable or disable fields
-    [standardRunThresCurrentValues setEnabled:!lockedOrNotRunningMaintenance];
+    [standardRunThresCurrentValues setEnabled:!locked];
     [standardRunSaveButton setEnabled:!locked];
     [standardRunLoadButton setEnabled:!locked];
     [standardRunLoadinHWButton setEnabled:!lockedOrNotRunningMaintenance];
     [triggersOFFButton setEnabled:notRunningOrInMaintenance];
 
-    //Do not lock detector state bits to the operator
-    for(int irow=0;irow<21;irow++){
-        [[runTypeWordMatrix cellAtRow:irow column:0] setEnabled:!lockedOrNotRunningMaintenance];
-    }
     [timedRunCB setEnabled:!runInProgress];
-    [timeLimitField setEnabled:!lockedOrNotRunningMaintenance];
-    [repeatRunCB setEnabled:!lockedOrNotRunningMaintenance];
-    [orcaDBIPAddressPU setEnabled:!lockedOrNotRunningMaintenance];
-    [debugDBIPAddressPU setEnabled:!lockedOrNotRunningMaintenance];
-    [mtcPort setEnabled:!lockedOrNotRunningMaintenance];
-    [mtcHost setEnabled:!lockedOrNotRunningMaintenance];
-    [xl3Port setEnabled:!lockedOrNotRunningMaintenance];
-    [xl3Host setEnabled:!lockedOrNotRunningMaintenance];
-    [dataPort setEnabled:!lockedOrNotRunningMaintenance];
-    [dataHost setEnabled:!lockedOrNotRunningMaintenance];
-    [logPort setEnabled:!lockedOrNotRunningMaintenance];
-    [logHost setEnabled:!lockedOrNotRunningMaintenance];
-    [orcaDBUser setEnabled:!lockedOrNotRunningMaintenance];
-    [orcaDBPswd setEnabled:!lockedOrNotRunningMaintenance];
-    [orcaDBName setEnabled:!lockedOrNotRunningMaintenance];
-    [orcaDBPort setEnabled:!lockedOrNotRunningMaintenance];
-    [orcaDBClearButton setEnabled:!lockedOrNotRunningMaintenance];
-    [debugDBUser setEnabled:!lockedOrNotRunningMaintenance];
-    [debugDBPswd setEnabled:!lockedOrNotRunningMaintenance];
-    [debugDBName setEnabled:!lockedOrNotRunningMaintenance];
-    [debugDBPort setEnabled:!lockedOrNotRunningMaintenance];
-    [debugDBClearButton setEnabled:!lockedOrNotRunningMaintenance];
+    [timeLimitField setEnabled:!locked];
+    [repeatRunCB setEnabled:!locked];
+    [orcaDBIPAddressPU setEnabled:!locked];
+    [debugDBIPAddressPU setEnabled:!locked];
+    [mtcPort setEnabled:!locked];
+    [mtcHost setEnabled:!locked];
+    [xl3Port setEnabled:!locked];
+    [xl3Host setEnabled:!locked];
+    [dataPort setEnabled:!locked];
+    [dataHost setEnabled:!locked];
+    [logPort setEnabled:!locked];
+    [logHost setEnabled:!locked];
+    [orcaDBUser setEnabled:!locked];
+    [orcaDBPswd setEnabled:!locked];
+    [orcaDBName setEnabled:!locked];
+    [orcaDBPort setEnabled:!locked];
+    [orcaDBClearButton setEnabled:!locked];
+    [debugDBUser setEnabled:!locked];
+    [debugDBPswd setEnabled:!locked];
+    [debugDBName setEnabled:!locked];
+    [debugDBPort setEnabled:!locked];
+    [debugDBClearButton setEnabled:!locked];
     [nhitMonitorAutoPulserRate setEnabled:!locked];
     [nhitMonitorAutoNumPulses setEnabled:!locked];
     [nhitMonitorAutoMaxNhit setEnabled:!locked];
@@ -1873,6 +1869,10 @@ err:
     [nhitMonitorCrateMaskMatrix setEnabled:!locked];
     [nhitMonitorTimeInterval setEnabled:!locked];
 
+    //Do not lock detector state bits to the operator
+    for(int irow=0;irow<21;irow++){
+        [[runTypeWordMatrix cellAtRow:irow column:0] setEnabled:!lockedOrNotRunningMaintenance];
+    }
     [rampDownCrateButton setEnabled:notRunningOrInMaintenance];
     [inMaintenanceLabel setHidden:notRunningOrInMaintenance];
 
