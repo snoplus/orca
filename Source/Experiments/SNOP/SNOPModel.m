@@ -201,9 +201,12 @@ tellieRunFiles = _tellieRunFiles;
         return;
     }
 
-    /* We don't have the lock. Open a modal dialog asking whether to quit Orca or ignore the lock (hostile takeover). */
+    /* We don't have the lock. Open a modal dialog asking whether to quit Orca, retry immediately, or ignore the lock (hostile takeover). */
+    [[NSApp delegate] closeSplashWindow];
+
     NSAlert *alert = [[NSAlert alloc] init];
-    [alert addButtonWithTitle:@"Quit"];
+    [alert addButtonWithTitle:@"Quit Orca"];
+    [alert addButtonWithTitle:@"Retry Now"];
     [alert addButtonWithTitle:@"Hostile Takeover"];
     [alert setInformativeText:@"Cannot start Orca when another copy is already running.\n\nWaiting to acquire lock..."];
     [alert setAlertStyle:NSWarningAlertStyle];
@@ -227,13 +230,15 @@ tellieRunFiles = _tellieRunFiles;
         [delegate terminate:self];
     }
     else if (modalAction == NSAlertSecondButtonReturn) {
+        [alert release];
+        [self checkDatabaseLock];
+    }
+    else if (modalAction == NSAlertThirdButtonReturn) {
         ignoreDBLock = YES;
     }
 
     /* Clean up and proceed with loading the SNOPModel. */
-    [alert release];
     [dbModalTimer invalidate];
-    [dbModalTimer release];
 }
 
 - (void) timerCheckDatabaseLock: (NSTimer*) timer
