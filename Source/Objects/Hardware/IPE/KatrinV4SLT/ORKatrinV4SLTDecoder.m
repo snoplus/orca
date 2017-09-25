@@ -224,11 +224,23 @@ static NSString* kFLTChanKey[24] = {
 //-------------------------------------------------------------
 - (id) init {
     self = [super init];
+    //preload all the filters
+    NSArray* listOfCards = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORKatrinV4FLTModel")];
+    for(ORKatrinV4FLTModel* aCard in listOfCards){
+        int filterShapingLength = [aCard filterShapingLength];
+        unsigned long filterDiv = 1L << filterShapingLength;
+
+        if(filterShapingLength==0){
+            filterDiv = [aCard boxcarLength] + 1;
+        }
+        
+        int index   = [aCard stationNumber];
+        filter[index] = filterDiv;
+    }
     return self;
 }
 - (void) dealloc
 {
-    [actualFlts release];
     [super dealloc];
 }
 
@@ -248,9 +260,6 @@ static NSString* kFLTChanKey[24] = {
     unsigned long headerlen = 4;
     unsigned long numEv=(length-headerlen)/6;
     
-    //prepare decoding
-    if(!actualFlts)actualFlts = [[NSMutableDictionary alloc] init];
-
     ptr+=headerlen;
     int i;
     for(i=0;i<numEv;i++){
@@ -269,9 +278,10 @@ static NSString* kFLTChanKey[24] = {
         NSString* channelKey  = @"??";
 	    if(chan<24)channelKey = kFLTChanKey[chan];
 
+        int aFilter = filter[card];
     
-        [aDataSet histogram:energy >> 8 /*energy >> filterShapingLength*/  //scale to 4096 bins for now
-                    numBins:4096 sender:self
+        [aDataSet histogram:energy/aFilter
+                    numBins:4*4096 sender:self
                    withKeys: crateKey,stationKey,channelKey,nil];
         
         ptr+=6;//next event

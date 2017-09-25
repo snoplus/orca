@@ -349,7 +349,6 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 
 - (void) writeSetInhibit		{ [self writeReg:kKatrinV4SLTCommandReg value:kCmdSetInh];          }
 - (void) writeClrInhibit		{ [self writeReg:kKatrinV4SLTCommandReg value:kCmdClrInh];          }
-- (void) writeSwTrigger			{ [self writeReg:kKatrinV4SLTCommandReg value:kCmdSwTr];            }
 - (void) writeTpStart			{ [self writeReg:kKatrinV4SLTCommandReg value:kCmdTpStart];         }
 - (void) writeFwCfg				{ [self writeReg:kKatrinV4SLTCommandReg value:kCmdFwCfg];           }
 - (void) writeSltReset			{ [self writeReg:kKatrinV4SLTCommandReg value:kCmdSltReset];        }

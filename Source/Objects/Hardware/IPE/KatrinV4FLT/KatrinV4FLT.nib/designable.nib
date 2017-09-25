@@ -26,6 +26,7 @@
                 <outlet property="fifoLengthPU" destination="3883" id="3897"/>
                 <outlet property="filterShapingLengthPU" destination="3118" id="3962"/>
                 <outlet property="fireSoftwareTriggerButton" destination="4106" id="4174"/>
+                <outlet property="fireSoftwareTriggerButton1" destination="tlb-B1-N7e" id="biy-sj-v5x"/>
                 <outlet property="fireTPButton" destination="4140" id="4146"/>
                 <outlet property="fltSlotNumTextField" destination="3222" id="3224"/>
                 <outlet property="forceFLTReadoutCB" destination="4275" id="4284"/>
@@ -4058,6 +4059,26 @@ Enable</string>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
+                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="TPu-Ag-VJl">
+                                                        <rect key="frame" x="1" y="12" width="116" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Fire Software Trigger" id="A65-Gj-3tI">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <button verticalHuggingPriority="750" imageHugsTitle="YES" id="tlb-B1-N7e">
+                                                        <rect key="frame" x="126" y="7" width="67" height="28"/>
+                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <buttonCell key="cell" type="push" title="Trigger" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="sLg-Ls-4DU">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="fireSoftwareTriggerAction:" target="-2" id="qSO-7Y-eHp"/>
+                                                        </connections>
+                                                    </button>
                                                 </subviews>
                                             </view>
                                             <font key="titleFont" metaFont="label"/>

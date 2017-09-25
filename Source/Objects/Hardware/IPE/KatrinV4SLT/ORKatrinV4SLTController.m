@@ -795,7 +795,6 @@
 - (IBAction) tpStartAction:(id)sender                 { [self do:@selector(writeTpStart)            name:@"Test Pattern Start"];               }
 - (IBAction) resetFLTAction:(id)sender                { [self do:@selector(writeFltReset)           name:@"FLT Reset"];                        }
 - (IBAction) resetSLTAction:(id)sender                { [self do:@selector(writeSltReset)           name:@"SLT Reset"];                        }
-- (IBAction) writeSWTrigAction:(id)sender             { [self do:@selector(writeSwTrigger)          name:@"SW Trigger"];                       }
 - (IBAction) writeClrInhibitAction:(id)sender         { [self do:@selector(writeClrInhibit)         name:@"Clr Inhibit"];                      }
 - (IBAction) writeSetInhibitAction:(id)sender         { [self do:@selector(writeSetInhibit)         name:@"Set Inhibit"];                      }
 - (IBAction) resetPageManagerAction:(id)sender        { [self do:@selector(writePageManagerReset)   name:@"Reset Page Manager"];               }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12120" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12120"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
         <capability name="box content view" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -30,8 +30,6 @@
                 <outlet property="enableDisableCountersMatrix" destination="5399" id="5410"/>
                 <outlet property="filePathField" destination="3051" id="3378"/>
                 <outlet property="forceReloadButton" destination="3052" id="3375"/>
-                <outlet property="forceTrigger1Button" destination="5163" id="5174"/>
-                <outlet property="forceTriggerButton" destination="2852" id="5175"/>
                 <outlet property="histogram" destination="5676" id="5689"/>
                 <outlet property="hwVersionButton" destination="2726" id="5071"/>
                 <outlet property="hwVersionField" destination="2729" id="5072"/>
@@ -372,79 +370,6 @@
                                                             <action selector="testPatternEnableAction:" target="-2" id="4886"/>
                                                         </connections>
                                                     </matrix>
-                                                </subviews>
-                                            </view>
-                                        </box>
-                                        <box misplaced="YES" title="Command Register" id="5097">
-                                            <rect key="frame" x="14" y="205" width="240" height="116"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="vfK-Tt-YFP">
-                                                <rect key="frame" x="2" y="2" width="236" height="99"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                <subviews>
-                                                    <button verticalHuggingPriority="750" id="5159">
-                                                        <rect key="frame" x="6" y="65" width="94" height="28"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="push" title="Set Inhibit" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5561">
-                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="writeSetInhibitAction:" target="-2" id="5171"/>
-                                                        </connections>
-                                                    </button>
-                                                    <button verticalHuggingPriority="750" id="5161">
-                                                        <rect key="frame" x="6" y="38" width="94" height="28"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="push" title="Clr Inhibit" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5562">
-                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="writeClrInhibitAction:" target="-2" id="5360"/>
-                                                        </connections>
-                                                    </button>
-                                                    <button verticalHuggingPriority="750" id="5163">
-                                                        <rect key="frame" x="6" y="11" width="94" height="28"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="push" title="Sw Trg" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5563">
-                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="writeSWTrigAction:" target="-2" id="5170"/>
-                                                        </connections>
-                                                    </button>
-                                                    <button verticalHuggingPriority="750" id="5366">
-                                                        <rect key="frame" x="128" y="65" width="83" height="28"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="push" title="Reset SLT" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5564">
-                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="resetSLTAction:" target="-2" id="5371"/>
-                                                        </connections>
-                                                    </button>
-                                                    <button verticalHuggingPriority="750" id="5368">
-                                                        <rect key="frame" x="128" y="38" width="83" height="28"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="push" title="Reset FLTs" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5565">
-                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="resetFLTAction:" target="-2" id="5370"/>
-                                                        </connections>
-                                                    </button>
-                                                    <button verticalHuggingPriority="750" id="5151">
-                                                        <rect key="frame" x="126" y="11" width="85" height="28"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="push" title="SW Trigger" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5560">
-                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                        </buttonCell>
-                                                    </button>
                                                 </subviews>
                                             </view>
                                         </box>
@@ -996,6 +921,60 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
+                                        <box misplaced="YES" title="Command Register" id="5097">
+                                            <rect key="frame" x="14" y="237" width="240" height="84"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView" id="vfK-Tt-YFP">
+                                                <rect key="frame" x="2" y="2" width="236" height="67"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <button verticalHuggingPriority="750" id="5159">
+                                                        <rect key="frame" x="6" y="33" width="94" height="28"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Set Inhibit" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5561">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="writeSetInhibitAction:" target="-2" id="5171"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" id="5161">
+                                                        <rect key="frame" x="6" y="6" width="94" height="28"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Clr Inhibit" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5562">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="writeClrInhibitAction:" target="-2" id="5360"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" id="5366">
+                                                        <rect key="frame" x="128" y="33" width="83" height="28"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Reset SLT" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5564">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="resetSLTAction:" target="-2" id="5371"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" id="5368">
+                                                        <rect key="frame" x="128" y="6" width="83" height="28"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Reset FLTs" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5565">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="resetFLTAction:" target="-2" id="5370"/>
+                                                        </connections>
+                                                    </button>
+                                                </subviews>
+                                            </view>
+                                        </box>
                                     </subviews>
                                 </view>
                             </tabViewItem>
@@ -1266,17 +1245,6 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <button verticalHuggingPriority="750" misplaced="YES" id="2852">
-                                            <rect key="frame" x="378" y="446" width="98" height="28"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="push" title="Force Trigger" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5515">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="writeSWTrigAction:" target="-2" id="5146"/>
-                                            </connections>
-                                        </button>
                                         <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="2850">
                                             <rect key="frame" x="185" y="245" width="134" height="34"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>

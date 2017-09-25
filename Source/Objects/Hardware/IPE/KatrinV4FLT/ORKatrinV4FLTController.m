@@ -662,7 +662,7 @@
     
 	// Populate the register popup
 	for(i=0;i<kNumV4FLTChannels;i++){
-        [channelPopUp insertItemWithTitle: [NSString stringWithFormat: @"%i",i+1 ] atIndex:i];
+        [channelPopUp insertItemWithTitle: [NSString stringWithFormat: @"%i",i ] atIndex:i];
         [[channelPopUp itemAtIndex:i] setTag: i];
     }
     [channelPopUp insertItemWithTitle: @"All" atIndex:i];
@@ -760,36 +760,35 @@
 	if([(ORKatrinV4FLTModel*)model runMode] < 3 || [(ORKatrinV4FLTModel*)model runMode] > 6)	[modeTabView selectTabViewItemAtIndex:0];
 	else											[modeTabView selectTabViewItemAtIndex:1];
     
-
+    [forceFLTReadoutCB           setEnabled: !lockedOrRunningMaintenance && [(ORKatrinV4FLTModel*)model fltRunMode] != kKatrinV4Flt_VetoEnergyTraceDaqMode];
+	[gapLengthPU                 setEnabled: !lockedOrRunningMaintenance && (([(ORKatrinV4FLTModel*)model runMode]<3) || ([(ORKatrinV4FLTModel*)model runMode]>6))];
+	[filterShapingLengthPU       setEnabled: !lockedOrRunningMaintenance];
+	[boxcarLengthPU              setEnabled: !lockedOrRunningMaintenance && useBoxcar];
+	[boxcarLengthLabel           setEnabled: !lockedOrRunningMaintenance && useBoxcar];
+    [testEnabledMatrix           setEnabled: !locked && !testingOrRunning];
+    [settingLockButton           setState: locked];
+	[initBoardButton             setEnabled: !lockedOrRunningMaintenance];
+	[reportButton                setEnabled: !lockedOrRunningMaintenance];
+	//[modeButton                setEnabled: !lockedOrRunningMaintenance]; //as per Florian's request 3/19/2013
+	[resetButton                 setEnabled: !lockedOrRunningMaintenance];
+    [gainTextFields              setEnabled: !lockedOrRunningMaintenance];
+    [thresholdTextFields         setEnabled: !lockedOrRunningMaintenance];
+    [triggerEnabledCBs           setEnabled: !lockedOrRunningMaintenance];
+    [fireSoftwareTriggerButton   setEnabled: !lockedOrRunningMaintenance];
+    [fireSoftwareTriggerButton1  setEnabled: !lockedOrRunningMaintenance];
+    [hitRateEnabledCBs           setEnabled: !lockedOrRunningMaintenance];
+    [vetoTriggerEnabledCBs       setEnabled: !lockedOrRunningMaintenance];
+    [vetoHitRateEnabledCBs       setEnabled: !lockedOrRunningMaintenance];
+    [vetoGainMatrix              setEnabled: !lockedOrRunningMaintenance];
+    [vetoThresholdMatrix         setEnabled: !lockedOrRunningMaintenance];
 	
-	[gapLengthPU setEnabled:!lockedOrRunningMaintenance && (([(ORKatrinV4FLTModel*)model runMode]<3) || ([(ORKatrinV4FLTModel*)model runMode]>6))];
-	[filterShapingLengthPU setEnabled:!lockedOrRunningMaintenance];
-	[boxcarLengthPU setEnabled:!lockedOrRunningMaintenance && useBoxcar];
-	[boxcarLengthLabel setEnabled:!lockedOrRunningMaintenance && useBoxcar];
+	[versionButton               setEnabled: !runInProgress];
+	[testButton                  setEnabled: !runInProgress];
+	[statusButton                setEnabled: !runInProgress];
 	
-    [testEnabledMatrix setEnabled:!locked && !testingOrRunning];
-    [settingLockButton setState: locked];
-	[initBoardButton setEnabled:!lockedOrRunningMaintenance];
-	[reportButton setEnabled:!lockedOrRunningMaintenance];
-	//[modeButton setEnabled:!lockedOrRunningMaintenance]; //as per Florian's request 3/19/2013
-	[resetButton setEnabled:!lockedOrRunningMaintenance];
-    [gainTextFields setEnabled:!lockedOrRunningMaintenance];
-    [thresholdTextFields setEnabled:!lockedOrRunningMaintenance];
-    [triggerEnabledCBs setEnabled:!lockedOrRunningMaintenance];
-	[fireSoftwareTriggerButton  setEnabled: !lockedOrRunningMaintenance];
-    [hitRateEnabledCBs setEnabled:!lockedOrRunningMaintenance];
-    [vetoTriggerEnabledCBs setEnabled:!lockedOrRunningMaintenance];
-    [vetoHitRateEnabledCBs setEnabled:!lockedOrRunningMaintenance];
-    [vetoGainMatrix setEnabled:!lockedOrRunningMaintenance];
-    [vetoThresholdMatrix setEnabled:!lockedOrRunningMaintenance];
-	
-	[versionButton setEnabled:!runInProgress];
-	[testButton setEnabled:!runInProgress];
-	[statusButton setEnabled:!runInProgress];
-	
-    [hitRateLengthPU setEnabled:!lockedOrRunningMaintenance];
-    [hitRateAllButton setEnabled:!lockedOrRunningMaintenance];
-    [hitRateNoneButton setEnabled:!lockedOrRunningMaintenance];
+    [hitRateLengthPU             setEnabled: !lockedOrRunningMaintenance];
+    [hitRateAllButton            setEnabled: !lockedOrRunningMaintenance];
+    [hitRateNoneButton           setEnabled: !lockedOrRunningMaintenance];
 		
 	if(testsAreRunning){
 		[testButton setEnabled: YES];
@@ -802,13 +801,13 @@
 	
 	int daqMode = [model runMode];
 	//[histNofMeasField setEnabled: !locked & (daqMode == kIpeFltV4_Histogram_DaqMode)];
-	[histMeasTimeField setEnabled: !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
-	[histEMinTextField setEnabled: !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
-	[histEBinPU setEnabled: !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
-	[syncWithRunControlButton setEnabled: !runInProgress & (daqMode == kIpeFltV4_Histogram_DaqMode)];
-	[shipSumHistogramPU setEnabled: !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
-	[histModePU setEnabled: !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
-	[histClrModePU setEnabled: !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
+	[histMeasTimeField setEnabled:               !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
+	[histEMinTextField setEnabled:               !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
+	[histEBinPU setEnabled:                      !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
+	[syncWithRunControlButton setEnabled:        !runInProgress              & (daqMode == kIpeFltV4_Histogram_DaqMode)];
+	[shipSumHistogramPU setEnabled:              !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
+	[histModePU setEnabled:                      !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
+	[histClrModePU setEnabled:                   !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
 	[clearReceivedHistoCounterButton setEnabled: !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
 	
 	NSString* s;
@@ -1632,7 +1631,7 @@
 
 - (IBAction) readRegAction: (id) sender
 {
-	int index = [model selectedRegIndex]; 
+	int index = [model selectedRegIndex];
 	@try {
 		unsigned long value;
         if(([model accessTypeOfReg:index] & kChanReg)){

@@ -154,7 +154,6 @@
 - (IBAction) testPatternEnableAction:(id)sender;
 - (IBAction) miscCntrlBitsAction:(id)sender;
 - (IBAction) hwVersionAction: (id) sender;
-- (IBAction) writeSWTrigAction:(id)sender;
 - (IBAction) resetPageManagerAction:(id)sender;
 - (IBAction) clearAllStatusErrorBitsAction:(id)sender;
 

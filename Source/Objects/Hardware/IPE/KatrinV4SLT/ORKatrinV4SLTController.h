@@ -163,7 +163,6 @@
 - (IBAction) testPatternEnableAction:(id)sender;
 - (IBAction) miscCntrlBitsAction:(id)sender;
 - (IBAction) hwVersionAction: (id) sender;
-- (IBAction) writeSWTrigAction:(id)sender;
 - (IBAction) resetPageManagerAction:(id)sender;
 - (IBAction) clearAllStatusErrorBitsAction:(id)sender;
 - (IBAction) dumpPageStatus:(id)sender;
@@ -196,7 +195,6 @@
 - (IBAction) tpStartAction:(id)sender;
 - (IBAction) resetFLTAction:(id)sender;
 - (IBAction) resetSLTAction:(id)sender;
-- (IBAction) writeSWTrigAction:(id)sender;
 - (IBAction) writeClrInhibitAction:(id)sender;
 - (IBAction) writeSetInhibitAction:(id)sender;
 - (IBAction) resetPageManagerAction:(id)sender;
