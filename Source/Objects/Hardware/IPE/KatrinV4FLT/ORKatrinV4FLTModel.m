@@ -2348,8 +2348,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     if(runMode == kKatrinV4Flt_EnergyDaqMode | runMode == kKatrinV4Flt_EnergyTraceDaqMode)
         runFlagsMask |= kSyncFltWithSltTimerFlag;                           //bit 17 = "sync flt with slt timer" flag
     if((shipSumHistogram == 1) && (!syncWithRunControl)) runFlagsMask |= kShipSumHistogramFlag;//bit 18 = "ship sum histogram" flag   //2013-06 added (!syncWithRunControl) - if syncWithRunControl is set, this 'facility' will produce sum histograms (using the decoder) -tb-
-    if(runMode == kKatrinV4Flt_EnergyTraceDaqMode){
-        runFlagsMask |= kForceFltReadoutFlag;               //fast event readout (SLT fifo)  //2016-05 added
+    if(forceFLTReadout || (runMode == kKatrinV4Flt_EnergyTraceDaqMode)){
+        runFlagsMask |= kForceFltReadoutFlag;      
     }
     
 	configStruct->card_info[index].deviceSpecificData[3] = runFlagsMask;	
