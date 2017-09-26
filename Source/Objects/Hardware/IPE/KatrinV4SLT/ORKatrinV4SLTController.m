@@ -206,7 +206,7 @@
 {
 	[pixelBusEnableRegTextField setIntValue: [model pixelBusEnableReg]];
 	int i;
-	for(i=0;i<19;i++){
+	for(i=0;i<20;i++){
 		[[pixelBusEnableRegMatrix cellWithTag:i] setIntValue: ([model pixelBusEnableReg] & (0x1 <<i))];
 	}    
 
