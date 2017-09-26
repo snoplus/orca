@@ -189,7 +189,6 @@
 - (IBAction) tpStartAction:(id)sender;
 - (IBAction) resetFLTAction:(id)sender;
 - (IBAction) resetSLTAction:(id)sender;
-- (IBAction) writeSWTrigAction:(id)sender;
 - (IBAction) writeClrInhibitAction:(id)sender;
 - (IBAction) writeSetInhibitAction:(id)sender;
 - (IBAction) resetPageManagerAction:(id)sender;
