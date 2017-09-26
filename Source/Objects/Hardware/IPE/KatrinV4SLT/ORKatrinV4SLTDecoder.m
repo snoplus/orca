@@ -229,7 +229,6 @@ static NSString* kFLTChanKey[24] = {
     for(ORKatrinV4FLTModel* aCard in listOfCards){
         int filterShapingLength = [aCard filterShapingLength];
         unsigned long filterDiv = 1L << filterShapingLength;
-
         if(filterShapingLength==0){
             filterDiv = [aCard boxcarLength] + 1;
         }
@@ -279,7 +278,7 @@ static NSString* kFLTChanKey[24] = {
 	    if(chan<24)channelKey = kFLTChanKey[chan];
 
         int aFilter = filter[card];
-    
+        if(aFilter==0)aFilter = 4096;
         [aDataSet histogram:energy/aFilter
                     numBins:4*4096 sender:self
                    withKeys: crateKey,stationKey,channelKey,nil];
