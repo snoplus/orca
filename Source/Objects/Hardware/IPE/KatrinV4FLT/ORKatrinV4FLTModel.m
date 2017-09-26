@@ -1888,8 +1888,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     [self setShipSumHistogram:          [decoder decodeIntForKey:   @"shipSumHistogram"]];
     [self setActivateDebuggingDisplays: [decoder decodeBoolForKey:  @"activateDebuggingDisplays"]];
     [self setHitRateMode:               [decoder decodeIntForKey:   @"hitRateMode"]];
-    [self setForceFLTReadout:           [decoder decodeBoolForKey:@"forceFLTReadout"]];
-    [self setFilterShapingLength:       [decoder decodeIntForKey:@"filterShapingLength"]];
+    [self setForceFLTReadout:           [decoder decodeBoolForKey:  @"forceFLTReadout"]];
+    [self setFilterShapingLength:       [decoder decodeIntForKey:   @"filterShapingLength"]];
 	
 	//TODO: many fields are  still in super class ORIpeV4FLTModel, some should move here (see ORIpeV4FLTModel::initWithCoder, see my comments in 2011-04-07-ORKatrinV4FLTModel.m) -tb-
     
@@ -1907,8 +1907,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     [encoder encodeBool:forceFLTReadout             forKey:@"forceFLTReadout"];
     [encoder encodeInt:skipFltEventReadout          forKey:@"skipFltEventReadout"];
     [encoder encodeInt32:bipolarEnergyThreshTest    forKey:@"bipolarEnergyThreshTest"];
-    //[encoder encodeInt:useBipolarEnergy           forKey:@"useBipolarEnergy"];
-    //[encoder encodeInt:useSLTtime                 forKey:@"useSLTtime"];
     [encoder encodeInt:boxcarLength                 forKey:@"boxcarLength"];
     [encoder encodeInt:useDmaBlockRead              forKey:@"useDmaBlockRead"];
     [encoder encodeInt:syncWithRunControl           forKey:@"syncWithRunControl"];
@@ -2348,7 +2346,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     if(runMode == kKatrinV4Flt_EnergyDaqMode | runMode == kKatrinV4Flt_EnergyTraceDaqMode)
         runFlagsMask |= kSyncFltWithSltTimerFlag;                           //bit 17 = "sync flt with slt timer" flag
     if((shipSumHistogram == 1) && (!syncWithRunControl)) runFlagsMask |= kShipSumHistogramFlag;//bit 18 = "ship sum histogram" flag   //2013-06 added (!syncWithRunControl) - if syncWithRunControl is set, this 'facility' will produce sum histograms (using the decoder) -tb-
-    if(forceFLTReadout || (runMode == kKatrinV4Flt_EnergyTraceDaqMode)){
+    if(forceFLTReadout || (runMode == kKatrinV4Flt_EnergyTraceDaqMode) || (runMode == kKatrinV4Flt_BipolarEnergyTraceDaqMode)){
         runFlagsMask |= kForceFltReadoutFlag;      
     }
     
