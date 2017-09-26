@@ -272,8 +272,9 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 - (void) setRunTime:(unsigned long long)aRunTime
 {
     runTime = aRunTime;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4SLTModelRunTimeChanged object:self];
+    //can be called from takedata and updates the gui, so must post on main thread
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORKatrinV4SLTModelRunTimeChanged object:nil userInfo:nil waitUntilDone:NO];
+// [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4SLTModelRunTimeChanged object:self];
 }
 
 - (unsigned long long) vetoTime
