@@ -46,7 +46,7 @@
 
 - (void) awakeFromNib
 {
-    settingSize     = NSMakeSize(965,460);
+    settingSize     = NSMakeSize(1060,460);
     rateSize		= NSMakeSize(790,340);
     registerTabSize	= NSMakeSize(800,520);
 	firmwareTabSize = NSMakeSize(480,187);
@@ -75,6 +75,7 @@
         [[enabledMatrix                 cellAtRow:i column:0] setTag:i];
         [[enabled2Matrix                cellAtRow:i column:0] setTag:i];
         [[extDiscrSrcMatrix             cellAtRow:i column:0] setTag:i];
+        [[extDiscrModeMatrix             cellAtRow:i column:0] setTag:i];
         [[pileupWaveformOnlyModeMatrix  cellAtRow:i column:0] setTag:i];
         [[pileupExtensionModeMatrix     cellAtRow:i column:0] setTag:i];
         [[discCountModeMatrix           cellAtRow:i column:0] setTag:i];
@@ -251,6 +252,11 @@
     [notifyCenter addObserver : self
                      selector : @selector(extDiscrSrcChanged:)
                          name : ORGretina4AExtDiscrimitorSrcChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(extDiscrModeChanged:)
+                         name : ORGretina4AExtDiscriminatorModeChanged
                         object: model];
 
     [notifyCenter addObserver : self
@@ -639,6 +645,7 @@
     [self forceFullInitChanged:nil];
     [self forceFullCardInitChanged:nil];
     [self extDiscrSrcChanged:nil];
+    [self extDiscrModeChanged:nil];
     [self userPackageDataChanged:nil];
     [self windowCompMinChanged:nil];
     [self windowCompMaxChanged:nil];
@@ -1111,6 +1118,14 @@
     }
 }
 
+- (void) extDiscrModeChanged:(NSNotification*)aNote
+{
+    int chan;
+    for(chan=0;chan<kNumGretina4AChannels;chan++){
+        [[extDiscrModeMatrix cellAtRow:chan column:0] selectItemAtIndex:([model extDiscriminatorMode]>>(chan*2)) & 0x3];
+    }
+}
+
 - (void) pileupWaveformOnlyModeChanged:(NSNotification*)aNote
 {
     short chan;
@@ -1286,6 +1301,17 @@
     regValue |= ((value&0x7)<<(chan*3));
     [model setExtDiscriminatorSrc:regValue];
 }
+
+- (IBAction) extDiscrModeAction:(id)sender
+{
+    unsigned long regValue = [model extDiscriminatorMode];
+    unsigned short chan    = [sender selectedRow];
+    unsigned long value   = [[sender selectedCell] indexOfSelectedItem];
+    regValue &= ~(0x00000003<<(chan*2));
+    regValue |= ((value&0x3)<<(chan*2));
+    [model setExtDiscriminatorMode:regValue];
+}
+
 
 - (IBAction) userPackageDataAction:(id)sender
 {
@@ -1755,6 +1781,11 @@
 - (IBAction) openPreampDialog:(id)sender
 {
     [model openPreampDialog];
+}
+
+- (IBAction) softwareTriggerAction:(id)sender
+{
+    [model softwareTrigger];
 }
 
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
