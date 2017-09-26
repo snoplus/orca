@@ -65,7 +65,7 @@ enum {
     kHoldoffControl,        //0x0414	holdoff_Control
     kBaselineDelay,         //0x418     baseline delay
     kDiagChannelInput,      //0x041C	diag_channel_input
-    kExtDiscSel,            //0x0420	ext_desc_sel
+    kExternalDiscMode,      //0x0420	ext_desc_mode
     kRj45SpareDoutControl,	//0x0424	rj45_spare_dout_control
     kLedStatus,             //0x0428	led_status
     kDownSampleHoldOffTime, //0x0434    downsample holdoff
