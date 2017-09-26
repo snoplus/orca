@@ -1044,13 +1044,6 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
         NSLog(@"-------------------------------------------------------------\n" );
 
     }
-
-    return;
-    
-    
-    unsigned long val;
-	val = [self readReg:kKatrinV4SLTPixelBusEnableReg];
-	[self setPixelBusEnableReg:val];	
 }
 
 - (void) loadSecondsReg
