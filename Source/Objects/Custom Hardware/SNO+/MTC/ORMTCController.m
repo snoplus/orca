@@ -441,9 +441,8 @@
     //Standards ops
     lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORMTCBasicLock] | sequenceRunning;
     
+    [includePedestalsCheckBox   setEnabled: !locked];
     [initMtcButton				setEnabled: !lockedOrNotRunningMaintenance];
-    [includePedestalsCheckBox   setEnabled: !lockedOrNotRunningMaintenance];
-    
     [firePedestalsButton		setEnabled: !lockedOrNotRunningMaintenance && [model isPulserFixedRate]];
     [stopPedestalsButton		setEnabled: !lockedOrNotRunningMaintenance && [model isPulserFixedRate]];
     [continuePedestalsButton	setEnabled: !lockedOrNotRunningMaintenance && [model isPulserFixedRate]];
@@ -453,28 +452,27 @@
     [fixedTimePedestalsDelayField	setEnabled: !lockedOrNotRunningMaintenance && ![model isPulserFixedRate]];
     
     //Settings
-    [setAdvancedOptionsButton           setEnabled: !lockedOrNotRunningMaintenance];
+    [nhitMatrix                     setEnabled: !locked];
+    [esumMatrix                     setEnabled: !locked];
+    [lockOutWidthField              setEnabled: !locked];
+    [pedestalWidthField             setEnabled: !locked];
+    [nhit100LoPrescaleField         setEnabled: !locked];
+    [pulserPeriodField              setEnabled: !locked];
+    [coarseDelayField               setEnabled: !locked];
+    [setAdvancedOptionsButton       setEnabled: !lockedOrNotRunningMaintenance];
     [loadMTCADacsButton				setEnabled: !lockedOrNotRunningMaintenance];
-    [nhitMatrix                     setEnabled: !lockedOrNotRunningMaintenance];
-    [esumMatrix                     setEnabled: !lockedOrNotRunningMaintenance];
-    [lockOutWidthField              setEnabled: !lockedOrNotRunningMaintenance];
-    [pedestalWidthField             setEnabled: !lockedOrNotRunningMaintenance];
-    [nhit100LoPrescaleField         setEnabled: !lockedOrNotRunningMaintenance];
-    [pulserPeriodField         setEnabled: !lockedOrNotRunningMaintenance];
-    [coarseDelayField                 setEnabled: !lockedOrNotRunningMaintenance];
 
     //Triggers
-    [globalTriggerCrateMaskMatrix setEnabled: !lockedOrNotRunningMaintenance];
-    [globalTriggerMaskMatrix setEnabled: !lockedOrNotRunningMaintenance];
-    [pedCrateMaskMatrix setEnabled: !lockedOrNotRunningMaintenance];
-    [mtcaEHIMatrix setEnabled: !lockedOrNotRunningMaintenance];
-    [mtcaELOMatrix setEnabled: !lockedOrNotRunningMaintenance];
-    [mtcaN100Matrix setEnabled: !lockedOrNotRunningMaintenance];
-    [mtcaN20Matrix setEnabled: !lockedOrNotRunningMaintenance];
-    [mtcaOEHIMatrix setEnabled: !lockedOrNotRunningMaintenance];
-    [mtcaOELOMatrix setEnabled: !lockedOrNotRunningMaintenance];
-    [mtcaOWLNMatrix setEnabled: !lockedOrNotRunningMaintenance];
-    
+    [globalTriggerCrateMaskMatrix setEnabled: !locked];
+    [globalTriggerMaskMatrix setEnabled: !locked];
+    [pedCrateMaskMatrix setEnabled: !locked];
+    [mtcaEHIMatrix setEnabled: !locked];
+    [mtcaELOMatrix setEnabled: !locked];
+    [mtcaN100Matrix setEnabled: !locked];
+    [mtcaN20Matrix setEnabled: !locked];
+    [mtcaOEHIMatrix setEnabled: !locked];
+    [mtcaOELOMatrix setEnabled: !locked];
+    [mtcaOWLNMatrix setEnabled: !locked];
     [loadGTCrateMaskButton setEnabled: !lockedOrNotRunningMaintenance];
     [loadMTCACrateMaskButton setEnabled: !lockedOrNotRunningMaintenance];
     [loadPEDCrateMaskButton setEnabled: !lockedOrNotRunningMaintenance];

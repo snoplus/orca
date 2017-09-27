@@ -859,12 +859,12 @@ static NSDictionary* xl3Ops;
 
 - (void) hvTriggerStatusChanged:(NSNotification*)aNote
 {
-    BOOL lockedOrNotRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORXL3Lock];
+    BOOL notRunningOrInMaintenance = isNotRunningOrIsInMaintenance();
 
     if ([model isTriggerON]) {
         [hvATriggerStatusField setStringValue:@"ON"];
         [hvBTriggerStatusField setStringValue:@"ON"];
-        [loadNominalSettingsButton setEnabled:!lockedOrNotRunningMaintenance];
+        [loadNominalSettingsButton setEnabled:notRunningOrInMaintenance];
         [hvTriggersButton setState:NSOnState];
     } else {
         [hvATriggerStatusField setStringValue:@"OFF"];

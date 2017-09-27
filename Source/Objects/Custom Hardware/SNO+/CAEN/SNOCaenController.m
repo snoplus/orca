@@ -561,7 +561,6 @@ static int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     BOOL locked						= [gSecurity isLocked:SNOCaenBasicLock];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:SNOCaenBasicLock];
 	
-	//[softwareTriggerButton setEnabled: !locked && !runInProgress]; 
     [basicLockButton setState: locked];
     
     [addressStepper setEnabled:!locked && !runInProgress];
@@ -590,46 +589,45 @@ static int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:SNOCaenSettingsLock];
     [settingsLockButton setState: locked];
 	[self setBufferStateLabel];
-    [thresholdMatrix setEnabled:!lockedOrRunningMaintenance]; 
-    [overUnderMatrix setEnabled:!lockedOrRunningMaintenance]; 
-    //[softwareTriggerButton setEnabled:!lockedOrRunningMaintenance]; 
-	[softwareTriggerButton setEnabled:YES]; 
-    [otherTriggerMatrix setEnabled:!lockedOrRunningMaintenance]; 
-    [chanTriggerMatrix setEnabled:!lockedOrRunningMaintenance]; 
-	[otherTriggerOutMatrix setEnabled:!lockedOrRunningMaintenance]; 
-	[chanTriggerOutMatrix setEnabled:!lockedOrRunningMaintenance]; 
-	[fpIOModeMatrix setEnabled:!lockedOrRunningMaintenance]; 
-	[fpIOLVDS0Matrix setEnabled:!lockedOrRunningMaintenance]; 
-	[fpIOLVDS1Matrix setEnabled:!lockedOrRunningMaintenance]; 
-	[fpIOLVDS2Matrix setEnabled:!lockedOrRunningMaintenance]; 
-	[fpIOLVDS3Matrix setEnabled:!lockedOrRunningMaintenance]; 
-	[fpIOPatternLatchMatrix setEnabled:!lockedOrRunningMaintenance]; 
-	[fpIOTrgInMatrix setEnabled:!lockedOrRunningMaintenance]; 
-    [fpIOTrgOutMatrix setEnabled:!lockedOrRunningMaintenance];
-    [fpIOTrgOutModeMatrix setEnabled:!lockedOrRunningMaintenance];
-	[fpIOGetButton setEnabled:!lockedOrRunningMaintenance];
-	[fpIOSetButton setEnabled:!lockedOrRunningMaintenance]; 
-    [postTriggerSettingTextField setEnabled:!lockedOrRunningMaintenance]; 
-    [triggerSourceMaskMatrix setEnabled:!lockedOrRunningMaintenance]; 
-    [coincidenceLevelTextField setEnabled:!lockedOrRunningMaintenance]; 
-    [dacMatrix setEnabled:!lockedOrRunningMaintenance]; 
-    [acquisitionModeMatrix setEnabled:!lockedOrRunningMaintenance]; 
-    [countAllTriggersMatrix setEnabled:!lockedOrRunningMaintenance]; 
-    [channelConfigMaskMatrix setEnabled:!lockedOrRunningMaintenance]; 
-    [eventSizePopUp setEnabled:!lockedOrRunningMaintenance]; 
-    [loadThresholdsButton setEnabled:!lockedOrRunningMaintenance]; 
-    [initButton setEnabled:!lockedOrRunningMaintenance]; 
+    [thresholdMatrix setEnabled:!locked];
+    [overUnderMatrix setEnabled:!locked];
+    [otherTriggerMatrix setEnabled:!locked];
+    [chanTriggerMatrix setEnabled:!locked];
+	[otherTriggerOutMatrix setEnabled:!locked];
+	[chanTriggerOutMatrix setEnabled:!locked];
+	[fpIOModeMatrix setEnabled:!locked];
+	[fpIOLVDS0Matrix setEnabled:!locked];
+	[fpIOLVDS1Matrix setEnabled:!locked];
+	[fpIOLVDS2Matrix setEnabled:!locked];
+	[fpIOLVDS3Matrix setEnabled:!locked];
+	[fpIOPatternLatchMatrix setEnabled:!locked];
+	[fpIOTrgInMatrix setEnabled:!locked];
+    [fpIOTrgOutMatrix setEnabled:!locked];
+    [fpIOTrgOutModeMatrix setEnabled:!locked];
+	[fpIOGetButton setEnabled:!locked];
+	[fpIOSetButton setEnabled:!lockedOrRunningMaintenance];
+    [postTriggerSettingTextField setEnabled:!locked];
+    [triggerSourceMaskMatrix setEnabled:!locked];
+    [coincidenceLevelTextField setEnabled:!locked];
+    [dacMatrix setEnabled:!locked];
+    [acquisitionModeMatrix setEnabled:!locked];
+    [countAllTriggersMatrix setEnabled:!locked];
+    [channelConfigMaskMatrix setEnabled:!locked];
+    [eventSizePopUp setEnabled:!locked];
+    [customSizeTextField setEnabled:!locked && [model isCustomSize]];
+    [customSizeButton setEnabled:!locked];
+    [fixedSizeButton setEnabled:!locked];
+    [eventSizePopUp setEnabled:!locked];
+    [enabledMaskMatrix setEnabled:!locked];
 
 	//these must NOT or can not be changed when run in progress
-    [customSizeTextField setEnabled:!locked && !runInProgress && [model isCustomSize]]; 
-	[customSizeButton setEnabled:!locked && !runInProgress]; 
-	[fixedSizeButton setEnabled:!locked && !runInProgress]; 
-    [eventSizePopUp setEnabled:!locked && !runInProgress]; 
-    [enabledMaskMatrix setEnabled:!locked && !runInProgress]; 
-	
+    [loadThresholdsButton setEnabled:!lockedOrRunningMaintenance];
+    [initButton setEnabled:!lockedOrRunningMaintenance];
+    [softwareTriggerButton setEnabled:!lockedOrRunningMaintenance];
+
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
-		if(runInProgress && ![gSecurity isLocked:SNOCaenSettingsLock])s = @"Not in Maintenance Run.";
+		if(runInProgress && ![gSecurity isLocked:SNOCaenSettingsLock])s = @"Not in Maintenance";
     }
     [settingsLockDocField setStringValue:s];
 	

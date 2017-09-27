@@ -487,7 +487,6 @@
 - (void)            dumpHardwareStatusDetails:  (unsigned long)aValue;
 - (void)            dumpExternalDiscSrcDetails: (unsigned long)aValue;
 - (void)            dumpChannelControlDetails:  (unsigned long)aValue;
-- (void)            dumpLedThresholdDetails:    (unsigned long)aValue;
 - (void)            dumpHoldoffControlDetails:  (unsigned long)aValue;
 - (void)            dumpBaselineDelayDetails:   (unsigned long)aValue;
 - (void)            dumpExtDiscSelDetails:      (unsigned long)aValue;

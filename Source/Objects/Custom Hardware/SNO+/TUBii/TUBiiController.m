@@ -91,29 +91,29 @@
     
     //Tubii
     [tubiiLockButton setState: locked];
-    [tubiiIPField setEnabled: !lockedOrNotRunningMaintenance];
-    [tubiiPortField setEnabled: !lockedOrNotRunningMaintenance];
-    [tubiiInitButton setEnabled: !lockedOrNotRunningMaintenance];
+    [tubiiIPField setEnabled: !locked];
+    [tubiiPortField setEnabled: !locked];
+    [tubiiInitButton setEnabled: !locked];
     [tubiiDataReadoutButton setEnabled: !lockedOrNotRunningMaintenance];
     [ECA_EnableButton setEnabled: !lockedOrNotRunningMaintenance];
 
     //Pulsers & Delays
-    [SmellieRate_TextField setEnabled: !lockedOrNotRunningMaintenance];
-    [SmellieWidth_TextField setEnabled: !lockedOrNotRunningMaintenance];
-    [SmellieNPulses_TextField setEnabled: !lockedOrNotRunningMaintenance];
-    [TellieRate_TextField setEnabled: !lockedOrNotRunningMaintenance];
-    [TellieWidth_TextField setEnabled: !lockedOrNotRunningMaintenance];
-    [TellieNPulses_TextField setEnabled: !lockedOrNotRunningMaintenance];
+    [SmellieRate_TextField setEnabled: !locked];
+    [SmellieWidth_TextField setEnabled: !locked];
+    [SmellieNPulses_TextField setEnabled: !locked];
+    [TellieRate_TextField setEnabled: !locked];
+    [TellieWidth_TextField setEnabled: !locked];
+    [TellieNPulses_TextField setEnabled: !locked];
     [fireSmellieButton setEnabled: !lockedOrNotRunningMaintenance];
     [stopSmellieButton setEnabled: !lockedOrNotRunningMaintenance];
     [fireTellieButton setEnabled: !lockedOrNotRunningMaintenance];
     [stopTellieButton setEnabled: !lockedOrNotRunningMaintenance];
-    [SmellieDelay_TextField setEnabled: !lockedOrNotRunningMaintenance];
-    [TellieDelay_TextField setEnabled: !lockedOrNotRunningMaintenance];
-    [GenericDelay_TextField setEnabled: !lockedOrNotRunningMaintenance];
-    [GenericRate_TextField setEnabled: !lockedOrNotRunningMaintenance];
-    [GenericWidth_TextField setEnabled: !lockedOrNotRunningMaintenance];
-    [GenericNPulses_TextField setEnabled: !lockedOrNotRunningMaintenance];
+    [SmellieDelay_TextField setEnabled: !locked];
+    [TellieDelay_TextField setEnabled: !locked];
+    [GenericDelay_TextField setEnabled: !locked];
+    [GenericRate_TextField setEnabled: !locked];
+    [GenericWidth_TextField setEnabled: !locked];
+    [GenericNPulses_TextField setEnabled: !locked];
     [loadSmellieButton setEnabled: !lockedOrNotRunningMaintenance];
     [loadTellieButton setEnabled: !lockedOrNotRunningMaintenance];
     [loadDelayButton setEnabled: !lockedOrNotRunningMaintenance];
@@ -121,80 +121,80 @@
     [stopPulserButton setEnabled: !lockedOrNotRunningMaintenance];
     
     //Triggers
-    [TrigMaskSelect setEnabled: !lockedOrNotRunningMaintenance];
+    [TrigMaskSelect setEnabled: !locked];
     [sendTriggerMaskButton setEnabled: !lockedOrNotRunningMaintenance];
-    [matchHWButton setEnabled: !lockedOrNotRunningMaintenance];
-    [BurstRate setEnabled: !lockedOrNotRunningMaintenance];
-    [BurstTriggerMask setEnabled: !lockedOrNotRunningMaintenance];
+    [matchHWButton setEnabled: !locked];
+    [BurstRate setEnabled: !locked];
+    [BurstTriggerMask setEnabled: !locked];
     [sendBurstButton setEnabled: !lockedOrNotRunningMaintenance];
-    [ComboEnableMask setEnabled: !lockedOrNotRunningMaintenance];
-    [ComboTriggerMask setEnabled: !lockedOrNotRunningMaintenance];
+    [ComboEnableMask setEnabled: !locked];
+    [ComboTriggerMask setEnabled: !locked];
     [sendComboButton setEnabled: !lockedOrNotRunningMaintenance];
-    [PrescaleFactor setEnabled: !lockedOrNotRunningMaintenance];
-    [PrescaleTriggerMask setEnabled: !lockedOrNotRunningMaintenance];
+    [PrescaleFactor setEnabled: !locked];
+    [PrescaleTriggerMask setEnabled: !locked];
     [sendPrescaleButton setEnabled: !lockedOrNotRunningMaintenance];
-    [TUBiiPGTRate setEnabled: !lockedOrNotRunningMaintenance];
+    [TUBiiPGTRate setEnabled: !locked];
     [sendTUBiiPGTStart setEnabled: !lockedOrNotRunningMaintenance];
     [sendTUBiiPGTStop setEnabled: !lockedOrNotRunningMaintenance];
-    [MTCAMimic_Slider setEnabled: !lockedOrNotRunningMaintenance];
-    [MTCAMimic_TextField setEnabled: !lockedOrNotRunningMaintenance];
+    [MTCAMimic_Slider setEnabled: !locked];
+    [MTCAMimic_TextField setEnabled: !locked];
     [sendMTCAButton setEnabled: !lockedOrNotRunningMaintenance];
-    [matchMTCAButton setEnabled: !lockedOrNotRunningMaintenance];
+    [matchMTCAButton setEnabled: !locked];
     //Make sure the sync/async mask are properly disabled
-    if(!lockedOrNotRunningMaintenance){
+    if(!locked){
         NSUInteger trigMaskVal = ([model currentModelState].syncTrigMask | [model currentModelState].asyncTrigMask);
         [self disableMask:trigMaskVal ForCheckBoxes:TrigMaskSelect FromBit:24 ToBit:48];
     }
 
     //Analog
-    [caenChannelSelect_0 setEnabled: !lockedOrNotRunningMaintenance];
-    [caenChannelSelect_1 setEnabled: !lockedOrNotRunningMaintenance];
-    [caenChannelSelect_2 setEnabled: !lockedOrNotRunningMaintenance];
-    [caenChannelSelect_3 setEnabled: !lockedOrNotRunningMaintenance];
-    [caenGainSelect_0 setEnabled: !lockedOrNotRunningMaintenance];
-    [caenGainSelect_1 setEnabled: !lockedOrNotRunningMaintenance];
-    [caenGainSelect_2 setEnabled: !lockedOrNotRunningMaintenance];
-    [caenGainSelect_3 setEnabled: !lockedOrNotRunningMaintenance];
-    [caenGainSelect_4 setEnabled: !lockedOrNotRunningMaintenance];
-    [caenGainSelect_5 setEnabled: !lockedOrNotRunningMaintenance];
-    [caenGainSelect_6 setEnabled: !lockedOrNotRunningMaintenance];
-    [caenGainSelect_7 setEnabled: !lockedOrNotRunningMaintenance];
-    [matchAnalogButton setEnabled: !lockedOrNotRunningMaintenance];
+    [caenChannelSelect_0 setEnabled: !locked];
+    [caenChannelSelect_1 setEnabled: !locked];
+    [caenChannelSelect_2 setEnabled: !locked];
+    [caenChannelSelect_3 setEnabled: !locked];
+    [caenGainSelect_0 setEnabled: !locked];
+    [caenGainSelect_1 setEnabled: !locked];
+    [caenGainSelect_2 setEnabled: !locked];
+    [caenGainSelect_3 setEnabled: !locked];
+    [caenGainSelect_4 setEnabled: !locked];
+    [caenGainSelect_5 setEnabled: !locked];
+    [caenGainSelect_6 setEnabled: !locked];
+    [caenGainSelect_7 setEnabled: !locked];
+    [matchAnalogButton setEnabled: !locked];
     [sendAnalogButton setEnabled: !lockedOrNotRunningMaintenance];
 
     //GT Delays
-    [LO_SrcSelect setEnabled: !lockedOrNotRunningMaintenance];
-    [LO_Field setEnabled: !lockedOrNotRunningMaintenance];
-    [DGT_Field setEnabled: !lockedOrNotRunningMaintenance];
-    [LO_Slider setEnabled: !lockedOrNotRunningMaintenance];
-    [DGT_Slider setEnabled: !lockedOrNotRunningMaintenance];
+    [LO_SrcSelect setEnabled: !locked];
+    [LO_Field setEnabled: !locked];
+    [DGT_Field setEnabled: !locked];
+    [LO_Slider setEnabled: !locked];
+    [DGT_Slider setEnabled: !locked];
+    [matchGTDelaysButton setEnabled: !locked];
     [sendGTDelaysButton setEnabled: !lockedOrNotRunningMaintenance];
-    [matchGTDelaysButton setEnabled: !lockedOrNotRunningMaintenance];
 
     //Speaker & Counter
-    [SpeakerMaskSelect_1 setEnabled: !lockedOrNotRunningMaintenance];
-    [SpeakerMaskSelect_2 setEnabled: !lockedOrNotRunningMaintenance];
-    [SpeakerMaskField setEnabled: !lockedOrNotRunningMaintenance];
-    [matchSpeakerButton setEnabled: !lockedOrNotRunningMaintenance];
+    [SpeakerMaskSelect_1 setEnabled: !locked];
+    [SpeakerMaskSelect_2 setEnabled: !locked];
+    [SpeakerMaskField setEnabled: !locked];
+    [matchSpeakerButton setEnabled: !locked];
+    [checkSpeakerButton setEnabled: !locked];
+    [uncheckSpeakerButton setEnabled: !locked];
+    [CounterMaskSelect_1 setEnabled: !locked];
+    [CounterMaskSelect_2 setEnabled: !locked];
+    [CounterMaskField setEnabled: !locked];
+    [matchCounterButton setEnabled: !locked];
+    [checkCounterButton setEnabled: !locked];
+    [uncheckCounterButton setEnabled: !locked];
+    [CounterLZBSelect setEnabled: !locked];
+    [CounterTestModeSelect setEnabled: !locked];
+    [CounterInhibitSelect setEnabled: !locked];
+    [CounterModeSelect setEnabled: !locked];
     [sendSpeakerButton setEnabled: !lockedOrNotRunningMaintenance];
-    [checkSpeakerButton setEnabled: !lockedOrNotRunningMaintenance];
-    [uncheckSpeakerButton setEnabled: !lockedOrNotRunningMaintenance];
-    [CounterMaskSelect_1 setEnabled: !lockedOrNotRunningMaintenance];
-    [CounterMaskSelect_2 setEnabled: !lockedOrNotRunningMaintenance];
-    [CounterMaskField setEnabled: !lockedOrNotRunningMaintenance];
-    [matchCounterButton setEnabled: !lockedOrNotRunningMaintenance];
     [sendCounterButton setEnabled: !lockedOrNotRunningMaintenance];
-    [checkCounterButton setEnabled: !lockedOrNotRunningMaintenance];
-    [uncheckCounterButton setEnabled: !lockedOrNotRunningMaintenance];
-    [CounterLZBSelect setEnabled: !lockedOrNotRunningMaintenance];
-    [CounterTestModeSelect setEnabled: !lockedOrNotRunningMaintenance];
-    [CounterInhibitSelect setEnabled: !lockedOrNotRunningMaintenance];
-    [CounterModeSelect setEnabled: !lockedOrNotRunningMaintenance];
 
     //Clock Monitor
-    [DefaultClockSelect setEnabled: !lockedOrNotRunningMaintenance];
+    [DefaultClockSelect setEnabled: !locked];
+    [matchClockButton setEnabled: !locked];
     [sendClockButton setEnabled: !lockedOrNotRunningMaintenance];
-    [matchClockButton setEnabled: !lockedOrNotRunningMaintenance];
     [resetClockButton setEnabled: !lockedOrNotRunningMaintenance];
     
 }

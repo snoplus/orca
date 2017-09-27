@@ -96,6 +96,7 @@ NSString* ORKatrinV4FLTNoiseFloorChanged                    = @"ORKatrinV4FLTNoi
 NSString* ORKatrinV4FLTNoiseFloorOffsetChanged              = @"ORKatrinV4FLTNoiseFloorOffsetChanged";
 NSString* ORKatrinV4FLTModelActivateDebuggingDisplaysChanged = @"ORKatrinV4FLTModelActivateDebuggingDisplaysChanged";
 NSString* ORKatrinV4FLTModeFifoFlagsChanged                 = @"ORKatrinV4FLTModeFifoFlagsChanged";
+NSString* ORKatrinV4FLTModelHitRateModeChanged              = @"ORKatrinV4FLTModelHitRateModeChanged";
 
 static NSString* fltTestName[kNumKatrinV4FLTTests]= {
 	@"Run Mode",
@@ -129,9 +130,24 @@ static NSString* fltTestName[kNumKatrinV4FLTTests]= {
 {
     [fltV4useDmaBlockReadAlarm clearAlarm];
     [fltV4useDmaBlockReadAlarm release];
-    
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[super dealloc];
+}
+
+- (void) sleep
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+}
+
+- (void) wakeUp
+{
+    [super wakeUp];
+    [self registerNotificationObservers];
+    if(hitRateMode == kKatrinV4HitRunRateAlways){
+        [self readHitRates];
+    }
 }
 
 - (void) setUpImage
@@ -152,6 +168,13 @@ static NSString* fltTestName[kNumKatrinV4FLTTests]= {
 - (BOOL) partOfEvent:(short)chan
 {
 	return (eventMask & (1L<<chan)) != 0;
+}
+
+- (void) awakeAfterDocumentLoaded
+{
+    if(hitRateMode == kKatrinV4HitRunRateAlways){
+        [self readHitRates];
+    }
 }
 
 //'stationNumber' returns the logical number of the FLT (FLT#) (1...20),
@@ -555,7 +578,51 @@ static double table[32]={
     return hint;
 }
 
+- (int) hitRateMode
+{
+    return hitRateMode;
+}
 
+- (void) setHitRateMode:(int)aMode
+{
+    if(aMode<0)aMode = 0;
+    if(aMode>1)aMode = 1;
+    
+    [[[self undoManager] prepareWithInvocationTarget:self] setHitRateMode:hitRateMode];
+    
+    hitRateMode = aMode;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelHitRateModeChanged object:self];
+    if(hitRateMode == kKatrinV4HitRunRateAlways){
+        [self startReadingHitRates];
+    }
+    else {
+        [self stopReadingHitRates];
+    }
+}
+- (void) stopReadingHitRates
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
+    [self clearHitRates];
+}
+
+- (void) clearHitRates
+{
+    int chan;
+    for(chan=0;chan<kNumV4FLTChannels;chan++){
+        hitRate[chan] = 0;
+    }
+    [self setHitRateTotal:0];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelHitRateChanged object:self];
+}
+
+- (void) startReadingHitRates
+{
+    [self performSelector:@selector(readHitRates)
+               withObject:nil
+               afterDelay: 1];		//start reading out the rates
+}
 
 - (int) customVariable
 {
@@ -704,9 +771,7 @@ static double table[32]={
 
     [[[self undoManager] prepareWithInvocationTarget:self] setRunMode:runMode];
     runMode = aRunMode;
-	
-	//int fifoLengthSetting = kFifoLength512;
-	
+		
 	switch (runMode) {
 		case kKatrinV4Flt_EnergyDaqMode:
 			[self setFltRunMode:kKatrinV4FLT_Run_Mode];
@@ -862,29 +927,35 @@ static double table[32]={
 - (int) filterShapingLength { return filterShapingLength; }
 - (void) setFilterShapingLength:(int)aFilterShapingLength
 {
-    if(aFilterShapingLength>0x3f)aFilterShapingLength = 0x3F;
-    if(aFilterShapingLength<2)   aFilterShapingLength = 2;
-    
-	if(aFilterShapingLength == 0x3f && gapLength>0){
+    [[[self undoManager] prepareWithInvocationTarget:self] setFilterShapingLength:filterShapingLength];
+    int newValue = [self restrictIntValue:aFilterShapingLength min:2 max:8];
+    if(filterShapingLength!=0 && newValue!=filterShapingLength){
+        float old = 1<<filterShapingLength;
+        float new = 1<<newValue;
+        float ratio = new/old;
+        int chan;
+        for(chan=0;chan<kNumV4FLTChannels;chan++){
+            unsigned long currentThreshold = [self threshold:chan];
+            [self setThreshold:chan withValue:currentThreshold*ratio];
+        }
+    }
+    filterShapingLength = newValue;
+	if(filterShapingLength == 8 && gapLength>0){
 		[self setGapLength:0];
 		NSLog(@"Warning: setFilterShapingLength: FLTv4: maximum filter length allows only gap length of 0. Gap length reset to 0!\n");
 	}
-    [[[self undoManager] prepareWithInvocationTarget:self] setFilterShapingLength:filterShapingLength];
-    filterShapingLength = [self restrictIntValue:aFilterShapingLength min:0 max:8];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelFilterShapingLengthChanged object:self];
 }
 
 - (int) gapLength { return gapLength; }
 - (void) setGapLength:(int)aGapLength
 {
-    if(aGapLength>0x7)aGapLength = 0x7;
-    if(aGapLength<0)  aGapLength = 0;
-    if(filterShapingLength == 0x3f && gapLength>0){
-		aGapLength=0;
-		NSLog(@"Warning: setGapLength: FLTv4: maximum filter length allows only gap length of 0. Gap length reset to 0!\n");
-	}
     [[[self undoManager] prepareWithInvocationTarget:self] setGapLength:gapLength];
     gapLength = [self restrictIntValue:aGapLength min:0 max:7];
+    if(filterShapingLength == 8 && gapLength>0){
+		gapLength=0;
+		NSLog(@"Warning: setGapLength: FLTv4: maximum filter length allows only gap length of 0. Gap length reset to 0!\n");
+	}
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelGapLengthChanged object:self];
 }
 
@@ -1354,7 +1425,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 - (void) initBoard
 {
-	//[self writeControl]; //removed setting runmode from here -tb-
+    [self writeControlWithStandbyMode];     //standby mode so the HW is stable for the following writes
 	[self writeReg: kFLTV4HrControlReg     value:hitRateLength];
 	[self writeReg: kFLTV4PostTrigger      value:postTriggerTime];
 	[self writeReg: kFLTV4EnergyOffsetReg  value:energyOffset];//new 2016-07 - is it OK for old firmware? -tb-
@@ -1366,6 +1437,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	if(fltRunMode == kKatrinV4FLT_Histo_Mode){
 		[self writeHistogramControl];
 	}
+    [self writeRunControl:YES];
+    [self writeControl];                //come out of standby mode
 }
 
 - (unsigned long) readStatus
@@ -1378,23 +1451,21 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	return [self readReg: kFLTV4ControlReg];
 }
 
-
 //TODO: better use the STANDBY flag of the FLT -tb- 2010-01-xx     !!!!!!!!!!!!!!!!!
 - (void) writeRunControl:(BOOL)startSampling
 {
 	unsigned long aValue = 
-	(((boxcarLength)        & 0x7)<<28)	|		//boxcarLength is the register value and the popup item tag -tb- extended to 3 bits in 2016, needed to be shifted to bit 28 ...
+	(((boxcarLength)        & 0x7)<<28)	|		//boxcarLength is the register value and the popup item tag. extended to 3 bits in 2016, needed to be shifted to bit 28
     (((poleZeroCorrection)  & 0xf)<<24) |		//poleZeroCorrection is stored as the popup index -- NEW since 2011-06-09 -tb-
 	(((nfoldCoincidence)    & 0xf)<<20) |		//nfoldCoincidence is stored as the popup index -- NEW since 2010-11-09 -tb-
 	(((vetoOverlapTime)     & 0xf)<<16)	|		//vetoOverlapTime is stored as the popup index -- NEW since 2010-08-04 -tb-
 	(((boxcarLength)        & 0x3)<<14)	|		//boxcarLength is the register value and the popup item tag -tb-
 	(((filterShapingLength) & 0xf)<<8)	|		//filterShapingLength is the register value and the popup item tag -tb-
-	((gapLength & 0xf)<<4)			| 
-	// -tb- ((runBoxCarFilter & 0x1)<<2)	|
-	((startSampling & 0x1)<<3)		|		// run trigger unit
-	((startSampling & 0x1)<<2)		|		// run filter unit
-	((startSampling & 0x1)<<1)      |		// start ADC sampling
-	 (startSampling & 0x1);					// store data in QDRII RAM
+	((gapLength & 0xf)<<4)              |
+	((startSampling & 0x1)<<3)          |		// run trigger unit
+	((startSampling & 0x1)<<2)          |		// run filter unit
+	((startSampling & 0x1)<<1)          |		// start ADC sampling
+	 (startSampling & 0x1);                     // store data in QDRII RAM
 	
 	[self writeReg:kFLTV4RunControlReg value:aValue];					
 }
@@ -1634,88 +1705,104 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
 	
 	@try {
-
-		BOOL    oneChanged          = NO;
-        int     hitRateLengthSec    = 1<<hitRateLength;
-		float   freq                = 1.0/((double)hitRateLengthSec);
-				
-		unsigned long location = (([self crateNumber]&0xf)<<21) | ([self stationNumber]& 0x0000001f)<<16;
-		unsigned long data[5 + kNumV4FLTChannels + kNumV4FLTChannels];//2013-04-24 changed to ship full 32 bit counter; data format changed! see decoder -tb-
-		
-		//combine all the hitrate read commands into one command packet
-		ORCommandList* aList = [[ORCommandList commandList] retain];
-        
-        int countHREnabledChans = 0;
-        int chan;
-		for(chan=0;chan<kNumV4FLTChannels;chan++){
-			if(hitRateEnabledMask & (1L<<chan)){
-				[aList addCommand: [self readRegCmd:kFLTV4HitRateReg channel:chan]];
-                countHREnabledChans++;
-			}
-        }
-		[self executeCommandList:aList];
-        
-		//pull out the result (same order as commands)
-        float   newTotal  = 0;
-		int     dataIndex = 0;
-		for(chan=0;chan<kNumV4FLTChannels;chan++){
-			if(hitRateEnabledMask & (1L<<chan)){
-				unsigned long aValue32 = [aList longValueForCmd:dataIndex];
-				//BOOL overflow = (aValue >> 31) & 0x1;
-				unsigned long overflow              = 0;//2013-04-24 for legacy data we 'simulate' a 16 bit counter -> simulate a 16 bit overflow flag -tb-
-				if(aValue32 & 0xffff0000) overflow  = 0x1;//2013-04-24 for legacy data we 'simulate' a 16 bit counter -> simulate a 16 bit overflow flag -tb-
-				unsigned long overflow32            = (aValue32 >>23) & 0x1;//2013-04-24 for legacy data we 'simulate' a 16 bit counter -> simulate a 16 bit overflow flag -tb-
-				unsigned long aValue16              = aValue32 & 0xffff;
-                aValue32                            = aValue32 & 0x7fffff;
-
-                data[dataIndex + 5]                       = ((chan&0xff)<<20) | ((overflow&0x1)<<16) | aValue16;    // The 16 bit values
-                data[5 + dataIndex + countHREnabledChans] =  aValue32 * freq;                                       // The 32 bit values (new format);
-
-                //... = aValue32 & 0xff000000; this is the new (2013-11) overflow counter: what to do with it? -tb-
-				if(aValue32 != hitRate[chan] || overflow32 != hitRateOverFlow[chan]){
-					if (hitRateLengthSec!=0)	hitRate[chan] = aValue32 * freq;
-					else					    hitRate[chan] = 0;
-					
-					if(overflow32) hitRate[chan] = 0;
-					hitRateOverFlow[chan] = overflow32;
-					
-					oneChanged = YES;
-				}
-				if(!hitRateOverFlow[chan]){
-					newTotal += hitRate[chan];
-				}
-				dataIndex++;
-			}
-		}
-        [aList release];
-
-        if(	dataIndex != countHREnabledChans){
-            NSLog(@"ERROR:  Shipping hitrates: FLT #%i:	dataIndex %i,  countHREnabledChans %i are not the same!!!\n",[self stationNumber],dataIndex , countHREnabledChans);	
-        }
-        
         id slt      = [[self crate] adapter];
-        sltSec      =  [slt getSeconds];
-        sltSubSec   =  [slt readSubSecondsCounter];
+        if([slt sbcIsConnected]){
+            
+            if(hitRateLength != lastHitRateLength){
+                lastHitRateLength = hitRateLength;
+                if([self hitRateMode] == kKatrinV4HitRunRateAlways){
+                    [self writeReg: kFLTV4HrControlReg value:hitRateLength];
+                    [self clearHitRates];
+                }
+            }
+            
+            else {
+                BOOL    oneChanged          = NO;
+                int     hitRateLengthSec    = 1<<hitRateLength;
+                float   freq                = 1.0/(float)hitRateLengthSec;
+                        
+                unsigned long location = (([self crateNumber]&0xf)<<21) | ([self stationNumber]& 0x0000001f)<<16;
+                unsigned long data[5 + kNumV4FLTChannels + kNumV4FLTChannels];//2013-04-24 changed to ship full 32 bit counter; data format changed! see decoder -tb-
+                
+                //combine all the hitrate read commands into one command packet
+                ORCommandList* aList = [[ORCommandList commandList] retain];
+                
+                int countHREnabledChans = 0;
+                int chan;
+                for(chan=0;chan<kNumV4FLTChannels;chan++){
+                    if(hitRateEnabledMask & (1L<<chan)){
+                        [aList addCommand: [self readRegCmd:kFLTV4HitRateReg channel:chan]];
+                        countHREnabledChans++;
+                    }
+                }
+                [self executeCommandList:aList];
+                
+                //pull out the result (same order as commands)
+                float   newTotal  = 0;
+                int     dataIndex = 0;
+                for(chan=0;chan<kNumV4FLTChannels;chan++){
+                    if(hitRateEnabledMask & (1L<<chan)){
+                        unsigned long aValue32 = [aList longValueForCmd:dataIndex];
+                        //BOOL overflow = (aValue >> 31) & 0x1;
+                        unsigned long overflow              = 0;//2013-04-24 for legacy data we 'simulate' a 16 bit counter -> simulate a 16 bit overflow flag -tb-
+                        if(aValue32 & 0xffff0000) overflow  = 0x1;//2013-04-24 for legacy data we 'simulate' a 16 bit counter -> simulate a 16 bit overflow flag -tb-
+                        unsigned long overflow32            = (aValue32 >>23) & 0x1;//2013-04-24 for legacy data we 'simulate' a 16 bit counter -> simulate a 16 bit overflow flag -tb-
+                        unsigned long aValue16              = aValue32 & 0xffff;
+                        aValue32                            = aValue32 & 0x7fffff;
 
-		if(dataIndex>0){
-			time_t	ut_time;
-			time(&ut_time);
+                        data[dataIndex + 5]                 = ((chan&0xff)<<20) | ((overflow&0x1)<<16) | aValue16;    // The 16 bit values
+                        data[5 + dataIndex + countHREnabledChans] =  aValue32 * freq;                                       // The 32 bit values (new format);
 
-			data[0] = hitRateId | (dataIndex + countHREnabledChans + 5); 
-			data[1] = location  | ((countHREnabledChans & 0x1f)<<8) | 0x1; //2013-04-24 version of record type: 0x1: shipping  32 bit hitrate registers  -tb-
-			data[2] = sltSec;
-			data[3] = hitRateLengthSec;	
-			data[4] = newTotal;
-			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-																object:[NSData dataWithBytes:data length:sizeof(long)*(dataIndex + 5 + countHREnabledChans)]];
-		}
-		
-		[self setHitRateTotal:newTotal];
-		
-		if(oneChanged){
-		    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelHitRateChanged object:self];
-		}
-        
+                        //... = aValue32 & 0xff000000; this is the new (2013-11) overflow counter: what to do with it? -tb-
+                        if(aValue32 != hitRate[chan] || overflow32 != hitRateOverFlow[chan]){
+                            if (hitRateLengthSec!=0)	hitRate[chan] = aValue32 * freq;
+                            else					    hitRate[chan] = 0;
+                            
+                            if(overflow32) hitRate[chan] = 0;
+                            hitRateOverFlow[chan] = overflow32;
+                            
+                            oneChanged = YES;
+                        }
+                        if(!hitRateOverFlow[chan]){
+                            newTotal += hitRate[chan];
+                        }
+                        dataIndex++;
+                    }
+                }
+                [aList release];
+
+                if(	dataIndex != countHREnabledChans){
+                    NSLog(@"ERROR:  Shipping hitrates: FLT #%i:	dataIndex %i,  countHREnabledChans %i are not the same!!!\n",[self stationNumber],dataIndex , countHREnabledChans);	
+                }
+                
+                sltSec      =  [slt getSeconds];
+                sltSubSec   =  [slt readSubSecondsCounter];
+
+                if(dataIndex>0 && [gOrcaGlobals runInProgress]){
+                    time_t	ut_time;
+                    time(&ut_time);
+
+                    data[0] = hitRateId | (dataIndex + countHREnabledChans + 5); 
+                    data[1] = location  | ((countHREnabledChans & 0x1f)<<8) | 0x1; //2013-04-24 version of record type: 0x1: shipping  32 bit hitrate registers  -tb-
+                    data[2] = sltSec;
+                    data[3] = hitRateLengthSec;	
+                    data[4] = newTotal;
+
+                    [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification
+                                                                        object:[NSData dataWithBytes:data length:sizeof(long)*(dataIndex + 5 + countHREnabledChans)]];
+                }
+                
+                [self setHitRateTotal:newTotal];
+                
+                if(oneChanged){
+                    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelHitRateChanged object:self];
+                }
+            }
+            
+        }
+        else {
+            [self clearHitRates];
+        }
 	}
 	@catch(NSException* localException) {
         NSLogError(@"",@"Hit Rate Exception",[self fullID],nil);
@@ -1725,7 +1812,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     double delay      = 1<<[self hitRateLength];
     double deltadelay = 0.4 - 0.00000005*sltSubSec;
     delay += deltadelay;
-
     [self performSelector:@selector(readHitRates) withObject:nil afterDelay:(delay)];
 }
 
@@ -1805,6 +1891,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     [self setVetoOverlapTime:           [decoder decodeIntForKey:   @"vetoOverlapTime"]];
     [self setShipSumHistogram:          [decoder decodeIntForKey:   @"shipSumHistogram"]];
     [self setActivateDebuggingDisplays: [decoder decodeBoolForKey:  @"activateDebuggingDisplays"]];
+    [self setHitRateMode:               [decoder decodeIntForKey:   @"hitRateMode"]];
 
 	if([decoder containsValueForKey:@"forceFLTReadout"]){
         [self setForceFLTReadout:[decoder decodeBoolForKey:@"forceFLTReadout"]];
@@ -1849,11 +1936,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     [encoder encodeInt:vetoOverlapTime              forKey:@"vetoOverlapTime"];
     [encoder encodeInt:shipSumHistogram             forKey:@"shipSumHistogram"];
     [encoder encodeBool:activateDebuggingDisplays   forKey:@"activateDebuggingDisplays"];
-
-    [encoder encodeInt:filterShapingLength forKey:@"filterShapingLength"];
-	if(filterShapingLength == 1) NSLog(@"filterShapingLength is 1. After saving ORCA configuration use ORCA 9.2.1, rev.5243 or higher to open again!\n");
-	
-	//see above: many fields are  still in super class ORIpeV4FLTModel, some should move here (see ORIpeV4FLTModel::encodeWithCoder, see my comments in 2011-04-07-ORKatrinV4FLTModel.m) -tb-
+    [encoder encodeInt:hitRateMode                  forKey:@"hitRateMode"];
+    [encoder encodeInt:filterShapingLength          forKey:@"filterShapingLength"];
 }
 
 #pragma mark Data Taking
@@ -1956,7 +2040,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     [objDictionary setObject:[NSNumber numberWithLong:analogOffset]			forKey:@"analogOffset"];
     [objDictionary setObject:[NSNumber numberWithLong:hitRateLength]		forKey:@"hitRateLength"];
     [objDictionary setObject:[NSNumber numberWithLong:gapLength]			forKey:@"gapLength"];
-    [objDictionary setObject:[NSNumber numberWithLong:filterShapingLength]		forKey:@"filterShapingLength"];//this is the fpga register value -tb-
+    [objDictionary setObject:[NSNumber numberWithLong:filterShapingLength]  forKey:@"filterShapingLength"];//this is the fpga register value -tb-
     [objDictionary setObject:[NSNumber numberWithInt:vetoOverlapTime]		forKey:@"vetoOverlapTime"];
     [objDictionary setObject:[NSNumber numberWithInt:nfoldCoincidence]		forKey:@"nfoldCoincidence"];
 	
@@ -2200,22 +2284,9 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	//}
     
     //if cold start (not 'quick start' in RunControl) ...
+    [self setLedOff:NO];
     if([[userInfo objectForKey:@"doinit"]intValue]){
-	    if(runMode == kKatrinV4Flt_Histogram_DaqMode){//FLTs NOT in histogram mode may stay in their previous mode - this will remove the delay (until next 1PPs) the FLT needs to start the filter -tb-
-    	    [self writeControlWithStandbyMode];
-	    }
-        //TODO: I could check the current mode and set it only if not yet set
-	    [self setLedOff:NO];
-	    [self writeRunControl:YES]; // writes to run control register (was NO, but this causes the first few noise events -tb-)
 	    [self initBoard];           // writes control reg + hr control reg + PostTrigg + thresh+gains + offset + triggControl + hr mask + enab.statistics
-
-        //I start non-histogramming FLTS early - the filter shall run and 1st PPS should be over when SLT releases inhibit -tb-
-        //histogramming FLTs will be started by SLTS late (after next 1PPS)
-	    if(runMode != kKatrinV4Flt_Histogram_DaqMode){//FLTs NOT in histogram mode may stay in their previous mode - this will remove the delay (until next 1PPs) the FLT needs to start the filter -tb-
-    	    [self writeControl];
-            
-	    }
-
 	}
 	
     [self reset];               // Write 1 to all reset/clear flags of the FLTv4 command register. (-> will 'clear' the event FIFO pointers)
@@ -2226,9 +2297,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
     //start timer functions for hitrate readout and/or histogram monitoring
 	if(ratesEnabled){
-		[self performSelector:@selector(readHitRates) 
-				   withObject:nil
-				   afterDelay: (1<<[self hitRateLength])];		//start reading out the rates
+        [self startReadingHitRates];
 	}
 		
 	if(runMode == kKatrinV4Flt_Histogram_DaqMode){
@@ -2261,15 +2330,12 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 {
 	//[self writeRunControl:NO];// let it run, see runTaskStarted ... -tb-
 	//changed 2013-04-29 -tb- SLT will set inhibit anyway! for quick start we want to leave the current mode active (histogr. FLTs are restarted at runTaskStarted) [self writeControlWithStandbyMode];
-	//[self setLedOff:YES];
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHistogrammingStatus) object:nil];
-	int chan;
-	for(chan=0;chan<kNumV4FLTChannels;chan++){
-		hitRate[chan] = 0;
-	}
-	[self setHitRateTotal:0];
-	
+	[self setLedOff:YES];
+    if(hitRateMode == kKatrinV4HitRunRateWithRun){
+        [self stopReadingHitRates];
+    }
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHistogrammingStatus) object:nil];
+
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelHitRateChanged object:self];
 
     [self setIsPartOfRun: NO];
@@ -2402,7 +2468,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Filter Shaping Length"];
-    [p setFormat:@"##0" upperLimit:0x3F lowerLimit:2 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:8 lowerLimit:2 stepSize:1 units:@""];
     [p setSetMethod:@selector(setFilterShapingLength:) getMethod:@selector(filterShapingLength)];
     [a addObject:p];			
 

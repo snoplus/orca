@@ -186,6 +186,10 @@
                          name : ORPulser33500LoadingChanged
                        object : [model pulser]];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(updateFreqLabels)
+                         name : ORPulser33500ShowInKHzChanged
+                       object : [model pulser]];
 	
 	
 }
@@ -203,11 +207,20 @@
     [self selectedWaveformChanged:nil];
 	[self negativePulseChanged:nil];
     [self loadConstantsChanged:nil];
-
+    [self updateFreqLabels];
 }
 
 #pragma mark •••Notifications
-
+- (void) updateFreqLabels
+{
+    if([[model pulser] showInKHz]) {
+        [freqLabel setStringValue:@"Freq (KHz)"];
+    }
+    else {
+        [freqLabel setStringValue:@"Freq (Hz)"];
+    }
+    [self frequencyChanged:nil];
+}
 - (void) loadConstantsChanged:(NSNotification*)aNotification
 {
 	if([model selectedWaveform] == kLogCalibrationWaveform){
@@ -255,7 +268,9 @@
 
 - (void) frequencyChanged:(NSNotification*)aNotification
 {
-	[frequencyField setFloatValue:[model frequency]];
+    float freq = [model frequency];
+    if([[model pulser] showInKHz])freq /= 1000.;
+	[frequencyField setFloatValue:freq];
 }
 
 - (void) burstPhaseChanged:(NSNotification*)aNotification
@@ -365,7 +380,9 @@
 
 - (IBAction) frequencyAction:(id)sender
 {
-	[model setFrequency:[sender floatValue]];	
+    float freq = [sender floatValue];
+    if([[model pulser] showInKHz])freq *= 1000;
+    [model setFrequency:freq];
 }
 
 - (IBAction) burstRateAction:(id)sender

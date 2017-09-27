@@ -29,6 +29,7 @@
 #define kMJDFlashGretinaFPGA    0x03
 #define kMJDReadPreampsANL      0x04
 #define kMJDSingleAuxIOANL      0x05
+#define kMJDFlashGretinaAFPGA   0x06
 
 typedef struct {
     uint32_t baseAddress;
