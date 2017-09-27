@@ -202,7 +202,7 @@ tellieRunFiles = _tellieRunFiles;
     }
 
     /* We don't have the lock. Open a modal dialog asking whether to quit Orca, retry immediately, or ignore the lock (hostile takeover). */
-    [[NSApp delegate] closeSplashWindow];
+    [(ORAppDelegate*)[NSApp delegate] closeSplashWindow];
 
     NSAlert *alert = [[NSAlert alloc] init];
     [alert addButtonWithTitle:@"Quit Orca"];
