@@ -82,7 +82,7 @@
     
     IBOutlet NSTextField*	breakdown1Field;
     IBOutlet NSTextField*	breakdown2Field;
-
+    IBOutlet NSTextField*   minNumDetsToAlertExpertsField;
 
     //items in the Calibration tab view
     IBOutlet NSButton*      checkSourceGateValveButton0;
@@ -154,6 +154,7 @@
 - (NSString*) sourceGateValveState:(int)index;
 - (NSString*) sourceIsInState:(int)index;
 - (void) maxNonCalibrationRateChanged:(NSNotification*)aNote;
+- (void) minNumDetsToAlertExpertsChanged:(NSNotification*)aNote;
 
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
@@ -197,11 +198,13 @@
 - (IBAction) checkSourceGateValve1:(id)sender;
 - (IBAction) closeGateValve1:(id)sender;
 - (IBAction) printBreakDownReport:(id)sender;
+- (IBAction) resetSpikeDictionariesAction:(id)sender;
 
 - (IBAction) calibrationLockAction:(id)sender;
 - (void)     confirmCloseGateValve:(int)index;
 - (IBAction) maxNonCalibrationRateAction:(id)sender;
 - (IBAction) verboseDiagnosticsAction:(id)sender;
+- (IBAction) minNumDetsToAlertExpertsAction:(id)sender;
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem;
 

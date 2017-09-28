@@ -53,6 +53,7 @@ NSString* ORMajoranaModelLastConstraintCheckChanged     = @"ORMajoranaModelLastC
 NSString* ORMajoranaModelUpdateSpikeDisplay             = @"ORMajoranaModelUpdateSpikeDisplay";
 NSString* ORMajoranaModelMaxNonCalibrationRate          = @"ORMajoranaModelMaxNonCalibrationRate";
 NSString* ORMajoranaModelVerboseDiagnosticsChanged      = @"ORMajoranaModelVerboseDiagnosticsChanged";
+NSString* ORMajoranaModelMinNumDetsToAlertExperts       = @"ORMajoranaModelMinNumDetsToAlertExperts";
 
 static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
@@ -248,6 +249,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 //    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:anObjForCouchID userInfo:info];
 //
 //    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddHistoryAdcRecord" object:anObjForCouchID userInfo:info];
+    [self resetSpikeDictionaries];
 }
 
 - (void) collectRates
@@ -371,30 +373,31 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
             int detIndex    = [detIndexString intValue]*2; //x2 because the stringMap hi/low gains get expanded into a bigger table
             int crate       = [[aGroup segment:detIndex objectForKey:@"kVME"]        intValue];
             int card        = [[aGroup segment:detIndex objectForKey:@"kCardSlot"]   intValue];
-            int chan        = [[aGroup segment:detIndex objectForKey:@"kChannel"]    intValue];
+            int loGainChan  = [[aGroup segment:detIndex objectForKey:@"kChannel"]    intValue];
+            int hiGainChan  = [[aGroup segment:detIndex+1 objectForKey:@"kChannel"]    intValue];
 
-            if((crate == aCrate) && (card  == aCard) && (aChan == chan)){
-                NSString* aKey = [NSString stringWithFormat:@"%d,%d",aCard,chan];
+            if((crate == aCrate) && (card  == aCard) && ((aChan == loGainChan) || (aChan == hiGainChan))){
+                NSString* aKey = [NSString stringWithFormat:@"%@D%d",[aGroup segment:detIndex objectForKey:@"kStringName"],i];
                 if(spiked){
-                    NSString* pos       = [NSString stringWithFormat:@"%@D%d",[aGroup segment:detIndex objectForKey:@"kStringName"],i];
-                    
                     NSMutableDictionary* data = [NSMutableDictionary dictionaryWithDictionary:[[aGroup segment:detIndex] params]];
                     [data setObject:[NSDate date]                                       forKey:@"date"];
                     [data setObject:[NSNumber numberWithFloat:[spikeInfo ave]]          forKey:@"averageValue"];
                     [data setObject:[NSNumber numberWithFloat:[spikeInfo spikeValue]]   forKey:@"spikeValue"];
-                    [data setObject:pos                                                 forKey:@"kStringName"];
+                    [data setObject:aKey                                                forKey:@"kStringName"];
                     if(!rateSpikes[index])rateSpikes[index] = [[NSMutableDictionary dictionary] retain];
                     [rateSpikes[index] setObject:data forKey:aKey];
                     [self setRateSpikeTime:index time:[NSDate date]];
                     
+                    [self alertExperts:index];
+                    
                     if(verboseDiagnostics){
-                        NSLog(@"added rate spike %d,%@\n",aCrate,aKey);
+                        NSLog(@"added rate spike for %@\n",aKey);
                     }
                 }
                 else {
                     if(verboseDiagnostics){
                         if([rateSpikes[index] objectForKey:aKey]){
-                            NSLog(@"removed rate spike %d,%@\n",aCrate,aKey);
+                            NSLog(@"removed rate spike for %@\n",aKey);
                         }
                     }
                     [rateSpikes[index] removeObjectForKey:aKey];
@@ -444,33 +447,31 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
             int preAmpChan  = [[aGroup segment:detIndex objectForKey:@"kPreAmpChan"] intValue];
             
             if((crate == aCrate) && (card  == aCard) && (preAmpChan == aPreAmpChan)){
-                int digChannel  = [[aGroup segment:detIndex objectForKey:@"kChannel"]    intValue];
-                NSString* aKey = [NSString stringWithFormat:@"%d,%d",aCard,digChannel];
+                NSString* aKey = [NSString stringWithFormat:@"%@D%d",[aGroup segment:detIndex objectForKey:@"kStringName"],i];
                 if(spiked){
-                    NSString* pos       = [NSString stringWithFormat:@"%@D%d",[aGroup segment:detIndex objectForKey:@"kStringName"],i];
                     NSMutableDictionary* data = [NSMutableDictionary dictionaryWithDictionary:[[aGroup segment:detIndex] params]];
                     [data setObject:[NSDate date]                                       forKey:@"date"];
                     [data setObject:[NSNumber numberWithFloat:[spikeInfo ave]]          forKey:@"averageValue"];
                     [data setObject:[NSNumber numberWithFloat:[spikeInfo spikeValue]]   forKey:@"spikeValue"];
-                    [data setObject:pos                                                 forKey:@"kStringName"];
+                    [data setObject:aKey                                                 forKey:@"kStringName"];
+                    
                    if(!baselineExcursions[index])baselineExcursions[index] = [[NSMutableDictionary dictionary] retain];
+                    
+                    NSString* deleteKey = [NSString stringWithFormat:@"%d,%@",index,aKey];
+                    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedRemoveBaselineExcursion:) object:deleteKey];
+                    
                     [baselineExcursions[index] setObject:data forKey:aKey];
+                    
+                    [self alertExperts:index];
+                    
                     if(verboseDiagnostics){
-                        NSLog(@"added baseline excursion %d,%@\n",aCrate,aKey);
+                        NSLog(@"added baseline excursion for %@\n",aKey);
                     }
                 }
                 else {
-                    if(verboseDiagnostics){
-                        if([baselineExcursions[index] objectForKey:aKey]){
-                            NSLog(@"removed baseline excursion %d,%@\n",aCrate,aKey);
-                        }
-                    }
-
-                    [baselineExcursions[index] removeObjectForKey:aKey];
-                    if([baselineExcursions[index] count] == 0){
-                        [baselineExcursions[index] release];
-                        baselineExcursions[index] = nil;
-                    }
+                    NSString* deleteKey = [NSString stringWithFormat:@"%d,%@",index,aKey];
+                    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedRemoveBaselineExcursion:) object:deleteKey];
+                    [self performSelector:@selector(delayedRemoveBaselineExcursion:) withObject:deleteKey afterDelay:45];
                 }
             }
         }
@@ -478,6 +479,78 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORMajoranaModelUpdateSpikeDisplay" object:self];
 }
 
+- (void) delayedRemoveBaselineExcursion:(NSString*)aBigKey
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedRemoveBaselineExcursion:) object:aBigKey];
+    int firstComma = [aBigKey rangeOfString:@","].location;
+    int index      = [[aBigKey substringToIndex:firstComma] intValue];
+    NSString* aKey = [aBigKey substringFromIndex:firstComma+1];
+    
+    if(verboseDiagnostics){
+        if([baselineExcursions[index] objectForKey:aKey]){
+            NSLog(@"removed baseline excursion %@\n",aKey);
+        }
+    }
+    [baselineExcursions[index] removeObjectForKey:aKey];
+
+    if([baselineExcursions[index] count] == 0){
+        [baselineExcursions[index] release];
+        baselineExcursions[index] = nil;
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORMajoranaModelUpdateSpikeDisplay" object:self];
+}
+
+- (int) countCommonSpikes:(int)index
+{
+    int count = 0;
+    NSArray* allKeys = rateSpikes[index].allKeys;
+    for(NSString* aKey in allKeys){
+        if([baselineExcursions[index] objectForKey:aKey]!=nil){
+            count++;
+        }
+    }
+
+    return count;
+}
+
+- (void) resetSpikeDictionaries
+{
+    int i;
+    for(i=0;i<2;i++){
+        [rateSpikes[i]         removeAllObjects];
+        [baselineExcursions[i] removeAllObjects];
+        
+        [rateSpikes[i]         release];
+        [baselineExcursions[i] release];
+
+        rateSpikes[i]           = nil;
+        baselineExcursions[i]   = nil;
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORMajoranaModelUpdateSpikeDisplay" object:self];
+}
+
+- (int)  minNumDetsToAlertExperts {return minNumDetsToAlertExperts;}
+- (void)  setMinNumDetsToAlertExperts:(int)aValue
+{
+    if(aValue<1)aValue=1;
+    [[[self undoManager] prepareWithInvocationTarget:self] setMinNumDetsToAlertExperts:minNumDetsToAlertExperts];
+    minNumDetsToAlertExperts = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORMajoranaModelMinNumDetsToAlertExperts" object:self];
+}
+
+- (void) alertExperts:(int)index;
+{
+    //if([self calibrationRun:index])return; //do we need to skip this if calibrating??
+
+    int count = [self countCommonSpikes:index];
+    if(count >= minNumDetsToAlertExperts){
+        OROnCallListModel* onCallObj = [[(ORAppDelegate*)[NSApp delegate] document] findObjectWithFullID:@"OROnCallListModel,1"];
+        NSString* exclaim = @"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
+        NSString* s = [NSString stringWithFormat:@"Simultaneous Rate Spikes and Baseline Excursions on %d detector%@ triggered this alert\n",count,count>1?@"s":@""];
+        NSString* report = [NSString stringWithFormat:@"%@%@%@\n%@\n",exclaim,s,exclaim,[self fullBreakDownReport:index]];
+        [onCallObj broadcastMessage:report];
+    }
+}
 
 - (void) scheduleConstraintCheck
 {
@@ -1344,7 +1417,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     [self setIgnoreBreakdownPanicOnA:[decoder decodeBoolForKey:@"ignoreBreakdownPanicOnA"]];
     [self setViewType:[decoder decodeIntForKey:@"viewType"]];
     [self setVerboseDiagnostics:[decoder decodeBoolForKey:@"verboseDiagnostics"]];
-    
+    [self setMinNumDetsToAlertExperts:[decoder decodeIntForKey:@"minNumDetsToAlertExperts"]];
+
     int i;
     for(i=0;i<2;i++){
         mjdInterlocks[i] = [[ORMJDInterlocks alloc] initWithDelegate:self slot:i];
@@ -1369,18 +1443,20 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeBool:verboseDiagnostics forKey:@"verboseDiagnostics"];
-    [encoder encodeBool:ignorePanicOnB forKey:@"ignorePanicOnB"];
-    [encoder encodeBool:ignorePanicOnA forKey:@"ignorePanicOnA"];
-    [encoder encodeBool:ignoreBreakdownCheckOnB forKey:@"ignoreBreakdownCheckOnB"];
-    [encoder encodeBool:ignoreBreakdownCheckOnA forKey:@"ignoreBreakdownCheckOnA"];
-    [encoder encodeBool:ignoreBreakdownPanicOnB forKey:@"ignoreBreakdownPanicOnB"];
-    [encoder encodeBool:ignoreBreakdownPanicOnA forKey:@"ignoreBreakdownPanicOnA"];
-    [encoder encodeInt:viewType        forKey: @"viewType"];
-	[encoder encodeInt:pollTime		   forKey: @"pollTime"];
-    [encoder encodeObject:stringMap	   forKey: @"stringMap"];
-    [encoder encodeObject:specialMap   forKey: @"specialMap"];
+    [encoder encodeBool:verboseDiagnostics       forKey:@"verboseDiagnostics"];
+    [encoder encodeBool:ignorePanicOnB           forKey:@"ignorePanicOnB"];
+    [encoder encodeBool:ignorePanicOnA           forKey:@"ignorePanicOnA"];
+    [encoder encodeBool:ignoreBreakdownCheckOnB  forKey:@"ignoreBreakdownCheckOnB"];
+    [encoder encodeBool:ignoreBreakdownCheckOnA  forKey:@"ignoreBreakdownCheckOnA"];
+    [encoder encodeBool:ignoreBreakdownPanicOnB  forKey:@"ignoreBreakdownPanicOnB"];
+    [encoder encodeBool:ignoreBreakdownPanicOnA  forKey:@"ignoreBreakdownPanicOnA"];
+    [encoder encodeInt:viewType                  forKey: @"viewType"];
+	[encoder encodeInt:pollTime		             forKey: @"pollTime"];
+    [encoder encodeObject:stringMap	             forKey: @"stringMap"];
+    [encoder encodeObject:specialMap             forKey: @"specialMap"];
     [encoder encodeFloat:maxNonCalibrationRate   forKey: @"maxNonCalibrationRate"];
+    [encoder encodeInt:minNumDetsToAlertExperts  forKey: @"minNumDetsToAlertExperts"];
+
 }
 
 - (NSString*) reformatSelectionString:(NSString*)aString forSet:(int)aSet
