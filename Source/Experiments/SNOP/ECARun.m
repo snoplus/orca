@@ -102,6 +102,10 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
     /* Set ECA parameters based on the run type word and
      * harcoded settings needed for the ECA algorithm */
 
+    NSException* ECAException = [NSException
+                                exceptionWithName:@"ECASettings"
+                                reason:@"ECA settings not set"
+                                userInfo:nil];
     @try{
         isFinished = NO;
         start_eca_run = NO;
@@ -110,7 +114,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
         if (![objs count]) {
             NSLogColor([NSColor redColor], @"setECASettings: SNO+ control not found.\n");
-            return false;
+            @throw ECAException;
         }
         aSNOPModel = [objs objectAtIndex:0];
 
@@ -134,14 +138,14 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
         if (![objs count]) {
             NSLogColor([NSColor redColor], @"setECASettings: Run control not found.\n");
-            return false;
+            @throw ECAException;
         }
         ORRunModel *aRunModel = [objs objectAtIndex:0];
         unsigned long runTypeWord = [aRunModel runType];
         //Set whether PDST or TSLP
         if( (runTypeWord & kECAPedestalRun) && (runTypeWord & kECATSlopeRun) ){
             NSLogColor([NSColor redColor], @"setECAsettings: Both PDST and TSLP bits checked in the run type word. Don't know what to do!.\n");
-            return false;
+            @throw ECAException;
         }
         else if( runTypeWord & (kECAPedestalRun) ){
             [self setECA_type:@"PDST"];
@@ -151,7 +155,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         }
         else{
             NSLogColor([NSColor redColor], @"setECAsettings: not an ECA run.\n");
-            return false;
+            @throw ECAException;
         }
         //Set mode
         if( runTypeWord & (kECARun) ){
@@ -165,7 +169,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         }
         else{
             NSLogColor([NSColor redColor], @"setECAsettings: Not a valid run for ECA_mode.\n");
-            return false;
+            @throw ECAException;
         }
         //Load hardcoded values if requested
         if([[aSNOPModel standardRunVersion] isEqualToString:@"ECA_PDST_STANDARD"]){
@@ -187,7 +191,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         }
         else{
             NSLogColor([NSColor redColor], @"setECASettings: Unknown standard run version.\n");
-            return false;
+            @throw ECAException;
         }
         /* Set pulser rate:
          * If we starting an ECA run we have to set the pulser
@@ -195,7 +199,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
         if (![objs count]) {
             NSLogColor([NSColor redColor], @"setECASettings: MTC not found.\n");
-            return false;
+            @throw ECAException;
         }
         anMTCModel = [objs objectAtIndex:0];
         [anMTCModel setGtMask:( [anMTCModel gtMask] | MTC_EXT_8_MASK )];
@@ -220,8 +224,8 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         return true;
     }
     @catch(...){
-        return false;
         isFinished = YES;
+        return false;
     }
 }
 

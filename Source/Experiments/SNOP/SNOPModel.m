@@ -1054,9 +1054,9 @@ err:
         goto err;
     }
 
-    /* Load the ECA settings in case it's an ECA run */
-    /* This will set MTC settings so we want this to be done
-     * before loading the GT mask below.*/
+    /* Load the ECA settings if it's an ECA run
+     * This will set MTC settings for correct ECA running, so 
+     * we want this to be done before loading settings in HW. */
     if( ![[self anECARun] setECASettings:NULL] ){
         NSLogColor([NSColor redColor], @"runAboutToStart: ECA settings not set.\n");
     };
