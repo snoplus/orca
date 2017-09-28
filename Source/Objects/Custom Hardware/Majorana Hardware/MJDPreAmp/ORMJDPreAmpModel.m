@@ -1319,12 +1319,11 @@ struct {
     if(!dacs || !amplitudes || !feedBackResistors || !baselineVoltages)	[self setUpArrays];
 
     if(!baselineRunningAverages){
-        [self setBaselineRunningAverages:[[[ORRunningAverageGroup alloc] initGroup:kMJDPreAmpAdcChannels groupTag:0 withLength:10] autorelease]];
+        [self setBaselineRunningAverages:[[[ORRunningAverageGroup alloc] initGroup:kMJDPreAmpAdcChannels groupTag:0 withLength:4] autorelease]];
     }
     
-   // [baselineRunningAverages resetCounters:0];
     [baselineRunningAverages setVerbose:false];
-    [baselineRunningAverages setTriggerValue:1.5];
+    [baselineRunningAverages setTriggerValue:1];
     [baselineRunningAverages setTriggerType:kRASpikeOnThreshold];
     
     [self registerNotificationObservers];
