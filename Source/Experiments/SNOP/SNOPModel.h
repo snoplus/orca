@@ -103,6 +103,8 @@ BOOL isNotRunningOrIsInMaintenance();
     NSString* standardRunVersion;
     NSString* lastStandardRunType;
     NSString* lastStandardRunVersion;
+    NSString* nextStandardRunType;
+    NSString* nextStandardRunVersion;
     NSNumber* standardRunTableVersion;
 
     bool rolloverRun;
@@ -141,7 +143,7 @@ BOOL isNotRunningOrIsInMaintenance();
     RedisClient *xl3_server;
 
     int state;
-    int start;
+    int startMode;
     bool resync;
     bool waitingForBuffers;     // flag indicates we are waiting for our buffers to empty
 
@@ -236,6 +238,8 @@ BOOL isNotRunningOrIsInMaintenance();
 - (void) runNhitMonitor;
 - (void) stopNhitMonitor;
 
+- (int) startMode;
+
 #pragma mark ¥¥orcascript helpers
 - (void) zeroPedestalMasks;
 - (void) hvMasterTriggersOFF;
@@ -305,6 +309,10 @@ BOOL isNotRunningOrIsInMaintenance();
 - (void) setStandardRunType:(NSString*)aValue;
 - (NSString*) standardRunVersion;
 - (void) setStandardRunVersion:(NSString*)aValue;
+- (NSString*) nextStandardRunType;
+- (void) setNextStandardRunType:(NSString*)aValue;
+- (NSString*) nextStandardRunVersion;
+- (void) setNextStandardRunVersion:(NSString*)aValue;
 - (NSString*) lastStandardRunType;
 - (void) setLastStandardRunType:(NSString*)aValue;
 - (NSString*) lastStandardRunVersion;
@@ -333,9 +341,6 @@ BOOL isNotRunningOrIsInMaintenance();
 
 // ECA
 -(ECARun*) anECARun;
-
--(void) startECARunInParallel;
--(void) startECACampaign;
 
 // Standard runs functions
 -(BOOL) refreshStandardRunsFromDB;

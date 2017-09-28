@@ -127,7 +127,7 @@ tellieRunFiles = _tellieRunFiles;
 
     rolloverRun = NO;
     state = STOPPED;
-    start = COLD_START;
+    startMode = COLD_START;
     resync = NO;
 
     /* initialize our connection to the MTC server */
@@ -476,13 +476,18 @@ tellieRunFiles = _tellieRunFiles;
     return xl3Host;
 }
 
+- (int) startMode
+{
+    return startMode;
+}
+
 - (id) initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
 
     rolloverRun = NO;
     state = STOPPED;
-    start = COLD_START;
+    startMode = COLD_START;
     resync = NO;
 
     // Database lock
@@ -525,6 +530,8 @@ tellieRunFiles = _tellieRunFiles;
     [self setLastRunTypeWordHex:[decoder decodeObjectForKey:@"SNOPlastRunTypeWordHex"]];
     [self setStandardRunType:[decoder decodeObjectForKey:@"SNOPStandardRunType"]];
     [self setStandardRunVersion:[decoder decodeObjectForKey:@"SNOPStandardRunVersion"]];
+    [self setNextStandardRunType:nil];
+    [self setNextStandardRunVersion:nil];
 
     //ECA
     [anECARun setECA_pattern:[decoder decodeIntForKey:@"SNOPECApattern"]];
@@ -807,23 +814,23 @@ tellieRunFiles = _tellieRunFiles;
 
     switch (state) {
     case STOPPED:
-        start = COLD_START;
+        startMode = COLD_START;
         break;
     case RUNNING:
         if (rolloverRun) {
-            start = ROLLOVER_START;
+            startMode = ROLLOVER_START;
             rolloverRun = NO;
         } else {
-            start = CONTINUOUS_START;
+            startMode = CONTINUOUS_START;
         }
         break;
     default:
-        start = COLD_START;
+        startMode = COLD_START;
     }
 
     state = STARTING;
 
-    switch (start) {
+    switch (startMode) {
     case ROLLOVER_START:
         /* We don't queue the run start here for rollover runs. Since we don't
          * send a queue_run_start command to the mtc server, the first gtid and
@@ -963,7 +970,7 @@ err:
                                 @"", @"Reason",
                                 @"", @"Details",
                                 nil];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStartupAbort object: self userInfo: userInfo];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStartupAbort object: self userInfo: userInfo];
 
     state = STOPPED;
 }
@@ -1047,7 +1054,14 @@ err:
         goto err;
     }
 
-    switch (start) {
+    /* Load the ECA settings in case it's an ECA run */
+    /* This will set MTC settings so we want this to be done
+     * before loading the GT mask below.*/
+    if( ![[self anECARun] setECASettings:NULL] ){
+        NSLogColor([NSColor redColor], @"runAboutToStart: ECA settings not set.\n");
+    };
+
+    switch (startMode) {
     case COLD_START:
         @try {
             /* Tell the MTC server to queue the run start. This will suspend
@@ -1081,7 +1095,7 @@ err:
                                 @"", @"Reason",
                                 @"", @"Details",
                                 nil];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStartupAbort object: self userInfo: userInfo];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStartupAbort object: self userInfo: userInfo];
 
     state = STOPPED;
 }
@@ -1107,7 +1121,7 @@ err:
     }
 
     state = RUNNING;
-    if (start != ROLLOVER_START) {
+    if (startMode != ROLLOVER_START) {
         [self setLastStandardRunType:[self standardRunType]];
         [self setLastStandardRunVersion:[self standardRunVersion]];
         [self setLastRunTypeWord:run_type];
@@ -1115,9 +1129,15 @@ err:
         [self setLastRunTypeWordHex:_lastRunTypeWord]; //FIXME: revisit if we go over 32 bits
     }
 
-    if ([gOrcaGlobals runType] & kPhysicsRun) {
-        /* If this is a physics run, we ping each slot in the detector once at
-         * the beginning of the run to look for any trigger issues. */
+    if([gOrcaGlobals runType] & (kECAPedestalRun | kECATSlopeRun)){
+        /* Launch the ECA algorithm if this is an ECA run, as in
+         * the PDST or TSLP bits are enabled */
+        [[self anECARun] launchECAThread:NULL];
+    }
+    else if ([gOrcaGlobals runType] & kPhysicsRun) {
+        /* If this is a physics run with no ECAs, we ping each slot in the 
+         * detector once at the beginning of the run to look for any trigger 
+         * issues. */
         [self pingCratesAtRunStart];
     }
 
@@ -1261,6 +1281,15 @@ err:
         state = STOPPED;
         break;
     }
+
+    /* At this point the run has stopped. So start the next scheduled SR, if any */
+    if(nextStandardRunType != nil && nextStandardRunVersion != nil){
+        NSLogColor([NSColor redColor], @"runStopped: starting next run %@ and %@ \n",nextStandardRunType,nextStandardRunVersion);
+        [self startStandardRun:nextStandardRunType withVersion:nextStandardRunVersion];
+        [self setNextStandardRunType:nil];
+        [self setNextStandardRunVersion:nil];
+    }
+
 }
 
 - (void) subRunStarted:(NSNotification*)aNote
@@ -2554,6 +2583,28 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     lastStandardRunVersion = [aValue copy];
 }
 
+- (NSString*)nextStandardRunType
+{
+    return nextStandardRunType;
+}
+
+- (void) setNextStandardRunType:(NSString *)aValue
+{
+    [nextStandardRunType autorelease];
+    nextStandardRunType = [aValue copy];
+}
+
+- (NSString*) nextStandardRunVersion
+{
+    return nextStandardRunVersion;
+}
+
+- (void) setNextStandardRunVersion:(NSString *)aValue
+{
+    [nextStandardRunVersion autorelease];
+    nextStandardRunVersion = [aValue copy];
+}
+
 - (NSNumber*) standardRunTableVersion
 {
     return standardRunTableVersion;
@@ -2570,21 +2621,10 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     return anECARun;
 }
 
-- (void) startECARunInParallel
-{
-    [anECARun start];
-
-}
-
-- (void) startECACampaign
-{
-
-    [anECARun startCampaign];
-    
-}
-
 - (BOOL) startStandardRun:(NSString*)_standardRun withVersion:(NSString*)_standardRunVersion
 {
+    /* Load settings into GUI from DB. The start run logic 
+     * will take care of shipping those to HW. */
     SNOCaenModel* caen;
 
     /* Get RC model */

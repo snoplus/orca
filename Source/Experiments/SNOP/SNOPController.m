@@ -731,6 +731,8 @@ snopGreenColor;
 
 - (IBAction) startRunAction:(id)sender
 {
+    [self endEditing];
+
     /* Action when the user clicks on the Start or Restart Button. */
     unsigned long dbruntypeword = 0;
 
@@ -1936,24 +1938,17 @@ err:
     [ecaPulserRate setObjectValue:[[model anECARun] ECA_rate]];
 
     if([[aNotification name] isEqualTo:ORECARunStartedNotification]) {
-        [startSingleECAButton setEnabled:false];
-        [startECACampaignButton setEnabled:false];
-        [ecaModeButton setEnabled:false];
         [ECApatternPopUpButton setEnabled:false];
         [ECAtypePopUpButton setEnabled:false];
         [ecaNEventsTextField setEnabled:false];
         [ecaPulserRate setEnabled:false];
     }
     else if([[aNotification name] isEqualTo:ORECARunFinishedNotification]){
-        [startSingleECAButton setEnabled:true];
-        [startECACampaignButton setEnabled:true];
-        [ecaModeButton setEnabled:true];
         [ECApatternPopUpButton setEnabled:true];
         [ECAtypePopUpButton setEnabled:true];
         [ecaNEventsTextField setEnabled:true];
         [ecaPulserRate setEnabled:true];
     }
-    [ecaModeButton selectCellAtRow:[[model anECARun] ECA_mode] column:0];
 
 }
 
@@ -1964,10 +1959,7 @@ err:
 
     //Status
     NSString * ecaStatusLabel = @"Not running";
-    if ([theECARun isCampaignRunning]){
-        ecaStatusLabel = @"Running Campaign";
-    }
-    else if ([theECARun isFinished]){
+    if ([theECARun isFinished]){
         ecaStatusLabel = @"Not running";
     }
     else if ([theECARun isExecuting]){
@@ -2023,22 +2015,6 @@ err:
 - (IBAction)ecaPulserRateAction:(id)sender
 {
     [[model anECARun] setECA_rate:[ecaPulserRate objectValue]];
-}
-
-- (IBAction)ecaModeAction:(id)sender
-{
-    [[model anECARun] setECA_mode:[ecaModeButton selectedRow]];
-}
-
-- (IBAction)startECACampaignAction:(id)sender
-{
-    [model startECACampaign];
-}
-
-- (IBAction)startECASingleRunAction:(id)sender
-{
-    [self endEditing];
-    [model startECARunInParallel];
 }
 
 //STANDARD RUNS

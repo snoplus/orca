@@ -30,14 +30,9 @@
     NSArray *anXL3Model;
     NSArray *aFECModel;
     //Previous run
-    NSString *previousSR_campaign;
-    NSString *previousSRVersion_campaign;
-    bool start_new_run_campaign;
     NSString *previousSR;
     NSString *previousSRVersion;
-    bool start_new_run;
     bool start_eca_run;
-    bool eca_campaign_running;
     int prev_coarsedelay;
     int prev_finedelay;
     uint16_t prev_pedwidth;
@@ -76,16 +71,11 @@
 - (void) setECA_currentStep:(int)aValue;
 - (void) setECA_currentPoint:(int)aValue;
 - (void) setECA_currentDelay:(double)aValue;
-- (BOOL) isCampaignRunning;
 - (BOOL) isExecuting;
 - (BOOL) isFinished;
 - (BOOL) isFinishing;
-- (void) startCampaign;
-- (void) startCampaignThread;
-- (void) start;
 - (void) stop;
-- (void) registerNotificationObservers;
-- (void) setECASettings:(NSNotification*)aNote;
+- (bool) setECASettings:(NSNotification*)aNote;
 - (void) launchECAThread:(NSNotification*)aNote;
 - (void) doECAs;
 - (BOOL) doPedestals;

@@ -25,7 +25,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 /* This flag must be enabled for commissioning 
  * and normal detector running. Disable it only 
  * for testing. */
-#define __COMMISSIONING__ 1
+//#define __COMMISSIONING__ 1
 
 /* Definitions */
 // Defaults
@@ -33,7 +33,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 #define ECA_FINE_DELAY 0 //ps
 #define ECA_PEDESTAL_WIDTH 50 //ns
 
-//ECA Campaign
+//ECA Standard values
 #define ECA_PDST_TYPE @"PDST"
 #define ECA_PDST_RATE 10
 #define ECA_PDST_PATTERN 4
@@ -50,11 +50,9 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 {
     self = [super init];
     ECAThread = [[NSThread alloc] init]; //Init empty
-    eca_campaign_running = FALSE;
     start_eca_run = FALSE;
     isFinishing = FALSE;
     isFinished = TRUE;
-    [self registerNotificationObservers];
     return self;
 
 }
@@ -63,196 +61,6 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 {
     [ECAThread release];
     [super dealloc];
-}
-
-- (void) registerNotificationObservers
-{
-
-    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(setECASettings:)
-                         name : ORRunSecondChanceForWait
-                       object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(launchECAThread:)
-                         name : ORRunStartedNotification
-                       object : nil];
-
-}
-
-- (void) startCampaign
-{
-
-    NSThread *ECACampaignThread = [[NSThread alloc] initWithTarget:self selector:@selector(startCampaignThread) object:nil];
-    [ECACampaignThread start];
-    [ECACampaignThread autorelease];
-
-}
-
-- (void) startCampaignThread
-{
-
-    @autoreleasepool {
-
-        /*
-         This will take both, a pedestal run and a Time slope run
-         in Supernova-live mode i.e. *with phyiscs triggers enabled*.
-         This is only permitted for the channel-by-channel pattern to
-         not fry the CTCs.
-         */
-
-        //Get SNO+ model
-        NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-        if ([objs count]) {
-            aSNOPModel = [objs objectAtIndex:0];
-        } else {
-            NSLogColor([NSColor redColor], @"ECARun: couldn't find SNO+ model. \n");
-            return;
-        }
-
-        //Store previous runs to rollover at the end
-        previousSR_campaign = [[aSNOPModel lastStandardRunType] copy];
-        previousSRVersion_campaign = [[aSNOPModel lastStandardRunVersion] copy];
-        start_new_run_campaign = [gOrcaGlobals runRunning];
-
-        //Pedestal run
-        eca_campaign_running = TRUE;
-        [self setECA_mode:ECAMODE_SUPERNOVA];
-        [self setECA_type:ECA_PDST_TYPE];
-        [self setECA_rate:[NSNumber numberWithInt:ECA_PDST_RATE]];
-        [self setECA_pattern:ECA_PDST_PATTERN];
-        [self setECA_nevents:ECA_PDST_NEVENTS];
-
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            [self start];
-        });
-
-        //Wait until finished
-        while ([ECAThread isExecuting] || ![self isFinished]) {
-            usleep(1e4);
-        }
-        if(![ECAThread isExecuting] && [ECAThread isCancelled] && [self isFinished]){
-            [previousSR_campaign release];
-            [previousSRVersion_campaign release];
-            eca_campaign_running = FALSE;
-            [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORECAStatusChangedNotification object: self userInfo: nil];
-            return;
-        }
-
-        //Time Slope run
-        [self setECA_mode:ECAMODE_SUPERNOVA];
-        [self setECA_type:ECA_TSLP_TYPE];
-        [self setECA_rate:[NSNumber numberWithInt:ECA_TSLP_RATE]];
-        [self setECA_pattern:ECA_TSLP_PATTERN];
-        [self setECA_nevents:ECA_TSLP_NEVENTS];
-
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            [self start];
-        });
-
-        //Wait until finished
-        while ([ECAThread isExecuting] || ![self isFinished]) {
-            usleep(1e4);
-        }
-        if(![ECAThread isExecuting] && [ECAThread isCancelled] && [self isFinished]){
-            [previousSR_campaign release];
-            [previousSRVersion_campaign release];
-            eca_campaign_running = FALSE;
-            dispatch_sync(dispatch_get_main_queue(), ^{
-                [[NSNotificationCenter defaultCenter] postNotificationName:ORECAStatusChangedNotification object: self userInfo: nil];
-            });
-            return;
-        }
-
-        //Rollover to previous run, if any.
-        if(start_new_run_campaign){
-            dispatch_sync(dispatch_get_main_queue(), ^{
-                [aSNOPModel startStandardRun:previousSR_campaign withVersion:previousSRVersion_campaign];
-            });
-        }
-        
-        //Don't leak memory
-        [previousSR_campaign release];
-        [previousSRVersion_campaign release];
-        eca_campaign_running = FALSE;
-
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            [[NSNotificationCenter defaultCenter] postNotificationName:ORECAStatusChangedNotification object: self userInfo: nil];
-        });
-
-    }
-
-}
-
-- (void) start
-{
-
-    /* Method called when an user request a single ECA run by
-     clicking the corresponding button. Start a new ECA run and 
-     set a flag to enable running of 'launchECAThread'. This will 
-     be called when the run is about to start. This is done in this 
-     way since we need to ensure that the ECAThread is launched AFTER 
-     run stop, to not cancel the Thread. */
-
-    if([ECAThread isExecuting]){
-        //Do nothing
-        NSLogColor([NSColor redColor], @"ECA Run already ongoing!\n");
-    }
-    else{
-
-        //Get SNO+ model
-        NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-        if ([objs count]) {
-            aSNOPModel = [objs objectAtIndex:0];
-        } else {
-            NSLogColor([NSColor redColor], @"ECARun: couldn't find SNO+ model. \n");
-            return;
-        }
-
-        objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-        if ([objs count]) {
-            anMTCModel = [objs objectAtIndex:0];
-        } else {
-            NSLogColor([NSColor redColor], @"ECARun: couldn't find MTC model. \n");
-            return;
-        }
-
-        //Store previous runs to rollover at the end
-        previousSR = [[aSNOPModel lastStandardRunType] copy];
-        previousSRVersion = [[aSNOPModel lastStandardRunVersion] copy];
-        prev_gtmask = [anMTCModel GTCrateMask];
-        prev_pedmask = [anMTCModel pedCrateMask];
-        start_new_run = [gOrcaGlobals runRunning] && !eca_campaign_running;
-
-        //Set ECA Standard Run and start run:
-        /* This needs to be outside the new thread since it will
-         stop/start a new run, which would cancel the thread and
-         exit after the first step... */
-        BOOL runstarted = FALSE;
-        switch (ECA_mode){
-            case ECAMODE_DEDICATED:
-                runstarted = [aSNOPModel startStandardRun:@"ECA" withVersion:@"DEFAULT"];
-                break;
-            case ECAMODE_SUPERNOVA:
-                runstarted = [aSNOPModel startStandardRun:@"SUPERNOVA" withVersion:@"DEFAULT"];
-                break;
-            case ECAMODE_PHYSICS:
-                runstarted = [aSNOPModel startStandardRun:@"PHYSICS" withVersion:@"DEFAULT"];
-                break;
-        }
-
-        //Don't leak memory
-        if(!runstarted){
-            [previousSR release];
-            [previousSRVersion release];
-        }
-
-        start_eca_run = TRUE;
-        isFinished = FALSE;
-
-    }
 }
 
 - (void) stop
@@ -274,11 +82,6 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 
 }
 
-- (BOOL) isCampaignRunning
-{
-    return eca_campaign_running;
-}
-
 - (BOOL) isExecuting
 {
     return [ECAThread isExecuting];
@@ -294,23 +97,114 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
     return isFinishing;
 }
 
-- (void) setECASettings:(NSNotification*)aNote
+- (bool) setECASettings:(NSNotification*)aNote
 {
+    /* Set ECA parameters based on the run type word and
+     * harcoded settings needed for the ECA algorithm */
 
-    if(start_eca_run){
+    @try{
+        isFinished = NO;
+        start_eca_run = NO;
+        isFinishing = NO;
 
+        NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+        if (![objs count]) {
+            NSLogColor([NSColor redColor], @"setECASettings: SNO+ control not found.\n");
+            return false;
+        }
+        aSNOPModel = [objs objectAtIndex:0];
+
+        // Store previous runs to rollover at the end
+        // only if CONTINUOUS_START
+        NSLogColor([NSColor redColor], @"setECASettings: startmode %i.\n", [aSNOPModel startMode]);
+        if( [aSNOPModel startMode] == 1){
+            previousSR = [[aSNOPModel lastStandardRunType] copy];
+            previousSRVersion = [[aSNOPModel lastStandardRunVersion] copy];
+            [aSNOPModel setNextStandardRunType:previousSR];
+            [aSNOPModel setNextStandardRunVersion:previousSRVersion];
+            NSLogColor([NSColor redColor], @"setECASettings: %@ and %@ \n",previousSR,previousSRVersion);
+        }
+        prev_gtmask = [anMTCModel GTCrateMask];
+        prev_pedmask = [anMTCModel pedCrateMask];
+        prev_coarsedelay = [anMTCModel coarseDelay];
+        prev_finedelay = [anMTCModel fineDelay];
+        prev_pedwidth = [anMTCModel pedestalWidth];
+
+        /* Check run type word and set parameters accordingly */
+        objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+        if (![objs count]) {
+            NSLogColor([NSColor redColor], @"setECASettings: Run control not found.\n");
+            return false;
+        }
+        ORRunModel *aRunModel = [objs objectAtIndex:0];
+        unsigned long runTypeWord = [aRunModel runType];
+        //Set whether PDST or TSLP
+        if( (runTypeWord & kECAPedestalRun) && (runTypeWord & kECATSlopeRun) ){
+            NSLogColor([NSColor redColor], @"setECAsettings: Both PDST and TSLP bits checked in the run type word. Don't know what to do!.\n");
+            return false;
+        }
+        else if( runTypeWord & (kECAPedestalRun) ){
+            [self setECA_type:@"PDST"];
+        }
+        else if( runTypeWord & (kECATSlopeRun) ){
+            [self setECA_type:@"TSLP"];
+        }
+        else{
+            NSLogColor([NSColor redColor], @"setECAsettings: not an ECA run.\n");
+            return false;
+        }
+        //Set mode
+        if( runTypeWord & (kECARun) ){
+            [self setECA_mode:ECAMODE_DEDICATED];
+        }
+        else if( runTypeWord & (kSupernovaRun) ){
+            [self setECA_mode:ECAMODE_SUPERNOVA];
+        }
+        else if( runTypeWord & (kPhysicsRun) ){
+            [self setECA_mode:ECAMODE_PHYSICS];
+        }
+        else{
+            NSLogColor([NSColor redColor], @"setECAsettings: Not a valid run for ECA_mode.\n");
+            return false;
+        }
+        //Load hardcoded values if requested
+        if([[aSNOPModel standardRunVersion] isEqualToString:@"ECA_PDST_STANDARD"]){
+            //Pedestal run
+            [self setECA_mode:ECAMODE_SUPERNOVA];
+            [self setECA_type:ECA_PDST_TYPE];
+            [self setECA_rate:[NSNumber numberWithInt:ECA_PDST_RATE]];
+            [self setECA_pattern:ECA_PDST_PATTERN];
+            [self setECA_nevents:ECA_PDST_NEVENTS];
+        }
+        else if([[aSNOPModel standardRunVersion] isEqualToString:@"ECA_TSLP_STANDARD"]){
+            //Time Slope run
+            [self setECA_mode:ECAMODE_SUPERNOVA];
+            [self setECA_type:ECA_TSLP_TYPE];
+            [self setECA_rate:[NSNumber numberWithInt:ECA_TSLP_RATE]];
+            [self setECA_pattern:ECA_TSLP_PATTERN];
+            [self setECA_nevents:ECA_TSLP_NEVENTS];
+        }
+        else if([[aSNOPModel standardRunVersion] isEqualToString:@"ECA_USER_SETTINGS"]){
+            NSLogColor([NSColor redColor], @"setECASettings: using user input.\n");
+        }
+        else{
+            NSLogColor([NSColor redColor], @"setECASettings: Unknown standard run version.\n");
+            return false;
+        }
         /* Set pulser rate:
          * If we starting an ECA run we have to set the pulser
          * rate enter by the operator, not the standard run one */
-        NSArray *objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-        if ([objs count])
-        {
-            anMTCModel = [objs objectAtIndex:0];
-            [anMTCModel setPgtRate:[[self ECA_rate] floatValue]];
-#ifdef __COMMISSIONING__
-            [anMTCModel loadPulserRateToHardware];
-#endif
+        objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+        if (![objs count]) {
+            NSLogColor([NSColor redColor], @"setECASettings: MTC not found.\n");
+            return false;
         }
+        anMTCModel = [objs objectAtIndex:0];
+        [anMTCModel setGtMask:( [anMTCModel gtMask] | MTC_EXT_8_MASK )];
+        [anMTCModel setPgtRate:[[self ECA_rate] floatValue]];
+#ifdef __COMMISSIONING__
+        [anMTCModel loadPulserRateToHardware];
+#endif
 
         /* Enable Pedestals */
         [anMTCModel setIsPedestalEnabledInCSR:TRUE];
@@ -323,50 +217,41 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         [anMTCModel loadPedestalCrateMaskToHardware];
 #endif
 
-        /* Set the required ECA bits in the run type word */
-        objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-        if ([objs count]) {
-            ORRunModel *aRunModel = [objs objectAtIndex:0];
-            unsigned long runTypeWord = [aRunModel runType];
-            runTypeWord &= ~(kECAPedestalRun & kECATSlopeRun); //Unset ECA bits
-            if ([ECA_type isEqualTo:@"PDST"]) {
-                runTypeWord |= kECAPedestalRun;
-            }
-            else if ([ECA_type isEqualTo:@"TSLP"]) {
-                runTypeWord |= kECATSlopeRun;
-            }
-            else {
-                //You should never get here
-                NSLogColor([NSColor redColor], @"ECA: Unknown ECA run type. The current run won't be flag as ECA run!");
-            }
-            [aRunModel setRunType:runTypeWord];
-        }
-
+        start_eca_run = YES;
+        NSLogColor([NSColor redColor], @"setECASettings: DONE! \n");
+        return true;
     }
-
+    @catch(...){
+        return false;
+        isFinished = YES;
+    }
 }
 
 - (void) launchECAThread:(NSNotification*)aNote
 {
 
-    if(start_eca_run){
-
-        start_eca_run = FALSE;
-        isFinishing = FALSE;
-
-        //Launch ECA thread
-        [ECAThread release];
-        ECAThread = [[NSThread alloc] initWithTarget:self selector:@selector(doECAs) object:nil];
-        [ECAThread start];
-        //[ECAThread autorelease];
-        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORECARunStartedNotification object:self];
-
+    if([ECAThread isExecuting]) {
+        NSLogColor([NSColor redColor], @"launchECAThread: ECA already running... \n");
+        return;
     }
+
+    NSLogColor([NSColor redColor], @"launchECAThread: launching... \n");
+
+    //Launch ECA thread
+    [ECAThread release];
+    ECAThread = [[NSThread alloc] initWithTarget:self selector:@selector(doECAs) object:nil];
+    [ECAThread start];
+    //[ECAThread autorelease];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORECARunStartedNotification object:self];
+
+    NSLogColor([NSColor redColor], @"launchECAThread: DONE! \n");
 
 }
 
 - (void) doECAs
 {
+
+    /* This is the actual ECA algorithm, that runs must run a different thread */
     @autoreleasepool {
 
         [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORECAStatusChangedNotification object: self userInfo: nil];
@@ -418,11 +303,6 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
             }
         }
 
-        /* Get previous settings */
-        prev_coarsedelay = [anMTCModel coarseDelay];
-        prev_finedelay = [anMTCModel fineDelay];
-        prev_pedwidth = [anMTCModel pedestalWidth];
-
         /* Set MTC correct settings for ECAs */
         dispatch_sync(dispatch_get_main_queue(), ^{
 
@@ -459,14 +339,16 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         if([ECA_type isEqualToString:@"PDST"]){
             if(![self doPedestals]) {
                 // User stopped manually
-                start_new_run = false;
+                [aSNOPModel setNextStandardRunType:nil];
+                [aSNOPModel setNextStandardRunVersion:nil];
                 goto stop;
             }
         }
         else if([ECA_type isEqualToString:@"TSLP"]){
             if(![self doTSlopes]) {
                 // User stopped manually
-                start_new_run = false;
+                [aSNOPModel setNextStandardRunType:nil];
+                [aSNOPModel setNextStandardRunVersion:nil];
                 goto stop;
             }
         }
@@ -500,33 +382,28 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
             NSLogColor([NSColor redColor], @" Some triggers couldn't be enabled: The GUI status  \n");
             NSLogColor([NSColor redColor], @" might not show the real state of the detector      \n");
             NSLogColor([NSColor redColor], @"*************************************************** \n");
-            start_new_run = FALSE;
+            [aSNOPModel setNextStandardRunType:nil];
+            [aSNOPModel setNextStandardRunVersion:nil];
         }
 
-        //Rollover to previous run, if any. Otherwise stop run.
-        if(start_new_run){
-            dispatch_sync(dispatch_get_main_queue(), ^{
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            if( [ECAThread isCancelled] ){
+                NSLogColor([NSColor redColor], @"doECAs: releasing wait \n");
                 [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object:self];
-                [aSNOPModel startStandardRun:previousSR withVersion:previousSRVersion];
-                //Don't leak memory
-                [previousSR release];
-                [previousSRVersion release];
-                [[NSNotificationCenter defaultCenter] postNotificationName:ORECARunFinishedNotification object:self];
-                isFinished = TRUE;
-            });
-        } else{
-            dispatch_sync(dispatch_get_main_queue(), ^{
-                [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object:self];
-                if(![ECAThread isCancelled]) [aSNOPModel stopRun]; //no user intervention -> we need to stop the run
-                //Don't leak memory
-                [previousSR release];
-                [previousSRVersion release];
-                [[NSNotificationCenter defaultCenter] postNotificationName:ORECARunFinishedNotification object:self];
-                isFinished = TRUE;
-            });
-        }
+            }
+            else{
+                NSLogColor([NSColor redColor], @"doECAs: stopping run \n");
+                [aSNOPModel stopRun]; //no user intervention -> we need to stop the run
+            }
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORECARunFinishedNotification object:self];
+            isFinished = TRUE;
+        });
+        //                [previousSR release];
+        //                [previousSRVersion release];
 
         [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORECAStatusChangedNotification object: self userInfo: nil];
+
+        NSLogColor([NSColor redColor], @"doECAs: DONE! \n");
 
     }//end autoreleasepool
 

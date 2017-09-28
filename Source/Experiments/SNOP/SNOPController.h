@@ -127,9 +127,6 @@
     IBOutlet NSTextField *TSlopePatternTextField;
     IBOutlet NSTextField *ecaNEventsTextField;
     IBOutlet NSTextField *ecaPulserRate;
-    IBOutlet NSButton *startSingleECAButton;
-    IBOutlet NSButton *startECACampaignButton;
-    IBOutlet NSMatrix *ecaModeButton;
     IBOutlet NSMatrix *ecaStatusMatrix;
 
 
