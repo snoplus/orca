@@ -814,17 +814,21 @@ tellieRunFiles = _tellieRunFiles;
 
     switch (state) {
     case STOPPED:
+        NSLogColor([NSColor redColor], @"runInitialization: COLD_START.\n");
         startMode = COLD_START;
         break;
     case RUNNING:
         if (rolloverRun) {
+            NSLogColor([NSColor redColor], @"runInitialization: ROLLOVER_START.\n");
             startMode = ROLLOVER_START;
             rolloverRun = NO;
         } else {
+            NSLogColor([NSColor redColor], @"runInitialization: CONTINUOUS_START.\n");
             startMode = CONTINUOUS_START;
         }
         break;
     default:
+        NSLogColor([NSColor redColor], @"runInitialization: COLD_START.\n");
         startMode = COLD_START;
     }
 
