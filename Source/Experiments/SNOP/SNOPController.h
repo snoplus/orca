@@ -128,7 +128,11 @@
     IBOutlet NSTextField *ecaNEventsTextField;
     IBOutlet NSTextField *ecaPulserRate;
     IBOutlet NSButton *startSingleECAButton;
-    
+    IBOutlet NSButton *startECACampaignButton;
+    IBOutlet NSMatrix *ecaModeButton;
+    IBOutlet NSMatrix *ecaStatusMatrix;
+
+
     //Server settings
     IBOutlet NSComboBox *orcaDBIPAddressPU;
     IBOutlet NSComboBox *debugDBIPAddressPU;

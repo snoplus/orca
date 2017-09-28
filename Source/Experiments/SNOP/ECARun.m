@@ -13,16 +13,35 @@
 #import "ORFec32Model.h"
 #import "ECAPatterns.h"
 #import "ORMTC_Constants.h"
+#import "RunTypeWordBits.hh"
 
 //Notifications
+NSString* ORECAStatusChangedNotification = @"ORECAStatusChangedNotification";
 NSString* ORECARunChangedNotification = @"ORECARunChangedNotification";
 NSString* ORECARunStartedNotification = @"ORECARunStartedNotification";
 NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 
-//Definitions
+/* This flag must be enabled for commissioning 
+ * and normal detector running. Disable it only 
+ * for testing. */
+#define __COMMISSIONING__ 1
+
+/* Definitions */
+// Defaults
 #define ECA_COARSE_DELAY 150 //ns
 #define ECA_FINE_DELAY 0 //ps
 #define ECA_PEDESTAL_WIDTH 50 //ns
+
+//ECA Campaign
+#define ECA_PDST_TYPE @"PDST"
+#define ECA_PDST_RATE 10
+#define ECA_PDST_PATTERN 4
+#define ECA_PDST_NEVENTS 14
+#define ECA_TSLP_TYPE @"TSLP"
+#define ECA_TSLP_RATE 200
+#define ECA_TSLP_PATTERN 4
+#define ECA_TSLP_NEVENTS 11
+
 
 @implementation ECARun
 
@@ -30,8 +49,10 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 {
     self = [super init];
     ECAThread = [[NSThread alloc] init]; //Init empty
+    eca_campaign_running = FALSE;
     start_eca_run = FALSE;
     isFinishing = FALSE;
+    isFinished = TRUE;
     [self registerNotificationObservers];
     return self;
 
@@ -49,7 +70,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
 
     [notifyCenter addObserver : self
-                     selector : @selector(setPulserRate:)
+                     selector : @selector(setECASettings:)
                          name : ORRunSecondChanceForWait
                        object : nil];
 
@@ -60,12 +81,112 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 
 }
 
+- (void) startCampaign
+{
+
+    NSThread *ECACampaignThread = [[NSThread alloc] initWithTarget:self selector:@selector(startCampaignThread) object:nil];
+    [ECACampaignThread start];
+    [ECACampaignThread autorelease];
+
+}
+
+- (void) startCampaignThread
+{
+
+    @autoreleasepool {
+
+        /*
+         This will take both, a pedestal run and a Time slope run
+         in Supernova-live mode i.e. *with phyiscs triggers enabled*.
+         This is only permitted for the channel-by-channel pattern to
+         not fry the CTCs.
+         */
+
+        //Get SNO+ model
+        NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+        if ([objs count]) {
+            aSNOPModel = [objs objectAtIndex:0];
+        } else {
+            NSLogColor([NSColor redColor], @"ECARun: couldn't find SNO+ model. \n");
+            return;
+        }
+
+        //Store previous runs to rollover at the end
+        previousSR_campaign = [[aSNOPModel lastStandardRunType] copy];
+        previousSRVersion_campaign = [[aSNOPModel lastStandardRunVersion] copy];
+        start_new_run_campaign = [gOrcaGlobals runRunning];
+
+        //Pedestal run
+        eca_campaign_running = TRUE;
+        [self setECA_mode:ECAMODE_SUPERNOVA];
+        [self setECA_type:ECA_PDST_TYPE];
+        [self setECA_rate:[NSNumber numberWithInt:ECA_PDST_RATE]];
+        [self setECA_pattern:ECA_PDST_PATTERN];
+        [self setECA_nevents:ECA_PDST_NEVENTS];
+
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [self start];
+        });
+
+        //Wait until finished
+        while ([ECAThread isExecuting] || ![self isFinished]) {
+            usleep(1e4);
+        }
+        if(![ECAThread isExecuting] && [ECAThread isCancelled] && [self isFinished]){
+            [previousSR_campaign release];
+            [previousSRVersion_campaign release];
+            eca_campaign_running = FALSE;
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORECAStatusChangedNotification object: self userInfo: nil];
+            return;
+        }
+
+        //Time Slope run
+        [self setECA_mode:ECAMODE_SUPERNOVA];
+        [self setECA_type:ECA_TSLP_TYPE];
+        [self setECA_rate:[NSNumber numberWithInt:ECA_TSLP_RATE]];
+        [self setECA_pattern:ECA_TSLP_PATTERN];
+        [self setECA_nevents:ECA_TSLP_NEVENTS];
+
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [self start];
+        });
+
+        //Wait until finished
+        while ([ECAThread isExecuting] || ![self isFinished]) {
+            usleep(1e4);
+        }
+        if(![ECAThread isExecuting] && [ECAThread isCancelled] && [self isFinished]){
+            [previousSR_campaign release];
+            [previousSRVersion_campaign release];
+            eca_campaign_running = FALSE;
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORECAStatusChangedNotification object: self userInfo: nil];
+            return;
+        }
+
+        //Rollover to previous run, if any.
+        if(start_new_run_campaign){
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                [aSNOPModel setResync:YES];
+                [aSNOPModel startStandardRun:previousSR_campaign withVersion:previousSRVersion_campaign];
+            });
+        }
+        
+        //Don't leak memory
+        [previousSR_campaign release];
+        [previousSRVersion_campaign release];
+        eca_campaign_running = FALSE;
+
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORECAStatusChangedNotification object: self userInfo: nil];
+
+    }
+
+}
 
 - (void) start
 {
     if([ECAThread isExecuting]){
         //Do nothing
-        NSLogColor([NSColor redColor], @"ECA Run already ongoing!");
+        NSLogColor([NSColor redColor], @"ECA Run already ongoing!\n");
     }
     else{
 
@@ -78,28 +199,60 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
             return;
         }
 
+        objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+        if ([objs count]) {
+            anMTCModel = [objs objectAtIndex:0];
+        } else {
+            NSLogColor([NSColor redColor], @"ECARun: couldn't find MTC model. \n");
+            return;
+        }
+
         //Store previous runs to rollover at the end
         previousSR = [[aSNOPModel lastStandardRunType] copy];
         previousSRVersion = [[aSNOPModel lastStandardRunVersion] copy];
-        start_new_run = [gOrcaGlobals runRunning];
+        prev_gtmask = [anMTCModel GTCrateMask];
+        prev_pedmask = [anMTCModel pedCrateMask];
+        start_new_run = [gOrcaGlobals runRunning] && !eca_campaign_running;
 
         //Set ECA Standard Run and start run:
         /* This needs to be outside the new thread since it will
          stop/start a new run, which would cancel the thread and
          exit after the first step... */
-        [aSNOPModel startStandardRun:@"ECA" withVersion:ECA_type];
+        BOOL runstarted = FALSE;
+        switch (ECA_mode){
+            case ECAMODE_DEDICATED:
+                [aSNOPModel setResync:YES];
+                runstarted = [aSNOPModel startStandardRun:@"ECA" withVersion:@"DEFAULT"];
+                break;
+            case ECAMODE_SUPERNOVA:
+                [aSNOPModel setResync:YES];
+                runstarted = [aSNOPModel startStandardRun:@"SUPERNOVA" withVersion:@"DEFAULT"];
+                break;
+            case ECAMODE_PHYSICS:
+                [aSNOPModel setResync:YES];
+                runstarted = [aSNOPModel startStandardRun:@"PHYSICS" withVersion:@"DEFAULT"];
+                break;
+        }
+
+        //Don't leak memory
+        if(!runstarted){
+            [previousSR release];
+            [previousSRVersion release];
+        }
 
         /* Enable the action of method 'launchECAThread' which
          is called when the run is about to start. This is done
-         is this way since we need to ensure that the ECAThread
+         in this way since we need to ensure that the ECAThread
          is launched AFTER run stop, to not cancel the Thread. */
         start_eca_run = TRUE;
+        isFinished = FALSE;
 
     }
 }
 
 - (void) stop
 {
+
     /*User intervention to stop the ECA run */
 
     //Hold the current run until the ECAs are done
@@ -116,6 +269,11 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 
 }
 
+- (BOOL) isCampaignRunning
+{
+    return eca_campaign_running;
+}
+
 - (BOOL) isExecuting
 {
     return [ECAThread isExecuting];
@@ -123,7 +281,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 
 - (BOOL) isFinished
 {
-    return [ECAThread isFinished];
+    return isFinished;
 }
 
 - (BOOL) isFinishing
@@ -131,20 +289,50 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
     return isFinishing;
 }
 
-- (void) setPulserRate:(NSNotification*)aNote
+- (void) setECASettings:(NSNotification*)aNote
 {
 
     if(start_eca_run){
 
-        /* If we starting an ECA run we have to set the pulser
-         rate enter by the operator, not the standard run one*/
-        //MTC model
+        /* Set pulser rate:
+         * If we starting an ECA run we have to set the pulser
+         * rate enter by the operator, not the standard run one */
         NSArray *objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-        if ([objs count]) {
+        if ([objs count])
+        {
             anMTCModel = [objs objectAtIndex:0];
-            [anMTCModel setPgtRate:[[self ECA_rate] floatValue]]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
-            [anMTCModel loadPulserRateToHardware]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
+            [anMTCModel setPgtRate:[[self ECA_rate] floatValue]];
+#ifdef __COMMISSIONING__
+            [anMTCModel loadPulserRateToHardware];
+#endif
         }
+
+        /* Enable Pedestals */
+        [anMTCModel setIsPedestalEnabledInCSR:TRUE];
+
+        /* Enable Pedestal and GT crate mask for all the crates */
+        [anMTCModel setGTCrateMask: (prev_gtmask | 0x7FFFF) ];
+        [anMTCModel setPedCrateMask: (prev_pedmask | 0x7FFFF) ];
+#ifdef __COMMISSIONING__
+        [anMTCModel loadGTCrateMaskToHardware];
+        [anMTCModel loadPedestalCrateMaskToHardware];
+#endif
+
+        /* Set the required ECA bits in the run type word */
+        objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+        if ([objs count]) {
+            aSNOPModel = [objs objectAtIndex:0];
+            unsigned long runTypeWord = [aSNOPModel runTypeWord];
+            runTypeWord &= ~(kECAPedestalRun & kECATSlopeRun); //Unset ECA bits
+            if ([ECA_type isEqualTo:@"PDST"]) {
+                runTypeWord |= kECAPedestalRun;
+            }
+            else if ([ECA_type isEqualTo:@"TSLP"]) {
+                runTypeWord |= kECATSlopeRun;
+            }
+            [aSNOPModel setRunTypeWord:runTypeWord];
+        }
+
     }
 
 }
@@ -171,6 +359,8 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 {
     @autoreleasepool {
 
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORECAStatusChangedNotification object: self userInfo: nil];
+
         /* Get models */
         //MTC model
         NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
@@ -195,9 +385,27 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
             goto stop;
         }
 
-        /* Disable channel triggers and stop if it fails */
-        if(![self triggersOFF]){
+        /*Check whether PED EXT bit is enabled. Otherwise the GT will latch the 10MHz
+         clock and cause a 20ns uncertainty in the TAC measurements*/
+        if(!([anMTCModel gtMask] & MTC_EXT_8_MASK)){
+            NSLogColor([NSColor redColor], @" Enable EXT PED bit in the MTC trigger mask. Stopping ECAs... \n");
             goto stop;
+        }
+
+        if(ECA_mode != ECAMODE_DEDICATED){
+            /* Do not allow to run with triggers ON with
+             a pattern other than channel by channel! */
+            if(ECA_pattern != 4){
+                NSLogColor([NSColor redColor], @"You are not allowed to run ECA with "
+                           "physics triggers enabled for high occupancy patterns!\n");
+                goto stop;
+            }
+        }
+        else{
+            /* Disable channel triggers and stop if it fails */
+            if(![self triggersOFF]){
+                goto stop;
+            }
         }
 
         /* Get previous settings */
@@ -207,35 +415,38 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 
         /* Set MTC correct settings for ECAs */
         dispatch_sync(dispatch_get_main_queue(), ^{
+
             [anMTCModel stopMTCPedestalsFixedRate];
-            [anMTCModel setCoarseDelay:ECA_COARSE_DELAY]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
-            [anMTCModel loadCoarseDelayToHardware]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
-            [anMTCModel setFineDelay:ECA_FINE_DELAY]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
-            [anMTCModel loadFineDelayToHardware]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
-            [anMTCModel setPedestalWidth:ECA_PEDESTAL_WIDTH]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
-            [anMTCModel loadPedWidthToHardware]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
+            [anMTCModel setCoarseDelay:ECA_COARSE_DELAY];
+            [anMTCModel setFineDelay:ECA_FINE_DELAY];
+            [anMTCModel setPedestalWidth:ECA_PEDESTAL_WIDTH];
+#ifdef __COMMISSIONING__
+            [anMTCModel loadCoarseDelayToHardware];
+            [anMTCModel loadFineDelayToHardware];
+            [anMTCModel loadPedWidthToHardware];
+#endif
         });
 
         NSLog(@"************************* \n");
         NSLog(@"Starting ECA Run \n");
+        switch (ECA_mode){
+            case ECAMODE_DEDICATED: NSLog(@"Dedicated Run \n"); break;
+            case ECAMODE_SUPERNOVA: NSLog(@"Supernova-Live \n"); break;
+            case ECAMODE_PHYSICS: NSLog(@"Physics-Live \n"); break;
+        }
         NSLog(@"------------------------- \n");
         NSLog(@" Events per cell: %d \n", ECA_nevents);
-        NSLog(@" Pattern: %d \n", ECA_pattern);
+        NSLog(@" Pattern: %@ \n", getECAPatternName(ECA_pattern) );
         NSLog(@" TSlope: %d \n", ECA_tslope_pattern);
         NSLog(@" Type: %@ \n", ECA_type);
         NSLog(@" Rate: %@ \n", ECA_rate);
         NSLog(@" SubRun Time: %f seconds \n", [self ECA_subruntime]);
         NSLog(@"************************* \n");
 
+        [self setECA_currentDelay:(double)ECA_COARSE_DELAY+(double)ECA_FINE_DELAY/100.];
+
         //Do ECAs
         if([ECA_type isEqualToString:@"PDST"]){
-            /*Check whether PED EXT bit is enabled. Otherwise the GT will latch the 10MHz
-             clock and cause a 20ns uncertainty in the TAC measurements*/
-            if(([anMTCModel gtMask] & MTC_EXT_8_MASK) || !([anMTCModel gtMask] & MTC_PULSE_GT_MASK)){
-                NSLogColor([NSColor redColor], @" Enable PGT and disable EXT PED bit in the MTC trigger mask. Stopping ECAs... \n");
-                goto stop;
-            }
-
             if(![self doPedestals]) {
                 // User stopped manually
                 start_new_run = false;
@@ -243,14 +454,6 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
             }
         }
         else if([ECA_type isEqualToString:@"TSLP"]){
-
-            /*Check whether PED EXT bit is enabled. Otherwise the GT will latch the 10MHz
-             clock and cause a 20ns uncertainty in the TAC measurements*/
-            if(!([anMTCModel gtMask] & MTC_EXT_8_MASK)){
-                NSLogColor([NSColor redColor], @" Enable EXT PED bit in the MTC trigger mask. Stopping ECAs... \n");
-                goto stop;
-            }
-
             if(![self doTSlopes]) {
                 // User stopped manually
                 start_new_run = false;
@@ -269,19 +472,20 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         NSLog(@"Finishing ECA Run \n");
         NSLog(@"************************* \n");
 
-        //Unset settings
+        //Recover previous settings
         dispatch_sync(dispatch_get_main_queue(), ^{
             [aSNOPModel zeroPedestalMasks];
-            [anMTCModel setCoarseDelay:prev_coarsedelay]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
-            [anMTCModel loadCoarseDelayToHardware]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
-            [anMTCModel setFineDelay:prev_finedelay]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
-            [anMTCModel loadFineDelayToHardware]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
-            [anMTCModel setPedestalWidth:prev_pedwidth]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
-            [anMTCModel loadPedWidthToHardware]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
+            [anMTCModel setPedestalWidth:prev_pedwidth];
+            [anMTCModel setGTCrateMask:prev_gtmask];
+            [anMTCModel setPedCrateMask:prev_pedmask];
+            [anMTCModel setCoarseDelay:prev_coarsedelay];
+            [anMTCModel setFineDelay:prev_finedelay];
         });
 
-        //Turn triggers back ON
-        if(![self triggersON]){
+        //Turn triggers back ON if not in physics
+        if(ECA_mode == ECAMODE_PHYSICS){
+            // Don't need to turn ON triggers
+        } else if(![self triggersON]){
             NSLogColor([NSColor redColor], @"*************************************************** \n");
             NSLogColor([NSColor redColor], @" Some triggers couldn't be enabled: The GUI status  \n");
             NSLogColor([NSColor redColor], @" might not show the real state of the detector      \n");
@@ -293,22 +497,27 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         if(start_new_run){
             dispatch_sync(dispatch_get_main_queue(), ^{
                 [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object:self];
+                [aSNOPModel setResync:YES];
                 [aSNOPModel startStandardRun:previousSR withVersion:previousSRVersion];
-                [[NSNotificationCenter defaultCenter] postNotificationName:ORECARunFinishedNotification object:self];
                 //Don't leak memory
                 [previousSR release];
                 [previousSRVersion release];
+                [[NSNotificationCenter defaultCenter] postNotificationName:ORECARunFinishedNotification object:self];
+                isFinished = TRUE;
             });
         } else{
             dispatch_sync(dispatch_get_main_queue(), ^{
                 [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object:self];
                 if(![ECAThread isCancelled]) [aSNOPModel stopRun]; //no user intervention -> we need to stop the run
-                [[NSNotificationCenter defaultCenter] postNotificationName:ORECARunFinishedNotification object:self];
                 //Don't leak memory
                 [previousSR release];
                 [previousSRVersion release];
+                [[NSNotificationCenter defaultCenter] postNotificationName:ORECARunFinishedNotification object:self];
+                isFinished = TRUE;
             });
         }
+
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORECAStatusChangedNotification object: self userInfo: nil];
 
     }//end autoreleasepool
 
@@ -341,9 +550,16 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 
     for (int step=0; step < eca_pattern_num_steps; step++) {
 
-        NSLog(@"************************* \n");
-        NSLog(@"ECA Pedestals: STEP %d/%d \n",step+1,eca_pattern_num_steps);
-        NSLog(@"************************* \n");
+        [self setECA_currentStep:step+1];
+
+        // Set channel triggers OFF only for pedestaled channels
+        if(ECA_mode == ECAMODE_SUPERNOVA){
+            if(![self loadTriggersWithCrateMask:[pedestal_mask objectAtIndex:step]]){
+                [pedestal_mask release];
+                return false;
+            }
+        }
+
         //Update Pedestal mask
         [self changePedestalMask:[pedestal_mask objectAtIndex:step]];
 
@@ -383,6 +599,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 
 - (BOOL) doTSlopes
 {
+
     NSLog(@"Starting ECA TSlope Run... \n");
 
     unsigned long coarse_delay = [anMTCModel coarseDelay];
@@ -390,7 +607,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
     unsigned long pedestal_width = [anMTCModel pedestalWidth];
 
     //Get time delays
-    const int tslope_nsteps = 50; //Hardcoded to 50 for the time being
+    const int tslope_nsteps = 50; //CHANGE TO 50 BEFORE COMMISSIONING
     NSMutableArray *tslope_delays_coarse = [[[NSMutableArray alloc] initWithCapacity:tslope_nsteps] autorelease];
     NSMutableArray *tslope_delays_fine = [[[NSMutableArray alloc] initWithCapacity:tslope_nsteps] autorelease];
     for (int ipoint=0; ipoint<tslope_nsteps; ipoint++) {
@@ -417,6 +634,16 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
     @try{
         for (int step=0; step < eca_pattern_num_steps; step++) {
 
+            [self setECA_currentStep:step+1];
+
+            // Set channel triggers OFF only for pedestaled channels
+            if(ECA_mode == ECAMODE_SUPERNOVA){
+                if(![self loadTriggersWithCrateMask:[pedestal_mask objectAtIndex:step]]){
+                    [pedestal_mask release];
+                    return false;
+                }
+            }
+
             //Update Pedestal mask
             [self changePedestalMask:[pedestal_mask objectAtIndex:step]];
 
@@ -426,19 +653,19 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 
                 unsigned long current_coarse_delay = [[tslope_delays_coarse objectAtIndex:ipoint] unsignedLongValue];
                 unsigned long current_fine_delay = [[tslope_delays_fine objectAtIndex:ipoint] unsignedLongValue];
-                NSLog(@"************************* \n");
-                NSLog(@"ECA TSlope: STEP %d/%d - Point %d/%d \n",step+1,eca_pattern_num_steps, ipoint+1,tslope_nsteps);
-                NSLog(@"------------------------- \n");
-                NSLog(@" Coarse delay: %d\n",current_coarse_delay);
-                NSLog(@" Fine delay: %d\n",current_fine_delay);
-                NSLog(@"************************* \n");
+
+                [self setECA_currentPoint:ipoint+1];
 
                 dispatch_sync(dispatch_get_main_queue(), ^{
-                    [anMTCModel setCoarseDelay:current_coarse_delay]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
-                    [anMTCModel loadCoarseDelayToHardware]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
-                    [anMTCModel setFineDelay:current_fine_delay]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
-                    [anMTCModel loadFineDelayToHardware]; //UNCOMMENT THIS LINE BEFORE COMMISSIONING
+                    [anMTCModel setCoarseDelay:current_coarse_delay];
+                    [anMTCModel setFineDelay:current_fine_delay];
+#ifdef __COMMISSIONING__
+                    [anMTCModel loadCoarseDelayToHardware];
+                    [anMTCModel loadFineDelayToHardware];
+#endif
                 });
+
+                [self setECA_currentDelay:(double)current_coarse_delay+(double)current_fine_delay/100.];
 
                 [aSNOPModel updateEPEDStructWithCoarseDelay:current_coarse_delay fineDelay:current_fine_delay chargePulseAmp:0x0 pedestalWidth:pedestal_width calType:20 + (ECA_pattern+1)];
 
@@ -483,7 +710,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 
 }
 
-- (void) changePedestalMask:(NSMutableArray*)pedestal_mask
+- (void) changePedestalMask:(NSMutableArray*)aPedestal_mask
 {
 
     //Set pedestal mask in FEC: this does not load it yet
@@ -491,7 +718,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         int crate_number = [fec crateNumber];
         if(crate_number == 19) crate_number = 0; //hack for the teststand
         int card_number = [fec stationNumber];
-        int mask = [[[pedestal_mask objectAtIndex:crate_number] objectAtIndex:card_number] intValue];
+        int mask = [[[aPedestal_mask objectAtIndex:crate_number] objectAtIndex:card_number] intValue];
         //NSLog(@"PEDESTAL MASK: %d, %d, %x \n",crate_number,card_number,mask);
         dispatch_async(dispatch_get_main_queue(), ^{
             [fec setPedEnabledMask:mask];
@@ -521,25 +748,58 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 
 }
 
-- (BOOL) triggersOFF
+- (BOOL) loadTriggersWithCrateMask:(NSMutableArray*)aPedestal_mask
 {
-    BOOL triggersSetOK = TRUE;
+    /* Disable triggers for the channels with pedestal enabled
+     * Disable triggers for channels 17 and 18 by default. */
 
+    //Deep copy the array so that we don't modify the original
+    NSMutableArray *used_pedestal_mask = [[NSMutableArray alloc] initWithCapacity:[aPedestal_mask count]];
+    for (id element in aPedestal_mask){
+        [used_pedestal_mask addObject:[element mutableCopy]];
+    }
+
+    BOOL triggersSetOK = TRUE;
     for (ORXL3Model *xl3 in anXL3Model) {
+        int crate = [xl3 crateNumber];
+        if(crate == 19) crate = 0; //hack for the teststand
         if([[xl3 xl3Link] isConnected]){
             @try {
-                [xl3 disableTriggers];
+                //Enable bits 17 and 18
+                for (int islot=0; islot<16; islot++){
+                    NSNumber *temp = [[used_pedestal_mask objectAtIndex:crate] objectAtIndex:islot];
+                    temp = [NSNumber numberWithUnsignedInt:[temp unsignedIntValue] | 1<<17];
+                    temp = [NSNumber numberWithUnsignedInt:[temp unsignedIntValue] | 1<<18];
+                    temp = [NSNumber numberWithUnsignedInt:~[temp unsignedIntValue]];
+                    [[used_pedestal_mask objectAtIndex:crate] replaceObjectAtIndex:islot withObject:temp];
+                }
+                [xl3 loadTriggersWithCrateMask:[used_pedestal_mask objectAtIndex:crate]];
             }
             @catch (NSException *exception) {
-                NSLogColor([NSColor redColor], @"ECA: triggers could not be disabled for crate %d \n",[xl3 crateNumber]);
+                NSLogColor([NSColor redColor], @"ECA: triggers could not be disabled for crate %d \n",crate);
                 triggersSetOK = FALSE;
             }
         }
         else{
-            NSLog(@"ECA: triggers could not be disabled for crate %d because XL3 is not connected\n",[xl3 crateNumber]);
+            NSLog(@"ECA: triggers could not be disabled for crate %d because XL3 is not connected\n",crate);
         }
     }
+
+    [used_pedestal_mask release];
     return triggersSetOK;
+}
+
+- (BOOL) triggersOFF
+{
+    NSMutableArray *detector_mask = [NSMutableArray array];
+    for (int icrate=0; icrate<19; icrate++) {
+        NSMutableArray* crate_pattern = [NSMutableArray array];
+        for (int islot=0; islot<16; islot++) {
+            [crate_pattern addObject:[NSNumber numberWithUnsignedInt:0xFFFFFFFF]];
+        }
+        [detector_mask addObject:crate_pattern];
+    }
+    return [self loadTriggersWithCrateMask:detector_mask];
 }
 
 - (BOOL) triggersON
@@ -573,10 +833,53 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
     return ECA_pattern;
 }
 
+- (NSString*) ECA_pattern_string
+{
+    return getECAPatternName(ECA_pattern);
+}
+
 - (void) setECA_pattern:(int)aValue
 {
     ECA_pattern = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORECARunChangedNotification object:self];
+}
+
+- (int)ECA_nsteps
+{
+    return getECAPatternNSteps(ECA_pattern);
+}
+
+- (int)ECA_currentStep
+{
+    return ECA_currentStep;
+}
+
+- (void)setECA_currentStep:(int)aValue
+{
+    ECA_currentStep = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORECAStatusChangedNotification object:self];
+}
+
+- (int)ECA_currentPoint
+{
+    return ECA_currentPoint;
+}
+
+- (void)setECA_currentPoint:(int)aValue
+{
+    ECA_currentPoint = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORECAStatusChangedNotification object:self];
+}
+
+- (int)ECA_currentDelay
+{
+    return ECA_currentDelay;
+}
+
+- (void)setECA_currentDelay:(double)aValue
+{
+    ECA_currentDelay = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORECAStatusChangedNotification object:self];
 }
 
 - (NSString*)ECA_type
@@ -647,6 +950,36 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         [[NSNotificationCenter defaultCenter] postNotificationName:ORECARunChangedNotification object:self];
     }
 }
+
+-(int) ECA_mode
+{
+    return ECA_mode;
+}
+
+-(NSString*) ECA_mode_string
+{
+    switch (ECA_mode) {
+        case ECAMODE_DEDICATED:
+            return @"Dedicated Run";
+            break;
+        case ECAMODE_SUPERNOVA:
+            return @"Supernova-live";
+            break;
+        case ECAMODE_PHYSICS:
+            return @"Physics-live";
+            break;
+        default:
+            return @"Unknown";
+            break;
+    }
+}
+
+-(void) setECA_mode:(int)aValue
+{
+    ECA_mode = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORECARunChangedNotification object:self];
+}
+
 
 
 @end

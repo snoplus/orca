@@ -1875,6 +1875,22 @@ void SwapLongBlock(void* p, int32_t n)
     /* Loads the current GUI channel trigger settings to the hardware. This
      * function will block and so should only be called on a separate thread.
      * This function will raise an exception if any error occurs. */
+
+    NSMutableArray* trigger_crate_mask = [NSMutableArray array];
+    for(int islot=0;islot<16;islot++){
+        [trigger_crate_mask insertObject:@0xFFFFFFFF atIndex:islot];
+    }
+
+    [self loadTriggersWithCrateMask:trigger_crate_mask];
+    
+}
+
+- (void) loadTriggersWithCrateMask:(NSMutableArray*)aXL3Mask
+{
+    /* Loads to the hardware an AND of the current GUI channel trigger settings
+     * and a given mask. This function will block and so should only be called 
+     * on a separate thread. This function will raise an exception if any error 
+     * occurs. */
     int slot, dbNum, channel;
     char payload[XL3_PAYLOAD_SIZE];
     ORFec32Model *fec;
@@ -1914,46 +1930,11 @@ void SwapLongBlock(void* p, int32_t n)
         }
     }
 
-    /* Convert args to network byte order. */
-    args->slotMask = htonl(args->slotMask);
-
+    /* AND with given mask */
     for (slot = 0; slot < 16; slot++) {
-        args->tr100Masks[slot] = htonl(args->tr100Masks[slot]);
-        args->tr20Masks[slot] = htonl(args->tr20Masks[slot]);
-    }
-
-    [[self xl3Link] sendCommand:MULTI_SET_CRATE_TRIGGERS_ID withPayload:payload expectResponse:YES];
-
-    MultiSetCrateTriggersResults *results = (MultiSetCrateTriggersResults *) payload;
-
-    if (ntohl(results->errorMask)) {
-        NSException *e = [NSException exceptionWithName:@"loadTriggersError"
-                          reason:@"failed to load channel triggers"
-                          userInfo:nil];
-        [e raise];
-    }
-}
-
-- (void) disableTriggers
-{
-    /* Turns off all channel level triggers. This function does *not* update
-     * the GUI so once this function is called, the GUI will most likely be in
-     * an inconsistent state. This can be useful in certain situations like ECA
-     * runs where you want to disable channel triggers but then load them back
-     * at the end of the run. This function will block until the operation
-     * completes. This function will raise an exception if any error occurs. */
-    int slot;
-    char payload[XL3_PAYLOAD_SIZE];
-
-    memset(&payload, 0, sizeof(payload));
-
-    MultiSetCrateTriggersArgs *args = (MultiSetCrateTriggersArgs *) payload;
-
-    args->slotMask = [self getSlotsPresent];
-
-    for (slot = 0; slot < 16; slot++) {
-        args->tr100Masks[slot] = 0;
-        args->tr20Masks[slot] = 0;
+        unsigned int mask = [[aXL3Mask objectAtIndex:slot] unsignedIntValue];
+        args->tr100Masks[slot] &= mask;
+        args->tr20Masks[slot] &= mask;
     }
 
     /* Convert args to network byte order. */
@@ -1970,8 +1951,8 @@ void SwapLongBlock(void* p, int32_t n)
 
     if (ntohl(results->errorMask)) {
         NSException *e = [NSException exceptionWithName:@"loadTriggersError"
-                          reason:@"failed to load channel triggers"
-                          userInfo:nil];
+                                                 reason:@"failed to load channel triggers"
+                                               userInfo:nil];
         [e raise];
     }
 }

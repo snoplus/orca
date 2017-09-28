@@ -335,6 +335,7 @@ BOOL isNotRunningOrIsInMaintenance();
 -(ECARun*) anECARun;
 
 -(void) startECARunInParallel;
+-(void) startECACampaign;
 
 // Standard runs functions
 -(BOOL) refreshStandardRunsFromDB;
