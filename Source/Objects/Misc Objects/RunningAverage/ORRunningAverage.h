@@ -30,7 +30,7 @@
 @interface ORRunningAverage : NSObject
 {
     float           runningAverage;
-    unsigned long   dataCount;
+    int             dataCount;
     float           spikeValue;
     float           averageAtTimeOfSpike;
     int             windowLength;
