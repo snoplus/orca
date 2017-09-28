@@ -658,7 +658,7 @@ NSString* OROnCallListModelEdited           = @"OROnCallListMessageChanged";
                 }
              }
         }
-        NSLog(@"On Call Message: %@\n",aMessage);
+        NSLog(@"On Call Message:\n %@\n",aMessage);
         NSLog(@"Sent to %@\n",[self name]);
 
     }
