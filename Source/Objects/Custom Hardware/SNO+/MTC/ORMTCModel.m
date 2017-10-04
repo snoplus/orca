@@ -242,6 +242,9 @@ tubRegister;
         /* Setup MTCA Thresholds */
         [self loadTheMTCADacs];
 
+        /* Load the crate to channel mapping on the MTCAs from the database. */
+        [self loadMTCACrateMapping];
+
         /* Setup MTCA relays */
         [self mtcatLoadCrateMasks];
 
@@ -1952,6 +1955,13 @@ tubRegister;
 		NSLog(@"Failed to load Tub serial register\n");
 		[localException raise];
 	}
+}
+
+- (void) loadMTCACrateMapping
+{
+    /* Sends a command to the MTC server to update the crate mapping from the
+     * database. */
+    [mtc okCommand:"load_mtca_crate_mapping"];
 }
 
 - (void) mtcatResetMtcat:(unsigned char) mtcat
