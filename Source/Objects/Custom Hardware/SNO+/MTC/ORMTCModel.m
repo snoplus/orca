@@ -242,7 +242,8 @@ tubRegister;
         /* Setup MTCA Thresholds */
         [self loadTheMTCADacs];
 
-        /* Load the crate to channel mapping on the MTCAs from the database. */
+        /* Update the mapping between crates and channels on the front of the
+         * MTCA+s from the detector state database. */
         [self loadMTCACrateMapping];
 
         /* Setup MTCA relays */
