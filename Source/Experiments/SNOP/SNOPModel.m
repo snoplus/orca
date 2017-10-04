@@ -128,9 +128,6 @@ tellieRunFiles = _tellieRunFiles;
     start = COLD_START;
     resync = NO;
 
-    /* Check that not other Orca is controlling the detector, using a database lock. This will either block or quit. */
-    [self checkDatabaseLock];
-
     /* initialize our connection to the MTC server */
     mtc_server = [[RedisClient alloc] init];
 
@@ -181,8 +178,11 @@ tellieRunFiles = _tellieRunFiles;
     if ([[self dbLockConnection] isConnected]) {
         ORPQResult* result = [dbLockConnection queryString:[NSString stringWithFormat:@"select pg_try_advisory_lock(%i);", _lockDBLockID]];
         gotLock = [[result fetchRowAsType:MCPTypeDictionary row:0] valueForKey:@"pg_try_advisory_lock"];
-        NSLog(@"Obtaining lock for %@ on %@:%u/%@ ID %u. Result: %@\n",
-              _lockDBUserName, _lockDBIPAddress, _lockDBPort, _lockDBName, _lockDBLockID, gotLock);
+        NSLog(@"Obtaining lock for %@ on %@:%u/%@ ID %u\n",
+              _lockDBUserName, _lockDBIPAddress, _lockDBPort, _lockDBName, _lockDBLockID);
+        if (![gotLock boolValue]) {
+            NSLogColor([NSColor redColor], @"Unable to obtain database lock.\n");
+        }
     }
 
     return [gotLock boolValue];
@@ -227,6 +227,7 @@ tellieRunFiles = _tellieRunFiles;
     /* Respond to a press of the modal buttons. */
     if (modalAction == NSAlertFirstButtonReturn) {
         ORAppDelegate* delegate = [NSApp delegate];
+        [alert release];
         [delegate terminate:self];
     }
     else if (modalAction == NSAlertSecondButtonReturn) {
@@ -234,7 +235,11 @@ tellieRunFiles = _tellieRunFiles;
         [self checkDatabaseLock];
     }
     else if (modalAction == NSAlertThirdButtonReturn) {
+        [alert release];
         ignoreDBLock = YES;
+    }
+    else {
+        [alert release];
     }
 
     /* Clean up and proceed with loading the SNOPModel. */
@@ -400,9 +405,6 @@ tellieRunFiles = _tellieRunFiles;
     self.lockDBPort = [decoder decodeInt32ForKey:@"ORSNOPModelLockDBPort"];
     self.lockDBLockID = [decoder decodeInt32ForKey:@"ORSNOPModelLockDBLockID"];
 
-    /* Check that not other Orca is controlling the detector, using a database lock. This will either block or quit. */
-    [self checkDatabaseLock];
-
     /* Initialize ECARun object: this doesn't start the run */
     anECARun = [[ECARun alloc] init];
 
@@ -561,7 +563,7 @@ tellieRunFiles = _tellieRunFiles;
 
 - (void) awakeAfterDocumentLoaded
 {
-    /* Check that not other Orca is controlling the detector, using a database lock. This will either block or quit. */
+    /* Check that no other Orca is controlling the detector, using a database lock. This will either block or quit. */
     [self checkDatabaseLock];
 
     /* Get the standard runs from the database. */
